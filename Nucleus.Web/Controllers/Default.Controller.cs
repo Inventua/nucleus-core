@@ -90,7 +90,7 @@ namespace Nucleus.Web.Controllers
 						if (pageRoute.Type == PageRoute.PageRouteTypes.PermanentRedirect)
 						{
 							string redirectUrl = this.Url.PageLink(this.Context.Page);
-							Logger.LogTrace("Permanently redirecting request to {redirectUrl}.");
+							Logger.LogTrace("Permanently redirecting request to {0}.", redirectUrl);
 							return RedirectPermanent(redirectUrl);
 						}
 					}

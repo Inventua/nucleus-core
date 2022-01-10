@@ -61,7 +61,7 @@ namespace Nucleus.Core.Authentication
 
 			if (!String.IsNullOrEmpty(sessionId))
 			{
-				Logger.LogTrace("Reading session {0}.", sessionId);
+				Logger.LogTrace("Reading session {sessionId}.", sessionId);
 				userSession = await this.SessionManager.Get(Guid.Parse(sessionId));
 
 				if (userSession != null)
@@ -69,7 +69,7 @@ namespace Nucleus.Core.Authentication
 					// user session exists, update sliding expiration in the database, and update the cookie expiry date
 					if (!userSession.RemoteIpAddress.Equals (this.Context.Connection.RemoteIpAddress))
 					{
-						Logger.LogCritical($"User {userSession.UserId} attempted to use a session {userSession.Id} from {this.Context.Connection.RemoteIpAddress} when the original session was from {userSession.RemoteIpAddress}!");
+						Logger.LogCritical("User {UserId} attempted to use a session {SessionId} from {CurrentRemoteIpAddress} when the original session was from {OriginalRemoteIpAddress}!", userSession.UserId, userSession.Id, this.Context.Connection.RemoteIpAddress, userSession.RemoteIpAddress);
 						await this.SessionManager.Delete(userSession);
 						_ = this.SessionManager.SignOut(this.Context);
 						return AuthenticateResult.Fail("Access Denied");
@@ -79,7 +79,7 @@ namespace Nucleus.Core.Authentication
 					{
 						if (userSession.SlidingExpiry)
 						{
-							Logger.LogInformation("Session {0} is valid, updating sliding expiration.", sessionId);
+							Logger.LogInformation("Session {sessionId} is valid, updating sliding expiration.", sessionId);
 
 							userSession.ExpiryDate = DateTime.UtcNow.Add(this.Options.SlidingExpirationTimeSpan);
 							await this.SessionManager.Save(userSession);
@@ -104,7 +104,7 @@ namespace Nucleus.Core.Authentication
 				}
 				else
 				{
-					Logger.LogWarning("Invalid session Id {0} sent from {1}.", sessionId, this.Context.Connection.RemoteIpAddress);
+					Logger.LogWarning("Invalid session Id {sessionId} sent from {remoteIpAddress}.", sessionId, this.Context.Connection.RemoteIpAddress);
 				}
 			}
 			else
@@ -121,21 +121,21 @@ namespace Nucleus.Core.Authentication
 
 				if (user == null)
 				{
-					Logger.LogWarning("Session Id {0} for user Id {1} was not found in the database.", sessionId, userSession.UserId);
+					Logger.LogWarning("Session Id {sessionId} for user Id {userId} was not found in the database.", sessionId, userSession.UserId);
 					return AuthenticateResult.Fail("Access Denied");
 				}
 				else
 				{
-					Logger.LogTrace("User Id {0} was found for session Id {1}: Adding Claims.", userSession.UserId, sessionId);
+					Logger.LogTrace("User Id {userId} was found for session Id {sessionId}: Adding Claims.", userSession.UserId, sessionId);
 
-					Logger.LogTrace("User Id {0} Adding Claim {1} {2}.", userSession.UserId, ClaimTypes.Name, user.UserName);
+					Logger.LogTrace("User Id {userId} Adding Claim {claimType} {userName}.", userSession.UserId, ClaimTypes.Name, user.UserName);
 					claims.Add(new Claim(ClaimTypes.Name, user.UserName));
-					Logger.LogTrace("User Id {0} Adding Claim {1} {2}.", userSession.UserId, ClaimTypes.NameIdentifier, user.Id.ToString());
+					Logger.LogTrace("User Id {userId} Adding Claim {claimType} {userId}.", userSession.UserId, ClaimTypes.NameIdentifier, user.Id.ToString());
 					claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
 
 					if (user.IsSystemAdministrator)
 					{
-						Logger.LogTrace("User Id {0} Adding Claim {1}.", userSession.UserId, Nucleus.Abstractions.Authentication.Constants.SYSADMIN_CLAIMTYPE);
+						Logger.LogTrace("User Id {userId} Adding Claim {claimType}.", userSession.UserId, Nucleus.Abstractions.Authentication.Constants.SYSADMIN_CLAIMTYPE);
 						claims.Add(new Claim(Nucleus.Abstractions.Authentication.Constants.SYSADMIN_CLAIMTYPE, ""));
 					}
 
@@ -143,7 +143,7 @@ namespace Nucleus.Core.Authentication
 					{
 						foreach (Role role in user.Roles)
 						{
-							Logger.LogTrace("User Id {0} Adding Claim {1} {2}.", userSession.UserId, ClaimTypes.Role, role.Name);
+							Logger.LogTrace("User Id {userId} Adding Claim {claimType} {roleName}.", userSession.UserId, ClaimTypes.Role, role.Name);
 							claims.Add(new Claim(ClaimTypes.Role, role.Name));
 						}
 					}
@@ -152,7 +152,7 @@ namespace Nucleus.Core.Authentication
 					{
 						if (!String.IsNullOrWhiteSpace(profileValue.Value) && !String.IsNullOrEmpty(profileValue?.UserProfileProperty.TypeUri) )
 						{
-							Logger.LogTrace("User Id {0} Adding Claim {1} {2}.", userSession.UserId,profileValue.UserProfileProperty.TypeUri, profileValue.Value);
+							Logger.LogTrace("User Id {userId} Adding Claim {claimType} {claimValue}.", userSession.UserId, profileValue.UserProfileProperty.TypeUri, profileValue.Value);
 							claims.Add(new Claim(profileValue.UserProfileProperty.TypeUri, profileValue.Value));
 						}
 					}
@@ -164,7 +164,7 @@ namespace Nucleus.Core.Authentication
 			{
 				Logger.LogTrace("Anonymous user");
 				// Anonymous user.  Set a claim for Role=Anonymous Users				
-				Logger.LogTrace("Adding Claim {0}.", ClaimTypes.Anonymous);
+				Logger.LogTrace("Adding Claim {claimType}.", ClaimTypes.Anonymous);
 				claims.Add(new Claim(ClaimTypes.Anonymous, ""));
 
 				// This overload creates an identity with IsAuthenticated=false, which is what we want for unauthenticated users
@@ -210,8 +210,8 @@ namespace Nucleus.Core.Authentication
 					}
 					else
 					{
-						string redirectUrl = loginPageRoute.Path + $"?returnUrl={System.Uri.EscapeUriString(this.Context.Request.Path)}";
-						Logger.LogTrace("Challenge: Redirecting to site login page {0}", redirectUrl);
+						string redirectUrl = loginPageRoute.Path + $"?returnUrl={System.Uri.EscapeDataString(this.Context.Request.Path)}";
+						Logger.LogTrace("Challenge: Redirecting to site login page {redirectUrl}", redirectUrl);
 						this.Context.Response.Redirect(redirectUrl);
 					}
 				}
@@ -236,7 +236,7 @@ namespace Nucleus.Core.Authentication
 			routeDictionary.Add("action", "Index");
 
 			string redirectUrl = this.LinkGenerator.GetPathByRouteValues("Admin", routeDictionary, this.Context.Request.PathBase, FragmentString.Empty, null);
-			Logger.LogTrace("Challenge: Redirecting to default login page {0}", redirectUrl);
+			Logger.LogTrace("Challenge: Redirecting to default login page {redirectUrl}", redirectUrl);
 			this.Context.Response.Redirect(redirectUrl);
 		}
 
@@ -266,7 +266,7 @@ namespace Nucleus.Core.Authentication
 		/// <returns></returns>
 		protected override Task HandleSignInAsync(ClaimsPrincipal user, AuthenticationProperties properties)
 		{
-			Logger.LogTrace("Logging in {0}.", user.Identity.Name);
+			Logger.LogTrace("Logging in {name}.", user.Identity.Name);
 			AppendCookie(user.FindFirstValue(Nucleus.Abstractions.Authentication.Constants.SESSION_ID_CLAIMTYPE), properties);
 			return Task.CompletedTask;
 		}
@@ -282,7 +282,7 @@ namespace Nucleus.Core.Authentication
 
 			if (!String.IsNullOrEmpty(sessionId))
 			{
-				Logger.LogTrace("Logging out: Removing session {0}.", sessionId);
+				Logger.LogTrace("Logging out: Removing session {sessionId}.", sessionId);
 
 				UserSession userSession = await this.SessionManager.Get(Guid.Parse(sessionId));
 

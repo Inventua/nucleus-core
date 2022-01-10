@@ -59,7 +59,7 @@ namespace Nucleus.Core.EventHandlers
 								{ "User", user }
 							};
 
-							Logger.LogTrace("Sending Welcome email {0} to user {1}.", template.Name, user.Id);
+							Logger.LogTrace("Sending Welcome email {emailTemplateName} to user {userid}.", template.Name, user.Id);
 
 							using (IMailClient mailClient = this.MailClientFactory.Create())
 							{
@@ -69,12 +69,12 @@ namespace Nucleus.Core.EventHandlers
 					}
 					else
 					{
-						Logger.LogTrace("Not sending Welcome email to user {0} because no welcome email is configured for site {1}.", user.Id, this.Context.Site.Id);
+						Logger.LogTrace("Not sending Welcome email to user {userid} because no welcome email is configured for site {siteId}.", user.Id, this.Context.Site.Id);
 					}
 				}
 				else
 				{
-					Logger.LogTrace("Not sending Welcome email to user {0} because the user does not have an email address set.", user.Id, this.Context.Site.Id);
+					Logger.LogTrace("Not sending Welcome email to user {userid} because the user does not have an email address set.", user.Id);
 				}
 
 			}

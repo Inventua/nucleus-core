@@ -189,7 +189,7 @@ namespace Nucleus.Extensions
 			System.IO.MemoryStream msOut = new();
 
 			// Create the ICryptoTransform instance.
-			System.Security.Cryptography.AesManaged aes = new();
+			System.Security.Cryptography.Aes aes = System.Security.Cryptography.Aes.Create();
 			aes.Key = site.Id.ToByteArray();
 			aes.IV = site.Id.ToByteArray();
 

@@ -117,6 +117,7 @@ namespace Nucleus.Web
 			services.Logger().LogInformation("");
 
 			services.AddHttpContextAccessor();  // required by many elements of the system
+			services.AddHttpClient();
 
 			IMvcBuilder builder = services.AddControllersWithViews();
 
@@ -155,7 +156,9 @@ namespace Nucleus.Web
 			}
 
 			builder.AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver());
-			builder.SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Latest);
+
+			// SetCompatibilityVersion is obsolete in .NET 6
+			//builder.SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Latest);
 
 			// Read HostOptions settings from config
 			services.Configure<HostOptions>(Configuration.GetSection("HostOptions"));

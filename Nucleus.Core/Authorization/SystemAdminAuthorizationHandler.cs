@@ -15,12 +15,12 @@ namespace Nucleus.Core.Authorization
 	{
 		
 
-		private Nucleus.Abstractions.Models.Context CurrentContext { get; }
+		//private Nucleus.Abstractions.Models.Context CurrentContext { get; }
 		private ILogger<SystemAdminAuthorizationHandler> Logger { get; }
 
-		public SystemAdminAuthorizationHandler(Nucleus.Abstractions.Models.Context context, ILogger<SystemAdminAuthorizationHandler> logger)
+		public SystemAdminAuthorizationHandler(ILogger<SystemAdminAuthorizationHandler> logger)
 		{
-			this.CurrentContext = context;
+			//this.CurrentContext = context;
 			this.Logger = logger;
 		}
 
@@ -34,13 +34,13 @@ namespace Nucleus.Core.Authorization
 		{			
 			if (context.User.IsSystemAdministrator())
 			{
-				Logger.LogTrace("User {0}: System Administrator access granted.");
+				Logger.LogTrace("User {userid}: System Administrator access granted.", context.User.GetUserId());
 				context.Succeed(requirement);
 			}
 
 			if (!context.HasSucceeded)
 			{
-				Logger.LogTrace("User {0}: System Administrator access denied.");
+				Logger.LogTrace("User {userid}: System Administrator access denied.", context.User.GetUserId());
 				context.Fail();
 			}
 			

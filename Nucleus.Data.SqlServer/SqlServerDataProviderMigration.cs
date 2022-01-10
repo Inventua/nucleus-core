@@ -46,18 +46,18 @@ namespace Nucleus.Data.SqlServer
 			switch (type)
 			{
 				case DatabaseObjectTypes.Table:
-					command.CommandText = "SELECT COUNT(*) FROM sys.tables WHERE name=@tableName";
+					command.CommandText = "SELECT COUNT(*) FROM sys.tables WHERE name=@objectName";
 					break;
 
 				case DatabaseObjectTypes.Index:
-					command.CommandText = "SELECT COUNT(*) FROM sys.indexes WHERE name=@tableName";
+					command.CommandText = "SELECT COUNT(*) FROM sys.indexes WHERE name=@objectName";
 					break;
 
 				default:
 					return false;
 			}
 
-			parameter.ParameterName = "tableName";
+			parameter.ParameterName = "objectName";
 			parameter.Value = name;
 			command.Parameters.Add(parameter);
 

@@ -7,10 +7,10 @@ using Microsoft.Extensions.Logging;
 using Nucleus.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 
-namespace Nucleus.Data.Sqlite
+namespace Nucleus.Data.MySql
 {
 	/// <summary>
-	/// Sqlite implementation of the data migration provider.
+	/// MySql implementation of the data migration provider.
 	/// </summary>
 	/// <typeparam name="TDataProvider">
 	/// Type of the data provider implementation that this class handles migration for.
@@ -18,7 +18,7 @@ namespace Nucleus.Data.Sqlite
 	/// <remarks>
 	/// Inherits the entity framework implementation and adds a database type so that script resources can be located.
 	/// </remarks>
-	public class SqliteDataProviderMigration<TDataProvider> : Nucleus.Data.EntityFramework.DataProviderMigration<TDataProvider>
+	public class MySqlDataProviderMigration<TDataProvider> : Nucleus.Data.EntityFramework.DataProviderMigration<TDataProvider>
 		where TDataProvider : Nucleus.Data.Common.DataProvider
 	{
 		/// <summary>
@@ -27,7 +27,7 @@ namespace Nucleus.Data.Sqlite
 		/// <param name="provider"></param>
 		/// <param name="eventDispatcher"></param>
 		/// <param name="logger"></param>
-		public SqliteDataProviderMigration(TDataProvider provider, Nucleus.Abstractions.EventHandlers.IEventDispatcher eventDispatcher, ILogger<DataProviderMigration<TDataProvider>> logger) : base((provider as Nucleus.Data.EntityFramework.DataProvider).Context, new string[] { "Migrations", "Sqlite" }, eventDispatcher, logger) {	}
+		public MySqlDataProviderMigration(TDataProvider provider, Nucleus.Abstractions.EventHandlers.IEventDispatcher eventDispatcher, ILogger<DataProviderMigration<TDataProvider>> logger) : base((provider as Nucleus.Data.EntityFramework.DataProvider)?.Context, new string[] { "Migrations", "SqlServer" }, eventDispatcher, logger) { }
 
 		/// <summary>
 		/// Checks whether the specified database object exists.
@@ -39,35 +39,36 @@ namespace Nucleus.Data.Sqlite
 		{
 			int result;
 
-			System.Data.Common.DbConnection connection = base.DbContext.Database.GetDbConnection();//new Microsoft.Data.Sqlite.SqliteConnection(base.DbContext.Database.GetConnectionString());
+			System.Data.Common.DbConnection connection = base.DbContext.Database.GetDbConnection();
 			System.Data.Common.DbCommand command = connection.CreateCommand();
-			System.Data.Common.DbParameter parameter = command.CreateParameter();
-
+			
 			switch (type)
 			{
 				case DatabaseObjectTypes.Table:
-					command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=@objectName";
+					command.CommandText = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name=@objectName";
 					break;
 
 				case DatabaseObjectTypes.Index:
-					command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='index' AND name=@objectName";
+					command.CommandText = "SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema=DATABASE() AND index_name=@objectName";
 					break;
 
 				default:
 					return false;
 			}
 
+			System.Data.Common.DbParameter parameter = command.CreateParameter();
 			parameter.ParameterName = "objectName";
 			parameter.Value = name;
 			command.Parameters.Add(parameter);
-			
+
 			if (connection.State == System.Data.ConnectionState.Closed)
 			{
 				connection.Open();
 			}
 
+			//command.Transaction = System.Transactions.Transaction.Current;
 			result = Convert.ToInt32(command.ExecuteScalar());
-			
+
 			return result > 0;
 		}
 

@@ -9,13 +9,13 @@ using Microsoft.Extensions.Options;
 using Nucleus.Abstractions;
 using Nucleus.Data.Common;
 
-namespace Nucleus.Data.MySql
+namespace Nucleus.Data.PostgreSql
 {
 	/// <summary>
-	/// DbContext options configuration class for MySql
+	/// DbContext options configuration class for PostgreSql
 	/// </summary>
 	/// <typeparam name="TDataProvider"></typeparam>
-	public class MySqlDbContextConfigurator<TDataProvider> : DbContextConfigurator<TDataProvider>
+	public class PostgreSqlDbContextConfigurator<TDataProvider> : DbContextConfigurator<TDataProvider>
 		where TDataProvider : Nucleus.Data.Common.DataProvider
 	{
 		private IOptions<DatabaseOptions> DatabaseOptions { get; }
@@ -24,13 +24,13 @@ namespace Nucleus.Data.MySql
 		/// Constructor
 		/// </summary>
 		/// <param name="databaseOptions"></param>
-		public MySqlDbContextConfigurator(IOptions<DatabaseOptions> databaseOptions)
+		public PostgreSqlDbContextConfigurator(IOptions<DatabaseOptions> databaseOptions)
 		{
 			this.DatabaseOptions = databaseOptions;
 		}
 
 		/// <summary>
-		/// Configure the DbContextOptionsBuilder for MySql
+		/// Configure the DbContextOptionsBuilder for PostgreSQL
 		/// </summary>
 		/// <param name="options"></param>
 		public override Boolean Configure(DbContextOptionsBuilder options)
@@ -39,7 +39,7 @@ namespace Nucleus.Data.MySql
 
 			if (connectionOption != null)
 			{
-					options.UseMySql(connectionOption.ConnectionString, ServerVersion.AutoDetect(connectionOption.ConnectionString));
+					options.UseNpgsql(connectionOption.ConnectionString);
 					return true;
 			}
 

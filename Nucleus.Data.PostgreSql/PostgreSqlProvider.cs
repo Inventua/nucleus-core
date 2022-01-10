@@ -9,12 +9,12 @@ using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Options;
 using Nucleus.Data.Common;
 
-namespace Nucleus.Data.MySql
+namespace Nucleus.Data.PostgreSql
 {
 	/// <summary>
 	/// 
 	/// </summary>
-	public class MySqlProvider : IConfigureDataProvider
+	public class PostgreSqlProvider : IConfigureDataProvider
 	{
 		/// <summary>
 		/// Add SqlServer data provider objects to the service collection for the data provider specified by TDataProvider if configuration 
@@ -29,7 +29,7 @@ namespace Nucleus.Data.MySql
 		public Boolean AddDataProvider<TDataProvider>(IServiceCollection services, DatabaseOptions options, string schemaName) 
 			where TDataProvider : Nucleus.Data.Common.DataProvider
 		{
-			return AddMySql<TDataProvider>(services, options, schemaName);
+			return AddPostgreSql<TDataProvider>(services, options, schemaName);
 		}
 
 		/// <summary>
@@ -42,16 +42,16 @@ namespace Nucleus.Data.MySql
 		/// <param name="options"></param>
 		/// <param name="schemaName"></param>
 		/// <returns></returns>
-		static private Boolean AddMySql<TDataProvider>(IServiceCollection services, DatabaseOptions options, string schemaName)
+		static private Boolean AddPostgreSql<TDataProvider>(IServiceCollection services, DatabaseOptions options, string schemaName)
 			where TDataProvider : Nucleus.Data.Common.DataProvider
 		{
-			// Get connection for the specified schema name.  If it is found, add MySql data provider objects to the services collection.
+			// Get connection for the specified schema name.  If it is found, add PostgreSQL data provider objects to the services collection.
 			DatabaseConnectionOption connectionOption = options.GetDatabaseConnection(schemaName);
 
-			if (connectionOption != null && connectionOption.Type == "MySql")
+			if (connectionOption != null && connectionOption.Type == "PostgreSql")
 			{
-				services.AddTransient<Nucleus.Data.Common.DataProviderMigration<TDataProvider>, Nucleus.Data.MySql.MySqlDataProviderMigration<TDataProvider>>();
-				services.AddSingleton<Nucleus.Data.EntityFramework.DbContextConfigurator<TDataProvider>, Nucleus.Data.MySql.MySqlDbContextConfigurator<TDataProvider>>();
+				services.AddTransient<Nucleus.Data.Common.DataProviderMigration<TDataProvider>, Nucleus.Data.PostgreSql.PostgreSqlDataProviderMigration<TDataProvider>>();
+				services.AddSingleton<Nucleus.Data.EntityFramework.DbContextConfigurator<TDataProvider>, Nucleus.Data.PostgreSql.PostgreSqlDbContextConfigurator<TDataProvider>>();
 				return true;
 			}
 

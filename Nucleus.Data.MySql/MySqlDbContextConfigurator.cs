@@ -30,7 +30,7 @@ namespace Nucleus.Data.MySql
 		}
 
 		/// <summary>
-		/// Configure the DbContextOptionsBuilder for Sql server
+		/// Configure the DbContextOptionsBuilder for MySql
 		/// </summary>
 		/// <param name="options"></param>
 		public override Boolean Configure(DbContextOptionsBuilder options)

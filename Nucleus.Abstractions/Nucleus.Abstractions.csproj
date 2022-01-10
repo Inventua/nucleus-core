@@ -36,12 +36,10 @@
 		<WarningLevel>4</WarningLevel>
 	</PropertyGroup>
 
-
 	<ItemGroup>
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
 	</ItemGroup>
-
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />

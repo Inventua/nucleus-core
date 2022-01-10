@@ -1,0 +1,96 @@
+﻿@model Nucleus.XmlDocumentation.Models.ApiClass
+@using Nucleus.XmlDocumentation
+@using Nucleus.ViewFeatures
+@using Nucleus.XmlDocumentation.ViewModels
+@* Renders documentation for a class. *@
+@if (Model != null)
+{
+<div class="api-class">
+	<h2>@Model.Name Class</h2>
+	<div><small class="text-muted">Namespace: @Model.Namespace</small></div>
+	<div><small class="text-muted">Assembly: @(Model.AssemblyName + ".dll")</small></div>
+	@if (Model?.Summary?.Items?.Any() == true)
+	{
+		<div class="api-summary">
+			@await Html.PartialAsync("_RenderMixedContent.cshtml", Model.Summary)
+		</div>
+	}
+	@if (Model?.TypeParams?.Any() == true)
+	{
+		<div class="api-typeparameters">
+			<h5>Type Parameters</h5>
+			<table>
+				@foreach (var parameter in Model.TypeParams)
+				{
+					<tr>
+						<td>@parameter.Name</td>
+						<td>@parameter.Description</td>
+					</tr>
+				}
+			</table>
+		</div>
+	}
+	@if (Model?.Remarks?.Items?.Any() == true)
+	{
+		<div class="api-remarks">
+			<h3>Remarks</h3>
+			<div>
+				@await Html.PartialAsync("_RenderMixedContent.cshtml", Model.Remarks)
+			</div>
+		</div>
+	}
+	@if (Model?.Examples?.Any() == true)
+	{
+		<div class="api-examples">
+			<h3>Examples</h3>
+			@foreach (var example in Model.Examples)
+			{
+				<code>@example.FilterXMLWhiteSpace()</code>
+			}
+		</div>
+	}
+
+	@if (Model?.Constructors?.Any() == true)
+	{
+		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Caption = "Constructors", CssClass = "api-constructors", Members = Model.Constructors })
+	}
+
+	@if (Model?.Properties.Any() == true)
+	{
+		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Caption = "Properties", CssClass = "api-properties", Members = Model.Properties })
+	}
+
+	@if (Model?.Fields?.Any() == true)
+	{
+		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Caption = "Fields", CssClass = "api-fields", Members = Model.Fields })
+	}
+
+	@if (Model?.Methods?.Any() == true)
+	{
+		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Caption = "Methods", CssClass = "api-methods", Members = Model.Methods })
+	}
+
+	@if (Model?.Events?.Any() == true)
+	{
+		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Caption = "Events", CssClass = "api-events", Members = Model.Events })
+	}
+
+	@if (Model?.SeeAlso?.Any() == true)
+	{
+		<div class="api-seealso">
+			<h5>See Also</h5>
+			@foreach (var seeAlso in Model.SeeAlso)
+			{
+				@if (seeAlso.Uri != null)
+				{
+					<mark><a href="@(seeAlso.Uri.IsAbsoluteUri ? seeAlso.Uri.ToString() : Url.PageLink(seeAlso.Uri.ToString()))">@seeAlso.LinkText</a></mark>
+				}
+				else
+				{
+					<mark>@seeAlso.CodeReference</mark>
+				}
+			}
+		</div>
+	}
+</div>
+}

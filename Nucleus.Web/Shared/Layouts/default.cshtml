@@ -1,0 +1,34 @@
+﻿@model Nucleus.Web.ViewModels.Default
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Extensions
+@addTagHelper "*, Nucleus.ViewFeatures"
+@{
+	Layout = "_Layout";
+}
+
+@section styles
+{
+	<link href="@Url.Content($"~{this.GetRelativeFilePath("default.css")}")" rel="stylesheet" />
+}
+
+<div class="LayoutWrapper">
+	<div class="BannerPane">
+		<Logo />
+		<account class="AccountControl navbar flex-row justify-content-end"></account>
+		<menu maxLevels="10"></menu>
+		@Html.Breadcrumb()
+		@await Html.RenderPaneAsync("BannerPane")
+	</div>
+
+	<div class="ContentWrapper">
+		<div class="ContentPane">
+			@await Html.RenderPaneAsync("ContentPane")
+		</div>
+	</div>
+
+	<div class="BottomPane">
+		<terms caption="Terms" />
+		<privacy caption="Privacy Policy" />
+		@await Html.RenderPaneAsync("BottomPane")
+	</div>
+</div>

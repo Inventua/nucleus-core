@@ -1,0 +1,59 @@
+﻿@model Nucleus.Web.ViewModels.Admin.PageEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+<fieldset role="group" aria-labelledby="heading">
+	<h2>Permissions</h2>
+	@if (Model.AvailablePageRoles.Any())
+	{
+		<div class="nucleus-form-tools">
+			@*@Html.DropDownListFor((model) => model.SelectedPageRoleId, new SelectList(Model.AvailablePageRoles, "Id", "Name"), new { @class = "flex-fill" })*@
+
+			@Html.DropDownListFor(model => model.SelectedPageRoleId, Model.AvailablePageRoles, new { @class = "flex-fill" })
+
+			<input type="submit" formaction="@Url.AreaAction("AddPagePermissionRole", "Pages", "Admin")" value="Add Role" data-target="form.parent()" class="btn btn-secondary" />
+		</div>
+	}
+	@if (Model.PagePermissions.Values.Any())
+	{
+		<table>
+			<tr>
+				<th></th>
+				@foreach (var permissionType in Model.PagePermissionTypes)
+				{
+					<th class="text-center">@permissionType.Name</th>
+				}
+			</tr>
+
+			@foreach (var item in Model.PagePermissions.Values)
+			{
+				<tr>
+					<td>
+						@item.Role.Name
+					</td>
+
+					@for (int permissionsCount = 0; permissionsCount < Model.PagePermissions[item.Role.Id].Permissions.Count; permissionsCount++)
+					{
+						<td>
+							@Html.HiddenFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].Id)
+							@Html.HiddenFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Id)
+							@Html.HiddenFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope)
+							@if (Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope == PermissionType.PermissionScopeNamespaces.Disabled)
+							{
+								<span class="nucleus-material-icon text-center d-block">&#xe8f5;</span>
+							}
+							else
+							{
+								@Html.CheckBoxFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].AllowAccess)
+							}
+						</td>
+					}
+
+					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("DeletePagePermissionRole", "Pages", "Admin", new { id = item.Role.Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target="#nucleus-page-editor" /></td>
+				</tr>
+			}
+
+		</table>
+	}
+</fieldset>

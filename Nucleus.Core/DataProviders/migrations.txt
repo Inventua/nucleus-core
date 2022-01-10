@@ -1,0 +1,9 @@
+﻿1. Use appSettings.config to configure your database provider, as for regular running
+2. In visual studio, open the Terminal window (View->Terminal)
+3. cd "c:\development\inventua\nucleus\source code\nucleus.core"
+
+XXXX 4. dotnet ef migrations add InitialCreate --context Nucleus.Core.DataProviders.CoreDataProviderDbContext --startup-project ..\Nucleus.Web
+4. dotnet ef migrations add InitialCreate --context Nucleus.Core.DataProviders.CoreDataProviderDbContext 
+
+
+5. dotnet ef migrations script 0 InitialCreate --context Nucleus.Core.DataProviders.CoreDataProviderDbContext --output Migrations\script.txt

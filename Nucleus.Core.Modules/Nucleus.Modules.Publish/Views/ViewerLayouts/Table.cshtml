@@ -1,0 +1,27 @@
+﻿@model Nucleus.Modules.Publish.ViewModels.Viewer
+@using Nucleus.Extensions
+@using Nucleus.ViewFeatures.HtmlHelpers
+@Html.AddStyle("~!/../../viewer.css")
+<div class="Articles table">
+	<table>
+		<tr>
+			<th>Title</th>
+			<th>Summary</th>
+			<th></th>
+		</tr>
+		@foreach (var article in Model.Articles.Items)
+		{
+			<tr>
+				<td class="title">
+					<a href="@article.Title.FriendlyEncode()">@article.Title</a>
+				</td>
+				<td class="summary">
+					@article.Summary
+				</td>
+				<td>
+					<a href="@article.Title.FriendlyEncode()" class="btn btn-secondary">Read more</a>
+				</td>
+			</tr>
+		}
+	</table>
+</div>

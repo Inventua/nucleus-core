@@ -1,0 +1,11 @@
+﻿@model Nucleus.Modules.MultiContent.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+<SettingsControl caption="Alert Style" helptext="Choose an alert style.">
+	@Html.DropDownListFor(model => model.LayoutSettings.AlertStyle, new SelectList(Model.LayoutSettings.AlertStyles))
+</SettingsControl>
+<SettingsControl caption="Show Close Button?" rendermode="LabelLast" class="inner-inline" helptext="Display a close button so that the user can close the alert.">
+	@Html.CheckBoxFor(model => model.LayoutSettings.ShowCloseButton, new { @class = "ToggleSwitch" })
+</SettingsControl>

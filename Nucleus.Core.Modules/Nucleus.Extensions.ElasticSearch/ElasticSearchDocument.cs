@@ -1,0 +1,248 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Search;
+
+namespace Nucleus.Extensions.ElasticSearch
+{
+	[Nest.ElasticsearchType(IdProperty = nameof(Id))]
+	public class ElasticSearchDocument
+	{
+		/// <summary>
+		/// Constructor used by NEST deserialization for search results.
+		/// </summary>
+		public ElasticSearchDocument() { }
+
+		/// <summary>
+		/// Constructor used when generating a feed.
+		/// </summary>
+		/// <param name="content"></param>
+		public ElasticSearchDocument(ContentMetaData content)
+		{
+			this.Id = $"{content.Scope}/{content.SourceId}";
+			this.SiteId = content.Site.Id;
+			this.Url = content.Url;
+			this.Title = content.Title;
+			this.Summary = content.Summary;
+
+			this.Scope = content.Scope;
+			this.SourceId = content.SourceId;
+
+			this.ContentType = content.ContentType;
+
+			if (content.Content.Any())
+			{
+				this.Content = Convert.ToBase64String(content.Content);				
+			}
+			else
+			{
+				this.Content = string.Empty;
+			}
+
+			if (content.PublishedDate.HasValue)
+			{
+				this.PublishedDate = content.PublishedDate.Value.Date;
+			}
+
+			this.Size = content.Size;
+			this.Keywords = content.Keywords?.ToList();
+
+			if (content.Categories == null)
+			{
+				this.Categories = new List<Guid>();
+			}
+			else
+			{
+				this.Categories = content.Categories.Select(category => category.Id).ToList();
+			}
+
+			if (content.Roles == null)
+			{
+				this.Roles = new List<Guid>();
+			}
+			else
+			{
+				this.Roles = content.Roles?.Select(role => role.Id).ToList();
+			}
+
+			this.IsSecure = this.IsPublic(content.Site, content.Roles);
+		}					
+
+		/// <summary>
+		/// Elastic search unique id for the document
+		/// </summary>
+		public string Id { get; set; }
+
+		/// <summary>
+		/// This Id of the site which the resource belongs to.
+		/// </summary>
+		[Nest.Keyword]
+		public Guid SiteId { get; set; }
+
+		/// <summary>
+		/// Url used to access the resource for this search item.
+		/// </summary>
+		/// <remarks>
+		/// This value is required.
+		/// </remarks>
+		public string Url { get; set; }
+
+		/// <summary>
+		/// Title for the resource.
+		/// </summary>
+		/// <remarks>
+		/// The title displayed in search results.  Title is optional, but highly recommended.  If the title is not set, the search result
+		/// will display the Url in place of a title.
+		/// </remarks>
+		public string Title { get; set; }
+
+		/// <summary>
+		/// Short summary for the resource.
+		/// </summary>
+		/// <remarks>
+		/// The summary displayed in search results.  Summary is optional.  If it is not set, the search result will not display
+		/// a summary.
+		/// </remarks>
+		public string Summary { get; set; }
+
+		/// <summary>
+		/// URN of the entity which was used to create this search entry.
+		/// </summary>
+		/// <remarks>
+		/// This value is optional.  If set, it can be used to allow users to select that only specified result types are included in their
+		/// search results.
+		/// </remarks>
+		[Nest.Keyword]
+		public string Scope { get; set; }
+
+		/// <summary>
+		/// Unique Id for the search entry source.
+		/// </summary>
+		/// <remarks>
+		/// This value is optional.  If set, it can be used to manage the individual search result for update and delete operations.
+		/// </remarks>
+		[Nest.Keyword]
+		public Guid SourceId { get; set; }
+
+		/// <summary>
+		/// Search entry content, used for content indexing.
+		/// </summary>
+		public string Content { get; set; }
+
+		/// <summary>
+		/// Search entry MIME type.
+		/// </summary>
+		/// <remarks>
+		/// This value should be set to the expected MIME type when a user-agent request the <see cref="Url"/> for this search entry.  This 
+		/// is not necessarily the MIME type of the Content field.  This value is intended for search result filtering.
+		/// </remarks>
+		[Nest.Keyword]
+		public string ContentType { get; set; }
+
+		/// <summary>
+		/// Source entity published date
+		/// </summary>
+		/// <remarks>
+		/// This value is optional.  If specified, it can be displayed in search results.
+		/// </remarks>
+		[Nest.Keyword]
+		public DateTime? PublishedDate { get; set; }
+
+		/// <summary>
+		/// The size of the resource in bytes.
+		/// </summary>
+		/// <remarks>
+		/// This value is optional and should only be supplied if it is relevant to the resource.  If specified, it can be displayed in search results.
+		/// </remarks>
+		public long? Size { get; set; }
+
+		/// <summary>
+		/// A list of keywords for the resource.
+		/// </summary>
+		/// <remarks>
+		/// This value is optional.  If supplied, keywords contribute to the search result weighting.
+		/// </remarks>
+		[Nest.Keyword]
+		public List<string> Keywords { get; set; }
+
+		/// <summary>
+		/// A list of categories for the resource.
+		/// </summary>
+		/// <remarks>
+		/// This value is optional.  If supplied, categories contribute to the search result weighting, and may also be used to filter results.
+		/// </remarks>
+		[Nest.Keyword]
+		public List<Guid> Categories { get; set; }
+
+		/// <summary>
+		/// A list of roles with view access to the resource.
+		/// </summary>
+		/// <remarks>
+		/// This value is optional.  If it not specified, search feeders will try to fill in roles by using the roles for the relevant
+		/// page, module or folder.  Roles are used to filter search results to resources which the current user can view.
+		/// </remarks>
+		[Nest.Keyword]
+		public List<Guid> Roles { get; set; }
+
+		/// <summary>
+		/// Specifies whether the document is visible to anonymous users.
+		/// </summary>
+		public Boolean IsSecure { get; set; }
+				
+		// This is auto-populated by the ingest pipeline
+		public string FeedProcessingDateTime { get; set; }
+
+		// This is populated for returned search results
+		public double? Score { get; set; }
+
+		// This is populated in the elastic search database by the attachment pipeline.  It is never populated by search results, but is
+		// used to represent the field in Elastic search (to include it for search queries)
+		public Nest.Attachment Attachment { get; set; }
+
+		/// <summary>
+		/// Content ingest status or error message
+		/// </summary>
+		/// <remarks>
+		/// This value is generated by the attachment pipeline.
+		/// </remarks>
+		public string Status { get; set; }
+
+		/// <summary>
+		/// Completion suggester title.
+		/// </summary>
+		/// <remarks>
+		/// This field is used by the completion suggester.  It is auto-populated by the ingest pipeline.  This is required so
+		/// that we can specify [Nest.Completion] in order to make Elastic Search index this value with an indexing type which
+		/// is optimized for speed.
+		/// </remarks>
+		[Nest.Completion()]
+		public string SuggesterTitle { get; set; } = "empty";
+
+		//[Nest.Completion()]
+		//public string SuggesterAttachmentTitle { get; set; } = "empty";
+
+		private bool IsPublic(Site site, IEnumerable<Role> roles)
+		{
+			if (roles?.Any() == false)
+			{
+				return true;
+			}
+			else
+			{
+				foreach (Role role in roles)
+				{
+					if (role == site.AnonymousUsersRole || role == site.AllUsersRole)
+					{
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
+	}
+}

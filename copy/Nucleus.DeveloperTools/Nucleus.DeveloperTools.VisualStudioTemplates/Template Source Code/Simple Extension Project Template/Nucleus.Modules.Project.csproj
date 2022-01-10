@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+		<RootNamespace>$nucleus_extension_namespace$</RootNamespace>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+<ItemGroup>
+		<None Remove="**\*.vspscc" />
+		<None Remove="**\*.scc" />
+		<None Remove="*.zip" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <None Remove="viewer.css" />
+    <None Remove="package.xml" />
+    <None Remove="readme.txt" />
+    <None Remove="settings.css" />
+    <None Remove="Views\Settings.cshtml" />
+    <None Remove="Views\Viewer.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="viewer.css" />
+    <Content Include="package.xml" />
+    <Content Include="readme.txt" />
+    <Content Include="settings.css" />
+    <Content Include="Views\Viewer.cshtml" />
+    <Content Include="Views\Settings.cshtml" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Nucleus.ViewFeatures" Version="1.0.0" />
+	</ItemGroup>
+
+	<PropertyGroup Label="Nucleus">
+		<ExtensionFolder>$nucleus_extension_name$</ExtensionFolder>
+		<Version>1.0.0</Version>
+	</PropertyGroup>
+
+	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+</Project>

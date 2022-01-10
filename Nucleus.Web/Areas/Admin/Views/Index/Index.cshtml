@@ -1,0 +1,87 @@
+﻿@model Nucleus.Web.ViewModels.Admin.Index
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta name="viewport" content="width=device-width" />
+	<meta charset="utf-8">
+	<title>Nucleus Admin</title>
+	@Html.AddStyle("~/Resources/Libraries/Bootstrap/5.1.0/css/bootstrap.css")
+	@Html.AddStyle("~/Resources/css/shared.css")
+	@Html.AddStyle("~/Resources/css/admin.css")
+	@Html.AddStyle("~/Resources/css/forms.css")
+	@Html.AddStyle("~/Resources/css/editmode.css")
+	@Html.AddStyle("~/Shared/Controls/Views/PagingControl.css")
+	@Html.RenderStyles()
+	@Html.AddScript("~/Resources/Libraries/jQuery/03.06.00/jquery.min.js")
+	@Html.AddScript("~/Resources/Libraries/Bootstrap/5.1.0/js/bootstrap.bundle.js")
+	@Html.AddScript("~/Resources/js/jquery-toggleswitch.js")
+	@Html.AddScript("~/Resources/js/jquery-pagelist.js")
+	@Html.AddScript("~/Resources/js/nucleus-shared.js")
+	@Html.AddScript("~/Resources/js/nucleus-admin.js")
+	@Html.AddHtmlEditor()
+	@Html.RenderScripts()
+</head>
+<body>
+	<div class="nucleus-control-panel">
+		<ul class="nucleus-control-panel-sidebar">
+			@if (Model.IsSiteAdmin)
+			{
+				<li data-target=".nucleus-adminpage" class="SystemIcon">
+					<a title="System" href="@Url.Content("~/Admin/System/Index")"><span>&#xe871;</span></a>
+					<span class="Label">System</span>
+				</li>
+				<li data-target=".nucleus-adminpage" class="PagesIcon">
+					<a title="Pages" class="Pages" href="@Url.Content("~/Admin/Pages/Index")"><span>&#xef42;</span></a>
+					<span class="Label">Pages</span>
+				</li>
+				<li data-target=".nucleus-adminpage" class="ManageIcon">
+					<a title="Manage" class="Manage" href="@Url.Content("~/Admin/Manage/Index")"><span>&#xf02e;</span></a>
+					<span class="Label">Manage</span>
+				</li>
+			}
+			@if (Model.IsSystemAdministrator)
+			{
+				<li data-target=".nucleus-adminpage" class="ExtensionsIcon">
+					<a title="Extensions" class="Extensions" href="@Url.Content("~/Admin/Extensions/Index")"><span>&#xe87b;</span></a>
+					<span class="Label">Extensions</span>
+				</li>
+				<li data-target=".nucleus-adminpage" class="SettingsIcon">
+					<a title="Settings" class="Settings" href="@Url.Content("~/Admin/Settings/Index")"><span>&#xe8b8;</span></a>
+					<span class="Label">Settings</span>
+				</li>
+			}
+
+			@if (Model.CanEdit)
+			{
+				<li id="nucleus-edit-page-btn" class="nucleus-control-panel-sidebar-bottom" data-target=".nucleus-adminpage">
+					<a title="Edit Page" class="EditPageButton" href="@Url.Content("~/Admin/Pages/Editor")?id=@Model.CurrentPage.Id&mode=Single"><span>&#xef42;</span></a>
+					<span class="Label">Edit Page Settings</span>
+				</li>
+
+				<li id="nucleus-edit-content-btn" class="nucleus-control-panel-sidebar-bottom@(Model.IsEditMode ? "-active" : "")">
+					<a title="Edit Content" href="@Url.Content("~/Admin/Settings/Index")"><span>&#xe3c9;</span></a>
+					<span class="Label">Edit Content</span>
+				</li>
+			}
+		</ul>
+
+		<div class="nucleus-control-panel-content collapse">
+			<div class="nucleus-control-panel-content-header">
+				<a class="nucleus-btn-close-frame">&#xe5cd;</a>
+				<a class="nucleus-btn-page-back" data-target=".nucleus-adminpage">&#xe5c4;</a>
+			</div>
+			<div class="nucleus-adminpage nucleus-admin-content"></div>
+		</div>
+	</div>
+
+	<modal id="PopupDialog" title="Settings"></modal>
+
+	<script type="text/javascript">
+		
+	</script>
+
+</body>
+
+</html>

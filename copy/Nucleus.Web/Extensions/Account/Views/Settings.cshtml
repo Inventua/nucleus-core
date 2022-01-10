@@ -1,0 +1,30 @@
+﻿@model Nucleus.Modules.Account.ViewModels.Login
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+@using Nucleus.Abstractions.Models.Configuration
+@using (Html.BeginNucleusForm("SaveSettings", "Login", FormMethod.Post))
+{
+<fieldset role="group" aria-labelledby="heading">
+	<h2>Settings</h2>
+	<div class="Flex">
+		<SettingsControl caption="Allow remember me?" helptext="Sets whether to allow users select a check box to save their login session.">
+			@Html.CheckBoxFor(model => model.AllowRememberMe, new { @class = "ToggleSwitch" })
+		</SettingsControl>
+
+		<SettingsControl caption="Allow user name recovery?" helptext="Sets whether to allow users to retrieve their username by supplying their email address.">
+			@Html.CheckBoxFor(model => model.AllowUsernameRecovery, new { @class = "ToggleSwitch" })
+		</SettingsControl>
+
+		<SettingsControl caption="Allow password reset?" helptext="Sets whether to allow users to reset their password by supplying their email address and using a reset token.">
+			@Html.CheckBoxFor(model => model.AllowPasswordReset, new { @class = "ToggleSwitch" })
+		</SettingsControl>
+	</div>
+</fieldset>
+
+
+	<div>
+		<input type="submit" value="Save Changes" />
+		<a href="/" value="Cancel" />
+	</div>
+}

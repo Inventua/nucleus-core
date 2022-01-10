@@ -1,0 +1,47 @@
+﻿@model Nucleus.Modules.Account.ViewModels.Login
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@Html.AddStyle("~/Resources/css/forms.css")
+<div id="@Model.ControlId">
+	@using (Html.BeginNucleusForm("Login", "Login", "Account", FormMethod.Post, new { data_target = "#" + Model.ControlId }))
+	{
+		<div class="Message"></div>
+
+		<fieldset>
+			@Html.HiddenFor(model => model.ReturnUrl)
+			<div>
+				<label>
+					<span>User name</span>
+					<span>@Html.TextBoxFor(model => model.Username, new { @autocorrect = "off", @autocapitalize = "none" })</span>
+				</label>
+			</div>
+
+			<div>
+				<label>
+					<span>Password</span>
+					<span>@Html.PasswordFor(model => model.Password)</span>
+				</label>
+			</div>
+
+			@if (Model.AllowRememberMe)
+			{
+				<div>
+					<label>
+						Remember Me?
+						@Html.CheckBoxFor(model => model.RememberMe)
+					</label>
+				</div>
+			}
+			<div>
+				<input type="submit" value="Login" />
+				<a href="/" class="button">Cancel</a>
+
+				@if (Model.AllowUsernameRecovery | Model.AllowPasswordReset)
+				{
+					@Html.LinkButton("", "Trouble logging in?", @Url.NucleusAction("Index", "Recover", "Account"), false, new { returnurl = Model.ReturnUrl, data_target = "#" + Model.ControlId })
+				}
+			</div>
+		</fieldset>
+	}
+</div>

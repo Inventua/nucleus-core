@@ -1,0 +1,52 @@
+﻿@model Nucleus.Modules.Media.ViewModels.Viewer
+@using Nucleus.Extensions
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models.FileSystem
+@Html.AddStyle("~#/media.css")
+<div class="Media">
+	@switch (Model.SelectedItemType)
+	{
+		case Nucleus.Modules.Media.ViewModels.Viewer.MediaTypes.Generic:
+			<div class="Name">@Model.SelectedFile.Name</div>
+			@if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
+			{
+				<div class="caption">@Model.Caption</div>
+			}
+			<div>
+				<span class="ModifiedDate">@Model.SelectedFile.DateModified</span>
+				<span class="Size">@Model.SelectedFile.Size.FormatFileSize()</span>
+			</div>
+
+			<div class="btn btn-secondary" role="button" aria-label="@Model.AlternateText">
+				<label>
+					<span class="nucleus-material-icon">&#xe2c4</span>
+					<a href="@Url.FileLink(Model.SelectedFile, false)">Download</a>
+				</label>
+			</div>
+			break;
+
+		case Nucleus.Modules.Media.ViewModels.Viewer.MediaTypes.Image:
+			<img src="@Url.FileLink(Model.SelectedFile, true)" alt="@Model.AlternateText" style="@Model.Style" />
+			@if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
+			{
+				<div class="caption">@Model.Caption</div>
+			}
+			break;
+
+		case Nucleus.Modules.Media.ViewModels.Viewer.MediaTypes.PDF:
+			<embed src="@Url.FileLink(Model.SelectedFile, true)" type="application/pdf" title="@Model.AlternateText" style="@Model.Style" />
+			@if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
+			{
+				<div class="caption">@Model.Caption</div>
+			}
+			break;
+
+		case Nucleus.Modules.Media.ViewModels.Viewer.MediaTypes.Video:
+			<video controls src="@Url.FileLink(Model.SelectedFile, true)" title="@Model.AlternateText" style="@Model.Style"></video>
+			@if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
+			{
+				<div class="caption">@Model.Caption</div>
+			}
+			break;
+	}
+</div>

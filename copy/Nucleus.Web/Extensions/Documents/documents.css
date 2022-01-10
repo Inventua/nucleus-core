@@ -1,0 +1,28 @@
+﻿.Documents TABLE
+{
+	width: 100%;
+}
+
+.Documents TABLE th, .Documents TABLE td
+{
+	text-align: left;
+}
+
+.Documents > div
+{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-auto-rows: 1fr;
+}
+
+.Documents > div > div
+{
+	padding: 8px;
+	border: solid 1px #ddd;
+	margin: 8px;	
+}
+
+.Documents .document-modifieddate:before
+{
+	content: 'modified '
+}

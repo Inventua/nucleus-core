@@ -1,0 +1,78 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Label="Globals">
+    <SccProjectName></SccProjectName>
+    <SccProvider></SccProvider>
+    <SccAuxPath></SccAuxPath>
+    <SccLocalPath></SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+		<RootNamespace>Nucleus.Modules.MultiContent</RootNamespace>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+<ItemGroup>
+		<None Remove="**\*.vspscc" />
+		<None Remove="**\*.scc" />
+		<None Remove="*.zip" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <None Remove="viewer.css" />
+    <None Remove="package.xml" />
+    <None Remove="readme.txt" />
+    <None Remove="settings.css" />
+    <None Remove="Views\Editor.cshtml" />
+    <None Remove="Views\Settings.cshtml" />
+    <None Remove="Views\Viewer.cshtml" />
+    <None Remove="Views\ViewerLayouts\Accordion.cshtml" />
+    <None Remove="Views\ViewerLayouts\Alert.cshtml" />
+    <None Remove="Views\ViewerLayouts\Carousel.cshtml" />
+    <None Remove="Views\ViewerLayouts\Pills.cshtml" />
+    <None Remove="Views\ViewerLayouts\Tabs.cshtml" />
+    <None Remove="Views\ViewerLayouts\_AccordionSettings.cshtml" />
+    <None Remove="Views\ViewerLayouts\_AlertSettings.cshtml" />
+    <None Remove="Views\ViewerLayouts\_CarouselSettings.cshtml" />
+    <None Remove="Views\ViewerLayouts\_PillsSettings.cshtml" />
+    <None Remove="Views\ViewerLayouts\_TabsSettings.cshtml" />
+    <None Remove="Views\_ContentList.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="viewer.css" />
+    <Content Include="package.xml" />
+    <Content Include="readme.txt" />
+    <Content Include="settings.css" />
+    <Content Include="Views\Editor.cshtml" />
+    <Content Include="Views\LayoutSettings\_AccordionSettings.cshtml" />
+    <Content Include="Views\LayoutSettings\_AlertSettings.cshtml" />
+    <Content Include="Views\LayoutSettings\_CarouselSettings.cshtml" />
+    <Content Include="Views\LayoutSettings\_PillsSettings.cshtml" />
+    <Content Include="Views\LayoutSettings\_TabsSettings.cshtml" />
+    <Content Include="Views\_ContentList.cshtml" />
+    <Content Include="Views\Viewer.cshtml" />
+    <Content Include="Views\Settings.cshtml" />
+    <Content Include="Views\ViewerLayouts\Accordion.cshtml" />
+    <Content Include="Views\ViewerLayouts\Carousel.cshtml" />
+    <Content Include="Views\ViewerLayouts\Pills.cshtml" />
+    <Content Include="Views\ViewerLayouts\Tabs.cshtml" />
+    <Content Include="Views\ViewerLayouts\Alert.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
+  </ItemGroup>
+
+	<PropertyGroup Label="Nucleus">
+		<ExtensionFolder>MultiContent</ExtensionFolder>
+		<Version>1.0.0</Version>
+	</PropertyGroup>
+
+	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+</Project>

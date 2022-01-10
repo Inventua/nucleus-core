@@ -1,0 +1,24 @@
+﻿@model Nucleus.ViewFeatures.ViewModels.FileSelector
+@using Nucleus.Abstractions.FileSystemProviders
+@using Nucleus.Abstractions.Models.FileSystem
+@if (Model.SelectedFile?.Id != Guid.Empty)
+{
+	<div>@Model.SelectedFile.Name</div>
+	<span class="btn btn-secondary">
+		<label>
+			<span class="nucleus-material-icon">&#xe2c6</span> Select Another File
+			<input type="submit" class="collapse btn btn-primary" formaction="@Url.NucleusAction(@Model.SelectAnotherActionName, Model.ControllerName, Model.AreaName, Model.ExtensionName)">
+		</label>
+	</span>
+	<span class="file-link collapse">@Url.FileLink(Model.SelectedFile)</span>
+	@Html.Hidden(@Model.PropertyName + $".{nameof(File.Id)}", Model.SelectedFile.Id)
+	@Html.Hidden(@Model.PropertyName + $".{nameof(File.Provider)}", Model.SelectedFile.Provider)
+	@Html.Hidden(@Model.PropertyName + $".{nameof(File.Path)}", Model.SelectedFile.Path)
+	@Html.Hidden(@Model.PropertyName + $".{nameof(File.Parent)}.{nameof(Folder.Id)}", Model.SelectedFolder.Id)
+}
+else
+{
+	@Html.DropDownList(@Model.PropertyName + $".{nameof(File.Provider)}", new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name), @Model.SelectedFile.Provider), new { @class = "providerKey", @data_autopostbackevent = "change", @onchange = $@"jQuery('#{Model.PropertyName}_Parent_Id').val(''); jQuery('#{Model.PropertyName}_Id').val('');" })
+	@Html.DropDownList(@Model.PropertyName + $".{nameof(File.Parent)}.{nameof(Folder.Id)}", new SelectList(Model.SelectedFolder.Folders, nameof(Folder.Id), nameof(Folder.Name), @Model.SelectedFolder.Id), new { @data_autopostbackevent = "change", @onchange = $@"jQuery('#{Model.PropertyName}_Id').val('');" })
+	@Html.DropDownList(@Model.PropertyName + $".{nameof(File.Id)}", new SelectList(Model.SelectedFolder.Files, nameof(File.Id), nameof(File.Name), @Model.SelectedFile.Id), Model.SelectedFolder.Files.Count > 0 ? "(select)" : "(no files)", new { @data_autopostbackevent = "change" })
+}

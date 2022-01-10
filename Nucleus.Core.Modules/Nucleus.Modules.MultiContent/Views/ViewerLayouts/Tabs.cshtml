@@ -1,0 +1,21 @@
+﻿@model Nucleus.Modules.MultiContent.ViewModels.Viewer
+@using Nucleus.Extensions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+<div>
+	<div class="nav nav-tabs@(Model.LayoutSettings.Alignment == Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.AlignmentStyles.Center ? " justify-content-center" : Model.LayoutSettings.Alignment == Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.AlignmentStyles.Right ? " justify-content-end" : " justify-content-start")@(Model.LayoutSettings.Orientation== Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.OrientationStyles.Vertical ? " flex-column" : "")@(Model.LayoutSettings.Fill ? " nav-fill" : "")@(Model.LayoutSettings.Justify ? " nav-justified" : "")" role="tablist">
+		@foreach (var content in Model.Contents)
+		{
+			<button id="tabpanel-@content.Id" class="nav-link @(content == Model.Contents.First() ? "active" : "")" aria-selected="@(content == Model.Contents.First() ? "true" : "false")" aria-current="page" data-bs-toggle="tab" data-bs-target="#tab-@content.Id" role="tab" type="button" aria-controls="tab-@content.Id">@content.Title</button>
+		}
+	</div>
+
+	<div class="tab-content">
+		@foreach (var content in Model.Contents)
+		{
+			<div id="tab-@content.Id" role="tabpanel" aria-labelledby="tabpanel-@content.Id" class="tab-pane fade @(content == Model.Contents.First() ? "show active" : "")">
+				@Html.Raw(content.ToHtml())
+			</div>
+		}
+	</div>
+</div>

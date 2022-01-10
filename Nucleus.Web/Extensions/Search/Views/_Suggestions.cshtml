@@ -1,0 +1,18 @@
+﻿@model Nucleus.Modules.Search.ViewModels.Suggestions
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Extensions
+@using Nucleus.Modules.Search.ViewModels
+@if (Model.SearchResults?.Results?.Any() == true)
+{
+	<ul class="suggestions-result">
+		@if (Model.SearchResults.Results.Any())
+		{
+			@foreach (var result in Model.SearchResults.Results)
+			{
+				<li title="@result.Title">@result.Title</li>
+			}
+		}
+	</ul>
+}

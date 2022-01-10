@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName></SccProjectName>
+    <SccProvider></SccProvider>
+    <SccAuxPath></SccAuxPath>
+    <SccLocalPath></SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Nucleus.Data.Common.xml</DocumentationFile>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Authors>Inventua Pty Ltd</Authors>
+		<Product>Nucleus</Product>
+		<Description>Common data provider base classes and interfaces.</Description>
+		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
+  </PropertyGroup>
+	
+	<ItemGroup>
+		<None Remove="**\*.vspscc" />
+		<None Remove="**\*.scc" />
+	</ItemGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

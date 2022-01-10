@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+	
+  <ItemGroup>
+    <None Remove="package.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="package.xml" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<None Remove="**\*.vspscc" />
+		<None Remove="**\*.scc" />
+		<None Remove="*.zip" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
+	  <ProjectReference Include="..\Nucleus.Core\Nucleus.Core.csproj" />
+	</ItemGroup>
+
+	<PropertyGroup Label="Nucleus">
+		<ExtensionFolder>Samples</ExtensionFolder>
+		<Version>1.0.0</Version>
+	</PropertyGroup>
+
+	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+
+</Project>

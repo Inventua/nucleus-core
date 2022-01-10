@@ -1,0 +1,43 @@
+﻿@model Nucleus.Modules.Sitemap.ViewModels.Sitemap
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using (Html.BeginNucleusForm("Save", "Sitemap", FormMethod.Post, null))
+{
+<fieldset role="group" aria-labelledby="heading">
+	<h2>Media Settings</h2>
+	<SettingsControl caption="Levels" helptext="Specifies number of levels to show.  Use '0' to show all levels.">
+		@Html.TextBoxFor(model => model.MaxLevels, new { type = "number", min = "0" })
+	</SettingsControl>
+
+	<SettingsControl caption="Root Page Type" helptext="Select the base page type ">
+		@Html.DropDownListFor(model => model.RootPageType, Html.GetEnumSelectList<Nucleus.Modules.Sitemap.RootPageTypes>(), new { @class = "SiteMapRootPageType" })
+	</SettingsControl>
+
+	<SettingsControl caption="Selected Page" helptext="Select the base page." class="SiteMapSelectedPage">
+		@Html.PageSelectorFor(model => model.RootPageId, Model.Pages, -1, new { })
+	</SettingsControl>
+
+	<SettingsControl caption="Show Description?" rendermode="LabelLast" class="inner-inline" helptext="Display the page description.">
+		@Html.CheckBoxFor(model => model.ShowDescription, new { @class = "ToggleSwitch" })
+	</SettingsControl>
+</fieldset>
+
+	<div class="ButtonRow">
+		<input type="submit" value="Save Changes" />
+	</div>
+}
+<script type="text/javascript">
+	ShowSelectedPage();
+	jQuery('.SiteMapRootPageType').on('change', ShowSelectedPage);
+
+	function ShowSelectedPage(e)
+	{
+		if (jQuery('.SiteMapRootPageType').val() === '@Convert.ToInt32(Nucleus.Modules.Sitemap.RootPageTypes.SelectedPage)')
+		{
+			jQuery('.SiteMapSelectedPage').show();
+		}
+		else
+		{
+			jQuery('.SiteMapSelectedPage').hide();
+		}
+	}
+</script>

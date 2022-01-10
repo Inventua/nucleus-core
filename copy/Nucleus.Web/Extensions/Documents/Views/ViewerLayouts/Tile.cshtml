@@ -1,0 +1,36 @@
+﻿@model Nucleus.Modules.Documents.ViewModels.Viewer
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Documents.ViewModels
+@Html.AddStyle("~!/../../documents.css")
+<div id="@Model.ControlId" class="Documents">
+	<div>
+		@for (int documentCount = 0; documentCount < Model.Documents.Count; documentCount++)
+		{
+		<div>
+			<div class="document-title">
+				<a href="@Url.DownloadLink(Model.Documents[documentCount].File)" alt="Model.Documents[documentCount].Title">
+					@Model.Documents[documentCount].Title
+				</a>
+			</div>
+			@if (Model.ShowCategory)
+			{
+				<div class="document-category">@Model.Documents[documentCount].Category?.Name</div>
+			}
+			@if (Model.ShowModifiedDate)
+			{
+				<div class="document-modifieddate">@Model.Documents[documentCount].ModifiedDate.FormatDate(true)</div>
+			}
+			@if (Model.ShowSize)
+			{
+				<div class="document-size">@Model.Documents[documentCount].Size.FormatSize()</div>
+			}
+			@if (Model.ShowDescription)
+			{
+				<div class="document-description">@Model.Documents[documentCount].Description</div>
+			}
+			</div>
+		}
+	</div>
+</div>

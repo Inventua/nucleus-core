@@ -1,0 +1,87 @@
+﻿@model Nucleus.Modules.Forums.ViewModels.ViewForumPost
+@using Nucleus.Extensions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Forums.ViewModels
+@Html.AddStyle("~!/../viewer.css")
+@Html.AddStyle("~/Resources/css/forms.css")
+@using (Html.BeginNucleusForm("SaveForumPost", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = "form.parent()", @enctype = "multipart/form-data" }))
+{
+<fieldset>
+	@Html.HiddenFor(model => model.Forum.Id)
+	@Html.HiddenFor(model => model.Post.Id)
+
+	<SettingsControl caption="Subject" helptext="Post subject.">
+		@Html.TextBoxFor(model => model.Post.Subject)
+	</SettingsControl>
+
+	<SettingsControl caption="Body" helptext="Post body.">
+		@Html.TextAreaFor(model => model.Post.Body, new { @class = "HtmlEditorControl" })
+	</SettingsControl>
+
+	@if (Model.CanAttach)
+	{
+		<SettingsControl caption="Add Attachment" helptext="Add Attachment">
+			<div class="nucleus-flex-fields nucleus-fileselector">
+				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { ActionName = "AddPostAttachment" })
+			</div>
+		</SettingsControl>
+	}
+
+	@if (Model.Post?.Attachments?.Any() == true)
+	{
+		<table>
+			@for (var attachmentCount = 0; attachmentCount < Model.Post.Attachments.Count; attachmentCount++)
+			{
+				<tr>
+					<td>
+						@Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].Id)
+						@Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].File.Id)
+						@Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].File.Provider)
+						@Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].File.Path)
+						@Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].File.Name)
+						<a href="@Url.FileLink(Model.Post.Attachments[attachmentCount].File)" alt="@Model.Post.Attachments[attachmentCount].File.Name">
+							@Model.Post.Attachments[attachmentCount].File.Name
+						</a>
+					</td>
+					<td class="nucleus-small-cell">
+						@if (Model.CanAttach)
+						{
+							<input type="submit" title="Delete Attachment" value="&#xe14c;" class="nucleus-material-icon btn btn-danger-secondary" formaction="@Url.NucleusAction("DeletePostAttachment", "Forums", "Forums")?id=@Model.Post.Attachments[attachmentCount].Id" data-confirm="Delete this attachment?" />
+						}
+					</td>
+				</tr>
+			}
+		</table>
+	}
+
+	@if (Model.Post.Id == Guid.Empty)
+	{
+		<div class="nucleus-flex-fields">
+			@if (Model.CanPinPost)
+			{
+				<SettingsControl caption="Pinned?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether this post is pinned (shown at the top of the forum).">
+					@Html.CheckBoxFor(model => model.Post.IsPinned, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+			}
+
+			@if (Model.CanLockPost)
+			{
+				<SettingsControl caption="Locked?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether this post is locked (replies are disabled).">
+					@Html.CheckBoxFor(model => model.Post.IsLocked, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+			}
+		</div>
+	}
+
+</fieldset>
+
+<div class="nucleus-form-tools">
+	<input type="submit" formaction="@Url.NucleusAction("SaveForumPost", "Forums", "Forums")" value="Save" class="btn btn-primary" data-target="form.parent()" />
+	@Html.LinkButton("", "Cancel", Url.PageLink(Model.Forum.Name.FriendlyEncode()), new { })
+
+</div>
+}
+<script type="text/javascript">
+	jQuery('.HtmlEditorControl').HtmlEditor();
+</script>

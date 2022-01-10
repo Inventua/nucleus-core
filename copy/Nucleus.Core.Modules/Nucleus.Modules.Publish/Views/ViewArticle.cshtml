@@ -1,0 +1,67 @@
+﻿@model Nucleus.Modules.Publish.ViewModels.ViewArticle
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Publish.ViewModels
+@Html.AddStyle("~!/../viewer.css")
+<div class="Article">
+	<h2 class="title">
+		@Model.Article.Title
+	</h2>
+	<div class="metadata">
+		<div class="publish-date">
+			@((Model.Article.PublishDate != DateTimeOffset.MinValue ? Model.Article.PublishDate : Model.Article.DateAdded).FormatDate(true))
+		</div>
+		@if (Model.Article.Categories.Count > 0 || Model.Article.Featured)
+		{
+			<div class="categories">
+				@if (Model.Article.Featured)
+				{
+					<span class="featured category">Featured</span>
+				}
+				@foreach (var category in Model.Article.Categories)
+				{
+					<span class="category">@category.CategoryItem.Name</span>
+				}
+			</div>
+		}
+	</div>
+	@if (!String.IsNullOrEmpty(@Model.Article.SubTitle))
+	{
+		<h3 class="sub-title">
+			@Model.Article.SubTitle
+		</h3>
+	}
+	@if (!String.IsNullOrEmpty(@Model.Article.Summary))
+	{
+		<div class="summary">
+			@Model.Article.Summary
+		</div>
+	}
+	@if (!String.IsNullOrEmpty(@Model.Article.Description))
+	{
+		<div class="description">
+			@Model.Article.Description
+		</div>
+	}
+	<div class="body">
+		@if (Model.Article.ImageFile != null && Model.Article.ImageFile.Id != Guid.Empty)
+		{
+			<span class="image"><img src="@Url.DownloadLink(Model.Article.ImageFile)" /></span>
+		}
+		@Html.Raw(Model.Article.Body)
+	</div>
+	@if (Model.Article.Attachments.Count > 0)
+	{
+		<div class="attachments">
+			@for (var attachmentCount = 0; attachmentCount < Model.Article.Attachments.Count; attachmentCount++)
+			{
+				<span>
+					<a href="@Url.DownloadLink(Model.Article.Attachments[attachmentCount].File)" alt="@Model.Article.Attachments[attachmentCount].File.Name">
+						@Model.Article.Attachments[attachmentCount].File.Name
+					</a>
+				</span>
+			}
+		</div>
+	}
+</div>

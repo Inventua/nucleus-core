@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<PropertyGroup Label="Globals">
+	  <SccProjectName>SAK</SccProjectName>
+	  <SccProvider>SAK</SccProvider>
+	  <SccAuxPath>SAK</SccAuxPath>
+	  <SccLocalPath>SAK</SccLocalPath>
+	</PropertyGroup>
+
+	<!--<PropertyGroup>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+	</PropertyGroup>-->
+
+	<ItemGroup>
+		<None Remove="**\*.vspscc" />
+		<None Remove="**\*.scc" />
+		<None Remove="*.zip" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="package.xml" />
+	  <None Remove="readme.txt" />
+	  <None Remove="Views\Settings.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="package.xml" />
+	  <Content Include="readme.txt" />
+	  <Content Include="Views\Settings.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Views\Viewer.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
+	  <ProjectReference Include="..\Nucleus.Core\Nucleus.Core.csproj" />
+	  <ProjectReference Include="..\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
+	</ItemGroup>
+
+	<PropertyGroup Label="Nucleus">
+		<ExtensionFolder>TextHtml</ExtensionFolder>
+		<Version>2.0.0</Version>
+	</PropertyGroup>
+
+	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+
+</Project>

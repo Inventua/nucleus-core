@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Label="Globals">
+    <SccProjectName></SccProjectName>
+    <SccProvider></SccProvider>
+    <SccAuxPath></SccAuxPath>
+    <SccLocalPath></SccLocalPath>
+  </PropertyGroup>
+	
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<RootNamespace>Nucleus.Extensions.ElasticSearch</RootNamespace>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+  <ItemGroup>
+		<None Remove="**\*.vspscc" />
+		<None Remove="**\*.scc" />
+		<None Remove="*.zip" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <None Remove="disable-private-loadcontext.json" />
+    <None Remove="package.xml" />
+    <None Remove="readme.txt" />
+    <None Remove="settings.css" />
+    <None Remove="Views\Settings.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="disable-private-loadcontext.json" />
+    <Content Include="package.xml" />
+    <Content Include="readme.txt" />
+    <Content Include="settings.css" />
+    <Content Include="Views\Settings.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+		<PackageReference Include="NEST" Version="7.16.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
+  </ItemGroup>
+
+	<PropertyGroup Label="Nucleus">
+		<ExtensionFolder>ElasticSearch</ExtensionFolder>
+		<Version>1.0.0</Version>
+	</PropertyGroup>
+	
+	<Target Name="FilterCopyLocalItems" AfterTargets="ResolveLockFileCopyLocalFiles">
+    <ItemGroup>
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(DestinationSubPath)' != 'Elasticsearch.Net.dll' AND '%(DestinationSubPath)' != 'NEST.dll'" />
+    </ItemGroup>
+  </Target>
+
+	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+</Project>

@@ -1,0 +1,17 @@
+﻿@model Nucleus.Web.ViewModels.Admin.ScheduledTaskIndex
+<h1>Scheduled Tasks</h1>
+<div class="nucleus-form-tools">
+	<a href="@Url.Content("~/Admin/ScheduledTasks/Editor")" class="btn btn-secondary" data-target=".ScheduledTaskEditor">New Scheduled Task</a>
+</div>
+<div class="nucleus-index-wrapper">
+	<div class="nucleus-index-items">
+		<ul>
+			@foreach (var item in Model.ScheduledTasks)
+			{
+				<li><a href="@Url.Content("~/Admin/ScheduledTasks/Editor")?id=@item.Id" data-target=".ScheduledTaskEditor">@item.Name</a></li>
+			}
+		</ul>
+	</div>
+
+	<div class="ScheduledTaskEditor nucleus-editor-panel"></div>
+</div>

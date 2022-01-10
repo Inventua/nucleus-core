@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package id="$guid1$" xmlns="urn:nucleus/schemas/package/1.0">
+	<name>$nucleus_extension_name$</name>
+	<version>1.0.0</version>
+	<publisher name="$publisher_name$" url="$publisher_url$" email="$publisher_email$" />
+	<description>
+		$nucleus_extension_description$
+	</description>
+	<compatibility minVersion="1.0.0.0" maxVersion="*" />
+	
+	<components>
+		<component folderName="$nucleus_extension_name$" optional="false">
+			<moduleDefinition id="$guid2$">
+				<friendlyName>$nucleus_extension_friendlyname$</friendlyName>
+				<classTypeName>$nucleus_extension_namespace$.Controllers.$nucleus_extension_name$Controller,$nucleus_extension_namespace$</classTypeName>
+				<viewAction>Index</viewAction>
+				<editAction>Settings</editAction>
+			</moduleDefinition>
+
+			<file name="readme.txt" />
+
+			<folder name="Bin">
+				<file name="$nucleus_extension_namespace$.dll" />
+			</folder>
+			
+		</component>
+	</components>
+	
+</package>

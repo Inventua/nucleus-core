@@ -1,0 +1,174 @@
+﻿@model Nucleus.Modules.Forums.ViewModels.GroupSettings
+@using Nucleus.Abstractions.Models
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Forums.ViewModels
+<h2>Group Settings</h2>
+@using (Html.BeginNucleusForm("SelectGroupAttachmentsFolder", "ForumsAdmin", "Forums", FormMethod.Post, new { @data_target = ".ForumsSettings", @autocomplete = "off" }))
+{
+	<Tab>
+		<TabItem target="#group-properties" caption="Properties" active="true"></TabItem>
+		<TabItem target="#group-permissions" caption="Permissions"></TabItem>
+		@if (Model.Group?.Forums != null)
+		{
+			<TabItem target="#group-forums" caption="Forums"></TabItem>
+		}
+	</Tab>
+
+	<TabContent>
+		<TabPanel id="group-properties" active="true">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Properties</h2>
+				@Html.HiddenFor(model => model.Group.Id)
+
+				<SettingsControl caption="Name" helptext="Group name">
+					@Html.TextBoxFor(model => model.Group.Name)
+				</SettingsControl>
+
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Enabled?" class="inner-inline" rendermode="LabelLast" helptext="Disabled forum groups are not displayed, and users cannot view, create or reply to posts.">
+						@Html.CheckBoxFor(model => model.Group.Settings.Enabled, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+
+					<SettingsControl caption="Visible?" class="inner-inline" rendermode="LabelLast" helptext="Forum groups which are not visible are not displayed, but users can view, create or reply to existing posts.">
+						@Html.CheckBoxFor(model => model.Group.Settings.Visible, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+				</div>
+
+				<SettingsControl caption="Allow attachments?" class="inner-inline AllowAttachments" rendermode="LabelLast" helptext="Specifies whether users can attach documents to posts or replies.">
+					@Html.CheckBoxFor(model => model.Group.Settings.AllowAttachments, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+
+				<SettingsControl caption="Attachments Folder" helptext="Attachments folder" class="AttachmentsFolder">
+					<div class="nucleus-flex-fields nucleus-fileselector">
+						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FolderSelector), new { model = Model.Group.Settings.AttachmentsFolder, PropertyName = "Group.Settings.AttachmentsFolder" })
+					</div>
+				</SettingsControl>
+
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Moderated?" class="inner-inline" rendermode="LabelLast" helptext="Posts and replies to moderated forums must be approved by a moderator before they can be seen by others.">
+						@Html.CheckBoxFor(model => model.Group.Settings.IsModerated, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+
+					<SettingsControl caption="Allow search indexing?" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether search indexing engines should include forum posts in their search index.">
+						@Html.CheckBoxFor(model => model.Group.Settings.AllowSearchIndexing, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+				</div>
+
+				<SettingsControl caption="Status List" helptext="Select the list to use for post statuses for this group.  Lists are managed in the Nucleus Lists manager.">
+					@Html.DropDownListFor(model => model.Group.Settings.StatusList.Id, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")
+				</SettingsControl>
+
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Subscription mail template" helptext="Email template used to inform subscribers of new posts or replies.">
+						@Html.DropDownListFor(model => model.Group.Settings.SubscriptionMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+					</SettingsControl>
+
+					<SettingsControl caption="Moderator mail template" helptext="Email template used to inform moderators of new posts or replies.">
+						@Html.DropDownListFor(model => model.Group.Settings.ModerationRequiredMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+					</SettingsControl>
+				</div>
+
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Post Approved mail template" helptext="Email template used to inform users that their post or reply has been approved by a moderator.">
+						@Html.DropDownListFor(model => model.Group.Settings.ModerationApprovedMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+					</SettingsControl>
+
+					<SettingsControl caption="Post Rejected mail template" helptext="Email template used to inform users that their post or reply has been rejected by a moderator.">
+						@Html.DropDownListFor(model => model.Group.Settings.ModerationRejectedMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+					</SettingsControl>
+				</div>
+			</fieldset>
+		</TabPanel>
+
+		<TabPanel id="group-permissions" class="Section">
+			@if (Model.AvailableRoles.Count() > 0)
+			{
+				<div class="nucleus-form-tools">
+					@Html.DropDownListFor(model => model.SelectedRoleId, Model.AvailableRoles, new { @class = "flex-fill" })
+					<input type="submit" formaction="@Url.NucleusAction("AddGroupPermissionRole", "ForumsAdmin", "Forums")" value="Add Role" data-target="#GroupEditor" class="btn btn-secondary" />
+				</div>
+			}
+			<table>
+				<tr>
+					<th></th>
+					@foreach (var permissionType in Model.ForumPermissionTypes)
+					{
+						<th>@permissionType.Name</th>
+					}
+				</tr>
+
+				@foreach (var item in Model.GroupPermissions.Values)
+				{
+					<tr>
+						<td>
+							@item.Role.Name
+						</td>
+
+						@for (int permissionsCount = 0; permissionsCount < Model.GroupPermissions[item.Role.Id].Permissions.Count; permissionsCount++)
+						{
+							<td>
+								@Html.HiddenFor(model => Model.GroupPermissions[item.Role.Id].Permissions[permissionsCount].Id)
+								@Html.HiddenFor(model => Model.GroupPermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Id)
+								@Html.HiddenFor(model => Model.GroupPermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope)
+								@if (Model.GroupPermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope == PermissionType.PermissionScopeNamespaces.Disabled)
+								{
+									<span class="nucleus-material-icon text-center d-block">&#xe8f5;</span>
+								}
+								else
+								{
+									@Html.CheckBoxFor(model => Model.GroupPermissions[item.Role.Id].Permissions[permissionsCount].AllowAccess)
+								}
+							</td>
+						}
+
+						<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("DeleteGroupPermissionRole", "ForumsAdmin", "Forums", new { id = item.Role.Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target="#GroupEditor" /></td>
+					</tr>
+				}
+			</table>
+		</TabPanel>
+
+		@if (Model.Group?.Forums != null)
+		{
+			<TabPanel id="group-forums">
+				<fieldset role="group" aria-labelledby="heading">
+					<h3>Forums</h3>
+					<div class="nucleus-form-tools">
+						<input type="submit" formaction="@Url.NucleusAction("NewForum", "ForumsAdmin", "Forums")" value="Add Forum" data-target="#ForumEditor" class="btn btn-primary" />
+					</div>
+
+					<div id="ForumList">
+						@await Html.PartialAsync("_ForumList.cshtml", Model)
+					</div>
+				</fieldset>
+			</TabPanel>
+		}
+	</TabContent>
+
+	<div class="nucleus-button-panel">
+		<input type="submit" class="btn btn-primary" value="Save Changes" formaction="@Url.NucleusAction("SaveGroup", "ForumsAdmin", "Forums")" />
+		@if (Model.Group?.Id != Guid.Empty)
+		{
+			<input type="submit" class="btn btn-danger" value="Delete Group" formaction="@Url.NucleusAction("DeleteGroup", "ForumsAdmin", "Forums")" data-confirm="Groups can only be deleted if they contain no forums.  Use the 'Enabled' setting to disable a group which contains forums.  Delete this group?" />
+		}
+	</div>
+}
+<script type="text/javascript">
+	GroupEditor_ShowSettings();
+
+	jQuery('#group-properties .AllowAttachments input[type=checkbox]').on('change', GroupEditor_ShowSettings);
+
+	function GroupEditor_ShowSettings()
+	{
+		if (!jQuery('#group-properties .AllowAttachments input[type=checkbox]').is(':checked'))
+		{
+			jQuery('#group-properties .AttachmentsFolder').css('opacity', '0.25');
+			jQuery('#group-properties .AttachmentsFolder *').attr('disabled', 'disabled');
+		}
+		else
+		{
+			jQuery('#group-properties .AttachmentsFolder').css('opacity', '1.0');
+			jQuery('#group-properties .AttachmentsFolder *').removeAttr('disabled');
+		}
+	}
+</script>

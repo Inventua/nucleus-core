@@ -1,0 +1,11 @@
+﻿@model Nucleus.Modules.Publish.ViewModels.Viewer
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Publish.ViewModels
+@Html.AddStyle("~!/../viewer.css")
+@using (Html.BeginNucleusForm("Index", "Publish", FormMethod.Post, new { @data_target = ".Module" }))
+{
+	@await Component.InvokeAsync("PagingControl", new { model = @Model.Articles, propertyName = "Articles" })
+	@await Html.PartialAsync(@Model.Layout, Model)
+}

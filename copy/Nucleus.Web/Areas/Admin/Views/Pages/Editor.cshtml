@@ -1,0 +1,191 @@
+﻿@model Nucleus.Web.ViewModels.Admin.PageEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@using (Html.BeginAreaForm("Save", "Pages", "Admin", FormMethod.Post, new { @data_target = ".AdminPage", @autocomplete = "off" }))
+{
+	
+	<Tab>
+		<TabItem active="true" target="#page-properties" caption="Properties"></TabItem>
+		<TabItem target="#page-permissions" caption="Permissions"></TabItem>
+		<TabItem target="#page-modules" caption="Modules"></TabItem>	
+	</Tab>
+	
+	<TabContent>
+		<TabPanel id="page-properties" active="true">
+			<fieldset role="group" aria-labelledby="heading">
+
+				<div class="align-right">
+					@if (!Model.Page.IsFirst)
+					{
+						@Html.SubmitButton("&#xe5d8;", "Move Up", Url.AreaAction("MovePageUp", "Pages", "Admin", new { id = Model.Page.Id }), null)
+					}
+
+					@if (!Model.Page.IsLast)
+					{
+						@Html.SubmitButton("&#xe5db;", "Move Down", Url.AreaAction("MovePageDown", "Pages", "Admin", new { id = Model.Page.Id }), null)
+					}
+				</div>
+				<h2>Basic Properties</h2>
+
+				@Html.HiddenFor(model => model.Page.Id)
+				@Html.HiddenFor((model) => model.Page.SortOrder)
+
+				<div class="Flex">
+					<SettingsControl caption="Page Name" helptext="Name of the page">
+						@Html.TextBoxFor(model => model.Page.Name, new { @class = "PageName" })
+					</SettingsControl>
+
+					<SettingsControl caption="Page Title" helptext="Title of the page">
+						@Html.TextBoxFor(model => model.Page.Title)
+					</SettingsControl>
+				</div>
+
+				<SettingsControl name="@nameof(Model.Page.ParentId)" caption="Parent Page" helptext="The parent page for this page, used when rendering a menu.">
+					@Html.DropDownListFor(model => model.Page.ParentId, new SelectList(Model.Pages, "Id", "Name"), "root")
+				</SettingsControl>
+
+				<SettingsControl caption="Description" helptext="Description of the page.  Some search engines use the page description to generate result snippets.">
+					@Html.TextAreaFor(model => model.Page.Description)
+				</SettingsControl>
+
+				<SettingsControl caption="Page Disabled?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the page is available.  Navigating to a disabled page will generate a '404: Not found' response.">
+					@Html.CheckBoxFor(model => model.Page.Disabled, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+			</fieldset>
+
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Meta Data/SEO</h2>
+
+				<SettingsControl caption="Keywords" helptext="Keywords may be used by a built-in search indexing service.  They are not used by search engines like Google, and are not rendered within the page meta-data.">
+					@Html.TextBoxFor(model => model.Page.Keywords)
+				</SettingsControl>
+			</fieldset>
+
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Layout</h2>
+
+				<SettingsControl caption="Layout" helptext="Select a page layout for this page, or select '(site default)' to use the default layout for this site.">
+					@Html.DropDownListFor(model => model.Page.Layout.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
+				</SettingsControl>
+
+				<div class="Flex">
+					<SettingsControl caption="Show in Menu?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the page is displayed in menus.">
+						@Html.CheckBoxFor(model => model.Page.ShowInMenu, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+
+					<SettingsControl caption="Disable in Menu?" rendermode="LabelLast" class="inner-inline" helptext="If the page is being used as a placeholder (heading) in menus, and has no content, set 'Disable in menu' to prevent it from being clickable in menus.">
+						@Html.CheckBoxFor(model => model.Page.DisableInMenu, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+				</div>
+			</fieldset>
+
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Paths</h2>
+				<div class="Tools">
+					@Html.SubmitButton("&#xe145;", "Add Path", Url.AreaAction("AddPageRoute", "Pages", "Admin"), new { @data_target = ".PageEditor" })
+				</div>
+				<table>
+					<tr>
+						<th>Path</th>
+						<th>Type</th>
+						<th class="align-center">Default</th>
+						<th></th>
+					</tr>
+					@for (int urlCount = 0; urlCount < Model.Page.Routes.Count; urlCount++)
+					{
+						<tr>
+							<td>
+								@Html.HiddenFor(model => model.Page.Routes[urlCount].Id)
+								@Html.TextBoxFor(model => model.Page.Routes[urlCount].Path, (@Model.Page.Routes[urlCount].Id == Guid.Empty ? new { @class = "DefaultPagePath" } : null))
+							</td>
+
+							<td>@Html.DropDownListFor(model => model.Page.Routes[urlCount].Type, Html.GetEnumSelectList<PageRoute.PageRouteTypes>())</td>
+							<td class="align-center">@Html.RadioButtonFor(model => model.Page.DefaultPageRouteId, @Model.Page.Routes[urlCount].Id)</td>
+							<td class="SmallIconCell"><input type="submit" formaction="@Url.AreaAction("DeletePageRoute", "Pages", "Admin", new { id = Model.Page.Routes[urlCount].Id })" value="&#xe14c;" class="MaterialIcon DeleteButton" title="Delete" data-target=".PageEditor" /></td>
+						</tr>
+					}
+				</table>
+			</fieldset>
+
+		</TabPanel>
+
+		<TabPanel id="page-permissions">
+			@await Html.PartialAsync("PagePermissionsEditor")
+		</TabPanel>
+
+		<TabPanel id="page-modules">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Modules on this page</h2>
+				<div class="Tools">
+					<input type="submit" formaction="@Url.AreaAction("AddModule", "Pages", "Admin")" value="Add Module" data-target=".ModuleCommonSettingsEditor" />
+				</div>
+				@if (Model.Page.Modules.Count > 0)
+				{
+					<table>
+						<tr>
+							<th></th>
+							<th>Type</th>
+							<th></th>
+							<th></th>
+							<th></th>
+						</tr>
+
+						@{ int count = 0; }
+						@foreach (var modulePane in Model.Page.Modules.GroupBy(m => m.Pane))
+						{
+							<tr>
+								<td><h3>@modulePane.Key</h3></td>
+							</tr>
+							count = 0;
+							@foreach (var module in modulePane)
+							{
+								<tr>
+									<td>@(String.IsNullOrEmpty(module.Title) ? "-" : module.Title)</td>
+									<td>@module.ModuleDefinition.FriendlyName</td>
+									<td class="SmallIconCell"><input type="submit" formaction="@Url.AreaAction("EditModule", "Pages", "Admin")?mid=@module.Id" value="&#xe3c9;" class="MaterialIcon" title="Edit" data-target=".ModuleEditor" /></td>
+									<td class="SmallIconCell"><input type="submit" formaction="@Url.AreaAction("EditModuleCommonSettings", "Pages", "Admin")?mid=@module.Id" value="&#xe8b8;" title="Settings" class="MaterialIcon" data-target=".ModuleCommonSettingsEditor" /></td>
+									<td class="SmallIconCell"><input type="submit" formaction="@Url.AreaAction("DeleteModule", "Pages", "Admin")?mid=@module.Id" value="&#xe14c;" class="MaterialIcon DeleteButton" title="Delete" data-target=".PageEditor" data-confirm="Delete this module?" /></td>
+									<td class="SmallIconCell">
+										@if (count != 0)
+										{
+											<input type="submit" formaction="@Url.AreaAction("MoveModuleUp", "Pages", "Admin")?mid=@module.Id" value="&#xe5d8;" class="MaterialIcon secondary" title="Move Up" data-target=".PageEditor" />
+										}
+									</td>
+									<td class="SmallIconCell">
+										@if (count < modulePane.Count() - 1)
+										{
+											<input type="submit" formaction="@Url.AreaAction("MoveModuleDown", "Pages", "Admin")?mid=@module.Id" value="&#xe5db;" class="MaterialIcon secondary" title="Move Down" data-target=".PageEditor" />
+										}
+									</td>
+								</tr>
+								count++;
+							}
+						}
+					</table>
+				}
+			</fieldset>
+		</TabPanel>
+	</TabContent>
+
+
+	<div class="ButtonPanel">
+		<input type="submit" class="DefaultButton" value="Save Changes" />
+		@if (Model.Page.Id != Guid.Empty)
+		{
+			<input type="submit" class="DeleteButton" value="Delete Page" formaction="@Url.AreaAction("DeletePage", "Pages", "Admin")" data-confirm="Delete this page?" />
+		}
+
+	</div>
+
+	<div class="ModuleCommonSettingsEditor EditorPopup" data-overlay=".ModuleEditorOverlay"></div>
+
+	<div class="ModuleEditorOverlay EditorOverlay"></div>
+}
+
+<div class="ModuleEditor EditorPopup" data-overlay=".ModuleEditorOverlay"></div>
+
+<script type="text/javascript">
+	jQuery('.PageName').on('change', function () { jQuery('.DefaultPagePath').val(jQuery(this).val()); })
+</script>

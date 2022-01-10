@@ -1,0 +1,640 @@
+{
+	"schemaName": "Nucleus.Modules.Forums",
+	"version": "01.00.00",
+	"operations": [
+		{
+			"createTable": {
+				"name": "ForumGroups",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ModuleId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Name",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "SortOrder",
+						"clrType": "int",
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ForumGroups",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_ForumGroups_ModuleId",
+						"Columns": [ "ModuleId" ],
+						"PrincipalTable": "PageModules",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ForumGroups_ModuleId",
+				"table": "ForumGroups",
+				"isunique": false,
+				"columns": [ "ModuleId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ForumGroups_Name",
+				"table": "ForumGroups",
+				"isunique": true,
+				"columns": [ "ModuleId", "Name" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "Forums",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ForumGroupId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Name",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Description",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "SortOrder",
+						"clrType": "int",
+						"isnullable": true
+					},
+					{
+						"name": "UseGroupSettings",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_Forums",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_Forums_ForumGroupId",
+						"Columns": [ "ForumGroupId" ],
+						"PrincipalTable": "ForumGroups",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Forums_ForumGroupId",
+				"table": "Forums",
+				"isunique": false,
+				"columns": [ "ForumGroupId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Forums_Name",
+				"table": "Forums",
+				"isunique": true,
+				"columns": [ "ForumGroupId", "Name" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "ForumSettings",
+				"columns": [
+					{
+						"name": "RelatedId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Enabled",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "Visible",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "StatusListId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "IsModerated",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "AllowAttachments",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "AllowSearchIndexing",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "SubscriptionMailTemplateId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "ModerationRequiredMailTemplateId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "ModerationApprovedMailTemplateId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "ModerationRejectedMailTemplateId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "AttachmentsFolderId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ForumSettings",
+					"isclustered": true,
+					"columns": [ "RelatedId" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_ForumSettings_StatusListId",
+						"Columns": [ "StatusListId" ],
+						"PrincipalTable": "Lists",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "SetNull"
+					}
+				]
+			}
+		},
+		{
+			"createTable": {
+				"name": "ForumPosts",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ForumId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Subject",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Body",
+						"clrType": "string",
+						"isnullable": false
+					},
+					{
+						"name": "IsLocked",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "IsPinned",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "IsApproved",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "StatusId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ForumPosts",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_ForumPosts_ForumId",
+						"Columns": [ "ForumId" ],
+						"PrincipalTable": "Forums",
+						"PrincipalColumns": [ "Id" ]
+					},
+					{
+						"name": "FK_ForumPosts_StatusId",
+						"Columns": [ "StatusId" ],
+						"PrincipalTable": "ListItems",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "SetNull"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ForumPosts_ForumId",
+				"table": "ForumPosts",
+				"isunique": false,
+				"columns": [ "ForumId" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "ForumReplies",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ForumPostId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ReplyToId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "Body",
+						"clrType": "string",
+						"isnullable": false
+					},
+					{
+						"name": "IsApproved",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ForumReplies",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_ForumReplies_ReplyToId",
+						"Columns": [ "ReplyToId" ],
+						"PrincipalTable": "ForumReplies",
+						"PrincipalColumns": [ "Id" ]
+					},
+					{
+						"name": "FK_ForumReplies_ForumPostId",
+						"Columns": [ "ForumPostId" ],
+						"PrincipalTable": "ForumPosts",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ForumReplies_ForumPostId",
+				"table": "ForumReplies",
+				"isunique": false,
+				"columns": [ "ForumPostId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ForumReplies_ReplyToId",
+				"table": "ForumReplies",
+				"isunique": false,
+				"columns": [ "ReplyToId" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "ForumAttachments",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ForumPostId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ForumReplyId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "FileId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ForumAttachments",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_ForumAttachments_ForumPostId",
+						"Columns": [ "ForumPostId" ],
+						"PrincipalTable": "ForumPosts",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					},
+					{
+						"name": "FK_ForumAttachments_ForumReplyId",
+						"Columns": [ "ForumReplyId" ],
+						"PrincipalTable": "ForumReplies",
+						"PrincipalColumns": [ "Id" ]
+					}
+				]
+			}
+		},
+		{
+			"createTable": {
+				"name": "ForumSubscriptions",
+				"columns": [
+					{
+						"name": "UserId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ForumId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ForumSubscriptions",
+					"isclustered": true,
+					"columns": [ "UserId", "ForumId" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_ForumSubscriptions_ForumId",
+						"Columns": [ "ForumId" ],
+						"PrincipalTable": "Forums",
+						"PrincipalColumns": [ "Id" ]
+					},
+					{
+						"name": "FK_ForumSubscriptions_UserId",
+						"Columns": [ "UserId" ],
+						"PrincipalTable": "Users",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createTable": {
+				"name": "ForumPostTracking",
+				"columns": [
+					{
+						"name": "UserId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ForumPostId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ForumPostTracking",
+					"isclustered": true,
+					"columns": [ "UserId", "ForumPostId" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_ForumPostTracking_ForumPostId",
+						"Columns": [ "ForumPostId" ],
+						"PrincipalTable": "ForumPosts",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					},
+					{
+						"name": "FK_ForumPostTracking_UserId",
+						"Columns": [ "UserId" ],
+						"PrincipalTable": "Users",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		}
+	]
+}

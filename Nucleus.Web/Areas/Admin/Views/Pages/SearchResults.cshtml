@@ -1,0 +1,36 @@
+﻿@model Nucleus.Web.ViewModels.Admin.PageIndex
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Extensions;
+<div class="nucleus-admin-search collapse@(Model.SearchResults?.Items?.Any() == true ? " show" : "")">
+	<a class="nucleus-btn-close-results" onclick="jQuery('.nucleus-admin-search').removeClass('show');">&#xe5cd;</a>
+	<h2>Search Results</h2>
+	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.SearchResults, propertyName = "SearchResults" })
+	@if (Model.SearchResults?.Items?.Any() == true)
+	{
+		<div class="nucleus-search-results d-flex flex-column">
+			@foreach (var item in Model.SearchResults.Items)
+			{
+				<div>
+					<div>
+						<a href="@Url.Content("~/Admin/Pages/Editor")?id=@item.Id" data-target="#nucleus-page-editor">@item.Name</a>
+						@if (!String.IsNullOrEmpty(item.Name == item.Title ? "" : item.Title))
+						{
+							<span class="nucleus-search-results-subtitle">@(item.Name == item.Title ? "" : item.Title)</span>
+						}
+					</div>
+					
+					@if (!String.IsNullOrEmpty(@item.Description))
+					{
+					<div class="text-muted">
+						<span class="nucleus-search-results-long-text">@item.Description</span>
+					</div>
+					}
+				</div>
+			}
+		</div>
+	}
+</div>
+
+
+
+

@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package id="ea9fa093-ba1a-4a04-bfee-9786ec4beda5" xmlns="urn:nucleus/schemas/package/1.0">
+	<name>Forums</name>
+	<version>1.0.0</version>
+	<publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
+	<description>
+		Nucleus Core Forums Module
+	</description>
+	<compatibility minVersion="1.0.0.0" maxVersion="*" />
+	
+	<components>
+		<component folderName="Forums" optional="false">
+			<moduleDefinition id="ea9b5d66-b791-414c-8c52-a20536cfa9f5">
+				<friendlyName>Forums</friendlyName>
+				<classTypeName>Nucleus.Modules.Forums.Controllers.ForumsController,Nucleus.Modules.Forums</classTypeName>
+				<viewAction>Index</viewAction>
+				<editAction>Settings</editAction>
+			</moduleDefinition>
+
+			<file name="readme.txt" />
+			<file name="viewer.css" />
+			<file name="settings.css" />
+			
+			<folder name="Bin">
+				<file name="Nucleus.Modules.Forums.dll" />
+			</folder>
+			
+			<folder name="Views">
+				<file name="ListForums.cshtml" />
+				<file name="ViewForum.cshtml" />
+				<file name="Settings.cshtml" />
+				<file name="GroupEditor.cshtml" />
+				<file name="ForumEditor.cshtml" />
+				<file name="ViewPost.cshtml" />
+				<file name="EditPost.cshtml" />
+				<file name="ReplyPost.cshtml" />
+			</folder>
+			
+		</component>
+	</components>
+	
+</package>

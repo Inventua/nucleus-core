@@ -1,0 +1,45 @@
+{
+  "$schema": "./nucleus.schema.json",
+  "Nucleus": {
+    "Database": {
+      "Connections": [
+        // Database connections are available to the core and modules, but must be configured in the Schemas section in order to be used.
+        {
+          "Key": "CoreSqlite",
+          "Type": "Sqlite",
+          "ConnectionString": "Data Source={DataFolder}//Data/Nucleus.db"
+        },
+        {
+          "Key": "TestSqlite",
+          "Type": "Sqlite",
+          "ConnectionString": "Data Source={DataFolder}//Data/Nucleus23-12-2021.db"
+        },
+        {
+          "Key": "CoreSqlServer",
+          "Type": "SqlServer",
+          "ConnectionString": "Data Source=UNICORN;Initial Catalog=NUCLEUS_DEV;User ID=sa;Password=Inventua1!"
+        },
+        {
+          "Key": "TestSqlServer",
+          "Type": "SqlServer",
+          "ConnectionString": "Data Source=UNICORN;Initial Catalog=NUCLEUS_DEV_TEST;User ID=sa;Password=Inventua1!"
+        },
+        {
+          // An in-memory database can be used to test database object creation and the setup wizard, but it
+          // will cease to exist after the app restarts - which happens after the setup wizard runs, so it can't
+          // be used for more general testing.
+          "Key": "InMemorySqlite",
+          "Type": "Sqlite",
+          "ConnectionString": "Data Source=file::memory:;Cache=Shared"
+        }
+      ],
+      "Schemas": [
+        {
+          "Name": "*",
+          "ConnectionKey": "TestSqlite"
+        }
+      ]
+    }
+  }
+}
+

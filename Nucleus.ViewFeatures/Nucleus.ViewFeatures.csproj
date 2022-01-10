@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName></SccProjectName>
+    <SccProvider></SccProvider>
+    <SccAuxPath></SccAuxPath>
+    <SccLocalPath></SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Nucleus.ViewFeatures.xml</DocumentationFile>
+		<TargetFramework>net5.0</TargetFramework>
+		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>Nucleus.ViewFeatures</PackageId>
+		<Authors>Inventua Pty Ltd</Authors>
+		<Product>Nucleus</Product>
+		<Description>Html Helpers, Tag Helpers, Url Helpers and shared controls used by Nucleus modules.</Description>
+		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
+	  <ProjectReference Include="..\Nucleus.Extensions\Nucleus.Extensions.csproj" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<None Remove="**\*.vspscc" />
+		<None Remove="**\*.scc" />
+	</ItemGroup>
+
+</Project>

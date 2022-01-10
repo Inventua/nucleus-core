@@ -1,0 +1,35 @@
+﻿/* CSS classes for the inline module settings controls */
+.nucleus-module-editing
+{
+  border: dotted 2px #ddd;
+  position: relative;
+  /*overflow: visible!important;*/
+}
+
+.nucleus-module-editing .nucleus-inline-edit-controls
+{
+  display: flex;
+  justify-content: end;
+	gap: 2px;
+}
+
+.nucleus-module-editing .nucleus-inline-edit-controls *
+{
+  visibility: hidden;  
+}
+
+.nucleus-module-editing .nucleus-inline-edit-controls .btn-danger
+{
+  margin-left: 4px;
+}
+
+.nucleus-module-editing:hover .nucleus-inline-edit-controls *
+{
+  visibility: visible;
+}
+
+.nucleus-module-editing .nucleus-inline-edit-controls .btn
+{
+  padding: 4px 6px;
+  font-size: 12px;
+}

@@ -1,0 +1,35 @@
+﻿@model Nucleus.Modules.MultiContent.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<table class="Contents">
+	<tr>
+		<th>Title</th>
+	</tr>
+	@for (int contentCount = 0; contentCount < Model.Contents.Count; contentCount++)
+	{
+		<tr>
+			<td>
+				@Html.HiddenFor(model => model.Contents[contentCount].Id)
+				@Model.Contents[contentCount].Title
+			</td>
+
+			<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("Edit", "MultiContent", "MultiContent")?id=@Model.Contents[contentCount].Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-primary" title="Edit" data-target="#ContentEditor" /></td>
+			<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("Delete", "MultiContent", "MultiContent")?id=@Model.Contents[contentCount].Id" value="&#xe14c;" data-target="#multi-content-contentlist" class="nucleus-material-icon btn btn-danger" title="Delete" data-confirm="Delete this content?" /></td>
+			<td class="nucleus-small-cell">
+				@if (contentCount != 0)
+				{
+					<input type="submit" formaction="@Url.NucleusAction("MoveUp", "MultiContent", "MultiContent")?id=@Model.Contents[contentCount].Id" value="&#xe5d8;" data-target="#multi-content-contentlist" class="nucleus-material-icon btn btn-outline-secondary" title="Move Up" />
+				}
+			</td>
+			<td class="nucleus-small-cell">
+				@if (contentCount < Model.Contents.Count - 1)
+				{
+					<input type="submit" formaction="@Url.NucleusAction("MoveDown", "MultiContent", "MultiContent")?id=@Model.Contents[contentCount].Id" value="&#xe5db;" data-target="#multi-content-contentlist" class="nucleus-material-icon btn btn-outline-secondary" title="Move Down" />
+				}
+			</td>
+		</tr>
+	}
+</table>

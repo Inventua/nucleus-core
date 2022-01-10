@@ -1,0 +1,16 @@
+﻿#article-attachments table tr td:last-child
+{
+	text-align: right;
+	width: 20px;
+	padding: 2px;
+}
+
+.article-categories
+{
+	display: grid;
+}
+
+.article-categories label span
+{
+	display: inline-block;
+}

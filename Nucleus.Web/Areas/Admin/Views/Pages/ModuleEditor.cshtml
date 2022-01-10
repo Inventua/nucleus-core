@@ -1,0 +1,17 @@
+﻿@model Nucleus.Web.ViewModels.Admin.PageModuleEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@if (!String.IsNullOrEmpty(Model.UseLayout))
+{
+	Layout = Model.UseLayout;
+}
+@*@if (Model.RenderHeader)
+{
+	<h2>@(String.IsNullOrEmpty(Model.Module.Title) ? "No Title" : @Model.Module.Title)</h2>
+}*@
+@await Html.RenderEditorAsync(Model.Module, false)
+
+
+

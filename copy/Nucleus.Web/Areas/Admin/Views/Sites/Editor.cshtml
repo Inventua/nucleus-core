@@ -1,0 +1,294 @@
+﻿@model Nucleus.Web.ViewModels.Admin.SiteEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions
+@using Nucleus.Abstractions.Models
+@using Nucleus.Abstractions.Models.Mail
+@using (Html.BeginAreaForm("Select", "Sites", "Admin", FormMethod.Post, new { @data_target = Model.IsCurrentSiteEditor ? ".AdminPage" : ".SiteEditor", @autocomplete = "off", @enctype = "multipart/form-data" }))
+{
+	@if (Model.IsCurrentSiteEditor)
+	{
+		<h1>Site</h1>
+	}
+	<Tab>
+		<TabItem target="#site-properties" caption="Properties" active="true"></TabItem>
+		<TabItem target="#site-aliases" caption="Aliases"></TabItem>
+		<TabItem target="#site-userprofile" caption="User Profile Properties"></TabItem>
+		<TabItem target="#site-sitepages" caption="Site Pages"></TabItem>
+		<TabItem target="#site-mailsettings" caption="Email Settings"></TabItem>
+		<TabItem target="#site-mailtemplates" caption="Email Templates"></TabItem>
+	</Tab>
+	<TabContent>
+		<TabPanel id="site-properties" active="true">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>General</h2>
+				@Html.HiddenFor(model => model.Site.Id)
+				@Html.HiddenFor(model => model.IsCurrentSiteEditor)
+
+				<SettingsControl caption="Name" helptext="Role name">
+					@Html.TextBoxFor(model => model.Site.Name)
+				</SettingsControl>
+
+				<SettingsControl caption="Default Layout" helptext="Description">
+					@Html.DropDownListFor(model => model.Site.DefaultLayout.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
+				</SettingsControl>
+
+				@if (Model.Site.Id == Guid.Empty)
+				{
+					<SettingsControl caption="Administrators Role" helptext="Administrators Role">
+						@Html.TextBoxFor(model => model.Site.AdministratorsRole.Name)
+					</SettingsControl>
+
+					<SettingsControl caption="Registered Users Role" helptext="Registered users role">
+						@Html.TextBoxFor(model => model.Site.RegisteredUsersRole.Name)
+					</SettingsControl>
+
+					<SettingsControl caption="Anonymous Users Role" helptext="Anonymous users role">
+						@Html.TextBoxFor(model => model.Site.AnonymousUsersRole.Name)
+					</SettingsControl>
+
+					<SettingsControl caption="All Users Role" helptext="All users role">
+						@Html.TextBoxFor(model => model.Site.AllUsersRole.Name)
+					</SettingsControl>
+				}
+				else
+				{
+					<SettingsControl caption="Site Logo" helptext="Site banner logo.">
+						<div class="Flex FileSelector">
+							@await Component.InvokeAsync("FileSelector", new { model = Model.SelectedLogoFile, PropertyName = "SelectedLogoFile", SelectAnotherActionName = "SelectAnotherLogo", Pattern = "(.gif|.png|.jpg|.jpeg|.bmp)" })
+							@await Component.InvokeAsync("FileUpload", new { actionName = "UploadLogo", controlName = "logoFile", filter="image/*" })
+						</div>
+					</SettingsControl>
+
+					<SettingsControl caption="Site Icon" helptext="Site icon.">
+						<div class="Flex FileSelector">
+							@await Component.InvokeAsync("FileSelector", new { model = Model.SelectedIconFile, PropertyName = "SelectedIconFile", SelectAnotherActionName = "SelectAnotherIcon", Pattern = ".*\\.ico" })
+							@await Component.InvokeAsync("FileUpload", new { actionName = "UploadIcon", controlName = "iconFile", filter = "image/*" })
+						</div>
+					</SettingsControl>
+
+					@Html.HiddenFor(model => model.Site.AdministratorsRole.Name)
+					@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Name)
+					@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Name)
+					@Html.HiddenFor(model => model.Site.AllUsersRole.Name)
+
+					<div class="Flex">
+						<SettingsControl caption="Administrators Role" helptext="Administrators Role">
+							@Html.DropDownListFor(model => model.Site.AdministratorsRole.Id, new SelectList(Model.Roles, "Id", "Name"))
+						</SettingsControl>
+
+						<SettingsControl caption="Registered Users Role" helptext="Registered Users Role">
+							@Html.DropDownListFor(model => model.Site.RegisteredUsersRole.Id, new SelectList(Model.Roles, "Id", "Name"))
+						</SettingsControl>
+					</div>
+
+					<div class="Flex">
+						<SettingsControl caption="Anonymous Users Role" helptext="Anonymous Users Role">
+							@Html.DropDownListFor(model => model.Site.AnonymousUsersRole.Id, new SelectList(Model.Roles, "Id", "Name"), "(none selected)")
+						</SettingsControl>
+
+						<SettingsControl caption="All Users Role" helptext="All Users Role">
+							@Html.DropDownListFor(model => model.Site.AllUsersRole.Id, new SelectList(Model.Roles, "Id", "Name"), "(none selected)")
+						</SettingsControl>
+					</div>
+				}
+
+
+				<SettingsControl caption="Site Group" helptext="Site Group">
+					@Html.DropDownListFor(model => model.Site.SiteGroupId, new SelectList(Model.SiteGroups, "Id", "Name"), "(none selected)")
+				</SettingsControl>
+
+				<SettingsControl caption="Home Directory" helptext="Home directory">
+					@Html.TextBoxFor(model => model.Site.HomeDirectory)
+				</SettingsControl>
+
+			</fieldset>
+		</TabPanel>
+
+		<TabPanel id="site-aliases">
+			<h2>Aliases</h2>
+			<div class="Tools">
+				<input type="submit" formaction="@Url.AreaAction("AddAlias", "Sites", "Admin")" value="Add Alias" data-target=".AliasEditor" />
+			</div>
+			<table>
+				<tr>
+					<th>Alias</th>
+				</tr>
+				@foreach (SiteAlias alias in Model.Site.Aliases)
+				{
+					<tr>
+						<td>@(String.IsNullOrEmpty(alias.Alias) ? "(default)" : alias.Alias)</td>
+						<td class="SmallIconCell"><input type="submit" formaction="@Url.AreaAction("EditAlias", "Sites", "Admin")?id=@alias.Id" value="&#xe3c9;" class="MaterialIcon" data-target=".AliasEditor" /></td>
+						<td class="SmallIconCell"><input type="submit" formaction="@Url.AreaAction("DeleteAlias", "Sites", "Admin")?id=@alias.Id" value="&#xe14c;" title="Delete Alias" class="MaterialIcon DeleteButton" data-target=".AdminPage" data-confirm="If you delete this site alias, the site will no longer respond to requests which use this alias.  Do you want to delete this alias?" /></td>
+
+					</tr>
+				}
+			</table>
+		</TabPanel>
+
+		<TabPanel id="site-userprofile">
+			<h2>User Profile Properties</h2>
+
+			<div class="Tools">
+				<input type="submit" formaction="@Url.AreaAction("AddUserProfileProperty", "Sites", "Admin")" value="Add Property" data-target=".PropertyEditor" />
+			</div>
+			<table>
+				<tr>
+					<th>Name</th>
+					<th>Type</th>
+				</tr>
+
+				@if (Model.Site.UserProfileProperties != null)
+				{
+					int count = 0;
+					@foreach (UserProfileProperty prop in Model.Site.UserProfileProperties)
+					{
+						<tr>
+							<td>@prop.Name</td>
+							<td>@(prop.TypeUri ?? "")</td>
+							<td class="SmallIconCell"><input type="submit" formaction="@Url.AreaAction("EditUserProfileProperty", "Sites", "Admin")?id=@prop.Id" value="&#xe3c9;" class="MaterialIcon" data-target=".PropertyEditor" /></td>
+							<td class="SmallIconCell"><input type="submit" formaction="@Url.AreaAction("DeleteUserProfileProperty", "Sites", "Admin")?id=@prop.Id" value="&#xe14c;" title="Delete user profile property" class="MaterialIcon DeleteButton" data-target=".AdminPage" data-confirm="This will delete the '@prop.Name' user property so that it no longer appears on user data input forms, but it will not remove data from existing users.  Delete this property?" /></td>
+							<td class="SmallIconCell">
+								@if (count != 0)
+								{
+									<input type="submit" formaction="@Url.AreaAction("MovePropertyUp", "Sites", "Admin")?id=@prop.Id" value="&#xe5d8;" class="MaterialIcon secondary" title="Move Up" data-target=".AdminPage" />
+								}
+							</td>
+							<td class="SmallIconCell">
+								@if (count < Model.Site.UserProfileProperties.Count() - 1)
+								{
+									<input type="submit" formaction="@Url.AreaAction("MovePropertyDown", "Sites", "Admin")?id=@prop.Id" value="&#xe5db;" class="MaterialIcon secondary" title="Move Down" data-target=".AdminPage" />
+								}
+							</td>
+						</tr>
+						count++;
+					}
+				}
+			</table>
+		</TabPanel>
+
+		<TabPanel id="site-sitepages">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Site Pages</h2>
+
+				<h3>User Pages</h3>
+				<div class="Flex">
+					<SettingsControl caption="Login Page" helptext="Login Page">
+						@Html.DropDownListFor(model => model.SitePages.LoginPageId, new SelectList(Model.Pages, "Id", "Name"), "(none selected)")
+					</SettingsControl>
+
+					<SettingsControl caption="User Registration Page" helptext="User Registration Page">
+						@Html.DropDownListFor(model => model.SitePages.UserRegisterPageId, new SelectList(Model.Pages, "Id", "Name"), "(none selected)")
+					</SettingsControl>
+				</div>
+				<div class="Flex">
+					<SettingsControl caption="User Profile Page" helptext="User Profile Page">
+						@Html.DropDownListFor(model => model.SitePages.UserProfilePageId, new SelectList(Model.Pages, "Id", "Name"), "(none selected)")
+					</SettingsControl>
+
+					<div></div>
+				</div>
+
+				<h3>Special Use Pages</h3>
+				<div class="Flex">
+					<SettingsControl caption="Terms of Use Page" helptext="Terms of Use Page">
+						@Html.DropDownListFor(model => model.SitePages.TermsPageId, new SelectList(Model.Pages, "Id", "Name"), "(none selected)")
+					</SettingsControl>
+
+					<SettingsControl caption="Privacy Policy Page" helptext="Privacy Policy Page">
+						@Html.DropDownListFor(model => model.SitePages.PrivacyPageId, new SelectList(Model.Pages, "Id", "Name"), "(none selected)")
+					</SettingsControl>
+				</div>
+
+				<h3>Error Pages</h3>
+				<div class="Flex">
+					<SettingsControl caption="Page not Found (404) page" helptext="Page not Found (404) page">
+						@Html.DropDownListFor(model => model.SitePages.NotFoundPageId, new SelectList(Model.Pages, "Id", "Name"), "(none selected)")
+					</SettingsControl>
+
+					<SettingsControl caption="Error Page" helptext="Error Page">
+						@Html.DropDownListFor(model => model.SitePages.ErrorPageId, new SelectList(Model.Pages, "Id", "Name"), "(none selected)")
+					</SettingsControl>
+				</div>
+
+			</fieldset>
+		</TabPanel>
+
+		<TabPanel id="site-mailsettings">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Email Settings</h2>
+
+				<div class="Flex">
+					<SettingsControl caption="SMTP Host" helptext="SMTP host name">
+						@Html.TextBoxFor(model => model.MailSettings.HostName)
+					</SettingsControl>
+
+					<SettingsControl caption="SMTP Port" helptext="SMTP Port">
+						@Html.TextBoxFor(model => model.MailSettings.Port)
+					</SettingsControl>
+				</div>
+
+				<SettingsControl caption="Use SSL?" helptext="Use SSL?" rendermode="LabelLast" class="inner-inline">
+					@Html.CheckBoxFor(model => model.MailSettings.UseSsl, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+
+				<SettingsControl caption="Sender Email" helptext="Sender Email">
+					@Html.TextBoxFor(model => model.MailSettings.Sender)
+				</SettingsControl>
+
+				<div class="Flex">
+					<SettingsControl caption="User Name" helptext="Username">
+						@Html.TextBoxFor(model => model.MailSettings.UserName)
+					</SettingsControl>
+
+					<SettingsControl caption="Password" helptext="Password">
+						@if (Model.Site.Id == Guid.Empty)
+						{
+							@Html.PasswordFor(model => model.MailSettings.Password)
+						}
+						else
+						{
+							@Html.PasswordFor(model => model.MailSettings.Password, new { @value = SiteExtensions.UNCHANGED_PASSWORD })
+						}
+					</SettingsControl>
+				</div>
+			</fieldset>
+		</TabPanel>
+
+		<TabPanel id="site-mailtemplates">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Email Templates</h2>
+
+				<SettingsControl caption="Welcome new user" helptext="Email template for the ''Welcome new user' message.'">
+					@Html.DropDownListFor(model => model.SiteTemplateSelections.WelcomeNewUserTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+				</SettingsControl>
+
+				<SettingsControl caption="Account Name Reminder" helptext="Email template sent to users who request a user name reminder.">
+					@Html.DropDownListFor(model => model.SiteTemplateSelections.AccountNameReminderTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+				</SettingsControl>
+
+
+				<SettingsControl caption="Password Reset" helptext="Password reset">
+					@Html.DropDownListFor(model => model.SiteTemplateSelections.PasswordResetTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+				</SettingsControl>
+
+			</fieldset>
+		</TabPanel>
+	</TabContent>
+
+	<div class="ButtonPanel">
+		<input type="submit" class="DefaultButton" value="Save Changes" formaction="@Url.AreaAction("Save", "Sites", "Admin")" data-target=".AdminPage" />
+		@if (Model.Site.Id != Guid.Empty && !Model.IsCurrentSite)
+		{
+			<input type="submit" class="DeleteButton" value="Delete Site" formaction="@Url.AreaAction("DeleteSite", "Sites", "Admin")" data-confirm="This will delete all pages, roles, role groups and users which belong to this site.  Delete this site?" />
+		}
+	</div>
+}
+
+
+<div class="AliasEditorOverlay EditorOverlay"></div>
+<div class="AliasEditor EditorPopup" data-overlay=".AliasEditorOverlay"></div>
+
+<div class="PropertyEditorOverlay EditorOverlay"></div>
+<div class="PropertyEditor EditorPopup" data-overlay=".PropertyEditorOverlay"></div>

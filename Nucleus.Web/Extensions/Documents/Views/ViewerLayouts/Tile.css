@@ -1,0 +1,86 @@
+﻿.Documents 
+{
+	display: flex;
+	flex-direction: column;
+}
+
+.Documents > div.document-tiles
+{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-auto-rows: 1fr;
+	grid-gap: 0.75rem;
+}
+
+.Documents > div.document-tiles > div
+{
+	padding: 0.75rem;
+	border: solid 1px #ddd;
+}
+
+.Documents .document-modifieddate:before
+{
+	content: 'modified '
+}
+
+.document-sort-list 
+{
+	display: flex;
+	position: relative;
+	width: 16rem;
+}
+
+.document-sort-list .document-sort-list-selected
+{
+	display: flex;
+	border: solid 1px #767676;
+	border-radius: 2px;
+	padding: 2px 3px;
+	margin-bottom: 0.25rem;
+	flex-basis: 100%;
+}
+
+.document-sort-list .document-sort-list-selected > span
+{
+	display: flex;
+	flex-grow: 1;
+	align-self: center;
+}
+
+.document-sort-list > ul
+{
+	padding: 0;
+	margin: 0;
+	max-height: 12rem;
+	overflow: auto;
+	border: solid 1px #333;
+	position: absolute;
+	background-color: white;
+	left: 0;
+	right:0;
+	z-index: 1;
+}
+
+.document-sort-list li
+{
+	opacity: 0.9;
+	cursor: default;		
+	list-style-type: none;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.document-sort-list li a, .document-sort-list li span
+{	
+	padding: 4px;
+	font-size: inherit!important;
+	flex-grow: 1;
+	text-decoration: none;
+	color: inherit;
+}
+
+.document-sort-list li a:hover
+{
+	opacity: 1;
+	background-color: #ccc;		
+}

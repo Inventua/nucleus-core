@@ -1,0 +1,10 @@
+﻿OL.Sitemap, OL.Sitemap OL
+{
+	padding-left: 1em;
+	margin-bottom: 0.5em;
+}
+
+OL.Sitemap LI
+{
+	list-style-type: none;
+}

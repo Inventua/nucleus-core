@@ -1,0 +1,6 @@
+﻿@model Nucleus.Web.ViewModels.User.PageSelector
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@Html.PageMenuFor(Model.PageMenu, Model.FromPage, -1, new { })

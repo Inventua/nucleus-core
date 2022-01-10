@@ -1,0 +1,7 @@
+{
+	"urls": "http://*:5000",
+	"iisSettings": {
+		"windowsAuthentication": false,
+		"anonymousAuthentication": true
+	}
+}

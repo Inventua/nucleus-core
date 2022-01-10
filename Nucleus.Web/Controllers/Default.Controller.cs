@@ -1,0 +1,131 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
+using Nucleus.Abstractions.Models;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions;
+using Nucleus.Extensions;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Nucleus.ViewFeatures;
+using Microsoft.Extensions.DependencyInjection;
+using Nucleus.Extensions.Authorization;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+
+namespace Nucleus.Web.Controllers
+{
+	/// <summary>
+	/// Display a page and module content, using the selected layout
+	/// </summary>
+	public class DefaultController : Controller
+	{
+		private ILogger<DefaultController> Logger { get; }
+		private Context Context { get; }
+		private IFileSystemManager FileSystemManager { get; }
+		private IPageManager PageManager { get; }
+		private ISiteManager SiteManager { get; }
+		private IUserManager UserManager { get; }
+
+		private HashSet<string> filteredFilenames = new(new string[] { "robots.txt" });
+		private HashSet<string> filteredFileExtensions = new(new string[] { ".txt" });
+
+		public DefaultController(ILogger<DefaultController> logger, Context context, ISiteManager siteManager, IUserManager userManager, IFileSystemManager fileSystemManager, IPageManager pageManager)
+		{
+			this.Logger = logger;
+			this.Context = context;
+			this.FileSystemManager = fileSystemManager;
+			this.PageManager = pageManager;
+			this.SiteManager = siteManager;
+			this.UserManager = userManager;
+		}
+
+		[HttpGet]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_VIEW_POLICY)]
+		public async Task<ActionResult> Index()
+		{
+			//string layoutPath;
+			Boolean isErrorPage = false;
+
+			if (this.Context.Site == null && this.Context.Page == null)
+			{
+				if (await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0)
+				{
+					return RedirectToAction("Index", "SiteWizard", new { area = "Setup" });
+				}
+			}
+
+			if (this.Context.Page == null)
+			{
+				Logger.LogTrace("Not found.");
+
+				if (!No404Redirect() && this.Context.Site != null)
+				{
+					SitePages sitePages = this.Context.Site.GetSitePages();
+					Page notFoundPage;
+					if (sitePages.NotFoundPageId.HasValue)
+					{
+						notFoundPage = await this.PageManager.Get(sitePages.NotFoundPageId.Value);
+						if (notFoundPage != null)
+						{
+							this.Context.Page = notFoundPage;
+							isErrorPage = true;
+						}
+					}
+				}
+
+				if (!isErrorPage)
+				{
+					return NotFound();
+				}
+			}
+
+			if (!isErrorPage)
+			{
+				// Handle "PermanentRedirect" page routes
+				foreach (PageRoute pageRoute in this.Context.Page.Routes.ToArray())
+				{
+					if (pageRoute.Path.Equals(ControllerContext.HttpContext.Request.Path, StringComparison.OrdinalIgnoreCase))
+					{
+						if (pageRoute.Type == PageRoute.PageRouteTypes.PermanentRedirect)
+						{
+							string redirectUrl = this.Url.PageLink(this.Context.Page);
+							Logger.LogTrace("Permanently redirecting request to {redirectUrl}.");
+							return RedirectPermanent(redirectUrl);
+						}
+					}
+				}				
+			}
+
+			ViewModels.Default viewModel = new(this.Context);
+
+			viewModel.IsEditing = User.IsEditing(HttpContext, this.Context.Site, this.Context.Page);
+			viewModel.CanEdit = User.CanEditContent(this.Context.Site, this.Context.Page);
+			viewModel.DefaultPageUri = base.Url.GetAbsoluteUri(this.Context.Page.DefaultPageRoute().Path).AbsoluteUri;
+			viewModel.SiteIconPath = Context.Site.GetIconPath();
+
+			return View(this.Context.Page.LayoutPath(this.Context.Site), viewModel);
+		}
+
+		/// <summary>
+		/// Return true to prevent redirection to the "friendly" 404 page if the form of the request path (or another condition) means
+		/// that the user agent should get a "real" 404 error.
+		/// </summary>
+		/// <returns></returns>
+		private Boolean No404Redirect()
+		{
+			if (filteredFilenames.Contains(System.IO.Path.GetFileName(ControllerContext.HttpContext.Request.Path)))
+			{
+				return true;
+			}
+
+			if (filteredFileExtensions.Contains(System.IO.Path.GetExtension(ControllerContext.HttpContext.Request.Path)))
+			{
+				return true;
+			}
+
+			return false;
+			
+		}
+	}
+}

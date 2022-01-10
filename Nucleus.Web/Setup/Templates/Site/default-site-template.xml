@@ -1,0 +1,913 @@
+<?xml version="1.0"?>
+<site-template xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="urn:nucleus:schemas:xml-site-template/v1">
+	<Site>
+		<Id>{$guid1}</Id>
+		<Name>Default Site</Name>
+		<AdministratorsRole>
+			<Id>{$guid2}</Id>
+			<Name>Administrators</Name>
+			<RoleGroupId xsi:nil="true" />
+			<Type>Normal</Type>
+		</AdministratorsRole>
+		<RegisteredUsersRole>
+			<Id>{$guid3}</Id>
+			<Name>Registered Users</Name>
+			<RoleGroupId xsi:nil="true" />
+			<Type>Normal</Type>
+		</RegisteredUsersRole>
+		<AllUsersRole>
+			<Id>{$guid4}</Id>
+			<Name>All Users</Name>
+			<RoleGroupId xsi:nil="true" />
+			<Description>This role represents all users, whether logged on or not.</Description>
+			<Type>Restricted</Type>
+		</AllUsersRole>
+		<AnonymousUsersRole>
+			<Id>{$guid5}</Id>
+			<Name>Anonymous Users</Name>
+			<RoleGroupId xsi:nil="true" />
+			<Description>This role represents users who are not logged on.</Description>
+			<Type>Restricted</Type>
+		</AnonymousUsersRole>
+		<SiteGroupId xsi:nil="true" />
+		<DefaultSiteAlias>
+			<Id>{$guid6}</Id>
+			<Alias>localhost:5000</Alias>
+		</DefaultSiteAlias>
+		<HomeDirectory>homeportal</HomeDirectory>
+		<Aliases>
+			<SiteAlias>
+				<Id>{$guid6}</Id>
+				<Alias>localhost:5000</Alias>
+			</SiteAlias>
+		</Aliases>
+		<UserProfileProperties>
+			<UserProfileProperty>
+				<Id>{$guid8}</Id>
+				<Name>Email</Name>
+				<TypeUri>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress</TypeUri>
+				<SortOrder>0</SortOrder>
+			</UserProfileProperty>
+			<UserProfileProperty>
+				<Id>{$guid9}</Id>
+				<Name>Mobile Phone</Name>
+				<TypeUri>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone</TypeUri>
+				<SortOrder>20</SortOrder>
+			</UserProfileProperty>
+			<UserProfileProperty>
+				<Id>{$guid10}</Id>
+				<Name>First Name</Name>
+				<TypeUri>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname</TypeUri>
+				<SortOrder>30</SortOrder>
+			</UserProfileProperty>
+			<UserProfileProperty>
+				<Id>{$guid11}</Id>
+				<Name>Last Name</Name>
+				<TypeUri>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname</TypeUri>
+				<SortOrder>40</SortOrder>
+			</UserProfileProperty>
+		</UserProfileProperties>
+		<SiteSettings>
+			<SiteSetting>
+				<SettingName>mailtemplate:welcomenewuser</SettingName>
+				<SettingValue>{$guid12}</SettingValue>
+			</SiteSetting>
+			<SiteSetting>
+				<SettingName>mailtemplate:passwordreset</SettingName>
+				<SettingValue>{$guid13}</SettingValue>
+			</SiteSetting>
+			<SiteSetting>
+				<SettingName>sitepage:login</SettingName>
+				<SettingValue>{$guid15}</SettingValue>
+			</SiteSetting>
+			<SiteSetting>
+				<SettingName>sitepage:notfound</SettingName>
+				<SettingValue>{$guid16}</SettingValue>
+			</SiteSetting>
+			<SiteSetting>
+				<SettingName>sitepage:privacy</SettingName>
+				<SettingValue>{$guid17}</SettingValue>
+			</SiteSetting>
+			<SiteSetting>
+				<SettingName>sitepage:userregister</SettingName>
+				<SettingValue>{$guid18}</SettingValue>
+			</SiteSetting>
+			<SiteSetting>
+				<SettingName>sitepage:userprofile</SettingName>
+				<SettingValue>{$guid20}</SettingValue>
+			</SiteSetting>
+			<SiteSetting>
+				<SettingName>favicon:provider</SettingName>
+				<SettingValue>local</SettingValue>
+			</SiteSetting>
+			<SiteSetting>
+				<SettingName>favicon:path</SettingName>
+				<SettingValue>favicon.ico</SettingValue>
+			</SiteSetting>
+			<SiteSetting>
+				<SettingName>mailtemplate:accountnamereminder</SettingName>
+				<SettingValue>{$guid21}</SettingValue>
+			</SiteSetting>
+			<SiteSetting>
+				<SettingName>sitepage:userchangepassword</SettingName>
+				<SettingValue>{$guid22}</SettingValue>
+			</SiteSetting>
+		</SiteSettings>
+	</Site>
+	<PermissionTypes>
+		<PermissionType>
+			<Id>7ec40aaa-9eb0-4005-9895-c0256e749b83</Id>
+			<Name>View</Name>
+			<SortOrder>0</SortOrder>
+			<Scope>urn:nucleus:entities:page/permissiontype/view</Scope>
+		</PermissionType>
+		<PermissionType>
+			<Id>f7ad2ba9-948a-4eb4-bc6e-fce814aee0bf</Id>
+			<Name>Edit</Name>
+			<SortOrder>1</SortOrder>
+			<Scope>urn:nucleus:entities:page/permissiontype/edit</Scope>
+		</PermissionType>
+		<PermissionType>
+			<Id>0a0cd2fb-8612-4932-8b7b-f4d6ee99cc11</Id>
+			<Name>View</Name>
+			<SortOrder>0</SortOrder>
+			<Scope>urn:nucleus:entities:module/permissiontype/view</Scope>
+		</PermissionType>
+		<PermissionType>
+			<Id>86c40f45-a84e-4be4-8186-3bee97896320</Id>
+			<Name>Edit</Name>
+			<SortOrder>1</SortOrder>
+			<Scope>urn:nucleus:entities:module/permissiontype/edit</Scope>
+		</PermissionType>
+		<PermissionType>
+			<Id>dc07183f-6d6c-41d0-8974-2af73d288145</Id>
+			<Name>View</Name>
+			<SortOrder>0</SortOrder>
+			<Scope>urn:nucleus:entities:folder/permissiontype/view</Scope>
+		</PermissionType>
+		<PermissionType>
+			<Id>dee15e89-d511-42f5-afc4-e41c77fa3b03</Id>
+			<Name>Edit</Name>
+			<SortOrder>1</SortOrder>
+			<Scope>urn:nucleus:entities:folder/permissiontype/edit</Scope>
+		</PermissionType>
+	</PermissionTypes>
+	<ScheduledTasks>
+		<ScheduledTask>
+			<Id>{$guid26}</Id>
+			<Name>Collect Cache</Name>
+			<TypeName>Nucleus.Core.ScheduledTasks.CollectCacheScheduledTask,Nucleus.Core</TypeName>
+			<IntervalType>Minutes</IntervalType>
+			<Interval>10</Interval>
+			<Enabled>true</Enabled>
+			<KeepHistoryCount>10</KeepHistoryCount>
+		</ScheduledTask>
+		<ScheduledTask>
+			<Id>{$guid27}</Id>
+			<Name>Truncate Scheduled Task History</Name>
+			<TypeName>Nucleus.Core.ScheduledTasks.TruncateScheduledTaskHistoryScheduledTask,Nucleus.Core</TypeName>
+			<IntervalType>Hours</IntervalType>
+			<Interval>1</Interval>
+			<Enabled>true</Enabled>
+			<KeepHistoryCount>10</KeepHistoryCount>
+		</ScheduledTask>
+		<ScheduledTask>
+			<Id>{$guid115}</Id>
+			<Name>Remove Expired Sessions</Name>
+			<TypeName>Nucleus.Core.ScheduledTasks.CollectSessionsScheduledTask,Nucleus.Core</TypeName>
+			<IntervalType>Minutes</IntervalType>
+			<Interval>10</Interval>
+			<Enabled>true</Enabled>
+			<KeepHistoryCount>10</KeepHistoryCount>
+		</ScheduledTask>
+	</ScheduledTasks>
+	<Pages>
+		<Page>
+			<Id>{$guid28}</Id>
+			<ParentId xsi:nil="true" />
+			<Name>Home</Name>
+			<Title>Home</Title>
+			<Description>Home page</Description>
+			<DefaultPageRouteId>{$guid29}</DefaultPageRouteId>
+			<Routes>
+				<PageRoute>
+					<Id>{$guid29}</Id>
+					<Path>/</Path>
+					<Type>Active</Type>
+				</PageRoute>
+			</Routes>
+			<Disabled>false</Disabled>
+			<ShowInMenu>true</ShowInMenu>
+			<DisableInMenu>false</DisableInMenu>
+			<LayoutDefinition>
+				<Id>07f3c7f2-97e6-46d3-8218-1e02cbbb5cf2</Id>
+				<FriendlyName>Default 2 Column</FriendlyName>
+				<RelativePath>Shared\Layouts\default-2-column.cshtml</RelativePath>
+			</LayoutDefinition>
+			<SortOrder>10</SortOrder>
+			<Modules>
+				<PageModule>
+					<Id>{$guid32}</Id>
+					<Pane>ContentPane</Pane>
+					<Title>Welcome</Title>
+					<ModuleDefinition>
+						<Id>b516d8dd-c793-4776-be33-902eb704bef6</Id>
+						<FriendlyName>Html</FriendlyName>
+						<ClassTypeName>Nucleus.Modules.TextHtml.Controllers.TextHtmlController,Nucleus.Modules.TextHtml</ClassTypeName>
+						<ViewAction>Index</ViewAction>
+						<EditAction>Edit</EditAction>
+						<Categories>Content</Categories>
+					</ModuleDefinition>
+					<ModuleSettings />
+					<Permissions />
+					<Style />
+					<SortOrder>10</SortOrder>
+					<InheritPagePermissions>true</InheritPagePermissions>
+				</PageModule>
+			</Modules>
+			<Permissions>
+				<Permission>
+					<Id>{$guid35}</Id>
+					<RelatedId>{$guid28}</RelatedId>
+					<PermissionType>
+						<Id>7ec40aaa-9eb0-4005-9895-c0256e749b83</Id>
+						<Name>View</Name>
+						<SortOrder>0</SortOrder>
+						<Scope>urn:nucleus:entities:page/permissiontype/view</Scope>
+					</PermissionType>
+					<Role>
+						<Id>{$guid4}</Id>
+						<Name>All Users</Name>
+						<RoleGroupId xsi:nil="true" />
+						<Description>This role represents all users, whether logged on or not.</Description>
+						<Type>Restricted</Type>
+					</Role>
+					<AllowAccess>true</AllowAccess>
+				</Permission>
+				<Permission>
+					<Id>{$guid38}</Id>
+					<RelatedId>{$guid28}</RelatedId>
+					<PermissionType>
+						<Id>f7ad2ba9-948a-4eb4-bc6e-fce814aee0bf</Id>
+						<Name>Edit</Name>
+						<SortOrder>1</SortOrder>
+						<Scope>urn:nucleus:entities:page/permissiontype/edit</Scope>
+					</PermissionType>
+					<Role>
+						<Id>{$guid4}</Id>
+						<Name>All Users</Name>
+						<RoleGroupId xsi:nil="true" />
+						<Description>This role represents all users, whether logged on or not.</Description>
+						<Type>Restricted</Type>
+					</Role>
+					<AllowAccess>false</AllowAccess>
+				</Permission>
+				<Permission>
+					<Id>{$guid41}</Id>
+					<RelatedId>{$guid28}</RelatedId>
+					<PermissionType>
+						<Id>7ec40aaa-9eb0-4005-9895-c0256e749b83</Id>
+						<Name>View</Name>
+						<SortOrder>0</SortOrder>
+						<Scope>urn:nucleus:entities:page/permissiontype/view</Scope>
+					</PermissionType>
+					<Role>
+						<Id>{$guid3}</Id>
+						<Name>Registered Users</Name>
+						<RoleGroupId xsi:nil="true" />
+						<Type>Normal</Type>
+					</Role>
+					<AllowAccess>true</AllowAccess>
+				</Permission>
+				<Permission>
+					<Id>{$guid44}</Id>
+					<RelatedId>{$guid28}</RelatedId>
+					<PermissionType>
+						<Id>f7ad2ba9-948a-4eb4-bc6e-fce814aee0bf</Id>
+						<Name>Edit</Name>
+						<SortOrder>1</SortOrder>
+						<Scope>urn:nucleus:entities:page/permissiontype/edit</Scope>
+					</PermissionType>
+					<Role>
+						<Id>{$guid3}</Id>
+						<Name>Registered Users</Name>
+						<RoleGroupId xsi:nil="true" />
+						<Type>Normal</Type>
+					</Role>
+					<AllowAccess>false</AllowAccess>
+				</Permission>
+			</Permissions>
+		</Page>
+		<Page>
+			<Id>{$guid47}</Id>
+			<ParentId xsi:nil="true" />
+			<Name>User Management</Name>
+			<Title>User Management</Title>
+			<DefaultPageRouteId xsi:nil="true" />
+			<Routes>
+				<PageRoute>
+					<Id>{$guid48}</Id>
+					<Path>/UserManagement</Path>
+					<Type>Active</Type>
+				</PageRoute>
+			</Routes>
+			<Disabled>false</Disabled>
+			<ShowInMenu>false</ShowInMenu>
+			<DisableInMenu>false</DisableInMenu>
+			<SortOrder>30</SortOrder>
+			<Modules />
+			<Permissions />
+		</Page>
+		<Page>
+			<Id>{$guid20}</Id>
+			<ParentId>{$guid47}</ParentId>
+			<Name>Account Settings</Name>
+			<Title>Account Settings</Title>
+			<DefaultPageRouteId>{$guid51}</DefaultPageRouteId>
+			<Routes>
+				<PageRoute>
+					<Id>{$guid51}</Id>
+					<Path>/Account</Path>
+					<Type>Active</Type>
+				</PageRoute>
+			</Routes>
+			<Disabled>false</Disabled>
+			<ShowInMenu>false</ShowInMenu>
+			<DisableInMenu>false</DisableInMenu>
+			<SortOrder>10</SortOrder>
+			<Modules>
+				<PageModule>
+					<Id>{$guid54}</Id>
+					<Pane>ContentPane</Pane>
+					<Title />
+					<ModuleDefinition>
+						<Id>1f347233-99e1-47b8-aa78-90ec16c6dbd2</Id>
+						<FriendlyName>User Profile</FriendlyName>
+						<ClassTypeName>Nucleus.Modules.Account.Controllers.UserProfileController,Nucleus.Modules.Account</ClassTypeName>
+						<ViewAction>Index</ViewAction>
+						<EditAction>Edit</EditAction>
+						<Categories>Account Management</Categories>
+					</ModuleDefinition>
+					<ModuleSettings />
+					<Permissions />
+					<Style />
+					<SortOrder>20</SortOrder>
+					<InheritPagePermissions>true</InheritPagePermissions>
+				</PageModule>
+			</Modules>
+			<Permissions>
+				<Permission>
+					<Id>{$guid55}</Id>
+					<RelatedId>{$guid20}</RelatedId>
+					<PermissionType>
+						<Id>7ec40aaa-9eb0-4005-9895-c0256e749b83</Id>
+						<Name>View</Name>
+						<SortOrder>0</SortOrder>
+						<Scope>urn:nucleus:entities:page/permissiontype/view</Scope>
+					</PermissionType>
+					<Role>
+						<Id>{$guid3}</Id>
+						<Name>Registered Users</Name>
+						<RoleGroupId xsi:nil="true" />
+						<Type>Normal</Type>
+					</Role>
+					<AllowAccess>true</AllowAccess>
+				</Permission>
+				<Permission>
+					<Id>{$guid58}</Id>
+					<RelatedId>{$guid20}</RelatedId>
+					<PermissionType>
+						<Id>f7ad2ba9-948a-4eb4-bc6e-fce814aee0bf</Id>
+						<Name>Edit</Name>
+						<SortOrder>1</SortOrder>
+						<Scope>urn:nucleus:entities:page/permissiontype/edit</Scope>
+					</PermissionType>
+					<Role>
+						<Id>{$guid3}</Id>
+						<Name>Registered Users</Name>
+						<RoleGroupId xsi:nil="true" />
+						<Type>Normal</Type>
+					</Role>
+					<AllowAccess>false</AllowAccess>
+				</Permission>
+			</Permissions>
+		</Page>
+		<Page>
+			<Id>{$guid18}</Id>
+			<ParentId>{$guid47}</ParentId>
+			<Name>Signup</Name>
+			<Title>Sign Up</Title>
+			<DefaultPageRouteId>{$guid63}</DefaultPageRouteId>
+			<Routes>
+				<PageRoute>
+					<Id>{$guid63}</Id>
+					<Path>/Signup</Path>
+					<Type>Active</Type>
+				</PageRoute>
+			</Routes>
+			<Disabled>false</Disabled>
+			<ShowInMenu>false</ShowInMenu>
+			<DisableInMenu>false</DisableInMenu>
+			<SortOrder>10</SortOrder>
+			<Modules>
+				<PageModule>
+					<Id>{$guid65}</Id>
+					<Pane>ContentPane</Pane>
+					<Title>Sign Up</Title>
+					<ModuleDefinition>
+						<Id>7b25bdaf-14a3-4bad-9c41-972dbbb384a1</Id>
+						<FriendlyName>User Signup</FriendlyName>
+						<ClassTypeName>Nucleus.Modules.Account.Controllers.SignupController,Nucleus.Modules.Account</ClassTypeName>
+						<ViewAction>Index</ViewAction>
+						<EditAction>Edit</EditAction>
+						<Categories>Account Management</Categories>
+					</ModuleDefinition>
+					<ModuleSettings />
+					<Permissions />
+					<Style />
+					<SortOrder>20</SortOrder>
+					<InheritPagePermissions>true</InheritPagePermissions>
+				</PageModule>
+			</Modules>
+			<Permissions>
+				<Permission>
+					<Id>{$guid66}</Id>
+					<RelatedId>{$guid18}</RelatedId>
+					<PermissionType>
+						<Id>7ec40aaa-9eb0-4005-9895-c0256e749b83</Id>
+						<Name>View</Name>
+						<SortOrder>0</SortOrder>
+						<Scope>urn:nucleus:entities:page/permissiontype/view</Scope>
+					</PermissionType>
+					<Role>
+						<Id>{$guid5}</Id>
+						<Name>Anonymous Users</Name>
+						<RoleGroupId xsi:nil="true" />
+						<Description>This role represents users who are not logged on.</Description>
+						<Type>Restricted</Type>
+					</Role>
+					<AllowAccess>true</AllowAccess>
+				</Permission>
+			</Permissions>
+		</Page>
+		<Page>
+			<Id>{$guid22}</Id>
+			<ParentId>{$guid47}</ParentId>
+			<Name>Change Password</Name>
+			<Title>Change Password</Title>
+			<DefaultPageRouteId>{$guid74}</DefaultPageRouteId>
+			<Routes>
+				<PageRoute>
+					<Id>{$guid74}</Id>
+					<Path>/ChangePassword</Path>
+					<Type>Active</Type>
+				</PageRoute>
+			</Routes>
+			<Disabled>false</Disabled>
+			<ShowInMenu>false</ShowInMenu>
+			<DisableInMenu>false</DisableInMenu>
+			<SortOrder>10</SortOrder>
+			<Modules>
+				<PageModule>
+					<Id>{$guid76}</Id>
+					<Pane>ContentPane</Pane>
+					<Title />
+					<ModuleDefinition>
+						<Id>530efacf-b9ff-4bf1-94d9-c357fc8769ed</Id>
+						<FriendlyName>Change Password</FriendlyName>
+						<ClassTypeName>Nucleus.Modules.Account.Controllers.ChangePasswordController,Nucleus.Modules.Account</ClassTypeName>
+						<ViewAction>Index</ViewAction>
+						<EditAction>Edit</EditAction>
+						<Categories>Account Management</Categories>
+					</ModuleDefinition>
+					<ModuleSettings />
+					<Permissions />
+					<Style />
+					<SortOrder>20</SortOrder>
+					<InheritPagePermissions>true</InheritPagePermissions>
+				</PageModule>
+			</Modules>
+			<Permissions>
+				<Permission>
+					<Id>{$guid77}</Id>
+					<RelatedId>{$guid22}</RelatedId>
+					<PermissionType>
+						<Id>7ec40aaa-9eb0-4005-9895-c0256e749b83</Id>
+						<Name>View</Name>
+						<SortOrder>0</SortOrder>
+						<Scope>urn:nucleus:entities:page/permissiontype/view</Scope>
+					</PermissionType>
+					<Role>
+						<Id>{$guid3}</Id>
+						<Name>Registered Users</Name>
+						<RoleGroupId xsi:nil="true" />
+						<Type>Normal</Type>
+					</Role>
+					<AllowAccess>true</AllowAccess>
+				</Permission>
+			</Permissions>
+		</Page>
+		<Page>
+			<Id>{$guid92}</Id>
+			<ParentId xsi:nil="true" />
+			<Name>Other pages</Name>
+			<Title>Other pages</Title>
+			<DefaultPageRouteId xsi:nil="true" />
+			<Routes>
+				<PageRoute>
+					<Id>{$guid93}</Id>
+					<Path>/other</Path>
+					<Type>Active</Type>
+				</PageRoute>
+			</Routes>
+			<Disabled>false</Disabled>
+			<ShowInMenu>true</ShowInMenu>
+			<DisableInMenu>false</DisableInMenu>
+			<SortOrder>40</SortOrder>
+			<Modules />
+			<Permissions />
+		</Page>
+		<Page>
+			<Id>{$guid94}</Id>
+			<ParentId>{$guid92}</ParentId>
+			<Name>Sitemap</Name>
+			<Title>Site map</Title>
+			<Description>Web site map</Description>
+			<DefaultPageRouteId>{$guid96}</DefaultPageRouteId>
+			<Routes>
+				<PageRoute>
+					<Id>{$guid96}</Id>
+					<Path>/Sitemap</Path>
+					<Type>Active</Type>
+				</PageRoute>
+			</Routes>
+			<Disabled>false</Disabled>
+			<ShowInMenu>true</ShowInMenu>
+			<DisableInMenu>false</DisableInMenu>
+			<LayoutDefinition>
+				<Id>2ff6818a-09fe-4ee2-beff-495a876ab6d6</Id>
+				<FriendlyName>Default</FriendlyName>
+				<RelativePath>Shared\Layouts\default.cshtml</RelativePath>
+			</LayoutDefinition>
+			<SortOrder>10</SortOrder>
+			<Modules>
+				<PageModule>
+					<Id>{$guid98}</Id>
+					<Pane>ContentPane</Pane>
+					<Title>Site map</Title>
+					<ModuleDefinition>
+						<Id>0392bf73-c646-4ccc-bcb5-372a75b9ea84</Id>
+						<FriendlyName>Sitemap</FriendlyName>
+						<ClassTypeName>Nucleus.Modules.Sitemap.Controllers.SitemapController,Nucleus.Modules.Sitemap</ClassTypeName>
+						<ViewAction>Index</ViewAction>
+						<EditAction>Edit</EditAction>
+					</ModuleDefinition>
+					<ModuleSettings>
+						<ModuleSetting>
+							<SettingName>sitemap:maxlevels</SettingName>
+							<SettingValue>0</SettingValue>
+						</ModuleSetting>
+						<ModuleSetting>
+							<SettingName>sitemap:root-page-type</SettingName>
+							<SettingValue>SiteRoot</SettingValue>
+						</ModuleSetting>
+						<ModuleSetting>
+							<SettingName>sitemap:root-page</SettingName>
+							<SettingValue>00000000-0000-0000-0000-000000000000</SettingValue>
+						</ModuleSetting>
+						<ModuleSetting>
+							<SettingName>sitemap:show-description</SettingName>
+							<SettingValue>True</SettingValue>
+						</ModuleSetting>
+					</ModuleSettings>
+					<Permissions />
+					<Style />
+					<SortOrder>20</SortOrder>
+					<InheritPagePermissions>true</InheritPagePermissions>
+				</PageModule>
+			</Modules>
+			<Permissions>
+				<Permission>
+					<Id>{$guid100}</Id>
+					<RelatedId>{$guid94}</RelatedId>
+					<PermissionType>
+						<Id>7ec40aaa-9eb0-4005-9895-c0256e749b83</Id>
+						<Name>View</Name>
+						<SortOrder>0</SortOrder>
+						<Scope>urn:nucleus:entities:page/permissiontype/view</Scope>
+					</PermissionType>
+					<Role>
+						<Id>{$guid4}</Id>
+						<Name>All Users</Name>
+						<RoleGroupId xsi:nil="true" />
+						<Description>This role represents all users, whether logged on or not.</Description>
+						<Type>Restricted</Type>
+					</Role>
+					<AllowAccess>true</AllowAccess>
+				</Permission>
+			</Permissions>
+		</Page>
+		<Page>
+			<Id>{$guid17}</Id>
+			<ParentId>{$guid92}</ParentId>
+			<Name>Privacy</Name>
+			<Title>Privacy</Title>
+			<DefaultPageRouteId>{$guid108}</DefaultPageRouteId>
+			<Routes>
+				<PageRoute>
+					<Id>{$guid108}</Id>
+					<Path>/Privacy</Path>
+					<Type>Active</Type>
+				</PageRoute>
+			</Routes>
+			<Disabled>false</Disabled>
+			<ShowInMenu>false</ShowInMenu>
+			<DisableInMenu>false</DisableInMenu>
+			<SortOrder>10</SortOrder>
+			<Modules>
+				<PageModule>
+					<Id>{$guid110}</Id>
+					<Pane>ContentPane</Pane>
+					<Title>Privacy Policy</Title>
+					<ModuleDefinition>
+						<Id>b516d8dd-c793-4776-be33-902eb704bef6</Id>
+						<FriendlyName>Html</FriendlyName>
+						<ClassTypeName>Nucleus.Modules.TextHtml.Controllers.TextHtmlController,Nucleus.Modules.TextHtml</ClassTypeName>
+						<ViewAction>Index</ViewAction>
+						<EditAction>Edit</EditAction>
+						<Categories>Content</Categories>
+					</ModuleDefinition>
+					<ModuleSettings />
+					<Permissions />
+					<Style />
+					<SortOrder>20</SortOrder>
+					<InheritPagePermissions>true</InheritPagePermissions>
+				</PageModule>
+			</Modules>
+			<Permissions>
+				<Permission>
+					<Id>{$guid111}</Id>
+					<RelatedId>{$guid17}</RelatedId>
+					<PermissionType>
+						<Id>7ec40aaa-9eb0-4005-9895-c0256e749b83</Id>
+						<Name>View</Name>
+						<SortOrder>0</SortOrder>
+						<Scope>urn:nucleus:entities:page/permissiontype/view</Scope>
+					</PermissionType>
+					<Role>
+						<Id>{$guid4}</Id>
+						<Name>All Users</Name>
+						<RoleGroupId xsi:nil="true" />
+						<Description>This role represents all users, whether logged on or not.</Description>
+						<Type>Restricted</Type>
+					</Role>
+					<AllowAccess>true</AllowAccess>
+				</Permission>
+			</Permissions>
+		</Page>
+		<Page>
+			<Id>{$guid16}</Id>
+			<ParentId>{$guid92}</ParentId>
+			<Name>404error</Name>
+			<Title>404error</Title>
+			<DefaultPageRouteId>{$guid119}</DefaultPageRouteId>
+			<Routes>
+				<PageRoute>
+					<Id>{$guid119}</Id>
+					<Path>/404error</Path>
+					<Type>Active</Type>
+				</PageRoute>
+			</Routes>
+			<Disabled>false</Disabled>
+			<ShowInMenu>false</ShowInMenu>
+			<DisableInMenu>false</DisableInMenu>
+			<SortOrder>10</SortOrder>
+			<Modules>
+				<PageModule>
+					<Id>{$guid121}</Id>
+					<Pane>ContentPane</Pane>
+					<Title>Not Found</Title>
+					<ModuleDefinition>
+						<Id>b516d8dd-c793-4776-be33-902eb704bef6</Id>
+						<FriendlyName>Html</FriendlyName>
+						<ClassTypeName>Nucleus.Modules.TextHtml.Controllers.TextHtmlController,Nucleus.Modules.TextHtml</ClassTypeName>
+						<ViewAction>Index</ViewAction>
+						<EditAction>Edit</EditAction>
+						<Categories>Content</Categories>
+					</ModuleDefinition>
+					<ModuleSettings />
+					<Permissions />
+					<Style />
+					<SortOrder>20</SortOrder>
+					<InheritPagePermissions>true</InheritPagePermissions>
+				</PageModule>
+			</Modules>
+			<Permissions>
+				<Permission>
+					<Id>{$guid122}</Id>
+					<RelatedId>{$guid16}</RelatedId>
+					<PermissionType>
+						<Id>7ec40aaa-9eb0-4005-9895-c0256e749b83</Id>
+						<Name>View</Name>
+						<SortOrder>0</SortOrder>
+						<Scope>urn:nucleus:entities:page/permissiontype/view</Scope>
+					</PermissionType>
+					<Role>
+						<Id>{$guid4}</Id>
+						<Name>All Users</Name>
+						<RoleGroupId xsi:nil="true" />
+						<Description>This role represents all users, whether logged on or not.</Description>
+						<Type>Restricted</Type>
+					</Role>
+					<AllowAccess>true</AllowAccess>
+				</Permission>
+			</Permissions>
+		</Page>
+		<Page>
+			<Id>{$guid15}</Id>
+			<ParentId xsi:nil="true" />
+			<Name>Login</Name>
+			<Title>Login</Title>
+			<DefaultPageRouteId>{$guid213}</DefaultPageRouteId>
+			<Routes>
+				<PageRoute>
+					<Id>{$guid213}</Id>
+					<Path>/Login</Path>
+					<Type>Active</Type>
+				</PageRoute>
+			</Routes>
+			<Disabled>false</Disabled>
+			<ShowInMenu>false</ShowInMenu>
+			<DisableInMenu>false</DisableInMenu>
+			<SortOrder>20</SortOrder>
+			<Modules>
+				<PageModule>
+					<Id>{$guid215}</Id>
+					<Pane>ContentPane</Pane>
+					<Title>Login</Title>
+					<ModuleDefinition>
+						<Id>f0a9ec71-c29e-436e-96e1-72dcdc44c32b</Id>
+						<FriendlyName>Login</FriendlyName>
+						<ClassTypeName>Nucleus.Modules.Account.Controllers.LoginController,Nucleus.Modules.Account</ClassTypeName>
+						<ViewAction>Index</ViewAction>
+						<EditAction>Edit</EditAction>
+						<Categories>Account Management</Categories>
+					</ModuleDefinition>
+					<ModuleSettings>
+						<ModuleSetting>
+							<SettingName>login:allowpasswordreset</SettingName>
+							<SettingValue>True</SettingValue>
+						</ModuleSetting>
+						<ModuleSetting>
+							<SettingName>login:allowusernamerecovery</SettingName>
+							<SettingValue>True</SettingValue>
+						</ModuleSetting>
+						<ModuleSetting>
+							<SettingName>login:allowrememberme</SettingName>
+							<SettingValue>True</SettingValue>
+						</ModuleSetting>
+					</ModuleSettings>
+					<Permissions />
+					<SortOrder>20</SortOrder>
+					<InheritPagePermissions>true</InheritPagePermissions>
+				</PageModule>
+			</Modules>
+			<Permissions>
+				<Permission>
+					<Id>{$guid216}</Id>
+					<RelatedId>{$guid15}</RelatedId>
+					<PermissionType>
+						<Id>7ec40aaa-9eb0-4005-9895-c0256e749b83</Id>
+						<Name>View</Name>
+						<SortOrder>0</SortOrder>
+						<Scope>urn:nucleus:entities:page/permissiontype/view</Scope>
+					</PermissionType>
+					<Role>
+						<Id>{$guid4}</Id>
+						<Name>All Users</Name>
+						<RoleGroupId xsi:nil="true" />
+						<Description>This role represents all users, whether logged on or not.</Description>
+						<Type>Restricted</Type>
+					</Role>
+					<AllowAccess>true</AllowAccess>
+				</Permission>
+			</Permissions>
+		</Page>
+		<Page>
+			<Id>{$guid222}</Id>
+			<ParentId>{$guid92}</ParentId>
+			<Name>ErrorPage</Name>
+			<Title>ErrorPage</Title>
+			<Description>Error handler page</Description>
+			<DefaultPageRouteId>{$guid223}</DefaultPageRouteId>
+			<Routes>
+				<PageRoute>
+					<Id>{$guid223}</Id>
+					<Path>/ErrorPage</Path>
+					<Type>Active</Type>
+				</PageRoute>
+			</Routes>
+			<Disabled>false</Disabled>
+			<ShowInMenu>true</ShowInMenu>
+			<DisableInMenu>false</DisableInMenu>
+			<SortOrder>70</SortOrder>
+			<Modules />
+			<Permissions>
+				<Permission>
+					<Id>{$guid225}</Id>
+					<RelatedId>{$guid222}</RelatedId>
+					<PermissionType>
+						<Id>7ec40aaa-9eb0-4005-9895-c0256e749b83</Id>
+						<Name>View</Name>
+						<SortOrder>0</SortOrder>
+						<Scope>urn:nucleus:entities:page/permissiontype/view</Scope>
+					</PermissionType>
+					<Role>
+						<Id>{$guid4}</Id>
+						<Name>All Users</Name>
+						<RoleGroupId xsi:nil="true" />
+						<Description>This role represents all users, whether logged on or not.</Description>
+						<Type>Restricted</Type>
+					</Role>
+					<AllowAccess>true</AllowAccess>
+				</Permission>
+			</Permissions>
+		</Page>
+	</Pages>
+	<Contents>
+		<Content>
+			<Id>{$guid231}</Id>
+			<PageModuleId>{$guid32}</PageModuleId>
+			<Value>&lt;p&gt;Welcome&amp;nbsp;to Nucleus.&lt;/p&gt;</Value>
+			<SortOrder>10</SortOrder>
+		</Content>
+		<Content>
+			<Id>{$guid233}</Id>
+			<PageModuleId>{$guid32}</PageModuleId>
+			<Value>&lt;img src=""&gt;&lt;p&gt;Welcome to Nucleus.&lt;/p&gt;</Value>
+			<SortOrder>30</SortOrder>
+		</Content>
+		<Content>
+			<Id>{$guid245}</Id>
+			<PageModuleId>{$guid110}</PageModuleId>
+			<Title />
+			<Value>&lt;p&gt;Enter your privacy policy here.&lt;/p&gt;</Value>
+			<SortOrder>20</SortOrder>
+		</Content>
+		<Content>
+			<Id>{$guid247}</Id>
+			<PageModuleId>{$guid121}</PageModuleId>
+			<Title />
+			<Value>&lt;p&gt;The page that you requested was not found.&lt;/p&gt;</Value>
+			<SortOrder>20</SortOrder>
+		</Content>
+	</Contents>
+	<Roles>
+		<Role>
+			<Id>{$guid2}</Id>
+			<Name>Administrators</Name>
+			<RoleGroupId xsi:nil="true" />
+			<Type>Normal</Type>
+		</Role>
+		<Role>
+			<Id>{$guid4}</Id>
+			<Name>All Users</Name>
+			<RoleGroupId xsi:nil="true" />
+			<Description>This role represents all users, whether logged on or not.</Description>
+			<Type>Restricted</Type>
+		</Role>
+		<Role>
+			<Id>{$guid5}</Id>
+			<Name>Anonymous Users</Name>
+			<RoleGroupId xsi:nil="true" />
+			<Description>This role represents users who are not logged on.</Description>
+			<Type>Restricted</Type>
+		</Role>
+		<Role>
+			<Id>{$guid3}</Id>
+			<Name>Registered Users</Name>
+			<RoleGroupId xsi:nil="true" />
+			<Type>Normal</Type>
+		</Role>
+	</Roles>
+	<MailTemplates>
+		<MailTemplate>
+			<Id>{$guid12}</Id>
+			<Name>Welcome new user</Name>
+			<Subject>Welcome new user</Subject>
+			<Body>Welcome {User.UserName}</Body>
+		</MailTemplate>
+		<MailTemplate>
+			<Id>{$guid21}</Id>
+			<Name>User name reminder</Name>
+			<Subject>Your user name reminder</Subject>
+			<Body>A user requested a user name reminder for the site.&amp;nbsp; Your user name is {User.UserName}.</Body>
+		</MailTemplate>
+		<MailTemplate>
+			<Id>{$guid13}</Id>
+			<Name>Password reset</Name>
+			<Subject>Password reset</Subject>
+			<Body>&lt;p&gt;Attn: {User.UserName}.&amp;nbsp; Your password reset code is {User.Secrets.PasswordResetToken}.&amp;nbsp; Visit&amp;nbsp;&lt;a href="{Urls.ResetPassword}"&gt;{Urls.ResetPassword}&lt;/a&gt; to reset your password.&lt;/p&gt;</Body>
+		</MailTemplate>
+	</MailTemplates>
+</site-template>

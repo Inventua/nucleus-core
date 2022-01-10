@@ -1,0 +1,159 @@
+﻿/* CSS classes for form controls */
+textarea
+{
+	font-family: 'Segoe UI', sans-serif;
+	font-size: 14px;
+}
+
+.Flex.FileSelector .button
+{
+	margin-left: auto;  /*  aligns buttons to the right */
+}
+
+.Flex.FileSelector select
+{
+	flex: 2;
+}
+
+.Flex.FileSelector select:first-child
+{
+	flex: 1;
+}
+
+.Flex .settings-control
+{
+	flex: 1;
+}
+
+.settings-control
+{
+	margin-bottom: 6px;
+}
+
+.settings-control.stretch
+{
+	display: flex;
+	flex-basis: 100%;
+}
+
+.settings-control.stretch label
+{
+	flex-basis: 100%;
+}
+
+.settings-control label
+{
+	display: flex;
+	flex-direction: column;
+}
+
+.settings-control.inner-inline label, .settings-control .button label
+{
+	flex-direction: row;
+	gap: 4px;
+}
+
+
+.settings-control label span
+{
+	font-size: 12px;
+	/*display: block;  This breaks the display of the upload button/icon in the sites page */
+	margin-bottom: 1px;
+}
+
+.settings-control input, .settings-control select
+{
+	display: block;
+	font-size: 14px;
+}
+
+.settings-control.inline, .settings-control.inline input, .settings-control.inline span
+{
+	display: inline-block;
+}
+
+.settings-control.inner-inline label span, .settings-control.inner-inline label input, settings-control.inner-inline label select
+{
+	display: inline-block;
+}
+
+
+fieldset
+{
+	border: none;
+	padding: 0;
+	width: auto;
+}
+
+fieldset legend
+{
+	display: none;
+}
+
+fieldset label span
+{
+	font-size: 14px;
+	display: block;	
+}
+/*
+fieldset.form-fields
+{
+}
+
+fieldset.form-fields input[type=text], fieldset.form-fields select, fieldset.form-fields textarea
+{
+	box-sizing: border-box;
+	font-size: 14px;
+	display: block;
+}
+
+fieldset.form-fields div
+{
+	margin-bottom: 6px;
+}*/
+
+table input, table select
+{
+	width: 100%;
+}
+
+fieldset input[type=text], fieldset input[type=email], fieldset input[type=tel], 
+fieldset input[type=search], fieldset input[type=url], 
+fieldset select, fieldset textarea
+{
+	box-sizing: border-box;
+	font-size: 14px;
+	padding: 2px;
+	border: 1px solid;
+}
+
+.settings-control input[type=checkbox]
+{
+	min-width: 20px;
+}
+
+
+.Tools
+{
+	display: flex;
+	flex-direction: row;
+	margin-bottom: 4px;
+	gap: 4px;
+	
+}
+
+/*.Nucleus .AdminPage form .Tools 
+{
+	margin: 8px 0 8px 0;
+}*/
+
+
+.Hide, .FileBrowser input[type=file]
+{
+	display: none!important;
+}
+
+.ButtonRow
+{
+	margin-top: 8px;
+}

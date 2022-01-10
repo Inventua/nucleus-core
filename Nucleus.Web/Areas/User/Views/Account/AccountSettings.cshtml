@@ -1,0 +1,55 @@
+﻿@model Nucleus.Web.ViewModels.User.AccountSettings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Extensions;
+@using Nucleus.Abstractions.Models.Configuration
+@{Layout = "_Generic";}
+<h1>Account Settings</h1>
+
+@using (Html.BeginAreaForm("SaveAccountSettings", "Account", "User", FormMethod.Post))
+{
+	@if (!String.IsNullOrEmpty(Model.Message))
+	{
+		<div>@Model.Message</div>
+	}
+
+	<fieldset>
+		@Html.HiddenFor((model) => model.ReturnUrl)
+		@Html.HiddenFor(model => model.User.Id)
+		<div>
+			<label>
+				<span>User Name</span>
+				<span>@Html.TextBoxFor((model) => model.User.UserName)</span>
+			</label>
+		</div>
+
+		<h3>Profile</h3>
+
+		@for (int profileValueCount = 0; profileValueCount < Model.User.Profile.Count; profileValueCount++)
+		{
+			<div class="settings-control" title="@Model.User.Profile[profileValueCount].UserProfileProperty.HelpText">
+				<label>
+					<span>@Model.User.Profile[profileValueCount].UserProfileProperty.Name</span>
+					@{Dictionary<string, object> parameters = new();
+						ClaimTypeOption claimTypeOption = Model.User.Profile[profileValueCount].UserProfileProperty.ClaimTypeOption(Model.ClaimTypeOptions);
+						if (claimTypeOption.InputType != null)
+						{
+							parameters.Add("type", claimTypeOption.InputType);
+						}
+						if (claimTypeOption.Pattern != null)
+						{
+							parameters.Add("pattern", claimTypeOption.Pattern);
+						} }
+					@Html.TextBoxFor(model => model.User.Profile[profileValueCount].Value, parameters)
+				</label>
+				@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Id)
+				@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Name)
+				@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.TypeUri)
+			</div>
+		}
+		<div>
+			<input type="submit" value="Save Changes" class="btn btn-primary" />
+			<a href="/" class="btn btn-secondary">Cancel</a>
+		</div>
+	</fieldset>
+}

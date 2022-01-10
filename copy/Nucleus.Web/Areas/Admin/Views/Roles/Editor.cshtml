@@ -1,0 +1,52 @@
+﻿@model Nucleus.Web.ViewModels.Admin.RoleEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@using (Html.BeginAreaForm("Save", "Roles", "Admin", FormMethod.Post, new { @data_target = ".AdminPage", @autocomplete = "off" }))
+{
+	<fieldset role="group" aria-labelledby="heading">
+		<h2>Role</h2>
+		@Html.HiddenFor(model => model.Role.Id)
+
+		<SettingsControl caption="Name" helptext="Role name">
+			@Html.TextBoxFor(model => model.Role.Name, ((Model.Role.Type & Role.RoleType.System) == Role.RoleType.System ? new { @disabled = "" } : new { }))
+		</SettingsControl>
+
+		<SettingsControl caption="Description" helptext="Description">
+			@Html.TextAreaFor(model => model.Role.Description, ((Model.Role.Type & Role.RoleType.System) == Role.RoleType.System ? new { @disabled = "" } : new { }))
+		</SettingsControl>
+
+
+		<SettingsControl caption="Role Group" helptext="Role Group">
+			@if (!((Model.Role.Type & Role.RoleType.System) == Role.RoleType.System))
+			{
+				@Html.DropDownListFor(model => model.Role.RoleGroupId, new SelectList(Model.RoleGroups, "Id", "Name"), "(none selected)")
+			}
+			else
+			{
+				<div>System</div>
+			}
+
+		</SettingsControl>
+	</fieldset>
+	
+	@if (!((Model.Role.Type & Role.RoleType.System) == Role.RoleType.System))
+	{
+		<div class="ButtonPanel">
+			<input type="submit" class="DefaultButton" value="Save Changes" />
+
+			@if (Model.Role.Id != Guid.Empty)
+			{
+				<input type="submit" class="DeleteButton" value="Delete Role" formaction="@Url.AreaAction("DeleteRole", "Roles", "Admin")" data-confirm="Delete this role?" />
+			}
+		</div>
+	}
+	else
+	{
+		<div class="alert alert-warning">
+			This is a system role.  You can't change any settings for this role.
+		</div>
+	}
+}
+

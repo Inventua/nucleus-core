@@ -1,0 +1,67 @@
+﻿@model Nucleus.Modules.Account.ViewModels.Signup
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+@using Nucleus.Abstractions.Models.Configuration
+@Html.AddStyle("~/Resources/css/forms.css")
+<div id="@Model.ControlId">
+	@using (Html.BeginNucleusForm("Signup", "Signup", FormMethod.Post, new { @data_target = "#" + Model.ControlId }))
+	{
+		@if (!String.IsNullOrEmpty(Model.Message))
+		{
+			<div>@Model.Message</div>
+		}
+
+		if (Model.ShowForm)
+		{
+			<fieldset>
+				@Html.HiddenFor((model) => model.ReturnUrl)
+				<SettingsControl caption="User Name" helptext="Enter your new user name">
+					@Html.TextBoxFor((model) => model.User.UserName)
+				</SettingsControl>
+
+				@*only show password field for a new user*@
+				@if (Model.User.Id == Guid.Empty)
+				{
+					<SettingsControl caption="Password" helptext="Enter a password for the user">
+						@Html.PasswordFor(model => model.NewPassword)
+					</SettingsControl>
+					<SettingsControl caption="Confirm Password" helptext="Confirm your new password">
+						@Html.PasswordFor(model => model.ConfirmPassword)
+					</SettingsControl>
+				}
+				<h3>Profile</h3>
+
+				@for (int profileValueCount = 0; profileValueCount < Model.User.Profile.Count; profileValueCount++)
+				{
+					<SettingsControl caption="@Model.User.Profile[profileValueCount].UserProfileProperty.Name" helptext="@Model.User.Profile[profileValueCount].UserProfileProperty.HelpText">
+						@{Dictionary<string, object> parameters = new();
+							ClaimTypeOption claimTypeOption = Model.User.Profile[profileValueCount].UserProfileProperty.ClaimTypeOption(Model.ClaimTypeOptions);
+							if (claimTypeOption.InputType != null)
+							{
+								parameters.Add("type", claimTypeOption.InputType);
+							}
+							if (claimTypeOption.Pattern != null)
+							{
+								parameters.Add("pattern", claimTypeOption.Pattern);
+							} }
+						@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Id)
+						@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Name)
+						@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.TypeUri)
+						@Html.TextBoxFor(model => model.User.Profile[profileValueCount].Value, parameters)
+					</SettingsControl>
+					@*<div class="settings-control" title="@Model.User.Profile[profileValueCount].UserProfileProperty.HelpText">
+							<label>
+								<span>@Model.User.Profile[profileValueCount].UserProfileProperty.Name</span>
+
+							</label>
+						</div>*@
+				}
+				<div>
+					<input type="submit" value="Save Changes" />
+					<a href="/" value="Cancel" />
+				</div>
+			</fieldset>
+		}
+	}
+</div>

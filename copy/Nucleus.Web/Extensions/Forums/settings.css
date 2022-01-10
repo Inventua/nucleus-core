@@ -1,0 +1,13 @@
+﻿.ForumsSettings
+{
+	display: flex;
+	flex-direction: column;
+	min-width: 900px;
+	min-height: 620px;
+}
+
+.ForumsSettings .ItemsList ul
+{
+	height: 100%;
+	overflow-y: auto;
+}

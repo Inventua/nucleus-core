@@ -1,0 +1,55 @@
+﻿.LayoutWrapper
+{
+	display: flex;
+	flex-direction: column;
+	min-height: 100%;
+}
+
+.BannerPane
+{
+
+}
+
+.BannerPane .Breadcrumbs
+{
+	margin-left: 4px;
+	vertical-align: middle;
+}
+
+
+.BannerPane .AccountControl
+{
+	float: right;
+	margin: 2px;
+}
+
+.ContentWrapper 
+{
+	flex-grow: 1;
+	display: flex;		
+}
+
+.LeftPane
+{
+	width: 200px;
+	background-color: #eee;	
+}
+
+.ContentPane
+{
+	flex-grow: 1;
+	max-height: 100%;
+	overflow-y: auto;
+}
+
+.BottomPane
+{
+	background-color: #535353;
+	opacity: 0.9;
+	min-height: 120px;	
+}
+
+.BottomPane *
+{
+	color: white;
+}

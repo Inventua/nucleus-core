@@ -1,0 +1,134 @@
+﻿@model Nucleus.Modules.Forums.ViewModels.ViewForumPost
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Forums.ViewModels
+<div class="Forums">
+	<div class="nucleus-form-tools">
+		@if (Model.CanReply && !Model.Post.IsLocked)
+		{
+			@Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @data_target = ".Forums.parent()" })
+		}
+		@if (Model.CanSubscribe)
+		{
+			@Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribePost", "Forums", "Forums"), new { @class = "btn btn-outline-secondary", @data_target = ".Forums.parent()" })
+		}
+		<button type="button" class="btn btn-secondary" onclick="window.history.back();">Back</button>
+	</div>
+	@using (Html.BeginNucleusForm("SetForumPostStatus", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = "form.parent()" }))
+	{
+		@Html.HiddenFor(model => model.Forum.Id)
+		@Html.HiddenFor(model => model.Post.Id)
+		<div class="post">
+			<h3>@Model.Post.Subject</h3>
+			<div class="post-author">
+				<div>Posted on @Model.Post.DateAdded.FormatDate(true) by @Model.Post.PostedBy.UserName</div>
+			</div>
+			<div class="post-flags">
+				@if (Model.Post.IsLocked)
+				{
+					<span>Locked</span>
+				}
+				@if (Model.Post.IsPinned)
+				{
+					<span>Pinned</span>
+				}
+				@if (Model.Post.IsApproved)
+				{
+					<span>Approved</span>
+				}
+				else
+				{
+					<span>Not Approved</span>
+				}
+			</div>
+			<div class="body">@Html.Raw(@Model.Post.Body)</div>
+
+			<div class="attachments">
+				@for (var attachmentCount = 0; attachmentCount < Model.Post.Attachments.Count; attachmentCount++)
+				{
+					<span>
+						<a href="@Url.FileLink(Model.Post.Attachments[attachmentCount].File)" alt="@Model.Post.Attachments[attachmentCount].File.Name">
+							@Model.Post.Attachments[attachmentCount].File.Name
+						</a>
+					</span>
+				}
+			</div>
+
+			<div class="nucleus-form-tools">
+				@if (Model.CanEditPost)
+				{
+					@Html.LinkButton("&#xe3c9;", "Edit", Url.NucleusAction("EditPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @class = "btn btn-primary", @data_target = ".Forums.parent()" })
+				}
+				@if (Model.CanDeletePost)
+				{
+					@Html.SubmitButton("", "Delete", Url.NucleusAction("DeleteForumPost", "Forums", "Forums"), new { @class = "btn btn-danger", @data_target = "form.parent()" })
+				}
+
+				<div class="AdminTools">
+					@if (Model.CanEditPost && Model.Forum.Settings.StatusList != null)
+					{
+						@Html.DropDownListFor(model => model.Post.Status.Id, new SelectList(Model.Forum.Settings.StatusList.Items, "Id", "Name"), new { @data_autopostbackevent = "change" })
+					}
+					@if (Model.CanApprovePost && !Model.Post.IsApproved)
+					{
+						@Html.SubmitButton("", "Approve", Url.NucleusAction("ApproveForumPost", "Forums", "Forums"), new { @data_target = "form.parent()" })
+						@Html.SubmitButton("", "Reject", Url.NucleusAction("RejectForumForumPost", "Forums", "Forums"), new { @data_target = "form.parent()" })
+					}
+					@if (Model.CanLockPost && !Model.Post.IsLocked)
+					{
+						@Html.SubmitButton("", "Lock", Url.NucleusAction("LockForumPost", "Forums", "Forums"), new { @data_target = "form.parent()" })
+					}
+					@if (Model.CanPinPost && !Model.Post.IsPinned)
+					{
+						@Html.SubmitButton("", "Pin", Url.NucleusAction("PinForumPost", "Forums", "Forums"), new { @data_target = "form.parent()" })
+					}
+				</div>
+			</div>
+		</div>
+
+		@if (Model.Replies.Count > 0)
+		{
+			<div class="replies">
+				<h3>Replies</h3>
+				@foreach (var reply in Model.Replies)
+				{
+					<div class="reply">
+						<div class="heading">
+							<span>@reply.PostedBy.UserName replied on</span><span>@reply.DateAdded.FormatDate(true)</span>
+							<span class="controls">
+								@if (Model.CanDeletePost)
+								{
+									@Html.SubmitButton("&#xe14c;", "", Url.NucleusAction("DeleteForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @data_confirm = "Delete this reply?" })
+								}
+								@if (Model.CanEditPost)
+								{
+									@Html.LinkButton("&#xe3c9;", "", Url.NucleusAction("EditForumPostReply", "Forums", "Forums", new { postId = Model.Post.Id, replyId = reply.Id }), new { @data_target = "form.parent()" })
+								}
+							</span>
+						</div>
+
+						<div class="body">
+							@Html.Raw(reply.Body)
+						</div>
+
+						<div class="attachments">
+							@for (var attachmentCount = 0; attachmentCount < reply.Attachments.Count; attachmentCount++)
+							{
+								<span>
+									<a href="@Url.FileLink(reply.Attachments[attachmentCount].File)" alt="@reply.Attachments[attachmentCount].File.Name">
+										@reply.Attachments[attachmentCount].File.Name
+									</a>
+								</span>
+							}
+						</div>
+					</div>
+				}
+			</div>
+		}
+		else
+		{
+			<span>There are no replies to this post.</span>
+		}
+	}
+</div>

@@ -1,0 +1,19 @@
+﻿@model Nucleus.Web.ViewModels.User.PageSelector
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@Html.PageListFor(model => model.Page.Id, Model.PageMenu)
+<script type="text/javascript">
+	if (jQuery().PageList) { jQuery('.nucleus-page-list').PageList(); }
+
+	// Read the child pages of the item containing the "+" button
+	jQuery('.nucleus-pageselector').on('click', '.nucleus-get-childpages', function (e)
+	{
+		// Add a ul to contain the new pages
+		Page.LoadPartialContent(e, '@Url.AreaAction("GetChildPages", "PageSelector", "User")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+
+		// remove the "+" button
+		jQuery(this).remove();
+	});
+</script>

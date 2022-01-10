@@ -1,0 +1,2682 @@
+{
+	"schemaName": "Nucleus.Core",
+	"version": "01.00.00",
+	"operations": [
+		{
+			"createTable": {
+				"name": "Schema",
+				"columns": [
+					{
+						"name": "SchemaName",
+						"clrType": "string",
+						"isnullable": false,
+						"maxlength": 256
+					},
+					{
+						"name": "SchemaVersion",
+						"clrType": "string",
+						"isnullable": true,
+						"maxlength": 32
+					}
+				],
+				"primaryKey": {
+					"name": "PK_Schema",
+					"isclustered": true,
+					"columns": [ "SchemaName" ]
+				}
+			}
+		},
+		{
+			"createTable": {
+				"name": "ModuleDefinitions",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "FriendlyName",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "ClassTypeName",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "ViewAction",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "EditAction",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "Categories",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ModuleDefinitions",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				}
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ModuleDefinitions_FriendlyName",
+				"table": "ModuleDefinitions",
+				"isunique": true,
+				"columns": [ "FriendlyName" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "LayoutDefinitions",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false,
+						"generateDefaultValue": true
+					},
+					{
+						"name": "FriendlyName",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "RelativePath",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_LayoutDefinitions",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				}
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_LayoutDefinitions_FriendlyName",
+				"table": "LayoutDefinitions",
+				"isunique": true,
+				"columns": [ "FriendlyName" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "ContainerDefinitions",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false,
+						"generateDefaultValue": true
+					},
+					{
+						"name": "FriendlyName",
+						"clrType": "string",
+						"maxLength": 256
+					},
+					{
+						"name": "RelativePath",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ContainerDefinitions",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				}
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ContainerDefinitions_FriendlyName",
+				"table": "ContainerDefinitions",
+				"isunique": true,
+				"columns": [ "FriendlyName" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "ControlPanelExtensionDefinitions",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false,
+						"generateDefaultValue": true
+					},
+					{
+						"name": "FriendlyName",
+						"clrType": "string",
+						"isnullable": false,
+						"maxLength": 256
+					},
+					{
+						"name": "Description",
+						"clrType": "string",
+						"isnullable": false,
+						"maxLength": 512
+					},
+					{
+						"name": "ControllerName",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "ExtensionName",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Scope",
+						"clrType": "int",
+						"isnullable": true
+					},
+					{
+						"name": "EditAction",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ControlPanelExtensionDefinitions",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				}
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ControlPanelExtensionDefinitions_FriendlyName",
+				"table": "ControlPanelExtensionDefinitions",
+				"isunique": true,
+				"columns": [ "FriendlyName" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "ScheduledTasks",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false,
+						"generateDefaultValue": true
+					},
+					{
+						"name": "TypeName",
+						"clrType": "string",
+						"isnullable": false,
+						"maxLength": 256
+					},
+					{
+						"name": "Name",
+						"clrType": "string",
+						"isnullable": false,
+						"maxLength": 256
+					},
+					{
+						"name": "Interval",
+						"clrType": "int",
+						"isnullable": false
+					},
+					{
+						"name": "IntervalType",
+						"clrType": "int",
+						"isnullable": false
+					},
+					{
+						"name": "Enabled",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "NextScheduledRun",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "KeepHistoryCount",
+						"clrType": "int",
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ScheduledTasks",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				}
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ScheduledTasks_Name",
+				"table": "ScheduledTasks",
+				"clrType": "boolean",
+				"isunique": true,
+				"columns": [ "Name" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "ScheduledTaskHistory",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ScheduledTaskId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "StartDate",
+						"clrType": "datetime",
+						"isnullable": false
+					},
+					{
+						"name": "FinishDate",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "NextScheduledRun",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "Server",
+						"clrType": "string",
+						"isnullable": false,
+						"maxLength": 256
+					},
+					{
+						"name": "Status",
+						"clrType": "int",
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ScheduledTaskHistory",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_ScheduledTaskHistory_ScheduledTaskId",
+						"Columns": [ "ScheduledTaskId" ],
+						"PrincipalTable": "ScheduledTasks",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createTable": {
+				"name": "SiteGroups",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Name",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Description",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "PrimarySiteId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_SiteGroups",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					// Sql Server needs the sites table to exist before we can create a foreign key.  Sqlite can't add a foreign key after creating the table, but doesn't
+					// check that the other table exists, so we can(must) create it when we create the table.
+					{
+						"DatabaseProviderSpecificOperation": {
+							"exclude": [ "SqlServer" ],
+							"operation": {
+								"addForeignKey": {
+									"name": "FK_SiteGroups_PrimarySiteId",
+									"Columns": [ "PrimarySiteId" ],
+									"PrincipalTable": "Sites",
+									"PrincipalColumns": [ "Id" ],
+									"OnDelete": "SetNull"
+								}
+							}
+						}
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_SiteGroups_PrimarySiteId",
+				"table": "SiteGroups",
+				"columns": [ "PrimarySiteId" ],
+				"isUnique": true
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_SiteGroups_Name",
+				"table": "SiteGroups",
+				"columns": [ "Name" ],
+				"isUnique": true
+			}
+		},
+		{
+			"createTable": {
+				"name": "Sites",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Name",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "AdministratorsRoleId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "RegisteredUsersRoleId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "AnonymousUsersRoleId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "AllUsersRoleId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "SiteGroupId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DefaultLayoutDefinitionId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DefaultContainerDefinitionId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DefaultSiteAliasId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "HomeDirectory",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_Sites",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"ForeignKeys": [
+					// Sql server needs the roles table to already exist to create these (and it doesn't).  Sqlite needs to create them when the table is created.
+					{
+						"DatabaseProviderSpecificOperation": {
+							"exclude": [ "SqlServer" ],
+							"operation": {
+								"addForeignKey": {
+									"name": "FK_Sites_AdministratorsRoleId",
+									"Columns": [ "AdministratorsRoleId" ],
+									"PrincipalTable": "Roles",
+									"PrincipalColumns": [ "Id" ]
+								}
+							}
+						}
+					},
+					{
+						"DatabaseProviderSpecificOperation": {
+							"exclude": [ "SqlServer" ],
+							"operation": {
+								"addForeignKey": {
+									"name": "FK_Sites_AllUsersRoleId",
+									"Columns": [ "AllUsersRoleId" ],
+									"PrincipalTable": "Roles",
+									"PrincipalColumns": [ "Id" ]
+								}
+							}
+						}
+					},
+					{
+						"DatabaseProviderSpecificOperation": {
+							"exclude": [ "SqlServer" ],
+							"operation": {
+								"addForeignKey": {
+									"name": "FK_Sites_AnonymousUsersRoleId",
+									"Columns": [ "AnonymousUsersRoleId" ],
+									"PrincipalTable": "Roles",
+									"PrincipalColumns": [ "Id" ]
+								}
+							}
+						}
+					},
+					{
+						"DatabaseProviderSpecificOperation": {
+							"exclude": [ "SqlServer" ],
+							"operation": {
+								"addForeignKey": {
+									"name": "FK_Sites_RegisteredUsersRoleId",
+									"Columns": [ "RegisteredUsersRoleId" ],
+									"PrincipalTable": "Roles",
+									"PrincipalColumns": [ "Id" ]
+								}
+							}
+						}
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Sites_Name",
+				"table": "Sites",
+				"columns": [ "Name" ],
+				"isUnique": true
+			}
+		},
+		// Sql Server needs the sites table to exist before we can create a foreign key.  Sqlite can't add a foreign key after creating the table, but doesn't
+		// check that the other table exists, so we can create it when we create the table.
+		{
+			"DatabaseProviderSpecificOperation": {
+				"include": [ "SqlServer" ],
+				"operation": {
+					"addForeignKey": {
+						"name": "FK_SiteGroups_PrimarySiteId",
+						"table": "SiteGroups",
+						"Columns": [ "PrimarySiteId" ],
+						"PrincipalTable": "Sites",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "SetNull"
+					}
+				}
+			}
+		},
+		{
+			"createTable": {
+				"name": "SiteAlias",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Alias",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_SiteAlias",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_SiteAlias_SiteId",
+						"Columns": [ "SiteId" ],
+						"PrincipalTable": "Sites",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_SiteAlias_Alias",
+				"table": "SiteAlias",
+				"columns": [ "Alias" ],
+				"isUnique": true
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_SiteAlias_SiteId",
+				"table": "SiteAlias",
+				"columns": [ "SiteId" ],
+				"isUnique": false
+			}
+		},
+		{
+			"createTable": {
+				"name": "SiteSettings",
+				"columns": [
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "SettingName",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+
+					{
+						"name": "SettingValue",
+						"clrType": "string",
+						"maxLength": 1024,
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_SiteSettings",
+					"isclustered": true,
+					"columns": [ "SiteId", "SettingName" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_SiteSettings_SiteId",
+						"Columns": [ "SiteId" ],
+						"PrincipalTable": "Sites",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_SiteSettings_SiteId",
+				"table": "SiteSettings",
+				"columns": [ "SiteId" ],
+				"isUnique": false
+			}
+		},
+		{
+			"createTable": {
+				"name": "Pages",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ParentId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Name",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Title",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "Description",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "Keywords",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "DefaultPageRouteId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "Disabled",
+						"clrType": "boolean"
+					},
+
+					{
+						"name": "ShowInMenu",
+						"clrType": "boolean"
+					},
+
+					{
+						"name": "DisableInMenu",
+						"clrType": "boolean"
+					},
+					{
+						"name": "LayoutDefinitionId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DefaultContainerDefinitionId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "SortOrder",
+						"clrType": "int",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_Pages",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_Pages_SiteId",
+						"Columns": [ "SiteId" ],
+						"PrincipalTable": "Sites",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					},
+					{
+						"name": "FK_Pages_ParentId",
+						"Columns": [ "ParentId" ],
+						"PrincipalTable": "Pages",
+						"PrincipalColumns": [ "Id" ]
+					},
+					{
+						// Foreign key must be added during table creation for Sqlite, but must be added after PageRoutes table is created for Sql server.
+						"DatabaseProviderSpecificOperation": {
+							"exclude": [ "SqlServer" ],
+							"operation": {
+								"addForeignKey": {
+									"name": "FK_Pages_DefaultPageRouteId",
+									"Columns": [ "DefaultPageRouteId" ],
+									"PrincipalTable": "PageRoutes",
+									"PrincipalColumns": [ "Id" ]
+								}
+							}
+						}
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Pages_Name",
+				"table": "Pages",
+				"columns": [ "SiteId", "ParentId", "Name" ],
+				"isUnique": true
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Pages_SiteId",
+				"table": "Pages",
+				"columns": [ "SiteId" ],
+				"isUnique": false
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Pages_ParentId",
+				"table": "Pages",
+				"columns": [ "ParentId" ],
+				"isUnique": false
+			}
+		},
+		{
+			"createTable": {
+				"name": "PageRoutes",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "PageId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+
+					{
+						"name": "Path",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Type",
+						"clrType": "int",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_PageRoutes",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_PageRoutes_SiteId",
+						"Columns": [ "SiteId" ],
+						"PrincipalTable": "Sites",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					},
+					{
+						"name": "FK_PageRoutes_PageId",
+						"Columns": [ "PageId" ],
+						"PrincipalTable": "Pages",
+						"PrincipalColumns": [ "Id" ]
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_PageRoutes_PageId",
+				"table": "PageRoutes",
+				"columns": [ "PageId" ],
+				"isUnique": false
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_PageRoutes_Path",
+				"table": "PageRoutes",
+				"columns": [ "SiteId", "Path" ],
+				"isUnique": true
+			}
+		},
+		{
+			// Foreign key must be added during table creation for Sqlite, but must be added after PageRoutes table is created for Sql server.
+			"DatabaseProviderSpecificOperation": {
+				"include": [ "SqlServer" ],
+				"operation": {
+					"addForeignKey": {
+						"name": "FK_Pages_DefaultPageRouteId",
+						"table": "Pages",
+						"Columns": [ "DefaultPageRouteId" ],
+						"PrincipalTable": "PageRoutes",
+						"PrincipalColumns": [ "Id" ]
+					}
+				}
+			}
+		},
+		{
+			"createTable": {
+				"name": "PageModules",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "PageId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Pane",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "ContainerDefinitionId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "Title",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "ModuleDefinitionId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Keywords",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "SortOrder",
+						"clrType": "int",
+						"isnullable": false
+					},
+					{
+						"name": "InheritPagePermissions",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "Style",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_PageModules",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_PageModules_PageId",
+						"Columns": [ "PageId" ],
+						"PrincipalTable": "Pages",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					},
+					{
+						"name": "FK_PageModules_ModuleDefinitionId",
+						"Columns": [ "ModuleDefinitionId" ],
+						"PrincipalTable": "ModuleDefinitions",
+						"PrincipalColumns": [ "Id" ]
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_PageModules_PageId",
+				"table": "PageModules",
+				"columns": [ "PageId" ],
+				"isUnique": false
+			}
+		},
+		{
+			"createTable": {
+				"name": "PageModuleSettings",
+				"columns": [
+					{
+						"name": "PageModuleId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "SettingName",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "SettingValue",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_PageModuleSettings",
+					"isclustered": true,
+					"columns": [ "PageModuleId", "SettingName" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_PageModuleSettings_PageModuleId",
+						"Columns": [ "PageModuleId" ],
+						"PrincipalTable": "PageModules",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_PageModuleSettings_PageModuleId",
+				"table": "PageModuleSettings",
+				"columns": [ "PageModuleId" ],
+				"isUnique": false
+			}
+		},
+		{
+			"createTable": {
+				"name": "Users",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "UserName",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "IsSystemAdministrator",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_Users",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_Users_SiteId",
+						"Columns": [ "SiteId" ],
+						"PrincipalTable": "Sites",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Users_SiteUser",
+				"table": "Users",
+				"columns": [ "UserName", "SiteId" ],
+				"isUnique": true
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Users_SiteId",
+				"table": "Users",
+				"columns": [ "SiteId" ],
+				"isUnique": false
+			}
+		},
+		{
+			"createTable": {
+				"name": "RoleGroups",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Name",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Description",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_RoleGroups",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_RoleGroups_SiteId",
+						"Columns": [ "SiteId" ],
+						"PrincipalTable": "Sites",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_RoleGroups_Name",
+				"table": "RoleGroups",
+				"columns": [ "SiteId", "Name" ],
+				"isUnique": true
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_RoleGroups_SiteId",
+				"table": "RoleGroups",
+				"columns": [ "SiteId" ],
+				"isUnique": true
+			}
+		},
+		{
+			"createTable": {
+				"name": "Roles",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "RoleGroupId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "Name",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Description",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Type",
+						"clrType": "int",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_Roles",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_Roles_SiteId",
+						"Columns": [ "SiteId" ],
+						"PrincipalTable": "Sites",
+						"PrincipalColumns": [ "Id" ]
+					},
+					{
+						"name": "FK_Roles_RoleGroupId",
+						"Columns": [ "RoleGroupId" ],
+						"PrincipalTable": "RoleGroups",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "SetNull"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Roles_Name",
+				"table": "Roles",
+				"columns": [ "SiteId", "Name" ],
+				"isUnique": true
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Roles_SiteId",
+				"table": "Roles",
+				"columns": [ "SiteId" ],
+				"isUnique": false
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Roles_RoleGroupId",
+				"table": "Roles",
+				"columns": [ "RoleGroupId" ],
+				"isUnique": false
+			}
+		},
+		// Sql server needs the roles table to already exist to create these (and it doesn't).  Sqlite needs to create them when the table is created.
+		{
+			"DatabaseProviderSpecificOperation": {
+				"include": [ "SqlServer" ],
+				"operation": {
+					"addForeignKey": {
+						"name": "FK_Sites_AdministratorsRoleId",
+						"table": "Sites",
+						"Columns": [ "AdministratorsRoleId" ],
+						"PrincipalTable": "Roles",
+						"PrincipalColumns": [ "Id" ]
+					}
+				}
+			}
+		},
+		{
+			"DatabaseProviderSpecificOperation": {
+				"include": [ "SqlServer" ],
+				"operation": {
+					"addForeignKey": {
+						"name": "FK_Sites_AllUsersRoleId",
+						"table": "Sites",
+						"Columns": [ "AllUsersRoleId" ],
+						"PrincipalTable": "Roles",
+						"PrincipalColumns": [ "Id" ]
+					}
+				}
+			}
+		},
+		{
+			"DatabaseProviderSpecificOperation": {
+				"include": [ "SqlServer" ],
+				"operation": {
+					"addForeignKey": {
+						"name": "FK_Sites_AnonymousUsersRoleId",
+						"table": "Sites",
+						"Columns": [ "AnonymousUsersRoleId" ],
+						"PrincipalTable": "Roles",
+						"PrincipalColumns": [ "Id" ]
+					}
+				}
+			}
+		},
+		{
+			"DatabaseProviderSpecificOperation": {
+				"include": [ "SqlServer" ],
+				"operation": {
+					"addForeignKey": {
+						"name": "FK_Sites_RegisteredUsersRoleId",
+						"table": "Sites",
+						"Columns": [ "RegisteredUsersRoleId" ],
+						"PrincipalTable": "Roles",
+						"PrincipalColumns": [ "Id" ]
+					}
+				}
+			}
+		},
+		{
+			"createTable": {
+				"name": "UserRoles",
+				"columns": [
+					{
+						"name": "UserId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "RoleId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_UserRoles",
+					"isclustered": true,
+					"columns": [ "UserId", "RoleId" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_UserRoles_UserId",
+						"Columns": [ "UserId" ],
+						"PrincipalTable": "Users",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					},
+					{
+						"name": "FK_UserRoles_RoleId",
+						"Columns": [ "RoleId" ],
+						"PrincipalTable": "Roles",
+						"PrincipalColumns": [ "Id" ]
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_UserRoles_UserId",
+				"table": "UserRoles",
+				"columns": [ "UserId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_UserRoles_RoleId",
+				"table": "UserRoles",
+				"columns": [ "RoleId" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "UserSecrets",
+				"columns": [
+					{
+						"name": "UserId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "PasswordHash",
+						"clrType": "string",
+						"maxLength": 1024,
+						"isnullable": false
+					},
+					{
+						"name": "PasswordHashAlgorithm",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "PasswordResetToken",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "PasswordResetTokenExpiryDate",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "PasswordQuestion",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "PasswordAnswer",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "LastLoginDate",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "LastPasswordChangedDate",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "LastLockoutDate",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "IsLockedOut",
+						"clrType": "boolean",
+						"isnullable": true
+					},
+					{
+						"name": "FailedPasswordAttemptCount",
+						"clrType": "int",
+						"isnullable": true
+					},
+					{
+						"name": "FailedPasswordWindowStart",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "FailedPasswordAnswerAttemptCount",
+						"clrType": "int",
+						"isnullable": true
+					},
+					{
+						"name": "FailedPasswordAnswerWindowStart",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "Salt",
+						"clrType": "string",
+						"maxLength": 1024,
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_UserSecrets",
+					"isclustered": true,
+					"columns": [ "UserId" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_UserSecrets_UserId",
+						"Columns": [ "UserId" ],
+						"PrincipalTable": "Users",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			// Sql Server unique indexes do not allow multiple rows set to NULL by default, so we exclude Sql Server
+			// and execute an alternative command below.
+			"DatabaseProviderSpecificOperation": {
+				"exclude": [ "SqlServer" ],
+				"operation": {
+					"createIndex": {
+						"name": "IX_UserSecrets_PasswordResetToken",
+						"table": "UserSecrets",
+						"columns": [ "PasswordResetToken" ],
+						"isUnique": true
+					}
+				}
+			}
+		},
+		{
+			// Sql Server unique indexes do not allow multiple rows set to NULL by default, so we have to execute a specific
+			// command to create the index.
+			"DatabaseProviderSpecificOperation": {
+				"include": [ "SqlServer" ],
+				"operation": {
+					"sql": {
+						"sql": "CREATE UNIQUE INDEX IX_UserSecrets_PasswordResetToken ON [UserSecrets] ([PasswordResetToken]) WHERE [PasswordResetToken] IS NOT NULL;"
+					}
+				}
+			}
+		},
+		{
+			"createTable": {
+				"name": "UserProfileProperties",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Name",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "TypeUri",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "HelpText",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "SortOrder",
+						"clrType": "int",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_UserProfileProperties",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_UserProfileProperties_SiteId",
+						"Columns": [ "SiteId" ],
+						"PrincipalTable": "Sites",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_UserProfileProperties_SiteId",
+				"table": "UserProfileProperties",
+				"columns": [ "SiteId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_UserProfileProperties_SiteId_TypeUri",
+				"table": "UserProfileProperties",
+				"columns": [ "SiteId", "TypeUri" ],
+				"isUnique": true
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_UserProfileProperties_Name",
+				"table": "UserProfileProperties",
+				"columns": [ "SiteId", "Name" ],
+				"isUnique": true
+			}
+		},
+		{
+			"createTable": {
+				"name": "UserProfileValues",
+				"columns": [
+					{
+						"name": "UserId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "UserProfilePropertyId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Value",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_UserProfileValues",
+					"isclustered": true,
+					"columns": [ "UserId", "UserProfilePropertyId" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_UserProfileValues_UserId",
+						"Columns": [ "UserId" ],
+						"PrincipalTable": "Users",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					},
+					{
+						"name": "FK_UserProfileValues_UserProfilePropertyId",
+						"Columns": [ "UserProfilePropertyId" ],
+						"PrincipalTable": "UserProfileProperties",
+						"PrincipalColumns": [ "Id" ]
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_UserProfileValues_UserId",
+				"table": "UserProfileValues",
+				"columns": [ "UserId" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "UserSessions",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "UserId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "SlidingExpiry",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "IsPersistent",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "ExpiryDate",
+						"clrType": "datetime",
+						"isnullable": false
+					},
+					{
+						"name": "IssuedDate",
+						"clrType": "datetime",
+						"isnullable": false
+					},
+					{
+						"name": "RemoteIpAddress",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_UserSessions",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_UserSessions_UserId",
+						"Columns": [ "UserId" ],
+						"PrincipalTable": "Users",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					},
+					{
+						"name": "FK_UserSessions_SiteId",
+						"Columns": [ "SiteId" ],
+						"PrincipalTable": "Sites",
+						"PrincipalColumns": [ "Id" ]
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_UserSessions_UserId",
+				"table": "UserSessions",
+				"columns": [ "UserId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_UserSessions_SiteId",
+				"table": "UserSessions",
+				"columns": [ "SiteId" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "PermissionTypes",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ModuleDefinitionId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "Scope",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Name",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "SortOrder",
+						"clrType": "int",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_PermissionTypes",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_PermissionTypes_ModuleDefinitionId",
+						"Columns": [ "ModuleDefinitionId" ],
+						"PrincipalTable": "ModuleDefinitions",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_PermissionTypes_Scope",
+				"table": "PermissionTypes",
+				"columns": [ "Scope" ],
+				"IsUnique": true
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_PermissionTypes_ModuleDefinitionId",
+				"table": "PermissionTypes",
+				"columns": [ "ModuleDefinitionId" ],
+				"IsUnique": false
+			}
+		},
+		{
+			"createTable": {
+				"name": "Permissions",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "RelatedId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "PermissionTypeId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "RoleId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "AllowAccess",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_Permissions",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_Permissions_PermissionTypeId",
+						"Columns": [ "PermissionTypeId" ],
+						"PrincipalTable": "PermissionTypes",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Permissions_RelatedId_PermissionTypeId_RoleId",
+				"table": "Permissions",
+				"columns": [ "RelatedId", "PermissionTypeId", "RoleId" ],
+				"IsUnique": true
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Permissions_RelatedId",
+				"table": "Permissions",
+				"columns": [ "RelatedId" ],
+				"IsUnique": false
+			}
+		},
+		{
+			"createTable": {
+				"name": "MailTemplates",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Name",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Subject",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Body",
+						"clrType": "string",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_MailTemplates",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_MailTemplates_SiteId",
+						"Columns": [ "SiteId" ],
+						"PrincipalTable": "Sites",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_MailTemplates_SiteId_Name",
+				"table": "MailTemplates",
+				"columns": [ "SiteId", "Name" ],
+				"IsUnique": true
+			}
+		},
+		{
+			"createTable": {
+				"name": "Folders",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Provider",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Path",
+						"clrType": "string",
+						"maxLength": 1024,
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_Folders",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_Folders_SiteId",
+						"Columns": [ "SiteId" ],
+						"PrincipalTable": "Sites",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Folders_Path",
+				"table": "Folders",
+				"columns": [ "Provider", "Path" ],
+				"IsUnique": true
+			}
+		},
+		{
+			"createTable": {
+				"name": "Files",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Provider",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Path",
+						"clrType": "string",
+						"maxLength": 1024,
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_Files",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_Files_SiteId",
+						"Columns": [ "SiteId" ],
+						"PrincipalTable": "Sites",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Files_Path",
+				"table": "Files",
+				"columns": [ "Provider", "Path" ],
+				"IsUnique": true
+			}
+		},
+		{
+			"createTable": {
+				"name": "Lists",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Name",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Description",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_Lists",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_Lists_SiteId",
+						"Columns": [ "SiteId" ],
+						"PrincipalTable": "Sites",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Lists_Name",
+				"table": "Lists",
+				"columns": [ "SiteId", "Name" ],
+				"IsUnique": true
+			}
+		},
+		{
+			"createTable": {
+				"name": "ListItems",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ListId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Name",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Value",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ListItems",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_ListItems_ListId",
+						"Columns": [ "ListId" ],
+						"PrincipalTable": "Lists",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ListItems_Name",
+				"table": "ListItems",
+				"columns": [ "ListId", "Name" ],
+				"IsUnique": true
+			}
+		},
+		{
+			"createTable": {
+				"name": "Content",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "PageModuleId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Title",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "Value",
+						"clrType": "string",
+						"isnullable": true
+					},
+					{
+						"name": "SortOrder",
+						"clrType": "int",
+						"isnullable": false
+					},
+					{
+						"name": "ContentType",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_Content",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_Content_PageModuleId",
+						"Columns": [ "PageModuleId" ],
+						"PrincipalTable": "PageModules",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		}
+	]
+}

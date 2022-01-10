@@ -1,0 +1,47 @@
+﻿@model Nucleus.Web.ViewModels.Admin.PageEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+<fieldset role="group" aria-labelledby="heading">
+	<h2>Permissions</h2>
+	<div class="Tools">
+		@Html.DropDownListFor((model) => model.SelectedPageRoleId, new SelectList(Model.AvailablePageRoles, "Id", "Name"), new { @class = "flex-fill" })
+		<input type="submit" formaction="@Url.AreaAction("AddPagePermissionRole", "Pages", "Admin")" value="Add Role" data-target=".PageEditor" />
+	</div>
+	<table>
+		<tr>
+			<th></th>
+			@foreach (var permissionType in Model.PagePermissionTypes)
+			{
+				<th class="align-center">@permissionType.Name</th>
+			}
+		</tr>
+
+		@foreach (var item in Model.PagePermissions.Values)
+		{
+			<tr>
+				<td>
+					@item.Role.Name
+				</td>
+
+				@for (int permissionsCount = 0; permissionsCount < Model.PagePermissions[item.Role.Id].Permissions.Count; permissionsCount++)
+				{
+			<td>
+				@Html.HiddenFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].Id)
+				@Html.HiddenFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Id)
+				@Html.CheckBoxFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].AllowAccess)
+
+
+				@*@Html.Hidden($"Page.Permissions[{role.Id}][{permissionsCount}].Id", Model.Page.Permissions[role][permissionsCount].Id)
+				@Html.Hidden($"Page.Permissions[{role.Id}][{permissionsCount}].PermissionType.Id", Model.Page.Permissions[role][permissionsCount].PermissionType.Id)
+				@Html.CheckBox($"Page.Permissions[{role.Id}][{permissionsCount}].AllowAccess", Model.Page.Permissions[role][permissionsCount].AllowAccess)*@
+			</td>
+				}
+
+				<td class="SmallIconCell"><input type="submit" formaction="@Url.AreaAction("DeletePagePermissionRole", "Pages", "Admin", new { id = item.Role.Id })" value="&#xe14c;" class="MaterialIcon" title="Delete" data-target=".PageEditor" /></td>
+			</tr>
+		}
+
+	</table>
+</fieldset>

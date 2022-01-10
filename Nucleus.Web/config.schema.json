@@ -1,0 +1,297 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema",
+	"$id": "config.schema.json",
+	"title": "Nucleus Configuration",
+	"description": "Nucleus options configuration",
+	"version": "1.0.0",
+	"type": "object",
+	"properties": {
+		"Nucleus": {
+			"type": "object",
+			"properties": {
+				"SmtpMailOptions": {
+					"properties": {
+						"DeliveryMethod": {
+							"type": "string",
+							"enum": [ "Network", "SpecifiedPickupDirectory", "PickupDirectoryFromIis" ]
+						},
+						"PickupDirectoryLocation": {
+							"type": "string"
+						}
+					}
+				},
+				"HtmlEditor": {
+					"$id": "#root/Nucleus/HtmlEditor",
+					"title": "Htmleditor",
+					"type": "object",
+					"required": [
+						"Scripts"
+					],
+					"properties": {
+						"Scripts": {
+							"$id": "#root/Nucleus/HtmlEditor/Scripts",
+							"title": "Scripts",
+							"type": "array",
+							"default": [],
+							"items": {
+								"$id": "#root/Nucleus/HtmlEditor/Scripts/items",
+								"title": "Items",
+								"type": "object",
+								"required": [
+									"Type",
+									"Path"
+								],
+								"properties": {
+									"Type": {
+										"$id": "#root/Nucleus/HtmlEditor/Scripts/items/Type",
+										"title": "Type",
+										"type": "string",
+										"default": "",
+										"enum": [
+											"stylesheet",
+											"javascript"
+										]
+									},
+									"Path": {
+										"$id": "#root/Nucleus/HtmlEditor/Scripts/items/Path",
+										"title": "Path",
+										"type": "string",
+										"default": ""
+									}
+								}
+							}
+
+						}
+					}
+				},
+				"FileSystems": {
+					"$id": "#root/Nucleus/FileSystems",
+					"title": "Filesystems",
+					"type": "object"
+					],
+					"properties": {
+						"AllowedFileTypes": {
+							"$id": "#root/Nucleus/FileSystems/Providers/local/AllowedFileTypes",
+							"title": "AllowedFileTypes",
+							"type": "array",
+							"default": []
+						}
+					},
+					"Providers": {
+						"$id": "#root/Nucleus/FileSystems/Providers",
+						"title": "Providers",
+						"type": "object",
+						"required": [
+							"local"
+						],
+						"properties": {
+							"local": {
+								"$id": "#root/Nucleus/FileSystems/Providers/local",
+								"title": "Local",
+								"type": "object",
+								"required": [
+									"Name",
+									"ProviderType",
+									"RootFolder"
+								],
+								"properties": {
+									"Name": {
+										"$id": "#root/Nucleus/FileSystems/Providers/local/Name",
+										"title": "Name",
+										"type": "string",
+										"default": "",
+										"examples": [
+											"Local"
+										],
+										"pattern": "^.*$"
+									},
+									"ProviderType": {
+										"$id": "#root/Nucleus/FileSystems/Providers/local/ProviderType",
+										"title": "Providertype",
+										"type": "string"
+									},
+									"RootFolder": {
+										"$id": "#root/Nucleus/FileSystems/Providers/local/RootFolder",
+										"title": "Rootfolder",
+										"type": "string",
+										"default": "",
+										"examples": [
+											"{DataFolder}//Content"
+										],
+										"pattern": "^.*$"
+									}
+								}
+							}
+
+						}
+					}
+				}
+			},
+			"PasswordOptions": {
+				"$id": "#root/Nucleus/PasswordOptions",
+				"title": "Passwordoptions",
+				"type": "object",
+				"properties": {
+					"FailedPasswordWindowTimeout": {
+						"$id": "#root/Nucleus/PasswordOptions/FailedPasswordWindowTimeout",
+						"title": "Failedpasswordwindowtimeout",
+						"type": "string",
+						"default": "",
+						"examples": [
+							"0:15:00"
+						],
+						"pattern": "^.*$"
+					},
+					"FailedPasswordMaxAttempts": {
+						"$id": "#root/Nucleus/PasswordOptions/FailedPasswordMaxAttempts",
+						"title": "Failedpasswordmaxattempts",
+						"type": "integer",
+						"examples": [
+							3
+						],
+						"default": 0
+					},
+					"FailedPasswordLockoutReset": {
+						"$id": "#root/Nucleus/PasswordOptions/FailedPasswordLockoutReset",
+						"title": "Failedpasswordlockoutreset",
+						"type": "string",
+						"default": "",
+						"examples": [
+							"0:10:00"
+						],
+						"pattern": "^.*$"
+					},
+					"PasswordResetTokenExpiry": {
+						"$id": "#root/Nucleus/PasswordOptions/PasswordResetTokenExpiry",
+						"title": "Passwordresettokenexpiry",
+						"type": "string",
+						"default": "",
+						"examples": [
+							"02:00:00"
+						],
+						"pattern": "^.*$"
+					},
+					"PasswordComplexityRules": {
+						"$id": "#root/Nucleus/PasswordOptions/PasswordComplexityRules",
+						"title": "Passwordcomplexityrules",
+						"type": "array",
+						"default": [],
+						"items": {
+							"$id": "#root/Nucleus/PasswordOptions/PasswordComplexityRules/items",
+							"title": "Items",
+							"type": "object",
+							"required": [
+								"Pattern",
+								"Message"
+							],
+							"properties": {
+								"Pattern": {
+									"$id": "#root/Nucleus/PasswordOptions/PasswordComplexityRules/items/Pattern",
+									"title": "Pattern",
+									"type": "string",
+									"default": "",
+									"examples": [
+										"^(?=.*[A-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[\\\\!\\@\\#\\$\\%\\^\\&\\*\\(\\)\\[\\]])\\S{8,}$"
+									],
+									"pattern": "^.*$"
+								},
+								"Message": {
+									"$id": "#root/Nucleus/PasswordOptions/PasswordComplexityRules/items/Message",
+									"title": "Message",
+									"type": "string",
+									"default": "",
+									"examples": [
+										"Passwords must contain at least one upper case character, at least one lower case character, at least one number, at least one symbol and must be at least 8 characters long."
+									],
+									"pattern": "^.*$"
+								}
+							}
+						}
+
+					}
+				}
+			},
+			"ClaimTypeOptions": {
+				"$id": "#root/Nucleus/ClaimTypeOptions",
+				"title": "Claimtypeoptions",
+				"type": "object",
+				"required": [
+					"Types"
+				],
+				"properties": {
+					"Types": {
+						"$id": "#root/Nucleus/ClaimTypeOptions/Types",
+						"title": "Types",
+						"type": "array",
+						"default": [],
+						"items": {
+							"$id": "#root/Nucleus/ClaimTypeOptions/Types/items",
+							"title": "Items",
+							"type": "object",
+							"required": [
+								"DefaultName",
+								"Uri"
+							],
+							"properties": {
+								"DefaultName": {
+									"$id": "#root/Nucleus/ClaimTypeOptions/Types/items/DefaultName",
+									"title": "Defaultname",
+									"type": "string",
+									"default": "",
+									"examples": [
+										"First Name"
+									],
+									"pattern": "^.*$"
+								},
+								"Uri": {
+									"$id": "#root/Nucleus/ClaimTypeOptions/Types/items/Uri",
+									"title": "Uri",
+									"type": "string",
+									"default": "",
+									"examples": [
+										"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"
+									],
+									"pattern": "^.*$"
+								}
+							}
+						}
+
+					}
+				}
+			},
+			"CacheOptions": {
+				"$id": "#root/Nucleus/CacheOptions",
+				"title": "Cacheoptions",
+				"type": "object",
+				"patternProperties": {
+					".*": {
+						"$id": "#root/Nucleus/CacheOptions/PageCache",
+						"title": "Cache Name",
+						"type": "object",
+						"required": [
+							"Capacity",
+							"ExpiryTime"
+						],
+						"properties": {
+							"Capacity": {
+								"$id": "#root/Nucleus/CacheOptions/cache-name/Capacity",
+								"title": "Capacity",
+								"type": "integer",
+								"examples": [
+									500
+								],
+								"default": 0
+							},
+							"ExpiryTimeMinutes": {
+								"$id": "#root/Nucleus/CacheOptions/cache-name/ExpiryTime",
+								"title": "ExpiryTime",
+								"type": "string"
+							}
+						}
+					}
+
+				}
+			}
+		}
+	}
+} 

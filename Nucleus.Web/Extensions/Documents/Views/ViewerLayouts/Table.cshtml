@@ -1,0 +1,78 @@
+﻿@model Nucleus.Modules.Documents.ViewModels.Viewer
+@using Nucleus.Extensions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Documents.ViewModels
+@Html.AddStyle("~!/Table.css")
+<div class="Documents">
+	<table>
+		<tr>
+			@if (Model.AllowSorting)
+			{
+				<th>@Html.LinkButton("", "Title", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Title)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</th>
+				@if (Model.ShowCategory)
+				{
+					<th>@Html.LinkButton("", "Category", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Category)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</th>
+									 }
+				@if (Model.ShowModifiedDate)
+				{
+					<th>@Html.LinkButton("", "Modified Date", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.ModifiedDate)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</th>
+				}
+				@if (Model.ShowSize)
+				{
+					<th>@Html.LinkButton("", "Size", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Size)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</th>
+				}
+				@if (Model.ShowDescription)
+				{
+					<th>@Html.LinkButton("", "Description", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Description)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</th>
+				}
+			}
+			else
+			{
+				<th>Title</th>
+				@if (Model.ShowCategory)
+				{
+					<th>Category</th>
+				}
+				@if (Model.ShowModifiedDate)
+				{
+					<th>Modified Date</th>
+				}
+				@if (Model.ShowSize)
+				{
+					<th>Size</th>
+				}
+				@if (Model.ShowDescription)
+				{
+					<th>Description</th>
+				}
+			}
+		</tr>
+		@for (int documentCount = 0; documentCount < Model.Documents.Count; documentCount++)
+		{
+			<tr>
+				<td>
+					<a href="@Url.FileLink(Model.Documents[documentCount].File)" alt="Model.Documents[documentCount].Title">
+						@Model.Documents[documentCount].Title
+					</a>
+				</td>
+				@if (Model.ShowCategory)
+				{
+					<td>@Model.Documents[documentCount].Category?.Name</td>
+				}
+				@if (Model.ShowModifiedDate)
+				{
+					<td>@Model.Documents[documentCount].ModifiedDate.FormatDate(true)</td>
+				}
+				@if (Model.ShowSize)
+				{
+					<td>@Model.Documents[documentCount].Size.FormatFileSize()</td>
+				}
+				@if (Model.ShowDescription)
+				{
+					<td>@Model.Documents[documentCount].Description</td>
+				}
+			</tr>
+		}
+	</table>
+</div>

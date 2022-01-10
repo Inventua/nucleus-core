@@ -1,0 +1,82 @@
+﻿@model Nucleus.Web.ViewModels.Admin.SystemIndex
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+<div class="System">
+	<h1>System</h1>
+
+	<Tab>
+		<TabItem target="#system-information" caption="System Information" active="true"></TabItem>
+		<TabItem target="#system-activity" caption="Activity"></TabItem>
+		<TabItem target="#system-configuration" caption="Configuration"></TabItem>
+		<TabItem target="#system-database" caption="Database"></TabItem>
+		<TabItem target="#system-logs" caption="Logs"></TabItem>
+	</Tab>
+
+	<TabContent>
+		<TabPanel id="system-information" active="true">
+			<table class="headers-column">
+				<tr>
+					<th>Product</th>
+					<td>@Model.Product @Model.Version</td>
+				</tr>
+				<tr>
+					<th>Copyright</th>
+					<td>@Model.Copyright</td>
+				</tr>
+				<tr>
+					<th>Server</th>
+					<td>@Model.Server</td>
+				</tr>
+				<tr>
+					<th>Server Time</th>
+					<td>@DateTime.UtcNow.ToShortDateString() @DateTime.UtcNow.ToShortTimeString() [UTC]</td>
+				</tr>
+				<tr>
+					<th>Operating System</th>
+					<td>@Model.OperatingSystem</td>
+				</tr>
+				<tr>
+					<th>.NET Framework</th>
+					<td>@Model.Framework</td>
+				</tr>
+			</table>
+		</TabPanel>
+
+		<TabPanel id="system-activity">
+			<h2>Running Scheduled Tasks</h2>
+			<table>
+				@foreach (var task in Model.RunningTasks)
+				{
+					<tr>
+						<td>@task.ScheduledTask.Name</td>
+						<td>@task.Progress?.Status</td>
+						<td>@task.Progress?.Message</td>
+					</tr>
+				}
+			</table>
+		</TabPanel>
+
+		<TabPanel id="system-configuration">
+			<div class="LogContent">
+				<pre>@Model.Configuration</pre>
+			</div>
+		</TabPanel>
+
+		<TabPanel id="system-database">
+
+		</TabPanel>
+
+		<TabPanel id="system-logs">
+			@using (Html.BeginAreaForm("GetLogFile", "System", "Admin", FormMethod.Post, new { @data_target = ".LogContent pre", @autocomplete = "off" }))
+			{
+				@Html.DropDownListFor(model => model.LogFile, new SelectList(Model.LogFiles, "Filename", "Title"), "(select)", new { @class = "LogFile" })
+				<div class="LogContent"><pre>@Model.LogContent</pre></div>
+			}
+		</TabPanel>
+	</TabContent>
+</div>
+
+<script type="text/javascript">
+	jQuery('.System .LogFile').on('change', function () { jQuery(this).parents('form').submit(); })
+</script>

@@ -1,0 +1,67 @@
+﻿@model Nucleus.Extensions.ElasticSearch.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<h2>Elastic Search Settings</h2>
+@using (Html.BeginNucleusForm("Settings", "ElasticSearch", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+<fieldset role="group" aria-labelledby="heading">
+	<div class="Flex">
+		<SettingsControl caption="Elastic Search Server Url" helptext="Enter the URL for your Elastic Search server, including the port.">
+			@Html.TextBoxFor(model => model.ServerUrl)
+		</SettingsControl>
+		<SettingsControl caption="Index Name" helptext="Enter the index name to use for this site.">
+			@Html.TextBoxFor(model => model.IndexName)
+		</SettingsControl>
+	</div>
+
+	<SettingsControl caption="Attachments Size Limit (mb)" helptext="Enter maximum file size to submit to the Elastic search server for indexing.">
+		@Html.TextBoxFor(model => model.AttachmentMaxSize)
+	</SettingsControl>
+
+	<h3>Boost</h3>
+	<div class="w-75">
+		<SettingsControl caption="Title" helptext="Title boost.  The default value is 1.">
+			@Html.RangeFor(model => model.Boost.Title, 0.5, 5, 0.5)
+		</SettingsControl>
+		<SettingsControl caption="Summary" helptext="Summary boost.  The default value is 1.">
+			@Html.RangeFor(model => model.Boost.Summary, 0.5, 5, 0.5)
+		</SettingsControl>
+		<SettingsControl caption="Categories" helptext="Categories boost.  The default value is 1.">
+			@Html.RangeFor(model => model.Boost.Categories, 0.5, 5, 0.5)
+		</SettingsControl>
+		<SettingsControl caption="Keywords" helptext="Keywords boost.  The default value is 1.">
+			@Html.RangeFor(model => model.Boost.Keywords, 0.5, 5, 0.5)
+		</SettingsControl>
+		<SettingsControl caption="Content" helptext="Content boost.  The default value is 1.  For web pages, the page content and meta-data is the search content.  For files, the file content is the search content.">
+			@Html.RangeFor(model => model.Boost.Content, 0.5, 5, 0.5)
+		</SettingsControl>
+
+		<SettingsControl caption="Attachment Title" helptext="Attachment Title boost.  The default value is 1.">
+			@Html.RangeFor(model => model.Boost.AttachmentTitle, 0.5, 5, 0.5)
+		</SettingsControl>
+		<SettingsControl caption="Attachment Name" helptext="Attachment Name (file name) boost.  The default value is 1.">
+			@Html.RangeFor(model => model.Boost.AttachmentName, 0.5, 5, 0.5)
+		</SettingsControl>
+		<SettingsControl caption="Attachment Author" helptext="Attachment Author boost.  The default value is 1.">
+			@Html.RangeFor(model => model.Boost.AttachmentAuthor, 0.5, 5, 0.5)
+		</SettingsControl>
+		<SettingsControl caption="Attachment Keywords" helptext="Attachment keywords boost.  The default value is 1.">
+			@Html.RangeFor(model => model.Boost.AttachmentKeywords, 0.5, 5, 0.5)
+		</SettingsControl>
+	</div>
+
+	<div class="Tools">
+		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "Settings", "ElasticSearch"), new { })
+
+		@Html.SubmitButton("", "Get Index Count", @Url.NucleusAction("GetIndexCount", "Settings", "ElasticSearch"), new { })
+
+		@Html.SubmitButton("", "Get Index Settings", @Url.NucleusAction("GetIndexSettings", "Settings", "ElasticSearch"), new { })
+
+		@Html.SubmitButton("", "Clear Index", @Url.NucleusAction("ClearIndex", "Settings", "ElasticSearch"), new { @class = "btn btn-danger", @data_confirm = "This will delete the selected Elastic Search index, and it will be automatically re-created the next time the search feeder runs.  Do you want to continue?" })
+
+	</div>
+</fieldset>
+}

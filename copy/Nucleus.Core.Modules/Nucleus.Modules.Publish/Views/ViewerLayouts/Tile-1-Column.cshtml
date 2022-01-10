@@ -1,0 +1,49 @@
+﻿@model Nucleus.Modules.Publish.ViewModels.Viewer
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Publish.ViewModels
+@Html.AddStyle("~!/../../viewer.css")
+<div class="Articles Tile-1-Column">
+
+	@foreach (var article in Model.Articles.Items)
+	{
+		<div class="Article">
+			<h2 class="title">
+				@article.Title
+			</h2>
+			<div class="metadata">
+				<div class="publish-date">
+					@((article.PublishDate != DateTimeOffset.MinValue ? article.PublishDate : @article.DateAdded).FormatDate(true))
+				</div>
+				@if (article.Categories.Count > 0 || article.Featured)
+				{
+					<div class="categories">
+						@if (article.Featured)
+						{
+							<span class="featured category">Featured</span>
+						}
+						@foreach (var category in article.Categories)
+						{
+							<span class="category">@category.CategoryItem.Name</span>
+						}
+					</div>
+				}
+			</div>
+			@if (!String.IsNullOrEmpty(@article.SubTitle))
+			{
+				<h3 class="sub-title">
+					@article.SubTitle
+				</h3>
+			}
+			@if (!String.IsNullOrEmpty(@article.Summary))
+			{
+				<div class="summary">
+					@article.Summary
+				</div>
+			}
+			<a href="@article.EncodedTitle()" class="button">Read more</a>
+		</div>
+	}
+</div>
+

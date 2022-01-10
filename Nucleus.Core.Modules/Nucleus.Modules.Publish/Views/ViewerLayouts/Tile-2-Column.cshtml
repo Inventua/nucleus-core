@@ -1,0 +1,48 @@
+﻿@model Nucleus.Modules.Publish.ViewModels.Viewer
+@using Nucleus.Extensions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@Html.AddStyle("~!/../../viewer.css")
+<div class="Articles tile-2-column">
+  @foreach (var article in Model.Articles.Items)
+  {
+    <div class="Article">
+      <h2 class="title">
+        @article.Title
+      </h2>
+      <div class="metadata">
+        <div class="publish-date">
+          @((article.PublishDate != DateTimeOffset.MinValue ? article.PublishDate : @article.DateAdded).FormatDate(true))
+        </div>
+        @if (article.Categories.Count > 0 || article.Featured)
+        {
+          <div class="categories">
+            @if (article.Featured)
+            {
+              <span class="featured category">Featured</span>
+            }
+            @foreach (var category in article.Categories)
+            {
+              <span class="category">@category.CategoryListItem?.Name</span>
+            }
+          </div>
+        }
+      </div>
+      @if (!String.IsNullOrEmpty(@article.SubTitle))
+      {
+        <h3 class="sub-title">
+          @article.SubTitle
+        </h3>
+      }
+      @if (!String.IsNullOrEmpty(@article.Summary))
+      {
+        <div class="summary">
+          @article.Summary
+        </div>
+      }
+      <div class="nucleus-button-row">
+        <a href="@article.Title.FriendlyEncode()" class="btn btn-secondary">Read more</a>
+      </div>
+    </div>
+  }
+</div>

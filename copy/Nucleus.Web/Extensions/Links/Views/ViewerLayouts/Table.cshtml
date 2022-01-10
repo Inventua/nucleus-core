@@ -1,0 +1,45 @@
+﻿@model Nucleus.Modules.Links.ViewModels.Viewer
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Links.ViewModels
+@Html.AddStyle("~!/../../viewer.css")
+<div class="Links">
+	<table>
+		<tr>
+			<th>Title</th>
+			<th>Category</th>
+			<th>Description</th>
+		</tr>
+		@foreach (var link in Model.Links)
+		{
+			string url = "";
+			@switch (link.LinkType)
+			{
+				case Nucleus.Modules.Links.Models.LinkTypes.Url:
+					url = link.LinkUrl?.Url;
+					break;
+				case Nucleus.Modules.Links.Models.LinkTypes.File:
+					url = @Url.DownloadLink(link.LinkFile?.File);
+					break;
+				case Nucleus.Modules.Links.Models.LinkTypes.Page:
+					url = @Url.PageLink(link.LinkPage?.Page);
+					break;
+			}
+			@if (!String.IsNullOrEmpty(url))
+			{
+				<tr>
+					<td>
+						<a href="@url" alt="@link.Title">
+							@link.Title
+						</a>
+					</td>
+					@if (Model.CategoryList != null)
+					{
+						<td class="category">@link.Category?.Name</td>
+					}
+					<td class="description">@link.Description</td>
+				</tr>
+			}
+		}
+	</table>
+</div>

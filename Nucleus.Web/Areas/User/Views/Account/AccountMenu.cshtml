@@ -1,0 +1,9 @@
+﻿@*@model Nucleus.Web.ViewModels.User.AccountMenu
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+<ul>
+	<li><a href="@Model.UserProfileUrl">Account Settings</a></li>
+	<li><a href="@Url.AreaAction("EditPassword", "Account", "User")">Change Password</a></li>
+</ul>*@

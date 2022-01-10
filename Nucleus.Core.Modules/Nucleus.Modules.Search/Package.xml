@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package id="78605b0e-584b-4939-8fff-cf372c98e80a" xmlns="urn:nucleus/schemas/package/1.0">
+	<name>Search</name>
+	<version>1.0.0</version>
+	<publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
+	<description>
+		Search module.  Requires one or more search provider implementations.
+	</description>
+	<compatibility minVersion="1.0.0.0" maxVersion="*" />
+	
+	<components>
+		<component folderName="Search" optional="false">
+			<moduleDefinition id="c225f388-e5c1-48e2-9352-237cd8d0d2b6">
+				<friendlyName>Search</friendlyName>
+				<classTypeName>Nucleus.Modules.Search.Controllers.SearchController,Nucleus.Modules.Search</classTypeName>
+				<viewAction>Index</viewAction>
+				<editAction>Settings</editAction>
+				<categories>Search</categories>
+			</moduleDefinition>
+
+			<file name="readme.txt" />
+			<file name="viewer.css" />
+			<file name="settings.css" />
+			
+			<folder name="Bin">
+				<file name="Nucleus.Modules.Search.dll" />
+			</folder>
+			
+			<folder name="Views">
+				<file name="Viewer.cshtml" />
+				<file name="Settings.cshtml" />
+			</folder>
+			
+		</component>
+	</components>
+	
+</package>

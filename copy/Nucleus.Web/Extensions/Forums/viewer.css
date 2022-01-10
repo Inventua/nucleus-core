@@ -1,0 +1,142 @@
+﻿.Forums table 
+{
+  border: 1px solid #ccc;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.Forums table th, .Forums table td 
+{
+  padding: 4px;
+	text-align: left;
+  vertical-align: middle;
+  width: 5em;
+}
+
+.Forums table th:first-child, .Forums table td:first-child
+{
+  width: 1em;
+}
+.Forums table th:nth-child(2), .Forums table td:nth-child(2)
+{
+  width: auto;
+}
+
+
+.Forums table th:last-child, .Forums table td:last-child
+{
+  width: 20%;
+}
+
+.Forums table td:last-child
+{
+  font-size: 0.75em;
+}
+
+.Forums .post
+{ 
+  border: solid 2px #16698c;
+  padding: 4px;
+  margin-bottom: 8px;
+}
+
+.Forums .post-status
+{
+  font-size: 0.8em;
+  color: #333;
+}
+
+.Forums .post-status
+{
+  text-transform: capitalize;
+  border: dashed 1px #bbb;
+  padding: 1px 2px;
+}
+
+.Forums .post .post-flags 
+{
+  display: flex;
+  gap: 4px;  
+  flex-direction: row;
+  margin-bottom: 4px;
+  justify-content: flex-end;
+}
+
+.Forums .post .post-flags span
+{
+  /*border-radius: 2px;
+  background-color: #777;
+  color: white;
+  font-size: 0.8em;
+  padding: 2px 4px;*/
+  font-size: 0.8em;
+   text-transform: capitalize;
+  border: dashed 1px #bbb;
+  padding: 1px 2px;
+}
+
+.Forums .post .attachments, .Forums .reply .attachments
+{
+  display: inline-grid;
+  gap: 1em;
+  grid-auto-flow: column;
+  font-size: 0.8em;
+}
+
+.Forums .post .Tools
+{
+  margin-top: 4px;
+}
+
+.Forums .post .AdminTools
+{
+  display: flex;
+  flex-direction: row;
+  flex-basis: 100%;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.Forums .post h3
+{
+  margin: 0;
+}
+
+.Forums .post .body
+{
+}
+
+.Forums .reply
+{
+  border: dotted 2px #21A3DA;
+  margin-bottom: 8px;
+}
+
+.Forums .reply .heading
+{
+  padding: 4px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;  
+}
+
+.Forums .reply .controls
+{
+  display: inline-flex;
+  flex-direction: row-reverse;
+  flex-grow: 1;
+  /*text-align: right;*/
+  gap: 4px;
+}
+
+.Forums .reply .controls *
+{
+  display: inline-flex;
+  align-self: flex-end;
+}
+
+.Forums .body
+{
+  background-color: #eee;
+  padding: 8px;
+}

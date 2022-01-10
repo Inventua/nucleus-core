@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package id="4036fdb6-6114-4740-b3c4-d3dbc8f37540" xmlns="urn:nucleus/schemas/package/1.0">
+	<name>My Special Install Set for things</name>
+	<version>1.2.3</version>
+	<publisher name="Inventua Pty Ltd" url="http://www.inventua.com" email="support@inventua.com" />
+	<description>
+		Sample application install set for a module-based application in Nucleus, along with layouts, containers and other stuff.			
+	</description>
+	<compatibility minVersion="1.0.0.0" maxVersion="*" />
+	
+	<components>
+		<component folderName="TextHtml" optional="false">
+			<!--<moduleDefinition id="b516d8dd-c793-4776-be33-902eb704bef6">
+				<friendlyName>Html</friendlyName>
+				<moduleControllerType>Nucleus.Modules.TextHtml.Controllers.TextHtmlController,Nucleus.Modules.TextHtml</moduleControllerType>
+				<viewAction>Index</viewAction>
+				<editAction>Edit</editAction>
+			</moduleDefinition>
+			
+			<file name="readme.txt" />
+			
+			<folder name="Bin">
+				<file name="Nucleus.Modules.TextHtml.dll" />
+			</folder>
+			
+			<folder name="Views">
+				<file name="TextHtml.cshtml" />
+				<file name="TextHtmlEditor.cshtml" />
+			</folder>-->
+
+			<layoutDefinition id="2FF6818A-09FE-4EE2-BEFF-495A876AB6D6">
+				<friendlyName>Default</friendlyName>
+				<relativePath>Layouts\default.cshtml</relativePath>
+			</layoutDefinition>
+
+			<layoutDefinition id="07F3C7F2-97E6-46D3-8218-1E02CBBB5CF2">
+				<friendlyName>Menu</friendlyName>
+				<relativePath>Layouts\menu.cshtml</relativePath>
+			</layoutDefinition>
+
+			<containerDefinition id="80A7F079-F61D-42A4-9A4B-DA7692415952">
+				<friendlyName>Default</friendlyName>
+				<relativePath>Containers\default.cshtml</relativePath>
+			</containerDefinition>
+
+			<containerDefinition id="CC0B83AC-A2D4-426F-B455-1715102D4A5E">
+				<friendlyName>no-container</friendlyName>
+				<relativePath>Containers\no-container.cshtml</relativePath>
+			</containerDefinition>
+			
+		</component>
+	</components>
+	
+</package>

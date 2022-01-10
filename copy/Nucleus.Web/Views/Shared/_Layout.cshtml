@@ -1,0 +1,145 @@
+﻿@model Nucleus.Web.ViewModels.Default
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+	@if (!String.IsNullOrEmpty(Model.Context.Page.Description))
+	{
+		<meta name="DESCRIPTION" content="@Model.Context.Page.Description" />
+	}
+	@if (!String.IsNullOrEmpty(Model.SiteIconPath))
+	{
+		<link rel="shortcut icon" href="@Model.SiteIconPath">
+	}
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta content="text/javascript" http-equiv="Content-Script-Type" />
+	<meta content="text/css" http-equiv="Content-Style-Type" />
+	<link rel="canonical" href="@Model.DefaultPageUri" />
+	<title>@Model.Context.Page.Title</title>
+	@Html.AddHtmlEditor()
+	<link href="@Url.Content("~/Resources/Libraries/Bootstrap/5.1.0/css/bootstrap.css")" rel="stylesheet" />
+	<link href="@Url.Content("~/Resources/css/main.css")" rel="stylesheet" />
+	<link href="@Url.Content("~/Resources/css/shared.css")" rel="stylesheet" />
+	@if (Model.IsEditing)
+	{
+		<link href="@Url.Content("~/Resources/css/editmode.css")" rel="stylesheet" />
+	}
+	@RenderSection("styles", false)
+	@Html.RenderStyles()
+	<script src="@Url.Content("~/Resources/Libraries/jQuery/03.06.00/jquery.min.js")" type="text/javascript"></script>
+	<script src="@Url.Content("~/Resources/Libraries/Bootstrap/5.1.0/js/bootstrap.bundle.js")" type="text/javascript"></script>
+	<script src="@Url.Content("~/Resources/js/nucleus-shared.js")" type="text/javascript"></script>
+	@RenderSection("scripts", false)
+	@Html.RenderScripts()
+</head>
+<body>
+	@if (Model.CanEdit)
+	{
+		<iframe id="AdminFrame" title="Control Panel" src="@Url.Content("~/Admin/Index/Index")?pageId=@Model.Context.Page.Id" class="Nucleus AdminFrame"></iframe>
+		<div class="AdminFramePlaceholder"></div>
+		@*<div class="Nucleus ModuleEditorFrameWrapper">*@			
+		<div class="modal" tabindex="-1">
+			<div class="modal-dialog modal-fullscreen">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Module Settings</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<iframe id="ModuleEditorFrame" src="about:blank" class="Nucleus ModuleEditorFrame" data-wrapper=".ModuleEditorFrameWrapper"></iframe>
+					</div>
+				</div>
+			</div>
+		</div>
+			@*<iframe id="ModuleEditorFrame" src="about:blank" class="Nucleus ModuleEditorFrame" data-wrapper=".ModuleEditorFrameWrapper"></iframe>*@
+		@*</div>*@
+		@*<div class="ModuleEditorFrameOverlay EditorOverlay"></div>*@
+	}
+
+	<div class="Nucleus Content">
+		@RenderBody()
+	</div>
+
+	@if (Model.CanEdit)
+	{
+		<script type="text/javascript">
+			jQuery(document).ready(function ()
+			{
+				
+			});
+
+			window.document.addEventListener('ExpandAdminFrame',
+				function (args)
+				{
+					if (args.detail !== null && args.detail.expand)
+						jQuery('#AdminFrame').addClass('Expanded');
+					else
+						jQuery('#AdminFrame').removeClass('Expanded');
+				}, false);
+
+			window.document.addEventListener('Refresh',
+				function (args)
+				{
+					if (args.detail !== null && typeof (args.detail.setEditMode) !== 'undefined')
+					{
+						if (args.detail.setEditMode)
+						{
+							document.cookie = "@Constants.EDIT_COOKIE_NAME=true; Path=/; max-age=3600";
+						}
+						else
+						{
+							document.cookie = "@Constants.EDIT_COOKIE_NAME=; Path=/; max-age=0";
+						}
+					}
+
+					window.location.reload(true);
+				}, false);
+
+			window.document.addEventListener('InitFrame',
+				function (args)
+				{
+					if (args.detail !== null && typeof (args.detail.element) !== 'undefined')
+					{
+						var element = jQuery(args.detail.element);
+						var wrapper = element.parents('.modal');
+
+						var title = wrapper.find('.modal-title');
+						title.html(args.detail.element.title);
+
+						var settingsDialog = new bootstrap.Modal(wrapper);
+						wrapper.on('hidden.bs.modal', function () { window.location.reload(true); });
+						element.show();
+						settingsDialog.show();
+
+						//var overlaySelector = element.attr('data-overlay');
+						//var wrapperSelector = element.attr('data-wrapper');
+
+						//var wrapper = jQuery(wrapperSelector);
+						//if (wrapper.length === 0)
+						//{
+						//	wrapper = element;
+						//}
+
+						//element.css('height', '80vh');
+						//element.css('width', '80vw');
+						//element.show();
+
+						//wrapper.dialog({
+						//	close: function (event, ui) { window.location.reload(true); },
+						//	title: args.detail.element.title,
+						//	width: 'auto',
+						//	height: 'auto',
+						//	modal: true
+						//});
+
+						//element.dialog('option', 'height', document.documentElement.clientHeight * 0.8);
+						//element.dialog('open');
+					}
+				}, false);
+		</script>
+	}
+</body>
+</html>

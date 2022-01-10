@@ -1,0 +1,55 @@
+﻿@model Nucleus.Modules.Forums.ViewModels.ListForums
+@using Nucleus.Extensions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Forums.ViewModels
+@Html.AddStyle("~!/../viewer.css")
+@Html.AddStyle("~/Resources/css/forms.css")
+<div class="Forums">
+	@foreach (var group in Model.Groups)
+	{
+		<table class="forums-list">
+			<tr>
+				<th colspan="5">@group.Name</th>
+			</tr>
+			<tr>
+				<th colspan="2">Forum Name</th>
+				<th>Posts</th>
+				<th>Replies</th>
+				<th>Most Recent</th>
+			</tr>
+			@foreach (var forum in group.Forums)
+			{
+				<tr class="forum-item @(forum.EffectiveSettings().Enabled ? "enabled" : "disabled")">
+					<td class="nucleus-material-icon">
+						@if (forum.EffectiveSettings().Enabled)
+						{
+							@Html.Raw("&#xe0bf;")
+						}
+						else
+						{
+							<span title="Disabled forum">@Html.Raw("&#xf236;")</span>
+						}
+					</td>
+					<td>						
+						<a href="@forum.Name.FriendlyEncode()/">@forum.Name</a>
+						@if (!String.IsNullOrEmpty(forum.Description))
+						{
+							<div>@forum.Description</div>
+						}
+					</td>
+					<td>@forum.Statistics.PostCount</td>
+					<td>@forum.Statistics.ReplyCount</td>
+					<td>
+						@if (forum.Statistics.LastPost != null)
+						{
+							<div>@forum.Statistics.LastPost.Subject</div>
+							<div>@forum.Statistics.LastPost.PostedBy.UserName</div>
+							<div>@forum.Statistics.LastPost.DateAdded.FormatDate(true)</div>
+						}
+					</td>
+				</tr>
+			}
+		</table>
+	}
+</div>

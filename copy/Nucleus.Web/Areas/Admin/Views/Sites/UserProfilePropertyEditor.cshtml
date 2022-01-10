@@ -1,0 +1,31 @@
+﻿@model Nucleus.Web.ViewModels.Admin.SiteEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@using (Html.BeginAreaForm("SaveUserProfileProperty", "Sites", "Admin", FormMethod.Post, new { @data_target = ".AdminPage", @autocomplete = "off" }))
+{
+<fieldset role="group" aria-labelledby="heading">
+	<h2>User Profile Property</h2>
+	<a class="ClosePopup">&#xe5cd;</a>
+	@Html.HiddenFor(model => model.Property.Id)
+	@Html.HiddenFor(model => model.Site.Id)
+	@Html.HiddenFor(model => model.IsCurrentSiteEditor)
+	<SettingsControl caption="Name" helptext="Property name">
+		@Html.TextBoxFor(model => model.Property.Name)
+	</SettingsControl>
+
+	<SettingsControl caption="Type" helptext="Property type (uri).  A list of common types is at https://docs.microsoft.com/en-us/dotnet/api/system.security.claims.claimtypes.  You can also use a custom claim type.">
+		@Html.TextBoxFor(model => model.Property.TypeUri)
+	</SettingsControl>
+
+	<SettingsControl caption="Help Text" helptext="Property help text.  This is displayed on-screen when a user edits user properties.">
+		@Html.TextBoxFor(model => model.Property.HelpText)
+	</SettingsControl>
+</fieldset>		
+
+	<div class="ButtonPanel">
+		<input type="submit" class="DefaultButton" value="Save Changes" />
+	</div>
+}
+

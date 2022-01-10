@@ -1,0 +1,17 @@
+﻿@model Nucleus.Web.ViewModels.Admin.FileSystemCreateFolder
+@using Nucleus.Abstractions.Models.FileSystem
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+<h2 class="nucleus-modal-caption">Create Folder</h2>
+@using (Html.BeginAreaForm("CreateFolder", "FileSystem", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage" }))
+{
+	<fieldset>
+		@Html.HiddenFor(model => model.Folder.Id)
+		<SettingsControl caption="Folder Name" helptext="Folder name">
+			@Html.TextBoxFor((model) => model.NewFolder)
+		</SettingsControl>
+	</fieldset>
+	<input type="submit" value="Create Folder" class="btn btn-primary" formaction="@Url.AreaAction("CreateFolder", "FileSystem", "Admin")" data-target=".nucleus-adminpage" />
+}

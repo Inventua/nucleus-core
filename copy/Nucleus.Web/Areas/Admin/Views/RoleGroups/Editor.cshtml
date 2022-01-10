@@ -1,0 +1,33 @@
+﻿@model Nucleus.Web.ViewModels.Admin.RoleGroupEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@using (Html.BeginAreaForm("Save", "RoleGroups", "Admin", FormMethod.Post, new { @data_target = ".AdminPage", @autocomplete = "off" }))
+{
+
+	<div id="rolegroup-properties">
+		<fieldset role="group" aria-labelledby="heading">
+			<h2>Role Group</h2>
+			@Html.HiddenFor(model => model.RoleGroup.Id)
+
+			<SettingsControl caption="Name" helptext="Role Group name">
+				@Html.TextBoxFor(model => model.RoleGroup.Name)
+			</SettingsControl>
+
+			<SettingsControl caption="Description" helptext="Description">
+				@Html.TextAreaFor(model => model.RoleGroup.Description)
+			</SettingsControl>
+
+		</fieldset>
+	</div>
+
+
+	<div class="ButtonPanel">
+		<input type="submit" class="DefaultButton" value="Save Changes" />
+		@if (Model.RoleGroup.Id != Guid.Empty)
+		{
+			<input type="submit" class="DeleteButton" value="Delete Role Group" formaction="@Url.AreaAction("DeleteRoleGroup", "RoleGroups", "Admin")" data-confirm="Delete this role group?" />
+		}
+		</div>
+}

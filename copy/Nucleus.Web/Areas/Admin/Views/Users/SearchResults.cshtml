@@ -1,0 +1,14 @@
+﻿@model Nucleus.Web.ViewModels.Admin.UserIndex
+@using Nucleus.ViewFeatures.HtmlHelpers
+<div class="Results">
+	<a class="CloseResults">&#xe5cd;</a>
+	<h2>Search Results</h2>
+	<table>
+		@foreach (var item in Model.Users)
+		{
+		<tr>
+			<td><a href="@Url.Content("~/Admin/Users/Editor")?id=@item.Id" data-target=".UserEditor">@item.UserName</a></td>
+		</tr>		
+		}
+	</table>
+</div>

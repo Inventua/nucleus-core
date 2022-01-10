@@ -1,0 +1,32 @@
+﻿#site-wizard .modal-body
+{
+	background-image: url('/Resources/Images/nucleus.png');
+	background-repeat: no-repeat;
+	background-position: right 1rem top 1rem;
+	
+}
+
+#site-wizard .tab-content
+{
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	overflow: auto;
+	margin-bottom: 1rem;
+}
+
+#site-wizard .installable-package
+{
+	margin-bottom: 0.75rem;
+}
+
+#site-wizard .installable-package label span
+{
+	display: inline-block;
+}
+
+#site-wizard .nucleus-button-panel
+{
+	display: flex;
+	gap: 4px;
+}

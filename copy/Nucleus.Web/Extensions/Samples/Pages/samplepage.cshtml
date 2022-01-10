@@ -1,0 +1,23 @@
+﻿@page
+@{
+	Layout = "_Layout";
+}
+
+@section styles
+{
+	<link href="@Url.Content("~/Extensions/Samples/pages/samplepage.css")" rel="stylesheet" />
+}
+
+@section scripts
+{
+	<script type="text/javascript" src="@Url.Content("~/Extensions/Samples/pages/samplepage.js")"></script>
+}
+
+Sample Razor page
+
+@section InlineScript
+{
+	<script type="text/javascript">
+		ShowDialog('welcome');
+	</script>
+}

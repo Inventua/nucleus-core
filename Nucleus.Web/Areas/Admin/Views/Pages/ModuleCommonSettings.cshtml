@@ -1,0 +1,77 @@
+﻿@model Nucleus.Web.ViewModels.Admin.PageEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@if (!String.IsNullOrEmpty(Model.UseLayout))
+{
+	Layout = Model.UseLayout;
+}
+@using (Html.BeginAreaForm("SaveModuleCommonSettings", "Pages", "Admin", FormMethod.Post, new { @data_target = "form.parent()", @autocomplete = "off" }))
+{
+	@Html.HiddenFor(model => model.Page.Id)
+	@Html.HiddenFor(model => model.PageEditorMode)
+
+	<fieldset role="group" aria-labelledby="heading">
+		<h2>@(String.IsNullOrEmpty(Model.Module.Title) ? "" : @Model.Module.Title)</h2>
+
+		<Tab>
+			<TabItem target="#module-properties" active="true" caption="Properties"></TabItem>
+			<TabItem target="#module-permissions" caption="Permissions"></TabItem>
+		</Tab>
+
+		<TabContent>
+			<TabPanel id="module-properties" active="true">
+				@Html.HiddenFor((model) => model.Module.Id)
+				@Html.HiddenFor((model) => model.Module.SortOrder)
+				<SettingsControl caption="Module Type" helptext="Select a Module Type.">
+					@if (Model.Module.Id == Guid.Empty)
+					{
+						@Html.DropDownListFor(model => model.Module.ModuleDefinition.Id, Model.AvailableModules, "(select module type)")
+					}
+					else
+					{
+						@Html.HiddenFor((model) => model.Module.ModuleDefinition.Id)
+						@Model.Module.ModuleDefinition.FriendlyName
+					}
+				</SettingsControl>
+
+				<SettingsControl caption="Title" helptext="Module Title.  This value may be shown on screen.">
+					@Html.TextBoxFor((model) => model.Module.Title, new { @maxlength = 256 })
+				</SettingsControl>
+
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Pane" helptext="Select the pane to display this module in.  Different layouts have different available panes and pane names.">
+						@Html.DropDownListFor((model) => model.Module.Pane, new SelectList(Model.AvailablePanes))
+					</SettingsControl>
+					<SettingsControl caption="Container" helptext="Select the container for the module, or select '(default)' to use the default layout for this page.">
+						@Html.DropDownListFor((model) => model.Module.ContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
+					</SettingsControl>
+					<SettingsControl caption="Style Classes" helptext="Applies additional CSS classes to the container.  Separate additional CSS classes with spaces.">
+						@Html.TextBoxFor((model) => model.Module.Style)
+					</SettingsControl>
+				</div>
+			</TabPanel>
+			<TabPanel id="module-permissions">
+				<div class="nucleus-form-tools">
+					@Html.DropDownListFor(model => model.SelectedModuleRoleId, Model.AvailableModuleRoles, new { @class = "flex-fill" })
+					<input type="submit" formaction="@Url.AreaAction("AddModulePermissionRole", "Pages", "Admin")?PageEditorMode=@Model.PageEditorMode" value="Add Role" data-target="form.parent()" class="btn btn-secondary" />
+				</div>
+				@await Html.PartialAsync("ModulePermissions")
+			</TabPanel>
+		</TabContent>
+	</fieldset>
+
+	<div class="nucleus-form-buttonrow">
+		<div class="nucleus-form-tools">
+			@if (Model.Module.Id == Guid.Empty)
+			{
+				<input type="submit" value="Add Module" formaction="@Url.AreaAction("CreateModule", "Pages", "Admin")" data-target="#pageeditor_pagemodules" class="btn btn-primary" />
+			}
+			else
+			{
+				<input type="submit" value="Save Changes" formaction="@Url.AreaAction("SaveModuleCommonSettings", "Pages", "Admin")" data-target="#pageeditor_pagemodules" class="btn btn-primary" />
+			}
+		</div>
+	</div>
+}

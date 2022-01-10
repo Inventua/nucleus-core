@@ -1,0 +1,69 @@
+﻿@model Nucleus.Web.ViewModels.Admin.ListEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@using (Html.BeginAreaForm("Save", "Lists", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @autocomplete = "off" }))
+{
+	<Tab>
+		<TabItem target="#list-properties" caption="Properties" active="true"></TabItem>
+		@if (Model.List.Id != Guid.Empty)
+		{
+			<TabItem target="#list-items" caption="List Items"></TabItem>
+		}
+	</Tab>
+
+	<TabContent>
+		<TabPanel id="list-properties" active="true">
+			<fieldset List="group" aria-labelledby="heading">
+				<h2>List</h2>
+				@Html.HiddenFor(model => model.List.Id)
+
+				<SettingsControl caption="Name" helptext="List name">
+					@Html.TextBoxFor(model => model.List.Name, new { @maxlength = 256 })
+				</SettingsControl>
+
+				<SettingsControl caption="Description" helptext="Description">
+					@Html.TextAreaFor(model => model.List.Description, new { @maxlength = 512 })
+				</SettingsControl>
+			</fieldset>
+		</TabPanel>
+
+		@if (Model.List.Id != Guid.Empty)
+		{
+			<TabPanel id="list-items">
+				<div class="nucleus-form-tools">
+					@Html.SubmitButton("&#xe145;", "Add List Item", Url.AreaAction("AddListItem", "Lists", "Admin"), new { @data_target = ".ListEditor", @class = "btn btn-secondary" })
+				</div>
+
+				<table>
+					<tr>
+						<th>Name</th>
+						<th>Value</th>
+					</tr>
+					@for (int itemCount = 0; itemCount < Model.List.Items.Count; itemCount++)
+					{
+						<tr>
+							<td>
+								@Html.HiddenFor(model => model.List.Items[itemCount].Id)
+								@Html.TextBoxFor(model => model.List.Items[itemCount].Name, new { @maxlength = 256 })
+							</td>
+							<td>
+								@Html.TextBoxFor(model => model.List.Items[itemCount].Value, new { @maxlength = 512 })
+							</td>
+							<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("DeleteListItem", "Lists", "Admin", new { id = Model.List.Items[itemCount].Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target=".ListEditor" /></td>
+						</tr>
+					}
+				</table>
+			</TabPanel>
+		}
+	</TabContent>
+	<div class="nucleus-button-panel">
+		<input type="submit" class="btn btn-primary" value="Save Changes" />
+
+		@if (Model.List.Id != Guid.Empty)
+		{
+			<input type="submit" class="btn btn-danger" value="Delete List" formaction="@Url.AreaAction("DeleteList", "Lists", "Admin")" data-confirm="Delete this list?" />
+		}
+	</div>
+}

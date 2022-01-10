@@ -1,0 +1,105 @@
+﻿@model Nucleus.Web.ViewModels.Admin.UserEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@using Nucleus.Abstractions.Models.Configuration
+@using (Html.BeginAreaForm("Save", "Users", "Admin", FormMethod.Post, new { @data_target = ".AdminPage", @autocomplete = "off" }))
+{
+		<Tab>
+			<TabItem target="#user-properties" caption="Properties" active="true"></TabItem>
+			<TabItem target="#user-profile" caption="Profile"></TabItem>
+			<TabItem target="#user-roles" caption="Roles"></TabItem>
+		</Tab>
+
+		<TabContent>
+			<TabPanel id="user-properties" active="true">
+				<fieldset role="group" aria-labelledby="heading">
+					<h2>Basic Properties</h2>
+					@Html.HiddenFor(model => model.User.Id)
+
+					<SettingsControl caption="User Name" helptext="User login name">
+						@Html.TextBoxFor(model => model.User.UserName)
+					</SettingsControl>
+
+					@*only show password field for a new user*@
+					@if (Model.User.Id == Guid.Empty)
+					{
+						<SettingsControl caption="Password" helptext="Enter a password for the user">
+							@Html.PasswordFor(model => model.EnteredPassword)
+						</SettingsControl>
+					}
+				</fieldset>
+			</TabPanel>
+
+			<TabPanel id="user-profile">
+				<fieldset role="group" aria-labelledby="heading">
+					<h2>Profile</h2>
+
+					@for (int profileValueCount = 0; profileValueCount < Model.User.Profile.Count; profileValueCount++)
+					{
+						<div class="settings-control" title="@Model.User.Profile[profileValueCount].UserProfileProperty.HelpText">
+							<label>
+								<span>@Model.User.Profile[profileValueCount].UserProfileProperty.Name</span>
+								@{Dictionary<string, object> parameters = new();
+									ClaimTypeOption claimTypeOption = Model.User.Profile[profileValueCount].UserProfileProperty.ClaimTypeOption(Model.ClaimTypeOptions);
+									if (claimTypeOption.InputType != null)
+									{
+										parameters.Add("type", claimTypeOption.InputType);
+									}
+									if (claimTypeOption.Pattern != null)
+									{
+										parameters.Add("pattern", claimTypeOption.Pattern);
+									} }
+								@Html.TextBoxFor(model => model.User.Profile[profileValueCount].Value, parameters)
+							</label>
+							@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Id)
+							@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Name)
+							@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.TypeUri)
+						</div>
+					}
+				</fieldset>
+			</TabPanel>
+
+			<TabPanel id="user-roles">
+				<fieldset role="group" aria-labelledby="heading">
+					<h2>Roles</h2>
+					@if (Model.AvailableRoles.Count > 0)
+					{
+						<div class="Tools">
+							@Html.DropDownListFor((model) => model.SelectedRoleId, new SelectList(Model.AvailableRoles, "Id", "Name"), new { @class = "flex-fill" })
+							<input type="submit" formaction="@Url.AreaAction("AddRole", "Users", "Admin")" value="Add Role" data-target=".UserEditor" />
+						</div>
+					}
+					<table>
+
+						@for (int roleCount = 0; roleCount < Model.User?.Roles.Count; roleCount++)
+						{
+							<tr>
+								<td>
+									@Html.HiddenFor(model => model.User.Roles[roleCount].Id)
+									@Html.HiddenFor(model => model.User.Roles[roleCount].Name)
+									@Model.User.Roles[roleCount].Name
+								</td>
+
+								<td class="SmallIconCell"><input type="submit" formaction="@Url.AreaAction("RemoveUserRole", "Users", "Admin")?roleId=@Model.User.Roles[roleCount].Id" value="&#xe14c;" class="MaterialIcon" title="Delete User Role" data-target=".UserEditor" /></td>
+
+							</tr>
+						}
+					</table>
+				</fieldset>
+			</TabPanel>
+		</TabContent>
+	<div class="ButtonPanel">
+		<input type="submit" class="DefaultButton" value="Save Changes" />
+		@if (Model.User.Id != Guid.Empty && !Model.IsCurrentUser)
+		{
+			<input type="submit" class="DeleteButton" value="Delete User" formaction="@Url.AreaAction("DeleteUser", "Users", "Admin")" data-confirm="Delete this user?" />
+		}
+	</div>
+}
+
+<div class="UserEditor">
+
+</div>

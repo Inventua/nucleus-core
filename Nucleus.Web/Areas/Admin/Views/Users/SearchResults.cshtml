@@ -1,0 +1,30 @@
+﻿@model Nucleus.Web.ViewModels.Admin.UserIndex
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Extensions
+<div class="nucleus-admin-search collapse@(Model.SearchResults?.Items?.Any() == true ? " show" : "")">
+	<a class="nucleus-btn-close-results" onclick="jQuery('.nucleus-admin-search').removeClass('show');">&#xe5cd;</a>
+	<h2>Search Results</h2>
+	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.SearchResults, propertyName = "SearchResults" })
+	@if (Model.SearchResults?.Items?.Any() == true)
+	{
+		<div class="nucleus-search-results">
+			<table>
+				@foreach (var item in Model.SearchResults.Items)
+				{
+					<tr>
+						<td><a href="@Url.Content("~/Admin/Users/Editor")?id=@item.Id" data-target=".UserEditor">@item.UserName</a></td>
+
+						@if (@item.Profile.HasProperty(System.Security.Claims.ClaimTypes.GivenName))
+						{
+							<td>@item.Profile.GetProperty(System.Security.Claims.ClaimTypes.GivenName).Value @item.Profile.GetProperty(System.Security.Claims.ClaimTypes.Surname).Value</td>
+						}
+						@if (@item.Profile.HasProperty(System.Security.Claims.ClaimTypes.Email))
+						{
+							<td>@item.Profile.GetProperty(System.Security.Claims.ClaimTypes.Email).Value</td>
+						}
+					</tr>
+				}
+			</table>
+		</div>
+	}
+</div>

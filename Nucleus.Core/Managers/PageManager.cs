@@ -1,0 +1,507 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Nucleus.Abstractions.Models;
+using Nucleus.Data.Common;
+using Nucleus.Core.DataProviders;
+using Nucleus.Core;
+using System.Security.Claims;
+using Nucleus.Core.Authorization;
+using Nucleus.Abstractions;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Extensions.Authorization;
+
+namespace Nucleus.Core.Managers
+{
+	/// <summary>
+	/// Provides functions to manage database data for <see cref="Page"/>s.
+	/// </summary>
+	public class PageManager : IPageManager
+	{
+
+		private IDataProviderFactory DataProviderFactory { get; }
+		private ICacheManager CacheManager { get; }
+
+		public PageManager(IDataProviderFactory dataProviderFactory, ICacheManager cacheManager)
+		{
+			this.CacheManager = cacheManager;
+			this.DataProviderFactory = dataProviderFactory;
+		}
+
+		/// <summary>
+		/// Create a new <see cref="Page"/> with default values.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// The new <see cref="Page"/> is not saved to the database until you call <see cref="Save(Site, Page)"/>.
+		/// </remarks>
+		public Task<Page> CreateNew(Site site)
+		{
+			Page result = new();
+
+			// default route (url)
+			result.Routes.Add(new PageRoute());
+
+			return Task.FromResult(result);
+		}
+
+		/// <summary>
+		/// Retrieve an existing <see cref="Page"/> from the database.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public async Task<Page> Get(Guid id)
+		{
+			return await this.CacheManager.PageCache().GetAsync(id, async id =>
+			{
+				using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+				{
+					return await provider.GetPage(id);
+				}
+			});
+		}
+
+		/// <summary>
+		/// Retrieve an existing page from the database, specified by site and path.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		public async Task<Page> Get(Site site, string path)
+		{
+			if (path.EndsWith('/') && path != "/")
+			{
+				path = path[0..^1];
+			}
+
+			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+			{
+				Guid pageId = await provider.FindPage(site, path);
+				if (pageId == Guid.Empty)
+				{
+					return null;
+				}
+				else
+				{
+					return await Get(pageId);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Retrive an existing page from the database.  The returned page is the "owner" of the specified module.
+		/// </summary>
+		/// <param name="page"></param>
+		/// <returns></returns>
+		public async Task<Page> Get(PageModule pageModule)
+		{
+			return await Get(pageModule.PageId);
+		}
+
+		/// <summary>
+		/// List all <see cref="PageModule"/>s that are part of the page.
+		/// </summary>
+		/// <param name="page"></param>
+		/// <returns></returns>
+		public async Task<List<PageModule>> ListModules(Page page)
+		{
+			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+			{
+				return await provider.ListPageModules(page.Id);
+			}
+		}
+
+		/// <summary>
+		/// Delete the specifed <see cref="Page"/> from the database.
+		/// </summary>
+		/// <param name="page"></param>
+		public async Task Delete(Page page)
+		{
+			using (IPermissionsDataProvider permissionsProvider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+			{
+				await permissionsProvider.DeletePermissions(page.Permissions);
+			}
+
+			if (page.Modules != null)
+			{
+				foreach (PageModule module in page.Modules)
+				{
+					using (IPermissionsDataProvider permissionsProvider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+					{
+						await permissionsProvider.DeletePermissions(module.Permissions);
+					}
+					using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+					{
+						await provider.DeletePageModule(module);
+					}
+				}
+			}
+
+			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+			{
+				await provider.DeletePage(page);
+				this.CacheManager.PageCache().Remove(page.Id);
+				this.CacheManager.PageMenuCache().Clear();
+			}
+		}
+
+		/// <summary>
+		/// List all <see cref="Page"/>s within the specified site.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <returns></returns>
+		public async Task<IList<Page>> List(Site site)
+		{
+			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+			{
+				return await provider.ListPages(site.Id);
+			}
+		}
+
+		/// <summary>
+		/// Return a list of all <see cref="Page"/>s for the site which match the specified search term.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="searchTerm"></param>
+		/// <returns></returns>
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> Search(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		{
+			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+			{
+				return await provider.SearchPages(site.Id, searchTerm, pagingSettings);
+			}
+		}
+
+		/// <summary>
+		/// Add default permissions to the specifed <see cref="Page"/> for the specified <see cref="Role"/>.
+		/// </summary>
+		/// <param name="page"></param>
+		/// <param name="role"></param>
+		/// <remarks>
+		/// The new permissions are not saved unless you call <see cref="Save(Site, Page)"/>.
+		/// </remarks>
+		public async Task CreatePermissions(Site site, Page page, Role role)
+		{
+			Boolean isAnonymousOrAllUsers = role.Equals(site.AnonymousUsersRole) || role.Equals(site.AllUsersRole);
+
+			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+			{
+				{
+					List<PermissionType> permissionTypes = await provider.ListPermissionTypes(Page.URN);
+					List<Permission> permissions = new();
+
+					foreach (PermissionType permissionType in permissionTypes)
+					{
+						Permission permission = new();
+						permission.Role = role;
+
+						if (isAnonymousOrAllUsers && !permissionType.IsPageViewPermission())
+						{
+							permission.AllowAccess = false;
+							permission.PermissionType = new() { Scope = PermissionType.PermissionScopeNamespaces.Disabled};
+						}
+						else
+						{
+							permission.AllowAccess = permissionType.IsPageViewPermission();							
+							permission.PermissionType = permissionType;
+						}
+
+						permissions.Add(permission);
+					}
+
+					page.Permissions.AddRange(permissions);
+				}
+			}
+		}
+
+		/// <summary>
+		/// List all permissions for the specified <see cref="Page"/>, sorted by <see cref="Role"/> name and <see cref="PermissionType"/> <see cref="PermissionType.SortOrder"/>.
+		/// </summary>
+		/// <param name="page"></param>
+		/// <returns></returns>
+		public async Task<List<Permission>> ListPermissions(Page page)
+		{
+			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+			{
+				List<PermissionType> permissionTypes = await provider.ListPermissionTypes(Page.URN);
+				List<Permission> permissions = await provider.ListPermissions(page.Id, Page.URN);
+				Dictionary<Role, IList<Permission>> results = new();
+
+				// ensure that for each role with any permissions defined, there is a full set of permission types for the role
+				foreach (Role role in permissions.Select((permission) => permission.Role).ToList())
+				{
+					foreach (PermissionType permissionType in permissionTypes)
+					{
+						if (permissions.Where((permission) => permission?.Role.Id == role.Id && permission?.PermissionType.Id == permissionType.Id).ToList().Count == 0)
+						{
+							Permission permission = new();
+							permission.AllowAccess = false;
+							permission.PermissionType = permissionType;
+							permission.Role = role;
+							permissions.Add(permission);
+						}
+					}
+				}
+
+				return permissions;
+			}
+		}
+
+		/// <summary>
+		/// Return a list of available permission types, sorted by SortOrder
+		/// </summary>
+		/// <returns></returns>
+		public async Task<List<PermissionType>> ListPagePermissionTypes()
+		{
+			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+			{
+				return (await provider.ListPermissionTypes(Page.URN)).OrderBy(permissionType => permissionType.SortOrder).ToList();
+			}
+		}
+
+		/// <summary>
+		/// Create or update a <see cref="Page"/>, including its <see cref="Page.Permissions"/> and <see cref="Page.Routes"/>.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="page"></param>
+		public async Task Save(Site site, Page page)
+		{
+			// If no default Url was selected and there's more than one Url, set the first Url as the default
+			if (page.DefaultPageRouteId == Guid.Empty && page.Routes.Count > 0)
+			{
+				page.DefaultPageRouteId = page.Routes[0].Id;
+			}
+
+			// check for reserved routes
+			foreach (PageRoute route in page.Routes)
+			{
+				if (RoutingConstants.RESERVED_ROUTES.Contains(route.Path.StartsWith('/') ? route.Path[1..] : route.Path, StringComparer.OrdinalIgnoreCase))
+				{
+					throw new InvalidOperationException($"The page route '{route.Path}' is reserved.");
+				}
+			}
+
+			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+			{
+				await provider.SavePage(site, page);
+				this.CacheManager.PageCache().Remove(page.Id);
+				this.CacheManager.PageMenuCache().Clear();
+			}
+		}
+
+		/// <summary>
+		/// Ensure that pages have unique sort order.
+		/// </summary>
+		/// <param name="pages"></param>
+		/// <remarks>
+		/// Page sort orders can produce duplicates and gaps when pages parents are changed, or pages are deleted.
+		/// </remarks>
+		private async Task CheckNumbering(Site site, List<Page> pages)
+		{
+			int sortOrder = 10;
+
+			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+			{
+				foreach (Page page in pages)
+				{
+					if (page.SortOrder != sortOrder)
+					{
+						page.SortOrder = sortOrder;
+						await provider.SavePage(site, page);
+
+						this.CacheManager.PageCache().Remove(page.Id);
+					}
+
+					sortOrder += 10;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Update the <see cref="Page.SortOrder"/> of the page module specifed by id by swapping it with the next-highest <see cref="Page.SortOrder"/>.
+		/// </summary>
+		/// <param name="pageId"></param>
+		public async Task MoveDown(Site site, Guid pageId)
+		{
+			Page previousPage = null;
+			Page thisPage;
+			List<Page> siblingPages;
+
+			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+			{
+				thisPage = await this.Get(pageId);
+				siblingPages = await provider.ListPages(site.Id, thisPage.ParentId);
+			}
+
+			await CheckNumbering(site, siblingPages);
+
+			siblingPages.Reverse();
+			foreach (Page page in siblingPages)
+			{
+				if (page.Id == pageId)
+				{
+					if (previousPage != null)
+					{
+						int temp = page.SortOrder;
+						page.SortOrder = previousPage.SortOrder;
+						previousPage.SortOrder = temp;
+
+						if (previousPage.SortOrder == page.SortOrder)
+						{
+							page.SortOrder += 10;
+						}
+
+						using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+						{
+							await provider.SavePage(site, previousPage);
+						}
+
+						using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+						{
+							await provider.SavePage(site, page);
+						}
+
+						this.CacheManager.PageCache().Remove(previousPage.Id);
+						this.CacheManager.PageCache().Remove(page.Id);
+						break;
+					}
+				}
+				else
+				{
+					previousPage = page;
+				}
+			}
+		}
+
+
+		/// <summary>
+		/// Update the <see cref="Page.SortOrder"/> of the page module specifed by id by swapping it with the previous <see cref="Page.SortOrder"/>.
+		/// </summary>
+		/// <param name="pageId"></param>
+		public async Task MoveUp(Site site, Guid pageId)
+		{
+			Page previousPage = null;
+			Page thisPage;
+			List<Page> siblingPages;
+
+			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+			{
+				thisPage = await provider.GetPage(pageId);
+				siblingPages = await provider.ListPages(site.Id, thisPage.ParentId);
+			}
+
+			await CheckNumbering(site, siblingPages);
+
+			foreach (Page page in siblingPages)
+			{
+				if (page.Id == pageId)
+				{
+					if (previousPage != null)
+					{
+						int temp = page.SortOrder;
+						page.SortOrder = previousPage.SortOrder;
+						previousPage.SortOrder = temp;
+
+						if (previousPage.SortOrder == page.SortOrder)
+						{
+							previousPage.SortOrder += 10;
+						}
+
+						using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+						{
+							await provider.SavePage(site, previousPage);
+						}
+
+						using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+						{
+							await provider.SavePage(site, page);
+						}
+
+						this.CacheManager.PageCache().Remove(previousPage.Id);
+						this.CacheManager.PageCache().Remove(page.Id);
+						break;
+					}
+				}
+				else
+				{
+					previousPage = page;
+				}
+			}
+		}
+
+		public async Task<PageMenu> GetAdminMenu(Site site, Page parentPage, ClaimsPrincipal user, int levels)
+		{
+			// read from database
+			PageMenuChildrenResult childrenResult = await GetPageMenuChildren(site, parentPage, user, levels, 0, true);
+			return new PageMenu(null, childrenResult.Children, childrenResult.HasChildren);
+		}
+
+
+		public async Task<PageMenu> GetMenu(Site site, Page parentPage, ClaimsPrincipal user, Boolean ignoreSettings)
+		{
+			string key;
+			if (user.IsSystemAdministrator())
+			{
+				key = $"system-administrator:{ignoreSettings}:{(parentPage == null ? Guid.Empty : parentPage.Id)}";
+			}
+			else if (user.IsSiteAdmin(site))
+			{
+				key = $"site-administrator:{site.Id}:{ignoreSettings}:{(parentPage == null ? Guid.Empty : parentPage.Id)}";
+			}
+			else
+			{
+				key = String.Join("|", user.Claims.Where(claim => claim.Type == System.Security.Claims.ClaimTypes.Role).Select(claim => claim.Value)) + $":{site.Id}:{ignoreSettings}:{(parentPage == null ? Guid.Empty : parentPage.Id)}";
+			}
+
+			return await this.CacheManager.PageMenuCache().GetAsync(key, async key =>
+			{
+				// read from database
+				PageMenuChildrenResult childrenResult = await GetPageMenuChildren(site, parentPage, user, 0, 0, ignoreSettings);
+				return new PageMenu(null, childrenResult.Children, childrenResult.HasChildren);
+			});
+		}
+
+		private async Task<PageMenuChildrenResult> GetPageMenuChildren(Site site, Page parentPage, ClaimsPrincipal user, int levels, int thisLevel, Boolean ignoreSettings)
+		{
+			List<PageMenu> children = new();
+
+			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+			{
+				// read from database
+				foreach (Page child in await provider.ListPages(site.Id, parentPage?.Id))
+				{
+					if (levels != 0 && thisLevel >= levels) return new PageMenuChildrenResult(true);
+
+					if (ignoreSettings || (!child.Disabled && child.ShowInMenu && user.HasViewPermission(site, child)))
+					{
+						PageMenuChildrenResult childrenResult = await GetPageMenuChildren(site, child, user, levels, thisLevel + 1, ignoreSettings);
+						children.Add(new PageMenu(child, childrenResult.Children, childrenResult.HasChildren));
+					}
+				}
+			}
+
+			return new PageMenuChildrenResult(children);
+		}
+
+		private class PageMenuChildrenResult
+		{
+			public Boolean HasChildren { get; set; }
+			public IEnumerable<PageMenu> Children { get; set; }
+
+			public PageMenuChildrenResult(Boolean hasChildren)
+			{
+				this.HasChildren = hasChildren;
+			}
+
+			public PageMenuChildrenResult(IEnumerable<PageMenu> children)
+			{
+				this.Children = children;
+				this.HasChildren = this.Children?.Count() != 0;
+			}
+
+		}
+	}
+}

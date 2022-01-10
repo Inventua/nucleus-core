@@ -1,0 +1,17 @@
+﻿@model Nucleus.Web.ViewModels.Admin.RoleGroupIndex
+<h1>Role Groups</h1>
+<div class="Tools">
+	<a href="@Url.Content("~/Admin/RoleGroups/Editor")" class="button" data-target=".RoleGroupEditor">New Role Group</a>
+</div>
+<div class="IndexWrapper">
+	<div class="ItemsList">
+		<ul>
+			@foreach (var item in Model.RoleGroups)
+			{
+				<li><a href="@Url.Content("~/Admin/RoleGroups/Editor")?id=@item.Id" data-target=".RoleGroupEditor">@item.Name</a></li>
+			}
+		</ul>
+	</div>
+
+	<div class="RoleGroupEditor EditorPanel"></div>
+</div>

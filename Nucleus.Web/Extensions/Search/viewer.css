@@ -1,0 +1,36 @@
+﻿.search-result
+{
+	margin-bottom: 0.5rem;
+	padding-bottom: 0.5rem;
+	border-bottom: dotted 1px #aaa;
+}
+
+#search-suggestions
+{
+	position: fixed;
+	display: inline-block;
+	border: 1px solid #ddd;
+	margin-top: 2.5rem;
+	background-color: white;
+}
+
+.suggestions-result 
+{
+	margin: 0;
+	padding: 0.25rem;
+}
+
+.suggestions-result li
+{
+	padding: 0.75rem;
+	list-style-type: none;
+	margin: 0;
+	cursor: default;
+	width: 25em;
+	text-overflow: ellipsis;
+}
+
+.suggestions-result li:hover
+{
+	background-color: #ddd;
+}

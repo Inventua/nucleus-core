@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CS1712: Enforce typeparam xml comments
+dotnet_diagnostic.CS1712.severity = silent

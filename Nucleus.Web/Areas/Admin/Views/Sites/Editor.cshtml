@@ -1,0 +1,294 @@
+﻿@model Nucleus.Web.ViewModels.Admin.SiteEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Extensions;
+@using Nucleus.Extensions.Authorization
+@using (Html.BeginAreaForm("Select", "Sites", "Admin", FormMethod.Post, new { @data_target = Model.IsCurrentSiteEditor ? ".nucleus-adminpage" : ".SiteEditor", @autocomplete = "off", @enctype = "multipart/form-data" }))
+{
+	@if (Model.IsCurrentSiteEditor)
+	{
+		<h1>Site</h1>
+	}
+	<Tab>
+		<TabItem target="#site-properties" caption="Properties" active="true"></TabItem>
+		@if (Model.Site.Id != Guid.Empty)
+		{
+			<TabItem target="#site-aliases" caption="Aliases"></TabItem>
+			<TabItem target="#site-userprofile" caption="User Profile Properties"></TabItem>
+			<TabItem target="#site-sitepages" caption="Site Pages"></TabItem>
+		}
+		<TabItem target="#site-mailsettings" caption="Email Settings"></TabItem>
+		@if (Model.Site.Id != Guid.Empty)
+		{
+			<TabItem target="#site-mailtemplates" caption="Email Templates"></TabItem>
+		}
+	</Tab>
+	<TabContent>
+		<TabPanel id="site-properties" active="true">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>General</h2>
+				@Html.HiddenFor(model => model.Site.Id)
+				@Html.HiddenFor(model => model.IsCurrentSiteEditor)
+
+				<SettingsControl caption="Name" helptext="Site name.  This value is for reference purposes only.">
+					@Html.TextBoxFor(model => model.Site.Name, new { @maxlength = 256 })
+				</SettingsControl>
+
+				<SettingsControl caption="Default Layout" helptext="Default presentation layout for the site.  Pages which do not specify a layout use the site default.">
+					@Html.DropDownListFor(model => model.Site.DefaultLayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
+				</SettingsControl>
+
+				<SettingsControl caption="Default Container" helptext="Default module container for the site.  Modules which which do not specify a layout use the page default, and if the page default is not set they use the site default container.">
+					@Html.DropDownListFor((model) => model.Site.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
+				</SettingsControl>
+
+				@if (Model.Site.Id == Guid.Empty)
+				{
+					<SettingsControl caption="Administrators Role" helptext="Administrators Role.  Users in this role can edit all site-related values, including users, roles, mail templates, files and lists.">
+						@Html.TextBoxFor(model => model.Site.AdministratorsRole.Name, new { @maxlength = 256 })
+					</SettingsControl>
+
+					<SettingsControl caption="Registered Users Role" helptext="Registered users role.  This role represents logged-in users.">
+						@Html.TextBoxFor(model => model.Site.RegisteredUsersRole.Name, new { @maxlength = 256 })
+					</SettingsControl>
+
+					<SettingsControl caption="Anonymous Users Role" helptext="Anonymous users role.  This role represents users who are not logged in.">
+						@Html.TextBoxFor(model => model.Site.AnonymousUsersRole.Name, new { @maxlength = 256 })
+					</SettingsControl>
+
+					<SettingsControl caption="All Users Role" helptext="All users role.  This role represents all users, whether logged in or not.">
+						@Html.TextBoxFor(model => model.Site.AllUsersRole.Name, new { @maxlength = 256 })
+					</SettingsControl>
+				}
+				else
+				{
+					<SettingsControl caption="Site Logo" helptext="Site banner logo.">
+						<div class="nucleus-flex-fields nucleus-fileselector">
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { model = Model.SelectedLogoFile, PropertyName = "SelectedLogoFile", SelectAnotherActionName = "SelectAnotherLogo", Pattern = "(.gif|.png|.jpg|.jpeg|.bmp)" })
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { actionName = "UploadLogo", controlName = "logoFile", filter = "image/*" })
+						</div>
+					</SettingsControl>
+
+					@if (Model.SelectedLogoFile != null && Model.SelectedLogoFile.Id != Guid.Empty && !Model.Site.AllUsersRole.HasViewPermission(Model.SelectedLogoFile.Parent))
+					{
+						<div class="alert alert-warning" role="alert">
+							<h4>Permissions Warning</h4>
+							The logo file that you have selected is not visible to all users.  Some users may encounter a broken image link.
+						</div>
+					}
+
+					<SettingsControl caption="Site Icon" helptext="Site icon.">
+						<div class="nucleus-flex-fields nucleus-fileselector">
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { model = Model.SelectedIconFile, PropertyName = "SelectedIconFile", SelectAnotherActionName = "SelectAnotherIcon", Pattern = "(.gif|.png|.jpg|.jpeg|.ico)" })
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { actionName = "UploadIcon", controlName = "iconFile", filter = "image/*" })
+						</div>
+					</SettingsControl>
+
+
+					@if (Model.SelectedIconFile != null && Model.SelectedIconFile.Id != Guid.Empty && !Model.Site.AllUsersRole.HasViewPermission(Model.SelectedIconFile.Parent))
+					{
+						<div class="alert alert-warning" role="alert">
+							<h4>Permissions Warning</h4>
+							The icon file that you have selected is not visible to all users.  Some users may encounter a "not found" response and be
+							unable to see the icon.
+						</div>
+					}
+
+
+					@Html.HiddenFor(model => model.Site.AdministratorsRole.Name)
+					@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Name)
+					@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Name)
+					@Html.HiddenFor(model => model.Site.AllUsersRole.Name)
+
+					<div class="nucleus-flex-fields">
+						<SettingsControl caption="Administrators Role" helptext="Administrators Role.  Users in this role can edit all site-related values, including users, roles, mail templates, files and lists.">
+							@Html.DropDownListFor(model => model.Site.AdministratorsRole.Id, new SelectList(Model.Roles, "Id", "Name"))
+						</SettingsControl>
+
+						<SettingsControl caption="Registered Users Role" helptext="Registered users role.  This role represents logged-in users.">
+							@Html.DropDownListFor(model => model.Site.RegisteredUsersRole.Id, new SelectList(Model.Roles, "Id", "Name"))
+						</SettingsControl>
+					</div>
+
+					<div class="nucleus-flex-fields">
+						<SettingsControl caption="Anonymous Users Role" helptext="Anonymous users role.  This role represents users who are not logged in.">
+							@Html.DropDownListFor(model => model.Site.AnonymousUsersRole.Id, new SelectList(Model.Roles, "Id", "Name"), "(none selected)")
+						</SettingsControl>
+
+						<SettingsControl caption="All Users Role" helptext="This role represents all users, whether logged in or not.">
+							@Html.DropDownListFor(model => model.Site.AllUsersRole.Id, new SelectList(Model.Roles, "Id", "Name"), "(none selected)")
+						</SettingsControl>
+					</div>
+				}
+
+				<SettingsControl caption="Site Group" helptext="Site Group.  Sites which are in a site group use the user, role, mail templates and lists of the site which is configured as the site group primary site.">
+					@Html.DropDownListFor(model => model.Site.SiteGroupId, new SelectList(Model.SiteGroups, "Id", "Name"), "(none selected)")
+				</SettingsControl>
+
+				<SettingsControl caption="Home Directory" helptext="The site home directory is a sub-directory (for every file provider) which contains the files for this site.">
+					@Html.TextBoxFor(model => model.Site.HomeDirectory, new { @maxlength = 1024 })
+				</SettingsControl>
+
+			</fieldset>
+		</TabPanel>
+
+		@if (Model.Site.Id != Guid.Empty)
+		{
+			<TabPanel id="site-aliases">
+				<h2>Aliases</h2>
+				<div class="nucleus-form-tools">
+					<input type="submit" formaction="@Url.AreaAction("AddAlias", "Sites", "Admin")" value="Add Alias" data-target="#PopupDialog .modal-body" class="btn btn-secondary" />
+				</div>
+				<div id="AliasList">
+					@await Html.PartialAsync("_AliasList.cshtml", Model)
+				</div>
+			</TabPanel>
+
+			<TabPanel id="site-userprofile">
+				<h2>User Profile Properties</h2>
+
+				<div class="nucleus-form-tools">
+					<input type="submit" formaction="@Url.AreaAction("AddUserProfileProperty", "Sites", "Admin")" value="Add Property" data-target="#PopupDialog .modal-body" class="btn btn-secondary" />
+				</div>
+				<div id="UserProfilePropertiesList">
+					@await Html.PartialAsync("_UserProfilePropertiesList.cshtml", Model)
+				</div>
+			</TabPanel>
+
+			<TabPanel id="site-sitepages">
+				<fieldset role="group" aria-labelledby="heading">
+					<h2>Site Pages</h2>
+
+					<h3>User Pages</h3>
+					<div class="nucleus-flex-fields">
+						<SettingsControl caption="Login Page" helptext="Login Page.  This page should contain a login module.">
+							@Html.PageListFor(model => model.SitePages.LoginPageId, Model.PageMenu, Guid.Empty)
+						</SettingsControl>
+
+						<SettingsControl caption="User Registration Page" helptext="User Registration Page.  This page should contain a user registration module, used to sign up new users.">
+							@Html.PageListFor(model => model.SitePages.UserRegisterPageId, Model.PageMenu, Guid.Empty)
+						</SettingsControl>
+					</div>
+
+					<div class="nucleus-flex-fields">
+						<SettingsControl caption="User Profile Page" helptext="User Profile Page.  This page should contain a user profile module, used to manage user properties.">
+							@Html.PageListFor(model => model.SitePages.UserProfilePageId, Model.PageMenu, Guid.Empty)
+						</SettingsControl>
+
+						<SettingsControl caption="User Change Password Page" helptext="User Change Password Page.  This page should contain a change password module, used to change a user's password.">
+							@Html.PageListFor(model => model.SitePages.UserChangePasswordPageId, Model.PageMenu, Guid.Empty)
+						</SettingsControl>
+					</div>
+
+					<h3>Special Use Pages</h3>
+					<div class="nucleus-flex-fields">
+						<SettingsControl caption="Terms of Use Page" helptext="Terms of Use Page.  This page is the target of the link rendered by the Terms Html helper or Tag helper, if your layout uses one of them.  It can contain any content.">
+							@Html.PageListFor(model => model.SitePages.TermsPageId, Model.PageMenu, Guid.Empty)
+						</SettingsControl>
+
+						<SettingsControl caption="Privacy Policy Page" helptext="Privacy Policy Page.  This page is the target of the link rendered by the Privacy Html helper or Tag helper, if your layout uses one of them.  It can contain any content.">
+							@Html.PageListFor(model => model.SitePages.PrivacyPageId, Model.PageMenu, Guid.Empty)
+						</SettingsControl>
+					</div>
+
+					<h3>Error Pages</h3>
+					<div class="nucleus-flex-fields">
+						<SettingsControl caption="Page not Found (404) page" helptext="Page not Found (404) page.  If a user browses to an Url which does not match a page or other resource, this page is displayed.  If you leave this set to 'none', a HTTP 404 error is returned.">
+							@Html.PageListFor(model => model.SitePages.NotFoundPageId, Model.PageMenu, Guid.Empty)
+						</SettingsControl>
+
+						<SettingsControl caption="Error Page" helptext="Error Page.  This page is displayed when an unhandled error occurs.">
+							@Html.PageListFor(model => model.SitePages.ErrorPageId, Model.PageMenu, Guid.Empty)
+						</SettingsControl>
+					</div>
+
+				</fieldset>
+			</TabPanel>
+		}
+		<TabPanel id="site-mailsettings">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Email Settings</h2>
+
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="SMTP Host" helptext="SMTP host name">
+						@Html.TextBoxFor(model => model.MailSettings.HostName)
+					</SettingsControl>
+
+					<SettingsControl caption="SMTP Port" helptext="SMTP Port">
+						@Html.TextBoxFor(model => model.MailSettings.Port)
+					</SettingsControl>
+				</div>
+
+				<SettingsControl caption="Use SSL?" helptext="Use SSL?" rendermode="LabelLast" class="inner-inline">
+					@Html.CheckBoxFor(model => model.MailSettings.UseSsl, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+
+				<SettingsControl caption="Sender Email" helptext="Sender Email">
+					@Html.TextBoxFor(model => model.MailSettings.Sender)
+				</SettingsControl>
+
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="User Name" helptext="Username">
+						@Html.TextBoxFor(model => model.MailSettings.UserName)
+					</SettingsControl>
+
+					<SettingsControl caption="Password" helptext="Password">
+						@if (Model.Site.Id == Guid.Empty)
+						{
+							@Html.PasswordFor(model => model.MailSettings.Password)
+						}
+						else
+						{
+							@Html.PasswordFor(model => model.MailSettings.Password, new { @value = SiteExtensions.UNCHANGED_PASSWORD })
+						}
+					</SettingsControl>
+				</div>
+			</fieldset>
+		</TabPanel>
+
+		<TabPanel id="site-mailtemplates">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Email Templates</h2>
+
+				<SettingsControl caption="Welcome new user" helptext="Email template for the ''Welcome new user' message.'">
+					@Html.DropDownListFor(model => model.SiteTemplateSelections.WelcomeNewUserTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+				</SettingsControl>
+
+				<SettingsControl caption="Account Name Reminder" helptext="Email template sent to users who request a user name reminder.">
+					@Html.DropDownListFor(model => model.SiteTemplateSelections.AccountNameReminderTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+				</SettingsControl>
+
+
+				<SettingsControl caption="Password Reset" helptext="Password reset">
+					@Html.DropDownListFor(model => model.SiteTemplateSelections.PasswordResetTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+				</SettingsControl>
+
+			</fieldset>
+		</TabPanel>
+	</TabContent>
+
+	<div class="nucleus-button-panel">
+		<input type="submit" class="btn btn-primary" value="Save Changes" formaction="@Url.AreaAction("Save", "Sites", "Admin")" data-target=".nucleus-adminpage" />
+		@if (Model.Site.Id != Guid.Empty)
+		{
+			if (!Model.IsCurrentSite)
+			{
+				<input type="submit" class="btn btn-danger" value="Delete Site" formaction="@Url.AreaAction("DeleteSite", "Sites", "Admin")" data-target=".nucleus-adminpage" data-confirm="This will delete all pages, roles, role groups and users which belong to this site.  Delete this site?" />
+			}
+
+			@Html.LinkButton("", "Export Site", @Url.AreaAction("ExportSite", "Sites", "Admin") + "?siteId=" + @Model.Site.Id, new { @class = "btn btn-secondary" });
+		}
+	</div>
+}
+<script type="text/javascript">
+	// Read the child pages of the item containing the "+" button
+	jQuery('#site-sitepages').on('click', '.nucleus-get-childpages', function (e)
+	{
+		// Add a ul to contain the new pages
+		Page.LoadPartialContent(e, '@Url.AreaAction("GetChildPages", "Sites", "Admin")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+
+		// remove the "+" button
+		jQuery(this).remove();
+	});
+</script>

@@ -1,0 +1,57 @@
+﻿CREATE TABLE IF NOT EXISTS [Links] 
+(
+	[Id] GUID NOT NULL,
+	[ModuleId] GUID NOT NULL,
+	[Title] TEXT NOT NULL,
+	[Description] TEXT NULL,
+	[LinkType] TEXT NOT NULL,
+	[SortOrder] INT NOT NULL,	
+	[CategoryId] GUID NULL,
+	[DateAdded] DATETIME NULL,
+	[AddedBy] GUID NULL,
+	[DateChanged] DATETIME NULL,
+	[ChangedBy] GUID NULL,
+	CONSTRAINT [PK_Links] PRIMARY KEY([Id]),
+	CONSTRAINT [FK_Links_ModuleId] FOREIGN KEY([ModuleId]) REFERENCES PageModules([Id]) ON DELETE CASCADE
+);
+GO
+
+CREATE TABLE IF NOT EXISTS [LinkUrls] 
+(
+	[LinkId] GUID NOT NULL,
+	[Url] TEXT NOT NULL,
+	[DateAdded] DATETIME NULL,
+	[AddedBy] GUID NULL,
+	[DateChanged] DATETIME NULL,
+	[ChangedBy] GUID NULL,
+	CONSTRAINT [PK_LinkUrls] PRIMARY KEY([LinkId]),
+	CONSTRAINT [FK_LinkUrls_LinkId] FOREIGN KEY([LinkId]) REFERENCES Links([Id]) ON DELETE CASCADE
+);
+GO
+
+CREATE TABLE IF NOT EXISTS [LinkFiles] 
+(
+	[LinkId] GUID NOT NULL,
+	[FileId] GUID NOT NULL,
+	[DateAdded] DATETIME NULL,
+	[AddedBy] GUID NULL,
+	[DateChanged] DATETIME NULL,
+	[ChangedBy] GUID NULL,
+	CONSTRAINT [PK_LinkFiles] PRIMARY KEY([LinkId]),
+	CONSTRAINT [FK_LinkFiles_LinkId] FOREIGN KEY([LinkId]) REFERENCES Links([Id]) ON DELETE CASCADE
+);
+GO
+
+CREATE TABLE IF NOT EXISTS [LinkPages] 
+(
+	[LinkId] GUID NOT NULL,
+	[PageId] GUID NOT NULL,
+	[DateAdded] DATETIME NULL,
+	[AddedBy] GUID NULL,
+	[DateChanged] DATETIME NULL,
+	[ChangedBy] GUID NULL,
+	CONSTRAINT [FK_LinkPages_LinkId] CONSTRAINT [PK_LinkPages] PRIMARY KEY([LinkId]),
+	FOREIGN KEY([LinkId]) REFERENCES Links([Id]) ON DELETE CASCADE
+);
+GO
+

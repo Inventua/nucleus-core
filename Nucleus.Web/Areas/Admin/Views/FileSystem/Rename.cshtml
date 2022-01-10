@@ -1,0 +1,19 @@
+﻿@model Nucleus.Web.ViewModels.Admin.FileSystem
+@using Nucleus.Abstractions.Models.FileSystem
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+<h2 class="nucleus-modal-caption">Rename</h2>
+@using (Html.BeginAreaForm("Rename", "FileSystem", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage" }))
+{
+	@Html.HiddenFor(model => Model.Folder.Id)
+	@Html.HiddenFor(model => model.SelectedItem.Id)
+	<fieldset>
+		<SettingsControl caption="New Name" helptext="New name">
+			@Html.TextBoxFor(model => model.SelectedItem.Name)
+		</SettingsControl>
+	</fieldset>
+	<input type="submit" value="Rename" class="btn btn-primary" formaction="@Url.AreaAction("Rename", "FileSystem", "Admin")" data-target=".nucleus-adminpage" />
+
+}

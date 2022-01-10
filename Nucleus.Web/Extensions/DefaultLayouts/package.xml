@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package id="c71695ec-111a-4ee6-9ba6-cdce64a6afd5" xmlns="urn:nucleus/schemas/package/1.0">
+	<name>Default Layouts</name>
+	<version>1.0.0</version>
+	<publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
+	<description>
+		Nucleus Default Layouts and Containers
+	</description>
+	<compatibility minVersion="1.0.0.0" maxVersion="*" />
+	
+	<!-- the default layouts and containers are always present (in /Shared).  This package contains definitions only -->
+	<components>
+		<component folderName="DefaultLayouts" optional="false">
+			<layoutDefinition id="2FF6818A-09FE-4EE2-BEFF-495A876AB6D6">
+				<friendlyName>Default</friendlyName>
+				<relativePath>Shared\Layouts\default.cshtml</relativePath>
+			</layoutDefinition>
+
+			<layoutDefinition id="DFAFC982-5CCE-4E09-91F3-A01B9130F1A2">
+				<friendlyName>Default 3 Column</friendlyName>
+				<relativePath>Shared\Layouts\default-3-column.cshtml</relativePath>
+			</layoutDefinition>
+
+			<layoutDefinition id="07F3C7F2-97E6-46D3-8218-1E02CBBB5CF2">
+				<friendlyName>Default 2 Column</friendlyName>
+				<relativePath>Shared\Layouts\default-2-column.cshtml</relativePath>
+			</layoutDefinition>
+
+			<containerDefinition id="80A7F079-F61D-42A4-9A4B-DA7692415952">
+				<friendlyName>Default</friendlyName>
+				<relativePath>Shared\Containers\default.cshtml</relativePath>
+			</containerDefinition>
+
+			<containerDefinition id="CC0B83AC-A2D4-426F-B455-1715102D4A5E">
+				<friendlyName>No Container</friendlyName>
+				<relativePath>Shared\Containers\no-container.cshtml</relativePath>
+			</containerDefinition>
+		</component>
+	</components>
+	
+</package>

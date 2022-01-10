@@ -1,0 +1,54 @@
+﻿@model Nucleus.Modules.Media.ViewModels.Settings
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+@using Nucleus.Abstractions.Models.FileSystem
+<div class="MediaEditor">
+	@using (Html.BeginNucleusForm("Select", "Media", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+	{
+		<fieldset role="group" aria-labelledby="heading">
+			<h2>Media Settings</h2>
+
+			<SettingsControl caption="File" helptext="File">
+				<div class="Flex FileSelector">
+					@await Component.InvokeAsync("FileSelector", new { model = Model.SelectedFile })
+					@await Component.InvokeAsync("FileUpload", new { })
+				</div>
+			</SettingsControl>
+
+			<SettingsControl caption="Caption" helptext="Specifies the media caption.  This can be shown on screen.">
+				@Html.TextBoxFor(model => model.Caption)
+			</SettingsControl>
+
+			<div class="Flex">
+				<SettingsControl caption="Show Caption?" helptext="Specifies whether to display the media caption on-screen.">
+					@Html.CheckBoxFor(model => model.ShowCaption, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+
+				<SettingsControl caption="Always download?" helptext="Specifies whether to always render a download link rather than rendering the content on-screen.">
+					@Html.CheckBoxFor(model => model.AlwaysDownload, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+			</div>
+
+			<SettingsControl caption="Alternate Text" helptext="Specifies alternate text to render for the media.  This is typically used by screen readers.">
+				@Html.TextBoxFor(model => model.AlternateText)
+			</SettingsControl>
+
+			<div class="Flex">
+				<SettingsControl caption="Height" helptext="Specifies the rendered height of the rendered media element.  Leave blank to automatically determine the height.">
+					@Html.TextBoxFor(model => model.Height)
+				</SettingsControl>
+
+				<SettingsControl caption="Width" helptext="Specifies the rendered width of the rendered media element.  Leave blank to automatically determine the width.">
+					@Html.TextBoxFor(model => model.Width)
+				</SettingsControl>
+			</div>
+
+		</fieldset>
+		<div class="ButtonPanel">
+			<input type="submit" class="DefaultButton" value="Save Changes" formaction="@Url.NucleusAction("Save", "Media", "Media")" />
+		</div>
+	}
+</div>
+
+

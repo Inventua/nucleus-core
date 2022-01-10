@@ -1,0 +1,68 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>Nucleus Complex Extension Project</Name>
+    <Description>Visual Studio project template for a Nucleus Extension, including default controllers, a data provider, view models and views, cache extension and manager class.</Description>
+    <ProjectType>CSharp</ProjectType>
+    <ProjectSubType>
+    </ProjectSubType>
+    <SortOrder>1000</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>My Extension</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <CreateInPlace>true</CreateInPlace>
+    <Icon>__TemplateIcon.ico</Icon>
+		<LanguageTag>csharp</LanguageTag>
+		<PlatformTag>windows</PlatformTag>
+		<ProjectTypeTag>Nucleus</ProjectTypeTag>
+  </TemplateData>
+  <TemplateContent>
+		<Project TargetFileName="Nucleus.Modules.Project.csproj" File="Nucleus.Modules.Project.csproj" ReplaceParameters="true">
+      <Folder Name="Controllers" TargetFolderName="Controllers">
+        <ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$Controller.cs">Controller.cs</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$AdminController.cs">Admin.cs</ProjectItem>
+      </Folder>
+			<Folder Name="DataProviders" TargetFolderName="DataProviders">
+				<Folder Name="Sqlite" TargetFolderName="Sqlite">
+					<Folder Name="Scripts" TargetFolderName="Scripts">
+						<ProjectItem ReplaceParameters="true" TargetFileName="01.00.00.sql">01.00.00.sql</ProjectItem>
+					</Folder>
+				</Folder>
+				<Folder Name="SqlServer" TargetFolderName="SqlServer">
+					<Folder Name="Scripts" TargetFolderName="Scripts">
+						<ProjectItem ReplaceParameters="true" TargetFileName="01.00.00.sql">01.00.00.sql</ProjectItem>
+					</Folder>
+				</Folder>
+				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$DataProvider.cs">DataProvider.cs</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="I$nucleus_extension_name$DataProvider.cs">IDataProvider.cs</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$DbContext.cs">DbContext.cs</ProjectItem>
+			</Folder>
+			<Folder Name="Models" TargetFolderName="Models">
+				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$.cs">Model.cs</ProjectItem>
+			</Folder>
+			<Folder Name="ViewModels" TargetFolderName="ViewModels">
+				<ProjectItem ReplaceParameters="true" TargetFileName="Settings.cs">Settings.cs</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="Viewer.cs">Viewer.cs</ProjectItem>
+			</Folder>
+			<Folder Name="Views" TargetFolderName="Views">
+				<ProjectItem ReplaceParameters="true" TargetFileName="Settings.cshtml">Settings.cshtml</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="Viewer.cshtml">Viewer.cshtml</ProjectItem>
+			</Folder>
+      <ProjectItem ReplaceParameters="true" TargetFileName="_ViewImports.cshtml">_ViewImports.cshtml</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="CacheExtensions.cs">CacheExtensions.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$Manager.cs">Manager.cs</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="Package.xml">Package.xml</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="readme.txt">readme.txt</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="settings.css">settings.css</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="viewer.css">viewer.css</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="Startup.cs">Startup.cs</ProjectItem>
+    </Project>	
+  </TemplateContent>
+	
+	<WizardExtension>
+		<Assembly>Nucleus.DeveloperTools.VisualStudioTemplates, Version=1.0.0.0, Culture=Neutral, PublicKeyToken=2cc815f0f52d0477</Assembly>
+		<FullClassName>Nucleus.DeveloperTools.VisualStudioTemplates.ProjectWizard</FullClassName>
+	</WizardExtension>
+
+</VSTemplate>

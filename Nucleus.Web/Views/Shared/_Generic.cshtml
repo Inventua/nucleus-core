@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta name="viewport" content="width=device-width" />
+	<meta charset="utf-8">
+	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+	<meta name="REVISIT-AFTER" content="1 DAYS" />
+	<meta name="RATING" content="GENERAL" />
+	<meta name="RESOURCE-TYPE" content="DOCUMENT" />
+	<meta name="DESCRIPTION" content="Login Page" />
+	<meta name="KEYWORDS" content="Login" />
+	<meta content="text/javascript" http-equiv="Content-Script-Type" />
+	<meta content="text/css" http-equiv="Content-Style-Type" />
+	<title>@ViewData["title"]</title>
+	@Html.AddStyle("~/Resources/Libraries/Bootstrap/5.1.0/css/bootstrap.css")
+	@Html.AddStyle("~/Resources/css/shared.css")
+	@Html.AddStyle("~/Resources/css/forms.css")
+	@Html.AddScript("~/Resources/Libraries/jQuery/03.06.00/jquery.min.js")
+	@Html.AddScript("~/Resources/Libraries/Bootstrap/5.1.0/js/bootstrap.bundle.js")
+	@Html.AddScript("~/Resources/js/nucleus-shared.js")
+	@Html.RenderStyles()
+	@Html.RenderScripts()
+</head>
+<body class="p-2">
+	@RenderBody()
+</body>
+</html>

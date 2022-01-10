@@ -1,0 +1,265 @@
+﻿@model Nucleus.Web.ViewModels.Setup.SiteWizard
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+@{
+	Layout = "_Generic";
+	ViewData["title"] = "Nucleus Setup Wizard";
+}
+@Html.AddStyle("~!index.css")
+@using (Html.BeginAreaForm("Install", "SiteWizard", "Setup", FormMethod.Post, new { @data_target = "#site-wizard" }))
+{
+	<Modal id="site-wizard" title="Nucleus Setup Wizard" can-close="false">
+		<h1>Welcome to Nucleus.</h1>
+		<p>This wizard will help you to set up your site.</p>
+
+		@Html.HiddenFor(model => model.SelectedTemplate)
+		@Html.HiddenFor(model => model.TemplateTempFileName)
+		@if (Model.SelectedTemplate == null || Model.MissingExtensionWarnings.Count() > 0)
+		{
+			<h2>Site Template</h2>
+			<p>
+				This wizard will automatically set up pages, roles, list entries and other data to get you started.  Please select a site template below.
+			</p>
+			<SettingsControl caption="Site Template" helptext="Select your site template.">
+				@Html.DropDownListFor(model => model.SelectedTemplate, new SelectList(Model.Templates, nameof(Nucleus.Web.ViewModels.Setup.SiteWizard.SiteTemplate.FileName), nameof(Nucleus.Web.ViewModels.Setup.SiteWizard.SiteTemplate.Title)))
+			</SettingsControl>
+
+			@if (Model.MissingExtensionWarnings.Count() > 0)
+			{
+				<div class="alert alert-danger">
+					<h3>Required Extensions Missing</h3>
+					<div>
+						One or more modules, layouts or containers are used by the selected template, but are not contained within any of the extensions in the Setup/Extensions folder.
+					</div>
+					<ul>
+						@foreach (string warning in Model.MissingExtensionWarnings)
+						{
+							<li>@warning</li>
+						}
+					</ul>
+				</div>
+			}
+
+			<div class="nucleus-button-panel justify-content-end">
+				<button class="btn btn-primary" type="submit" title="Next" formaction="@Url.AreaAction("Index", "SiteWizard", "Setup")">Next</button>
+			</div>
+		}
+		else
+		{
+			<Tab class="nav-pills nav-justified">
+				<TabItem caption="Install" active="true" target="#site-install"></TabItem>
+				<TabItem caption="Site" target="#site-settings"></TabItem>
+				<TabItem caption="Users" target="#user-settings"></TabItem>
+			</Tab>
+			<TabContent>
+				<TabPanel id="site-install" active="true">
+					<fieldset role="group" aria-labelledby="heading">
+						<h2>Install Extensions</h2>
+						<p>
+							Select the extensions that you want to install.  You can install more extensions later.  Extensions with a disabled checkbox
+							are required because they are used by the site template.
+						</p>
+						@{
+							var disabledAttr = new { disabled = "disabled" };
+							var enabledAttr = new { };
+						}
+						@for (var count = 0; count < Model.InstallableExtensions.Count(); count++)
+						{
+							<div class="installable-package">
+								<label>
+									@Html.HiddenFor(model => model.InstallableExtensions[count].Filename)
+									@if (Model.InstallableExtensions[count].IsRequired)
+									{
+										@Html.HiddenFor(model => model.InstallableExtensions[count].IsSelected)
+									}
+									@Html.CheckBoxFor(model => model.InstallableExtensions[count].IsSelected, Model.InstallableExtensions[count].IsRequired ? disabledAttr : enabledAttr)
+									<span>@Model.InstallableExtensions[count].Name</span>
+
+									<span class="d-block">@Model.InstallableExtensions[count].Description</span>
+									<span class="d-block">
+										<span class="fst-italic">Publisher</span> @Model.InstallableExtensions[count].Publisher
+										<a href="@Model.InstallableExtensions[count].PublisherUrl">Web site</a>
+										<a href="mailto:@Model.InstallableExtensions[count].PublisherEmail">Support Email</a>
+									</span>
+								</label>
+							</div>
+						}
+					</fieldset>
+				</TabPanel>
+
+				<TabPanel id="site-settings">
+					<fieldset role="group" aria-labelledby="heading">
+						<h2>Site Settings</h2>
+
+						<SettingsControl caption="Site Name" helptext="Site name">
+							@Html.HiddenFor(model => model.Site.Id)
+							@Html.TextBoxFor(model => model.Site.Name)
+						</SettingsControl>
+
+						<SettingsControl caption="Default Alias (url)" helptext="Enter the primary url for your new site, omitting the http/https scheme (example: mysite.com/site1).">
+							@Html.HiddenFor(model => model.Site.DefaultSiteAlias.Id)
+							@Html.TextBoxFor(model => model.Site.DefaultSiteAlias.Alias)
+						</SettingsControl>
+
+						<SettingsControl caption="Home directory" helptext="Enter the home directory for this site's files, relative to the Nucleus files folder root.'">
+							@Html.TextBoxFor(model => model.Site.HomeDirectory)
+						</SettingsControl>
+
+						<h3>Appearance</h3>
+						<div class="nucleus-flex-fields">
+							<SettingsControl caption="Default Layout" helptext="Description">
+								@Html.DropDownListFor(model => model.Site.DefaultLayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
+							</SettingsControl>
+
+							<SettingsControl caption="Default Container" helptext="Page default container">
+								@Html.DropDownListFor((model) => model.Site.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
+							</SettingsControl>
+						</div>
+
+						<h3>Security Roles</h3>
+						<div class="nucleus-flex-fields">
+							<SettingsControl caption="Administrators Role" helptext="Administrators Role">
+								@Html.HiddenFor(model => model.Site.AdministratorsRole.Id)
+								@Html.HiddenFor(model => model.Site.AdministratorsRole.Description)
+								@if (Model.Site.AdministratorsRole.RoleGroup != null)
+								{
+									@Html.HiddenFor(model => model.Site.AdministratorsRole.RoleGroup.Id)
+								}
+								@Html.HiddenFor(model => model.Site.AdministratorsRole.Type)
+								@Html.TextBoxFor(model => model.Site.AdministratorsRole.Name)
+							</SettingsControl>
+
+							<SettingsControl caption="Registered Users Role" helptext="Registered users role">
+								@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Id)
+								@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Description)
+								@if (Model.Site.RegisteredUsersRole.RoleGroup != null)
+								{
+									@Html.HiddenFor(model => model.Site.RegisteredUsersRole.RoleGroup.Id)
+								}
+								@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Type)
+								@Html.TextBoxFor(model => model.Site.RegisteredUsersRole.Name)
+							</SettingsControl>
+						</div>
+
+						<div class="nucleus-flex-fields">
+							<SettingsControl caption="Anonymous Users Role" helptext="Anonymous users role">
+								@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Id)
+								@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Description)
+								@if (Model.Site.AnonymousUsersRole.RoleGroup != null)
+								{
+									@Html.HiddenFor(model => model.Site.AnonymousUsersRole.RoleGroup.Id)
+								}
+								@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Type)
+								@Html.TextBoxFor(model => model.Site.AnonymousUsersRole.Name)
+							</SettingsControl>
+
+							<SettingsControl caption="All Users Role" helptext="All users role">
+								@Html.HiddenFor(model => model.Site.AllUsersRole.Id)
+								@Html.HiddenFor(model => model.Site.AllUsersRole.Description)
+								@if (Model.Site.AllUsersRole.RoleGroup != null)
+								{
+									@Html.HiddenFor(model => model.Site.AllUsersRole.RoleGroup.Id)
+								}
+								@Html.HiddenFor(model => model.Site.AllUsersRole.Type)
+								@Html.TextBoxFor(model => model.Site.AllUsersRole.Name)
+							</SettingsControl>
+						</div>
+					</fieldset>
+				</TabPanel>
+
+				<TabPanel id="user-settings">
+					<fieldset role="group" aria-labelledby="heading">
+						<h2>User Settings</h2>
+
+						@if (Model.CreateSystemAdministratorUser)
+						{
+							<SettingsControl caption="System Administrator User Name" helptext="Enter a name for your system administrator user.  This user can manage all sites.">
+								@Html.TextBoxFor(model => model.SystemAdminUserName)
+							</SettingsControl>
+
+							<div class="nucleus-flex-fields">
+								<SettingsControl caption="System Administrator User Password" helptext="Enter a password for the user">
+									@Html.PasswordFor(model => model.SystemAdminPassword)
+								</SettingsControl>
+								<SettingsControl caption="Confirm Password" helptext="Enter a password for the user">
+									@Html.PasswordFor(model => model.SystemAdminConfirmPassword)
+								</SettingsControl>
+							</div>
+						}
+						<SettingsControl caption="Site Administrator User Name" helptext="Enter a name for your site administrator user.  This user can manage a single site only.">
+							@Html.TextBoxFor(model => model.SiteAdminUserName)
+						</SettingsControl>
+
+						<div class="nucleus-flex-fields">
+							<SettingsControl caption="Site Administrator User Password" helptext="Enter a password for the user">
+								@Html.PasswordFor(model => model.SiteAdminPassword)
+							</SettingsControl>
+							<SettingsControl caption="Confirm Password" helptext="Enter a password for the user">
+								@Html.PasswordFor(model => model.SiteAdminConfirmPassword)
+							</SettingsControl>
+						</div>
+
+					</fieldset>
+				</TabPanel>
+			</TabContent>
+
+			<div class="nucleus-button-panel justify-content-end">
+				<button id="wizard-button-back" class="collapse btn btn-secondary" type="button" title="Back">Back</button>
+				<button id="wizard-button-next" class="collapse show btn btn-primary" type="button" title="Next">Next</button>
+				<button id="wizard-button-finish" class="collapse btn btn-success" type="submit" title="Finish">Finish</button>
+			</div>
+		}
+
+	</Modal>
+}
+
+<script type="text/javascript">
+	jQuery(document).ready(function ()
+	{
+		jQuery('button[data-bs-toggle="tab"][data-bs-target="#user-settings"]').on('shown.bs.tab', function (event)
+		{
+			jQuery('#wizard-button-next').removeClass('show');
+			jQuery('#wizard-button-finish').addClass('show');
+		});
+
+		jQuery('button[data-bs-toggle="tab"]:not([data-bs-target="#user-settings"])').on('shown.bs.tab', function (event)
+		{
+			jQuery('#wizard-button-next').addClass('show');
+			jQuery('#wizard-button-finish').removeClass('show');
+		});
+
+		jQuery('button[data-bs-toggle="tab"][data-bs-target="#site-install"]').on('shown.bs.tab', function (event)
+		{
+			jQuery('#wizard-button-back').removeClass('show');
+		});
+
+		jQuery('button[data-bs-toggle="tab"]:not([data-bs-target="#site-install"])').on('shown.bs.tab', function (event)
+		{
+			jQuery('#wizard-button-back').addClass('show');
+		});
+
+		jQuery('#site-wizard').modal('show');
+		jQuery('#wizard-button-back, #wizard-button-next').on('click', navigateTab);
+	});
+
+	function navigateTab(e)
+	{
+		e.preventDefault();
+
+		var clickedButton = jQuery(e.currentTarget);
+		var currentTab = jQuery('.nav-item').has('.active');
+		var newTab;
+
+		if (clickedButton.is('#wizard-button-back'))
+		{
+			newTab = currentTab.prev();
+		}
+		else
+		{
+			newTab = currentTab.next();
+		}
+
+		newTab.find('.nav-link').tab('show');
+	}
+</script>

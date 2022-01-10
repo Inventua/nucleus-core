@@ -1,0 +1,6 @@
+﻿@model Nucleus.Web.ViewModels.User.FileSelector
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { model = Model.File, propertyName = "File", pattern = Model.Pattern })

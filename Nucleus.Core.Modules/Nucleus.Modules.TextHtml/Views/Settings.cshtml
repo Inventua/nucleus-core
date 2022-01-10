@@ -1,0 +1,12 @@
+﻿@model Nucleus.Modules.TextHtml.ViewModels.Settings
+@using Nucleus.ViewFeatures.HtmlHelpers
+<h1 class="nucleus-modal-caption">Text/Html Content</h1>
+@using (Html.BeginNucleusForm("Save", "TextHtml", FormMethod.Post, null))
+{
+	@Html.HiddenFor(model => model.Content.Id)
+	@Html.TextAreaFor(model => model.Content.Value, 12, 60, new { @class = "HtmlEditorControl" });
+
+	<div class="nucleus-form-buttonrow">
+		<input type="submit" value="Save Changes" class="btn btn-primary" />
+	</div>
+}

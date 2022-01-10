@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package id="5a107a88-3b72-43de-958d-1463375d518f" xmlns="urn:nucleus/schemas/package/1.0">
+	<name>Nucleus Samples</name>
+	<version>1.0.0</version>
+	<publisher name="Inventua Pty Ltd" url="http://www.inventua.com" email="support@inventua.com" />
+	<description>
+		Application install set for sample and testing components.
+	</description>
+	
+	<compatibility minVersion="1.0.0.0" maxVersion="*" />
+	
+	<components>
+		<component folderName="Samples" optional="false">
+			
+			<folder name="Bin">
+				<file name="Nucleus.Samples.dll" />
+			</folder>
+
+			
+		</component>
+	</components>
+	
+</package>

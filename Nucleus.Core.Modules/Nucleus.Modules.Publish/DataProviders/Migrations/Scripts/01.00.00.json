@@ -1,0 +1,269 @@
+{
+	"schemaName": "Nucleus.Modules.Publish",
+	"version": "01.00.00",
+	"operations": [
+		{
+			"createTable": {
+				"name": "Articles",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ModuleId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Title",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "EncodedTitle",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "SubTitle",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "Description",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "Summary",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "Body",
+						"clrType": "string",
+						"isnullable": true
+					},
+					{
+						"name": "ImageFileId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "PublishDate",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ExpireDate",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "Enabled",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "Featured",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_Articles",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_Articles_ModuleId",
+						"Columns": [ "ModuleId" ],
+						"PrincipalTable": "PageModules",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Articles_ModuleId",
+				"table": "Articles",
+				"isunique": false,
+				"columns": [ "ModuleId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Articles_Title",
+				"table": "Articles",
+				"isunique": true,
+				"columns": [ "ModuleId", "Title" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Articles_EncodedTitle",
+				"table": "Articles",
+				"isunique": false,
+				"columns": [ "EncodedTitle" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "ArticleCategories",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ArticleId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "CategoryListItemId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ArticleCategories",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_ArticleCategories_ArticleId",
+						"Columns": [ "ArticleId" ],
+						"PrincipalTable": "Articles",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ArticleCategories_Category",
+				"table": "ArticleCategories",
+				"isunique": true,
+				"columns": [ "ArticleId", "CategoryListItemId" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "ArticleAttachments",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ArticleId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "FileId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ArticleAttachments",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_ArticleAttachments_ArticleId",
+						"Columns": [ "ArticleId" ],
+						"PrincipalTable": "Articles",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ArticleAttachments_FileId",
+				"table": "ArticleAttachments",
+				"isunique": true,
+				"columns": [ "ArticleId", "FileId" ]
+			}
+		}
+	]
+}

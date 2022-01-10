@@ -1,0 +1,50 @@
+﻿@model Nucleus.Web.ViewModels.Admin.Extensions
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+<div class="ExtensionInstaller">	
+	<h1>Extension Details</h1>
+
+	@using (Html.BeginAreaForm("Install", "Extensions", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage" }))
+	{
+		@Html.HiddenFor((model) => model.FileId)
+
+<table>
+	<tr>
+		<td>Name</td>
+		<td>@Model.Package.name</td>
+	</tr>
+	<tr>
+		<td>Version</td>
+		<td>@Model.Package.version</td>
+	</tr>
+	<tr>
+		<td>Description</td>
+		<td>@Model.Package.description</td>
+	</tr>
+	<tr>
+		<td>Publisher</td>
+		<td>@Model.Package.publisher.name</td>
+	</tr>
+	<tr>
+		<td>Product Page</td>
+		<td><a href="@Model.Package.publisher.url" target="_blank">@Model.Package.publisher.url</a></td>
+	</tr>
+	<tr>
+		<td>Support Email</td>
+		<td><a href="mailto:@Model.Package.publisher.email">@Model.Package.publisher.email</a></td>
+	</tr>
+
+	<tr>
+		<td colspan="2"><pre>@Model.Readme</pre></td>		
+	</tr>
+
+</table>
+
+		<div class="nucleus-form-buttonrow">
+			<input type="submit" value="Install Extension" class="btn btn-primary" />
+			<a href="@Url.AreaAction("Index", "Extensions", "Admin")" class="btn btn-secondary" data-target=".nucleus-adminpage">Cancel</a>
+		</div>
+	}
+
+</div>

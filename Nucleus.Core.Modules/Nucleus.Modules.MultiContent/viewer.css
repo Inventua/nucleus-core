@@ -1,0 +1,15 @@
+﻿.multi-content-carousel .carousel-control-prev, .multi-content-carousel .carousel-control-next
+{
+	width: auto;
+}
+
+.multi-content-carousel .carousel-indicators
+{
+	margin-bottom: 0;
+}
+
+.multi-content-carousel .carousel-inner
+{
+	width: calc(100% - 5rem);
+	margin: auto;
+}

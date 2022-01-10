@@ -1,0 +1,91 @@
+﻿@model Nucleus.XmlDocumentation.Models.Serialization.MixedContent
+@using Nucleus.XmlDocumentation
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.XmlDocumentation.ViewModels
+@* Renders a MixedContent class instance.  The MixedContent class is used by any element which can contain the various *@
+@* tags which can be included in XML documentation comments. *@
+@if (Model != null && Model.Items != null)
+{
+	@foreach (var item in Model.Items)
+	{
+		if (item is String)
+		{
+			@(item as String)
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.See)
+		{
+			var seeItem = item as Nucleus.XmlDocumentation.Models.Serialization.See;
+			@if (!String.IsNullOrEmpty(seeItem.Keyword))
+			{
+				<mark>@seeItem.Keyword</mark>
+			}
+			else
+			{
+				@if (seeItem.Uri != null)
+				{
+					<a class="link-primary" href="@(seeItem.Uri.IsAbsoluteUri ? seeItem.Uri.ToString() : Url.PageLink(seeItem.Uri.ToString()))">@seeItem.LinkText</a>
+				}
+				else
+				{
+					<mark>@seeItem.CodeReference</mark>
+				}
+			}
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.SeeAlso)
+		{
+			var seeItem = item as Nucleus.XmlDocumentation.Models.Serialization.SeeAlso;
+
+			@if (seeItem.Uri != null)
+			{
+				<a class="link-primary" href="@(seeItem.Uri.IsAbsoluteUri ? seeItem.Uri.ToString() : Url.PageLink(seeItem.Uri.ToString()))">@seeItem.LinkText</a>
+			}
+			else
+			{
+				<mark>@seeItem.CodeReference</mark>
+			}			
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.ParamRef)
+		{
+			<mark>@((item as Nucleus.XmlDocumentation.Models.Serialization.ParamRef).Name)</mark>
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.TypeParamRef)
+		{
+			<mark>@((item as Nucleus.XmlDocumentation.Models.Serialization.TypeParamRef).Name)</mark>
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.Value)
+		{
+			<var>@((item as Nucleus.XmlDocumentation.Models.Serialization.Value).Description.FilterXMLWhiteSpace())</var>
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.Paragraph)
+		{
+			<p>@((item as Nucleus.XmlDocumentation.Models.Serialization.Paragraph).Description.FilterXMLWhiteSpace())</p>
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.Code)
+		{
+			<code>@((item as Nucleus.XmlDocumentation.Models.Serialization.Code).Description.FilterXMLWhiteSpace())</code>
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.InlineCode)
+		{
+			<code>@((item as Nucleus.XmlDocumentation.Models.Serialization.Code).Description.FilterXMLWhiteSpace())</code>
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.Note)
+		{
+			string className;
+			switch ((item as Nucleus.XmlDocumentation.Models.Serialization.Note).Type.ToLower())
+			{
+				case "cautionary":
+					className = "alert-warning";
+					break;
+				case "security":
+				case "security note":
+					className = "alert-danger";
+					break;
+				default:
+					className = "alert-note";
+					break;
+			}
+			<div class="alert @className">@((item as Nucleus.XmlDocumentation.Models.Serialization.Note).Description.FilterXMLWhiteSpace())</div>
+		}
+	}
+}

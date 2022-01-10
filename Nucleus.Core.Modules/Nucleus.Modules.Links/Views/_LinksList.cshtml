@@ -1,0 +1,42 @@
+﻿@model Nucleus.Modules.Links.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<table class="Links">
+	<tr>
+		<th>Title</th>
+		<th>Description</th>
+	</tr>
+	@for (int linkCount = 0; linkCount < Model.Links.Count; linkCount++)
+	{
+		<tr>
+			<td>
+				@Html.HiddenFor(model => model.Links[linkCount].Id)
+				@Model.Links[linkCount].Title
+				@if (Model.Links[linkCount].LinkType == Nucleus.Abstractions.Models.FileSystem.File.URN && Model.Links[linkCount].LinkFile?.File?.Id == Guid.Empty)
+				{
+					<span class="nucleus-material-icon text-danger" title="Linked file is missing or has been deleted.">@Html.Raw("&#xe000;")</span>
+				}
+			</td>
+
+			<td>@Model.Links[linkCount].Description</td>
+
+			<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("Editor", "Admin", "Links")?id=@Model.Links[linkCount].Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-primary" title="Edit" data-target="#LinksEditor" /></td>
+			<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("DeleteLink", "Admin", "Links")?id=@Model.Links[linkCount].Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target="#LinksList" data-confirm="Delete this link?" /></td>
+			<td class="nucleus-small-cell">
+				@if (linkCount != 0)
+				{
+					<input type="submit" formaction="@Url.NucleusAction("MoveUp", "Admin", "Links")?id=@Model.Links[linkCount].Id" value="&#xe5d8;" class="nucleus-material-icon btn btn-outline-secondary" title="Move Up" data-target="#LinksList" />
+				}
+			</td>
+			<td class="nucleus-small-cell">
+				@if (linkCount < Model.Links.Count - 1)
+				{
+					<input type="submit" formaction="@Url.NucleusAction("MoveDown", "Admin", "Links")?id=@Model.Links[linkCount].Id" value="&#xe5db;" class="nucleus-material-icon btn btn-outline-secondary" title="Move Down" data-target="#LinksList" />
+				}
+			</td>
+		</tr>
+	}
+</table>

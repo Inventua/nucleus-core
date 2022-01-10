@@ -1,0 +1,64 @@
+﻿.PagingControl
+{
+  padding: 4px 8px 4px 8px;
+	background-color: #5d81a0;
+	margin-bottom: 2px;
+	display: flex;
+	gap: 4px;
+	align-items: center;
+	flex-basis: 100%;
+	font-size: 0.9em;
+}
+
+.PagingControl .PageButton:hover, .PagingControl .PageButton:active
+{
+  background-color: #357fbe;
+  color: White;
+}
+
+.PagingControl .PageButton.disabled
+{
+	opacity: 0;
+}
+
+.PagingControl .Summary
+{
+	flex-grow: 2;
+}
+
+.PagingControl .Summary, .PagingControl label
+{
+  color: White;
+}
+
+.PagingControl label
+{
+	margin-left: 0.5em;
+}
+
+.PagingControl .PageButton
+{
+	padding: 2px 6px 2px 6px;
+	border: solid 1px #DDDDDD;
+	background-color: White;
+	color: Black;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.PagingControl .PageButton.Current
+{
+	background-color: #DDDDDD;
+}
+
+.PagingControl .PageDropDown
+{
+	margin-left: 1em;
+}
+
+
+.PagingControl .PageSizeDropDown, .PagingControl .PageDropDown
+{
+	padding: 2px 6px 2px 6px;
+	border: solid 1px #DDDDDD;	
+}

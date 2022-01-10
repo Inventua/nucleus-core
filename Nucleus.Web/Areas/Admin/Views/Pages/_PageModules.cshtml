@@ -1,0 +1,51 @@
+﻿@model Nucleus.Web.ViewModels.Admin.PageEditor
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions;
+@if (Model.Page.Modules.Count > 0)
+{
+<table>
+	<tr>
+		<th></th>
+		<th>Type</th>
+		<th></th>
+		<th></th>
+		<th></th>
+	</tr>
+
+	@{ int count = 0; }
+	@foreach (var modulePane in Model.AvailablePanes)
+	{
+		var modules = Model.Page.Modules.Where(module => module.Pane == modulePane);
+		@if (modules.Any())
+		{
+			<tr>
+				<td><h3>@modulePane</h3></td>
+			</tr>
+			count = 0;
+			@foreach (var module in Model.Page.Modules.Where(module => module.Pane == modulePane))
+			{
+				<tr>
+					<td>@(String.IsNullOrEmpty(module.Title) ? "-" : module.Title)</td>
+					<td>@module.ModuleDefinition.FriendlyName</td>
+					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("EditModule", "Pages", "Admin")?mid=@module.Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-outline-secondary" title="Edit" data-target="#PopupDialog .modal-body" /></td>
+					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("EditModuleCommonSettings", "Pages", "Admin")?mid=@module.Id" value="&#xe8b8;" title="Settings" class="nucleus-material-icon btn btn-outline-secondary" data-target="#PopupDialog .modal-body" /></td>
+					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("DeleteModule", "Pages", "Admin")?mid=@module.Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target="#pageeditor_pagemodules" data-confirm="Delete this module?" /></td>
+					<td class="nucleus-small-cell">
+						@if (count != 0)
+						{
+							<input type="submit" formaction="@Url.AreaAction("MoveModuleUp", "Pages", "Admin")?mid=@module.Id" value="&#xe5d8;" class="nucleus-material-icon btn btn-outline-secondary" title="Move Up" data-target="#pageeditor_pagemodules" />
+						}
+					</td>
+					<td class="nucleus-small-cell">
+						@if (count < modules.Count() - 1)
+						{
+							<input type="submit" formaction="@Url.AreaAction("MoveModuleDown", "Pages", "Admin")?mid=@module.Id" value="&#xe5db;" class="nucleus-material-icon btn btn-outline-secondary" title="Move Down" data-target="#pageeditor_pagemodules" />
+						}
+					</td>
+				</tr>
+				count++;
+			}
+		}
+	}
+</table>
+}

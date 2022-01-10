@@ -1,0 +1,23 @@
+﻿@model Nucleus.Modules.MultiContent.ViewModels.Editor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<h1 class="nucleus-modal-caption">Multi-Content Editor</h1>
+@using (Html.BeginNucleusForm("Edit", "MultiContent", FormMethod.Post, null))
+{
+	@Html.HiddenFor(model => model.Content.Id)
+	@Html.HiddenFor(model => model.Content.SortOrder)
+	
+		<SettingsControl caption="Title" helptext="Title.">
+			@Html.TextBoxFor(model => model.Content.Title)
+		</SettingsControl>
+
+		@Html.TextAreaFor(model => model.Content.Value, 12, 60, new { @class = "HtmlEditorControl" })
+@*<fieldset role="group" aria-label="Multi-Content Editor"></fieldset>*@
+
+	<div class="nucleus-form-buttonrow">
+		<button type="submit" class="btn btn-primary" formaction="@Url.NucleusAction("SaveContent", "MultiContent", "MultiContent")" data-target="#multi-content-contentlist">Save Changes</button>
+	</div>
+}

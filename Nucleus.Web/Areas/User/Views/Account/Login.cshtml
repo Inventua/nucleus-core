@@ -1,0 +1,40 @@
+﻿@model Nucleus.Web.ViewModels.User.AccountPassword
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@{Layout = "_Generic";}
+<h1>Login</h1>
+
+@using (Html.BeginAreaForm("Login", "Account", "User", FormMethod.Post))
+{
+	@if (!String.IsNullOrEmpty(Model.Message))
+	{
+		<div>@Model.Message</div>
+	}
+
+	<fieldset>
+		@Html.HiddenFor(model => model.ReturnUrl)
+		<div>
+			<label>
+				<span>User name</span>
+				<span>@Html.TextBoxFor(model => model.Username, new { @autocorrect = "off", @autocapitalize = "none" })</span>
+			</label>
+		</div>
+
+		<div>
+			<label>
+				<span>Password</span>
+				<span>@Html.PasswordFor(model => model.Password)</span>
+			</label>
+		</div>
+		<div>
+			<label>
+				Remember Me?
+				@Html.CheckBoxFor(model => model.RememberMe)
+			</label>
+		</div>
+		<div>
+			<input type="submit" value="Login" class="btn btn-primary" />
+			<a href="/" class="btn btn-secondary">Cancel</a>
+		</div>
+	</fieldset>
+}

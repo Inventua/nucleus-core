@@ -1,0 +1,180 @@
+﻿@model Nucleus.Modules.Forums.ViewModels.ForumSettings
+@using Nucleus.Abstractions.Models
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Forums.ViewModels
+<h1 class="nucleus-modal-caption">Forum Settings</h1>
+@using (Html.BeginNucleusForm("SelectForumAttachmentsFolder", "ForumsAdmin", "Forums", FormMethod.Post, new { @data_target = "#ForumEditor", @autocomplete = "off" }))
+{
+	<Tab>
+		<TabItem target="#forum-properties" caption="Properties" active="true"></TabItem>
+		<TabItem target="#forum-permissions" caption="Permissions"></TabItem>
+	</Tab>
+
+	<TabContent>
+		<TabPanel id="forum-properties" active="true">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Properties</h2>
+				@Html.HiddenFor(model => model.Forum.Id)
+				@Html.HiddenFor(model => model.GroupId)
+
+				<SettingsControl caption="Name" helptext="Forum name">
+					@Html.TextBoxFor(model => model.Forum.Name)
+				</SettingsControl>
+
+				<SettingsControl caption="Description" helptext="Forum description.  This is shown on screen.">
+					@Html.TextAreaFor(model => model.Forum.Description)
+				</SettingsControl>
+
+				<SettingsControl caption="Use Group Settings?" class="inner-inline UseGroupSettings" rendermode="LabelLast" helptext="Use settings from the forum group.">
+					@Html.CheckBoxFor(model => model.Forum.UseGroupSettings, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+
+				<div class="ForumSettings">
+					<div class="nucleus-flex-fields">
+						<SettingsControl caption="Enabled?" class="inner-inline" rendermode="LabelLast" helptext="Disabled forums are visible, but users cannot view, create or reply to posts.">
+							@Html.CheckBoxFor(model => model.Forum.Settings.Enabled, new { @class = "ToggleSwitch" })
+						</SettingsControl>
+
+						<SettingsControl caption="Visible?" class="inner-inline" rendermode="LabelLast" helptext="Forums which are not visible are not displayed, but users can view, create or reply to existing posts.">
+							@Html.CheckBoxFor(model => model.Forum.Settings.Visible, new { @class = "ToggleSwitch" })
+						</SettingsControl>
+
+					</div>
+
+					<SettingsControl caption="Allow attachments?" class="inner-inline AllowAttachments" rendermode="LabelLast" helptext="Specifies whether users can attach documents to posts or replies.">
+						@Html.CheckBoxFor(model => model.Forum.Settings.AllowAttachments, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+
+					<SettingsControl caption="Attachments Folder" helptext="Attachments folder" class="AttachmentsFolder">
+						<div class="nucleus-flex-fields nucleus-fileselector">
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FolderSelector), new { model = Model.Forum?.Settings?.AttachmentsFolder, PropertyName = "Forum.Settings.AttachmentsFolder" })
+						</div>
+					</SettingsControl>
+
+					<div class="nucleus-flex-fields">
+						<SettingsControl caption="Moderated?" class="inner-inline" rendermode="LabelLast" helptext="Posts and replies to moderated forums must be approved by a moderator before they can be seen by others.">
+							@Html.CheckBoxFor(model => model.Forum.Settings.IsModerated, new { @class = "ToggleSwitch" })
+						</SettingsControl>
+
+						<SettingsControl caption="Allow search indexing?" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether search indexing engines should include forum posts in their search index.">
+							@Html.CheckBoxFor(model => model.Forum.Settings.AllowSearchIndexing, new { @class = "ToggleSwitch" })
+						</SettingsControl>
+						<div></div>
+					</div>
+
+					<SettingsControl caption="Status List" helptext="Select the list to use for post statuses for this group.  Lists are managed in the Nucleus Lists manager.">
+						@Html.DropDownListFor(model => model.Forum.Settings.StatusList.Id, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")
+					</SettingsControl>
+
+					<div class="nucleus-flex-fields">
+						<SettingsControl caption="Subscription mail template" helptext="Email template used to inform subscribers of new posts or replies.">
+							@Html.DropDownListFor(model => model.Forum.Settings.SubscriptionMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+						</SettingsControl>
+
+						<SettingsControl caption="Moderator mail template" helptext="Email template used to inform moderators of new posts or replies.">
+							@Html.DropDownListFor(model => model.Forum.Settings.ModerationRequiredMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+						</SettingsControl>
+					</div>
+
+					<div class="nucleus-flex-fields">
+						<SettingsControl caption="Post Approved mail template" helptext="Email template used to inform users that their post or reply has been approved by a moderator.">
+							@Html.DropDownListFor(model => model.Forum.Settings.ModerationApprovedMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+						</SettingsControl>
+
+						<SettingsControl caption="Post Rejected mail template" helptext="Email template used to inform users that their post or reply has been rejected by a moderator.">
+							@Html.DropDownListFor(model => model.Forum.Settings.ModerationRejectedMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+						</SettingsControl>
+					</div>
+				</div>
+			</fieldset>
+		</TabPanel>
+
+		<TabPanel id="forum-permissions" class="Section ForumSettings">
+			@if (Model.AvailableRoles.Count() > 0)
+			{
+				<div class="nucleus-form-tools">
+					@Html.DropDownListFor(model => model.SelectedRoleId, Model.AvailableRoles, new { @class = "flex-fill" })
+					<input type="submit" formaction="@Url.NucleusAction("AddForumPermissionRole", "ForumsAdmin", "Forums")" value="Add Role" data-target="#ForumEditor" class="btn btn-secondary" />
+				</div>
+			}
+			<table>
+				<tr>
+					<th></th>
+					@foreach (var permissionType in Model.ForumPermissionTypes)
+					{
+						<th>@permissionType.Name</th>
+					}
+				</tr>
+
+				@foreach (var item in Model.ForumPermissions.Values)
+				{
+					<tr>
+						<td>
+							@item.Role.Name
+						</td>
+
+						@for (int permissionsCount = 0; permissionsCount < Model.ForumPermissions[item.Role.Id].Permissions.Count; permissionsCount++)
+						{
+							<td>
+								@Html.HiddenFor(model => model.ForumPermissions[item.Role.Id].Permissions[permissionsCount].Id)
+								@Html.HiddenFor(model => model.ForumPermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Id)
+								@Html.HiddenFor(model => Model.ForumPermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope)
+
+								@if (Model.ForumPermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope == PermissionType.PermissionScopeNamespaces.Disabled)
+								{
+									<span class="nucleus-material-icon text-center d-block">&#xe8f5;</span>
+								}
+								else
+								{
+									@Html.CheckBoxFor(model => model.ForumPermissions[item.Role.Id].Permissions[permissionsCount].AllowAccess)
+								}
+							</td>
+						}
+
+						<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("DeleteForumPermissionRole", "ForumsAdmin", "Forums", new { id = item.Role.Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target="#ForumEditor" /></td>
+					</tr>
+				}
+			</table>
+		</TabPanel>
+	</TabContent>
+
+	<div class="nucleus-button-panel">
+		<input type="submit" class="btn btn-primary" value="Save Changes" formaction="@Url.NucleusAction("SaveForum", "ForumsAdmin", "Forums")" data-target="#ForumList" />
+		@if (Model.Forum != null && Model.Forum.Id != Guid.Empty)
+		{
+			<input type="submit" class="btn btn-danger" value="Delete Forum" formaction="@Url.NucleusAction("DeleteForum", "ForumsAdmin", "Forums")?id=@Model.Forum.Id&groupId=@Model.GroupId" data-target="#ForumList" data-confirm="Forums can only be deleted if they contain no posts.  Use the 'Enabled' setting to disable a forum which has existing posts.  Delete this forum?" />
+		}
+	</div>
+}
+<script type="text/javascript">
+	ForumEditor_ShowSettings();
+
+	jQuery('#forum-properties .AllowAttachments input[type=checkbox]').on('change', ForumEditor_ShowSettings);
+	jQuery('#forum-properties .UseGroupSettings input[type=checkbox]').on('change', ForumEditor_ShowSettings);
+
+	function ForumEditor_ShowSettings()
+	{
+		if (jQuery('#forum-properties .UseGroupSettings input[type=checkbox]').is(':checked'))
+		{
+			jQuery('#forum-properties .ForumSettings').css('opacity', '0.25');
+			jQuery('#forum-properties .ForumSettings *').attr('disabled', 'disabled');
+		}
+		else
+		{
+			jQuery('#forum-properties .ForumSettings').css('opacity', '1.0');
+			jQuery('#forum-properties .ForumSettings *').removeAttr('disabled');
+		}
+
+		if (!jQuery('#forum-properties .AllowAttachments input[type=checkbox]').is(':checked'))
+		{
+			jQuery('#forum-properties .AttachmentsFolder').css('opacity', '0.25');
+			jQuery('#forum-properties .AttachmentsFolder *').attr('disabled', 'disabled');
+		}
+		else
+		{
+			jQuery('#forum-properties .AttachmentsFolder').css('opacity', '1.0');
+			jQuery('#forum-properties .AttachmentsFolder *').removeAttr('disabled');
+		}
+	}
+</script>

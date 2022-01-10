@@ -1,0 +1,28 @@
+﻿@model Nucleus.XmlDocumentation.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<h1 class="nucleus-modal-caption">XML Documentation Viewer Settings</h1>
+@using (Html.BeginNucleusForm("Settings", "XmlDocumentation", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+<fieldset role="group" aria-labelledby="heading">
+	<h2>Settings</h2>
+
+	<SettingsControl caption="Documents Folder" helptext="Select the folder containing XML documentation files.">
+		<div class="nucleus-flex-fields nucleus-fileselector">
+			@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FolderSelector), new { model = Model.DocumentationFolder, PropertyName = "DocumentationFolder" })
+		</div>
+	</SettingsControl>
+
+	<SettingsControl caption="Expand menu items by default?" rendermode="LabelLast" class="inner-inline" helptext="Specify whether to open (expand) all documentation menu items by default, or close them.">
+		@Html.CheckBoxFor(model => model.DefaultOpen, new { @class = "ToggleSwitch" })
+	</SettingsControl>
+
+	<div class="nucleus-form-tools">
+		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "XmlDocumentation", "XmlDocumentation"), new { })
+
+	</div>
+</fieldset>
+}

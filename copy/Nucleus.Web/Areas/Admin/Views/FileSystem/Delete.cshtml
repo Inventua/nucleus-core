@@ -1,0 +1,12 @@
+﻿@model Nucleus.Web.ViewModels.Admin.FileSystem
+@using Nucleus.Abstractions.Models.FileSystem
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+<h2>Delete</h2>
+<a class="ClosePopup">&#xe5cd;</a>
+
+<p>Delete selected files and folders?</p>
+
+<input type="submit" value="Delete" formaction="@Url.AreaAction("DeleteSelected", "FileSystem", "Admin")" data-target=".AdminPage" />

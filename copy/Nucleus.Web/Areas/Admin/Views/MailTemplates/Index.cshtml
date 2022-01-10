@@ -1,0 +1,20 @@
+﻿@model Nucleus.Web.ViewModels.Admin.MailTemplateIndex
+<h1>Mail Templates</h1>
+<div class="Tools">
+	<a href="@Url.Content("~/Admin/MailTemplates/Editor")" class="button" data-target=".MailTemplateEditor">New Mail Template</a>
+</div>
+<div class="IndexWrapper">
+	<div class="ItemsList">
+
+		<ul>
+			@foreach (var item in Model.MailTemplates)
+			{
+				<li><a href="@Url.Content("~/Admin/MailTemplates/Editor")?id=@item.Id" data-target=".MailTemplateEditor">@item.Name</a></li>
+			}
+		</ul>
+	</div>
+
+	<div class="MailTemplateEditor EditorPanel">
+
+	</div>
+</div>

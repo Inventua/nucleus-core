@@ -1,0 +1,136 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName></SccProjectName>
+    <SccProvider></SccProvider>
+    <SccAuxPath></SccAuxPath>
+    <SccLocalPath></SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.13">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="5.0.12" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+	
+	<PropertyGroup>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+		<Product>Nucleus</Product>
+		<Copyright>© Inventua Pty Ltd</Copyright>
+	</PropertyGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
+    <ProjectReference Include="..\Nucleus.Core\Nucleus.Core.csproj" />
+    <ProjectReference Include="..\Nucleus.Extensions\Nucleus.Extensions.csproj" />
+    <ProjectReference Include="..\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="Extensions\**" />
+		<Compile Remove="logs\**" />
+		<Compile Remove="publish\**" />
+		<Content Remove="Extensions\**" />
+		<Content Remove="logs\**" />
+		<Content Remove="publish\**" />
+		<EmbeddedResource Remove="Extensions\**" />
+		<EmbeddedResource Remove="logs\**" />
+		<EmbeddedResource Remove="publish\**" />
+		<None Remove="**\*.vspscc" />
+		<None Remove="**\*.scc" />
+		<None Remove="Extensions\**" />
+		<None Remove="logs\**" />
+		<None Remove="publish\**" />
+		<None Remove="Setup\Extensions\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="module.build.targets" />
+	  <None Remove="package.xsd" />
+	  <None Remove="Resources\css\admin.css" />
+	  <None Remove="Resources\css\editmode.css" />
+	  <None Remove="Resources\css\forms.css" />
+	  <None Remove="Resources\css\main.css" />
+	  <None Remove="Resources\css\shared.css" />
+	  <None Remove="Resources\Images\atom_symbol.png" />
+	  <None Remove="Resources\js\jquery-3.6.0.min.js" />
+	  <None Remove="Resources\js\nucleus-admin.js" />
+	  <None Remove="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_444444_256x240.png" />
+	  <None Remove="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_555555_256x240.png" />
+	  <None Remove="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_777620_256x240.png" />
+	  <None Remove="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_777777_256x240.png" />
+	  <None Remove="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_cc0000_256x240.png" />
+	  <None Remove="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_ffffff_256x240.png" />
+	  <None Remove="Resources\Libraries\jQuery-UI\01.12.01\jquery-ui.min.css" />
+	  <None Remove="Resources\Libraries\jQuery-UI\01.12.01\jquery-ui.min.js" />
+	  <None Remove="Resources\Libraries\jQuery-UI\01.12.01\jquery-ui.structure.min.css" />
+	  <None Remove="Resources\Libraries\jQuery-UI\01.12.01\jquery-ui.theme.min.css" />
+	  <None Remove="Resources\Libraries\Trumbowyg\trumbowyg.js" />
+	  <None Remove="Resources\Libraries\Trumbowyg\trumbowyg.min.js" />
+	  <None Remove="Resources\Libraries\Trumbowyg\ui\icons.svg" />
+	  <None Remove="Resources\Libraries\Trumbowyg\ui\sass\trumbowyg.scss" />
+	  <None Remove="Resources\Libraries\Trumbowyg\ui\trumbowyg.css" />
+	  <None Remove="Resources\Libraries\Trumbowyg\ui\trumbowyg.min.css" />
+	  <None Remove="Resources\material-icons.woff2" />
+	  <None Remove="Shared\Controls\Views\PagingControl.css" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishInstall.pubxml" />
+	  <_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishUpgrade.pubxml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="module.build.targets" />
+	  <Content Include="package.xsd">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Resources\css\admin.css" />
+	  <Content Include="Resources\css\forms.css" />
+	  <Content Include="Resources\css\main.css" />
+	  <Content Include="Resources\css\editmode.css" />
+	  <Content Include="Resources\css\shared.css" />
+	  <Content Include="Resources\Images\atom_symbol.png" />
+	  <Content Include="Resources\js\nucleus-admin.js" />
+	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_444444_256x240.png" />
+	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_555555_256x240.png" />
+	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_777620_256x240.png" />
+	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_777777_256x240.png" />
+	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_cc0000_256x240.png" />
+	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_ffffff_256x240.png" />
+	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\jquery-ui.min.css" />
+	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\jquery-ui.min.js" />
+	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\jquery-ui.structure.min.css" />
+	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\jquery-ui.theme.min.css" />
+	  <Content Include="Resources\Libraries\jQuery\03.06.00\jquery.min.js" />
+	  <Content Include="Resources\js\nucleus-shared.js" />
+	  <Content Include="Resources\Libraries\Trumbowyg\trumbowyg.js" />
+	  <Content Include="Resources\Libraries\Trumbowyg\trumbowyg.min.js" />
+	  <Content Include="Resources\Libraries\Trumbowyg\ui\icons.svg" />
+	  <Content Include="Resources\Libraries\Trumbowyg\ui\sass\trumbowyg.scss" />
+	  <Content Include="Resources\Libraries\Trumbowyg\ui\trumbowyg.css" />
+	  <Content Include="Resources\Libraries\Trumbowyg\ui\trumbowyg.min.css" />
+	  <Content Include="Resources\material-icons.woff2" />
+	  <Content Include="Shared\Controls\Views\PagingControl.css" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="Areas\Admin\Views\ScheduledTasks\Editor.cshtml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="nucleus.schema.json" /></VisualStudio></ProjectExtensions>
+	
+</Project>

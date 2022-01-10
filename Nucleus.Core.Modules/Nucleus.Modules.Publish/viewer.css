@@ -1,0 +1,75 @@
+﻿.Articles h2
+{
+	font-size: 1.6rem;
+}
+
+.Articles h3
+{
+	font-size: 1.3rem;
+}
+
+.Article .image
+{
+	float: left;
+	margin-right: 1em;
+}
+
+.Article .attachments, .Article .metadata
+{
+  display: inline-grid;
+  gap: 1em;
+  grid-auto-flow: column;
+  font-size: 0.8em;
+}
+
+.Article .category
+{
+  text-transform: capitalize;
+  border: dashed 1px #bbb;
+  padding: 1px 2px;
+}
+
+.Article .category.featured
+{
+	font-weight: bold;
+}
+
+.Articles TABLE
+{
+	width: 100%;
+}
+
+.Articles TABLE th, .Articles TABLE td
+{
+	text-align: left;
+}
+
+.Articles TABLE .btn
+{
+	white-space: nowrap;
+}
+
+.Articles.tile-1-column h2, .Articles.tile-2-column h2
+{
+	font-size: 1.0rem;
+}
+
+.Articles.tile-2-column 
+{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-auto-rows: 1fr;
+}
+
+.Articles.tile-1-column .Article, .Articles.tile-2-column .Article
+{
+	overflow: hidden;
+	max-width: 100%;
+}
+
+.Articles.tile-1-column .Article .title, .Articles.tile-2-column .Article .title
+{
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}

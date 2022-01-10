@@ -1,0 +1,36 @@
+﻿@model Nucleus.Modules.Account.ViewModels.Recover
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@Html.AddStyle("~/Resources/css/forms.css")
+@using (Html.BeginNucleusForm("Index", "Recover", FormMethod.Post, new { data_target = ".Module" }))
+{
+	<div class="Message">@Model.Message</div>
+
+	if (String.IsNullOrEmpty(Model.Message))
+	{
+		<fieldset>
+			@Html.HiddenFor(model => model.ReturnUrl)
+			<p>
+				Please enter the email address associated with your account.
+			</p>
+			<div>
+				<label>
+					<span>Email</span>
+					<span>@Html.TextBoxFor(model => model.Email, new { @autocorrect = "off", @autocapitalize = "none" })</span>
+				</label>
+			</div>
+
+			<div>
+				@if (Model.AllowUsernameRecovery)
+				{
+					<input type="submit" value="Recover User Name" formaction="@Url.NucleusAction("RecoverUserName", "Recover", "Account")" />
+				}
+				@if (Model.AllowPasswordReset)
+				{
+					<input type="submit" value="Reset Password" formaction="@Url.NucleusAction("RecoverPassword", "Recover", "Account")" />
+				}
+			</div>
+		</fieldset>
+	}
+}

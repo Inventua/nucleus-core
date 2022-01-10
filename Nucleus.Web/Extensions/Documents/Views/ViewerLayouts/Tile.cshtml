@@ -1,0 +1,89 @@
+﻿@model Nucleus.Modules.Documents.ViewModels.Viewer
+@using Nucleus.Extensions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Documents.ViewModels
+@Html.AddStyle("~!/Tile.css")
+<div class="Documents">
+  @if (Model.AllowSorting)
+  {
+    <span>Sort by:</span>
+
+    <div class="document-sort-list" aria-label="Sort By">
+      <div class="document-sort-list-selected">
+        <span>@(String.IsNullOrEmpty(Model.SortKey) ? "(none)" : (Model.SortKey == nameof(Viewer.DocumentInfo.ModifiedDate) ? "Modified Date" : Model.SortKey))</span>
+        <button class="btn nucleus-material-icon" type="button">&#xe5cf;</button>
+      </div>
+
+      <ul class="collapse">
+        <li>@Html.LinkButton("", "Title", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Title)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</li>
+        @if (Model.ShowCategory)
+        {
+          <li>@Html.LinkButton("", "Category", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Category)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</li>
+        }
+        @if (Model.ShowModifiedDate)
+        {
+          <li>@Html.LinkButton("", "Modified Date", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.ModifiedDate)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</li>
+        }
+        @if (Model.ShowSize)
+        {
+          <li>@Html.LinkButton("", "Size", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Size)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</li>
+        }
+        @if (Model.ShowDescription)
+        {
+          <li>@Html.LinkButton("", "Description", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Description)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</li>
+        }
+      </ul>
+
+
+
+    </div>
+  }
+
+  <div class="document-tiles">
+    @for (int documentCount = 0; documentCount < Model.Documents.Count; documentCount++)
+    {
+      <div>
+        <div class="document-title">
+          <a href="@Url.FileLink(Model.Documents[documentCount].File)" alt="Model.Documents[documentCount].Title">
+            @Model.Documents[documentCount].Title
+          </a>
+        </div>
+        @if (Model.ShowCategory)
+        {
+          <div class="document-category">@Model.Documents[documentCount].Category?.Name</div>
+        }
+        @if (Model.ShowModifiedDate)
+        {
+          <div class="document-modifieddate">@Model.Documents[documentCount].ModifiedDate.FormatDate(true)</div>
+        }
+        @if (Model.ShowSize)
+        {
+          <div class="document-size">@Model.Documents[documentCount].Size.FormatFileSize()</div>
+        }
+        @if (Model.ShowDescription)
+        {
+          <div class="document-description">@Model.Documents[documentCount].Description</div>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+@if (Model.AllowSorting)
+{
+  <script type="text/javascript">
+    // allow clicks outside the control to close it
+    jQuery(document).on('click', function (event)
+    {
+      jQuery('.document-sort-list ul').removeClass('show');
+    });
+
+    jQuery('.document-sort-list-selected').on('click', function (event)
+    {
+      jQuery(this).siblings('ul').addClass('show');
+      event.stopPropagation();
+      event.preventDefault();
+    });
+  </script>
+}

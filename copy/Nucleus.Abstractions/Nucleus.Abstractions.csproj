@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DocumentationFile>C:\Development\Inventua\Nucleus\Source Code\Nucleus.Abstractions\bin\$(Configuration)\$(TargetFramework)\Nucleus.Abstractions.xml</DocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Inventua Pty Ltd</Authors>
+    <Product>Nucleus</Product>
+    <Description>Models, interfaces and extensions used by the Nucleus runtime and by Nucleus extensions.</Description>
+		<PackageOutputPath>$(SolutionDir)\Nuget Packages</PackageOutputPath>
+  </PropertyGroup>
+
+
+	<ItemGroup>
+		<None Remove="**\*.vspscc" />
+		<None Remove="**\*.scc" />
+	</ItemGroup>
+</Project>

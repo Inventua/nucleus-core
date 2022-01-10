@@ -1,0 +1,251 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Nucleus.Abstractions.Models;
+using Microsoft.AspNetCore.Http;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+
+namespace Nucleus.ViewFeatures.HtmlContent
+{
+	/// <summary>
+	/// 
+	/// </summary>
+	public class Menu
+	{
+		/// <summary>
+		/// Menu rendering styles
+		/// </summary>
+		public enum MenuStyles
+		{
+			/// <summary>
+			/// Drop-down/Flyout style menu
+			/// </summary>
+			DropDown,
+			/// <summary>
+			/// Child items rendered horizontally as list blocks
+			/// </summary>
+			RibbonLandscape,
+			/// <summary>
+			/// Child items rendered vertically as list blocks
+			/// </summary>
+			RibbonPortrait,
+		}
+
+		internal static async Task<TagBuilder> Build(ViewContext context, MenuStyles menuStyle, int maxLevels, object htmlAttributes)
+		{
+			IUrlHelper urlHelper = context.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(context);
+			Site site = context.HttpContext.RequestServices.GetService<Context>().Site;
+			IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
+			PageMenu topMenu = await pageManager.GetMenu
+				(
+					site,
+					null,
+					context.HttpContext.User,
+					false
+				);
+
+			TagBuilder outputBuilder = new("nav");
+			TagBuilder divBuilder = new("div");
+			TagBuilder divInnerBuilder = new("div");
+			TagBuilder listBuilder = new("ul");
+
+			outputBuilder.AddCssClass("navbar navbar-expand-lg navbar-light bg-light nucleus-menu");
+			divBuilder.AddCssClass("container-fluid");
+
+			divInnerBuilder.AddCssClass("collapse navbar-collapse");
+
+			listBuilder.AddCssClass("navbar-nav me-auto mb-2 mb-lg-0");
+			AddChildren(menuStyle, listBuilder, urlHelper, topMenu, maxLevels, 0);
+
+			outputBuilder.MergeAttributes(htmlAttributes);
+
+			divInnerBuilder.InnerHtml.AppendHtml(listBuilder);
+			divBuilder.InnerHtml.AppendHtml(divInnerBuilder);
+			outputBuilder.InnerHtml.AppendHtml(divBuilder);
+
+			return outputBuilder;
+		}
+
+		private static void AddChildren(MenuStyles menuStyle, TagBuilder control, IUrlHelper urlHelper, PageMenu menu, int maxLevels, int thisLevel)
+		{
+			if (maxLevels != 0 && thisLevel == maxLevels) return;
+
+			foreach (PageMenu childItem in menu.Children)
+			{
+				Boolean renderChildren = (maxLevels == 0 || (thisLevel + 1 < maxLevels)) && childItem.Children != null && childItem.Children.Any();
+				TagBuilder itemBuilder = null;
+
+				switch (menuStyle)
+				{
+					case MenuStyles.DropDown:
+						itemBuilder = RenderDropDownItem(menuStyle, childItem, urlHelper, thisLevel, maxLevels, renderChildren);
+						if (renderChildren)
+						{
+							itemBuilder.InnerHtml.AppendHtml(RenderDropDownChildren(menuStyle, childItem, urlHelper, thisLevel, maxLevels)); 
+						}
+						break;
+
+					case MenuStyles.RibbonLandscape: 
+					case MenuStyles.RibbonPortrait:
+						if (thisLevel == 0)
+						{
+							// top level items are rendered the same as the default style
+							itemBuilder = RenderDropDownItem(menuStyle, childItem, urlHelper, thisLevel, maxLevels, renderChildren);
+						}
+						else
+						{
+							itemBuilder = RenderRibbonItem(menuStyle, childItem, urlHelper, thisLevel, maxLevels, renderChildren);
+						}
+						if (renderChildren)
+						{
+							itemBuilder.InnerHtml.AppendHtml(RenderRibbonChildren(menuStyle, childItem, urlHelper, thisLevel, maxLevels));
+						}
+						break;											
+				}
+
+				if (itemBuilder != null)
+				{
+					control.InnerHtml.AppendHtml(itemBuilder);
+				}
+			}
+		}
+
+		private static TagBuilder RenderDropDownItem(MenuStyles menuStyle, PageMenu childItem, IUrlHelper urlHelper, int thisLevel, int maxLevels, Boolean renderChildren)
+		{
+			TagBuilder itemBuilder = new("li");
+
+			if (renderChildren)
+			{
+				itemBuilder.AddCssClass("dropdown-submenu");
+			}
+			else
+			{
+				itemBuilder.AddCssClass("nav-item");
+			}
+			
+			string caption = String.IsNullOrWhiteSpace(childItem.Page.Title) ? childItem.Page.Name : childItem.Page.Title;
+			TagBuilder linkBuilder = SetLinkUrl(childItem, urlHelper);
+			
+			if (thisLevel != 0)
+			{
+				linkBuilder.AddCssClass("dropdown-item");
+			}
+			linkBuilder.InnerHtml.SetContent(caption);
+
+			itemBuilder.InnerHtml.AppendHtml(linkBuilder);	
+
+			if (renderChildren)
+			{
+				TagBuilder toggleLinkBuilder = new("a");
+				toggleLinkBuilder.AddCssClass("dropdown-toggle nav-link");
+				toggleLinkBuilder.Attributes.Add("style", "display: inline-flex;");
+				toggleLinkBuilder.Attributes.Add("title", "open");
+				toggleLinkBuilder.Attributes.Add("role", "button");
+				toggleLinkBuilder.Attributes.Add("aria-expanded", "false");
+				itemBuilder.InnerHtml.AppendHtml(toggleLinkBuilder);
+			}
+		
+
+			return itemBuilder;
+		}
+
+		private static TagBuilder RenderDropDownChildren(MenuStyles menuStyle, PageMenu childItem, IUrlHelper urlHelper, int thisLevel, int maxLevels)
+		{			
+			TagBuilder listBuilder = new("ul");
+			listBuilder.AddCssClass("dropdown-menu");
+			AddChildren(menuStyle, listBuilder, urlHelper, childItem, maxLevels, thisLevel + 1);
+
+			return listBuilder;
+		}
+
+		private static TagBuilder RenderRibbonItem(MenuStyles menuStyle, PageMenu childItem, IUrlHelper urlHelper, int thisLevel, int maxLevels, Boolean renderChildren)
+		{
+			string caption = String.IsNullOrWhiteSpace(childItem.Page.Title) ? childItem.Page.Name : childItem.Page.Title;
+			TagBuilder itemBuilder = new("li");
+		
+			//TagBuilder linkBuilder = new("a");
+			//linkBuilder.AddCssClass("nav-link");
+		//	linkBuilder.InnerHtml.SetContent(caption);
+
+			//if (!childItem.Page.DisableInMenu)
+			//{
+			//	defaultRoute = childItem.Page.DefaultPageRoute();
+			//	if (defaultRoute == null)
+			//	{
+			//		linkBuilder.AddCssClass("disabled");
+			//	}
+			//}			
+			//else
+			//{
+			//	linkBuilder.Attributes.Add("href", Nucleus.ViewFeatures.UrlHelperExtensions.PageLink(urlHelper, childItem.Page));
+			//}
+			TagBuilder linkBuilder = SetLinkUrl(childItem, urlHelper);
+			linkBuilder.InnerHtml.SetContent(caption);
+
+			itemBuilder.InnerHtml.AppendHtml(linkBuilder);
+
+			return itemBuilder;
+		}
+
+		private static TagBuilder SetLinkUrl(PageMenu childItem, IUrlHelper urlHelper)
+		{
+			TagBuilder linkBuilder;
+			
+			if (!childItem.Page.DisableInMenu)
+			{
+				PageRoute defaultRoute = childItem.Page.DefaultPageRoute();
+				if (defaultRoute == null)
+				{
+					linkBuilder = new("span");
+					linkBuilder.AddCssClass("disabled");
+				}
+				else 
+				{
+					linkBuilder = new("a");
+					linkBuilder.Attributes.Add("href", Nucleus.ViewFeatures.UrlHelperExtensions.PageLink(urlHelper, childItem.Page));
+				}				
+			}
+			else
+			{
+				linkBuilder = new("span");
+				// for disabled items, apply disabled class if the item has no children, otherwise render as a LI/SPAN with no href
+				if (!childItem.Children.Any())
+				{
+					linkBuilder.AddCssClass("disabled");
+				}
+			}
+
+			linkBuilder.AddCssClass("nav-link");
+
+			return linkBuilder;
+		}
+
+		private static TagBuilder RenderRibbonChildren(MenuStyles menuStyle, PageMenu childItem, IUrlHelper urlHelper, int thisLevel, int maxLevels)
+		{
+			TagBuilder listBuilder = new("ul");
+			
+			if (thisLevel < 1)
+			{
+				listBuilder.AddCssClass("ribbon-item");
+				listBuilder.AddCssClass(menuStyle.ToString());
+				listBuilder.AddCssClass("dropdown-menu");
+			}
+
+			AddChildren(menuStyle, listBuilder, urlHelper, childItem, maxLevels, thisLevel + 1);
+
+			return listBuilder;
+		}
+
+		
+		
+	}
+}

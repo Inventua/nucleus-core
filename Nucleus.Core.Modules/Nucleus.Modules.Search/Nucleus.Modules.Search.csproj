@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Label="Globals">
+    <SccProjectName></SccProjectName>
+    <SccProvider></SccProvider>
+    <SccAuxPath></SccAuxPath>
+    <SccLocalPath></SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+		<RootNamespace>Nucleus.Modules.Search</RootNamespace>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+<ItemGroup>
+		<None Remove="**\*.vspscc" />
+		<None Remove="**\*.scc" />
+		<None Remove="*.zip" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <None Remove="viewer.css" />
+    <None Remove="package.xml" />
+    <None Remove="readme.txt" />
+    <None Remove="settings.css" />
+    <None Remove="Views\Settings.cshtml" />
+    <None Remove="Views\Viewer.cshtml" />
+    <None Remove="Views\_Suggestions.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="viewer.css" />
+    <Content Include="package.xml" />
+    <Content Include="readme.txt" />
+    <Content Include="settings.css" />
+    <Content Include="Views\_Suggestions.cshtml" />
+    <Content Include="Views\Viewer.cshtml" />
+    <Content Include="Views\Settings.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
+  </ItemGroup>
+
+	<PropertyGroup Label="Nucleus">
+		<ExtensionFolder>Search</ExtensionFolder>
+		<Version>1.0.0</Version>
+	</PropertyGroup>
+
+	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+</Project>

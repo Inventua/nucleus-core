@@ -1,0 +1,36 @@
+﻿@model Nucleus.Web.ViewModels.Admin.MailTemplateEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@using (Html.BeginAreaForm("Save", "MailTemplates", "Admin", FormMethod.Post, new { @data_target = ".AdminPage", @autocomplete = "off" }))
+{
+<fieldset role="group" aria-labelledby="heading">
+	<h2>Mail Template</h2>
+	@Html.HiddenFor(model => model.MailTemplate.Id)
+
+	<SettingsControl caption="Name" helptext="MailTemplate name">
+		@Html.TextBoxFor(model => model.MailTemplate.Name)
+	</SettingsControl>
+
+	<SettingsControl caption="Subject" helptext="Subject">
+		@Html.TextBoxFor(model => model.MailTemplate.Subject)
+	</SettingsControl>
+
+	<SettingsControl caption="Body" helptext="Body" class="stretch">
+		@Html.TextAreaFor(model => model.MailTemplate.Body, 12, 60, new { @class = "HtmlEditorControl" })
+	</SettingsControl>
+
+</fieldset>
+	
+	<div class="ButtonPanel">
+		<input type="submit" class="DefaultButton" value="Save Changes" />
+
+		@if (Model.MailTemplate.Id != Guid.Empty)
+		{
+			<input type="submit" class="DeleteButton" value="Delete Mail Template" formaction="@Url.AreaAction("DeleteMailTemplate", "MailTemplates", "Admin")" data-confirm="Delete this Mail Template?" />
+		}
+	</div>
+	
+}
+

@@ -1,0 +1,76 @@
+﻿@model Nucleus.Web.ViewModels.Admin.UserEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.Extensions;
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models.Configuration
+@using (Html.BeginAreaForm("Save", "SystemAdministrators", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @autocomplete = "off" }))
+{
+	<Tab>
+		<TabItem target="#user-properties" caption="Properties" active="true"></TabItem>
+		<TabItem target="#user-profile" caption="Profile"></TabItem>
+	</Tab>
+	<TabContent>
+		<TabPanel id="user-properties" active="true">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Basic Properties</h2>
+				@Html.HiddenFor(model => model.User.Id)
+
+				<SettingsControl caption="User Name" helptext="Unique login name used to log in to the site.">
+					@Html.TextBoxFor(model => model.User.UserName, new { @maxlength = 256 })
+				</SettingsControl>
+
+				@*only show password field for a new user*@
+				@if (Model.User.Id == Guid.Empty)
+				{
+					<SettingsControl caption="Password" helptext="Enter a password for the system administrator.">
+						@Html.PasswordFor(model => model.EnteredPassword)
+					</SettingsControl>
+				}
+			</fieldset>
+		</TabPanel>
+
+		<TabPanel id="user-profile" class="Section">
+			<fieldset role="group" aria-labelledby="heading">
+				<h3>Profile</h3>
+
+				@for (int profileValueCount = 0; profileValueCount < Model.User.Profile.Count; profileValueCount++)
+				{
+					<div class="settings-control" title="@Model.User.Profile[profileValueCount].UserProfileProperty.HelpText">
+						<label>
+							<span>@Model.User.Profile[profileValueCount].UserProfileProperty.Name</span>
+							@{Dictionary<string, object> parameters = new();
+								parameters.Add("maxlength", 512); 
+								ClaimTypeOption claimTypeOption = Model.User.Profile[profileValueCount].UserProfileProperty.ClaimTypeOption(Model.ClaimTypeOptions);
+								if (claimTypeOption.InputType != null)
+								{
+									parameters.Add("type", claimTypeOption.InputType);
+								}
+								if (claimTypeOption.Pattern != null)
+								{
+									parameters.Add("pattern", claimTypeOption.Pattern);
+								} 
+								}
+							@Html.TextBoxFor(model => model.User.Profile[profileValueCount].Value, parameters)
+						</label>
+						@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Id)
+						@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Name)
+						@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.TypeUri)
+					</div>
+				}
+			</fieldset>
+		</TabPanel>
+	</TabContent>
+
+	<div class="nucleus-button-panel">
+		<input type="submit" class="btn btn-primary" value="Save Changes" />
+		@if (Model.User.Id != Guid.Empty && !Model.IsCurrentUser)
+		{
+			<input type="submit" class="btn btn-danger" value="Delete User" formaction="@Url.AreaAction("DeleteUser", "Users", "Admin")" data-confirm="Delete this user?" />
+		}
+	</div>
+}
+
+<div class="UserEditor">
+
+</div>

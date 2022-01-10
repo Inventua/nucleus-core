@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package id="2db48e5d-57db-485e-978e-635832749d28" xmlns="urn:nucleus/schemas/package/1.0">
+	<name>Publish</name>
+	<version>1.0.0</version>
+	<publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
+	<description>
+		Combined news, blogs and announcements module.
+	</description>
+	<compatibility minVersion="1.0.0.0" maxVersion="*" />
+	
+	<components>
+		<component folderName="Publish" optional="false">
+			<moduleDefinition id="20af00b8-1d72-4c94-bce7-b175e0b173af">
+				<friendlyName>Publish</friendlyName>
+				<classTypeName>Nucleus.Modules.Publish.Controllers.PublishController,Nucleus.Modules.Publish</classTypeName>
+				<viewAction>Index</viewAction>
+				<editAction>Settings</editAction>
+			</moduleDefinition>
+
+			<file name="readme.txt" />
+			<file name="viewer.css" />
+			<file name="settings.css" />
+			
+			<folder name="Bin">
+				<file name="Nucleus.Modules.Publish.dll" />
+			</folder>
+			
+			<folder name="Views">
+				<file name="Viewer.cshtml" />
+				<file name="Settings.cshtml" />
+				<file name="Editor.cshtml" />
+				<file name="ViewArticle.cshtml" />
+
+				<folder name="ViewerLayouts">
+					<file name="Table.cshtml" />
+					<file name="Tile-1-Column.cshtml" />
+					<file name="Tile-2-Column.cshtml" />
+				</folder>
+			</folder>
+			
+		</component>
+	</components>
+	
+</package>

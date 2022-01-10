@@ -1,0 +1,29 @@
+﻿@model Nucleus.Modules.Publish.ViewModels.Viewer
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Publish.ViewModels
+@Html.AddStyle("~!/../../viewer.css")
+<div class="Articles Tile-1-Column">
+	<table>
+		<tr>
+			<th>Title</th>
+			<th>Summary</th>
+			<th></th>
+		</tr>
+		@foreach (var article in Model.Articles.Items)
+		{
+			<tr>
+				<td class="title">
+					<a href="@article.EncodedTitle()">@article.Title</a>					
+				</td>
+				<td class="summary">
+					@article.Summary
+				</td>
+				<td>
+					<a href="@article.EncodedTitle()" class="button">Read more</a>
+				</td>
+			</tr>
+		}
+	</table>
+</div>

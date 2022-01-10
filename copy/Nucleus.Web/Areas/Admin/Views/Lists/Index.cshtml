@@ -1,0 +1,17 @@
+﻿@model Nucleus.Web.ViewModels.Admin.ListIndex
+<h1>Lists</h1>
+<div class="Tools">
+	<a href="@Url.Content("~/Admin/Lists/Editor")" class="button" data-target=".ListEditor">New List</a>
+</div>
+<div class="IndexWrapper">
+	<div class="ItemsList">
+		<ul>
+			@foreach (var item in Model.Lists)
+			{
+				<li><a href="@Url.Content("~/Admin/Lists/Editor")?id=@item.Id" data-target=".ListEditor">@item.Name</a></li>
+			}
+		</ul>
+	</div>
+
+	<div class="ListEditor EditorPanel"></div>
+</div>

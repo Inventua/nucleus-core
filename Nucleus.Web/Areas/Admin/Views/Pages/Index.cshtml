@@ -1,0 +1,47 @@
+﻿@model Nucleus.Web.ViewModels.Admin.PageIndex
+@using Nucleus.ViewFeatures.HtmlHelpers
+<h1>Pages</h1>
+<div class="nucleus-form-tools">
+	@using (Html.BeginAreaForm("Search", "Pages", "Admin", FormMethod.Post, new { @data_target = "#Page_Search_Results", @autocomplete = "off" }))
+	{
+		@Html.TextBoxFor(model => model.SearchTerm, new { @data_autopostbackevent = "keyup", @placeholder = "search", @type = "search" })
+		<input type="submit" value="&#xe8b6;" class="nucleus-material-icon btn btn-outline-secondary" />
+		<div id="Page_Search_Results" class="nucleus-search-results-wrapper">
+			@await Html.PartialAsync("SearchResults.cshtml")
+		</div>
+	}
+
+	<a href="@Url.Content("~/Admin/Pages/Editor")" class="btn btn-secondary" data-target="#nucleus-page-editor">New Page</a>
+</div>
+
+<div class="nucleus-index-wrapper">
+	<div class="nucleus-index-items">
+		@Html.PageMenu(Model.Pages, Model.PageId, -1, new { data_target = "#nucleus-page-editor" })
+	</div>
+
+	<div id="nucleus-page-editor" class="nucleus-editor-panel"></div>
+</div>
+
+@if (Model.PageId != Guid.Empty)
+{
+	<script type="text/javascript">
+		Page.LoadPartialContent(null, '@Url.Content("~/Admin/Pages/Editor?id=")' + '@Model.PageId', '#nucleus-page-editor');
+	</script>
+}
+<script type="text/javascript">
+	// Open a page for editing
+	jQuery('.nucleus-index-wrapper').on('click', 'li[data-target="#nucleus-page-editor"] a', function (e)
+	{
+		Page.LoadPartialContent(e, '@Url.Content("~/Admin/Pages/Editor?id=")' + jQuery(this).attr('data-id'), '#nucleus-page-editor');
+	});
+
+	// Read the child pages of the item containing the "+" button
+	jQuery('.nucleus-index-wrapper').on('click', '.nucleus-get-childpages', function (e)
+	{
+		// Add a ul to contain the new pages
+		Page.LoadPartialContent(e, '@Url.AreaAction("GetChildPages", "Pages", "Admin")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+
+		// remove the "+" button
+		jQuery(this).remove();
+	});
+</script>

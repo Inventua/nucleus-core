@@ -1,0 +1,272 @@
+{
+	"schemaName": "Nucleus.Modules.Links",
+	"version": "01.00.00",
+	"operations": [
+		{
+			"createTable": {
+				"name": "Links",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ModuleId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Title",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "Description",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "LinkType",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
+					},
+					{
+						"name": "SortOrder",
+						"clrType": "int",
+						"isnullable": true
+					},
+					{
+						"name": "CategoryId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_Links",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_Links_ModuleId",
+						"Columns": [ "ModuleId" ],
+						"PrincipalTable": "PageModules",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_Links_ModuleId",
+				"table": "Links",
+				"isunique": false,
+				"columns": [ "ModuleId" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "LinkUrls",
+				"columns": [
+					{
+						"name": "LinkId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Url",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_LinkUrls",
+					"isclustered": true,
+					"columns": [ "LinkId" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_LinkUrls_LinkId",
+						"Columns": [ "LinkId" ],
+						"PrincipalTable": "Links",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_LinkUrls_LinkId",
+				"table": "LinkUrls",
+				"isunique": false,
+				"columns": [ "LinkId" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "LinkFiles",
+				"columns": [
+					{
+						"name": "LinkId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "FileId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_LinkFiles",
+					"isclustered": true,
+					"columns": [ "LinkId" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_LinkFiles_LinkId",
+						"Columns": [ "LinkId" ],
+						"PrincipalTable": "Links",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_LinkFiles_LinkId",
+				"table": "LinkFiles",
+				"isunique": false,
+				"columns": [ "LinkId" ]
+			}
+		},
+
+		{
+			"createTable": {
+				"name": "LinkPages",
+				"columns": [
+					{
+						"name": "LinkId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "PageId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_LinkPages",
+					"isclustered": true,
+					"columns": [ "LinkId" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_LinkPages_LinkId",
+						"Columns": [ "LinkId" ],
+						"PrincipalTable": "Links",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_LinkPages_LinkId",
+				"table": "LinkPages",
+				"isunique": false,
+				"columns": [ "LinkId" ]
+			}
+		}
+	]
+}

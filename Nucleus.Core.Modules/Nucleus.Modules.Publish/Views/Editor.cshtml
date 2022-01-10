@@ -1,0 +1,127 @@
+﻿@model Nucleus.Modules.Publish.ViewModels.Editor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<h2 class="nucleus-modal-caption">Article Settings</h2>
+@using (Html.BeginNucleusForm("Edit", "Admin", "Publish", FormMethod.Post, new { @enctype = "multipart/form-data", @data_target="#ArticleEditor.parent()" }))
+{
+	<Tab>
+		<TabItem target="#article-properties" caption="Properties" active="true"></TabItem>
+		<TabItem target="#article-body" caption="Content"></TabItem>
+		<TabItem target="#article-categories" caption="Categories"></TabItem>
+		<TabItem target="#article-attachments" caption="Attachments"></TabItem>
+	</Tab>
+	<TabContent>
+		<TabPanel id="article-properties" active="true">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Article Properties</h2>
+
+				@Html.HiddenFor(model => model.Article.Id)
+				<SettingsControl caption="Title" helptext="Article title.">
+					@Html.TextBoxFor(model => model.Article.Title)
+				</SettingsControl>
+
+				<SettingsControl caption="Sub Title" helptext="Article sub-title.">
+					@Html.TextBoxFor(model => model.Article.SubTitle)
+				</SettingsControl>
+
+				<SettingsControl caption="Summary" helptext="Article summary.">
+					@Html.TextAreaFor(model => model.Article.Summary)
+				</SettingsControl>
+					
+				<SettingsControl caption="Image" helptext="Article image.">
+					<div class="nucleus-flex-fields nucleus-fileselector">
+						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { model = Model.Article.ImageFile, propertyName = "Article.ImageFile", selectAnotherActionName = "SelectAnotherImage", pattern = "(.gif)|(.png)(.jpg)|(.jpeg)|(.bmp)" })
+						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { actionName = "UploadImageFile", Filter = "image/*" })
+					</div>
+				</SettingsControl>
+
+				<SettingsControl caption="Description" helptext="Article description.">
+					@Html.TextAreaFor(model => model.Article.Description)
+				</SettingsControl>
+
+
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Enabled?" helptext="Specifies whether the article is visible to users." rendermode="LabelLast" class="inner-inline">
+						@Html.CheckBoxFor(model => model.Article.Enabled, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+
+					<SettingsControl caption="Featured?" helptext="Featured articles are shown at the top of the list." rendermode="LabelLast" class="inner-inline">
+						@Html.CheckBoxFor(model => model.Article.Featured, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+
+					<SettingsControl caption="Publish Date" helptext="Article publication date.  The article will not be visible before this date.">
+						@Html.TextBoxFor(model => model.Article.PublishDate, new { @type = "datetime-local", @step = "60", @data_value = Model.Article.PublishDate.HasValue ? Model.Article.PublishDate.Value.ToString("O") : ""})
+						@*@Html.Hidden("Article.PublishDate.Offset", Model.Article.PublishDate.Offset )*@
+					</SettingsControl>
+
+					<SettingsControl caption="Expiry Date" helptext="Article expiry date.  The article will not be visible after this date.">
+						@Html.TextBoxFor(model => model.Article.ExpireDate, new { @type = "datetime-local", @step = "60", @data_value = Model.Article.ExpireDate.HasValue ? Model.Article.ExpireDate.Value.ToString("O") : ""})
+					</SettingsControl>
+				</div>
+			</fieldset>
+			
+		</TabPanel>
+		<TabPanel id="article-body">
+				@Html.TextAreaFor(model => model.Article.Body, new { @class = "HtmlEditorControl flex-fill" })
+		</TabPanel>
+		<TabPanel id="article-categories">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Categories</h2>
+				<div class="article-categories">
+					@for (var categoryCount = 0; categoryCount < Model.Categories.Count; categoryCount++)
+					{
+						<label>
+							@Html.CheckBoxFor(model => model.Categories[categoryCount].IsSelected)
+							@Html.HiddenFor(model => model.Categories[categoryCount].Category.CategoryListItem.Id)
+							@Html.HiddenFor(model => model.Categories[categoryCount].Category.CategoryListItem.Name)
+							<span>@Model.Categories[categoryCount].Category.CategoryListItem.Name</span>
+						</label>
+					}
+				</div>
+			</fieldset>
+		</TabPanel>
+		<TabPanel id="article-attachments">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Attachments</h2>
+
+				<SettingsControl caption="Image" helptext="Article image.">
+					<div class="nucleus-flex-fields nucleus-fileselector">
+						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { model = Model.SelectedAttachmentFile, propertyName = "SelectedAttachmentFile" })
+						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { actionName = "UploadAttachment" })
+					</div>
+				</SettingsControl>
+				@Html.SubmitButton("", "Add Attachment", @Url.NucleusAction("AddAttachment", "Admin", "Publish"), new { })
+
+				<table>
+					@for (var attachmentCount = 0; attachmentCount < Model.Article.Attachments.Count; attachmentCount++)
+					{
+						<tr>
+							<td>
+								@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].Id)
+								@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Id)
+								@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Provider)
+								@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Path)
+								@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Name)
+								<a href="@Url.FileLink(Model.Article.Attachments[attachmentCount].File)" alt="@Model.Article.Attachments[attachmentCount].File.Name" target="_blank">
+									@Model.Article.Attachments[attachmentCount].File.Name
+								</a>
+							</td>
+							<td class="nucleus-small-cell">
+								<input type="submit" title="Delete Attachment" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" formaction="@Url.NucleusAction("DeleteAttachment", "Admin", "Publish")?id=@Model.Article.Attachments[attachmentCount].Id" data-confirm="Delete this attachment?" />
+							</td>
+						</tr>
+					}
+				</table>
+
+			</fieldset>
+		</TabPanel>
+	</TabContent>
+	<div class="nucleus-form-buttonrow">
+		<div class="nucleus-form-tools">
+			@Html.SubmitButton("", "Save Article", @Url.NucleusAction("SaveArticle", "Admin", "Publish"), new { })			
+		</div>
+	</div>
+}

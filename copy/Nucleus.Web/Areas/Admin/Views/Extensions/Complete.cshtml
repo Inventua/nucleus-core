@@ -1,0 +1,21 @@
+﻿@model Nucleus.Web.ViewModels.Admin.Extensions
+<div class="ExtensionInstaller">
+	<h1>Extension Installer</h1>
+
+	@if (@Model.Messages.Count > 0)
+	{
+		<ul>
+			@foreach (string message in Model.Messages)
+			{
+				<li>@message</li>
+			}
+		</ul>
+	}
+	else
+	{
+		<div>Installation Complete.</div>
+	}
+	<div class="ButtonRow">
+		<a href="@Url.AreaAction("Index", "Extensions", "Admin")" class="button" data-target=".AdminPage">Back</a>
+	</div>
+</div>

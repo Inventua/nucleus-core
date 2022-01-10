@@ -1,0 +1,118 @@
+﻿@model Nucleus.Modules.Documents.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<div class="DocumentsSettings">
+	@using (Html.BeginNucleusForm("Settings", "Documents", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+	{
+		<Tab>
+			<TabItem target="#document-list" caption="Documents" active="true"></TabItem>
+			<TabItem target="#document-settings" caption="Settings"></TabItem>
+		</Tab>
+
+		<TabContent>
+			<TabPanel id="document-list" active="true">
+				<div class="Tools">
+					<div class="button">
+						<label>
+							<span class="MaterialIcon">&#xe147</span> Add Document
+							<input type="submit" class="Hide" formaction="@Url.NucleusAction("Create", "Documents", "Documents")" data-target=".DocumentsEditor">
+						</label>
+					</div>
+				</div>
+
+				<table class="Documents">
+					<tr>
+						<th>Title</th>
+						<th>Category</th>
+						<th>Description</th>
+					</tr>
+					@for (int documentCount = 0; documentCount < Model.Documents.Count; documentCount++)
+					{
+						<tr>
+							<td>
+								@Html.HiddenFor(model => model.Documents[documentCount].Id)
+								@Model.Documents[documentCount].Title
+							</td>
+
+							<td>@Model.Documents[documentCount].Category?.Name</td>
+
+							<td>@Model.Documents[documentCount].Description</td>
+							<td class="SmallIconCell"><input type="submit" formaction="@Url.NucleusAction("Edit", "Documents", "Documents")?mid=@Model.ModuleId&id=@Model.Documents[documentCount].Id" value="&#xe3c9;" class="MaterialIcon" title="Edit" data-target=".DocumentsEditor" /></td>
+							<td class="SmallIconCell"><input type="submit" formaction="@Url.NucleusAction("Delete", "Documents", "Documents")?mid=@Model.ModuleId&id=@Model.Documents[documentCount].Id" value="&#xe14c;" class="MaterialIcon" title="Delete" data-target=".DocumentsEditor" /></td>
+							<td class="SmallIconCell">
+								@if (documentCount != 0)
+								{
+									<input type="submit" formaction="@Url.NucleusAction("MoveUp", "Documents", "Documents")?mid=@Model.ModuleId&id=@Model.Documents[documentCount].Id" value="&#xe5d8;" class="MaterialIcon secondary" title="Move Up" data-target=".DocumentsEditor" />
+								}
+							</td>
+							<td class="SmallIconCell">
+								@if (documentCount < Model.Documents.Count - 1)
+								{
+									<input type="submit" formaction="@Url.NucleusAction("MoveDown", "Documents", "Documents")?mid=@Model.ModuleId&id=@Model.Documents[documentCount].Id" value="&#xe5db;" class="MaterialIcon secondary" title="Move Down" data-target=".DocumentsEditor" />
+								}
+							</td>
+						</tr>
+					}
+				</table>
+			</TabPanel>
+
+			<TabPanel id="document-settings">
+				<fieldset role="group" aria-labelledby="heading">
+					<h2>Settings</h2>
+					<div class="Flex">
+						<SettingsControl caption="Categories List" helptext="Select the list to use for categories for this module instance.  Lists are managed in the Nucleus Lists manager.">
+							@Html.DropDownListFor(model => model.CategoryList.Id, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")
+						</SettingsControl>
+						<SettingsControl caption="Layout" helptext="Display layout.">
+							@Html.DropDownListFor(model => model.Layout, new SelectList(Model.Layouts))
+						</SettingsControl>
+					</div>
+
+					<SettingsControl caption="Default Folder" helptext="Default folder">
+						<div class="Flex FileSelector">
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FolderSelector), new { model = Model.SelectedFolder })
+						</div>
+					</SettingsControl>
+
+					<div class="ShowColumns">
+						<SettingsControl caption="Allow Sorting?" helptext="Specifies whether to allow the user to sort the list." class="inner-inline">
+							@Html.CheckBoxFor(model => model.AllowSorting, new { @class = "ToggleSwitch" })
+						</SettingsControl>
+					</div>
+
+					<div class="ShowColumns">
+						<SettingsControl caption="Show Category?" helptext="Specifies whether to display the category." class="inner-inline">
+							@Html.CheckBoxFor(model => model.ShowCategory, new { @class = "ToggleSwitch" })
+						</SettingsControl>
+
+						<SettingsControl caption="Show Modified Date?" helptext="Specifies whether to display the file last modified date." class="inner-inline">
+							@Html.CheckBoxFor(model => model.ShowModifiedDate, new { @class = "ToggleSwitch" })
+						</SettingsControl>
+
+						<SettingsControl caption="Show Size?" helptext="Specifies whether to display the file size." class="inner-inline">
+							@Html.CheckBoxFor(model => model.ShowSize, new { @class = "ToggleSwitch" })
+						</SettingsControl>
+
+						<SettingsControl caption="Show Description?" helptext="Specifies whether to display the description." class="inner-inline">
+							@Html.CheckBoxFor(model => model.ShowDescription, new { @class = "ToggleSwitch" })
+						</SettingsControl>
+					</div>
+
+					<div class="Tools">
+						@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "Documents", "Documents"), new { })
+						@if (!String.IsNullOrEmpty(@Model.Message))
+						{
+							<div class="Message">@Model.Message</div>
+						}
+					</div>
+				</fieldset>
+			</TabPanel>
+		</TabContent>
+
+	}
+	<div class="EditorPopup DocumentsEditor" data-overlay=".DocumentsEditorOverlay"></div>
+	<div class="DocumentsEditorOverlay EditorOverlay"></div>
+</div>

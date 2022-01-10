@@ -1,0 +1,20 @@
+﻿@model Nucleus.Modules.MultiContent.ViewModels.Viewer
+@using Nucleus.Extensions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@Html.AddStyle("~!/../../viewer.css")
+@foreach (var content in Model.Contents)
+{
+<div role="alert" class="alert @($"alert-{Model.LayoutSettings.AlertStyle.ToLower()}")@(Model.LayoutSettings.ShowCloseButton ? " alert-dismissible fade show" : "")">
+	@if (Model.LayoutSettings.ShowCloseButton)
+	{
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	}
+	@if (!String.IsNullOrEmpty(content.Title))
+	{
+		<h3>@content.Title</h3>
+	}
+	@Html.Raw(content.ToHtml())
+
+</div>
+}

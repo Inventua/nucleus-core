@@ -1,0 +1,42 @@
+﻿.Articles TABLE
+{
+	width: 100%;
+}
+
+.Articles TABLE th, .Articles TABLE td
+{
+	text-align: left;
+}
+
+.Articles.TwoColumn > div
+{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-auto-rows: 1fr;
+}
+
+.Article .image
+{
+	float: left;
+	margin-right: 1em;
+}
+
+.Article .attachments, .Article .metadata
+{
+  display: inline-grid;
+  gap: 1em;
+  grid-auto-flow: column;
+  font-size: 0.8em;
+}
+
+.Article .category
+{
+  text-transform: capitalize;
+  border: dashed 1px #bbb;
+  padding: 1px 2px;
+}
+
+.Article .category.featured
+{
+	font-weight: bold;
+}

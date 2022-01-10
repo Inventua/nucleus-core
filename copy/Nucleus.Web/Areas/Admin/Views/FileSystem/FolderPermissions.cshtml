@@ -1,0 +1,51 @@
+﻿@model Nucleus.Web.ViewModels.Admin.FileSystem
+<h2>Folder Permissions</h2>
+<a class="ClosePopup">&#xe5cd;</a>
+
+@using (Html.BeginAreaForm("SaveFolderPermissions", "FileSystem", "Admin", new { @id = Model.Folder.Path }, FormMethod.Post, new { @data_target = ".FolderPermissionsEditor" }))
+{<div class="Tools">
+		@Html.DropDownListFor((model) => model.SelectedFolderRoleId, new SelectList(Model.AvailableFolderRoles, "Id", "Name"), new { @class = "flex-fill" })
+		<input type="submit" formaction="@Url.AreaAction("AddFolderPermissionRole", "FileSystem", "Admin")" value="Add Role" data-target=".FolderPermissionsEditor" />
+	</div>
+
+	@Html.HiddenFor(model => Model.Folder.Provider)
+	@Html.HiddenFor(model => Model.Folder.Path)
+	<fieldset role="group" aria-labelledby="heading">
+		<h3>Permissions</h3>
+
+		<table>
+			<tr>
+				<th></th>
+				@foreach (var permissionType in Model.FolderPermissionTypes)
+				{
+					<th class="align-center">@permissionType.Name</th>
+				}
+			</tr>
+
+			@foreach (var item in Model.FolderPermissions.Values)
+			{
+				<tr>
+					<td>
+						@item.Role.Name
+					</td>
+
+					@for (int permissionsCount = 0; permissionsCount < Model.FolderPermissions[item.Role.Id].Permissions.Count; permissionsCount++)
+					{
+						<td>
+							@Html.HiddenFor(model => Model.FolderPermissions[item.Role.Id].Permissions[permissionsCount].Id)
+							@Html.HiddenFor(model => Model.FolderPermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Id)
+							@Html.CheckBoxFor(model => Model.FolderPermissions[item.Role.Id].Permissions[permissionsCount].AllowAccess)
+						</td>
+					}
+
+					<td class="SmallIconCell"><input type="submit" formaction="@Url.AreaAction("DeleteFolderPermissionRole", "FileSystem", "Admin", new { id = item.Role.Id })" value="&#xe14c;" class="MaterialIcon" title="Delete" data-target=".FolderPermissionsEditor" /></td>
+				</tr>
+			}
+		</table>
+	</fieldset>
+
+	<div class="ButtonPanel">
+		<input type="submit" class="DefaultButton" value="Save Changes" />
+	</div>
+}
+

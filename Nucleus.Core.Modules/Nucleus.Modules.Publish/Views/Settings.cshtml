@@ -1,0 +1,65 @@
+﻿@model Nucleus.Modules.Publish.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+@using (Html.BeginNucleusForm("Settings", "Admin", "Publish", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+	<Tab>
+		<TabItem target="#article-list" caption="Articles" active="true"></TabItem>
+		<TabItem target="#publish-settings" caption="Settings"></TabItem>
+	</Tab>
+
+	<TabContent>
+		<TabPanel id="article-list" active="true">
+			<div class="nucleus-form-tools">
+				<div class="btn btn-secondary">
+					<label>
+						<span class="nucleus-material-icon">&#xe147</span> Add Article
+						<input type="submit" class="collapse" formaction="@Url.NucleusAction("Create", "Admin", "Publish")" data-target="#ArticleEditor">
+					</label>
+				</div>
+			</div>
+
+			<table class="Articles">
+				<tr>
+					<th>Title</th>
+					<th>Description</th>
+				</tr>
+				@for (int articleCount = 0; articleCount < Model.Articles.Count; articleCount++)
+				{
+					<tr>
+						<td>
+							@Html.HiddenFor(model => model.Articles[articleCount].Id)
+							@Model.Articles[articleCount].Title
+						</td>
+
+						<td>@Model.Articles[articleCount].Description</td>
+						<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("Edit", "Admin", "Publish")?id=@Model.Articles[articleCount].Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-secondary" data-target="#ArticleEditor" title="Edit" /></td>
+						<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("DeleteArticle", "Admin", "Publish")?id=@Model.Articles[articleCount].Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-confirm="Delete this article?" /></td>
+					</tr>
+				}
+			</table>
+		</TabPanel>
+		<TabPanel id="publish-settings">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Settings</h2>
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Categories List" helptext="Select the list to use for categories for this module instance.  Lists are managed in the Nucleus Lists manager.">
+						@Html.DropDownListFor(model => model.CategoryList.Id, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")
+					</SettingsControl>
+					<SettingsControl caption="Layout" helptext="Display layout.">
+						@Html.DropDownListFor(model => model.Layout, new SelectList(Model.Layouts))
+					</SettingsControl>
+				</div>
+
+				<div class="nucleus-form-tools">
+					@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "Admin", "Publish"), new { })
+				</div>
+			</fieldset>
+
+		</TabPanel>
+	</TabContent>
+}
+<modal id="ArticleEditor" title="Article"></modal>

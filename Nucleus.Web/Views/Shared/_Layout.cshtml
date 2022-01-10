@@ -1,0 +1,121 @@
+﻿@model Nucleus.Web.ViewModels.Default
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Extensions.Authorization
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+	@if (!String.IsNullOrEmpty(Model.Context.Page.Description))
+	{
+		<meta name="DESCRIPTION" content="@Model.Context.Page.Description" />
+	}
+	@if (!String.IsNullOrEmpty(Model.SiteIconPath))
+	{
+		<link rel="shortcut icon" href="@Model.SiteIconPath">
+	}
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta content="text/javascript" http-equiv="Content-Script-Type" />
+	<meta content="text/css" http-equiv="Content-Style-Type" />
+	<link rel="canonical" href="@Model.DefaultPageUri" />
+	<title>@Model.Context.Page.Title</title>
+	@Html.AddScript("~/Resources/Libraries/jQuery/03.06.00/jquery.min.js")
+	@Html.AddScript("~/Resources/Libraries/Bootstrap/5.1.0/js/bootstrap.bundle.js")
+	@Html.AddScript("~/Resources/js/nucleus-shared.js")
+	@Html.AddStyle("~/Resources/Libraries/Bootstrap/5.1.0/css/bootstrap.css")
+	@Html.AddStyle("~/Resources/css/shared.css")
+	@if (Model.IsEditing)
+	{
+		@Html.AddStyle("~/Resources/css/editmode.css")
+	}
+	@Html.AddHtmlEditor()	
+	@Html.RenderStyles()
+	@RenderSection("styles", false)
+	@Html.RenderScripts()
+	@RenderSection("scripts", false)
+</head>
+<body>
+	@if (Model.CanEdit)
+	{
+		<iframe id="AdminFrame" title="Control Panel" src="@Url.Content("~/Admin/Index/Index")?pageId=@Model.Context.Page.Id" class="Nucleus AdminFrame"></iframe>
+		<div class="AdminFramePlaceholder"></div>
+
+		<div class="modal" tabindex="-1">
+			<div class="modal-dialog modal-auto-size modal-dialog-scrollable modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Module Settings</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<iframe id="ModuleSettingsFrame" src="about:blank" title="Settings" class="Nucleus ModuleSettingsFrame"></iframe>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+
+	<div class="Nucleus Content">
+		@RenderBody()
+	</div>
+
+	@if (Model.CanEdit)
+	{
+		<script type="text/javascript">
+			jQuery(document).ready(function ()
+			{
+				
+			});
+
+			window.document.addEventListener('ExpandAdminFrame',
+				function (args)
+				{
+					if (args.detail !== null && args.detail.expand)
+						jQuery('#AdminFrame').addClass('Expanded');
+					else
+						jQuery('#AdminFrame').removeClass('Expanded');
+				}, false);
+
+			window.document.addEventListener('Refresh',
+				function (args)
+				{
+					if (args.detail !== null && typeof (args.detail.setEditMode) !== 'undefined')
+					{
+						if (args.detail.setEditMode)
+						{
+							document.cookie = "@PermissionExtensions.EDIT_COOKIE_NAME=true; Path=/; max-age=3600";
+						}
+						else
+						{
+							document.cookie = "@PermissionExtensions.EDIT_COOKIE_NAME=; Path=/; max-age=0";
+						}
+					}
+
+					window.location.reload(true);
+				}, false);
+
+			window.document.addEventListener('InitFrame',
+				function (args)
+				{
+					if (args.detail !== null && typeof (args.detail.element) !== 'undefined')
+					{
+						var element = jQuery(args.detail.element);
+						var wrapper = element.parents('.modal');
+												
+						var titleElement = wrapper.find('.modal-title');
+						titleElement.html(args.detail.element.title);
+
+						if (!wrapper.is(':visible'))
+						{
+							var settingsDialog = new bootstrap.Modal(wrapper);
+							//var settingsDialog = wrapper.modal();
+							wrapper.on('hidden.bs.modal', function () { window.location.reload(true); });
+							settingsDialog.show();
+						}
+						element.show();
+					}
+				}, false);
+		</script>
+	}
+</body>
+</html>

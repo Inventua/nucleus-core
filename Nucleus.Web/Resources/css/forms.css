@@ -1,0 +1,122 @@
+﻿/* CSS classes for form controls */
+.nucleus-flex-fields
+{
+	display: flex;
+	gap: 8px;
+	clear: both;
+	align-items: end;
+}
+
+.nucleus-flex-fields > div
+{
+	flex-grow: 1;
+	align-self: center;
+	text-align: left;
+}
+
+.nucleus-flex-fields.nucleus-fileselector label
+{
+	flex-direction: row;
+}
+
+.nucleus-flex-fields.nucleus-fileselector .button
+{
+	margin-left: auto;  /*  aligns buttons to the right */
+}
+
+.nucleus-flex-fields.nucleus-fileselector select
+{
+	flex: 2;
+}
+
+.nucleus-flex-fields.nucleus-fileselector select:first-child
+{
+	flex: 1;
+}
+
+.nucleus-flex-fields .settings-control
+{
+	flex: 1;
+}
+
+.settings-control
+{
+	margin-bottom: 6px;
+}
+
+.settings-control label
+{
+	display: flex;
+	flex-direction: column;
+}
+
+.settings-control.inner-inline label, .settings-control .button label
+{
+	flex-direction: row;
+	gap: 4px;
+}
+
+.settings-control label span
+{
+	font-size: 12px;
+	margin-bottom: 1px;
+}
+
+.settings-control input, .settings-control select, .settings-control textarea
+{
+	display: block;
+	font-size: 0.95em;
+}
+
+.settings-control.inline, .settings-control.inline input, .settings-control.inline span
+{
+	display: inline-block;
+}
+
+.settings-control.inner-inline label span, .settings-control.inner-inline label input, settings-control.inner-inline label select
+{
+	display: inline-block;
+}
+
+.settings-control span
+{
+	white-space: nowrap;
+}
+
+fieldset label span
+{
+	font-size: 14px;
+	display: block;	
+}
+
+table input, table select
+{
+	width: 100%;
+}
+
+fieldset input[type=text], fieldset input[type=email], fieldset input[type=tel], 
+fieldset input[type=search], fieldset input[type=url], 
+fieldset select, fieldset textarea
+{
+	padding: 2px;	
+}
+
+.settings-control input[type=checkbox]
+{
+	min-width: 20px;
+}
+
+.nucleus-form-tools
+{
+	display: flex;
+	flex-direction: row;
+	margin-bottom: 4px;
+	gap: 4px;	
+}
+
+.nucleus-form-buttonrow
+{
+	margin-top: 8px;
+	display: flex;
+	gap: 4px;
+}

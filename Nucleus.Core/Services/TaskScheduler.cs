@@ -1,0 +1,282 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Nucleus.Abstractions.Models.TaskScheduler;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions;
+
+namespace Nucleus.Core.Services
+{
+	/// <summary>
+	/// Manages scheduling and execution of scheduled tasks.
+	/// </summary>
+	public class TaskScheduler : IHostedService, IDisposable
+	{
+		// https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-5.0&tabs=visual-studio
+
+		private Timer Timer { get; set; }
+		private ILogger<TaskScheduler> Logger { get; }
+		private IScheduledTaskManager ScheduledTaskManager { get; }
+		private IServiceProvider Services { get; }
+		public RunningTaskQueue Queue { get; }
+		public CancellationTokenSource CancellationTokenSource { get; } = new();
+
+		public TaskScheduler(IServiceProvider services, ILogger<TaskScheduler> logger, IScheduledTaskManager scheduledTaskManager, RunningTaskQueue queue)
+		{
+			this.Services = services;
+			this.Logger = logger;
+			this.ScheduledTaskManager = scheduledTaskManager;
+			this.Queue = queue;
+		}
+
+		/// <summary>
+		/// Initialize the timer to start executing scheduled tasks.
+		/// </summary>
+		/// <param name="cancellationToken"></param>
+		/// <returns></returns>
+		public Task StartAsync(CancellationToken cancellationToken)
+		{
+			this.Logger.LogInformation("The task scheduler is starting.");
+			this.Timer = new(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(60));
+			
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Shut down
+		/// </summary>
+		/// <param name="cancellationToken"></param>
+		/// <returns></returns>
+		public Task StopAsync(CancellationToken cancellationToken)
+		{
+			this.Logger.LogInformation("The task scheduler is stopping.");
+			this.Timer?.Change(Timeout.Infinite, 0);
+			this.CancellationTokenSource.Cancel();
+
+			return Task.CompletedTask;
+		}
+
+		public void Dispose()
+		{
+			this.Timer?.Dispose();
+			this.Timer = null;
+		}
+
+		private void DoWork(object state)
+		{
+			DoWorkAsync(state).Wait();
+		}
+
+		/// <summary>
+		/// Check for scheduled tasks that are ready to be invoked and start them.
+		/// </summary>
+		/// <param name="state"></param>
+		private async Task DoWorkAsync(object state)
+		{
+			try
+			{
+				await Collect();
+
+				foreach (ScheduledTask task in await this.ScheduledTaskManager.List())
+				{
+					if (task.Enabled && task.NextScheduledRun <= DateTime.UtcNow)
+					{
+						if (!this.Queue.Contains(task))
+						{
+							StartScheduledTask(task);
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.LogError(e, "Checking scheduled tasks.");
+			}			
+		}
+
+		/// <summary>
+		/// Check for completed tasks in the queue: reschedule then and remove them from the queue.
+		/// </summary>
+		private async Task Collect()
+		{
+			foreach (RunningTask queueItem in this.Queue.ToList())
+			{
+				// queueItem.Task can be null if the implementation of .InvokeAsync doesn't return anything
+				if (queueItem.Task == null || queueItem.Task.IsCompleted)
+				{
+					await SignalCompleted(queueItem);
+					//// re-schedule the task
+					//await RescheduleTask(queueItem.ScheduledTask, queueItem.ScheduledTask.NextScheduledRun.HasValue ? queueItem.ScheduledTask.NextScheduledRun.Value : queueItem.StartDate);
+
+					//queueItem.History.FinishDate = DateTime.UtcNow;
+					//queueItem.History.NextScheduledRun = queueItem.ScheduledTask.NextScheduledRun;
+					//TaskSucceeded(queueItem.History);
+
+					//this.Queue.Remove(queueItem.ScheduledTask);
+				}
+			}
+		}
+
+		private async Task SignalCompleted(RunningTask runningTask)
+		{
+			// re-schedule the task
+			await RescheduleTask(runningTask.ScheduledTask, runningTask.ScheduledTask.NextScheduledRun.HasValue ? runningTask.ScheduledTask.NextScheduledRun.Value : runningTask.StartDate);
+
+			runningTask.History.FinishDate = DateTime.UtcNow;
+			runningTask.History.NextScheduledRun = runningTask.ScheduledTask.NextScheduledRun;
+			TaskSucceeded(runningTask.History);
+
+			this.Queue.Remove(runningTask.ScheduledTask);
+		}
+
+		/// <summary>
+		/// Update the <see cref="ScheduledTask.NextScheduledRun"/> based on task settings.
+		/// </summary>
+		/// <param name="thisTask"></param>
+		/// <param name="thisRunDateTime"></param>
+		private async Task RescheduleTask(ScheduledTask thisTask, DateTime thisRunDateTime)
+		{
+			DateTime nextRunDateTime;
+
+			// re-get the task in case its interval has changed (or it has been deleted!) since we invoked it
+			ScheduledTask task = await this.ScheduledTaskManager.Get(thisTask.Id);
+
+			// only re-schedule the task if it was not already re-scheduled while the task was running (a user clicked "run now").
+			if (task != null && task.NextScheduledRun <= thisRunDateTime)
+			{
+				nextRunDateTime = CalculateInterval(thisRunDateTime, task.IntervalType, task.Interval);
+				await this.ScheduledTaskManager.ScheduleNextRun(task, nextRunDateTime);
+			}			
+		}
+
+		private DateTime CalculateInterval(DateTime thisRunDateTime, ScheduledTask.Intervals intervalType, int interval)
+		{
+			switch (intervalType)
+			{
+				case ScheduledTask.Intervals.Minutes:
+					return thisRunDateTime.AddMinutes(interval);
+
+				case ScheduledTask.Intervals.Hours:
+					return thisRunDateTime.AddHours(interval);
+
+				case ScheduledTask.Intervals.Days:
+					return thisRunDateTime.AddDays(interval);
+
+				case ScheduledTask.Intervals.Weeks:
+					return thisRunDateTime.AddDays(interval * 7);
+
+				case ScheduledTask.Intervals.Months:
+					return thisRunDateTime.AddMonths(interval);
+
+				case ScheduledTask.Intervals.Years:
+					return thisRunDateTime.AddYears(interval);
+
+				default:  // case ScheduledTask.IntervalTypes.None:
+					return thisRunDateTime;
+
+			}
+		}
+
+		private void TaskFailed(ScheduledTaskHistory history)
+		{
+			history.Status = ScheduledTaskProgress.State.Error;
+			this.ScheduledTaskManager.SaveHistory(history);
+		}
+
+		private void TaskRunning(ScheduledTaskHistory history)
+		{
+			history.Status = ScheduledTaskProgress.State.Running;
+			this.ScheduledTaskManager.SaveHistory(history);
+		}
+
+		private void TaskSucceeded(ScheduledTaskHistory history)
+		{
+			history.Status = ScheduledTaskProgress.State.Succeeded;
+			this.ScheduledTaskManager.SaveHistory(history);
+		}
+
+
+		/// <summary>
+		/// Start the <see cref="IScheduledTask"/> represented by the specified <see cref="ScheduledTask"/>.
+		/// </summary>
+		/// <param name="task"></param>
+		void StartScheduledTask(ScheduledTask task)
+		{
+			using (System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope scope = Nucleus.Core.Plugins.AssemblyLoader.EnterExtensionContext(task.TypeName))
+			{
+				ScheduledTaskHistory history = new();
+				history.ScheduledTaskId = task.Id;
+				history.Server = Environment.MachineName;
+				history.StartDate = DateTime.UtcNow;
+				history.Status = ScheduledTaskProgress.State.None;
+				this.ScheduledTaskManager.SaveHistory(history);
+
+				System.Type serviceType = Type.GetType(task.TypeName);
+
+				if (serviceType == null)
+				{
+					this.Logger.LogError("Unable to find type {0}", task.TypeName);
+					TaskFailed(history);
+					return;
+				}
+
+				object service = this.Services.GetService(serviceType);
+
+				if (service == null)
+				{
+					this.Logger.LogError("Unable to create an instance of {0}", task.TypeName);
+					TaskFailed(history);
+					return;
+				}
+
+				IScheduledTask taskService = service as IScheduledTask;
+
+				if (taskService == null)
+				{
+					this.Logger.LogError("Unable to create an instance of {0} because it does not implement IScheduledTask", task.TypeName);
+					TaskFailed(history);
+					return;
+				}
+
+				if (!task.NextScheduledRun.HasValue)
+				{
+					// when tasks are first created, they have a null date.  If the date is null, we set the  NextScheduledRun 
+					// to DateTime.UtcNow so that the re-schedule calculation is based on the current date/time.				
+					task.NextScheduledRun = DateTime.UtcNow;
+				}
+				else if (CalculateInterval(task.NextScheduledRun.Value, task.IntervalType, task.Interval) < DateTime.UtcNow)
+				{
+					// If the system was stopped and missed the next scheduled run, bump the time up to now
+					task.NextScheduledRun = DateTime.UtcNow;
+				}
+
+				RunningTask runningTask = this.Queue.Add(task, history);
+				runningTask.OnProgress += HandleProgress;
+
+				TaskRunning(history);
+
+
+				runningTask.Task = Task.Run(async () =>
+				{
+					using (this.Logger.BeginScope(runningTask))
+					{
+						await taskService.InvokeAsync(runningTask, runningTask.ProgressCallback, this.CancellationTokenSource.Token);
+					}
+				});
+			}
+		}
+
+		async void HandleProgress(RunningTask sender, ScheduledTaskProgress progress)
+		{
+			if (progress.Status == ScheduledTaskProgress.State.Succeeded)
+			{
+				await SignalCompleted(sender);
+			}
+		}
+	}
+}

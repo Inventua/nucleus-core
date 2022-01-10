@@ -69,6 +69,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.AzureBlo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Data.MySql", "Nucleus.Data.MySql\Nucleus.Data.MySql.csproj", "{5359B271-0112-49F8-A6ED-1CC6A21F9C32}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Data.PostgreSql", "Nucleus.Data.PostgreSql\Nucleus.Data.PostgreSql.csproj", "{11E25778-517D-4AA0-820F-21E5F31F478F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -179,6 +181,10 @@ Global
 		{5359B271-0112-49F8-A6ED-1CC6A21F9C32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5359B271-0112-49F8-A6ED-1CC6A21F9C32}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5359B271-0112-49F8-A6ED-1CC6A21F9C32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11E25778-517D-4AA0-820F-21E5F31F478F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11E25778-517D-4AA0-820F-21E5F31F478F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11E25778-517D-4AA0-820F-21E5F31F478F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11E25778-517D-4AA0-820F-21E5F31F478F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

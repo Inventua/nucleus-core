@@ -48,7 +48,7 @@ namespace Nucleus.Data.MySql
 			// Get connection for the specified schema name.  If it is found, add MySql data provider objects to the services collection.
 			DatabaseConnectionOption connectionOption = options.GetDatabaseConnection(schemaName);
 
-			if (connectionOption != null && connectionOption.Type == "MySql")
+			if (connectionOption != null && connectionOption.Type.Equals("MySql", StringComparison.OrdinalIgnoreCase))
 			{
 				services.AddTransient<Nucleus.Data.Common.DataProviderMigration<TDataProvider>, Nucleus.Data.MySql.MySqlDataProviderMigration<TDataProvider>>();
 				services.AddSingleton<Nucleus.Data.EntityFramework.DbContextConfigurator<TDataProvider>, Nucleus.Data.MySql.MySqlDbContextConfigurator<TDataProvider>>();

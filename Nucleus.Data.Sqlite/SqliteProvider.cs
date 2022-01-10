@@ -48,7 +48,7 @@ namespace Nucleus.Data.Sqlite
 			// Get connection for the specified schema name.  If it is found, add Sqlite data provider objects to the services collection.
 			DatabaseConnectionOption connectionOption = options.GetDatabaseConnection(schemaName);
 
-			if (connectionOption != null && connectionOption.Type == "Sqlite")
+			if (connectionOption != null && connectionOption.Type.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
 			{
 				services.AddTransient<Nucleus.Data.Common.DataProviderMigration<TDataProvider>, Nucleus.Data.Sqlite.SqliteDataProviderMigration<TDataProvider>>();
 				services.AddSingleton<Nucleus.Data.EntityFramework.DbContextConfigurator<TDataProvider>, Nucleus.Data.Sqlite.SqliteDbContextConfigurator<TDataProvider>>();

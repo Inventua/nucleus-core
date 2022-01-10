@@ -1,1 +1,0 @@
-﻿jQuery.fn.HtmlEditor = jQuery.fn.jqte;

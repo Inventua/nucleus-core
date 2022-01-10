@@ -48,7 +48,7 @@ namespace Nucleus.Data.PostgreSql
 			// Get connection for the specified schema name.  If it is found, add PostgreSQL data provider objects to the services collection.
 			DatabaseConnectionOption connectionOption = options.GetDatabaseConnection(schemaName);
 
-			if (connectionOption != null && connectionOption.Type == "PostgreSql")
+			if (connectionOption != null && connectionOption.Type.Equals("PostgreSql", StringComparison.OrdinalIgnoreCase))
 			{
 				services.AddTransient<Nucleus.Data.Common.DataProviderMigration<TDataProvider>, Nucleus.Data.PostgreSql.PostgreSqlDataProviderMigration<TDataProvider>>();
 				services.AddSingleton<Nucleus.Data.EntityFramework.DbContextConfigurator<TDataProvider>, Nucleus.Data.PostgreSql.PostgreSqlDbContextConfigurator<TDataProvider>>();

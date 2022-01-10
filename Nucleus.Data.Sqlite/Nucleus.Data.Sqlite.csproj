@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Nucleus.Data.Sqlite.xml</DocumentationFile>
 		<Authors>Inventua Pty Ltd</Authors>
 		<Product>Nucleus</Product>
@@ -25,8 +25,8 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.13" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.13" />
+	  <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.1" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.1" />
 	</ItemGroup>
 	
   <ItemGroup>

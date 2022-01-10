@@ -37,13 +37,13 @@ namespace Nucleus.Core.Authorization
 		{			
 			if (context.User.IsSystemAdministrator() || (await this .SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators () == 0))
 			{
-				Logger.LogTrace("User {0}: System Administrator access granted.");
+				Logger.LogTrace("User {userid}: System Administrator access granted.", context.User.GetUserId());
 				context.Succeed(requirement);
 			}
 
 			if (!context.HasSucceeded)
 			{
-				Logger.LogTrace("User {0}: System Administrator access denied.");
+				Logger.LogTrace("User {userid}: System Administrator access denied.", context.User.GetUserId());
 				context.Fail();
 			}			
 		}

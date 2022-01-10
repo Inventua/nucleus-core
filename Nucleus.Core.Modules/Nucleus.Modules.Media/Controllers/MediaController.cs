@@ -133,7 +133,7 @@ namespace Nucleus.Modules.Media.Controllers
 			return View("Settings", viewModel);
 		}
 
-		private ViewModels.Viewer.MediaTypes GetMediaType(File file, Boolean alwaysDownload)
+		private static ViewModels.Viewer.MediaTypes GetMediaType(File file, Boolean alwaysDownload)
 		{
 			if (file == null) return ViewModels.Viewer.MediaTypes.None;
 

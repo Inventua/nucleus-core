@@ -17,7 +17,7 @@ namespace Nucleus.XmlDocumentation
 		public DocumentationParser(System.IO.Stream input, string sourceFileName)
 		{
 			this.SourceFileName = sourceFileName;
-			this.Source = this.DeserializeDocumentationFile(input);
+			this.Source = DeserializeDocumentationFile(input);
 			this.IsValid = true;
 			input.Close();
 		}
@@ -509,7 +509,7 @@ namespace Nucleus.XmlDocumentation
 		/// </summary>
 		/// <param name="input"></param>
 		/// <returns></returns>
-		private Models.Serialization.Documentation DeserializeDocumentationFile(System.IO.Stream input)
+		private static Models.Serialization.Documentation DeserializeDocumentationFile(System.IO.Stream input)
 		{
 			System.Xml.Serialization.XmlSerializer xmlSerializer = new(typeof(Models.Serialization.Documentation));
 			Models.Serialization.Documentation result = xmlSerializer.Deserialize(input) as Models.Serialization.Documentation;
@@ -564,7 +564,7 @@ namespace Nucleus.XmlDocumentation
 			return ns;
 		}
 
-		private Boolean AllMethodsStartsWith(Models.Serialization.Member[] members, string prefix)
+		private static Boolean AllMethodsStartsWith(Models.Serialization.Member[] members, string prefix)
 		{
 			foreach (Member value in members)
 			{

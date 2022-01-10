@@ -9,7 +9,7 @@
 
   <PropertyGroup>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Nucleus.ViewFeatures.xml</DocumentationFile>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>Nucleus.ViewFeatures</PackageId>

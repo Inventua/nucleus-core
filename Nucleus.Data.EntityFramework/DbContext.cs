@@ -128,18 +128,15 @@ namespace Nucleus.Data.EntityFramework
 			Microsoft.EntityFrameworkCore.Metadata.IKey key = this.Entry(newEntity).Metadata.FindPrimaryKey();
 			if (key != null)
 			{
-				foreach (Microsoft.EntityFrameworkCore.Metadata.Internal.Property keyProp in this.Entry(newEntity).Metadata.FindPrimaryKey().Properties)
+				foreach (Microsoft.EntityFrameworkCore.Metadata.RuntimeProperty keyProp in this.Entry(newEntity).Metadata.FindPrimaryKey().Properties)
 				{
-#pragma warning disable EF1001 // Internal EF Core API usage.
 					if (this.Entry(newEntity).Property(keyProp.Name).CurrentValue.GetType() == typeof(System.Guid))
-
 					{
 						if ((Guid)this.Entry(newEntity).Property(keyProp.Name).CurrentValue == Guid.Empty)
 						{
 							this.Entry(newEntity).Property(keyProp.Name).CurrentValue = Guid.NewGuid();
 						}
 					}
-#pragma warning restore EF1001 // Internal EF Core API usage.
 				}
 			}
 

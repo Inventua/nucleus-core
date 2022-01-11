@@ -367,4 +367,5 @@ FodyWeavers.xsd
 *.Development.json
 
 # Nucleus.Web extensions folder
-Extensions/**/*.*
+Extensions/
+Extensions/**/

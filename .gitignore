@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Development configs
+*.development.json
+
+# Nucleus.Web extensions folder
+Extensions/

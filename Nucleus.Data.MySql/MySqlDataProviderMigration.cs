@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nucleus.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Nucleus.Data.MySql
 {
@@ -41,7 +42,7 @@ namespace Nucleus.Data.MySql
 
 			System.Data.Common.DbConnection connection = base.DbContext.Database.GetDbConnection();
 			System.Data.Common.DbCommand command = connection.CreateCommand();
-			
+
 			switch (type)
 			{
 				case DatabaseObjectTypes.Table:
@@ -66,7 +67,13 @@ namespace Nucleus.Data.MySql
 				connection.Open();
 			}
 
-			//command.Transaction = System.Transactions.Transaction.Current;
+			// Enlist in the current transaction.  The underlying MySqlConnector library requires that all commands are run in the same transaction as the
+			// currently-active transaction for the connection.  Reference: https://mysqlconnector.net/troubleshooting/transaction-usage/
+			if (base.DbContext.Database.CurrentTransaction != null)
+			{
+				command.Transaction = base.DbContext.Database.CurrentTransaction.GetDbTransaction();
+			}
+
 			result = Convert.ToInt32(command.ExecuteScalar());
 
 			return result > 0;

@@ -501,11 +501,11 @@
 					"columns": [ "Id" ]
 				},
 				"foreignKeys": [
-					// Sql Server needs the sites table to exist before we can create a foreign key.  Sqlite can't add a foreign key after creating the table, but doesn't
+					// Some databases need the sites table to exist before we can create a foreign key.  Sqlite can't add a foreign key after creating the table, but doesn't
 					// check that the other table exists, so we can(must) create it when we create the table.
 					{
 						"DatabaseProviderSpecificOperation": {
-							"exclude": [ "SqlServer" ],
+							"exclude": [ "SqlServer", "MySql", "PostgreSQL" ],
 							"operation": {
 								"addForeignKey": {
 									"name": "FK_SiteGroups_PrimarySiteId",
@@ -624,10 +624,10 @@
 					"columns": [ "Id" ]
 				},
 				"ForeignKeys": [
-					// Sql server needs the roles table to already exist to create these (and it doesn't).  Sqlite needs to create them when the table is created.
+					// Some databases need the roles table to already exist to create these (and it doesn't).  Sqlite needs to create them when the table is created.
 					{
 						"DatabaseProviderSpecificOperation": {
-							"exclude": [ "SqlServer" ],
+							"exclude": [ "SqlServer", "MySql", "PostgreSQL" ],
 							"operation": {
 								"addForeignKey": {
 									"name": "FK_Sites_AdministratorsRoleId",
@@ -640,7 +640,7 @@
 					},
 					{
 						"DatabaseProviderSpecificOperation": {
-							"exclude": [ "SqlServer" ],
+							"exclude": [ "SqlServer", "MySql", "PostgreSQL" ],
 							"operation": {
 								"addForeignKey": {
 									"name": "FK_Sites_AllUsersRoleId",
@@ -653,7 +653,7 @@
 					},
 					{
 						"DatabaseProviderSpecificOperation": {
-							"exclude": [ "SqlServer" ],
+							"exclude": [ "SqlServer", "MySql", "PostgreSQL" ],
 							"operation": {
 								"addForeignKey": {
 									"name": "FK_Sites_AnonymousUsersRoleId",
@@ -666,7 +666,7 @@
 					},
 					{
 						"DatabaseProviderSpecificOperation": {
-							"exclude": [ "SqlServer" ],
+							"exclude": [ "SqlServer", "MySql", "PostgreSQL" ],
 							"operation": {
 								"addForeignKey": {
 									"name": "FK_Sites_RegisteredUsersRoleId",
@@ -688,11 +688,11 @@
 				"isUnique": true
 			}
 		},
-		// Sql Server needs the sites table to exist before we can create a foreign key.  Sqlite can't add a foreign key after creating the table, but doesn't
+		// Some databases need the sites table to exist before we can create a foreign key.  Sqlite can't add a foreign key after creating the table, but doesn't
 		// check that the other table exists, so we can create it when we create the table.
 		{
 			"DatabaseProviderSpecificOperation": {
-				"include": [ "SqlServer" ],
+				"include": [ "SqlServer", "MySql", "PostgreSQL" ],
 				"operation": {
 					"addForeignKey": {
 						"name": "FK_SiteGroups_PrimarySiteId",
@@ -963,9 +963,9 @@
 						"PrincipalColumns": [ "Id" ]
 					},
 					{
-						// Foreign key must be added during table creation for Sqlite, but must be added after PageRoutes table is created for Sql server.
+						// Foreign key must be added during table creation for Sqlite, but must be added after PageRoutes table is created for most others.
 						"DatabaseProviderSpecificOperation": {
-							"exclude": [ "SqlServer" ],
+							"exclude": [ "SqlServer", "MySql", "PostgreSQL" ],
 							"operation": {
 								"addForeignKey": {
 									"name": "FK_Pages_DefaultPageRouteId",
@@ -1094,9 +1094,9 @@
 			}
 		},
 		{
-			// Foreign key must be added during table creation for Sqlite, but must be added after PageRoutes table is created for Sql server.
+			// Foreign key must be added during table creation for Sqlite, but must be added after PageRoutes table is created for most others.
 			"DatabaseProviderSpecificOperation": {
-				"include": [ "SqlServer" ],
+				"include": [ "SqlServer", "MySql", "PostgreSQL" ],
 				"operation": {
 					"addForeignKey": {
 						"name": "FK_Pages_DefaultPageRouteId",
@@ -1543,10 +1543,10 @@
 				"isUnique": false
 			}
 		},
-		// Sql server needs the roles table to already exist to create these (and it doesn't).  Sqlite needs to create them when the table is created.
+		// Some databases need the roles table to already exist to create these (and it doesn't).  Sqlite needs to create them when the table is created.
 		{
 			"DatabaseProviderSpecificOperation": {
-				"include": [ "SqlServer" ],
+				"include": [ "SqlServer", "MySql", "PostgreSQL" ],
 				"operation": {
 					"addForeignKey": {
 						"name": "FK_Sites_AdministratorsRoleId",
@@ -1560,7 +1560,7 @@
 		},
 		{
 			"DatabaseProviderSpecificOperation": {
-				"include": [ "SqlServer" ],
+				"include": [ "SqlServer", "MySql", "PostgreSQL" ],
 				"operation": {
 					"addForeignKey": {
 						"name": "FK_Sites_AllUsersRoleId",
@@ -1574,7 +1574,7 @@
 		},
 		{
 			"DatabaseProviderSpecificOperation": {
-				"include": [ "SqlServer" ],
+				"include": [ "SqlServer", "MySql", "PostgreSQL" ],
 				"operation": {
 					"addForeignKey": {
 						"name": "FK_Sites_AnonymousUsersRoleId",
@@ -1588,7 +1588,7 @@
 		},
 		{
 			"DatabaseProviderSpecificOperation": {
-				"include": [ "SqlServer" ],
+				"include": [ "SqlServer", "MySql", "PostgreSQL" ],
 				"operation": {
 					"addForeignKey": {
 						"name": "FK_Sites_RegisteredUsersRoleId",
@@ -2338,13 +2338,13 @@
 					{
 						"name": "Provider",
 						"clrType": "string",
-						"maxLength": 256,
+						"maxLength": 128,
 						"isnullable": false
 					},
 					{
 						"name": "Path",
 						"clrType": "string",
-						"maxLength": 1024,
+						"maxLength": 640,
 						"isnullable": false
 					},
 					{
@@ -2409,13 +2409,13 @@
 					{
 						"name": "Provider",
 						"clrType": "string",
-						"maxLength": 256,
+						"maxLength": 128,
 						"isnullable": false
 					},
 					{
 						"name": "Path",
 						"clrType": "string",
-						"maxLength": 1024,
+						"maxLength": 640,
 						"isnullable": false
 					},
 					{

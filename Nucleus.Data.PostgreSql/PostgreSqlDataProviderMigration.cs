@@ -45,18 +45,17 @@ namespace Nucleus.Data.PostgreSql
 			switch (type)
 			{
 				case DatabaseObjectTypes.Table:
-					command.CommandText = "SELECT COUNT(*) FROM pg_tables WHERE schemaname=@schemaname AND tablename=@objectName";
+					command.CommandText = "SELECT COUNT(*) FROM pg_tables WHERE tablename=@objectName";
 					break;
 
 				case DatabaseObjectTypes.Index:
-					command.CommandText = "SELECT COUNT(*) FROM pg_indexes WHERE schemaname=@schemaname AND indexname=@objectName";
+					command.CommandText = "SELECT COUNT(*) FROM pg_indexes WHERE indexname=@objectName";
 					break;
 
 				default:
 					return false;
 			}
 
-			CreateParameter(command, "schemaname", base.DbContext.Database.GetDbConnection().Database);
 			CreateParameter(command, "objectName", name);
 
 			if (connection.State == System.Data.ConnectionState.Closed)

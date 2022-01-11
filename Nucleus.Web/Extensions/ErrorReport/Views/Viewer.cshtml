@@ -1,9 +1,0 @@
-﻿@model Nucleus.Modules.ErrorReport.ViewModels.Viewer
-@using Nucleus.Abstractions
-@using Nucleus.ViewFeatures
-@using Nucleus.ViewFeatures.HtmlHelpers
-@using Nucleus.Modules.ErrorReport.ViewModels
-@Html.AddStyle("~!/../viewer.css")
-<h2>An error occurred while processing your request</h2>
-<div>Source: @Model?.ExceptionInfo?.Error?.Source</div>
-<div>Message: @Model?.ExceptionInfo?.Error?.Message</div>

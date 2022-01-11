@@ -31,12 +31,27 @@
           "Key": "InMemorySqlite",
           "Type": "Sqlite",
           "ConnectionString": "Data Source=file::memory:;Cache=Shared"
+        },
+        {
+          "Key": "mysql",
+          "Type": "MySql",
+          "ConnectionString": "Server=localhost;Database=nucleus;Uid=root;Pwd=password;"
+        },
+        {
+          "Key": "MariaDb",
+          "Type": "MySql",
+          "ConnectionString": "Server=localhost;Database=nucleus;Uid=root;Pwd=password;"
+        },
+        {
+          "Key": "Postgres",
+          "Type": "PostgreSQL",
+          "ConnectionString": "Server=localhost;Database=nucleus;User Id=postgres;Password=password;"
         }
       ],
       "Schemas": [
         {
           "Name": "*",
-          "ConnectionKey": "TestSqlite"
+          "ConnectionKey": "MariaDb"
         }
       ]
     }

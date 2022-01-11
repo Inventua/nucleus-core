@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nucleus.Data.Common
+namespace Nucleus.Abstractions.Models.Configuration
 {
 	/// <summary>
 	/// Represents database configuration options.

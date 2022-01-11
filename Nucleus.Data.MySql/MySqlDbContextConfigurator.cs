@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Nucleus.Data.EntityFramework;
 using Microsoft.Extensions.Options;
-using Nucleus.Abstractions;
+using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Data.Common;
 
 namespace Nucleus.Data.MySql

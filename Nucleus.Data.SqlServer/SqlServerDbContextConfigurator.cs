@@ -8,6 +8,7 @@ using Nucleus.Data.EntityFramework;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions;
 using Nucleus.Data.Common;
+using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Data.SqlServer
 {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Data.Common
 {

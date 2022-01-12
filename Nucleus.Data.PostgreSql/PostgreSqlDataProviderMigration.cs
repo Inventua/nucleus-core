@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nucleus.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Nucleus.Data.PostgreSql
 {
@@ -63,7 +64,12 @@ namespace Nucleus.Data.PostgreSql
 				connection.Open();
 			}
 
-			//command.Transaction = System.Transactions.Transaction.Current;
+			// Enlist in the current transaction.  
+			if (base.DbContext.Database.CurrentTransaction != null)
+			{
+				command.Transaction = base.DbContext.Database.CurrentTransaction.GetDbTransaction();
+			}
+
 			result = Convert.ToInt32(command.ExecuteScalar());
 
 			return result > 0;

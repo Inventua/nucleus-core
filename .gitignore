@@ -369,3 +369,5 @@ FodyWeavers.xsd
 # Nucleus.Web extensions folder
 Extensions/
 Extensions/**/
+Setup/Extensions/
+Setup/Extensions/*.*

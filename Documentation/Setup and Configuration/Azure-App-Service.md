@@ -25,10 +25,33 @@ FTP information.
 
 9.  Un-zip the install package (zip file) locally, then upload the files to your Azure /site/wwwroot folder.
 
-10.  Edit the databaseSettings.json file.  Paste your database connection string in to the CoreSqlServer connection string, and 
+10.  Edit the databaseSettings.json file, or copy the existing databaseSettings.json file to databaseSettings.Production.json or 
+databaseSettings.Development.json.  Paste your database connection string in to the CoreSqlServer connection string, and 
 alter the existing Schemas connection key named "*" from "CoreSqlite" to "CoreSqlServer". 
 
-11.  Get your site Url from the Azure portal by clicking "App services", then selecting your App Service.  Click the site Url to 
+11.  Create an Azure storage account.
+
+12.  In Azure Portal, open your storage account, select "Access Keys" from the "Security+Networking" submenu and click the "Show Keys"
+link.  Click the copy button next to the first connection string to copy it to the clipboard.
+
+13.  Edit the appSettings.json file, or copy the existing appSettings.json file to appSettings.Production.json or 
+appSettings.Development.json.  Locate the Nucleus/FileSystems/Providers section, remove the default provider and add your Azure storage
+account. 
+
+    "FileSystems": {
+      "Providers": [
+        // File providers have a key, name, provider type and root folder.  You can specify multiple file providers, and the user
+        // will be presented with a list.  The "Name" property is shown to the user.  Each entry has a key which uniquely identifies 
+        // the provider entry.
+        {
+          "Key": "My-Azure-Storage",
+          "Name": "My-Azure-Storage",
+          "ProviderType": "Nucleus.Extensions.AzureBlobStorageFileSystemProvider.FileSystemProvider,Nucleus.Extensions.AzureBlobStorageFileSystemProvider",
+          "ConnectionString": "DefaultEndpointsProtocol=https;AccountName=your-account-name;AccountKey=your-account-key;EndpointSuffix=core.windows.net"
+        }
+      ]
+
+12.  Get your site Url from the Azure portal by clicking "App services", then selecting your App Service.  Click the site Url to 
 launch your site.
 
 ##Troubleshooting

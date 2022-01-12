@@ -85,7 +85,7 @@ namespace Nucleus.Web.Controllers.Setup
 
 				this.HostApplicationLifetime.StopApplication();
 
-				return Ok();
+				return Redirect(viewModel.Site.Aliases.First().Alias);
 			}
 			else
 			{

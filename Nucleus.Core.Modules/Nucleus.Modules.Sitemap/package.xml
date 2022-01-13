@@ -18,6 +18,7 @@
 			</moduleDefinition>
 
 			<file name="readme.txt" />
+			<file name="Sitemap.css" />
 			
 			<folder name="Bin">
 				<file name="Nucleus.Modules.Sitemap.dll" />
@@ -25,7 +26,7 @@
 			
 			<folder name="Views">
 				<file name="Viewer.cshtml" />
-				<file name="Settings.cshtml" />
+				<file name="Settings.cshtml" />				
 			</folder>
 			
 		</component>

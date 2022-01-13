@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31424.327
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.DeveloperTools.VisualStudioTemplates", "Nucleus.DeveloperTools.VisualStudioTemplates\Nucleus.DeveloperTools.VisualStudioTemplates.csproj", "{56C0FBA5-14B7-43D5-8FC2-0F185D45FF68}"
 EndProject
@@ -27,12 +27,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {990CB90F-7DB0-4A5C-8978-D468F1D71192}
-	EndGlobalSection
-	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 2
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Nucleus.DeveloperTools.VisualStudioTemplates\\Nucleus.DeveloperTools.VisualStudioTemplates.csproj
-		SccLocalPath1 = .
-		SccProjectFilePathRelativizedFromConnection1 = Nucleus.DeveloperTools.VisualStudioTemplates\\
 	EndGlobalSection
 EndGlobal

@@ -8,7 +8,7 @@ trigger:
 
 pool:
   name: 'Default'
-  vmImage: 'windows-latest'
+  vmImage: 'windows-2022' # Signals to use VS2022 to build (in preview).  Will change back to windows-latest in the future
 
 variables:
   solution: '**/*.sln'

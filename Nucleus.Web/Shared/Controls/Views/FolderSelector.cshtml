@@ -1,3 +1,5 @@
 ﻿@model Nucleus.ViewFeatures.ViewModels.FolderSelector
-@Html.DropDownList(@Model.PropertyName + ".Provider", new SelectList(Model.Providers, "Key", "Value.Name", Model.SelectedFolder.Provider), new { @class = "providerKey", @data_autopostbackevent = "change" })
-@Html.DropDownList(@Model.PropertyName + ".Id", new SelectList(Model.SelectedFolder.Folders, "Id", "Name", Model.SelectedFolder.Id), new { @data_autopostbackevent = "change" })
+@using Nucleus.Abstractions.FileSystemProviders
+@using Nucleus.Abstractions.Models.FileSystem
+@Html.DropDownList(@Model.PropertyName + ".Provider", new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name), @Model.SelectedFolder.Provider), new { @class = "providerKey", @data_autopostbackevent = "change" })
+@Html.DropDownList(@Model.PropertyName + ".Id", new SelectList(Model.SelectedFolder.Folders, nameof(Folder.Id), nameof(Folder.Name), @Model.SelectedFolder.Id), new { @data_autopostbackevent = "change" })

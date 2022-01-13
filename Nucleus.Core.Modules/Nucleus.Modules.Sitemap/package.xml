@@ -26,6 +26,7 @@
 			<folder name="Views">
 				<file name="Viewer.cshtml" />
 				<file name="Settings.cshtml" />
+				<file name="Sitemap.css" />
 			</folder>
 			
 		</component>

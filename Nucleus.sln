@@ -67,9 +67,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup and Configuration", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.AzureBlobStorageFileSystemProvider", "Nucleus.Core.Modules\Nucleus.Extensions.AzureBlobStorageFileSystemProvider\Nucleus.Extensions.AzureBlobStorageFileSystemProvider.csproj", "{BE4E2A1D-F255-4F21-A80A-1E016C09F0A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Data.MySql", "Nucleus.Data.MySql\Nucleus.Data.MySql.csproj", "{5359B271-0112-49F8-A6ED-1CC6A21F9C32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Data.MySql", "Nucleus.Data.MySql\Nucleus.Data.MySql.csproj", "{5359B271-0112-49F8-A6ED-1CC6A21F9C32}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Data.PostgreSql", "Nucleus.Data.PostgreSql\Nucleus.Data.PostgreSql.csproj", "{11E25778-517D-4AA0-820F-21E5F31F478F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Data.PostgreSql", "Nucleus.Data.PostgreSql\Nucleus.Data.PostgreSql.csproj", "{11E25778-517D-4AA0-820F-21E5F31F478F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -697,7 +697,6 @@ namespace Nucleus.Core.DataProviders
 			PageModule module = await this.Context.PageModules
 				.Where(existing => existing.Id == moduleId)
 				.Include(module => module.ModuleSettings)
-				.AsNoTracking()
 				.FirstOrDefaultAsync();
 
 			foreach (ModuleSetting setting in moduleSettings)
@@ -711,9 +710,9 @@ namespace Nucleus.Core.DataProviders
 				}
 				else
 				{
-					this.Context.Add(setting);
-					this.Context.Entry(setting).Property("PageModuleId").CurrentValue = moduleId;
+					this.Context.Add(setting);					
 					this.Context.Entry(setting).State = EntityState.Added;
+					this.Context.Entry(setting).Property("PageModuleId").CurrentValue = moduleId;
 				}
 			}
 

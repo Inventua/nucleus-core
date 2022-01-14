@@ -199,8 +199,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 				}
 				Azure.Pageable<BlobHierarchyItem> items = containerClient.GetBlobsByHierarchy(Azure.Storage.Blobs.Models.BlobTraits.None, BlobStates.None, new string(System.IO.Path.AltDirectorySeparatorChar, 1), prefix);
 
-				foreach (BlobHierarchyItem item in items
-				.Where(item => String.IsNullOrEmpty(pattern) || System.Text.RegularExpressions.Regex.IsMatch(item.Blob.Name, pattern)))
+				foreach (BlobHierarchyItem item in items)
 				{
 					//GetFullPath(containerClient.Name, item.Prefix)
 					if (!item.IsBlob)
@@ -232,9 +231,12 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 						else
 						{
 							// Item is a file
-							File file = BuildFile(containerClient.Name, item.Blob);
 
-							folder.Files.Add(file);							
+							// Add file if it matches the specifed pattern
+							if (String.IsNullOrEmpty(pattern) || System.Text.RegularExpressions.Regex.IsMatch(item?.Blob.Name, pattern))
+							{
+								folder.Files.Add(BuildFile(containerClient.Name, item.Blob));
+							}
 						}
 					}
 				}

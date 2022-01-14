@@ -33,5 +33,7 @@ namespace Nucleus.Web.ViewModels.Admin
 		// favicon
 		public File SelectedIconFile { get; set; }
 		public File SelectedLogoFile { get; set; }
+		public File SelectedCssFile { get; set; }
+
 	}
 }

@@ -103,6 +103,7 @@ namespace Nucleus.Web.Controllers
 			viewModel.CanEdit = User.CanEditContent(this.Context.Site, this.Context.Page);
 			viewModel.DefaultPageUri = base.Url.GetAbsoluteUri(this.Context.Page.DefaultPageRoute().Path).AbsoluteUri;
 			viewModel.SiteIconPath = Context.Site.GetIconPath();
+			viewModel.SiteCssFilePath = Context.Site.GetCssFilePath();
 
 			return View(this.Context.Page.LayoutPath(this.Context.Site), viewModel);
 		}

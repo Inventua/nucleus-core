@@ -28,11 +28,15 @@
 	{
 		@Html.AddStyle("~/Resources/css/editmode.css")
 	}
-	@Html.AddHtmlEditor()	
-	@Html.RenderStyles()
+	@Html.AddHtmlEditor()		
 	@RenderSection("styles", false)
-	@Html.RenderScripts()
+	@if (!String.IsNullOrEmpty(Model.SiteCssFilePath))
+	{
+		@Html.AddStyle(Model.SiteCssFilePath);
+	}
 	@RenderSection("scripts", false)
+	@Html.RenderStyles()
+	@Html.RenderScripts()	
 </head>
 <body>
 	@if (Model.CanEdit)

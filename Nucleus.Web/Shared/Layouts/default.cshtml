@@ -8,7 +8,8 @@
 
 @section styles
 {
-	<link href="@Url.Content($"~{this.GetRelativeFilePath("default.css")}")" rel="stylesheet" />
+	@Html.AddStyle($"~{this.GetRelativeFilePath("default.css")}");
+	@*<link href="@Url.Content($"~{this.GetRelativeFilePath("default.css")}")" rel="stylesheet" />*@
 }
 
 <div class="LayoutWrapper">

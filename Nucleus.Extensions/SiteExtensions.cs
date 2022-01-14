@@ -149,7 +149,21 @@ namespace Nucleus.Extensions
 		/// <returns></returns>`
 		public static string GetIconPath(this Site site)
 		{
-			if (site.SiteSettings.TryGetValue(Site.SiteImageKeys.FAVICON_FILEID, out Guid fileId))
+			if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.FAVICON_FILEID, out Guid fileId))
+			{
+				return $"/files/{FileExtensions.EncodeFileId(fileId)}";
+			}
+			return null;
+		}
+
+		/// <summary>
+		/// Return the relative path to the site's icon image file.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <returns></returns>`
+		public static string GetCssFilePath(this Site site)
+		{
+			if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.CSSFILE_FILEID, out Guid fileId))
 			{
 				return $"/files/{FileExtensions.EncodeFileId(fileId)}";
 			}

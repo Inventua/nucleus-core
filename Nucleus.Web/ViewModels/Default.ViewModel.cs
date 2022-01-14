@@ -14,6 +14,8 @@ namespace Nucleus.Web.ViewModels
 		public Boolean CanEdit { get; internal set; }
 		public string DefaultPageUri { get; internal set; }
 		public string SiteIconPath { get; internal set; }
+		public string SiteCssFilePath { get; internal set; }
+		
 		public Default(Context context)
 		{			
 			this.Context = context;

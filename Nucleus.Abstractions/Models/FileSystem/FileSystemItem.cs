@@ -52,7 +52,7 @@ namespace Nucleus.Abstractions.Models.FileSystem
 		public Folder Parent { get; set; }
 
 		/// <summary>
-		/// Name of the file system item.
+		/// Display Name of the file system item.
 		/// </summary>
 		public string Name { get; set; }
 

@@ -63,6 +63,21 @@
 				}
 				else
 				{
+				  <SettingsControl caption="Site CSS" helptext="Site CSS.">
+						<div class="nucleus-flex-fields nucleus-fileselector">
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { model = Model.SelectedCssFile, PropertyName = "SelectedCssFile", SelectAnotherActionName = "SelectAnotherCssFile", Pattern = "(.css)" })
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { actionName = "UploadCssFile", controlName = "CssFile", filter = ".css" })
+						</div>
+					</SettingsControl>
+
+					@if (Model.SelectedCssFile != null && Model.SelectedCssFile.Id != Guid.Empty && !Model.Site.AllUsersRole.HasViewPermission(Model.SelectedCssFile.Parent))
+					{
+						<div class="alert alert-warning" role="alert">
+							<h4>Permissions Warning</h4>
+							The CSS file that you have selected is not visible to all users.  Some users may encounter a broken image link.
+						</div>
+					}
+
 					<SettingsControl caption="Site Logo" helptext="Site banner logo.">
 						<div class="nucleus-flex-fields nucleus-fileselector">
 							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { model = Model.SelectedLogoFile, PropertyName = "SelectedLogoFile", SelectAnotherActionName = "SelectAnotherLogo", Pattern = "(.gif|.png|.jpg|.jpeg|.bmp)" })

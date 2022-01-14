@@ -70,8 +70,13 @@ namespace Nucleus.Abstractions.Models
 		/// <summary>
 		/// SiteSettings keys for image settings.
 		/// </summary>
-		public static class SiteImageKeys
+		public static class SiteFilesKeys
 		{
+			/// <summary>
+			/// Site CSS file
+			/// </summary>
+			public const string CSSFILE_FILEID = "css:fileid";
+
 			/// <summary>
 			/// Site logo file
 			/// </summary>

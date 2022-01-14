@@ -32,7 +32,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			Site site = context.HttpContext.RequestServices.GetService<Context>().Site;
 			IFileSystemManager fileSystemManager = context.HttpContext.RequestServices.GetService<IFileSystemManager>();
 			
-			if (site.SiteSettings.TryGetValue(Site.SiteImageKeys.LOGO_FILEID, out Guid fileId))
+			if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.LOGO_FILEID, out Guid fileId))
 			{
 				File logoFile;
 

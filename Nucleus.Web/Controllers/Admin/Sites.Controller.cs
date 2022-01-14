@@ -221,6 +221,14 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Editor", await BuildViewModel(viewModel));
 		}
 
+		
+		[HttpPost]
+		public async Task<ActionResult> SelectAnotherCssFile(ViewModels.Admin.SiteEditor viewModel)
+		{
+			viewModel.SelectedCssFile.ClearSelection();
+			return View("Editor", await BuildViewModel(viewModel));
+		}
+
 		[HttpPost]
 		public async Task<ActionResult> SelectAnotherIcon(ViewModels.Admin.SiteEditor viewModel)
 		{
@@ -255,6 +263,25 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
+		public async Task<ActionResult> UploadCssFile(ViewModels.Admin.SiteEditor viewModel, [FromForm] IFormFile cssFile)
+		{
+			if (cssFile != null)
+			{
+				viewModel.SelectedIconFile.Parent = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedCssFile.Parent.Id);
+				using (System.IO.Stream fileStream = cssFile.OpenReadStream())
+				{
+					viewModel.SelectedCssFile = await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedIconFile.Provider, viewModel.SelectedCssFile.Parent.Path, cssFile.FileName, fileStream, false);
+				}
+			}
+			else
+			{
+				return BadRequest();
+			}
+
+			return View("Editor", await BuildViewModel(viewModel));
+		}
+
+		[HttpPost]
 		public async Task<ActionResult> UploadIcon(ViewModels.Admin.SiteEditor viewModel, [FromForm] IFormFile iconFile)
 		{
 			if (iconFile != null)
@@ -279,6 +306,7 @@ namespace Nucleus.Web.Controllers.Admin
 			Boolean isNew = false;
 
 			// Not selecting a file is a valid choice, so we remove any validation errors for the logo/icon file controls
+			ControllerContext.ModelState.Remove($"{nameof(ViewModels.Admin.SiteEditor.SelectedCssFile)}.{nameof(ViewModels.Admin.SiteEditor.SelectedCssFile.Id)}");
 			ControllerContext.ModelState.Remove($"{nameof(ViewModels.Admin.SiteEditor.SelectedIconFile)}.{nameof(ViewModels.Admin.SiteEditor.SelectedIconFile.Id)}");
 			ControllerContext.ModelState.Remove($"{nameof(ViewModels.Admin.SiteEditor.SelectedLogoFile)}.{nameof(ViewModels.Admin.SiteEditor.SelectedLogoFile.Id)}");
 			ControllerContext.ModelState.Remove($"{nameof(ViewModels.Admin.SiteEditor.Site)}.{nameof(ViewModels.Admin.SiteEditor.Site.DefaultSiteAlias)}.{nameof(ViewModels.Admin.SiteEditor.Site.DefaultSiteAlias.Alias)}");
@@ -303,8 +331,9 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.Site.SetSiteMailTemplates(viewModel.SiteTemplateSelections);
 			viewModel.Site.SetSitePages(viewModel.SitePages);
 
-			viewModel.Site.SiteSettings.TrySetValue(Site.SiteImageKeys.FAVICON_FILEID, viewModel.SelectedIconFile?.Id);
-			viewModel.Site.SiteSettings.TrySetValue(Site.SiteImageKeys.LOGO_FILEID, viewModel.SelectedLogoFile?.Id);
+			viewModel.Site.SiteSettings.TrySetValue(Site.SiteFilesKeys.CSSFILE_FILEID, viewModel.SelectedCssFile?.Id);
+			viewModel.Site.SiteSettings.TrySetValue(Site.SiteFilesKeys.FAVICON_FILEID, viewModel.SelectedIconFile?.Id);
+			viewModel.Site.SiteSettings.TrySetValue(Site.SiteFilesKeys.LOGO_FILEID, viewModel.SelectedLogoFile?.Id);
 
 			await this.SiteManager.Save(viewModel.Site);
 
@@ -372,6 +401,25 @@ namespace Nucleus.Web.Controllers.Admin
 
 			try
 			{
+				if (viewModel.SelectedCssFile != null)
+				{
+					if (viewModel.SelectedCssFile.Id != Guid.Empty)
+					{
+						viewModel.SelectedCssFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedCssFile.Id);
+					}
+					if (viewModel.SelectedCssFile.Parent != null)
+					{
+						viewModel.SelectedCssFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.SelectedCssFile.Parent);
+					}
+				}
+			}
+			catch (System.IO.FileNotFoundException)
+			{
+				// in case file has been deleted
+			}
+
+			try
+			{
 				if (viewModel.SelectedLogoFile != null)
 				{
 					if (viewModel.SelectedLogoFile.Id != Guid.Empty)
@@ -424,10 +472,20 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.SiteTemplateSelections = viewModel.Site.GetSiteTemplateSelections();
 			viewModel.SitePages = viewModel.Site.GetSitePages();
 
+			if (viewModel.SelectedCssFile == null)
+			{
+				viewModel.SelectedCssFile = new();
+				if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.CSSFILE_FILEID, out Guid cssFileId))
+				{
+					viewModel.SelectedCssFile.Id = cssFileId;
+				}
+			}
+
+
 			if (viewModel.SelectedIconFile == null)
 			{
 				viewModel.SelectedIconFile = new();
-				if (site.SiteSettings.TryGetValue(Site.SiteImageKeys.FAVICON_FILEID, out Guid iconFileId))
+				if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.FAVICON_FILEID, out Guid iconFileId))
 				{
 					viewModel.SelectedIconFile.Id = iconFileId;
 				}
@@ -436,7 +494,7 @@ namespace Nucleus.Web.Controllers.Admin
 			if (viewModel.SelectedLogoFile == null)
 			{
 				viewModel.SelectedLogoFile = new();
-				if (site.SiteSettings.TryGetValue(Site.SiteImageKeys.LOGO_FILEID, out Guid logoFileId))
+				if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.LOGO_FILEID, out Guid logoFileId))
 				{
 					viewModel.SelectedLogoFile.Id = logoFileId;
 				}

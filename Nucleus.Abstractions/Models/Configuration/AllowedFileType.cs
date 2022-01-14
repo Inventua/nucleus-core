@@ -36,5 +36,11 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// value "??" in a signature skips validation of the byte in the ordinal position represented by the ?? characters.
 		/// </remarks>
 		public List<string> Signatures { get; private set; }
+
+		/// <summary>
+		/// Specifies whether uploads if the file type are restricted to site administrators.
+		/// </summary>
+		public Boolean Restricted { get; private set; }
+
 	}
 }

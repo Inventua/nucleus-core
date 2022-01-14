@@ -49,7 +49,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
 			if (!scripts.ContainsKey(scriptPath))
 			{
-				scripts.Add(scriptPath, System.Reflection.Assembly.GetCallingAssembly().GetName().Version);
+				scripts.Add(scriptPath, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
 				htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] = scripts;
 			}
 

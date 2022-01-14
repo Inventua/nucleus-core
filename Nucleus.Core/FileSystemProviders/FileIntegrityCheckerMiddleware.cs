@@ -58,6 +58,13 @@ namespace Nucleus.Core.FileSystemProviders
 					Boolean isValid = false;
 					if (fileType != null)
 					{
+						if (fileType.Restricted && !context.User.IsSiteAdmin(this.Context.Site))
+						{
+							Logger.LogWarning("File upload [filename: {0}] blocked: File type Permission Denied.", file.FileName);
+							context.Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+							return;
+						}
+
 						foreach (string signature in fileType.Signatures)
 						{
 							if (IsValid(signature, sample))

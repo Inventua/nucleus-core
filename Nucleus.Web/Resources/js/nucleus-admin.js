@@ -129,7 +129,7 @@ function _handleContentLoaded(event, page, target, data, url, triggerEvent, stat
 		}
 		else
 		{
-			jQuery(triggerEvent.currentTarget).parents('li').addClass('selected');
+			jQuery(triggerEvent.currentTarget).parent('li').addClass('selected');
 		}
 
 		if (triggerEvent.currentTarget.scrollIntoView)

@@ -468,7 +468,7 @@ ul.nucleus-control-panel-items a
 {
 	padding: 4px 8px;
 	text-decoration: none;
-	margin: 0 0 4px 0;
+	margin: 0;/* 0 4px 0;*/
 	color: black;
 }
 
@@ -484,14 +484,20 @@ ul.nucleus-control-panel-items a
 	color: white;
 }
 
-.nucleus-index-items li.selected > A
+.nucleus-index-items li.selected a:hover
 {
-	background-color: #197ba4;
+	border-radius: 0;
 }
 
-.nucleus-index-items li.selected > *
+.nucleus-index-items li.selected > a, .nucleus-index-items li.selected > a:hover, .nucleus-index-items li.selected > a:active, .nucleus-index-items li.selected > button
 {
+	background-color: #197ba4;
 	color: white;
+}
+
+.nucleus-index-items li.selected .nucleus-get-childpages
+{
+	border-radius: 0;
 }
 
 .nucleus-admin-content .nucleus-editor-panel

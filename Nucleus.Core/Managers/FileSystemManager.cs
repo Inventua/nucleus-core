@@ -534,5 +534,32 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
+		public async Task<File> RefreshProperties(Site site, File file)
+		{
+			try
+			{
+				if (file != null)
+				{
+					if (file.Id != Guid.Empty)
+					{
+						file = await this.GetFile(site, file.Id);
+					}
+					if (file.Parent != null)
+					{
+						file.Parent.Permissions = await this.ListPermissions(file.Parent);
+					}
+					else
+					{
+						file.Parent = await this.GetFolder(site, file.Provider, "");
+					}
+				}
+			}
+			catch (System.IO.FileNotFoundException)
+			{
+				// in case file has been deleted
+			}
+
+			return file;
+		}
 	}
 }

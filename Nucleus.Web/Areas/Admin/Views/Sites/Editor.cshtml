@@ -66,7 +66,7 @@
 				  <SettingsControl caption="Site CSS" helptext="Site CSS.">
 						<div class="nucleus-flex-fields nucleus-fileselector">
 							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { model = Model.SelectedCssFile, PropertyName = "SelectedCssFile", SelectAnotherActionName = "SelectAnotherCssFile", Pattern = "(.css)" })
-							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { actionName = "UploadCssFile", controlName = "CssFile", filter = ".css" })
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { model = Model.SelectedCssFile?.Parent, actionName = "UploadCssFile", controlName = "CssFile", filter = ".css" })
 						</div>
 					</SettingsControl>
 
@@ -74,14 +74,14 @@
 					{
 						<div class="alert alert-warning" role="alert">
 							<h4>Permissions Warning</h4>
-							The CSS file that you have selected is not visible to all users.  Some users may encounter a broken image link.
+							The CSS file that you have selected is not visible to all users.  Some users may encounter a broken link.
 						</div>
 					}
 
 					<SettingsControl caption="Site Logo" helptext="Site banner logo.">
 						<div class="nucleus-flex-fields nucleus-fileselector">
 							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { model = Model.SelectedLogoFile, PropertyName = "SelectedLogoFile", SelectAnotherActionName = "SelectAnotherLogo", Pattern = "(.gif|.png|.jpg|.jpeg|.bmp)" })
-							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { actionName = "UploadLogo", controlName = "logoFile", filter = "image/*" })
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { model = Model.SelectedLogoFile?.Parent, actionName = "UploadLogo", controlName = "logoFile", filter = "image/*" })
 						</div>
 					</SettingsControl>
 
@@ -96,7 +96,7 @@
 					<SettingsControl caption="Site Icon" helptext="Site icon.">
 						<div class="nucleus-flex-fields nucleus-fileselector">
 							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { model = Model.SelectedIconFile, PropertyName = "SelectedIconFile", SelectAnotherActionName = "SelectAnotherIcon", Pattern = "(.gif|.png|.jpg|.jpeg|.ico)" })
-							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { actionName = "UploadIcon", controlName = "iconFile", filter = "image/*" })
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { model = Model.SelectedIconFile?.Parent, actionName = "UploadIcon", controlName = "iconFile", filter = "image/*" })
 						</div>
 					</SettingsControl>
 

@@ -171,5 +171,15 @@ namespace Nucleus.Abstractions.Managers
 		/// <returns></returns>
 		public Task<File> SaveFile(Site site, string providerName, string parentPath, string newFileName, System.IO.Stream content, Boolean overwrite);
 
+		/// <summary>
+		/// Refresh the properties of a file.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="file"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// Use this method to populate the properties of a file after model binding returns a file object with just the Id property populated.
+		/// </remarks>
+		public Task<File> RefreshProperties(Site site, File file);
 	}
 }

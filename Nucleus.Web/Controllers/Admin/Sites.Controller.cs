@@ -399,62 +399,70 @@ namespace Nucleus.Web.Controllers.Admin
 			// todo
 			viewModel.SiteGroups = new List<SiteGroup>();
 
-			try
-			{
-				if (viewModel.SelectedCssFile != null)
-				{
-					if (viewModel.SelectedCssFile.Id != Guid.Empty)
-					{
-						viewModel.SelectedCssFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedCssFile.Id);
-					}
-					if (viewModel.SelectedCssFile.Parent != null)
-					{
-						viewModel.SelectedCssFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.SelectedCssFile.Parent);
-					}
-				}
-			}
-			catch (System.IO.FileNotFoundException)
-			{
-				// in case file has been deleted
-			}
+			viewModel.SelectedCssFile = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.SelectedCssFile);
+			viewModel.SelectedIconFile = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.SelectedIconFile);
+			viewModel.SelectedLogoFile = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.SelectedLogoFile);
 
-			try
-			{
-				if (viewModel.SelectedLogoFile != null)
-				{
-					if (viewModel.SelectedLogoFile.Id != Guid.Empty)
-					{
-						viewModel.SelectedLogoFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedLogoFile.Id);
-					}
-					if (viewModel.SelectedLogoFile.Parent != null)
-					{
-						viewModel.SelectedLogoFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.SelectedLogoFile.Parent);
-					}
-				}
-			}
-			catch (System.IO.FileNotFoundException)
-			{
-				// in case file has been deleted
-			}
+			////try
+			////{
+			////	if (viewModel.SelectedCssFile != null)
+			////	{
+			////		if (viewModel.SelectedCssFile.Id != Guid.Empty)
+			////		{
+			////			viewModel.SelectedCssFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedCssFile.Id);
+			////		}
+			////		if (viewModel.SelectedCssFile.Parent != null)
+			////		{
+			////			viewModel.SelectedCssFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.SelectedCssFile.Parent);
+			////		}
+			////	}
+			////}
+			////catch (System.IO.FileNotFoundException)
+			////{
+			////	// in case file has been deleted
+			////}
 
-			try
-			{
-				if (viewModel.SelectedIconFile != null)
-				{
-					if (viewModel.SelectedIconFile.Id != Guid.Empty)
-					{
-						viewModel.SelectedIconFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedIconFile.Id);
-					}
-					if (viewModel.SelectedIconFile.Parent != null)
-					{
-						viewModel.SelectedIconFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.SelectedIconFile.Parent);
-					}
-				}
-			}
-			catch (System.IO.FileNotFoundException)
-			{
-				// in case file has been deleted
-			}
+			////try
+			////{
+			////	if (viewModel.SelectedLogoFile != null)
+			////	{
+			////		if (viewModel.SelectedLogoFile.Id != Guid.Empty)
+			////		{
+			////			viewModel.SelectedLogoFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedLogoFile.Id);
+			////		}
+			////		if (viewModel.SelectedLogoFile.Parent != null)
+			////		{
+			////			viewModel.SelectedLogoFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.SelectedLogoFile.Parent);
+			////		}
+			////		else
+			////		{
+			////			viewModel.SelectedLogoFile.Parent = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedLogoFile.Provider, "");
+			////		}
+			////	}
+			////}
+			////catch (System.IO.FileNotFoundException)
+			////{
+			////	// in case file has been deleted
+			////}
+
+			////try
+			////{
+			////	if (viewModel.SelectedIconFile != null)
+			////	{
+			////		if (viewModel.SelectedIconFile.Id != Guid.Empty)
+			////		{
+			////			viewModel.SelectedIconFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedIconFile.Id);
+			////		}
+			////		if (viewModel.SelectedIconFile.Parent != null)
+			////		{
+			////			viewModel.SelectedIconFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.SelectedIconFile.Parent);
+			////		}
+			////	}
+			////}
+			////catch (System.IO.FileNotFoundException)
+			////{
+			////	// in case file has been deleted
+			////}
 
 			return viewModel;
 		}

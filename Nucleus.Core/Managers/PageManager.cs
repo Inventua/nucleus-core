@@ -366,6 +366,7 @@ namespace Nucleus.Core.Managers
 
 						this.CacheManager.PageCache().Remove(previousPage.Id);
 						this.CacheManager.PageCache().Remove(page.Id);
+						this.CacheManager.PageMenuCache().Clear();
 						break;
 					}
 				}
@@ -422,6 +423,7 @@ namespace Nucleus.Core.Managers
 
 						this.CacheManager.PageCache().Remove(previousPage.Id);
 						this.CacheManager.PageCache().Remove(page.Id);
+						this.CacheManager.PageMenuCache().Clear();
 						break;
 					}
 				}

@@ -90,16 +90,16 @@ namespace Nucleus.Web.Controllers.Setup
 			else
 			{
 				return BadRequest(ModelState);
-			}		
+			}
 		}
 
 		private async Task BuildSite(ViewModels.Setup.SiteWizard viewModel)
 		{
 			// install extensions
-			foreach (ViewModels.Setup.SiteWizard.InstallableExtension selectedExtension in viewModel.InstallableExtensions.Where(ext=>ext.IsSelected))
+			foreach (ViewModels.Setup.SiteWizard.InstallableExtension selectedExtension in viewModel.InstallableExtensions.Where(ext => ext.IsSelected))
 			{
 				using (System.IO.FileStream extensionStream = System.IO.File.OpenRead(System.IO.Path.Combine(InstallableExtensionsFolder().FullName, selectedExtension.Filename)))
-				{ 					
+				{
 					await this.ExtensionManager.InstallExtension(await this.ExtensionManager.SaveTempFile(extensionStream));
 				}
 			}
@@ -107,25 +107,25 @@ namespace Nucleus.Web.Controllers.Setup
 			// create site
 			//using (Stream templateFile = System.IO.File.OpenRead(System.IO.Path.Combine(TemplatesFolder().FullName, viewModel.TemplateTempFileName)))
 			//{
-				//Nucleus.Abstractions.Models.Export.SiteTemplate template = this.SiteManager.ParseTemplate(templateFile);
-				Nucleus.Abstractions.Models.Export.SiteTemplate template = await this.SiteManager.ReadTemplateTempFile(viewModel.TemplateTempFileName);
+			//Nucleus.Abstractions.Models.Export.SiteTemplate template = this.SiteManager.ParseTemplate(templateFile);
+			Nucleus.Abstractions.Models.Export.SiteTemplate template = await this.SiteManager.ReadTemplateTempFile(viewModel.TemplateTempFileName);
 
-				template.Site.Name = viewModel.Site.Name;
+			template.Site.Name = viewModel.Site.Name;
+			//viewModel.Site.Aliases.First().Alias = this.HttpContext.Request.Host.Value;
+			viewModel.Site.DefaultSiteAlias.Id = Guid.NewGuid();
+			template.Site.Aliases = new() { viewModel.Site.DefaultSiteAlias };
+			template.Site.DefaultSiteAlias = viewModel.Site.DefaultSiteAlias;
 
-				viewModel.Site.DefaultSiteAlias.Id = Guid.NewGuid();
-				template.Site.Aliases = new() { viewModel.Site.DefaultSiteAlias };
-				template.Site.DefaultSiteAlias = viewModel.Site.DefaultSiteAlias;
+			template.Site.AdministratorsRole = viewModel.Site.AdministratorsRole;
+			template.Site.AllUsersRole = viewModel.Site.AllUsersRole;
+			template.Site.AnonymousUsersRole = viewModel.Site.AnonymousUsersRole;
+			template.Site.RegisteredUsersRole = viewModel.Site.RegisteredUsersRole;
 
-				template.Site.AdministratorsRole = viewModel.Site.AdministratorsRole;
-				template.Site.AllUsersRole = viewModel.Site.AllUsersRole;
-				template.Site.AnonymousUsersRole = viewModel.Site.AnonymousUsersRole;
-				template.Site.RegisteredUsersRole = viewModel.Site.RegisteredUsersRole;
-				
-				template.Site.DefaultContainerDefinition = viewModel.Site.DefaultContainerDefinition;
-				template.Site.DefaultLayoutDefinition = viewModel.Site.DefaultLayoutDefinition;
-				template.Site.HomeDirectory = viewModel.Site.HomeDirectory;
+			template.Site.DefaultContainerDefinition = viewModel.Site.DefaultContainerDefinition;
+			template.Site.DefaultLayoutDefinition = viewModel.Site.DefaultLayoutDefinition;
+			template.Site.HomeDirectory = viewModel.Site.HomeDirectory;
 
-				viewModel.Site = await this.SiteManager.Import(template);
+			viewModel.Site = await this.SiteManager.Import(template);
 			//}
 
 			// create users
@@ -170,7 +170,7 @@ namespace Nucleus.Web.Controllers.Setup
 			{
 				viewModel.Templates.Add(new ViewModels.Setup.SiteWizard.SiteTemplate(System.IO.Path.GetFileNameWithoutExtension(templateFile.Name).Replace('-', ' '), templateFile.Name));
 			}
-						
+
 			if (String.IsNullOrEmpty(viewModel.SelectedTemplate) && viewModel.Templates.Count == 1)
 			{
 				viewModel.SelectedTemplate = viewModel.Templates[0].FileName;
@@ -185,7 +185,7 @@ namespace Nucleus.Web.Controllers.Setup
 					viewModel.Site = template.Site;
 					if (String.IsNullOrEmpty(viewModel.Site.DefaultSiteAlias?.Alias))
 					{
-						viewModel.Site.DefaultSiteAlias = new SiteAlias() { Alias = ControllerContext.HttpContext.Request.Host + ControllerContext.HttpContext.Request.PathBase };						
+						viewModel.Site.DefaultSiteAlias = new SiteAlias() { Alias = ControllerContext.HttpContext.Request.Host + ControllerContext.HttpContext.Request.PathBase };
 					}
 					modulesInTemplate = template.Pages
 						.SelectMany(page => page.Modules)
@@ -224,7 +224,7 @@ namespace Nucleus.Web.Controllers.Setup
 					viewModel.TemplateTempFileName = await this.SiteManager.SaveTemplateTempFile(template);
 				}
 			}
-					
+
 
 			List<ViewModels.Setup.SiteWizard.InstallableExtension> installableExtensions = new();
 
@@ -303,11 +303,11 @@ namespace Nucleus.Web.Controllers.Setup
 
 			viewModel.MissingExtensionWarnings = warnings.Distinct();
 
-			viewModel.InstallableExtensions = installableExtensions.OrderBy(ext=>ext.Name).ToList();
+			viewModel.InstallableExtensions = installableExtensions.OrderBy(ext => ext.Name).ToList();
 			viewModel.Layouts = (await this.LayoutManager.List()).InsertDefaultListItem();
 			viewModel.Containers = (await this.ContainerManager.List()).InsertDefaultListItem();
 
-			viewModel.Site.Aliases.First().Alias = this.HttpContext.Request.Host.Value;
+			viewModel.Site.DefaultSiteAlias.Alias = this.HttpContext.Request.Host.Value;
 
 			return viewModel;
 		}
@@ -315,7 +315,7 @@ namespace Nucleus.Web.Controllers.Setup
 		private async Task<ViewModels.Setup.SiteWizard> BuildViewModel()
 		{
 			ViewModels.Setup.SiteWizard viewModel = await BuildViewModel(new());
-			
+
 
 			return viewModel;
 		}

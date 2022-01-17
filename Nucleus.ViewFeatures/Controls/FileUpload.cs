@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions.Models;
-using Nucleus.Abstractions.FileSystemProviders;
+using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models.FileSystem;
 
 namespace Nucleus.ViewFeatures.Controls
@@ -17,32 +17,28 @@ namespace Nucleus.ViewFeatures.Controls
 	public class FileUpload : ViewComponent 
 	{
 		private Context Context { get; }
-		private IFileSystemProviderFactory FileSystemProviderFactory { get; }
+		private IFileSystemManager FileSystemManager { get; }
 
 		/// <summary>
 		/// Create an instance.
 		/// </summary>
 		/// <param name="Context"></param>
-		/// <param name="fileSystemProviderFactory"></param>
-		public FileUpload(Context Context, IFileSystemProviderFactory fileSystemProviderFactory)
+		/// <param name="fileSystemManager"></param>
+		public FileUpload(Context Context, IFileSystemManager fileSystemManager)
 		{
 			this.Context = Context;
-			this.FileSystemProviderFactory = fileSystemProviderFactory;
+			this.FileSystemManager = fileSystemManager;
 		}
 
 		/// <summary>
 		/// Invoke (render) the control.
 		/// </summary>
+		/// <param name="model"></param>
 		/// <param name="filter"></param>
 		/// <param name="actionName"></param>
 		/// <param name="controlName"></param>
 		/// <returns></returns>
-		public Task<IViewComponentResult> InvokeAsync(string filter, string actionName, string controlName)
-		{
-			return Task.Run(() => Invoke(filter, actionName, controlName));
-		}
-
-		private IViewComponentResult Invoke(string filter, string actionName, string controlName)
+		public async Task<IViewComponentResult> InvokeAsync(Folder model, string filter, string actionName, string controlName)
 		{
 			ViewModels.FileUpload viewModel = new()
 			{
@@ -54,7 +50,33 @@ namespace Nucleus.ViewFeatures.Controls
 				Filter = filter
 			};
 
+			if (model != null)
+			{
+				if (model.Id != Guid.Empty)
+				{
+					model = await this.FileSystemManager.GetFolder(this.Context.Site, model.Id);
+				}
+			}
+
+			if (model == null)
+			{
+				model = new();
+			}
+
+			// if no provider is selected, default the selected provider key to the first available
+			if (String.IsNullOrEmpty(model.Provider))
+			{
+				model.Provider = this.FileSystemManager.ListProviders().FirstOrDefault()?.Key;
+			}
+
+			if (model.Id == Guid.Empty)
+			{
+				model = await this.FileSystemManager.GetFolder(this.Context.Site, model.Provider, model.Path);
+			}
+
+			viewModel.Enabled = model.Capabilities.CanStoreFiles;
+
 			return View("~/Shared/Controls/Views/FileUpload.cshtml", viewModel);
-		}
+		}		
 	}
 }

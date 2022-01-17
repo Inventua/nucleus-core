@@ -37,6 +37,11 @@ namespace Nucleus.ViewFeatures.ViewModels
 		public string ExtensionName { get; set; }
 
 		/// <summary>
+		/// Specifies whether uploads are enabled.
+		/// </summary>
+		public Boolean Enabled { get; set; }
+
+		/// <summary>
 		/// File filter.
 		/// </summary>
 		/// <remarks>

@@ -544,13 +544,14 @@ namespace Nucleus.Core.Managers
 					{
 						file = await this.GetFile(site, file.Id);
 					}
+
 					if (file.Parent != null)
 					{
 						file.Parent.Permissions = await this.ListPermissions(file.Parent);
 					}
 					else
 					{
-						file.Parent = await this.GetFolder(site, file.Provider, "");
+						file.Parent = await this.GetFolder(site, file.Provider ?? this.ListProviders().FirstOrDefault()?.Key, "");
 					}
 				}
 			}

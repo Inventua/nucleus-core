@@ -139,10 +139,22 @@ namespace Nucleus.Core.DataProviders
 		public async Task<Guid> DetectSite(Microsoft.AspNetCore.Http.HostString requestUri, string pathBase)
 		{
 			string siteAlias = requestUri.Value + pathBase;
-			Site site = await this.Context.Sites
-				.Where(site => site.Aliases.Where(alias => alias.Alias == siteAlias).Any())
-				.AsNoTracking()
-				.FirstOrDefaultAsync();
+			Site site;
+
+			if (String.IsNullOrEmpty(siteAlias) && await CountSites() == 1)
+			{
+				site = await this.Context.Sites
+					.AsNoTracking()
+					.OrderBy(site => site.DateAdded)
+					.FirstOrDefaultAsync();
+			}
+			else
+			{
+				site = await this.Context.Sites
+					.Where(site => site.Aliases.Where(alias => alias.Alias == siteAlias).Any())
+					.AsNoTracking()
+					.FirstOrDefaultAsync();
+			}
 			return site == null ? Guid.Empty : site.Id;
 		}
 

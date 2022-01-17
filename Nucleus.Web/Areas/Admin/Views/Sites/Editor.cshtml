@@ -31,7 +31,7 @@
 				@Html.HiddenFor(model => model.Site.Id)
 				@Html.HiddenFor(model => model.IsCurrentSiteEditor)
 
-				<SettingsControl caption="Name" helptext="Site name.  This value is for reference purposes only.">
+				<SettingsControl caption="Name" helptext="Site name.  This value can be displayed on-screen, depending on the selected layout.">
 					@Html.TextBoxFor(model => model.Site.Name, new { @maxlength = 256 })
 				</SettingsControl>
 
@@ -284,7 +284,8 @@
 	</TabContent>
 
 	<div class="nucleus-button-panel">
-		<input type="submit" class="btn btn-primary" value="Save Changes" formaction="@Url.AreaAction("Save", "Sites", "Admin")" data-target=".nucleus-adminpage" />
+		<input type="submit" class="btn btn-primary nucleus-dialogresult" value="Save Changes" formaction="@Url.AreaAction("Save", "Sites", "Admin")" data-target=".nucleus-adminpage" />		
+		
 		@if (Model.Site.Id != Guid.Empty)
 		{
 			if (!Model.IsCurrentSite)

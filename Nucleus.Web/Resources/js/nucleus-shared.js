@@ -274,24 +274,6 @@ function _Page()
 			}
 		}
 
-		//// first, try to get the closest (single) element matching the target selector
-		//if (eventTarget !== null && eventTarget.length > 0)
-		//{
-		//	// check children
-		//	target = eventTarget.find(targetSelector).first();
-
-		//	if (target === null || target.length === 0)
-		//	{
-		//		// check (self) and parents
-		//		target = eventTarget.closest(targetSelector).first();
-		//	}
-		//}
-
-		//// If that doesn't find anything, look through the whole DOM
-		//if (target === null || target.length === 0)
-		//{
-		//	target = jQuery(targetSelector).first();
-		//}
 		target = _getTarget(eventTarget, targetSelector);
 
 		// reset validation error highlighting
@@ -658,7 +640,7 @@ function _Page()
 		}
 
 		// if we get an empty response, and the target is in an iframe and the iFrame is not #AdminFrame, hide the iframe and refresh the page
-		if (self !== top && data === '' && jQuery(frameElement).attr('id') !== 'AdminFrame')
+		if (self !== top && data === '' && (jQuery(frameElement).attr('id') !== 'AdminFrame' || source.hasClass('nucleus-dialogresult')))
 		{
 			jQuery(frameElement).hide();
 			window.parent.document.dispatchEvent(new CustomEvent('Refresh'));

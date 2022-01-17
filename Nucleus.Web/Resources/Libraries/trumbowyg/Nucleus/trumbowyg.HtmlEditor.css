@@ -39,10 +39,10 @@
 	flex-grow: 1;
 }
 
-.trumbowyg-editor p
+/*.trumbowyg-editor p
 {
 	margin: 0;
-}
+}*/
 
 .trumbowyg-modal form.nucleus-fileselectorform, .trumbowyg-modal .nucleus-fileselector, .trumbowyg-modal .nucleus-pageselector
 {

@@ -30,6 +30,11 @@ namespace Nucleus.ViewFeatures.TagHelpers
 		public ViewContext ViewContext { get; set; }
 
 		/// <summary>
+		/// Toggles whether to suppress display when only one item (the current page) is being shown in the breadcrumb.
+		/// </summary>
+		public Boolean HideTopLevel { get; set; } = true;
+
+		/// <summary>
 		/// Generate the output.
 		/// </summary>
 		/// <param name="context"></param>
@@ -38,7 +43,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
 
 		async public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
 		{
-			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Breadcrumb.Build(this.ViewContext, null);
+			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Breadcrumb.Build(this.ViewContext, this.HideTopLevel, null);
 
 			output.TagName = builder.TagName;
 			output.MergeAttributes(builder);

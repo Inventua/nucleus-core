@@ -31,6 +31,11 @@
 				<relativePath>Shared\Containers\default.cshtml</relativePath>
 			</containerDefinition>
 
+			<containerDefinition id="006CF94A-8279-4054-8EC2-4E0CAEBE77C7">
+				<friendlyName>No Title</friendlyName>
+				<relativePath>Shared\Containers\no-title.cshtml</relativePath>
+			</containerDefinition>
+			
 			<containerDefinition id="CC0B83AC-A2D4-426F-B455-1715102D4A5E">
 				<friendlyName>No Container</friendlyName>
 				<relativePath>Shared\Containers\no-container.cshtml</relativePath>

@@ -39,6 +39,7 @@
 	flex-grow: 1;
 	display: flex;		
 	overflow: auto;
+	flex-direction: column;
 }
 
 .ContentPane
@@ -46,7 +47,7 @@
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
-	overflow: auto;
+	/*overflow: auto;*/
 }
 
 .ContentPane > div

@@ -371,4 +371,4 @@ Extensions/
 Extensions/**/
 Setup/Extensions/
 Setup/Extensions/*.*
-*_Extension.zip
+Nucleus.Core.Modules/**/*.zip

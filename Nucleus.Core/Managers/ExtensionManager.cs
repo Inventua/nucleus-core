@@ -37,7 +37,7 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		private ExtensionInstaller CreateInstaller(Abstractions.Models.Extensions.package package)
 		{
-			return new ExtensionInstaller(package, this);			
+			return new ExtensionInstaller(package, this, this.Logger);			
 		}
 
 		/// <summary>
@@ -47,7 +47,7 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		private ExtensionInstaller CreateInstaller(Stream input)
 		{
-			return new ExtensionInstaller(input, this, this.FolderOptions);
+			return new ExtensionInstaller(input, this, this.Logger, this.FolderOptions);
 		}
 
 		/// <summary>

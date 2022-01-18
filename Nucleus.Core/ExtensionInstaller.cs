@@ -11,6 +11,7 @@ using Nucleus.Abstractions;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 
 namespace Nucleus.Core
 {
@@ -23,6 +24,7 @@ namespace Nucleus.Core
 		private Stream ArchiveStream { get; }
 		private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
 		private Abstractions.Models.Extensions.package Package { get; set; }
+		private ILogger<IExtensionManager> Logger { get; }
 
 		public Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary ModelState { get; } = new() { MaxAllowedErrors = int.MaxValue};
 
@@ -36,7 +38,7 @@ namespace Nucleus.Core
 		/// <remarks>
 		/// This constructor is called by the <see cref="ExtensionManager"/> class.  
 		/// </remarks>
-		internal ExtensionInstaller(Stream input, IExtensionManager extensionManager, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
+		internal ExtensionInstaller(Stream input, IExtensionManager extensionManager, ILogger<IExtensionManager> logger, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
 		{
 			this.FolderOptions = folderOptions;
 
@@ -47,6 +49,7 @@ namespace Nucleus.Core
 			this.Archive = OpenZipArchive(this.ArchiveStream);
 
 			this.ExtensionManager = extensionManager;
+			this.Logger = logger;
 		}
 
 		/// <summary>
@@ -57,10 +60,11 @@ namespace Nucleus.Core
 		/// <remarks>
 		/// This constructor is called by the <see cref="ExtensionManager"/> class.  
 		/// </remarks>
-		internal ExtensionInstaller(Abstractions.Models.Extensions.package package, IExtensionManager extensionManager)
+		internal ExtensionInstaller(Abstractions.Models.Extensions.package package, IExtensionManager extensionManager, ILogger<IExtensionManager> logger)
 		{
 			this.Package = package;
 			this.ExtensionManager = extensionManager;
+			this.Logger = logger;
 		}
 
 		private static ZipArchive OpenZipArchive(Stream input)
@@ -109,15 +113,6 @@ namespace Nucleus.Core
 			ZipArchiveEntry manifestEntry = null;
 
 			manifestEntry = this.Archive.Entries.Where(entry => entry.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-
-			//foreach (ZipArchiveEntry entry in this.Archive.Entries)
-			//{
-			//	if (entry.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase))
-			//	{
-			//		manifestEntry = entry;
-			//		break;
-			//	}
-			//}
 
 			if (manifestEntry == null)
 			{
@@ -220,18 +215,18 @@ namespace Nucleus.Core
 						// top level files
 						foreach (Nucleus.Abstractions.Models.Extensions.file file in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.file>())
 						{
-							CopyFile(component.folderName, file, null);
+							CopyFile(component.folderName, "", file);
 						}
 
 						foreach (Nucleus.Abstractions.Models.Extensions.folder folder in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.folder>())
 						{
-							CopyFolder(component.folderName, folder);
+							CopyFolder(component.folderName, folder.name, folder);
 						}
 
 						// The package file is not included in the manifest, so we have to install it separately
 						Nucleus.Abstractions.Models.Extensions.file packageFile = new();
 						packageFile.name = IExtensionManager.PACKAGE_MANIFEST_FILENAME;
-						CopyFile(component.folderName, packageFile, null);
+						CopyFile(component.folderName, "", packageFile);
 
 						// apply module definitions
 						foreach (Nucleus.Abstractions.Models.Extensions.moduleDefinition moduleDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.moduleDefinition>())
@@ -490,12 +485,12 @@ namespace Nucleus.Core
 					// top level files
 					foreach (Nucleus.Abstractions.Models.Extensions.file file in component.Items.OfType<Abstractions.Models.Extensions.file>())
 					{
-						ValidateFile(component.folderName, file, null);
+						ValidateFile(component.folderName, "", file);
 					}
 
 					foreach (Nucleus.Abstractions.Models.Extensions.folder folder in component.Items.OfType<Abstractions.Models.Extensions.folder>())
 					{
-						ValidateFolder(component.folderName, folder);						
+						ValidateFolder(component.folderName, folder.name, folder);						
 					}
 				}
 			}
@@ -509,13 +504,13 @@ namespace Nucleus.Core
 		/// <param name="componentFolder"></param>
 		/// <param name="folder"></param>
 		/// <returns></returns>
-		private Boolean ValidateFolder(string componentFolder, Abstractions.Models.Extensions.folder folder)
+		private Boolean ValidateFolder(string componentFolder, string path, Abstractions.Models.Extensions.folder folder)
 		{
 			Boolean result = true;
 
 			foreach (Abstractions.Models.Extensions.file file in folder.Items.OfType<Abstractions.Models.Extensions.file>())
 			{
-				if (!ValidateFile(componentFolder, file, folder))
+				if (!ValidateFile(componentFolder, path, file))
 				{
 					result = false;
 				}
@@ -523,8 +518,8 @@ namespace Nucleus.Core
 
 			foreach (Nucleus.Abstractions.Models.Extensions.folder subfolder in folder.Items.OfType<Nucleus.Abstractions.Models.Extensions.folder>())
 			{
-				subfolder.name = folder.name + "/" + subfolder.name;
-				ValidateFolder(componentFolder, subfolder);
+				//subfolder.name = folder.name + "/" + subfolder.name;
+				ValidateFolder(componentFolder, path + "/" + subfolder.name, subfolder);
 			}
 
 			return result;
@@ -537,15 +532,16 @@ namespace Nucleus.Core
 		/// <param name="file"></param>
 		/// <param name="folder"></param>
 		/// <returns></returns>
-		private Boolean ValidateFile(string componentFolder, Abstractions.Models.Extensions.file file, Abstractions.Models.Extensions.folder folder)
+		private Boolean ValidateFile(string componentFolder, string path, Abstractions.Models.Extensions.file file)
 		{
 			string zipFullName;
 			ZipArchiveEntry entry;
 
-			if (folder != null)
+			if (!String.IsNullOrEmpty(path))
 			{
 				// Note: Zip file paths (.FullName) always use "/" to separate folder paths, per ".ZIP File Format Specification" 4.4.17.1. [https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT]
-				zipFullName = $"{folder.name}/{file.name}";
+				//zipFullName = $"{folder.name}/{file.name}";
+				zipFullName = $"{path}/{file.name}";
 			}
 			else
 			{
@@ -613,20 +609,19 @@ namespace Nucleus.Core
 		/// <param name="componentFolder">Source folder.</param>
 		/// <param name="folder">Target folder.</param>
 		/// <returns></returns>
-		private Boolean CopyFolder(string componentFolder, Abstractions.Models.Extensions.folder folder)
+		private Boolean CopyFolder(string componentFolder, string path, Abstractions.Models.Extensions.folder folder)
 		{
 			foreach (Abstractions.Models.Extensions.file file in folder.Items.OfType<Nucleus.Abstractions.Models.Extensions.file>())
 			{
-				if (!CopyFile(componentFolder, file, folder))
+				if (!CopyFile(componentFolder, path, file))
 				{
 					return false;
 				}
 			}
 
 			foreach (Nucleus.Abstractions.Models.Extensions.folder subfolder in folder.Items.OfType<Nucleus.Abstractions.Models.Extensions.folder>())
-			{
-				subfolder.name = folder.name + "/" + subfolder.name;
-				CopyFolder(componentFolder, subfolder);
+			{				
+				CopyFolder(componentFolder, path + "/" + subfolder.name, subfolder);
 			}
 
 			return true;
@@ -667,17 +662,17 @@ namespace Nucleus.Core
 		/// <param name="file">Target file</param>
 		/// <param name="folder">Target folder.  Can be null for root.</param>
 		/// <returns></returns>
-		private Boolean CopyFile(string componentFolder, Abstractions.Models.Extensions.file file, Abstractions.Models.Extensions.folder folder)
+		private Boolean CopyFile(string componentFolder, string path, Abstractions.Models.Extensions.file file)
 		{
 			string zipFilePath;
 			string localFilePath;
 			ZipArchiveEntry entry;
 
-			if (folder != null)
+			if (!String.IsNullOrEmpty(path))
 			{
 				// Note: Zip file paths (.FullName) always use "/" to separate folder paths, per ".ZIP File Format Specification" 4.4.17.1. [https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT]
-				zipFilePath = $"{folder.name}/{file.name}";
-				localFilePath = $"{folder.name.Replace('/', System.IO.Path.DirectorySeparatorChar)}{System.IO.Path.DirectorySeparatorChar}{file.name}";
+				zipFilePath = $"{path}/{file.name}";
+				localFilePath = $"{path.Replace('/', System.IO.Path.DirectorySeparatorChar)}{System.IO.Path.DirectorySeparatorChar}{file.name}";
 			}
 			else
 			{
@@ -688,16 +683,27 @@ namespace Nucleus.Core
 			entry = this.Archive.Entries.Where((entry) => entry.FullName.Equals(zipFilePath, StringComparison.OrdinalIgnoreCase)).SingleOrDefault();
 			if (entry != null)
 			{
+				string target = BuildExtensionFilePath(componentFolder, localFilePath, true);
+				string renamePath = BuildExtensionFilePath(componentFolder, localFilePath) + IExtensionManager.BACKUP_FILE_EXTENSION;
+
 				// rename DLLs to .backup to prevent a file in use error.  ExtensionManager.Cleanup is called during startup to remove the 
 				// backups.   Nucleus.Web.Program watches for changes to files in extensions folders & automatically restarts after a few seconds.
 				if (System.IO.File.Exists(BuildExtensionFilePath(componentFolder, localFilePath)) && System.IO.Path.GetExtension(file.name).Equals(".dll", StringComparison.OrdinalIgnoreCase))
 				{
-					System.IO.File.Move(BuildExtensionFilePath(componentFolder, localFilePath), BuildExtensionFilePath(componentFolder, localFilePath) + IExtensionManager.BACKUP_FILE_EXTENSION);
+					this.Logger?.LogInformation("Renaming {target} to {renamePath}.", target, renamePath);
+					System.IO.File.Move(target, renamePath);
 				}
-				entry.ExtractToFile(BuildExtensionFilePath(componentFolder, localFilePath, true), true);				
-			}
 
-			return true;
+				this.Logger?.LogInformation("Writing {target} from zip.", target);
+				entry.ExtractToFile(target, true);
+				return true;
+			}
+			else
+			{
+				this.Logger?.LogWarning("Cannot find {zipFilePath} in zip.  Installation failed.", zipFilePath);
+				return false;
+			}
+			
 		}
 
 		/// <summary>

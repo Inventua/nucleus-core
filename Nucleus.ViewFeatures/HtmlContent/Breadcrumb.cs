@@ -23,7 +23,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	internal static class Breadcrumb
 	{
 
-		internal static async Task<TagBuilder> Build(ViewContext context, object htmlAttributes)
+		internal static async Task<TagBuilder> Build(ViewContext context, Boolean hideTopLevel, object htmlAttributes)
 		{
 			TagBuilder outputBuilder = new("nav");
 			TagBuilder listBuilder = new("ol");
@@ -54,10 +54,10 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				}
 			} while (breadcrumbPage != null);
 
-			if (breadcrumbs.Count == 0)
+			if (breadcrumbs.Count == 0 || (breadcrumbs.Count == 1 && hideTopLevel))
 			{
 				return null;
-			}
+			}			
 			else
 			{
 				breadcrumbs.Reverse();

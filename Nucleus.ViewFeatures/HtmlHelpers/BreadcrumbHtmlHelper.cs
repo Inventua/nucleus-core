@@ -15,24 +15,48 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 	public static class BreadcrumbHtmlHelper
 	{
 		/// <summary>
-		/// Renders an Breadcrumb control.
+		/// Renders a Breadcrumb control.
 		/// </summary>
 		/// <param name="htmlHelper"></param>
 		/// <returns></returns>
 		public static IHtmlContent Breadcrumb(this IHtmlHelper htmlHelper)
 		{
-			return Nucleus.ViewFeatures.HtmlContent.Breadcrumb.Build(htmlHelper.ViewContext, null).Result;
+			return Nucleus.ViewFeatures.HtmlContent.Breadcrumb.Build(htmlHelper.ViewContext, true, null).Result;
 		}
 
 		/// <summary>
-		/// Renders an Breadcrumb control.
+		/// Renders a Breadcrumb control.
 		/// </summary>
 		/// <param name="htmlHelper"></param>
 		/// <param name="htmlAttributes"></param>
 		/// <returns></returns>
 		public static IHtmlContent Breadcrumb(this IHtmlHelper htmlHelper, object htmlAttributes)
 		{
-			return Nucleus.ViewFeatures.HtmlContent.Breadcrumb.Build(htmlHelper.ViewContext, htmlAttributes).Result;
+			return Nucleus.ViewFeatures.HtmlContent.Breadcrumb.Build(htmlHelper.ViewContext, true, htmlAttributes).Result;
 		}
+
+		/// <summary>
+		/// Renders a Breadcrumb control.
+		/// </summary>
+		/// <param name="htmlHelper"></param>
+		/// <param name="hideTopLevel"></param>
+		/// <returns></returns>
+		public static IHtmlContent Breadcrumb(this IHtmlHelper htmlHelper, Boolean hideTopLevel)
+		{
+			return Nucleus.ViewFeatures.HtmlContent.Breadcrumb.Build(htmlHelper.ViewContext, hideTopLevel, null).Result;
+		}
+
+		/// <summary>
+		/// Renders a Breadcrumb control.
+		/// </summary>
+		/// <param name="htmlHelper"></param>
+		/// <param name="hideTopLevel"></param>
+		/// <param name="htmlAttributes"></param>
+		/// <returns></returns>
+		public static IHtmlContent Breadcrumb(this IHtmlHelper htmlHelper, Boolean hideTopLevel, object htmlAttributes)
+		{
+			return Nucleus.ViewFeatures.HtmlContent.Breadcrumb.Build(htmlHelper.ViewContext, hideTopLevel, htmlAttributes).Result;
+		}
+
 	}
 }

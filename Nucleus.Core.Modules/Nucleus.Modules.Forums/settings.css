@@ -11,3 +11,8 @@
 	height: 100%;
 	overflow-y: auto;
 }
+
+.ForumsSettings .group-permissions th, .ForumsSettings .forum-permissions th
+{
+	text-align: center;
+}

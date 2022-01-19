@@ -8,7 +8,7 @@
 	<Tab>
 		<TabItem target="#system-information" caption="System Information" active="true"></TabItem>
 		<TabItem target="#system-activity" caption="Activity"></TabItem>
-		<TabItem target="#system-configuration" caption="Configuration"></TabItem>
+		@*<TabItem target="#system-configuration" caption="Configuration"></TabItem>*@
 		<TabItem target="#system-database" caption="Database"></TabItem>
 		<TabItem target="#system-logs" caption="Logs"></TabItem>
 	</Tab>
@@ -45,26 +45,48 @@
 
 		<TabPanel id="system-activity">
 			<h2>Running Scheduled Tasks</h2>
-			<table>
-				@foreach (var task in Model.RunningTasks)
-				{
-					<tr>
-						<td>@task.ScheduledTask.Name</td>
+
+			@if (Model.RunningTasks.Any())
+			{
+				<table>
+					@foreach (var task in Model.RunningTasks)
+					{
+						<tr>
+							<td>@task.ScheduledTask.Name</td>
 						<td>@task.Progress?.Status</td>
 						<td>@task.Progress?.Message</td>
 					</tr>
 				}
-			</table>
+				</table>
+			}
+			else
+			{
+				<span>No tasks are running.</span>
+			}
 		</TabPanel>
 
-		<TabPanel id="system-configuration">
+		@*<TabPanel id="system-configuration">
 			<div class="LogContent">
 				<pre>@Model.Configuration</pre>
 			</div>
-		</TabPanel>
+		</TabPanel>*@
 
 		<TabPanel id="system-database">
-
+			<table class="table">
+				<tr>
+					<th class="text-nowrap">Schema</th>
+					<th class="text-nowrap">Database Type</th>
+					<th class="text-nowrap">Connection String</th>
+				</tr>
+				@foreach (var connection in Model.DatabaseConnections)
+				{
+					<tr>
+						<td class="text-nowrap">@(connection.Schema == "*" ? "Default (*)" : connection.Schema)</td>
+						<td>@connection.DatabaseType</td>
+						<td>@connection.ConnectionString</td>
+					</tr>
+				}
+			</table>
 		</TabPanel>
 
 		<TabPanel id="system-logs">

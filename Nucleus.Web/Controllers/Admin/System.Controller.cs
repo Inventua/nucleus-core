@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Nucleus.Abstractions;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Models.TaskScheduler;
+using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
@@ -20,11 +21,13 @@ namespace Nucleus.Web.Controllers.Admin
 		private RunningTaskQueue RunningTaskQueue { get; }
 		private IConfiguration Configuration { get; }
 		private ILogger<SystemController> Logger { get; }
+		private IOptions<DatabaseOptions> DatabaseOptions { get; }
 
-		public SystemController(RunningTaskQueue runningTaskQueue, ILogger<SystemController> logger, IOptions<Nucleus.Core.Logging.TextFileLoggerOptions> options, IConfiguration configuration)
+		public SystemController(RunningTaskQueue runningTaskQueue, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<Nucleus.Core.Logging.TextFileLoggerOptions> options, IConfiguration configuration)
 		{
 			this.RunningTaskQueue = runningTaskQueue;
 			this.Logger = logger;
+			this.DatabaseOptions = databaseOptions;
 			this.Configuration = configuration;
 
 			if (options.Value != null)
@@ -111,9 +114,28 @@ namespace Nucleus.Web.Controllers.Admin
 				}
 			}
 
-			viewModelOutput.Configuration = Sanitize((this.Configuration as IConfigurationRoot).GetDebugView());
+			// Removed.  Config data can contain unsafe data.
+			//viewModelOutput.Configuration = Sanitize((this.Configuration as IConfigurationRoot).GetDebugView());
 			viewModelOutput.RunningTasks = this.RunningTaskQueue.ToList();
-			
+
+			List<ViewModels.Admin.SystemIndex.DatabaseConnection> connections = new();
+
+			foreach (DatabaseSchema schema in this.DatabaseOptions.Value.Schemas)
+			{
+				DatabaseConnectionOption connection = this.DatabaseOptions.Value.GetDatabaseConnection(schema.ConnectionKey);
+
+				if (connection != null)
+				{
+					connections.Add(new ViewModels.Admin.SystemIndex.DatabaseConnection() { Schema = schema.Name, DatabaseType = connection.Type, ConnectionString = Sanitize(connection.ConnectionString) });
+				}
+				else
+				{
+					connections.Add(new ViewModels.Admin.SystemIndex.DatabaseConnection() { Schema = schema.Name, DatabaseType = "Not Found" });
+				}
+			}
+
+			viewModelOutput.DatabaseConnections = connections;
+
 			return View("Index", viewModelOutput);
 		}
 
@@ -139,11 +161,39 @@ namespace Nucleus.Web.Controllers.Admin
 		/// <returns></returns>
 		private static string Sanitize(string value)
 		{
-			value = System.Text.RegularExpressions.Regex.Replace(value, "Password[:-=](.*)[ ,;]{0,1}.*$", "Password=********", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline);
-			value = System.Text.RegularExpressions.Regex.Replace(value, "ConnectionString=(.*).*$", "ConnectionString=********", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline);
+			const string TOKEN_REGEX = "(?<Pair>(?<Key>[^=;\"]+)=(?<Value>[^;]+))";
 
-			return value;
+			return System.Text.RegularExpressions.Regex.Replace(value, TOKEN_REGEX, new System.Text.RegularExpressions.MatchEvaluator(SanitizeToken));
+
+			//value = System.Text.RegularExpressions.Regex.Replace(value, "Password[:-=](.*)[ ,;]{0,1}.*$", "Password=********", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline);
+			//value = System.Text.RegularExpressions.Regex.Replace(value, "Pwd[:-=](.*)[ ,;]{0,1}.*$", "Pwd=********", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline);
+			//value = System.Text.RegularExpressions.Regex.Replace(value, "User ID[:-=](.*)[ ,;]{0,1}.*$", "User ID=********", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline);
+			//value = System.Text.RegularExpressions.Regex.Replace(value, "UserID[:-=](.*)[ ,;]{0,1}.*$", "UserID=********", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline);
+			//value = System.Text.RegularExpressions.Regex.Replace(value, "uid[:-=](.*)[ ,;]{0,1}.*$", "uid=********", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline);
+			//value = System.Text.RegularExpressions.Regex.Replace(value, "ConnectionString=(.*).*$", "ConnectionString=********", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline);
+			//return value;
 		}
 
+		private static string SanitizeToken(System.Text.RegularExpressions.Match match)
+		{
+			string[] securityTokens = { "password", "pwd", "user", "userid", "user id", "uid", "username", "user name", "connectionstring" };
+
+			if (match.Groups["Key"].Success)
+			{
+				if (securityTokens.Contains(match.Groups["Key"].Value, StringComparer.OrdinalIgnoreCase))
+				{
+					return match.Groups["Key"].Value + "=" + "****";
+				}
+				else
+				{
+					return match.Groups[0].Value;
+				}
+			}
+			else
+			{
+				return String.Empty;
+			}
+
+		}
 	}
 }

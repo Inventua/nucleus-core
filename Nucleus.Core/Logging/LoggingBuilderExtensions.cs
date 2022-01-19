@@ -61,6 +61,7 @@ namespace Nucleus.Core.Logging
 				{
 					options.Path = this.FolderOptions.Value.GetDataFolder("Logs");
 				}
+				options.Path = Environment.ExpandEnvironmentVariables(options.Path);
 			}
 		}
 	}

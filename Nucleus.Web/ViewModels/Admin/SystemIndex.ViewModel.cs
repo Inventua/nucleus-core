@@ -31,8 +31,20 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public IEnumerable<Nucleus.Abstractions.Models.TaskScheduler.RunningTask> RunningTasks { get; set; }
 
+		public IEnumerable<DatabaseConnection> DatabaseConnections { get; set; }
+
 		public SystemIndex()
 		{
+		}
+
+		public class DatabaseConnection
+		{
+			public string Schema { get; set; }
+
+			public string DatabaseType { get; set; }
+
+			public string ConnectionString { get; set; }
+
 		}
 	}
 }

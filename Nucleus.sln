@@ -62,7 +62,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup and Configuration", "
 		Documentation\Setup and Configuration\Azure-App-Service.md = Documentation\Setup and Configuration\Azure-App-Service.md
 		Documentation\Setup and Configuration\Configuration.md = Documentation\Setup and Configuration\Configuration.md
 		Documentation\Setup and Configuration\GettingStarted.md = Documentation\Setup and Configuration\GettingStarted.md
-		Documentation\Setup and Configuration\Other-files.md = Documentation\Setup and Configuration\Other-files.md
+		Documentation\Setup and Configuration\Logging.md = Documentation\Setup and Configuration\Logging.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.AzureBlobStorageFileSystemProvider", "Nucleus.Core.Modules\Nucleus.Extensions.AzureBlobStorageFileSystemProvider\Nucleus.Extensions.AzureBlobStorageFileSystemProvider.csproj", "{BE4E2A1D-F255-4F21-A80A-1E016C09F0A2}"

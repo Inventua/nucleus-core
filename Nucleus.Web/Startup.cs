@@ -112,9 +112,10 @@ namespace Nucleus.Web
 				""
 			});
 
-			services.Logger().LogInformation("Configuration Settings:");
-			services.Logger().LogInformation((this.Configuration as IConfigurationRoot).GetDebugView());
-			services.Logger().LogInformation("");
+			// Removed config settings from log because the content makes log files too big - users can view this information in system->configuration.
+			//services.Logger().LogInformation("Configuration Settings:");
+			//services.Logger().LogInformation((this.Configuration as IConfigurationRoot).GetDebugView());
+			//services.Logger().LogInformation("");
 
 			services.AddHttpContextAccessor();  // required by many elements of the system
 			services.AddHttpClient();

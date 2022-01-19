@@ -8,6 +8,7 @@ using Nucleus.Abstractions;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Models.TaskScheduler;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -20,15 +21,15 @@ namespace Nucleus.Web.Controllers.Admin
 		private IConfiguration Configuration { get; }
 		private ILogger<SystemController> Logger { get; }
 
-		public SystemController(RunningTaskQueue runningTaskQueue, ILogger<SystemController> logger, ILoggerProvider logProvider, IConfiguration configuration)
+		public SystemController(RunningTaskQueue runningTaskQueue, ILogger<SystemController> logger, IOptions<Nucleus.Core.Logging.TextFileLoggerOptions> options, IConfiguration configuration)
 		{
 			this.RunningTaskQueue = runningTaskQueue;
 			this.Logger = logger;
 			this.Configuration = configuration;
 
-			if (logProvider is Nucleus.Core.Logging.TextFileLoggingProvider provider)
+			if (options.Value != null)
 			{
-				this.LogFolderPath = provider.Options.Path;
+				this.LogFolderPath = options.Value.Path;
 			}
 		}
 
@@ -55,14 +56,17 @@ namespace Nucleus.Web.Controllers.Admin
 			if (!String.IsNullOrEmpty(this.LogFolderPath) && System.IO.Directory.Exists(this.LogFolderPath))
 			{
 				System.IO.DirectoryInfo logFolder = new(this.LogFolderPath);
-
+				Logger.LogTrace("Log folder {logFolderPath} exists, and contains {count} .log files.", this.LogFolderPath, logFolder.EnumerateFiles("*.log").Count());
+				
 				List<Nucleus.Web.ViewModels.Shared.LogFileInfo> logs = new();
 				foreach (System.IO.FileInfo file in logFolder.EnumerateFiles("*.log"))
 				{
 					System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(file.Name, LogFileConstants.LOGFILE_REGEX);
-
+					
 					if (match.Success && match.Groups.Count >= 3)
 					{
+						Logger.LogTrace("Log file {file.Name} matches the expected pattern.", file.Name);
+						
 						if (DateTime.TryParseExact(match.Groups[1].Value, LogFileConstants.DATE_FILENAME_FORMAT, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal, out DateTime logDate))
 						{
 							logs.Add(new Nucleus.Web.ViewModels.Shared.LogFileInfo()
@@ -72,6 +76,14 @@ namespace Nucleus.Web.Controllers.Admin
 								LogDate = logDate
 							});
 						}
+						else
+						{
+							Logger.LogTrace("Could not parse the date for log file {file.Name}.", file.Name);
+						}
+					}
+					else
+					{
+						Logger.LogTrace("Log file {file.Name} does not match the expected pattern.", file.Name);
 					}
 				}
 
@@ -89,6 +101,14 @@ namespace Nucleus.Web.Controllers.Admin
 			else
 			{
 				viewModelOutput.LogFiles = new();
+				if (String.IsNullOrEmpty(this.LogFolderPath))
+				{
+					viewModelOutput.LogContent = $"The text file log folder is not set.";
+				}
+				else if (!System.IO.Directory.Exists(this.LogFolderPath))
+				{
+					viewModelOutput.LogContent = $"The log folder {this.LogFolderPath} does not exist.";
+				}
 			}
 
 			viewModelOutput.Configuration = Sanitize((this.Configuration as IConfigurationRoot).GetDebugView());

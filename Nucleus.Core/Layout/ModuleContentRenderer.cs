@@ -83,6 +83,23 @@ namespace Nucleus.Core.Layout
 							// modules can throw an UnauthorizedAccessException to indicate that the user doesn't have access to a resource that
 							// the module uses.  This should not be treated as a failure, it just means we don't render the module
 						}
+						catch (System.InvalidOperationException e)
+						{
+							// If the specified container was not found, and the user is an admin, display the error message in place of the module
+							// content.  If the user is not an admin, suppress output of the module.
+							if (e.Message.Contains("The view") && e.Message.Contains("was not found"))
+							{
+								htmlHelper.ViewContext.HttpContext.RequestServices.GetService<ILogger<ModuleContentRenderer>>()?.LogError(e, "Error rendering {pane}.", moduleInfo.Pane);
+								if (htmlHelper.ViewContext.HttpContext.User.IsSiteAdmin(this.Context.Site))
+								{
+									output.AppendHtml(e.Message);
+								}
+							}
+							else
+							{
+								throw;
+							}
+						}
 						// Removed in favour of Site.ErrorPageId/ErrorReport module
 						//catch (Exception e)
 						//{
@@ -90,7 +107,7 @@ namespace Nucleus.Core.Layout
 						//	IHtmlContent moduleErrorBody = RenderException(htmlHelper.ViewContext?.HttpContext, moduleInfo, e);
 						//	output.AppendHtml(moduleErrorBody);
 						//}
-					}
+						}
 				}
 			}
 
@@ -463,10 +480,15 @@ namespace Nucleus.Core.Layout
 				newHttpContext.Response.Body = new MemoryStream();
 
 				// Create the controller and run the controller action
-				await actionInvoker.InvokeAsync();
-
-				// Restore the original service provider before moduleScope is disposed to prevent it from also being disposed
-				newHttpContext.RequestServices = originalServiceProvider;
+				try
+				{
+					await actionInvoker.InvokeAsync();
+				}
+				finally
+				{
+					// Restore the original service provider before moduleScope is disposed to prevent it from also being disposed
+					newHttpContext.RequestServices = originalServiceProvider;
+				}
 
 				// Extract the response
 				newHttpContext.Response.Body.Position = 0;

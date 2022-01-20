@@ -66,5 +66,12 @@ namespace Nucleus.Core.Managers
 			return Add<TKey, TModel>();
 		}
 
+		public void Collect()
+		{
+			foreach (ICacheCollection cache in this.Caches.Values)
+			{
+				cache.Collect();
+			}
+		}
 	}
 }

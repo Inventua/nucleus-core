@@ -82,8 +82,16 @@ namespace Nucleus.Core.Authentication
 							Logger.LogInformation("Session {sessionId} is valid, updating sliding expiration.", sessionId);
 
 							userSession.ExpiryDate = DateTime.UtcNow.Add(this.Options.SlidingExpirationTimeSpan);
-							await this.SessionManager.Save(userSession);
-						
+							
+							// Only update the database expiry date if the database was updated more than 1 minute ago.  This is to avoid a negative impact
+							// on performance, as the authentication handler is called for every request - even static files - so a single page load could otherwise
+							// generate dozens of database updates.
+							if (DateTime.UtcNow > userSession.LastUpdate.AddSeconds(60))
+							{
+								await this.SessionManager.Save(userSession);
+								userSession.LastUpdate = DateTime.UtcNow;
+							}
+
 							AppendCookie(userSession.Id.ToString(), new AuthenticationProperties()
 							{
 								AllowRefresh = userSession.SlidingExpiry,
@@ -97,7 +105,7 @@ namespace Nucleus.Core.Authentication
 					{
 						// Session has expired
 						Logger.LogInformation("Session has expired.");
-						await this .SessionManager.Delete(userSession);
+						await this.SessionManager.Delete(userSession);
 						_ = this.SessionManager.SignOut(this.Context);
 						return AuthenticateResult.Fail("Session Expired");
 					}

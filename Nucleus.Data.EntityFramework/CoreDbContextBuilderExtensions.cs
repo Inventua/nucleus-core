@@ -178,6 +178,10 @@ namespace Nucleus.Data.EntityFramework
 				.ToTable("Users")
 				.HasOne(user => user.Secrets);
 
+			builder.Entity<UserSession>()
+				.ToTable("UserSessions")
+				.Ignore(userSession => userSession.LastUpdate);
+
 			builder.Entity<UserProfileValue>()
 				.ToTable("UserProfileValues")
 				.HasKey(new string[] { "UserId", "UserProfilePropertyId" });

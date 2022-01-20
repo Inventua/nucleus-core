@@ -55,6 +55,11 @@ namespace Nucleus.Abstractions.Models
 		public System.Net.IPAddress RemoteIpAddress { get; set; }
 
 		/// <summary>
+		/// This value is used to track the most recent database update for the user session.
+		/// </summary>
+		public DateTime LastUpdate { get; set; }
+
+		/// <summary>
 		/// Initialize a new instance of UserSession.
 		/// </summary>
 		/// <remarks>

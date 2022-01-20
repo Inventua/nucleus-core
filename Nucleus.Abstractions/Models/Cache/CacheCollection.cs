@@ -11,7 +11,13 @@ namespace Nucleus.Abstractions.Models.Cache
 	/// <summary>
 	/// Marker-only interface used so that extensions can add their own cache collections.
 	/// </summary>
-	public interface ICacheCollection { }
+	public interface ICacheCollection 
+	{
+		/// <summary>
+		/// Remove expired items from the cache.
+		/// </summary>
+		public void Collect();
+	}
 
 	/// <summary>
 	/// Stores a collection of cached entities keys and values.  Provides operations to populate and retrieve, remove and clear items the cache.

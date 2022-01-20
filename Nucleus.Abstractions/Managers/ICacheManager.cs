@@ -30,5 +30,9 @@ namespace Nucleus.Abstractions.Managers
 		/// </remarks>
 		public CacheCollection<TKey, TModel> Get<TKey, TModel>() where TModel : class;
 
+		/// <summary>
+		/// Remove expired items from all caches.
+		/// </summary>
+		public void Collect();
 	}
 }

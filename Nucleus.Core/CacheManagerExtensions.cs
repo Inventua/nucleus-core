@@ -14,13 +14,14 @@ namespace Nucleus.Core
 {
 	public static class CacheManagerExtensions
 	{
-		// When adding a new cache here, add to the CacheManager constructor, and to the CollectCacheScheduledTask. 
 		public static CacheCollection<string, PageMenu> PageMenuCache (this ICacheManager cacheManager)  { return cacheManager.Get<string, PageMenu>(); } 
 		public static CacheCollection<Guid, Page> PageCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, Page>(); } 
 		public static CacheCollection<Guid, PageModule> PageModuleCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, PageModule>(); } 
 		public static CacheCollection<Guid, RoleGroup> RoleGroupCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, RoleGroup>(); } 
 		
-		public static CacheCollection<Guid, Role> RoleCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, Role>(); } 
+		public static CacheCollection<Guid, Role> RoleCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, Role>(); }
+		public static CacheCollection<Guid, UserSession> SessionCache(this ICacheManager cacheManager) { return cacheManager.Get<Guid, UserSession>(); }
+
 		public static CacheCollection<Guid, Site> SiteCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, Site>(); } 
 		public static CacheCollection<Guid, User> UserCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, User>(); } 
 		public static CacheCollection<Guid, MailTemplate> MailTemplateCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, MailTemplate>(); } 

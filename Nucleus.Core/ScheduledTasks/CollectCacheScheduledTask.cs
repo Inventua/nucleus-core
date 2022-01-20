@@ -28,22 +28,24 @@ namespace Nucleus.Core.ScheduledTasks
 		
 		private void CollectCache(IProgress<ScheduledTaskProgress> progress)
 		{
-			this.CacheManager.PageCache().Collect();
-			this.CacheManager.PageMenuCache().Collect();
-			this.CacheManager.MailTemplateCache().Collect();
-			this.CacheManager.PageModuleCache().Collect();
+			this.CacheManager.Collect();
+			
+			//this.CacheManager.PageCache().Collect();
+			//this.CacheManager.PageMenuCache().Collect();
+			//this.CacheManager.MailTemplateCache().Collect();
+			//this.CacheManager.PageModuleCache().Collect();
 
-			this.CacheManager.RoleCache().Collect();
-			this.CacheManager.RoleGroupCache().Collect();
-			this.CacheManager.ScheduledTaskCache().Collect();
-			this.CacheManager.SiteCache().Collect();
+			//this.CacheManager.RoleCache().Collect();
+			//this.CacheManager.RoleGroupCache().Collect();
+			//this.CacheManager.ScheduledTaskCache().Collect();
+			//this.CacheManager.SiteCache().Collect();
 
-			this.CacheManager.SiteGroupCache().Collect();
-			this.CacheManager.UserCache().Collect();
-			this.CacheManager.FolderCache().Collect();
-			this.CacheManager.ListCache().Collect();
+			//this.CacheManager.SiteGroupCache().Collect();
+			//this.CacheManager.UserCache().Collect();
+			//this.CacheManager.FolderCache().Collect();
+			//this.CacheManager.ListCache().Collect();
 
-			this.CacheManager.ContentCache().Collect();
+			//this.CacheManager.ContentCache().Collect();
 
 			progress.Report(new ScheduledTaskProgress() { Status = ScheduledTaskProgress.State.Succeeded });
 			

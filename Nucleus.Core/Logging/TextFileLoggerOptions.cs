@@ -27,7 +27,7 @@ namespace Nucleus.Core.Logging
 			}
 			internal set
 			{
-				_path = value;
+				_path = Environment.ExpandEnvironmentVariables(value); ;
 
 				if (!System.IO.Directory.Exists(_path))
 				{

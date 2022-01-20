@@ -239,7 +239,7 @@ namespace Nucleus.Web.Controllers.Admin
 			{				
 				using (System.IO.Stream fileStream = mediaFile.OpenReadStream())
 				{
-					await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedProviderKey, viewModel.Folder.Path, mediaFile.FileName, fileStream, false);
+					await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedProviderKey, viewModel.Folder.Path, mediaFile.FileName, fileStream, true);
 				}				
 			}
 			else

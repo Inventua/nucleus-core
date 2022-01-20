@@ -39,7 +39,7 @@
 	flex-grow: 1;
 	display: flex;		
 	overflow: auto;
-	flex-direction: column;
+	flex-direction: row;
 }
 
 .ContentPane
@@ -63,6 +63,7 @@
 	background-color: #535353;
 	opacity: 0.9;
 	min-height: 120px;	
+	padding: 0.5rem;
 }
 
 .BottomPane *

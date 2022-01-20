@@ -24,13 +24,16 @@ namespace Nucleus.Core.Managers
 	public class SessionManager : ISessionManager
 	{
 		private IDataProviderFactory DataProviderFactory { get; }
+		private ICacheManager CacheManager { get; }
+
 		private IUserManager UserManager { get; }
 		private IOptions<Authentication.AuthenticationOptions> Options { get; }
 
-		public SessionManager(IDataProviderFactory dataProviderFactory, IUserManager userManager, IOptions<Authentication.AuthenticationOptions> options)
+		public SessionManager(IDataProviderFactory dataProviderFactory, IUserManager userManager, ICacheManager cacheManager, IOptions<Authentication.AuthenticationOptions> options)
 		{
 			this.DataProviderFactory = dataProviderFactory;
 			this.UserManager = userManager;
+			this.CacheManager = cacheManager;
 			this.Options = options;
 		}
 
@@ -53,10 +56,15 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		public async Task<UserSession> Get(Guid id)
 		{
-			using (ISessionDataProvider provider = this.DataProviderFactory.CreateProvider<ISessionDataProvider>())
+			return await this.CacheManager.SessionCache().GetAsync(id, async id =>
 			{
-				return await provider.GetUserSession(id);
-			}
+				using (ISessionDataProvider provider = this.DataProviderFactory.CreateProvider<ISessionDataProvider>())
+				{
+					return await provider.GetUserSession(id);
+				}
+			});
+
+			
 		}
 
 		/// <summary>
@@ -69,6 +77,7 @@ namespace Nucleus.Core.Managers
 			{
 				await provider.DeleteUserSession(userSession);
 			}
+			this.CacheManager.SessionCache().Remove(userSession.Id);
 		}
 
 		/// <summary>

@@ -34,15 +34,18 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			
 			if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.LOGO_FILEID, out Guid fileId))
 			{
-				File logoFile;
+				File logoFile = null;
 
-				try
+				if (fileId != Guid.Empty)
 				{
-					logoFile = await fileSystemManager.GetFile(site, fileId);
-				}
-				catch (System.IO.FileNotFoundException)
-				{
-					logoFile = null;
+					try
+					{
+						logoFile = await fileSystemManager.GetFile(site, fileId);
+					}
+					catch (System.IO.FileNotFoundException)
+					{
+						logoFile = null;
+					}
 				}
 
 				if (logoFile != null)

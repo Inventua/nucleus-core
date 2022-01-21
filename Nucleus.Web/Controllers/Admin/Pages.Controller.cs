@@ -604,10 +604,12 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private async Task<IEnumerable<SelectListItem>> GetAvailableRoles(List<Permission> existingPermissions)
 		{
-			IEnumerable<Role> availableRoles = (await this.RoleManager.List(this.Context.Site)).Where
-			(
-				role => role.Id != this.Context.Site.AdministratorsRole?.Id && (existingPermissions == null || !existingPermissions.Where(item => item.Role.Id == role.Id).Any())
-			);
+			IEnumerable<Role> availableRoles = (await this.RoleManager.List(this.Context.Site))
+				.Where
+				(
+					role => role.Id != this.Context.Site.AdministratorsRole?.Id && (existingPermissions == null || !existingPermissions.Where(item => item.Role.Id == role.Id).Any())
+				)
+				.OrderBy(role => role.Name);
 
 			IEnumerable<string> roleGroups = availableRoles
 				.Where(role => role.RoleGroup != null)

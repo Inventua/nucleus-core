@@ -19,9 +19,9 @@
 	<meta content="text/css" http-equiv="Content-Style-Type" />
 	<link rel="canonical" href="@Model.DefaultPageUri" />
 	<title>@Model.Context.Page.Title</title>
-	@Html.AddScript("~/Resources/Libraries/jQuery/03.06.00/jquery.min.js")
-	@Html.AddScript("~/Resources/Libraries/Bootstrap/5.1.0/js/bootstrap.bundle.js")
-	@Html.AddScript("~/Resources/js/nucleus-shared.js")
+	@Html.AddScript("~/Resources/Libraries/jQuery/03.06.00/jquery.min.js", false)
+	@Html.AddScript("~/Resources/Libraries/Bootstrap/5.1.0/js/bootstrap.bundle.js", false)
+	@Html.AddScript("~/Resources/js/nucleus-shared.js", true)
 	@Html.AddStyle("~/Resources/Libraries/Bootstrap/5.1.0/css/bootstrap.css")
 	@Html.AddStyle("~/Resources/css/shared.css")
 	@if (Model.IsEditing)

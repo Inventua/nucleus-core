@@ -43,13 +43,34 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// </example>
 		public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, string scriptPath)
 		{
-			Dictionary<string, System.Version> scripts = (Dictionary<string, System.Version>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
+			return AddScript(htmlHelper, scriptPath, false);
+		}
+
+		/// <summary>
+		/// Register the specified script to be added to the Layout or module's scripts.
+		/// </summary>
+		/// <param name="htmlHelper"></param>
+		/// <param name="scriptPath"></param>
+		/// <param name="isAsync"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// Extensions (modules) can use this Html Helper to add scripts to the HEAD block.  The scriptPath can contain the 
+		/// tilde (~) character to specify an app-relative path.  Your script path should include the extensions folder and your
+		/// extension folder name.
+		/// </remarks>
+		/// <example>
+		/// @Html.AddScript("~/Extensions/MyModule/MyModule.js")
+		/// </example>
+		public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, string scriptPath, Boolean isAsync)
+		{
+			//Dictionary<string, System.Version> scripts = (Dictionary<string, System.Version>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
+			Dictionary<string, ScriptInfo> scripts = (Dictionary<string, ScriptInfo>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
 
 			scriptPath = new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).ResolveExtensionUrl(scriptPath);
 
 			if (!scripts.ContainsKey(scriptPath))
 			{
-				scripts.Add(scriptPath, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
+				scripts.Add(scriptPath, new ScriptInfo() { Path = scriptPath, IsAsync = isAsync, Version = ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version });
 				htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] = scripts;
 			}
 
@@ -66,20 +87,33 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		{
 			HtmlContentBuilder scriptOutput = new();
 
-			Dictionary<string, System.Version> scripts = (Dictionary<string, System.Version>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY];
+			Dictionary<string, ScriptInfo> scripts = (Dictionary<string, ScriptInfo>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
 			if (scripts != null)
 			{
-				foreach (KeyValuePair<string, System.Version> script in scripts)
+				foreach (KeyValuePair<string, ScriptInfo> script in scripts)
 				{
-					TagBuilder builder = new("script");
-					builder.Attributes.Add("type", "text/javascript");
-					builder.Attributes.Add("src", new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(script.Key) + "?v=" + script.Value.ToString());
-
-					scriptOutput.AppendHtml(builder);
+					if (!String.IsNullOrEmpty(script.Key))
+					{
+						TagBuilder builder = new("script");
+						builder.Attributes.Add("type", "text/javascript");
+						builder.Attributes.Add("src", new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(script.Key) + "?v=" + script.Value.Version.ToString());
+						if (script.Value.IsAsync)
+						{
+							builder.Attributes.Add("async", "");
+						}
+						scriptOutput.AppendHtml(builder);
+					}
 				}
 			}
 
 			return scriptOutput;
+		}
+
+		private class ScriptInfo
+		{
+			public System.Version Version { get; set; }	
+			public Boolean IsAsync { get; set; }
+			public string Path { get; set; }
 		}
 	}
 }

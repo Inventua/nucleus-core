@@ -70,11 +70,15 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			{
 				foreach (KeyValuePair<string, System.Version> style in styles)
 				{
-					TagBuilder builder = new("link");
-					builder.Attributes.Add("rel", "stylesheet");
-					builder.Attributes.Add("href", new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(style.Key) + "?v=" + style.Value.ToString());
+					if (!String.IsNullOrEmpty(style.Key))
+					{
+						TagBuilder builder = new("link");
+						builder.Attributes.Add("rel", "stylesheet");
+						builder.Attributes.Add("href", new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(style.Key) + "?v=" + style.Value.ToString());
+						builder.Attributes.Add("defer", "");
 
-					scriptOutput.AppendHtml(builder);
+						scriptOutput.AppendHtml(builder);
+					}
 				}
 			}
 

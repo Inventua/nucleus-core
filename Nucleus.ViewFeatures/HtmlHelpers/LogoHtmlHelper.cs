@@ -21,7 +21,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// <param name="htmlAttributes"></param>
 		/// <returns></returns>
 		/// <remarks>
-		/// If the site does not have a configured privacy page, nothing is rendered.
+		/// If the site does not have a configured logo, nothing is rendered.
 		/// </remarks>
 		public static IHtmlContent Logo(this IHtmlHelper htmlHelper, object htmlAttributes)
 		{
@@ -36,7 +36,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// <param name="htmlAttributes"></param>
 		/// <returns></returns>
 		/// <remarks>
-		/// If the site does not have a configured privacy page, nothing is rendered.
+		/// If the site does not have a configured logo, nothing is rendered.
 		/// </remarks>
 		public static IHtmlContent Logo(this IHtmlHelper htmlHelper, string caption, object htmlAttributes)
 		{

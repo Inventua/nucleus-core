@@ -151,7 +151,14 @@ namespace Nucleus.Extensions
 		{
 			if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.FAVICON_FILEID, out Guid fileId))
 			{
-				return $"/files/{FileExtensions.EncodeFileId(fileId)}";
+				if (fileId == Guid.Empty)
+				{
+					return "";
+				}
+				else
+				{
+					return $"/files/{FileExtensions.EncodeFileId(fileId)}";
+				}
 			}
 			return null;
 		}
@@ -165,7 +172,14 @@ namespace Nucleus.Extensions
 		{
 			if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.CSSFILE_FILEID, out Guid fileId))
 			{
-				return $"/files/{FileExtensions.EncodeFileId(fileId)}";
+				if (fileId == Guid.Empty)
+				{
+					return "";
+				}
+				else
+				{
+					return $"/files/{FileExtensions.EncodeFileId(fileId)}";
+				}
 			}
 			return null;
 		}

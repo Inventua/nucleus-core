@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Mail;
+using Nucleus.Abstractions.Models.FileSystem;
+using Nucleus.Abstractions.Managers;
 
 namespace Nucleus.Extensions
 {
@@ -146,8 +148,9 @@ namespace Nucleus.Extensions
 		/// Return the relative path to the site's icon image file.
 		/// </summary>
 		/// <param name="site"></param>
-		/// <returns></returns>`
-		public static string GetIconPath(this Site site)
+		/// <param name="fileSystemManager"></param>
+		/// <returns></returns>
+		public async static Task<string> GetIconPath(this Site site, IFileSystemManager fileSystemManager)
 		{
 			if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.FAVICON_FILEID, out Guid fileId))
 			{
@@ -157,7 +160,8 @@ namespace Nucleus.Extensions
 				}
 				else
 				{
-					return $"/files/{FileExtensions.EncodeFileId(fileId)}";
+					return await GetDirectFilePath(site, fileId, fileSystemManager);
+					//return $"/files/{FileExtensions.EncodeFileId(fileId)}";
 				}
 			}
 			return null;
@@ -167,8 +171,9 @@ namespace Nucleus.Extensions
 		/// Return the relative path to the site's icon image file.
 		/// </summary>
 		/// <param name="site"></param>
-		/// <returns></returns>`
-		public static string GetCssFilePath(this Site site)
+		/// <param name="fileSystemManager"></param>
+		/// <returns></returns>
+		public async static Task<string> GetCssFilePath(this Site site, IFileSystemManager fileSystemManager)
 		{
 			if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.CSSFILE_FILEID, out Guid fileId))
 			{
@@ -178,10 +183,48 @@ namespace Nucleus.Extensions
 				}
 				else
 				{
-					return $"/files/{FileExtensions.EncodeFileId(fileId)}";
+					return await GetDirectFilePath(site, fileId, fileSystemManager);
+					//return $"/files/{FileExtensions.EncodeFileId(fileId)}";
 				}
 			}
 			return null;
+		}
+
+		/// <summary>
+		/// Return a direct file path, if the file system provider supports it.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="fileId"></param>
+		/// <param name="fileSystemManager"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// Return a direct link if the file system provider supports it (because it is faster than returning a redirect to azure storage).  This "skips"
+		/// the Nucleus permissions check, but the performance difference is > 200ms.  This function should only be used for cases where it is ok to
+		/// skip the permission check, like site logo/css/favicon.
+		/// </remarks>
+		private async static Task<string> GetDirectFilePath(this Site site, Guid fileId, IFileSystemManager fileSystemManager)
+		{
+			File file = await fileSystemManager.GetFile(site, fileId);
+			// render a direct link if the file system provider supports it (because it is faster than returning a redirect to azure storage).  This "skips"
+			// the Nucleus permissions check, but the performance difference is > 200ms.
+			if (file.Capabilities.CanDirectLink)
+			{
+				System.Uri uri = fileSystemManager.GetFileDirectUrl(site, file);
+				if (uri != null)
+				{
+					return uri.AbsoluteUri;
+				}
+				else
+				{
+					return "";
+				}
+			}
+			else
+			{
+				return $"/files/{FileExtensions.EncodeFileId(file.Id)}";
+			}
+
+
 		}
 
 		/// <summary>

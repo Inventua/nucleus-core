@@ -44,11 +44,19 @@ namespace Nucleus.Data.EntityFramework
 		/// </summary>
 		public override void CheckConnection()
 		{
-			this.Context.Database.OpenConnection();
+			try
+			{
+				this.Context.Database.OpenConnection();
+			}
+			catch(Exception e)
+			{
+				Logger?.LogError("An error occurred while connecting to the database.", e);
+				throw;
+			}
 		}
 
 		///// <summary>
-		///// Check whether the Schema table exists in a database-agnostic way by quering it.
+		///// Check whether the Schema table exists in a database-agnostic way by querying it.
 		///// </summary>
 		///// <returns></returns>
 		///// <remarks>

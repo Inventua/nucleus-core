@@ -56,7 +56,22 @@ namespace Nucleus.ViewFeatures.HtmlContent
 					outputBuilder.Attributes.Add("title", linkTitle);
 
 					TagBuilder imageBuilder = new("img");
-					imageBuilder.Attributes.Add("src", urlHelper.FileLink(logoFile));
+
+					// render a direct link if the file system provider supports it (because it is faster than returning a redirect to azure storage).  This "skips"
+					// the Nucleus permissions check, but the performance difference is > 200ms.
+					if (logoFile.Capabilities.CanDirectLink)
+					{
+						System.Uri uri = fileSystemManager.GetFileDirectUrl(site, logoFile);
+						if (uri != null)
+						{
+							imageBuilder.Attributes.Add("src", uri.AbsoluteUri);
+						}
+					}
+					else
+					{
+						imageBuilder.Attributes.Add("src", urlHelper.FileLink(logoFile));
+					}
+					
 					imageBuilder.Attributes.Add("loading", "lazy");
 					imageBuilder.Attributes.Add("role", "presentation");
 

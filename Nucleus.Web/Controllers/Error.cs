@@ -16,11 +16,13 @@ namespace Nucleus.Web.Controllers
 	{
 		private Context Context { get; }
 		private IPageManager PageManager { get; }
+		private IFileSystemManager FileSystemManager { get; }
 
 
-		public Error(Context context, IPageManager pageManager)
+		public Error(Context context, IFileSystemManager fileSystemManager, IPageManager pageManager)
 		{
 			this.Context = context;
+			this.FileSystemManager = fileSystemManager;
 			this.PageManager = pageManager;
 		}
 
@@ -62,7 +64,8 @@ namespace Nucleus.Web.Controllers
 
 						viewModel.IsEditing = User.IsEditing(HttpContext, this.Context.Site, this.Context.Page);
 						viewModel.CanEdit = User.CanEditContent(this.Context.Site, this.Context.Page);
-						viewModel.SiteIconPath = Context.Site.GetIconPath();
+						viewModel.SiteIconPath = await Context.Site.GetIconPath(this.FileSystemManager);
+						viewModel.SiteCssFilePath = await Context.Site.GetCssFilePath(this.FileSystemManager);
 
 						return View(this.Context.Page.LayoutPath(this.Context.Site), viewModel);
 					}

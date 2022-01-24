@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TemplateWizard;
 using System.Windows.Forms;
-using EnvDTE80;
 using EnvDTE;
 
 namespace Nucleus.DeveloperTools.VisualStudioTemplates

@@ -89,9 +89,19 @@ namespace Nucleus.Modules.StaticContent.Controllers
 				}
 			}
 
+			//// We have to list the contents of the source folder in order to populate the default file dropdown
 			if (viewModel.SourceFolder != null)
 			{
-				viewModel.SourceFolder = await fileSystemManager.ListFolder(site, viewModel.SourceFolder.Id, "");				
+				Folder folder = await fileSystemManager.GetFolder(site, viewModel.SourceFolder.Id);
+
+				// handle provider change
+				if (folder.Provider != viewModel.SourceFolder.Provider)
+				{
+					folder = await fileSystemManager.GetFolder(site, viewModel.SourceFolder.Provider, "");
+				}
+				viewModel.SourceFolder = await fileSystemManager.ListFolder(site, folder.Id, "");
+
+				//viewModel.SourceFolder = await fileSystemManager.ListFolder(site, viewModel.SourceFolder.Id, "");
 			}
 
 			return viewModel;

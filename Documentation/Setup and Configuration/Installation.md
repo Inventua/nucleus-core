@@ -90,6 +90,8 @@ in your storage account's menu blade to see connection strings for both primary 
 
 If you are adding the Azure Blob Storage provider, you must also install the Azure Blob Storage provider extension.
 
-If you don't want the local file system provider, remove that section, including the comma between sections.
+If you don't want the local file system provider, remove that section, including the comma between sections.  If you are using the local file system provider, the {DataFolder} token
+refers to %PROGRAMDATA%\Nucleus.  You can change this value if you need to, but it should not be set to a path within your web root (installation folder) in order to ensure that
+access to files is controlled by Nucleus - otherwise IIS may serve static files without Nucleus being able to check permissions.
 
 The "Key" value is saved in the database when you add files and folders, so you can't change it later.  The "Name" is shown on-screen, and you can change it any time.

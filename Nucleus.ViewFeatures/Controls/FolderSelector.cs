@@ -53,7 +53,15 @@ namespace Nucleus.ViewFeatures.Controls
 			{
 				if (viewModel.SelectedFolder.Id != Guid.Empty)
 				{
-					viewModel.SelectedFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFolder.Id);
+					Folder folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFolder.Id);
+
+					// handle provider change
+					if (folder.Provider != viewModel.SelectedFolder.Provider)
+					{
+						folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFolder.Provider, "");
+					}
+
+					viewModel.SelectedFolder = folder;
 				}
 			}
 
@@ -83,8 +91,8 @@ namespace Nucleus.ViewFeatures.Controls
 			try
 			{
 				if (viewModel.SelectedFolder.Id != Guid.Empty)
-				{
-					viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFolder.Id, pattern);
+				{					
+					viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFolder.Id, pattern);					
 				}
 			}
 			catch (System.IO.FileNotFoundException)

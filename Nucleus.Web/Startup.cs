@@ -281,10 +281,16 @@ namespace Nucleus.Web
 				routes.MapRazorPages();
 
 				// Map the search engines "site map" controller to /sitemap.xml
+				//routes.MapControllerRoute(
+				//	name: "merged.js",
+				//	pattern: "/merged.js/{*src}",
+				//	defaults: new { controller = "MergedFiles", action = "Scripts" });
+
+				// Map the error page
 				routes.MapControllerRoute(
-					name: "test",
-					pattern: "/merged.js/{*src}",
-					defaults: new { controller = "MergedFiles", action = "Scripts" });
+					name: RoutingConstants.ERROR_ROUTE_NAME,
+					pattern: $"/{RoutingConstants.ERROR_ROUTE_PATH}",
+					defaults: new { controller = "Error", action = "Index" });
 
 				// map area routes for the admin controllers
 				routes.MapControllerRoute(
@@ -307,11 +313,6 @@ namespace Nucleus.Web
 					pattern: $"/{RoutingConstants.SITEMAP_ROUTE_PATH}",
 					defaults: new { controller = "Sitemap", action = "Index" });
 
-				// Map the error page
-				routes.MapControllerRoute(
-					name: RoutingConstants.ERROR_ROUTE_NAME,
-					pattern: $"/{RoutingConstants.ERROR_ROUTE_PATH}",
-					defaults: new { controller = "Error", action = "Index" });
 
 				// Configure controller routes using attribute-based routing
 				routes.MapControllers();

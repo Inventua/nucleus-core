@@ -18,18 +18,14 @@ namespace Nucleus.Core.DataProviders
 	public class EFToolsDbContextConfigurator<TDataProvider> : DbContextConfigurator<TDataProvider>
 		where TDataProvider : Nucleus.Data.Common.DataProvider
 	{
-		//private IOptions<DatabaseOptions> DatabaseOptions { get; }
-		//private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
-
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="databaseOptions"></param>
 		/// <param name="folderOptions"></param>
-		public EFToolsDbContextConfigurator()//IOptions<DatabaseOptions> databaseOptions, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
+		public EFToolsDbContextConfigurator()
 		{
-			//this.DatabaseOptions = databaseOptions;
-			//this.FolderOptions = folderOptions;
+			
 		}
 
 		/// <summary>
@@ -39,18 +35,8 @@ namespace Nucleus.Core.DataProviders
 		/// <returns></returns>
 		public override Boolean Configure(DbContextOptionsBuilder options)
 		{
-
-			//DatabaseConnectionOption connectionOption = this.DatabaseOptions.Value.GetDatabaseConnection(typeof(TDataProvider).GetDefaultSchemaName());
-
-			//if (connectionOption != null)
-			//{
-			//options.UseSqlite("Filename=:memory:");
 			options.UseSqlite();
 			return true;
-			//}
-
-			//return false;
-			//return true;
 		}
 	}
 }

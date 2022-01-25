@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.EventHandlers;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace Nucleus.Data.Common
 {
@@ -15,8 +16,8 @@ namespace Nucleus.Data.Common
 	/// the schema migration functions.  Data provider implementations which register a related DataProviderMigration class must inherit 
 	/// this class.
 	/// </remarks>
-	public abstract class DataProvider : IDisposable 
-	{		
+	public abstract class DataProvider : IDisposable
+	{
 		/// <summary>
 		/// Constructor
 		/// </summary>
@@ -33,13 +34,28 @@ namespace Nucleus.Data.Common
 		/// </remarks>
 		abstract public void CheckConnection();
 
-		
+		/// <summary>
+		/// Get database diagnostics information for the specified schema.
+		/// </summary>
+		/// <param name="configuration"></param>
+		/// <param name="schemaName"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// The logic to check whether a specific database provider is the right one to use for the specified schema name 
+		/// is implemented within each <see cref="IDatabaseProvider"/> implementation.
+		/// </remarks>
+		public Dictionary<string, string> GetDatabaseInformation(IConfiguration configuration, string schemaName)
+		{
+			return DataProviderExtensions.GetDataProviderInformation(configuration, schemaName);			
+		}
+
+
 		/// <summary>
 		/// Dispose of resources.
 		/// </summary>
 		public virtual void Dispose()
 		{
-			
+
 		}
 	}
 

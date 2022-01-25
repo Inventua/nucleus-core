@@ -33,6 +33,8 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public IEnumerable<DatabaseConnection> DatabaseConnections { get; set; }
 
+		//public Dictionary<string, string> WebServerInformation { get; set; } = new();
+
 		public SystemIndex()
 		{
 		}
@@ -45,6 +47,7 @@ namespace Nucleus.Web.ViewModels.Admin
 
 			public string ConnectionString { get; set; }
 
+			public Dictionary<string, string> DatabaseInformation { get; set; } = new();
 		}
 	}
 }

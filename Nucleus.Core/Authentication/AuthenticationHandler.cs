@@ -62,7 +62,17 @@ namespace Nucleus.Core.Authentication
 			if (!String.IsNullOrEmpty(sessionId))
 			{
 				Logger.LogTrace("Reading session {sessionId}.", sessionId);
-				userSession = await this.SessionManager.Get(Guid.Parse(sessionId));
+
+				try
+				{
+					userSession = await this.SessionManager.Get(Guid.Parse(sessionId));
+				}
+				catch (Exception e)
+				{
+					Logger?.LogError(e, "");
+					// we need to suppress exceptions here, because when a database connection failure occurs, the Authentication handler (this class) is
+					// called, which causes the exception to be thrown again, and disrupts the error handler.
+				}
 
 				if (userSession != null)
 				{

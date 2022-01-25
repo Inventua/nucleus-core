@@ -14,6 +14,15 @@ namespace Nucleus.Data.Common
 	public interface IDatabaseProvider
 	{
 		/// <summary>
+		/// Database provider type key.
+		/// </summary>
+		/// <remarks>
+		/// This value is used to represent the database provider in the database configuration file 'Type' property.
+		/// </remarks>
+		/// <returns></returns>
+		public string TypeKey();
+
+		/// <summary>
 		/// Add data provider objects to the service collection for the data provider specified by TDataProvider if configuration 
 		/// contains an entry specifying that the data provider uses the database provider implementing this interface.  
 		/// </summary>
@@ -22,7 +31,7 @@ namespace Nucleus.Data.Common
 		/// <param name="options"></param>
 		/// <param name="schemaName"></param>
 		/// <returns></returns>
-		public Boolean AddDataProvider<TDataProvider>(IServiceCollection services, DatabaseOptions options, string schemaName)
+		public IServiceCollection AddDataProvider<TDataProvider>(IServiceCollection services, DatabaseConnectionOption options, string schemaName)
 			where TDataProvider : Nucleus.Data.Common.DataProvider;
 
 		/// <summary>
@@ -32,6 +41,6 @@ namespace Nucleus.Data.Common
 		/// <param name="options"></param>
 		/// <param name="schemaName"></param>
 		/// <returns></returns>
-		public Dictionary<string, string> GetDatabaseInformation(DatabaseOptions options, string schemaName);
+		public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName);
 	}
 }

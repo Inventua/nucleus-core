@@ -77,17 +77,7 @@ namespace Nucleus.Web.Controllers
 				// no error page, or Context.Site is null
 				if (data != null)
 				{
-					// write the error message to the response if the user is a system admin
-					if (ControllerContext.HttpContext.User.IsSystemAdministrator())
-					{
-						return new Microsoft.AspNetCore.Mvc.ContentResult()
-						{
-							ContentType = "text/plain",
-							StatusCode = data.Status.Value,
-							Content = data.Detail
-						};
-					}
-					else if (IsConnectionFailure(exceptionDetails.Error))
+					if (IsConnectionFailure(exceptionDetails.Error))
 					{
 						// Special case.  Display database connection errors regardless of user, because database connection configuration is a likely/common misconfiguration.
 						return new Microsoft.AspNetCore.Mvc.ContentResult()
@@ -95,6 +85,16 @@ namespace Nucleus.Web.Controllers
 							ContentType = "text/plain",
 							StatusCode = data.Status.Value,
 							Content = $"{System.Reflection.Assembly.GetExecutingAssembly().Product()} version {System.Reflection.Assembly.GetExecutingAssembly().Version()}\n- {data.Detail}"
+						};
+					}
+					// write the error message to the response if the user is a system admin
+					else if (ControllerContext.HttpContext.User.IsSystemAdministrator())
+					{
+						return new Microsoft.AspNetCore.Mvc.ContentResult()
+						{
+							ContentType = "text/plain",
+							StatusCode = data.Status.Value,
+							Content = data.Detail
 						};
 					}
 					else

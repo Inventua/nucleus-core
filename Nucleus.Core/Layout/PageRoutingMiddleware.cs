@@ -73,7 +73,25 @@ namespace Nucleus.Core.Layout
 			{
 				Logger.LogTrace("Matching site by host {0} and pathbase {1}.", context.Request.Host, context.Request.PathBase);
 
-				this.Context.Site = await this.SiteManager.Get(context.Request.Host, context.Request.PathBase);
+				try
+				{
+					this.Context.Site = await this.SiteManager.Get(context.Request.Host, context.Request.PathBase);
+				}
+				catch 
+				{
+					if (context.Request.Path.Value == "/" + Nucleus.Abstractions.RoutingConstants.ERROR_ROUTE_PATH)
+					{
+						// Special case.  If an error occurs trying to read page data for the error page, then it is most likely a database connection error.  Suppress the exception
+						// so that the error handler (Nucleus.Web.Controllers.Error) can handle the original error.
+						this.Context.Site = null;
+						await next(context);
+						return;
+					}
+					else
+					{
+						throw;
+					}
+				}
 
 				if (this.Context.Site == null)
 				{

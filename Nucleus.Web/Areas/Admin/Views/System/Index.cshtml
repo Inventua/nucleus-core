@@ -8,6 +8,7 @@
 	<Tab>
 		<TabItem target="#system-information" caption="System Information" active="true"></TabItem>
 		<TabItem target="#system-activity" caption="Activity"></TabItem>
+		@*<TabItem target="#system-webserver" caption="Web Server"></TabItem>*@
 		@*<TabItem target="#system-configuration" caption="Configuration"></TabItem>*@
 		<TabItem target="#system-database" caption="Database"></TabItem>
 		<TabItem target="#system-logs" caption="Logs"></TabItem>
@@ -65,6 +66,18 @@
 			}
 		</TabPanel>
 
+		@*<TabPanel id="system-webserver">
+			<table class="table">
+				@foreach (var keyValue in Model.WebServerInformation)
+				{
+					<tr>
+						<td class="text-nowrap fw-bold">@keyValue.Key</td>
+						<td>@keyValue.Value</td>
+					</tr>
+				}
+				</table>
+		</TabPanel>*@
+
 		@*<TabPanel id="system-configuration">
 			<div class="LogContent">
 				<pre>@Model.Configuration</pre>
@@ -85,8 +98,23 @@
 						<td>@connection.DatabaseType</td>
 						<td>@connection.ConnectionString</td>
 					</tr>
+					<tr>
+						<td colspan="3">
+							<table class="border border-1 table">
+							@foreach (var keyValue in connection.DatabaseInformation)
+							{
+								<tr>
+									<td class="text-nowrap fw-bold">@keyValue.Key</td>
+									<td>@keyValue.Value</td>
+								</tr>
+							}
+							</table>
+						</td>
+					</tr>
 				}
 			</table>
+
+			
 		</TabPanel>
 
 		<TabPanel id="system-logs">

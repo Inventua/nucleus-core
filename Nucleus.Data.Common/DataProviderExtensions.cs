@@ -25,7 +25,7 @@ namespace Nucleus.Data.Common
 		/// <returns></returns>
 		/// <remarks>
 		/// The logic to check whether a specific database provider is the right one to use for the specified <typeparamref name="TDataProvider"/> 
-		/// is implemented within each <see cref="IConfigureDataProvider"/> implementation.
+		/// is implemented within each <see cref="IDatabaseProvider"/> implementation.
 		/// Data providers which are based on Nucleus.Data.EntityFramework do not need to call this directly - it is called by the
 		/// Nucleus.Data.EntityFramework.DataProviderExtensions.AddDataProvider() methods.
 		/// </remarks>
@@ -48,7 +48,7 @@ namespace Nucleus.Data.Common
 		/// <returns></returns>
 		/// <remarks>
 		/// The logic to check whether a specific database provider is the right one to use for the specified <typeparamref name="TDataProvider"/> 
-		/// is implemented within each <see cref="IConfigureDataProvider"/> implementation.
+		/// is implemented within each <see cref="IDatabaseProvider"/> implementation.
 		/// Data providers which are based on Nucleus.Data.EntityFramework do not need to call this directly - it is called by the
 		/// Nucleus.Data.EntityFramework.DataProviderExtensions.AddDataProvider() methods.
 		/// </remarks>
@@ -65,21 +65,24 @@ namespace Nucleus.Data.Common
 			List<Type> dataProviderConfigImplementations = System.Runtime.Loader.AssemblyLoadContext.All
 				.SelectMany(context => context.Assemblies)
 				.SelectMany(assm => GetTypes(assm))// assm => assm.GetTypes())
-				.Where(type => typeof(IConfigureDataProvider).IsAssignableFrom(type) && !type.Equals(typeof(IConfigureDataProvider)))
+				.Where(type => typeof(IDatabaseProvider).IsAssignableFrom(type) && !type.Equals(typeof(IDatabaseProvider)))
 				.ToList();
 
 			// Add data provider objects for the data provider specified by <T>.  The database provider required for <T> is specified in
-			// config.  The .AddDataProvider method in each database provider is responsible for checking whether it is the right one to be
-			// used for <T>.
+			// config. 
 			foreach (Type implementation in dataProviderConfigImplementations)
 			{
-				IConfigureDataProvider instance = Activator.CreateInstance(implementation) as IConfigureDataProvider;
+				IDatabaseProvider instance = Activator.CreateInstance(implementation) as IDatabaseProvider;
 				if (instance != null)
 				{
-					if (instance.AddDataProvider<TDataProvider>(services, options, schemaName))
+					// Get connection for the specified schema name.  If it is found, add Sqlite data provider objects to the services collection.
+					DatabaseConnectionOption connectionOption = options.GetDatabaseConnection(schemaName);
+
+					if (connectionOption != null && connectionOption.Type.Equals(instance.TypeKey(), StringComparison.OrdinalIgnoreCase))
 					{
+						instance.AddDataProvider<TDataProvider>(services, connectionOption, schemaName);						
 						success = true;
-						break;
+						break;						
 					}
 				}
 			}
@@ -90,6 +93,49 @@ namespace Nucleus.Data.Common
 			}
 
 			return services;
+		}
+
+		/// <summary>
+		/// Get database diagnostics information for the specified schema.
+		/// </summary>
+		/// <param name="configuration"></param>
+		/// <param name="schemaName"></param>
+		/// <returns></returns>
+		static public Dictionary<string, string> GetDataProviderInformation(IConfiguration configuration, string schemaName)
+		{
+			Dictionary<string, string> results = new();
+
+			// Get database options
+			DatabaseOptions options = new();
+			configuration.GetSection(DatabaseOptions.Section).Bind(options, options => options.BindNonPublicProperties = true);
+
+			// Find IConfigureDataProvider implementations		
+			List<Type> dataProviderConfigImplementations = System.Runtime.Loader.AssemblyLoadContext.All
+				.SelectMany(context => context.Assemblies)
+				.SelectMany(assm => GetTypes(assm))// assm => assm.GetTypes())
+				.Where(type => typeof(IDatabaseProvider).IsAssignableFrom(type) && !type.Equals(typeof(IDatabaseProvider)))
+				.ToList();
+
+			// Determine which database provider services the specified schema name and retrieve database diagnostic information
+			foreach (Type implementation in dataProviderConfigImplementations)
+			{
+				IDatabaseProvider instance = Activator.CreateInstance(implementation) as IDatabaseProvider;
+				if (instance != null)
+				{
+					// Get connection for the specified schema name.  If it is found, add data provider objects to the services collection.
+					DatabaseConnectionOption connectionOption = options.GetDatabaseConnection(schemaName);
+
+					if (connectionOption != null && connectionOption.Type.Equals(instance.TypeKey(), StringComparison.OrdinalIgnoreCase))
+					{
+						foreach (KeyValuePair<string, string> value in instance.GetDatabaseInformation(connectionOption, schemaName))
+						{
+							results.Add(value.Key, value.Value);
+						}
+					}					
+				}
+			}
+
+			return results;
 		}
 
 		private static Type[] GetTypes(System.Reflection.Assembly assembly)

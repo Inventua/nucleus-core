@@ -10,6 +10,7 @@ using Nucleus.Abstractions.Models.TaskScheduler;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -22,7 +23,7 @@ namespace Nucleus.Web.Controllers.Admin
 		private IConfiguration Configuration { get; }
 		private ILogger<SystemController> Logger { get; }
 		private IOptions<DatabaseOptions> DatabaseOptions { get; }
-
+				
 		public SystemController(RunningTaskQueue runningTaskQueue, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<Nucleus.Core.Logging.TextFileLoggerOptions> options, IConfiguration configuration)
 		{
 			this.RunningTaskQueue = runningTaskQueue;
@@ -126,7 +127,10 @@ namespace Nucleus.Web.Controllers.Admin
 
 				if (connection != null)
 				{
-					connections.Add(new ViewModels.Admin.SystemIndex.DatabaseConnection() { Schema = schema.Name, DatabaseType = connection.Type, ConnectionString = Sanitize(connection.ConnectionString) });
+					ViewModels.Admin.SystemIndex.DatabaseConnection databaseConnection = new ViewModels.Admin.SystemIndex.DatabaseConnection() { Schema = schema.Name, DatabaseType = connection.Type, ConnectionString = Sanitize(connection.ConnectionString) };
+					databaseConnection.DatabaseInformation = Nucleus.Data.Common.DataProviderExtensions.GetDataProviderInformation(this.Configuration, schema.Name);
+
+					connections.Add(databaseConnection);					
 				}
 				else
 				{
@@ -135,6 +139,14 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 
 			viewModelOutput.DatabaseConnections = connections;
+
+			//IServerVariablesFeature serverVars = HttpContext.Features.Get<IServerVariablesFeature>();
+			//if (serverVars != null)
+			//{				
+			//	viewModelOutput.WebServerInformation.Add("Server", serverVars["SERVER_NAME"]);
+			//	viewModelOutput.WebServerInformation.Add("Software", serverVars["SERVER_SOFTWARE"]);
+			//	viewModelOutput.WebServerInformation.Add("Path", serverVars["APPL_PHYSICAL_PATH"]);				
+			//}
 
 			return View("Index", viewModelOutput);
 		}

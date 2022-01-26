@@ -178,9 +178,15 @@ namespace Nucleus.Data.EntityFramework
 				.ToTable("Users")
 				.HasOne(user => user.Secrets);
 
+			// Custom valid converter for userSession.RemoteIpAddress [System.Net.IPAddress] is required because the PostgreSQL E/F provider can't convert
+			// string to IPAddress.
 			builder.Entity<UserSession>()
 				.ToTable("UserSessions")
-				.Ignore(userSession => userSession.LastUpdate);
+				.Ignore(userSession => userSession.LastUpdate)
+				.Property(userSession => userSession.RemoteIpAddress)
+				.HasConversion(
+						value => value.ToString(),
+						value => System.Net.IPAddress.Parse(value));
 
 			builder.Entity<UserProfileValue>()
 				.ToTable("UserProfileValues")

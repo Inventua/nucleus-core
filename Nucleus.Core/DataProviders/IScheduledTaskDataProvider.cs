@@ -16,7 +16,10 @@ namespace Nucleus.Core.DataProviders
 	{
 		abstract Task<ScheduledTask> GetScheduledTaskByTypeName(string typeName);
 		abstract Task SaveScheduledTask(ScheduledTask scheduledTask);
-		abstract Task ScheduleNextRun(ScheduledTask scheduledTask, DateTime nextRunDateTime);
+		//abstract Task ScheduleNextRun(ScheduledTask scheduledTask, DateTime nextRunDateTime);
+
+		abstract Task<ScheduledTaskHistory> GetMostRecentHistory(ScheduledTask scheduledTask, string server);
+
 		abstract Task<ScheduledTask> GetScheduledTask(Guid scheduledTaskId);
 		abstract Task<List<ScheduledTask>> ListScheduledTasks();
 		abstract Task DeleteScheduledTask(ScheduledTask scheduledTask);

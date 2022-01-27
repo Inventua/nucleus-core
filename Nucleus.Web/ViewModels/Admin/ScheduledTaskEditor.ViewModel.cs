@@ -11,6 +11,9 @@ namespace Nucleus.Web.ViewModels.Admin
 	public class ScheduledTaskEditor
 	{
 		public ScheduledTask ScheduledTask { get; set; }
+
+		public ScheduledTaskHistory LatestHistory { get; set; }
+
 		public List<ScheduledTaskHistory> History { get; set; }
 
 		public IEnumerable<string> AvailableServiceTypes { get; set; }

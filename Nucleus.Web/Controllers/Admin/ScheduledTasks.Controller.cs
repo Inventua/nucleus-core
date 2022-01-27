@@ -86,8 +86,10 @@ namespace Nucleus.Web.Controllers.Admin
 			{
 				return BadRequest(ControllerContext.ModelState);
 			}
-
-			await this.ScheduledTaskManager.ScheduleNextRun(viewModel.ScheduledTask, DateTime.UtcNow);
+	
+			ScheduledTaskHistory history =	await this.ScheduledTaskManager.GetMostRecentHistory(viewModel.ScheduledTask, Environment.MachineName);
+			history.NextScheduledRun = null;
+			await this.ScheduledTaskManager.SaveHistory(history);
 
 			return View("Index", await BuildViewModel());
 		}
@@ -137,6 +139,7 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.ScheduledTask = scheduledTask;
 			viewModel.AvailableServiceTypes = await this.ScheduledTaskManager.ListBackgroundServices();
 			viewModel.History = await this.ScheduledTaskManager.ListHistory(scheduledTask);
+			viewModel.LatestHistory = await this.ScheduledTaskManager.GetMostRecentHistory(scheduledTask, !scheduledTask.InstanceType.HasValue || scheduledTask.InstanceType == ScheduledTask.InstanceTypes.PerInstance ? null : Environment.MachineName);
 
 			if (scheduledTask.Id != Guid.Empty && !String.IsNullOrEmpty(this.LogFolderPath))
 			{
@@ -146,15 +149,30 @@ namespace Nucleus.Web.Controllers.Admin
 					List<Nucleus.Web.ViewModels.Shared.LogFileInfo> logs = new();
 					foreach (System.IO.FileInfo file in logFolder.EnumerateFiles("*.log"))
 					{
-						if (DateTime.TryParseExact(System.IO.Path.GetFileNameWithoutExtension(file.Name), LogFileConstants.DATETIME_FILENAME_FORMAT, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal, out DateTime logDate))
+						System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(file.Name, LogFileConstants.LOGFILE_REGEX);
+
+						if (match.Success && match.Groups.Count >= 3)
 						{
-							logs.Add(new Nucleus.Web.ViewModels.Shared.LogFileInfo()
+							Logger.LogTrace("Log file {file.Name} matches the expected pattern.", file.Name);
+
+							if (DateTime.TryParseExact(match.Groups[1].Value, LogFileConstants.DATETIME_FILENAME_FORMAT, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal, out DateTime logDate))
 							{
-								Filename = file.Name,
-								Title = logDate.ToLocalTime().ToString("dd MMM yyyy HH:mm"),
-								LogDate = logDate
-							});
+								logs.Add(new Nucleus.Web.ViewModels.Shared.LogFileInfo()
+								{
+									Filename = file.Name,
+									Title = $"{logDate.ToLocalTime():dd MMM yyyy HH:mm} [{match.Groups[2].Value}]",
+									LogDate = logDate
+								});
+							}
+							else
+							{
+								Logger.LogTrace("Could not parse the date for log file {file.Name}.", file.Name);
+							}
 						}
+						else
+						{
+							Logger.LogTrace("Log file {file.Name} does not match the expected pattern.", file.Name);
+						}					
 					}
 
 					viewModel.LogFiles = logs.OrderByDescending(log => log.LogDate).ToList();

@@ -83,7 +83,7 @@ namespace Nucleus.Abstractions
 		/// <summary>
 		/// Regex used to parse log file into date and computer name
 		/// </summary>
-		public const string LOGFILE_REGEX = "(?<logdate>[0-9]{2}-[A-Za-z]{3}-[0-9]{4}[ 0-9-]{0,5} UTC)_(?<computername>.*).log";
+		public const string LOGFILE_REGEX = "(?<logdate>[0-9]{2}-[A-Za-z]{3}-[0-9]{4}[ 0-9-]{0,6} UTC)_(?<computername>.*).log";
 
 	}
 }

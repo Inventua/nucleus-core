@@ -53,6 +53,23 @@ namespace Nucleus.Abstractions.Models.TaskScheduler
 		}
 
 		/// <summary>
+		/// Specifies whether the task runs per instance, or per server.
+		/// </summary>
+		public enum InstanceTypes
+		{
+			/// <summary>
+			/// Task runs on each server.
+			/// </summary>
+			[Display(Name = "Per Server")]
+			PerServer,
+			/// <summary>
+			/// Task runs once per instance.
+			/// </summary>
+			[Display(Name = "Per Instance")]
+			PerInstance
+		}
+
+		/// <summary>
 		/// Unique record identifier.
 		/// </summary>
 		public Guid Id { get; set; }
@@ -83,10 +100,15 @@ namespace Nucleus.Abstractions.Models.TaskScheduler
 		/// </summary>
 		public Boolean Enabled { get; set; } = true;
 
+		///// <summary>
+		///// The date/time that the task will next run.
+		///// </summary>
+		//public DateTime? NextScheduledRun { get; set; }
+
 		/// <summary>
-		/// The date/time that the task will next run.
+		/// Specifies whether the task runs once for all servers, or once on each server.
 		/// </summary>
-		public DateTime? NextScheduledRun { get; set; }
+		public InstanceTypes? InstanceType { get; set; }
 
 		/// <summary>
 		/// Specifies the number of history records to keep.

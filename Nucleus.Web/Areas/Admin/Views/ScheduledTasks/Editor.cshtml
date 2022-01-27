@@ -40,6 +40,10 @@
 							@Html.DropDownListFor(model => model.ScheduledTask.IntervalType, Html.GetEnumSelectList(typeof(ScheduledTask.Intervals)))
 						</SettingsControl>
 
+						<SettingsControl caption="Instance Type" helptext="Instance Type.">
+							@Html.DropDownListFor(model => model.ScheduledTask.InstanceType, Html.GetEnumSelectList(typeof(ScheduledTask.InstanceTypes)))
+						</SettingsControl>
+
 						<SettingsControl caption="Keep History (count)" helptext="The number of history records to retain in the database.">
 							@Html.DropDownListFor(model => model.ScheduledTask.KeepHistoryCount, new List<SelectListItem>
 							{
@@ -56,7 +60,7 @@
 
 
 					<SettingsControl caption="Next Run">
-						<div>@(!Model.ScheduledTask.NextScheduledRun.HasValue ? "Immediate" : Model.ScheduledTask.NextScheduledRun.FormatDate(true))</div>
+						<div>@(Model.LatestHistory == null ? "Immediate" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(true) : "-"))</div>
 					</SettingsControl>
 
 					@if (Model.ScheduledTask.Id != Guid.Empty)

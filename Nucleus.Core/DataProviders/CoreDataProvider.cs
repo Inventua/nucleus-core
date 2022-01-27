@@ -1570,15 +1570,30 @@ namespace Nucleus.Core.DataProviders
 				.FirstOrDefaultAsync();
 		}
 
-		public async Task ScheduleNextRun(ScheduledTask scheduledTask, DateTime nextRunDateTime)
-		{
-			ScheduledTask task = await this.Context.ScheduledTasks
-				.Where(task => task.Id == scheduledTask.Id)
-				.FirstOrDefaultAsync();
+		//public async Task ScheduleNextRun(ScheduledTask scheduledTask, DateTime nextRunDateTime)
+		//{
+		//	ScheduledTask task = await this.Context.ScheduledTasks
+		//		.Where(task => task.Id == scheduledTask.Id)
+		//		.FirstOrDefaultAsync();
 
-			task.NextScheduledRun = nextRunDateTime;
-			await this.Context.SaveChangesAsync<ScheduledTask>();
-			this.EventManager.RaiseEvent<ScheduledTask, Update>(scheduledTask);
+		//	task.NextScheduledRun = nextRunDateTime;
+		//	await this.Context.SaveChangesAsync<ScheduledTask>();
+		//	this.EventManager.RaiseEvent<ScheduledTask, Update>(scheduledTask);
+		//}
+
+		public async Task<ScheduledTaskHistory> GetMostRecentHistory(ScheduledTask scheduledTask, string server)
+		{
+			var query = this.Context.ScheduledTaskHistory
+				.Where(history => history.ScheduledTaskId == scheduledTask.Id);
+
+			if (!String.IsNullOrEmpty(server))
+			{
+				query = query.Where(history => history.Server == server);
+			}
+
+			return await query
+				.OrderByDescending(history => history.NextScheduledRun)
+				.FirstOrDefaultAsync();
 		}
 
 		public async Task<ScheduledTask> GetScheduledTaskByTypeName(string typeName)

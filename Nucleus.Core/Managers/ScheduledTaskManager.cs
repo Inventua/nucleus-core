@@ -82,17 +82,25 @@ namespace Nucleus.Core.Managers
 			return Task.FromResult(results as IEnumerable<string>);			
 		}
 
-		/// <summary>
-		/// Update the <see cref="ScheduledTask.NextScheduledRun"/>.
-		/// </summary>
-		/// <param name="scheduledTask"></param>
-		/// <param name="nextRunDateTime"></param>
-		public async Task ScheduleNextRun(ScheduledTask scheduledTask, DateTime nextRunDateTime)
+		///// <summary>
+		///// Update the <see cref="ScheduledTask.NextScheduledRun"/>.
+		///// </summary>
+		///// <param name="scheduledTask"></param>
+		///// <param name="nextRunDateTime"></param>
+		//public async Task ScheduleNextRun(ScheduledTask scheduledTask, DateTime nextRunDateTime)
+		//{
+		//	using (IScheduledTaskDataProvider provider = this.DataProviderFactory.CreateProvider<IScheduledTaskDataProvider>())
+		//	{
+		//		await provider.ScheduleNextRun(scheduledTask, nextRunDateTime);
+		//		this.CacheManager.ScheduledTaskCache().Remove(scheduledTask.Id);
+		//	}
+		//}
+
+		public async Task<ScheduledTaskHistory> GetMostRecentHistory(ScheduledTask scheduledTask, string server)
 		{
 			using (IScheduledTaskDataProvider provider = this.DataProviderFactory.CreateProvider<IScheduledTaskDataProvider>())
 			{
-				await provider.ScheduleNextRun(scheduledTask, nextRunDateTime);
-				this.CacheManager.ScheduledTaskCache().Remove(scheduledTask.Id);
+				return await provider.GetMostRecentHistory(scheduledTask, !scheduledTask.InstanceType.HasValue || scheduledTask.InstanceType == ScheduledTask.InstanceTypes.PerInstance ? null : server);					
 			}
 		}
 

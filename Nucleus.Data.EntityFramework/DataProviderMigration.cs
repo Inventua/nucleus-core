@@ -262,6 +262,7 @@ namespace Nucleus.Data.EntityFramework
 			return true;
 		}
 
+		
 		private void ApplyCorrections(MigrationOperation operation)
 		{
 			if (operation.GetType() == typeof(CreateTableOperation))
@@ -275,11 +276,7 @@ namespace Nucleus.Data.EntityFramework
 						column.Table = createTableOperation.Name;
 					}
 
-					// Default to unicode (nvarchar) types if not specified
-					if (!column.IsUnicode.HasValue)
-					{
-						column.IsUnicode = true;
-					}
+					ApplyCorrections(column);
 
 					if (DbContext.Database.ProviderName.EndsWith("SqlServer", StringComparison.OrdinalIgnoreCase))
 					{
@@ -287,10 +284,10 @@ namespace Nucleus.Data.EntityFramework
 						// set default to newsequentialid() 
 						if
 						(
-							createTableOperation.PrimaryKey != null && 
+							createTableOperation.PrimaryKey != null &&
 							column.ClrType == typeof(Guid) &&
-							(column.Name.Equals("Id",StringComparison.OrdinalIgnoreCase) || column.Name.Equals($"{column.Table}Id", StringComparison.OrdinalIgnoreCase) || column.Name.Equals($"{column.Table}_Id", StringComparison.OrdinalIgnoreCase)) &&
-							createTableOperation.PrimaryKey.Columns.Count() == 1 && 
+							(column.Name.Equals("Id", StringComparison.OrdinalIgnoreCase) || column.Name.Equals($"{column.Table}Id", StringComparison.OrdinalIgnoreCase) || column.Name.Equals($"{column.Table}_Id", StringComparison.OrdinalIgnoreCase)) &&
+							createTableOperation.PrimaryKey.Columns.Count() == 1 &&
 							createTableOperation.PrimaryKey.Columns.Contains(column.Name, StringComparer.OrdinalIgnoreCase))
 						{
 							column.DefaultValueSql = "newsequentialid()";
@@ -322,6 +319,10 @@ namespace Nucleus.Data.EntityFramework
 				}
 			}
 
+			if (operation.GetType() == typeof(AddColumnOperation))
+			{
+				ApplyCorrections(operation as AddColumnOperation);
+			}
 
 			if (operation.GetType() == typeof(DatabaseProviderSpecificOperation))
 			{
@@ -329,6 +330,18 @@ namespace Nucleus.Data.EntityFramework
 			}
 		}
 
+		/// <summary>
+		/// Apply corrections for an AddColumnOperation, which could be standalone, or part of a create table operation.
+		/// </summary>
+		/// <param name="operation"></param>
+		private void ApplyCorrections(AddColumnOperation operation)
+		{
+			// Default to unicode (nvarchar) types if not specified
+			if (!operation.IsUnicode.HasValue)
+			{
+				operation.IsUnicode = true;
+			}
+		}
 
 		private void ExecuteCommand(DatabaseSchemaScript script, string command)
 		{

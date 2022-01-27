@@ -42,12 +42,12 @@ namespace Nucleus.Abstractions.Managers
 		/// <returns></returns>
 		public Task<IEnumerable<string>> ListBackgroundServices();
 
-		/// <summary>
-		/// Update the <see cref="ScheduledTask.NextScheduledRun"/>.
-		/// </summary>
-		/// <param name="scheduledTask"></param>
-		/// <param name="nextRunDateTime"></param>
-		public Task ScheduleNextRun(ScheduledTask scheduledTask, DateTime nextRunDateTime);
+		///// <summary>
+		///// Update the <see cref="ScheduledTask.NextScheduledRun"/>.
+		///// </summary>
+		///// <param name="scheduledTask"></param>
+		///// <param name="nextRunDateTime"></param>
+		//public Task ScheduleNextRun(ScheduledTask scheduledTask, DateTime nextRunDateTime);
 
 		/// <summary>
 		/// Create or update the specified <see cref="ScheduledTaskHistory"/>.
@@ -66,6 +66,17 @@ namespace Nucleus.Abstractions.Managers
 		/// </summary>
 		/// <param name="task"></param>
 		public Task<List<ScheduledTaskHistory>> ListHistory(ScheduledTask task);
+
+		/// <summary>
+		/// Get the most recent scheduled task history for the specified server.
+		/// </summary>
+		/// <param name="scheduledTask"></param>
+		/// <param name="server"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// Specify NULL for the server name to ignore the server name.
+		/// </remarks>
+		public Task<ScheduledTaskHistory> GetMostRecentHistory(ScheduledTask scheduledTask, string server);
 
 		/// <summary>
 		/// Create or update the specified <see cref="ScheduledTask"/>.

@@ -17,7 +17,7 @@ namespace Nucleus.Abstractions.Models.TaskScheduler
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="progress"></param>
-		public delegate void ProgressEvent(RunningTask sender, ScheduledTaskProgress progress);
+		public delegate Task ProgressEvent(RunningTask sender, ScheduledTaskProgress progress);
 
 		/// <summary>
 		/// Event raised when progress is reported by the task.

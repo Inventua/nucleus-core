@@ -1,0 +1,13 @@
+{
+	"schemaName": "Nucleus.Core",
+	"version": "01.00.01",
+	"operations": [
+		{
+			"addColumn": {
+				"table": "ScheduledTasks",
+				"name": "InstanceType",
+				"clrType": "int"
+			}
+		}
+	]
+}

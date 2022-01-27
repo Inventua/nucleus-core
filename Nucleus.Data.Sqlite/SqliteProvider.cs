@@ -73,13 +73,16 @@ namespace Nucleus.Data.Sqlite
 		public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName)
 		{
 			Dictionary<string, string> results = new();
-
-			System.Data.Common.DbConnection connection = new Microsoft.Data.Sqlite.SqliteConnection(options.ConnectionString);
+			Nucleus.Abstractions.Models.Configuration.FolderOptions folderOptions = new();
+			System.Data.Common.DbConnection connection = new Microsoft.Data.Sqlite.SqliteConnection(folderOptions.Parse(options.ConnectionString));
 			connection.Open();
 
-			results.Add("Database", connection.Database);
+			// For Sqlite, we show the filename (with no path or extension) as the database name, because the Sqlite "database" is always called "main".  We
+			// exclude the path in order to not show potentially sensitive information, and we exclude the file extension because it doesn't add anything to
+			// the display, and the filename presents better on-screen without the extension (which is pretty much always ".db" anyway).
+			results.Add("Database", System.IO.Path.GetFileNameWithoutExtension(connection.DataSource));
 			results.Add("Version", ExecuteScalar(connection, "SELECT sqlite_version()"));			
-			results.Add("Size", new System.IO.FileInfo(connection.Database).Length.FormatFileSize());
+			results.Add("Size", new System.IO.FileInfo(connection.DataSource).Length.FormatFileSize());
 
 			connection.Close();
 

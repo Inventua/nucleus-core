@@ -28,7 +28,7 @@ namespace Nucleus.Extensions
 			}
 			else
 			{
-				return System.TimeZoneInfo.CreateCustomTimeZone("User Timezone", new TimeSpan(Convert.ToInt32(request.Cookies["timezone-offset"])), "User Timezone", "User Timezone");
+				return System.TimeZoneInfo.CreateCustomTimeZone("User Timezone", TimeSpan.FromMinutes(Convert.ToInt32(request.Cookies["timezone-offset"])), "User Timezone", "User Timezone");
 			}
 		}
 	}

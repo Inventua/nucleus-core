@@ -37,16 +37,16 @@ namespace Nucleus.Data.Common
 		/// <summary>
 		/// Get database diagnostics information for the specified schema.
 		/// </summary>
-		/// <param name="configuration"></param>
+		/// <param name="services"></param>
 		/// <param name="schemaName"></param>
 		/// <returns></returns>
 		/// <remarks>
 		/// The logic to check whether a specific database provider is the right one to use for the specified schema name 
 		/// is implemented within each <see cref="IDatabaseProvider"/> implementation.
 		/// </remarks>
-		public Dictionary<string, string> GetDatabaseInformation(IConfiguration configuration, string schemaName)
+		public Dictionary<string, string> GetDatabaseInformation(IServiceProvider services, string schemaName)
 		{
-			return DataProviderExtensions.GetDataProviderInformation(configuration, schemaName);			
+			return DataProviderExtensions.GetDataProviderInformation(services, schemaName);			
 		}
 
 

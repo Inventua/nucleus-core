@@ -124,6 +124,7 @@ namespace Nucleus.Core.Logging
 		{
 			logger.LogInformation(String.Join(Environment.NewLine, messages), args);
 		}
+
 	}
 		
 }

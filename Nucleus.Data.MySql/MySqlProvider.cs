@@ -32,7 +32,7 @@ namespace Nucleus.Data.MySql
 		}
 
 		/// <summary>
-		/// Add SqlServer data provider objects to the service collection for the data provider specified by TDataProvider if configuration 
+		/// Add MySql data provider objects to the service collection for the data provider specified by TDataProvider if configuration 
 		/// contains an entry specifying that the data provider uses SqlServer.  This overload allows callers to specify their schema name instead 
 		/// if using the default.
 		/// </summary>
@@ -48,7 +48,7 @@ namespace Nucleus.Data.MySql
 		}
 
 		/// <summary>
-		/// Add SqlServer data provider objects to the service collection for the data provider specified by TDataProvider if configuration 
+		/// Add MySql data provider objects to the service collection for the data provider specified by TDataProvider if configuration 
 		/// contains an entry specifying that the data provider uses SqlServer.  This overload allows callers to specify their schema name instead 
 		/// if using the default.
 		/// </summary>
@@ -70,7 +70,7 @@ namespace Nucleus.Data.MySql
 		/// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
 		/// the database provider implementing this interface.
 		/// </summary>
-		public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName)
+		public Dictionary<string, string> GetDatabaseInformation(IServiceProvider services, DatabaseConnectionOption options, string schemaName)
 		{
 			Dictionary<string, string> results = new();
 

@@ -1,9 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using Nucleus.Data.Common;
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Nucleus.Abstractions.EventHandlers;
 using System.Linq;
 
 namespace Nucleus.Data.EntityFramework

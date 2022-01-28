@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Abstractions.Models.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace Nucleus.Data.Common
 {
@@ -21,7 +22,7 @@ namespace Nucleus.Data.Common
 		/// </remarks>
 		/// <returns></returns>
 		public string TypeKey();
-
+		
 		/// <summary>
 		/// Add data provider objects to the service collection for the data provider specified by TDataProvider if configuration 
 		/// contains an entry specifying that the data provider uses the database provider implementing this interface.  
@@ -38,9 +39,10 @@ namespace Nucleus.Data.Common
 		/// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
 		/// the database provider implementing this interface.
 		/// </summary>
+		/// <param name="services"></param>
 		/// <param name="options"></param>
 		/// <param name="schemaName"></param>
 		/// <returns></returns>
-		public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName);
+		public Dictionary<string, string> GetDatabaseInformation(IServiceProvider services, DatabaseConnectionOption options, string schemaName);
 	}
 }

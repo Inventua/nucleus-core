@@ -80,8 +80,8 @@ namespace Nucleus.Core.Plugins
 			// Load the assembly
 			try
 			{
-				// exclude anything in the bin/runtimes folder, these are not .net assemblies
-				if (System.IO.Path.GetDirectoryName(path).ToLower().Contains("\\runtimes\\") && System.IO.Path.GetDirectoryName(path).ToLower().EndsWith("\\native"))
+				// exclude anything in the bin/runtimes/**/native folder, these are not .net assemblies
+				if (System.IO.Path.GetDirectoryName(path).ToLower().Replace('/', '\\').Contains("\\runtimes\\") && System.IO.Path.GetDirectoryName(path).ToLower().Replace('/', '\\').EndsWith("\\native"))
 				{
 					return null;
 				}

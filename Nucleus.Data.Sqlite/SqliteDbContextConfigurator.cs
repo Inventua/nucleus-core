@@ -11,7 +11,7 @@ using Nucleus.Data.Common;
 using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Data.Sqlite
-{
+{	
 	/// <summary>
 	/// DbContext options configuration class for Sqlite
 	/// </summary>
@@ -44,7 +44,17 @@ namespace Nucleus.Data.Sqlite
 
 			if (connectionOption != null)
 			{
-				options.UseSqlite(this.FolderOptions.Value.Parse(connectionOption.ConnectionString));
+				// Special case for Sqlite - ensure that the folder exists
+				FolderOptions folderOptions = this.FolderOptions.Value;
+
+				Microsoft.Data.Sqlite.SqliteConnection connection = new(folderOptions.Parse(connectionOption.ConnectionString));
+				if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(connection.DataSource)))
+				{
+					System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(connection.DataSource));
+				}
+
+				options.UseSqlite(connection.ConnectionString);
+
 				return true;
 			}
 

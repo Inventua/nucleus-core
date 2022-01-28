@@ -12,11 +12,27 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Mail;
 using Nucleus.Abstractions.EventHandlers;
 using Nucleus.Abstractions.Search;
+using Microsoft.Extensions.Options;
 
 namespace Nucleus.Core
 {
 	public static class CoreServiceExtensions
 	{	
+		/// <summary>
+		/// Add and configure Nucleus folder options
+		/// </summary>
+		/// <param name="services"></param>
+		/// <param name="configuration"></param>
+		/// <returns></returns>
+		public static IServiceCollection AddFolderOptions(this IServiceCollection services, IConfiguration configuration)
+		{
+			// Register action & post-configuration for folder options (as normal)
+			AddOption<FolderOptions>(services, configuration, FolderOptions.Section);
+			services.ConfigureOptions(typeof(ConfigureFolderOptions));
+
+			return services;
+		}
+
 		/// <summary>
 		/// Add core service "manager" classes to the dependency injection services collection
 		/// </summary>
@@ -72,10 +88,7 @@ namespace Nucleus.Core
 
 			// config options
 			AddOption<PasswordOptions>(services, configuration, PasswordOptions.Section);
-			AddOption<ClaimTypeOptions>(services, configuration, ClaimTypeOptions.Section);
-			
-			// Replaced by code in CacheManager.Add
-			//AddOption<CacheOptions>(services, configuration, CacheOptions.Section);
+			AddOption<ClaimTypeOptions>(services, configuration, ClaimTypeOptions.Section);			
 			AddOption<SmtpMailOptions>(services, configuration, SmtpMailOptions.Section);
 			AddOption<HtmlEditorOptions>(services, configuration, HtmlEditorOptions.Section);
 			
@@ -85,8 +98,34 @@ namespace Nucleus.Core
 		public static void AddOption<T>(IServiceCollection services, IConfiguration configuration, string key) where T : class, new()
 		{
 			services.Configure<T>(configuration.GetSection(key), binderOptions => binderOptions.BindNonPublicProperties = true); 
-		}	
-	
+		}
+
+
+		public class ConfigureFolderOptions : IPostConfigureOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions>
+		{			
+			public ConfigureFolderOptions()
+			{
+				
+			}
+
+			public void PostConfigure(string name, Nucleus.Abstractions.Models.Configuration.FolderOptions options)
+			{
+				PostConfigure(options);
+			}
+
+			public static void PostConfigure(Nucleus.Abstractions.Models.Configuration.FolderOptions options)
+			{
+				if (String.IsNullOrEmpty(options.DataFolder))
+				{
+					options.DataFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Nucleus");
+				}
+
+				if (!System.IO.Directory.Exists(options.DataFolder))
+				{
+					System.IO.Directory.CreateDirectory(options.DataFolder);
+				}
+			}
+		}
 	}
 }
 

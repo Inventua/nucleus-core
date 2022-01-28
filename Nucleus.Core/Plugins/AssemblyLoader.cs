@@ -261,12 +261,13 @@ namespace Nucleus.Core.Plugins
 		/// </remarks>
 		public static void UnloadAll()
 		{
+			TypeContextCache.Clear();
+			
 			foreach (string path in System.IO.Directory.GetDirectories(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic()))
 			{
 				UnloadPlugin(GetExtensionFolderName(path));
 			}
 
-			TypeContextCache.Clear();
 			ExtensionLoadContexts.Clear();
 
 			GC.Collect();
@@ -282,14 +283,16 @@ namespace Nucleus.Core.Plugins
 			if (ExtensionLoadContexts.Keys.Contains(pluginName))
 			{
 				AssemblyLoadContext context = ExtensionLoadContexts[pluginName];
-
+			
 				ExtensionLoadContexts.Remove(pluginName);
+					
 				context.Unload();
 				context = null;
 
 				GC.Collect();
 				GC.WaitForPendingFinalizers();
-			}
+				
+			}			
 		}
 
 		/// <summary>
@@ -307,7 +310,7 @@ namespace Nucleus.Core.Plugins
 			// get all assemblies (dlls) in /bin 
 			results.AddRange(System.IO.Directory.EnumerateFiles(System.IO.Path.GetDirectoryName(typeof(AssemblyLoader).Assembly.Location), "*.dll", System.IO.SearchOption.AllDirectories));
 			
-			// get all module assemblies (dlls) 
+			// get all extension assemblies (dlls) 
 			results.AddRange(System.IO.Directory.EnumerateFiles(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic(), "*.dll", System.IO.SearchOption.AllDirectories));
 			
 			return results;

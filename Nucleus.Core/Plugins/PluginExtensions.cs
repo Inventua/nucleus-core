@@ -27,9 +27,6 @@ namespace Nucleus.Core.Plugins
 		{
 			builder.AddExternalControllers();
 
-			// replaced by ModuleViewLocationExpander
-			//builder.AddExternalViews(contentRootPath);  
-
 			builder.AddCompiledRazorViews();
 			builder.AddScheduledTasks();
 

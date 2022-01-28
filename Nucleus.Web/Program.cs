@@ -5,7 +5,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System.IO;
 using Nucleus.Core.Plugins;
 using Nucleus.Core.Logging;
@@ -29,12 +30,12 @@ namespace Nucleus.Web
 		/// </summary>
 		private static IHost WebHost;
 
-		///// <summary>
-		///// File system watcher used to monitor the extensions folder for changes to DLL files and restart the application host if changes
-		///// are detected.
-		///// </summary>
-		//private static System.IO.FileSystemWatcher Watcher;
-				
+		/// <summary>
+		/// File system watcher used to monitor the extensions folder for changes to DLL files and restart the application host if changes
+		/// are detected.
+		/// </summary>
+		private static System.IO.FileSystemWatcher Watcher;
+
 		public static void Main(string[] args)
 		{
 			// The app can start with the current directory set to /bin, or /bin/debug/net5.0 but we want it set to the application root
@@ -54,7 +55,7 @@ namespace Nucleus.Web
 				if (isRestart)
 				{
 					WebHost.Dispose();
-					//WebHost?.Logger().LogInformation($"Restarted at {DateTime.Now}.");
+					WebHost?.Logger().LogInformation($"Restarted at {DateTime.Now}.");
 
 					Nucleus.Core.Plugins.AssemblyLoader.UnloadAll();
 					WebHost.StopAsync();
@@ -70,8 +71,10 @@ namespace Nucleus.Web
 				WebHost = CreateHostBuilder(args)
 					.ConfigureAppConfiguration(Startup.ConfigureAppConfiguration)
 					.Build();
-				//WatchFileChanges();
-				WebHost.Run();
+				
+				// Disabled file system watcher, because Assembly load contexts are not unloading properly.
+				// WatchFileChanges(WebHost.Services.GetService<IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions>>().Value.GetExtensionsFolder());
+				WebHost.Run();				
 			}
 		}
 
@@ -97,39 +100,39 @@ namespace Nucleus.Web
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		//static async void FileChanged(object sender, FileSystemEventArgs e)
-		//{
-		//	WebHost.Logger().LogInformation($"Detected assembly file change {e.FullPath} [{e.ChangeType}].");
+		static async void FileChanged(object sender, FileSystemEventArgs e)
+		{
+			WebHost.Logger().LogInformation($"Detected assembly file change {e.FullPath} [{e.ChangeType}].");
 
-		//	// The restart loop is disabled at present, because AssemblyLoadContexts are not unloading assemblies properly, which 
-		//	// prevents cleanup tasks from running successfully - so the application terminates after an extension install/uninstall.  
-		//	//doRestart = true;
-		//	//isRestart = true;
-			
-		//	//await System.Threading.Tasks.Task.Delay(10000);			
-		//	await WebHost.StopAsync();
-		//}
+			// The restart loop is disabled at present, because AssemblyLoadContexts are not unloading assemblies properly, which 
+			// prevents cleanup tasks from running successfully - so the application terminates after an extension install/uninstall.  
+			doRestart = true;
+			isRestart = true;
+
+			await System.Threading.Tasks.Task.Delay(10000);			
+			await WebHost.StopAsync();
+		}
 
 		/// <summary>
 		/// Sets up the file system watcher to monitor for changes to dll files in extensions folders.
 		/// </summary>
-		//static void WatchFileChanges()
-		//{
-		//	if (Watcher == null)
-		//	{
-		//		string extensionsFolder = Nucleus.Abstractions.Folders.GetExtensionsFolder();
+		static void WatchFileChanges(string extensionsFolder)
+		{
+			if (Watcher == null)
+			{
+				//string extensionsFolder = Nucleus.Abstractions.Folders.GetExtensionsFolder();
 
-		//		Watcher = new System.IO.FileSystemWatcher(extensionsFolder, "*.dll")
-		//		{
-		//			EnableRaisingEvents = true,
-		//			IncludeSubdirectories = true
-		//		};
+				Watcher = new System.IO.FileSystemWatcher(extensionsFolder, "*.dll")
+				{
+					EnableRaisingEvents = true,
+					IncludeSubdirectories = true
+				};
 
-		//		Watcher.Changed += FileChanged;
-		//		Watcher.Deleted += FileChanged;
-		//		Watcher.Created += FileChanged;
-		//		Watcher.Renamed += FileChanged;
-		//	}
-		//}
+				Watcher.Changed += FileChanged;
+				Watcher.Deleted += FileChanged;
+				Watcher.Created += FileChanged;
+				Watcher.Renamed += FileChanged;
+			}
+		}
 	}
 }

@@ -35,14 +35,14 @@ namespace Nucleus.Core.Services
 		}
 
 		/// <summary>
-		/// Initialize the timer to start executing scheduled tasks.
+		/// Initialize the timer to start executing scheduled tasks after 60 seconds.
 		/// </summary>
 		/// <param name="cancellationToken"></param>
 		/// <returns></returns>
 		public Task StartAsync(CancellationToken cancellationToken)
 		{
 			this.Logger.LogInformation("The task scheduler is starting.");
-			this.Timer = new(DoWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(60));
+			this.Timer = new(DoWork, null, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(60));
 			
 			return Task.CompletedTask;
 		}

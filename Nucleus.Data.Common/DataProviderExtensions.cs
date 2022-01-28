@@ -123,7 +123,7 @@ namespace Nucleus.Data.Common
 				IDatabaseProvider instance = Activator.CreateInstance(implementation) as IDatabaseProvider;
 				if (instance != null)
 				{
-					// Get connection for the specified schema name.  If it is found, add data provider objects to the services collection.
+					// Get connection for the specified schema name.  If it is found, get database information.
 					DatabaseConnectionOption connectionOption = options.GetDatabaseConnection(schemaName);
 
 					if (connectionOption != null && connectionOption.Type.Equals(instance.TypeKey(), StringComparison.OrdinalIgnoreCase))
@@ -132,6 +132,8 @@ namespace Nucleus.Data.Common
 						{
 							results.Add(value.Key, value.Value);
 						}
+
+						break;
 					}					
 				}
 			}

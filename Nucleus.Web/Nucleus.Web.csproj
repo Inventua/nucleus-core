@@ -57,6 +57,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="LICENSE" />
 	  <None Remove="module.build.targets" />
 	  <None Remove="package.xsd" />
 	  <None Remove="Resources\css\admin.css" />
@@ -90,6 +91,10 @@
 	<ItemGroup>
 	  <_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishInstall.pubxml" />
 	  <_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishUpgrade.pubxml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="LICENSE" />
 	</ItemGroup>
 
 	<ItemGroup>

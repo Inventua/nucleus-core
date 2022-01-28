@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace Nucleus.Abstractions.Models.Configuration
 {
@@ -11,6 +12,11 @@ namespace Nucleus.Abstractions.Models.Configuration
 	/// </summary>
 	public class FolderOptions
 	{
+		/// <summary>
+		/// Configuration file section.
+		/// </summary>
+		public const string Section = "Nucleus:FolderOptions";
+
 		// Data paths    
 		/// <summary>
 		/// Sub folder name (within the Nucleus data folder) used for temp files
@@ -76,10 +82,12 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string ParseFolder(string folder)
 		{
-			System.IO.DirectoryInfo directory = new(
-				folder
-					.Replace("{DataFolder}", GetDataFolder())
-					.Replace("{WebRootFolder}", System.Environment.CurrentDirectory));
+			System.IO.DirectoryInfo directory = new(Parse(folder));
+
+			if (!directory.Exists)
+			{
+				directory.Create();
+			}
 
 			return directory.FullName;
 		}
@@ -92,7 +100,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		public string Parse(string value)
 		{
 			return value
-					.Replace("{DataFolder}", GetDataFolder())
+					.Replace("{DataFolder}", DataFolder)
 					.Replace("{WebRootFolder}", System.Environment.CurrentDirectory);
 		}
 
@@ -169,27 +177,15 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// Gets the default application data storage folder location, used for logs and database files.
 		/// </summary>
 		/// <returns></returns>
-		public string GetDataFolder()
-		{
-			string result;
-
-			result = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Nucleus");
-
-			if (!System.IO.Directory.Exists(result))
-			{
-				System.IO.Directory.CreateDirectory(result);
-			}
-
-			return result;
-		}
-
+		public string DataFolder { get; set; }
+		
 		/// <summary>
 		/// Gets the default application data storage folder location, used for logs and database files.
 		/// </summary>
 		/// <returns></returns>
 		public string GetTempFolder()
 		{
-			return GetDataFolder(TEMP_FOLDER);
+			return this.GetDataFolder(TEMP_FOLDER);
 		}
 
 		/// <summary>
@@ -199,13 +195,14 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string GetDataFolder(string SubFolder)
 		{
-			string strResult = GetDataFolder();
-			strResult = System.IO.Path.Combine(strResult, SubFolder);
+			string result = System.IO.Path.Combine(this.DataFolder, SubFolder);
 
-			if (!System.IO.Directory.Exists(strResult))
-				System.IO.Directory.CreateDirectory(strResult);
+			if (!System.IO.Directory.Exists(result))
+			{
+				System.IO.Directory.CreateDirectory(result);				
+			}
 
-			return strResult;
+			return result;
 		}
 
 	}

@@ -17,6 +17,8 @@ namespace Nucleus.Core.Logging
 	/// </remarks>
 	public static class LoggingBuilderExtensions
 	{
+		private static string _datafolder;
+
 		/// <summary>
 		///   Adds a Debug logger.
 		/// </summary>
@@ -39,9 +41,17 @@ namespace Nucleus.Core.Logging
 		{
 			builder.Services.Configure<TextFileLoggerOptions>(configuration.GetSection(TextFileLoggerOptions.Section), options => options.BindNonPublicProperties=true);
 			builder.Services.ConfigureOptions<ConfigureTextFileLogger>();
-			//builder.Services.Configure<TextFileLoggerOptions>(configuration.GetSection(TextFileLoggerOptions.Section));
+
 			builder.Services.AddSingleton<ILoggerProvider, TextFileLoggingProvider>();
 
+			// The TextFileLogger is used by the StartupLogger for logging during dependency injection setup.  The IOptions<FolderOptions> instance which is added to the  
+			// Dependency Injection container won't be configured yet when ConfigureTextFileLogger.PostConfigure is called for the instance which is used by StartupLogger,
+			// so we have to read config here, and save the DataFolder in a static for use in ConfigureTextFileLogger.PostConfigure.  
+			// This is not an elegant solution, but the only alternative would be to require an appSettings setting for Nucleus:TextFileLoggerOptions:Path, and we want
+			// that settint to be optional.
+			Nucleus.Abstractions.Models.Configuration.FolderOptions folderOptions = new();
+			configuration.GetSection(Nucleus.Abstractions.Models.Configuration.FolderOptions.Section).Bind(folderOptions);
+			_datafolder = folderOptions.DataFolder;
 
 			return builder;
 		}
@@ -49,14 +59,21 @@ namespace Nucleus.Core.Logging
 		public class ConfigureTextFileLogger : IPostConfigureOptions<TextFileLoggerOptions>
 		{
 			private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
-
+			
 			public ConfigureTextFileLogger(IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
 			{
-				this.FolderOptions = folderOptions;
+				this.FolderOptions = folderOptions;				
 			}
 
 			public void PostConfigure(string name, TextFileLoggerOptions options)
 			{
+				if (String.IsNullOrEmpty(this.FolderOptions.Value.DataFolder))
+				{
+					//  Special case:  When the text file logger is added to the StartupLogger, dependency injection hasn't been set up yet and folderOptions hasn't
+					// been initialized, so we have to use the DataPath that we read ourselves in AddTextFileLogger.				
+					this.FolderOptions.Value.DataFolder = _datafolder;
+				}
+
 				if (String.IsNullOrEmpty(options.Path))
 				{
 					options.Path = this.FolderOptions.Value.GetDataFolder("Logs");

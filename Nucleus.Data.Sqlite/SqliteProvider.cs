@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Extensions;
 using Nucleus.Data.Common;
+using Microsoft.Extensions.Options;
 
 namespace Nucleus.Data.Sqlite
 {
@@ -17,7 +18,7 @@ namespace Nucleus.Data.Sqlite
 	public class SqliteProvider : IDatabaseProvider
 	{
 		private const string DATABASE_PROVIDER_TYPE = "Sqlite";
-		
+				
 		/// <summary>
 		/// Database provider type key.
 		/// </summary>
@@ -70,11 +71,12 @@ namespace Nucleus.Data.Sqlite
 		/// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
 		/// the database provider implementing this interface.
 		/// </summary>
-		public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName)
+		public Dictionary<string, string> GetDatabaseInformation(IServiceProvider services, DatabaseConnectionOption options, string schemaName)
 		{
 			Dictionary<string, string> results = new();
-			Nucleus.Abstractions.Models.Configuration.FolderOptions folderOptions = new();
-			System.Data.Common.DbConnection connection = new Microsoft.Data.Sqlite.SqliteConnection(folderOptions.Parse(options.ConnectionString));
+
+			IOptions<FolderOptions> folderOptions = services.GetService<IOptions<FolderOptions>>();
+			System.Data.Common.DbConnection connection = new Microsoft.Data.Sqlite.SqliteConnection(folderOptions.Value.Parse(options.ConnectionString));
 			connection.Open();
 
 			// For Sqlite, we show the filename (with no path or extension) as the database name, because the Sqlite "database" is always called "main".  We

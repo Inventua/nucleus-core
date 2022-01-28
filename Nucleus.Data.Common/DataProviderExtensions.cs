@@ -98,15 +98,16 @@ namespace Nucleus.Data.Common
 		/// <summary>
 		/// Get database diagnostics information for the specified schema.
 		/// </summary>
-		/// <param name="configuration"></param>
+		/// <param name="services"></param>
 		/// <param name="schemaName"></param>
 		/// <returns></returns>
-		static public Dictionary<string, string> GetDataProviderInformation(IConfiguration configuration, string schemaName)
+		static public Dictionary<string, string> GetDataProviderInformation(IServiceProvider services, string schemaName)
 		{
 			Dictionary<string, string> results = new();
 
 			// Get database options
 			DatabaseOptions options = new();
+			IConfiguration configuration = services.GetService<IConfiguration>();
 			configuration.GetSection(DatabaseOptions.Section).Bind(options, options => options.BindNonPublicProperties = true);
 
 			// Find IConfigureDataProvider implementations		
@@ -127,7 +128,7 @@ namespace Nucleus.Data.Common
 
 					if (connectionOption != null && connectionOption.Type.Equals(instance.TypeKey(), StringComparison.OrdinalIgnoreCase))
 					{
-						foreach (KeyValuePair<string, string> value in instance.GetDatabaseInformation(connectionOption, schemaName))
+						foreach (KeyValuePair<string, string> value in instance.GetDatabaseInformation(services, connectionOption, schemaName))
 						{
 							results.Add(value.Key, value.Value);
 						}

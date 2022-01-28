@@ -52,6 +52,7 @@
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>TextHtml</ExtensionFolder>
 		<Version>2.0.0</Version>
+		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 	</PropertyGroup>
 
 	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />

@@ -50,9 +50,8 @@
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>StaticContent</ExtensionFolder>
 		<Version>1.0.0</Version>
-	</PropertyGroup>
-
-	
+		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+	</PropertyGroup>	
 	
 	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
 </Project>

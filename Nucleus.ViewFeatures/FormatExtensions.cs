@@ -15,13 +15,13 @@ namespace Nucleus.ViewFeatures
 		/// Convert a DateTime from UTC to local time and output as a string in short date+short time format.
 		/// </summary>
 		/// <param name="value"></param>
-		/// <param name="fromUTC"></param>
+		/// <param name="timezone"></param>
 		/// <returns></returns>
-		public static string FormatDate(this DateTime? value, Boolean fromUTC)
+		public static string FormatDate(this DateTime? value, TimeZoneInfo timezone)
 		{
 			if (value.HasValue)
 			{
-				return FormatDate(value.Value, fromUTC);
+				return FormatDate(value.Value, timezone);
 			}
 			else
 			{
@@ -33,9 +33,9 @@ namespace Nucleus.ViewFeatures
 		/// Convert a DateTime from UTC to local time and output as a string in short date+short time format.
 		/// </summary>
 		/// <param name="value"></param>
-		/// <param name="fromUTC"></param>
+		/// <param name="timezone"></param>
 		/// <returns></returns>
-		public static string FormatDate(this DateTime value, Boolean fromUTC)
+		public static string FormatDate(this DateTime value, TimeZoneInfo timezone)
 		{
 			if (value == DateTime.MinValue)
 			{
@@ -43,13 +43,20 @@ namespace Nucleus.ViewFeatures
 			}
 			else
 			{
+				if (timezone == null)
+				{
+					timezone = TimeZoneInfo.Local;
+				}
+
 				if (value.TimeOfDay == TimeSpan.Zero)
 				{
-					return $"{(fromUTC ? value.ToLocalTime() : value).ToShortDateString()}";
+					return $"{System.TimeZoneInfo.ConvertTime(value, System.TimeZoneInfo.Utc, timezone).ToShortDateString()}";
+					//return $"{(fromUTC ? value.ToLocalTime() : value).ToShortDateString()}";
 				}
 				else
 				{
-					return $"{(fromUTC ? value.ToLocalTime() : value).ToString("g")}";
+					return $"{System.TimeZoneInfo.ConvertTime(value, System.TimeZoneInfo.Utc, timezone).ToString("g")}";
+					//return $"{(fromUTC ? value.ToLocalTime() : value).ToString("g")}";
 				}
 			}
 		}
@@ -58,9 +65,9 @@ namespace Nucleus.ViewFeatures
 		/// Convert a DateTime from UTC to local time and output as a string in short date format.
 		/// </summary>
 		/// <param name="value"></param>
-		/// <param name="fromUTC"></param>
+		/// <param name="timezone"></param>
 		/// <returns></returns>
-		public static string FormatDate(this DateTimeOffset value, Boolean fromUTC)
+		public static string FormatDate(this DateTimeOffset value, TimeZoneInfo timezone)
 		{
 			if (value == DateTimeOffset.MinValue)
 			{
@@ -73,7 +80,7 @@ namespace Nucleus.ViewFeatures
 				//	value = value.ToLocalTime();
 				//}
 
-				return FormatDate(value.DateTime, fromUTC);
+				return FormatDate(value.DateTime, timezone);
 				//return $"{value.DateTime.ToShortDateString()} {value.DateTime.ToShortTimeString()}";
 			}
 		}

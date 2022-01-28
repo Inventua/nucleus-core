@@ -1,5 +1,5 @@
 ﻿@model Nucleus.Modules.Forums.ViewModels.ViewForum
-@using Nucleus.Abstractions
+@using Nucleus.Extensions
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Forums.ViewModels
@@ -58,7 +58,7 @@
 					@if (post.Statistics.LastReply != null)
 					{
 						<div>@post.Statistics.LastReply.PostedBy.UserName</div>
-						<div>@post.Statistics.LastReply.DateAdded.FormatDate(true)</div>
+						<div>@post.Statistics.LastReply.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
 					}
 				</td>
 			</tr>

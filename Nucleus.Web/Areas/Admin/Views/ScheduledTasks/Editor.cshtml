@@ -4,7 +4,7 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 @using Nucleus.Abstractions.Models.TaskScheduler
-
+@using Nucleus.Extensions
 <div class="ScheduledTasks">
 	<Tab>
 		<TabItem target="#task-properties" caption="Properties" active="true"></TabItem>
@@ -60,7 +60,7 @@
 
 
 					<SettingsControl caption="Next Run">
-						<div>@(Model.LatestHistory == null ? "Immediate" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(true) : "-"))</div>
+						<div>@(Model.LatestHistory == null ? "Immediate" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "-"))</div>
 					</SettingsControl>
 
 					@if (Model.ScheduledTask.Id != Guid.Empty)
@@ -95,9 +95,9 @@
 				@foreach (var item in Model.History)
 				{
 					<tr>
-						<td>@item.StartDate.FormatDate(true)</td>
-						<td>@item.FinishDate.FormatDate(true)</td>
-						<td>@item.NextScheduledRun.FormatDate(true)</td>
+						<td>@item.StartDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+						<td>@item.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+						<td>@item.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone())</td>
 						<td>@item.Server</td>
 						<td>@item.Status</td>
 					</tr>

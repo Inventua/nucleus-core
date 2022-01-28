@@ -55,7 +55,7 @@
         }
         @if (Model.ShowModifiedDate)
         {
-          <div class="document-modifieddate">@Model.Documents[documentCount].ModifiedDate.FormatDate(true)</div>
+          <div class="document-modifieddate">@Model.Documents[documentCount].ModifiedDate.FormatDate(this.Context.Request.GetUserTimeZone())</div>
         }
         @if (Model.ShowSize)
         {

@@ -11,6 +11,11 @@ function _Page()
 	// Attach Nucleus-standard event handlers when document is ready
 	jQuery(document).ready(function ()
 	{
+		// Capture the user's timezone
+		var timezoneOffset = new Date().getTimezoneOffset();
+		document.cookie = 'timezone-offset=' + timezoneOffset.toString();
+
+
 		// Attach the click event for any element with a data-target attribute to _GetPartialContent
 		jQuery(document).on('click', '[data-target]:not(form, input, button):not([data-method="POST"])', _getPartialContent);
 

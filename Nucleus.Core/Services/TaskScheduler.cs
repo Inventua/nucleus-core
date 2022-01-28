@@ -227,7 +227,7 @@ namespace Nucleus.Core.Services
 
 				if (serviceType == null)
 				{
-					this.Logger.LogError("Unable to find type {0}", task.TypeName);
+					this.Logger.LogError("Unable to find type {typeName}", task.TypeName);
 					TaskFailed(history);
 					return;
 				}
@@ -236,7 +236,7 @@ namespace Nucleus.Core.Services
 
 				if (service == null)
 				{
-					this.Logger.LogError("Unable to create an instance of {0}", task.TypeName);
+					this.Logger.LogError("Unable to create an instance of {typeName}", task.TypeName);
 					TaskFailed(history);
 					return;
 				}
@@ -245,7 +245,7 @@ namespace Nucleus.Core.Services
 
 				if (taskService == null)
 				{
-					this.Logger.LogError("Unable to create an instance of {0} because it does not implement IScheduledTask", task.TypeName);
+					this.Logger.LogError("Unable to create an instance of {TypeName} because it does not implement IScheduledTask", task.TypeName);
 					TaskFailed(history);
 					return;
 				}

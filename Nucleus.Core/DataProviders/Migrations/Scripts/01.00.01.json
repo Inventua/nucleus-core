@@ -6,7 +6,8 @@
 			"addColumn": {
 				"table": "ScheduledTasks",
 				"name": "InstanceType",
-				"clrType": "int"
+				"clrType": "int",
+				"isnullable": true
 			}
 		}
 	]

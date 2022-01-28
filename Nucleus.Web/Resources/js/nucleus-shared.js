@@ -11,8 +11,9 @@ function _Page()
 	// Attach Nucleus-standard event handlers when document is ready
 	jQuery(document).ready(function ()
 	{
-		// Capture the user's timezone
-		var timezoneOffset = new Date().getTimezoneOffset();
+		// Capture the user's timezone.  We have to * -1 because the javascript getTimezoneOffset function returns an "opposite" value (The number of minutes returned 
+		// by getTimezoneOffset()	is positive if the local time zone is behind UTC, and negative if the local time zone is ahead of UTC.For example, for UTC + 10, -600 will be returned.)
+		var timezoneOffset = new Date().getTimezoneOffset() * -1;
 		document.cookie = 'timezone-offset=' + timezoneOffset.toString();
 
 

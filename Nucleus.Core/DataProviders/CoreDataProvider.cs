@@ -1592,7 +1592,7 @@ namespace Nucleus.Core.DataProviders
 			}
 
 			return await query
-				.OrderByDescending(history => history.NextScheduledRun)
+				.OrderByDescending(history => history.FinishDate)
 				.FirstOrDefaultAsync();
 		}
 

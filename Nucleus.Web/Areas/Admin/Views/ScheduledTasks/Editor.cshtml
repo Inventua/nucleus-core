@@ -60,7 +60,7 @@
 
 
 					<SettingsControl caption="Next Run">
-						<div>@(Model.LatestHistory == null ? "Immediate" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "-"))</div>
+						<div>@(Model.LatestHistory == null ? "Immediate" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "Immediate"))</div>
 					</SettingsControl>
 
 					@if (Model.ScheduledTask.Id != Guid.Empty)

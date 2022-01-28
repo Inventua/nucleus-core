@@ -95,6 +95,8 @@ namespace Nucleus.Web
 
 		public void ConfigureServices(IServiceCollection services)
 		{
+			// This must be called before .AddStartupLogger, because the TextFileLogger uses its values.
+			services.AddFolderOptions(this.Configuration);
 
 			services.AddStartupLogger(this.Configuration);
 
@@ -176,8 +178,6 @@ namespace Nucleus.Web
 				// encapsulate this limit anyway, and provide better error messages.
 				services.Configure<KestrelServerOptions>(options => { options.Limits.MaxRequestBodySize = long.MaxValue; });
 			}
-
-			services.AddSingleton<Nucleus.Abstractions.Models.Configuration.FolderOptions>();
 
 			// Add merged file provider.  
 			//services.AddMergedFileProvider(this.Configuration);

@@ -29,7 +29,6 @@ namespace Nucleus.Data.Common
 		public DataProviderFactory(IServiceProvider requestServices, ILogger<DataProviderFactory> logger)
 		{
 			this.RequestServices = requestServices;
-			//this.Options = options;
 			this.Logger = logger;
 		}
 

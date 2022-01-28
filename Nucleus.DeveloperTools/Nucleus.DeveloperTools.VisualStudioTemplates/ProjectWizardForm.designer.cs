@@ -48,7 +48,7 @@
 			this.label8 = new System.Windows.Forms.Label();
 			this.txtPublisherEmail = new System.Windows.Forms.TextBox();
 			this.label9 = new System.Windows.Forms.Label();
-			this.label10 = new System.Windows.Forms.Label();
+			this.lblVersion = new System.Windows.Forms.Label();
 			this.txtFriendlyName = new System.Windows.Forms.TextBox();
 			this.label11 = new System.Windows.Forms.Label();
 			this.txtExtensionDescription = new System.Windows.Forms.TextBox();
@@ -258,14 +258,14 @@
 			this.label9.TabIndex = 22;
 			this.label9.Text = "Publisher Email";
 			// 
-			// label10
+			// lblVersion
 			// 
-			this.label10.AutoSize = true;
-			this.label10.Location = new System.Drawing.Point(12, 468);
-			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(22, 15);
-			this.label10.TabIndex = 23;
-			this.label10.Text = "1.0";
+			this.lblVersion.AutoSize = true;
+			this.lblVersion.Location = new System.Drawing.Point(12, 468);
+			this.lblVersion.Name = "lblVersion";
+			this.lblVersion.Size = new System.Drawing.Size(22, 15);
+			this.lblVersion.TabIndex = 23;
+			this.lblVersion.Text = "1.0";
 			// 
 			// txtFriendlyName
 			// 
@@ -319,7 +319,7 @@
 			this.Controls.Add(this.label12);
 			this.Controls.Add(this.txtFriendlyName);
 			this.Controls.Add(this.label11);
-			this.Controls.Add(this.label10);
+			this.Controls.Add(this.lblVersion);
 			this.Controls.Add(this.txtPublisherEmail);
 			this.Controls.Add(this.label9);
 			this.Controls.Add(this.txtPublisherUrl);
@@ -371,7 +371,7 @@
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.TextBox txtPublisherEmail;
 		private System.Windows.Forms.Label label9;
-		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.Label lblVersion;
 		private System.Windows.Forms.TextBox txtFriendlyName;
 		private System.Windows.Forms.Label label11;
 		private System.Windows.Forms.TextBox txtExtensionDescription;

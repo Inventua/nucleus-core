@@ -23,6 +23,11 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 
 		public void RunFinished()
 		{
+			// Set NUCLEUS_PATH if it is not already set
+			if (String.IsNullOrEmpty(System.Environment.GetEnvironmentVariable("NUCLEUS_PATH")))
+			{
+				System.Environment.SetEnvironmentVariable("NUCLEUS_PATH", System.IO.Path.GetDirectoryName(this.GetType().Assembly.Location), EnvironmentVariableTarget.User);
+			}
 		}
 
 		private string Get(Dictionary<string, string> replacementsDictionary, string key)

@@ -80,7 +80,7 @@
 							@Html.AreaActionLink(Model.Folder.Folders[folderCount].Name, "Index", "FileSystem", "Admin", new { folderId = @Model.Folder.Folders[folderCount].Id }, new { @class = "NavigateLink", @data_target = ".nucleus-adminpage" })
 						</td>
 						<td>Folder</td>
-						<td>@Model.Folder.Folders[folderCount].DateModified.FormatDate(true)</td>
+						<td>@Model.Folder.Folders[folderCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
 						<td />
 					</tr>
 				}
@@ -96,7 +96,7 @@
 							@Html.HiddenFor(model => model.Folder.Files[fileCount].Id)
 						</td>
 						<td>File</td>
-						<td>@Model.Folder.Files[fileCount].DateModified.FormatDate(true)</td>
+						<td>@Model.Folder.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
 						<td>@((Model.Folder.Files[fileCount] as File).Size.FormatFileSize())</td>
 					</tr>
 				}

@@ -45,7 +45,7 @@
 						{
 							<div>@forum.Statistics.LastPost.Subject</div>
 							<div>@forum.Statistics.LastPost.PostedBy.UserName</div>
-							<div>@forum.Statistics.LastPost.DateAdded.FormatDate(true)</div>
+							<div>@forum.Statistics.LastPost.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
 						}
 					</td>
 				</tr>

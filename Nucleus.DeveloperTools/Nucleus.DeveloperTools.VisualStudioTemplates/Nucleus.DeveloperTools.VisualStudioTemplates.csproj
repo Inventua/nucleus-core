@@ -63,6 +63,9 @@
     <CopyVsixExtensionFiles>False</CopyVsixExtensionFiles>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="module.build.targets">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="Template Source Code\Complex Extension Project Template\DataProviders\DbContext.cs" />
     <Content Include="ProjectTemplates\Empty Extension.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -100,6 +100,7 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 		public ProjectWizardForm()
 		{
 			InitializeComponent();
+			this.lblVersion.Text = this.GetType().Assembly.GetName().Version.ToString();
 		}
 	}
 }

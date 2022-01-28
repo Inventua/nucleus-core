@@ -160,6 +160,7 @@
 			<IntervalType>Minutes</IntervalType>
 			<Interval>10</Interval>
 			<Enabled>true</Enabled>
+			<InstanceType>PerServer</InstanceType>
 			<KeepHistoryCount>10</KeepHistoryCount>
 		</ScheduledTask>
 		<ScheduledTask>
@@ -169,6 +170,7 @@
 			<IntervalType>Hours</IntervalType>
 			<Interval>1</Interval>
 			<Enabled>true</Enabled>
+			<InstanceType>PerInstance</InstanceType>
 			<KeepHistoryCount>10</KeepHistoryCount>
 		</ScheduledTask>
 		<ScheduledTask>
@@ -178,6 +180,7 @@
 			<IntervalType>Minutes</IntervalType>
 			<Interval>10</Interval>
 			<Enabled>true</Enabled>
+			<InstanceType>PerInstance</InstanceType>
 			<KeepHistoryCount>10</KeepHistoryCount>
 		</ScheduledTask>
 	</ScheduledTasks>

@@ -180,7 +180,7 @@ namespace Nucleus.Web
 			}
 
 			// Add merged file provider.  
-			//services.AddMergedFileProvider(this.Configuration);
+			services.AddMergedFileProvider(this.Configuration);
 
 			// This makes embedded static files in our precompiled Razor assemblies [modules] work
 			services.AddRazorEmbeddedFileProviders();
@@ -247,7 +247,11 @@ namespace Nucleus.Web
 					});
 				}
 			}
-					
+
+			// UseStaticFiles with default (no) parameters is used to enable the merged file provider and minified file provider.  It doesn't
+			// actually serve any static files, because by default it looks in /wwwroot, which does not exist in a standard Nucleus install. 
+			app.UseStaticFiles();
+
 			app.UseCookiePolicy(new CookiePolicyOptions() { });
 
 			app.UseRouting();
@@ -280,12 +284,18 @@ namespace Nucleus.Web
 				// "Razor Pages" (Razor Pages is different to Razor views with controllers [MVC])
 				routes.MapRazorPages();
 
-				// Map the search engines "site map" controller to /sitemap.xml
+				// Map the merged.js route
 				//routes.MapControllerRoute(
-				//	name: "merged.js",
+				//	name: RoutingConstants.MERGED_JS_ROUTE_NAME,
 				//	pattern: "/merged.js/{*src}",
-				//	defaults: new { controller = "MergedFiles", action = "Scripts" });
+				//	defaults: new { controller = "MergedFile", action = "Index" });
 
+				// Map the merged.css route
+				//routes.MapControllerRoute(
+				//	name: RoutingConstants.MERGED_CSS_ROUTE_NAME,
+				//	pattern: "/{linkpath}/merged.css/{*src}",
+				//	defaults: new { controller = "MergedFile", action = "Index" });
+				
 				// Map the error page
 				routes.MapControllerRoute(
 					name: RoutingConstants.ERROR_ROUTE_NAME,

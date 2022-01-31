@@ -18,8 +18,12 @@
 	@Html.AddScript("~/Resources/Libraries/jQuery/03.06.00/jquery.min.js")
 	@Html.AddScript("~/Resources/Libraries/Bootstrap/5.1.0/js/bootstrap.bundle.min.js")
 	@Html.AddScript("~/Resources/js/nucleus-shared.js")
+	<merge-stylesheets>
 	@Html.RenderStyles()
+	</merge-stylesheets>
+	<merge-scripts>
 	@Html.RenderScripts()
+	</merge-scripts>
 </head>
 <body class="p-2">
 	@RenderBody()

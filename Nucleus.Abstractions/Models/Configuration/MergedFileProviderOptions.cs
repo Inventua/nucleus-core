@@ -21,6 +21,11 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// </summary>
 		public const string Section = "Nucleus:MergedFileProviderOptions";
 
+		/// <summary>
+		/// Delimiter for merged filenames.
+		/// </summary>
+		public const string SEPARATOR_CHAR = ",";
+
 		/// <value>
 		/// Specifies whether to merge requests for Javascript files.
 		/// </value>

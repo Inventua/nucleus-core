@@ -1,47 +1,47 @@
-﻿//using Microsoft.Extensions.FileProviders;
-//using System;
-//using System.Collections.Generic;
-//using System.IO;
-//using System.Text;
+﻿using Microsoft.Extensions.FileProviders;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
-//namespace Nucleus.Core.FileProviders
-//{
-//	internal class MergedFileInfo : IFileInfo
-//	{
-//		private Stream FileStream { get; }
-		
-//		public MergedFileInfo (string name, Stream newStream)
-//		{
-//			this.Exists = true;
-//			this.Length = newStream.Length;
-//			this.PhysicalPath = null;
-//			this.Name = name;
-//			this.LastModified = DateTime.Now;
-//			this.IsDirectory = false;
+namespace Nucleus.Core.FileProviders
+{
+	internal class MergedFileInfo : IFileInfo
+	{
+		private Stream FileStream { get; }
 
-//			this.FileStream = newStream;			
-//		}
+		public MergedFileInfo(string name, Stream newStream)
+		{
+			this.Exists = true;
+			this.Length = newStream.Length;
+			this.PhysicalPath = null;
+			this.Name = name;
+			this.LastModified = DateTime.Now;
+			this.IsDirectory = false;
 
-//		public bool Exists { get; }
+			this.FileStream = newStream;
+		}
 
-//		public long Length { get; }
+		public bool Exists { get; }
 
-//		public string PhysicalPath { get; }
+		public long Length { get; }
 
-//		public string Name { get; }
+		public string PhysicalPath { get; }
 
-//		public DateTimeOffset LastModified { get; }
+		public string Name { get; }
 
-//		public bool IsDirectory  { get; }
+		public DateTimeOffset LastModified { get; }
 
-//		public Stream CreateReadStream()
-//		{
-//			MemoryStream result = new MemoryStream();
+		public bool IsDirectory { get; }
 
-//			this.FileStream.Position = 0;
-//			this.FileStream.CopyTo(result);
-//			result.Position = 0;
-//			return result;
-//		}
-//	}
-//}
+		public Stream CreateReadStream()
+		{
+			MemoryStream result = new MemoryStream();
+
+			this.FileStream.Position = 0;
+			this.FileStream.CopyTo(result);
+			result.Position = 0;
+			return result;
+		}
+	}
+}

@@ -25,64 +25,56 @@ namespace Nucleus.Core.FileProviders
 	/// </remarks>
 	public static class FileProviderExtensions
 	{
-		///// <summary>
-		///// Add and configure the <see cref="MergedFileProvider"/>.
-		///// </summary>
-		///// <param name="services">.NET core dependency injection services collection.</param>
-		///// <param name="configuration">.NET core configuration object used to access configuration items.</param>
-		//public static void AddMergedFileProvider(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, IConfiguration configuration)
-		//{
-		//	// .Configure adds the options object to the service container as a IOptions<T> and binds it to configuration
+		/// <summary>
+		/// Add and configure the <see cref="MergedFileProvider"/>.
+		/// </summary>
+		/// <param name="services">.NET core dependency injection services collection.</param>
+		/// <param name="configuration">.NET core configuration object used to access configuration items.</param>
+		public static void AddMergedFileProvider(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, IConfiguration configuration)
+		{
+			services.AddHttpContextAccessor();
 			
-		//	// UrlHelper is required by the MergedStylesheetsTagHelper and MergedScriptsTagHelper
-		//	services.AddSingleton<IActionContextAccessor, ActionContextAccessor>()
-		//		.AddScoped<IUrlHelper>(
-		//				serviceProvider => new UrlHelper(serviceProvider.GetRequiredService<IActionContextAccessor>().ActionContext)
-		//		);
+			services.Configure<StaticFileOptions>(configuration);
+			services.Configure<MergedFileProviderOptions>(configuration.GetSection(MergedFileProviderOptions.Section));
 
-		//	services.AddHttpContextAccessor();
+			services.ConfigureOptions(typeof(ConfigureMergedFileProvider));
+		}
 
-		//	services.Configure<MergedFileProviderOptions>(configuration.GetSection(MergedFileProviderOptions.Section));
+		/// <summary>
+		///   Add an instance of the Merged File Provider to the StaticFileOptions FileProvider property.  If a file provider is already specified, 
+		///   replace the existing file provider with a CompositeFileProvider which wraps the existing provider and a new Merged File provider 
+		///   instance.
+		/// </summary>
+		public class ConfigureMergedFileProvider : IPostConfigureOptions<StaticFileOptions>
+		{
+			private MergedFileProviderOptions Options { get; }
+			private IWebHostEnvironment Environment { get; }
+			private ILogger<MergedFileProvider> Logger { get; }
+			private IHttpContextAccessor ContextAccessor { get; }
+			private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
 
-		//	services.ConfigureOptions(typeof(ConfigureMergedFileProvider));
-		//}
+			public ConfigureMergedFileProvider(IWebHostEnvironment env, IHttpContextAccessor httpContextAccessor, IOptions<MergedFileProviderOptions> options, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions, ILogger<MergedFileProvider> Logger)
+			{
+				this.Options = options.Value;
+				this.Logger = Logger;
+				this.FolderOptions = folderOptions;
+				this.ContextAccessor = httpContextAccessor;
+				this.Environment = env;
+			}
 
-		///// <summary>
-		/////   Add an instance of the Merged File Provider to the StaticFileOptions FileProvider property.  If a file provider is already specified, 
-		/////   replace the existing file provider with a CompositeFileProvider which wraps the existing provider and a new Merged File provider 
-		/////   instance.
-		///// </summary>
-		//[EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
-		//public class ConfigureMergedFileProvider : IPostConfigureOptions<StaticFileOptions>
-		//{
-		//	private MergedFileProviderOptions Options { get; }			
-		//	private IWebHostEnvironment Environment { get; }
-		//	private ILogger<MergedFileProvider> Logger { get; }
-		//	private IHttpContextAccessor ContextAccessor { get; }
-		//	private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
+			public void PostConfigure(string name, StaticFileOptions options)
+			{
+				MergedFileProvider mergedFileProvider = new(this.Options, options, this.FolderOptions, this.ContextAccessor, this.Logger);
 
-		//	public ConfigureMergedFileProvider(IWebHostEnvironment env, IHttpContextAccessor httpContextAccessor, IOptions<MergedFileProviderOptions> options, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions, ILogger<MergedFileProvider> Logger)
-		//	{				
-		//		this.Options = options.Value;
-		//		this.Logger = Logger;
-		//		this.FolderOptions = folderOptions;
-		//		this.ContextAccessor = httpContextAccessor;
-		//		this.Environment = env;
-		//	}
-
-		//	public void PostConfigure(string name, StaticFileOptions options)
-		//	{
-		//		MergedFileProvider objMergedFileProvider = new(this.Options, options, this.FolderOptions, this.ContextAccessor, this.Logger);
-
-		//		if (options.FileProvider == null)
-		//			// No file provider set yet (null), so create a new CompositeFileProvider & assign to initialize
-		//			options.FileProvider = new CompositeFileProvider(this.Environment.WebRootFileProvider, objMergedFileProvider);
-		//		else
-		//		{
-		//			options.FileProvider = new CompositeFileProvider(this.Environment.WebRootFileProvider, options.FileProvider, objMergedFileProvider);
-		//		}
-		//	}
-		//}
+				if (options.FileProvider == null)
+					// No file provider set yet (null), so create a new CompositeFileProvider & assign to initialize
+					options.FileProvider = new CompositeFileProvider(this.Environment.WebRootFileProvider, mergedFileProvider);
+				else
+				{
+					options.FileProvider = new CompositeFileProvider(this.Environment.WebRootFileProvider, options.FileProvider, mergedFileProvider);
+				}
+			}
+		}
 
 
 		/// <summary>
@@ -97,7 +89,6 @@ namespace Nucleus.Core.FileProviders
 		/// <summary>
 		/// Detect plugin assemblies (compiled Razor assemblies) and add an EmbeddedFilesProvider for each detected Razor assembly.
 		/// </summary>
-		[EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
 		public class ConfigureRazorEmbeddedFileProviders : IPostConfigureOptions<StaticFileOptions>
 		{
 			private IWebHostEnvironment Environment { get; }

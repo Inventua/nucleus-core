@@ -8,10 +8,11 @@ using Nucleus.Abstractions;
 using Nucleus.Extensions;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Nucleus.ViewFeatures;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Nucleus.Extensions.Authorization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Builder;
 
 namespace Nucleus.Web.Controllers
 {
@@ -31,7 +32,7 @@ namespace Nucleus.Web.Controllers
 		private static HashSet<string> filteredFilenames = new(new string[] { "favicon.ico", "robots.txt" }, StringComparer.OrdinalIgnoreCase);
 		private static HashSet<string> filteredFileExtensions = new(new string[] { ".txt", ".css", ".js", ".map" }, StringComparer.OrdinalIgnoreCase);
 
-		public DefaultController(ILogger<DefaultController> logger, Context context, ISiteManager siteManager, IUserManager userManager, IFileSystemManager fileSystemManager, IPageManager pageManager)
+		public DefaultController(ILogger<DefaultController> logger, Context context, ISiteManager siteManager, IUserManager userManager, IFileSystemManager fileSystemManager, IPageManager pageManager, IOptions<StaticFileOptions> staticFileOptions)
 		{
 			this.Logger = logger;
 			this.Context = context;
@@ -39,6 +40,9 @@ namespace Nucleus.Web.Controllers
 			this.PageManager = pageManager;
 			this.SiteManager = siteManager;
 			this.UserManager = userManager;
+
+			// We pass in staticFileOptions in order to trigger FileProviderExtensions.ConfigureMergedFileProvider
+			StaticFileOptions primer = staticFileOptions.Value;
 		}
 
 		[HttpGet]

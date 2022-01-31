@@ -30,6 +30,16 @@ namespace Nucleus.Abstractions
 		public const string SITEMAP_ROUTE_NAME = "route:sitemap";
 
 		/// <summary>
+		/// Key for the merges.css route.
+		/// </summary>
+		public const string MERGED_CSS_ROUTE_NAME = "route:merged.css";
+
+		/// <summary>
+		/// Key for the merges.js route.
+		/// </summary>
+		public const string MERGED_JS_ROUTE_NAME = "route:merged.js";
+
+		/// <summary>
 		/// Key for the error route.
 		/// </summary>
 		public const string ERROR_ROUTE_NAME = "route:error";

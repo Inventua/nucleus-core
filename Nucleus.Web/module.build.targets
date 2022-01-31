@@ -50,6 +50,10 @@
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Core.dll,bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Extensions.dll"></ExcludedAssemblies>
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Data.Common.dll"></ExcludedAssemblies>
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Data.EntityFramework.dll"></ExcludedAssemblies>
+			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Data.SqlServer.dll"></ExcludedAssemblies>
+			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Data.Sqlite.dll"></ExcludedAssemblies>
+			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Data.PostgreSql.dll"></ExcludedAssemblies>
+			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Data.MySql.dll"></ExcludedAssemblies>
 			
 			<Message Importance="high" Text="Reference assembles: @(ReferenceAssemblies)" />
 			<Message Importance="high" Text="Excluded assembles: @(ExcludedAssemblies)" />
@@ -58,7 +62,7 @@
 		</ItemGroup>		
 	</Target>
 	
-	<Target Name="CopyToExtensionsFolder" AfterTargets="PostBuildEvent" Condition="'$(NUCLEUS_PATH)' != '' AND '$(ExtensionFolder)' != ''">
+	<Target Name="CopyToExtensionsFolder" AfterTargets="PostBuildEvent" Condition="'$(NUCLEUS_PATH)' != '' AND '$(ExtensionFolder)' != '' AND Exists('$(NUCLEUS_PATH)Extensions')">
 		<ItemGroup>			
 		  <RenameExtensionFiles Include="$(NUCLEUS_PATH)Extensions\$(ExtensionFolder)\**\$(ProjectName)\*.*" />
   	</ItemGroup>
@@ -74,7 +78,7 @@
 		<RemoveDir Directories="$(NUCLEUS_PATH)\_OLD" />
 	</Target>
 
-	<Target Name="PackageExtension" AfterTargets="PostBuildEvent" Condition = "'$(Configuration)' == 'Release' AND $(ExtensionFolder) != '' AND $(NUCLEUS_PATH) != ''">		
+	<Target Name="PackageExtension" AfterTargets="PostBuildEvent" Condition = "'$(Configuration)' == 'Release' AND $(ExtensionFolder) != '' AND $(NUCLEUS_PATH) != '' AND Exists('$(NUCLEUS_PATH)Setup')">		
 		<RemoveDir Directories="AppPackage" />
 
 		<Copy SourceFiles="@(OutputAssemblies)" DestinationFolder="AppPackage\bin\%(RecursiveDir)" Retries="2" />

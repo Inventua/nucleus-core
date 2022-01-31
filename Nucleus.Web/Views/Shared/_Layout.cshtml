@@ -35,8 +35,12 @@
 		@Html.AddStyle(Model.SiteCssFilePath);
 	}
 	@RenderSection("scripts", false)
+	<merge-stylesheets>
 	@Html.RenderStyles()
+	</merge-stylesheets>
+	<merge-scripts>
 	@Html.RenderScripts()	
+	</merge-scripts>
 </head>
 <body>
 	@if (Model.CanEdit)

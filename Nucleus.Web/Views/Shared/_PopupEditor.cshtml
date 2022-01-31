@@ -18,8 +18,12 @@
 	@Html.AddScript("~/Resources/js/nucleus-shared.js")
 	@Html.AddScript("~/Resources/js/nucleus-admin.js")
 	@Html.AddHtmlEditor()
+	<merge-stylesheets>
 	@Html.RenderStyles()
+	</merge-stylesheets>
+	<merge-scripts>
 	@Html.RenderScripts()
+	</merge-scripts>
 </head>
 <body>
 	<div class="nucleus-adminpage nucleus-admin-content">

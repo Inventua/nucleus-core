@@ -27,8 +27,9 @@ namespace Nucleus.Web.Controllers
 		private ISiteManager SiteManager { get; }
 		private IUserManager UserManager { get; }
 
-		private HashSet<string> filteredFilenames = new(new string[] { "robots.txt" });
-		private HashSet<string> filteredFileExtensions = new(new string[] { ".txt" });
+		// Files and extensions in these lists do not show the site error page, they always return a 404 if they are not found.
+		private static HashSet<string> filteredFilenames = new(new string[] { "favicon.ico", "robots.txt" }, StringComparer.OrdinalIgnoreCase);
+		private static HashSet<string> filteredFileExtensions = new(new string[] { ".txt", ".css", ".js", ".map" }, StringComparer.OrdinalIgnoreCase);
 
 		public DefaultController(ILogger<DefaultController> logger, Context context, ISiteManager siteManager, IUserManager userManager, IFileSystemManager fileSystemManager, IPageManager pageManager)
 		{
@@ -44,9 +45,9 @@ namespace Nucleus.Web.Controllers
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_VIEW_POLICY)]
 		public async Task<ActionResult> Index()
 		{
-			//string layoutPath;
-			Boolean isErrorPage = false;
+			Boolean useSiteErrorPage = false;
 
+			// If the site hasn't been set up yet (empty database), redirect to the site wizard.
 			if (this.Context.Site == null && this.Context.Page == null)
 			{
 				if (await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0)
@@ -55,9 +56,11 @@ namespace Nucleus.Web.Controllers
 				}
 			}
 
+			// If the page was not found, display the error page if one is defined for the site, or if the requested Uri is one
+			// of the file names/extensions that we always return a "raw" 404 error for, return NotFound().
 			if (this.Context.Page == null)
 			{
-				Logger.LogTrace("Not found.");
+				Logger.LogTrace("Not found: {path}.", ControllerContext.HttpContext.Request.Path);
 
 				if (!No404Redirect() && this.Context.Site != null)
 				{
@@ -69,18 +72,20 @@ namespace Nucleus.Web.Controllers
 						if (notFoundPage != null)
 						{
 							this.Context.Page = notFoundPage;
-							isErrorPage = true;
+							useSiteErrorPage = true;
 						}
 					}
 				}
 
-				if (!isErrorPage)
+				// Either no error page is defined, or the requested url matches one of the file names/extensions that we always return 
+				// a "raw" 404 error for
+				if (!useSiteErrorPage)
 				{
 					return NotFound();
 				}
 			}
 
-			if (!isErrorPage)
+			if (!useSiteErrorPage)
 			{
 				// Handle "PermanentRedirect" page routes
 				foreach (PageRoute pageRoute in this.Context.Page.Routes.ToArray())

@@ -153,7 +153,7 @@ namespace Nucleus.Web
 				});
 			}
 
-			builder.AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver());
+			//builder.AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver());
 
 			// SetCompatibilityVersion is obsolete in .NET 6
 			//builder.SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Latest);

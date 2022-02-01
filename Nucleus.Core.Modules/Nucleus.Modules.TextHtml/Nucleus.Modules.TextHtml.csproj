@@ -28,12 +28,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="LICENSE" />
 	  <None Remove="package.xml" />
 	  <None Remove="readme.txt" />
 	  <None Remove="Views\Settings.cshtml" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Include="LICENSE" />
 	  <Content Include="package.xml" />
 	  <Content Include="readme.txt" />
 	  <Content Include="Views\Settings.cshtml" />

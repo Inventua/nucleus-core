@@ -1,4 +1,4 @@
-# Setup Guide for Azure App Service 
+# Hosting in Azure App Service 
 1.  If you don't already have one, [create an Azure free account](https://azure.microsoft.com/en-au/free)
 
 2.  Sign in to the Azure portal, click "App Services" and create an App service.

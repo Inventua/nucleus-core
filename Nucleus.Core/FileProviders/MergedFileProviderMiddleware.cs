@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 using System.IO;
@@ -19,41 +20,30 @@ namespace Nucleus.Core.FileProviders
 	/// </summary>
 	/// <remarks>
 	/// The MergedFileProvider responds to requests for <strong>merged.css</strong> and <strong>merged.js</strong>, with a src query 
-	/// string containing a comma-separated list of resources.  The script and link tags which the merged file provider responds to are generated 
+	/// string containing a base64 encoded comma-separated list of resources.  The script and link tags which the merged file provider responds to are generated 
 	/// by the <see cref="T:Nucleus.AspNetCore.Mvc.ViewFeatures.TagHelpersMergedScriptsTagHelper"/>
 	/// and <see cref="T:Nucleus.AspNetCore.Mvc.ViewFeatures.MergedStyleSheetsTagHelper"/>.
 	/// <br/><br/>
 	/// Merging files reduces the number of requests sent to the server, which improves application load performance.  File merging is
 	/// executed dynamically, so there is no need to change the way that you separate functionality into different files for code maintainability.
 	/// <br/><br/>
-	/// The Tag Helpers which generate the merged file tags can is enabled or disabled in config/appSettings.config.
+	/// The Tag Helpers which generate the merged file tags can be enabled or disabled in appSettings.config.
 	/// <br/><br/>
 	/// The results are cached, so the processing overhead only occurs once.
-	/// <br/><br/>
-	/// The Merged File Provider service is injected by the Nucleus Core host and is always available in all Nucleus Core applications.  
 	/// </remarks>
-	public class MergedFileProvider : IFileProvider
+	public class MergedFileProviderMiddleware : Microsoft.AspNetCore.Http.IMiddleware
 	{
 		public const char SEPARATOR_CHAR = ',';
 
-		private MergedFileProviderOptions Options { get; }
-		private StaticFileOptions StaticFileOptions { get; }
-		private ILogger<MergedFileProvider> Logger { get; }
-		private IHttpContextAccessor Context { get; }
-		//private ConcurrentDictionary<string, MergedFileInfo> MergedFilesCache { get; } = new ConcurrentDictionary<string, MergedFileInfo>(StringComparer.OrdinalIgnoreCase);
+		private IOptions<MergedFileProviderOptions> Options { get; }
+		private ILogger<MergedFileProviderMiddleware> Logger { get; }
+		
 		private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="MinifiedFileProvider" /> class using a collection of file provider.
-		/// </summary>
-		/// <param name="fileProviders">The collection of <see cref="IFileProvider" /></param>
-		public MergedFileProvider(MergedFileProviderOptions options, StaticFileOptions staticFileOptions, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions, IHttpContextAccessor httpContextAccessor, ILogger<MergedFileProvider> Logger)
+		public MergedFileProviderMiddleware(IOptions<MergedFileProviderOptions> options, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions, ILogger<MergedFileProviderMiddleware> Logger)
 		{
 			this.Options = options;
-			this.StaticFileOptions = staticFileOptions;
-
 			this.Logger = Logger;
-			this.Context = httpContextAccessor;
 			this.FolderOptions = folderOptions;
 
 			ClearCache();
@@ -67,29 +57,32 @@ namespace Nucleus.Core.FileProviders
 		/// The file information. Caller must check Exists property. This will be the first existing <see cref="IFileInfo"/> returned 
 		/// by the provided <see cref="IFileProvider"/> or a not found <see cref="IFileInfo"/> if no existing files is found.
 		/// </returns>
-		public IFileInfo GetFileInfo(string subpath)
+		public async Task InvokeAsync(HttpContext context, RequestDelegate next)
 		{
 			string extension = "";
 			string src;
-			string cacheKey = this.Context.HttpContext.Request.Query["src"];
+			string cacheKey = context.Request.Query["src"];
 
 			Boolean isFound = false;
 			MemoryStream mergedcontent;
 			MergedFileInfo result;
 			Stream fileStream;
+			string subpath = context.Request.Path;
+			string contentType;
 
-			if (subpath.Contains("/merged.") && this.Context.HttpContext.Request.Query.ContainsKey("src"))
+			if (subpath.Contains("/merged.") && context.Request.Query.ContainsKey("src"))
 			{
-				src = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(this.Context.HttpContext.Request.Query["src"]));
-				Logger.LogInformation("Received Request for {src}", src);
+				src = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(context.Request.Query["src"]));
+				Logger.LogTrace("Received Request for {src}", src);
 
+				contentType = subpath.EndsWith(".css") ? "text/css" : "text/javascript";
 				fileStream = GetCacheValue(cacheKey);
 
 				if (fileStream != null)
 				{
-					Logger.LogInformation("Served {cacheKey} from cache", cacheKey);
-					result = new MergedFileInfo(cacheKey, fileStream);
-					return result;
+					Logger.LogTrace("Served {cacheKey} from cache", cacheKey);
+					await WriteFile(fileStream, context.Response, contentType);
+					return;
 				}
 				else
 				{
@@ -101,63 +94,65 @@ namespace Nucleus.Core.FileProviders
 						string[] pathParts = path.Split(new char[] { System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
 						string root = pathParts[0];
 
-						if (!Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS.Contains(root))
+						if (Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS.Contains(root))
 						{
-							return null;
-						}
+							PhysicalFileProvider fileProvider = new PhysicalFileProvider(System.IO.Path.Combine(
+								this.FolderOptions.Value.GetWebRootFolder(),
+								""));
 
-						PhysicalFileProvider fileProvider = new PhysicalFileProvider(System.IO.Path.Combine(
-							this.FolderOptions.Value.GetWebRootFolder(),
-							""));
-
-						if (TryProvider(fileProvider, path, mergedcontent))
-						{
-							Logger.LogInformation("Added {path} to result", path);
-
-							// signal that at least one file was found
-							isFound = true;
-
-							if (String.IsNullOrEmpty(extension))
+							if (TryProvider(fileProvider, path, mergedcontent))
 							{
-								extension = System.IO.Path.GetExtension(path).ToLower();
+								Logger.LogTrace("Added {path} to result", path);
+
+								// signal that at least one file was found
+								isFound = true;
+
+								if (String.IsNullOrEmpty(extension))
+								{
+									extension = System.IO.Path.GetExtension(path).ToLower();
+								}
+								else if (extension != System.IO.Path.GetExtension(path).ToLower())
+								{
+									Logger.LogWarning("File Extension mismatch on path {path}, expected {extension}", path, extension);
+									return;
+								}
 							}
-							else if (extension != System.IO.Path.GetExtension(path).ToLower())
+							else
 							{
-								Logger.LogInformation("File Extension mismatch on path {path}, expected {extension}", path, extension);
-								return null;
+								// one of the files was not found, fail the whole request
+								Logger.LogWarning("File not found - {path}", path);
+								return;
 							}
 						}
-						else
-						{
-							// one of the files was not found, fail the whole request
-							Logger.LogWarning("File not found - {0}", path);
-							return null;
-						}
+
 					}
 
 					if (isFound)
 					{
 						result = new MergedFileInfo(cacheKey, mergedcontent);
-						//this.MergedFilesCache.TryAdd(src, result);
 						this.SetCacheValue(cacheKey, mergedcontent);
-						return result;
+						await WriteFile(mergedcontent, context.Response, contentType);
+						return;
 					}
 				}
-
 			}
 
-			return null;
+			await next(context);
+		}
+
+		private async Task WriteFile(Stream input, HttpResponse response, string contentType)
+		{
+			input.Position = 0;
+
+			response.ContentType = contentType;
+			response.ContentLength = input.Length;
+			await input.CopyToAsync(response.Body);
 		}
 
 		private static Boolean TryProvider(IFileProvider provider, string path, Stream stream)
 		{
 			StreamReader reader;
 			StreamWriter writer = new(stream, new UTF8Encoding(false));
-
-			//if (path.StartsWith('/'))
-			//{
-			//	path = "~" + path;
-			//}
 
 			IFileInfo file = provider.GetFileInfo(path);
 
@@ -175,18 +170,6 @@ namespace Nucleus.Core.FileProviders
 			}
 
 			return false;
-		}
-
-		[EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
-		public IDirectoryContents GetDirectoryContents(string subpath)
-		{
-			return null;
-		}
-
-		[EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
-		public IChangeToken Watch(string pattern)
-		{
-			return null;
 		}
 
 		private string CacheFolder()
@@ -264,7 +247,6 @@ namespace Nucleus.Core.FileProviders
 			using (MD5 md5 = MD5.Create())
 			{
 				return BitConverter.ToString(md5.ComputeHash(valueBytes)).Replace("-", "");
-				//return Convert.ToBase64String(md5.ComputeHash(valueBytes)).Replace("+", "%2B").Replace("/", "%2F");
 			}
 		}
 	}

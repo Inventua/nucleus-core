@@ -10,13 +10,13 @@ namespace Nucleus.Core.FileProviders
 	{
 		private Stream FileStream { get; }
 
-		public MergedFileInfo(string name, Stream newStream)
+		public MergedFileInfo(string name, DateTime lastModified, Stream newStream)
 		{
 			this.Exists = true;
 			this.Length = newStream.Length;
 			this.PhysicalPath = null;
 			this.Name = name;
-			this.LastModified = DateTime.Now;
+			this.LastModified = lastModified;
 			this.IsDirectory = false;
 
 			this.FileStream = newStream;

@@ -66,7 +66,6 @@ namespace Nucleus.Core.FileProviders
 			Boolean isFound = false;
 			MemoryStream mergedcontent;
 			MergedFileInfo result;
-			Stream fileStream;
 			string subpath = context.Request.Path;
 			string contentType;
 
@@ -75,13 +74,25 @@ namespace Nucleus.Core.FileProviders
 				src = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(context.Request.Query["src"]));
 				Logger.LogTrace("Received Request for {src}", src);
 
-				contentType = subpath.EndsWith(".css") ? "text/css" : "text/javascript";
-				fileStream = GetCacheValue(cacheKey);
+				contentType = subpath.EndsWith(".css") ? "text/css; charset=utf-8" : "application/javascript";
+				result = GetCacheValue(cacheKey);
 
-				if (fileStream != null)
+				if (result != null && result.Exists)
 				{
+					if (context.Request.Headers.IfNoneMatch == GenerateETag(result.LastModified.UtcDateTime))
+					{
+						context.Response.StatusCode = (int)System.Net.HttpStatusCode.NotModified;
+						return;
+					}
+
+					if (context.Request.Headers.IfModifiedSince == result.LastModified.UtcDateTime.ToString("r"))
+					{
+						context.Response.StatusCode = (int)System.Net.HttpStatusCode.NotModified;
+						return;
+					}
+
 					Logger.LogTrace("Served {cacheKey} from cache", cacheKey);
-					await WriteFile(fileStream, context.Response, contentType);
+					await WriteFile(result, context.Response, contentType, result.LastModified.UtcDateTime);
 					return;
 				}
 				else
@@ -103,7 +114,7 @@ namespace Nucleus.Core.FileProviders
 							if (TryProvider(fileProvider, path, mergedcontent))
 							{
 								Logger.LogTrace("Added {path} to result", path);
-
+																
 								// signal that at least one file was found
 								isFound = true;
 
@@ -114,14 +125,12 @@ namespace Nucleus.Core.FileProviders
 								else if (extension != System.IO.Path.GetExtension(path).ToLower())
 								{
 									Logger.LogWarning("File Extension mismatch on path {path}, expected {extension}", path, extension);
-									return;
 								}
 							}
 							else
 							{
 								// one of the files was not found, fail the whole request
 								Logger.LogWarning("File not found - {path}", path);
-								return;
 							}
 						}
 
@@ -129,9 +138,9 @@ namespace Nucleus.Core.FileProviders
 
 					if (isFound)
 					{
-						result = new MergedFileInfo(cacheKey, mergedcontent);
+						result = new MergedFileInfo(cacheKey, DateTime.UtcNow, mergedcontent);
 						this.SetCacheValue(cacheKey, mergedcontent);
-						await WriteFile(mergedcontent, context.Response, contentType);
+						await WriteFile(result, context.Response, contentType, GetCacheEntryDate(cacheKey));
 						return;
 					}
 				}
@@ -140,13 +149,19 @@ namespace Nucleus.Core.FileProviders
 			await next(context);
 		}
 
-		private async Task WriteFile(Stream input, HttpResponse response, string contentType)
+		private async Task WriteFile(IFileInfo input, HttpResponse response, string contentType, DateTime lastModified)
 		{
-			input.Position = 0;
-
 			response.ContentType = contentType;
 			response.ContentLength = input.Length;
-			await input.CopyToAsync(response.Body);
+			 
+			response.Headers.LastModified = lastModified.ToString("r");
+			response.Headers.ETag = GenerateETag(lastModified);
+			await response.SendFileAsync(input);
+		}
+				
+		private string GenerateETag(DateTime lastModified)
+		{
+			return "\"" + Encode(lastModified.ToString()) + "\"";
 		}
 
 		private static Boolean TryProvider(IFileProvider provider, string path, Stream stream)
@@ -194,17 +209,38 @@ namespace Nucleus.Core.FileProviders
 			}
 		}
 
-		private Stream GetCacheValue(string subpath)
+		private MergedFileInfo GetCacheValue(string subpath)
 		{
 			string cachedFilePath = Path.Combine(CacheFolder(), Encode(subpath) + ".cache");
 			if (File.Exists(cachedFilePath))
 			{
-				return new FileStream(cachedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+				return new MergedFileInfo(subpath, File.GetLastWriteTimeUtc(cachedFilePath), new FileStream(cachedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read));
+				//return new FileStream(cachedFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
 			}
 			else
 			{
 				return null;
 			}
+		}
+
+		private DateTime GetCacheEntryDate(string subpath)
+		{
+			string cachedFilePath = Path.Combine(CacheFolder(), Encode(subpath) + ".cache");
+
+			try
+			{
+				if (File.Exists(cachedFilePath))
+				{
+					return File.GetLastWriteTimeUtc(cachedFilePath);
+				}
+			}
+			catch 
+			{
+				// The try-catch is for the (unlikely) case where the cache item expires and is deleted in between the File.Exists check and the File.GetLastWriteTime
+				// call.  We suppress that case and return DateTime.MinValue 
+			}
+
+			return DateTime.MinValue;
 		}
 
 		private void SetCacheValue(string subpath, Stream stream)

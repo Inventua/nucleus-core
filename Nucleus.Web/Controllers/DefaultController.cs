@@ -29,8 +29,8 @@ namespace Nucleus.Web.Controllers
 		private IUserManager UserManager { get; }
 
 		// Files and extensions in these lists do not show the site error page, they always return a 404 if they are not found.
-		private static HashSet<string> filteredFilenames = new(new string[] { "favicon.ico", "robots.txt" }, StringComparer.OrdinalIgnoreCase);
-		private static HashSet<string> filteredFileExtensions = new(new string[] { ".txt", ".css", ".js", ".map" }, StringComparer.OrdinalIgnoreCase);
+		private static readonly HashSet<string> filteredFilenames = new(new string[] { "favicon.ico", "robots.txt" }, StringComparer.OrdinalIgnoreCase);
+		private static readonly HashSet<string> filteredFileExtensions = new(new string[] { ".txt", ".css", ".js", ".map" }, StringComparer.OrdinalIgnoreCase);
 
 		public DefaultController(ILogger<DefaultController> logger, Context context, ISiteManager siteManager, IUserManager userManager, IFileSystemManager fileSystemManager, IPageManager pageManager)
 		{
@@ -96,7 +96,7 @@ namespace Nucleus.Web.Controllers
 						if (pageRoute.Type == PageRoute.PageRouteTypes.PermanentRedirect)
 						{
 							string redirectUrl = this.Url.PageLink(this.Context.Page);
-							Logger.LogTrace("Permanently redirecting request to {0}.", redirectUrl);
+							Logger.LogTrace("Permanently redirecting request to {redirectUrl}.", redirectUrl);
 							return RedirectPermanent(redirectUrl);
 						}
 					}

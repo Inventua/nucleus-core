@@ -32,7 +32,7 @@ namespace Nucleus.Web.Controllers
 		[Route("/files/{providerKey}/{path}")]
 		public async Task<ActionResult> Index(string providerKey, string path, Boolean inline)
 		{
-			this.Logger.LogInformation("File {0}/{1} requested.", providerKey, path);
+			this.Logger.LogInformation("File {providerKey}/{path} requested.", providerKey, path);
 
 			try
 			{
@@ -44,13 +44,13 @@ namespace Nucleus.Web.Controllers
 				}
 				else
 				{
-					this.Logger.LogInformation("File {0}/{1} not found.", providerKey, path);
+					this.Logger.LogInformation("File {providerKey}/{path} not found.", providerKey, path);
 					return NotFound();
 				}
 			}
 			catch (System.IO.FileNotFoundException)
 			{
-				this.Logger.LogInformation("File {0}/{1} not found.", providerKey, path);
+				this.Logger.LogInformation("File {providerKey}/{path} not found.", providerKey, path);
 				return NotFound();
 			}
 		}
@@ -61,13 +61,13 @@ namespace Nucleus.Web.Controllers
 		{
 			string idString;
 
-			this.Logger.LogInformation("File with encoded path {0} requested.", encodedPath);
+			this.Logger.LogInformation("File with encoded path {encodedPath} requested.", encodedPath);
 
 			idString = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedPath));
 
 			if (!Guid.TryParse(idString, out Guid id))
 			{
-				this.Logger.LogInformation("Encoded path {0} is not valid.", encodedPath);
+				this.Logger.LogInformation("Encoded path {encodedPath} is not valid.", encodedPath);
 				return BadRequest();
 			}
 
@@ -81,13 +81,13 @@ namespace Nucleus.Web.Controllers
 				}
 				else
 				{
-					this.Logger.LogInformation("File {0} not found.", id);
+					this.Logger.LogInformation("File {id} not found.", id);
 					return NotFound();
 				}
 			}
 			catch (System.IO.FileNotFoundException)
 			{
-				this.Logger.LogInformation("File {0} not found.", id);
+				this.Logger.LogInformation("File {id} not found.", id);
 				return NotFound();
 			}
 		}
@@ -100,7 +100,7 @@ namespace Nucleus.Web.Controllers
 				{
 					DateTime lastModifiedDate = file.DateModified;
 
-					this.Logger.LogInformation("File {0}/{1} found.", file.Provider, file.Path);
+					this.Logger.LogInformation("File {provider}/{path} found.", file.Provider, file.Path);
 
 					Folder folder = await this.FileSystemManager.GetFolder(this.Context.Site, file.Parent.Id);
 					if (folder != null)
@@ -135,30 +135,32 @@ namespace Nucleus.Web.Controllers
 						};
 
 						Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider extensionProvider = new();
-						string mimeType = "application/octet-stream";
-
+						
 						Response.Headers.Add(Microsoft.Net.Http.Headers.HeaderNames.ContentDisposition, contentDisposition.ToString());
 						Response.GetTypedHeaders().LastModified = lastModifiedDate;
 
-						extensionProvider.TryGetContentType(file.Path, out mimeType);
+						if (!extensionProvider.TryGetContentType(file.Path, out string mimeType))
+						{
+							mimeType = "application/octet-stream";
+						}
 
 						return File(this.FileSystemManager.GetFileContents(this.Context.Site, file), mimeType);
 					}
 					else
 					{
-						this.Logger.LogInformation("File {0}/{1} permission denied for {2}.", file.Provider, file.Path, HttpContext.User.Identity.Name);
+						this.Logger.LogInformation("File {provider}/{path} permission denied for {username}.", file.Provider, file.Path, HttpContext.User.Identity.Name);
 						return Forbid();
 					}
 				}
 				else
 				{
-					this.Logger.LogInformation("File {0}/{1} not found.", file.Provider, file.Path);
+					this.Logger.LogInformation("File {provider}/{path} not found.", file.Provider, file.Path);
 					return NotFound();
 				}
 			}
 			catch (System.IO.FileNotFoundException)
 			{
-				this.Logger.LogInformation("File {0}/{1} not found.", file.Provider, file.Path);
+				this.Logger.LogInformation("File {provider}/{path} not found.", file.Provider, file.Path);
 				return NotFound();
 			}
 		}

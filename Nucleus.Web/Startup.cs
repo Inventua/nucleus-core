@@ -225,7 +225,7 @@ namespace Nucleus.Web
 
 				if (System.IO.Directory.Exists(path))
 				{
-					app.Logger().LogInformation($"Adding static file path: [{path}]");
+					app.Logger().LogInformation("Adding static file path: [{path}]", path);
 
 					app.UseStaticFiles(new StaticFileOptions
 					{

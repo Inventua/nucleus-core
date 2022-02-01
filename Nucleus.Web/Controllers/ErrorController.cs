@@ -118,7 +118,7 @@ namespace Nucleus.Web.Controllers
 			};
 		}
 
-		private Boolean IsConnectionFailure(Exception e)
+		private static Boolean IsConnectionFailure(Exception e)
 		{
 			const string CHECK_CONNECTION_FUNCTION = "CheckConnection()";
 		
@@ -134,7 +134,7 @@ namespace Nucleus.Web.Controllers
 			return false;
 		}
 
-		private Microsoft.AspNetCore.Mvc.ProblemDetails ParseException(Exception ex)
+		private static Microsoft.AspNetCore.Mvc.ProblemDetails ParseException(Exception ex)
 		{
 			if (ex is Microsoft.Data.Sqlite.SqliteException)
 			{

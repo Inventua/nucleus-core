@@ -185,9 +185,6 @@ namespace Nucleus.Web
 			// This makes embedded static files in our precompiled Razor assemblies [modules] work
 			services.AddRazorEmbeddedFileProviders();
 
-			// File minifier wraps all static file requests, thus must be the LAST file provider added.  
-			//services.AddMinifiedFileProvider(this.Configuration);
-
 			services.AddDataProviderFactory(this.Configuration);
 			services.AddCoreDataProvider(this.Configuration);
 

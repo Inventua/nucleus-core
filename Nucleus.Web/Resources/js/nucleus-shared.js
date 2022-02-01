@@ -14,7 +14,7 @@ function _Page()
 		// Capture the user's timezone.  We have to * -1 because the javascript getTimezoneOffset function returns an "opposite" value (The number of minutes returned 
 		// by getTimezoneOffset()	is positive if the local time zone is behind UTC, and negative if the local time zone is ahead of UTC.For example, for UTC + 10, -600 will be returned.)
 		var timezoneOffset = new Date().getTimezoneOffset() * -1;
-		document.cookie = 'timezone-offset=' + timezoneOffset.toString();
+		document.cookie = 'name=timezone-offset=' + timezoneOffset.toString() + '; path=/';
 
 
 		// Attach the click event for any element with a data-target attribute to _GetPartialContent

@@ -20,17 +20,14 @@ namespace Nucleus.Web.Controllers.Admin
 	{
 		private ILogger<ScheduledTasksController> Logger { get; }
 		private IScheduledTaskManager ScheduledTaskManager { get; }
-		private Context Context { get; }
 		private string LogFolderPath { get; }
 
-		public ScheduledTasksController(Context context, ILogger<ScheduledTasksController> logger, ILoggerProvider logProvider, IScheduledTaskManager scheduledTaskManager)
+		public ScheduledTasksController(ILogger<ScheduledTasksController> logger, ILoggerProvider logProvider, IScheduledTaskManager scheduledTaskManager)
 		{
-			this.Context = context;
 			this.Logger = logger;
 			this.ScheduledTaskManager = scheduledTaskManager;
 
-			Nucleus.Core.Logging.TextFileLoggingProvider provider = logProvider as Nucleus.Core.Logging.TextFileLoggingProvider;
-			if (provider != null)
+			if (logProvider is Nucleus.Core.Logging.TextFileLoggingProvider provider)
 			{
 				this.LogFolderPath = System.IO.Path.Combine(provider.Options.Path, ScheduledTask.SCHEDULED_TASKS_LOG_SUBPATH);
 			}

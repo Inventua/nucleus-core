@@ -44,7 +44,7 @@ namespace Nucleus.Data.Sqlite
 		public IServiceCollection AddDataProvider<TDataProvider>(IServiceCollection services, DatabaseConnectionOption options, string schemaName)
 			where TDataProvider : Nucleus.Data.Common.DataProvider
 		{
-			return AddSqlite<TDataProvider>(services, options, schemaName);
+			return AddSqlite<TDataProvider>(services);
 		}
 
 		/// <summary>
@@ -54,10 +54,8 @@ namespace Nucleus.Data.Sqlite
 		/// </summary>
 		/// <typeparam name="TDataProvider"></typeparam>
 		/// <param name="services"></param>
-		/// <param name="options"></param>
-		/// <param name="schemaName"></param>
 		/// <returns></returns>
-		private IServiceCollection AddSqlite<TDataProvider>(IServiceCollection services, DatabaseConnectionOption options, string schemaName)
+		private static IServiceCollection AddSqlite<TDataProvider>(IServiceCollection services)
 			where TDataProvider : Nucleus.Data.Common.DataProvider
 		{
 			// add Sqlite data provider objects to the services collection.
@@ -91,7 +89,7 @@ namespace Nucleus.Data.Sqlite
 			return results;
 		}
 
-		private string ExecuteScalar(System.Data.Common.DbConnection connection, string sql)
+		private static string ExecuteScalar(System.Data.Common.DbConnection connection, string sql)
 		{
 			string result;
 

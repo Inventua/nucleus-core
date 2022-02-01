@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -131,8 +131,6 @@ namespace Nucleus.ViewFeatures.TagHelpers
 					}
 				}
 			}
-			//stream.Close();
-
 
 			if (links.Count > 0)
 			{
@@ -140,32 +138,48 @@ namespace Nucleus.ViewFeatures.TagHelpers
 				{
 					string linksUrl = "";
 
-					foreach (LinkElement link in links[linkpath])
+					if (links[linkpath].Count == 1)
 					{
-						if (!String.IsNullOrEmpty(linksUrl))
+						// Only one css file in path, write original
+						linkbuilder = new TagBuilder("link");
+						linkbuilder.TagRenderMode = TagRenderMode.SelfClosing;
+
+						linkbuilder.Attributes.Add("rel", "stylesheet");
+						linkbuilder.Attributes.Add("href", links[linkpath].First().Href);
+
+						if (builder == null)
 						{
-							linksUrl += SEPARATOR_CHAR;
+							builder = new HtmlContentBuilder();
 						}
-						linksUrl += link.Href;
+						builder.AppendHtml(linkbuilder);
 					}
-
-					IUrlHelper urlHelper = this.ViewContext.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(this.ViewContext);
-
-					linkbuilder = new TagBuilder("link");
-					linkbuilder.TagRenderMode = TagRenderMode.SelfClosing;
-
-					linkbuilder.Attributes.Add("rel", "stylesheet");
-					//linkbuilder.Attributes.Add("href", urlHelper.Content($"~/{linkpath}/merged.css?src={System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linksUrl))}{this.Version()}"));
-					//linkbuilder.Attributes.Add("href", RenderUrl(urlHelper, linkpath, linksUrl));
-					linkbuilder.Attributes.Add("href", $"/{linkpath}/merged.css?src={System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linksUrl))}{this.Version()}");
-
-					if (builder == null)
+					else
 					{
-						builder = new HtmlContentBuilder();
-					}
-					builder.AppendHtml(linkbuilder);
+						foreach (LinkElement link in links[linkpath])
+						{
+							if (!String.IsNullOrEmpty(linksUrl))
+							{
+								linksUrl += SEPARATOR_CHAR;
+							}
+							linksUrl += link.Href;
+						}
 
-					Logger.LogInformation("Merged Uri {0}", linkbuilder.Attributes["href"]);
+						IUrlHelper urlHelper = this.ViewContext.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(this.ViewContext);
+
+						linkbuilder = new TagBuilder("link");
+						linkbuilder.TagRenderMode = TagRenderMode.SelfClosing;
+
+						linkbuilder.Attributes.Add("rel", "stylesheet");
+						linkbuilder.Attributes.Add("href", $"/{linkpath}/merged.css?src={System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linksUrl))}{this.Version()}");
+
+						if (builder == null)
+						{
+							builder = new HtmlContentBuilder();
+						}
+						builder.AppendHtml(linkbuilder);
+
+						Logger.LogInformation("Merged Uri {0}", linkbuilder.Attributes["href"]);
+					}
 				}
 			}
 
@@ -186,20 +200,6 @@ namespace Nucleus.ViewFeatures.TagHelpers
 				return;
 			}
 		}
-
-		//private string RenderUrl(IUrlHelper urlHelper, string linkpath, string linksUrl)
-		//{
-		//	RouteValueDictionary routeDictionary = new();
-		//	UrlRouteContext context = new();
-
-		//	routeDictionary.Add("linkpath", linkpath);
-		//	routeDictionary.Add("src", System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(linksUrl)));
-
-		//	context.Values = routeDictionary;
-		//	context.RouteName = RoutingConstants.MERGED_CSS_ROUTE_NAME;
-
-		//	return urlHelper.RouteUrl(context);
-		//}
 
 		private string Version()
 		{

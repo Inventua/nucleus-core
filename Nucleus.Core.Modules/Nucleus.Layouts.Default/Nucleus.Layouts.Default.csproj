@@ -23,10 +23,12 @@
 	</ItemGroup>
 
   <ItemGroup>
+    <None Remove="LICENSE" />
     <None Remove="package.xml" />    
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="LICENSE" />
     <Content Include="package.xml" />    
   </ItemGroup>
 

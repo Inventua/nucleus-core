@@ -24,6 +24,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="LICENSE" />
 	  <None Remove="media.css" />
 	  <None Remove="package.xml" />
 	  <None Remove="readme.txt" />
@@ -33,6 +34,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Include="LICENSE" />
 	  <Content Include="media.css" />
 	  <Content Include="_ViewImports.cshtml" />
 	  <Content Include="package.xml" />

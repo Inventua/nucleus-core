@@ -108,7 +108,6 @@ namespace Nucleus.Core.FileProviders
 			{
 				// https://stackoverflow.com/questions/51610513/can-razor-class-library-pack-static-files-js-css-etc-too
 				// https://www.mikesdotnetting.com/article/330/including-static-resources-in-razor-class-libraries-in-asp-net-core
-				// **Microsoft.Extensions.FileProviders.ManifestEmbeddedFileProvider objEmbeddedFilesProvider;
 
 				EmbeddedFileProvider objEmbeddedFilesProvider;
 
@@ -160,44 +159,6 @@ namespace Nucleus.Core.FileProviders
 					}
 				}
 			}
-		}
-
-		/// <summary>
-		/// Add a Minified File Provider, which wraps all previously configured file providers and automatically "minifies" Javascript and CSS files.
-		/// </summary>
-		/// <param name="services">.NET core dependency injection services collection.</param>
-		/// <param name="configuration">.NET core configuration object used to access configuration items.</param>
-		public static void AddMinifiedFileProvider(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, IConfiguration configuration)
-		{
-			// .Configure adds the options object to the service container as a IOptions<T> and binds it to configuration
-			services.Configure<MinifiedFileProviderOptions>(configuration.GetSection(MinifiedFileProviderOptions.Section));
-
-			services.ConfigureOptions(typeof(ConfigureMinifiedFileProvider));
-		}
-
-		/// <summary>
-		///  Create a minified file provider to intercept all static file requests and minify the results.
-		/// </summary>
-		[EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
-		public class ConfigureMinifiedFileProvider : IPostConfigureOptions<StaticFileOptions>
-		{
-			private MinifiedFileProviderOptions Options { get; }
-			private ILogger<MinifiedFileProvider> Logger { get; }
-			private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
-
-			public ConfigureMinifiedFileProvider(IOptions<MinifiedFileProviderOptions> options, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions, ILogger<MinifiedFileProvider> Logger)
-			{
-				this.Options = options.Value;
-				this.Logger = Logger;
-				this.FolderOptions = folderOptions;
-			}
-
-			public void PostConfigure(string name, StaticFileOptions options)
-			{
-				// The Minified file provider works by "wrapping" all other file providers.  It performs the same tasks as the Composite file 
-				// provider (as well as minification) by looping though all of its child file providers and getting the results
-				options.FileProvider = new MinifiedFileProvider(this.Options, this.Logger, this.FolderOptions, options.FileProvider);
-			}
-		}
+		}		
 	}
 }

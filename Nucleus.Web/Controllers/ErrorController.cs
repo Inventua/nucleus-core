@@ -12,14 +12,14 @@ using Nucleus.ViewFeatures;
 
 namespace Nucleus.Web.Controllers
 {
-	public class Error : Controller
+	public class ErrorController : Controller
 	{
 		private Context Context { get; }
 		private IPageManager PageManager { get; }
 		private IFileSystemManager FileSystemManager { get; }
 
 
-		public Error(Context context, IFileSystemManager fileSystemManager, IPageManager pageManager)
+		public ErrorController(Context context, IFileSystemManager fileSystemManager, IPageManager pageManager)
 		{
 			this.Context = context;
 			this.FileSystemManager = fileSystemManager;

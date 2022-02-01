@@ -180,10 +180,7 @@ namespace Nucleus.Web
 			}
 
 			// Add merged file provider.  
-			services.AddMergedFileProvider(this.Configuration);
-
-			// This makes embedded static files in our precompiled Razor assemblies [modules] work
-			services.AddRazorEmbeddedFileProviders();
+			services.AddMergedFileMiddleware(this.Configuration);
 
 			services.AddDataProviderFactory(this.Configuration);
 			services.AddCoreDataProvider(this.Configuration);
@@ -245,10 +242,6 @@ namespace Nucleus.Web
 				}
 			}
 
-			// UseStaticFiles with default (no) parameters is used to enable the merged file provider and minified file provider.  It doesn't
-			// actually serve any static files, because by default it looks in /wwwroot, which does not exist in a standard Nucleus install. 
-			app.UseStaticFiles();
-
 			app.UseCookiePolicy(new CookiePolicyOptions() { });
 
 			app.UseRouting();
@@ -256,6 +249,7 @@ namespace Nucleus.Web
 			// the order here is important.  The page routing and module routing middleware sets the Nucleus context, which is used by some of the
 			// authorization handlers, but ModuleRoutingMiddleware does a permission check, which requires that Authentication has run - and
 			// middleware is executed in the order of the code below
+			app.UseMiddleware<MergedFileProviderMiddleware>();
 			app.UseMiddleware<PageRoutingMiddleware>();
 			app.UseAuthentication();
 			app.UseMiddleware<Nucleus.Core.FileSystemProviders.FileIntegrityCheckerMiddleware>();

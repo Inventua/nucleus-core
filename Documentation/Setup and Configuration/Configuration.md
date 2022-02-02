@@ -19,7 +19,7 @@ Nucleus automatically loads configuration in this order:
 9. Command line arguments
 
 > **_NOTE:_**    Enviroment-specific settings are commonly used in order to run with different settings in your production, development or testing 
-> environments.  A best practise is to always leave the default appSettings.json and databaseSettings.json files as-is, and make all of your changes
+> environments.  A best practise is to always leave the default `appSettings.json` and `databaseSettings.jso`n files as-is, and make all of your changes
 > in enviroment-specific json files.
 > The {enviroment} used in configuration filenames can be configured in a variety of ways.
 > Refer to [Use multiple environments in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/environments) for more information.
@@ -33,9 +33,10 @@ Use the `hosting.json` file to configure the Urls that Nucleus listens on.  The 
 {
   "urls": "http://0.0.0.0:5000",
   "iisSettings": {
-		"windowsAuthentication": false,
-		"anonymousAuthentication": true
-	}
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true
+  }
+}
 ```
 
 You can also configure IISSettings, [IISServerOptions](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.builder.iisserveroptions) 
@@ -90,11 +91,11 @@ The `databaseSettings.json` file contains database connection information and sc
 ```
 
 # IIS Configuration
-IIS Configuration settings are stored in `web.config`.
 
 ## web.config
 If you are hosting the Osa App Core host runtime in Internet Information Services, you need to configure the ASP.NET core module.
-
+IIS Configuration settings are stored in `web.config`.
 More information is available on the Microsoft web site - [ASP.NET Core Module](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/aspnet-core-module).
 
-> **_TIP:_**    A default `web.config` file is included as part of the installation, which includes the base settings that you need to run Nucleus in IIS.
+> **_TIP:_**    A default `web.config` file is included as part of the installation, which includes the base settings that you need to run Nucleus in IIS.  In
+most cases, you can use the default web.config file as-is.

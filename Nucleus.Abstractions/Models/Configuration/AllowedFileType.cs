@@ -23,7 +23,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// List of allowed file extensions for the allowed file type.
 		/// </summary>
 		/// <remarks>
-		/// Some file types can have different file extensionss. 
+		/// Some file types can have multiple file extensions. 
 		/// </remarks>
 		public List<string> FileExtensions { get; private set; }
 

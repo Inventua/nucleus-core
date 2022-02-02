@@ -63,7 +63,6 @@
 	  <None Remove="Resources\css\forms.css" />
 	  <None Remove="Resources\css\main.css" />
 	  <None Remove="Resources\css\shared.css" />
-	  <None Remove="Resources\Images\atom_symbol.png" />
 	  <None Remove="Resources\js\jquery-3.6.0.min.js" />
 	  <None Remove="Resources\js\nucleus-admin.js" />
 	  <None Remove="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_444444_256x240.png" />
@@ -105,7 +104,6 @@
 	  <Content Include="Resources\css\main.css" />
 	  <Content Include="Resources\css\editmode.css" />
 	  <Content Include="Resources\css\shared.css" />
-	  <Content Include="Resources\Images\atom_symbol.png" />
 	  <Content Include="Resources\js\nucleus-admin.js" />
 	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_444444_256x240.png" />
 	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_555555_256x240.png" />

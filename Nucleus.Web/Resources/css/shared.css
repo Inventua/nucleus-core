@@ -24,6 +24,20 @@ body
 	font-family: 'Material Icons'!important; 
 }
 
+.nucleus-progress-medium
+{
+  margin: auto; 
+  width: 407px; 
+  height: 407px;
+  animation: show-progress 1s 1.5s forwards;
+  opacity: 0;
+}
+
+@keyframes show-progress {
+  to { opacity: 1; }
+}
+
+
 /*  nucleus-modal-caption is used to set popup captions and should not be displayed in content */
 .nucleus-inline-edit-controls
 {

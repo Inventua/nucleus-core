@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Nucleus.ViewFeatures;
 
 namespace Nucleus.Modules.StaticContent.Controllers
 {
@@ -57,8 +58,9 @@ namespace Nucleus.Modules.StaticContent.Controllers
 							viewModel.Content = GetStreamAsString(content);
 						}
 						else
-						{							
-							return File(content, GetMimeType(file));
+						{
+							// Redirect to use the File Controller so that permissions and other checks are performed.
+							return Redirect(Url.FileLink(file));
 						}
 					}
 				}

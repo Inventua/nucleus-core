@@ -28,7 +28,8 @@
         plugins: {
           insertNucleusImage: {},
           insertNucleusPage: {}
-        }
+        },
+        svgPath: "/Resources/Libraries/Trumbowyg/ui/icons.svg"
       });
 
       

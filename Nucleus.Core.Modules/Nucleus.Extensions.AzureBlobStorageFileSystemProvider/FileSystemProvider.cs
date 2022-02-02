@@ -10,6 +10,7 @@ using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Options;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure;
 
 namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 {
@@ -262,7 +263,15 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			BlobContainerClient containerClient = client.GetBlobContainerClient(GetContainerName(parentPath));
 			BlobClient blobClient = containerClient.GetBlobClient(GetBlobName(newObjectPath));
 
-			await blobClient.UploadAsync(content, overwrite: overwrite);
+			//await blobClient.UploadAsync(content, overwrite: overwrite);
+			Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider extensionProvider = new();
+
+			if (!extensionProvider.TryGetContentType(newFileName, out string mimeType))
+			{
+				mimeType = "application/octet-stream";
+			}
+
+			await blobClient.UploadAsync(content, new BlobHttpHeaders { ContentType = mimeType, CacheControl="max-age=3600" }, conditions: new BlobRequestConditions { IfMatch = new ETag("*") });
 
 			return BuildFile(newObjectPath);
 		}

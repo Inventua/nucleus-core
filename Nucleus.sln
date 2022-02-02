@@ -72,6 +72,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Data.MySql", "Nucle
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Data.PostgreSql", "Nucleus.Data.PostgreSql\Nucleus.Data.PostgreSql.csproj", "{11E25778-517D-4AA0-820F-21E5F31F478F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Content Managers", "Content Managers", "{87D24D71-4026-4693-A812-212F16C9E952}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Content Managers\FilesAndFolders-FileManager.png = Documentation\Content Managers\FilesAndFolders-FileManager.png
+		Documentation\Content Managers\FilesAndFolders.md = Documentation\Content Managers\FilesAndFolders.md
+		Documentation\Content Managers\FilesAndFolders.png = Documentation\Content Managers\FilesAndFolders.png
+		Documentation\Content Managers\PageManagement.md = Documentation\Content Managers\PageManagement.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{277A9E40-499B-4995-A467-D744A695C475}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Content Managers\FilesAndFolders.png = Documentation\Content Managers\FilesAndFolders.png
+		Documentation\Content Managers\Modules\TextHtml.md = Documentation\Content Managers\Modules\TextHtml.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -208,6 +222,8 @@ Global
 		{A317F888-BFD7-4EC8-92BC-D75ECE4F92B3} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{ECD9AE80-AE2F-46F1-8EB1-E48F1ED7EAA8} = {800D8125-BD40-410A-B1E9-C1E62224DC03}
 		{BE4E2A1D-F255-4F21-A80A-1E016C09F0A2} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
+		{87D24D71-4026-4693-A812-212F16C9E952} = {800D8125-BD40-410A-B1E9-C1E62224DC03}
+		{277A9E40-499B-4995-A467-D744A695C475} = {87D24D71-4026-4693-A812-212F16C9E952}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D84CD364-9C8E-400E-84AA-45562061ED44}

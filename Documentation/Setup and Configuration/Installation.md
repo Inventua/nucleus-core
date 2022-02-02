@@ -5,11 +5,12 @@ in Windows/Internet Information Services using the Sqlite database provider and 
 ## Basic Setup 
 1. Download the install set (zip format) from the [downloads](/downloads) page.
 2. Create an installation folder, and un-zip the install set to that folder.
-3. In Internet Information Services (IIS) manager, add a web site or application with the path set to your installation folder.  Nucleus ships
+3. Install the [.NET Core runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+4. In Internet Information Services (IIS) manager, add a web site or application with the path set to your installation folder.  Nucleus ships
    with a web.config which is pre-configured with settings to run Nucleus in IIS.  Make sure that the IIS application has a unique application 
    pool, set to use NET CLR version v4.0.30319 and integrated pipeline.
-4. If you want to use a different database or file system provider, refer to the sections below.
-5. Browse to your web site address.  The new site wizard will appear, prompting you to set your site properties and administrator users.
+5. If you want to use a different database or file system provider, refer to the sections below.
+6. Browse to your web site address.  The new site wizard will appear, prompting you to set your site properties and administrator users.
 
 ## Using a different database provider
 1. Create a database in your database server.

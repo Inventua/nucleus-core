@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions.Authorization;
+using Microsoft.Extensions.Options;
+using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Web.Controllers
 {
@@ -20,9 +22,11 @@ namespace Nucleus.Web.Controllers
 		private ILogger<FileController> Logger { get; }
 		private Context Context { get; }
 		private IFileSystemManager FileSystemManager { get; }
+		private IOptions<FileSystemProviderFactoryOptions> Options { get; }
 
-		public FileController(ILogger<FileController> logger, Context context, IFileSystemManager fileSystemManager)
+		public FileController(IOptions<FileSystemProviderFactoryOptions> options, ILogger<FileController> logger, Context context, IFileSystemManager fileSystemManager)
 		{
+			this.Options = options;
 			this.Logger = logger;
 			this.Context = context;
 			this.FileSystemManager = fileSystemManager;
@@ -101,6 +105,12 @@ namespace Nucleus.Web.Controllers
 					DateTime lastModifiedDate = file.DateModified;
 
 					this.Logger.LogInformation("File {provider}/{path} found.", file.Provider, file.Path);
+
+					// Verify that the file extension is allowed
+					if (!this.Options.Value.AllowedFileTypes.Where(allowedtype => allowedtype.FileExtensions.Contains(System.IO.Path.GetExtension(file.Name), StringComparer.OrdinalIgnoreCase)).Any())
+					{
+						return BadRequest();
+					}
 
 					Folder folder = await this.FileSystemManager.GetFolder(this.Context.Site, file.Parent.Id);
 					if (folder != null)

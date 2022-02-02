@@ -315,27 +315,8 @@ namespace Nucleus.Core.Managers
 
 			Folder result = fileSystemProvider.CreateFolder(parentPath, newFolder);
 
-			// Create default permissions
-
-			// Add permissions (administrator-view/edit)				
-			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
-			{
-				List<PermissionType> permissionTypes = await provider.ListPermissionTypes(Folder.URN);
-				List<Permission> permissions = new();
-
-				foreach (PermissionType permissionType in permissionTypes)
-				{
-					Permission permission = new();
-					permission.AllowAccess = true;
-					permission.PermissionType = permissionType;
-					permission.Role = site.AdministratorsRole;
-
-					permissions.Add(permission);
-				}
-
-				result.Permissions.AddRange(permissions);
-			}
-
+			// SaveFolderPermissions creates a record in the database for the folder (a new folder doesn't have
+			// any permissions to save, but we do want to save the database record).
 			await SaveFolderPermissions(site, result);
 
 			return result;

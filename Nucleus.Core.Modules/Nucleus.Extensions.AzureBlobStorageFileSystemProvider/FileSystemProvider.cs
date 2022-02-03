@@ -271,7 +271,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 				mimeType = "application/octet-stream";
 			}
 
-			await blobClient.UploadAsync(content, new BlobHttpHeaders { ContentType = mimeType, CacheControl="max-age=3600" }, conditions: new BlobRequestConditions { IfMatch = new ETag("*") });
+			await blobClient.UploadAsync(content, new BlobHttpHeaders { ContentType = mimeType, CacheControl="max-age=3600" });
 
 			return BuildFile(newObjectPath);
 		}

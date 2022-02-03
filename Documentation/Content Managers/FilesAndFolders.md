@@ -9,7 +9,7 @@ logging in as a system administrator or site administrator, you can access the f
 Nucleus has support for the local file system as well as files hosted in Azure blob storage.  The file provider system is
 extensible, so you may have support for other file systems.  You can configure Nucleus with more than one file system.
 
-The file manager displays a drop-down list to select which file provider to manage.  A list of files and folders is listed 
+The file manager displays a drop-down list to select which file system provider to manage.  A list of files and folders is listed 
 in the main display.
 
 ![Manage Files and Folders](FilesAndFolders-FileManager.png)
@@ -29,7 +29,9 @@ files to the root folder.  If you can't see the upload button, choose a sub-fold
 with an extension that is not in the "allowed" list.  File contents are validated against a list of known "signatures", 
 so your file content must match its extension.  If you use external file management tools to copy a file with a restricted a 
 file extension to your file system, Nucleus will not display the file.  Your system administrator can modify the 
-configuration files which control which file types are allowed.
+configuration files which control which file types are allowed.  The default allowed file extensions are web documents (css, htm, html), 
+images (ico, jpg and jpeg, gif, png, bmp, webp, tif and tiff), Microsoft Office documents (doc, docx, pptx, ppt, xls, xlsx, vsd),
+video and audio (mp4, mpg, mpeg, webm, mkv, mka), generic documents (txt, md, rtf, xml, xps) and zip files.
 
 ## Rename a file or folder
 Some file systems do not support rename operations (most cloud file systems).  If your file system provider supports it, use the 

@@ -110,7 +110,6 @@ namespace Nucleus.Web
 				$"Web Root:                [{this.Environment.WebRootPath}]",
 				$"Environment:             [{this.Environment.EnvironmentName}]",
 				$"Urls:                    [{this.Configuration.GetValue<string>(Microsoft.AspNetCore.Hosting.WebHostDefaults.ServerUrlsKey)}]",
-				$"Default App Data:        [{System.Environment.GetFolderPath(System.Environment.SpecialFolder.CommonApplicationData)}]",
 				""
 			});
 

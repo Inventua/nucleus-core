@@ -17,7 +17,7 @@ namespace Nucleus.Core.Logging
 	/// </remarks>
 	public static class LoggingBuilderExtensions
 	{
-		private static string _datafolder;
+		public static string DataFolder { get; private set; }
 
 		/// <summary>
 		///   Adds a Debug logger.
@@ -48,10 +48,16 @@ namespace Nucleus.Core.Logging
 			// Dependency Injection container won't be configured yet when ConfigureTextFileLogger.PostConfigure is called for the instance which is used by StartupLogger,
 			// so we have to read config here, and save the DataFolder in a static for use in ConfigureTextFileLogger.PostConfigure.  
 			// This is not an elegant solution, but the only alternative would be to require an appSettings setting for Nucleus:TextFileLoggerOptions:Path, and we want
-			// that settint to be optional.
+			// that setting to be optional.
 			Nucleus.Abstractions.Models.Configuration.FolderOptions folderOptions = new();
 			configuration.GetSection(Nucleus.Abstractions.Models.Configuration.FolderOptions.Section).Bind(folderOptions);
-			_datafolder = folderOptions.DataFolder;
+						
+			DataFolder = folderOptions.DataFolder;
+			if (String.IsNullOrEmpty(DataFolder))
+			{
+				DataFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Nucleus");
+			}
+			DataFolder = folderOptions.Parse(DataFolder);
 
 			return builder;
 		}
@@ -71,7 +77,7 @@ namespace Nucleus.Core.Logging
 				{
 					//  Special case:  When the text file logger is added to the StartupLogger, dependency injection hasn't been set up yet and folderOptions hasn't
 					// been initialized, so we have to use the DataPath that we read ourselves in AddTextFileLogger.				
-					this.FolderOptions.Value.DataFolder = _datafolder;
+					this.FolderOptions.Value.DataFolder = DataFolder;
 
 					// If the config files don't have an entry, initialize to default.  This also happens in CoreServiceExtensions.ConfigureFolderOptions.PostConfigure,
 					// but that doesn't run in time for the StartupLogger

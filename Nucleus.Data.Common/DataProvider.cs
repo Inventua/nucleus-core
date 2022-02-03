@@ -9,12 +9,10 @@ using Microsoft.Extensions.Configuration;
 namespace Nucleus.Data.Common
 {
 	/// <summary>
-	/// Base class used by entity-framework data providers.
+	/// Base class used by data providers.
 	/// </summary>
 	/// <remarks>
-	/// Nucleus core and module data provider which use entity framework classes inherit this class, which contains an implementation of
-	/// the schema migration functions.  Data provider implementations which register a related DataProviderMigration class must inherit 
-	/// this class.
+	/// Nucleus core and module data provider classes inherit this class.
 	/// </remarks>
 	public abstract class DataProvider : IDisposable
 	{

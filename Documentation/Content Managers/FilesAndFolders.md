@@ -31,6 +31,13 @@ so your file content must match its extension.  If you use external file managem
 file extension to your file system, Nucleus will not display the file.  Your system administrator can modify the 
 configuration files which control which file types are allowed.
 
+## Rename a file or folder
+Some file systems do not support rename operations (most cloud file systems).  If your file system provider supports it, use the 
+check boxes on the left to select a single files or folder and click `Rename`.  You will prompted for the new name.
+
+> **_NOTE:_**  You can't change the file extension of a file when renaming it.  This is a security measure to prevent users 
+from circumventing restricted file type checking during upload.
+
 ## Delete a file or folder
 To delete files or folders, use the check boxes on the left to select the files and folders that you want to delete, and click 
 `Delete`.  Folders must be empty before you can delete them.

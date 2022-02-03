@@ -109,8 +109,7 @@ namespace Nucleus.Web
 				$"Content Root:            [{this.Environment.ContentRootPath}]",
 				$"Web Root:                [{this.Environment.WebRootPath}]",
 				$"Environment:             [{this.Environment.EnvironmentName}]",
-				$"Urls:                    [{this.Configuration.GetValue<string>(Microsoft.AspNetCore.Hosting.WebHostDefaults.ServerUrlsKey)}]",
-				""
+				$"Urls:                    [{this.Configuration.GetValue<string>(Microsoft.AspNetCore.Hosting.WebHostDefaults.ServerUrlsKey)}]"
 			});
 
 			services.AddHttpContextAccessor();  // required by many elements of the system
@@ -132,6 +131,11 @@ namespace Nucleus.Web
 				logging.AddAzureWebAppDiagnostics();
 			});
 
+			services.Logger().LogInformation(new[] { 
+				$"App Data Folder:         [{Core.Logging.LoggingBuilderExtensions.DataFolder}]",
+				""
+			});
+				
 			// Enable compression
 			if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
 			{

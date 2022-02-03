@@ -27,6 +27,7 @@ namespace Nucleus.Abstractions.Models
 			/// <summary>
 			/// Page is a redirect, a 301-Moved permanently response is returned if this route is requested.
 			/// </summary>
+			[Display(Name = "Permanent Redirect")]
 			PermanentRedirect
 		}
 

@@ -78,11 +78,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Content Managers", "Content
 		Documentation\Content Managers\FilesAndFolders.md = Documentation\Content Managers\FilesAndFolders.md
 		Documentation\Content Managers\FilesAndFolders.png = Documentation\Content Managers\FilesAndFolders.png
 		Documentation\Content Managers\PageManagement.md = Documentation\Content Managers\PageManagement.md
+		Documentation\Content Managers\PageManagement.png = Documentation\Content Managers\PageManagement.png
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{277A9E40-499B-4995-A467-D744A695C475}"
 	ProjectSection(SolutionItems) = preProject
-		Documentation\Content Managers\FilesAndFolders.png = Documentation\Content Managers\FilesAndFolders.png
 		Documentation\Content Managers\Modules\TextHtml.md = Documentation\Content Managers\Modules\TextHtml.md
 	EndProjectSection
 EndProject

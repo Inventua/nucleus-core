@@ -4,8 +4,8 @@ After logging in as a system administrator or site administrator, you can access
 
 ![Manage Pages](PageManagement.png)
 
-To create a new page, click the `New Page` button.  To edit an existing page, select it from the menu on the left.  
-Click the arrow icon to the right of any page which contains child pages to open a list of child pages.  You can also 
+To create a new page, click the `New Page` button.  To edit an existing page, select it from the menu on the left.  Click the arrow icon to 
+the right of any page which contains child pages to open a list of child pages.  You can also 
 search for pages by typing part of the page name, title, description or keywords.  Search results are displayed 
 automatically while you type.
 
@@ -41,7 +41,7 @@ Page paths are the Url for your page.  Each page must have at least one path in 
 | Default          | Specifies the default path for the page.  A page can have only one default path.  If none are specified, the first path is treated as the default.   |
 
 > **_AVOID:_**  spaces in paths.  Browsers will replace spaces with %20% - which works, but doesn't present well.  Use a '-' or other character for word breaks.  You should
-also avoid non-alphanumeric characters, apart from '-' because most of these will be encoded as well.
+also avoid non-alphanumeric characters, apart from '-' because most of these will be url-encoded as well.
 
 ## Permissions
 Click the `Permissions` tab to view and modify permissions for the page.  You can add roles for the page, and specify whether users within those roles have view or edit permissions.  Administrator 

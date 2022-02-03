@@ -81,7 +81,7 @@ namespace Nucleus.Modules.Sitemap
 
 			PageMenu pageMenu = await pageManager.GetMenu(nucleusContext.Site, rootPage, context.HttpContext.User, true);
 
-			outputBuilder = AddPageChildren(urlHelper, pageMenu.Children, showDescription, 0, maxlevels);
+			outputBuilder = AddPageChildren(nucleusContext, urlHelper, pageMenu.Children, showDescription, 0, maxlevels);
 			outputBuilder.AddCssClass("Sitemap");
 			return outputBuilder;
 		}
@@ -98,7 +98,7 @@ namespace Nucleus.Modules.Sitemap
 			}
 		}
 
-		private static TagBuilder AddPageChildren(IUrlHelper urlHelper, IEnumerable<PageMenu> items, Boolean showDescription, int level, int maxlevels)
+		private static TagBuilder AddPageChildren(Context nucleusContext, IUrlHelper urlHelper, IEnumerable<PageMenu> items, Boolean showDescription, int level, int maxlevels)
 		{
 			TagBuilder outputBuilder = new("ol");
 
@@ -128,9 +128,14 @@ namespace Nucleus.Modules.Sitemap
 					listItemBuilder.InnerHtml.AppendHtml(descriptionBuilder);
 				}
 
+				if (menuItem.Page.Id == nucleusContext.Page.Id)
+				{
+					listItemBuilder.AddCssClass("current-page");
+				}
+
 				if (maxlevels==0 || level < maxlevels-1)
 				{
-					listItemBuilder.InnerHtml.AppendHtml(AddPageChildren(urlHelper, menuItem.Children, showDescription, level + 1, maxlevels));
+					listItemBuilder.InnerHtml.AppendHtml(AddPageChildren(nucleusContext, urlHelper, menuItem.Children, showDescription, level + 1, maxlevels));
 				}
 
 				outputBuilder.InnerHtml.AppendHtml(listItemBuilder);

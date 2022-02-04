@@ -1,6 +1,6 @@
 # Page Management
 After logging in as a system administrator or site administrator, you can access the page manager by clicking the
-`Pages` button..
+`Pages` button.
 
 ![Manage Pages](PageManagement.png)
 
@@ -43,6 +43,8 @@ Page paths are the Url for your page.  Each page must have at least one path in 
 > **_AVOID:_**  spaces in paths.  Browsers will replace spaces with %20% - which works, but doesn't present well.  Use a '-' or other character for word breaks.  You should
 also avoid non-alphanumeric characters, apart from '-' because most of these will be url-encoded as well.
 
+> **_TIP:_**  You can use `Permanent Redirect` paths to maintain compatibility with old versions of your site.
+
 ## Permissions
 Click the `Permissions` tab to view and modify permissions for the page.  You can add roles for the page, and specify whether users within those roles have view or edit permissions.  Administrator 
 users always have view and edit permissions.  The `All Users` role is restricted, and can only have view permission.
@@ -63,4 +65,5 @@ pane, and delete it if it is no longer required.
 > **_TIP:_**  It's a good idea to specify a title, so that you know what the module is fore, even if you don't want it shown on-screen.  Choose (or create) a container that doesn't 
 display the title if you don't want to display it.
 
-
+## Module Permissions
+Use the `Permissions` tab to set permissions for a specific module, or use the default `Inherit from Page` option.

@@ -159,6 +159,16 @@
 		if (jQuery('#Page_Title').val() === '')
 		{
 			jQuery('#Page_Title').val(jQuery(this).val());
-		}
+		}			
 	})
+	
+	// Read the child pages of the item containing the "+" button
+	jQuery('#page-properties').on('click', '.nucleus-get-childpages', function (e)
+	{
+		// Add a ul to contain the new pages
+		Page.LoadPartialContent(e, '@Url.AreaAction("GetChildPages", "Pages", "Admin")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+
+		// remove the "+" button
+		jQuery(this).remove();
+	});
 </script>

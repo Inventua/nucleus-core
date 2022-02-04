@@ -45,7 +45,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		{
 			Dictionary<string, System.Version> scripts = (Dictionary<string, System.Version>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
 
-			scriptPath = new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).ResolveExtensionUrl(scriptPath);			
+			scriptPath = htmlHelper.ResolveExtensionUrl(scriptPath);			
 
 			if (!scripts.ContainsKey(scriptPath))
 			{

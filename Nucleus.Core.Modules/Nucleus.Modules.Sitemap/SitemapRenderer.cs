@@ -100,6 +100,11 @@ namespace Nucleus.Modules.Sitemap
 
 		private static TagBuilder AddPageChildren(Context nucleusContext, IUrlHelper urlHelper, IEnumerable<PageMenu> items, Boolean showDescription, int level, int maxlevels)
 		{
+			if (!items.Any())
+			{
+				return null;
+			}	
+
 			TagBuilder outputBuilder = new("ol");
 
 			foreach (PageMenu menuItem in items)

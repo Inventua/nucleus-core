@@ -86,6 +86,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{277A
 		Documentation\Content Managers\Modules\TextHtml.md = Documentation\Content Managers\Modules\TextHtml.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Developers", "Developers", "{3542AB19-07D1-46AE-8CC8-295F847A9741}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Developers\Layouts-and-Containers.md = Documentation\Developers\Layouts-and-Containers.md
+		Documentation\Developers\Modules.md = Documentation\Developers\Modules.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -224,6 +230,7 @@ Global
 		{BE4E2A1D-F255-4F21-A80A-1E016C09F0A2} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{87D24D71-4026-4693-A812-212F16C9E952} = {800D8125-BD40-410A-B1E9-C1E62224DC03}
 		{277A9E40-499B-4995-A467-D744A695C475} = {87D24D71-4026-4693-A812-212F16C9E952}
+		{3542AB19-07D1-46AE-8CC8-295F847A9741} = {800D8125-BD40-410A-B1E9-C1E62224DC03}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D84CD364-9C8E-400E-84AA-45562061ED44}

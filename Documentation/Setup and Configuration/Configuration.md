@@ -7,11 +7,11 @@ multiple files, the last one read takes precedence.
 Nucleus automatically loads configuration in this order:
 
 1. hosting.json
-2. hosting.{environment}.json
+2. hosting.`{environment}`.json
 3. appSettings.json
-4. appSettings.{environment}.json
+4. appSettings.`{environment}`.json
 5. databaseSettings.json
-6. databaseSettings.{environment}.json
+6. databaseSettings.`{environment}`.json
 
 7. All other .json files in the application folder, in alphabetical order.
 
@@ -21,7 +21,7 @@ Nucleus automatically loads configuration in this order:
 > **_NOTE:_**    Enviroment-specific settings are commonly used in order to run with different settings in your production, development or testing 
 > environments.  A best practise is to always leave the default `appSettings.json` and `databaseSettings.jso`n files as-is, and make all of your changes
 > in enviroment-specific json files.
-> The {enviroment} used in configuration filenames can be configured in a variety of ways.
+> The `{enviroment}` used in configuration filenames can be configured in a variety of ways.
 > Refer to [Use multiple environments in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/environments) for more information.
 
 You can organize your application settings any way you want to, the sections below refer to the default conventions used by Nucleus.

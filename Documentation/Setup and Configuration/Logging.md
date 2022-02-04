@@ -3,7 +3,7 @@ Nucleus includes a console, debug, text file and Azure Web App Diagnostics logge
 
 The Text File logger writes text file logs, which are stored in the `C:\ProgramData\Nucleus\Logs` folder by default, in files named dd-MMM-yyyy.log.  
 Text file logs are automatically deleted after 7 days by default.  If you are hosting in an Azure App Service, you must configure to the text file logger 
-to write to %HOME%/LogFiles/Application or another writable folder by adding an entry to the Nucleus section of the appSettings.{environment}.json 
+to write to %HOME%/LogFiles/Application or another writable folder by adding an entry to the Nucleus section of the appSettings.`{environment}`.json 
 configuration file:
 
     "TextFileLoggerOptions": 

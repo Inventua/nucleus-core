@@ -18,7 +18,7 @@
           editor.lang.insertNucleusPage,
           [
             '<form class="nucleus-pageselectorform"><div class="nucleus-flex-fields nucleus-pageselector"></div></form>',
-            '<div class="nucleus-button-panel"><button class="btn btn-primary insert-page">Insert Page</button><button class="btn btn-secondary cancel-insert-page">Cancel</button></div>',
+            '<div class="nucleus-button-panel"><button class="btn btn-primary insert-page">Insert Page Link</button><button class="btn btn-secondary cancel-insert-page">Cancel</button></div>',
           ], false);
         
         buildModal(editor, '.nucleus-pageselector');
@@ -65,7 +65,7 @@
     // Add some translations
     langs: {
       en: {
-        insertNucleusPage: 'Insert Page'
+        insertNucleusPage: 'Insert Page Link'
       }
     },
     // Register plugin in Trumbowyg

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Extensions;
 using Nucleus.Abstractions;
@@ -18,18 +19,7 @@ namespace Nucleus.ViewFeatures
 	/// Extensions used to render links to Nucleus pages, files and actions.
 	/// </summary>
 	public static class UrlHelperExtensions
-	{
-		/// <summary>
-		/// Special token used by the AddScript and AddStyle html helpers to represent the path of the currently executing view.
-		/// </summary>
-		public static string VIEWPATH_TOKEN = "~!";
-
-		/// <summary>
-		/// Special token used by the AddScript and AddStyle html helpers to represent the extension path of the currently executing view.
-		/// </summary>
-		public static string EXTENSIONPATH_TOKEN = "~#";
-
-
+	{		
 		/// <summary>
 		/// Output an relative url, with the leading "~" character for use by UrlHelper.Content for the specified <see cref="Page"/>.
 		/// </summary>
@@ -194,18 +184,6 @@ namespace Nucleus.ViewFeatures
 			return helper.RouteUrl(context);
 		}
 
-		//public static string NucleusAction(this IUrlHelper helper, string actionName)
-		//{
-		//	// This doesn't work properly in a module view/edit view.  IUrlHelper is always initialized with the current httpRequest, so
-		//	// ActionContext always returns the original request route values rather than the ones which are set in ModuleContentRenderer.
-		//	string controllerName = (string)helper.ActionContext.HttpContext.GetRouteValue("controller");
-		//	return NucleusAction(helper, actionName, controllerName, null);
-		//}
-		//public static string NucleusAction(this IUrlHelper helper, string actionName, string controllerName)
-		//{
-		//	return NucleusAction(helper, actionName, controllerName, null, (string)helper.ActionContext.RouteData.Values["extension"]);
-		//}
-
 		/// <summary>
 		/// Generates a fully qualified URL to an Nucleus extension action method by using the specified action name, controller name and extension name.
 		/// </summary>
@@ -306,47 +284,6 @@ namespace Nucleus.ViewFeatures
 			context.RouteName = RoutingConstants.API_ROUTE_NAME;
 
 			return helper.RouteUrl(context);
-		}
-
-		/// <summary>
-		/// Generates an absolute url from the passed-in relative url after substituting ~! for the currently executing view path, or ~#
-		/// for the currently executing extension.
-		/// </summary>
-		/// <param name="helper"></param>
-		/// <param name="url"></param>
-		/// <returns></returns>
-		public static string ResolveExtensionUrl(this IUrlHelper helper, string url)
-		{
-			if (url.StartsWith(VIEWPATH_TOKEN))
-			{
-				string executingViewPath = ((Microsoft.AspNetCore.Mvc.Rendering.ViewContext)helper.ActionContext).ExecutingFilePath;
-				System.Uri viewPath = GetAbsoluteUri(helper, System.IO.Path.GetDirectoryName(executingViewPath).Replace("\\", "/"));
-				return new System.Uri(viewPath, ParseScriptPath(url, VIEWPATH_TOKEN)).AbsolutePath;
-			}
-			else if (url.StartsWith(EXTENSIONPATH_TOKEN))
-			{
-				string viewPath = System.IO.Path.GetDirectoryName(((Microsoft.AspNetCore.Mvc.Rendering.ViewContext)helper.ActionContext).ExecutingFilePath).Replace("\\", "/");
-				string[] viewPathParts = viewPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-
-				// viewPathParts[0] will be "extensions", and viewPathParts[1] will be the extension folder name
-				if (viewPathParts.Length > 2)
-				{
-					System.Uri extensionPath = GetAbsoluteUri(helper, $"{viewPathParts[0]}/{viewPathParts[1]}");
-					return new System.Uri(extensionPath, ParseScriptPath(url, EXTENSIONPATH_TOKEN)).AbsolutePath;
-				}
-			}
-
-			return url;
-		}
-
-		private static string ParseScriptPath(string url, string token)
-		{
-			string scriptPath = url[token.Length..];
-			if (scriptPath.StartsWith('/'))
-			{
-				scriptPath = scriptPath[1..];
-			}
-			return scriptPath;
 		}
 
 		/// <summary>

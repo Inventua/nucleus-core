@@ -14,22 +14,28 @@ in the main display.
 
 ![Manage Files and Folders](FilesAndFolders-FileManager.png)
 
+## Create a folder
+Click `Create Folder` and enter your new folder name to create a folder.  The file manager automatically 
+navigates to your new folder after creating it.
+
+> File system providers have different restrictions on which characters you can use.  If you use invalid characters, you will get 
+an error message.  
+
 ## Selecting a folder
 Navigate to a folder by clicking its link in the display.  Navigate back a level by clicking the `Back` button.
 
-## Create a folder
-Click `Create Folder` and enter your new folder name to create a folder.  File system providers have different restrictions on
-which characters you can use.  If you use invalid characters, you will get an error message.
-
 ## Upload a file
 Click the `Upload File` button to upload a file.  Some file system providers (like Azure Storage) do not allow you to upload 
-files to the root folder.  If you can't see the upload button, choose a sub-folder and upload there.
+files to the root folder.  If the upload button is disabled, you will need to create a sub-folder and upload your files to that 
+location.
 
-> **_NOTE:_**  For security reasons, Nucleus restricts the file types that you can use.  You can't upload files
+> For security reasons, Nucleus restricts the file types that you can use.  You can't upload files
 with an extension that is not in the "allowed" list.  File contents are validated against a list of known "signatures", 
 so your file content must match its extension.  If you use external file management tools to copy a file with a restricted a 
-file extension to your file system, Nucleus will not display the file.  Your system administrator can modify the 
-configuration files which control which file types are allowed.  The default allowed file extensions are web documents (css, htm, html), 
+file extension to your file system, Nucleus will not display the file.  If you need to support file types that aren't in the default
+approved list, your system administrator can modify the Nucleus configuration files which control which file types are allowed.  
+
+> The default allowed file extensions are web documents (css, htm, html), 
 images (ico, jpg and jpeg, gif, png, bmp, webp, tif and tiff), Microsoft Office documents (doc, docx, pptx, ppt, xls, xlsx, vsd),
 video and audio (mp4, mpg, mpeg, webm, mkv, mka), generic documents (txt, md, rtf, xml, xps) and zip files.
 
@@ -37,7 +43,7 @@ video and audio (mp4, mpg, mpeg, webm, mkv, mka), generic documents (txt, md, rt
 Some file systems do not support rename operations (most cloud file systems).  If your file system provider supports it, use the 
 check boxes on the left to select a single files or folder and click `Rename`.  You will prompted for the new name.
 
-> **_NOTE:_**  You can't change the file extension of a file when renaming it.  This is a security measure to prevent users 
+> You can't change the file extension of a file when renaming it.  This is a security measure to prevent users 
 from circumventing restricted file type checking during upload.
 
 ## Delete a file or folder
@@ -45,6 +51,6 @@ To delete files or folders, use the check boxes on the left to select the files 
 `Delete`.  Folders must be empty before you can delete them.
 
 ## Setting Permissions
-Permissions are set at the folder level.  If your files are intended for use by all of your site users, you will want to grant 
+Permissions are set at the folder level.  If the files within a folder are intended for use by users of your site, you will want to grant 
 `View` permissions to `All Users`.  Newly-created folders have no permissions by default.
 

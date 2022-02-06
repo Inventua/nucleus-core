@@ -56,7 +56,7 @@ pane, and delete it if it is no longer required.
 ### Module Settings
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
-| Module Type      | You can choose any of the installed modules to add.  After a module has been added, you can't change its type |
+| Module Type      | You can choose any of the installed modules to add.  After a module has been added, you can't change its type. |
 | Title            | The module title is displayed on-screen, unless you choose a container which does not display the title.    |
 | Pane             | Specifies the pane to display the module in.  Different layouts have different available panes and pane names.   |
 | Container        | Specifies the container for the module, or select '(default)' to use the default layout for this page.   |

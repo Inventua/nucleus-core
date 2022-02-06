@@ -42,7 +42,7 @@
 					<div class="text-muted small fst-italic result-meta">
 						@if (Model.Settings.ShowPublishDate && result.PublishedDate.HasValue)
 						{
-							<span>Published: @result.PublishedDate.FormatDate(true)</span>
+							<span>Published: @result.PublishedDate.FormatDate(this.Context.Request.GetUserTimeZone())</span>
 						}
 						@if ((Model.Settings.ShowPublishDate && result.PublishedDate.HasValue) && (Model.Settings.ShowSize && result.Size.HasValue))
 						{

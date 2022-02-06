@@ -10,7 +10,7 @@
 	</h2>
 	<div class="metadata">
 		<div class="publish-date">
-			@((Model.Article.PublishDate.HasValue ? Model.Article.PublishDate : Model.Article.DateAdded).FormatDate(true))
+			@((Model.Article.PublishDate.HasValue ? Model.Article.PublishDate : Model.Article.DateAdded).FormatDate(this.Context.Request.GetUserTimeZone()))
 		</div>
 		@if (Model.Article.Categories.Count > 0 || Model.Article.Featured)
 		{

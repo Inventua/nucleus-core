@@ -22,7 +22,7 @@
 		<div class="post">
 			<h3>@Model.Post.Subject</h3>
 			<div class="post-author">
-				<div>Posted on @Model.Post.DateAdded.FormatDate(true) by @Model.Post.PostedBy.UserName</div>
+				<div>Posted on @Model.Post.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone()) by @Model.Post.PostedBy.UserName</div>
 			</div>
 			<div class="post-flags">
 				@if (Model.Post.IsLocked)
@@ -95,7 +95,7 @@
 				{
 					<div class="reply">
 						<div class="heading">
-							<span>@reply.PostedBy.UserName replied on</span><span>@reply.DateAdded.FormatDate(true)</span>
+							<span>@reply.PostedBy.UserName replied on</span><span>@reply.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</span>
 							<span class="controls">
 								@if (Model.CanDeletePost)
 								{

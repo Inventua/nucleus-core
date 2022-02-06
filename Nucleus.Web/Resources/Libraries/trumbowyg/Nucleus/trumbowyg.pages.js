@@ -27,7 +27,12 @@
         jQuery('.insert-page').on('click', function ()
         {
           var pageSrc = jQuery('.nucleus-pageselector li > a.selected').attr('data-linkurl');
-          var pageText = jQuery('.nucleus-pageselector li > a.selected').html();
+          var pageText = editor.getRangeText();
+          if (pageText === null)
+          {
+            pageText = jQuery('.nucleus-pageselector li > a.selected').html();
+          }
+
           editor.restoreRange();
           editor.execCmd('insertHTML', '<a href="' + pageSrc + '">' + pageText + '</a>' );
           

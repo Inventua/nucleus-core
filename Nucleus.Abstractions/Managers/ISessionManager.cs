@@ -65,5 +65,15 @@ namespace Nucleus.Abstractions.Managers
 		/// </summary>
 		/// <returns></returns>
 		public Task DeleteExpiredSessions();
+
+		/// <summary>
+		/// Return a count of active user sessions.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// An active user session is defined as a session which has not expired, and has been updated in the last 5 minutes.
+		/// </remarks>
+		public Task<long> CountUsersOnline(Site site);
 	}
 }

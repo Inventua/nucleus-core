@@ -32,6 +32,7 @@ namespace Nucleus.Web.ViewModels.Admin
 		public IEnumerable<Nucleus.Abstractions.Models.TaskScheduler.RunningTask> RunningTasks { get; set; }
 
 		public IEnumerable<DatabaseConnection> DatabaseConnections { get; set; }
+		public long UsersOnline { get; set; }
 
 		//public Dictionary<string, string> WebServerInformation { get; set; } = new();
 

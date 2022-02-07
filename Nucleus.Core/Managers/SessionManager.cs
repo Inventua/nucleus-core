@@ -145,5 +145,13 @@ namespace Nucleus.Core.Managers
 			// The AuthenticationHandler manages deleting the session
 			await httpContext.SignOutAsync();
 		}
+
+		public async Task<long> CountUsersOnline(Site site)
+		{
+			using (ISessionDataProvider provider = this.DataProviderFactory.CreateProvider<ISessionDataProvider>())
+			{
+				return await provider.CountUsersOnline(site);
+			}
+		}
 	}
 }

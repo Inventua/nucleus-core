@@ -1,0 +1,14 @@
+{
+	"schemaName": "Nucleus.Core",
+	"version": "01.00.02",
+	"operations": [
+		{
+			"addColumn": {
+				"table": "UserSessions",
+				"name": "LastUpdated",
+				"clrType": "DateTime",
+				"isnullable": true
+			}
+		}
+	]
+}

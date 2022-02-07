@@ -1304,6 +1304,13 @@ namespace Nucleus.Core.DataProviders
 			await this.Context.SaveChangesAsync();
 		}
 
+		public async Task<long> CountUsersOnline(Site site)
+		{
+			return await this.Context.UserSessions
+				.Where(session => session.SiteId == site.Id && session.ExpiryDate > DateTime.UtcNow && session.LastUpdated > DateTime.UtcNow.AddMinutes(-5))
+				.CountAsync();			
+		}
+
 		public async Task SaveUserSession(UserSession userSession)
 		{
 			this.Context.Attach(userSession);

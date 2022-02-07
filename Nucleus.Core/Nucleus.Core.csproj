@@ -25,9 +25,11 @@
   <ItemGroup>
     <None Remove="DataProviders\Migrations\Scripts\01.00.00.json" />
     <None Remove="DataProviders\Migrations\Scripts\01.00.01.json" />
+    <None Remove="DataProviders\Migrations\Scripts\01.00.02.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.02.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.01.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.00.json" />
   </ItemGroup>

@@ -20,7 +20,7 @@
 			<file name="readme.txt" />
 			<file name="viewer.css" />
 			<file name="settings.css" />
-			<file name="disable-private-loadcontext.json" />
+			<!--<file name="disable-private-loadcontext.json" />-->
 			
 			<folder name="Bin">
 				<file name="Nucleus.XmlDocumentation.dll" />

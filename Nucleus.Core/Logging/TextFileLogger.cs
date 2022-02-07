@@ -19,20 +19,14 @@ namespace Nucleus.Core.Logging
 	/// </remarks>
 	public class TextFileLogger : ILogger
 	{
-
-
 		private string Category { get; }
 		private const int LOG_FILE_RETENTION_DAYS = 7;
 		
-
 		private readonly static object syncObj = new();
 		private TextFileLoggingProvider Provider { get; }
 		private TextFileLoggerOptions Options { get; }
 		private static AsyncLocal<System.Collections.Stack> ScopeStack { get; } = new();
 
-
-
-		[EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
 		public TextFileLogger(TextFileLoggingProvider Provider, TextFileLoggerOptions Options, string Category)
 		{
 			this.Provider = Provider;
@@ -46,7 +40,6 @@ namespace Nucleus.Core.Logging
 			this.Category = Category;
 		}
 
-		[EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
 		public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
 		{
 			string message = null;
@@ -65,7 +58,6 @@ namespace Nucleus.Core.Logging
 						if (logInfo != null)
 						{
 							LogMessage(logInfo, message);
-							//LogMessage(message, System.IO.Path.Combine(this.Options.Path, LogPath(logInfo)), LogFile(logInfo));
 						}
 					}
 				}
@@ -87,13 +79,11 @@ namespace Nucleus.Core.Logging
 			}
 		}
 
-		[EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
 		public bool IsEnabled(LogLevel logLevel)
 		{
 			return true;
 		}
 
-		[EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
 		public IDisposable BeginScope<TState>(TState state)
 		{
 			if (ScopeStack.Value == null)
@@ -118,8 +108,6 @@ namespace Nucleus.Core.Logging
 			string logFileName = $"{task.StartDate.ToString(LogFileConstants.DATETIME_FILENAME_FORMAT)}_{Environment.MachineName}.log";
 
 			LogMessage (message, logPath, logFileName);
-
-			//return $"{task.StartDate.ToString(LogFileConstants.DATETIME_FILENAME_FORMAT)}_{Environment.MachineName}.log";
 		}
 
 		private void LogMessage(string message)

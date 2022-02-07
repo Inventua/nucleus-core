@@ -93,9 +93,8 @@ The `databaseSettings.json` file contains database connection information and sc
 # IIS Configuration
 
 ## web.config
-If you are hosting the Osa App Core host runtime in Internet Information Services, you need to configure the ASP.NET core module.
-IIS Configuration settings are stored in `web.config`.
+If you are hosting Nucleus in Internet Information Services, you need to configure the ASP.NET core module.  IIS Configuration settings are stored in `web.config`.
 More information is available on the Microsoft web site - [ASP.NET Core Module](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/aspnet-core-module).
 
-> **_TIP:_**    A default `web.config` file is included as part of the installation, which includes the base settings that you need to run Nucleus in IIS.  In
+> **_TIP:_**    A default `web.config` file is included as part of the installation, which includes the settings that you need to run Nucleus in IIS.  In
 most cases, you can use the default web.config file as-is.

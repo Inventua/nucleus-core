@@ -53,6 +53,8 @@ namespace Nucleus.Core.Plugins
 			// special case:  If a file named disable-private-loadcontext.json exists in the extension root, load the assemblies into the
 			// default context.  This is a special workaround for cases where .net components do not work properly in a private load context.
 			// https://github.com/dotnet/runtime/issues/1388		 https://github.com/dotnet/runtime/pull/58932
+			// While the original issue in the XmlSerializer was fixed for .NET 6, the extension-level option to opt-out of private load contexts
+			// is still required by the Elastic Search components, as it has the same issue. 
 			if (System.IO.File.Exists(System.IO.Path.Combine(Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER, extensionFolder, "disable-private-loadcontext.json")))
 			{
 				extensionFolder = "";

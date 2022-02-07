@@ -1,16 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using Nucleus.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Nucleus.Abstractions;
 using Microsoft.Extensions.Logging;
+using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.TaskScheduler;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http.Features;
+using Nucleus.Abstractions.Managers;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -23,13 +26,17 @@ namespace Nucleus.Web.Controllers.Admin
 		private IConfiguration Configuration { get; }
 		private ILogger<SystemController> Logger { get; }
 		private IOptions<DatabaseOptions> DatabaseOptions { get; }
-				
-		public SystemController(RunningTaskQueue runningTaskQueue, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<Nucleus.Core.Logging.TextFileLoggerOptions> options, IConfiguration configuration)
+		private ISessionManager SessionManager { get; }
+		private Context Context { get; }
+
+		public SystemController(Context context, RunningTaskQueue runningTaskQueue, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<Nucleus.Core.Logging.TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager)
 		{
+			this.Context = context;
 			this.RunningTaskQueue = runningTaskQueue;
 			this.Logger = logger;
 			this.DatabaseOptions = databaseOptions;
 			this.Configuration = configuration;
+			this.SessionManager = sessionManager;
 
 			if (options.Value != null)
 			{
@@ -43,7 +50,7 @@ namespace Nucleus.Web.Controllers.Admin
 		/// <returns></returns>
 		[HttpGet]
 		[HttpPost]
-		public ActionResult Index(ViewModels.Admin.SystemIndex viewModelInput)
+		public async Task<ActionResult> Index(ViewModels.Admin.SystemIndex viewModelInput)
 		{					
 			ViewModels.Admin.SystemIndex viewModelOutput = new()
 			{
@@ -139,7 +146,9 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 
 			viewModelOutput.DatabaseConnections = connections;
-			
+
+			viewModelOutput.UsersOnline = await this.SessionManager.CountUsersOnline(this.Context.Site);
+
 			//IServerVariablesFeature serverVars = HttpContext.Features.Get<IServerVariablesFeature>();
 			//if (serverVars != null)
 			//{				

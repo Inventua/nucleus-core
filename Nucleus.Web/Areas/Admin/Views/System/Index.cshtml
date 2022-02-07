@@ -45,25 +45,42 @@
 		</TabPanel>
 
 		<TabPanel id="system-activity">
-			<h2>Running Scheduled Tasks</h2>
-
-			@if (Model.RunningTasks.Any())
-			{
-				<table>
-					@foreach (var task in Model.RunningTasks)
-					{
-						<tr>
-							<td>@task.ScheduledTask.Name</td>
-						<td>@task.Progress?.Status</td>
-						<td>@task.Progress?.Message</td>
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>General</h2>
+				<table class="headers-column mb-4">
+					<tr>
+						<th>Users Online</th>
+						<td>@Model.UsersOnline</td>
 					</tr>
-				}
 				</table>
-			}
-			else
-			{
-				<span>No tasks are running.</span>
-			}
+			</fieldset>
+
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Running Scheduled Tasks</h2>
+
+				@if (Model.RunningTasks.Any())
+				{
+					<table class="table">
+						<tr>
+							<th>Name</th>
+							<th>Status</th>
+							<th>Message</th>
+						</tr>
+						@foreach (var task in Model.RunningTasks)
+						{
+							<tr>
+								<td>@task.ScheduledTask.Name</td>
+								<td>@task.Progress?.Status</td>
+								<td>@task.Progress?.Message</td>
+						</tr>
+					}
+					</table>
+				}
+				else
+				{
+					<span>No tasks are running.</span>
+				}
+			</fieldset>
 		</TabPanel>
 
 		@*<TabPanel id="system-webserver">

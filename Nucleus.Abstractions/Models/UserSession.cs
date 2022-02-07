@@ -57,7 +57,7 @@ namespace Nucleus.Abstractions.Models
 		/// <summary>
 		/// This value is used to track the most recent database update for the user session.
 		/// </summary>
-		public DateTime LastUpdate { get; set; }
+		public DateTime LastUpdated { get; set; }
 
 		/// <summary>
 		/// Initialize a new instance of UserSession.
@@ -85,6 +85,7 @@ namespace Nucleus.Abstractions.Models
 			this.UserId = user.Id;
 			this.SiteId = site.Id;
 			this.ExpiryDate = expiry;
+			this.LastUpdated = DateTime.UtcNow;
 			this.RemoteIpAddress = remoteIpAddress;
 		}
 	}

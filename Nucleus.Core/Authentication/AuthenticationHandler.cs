@@ -96,10 +96,10 @@ namespace Nucleus.Core.Authentication
 							// Only update the database expiry date if the database was updated more than 1 minute ago.  This is to avoid a negative impact
 							// on performance, as the authentication handler is called for every request - even static files - so a single page load could otherwise
 							// generate dozens of database updates.
-							if (DateTime.UtcNow > userSession.LastUpdate.AddSeconds(60))
+							if (DateTime.UtcNow > userSession.LastUpdated.AddSeconds(60))
 							{
+								userSession.LastUpdated = DateTime.UtcNow;
 								await this.SessionManager.Save(userSession);
-								userSession.LastUpdate = DateTime.UtcNow;
 							}
 
 							AppendCookie(userSession.Id.ToString(), new AuthenticationProperties()

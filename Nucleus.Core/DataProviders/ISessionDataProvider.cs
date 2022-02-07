@@ -9,11 +9,12 @@ using Nucleus.Data.Common;
 namespace Nucleus.Core.DataProviders
 {
 	/// Provides create, read, update and delete functionality for the <see cref="UserSession"/> class.
-	internal interface ISessionDataProvider : IDisposable//, IDataProvider<ISessionDataProvider>
+	internal interface ISessionDataProvider : IDisposable
 	{
 		abstract Task SaveUserSession(UserSession session);
 		abstract Task<UserSession> GetUserSession(Guid sessionId);
 		abstract Task DeleteUserSession(UserSession session);
 		abstract Task DeleteExpiredSessions();
+		abstract Task<long> CountUsersOnline(Site site);
 	}
 }

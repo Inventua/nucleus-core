@@ -182,7 +182,6 @@ namespace Nucleus.Data.EntityFramework
 			// string to IPAddress.
 			builder.Entity<UserSession>()
 				.ToTable("UserSessions")
-				.Ignore(userSession => userSession.LastUpdate)
 				.Property(userSession => userSession.RemoteIpAddress)
 				.HasConversion(
 						value => value.ToString(),

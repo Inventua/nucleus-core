@@ -64,6 +64,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup and Configuration", "
 		Documentation\Setup and Configuration\Installation.md = Documentation\Setup and Configuration\Installation.md
 		Documentation\Setup and Configuration\Linux.md = Documentation\Setup and Configuration\Linux.md
 		Documentation\Setup and Configuration\Logging.md = Documentation\Setup and Configuration\Logging.md
+		Documentation\Setup and Configuration\Scheduled-Tasks-Editor.png = Documentation\Setup and Configuration\Scheduled-Tasks-Editor.png
+		Documentation\Setup and Configuration\Scheduled-Tasks.md = Documentation\Setup and Configuration\Scheduled-Tasks.md
+		Documentation\Setup and Configuration\Scheduled-Tasks.png = Documentation\Setup and Configuration\Scheduled-Tasks.png
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.AzureBlobStorageFileSystemProvider", "Nucleus.Core.Modules\Nucleus.Extensions.AzureBlobStorageFileSystemProvider\Nucleus.Extensions.AzureBlobStorageFileSystemProvider.csproj", "{BE4E2A1D-F255-4F21-A80A-1E016C09F0A2}"
@@ -88,8 +91,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{277A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Developers", "Developers", "{3542AB19-07D1-46AE-8CC8-295F847A9741}"
 	ProjectSection(SolutionItems) = preProject
+		Documentation\Developers\Control-Panel-Extensions.md = Documentation\Developers\Control-Panel-Extensions.md
+		Documentation\Developers\Extension-Packaging.md = Documentation\Developers\Extension-Packaging.md
 		Documentation\Developers\Layouts-and-Containers.md = Documentation\Developers\Layouts-and-Containers.md
 		Documentation\Developers\Modules.md = Documentation\Developers\Modules.md
+		Documentation\Developers\Other.md = Documentation\Developers\Other.md
+		Documentation\Developers\Scheduled-Tasks.md = Documentation\Developers\Scheduled-Tasks.md
 	EndProjectSection
 EndProject
 Global

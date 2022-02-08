@@ -61,12 +61,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup and Configuration", "
 	ProjectSection(SolutionItems) = preProject
 		Documentation\Setup and Configuration\Azure-App-Service.md = Documentation\Setup and Configuration\Azure-App-Service.md
 		Documentation\Setup and Configuration\Configuration.md = Documentation\Setup and Configuration\Configuration.md
+		Documentation\Setup and Configuration\Install-Extensions.md = Documentation\Setup and Configuration\Install-Extensions.md
+		Documentation\Setup and Configuration\Install-Extensions.png = Documentation\Setup and Configuration\Install-Extensions.png
 		Documentation\Setup and Configuration\Installation.md = Documentation\Setup and Configuration\Installation.md
 		Documentation\Setup and Configuration\Linux.md = Documentation\Setup and Configuration\Linux.md
+		Documentation\Setup and Configuration\Lists.md = Documentation\Setup and Configuration\Lists.md
 		Documentation\Setup and Configuration\Logging.md = Documentation\Setup and Configuration\Logging.md
+		Documentation\Setup and Configuration\Mail Templates.md = Documentation\Setup and Configuration\Mail Templates.md
+		Documentation\Setup and Configuration\Roles.md = Documentation\Setup and Configuration\Roles.md
 		Documentation\Setup and Configuration\Scheduled-Tasks-Editor.png = Documentation\Setup and Configuration\Scheduled-Tasks-Editor.png
 		Documentation\Setup and Configuration\Scheduled-Tasks.md = Documentation\Setup and Configuration\Scheduled-Tasks.md
 		Documentation\Setup and Configuration\Scheduled-Tasks.png = Documentation\Setup and Configuration\Scheduled-Tasks.png
+		Documentation\Setup and Configuration\Site-Settings-Editor.png = Documentation\Setup and Configuration\Site-Settings-Editor.png
+		Documentation\Setup and Configuration\Site-Settings.md = Documentation\Setup and Configuration\Site-Settings.md
+		Documentation\Setup and Configuration\Site-Settings.png = Documentation\Setup and Configuration\Site-Settings.png
+		Documentation\Setup and Configuration\System-Administrators.md = Documentation\Setup and Configuration\System-Administrators.md
+		Documentation\Setup and Configuration\Users.md = Documentation\Setup and Configuration\Users.md
+		Documentation\Setup and Configuration\Users.png = Documentation\Setup and Configuration\Users.png
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.AzureBlobStorageFileSystemProvider", "Nucleus.Core.Modules\Nucleus.Extensions.AzureBlobStorageFileSystemProvider\Nucleus.Extensions.AzureBlobStorageFileSystemProvider.csproj", "{BE4E2A1D-F255-4F21-A80A-1E016C09F0A2}"
@@ -77,6 +88,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Data.PostgreSql", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Content Managers", "Content Managers", "{87D24D71-4026-4693-A812-212F16C9E952}"
 	ProjectSection(SolutionItems) = preProject
+		Documentation\Content Managers\Editing.md = Documentation\Content Managers\Editing.md
 		Documentation\Content Managers\FilesAndFolders-FileManager.png = Documentation\Content Managers\FilesAndFolders-FileManager.png
 		Documentation\Content Managers\FilesAndFolders.md = Documentation\Content Managers\FilesAndFolders.md
 		Documentation\Content Managers\FilesAndFolders.png = Documentation\Content Managers\FilesAndFolders.png
@@ -86,7 +98,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Content Managers", "Content
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{277A9E40-499B-4995-A467-D744A695C475}"
 	ProjectSection(SolutionItems) = preProject
+		Documentation\Content Managers\Modules\TextHtml-editor.png = Documentation\Content Managers\Modules\TextHtml-editor.png
 		Documentation\Content Managers\Modules\TextHtml.md = Documentation\Content Managers\Modules\TextHtml.md
+		Documentation\Content Managers\Modules\TextHtml.png = Documentation\Content Managers\Modules\TextHtml.png
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Developers", "Developers", "{3542AB19-07D1-46AE-8CC8-295F847A9741}"

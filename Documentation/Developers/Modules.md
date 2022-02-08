@@ -1,4 +1,4 @@
-Modules add functionality to your site and are typically developed using Visual Studio and C#.  A Nucleus module is a .NET Core MVC project with Controllers, ViewModels and 
+Modules add functionality to your site and are typically developed using Visual Studio and C#.  A Nucleus module is one or more .NET Core MVC Controllers, ViewModels and 
 Razor Views.
 
 ## Project Templates

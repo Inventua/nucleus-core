@@ -269,7 +269,7 @@ namespace Nucleus.Core
 							{
 								Id = Guid.Parse(layoutDef.id),
 								FriendlyName = layoutDef.friendlyName,
-								RelativePath = layoutDef.relativePath
+								RelativePath = ParseRelativePath(component.folderName, layoutDef.relativePath)
 							};
 
 							await this.ExtensionManager.SaveLayoutDefinition(layoutDefinition);
@@ -283,7 +283,7 @@ namespace Nucleus.Core
 							{
 								Id = Guid.Parse(containerDef.id),
 								FriendlyName = containerDef.friendlyName,
-								RelativePath = containerDef.relativePath
+								RelativePath = ParseRelativePath(component.folderName, containerDef.relativePath)
 							};
 
 							await this.ExtensionManager.SaveContainerDefinition(containerDefinition);
@@ -298,7 +298,7 @@ namespace Nucleus.Core
 								{
 									Id = Guid.Parse(containerDef.id),
 									FriendlyName = containerDef.friendlyName,
-									RelativePath = containerDef.relativePath
+									RelativePath = ParseRelativePath(component.folderName, containerDef.relativePath)
 								};
 
 								await this.ExtensionManager.DeleteContainerDefinition(containerDefinition);
@@ -310,7 +310,7 @@ namespace Nucleus.Core
 								{
 									Id = Guid.Parse(layoutDef.id),
 									FriendlyName = layoutDef.friendlyName,
-									RelativePath = layoutDef.relativePath
+									RelativePath = ParseRelativePath(component.folderName, layoutDef.relativePath)
 								};
 
 								await this.ExtensionManager.DeleteLayoutDefinition(layoutDefinition);
@@ -362,6 +362,18 @@ namespace Nucleus.Core
 			}
 
 			return true;
+		}
+
+		private string ParseRelativePath(string extensionFolder, string relativePath)
+		{
+			if (relativePath.StartsWith("Extensions", StringComparison.OrdinalIgnoreCase) || relativePath.StartsWith("Shared", StringComparison.OrdinalIgnoreCase))
+			{
+				return relativePath;
+			}
+			else
+			{
+				return System.IO.Path.Combine(Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER, extensionFolder, relativePath);
+			}
 		}
 
 		/// <summary>
@@ -419,7 +431,7 @@ namespace Nucleus.Core
 					{
 						Id = Guid.Parse(layoutDef.id),
 						FriendlyName = layoutDef.friendlyName,
-						RelativePath = layoutDef.relativePath
+						RelativePath = ParseRelativePath(component.folderName, layoutDef.relativePath)
 					};
 
 					this.ExtensionManager.DeleteLayoutDefinition(layoutDefinition);
@@ -433,7 +445,7 @@ namespace Nucleus.Core
 					{
 						Id = Guid.Parse(containerDef.id),
 						FriendlyName = containerDef.friendlyName,
-						RelativePath = containerDef.relativePath
+						RelativePath = ParseRelativePath(component.folderName, containerDef.relativePath)
 					};
 
 					this.ExtensionManager.DeleteContainerDefinition(containerDefinition);

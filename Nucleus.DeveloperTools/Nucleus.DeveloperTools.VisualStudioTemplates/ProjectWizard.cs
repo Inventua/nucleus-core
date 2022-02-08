@@ -26,7 +26,10 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 			// Set NUCLEUS_PATH if it is not already set
 			if (String.IsNullOrEmpty(System.Environment.GetEnvironmentVariable("NUCLEUS_PATH")))
 			{
-				System.Environment.SetEnvironmentVariable("NUCLEUS_PATH", System.IO.Path.GetDirectoryName(this.GetType().Assembly.Location), EnvironmentVariableTarget.User);
+				if (MessageBox.Show("The NUCLEUS_PATH environment variable is not set.  Nucleus build scripts require this path in order to find required resources.  Do you want to automatically set NUCLEUS_PATH?", "Set Path", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+				{
+					System.Environment.SetEnvironmentVariable("NUCLEUS_PATH", System.IO.Path.GetDirectoryName(this.GetType().Assembly.Location), EnvironmentVariableTarget.User);
+				}
 			}
 		}
 

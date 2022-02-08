@@ -1,36 +1,144 @@
 A Nucleus extension is installed by installing a **package** using the `Extensions` page.
 
 An extension package is a zip file which contains all of the files needed for your extension, along with a Extension Packaging (package.xml) file with instructions for Nucleus
-on how to install your components. 
+on how to install your components.  If you use one of the Nucleus Visual Studio project templates, your project file will contain entries which will automatically create a package (zip)
+file when you build your project using `Release` configuration.
 
+> **_Tip:_**  Set the build action of files in your extension project to `Content` in order to have them included in the package automatically.  The project assembly is automatically 
+included.  
+
+> **_Tip:_**  Visual Studio (MSBuild/Nuget) does not always include third-party assemblies for class library projects.  You may need to alter your project file or manually include 
+third-party assemblies and other required files in your package (zip) file.
+
+### Sample package.xml
 ```
 <?xml version="1.0" encoding="utf-8" ?>
 <package id="{generate-guid}" xmlns="urn:nucleus/schemas/package/1.0">
-  <name>Elastic Search</name>
+  <name>My Sample Extension</name>
   <version>1.0.0</version>
-  <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
+  <publisher name="Inventua" url="http://your-site.com" email="support@your-domain" />
   <description>
     Sample Description.
   </description>
-  <compatibility minVersion="1.0.0.0" maxVersion="1.99999.999999.99999" />
+  <compatibility minVersion="1.0.0.0" maxVersion="1.*" />
   
   <components>
     <component folderName="MyExtension" optional="false">
-      <file name="readme.txt" />
-      <file name="settings.css" />
+      <file name="myextension.css" />
       
       <folder name="Bin">
-        <file name="Nucleus.Extensions.ElasticSearch.dll" />
-        <file name="Nest.dll" />
-        <file name="ElasticSearch.Net.dll" />
+        <file name="MyExtension.dll" />        
       </folder>
       
       <folder name="Views">
+        <file name="Viewer.cshtml" />
         <file name="Settings.cshtml" />
-      </folder>
-      
+      </folder>      
     </component>
-  </components>
-  
+  </components>  
 </package>
 ```
+
+
+### Manifest (package.xml)
+
+## `<package>`
+The root element of a manifest file is the `<package>` element.  It must have a unique id (guid) and must include the `xmlns="urn:nucleus/schemas/package/1.0"` attribute.
+
+The package element contains:
+
+| Name             | Required? | Description                                                                          |
+|------------------|-----------|--------------------------------------------------------------------------------------|
+| id               | Yes       | (attribute) A unique id (guid) to identify your extension. |
+| name             | Yes       | (element)   Display name for your extension. |
+| publisher        | Yes       | (element)   Specifies publisher/support information for your extension.  This is displayed to users during the installation process and in the extensions page. |
+| description      | Yes       | (element)   Description for your package.  This is displayed to users during the installation process and in the extensions page. |
+| compatibility    | No        | (element)   The compatibility element defines which Nucleus versions that the extension is compatible with. |
+| components       | Yes       | (element)   The components element contains one or more `<component>` elements which provide installation instructions to Nucleus.  |
+
+## `<publisher>` 
+| Name             | Required? | Description                                                                          |
+|------------------|-----------|--------------------------------------------------------------------------------------|
+| name             | No        | (attribute) Your company name. |
+| url              | No        | (attribute) Your website url, or the Url for product information for your extension. |
+| email            | No        | (attribute) A support email address for your extension.   |
+
+## `<compatibility>` 
+| Name             | Required? | Description                                                                          |
+|------------------|-----------|--------------------------------------------------------------------------------------|
+| minVersion       | Yes       | (attribute) The minimum version of Nucleus supported by your extension in .NET System.Version format. |
+| maxVersion       | No        | (attribute) The maximum version of Nucleus supported by your extension in .NET System.Version format.  |
+
+The `maxVersion` attribute is not required, but is recommended.  You can use '*' in place of any parts of the version.
+
+## Component Types
+The `<components>` element can contain any combination of:  moduleDefinition, layoutDefinition, containerDefinition, controlPanelExtensionDefinition, 
+file, folder, cleanup.
+
+## `<moduleDefinition>` 
+Modules must specify additional information for use by Nucleus.
+
+| Name             | Required? | Description                                                                          |
+|------------------|-----------|--------------------------------------------------------------------------------------|
+| id               | Yes       | (attribute) A unique id (guid) for your module. |
+| friendlyName     | Yes       | (element)   The display name for your module.  This is displayed in the Nucleus user interface. |
+| classTypeName    | Yes       | (element)   The assembly/class .NET class name for your controller class in the form classname,assembly.  |
+| viewAction       | Yes       | (element)   The action in your controller class to call to display the end-user user interface.  |
+| editAction       | No        | (element)   The action in your controller class to call to display the administrative/settings user interface.  |
+| categories       | No        | (element)   A comma-separated list of module categories.  In the Nucleus add module page, modules are listed beneath each category that they are assigned to.  |
+
+> The classTypeName is the assembly-qualified name for your controller class.  You need to include the class name (including namespace) followed by a comma, then the assembly name (without .dll).  You
+do not need to include version, culture or the public key token.
+
+## `<layoutDefinition>` 
+Layouts must specify additional information for use by Nucleus.
+
+| Name             | Required? | Description                                                                          |
+|------------------|-----------|--------------------------------------------------------------------------------------|
+| id               | Yes       | (attribute) A unique id (guid) for your layout. |
+| friendlyName     | Yes       | (element)   The display name for your layout.  This is displayed in the Nucleus user interface. |
+| relativePath     | Yes       | (element)   The path to the layout view (razor page), relative to the root of your extension.  |
+
+## `<containerDefinition>` 
+Containers must specify additional information for use by Nucleus.
+
+| Name             | Required? | Description                                                                          |
+|------------------|-----------|--------------------------------------------------------------------------------------|
+| id               | Yes       | (attribute) A unique id (guid) for your container. |
+| friendlyName     | Yes       | (element)   The display name for your container.  This is displayed in the Nucleus user interface. |
+| relativePath     | Yes       | (element)   The path to the container view (razor page), relative to the root of your extension.  |
+
+## `<controlPanelExtensionDefinition>` 
+Control panel extensions must specify additional information for use by Nucleus.
+
+| Name             | Required? | Description                                                              |
+|------------------|-----------|--------------------------------------------------------------------------|
+| id               | Yes       | (attribute) Unique id (guid) for your control panel extension. |
+| FriendlyName     | Yes       | (element)  Display name for your control panel extension.  This is shown on-screen in the `Manage` or `Settings` control panel. |
+| Description      | Yes       | (element)  Description for your control panel extension.  This is shown on-screen in the `Manage` or `Settings` control panel. |
+| ControllerName   | Yes       | (element)  The type name of your controller class.  You can omit the root namespace and `Controller` suffix. For example, if your class name is `MyExtension.MyControlPanelController`, you can just specify `MyControlPanel`. |
+| ExtensionName    | Yes       | (element)  The name of the extension that the control panel extension belongs to.  This value must match the value of the `Extension()` attribute in your controller class and is used for MVC routing. |
+| Scope            | Yes       | (element)  Specifies whether the control panel extension is added to the `Manage` or `Settings` control panel.  The allowed values are `Site` or `Global`.  If your control panel extension saves settings for the current site, choose `Site`.  If your settings are for the entire Nucleus instance, choose `Global`. |
+| EditAction       | Yes       | (element)  The name of the Controller Action to run when the user selects the control panel extension.  This action should render a View. |
+
+## `<file>` 
+Specifies a file to copy during installation.  The file must be present in the package, in a folder location that matches the structure 
+represented by the manifest's file/folder elements.  The file is copied to /Extensions/extension-name/folder, where folder is the root when 
+the file element is a child of the `<components>`, or a sub-folder if the `<file>` element is a child of a `<folder>` element.
+
+| Name             | Required? | Description                                                              |
+|------------------|-----------|--------------------------------------------------------------------------|
+| name             | Yes       | (attribute) File name. |
+
+## `<folder>` 
+Specifies a folder.  `<folder>` elements can contain `<file>` elements or `<folder>` elements to represent the target directory structure.
+
+| Name             | Required? | Description                                                              |
+|------------------|-----------|--------------------------------------------------------------------------|
+| name             | Yes       | (attribute) Folder name. |
+
+## `<cleanup>` 
+Use the `<cleanup>` element to remove components during an upgrade when they are no longer needed.
+
+The `<cleanup>` element can contain any number of moduleDefinition, layoutDefinition, containerDefinition, controlPanelExtensionDefinition, 
+file or folder elements.  Items in the `<cleanup>` element are removed during installation.

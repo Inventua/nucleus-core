@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using Nucleus.Extensions;
+using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Modules.Documents.Controllers
 {
@@ -191,14 +192,18 @@ namespace Nucleus.Modules.Documents.Controllers
 				if (document.File != null)
 				{
 					File file = await this.FileSystemManager.GetFile(this.Context.Site, document.File.Id);
+					file.Parent.Permissions = await this.FileSystemManager.ListPermissions(file.Parent);
 
-					if (file != null)
+					if (User.HasViewPermission(this.Context.Site, file.Parent))
 					{
-						docInfo.ModifiedDate = file.DateModified;
-						docInfo.Size = file.Size;
-					}
+						if (file != null)
+						{
+							docInfo.ModifiedDate = file.DateModified;
+							docInfo.Size = file.Size;
+						}
 
-					viewModel.Documents.Add(docInfo);
+						viewModel.Documents.Add(docInfo);
+					}
 				}
 			}
 

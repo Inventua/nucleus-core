@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Nucleus.Abstractions;
-using Nucleus.Abstractions.Authorization;
+using Nucleus.Extensions.Authorization;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
@@ -47,20 +47,30 @@ namespace Nucleus.Modules.StaticContent.Controllers
 
 				if (file != null && file.Id != Guid.Empty)
 				{
-					using (System.IO.Stream content = this.FileSystemManager.GetFileContents(this.Context.Site, file))
+					// Check that the user has permission to view the static file
+					file.Parent.Permissions = await this.FileSystemManager.ListPermissions(file.Parent);
+
+					if (!User.HasViewPermission(this.Context.Site, file.Parent))
 					{
-						if (file.IsMarkdown())
+						viewModel.Content = "";
+					}
+					else
+					{
+						using (System.IO.Stream content = this.FileSystemManager.GetFileContents(this.Context.Site, file))
 						{
-							viewModel.Content = ContentExtensions.ToHtml(GetStreamAsString(content), "text/markdown");							
-						}
-						else if (file.IsContent())
-						{
-							viewModel.Content = GetStreamAsString(content);
-						}
-						else
-						{
-							// Redirect to use the File Controller so that permissions and other checks are performed.
-							return Redirect(Url.FileLink(file));
+							if (file.IsMarkdown())
+							{
+								viewModel.Content = ContentExtensions.ToHtml(GetStreamAsString(content), "text/markdown");
+							}
+							else if (file.IsContent())
+							{
+								viewModel.Content = GetStreamAsString(content);
+							}
+							else
+							{
+								// Redirect to use the File Controller so that permissions and other checks are performed.
+								return Redirect(Url.FileLink(file));
+							}
 						}
 					}
 				}

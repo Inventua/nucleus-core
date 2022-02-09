@@ -18,7 +18,7 @@
 }
 else
 {
-	@Html.DropDownList(@Model.PropertyName + $".{nameof(File.Provider)}", new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name), @Model.SelectedFile.Provider), new { @class = "providerKey", @data_autopostbackevent = "change", @onchange = $@"jQuery('#{Model.PropertyName}_Parent_Id').val(''); jQuery('#{Model.PropertyName}_Id').val('');" })
-	@Html.DropDownList(@Model.PropertyName + $".{nameof(File.Parent)}.{nameof(Folder.Id)}", new SelectList(Model.SelectedFolder.Folders, nameof(Folder.Id), nameof(Folder.Name), @Model.SelectedFolder.Id), new { @data_autopostbackevent = "change", @onchange = $@"jQuery('#{Model.PropertyName}_Id').val('');" })
+	@Html.DropDownList(@Model.PropertyName + $".{nameof(File.Provider)}", new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name), @Model.SelectedFile.Provider), new { @class = "providerKey", @data_autopostbackevent = "change", @onchange = $@"jQuery('#{Model.PropertyName.Replace(".", "_")}_Parent_Id').val(''); jQuery('#{Model.PropertyName.Replace(".", "_")}_Id').val('')" })
+	@Html.DropDownList(@Model.PropertyName + $".{nameof(File.Parent)}.{nameof(Folder.Id)}", new SelectList(Model.SelectedFolder.Folders, nameof(Folder.Id), nameof(Folder.Name), @Model.SelectedFolder.Id), new { @data_autopostbackevent = "change", @onchange = $@"jQuery('#{Model.PropertyName.Replace(".", "_")}_Id').val('');" })
 	@Html.DropDownList(@Model.PropertyName + $".{nameof(File.Id)}", new SelectList(Model.SelectedFolder.Files, nameof(File.Id), nameof(File.Name), @Model.SelectedFile.Id), Model.SelectedFolder.Files.Count > 0 ? "(select)" : "(no files)", new { @data_autopostbackevent = "change" })
 }

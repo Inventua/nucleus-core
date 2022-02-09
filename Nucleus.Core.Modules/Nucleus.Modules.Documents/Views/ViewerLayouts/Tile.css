@@ -30,9 +30,19 @@
 	display: flex;
 	border: solid 1px #767676;
 	border-radius: 2px;
-	padding: 2px 3px;
+	padding: 0 4px;
 	margin-bottom: 0.25rem;
 	flex-basis: 100%;
+}
+
+.document-sort-list .document-sort-list-selected .btn
+{
+	padding-right: 0;
+}
+
+.document-sort-list .document-sort-list-selected .btn:focus
+{
+	box-shadow: none;
 }
 
 .document-sort-list .document-sort-list-selected > span

@@ -72,7 +72,7 @@ namespace Nucleus.Modules.Documents.DataProviders
 				raiseEvent = new(() => { this.EventManager.RaiseEvent<Document, Update>(document); });
 			}
 
-			await this.Context.SaveChangesAsync();
+			await this.Context.SaveChangesAsync<Document>();
 
 			raiseEvent.Invoke();
 		}

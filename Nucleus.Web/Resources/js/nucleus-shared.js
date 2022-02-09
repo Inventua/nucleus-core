@@ -515,9 +515,9 @@ function _Page()
 	{
 		_preRender(target, source, data, status, request);
 
-		if (typeof (request.responseJSON) !== 'undefined' && typeof (request.responseJSON.Message) !== 'undefined')
+		if (typeof (request.responseJSON) !== 'undefined' && typeof (request.responseJSON.message) !== 'undefined')
 		{
-			_dialog(request.responseJSON.Title, request.responseJSON.Message);
+			_dialog(request.responseJSON.title, request.responseJSON.message);
 		}
 		else
 		{

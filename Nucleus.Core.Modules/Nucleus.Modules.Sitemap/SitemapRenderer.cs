@@ -109,42 +109,46 @@ namespace Nucleus.Modules.Sitemap
 
 			foreach (PageMenu menuItem in items)
 			{
-				PageRoute route = menuItem.Page.DefaultPageRoute();
-				string caption = !String.IsNullOrWhiteSpace(menuItem.Page.Title) ? menuItem.Page.Title : menuItem.Page.Name;
-
-				TagBuilder listItemBuilder = new("li");
-					
-				if (route != null)
+				if (menuItem.Page.ShowInMenu)
 				{
-					TagBuilder linkBuilder = new("a");
-					linkBuilder.InnerHtml.SetContent(caption);
-					linkBuilder.Attributes.Add("href", urlHelper.GetAbsoluteUri(menuItem.Page.DefaultPageRoute().Path).AbsoluteUri);
-					listItemBuilder.InnerHtml.AppendHtml(linkBuilder);				
-				}
-				else
-				{
-					listItemBuilder.InnerHtml.SetContent(caption);
-				}
+					PageRoute route = menuItem.Page.DefaultPageRoute();
+					string caption = !String.IsNullOrWhiteSpace(menuItem.Page.Title) ? menuItem.Page.Title : menuItem.Page.Name;
 
-				if (showDescription && !String.IsNullOrEmpty(menuItem.Page.Description))
-				{
-					TagBuilder descriptionBuilder = new("div");
-					descriptionBuilder.InnerHtml.SetContent(menuItem.Page.Description);
-					listItemBuilder.InnerHtml.AppendHtml(descriptionBuilder);
-				}
+					TagBuilder listItemBuilder = new("li");
 
-				if (menuItem.Page.Id == nucleusContext.Page.Id)
-				{
-					listItemBuilder.AddCssClass("current-page");
-				}
+					if (!menuItem.Page.DisableInMenu && route != null)
+					{
+						TagBuilder linkBuilder = new("a");
+						linkBuilder.InnerHtml.SetContent(caption);
+						linkBuilder.Attributes.Add("href", urlHelper.GetAbsoluteUri(menuItem.Page.DefaultPageRoute().Path).AbsoluteUri);
+						listItemBuilder.InnerHtml.AppendHtml(linkBuilder);
+					}
+					else
+					{
+						TagBuilder headingBuilder = new("h3");
+						headingBuilder.InnerHtml.SetContent(caption);
+						listItemBuilder.InnerHtml.AppendHtml(headingBuilder);						
+					}
 
-				if (maxlevels==0 || level < maxlevels-1)
-				{
-					listItemBuilder.InnerHtml.AppendHtml(AddPageChildren(nucleusContext, urlHelper, menuItem.Children, showDescription, level + 1, maxlevels));
-				}
+					if (showDescription && !String.IsNullOrEmpty(menuItem.Page.Description))
+					{
+						TagBuilder descriptionBuilder = new("div");
+						descriptionBuilder.InnerHtml.SetContent(menuItem.Page.Description);
+						listItemBuilder.InnerHtml.AppendHtml(descriptionBuilder);
+					}
 
-				outputBuilder.InnerHtml.AppendHtml(listItemBuilder);
-				
+					if (menuItem.Page.Id == nucleusContext.Page.Id)
+					{
+						listItemBuilder.AddCssClass("current-page");
+					}
+
+					if (maxlevels == 0 || level < maxlevels - 1)
+					{
+						listItemBuilder.InnerHtml.AppendHtml(AddPageChildren(nucleusContext, urlHelper, menuItem.Children, showDescription, level + 1, maxlevels));
+					}
+
+					outputBuilder.InnerHtml.AppendHtml(listItemBuilder);
+				}
 			}
 
 			return outputBuilder;

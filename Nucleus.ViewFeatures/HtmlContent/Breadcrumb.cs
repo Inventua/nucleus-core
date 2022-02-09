@@ -64,26 +64,38 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 				foreach (Page page in breadcrumbs)
 				{
-					TagBuilder listItemBuilder = new("li");
-					string caption = String.IsNullOrEmpty(page.Title) ? page.Name : page.Title;
-
-					listItemBuilder.AddCssClass("breadcrumb-item");
-
-					if (page.Id == nucleusContext.Page.Id)
+					if (page.ShowInMenu)
 					{
-						listItemBuilder.AddCssClass("active");
+						TagBuilder listItemBuilder = new("li");
+						string caption = String.IsNullOrEmpty(page.Title) ? page.Name : page.Title;
+
+						listItemBuilder.AddCssClass("breadcrumb-item");
+
+						if (page.Id == nucleusContext.Page.Id)
+						{
+							listItemBuilder.AddCssClass("active");
+						}
+
+						if (page.DisableInMenu)
+						{
+							TagBuilder breadcrumbSpanBuilder = new("span");
+							breadcrumbSpanBuilder.InnerHtml.SetContent(caption);
+							
+							listItemBuilder.InnerHtml.AppendHtml(breadcrumbSpanBuilder);
+						}
+						else
+						{
+							TagBuilder breadcrumbLinkBuilder = new("a");
+							breadcrumbLinkBuilder.InnerHtml.SetContent(caption);
+							breadcrumbLinkBuilder.Attributes.Add("href", urlHelper.GetAbsoluteUri(page.DefaultPageRoute().Path).AbsoluteUri);
+
+							listItemBuilder.InnerHtml.AppendHtml(breadcrumbLinkBuilder);
+						}
+
+						listBuilder.InnerHtml.AppendHtml(listItemBuilder);
 					}
-
-					TagBuilder breadcrumbLinkBuilder = new("a");
-					breadcrumbLinkBuilder.InnerHtml.SetContent(caption);
-					breadcrumbLinkBuilder.Attributes.Add("href", urlHelper.GetAbsoluteUri(page.DefaultPageRoute().Path).AbsoluteUri);
-
-					listItemBuilder.InnerHtml.AppendHtml(breadcrumbLinkBuilder);
-					
-					listBuilder.InnerHtml.AppendHtml(listItemBuilder);
 				}
-
-				//outputBuilder.AddCssClass("Breadcrumbs");
+				
 				outputBuilder.InnerHtml.AppendHtml(listBuilder);
 				outputBuilder.MergeAttributes(htmlAttributes);
 

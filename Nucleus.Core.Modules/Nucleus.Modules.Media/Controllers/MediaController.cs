@@ -194,11 +194,11 @@ namespace Nucleus.Modules.Media.Controllers
 
 				if (viewModel.SelectedFile != null)
 				{
-					Folder folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFile.Parent.Id);
-					if (folder != null)
+					//Folder folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFile.Parent.Id);
+					if (viewModel.SelectedFile.Parent != null)
 					{
-						folder.Permissions = await this.FileSystemManager.ListPermissions(folder);
-						if (HttpContext.User.HasViewPermission(this.Context.Site, folder))
+						viewModel.SelectedFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.SelectedFile.Parent);
+						if (HttpContext.User.HasViewPermission(this.Context.Site, viewModel.SelectedFile.Parent))
 						{
 							viewModel.Caption = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_CAPTION, "");
 							viewModel.AlternateText = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_ALTERNATETEXT, "");

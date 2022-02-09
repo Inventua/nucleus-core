@@ -80,7 +80,8 @@ namespace Nucleus.Modules.Links
 
 					if (result.LinkFile.File != null)
 					{
-						result.LinkFile.File = await this .FileSystemManager.GetFile(site, result.LinkFile.File.Id);
+						result.LinkFile.File = await this.FileSystemManager.GetFile(site, result.LinkFile.File.Id);
+						result.LinkFile.File.Parent.Permissions = await this.FileSystemManager.ListPermissions(result.LinkFile.File.Parent);
 					}
 					else
 					{

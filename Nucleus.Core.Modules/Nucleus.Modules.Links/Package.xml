@@ -15,6 +15,7 @@
 				<classTypeName>Nucleus.Modules.Links.Controllers.LinksController,Nucleus.Modules.Links</classTypeName>
 				<viewAction>Index</viewAction>
 				<editAction>Settings</editAction>
+				<categories>Content</categories>
 			</moduleDefinition>
 
 			<file name="readme.txt" />

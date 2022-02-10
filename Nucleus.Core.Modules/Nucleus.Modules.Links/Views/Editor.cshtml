@@ -8,7 +8,7 @@
 @using (Html.BeginNucleusForm("Editor", "Admin", "Links", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
 	<fieldset role="group" aria-labelledby="heading">
-		<h2>Link Properties</h2>
+		<h2 class="nucleus-modal-caption">Link Properties</h2>
 		@Html.HiddenFor(model => model.Link.Id)
 
 		<SettingsControl caption="Title" helptext="Document title">

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models.FileSystem;
 using Microsoft.AspNetCore.Authorization;
@@ -173,9 +174,15 @@ namespace Nucleus.Modules.Documents.Controllers
 			viewModel.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
 
 			System.IO.DirectoryInfo thisFolder = new(this.GetType().Assembly.Location);
-					
 
-			viewModel.Layout = $"ViewerLayouts/{this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table")}.cshtml";
+			string layoutPath = $"ViewerLayouts/{this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table")}.cshtml";
+
+			if (!System.IO.File.Exists($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\Documents\\Views\\{layoutPath}"))
+			{
+				layoutPath = $"ViewerLayouts/Table.cshtml";
+			}
+
+			viewModel.Layout = layoutPath;
 
 			foreach (Models.Document document in await this.DocumentsManager.List(this.Context.Site, this.Context.Module))
 			{
@@ -255,7 +262,7 @@ namespace Nucleus.Modules.Documents.Controllers
 			}
 
 			viewModel.Layouts = new();
-			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{RoutingConstants.EXTENSIONS_ROUTE_PATH}\\Documents\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
+			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\Documents\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
 			{
 				viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
 			}

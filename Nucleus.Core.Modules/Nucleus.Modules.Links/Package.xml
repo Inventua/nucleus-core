@@ -34,7 +34,8 @@
 				
 				<folder name="ViewerLayouts">
 					<file name="Table.cshtml" />
-					<file name="List.cshtml" />
+					<file name="Ordered List.cshtml" />
+					<file name="Unordered List.cshtml" />
 				</folder>
 			</folder>
 			

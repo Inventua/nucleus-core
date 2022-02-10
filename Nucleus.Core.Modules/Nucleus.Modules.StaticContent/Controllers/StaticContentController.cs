@@ -38,7 +38,7 @@ namespace Nucleus.Modules.StaticContent.Controllers
 				File file;
 				if (!String.IsNullOrEmpty(this.Context.Parameters))
 				{
-					file = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SourceFolder.Provider, viewModel.SourceFolder.Path + "/" + this.Context.Parameters);
+					file = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SourceFolder.Provider, viewModel.SourceFolder.Path + (String.IsNullOrEmpty(viewModel.SourceFolder.Path) ? "" : "/") + this.Context.Parameters);
 				}
 				else
 				{
@@ -68,8 +68,23 @@ namespace Nucleus.Modules.StaticContent.Controllers
 							}
 							else
 							{
-								// Redirect to use the File Controller so that permissions and other checks are performed.
-								return Redirect(Url.FileLink(file));
+								// Redirect to the file.
+								if (file.Capabilities.CanDirectLink)
+								{
+									System.Uri uri = this.FileSystemManager.GetFileDirectUrl(this.Context.Site, file);
+									if (uri != null)
+									{
+										return new RedirectResult(uri.AbsoluteUri, true);
+									}
+									else
+									{
+										return NotFound();
+									}
+								}
+								else
+								{
+									return new RedirectResult(Url.FileLink(file), true);
+								}								
 							}
 						}
 					}

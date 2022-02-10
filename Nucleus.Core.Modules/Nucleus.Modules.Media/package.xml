@@ -15,6 +15,7 @@
 				<classTypeName>Nucleus.Modules.Media.Controllers.MediaController,Nucleus.Modules.Media</classTypeName>
 				<viewAction>Index</viewAction>
 				<editAction>Edit</editAction>
+				<categories>Media</categories>
 			</moduleDefinition>
 
 			<file name="readme.txt" />

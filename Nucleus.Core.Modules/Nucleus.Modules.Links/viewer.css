@@ -1,14 +1,10 @@
 ﻿.Links table 
 {
-  border: 1px solid #ccc;
   width: 100%;
-  margin-bottom: 12px;
+  margin-bottom: 0.5rem;
 }
 
-.Links table th, .Links table td 
+ol.Links li span
 {
-  padding: 4px;
-	text-align: left;
-  vertical-align: middle;
-  width: 5em;
+  margin-left: 0.5rem;
 }

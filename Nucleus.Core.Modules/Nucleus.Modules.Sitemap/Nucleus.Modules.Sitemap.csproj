@@ -45,6 +45,10 @@
     <ProjectReference Include="..\..\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Documentation\" />
+  </ItemGroup>
+
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>Sitemap</ExtensionFolder>
 		<Version>1.0.0</Version>

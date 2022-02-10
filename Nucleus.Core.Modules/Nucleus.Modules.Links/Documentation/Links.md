@@ -3,36 +3,36 @@ The links module displays a lists of links to specified pages, files or Urls in 
 
 ![Links Module Screenshot](links.png)
 
+Any combination of links to files, pages and urls can be added to a links module.
 
 ![Settings](links-list.png)
 
 To change settings for the module, click the `Settings` tab.
 
-![Settings](documents-settings.png)
+![Settings](links-settings.png)
 
 ## Settings
 |                   |                                                                                      |
 |-------------------|--------------------------------------------------------------------------------------|
-| Categories List   | Specifies the list that is used by this module for categories.  If specified, users can assign a category from the list to documents, and users can sort by category. Lists are managed in the `Lists` editor in the `Manage` control panel. |
-| Layout            | Documents can be displayed in a table, or as tiles in two columns.  |
-| Default Folder    | You can assign a default folder which is selected automatically when you create a new document.  You can still choose files from other folders.  |
-| Allow Sorting     | Specifies whether site users can sort the documents.  |
-| Show Category     | Specifies whether to display the document category on-screen.  |
-| Show Modified Date| Specifies whether to display the selected file's last modified date on-screen.  |
-| Show Size         | Specifies whether to display the selected file's size on-screen.  |
-| Show Description  | Specifies whether to display the document description on-screen.  |
+| Categories List   | Specifies the list that is used by this module for categories.  If specified, users can assign a category from the list to each link.  Lists are managed in the `Lists` editor in the `Manage` control panel. |
+| Layout            | Links can be displayed in a table, or as an ordered or unordered list.  |
+| Open in new window| Specifies whether to open links in the current window, or in a new window or tab (depending on your browser setup). |
 
-To add a new document, click `Add Document`.  To edit an existing document, click the edit button to the right of the documents list.  You can 
-also delete documents and change their default order.
+To add a new link, click `Add Link`.  To edit an existing link, click the edit button to the right of the links list.  
 
-![Document Properties](documents-properties.png)
 
-## Document Properties
+![Link Properties](links-properties.png)
+
+## Link Properties
 |                   |                                                                                      |
 |-------------------|--------------------------------------------------------------------------------------|
-| Title             | The document's title. This is shown on-screen. |
-| Description       | The document description. This can be shown on-screen, depending on module settings.  |
-| Allow Sorting     | Specifies whether site users can sort the documents.  |
-| Category          | The document category. This can be shown on-screen, depending on module settings.  |
-| File              | The document file.  You can assign an existing file or upload a new one.  |
+| Title             | The link title is displayed on-screen. |
+| Description       | The link description is displayed on-screen.  |
+| Category          | The category is displayed on-screen, if selected.  The category property is not visible if you have not selected a category list in module settings.  |
+| Link Type         | `Url`, `Page` or `File` |
+| - Url             | If the link type is Url, enter the web site url to link to. |
+| - Page            | If the link type is Page, select the target page. |
+| - File            | If the link type is File, select the target file. |
 
+> Permissions for Page and File links are checked at run time.  If the user does not have view permission for 
+a linked page or file, the link is not displayed.

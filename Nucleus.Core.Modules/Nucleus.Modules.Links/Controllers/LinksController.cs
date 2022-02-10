@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Models;
-using Nucleus.Abstractions.Models.FileSystem;
+using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions.Authorization;
 using System;
@@ -79,7 +79,14 @@ namespace Nucleus.Modules.Links.Controllers
 				}
 			}
 
-			viewModel.Layout = $"ViewerLayouts/{this.Context.Module.ModuleSettings.Get(AdminController.MODULESETTING_LAYOUT, "Table")}.cshtml";
+			string layoutPath = $"ViewerLayouts/{this.Context.Module.ModuleSettings.Get(AdminController.MODULESETTING_LAYOUT, "Table")}.cshtml";
+
+			if (!System.IO.File.Exists($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\Links\\Views\\{layoutPath}"))
+			{
+				layoutPath = $"ViewerLayouts/Table.cshtml";
+			}
+
+			viewModel.Layout = layoutPath;
 			viewModel.CategoryList = await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(AdminController.MODULESETTING_CATEGORYLIST_ID, Guid.Empty));
 			viewModel.NewWindow = this.Context.Module.ModuleSettings.Get(AdminController.MODULESETTING_OPEN_NEW_WINDOW, false);
 

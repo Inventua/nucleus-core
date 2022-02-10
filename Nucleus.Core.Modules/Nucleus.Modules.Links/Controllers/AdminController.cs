@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Abstractions.Managers;
 using System;
 using System.Linq;
@@ -161,7 +162,7 @@ namespace Nucleus.Modules.Links.Controllers
 
 
 			viewModel.Layouts = new();
-			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{RoutingConstants.EXTENSIONS_ROUTE_PATH}\\Links\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
+			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\Links\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
 			{
 				viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
 			}

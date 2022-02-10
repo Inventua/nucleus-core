@@ -22,9 +22,7 @@
 		@if (!String.IsNullOrEmpty(url))
 		{
 			<li>
-				<a href="@url" alt="@link.Title" target="@(Model.NewWindow ? "_blank" : "")">
-					@link.Title
-				</a>
+				<a href="@url" alt="@link.Title" target="@(Model.NewWindow ? "_blank" : "")">@link.Title</a>
 
 				@if (Model.CategoryList != null)
 				{

@@ -70,13 +70,15 @@
 			<fieldset role="group" aria-labelledby="heading">
 				<h2>Layout</h2>
 
-				<SettingsControl caption="Layout" helptext="Select a page layout for this page, or select '(default)' to use the default layout for this site.">
-					@Html.DropDownListFor(model => model.Page.LayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
-				</SettingsControl>
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Layout" helptext="Select a page layout for this page, or select '(default)' to use the default layout for this site.">
+						@Html.DropDownListFor(model => model.Page.LayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
+					</SettingsControl>
 
-				<SettingsControl caption="Default Container" helptext="Select a default container for modules on this page, or select '(default)' to use the default layout for this site.">
-					@Html.DropDownListFor((model) => model.Page.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
-				</SettingsControl>
+					<SettingsControl caption="Default Container" helptext="Select a default container for modules on this page, or select '(default)' to use the default layout for this site.">
+						@Html.DropDownListFor((model) => model.Page.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
+					</SettingsControl>
+				</div>
 
 				<div class="nucleus-flex-fields">
 					<SettingsControl caption="Show in Menu?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the page is displayed in menus.">

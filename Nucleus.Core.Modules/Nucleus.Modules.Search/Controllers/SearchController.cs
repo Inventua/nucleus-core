@@ -110,7 +110,7 @@ namespace Nucleus.Modules.Search.Controllers
 				
 				SearchResults results = await searchProvider.Search(viewModel);
 
-				viewModel.PagingSettings.TotalCount = results.Total;
+				viewModel.PagingSettings.TotalCount = Convert.ToInt32(results.Total);
 				viewModel.SearchResults = results;
 			}
 			
@@ -149,7 +149,7 @@ namespace Nucleus.Modules.Search.Controllers
 				{
 					SearchResults results = await searchProvider.Suggest(viewModel);
 
-					viewModel.PagingSettings.TotalCount = results.Total;
+					viewModel.PagingSettings.TotalCount = Convert.ToInt32(results.Total);
 					viewModel.SearchResults = results;
 				}
 				catch (NotImplementedException)

@@ -36,7 +36,7 @@ namespace Nucleus.Abstractions.Models.Paging
     /// <summary>
     /// The count of available items in the database.
     /// </summary>
-    public long TotalCount { get; set; } = -1;
+    public int TotalCount { get; set; } = -1;
 
     /// <summary>
     /// Currently selected page size
@@ -90,6 +90,24 @@ namespace Nucleus.Abstractions.Models.Paging
 			  }
 			  return ((this.CurrentPageIndex - 1) * PageSize);		
 			}				
+		}
+
+    /// <summary>
+    /// Return the index of the last item shown on the current page.
+    /// </summary>
+    public int LastDisplayedRowIndex
+		{
+      get
+			{
+        if (CurrentPageIndex * PageSize > TotalCount)
+				{
+          return TotalCount;
+				}
+        else
+				{
+          return CurrentPageIndex * PageSize;
+        }
+			}
 		}
 
     /// <summary>

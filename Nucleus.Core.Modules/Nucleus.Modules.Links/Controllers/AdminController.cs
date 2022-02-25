@@ -110,6 +110,26 @@ namespace Nucleus.Modules.Links.Controllers
 			return View("Editor", viewModel);
 		}
 
+		[HttpGet]
+		public async Task<ActionResult> GetChildPages(Guid id)
+		{
+			ViewModels.PageIndexPartial viewModel = new();
+
+			viewModel.FromPage = await this.PageManager.Get(id);
+
+			viewModel.Pages = await this.PageManager.GetAdminMenu
+				(
+					this.Context.Site,
+					await this.PageManager.Get(id),
+					ControllerContext.HttpContext.User,
+					1,
+					true,
+					false,
+					true
+				);
+
+			return View("_PageMenu", viewModel);
+		}
 
 		[HttpPost]
 		public async Task<ActionResult> SaveLink(ViewModels.Editor viewModel)
@@ -202,7 +222,7 @@ namespace Nucleus.Modules.Links.Controllers
 				//case Models.LinkTypes.Url:
 				//case Models.LinkTypes.File:
 				case Models.LinkTypes.Page:
-					viewModel.Pages = (await this.PageManager.List(this.Context.Site)).Where(page => !page.Disabled).ToList();
+					viewModel.PageMenu = (await this.PageManager.GetAdminMenu(this.Context.Site, null, ControllerContext.HttpContext.User, 1, true, false, true));
 					break;
 			}
 

@@ -30,6 +30,7 @@
 				<file name="Viewer.cshtml" />
 				<file name="Settings.cshtml" />
 				<file name="_LinksList.cshtml" />
+				<file name="_PageMenu.cshtml" />
 				<file name="Editor.cshtml" />
 				
 				<folder name="ViewerLayouts">

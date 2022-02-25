@@ -137,6 +137,20 @@ namespace Nucleus.Abstractions.Managers
 		public Task<PageMenu> GetAdminMenu(Site site, Page parentPage, ClaimsPrincipal user, int levels);
 
 		/// <summary>
+		/// Retrieve a "tree" representation of site pages, with control over whether to ignore permissions, disabled flag and the show in menu flag
+		/// flags.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="parentPage"></param>
+		/// <param name="user"></param>
+		/// <param name="levels"></param>
+		/// <param name="ignoreDisabled"></param>
+		/// <param name="ignorePermissions"></param>
+		/// <param name="ignoreShowInMenu"></param>
+		/// <returns></returns>
+		public Task<PageMenu> GetAdminMenu(Site site, Page parentPage, ClaimsPrincipal user, int levels, Boolean ignorePermissions, Boolean ignoreDisabled, Boolean ignoreShowInMenu);
+
+		/// <summary>
 		/// Retrieve a "tree" representation of site pages.
 		/// </summary>
 		/// <param name="site"></param>

@@ -17,7 +17,7 @@ namespace Nucleus.Modules.Links.ViewModels
     public string Message { get; set; }
 
     public List CategoryList { get; set; }
-    public IList<Page> Pages { get; set; }
+    public PageMenu PageMenu { get; set; }
 
     public Dictionary<string, string> LinkTypes { get; set; }
   }

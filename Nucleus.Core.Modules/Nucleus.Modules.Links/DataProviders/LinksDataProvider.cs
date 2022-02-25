@@ -141,7 +141,7 @@ namespace Nucleus.Modules.Links.DataProviders
 				raiseEvent = new(() => { this.EventManager.RaiseEvent<Link, Update>(link); });
 			}
 
-			await this.Context.SaveChangesAsync();
+			await this.Context.SaveChangesAsync<Link>();
 
 			switch (link.LinkType)
 			{
@@ -171,31 +171,58 @@ namespace Nucleus.Modules.Links.DataProviders
 
 		private async Task SaveLinkItem(Guid linkId, LinkUrl linkItem)
 		{
-			Boolean isNew = !await this.Context.Set<LinkUrl>().Where(existing => EF.Property<Guid>(existing, "LinkId") == linkId).AnyAsync();
+			LinkUrl existingItem = await this.Context.Set<LinkUrl>()
+				.Where(existing => EF.Property<Guid>(existing, "LinkId") == linkId)
+				.FirstOrDefaultAsync();
 
-			this.Context.Attach(linkItem);
-			this.Context.Entry(linkItem).Property("LinkId").CurrentValue = linkId;
-			this.Context.Entry(linkItem).State = isNew ? EntityState.Added : EntityState.Modified;
+			if (existingItem == null)
+			{
+				this.Context.Add(linkItem);
+				this.Context.Entry(linkItem).Property("LinkId").CurrentValue = linkId;
+			}
+			else
+			{
+				existingItem.Url = linkItem.Url;
+			}
+
 			await this.Context.SaveChangesAsync<LinkUrl>();
 		}
 
 		private async Task SaveLinkItem(Guid linkId, LinkFile linkItem)
 		{
-			Boolean isNew = !await this.Context.Set<LinkFile>().Where(existing => EF.Property<Guid>(existing, "LinkId") == linkId).AnyAsync();
+			LinkFile existingItem = await this.Context.Set<LinkFile>()
+				.Where(existing => EF.Property<Guid>(existing, "LinkId") == linkId)
+				.FirstOrDefaultAsync();
 
-			this.Context.Attach(linkItem);
-			this.Context.Entry(linkItem).Property("LinkId").CurrentValue = linkId;
-			this.Context.Entry(linkItem).State = isNew ? EntityState.Added : EntityState.Modified;
+			if (existingItem == null)
+			{
+				this.Context.Add(linkItem);
+				this.Context.Entry(linkItem).Property("LinkId").CurrentValue = linkId;
+			}
+			else
+			{
+				existingItem.File = linkItem.File;
+			}
+
 			await this.Context.SaveChangesAsync<LinkFile>();
 		}
 
 		private async Task SaveLinkItem(Guid linkId, LinkPage linkItem)
 		{
-			Boolean isNew = !await this.Context.Set<LinkPage>().Where(existing => EF.Property<Guid>(existing, "LinkId") == linkId).AnyAsync();
+			LinkPage existingItem = await this.Context.Set<LinkPage>()
+				.Where(existing => EF.Property<Guid>(existing, "LinkId") == linkId)
+				.FirstOrDefaultAsync();
 
-			this.Context.Attach(linkItem);
-			this.Context.Entry(linkItem).Property("LinkId").CurrentValue = linkId;
-			this.Context.Entry(linkItem).State = isNew ? EntityState.Added : EntityState.Modified;
+			if (existingItem == null)
+			{
+				this.Context.Add(linkItem);
+				this.Context.Entry(linkItem).Property("LinkId").CurrentValue = linkId;
+			}
+			else
+			{
+				existingItem.Page = linkItem.Page;
+			}
+
 			await this.Context.SaveChangesAsync<LinkPage>();
 		}
 

@@ -43,8 +43,9 @@
 				</SettingsControl>
 				break;
 			case Nucleus.Modules.Links.Models.LinkTypes.Page:
-				<SettingsControl caption="Page" helptext="Link page">
-					@Html.DropDownListFor(model => model.Link.LinkPage.Page.Id, new SelectList(Model.Pages, "Id", "Name"), "root")
+				<SettingsControl caption="Page" helptext="Link page" class="links-page-list">
+					@Html.PageListFor(model =>  model.Link.LinkPage.Page.Id, Model.PageMenu, Guid.Empty)
+					@*@Html.DropDownListFor(model => model.Link.LinkPage.Page.Id, new SelectList(Model.Pages, "Id", "Name"), "root")*@
 				</SettingsControl>
 				break;
 			default:
@@ -64,3 +65,15 @@
 		}
 	</div>
 }
+
+<script type="text/javascript">
+	// Read the child pages of the item containing the "+" button
+	jQuery('.links-page-list').on('click', '.nucleus-get-childpages', function (e)
+	{
+		// Add a ul to contain the new pages
+		Page.LoadPartialContent(e, '@Url.NucleusAction("GetChildPages", "Admin", "Links")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+
+		// remove the "+" button
+		jQuery(this).remove();
+	});	
+</script>

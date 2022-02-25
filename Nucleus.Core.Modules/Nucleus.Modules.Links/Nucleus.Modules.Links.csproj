@@ -36,6 +36,7 @@
     <None Remove="Views\ViewerLayouts\Table.cshtml" />
     <None Remove="Views\ViewerLayouts\Unordered List.cshtml" />
     <None Remove="Views\_LinksList.cshtml" />
+    <None Remove="Views\_PageMenu.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,6 +52,7 @@
     <Content Include="Views\Settings.cshtml" />
     <Content Include="Views\ViewerLayouts\Ordered List.cshtml" />
     <Content Include="Views\ViewerLayouts\Table.cshtml" />
+    <Content Include="Views\_PageMenu.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

@@ -434,11 +434,16 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
-		public async Task<PageMenu> GetAdminMenu(Site site, Page parentPage, ClaimsPrincipal user, int levels)
+		public async Task<PageMenu> GetAdminMenu(Site site, Page parentPage, ClaimsPrincipal user, int levels, Boolean ignorePermissions, Boolean ignoreDisabled, Boolean ignoreShowInMenu)
 		{
 			// read from database
-			PageMenuChildrenResult childrenResult = await GetPageMenuChildren(site, parentPage, user, levels, 0, true);
+			PageMenuChildrenResult childrenResult = await GetPageMenuChildren(site, parentPage, user, levels, 0, ignorePermissions, ignoreDisabled, ignoreShowInMenu);
 			return new PageMenu(null, childrenResult.Children, childrenResult.HasChildren);
+		}
+
+		public async Task<PageMenu> GetAdminMenu(Site site, Page parentPage, ClaimsPrincipal user, int levels)
+		{
+			return await GetAdminMenu(site, parentPage, user, levels, true, true, true);
 		}
 
 
@@ -461,12 +466,12 @@ namespace Nucleus.Core.Managers
 			return await this.CacheManager.PageMenuCache().GetAsync(key, async key =>
 			{
 				// read from database
-				PageMenuChildrenResult childrenResult = await GetPageMenuChildren(site, parentPage, user, 0, 0, ignoreSettings);
+				PageMenuChildrenResult childrenResult = await GetPageMenuChildren(site, parentPage, user, 0, 0, ignoreSettings, ignoreSettings, ignoreSettings);
 				return new PageMenu(null, childrenResult.Children, childrenResult.HasChildren);
 			});
 		}
 
-		private async Task<PageMenuChildrenResult> GetPageMenuChildren(Site site, Page parentPage, ClaimsPrincipal user, int levels, int thisLevel, Boolean ignoreSettings)
+		private async Task<PageMenuChildrenResult> GetPageMenuChildren(Site site, Page parentPage, ClaimsPrincipal user, int levels, int thisLevel, Boolean ignorePermissions, Boolean ignoreDisabled, Boolean ignoreShowInMenu)
 		{
 			List<PageMenu> children = new();
 
@@ -477,9 +482,9 @@ namespace Nucleus.Core.Managers
 				{
 					if (levels != 0 && thisLevel >= levels) return new PageMenuChildrenResult(true);
 
-					if (ignoreSettings || (!child.Disabled && child.ShowInMenu && user.HasViewPermission(site, child)))
+					if ( (ignoreDisabled || !child.Disabled) && (ignoreShowInMenu || child.ShowInMenu) && (ignorePermissions || user.HasViewPermission(site, child)))
 					{
-						PageMenuChildrenResult childrenResult = await GetPageMenuChildren(site, child, user, levels, thisLevel + 1, ignoreSettings);
+						PageMenuChildrenResult childrenResult = await GetPageMenuChildren(site, child, user, levels, thisLevel + 1, ignorePermissions, ignoreDisabled, ignoreShowInMenu);
 						children.Add(new PageMenu(child, childrenResult.Children, childrenResult.HasChildren));
 					}
 				}

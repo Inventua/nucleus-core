@@ -1,6 +1,6 @@
 # Page Management
 After logging in as a system administrator or site administrator, you can access the page manager by clicking the
-`Pages` button.
+`Pages` button, or you can edit the current page settings by clicking the `Edit Page Settings` button.
 
 ![Manage Pages](PageManagement.png)
 

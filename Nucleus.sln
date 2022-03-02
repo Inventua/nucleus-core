@@ -76,6 +76,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup and Configuration", "
 		Documentation\Setup and Configuration\Site-Settings.md = Documentation\Setup and Configuration\Site-Settings.md
 		Documentation\Setup and Configuration\Site-Settings.png = Documentation\Setup and Configuration\Site-Settings.png
 		Documentation\Setup and Configuration\System-Administrators.md = Documentation\Setup and Configuration\System-Administrators.md
+		Documentation\Setup and Configuration\System.md = Documentation\Setup and Configuration\System.md
+		Documentation\Setup and Configuration\System.png = Documentation\Setup and Configuration\System.png
 		Documentation\Setup and Configuration\Users.md = Documentation\Setup and Configuration\Users.md
 		Documentation\Setup and Configuration\Users.png = Documentation\Setup and Configuration\Users.png
 	EndProjectSection

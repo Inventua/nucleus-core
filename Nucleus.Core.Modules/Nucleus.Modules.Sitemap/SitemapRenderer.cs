@@ -29,13 +29,8 @@ namespace Nucleus.Modules.Sitemap
 	}
 
 	/// <summary>
-	/// Renders an site map.
+	/// Renders a site map.
 	/// </summary>
-	/// <remarks>
-	///   
-	/// This function is used by the <see cref="HtmlHelpers.SitemapHtmlHelper"/> and <see cref="TagHelpers.BreadcrumbTagHelper"/>.  The output is structured per
-	/// https://developers.google.com/search/docs/data-types/breadcrumb#html
-	/// </remarks>
 	internal static class SitemapRenderer
 	{
 

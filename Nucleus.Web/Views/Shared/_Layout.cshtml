@@ -102,6 +102,16 @@
 					window.location.reload(true);
 				}, false);
 
+			window.document.addEventListener('Open',
+				function (args)
+				{
+					if (args.detail !== null && typeof (args.detail.target) !== 'undefined')
+					{
+						window.location = args.detail.target;
+					}
+				}, false);
+
+
 			window.document.addEventListener('InitFrame',
 				function (args)
 				{

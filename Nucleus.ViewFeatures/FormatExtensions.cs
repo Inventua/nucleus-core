@@ -51,12 +51,10 @@ namespace Nucleus.ViewFeatures
 				if (value.TimeOfDay == TimeSpan.Zero)
 				{
 					return $"{System.TimeZoneInfo.ConvertTime(value, System.TimeZoneInfo.Utc, timezone).ToShortDateString()}";
-					//return $"{(fromUTC ? value.ToLocalTime() : value).ToShortDateString()}";
 				}
 				else
 				{
 					return $"{System.TimeZoneInfo.ConvertTime(value, System.TimeZoneInfo.Utc, timezone).ToString("g")}";
-					//return $"{(fromUTC ? value.ToLocalTime() : value).ToString("g")}";
 				}
 			}
 		}
@@ -75,13 +73,7 @@ namespace Nucleus.ViewFeatures
 			}
 			else
 			{
-				//if (fromUTC)
-				//{
-				//	value = value.ToLocalTime();
-				//}
-
 				return FormatDate(value.DateTime, timezone);
-				//return $"{value.DateTime.ToShortDateString()} {value.DateTime.ToShortTimeString()}";
 			}
 		}
 	}

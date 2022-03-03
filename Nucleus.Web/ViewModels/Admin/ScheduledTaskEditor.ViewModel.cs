@@ -22,8 +22,9 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public string LogFile { get; set; }
 
-		public string LogContent { get; set; }
+		public List<ViewModels.Admin.SystemIndex.LogEntry> LogContent { get; set; }
 
-		
+		public string LogMessage { get; set; }
+
 	}
 }

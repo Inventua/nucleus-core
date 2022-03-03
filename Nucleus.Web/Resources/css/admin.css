@@ -678,3 +678,8 @@ ul.nucleus-control-panel-items a
 	background-color: #dc3545!important;
 	border-radius: 4px;
 }
+
+.text-break
+{
+	white-space: break-spaces;
+}

@@ -12,7 +12,7 @@
 		{
 			<tr>
 				<td>@entry.Date.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-				<td>@entry.Level</td>
+				<td class="nucleus-log-@entry.Level.ToLower()">@entry.Level</td>
 				<td>@entry.Category</td>
 				<td>@entry.Message</td>
 			</tr>

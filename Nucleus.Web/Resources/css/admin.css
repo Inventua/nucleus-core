@@ -667,4 +667,14 @@ ul.nucleus-control-panel-items a
 	background-color: #ccc;		
 }
 
+.nucleus-log-warning
+{
+	background-color: #ffc107!important;
+	border-radius: 4px;
+}
 
+.nucleus-log-error
+{
+	background-color: #dc3545!important;
+	border-radius: 4px;
+}

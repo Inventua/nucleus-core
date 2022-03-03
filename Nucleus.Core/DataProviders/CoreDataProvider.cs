@@ -1299,6 +1299,8 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task DeleteExpiredSessions()
 		{
+			var test = this.Context.UserSessions.Where(session => session.ExpiryDate < DateTime.UtcNow);
+
 			List<UserSession> sessions = await this.Context.UserSessions.Where(session => session.ExpiryDate < DateTime.UtcNow).ToListAsync();
 			this.Context.RemoveRange(sessions);
 			await this.Context.SaveChangesAsync();

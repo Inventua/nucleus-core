@@ -47,6 +47,11 @@ namespace Nucleus.Abstractions.Models
 		public DateTime IssuedDate { get; set; }
 
 		/// <summary>
+		/// Record creation date date/time.
+		/// </summary>
+		public DateTime? DateAdded { get; set; }
+
+		/// <summary>
 		/// Address of the user-agent used to log in.  
 		/// </summary>
 		/// <remarks>
@@ -57,7 +62,7 @@ namespace Nucleus.Abstractions.Models
 		/// <summary>
 		/// This value is used to track the most recent database update for the user session.
 		/// </summary>
-		public DateTime LastUpdated { get; set; }
+		public DateTime? LastUpdated { get; set; }
 
 		/// <summary>
 		/// Initialize a new instance of UserSession.
@@ -87,6 +92,7 @@ namespace Nucleus.Abstractions.Models
 			this.ExpiryDate = expiry;
 			this.LastUpdated = DateTime.UtcNow;
 			this.RemoteIpAddress = remoteIpAddress;
+			this.DateAdded = DateTime.UtcNow;
 		}
 	}
 }

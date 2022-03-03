@@ -102,7 +102,6 @@ namespace Nucleus.Web
 
 			services.Logger().LogInformation(new[]
 			{
-				"",
 				$"{System.Reflection.Assembly.GetExecutingAssembly().Product()} version {System.Reflection.Assembly.GetExecutingAssembly().Version()}. {System.Reflection.Assembly.GetExecutingAssembly().Copyright()}",
 				$"Application Root folder: [{System.Environment.CurrentDirectory}]",
 				$"Configuration folder:    [{ConfigFolder()}]",
@@ -131,10 +130,7 @@ namespace Nucleus.Web
 				logging.AddAzureWebAppDiagnostics();
 			});
 
-			services.Logger().LogInformation(new[] { 
-				$"App Data Folder:         [{Core.Logging.LoggingBuilderExtensions.DataFolder}]",
-				""
-			});
+			services.Logger().LogInformation($"App Data Folder:         [{Core.Logging.LoggingBuilderExtensions.DataFolder}]");
 				
 			// Enable compression
 			if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))

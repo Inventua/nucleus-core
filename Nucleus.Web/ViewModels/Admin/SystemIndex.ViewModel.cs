@@ -25,7 +25,8 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public string LogFile { get; set; }
 
-		public string LogContent { get; set; }
+		public List<LogEntry> LogContent { get; set; }
+		public string LogMessage { get; set; }
 
 		public string Configuration { get; set; }
 
@@ -38,6 +39,38 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public SystemIndex()
 		{
+		}
+
+		public class LogEntry
+		{
+			public DateTime Date { get; set; }
+			public string Level { get; set; }
+			public string Category { get; set; }
+			public string Message { get; set; }
+			public Boolean IsValid { get; set; } = true;
+
+			public LogEntry(string input)
+			{
+				string[] parts = input.Split(',');
+
+				if (parts.Length >= 4)
+				{
+					if (DateTime.TryParse(parts[0], out DateTime result))
+					{
+						this.Date = result;
+					}
+					this.Level = parts[1];
+					this.Category = parts[2];
+
+					// Message could contain commas, so we just use the rest of the string
+					this.Message = input.Substring(parts[0].Length + parts[1].Length + parts[2].Length + 3);
+				}
+				else
+				{
+					// Prevent lines that aren't in the correct delimited form from being displayed.
+					this.IsValid = false;
+				}
+			}
 		}
 
 		public class DatabaseConnection

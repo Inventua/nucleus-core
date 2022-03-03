@@ -71,11 +71,11 @@ namespace Nucleus.Core.Logging
 		{
 			if (exception != null)
 			{
-				return $"{DateTime.UtcNow:dd-MMM-yyyy HH:mm:ss.fffffff} [{logLevel,-11}] {this.Category} {0,-28} {formatter(state, exception)} {exception.Message}" + Environment.NewLine + exception.ToString();
+				return $"{DateTime.UtcNow:dd-MMM-yyyy HH:mm:ss.fffffff},{logLevel},{this.Category},{formatter(state, exception)} {exception.Message}" + Environment.NewLine + exception.ToString();
 			}
 			else
 			{
-				return $"{DateTime.UtcNow:dd-MMM-yyyy HH:mm:ss.fffffff} [{logLevel,-11}] {this.Category} {0,-28} {formatter(state, exception)}" + Environment.NewLine;
+				return $"{DateTime.UtcNow:dd-MMM-yyyy HH:mm:ss.fffffff},{logLevel},{this.Category},{formatter(state, exception)}" + Environment.NewLine;
 			}
 		}
 
@@ -126,7 +126,7 @@ namespace Nucleus.Core.Logging
 				{
 					System.IO.Directory.CreateDirectory(path);
 				}
-				File.AppendAllText(logFilePath, Message + Environment.NewLine);
+				File.AppendAllText(logFilePath, Message);
 			}
 
 			if (this.Provider != null)

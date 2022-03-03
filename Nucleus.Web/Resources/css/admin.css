@@ -17,9 +17,10 @@ body
 
 .nucleus-control-panel-content-header
 {
-	position: absolute;
+	position: sticky;
+	/*position: absolute;
 	top: 0;
-	right: 0;
+	right: 0;*/
 }
 
 .nucleus-button-panel
@@ -39,10 +40,11 @@ body
 
 .nucleus-adminpage
 {
-	height: calc(100% - 12px);	
+	height: calc(100% - 32px);	
 	position: relative;	
 	display: flex;
 	flex-direction: column;
+	overflow: auto;
 }
 
 .nucleus-adminpage > form, .nucleus-adminpage .modal-body > form
@@ -369,18 +371,16 @@ ul.nucleus-control-panel-items a
 
 .nucleus-control-panel-content
 {
-	/*display: none;	*/
+	display: flex;
+	flex-direction: column;
 	position: relative;
 	flex-grow: 1;
-	/*transition: .25s;*/
 	margin: 8px;	
 	box-sizing: border-box;
 	border: 8px solid white;
-	/*border-radius: 8px;*/
 	background-color: white;	
 	max-height: calc(100% - 16px);
 	overflow: auto;
-	/*resize: both;*/
 }
 
 /*.nucleus-control-panel .AdminContentControls
@@ -427,20 +427,22 @@ ul.nucleus-control-panel-items a
 
 .nucleus-index-items
 {
-	display: inline-block;
+	display: flex;
+	/*display: inline-block;*/
 	vertical-align: top;
-	min-width: 200px;			
 	flex-grow: 1;
 	max-width: 20rem;	
-	
+	align-self: stretch;
 }
 
 .nucleus-index-items ul
 {
-	min-height: 300px;
+	width: 100%;
+	min-width: 200px;	
+	/*min-height: 300px;*/
 	height: 100%;
 	overflow-y: auto;
-	margin-top: 2px;
+	/*margin-top: 2px;*/
 	padding: 4px;
 	border: solid 1px #AAA;
 }
@@ -505,9 +507,9 @@ ul.nucleus-control-panel-items a
 	display: flex; 
 	flex-direction: column;
 	justify-content: stretch;
-	margin-left: 16px;
+	margin-left: 8px;
 	flex-grow: 4;
-	overflow: auto;
+	/*overflow: auto;*/
 }
 
 .nucleus-admin-content .nucleus-editor-panel form, .nucleus-admin-content .nucleus-editor-panel form fieldset

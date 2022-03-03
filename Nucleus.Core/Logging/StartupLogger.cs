@@ -122,7 +122,10 @@ namespace Nucleus.Core.Logging
 		/// <param name="args">Values to substitute in messages.</param>
 		public static void LogInformation(this ILogger logger, string[] messages, params object[] args)
 		{
-			logger.LogInformation(String.Join(Environment.NewLine, messages), args);
+			foreach (string message in messages)
+			{
+				logger.LogInformation(message, args);
+			}
 		}
 
 	}

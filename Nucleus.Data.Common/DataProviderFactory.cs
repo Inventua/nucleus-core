@@ -78,7 +78,7 @@ namespace Nucleus.Data.Common
 					{
 						if (!this.IsSchemaChecked.ContainsKey(migration.SchemaName) || !this.IsSchemaChecked[migration.SchemaName])
 						{
-							Logger.LogInformation("Checking database schema.");
+							Logger.LogInformation("Checking database schema [{name}].", migration.SchemaName);
 							migration.CheckDatabaseSchema();
 
 							if (this.IsSchemaChecked.ContainsKey(migration.SchemaName))

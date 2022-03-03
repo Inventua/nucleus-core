@@ -69,14 +69,16 @@ namespace Nucleus.Extensions.ElasticSearch
 				if (!createIndexResponse.IsValid)
 				{
 					this.DebugInformation = createIndexResponse.DebugInformation;
-					return false;
+					throw createIndexResponse.OriginalException;
+					//return false;
 				}
 
 				mapResponse = this.Client.Map<ElasticSearchDocument>(e => e.AutoMap());
 				if (!mapResponse.IsValid)
 				{
 					this.DebugInformation = mapResponse.DebugInformation;
-					return false;
+					throw createIndexResponse.OriginalException;
+					//return false;
 				}
 
 				// Configure a pipeline for attachments 
@@ -84,14 +86,16 @@ namespace Nucleus.Extensions.ElasticSearch
 				if (!attachmentPipelineResponse.IsValid)
 				{
 					this.DebugInformation = attachmentPipelineResponse.DebugInformation;
-					return false;
+					throw createIndexResponse.OriginalException;
+					//return false;
 				}
 
 				noAttachmentPipelineResponse = ConfigureNoAttachmentPipeline();
 				if (!noAttachmentPipelineResponse.IsValid)
 				{
 					this.DebugInformation = noAttachmentPipelineResponse.DebugInformation;
-					return false;
+					throw createIndexResponse.OriginalException;
+					//return false;
 				}
 			}
 

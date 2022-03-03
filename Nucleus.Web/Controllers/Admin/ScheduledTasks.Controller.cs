@@ -98,21 +98,46 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", await BuildViewModel());
 		}
 
-		[HttpPost]
-		public async Task<ActionResult> GetLogFile(ViewModels.Admin.ScheduledTaskEditor viewModel)
+		private async Task<List<ViewModels.Admin.SystemIndex.LogEntry>> ReadLogFile(ViewModels.Admin.ScheduledTaskEditor viewModelInput)
 		{
-			if (!String.IsNullOrEmpty(viewModel.LogFile) && !String.IsNullOrEmpty(this.LogFolderPath))
+			List<ViewModels.Admin.SystemIndex.LogEntry> results = new();
+
+			if (!String.IsNullOrEmpty(viewModelInput.LogFile))
 			{
-				ScheduledTask existing = await this.ScheduledTaskManager.Get(viewModel.ScheduledTask.Id);
-				string logFilePath = System.IO.Path.Combine(LogFolder(existing).FullName, viewModel.LogFile);
+				ScheduledTask existing = await this.ScheduledTaskManager.Get(viewModelInput.ScheduledTask.Id);
+				string logFilePath = System.IO.Path.Combine(LogFolder(existing).FullName, viewModelInput.LogFile);
+				
 				if (System.IO.File.Exists(logFilePath))
 				{
-					//return File( System.IO.File.ReadAllBytes(logFilePath),"text/plain");
-					return File(System.Text.Encoding.UTF8.GetBytes(System.Net.WebUtility.HtmlEncode(System.IO.File.ReadAllText(logFilePath))), "text/plain");
+					foreach (string line in System.IO.File.ReadAllLines(logFilePath))
+					{
+						results.Add(new ViewModels.Admin.SystemIndex.LogEntry(line));
+					}
 				}
 			}
 
-			return BadRequest();
+			return results;
+		}
+
+
+		[HttpPost]
+		public async Task<ActionResult> GetLogFile(ViewModels.Admin.ScheduledTaskEditor viewModel)
+		{
+			viewModel.LogContent = await ReadLogFile(viewModel);
+
+			return View("_Log", viewModel);
+			//if (!String.IsNullOrEmpty(viewModel.LogFile) && !String.IsNullOrEmpty(this.LogFolderPath))
+			//{
+			//	ScheduledTask existing = await this.ScheduledTaskManager.Get(viewModel.ScheduledTask.Id);
+			//	string logFilePath = System.IO.Path.Combine(LogFolder(existing).FullName, viewModel.LogFile);
+			//	if (System.IO.File.Exists(logFilePath))
+			//	{
+			//		//return File( System.IO.File.ReadAllBytes(logFilePath),"text/plain");
+			//		return File(System.Text.Encoding.UTF8.GetBytes(System.Net.WebUtility.HtmlEncode(System.IO.File.ReadAllText(logFilePath))), "text/plain");
+			//	}
+			//}
+
+			//return BadRequest();
 		}
 
 		private System.IO.DirectoryInfo LogFolder(ScheduledTask scheduledTask)
@@ -178,11 +203,12 @@ namespace Nucleus.Web.Controllers.Admin
 			
 			if (!String.IsNullOrEmpty(viewModel.LogFile))
 			{
-				string logFilePath = System.IO.Path.Combine(this.LogFolderPath, viewModel.LogFile);
-				if (System.IO.File.Exists(logFilePath))
-				{
-					viewModel.LogContent = System.Net.WebUtility.HtmlEncode(System.IO.File.ReadAllText(logFilePath));
-				}
+				viewModel.LogContent = await ReadLogFile(viewModel);
+				//string logFilePath = System.IO.Path.Combine(this.LogFolderPath, viewModel.LogFile);
+				//if (System.IO.File.Exists(logFilePath))
+				//{
+				//	viewModel.LogContent = System.Net.WebUtility.HtmlEncode(System.IO.File.ReadAllText(logFilePath));
+				//}
 			}
 
 			return viewModel;

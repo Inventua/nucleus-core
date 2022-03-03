@@ -178,6 +178,7 @@ input[type=search]
   display: flex;
   flex-direction: column;
   flex-basis: 100%;
+  align-self: flex-start;
 }
 
 /* override bootstrap breadcrumb style */

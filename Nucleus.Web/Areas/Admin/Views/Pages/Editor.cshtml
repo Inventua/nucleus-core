@@ -5,6 +5,19 @@
 @using Nucleus.Abstractions.Models
 @using (Html.BeginAreaForm("Save", "Pages", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @autocomplete = "off" }))
 {
+	<div class="position-absolute end-0">
+		<button class="btn btn-success nucleus-open-page">Open</button>
+		@if (Model.Page.Id != Guid.Empty && !Model.Page.IsFirst)
+		{
+			@Html.SubmitButton("&#xe5d8;", "Move Up", Url.AreaAction("MovePageUp", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @data_target = ".nucleus-adminpage" })
+		}
+
+		@if (Model.Page.Id != Guid.Empty && !Model.Page.IsLast)
+		{
+			@Html.SubmitButton("&#xe5db;", "Move Down", Url.AreaAction("MovePageDown", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @data_target = ".nucleus-adminpage" })
+		}
+	</div>
+
 	<Tab>
 		<TabItem active="true" target="#page-properties" caption="Properties"></TabItem>
 		<TabItem target="#page-permissions" caption="Permissions"></TabItem>
@@ -18,17 +31,7 @@
 		<TabPanel id="page-properties" active="true">
 			<fieldset role="group" aria-labelledby="heading">
 
-				<div class="text-end">
-					@if (Model.Page.Id != Guid.Empty && !Model.Page.IsFirst)
-					{
-						@Html.SubmitButton("&#xe5d8;", "Move Up", Url.AreaAction("MovePageUp", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @data_target = ".nucleus-adminpage" })
-					}
-
-					@if (Model.Page.Id != Guid.Empty && !Model.Page.IsLast)
-					{
-						@Html.SubmitButton("&#xe5db;", "Move Down", Url.AreaAction("MovePageDown", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @data_target = ".nucleus-adminpage" })
-					}
-				</div>
+				
 				<h2>Basic Properties</h2>
 				@Html.HiddenFor((model) => model.PageEditorMode)
 				@Html.HiddenFor(model => model.Page.Id)
@@ -164,6 +167,12 @@
 		}			
 	})
 	
+	// functionality for the "open" button
+	jQuery('.nucleus-open-page').on('click', function()
+	{
+		window.parent.document.dispatchEvent(new CustomEvent('Open', { detail: { target: '/?pageid=@Model.Page.Id' } }));
+	});
+
 	// Read the child pages of the item containing the "+" button
 	jQuery('#page-properties').on('click', '.nucleus-get-childpages', function (e)
 	{

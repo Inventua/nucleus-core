@@ -72,8 +72,8 @@
 								<td>@task.ScheduledTask.Name</td>
 								<td>@task.Progress?.Status</td>
 								<td>@task.Progress?.Message</td>
-						</tr>
-					}
+							</tr>
+						}
 					</table>
 				}
 				else
@@ -85,21 +85,21 @@
 
 		@*<TabPanel id="system-webserver">
 			<table class="table">
-				@foreach (var keyValue in Model.WebServerInformation)
-				{
-					<tr>
-						<td class="text-nowrap fw-bold">@keyValue.Key</td>
-						<td>@keyValue.Value</td>
-					</tr>
-				}
-				</table>
-		</TabPanel>*@
+			@foreach (var keyValue in Model.WebServerInformation)
+			{
+			<tr>
+			<td class="text-nowrap fw-bold">@keyValue.Key</td>
+			<td>@keyValue.Value</td>
+			</tr>
+			}
+			</table>
+			</TabPanel>*@
 
 		@*<TabPanel id="system-configuration">
 			<div class="LogContent">
-				<pre>@Model.Configuration</pre>
+			<pre>@Model.Configuration</pre>
 			</div>
-		</TabPanel>*@
+			</TabPanel>*@
 
 		<TabPanel id="system-database">
 			<table class="table">
@@ -118,27 +118,35 @@
 					<tr>
 						<td colspan="3">
 							<table class="border border-1 table">
-							@foreach (var keyValue in connection.DatabaseInformation)
-							{
-								<tr>
-									<td class="text-nowrap fw-bold">@keyValue.Key</td>
-									<td>@keyValue.Value</td>
-								</tr>
-							}
+								@foreach (var keyValue in connection.DatabaseInformation)
+								{
+									<tr>
+										<td class="text-nowrap fw-bold">@keyValue.Key</td>
+										<td>@keyValue.Value</td>
+									</tr>
+								}
 							</table>
 						</td>
 					</tr>
 				}
 			</table>
 
-			
+
 		</TabPanel>
 
 		<TabPanel id="system-logs">
-			@using (Html.BeginAreaForm("GetLogFile", "System", "Admin", FormMethod.Post, new { @data_target = ".LogContent pre", @autocomplete = "off" }))
+			@using (Html.BeginAreaForm("GetLogFile", "System", "Admin", FormMethod.Post, new { @data_target = ".LogContent", @autocomplete = "off" }))
 			{
 				@Html.DropDownListFor(model => model.LogFile, new SelectList(Model.LogFiles, "Filename", "Title"), "(select)", new { @class = "LogFile" })
-				<div class="LogContent"><pre>@Model.LogContent</pre></div>
+				@*<div class="LogContent"><pre>@Model.LogContent</pre></div>*@
+				<div class="LogContent">
+					@if (String.IsNullOrEmpty(Model.LogMessage))
+					{
+						@Model.LogMessage
+					}
+
+					@await Html.PartialAsync("_Log", Model)
+				</div>
 			}
 		</TabPanel>
 	</TabContent>

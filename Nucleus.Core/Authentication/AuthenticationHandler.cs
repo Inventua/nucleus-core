@@ -89,7 +89,7 @@ namespace Nucleus.Core.Authentication
 					{
 						if (userSession.SlidingExpiry)
 						{
-							Logger.LogInformation("Session {sessionId} is valid, updating sliding expiration.", sessionId);
+							Logger.LogTrace("Session {sessionId} is valid, updating sliding expiration.", sessionId);
 
 							userSession.ExpiryDate = DateTime.UtcNow.Add(this.Options.SlidingExpirationTimeSpan);
 							

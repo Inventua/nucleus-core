@@ -51,7 +51,7 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpGet]
 		[HttpPost]
 		public async Task<ActionResult> Index(ViewModels.Admin.SystemIndex viewModelInput)
-		{					
+		{
 			ViewModels.Admin.SystemIndex viewModelOutput = new()
 			{
 				Server = Environment.MachineName,
@@ -64,20 +64,23 @@ namespace Nucleus.Web.Controllers.Admin
 				LogFile = viewModelInput.LogFile
 			};
 
+			viewModelOutput.LogMessage = "";
+
+
 			if (!String.IsNullOrEmpty(this.LogFolderPath) && System.IO.Directory.Exists(this.LogFolderPath))
 			{
 				System.IO.DirectoryInfo logFolder = new(this.LogFolderPath);
 				Logger.LogTrace("Log folder {logFolderPath} exists, and contains {count} .log files.", this.LogFolderPath, logFolder.EnumerateFiles("*.log").Count());
-				
+
 				List<Nucleus.Web.ViewModels.Shared.LogFileInfo> logs = new();
 				foreach (System.IO.FileInfo file in logFolder.EnumerateFiles("*.log"))
 				{
 					System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(file.Name, LogFileConstants.LOGFILE_REGEX);
-					
+
 					if (match.Success && match.Groups.Count >= 3)
 					{
 						Logger.LogTrace("Log file {file.Name} matches the expected pattern.", file.Name);
-						
+
 						if (DateTime.TryParseExact(match.Groups[1].Value, LogFileConstants.DATE_FILENAME_FORMAT, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal, out DateTime logDate))
 						{
 							logs.Add(new Nucleus.Web.ViewModels.Shared.LogFileInfo()
@@ -100,25 +103,18 @@ namespace Nucleus.Web.Controllers.Admin
 
 				viewModelOutput.LogFiles = logs.OrderByDescending(log => log.LogDate).ToList();
 
-				if (!String.IsNullOrEmpty(viewModelInput.LogFile))
-				{
-					string logFilePath = System.IO.Path.Combine(this.LogFolderPath, viewModelInput.LogFile);
-					if (System.IO.File.Exists(logFilePath))
-					{
-						viewModelOutput.LogContent = System.Net.WebUtility.HtmlEncode(System.IO.File.ReadAllText(logFilePath));
-					}
-				}
+				viewModelOutput.LogContent = ReadLogFile(viewModelInput);
 			}
 			else
 			{
 				viewModelOutput.LogFiles = new();
 				if (String.IsNullOrEmpty(this.LogFolderPath))
 				{
-					viewModelOutput.LogContent = $"The text file log folder is not set.";
+					viewModelOutput.LogMessage = $"The text file log folder is not set.";
 				}
 				else if (!System.IO.Directory.Exists(this.LogFolderPath))
 				{
-					viewModelOutput.LogContent = $"The log folder {this.LogFolderPath} does not exist.";
+					viewModelOutput.LogMessage = $"The log folder {this.LogFolderPath} does not exist.";
 				}
 			}
 
@@ -137,7 +133,7 @@ namespace Nucleus.Web.Controllers.Admin
 					ViewModels.Admin.SystemIndex.DatabaseConnection databaseConnection = new ViewModels.Admin.SystemIndex.DatabaseConnection() { Schema = schema.Name, DatabaseType = connection.Type, ConnectionString = Sanitize(connection.ConnectionString) };
 					databaseConnection.DatabaseInformation = Nucleus.Data.Common.DataProviderExtensions.GetDataProviderInformation(ControllerContext.HttpContext.RequestServices, schema.Name);
 
-					connections.Add(databaseConnection);					
+					connections.Add(databaseConnection);
 				}
 				else
 				{
@@ -160,19 +156,41 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", viewModelOutput);
 		}
 
-		[HttpPost]
-		public ActionResult GetLogFile(ViewModels.Admin.SystemIndex viewModelInput)
+		private List<ViewModels.Admin.SystemIndex.LogEntry> ReadLogFile(ViewModels.Admin.SystemIndex viewModelInput)
 		{
+			List<ViewModels.Admin.SystemIndex.LogEntry> results = new();
+
 			if (!String.IsNullOrEmpty(viewModelInput.LogFile))
 			{
 				string logFilePath = System.IO.Path.Combine(this.LogFolderPath, viewModelInput.LogFile);
 				if (System.IO.File.Exists(logFilePath))
 				{
-					return File(System.Text.Encoding.UTF8.GetBytes(System.Net.WebUtility.HtmlEncode(System.IO.File.ReadAllText(logFilePath))), "text/plain");
+					foreach (string line in System.IO.File.ReadAllLines(logFilePath))
+					{
+						results.Add(new ViewModels.Admin.SystemIndex.LogEntry(line));
+					}
 				}
 			}
-			
-			return BadRequest();			
+
+			return results;
+		}
+
+		[HttpPost]
+		public ActionResult GetLogFile(ViewModels.Admin.SystemIndex viewModelInput)
+		{
+			viewModelInput.LogContent = ReadLogFile(viewModelInput);
+
+			return View("_Log", viewModelInput);
+
+			//if (!String.IsNullOrEmpty(viewModelInput.LogFile))
+			//{
+			//	string logFilePath = System.IO.Path.Combine(this.LogFolderPath, viewModelInput.LogFile);
+			//	if (System.IO.File.Exists(logFilePath))
+			//	{
+			//		return File(System.Text.Encoding.UTF8.GetBytes(System.Net.WebUtility.HtmlEncode(System.IO.File.ReadAllText(logFilePath))), "text/plain");
+			//	}
+			//}
+			//return BadRequest();
 		}
 
 		/// <summary>

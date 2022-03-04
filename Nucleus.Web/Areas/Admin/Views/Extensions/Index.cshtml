@@ -1,6 +1,6 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.Extensions
 <div class="ExtensionInstaller">
-	<h1>Extensions</h1>
+	<h1 class="nucleus-control-panel-heading">Extensions</h1>
 
 	@using (Html.BeginAreaForm("Upload", "Extensions", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
 	{

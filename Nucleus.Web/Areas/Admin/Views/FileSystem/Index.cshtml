@@ -6,7 +6,7 @@
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
 <div class="FileSystemManager">
-	<h2>Files</h2>
+	<h2 class="nucleus-control-panel-heading">Files</h2>
 
 	@using (Html.BeginAreaForm("Index", "FileSystem", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
 	{

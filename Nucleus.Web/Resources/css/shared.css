@@ -119,12 +119,6 @@ body
 	border: solid 2px red!important;
 }
 
-/* override Safari/IOS styling of input[type=search] */
-input[type=search]
-{
-  -webkit-appearance: none;
-}
-
 /* override bootstrap modal width constraints */
 .modal-auto-size.modal-dialog
 {
@@ -167,7 +161,7 @@ input[type=search]
 {
   border: 1px solid #dee2e6;
   border-top-width: 0;
-  padding: 1rem;
+  padding: 0.6rem;
   display: flex;
   flex-grow: 1;
   overflow: auto;

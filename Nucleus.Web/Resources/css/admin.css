@@ -71,9 +71,16 @@ body
 	cursor: default;
 }
 
+#nucleus-control-panel-heading
+{
+	font-size: 20px;
+	margin: 0 0 8px 0;
+	display: inline-block;
+}
+
 .nucleus-admin-content h1, .nucleus-admin-content h2, .nucleus-admin-content h3
 {
-	margin: 0 0 8px 0;	
+	margin: 0 0 6px 0;	
 }
 
 .nucleus-admin-content h1

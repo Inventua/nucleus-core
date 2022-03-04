@@ -25,3 +25,5 @@ A Control Panel extension is an MVC Controller/ViewModel/View, just like a modul
 | Scope            | Specifies whether the control panel extension is added to the `Manage` or `Settings` control panel.  The allowed values are `Site` or `Global`.  If your control panel extension saves settings for the current site, choose `Site`.  If your settings are for the entire Nucleus instance, choose `Global`. |
 | EditAction       | The name of the Controller Action to run when the user selects the control panel extension.  This action should render a View. |
 
+> If your control panel extension settings view has a header element with a `class="nucleus-control-panel-heading"`, Nucleus will automatically set the control panel editing area heading - which is in the same line
+as the panel close and black controls - to the value of your header element.  This is recommended, as it increases the vertical space available for your settings view contents.

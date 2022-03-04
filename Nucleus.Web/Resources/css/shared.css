@@ -119,10 +119,10 @@ body
 	border: solid 2px red!important;
 }
 
-/* override bootstrap styling of input[type=search] */
+/* override Safari/IOS styling of input[type=search] */
 input[type=search]
 {
-  outline-offset: unset;
+  -webkit-appearance: none;
 }
 
 /* override bootstrap modal width constraints */

@@ -39,19 +39,6 @@
 	flex: 1;
 }
 
-select
-{
-	appearance: none;
-	background: url(data:image/svg+xml;base64,PHN2ZyAKICAgICB2ZXJzaW9uPSIxLjEiIAogICAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgCiAgICAgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIAogICAgIHdpZHRoPSIxMHB4IiBoZWlnaHQ9IjZweCIgCiAgICAgdmlld0JveD0iMCAwIDEwIDYiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPiAKICAgPGc+IAo8aW1hZ2Ugd2lkdGg9IjEwIiBoZWlnaHQ9IjYiIHhsaW5rOmhyZWY9ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCwgCmlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFBb0FBQUFHQ0FZQUFBRDY4QS9HQUFBQUdYUkZXSFJUYjJaMGQyRnlaUUJCWkc5aVpTQkoKYldGblpWSmxZV1I1Y2NsbFBBQUFBRjVKUkVGVWVOcGN6TEVOd0RBSUJFREdTT2xSR0NPanBHUVR4c2dvS1JrakpmRWoyZnBRSUwyZQpBOGxNTWJNcklnNWtIblR1ZmlJWEVwRjNqUEV3UmxiVkd6dmdLb0Jta1FzelFsY2YxelhobkNnWmJkaHhSei9JdUNQTUo4QUFDZVdGCkp4dEtjTWNBQUFBQVNVVk9SSzVDWUlJPQoiLz4gCiAgIDwvZz4gCjwvc3ZnPgkK) no-repeat 99% 50%;	
-	outline: black;
-}
-
-input[type=text], input[type=button], input[type=search], input[type=button], input[type=tel], input[type=checkbox], input[type=email], input[type=password], input[type=date], input[type=datetime]
-{
-	-webkit-appearance: none;
-	-webkit-border-radius: 0;
-}
-
 .settings-control
 {
 	margin-bottom: 6px;
@@ -112,12 +99,36 @@ table input[type=radio]
 	width: auto;
 }
 
-fieldset input[type=text], fieldset input[type=email], fieldset input[type=tel], 
-fieldset input[type=search], fieldset input[type=url], 
-fieldset select, fieldset textarea
+/* This section is mostly to do with overriding Safari/IOS styling of various elements */
+input[type=text], input[type=email], input[type=tel], 
+input[type=search], input[type=url], 
+select, textarea
 {
 	padding: 2px;	
+	border: solid 1px black;
+	outline: black;
 }
+
+select
+{
+	appearance: none;
+	background: url(data:image/svg+xml;base64,PHN2ZyAKICAgICB2ZXJzaW9uPSIxLjEiIAogICAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgCiAgICAgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIAogICAgIHdpZHRoPSIxMHB4IiBoZWlnaHQ9IjZweCIgCiAgICAgdmlld0JveD0iMCAwIDEwIDYiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPiAKICAgPGc+IAo8aW1hZ2Ugd2lkdGg9IjEwIiBoZWlnaHQ9IjYiIHhsaW5rOmhyZWY9ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCwgCmlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFBb0FBQUFHQ0FZQUFBRDY4QS9HQUFBQUdYUkZXSFJUYjJaMGQyRnlaUUJCWkc5aVpTQkoKYldGblpWSmxZV1I1Y2NsbFBBQUFBRjVKUkVGVWVOcGN6TEVOd0RBSUJFREdTT2xSR0NPanBHUVR4c2dvS1JrakpmRWoyZnBRSUwyZQpBOGxNTWJNcklnNWtIblR1ZmlJWEVwRjNqUEV3UmxiVkd6dmdLb0Jta1FzelFsY2YxelhobkNnWmJkaHhSei9JdUNQTUo4QUFDZVdGCkp4dEtjTWNBQUFBQVNVVk9SSzVDWUlJPQoiLz4gCiAgIDwvZz4gCjwvc3ZnPgkK) no-repeat 99% 50%;	
+	outline: black;
+	color: black;
+}
+
+input[type=text], input[type=button], input[type=search], input[type=button], input[type=tel], input[type=checkbox], input[type=email], input[type=password], input[type=date], input[type=datetime]
+{
+	-webkit-appearance: none;
+	-webkit-border-radius: 0;
+}
+
+input[type=search], select
+{
+  appearance: none;
+	-webkit-appearance: none;
+}
+/********************/
 
 .settings-control input[type=checkbox]
 {

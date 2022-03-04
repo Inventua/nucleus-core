@@ -30,9 +30,8 @@
 	<TabContent>
 		<TabPanel id="page-properties" active="true">
 			<fieldset role="group" aria-labelledby="heading">
-
-				
-				<h2>Basic Properties</h2>
+								
+				@*<h2>Basic Properties</h2>*@
 				@Html.HiddenFor((model) => model.PageEditorMode)
 				@Html.HiddenFor(model => model.Page.Id)
 				@Html.HiddenFor((model) => model.Page.SortOrder)
@@ -74,7 +73,7 @@
 				<h2>Layout</h2>
 
 				<div class="nucleus-flex-fields">
-					<SettingsControl caption="Layout" helptext="Select a page layout for this page, or select '(default)' to use the default layout for this site.">
+					<SettingsControl caption="Page Layout" helptext="Select a page layout for this page, or select '(default)' to use the default layout for this site.">
 						@Html.DropDownListFor(model => model.Page.LayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
 					</SettingsControl>
 
@@ -102,7 +101,7 @@
 				<table>
 					<tr>
 						<th>Path</th>
-						<th>Type</th>
+						<th class="ps-1">Type</th>
 						<th class="text-center">Default</th>
 						<th></th>
 					</tr>
@@ -114,7 +113,7 @@
 						@Html.TextBoxFor(model => model.Page.Routes[urlCount].Path, (@Model.Page.Routes[urlCount].Id == Guid.Empty ? new { @class = "DefaultPagePath", @maxlength = 256 } : null))
 					</td>
 
-					<td>@Html.DropDownListFor(model => model.Page.Routes[urlCount].Type, Html.GetEnumSelectList<PageRoute.PageRouteTypes>())</td>
+					<td class="ps-1">@Html.DropDownListFor(model => model.Page.Routes[urlCount].Type, Html.GetEnumSelectList<PageRoute.PageRouteTypes>())</td>
 					<td class="text-center">@Html.RadioButtonFor(model => model.Page.DefaultPageRouteId, @Model.Page.Routes[urlCount].Id)</td>
 					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("DeletePageRoute", "Pages", "Admin", new { id = Model.Page.Routes[urlCount].Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target="form.parent()" /></td>
 				</tr>

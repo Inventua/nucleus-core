@@ -45,6 +45,15 @@ function _handleContentLoaded(event, page, target, data, url, triggerEvent, stat
 		}
 	}
 
+	// Set heading	
+	var heading = jQuery('.nucleus-control-panel-heading').first();
+	if (heading.length !== 0)
+	{
+		jQuery('#nucleus-control-panel-heading').html(heading.html());
+		jQuery('#nucleus-control-panel-heading').show();
+		heading.remove();
+	}
+
 	// Open/close (expand) the admin frame when the user clicks an icon
 	jQuery('.nucleus-control-panel .nucleus-control-panel-sidebar LI:not(#nucleus-edit-content-btn)').off('click.sidebar');
 	jQuery('.nucleus-control-panel .nucleus-control-panel-sidebar LI:not(#nucleus-edit-content-btn)').on('click.sidebar', AdminMenuItem_Click);

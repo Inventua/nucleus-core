@@ -117,7 +117,7 @@ select
 	color: black;
 }
 
-input[type=text], input[type=button], input[type=search], input[type=button], input[type=tel], input[type=checkbox], input[type=email], input[type=password], input[type=date], input[type=datetime]
+input[type=text], input[type=button], input[type=search], input[type=button], input[type=tel], input[type=email], input[type=password], input[type=date], input[type=datetime]
 {
 	-webkit-appearance: none;
 	-webkit-border-radius: 0;

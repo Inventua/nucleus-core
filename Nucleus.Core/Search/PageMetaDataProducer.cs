@@ -39,7 +39,7 @@ namespace Nucleus.Core.Search
 			{
 				foreach (Page page in (await this.PageManager.List(site)).Where(page => !page.Disabled))
 				{
-					Logger.LogInformation("Building meta-data for page {pageId}[{pageName}]", page.Id, page.Name);
+					Logger.LogInformation("Building meta-data for page {pageId} [{pageName}]", page.Id, page.Name);
 					// we have to .Get the site and page because the .List methods don't return fully-populated page objects
 					ContentMetaData metaData = await BuildContentMetaData(site, await this.PageManager.Get(page.Id));
 

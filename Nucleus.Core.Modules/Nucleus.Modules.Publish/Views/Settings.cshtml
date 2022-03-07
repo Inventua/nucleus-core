@@ -25,7 +25,6 @@
 			<table class="Articles">
 				<tr>
 					<th>Title</th>
-					<th>Description</th>
 				</tr>
 				@for (int articleCount = 0; articleCount < Model.Articles.Count; articleCount++)
 				{
@@ -35,7 +34,6 @@
 							@Model.Articles[articleCount].Title
 						</td>
 
-						<td>@Model.Articles[articleCount].Description</td>
 						<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("Edit", "Admin", "Publish")?id=@Model.Articles[articleCount].Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-secondary" data-target="#ArticleEditor" title="Edit" /></td>
 						<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("DeleteArticle", "Admin", "Publish")?id=@Model.Articles[articleCount].Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-confirm="Delete this article?" /></td>
 					</tr>

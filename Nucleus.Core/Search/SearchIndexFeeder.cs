@@ -77,7 +77,7 @@ namespace Nucleus.Core.Search
 								catch (Exception e)
 								{
 									// error in .Index implementation
-									this.Logger.LogError(e, "Error adding {0} to {1}.Index()", item.Url, searchIndexManager.GetType().FullName);
+									this.Logger.LogError(e, "Error adding {0} to index using {1}.Index()", item.Url, searchIndexManager.GetType().FullName);
 								}
 							}
 						}

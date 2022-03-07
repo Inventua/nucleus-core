@@ -674,16 +674,30 @@ ul.nucleus-control-panel-items a
 	background-color: #ccc;		
 }
 
-.nucleus-log-warning
+.nucleus-log-level
+{
+	display: block;
+	padding: 0 8px 0 8px;
+}
+
+.nucleus-log-level-warning
 {
 	background-color: #ffc107!important;
 	border-radius: 4px;
 }
 
-.nucleus-log-error
+.nucleus-log-level-error
 {
 	background-color: #dc3545!important;
+	color: white;
 	border-radius: 4px;
+}
+
+.nucleus-log-message
+{
+	max-height: 8rem;
+	text-overflow: ellipsis;
+	overflow: auto;
 }
 
 .text-break

@@ -71,11 +71,11 @@ namespace Nucleus.Core.Logging
 		{
 			if (exception != null)
 			{
-				return $"{DateTime.UtcNow:dd-MMM-yyyy HH:mm:ss.fffffff},{logLevel},{this.Category},{formatter(state, exception)} {exception.Message}: {exception.ToString().Replace(Environment.NewLine, "|")}";
+				return $"{DateTime.UtcNow:dd-MMM-yyyy HH:mm:ss.fffffff},{logLevel},{this.Category},{formatter(state, exception)} {exception.Message}: {exception.ToString()}".Replace(Environment.NewLine, "|");
 			}
 			else
 			{
-				return $"{DateTime.UtcNow:dd-MMM-yyyy HH:mm:ss.fffffff},{logLevel},{this.Category},{formatter(state, exception)}";
+				return $"{DateTime.UtcNow:dd-MMM-yyyy HH:mm:ss.fffffff},{logLevel},{this.Category},{formatter(state, exception)}".Replace(Environment.NewLine, "|");
 			}
 		}
 

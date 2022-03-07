@@ -188,7 +188,7 @@ namespace Nucleus.Modules.Publish
 		{
 			using (IArticlesDataProvider provider = this.DataProviderFactory.CreateProvider<IArticlesDataProvider>())
 			{
-				await provider .Save(module, article);
+				await provider.Save(module, article);
 				this.CacheManager.ArticleCache().Remove(article.Id);
 			}
 		}

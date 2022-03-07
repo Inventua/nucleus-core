@@ -16,7 +16,7 @@
 			</div>
 		</SettingsControl>
 
-		@if (Model.SourceFolder?.Files != null)
+		@if (Model.SourceFolder?.Files != null && Model.SourceFolder.Files.Any())
 		{
 			<SettingsControl caption="Default File" helptext="Select the default file to display.">
 				@Html.DropDownListFor(model => model.DefaultFile.Id, new SelectList(Model.SourceFolder?.Files, "Id", "Name"))

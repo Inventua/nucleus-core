@@ -127,7 +127,7 @@ namespace Nucleus.Core.Authentication
 			}
 			else
 			{
-				Logger.LogInformation("Session cookie blank or not present.");
+				Logger.LogTrace("Session cookie blank or not present.");
 			}
 
 			if (userSession != null)

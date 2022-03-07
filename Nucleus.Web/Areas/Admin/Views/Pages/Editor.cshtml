@@ -3,16 +3,23 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
+@if (Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default)
+{
+	<h1 class="nucleus-control-panel-heading">Page Settings</h1>
+}
 @using (Html.BeginAreaForm("Save", "Pages", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @autocomplete = "off" }))
 {
 	<div class="position-absolute end-0">
-		<button class="btn btn-success nucleus-open-page">Open</button>
-		@if (Model.Page.Id != Guid.Empty && !Model.Page.IsFirst)
+		@if (Model.Page.Id != Guid.Empty)
+		{
+			<button class="btn btn-success nucleus-open-page">Open</button>
+		}
+		@if (Model.PageEditorMode == Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default && Model.Page.Id != Guid.Empty && !Model.Page.IsFirst)
 		{
 			@Html.SubmitButton("&#xe5d8;", "Move Up", Url.AreaAction("MovePageUp", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @data_target = ".nucleus-adminpage" })
 		}
 
-		@if (Model.Page.Id != Guid.Empty && !Model.Page.IsLast)
+		@if (Model.PageEditorMode == Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default && Model.Page.Id != Guid.Empty && !Model.Page.IsLast)
 		{
 			@Html.SubmitButton("&#xe5db;", "Move Down", Url.AreaAction("MovePageDown", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @data_target = ".nucleus-adminpage" })
 		}

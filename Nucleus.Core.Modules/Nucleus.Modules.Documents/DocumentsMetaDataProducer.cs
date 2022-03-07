@@ -78,9 +78,10 @@ namespace Nucleus.Modules.Documents
 			if (page != null)
 			{
 				string pageUrl = UrlHelperExtensions.RelativePageLink(page);
+
 				if (!String.IsNullOrEmpty(pageUrl))
 				{
-					pageUri = new System.Uri(new System.Uri("http" + Uri.SchemeDelimiter + site.DefaultSiteAlias.Alias), pageUrl);
+					pageUri = new System.Uri(new System.Uri("http" + Uri.SchemeDelimiter + site.DefaultSiteAlias.Alias), pageUrl.Replace("~", ""));
 				}
 			}
 

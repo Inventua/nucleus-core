@@ -12,9 +12,9 @@
 		{
 			<tr>
 				<td>@entry.Date.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-				<td class="nucleus-log-@entry.Level.ToLower()">@entry.Level</td>
+				<td><span class="nucleus-log-level nucleus-log-level-@entry.Level.ToLower()">@entry.Level</span></td>
 				<td>@entry.Category</td>
-				<td class="text-break">@entry.Message</td>
+				<td class="text-break"><div class="nucleus-log-message">@entry.Message</div></td>
 			</tr>
 		}
 	</table>					

@@ -10,7 +10,10 @@
 	<Tab>
 		<TabItem target="#article-properties" caption="Properties" active="true"></TabItem>
 		<TabItem target="#article-body" caption="Content"></TabItem>
-		<TabItem target="#article-categories" caption="Categories"></TabItem>
+		@if (Model.Categories.Any())
+		{
+			<TabItem target="#article-categories" caption="Categories"></TabItem>
+		}
 		<TabItem target="#article-attachments" caption="Attachments"></TabItem>
 	</Tab>
 	<TabContent>
@@ -67,14 +70,17 @@
 		<TabPanel id="article-body">
 				@Html.TextAreaFor(model => model.Article.Body, new { @class = "HtmlEditorControl flex-fill" })
 		</TabPanel>
-		<TabPanel id="article-categories">
-			<fieldset role="group" aria-labelledby="heading">
-				<h2>Categories</h2>
-				<div class="article-categories">
-					@for (var categoryCount = 0; categoryCount < Model.Categories.Count; categoryCount++)
-					{
-						<label>
-							@Html.CheckBoxFor(model => model.Categories[categoryCount].IsSelected)
+
+		@if (Model.Categories.Any())
+		{
+			<TabPanel id="article-categories">
+				<fieldset role="group" aria-labelledby="heading">
+					<h2>Categories</h2>
+					<div class="article-categories">
+						@for (var categoryCount = 0; categoryCount < Model.Categories.Count; categoryCount++)
+						{
+							<label>
+								@Html.CheckBoxFor(model => model.Categories[categoryCount].IsSelected)
 							@Html.HiddenFor(model => model.Categories[categoryCount].Category.CategoryListItem.Id)
 							@Html.HiddenFor(model => model.Categories[categoryCount].Category.CategoryListItem.Name)
 							<span>@Model.Categories[categoryCount].Category.CategoryListItem.Name</span>
@@ -83,6 +89,7 @@
 				</div>
 			</fieldset>
 		</TabPanel>
+		}
 		<TabPanel id="article-attachments">
 			<fieldset role="group" aria-labelledby="heading">
 				<h2>Attachments</h2>

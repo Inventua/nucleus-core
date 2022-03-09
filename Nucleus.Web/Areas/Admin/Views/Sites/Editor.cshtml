@@ -35,13 +35,15 @@
 					@Html.TextBoxFor(model => model.Site.Name, new { @maxlength = 256 })
 				</SettingsControl>
 
-				<SettingsControl caption="Default Layout" helptext="Default presentation layout for the site.  Pages which do not specify a layout use the site default.">
-					@Html.DropDownListFor(model => model.Site.DefaultLayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
-				</SettingsControl>
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Default Layout" helptext="Default presentation layout for the site.  Pages which do not specify a layout use the site default.">
+						@Html.DropDownListFor(model => model.Site.DefaultLayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
+					</SettingsControl>
 
-				<SettingsControl caption="Default Container" helptext="Default module container for the site.  Modules which which do not specify a layout use the page default, and if the page default is not set they use the site default container.">
-					@Html.DropDownListFor((model) => model.Site.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
-				</SettingsControl>
+					<SettingsControl caption="Default Container" helptext="Default module container for the site.  Modules which which do not specify a layout use the page default, and if the page default is not set they use the site default container.">
+						@Html.DropDownListFor((model) => model.Site.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
+					</SettingsControl>
+				</div>
 
 				@if (Model.Site.Id == Guid.Empty)
 				{
@@ -109,7 +111,6 @@
 							unable to see the icon.
 						</div>
 					}
-
 
 					@Html.HiddenFor(model => model.Site.AdministratorsRole.Name)
 					@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Name)

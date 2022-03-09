@@ -1,6 +1,7 @@
 ﻿@model Nucleus.Modules.Forums.ViewModels.ViewForumPost
 @using Nucleus.Abstractions
 @using Nucleus.ViewFeatures
+@using Nucleus.Extensions
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Forums.ViewModels
 <div class="Forums">
@@ -66,9 +67,9 @@
 				}
 
 				<div class="AdminTools">
-					@if (Model.CanEditPost && Model.Forum.Settings.StatusList != null)
+					@if (Model.CanEditPost && Model.Forum.EffectiveSettings().StatusList != null)
 					{
-						@Html.DropDownListFor(model => model.Post.Status.Id, new SelectList(Model.Forum.Settings.StatusList.Items, "Id", "Name"), new { @data_autopostbackevent = "change" })
+						@Html.DropDownListFor(model => model.Post.Status.Id, new SelectList(Model.Forum.EffectiveSettings().StatusList.Items, "Id", "Name"), new { @data_autopostbackevent = "change" })
 					}
 					@if (Model.CanApprovePost && !Model.Post.IsApproved)
 					{

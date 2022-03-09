@@ -294,6 +294,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 			return await this.Context.Settings
 				.Where(settings => EF.Property<Guid>(settings, "RelatedId") == relatedId)
 				.Include(settings => settings.StatusList)
+					.ThenInclude(statuslist => statuslist.Items)
 				.Include(forum => forum.AttachmentsFolder)
 				.AsSplitQuery()
 				.FirstOrDefaultAsync();
@@ -550,7 +551,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			if (existing != null)
 			{
-				this.Context.Entry(existing).Property(existing => existing.Status).CurrentValue = value;
+				this.Context.Entry(existing).Reference(existing => existing.Status).CurrentValue = value;
 				await this.Context.SaveChangesAsync<Post>();
 			}
 		}

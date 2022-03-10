@@ -693,6 +693,11 @@ ul.nucleus-control-panel-items a
 	border-radius: 4px;
 }
 
+.nucleus-log-category
+{
+	color: #888;
+}
+
 .nucleus-log-message
 {
 	max-height: 8rem;

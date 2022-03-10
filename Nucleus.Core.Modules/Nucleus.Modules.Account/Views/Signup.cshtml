@@ -17,12 +17,14 @@
 			@*only show password field for a new user*@
 			@if (Model.User.Id == Guid.Empty)
 			{
-				<SettingsControl caption="Password" helptext="Enter a password for the user">
-					@Html.PasswordFor(model => model.NewPassword)
-				</SettingsControl>
-				<SettingsControl caption="Confirm Password" helptext="Confirm your new password">
-					@Html.PasswordFor(model => model.ConfirmPassword)
-				</SettingsControl>
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Password" helptext="Enter a password for the user">
+						@Html.PasswordFor(model => model.NewPassword)
+					</SettingsControl>
+					<SettingsControl caption="Confirm Password" helptext="Confirm your new password">
+						@Html.PasswordFor(model => model.ConfirmPassword)
+					</SettingsControl>
+				</div>
 			}
 			<h3>Profile</h3>
 

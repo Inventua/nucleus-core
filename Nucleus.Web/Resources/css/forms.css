@@ -100,9 +100,7 @@ table input[type=radio]
 }
 
 /* This section is mostly to do with overriding Safari/IOS styling of various elements */
-input[type=text], input[type=email], input[type=tel], 
-input[type=search], input[type=url], 
-select, textarea
+input[type=text], input[type=email], input[type=tel], input[type=search], input[type=url], input[type=password], select, textarea
 {
 	padding: 2px;	
 	border: solid 1px black;

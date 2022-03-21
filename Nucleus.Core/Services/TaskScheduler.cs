@@ -92,7 +92,7 @@ namespace Nucleus.Core.Services
 						{
 							if (!this.Queue.Contains(task))
 							{
-								StartScheduledTask(task);
+								await StartScheduledTask(task);
 							}
 						}
 					}
@@ -189,16 +189,16 @@ namespace Nucleus.Core.Services
 			}
 		}
 
-		private void TaskFailed(ScheduledTaskHistory history)
+		private async Task TaskFailed(ScheduledTaskHistory history)
 		{
 			history.Status = ScheduledTaskProgress.State.Error;
-			this.ScheduledTaskManager.SaveHistory(history);
+			await this.ScheduledTaskManager.SaveHistory(history);
 		}
 
-		private void TaskRunning(ScheduledTaskHistory history)
+		private async Task TaskRunning(ScheduledTaskHistory history)
 		{
 			history.Status = ScheduledTaskProgress.State.Running;
-			this.ScheduledTaskManager.SaveHistory(history);
+			await this.ScheduledTaskManager.SaveHistory(history);
 		}
 
 		private async Task TaskSucceeded(ScheduledTaskHistory history)
@@ -212,7 +212,7 @@ namespace Nucleus.Core.Services
 		/// Start the <see cref="IScheduledTask"/> represented by the specified <see cref="ScheduledTask"/>.
 		/// </summary>
 		/// <param name="task"></param>
-		void StartScheduledTask(ScheduledTask task)
+		async Task StartScheduledTask(ScheduledTask task)
 		{
 			using (System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope scope = Nucleus.Core.Plugins.AssemblyLoader.EnterExtensionContext(task.TypeName))
 			{
@@ -221,14 +221,15 @@ namespace Nucleus.Core.Services
 				history.Server = Environment.MachineName;
 				history.StartDate = DateTime.UtcNow;
 				history.Status = ScheduledTaskProgress.State.None;
-				this.ScheduledTaskManager.SaveHistory(history);
+				
+				await this.ScheduledTaskManager.SaveHistory(history);
 
 				System.Type serviceType = Type.GetType(task.TypeName);
 
 				if (serviceType == null)
 				{
 					this.Logger.LogError("Unable to find type {typeName}", task.TypeName);
-					TaskFailed(history);
+					await TaskFailed(history);
 					return;
 				}
 
@@ -237,7 +238,7 @@ namespace Nucleus.Core.Services
 				if (service == null)
 				{
 					this.Logger.LogError("Unable to create an instance of {typeName}", task.TypeName);
-					TaskFailed(history);
+					await TaskFailed(history);
 					return;
 				}
 
@@ -246,7 +247,7 @@ namespace Nucleus.Core.Services
 				if (taskService == null)
 				{
 					this.Logger.LogError("Unable to create an instance of {TypeName} because it does not implement IScheduledTask", task.TypeName);
-					TaskFailed(history);
+					await TaskFailed(history);
 					return;
 				}
 
@@ -265,7 +266,7 @@ namespace Nucleus.Core.Services
 				RunningTask runningTask = this.Queue.Add(task, history);
 				runningTask.OnProgress += HandleProgress;
 
-				TaskRunning(history);
+				await TaskRunning(history);
 
 
 				runningTask.Task = Task.Run(async () =>

@@ -107,15 +107,17 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 				if (childItem.HasChildren && childItem.Page.Id != disabledPageId)
 				{
-					TagBuilder expandlinkBuilder = new("button");
-					expandlinkBuilder.AddCssClass("btn nucleus-get-childpages nucleus-material-icon");
-					expandlinkBuilder.Attributes.Add("type", "button");
-					expandlinkBuilder.Attributes.Add("data-target", "this");
-					expandlinkBuilder.Attributes.Add("data-id", childItem.Page.Id.ToString());
-					//expandlinkBuilder.Attributes.Add("formaction", urlHelper.AreaAction("GetChildPages", "Pages", "Admin", new { id = childItem.Page.Id.ToString() }));
-					expandlinkBuilder.InnerHtml.SetHtmlContent("&#xe5cf;");
+					//TagBuilder expandlinkBuilder = new("button");
+					//expandlinkBuilder.AddCssClass("btn nucleus-get-childpages nucleus-material-icon");
+					//expandlinkBuilder.Attributes.Add("type", "button");
+					//expandlinkBuilder.Attributes.Add("data-target", "this");
+					//expandlinkBuilder.Attributes.Add("data-id", childItem.Page.Id.ToString());
+					////expandlinkBuilder.Attributes.Add("formaction", urlHelper.AreaAction("GetChildPages", "Pages", "Admin", new { id = childItem.Page.Id.ToString() }));
+					//expandlinkBuilder.InnerHtml.SetHtmlContent("&#xe5cf;");
 
-					itemBuilder.InnerHtml.AppendHtml(expandlinkBuilder);
+					/*itemBuilder.InnerHtml.AppendHtml(expandlinkBuilder);*/
+					itemBuilder.InnerHtml.AppendHtml(HtmlHelpers.PageMenuHtmlHelper.RenderExpandButton(childItem.Page, true));
+
 				}
 
 				if (childItem.Children != null && childItem.Children.Any())

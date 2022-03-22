@@ -41,7 +41,21 @@
 		// Add a ul to contain the new pages
 		Page.LoadPartialContent(e, '@Url.AreaAction("GetChildPages", "Pages", "Admin")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
 
-		// remove the "+" button
-		jQuery(this).remove();
+		// hide the "+" button
+		jQuery(this).removeClass('show');
+
 	});
+
+	// Hide the child pages of the item containing the "-" button
+	jQuery('.nucleus-index-wrapper').on('click', '.nucleus-hide-childpages', function (e)
+	{
+		// hide the "-" button
+		jQuery(this).removeClass('show');
+
+		// show the "+" button
+		jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
+
+		jQuery(this).closest('li').find('ul').remove();
+	});
+
 </script>

@@ -577,13 +577,15 @@ function _Page()
 			target.show();
 		}
 
-		// AG: Removed.  This is a unusual case (a submit within a modal returning content outside the modal), and it causes problems with "insert image" in the html editor
-		// control because it closes the editor modal dialog when you choose a file.
-		//if (!target.is('.modal, .modal-body') && data !== '' && jQuery('.modal').is(':visible'))
-		//{
-			// a modal is visible, data is non-blank, target is not .modal or one of its descendants, hide the modal
-			/*jQuery('.modal:visible').modal('hide');*/
-		//}
+		if (!target.is('.modal, .modal-body') && data !== '' && jQuery('.modal').is(':visible'))
+		{
+			// Check for the Nucleus trumbowyg insert image plugin to prevent the editor modal dialog from closing when you choose a file.
+			if (source.closest('.nucleus-fileselectorform').length === 0)
+			{
+				// a modal is visible, data is non-blank, target is not .modal or one of its descendants, hide the modal
+				jQuery('.modal:visible').modal('hide');
+			}
+		}
 
 		if (target.parents('.modal').length !== 0)
 		{

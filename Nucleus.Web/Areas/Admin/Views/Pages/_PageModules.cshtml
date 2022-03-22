@@ -1,7 +1,10 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.PageEditor
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Abstractions;
-@if (Model.Page.Modules.Count > 0)
+@if (Model.Page.Modules.Count == 0)
+{	<div class="alert alert-primary" role="alert">This page does not have any modules. Click "Add Module" to add a new module.</div>
+}
+else
 {
 <table>
 	<tr>

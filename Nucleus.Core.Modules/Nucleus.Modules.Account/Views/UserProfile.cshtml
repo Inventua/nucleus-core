@@ -9,12 +9,8 @@
 	<fieldset aria-label="User Profile">
 		@Html.HiddenFor((model) => model.ReturnUrl)
 		@Html.HiddenFor(model => model.User.Id)
-		<div>
-			<label>
-				<span>User Name</span>
-				<span>@Model.User.UserName</span>
-			</label>
-		</div>
+		<h3>User Name</h3>
+		<div>@Model.User.UserName</div>
 
 		<h3>Profile</h3>
 

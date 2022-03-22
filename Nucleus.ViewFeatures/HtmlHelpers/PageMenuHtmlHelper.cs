@@ -62,7 +62,11 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			linkBuilder.Attributes.Add("data-id", fromPage.Id.ToString());
 			linkBuilder.Attributes.Add("data-linkurl", urlHelper.PageLink(fromPage));
 			linkBuilder.InnerHtml.SetContent(caption);
+
 			outputBuilder.AppendHtml(linkBuilder);
+						
+			outputBuilder.AppendHtml(RenderExpandButton(fromPage, false));
+			outputBuilder.AppendHtml(RenderCollapseButton(fromPage, true));
 
 			TagBuilder listBuilder = new("ul");
 			AddChildren(urlHelper, listBuilder, pages, Guid.Empty, maxLevels, 0, htmlAttributes);
@@ -103,13 +107,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
 				if (childItem.HasChildren)
 				{
-					TagBuilder expandlinkBuilder = new("button");
-					expandlinkBuilder.AddCssClass("btn nucleus-get-childpages nucleus-material-icon");
-					expandlinkBuilder.Attributes.Add("type", "button");
-					expandlinkBuilder.Attributes.Add("data-id", childItem.Page.Id.ToString());
-					expandlinkBuilder.InnerHtml.SetHtmlContent("&#xe5cf;");
-
-					itemBuilder.InnerHtml.AppendHtml(expandlinkBuilder);
+					itemBuilder.InnerHtml.AppendHtml(RenderExpandButton(childItem.Page, true));
 				}
 
 				if (childItem.Children != null && childItem.Children.Any())
@@ -119,6 +117,29 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 					itemBuilder.InnerHtml.AppendHtml(childList);
 				}
 			}
+		}
+
+
+		private static TagBuilder RenderExpandButton(Page page, Boolean show)
+		{
+			TagBuilder expandlinkBuilder = new("button");
+			expandlinkBuilder.AddCssClass($"btn nucleus-get-childpages nucleus-material-icon collapse{(show ? " show" : "")}");
+			expandlinkBuilder.Attributes.Add("type", "button");
+			expandlinkBuilder.Attributes.Add("data-id", page.Id.ToString());
+			expandlinkBuilder.InnerHtml.SetHtmlContent("&#xe5cc;");
+
+			return expandlinkBuilder;
+		}
+
+		private static TagBuilder RenderCollapseButton(Page page, Boolean show)
+		{
+			TagBuilder collapselinkBuilder = new("button");
+			collapselinkBuilder.AddCssClass($"btn nucleus-hide-childpages nucleus-material-icon collapse{(show ? " show" : "")}");
+			collapselinkBuilder.Attributes.Add("type", "button");
+			collapselinkBuilder.Attributes.Add("data-id", page.Id.ToString());
+			collapselinkBuilder.InnerHtml.SetHtmlContent("&#xe5cf;");
+
+			return collapselinkBuilder;
 		}
 	}
 }

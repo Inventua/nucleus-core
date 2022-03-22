@@ -450,7 +450,7 @@ ul.nucleus-control-panel-items a
 	height: 100%;
 	overflow-y: auto;
 	/*margin-top: 2px;*/
-	padding: 4px;
+	padding: 4px 0 4px 4px;
 	border: solid 1px #AAA;
 }
 
@@ -471,6 +471,7 @@ ul.nucleus-control-panel-items a
 	display: flex;	
 	list-style-type: none;
 	flex-wrap: wrap;
+	justify-content: flex-end;
 }
 
 .nucleus-index-items li a
@@ -498,7 +499,8 @@ ul.nucleus-control-panel-items a
 	border-radius: 0;
 }
 
-.nucleus-index-items li.selected > a, .nucleus-index-items li.selected > a:hover, .nucleus-index-items li.selected > a:active, .nucleus-index-items li.selected > button
+.nucleus-index-items li.selected > a, .nucleus-index-items li.selected > a:hover, .nucleus-index-items li.selected > a:active
+/*, .nucleus-index-items li.selected > button*/
 {
 	background-color: #197ba4;
 	color: white;

@@ -7,23 +7,17 @@
 		Nucleus Default Layouts and Containers
 	</description>
 	<compatibility minVersion="1.0.0.0" maxVersion="*" />
-	
-	<!-- the default layouts and containers are always present (in /Shared).  This package contains definitions only -->
+
+
 	<components>
 		<component folderName="DefaultLayouts" optional="false">
+			<!-- 
+				The default layout and container (both named default.cshtml) are always present (in /Shared), so they are not present in this project (this manifest 
+				creates the database entries for them).  The other layouts and containers are "normal" and are part of this project.
+			-->
 			<layoutDefinition id="2FF6818A-09FE-4EE2-BEFF-495A876AB6D6">
 				<friendlyName>Default</friendlyName>
 				<relativePath>Shared\Layouts\default.cshtml</relativePath>
-			</layoutDefinition>
-
-			<layoutDefinition id="DFAFC982-5CCE-4E09-91F3-A01B9130F1A2">
-				<friendlyName>Default 3 Column</friendlyName>
-				<relativePath>Shared\Layouts\default-3-column.cshtml</relativePath>
-			</layoutDefinition>
-
-			<layoutDefinition id="07F3C7F2-97E6-46D3-8218-1E02CBBB5CF2">
-				<friendlyName>Default 2 Column</friendlyName>
-				<relativePath>Shared\Layouts\default-2-column.cshtml</relativePath>
 			</layoutDefinition>
 
 			<containerDefinition id="80A7F079-F61D-42A4-9A4B-DA7692415952">
@@ -31,16 +25,46 @@
 				<relativePath>Shared\Containers\default.cshtml</relativePath>
 			</containerDefinition>
 
+			<!-- Regular layouts and containers  -->
+			<layoutDefinition id="DFAFC982-5CCE-4E09-91F3-A01B9130F1A2">
+				<friendlyName>Default 3 Column</friendlyName>
+				<relativePath>Layouts\default-3-column.cshtml</relativePath>
+			</layoutDefinition>
+
+			<layoutDefinition id="07F3C7F2-97E6-46D3-8218-1E02CBBB5CF2">
+				<friendlyName>Default 2 Column</friendlyName>
+				<relativePath>Layouts\default-2-column.cshtml</relativePath>
+			</layoutDefinition>
+
 			<containerDefinition id="006CF94A-8279-4054-8EC2-4E0CAEBE77C7">
 				<friendlyName>No Title</friendlyName>
-				<relativePath>Shared\Containers\no-title.cshtml</relativePath>
+				<relativePath>Containers\no-title.cshtml</relativePath>
 			</containerDefinition>
-			
+
 			<containerDefinition id="CC0B83AC-A2D4-426F-B455-1715102D4A5E">
 				<friendlyName>No Container</friendlyName>
-				<relativePath>Shared\Containers\no-container.cshtml</relativePath>
+				<relativePath>Containers\no-container.cshtml</relativePath>
 			</containerDefinition>
+
+			<containerDefinition id="75316C9F-2803-4597-B952-011C15A15758">
+				<friendlyName>Centered</friendlyName>
+				<relativePath>Containers\centered.cshtml</relativePath>
+			</containerDefinition>
+
+			<folder name="Layouts">
+				<file name="_banner.cshtml" />
+				<file name="default-2-column.cshtml" />
+				<file name="default-2-column.css" />
+				<file name="default-3-column.cshtml" />
+				<file name="default-3-column.css" />
+			</folder>
+
+			<folder name="Containers">
+				<file name="centered.cshtml" />
+				<file name="no-container.cshtml" />
+				<file name="no-title.cshtml" />
+			</folder>
 		</component>
 	</components>
-	
+
 </package>

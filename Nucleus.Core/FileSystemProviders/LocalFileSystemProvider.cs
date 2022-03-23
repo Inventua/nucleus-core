@@ -26,7 +26,7 @@ namespace Nucleus.Core.FileSystemProviders
 		private IOptions<FileSystemProviderFactoryOptions> GlobalOptions { get; }
 		private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
 
-		public LocalFileSystemProvider(IOptions<FileSystemProviderFactoryOptions> globalOptions, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)  
+		public LocalFileSystemProvider(IOptions<FileSystemProviderFactoryOptions> globalOptions, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
 		{
 			this.GlobalOptions = globalOptions;
 			this.FolderOptions = folderOptions;
@@ -38,7 +38,7 @@ namespace Nucleus.Core.FileSystemProviders
 		/// <param name="configSection"></param>
 		public override void Configure(IConfigurationSection configSection, string homeDirectory)
 		{
-			configSection.Bind(this.Options);			
+			configSection.Bind(this.Options);
 
 			if (System.IO.Path.IsPathRooted(homeDirectory))
 			{
@@ -81,9 +81,9 @@ namespace Nucleus.Core.FileSystemProviders
 			else
 			{
 				string relativePath = path.Replace(this.Options.RootFolder, "");
-				if (relativePath.StartsWith (System.IO.Path.DirectorySeparatorChar) || relativePath.StartsWith(System.IO.Path.AltDirectorySeparatorChar))
+				if (relativePath.StartsWith(System.IO.Path.DirectorySeparatorChar) || relativePath.StartsWith(System.IO.Path.AltDirectorySeparatorChar))
 				{
-					if (relativePath.Length>1)
+					if (relativePath.Length > 1)
 					{
 						// remove leading "/"
 						return relativePath[1..];
@@ -102,7 +102,7 @@ namespace Nucleus.Core.FileSystemProviders
 		}
 
 		public override Folder CreateFolder(string parentPath, string newFolder)
-		{			
+		{
 			if (PathUtils.PathNavigatesAboveRoot(parentPath) || PathUtils.HasInvalidPathChars(parentPath))
 			{
 				throw new ArgumentException("Invalid parent path.", nameof(parentPath));
@@ -149,12 +149,12 @@ namespace Nucleus.Core.FileSystemProviders
 			if (folderInfo.Exists)
 			{
 				// item is a folder
-				return BuildFolder(folderInfo);			
+				return BuildFolder(folderInfo);
 			}
 			else
 			{
 				throw new System.IO.FileNotFoundException();
-			}			
+			}
 		}
 
 		public override File GetFile(string path)
@@ -175,7 +175,7 @@ namespace Nucleus.Core.FileSystemProviders
 			{
 				// file not found
 				throw new System.IO.FileNotFoundException();
-			}			
+			}
 		}
 
 		/// <summary>
@@ -193,7 +193,7 @@ namespace Nucleus.Core.FileSystemProviders
 		public override System.IO.Stream GetFileContents(string path)
 		{
 			File file = GetFile(path);
-			
+
 			if (file == null)
 			{
 				throw new System.IO.FileNotFoundException();
@@ -234,7 +234,7 @@ namespace Nucleus.Core.FileSystemProviders
 				.Where(item => String.IsNullOrEmpty(pattern) || System.Text.RegularExpressions.Regex.IsMatch(item.Name, pattern)))
 			{
 				//if (this.Options.AllowedTypes.Contains(item.Extension, StringComparer.OrdinalIgnoreCase))
-				if (this.GlobalOptions.Value.AllowedFileTypes.Where(allowed=>allowed.FileExtensions.Contains(item.Extension, StringComparer.OrdinalIgnoreCase)).Any())
+				if (this.GlobalOptions.Value.AllowedFileTypes.Where(allowed => allowed.FileExtensions.Contains(item.Extension, StringComparer.OrdinalIgnoreCase)).Any())
 				{
 					result.Files.Add(BuildFile(item));
 				}
@@ -278,8 +278,8 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 
 			newPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(path), newName);
-			
-			System.IO.Directory.Move(BuildPath(path), BuildPath(newPath));						
+
+			System.IO.Directory.Move(BuildPath(path), BuildPath(newPath));
 
 			return this.GetFolder(newPath);
 		}
@@ -303,7 +303,7 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 
 			string targetPath = System.IO.Path.Combine(BuildPath(parentPath), newFileName);
-			
+
 			if (!overwrite && System.IO.File.Exists(targetPath))
 			{
 				throw new System.IO.IOException("The file already exists.");
@@ -321,7 +321,7 @@ namespace Nucleus.Core.FileSystemProviders
 		{
 			return new File()
 			{
-				Provider=this.Key,
+				Provider = this.Key,
 				Path = BuildRelativePath(fileItem.FullName),
 				Name = fileItem.Name,
 				DateModified = fileItem.LastWriteTimeUtc,
@@ -343,7 +343,9 @@ namespace Nucleus.Core.FileSystemProviders
 					Name = "/",
 					DateModified = folderItem.LastWriteTimeUtc,
 					Parent = new Folder() { Provider = this.Key, Path = "" },
-					Capabilities = BuildFolderCapabilities()
+					Capabilities = BuildFolderCapabilities(),
+					FolderValidationRules = BuildFolderValidationRules(),
+					FileValidationRules = BuildFileValidationRules()
 				};
 			}
 			else
@@ -355,47 +357,49 @@ namespace Nucleus.Core.FileSystemProviders
 					Name = folderItem.Name,
 					DateModified = folderItem.LastWriteTimeUtc,
 					Parent = new Folder { Provider = this.Key, Path = BuildRelativePath(folderItem.Parent.FullName) },
-					Capabilities = BuildFolderCapabilities(),					
-					FolderValidationRules = new FileSystemValidationRule[]
-					{
-						new FileSystemValidationRule()
-						{
-							ValidationExpression = "^(?!CON|PRN|AUX|NUL|LPT|COM|).*$" , ErrorMessage = "Folder names cannot start with CON, PRN, AUX, NUL, LPT or COM.",
-						},
-						new FileSystemValidationRule()
-						{
-							ValidationExpression = "^(?!COM).*$" , ErrorMessage = "Folder names cannot start with COM.",
-						},
-						new FileSystemValidationRule()
-						{
-							ValidationExpression = "^[^<>:\"|?*]+$" , ErrorMessage = "Folder names cannot contain any of the <, >, :, \" | ? or * characters.",
-						},
-						new FileSystemValidationRule()
-						{
-							ValidationExpression = "^[^\\/\\\\]+$" , ErrorMessage = "Folder names cannot contain the '/' or '\\' character.",
-						}
-					},
-					FileValidationRules = new FileSystemValidationRule[]
-					{
-						new FileSystemValidationRule()
-						{
-							ValidationExpression = "^(?!CON|PRN|AUX|NUL|LPT|COM|).*$" , ErrorMessage = "File names cannot start with CON, PRN, AUX, NUL, LPT or COM.",
-						},
-						new FileSystemValidationRule()
-						{
-							ValidationExpression = "^(?!COM).*$" , ErrorMessage = "File names cannot start with COM.",
-						},
-						new FileSystemValidationRule()
-						{
-							ValidationExpression = "^[^<>:\"|?*]+$" , ErrorMessage = "File names cannot contain any of the <, >, :, \" | ? or * characters.",
-						},
-						new FileSystemValidationRule()
-						{
-							ValidationExpression = "^[^\\/\\\\]+$" , ErrorMessage = "File names cannot contain the '/' or '\\' character.",
-						}
-					}
+					Capabilities = BuildFolderCapabilities(),
+					FolderValidationRules = BuildFolderValidationRules(),
+					FileValidationRules = BuildFileValidationRules()
 				};
 			}
+		}
+
+		private FileSystemValidationRule[] BuildFolderValidationRules()
+		{
+			return new FileSystemValidationRule[]
+			{
+				new FileSystemValidationRule()
+				{
+					ValidationExpression = "^(?!CON|PRN|AUX|NUL|LPT|COM)" , ErrorMessage = "Folder names cannot start with CON, PRN, AUX, NUL, LPT or COM.",
+				},
+				new FileSystemValidationRule()
+				{
+					ValidationExpression = "^[^<>:\"|?*]+$" , ErrorMessage = "Folder names cannot contain any of the <, >, :, \" | ? or * characters.",
+				},
+				new FileSystemValidationRule()
+				{
+					ValidationExpression = "^[^\\/\\\\]+$" , ErrorMessage = "Folder names cannot contain the '/' or '\\' character.",
+				}
+			};
+		}
+
+		private FileSystemValidationRule[] BuildFileValidationRules()
+		{
+			return new FileSystemValidationRule[]
+			{
+				new FileSystemValidationRule()
+				{
+					ValidationExpression = "^(?!CON|PRN|AUX|NUL|LPT|COM)" , ErrorMessage = "File names cannot start with CON, PRN, AUX, NUL, LPT or COM.",
+				},
+				new FileSystemValidationRule()
+				{
+					ValidationExpression = "^[^<>:\"|?*]+$" , ErrorMessage = "File names cannot contain any of the <, >, :, \" | ? or * characters.",
+				},
+				new FileSystemValidationRule()
+				{
+					ValidationExpression = "^[^\\/\\\\]+$" , ErrorMessage = "File names cannot contain the '/' or '\\' character.",
+				}
+			};
 		}
 
 		private FileSystemItemCapabilities BuildFolderCapabilities()

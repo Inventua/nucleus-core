@@ -83,7 +83,19 @@ function _Page()
 			{
 				jQuery('.dropdown-menu').not(subMenu.parents()).removeClass('show');
 			}
-			subMenu.addClass('show');
+
+			subMenu.on('shown.bs.collapse', function ()
+			{
+				subMenu.css('margin-left', '');
+				var overflowpx = jQuery(window).width() - (subMenu.offset().left + subMenu.outerWidth(true));
+
+				if (overflowpx < 0)
+				{
+					subMenu.css('margin-left', overflowpx);
+				}
+			})
+
+			subMenu.collapse('show');
 
 			return false;
 		});

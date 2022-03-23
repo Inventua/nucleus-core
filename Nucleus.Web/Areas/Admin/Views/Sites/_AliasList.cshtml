@@ -15,7 +15,7 @@
 	{
 		<tr>
 			<td>@(String.IsNullOrEmpty(alias.Alias) ? "(default)" : alias.Alias)</td>
-			<td class="text-center">@Html.RadioButtonFor(model => model.Site.DefaultSiteAlias.Id, alias.Id)</td>
+			<td class="text-center">@Html.RadioButtonFor(model => model.Site.DefaultSiteAlias.Id, alias.Id, new {@id = ""})</td>
 			<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("EditAlias", "Sites", "Admin")?id=@alias.Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-secondary" data-target="#PopupDialog .modal-body" /></td>
 			<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("DeleteAlias", "Sites", "Admin")?id=@alias.Id" value="&#xe14c;" title="Delete Alias" class="nucleus-material-icon btn btn-danger" data-target="#AliasList" data-confirm="If you delete this site alias, the site will no longer respond to requests which use this alias.  Do you want to delete this alias?" /></td>
 		</tr>

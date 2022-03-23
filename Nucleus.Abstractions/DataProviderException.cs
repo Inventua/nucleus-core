@@ -7,15 +7,18 @@ using System.Threading.Tasks;
 namespace Nucleus.Abstractions
 {
 	/// <summary>
-	/// 
+	///	Represents a parsed "friendly" error message derived from a DbException.
 	/// </summary>
+	/// <remarks>
+	/// This type is intended for use by the Nucleus core only.
+	/// </remarks>
 	public class DataProviderException : Exception
 	{
 		/// <summary>
-		/// 
+		/// Constructor.
 		/// </summary>
-		/// <param name="message"></param>
-		/// <param name="ex"></param>
+		/// <param name="message">Friendly error message.</param>
+		/// <param name="ex">Original exception.</param>
 		public DataProviderException(string message, Exception ex) : base(message, ex) 
 		{
 			

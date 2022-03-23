@@ -582,9 +582,17 @@ namespace Nucleus.Core.DataProviders
 				.FirstOrDefaultAsync();
 
 			if (result != null)
-			{ 
+			{
+				if (result.Routes != null)
+				{ 
+					foreach (PageRoute pageRoute in result.Routes)
+					{
+						this.Context.Remove(pageRoute);
+					}
+				}
+
 				this.Context.Remove(result);
-				await this.Context.SaveChangesAsync<Page>();
+				await this.Context.SaveChangesAsync();
 			}
 		}
 		#endregion

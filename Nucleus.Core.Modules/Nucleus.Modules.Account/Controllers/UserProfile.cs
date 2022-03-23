@@ -56,6 +56,8 @@ namespace Nucleus.Modules.Account.Controllers
 		[HttpPost]
 		public async Task<ActionResult> SaveAccountSettings(ViewModels.UserProfile viewModel)
 		{
+			this.ControllerContext.ModelState.Remove("User.UserName");
+
 			if (!ControllerContext.ModelState.IsValid)
 			{
 				return BadRequest(ControllerContext.ModelState);

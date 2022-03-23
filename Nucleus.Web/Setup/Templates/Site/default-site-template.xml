@@ -841,7 +841,7 @@
 		<Content>
 			<Id>{$guid231}</Id>
 			<PageModuleId>{$guid32}</PageModuleId>
-			<Value>&lt;p&gt;Welcome&amp;nbsp;to Nucleus.&lt;/p&gt;</Value>
+			<Value>&lt;p&gt;Welcome to Nucleus.&lt;/p&gt;</Value>
 			<SortOrder>10</SortOrder>
 		</Content>
 		<Content>

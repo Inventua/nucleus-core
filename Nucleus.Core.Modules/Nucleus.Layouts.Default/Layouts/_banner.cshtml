@@ -1,0 +1,10 @@
+﻿@model Nucleus.Web.ViewModels.Default
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Extensions
+@addTagHelper "*, Nucleus.ViewFeatures"
+<div class="d-flex">
+  <Logo />
+  <account class="AccountControl navbar ms-auto flex-row justify-content-end"></account>
+</div>
+<menu maxLevels="10" menuStyle="RibbonPortrait"></menu>
+@Html.Breadcrumb()

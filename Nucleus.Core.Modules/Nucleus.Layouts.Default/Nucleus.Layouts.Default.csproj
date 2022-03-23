@@ -23,17 +23,53 @@
 	</ItemGroup>
 
   <ItemGroup>
+    <None Remove="Containers\centered.cshtml" />
+    <None Remove="Containers\no-container.cshtml" />
+    <None Remove="Containers\no-title.cshtml" />
+    <None Remove="Layouts\default-2-column.cshtml" />
+    <None Remove="Layouts\default-2-column.css" />
+    <None Remove="Layouts\default-3-column.cshtml" />
+    <None Remove="Layouts\default-3-column.css" />
+    <None Remove="Layouts\_banner.cshtml" />
     <None Remove="LICENSE" />
     <None Remove="package.xml" />    
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Containers\centered.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Containers\no-container.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Containers\no-title.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Layouts\default-2-column.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Layouts\default-2-column.css" />
+    <Content Include="Layouts\default-3-column.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Layouts\default-3-column.css" />
+    <Content Include="Layouts\_banner.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="LICENSE" />
     <Content Include="package.xml" />    
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\.editorconfig" Link=".editorconfig" />
+    <PackageReference Include="Nucleus.Abstractions" Version="1.0.0" />
+    <PackageReference Include="Nucleus.Extensions" Version="1.0.0" />
+    <PackageReference Include="Nucleus.ViewFeatures" Version="1.0.0" />
   </ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

@@ -8,13 +8,12 @@ using Nucleus.Abstractions;
 namespace Nucleus.Extensions
 {
 	/// <summary>
-	/// 
+	/// Extension for handling exceptions.
 	/// </summary>
 	public static class DbExceptionExtensions
 	{
-
 		/// <summary>
-		/// 
+		/// Parse a DbException and return a friendly message in a DataProviderException, or return the original exception if the message is not recognized.
 		/// </summary>
 		/// <param name="ex"></param>
 		public static Exception Parse(this Exception ex)

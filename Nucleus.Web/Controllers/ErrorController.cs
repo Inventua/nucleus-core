@@ -34,7 +34,9 @@ namespace Nucleus.Web.Controllers
 				
 			if (exceptionDetails?.Error != null)
 			{
-				data = ParseException(exceptionDetails.Error);
+				Exception ex = exceptionDetails.Error.Parse();
+
+				data = ParseException(ex);
 
 				if (ControllerContext.HttpContext.Request.Headers[Microsoft.Net.Http.Headers.HeaderNames.Accept].ToString().Contains("application/json"))
 				{
@@ -136,24 +138,33 @@ namespace Nucleus.Web.Controllers
 
 		private static Microsoft.AspNetCore.Mvc.ProblemDetails ParseException(Exception ex)
 		{
-			if (ex is Microsoft.Data.Sqlite.SqliteException)
+			if (ex is Nucleus.Abstractions.DataProviderException)
 			{
 				return new()
 				{
 					Title = "Error",
-					Status = (int)System.Net.HttpStatusCode.InternalServerError,
+					Status = (int)System.Net.HttpStatusCode.Conflict,
 					Detail = ex.Message
 				};
 			}
-			else if (ex is Microsoft.EntityFrameworkCore.DbUpdateException)
-			{
-				return new()
-					{
-						Title = "Error",
-						Status = (int)System.Net.HttpStatusCode.InternalServerError,
-						Detail = ex.InnerException == null ? ex.Message : ex.InnerException.Message
-					};
-			}
+			//else if (ex is Microsoft.Data.Sqlite.SqliteException)
+			//{
+			//	return new()
+			//	{
+			//		Title = "Error",
+			//		Status = (int)System.Net.HttpStatusCode.InternalServerError,
+			//		Detail = ex.Message
+			//	};
+			//}
+			//else if (ex is Microsoft.EntityFrameworkCore.DbUpdateException)
+			//{
+			//	return new()
+			//		{
+			//			Title = "Error",
+			//			Status = (int)System.Net.HttpStatusCode.InternalServerError,
+			//			Detail = ex.InnerException == null ? ex.Message : ex.InnerException.Message
+			//		};
+			//}
 			else if (ex is Microsoft.AspNetCore.Http.BadHttpRequestException)
 			{
 				return new()

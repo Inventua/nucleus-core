@@ -34,7 +34,6 @@ namespace Nucleus.Extensions
 		/// <returns></returns>
 		public static string ToHtml(string content, string contentType)
 		{
-
 			switch (contentType)
 			{
 				case "text/markdown":
@@ -47,9 +46,9 @@ namespace Nucleus.Extensions
 							.Build();
 					}
 					return Markdown.ToHtml(content, pipeline);
-					//Markdig.Syntax.MarkdownDocument output = Markdown.Parse();
-					//return output.ToHtml(pipeline);
-					//return Markdig.Markdown.ToHtml(content, pipeline);
+
+				case "text/plain":					
+					return content.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br />");
 
 				default:  // "text/html"
 					return content;

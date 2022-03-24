@@ -241,6 +241,8 @@ namespace Nucleus.Web
 				}
 			}
 
+			app.UseAuthorizationRedirect();
+
 			app.UseCookiePolicy(new CookiePolicyOptions() { });
 
 			app.UseRouting();

@@ -5,11 +5,65 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
+using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Managers;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Nucleus.Extensions;
 
 namespace Nucleus.Core.Authorization
 {
 	public static class AuthorizationExtensions
 	{
+		/// <summary>
+		/// If an unauthenticated user tries to view a page and does not have view permission, redirect to the site's login page, if the site 
+		/// has a login page configured.
+		/// </summary>
+		/// <param name="app"></param>
+		/// <returns></returns>
+		public static IApplicationBuilder UseAuthorizationRedirect(this IApplicationBuilder app)
+		{
+			app.UseStatusCodePages(async context =>
+			{
+
+				if (!context.HttpContext.User.Identity.IsAuthenticated)
+				{
+					if (context.HttpContext.Response.StatusCode == (int)System.Net.HttpStatusCode.Unauthorized || context.HttpContext.Response.StatusCode == (int)System.Net.HttpStatusCode.Forbidden)
+					{
+						IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
+
+						SitePages sitePages = context.HttpContext.RequestServices.GetService<Context>().Site.GetSitePages();
+						PageRoute loginPageRoute = await GetPageRoute(sitePages.LoginPageId, pageManager);
+
+
+						if (loginPageRoute != null)
+						{
+							string url = loginPageRoute.Path + $"?returnUrl={System.Uri.EscapeDataString(context.HttpContext.Request.Path)}";
+
+							context.HttpContext.Response.Redirect(url);
+						}
+					}
+				}
+			});
+
+			return app;
+		}
+
+		private async static Task<PageRoute> GetPageRoute(Guid? pageId, IPageManager pageManager)
+		{
+			if (pageId.HasValue)
+			{
+				Page loginPage = await pageManager.Get(pageId.Value);
+				if (loginPage != null)
+				{
+					return loginPage.DefaultPageRoute();
+				}
+			}
+
+			return null;
+		}
+
 		/// <summary>
 		/// Add Nucleus core Authorization, policies and handlers.
 		/// </summary>

@@ -14,9 +14,16 @@ namespace Nucleus.Modules.StaticContent
 			return System.IO.Path.GetExtension(file.Name).ToLower() == ".md";
 		}
 
+		public static Boolean IsText(this File file)
+		{
+			string[] fileExtensions = new string[] { ".txt" };
+
+			return fileExtensions.Contains(System.IO.Path.GetExtension(file.Name).ToLower());
+		}
+
 		public static Boolean IsContent(this File file)
 		{
-			string[] fileExtensions = new string[] { ".htm", ".html", ".txt"};
+			string[] fileExtensions = new string[] { ".htm", ".html"};
 
 			return fileExtensions.Contains(System.IO.Path.GetExtension(file.Name).ToLower());
 		}

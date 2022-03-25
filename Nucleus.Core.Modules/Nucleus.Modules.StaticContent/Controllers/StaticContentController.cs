@@ -62,6 +62,10 @@ namespace Nucleus.Modules.StaticContent.Controllers
 							{
 								viewModel.Content = ContentExtensions.ToHtml(GetStreamAsString(content), "text/markdown");
 							}
+							else if (file.IsText())
+							{
+								viewModel.Content = ContentExtensions.ToHtml(GetStreamAsString(content), "text/plain");
+							}
 							else if (file.IsContent())
 							{
 								viewModel.Content = GetStreamAsString(content);

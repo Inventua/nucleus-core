@@ -20,10 +20,10 @@
 				@if (!String.IsNullOrEmpty(content.Title))
 				{
 					<h3>@content.Title</h3>
-					<div>
-						@Html.Raw(content.ToHtml())
-					</div>
 				}
+				<div>
+					@Html.Raw(content.ToHtml())
+				</div>
 			</div>
 		}
 	</div>

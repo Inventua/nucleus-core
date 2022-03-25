@@ -107,12 +107,46 @@ namespace Nucleus.Modules.Account.Controllers
 				}
 				else
 				{
-					UserSession session = await this.SessionManager.CreateNew(this.Context.Site, loginUser, viewModel.AllowRememberMe && viewModel.RememberMe, ControllerContext.HttpContext.Connection.RemoteIpAddress);
-					await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
+					if (!loginUser.Approved)
+					{
+						return Json(new { Title = "Login", Message = "Your account has not been approved." });
+					}
+					else if (!loginUser.Verified && !viewModel.ShowVerificationToken)
+					{
+						ModelState.Remove(nameof(ViewModels.Login.ShowVerificationToken));
+						viewModel.ShowVerificationToken = true;
+						return View(viewModel);						
+					}
+					else
+					{
+						if (viewModel.ShowVerificationToken && viewModel.VerificationToken != null)
+						{
+							if (viewModel.VerificationToken == loginUser.Secrets.VerificationToken)
+							{
+								if (loginUser.Secrets.VerificationTokenExpiryDate < DateTime.UtcNow)
+								{
+									return Json(new { Title = "Login", Message = "Your verification token has expired. Contact the system administrator for help." });
+								}
+								else
+								{
+									// mark user as verified
+									loginUser.Verified = true;
+									await this.UserManager.Save(this.Context.Site, loginUser);
+								}
+							}
+							else
+							{
+								return Json(new { Title = "Login", Message = "Invalid verification token." });
+							}
+						}
+						
+						UserSession session = await this.SessionManager.CreateNew(this.Context.Site, loginUser, viewModel.AllowRememberMe && viewModel.RememberMe, ControllerContext.HttpContext.Connection.RemoteIpAddress);
+						await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
 
-					string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.GetAbsoluteUri("/").ToString() : Url.GetAbsoluteUri(viewModel.ReturnUrl).ToString();
-					ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
-					return StatusCode((int)System.Net.HttpStatusCode.Found);
+						string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.GetAbsoluteUri("/").ToString() : Url.GetAbsoluteUri(viewModel.ReturnUrl).ToString();
+						ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
+						return StatusCode((int)System.Net.HttpStatusCode.Found);
+					}
 				}
 			}
 		}

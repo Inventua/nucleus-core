@@ -327,6 +327,33 @@ namespace Nucleus.Web.Controllers.Admin
 				isNew = true;
 			}
 
+			if (viewModel.AllowPublicRegistration)
+			{
+				viewModel.Site.UserRegistrationOptions = viewModel.Site.UserRegistrationOptions |= Site.SiteUserRegistrationOptions.SignupAllowed;
+			}
+			else
+			{
+				viewModel.Site.UserRegistrationOptions = Site.SiteUserRegistrationOptions.NoSignup;
+			}
+
+			if (viewModel.RequireApproval)
+			{
+				viewModel.Site.UserRegistrationOptions = viewModel.Site.UserRegistrationOptions |= Site.SiteUserRegistrationOptions.RequireApproval;
+			}
+			else
+			{
+				viewModel.Site.UserRegistrationOptions &= ~Site.SiteUserRegistrationOptions.RequireApproval;
+			}
+
+			if (viewModel.RequireEmailVerification)
+			{
+				viewModel.Site.UserRegistrationOptions = viewModel.Site.UserRegistrationOptions |= Site.SiteUserRegistrationOptions.RequireEmailVerification;
+			}
+			else
+			{
+				viewModel.Site.UserRegistrationOptions &= ~Site.SiteUserRegistrationOptions.RequireEmailVerification;
+			}
+
 			viewModel.Site.SetSiteMailSettings(viewModel.MailSettings);
 			viewModel.Site.SetSiteMailTemplates(viewModel.SiteTemplateSelections);
 			viewModel.Site.SetSitePages(viewModel.SitePages);
@@ -386,7 +413,11 @@ namespace Nucleus.Web.Controllers.Admin
 			Site fullSite = await this.SiteManager.Get(viewModel.Site.Id);
 			viewModel.Site.Aliases = fullSite?.Aliases;
 			viewModel.Site.UserProfileProperties = fullSite?.UserProfileProperties;
-			
+
+			viewModel.AllowPublicRegistration = fullSite.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.SignupAllowed);
+			viewModel.RequireApproval = fullSite.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.RequireApproval);
+			viewModel.RequireEmailVerification = fullSite.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.RequireEmailVerification);
+
 			viewModel.IsCurrentSite = (viewModel.Site.Id == this.Context.Site.Id);
 
 			viewModel.MailTemplates = await this.MailTemplateManager.List(viewModel.Site);
@@ -403,67 +434,6 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.SelectedIconFile = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.SelectedIconFile);
 			viewModel.SelectedLogoFile = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.SelectedLogoFile);
 
-			////try
-			////{
-			////	if (viewModel.SelectedCssFile != null)
-			////	{
-			////		if (viewModel.SelectedCssFile.Id != Guid.Empty)
-			////		{
-			////			viewModel.SelectedCssFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedCssFile.Id);
-			////		}
-			////		if (viewModel.SelectedCssFile.Parent != null)
-			////		{
-			////			viewModel.SelectedCssFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.SelectedCssFile.Parent);
-			////		}
-			////	}
-			////}
-			////catch (System.IO.FileNotFoundException)
-			////{
-			////	// in case file has been deleted
-			////}
-
-			////try
-			////{
-			////	if (viewModel.SelectedLogoFile != null)
-			////	{
-			////		if (viewModel.SelectedLogoFile.Id != Guid.Empty)
-			////		{
-			////			viewModel.SelectedLogoFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedLogoFile.Id);
-			////		}
-			////		if (viewModel.SelectedLogoFile.Parent != null)
-			////		{
-			////			viewModel.SelectedLogoFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.SelectedLogoFile.Parent);
-			////		}
-			////		else
-			////		{
-			////			viewModel.SelectedLogoFile.Parent = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedLogoFile.Provider, "");
-			////		}
-			////	}
-			////}
-			////catch (System.IO.FileNotFoundException)
-			////{
-			////	// in case file has been deleted
-			////}
-
-			////try
-			////{
-			////	if (viewModel.SelectedIconFile != null)
-			////	{
-			////		if (viewModel.SelectedIconFile.Id != Guid.Empty)
-			////		{
-			////			viewModel.SelectedIconFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedIconFile.Id);
-			////		}
-			////		if (viewModel.SelectedIconFile.Parent != null)
-			////		{
-			////			viewModel.SelectedIconFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.SelectedIconFile.Parent);
-			////		}
-			////	}
-			////}
-			////catch (System.IO.FileNotFoundException)
-			////{
-			////	// in case file has been deleted
-			////}
-
 			return viewModel;
 		}
 
@@ -473,6 +443,10 @@ namespace Nucleus.Web.Controllers.Admin
 
 			viewModel.Site = site;
 			viewModel.IsCurrentSiteEditor = isCurrentSiteEditor;
+
+			viewModel.AllowPublicRegistration = site.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.SignupAllowed);
+			viewModel.RequireApproval = site.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.RequireApproval);
+			viewModel.RequireEmailVerification= site.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.RequireEmailVerification);
 
 			viewModel.MailSettings = site.GetSiteMailSettings();
 			viewModel.MailSettings.Password = SiteExtensions.UNCHANGED_PASSWORD;
@@ -488,7 +462,6 @@ namespace Nucleus.Web.Controllers.Admin
 					viewModel.SelectedCssFile.Id = cssFileId;
 				}
 			}
-
 
 			if (viewModel.SelectedIconFile == null)
 			{

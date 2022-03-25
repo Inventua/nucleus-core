@@ -74,35 +74,47 @@ namespace Nucleus.Modules.Account.Controllers
 				}
 				else
 				{
-					SiteTemplateSelections templateSelections = this.Context.Site.GetSiteTemplateSelections();
-
-					if (templateSelections.AccountNameReminderTemplateId.HasValue)
+					if (!user.Approved)
 					{
-						MailTemplate template = await this.MailTemplateManager.Get(templateSelections.AccountNameReminderTemplateId.Value);
-						if (template != null && viewModel.Email != null)
-						{
-							MailArgs args = new()
-							{
-								{ "Site", this.Context.Site },
-								{ "User", GetCensoredUser(user) },
-								{ "Urls.Login", GetLoginPageUri() }
-							};
-
-							Logger.LogTrace("Sending account name reminder email {0} to user {1}.", template.Name, user.Id);
-
-							using (IMailClient mailClient = this.MailClientFactory.Create())
-							{
-								mailClient.Send(template, args, viewModel.Email);
-								return Json(new { Title = "Recover Account", Message = "Account Name Reminder email sent." });
-								//viewModel.Message = "Account Name Reminder email sent." ;
-							}
-						}
+						return Json(new { Title = "Recover Account", Message = "Your account has not been approved." });
+					}
+					else if (!user.Verified)
+					{
+						return Json(new { Title = "Recover Account", Message = "Your account has not been verified." });
 					}
 					else
 					{
-						Logger.LogTrace("Not sending account name reminder to user {0} because no Account Name Reminder Template is configured for site {1}.", user.Id, this.Context.Site.Id);
-						return Json(new { Title = "Recover Account", Message = "Your site administrator has not configured an Account Name Reminder email template.  Please contact the site administrator for help." });
-						//viewModel.Message = "Your site administrator has not configured an Account Name Reminder email template.  Please contact the site administrator for help.";				
+						SiteTemplateSelections templateSelections = this.Context.Site.GetSiteTemplateSelections();
+
+						if (templateSelections.AccountNameReminderTemplateId.HasValue)
+						{
+							MailTemplate template = await this.MailTemplateManager.Get(templateSelections.AccountNameReminderTemplateId.Value);
+							if (template != null && viewModel.Email != null)
+							{
+								MailArgs args = new()
+								{
+									{ "Site", this.Context.Site },
+									{ "User", GetCensoredUser(user) },
+									{ "Urls.Login", GetLoginPageUri() }
+								};
+
+								Logger.LogTrace("Sending account name reminder email {0} to user {1}.", template.Name, user.Id);
+
+								using (IMailClient mailClient = this.MailClientFactory.Create())
+								{
+									mailClient.Send(template, args, viewModel.Email);
+									return Json(new { Title = "Recover Account", Message = "Account Name Reminder email sent." });
+									//viewModel.Message = "Account Name Reminder email sent." ;
+								}
+							}
+						}
+
+						else
+						{
+							Logger.LogTrace("Not sending account name reminder to user {0} because no Account Name Reminder Template is configured for site {1}.", user.Id, this.Context.Site.Id);
+							return Json(new { Title = "Recover Account", Message = "Your site administrator has not configured an Account Name Reminder email template.  Please contact the site administrator for help." });
+							//viewModel.Message = "Your site administrator has not configured an Account Name Reminder email template.  Please contact the site administrator for help.";				
+						}
 					}
 				}			
 			}

@@ -87,7 +87,15 @@ namespace Nucleus.Modules.Account.Controllers
 			}
 			else
 			{
-				if (String.IsNullOrEmpty(viewModel.Password) || !loginUser.Secrets.VerifyPassword(viewModel.Password))
+				if (!loginUser.Approved)
+				{
+					return Json(new { Title = "Change Password", Message = "Your account has not been approved." });
+				}
+				else if (!loginUser.Verified)
+				{
+					return Json(new { Title = "Change Password", Message = "Your account has not been verified." });
+				}
+				else if (String.IsNullOrEmpty(viewModel.Password) || !loginUser.Secrets.VerifyPassword(viewModel.Password))
 				{
 					return Json(new { Title = "Change Password", Message = "Invalid password." });
 				}

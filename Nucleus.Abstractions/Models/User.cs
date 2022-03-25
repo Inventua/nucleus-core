@@ -37,6 +37,26 @@ namespace Nucleus.Abstractions.Models
 		public Boolean IsSystemAdministrator { get; set; }
 
 		/// <summary>
+		/// Flag used to indicate that the user has been approved.
+		/// </summary>
+		/// <remarks>
+		/// If the site user registration options are set to require administrator approval for new users, this flag is set when the 
+		/// administrator approves the user.  If the site registration options are set to not require administrator approval, this flag
+		/// is set automatically during registration.
+		/// </remarks>
+		public Boolean Approved { get; set; }
+
+		/// <summary>
+		/// Flag used to indicate that the user has verified their email address.
+		/// </summary>
+		/// <remarks>
+		/// If the site user registration options are set to require email verification for new users, this flag is set when the 
+		/// user enters their verification code.  If the site registration options are set to not require email verification, this flag
+		/// is set automatically during registration.
+		/// </remarks>
+		public Boolean Verified { get; set; }
+
+		/// <summary>
 		/// User secrets.
 		/// </summary>
 		public UserSecrets Secrets { get; set; }

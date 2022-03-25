@@ -4,7 +4,7 @@
 @using Nucleus.Extensions
 @using Nucleus.Abstractions.Models.Configuration
 @Html.AddStyle("~/Resources/css/forms.css")
-@using (Html.BeginNucleusForm("SaveAccountSettings", "UserProfile", FormMethod.Post, new { @data_target = "form.parent()" }))
+@using (Html.BeginNucleusForm("SaveAccountSettings", "UserProfile", "Account", FormMethod.Post, new { @data_target = "form.parent()" }))
 {
 	<fieldset aria-label="User Profile">
 		@Html.HiddenFor((model) => model.ReturnUrl)

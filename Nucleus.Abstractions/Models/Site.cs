@@ -16,6 +16,30 @@ namespace Nucleus.Abstractions.Models
 	public class Site : ModelBase
 	{
 		/// <summary>
+		/// Bitwise flags enum specifying public signup options.
+		/// </summary>
+		[Flags]
+		public enum SiteUserRegistrationOptions
+		{
+			/// <value>
+			/// No public signup allowed.
+			/// </value>
+			NoSignup = 0,
+			/// <value>
+			/// Public signup is allowed.
+			/// </value>
+			SignupAllowed = 1,
+			/// <value>
+			/// New signups require administrator approval.
+			/// </value>
+			RequireApproval = 2,
+			/// <value>
+			/// New signups .
+			/// </value>
+			RequireEmailVerification = 4
+		}
+
+		/// <summary>
 		/// SiteSettings keys for mail server settings.
 		/// </summary>
 		public static class SiteMailSettingKeys
@@ -188,6 +212,11 @@ namespace Nucleus.Abstractions.Models
 		/// Represents the site group that a site belongs to.  This field is for future use.
 		/// </remarks>		
 		public Guid? SiteGroupId { get; set; }
+
+		/// <summary>
+		/// Gets or sets signup options for the site.
+		/// </summary>
+		public SiteUserRegistrationOptions UserRegistrationOptions { get; set; } = SiteUserRegistrationOptions.SignupAllowed;
 
 		/// <summary>
 		/// Gets or sets the default layout for the site, or NULL to use the default.

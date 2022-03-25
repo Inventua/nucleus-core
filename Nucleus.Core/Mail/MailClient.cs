@@ -161,7 +161,7 @@ namespace Nucleus.Core.Mail
 					}
 					else
 					{
-						System.Reflection.PropertyInfo propInfo = value.GetType().GetProperty(part, System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.Static  );
+						System.Reflection.PropertyInfo propInfo = value.GetType().GetProperty(part, System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance );
 
 						if (propInfo != null && propInfo.CanRead)
 						{
@@ -172,9 +172,7 @@ namespace Nucleus.Core.Mail
 							return "";
 						}
 					}
-
-				}
-				
+				}				
 
 				return value.ToString();
 				//return "";

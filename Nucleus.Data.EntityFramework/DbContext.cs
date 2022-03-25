@@ -61,17 +61,6 @@ namespace Nucleus.Data.EntityFramework
 			this.LoggerFactory = loggerFactory;
 		}
 
-		///// <summary>
-		///// Constructor
-		///// </summary>
-		///// <remarks>
-		///// This constructor exists for use by the entity framework tools only.  Do not use this constructor.
-		///// </remarks>
-		//public DbContext(DbContextOptions options, DbContextConfigurator dbContextConfigurator): base(options)
-		//{
-		//	this.DbContextConfigurator = dbContextConfigurator;
-		//}
-
 		/// <summary>
 		/// Call the dbContextConfigurator to configure this DbContext.
 		/// </summary>
@@ -153,6 +142,16 @@ namespace Nucleus.Data.EntityFramework
 		{
 			ManageSpecialColumns();
 			return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+		}
+
+		/// <summary>
+		/// Save changes made in this context, after updating audit properties.
+		/// </summary>
+		/// <returns></returns>
+		public override int SaveChanges()
+		{
+			ManageSpecialColumns();
+			return base.SaveChanges();
 		}
 
 		/// <summary>

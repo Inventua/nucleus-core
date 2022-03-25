@@ -17,6 +17,9 @@ namespace Nucleus.Modules.Account.ViewModels
 		public Boolean AllowRememberMe { get; set; }		
 		public Boolean AllowUsernameRecovery { get; set; }
 		public Boolean AllowPasswordReset { get; set; }
-		
+
+		public Boolean ShowVerificationToken { get; set; }
+		public string VerificationToken { get; set; }
+
 	}
 }

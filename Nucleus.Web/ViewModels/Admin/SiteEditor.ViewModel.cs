@@ -14,6 +14,13 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public Boolean IsCurrentSite { get; set; }
 		public Site Site { get; set; }
+
+		/// These properties are used to set the Site.
+		public Boolean AllowPublicRegistration { get;set; }
+		public Boolean RequireEmailVerification { get; set; }
+		public Boolean RequireApproval { get; set; }
+
+
 		public IEnumerable<LayoutDefinition> Layouts { get; set; }
 		public IEnumerable<ContainerDefinition> Containers { get; set; }
 		public IEnumerable<Role> Roles { get; set; }

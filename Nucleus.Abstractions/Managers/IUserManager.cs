@@ -41,6 +41,13 @@ namespace Nucleus.Abstractions.Managers
 		public Task SetPasswordResetToken(User user);
 
 		/// <summary>
+		/// Generate and set a random verification token.
+		/// </summary>
+		/// <param name="user"></param>
+		/// <returns></returns>
+		public Task SetVerificationToken(User user);
+
+		/// <summary>
 		/// Create a new <see cref="User"/> with default values.
 		/// </summary>
 		/// <returns></returns>
@@ -135,6 +142,16 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="site"></param>
 		/// <param name="user"></param>
 		public Task Save(Site site, User user);
+
+		/// <summary>
+		/// Set <see cref="User"/> approved and verified flags based on site settings.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="user"></param>
+		/// <remarks>
+		/// This function should be called before saving a new user, if the user is self-registering.
+		/// </remarks>
+		public void SetNewUserFlags(Site site, User user);
 
 		/// <summary>
 		/// Save user secrets.

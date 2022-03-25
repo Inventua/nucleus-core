@@ -26,20 +26,29 @@ namespace Nucleus.Modules.Account.Controllers
 		private IPageManager PageManager { get; }
 
 		private ClaimTypeOptions ClaimTypeOptions { get; }
+		private ISessionManager SessionManager { get; }
 
-		public SignupController(Context context, ILogger<LoginController> Logger, IUserManager userManager, IPageManager pageManager, IOptions<ClaimTypeOptions> claimTypeOptions)
+		public SignupController(Context context, ILogger<LoginController> Logger, IUserManager userManager, IPageManager pageManager, ISessionManager sessionManager, IOptions<ClaimTypeOptions> claimTypeOptions)
 		{
 			this.Context = context;
 			this.Logger = Logger;
 			this.UserManager = userManager;
 			this.PageManager = pageManager;
+			this.SessionManager = sessionManager;
 			this.ClaimTypeOptions = claimTypeOptions.Value;
 		}
 
 		[HttpGet]
 		public async Task<ActionResult> Index(string returnUrl)
 		{
-			return View("Signup", await BuildViewModel(returnUrl));
+			if (this.Context.Site.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.SignupAllowed))
+			{
+				return View("Signup", await BuildViewModel(returnUrl));
+			}
+			else
+			{
+				return Forbid();
+			}
 		}
 
 		[HttpGet]
@@ -60,16 +69,17 @@ namespace Nucleus.Modules.Account.Controllers
 			{
 				return BadRequest("Your new password and confirm password values do not match");
 			}
-			
+
 			Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState = await this.UserManager.ValidatePasswordComplexity(nameof(viewModel.NewPassword), viewModel.NewPassword);
 			if (!modelState.IsValid)
 			{
 				return BadRequest(modelState);
 			}
-			
+
 			try
 			{
 				User newUser = await this.UserManager.CreateNew(this.Context.Site);
+				this.UserManager.SetNewUserFlags(this.Context.Site, newUser);
 
 				newUser.UserName = viewModel.User.UserName;
 				newUser.Profile = viewModel.User.Profile;
@@ -77,10 +87,22 @@ namespace Nucleus.Modules.Account.Controllers
 				newUser.Secrets.SetPassword(viewModel.NewPassword);
 
 				await this.UserManager.Save(this.Context.Site, newUser);
+
+				if (newUser.Approved && newUser.Verified)
+				{
+					UserSession session = await this.SessionManager.CreateNew(this.Context.Site, newUser, false, ControllerContext.HttpContext.Connection.RemoteIpAddress);
+					await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
+				}
+
+				string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.GetAbsoluteUri("/").ToString() : Url.GetAbsoluteUri(viewModel.ReturnUrl).ToString();
+				ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
+				return StatusCode((int)System.Net.HttpStatusCode.Found);
+
+				//return Json(new { Title = "Sign Up", Message = "Your new account has been saved." });
 			}
 			catch (Exception ex)
 			{
-				if (ex.Message.Contains("UNIQUE constraint failed", StringComparison.OrdinalIgnoreCase))
+				if (ex.Message.Contains("unique constraint failed", StringComparison.OrdinalIgnoreCase) || ex.InnerException?.Message.Contains("unique constraint failed", StringComparison.OrdinalIgnoreCase) == true)
 				{
 					return BadRequest("User name is already in use.");
 				}
@@ -89,11 +111,8 @@ namespace Nucleus.Modules.Account.Controllers
 					throw;
 				}
 			}
-			
-			viewModel = await BuildViewModel("");
-			viewModel.ShowForm = false;
-			return Json(new { Title = "Sign Up", Message = "Your new account has been saved." });
-			
+
+
 		}
 
 		private async Task<ViewModels.Signup> BuildViewModel(string returnUrl)
@@ -103,7 +122,7 @@ namespace Nucleus.Modules.Account.Controllers
 				ShowForm = true,
 				ReturnUrl = returnUrl,
 				User = await this.UserManager.CreateNew(this.Context.Site),
-				ClaimTypeOptions=this.ClaimTypeOptions
+				ClaimTypeOptions = this.ClaimTypeOptions
 			};
 		}
 

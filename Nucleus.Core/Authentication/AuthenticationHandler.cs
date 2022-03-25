@@ -114,7 +114,7 @@ namespace Nucleus.Core.Authentication
 					else
 					{
 						// Session has expired
-						Logger.LogInformation("Session has expired.");
+						Logger.LogTrace("Session has expired.");
 						await this.SessionManager.Delete(userSession);
 						_ = this.SessionManager.SignOut(this.Context);
 						return AuthenticateResult.Fail("Session Expired");
@@ -144,6 +144,18 @@ namespace Nucleus.Core.Authentication
 				}
 				else
 				{
+					Logger.LogTrace("User Id {userId} was found for session Id {sessionId}: Validating.", userSession.UserId, sessionId);
+					if (!user.Approved)
+					{
+						Logger.LogTrace("Accesss denied for session Id {sessionId} for user Id {userId} - user not approved.", sessionId, userSession.UserId);
+						return AuthenticateResult.Fail("User not approved.");
+					}
+					else if (!user.Verified)
+					{
+						Logger.LogTrace("Accesss denied for session Id {sessionId} for user Id {userId} - user not verified.", sessionId, userSession.UserId);
+						return AuthenticateResult.Fail("User not verified.");
+					}
+
 					Logger.LogTrace("User Id {userId} was found for session Id {sessionId}: Adding Claims.", userSession.UserId, sessionId);
 
 					Logger.LogTrace("User Id {userId} Adding Claim {claimType} {userName}.", userSession.UserId, ClaimTypes.Name, user.UserName);

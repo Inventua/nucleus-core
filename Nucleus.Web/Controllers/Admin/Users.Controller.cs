@@ -73,10 +73,14 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Editor", viewModel);
 		}
 
-		[HttpPost]
+		[HttpGet]
 		public async Task<ActionResult> AddUser()
 		{
-			return View("Editor", await BuildViewModel(new User()));
+			User newUser = await this.UserManager.CreateNew(this.Context.Site);
+			newUser.Verified = true;
+			newUser.Approved = true;
+
+			return View("Editor", await BuildViewModel( newUser ));
 		}
 
 		[HttpPost]
@@ -161,7 +165,7 @@ namespace Nucleus.Web.Controllers.Admin
 			{
 				foreach (Role role in await this.RoleManager.List(this.Context.Site))
 				{
-					if (!((role.Type & Role.RoleType.Restricted) == Role.RoleType.Restricted) && !viewModel.User?.Roles.Contains(role) == true)
+					if (!((role.Type & Role.RoleType.Restricted) == Role.RoleType.Restricted) && !viewModel.User.Roles?.Contains(role) == true)
 					{
 						viewModel.AvailableRoles.Add(role);
 					}

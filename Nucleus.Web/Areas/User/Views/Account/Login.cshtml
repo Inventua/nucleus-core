@@ -6,11 +6,6 @@
 
 @using (Html.BeginAreaForm("Login", "Account", "User", FormMethod.Post))
 {
-	@if (!String.IsNullOrEmpty(Model.Message))
-	{
-		<div>@Model.Message</div>
-	}
-
 	<fieldset>
 		@Html.HiddenFor(model => model.ReturnUrl)
 		<div>

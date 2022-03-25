@@ -34,6 +34,16 @@ namespace Nucleus.Abstractions.Models
 		public DateTime? PasswordResetTokenExpiryDate { get; set; }
 
 		/// <summary>
+		/// Auto-generated token used for new user verification.
+		/// </summary>
+		public string VerificationToken { get; set; }
+
+		/// <summary>
+		/// Expiry date/time for <see cref="VerificationToken"/>
+		/// </summary>
+		public DateTime? VerificationTokenExpiryDate { get; set; }
+
+		/// <summary>
 		/// Not in use
 		/// </summary>
 		public string PasswordQuestion { get; set; }

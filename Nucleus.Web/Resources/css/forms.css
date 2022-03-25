@@ -62,10 +62,21 @@
 	margin-bottom: 1px;
 }
 
+.settings-control label.disabled
+{
+	opacity: 0.5;
+}
+
 .settings-control input, .settings-control select, .settings-control textarea
 {
 	display: block;
 	font-size: 0.95em;
+}
+
+.settings-control input[type=checkbox]
+{
+	font-size: 1em;
+	vertical-align: middle;
 }
 
 .settings-control.inline, .settings-control.inline input, .settings-control.inline span

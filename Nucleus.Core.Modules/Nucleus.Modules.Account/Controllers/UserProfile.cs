@@ -68,12 +68,10 @@ namespace Nucleus.Modules.Account.Controllers
 				return BadRequest();
 			}
 
-			User existing = await this.UserManager.Get(this.Context.Site, viewModel.User.Id);
-			
-			// User profile UI does not allow editing of username
-			viewModel.User.UserName = existing.UserName;
+			User existing = await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId());
+			existing.Profile = viewModel.User.Profile;
 
-			await this.UserManager.Save(this.Context.Site, viewModel.User);
+			await this.UserManager.Save(this.Context.Site, existing);
 			
 			return Redirect(String.IsNullOrEmpty(viewModel.ReturnUrl) ? "/" : viewModel.ReturnUrl);
 		}

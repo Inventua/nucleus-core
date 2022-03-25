@@ -1,0 +1,49 @@
+{
+	"schemaName": "Nucleus.Core",
+	"version": "01.00.03",
+	"operations": [
+		{
+			"addColumn": {
+				"table": "Sites",
+				"name": "UserRegistrationOptions",
+				"clrType": "int",
+				"isnullable": false,
+				"defaultvaluesql": 0
+			}
+		},
+		{
+			"addColumn": {
+				"table": "Users",
+				"name": "Approved",
+				"clrType": "boolean",
+				"isnullable": false,
+				"defaultvaluesql": 1
+			}
+		},
+		{
+			"addColumn": {
+				"table": "Users",
+				"name": "Verified",
+				"clrType": "boolean",
+				"isnullable": false,
+				"defaultvaluesql": 1
+			}
+		},
+		{
+			"addColumn": {
+				"table": "UserSecrets",
+				"name": "VerificationToken",
+				"clrType": "string",
+				"isnullable": true
+			}
+		},
+		{
+			"addColumn": {
+				"table": "UserSecrets",
+				"name": "VerificationTokenExpiryDate",
+				"clrType": "datetime",
+				"isnullable": true
+			}
+		}
+	]
+}

@@ -30,14 +30,13 @@ namespace Nucleus.ViewFeatures.HtmlContent
 		{
 			TagBuilder outputBuilder = new("div");			
 			IUrlHelper urlHelper = context.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(context);
-			SitePages sitePages = context.HttpContext.RequestServices.GetService<Context>().Site.GetSitePages();
+			Context nucleusContext = context.HttpContext.RequestServices.GetService<Context>();
+			SitePages sitePages = nucleusContext.Site.GetSitePages();
 			IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
 
 			if (context.HttpContext.User.Identity.IsAuthenticated)
 			{
 				// user is logged in
-				//outputBuilder.AddCssClass("btn-group");
-
 				TagBuilder accountMenuButtonBuilder = new("button");
 				accountMenuButtonBuilder.AddCssClass("btn btn-secondary dropdown-toggle");
 				accountMenuButtonBuilder.InnerHtml.AppendHtml(context.HttpContext.User.Identity.Name);
@@ -58,7 +57,6 @@ namespace Nucleus.ViewFeatures.HtmlContent
 					accountProfileLinkBuilder.InnerHtml.Append("Account Settings");
 
 					PageRoute accountSettingsPageRoute = await GetPageRoute(sitePages.UserProfilePageId, pageManager);
-					//accountProfileLinkBuilder.Attributes.Add("href", $"{urlHelper.AreaAction("EditAccountSettings", "Account", "User")}");
 					accountProfileLinkBuilder.Attributes.Add("href",
 						accountSettingsPageRoute == null ? urlHelper.AreaAction("EditAccountSettings", "Account", "User") : urlHelper.Content("~" + accountSettingsPageRoute.Path) + $"?returnUrl={System.Uri.EscapeDataString(context.HttpContext.Request.Path)}");
 
@@ -96,21 +94,23 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			{
 				// user is not logged in
 				
-				PageRoute registerPageRoute = await GetPageRoute(sitePages.UserRegisterPageId, pageManager); 
-			
-				if (registerPageRoute != null)
+				if (nucleusContext.Site.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.SignupAllowed))
 				{
-					TagBuilder registerLinkBuilder = new("a");
+					PageRoute registerPageRoute = await GetPageRoute(sitePages.UserRegisterPageId, pageManager); 
+			
+					if (registerPageRoute != null)
+					{
+						TagBuilder registerLinkBuilder = new("a");
 
-					registerLinkBuilder.AddCssClass("btn btn-secondary");
-					registerLinkBuilder.InnerHtml.Append("Register");
-					registerLinkBuilder.Attributes.Add("href", urlHelper.Content("~" + registerPageRoute.Path + $"?returnUrl={System.Uri.EscapeDataString(context.HttpContext.Request.Path)}"));
+						registerLinkBuilder.AddCssClass("btn btn-secondary");
+						registerLinkBuilder.InnerHtml.Append("Register");
+						registerLinkBuilder.Attributes.Add("href", urlHelper.Content("~" + registerPageRoute.Path + $"?returnUrl={System.Uri.EscapeDataString(context.HttpContext.Request.Path)}"));
 
-					outputBuilder.InnerHtml.AppendHtml(registerLinkBuilder);
+						outputBuilder.InnerHtml.AppendHtml(registerLinkBuilder);
+					}
 				}
 
 				PageRoute loginPageRoute = await GetPageRoute(sitePages.LoginPageId, pageManager);
-
 				
 				TagBuilder loginLinkBuilder = new("a");
 				loginLinkBuilder.AddCssClass("btn btn-secondary");

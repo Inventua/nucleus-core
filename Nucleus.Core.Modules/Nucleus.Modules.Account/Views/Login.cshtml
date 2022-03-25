@@ -6,7 +6,8 @@
 @using (Html.BeginNucleusForm("Login", "Login", "Account", FormMethod.Post, new { data_target = "form.parent()" }))
 {
 	<fieldset aria-label="Login">		
-		@Html.HiddenFor(model => model.ReturnUrl)
+		@Html.HiddenFor(model => model.ReturnUrl)		
+		@Html.HiddenFor(model => model.ShowVerificationToken)
 		<div>
 			<label>
 				<span>User name</span>
@@ -17,9 +18,22 @@
 		<div>
 			<label>
 				<span>Password</span>
-				<span>@Html.PasswordFor(model => model.Password)</span>
+				<span>@Html.PasswordFor(model => model.Password, new { @value = Model.Password })</span>
 			</label>
 		</div>
+
+		@if (Model.ShowVerificationToken)
+		{
+			<div class="alert alert-primary mt-3">
+				Please enter the verification code from your welcome e-mail and click Login.
+			</div>
+			<div>
+				<label>
+					<span>Verification Token</span>
+					<span>@Html.TextBoxFor(model => model.VerificationToken)</span>
+				</label>
+			</div>	
+		}
 
 		@if (Model.AllowRememberMe)
 		{
@@ -31,7 +45,7 @@
 			</div>
 		}
 		<div class="mt-2">
-			<input type="submit" value="Login" class="btn btn-primary" />
+			<input type="submit" value="Login" class="btn btn-primary" data-target="form.parent()" />
 			<a href="/" class="btn btn-secondary">Cancel</a>
 
 			@if (Model.AllowUsernameRecovery | Model.AllowPasswordReset)

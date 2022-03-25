@@ -141,6 +141,17 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
+		public async Task SetVerificationToken(User user)
+		{
+			user.Secrets.VerificationToken = new Random().Next(100000, 999999).ToString();
+			user.Secrets.VerificationTokenExpiryDate = DateTime.UtcNow.Add(this.PasswordOptions.VerificationTokenExpiry);
+
+			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+			{
+				await provider.SaveUserSecrets(user);
+			}
+		}
+
 		public async Task SetPasswordResetToken(User user)
 		{
 			if (user.Secrets == null)
@@ -359,9 +370,22 @@ namespace Nucleus.Core.Managers
 		{
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{
-				await provider .SaveUser(site, user);
+				await provider.SaveUser(site, user);
 				this.CacheManager.UserCache().Remove(user.Id);
 			}
+			
+			// set a verification token if needed
+			if (!user.Verified && (user.Secrets != null && (String.IsNullOrEmpty(user.Secrets.VerificationToken) || user.Secrets.VerificationTokenExpiryDate < DateTime.UtcNow)))
+			{
+				await SetVerificationToken(user);
+			}			
+			
+		}
+
+		public void SetNewUserFlags(Site site, User user)
+		{
+			user.Approved = !site.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.RequireApproval);
+			user.Verified = !site.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.RequireEmailVerification);
 		}
 
 		public async Task SaveSecrets(User user)

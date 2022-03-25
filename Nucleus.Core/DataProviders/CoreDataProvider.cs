@@ -963,6 +963,7 @@ namespace Nucleus.Core.DataProviders
 
 			await this.Context.SaveChangesAsync();
 
+			this.Context.ChangeTracker.Clear();
 			if (userRoles != null)
 			{
 				await SaveRoles(user.Id, userRoles);

@@ -35,6 +35,19 @@
 					@Html.TextBoxFor(model => model.Site.Name, new { @maxlength = 256 })
 				</SettingsControl>
 
+				<SettingsControl caption="User Registration" helptext="Specify user registration options.">
+					<div class="d-flex align-items-baseline gap-1">
+						@Html.CheckBoxFor(model => model.AllowPublicRegistration, new { @class = "allow-registration"})
+						<label class="ms-1 me-4">Allow public registration</label>
+
+						@Html.CheckBoxFor(model => model.RequireEmailVerification)
+						<label class="ms-1 me-4">Require Email Verification</label>
+
+						@Html.CheckBoxFor(model => model.RequireApproval)
+						<label class="ms-1 me-4">Require Approval</label>
+					</div>
+				</SettingsControl>
+
 				<div class="nucleus-flex-fields">
 					<SettingsControl caption="Default Layout" helptext="Default presentation layout for the site.  Pages which do not specify a layout use the site default.">
 						@Html.DropDownListFor(model => model.Site.DefaultLayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
@@ -299,6 +312,11 @@
 	</div>
 }
 <script type="text/javascript">
+	$(document).ready(function() 
+	{
+		EnableRegistrationControls(jQuery('.allow-registration').is(':checked'));
+	});
+
 	// Read the child pages of the item containing the "+" button
 	jQuery('#site-sitepages').on('click', '.nucleus-get-childpages', function (e)
 	{
@@ -321,4 +339,27 @@
 
 		jQuery(this).closest('li').find('ul').remove();
 	});
+
+	jQuery('.allow-registration').on('change', function (e)
+	{
+		EnableRegistrationControls(jQuery(this).is(':checked'));		
+	});
+
+	function EnableRegistrationControls(enable)
+	{
+		var elements = jQuery('.allow-registration').siblings(':not(:first)');
+
+		elements.prop('disabled', !enable);
+				
+		if (enable)
+		{
+			elements.removeAttr('aria-disabled');
+			elements.removeClass('disabled');
+		}
+		else
+		{
+			elements.attr('aria-disabled', true);
+			elements.addClass('disabled');
+		}
+	}
 </script>

@@ -27,12 +27,14 @@ namespace Nucleus.Core.EventHandlers
 		private IMailClientFactory MailClientFactory { get; }
 		private IMailTemplateManager MailTemplateManager { get; }
 		private ILogger<UserEventHandler> Logger { get; }
+		private IUserManager UserManager { get; }
 
-		public UserEventHandler(Context context, IMailClientFactory mailClientFactory, IMailTemplateManager mailTemplateManager, ILogger<UserEventHandler> logger)
+		public UserEventHandler(Context context, IMailClientFactory mailClientFactory, IUserManager userManager, IMailTemplateManager mailTemplateManager, ILogger<UserEventHandler> logger)
 		{
 			this.Context = context;
 			this.MailClientFactory = mailClientFactory;
 			this.MailTemplateManager = mailTemplateManager;
+			this.UserManager = userManager;
 			this.Logger = logger;
 		}
 
@@ -42,6 +44,9 @@ namespace Nucleus.Core.EventHandlers
 
 			if (this.Context != null && this.Context.Site != null)
 			{
+				// the user may not be fully populated, so we read it again
+				user = await this.UserManager.Get(this.Context.Site, user.Id);
+
 				UserProfileValue mailTo = user.Profile.Where(value => value.UserProfileProperty?.TypeUri == ClaimTypes.Email).FirstOrDefault();
 
 				if (!String.IsNullOrEmpty(mailTo?.Value))

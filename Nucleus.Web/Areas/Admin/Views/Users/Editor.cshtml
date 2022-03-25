@@ -29,6 +29,17 @@
 						@Html.PasswordFor(model => model.EnteredPassword)
 					</SettingsControl>
 				}
+
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Approved" class="inner-inline" helptext="Set whether this user is approved.">
+						@Html.CheckBoxFor(model => model.User.Approved, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+
+					<SettingsControl caption="Verified" class="inner-inline" helptext="Set whether this user is verified.">
+						@Html.CheckBoxFor(model => model.User.Verified, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+				</div>
+
 			</fieldset>
 		</TabPanel>
 
@@ -74,7 +85,7 @@
 				}
 				<table>
 
-					@for (int roleCount = 0; roleCount < Model.User?.Roles.Count; roleCount++)
+					@for (int roleCount = 0; roleCount < Model.User.Roles?.Count; roleCount++)
 					{
 						<tr>
 							<td>

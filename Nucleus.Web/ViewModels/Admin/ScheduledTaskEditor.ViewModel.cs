@@ -18,7 +18,7 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public IEnumerable<string> AvailableServiceTypes { get; set; }
 
-		public List<Nucleus.Web.ViewModels.Shared.LogFileInfo> LogFiles { get; set; }
+		public List<Shared.LogFileInfo> LogFiles { get; set; }
 
 		public string LogFile { get; set; }
 

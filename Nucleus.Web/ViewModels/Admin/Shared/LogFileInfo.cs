@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Nucleus.Web.ViewModels.Shared
+namespace Nucleus.Web.ViewModels.Admin.Shared
 {
 	public class LogFileInfo
 	{

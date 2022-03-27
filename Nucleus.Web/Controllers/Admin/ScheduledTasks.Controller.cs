@@ -168,7 +168,7 @@ namespace Nucleus.Web.Controllers.Admin
 				System.IO.DirectoryInfo logFolder = LogFolder(scheduledTask);
 				if (logFolder.Exists)
 				{
-					List<Nucleus.Web.ViewModels.Shared.LogFileInfo> logs = new();
+					List<Nucleus.Web.ViewModels.Admin.Shared.LogFileInfo> logs = new();
 					foreach (System.IO.FileInfo file in logFolder.EnumerateFiles("*.log"))
 					{
 						System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(file.Name, LogFileConstants.LOGFILE_REGEX);
@@ -179,7 +179,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 							if (DateTime.TryParseExact(match.Groups[1].Value, LogFileConstants.DATETIME_FILENAME_FORMAT, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal, out DateTime logDate))
 							{
-								logs.Add(new Nucleus.Web.ViewModels.Shared.LogFileInfo()
+								logs.Add(new Nucleus.Web.ViewModels.Admin.Shared.LogFileInfo()
 								{
 									Filename = file.Name,
 									Title = $"{logDate.ToLocalTime():dd MMM yyyy HH:mm} [{match.Groups[2].Value}]",

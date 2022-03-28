@@ -34,6 +34,9 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			SitePages sitePages = nucleusContext.Site.GetSitePages();
 			IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
 
+			outputBuilder.AddCssClass("nucleus-account-control");
+			outputBuilder.AddCssClass("navbar");
+
 			if (context.HttpContext.User.Identity.IsAuthenticated)
 			{
 				// user is logged in
@@ -93,7 +96,9 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			else
 			{
 				// user is not logged in
-				
+				TagBuilder buttonRowBuilder = new("div");
+				buttonRowBuilder.AddCssClass("d-flex flex-row gap-1");
+
 				if (nucleusContext.Site.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.SignupAllowed))
 				{
 					PageRoute registerPageRoute = await GetPageRoute(sitePages.UserRegisterPageId, pageManager); 
@@ -106,7 +111,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 						registerLinkBuilder.InnerHtml.Append("Register");
 						registerLinkBuilder.Attributes.Add("href", urlHelper.Content("~" + registerPageRoute.Path + $"?returnUrl={System.Uri.EscapeDataString(context.HttpContext.Request.Path)}"));
 
-						outputBuilder.InnerHtml.AppendHtml(registerLinkBuilder);
+						buttonRowBuilder.InnerHtml.AppendHtml(registerLinkBuilder);
 					}
 				}
 
@@ -122,7 +127,9 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				loginLinkBuilder.Attributes.Add("href",
 					loginPageRoute == null ? urlHelper.AreaAction("", "Account", "User") : urlHelper.Content("~" + loginPageRoute.Path) + $"?returnUrl={System.Uri.EscapeDataString(context.HttpContext.Request.Path)}");
 
-				outputBuilder.InnerHtml.AppendHtml(loginLinkBuilder);
+				buttonRowBuilder.InnerHtml.AppendHtml(loginLinkBuilder);
+
+				outputBuilder.InnerHtml.AppendHtml(buttonRowBuilder);
 			}
 
 			outputBuilder.MergeAttributes(htmlAttributes);

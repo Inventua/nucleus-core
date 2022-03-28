@@ -11,31 +11,16 @@
 	flex-direction: column;	
 }
 
-.BannerPane .Breadcrumbs
+/*.BannerPane .Breadcrumbs
 {
 	margin-left: 4px;
 	vertical-align: middle;
-}
+}*/
 
-.BannerPane .AccountControl
-{
-	margin-right: 2px;	
-	gap: 2px;
-}
-
-.BannerPane .AccountControl .dropdown-menu
-{
-	left: initial;
-	right: 0;
-	margin: auto;
-	/*display: flex;
-	flex-direction: column;*/
-}
-
-.BannerPane .AccountControl > *
+/*.nucleus-account-control > *
 {
 	flex-grow: 0;
-}
+}*/
 
 .ContentWrapper 
 {

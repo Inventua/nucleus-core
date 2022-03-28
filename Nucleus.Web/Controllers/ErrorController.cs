@@ -65,7 +65,7 @@ namespace Nucleus.Web.Controllers
 			{
 				this.Context.Page = errorPage;
 
-				ViewModels.Default viewModel = new(this.Context);
+				Nucleus.ViewFeatures.ViewModels.Layout viewModel = new(this.Context);
 
 				viewModel.IsEditing = User.IsEditing(HttpContext, this.Context.Site, this.Context.Page);
 				viewModel.CanEdit = User.CanEditContent(this.Context.Site, this.Context.Page);

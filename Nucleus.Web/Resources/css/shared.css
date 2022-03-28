@@ -292,6 +292,22 @@ body
   flex-basis: 100%
 }
 
+
+.nucleus-account-control.justify-content-end .dropdown-menu
+{
+	left: initial;
+	right: 0;
+	margin: auto;
+}
+
+.nucleus-account-control.justify-content-start .dropdown-menu
+{
+	left: 0;
+	right: initial;
+	margin: auto;
+}
+
+
 /*  Toggle switch plugin  */
 input[type=range].ToggleSwitch
 {

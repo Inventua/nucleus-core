@@ -84,6 +84,18 @@ namespace Nucleus.Web.Controllers.Admin
 				return BadRequest("System Administrator users must have a password.");
 			}
 
+			// If the user being edited is the currently logged in user, the approved and verified fields won't be shown, so we need
+			// to get them  from the existing record
+			if (viewModel.User.Id == ControllerContext.HttpContext.User.GetUserId())
+			{
+				User existing = await this.UserManager.Get(this.Context.Site, viewModel.User.Id);
+				if (existing != null)
+				{
+					viewModel.User.Verified = existing.Verified;
+					viewModel.User.Approved = existing.Approved;
+				}
+			}
+
 			// only save a password for a new user
 			if (viewModel.User.Id == Guid.Empty)
 			{

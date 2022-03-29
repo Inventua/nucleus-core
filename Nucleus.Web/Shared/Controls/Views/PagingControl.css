@@ -46,6 +46,13 @@
 .nucleus-paging-control label
 {
 	margin-left: 0.5em;
+	margin-right: 0.5em;
+}
+
+.nucleus-paging-control.compact label
+{
+	margin-left: 0.25em;
+	margin-right: 0.25em;
 }
 
 .nucleus-paging-control .nucleus-pagingcontrol-pagebutton, .nucleus-paging-control .nucleus-pagingcontrol-pagedropdown, .nucleus-paging-control .nucleus-pagingcontrol-pagesizedropdown

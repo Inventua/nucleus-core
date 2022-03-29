@@ -33,7 +33,7 @@ else
 			@Html.DropDownList(Model.PropertyName + ".CurrentPageIndex", new SelectList(Model.Results.Pages, "Key", "Value", Model.Results.CurrentPageIndex), new { @class = "nucleus-pagingcontrol-pagedropdown", @title = "Select Page", @data_autopostbackevent = "change" })
 
 		}
-		<label class="PageSizeLabel">Page Size:</label>
+		<label class="nucleus-pagingcontrol-pagesizelabel">Page Size:</label>
 		@Html.DropDownList(Model.PropertyName + ".PageSize", new SelectList(Model.Results.PageSizes, Model.Results.PageSize), new { @class = "nucleus-pagingcontrol-pagesizedropdown", @title = "Page Size", @data_autopostbackevent = "change" })
 
 	</div>

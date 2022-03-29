@@ -17,11 +17,11 @@
 				@Html.HiddenFor(model => model.SelectedDocument.SortOrder)
 
 				<SettingsControl caption="Title" helptext="Document title">
-					@Html.TextBoxFor(model => model.SelectedDocument.Title)
+					@Html.TextBoxFor(model => model.SelectedDocument.Title, new { @maxlength = 256 })
 				</SettingsControl>
 
 				<SettingsControl caption="Description" helptext="Description of the document">
-					@Html.TextAreaFor(model => model.SelectedDocument.Description)
+					@Html.TextAreaFor(model => model.SelectedDocument.Description, new { @maxlength = 512 })
 				</SettingsControl>
 
 				@if (Model.Categories != null)

@@ -32,7 +32,7 @@ namespace Nucleus.Abstractions.Managers
 		/// List all <see cref="SiteGroup"/>s for the specified site.
 		/// </summary>
 		/// <returns></returns>
-		public Task<IEnumerable<SiteGroup>> List();
+		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<SiteGroup>> List(Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 
 		/// <summary>
 		/// Create or update the specified <see cref="SiteGroup"/>.

@@ -341,6 +341,15 @@ namespace Nucleus.Data.EntityFramework
 			{
 				operation.IsUnicode = true;
 			}
+
+			if (DbContext.Database.ProviderName.EndsWith("Sqlite", StringComparison.OrdinalIgnoreCase))
+			{
+				if (operation.ClrType == typeof(string) && operation.Collation == null)
+				{
+					// For Sqlite, make all string columns case-insensitive unless collation is already specified
+					operation.Collation = "NOCASE";
+				}
+			}
 		}
 
 		private void ExecuteCommand(DatabaseSchemaScript script, string command)

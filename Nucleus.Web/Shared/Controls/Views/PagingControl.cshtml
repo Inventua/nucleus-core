@@ -6,35 +6,45 @@
 }
 else
 {
-	<div class="PagingControl">
-		<span class="Summary">Page @Model.Results.CurrentPageIndex of @Model.Results.TotalPages</span>
-		<a class="PageButton@(Model.Results.CurrentPageIndex == 1 ? " disabled" : "")" data-page="1">|&lt;</a>
-		<a class="PageButton@(Model.Results.CurrentPageIndex == 1 ? " disabled" : "")" data-page="@(Model.Results.CurrentPageIndex - 1)">Previous</a>
-
+	<div class="nucleus-paging-control @Model.RenderMode.ToString().ToLower()">
 		@if (Model.Results.Pages.Count > 1)
 		{
-			@foreach (var pageInfo in Model.Results.Pages)
-			{
-				@if (pageInfo.Key == Model.Results.TotalPages && Model.Results.TotalPages > Model.Results.MaxPageControls)
+			<div class="nucleus-pagingcontrol-left">
+				<span class="nucleus-paging-control-summary">Page @Model.Results.CurrentPageIndex of @Model.Results.TotalPages</span>
+				@if (Model.RenderMode == Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Standard)
 				{
-					<span>...</span>
+						<a class="nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == 1 ? " disabled" : "")" data-page="1">|&lt;</a>
+						<a class="nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == 1 ? " disabled" : "")" data-page="@(Model.Results.CurrentPageIndex - 1)">Previous</a>
+
+						@foreach (var pageInfo in Model.Results.Pages)
+						{
+							@if (pageInfo.Key == Model.Results.TotalPages && Model.Results.TotalPages > Model.Results.MaxPageControls)
+							{
+								<span>...</span>
+							}
+							<a class="nucleus-pagingcontrol-pagebutton@(pageInfo.Key == Model.Results.CurrentPageIndex ? " Current" : "")" data-page="@pageInfo.Key">@pageInfo.Key</a>
+						}
+						<a class="nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == Model.Results.TotalPages ? " disabled" : "")" data-page="@(Model.Results.CurrentPageIndex + 1)">Next</a>
+						<a class="nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == Model.Results.TotalPages ? " disabled" : "")" data-page="@Model.Results.TotalPages">&gt;|</a>
+				
 				}
-				<a class="PageButton@(pageInfo.Key == Model.Results.CurrentPageIndex ? " Current" : "")" data-page="@pageInfo.Key">@pageInfo.Key</a>
-			}
-			<a class="PageButton@(Model.Results.CurrentPageIndex == Model.Results.TotalPages ? " disabled" : "")" data-page="@(Model.Results.CurrentPageIndex + 1)">Next</a>
-			<a class="PageButton@(Model.Results.CurrentPageIndex == Model.Results.TotalPages ? " disabled" : "")" data-page="@Model.Results.TotalPages">&gt;|</a>
-			@Html.DropDownList(Model.PropertyName + ".CurrentPageIndex", new SelectList(Model.Results.Pages, "Key", "Value", Model.Results.CurrentPageIndex), new { @class = "PageDropDown", @title = "Select Page", @data_autopostbackevent = "change" })
+			</div>
+
+			@Html.DropDownList(Model.PropertyName + ".CurrentPageIndex", new SelectList(Model.Results.Pages, "Key", "Value", Model.Results.CurrentPageIndex), new { @class = "nucleus-pagingcontrol-pagedropdown", @title = "Select Page", @data_autopostbackevent = "change" })
+
 		}
 		<label class="PageSizeLabel">Page Size:</label>
-		@Html.DropDownList(Model.PropertyName + ".PageSize", new SelectList(Model.Results.PageSizes, Model.Results.PageSize), new { @class = "PageSizeDropDown", @title = "Page Size", @data_autopostbackevent = "change" })
+		@Html.DropDownList(Model.PropertyName + ".PageSize", new SelectList(Model.Results.PageSizes, Model.Results.PageSize), new { @class = "nucleus-pagingcontrol-pagesizedropdown", @title = "Page Size", @data_autopostbackevent = "change" })
+
 	</div>
+
 }
 
 <script type="text/javascript">
 	jQuery(document).ready(function ()
 	{
 		jQuery(document).off('click.pagingcontrol');
-		jQuery(document).on('click.pagingcontrol', '.PagingControl [data-page]:not(.disabled)', function (event)
+		jQuery(document).on('click.pagingcontrol', '.nucleus-paging-control [data-page]:not(.disabled)', function (event)
 		{
 			jQuery('#@(Model.PropertyName)_CurrentPageIndex').val(jQuery(event.currentTarget).attr('data-page')).trigger("change");
 		});

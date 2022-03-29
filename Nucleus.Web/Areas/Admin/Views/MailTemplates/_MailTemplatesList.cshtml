@@ -1,0 +1,11 @@
+﻿@model Nucleus.Web.ViewModels.Admin.MailTemplateIndex
+@using (Html.BeginAreaForm("List", "MailTemplates", "Admin", FormMethod.Post, new { @data_target = ".nucleus-index-items", @autocomplete = "off" }))
+{
+	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.MailTemplates, propertyName = "MailTemplates", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
+}
+<ul>
+	@foreach (var item in Model.MailTemplates.Items)
+	{
+		<li><a href="@Url.Content("~/Admin/MailTemplates/Editor")?id=@item.Id" data-target=".MailTemplateEditor">@item.Name</a></li>
+	}
+</ul>

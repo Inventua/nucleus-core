@@ -312,11 +312,11 @@ namespace Nucleus.Core.Managers
 		/// </summary>
 		/// <param name="site"></param>
 		/// <returns></returns>
-		public async Task<IEnumerable<User>> List(Site site)
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> List(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
 		{
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{
-				return await provider.ListUsers(site);
+				return await provider.ListUsers(site, pagingSettings);
 			}
 		}
 
@@ -325,11 +325,11 @@ namespace Nucleus.Core.Managers
 		/// </summary>
 		/// <param name="site"></param>
 		/// <returns></returns>
-		public async Task<IEnumerable<User>> ListSystemAdministrators()
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListSystemAdministrators(Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
 		{
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{
-				return await provider.ListSystemAdministrators();
+				return await provider.ListSystemAdministrators(pagingSettings);
 			}
 		}
 

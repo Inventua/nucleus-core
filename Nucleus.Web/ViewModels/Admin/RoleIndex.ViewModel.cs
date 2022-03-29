@@ -8,7 +8,7 @@ namespace Nucleus.Web.ViewModels.Admin
 {	
 	public class RoleIndex
 	{
-		public IEnumerable<Role> Roles { get; set; }
+		public Nucleus.Abstractions.Models.Paging.PagedResult<Role> Roles { get; set; } = new() { PageSize = 20 };
 
 	}
 }

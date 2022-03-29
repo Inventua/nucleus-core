@@ -388,12 +388,12 @@ namespace Nucleus.Core.Managers
 
 			using (IListDataProvider provider = this.DataProviderFactory.CreateProvider<IListDataProvider>())
 			{
-				export.Lists = await provider.ListLists(site);
+				export.Lists = new(await provider.ListLists(site));
 			}
 
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{
-				export.RoleGroups = await provider.ListRoleGroups(site);
+				export.RoleGroups = new(await provider.ListRoleGroups(site));
 				
 				// don't include special site roles as these are imported from the Sites entity
 				export.Roles = (await provider.ListRoles(site))
@@ -402,7 +402,7 @@ namespace Nucleus.Core.Managers
 
 			using (IMailDataProvider provider = this.DataProviderFactory.CreateProvider<IMailDataProvider>())
 			{
-				export.MailTemplates = await provider.ListMailTemplates(site);				
+				export.MailTemplates = new (await provider.ListMailTemplates(site));
 			}
 
 			// serialize the export data to XML

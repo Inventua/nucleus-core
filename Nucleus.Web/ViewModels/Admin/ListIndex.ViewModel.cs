@@ -8,7 +8,7 @@ namespace Nucleus.Web.ViewModels.Admin
 {	
 	public class ListIndex
 	{
-		public IEnumerable<List> Lists { get; set; }
+		public Nucleus.Abstractions.Models.Paging.PagedResult<List> Lists { get; set; } = new() { PageSize = 20 };
 
 	}
 }

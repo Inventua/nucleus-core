@@ -66,6 +66,19 @@ namespace Nucleus.Core.Managers
 		}
 
 		/// <summary>
+		/// List paged <see cref="Role"/>s for the specified site.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <returns></returns>
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Role>> List(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		{
+			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+			{
+				return await provider.ListRoles(site, pagingSettings);
+			}
+		}
+
+		/// <summary>
 		/// Create or update the specified <see cref="Role"/>.
 		/// </summary>
 		/// <param name="site"></param>

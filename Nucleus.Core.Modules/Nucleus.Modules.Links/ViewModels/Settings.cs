@@ -17,7 +17,7 @@ namespace Nucleus.Modules.Links.ViewModels
     public IList<Link> Links { get; set; }
     //public string Message { get; set; }
     public Boolean NewWindow { get; set; }
-    public IList<List> Lists { get; set; }
+    public IEnumerable<List> Lists { get; set; }
 
     public List CategoryList { get; set; }
 

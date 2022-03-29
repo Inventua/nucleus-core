@@ -38,13 +38,23 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Display the page editor
+		/// Display the user list
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet]
 		public async Task<ActionResult> Index()
 		{
 			return View("Index", await BuildViewModel());
+		}
+
+		/// <summary>
+		/// Display the user list
+		/// </summary>
+		/// <returns></returns>
+		[HttpPost]
+		public async Task<ActionResult> List(ViewModels.Admin.UserIndex viewModel)
+		{
+			return View("_UserList", await BuildViewModel(viewModel));
 		}
 
 		/// <summary>
@@ -158,10 +168,12 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private async Task<ViewModels.Admin.UserIndex> BuildViewModel()
 		{
-			ViewModels.Admin.UserIndex viewModel = new();
+			return await BuildViewModel(new ViewModels.Admin.UserIndex());
+		}
 
-			viewModel.Users = await this.UserManager.List(this.Context.Site);
-
+		private async Task<ViewModels.Admin.UserIndex> BuildViewModel(ViewModels.Admin.UserIndex viewModel)
+		{
+			viewModel.Users = await this.UserManager.List(this.Context.Site, viewModel.Users);
 			return viewModel;
 		}
 

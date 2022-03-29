@@ -2,53 +2,52 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Extensions;
 @addTagHelper "*, Nucleus.ViewFeatures"
-<h1>Manage</h1>
-
+<h1 class="nucleus-control-panel-heading">Manage</h1>
 <ul class="nucleus-control-panel-items">
 	<li class="UsersIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/Users/Index")"></a>
+		<a href="@Url.Content("~/Admin/Users/Index")" accesskey="U"></a>
 		<span>&#xf02e;</span>
 		<h3>Users</h3>
 		Create and Manage user accounts, profile settings and user role assignments.
 	</li>
 
 	<li class="RoleGroupsIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/RoleGroups/Index")"></a>
+		<a href="@Url.Content("~/Admin/RoleGroups/Index")" accesskey="G"></a>
 		<span>&#xf233;</span>
 		<h3>Role Groups</h3>
 		Create and Manage Role Groups.
 	</li>
 
 	<li class="RolesIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/Roles/Index")"></a>
+		<a href="@Url.Content("~/Admin/Roles/Index")" accesskey="R"></a>
 		<span>&#xe7ef;</span>
 		<h3>Roles</h3>
 		Create and Manage Security Roles.
 	</li>
 
 	<li class="SiteIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/Sites/EditCurrentSite")"></a>
+		<a href="@Url.Content("~/Admin/Sites/EditCurrentSite")" accesskey="S"></a>
 		<span>&#xe051;</span>
 		<h3>Site</h3>
 		Manage settings for the current site.
 	</li>
 
 	<li class="MailIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/MailTemplates/Index")"></a>
+		<a href="@Url.Content("~/Admin/MailTemplates/Index")" accesskey="M"></a>
 		<span>&#xe0be;</span>
 		<h3>Mail Templates</h3>
 		Manage e-mail templates for the current site.
 	</li>
 
 	<li class="FilesIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/FileSystem/Index")"></a>
+		<a href="@Url.Content("~/Admin/FileSystem/Index")" accesskey="F"></a>
 		<span>&#xe2c7;</span>
 		<h3>Files</h3>
 		Manage file system providers, folders and files.
 	</li>
 
 	<li class="ListsIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/Lists/Index")"></a>
+		<a href="@Url.Content("~/Admin/Lists/Index")" accesskey="L"></a>
 		<span>&#xe7ef;</span>
 		<h3>Lists</h3>
 		Create and Manage Lists, which can be used by modules or other parts of the system.
@@ -57,7 +56,7 @@
 	@foreach (var extension in Model.Extensions)
 	{
 	<li class="ExtensionIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.NucleusAction(extension.EditAction, extension.ControllerName, extension.ExtensionName)"></a>
+		<a href="@Url.NucleusAction(extension.EditAction, extension.ControllerName, extension.ExtensionName)" accesskey="@extension.FriendlyName.Substring(0,1)"></a>
 		<span>&#xe87b;</span>
 		<h3>@extension.FriendlyName</h3>
 		@extension.Description

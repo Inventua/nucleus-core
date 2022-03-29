@@ -67,6 +67,19 @@ namespace Nucleus.Core.Managers
 		}
 
 		/// <summary>
+		/// List paged <see cref="MailTemplate"/>s for the specified site.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <returns></returns>
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<MailTemplate>> List(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		{
+			using (IMailDataProvider provider = this.DataProviderFactory.CreateProvider<IMailDataProvider>())
+			{
+				return await provider.ListMailTemplates(site, pagingSettings);
+			}
+		}
+
+		/// <summary>
 		/// Create or update a <see cref="MailTemplate"/>.
 		/// </summary>
 		/// <param name="site"></param>

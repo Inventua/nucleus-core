@@ -36,6 +36,14 @@ namespace Nucleus.Abstractions.Managers
 		public Task<IEnumerable<RoleGroup>> List(Site site);
 
 		/// <summary>
+		/// List paged <see cref="RoleGroup"/>s for the specified site.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="pagingSettings"></param>
+		/// <returns></returns>
+		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<RoleGroup>> List(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
+
+		/// <summary>
 		/// Create or update the specified <see cref="RoleGroup"/>.
 		/// </summary>
 		/// <param name="site"></param>

@@ -57,11 +57,11 @@ namespace Nucleus.Core.Managers
 		/// </summary>
 		/// <param name="site"></param>
 		/// <returns></returns>
-		public async Task<IEnumerable<SiteGroup>> List()
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<SiteGroup>> List(Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
 		{
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
-				return await provider.ListSiteGroups();
+				return await provider.ListSiteGroups(pagingSettings);
 			}
 		}
 

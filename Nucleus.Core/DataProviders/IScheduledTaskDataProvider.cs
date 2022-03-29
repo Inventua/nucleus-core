@@ -22,6 +22,7 @@ namespace Nucleus.Core.DataProviders
 
 		abstract Task<ScheduledTask> GetScheduledTask(Guid scheduledTaskId);
 		abstract Task<List<ScheduledTask>> ListScheduledTasks();
+		abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<ScheduledTask>> ListScheduledTasks(Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 		abstract Task DeleteScheduledTask(ScheduledTask scheduledTask);
 		abstract Task SaveScheduledTaskHistory(ScheduledTaskHistory history);
 		abstract Task<List<ScheduledTaskHistory>> ListScheduledTaskHistory(Guid scheduledTaskId);

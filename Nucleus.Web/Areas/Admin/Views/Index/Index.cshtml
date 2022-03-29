@@ -34,26 +34,26 @@
 			@if (Model.IsSiteAdmin)
 			{
 				<li data-target=".nucleus-adminpage" class="SystemIcon">
-					<a title="System" href="@Url.Content("~/Admin/System/Index")"><span>&#xe871;</span></a>
+					<a title="System" href="@Url.Content("~/Admin/System/Index")" accesskey="Y"><span>&#xe871;</span></a>
 					<span class="Label">System</span>
 				</li>
 				<li data-target=".nucleus-adminpage" class="PagesIcon">
-					<a title="Pages" class="Pages" href="@Url.Content("~/Admin/Pages/Index")"><span>&#xef42;</span></a>
+					<a title="Pages" class="Pages" href="@Url.Content("~/Admin/Pages/Index")" accesskey="P"><span>&#xef42;</span></a>
 					<span class="Label">Pages</span>
 				</li>
 				<li data-target=".nucleus-adminpage" class="ManageIcon">
-					<a title="Manage" class="Manage" href="@Url.Content("~/Admin/Manage/Index")"><span>&#xf02e;</span></a>
+					<a title="Manage" class="Manage" href="@Url.Content("~/Admin/Manage/Index")" accesskey="M"><span>&#xf02e;</span></a>
 					<span class="Label">Manage</span>
 				</li>
 			}
 			@if (Model.IsSystemAdministrator)
 			{
 				<li data-target=".nucleus-adminpage" class="ExtensionsIcon">
-					<a title="Extensions" class="Extensions" href="@Url.Content("~/Admin/Extensions/Index")"><span>&#xe87b;</span></a>
+					<a title="Extensions" class="Extensions" href="@Url.Content("~/Admin/Extensions/Index")" accesskey="E"><span>&#xe87b;</span></a>
 					<span class="Label">Extensions</span>
 				</li>
 				<li data-target=".nucleus-adminpage" class="SettingsIcon">
-					<a title="Settings" class="Settings" href="@Url.Content("~/Admin/Settings/Index")"><span>&#xe8b8;</span></a>
+					<a title="Settings" class="Settings" href="@Url.Content("~/Admin/Settings/Index")" accesskey="S"><span>&#xe8b8;</span></a>
 					<span class="Label">Settings</span>
 				</li>
 			}

@@ -30,7 +30,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Display the editor
+		/// Display the list of templates
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet]
@@ -40,7 +40,17 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Display the user editor
+		/// Display the templates list
+		/// </summary>
+		/// <returns></returns>
+		[HttpPost]
+		public async Task<ActionResult> List(ViewModels.Admin.MailTemplateIndex viewModel)
+		{
+			return View("_MailTemplatesList", await BuildViewModel(viewModel));
+		}
+
+		/// <summary>
+		/// Display the mail template editor
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet]
@@ -81,9 +91,12 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private async Task<ViewModels.Admin.MailTemplateIndex> BuildViewModel()
 		{
-			ViewModels.Admin.MailTemplateIndex viewModel = new();
+			return await BuildViewModel(new ViewModels.Admin.MailTemplateIndex());
+		}
 
-			viewModel.MailTemplates = await this.MailTemplateManager.List(this.Context.Site);
+		private async Task<ViewModels.Admin.MailTemplateIndex> BuildViewModel(ViewModels.Admin.MailTemplateIndex viewModel)
+		{
+			viewModel.MailTemplates = await this.MailTemplateManager.List(this.Context.Site, viewModel.MailTemplates);
 			
 			return viewModel;
 		}

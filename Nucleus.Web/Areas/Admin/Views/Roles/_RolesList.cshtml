@@ -1,0 +1,11 @@
+﻿@model Nucleus.Web.ViewModels.Admin.RoleIndex
+@using (Html.BeginAreaForm("List", "Roles", "Admin", FormMethod.Post, new { @data_target = ".nucleus-index-items", @autocomplete = "off" }))
+{
+	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.Roles, propertyName = "Roles", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
+}
+<ul>
+	@foreach (var item in Model.Roles.Items)
+	{
+		<li><a href="@Url.Content("~/Admin/Roles/Editor")?id=@item.Id" data-target=".RoleEditor">@item.Name</a></li>
+	}
+</ul>

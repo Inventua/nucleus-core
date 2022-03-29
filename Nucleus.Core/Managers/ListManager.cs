@@ -71,11 +71,25 @@ namespace Nucleus.Core.Managers
 		/// </summary>
 		/// <param name="site"></param>
 		/// <returns></returns>
-		public async Task<IList<List>> List(Site site)
+		public async Task<IEnumerable<List>> List(Site site)
 		{
 			using (IListDataProvider provider = this.DataProviderFactory.CreateProvider<IListDataProvider>())
 			{
 				return await provider.ListLists(site);
+			}
+		}
+
+
+		/// <summary>
+		/// List paged <see cref="List"/>s for the specified site.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <returns></returns>
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<List>> List(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		{
+			using (IListDataProvider provider = this.DataProviderFactory.CreateProvider<IListDataProvider>())
+			{
+				return await provider.ListLists(site, pagingSettings);
 			}
 		}
 

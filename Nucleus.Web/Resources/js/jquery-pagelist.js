@@ -17,6 +17,7 @@
         if (control.is(event.target) || control.has(event.target).length !== 0)
         {
           control.find('ul:first').addClass('show');
+          control.find('ul:first').find('a:first').focus();
         }
       });
     });

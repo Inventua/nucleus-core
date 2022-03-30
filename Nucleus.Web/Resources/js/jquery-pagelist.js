@@ -6,7 +6,7 @@
     var config = jQuery.extend({
     }, conf);
 
-    // allow clicks outside the control to close it
+    // allow clicks outside the control to close the page list
     jQuery(document).on('click', function (event)
     {
       jQuery('.nucleus-page-list ul').removeClass('show');
@@ -21,6 +21,16 @@
       });
     });
 
+    // allow up arrow or page up to close page list
+    jQuery(document).on('keydown', function (event)
+    {
+      if (event.which === 38 || event.which === 33)
+      {
+        jQuery('.nucleus-page-list ul').removeClass('show');
+      }
+    });
+
+
     // For every element passed to the plug-in
     return this.each(function (index, value)
     {
@@ -31,6 +41,16 @@
       {
         jQuery(this).siblings('ul').addClass('show');
         event.preventDefault();
+      });
+
+      control.find('.nucleus-page-list-selected, button').on('keydown', function (event)
+      {
+        // trigger click event when the user presses space or down arrow or page down
+        if (event.which === 32 || event.which === 40 || event.which === 34)
+        {
+          jQuery(this.click());
+          event.preventDefault();
+				}
       });
 
       // we must use a jquery delegated event handler, because the list can expand (have more elements added)

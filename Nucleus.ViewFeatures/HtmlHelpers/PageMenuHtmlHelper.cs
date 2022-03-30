@@ -126,6 +126,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			expandlinkBuilder.AddCssClass($"btn nucleus-get-childpages nucleus-material-icon collapse{(show ? " show" : "")}");
 			expandlinkBuilder.Attributes.Add("type", "button");
 			expandlinkBuilder.Attributes.Add("data-id", page.Id.ToString());
+			expandlinkBuilder.Attributes.Add("tabindex", "0");
 			expandlinkBuilder.InnerHtml.SetHtmlContent("&#xe5cc;");
 
 			return expandlinkBuilder;
@@ -137,6 +138,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			collapselinkBuilder.AddCssClass($"btn nucleus-hide-childpages nucleus-material-icon collapse{(show ? " show" : "")}");
 			collapselinkBuilder.Attributes.Add("type", "button");
 			collapselinkBuilder.Attributes.Add("data-id", page.Id.ToString());
+			collapselinkBuilder.Attributes.Add("tabindex", "0");
 			collapselinkBuilder.InnerHtml.SetHtmlContent("&#xe5cf;");
 
 			return collapselinkBuilder;

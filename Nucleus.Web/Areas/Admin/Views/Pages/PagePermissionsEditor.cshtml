@@ -3,10 +3,10 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
-<fieldset role="group" aria-labelledby="heading">
-	<h2>Permissions</h2>
+<fieldset role="group" aria-labelledby="heading">	
 	@if (Model.AvailablePageRoles.Any())
 	{
+		<h2>Roles</h2>
 		<div class="nucleus-form-tools">
 			@*@Html.DropDownListFor((model) => model.SelectedPageRoleId, new SelectList(Model.AvailablePageRoles, "Id", "Name"), new { @class = "flex-fill" })*@
 
@@ -15,7 +15,13 @@
 			<input type="submit" formaction="@Url.AreaAction("AddPagePermissionRole", "Pages", "Admin")" value="Add Role" data-target="form.parent()" class="btn btn-secondary" />
 		</div>
 	}
-	@if (Model.PagePermissions.Values.Any())
+	@if (!Model.PagePermissions.Values.Any())
+	{
+		{
+			<div class="alert alert-primary" role="alert">This page does not have any permissions configured, so only administrators can see it. Select a role from the drop-down list and click "Add Role" to create a page permission.</div>
+		}	
+	}
+	else
 	{
 		<table>
 			<tr>

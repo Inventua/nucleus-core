@@ -99,14 +99,16 @@
 						}
 					}
 
+					jQuery('body').fadeTo('opacity', '0.3');
 					window.location.reload(true);
 				}, false);
 
 			window.document.addEventListener('Open',
 				function (args)
 				{
-					if (args.detail !== null && typeof (args.detail.target) !== 'undefined')
+					if (args.detail !== null && typeof (args.detail.target) !== 'undefined')					
 					{
+						jQuery('body').fadeTo('opacity', '0.3');
 						window.location = args.detail.target;
 					}
 				}, false);
@@ -127,7 +129,7 @@
 						{
 							var settingsDialog = new bootstrap.Modal(wrapper);
 							//var settingsDialog = wrapper.modal();
-							wrapper.on('hidden.bs.modal', function () { window.location.reload(true); });
+							wrapper.on('hidden.bs.modal', function () { jQuery('body').fadeTo('opacity', '0.3'); window.location.reload(true); });
 							settingsDialog.show();
 						}
 						element.show();

@@ -70,7 +70,7 @@ namespace Nucleus.Abstractions.Models
 		/// <summary>
 		/// A list of routes for the page.
 		/// </summary>
-		public List<PageRoute> Routes { get; set; } = new();
+		public List<PageRoute> Routes { get; } = new();
 
 		/// <summary>
 		/// Page keywords.

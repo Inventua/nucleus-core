@@ -29,7 +29,7 @@
 					<tr>
 						<th>Title</th>
 						<th>Category</th>
-						<th>Description</th>
+						@*<th>Description</th>*@
 					</tr>
 					@for (int documentCount = 0; documentCount < Model.Documents.Count; documentCount++)
 					{
@@ -41,7 +41,7 @@
 
 							<td>@Model.Documents[documentCount].Category?.Name</td>
 
-							<td>@Model.Documents[documentCount].Description</td>
+							@*<td>@Model.Documents[documentCount].Description</td>*@
 							<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("Edit", "Documents", "Documents")?id=@Model.Documents[documentCount].Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-primary" title="Edit" data-target="#DocumentEditor" /></td>
 							<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("Delete", "Documents", "Documents")?id=@Model.Documents[documentCount].Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-confirm="Delete this document?" /></td>
 							<td class="nucleus-small-cell">

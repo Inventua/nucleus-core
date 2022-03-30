@@ -2,32 +2,31 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Extensions;
 @addTagHelper "*, Nucleus.ViewFeatures"
-<h1>Settings</h1>
-
+<h1 class="nucleus-control-panel-heading">Settings</h1>
 <ul class="nucleus-control-panel-items">
 	<li class="SysAdminsIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/SystemAdministrators/Index")"></a>
+		<a href="@Url.Content("~/Admin/SystemAdministrators/Index")" accesskey="A"></a>
 		<span>&#xef3d;</span>
 		<h3>System Administrators</h3>
 		Create and manage System Administrator users.  System Administrator users can manage all features of all sites.
 	</li>
 
 	<li class="SiteGroupsIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/SiteGroups/Index")"></a>
+		<a href="@Url.Content("~/Admin/SiteGroups/Index")" accesskey="G"></a>
 		<span>&#xe051;</span>
 		<h3>Site Groups</h3>
 		Create and manage sites groups.  Sites can be added to a site group to share users, roles and other data.
 	</li>
 
 	<li class="SitesIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/Sites/Index")"></a>
+		<a href="@Url.Content("~/Admin/Sites/Index")" accesskey="S"></a>
 		<span>&#xe051;</span>
 		<h3>Sites</h3>
 		Create and manage sites (Tenants).
 	</li>
 
 	<li class="ScheduledTasksIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/ScheduledTasks/Index")"></a>
+		<a href="@Url.Content("~/Admin/ScheduledTasks/Index")" accesskey="T"></a>
 		<span>&#xe8b5;</span>
 		<h3>Scheduler</h3>
 		Create and manage scheduled tasks.

@@ -1,0 +1,11 @@
+﻿@model Nucleus.Web.ViewModels.Admin.UserIndex
+@using (Html.BeginAreaForm("List", "Users", "Admin", FormMethod.Post, new { @data_target = ".nucleus-index-items", @autocomplete = "off" }))
+{
+	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.Users, propertyName = "Users", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
+}
+<ul>
+	@foreach (var item in Model.Users.Items)
+	{
+		<li><a href="@Url.Content("~/Admin/Users/Editor")?id=@item.Id" data-target=".UserEditor">@item.UserName</a></li>
+	}
+</ul>

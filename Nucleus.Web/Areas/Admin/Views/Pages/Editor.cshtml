@@ -12,16 +12,16 @@
 	<div class="position-absolute end-0">
 		@if (Model.Page.Id != Guid.Empty)
 		{
-			<button class="btn btn-success nucleus-open-page">Open</button>
+			<button class="btn btn-success nucleus-open-page" accesskey="O">Open</button>
 		}
 		@if (Model.PageEditorMode == Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default && Model.Page.Id != Guid.Empty && !Model.Page.IsFirst)
 		{
-			@Html.SubmitButton("&#xe5d8;", "Move Up", Url.AreaAction("MovePageUp", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @data_target = ".nucleus-adminpage" })
+			@Html.SubmitButton("&#xe5d8;", "Move Up", Url.AreaAction("MovePageUp", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @accesskey = "U", @data_target = ".nucleus-adminpage" })
 		}
 
 		@if (Model.PageEditorMode == Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default && Model.Page.Id != Guid.Empty && !Model.Page.IsLast)
 		{
-			@Html.SubmitButton("&#xe5db;", "Move Down", Url.AreaAction("MovePageDown", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @data_target = ".nucleus-adminpage" })
+			@Html.SubmitButton("&#xe5db;", "Move Down", Url.AreaAction("MovePageDown", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @accesskey = "D", @data_target = ".nucleus-adminpage" })
 		}
 	</div>
 
@@ -100,10 +100,12 @@
 				</div>
 			</fieldset>
 
-			<fieldset role="group" aria-labelledby="heading">
-				<h2>Paths</h2>
-				<div class="nucleus-form-tools">
-					@Html.SubmitButton("&#xe145;", "Add Path", Url.AreaAction("AddPageRoute", "Pages", "Admin"), new { @data_target = "form.parent()", @class = "btn btn-secondary" })
+			<fieldset role="group" aria-labelledby="heading" class="border-top pt-2 mt-2">
+				<div class="d-flex">
+					<h2 class="flex-grow-1 align-self-end">Page Routes</h2>
+					<div class="nucleus-form-tools">
+						@Html.SubmitButton("&#xe145;", "Add Path", Url.AreaAction("AddPageRoute", "Pages", "Admin"), new { @data_target = "form.parent()", @class = "btn btn-secondary", @accesskey = "A" })
+					</div>
 				</div>
 				<table>
 					<tr>

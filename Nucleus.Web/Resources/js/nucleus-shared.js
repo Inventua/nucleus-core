@@ -637,16 +637,12 @@ function _Page()
 				});
 
 				wrapper.modal('show');
-				//settingsDialog = new bootstrap.Modal(wrapper);
 				wrapper.on('hidden.bs.modal', function () { jQuery('.modal-backdrop').remove(); });
-				//settingsDialog.show();
 
 			}
 			else
 			{
 				wrapper.modal('hide');
-				//settingsDialog = bootstrap.Modal.getInstance(wrapper);
-				//settingsDialog.hide();
 			}
 
 		}
@@ -665,6 +661,9 @@ function _Page()
 			window.parent.document.dispatchEvent(new CustomEvent('Refresh'));
 			return;
 		}
+
+		// attempt to set focus to the first input control in the response
+		target.find(':input:not(:hidden,:button)').first().focus();
 
 		// adjust dates from UTC to local
 		_setupDateFields(target);

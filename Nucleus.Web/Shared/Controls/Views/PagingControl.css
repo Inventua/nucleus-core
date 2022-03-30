@@ -1,4 +1,4 @@
-﻿.PagingControl
+﻿.nucleus-paging-control
 {
   padding: 4px 8px 4px 8px;
 	background-color: #5d81a0;
@@ -6,37 +6,56 @@
 	display: flex;
 	gap: 4px;
 	align-items: center;
-	flex-basis: 100%;
 	font-size: 0.9em;
+	justify-content: flex-end;
 }
 
-.PagingControl .PageButton:hover, .PagingControl .PageButton:active
+.nucleus-paging-control.compact
+{
+	font-size: 0.8em;
+	padding: 4px 4px 4px 4px;
+	gap: 2px;	
+}
+
+.nucleus-paging-control .nucleus-pagingcontrol-pagebutton:hover, .nucleus-paging-control .nucleus-pagingcontrol-pagebutton:active
 {
   background-color: #357fbe;
   color: White;
 }
 
-.PagingControl .PageButton.disabled
+.nucleus-paging-control .nucleus-pagingcontrol-pagebutton.disabled
 {
 	opacity: 0;
 }
 
-.PagingControl .Summary
+.nucleus-paging-control .nucleus-pagingcontrol-left
+{
+	flex-grow: 5;
+}
+
+.nucleus-paging-control .nucleus-paging-control-summary
 {
 	flex-grow: 2;
 }
 
-.PagingControl .Summary, .PagingControl label
+.nucleus-paging-control .nucleus-paging-control-summary, .nucleus-paging-control label
 {
-  color: White;
+  color: white;
 }
 
-.PagingControl label
+.nucleus-paging-control label
 {
 	margin-left: 0.5em;
+	margin-right: 0.5em;
 }
 
-.PagingControl .PageButton, .PagingControl .PageDropDown, .PagingControl .PageSizeDropDown
+.nucleus-paging-control.compact label
+{
+	margin-left: 0.25em;
+	margin-right: 0.25em;
+}
+
+.nucleus-paging-control .nucleus-pagingcontrol-pagebutton, .nucleus-paging-control .nucleus-pagingcontrol-pagedropdown, .nucleus-paging-control .nucleus-pagingcontrol-pagesizedropdown
 {
 	padding: 2px 6px 2px 6px;
 	border: solid 1px #DDDDDD;
@@ -46,19 +65,29 @@
 	text-decoration: none;
 }
 
-.PagingControl .PageButton.Current
+
+.nucleus-paging-control .nucleus-pagingcontrol-pagebutton.Current
 {
 	background-color: #DDDDDD;
 }
 
-.PagingControl .PageDropDown
+.nucleus-paging-control .nucleus-pagingcontrol-pagedropdown
 {
 	margin-left: 1em;
 }
 
+.nucleus-paging-control.compact .nucleus-pagingcontrol-pagedropdown
+{
+	margin-left: 0.5em;
+}
 
-.PagingControl .PageSizeDropDown, .PagingControl .PageDropDown
+.nucleus-paging-control .nucleus-pagingcontrol-pagesizedropdown, .nucleus-paging-control .nucleus-pagingcontrol-pagedropdown
 {
 	padding: 2px 26px 2px 6px;
 	border: solid 1px #DDDDDD;	
+}
+
+.nucleus-paging-control.compact .nucleus-pagingcontrol-pagedropdown, .nucleus-paging-control.compact .nucleus-pagingcontrol-pagesizedropdown
+{
+	padding: 2px 22px 2px 4px;
 }

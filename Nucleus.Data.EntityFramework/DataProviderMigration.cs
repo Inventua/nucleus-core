@@ -32,7 +32,7 @@ namespace Nucleus.Data.EntityFramework
 		protected DbContext DbContext { get; }
 		private ILogger<DataProviderMigration<TDataProvider>> Logger { get; }
 
-		private Nucleus.Abstractions.EventHandlers.IEventDispatcher EventDispatcher {get;}
+		private Nucleus.Abstractions.EventHandlers.IEventDispatcher EventDispatcher { get; }
 
 		/// <summary>
 		/// Constructor.
@@ -107,7 +107,7 @@ namespace Nucleus.Data.EntityFramework
 			//	return false;
 			//}
 		}
-				
+
 		/// <summary>
 		/// Retrieve the version number of the latest schema update that has been applied for the specified schema name.  
 		/// </summary>
@@ -152,10 +152,10 @@ namespace Nucleus.Data.EntityFramework
 				.FirstOrDefault();
 
 			Nucleus.Abstractions.Models.Internal.Schema schema = new() { SchemaName = schemaName, SchemaVersion = version.ToString() };
-			
+
 			this.DbContext.Attach(schema);
 			this.DbContext.Entry(schema).State = existing == null ? EntityState.Added : EntityState.Modified;
-			
+
 			this.DbContext.SaveChanges<Nucleus.Abstractions.Models.Internal.Schema>();
 		}
 
@@ -197,7 +197,7 @@ namespace Nucleus.Data.EntityFramework
 
 				// Execute the entire script and schema table update in a transaction, so that it succeeds or fails as an atomic block.
 				this.DbContext.Database.BeginTransaction();
-					
+
 				if (script.FullName.EndsWith(".sql", StringComparison.OrdinalIgnoreCase))
 				{
 
@@ -262,7 +262,7 @@ namespace Nucleus.Data.EntityFramework
 			return true;
 		}
 
-		
+
 		private void ApplyCorrections(MigrationOperation operation)
 		{
 			if (operation.GetType() == typeof(CreateTableOperation))
@@ -341,6 +341,43 @@ namespace Nucleus.Data.EntityFramework
 			{
 				operation.IsUnicode = true;
 			}
+
+			if (DbContext.Database.ProviderName.EndsWith("Sqlite", StringComparison.OrdinalIgnoreCase))
+			{
+				if (operation.ClrType == typeof(string) && operation.Collation == null)
+				{
+					// For Sqlite, make all string columns case-insensitive unless collation is already specified
+					operation.Collation = "NOCASE";
+				}
+			}
+
+			if (operation.ClrType == typeof(Boolean))
+			{
+				if (DbContext.Database.ProviderName.EndsWith("PostgreSQL", StringComparison.OrdinalIgnoreCase))
+				{
+					// For Postgres, booleans are "true" or "false" rather than "1" or "0"
+					if (operation.DefaultValueSql == "1")
+					{
+						operation.DefaultValueSql = "true";
+					}
+					else
+					{
+						operation.DefaultValueSql = "false";
+					}
+				}
+				else
+				{
+					// For everything else, booleans are "1" or "0" rather than "true" or "false"
+					if (operation.DefaultValueSql == "true")
+					{
+						operation.DefaultValueSql = "1";
+					}
+					else
+					{
+						operation.DefaultValueSql = "0";
+					}
+				}
+			}
 		}
 
 		private void ExecuteCommand(DatabaseSchemaScript script, string command)
@@ -364,7 +401,7 @@ namespace Nucleus.Data.EntityFramework
 		{
 			if (operation is CreateTableOperation)
 			{
-				if (DatabaseObjectExists((operation as CreateTableOperation).Name, DatabaseObjectTypes.Table ))
+				if (DatabaseObjectExists((operation as CreateTableOperation).Name, DatabaseObjectTypes.Table))
 				{
 					// table already exists
 					this?.Logger.LogInformation("Table {0} already exists, create table operation skipped.", (operation as CreateTableOperation).Name);
@@ -397,7 +434,7 @@ namespace Nucleus.Data.EntityFramework
 				}
 			}
 
-			
+
 		}
 
 	}

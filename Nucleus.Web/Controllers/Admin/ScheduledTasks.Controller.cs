@@ -34,7 +34,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Display the page editor
+		/// Display the tasks list
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet]
@@ -44,7 +44,17 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Display the user editor
+		/// Display the tasks list
+		/// </summary>
+		/// <returns></returns>
+		[HttpPost]
+		public async Task<ActionResult> List(ViewModels.Admin.ScheduledTaskIndex viewModel)
+		{
+			return View("_ScheduledTasksList", await BuildViewModel(viewModel));
+		}
+
+		/// <summary>
+		/// Display the task editor
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet]
@@ -126,18 +136,6 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.LogContent = await ReadLogFile(viewModel);
 
 			return View("_Log", viewModel);
-			//if (!String.IsNullOrEmpty(viewModel.LogFile) && !String.IsNullOrEmpty(this.LogFolderPath))
-			//{
-			//	ScheduledTask existing = await this.ScheduledTaskManager.Get(viewModel.ScheduledTask.Id);
-			//	string logFilePath = System.IO.Path.Combine(LogFolder(existing).FullName, viewModel.LogFile);
-			//	if (System.IO.File.Exists(logFilePath))
-			//	{
-			//		//return File( System.IO.File.ReadAllBytes(logFilePath),"text/plain");
-			//		return File(System.Text.Encoding.UTF8.GetBytes(System.Net.WebUtility.HtmlEncode(System.IO.File.ReadAllText(logFilePath))), "text/plain");
-			//	}
-			//}
-
-			//return BadRequest();
 		}
 
 		private System.IO.DirectoryInfo LogFolder(ScheduledTask scheduledTask)
@@ -147,10 +145,13 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private async Task<ViewModels.Admin.ScheduledTaskIndex> BuildViewModel()
 		{
-			ViewModels.Admin.ScheduledTaskIndex viewModel = new();
+			return await BuildViewModel(new ViewModels.Admin.ScheduledTaskIndex ());
+		}
 
-			viewModel.ScheduledTasks = await this.ScheduledTaskManager.List();
-			
+		private async Task<ViewModels.Admin.ScheduledTaskIndex> BuildViewModel(ViewModels.Admin.ScheduledTaskIndex viewModel)
+		{
+			viewModel.ScheduledTasks = await this.ScheduledTaskManager.List(viewModel.ScheduledTasks);
+
 			return viewModel;
 		}
 

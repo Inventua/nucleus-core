@@ -13,18 +13,12 @@
 		</div>
 	}
 
-
-	<a href="@Url.Content("~/Admin/Users/AddUser")" class="btn btn-secondary" data-target=".UserEditor">New User</a>
+	<a href="@Url.Content("~/Admin/Users/AddUser")" class="btn btn-secondary" data-target=".UserEditor" accesskey="N">New User</a>
 </div>
 
 <div class="nucleus-index-wrapper">
-	<div class="nucleus-index-items">
-		<ul>
-			@foreach (var item in Model.Users)
-			{
-				<li><a href="@Url.Content("~/Admin/Users/Editor")?id=@item.Id" data-target=".UserEditor">@item.UserName</a></li>
-			}
-		</ul>
+	<div class="nucleus-index-items">		
+		@await Html.PartialAsync("_UserList", Model)
 	</div>
 
 	<div class="UserEditor nucleus-editor-panel"></div>

@@ -32,7 +32,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Display the page editor
+		/// Display the site group editor
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet]
@@ -40,6 +40,17 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			return View("Index", await BuildViewModel());
 		}
+
+		/// <summary>
+		/// Display the site group list
+		/// </summary>
+		/// <returns></returns>
+		[HttpPost]
+		public async Task<ActionResult> List(ViewModels.Admin.SiteGroupIndex viewModel)
+		{
+			return View("_SiteGroupsList", await BuildViewModel(viewModel));
+		}
+
 
 		/// <summary>
 		/// Display the user editor
@@ -97,9 +108,12 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private async Task<ViewModels.Admin.SiteGroupIndex> BuildViewModel()
 		{
-			ViewModels.Admin.SiteGroupIndex viewModel = new();
-						
-			viewModel.SiteGroups = await this.SiteGroupManager.List();
+			return await BuildViewModel(new ViewModels.Admin.SiteGroupIndex());
+		}
+
+		private async Task<ViewModels.Admin.SiteGroupIndex> BuildViewModel(ViewModels.Admin.SiteGroupIndex viewModel)
+		{						
+			viewModel.SiteGroups = await this.SiteGroupManager.List(viewModel.SiteGroups);
 			
 			return viewModel;
 		}

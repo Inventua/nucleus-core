@@ -9,7 +9,7 @@ namespace Nucleus.Web.ViewModels.Admin
 {	
 	public class MailTemplateIndex
 	{
-		public IEnumerable<MailTemplate> MailTemplates { get; set; }
+		public Nucleus.Abstractions.Models.Paging.PagedResult<MailTemplate> MailTemplates { get; set; } = new() { PageSize = 20 };
 
 	}
 }

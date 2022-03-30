@@ -36,7 +36,7 @@ namespace Nucleus.Web.Controllers
 			{
 				Exception ex = exceptionDetails.Error.Parse();
 
-				data = ParseException(ex);
+				data = WrapException(ex);
 
 				if (ControllerContext.HttpContext.Request.Headers[Microsoft.Net.Http.Headers.HeaderNames.Accept].ToString().Contains("application/json"))
 				{
@@ -136,7 +136,7 @@ namespace Nucleus.Web.Controllers
 			return false;
 		}
 
-		private static Microsoft.AspNetCore.Mvc.ProblemDetails ParseException(Exception ex)
+		private static Microsoft.AspNetCore.Mvc.ProblemDetails WrapException(Exception ex)
 		{
 			if (ex is Nucleus.Abstractions.DataProviderException)
 			{

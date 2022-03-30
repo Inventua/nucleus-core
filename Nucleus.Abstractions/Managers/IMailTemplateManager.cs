@@ -35,6 +35,14 @@ namespace Nucleus.Abstractions.Managers
 		public Task<IEnumerable<MailTemplate>> List(Site site);
 
 		/// <summary>
+		/// List paged <see cref="MailTemplate"/>s for the specified site.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="pagingSettings"></param>
+		/// <returns></returns>
+		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<MailTemplate>> List(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
+
+		/// <summary>
 		/// Create or update a <see cref="MailTemplate"/>.
 		/// </summary>
 		/// <param name="site"></param>

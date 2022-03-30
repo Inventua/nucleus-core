@@ -7,7 +7,7 @@ using Nucleus.Abstractions.Models;
 namespace Nucleus.Web.ViewModels.Admin
 {	
 	public class SiteGroupIndex
-	{		
-		public IEnumerable<SiteGroup> SiteGroups { get; set; }
+	{
+		public Nucleus.Abstractions.Models.Paging.PagedResult<SiteGroup> SiteGroups { get; set; } = new() { PageSize = 20 };
 	}
 }

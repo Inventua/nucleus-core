@@ -1,0 +1,11 @@
+﻿@model Nucleus.Web.ViewModels.Admin.SiteGroupIndex
+@using (Html.BeginAreaForm("List", "SiteGroups", "Admin", FormMethod.Post, new { @data_target = ".nucleus-index-items", @autocomplete = "off" }))
+{
+	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.SiteGroups, propertyName = "SiteGroups", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
+}
+<ul>
+	@foreach (var item in Model.SiteGroups.Items)
+	{
+		<li><a href="@Url.Content("~/Admin/SiteGroups/Editor")?id=@item.Id" data-target=".SiteGroupEditor">@item.Name</a></li>
+	}
+</ul>

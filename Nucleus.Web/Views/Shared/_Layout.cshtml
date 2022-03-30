@@ -45,7 +45,7 @@
 <body>
 	@if (Model.CanEdit)
 	{
-		<iframe id="AdminFrame" title="Control Panel" src="@Url.Content("~/Admin/Index/Index")?pageId=@Model.Context.Page.Id" class="Nucleus AdminFrame"></iframe>
+		<iframe id="AdminFrame" title="Control Panel" accesskey="A" src="@Url.Content("~/Admin/Index/Index")?pageId=@Model.Context.Page.Id" class="Nucleus AdminFrame"></iframe>
 		<div class="AdminFramePlaceholder"></div>
 
 		<div class="modal" tabindex="-1">

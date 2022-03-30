@@ -7,7 +7,7 @@ using Nucleus.Abstractions.Models;
 namespace Nucleus.Web.ViewModels.Admin
 {	
 	public class RoleGroupIndex 
-	{		
-		public IEnumerable<RoleGroup> RoleGroups { get; set; }
+	{
+		public Nucleus.Abstractions.Models.Paging.PagedResult<RoleGroup> RoleGroups { get; set; } = new() { PageSize = 20 };
 	}
 }

@@ -1,0 +1,11 @@
+﻿@model Nucleus.Web.ViewModels.Admin.ScheduledTaskIndex
+@using (Html.BeginAreaForm("List", "ScheduledTasks", "Admin", FormMethod.Post, new { @data_target = ".nucleus-index-items", @autocomplete = "off" }))
+{
+	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.ScheduledTasks, propertyName = "ScheduledTasks", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
+}
+<ul>
+	@foreach (var item in Model.ScheduledTasks.Items)
+	{
+		<li><a href="@Url.Content("~/Admin/ScheduledTasks/Editor")?id=@item.Id" data-target=".ScheduledTaskEditor">@item.Name</a></li>
+	}
+</ul>

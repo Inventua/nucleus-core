@@ -799,12 +799,24 @@ namespace Nucleus.Core.DataProviders
 				.CountAsync();
 		}
 
-		public async Task<List<User>> ListSystemAdministrators()
-		{
-			return await this.Context.Users
-				.Where(user => user.IsSystemAdministrator == true && user.SiteId == null)
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListSystemAdministrators(Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		{			
+			List<User> results;
+
+			var query = this.Context.Users
+				.Where(user => user.IsSystemAdministrator == true && user.SiteId == null);
+
+			pagingSettings.TotalCount = await query
+				.CountAsync();
+
+			results = await query
+				.OrderBy(user => user.UserName)
+				.Skip(pagingSettings.FirstRowIndex)
+				.Take(pagingSettings.PageSize)
 				.AsNoTracking()
 				.ToListAsync();
+
+			return new Nucleus.Abstractions.Models.Paging.PagedResult<User>(pagingSettings, results);
 		}
 
 		public async Task SaveSystemAdministrator(User user)
@@ -828,12 +840,23 @@ namespace Nucleus.Core.DataProviders
 			}
 		}
 
-		public async Task<List<User>> ListUsers(Site site)
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListUsers(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
 		{
-			return await this.Context.Users
-				.Where(user => user.IsSystemAdministrator == false && user.SiteId == site.Id)
+			List<User> results;
+			var query = this.Context.Users
+				.Where(user => user.IsSystemAdministrator == false && user.SiteId == site.Id);
+			
+			pagingSettings.TotalCount = await query
+				.CountAsync();
+
+			results =  await query
+				.OrderBy(user => user.UserName)
+				.Skip(pagingSettings.FirstRowIndex)
+				.Take(pagingSettings.PageSize)
 				.AsNoTracking()
 				.ToListAsync();
+
+			return new Nucleus.Abstractions.Models.Paging.PagedResult<User>(pagingSettings, results);
 		}
 
 		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> SearchUsers(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
@@ -1048,12 +1071,33 @@ namespace Nucleus.Core.DataProviders
 
 		#region "    Role Groups    "
 
-		public async Task<List<RoleGroup>> ListRoleGroups(Site site)
+		public async Task<IEnumerable<RoleGroup>> ListRoleGroups(Site site)
 		{
 			return await this.Context.RoleGroups
 				.Where(rolegroup => EF.Property<Guid>(rolegroup, "SiteId") == site.Id)
+				.OrderBy(rolegroup => rolegroup.Name)
 				.AsNoTracking()
 				.ToListAsync();
+		}
+
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<RoleGroup>> ListRoleGroups(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		{
+			List<RoleGroup> results;
+
+			var query = this.Context.RoleGroups
+				.Where(rolegroup => EF.Property<Guid>(rolegroup, "SiteId") == site.Id);
+
+			pagingSettings.TotalCount = await query
+				.CountAsync();
+
+			results = await query
+				.OrderBy(rolegroup => rolegroup.Name)
+				.Skip(pagingSettings.FirstRowIndex)
+				.Take(pagingSettings.PageSize)
+				.AsNoTracking()
+				.ToListAsync();
+
+			return new Nucleus.Abstractions.Models.Paging.PagedResult<RoleGroup>(pagingSettings, results);
 		}
 
 		public async Task<RoleGroup> GetRoleGroup(Guid roleGroupId)
@@ -1103,13 +1147,36 @@ namespace Nucleus.Core.DataProviders
 
 		#region "    Roles    "
 
-		public async Task<List<Role>> ListRoles(Site site)
+		public async Task<IEnumerable<Role>> ListRoles(Site site)
 		{
 			return await this.Context.Roles
 				.Where(role => EF.Property<Guid>(role, "SiteId") == site.Id)
 				.Include(role => role.RoleGroup)
+				.OrderBy(role => role.Name)
 				.AsNoTracking()
 				.ToListAsync();
+		}
+
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Role>> ListRoles(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		{
+			List<Role> results;
+
+			var query = this.Context.Roles
+				.Where(role => EF.Property<Guid>(role, "SiteId") == site.Id);
+
+			pagingSettings.TotalCount = await query
+				.CountAsync();
+
+			results = await query
+				.Include(role => role.RoleGroup)
+				.OrderBy(role => role.Name)
+				.Skip(pagingSettings.FirstRowIndex)
+				.Take(pagingSettings.PageSize)
+				.AsNoTracking()
+				.ToListAsync();
+
+			return new Nucleus.Abstractions.Models.Paging.PagedResult<Role>(pagingSettings, results);
+
 		}
 
 		public async Task<List<Role>> ListRoleGroupRoles(Guid roleGroupId)
@@ -1393,12 +1460,34 @@ namespace Nucleus.Core.DataProviders
 		#endregion
 
 		#region "    Mail Templates    "
-		public async Task<List<MailTemplate>> ListMailTemplates(Site site)
+		public async Task<IEnumerable<MailTemplate>> ListMailTemplates(Site site)
 		{
 			return await this.Context.MailTemplates
 				.Where(template => EF.Property<Guid>(template, "SiteId") == site.Id)
+				.OrderBy(template => template.Name)
 				.AsNoTracking()
 				.ToListAsync();
+		}
+
+
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<MailTemplate>> ListMailTemplates(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		{
+			List<MailTemplate> results;
+
+			var query = this.Context.MailTemplates
+				.Where(template => EF.Property<Guid>(template, "SiteId") == site.Id);
+
+			pagingSettings.TotalCount = await query
+				.CountAsync();
+
+			results = await query
+				.OrderBy(template => template.Name)
+				.Skip(pagingSettings.FirstRowIndex)
+				.Take(pagingSettings.PageSize)
+				.AsNoTracking()
+				.ToListAsync();
+
+			return new Nucleus.Abstractions.Models.Paging.PagedResult<MailTemplate>(pagingSettings, results);
 		}
 
 		public async Task<MailTemplate> GetMailTemplate(Guid templateId)
@@ -1579,6 +1668,26 @@ namespace Nucleus.Core.DataProviders
 				.AsNoTracking()
 				.ToListAsync();
 		}
+
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<ScheduledTask>> ListScheduledTasks(Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		{
+			List<ScheduledTask> results;
+
+			var query = this.Context.ScheduledTasks;
+
+			pagingSettings.TotalCount = await query
+				.CountAsync();
+
+			results = await query
+				.OrderBy(scheduledTask => scheduledTask.Name)
+				.Skip(pagingSettings.FirstRowIndex)
+				.Take(pagingSettings.PageSize)
+				.AsNoTracking()
+				.ToListAsync();
+
+			return new Nucleus.Abstractions.Models.Paging.PagedResult<ScheduledTask>(pagingSettings, results);
+		}
+
 
 		public async Task<ScheduledTask> GetScheduledTask(Guid scheduledTaskId)
 		{
@@ -1774,11 +1883,30 @@ namespace Nucleus.Core.DataProviders
 
 		#region "    Site Groups    "
 
-		public async Task<List<SiteGroup>> ListSiteGroups()
+		public async Task<IEnumerable<SiteGroup>> ListSiteGroups()
 		{
 			return await this.Context.SiteGroups
 				.AsNoTracking()
 				.ToListAsync();
+		}
+
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<SiteGroup>> ListSiteGroups(Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		{
+			List<SiteGroup> results;
+
+			var query = this.Context.SiteGroups;
+
+			pagingSettings.TotalCount = await query
+				.CountAsync();
+
+			results = await query
+				.OrderBy(group => group.Name)
+				.Skip(pagingSettings.FirstRowIndex)
+				.Take(pagingSettings.PageSize)
+				.AsNoTracking()
+				.ToListAsync();
+
+			return new Nucleus.Abstractions.Models.Paging.PagedResult<SiteGroup>(pagingSettings, results);
 		}
 
 		public async Task<SiteGroup> GetSiteGroup(Guid siteGroupId)
@@ -1818,13 +1946,35 @@ namespace Nucleus.Core.DataProviders
 		#endregion
 
 		#region "    Lists    "
-		public async Task<List<List>> ListLists(Site site)
+		public async Task<IEnumerable<List>> ListLists(Site site)
 		{
 			return await this.Context.Lists
 				.Where(list => EF.Property<Guid>(list, "SiteId") == site.Id)
 				.Include(list => list.Items)
+				.OrderBy(list => list.Name)
 				.AsNoTracking()
 				.ToListAsync();
+		}
+
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<List>> ListLists(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		{
+			List<List> results;
+
+			var query = this.Context.Lists
+				.Where(list => EF.Property<Guid>(list, "SiteId") == site.Id);
+
+			pagingSettings.TotalCount = await query
+				.CountAsync();
+
+			results = await query
+				.Include(list => list.Items)
+				.OrderBy(list => list.Name)
+				.Skip(pagingSettings.FirstRowIndex)
+				.Take(pagingSettings.PageSize)
+				.AsNoTracking()
+				.ToListAsync();
+
+			return new Nucleus.Abstractions.Models.Paging.PagedResult<List>(pagingSettings, results);
 		}
 
 		public async Task<List> GetList(Guid listId)

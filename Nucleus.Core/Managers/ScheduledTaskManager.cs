@@ -68,6 +68,19 @@ namespace Nucleus.Core.Managers
 		}
 
 		/// <summary>
+		/// List all <see cref="ScheduledTask"/>s for the specified site.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <returns></returns>
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<ScheduledTask>> List(Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		{
+			using (IScheduledTaskDataProvider provider = this.DataProviderFactory.CreateProvider<IScheduledTaskDataProvider>())
+			{
+				return await provider.ListScheduledTasks(pagingSettings);
+			}
+		}
+
+		/// <summary>
 		/// Returns a list of installed Scheduled task classes.
 		/// </summary>
 		/// <returns></returns>

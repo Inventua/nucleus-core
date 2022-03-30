@@ -112,14 +112,15 @@ namespace Nucleus.Abstractions.Managers
 		/// List all <see cref="User"/>s who belong to the specified <see cref="Site"/>.
 		/// </summary>
 		/// <param name="site"></param>
+		/// <param name="pagingSettings"></param>
 		/// <returns></returns>
-		public Task<IEnumerable<User>> List(Site site);
+		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> List(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 
 		/// <summary>
 		/// List all System Administrator <see cref="User"/>s.
 		/// </summary>
 		/// <returns></returns>
-		public Task<IEnumerable<User>> ListSystemAdministrators();
+		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListSystemAdministrators(Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 
 		/// <summary>
 		/// Count the number of System Administrator <see cref="User"/>s.

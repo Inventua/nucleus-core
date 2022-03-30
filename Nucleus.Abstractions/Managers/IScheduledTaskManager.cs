@@ -37,6 +37,12 @@ namespace Nucleus.Abstractions.Managers
 		public Task<IEnumerable<ScheduledTask>> List();
 
 		/// <summary>
+		/// List <see cref="ScheduledTask"/>s for the specified site.
+		/// </summary>
+		/// <returns></returns>
+		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<ScheduledTask>> List(Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
+
+		/// <summary>
 		/// Returns a list of installed Scheduled task classes.
 		/// </summary>
 		/// <returns></returns>

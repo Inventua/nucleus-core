@@ -29,7 +29,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Display the list editor
+		/// Display the lists list
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet]
@@ -39,7 +39,17 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Display the user editor
+		/// Display the lists list
+		/// </summary>
+		/// <returns></returns>
+		[HttpPost]
+		public async Task<ActionResult> List(ViewModels.Admin.ListIndex viewModel)
+		{
+			return View("_ListsList", await BuildViewModel(viewModel));
+		}
+
+		/// <summary>
+		/// Display the list editor
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet]
@@ -130,9 +140,12 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private async Task<ViewModels.Admin.ListIndex> BuildViewModel()
 		{
-			ViewModels.Admin.ListIndex viewModel = new();
+			return await BuildViewModel(new ViewModels.Admin.ListIndex());
+		}
 
-			viewModel.Lists = await this.ListManager.List(this.Context.Site);
+		private async Task<ViewModels.Admin.ListIndex> BuildViewModel(ViewModels.Admin.ListIndex viewModel)
+		{
+			viewModel.Lists = await this.ListManager.List(this.Context.Site, viewModel.Lists);
 			
 			return viewModel;
 		}

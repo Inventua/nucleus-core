@@ -28,15 +28,18 @@
 					</SettingsControl>
 				}
 
-				<div class="nucleus-flex-fields">
-					<SettingsControl caption="Approved" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user is approved.">
-						@Html.CheckBoxFor(model => model.User.Approved, new { @class = "ToggleSwitch" })
-					</SettingsControl>
+				@if (!Model.IsCurrentUser)
+				{
+					<div class="nucleus-flex-fields">
+						<SettingsControl caption="Approved" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user is approved.">
+							@Html.CheckBoxFor(model => model.User.Approved, new { @class = "ToggleSwitch" })
+						</SettingsControl>
 
-					<SettingsControl caption="Verified" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user is verified.">
-						@Html.CheckBoxFor(model => model.User.Verified, new { @class = "ToggleSwitch" })
-					</SettingsControl>
+						<SettingsControl caption="Verified" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user is verified.">
+							@Html.CheckBoxFor(model => model.User.Verified, new { @class = "ToggleSwitch" })
+						</SettingsControl>
 				</div>
+				}
 			</fieldset>
 		</TabPanel>
 

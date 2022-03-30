@@ -79,7 +79,8 @@ namespace Nucleus.Core.DataProviders
 		abstract Task DeleteControlPanelExtensionDefinition(ControlPanelExtensionDefinition controlPanelExtensionDefinition);
 
 		// site groups
-		abstract Task<List<SiteGroup>> ListSiteGroups();
+		abstract Task<IEnumerable<SiteGroup>> ListSiteGroups(); 
+		abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<SiteGroup>> ListSiteGroups(Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 		abstract Task<SiteGroup> GetSiteGroup(Guid Id);
 		abstract Task SaveSiteGroup(SiteGroup SiteGroup);
 		abstract Task DeleteSiteGroup(SiteGroup SiteGroup);

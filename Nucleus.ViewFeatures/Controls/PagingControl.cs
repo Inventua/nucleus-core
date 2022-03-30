@@ -16,8 +16,8 @@ namespace Nucleus.ViewFeatures.Controls
 	[ViewComponent(Name = "PagingControl")]
 	public class PagingControl : ViewComponent
 	{
-		Context Context { get; }
-		IFileSystemManager FileSystemManager { get; }
+		private Context Context { get; }
+		private IFileSystemManager FileSystemManager { get; }
 
 		/// <summary>
 		/// Create an instance.
@@ -35,13 +35,15 @@ namespace Nucleus.ViewFeatures.Controls
 		/// </summary>
 		/// <param name="model"></param>
 		/// <param name="propertyName"></param>
+		/// <param name="renderMode"></param>
 		/// <returns></returns>
-		public IViewComponentResult Invoke(PagingSettings model, string propertyName)
+		public IViewComponentResult Invoke(PagingSettings model, string propertyName, ViewModels.PagingControl.RenderModes renderMode = ViewModels.PagingControl.RenderModes.Standard)
 		{
 			ViewModels.PagingControl viewModel = new()
 			{
 				Results = model,
-				PropertyName = propertyName ?? "PagingResult"
+				PropertyName = propertyName ?? "PagingResult",
+				RenderMode = renderMode
 			};
 
 			// https://stackoverflow.com/questions/16816184/mvc-crazy-property-lose-its-value-does-html-hiddenfor-bug

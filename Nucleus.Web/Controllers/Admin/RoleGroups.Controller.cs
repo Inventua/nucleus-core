@@ -29,7 +29,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Display the page editor
+		/// Display the role groups list
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet]
@@ -39,7 +39,17 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Display the user editor
+		/// Display the role groups list
+		/// </summary>
+		/// <returns></returns>
+		[HttpPost]
+		public async Task<ActionResult> List(ViewModels.Admin.RoleGroupIndex viewModel)
+		{
+			return View("_RoleGroupsList", await BuildViewModel(viewModel));
+		}
+
+		/// <summary>
+		/// Display the role groups editor
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet]
@@ -81,10 +91,13 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private async Task<ViewModels.Admin.RoleGroupIndex> BuildViewModel()
 		{
-			ViewModels.Admin.RoleGroupIndex viewModel = new();
-						
-			viewModel.RoleGroups = await this.RoleGroupManager.List(this.Context.Site);
-			
+			return await BuildViewModel(new ViewModels.Admin.RoleGroupIndex());
+		}
+
+		private async Task<ViewModels.Admin.RoleGroupIndex> BuildViewModel(ViewModels.Admin.RoleGroupIndex viewModel)
+		{
+			viewModel.RoleGroups = await this.RoleGroupManager.List(this.Context.Site, viewModel.RoleGroups);
+
 			return viewModel;
 		}
 

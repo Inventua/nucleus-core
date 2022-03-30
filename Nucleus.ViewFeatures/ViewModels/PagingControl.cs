@@ -12,6 +12,22 @@ namespace Nucleus.ViewFeatures.ViewModels
 	public class PagingControl
 	{
 		/// <summary>
+		/// Enum representing control render mode.
+		/// </summary>
+		public enum RenderModes
+		{
+			/// <value>
+			/// Render all controls
+			/// </value>
+			Standard,
+			/// <value>
+			/// Render the control without the individual paging and page size buttons
+			/// </value>
+			Compact
+		}
+
+
+		/// <summary>
 		/// Selected paging information property name in the caller's view model.
 		/// </summary>
 		/// <remarks>
@@ -23,5 +39,10 @@ namespace Nucleus.ViewFeatures.ViewModels
 		/// Current paging settings selection
 		/// </summary>
 		public PagingSettings Results { get; set; }
+
+		/// <summary>
+		/// Control rendering mode.
+		/// </summary>
+		public RenderModes RenderMode { get; set; }
 	}
 }

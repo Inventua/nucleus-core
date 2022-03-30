@@ -9,7 +9,7 @@ namespace Nucleus.Web.ViewModels.Admin
 {	
 	public class ScheduledTaskIndex
 	{
-		public IEnumerable<ScheduledTask> ScheduledTasks { get; set; }
+		public Nucleus.Abstractions.Models.Paging.PagedResult<ScheduledTask> ScheduledTasks { get; set; } = new() { PageSize = 20 };	
 
 	}
 }

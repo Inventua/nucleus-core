@@ -38,13 +38,23 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Display the page editor
+		/// Display the user list
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet]
 		public async Task<ActionResult> Index()
 		{
 			return View("Index", await BuildViewModel());
+		}
+
+		/// <summary>
+		/// Display the user list
+		/// </summary>
+		/// <returns></returns>
+		[HttpPost]
+		public async Task<ActionResult> List(ViewModels.Admin.UserIndex viewModel)
+		{
+			return View("_UserList", await BuildViewModel(viewModel));
 		}
 
 		/// <summary>
@@ -123,6 +133,18 @@ namespace Nucleus.Web.Controllers.Admin
 				viewModel.User.Roles = new();
 			}
 
+			// If the user being edited is the currently logged in user, the approved and verified fields won't be shown, so we need
+			// to get them  from the existing record
+			if (viewModel.User.Id == ControllerContext.HttpContext.User.GetUserId())
+			{
+				User existing = await this.UserManager.Get(this.Context.Site, viewModel.User.Id);
+				if (existing != null)
+				{
+					viewModel.User.Verified = existing.Verified;
+					viewModel.User.Approved = existing.Approved;
+				}
+			}
+
 			await this.UserManager.Save(this.Context.Site, viewModel.User);
 
 			return View("Index", await BuildViewModel());
@@ -146,10 +168,12 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private async Task<ViewModels.Admin.UserIndex> BuildViewModel()
 		{
-			ViewModels.Admin.UserIndex viewModel = new();
+			return await BuildViewModel(new ViewModels.Admin.UserIndex());
+		}
 
-			viewModel.Users = await this.UserManager.List(this.Context.Site);
-
+		private async Task<ViewModels.Admin.UserIndex> BuildViewModel(ViewModels.Admin.UserIndex viewModel)
+		{
+			viewModel.Users = await this.UserManager.List(this.Context.Site, viewModel.Users);
 			return viewModel;
 		}
 

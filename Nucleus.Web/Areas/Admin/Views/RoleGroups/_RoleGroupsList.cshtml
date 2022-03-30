@@ -1,0 +1,11 @@
+﻿@model Nucleus.Web.ViewModels.Admin.RoleGroupIndex
+@using (Html.BeginAreaForm("List", "RoleGroups", "Admin", FormMethod.Post, new { @data_target = ".nucleus-index-items", @autocomplete = "off" }))
+{
+	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.RoleGroups, propertyName = "RoleGroups", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
+}
+<ul>
+	@foreach (var item in Model.RoleGroups.Items)
+	{
+		<li><a href="@Url.Content("~/Admin/RoleGroups/Editor")?id=@item.Id" data-target=".RoleGroupEditor">@item.Name</a></li>
+	}
+</ul>

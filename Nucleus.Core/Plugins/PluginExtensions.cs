@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Nucleus.Core.Logging;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using System.Threading.Tasks;
 
 namespace Nucleus.Core.Plugins
 {
@@ -45,9 +46,8 @@ namespace Nucleus.Core.Plugins
 		/// <param name="builder">IMvcBuilder instance used to configure services.</param>
 		/// <returns>IMvcBuilder instance.</returns>
 		public static IMvcBuilder AddExternalControllers(this IMvcBuilder builder)
-		{
-			
-			foreach (Assembly assembly in AssemblyLoader.GetAssembliesImplementing<Microsoft.AspNetCore.Mvc.Controller>(builder.Logger()))
+		{			
+			foreach (Assembly assembly in AssemblyLoader.GetAssembliesImplementing<Controller>(builder.Logger()))
 			{
 				builder.Logger().LogInformation($"Adding controllers from {assembly.FullName}.");
 
@@ -93,13 +93,7 @@ namespace Nucleus.Core.Plugins
 		/// <returns></returns>
 		private static Boolean ApplicationPartContains(this IMvcBuilder builder, Microsoft.AspNetCore.Mvc.ApplicationParts.ApplicationPart part)
 		{
-			foreach (var existingPart in builder.PartManager.ApplicationParts)
-			{
-				if (existingPart is Microsoft.AspNetCore.Mvc.ApplicationParts.AssemblyPart)
-					if (existingPart.Name == part.Name)
-						return true;
-			}
-			return false;
+			return builder.PartManager.ApplicationParts.Where(existing => existing is AssemblyPart && existing.Name == part.Name ).Any();
 		}
 
 		/// <summary>
@@ -109,7 +103,7 @@ namespace Nucleus.Core.Plugins
 		/// <returns></returns>
 		public static IMvcBuilder AddCompiledRazorViews(this IMvcBuilder builder)
 		{
-			foreach (string assemblyFileName in AssemblyLoader.GetAssembliesWithAttribute<Microsoft.AspNetCore.Razor.Hosting.RazorCompiledItemAttribute>())
+			foreach (string assemblyFileName in AssemblyLoader.GetAssemblyNamesWithAttribute<Microsoft.AspNetCore.Razor.Hosting.RazorCompiledItemAttribute>())
 			{
 				Assembly assembly = AssemblyLoader.LoadFrom(assemblyFileName);
 
@@ -117,7 +111,7 @@ namespace Nucleus.Core.Plugins
 				{
 					if (!ApplicationPartContains(builder, part))
 					{
-						builder.Logger().LogInformation($"Adding Compiled Razor views from {part.Name}.");						
+						builder.Logger().LogInformation($"Adding Compiled Razor views from {part.Name}.");
 						builder.PartManager.ApplicationParts.Add(part);
 					}
 				}

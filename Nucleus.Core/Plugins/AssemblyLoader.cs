@@ -24,7 +24,7 @@ namespace Nucleus.Core.Plugins
 	{
 		private static Dictionary<string, AssemblyLoadContext> ExtensionLoadContexts { get; } = new(StringComparer.OrdinalIgnoreCase);
 		private static Dictionary<string, AssemblyLoadContext> TypeContextCache { get; } = new(StringComparer.OrdinalIgnoreCase);
-	
+
 		/// <summary>
 		/// Load an assembly into the appropriate AssemblyLoadContext. 
 		/// </summary>
@@ -44,7 +44,7 @@ namespace Nucleus.Core.Plugins
 			// Hook the default assembly load context's Resolving event so that we can override it and load extension assemblies from the correct
 			// AssemblyLoadContext.
 			AssemblyLoadContext.Default.Resolving += HandleResolving;
-			
+
 			// Determine whether the assembly is located within an extension folder
 			pluginPath = System.IO.Path.GetDirectoryName(path);
 
@@ -59,12 +59,12 @@ namespace Nucleus.Core.Plugins
 			{
 				extensionFolder = "";
 			}
-			
+
 			// Retrieve or create an assembly load context for the specified extension folder, or use the Default assembly load context if the 
 			// assembly is not located in an extension folder.
-			if (String.IsNullOrEmpty(extensionFolder))  
+			if (String.IsNullOrEmpty(extensionFolder))
 			{
-				assemblyLoadContext = AssemblyLoadContext.Default;				
+				assemblyLoadContext = AssemblyLoadContext.Default;
 			}
 			else
 			{
@@ -74,7 +74,7 @@ namespace Nucleus.Core.Plugins
 				}
 				else
 				{
-					assemblyLoadContext = new PluginLoadContext(extensionFolder, pluginPath);					
+					assemblyLoadContext = new PluginLoadContext(extensionFolder, pluginPath);
 					ExtensionLoadContexts.Add(extensionFolder, assemblyLoadContext);
 				}
 			}
@@ -89,7 +89,7 @@ namespace Nucleus.Core.Plugins
 				}
 				else
 				{
-					
+
 					// Microsoft design documentation on assembly load contexts is here:
 					// https://github.com/dotnet/runtime/blob/main/docs/design/features/AssemblyLoadContext.ContextualReflection.md
 
@@ -229,7 +229,7 @@ namespace Nucleus.Core.Plugins
 		///	}
 		/// </example>
 		public static System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope EnterExtensionContext(string typeName)
-		{			
+		{
 			if (TypeContextCache.ContainsKey(typeName))
 			{
 				return TypeContextCache[typeName].EnterContextualReflection();
@@ -241,16 +241,16 @@ namespace Nucleus.Core.Plugins
 				{
 					System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope scope = context.EnterContextualReflection();
 
-				if (Type.GetType(typeName) != null)
-				//	if (context.Assemblies.Where(asm => asm.GetType(typeName.Split(',')[0], false, true) != null).Any())
-				{ 
-						TypeContextCache.TryAdd(typeName, context); 
-						return scope;			
+					if (Type.GetType(typeName) != null)
+					//	if (context.Assemblies.Where(asm => asm.GetType(typeName.Split(',')[0], false, true) != null).Any())
+					{
+						TypeContextCache.TryAdd(typeName, context);
+						return scope;
 					}
 
 					scope.Dispose();
 				}
-				
+
 				return System.Runtime.Loader.AssemblyLoadContext.Default.EnterContextualReflection();
 			}
 		}
@@ -264,7 +264,7 @@ namespace Nucleus.Core.Plugins
 		public static void UnloadAll()
 		{
 			TypeContextCache.Clear();
-			
+
 			foreach (string path in System.IO.Directory.GetDirectories(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic()))
 			{
 				UnloadPlugin(GetExtensionFolderName(path));
@@ -285,16 +285,16 @@ namespace Nucleus.Core.Plugins
 			if (ExtensionLoadContexts.Keys.Contains(pluginName))
 			{
 				AssemblyLoadContext context = ExtensionLoadContexts[pluginName];
-			
+
 				ExtensionLoadContexts.Remove(pluginName);
-					
+
 				context.Unload();
 				context = null;
 
 				GC.Collect();
 				GC.WaitForPendingFinalizers();
-				
-			}			
+
+			}
 		}
 
 		/// <summary>
@@ -305,17 +305,25 @@ namespace Nucleus.Core.Plugins
 		/// This method returns a list of filenames in /bin and /{Extensions}/** with the .dll extension.  Not all dlls are assemblies.  Callers
 		/// should implement checking or exception handling for cases where a returned dll file is not an assembly.
 		/// </remarks>
-		private static IEnumerable<string> EnumerateAssemblies()
+		private static IEnumerable<string> EnumerateAssemblyNames()
 		{
-			List<string> results = new();
+			//List<string> results = new();
 
-			// get all assemblies (dlls) in /bin 
-			results.AddRange(System.IO.Directory.EnumerateFiles(System.IO.Path.GetDirectoryName(typeof(AssemblyLoader).Assembly.Location), "*.dll", System.IO.SearchOption.AllDirectories));
-			
-			// get all extension assemblies (dlls) 
-			results.AddRange(System.IO.Directory.EnumerateFiles(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic(), "*.dll", System.IO.SearchOption.AllDirectories));
-			
-			return results;
+			// get all assemblies (dlls) in /bin 			
+			foreach (string filename in System.IO.Directory.EnumerateFiles(System.IO.Path.GetDirectoryName(typeof(AssemblyLoader).Assembly.Location), "*.dll", System.IO.SearchOption.AllDirectories))
+			{
+				yield return filename;
+			}
+			//results.AddRange(System.IO.Directory.EnumerateFiles(System.IO.Path.GetDirectoryName(typeof(AssemblyLoader).Assembly.Location), "*.dll", System.IO.SearchOption.AllDirectories));
+
+			// get all extension assemblies (dlls) in /extensions/*
+			foreach (string foldername in System.IO.Directory.EnumerateFiles(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic(), "*.dll", System.IO.SearchOption.AllDirectories))
+			{
+				yield return foldername;
+			}
+			//results.AddRange(System.IO.Directory.EnumerateFiles(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic(), "*.dll", System.IO.SearchOption.AllDirectories));
+
+			//return results;
 		}
 
 		/// <summary>
@@ -324,13 +332,14 @@ namespace Nucleus.Core.Plugins
 		/// <typeparam name="T"></typeparam>
 		/// <returns></returns>
 		/// <remarks>
-		/// A side effect of this function is that assemblies are loaded into their assembly load contexts by <see cref="LoadAssemblies"/>.
+		/// A side effect of this function is that assemblies are loaded into their assembly load contexts.
 		/// </remarks>
-		internal static IEnumerable<string> GetAssembliesWithAttribute<T>()
+		internal static IEnumerable<string> GetAssemblyNamesWithAttribute<T>()
 		{
-			SortedList<string, string> results = new();
+			//SortedList<string, string> results = new();
+			//HashSet<string> results = new();
 
-			foreach (string assemblyFileName in EnumerateAssemblies())
+			foreach (string assemblyFileName in EnumerateAssemblyNames())
 			{
 				Assembly assembly = AssemblyLoader.LoadFrom(assemblyFileName);
 
@@ -340,17 +349,18 @@ namespace Nucleus.Core.Plugins
 
 					if (attributes != null)
 					{
-						if (!results.ContainsKey(assemblyFileName))
-						{
-							results.Add(assemblyFileName, assemblyFileName);
-						}
+						//if (!results.Contains(assemblyFileName))
+						//{
+						//	results.Add(assemblyFileName);
+						yield return assemblyFileName;
+						//}
 					}
 				}
 			}
 
-			return results.Values;
+			//return results.Values;
 		}
-				
+
 		/// <summary>
 		/// Return a list of assemblies which implement the class specified by T.  
 		/// </summary>
@@ -362,32 +372,30 @@ namespace Nucleus.Core.Plugins
 		/// </remarks>
 		internal static IEnumerable<Assembly> GetAssembliesImplementing<T>(ILogger logger)
 		{
-			SortedList<string, Assembly> results = new(StringComparer.OrdinalIgnoreCase);
-
 			foreach (Assembly assembly in LoadAssemblies())
 			{
+				Type type;
+
 				try
 				{
-					Type types = assembly.GetTypes().FirstOrDefault
+					// We use .FirstOrDefault for performance - we want all of the assemblies implementing <T>, but we only need one match
+					// not all of them.
+					type = assembly.GetTypes().FirstOrDefault
 					(
-						typ => typeof(T).IsAssignableFrom(typ) && !typ.Equals(typeof(T))
+						typ => !typ.IsAbstract && typeof(T).IsAssignableFrom(typ) && !typ.Equals(typeof(T))
 					);
-
-					if (types != null)
-					{
-						if (!results.ContainsKey(assembly.Location))
-						{
-							results.Add(assembly.Location, assembly);
-						}
-					}
 				}
 				catch (System.Reflection.ReflectionTypeLoadException e)
 				{
 					logger?.LogError(e, "Unable to load assembly {0}", assembly.FullName);
+					type = null;
 				}
+				
+				if (type != null)
+				{
+					yield return assembly;
+				}				
 			}
-
-			return results.Values;
 		}
 
 		/// <summary>
@@ -400,26 +408,17 @@ namespace Nucleus.Core.Plugins
 		/// </remarks>
 		internal static IEnumerable<Type> GetTypes<T>()
 		{
-			List<Type> results = new();
-
 			foreach (Assembly assembly in LoadAssemblies())
 			{
 				if (assembly != null)
 				{
-					IEnumerable<Type> types = GetTypes(assembly)// assm => assm.GetTypes())
-						.Where(type => typeof(T).IsAssignableFrom(type) && !type.Equals(typeof(T)))
-						.ToList();
-
-					//IEnumerable<Type> types = from type in assembly.GetTypes()
-					//													where typeof(T).IsAssignableFrom(type)
-					//													where !type.Equals(typeof(T))
-					//													select type;
-										
-					results.AddRange(types);
+					foreach(Type type in GetTypes(assembly)
+						.Where(type => !type.IsAbstract && typeof(T).IsAssignableFrom(type) && !type.Equals(typeof(T))))
+					{
+						yield return type;
+					}						
 				}
 			}
-			
-			return results;
 		}
 
 		private static Type[] GetTypes(System.Reflection.Assembly assembly)
@@ -444,9 +443,7 @@ namespace Nucleus.Core.Plugins
 		/// </remarks>
 		private static IEnumerable<Assembly> LoadAssemblies()
 		{
-			List<Assembly> results = new();
-
-			foreach (string assemblyFileName in EnumerateAssemblies())
+			foreach (string assemblyFileName in EnumerateAssemblyNames())
 			{
 				// Load all assemblies EXCEPT Razor views (because they aren't real assemblies and LoadFrom doesn't 
 				// work on them)
@@ -456,12 +453,10 @@ namespace Nucleus.Core.Plugins
 
 					if (assembly != null)
 					{
-						results.Add(assembly);
+						yield return assembly;
 					}
 				}
 			}
-
-			return results;
 		}
 
 	}

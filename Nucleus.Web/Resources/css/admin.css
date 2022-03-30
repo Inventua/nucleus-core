@@ -468,6 +468,7 @@ ul.nucleus-control-panel-items a
 	list-style-type: none;
 	flex-wrap: wrap;
 	justify-content: flex-end;
+	align-items: center;
 }
 
 .nucleus-index-items li a

@@ -5,11 +5,18 @@
 @using Nucleus.Abstractions.Models
 <fieldset role="group" aria-label="Permissions">	
 	<div class="nucleus-form-buttonrow">
-		<SettingsControl caption="Inherit Page Permissions?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to disable module permission checks.">
-			@Html.CheckBoxFor(model => Model.Module.InheritPagePermissions, new { @class = "ToggleButtonControl" })
+		<SettingsControl caption="Inherit Page Permissions?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to use page permissions for this module.">
+			@Html.CheckBoxFor(model => Model.Module.InheritPagePermissions, new { @class = "ToggleSwitch" })
 		</SettingsControl>
 	</div>
-	@if (Model.ModulePermissions.Values.Any())
+	@if (!Model.ModulePermissions.Values.Any())
+	{
+		@if (!Model.Module.InheritPagePermissions)
+		{
+			<div class="alert alert-primary" role="alert">This module does not have any permissions configured, so only administrators can see it. Select a role from the drop-down list and click "Add Role" to create a page permission.</div>
+		}			
+	}
+	else
 	{
 		<table>
 			<tr>

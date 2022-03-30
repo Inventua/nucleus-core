@@ -352,28 +352,30 @@ namespace Nucleus.Data.EntityFramework
 			}
 
 			if (operation.ClrType == typeof(Boolean))
-			{
+			{	
 				if (DbContext.Database.ProviderName.EndsWith("PostgreSQL", StringComparison.OrdinalIgnoreCase))
 				{
 					// For Postgres, booleans are "true" or "false" rather than "1" or "0"
-					if (operation.DefaultValueSql == "1")
+					if (operation.DefaultValueSql == "1" || (Boolean.TryParse(operation.DefaultValueSql, out Boolean value1) && value1 == true))
 					{
 						operation.DefaultValueSql = "true";
 					}
-					else
+					else if (operation.DefaultValueSql == "0" || (Boolean.TryParse(operation.DefaultValueSql, out Boolean value2) && value2 == false) || !operation.IsNullable)
 					{
+						// set default value to false if "0" or "false" is specified, or if nothing is specified and the column does not allow nulls
 						operation.DefaultValueSql = "false";
 					}
 				}
 				else
 				{
 					// For everything else, booleans are "1" or "0" rather than "true" or "false"
-					if (operation.DefaultValueSql == "true")
+					if (operation.DefaultValueSql == "1" || (Boolean.TryParse(operation.DefaultValueSql, out Boolean value1) && value1 == true))
 					{
 						operation.DefaultValueSql = "1";
 					}
-					else
+					else if (operation.DefaultValueSql == "0" || (Boolean.TryParse(operation.DefaultValueSql, out Boolean value2) && value2 == false) || !operation.IsNullable)
 					{
+						// set default value to false if "0" or "false" is specified, or if nothing is specified and the column does not allow nulls
 						operation.DefaultValueSql = "0";
 					}
 				}

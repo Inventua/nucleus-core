@@ -17,7 +17,21 @@ using Microsoft.Extensions.Options;
 namespace Nucleus.Core
 {
 	public static class CoreServiceExtensions
-	{	
+	{
+		
+		/// <summary>
+		/// Add and configure security headers middleware.
+		/// </summary>
+		/// <param name="services"></param>
+		/// <param name="configuration"></param>
+		/// <returns></returns>
+		public static IServiceCollection AddSecurityHeadersMiddleware(this IServiceCollection services, IConfiguration configuration)
+		{
+			services.AddScoped<SecurityHeadersMiddleware>();
+			return services;
+		}
+
+
 		/// <summary>
 		/// Add and configure Nucleus folder options
 		/// </summary>

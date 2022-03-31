@@ -123,11 +123,6 @@ namespace Nucleus.Web.Controllers
 
 				ControllerContext.HttpContext.Response.Cookies.Append(PermissionExtensions.EDIT_COOKIE_NAME, "true", options);
 			}
-			else
-			{
-				// remove editing cookie 
-				ControllerContext.HttpContext.Response.Cookies.Delete(PermissionExtensions.EDIT_COOKIE_NAME);
-			}
 
 			return View(this.Context.Page.LayoutPath(this.Context.Site), viewModel);
 		}

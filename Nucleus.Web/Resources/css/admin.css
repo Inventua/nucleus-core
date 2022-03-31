@@ -1,6 +1,5 @@
 ﻿html, body, .nucleus-control-panel
 {
-	height: 100%;
 }
 
 body 
@@ -13,6 +12,7 @@ body
 {
 	display: flex;	
 	background: #444;	
+	height: 100%;
 }
 
 .nucleus-control-panel-content-header
@@ -37,7 +37,6 @@ body
 
 .nucleus-adminpage
 {
-	margin-top: 8px;
 	height: calc(100% - 40px);	
 	position: relative;	
 	display: flex;

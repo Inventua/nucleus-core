@@ -443,6 +443,10 @@ namespace Nucleus.Core.Plugins
 		/// </remarks>
 		private static IEnumerable<Assembly> LoadAssemblies()
 		{
+			List<Assembly> assemblies = new List<Assembly>();	
+
+			// All assemblies must be loaded into their correct AssemblyLoadContexts in this function (don't use yield return).  This is to ensure that
+			// assemblies which reference other assemblies (in an extension/bin folder) load them from the correct folder and using the correct AssemmblyLoadContext.
 			foreach (string assemblyFileName in EnumerateAssemblyNames())
 			{
 				// Load all assemblies EXCEPT Razor views (because they aren't real assemblies and LoadFrom doesn't 
@@ -453,10 +457,12 @@ namespace Nucleus.Core.Plugins
 
 					if (assembly != null)
 					{
-						yield return assembly;
+						assemblies.Add(assembly);
 					}
 				}
 			}
+
+			return assemblies;
 		}
 
 	}

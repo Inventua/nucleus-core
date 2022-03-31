@@ -9,7 +9,7 @@
 {
 	<SettingsControl caption="Search Term" helptext="Enter your search term.">
 		<div id="search-suggestions" aria-hidden="true"></div>
-		@Html.TextBoxFor(model => model.SearchTerm, new { @class = "search-term", @data_autopostbackevent = "input", @autocomplete = "off" })
+		@Html.TextBoxFor(model => model.SearchTerm, new { @id = "", @class = "search-term", @data_autopostbackevent = "input", @autocomplete = "off" })
 		@Html.SubmitButton("", "Search", @Url.NucleusAction("Index", "Search", "Search"), new { @data_target = "form.parent()" })
 	</SettingsControl>
 }
@@ -29,7 +29,7 @@
 
 @using (Html.BeginNucleusForm("Index", "Search", FormMethod.Post, new { @data_target = "form.parent()", @role = "search" }))
 {
-	@Html.HiddenFor(model => model.SearchTerm)
+	@Html.HiddenFor(model => model.SearchTerm, new { @id = ""})
 	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.PagingSettings, propertyName = nameof(Model.PagingSettings) })
 
 	@if (Model.SearchResults?.Results?.Any() == true)

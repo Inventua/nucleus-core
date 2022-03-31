@@ -27,6 +27,9 @@ namespace Nucleus.Core
 		/// <returns></returns>
 		public static IServiceCollection AddSecurityHeadersMiddleware(this IServiceCollection services, IConfiguration configuration)
 		{
+			// Register action & post-configuration for security header options 
+			AddOption<SecurityHeaderOptions>(services, configuration, SecurityHeaderOptions.Section);
+			// Add middleware
 			services.AddScoped<SecurityHeadersMiddleware>();
 			return services;
 		}

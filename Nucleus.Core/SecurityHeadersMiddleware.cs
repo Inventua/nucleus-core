@@ -3,14 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Nucleus.Abstractions.Models;
-using Nucleus.Core.DataProviders;
-using Nucleus.Data.Common;
-using Nucleus.Core;
-using Nucleus.Core.Authorization;
-using Nucleus.Extensions.Authorization;
-using Nucleus.Abstractions.Managers;
+using Microsoft.Extensions.Options;
+using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Core.Layout
 {
@@ -19,9 +13,11 @@ namespace Nucleus.Core.Layout
 	/// </summary>
 	public class SecurityHeadersMiddleware : Microsoft.AspNetCore.Http.IMiddleware
 	{
-		
-		public SecurityHeadersMiddleware()
+		private IOptions<SecurityHeaderOptions> Options { get; }
+
+		public SecurityHeadersMiddleware(IOptions<SecurityHeaderOptions> options)
 		{
+			this.Options = options;
 		}
 
 		/// <summary>
@@ -32,6 +28,13 @@ namespace Nucleus.Core.Layout
 		/// <returns></returns>
 		public async Task InvokeAsync(HttpContext context, RequestDelegate next)
 		{
+			foreach (var option in this.Options.Value)
+			{
+				AddHeader(context, option.HeaderName, option.HeaderValue);
+			}
+
+			// Add defaults.  The AddHeader function checks whether the header is already present,
+			// so if the user specified a header in config, the default will be ignored.
 			AddHeader(context, "X-Frame-Options", "SAMEORIGIN");
 			AddHeader(context, "X-Content-Type-Options", "nosniff");
 			AddHeader(context, "X-XSS-Protection", "1; mode=block");
@@ -43,9 +46,12 @@ namespace Nucleus.Core.Layout
 
 		private void AddHeader(HttpContext context, string name, string value)
 		{
-			if (!context.Response.Headers.ContainsKey(name))
+			if (!string.IsNullOrEmpty(name))
 			{
-				context.Response.Headers.Add(name, value);
+				if (!context.Response.Headers.ContainsKey(name))
+				{
+					context.Response.Headers.Add(name, value);
+				}
 			}
 		}
 	}

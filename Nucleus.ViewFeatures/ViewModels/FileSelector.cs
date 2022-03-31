@@ -28,6 +28,11 @@ namespace Nucleus.ViewFeatures.ViewModels
 		public string ExtensionName { get; set; }
 
 		/// <summary>
+		/// Set to false to suppress the "Select Another" button.
+		/// </summary>
+		public Boolean ShowSelectAnother { get; set; }
+
+		/// <summary>
 		/// Name of the action to execute when the user clicks "select another file"
 		/// </summary>
 		public string SelectAnotherActionName { get; set; }

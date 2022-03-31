@@ -25,9 +25,11 @@ namespace Nucleus.Web.Controllers
 
 		[HttpGet]
 		[HttpPost]
-		public ActionResult Index(ViewModels.User.FileSelector viewModel, string pattern)
+		public ActionResult Index(ViewModels.User.FileSelector viewModel, string pattern, Boolean showSelectAnother = true)
 		{
 			viewModel.Pattern = pattern;
+			viewModel.ShowSelectAnother = showSelectAnother;
+
 			return View("Index", viewModel);
 		}
 

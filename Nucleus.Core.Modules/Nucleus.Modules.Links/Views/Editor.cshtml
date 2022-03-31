@@ -37,7 +37,7 @@
 			case Nucleus.Modules.Links.Models.LinkTypes.File:
 				<SettingsControl caption="File" helptext="File">
 					<div class="nucleus-flex-fields nucleus-fileselector">
-						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { model = Model.Link.LinkFile?.File, propertyName = "Link.LinkFile.File" })
+						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.Link.LinkFile?.File, propertyName = "Link.LinkFile.File" })
 						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { })
 					</div>
 				</SettingsControl>

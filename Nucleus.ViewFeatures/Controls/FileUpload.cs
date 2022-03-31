@@ -33,12 +33,12 @@ namespace Nucleus.ViewFeatures.Controls
 		/// <summary>
 		/// Invoke (render) the control.
 		/// </summary>
-		/// <param name="model"></param>
+		/// <param name="folder"></param>
 		/// <param name="filter"></param>
 		/// <param name="actionName"></param>
 		/// <param name="controlName"></param>
 		/// <returns></returns>
-		public async Task<IViewComponentResult> InvokeAsync(Folder model, string filter, string actionName, string controlName)
+		public async Task<IViewComponentResult> InvokeAsync(Folder folder, string filter, string actionName, string controlName)
 		{
 			ViewModels.FileUpload viewModel = new()
 			{
@@ -50,31 +50,31 @@ namespace Nucleus.ViewFeatures.Controls
 				Filter = filter
 			};
 
-			if (model != null)
+			if (folder != null)
 			{
-				if (model.Id != Guid.Empty)
+				if (folder.Id != Guid.Empty)
 				{
-					model = await this.FileSystemManager.GetFolder(this.Context.Site, model.Id);
+					folder = await this.FileSystemManager.GetFolder(this.Context.Site, folder.Id);
 				}
 			}
 
-			if (model == null)
+			if (folder == null)
 			{
-				model = new();
+				folder = new();
 			}
 
 			// if no provider is selected, default the selected provider key to the first available
-			if (String.IsNullOrEmpty(model.Provider))
+			if (String.IsNullOrEmpty(folder.Provider))
 			{
-				model.Provider = this.FileSystemManager.ListProviders().FirstOrDefault()?.Key;
+				folder.Provider = this.FileSystemManager.ListProviders().FirstOrDefault()?.Key;
 			}
 
-			if (model.Id == Guid.Empty)
+			if (folder.Id == Guid.Empty)
 			{
-				model = await this.FileSystemManager.GetFolder(this.Context.Site, model.Provider, model.Path);
+				folder = await this.FileSystemManager.GetFolder(this.Context.Site, folder.Provider, folder.Path);
 			}
 
-			viewModel.Enabled = model.Capabilities.CanStoreFiles;
+			viewModel.Enabled = folder.Capabilities.CanStoreFiles;
 
 			return View("~/Shared/Controls/Views/FileUpload.cshtml", viewModel);
 		}		

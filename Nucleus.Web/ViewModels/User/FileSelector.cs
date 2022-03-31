@@ -10,5 +10,7 @@ namespace Nucleus.Web.ViewModels.User
 	{
 		public string Pattern { get; set; }
 		public File File { get; set; }
+		public bool ShowSelectAnother { get; set; } = true;
+
 	}
 }

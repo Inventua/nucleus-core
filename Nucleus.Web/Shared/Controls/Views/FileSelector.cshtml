@@ -4,12 +4,15 @@
 @if (Model.SelectedFile?.Id != Guid.Empty)
 {
 	<div>@Model.SelectedFile.Name</div>
-	<span class="btn btn-secondary">
-		<label>
+	@if (Model.ShowSelectAnother)
+	{
+		<span class="btn btn-secondary">
+			<label>
 			<span class="nucleus-material-icon">&#xe2c6</span> Select Another File
 			<input type="submit" class="collapse btn btn-primary" formaction="@Url.NucleusAction(@Model.SelectAnotherActionName, Model.ControllerName, Model.AreaName, Model.ExtensionName)">
 		</label>
 	</span>
+	}
 	<span class="file-link collapse">@Url.FileLink(Model.SelectedFile)</span>
 	@Html.Hidden(@Model.PropertyName + $".{nameof(File.Id)}", Model.SelectedFile.Id)
 	@Html.Hidden(@Model.PropertyName + $".{nameof(File.Provider)}", Model.SelectedFile.Provider)

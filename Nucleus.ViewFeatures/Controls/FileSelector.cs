@@ -33,21 +33,23 @@ namespace Nucleus.ViewFeatures.Controls
 		/// <summary>
 		/// Invoke (render) the control.
 		/// </summary>
-		/// <param name="model"></param>
+		/// <param name="file"></param>
 		/// <param name="pattern"></param>
 		/// <param name="propertyName"></param>
+		/// <param name="showSelectAnother"></param>
 		/// <param name="selectAnotherActionName"></param>
 		/// <returns></returns>
-		public async Task<IViewComponentResult> InvokeAsync(File model, string pattern, string propertyName, string selectAnotherActionName)
+		public async Task<IViewComponentResult> InvokeAsync(File file, string pattern, string propertyName, string selectAnotherActionName, Boolean showSelectAnother = true)
 		{
 			ViewModels.FileSelector viewModel = new() 
 			{
 				AreaName = (string)this.ViewContext.RouteData.Values["area"],
 				ControllerName = (string)this.ViewContext.RouteData.Values["controller"],
 				ExtensionName = (string)this.ViewContext.RouteData.Values["extension"],
-				SelectedFile = model,
+				SelectedFile = file,
 				Providers = this.FileSystemManager.ListProviders(),
 				PropertyName = propertyName ?? "SelectedFile",
+				ShowSelectAnother = showSelectAnother,
 				SelectAnotherActionName = selectAnotherActionName ?? "SelectAnother"
 			};
 

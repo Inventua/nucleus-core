@@ -36,7 +36,7 @@
 					
 				<SettingsControl caption="Image" helptext="Article image.">
 					<div class="nucleus-flex-fields nucleus-fileselector">
-						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { model = Model.Article.ImageFile, propertyName = "Article.ImageFile", selectAnotherActionName = "SelectAnotherImage", pattern = "(.gif)|(.png)(.jpg)|(.jpeg)|(.bmp)" })
+						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.Article.ImageFile, propertyName = "Article.ImageFile", selectAnotherActionName = "SelectAnotherImage", pattern = "(.gif)|(.png)(.jpg)|(.jpeg)|(.bmp)" })
 						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { actionName = "UploadImageFile", Filter = "image/*" })
 					</div>
 				</SettingsControl>
@@ -96,7 +96,7 @@
 
 				<SettingsControl caption="Image" helptext="Article image.">
 					<div class="nucleus-flex-fields nucleus-fileselector">
-						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { model = Model.SelectedAttachmentFile, propertyName = "SelectedAttachmentFile" })
+						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.SelectedAttachmentFile, propertyName = "SelectedAttachmentFile" })
 						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { actionName = "UploadAttachment" })
 					</div>
 				</SettingsControl>

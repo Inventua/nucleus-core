@@ -33,7 +33,7 @@
 
 				<SettingsControl caption="File" helptext="File">
 					<div class="nucleus-flex-fields nucleus-fileselector">
-						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { model = Model.SelectedDocument.File, propertyName = "SelectedDocument.File" })
+						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.SelectedDocument.File, propertyName = "SelectedDocument.File" })
 						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { })
 					</div>
 				</SettingsControl>

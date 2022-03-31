@@ -111,6 +111,24 @@ namespace Nucleus.Web.Controllers
 			viewModel.SiteIconPath = await Context.Site.GetIconPath(this.FileSystemManager);
 			viewModel.SiteCssFilePath = await Context.Site.GetCssFilePath(this.FileSystemManager);
 
+			if (viewModel.IsEditing)
+			{				
+				// refresh editing cookie expiry
+				Microsoft.AspNetCore.Http.CookieOptions options = new()
+				{
+					Expires = DateTime.UtcNow.AddMinutes(60),
+					IsEssential = true,
+					SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict
+				};
+
+				ControllerContext.HttpContext.Response.Cookies.Append(PermissionExtensions.EDIT_COOKIE_NAME, "true", options);
+			}
+			else
+			{
+				// remove editing cookie 
+				ControllerContext.HttpContext.Response.Cookies.Delete(PermissionExtensions.EDIT_COOKIE_NAME);
+			}
+
 			return View(this.Context.Page.LayoutPath(this.Context.Site), viewModel);
 		}
 

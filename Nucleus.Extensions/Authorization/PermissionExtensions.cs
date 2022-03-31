@@ -185,19 +185,6 @@ namespace Nucleus.Extensions.Authorization
 		{			
 			if (Boolean.TryParse(context.Request.Cookies[EDIT_COOKIE_NAME], out Boolean isEditMode))
 			{
-				if (isEditMode)
-				{
-					// refresh cookie expiry
-					Microsoft.AspNetCore.Http.CookieOptions options = new()
-					{
-						Expires = DateTime.UtcNow.AddMinutes(60),
-						IsEssential = true,
-						SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict
-					};
-
-					context.Response.Cookies.Append(EDIT_COOKIE_NAME, "true", options);
-				}
-
 				return isEditMode;
 			}			
 

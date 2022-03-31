@@ -20,10 +20,6 @@
 
 			<div class="Tools">
 				@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "$nucleus_extension_name$", "$nucleus_extension_name$"), new { })
-				@if (!String.IsNullOrEmpty(@Model.Message))
-				{
-					<div class="Message">@Model.Message</div>
-				}
 			</div>
 		</fieldset>
 	}

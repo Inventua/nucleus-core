@@ -591,11 +591,14 @@ function _Page()
 
 		if (!target.is('.modal, .modal-body') && data !== '' && jQuery('.modal').is(':visible'))
 		{
-			// Check for the Nucleus trumbowyg insert image plugin to prevent the editor modal dialog from closing when you choose a file.
-			if (source.closest('.nucleus-fileselectorform').length === 0)
+			// if the source element is in a modal, and the target is not inside the same modal, close the modal
+			if (source !== null && source.parents('.modal').length !== 0)
 			{
-				// a modal is visible, data is non-blank, target is not .modal or one of its descendants, hide the modal
-				jQuery('.modal:visible').modal('hide');
+				if (source.parents('.modal').find(target).length === 0)
+				{
+					// a modal is visible, data is non-blank, target is not the modal or one of its descendants, hide the modal
+					jQuery('.modal:visible').modal('hide');					
+				}
 			}
 		}
 

@@ -25,6 +25,8 @@ namespace Nucleus.Core.Plugins
 		private static Dictionary<string, AssemblyLoadContext> ExtensionLoadContexts { get; } = new(StringComparer.OrdinalIgnoreCase);
 		private static Dictionary<string, AssemblyLoadContext> TypeContextCache { get; } = new(StringComparer.OrdinalIgnoreCase);
 
+		private static Boolean isResolvingEventHooked = false;
+
 		/// <summary>
 		/// Load an assembly into the appropriate AssemblyLoadContext. 
 		/// </summary>
@@ -43,7 +45,11 @@ namespace Nucleus.Core.Plugins
 			string pluginPath;
 			// Hook the default assembly load context's Resolving event so that we can override it and load extension assemblies from the correct
 			// AssemblyLoadContext.
-			AssemblyLoadContext.Default.Resolving += HandleResolving;
+			if (!isResolvingEventHooked)
+			{
+				AssemblyLoadContext.Default.Resolving += HandleResolving;
+				isResolvingEventHooked = true;
+			}
 
 			// Determine whether the assembly is located within an extension folder
 			pluginPath = System.IO.Path.GetDirectoryName(path);
@@ -181,7 +187,6 @@ namespace Nucleus.Core.Plugins
 			{
 				if (AssemblyLoadContext.CurrentContextualReflectionContext != null)
 				{
-					//return AssemblyLoadContext.CurrentContextualReflectionContext.Assemblies.Where(asm => asm.FullName == assemblyName.FullName).FirstOrDefault();
 					Assembly asm = AssemblyLoadContext.CurrentContextualReflectionContext.Assemblies.Where(asm => Compare(asm.GetName(), assemblyName)).FirstOrDefault();
 					return asm;
 				}
@@ -189,7 +194,6 @@ namespace Nucleus.Core.Plugins
 				{
 					foreach (AssemblyLoadContext moduleContext in ExtensionLoadContexts.Values)
 					{
-						//Assembly asm = moduleContext.Assemblies.Where(asm => asm.FullName == assemblyName.FullName).FirstOrDefault();
 						Assembly asm = moduleContext.Assemblies.Where(asm => Compare(asm.GetName(), assemblyName)).FirstOrDefault();
 						if (asm != null) return asm;
 					}

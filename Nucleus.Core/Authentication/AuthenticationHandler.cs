@@ -107,7 +107,7 @@ namespace Nucleus.Core.Authentication
 								AllowRefresh = userSession.SlidingExpiry,
 								ExpiresUtc = userSession.ExpiryDate,
 								IsPersistent = userSession.IsPersistent,
-								IssuedUtc = userSession.IssuedDate								
+								IssuedUtc = userSession.IssuedDate
 							});
 						}
 					}
@@ -282,7 +282,8 @@ namespace Nucleus.Core.Authentication
 				Expires = properties.ExpiresUtc,
 				IsEssential = true,
 				HttpOnly = true,
-				SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict					  
+				SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict,
+				Secure = this.Context.Request.Scheme == "https"
 			};
 
 			this.Context.Response.Cookies.Append(this.Options.CookieName, sessionId, options);

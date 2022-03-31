@@ -19,12 +19,12 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <summary>
 		/// List of configured database connections.
 		/// </summary>
-		public List<DatabaseConnectionOption> Connections { get; set; }
+		public List<DatabaseConnectionOption> Connections { get; private set; }
 
 		/// <summary>
 		/// List of configured schemas.
 		/// </summary>
-		public List<DatabaseSchema> Schemas { get; set; }
+		public List<DatabaseSchema> Schemas { get; private set; }
 
 		/// <summary>
 		/// Get the database connection options for the schema specifed by <paramref name="schemaName"/>.  If no matching 

@@ -220,7 +220,7 @@ namespace Nucleus.Core.Layout
 			editControlBuilder.InnerHtml.SetContent(text);
 			editControlBuilder.Attributes.Add("class", "nucleus-material-icon btn btn-secondary");
 			editControlBuilder.Attributes.Add("title", title);
-			editControlBuilder.Attributes.Add("data-frametarget", "#ModuleSettingsFrame");
+			editControlBuilder.Attributes.Add("data-frametarget", ".nucleus-modulesettings-frame");
 			editControlBuilder.Attributes.Add("href", $"{formaction}?mid={moduleInfo.Id}&mode=Standalone");
 			
 			if (attributes != null)

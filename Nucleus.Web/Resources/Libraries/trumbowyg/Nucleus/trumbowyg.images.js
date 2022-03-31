@@ -43,7 +43,7 @@
 
   function buildModal(editor, targetSelector)
   {
-    var url = '/User/FileSelector/Index?pattern=(.gif)|(.png)|(.jpg)|(.jpeg)|(.bmp)|(.webp)';
+    var url = '/User/FileSelector/Index?pattern=(.gif)|(.png)|(.jpg)|(.jpeg)|(.bmp)|(.webp)&showSelectAnother=false';
     jQuery.ajax({
       url: url,
       method: 'GET',

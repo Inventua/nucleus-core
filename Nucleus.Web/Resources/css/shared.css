@@ -56,7 +56,7 @@ body
 	transition: 0.25s;
 }
 
-.Nucleus.ModuleSettingsFrame
+.nucleus-modulesettings-frame
 {
 	display: none;
 	z-index: 99;

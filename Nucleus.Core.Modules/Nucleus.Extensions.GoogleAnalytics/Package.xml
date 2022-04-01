@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package id="5a74caf7-c328-466c-85aa-db9861c44700" xmlns="urn:nucleus/schemas/package/1.0">
+	<name>Google Analytics</name>
+	<version>1.0.0</version>
+	<publisher name="Inventua Pty Ltd" url="http://www.inventua.com" email="support@inventua.com" />
+	<description>
+		Use this extension to add Google Analytics reporting to your site.
+	</description>
+	<compatibility minVersion="1.0.0.0" maxVersion="*" />
+	
+	<components>
+		<component folderName="GoogleAnalytics" optional="false">
+			<controlPanelExtensionDefinition id="955b089f-f002-446e-bde0-71f3fe64caab">
+				<friendlyName>Google Analytics</friendlyName>
+				<description>Configure Google Analytics settings.</description>
+				<controllerName>GoogleAnalytics</controllerName>
+				<extensionName>GoogleAnalytics</extensionName>
+				<scope>Site</scope>				
+				<editAction>Settings</editAction>
+			</controlPanelExtensionDefinition>
+
+			<file name="readme.txt" />
+			<file name="viewer.css" />
+			<file name="settings.css" />
+			
+			<folder name="Bin">
+				<file name="Nucleus.Extensions.GoogleAnalytics.dll" />
+			</folder>
+			
+			<folder name="Views">
+				<file name="Settings.cshtml" />
+				<file name="AnalyticsScript.cshtml" />
+			</folder>
+			
+		</component>
+	</components>
+	
+</package>

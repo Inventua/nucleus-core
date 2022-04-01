@@ -1635,7 +1635,10 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task SaveControlPanelExtensionDefinition(ControlPanelExtensionDefinition controlPanelExtensionDefinition)
 		{
-			Boolean isNew = !this.Context.ContainerDefinitions.Where(existing => existing.Id == controlPanelExtensionDefinition.Id).Any();
+			Boolean isNew = !this.Context.ControlPanelExtensionDefinitions
+				.Where(existing => existing.Id == controlPanelExtensionDefinition.Id)
+				.AsNoTracking()
+				.Any();
 
 			this.Context.Attach(controlPanelExtensionDefinition);
 			this.Context.Entry(controlPanelExtensionDefinition).State = isNew ? EntityState.Added : EntityState.Modified;

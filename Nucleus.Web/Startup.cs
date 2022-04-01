@@ -257,7 +257,7 @@ namespace Nucleus.Web
 			app.UseMiddleware<PageRoutingMiddleware>();
 			app.UseAuthentication();
 			app.UseMiddleware<Nucleus.Core.FileSystemProviders.FileIntegrityCheckerMiddleware>();
-			app.UseMiddleware<SecurityHeadersMiddleware>();
+			app.UseMiddleware<ModuleRoutingMiddleware>();
 			app.UseAuthorization();
 
 			if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))

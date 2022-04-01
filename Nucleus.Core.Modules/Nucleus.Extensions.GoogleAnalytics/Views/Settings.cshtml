@@ -1,0 +1,23 @@
+﻿@model Nucleus.Extensions.GoogleAnalytics.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<div>
+	@using (Html.BeginNucleusForm("Settings", "GoogleAnalytics", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+	{
+		<fieldset role="group" aria-labelledby="heading">
+			<h2>Settings</h2>
+			<div class="nucleus-flex-fields">
+				<SettingsControl caption="Google Analytics ID" helptext="Enter the Google Analytics ID for your site.  You can disable Google Analytics by setting a blank value.">
+					@Html.TextBoxFor(model => model.GoogleAnalyticsId)
+				</SettingsControl>
+			</div>
+
+			<div class="Tools">
+				@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "GoogleAnalytics", "GoogleAnalytics"), new { })
+			</div>
+		</fieldset>
+	}
+</div>

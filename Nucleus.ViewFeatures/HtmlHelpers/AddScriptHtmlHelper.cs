@@ -77,6 +77,30 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			return new HtmlContentBuilder();
 		}
 
+		/// <summary>
+		/// Register the specified script to be added to the Layout or module's scripts.
+		/// </summary>
+		/// <param name="context"></param>
+		/// <param name="scriptPath"></param>
+		/// <param name="isAsync"></param>
+		/// <param name="order"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// This overload is intended for use by extensions which need to add a script from code other than a view.  This overload does not support the 
+		/// tilde (~) character to specify an app-relative path.  Your script path should be absolute.  This overload does not append a version querystring element.
+		/// </remarks>
+		public static IHtmlContent AddScript(this HttpContext context, string scriptPath, Boolean isAsync, int order)
+		{
+			Dictionary<string, ScriptInfo> scripts = (Dictionary<string, ScriptInfo>)context.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
+						
+			if (!scripts.ContainsKey(scriptPath))
+			{
+				scripts.Add(scriptPath, new ScriptInfo() { Path = scriptPath, IsAsync = isAsync, Order = order });
+				context.Items[ITEMS_KEY] = scripts;
+			}
+
+			return new HtmlContentBuilder();
+		}
 
 		/// <summary>
 		/// Adds the scripts submitted by AddScript to the layout.  This method is intended for use by the Nucleus Core layout.
@@ -90,13 +114,13 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			Dictionary<string, ScriptInfo> scripts = (Dictionary<string, ScriptInfo>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
 			if (scripts != null)
 			{
-				foreach (KeyValuePair<string, ScriptInfo> script in scripts)
+				foreach (KeyValuePair<string, ScriptInfo> script in scripts.OrderBy(script => script.Value.Order))
 				{
 					if (!String.IsNullOrEmpty(script.Key))
 					{
 						TagBuilder builder = new("script");
 						builder.Attributes.Add("type", "text/javascript");
-						builder.Attributes.Add("src", new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(script.Key) + "?v=" + script.Value.Version.ToString());
+						builder.Attributes.Add("src", new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(script.Key) + (script.Value.Version != null ? "?v=" + script.Value.Version.ToString() : ""));
 						if (script.Value.IsAsync)
 						{
 							builder.Attributes.Add("async", "");
@@ -114,6 +138,8 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			public System.Version Version { get; set; }	
 			public Boolean IsAsync { get; set; }
 			public string Path { get; set; }
+			public int Order { get; set; } = 0;
+
 		}
 	}
 }

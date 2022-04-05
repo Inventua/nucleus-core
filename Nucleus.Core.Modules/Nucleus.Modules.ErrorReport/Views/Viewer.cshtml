@@ -8,3 +8,4 @@
 <div>Date/Time: @DateTime.UtcNow.ToString("g") UTC</div>
 <div>Source: @Model?.ExceptionInfo?.Error?.Source</div>
 <div>Message: @Model?.ExceptionInfo?.Error?.Message</div>
+<div>More Information: @Model?.ExceptionInfo?.Error?.InnerException?.Message</div>

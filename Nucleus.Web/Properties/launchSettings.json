@@ -21,7 +21,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "https://golem.inventua.com:5001"
     },
     "WSL": {
       "commandName": "WSL2",

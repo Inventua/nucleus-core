@@ -427,7 +427,14 @@ function _Page()
 		// Handle response code "redirect", but with header X-Location rather than location.  Used by modules which need to return a redirect (302) without the browser automatically following it.
 		if (request.status === 302)
 		{
-			window.location.assign(request.getResponseHeader('X-Location'));
+			if (request.getResponseHeader('X-Location-Target') === '_top')
+			{
+				window.parent.document.dispatchEvent(new CustomEvent('Open', { detail: { target: request.getResponseHeader('X-Location') } }));
+			}
+			else
+			{
+				window.location.assign(request.getResponseHeader('X-Location'));
+			}
 			return;
 		}
 

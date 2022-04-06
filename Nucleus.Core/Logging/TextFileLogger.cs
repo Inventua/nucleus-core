@@ -96,10 +96,39 @@ namespace Nucleus.Core.Logging
 
 		private class DisposableScope : IDisposable
 		{
+			Boolean _disposed = false;
+
 			public void Dispose()
 			{
-				ScopeStack.Value.Pop();
+				// Dispose of unmanaged resources.
+				Dispose(true);
+				// Suppress finalization.
+				GC.SuppressFinalize(this);
 			}
+
+			protected virtual void Dispose(bool disposing)
+			{
+				if (_disposed)
+				{
+					return;
+				}
+
+				if (disposing)
+				{
+					// dispose managed state (managed objects).
+					ScopeStack.Value.Pop();
+				}
+
+				// TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+				// TODO: set large fields to null.
+
+				_disposed = true;
+			}
+
+			//public void Dispose(Boolean disposing)
+			//{
+			//	ScopeStack.Value.Pop();
+			//}
 		}
 
 		private void LogMessage(RunningTask task, string message)

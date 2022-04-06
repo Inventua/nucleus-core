@@ -1679,13 +1679,13 @@
 						"name": "PasswordHash",
 						"clrType": "string",
 						"maxLength": 1024,
-						"isnullable": false
+						"isnullable": true
 					},
 					{
 						"name": "PasswordHashAlgorithm",
 						"clrType": "string",
 						"maxLength": 256,
-						"isnullable": false
+						"isnullable": true
 					},
 					{
 						"name": "PasswordResetToken",

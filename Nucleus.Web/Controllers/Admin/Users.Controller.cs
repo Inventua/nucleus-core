@@ -109,6 +109,11 @@ namespace Nucleus.Web.Controllers.Admin
 				return BadRequest(ControllerContext.ModelState);
 			}
 
+			if (viewModel.User.Secrets == null)
+			{
+				viewModel.User.Secrets = new();
+			}
+
 			// only save a password for a new user (and if they entered one)
 			if (viewModel.User.Id == Guid.Empty && !String.IsNullOrEmpty(viewModel.EnteredPassword))
 			{
@@ -118,10 +123,7 @@ namespace Nucleus.Web.Controllers.Admin
 					return BadRequest(modelState);
 				}
 
-				if (viewModel.User.Secrets == null)
-				{
-					viewModel.User.Secrets = new();
-				}
+				
 				viewModel.User.Secrets.SetPassword(viewModel.EnteredPassword);
 			}
 

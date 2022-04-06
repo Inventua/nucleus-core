@@ -245,7 +245,12 @@ namespace Nucleus.Web
 
 			app.UseAuthorizationRedirect();
 
-			app.UseCookiePolicy(new CookiePolicyOptions() { });
+			app.UseCookiePolicy(new CookiePolicyOptions() 
+			{
+				//HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
+				//Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest,
+				//MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Strict
+			});
 
 			app.UseRouting();
 

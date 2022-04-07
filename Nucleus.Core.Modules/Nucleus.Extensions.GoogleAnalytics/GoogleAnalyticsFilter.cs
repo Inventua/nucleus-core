@@ -30,7 +30,7 @@ namespace Nucleus.Extensions.GoogleAnalytics
 				// Only render the Google Analytics scripts when a page is requested (not when rendering admin views, partial renders, or other resources).
 				if (result != null && result.Model != null && result.Model is Nucleus.ViewFeatures.ViewModels.Layout)
 				{
-					if (this.Context.Site.SiteSettings.TryGetValue(Controllers.GoogleAnalyticsController.MODULESETTING_ANALYTICS_ID, out string googleAnalyticsId))
+					if (this.Context.Site.SiteSettings.TryGetValue(Controllers.GoogleAnalyticsController.SETTING_ANALYTICS_ID, out string googleAnalyticsId))
 					{
 						IUrlHelper urlHelper = this.UrlHelperFactory.GetUrlHelper(executingContext);
 

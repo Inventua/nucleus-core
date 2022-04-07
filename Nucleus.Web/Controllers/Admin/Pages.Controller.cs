@@ -12,6 +12,7 @@ using Nucleus.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Nucleus.Abstractions.Models.Permissions;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Nucleus.ViewFeatures;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -197,7 +198,17 @@ namespace Nucleus.Web.Controllers.Admin
 
 			if (viewModel.PageEditorMode != ViewModels.Admin.PageEditor.PageEditorModes.Default)
 			{
-				return Ok();
+				if (viewModel.Page.DefaultPageRoute() != null)
+				{
+					string location = Url.GetAbsoluteUri(viewModel.Page.DefaultPageRoute().Path).ToString();
+					ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
+					ControllerContext.HttpContext.Response.Headers.Add("X-Location-Target", "_top");
+					return StatusCode((int)System.Net.HttpStatusCode.Found);
+				}
+				else
+				{
+					return Ok();
+				}
 			}
 			else
 			{

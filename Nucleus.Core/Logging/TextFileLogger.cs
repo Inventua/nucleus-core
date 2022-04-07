@@ -25,7 +25,7 @@ namespace Nucleus.Core.Logging
 		private readonly static object syncObj = new();
 		private TextFileLoggingProvider Provider { get; }
 		private TextFileLoggerOptions Options { get; }
-		private static AsyncLocal<System.Collections.Stack> ScopeStack { get; } = new();
+		private AsyncLocal<System.Collections.Stack> ScopeStack { get; } = new();
 
 		public TextFileLogger(TextFileLoggingProvider Provider, TextFileLoggerOptions Options, string Category)
 		{
@@ -91,12 +91,18 @@ namespace Nucleus.Core.Logging
 				ScopeStack.Value = new();
 			}
 			ScopeStack.Value.Push(state);
-			return new DisposableScope();
+			return new DisposableScope(this.ScopeStack);
 		}
 
 		private class DisposableScope : IDisposable
 		{
 			Boolean _disposed = false;
+			AsyncLocal<System.Collections.Stack> ScopeStack;
+
+			public DisposableScope(AsyncLocal<System.Collections.Stack> scopeStack)
+			{
+				this.ScopeStack = scopeStack;
+			}
 
 			public void Dispose()
 			{

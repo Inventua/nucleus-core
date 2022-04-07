@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package id="2f4b7999-9c15-4afa-9ed0-9549602ba7a5" xmlns="urn:nucleus/schemas/package/1.0">
+	<name>OAuth</name>
+	<version>1.0.0</version>
+	<publisher name="Inventua Pty Ltd" url="http://www.inventua.comn" email="support@inventua.com" />
+	<description>
+		OAuth Client for Nucleus.
+	</description>
+	<compatibility minVersion="1.0.0.0" maxVersion="*" />
+	
+	<components>
+		<component folderName="OAuth" optional="false">
+			<controlPanelExtensionDefinition id="C93446E0-CEB6-40E6-80A9-E15BC7CB85A2">
+				<friendlyName>OAuth Client</friendlyName>
+				<description>Configure OAuth client.</description>
+				<controllerName>OAuth</controllerName>
+				<extensionName>OAuth</extensionName>
+				<scope>Site</scope>
+				<editAction>Settings</editAction>
+			</controlPanelExtensionDefinition>
+
+			<file name="readme.txt" />
+			<file name="viewer.css" />
+			<file name="settings.css" />
+			
+			<folder name="Bin">
+				<file name="Nucleus.OAuth.dll" />
+				<file name="Microsoft.AspNetCore.Authentication.Facebook.dll" />
+				<file name="Microsoft.AspNetCore.Authentication.Google.dll" />
+				<file name="Microsoft.AspNetCore.Authentication.MicrosoftAccount.dll" />
+				<file name="Microsoft.AspNetCore.Authentication.OpenIdConnect.dll" />
+				<file name="Microsoft.AspNetCore.Authentication.Twitter.dll" />
+				<file name="Microsoft.IdentityModel.Protocols.OpenIdConnect.dll" />
+				<file name="Microsoft.IdentityModel.Tokens.dll" />
+				<file name="Microsoft.IdentityModel.Protocols.dll" />
+				<file name="Microsoft.IdentityModel.Logging.dll" />
+				<file name="System.IdentityModel.Tokens.Jwt.dll" />				
+			</folder>
+			
+			<folder name="Views">
+				<file name="Viewer.cshtml" />
+				<file name="Settings.cshtml" />
+			</folder>
+			
+		</component>
+	</components>
+	
+</package>

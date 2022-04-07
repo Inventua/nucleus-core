@@ -1,0 +1,156 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Identity;
+using Nucleus.ViewFeatures;
+using Nucleus.Abstractions;
+
+namespace Nucleus.OAuth
+{
+	internal static class OAuthExtensions
+	{
+		private static string[] ReservedProperties = new[] { nameof(Models.Configuration.OAuthProvider.Name), nameof(Models.Configuration.OAuthProvider.Type), nameof(Models.Configuration.OAuthProvider.MapJsonKeys), nameof(Models.Configuration.OAuthProvider.Scope) };
+
+		/// <summary>
+		/// Add Nucleus core Authentication to DI.
+		/// </summary>
+		/// <param name="services"></param>
+		/// <param name="configuration"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// Configures and adds Nucleus remote (Oauth) authentication to DI, including the <see cref="AuthenticationOptions"/> class.
+		/// </remarks>
+		public static IServiceCollection AddRemoteAuthentication(this IServiceCollection services, IConfiguration configuration)
+		{
+			services.Configure<RemoteAuthenticationOptions>(configuration.GetSection(RemoteAuthenticationOptions.Section), binderOptions => binderOptions.BindNonPublicProperties = true);
+
+			services.AddAuthentication(Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME)
+				.AddScheme<RemoteAuthenticationOptions, RemoteAuthenticationHandler>(RemoteAuthenticationHandler.REMOTE_AUTH_SCHEME, options =>
+				{
+				});
+
+			return services;
+		}
+
+		public static void AddOAuth(this AuthenticationBuilder builder, IConfiguration configuration)
+		{			
+			AddRemoteAuthentication(builder.Services, configuration);
+				
+			// Look for configured OAuth providers
+
+			// Get config for immediate use
+			OAuth.Models.Configuration.OAuthProviders config = new();
+			configuration.Bind(OAuth.Models.Configuration.OAuthProviders.Section, config);
+
+			// Add config to dependency injection for later use
+			builder.Services.Configure<OAuth.Models.Configuration.OAuthProviders>(configuration.GetSection(OAuth.Models.Configuration.OAuthProviders.Section), options => options.BindNonPublicProperties = true);
+
+			IConfigurationSection[] configurationSections = configuration.GetSection(OAuth.Models.Configuration.OAuthProviders.Section).GetChildren().ToArray();
+
+			for (int count = 0; count < config.Count; count++)
+			{
+				IConfigurationSection configurationSection = configurationSections[count];
+				Models.Configuration.OAuthProvider providerConfig = config[count];
+				string providerName = providerConfig.Name ?? providerConfig.Type; // configurationSection["Name"] ?? configurationSection["Type"];
+				string providerType = providerConfig.Type; //configurationSection["Type"];
+
+				switch (providerType)
+				{
+					case "OAuth":
+						builder.AddOAuth(providerName, options =>
+						{
+							SetOptions(options, providerName, configurationSection, providerConfig);
+						});
+						break;
+
+					case "OpenIdConnect":
+						builder.AddOpenIdConnect(providerName, options =>
+						{
+							SetOptions(options, providerName, configurationSection, providerConfig);
+						});
+						break;
+
+					case "Google":
+						builder.AddGoogle(providerName, options =>
+						{
+							SetOptions(options, providerName, configurationSection, providerConfig);
+						});
+						break;
+
+					case "Facebook":
+						builder.AddFacebook(providerName, options =>
+						{
+							SetOptions(options, providerName, configurationSection, providerConfig);
+						});
+						break;
+
+					case "Twitter":
+						builder.AddTwitter(providerName, options =>
+						{
+							SetOptions(options, providerName, configurationSection, providerConfig);
+						});
+						break;
+
+					case "Microsoft":
+						builder.AddMicrosoftAccount(providerName, options =>
+						{
+							SetOptions(options, providerName, configurationSection, providerConfig);
+						});
+						break;
+
+					default:
+						throw new InvalidOperationException($"OAuth provider {providerName} not recognized.");
+				}
+
+			}
+		}
+
+		private static void SetOptions(Microsoft.AspNetCore.Authentication.RemoteAuthenticationOptions options, string providerName, IConfigurationSection configurationSection, Models.Configuration.OAuthProvider providerConfig)
+		{
+			options.SignInScheme = RemoteAuthenticationHandler.REMOTE_AUTH_SCHEME;
+			options.CallbackPath = GetCallbackPath(providerName);
+
+			foreach (IConfigurationSection configValue in configurationSection.GetChildren())
+			{
+				if (!ReservedProperties.Contains(configValue.Key, StringComparer.OrdinalIgnoreCase))
+				{ // use reflection to set properties (if present)
+					var prop = options.GetType().GetProperty(configValue.Key);
+					if (prop != null)
+					{
+						prop.SetValue(options, Convert.ChangeType(configValue.Value, prop.PropertyType));
+					}
+					else
+					{
+						throw new InvalidOperationException($"OAuth provider value {configValue.Key} for configured provider '{providerName}' not recognized [{configValue.Path}].");
+					}
+				}
+			}
+
+			Microsoft.AspNetCore.Authentication.OAuth.OAuthOptions oauthOptions = options as Microsoft.AspNetCore.Authentication.OAuth.OAuthOptions;
+
+			if (oauthOptions != null)
+			{
+				foreach (string scope in providerConfig.Scope)
+				{
+					oauthOptions.Scope.Add(scope);
+				}
+
+				foreach (Models.Configuration.MapJsonKey key in providerConfig.MapJsonKeys)
+				{
+					oauthOptions.ClaimActions.MapJsonKey(key.ClaimType, key.JsonKey);
+				}
+			}
+		}
+
+		private static string GetCallbackPath(string provider)
+		{
+			return $"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/oauth/callback/{provider.ToLower()}";
+		}
+	}
+}

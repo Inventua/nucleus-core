@@ -18,7 +18,7 @@ namespace Nucleus.Extensions.GoogleAnalytics.Controllers
 		private Context Context { get; }
 		private ISiteManager SiteManager { get; }
 
-		internal const string MODULESETTING_ANALYTICS_ID = "googleanalytics:id";
+		internal const string SETTING_ANALYTICS_ID = "googleanalytics:id";
 
 		public GoogleAnalyticsController(Context Context, ISiteManager siteManager)
 		{
@@ -38,7 +38,7 @@ namespace Nucleus.Extensions.GoogleAnalytics.Controllers
 		[HttpPost]
 		public ActionResult SaveSettings(ViewModels.Settings viewModel)
 		{
-			this.Context.Site.SiteSettings.TrySetValue(MODULESETTING_ANALYTICS_ID, viewModel.GoogleAnalyticsId);
+			this.Context.Site.SiteSettings.TrySetValue(SETTING_ANALYTICS_ID, viewModel.GoogleAnalyticsId);
 			this.SiteManager.Save(this.Context.Site);
 
 			return Ok();
@@ -58,7 +58,7 @@ namespace Nucleus.Extensions.GoogleAnalytics.Controllers
 				viewModel = new();
 			}
 
-			if (this.Context.Site.SiteSettings.TryGetValue(MODULESETTING_ANALYTICS_ID, out string googleId))
+			if (this.Context.Site.SiteSettings.TryGetValue(SETTING_ANALYTICS_ID, out string googleId))
 			{
 				viewModel.GoogleAnalyticsId = googleId;
 			}

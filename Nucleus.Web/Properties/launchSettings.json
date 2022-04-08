@@ -31,6 +31,14 @@
       },
       "applicationUrl": "https://minion.inventua.com:5001"
     },
+    "Nucleus.Web.Local": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:5000"
+    },
     "WSL": {
       "commandName": "WSL2",
       "launchBrowser": true,

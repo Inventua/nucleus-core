@@ -47,7 +47,8 @@
 			
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Abstractions.dll"></ExcludedAssemblies>
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.ViewFeatures.dll"></ExcludedAssemblies>
-			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Core.dll,bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Extensions.dll"></ExcludedAssemblies>
+			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Core.dll"></ExcludedAssemblies>
+			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Extensions.dll"></ExcludedAssemblies>
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Data.Common.dll"></ExcludedAssemblies>
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Data.EntityFramework.dll"></ExcludedAssemblies>
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Data.SqlServer.dll"></ExcludedAssemblies>
@@ -58,7 +59,7 @@
 			<Message Importance="high" Text="Reference assembles: @(ReferenceAssemblies)" />
 			<Message Importance="high" Text="Excluded assembles: @(ExcludedAssemblies)" />
 			<AllAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\*.dll" />
-			<OutputAssemblies Include="@(AllAssemblies)" Exclude="@(ReferenceAssemblies);@(ExcludedAssemblies)" Condition="!Exists('$(NUCLEUS_PATH)bin\%(FileName)%(Extension)') And !Exists('$(NUCLEUS_PATH)bin\$(Configuration)\$(TargetFramework)\%(FileName)%(Extension)')" />
+			<OutputAssemblies Include="@(AllAssemblies)" Exclude="@(ReferenceAssemblies);@(ExcludedAssemblies)" />
 		</ItemGroup>		
 	</Target>
 	

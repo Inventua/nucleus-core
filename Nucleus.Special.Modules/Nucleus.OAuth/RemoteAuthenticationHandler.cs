@@ -35,6 +35,7 @@ namespace Nucleus.OAuth
 			this.SiteManager = siteManager;
 			this.LinkGenerator = linkGenerator;
 			this.CurrentContext = context;
+
 		}
 
 		/// <summary>
@@ -67,14 +68,14 @@ namespace Nucleus.OAuth
 			User loginUser = null;
 			object email = properties.Parameters.Where(prop => prop.Key == "email").Select(pair => pair.Value).FirstOrDefault();
 				
-			if (settings.MatchByName)
+			if (settings.MatchByName && !String.IsNullOrEmpty(user.Identity.Name))
 			{
 				loginUser = await this.UserManager.Get(this.CurrentContext.Site, user.Identity.Name);
 			}
 
 			if (loginUser == null && settings.MatchByEmail)
 			{
-				if (email != null && email.ToString() != null)
+				if (email != null && !String.IsNullOrEmpty(email.ToString()))
 				{
 					loginUser = await this.UserManager.GetByEmail(this.CurrentContext.Site, email.ToString());
 				}

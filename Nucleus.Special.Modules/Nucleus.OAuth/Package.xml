@@ -34,7 +34,8 @@
 				<file name="Microsoft.IdentityModel.Tokens.dll" />
 				<file name="Microsoft.IdentityModel.Protocols.dll" />
 				<file name="Microsoft.IdentityModel.Logging.dll" />
-				<file name="System.IdentityModel.Tokens.Jwt.dll" />				
+				<file name="System.IdentityModel.Tokens.Jwt.dll" />
+				<file name="Microsoft.IdentityModel.JsonWebTokens.dll" />				
 			</folder>
 			
 			<folder name="Views">

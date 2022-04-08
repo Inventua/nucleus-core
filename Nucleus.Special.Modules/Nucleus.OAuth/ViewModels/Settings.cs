@@ -19,12 +19,12 @@ namespace Nucleus.OAuth.ViewModels
 		internal const string SETTING_AUTO_VERIFY = "oauth:auto-verify";
 		internal const string SETTING_AUTO_APPROVE = "oauth:auto-approve";
 
-		public Boolean MatchByName { get; set; }
+		public Boolean MatchByName { get; set; }=true;
 		public Boolean MatchByEmail { get; set; }
 
 		public Boolean CreateUsers { get; set; }
-		public Boolean AutomaticallyApproveNewUsers { get; set; }
-		public Boolean AutomaticallyVerifyNewUsers { get; set; }
+		public Boolean AutomaticallyApproveNewUsers { get; set; } = true;
+		public Boolean AutomaticallyVerifyNewUsers { get; set; } = true;
 
 		public void ReadSettings(Site site)
 		{

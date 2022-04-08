@@ -15,13 +15,21 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Nucleus.Web": {
+    "Nucleus.Web.Golem": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "https://golem.inventua.com:5001"
+    },
+    "Nucleus.Web.Minion": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://minion.inventua.com:5001"
     },
     "WSL": {
       "commandName": "WSL2",

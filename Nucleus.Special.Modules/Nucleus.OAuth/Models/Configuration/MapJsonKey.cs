@@ -10,5 +10,7 @@ namespace Nucleus.OAuth.Models.Configuration
 	{
 		public string ClaimType { get; set; }
 		public string JsonKey { get; set; }
+		public string ValueType { get; set; }
+
 	}
 }

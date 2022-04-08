@@ -29,10 +29,11 @@ namespace Nucleus.OAuth
 		public static IServiceCollection AddRemoteAuthentication(this IServiceCollection services, IConfiguration configuration)
 		{
 			services.Configure<RemoteAuthenticationOptions>(configuration.GetSection(RemoteAuthenticationOptions.Section), binderOptions => binderOptions.BindNonPublicProperties = true);
-
+			
 			services.AddAuthentication(Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME)
 				.AddScheme<RemoteAuthenticationOptions, RemoteAuthenticationHandler>(RemoteAuthenticationHandler.REMOTE_AUTH_SCHEME, options =>
 				{
+					
 				});
 
 			return services;
@@ -57,8 +58,8 @@ namespace Nucleus.OAuth
 			{
 				IConfigurationSection configurationSection = configurationSections[count];
 				Models.Configuration.OAuthProvider providerConfig = config[count];
-				string providerName = providerConfig.Name ?? providerConfig.Type; // configurationSection["Name"] ?? configurationSection["Type"];
-				string providerType = providerConfig.Type; //configurationSection["Type"];
+				string providerName = providerConfig.Name ?? providerConfig.Type; 
+				string providerType = providerConfig.Type; 
 
 				switch (providerType)
 				{
@@ -66,6 +67,32 @@ namespace Nucleus.OAuth
 						builder.AddOAuth(providerName, options =>
 						{
 							SetOptions(options, providerName, configurationSection, providerConfig);
+							
+							options.Events.OnCreatingTicket = ctx =>
+							{
+								System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler handler = new();
+
+								// if the response contains an id_token (JWT token), read it and copy any claims that are 
+								if (ctx.TokenResponse.Response.RootElement.TryGetProperty("id_token", out System.Text.Json.JsonElement value))
+								{
+									System.IdentityModel.Tokens.Jwt.JwtSecurityToken token = handler.ReadJwtToken(value.ToString());
+
+									// Look for claim actions (set in config/code with MapJsonType) in the JWT payload (token claims).  If found, add claims
+									// to the identity with the claim types specified.  Normally claim actions are populated (automatically) by a call to
+									// options.UserInformationEndpoint, and .net core doesn't seem to pay any attention to JWT tokens (hence this code is required).
+									foreach (Microsoft.AspNetCore.Authentication.OAuth.Claims.ClaimAction action in ctx.Options.ClaimActions)
+									{
+										var claim = token.Claims.Where(claim => claim.Type.Equals(action.ClaimType, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+
+										if (claim != null)
+										{
+											ctx.Identity.AddClaim(new(action.ClaimType, claim.Value, claim.ValueType, providerName, claim.Issuer));
+										}
+									}
+								}
+
+								return Task.CompletedTask;
+							};
 						});
 						break;
 
@@ -115,7 +142,7 @@ namespace Nucleus.OAuth
 		{
 			options.SignInScheme = RemoteAuthenticationHandler.REMOTE_AUTH_SCHEME;
 			options.CallbackPath = GetCallbackPath(providerName);
-
+			
 			foreach (IConfigurationSection configValue in configurationSection.GetChildren())
 			{
 				if (!ReservedProperties.Contains(configValue.Key, StringComparer.OrdinalIgnoreCase))
@@ -127,7 +154,7 @@ namespace Nucleus.OAuth
 					}
 					else
 					{
-						throw new InvalidOperationException($"OAuth provider value {configValue.Key} for configured provider '{providerName}' not recognized [{configValue.Path}].");
+						throw new InvalidOperationException($"OAuth provider value '{configValue.Key}' for configured provider '{providerName}' not recognized [{configValue.Path}].");
 					}
 				}
 			}
@@ -143,7 +170,7 @@ namespace Nucleus.OAuth
 
 				foreach (Models.Configuration.MapJsonKey key in providerConfig.MapJsonKeys)
 				{
-					oauthOptions.ClaimActions.MapJsonKey(key.ClaimType, key.JsonKey);
+					oauthOptions.ClaimActions.MapJsonKey(key.ClaimType, key.JsonKey, key.ValueType);
 				}
 			}
 		}

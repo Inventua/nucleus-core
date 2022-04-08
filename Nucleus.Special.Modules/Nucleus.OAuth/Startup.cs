@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Logging;
+using Microsoft.AspNetCore.Builder;
 
 [assembly: HostingStartup(typeof(Nucleus.OAuth.Startup))]
 
@@ -18,9 +20,11 @@ namespace Nucleus.OAuth
 		{			
 			builder.ConfigureServices((context, services) =>
 			{
+				// test use only: IdentityModelEventSource.ShowPII = true;
 				services.AddAuthentication().AddOAuth(context.Configuration);
 			});
 
+			
 		}
 
 

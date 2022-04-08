@@ -15,7 +15,7 @@
       if (!targetControl.is('input[type=checkbox]')) return;
 
       // check to see if the toggleswitch is already initialized
-      if (targetControl.siblings('.ToggleSwitch').length !== 0) return;
+      if (targetControl.next().is('input[type=range]')) return;
 
       switchElement = jQuery('<input type="range" min="1" max="2" step="1" class="ToggleSwitch"></input>');
       targetControl.hide();

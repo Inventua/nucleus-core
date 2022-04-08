@@ -37,14 +37,14 @@
 
 				<SettingsControl caption="User Registration" helptext="Specify user registration options.">
 					<div class="d-flex align-items-baseline gap-1">
-						@Html.CheckBoxFor(model => model.AllowPublicRegistration, new { @class = "allow-registration"})
-						<label class="ms-1 me-4">Allow public registration</label>
+						@Html.CheckBoxFor(model => model.AllowPublicRegistration, new { @class = "allow-registration ToggleSwitch"})
+						<label class="ms-1 me-4 align-self-start">Allow public registration</label>
 
-						@Html.CheckBoxFor(model => model.RequireEmailVerification)
-						<label class="ms-1 me-4">Require Email Verification</label>
+						@Html.CheckBoxFor(model => model.RequireEmailVerification, new { @class = "ToggleSwitch" })
+						<label class="ms-1 me-4 align-self-start">Require Email Verification</label>
 
-						@Html.CheckBoxFor(model => model.RequireApproval)
-						<label class="ms-1 me-4">Require Approval</label>
+						@Html.CheckBoxFor(model => model.RequireApproval, new { @class = "ToggleSwitch" })
+						<label class="ms-1 me-4 align-self-start">Require Approval</label>
 					</div>
 				</SettingsControl>
 

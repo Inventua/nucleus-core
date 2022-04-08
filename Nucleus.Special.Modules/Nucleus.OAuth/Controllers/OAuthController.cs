@@ -25,20 +25,16 @@ namespace Nucleus.OAuth.Controllers
 	public class OAuthController : Controller
 	{
 		private Context Context { get; }
-		private ISessionManager SessionManager { get; }
-		private IUserManager UserManager { get; }
-
-		private IPageModuleManager PageModuleManager { get; }
+		
+		private ISiteManager SiteManager { get; }
 
 		private IOptions<OAuth.Models.Configuration.OAuthProviders> Options { get; }
 
 
-		public OAuthController(Context Context, ISessionManager sessionManager, IUserManager userManager, IPageModuleManager pageModuleManager, IOptions<OAuth.Models.Configuration.OAuthProviders> options)
+		public OAuthController(Context Context, ISiteManager siteManager, IOptions<OAuth.Models.Configuration.OAuthProviders> options)
 		{
 			this.Context = Context;
-			this.SessionManager = sessionManager;
-			this.UserManager = userManager;
-			this.PageModuleManager = pageModuleManager;
+			this.SiteManager = siteManager;
 			this.Options = options;
 		}
 
@@ -78,22 +74,6 @@ namespace Nucleus.OAuth.Controllers
 			return View("Viewer", BuildViewModel());
 		}
 
-		////[HttpGet]
-		////[HttpPost]
-		////[Route($"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{action=Signin}}/{{provider}}")]
-		////public async Task<ActionResult> Signin(string provider)
-		////{
-		////	// sign in 
-		////	User loginUser = await this.UserManager.Get(this.Context.Site, ControllerContext.HttpContext.User.Identity.Name);
-
-		////	UserSession session = await this.SessionManager.CreateNew(this.Context.Site, loginUser, false, ControllerContext.HttpContext.Connection.RemoteIpAddress);
-		////	await this.SessionManager.SignIn(session, HttpContext, "/"); // viewModel.ReturnUrl
-
-		////	string location = "/";// String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.GetAbsoluteUri("/").ToString() : Url.GetAbsoluteUri(viewModel.ReturnUrl).ToString();
-		////	ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
-		////	return StatusCode((int)System.Net.HttpStatusCode.Found);
-		////}
-
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpGet]
 		[HttpPost]
@@ -113,7 +93,7 @@ namespace Nucleus.OAuth.Controllers
 			this.Context.Site.SiteSettings.TrySetValue(ViewModels.Settings.SETTING_AUTO_VERIFY, viewModel.AutomaticallyVerifyNewUsers);
 			this.Context.Site.SiteSettings.TrySetValue(ViewModels.Settings.SETTING_AUTO_APPROVE, viewModel.AutomaticallyApproveNewUsers);
 
-			this.PageModuleManager.SaveSettings(this.Context.Module);
+			this.SiteManager.Save(this.Context.Site);
 
 			return Ok();
 		}

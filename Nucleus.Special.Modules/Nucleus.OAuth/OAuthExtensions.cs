@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Identity;
-using Nucleus.ViewFeatures;
+using System.IdentityModel.Tokens.Jwt;
 using Nucleus.Abstractions;
 
 namespace Nucleus.OAuth
@@ -67,32 +67,33 @@ namespace Nucleus.OAuth
 						builder.AddOAuth(providerName, options =>
 						{
 							SetOptions(options, providerName, configurationSection, providerConfig);
-							
-							options.Events.OnCreatingTicket = ctx =>
-							{
-								System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler handler = new();
 
-								// if the response contains an id_token (JWT token), read it and copy any claims that are 
-								if (ctx.TokenResponse.Response.RootElement.TryGetProperty("id_token", out System.Text.Json.JsonElement value))
-								{
-									System.IdentityModel.Tokens.Jwt.JwtSecurityToken token = handler.ReadJwtToken(value.ToString());
+							options.Events.OnCreatingTicket = ParseJWT;
 
-									// Look for claim actions (set in config/code with MapJsonType) in the JWT payload (token claims).  If found, add claims
-									// to the identity with the claim types specified.  Normally claim actions are populated (automatically) by a call to
-									// options.UserInformationEndpoint, and .net core doesn't seem to pay any attention to JWT tokens (hence this code is required).
-									foreach (Microsoft.AspNetCore.Authentication.OAuth.Claims.ClaimAction action in ctx.Options.ClaimActions)
-									{
-										var claim = token.Claims.Where(claim => claim.Type.Equals(action.ClaimType, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+							//options.Events.OnCreatingTicket = ctx =>
+							//{
+							//	JwtSecurityTokenHandler handler = new();
+							//	// if the response contains an id_token (JWT token), read it and copy any claims that are 
+							//	if (ctx.TokenResponse.Response.RootElement.TryGetProperty("id_token", out System.Text.Json.JsonElement value))
+							//	{
+							//		JwtSecurityToken token = handler.ReadJwtToken(value.ToString());
 
-										if (claim != null)
-										{
-											ctx.Identity.AddClaim(new(action.ClaimType, claim.Value, claim.ValueType, providerName, claim.Issuer));
-										}
-									}
-								}
+							//		// Look for claim actions (set in config/code with MapJsonType) in the JWT payload (token claims).  If found, add claims
+							//		// to the identity with the claim types specified.  Normally claim actions are populated (automatically) by a call to
+							//		// options.UserInformationEndpoint, and .net core doesn't seem to pay any attention to JWT tokens (hence this code is required).
+							//		foreach (Microsoft.AspNetCore.Authentication.OAuth.Claims.ClaimAction action in ctx.Options.ClaimActions)
+							//		{
+							//			var claim = token.Claims.Where(claim => claim.Type.Equals(action.ClaimType, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
-								return Task.CompletedTask;
-							};
+							//			if (claim != null)
+							//			{
+							//				ctx.Identity.AddClaim(new(action.ClaimType, claim.Value, claim.ValueType, providerName, claim.Issuer));
+							//			}
+							//		}
+							//	}
+
+							//	return Task.CompletedTask;
+							//};
 						});
 						break;
 
@@ -138,6 +139,33 @@ namespace Nucleus.OAuth
 			}
 		}
 
+		private static Task ParseJWT(Microsoft.AspNetCore.Authentication.OAuth.OAuthCreatingTicketContext ctx)
+		{
+			JwtSecurityTokenHandler handler = new();
+			// if the response contains an id_token (JWT token), read it and copy any claims that are 
+			if (ctx.TokenResponse.Response.RootElement.TryGetProperty("id_token", out System.Text.Json.JsonElement value))
+			{
+				JwtSecurityToken token = handler.ReadJwtToken(value.ToString());
+
+				// Look for claim actions (set in config/code with MapJsonType) in the JWT payload (token claims).  If found, add claims
+				// to the identity with the claim types specified.  Normally claim actions are populated (automatically) by a call to
+				// options.UserInformationEndpoint, and .net core doesn't seem to pay any attention to JWT tokens (hence this code is required).
+				foreach (Microsoft.AspNetCore.Authentication.OAuth.Claims.ClaimAction action in ctx.Options.ClaimActions)
+				{
+					System.Security.Claims.Claim claim = token.Claims
+						.Where(claim => claim.Type.Equals((action as Microsoft.AspNetCore.Authentication.OAuth.Claims.JsonKeyClaimAction)?.JsonKey, StringComparison.OrdinalIgnoreCase))
+						.FirstOrDefault();
+
+					if (claim != null)
+					{
+						ctx.Identity.AddClaim(new(action.ClaimType, claim.Value, claim.ValueType, claim.Issuer, claim.Issuer));
+					}
+				}
+			}
+
+			return Task.CompletedTask;
+		}
+
 		private static void SetOptions(Microsoft.AspNetCore.Authentication.RemoteAuthenticationOptions options, string providerName, IConfigurationSection configurationSection, Models.Configuration.OAuthProvider providerConfig)
 		{
 			options.SignInScheme = RemoteAuthenticationHandler.REMOTE_AUTH_SCHEME;
@@ -146,7 +174,8 @@ namespace Nucleus.OAuth
 			foreach (IConfigurationSection configValue in configurationSection.GetChildren())
 			{
 				if (!ReservedProperties.Contains(configValue.Key, StringComparer.OrdinalIgnoreCase))
-				{ // use reflection to set properties (if present)
+				{ 
+					// use reflection to set properties from config (if present).  Throw an exception if config contains any unrecognized values.
 					var prop = options.GetType().GetProperty(configValue.Key);
 					if (prop != null)
 					{
@@ -159,6 +188,7 @@ namespace Nucleus.OAuth
 				}
 			}
 
+			// if the options class inherits OAuthOptions, add scopes and json key mappings from config
 			Microsoft.AspNetCore.Authentication.OAuth.OAuthOptions oauthOptions = options as Microsoft.AspNetCore.Authentication.OAuth.OAuthOptions;
 
 			if (oauthOptions != null)

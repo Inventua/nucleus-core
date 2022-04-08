@@ -105,15 +105,6 @@ namespace Nucleus.OAuth
 						}
 					}
 
-					//if (email != null && email.ToString() != null)
-					//{
-					//	UserProfileProperty emailProperty = this.CurrentContext.Site.UserProfileProperties.Where(prop => prop.TypeUri.Equals(System.Security.Claims.ClaimTypes.Email, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-					//	if (emailProperty != null)
-					//	{
-					//		loginUser.Profile.Add(new UserProfileValue() { UserProfileProperty = emailProperty, Value = email.ToString() });
-					//	}
-					//}
-
 					this.UserManager.SetNewUserFlags(this.CurrentContext.Site, loginUser);
 
 					if (settings.AutomaticallyVerifyNewUsers)
@@ -126,6 +117,7 @@ namespace Nucleus.OAuth
 						loginUser.Approved = true;
 					}
 
+					await this.UserManager.Save(this.CurrentContext.Site, loginUser);
 				}
 			}
 			

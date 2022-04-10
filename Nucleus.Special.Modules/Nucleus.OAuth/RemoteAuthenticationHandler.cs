@@ -62,7 +62,7 @@ namespace Nucleus.OAuth
 			{
 				throw new ArgumentNullException(nameof(user));
 			}
-			ViewModels.Settings settings = new();
+			ViewModels.SiteSettings settings = new();
 			settings.ReadSettings(this.CurrentContext.Site);
 
 			User loginUser = null;
@@ -87,6 +87,7 @@ namespace Nucleus.OAuth
 
 				if (!settings.CreateUsers)
 				{
+					//await base.ForbidAsync(properties);
 					throw new UnauthorizedAccessException("User does not exist");
 				}
 				else
@@ -127,6 +128,12 @@ namespace Nucleus.OAuth
 				await this.SessionManager.SignIn(session, base.Context, "/"); 
 			}
 
+		}
+
+		protected override Task HandleForbiddenAsync(AuthenticationProperties properties)
+		{
+			this.Context.Response.Redirect(BuildRedirectUri(this.Options.AccessDeniedPath));
+			return Task.CompletedTask;
 		}
 
 		protected override Task HandleSignOutAsync(AuthenticationProperties properties)

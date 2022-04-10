@@ -23,7 +23,9 @@
     <None Remove="readme.txt" />
     <None Remove="settings.css" />
     <None Remove="Views\Settings.cshtml" />
+    <None Remove="Views\SiteSettings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
+    <None Remove="Views\ViewerLayouts\List.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,8 +33,10 @@
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
     <Content Include="settings.css" />
-    <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />
+    <Content Include="Views\Viewer.cshtml" />
+    <Content Include="Views\SiteSettings.cshtml" />
+    <Content Include="Views\ViewerLayouts\List.cshtml" />
   </ItemGroup>
 
 	<ItemGroup>

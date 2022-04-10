@@ -172,9 +172,7 @@ namespace Nucleus.Modules.Documents.Controllers
 			viewModel.ShowDescription = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_DESCRIPTION, true);
 			viewModel.ShowModifiedDate= this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_MODIFIEDDATE, true);
 			viewModel.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
-
-			System.IO.DirectoryInfo thisFolder = new(this.GetType().Assembly.Location);
-
+						
 			string layoutPath = $"ViewerLayouts/{this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table")}.cshtml";
 
 			if (!System.IO.File.Exists($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\Documents\\Views\\{layoutPath}"))

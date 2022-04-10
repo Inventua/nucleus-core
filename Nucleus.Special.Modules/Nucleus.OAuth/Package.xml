@@ -19,6 +19,14 @@
 				<editAction>Settings</editAction>
 			</controlPanelExtensionDefinition>
 
+			<moduleDefinition id="A42F8AD6-1285-411B-874F-BAC8DDDF259E">
+				<friendlyName>OAuth Selector</friendlyName>
+				<classTypeName>Nucleus.OAuth.Controllers.OAuthController,Nucleus.OAuth.OAuth</classTypeName>
+				<viewAction>Index</viewAction>
+				<editAction>Settings</editAction>
+				<categories>Account</categories>
+			</moduleDefinition>
+			
 			<file name="readme.txt" />
 			<file name="viewer.css" />
 			<file name="settings.css" />
@@ -41,6 +49,10 @@
 			<folder name="Views">
 				<file name="Viewer.cshtml" />
 				<file name="Settings.cshtml" />
+
+				<folder name="ViewerLayouts">
+					<file name="List.cshtml" />
+				</folder>
 			</folder>
 			
 		</component>

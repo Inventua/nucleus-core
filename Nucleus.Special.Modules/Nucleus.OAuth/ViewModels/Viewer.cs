@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace Nucleus.OAuth.ViewModels
 {
-	public class Viewer
+	public class Viewer : Settings
 	{
-
+		public OAuth.Models.Configuration.OAuthProviders Options { get; set; }
 	}
 }

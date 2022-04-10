@@ -11,6 +11,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
+using Nucleus.Abstractions.Models.Configuration;
+using Microsoft.AspNetCore.Hosting;
 
 // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.iauthenticationservice?view=aspnetcore-6.0
 // https://github.com/aspnet-contrib/AspNet.Security.OAuth.Providers/blob/dev/src/AspNet.Security.OAuth.WordPress/WordPressAuthenticationExtensions.cs
@@ -24,15 +26,19 @@ namespace Nucleus.OAuth.Controllers
 	[Extension("OAuth")]
 	public class OAuthController : Controller
 	{
+		private IWebHostEnvironment WebHostEnvironment { get; }
+
 		private Context Context { get; }
 		
 		private ISiteManager SiteManager { get; }
 
 		private IOptions<OAuth.Models.Configuration.OAuthProviders> Options { get; }
 
+		private const string MODULESETTING_LAYOUT = "oauth:viewer:layout";
 
-		public OAuthController(Context Context, ISiteManager siteManager, IOptions<OAuth.Models.Configuration.OAuthProviders> options)
+		public OAuthController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IOptions<OAuth.Models.Configuration.OAuthProviders> options)
 		{
+			this.WebHostEnvironment = webHostEnvironment;
 			this.Context = Context;
 			this.SiteManager = siteManager;
 			this.Options = options;
@@ -83,15 +89,23 @@ namespace Nucleus.OAuth.Controllers
 		}
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+		[HttpGet]
 		[HttpPost]
-		public ActionResult SaveSettings(ViewModels.Settings viewModel)
+		public ActionResult SiteSettings(ViewModels.SiteSettings viewModel)
 		{
-			this.Context.Site.SiteSettings.TrySetValue(ViewModels.Settings.SETTING_MATCH_BY_NAME, viewModel.MatchByName);
-			this.Context.Site.SiteSettings.TrySetValue(ViewModels.Settings.SETTING_MATCH_BY_EMAIL, viewModel.MatchByEmail);
+			return View("SiteSettings", BuildSiteSettingsViewModel(viewModel));
+		}
 
-			this.Context.Site.SiteSettings.TrySetValue(ViewModels.Settings.SETTING_CREATE_USERS, viewModel.CreateUsers);
-			this.Context.Site.SiteSettings.TrySetValue(ViewModels.Settings.SETTING_AUTO_VERIFY, viewModel.AutomaticallyVerifyNewUsers);
-			this.Context.Site.SiteSettings.TrySetValue(ViewModels.Settings.SETTING_AUTO_APPROVE, viewModel.AutomaticallyApproveNewUsers);
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+		[HttpPost]
+		public ActionResult SaveSettings(ViewModels.SiteSettings viewModel)
+		{
+			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteSettings.SETTING_MATCH_BY_NAME, viewModel.MatchByName);
+			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteSettings.SETTING_MATCH_BY_EMAIL, viewModel.MatchByEmail);
+
+			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteSettings.SETTING_CREATE_USERS, viewModel.CreateUsers);
+			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteSettings.SETTING_AUTO_VERIFY, viewModel.AutomaticallyVerifyNewUsers);
+			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteSettings.SETTING_AUTO_APPROVE, viewModel.AutomaticallyApproveNewUsers);
 
 			this.SiteManager.Save(this.Context.Site);
 
@@ -101,11 +115,29 @@ namespace Nucleus.OAuth.Controllers
 		private ViewModels.Viewer BuildViewModel()
 		{
 			ViewModels.Viewer viewModel = new();
-
+			viewModel.Options = this.Options.Value;
 			return viewModel;
 		}
 
 		private ViewModels.Settings BuildSettingsViewModel(ViewModels.Settings viewModel)
+		{
+			if (viewModel == null)
+			{
+				viewModel = new();
+			}
+
+			viewModel.Layout = this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table");
+
+			viewModel.Layouts = new();
+			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\OAuth\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
+			{
+				viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
+			}
+
+			return viewModel;
+		}
+
+		private ViewModels.SiteSettings BuildSiteSettingsViewModel(ViewModels.SiteSettings viewModel)
 		{
 			if (viewModel == null)
 			{

@@ -4,7 +4,10 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.OAuth.ViewModels
 @Html.AddStyle("~!/../viewer.css")
-@if (Model.Options.Any())
-{
-	@await Html.PartialAsync(@Model.Layout, Model)
-}
+<label>Log in with</label>
+<ul>
+	@foreach (var option in Model.Options)
+	{
+		<li><a href="@Url.NucleusAction("Authenticate", "OAuth", "OAuth")">@option.Name</a></li>
+	}
+</ul>	

@@ -203,6 +203,17 @@ namespace Nucleus.OAuth
 					oauthOptions.ClaimActions.MapJsonKey(key.ClaimType, key.JsonKey, key.ValueType);
 				}
 			}
+			options.Events.OnRemoteFailure = ((RemoteFailureContext ctx) => 
+			{ 
+				return Task.CompletedTask;
+			});
+
+			options.Events.OnAccessDenied = ((AccessDeniedContext ctx) => 
+			{
+
+				return Task.CompletedTask;
+			});
+
 		}
 
 		private static string GetCallbackPath(string provider)

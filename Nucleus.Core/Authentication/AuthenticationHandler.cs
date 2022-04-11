@@ -277,13 +277,20 @@ namespace Nucleus.Core.Authentication
 		/// <param name="properties"></param>
 		private void AppendCookie(string sessionId, AuthenticationProperties properties)
 		{
+			// SameSite = Lax is important in this context.  
+			// - For OAUTH2, if a user logs in to a remote authentication site & is redirected back (and is then logged in and redirected to
+			//   the home page), browsers treat the entire sequence of requests as "originating" from the remote authentication site, thus
+			//   if SameSite=Strct, the session ID is not sent by the browser when it follows the redirect.  SameSite=Lax allows the cookie to 
+			//   be sent even though the sequence of requests/responses "originates" at the remote authentication site.
+			// - For any other case where a user clicks a link on another site which links to a Nucleus site, and is already logged in to the
+			//   Nucleus site, SameSite=Strict would prevent the browser from sending the session cookie (but is SameSite=Lax it will work).
 			CookieOptions options = new()
 			{
 				Expires = properties.ExpiresUtc,
 				IsEssential = true,
 				HttpOnly = true,
-				SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict,
-				Secure = this.Context.Request.Scheme == "https"
+				SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax,
+				Secure = this.Context.Request.IsHttps
 			};
 
 			this.Context.Response.Cookies.Append(this.Options.CookieName, sessionId, options);

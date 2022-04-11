@@ -116,6 +116,10 @@ namespace Nucleus.Core.Managers
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{
 				user = await provider.GetUser(userSession.UserId);
+				if (user.Secrets == null)
+				{
+					user.Secrets = new();
+				}
 			}
 
 			user.Secrets.LastLoginDate = DateTime.UtcNow;

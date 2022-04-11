@@ -87,8 +87,8 @@ namespace Nucleus.OAuth
 
 				if (!settings.CreateUsers)
 				{
-					//await base.ForbidAsync(properties);
-					throw new UnauthorizedAccessException("User does not exist");
+					await base.ForbidAsync(properties);
+					//throw new UnauthorizedAccessException("User does not exist");
 				}
 				else
 				{
@@ -125,14 +125,20 @@ namespace Nucleus.OAuth
 			if (loginUser != null)
 			{
 				UserSession session = await this.SessionManager.CreateNew(this.CurrentContext.Site, loginUser, false, base.Context.Connection.RemoteIpAddress);
-				await this.SessionManager.SignIn(session, base.Context, "/"); 
+				await this.SessionManager.SignIn(session, base.Context, properties.RedirectUri ?? "/");
+				base.Response.Redirect(properties.RedirectUri ?? "/");
 			}
 
 		}
 
 		protected override Task HandleForbiddenAsync(AuthenticationProperties properties)
 		{
-			this.Context.Response.Redirect(BuildRedirectUri(this.Options.AccessDeniedPath));
+			base.Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+
+			// Using base.Response.StartAsync causes the Microsoft Identity classes to throw a "System.InvalidOperationException: StatusCode
+			// cannot be set because the response has already started" exception, but it's the only way that seems to stop Microsoft Identity from
+			// ignoring what we do here & directing quietly to properties.RedirectUri, regardless of our already having set the status to forbidden.			
+			base.Response.StartAsync();
 			return Task.CompletedTask;
 		}
 

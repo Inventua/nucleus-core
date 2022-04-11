@@ -12,5 +12,6 @@ namespace Nucleus.OAuth.ViewModels
 	public class Viewer : Settings
 	{
 		public OAuth.Models.Configuration.OAuthProviders Options { get; set; }
+		public string ReturnUrl { get; set; }
 	}
 }

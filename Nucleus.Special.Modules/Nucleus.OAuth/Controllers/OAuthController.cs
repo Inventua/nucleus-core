@@ -45,15 +45,22 @@ namespace Nucleus.OAuth.Controllers
 		}
 
 		[HttpGet]
-		[Route($"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{action=Index}}/{{provider}}")]
-		public ActionResult Index()
+		//[Route($"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{action=Index}}/{{provider}}")]
+		public ActionResult Index(string returnUrl)
 		{
-			return View("Viewer", BuildViewModel());
+			return View("Viewer", BuildViewModel(returnUrl));
+		}
+
+		[HttpGet]
+		[Route($"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{action=AccessDenied}}")]
+		public ActionResult AccessDenied()
+		{
+			return View("Viewer", BuildViewModel(""));
 		}
 
 		[HttpGet]
 		[Route($"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{action=Authenticate}}/{{providerName}}")]
-		public ActionResult Authenticate(string providerName, string redirectUri)
+		public ActionResult Authenticate(string providerName, string returnUrl)
 		{
 			if (!String.IsNullOrEmpty(providerName))
 			{
@@ -68,7 +75,7 @@ namespace Nucleus.OAuth.Controllers
 				{
 					// redirect to OAUTH provider 
 					// Only allow a relative path for redirectUri, to ensure that it points to "this" site.					
-					return Challenge(new AuthenticationProperties() { RedirectUri = String.IsNullOrEmpty(redirectUri) || !redirectUri.StartsWith("/") ? "/" : redirectUri }, providerOption.Name ?? providerOption.Type);
+					return Challenge(new AuthenticationProperties() { RedirectUri = String.IsNullOrEmpty(returnUrl) || !returnUrl.StartsWith("/") ? "/" : returnUrl }, providerOption.Name ?? providerOption.Type);
 					//return Challenge(new AuthenticationProperties() { RedirectUri = String.IsNullOrEmpty(redirectUri) || !redirectUri.StartsWith("/") ? "/" : redirectUri }, $"{RemoteAuthenticationHandler.REMOTE_AUTH_SCHEME}/{providerName}");
 				}
 				else
@@ -76,8 +83,10 @@ namespace Nucleus.OAuth.Controllers
 					return BadRequest();
 				}
 			}
-
-			return View("Viewer", BuildViewModel());
+			else
+			{
+				return BadRequest();
+			}			
 		}
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
@@ -112,10 +121,31 @@ namespace Nucleus.OAuth.Controllers
 			return Ok();
 		}
 
-		private ViewModels.Viewer BuildViewModel()
+		private ViewModels.Viewer BuildViewModel(string redirectUri)
 		{
 			ViewModels.Viewer viewModel = new();
 			viewModel.Options = this.Options.Value;
+			viewModel.ReturnUrl = redirectUri;
+
+			// Name property is optional in config - for empty names, set the name to the value of the type property so that we
+			// don't have to check for blank names in views.  
+			foreach (OAuth.Models.Configuration.OAuthProvider option in viewModel.Options)
+			{
+				if (String.IsNullOrEmpty(option.Name))
+				{
+					option.Name = option.Type;
+				}
+			}
+
+			string layoutPath = $"ViewerLayouts\\{this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "List")}.cshtml";
+
+			if (!System.IO.File.Exists($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\OAuth\\Views\\{layoutPath}"))
+			{
+				layoutPath = $"ViewerLayouts/List.cshtml";
+			}
+
+			viewModel.Layout = layoutPath;
+
 			return viewModel;
 		}
 
@@ -126,7 +156,7 @@ namespace Nucleus.OAuth.Controllers
 				viewModel = new();
 			}
 
-			viewModel.Layout = this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table");
+			viewModel.Layout = this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "List");
 
 			viewModel.Layouts = new();
 			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\OAuth\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))

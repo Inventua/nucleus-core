@@ -15,7 +15,15 @@ namespace Nucleus.OAuth
 {
 	internal static class OAuthExtensions
 	{
-		private static string[] ReservedProperties = new[] { nameof(Models.Configuration.OAuthProvider.Name), nameof(Models.Configuration.OAuthProvider.Type), nameof(Models.Configuration.OAuthProvider.MapJsonKeys), nameof(Models.Configuration.OAuthProvider.Scope) };
+		private static string[] ReservedProperties = GetReservedProperties();// new[] { nameof(Models.Configuration.OAuthProvider.Name), nameof(Models.Configuration.OAuthProvider.Type), nameof(Models.Configuration.OAuthProvider.MapJsonKeys), nameof(Models.Configuration.OAuthProvider.Scope) };
+
+		private static string[] GetReservedProperties()
+		{
+			System.Reflection.PropertyInfo[] properties = typeof(Models.Configuration.OAuthProvider).GetProperties();
+
+			return properties.Select(prop => prop.Name).ToArray();
+
+		}
 
 		/// <summary>
 		/// Add Nucleus core Authentication to DI.

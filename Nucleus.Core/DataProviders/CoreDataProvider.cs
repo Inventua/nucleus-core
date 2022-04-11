@@ -1009,7 +1009,7 @@ namespace Nucleus.Core.DataProviders
 				.Where(existing => existing.Id == userId)
 				.Include(existing => existing.Roles)
 				.FirstOrDefaultAsync();
-
+			
 			if (existing != null)
 			{
 				// add new role assignments
@@ -1243,6 +1243,8 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task<List<PermissionType>> ListPermissionTypes(string scopeNamespace)
 		{
+			// if you get a weird error saying this can't be parsed, stop and start Nucleus.  The error is caused by a bug in 
+			// entity framework with visual studio edit & continue.
 			return await this.Context.PermissionTypes
 				.Where(typ => EF.Functions.Like(typ.Scope, $"%{scopeNamespace}%"))
 				.AsNoTracking()

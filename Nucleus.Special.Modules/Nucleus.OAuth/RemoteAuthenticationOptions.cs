@@ -21,9 +21,9 @@ namespace Nucleus.OAuth
 			this.ClaimsIssuer = RemoteAuthenticationHandler.REMOTE_AUTH_SCHEME;			
 			this.ForwardAuthenticate = RemoteAuthenticationHandler.REMOTE_AUTH_SCHEME;
 			this.ForwardForbid = RemoteAuthenticationHandler.REMOTE_AUTH_SCHEME;
-			this.AccessDeniedPath = "/extensions/oauth/accessdenied";
+			//this.AccessDeniedPath = "/extensions/oauth/accessdenied";
 		}
 
-		public string AccessDeniedPath { get;	}
+		//public string AccessDeniedPath { get;	}
 	}
 }

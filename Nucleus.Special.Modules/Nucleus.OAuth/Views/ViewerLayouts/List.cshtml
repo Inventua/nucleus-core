@@ -3,11 +3,11 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.OAuth.ViewModels
-@Html.AddStyle("~!/../viewer.css")
 <label>Log in with</label>
 <ul>
 	@foreach (var option in Model.Options)
 	{
-		<li><a href="@Url.NucleusAction("Authenticate", "OAuth", "OAuth")">@option.Name</a></li>
+		@*// The OAuth Authenticate action uses a custom (attribute based) route, so we have to 'hard code' it *@
+		<li><a href="@option.AuthenticateEndpoint(Model.ReturnUrl)">@option.DisplayName()</a></li>
 	}
 </ul>	

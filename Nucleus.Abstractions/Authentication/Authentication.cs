@@ -14,7 +14,7 @@ namespace Nucleus.Abstractions.Authentication
 		/// <summary>
 		/// Authentication scheme name
 		/// </summary>
-		public const string DEFAULT_AUTH_SCHEME = "urn:nucleus/authentication/default-scheme-name";
+		public const string DEFAULT_AUTH_SCHEME = "urn:nucleus/authentication/nucleus-default";
 
 		/// <summary>
 		/// Nucleus session ID claim URI.
@@ -22,11 +22,11 @@ namespace Nucleus.Abstractions.Authentication
 		/// <remarks>
 		/// This claim type is used in the cookie which is used to represent a logged-on user.
 		/// </remarks>
-		public const string SESSION_ID_CLAIMTYPE = "urn:nucleus/identity/claims/sessionid";
+		public const string SESSION_ID_CLAIMTYPE = "urn:nucleus/identity/claims/session-id";
 
 		/// <summary>
 		/// Nucleus System Administrator claim Uri.
 		/// </summary>
-		public const string SYSADMIN_CLAIMTYPE = "urn:nucleus/identity/claims/issystemadministrator";
+		public const string SYSADMIN_CLAIMTYPE = "urn:nucleus/identity/claims/is-system-administrator";
 	}
 }

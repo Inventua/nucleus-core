@@ -26,7 +26,6 @@ namespace Nucleus.Core.Authorization
 		{
 			app.UseStatusCodePages(async context =>
 			{
-
 				if (!context.HttpContext.User.Identity.IsAuthenticated)
 				{
 					if (context.HttpContext.Response.StatusCode == (int)System.Net.HttpStatusCode.Unauthorized || context.HttpContext.Response.StatusCode == (int)System.Net.HttpStatusCode.Forbidden)

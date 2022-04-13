@@ -49,9 +49,25 @@ namespace Nucleus.Modules.Account.Controllers
 		}
 
 		[HttpGet]
-		public ActionResult Index(string returnUrl, string token)
+		public ActionResult Index(string returnUrl, string token, string reason)
 		{
 			ViewModels.Login viewModel = BuildViewModel(returnUrl);
+
+			switch (reason)
+			{
+				case "not-verified":
+					viewModel.Message = "Your account has not been verified.  To verify your account, check your email for a welcome message which contains your verification token and a link to submit it.";
+					break;
+
+				case "not-approved":
+					viewModel.Message = "Your account has not been approved.  You must wait for the site administrator to approve your account before you can log in.";
+					break;
+
+				default:
+					viewModel.Message = "";
+					break;
+			}
+			
 
 			if (!String.IsNullOrEmpty(token) && viewModel.AllowPasswordReset)
 			{

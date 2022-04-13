@@ -1243,8 +1243,8 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task<List<PermissionType>> ListPermissionTypes(string scopeNamespace)
 		{
-			// if you get a weird error saying this can't be parsed, stop and start Nucleus.  The error is caused by a bug in 
-			// entity framework with visual studio edit & continue.
+			// if you get a weird error in debug mode saying this can't be parsed, restart the application in Visual Studio.  The error
+			// is caused by a bug in entity framework with visual studio edit & continue.
 			return await this.Context.PermissionTypes
 				.Where(typ => EF.Functions.Like(typ.Scope, $"%{scopeNamespace}%"))
 				.AsNoTracking()

@@ -28,5 +28,15 @@ namespace Nucleus.Abstractions.Authentication
 		/// Nucleus System Administrator claim Uri.
 		/// </summary>
 		public const string SYSADMIN_CLAIMTYPE = "urn:nucleus/identity/claims/is-system-administrator";
+
+		/// <summary>
+		/// Nucleus not-approved user claim Uri.
+		/// </summary>
+		public const string NOT_APPROVED_CLAIMTYPE = "urn:nucleus/identity/claims/not-approved";
+
+		/// <summary>
+		/// Nucleus unverified user claim Uri.
+		/// </summary>
+		public const string NOT_VERIFIED_CLAIMTYPE = "urn:nucleus/identity/claims/not-verified";
 	}
 }

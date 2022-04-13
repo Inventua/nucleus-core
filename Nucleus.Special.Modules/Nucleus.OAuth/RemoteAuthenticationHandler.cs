@@ -123,7 +123,7 @@ namespace Nucleus.OAuth
 			}
 			
 			if (loginUser != null)
-			{
+			{				
 				UserSession session = await this.SessionManager.CreateNew(this.CurrentContext.Site, loginUser, false, base.Context.Connection.RemoteIpAddress);
 				await this.SessionManager.SignIn(session, base.Context, properties.RedirectUri ?? "/");
 				base.Response.Redirect(properties.RedirectUri ?? "/");
@@ -131,20 +131,69 @@ namespace Nucleus.OAuth
 
 		}
 
-		protected override Task HandleForbiddenAsync(AuthenticationProperties properties)
-		{
-			base.Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
-
-			// Using base.Response.StartAsync causes the Microsoft Identity classes to throw a "System.InvalidOperationException: StatusCode
-			// cannot be set because the response has already started" exception, but it's the only way that seems to stop Microsoft Identity from
-			// ignoring what we do here & directing quietly to properties.RedirectUri, regardless of our already having set the status to forbidden.			
-			base.Response.StartAsync();
-			return Task.CompletedTask;
-		}
+		//protected override async Task HandleForbiddenAsync(AuthenticationProperties properties)
+		//{			
+		//	base.Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+			
+			
+		//	// Using base.Response.StartAsync here is not ideal, because it causes the Microsoft Identity classes to throw a
+		//	// "System.InvalidOperationException: StatusCode cannot be set because the response has already started" exception,
+		//	// but it's the only way that seems to stop the .net core authentication system from ignoring/overriding what we do
+		//	// here & directing quietly to properties.RedirectUri, regardless of our already having set the status to forbidden
+		//	// or redirected to login.			
+		//	await base.Response.StartAsync();
+		//}
 
 		protected override Task HandleSignOutAsync(AuthenticationProperties properties)
 		{
 			throw new NotImplementedException();
+		}
+
+		private async Task RedirectToLogin(string reason)
+		{
+			if (this.CurrentContext.Site != null)
+			{
+				SitePages sitePage = this.Context.RequestServices.GetService<Context>().Site.GetSitePages();
+				PageRoute loginPageRoute = null;
+
+				if (sitePage.LoginPageId.HasValue)
+				{
+					Page loginPage = await this.Context.RequestServices.GetService<IPageManager>().Get(sitePage.LoginPageId.Value);
+					if (loginPage != null)
+					{
+						loginPageRoute = loginPage.DefaultPageRoute();
+					}
+				}
+				if (loginPageRoute == null)
+				{
+					// Use default login page
+					this.RedirectToDefaultLogin(reason);
+				}
+				else
+				{
+					string redirectUrl = loginPageRoute.Path + $"?reason={reason}";
+					Logger.LogTrace("Challenge: Redirecting to site login page {redirectUrl}", redirectUrl);
+					this.Context.Response.Redirect(redirectUrl);
+				}
+			}
+			else
+			{
+				// use default login page
+				this.RedirectToDefaultLogin(reason);
+			}
+		}
+
+		private void RedirectToDefaultLogin(string reason)
+		{
+			RouteValueDictionary routeDictionary = new();
+
+			routeDictionary.Add("area", "User");
+			routeDictionary.Add("controller", "Account");
+			routeDictionary.Add("action", "Index");
+
+			string redirectUrl = this.LinkGenerator.GetPathByRouteValues("Admin", routeDictionary, this.Context.Request.PathBase, FragmentString.Empty, null);
+			Logger.LogTrace("Challenge: Redirecting to default login page {redirectUrl}", redirectUrl);
+			this.Context.Response.Redirect(redirectUrl +  $"?reason={reason}");
 		}
 	}
 }

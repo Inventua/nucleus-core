@@ -62,6 +62,11 @@ namespace Nucleus.Modules.Account.Controllers
 			User loginUser;
 			List<Claim> claims = new();
 
+			if (viewModel.ExistingPasswordBlank)
+			{
+				ControllerContext.ModelState.Remove(nameof(ViewModels.ChangePassword.Password));
+			}
+
 			if (!ControllerContext.ModelState.IsValid)
 			{
 				return BadRequest(ControllerContext.ModelState);
@@ -95,7 +100,7 @@ namespace Nucleus.Modules.Account.Controllers
 				{
 					return Json(new { Title = "Change Password", Message = "Your account has not been verified." });
 				}
-				else if (String.IsNullOrEmpty(viewModel.Password) || !loginUser.Secrets.VerifyPassword(viewModel.Password))
+				else if (!viewModel.ExistingPasswordBlank && (String.IsNullOrEmpty(viewModel.Password) || !loginUser.Secrets.VerifyPassword(viewModel.Password)))
 				{
 					return Json(new { Title = "Change Password", Message = "Invalid password." });
 				}
@@ -106,7 +111,7 @@ namespace Nucleus.Modules.Account.Controllers
 					{
 						return BadRequest(modelState);
 					}
-					// null password is a "last resort" check in case all password complexity rules have been removed
+					// null password check is a "last resort" in case all password complexity rules have been removed from config
 					else if (!String.IsNullOrEmpty(viewModel.NewPassword))
 					{
 						loginUser.Secrets.SetPassword(viewModel.NewPassword);
@@ -119,12 +124,23 @@ namespace Nucleus.Modules.Account.Controllers
 			return View("ChangePassword", viewModel);
 		}
 
-		private Task<ViewModels.ChangePassword> BuildViewModel(string returnUrl)
+		private async Task<ViewModels.ChangePassword> BuildViewModel(string returnUrl)
 		{
-			return Task.FromResult(new ViewModels.ChangePassword()
+			User loginUser;
+			if (User.IsSystemAdministrator())
 			{
+				loginUser = await this.UserManager.GetSystemAdministrator(ControllerContext.HttpContext.User.Identity.Name);
+			}
+			else
+			{
+				loginUser = await this.UserManager.Get(this.Context.Site, ControllerContext.HttpContext.User.Identity.Name);
+			}
+
+			return new ViewModels.ChangePassword()
+			{
+				ExistingPasswordBlank = loginUser != null && String.IsNullOrEmpty(loginUser.Secrets.PasswordHashAlgorithm),
 				ReturnUrl = returnUrl
-			});
+			};
 		}
 
 	}

@@ -5,8 +5,12 @@
 @Html.AddStyle("~/Resources/css/forms.css")
 @using (Html.BeginNucleusForm("Login", "Login", "Account", FormMethod.Post, new { data_target = "form.parent()" }))
 {
-	<fieldset aria-label="Login">		
-		@Html.HiddenFor(model => model.ReturnUrl)		
+	<fieldset aria-label="Login">
+		@if (!String.IsNullOrEmpty(Model.Message))
+		{
+			<div class="alert alert-info">@Model.Message</div>
+		}
+		@Html.HiddenFor(model => model.ReturnUrl)
 		@Html.HiddenFor(model => model.ShowVerificationToken)
 		<div>
 			<label>
@@ -14,7 +18,6 @@
 				<span>@Html.TextBoxFor(model => model.Username, new { @autocorrect = "off", @autocapitalize = "none" })</span>
 			</label>
 		</div>
-
 		<div>
 			<label>
 				<span>Password</span>
@@ -32,7 +35,7 @@
 					<span>Verification Token</span>
 					<span>@Html.TextBoxFor(model => model.VerificationToken)</span>
 				</label>
-			</div>	
+			</div>
 		}
 
 		@if (Model.AllowRememberMe)

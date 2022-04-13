@@ -239,6 +239,10 @@ body
   right: 0;
 }
 
+.dropdown-menu .alert
+{
+  margin: -0.5rem 0 0.5rem 0;
+}
 /*  ribbon menu styles */
 .nucleus-menu .ribbon-item, .nucleus-menu .ribbon-item li
 {

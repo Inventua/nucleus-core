@@ -23,7 +23,7 @@ namespace Nucleus.Core.Authentication
 {
 	public class AuthenticationHandler : Microsoft.AspNetCore.Authentication.SignInAuthenticationHandler<AuthenticationOptions>
 	{
-		
+
 		private ISessionManager SessionManager { get; }
 		private IUserManager UserManager { get; }
 		private ISiteManager SiteManager { get; }
@@ -77,7 +77,7 @@ namespace Nucleus.Core.Authentication
 				if (userSession != null)
 				{
 					// user session exists, update sliding expiration in the database, and update the cookie expiry date
-					if (!userSession.RemoteIpAddress.Equals (this.Context.Connection.RemoteIpAddress))
+					if (!userSession.RemoteIpAddress.Equals(this.Context.Connection.RemoteIpAddress))
 					{
 						Logger.LogCritical("User {UserId} attempted to use a session {SessionId} from {CurrentRemoteIpAddress} when the original session was from {OriginalRemoteIpAddress}!", userSession.UserId, userSession.Id, this.Context.Connection.RemoteIpAddress, userSession.RemoteIpAddress);
 						await this.SessionManager.Delete(userSession);
@@ -92,7 +92,7 @@ namespace Nucleus.Core.Authentication
 							Logger.LogTrace("Session {sessionId} is valid, updating sliding expiration.", sessionId);
 
 							userSession.ExpiryDate = DateTime.UtcNow.Add(this.Options.SlidingExpirationTimeSpan);
-							
+
 							// Only update the database expiry date if the database was updated more than 1 minute ago.  This is to avoid a negative impact
 							// on performance, as the authentication handler is called for every request - even static files - so a single page load could otherwise
 							// generate dozens of database updates.
@@ -134,7 +134,7 @@ namespace Nucleus.Core.Authentication
 			{
 				// User found, set context User Identity
 				User user;
-								
+
 				user = await this.UserManager.Get(await this.SiteManager.Get(userSession.SiteId), userSession.UserId);
 
 				if (user == null)
@@ -145,56 +145,71 @@ namespace Nucleus.Core.Authentication
 				else
 				{
 					Logger.LogTrace("User Id {userId} was found for session Id {sessionId}: Validating.", userSession.UserId, sessionId);
-					if (!user.Approved)
+					
+					if (!user.Approved || !user.Verified)
 					{
-						Logger.LogTrace("Accesss denied for session Id {sessionId} for user Id {userId} - user not approved.", sessionId, userSession.UserId);
-						return AuthenticateResult.Fail("User not approved.");
-					}
-					else if (!user.Verified)
-					{
-						Logger.LogTrace("Accesss denied for session Id {sessionId} for user Id {userId} - user not verified.", sessionId, userSession.UserId);
-						return AuthenticateResult.Fail("User not verified.");
-					}
-
-					Logger.LogTrace("User Id {userId} was found for session Id {sessionId}: Adding Claims.", userSession.UserId, sessionId);
-
-					Logger.LogTrace("User Id {userId} Adding Claim {claimType} {userName}.", userSession.UserId, ClaimTypes.Name, user.UserName);
-					claims.Add(new Claim(ClaimTypes.Name, user.UserName));
-					Logger.LogTrace("User Id {userId} Adding Claim {claimType} {userId}.", userSession.UserId, ClaimTypes.NameIdentifier, user.Id.ToString());
-					claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-
-					if (user.IsSystemAdministrator)
-					{
-						Logger.LogTrace("User Id {userId} Adding Claim {claimType}.", userSession.UserId, Nucleus.Abstractions.Authentication.Constants.SYSADMIN_CLAIMTYPE);
-						claims.Add(new Claim(Nucleus.Abstractions.Authentication.Constants.SYSADMIN_CLAIMTYPE, ""));
-					}
-
-					if (user.Roles != null)
-					{
-						foreach (Role role in user.Roles)
+						if (!user.Approved)
 						{
-							Logger.LogTrace("User Id {userId} Adding Claim {claimType} {roleName}.", userSession.UserId, ClaimTypes.Role, role.Name);
-							claims.Add(new Claim(ClaimTypes.Role, role.Name));
+							Logger.LogInformation("Limiting access for session Id {sessionId} for user Id {userId} - user not approved.", sessionId, userSession.UserId);
+							// The "not approved" claim is added to make it easier to check for in other parts of the system so that we can present messages to warn the user
+							claims.Add(new Claim(Nucleus.Abstractions.Authentication.Constants.NOT_APPROVED_CLAIMTYPE, ""));
 						}
-					}
-				
-					foreach (UserProfileValue profileValue in user.Profile)
-					{
-						if (!String.IsNullOrWhiteSpace(profileValue.Value) && !String.IsNullOrEmpty(profileValue?.UserProfileProperty.TypeUri) )
+						else if (!user.Verified)
 						{
-							Logger.LogTrace("User Id {userId} Adding Claim {claimType} {claimValue}.", userSession.UserId, profileValue.UserProfileProperty.TypeUri, profileValue.Value);
-							claims.Add(new Claim(profileValue.UserProfileProperty.TypeUri, profileValue.Value));
+							Logger.LogInformation("Limiting access for session Id {sessionId} for user Id {userId} - user not verified.", sessionId, userSession.UserId);
+							// The "not verified" claim is added to make it easier to check for in other parts of the system so that we can present messages to warn the user
+							claims.Add(new Claim(Nucleus.Abstractions.Authentication.Constants.NOT_VERIFIED_CLAIMTYPE, ""));
 						}
-					}
 
-					identity = new ClaimsIdentity(claims, Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME);
-				}				
-			}				
+						// Users who are not approved/verified are still authenticated (we know who they are), but they do not get any roles, and 
+						// if they are site admins or system admins, they don't get those claims added, so the authorization system doesn't allow them
+						// to access any protected functionality.
+						claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+						claims.Add(new Claim(ClaimTypes.Name, user.UserName));
+						identity = new ClaimsIdentity(claims, Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME);						
+					}
+					else
+					{
+						Logger.LogTrace("User Id {userId} was found for session Id {sessionId}: Adding Claims.", userSession.UserId, sessionId);
+
+						Logger.LogTrace("User Id {userId} Adding Claim {claimType} {userName}.", userSession.UserId, ClaimTypes.Name, user.UserName);
+						claims.Add(new Claim(ClaimTypes.Name, user.UserName));
+						Logger.LogTrace("User Id {userId} Adding Claim {claimType} {userId}.", userSession.UserId, ClaimTypes.NameIdentifier, user.Id.ToString());
+						claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+
+						if (user.IsSystemAdministrator)
+						{
+							Logger.LogTrace("User Id {userId} Adding Claim {claimType}.", userSession.UserId, Nucleus.Abstractions.Authentication.Constants.SYSADMIN_CLAIMTYPE);
+							claims.Add(new Claim(Nucleus.Abstractions.Authentication.Constants.SYSADMIN_CLAIMTYPE, ""));
+						}
+
+						if (user.Roles != null)
+						{
+							foreach (Role role in user.Roles)
+							{
+								Logger.LogTrace("User Id {userId} Adding Claim {claimType} {roleName}.", userSession.UserId, ClaimTypes.Role, role.Name);
+								claims.Add(new Claim(ClaimTypes.Role, role.Name));
+							}
+						}
+
+						foreach (UserProfileValue profileValue in user.Profile)
+						{
+							if (!String.IsNullOrWhiteSpace(profileValue.Value) && !String.IsNullOrEmpty(profileValue?.UserProfileProperty.TypeUri))
+							{
+								Logger.LogTrace("User Id {userId} Adding Claim {claimType} {claimValue}.", userSession.UserId, profileValue.UserProfileProperty.TypeUri, profileValue.Value);
+								claims.Add(new Claim(profileValue.UserProfileProperty.TypeUri, profileValue.Value));
+							}
+						}
+
+						identity = new ClaimsIdentity(claims, Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME);
+					}
+				}
+			}
 			else
 			{
-				Logger.LogTrace("Anonymous user");
-				// Anonymous user.  Set a claim for Role=Anonymous Users				
-				Logger.LogTrace("Adding Claim {claimType}.", ClaimTypes.Anonymous);
+				// Anonymous users are authenticated - it is not the role of the authentication handler to deny access to anonymous users, 
+				// since anonymous users can still access functionality that is allowed for "all users", we just identify them as anonymous.
+				Logger.LogTrace("Anonymous user.  Adding Claim {claimType}.", ClaimTypes.Anonymous);
 				claims.Add(new Claim(ClaimTypes.Anonymous, ""));
 
 				// This overload creates an identity with IsAuthenticated=false, which is what we want for unauthenticated users
@@ -224,7 +239,7 @@ namespace Nucleus.Core.Authentication
 				{
 					SitePages sitePage = this.Context.RequestServices.GetService<Context>().Site.GetSitePages();
 					PageRoute loginPageRoute = null;
-				
+
 					if (sitePage.LoginPageId.HasValue)
 					{
 						Page loginPage = await this.Context.RequestServices.GetService<IPageManager>().Get(sitePage.LoginPageId.Value);
@@ -251,7 +266,7 @@ namespace Nucleus.Core.Authentication
 					this.RedirectToDefaultLogin();
 				}
 			}
-			
+
 		}
 
 		/// <summary>
@@ -331,7 +346,7 @@ namespace Nucleus.Core.Authentication
 			}
 
 			this.Context.Response.Cookies.Delete(this.Options.CookieName);
-			
+
 		}
 	}
 }

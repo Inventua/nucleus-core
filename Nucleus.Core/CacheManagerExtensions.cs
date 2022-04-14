@@ -32,6 +32,7 @@ namespace Nucleus.Core
 		public static CacheCollection<Guid, List> ListCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, List>(); }
 
 		public static CacheCollection<Guid, Content> ContentCache(this ICacheManager cacheManager) { return cacheManager.Get<Guid, Content>(); }
+		public static CacheCollection<Guid, ApiKey> ApiKeyCache(this ICacheManager cacheManager) { return cacheManager.Get<Guid, ApiKey>(); }
 
 	}
 }

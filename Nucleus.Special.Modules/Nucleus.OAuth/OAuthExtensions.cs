@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using Nucleus.Abstractions;
 
-namespace Nucleus.OAuth
+namespace Nucleus.OAuth.Client
 {
 	internal static class OAuthExtensions
 	{
@@ -54,13 +54,13 @@ namespace Nucleus.OAuth
 			// Look for configured OAuth providers
 
 			// Get config for immediate use
-			OAuth.Models.Configuration.OAuthProviders config = new();
-			configuration.Bind(OAuth.Models.Configuration.OAuthProviders.Section, config);
+			Models.Configuration.OAuthProviders config = new();
+			configuration.Bind(Models.Configuration.OAuthProviders.Section, config);
 
 			// Add config to dependency injection for later use
-			builder.Services.Configure<OAuth.Models.Configuration.OAuthProviders>(configuration.GetSection(OAuth.Models.Configuration.OAuthProviders.Section), options => options.BindNonPublicProperties = true);
+			builder.Services.Configure<Models.Configuration.OAuthProviders>(configuration.GetSection(Models.Configuration.OAuthProviders.Section), options => options.BindNonPublicProperties = true);
 
-			IConfigurationSection[] configurationSections = configuration.GetSection(OAuth.Models.Configuration.OAuthProviders.Section).GetChildren().ToArray();
+			IConfigurationSection[] configurationSections = configuration.GetSection(Models.Configuration.OAuthProviders.Section).GetChildren().ToArray();
 
 			for (int count = 0; count < config.Count; count++)
 			{

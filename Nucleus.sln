@@ -111,7 +111,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Developers", "Developers", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.GoogleAnalytics", "Nucleus.Core.Modules\Nucleus.Extensions.GoogleAnalytics\Nucleus.Extensions.GoogleAnalytics.csproj", "{DE7E58D2-BADD-4582-8825-7E5F9924B5E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.OAuth", "Nucleus.Special.Modules\Nucleus.OAuth\Nucleus.OAuth.csproj", "{61E6E38D-2018-4FB6-AD26-47F4AAE25FD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.OAuth.Client", "Nucleus.Special.Modules\Nucleus.OAuth\Nucleus.OAuth.Client.csproj", "{61E6E38D-2018-4FB6-AD26-47F4AAE25FD0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

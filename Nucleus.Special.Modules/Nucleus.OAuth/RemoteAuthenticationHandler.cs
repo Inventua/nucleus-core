@@ -13,7 +13,7 @@ using Nucleus.Extensions;
 using Microsoft.AspNetCore.Routing;
 using Nucleus.Abstractions.Managers;
 
-namespace Nucleus.OAuth
+namespace Nucleus.OAuth.Client
 {
 	public class RemoteAuthenticationHandler : Microsoft.AspNetCore.Authentication.SignInAuthenticationHandler<RemoteAuthenticationOptions>
 	{

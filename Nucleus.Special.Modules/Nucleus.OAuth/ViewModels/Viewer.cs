@@ -7,11 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nucleus.OAuth.ViewModels
+namespace Nucleus.OAuth.Client.ViewModels
 {
 	public class Viewer : Settings
 	{
-		public OAuth.Models.Configuration.OAuthProviders Options { get; set; }
+		public Models.Configuration.OAuthProviders Options { get; set; }
 		public string ReturnUrl { get; set; }
 	}
 }

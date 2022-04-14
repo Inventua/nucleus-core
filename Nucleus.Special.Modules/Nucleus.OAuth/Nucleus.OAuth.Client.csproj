@@ -3,7 +3,7 @@
     <TargetFramework>net6.0</TargetFramework>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
-		<RootNamespace>Nucleus.OAuth</RootNamespace>
+		<RootNamespace>Nucleus.OAuth.Client</RootNamespace>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
@@ -54,9 +54,10 @@
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">
-		<ExtensionFolder>OAuth</ExtensionFolder>
+		<ExtensionFolder>OAuth Client</ExtensionFolder>
 		<Version>1.0.0</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+		<CopyToDefaultSetup>false</CopyToDefaultSetup>
 	</PropertyGroup>
 
 	<Target Name="FilterCopyLocalItems" AfterTargets="ResolveLockFileCopyLocalFiles">

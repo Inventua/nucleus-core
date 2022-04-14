@@ -20,7 +20,7 @@ namespace Nucleus.Data.Common
 		private IServiceProvider RequestServices { get; }
 		private Dictionary<string, Boolean> IsSchemaChecked { get; } = new();
 		private Dictionary<System.Type, Boolean> IsConnectionChecked { get; } = new();
-		
+
 		private static readonly object lockObject = new();
 
 		/// <summary>
@@ -44,7 +44,7 @@ namespace Nucleus.Data.Common
 			if (provider != null)
 			{
 				Boolean checkConnectionRequired = (!this.IsConnectionChecked.ContainsKey(provider.GetType()) || !this.IsConnectionChecked[provider.GetType()]);
-				
+
 				if (checkConnectionRequired)
 				{
 					lock (lockObject)
@@ -62,37 +62,38 @@ namespace Nucleus.Data.Common
 						}
 					}
 				}
-			}
 
-			DataProviderMigration migration = (DataProviderMigration)this.RequestServices.GetService(typeof(DataProviderMigration<>).MakeGenericType(new Type[] { provider.GetType() }));
+				DataProviderMigration migration = (DataProviderMigration)this.RequestServices.GetService(typeof(DataProviderMigration<>).MakeGenericType(new Type[] { provider.GetType() }));
 
-			// There doesn't have to be a DataProviderConfiguration<T> in the services collection, but if there is, we can
-			// check for new schema updates and perform schema migration.
-			if (migration != null)
-			{
-				Boolean checkSchemaRequired = (!this.IsSchemaChecked.ContainsKey(migration.SchemaName) || !this.IsSchemaChecked[migration.SchemaName]);
-				
-				if (checkSchemaRequired)
+				// There doesn't have to be a DataProviderConfiguration<T> in the services collection, but if there is, we can
+				// check for new schema updates and perform schema migration.
+				if (migration != null)
 				{
-					lock (lockObject)
-					{
-						if (!this.IsSchemaChecked.ContainsKey(migration.SchemaName) || !this.IsSchemaChecked[migration.SchemaName])
-						{
-							Logger.LogInformation("Checking database schema [{name}].", migration.SchemaName);
-							migration.CheckDatabaseSchema();
+					Boolean checkSchemaRequired = (!this.IsSchemaChecked.ContainsKey(migration.SchemaName) || !this.IsSchemaChecked[migration.SchemaName]);
 
-							if (this.IsSchemaChecked.ContainsKey(migration.SchemaName))
+					if (checkSchemaRequired)
+					{
+						lock (lockObject)
+						{
+							if (!this.IsSchemaChecked.ContainsKey(migration.SchemaName) || !this.IsSchemaChecked[migration.SchemaName])
 							{
-								this.IsSchemaChecked[migration.SchemaName] = true;
-							}
-							else
-							{
-								this.IsSchemaChecked.Add(migration.SchemaName, true);
+								Logger.LogInformation("Checking database schema [{name}].", migration.SchemaName);
+								migration.CheckDatabaseSchema();
+
+								if (this.IsSchemaChecked.ContainsKey(migration.SchemaName))
+								{
+									this.IsSchemaChecked[migration.SchemaName] = true;
+								}
+								else
+								{
+									this.IsSchemaChecked.Add(migration.SchemaName, true);
+								}
 							}
 						}
 					}
 				}
 			}
+
 
 			return provider;
 		}

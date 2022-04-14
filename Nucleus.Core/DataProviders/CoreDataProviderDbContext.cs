@@ -67,6 +67,8 @@ namespace Nucleus.Core.DataProviders
 
 		public DbSet<User> Users { get; set; }
 
+		public DbSet<ApiKey> ApiKeys { get; set; }
+
 		// This isn't referenced anywhere, but it allows EF to correctly understand the database schema
 		public DbSet<UserSecrets> UserSecrets { get; set; }
 

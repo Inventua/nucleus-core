@@ -33,6 +33,8 @@ namespace Nucleus.Data.EntityFramework
 			builder.Entity<ScheduledTask>().ToTable("ScheduledTasks");
 			builder.Entity<ScheduledTaskHistory>().ToTable("ScheduledTaskHistory");
 
+			builder.Entity<ApiKey>().ToTable("ApiKeys");
+
 			return builder;
 		}
 

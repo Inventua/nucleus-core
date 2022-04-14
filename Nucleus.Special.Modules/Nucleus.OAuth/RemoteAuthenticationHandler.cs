@@ -84,11 +84,9 @@ namespace Nucleus.OAuth
 			if (loginUser == null)
 			{
 				// user does not exist		
-
 				if (!settings.CreateUsers)
 				{
 					await base.ForbidAsync(properties);
-					//throw new UnauthorizedAccessException("User does not exist");
 				}
 				else
 				{
@@ -128,21 +126,22 @@ namespace Nucleus.OAuth
 				await this.SessionManager.SignIn(session, base.Context, properties.RedirectUri ?? "/");
 				base.Response.Redirect(properties.RedirectUri ?? "/");
 			}
-
 		}
 
-		//protected override async Task HandleForbiddenAsync(AuthenticationProperties properties)
-		//{			
-		//	base.Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
-			
-			
-		//	// Using base.Response.StartAsync here is not ideal, because it causes the Microsoft Identity classes to throw a
-		//	// "System.InvalidOperationException: StatusCode cannot be set because the response has already started" exception,
-		//	// but it's the only way that seems to stop the .net core authentication system from ignoring/overriding what we do
-		//	// here & directing quietly to properties.RedirectUri, regardless of our already having set the status to forbidden
-		//	// or redirected to login.			
-		//	await base.Response.StartAsync();
-		//}
+		protected override async Task HandleForbiddenAsync(AuthenticationProperties properties)
+		{
+			// This code handles the response when a user logs in using a remote provider, but does not have a Nucleus account, and the 
+			// "create new account" option is disabled.
+			//base.Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+			await RedirectToLogin(System.Net.HttpStatusCode.Forbidden.ToString());
+
+			// Using base.Response.StartAsync here is not ideal, because it causes the Microsoft Identity classes to throw a
+			// "System.InvalidOperationException: StatusCode cannot be set because the response has already started" exception,
+			// but it's the only way that seems to stop the .net core authentication system from ignoring/overriding what we do
+			// here & directing quietly to properties.RedirectUri, regardless of our already having set the status to forbidden
+			// or redirected to login.			
+			await base.Response.StartAsync();
+		}
 
 		protected override Task HandleSignOutAsync(AuthenticationProperties properties)
 		{

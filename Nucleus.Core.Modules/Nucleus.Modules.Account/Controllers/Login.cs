@@ -55,14 +55,10 @@ namespace Nucleus.Modules.Account.Controllers
 
 			switch (reason)
 			{
-				case "not-verified":
-					viewModel.Message = "Your account has not been verified.  To verify your account, check your email for a welcome message which contains your verification token and a link to submit it.";
+				case nameof(System.Net.HttpStatusCode.Forbidden):
+					viewModel.Message = "Access was denied.  Your account is not authorized to use this system.";
 					break;
-
-				case "not-approved":
-					viewModel.Message = "Your account has not been approved.  You must wait for the site administrator to approve your account before you can log in.";
-					break;
-
+									
 				default:
 					viewModel.Message = "";
 					break;

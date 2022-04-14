@@ -8,7 +8,7 @@
 	<fieldset aria-label="Login">
 		@if (!String.IsNullOrEmpty(Model.Message))
 		{
-			<div class="alert alert-info">@Model.Message</div>
+			<div class="alert alert-warning">@Model.Message</div>
 		}
 		@Html.HiddenFor(model => model.ReturnUrl)
 		@Html.HiddenFor(model => model.ShowVerificationToken)

@@ -1,0 +1,22 @@
+﻿@model Nucleus.OAuth.ViewModels.Viewer
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.OAuth.ViewModels
+<label>Log in with</label>
+<select id="oauth-viewer-select">
+	@foreach (var option in Model.Options)
+	{
+		<option value="@option.AuthenticateEndpoint(Model.ReturnUrl)">@option.DisplayName()</option>
+	}
+</select>	
+<button id="oauth-viewer-login" class="button" type="button">Log in</button>
+<script type="text/javascript">
+	jQuery(document).ready(function ()
+	{
+		jQuery('#oauth-viewer-login').on('click', function() 
+		{
+			document.location = jQuery('#oauth-viewer-select option:selected').prop('value');
+		});
+	});
+</script>

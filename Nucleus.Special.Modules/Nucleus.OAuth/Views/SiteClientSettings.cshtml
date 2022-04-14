@@ -1,14 +1,14 @@
-﻿@model Nucleus.OAuth.ViewModels.SiteSettings
+﻿@model Nucleus.OAuth.ViewModels.SiteClientSettings
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 @Html.AddStyle("~!/../settings.css")
 <div>
-	@using (Html.BeginNucleusForm("Settings", "OAuth", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+	@using (Html.BeginNucleusForm("SaveSettings", "OAuthClientAdmin", "OAuth", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 	{
 		<fieldset role="group" aria-labelledby="heading">
-			<h2>Settings</h2>
+			<h2 class="nucleus-control-panel-heading">OAuth Client Settings</h2>
 
 			<div class="nucleus-flex-fields">
 				<SettingsControl caption="Match by name" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to match existing users matching the name supplied by the OAuth provider.">
@@ -35,7 +35,7 @@
 			</div>
 
 			<div class="Tools">
-				@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "OAuth", "OAuth"), new { })				
+				@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSiteSettings", "OAuthClientAdmin", "OAuth"), new { })				
 			</div>
 		</fieldset>
 	}

@@ -14,7 +14,7 @@ using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.AspNetCore.Hosting;
 
-namespace Nucleus.OAuth.Controllers
+namespace Nucleus.OAuth.Client.Controllers
 {
 	[Extension("OAuth")]
 	public class OAuthClientAdminController : Controller
@@ -27,10 +27,10 @@ namespace Nucleus.OAuth.Controllers
 
 		private IPageModuleManager PageModuleManager { get; }
 
-		private IOptions<OAuth.Models.Configuration.OAuthProviders> Options { get; }
+		private IOptions<Models.Configuration.OAuthProviders> Options { get; }
 
 
-		public OAuthClientAdminController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<OAuth.Models.Configuration.OAuthProviders> options)
+		public OAuthClientAdminController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<Models.Configuration.OAuthProviders> options)
 		{
 			this.WebHostEnvironment = webHostEnvironment;
 			this.Context = Context;

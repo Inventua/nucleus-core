@@ -21,7 +21,7 @@ using Microsoft.AspNetCore.Hosting;
 
 // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.authenticationhandler-1?view=aspnetcore-1.1
 
-namespace Nucleus.OAuth.Controllers
+namespace Nucleus.OAuth.Client.Controllers
 {
 	[Extension("OAuth")]
 	public class OAuthController : Controller
@@ -34,10 +34,9 @@ namespace Nucleus.OAuth.Controllers
 
 		private IPageModuleManager PageModuleManager { get; }
 
-		private IOptions<OAuth.Models.Configuration.OAuthProviders> Options { get; }
+		private IOptions<Models.Configuration.OAuthProviders> Options { get; }
 
-
-		public OAuthController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<OAuth.Models.Configuration.OAuthProviders> options)
+		public OAuthController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<Models.Configuration.OAuthProviders> options)
 		{
 			this.WebHostEnvironment = webHostEnvironment;
 			this.Context = Context;
@@ -54,7 +53,7 @@ namespace Nucleus.OAuth.Controllers
 			{
 				if (!User.Identity.IsAuthenticated && this.Options.Value.Count == 1)
 				{
-					OAuth.Models.Configuration.OAuthProvider providerOption = this.Options.Value.FirstOrDefault();
+					Models.Configuration.OAuthProvider providerOption = this.Options.Value.FirstOrDefault();
 
 					if (providerOption != null)
 					{
@@ -92,7 +91,7 @@ namespace Nucleus.OAuth.Controllers
 				// Find provider configuration matching the supplied providerName.  The Name property is optional, but takes precendence over the Type.  If the name is not specifed, match by Type.
 				// It is possible to have multiple OpenIdConnect configurations which have settings which point to different OAUTH providers, which are identified by Name.  Most of the settings for the
 				// Facebook/Google/Twitter/MicrosoftAccount are built in to the Microsoft.AspNetCore.Authentication.* package, so they can only have one configuration set up, and do require a name.
-				OAuth.Models.Configuration.OAuthProvider providerOption = this.Options.Value
+				Models.Configuration.OAuthProvider providerOption = this.Options.Value
 					.Where(option => (option.Name != null && option.Name.Equals(providerName, StringComparison.OrdinalIgnoreCase)) || option.Type.Equals(providerName, StringComparison.OrdinalIgnoreCase))
 					.FirstOrDefault();
 
@@ -140,7 +139,7 @@ namespace Nucleus.OAuth.Controllers
 
 			// Name property is optional in config - for empty names, set the name to the value of the type property so that we
 			// don't have to check for blank names in views.  
-			foreach (OAuth.Models.Configuration.OAuthProvider option in viewModel.Options)
+			foreach (Models.Configuration.OAuthProvider option in viewModel.Options)
 			{
 				if (String.IsNullOrEmpty(option.Name))
 				{

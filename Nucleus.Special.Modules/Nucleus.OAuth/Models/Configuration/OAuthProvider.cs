@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nucleus.OAuth.Models.Configuration
+namespace Nucleus.OAuth.Client.Models.Configuration
 {
 	public class OAuthProvider
 	{

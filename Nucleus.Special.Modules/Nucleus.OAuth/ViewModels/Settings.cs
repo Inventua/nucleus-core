@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Extensions;
 
-namespace Nucleus.OAuth.ViewModels
+namespace Nucleus.OAuth.Client.ViewModels
 {
 	public class Settings
 	{

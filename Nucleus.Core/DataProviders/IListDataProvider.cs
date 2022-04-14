@@ -9,7 +9,7 @@ using Nucleus.Data.Common;
 
 namespace Nucleus.Core.DataProviders
 {
-	/// Provides create, read, update and delete functionality for the <see cref="Folder"/>, <see cref="Role"/> and <see cref="RoleGroup"/> classes.
+	/// Provides create, read, update and delete functionality for the <see cref="List"/> class.
 	internal interface IListDataProvider : IDisposable//, IDataProvider<IListDataProvider>
 	{
 		abstract Task<IEnumerable<List>> ListLists(Site site);

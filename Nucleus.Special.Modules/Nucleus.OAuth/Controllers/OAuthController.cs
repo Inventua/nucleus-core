@@ -32,32 +32,57 @@ namespace Nucleus.OAuth.Controllers
 		
 		private ISiteManager SiteManager { get; }
 
+		private IPageModuleManager PageModuleManager { get; }
+
 		private IOptions<OAuth.Models.Configuration.OAuthProviders> Options { get; }
 
-		private const string MODULESETTING_LAYOUT = "oauth:viewer:layout";
 
-		public OAuthController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IOptions<OAuth.Models.Configuration.OAuthProviders> options)
+		public OAuthController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<OAuth.Models.Configuration.OAuthProviders> options)
 		{
 			this.WebHostEnvironment = webHostEnvironment;
 			this.Context = Context;
 			this.SiteManager = siteManager;
+			this.PageModuleManager = pageModuleManager;
 			this.Options = options;
 		}
 
 		[HttpGet]
-		//[Route($"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{action=Index}}/{{provider}}")]
 		public ActionResult Index(string returnUrl)
 		{
-			return View("Viewer", BuildViewModel(returnUrl));
+			ViewModels.Viewer viewModel = BuildViewModel(returnUrl);
+			if (viewModel.AutoLogin)
+			{
+				if (!User.Identity.IsAuthenticated && this.Options.Value.Count == 1)
+				{
+					OAuth.Models.Configuration.OAuthProvider providerOption = this.Options.Value.FirstOrDefault();
+
+					if (providerOption != null)
+					{
+						// redirect to OAUTH provider 
+						return Challenge(new AuthenticationProperties() { RedirectUri = BuildRedirectUrl(returnUrl) }, providerOption.Name ?? providerOption.Type);
+					}
+				}
+			}
+
+			return View("Viewer", viewModel);
 		}
 
-		[HttpGet]
-		[Route($"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{action=AccessDenied}}")]
-		public ActionResult AccessDenied()
+		private string BuildRedirectUrl(string returnUrl)
 		{
-			return View("Viewer", BuildViewModel(""));
+			// Only allow a relative path for redirectUri (that is, the url must start with "/"), to ensure that it points to "this" site.					
+			return String.IsNullOrEmpty(returnUrl) || !returnUrl.StartsWith("/") ? "/" : returnUrl;
 		}
 
+		/// <summary>
+		/// Start a remote login by redirecting to the specified remote (OAuth) provider.  
+		/// </summary>
+		/// <param name="providerName"></param>
+		/// <param name="returnUrl"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// The remote login is started by returning Challenge(options, providerName).  The aspnet core authentication middleware responds to this by 
+		/// redirecting to the provider's AuthorizationEndpoint.
+		/// </remarks>
 		[HttpGet]
 		[Route($"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{action=Authenticate}}/{{providerName}}")]
 		public ActionResult Authenticate(string providerName, string returnUrl)
@@ -74,9 +99,7 @@ namespace Nucleus.OAuth.Controllers
 				if (providerOption != null)
 				{
 					// redirect to OAUTH provider 
-					// Only allow a relative path for redirectUri, to ensure that it points to "this" site.					
-					return Challenge(new AuthenticationProperties() { RedirectUri = String.IsNullOrEmpty(returnUrl) || !returnUrl.StartsWith("/") ? "/" : returnUrl }, providerOption.Name ?? providerOption.Type);
-					//return Challenge(new AuthenticationProperties() { RedirectUri = String.IsNullOrEmpty(redirectUri) || !redirectUri.StartsWith("/") ? "/" : redirectUri }, $"{RemoteAuthenticationHandler.REMOTE_AUTH_SCHEME}/{providerName}");
+					return Challenge(new AuthenticationProperties() { RedirectUri = BuildRedirectUrl(returnUrl) }, providerOption.Name ?? providerOption.Type);
 				}
 				else
 				{
@@ -98,25 +121,13 @@ namespace Nucleus.OAuth.Controllers
 		}
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-		[HttpGet]
 		[HttpPost]
-		public ActionResult SiteSettings(ViewModels.SiteSettings viewModel)
+		public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
 		{
-			return View("SiteSettings", BuildSiteSettingsViewModel(viewModel));
-		}
+			this.Context.Module.ModuleSettings.Set(ViewModels.Settings.MODULESETTING_AUTOLOGIN, viewModel.AutoLogin);
+			this.Context.Module.ModuleSettings.Set(ViewModels.Settings.MODULESETTING_LAYOUT, viewModel.Layout);
 
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-		[HttpPost]
-		public ActionResult SaveSettings(ViewModels.SiteSettings viewModel)
-		{
-			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteSettings.SETTING_MATCH_BY_NAME, viewModel.MatchByName);
-			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteSettings.SETTING_MATCH_BY_EMAIL, viewModel.MatchByEmail);
-
-			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteSettings.SETTING_CREATE_USERS, viewModel.CreateUsers);
-			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteSettings.SETTING_AUTO_VERIFY, viewModel.AutomaticallyVerifyNewUsers);
-			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteSettings.SETTING_AUTO_APPROVE, viewModel.AutomaticallyApproveNewUsers);
-
-			this.SiteManager.Save(this.Context.Site);
+			await this.PageModuleManager.SaveSettings(this.Context.Module);
 
 			return Ok();
 		}
@@ -137,17 +148,20 @@ namespace Nucleus.OAuth.Controllers
 				}
 			}
 
-			string layoutPath = $"ViewerLayouts\\{this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "List")}.cshtml";
+			viewModel.ReadSettings(this.Context.Module);
+
+			string layoutPath = $"ViewerLayouts\\{viewModel.Layout}.cshtml";
 
 			if (!System.IO.File.Exists($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\OAuth\\Views\\{layoutPath}"))
 			{
-				layoutPath = $"ViewerLayouts/List.cshtml";
+				layoutPath = $"ViewerLayouts\\List.cshtml";
 			}
 
 			viewModel.Layout = layoutPath;
 
 			return viewModel;
 		}
+
 
 		private ViewModels.Settings BuildSettingsViewModel(ViewModels.Settings viewModel)
 		{
@@ -156,26 +170,14 @@ namespace Nucleus.OAuth.Controllers
 				viewModel = new();
 			}
 
-			viewModel.Layout = this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "List");
+			viewModel.ReadSettings(this.Context.Module);
 
 			viewModel.Layouts = new();
 			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\OAuth\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
 			{
 				viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
 			}
-
-			return viewModel;
-		}
-
-		private ViewModels.SiteSettings BuildSiteSettingsViewModel(ViewModels.SiteSettings viewModel)
-		{
-			if (viewModel == null)
-			{
-				viewModel = new();
-			}
-
-			viewModel.ReadSettings(this.Context.Site);
-
+						
 			return viewModel;
 		}
 

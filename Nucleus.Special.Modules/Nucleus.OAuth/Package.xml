@@ -4,7 +4,7 @@
 	<version>1.0.0</version>
 	<publisher name="Inventua Pty Ltd" url="http://www.inventua.comn" email="support@inventua.com" />
 	<description>
-		OAuth Client for Nucleus.
+		OAuth Services for Nucleus.
 	</description>
 	<compatibility minVersion="1.0.0.0" maxVersion="*" />
 	
@@ -13,10 +13,10 @@
 			<controlPanelExtensionDefinition id="C93446E0-CEB6-40E6-80A9-E15BC7CB85A2">
 				<friendlyName>OAuth Client</friendlyName>
 				<description>Configure OAuth client.</description>
-				<controllerName>OAuth</controllerName>
+				<controllerName>OAuthClientAdmin</controllerName>
 				<extensionName>OAuth</extensionName>
 				<scope>Site</scope>
-				<editAction>SiteSettings</editAction>
+				<editAction>Settings</editAction>
 			</controlPanelExtensionDefinition>
 
 			<moduleDefinition id="A42F8AD6-1285-411B-874F-BAC8DDDF259E">
@@ -49,9 +49,11 @@
 			<folder name="Views">
 				<file name="Viewer.cshtml" />
 				<file name="Settings.cshtml" />
-
+				<file name="SiteClientSettings.cshtml" />
+				
 				<folder name="ViewerLayouts">
 					<file name="List.cshtml" />
+					<file name="DropDown.cshtml" />
 				</folder>
 			</folder>
 			

@@ -23,8 +23,9 @@
     <None Remove="readme.txt" />
     <None Remove="settings.css" />
     <None Remove="Views\Settings.cshtml" />
-    <None Remove="Views\SiteSettings.cshtml" />
+    <None Remove="Views\SiteClientSettings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
+    <None Remove="Views\ViewerLayouts\DropDown.cshtml" />
     <None Remove="Views\ViewerLayouts\List.cshtml" />
   </ItemGroup>
 
@@ -35,7 +36,8 @@
     <Content Include="settings.css" />
     <Content Include="Views\Settings.cshtml" />
     <Content Include="Views\Viewer.cshtml" />
-    <Content Include="Views\SiteSettings.cshtml" />
+    <Content Include="Views\SiteClientSettings.cshtml" />
+    <Content Include="Views\ViewerLayouts\DropDown.cshtml" />
     <Content Include="Views\ViewerLayouts\List.cshtml" />
   </ItemGroup>
 

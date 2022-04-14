@@ -62,7 +62,7 @@ namespace Nucleus.OAuth
 			{
 				throw new ArgumentNullException(nameof(user));
 			}
-			ViewModels.SiteSettings settings = new();
+			ViewModels.SiteClientSettings settings = new();
 			settings.ReadSettings(this.CurrentContext.Site);
 
 			User loginUser = null;

@@ -7,7 +7,6 @@
 <ul>
 	@foreach (var option in Model.Options)
 	{
-		@*// The OAuth Authenticate action uses a custom (attribute based) route, so we have to 'hard code' it *@
 		<li><a href="@option.AuthenticateEndpoint(Model.ReturnUrl)">@option.DisplayName()</a></li>
 	}
 </ul>	

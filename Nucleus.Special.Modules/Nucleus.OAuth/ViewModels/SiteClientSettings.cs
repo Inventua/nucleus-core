@@ -11,7 +11,7 @@ using Nucleus.Extensions;
 
 namespace Nucleus.OAuth.ViewModels
 {
-	public class SiteSettings
+	public class SiteClientSettings
 	{
 		internal const string SETTING_MATCH_BY_NAME = "oauth:match-by-name";
 		internal const string SETTING_MATCH_BY_EMAIL = "oauth:match-by-email";

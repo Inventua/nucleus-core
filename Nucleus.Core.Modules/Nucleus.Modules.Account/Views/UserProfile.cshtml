@@ -4,41 +4,46 @@
 @using Nucleus.Extensions
 @using Nucleus.Abstractions.Models.Configuration
 @Html.AddStyle("~/Resources/css/forms.css")
-@using (Html.BeginNucleusForm("SaveAccountSettings", "UserProfile", "Account", FormMethod.Post, new { @data_target = "form.parent()" }))
+@if (Model.User != null)
 {
-	<fieldset aria-label="User Profile">
-		@Html.HiddenFor((model) => model.ReturnUrl)
-		@Html.HiddenFor(model => model.User.Id)
-		<h3>User Name</h3>
-		<div>@Model.User.UserName</div>
+	@using (Html.BeginNucleusForm("SaveAccountSettings", "UserProfile", "Account", FormMethod.Post, new { @data_target = "form.parent()" }))
+	{
+		<fieldset aria-label="User Profile">
+			@Html.HiddenFor((model) => model.ReturnUrl)
+			@Html.HiddenFor(model => model.User.Id)
+			<h3>User Name</h3>
+			<div>@Model.User.UserName</div>
 
-		<h3>Profile</h3>
+			<h3>Profile</h3>
 
-		@for (int profileValueCount = 0; profileValueCount < Model.User.Profile.Count; profileValueCount++)
-		{
-			<div class="settings-control" title="@Model.User.Profile[profileValueCount].UserProfileProperty.HelpText">
-				<label>
-					<span>@Model.User.Profile[profileValueCount].UserProfileProperty.Name</span>
-					@{Dictionary<string, object> parameters = new();
-						ClaimTypeOption claimTypeOption = Model.User.Profile[profileValueCount].UserProfileProperty.ClaimTypeOption(Model.ClaimTypeOptions);
-						if (claimTypeOption.InputType != null)
-						{
-							parameters.Add("type", claimTypeOption.InputType);
+			@for (int profileValueCount = 0; profileValueCount < Model.User.Profile.Count; profileValueCount++)
+			{
+				<div class="settings-control" title="@Model.User.Profile[profileValueCount].UserProfileProperty.HelpText">
+					<label>
+						<span>@Model.User.Profile[profileValueCount].UserProfileProperty.Name</span>
+						@{
+							Dictionary<string, object> parameters = new();
+							ClaimTypeOption claimTypeOption = Model.User.Profile[profileValueCount].UserProfileProperty.ClaimTypeOption(Model.ClaimTypeOptions);
+							if (claimTypeOption.InputType != null)
+							{
+								parameters.Add("type", claimTypeOption.InputType);
+							}
+							if (claimTypeOption.Pattern != null)
+							{
+								parameters.Add("pattern", claimTypeOption.Pattern);
+							}
 						}
-						if (claimTypeOption.Pattern != null)
-						{
-							parameters.Add("pattern", claimTypeOption.Pattern);
-						} }
-					@Html.TextBoxFor(model => model.User.Profile[profileValueCount].Value, parameters)
-				</label>
-				@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Id)
-				@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Name)
-				@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.TypeUri)
+						@Html.TextBoxFor(model => model.User.Profile[profileValueCount].Value, parameters)
+					</label>
+					@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Id)
+					@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Name)
+					@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.TypeUri)
+				</div>
+			}
+			<div>
+				<input type="submit" value="Save Changes" class="btn btn-primary" />
+				<a href="/" class="btn btn-secondary">Cancel</a>
 			</div>
-		}
-		<div>
-			<input type="submit" value="Save Changes" class="btn btn-primary" />
-			<a href="/" class="btn btn-secondary">Cancel</a>
-		</div>
-	</fieldset>
+		</fieldset>
+	}
 }

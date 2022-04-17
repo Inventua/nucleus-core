@@ -23,10 +23,27 @@
 #site-wizard .installable-package label span
 {
 	display: inline-block;
+	vertical-align: middle;
 }
 
 #site-wizard .nucleus-button-panel
 {
 	display: flex;
 	gap: 4px;
+}
+
+#site-wizard .installable-package .placeholder-checkbox
+{
+	color: #cbc7c7;
+}
+
+#site-wizard .tab-content .tab-pane.active
+{
+	align-self: stretch;
+}
+
+#site-wizard input[type=checkbox], #site-wizard .installable-package .placeholder-checkbox
+{
+	transform: scale(1.2);
+	vertical-align: middle;
 }

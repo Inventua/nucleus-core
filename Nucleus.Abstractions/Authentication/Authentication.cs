@@ -38,5 +38,11 @@ namespace Nucleus.Abstractions.Authentication
 		/// Nucleus unverified user claim Uri.
 		/// </summary>
 		public const string NOT_VERIFIED_CLAIMTYPE = "urn:nucleus/identity/claims/not-verified";
+
+
+		/// <summary>
+		/// Nucleus cookie authentication method.
+		/// </summary>
+		public const string AUTHENTICATED_BY_COOKIE = "user-cookie";
 	}
 }

@@ -21,8 +21,8 @@
 			@Html.TextAreaFor(model => model.ApiKey.Secret, new { @maxlength = 256 })
 		</SettingsControl>
 
-		<SettingsControl caption="Scope" helptext="Space-separated list of scopes for the API key.  Scopes represent the operations that the API key can be used for.">
-			@Html.TextAreaFor(model => model.ApiKey.Scope, new { @maxlength = 512 })
+		<SettingsControl caption="Scope" helptext="Line-feed separated list of scopes for the API key.  Scopes represent the claims that the API key is assigned during authentication.  The most common use is to assign a role, for example 'role:Registered Users'.'">
+			@Html.TextAreaFor(model => model.ApiKey.Scope, new { @maxlength = 512, @rows = 8 })
 		</SettingsControl>
 
 	</fieldset>
@@ -32,7 +32,7 @@
 
 		@if (Model.ApiKey.Id != Guid.Empty)
 		{
-			<input type="submit" class="btn btn-danger" value="Delete ApiKey" formaction="@Url.AreaAction("DeleteApiKey", "ApiKeys", "Admin")" data-confirm="Delete this ApiKey?" />
+			<input type="submit" class="btn btn-danger" value="Delete Api Key" formaction="@Url.AreaAction("DeleteApiKey", "ApiKeys", "Admin")" data-confirm="Delete this ApiKey?" />
 		}
 	</div>
 	

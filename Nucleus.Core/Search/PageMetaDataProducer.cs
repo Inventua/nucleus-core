@@ -17,12 +17,14 @@ namespace Nucleus.Core.Search
 	public class PageMetaDataProducer : IContentMetaDataProducer
 	{
 		private IPageManager PageManager { get; }
+		private IApiKeyManager ApiKeyManager { get; }
 		private ILogger<PageMetaDataProducer> Logger { get; }
 		private HttpClient HttpClient { get; }
 
-		public PageMetaDataProducer(HttpClient httpClient, IPageManager pageManager, ILogger<PageMetaDataProducer> logger)
+		public PageMetaDataProducer(HttpClient httpClient, IPageManager pageManager, IApiKeyManager apiKeyManager, ILogger<PageMetaDataProducer> logger)
 		{
 			this.PageManager = pageManager;
+			this.ApiKeyManager = apiKeyManager;
 			this.HttpClient = httpClient;
 			this.Logger = logger;
 		}
@@ -30,6 +32,7 @@ namespace Nucleus.Core.Search
 		public async override Task<IEnumerable<ContentMetaData>> ListItems(Site site)
 		{
 			List<ContentMetaData> results = new();
+			ApiKey apiKey = null;
 
 			if (site.DefaultSiteAlias == null)
 			{
@@ -37,11 +40,16 @@ namespace Nucleus.Core.Search
 			}
 			else
 			{
+				if (site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.APIKEY_ID, out Guid result))
+				{
+					apiKey = await this.ApiKeyManager.Get(result);
+				}
+
 				foreach (Page page in (await this.PageManager.List(site)).Where(page => !page.Disabled))
 				{
 					Logger.LogInformation("Building meta-data for page {pageId} [{pageName}]", page.Id, page.Name);
 					// we have to .Get the site and page because the .List methods don't return fully-populated page objects
-					ContentMetaData metaData = await BuildContentMetaData(site, await this.PageManager.Get(page.Id));
+					ContentMetaData metaData = await BuildContentMetaData(site, apiKey, await this.PageManager.Get(page.Id));
 
 					if (metaData != null)
 					{
@@ -53,7 +61,7 @@ namespace Nucleus.Core.Search
 			return results;
 		}
 
-		private async Task<ContentMetaData> BuildContentMetaData(Site site, Page page)
+		private async Task<ContentMetaData> BuildContentMetaData(Site site, ApiKey apiKey, Page page)
 		{
 			System.IO.MemoryStream htmlContent = new();
 			string pageRelativeUrl = PageLink(page);
@@ -75,17 +83,16 @@ namespace Nucleus.Core.Search
 					Roles = await GetViewRoles(page)
 				};
 
-				// todo: write a magic cookie/header to so pages are rendered with all permissions (API key)
-				// todo: add a header/something to render the page in a simple form
-				// todo: consider System.Net.Http.HttpClient
-
-				//System.Net.WebRequest request = System.Net.WebRequest.Create(pageUri);
-				//System.Net.WebResponse response = request.GetResponse();
-
 				System.Net.Http.HttpRequestMessage request = new(HttpMethod.Get, pageUri);
+				if (apiKey != null)
+				{
+					request.Headers.Host = site.DefaultSiteAlias.Alias;
+					request.Headers.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("Nucleus-Search-Feeder", this.GetType().Assembly.GetName().Version.ToString()));
+					request.Sign(apiKey.Id, apiKey.Secret);
+				}
 				System.Net.Http.HttpResponseMessage response = this.HttpClient.Send(request);
 
-				using (System.IO.Stream responseStream = await response.Content.ReadAsStreamAsync()) // GetResponseStream())
+				using (System.IO.Stream responseStream = await response.Content.ReadAsStreamAsync())
 				{
 					// Kestrel doesn't return a content-length, so we have to read into a memory stream first in order to determine the 
 					// size of the content array.
@@ -105,6 +112,7 @@ namespace Nucleus.Core.Search
 			}
 
 			Logger.LogWarning("Could not build page meta-data because the page has no routes.");
+
 			return null;
 		}
 

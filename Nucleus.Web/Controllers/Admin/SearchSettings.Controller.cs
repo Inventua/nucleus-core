@@ -24,7 +24,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private Context Context { get; }
 
-		private const string SETTING_APIKEY_ID = "searchsettings:apikey:id";
+		
 
 		public SearchSettingsController(Context context, ILogger<ApiKeysController> logger, ISiteManager siteManager, IApiKeyManager ApiKeyManager)
 		{
@@ -52,7 +52,7 @@ namespace Nucleus.Web.Controllers.Admin
 				return BadRequest(ControllerContext.ModelState);
 			}
 
-			this.Context.Site.SiteSettings.TrySetValue(SETTING_APIKEY_ID, viewModel.ApiKey.Id);
+			this.Context.Site.SiteSettings.TrySetValue(Site.SiteSearchSettingsKeys.APIKEY_ID, viewModel.ApiKey.Id);
 
 			await this.SiteManager.Save(this.Context.Site);
 
@@ -63,7 +63,7 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			ViewModels.Admin.SearchSettings viewModel = new();
 
-			if (this.Context.Site.SiteSettings.TryGetValue(SETTING_APIKEY_ID, out Guid result))
+			if (this.Context.Site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.APIKEY_ID, out Guid result))
 			{
 				viewModel.ApiKey = await this.ApiKeyManager.Get(result);
 			}

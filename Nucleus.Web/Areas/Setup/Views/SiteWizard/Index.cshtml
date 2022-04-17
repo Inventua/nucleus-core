@@ -72,8 +72,12 @@
 									@if (Model.InstallableExtensions[count].IsRequired)
 									{
 										@Html.HiddenFor(model => model.InstallableExtensions[count].IsSelected)
+										<span class="nucleus-material-icon placeholder-checkbox">&#xe834;</span>
 									}
-									@Html.CheckBoxFor(model => model.InstallableExtensions[count].IsSelected, Model.InstallableExtensions[count].IsRequired ? disabledAttr : enabledAttr)
+									else
+									{
+										@Html.CheckBoxFor(model => model.InstallableExtensions[count].IsSelected, Model.InstallableExtensions[count].IsRequired ? disabledAttr : enabledAttr)
+									}
 									<span>@Model.InstallableExtensions[count].Name</span>
 
 									<span class="d-block">@Model.InstallableExtensions[count].Description</span>

@@ -15,6 +15,11 @@ namespace Nucleus.Extensions
 		private static TimeSpan DateThreshold = TimeSpan.FromMinutes(10);
 
 		/// <summary>
+		/// Scheme name for the authorization header used to send the request signature.
+		/// </summary>
+		public const string AUTHORIZATION_SCHEME = "Nucleus-HMAC256";
+
+		/// <summary>
 		/// Add a signature to the specified HttpRequestMessage
 		/// </summary>
 		/// <param name="request"></param>
@@ -22,74 +27,111 @@ namespace Nucleus.Extensions
 		/// <param name="secret"></param>
 		public static void Sign(this System.Net.Http.HttpRequestMessage request, Guid accessKey, string secret)
 		{
-			request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", $"{accessKey}:{GenerateSignature(request, accessKey, secret)}");
+			if (!request.Headers.Date.HasValue)
+			{
+				request.Headers.Date = DateTimeOffset.UtcNow;
+			}
+			request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(AUTHORIZATION_SCHEME, $"{accessKey}:{GenerateSignature(request, accessKey, secret)}");
 		}
 
 		/// <summary>
-		/// Retrieve the access key from an incoming request.
+		/// Return whether an incoming request has a API key signature
 		/// </summary>
 		/// <param name="request"></param>
+		/// <param name="accessKey"></param>
 		/// <returns></returns>
-		public static string AccessKey(this System.Net.Http.HttpRequestMessage request)
+		public static Boolean IsSigned(this Microsoft.AspNetCore.Http.HttpRequest request, out Guid accessKey)
 		{
-			string headerAccessKey = "";
-			string headerSignature = "";
-
-			Validate(request, ref headerAccessKey, ref headerSignature);
-
-			return headerAccessKey;
+			return IsSigned(request, out accessKey, out string signature, out string reason);
 		}
 
 		/// <summary>
-		/// Validate request headers.
+		/// Validate request headers from an incoming request..
 		/// </summary>
 		/// <param name="request"></param>
 		/// <param name="accessKey"></param>
 		/// <param name="signature"></param>
+		/// <param name="reason"></param>
 		/// <exception cref="InvalidOperationException"></exception>
-		private static void Validate(System.Net.Http.HttpRequestMessage request, ref string accessKey, ref string signature)
+		private static Boolean IsSigned(Microsoft.AspNetCore.Http.HttpRequest request, out Guid accessKey, out string signature, out string reason)
 		{
-			if (request.Headers.Authorization.Scheme != "Bearer")
+			accessKey = Guid.Empty;
+			signature = "";
+			reason = "";
+
+			if (request.Headers.Authorization.Count != 1)
 			{
-				throw new InvalidOperationException($"Invalid authorization scheme.");
+				reason = $"Invalid request signature [invalid format]: {request.Headers.Authorization}";
+				return false;
 			}
 
-			string[] authorizationValues = request.Headers.Authorization.Parameter.Split(':');
-
-			if (authorizationValues.Length != 2)
+			string[] headerParts = request.Headers.Authorization[0].Split(' ');			
+			if (headerParts.Length != 2)
 			{
-				throw new InvalidOperationException($"Invalid request signature [invalid format]: {request.Headers.Authorization.Parameter}");
+				reason = $"Invalid request signature [invalid header format]: {request.Headers.Authorization}";
+				return false;
 			}
 
-			string headerAccessKey = authorizationValues[0];
-			string headerSignature = authorizationValues[1];
+			string headerAuthorizationScheme = headerParts[0];
+			string[] signatureParts = headerParts[1].Split(':');
 
-			if (String.IsNullOrEmpty(headerAccessKey))
+			if (signatureParts.Length != 2)
 			{
-				throw new InvalidOperationException($"Invalid request signature [access key blank]: {request.Headers.Authorization.Parameter}");
+				reason = $"Invalid request signature [invalid signature format]: {request.Headers.Authorization}";
+				return false;
 			}
 
-			if (String.IsNullOrEmpty(headerSignature))
+			string accessKeyValue = signatureParts[0];
+			signature = signatureParts[1];
+
+			if (headerAuthorizationScheme != AUTHORIZATION_SCHEME)
 			{
-				throw new InvalidOperationException($"Invalid request signature [signature blank]:  {request.Headers.Authorization.Parameter}");
+				reason = $"Invalid authorization scheme.";
+				return false;
+			}			
+
+			if (String.IsNullOrEmpty(accessKeyValue))
+			{
+				reason = $"Invalid request signature [access key blank]: {request.Headers.Authorization}";
+				return false;
 			}
 
-			if (!Guid.TryParse(headerAccessKey, out Guid result))
+			if (String.IsNullOrEmpty(signature))
 			{
-				throw new InvalidOperationException($"Invalid request signature [access key invalid format]: {request.Headers.Authorization.Parameter}");
+				reason = $"Invalid request signature [signature blank]:  {request.Headers.Authorization}";
+				return false;
 			}
 
-			if (request.Headers.Date.HasValue)
+			if (!Guid.TryParse(accessKeyValue, out accessKey))
 			{
-				if (request.Headers.Date.Value < DateTime.UtcNow.Add(-DateThreshold) || request.Headers.Date.Value > DateTime.UtcNow.Add(DateThreshold))
+				reason = $"Invalid request signature [access key invalid format]: {request.Headers.Authorization}";
+				return false;
+			}
+
+			if (request.Headers.Date.Count == 1)
+			{
+				if (DateTime.TryParse(request.Headers.Date[0], out DateTime requestDate))
 				{
-					throw new InvalidOperationException($"Invalid request signature [expired]: {request.Headers.Authorization.Parameter}");
+					// aspnet core converts the date header to server-local date/time so we need to compare with DateTime.Now, not DateTime.UtcNow
+					if (requestDate < DateTime.Now.Add(-DateThreshold) || requestDate > DateTime.Now.Add(DateThreshold))
+					{
+						reason = $"Invalid request signature [expired]: {request.Headers.Authorization}";
+						return false;
+					}
+				}
+				else
+				{
+					reason = $"Invalid request signature [invalid date header]";
+					return false;
 				}
 			}
 			else
 			{
-				throw new InvalidOperationException($"Invalid request signature [no date header]");
+				reason = $"Invalid request signature [no date header]";
+				return false;
 			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -97,15 +139,18 @@ namespace Nucleus.Extensions
 		/// </summary>
 		/// <param name="request"></param>
 		/// <param name="secret"></param>
+		/// <param name="reason"></param>
 		/// <returns></returns>
-		public static Boolean IsValid(this System.Net.Http.HttpRequestMessage request, string secret)
+		public static Boolean IsValid(this Microsoft.AspNetCore.Http.HttpRequest request, string secret, out string reason)
 		{
-			string headerAccessKey = "";
-			string headerSignature = "";
-
-			Validate(request, ref headerAccessKey, ref headerSignature);
-
-			return GenerateSignature(request, Guid.Parse(headerAccessKey), secret) == headerSignature;			
+			if (IsSigned(request, out Guid accessKey, out string signature, out reason))
+			{
+				return GenerateSignature(request, accessKey, secret) == signature;
+			}
+			else
+			{
+				return false;
+			}	
 		}
 
 		/// <summary>
@@ -189,13 +234,97 @@ namespace Nucleus.Extensions
 						{
 							break;
 						}
-						// ignore
-
 				}
 			}
 
 			localPath = request.RequestUri.LocalPath;
 			signatureSource = request.Method.ToString().ToUpper() + "\n" + request.RequestUri.Host.ToLower() + "\n" + localPath + "\n" + canonicalizedParameters;
+			return SHA256Hash(signatureSource, secret);
+		}
+
+		/// <summary>
+		/// Generate a signature for an incoming request in order to compare it.
+		/// </summary>
+		/// <param name="request"></param>
+		/// <param name="accessKey"></param>
+		/// <param name="secret"></param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentException"></exception>
+		public static string GenerateSignature(Microsoft.AspNetCore.Http.HttpRequest request, Guid accessKey, string secret)
+		{
+			string signatureSource;
+			var parameterKeys = new SortedDictionary<string, string>();
+			string canonicalizedParameters = "";
+			string localPath;
+			bool hostHeaderProcessed = false;
+
+			if (String.IsNullOrEmpty(secret))
+			{
+				throw new ArgumentException("Invalid secret");
+			}
+
+			foreach (KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues> header in request.Headers)
+			{
+				if (header.Key.ToLower() == "host")
+				{
+					hostHeaderProcessed = true;
+				}
+
+				if (header.Value.Count() > 0)
+				{
+					parameterKeys.Add(header.Key, ConcatenateHeaderValues(header.Value));
+				}
+			}
+
+			foreach (string parameter in parameterKeys.Keys)
+			{
+				string name = parameter;
+				string value = parameterKeys[parameter];
+
+				switch (name.ToLower() ?? "")
+				{
+					case "date":
+						{
+							canonicalizedParameters = canonicalizedParameters + PercentEncode(value);
+							if (!hostHeaderProcessed)
+							{
+								value = request.Host.Host;
+								canonicalizedParameters = canonicalizedParameters + PercentEncode(value);
+								hostHeaderProcessed = true;
+							}
+
+							break;
+						}
+
+					case "soapaction":
+					case "user-agent":
+						{
+							canonicalizedParameters = canonicalizedParameters + PercentEncode(value);
+							break;
+						}
+
+					case "host":
+						{
+							if (value.IndexOf(':') >= 0)
+							{
+								value = value.Substring(0, value.IndexOf(':'));
+							}
+
+							canonicalizedParameters = canonicalizedParameters + PercentEncode(value);
+							break;
+						}
+
+					default:
+						{
+							break;
+						}
+						// ignore
+
+				}
+			}
+
+			localPath = request.Path;
+			signatureSource = request.Method.ToString().ToUpper() + "\n" + request.Host.Host.ToLower() + "\n" + localPath + "\n" + canonicalizedParameters;
 			return SHA256Hash(signatureSource, secret);
 		}
 

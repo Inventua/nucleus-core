@@ -23,7 +23,14 @@ namespace Nucleus.Extensions.Authorization
 		/// </remarks>
 		public static Guid GetUserId(this System.Security.Claims.ClaimsPrincipal user)
 		{
-			return GetUserClaim<Guid>(user, ClaimTypes.NameIdentifier);
+			if (GetUserClaim<string>(user, ClaimTypes.AuthenticationMethod) == Nucleus.Abstractions.Authentication.Constants.AUTHENTICATED_BY_COOKIE)
+			{ 
+				return GetUserClaim<Guid>(user, ClaimTypes.NameIdentifier);
+			}
+			else
+			{
+				return Guid.Empty;
+			}
 		}
 
 		/// <summary>

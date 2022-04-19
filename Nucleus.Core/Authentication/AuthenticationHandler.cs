@@ -75,14 +75,19 @@ namespace Nucleus.Core.Authentication
 					ApiKey apiKey = await this.ApiKeyManager.Get(accessKey);
 					if (apiKey == null)
 					{
-						Logger.LogWarning("Invalid Api Key {sessionId} from {remoteIpAddress}.", accessKey, this.Context.Connection.RemoteIpAddress);
+						Logger.LogWarning("Invalid Api Key {key} from {remoteIpAddress}.", accessKey, this.Context.Connection.RemoteIpAddress);
 						return AuthenticateResult.Fail($"Invalid Api Key {sessionId} from {this.Context.Connection.RemoteIpAddress}.");
+					}
+					else if (!apiKey.Enabled)
+					{
+						Logger.LogWarning("Invalid [disabled] Api Key {key} from {remoteIpAddress}.", accessKey, this.Context.Connection.RemoteIpAddress);
+						return AuthenticateResult.Fail($"Invalid [disabled] Api Key {sessionId} from {this.Context.Connection.RemoteIpAddress}.");
 					}
 					else
 					{
 						if (!this.Context.Request.IsValid(apiKey.Secret, out string reason))
 						{
-							Logger.LogWarning("Invalid Api Key {sessionId} from {remoteIpAddress}, {reason}.", accessKey, this.Context.Connection.RemoteIpAddress, reason);
+							Logger.LogWarning("Invalid Api Key {key} from {remoteIpAddress}, {reason}.", accessKey, this.Context.Connection.RemoteIpAddress, reason);
 							return AuthenticateResult.Fail($"Invalid Api Key {sessionId} from {this.Context.Connection.RemoteIpAddress}, {reason}.");
 						}
 						else
@@ -294,10 +299,16 @@ namespace Nucleus.Core.Authentication
 		/// <returns></returns>
 		protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
 		{
-			// special handling for admin menu
 			if (this.Context.Request.Path.StartsWithSegments(new PathString("/admin")))
 			{
+				// special handling for admin menu to display a message rather than redirect to login
 				await this.Context.Response.WriteAsync("Session expired.");
+			}
+			else if (this.Context.Request.IsSigned(out Guid accessKey))
+			{
+				// special handing for API key access (invalid key, or disabled key, or invalid signature), return a 403: Forbidden
+				this.Context.Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
+				await this.Context.Response.WriteAsync("{'error': 'Invalid API Key.'}");
 			}
 			else
 			{

@@ -36,6 +36,11 @@
 						"maxlength": 512
 					},
 					{
+						"name": "Enabled",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
 						"name": "DateAdded",
 						"clrType": "datetime",
 						"isnullable": true

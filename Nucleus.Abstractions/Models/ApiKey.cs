@@ -44,5 +44,14 @@ namespace Nucleus.Abstractions.Models
 		/// Space-separated list of scopes for the API key.  Scopes represent the operations that the API key can be used for.
 		/// </remarks>
 		public string Scope { get; set; }
+
+		/// <summary>
+		/// Enabled flag.
+		/// </summary>
+		/// <remarks>
+		/// Disabled Api Keys throw an "access denied" error if used.
+		/// </remarks>
+		public Boolean Enabled { get; set; } = true;
+
 	}
 }

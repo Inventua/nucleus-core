@@ -21,7 +21,7 @@
 			
 			<file name="readme.txt" />
 			<file name="viewer.css" />
-			<file name="controlpanel.css" />
+			<file name="settings.css" />
 			
 			<folder name="Bin">
 				<file name="Nucleus.OAuth.Server.dll" />
@@ -29,9 +29,10 @@
 			
 			<folder name="Views">
 				<file name="Viewer.cshtml" />
-				<file name="controlpanel.cshtml" />
-				<file name="editor.cshtml" />
-				<file name="_ClientAppsList.cshtml" />				
+				<file name="Settings.cshtml" />
+				<file name="Editor.cshtml" />
+				<file name="_ClientAppsList.cshtml" />
+				<file name="_PageMenu.cshtml" />
 			</folder>
 			
 		</component>

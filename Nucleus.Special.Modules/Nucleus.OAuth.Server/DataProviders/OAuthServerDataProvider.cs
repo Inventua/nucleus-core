@@ -44,7 +44,7 @@ namespace Nucleus.OAuth.Server.DataProviders
 			Nucleus.Abstractions.Models.Paging.PagedResult<ClientApp> result = new();
 
 			var query = this.Context.ClientApps
-				.Where(clientApp => EF.Property<Guid>(site, "SiteId") == site.Id)
+				.Where(clientApp => EF.Property<Guid>(clientApp, "SiteId") == site.Id)
 				.Include(clientApp => clientApp.LoginPage)
 				.Include(clientApp => clientApp.ApiKey);
 

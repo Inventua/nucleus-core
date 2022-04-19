@@ -71,7 +71,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <None Include="Template Source Code\Complex Extension Project Template\DataProviders\SqlServer\Scripts\01.00.00.sql" />
+    <EmbeddedResource Include="Template Source Code\Complex Extension Project Template\DataProviders\Migrations\Scripts\01.00.00.json" />
     <None Include="Template Source Code\Empty Extension Project Template\readme.txt" />
     <None Include="Template Source Code\Empty Extension Project Template\Project.vstemplate" />
     <None Include="Template Source Code\Empty Extension Project Template\package.xml" />
@@ -148,7 +148,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Template Source Code\Complex Extension Project Template\DataProviders\Sqlite\Scripts\01.00.00.sql" />
     <None Include="Template Source Code\Complex Extension Project Template\package.xml" />
     <None Include="Template Source Code\Complex Extension Project Template\Project.vstemplate" />
     <None Include="Template Source Code\Complex Extension Project Template\readme.txt" />

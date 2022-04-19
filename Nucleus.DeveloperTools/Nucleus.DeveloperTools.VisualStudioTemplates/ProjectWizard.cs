@@ -75,7 +75,7 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 							extensionNameSingular = extensionNameSingular.Substring(0, extensionNameSingular.Length - 1);
 						}
 
-						replacementsDictionary.Add("$nucleus_extension_name_singular", extensionNameSingular);
+						replacementsDictionary.Add("$nucleus_extension_name_singular$", extensionNameSingular);
 						replacementsDictionary.Add("$nucleus_extension_name_singular_lcase$", extensionNameSingular.Substring(0, 1).ToLower() + extensionNameSingular.Substring(1));
 						
 

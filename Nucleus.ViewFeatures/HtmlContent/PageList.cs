@@ -18,7 +18,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// </summary>
 	internal static class PageList
 	{
-		internal static async Task<TagBuilder> Build(ViewContext context, string propertyId, string propertyName, Guid selectedPageId, Guid? disabledPageId, Nucleus.Abstractions.Models.PageMenu pageMenu, object htmlAttributes)
+		internal static async Task<TagBuilder> Build(ViewContext context, string propertyId, string propertyName, Guid selectedPageId, Guid? disabledPageId, Nucleus.Abstractions.Models.PageMenu pageMenu, string noSelectionText, object htmlAttributes)
 		{
 			TagBuilder outputBuilder = new("div");
 			outputBuilder.AddCssClass("nucleus-page-list");
@@ -36,12 +36,12 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 			TagBuilder selectedItemBuilder = new("div");
 			selectedItemBuilder.AddCssClass("nucleus-page-list-selected");
-			selectedItemBuilder.InnerHtml.SetContent(selectedPageId==Guid.Empty ? "(none)" : (await pageManager.Get(selectedPageId))?.Name);
+			selectedItemBuilder.InnerHtml.SetContent(selectedPageId==Guid.Empty ? noSelectionText : (await pageManager.Get(selectedPageId))?.Name);
 			outputBuilder.InnerHtml.AppendHtml(selectedItemBuilder);
 
 			TagBuilder listBuilder = new("ul");
 			listBuilder.AddCssClass("collapse");
-			AddChildren(urlHelper, listBuilder, pageMenu, selectedPageId, disabledPageId, 1, 0, htmlAttributes);
+			AddChildren(urlHelper, listBuilder, pageMenu, selectedPageId, disabledPageId, noSelectionText, 1, 0, htmlAttributes);
 			listBuilder.MergeAttributes(htmlAttributes);
 			outputBuilder.InnerHtml.AppendHtml(listBuilder);
 
@@ -55,7 +55,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			return outputBuilder;
 		}
 
-		private static void AddChildren(IUrlHelper urlHelper, TagBuilder control, PageMenu menu, Guid selectedPageId, Guid? disabledPageId, int maxLevels, int thisLevel, object htmlAttributes)
+		private static void AddChildren(IUrlHelper urlHelper, TagBuilder control, PageMenu menu, Guid selectedPageId, Guid? disabledPageId, string noSelectionText, int maxLevels, int thisLevel, object htmlAttributes)
 		{
 			if (thisLevel == maxLevels) return;
 
@@ -66,7 +66,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				TagBuilder linkBuilder = new("a");
 				linkBuilder.Attributes.Add("data-id", Guid.Empty.ToString());
 				linkBuilder.Attributes.Add("tabindex", "0");
-				linkBuilder.InnerHtml.SetContent("(none)");
+				linkBuilder.InnerHtml.SetContent(noSelectionText);
 				itemBuilder.InnerHtml.AppendHtml(linkBuilder);
 				itemBuilder.MergeAttributes(htmlAttributes);
 				control.InnerHtml.AppendHtml(itemBuilder);
@@ -115,7 +115,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				if (childItem.Children != null && childItem.Children.Any())
 				{
 					TagBuilder childList = new("ul");
-					AddChildren(urlHelper, childList, childItem, selectedPageId, disabledPageId, maxLevels, thisLevel + 1, htmlAttributes);
+					AddChildren(urlHelper, childList, childItem, selectedPageId, disabledPageId, noSelectionText, maxLevels, thisLevel + 1, htmlAttributes);
 					itemBuilder.InnerHtml.AppendHtml(childList);
 				}
 			}

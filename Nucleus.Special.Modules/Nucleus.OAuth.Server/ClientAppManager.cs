@@ -34,11 +34,11 @@ namespace Nucleus.OAuth.Server
 		/// <remarks>
 		/// The new <see cref="ClientApp"/> is not saved to the database until you call <see cref="Save(ClientApp)"/>.
 		/// </remarks>
-		public ClientApp CreateNew()
+		public Task<ClientApp> CreateNew()
 		{
 			ClientApp result = new();
 
-			return result;
+			return Task.FromResult(result);
 		}
 
 		/// <summary>

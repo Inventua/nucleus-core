@@ -38,25 +38,32 @@ namespace Nucleus.OAuth.Server.DataProviders
 
 			builder.Entity<ClientApp>()
 				.ToTable("OAuthServerClientApps")
-				.HasOne<Site>()
-				.WithMany()
-				.HasForeignKey("SiteId").IsRequired();
-
-			builder.Entity<ClientApp>()
-				.HasOne<Nucleus.Abstractions.Models.ApiKey>()
-				.WithMany()
-				.HasForeignKey("ApiKeyId").IsRequired();
-
-			builder.Entity<ClientApp>()
-				.HasOne<Nucleus.Abstractions.Models.Page>()
-				.WithMany()
-				.HasForeignKey("LoginPageId").IsRequired();
+				.HasOne<Site>();
 
 			builder.Entity<ClientAppToken>()
-				.ToTable("OAuthServerClientAppTokens")
-				.HasOne<ClientApp>()
-				.WithMany()
-				.HasForeignKey("ClientAppId").IsRequired();
+				.ToTable("OAuthServerClientAppTokens");
+
+			//builder.Entity<ClientApp>()
+			//	.ToTable("OAuthServerClientApps")
+			//	.HasOne<Site>()
+			//	.WithMany()
+			//	.HasForeignKey("SiteId").IsRequired();
+
+			//builder.Entity<ClientApp>()
+			//	.HasOne<Nucleus.Abstractions.Models.ApiKey>()
+			//	.WithMany()
+			//	.HasForeignKey("ApiKeyId").IsRequired();
+
+			//builder.Entity<ClientApp>()
+			//	.HasOne<Nucleus.Abstractions.Models.Page>()
+			//	.WithMany()
+			//	.HasForeignKey("LoginPageId").IsRequired();
+
+			//builder.Entity<ClientAppToken>()
+			//	.ToTable("OAuthServerClientAppTokens")
+			//	.HasOne<ClientApp>()
+			//	.WithMany()
+			//	.HasForeignKey("ClientAppId").IsRequired();
 		}
 	}
 }

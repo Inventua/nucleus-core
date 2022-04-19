@@ -18,13 +18,13 @@ namespace Nucleus.OAuth.Server.Controllers
 	{
 		private Context Context { get; }
 		private IPageModuleManager PageModuleManager { get; }
-		private ClientAppManager OAuthServerManager { get; }
+		private ClientAppManager ClientAppManager { get; }
 
-		public OAuthServerController(Context Context, IPageModuleManager pageModuleManager, ClientAppManager oAuthServerManager)
+		public OAuthServerController(Context Context, IPageModuleManager pageModuleManager, ClientAppManager clientAppManager)
 		{
 			this.Context = Context;
 			this.PageModuleManager = pageModuleManager;
-			this.OAuthServerManager = oAuthServerManager;
+			this.ClientAppManager = clientAppManager;
 		}
 
 		[HttpGet]

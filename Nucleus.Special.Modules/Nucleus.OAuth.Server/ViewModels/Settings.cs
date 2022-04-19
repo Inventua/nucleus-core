@@ -16,5 +16,9 @@ namespace Nucleus.OAuth.Server.ViewModels
 		public Nucleus.Abstractions.Models.Paging.PagedResult<ClientApp> ClientApps { get; set; } = new () { PageSize = 20 };
 	
 		public ClientApp ClientApp { get; set; }
+
+		public PageMenu Pages { get; set; }
+
+		public IEnumerable<ApiKey> ApiKeys { get; set; }
 	}
 }

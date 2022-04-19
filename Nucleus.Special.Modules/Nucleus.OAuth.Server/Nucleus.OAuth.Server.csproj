@@ -17,29 +17,31 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <None Remove="controlpanel.css" />
     <None Remove="DataProviders\Migrations\Scripts\01.00.00.json" />
+    <None Remove="settings.css" />
     <None Remove="viewer.css" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
-    <None Remove="Views\ControlPanel.cshtml" />
     <None Remove="Views\Editor.cshtml" />
+    <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
     <None Remove="Views\_ClientAppsList.cshtml" />
+    <None Remove="Views\_PageMenu.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="viewer.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
-    <Content Include="controlpanel.css" />
+    <Content Include="settings.css" />
     <Content Include="Views\Editor.cshtml" />
     <Content Include="Views\Viewer.cshtml" />
-    <Content Include="Views\ControlPanel.cshtml" />
+    <Content Include="Views\Settings.cshtml" />
     <Content Include="Views\_ClientAppsList.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+    <Content Include="Views\_PageMenu.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

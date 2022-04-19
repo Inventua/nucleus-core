@@ -25,6 +25,9 @@
 			@Html.TextAreaFor(model => model.ApiKey.Scope, new { @maxlength = 512, @rows = 8 })
 		</SettingsControl>
 
+		<SettingsControl caption="Enabled?" helptext="Specifies whether this Api Key is enabled.  If a disabled Api key is used, an 'access denied' ">
+			@Html.CheckBoxFor(model => model.ApiKey.Enabled, new { @class = "ToggleSwitch" })
+		</SettingsControl>
 	</fieldset>
 	
 	<div class="nucleus-button-panel">

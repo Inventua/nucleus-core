@@ -24,8 +24,6 @@ namespace $nucleus_extension_namespace$
 		{
 			this.CacheManager = cacheManager;
 			this.DataProviderFactory = dataProviderFactory;
-
-			this.CacheManager.Add<Guid, $nucleus_extension_name$> (new Nucleus.Abstractions.Models.Configuration.CacheOption());
 		}
 
 		/// <summary>

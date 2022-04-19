@@ -1,0 +1,92 @@
+//{
+//	"schemaName": "Nucleus.Modules.Documents",
+//	"version": "01.00.00",
+//	"operations": [
+//		{
+//			"createTable": {
+//				"name": "Documents",
+//				"columns": [
+//					{
+//						"name": "Id",
+//						"clrType": "guid",
+//						"isnullable": false
+//					},
+//					{
+//						"name": "ModuleId",
+//						"clrType": "guid",
+//						"isnullable": false
+//					},
+//					{
+//						"name": "Title",
+//						"clrType": "string",
+//						"maxLength": 256,
+//						"isnullable": false
+//					},
+//					{
+//						"name": "Description",
+//						"clrType": "string",
+//						"maxLength": 512,
+//						"isnullable": true
+//					},
+//					{
+//						"name": "CategoryId",
+//						"clrType": "guid",
+//						"isnullable": true
+//					},
+//					{
+//						"name": "SortOrder",
+//						"clrType": "int",
+//						"isnullable": true
+//					},
+//					{
+//						"name": "FileId",
+//						"clrType": "guid",
+//						"isnullable": true
+//					},
+//					{
+//						"name": "DateAdded",
+//						"clrType": "datetime",
+//						"isnullable": true
+//					},
+//					{
+//						"name": "AddedBy",
+//						"clrType": "guid",
+//						"isnullable": true
+//					},
+//					{
+//						"name": "DateChanged",
+//						"clrType": "datetime",
+//						"isnullable": true
+//					},
+//					{
+//						"name": "ChangedBy",
+//						"clrType": "guid",
+//						"isnullable": true
+//					}
+//				],
+//				"primaryKey": {
+//					"name": "PK_Documents",
+//					"isclustered": true,
+//					"columns": [ "Id" ]
+//				},
+//				"foreignKeys": [
+//					{
+//						"name": "FK_Documents_ModuleId",
+//						"Columns": [ "ModuleId" ],
+//						"PrincipalTable": "PageModules",
+//						"PrincipalColumns": [ "Id" ],
+//						"OnDelete": "Cascade"
+//					}
+//				]
+//			}
+//		},
+//		{
+//			"createIndex": {
+//				"name": "IX_Documents_ModuleId",
+//				"table": "Documents",
+//				"isunique": false,
+//				"columns": [ "ModuleId" ]
+//			}
+//		}
+//	]
+//}

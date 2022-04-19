@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Nucleus.Data.EntityFramework;
 using $nucleus_extension_namespace$.DataProviders;
 
 [assembly:HostingStartup(typeof($nucleus_extension_namespace$.Startup))]

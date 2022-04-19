@@ -135,10 +135,10 @@ namespace Nucleus.OAuth.Client
 			//base.Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
 			await RedirectToLogin(System.Net.HttpStatusCode.Forbidden.ToString());
 
-			// Using base.Response.StartAsync here is not ideal, because it causes the Microsoft Identity classes to throw a
+			// Using base.Response.StartAsync here is not ideal, because it causes the Microsoft authentication classes to throw a
 			// "System.InvalidOperationException: StatusCode cannot be set because the response has already started" exception,
 			// but it's the only way that seems to stop the .net core authentication system from ignoring/overriding what we do
-			// here & directing quietly to properties.RedirectUri, regardless of our already having set the status to forbidden
+			// here & directing to properties.RedirectUri, regardless of our already having set the status to forbidden
 			// or redirected to login.			
 			await base.Response.StartAsync();
 		}

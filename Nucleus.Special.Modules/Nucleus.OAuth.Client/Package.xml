@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <package id="2f4b7999-9c15-4afa-9ed0-9549602ba7a5" xmlns="urn:nucleus/schemas/package/1.0">
-	<name>OAuth</name>
+	<name>OAuth Client</name>
 	<version>1.0.0</version>
 	<publisher name="Inventua Pty Ltd" url="http://www.inventua.comn" email="support@inventua.com" />
 	<description>
@@ -9,7 +9,7 @@
 	<compatibility minVersion="1.0.0.0" maxVersion="*" />
 	
 	<components>
-		<component folderName="OAuth" optional="false">
+		<component folderName="OAuth Client" optional="false">
 			<controlPanelExtensionDefinition id="C93446E0-CEB6-40E6-80A9-E15BC7CB85A2">
 				<friendlyName>OAuth Client</friendlyName>
 				<description>Configure OAuth client.</description>

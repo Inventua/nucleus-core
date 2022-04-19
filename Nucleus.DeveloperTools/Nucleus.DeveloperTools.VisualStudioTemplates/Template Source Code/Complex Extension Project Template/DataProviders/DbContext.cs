@@ -8,13 +8,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Nucleus.Data.Common;
 using Microsoft.EntityFrameworkCore;
-using Nucleus.Modules.Links.Models;
+using $nucleus_extension_namespace$.Models;
 
 namespace $nucleus_extension_namespace$.DataProviders
 {
-	public class LinksDbContext : Nucleus.Data.EntityFramework.DbContext
+	public class $nucleus_extension_name$DbContext : Nucleus.Data.EntityFramework.DbContext
 	{
-		public DbSet<$nucleus_extension_name$> Links { get; set; }
+		public DbSet<$nucleus_extension_name$> $nucleus_extension_name$ { get; set; }
 
 		public LinksDbContext(DbContextConfigurator<$nucleus_extension_name$DataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
 		{

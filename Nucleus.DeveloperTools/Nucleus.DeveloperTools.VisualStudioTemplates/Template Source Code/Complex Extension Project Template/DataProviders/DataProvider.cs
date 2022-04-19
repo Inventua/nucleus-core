@@ -6,7 +6,7 @@ using System.Linq;
 using System.Data;
 using Nucleus.Abstractions.EventHandlers;
 using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
-using Nucleus.Modules.$nucleus_extension_name$.Models;
+using $nucleus_extension_namespace$.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
@@ -31,7 +31,7 @@ namespace $nucleus_extension_namespace$.DataProviders
 
 		public async Task<$nucleus_extension_name$> Get(Guid id)
 		{
-			return await this.Context.$nucleus_extension_name$
+			return await this.$nucleus_extension_name$
 				.Where($nucleus_extension_name_singular_lcase$ => $nucleus_extension_name_singular_lcase$ $nucleus_extension_name_singular_lcase$.Id == id)
 				.Include($nucleus_extension_name_singular_lcase$ => $nucleus_extension_name_singular_lcase$ $nucleus_extension_name_singular_lcase$.Category)
 				.Include($nucleus_extension_name_singular_lcase$ => $nucleus_extension_name_singular_lcase$ $nucleus_extension_name_singular_lcase$.File)
@@ -51,7 +51,7 @@ namespace $nucleus_extension_namespace$.DataProviders
 				.ToListAsync();
 		}
 
-		public async Task Save(PageModule pageModule, Document $nucleus_extension_name_singular_lcase$)
+		public async Task Save(PageModule pageModule, $nucleus_extension_name$ $nucleus_extension_name_singular_lcase$)
 		{
 			Action raiseEvent;
 

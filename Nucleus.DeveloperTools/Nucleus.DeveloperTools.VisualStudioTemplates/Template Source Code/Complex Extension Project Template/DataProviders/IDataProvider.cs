@@ -8,7 +8,7 @@ using Nucleus.Abstractions.Models;
 
 namespace $nucleus_extension_namespace$.DataProviders
 {
-	public interface I$nucleus_extension_name$DataProvider : IDisposable, Nucleus.Data.Common.IDataProvider
+	public interface I$nucleus_extension_name$DataProvider : IDisposable
 	{
 		public $nucleus_extension_name$ Get(Guid Id);
 		public IList<$nucleus_extension_name$> List(PageModule pageModule);

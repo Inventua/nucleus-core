@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace Nucleus.OAuth.Client.Controllers
 {
-	[Extension("OAuth")]
+	[Extension("OAuthClient")]
 	public class OAuthClientAdminController : Controller
 	{
 		private IWebHostEnvironment WebHostEnvironment { get; }

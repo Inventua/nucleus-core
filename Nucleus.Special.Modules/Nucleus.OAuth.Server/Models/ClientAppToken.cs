@@ -14,6 +14,17 @@ namespace Nucleus.OAuth.Server.Models
 				
 		public ClientApp ClientApp { get; set; }
 
+		public string Type { get; set; }
+
+		public string Scope { get; set; }
+		public string State { get; set; }
+
+		public string RedirectUri { get; set; }
+
+		public string Code { get; set; }
+
+		public Guid? UserId { get; set; }
+
 		public string AccessToken { get; set; }
 		
 		public string RefreshToken { get; set; }

@@ -8,7 +8,7 @@
 {
 	<fieldset role="group" aria-labelledby="heading">
 		<h2>Settings</h2>
-			
+		@Html.HiddenFor(model => model.ClientApp.Id)		
 		<SettingsControl caption="API Key" helptext="Select the API key for this Client App, or leave set to 'create' to automatically create a new one.">
 			@Html.DropDownListFor(model => model.ClientApp.ApiKey.Id, new SelectList(Model.ApiKeys, "Id", "Name"), "(create)")
 		</SettingsControl>

@@ -48,13 +48,23 @@ namespace Nucleus.OAuth.Server
 		/// <returns></returns>
 		public async Task<ClientApp> Get(Guid id)
 		{
-			return await this.CacheManager.ClientAppCache().GetAsync(id, async id =>
+			using (IClientAppDataProvider provider = this.DataProviderFactory.CreateProvider<IClientAppDataProvider>())
 			{
-				using (IClientAppDataProvider provider = this.DataProviderFactory.CreateProvider<IClientAppDataProvider>())
-				{
 					return await provider.GetClientApp(id);
 				}
-			});
+		}
+
+		/// <summary>
+		/// Retrieve an existing <see cref="ClientApp"/> from the database.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public async Task<ClientApp> GetByApiKey(Guid id)
+		{
+			using (IClientAppDataProvider provider = this.DataProviderFactory.CreateProvider<IClientAppDataProvider>())
+			{
+				return await provider.GetClientAppByApiKey(id);
+			}			
 		}
 
 		/// <summary>
@@ -66,7 +76,6 @@ namespace Nucleus.OAuth.Server
 			using (IClientAppDataProvider provider = this.DataProviderFactory.CreateProvider<IClientAppDataProvider>())
 			{
 				await provider.DeleteClientApp(clientApp);
-				this.CacheManager.ClientAppCache().Remove(clientApp.Id);
 			}
 		}
 
@@ -93,7 +102,6 @@ namespace Nucleus.OAuth.Server
 			using (IClientAppDataProvider provider = this.DataProviderFactory.CreateProvider<IClientAppDataProvider>())
 			{
 				await provider.SaveClientApp(site, clientApp);
-				this.CacheManager.ClientAppCache().Remove(clientApp.Id);
 			}
 		}
 

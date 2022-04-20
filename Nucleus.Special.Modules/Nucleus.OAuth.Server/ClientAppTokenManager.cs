@@ -48,13 +48,36 @@ namespace Nucleus.OAuth.Server
 		/// <returns></returns>
 		public async Task<ClientAppToken> Get(Guid id)
 		{
-			return await this.CacheManager.ClientAppTokenCache().GetAsync(id, async id =>
+			using (IClientAppTokenDataProvider provider = this.DataProviderFactory.CreateProvider<IClientAppTokenDataProvider>())
 			{
-				using (IClientAppTokenDataProvider provider = this.DataProviderFactory.CreateProvider<IClientAppTokenDataProvider>())
-				{
-					return await provider.GetToken(id);
-				}
-			});
+				return await provider.GetToken(id);
+			}
+		}
+
+		/// <summary>
+		/// Retrieve an existing <see cref="ClientAppToken"/> from the database.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public async Task<ClientAppToken> GetByCode(string code)
+		{
+			using (IClientAppTokenDataProvider provider = this.DataProviderFactory.CreateProvider<IClientAppTokenDataProvider>())
+			{
+				return await provider.GetTokenByCode(code);
+			}
+		}
+
+		/// <summary>
+		/// Retrieve an existing <see cref="ClientAppToken"/> from the database.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public async Task<ClientAppToken> GetByAccessToken(string accessToken)
+		{
+			using (IClientAppTokenDataProvider provider = this.DataProviderFactory.CreateProvider<IClientAppTokenDataProvider>())
+			{
+				return await provider.GetTokenByAccessToken(accessToken);
+			}
 		}
 
 		/// <summary>
@@ -66,7 +89,6 @@ namespace Nucleus.OAuth.Server
 			using (IClientAppTokenDataProvider provider = this.DataProviderFactory.CreateProvider<IClientAppTokenDataProvider>())
 			{
 				await provider.DeleteToken(clientAppToken);
-				this.CacheManager.ClientAppTokenCache().Remove(clientAppToken.Id);
 			}
 		}
 
@@ -80,7 +102,6 @@ namespace Nucleus.OAuth.Server
 			using (IClientAppTokenDataProvider provider = this.DataProviderFactory.CreateProvider<IClientAppTokenDataProvider>())
 			{
 				await provider.SaveToken(clientAppToken);
-				this.CacheManager.ClientAppTokenCache().Remove(clientAppToken.Id);
 			}
 		}
 

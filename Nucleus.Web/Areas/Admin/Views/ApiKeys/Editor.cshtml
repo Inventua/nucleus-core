@@ -7,9 +7,20 @@
 {
 	<fieldset ApiKey="group" aria-labelledby="heading">
 		<h2>API Key</h2>
-		@Html.HiddenFor(model => model.ApiKey.Id)
+		
+		<SettingsControl caption="ID" helptext="Api Key Id (guid).  This is the value used as an access key for API request signing, or as the client_id in an OAuth request.  If you are creating a new Api Key, you can enter this value in order to have it match the value from another environment, but you can't change the Id of an existing key.">
+			@if (Model.IsNew)
+			{
+				@Html.TextBoxFor(model => model.ApiKey.Id, new { @maxlength = 36 })
+			}
+			else
+			{
+				@Html.HiddenFor(model => model.ApiKey.Id)
+				@Model.ApiKey.Id
+			}
+		</SettingsControl>
 
-		<SettingsControl caption="Name" helptext="ApiKey name.  This value is displayed in on-screen controls which refer to ApiKeys.">
+		<SettingsControl caption="Name" helptext="Ap iKey name.  This value is displayed in on-screen controls which refer to ApiKeys.">
 			@Html.TextBoxFor(model => model.ApiKey.Name, new { @maxlength = 256 })
 		</SettingsControl>
 

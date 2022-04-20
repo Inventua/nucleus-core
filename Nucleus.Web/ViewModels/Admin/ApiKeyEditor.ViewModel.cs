@@ -9,6 +9,6 @@ namespace Nucleus.Web.ViewModels.Admin
 	public class ApiKeyEditor
 	{
 		public ApiKey ApiKey { get; set; }
-
+		public Boolean IsNew { get; set; }
 	}
 }

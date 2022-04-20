@@ -410,7 +410,7 @@ namespace Nucleus.Core.Plugins
 		/// <remarks>
 		/// A side effect of this function is that assemblies are loaded into their assembly load contexts by <see cref="LoadAssemblies"/>.
 		/// </remarks>
-		internal static IEnumerable<Type> GetTypes<T>()
+		public static IEnumerable<Type> GetTypes<T>()
 		{
 			foreach (Assembly assembly in LoadAssemblies())
 			{

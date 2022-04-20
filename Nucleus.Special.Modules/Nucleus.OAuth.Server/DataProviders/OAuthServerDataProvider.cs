@@ -41,23 +41,24 @@ namespace Nucleus.OAuth.Server.DataProviders
 
 		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<ClientApp>> ListClientApps(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
 		{
-			Nucleus.Abstractions.Models.Paging.PagedResult<ClientApp> result = new();
+			List<ClientApp> results = new();
 
 			var query = this.Context.ClientApps
 				.Where(clientApp => EF.Property<Guid>(clientApp, "SiteId") == site.Id)
 				.Include(clientApp => clientApp.LoginPage)
 				.Include(clientApp => clientApp.ApiKey);
 
-			result.TotalCount = await query.CountAsync();
+			pagingSettings.TotalCount = await query.CountAsync();
 
-			result.Items = await query
+			results = await query
 				.Skip(pagingSettings.FirstRowIndex)
 				.Take(pagingSettings.PageSize)
 				.AsNoTracking()
 				.AsSingleQuery()
 				.ToListAsync();
 
-			return result;
+			return new Nucleus.Abstractions.Models.Paging.PagedResult<ClientApp>(pagingSettings, results);
+			
 		}
 
 		public async Task SaveClientApp(Site site, ClientApp clientApp)

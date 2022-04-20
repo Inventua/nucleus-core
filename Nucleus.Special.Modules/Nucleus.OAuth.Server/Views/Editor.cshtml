@@ -26,7 +26,7 @@
 		</SettingsControl>
 
 		<SettingsControl caption="Login Page" helptext="Login Page for this client App.  Leave this set to 'Site Default' if you want to use the configured login page for this site, or select a custom login page for the Client App.">
-			@Html.PageListFor(model => model.ClientApp.LoginPage, Model.Pages, Guid.Empty)
+			@Html.PageListFor(model => model.ClientApp.LoginPage, Model.Pages, Guid.Empty, "(site default)", new {})
 		</SettingsControl>
 
 		<div class="Tools">

@@ -237,11 +237,11 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
-		public async Task<List<ControlPanelExtensionDefinition>> ListControlPanelExtensions(ControlPanelExtensionDefinition.ControlPanelExtensionScopes scope)
+		public async Task<IEnumerable<ControlPanelExtensionDefinition>> ListControlPanelExtensions(ControlPanelExtensionDefinition.ControlPanelExtensionScopes scope)
 		{
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
-				return (await provider.ListControlPanelExtensionDefinitions()).Where(ext => ext.Scope == scope).ToList();
+				return (await provider.ListControlPanelExtensionDefinitions()).Where(ext => ext.Scope == scope);
 			}
 		}
 

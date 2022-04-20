@@ -8,7 +8,7 @@ namespace Nucleus.Web.ViewModels.Admin
 {
 	public class Settings
 	{
-		public List<ControlPanelExtensionDefinition> Extensions { get; set; }
+		public IEnumerable<ControlPanelExtensionDefinition> Extensions { get; set; }
 
 	}
 }

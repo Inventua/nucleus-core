@@ -8,7 +8,7 @@ using Nucleus.Extensions;
 namespace Nucleus.Extensions.ElasticSearch.Controllers
 {
 	[Extension("ElasticSearch")]
-	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
 	public class SettingsController : Controller
 	{
 		private Context Context { get; }

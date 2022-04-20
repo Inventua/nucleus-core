@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using Nucleus.Abstractions;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace Nucleus.OAuth.Client
 {
@@ -75,33 +77,7 @@ namespace Nucleus.OAuth.Client
 						builder.AddOAuth(providerName, options =>
 						{
 							SetOptions(options, providerName, configurationSection, providerConfig);
-
-							options.Events.OnCreatingTicket = ParseJWT;
-
-							//options.Events.OnCreatingTicket = ctx =>
-							//{
-							//	JwtSecurityTokenHandler handler = new();
-							//	// if the response contains an id_token (JWT token), read it and copy any claims that are 
-							//	if (ctx.TokenResponse.Response.RootElement.TryGetProperty("id_token", out System.Text.Json.JsonElement value))
-							//	{
-							//		JwtSecurityToken token = handler.ReadJwtToken(value.ToString());
-
-							//		// Look for claim actions (set in config/code with MapJsonType) in the JWT payload (token claims).  If found, add claims
-							//		// to the identity with the claim types specified.  Normally claim actions are populated (automatically) by a call to
-							//		// options.UserInformationEndpoint, and .net core doesn't seem to pay any attention to JWT tokens (hence this code is required).
-							//		foreach (Microsoft.AspNetCore.Authentication.OAuth.Claims.ClaimAction action in ctx.Options.ClaimActions)
-							//		{
-							//			var claim = token.Claims.Where(claim => claim.Type.Equals(action.ClaimType, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-
-							//			if (claim != null)
-							//			{
-							//				ctx.Identity.AddClaim(new(action.ClaimType, claim.Value, claim.ValueType, providerName, claim.Issuer));
-							//			}
-							//		}
-							//	}
-
-							//	return Task.CompletedTask;
-							//};
+							options.Events.OnCreatingTicket = ReadUserData;
 						});
 						break;
 
@@ -147,12 +123,16 @@ namespace Nucleus.OAuth.Client
 			}
 		}
 
-		private static Task ParseJWT(Microsoft.AspNetCore.Authentication.OAuth.OAuthCreatingTicketContext ctx)
+		private static async Task ReadUserData(Microsoft.AspNetCore.Authentication.OAuth.OAuthCreatingTicketContext ctx)
 		{
-			JwtSecurityTokenHandler handler = new();
+			// If a JWT (id_token) is returned along with the OAuth2 access_token response, parse it.  Otherwise, call the
+			// UserInformationEndpoint to retrieve user data.
+
 			// if the response contains an id_token (JWT token), read it and copy any claims that are 
 			if (ctx.TokenResponse.Response.RootElement.TryGetProperty("id_token", out System.Text.Json.JsonElement value))
 			{
+				JwtSecurityTokenHandler handler = new();
+			
 				JwtSecurityToken token = handler.ReadJwtToken(value.ToString());
 
 				// Look for claim actions (set in config/code with MapJsonType) in the JWT payload (token claims).  If found, add claims
@@ -170,8 +150,20 @@ namespace Nucleus.OAuth.Client
 					}
 				}
 			}
+			else
+			{
+				// Get user info from the UserInformationEndpoint and parse it.
+				var request = new HttpRequestMessage(HttpMethod.Get, ctx.Options.UserInformationEndpoint);
+				request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ctx.AccessToken);
 
-			return Task.CompletedTask;
+				var response = await ctx.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ctx.HttpContext.RequestAborted);
+				response.EnsureSuccessStatusCode();
+
+				System.Text.Json.JsonDocument user = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+
+				ctx.RunClaimActions(user.RootElement);
+			}
 		}
 
 		private static void SetOptions(Microsoft.AspNetCore.Authentication.RemoteAuthenticationOptions options, string providerName, IConfigurationSection configurationSection, Models.Configuration.OAuthProvider providerConfig)
@@ -208,7 +200,7 @@ namespace Nucleus.OAuth.Client
 
 				foreach (Models.Configuration.MapJsonKey key in providerConfig.MapJsonKeys)
 				{
-					oauthOptions.ClaimActions.MapJsonKey(key.ClaimType, key.JsonKey, key.ValueType);
+					oauthOptions.ClaimActions.MapJsonKey(key.ClaimType, key.JsonKey ?? key.ClaimType, key.ValueType);
 				}
 			}
 			options.Events.OnRemoteFailure = ((RemoteFailureContext ctx) => 

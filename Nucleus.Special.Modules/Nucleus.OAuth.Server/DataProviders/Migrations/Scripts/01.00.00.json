@@ -89,6 +89,14 @@
 			}
 		},
 		{
+			"createIndex": {
+				"name": "IX_OAuthServerClientApps_ApiKeyId",
+				"table": "OAuthServerClientApps",
+				"isunique": true,
+				"columns": [ "ApiKeyId" ]
+			}
+		},
+		{
 			"createTable": {
 				"name": "OAuthServerClientAppTokens",
 				"columns": [
@@ -103,16 +111,51 @@
 						"isnullable": false
 					},
 					{
-						"name": "AccessToken",
+						"name": "RedirectUri",
 						"clrType": "string",
 						"maxLength": 512,
 						"isnullable": false
 					},
 					{
+						"name": "Type",
+						"clrType": "string",
+						"maxLength": 32,
+						"isnullable": false
+					},
+					{
+						"name": "State",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "Scope",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "Code",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "UserId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "AccessToken",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
 						"name": "RefreshToken",
 						"clrType": "string",
 						"maxLength": 512,
-						"isnullable": false
+						"isnullable": true
 					},
 					{
 						"name": "ExpiryDate",
@@ -133,10 +176,16 @@
 				"foreignKeys": [
 					{
 						"name": "FK_OAuthServerClientAppTokens_OAuthServerClientAppId",
-						"Columns": [ "Id" ],
+						"Columns": [ "ClientAppId" ],
 						"PrincipalTable": "OAuthServerClientApps",
 						"PrincipalColumns": [ "Id" ],
 						"OnDelete": "Cascade"
+					},
+					{
+						"name": "FK_OAuthServerClientAppTokens_UserId",
+						"Columns": [ "UserId" ],
+						"PrincipalTable": "Users",
+						"PrincipalColumns": [ "Id" ]
 					}
 				]
 			}
@@ -147,6 +196,30 @@
 				"table": "OAuthServerClientApps",
 				"isunique": false,
 				"columns": [ "ApiKeyId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_OAuthServerClientAppTokens_ExpiryDate",
+				"table": "OAuthServerClientApps",
+				"isunique": false,
+				"columns": [ "ExpiryDate" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_OAuthServerClientAppTokens_Code",
+				"table": "OAuthServerClientAppTokens",
+				"isunique": true,
+				"columns": [ "Code" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_OAuthServerClientAppTokens_AccessToken",
+				"table": "OAuthServerClientAppTokens",
+				"isunique": true,
+				"columns": [ "AccessToken" ]
 			}
 		}
 	]

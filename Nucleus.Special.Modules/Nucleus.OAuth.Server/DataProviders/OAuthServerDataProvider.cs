@@ -39,6 +39,17 @@ namespace Nucleus.OAuth.Server.DataProviders
 				.FirstOrDefaultAsync();
 		}
 
+		public async Task<ClientApp> GetClientAppByApiKey(Guid id)
+		{
+			return await this.Context.ClientApps
+				.Where(ClientApp => ClientApp.ApiKey.Id == id)
+				.Include(ClientApp => ClientApp.LoginPage)
+				.Include(ClientApp => ClientApp.ApiKey)
+				.AsNoTracking()
+				.FirstOrDefaultAsync();
+		}
+
+
 		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<ClientApp>> ListClientApps(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
 		{
 			List<ClientApp> results = new();
@@ -98,8 +109,29 @@ namespace Nucleus.OAuth.Server.DataProviders
 			return await this.Context.ClientAppTokens
 				.Where(clientAppToken => clientAppToken.Id == id)
 				.Include(clientAppToken => clientAppToken.ClientApp)
+					.ThenInclude(clientApp => clientApp.ApiKey)
 				.AsNoTracking()
 				.FirstOrDefaultAsync();
+		}
+
+		public async Task<ClientAppToken> GetTokenByCode(string code)
+		{
+			return await this.Context.ClientAppTokens
+			.Where(clientAppToken => clientAppToken.Code == code)
+			.Include(clientAppToken => clientAppToken.ClientApp)
+				.ThenInclude(clientApp => clientApp.ApiKey)
+			.AsNoTracking()
+			.FirstOrDefaultAsync();
+		}
+
+		public async Task<ClientAppToken> GetTokenByAccessToken(string accessToken)
+		{
+			return await this.Context.ClientAppTokens
+			.Where(clientAppToken => clientAppToken.AccessToken == accessToken)
+			.Include(clientAppToken => clientAppToken.ClientApp)
+				.ThenInclude(clientApp => clientApp.ApiKey)
+			.AsNoTracking()
+			.FirstOrDefaultAsync();
 		}
 
 		public async Task SaveToken(ClientAppToken clientAppToken)
@@ -131,7 +163,6 @@ namespace Nucleus.OAuth.Server.DataProviders
 			this.Context.Remove(clientAppToken);
 			await this.Context.SaveChangesAsync<ClientAppToken>();
 		}
-
 
 	}
 }

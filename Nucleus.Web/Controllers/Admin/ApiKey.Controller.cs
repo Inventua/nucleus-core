@@ -59,6 +59,12 @@ namespace Nucleus.Web.Controllers.Admin
 
 			viewModel = BuildViewModel(id == Guid.Empty ? await ApiKeyManager.CreateNew() : await ApiKeyManager.Get(id));
 			
+			if (viewModel.ApiKey.Id == Guid.Empty)
+			{
+				viewModel.IsNew = true;
+				viewModel.ApiKey.Id = Guid.NewGuid();
+			}
+
 			return View("Editor", viewModel);
 		}
 

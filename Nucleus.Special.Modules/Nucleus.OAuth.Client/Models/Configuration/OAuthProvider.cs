@@ -39,7 +39,7 @@ namespace Nucleus.OAuth.Client.Models.Configuration
 		/// </remarks
 		public string AuthenticateEndpoint(string returnUrl)
 		{
-			return $"/extensions/OAuth/Authenticate/{this.Name ?? this.Type}?returnUrl={returnUrl ?? "/"}";
+			return $"/extensions/OAuthClient/Authenticate/{this.Name ?? this.Type}?returnUrl={returnUrl ?? "/"}";
 		}
 	}
 }

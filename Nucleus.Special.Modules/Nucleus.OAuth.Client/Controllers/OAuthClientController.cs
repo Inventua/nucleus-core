@@ -24,7 +24,7 @@ using Microsoft.AspNetCore.Hosting;
 namespace Nucleus.OAuth.Client.Controllers
 {
 	[Extension("OAuthClient")]
-	public class OAuthController : Controller
+	public class OAuthClientController : Controller
 	{
 		private IWebHostEnvironment WebHostEnvironment { get; }
 
@@ -36,7 +36,7 @@ namespace Nucleus.OAuth.Client.Controllers
 
 		private IOptions<Models.Configuration.OAuthProviders> Options { get; }
 
-		public OAuthController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<Models.Configuration.OAuthProviders> options)
+		public OAuthClientController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<Models.Configuration.OAuthProviders> options)
 		{
 			this.WebHostEnvironment = webHostEnvironment;
 			this.Context = Context;
@@ -83,7 +83,7 @@ namespace Nucleus.OAuth.Client.Controllers
 		/// redirecting to the provider's AuthorizationEndpoint.
 		/// </remarks>
 		[HttpGet]
-		[Route($"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{action=Authenticate}}/{{providerName}}")]
+		[Route($"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension=OAuthClient}}/{{action=Authenticate}}/{{providerName}}")]
 		public ActionResult Authenticate(string providerName, string returnUrl)
 		{
 			if (!String.IsNullOrEmpty(providerName))

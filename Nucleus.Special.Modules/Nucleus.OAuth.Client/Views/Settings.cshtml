@@ -7,7 +7,7 @@
 
 <h1 class="nucleus-modal-caption">Documents Settings</h1>
 
-@using (Html.BeginNucleusForm("Settings", "OAuth", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+@using (Html.BeginNucleusForm("Settings", "OAuthClient", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
 	<fieldset role="group" aria-labelledby="heading">
 		<h2>Settings</h2>
@@ -20,7 +20,7 @@
 		</SettingsControl>
 
 		<div class="nucleus-form-tools">
-			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "OAuth", "OAuth"), new { })
+			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "OAuthClient", "OAuthClient"), new { })
 		</div>
 	</fieldset>
 }

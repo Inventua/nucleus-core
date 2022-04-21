@@ -71,6 +71,17 @@ namespace Nucleus.Abstractions.Models
 		}
 
 		/// <summary>
+		/// SiteSettings keys for search settings.
+		/// </summary>
+		public static class SiteSearchSettingsKeys
+		{
+			/// <summary>
+			/// API key for the search feeder to use for reading page content.
+			/// </summary>
+			public const string APIKEY_ID = "searchfeeder:apikey:id";
+		}
+
+		/// <summary>
 		/// SiteSettings keys for mail template settings.
 		/// </summary>
 		public static class SiteTemplatesKeys

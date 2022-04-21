@@ -23,7 +23,14 @@ namespace Nucleus.Extensions.Authorization
 		/// </remarks>
 		public static Guid GetUserId(this System.Security.Claims.ClaimsPrincipal user)
 		{
-			return GetUserClaim<Guid>(user, ClaimTypes.NameIdentifier);
+			if (GetUserClaim<string>(user, ClaimTypes.AuthenticationMethod) == Nucleus.Abstractions.Authentication.Constants.AUTHENTICATED_BY_COOKIE)
+			{ 
+				return GetUserClaim<Guid>(user, ClaimTypes.NameIdentifier);
+			}
+			else
+			{
+				return Guid.Empty;
+			}
 		}
 
 		/// <summary>
@@ -48,6 +55,26 @@ namespace Nucleus.Extensions.Authorization
 		}
 
 		/// <summary>
+		/// Retrieve a true/false value indicating whether the user (claims principal) account has been approved.
+		/// </summary>
+		/// <param name="user"></param>
+		/// <returns></returns>
+		public static Boolean IsApproved(this ClaimsPrincipal user)
+		{
+			return !user.Claims.Where(claim => claim.Type == Nucleus.Abstractions.Authentication.Constants.NOT_APPROVED_CLAIMTYPE).Any();
+		}
+
+		/// <summary>
+		/// Retrieve a true/false value indicating whether the user (claims principal) account has been verified.
+		/// </summary>
+		/// <param name="user"></param>
+		/// <returns></returns>
+		public static Boolean IsVerified(this ClaimsPrincipal user)
+		{
+			return !user.Claims.Where(claim => claim.Type == Nucleus.Abstractions.Authentication.Constants.NOT_VERIFIED_CLAIMTYPE).Any();
+		}
+
+		/// <summary>
 		/// Retrieve the specified claim from the user (claims principal)
 		/// </summary>
 		/// <param name="user"></param>
@@ -56,7 +83,7 @@ namespace Nucleus.Extensions.Authorization
 		/// <returns></returns>
 		public static T GetUserClaim<T>(this System.Security.Claims.ClaimsPrincipal user, string nameIdentifier)
 		{
-			Claim claim = user.Claims.FirstOrDefault((claim) => claim.Type == nameIdentifier);
+			Claim claim = user.Claims.Where(claim => claim.Type == nameIdentifier).FirstOrDefault();
 
 			if (claim != null)
 			{

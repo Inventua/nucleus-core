@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <package id="93788e4e-4c0f-4381-bfd8-3b3e6fe07fc0" xmlns="urn:nucleus/schemas/package/1.0">
-	<name>ErrorReport</name>
+	<name>Error Report</name>
 	<version>1.0.0</version>
 	<publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
 	<description>

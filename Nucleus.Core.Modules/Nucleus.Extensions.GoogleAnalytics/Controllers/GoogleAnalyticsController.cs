@@ -26,7 +26,7 @@ namespace Nucleus.Extensions.GoogleAnalytics.Controllers
 			this.SiteManager = siteManager;
 		}
 
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
 		[HttpGet]
 		[HttpPost]
 		public ActionResult Settings(ViewModels.Settings viewModel)
@@ -34,7 +34,7 @@ namespace Nucleus.Extensions.GoogleAnalytics.Controllers
 			return View("Settings", BuildSettingsViewModel(viewModel));
 		}
 
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
 		[HttpPost]
 		public ActionResult SaveSettings(ViewModels.Settings viewModel)
 		{

@@ -473,6 +473,16 @@ function _Page()
 				errorData = request.responseJSON;
 			}
 		}
+		else
+		{			
+			if (request.status === 403)
+			{
+				errorData = new Object();
+				errorData.title = 'Access Denied';
+				errorData.detail = request.responseText === null || request.responseText === '' ? 'Your account does not have permission to access this function.' : request.responseText;
+				errorData.statusCode = request.status;
+			}
+		}
 
 		// catch-all for non JSON & unrecognized error results
 		if (typeof (errorData) === 'undefined' || errorData === null)

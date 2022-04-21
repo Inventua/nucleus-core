@@ -24,8 +24,6 @@ namespace $nucleus_extension_namespace$
 		{
 			this.CacheManager = cacheManager;
 			this.DataProviderFactory = dataProviderFactory;
-
-			this.CacheManager.Add<Guid, $nucleus_extension_name$> (new Nucleus.Abstractions.Models.Configuration.CacheOption());
 		}
 
 		/// <summary>
@@ -48,13 +46,13 @@ namespace $nucleus_extension_namespace$
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		public $nucleus_extension_name$ Get(Guid id)
+		public async Task<$nucleus_extension_name$> Get(Guid id)
 		{
-			return this.CacheManager.$nucleus_extension_name$Cache().Get(id, id =>
+			return await this.CacheManager.$nucleus_extension_name$Cache().GetAsync(id, async id =>
 			{
 				using (I$nucleus_extension_name$DataProvider provider = this.DataProviderFactory.CreateProvider<I$nucleus_extension_name$DataProvider>())
 				{
-					return provider.Get(id);
+					return await provider.Get(id);
 				}
 			});
 		}
@@ -63,11 +61,11 @@ namespace $nucleus_extension_namespace$
 		/// Delete the specified <see cref="$nucleus_extension_name$"/> from the database.
 		/// </summary>
 		/// <param name="$nucleus_extension_name$"></param>
-		public void Delete($nucleus_extension_name$ $nucleus_extension_name_lcase$)
+		public async Task Delete($nucleus_extension_name$ $nucleus_extension_name_lcase$)
 		{
 			using (I$nucleus_extension_name$DataProvider provider = this.DataProviderFactory.CreateProvider<I$nucleus_extension_name$DataProvider>())
 			{
-				provider.Delete($nucleus_extension_name_lcase$);
+				await provider.Delete($nucleus_extension_name_lcase$);
 				this.CacheManager.$nucleus_extension_name$Cache().Remove($nucleus_extension_name_lcase$.Id);
 			}
 		}
@@ -77,11 +75,11 @@ namespace $nucleus_extension_namespace$
 		/// </summary>
 		/// <param name="site"></param>
 		/// <returns></returns>
-		public IList<$nucleus_extension_name$> List(PageModule module)
+		public async Task<IList<$nucleus_extension_name$>> List(PageModule module)
 		{
 			using (I$nucleus_extension_name$DataProvider provider = this.DataProviderFactory.CreateProvider<I$nucleus_extension_name$DataProvider>())
 			{
-				return provider.List(module);
+				return await provider.List(module);
 			}
 		}
 
@@ -90,11 +88,11 @@ namespace $nucleus_extension_namespace$
 		/// </summary>
 		/// <param name="site"></param>
 		/// <param name="$nucleus_extension_name$"></param>
-		public void Save(PageModule module, $nucleus_extension_name$ $nucleus_extension_name_lcase$)
+		public async Task Save(PageModule module, $nucleus_extension_name$ $nucleus_extension_name_lcase$)
 		{
 			using (I$nucleus_extension_name$DataProvider provider = this.DataProviderFactory.CreateProvider<I$nucleus_extension_name$DataProvider>())
 			{
-				provider.Save(module, $nucleus_extension_name_lcase$);
+				await provider.Save(module, $nucleus_extension_name_lcase$);
 				this.CacheManager.$nucleus_extension_name$Cache().Remove($nucleus_extension_name_lcase$.Id);				
 			}
 		}

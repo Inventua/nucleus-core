@@ -1,0 +1,12 @@
+﻿@model Nucleus.OAuth.Client.ViewModels.Viewer
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.OAuth.Client.ViewModels
+<label>Log in with</label>
+<ul>
+	@foreach (var option in Model.Options)
+	{
+		<li><a href="@option.AuthenticateEndpoint(Model.ReturnUrl)">@option.DisplayName()</a></li>
+	}
+</ul>	

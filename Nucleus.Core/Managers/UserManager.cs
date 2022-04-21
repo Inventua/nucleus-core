@@ -373,13 +373,6 @@ namespace Nucleus.Core.Managers
 				await provider.SaveUser(site, user);
 				this.CacheManager.UserCache().Remove(user.Id);
 			}
-			
-			// set a verification token if needed
-			if (!user.Verified && (user.Secrets != null && (String.IsNullOrEmpty(user.Secrets.VerificationToken) || user.Secrets.VerificationTokenExpiryDate < DateTime.UtcNow)))
-			{
-				await SetVerificationToken(user);
-			}			
-			
 		}
 
 		public void SetNewUserFlags(Site site, User user)

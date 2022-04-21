@@ -1,0 +1,11 @@
+﻿@model Nucleus.Web.ViewModels.Admin.ApiKeyIndex
+@using (Html.BeginAreaForm("List", "ApiKeys", "Admin", FormMethod.Post, new { @data_target = ".nucleus-index-items", @autocomplete = "off" }))
+{
+	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.ApiKeys, propertyName = "ApiKeys", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
+}
+<ul>
+	@foreach (var item in Model.ApiKeys.Items)
+	{
+		<li><a href="@Url.Content("~/Admin/ApiKeys/Editor")?id=@item.Id" data-target=".ApiKeyEditor">@item.Name</a></li>
+	}
+</ul>

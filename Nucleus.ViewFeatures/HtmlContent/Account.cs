@@ -10,6 +10,7 @@ using Nucleus.Abstractions.Models;
 using Microsoft.AspNetCore.Http;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions;
+using Nucleus.Extensions.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -42,6 +43,15 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				// user is logged in
 				TagBuilder accountMenuButtonBuilder = new("button");
 				accountMenuButtonBuilder.AddCssClass("btn btn-secondary dropdown-toggle");
+
+				if (!context.HttpContext.User.IsApproved() || !context.HttpContext.User.IsVerified())
+				{
+					TagBuilder warningBuilder = new("span");
+					warningBuilder.AddCssClass("nucleus-material-icon pe-2");
+					warningBuilder.InnerHtml.AppendHtml("&#xf052;");
+					accountMenuButtonBuilder.InnerHtml.AppendHtml(warningBuilder);
+				}
+
 				accountMenuButtonBuilder.InnerHtml.AppendHtml(context.HttpContext.User.Identity.Name);
 				accountMenuButtonBuilder.Attributes.Add("type", "button");
 				accountMenuButtonBuilder.Attributes.Add("data-bs-toggle", "dropdown");
@@ -52,6 +62,33 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				accountMenuBuilder.AddCssClass("dropdown-menu");
 				accountMenuBuilder.Attributes.Add("data-boundary", "viewport");
 
+				if (!context.HttpContext.User.IsApproved())
+				{
+					TagBuilder notApprovedItemBuilder = new("li");
+					TagBuilder notApprovedSpanBuilder = new("span");
+
+					notApprovedSpanBuilder.AddCssClass("d-inline-block text-center alert alert-warning px-1 small");
+					notApprovedSpanBuilder.InnerHtml.Append("Your account has not been approved");
+					notApprovedSpanBuilder.Attributes.Add("title", "Your account has not been approved.  You can log in, but you can't access any secured functions.");
+
+					notApprovedItemBuilder.InnerHtml.AppendHtml(notApprovedSpanBuilder);
+					accountMenuBuilder.InnerHtml.AppendHtml(notApprovedItemBuilder);
+				}
+
+				if (!context.HttpContext.User.IsVerified())
+				{
+					TagBuilder notVerifiedItemBuilder = new("li");
+					TagBuilder notVerifiedSpanBuilder = new("span");
+
+					notVerifiedSpanBuilder.AddCssClass("d-inline-block text-center alert alert-warning px-1 small");
+					notVerifiedSpanBuilder.InnerHtml.Append("Your account has not been verified");
+					notVerifiedSpanBuilder.Attributes.Add("title", "Your account has not been verified.  You can log in, but you can't access any secured functions.  Check your email for a welcome message with instructions on how to verify your account.");
+
+					notVerifiedItemBuilder.InnerHtml.AppendHtml(notVerifiedSpanBuilder);
+					accountMenuBuilder.InnerHtml.AppendHtml(notVerifiedItemBuilder);
+				}
+
+				if (context.HttpContext.User.IsApproved() && context.HttpContext.User.IsVerified())
 				{
 					TagBuilder accountProfileItemBuilder = new("li");
 					TagBuilder accountProfileLinkBuilder = new("a");
@@ -67,6 +104,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 					accountMenuBuilder.InnerHtml.AppendHtml(accountProfileItemBuilder);
 				}
 
+				if (context.HttpContext.User.IsApproved() && context.HttpContext.User.IsVerified())
 				{
 					TagBuilder changePasswordItemBuilder = new("li");
 					TagBuilder changePasswordLinkBuilder = new("a");

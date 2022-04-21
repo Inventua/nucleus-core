@@ -65,7 +65,7 @@ namespace Nucleus.Abstractions.Search
 		/// <summary>
 		/// Search entry content, used for content indexing.
 		/// </summary>
-		public byte[] Content { get; set; }
+		public byte[] Content { get; set; } = Array.Empty<byte>();
 
 		/// <summary>
 		/// Search entry MIME type.

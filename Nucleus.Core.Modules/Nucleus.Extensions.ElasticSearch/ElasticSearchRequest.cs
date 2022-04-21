@@ -62,44 +62,48 @@ namespace Nucleus.Extensions.ElasticSearch
 
 			this.Client = new ElasticClient(connectionSettings);
 
-			// Create index
-			if (!this.IndexExists())
+			if (this.Client.Ping(BuildPingRequest()).IsValid)
 			{
-				createIndexResponse = this.Client.Indices.Create(BuildIndexRequest(this.IndexName));
-				if (!createIndexResponse.IsValid)
+				// Create index
+				if (!this.IndexExists())
 				{
-					this.DebugInformation = createIndexResponse.DebugInformation;
-					throw createIndexResponse.OriginalException;
-					//return false;
-				}
+					createIndexResponse = this.Client.Indices.Create(BuildIndexRequest(this.IndexName));
+					if (!createIndexResponse.IsValid)
+					{
+						this.DebugInformation = createIndexResponse.DebugInformation;
+						throw createIndexResponse.OriginalException;
+					}
 
-				mapResponse = this.Client.Map<ElasticSearchDocument>(e => e.AutoMap());
-				if (!mapResponse.IsValid)
-				{
-					this.DebugInformation = mapResponse.DebugInformation;
-					throw createIndexResponse.OriginalException;
-					//return false;
-				}
+					mapResponse = this.Client.Map<ElasticSearchDocument>(e => e.AutoMap());
+					if (!mapResponse.IsValid)
+					{
+						this.DebugInformation = mapResponse.DebugInformation;
+						throw createIndexResponse.OriginalException;
+					}
 
-				// Configure a pipeline for attachments 
-				attachmentPipelineResponse = ConfigureAttachmentPipeline();
-				if (!attachmentPipelineResponse.IsValid)
-				{
-					this.DebugInformation = attachmentPipelineResponse.DebugInformation;
-					throw createIndexResponse.OriginalException;
-					//return false;
-				}
+					// Configure a pipeline for attachments 
+					attachmentPipelineResponse = ConfigureAttachmentPipeline();
+					if (!attachmentPipelineResponse.IsValid)
+					{
+						this.DebugInformation = attachmentPipelineResponse.DebugInformation;
+						throw createIndexResponse.OriginalException;
+					}
 
-				noAttachmentPipelineResponse = ConfigureNoAttachmentPipeline();
-				if (!noAttachmentPipelineResponse.IsValid)
-				{
-					this.DebugInformation = noAttachmentPipelineResponse.DebugInformation;
-					throw createIndexResponse.OriginalException;
-					//return false;
+					noAttachmentPipelineResponse = ConfigureNoAttachmentPipeline();
+					if (!noAttachmentPipelineResponse.IsValid)
+					{
+						this.DebugInformation = noAttachmentPipelineResponse.DebugInformation;
+						throw createIndexResponse.OriginalException;
+					}
 				}
 			}
 
 			return true;
+		}
+
+		private Nest.PingRequest BuildPingRequest()
+		{
+			return new Nest.PingRequest();
 		}
 
 		private Nest.CreateIndexRequest BuildIndexRequest(string Index)
@@ -136,7 +140,7 @@ namespace Nucleus.Extensions.ElasticSearch
 							new SetProcessor()
 							{
 								Field = ParseField(nameof(ElasticSearchDocument.Status)),
-								Value = "Error: could not process attachment. Ingest processor error: {{_ingest.on_failure_message}}." 
+								Value = "Error: could not process attachment. Ingest processor error: {{_ingest.on_failure_message}}."
 							},
 							new RemoveProcessor()
 							{
@@ -145,7 +149,7 @@ namespace Nucleus.Extensions.ElasticSearch
 								// original outside nucleus.
 								Field =  ParseField(nameof(ElasticSearchDocument.Content))
 							}
-						}						 
+						}
 					},
 					new SetProcessor()
 					{
@@ -155,7 +159,7 @@ namespace Nucleus.Extensions.ElasticSearch
 					new SetProcessor()
 					{
 						Field = ParseField(nameof(ElasticSearchDocument.Status)),
-						Value = "Entry with attachment was processed successfully." 
+						Value = "Entry with attachment was processed successfully."
 					},
 					//new SetProcessor()
 					//{
@@ -214,7 +218,7 @@ namespace Nucleus.Extensions.ElasticSearch
 					new SetProcessor()
 					{
 						Field = ParseField(nameof(ElasticSearchDocument.Status)),
-						Value = "Entry was processed successfully (no attachment)." 
+						Value = "Entry was processed successfully (no attachment)."
 					},
 					new SetProcessor()
 					{
@@ -320,7 +324,7 @@ namespace Nucleus.Extensions.ElasticSearch
 			Nest.DeleteResponse deleteResponse;
 
 			deleteRequest = new DeleteRequest<ElasticSearchDocument>(content)
-			{				 
+			{
 			};
 
 			requestSettings.DisableDirectStreaming = false;
@@ -358,7 +362,7 @@ namespace Nucleus.Extensions.ElasticSearch
 			SuggestContainer suggest = new SuggestContainer();
 
 			suggest.Add("suggest-title", BuildSuggestBucket(query.SearchTerm, ParseField(nameof(ElasticSearchDocument.SuggesterTitle)), maxSuggestions));
-			
+
 			searchRequest = new SearchRequest(this.IndexName)
 			{
 				Query = BuildSearchQuery(query),
@@ -374,7 +378,7 @@ namespace Nucleus.Extensions.ElasticSearch
 					}
 				}
 			};
-			
+
 			response = Search(searchRequest);
 
 			return response;
@@ -388,7 +392,7 @@ namespace Nucleus.Extensions.ElasticSearch
 				Completion = new CompletionSuggester()
 				{
 					Field = fieldName,
-					SkipDuplicates = true,					
+					SkipDuplicates = true,
 					Size = maxSuggestions,
 					Fuzzy = new SuggestFuzziness()
 					{
@@ -407,7 +411,7 @@ namespace Nucleus.Extensions.ElasticSearch
 
 			if (query.SearchTerm == string.Empty)
 				throw new ApplicationException("No search term");
-			else				
+			else
 				searchRequest = new SearchRequest(this.IndexName)
 				{
 					Query = BuildSearchQuery(query),
@@ -480,8 +484,8 @@ namespace Nucleus.Extensions.ElasticSearch
 				PostTags = new string[] { ("</em>") },
 				Fields = new Dictionary<Field, IHighlightField>()
 				{
-					{	nameof(ElasticSearchDocument.Summary), new HighlightField() { RequireFieldMatch = false }	},
-					{ nameof(ElasticSearchDocument.Title), new HighlightField()	{	RequireFieldMatch = false	}	}
+					{ nameof(ElasticSearchDocument.Summary), new HighlightField() { RequireFieldMatch = false } },
+					{ nameof(ElasticSearchDocument.Title), new HighlightField() { RequireFieldMatch = false } }
 				}
 			};
 		}

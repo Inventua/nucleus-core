@@ -1,0 +1,68 @@
+﻿@model Nucleus.OAuth.Server.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+@using (Html.BeginNucleusForm("Settings", "OAuthServerAdmin", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+	<fieldset role="group" aria-labelledby="heading">
+		<h2>Settings</h2>
+		@Html.HiddenFor(model => model.ClientApp.Id)		
+		<SettingsControl caption="API Key" helptext="Select the API key for this Client App, or leave set to 'create' to automatically create a new one.">
+			@Html.DropDownListFor(model => model.ClientApp.ApiKey.Id, new SelectList(Model.ApiKeys, "Id", "Name"), "(create)")
+		</SettingsControl>
+
+		<SettingsControl caption="Title" helptext="Client App Title.">
+			@Html.TextBoxFor(model => model.ClientApp.Title)
+		</SettingsControl>
+			
+		<SettingsControl caption="Token Lifetime (minutes)" helptext="OAuth2 token lifetime in minutes. ">
+			@Html.TextBoxFor(model => model.ClientApp.TokenExpiryMinutes)
+		</SettingsControl>
+
+		<SettingsControl caption="Redirect Uri" helptext="Enter one or more Redirect Uri values separated by commas.">
+			@Html.TextAreaFor(model => model.ClientApp.RedirectUri, new { @rows = 4 })
+		</SettingsControl>
+
+		<SettingsControl caption="Login Page" helptext="Login Page for this client App.  Leave this set to 'Site Default' if you want to use the configured login page for this site, or select a custom login page for the Client App.">
+			@Html.PageListFor(model => model.ClientApp.LoginPage, Model.Pages, Guid.Empty, "(site default)", new {})
+		</SettingsControl>
+
+		<div class="Tools">
+			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "OAuthServerAdmin", "OAuthServer"), new { @data_target = ".nucleus-admin-content" })				
+		</div>
+	</fieldset>
+}
+
+<script type="text/javascript">
+	$(document).ready(function() 
+	{
+		
+		// Read the child pages of the item containing the "+" button
+		jQuery('.nucleus-page-list').on('click', '.nucleus-get-childpages', function (e)
+		{
+			// Add a ul to contain the new pages
+			Page.LoadPartialContent(e, '@Url.NucleusAction("GetChildPages", "OAuthServerAdmin", "OAuthServer")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+
+			// hide the "+" button
+			jQuery(this).removeClass('show');
+
+		});
+				
+		// Hide the child pages of the item containing the "-" button
+		jQuery('.nucleus-page-list').on('click', '.nucleus-hide-childpages', function (e)
+		{
+			// hide the "-" button
+			jQuery(this).removeClass('show');
+
+			// show the "+" button
+			jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
+
+			jQuery(this).closest('li').find('ul').remove();
+		});
+	});
+
+
+
+</script>

@@ -49,9 +49,21 @@ namespace Nucleus.Modules.Account.Controllers
 		}
 
 		[HttpGet]
-		public ActionResult Index(string returnUrl, string token)
+		public ActionResult Index(string returnUrl, string token, string reason)
 		{
 			ViewModels.Login viewModel = BuildViewModel(returnUrl);
+
+			switch (reason)
+			{
+				case nameof(System.Net.HttpStatusCode.Forbidden):
+					viewModel.Message = "Access was denied.  Your account is not authorized to use this system.";
+					break;
+									
+				default:
+					viewModel.Message = "";
+					break;
+			}
+			
 
 			if (!String.IsNullOrEmpty(token) && viewModel.AllowPasswordReset)
 			{

@@ -7,27 +7,27 @@
 			<Id>{$guid2}</Id>
 			<Name>Administrators</Name>
 			<RoleGroupId xsi:nil="true" />
-			<Type>Normal</Type>
+			<Type>System</Type>
 		</AdministratorsRole>
 		<RegisteredUsersRole>
 			<Id>{$guid3}</Id>
 			<Name>Registered Users</Name>
 			<RoleGroupId xsi:nil="true" />
-			<Type>Normal</Type>
+			<Type>System</Type>
 		</RegisteredUsersRole>
 		<AllUsersRole>
 			<Id>{$guid4}</Id>
 			<Name>All Users</Name>
 			<RoleGroupId xsi:nil="true" />
 			<Description>This role represents all users, whether logged on or not.</Description>
-			<Type>Restricted</Type>
+			<Type>System Restricted</Type>
 		</AllUsersRole>
 		<AnonymousUsersRole>
 			<Id>{$guid5}</Id>
 			<Name>Anonymous Users</Name>
 			<RoleGroupId xsi:nil="true" />
 			<Description>This role represents users who are not logged on.</Description>
-			<Type>Restricted</Type>
+			<Type>System Restricted</Type>
 		</AnonymousUsersRole>
 		<SiteGroupId xsi:nil="true" />
 		<DefaultSiteAlias>
@@ -870,27 +870,27 @@
 			<Id>{$guid2}</Id>
 			<Name>Administrators</Name>
 			<RoleGroupId xsi:nil="true" />
-			<Type>Normal</Type>
+			<Type>System</Type>
 		</Role>
 		<Role>
 			<Id>{$guid4}</Id>
 			<Name>All Users</Name>
 			<RoleGroupId xsi:nil="true" />
 			<Description>This role represents all users, whether logged on or not.</Description>
-			<Type>Restricted</Type>
+			<Type>System Restricted</Type>
 		</Role>
 		<Role>
 			<Id>{$guid5}</Id>
 			<Name>Anonymous Users</Name>
 			<RoleGroupId xsi:nil="true" />
 			<Description>This role represents users who are not logged on.</Description>
-			<Type>Restricted</Type>
+			<Type>System Restricted</Type>
 		</Role>
 		<Role>
 			<Id>{$guid3}</Id>
 			<Name>Registered Users</Name>
 			<RoleGroupId xsi:nil="true" />
-			<Type>Normal</Type>
+			<Type>System</Type>
 		</Role>
 	</Roles>
 	<MailTemplates>

@@ -29,7 +29,7 @@
 					</SettingsControl>
 
 					<div class="nucleus-flex-fields interval">
-						<SettingsControl caption="Enabled?" helptext="Specifies whether this task is enabled.  Disabled tasks do not run automatically, but can be executed manuallly by using the 'Run now' button.">
+						<SettingsControl caption="Enabled?" helptext="Specifies whether this task is enabled.  Disabled tasks do not run automatically, but can be executed manually by using the 'Run now' button.">
 							@Html.CheckBoxFor(model => model.ScheduledTask.Enabled, new { @class = "ToggleSwitch" })
 						</SettingsControl>
 						<SettingsControl caption="Interval" helptext="Interval between each run.">

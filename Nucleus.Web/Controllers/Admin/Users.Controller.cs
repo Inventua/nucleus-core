@@ -122,8 +122,7 @@ namespace Nucleus.Web.Controllers.Admin
 				{
 					return BadRequest(modelState);
 				}
-
-				
+								
 				viewModel.User.Secrets.SetPassword(viewModel.EnteredPassword);
 			}
 
@@ -146,6 +145,11 @@ namespace Nucleus.Web.Controllers.Admin
 					viewModel.User.Approved = existing.Approved;
 				}
 			}
+
+			// We must NULL viewModel.User.Secrets because model binding always creates a new (empty) .Secrets object, which would cause
+			// the data provider to overwrite an existing user's secrets record with blanks.  Setting to null prevents the data provider 
+			// from saving secrets.
+			viewModel.User.Secrets = null;
 
 			await this.UserManager.Save(this.Context.Site, viewModel.User);
 

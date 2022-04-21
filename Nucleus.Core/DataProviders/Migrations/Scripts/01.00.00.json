@@ -371,7 +371,6 @@
 			"createIndex": {
 				"name": "IX_ScheduledTasks_Name",
 				"table": "ScheduledTasks",
-				"clrType": "boolean",
 				"isunique": true,
 				"columns": [ "Name" ]
 			}

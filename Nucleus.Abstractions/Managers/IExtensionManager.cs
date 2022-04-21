@@ -108,7 +108,7 @@ namespace Nucleus.Abstractions.Managers
 		/// </summary>
 		/// <param name="scope"></param>
 		/// <returns></returns>
-		public Task<List<ControlPanelExtensionDefinition>> ListControlPanelExtensions(ControlPanelExtensionDefinition.ControlPanelExtensionScopes scope);
+		public Task<IEnumerable<ControlPanelExtensionDefinition>> ListControlPanelExtensions(ControlPanelExtensionDefinition.ControlPanelExtensionScopes scope);
 
 		/// <summary>
 		/// Save a stream to a randomly generated filename in the temp folder.

@@ -348,7 +348,7 @@ ul.nucleus-control-panel-items a
 	color: #a8c600;
 }
 
-.nucleus-control-panel-items li.FilesIcon span
+.nucleus-control-panel-items li.FilesIcon span, .nucleus-control-panel-items li.ApiKeysIcon span
 {
 	color: #dd9700;
 }

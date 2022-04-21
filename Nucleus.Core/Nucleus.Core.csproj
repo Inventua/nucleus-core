@@ -27,6 +27,7 @@
     <None Remove="DataProviders\Migrations\Scripts\01.00.01.json" />
     <None Remove="DataProviders\Migrations\Scripts\01.00.02.json" />
     <None Remove="DataProviders\Migrations\Scripts\01.00.03.json" />
+    <None Remove="DataProviders\Migrations\Scripts\01.00.04.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +35,7 @@
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.01.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.00.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.03.json" />
+    <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.04.json" />
   </ItemGroup>
 
   <ItemGroup>

@@ -24,16 +24,11 @@
 				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$AdminController.cs">Admin.cs</ProjectItem>
       </Folder>
 			<Folder Name="DataProviders" TargetFolderName="DataProviders">
-				<Folder Name="Sqlite" TargetFolderName="Sqlite">
+				<Folder Name="Migrations" TargetFolderName="Migrations">
 					<Folder Name="Scripts" TargetFolderName="Scripts">
-						<ProjectItem ReplaceParameters="true" TargetFileName="01.00.00.sql">01.00.00.sql</ProjectItem>
+						<ProjectItem ReplaceParameters="true" TargetFileName="01.00.00.json">01.00.00.json</ProjectItem>
 					</Folder>
-				</Folder>
-				<Folder Name="SqlServer" TargetFolderName="SqlServer">
-					<Folder Name="Scripts" TargetFolderName="Scripts">
-						<ProjectItem ReplaceParameters="true" TargetFileName="01.00.00.sql">01.00.00.sql</ProjectItem>
-					</Folder>
-				</Folder>
+				</Folder>				
 				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$DataProvider.cs">DataProvider.cs</ProjectItem>
 				<ProjectItem ReplaceParameters="true" TargetFileName="I$nucleus_extension_name$DataProvider.cs">IDataProvider.cs</ProjectItem>
 				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$DbContext.cs">DbContext.cs</ProjectItem>

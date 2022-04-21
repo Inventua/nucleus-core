@@ -71,7 +71,7 @@ namespace Nucleus.Abstractions
 		/// Reserved route names.
 		/// </summary>
 		// the "pages" route isn't currently used for anything, but is reserved in case we want to use it later
-		public static readonly string[] RESERVED_ROUTES = { ADMIN_ROUTE_PATH, EXTENSIONS_ROUTE_PATH, "pages", SITEMAP_ROUTE_PATH, ERROR_ROUTE_PATH };
+		public static readonly string[] RESERVED_ROUTES = { ADMIN_ROUTE_PATH, EXTENSIONS_ROUTE_PATH, "pages", "oauth2", SITEMAP_ROUTE_PATH, ERROR_ROUTE_PATH };
 	}
 
 	/// <summary>

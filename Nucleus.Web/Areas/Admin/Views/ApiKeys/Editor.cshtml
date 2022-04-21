@@ -1,0 +1,54 @@
+﻿@model Nucleus.Web.ViewModels.Admin.ApiKeyEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@using (Html.BeginAreaForm("Save", "ApiKeys", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @autocomplete = "off" }))
+{
+	<fieldset ApiKey="group" aria-labelledby="heading">
+		<h2>API Key</h2>
+		
+		<SettingsControl caption="ID" helptext="Api Key Id (guid).  This is the value used as an access key for API request signing, or as the client_id in an OAuth request.  If you are creating a new Api Key, you can enter this value in order to have it match the value from another environment, but you can't change the Id of an existing key.">
+			@if (Model.IsNew)
+			{
+				@Html.TextBoxFor(model => model.ApiKey.Id, new { @maxlength = 36 })
+			}
+			else
+			{
+				@Html.HiddenFor(model => model.ApiKey.Id)
+				@Model.ApiKey.Id
+			}
+		</SettingsControl>
+
+		<SettingsControl caption="Name" helptext="Ap iKey name.  This value is displayed in on-screen controls which refer to ApiKeys.">
+			@Html.TextBoxFor(model => model.ApiKey.Name, new { @maxlength = 256 })
+		</SettingsControl>
+
+		<SettingsControl caption="Notes" helptext="Notes for your reference in the control panel pages.">
+			@Html.TextAreaFor(model => model.ApiKey.Notes, new { @maxlength = 512 })
+		</SettingsControl>
+
+		<SettingsControl caption="Secret" helptext="API Key Secret.  This value is used when encrypting API data.">
+			@Html.TextAreaFor(model => model.ApiKey.Secret, new { @maxlength = 256 })
+		</SettingsControl>
+
+		<SettingsControl caption="Scope" helptext="Line-feed separated list of scopes for the API key.  Scopes represent the claims that the API key is assigned during authentication.  The most common use is to assign a role, for example 'role:Registered Users'.'">
+			@Html.TextAreaFor(model => model.ApiKey.Scope, new { @maxlength = 512, @rows = 8 })
+		</SettingsControl>
+
+		<SettingsControl caption="Enabled?" helptext="Specifies whether this Api Key is enabled.  If a disabled Api key is used, an 'access denied' ">
+			@Html.CheckBoxFor(model => model.ApiKey.Enabled, new { @class = "ToggleSwitch" })
+		</SettingsControl>
+	</fieldset>
+	
+	<div class="nucleus-button-panel">
+		<input type="submit" class="btn btn-primary" value="Save Changes" />
+
+		@if (Model.ApiKey.Id != Guid.Empty)
+		{
+			<input type="submit" class="btn btn-danger" value="Delete Api Key" formaction="@Url.AreaAction("DeleteApiKey", "ApiKeys", "Admin")" data-confirm="Delete this ApiKey?" />
+		}
+	</div>
+	
+}
+

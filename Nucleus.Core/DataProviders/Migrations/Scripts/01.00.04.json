@@ -1,0 +1,72 @@
+{
+	"schemaName": "Nucleus.Core",
+	"version": "01.00.04",
+	"operations": [
+		{
+			"createTable": {
+				"name": "ApiKeys",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Name",
+						"clrType": "string",
+						"isnullable": true,
+						"maxlength": 256
+					},
+					{
+						"name": "Notes",
+						"clrType": "string",
+						"isnullable": true,
+						"maxlength": 512
+					},
+					{
+						"name": "Secret",
+						"clrType": "string",
+						"isnullable": true,
+						"maxlength": 256
+					},
+					{
+						"name": "Scope",
+						"clrType": "string",
+						"isnullable": true,
+						"maxlength": 512
+					},
+					{
+						"name": "Enabled",
+						"clrType": "boolean",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_APIKeys",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				}
+			}
+		}
+	]
+}

@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+		<RootNamespace>Nucleus.OAuth.Server</RootNamespace>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+<ItemGroup>
+		<None Remove="**\*.vspscc" />
+		<None Remove="**\*.scc" />
+		<None Remove="*.zip" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <None Remove="DataProviders\Migrations\Scripts\01.00.00.json" />
+    <None Remove="settings.css" />
+    <None Remove="viewer.css" />
+    <None Remove="package.xml" />
+    <None Remove="readme.txt" />
+    <None Remove="Views\Editor.cshtml" />
+    <None Remove="Views\Settings.cshtml" />
+    <None Remove="Views\Viewer.cshtml" />
+    <None Remove="Views\_ClientAppsList.cshtml" />
+    <None Remove="Views\_PageMenu.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="viewer.css" />
+    <Content Include="package.xml" />
+    <Content Include="readme.txt" />
+    <Content Include="settings.css" />
+    <Content Include="Views\Editor.cshtml" />
+    <Content Include="Views\Viewer.cshtml" />
+    <Content Include="Views\Settings.cshtml" />
+    <Content Include="Views\_ClientAppsList.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\_PageMenu.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.00.json" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Nucleus.Abstractions" Version="1.0.0.3" />
+		<PackageReference Include="Nucleus.Extensions" Version="1.0.0" />
+		<PackageReference Include="Nucleus.ViewFeatures" Version="1.0.0.2" />
+		<PackageReference Include="Nucleus.Data.Common" Version="1.0.0" />
+		<PackageReference Include="Nucleus.Data.EntityFramework" Version="1.0.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.17.0" />
+	</ItemGroup>
+
+	<PropertyGroup Label="Nucleus">
+		<ExtensionFolder>OAuth Server</ExtensionFolder>
+		<Version>1.0.0</Version>
+		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+	</PropertyGroup>
+
+	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+</Project>

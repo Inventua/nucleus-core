@@ -89,6 +89,8 @@ namespace Nucleus.Core
 			services.AddSingleton<IContentManager, Managers.ContentManager>();
 			services.AddSingleton<IPermissionsManager, Managers.PermissionsManager>();
 
+			services.AddSingleton<IApiKeyManager, Managers.ApiKeyManager>();
+
 			// Search
 			services.AddTransient<IContentMetaDataProducer, Search.PageMetaDataProducer>();
 			services.AddTransient<IContentMetaDataProducer, Search.FileMetaDataProducer>();

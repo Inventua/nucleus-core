@@ -41,7 +41,6 @@ namespace $nucleus_extension_namespace$.Controllers
 			return View("Settings", BuildSettingsViewModel(viewModel));
 		}
 
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpPost]
 		public ActionResult SaveSettings(ViewModels.Settings viewModel)
 		{

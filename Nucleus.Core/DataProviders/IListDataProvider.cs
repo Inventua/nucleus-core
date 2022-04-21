@@ -9,8 +9,8 @@ using Nucleus.Data.Common;
 
 namespace Nucleus.Core.DataProviders
 {
-	/// Provides create, read, update and delete functionality for the <see cref="Folder"/>, <see cref="Role"/> and <see cref="RoleGroup"/> classes.
-	internal interface IListDataProvider : IDisposable//, IDataProvider<IListDataProvider>
+	/// Provides create, read, update and delete functionality for the <see cref="List"/> class.
+	internal interface IListDataProvider : IDisposable
 	{
 		abstract Task<IEnumerable<List>> ListLists(Site site);
 		abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<List>> ListLists(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);

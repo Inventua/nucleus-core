@@ -46,7 +46,7 @@ namespace Nucleus.Core.Managers
 		/// </remarks>
 		public Task<UserSession> CreateNew(Site site, User user, Boolean rememberMe, System.Net.IPAddress remoteIpAddress)
 		{
-			return Task.FromResult(new UserSession(site, user, rememberMe, remoteIpAddress, DateTime.UtcNow.Add(this.Options.Value.ExpireTimeSpan), !this.Options.Value.ExpireTimeSpan.Equals(TimeSpan.Zero)));
+			return Task.FromResult(new UserSession(site, user, rememberMe, remoteIpAddress, DateTime.UtcNow.Add(this.Options.Value.ExpireTimeSpan), !this.Options.Value.ExpireTimeSpan.Equals(TimeSpan.Zero)));			
 		}
 
 		/// <summary>
@@ -116,6 +116,10 @@ namespace Nucleus.Core.Managers
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{
 				user = await provider.GetUser(userSession.UserId);
+				if (user.Secrets == null)
+				{
+					user.Secrets = new();
+				}
 			}
 
 			user.Secrets.LastLoginDate = DateTime.UtcNow;

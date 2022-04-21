@@ -14,6 +14,7 @@ using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
 using Nucleus.Abstractions.Models.FileSystem;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Nucleus.Abstractions.Models.Paging;
 
 namespace Nucleus.Core.DataProviders
 {
@@ -23,7 +24,7 @@ namespace Nucleus.Core.DataProviders
 	/// <remarks>
 	/// This class implements all of the data provider interfaces for use with entity framework.  
 	/// </remarks>
-	public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayoutDataProvider, IUserDataProvider, IPermissionsDataProvider, ISessionDataProvider, IMailDataProvider, IScheduledTaskDataProvider, IFileSystemDataProvider, IListDataProvider, IContentDataProvider
+	public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayoutDataProvider, IUserDataProvider, IPermissionsDataProvider, ISessionDataProvider, IMailDataProvider, IScheduledTaskDataProvider, IFileSystemDataProvider, IListDataProvider, IContentDataProvider, IApiKeyDataProvider
 	{
 		protected IEventDispatcher EventManager { get; }
 		protected new CoreDataProviderDbContext Context { get; }
@@ -1009,7 +1010,7 @@ namespace Nucleus.Core.DataProviders
 				.Where(existing => existing.Id == userId)
 				.Include(existing => existing.Roles)
 				.FirstOrDefaultAsync();
-
+			
 			if (existing != null)
 			{
 				// add new role assignments
@@ -1243,6 +1244,8 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task<List<PermissionType>> ListPermissionTypes(string scopeNamespace)
 		{
+			// if you get a weird error in debug mode saying this can't be parsed, restart the application in Visual Studio.  The error
+			// is caused by a bug in entity framework with visual studio edit & continue.
 			return await this.Context.PermissionTypes
 				.Where(typ => EF.Functions.Like(typ.Scope, $"%{scopeNamespace}%"))
 				.AsNoTracking()
@@ -2130,9 +2133,71 @@ namespace Nucleus.Core.DataProviders
 			await this.Context.SaveChangesAsync<Content>();
 		}
 
+		#endregion
 
+		#region "    API Keys    "
+
+
+		public async Task<IEnumerable<ApiKey>> ListApiKeys()
+		{
+			return await this.Context.ApiKeys
+				.AsNoTracking()
+				.ToListAsync();
+		}
+
+		public async Task<PagedResult<ApiKey>> ListApiKeys(PagingSettings pagingSettings)
+		{
+			List<ApiKey> results;
+
+			var query = this.Context.ApiKeys;
+
+			pagingSettings.TotalCount = await query
+				.CountAsync();
+
+			results = await query
+				.OrderBy(ApiKey => ApiKey.Name)
+				.Skip(pagingSettings.FirstRowIndex)
+				.Take(pagingSettings.PageSize)
+				.AsNoTracking()
+				.ToListAsync();
+
+			return new Nucleus.Abstractions.Models.Paging.PagedResult<ApiKey>(pagingSettings, results);
+		}
+
+		public async Task<ApiKey> GetApiKey(Guid id)
+		{
+			return await this.Context.ApiKeys
+				.Where(content => content.Id == id)
+				.AsNoTracking()
+				.FirstOrDefaultAsync();
+		}
+
+		public async Task SaveApiKey(ApiKey apiKey)
+		{
+			Boolean isNew = !this.Context.ApiKeys.Where(existing => existing.Id == apiKey.Id).Any();
+
+			this.Context.Attach(apiKey);
+			this.Context.Entry(apiKey).State = isNew ? EntityState.Added : EntityState.Modified;
+			await this.Context.SaveChangesAsync();
+
+			if (isNew)
+			{
+				this.EventManager.RaiseEvent<ApiKey, Create>(apiKey);
+			}
+			else
+			{
+				this.EventManager.RaiseEvent<ApiKey, Update>(apiKey);
+			}
+		}
+
+		public async Task DeleteApiKey(ApiKey apiKey)
+		{
+			this.Context.ApiKeys.Remove(apiKey);
+			await this.Context.SaveChangesAsync();
+		}
 
 		#endregion
+
 	}
 }
 

@@ -8,7 +8,7 @@
 	@using (Html.BeginNucleusForm("Settings", "GoogleAnalytics", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 	{
 		<fieldset role="group" aria-labelledby="heading">
-			<h2>Settings</h2>
+			<h2 class="nucleus-control-panel-heading">Settings</h2>
 			<div class="nucleus-flex-fields">
 				<SettingsControl caption="Google Analytics ID" helptext="Enter the Google Analytics ID for your site.  You can disable Google Analytics by setting a blank value.">
 					@Html.TextBoxFor(model => model.GoogleAnalyticsId)

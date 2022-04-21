@@ -1,0 +1,226 @@
+{
+	"schemaName": "Nucleus.OAuth.Server",
+	"version": "01.00.00",
+	"operations": [
+		{
+			"createTable": {
+				"name": "OAuthServerClientApps",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ApiKeyId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Title",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "RedirectUri",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "LoginPageId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "TokenExpiryMinutes",
+						"clrType": "int",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_OAuthServerClientApps",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_OAuthServerClientApps_LoginPageId",
+						"Columns": [ "LoginPageId" ],
+						"PrincipalTable": "Pages",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "SetNull"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_OAuthServerClientApps_LoginPageId",
+				"table": "Pages",
+				"isunique": false,
+				"columns": [ "LoginPageId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_OAuthServerClientApps_ApiKeyId",
+				"table": "OAuthServerClientApps",
+				"isunique": true,
+				"columns": [ "ApiKeyId" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "OAuthServerClientAppTokens",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ClientAppId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "RedirectUri",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": false
+					},
+					{
+						"name": "Type",
+						"clrType": "string",
+						"maxLength": 32,
+						"isnullable": false
+					},
+					{
+						"name": "State",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "Scope",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "Code",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "UserId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "AccessToken",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "RefreshToken",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "ExpiryDate",
+						"clrType": "datetime",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_OAuthServerClientAppTokens",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_OAuthServerClientAppTokens_OAuthServerClientAppId",
+						"Columns": [ "ClientAppId" ],
+						"PrincipalTable": "OAuthServerClientApps",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					},
+					{
+						"name": "FK_OAuthServerClientAppTokens_UserId",
+						"Columns": [ "UserId" ],
+						"PrincipalTable": "Users",
+						"PrincipalColumns": [ "Id" ]
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_OAuthServerClientAppTokens_OAuthServerClientAppId",
+				"table": "OAuthServerClientApps",
+				"isunique": false,
+				"columns": [ "ApiKeyId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_OAuthServerClientAppTokens_ExpiryDate",
+				"table": "OAuthServerClientApps",
+				"isunique": false,
+				"columns": [ "ExpiryDate" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_OAuthServerClientAppTokens_Code",
+				"table": "OAuthServerClientAppTokens",
+				"isunique": true,
+				"columns": [ "Code" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_OAuthServerClientAppTokens_AccessToken",
+				"table": "OAuthServerClientAppTokens",
+				"isunique": true,
+				"columns": [ "AccessToken" ]
+			}
+		}
+	]
+}

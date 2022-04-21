@@ -90,6 +90,6 @@
 
 		<RemoveDir Directories="AppPackage" />
 
-		<Copy SourceFiles="$(ExtensionFolder)_Extension.zip" DestinationFolder="$(NUCLEUS_PATH)\Setup\Extensions\" Retries="2" />
+		<Copy SourceFiles="$(ExtensionFolder)_Extension.zip" DestinationFolder="$(NUCLEUS_PATH)\Setup\Extensions\" Retries="2" Condition="$(CopyToDefaultSetup) != false " />
 	</Target>
 </Project>

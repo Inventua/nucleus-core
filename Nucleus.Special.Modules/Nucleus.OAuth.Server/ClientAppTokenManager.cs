@@ -105,5 +105,17 @@ namespace Nucleus.OAuth.Server
 			}
 		}
 
+		/// <summary>
+		/// Remove expired tokens
+		/// </summary>
+		/// <param name="expiryThreshold"></param>
+		/// <returns></returns>
+		public async Task ExpireTokens()
+		{
+			using (IClientAppTokenDataProvider provider = this.DataProviderFactory.CreateProvider<IClientAppTokenDataProvider>())
+			{
+				await provider.ExpireTokens(TimeSpan.FromDays(1));
+			}
+		}
 	}
 }

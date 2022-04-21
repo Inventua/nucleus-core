@@ -16,5 +16,6 @@ namespace Nucleus.OAuth.Server.DataProviders
 		public Task SaveToken(ClientAppToken clientAppToken);
 		public Task DeleteToken(ClientAppToken clientAppToken);
 
+		public Task ExpireTokens(TimeSpan expiryThreshold);
 	}
 }

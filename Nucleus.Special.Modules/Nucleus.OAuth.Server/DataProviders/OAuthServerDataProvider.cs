@@ -164,5 +164,17 @@ namespace Nucleus.OAuth.Server.DataProviders
 			await this.Context.SaveChangesAsync<ClientAppToken>();
 		}
 
+		public async Task ExpireTokens(TimeSpan expiryThreshold)
+		{
+			DateTime expiryDate = DateTime.UtcNow.Add(-expiryThreshold);
+			
+			List<ClientAppToken> expiredTokens = await this.Context.ClientAppTokens
+				.Where(clientAppToken => clientAppToken.DateAdded < expiryDate)
+				.ToListAsync();
+
+			this.Context.RemoveRange(expiredTokens);
+
+			await this.Context.SaveChangesAsync<ClientAppToken>();
+		}
 	}
 }

@@ -132,7 +132,7 @@ namespace Nucleus.OAuth.Client
 			if (ctx.TokenResponse.Response.RootElement.TryGetProperty("id_token", out System.Text.Json.JsonElement value))
 			{
 				JwtSecurityTokenHandler handler = new();
-			
+
 				JwtSecurityToken token = handler.ReadJwtToken(value.ToString());
 
 				// Look for claim actions (set in config/code with MapJsonType) in the JWT payload (token claims).  If found, add claims

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Nucleus.Extensions.Authorization;
 using Nucleus.ViewFeatures;
 using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt; 
 
 namespace Nucleus.OAuth.Server.Controllers
 {
@@ -97,7 +98,16 @@ namespace Nucleus.OAuth.Server.Controllers
 				token.State = state;
 
 				await this.ClientAppTokenManager.Save(token);
-				return await RedirectToLogin(token);
+
+				if (User.Identity.IsAuthenticated)
+				{
+					// User is already logged in, redirect back immediately
+					return await Respond(token.Id);
+				}
+				else
+				{
+					return await RedirectToLogin(token);
+				}
 			}
 		}
 
@@ -105,6 +115,7 @@ namespace Nucleus.OAuth.Server.Controllers
 		/// <summary>
 		/// Receive a redirect from the Nucleus login module, proces it and redirect back to the original caller (Oauth client).
 		/// </summary>
+		/// <param name="id">The id of an app token created by /Authenticate and included in the ReturnUri sent to the login module.</param>
 		/// <returns></returns>
 		[HttpGet]
 		[Route("/oauth2/respond/{id}")]
@@ -194,13 +205,35 @@ namespace Nucleus.OAuth.Server.Controllers
 				{
 					access_token = token.AccessToken,
 					token_type = "Bearer",
-					expires_in = (token.ExpiryDate - DateTime.Now).TotalMinutes
+					expires_in = (token.ExpiryDate - DateTime.Now).TotalMinutes,
+					token_id = await BuildJwtToken(token)
 					// we don't currently support refresh tokens
 					//refresh_token = token.RefreshToken
 				});
 			}
 		}
 
+		private async Task<string> BuildJwtToken(ClientAppToken appToken)
+		{
+			JwtSecurityTokenHandler handler = new();
+			User user = await this.UserManager.Get(this.Context.Site, appToken.UserId.Value);
+			Dictionary<string, Object> claims;
+
+			if (user == null) return null;
+
+			claims = BuildUserClaims(user);
+						
+			Microsoft.IdentityModel.Tokens.SecurityTokenDescriptor descriptor = new()
+			{
+				Audience=appToken.ClientApp.ApiKey.Id.ToString(),
+				Issuer=this.Context.Site.DefaultSiteAlias.Alias,
+				NotBefore=DateTime.UtcNow,
+				Expires=DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)),
+				Claims = claims
+			};
+
+			return handler.CreateEncodedJwt(descriptor);
+		}
 
 		[HttpGet]
 		[Route("/oauth2/userinfo")]
@@ -233,25 +266,52 @@ namespace Nucleus.OAuth.Server.Controllers
 					return BadRequest("Invalid_request");
 				}
 
+
+				Dictionary<string, Object> claims = BuildUserClaims(user);
 				System.Dynamic.ExpandoObject result = new();
 
-				result.TryAdd(ClaimTypes.NameIdentifier, user.Id);
-				result.TryAdd(ClaimTypes.Name, user.UserName);
+				foreach (var value in claims)
+				{
+					result.TryAdd(value.Key, value.Value);
+				}
 				
-				// A user can be in more than one role, so the role claim is set to an array
-				if (user.Roles != null && user.Roles.Any())
-				{
-					result.TryAdd("roles", user.Roles.Select(role => role.Name));
-					//result.TryAdd(ClaimTypes.Role, String.Join(",", user.Roles.Select(role => role.Name)));
-				}
+				//result.TryAdd(ClaimTypes.NameIdentifier, user.Id);
+				//result.TryAdd(ClaimTypes.Name, user.UserName);
+				
+				//// A user can be in more than one role, so the role claim is set to an array
+				//if (user.Roles != null && user.Roles.Any())
+				//{
+				//	result.TryAdd("roles", user.Roles.Select(role => role.Name));
+				//}
 
-				foreach (UserProfileValue value in user.Profile)
-				{
-					result.TryAdd(value.UserProfileProperty.TypeUri, value.Value);
-				}
+				//foreach (UserProfileValue value in user.Profile)
+				//{
+				//	result.TryAdd(value.UserProfileProperty.TypeUri, value.Value);
+				//}
 
 				return Json(result);
 			}
+		}
+
+		private Dictionary<string, Object> BuildUserClaims(User user)
+		{
+			Dictionary<string, Object> claims = new();
+
+			claims.Add(ClaimTypes.NameIdentifier, user.Id.ToString());
+			claims.Add(ClaimTypes.Name, user.UserName);					
+
+			foreach (UserProfileValue value in user.Profile)
+			{
+				claims.Add(value.UserProfileProperty.TypeUri, value.Value);
+			}
+
+			// A user can be in more than one role, so the role claim is set to a comma-separated list
+			if (user.Roles != null && user.Roles.Any())
+			{
+				claims.Add("roles", user.Roles.Select(role => role.Name));
+			}
+
+			return claims;
 		}
 
 		private async Task<RedirectResult> RedirectToLogin(ClientAppToken token)

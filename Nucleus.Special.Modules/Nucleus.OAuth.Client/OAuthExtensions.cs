@@ -17,7 +17,7 @@ namespace Nucleus.OAuth.Client
 {
 	internal static class OAuthExtensions
 	{
-		private static string[] ReservedProperties = GetReservedProperties();// new[] { nameof(Models.Configuration.OAuthProvider.Name), nameof(Models.Configuration.OAuthProvider.Type), nameof(Models.Configuration.OAuthProvider.MapJsonKeys), nameof(Models.Configuration.OAuthProvider.Scope) };
+		private static string[] ReservedProperties = GetReservedProperties();
 
 		private static string[] GetReservedProperties()
 		{

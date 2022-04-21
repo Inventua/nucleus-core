@@ -1,0 +1,71 @@
+﻿@model Nucleus.Modules.ContactUs.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+@using (Html.BeginNucleusForm("Settings", "ContactUs", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+	<fieldset role="group" aria-labelledby="heading">
+		<h2>Settings</h2>
+		<div class="nucleus-flex-fields">
+			<SettingsControl caption="Categories List" helptext="Select the list to use for categories for this module instance.  Lists are managed in the Nucleus Lists manager.">
+				@Html.DropDownListFor(model => model.CategoryList.Id, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")
+			</SettingsControl>
+
+			<SettingsControl caption="Mail Templates" helptext="Email template used to generate an email message when the user clicks send.">
+				@Html.DropDownListFor(model => model.MailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(not selected)")
+			</SettingsControl>
+		</div>
+
+		<h2>Fields</h2>
+		<div class="nucleus-flex-fields">
+			<SettingsControl caption="Show Name?" class="inner-inline" rendermode="LabelLast" helptext="Show the first name and last name fields.">
+				@Html.CheckBoxFor(model => model.ShowName, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+
+			<SettingsControl caption="Require Name?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the first name and last name fields are mandatory.">
+				@Html.CheckBoxFor(model => model.RequireName, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+		</div>
+		<div class="nucleus-flex-fields">
+			<SettingsControl caption="Show Company?" class="inner-inline" rendermode="LabelLast" helptext="Show the company name field.">
+				@Html.CheckBoxFor(model => model.ShowCompany, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+
+			<SettingsControl caption="Require Company?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the company name field is mandatory.">
+				@Html.CheckBoxFor(model => model.RequireCompany, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+		</div>
+		<div class="nucleus-flex-fields">
+			<SettingsControl caption="Show Phone Number?" class="inner-inline" rendermode="LabelLast" helptext="Show the phone number field.">
+				@Html.CheckBoxFor(model => model.ShowPhoneNumber, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+
+			<SettingsControl caption="Require Phone Number?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the phone number field is mandatory.">
+				@Html.CheckBoxFor(model => model.RequirePhoneNumber, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+		</div>
+		<div class="nucleus-flex-fields">
+			<SettingsControl caption="Show Category?" class="inner-inline" rendermode="LabelLast" helptext="Show the category field.">
+				@Html.CheckBoxFor(model => model.ShowCategory, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+
+			<SettingsControl caption="Require Category?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the phone number field is mandatory.">
+				@Html.CheckBoxFor(model => model.RequireCategory, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+		</div>
+		<div class="nucleus-flex-fields">
+			<SettingsControl caption="Show Subject?" class="inner-inline" rendermode="LabelLast" helptext="Show the subject field.">
+				@Html.CheckBoxFor(model => model.ShowSubject, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+
+			<SettingsControl caption="Require Subject?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the subject field is mandatory.">
+				@Html.CheckBoxFor(model => model.RequireSubject, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+		</div>
+		<div class="Tools">
+			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "ContactUs", "ContactUs"), new { })
+		</div>
+	</fieldset>
+}

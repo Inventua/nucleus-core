@@ -151,7 +151,7 @@ namespace Nucleus.OAuth.Client.Controllers
 
 			string layoutPath = $"ViewerLayouts\\{viewModel.Layout}.cshtml";
 
-			if (!System.IO.File.Exists($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\OAuth\\Views\\{layoutPath}"))
+			if (!System.IO.File.Exists($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\OAuth Client\\Views\\{layoutPath}"))
 			{
 				layoutPath = $"ViewerLayouts\\List.cshtml";
 			}
@@ -172,7 +172,7 @@ namespace Nucleus.OAuth.Client.Controllers
 			viewModel.ReadSettings(this.Context.Module);
 
 			viewModel.Layouts = new();
-			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\OAuth\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
+			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\OAuth Client\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
 			{
 				viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
 			}

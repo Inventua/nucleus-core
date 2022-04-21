@@ -53,6 +53,20 @@ namespace Nucleus.Core.Managers
 		}
 
 		/// <summary>
+		/// Retrieve an existing <see cref="Role"/> from the database.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		public async Task<Role> GetByName(Site site, string name)
+		{
+			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+			{
+				return await provider.GetRoleByName(name);
+			};
+		}
+
+		/// <summary>
 		/// List all <see cref="Role"/>s for the specified site.
 		/// </summary>
 		/// <param name="site"></param>

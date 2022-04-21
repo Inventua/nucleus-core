@@ -56,7 +56,7 @@ namespace Nucleus.OAuth.Client.Controllers
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
 		[HttpPost]
-		public async Task<ActionResult> SaveSettings(ViewModels.SiteClientSettings viewModel)
+		public async Task<ActionResult> SaveSiteSettings(ViewModels.SiteClientSettings viewModel)
 		{
 			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteClientSettings.SETTING_MATCH_BY_NAME, viewModel.MatchByName);
 			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteClientSettings.SETTING_MATCH_BY_EMAIL, viewModel.MatchByEmail);
@@ -64,6 +64,10 @@ namespace Nucleus.OAuth.Client.Controllers
 			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteClientSettings.SETTING_CREATE_USERS, viewModel.CreateUsers);
 			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteClientSettings.SETTING_AUTO_VERIFY, viewModel.AutomaticallyVerifyNewUsers);
 			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteClientSettings.SETTING_AUTO_APPROVE, viewModel.AutomaticallyApproveNewUsers);
+
+			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteClientSettings.SETTING_SYNC_ROLES, viewModel.SynchronizeRoles);
+			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteClientSettings.SETTING_ADD_ROLES, viewModel.AddToRoles);
+			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteClientSettings.SETTING_REMOVE_ROLES, viewModel.RemoveFromRoles);
 
 			await this.SiteManager.Save(this.Context.Site);
 

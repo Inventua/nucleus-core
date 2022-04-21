@@ -15,9 +15,14 @@ namespace Nucleus.OAuth.Client.ViewModels
 	{
 		internal const string SETTING_MATCH_BY_NAME = "oauth:match-by-name";
 		internal const string SETTING_MATCH_BY_EMAIL = "oauth:match-by-email";
+
 		internal const string SETTING_CREATE_USERS = "oauth:create-users";
 		internal const string SETTING_AUTO_VERIFY = "oauth:auto-verify";
 		internal const string SETTING_AUTO_APPROVE = "oauth:auto-approve";
+
+		internal const string SETTING_SYNC_ROLES = "oauth:sync-roles";
+		internal const string SETTING_ADD_ROLES = "oauth:sync-roles-add";
+		internal const string SETTING_REMOVE_ROLES = "oauth:sync-roles-remove";
 
 		public Boolean MatchByName { get; set; }=true;
 		public Boolean MatchByEmail { get; set; }
@@ -25,6 +30,11 @@ namespace Nucleus.OAuth.Client.ViewModels
 		public Boolean CreateUsers { get; set; }
 		public Boolean AutomaticallyApproveNewUsers { get; set; } = true;
 		public Boolean AutomaticallyVerifyNewUsers { get; set; } = true;
+
+		public Boolean SynchronizeRoles { get; set; }
+		public Boolean AddToRoles { get; set; }
+		public Boolean RemoveFromRoles { get; set; }
+
 
 		public void ReadSettings(Site site)
 		{
@@ -51,6 +61,21 @@ namespace Nucleus.OAuth.Client.ViewModels
 			if (site.SiteSettings.TryGetValue(SETTING_AUTO_APPROVE, out Boolean automaticallyApproveNewUsers))
 			{
 				this.AutomaticallyApproveNewUsers = automaticallyApproveNewUsers;
+			}
+
+			if (site.SiteSettings.TryGetValue(SETTING_SYNC_ROLES, out Boolean syncRoles))
+			{
+				this.SynchronizeRoles = syncRoles;
+			}
+
+			if (site.SiteSettings.TryGetValue(SETTING_ADD_ROLES, out Boolean addRoles))
+			{
+				this.AddToRoles = addRoles;
+			}
+
+			if (site.SiteSettings.TryGetValue(SETTING_REMOVE_ROLES, out Boolean removeRoles))
+			{
+				this.RemoveFromRoles = removeRoles;
 			}
 
 		}

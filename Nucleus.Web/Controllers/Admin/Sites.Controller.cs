@@ -371,9 +371,9 @@ namespace Nucleus.Web.Controllers.Admin
 				await this.RoleManager.Save(viewModel.Site, viewModel.Site.AdministratorsRole);
 				viewModel.Site.RegisteredUsersRole.Type = Role.RoleType.System;
 				await this.RoleManager.Save(viewModel.Site, viewModel.Site.RegisteredUsersRole);
-				viewModel.Site.AnonymousUsersRole.Type = Role.RoleType.System;
+				viewModel.Site.AnonymousUsersRole.Type = Role.RoleType.System | Role.RoleType.Restricted;
 				await this.RoleManager.Save(viewModel.Site, viewModel.Site.AnonymousUsersRole);
-				viewModel.Site.AllUsersRole.Type = Role.RoleType.System;
+				viewModel.Site.AllUsersRole.Type = Role.RoleType.System | Role.RoleType.Restricted;
 				await this.RoleManager.Save(viewModel.Site, viewModel.Site.AllUsersRole);
 
 				await this.SiteManager.Save(viewModel.Site);
@@ -411,12 +411,16 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			// Aliases are not held in hidden fields & are lost between postbacks
 			Site fullSite = await this.SiteManager.Get(viewModel.Site.Id);
-			viewModel.Site.Aliases = fullSite?.Aliases;
-			viewModel.Site.UserProfileProperties = fullSite?.UserProfileProperties;
 
-			viewModel.AllowPublicRegistration = fullSite.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.SignupAllowed);
-			viewModel.RequireApproval = fullSite.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.RequireApproval);
-			viewModel.RequireEmailVerification = fullSite.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.RequireEmailVerification);
+			if (fullSite != null)
+			{
+				viewModel.Site.Aliases = fullSite?.Aliases;
+				viewModel.Site.UserProfileProperties = fullSite?.UserProfileProperties;
+
+				viewModel.AllowPublicRegistration = fullSite.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.SignupAllowed);
+				viewModel.RequireApproval = fullSite.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.RequireApproval);
+				viewModel.RequireEmailVerification = fullSite.UserRegistrationOptions.HasFlag(Site.SiteUserRegistrationOptions.RequireEmailVerification);
+			}
 
 			viewModel.IsCurrentSite = (viewModel.Site.Id == this.Context.Site.Id);
 

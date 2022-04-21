@@ -210,7 +210,7 @@ namespace Nucleus.OAuth.Server.Controllers
 
 			if (authHeaderValues.Length != 1 || !authHeaderValues[0].StartsWith(TOKEN_TYPE, StringComparison.OrdinalIgnoreCase))
 			{
-				return BadRequest();
+				return BadRequest("Invalid_request");
 			}
 			else
 			{
@@ -218,14 +218,19 @@ namespace Nucleus.OAuth.Server.Controllers
 
 				if (token == null)
 				{
-					return BadRequest();
+					return BadRequest("Invalid_token");
+				}
+
+				if (token.ExpiryDate < DateTime.UtcNow)
+				{
+					return Unauthorized("Expired_token");
 				}
 
 				Nucleus.Abstractions.Models.User user = await this.UserManager.Get(this.Context.Site, token.UserId.Value);
 
 				if (user == null)
 				{
-					return BadRequest();
+					return BadRequest("Invalid_request");
 				}
 
 				System.Dynamic.ExpandoObject result = new();
@@ -233,9 +238,11 @@ namespace Nucleus.OAuth.Server.Controllers
 				result.TryAdd(ClaimTypes.NameIdentifier, user.Id);
 				result.TryAdd(ClaimTypes.Name, user.UserName);
 				
+				// A user can be in more than one role, so the role claim is set to an array
 				if (user.Roles != null && user.Roles.Any())
 				{
-					result.TryAdd(ClaimTypes.Role, user.Roles.Select(role => role.Name));
+					result.TryAdd("roles", user.Roles.Select(role => role.Name));
+					//result.TryAdd(ClaimTypes.Role, String.Join(",", user.Roles.Select(role => role.Name)));
 				}
 
 				foreach (UserProfileValue value in user.Profile)
@@ -245,9 +252,7 @@ namespace Nucleus.OAuth.Server.Controllers
 
 				return Json(result);
 			}
-
 		}
-
 
 		private async Task<RedirectResult> RedirectToLogin(ClientAppToken token)
 		{

@@ -14,7 +14,7 @@ namespace Nucleus.Abstractions.Authentication
 		/// <summary>
 		/// Authentication scheme name
 		/// </summary>
-		public const string DEFAULT_AUTH_SCHEME = "urn:nucleus/authentication/nucleus-default";
+		public const string DEFAULT_AUTH_SCHEME = "urn:nucleus/authentication/default-scheme-name";
 
 		/// <summary>
 		/// Nucleus session ID claim URI.
@@ -22,27 +22,11 @@ namespace Nucleus.Abstractions.Authentication
 		/// <remarks>
 		/// This claim type is used in the cookie which is used to represent a logged-on user.
 		/// </remarks>
-		public const string SESSION_ID_CLAIMTYPE = "urn:nucleus/identity/claims/session-id";
+		public const string SESSION_ID_CLAIMTYPE = "urn:nucleus/identity/claims/sessionid";
 
 		/// <summary>
 		/// Nucleus System Administrator claim Uri.
 		/// </summary>
-		public const string SYSADMIN_CLAIMTYPE = "urn:nucleus/identity/claims/is-system-administrator";
-
-		/// <summary>
-		/// Nucleus not-approved user claim Uri.
-		/// </summary>
-		public const string NOT_APPROVED_CLAIMTYPE = "urn:nucleus/identity/claims/not-approved";
-
-		/// <summary>
-		/// Nucleus unverified user claim Uri.
-		/// </summary>
-		public const string NOT_VERIFIED_CLAIMTYPE = "urn:nucleus/identity/claims/not-verified";
-
-
-		/// <summary>
-		/// Nucleus cookie authentication method.
-		/// </summary>
-		public const string AUTHENTICATED_BY_COOKIE = "user-cookie";
+		public const string SYSADMIN_CLAIMTYPE = "urn:nucleus/identity/claims/issystemadministrator";
 	}
 }

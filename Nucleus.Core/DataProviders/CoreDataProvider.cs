@@ -1197,6 +1197,15 @@ namespace Nucleus.Core.DataProviders
 				.FirstOrDefaultAsync();
 		}
 
+		public async Task<Role> GetRoleByName(string name)
+		{
+			return await this.Context.Roles
+				.Where(existing => existing.Name == name)
+				.Include(role => role.RoleGroup)
+				.AsNoTracking()
+				.FirstOrDefaultAsync();
+		}
+
 		public async Task SaveRole(Site site, Role role)
 		{
 			Action raiseEvent;

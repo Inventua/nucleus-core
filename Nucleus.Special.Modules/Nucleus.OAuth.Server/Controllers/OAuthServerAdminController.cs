@@ -77,8 +77,8 @@ namespace Nucleus.OAuth.Server.Controllers
 			{
 				// create a new Api Key
 				viewModel.ClientApp.ApiKey = await this.ApiKeyManager.CreateNew();
-				viewModel.ClientApp.ApiKey.Name = $"API Key for OAuth Client App {viewModel.ClientApp.Title}";
-				viewModel.ClientApp.ApiKey.Scope = "OAuth";
+				viewModel.ClientApp.ApiKey.Name = $"API Key for OAuth2 Client App {viewModel.ClientApp.Title}";
+				viewModel.ClientApp.ApiKey.Scope = "OAuth2";
 				viewModel.ClientApp.ApiKey.Notes = "This API Key was automatically created by the OAuth Server Control Panel.";
 
 				await this.ApiKeyManager.Save(viewModel.ClientApp.ApiKey);

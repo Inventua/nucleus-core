@@ -39,6 +39,7 @@ namespace Nucleus.Core.DataProviders
 		abstract Task<IEnumerable<Role>> ListRoles(Site site);
 		abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<Role>> ListRoles(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 		abstract Task<Role> GetRole(Guid roleId);
+		abstract Task<Role> GetRoleByName(string name);
 		abstract Task SaveRole(Site site, Role role);
 		abstract Task DeleteRole(Role role);
 	}

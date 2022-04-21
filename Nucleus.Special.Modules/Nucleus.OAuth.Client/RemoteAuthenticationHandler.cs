@@ -21,17 +21,19 @@ namespace Nucleus.OAuth.Client
 
 		private ISessionManager SessionManager { get; }
 		private IUserManager UserManager { get; }
+		private IRoleManager RoleManager { get; }
 		private ISiteManager SiteManager { get; }
 		private Context CurrentContext { get; set; }
 		private LinkGenerator LinkGenerator { get; }
 
-		public RemoteAuthenticationHandler(ISessionManager sessionManager, IUserManager userManager, LinkGenerator linkGenerator, ISiteManager siteManager,
+		public RemoteAuthenticationHandler(ISessionManager sessionManager, IUserManager userManager, IRoleManager roleManager, LinkGenerator linkGenerator, ISiteManager siteManager,
 																 Context context,
 																 IOptionsMonitor<RemoteAuthenticationOptions> options, ILoggerFactory logger, System.Text.Encodings.Web.UrlEncoder encoder,
 																 ISystemClock clock) : base(options, logger, encoder, clock)
 		{
 			this.SessionManager = sessionManager;
 			this.UserManager = userManager;
+			this.RoleManager = roleManager;
 			this.SiteManager = siteManager;
 			this.LinkGenerator = linkGenerator;
 			this.CurrentContext = context;
@@ -67,7 +69,7 @@ namespace Nucleus.OAuth.Client
 
 			User loginUser = null;
 			object email = properties.Parameters.Where(prop => prop.Key == "email").Select(pair => pair.Value).FirstOrDefault();
-				
+
 			if (settings.MatchByName && !String.IsNullOrEmpty(user.Identity.Name))
 			{
 				loginUser = await this.UserManager.Get(this.CurrentContext.Site, user.Identity.Name);
@@ -93,7 +95,7 @@ namespace Nucleus.OAuth.Client
 					// create new user 
 					loginUser = await this.UserManager.CreateNew(this.CurrentContext.Site);
 					loginUser.UserName = user.Identity.Name;
-					
+
 					// fill in all of the user properties that we can find a value for
 					foreach (var prop in this.CurrentContext.Site.UserProfileProperties)
 					{
@@ -119,13 +121,69 @@ namespace Nucleus.OAuth.Client
 					await this.UserManager.Save(this.CurrentContext.Site, loginUser);
 				}
 			}
-			
+
 			if (loginUser != null)
-			{				
+			{
+				if (settings.SynchronizeRoles)
+				{
+					Boolean userRolesUpdated = false;
+					IEnumerable<Claim> roleClaims = user.Claims.Where(claim => claim.Type == ClaimTypes.Role);
+
+					// Only sync roles if the OAUTH provider returned role claims
+					if (roleClaims.Any())
+					{
+						if (settings.AddToRoles)
+						{
+							// Add user to roles in role claims, if a matching role name is found, and it isn't one of the special site roles.
+							foreach (Claim claim in roleClaims.Where(claim => !IsSpecialRole(claim.Value)))
+							{
+								Role role = await this.RoleManager.GetByName(this.CurrentContext.Site, claim.Value);
+								if (role != null)
+								{
+									loginUser.Roles.Add(role);
+									userRolesUpdated = true;
+								}
+							}
+						}
+
+						if (settings.RemoveFromRoles)
+						{
+							foreach (Role role in loginUser.Roles.ToArray())
+							{
+								if (!IsSpecialRole(role.Name))
+								{
+									if (!roleClaims.Where(claim => claim.Value == role.Name).Any())
+									{
+										// Role assigned to user is not present in role claims, remove it if it isn't one of the special site roles
+										loginUser.Roles.Remove(role);
+										userRolesUpdated = true;
+									}
+								}
+							}
+						}
+					}
+
+					if (userRolesUpdated)
+					{
+						// save user if any roles have changed
+						await this.UserManager.Save(this.CurrentContext.Site, loginUser);
+					}
+				}
+
 				UserSession session = await this.SessionManager.CreateNew(this.CurrentContext.Site, loginUser, false, base.Context.Connection.RemoteIpAddress);
 				await this.SessionManager.SignIn(session, base.Context, properties.RedirectUri ?? "/");
 				base.Response.Redirect(properties.RedirectUri ?? "/");
 			}
+		}
+
+		private Boolean IsSpecialRole(string name)
+		{
+			if (name == this.CurrentContext.Site.AdministratorsRole.Name) return true;
+			if (name == this.CurrentContext.Site.AllUsersRole.Name) return true;
+			if (name == this.CurrentContext.Site.AnonymousUsersRole.Name) return true;
+			if (name == this.CurrentContext.Site.RegisteredUsersRole.Name) return true;
+
+			return false;
 		}
 
 		protected override async Task HandleForbiddenAsync(AuthenticationProperties properties)
@@ -192,7 +250,7 @@ namespace Nucleus.OAuth.Client
 
 			string redirectUrl = this.LinkGenerator.GetPathByRouteValues("Admin", routeDictionary, this.Context.Request.PathBase, FragmentString.Empty, null);
 			Logger.LogTrace("Challenge: Redirecting to default login page {redirectUrl}", redirectUrl);
-			this.Context.Response.Redirect(redirectUrl +  $"?reason={reason}");
+			this.Context.Response.Redirect(redirectUrl + $"?reason={reason}");
 		}
 	}
 }

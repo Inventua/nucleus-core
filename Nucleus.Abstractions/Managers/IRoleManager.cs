@@ -29,6 +29,14 @@ namespace Nucleus.Abstractions.Managers
 		public Task<Role> Get(Guid id);
 
 		/// <summary>
+		/// Retrieve an existing <see cref="Role"/> from the database.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		public Task<Role> GetByName(Site site, string name);
+
+		/// <summary>
 		/// List all <see cref="Role"/>s for the specified site.
 		/// </summary>
 		/// <param name="site"></param>

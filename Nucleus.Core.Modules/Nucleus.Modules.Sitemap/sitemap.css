@@ -1,7 +1,16 @@
-﻿OL.Sitemap, OL.Sitemap OL
+﻿OL.Sitemap
 {
 	padding-left: 0;
-	margin-bottom: 0.5em;
+}
+
+OL.Sitemap, OL.Sitemap OL
+{
+	margin-bottom: 0.5rem;
+}
+
+OL.Sitemap OL
+{
+	padding-left: 0.5rem;
 }
 
 OL.Sitemap LI

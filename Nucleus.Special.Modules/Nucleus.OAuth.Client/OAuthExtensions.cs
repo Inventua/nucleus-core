@@ -12,6 +12,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Nucleus.Abstractions;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Microsoft.Extensions.Logging;
 
 namespace Nucleus.OAuth.Client
 {
@@ -128,11 +129,16 @@ namespace Nucleus.OAuth.Client
 			// If a JWT (id_token) is returned along with the OAuth2 access_token response, parse it.  Otherwise, call the
 			// UserInformationEndpoint to retrieve user data.
 
+			ILogger<Controllers.OAuthClientController> logger = ctx.HttpContext.RequestServices.GetService<ILogger<Controllers.OAuthClientController>>();
+
+			logger?.LogTrace("An OAUTH token was received for user '{user}'.", ctx.Identity.Name);
+
 			// if the response contains an id_token (JWT token), read it and copy any claims that are 
 			if (ctx.TokenResponse.Response.RootElement.TryGetProperty("id_token", out System.Text.Json.JsonElement value))
 			{
-				JwtSecurityTokenHandler handler = new();
+				logger?.LogTrace("The OAUTH token contains a id_token property (JWT token).");
 
+				JwtSecurityTokenHandler handler = new();				
 				JwtSecurityToken token = handler.ReadJwtToken(value.ToString());
 
 				// Look for claim actions (set in config/code with MapJsonType) in the JWT payload (token claims).  If found, add claims
@@ -146,23 +152,37 @@ namespace Nucleus.OAuth.Client
 
 					if (claim != null)
 					{
+						logger?.LogTrace("Adding claim {claimtype}: {value} from the JWT {inputClaimType} property.", action.ClaimType, claim.Value, claim.Type);
 						ctx.Identity.AddClaim(new(action.ClaimType, claim.Value, claim.ValueType, claim.Issuer, claim.Issuer));
+					}
+					else
+					{
+						logger?.LogTrace("No mapping was found for the JWT token {inputClaimType} property.", (action as Microsoft.AspNetCore.Authentication.OAuth.Claims.JsonKeyClaimAction)?.JsonKey);
 					}
 				}
 			}
 			else
 			{
+				logger?.LogTrace("The OAUTH token does not contain an id_token property (JWT token), calling UserInformationEndpoint '{url}' using Access Token '{token}'.", ctx.Options.UserInformationEndpoint, ctx.AccessToken);
+
 				// Get user info from the UserInformationEndpoint and parse it.
 				var request = new HttpRequestMessage(HttpMethod.Get, ctx.Options.UserInformationEndpoint);
 				request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 				request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ctx.AccessToken);
 
 				var response = await ctx.Backchannel.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ctx.HttpContext.RequestAborted);
-				response.EnsureSuccessStatusCode();
 
-				System.Text.Json.JsonDocument user = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+				if (response.IsSuccessStatusCode)
+				{
+					logger?.LogTrace("The request to UserInformationEndpoint '{url}' was successful, reading claims.", ctx.Options.UserInformationEndpoint);
 
-				ctx.RunClaimActions(user.RootElement);
+					System.Text.Json.JsonDocument user = System.Text.Json.JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+					ctx.RunClaimActions(user.RootElement);
+				}
+				else
+				{
+					logger?.LogTrace("The request to UserInformationEndpoint '{url}' failed with status {statuscode}:{reason}.", ctx.Options.UserInformationEndpoint, response.StatusCode, response.ReasonPhrase);
+				}
 			}
 		}
 

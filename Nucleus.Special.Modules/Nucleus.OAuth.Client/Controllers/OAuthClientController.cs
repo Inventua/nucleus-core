@@ -104,7 +104,7 @@ namespace Nucleus.OAuth.Client.Controllers
 				if (providerOption != null)
 				{
 					string url = BuildRedirectUrl(returnUrl);
-					Logger?.LogTrace("Redirecting to '{url}' in order to start the remote login process.", url);
+					Logger?.LogTrace("Starting the remote login process.");
 					// redirect to OAUTH provider 
 					return Challenge(new AuthenticationProperties() { RedirectUri = url }, providerOption.Name ?? providerOption.Type);
 				}

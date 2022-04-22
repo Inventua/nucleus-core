@@ -131,14 +131,13 @@ namespace Nucleus.OAuth.Client
 
 			ILogger<Controllers.OAuthClientController> logger = ctx.HttpContext.RequestServices.GetService<ILogger<Controllers.OAuthClientController>>();
 
-			logger?.LogTrace("An OAUTH token was received for user '{user}'.", ctx.Identity.Name);
-
 			// if the response contains an id_token (JWT token), read it and copy any claims that are 
 			if (ctx.TokenResponse.Response.RootElement.TryGetProperty("id_token", out System.Text.Json.JsonElement value))
 			{
 				logger?.LogTrace("The OAUTH token contains a id_token property (JWT token).");
 
-				JwtSecurityTokenHandler handler = new();				
+				JwtSecurityTokenHandler handler = new();
+				handler.InboundClaimTypeMap.Clear();
 				JwtSecurityToken token = handler.ReadJwtToken(value.ToString());
 
 				// Look for claim actions (set in config/code with MapJsonType) in the JWT payload (token claims).  If found, add claims
@@ -146,14 +145,17 @@ namespace Nucleus.OAuth.Client
 				// options.UserInformationEndpoint, and .net core doesn't seem to pay any attention to JWT tokens (hence this code is required).
 				foreach (Microsoft.AspNetCore.Authentication.OAuth.Claims.ClaimAction action in ctx.Options.ClaimActions)
 				{
-					System.Security.Claims.Claim claim = token.Claims
-						.Where(claim => claim.Type.Equals((action as Microsoft.AspNetCore.Authentication.OAuth.Claims.JsonKeyClaimAction)?.JsonKey, StringComparison.OrdinalIgnoreCase))
-						.FirstOrDefault();
+					// The JWT token can contain multiple claims with the same claim type (roles, for example), so we must loop through them.
+					IEnumerable<System.Security.Claims.Claim> claims = token.Claims
+						.Where(claim => claim.Type.Equals((action as Microsoft.AspNetCore.Authentication.OAuth.Claims.JsonKeyClaimAction)?.JsonKey, StringComparison.OrdinalIgnoreCase));
 
-					if (claim != null)
+					if (claims.Any())
 					{
-						logger?.LogTrace("Adding claim {claimtype}: {value} from the JWT {inputClaimType} property.", action.ClaimType, claim.Value, claim.Type);
-						ctx.Identity.AddClaim(new(action.ClaimType, claim.Value, claim.ValueType, claim.Issuer, claim.Issuer));
+						foreach (System.Security.Claims.Claim claim in claims)
+						{
+							logger?.LogTrace("Adding claim {claimtype}: '{value}' from the JWT {inputClaimType} property.", action.ClaimType, claim.Value, claim.Type);
+							ctx.Identity.AddClaim(new(action.ClaimType, claim.Value, claim.ValueType, claim.Issuer, claim.Issuer));
+						}
 					}
 					else
 					{

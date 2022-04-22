@@ -24,6 +24,8 @@ namespace Nucleus.OAuth.Client.ViewModels
 		internal const string SETTING_ADD_ROLES = "oauth:sync-roles-add";
 		internal const string SETTING_REMOVE_ROLES = "oauth:sync-roles-remove";
 
+		internal const string SETTING_SYNC_PROFILE = "oauth:sync-profile";
+
 		public Boolean MatchByName { get; set; }=true;
 		public Boolean MatchByEmail { get; set; }
 
@@ -34,6 +36,8 @@ namespace Nucleus.OAuth.Client.ViewModels
 		public Boolean SynchronizeRoles { get; set; }
 		public Boolean AddToRoles { get; set; }
 		public Boolean RemoveFromRoles { get; set; }
+
+		public Boolean SynchronizeProfile { get; set; }
 
 
 		public void ReadSettings(Site site)
@@ -76,6 +80,11 @@ namespace Nucleus.OAuth.Client.ViewModels
 			if (site.SiteSettings.TryGetValue(SETTING_REMOVE_ROLES, out Boolean removeRoles))
 			{
 				this.RemoveFromRoles = removeRoles;
+			}
+
+			if (site.SiteSettings.TryGetValue(SETTING_SYNC_PROFILE, out Boolean syncProfile))
+			{
+				this.SynchronizeProfile = syncProfile;
 			}
 
 		}

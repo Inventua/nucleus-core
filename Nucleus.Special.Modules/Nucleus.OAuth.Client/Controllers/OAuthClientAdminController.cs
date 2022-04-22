@@ -69,6 +69,8 @@ namespace Nucleus.OAuth.Client.Controllers
 			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteClientSettings.SETTING_ADD_ROLES, viewModel.AddToRoles);
 			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteClientSettings.SETTING_REMOVE_ROLES, viewModel.RemoveFromRoles);
 
+			this.Context.Site.SiteSettings.TrySetValue(ViewModels.SiteClientSettings.SETTING_SYNC_PROFILE, viewModel.SynchronizeProfile);
+
 			await this.SiteManager.Save(this.Context.Site);
 
 			return Ok();

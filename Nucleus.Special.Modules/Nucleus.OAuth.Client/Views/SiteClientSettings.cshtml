@@ -10,18 +10,22 @@
 		<fieldset role="group" aria-labelledby="heading">
 			<h2 class="nucleus-control-panel-heading">OAuth Client Settings</h2>
 
-			<div class="nucleus-flex-fields">
-				<SettingsControl caption="Match by name" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to match existing users matching the name supplied by the OAuth provider.">
-					@Html.CheckBoxFor(model => model.MatchByName, new { @class = "ToggleSwitch" })
-				</SettingsControl>
+			<div class="border m-2 p-2">
+				<h3>User Matching</h3>
 
-				<SettingsControl caption="Match by email" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to match existing users matching the email supplied by the OAuth provider.">
-					@Html.CheckBoxFor(model => model.MatchByEmail, new { @class = "ToggleSwitch" })
-				</SettingsControl>
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Match by name" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to match existing users matching the name supplied by the OAuth provider.">
+						@Html.CheckBoxFor(model => model.MatchByName, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+
+					<SettingsControl caption="Match by email" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to match existing users matching the email supplied by the OAuth provider.">
+						@Html.CheckBoxFor(model => model.MatchByEmail, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+				</div>
 			</div>
 
 			<div class="border m-2 p-2">
-				<h3>Users</h3>
+				<h3>New Users</h3>
 				<SettingsControl caption="Create a New User if no Matching User is Found" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to create a new user if no matching user was found.  If this setting is OFF and a user logs in using an OAUTH provider and does not have a Nucleus user account, the system will redirect them to the login page with a message 'Access was denied.  Your account is not authorized to use this system'.">
 					@Html.CheckBoxFor(model => model.CreateUsers, new { @class = "nucleus-oauth-create-user-control ToggleSwitch" })
 				</SettingsControl>
@@ -38,8 +42,16 @@
 			</div>
 
 			<div class="border m-2 p-2">
+				<h3>Profile</h3>
+
+				<SettingsControl caption="Synchronize Profile" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to update user profile information with data from the OAUTH provider.  This setting applies to both new users and existing users.">
+					@Html.CheckBoxFor(model => model.SynchronizeProfile, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+			</div>
+
+			<div class="border m-2 p-2">
 				<h3>Roles</h3>
-				<SettingsControl caption="Synchronize Roles" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to update roles based on the response from the OAUTH2 provider.  This function only works when the OAUTH2 provider returns roles.  Providers like Google and Facebook do not return roles.">
+				<SettingsControl caption="Synchronize Roles" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to update roles based on the response from the OAUTH2 provider.  This setting applies to both new users and existing users.  If your OAUTH2 provider does not return roles, roles are not synchronized.  Providers like Google, Twitter and Facebook do not return roles.">
 					@Html.CheckBoxFor(model => model.SynchronizeRoles, new { @class = "nucleus-oauth-sync-roles-control ToggleSwitch" })
 				</SettingsControl>
 
@@ -68,7 +80,7 @@
 		
 		jQuery('.nucleus-oauth-create-user-control').on('change', function() 
 		{
-			jQuery('.nucleus-oauth-new-user-controls input').toggleClass('disabled');
+			//jQuery('.nucleus-oauth-new-user-controls input').toggleClass('disabled');
 			EnableControls(jQuery(this).is(':checked'), '.nucleus-oauth-create-user-controls');
 		});	
 
@@ -76,7 +88,7 @@
 		
 		jQuery('.nucleus-oauth-sync-roles-control').on('change', function() 
 		{
-			jQuery('.nucleus-oauth-sync-roles-controls input').toggleClass('disabled');
+			//jQuery('.nucleus-oauth-sync-roles-controls input').toggleClass('disabled');
 			EnableControls(jQuery(this).is(':checked'), '.nucleus-oauth-sync-roles-controls');
 		});	
 	});

@@ -141,9 +141,29 @@ namespace Nucleus.OAuth.Client
 
 			if (loginUser != null)
 			{
+				Boolean userProfileUpdated = false;
+				Boolean userRolesUpdated = false;
+
+				if (settings.SynchronizeProfile)
+				{
+					Logger?.LogTrace("Synchronizing profile for user '{name}'.", loginUser.UserName);
+
+					foreach (Claim claim in user.Claims)
+					{
+						UserProfileValue prop = loginUser?.Profile.Where(profileProperty => profileProperty.UserProfileProperty.TypeUri == claim.Type).FirstOrDefault();
+						// If a property with the same type as the incoming claim is found, update the property if the new value is different than the old value (with extra
+						// checking so that an empty string is equivalent to null for the purpose of checking the value)
+						if (prop != null && (String.IsNullOrEmpty(prop.Value) ? "" : prop.Value) != (String.IsNullOrEmpty(claim.Value) ? "" : claim.Value))
+						{
+							Logger?.LogTrace("Setting profile value '{typeuri}' [{profilePropertyName}] to '{value}'.", prop.UserProfileProperty.TypeUri, prop.UserProfileProperty.Name, claim.Value);
+							prop.Value = claim.Value;
+							userProfileUpdated = true;
+						}
+					}
+				}
+
 				if (settings.SynchronizeRoles)
 				{
-					Boolean userRolesUpdated = false;
 					IEnumerable<Claim> roleClaims = user.Claims.Where(claim => claim.Type == ClaimTypes.Role);
 
 					// Only sync roles if the OAUTH provider returned role claims
@@ -156,13 +176,14 @@ namespace Nucleus.OAuth.Client
 							// Add user to roles in role claims, if a matching role name is found, and it isn't one of the special site roles.
 							foreach (Claim claim in roleClaims)
 							{
-								if (!IsSpecialRole(claim.Value))
+								Role role = await this.RoleManager.GetByName(this.CurrentContext.Site, claim.Value);
+								if (role != null)
 								{
-									Role role = await this.RoleManager.GetByName(this.CurrentContext.Site, claim.Value);
-									if (role != null)
+									if (!IsSpecialRole(claim.Value))
 									{
 										if (!loginUser.Roles.Where(existing => existing.Name == role.Name).Any())
 										{
+
 											loginUser.Roles.Add(role);
 											Logger?.LogTrace("Added user '{name}' to role '{role}'.", loginUser.UserName, claim.Value);
 											userRolesUpdated = true;
@@ -174,13 +195,13 @@ namespace Nucleus.OAuth.Client
 									}
 									else
 									{
-										Logger?.LogTrace("Did not add a role named '{roleName}' for user '{name}' because no role with that name exists.", claim.Value, loginUser.UserName);
+										Logger?.LogTrace("Ignored a role named '{roleName}' because the role is a special role.", claim.Value);
 									}
 								}
 								else
 								{
-									Logger?.LogTrace("Did not add a role named '{roleName}' for user '{name}' because the role is a special role.", claim.Value, loginUser.UserName);
-								}								
+									Logger?.LogTrace("Did not add a role named '{roleName}' for user '{name}' because no role with that name exists.", claim.Value, loginUser.UserName);
+								}
 							}
 						}
 
@@ -188,20 +209,21 @@ namespace Nucleus.OAuth.Client
 						{
 							foreach (Role role in loginUser.Roles.ToArray())
 							{
-								if (!IsSpecialRole(role.Name))
+								if (!roleClaims.Where(claim => claim.Value == role.Name).Any())
 								{
-									if (!roleClaims.Where(claim => claim.Value == role.Name).Any())
+									if (!IsSpecialRole(role.Name))
 									{
 										// Role assigned to user is not present in role claims, remove it if it isn't one of the special site roles
 										loginUser.Roles.Remove(role);
 										Logger?.LogTrace("Removed user '{name}' from role '{role}'.", loginUser.UserName, role.Name);
 										userRolesUpdated = true;
 									}
+									else
+									{
+										Logger?.LogTrace("Ignored a role named '{roleName}' because the role is a special role.", role.Name);
+									}
 								}
-								else
-								{
-									Logger?.LogTrace("Did not remove a role named '{roleName}' from user '{name}' because the role is a special role.", role.Name, loginUser.UserName);
-								}
+
 							}
 						}
 					}
@@ -210,7 +232,7 @@ namespace Nucleus.OAuth.Client
 						Logger?.LogTrace("Nucleus did not synchronize roles for user '{name}' because the OAUTH provider did not return any roles.", loginUser.UserName);
 					}
 
-					if (userRolesUpdated)
+					if (userProfileUpdated || userRolesUpdated)
 					{
 						// save user if any roles have changed
 						await this.UserManager.Save(this.CurrentContext.Site, loginUser);
@@ -220,7 +242,7 @@ namespace Nucleus.OAuth.Client
 				UserSession session = await this.SessionManager.CreateNew(this.CurrentContext.Site, loginUser, false, base.Context.Connection.RemoteIpAddress);
 				await this.SessionManager.SignIn(session, base.Context, properties.RedirectUri ?? "/");
 				string url = properties.RedirectUri ?? "/";
-				Logger?.LogTrace("Signin for user '{name}' was successful, redirecting to '{url}'.", url);
+				Logger?.LogTrace("Signin for user '{name}' was successful, redirecting to '{url}'.", loginUser.UserName, url);
 				base.Response.Redirect(url);
 			}
 		}

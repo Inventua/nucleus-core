@@ -93,6 +93,10 @@ namespace Nucleus.Modules.StaticContent.Controllers
 						}
 					}
 				}
+				else
+				{
+					return NotFound();
+				}
 
 				return View("Viewer", viewModel);
 			}

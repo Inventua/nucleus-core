@@ -161,10 +161,16 @@ namespace Nucleus.OAuth.Client
 									Role role = await this.RoleManager.GetByName(this.CurrentContext.Site, claim.Value);
 									if (role != null)
 									{
-
-										loginUser.Roles.Add(role);
-										Logger?.LogTrace("Added user '{name}' to role '{role}'.", loginUser.UserName, claim.Value);
-										userRolesUpdated = true;
+										if (!loginUser.Roles.Where(existing => existing.Name == role.Name).Any())
+										{
+											loginUser.Roles.Add(role);
+											Logger?.LogTrace("Added user '{name}' to role '{role}'.", loginUser.UserName, claim.Value);
+											userRolesUpdated = true;
+										}
+										else
+										{
+											Logger?.LogTrace("Did not add a role named '{roleName}' for user '{name}' because the user is already a member of that role.", claim.Value, loginUser.UserName);
+										}
 									}
 									else
 									{

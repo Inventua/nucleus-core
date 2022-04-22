@@ -99,7 +99,7 @@ namespace Nucleus.OAuth.Server.Controllers
 					return ErrorRedirect(redirect_uri, state, "invalid_scope");
 				}
 
-				Logger.LogTrace("Creating OAUTH token.");
+				Logger.LogTrace("Creating empty OAUTH token.");
 				ClientAppToken token = this.ClientAppTokenManager.CreateNew();
 
 				token.ClientApp = clientApp;
@@ -112,7 +112,7 @@ namespace Nucleus.OAuth.Server.Controllers
 
 				if (User.Identity.IsAuthenticated)
 				{
-					Logger.LogTrace("A user is already logged on.");
+					Logger.LogTrace("A user is already logged in.");
 					// User is already logged in, redirect back immediately
 					return await Respond(token.Id);
 				}
@@ -125,9 +125,9 @@ namespace Nucleus.OAuth.Server.Controllers
 
 
 		/// <summary>
-		/// Receive a redirect from the Nucleus login module, proces it and redirect back to the original caller (Oauth client).
+		/// Receive a redirect from the Nucleus login module, process it and redirect back to the original caller (Oauth client).
 		/// </summary>
-		/// <param name="id">The id of an app token created by /Authenticate and included in the ReturnUri sent to the login module.</param>
+		/// <param name="id">The id of an app token created by /Authorize and included in the ReturnUri sent to the login module.</param>
 		/// <returns></returns>
 		[HttpGet]
 		[Route("/oauth2/respond/{id}")]
@@ -135,6 +135,7 @@ namespace Nucleus.OAuth.Server.Controllers
 		{
 			ClientAppToken token = await this.ClientAppTokenManager.Get(id);
 
+			Logger?.LogTrace("Populating OAUTH token.");
 			token.UserId = User.GetUserId();
 
 			if (token.Type == "code")
@@ -218,7 +219,7 @@ namespace Nucleus.OAuth.Server.Controllers
 					access_token = token.AccessToken,
 					token_type = "Bearer",
 					expires_in = (token.ExpiryDate - DateTime.Now).TotalMinutes,
-					token_id = await BuildJwtToken(token)
+					id_token = await BuildJwtToken(token)
 					// we don't currently support refresh tokens
 					//refresh_token = token.RefreshToken
 				});
@@ -228,6 +229,8 @@ namespace Nucleus.OAuth.Server.Controllers
 		private async Task<string> BuildJwtToken(ClientAppToken appToken)
 		{
 			JwtSecurityTokenHandler handler = new();
+			handler.OutboundClaimTypeMap.Clear();
+
 			User user = await this.UserManager.Get(this.Context.Site, appToken.UserId.Value);
 			Dictionary<string, Object> claims;
 
@@ -238,6 +241,7 @@ namespace Nucleus.OAuth.Server.Controllers
 			Microsoft.IdentityModel.Tokens.SecurityTokenDescriptor descriptor = new()
 			{
 				Audience=appToken.ClientApp.ApiKey.Id.ToString(),
+				Subject = new ClaimsIdentity(new List<Claim>() { { new Claim(ClaimTypes.Name, user.UserName) } }) ,
 				Issuer=this.Context.Site.DefaultSiteAlias.Alias,
 				NotBefore=DateTime.UtcNow,
 				Expires=DateTime.UtcNow.Add(TimeSpan.FromMinutes(2)),
@@ -306,7 +310,7 @@ namespace Nucleus.OAuth.Server.Controllers
 			// A user can be in more than one role, so the role claim is set to a comma-separated list
 			if (user.Roles != null && user.Roles.Any())
 			{
-				claims.Add("roles", user.Roles.Select(role => role.Name));
+				claims.Add(ClaimTypes.Role, user.Roles.Select(role => role.Name));
 			}
 
 			return claims;

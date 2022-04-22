@@ -13,12 +13,12 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 
+// REFERENCES:
 // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.iauthenticationservice?view=aspnetcore-6.0
-// https://github.com/aspnet-contrib/AspNet.Security.OAuth.Providers/blob/dev/src/AspNet.Security.OAuth.WordPress/WordPressAuthenticationExtensions.cs
-// https://github.com/aspnet/Security/blob/master/src/Microsoft.AspNetCore.Authentication.OAuth/OAuthExtensions.cshttps://github.com/aspnet/Security/blob/master/src/Microsoft.AspNetCore.Authentication.OAuth/OAuthExtensions.cs
+// https://github.com/aspnet-contrib/AspNet.Security.OAuth.Providers/blob/dev/src/AspNet.Security.OAuth.WordPress/WordPressAuthenticationExtensions.cs 
 // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.oauth.oauthmiddleware-1?view=aspnetcore-1.1
-
 // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.authenticationhandler-1?view=aspnetcore-1.1
 
 namespace Nucleus.OAuth.Client.Controllers
@@ -35,14 +35,16 @@ namespace Nucleus.OAuth.Client.Controllers
 		private IPageModuleManager PageModuleManager { get; }
 
 		private IOptions<Models.Configuration.OAuthProviders> Options { get; }
+		private ILogger<OAuthClientAdminController> Logger { get; }
 
-		public OAuthClientController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<Models.Configuration.OAuthProviders> options)
+		public OAuthClientController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<Models.Configuration.OAuthProviders> options, ILogger<OAuthClientAdminController> logger)
 		{
 			this.WebHostEnvironment = webHostEnvironment;
 			this.Context = Context;
 			this.SiteManager = siteManager;
 			this.PageModuleManager = pageModuleManager;
 			this.Options = options;
+			this.Logger = logger;
 		}
 
 		[HttpGet]
@@ -57,8 +59,10 @@ namespace Nucleus.OAuth.Client.Controllers
 
 					if (providerOption != null)
 					{
+						string url = BuildRedirectUrl(returnUrl);
+						Logger?.LogTrace("OAuth Provider Selector: AutoLogin is enabled, automatically redirecting to '{url}'.", url);
 						// redirect to OAUTH provider 
-						return Challenge(new AuthenticationProperties() { RedirectUri = BuildRedirectUrl(returnUrl) }, providerOption.Name ?? providerOption.Type);
+						return Challenge(new AuthenticationProperties() { RedirectUri = url }, providerOption.Name ?? providerOption.Type);
 					}
 				}
 			}
@@ -88,6 +92,8 @@ namespace Nucleus.OAuth.Client.Controllers
 		{
 			if (!String.IsNullOrEmpty(providerName))
 			{
+				Logger?.LogTrace("OAUTH provider {providername} requested.", providerName);
+
 				// Find provider configuration matching the supplied providerName.  The Name property is optional, but takes precendence over the Type.  If the name is not specifed, match by Type.
 				// It is possible to have multiple OpenIdConnect configurations which have settings which point to different OAUTH providers, which are identified by Name.  Most of the settings for the
 				// Facebook/Google/Twitter/MicrosoftAccount are built in to the Microsoft.AspNetCore.Authentication.* package, so they can only have one configuration set up, and do require a name.
@@ -97,16 +103,20 @@ namespace Nucleus.OAuth.Client.Controllers
 
 				if (providerOption != null)
 				{
+					string url = BuildRedirectUrl(returnUrl);
+					Logger?.LogTrace("Redirecting to '{url}' in order to start the remote login process.", url);
 					// redirect to OAUTH provider 
-					return Challenge(new AuthenticationProperties() { RedirectUri = BuildRedirectUrl(returnUrl) }, providerOption.Name ?? providerOption.Type);
+					return Challenge(new AuthenticationProperties() { RedirectUri = url }, providerOption.Name ?? providerOption.Type);
 				}
 				else
 				{
+					Logger?.LogTrace("OAUTH provider {providername} not found.  Check your configuration files Nucleus:OAuthProviders section for a provider with a matching name, or a matching type and no name.", providerName);
 					return BadRequest();
 				}
 			}
 			else
 			{
+				Logger?.LogTrace("No provider name was specified.  The Url for remote logins is https:/[your-domain]/extensions/OAuthClient/Authenticate/providerName, where providerName matches a configuration file Nucleus:OAuthProviders section for a provider with a matching name, or a matching type and no name.");
 				return BadRequest();
 			}			
 		}

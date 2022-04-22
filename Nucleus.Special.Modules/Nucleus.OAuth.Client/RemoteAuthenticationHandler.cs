@@ -64,22 +64,35 @@ namespace Nucleus.OAuth.Client
 			{
 				throw new ArgumentNullException(nameof(user));
 			}
+
 			ViewModels.SiteClientSettings settings = new();
 			settings.ReadSettings(this.CurrentContext.Site);
 
 			User loginUser = null;
 			object email = properties.Parameters.Where(prop => prop.Key == "email").Select(pair => pair.Value).FirstOrDefault();
 
+			Logger?.LogTrace("Signing in remote user '{username}'", user.Identity.Name);
+
 			if (settings.MatchByName && !String.IsNullOrEmpty(user.Identity.Name))
 			{
+				Logger?.LogTrace("Checking for existing user '{username}' by name.", user.Identity.Name);
 				loginUser = await this.UserManager.Get(this.CurrentContext.Site, user.Identity.Name);
+				if (loginUser == null)
+				{
+					Logger?.LogTrace("Existing user '{username}' not found by name.", user.Identity.Name);
+				}
 			}
 
 			if (loginUser == null && settings.MatchByEmail)
 			{
 				if (email != null && !String.IsNullOrEmpty(email.ToString()))
 				{
+					Logger?.LogTrace("Checking for existing user with email address '{email}'.", email);
 					loginUser = await this.UserManager.GetByEmail(this.CurrentContext.Site, email.ToString());
+					if (loginUser == null)
+					{
+						Logger?.LogTrace("Existing user with email '{email}' not found by name, or more than one user with that email address is present in the database.", email);
+					}
 				}
 			}
 
@@ -88,10 +101,13 @@ namespace Nucleus.OAuth.Client
 				// user does not exist		
 				if (!settings.CreateUsers)
 				{
+					Logger?.LogTrace("A matching user was not found, and the OAUTH server CreateUsers setting is set to false.");
 					await base.ForbidAsync(properties);
 				}
 				else
 				{
+					Logger?.LogTrace("A matching user was not found, creating a new user '{username}'.", user.Identity.Name);
+
 					// create new user 
 					loginUser = await this.UserManager.CreateNew(this.CurrentContext.Site);
 					loginUser.UserName = user.Identity.Name;
@@ -102,6 +118,7 @@ namespace Nucleus.OAuth.Client
 						string userPropertyValue = user.FindFirstValue(prop.TypeUri);
 						if (userPropertyValue != null)
 						{
+							Logger?.LogTrace("Adding profile value {name}:'{value}'.", prop.TypeUri, userPropertyValue);
 							loginUser.Profile.Add(new UserProfileValue() { UserProfileProperty = prop, Value = userPropertyValue });
 						}
 					}
@@ -132,17 +149,32 @@ namespace Nucleus.OAuth.Client
 					// Only sync roles if the OAUTH provider returned role claims
 					if (roleClaims.Any())
 					{
+						Logger?.LogTrace("Synchronizing roles for user '{name}'.", loginUser.UserName);
+
 						if (settings.AddToRoles)
 						{
 							// Add user to roles in role claims, if a matching role name is found, and it isn't one of the special site roles.
-							foreach (Claim claim in roleClaims.Where(claim => !IsSpecialRole(claim.Value)))
+							foreach (Claim claim in roleClaims)
 							{
-								Role role = await this.RoleManager.GetByName(this.CurrentContext.Site, claim.Value);
-								if (role != null)
+								if (!IsSpecialRole(claim.Value))
 								{
-									loginUser.Roles.Add(role);
-									userRolesUpdated = true;
+									Role role = await this.RoleManager.GetByName(this.CurrentContext.Site, claim.Value);
+									if (role != null)
+									{
+
+										loginUser.Roles.Add(role);
+										Logger?.LogTrace("Added user '{name}' to role '{role}'.", loginUser.UserName, claim.Value);
+										userRolesUpdated = true;
+									}
+									else
+									{
+										Logger?.LogTrace("Did not add a role named '{roleName}' for user '{name}' because no role with that name exists.", claim.Value, loginUser.UserName);
+									}
 								}
+								else
+								{
+									Logger?.LogTrace("Did not add a role named '{roleName}' for user '{name}' because the role is a special role.", claim.Value, loginUser.UserName);
+								}								
 							}
 						}
 
@@ -156,11 +188,20 @@ namespace Nucleus.OAuth.Client
 									{
 										// Role assigned to user is not present in role claims, remove it if it isn't one of the special site roles
 										loginUser.Roles.Remove(role);
+										Logger?.LogTrace("Removed user '{name}' from role '{role}'.", loginUser.UserName, role.Name);
 										userRolesUpdated = true;
 									}
 								}
+								else
+								{
+									Logger?.LogTrace("Did not remove a role named '{roleName}' from user '{name}' because the role is a special role.", role.Name, loginUser.UserName);
+								}
 							}
 						}
+					}
+					else
+					{
+						Logger?.LogTrace("Nucleus did not synchronize roles for user '{name}' because the OAUTH provider did not return any roles.", loginUser.UserName);
 					}
 
 					if (userRolesUpdated)
@@ -172,7 +213,9 @@ namespace Nucleus.OAuth.Client
 
 				UserSession session = await this.SessionManager.CreateNew(this.CurrentContext.Site, loginUser, false, base.Context.Connection.RemoteIpAddress);
 				await this.SessionManager.SignIn(session, base.Context, properties.RedirectUri ?? "/");
-				base.Response.Redirect(properties.RedirectUri ?? "/");
+				string url = properties.RedirectUri ?? "/";
+				Logger?.LogTrace("Signin for user '{name}' was successful, redirecting to '{url}'.", url);
+				base.Response.Redirect(url);
 			}
 		}
 
@@ -188,6 +231,8 @@ namespace Nucleus.OAuth.Client
 
 		protected override async Task HandleForbiddenAsync(AuthenticationProperties properties)
 		{
+			Logger?.LogTrace("Signin for user was forbidden.");
+
 			// This code handles the response when a user logs in using a remote provider, but does not have a Nucleus account, and the 
 			// "create new account" option is disabled.
 			//base.Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
@@ -229,7 +274,7 @@ namespace Nucleus.OAuth.Client
 				else
 				{
 					string redirectUrl = loginPageRoute.Path + $"?reason={reason}";
-					Logger.LogTrace("Challenge: Redirecting to site login page {redirectUrl}", redirectUrl);
+					Logger?.LogTrace("Challenge: Redirecting to site login page {redirectUrl}", redirectUrl);
 					this.Context.Response.Redirect(redirectUrl);
 				}
 			}
@@ -249,7 +294,7 @@ namespace Nucleus.OAuth.Client
 			routeDictionary.Add("action", "Index");
 
 			string redirectUrl = this.LinkGenerator.GetPathByRouteValues("Admin", routeDictionary, this.Context.Request.PathBase, FragmentString.Empty, null);
-			Logger.LogTrace("Challenge: Redirecting to default login page {redirectUrl}", redirectUrl);
+			Logger?.LogTrace("Challenge: Redirecting to default login page {redirectUrl}", redirectUrl);
 			this.Context.Response.Redirect(redirectUrl + $"?reason={reason}");
 		}
 	}

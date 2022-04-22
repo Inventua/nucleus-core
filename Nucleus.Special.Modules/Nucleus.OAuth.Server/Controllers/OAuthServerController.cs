@@ -13,7 +13,8 @@ using System.Threading.Tasks;
 using Nucleus.Extensions.Authorization;
 using Nucleus.ViewFeatures;
 using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt; 
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Logging;
 
 namespace Nucleus.OAuth.Server.Controllers
 {
@@ -25,16 +26,18 @@ namespace Nucleus.OAuth.Server.Controllers
 		private ClientAppManager ClientAppManager { get; }
 		private IPageManager PageManager { get; }
 		private IUserManager UserManager { get; }
+		private ILogger<OAuthServerController> Logger { get; }
 
 		private const string TOKEN_TYPE = "bearer";
 
-		public OAuthServerController(Context Context, ClientAppManager clientAppManager, ClientAppTokenManager clientAppTokenManager, IPageManager pageManager, IUserManager userManager) 
+		public OAuthServerController(Context Context, ClientAppManager clientAppManager, ClientAppTokenManager clientAppTokenManager, IPageManager pageManager, IUserManager userManager, ILogger<OAuthServerController> logger) 
 		{
 			this.Context = Context;
 			this.ClientAppTokenManager = clientAppTokenManager;
 			this.ClientAppManager = clientAppManager;
 			this.PageManager = pageManager;
 			this.UserManager = userManager;
+			this.Logger = logger;
 		}
 
 		/// <summary>
@@ -54,21 +57,25 @@ namespace Nucleus.OAuth.Server.Controllers
 				case "token":
 					break;
 				default:
+					Logger.LogTrace("Invalid Authorize request from '{source}': Unsupported response_type '{type}'.", this.HttpContext.Connection.RemoteIpAddress, response_type);
 					return ErrorRedirect(redirect_uri, state, "unsupported_response_type");
 			}
 
 			if (String.IsNullOrEmpty(client_id))
 			{
+				Logger.LogTrace("Invalid Authenticate request from '{source}': Missing client_id.", this.HttpContext.Connection.RemoteIpAddress);
 				return BadRequest("Missing client_id");
 			}
 
 			if (String.IsNullOrEmpty(redirect_uri))
 			{
+				Logger.LogTrace("Invalid Authenticate request from '{source}': Missing redirect_uri.", this.HttpContext.Connection.RemoteIpAddress);
 				return BadRequest("Missing redirect_uri");
 			}
 
 			if (!Guid.TryParse(client_id, out Guid parsedClientId))
 			{
+				Logger.LogTrace("Invalid Authenticate request from '{source}': Invalid client_id '{clientid}' (not a Guid).", this.HttpContext.Connection.RemoteIpAddress, client_id);
 				return BadRequest("invalid_client");
 			}
 			else
@@ -76,19 +83,23 @@ namespace Nucleus.OAuth.Server.Controllers
 				ClientApp clientApp = await this.ClientAppManager.GetByApiKey(parsedClientId);
 				if (clientApp == null)
 				{
+					Logger.LogTrace("Invalid Authenticate request from '{source}': A Client App with API key {clientid} was not found.", this.HttpContext.Connection.RemoteIpAddress, parsedClientId);
 					return BadRequest("invalid_client");
 				}
 
 				if (!clientApp.RedirectUri.Split("\r\n").Contains(redirect_uri))
 				{
+					Logger.LogTrace("Invalid Authenticate request from '{source}': Invalid redirect_uri '{redirecturi}'.", this.HttpContext.Connection.RemoteIpAddress, redirect_uri);
 					return BadRequest($"Invalid redirect_uri '{redirect_uri}'.");
 				}
 
 				if (!clientApp.ApiKey.Scope.Split(' ').Contains(scope))
 				{
+					Logger.LogTrace("Invalid Authenticate request from '{source}': Invalid scope '{scope}'.", this.HttpContext.Connection.RemoteIpAddress, scope);
 					return ErrorRedirect(redirect_uri, state, "invalid_scope");
 				}
 
+				Logger.LogTrace("Creating OAUTH token.");
 				ClientAppToken token = this.ClientAppTokenManager.CreateNew();
 
 				token.ClientApp = clientApp;
@@ -101,6 +112,7 @@ namespace Nucleus.OAuth.Server.Controllers
 
 				if (User.Identity.IsAuthenticated)
 				{
+					Logger.LogTrace("A user is already logged on.");
 					// User is already logged in, redirect back immediately
 					return await Respond(token.Id);
 				}
@@ -274,20 +286,6 @@ namespace Nucleus.OAuth.Server.Controllers
 				{
 					result.TryAdd(value.Key, value.Value);
 				}
-				
-				//result.TryAdd(ClaimTypes.NameIdentifier, user.Id);
-				//result.TryAdd(ClaimTypes.Name, user.UserName);
-				
-				//// A user can be in more than one role, so the role claim is set to an array
-				//if (user.Roles != null && user.Roles.Any())
-				//{
-				//	result.TryAdd("roles", user.Roles.Select(role => role.Name));
-				//}
-
-				//foreach (UserProfileValue value in user.Profile)
-				//{
-				//	result.TryAdd(value.UserProfileProperty.TypeUri, value.Value);
-				//}
 
 				return Json(result);
 			}
@@ -316,13 +314,14 @@ namespace Nucleus.OAuth.Server.Controllers
 
 		private async Task<RedirectResult> RedirectToLogin(ClientAppToken token)
 		{
+			string url;
+
 			if (token.ClientApp.LoginPage != null)
 			{
-				return Redirect($"{token.ClientApp.LoginPage.DefaultPageRoute}?returnUrl=/oauth2/respond/{token.Id}");
+				url = $"{token.ClientApp.LoginPage.DefaultPageRoute}?returnUrl=/oauth2/respond/{token.Id}";
 			}
 			else
 			{
-				string uri;
 				if (this.Context.Site != null)
 				{
 					SitePages sitePage = this.Context.Site.GetSitePages();
@@ -339,21 +338,24 @@ namespace Nucleus.OAuth.Server.Controllers
 					if (loginPageRoute == null)
 					{
 						// Use default login page
-						uri = this.DefaultLoginUri();
+						url = this.DefaultLoginUri();
 					}
 					else
 					{
-						uri = loginPageRoute.Path;
+						url = loginPageRoute.Path;
 					}
 				}
 				else
 				{
 					// use default login page
-					uri = this.DefaultLoginUri();
+					url = this.DefaultLoginUri();
 				}
 
-				return Redirect($"{uri}?returnUrl=/oauth2/respond/{token.Id}");
+				url = $"{url}?returnUrl=/oauth2/respond/{token.Id}";
 			}
+
+			Logger.LogTrace("Redirecting to '{url}'.", url);
+			return Redirect(url);
 		}
 
 		private RedirectResult ErrorRedirect(string redirectUrl, string error)

@@ -3,20 +3,24 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.OAuth.Client.ViewModels
-<label>Log in with</label>
-<select id="oauth-viewer-select">
-	@foreach (var option in Model.Options)
-	{
-		<option value="@option.AuthenticateEndpoint(Model.ReturnUrl)">@option.DisplayName()</option>
-	}
-</select>	
-<button id="oauth-viewer-login" class="button" type="button">Log in</button>
+<div class="d-flex">
+	<div class="d-flex">
+		<label class="d-flex align-self-center me-1">Log in with</label>
+		<select id="oauthclient-viewer-select">
+			@foreach (var option in Model.Options)
+			{
+				<option value="@option.AuthenticateEndpoint(Model.ReturnUrl)">@option.DisplayName()</option>
+			}
+		</select>	
+		<button id="oauth-viewer-login" class="btn btn-primary ms-1" type="button">Log in</button>
+	</div>
+</div>
 <script type="text/javascript">
 	jQuery(document).ready(function ()
 	{
 		jQuery('#oauth-viewer-login').on('click', function() 
 		{
-			document.location = jQuery('#oauth-viewer-select option:selected').prop('value');
+			document.location = jQuery('#oauthclient-viewer-select option:selected').prop('value');
 		});
 	});
 </script>

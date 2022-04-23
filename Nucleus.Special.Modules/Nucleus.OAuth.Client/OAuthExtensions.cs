@@ -93,6 +93,7 @@ namespace Nucleus.OAuth.Client
 						builder.AddGoogle(providerName, options =>
 						{
 							SetOptions(options, providerName, configurationSection, providerConfig);
+							options.Events.OnCreatingTicket = ReadUserData;
 						});
 						break;
 
@@ -100,6 +101,8 @@ namespace Nucleus.OAuth.Client
 						builder.AddFacebook(providerName, options =>
 						{
 							SetOptions(options, providerName, configurationSection, providerConfig);
+							options.Scope.Add("public_profile");
+							options.Events.OnCreatingTicket = ReadUserData;
 						});
 						break;
 
@@ -114,6 +117,7 @@ namespace Nucleus.OAuth.Client
 						builder.AddMicrosoftAccount(providerName, options =>
 						{
 							SetOptions(options, providerName, configurationSection, providerConfig);
+							options.Events.OnCreatingTicket = ReadUserData;
 						});
 						break;
 
@@ -137,9 +141,12 @@ namespace Nucleus.OAuth.Client
 				logger?.LogTrace("The OAUTH token contains a id_token property (JWT token).");
 
 				JwtSecurityTokenHandler handler = new();
-				handler.InboundClaimTypeMap.Clear();
-				JwtSecurityToken token = handler.ReadJwtToken(value.ToString());
 
+				// Make the JwtSecurityTokenHandler use the claim types we give it instead of changing them to different types
+				handler.InboundClaimTypeMap.Clear();
+
+				JwtSecurityToken token = handler.ReadJwtToken(value.ToString());
+				
 				// Look for claim actions (set in config/code with MapJsonType) in the JWT payload (token claims).  If found, add claims
 				// to the identity with the claim types specified.  Normally claim actions are populated (automatically) by a call to
 				// options.UserInformationEndpoint, and .net core doesn't seem to pay any attention to JWT tokens (hence this code is required).

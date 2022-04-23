@@ -229,6 +229,8 @@ namespace Nucleus.OAuth.Server.Controllers
 		private async Task<string> BuildJwtToken(ClientAppToken appToken)
 		{
 			JwtSecurityTokenHandler handler = new();
+
+			// Make the JwtSecurityTokenHandler use the claim types we give it instead of changing them to different types
 			handler.OutboundClaimTypeMap.Clear();
 
 			User user = await this.UserManager.Get(this.Context.Site, appToken.UserId.Value);

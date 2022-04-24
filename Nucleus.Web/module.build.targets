@@ -22,7 +22,19 @@
 			Condition="'$(Configuration)' == 'Debug' AND '$(NUCLEUS_PATH)' == ''"
 			Text="The %NUCLEUS_PATH% environment path is not set, your plugin will not be copied." />
 	</Target>
+
+	<Target Name="GetPackageAssemblies" AfterTargets="PostBuildEvent">
+		<XmlPeek XmlInputPath="package.xml" Namespaces="&lt;Namespace Prefix='p' Uri='urn:nucleus/schemas/package/1.0'/&gt;" Query="//p:package/p:components/p:component/p:folder[@name='Bin' or @name='bin']/p:file/@name">
+			<Output TaskParameter="Result" ItemName="_XmlPackageAssemblies" />
+		</XmlPeek>
+		<ItemGroup>
+			<PackageAssemblies Include="@(_XmlPackageAssemblies->'bin\$(Configuration)\$(TargetFramework)\%(Identity)')" />
+		</ItemGroup>
+	</Target>
 	
+	<Target Name="test" AfterTargets="PostBuildEvent">
+		<Message Importance="high" Text="Package assembles: @(PackageAssemblies)" />
+	</Target>
 	<!-- 
 		Copy module assemblies to the dev environment Nucleus host/extensions/YOURMODULE/bin folder.	This step renames (moves) existing 
 		DLLs to _OLD first in order to trigger a restart, this is required because otherwise the DLLs will be "in use"
@@ -43,7 +55,7 @@
 	 -->
 	<Target Name="GetOutputAssemblies" AfterTargets="PostBuildEvent">
 		<ItemGroup>
-			<ReferenceAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\ref\*.dll" />
+			<!--<ReferenceAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\ref\*.dll" />-->
 			
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Abstractions.dll"></ExcludedAssemblies>
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.ViewFeatures.dll"></ExcludedAssemblies>
@@ -58,8 +70,9 @@
 			
 			<Message Importance="high" Text="Reference assembles: @(ReferenceAssemblies)" />
 			<Message Importance="high" Text="Excluded assembles: @(ExcludedAssemblies)" />
-			<AllAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\*.dll" />
-			<OutputAssemblies Include="@(AllAssemblies)" Exclude="@(ReferenceAssemblies);@(ExcludedAssemblies)" />
+			<!--<AllAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\*.dll" />-->
+			<!--<OutputAssemblies Include="@(AllAssemblies);@(PackageAssemblies)" Exclude="@(ReferenceAssemblies);@(ExcludedAssemblies)" />-->
+			<OutputAssemblies Include="@(PackageAssemblies)" Exclude="@(ExcludedAssemblies)" />
 		</ItemGroup>		
 	</Target>
 	

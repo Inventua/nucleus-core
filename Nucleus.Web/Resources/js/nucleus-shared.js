@@ -23,7 +23,7 @@ function _Page()
 		jQuery(document).on('submit', 'form[data-target], form:has(input[type="submit"][data-target], input[type="file"][data-target], button[type="submit"][data-target])', _postPartialContent);
 				
 		// Attach links which target an IFRAME
-		jQuery(document).on('click', 'A[data-frametarget]', _loadIFrame);
+		jQuery(document).on('click', 'A[data-frametarget], BUTTON[data-frametarget]', _loadIFrame);
 
 		// Attach hyperlinks with a data-target, but not a data-method to _getPartialContent
 		jQuery(document).on('click', 'A[data-target]:not([data-method])', _getPartialContent);
@@ -170,6 +170,13 @@ function _Page()
 			url = jQuery(event.currentTarget).attr('href');
 			targetFrameSelector = jQuery(event.currentTarget).attr('data-frametarget');
 		}
+		else if (event.currentTarget.tagName.toLowerCase() === 'button')
+		{
+			form = jQuery(event.currentTarget).parents('form');
+
+			url = jQuery(event.currentTarget).attr('formaction');
+			targetFrameSelector = jQuery(event.currentTarget).attr('data-frametarget');
+		}
 
 		if (typeof (event.originalEvent) !== 'undefined' && typeof (event.originalEvent.submitter) !== 'undefined')
 		{
@@ -183,11 +190,6 @@ function _Page()
 		targetFrame = jQuery(targetFrameSelector);
 		if (targetFrame.length !== 0)
 		{
-			//if (targetFrame.attr('data-overlay') !== '')
-			//{
-			//	jQuery(targetFrame.attr('data-overlay')).show();
-			//}
-
 			targetFrame.attr('src', url);
 		}
 

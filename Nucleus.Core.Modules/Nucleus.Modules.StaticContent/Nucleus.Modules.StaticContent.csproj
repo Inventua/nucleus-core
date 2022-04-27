@@ -43,6 +43,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
     <ProjectReference Include="..\..\Nucleus.Data.Common\Nucleus.Data.Common.csproj" />
     <ProjectReference Include="..\..\Nucleus.Extensions\Nucleus.Extensions.csproj" />

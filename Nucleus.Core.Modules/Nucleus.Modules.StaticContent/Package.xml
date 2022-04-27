@@ -24,6 +24,7 @@
 			
 			<folder name="Bin">
 				<file name="Nucleus.Modules.StaticContent.dll" />
+				<file name="HtmlAgilityPack.dll" />
 			</folder>
 			
 			<folder name="Views">

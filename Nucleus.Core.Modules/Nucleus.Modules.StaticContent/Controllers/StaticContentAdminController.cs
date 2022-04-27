@@ -48,7 +48,15 @@ namespace Nucleus.Modules.StaticContent.Controllers
 		public ActionResult SaveSettings(ViewModels.Settings viewModel)
 		{
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SOURCE_FOLDER_ID, viewModel.SourceFolder.Id);
-			this.Context.Module.ModuleSettings.Set(MODULESETTING_DEFAULT_FILE_ID, viewModel.DefaultFile.Id);
+
+			if (viewModel.DefaultFile == null)
+			{
+				this.Context.Module.ModuleSettings.Set(MODULESETTING_DEFAULT_FILE_ID, Guid.Empty);
+			}
+			else
+			{
+				this.Context.Module.ModuleSettings.Set(MODULESETTING_DEFAULT_FILE_ID, viewModel.DefaultFile.Id);
+			}
 
 			this.PageModuleManager.SaveSettings(this.Context.Module);
 
@@ -87,9 +95,14 @@ namespace Nucleus.Modules.StaticContent.Controllers
 				catch (System.IO.FileNotFoundException)
 				{
 				}
+
+				if (viewModel.DefaultFile == null)
+				{
+					viewModel.DefaultFile = new() { Id = module.ModuleSettings.Get(MODULESETTING_DEFAULT_FILE_ID, Guid.Empty) };
+				}
 			}
 
-			//// We have to list the contents of the source folder in order to populate the default file dropdown
+			// We have to list the contents of the source folder in order to populate the default file dropdown
 			if (viewModel.SourceFolder != null)
 			{
 				Folder folder = await fileSystemManager.GetFolder(site, viewModel.SourceFolder.Id);
@@ -100,8 +113,6 @@ namespace Nucleus.Modules.StaticContent.Controllers
 					folder = await fileSystemManager.GetFolder(site, viewModel.SourceFolder.Provider, "");
 				}
 				viewModel.SourceFolder = await fileSystemManager.ListFolder(site, folder.Id, "");
-
-				//viewModel.SourceFolder = await fileSystemManager.ListFolder(site, viewModel.SourceFolder.Id, "");
 			}
 
 			return viewModel;

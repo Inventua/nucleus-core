@@ -26,6 +26,7 @@
 				<file name="Azure.Storage.Common.dll" />
 				<file name="System.Memory.Data.dll" />
 				<file name="Microsoft.Bcl.AsyncInterfaces.dll" />
+				<file name="System.IO.Hashing.dll" />
 			</folder>
 			
 		</component>

@@ -49,15 +49,11 @@
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 	</PropertyGroup>
 
-	<Target Name="FilterCopyLocalItems" AfterTargets="ResolveLockFileCopyLocalFiles">
+	<!--<Target Name="FilterCopyLocalItems" AfterTargets="ResolveLockFileCopyLocalFiles">
 		<ItemGroup>
 			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="!($([System.String]::new('%(DestinationSubPath)').StartsWith('Azure'))) AND '%(DestinationSubPath)' != 'System.Memory.Data.dll' AND '%(DestinationSubPath)' != 'Microsoft.Bcl.AsyncInterfaces.dll'" />
 		</ItemGroup>
-	<!-- 
-	Condition="'%(DestinationSubPath)'.StartsWith('Azure')"
-				Condition="'%(DestinationSubPath)' != 'Elasticsearch.Net.dll' AND '%(DestinationSubPath)' != 'NEST.dll'" /> 
-	-->
-	</Target>
+	</Target>-->
 	
 	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
 </Project>

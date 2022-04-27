@@ -247,7 +247,7 @@ namespace Nucleus.OAuth.Client
 
 		private static string GetCallbackPath(string provider)
 		{
-			return $"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/oauth/callback/{provider.ToLower()}";
+			return $"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/oauthclient/callback/{provider.ToLower()}";
 		}
 	}
 }

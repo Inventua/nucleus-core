@@ -13,8 +13,6 @@
 	@Html.HiddenFor(model => model.PageEditorMode)
 
 	<fieldset role="group" aria-labelledby="heading">
-		<h2>@(String.IsNullOrEmpty(Model.Module.Title) ? "" : @Model.Module.Title)</h2>
-
 		<Tab>
 			<TabItem target="#module-properties" active="true" caption="Properties"></TabItem>
 			<TabItem target="#module-permissions" caption="Permissions"></TabItem>

@@ -142,7 +142,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			{
 				try
 				{
-					return blobClient.GenerateSasUri(Azure.Storage.Sas.BlobSasPermissions.Read, DateTimeOffset.Now.AddMinutes(60));
+					return blobClient.GenerateSasUri(Azure.Storage.Sas.BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddMinutes(60));
 				}
 				catch (Azure.RequestFailedException ex)
 				{

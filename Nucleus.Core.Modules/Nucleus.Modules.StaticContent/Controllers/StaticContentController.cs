@@ -72,6 +72,10 @@ namespace Nucleus.Modules.StaticContent.Controllers
 							}
 							else
 							{
+								//System.IO.MemoryStream data = new();
+								//content.Position = 0;
+								//content.CopyTo(data);
+								//return File(data.ToArray(), GetMimeType(file));
 								// Redirect to the file.
 								if (file.Capabilities.CanDirectLink)
 								{
@@ -88,7 +92,7 @@ namespace Nucleus.Modules.StaticContent.Controllers
 								else
 								{
 									return new RedirectResult(Url.FileLink(file), true);
-								}								
+								}
 							}
 						}
 					}
@@ -98,11 +102,68 @@ namespace Nucleus.Modules.StaticContent.Controllers
 					return NotFound();
 				}
 
+				// Parse the output (html) for static file links
+				HtmlAgilityPack.HtmlDocument document = new();
+				document.LoadHtml(viewModel.Content);
+
+				await ReplaceAttribute(viewModel, document, "img", "src");
+				await ReplaceAttribute(viewModel, document, "link", "href");
+				await ReplaceAttribute(viewModel, document, "script", "src");
+
+				viewModel.Content = document.DocumentNode.OuterHtml;
+
 				return View("Viewer", viewModel);
 			}
 			catch (System.IO.FileNotFoundException)
 			{
 				return NotFound();
+			}
+		}
+
+		private async Task ReplaceAttribute(ViewModels.Viewer viewModel, HtmlAgilityPack.HtmlDocument document, string nodeType, string attributeName)
+		{
+			HtmlAgilityPack.HtmlNodeCollection nodes = document.DocumentNode.SelectNodes($"//{nodeType.ToLower()}");
+
+			if (nodes != null)
+			{
+
+				foreach (HtmlAgilityPack.HtmlNode node in nodes)
+				{
+					string attributeValue = node.GetAttributeValue(attributeName, "");
+					if (attributeValue != null)
+					{
+						if (!attributeValue.Contains(System.Uri.SchemeDelimiter))
+						{
+							string localPath;
+							string query;
+
+							int position = attributeValue.IndexOfAny(new char[] { '?', '#' });
+							if (position < 0)
+							{
+								localPath = attributeValue;
+								query = "";
+							}
+							else
+							{
+								localPath = attributeValue.Substring(0, position);
+								query = attributeValue.Substring(position);
+							}
+
+							// attribute is a relative path
+							File file = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SourceFolder.Provider, viewModel.SourceFolder.Path + (String.IsNullOrEmpty(viewModel.SourceFolder.Path) ? "" : "/") + localPath);
+							if (file != null && file.Capabilities.CanDirectLink)
+							{
+								// replace attribute with direct file link
+								string fileUri = this.FileSystemManager.GetFileDirectUrl(this.Context.Site, file).ToString();
+								if (fileUri.Contains('?') && query.StartsWith('?'))
+								{
+									query = $"&{query.Substring(1)}";
+								}
+								node.SetAttributeValue(attributeName, fileUri + query);
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -132,7 +193,7 @@ namespace Nucleus.Modules.StaticContent.Controllers
 
 		private async Task<ViewModels.Viewer> BuildViewModel()
 		{
-		
+
 			return await StaticContentAdminController.BuildSettingsViewModel<ViewModels.Viewer>(null, this.Context.Site, this.Context.Module, this.FileSystemManager);
 		}
 

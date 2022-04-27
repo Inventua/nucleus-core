@@ -3,6 +3,10 @@ The OAuth client allows users to sign on to Nucleus using an external OAuth2 ser
 
 > An OAuth server extension for Nucleus is available for sale. 
 
+> Most OAuth services use SSL (https).  The Microsoft remote authentication system uses a 'correlation cookie' to track remote login requests. 
+Modern browsers block cookies when navigating from an SSL to non-SSL site.  Therefore, if you are using an OAuth service you should use SSL for
+your site, because browsers will block the correlation cookie unless both the OAuth client site and OAuth service site use SSL.
+
 The OAuth client extension settings are accessed in the `Manage` control panel.  OAuth providers are set up in configuration files.
 
 ![OAuth Client Settings](OAuthClientSettings.png)
@@ -37,7 +41,7 @@ pages.
 | Automatically redirect to remote login | If you only have one OAuth provider configured, you can set the module to automatically redirect to that OAuth provider's login page automatically. If you have more than one OAuth provider configured, this setting has no effect. |
 
 > You can choose not to use the OAuth Providers List module and include a link to your OAuth provider in your page layout, or in the content of another module.  The Url to 
-start remote authentication is /extensions/OAuthClient/Authorize/providerName, where providerName is the name of an entry in your configuration file, or is the type of an 
+start remote authentication is `https://your-site/extensions/oauthclient/authenticate/providerName`, where providerName is the name of an entry in your configuration file, or is the type of an 
 OAuth provider entry which does not have a name.
 
 ## Configuration
@@ -79,10 +83,12 @@ different file if you want to.
 ```
 
 > The Google, Facebook, Twitter and Microsoft Account services are straightforward to set up, and only need the client id and client secret that you generate using the 
-OAuth service's web site tools.  (Click here)[https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social#setup-login-providers-required-by-your-application]
-for instructions on how to use their web sites to generate client credentials.
+OAuth service's web site tools.  [Click here](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social#setup-login-providers-required-by-your-application)
+for instructions on how to use their web sites to generate client credentials.  Most OAuth services need for you to enter your Redirect URI, which is 
+`https://your-site/extensions/oauthclient/callback/providerName`, where providerName is the name of an entry in your configuration file, or is the type of an 
+OAuth provider entry which does not have a name.
 
-> The Nucleus OAuth Server example above uses the generic `OAuth` provider, which can also be used to configure other OAuth providers.
+> The Nucleus OAuth Server example above uses the generic `OAuth` provider, which can also be used to use other OAuth services.
 
 ### Configuration Settings
 |                         |                                                                                      |

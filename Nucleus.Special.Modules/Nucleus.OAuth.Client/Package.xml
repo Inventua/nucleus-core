@@ -37,7 +37,7 @@
 				<file name="Microsoft.AspNetCore.Authentication.Google.dll" />
 				<file name="Microsoft.AspNetCore.Authentication.MicrosoftAccount.dll" />
 				<file name="Microsoft.AspNetCore.Authentication.OpenIdConnect.dll" />
-				<file name="Microsoft.AspNetCore.Authentication.Twitter.dll" />
+				<file name="AspNet.Security.OAuth.Twitter.dll" />
 				<file name="Microsoft.IdentityModel.Protocols.OpenIdConnect.dll" />
 				<file name="Microsoft.IdentityModel.Tokens.dll" />
 				<file name="Microsoft.IdentityModel.Protocols.dll" />

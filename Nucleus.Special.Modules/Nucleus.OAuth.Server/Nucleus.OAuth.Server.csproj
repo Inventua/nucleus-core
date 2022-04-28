@@ -49,9 +49,9 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Nucleus.Abstractions" Version="1.0.0.3" />
+		<PackageReference Include="Nucleus.Abstractions" Version="1.0.0.4" />
 		<PackageReference Include="Nucleus.Extensions" Version="1.0.0" />
-		<PackageReference Include="Nucleus.ViewFeatures" Version="1.0.0.2" />
+		<PackageReference Include="Nucleus.ViewFeatures" Version="1.0.1" />
 		<PackageReference Include="Nucleus.Data.Common" Version="1.0.0" />
 		<PackageReference Include="Nucleus.Data.EntityFramework" Version="1.0.0" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.17.0" />

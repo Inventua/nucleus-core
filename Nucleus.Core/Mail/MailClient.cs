@@ -34,7 +34,8 @@ namespace Nucleus.Core.Mail
 		}
 
 		/// <summary>
-		/// Parse the specified template, and send the resulting email to the specified to address.
+		/// Parse the specified template, and send the resulting email to the specified 'to' address. The 'to' address can be a list of email addresses
+		/// separated by commas or semicolons.
 		/// </summary>
 		/// <param name="template"></param>
 		/// <param name="args"></param>
@@ -45,7 +46,11 @@ namespace Nucleus.Core.Mail
 			MimeKit.BodyBuilder builder = new();
 			
 			message.From.Add(MimeKit.MailboxAddress.Parse(this.MailSettings.Sender));
-			message.To.Add( MimeKit.MailboxAddress.Parse(to));
+
+			foreach (string address in to.Split(new char[] { ',' , ';' }, StringSplitOptions.RemoveEmptyEntries))
+      {
+				message.To.Add(MimeKit.MailboxAddress.Parse(address));
+			}
 
 			message.Subject = ParseTemplate(template.Subject, args);
 			builder.HtmlBody = ParseTemplate(template.Body, args);

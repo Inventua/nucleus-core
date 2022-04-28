@@ -124,7 +124,6 @@ namespace Nucleus.OAuth.Client
 					default:
 						throw new InvalidOperationException($"OAuth provider {providerName} not recognized.");
 				}
-
 			}
 		}
 
@@ -232,16 +231,21 @@ namespace Nucleus.OAuth.Client
 					oauthOptions.ClaimActions.MapJsonKey(key.ClaimType, key.JsonKey ?? key.ClaimType, key.ValueType);
 				}
 			}
-			options.Events.OnRemoteFailure = ((RemoteFailureContext ctx) => 
-			{ 
-				return Task.CompletedTask;
-			});
-
-			options.Events.OnAccessDenied = ((AccessDeniedContext ctx) => 
+			options.Events.OnTicketReceived = ((TicketReceivedContext ctx) =>
 			{
-
 				return Task.CompletedTask;
 			});
+
+			//options.Events.OnRemoteFailure = ((RemoteFailureContext ctx) => 
+			//{ 
+			//	return Task.CompletedTask;
+			//});
+
+			//options.Events.OnAccessDenied = ((AccessDeniedContext ctx) => 
+			//{
+
+			//	return Task.CompletedTask;
+			//});
 
 		}
 

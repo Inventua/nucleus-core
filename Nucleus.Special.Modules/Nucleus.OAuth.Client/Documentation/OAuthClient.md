@@ -82,11 +82,13 @@ different file if you want to.
   }]
 ```
 
-> The Google, Facebook, Twitter and Microsoft Account services are straightforward to set up, and only need the client id and client secret that you generate using the 
+> The Google, Facebook, Twitter and Microsoft Account services have pre-configued default settings, so you only need to configure the client id and client secret that you generate using the 
 OAuth service's web site tools.  [Click here](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social#setup-login-providers-required-by-your-application)
 for instructions on how to use their web sites to generate client credentials.  Most OAuth services need for you to enter your Redirect URI, which is 
 `https://your-site/extensions/oauthclient/callback/providerName`, where providerName is the name of an entry in your configuration file, or is the type of an 
 OAuth provider entry which does not have a name.
+
+> The Twitter OAuth2 service does not return the user's email address.  If you need the user's email address, don't allow users to login using Twitter.
 
 > The Nucleus OAuth Server example above uses the generic `OAuth` provider, which can also be used to use other OAuth services.
 

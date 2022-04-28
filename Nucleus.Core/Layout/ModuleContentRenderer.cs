@@ -216,12 +216,13 @@ namespace Nucleus.Core.Layout
 
 		private HtmlString BuildEditButton(string text, string title, string formaction, PageModule moduleInfo, IDictionary<string, string> attributes)
 		{
-			TagBuilder editControlBuilder = new("a");
+			TagBuilder editControlBuilder = new("button");
 			editControlBuilder.InnerHtml.SetContent(text);
 			editControlBuilder.Attributes.Add("class", "nucleus-material-icon btn btn-secondary");
 			editControlBuilder.Attributes.Add("title", title);
+			editControlBuilder.Attributes.Add("type", "button");
 			editControlBuilder.Attributes.Add("data-frametarget", ".nucleus-modulesettings-frame");
-			editControlBuilder.Attributes.Add("href", $"{formaction}?mid={moduleInfo.Id}&mode=Standalone");
+			editControlBuilder.Attributes.Add("formaction", $"{formaction}?mid={moduleInfo.Id}&mode=Standalone");
 			
 			if (attributes != null)
 			{

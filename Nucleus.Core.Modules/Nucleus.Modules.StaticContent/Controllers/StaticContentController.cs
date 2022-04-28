@@ -39,9 +39,17 @@ namespace Nucleus.Modules.StaticContent.Controllers
 				if (!String.IsNullOrEmpty(this.Context.Parameters))
 				{
 					file = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SourceFolder.Provider, viewModel.SourceFolder.Path + (String.IsNullOrEmpty(viewModel.SourceFolder.Path) ? "" : "/") + this.Context.Parameters);
+					if (file == null)
+					{
+						return NotFound();
+					}
 				}
 				else
 				{
+					if (viewModel.DefaultFile == null)
+					{
+						return NotFound();
+					}
 					file = viewModel.DefaultFile;
 				}
 
@@ -97,20 +105,18 @@ namespace Nucleus.Modules.StaticContent.Controllers
 						}
 					}
 				}
-				else
-				{
-					return NotFound();
+
+				if (!String.IsNullOrEmpty(viewModel.Content))
+				{   // Parse the output (html) for static file links
+					HtmlAgilityPack.HtmlDocument document = new();
+					document.LoadHtml(viewModel.Content);
+
+					await ReplaceAttribute(viewModel, document, "img", "src");
+					await ReplaceAttribute(viewModel, document, "link", "href");
+					await ReplaceAttribute(viewModel, document, "script", "src");
+
+					viewModel.Content = document.DocumentNode.OuterHtml;
 				}
-
-				// Parse the output (html) for static file links
-				HtmlAgilityPack.HtmlDocument document = new();
-				document.LoadHtml(viewModel.Content);
-
-				await ReplaceAttribute(viewModel, document, "img", "src");
-				await ReplaceAttribute(viewModel, document, "link", "href");
-				await ReplaceAttribute(viewModel, document, "script", "src");
-
-				viewModel.Content = document.DocumentNode.OuterHtml;
 
 				return View("Viewer", viewModel);
 			}
@@ -193,7 +199,6 @@ namespace Nucleus.Modules.StaticContent.Controllers
 
 		private async Task<ViewModels.Viewer> BuildViewModel()
 		{
-
 			return await StaticContentAdminController.BuildSettingsViewModel<ViewModels.Viewer>(null, this.Context.Site, this.Context.Module, this.FileSystemManager);
 		}
 

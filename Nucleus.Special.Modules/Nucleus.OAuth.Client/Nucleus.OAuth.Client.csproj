@@ -42,12 +42,12 @@
   </ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AspNet.Security.OAuth.Twitter" Version="6.0.6" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="6.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="6.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.4" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="6.0.4" />
 		<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.17.0" />
 		<PackageReference Include="Nucleus.Abstractions" Version="1.0.0.4" />
 		<PackageReference Include="Nucleus.ViewFeatures" Version="1.0.0.2" />
@@ -60,11 +60,11 @@
 		<CopyToDefaultSetup>false</CopyToDefaultSetup>
 	</PropertyGroup>
 
-	<Target Name="FilterCopyLocalItems" AfterTargets="ResolveLockFileCopyLocalFiles">
+	<!--<Target Name="FilterCopyLocalItems" AfterTargets="ResolveLockFileCopyLocalFiles">
 		<ItemGroup>
 			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="!($([System.String]::new('%(DestinationSubPath)').StartsWith('Microsoft.AspNetCore.Authentication')) OR '%(DestinationSubPath)' == 'Microsoft.IdentityModel.Protocols.OpenIdConnect.dll' OR '%(DestinationSubPath)' == 'Microsoft.IdentityModel.Tokens.dll' OR '%(DestinationSubPath)' == 'Microsoft.IdentityModel.Protocols.dll' OR '%(DestinationSubPath)' == 'System.IdentityModel.Tokens.Jwt.dll' OR '%(DestinationSubPath)' == 'Microsoft.IdentityModel.Logging.dll'  OR '%(DestinationSubPath)' == 'Microsoft.IdentityModel.JsonWebTokens.dll')" />
 		</ItemGroup>
-	</Target>
+	</Target>-->
 	
 	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
 </Project>

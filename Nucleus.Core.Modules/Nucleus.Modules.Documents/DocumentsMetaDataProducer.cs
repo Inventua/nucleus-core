@@ -75,7 +75,7 @@ namespace Nucleus.Modules.Documents
 			Page page = await this.PageManager.Get(module.PageId);
 			Uri pageUri = null;
 
-			if (page != null)
+			if (page != null && document.File != null)
 			{
 				string pageUrl = UrlHelperExtensions.RelativePageLink(page);
 

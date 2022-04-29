@@ -681,6 +681,124 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 		#endregion
 
+		#region "    Subscriptions    "
+
+		public async Task SubscribeForum(Guid forumId, Guid userId)
+		{
+			Boolean alreadyExists = await this.Context.ForumSubscriptions
+				.Where(subscription => subscription.ForumId == forumId && subscription.UserId == userId)
+				.AnyAsync();
+
+			if (!alreadyExists)
+			{
+				this.Context.Add(new ForumSubscription() { ForumId = forumId, UserId = userId });
+				await this.Context.SaveChangesAsync<ForumSubscription>();
+			}
+
+		}
+
+		public async Task UnSubscribeForum(Guid forumId, Guid userId)
+		{
+			ForumSubscription subscription = await this.Context.ForumSubscriptions
+				.Where(subscription => subscription.ForumId == forumId && subscription.UserId == userId)
+				.FirstOrDefaultAsync();
+
+			if (subscription != null)
+			{
+				this.Context.Remove(subscription);
+			}
+
+			await this.Context.SaveChangesAsync<ForumSubscription>();
+		}
+
+
+		public async Task<ForumSubscription> GetForumSubscription(Guid forumId, Guid userId)
+		{
+			return await this.Context.ForumSubscriptions
+				.Where(subscription => subscription.ForumId == forumId && subscription.UserId == userId)
+				.FirstOrDefaultAsync();
+		}
+
+		public async Task SubscribeForumPost(Guid postId, Guid userId)
+		{
+			Boolean alreadyExists = await this.Context.PostSubscriptions
+				.Where(subscription => subscription.ForumPostId == postId && subscription.UserId == userId)
+				.AnyAsync();
+
+			if (!alreadyExists)
+			{
+				this.Context.Add(new PostSubscription() { ForumPostId = postId, UserId = userId });
+				await this.Context.SaveChangesAsync<PostSubscription>();
+			}
+
+		}
+
+
+		public async Task UnSubscribeForumPost(Guid postId, Guid userId)
+		{
+			PostSubscription subscription = await this.Context.PostSubscriptions
+				.Where(subscription => subscription.ForumPostId == postId && subscription.UserId == userId)
+				.FirstOrDefaultAsync();
+
+			if (subscription != null)
+			{
+				this.Context.Remove(subscription);
+			}
+
+			await this.Context.SaveChangesAsync<PostSubscription>();
+		}
+
+
+		public async Task<PostSubscription> GetPostSubscription(Guid postId, Guid userId)
+		{
+			return await this.Context.PostSubscriptions
+				.Where(subscription => subscription.ForumPostId == postId && subscription.UserId == userId)
+				.FirstOrDefaultAsync();
+		}
+		#endregion
+
+		#region "    Post Tracking    "
+		public async Task<PostTracking> GetPostTracking(Guid postId, Guid userId) 
+		{
+			return await this.Context.PostTracking
+				.Where(tracking => tracking.ForumPostId == postId && tracking.UserId == userId)
+				.FirstOrDefaultAsync();
+		}
+		
+		public async Task SavePostTracking(Guid postId, Guid userId)
+		{
+			PostTracking tracking = await this.Context.PostTracking
+				.Where(tracking => tracking.ForumPostId == postId && tracking.UserId == userId)
+				.FirstOrDefaultAsync();
+
+			if (tracking == null)
+			{
+				this.Context.Add(new PostTracking() { ForumPostId = postId, UserId = userId });
+			}
+			else
+			{
+				this.Context.Entry(tracking).State = EntityState.Modified;
+			}
+
+			await this.Context.SaveChangesAsync<PostTracking>();
+		}
+
+		public async Task DeletePostTracking(Guid postId, Guid userId)
+		{
+			PostTracking tracking = await this.Context.PostTracking
+				.Where(tracking => tracking.ForumPostId == postId && tracking.UserId == userId)
+				.FirstOrDefaultAsync();
+
+			if (tracking != null)
+			{
+				this.Context.Remove(tracking);
+			}
+
+			await this.Context.SaveChangesAsync<PostTracking>();
+		}
+
+
+		#endregion
 	}
 }
 

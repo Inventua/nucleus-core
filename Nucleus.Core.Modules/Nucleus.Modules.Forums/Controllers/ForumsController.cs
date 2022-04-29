@@ -49,11 +49,19 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				if (postId == Guid.Empty)
 				{
-					// display selected forum
-					Models.Forum forum = await this.GroupsManager.FindForum(this.Context.Module, this.Context.Parameters);
+					// display selected forum (and post, if specified)
+					string[] parameters = this.Context.Parameters.Split('/');
+					Models.Forum forum = await this.GroupsManager.FindForum(this.Context.Module, parameters[0]);
 					if (forum != null)
 					{
-						return View("ViewForum", await BuildViewForumViewModel(forum.Id));
+						if (parameters.Length > 1)
+						{ 
+							return await ViewPost(Guid.Parse(parameters[1]));
+						}
+						else
+						{
+							return View("ViewForum", await BuildViewForumViewModel(forum.Id));
+						}
 					}
 					else
 					{
@@ -198,6 +206,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_VIEW))
 			{
+				await this.ForumsManager.SavePostTracking(viewModel.Post, HttpContext.User);
 				return View("ViewPost", viewModel);
 			}
 			else
@@ -246,6 +255,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			}
 
 			await this.ForumsManager.SavePost(this.Context.Site, forum, viewModel.Post);
+			await this.ForumsManager.SavePostTracking(viewModel.Post, HttpContext.User);
 
 			return View("ViewForum", await BuildViewForumViewModel(forum.Id));
 		}
@@ -270,11 +280,10 @@ namespace Nucleus.Modules.Forums.Controllers
 		{
 			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
 
-			// TODO
 			if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE))
 			{
 				// subscribe to the forum 
-
+				await this.ForumsManager.Subscribe(forum, HttpContext.User);
 			}
 			else
 			{
@@ -284,23 +293,43 @@ namespace Nucleus.Modules.Forums.Controllers
 			return View("ViewForum", await BuildViewForumViewModel(forum.Id));
 		}
 
+
+		[HttpPost]
+		public async Task<ActionResult> UnSubscribeForum(ViewModels.ViewForum viewModel)
+		{
+			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+
+			// UnSubscribe from the forum 
+			await this.ForumsManager.UnSubscribe(forum, HttpContext.User);
+			
+			return View("ViewForum", await BuildViewForumViewModel(forum.Id));
+		}
+
 		[HttpPost]
 		public async Task<ActionResult> SubscribePost(ViewModels.ViewForumPost viewModel)
 		{
 			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
 
-			// TODO
 			if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE))
 			{
 				// subscribe to the forum post
-
+				await this.ForumsManager.Subscribe(viewModel.Post, HttpContext.User);
 			}
 			else
 			{
 				return BadRequest();
 			}
 
-			return View("ViewForum", await BuildViewForumViewModel(forum.Id));
+			return await ViewPost(viewModel.Post.Id);
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> UnSubscribePost(ViewModels.ViewForumPost viewModel)
+		{
+			// UnSubscribe from the forum post
+			await this.ForumsManager.UnSubscribe(viewModel.Post, HttpContext.User);
+
+			return await ViewPost(viewModel.Post.Id);
 		}
 
 		[HttpPost]
@@ -320,6 +349,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			return View("ViewForum", await BuildViewForumViewModel(forum.Id));
 		}
+
 
 		[HttpPost]
 		public async Task<ActionResult> RejectForumPost(ViewModels.ViewForumPost viewModel)
@@ -557,6 +587,7 @@ namespace Nucleus.Modules.Forums.Controllers
 						viewModel.Posts = await this.ForumsManager.ListPosts(this.Context.Site, forum, Models.FlagStates.IsTrue);
 					}
 
+					viewModel.Subscription = await this.ForumsManager.GetSubscription(forum, HttpContext.User);
 					viewModel.CanPost = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_CREATE_POST);
 					viewModel.CanSubscribe = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE);										
 				}
@@ -573,16 +604,19 @@ namespace Nucleus.Modules.Forums.Controllers
 		{
 			Models.Forum forum;
 			Models.Post post;
+			Models.PostSubscription subscription;
 
 			if (forumPostId != Guid.Empty)
 			{
 				post = await this.ForumsManager.GetForumPost(this.Context.Site, forumPostId);
 				forum = await this.ForumsManager.Get(this.Context.Site, post.ForumId);
+				subscription = await this.ForumsManager.GetSubscription(post, HttpContext.User);
 			}
 			else
 			{
 				forum = await this.ForumsManager.Get(this.Context.Site, forumId);
 				post = new();
+				subscription = null;
 			}
 						
 			// Check forum (view) permissions			
@@ -593,7 +627,8 @@ namespace Nucleus.Modules.Forums.Controllers
 					return await BuildPostViewModel(new ViewModels.ViewForumPost
 					{
 						Forum = forum,
-						Post = post						
+						Post = post,
+						Subscription = subscription
 					}, readReplies);
 				}
 			}

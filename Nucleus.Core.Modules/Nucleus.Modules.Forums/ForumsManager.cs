@@ -484,7 +484,107 @@ namespace Nucleus.Modules.Forums
 			return results;
 		}
 
+		/// <summary>
+		/// Subscribe the specifed user to the specified <see cref="Forum"/>.
+		/// </summary>
+		/// <param name="Forum"></param>
+		public async Task Subscribe(Forum forum, ClaimsPrincipal user)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				await provider.SubscribeForum(forum.Id, user.GetUserId());
+			}
+		}
 
+		/// <summary>
+		/// Un-subscribe the specifed user from the specified <see cref="Forum"/>.
+		/// </summary>
+		/// <param name="Forum"></param>
+		public async Task UnSubscribe(Forum forum, ClaimsPrincipal user)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				await provider.UnSubscribeForum(forum.Id, user.GetUserId());
+			}
+		}
+
+		/// <summary>
+		/// Subscribe the specifed user to the specified <see cref="Forum"/>.
+		/// </summary>
+		/// <param name="Forum"></param>
+		public async Task Subscribe(Post post, ClaimsPrincipal user)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				await provider.SubscribeForumPost(post.Id, user.GetUserId());
+			}
+		}
+
+		/// <summary>
+		/// Un-subscribe the specifed user from the specified <see cref="Forum"/>.
+		/// </summary>
+		/// <param name="Post"></param>
+		public async Task UnSubscribe(Post post, ClaimsPrincipal user)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				await provider.UnSubscribeForumPost(post.Id, user.GetUserId());
+			}
+		}
+
+		/// <summary>
+		/// Retrieve an existing <see cref="ForumSubscription"/> from the database, or return null if there is no matching record.
+		/// </summary>
+		/// <param name="forum"></param>
+		/// <param name="user"></param>
+		/// <returns></returns>
+		public async Task<ForumSubscription> GetSubscription(Forum forum, ClaimsPrincipal user)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				return await provider.GetForumSubscription(forum.Id, user.GetUserId()); 
+			}
+		}
+
+
+		/// <summary>
+		/// Retrieve an existing <see cref="ForumSubscription"/> from the database, or return null if there is no matching record.
+		/// </summary>
+		/// <param name="post"></param>
+		/// <param name="user"></param>
+		/// <returns></returns>
+		public async Task<PostSubscription> GetSubscription(Post post, ClaimsPrincipal user)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				return await provider.GetPostSubscription(post.Id, user.GetUserId());
+			}
+
+		}
+
+		public async Task<PostTracking> GetPostTracking(Post post, ClaimsPrincipal user)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				return await provider.GetPostTracking(post.Id, user.GetUserId());
+			}
+		}
+		
+		public async Task SavePostTracking(Post post, ClaimsPrincipal user)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				await provider.SavePostTracking(post.Id, user.GetUserId());
+			}
+		}
+
+		public async Task DeletePostTracking(Post post, ClaimsPrincipal user)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				await provider.DeletePostTracking(post.Id, user.GetUserId());
+			}
+		}
 	}
 
 }

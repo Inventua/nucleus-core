@@ -4,20 +4,27 @@
 @using Nucleus.Extensions
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Forums.ViewModels
+@Html.AddStyle("~!/../viewer.css")
+@Html.AddStyle("~/Resources/css/forms.css")
 <div class="Forums">
-	<div class="nucleus-form-tools">
-		@if (Model.CanReply && !Model.Post.IsLocked)
-		{
-			@Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @data_target = ".Forums.parent()" })
-		}
-		@if (Model.CanSubscribe)
-		{
-			@Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribePost", "Forums", "Forums"), new { @class = "btn btn-outline-secondary", @data_target = ".Forums.parent()" })
-		}
-		<button type="button" class="btn btn-secondary" onclick="window.history.back();">Back</button>
-	</div>
 	@using (Html.BeginNucleusForm("SetForumPostStatus", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = "form.parent()" }))
 	{
+		<div class="nucleus-form-tools">
+			@if (Model.CanReply && !Model.Post.IsLocked)
+			{
+				@Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @data_target = ".Forums.parent()" })
+			}
+			@if (Model.CanSubscribe && Model.Subscription == null)
+			{
+				@Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribePost", "Forums", "Forums"), new { @class = "btn btn-outline-secondary", @data_target = ".Forums.parent()" })
+			}
+			@if (Model.Subscription != null)
+			{
+				@Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-outline-secondary", @data_target = ".Forums.parent()" })
+			}
+			<a class="btn btn-secondary" href="../@Model.Forum.Name.FriendlyEncode()/">Back</a>
+		</div>
+
 		@Html.HiddenFor(model => model.Forum.Id)
 		@Html.HiddenFor(model => model.Post.Id)
 		<div class="post">

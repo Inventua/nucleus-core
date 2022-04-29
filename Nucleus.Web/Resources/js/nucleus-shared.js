@@ -16,7 +16,10 @@ function _Page()
 		var timezoneOffset = new Date().getTimezoneOffset() * -1;
 		document.cookie = 'timezone-offset=' + timezoneOffset.toString() + '; path=/;SameSite=Strict;max-age=3600';
 
-		jQuery('a[data-target][href]').each(function (index, element)
+		// a elements (links) with a data-target which exist after initial page rendering (not dynamically populated) are tracked by the Google Analytics javascript, which
+		// intermittently causes page navigation (to the url in href) *after* _getPartialContent has executed.  We move the href value to data-href (which is handled by _getPartialContent)
+		// to work around this issue.
+		jQuery('a[data-target][href], a[data-frametarget][href]').each(function (index, element)
 		{
 			jQuery(element).attr('data-href', jQuery(element).attr('href'));
 			jQuery(element).attr('href', '#0;');
@@ -174,7 +177,14 @@ function _Page()
 		{
 			form = jQuery(event.currentTarget).parents('form');
 
-			url = jQuery(event.currentTarget).attr('href');
+			if (jQuery(event.currentTarget).attr('href') !== undefined)
+			{
+				url = jQuery(event.currentTarget).attr('href');
+			}
+			if (jQuery(event.currentTarget).attr('data-href') !== undefined)
+			{
+				url = jQuery(event.currentTarget).attr('data-href');
+			}
 			targetFrameSelector = jQuery(event.currentTarget).attr('data-frametarget');
 		}
 		else if (event.currentTarget.tagName.toLowerCase() === 'button')

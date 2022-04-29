@@ -24,8 +24,8 @@
 			{
 				@Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribeForum", "Forums", "Forums"), new { @class = "btn btn-secondary", @data_target = ".Forums.parent()" })
 			}
-			
-			<button type="button" class="btn btn-secondary" href="" onclick="window.history.back();">Back</button>
+			@Html.LinkButton("", "Back", Url.PageLink(Model.Page), new { @class="btn btn-secondary" })
+			@*<button type="button" class="btn btn-secondary" href="/@Model.Forum.Name.FriendlyEncode()">Back</button>*@
 		</div>
 	}
 	<table class="forum-posts">

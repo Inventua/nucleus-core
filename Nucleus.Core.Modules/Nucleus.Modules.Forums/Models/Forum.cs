@@ -22,7 +22,7 @@ namespace Nucleus.Modules.Forums.Models
 		public Settings Settings { get; set; }
 		public List<Permission> Permissions { get; set; } = new();
 		public ForumStatistics Statistics { get; set; }
-
+				
 		public Settings EffectiveSettings()
 		{
 			if (this.UseGroupSettings)

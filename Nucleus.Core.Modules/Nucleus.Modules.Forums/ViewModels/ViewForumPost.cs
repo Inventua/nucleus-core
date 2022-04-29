@@ -17,7 +17,8 @@ namespace Nucleus.Modules.Forums.ViewModels
 
 		public IList<Reply> Replies { get; set; }
 
-		
+		public PostSubscription Subscription { get; set; }
+
 		public Boolean CanEditPost { get; set; }
 		public Boolean CanReply { get; set; }
 		public Boolean CanAttach { get; set; }

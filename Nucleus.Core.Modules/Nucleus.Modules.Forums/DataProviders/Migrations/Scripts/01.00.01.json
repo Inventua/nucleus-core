@@ -1,0 +1,140 @@
+{
+	"schemaName": "Nucleus.Modules.Forums",
+	"version": "01.00.01",
+	"operations": [
+		{
+			"createTable": {
+				"name": "ForumMailQueue",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ModuleId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "UserId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "MailTemplateId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ForumMailQueue",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_ForumMailQueue_ModuleId",
+						"Columns": [ "ModuleId" ],
+						"PrincipalTable": "PageModules",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ForumMailQueue_ModuleId",
+				"table": "ForumMailQueue",
+				"isunique": false,
+				"columns": [ "ModuleId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ForumMailQueue_DateAdded",
+				"table": "ForumMailQueue",
+				"isunique": false,
+				"columns": [ "DateAdded" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "ForumPostSubscriptions",
+				"columns": [
+					{
+						"name": "UserId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ForumPostId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ForumPostSubscriptions",
+					"isclustered": true,
+					"columns": [ "UserId", "ForumPostId" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_ForumPostSubscriptions_ForumPostId",
+						"Columns": [ "ForumPostId" ],
+						"PrincipalTable": "ForumPosts",
+						"PrincipalColumns": [ "Id" ]
+					},
+					{
+						"name": "FK_ForumPostSubscriptions_UserId",
+						"Columns": [ "UserId" ],
+						"PrincipalTable": "Users",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		}
+	]
+}

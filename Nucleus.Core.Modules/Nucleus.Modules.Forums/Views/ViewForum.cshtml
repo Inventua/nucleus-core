@@ -5,6 +5,8 @@
 @using Nucleus.Modules.Forums.ViewModels
 @Html.AddStyle("~!/../viewer.css")
 @Html.AddStyle("~/Resources/css/forms.css")
+@if (Model.Forum != null)
+{
 <div class="Forums">
 	@using (Html.BeginNucleusForm("SubscribeForum", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off" }))
 	{
@@ -14,11 +16,16 @@
 			{
 				@Html.LinkButton("", "Add new post", Url.NucleusAction("AddPost", "Forums", "Forums", new { forumId = Model.Forum.Id }), new { @class = "btn btn-primary", @data_target = ".Forums.parent()" })
 			}
-			@if (Model.CanSubscribe)
+			@if (Model.CanSubscribe && Model.Subscription == null)
 			{
 				@Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribeForum", "Forums", "Forums"), new { @class = "btn btn-secondary", @data_target = ".Forums.parent()" })
 			}
-			<button type="button" class="btn btn-secondary" onclick="window.history.back();">Back</button>
+			@if (Model.Subscription != null)
+			{
+				@Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribeForum", "Forums", "Forums"), new { @class = "btn btn-secondary", @data_target = ".Forums.parent()" })
+			}
+			
+			<button type="button" class="btn btn-secondary" href="" onclick="window.history.back();">Back</button>
 		</div>
 	}
 	<table class="forum-posts">
@@ -46,7 +53,8 @@
 					}
 				</td>
 				<td>
-					<a href="@Url.NucleusAction("ViewPost", "Forums", "Forums", new { @id = post.Id })" data-target=".Forums.parent()">@post.Subject</a>
+					<a href="@post.Id">@post.Subject</a>					
+					@*<a href="@Url.NucleusAction("ViewPost", "Forums", "Forums", new { @Id = post.Id })" data-target=".Forums.parent()">@post.Subject</a>*@
 					@if (post.Status != null)
 					{
 						<span class="post-status">@post.Status.Name</span>
@@ -65,3 +73,4 @@
 		}
 	</table>
 </div>
+}

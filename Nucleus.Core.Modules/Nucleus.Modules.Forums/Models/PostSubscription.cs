@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Forums.Models
 {
-	public class Subscription
+	public class PostSubscription
 	{
 		public Guid UserId { get; set; }
-		public Guid ForumId { get; set; }
+		public Guid ForumPostId { get; set; }
 	}
 }

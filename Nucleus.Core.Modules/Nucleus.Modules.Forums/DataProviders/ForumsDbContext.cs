@@ -21,6 +21,10 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public DbSet<Reply> Replies { get; set; }
 		public DbSet<Attachment> Attachments { get; set; }
 		public DbSet<Settings> Settings { get; set; }
+		public DbSet<ForumSubscription> ForumSubscriptions { get; set; }
+		public DbSet<PostSubscription> PostSubscriptions { get; set; }
+		public DbSet<PostTracking> PostTracking { get; set; }
+
 
 		public ForumsDbContext(DbContextConfigurator<ForumsDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
 		{
@@ -96,6 +100,15 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.HasOne<Forum>()
 				.WithMany(forum => forum.Permissions)
 				.HasForeignKey("RelatedId");
+
+			builder.Entity<ForumSubscription>().ToTable("ForumSubscriptions");
+			builder.Entity<ForumSubscription>().HasKey( subscription => new { subscription.ForumId, subscription.UserId } );
+
+			builder.Entity<PostSubscription>().ToTable("ForumPostSubscriptions");
+			builder.Entity<PostSubscription>().HasKey(subscription => new { subscription.ForumPostId, subscription.UserId });
+
+			builder.Entity<PostTracking>().ToTable("ForumPostTracking");
+			builder.Entity<PostTracking>().HasKey(tracking => new { tracking.ForumPostId, tracking.UserId });
 		}
 	}
 }

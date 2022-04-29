@@ -42,5 +42,20 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public Task DeletePostAttachments(Post post);
 
 		public Task DeleteReplyAttachments(Reply reply);
+
+		public Task SubscribeForum(Guid forumId, Guid userId);
+		public Task UnSubscribeForum(Guid forumId, Guid userId);
+
+		public Task SubscribeForumPost(Guid postId, Guid userId);
+		public Task UnSubscribeForumPost(Guid postId, Guid userId);
+
+
+		public Task<ForumSubscription> GetForumSubscription(Guid forumId, Guid userId);
+		public Task<PostSubscription> GetPostSubscription(Guid PostId, Guid userId);
+
+		public Task<PostTracking> GetPostTracking(Guid postId, Guid userId);
+		public Task SavePostTracking(Guid postId, Guid userId);
+		public Task DeletePostTracking(Guid postId, Guid userId);
+
 	}
 }

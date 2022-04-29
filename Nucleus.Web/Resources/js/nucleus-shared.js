@@ -16,6 +16,12 @@ function _Page()
 		var timezoneOffset = new Date().getTimezoneOffset() * -1;
 		document.cookie = 'timezone-offset=' + timezoneOffset.toString() + '; path=/;SameSite=Strict;max-age=3600';
 
+		jQuery('a[data-target][href]').each(function (index, element)
+		{
+			jQuery(element).attr('data-href', jQuery(element).attr('href'));
+			jQuery(element).attr('href', '#0;');
+		});
+
 		// Attach the click event for any element with a data-target attribute to _getPartialContent
 		jQuery(document).on('click', '[data-target]:not(form, input, button):not([data-method="POST"])', _getPartialContent);
 
@@ -25,7 +31,7 @@ function _Page()
 		// Attach links which target an IFRAME
 		jQuery(document).on('click', 'a[data-frametarget], button[data-frametarget]', _loadIFrame);
 
-// Attach hyperlinks with a data-target, but not a data-method to _getPartialContent
+		// Attach hyperlinks with a data-target, but not a data-method to _getPartialContent
 		// Removed: this duplicates the binding above ([data-target]:not(form, input, button):not([data-method="POST"]))
 		//jQuery(document).on('click', 'a[data-target]:not([data-method])', _getPartialContent);
 				
@@ -387,7 +393,7 @@ function _Page()
 	function _getPartialContent(event)
 	{
 		event.preventDefault();
-		event.stopImmediatePropagation();
+		event.stopPropagation();
 		
 		var url;
 		var targetSelector;
@@ -395,17 +401,29 @@ function _Page()
 
 		if (jQuery(event.currentTarget).attr('data-target') !== undefined)
 		{
-			url = jQuery(event.currentTarget).attr('href');
+			if (jQuery(event.currentTarget).attr('href') !== undefined)
+			{
+				url = jQuery(event.currentTarget).attr('href');
+			}
+			if (jQuery(event.currentTarget).attr('data-href') !== undefined)
+			{
+				url = jQuery(event.currentTarget).attr('data-href');
+			}
 			targetSelector = jQuery(event.currentTarget).attr('data-target');
 			target = _getTarget(jQuery(event.currentTarget), targetSelector);
-			jQuery(event.currentTarget).removeAttr('href');
 		}
 		else if (jQuery(event.target).attr('data-target') !== undefined)
 		{
-			url = jQuery(event.target).attr('href');
+			if (jQuery(event.target).attr('href') !== undefined)
+			{
+				url = jQuery(event.target).attr('href');
+			}
+			if (jQuery(event.target).attr('data-href') !== undefined)
+			{
+				url = jQuery(event.target).attr('data-href');
+			}
 			targetSelector = jQuery(event.target).attr('data-target');
 			target = _getTarget(jQuery(event.target), targetSelector);
-			jQuery(event.currentTarget).removeAttr('href');
 		}
 
 		// reset validation error highlighting
@@ -427,6 +445,8 @@ function _Page()
 				error: function (request, status, message) { _handleError(target, url, event, status, message, request); }
 			});
 		}
+
+		return false;
 	}
 
 	function _confirm(message, action)

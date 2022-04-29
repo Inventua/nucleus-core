@@ -14,6 +14,7 @@ namespace Nucleus.Modules.Forums.ViewModels
 	{
 		public Forum Forum { get; set; }
 		public IList<Post> Posts { get; set; }
+		public ForumSubscription Subscription { get; set; }
 
 		public Boolean CanPost { get; set; }
 		public Boolean CanSubscribe { get; set; }

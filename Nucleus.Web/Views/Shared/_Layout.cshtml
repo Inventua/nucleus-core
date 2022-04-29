@@ -21,7 +21,12 @@
 	<title>@Model.Context.Page.Title</title>
 	@Html.AddScript("~/Resources/Libraries/jQuery/03.06.00/jquery.min.js", false)
 	@Html.AddScript("~/Resources/Libraries/Bootstrap/5.1.0/js/bootstrap.bundle.min.js", false)
-	@Html.AddScript("~/Resources/js/nucleus-shared.js", true)
+	@* 
+		// the defer parameter must be false for nucleus-shared.js.  If defer is used, event handlers can be attached after google analytics has attached it's
+		// event handlers, which causes <a> elements with data-target attributes to be followed (intermittently) even though they have already been handled by 
+		// _getPartialContent.
+	*@
+	@Html.AddScript("~/Resources/js/nucleus-shared.js", false)
 	@Html.AddStyle("~/Resources/Libraries/Bootstrap/5.1.0/css/bootstrap.min.css")
 	@Html.AddStyle("~/Resources/css/shared.css")
 	@if (Model.IsEditing)

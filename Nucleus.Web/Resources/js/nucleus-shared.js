@@ -16,20 +16,21 @@ function _Page()
 		var timezoneOffset = new Date().getTimezoneOffset() * -1;
 		document.cookie = 'timezone-offset=' + timezoneOffset.toString() + '; path=/;SameSite=Strict;max-age=3600';
 
-		// Attach the click event for any element with a data-target attribute to _GetPartialContent
+		// Attach the click event for any element with a data-target attribute to _getPartialContent
 		jQuery(document).on('click', '[data-target]:not(form, input, button):not([data-method="POST"])', _getPartialContent);
 
 		// Attach forms and form-submit controls with a data-target attribute to _PostPartialContent
 		jQuery(document).on('submit', 'form[data-target], form:has(input[type="submit"][data-target], input[type="file"][data-target], button[type="submit"][data-target])', _postPartialContent);
 				
 		// Attach links which target an IFRAME
-		jQuery(document).on('click', 'A[data-frametarget], BUTTON[data-frametarget]', _loadIFrame);
+		jQuery(document).on('click', 'a[data-frametarget], button[data-frametarget]', _loadIFrame);
 
-		// Attach hyperlinks with a data-target, but not a data-method to _getPartialContent
-		jQuery(document).on('click', 'A[data-target]:not([data-method])', _getPartialContent);
-
+// Attach hyperlinks with a data-target, but not a data-method to _getPartialContent
+		// Removed: this duplicates the binding above ([data-target]:not(form, input, button):not([data-method="POST"]))
+		//jQuery(document).on('click', 'a[data-target]:not([data-method])', _getPartialContent);
+				
 		// Attach hyperlinks with a data-method="POST" attribute to _PostPartialContent
-		jQuery(document).on('click', 'A[data-method="POST"]', _postPartialContent);
+		jQuery(document).on('click', 'a[data-method="POST"]', _postPartialContent);
 
 		// Automatically POST the form containing the specified control when the specified event is triggered
 		jQuery(document).on('click change keydown keyup input', 'INPUT[data-autopostbackevent], SELECT[data-autopostbackevent]', _handleAutoPostBack);
@@ -109,6 +110,9 @@ function _Page()
 		// handle file uploads
 		jQuery(document).on('change', 'input[type=file]', function ()
 		{
+			event.preventDefault();
+			event.stopImmediatePropagation();
+
 			var form = jQuery(this).parents('form');
 			var parent = jQuery(this).parents('.FileSelector');
 
@@ -128,14 +132,8 @@ function _Page()
 				parent.find('.UploadProgress').siblings().show();
 			});
 
-			//if (jQuery(this).attr('action') !== '')
-			//{
 			form.attr('action', jQuery(this).attr('formaction'));
-			//}
-			form.submit();
-			
-			event.preventDefault();
-			event.stopImmediatePropagation();
+			form.submit();			
 		});
 
 		// Close popups when a user clicks outside a popup.  Click events will be propagated up to BODY if they are not handled elsewhere and 
@@ -159,6 +157,9 @@ function _Page()
 
 	function _loadIFrame(event)
 	{
+		event.preventDefault();
+		event.stopImmediatePropagation();
+
 		var url;
 		var targetFrameSelector;
 		var targetFrame;
@@ -192,9 +193,6 @@ function _Page()
 		{
 			targetFrame.attr('src', url);
 		}
-
-		event.preventDefault();
-		event.stopImmediatePropagation();
 	}
 
 	function _getTarget(eventTarget, targetSelector)
@@ -248,6 +246,9 @@ function _Page()
 	 */
 	function _postPartialContent(event)
 	{
+		event.preventDefault();
+		event.stopImmediatePropagation();
+
 		var form;
 		var url;
 		var targetSelector;
@@ -349,9 +350,6 @@ function _Page()
 			// submit form with no confirmation
 			action.call(this);
 		}
-
-		event.preventDefault();
-		event.stopImmediatePropagation();
 	}
 
 	/**
@@ -363,6 +361,9 @@ function _Page()
 	 */
 	function _loadPartialContent(event, url, target)
 	{
+		event.preventDefault();
+		event.stopImmediatePropagation();
+
 		if (typeof (target) === 'string')
 		{
 			target = jQuery(target);
@@ -374,9 +375,6 @@ function _Page()
 			success: function (data, status, request) { _render(target, null, data, url, event, status, request); },
 			error: function (request, status, message) { _handleError(target, url, event, status, message, request); }
 		});
-
-		event.preventDefault();
-		event.stopImmediatePropagation();
 	}
 
 	/**
@@ -388,11 +386,27 @@ function _Page()
 	 */
 	function _getPartialContent(event)
 	{
-		var url = jQuery(event.currentTarget).attr('href');
-		var targetSelector = jQuery(event.currentTarget).attr('data-target');
+		event.preventDefault();
+		event.stopImmediatePropagation();
+		
+		var url;
+		var targetSelector;
 		var target;
 
-		target = _getTarget(jQuery(event.currentTarget), targetSelector);
+		if (jQuery(event.currentTarget).attr('data-target') !== undefined)
+		{
+			url = jQuery(event.currentTarget).attr('href');
+			targetSelector = jQuery(event.currentTarget).attr('data-target');
+			target = _getTarget(jQuery(event.currentTarget), targetSelector);
+			jQuery(event.currentTarget).removeAttr('href');
+		}
+		else if (jQuery(event.target).attr('data-target') !== undefined)
+		{
+			url = jQuery(event.target).attr('href');
+			targetSelector = jQuery(event.target).attr('data-target');
+			target = _getTarget(jQuery(event.target), targetSelector);
+			jQuery(event.currentTarget).removeAttr('href');
+		}
 
 		// reset validation error highlighting
 		target.find('.ValidationError').removeClass('ValidationError');
@@ -413,9 +427,6 @@ function _Page()
 				error: function (request, status, message) { _handleError(target, url, event, status, message, request); }
 			});
 		}
-
-		event.preventDefault();
-		event.stopImmediatePropagation();
 	}
 
 	function _confirm(message, action)

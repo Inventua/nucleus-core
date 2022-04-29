@@ -71,7 +71,7 @@ namespace Nucleus.Modules.Forums.Controllers
 				else
 				{
 					// display selected post
-					return await EditPost(postId);
+					return await ViewPost(postId);
 				}
 
 			}
@@ -569,6 +569,8 @@ namespace Nucleus.Modules.Forums.Controllers
 		{
 			ViewModels.ViewForum viewModel = new();
 
+			viewModel.Page = this.Context.Page;
+
 			// get a fully-populated forum object
 			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, forumId);
 
@@ -628,7 +630,8 @@ namespace Nucleus.Modules.Forums.Controllers
 					{
 						Forum = forum,
 						Post = post,
-						Subscription = subscription
+						Subscription = subscription,
+						Page = this.Context.Page
 					}, readReplies);
 				}
 			}
@@ -639,6 +642,8 @@ namespace Nucleus.Modules.Forums.Controllers
 
 		private async Task<ViewModels.ViewForumPost> BuildPostViewModel(ViewModels.ViewForumPost viewModel, Boolean readReplies)
 		{
+			viewModel.Page = this.Context.Page;
+
 			if (viewModel.Post != null)
 			{
 				// the data provider only populates some properties for attachments, get full File object(s)

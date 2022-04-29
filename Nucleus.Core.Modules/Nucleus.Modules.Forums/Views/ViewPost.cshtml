@@ -22,7 +22,8 @@
 			{
 				@Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-outline-secondary", @data_target = ".Forums.parent()" })
 			}
-			<a class="btn btn-secondary" href="../@Model.Forum.Name.FriendlyEncode()/">Back</a>
+			@Html.LinkButton("", "Back", Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode()), new { @class="btn btn-secondary" })
+			@*<a class="btn btn-secondary" href="../@Model.Forum.Name.FriendlyEncode()/">Back</a>*@
 		</div>
 
 		@Html.HiddenFor(model => model.Forum.Id)

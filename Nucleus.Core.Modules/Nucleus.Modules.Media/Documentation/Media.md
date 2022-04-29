@@ -1,5 +1,5 @@
 ## Media module
-The media module multimedia content on a page.  It can be used to show video, images, PDF documents within your page, and will render a download link for other file types.
+The media module presents multimedia content on a page.  It can be used to show video, images, PDF documents within your page, and will render a download link for other file types.
 
 ![Settings](Media.png)
 

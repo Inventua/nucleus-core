@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Nucleus.Modules.Forums.Models
 {
+	
 	public enum FlagStates
 	{
 		IsTrue,
@@ -18,6 +19,8 @@ namespace Nucleus.Modules.Forums.Models
 
 	public class Post : Nucleus.Abstractions.Models.ModelBase
 	{
+		public const string URN = "urn:nucleus:entities:forum-post";
+
 		public Guid Id { get; set; }
 		public Guid ForumId { get; private set; }
 
@@ -37,6 +40,8 @@ namespace Nucleus.Modules.Forums.Models
 
 		public PostStatistics Statistics { get; set; }
 		public List<Attachment> Attachments { get; set; } = new();
+		public PostTracking Tracking { get; set; }
+
 		public User PostedBy { get; private set; }
 	}
 }

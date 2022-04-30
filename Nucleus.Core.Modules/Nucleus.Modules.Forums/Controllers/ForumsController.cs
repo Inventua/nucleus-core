@@ -42,8 +42,15 @@ namespace Nucleus.Modules.Forums.Controllers
 		{
 			if (String.IsNullOrEmpty(this.Context.Parameters))
 			{
-				// display forum table of contents
-				return View("ListForums", await BuildListForumsViewModel());
+				try
+				{
+					// display forum table of contents
+					return View("ListForums", await BuildListForumsViewModel());
+				}
+				catch (UnauthorizedAccessException)
+				{
+					return Unauthorized();
+				}
 			}
 			else
 			{
@@ -60,7 +67,7 @@ namespace Nucleus.Modules.Forums.Controllers
 						}
 						else
 						{
-							return View("ViewForum", await BuildViewForumViewModel(forum.Id));
+							return await ViewForum(forum.Id);
 						}
 					}
 					else
@@ -76,6 +83,19 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			}
 		}
+
+		private async Task<ActionResult> ViewForum(Guid forumId)
+		{
+			try
+			{
+				return View("ViewForum", await BuildViewForumViewModel(forumId));
+			}
+			catch (UnauthorizedAccessException)
+			{
+				return Unauthorized();
+			}
+		}
+
 
 		[HttpGet]
 		public async Task<ActionResult> AddPost(Guid forumId)
@@ -204,7 +224,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		{
 			ViewModels.ViewForumPost viewModel = await BuildPostViewModel(Guid.Empty, id, true);
 
-			if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_VIEW))
+			if (viewModel.Forum!= null && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_VIEW))
 			{
 				await this.ForumsManager.SavePostTracking(viewModel.Post, HttpContext.User);
 				return View("ViewPost", viewModel);
@@ -257,7 +277,8 @@ namespace Nucleus.Modules.Forums.Controllers
 			await this.ForumsManager.SavePost(this.Context.Site, forum, viewModel.Post);
 			await this.ForumsManager.SavePostTracking(viewModel.Post, HttpContext.User);
 
-			return View("ViewForum", await BuildViewForumViewModel(forum.Id));
+			return await ViewForum(forum.Id);
+			
 		}
 
 		[HttpPost]
@@ -290,7 +311,7 @@ namespace Nucleus.Modules.Forums.Controllers
 				return BadRequest();
 			}
 
-			return View("ViewForum", await BuildViewForumViewModel(forum.Id));
+			return await ViewForum(forum.Id);			
 		}
 
 
@@ -301,8 +322,8 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			// UnSubscribe from the forum 
 			await this.ForumsManager.UnSubscribe(forum, HttpContext.User);
-			
-			return View("ViewForum", await BuildViewForumViewModel(forum.Id));
+
+			return await ViewForum(forum.Id);
 		}
 
 		[HttpPost]
@@ -347,7 +368,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.ApproveForumPost(viewModel.Post, true);
 
-			return View("ViewForum", await BuildViewForumViewModel(forum.Id));
+			return await ViewForum(forum.Id);
 		}
 
 
@@ -366,7 +387,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.RejectForumPost(viewModel.Forum, viewModel.Post);
 
-			return View("ViewForum", await BuildViewForumViewModel(forum.Id));
+			return await ViewForum(forum.Id);
 		}
 
 		[HttpPost]
@@ -384,7 +405,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.PinForumPost(viewModel.Post, true);
 
-			return View("ViewForum", await BuildViewForumViewModel(forum.Id));
+			return await ViewForum(forum.Id);
 		}
 
 		[HttpPost]
@@ -402,7 +423,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.LockForumPost(viewModel.Post, true);
 
-			return View("ViewForum", await BuildViewForumViewModel(forum.Id));
+			return await ViewForum(forum.Id);
 		}
 
 		[HttpPost]
@@ -420,7 +441,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.DeleteForumPost(forum, viewModel.Post);
 
-			return View("ViewForum", await BuildViewForumViewModel(forum.Id));
+			return await ViewForum(forum.Id);
 		}
 
 
@@ -545,6 +566,10 @@ namespace Nucleus.Modules.Forums.Controllers
 						{
 							forums.Add(forum);
 						}
+						else
+						{
+							throw new UnauthorizedAccessException();
+						}
 					}
 				}
 
@@ -557,7 +582,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			}
 
 			viewModel.Groups = groups;
-			//viewModel.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
+
 			return viewModel;
 		}
 
@@ -582,16 +607,20 @@ namespace Nucleus.Modules.Forums.Controllers
 
 					if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE))
 					{
-						viewModel.Posts = await this.ForumsManager.ListPosts(this.Context.Site, forum, Models.FlagStates.IsAny);
+						viewModel.Posts = await this.ForumsManager.ListPosts(this.Context.Site, forum, HttpContext.User,  Models.FlagStates.IsAny);
 					}
 					else
 					{
-						viewModel.Posts = await this.ForumsManager.ListPosts(this.Context.Site, forum, Models.FlagStates.IsTrue);
+						viewModel.Posts = await this.ForumsManager.ListPosts(this.Context.Site, forum, HttpContext.User, Models.FlagStates.IsTrue);
 					}
 
 					viewModel.Subscription = await this.ForumsManager.GetSubscription(forum, HttpContext.User);
 					viewModel.CanPost = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_CREATE_POST);
 					viewModel.CanSubscribe = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE);										
+				}
+				else
+				{
+					throw new UnauthorizedAccessException();
 				}
 			}
 

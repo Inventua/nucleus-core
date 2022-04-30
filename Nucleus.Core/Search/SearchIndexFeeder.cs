@@ -52,23 +52,24 @@ namespace Nucleus.Core.Search
 		{
 			foreach (IContentMetaDataProducer contentProvider in this.SearchContentProviders)
 			{
-				foreach (ISearchIndexManager searchIndexManager in this.SearchIndexManagers)
+				foreach (Site site in await this.SiteManager.List())
 				{
-					foreach (Site site in await this.SiteManager.List())
-					{
-						// .List doesn't fully populate the site object, so we call .Get 
-						Site fullSite = await this.SiteManager.Get(site.Id);
+					// .List doesn't fully populate the site object, so we call .Get 
+					Site fullSite = await this.SiteManager.Get(site.Id);
 
-						try
+					try
+					{
+						this.Logger.LogTrace("Getting search content from {type}.", contentProvider.GetType().FullName);
+						foreach (ContentMetaData item in await contentProvider.ListItems(fullSite))
 						{
-							this.Logger.LogTrace("Getting search content from {0}.", contentProvider.GetType().FullName);
-							foreach (ContentMetaData item in await contentProvider.ListItems(fullSite))
+							this.Logger.LogTrace("Adding {url} to index.", item.Url);
+
+							foreach (ISearchIndexManager searchIndexManager in this.SearchIndexManagers)
 							{
-								this.Logger.LogTrace("Adding {0} to index.", item.Url);
 								try
 								{
 									searchIndexManager.Index(item);
-									this.Logger.LogTrace("Added {0} to index.", item.Url);
+									this.Logger.LogTrace("{searchIndexManager}: Added {url} to index.", searchIndexManager.GetType(), item.Url);
 								}
 								catch (NotImplementedException)
 								{
@@ -77,19 +78,19 @@ namespace Nucleus.Core.Search
 								catch (Exception e)
 								{
 									// error in .Index implementation
-									this.Logger.LogError(e, "Error adding {0} to index using {1}.Index()", item.Url, searchIndexManager.GetType().FullName);
+									this.Logger.LogError(e, "Error adding {url} to index using {type}.Index()", item.Url, searchIndexManager.GetType().FullName);
 								}
 							}
 						}
-						catch (NotImplementedException)
-						{
-							// ignore
-						}
-						catch (Exception e)
-						{
-							// error in .ListItems implementation
-							this.Logger.LogError(e, "Error in {0}.ListItems()", contentProvider.GetType().FullName);
-						}
+					}
+					catch (NotImplementedException)
+					{
+						// ignore
+					}
+					catch (Exception e)
+					{
+						// error in .ListItems implementation
+						this.Logger.LogError(e, "Error in {0}.ListItems()", contentProvider.GetType().FullName);
 					}
 				}
 			}

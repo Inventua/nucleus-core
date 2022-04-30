@@ -269,13 +269,21 @@ namespace Nucleus.Modules.Forums
 		}
 
 
-		public async Task<IList<Post>> ListPosts(Site site, Forum forum, Models.FlagStates approved)
+		public async Task<IList<Post>> ListPosts(Site site, Forum forum, ClaimsPrincipal user, Models.FlagStates approved)
 		{
 			IList<Post> posts;
 
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
 				posts = await provider.ListForumPosts(forum, approved);
+
+				if (user != null)
+				{
+					foreach (Post post in posts)
+					{
+						post.Tracking = await GetPostTracking(post, user);
+					}
+				}
 			}
 
 			return posts;
@@ -572,9 +580,12 @@ namespace Nucleus.Modules.Forums
 		
 		public async Task SavePostTracking(Post post, ClaimsPrincipal user)
 		{
-			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			if (user.Identity.IsAuthenticated)
 			{
-				await provider.SavePostTracking(post.Id, user.GetUserId());
+				using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+				{
+					await provider.SavePostTracking(post.Id, user.GetUserId());
+				}
 			}
 		}
 

@@ -53,8 +53,8 @@
 					}
 				</td>
 				<td>
-					<a href="@post.Id">@post.Subject</a>					
-					@*<a href="@Url.NucleusAction("ViewPost", "Forums", "Forums", new { @Id = post.Id })" data-target=".Forums.parent()">@post.Subject</a>*@
+					<a href="@post.Id" class="@(post.Tracking == null ? "d-block fw-bold" : "d-block")">@post.Subject</a>
+					
 					@if (post.Status != null)
 					{
 						<span class="post-status">@post.Status.Name</span>

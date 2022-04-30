@@ -59,6 +59,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.HasForeignKey("AddedBy");
 
 			builder.Entity<Post>()
+				.Ignore(post => post.Tracking)
 				.HasMany(post => post.Attachments)
 				.WithOne()
 				.HasForeignKey("ForumPostId");

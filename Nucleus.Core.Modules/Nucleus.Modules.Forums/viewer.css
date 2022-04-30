@@ -23,6 +23,7 @@
 .Forums .forum-posts th:nth-child(2), .Forums .forum-posts td:nth-child(2)
 {
   width: auto;
+  white-space: nowrap;
 }
 
 .Forums .forums-list th:last-child, .Forums .forums-list td:last-child

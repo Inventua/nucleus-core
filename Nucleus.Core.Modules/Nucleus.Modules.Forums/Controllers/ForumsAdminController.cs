@@ -213,7 +213,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		public async Task<ActionResult> DeleteForum(ViewModels.ForumSettings viewModel, Guid id, Guid groupId)
 		{
 			// delete button from the forum editor popup OR group editor forums list (which is why groupId is on the query string instead of in the view model)
-			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, id);
+			Models.Forum forum = await this.ForumsManager.Get(id);
 
 			await this.ForumsManager.Delete(forum);
 			
@@ -295,7 +295,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		{
 			ViewModels.ForumSettings viewModel = new();
 
-			viewModel.Forum = await this.ForumsManager.Get(this.Context.Site, id); 
+			viewModel.Forum = await this.ForumsManager.Get(id); 
 			await BuildForumSettingsViewModel(viewModel, false);
 						
 			viewModel.ForumPermissions = viewModel.Forum.Permissions.ToPermissionsList(this.Context.Site);

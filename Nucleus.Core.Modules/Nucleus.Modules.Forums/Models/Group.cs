@@ -15,6 +15,8 @@ namespace Nucleus.Modules.Forums.Models
 		public const string URN = Forum.URN;
 
 		public Guid Id { get; set; }
+		public Guid ModuleId { get; set; }
+
 
 		[Required]
 		public string Name { get; set; }

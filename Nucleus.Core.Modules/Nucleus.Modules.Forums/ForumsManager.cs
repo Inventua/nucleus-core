@@ -77,7 +77,7 @@ namespace Nucleus.Modules.Forums
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		public async Task<Forum> Get(Site site, Guid id)
+		public async Task<Forum> Get(Guid id)
 		{
 			return await this.CacheManager.ForumsCache().GetAsync(id, async id =>
 			{
@@ -554,6 +554,33 @@ namespace Nucleus.Modules.Forums
 			}
 		}
 
+		/// <summary>
+		/// Retrieve a list of users who are subscribed to the specified forum.
+		/// </summary>
+		/// <param name="forum"></param>
+		/// <returns></returns>
+		public async Task<List<User>> ListForumSubscribers(Guid forumId)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				return await provider.ListForumSubscribers(forumId);
+			}
+		}
+
+		/// <summary>
+		/// Retrieve a list of users who are subscribed to the specified forum post.
+		/// </summary>
+		/// <param name="forum"></param>
+		/// <param name="user"></param>
+		/// <returns></returns>
+		public async Task<List<User>> ListPostSubscribers(Guid postId)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				return await provider.ListPostSubscribers(postId);
+			}
+		}
+
 
 		/// <summary>
 		/// Retrieve an existing <see cref="ForumSubscription"/> from the database, or return null if there is no matching record.
@@ -594,6 +621,17 @@ namespace Nucleus.Modules.Forums
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
 				await provider.DeletePostTracking(post.Id, user.GetUserId());
+			}
+		}
+
+		public async Task SaveMailQueue(MailQueue mailQueue)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				if (!await provider.IsQueued(mailQueue))
+				{
+					await provider.SaveMailQueue(mailQueue);
+				}
 			}
 		}
 	}

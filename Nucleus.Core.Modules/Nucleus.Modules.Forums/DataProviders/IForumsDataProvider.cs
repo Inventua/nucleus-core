@@ -45,10 +45,11 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 		public Task SubscribeForum(Guid forumId, Guid userId);
 		public Task UnSubscribeForum(Guid forumId, Guid userId);
+		public Task<List<User>> ListForumSubscribers(Guid forumId);
 
 		public Task SubscribeForumPost(Guid postId, Guid userId);
 		public Task UnSubscribeForumPost(Guid postId, Guid userId);
-
+		public Task<List<User>> ListPostSubscribers(Guid postId);
 
 		public Task<ForumSubscription> GetForumSubscription(Guid forumId, Guid userId);
 		public Task<PostSubscription> GetPostSubscription(Guid PostId, Guid userId);
@@ -57,5 +58,9 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public Task SavePostTracking(Guid postId, Guid userId);
 		public Task DeletePostTracking(Guid postId, Guid userId);
 
+		public Task<Boolean> IsQueued(MailQueue mailQueue);
+		public Task SaveMailQueue(MailQueue mailQueue);
+		public Task DeleteMailQueue(MailQueue mailQueue);
+		public Task<List<MailQueue>> ListMailQueue();
 	}
 }

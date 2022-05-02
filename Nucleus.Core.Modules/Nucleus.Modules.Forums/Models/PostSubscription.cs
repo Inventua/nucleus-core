@@ -11,6 +11,7 @@ namespace Nucleus.Modules.Forums.Models
 	public class PostSubscription
 	{
 		public Guid UserId { get; set; }
+		
 		public Guid ForumPostId { get; set; }
 	}
 }

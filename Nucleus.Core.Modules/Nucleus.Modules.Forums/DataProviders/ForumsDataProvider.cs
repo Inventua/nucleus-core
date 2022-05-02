@@ -524,6 +524,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			if (existing != null)
 			{
+				post.IsPinned = value;
 				this.Context.Entry(existing).Property(existing => existing.IsPinned).CurrentValue = value;
 				await this.Context.SaveChangesAsync<Post>();
 			}
@@ -538,6 +539,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			if (existing != null)
 			{
+				existing.IsLocked = value;
 				this.Context.Entry(existing).Property(existing => existing.IsLocked).CurrentValue = value;
 				await this.Context.SaveChangesAsync<Post>();
 			}
@@ -551,6 +553,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			if (existing != null)
 			{
+				existing.Status = value;
 				this.Context.Entry(existing).Reference(existing => existing.Status).CurrentValue = value;
 				await this.Context.SaveChangesAsync<Post>();
 			}
@@ -564,8 +567,10 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			if (existing != null)
 			{
+				post.IsApproved = value;
 				this.Context.Entry(existing).Property(existing => existing.IsApproved).CurrentValue = value;
 				await this.Context.SaveChangesAsync<Post>();
+				this.EventManager.RaiseEvent<Post, Approved>(post);
 			}
 		}
 
@@ -694,7 +699,6 @@ namespace Nucleus.Modules.Forums.DataProviders
 				this.Context.Add(new ForumSubscription() { ForumId = forumId, UserId = userId });
 				await this.Context.SaveChangesAsync<ForumSubscription>();
 			}
-
 		}
 
 		public async Task UnSubscribeForum(Guid forumId, Guid userId)
@@ -711,6 +715,18 @@ namespace Nucleus.Modules.Forums.DataProviders
 			await this.Context.SaveChangesAsync<ForumSubscription>();
 		}
 
+		public async Task<List<User>> ListForumSubscribers(Guid forumId)
+		{
+			List<Guid> subscriptionUsers = await this.Context.ForumSubscriptions
+				.Where(subscription => subscription.ForumId == forumId)
+				.Select(subscription => subscription.UserId)
+				.ToListAsync();
+
+			return await this.Context.Users
+				.Where(user => subscriptionUsers.Contains(user.Id))
+				.ToListAsync();
+
+		}
 
 		public async Task<ForumSubscription> GetForumSubscription(Guid forumId, Guid userId)
 		{
@@ -730,9 +746,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 				this.Context.Add(new PostSubscription() { ForumPostId = postId, UserId = userId });
 				await this.Context.SaveChangesAsync<PostSubscription>();
 			}
-
 		}
-
 
 		public async Task UnSubscribeForumPost(Guid postId, Guid userId)
 		{
@@ -746,6 +760,19 @@ namespace Nucleus.Modules.Forums.DataProviders
 			}
 
 			await this.Context.SaveChangesAsync<PostSubscription>();
+		}
+
+		public async Task<List<User>> ListPostSubscribers(Guid postId)
+		{
+			List<Guid> subscriptionUsers = await this.Context.PostSubscriptions
+				.Where(subscription => subscription.ForumPostId == postId)
+				.Select(subscription => subscription.UserId)
+				.ToListAsync();
+
+			return await this.Context.Users
+				.Where(user => subscriptionUsers.Contains(user.Id))
+				.ToListAsync();
+
 		}
 
 
@@ -795,6 +822,55 @@ namespace Nucleus.Modules.Forums.DataProviders
 			}
 
 			await this.Context.SaveChangesAsync<PostTracking>();
+		}
+		#endregion
+
+		#region "    Mail Queue    "
+
+		public async Task<Boolean> IsQueued(MailQueue mailQueue)
+		{
+			return await this.Context.MailQueue
+				.Where(existing => existing.UserId == mailQueue.UserId && existing.Post.Id == mailQueue.Post.Id && (mailQueue.Reply == null && existing.Reply == null) || (mailQueue.Reply != null && existing.Reply.Id == mailQueue.Reply.Id))
+				.AnyAsync();
+		}
+
+		public async Task SaveMailQueue(MailQueue mailQueue)
+		{
+			MailQueue existing = await this.Context.MailQueue
+				.Where(existing => existing.Id == mailQueue.Id)
+				.FirstOrDefaultAsync();
+
+			if (existing == null)
+			{
+				this.Context.Add(mailQueue);
+			}
+			else
+			{
+				this.Context.Entry(mailQueue).State = EntityState.Modified;
+			}
+
+			await this.Context.SaveChangesAsync<MailQueue>();
+		}
+
+		public async Task DeleteMailQueue(MailQueue mailQueue)
+		{
+			MailQueue item = await this.Context.MailQueue
+				.Where(item => item.Id == mailQueue.Id)
+				.FirstOrDefaultAsync();
+
+			if (item != null)
+			{
+				this.Context.Remove(item);
+			}
+
+			await this.Context.SaveChangesAsync<MailQueue>();
+		}
+		
+		public async Task<List<MailQueue>> ListMailQueue()
+		{
+			return await this.Context.MailQueue
+				.Where(item => item.Status == MailQueue.MailQueueStatus.Queued)
+				.ToListAsync();
 		}
 
 

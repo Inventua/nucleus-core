@@ -22,7 +22,7 @@ namespace Nucleus.Modules.Forums.Models
 		public const string URN = "urn:nucleus:entities:forum-post";
 
 		public Guid Id { get; set; }
-		public Guid ForumId { get; private set; }
+		public Guid ForumId { get; set; }
 
 		[Required(ErrorMessage = "Please enter a subject.")]
 		public string Subject { get; set; }
@@ -30,8 +30,8 @@ namespace Nucleus.Modules.Forums.Models
 		[Required(ErrorMessage = "Please enter a body.")] 
 		public string Body { get; set; }
 
-		public Boolean IsLocked { get; private set; }
-		public Boolean IsPinned { get; private set; }
+		public Boolean IsLocked { get; set; }
+		public Boolean IsPinned { get; set; }
 		public Boolean IsApproved { get; set; }
 
 		public List<Reply> Replies { get; set; }

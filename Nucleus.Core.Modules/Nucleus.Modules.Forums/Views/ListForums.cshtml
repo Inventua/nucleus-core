@@ -10,29 +10,31 @@
 	{
 		<table class="forums-list">
 			<tr>
-				<th colspan="5">@group.Name</th>
+				<th colspan="4">@group.Name</th>
 			</tr>
 			<tr>
-				<th colspan="2">Forum Name</th>
+				<th class="forum-title">Forum Name</th>
 				<th>Posts</th>
 				<th>Replies</th>
 				<th>Most Recent</th>
 			</tr>
 			@foreach (var forum in group.Forums)
 			{
-				<tr class="forum-item @(forum.EffectiveSettings().Enabled ? "enabled" : "disabled")">
-					<td class="nucleus-material-icon">
-						@if (forum.EffectiveSettings().Enabled)
-						{
-							@Html.Raw("&#xe0bf;")
-						}
-						else
-						{
-							<span title="Disabled forum">@Html.Raw("&#xf236;")</span>
-						}
-					</td>
-					<td>						
+				<tr class="forum-item @(forum.EffectiveSettings().Enabled ? "enabled" : "disabled")">					
+					<td class="forum-title">						
+						<span class="nucleus-material-icon">
+							@if (forum.EffectiveSettings().Enabled)
+							{
+								@Html.Raw("&#xe0bf;")
+							}
+							else
+							{
+								<span title="Disabled forum">@Html.Raw("&#xf236;")</span>
+							}
+						</span>
+
 						<a href="@forum.Name.FriendlyEncode()/">@forum.Name</a>
+
 						@if (!String.IsNullOrEmpty(forum.Description))
 						{
 							<div>@forum.Description</div>

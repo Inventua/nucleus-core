@@ -23,12 +23,12 @@
 				@Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-outline-secondary", @data_target = ".Forums.parent()" })
 			}
 			@Html.LinkButton("", "Back", Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode()), new { @class="btn btn-secondary" })
-			@*<a class="btn btn-secondary" href="../@Model.Forum.Name.FriendlyEncode()/">Back</a>*@
 		</div>
 
-		@Html.HiddenFor(model => model.Forum.Id)
-		@Html.HiddenFor(model => model.Post.Id)
 		<div class="post">
+			@Html.HiddenFor(model => model.Forum.Id)
+			@Html.HiddenFor(model => model.Post.Id)
+			@Html.HiddenFor(model => model.Post.ForumId)
 			<h3>@Model.Post.Subject</h3>
 			<div class="post-author">
 				<div>Posted on @Model.Post.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone()) by @Model.Post.PostedBy.UserName</div>
@@ -77,7 +77,7 @@
 				<div class="AdminTools">
 					@if (Model.CanEditPost && Model.Forum.EffectiveSettings().StatusList != null)
 					{
-						@Html.DropDownListFor(model => model.Post.Status.Id, new SelectList(Model.Forum.EffectiveSettings().StatusList.Items, "Id", "Name"), new { @data_autopostbackevent = "change" })
+						@Html.DropDownListFor(model => model.Post.Status.Id, new SelectList(Model.Forum.EffectiveSettings().StatusList.Items, "Id", "Name"), new { @data_autopostbackevent = "change", @title= "Forum Post Status" })
 					}
 					@if (Model.CanApprovePost && !Model.Post.IsApproved)
 					{

@@ -61,7 +61,7 @@ namespace Nucleus.Core
 			
 			// General-use services 
 			services.AddSingleton<IEventDispatcher, Services.EventDispatcher>();
-			services.AddScoped<IMailClientFactory, Mail.MailClientFactory>(); 
+			services.AddTransient<IMailClientFactory, Mail.MailClientFactory>(); 
 			
 			services.AddSingleton<ICacheManager, Managers.CacheManager>();
 

@@ -19,23 +19,32 @@ namespace Nucleus.Modules.Forums
 		{
 			builder.ConfigureServices((context, services) =>
 			{
+				// Add forum services, data provider
 				services.AddSingleton<GroupsManager>();
 				services.AddSingleton<ForumsManager>();
 				services.AddDataProvider<IForumsDataProvider, DataProviders.ForumsDataProvider, DataProviders.ForumsDbContext>(context.Configuration);
 
+				// search content producer
 				services.AddTransient<IContentMetaDataProducer, ForumsMetaDataProducer>();
 
-				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Post, Create>, ForumsEventHandler>();
-				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Reply, Create>, ForumsEventHandler>();
-				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Post, Approved>, ForumsEventHandler>();
-				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Reply, Approved>, ForumsEventHandler>();
+				// Event handlers manage the mail queue
+				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Post, Create>, EventHandlers.CreatePostEventHandler>();
+				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Reply, Create>, EventHandlers.CreateReplyEventHandler>();
+				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Post, Approved>, EventHandlers.ApprovedPostEventHandler>();
+				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Reply, Approved>, EventHandlers.ApprovedReplyEventHandler>();
 
+				// Handle migration (install) events
 				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEvent, Migrate>, MigrationEventHandler>();
-
 			});
 		}
 	}
 
+	/// <summary>
+	/// Take action during installation events.
+	/// </summary>
+	/// <remarks>
+	/// When the forums data objects are created, create permission types for forums.
+	/// </remarks>
 	public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEvent, Migrate>
 	{
 		private IPermissionsManager PermissionsManager { get; }

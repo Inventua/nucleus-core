@@ -8,7 +8,7 @@ using Nucleus.Abstractions.Models.Mail;
 
 namespace Nucleus.Modules.Forums.Models
 {
-	public class MailQueue
+	public class MailQueue : ModelBase
 	{
 		public enum MailQueueStatus
 		{
@@ -19,6 +19,7 @@ namespace Nucleus.Modules.Forums.Models
 		public Guid Id { get; set; }	
 		public Guid ModuleId { get; set; }	
 		public Guid UserId { get; set; }
+		public Guid MailTemplateId { get; set; }
 		public Post Post { get; set; }
 		public Reply Reply { get; set; }
 		public MailQueueStatus Status { get; set; } = MailQueueStatus.Queued;

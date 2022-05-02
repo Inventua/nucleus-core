@@ -8,12 +8,12 @@ namespace Nucleus.Core.Mail
 {
 	public class MailClientFactory : IMailClientFactory
 	{
-		private Context Context { get; }
+		//private Context Context { get; }
 		private IOptions<SmtpMailOptions> SmtpMailOptions { get; }
 
-		public MailClientFactory(Context context, IOptions<SmtpMailOptions> smtpMailOptions)
+		public MailClientFactory(IOptions<SmtpMailOptions> smtpMailOptions)
 		{
-			this.Context = context;
+			//this.Context = context;
 			this.SmtpMailOptions = smtpMailOptions;
 		}
 
@@ -24,20 +24,20 @@ namespace Nucleus.Core.Mail
 		/// <remarks>
 		/// This constructor is for use by code which is running in the context of a Http request.
 		/// </remarks>
-		public IMailClient Create()
-		{
-			if (this.Context == null)
-			{
-				throw new InvalidOperationException($"{nameof(Context)} cannot be null");
-			}
+		//public IMailClient Create()
+		//{
+		//	if (this.Context == null)
+		//	{
+		//		throw new InvalidOperationException($"{nameof(Context)} cannot be null");
+		//	}
 
-			if (this.Context.Site == null)
-			{
-				throw new InvalidOperationException($"{nameof(Context)}.{nameof(Context.Site)} cannot be null");
-			}
+		//	if (this.Context.Site == null)
+		//	{
+		//		throw new InvalidOperationException($"{nameof(Context)}.{nameof(Context.Site)} cannot be null");
+		//	}
 
-			return new MailClient(this.Context, this.SmtpMailOptions);
-		}
+		//	return new MailClient(this.Context.Site, this.SmtpMailOptions);
+		//}
 
 		/// <summary>
 		/// Create a new instance of the <see cref="MailClient"/> class for the specifed site.

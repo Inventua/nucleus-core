@@ -22,7 +22,7 @@ namespace Nucleus.Abstractions.Mail
 		/// <remarks>
 		/// This constructor is for use by code which is running in the context of a Http request.
 		/// </remarks>
-		public IMailClient Create();
+		//public IMailClient Create();
 
 		/// <summary>
 		/// Create a new instance of the <see cref="IMailClient"/> class for the specifed site.

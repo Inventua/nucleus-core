@@ -90,7 +90,7 @@ namespace Nucleus.Modules.Forums
 
 			if (pageUri != null)
 			{
-				foreach (Models.Post post in await this.ForumsManager.ListPosts(site, forum, null, Models.FlagStates.IsTrue))
+				foreach (Models.Post post in await this.ForumsManager.ListPosts(forum, null, Models.FlagStates.IsTrue))
 				{
 					StringBuilder content = new(post.Body);
 					

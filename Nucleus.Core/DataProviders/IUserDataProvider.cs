@@ -42,5 +42,7 @@ namespace Nucleus.Core.DataProviders
 		abstract Task<Role> GetRoleByName(string name);
 		abstract Task SaveRole(Site site, Role role);
 		abstract Task DeleteRole(Role role);
+
+		abstract Task<IList<User>> ListUsersInRole(Guid roleId);
 	}
 }

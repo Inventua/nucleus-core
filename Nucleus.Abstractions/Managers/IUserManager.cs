@@ -65,6 +65,13 @@ namespace Nucleus.Abstractions.Managers
 		public Task<User> Get(Site site, Guid id);
 
 		/// <summary>
+		/// Retrieve an existing <see cref="User"/> from the database.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public Task<User> Get(Guid id);
+
+		/// <summary>
 		/// Retrieve an existing <see cref="User"/> from the database, matching by the specified userName.
 		/// </summary>
 		/// <param name="site"></param>
@@ -172,6 +179,13 @@ namespace Nucleus.Abstractions.Managers
 		/// </summary>
 		/// <param name="user"></param>
 		public Task Delete(User user);
+
+		/// <summary>
+		/// List the <see cref="User"/>s who are members of the specified <see cref="Role"/>.
+		/// </summary>
+		/// <param name="role"></param>
+		/// <returns></returns>
+		public Task<IList<User>> ListUsersInRole(Role role);
 
 	}
 }

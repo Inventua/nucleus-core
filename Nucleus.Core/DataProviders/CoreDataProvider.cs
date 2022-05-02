@@ -1240,6 +1240,12 @@ namespace Nucleus.Core.DataProviders
 
 		#region "    Permissions    "
 
+		public async Task<IList<User>> ListUsersInRole(Guid roleId)
+		{
+			return await this.Context.Users
+				.Where(user => user.Roles.Where(role => role.Id == roleId).Any())
+				.ToListAsync();
+		}
 
 		public async Task<Guid> AddPermissionType(PermissionType permissionType)
 		{

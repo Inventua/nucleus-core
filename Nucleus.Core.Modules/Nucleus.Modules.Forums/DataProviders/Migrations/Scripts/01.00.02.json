@@ -22,6 +22,11 @@
 						"isnullable": false
 					},
 					{
+						"name": "MailTemplateId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
 						"name": "PostId",
 						"clrType": "guid",
 						"isnullable": false
@@ -105,10 +110,10 @@
 		},
 		{
 			"createIndex": {
-				"name": "IX_ForumMailQueue_PostReplyUserId",
+				"name": "IX_ForumMailQueue_PostReplyTemplateUserId",
 				"table": "ForumMailQueue",
 				"isunique": true,
-				"columns": [ "PostId", "ReplyId", "UserId" ]
+				"columns": [ "PostId", "ReplyId", "MailTemplateId", "UserId" ]
 			}
 		},
 		{

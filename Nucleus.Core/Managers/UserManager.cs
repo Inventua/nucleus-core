@@ -201,6 +201,46 @@ namespace Nucleus.Core.Managers
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
+		public async Task<User> Get(Guid id)
+		{
+			User result = await this.CacheManager.UserCache().GetAsync(id, async id =>
+			{
+				using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+				{
+					return await provider.GetUser(id);
+				}
+			});
+
+			if ( result != null)
+			{
+				Site site;
+				using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+				{
+					site = await provider.GetSite(result.SiteId.Value);
+				}
+				
+				if (site != null && result != null)
+				{
+					foreach (UserProfileProperty property in site.UserProfileProperties)
+					{
+						if (!result.Profile.Where(profilevalue => profilevalue.UserProfileProperty.Id == property.Id).Any())
+						{
+							result.Profile.Add(new UserProfileValue() { UserProfileProperty = property });
+						}
+					}
+
+					result.Profile = result.Profile.OrderBy(profileValue => profileValue.UserProfileProperty.SortOrder).ToList();
+				}
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Retrieve an existing <see cref="User"/> from the database.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		public async Task<User> Get(Site site, Guid id)
 		{
 			User result = await this.CacheManager.UserCache().GetAsync(id, async id =>
@@ -317,6 +357,19 @@ namespace Nucleus.Core.Managers
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{
 				return await provider.ListUsers(site, pagingSettings);
+			}
+		}
+
+		/// <summary>
+		/// List all <see cref="User"/> who belong to any of the specified <see cref="Role"/>s.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <returns></returns>
+		public async Task<IList<User>> ListUsersInRole(Role role)
+		{
+			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+			{
+				return await provider.ListUsersInRole(role.Id);
 			}
 		}
 

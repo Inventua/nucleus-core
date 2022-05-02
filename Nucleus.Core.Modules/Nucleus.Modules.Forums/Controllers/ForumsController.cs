@@ -38,7 +38,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult> Index(Guid postId)
+		public async Task<ActionResult> Index()//Guid postId
 		{
 			if (String.IsNullOrEmpty(this.Context.Parameters))
 			{
@@ -54,8 +54,8 @@ namespace Nucleus.Modules.Forums.Controllers
 			}
 			else
 			{
-				if (postId == Guid.Empty)
-				{
+				//if (postId == Guid.Empty)
+				//{
 					// display selected forum (and post, if specified)
 					string[] parameters = this.Context.Parameters.Split('/');
 					Models.Forum forum = await this.GroupsManager.FindForum(this.Context.Module, parameters[0]);
@@ -74,12 +74,12 @@ namespace Nucleus.Modules.Forums.Controllers
 					{
 						return NotFound();
 					}
-				}
-				else
-				{
-					// display selected post
-					return await ViewPost(postId);
-				}
+				//}
+				//else
+				//{
+				//	// display selected post
+				//	return await ViewPost(postId);
+				//}
 
 			}
 		}
@@ -132,7 +132,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		{
 			if (mediaFile != null)
 			{
-				viewModel.Forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+				viewModel.Forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 				viewModel.Forum.EffectiveSettings().AttachmentsFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Forum.EffectiveSettings().AttachmentsFolder.Id);
 				using (System.IO.Stream fileStream = mediaFile.OpenReadStream())
 				{
@@ -155,7 +155,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> DeletePostAttachment(ViewModels.ViewForumPost viewModel, Guid id)
 		{
-			viewModel.Forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+			viewModel.Forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
 			Models.Attachment attachment = viewModel.Post.Attachments.Where(attachment => attachment.Id == id).FirstOrDefault();
 			if (attachment != null)
@@ -179,7 +179,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		{
 			if (mediaFile != null)
 			{
-				viewModel.Forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+				viewModel.Forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 				viewModel.Forum.EffectiveSettings().AttachmentsFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Forum.EffectiveSettings().AttachmentsFolder.Id);
 				using (System.IO.Stream fileStream = mediaFile.OpenReadStream())
 				{
@@ -202,7 +202,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> DeleteReplyAttachment(ViewModels.ReplyForumPost viewModel, Guid id)
 		{
-			viewModel.Forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+			viewModel.Forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
 			Models.Attachment attachment = viewModel.Reply.Attachments.Where(attachment=>attachment.Id == id).FirstOrDefault();
 			if (attachment != null)
@@ -243,7 +243,7 @@ namespace Nucleus.Modules.Forums.Controllers
 				return BadRequest(ModelState);
 			}
 
-			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
 			if (viewModel.Post.Id == Guid.Empty)
 			{
@@ -284,7 +284,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> SetForumPostStatus(ViewModels.ViewForumPost viewModel)
 		{
-			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
 			if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_EDIT_POST))
 			{
@@ -299,7 +299,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> SubscribeForum(ViewModels.ViewForum viewModel)
 		{
-			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
 			if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE))
 			{
@@ -318,7 +318,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> UnSubscribeForum(ViewModels.ViewForum viewModel)
 		{
-			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
 			// UnSubscribe from the forum 
 			await this.ForumsManager.UnSubscribe(forum, HttpContext.User);
@@ -329,7 +329,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> SubscribePost(ViewModels.ViewForumPost viewModel)
 		{
-			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
 			if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE))
 			{
@@ -356,7 +356,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> ApproveForumPost(ViewModels.ViewForumPost viewModel)
 		{
-			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
 			if (viewModel.Post.Id == Guid.Empty)
 			{
@@ -375,7 +375,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> RejectForumPost(ViewModels.ViewForumPost viewModel)
 		{
-			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
 			if (viewModel.Post.Id == Guid.Empty)
 			{
@@ -393,7 +393,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> PinForumPost(ViewModels.ViewForumPost viewModel)
 		{
-			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
 			if (viewModel.Post.Id == Guid.Empty)
 			{
@@ -411,7 +411,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> LockForumPost(ViewModels.ViewForumPost viewModel)
 		{
-			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
 			if (viewModel.Post.Id == Guid.Empty)
 			{
@@ -429,7 +429,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> DeleteForumPost(ViewModels.ViewForumPost viewModel)
 		{
-			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
 			if (viewModel.Post.Id == Guid.Empty)
 			{
@@ -484,7 +484,7 @@ namespace Nucleus.Modules.Forums.Controllers
 				return BadRequest(ModelState);
 			}
 
-			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, viewModel.Forum.Id);
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 			Models.Post post = await this.ForumsManager.GetForumPost(this.Context.Site, viewModel.Post.Id);
 
 			if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_REPLY_POST))
@@ -514,7 +514,7 @@ namespace Nucleus.Modules.Forums.Controllers
 				return BadRequest();
 			}
 
-			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, post.ForumId);
+			Models.Forum forum = await this.ForumsManager.Get(post.ForumId);
 
 			if (forum == null)
 			{
@@ -558,7 +558,7 @@ namespace Nucleus.Modules.Forums.Controllers
 				foreach (Models.Forum item in await this.ForumsManager.List(group))
 				{
 					// get a fully-populated forum object (will generally be in cache)
-					Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, item.Id);
+					Models.Forum forum = await this.ForumsManager.Get(item.Id);
 
 					if (forum.EffectiveSettings().Visible)
 					{
@@ -597,7 +597,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			viewModel.Page = this.Context.Page;
 
 			// get a fully-populated forum object
-			Models.Forum forum = await this.ForumsManager.Get(this.Context.Site, forumId);
+			Models.Forum forum = await this.ForumsManager.Get(forumId);
 
 			if (forum != null)
 			{
@@ -640,12 +640,12 @@ namespace Nucleus.Modules.Forums.Controllers
 			if (forumPostId != Guid.Empty)
 			{
 				post = await this.ForumsManager.GetForumPost(this.Context.Site, forumPostId);
-				forum = await this.ForumsManager.Get(this.Context.Site, post.ForumId);
+				forum = await this.ForumsManager.Get(post.ForumId);
 				subscription = await this.ForumsManager.GetSubscription(post, HttpContext.User);
 			}
 			else
 			{
-				forum = await this.ForumsManager.Get(this.Context.Site, forumId);
+				forum = await this.ForumsManager.Get(forumId);
 				post = new();
 				subscription = null;
 			}
@@ -788,7 +788,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			Models.Reply reply = null;
 
 			post = await this.ForumsManager.GetForumPost(this.Context.Site, forumPostId);
-			forum = await this.ForumsManager.Get(this.Context.Site, post.ForumId);
+			forum = await this.ForumsManager.Get(post.ForumId);
 
 			if (replyId != Guid.Empty)
 			{

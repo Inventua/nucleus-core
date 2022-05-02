@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Nucleus.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Models.Mail;
 using Nucleus.Modules.Forums.Models;
 
 namespace Nucleus.Modules.Forums.DataProviders
@@ -24,6 +25,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public DbSet<ForumSubscription> ForumSubscriptions { get; set; }
 		public DbSet<PostSubscription> PostSubscriptions { get; set; }
 		public DbSet<PostTracking> PostTracking { get; set; }
+		public DbSet<MailQueue> MailQueue {get; set; }
+		public DbSet<User> Users { get; set; }
 
 
 		public ForumsDbContext(DbContextConfigurator<ForumsDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
@@ -110,6 +113,19 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			builder.Entity<PostTracking>().ToTable("ForumPostTracking");
 			builder.Entity<PostTracking>().HasKey(tracking => new { tracking.ForumPostId, tracking.UserId });
+
+			builder.Entity<MailQueue>().ToTable("ForumMailQueue");
+
+			//builder.Entity<MailQueue>()
+			//	.HasOne<Post>(item => item.Post)
+			//	.WithMany()
+			//	.HasForeignKey(post => post.Id);
+			
+			//builder.Entity<MailQueue>()
+			//	.HasOne<Reply>(item => item.Reply)
+			//	.WithMany()
+			//	.HasForeignKey(reply => reply.Id);
+
 		}
 	}
 }

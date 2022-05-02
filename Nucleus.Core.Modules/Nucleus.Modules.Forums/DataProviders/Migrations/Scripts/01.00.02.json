@@ -1,0 +1,123 @@
+{
+	"schemaName": "Nucleus.Modules.Forums",
+	"version": "01.00.02",
+	"operations": [
+		{
+			"createTable": {
+				"name": "ForumMailQueue",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ModuleId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "UserId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "PostId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ReplyId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "Status",
+						"clrType": "int",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_ForumMailQueue",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_ForumMailQueue_ModuleId",
+						"Columns": [ "ModuleId" ],
+						"PrincipalTable": "PageModules",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					},
+					{
+						"name": "FK_ForumMailQueue_PostId",
+						"Columns": [ "PostId" ],
+						"PrincipalTable": "ForumPosts",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					},
+					{
+						"name": "FK_ForumMailQueue_ReplyId",
+						"Columns": [ "ReplyId" ],
+						"PrincipalTable": "ForumReplies",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ForumMailQueue_ModuleId",
+				"table": "ForumMailQueue",
+				"isunique": false,
+				"columns": [ "ModuleId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ForumMailQueue_PostReplyId",
+				"table": "ForumMailQueue",
+				"isunique": false,
+				"columns": [ "PostId", "ReplyId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ForumMailQueue_PostReplyUserId",
+				"table": "ForumMailQueue",
+				"isunique": true,
+				"columns": [ "PostId", "ReplyId", "UserId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_ForumMailQueue_DateAdded",
+				"table": "ForumMailQueue",
+				"isunique": false,
+				"columns": [ "DateAdded" ]
+			}
+		}
+	]
+}

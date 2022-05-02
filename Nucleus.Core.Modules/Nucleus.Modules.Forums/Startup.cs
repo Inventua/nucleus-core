@@ -27,6 +27,8 @@ namespace Nucleus.Modules.Forums
 
 				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Post, Create>, ForumsEventHandler>();
 				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Reply, Create>, ForumsEventHandler>();
+				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Post, Approved>, ForumsEventHandler>();
+				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Reply, Approved>, ForumsEventHandler>();
 
 				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEvent, Migrate>, MigrationEventHandler>();
 

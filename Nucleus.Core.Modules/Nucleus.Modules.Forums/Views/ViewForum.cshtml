@@ -30,37 +30,39 @@
 	}
 	<table class="forum-posts">
 		<tr>
-			<th colspan="2">Subject</th>
-			<th>Started By</th>
+			<th colspan="1" class="forum-title">Subject</th>
+			<th class="forum-author">Started By</th>
 			<th>Replies</th>
 			<th>Most Recent</th>
 		</tr>
 		@foreach (var post in Model.Posts)
 		{
-			<tr>
-				<td class="nucleus-material-icon">
-					@if (post.IsPinned)
-					{
-					<span title="Pinned">@Html.Raw("&#xe55f;")</span>
-					}
-					else if (post.IsLocked)
-					{
-						<span title="Pinned">@Html.Raw("&#xe897;")</span>
-					}
-					else if (!post.IsApproved)
-					{
-						<span title="Approved">@Html.Raw("&#xef64;")</span>
-					}
-				</td>
-				<td>
-					<a href="@post.Id" class="@(post.Tracking == null ? "d-block fw-bold" : "d-block")">@post.Subject</a>
+			<tr>				
+				<td class="forum-title">
+					<a href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode() + $"/{@post.Id}")" class="@(post.Tracking == null ? "d-block fw-bold" : "d-block")">
+						<span class="nucleus-material-icon">
+							@if (post.IsPinned)
+							{
+							<span title="Pinned">@Html.Raw("&#xe55f;")</span>
+							}
+							else if (post.IsLocked)
+							{
+								<span title="Pinned">@Html.Raw("&#xe897;")</span>
+							}
+							else if (!post.IsApproved)
+							{
+								<span title="Not Approved">@Html.Raw("&#xef64;")</span>
+							}
+						</span>
+						@post.Subject
+					</a>
 					
 					@if (post.Status != null)
 					{
 						<span class="post-status">@post.Status.Name</span>
 					}
 				</td>
-				<td>@post.PostedBy.UserName</td>
+				<td class="forum-author">@post.PostedBy.UserName</td>
 				<td>@post.Statistics.ReplyCount</td>
 				<td>
 					@if (post.Statistics.LastReply != null)

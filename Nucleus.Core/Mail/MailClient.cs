@@ -20,7 +20,7 @@ namespace Nucleus.Core.Mail
 	{
 		public MailSettings MailSettings { get; private set; }
 			
-		internal MailClient (Context context, IOptions<SmtpMailOptions> smtpMailOptions) : this(context.Site, smtpMailOptions)	{	}
+		//internal MailClient (Context context, IOptions<SmtpMailOptions> smtpMailOptions) : this(context.Site, smtpMailOptions)	{	}
 
 		internal MailClient(Site site, IOptions<SmtpMailOptions> smtpMailOptions)
 		{
@@ -82,7 +82,11 @@ namespace Nucleus.Core.Mail
 		/// <returns></returns>
 		private static string ParseTemplate(string template, MailArgs args)
 		{
-			string result = System.Text.RegularExpressions.Regex.Replace(template, "{(.*?)}", new TemplateParser(args).MatchEvaluator);
+			string result = template;
+
+			result = System.Text.RegularExpressions.Regex.Replace(result, "\\[(?<key>[A-Za-z]*)\\((?<expression>.*)\\)\\]", new TemplateParser(args).CollectionMatchEvaluator);
+
+			result = System.Text.RegularExpressions.Regex.Replace(result, "{(.*?)}", new TemplateParser(args).MatchEvaluator);
 
 			return result;
 		}
@@ -100,6 +104,32 @@ namespace Nucleus.Core.Mail
 			public TemplateParser(MailArgs args)
 			{
 				this.MailArgs = args;
+			}
+
+			internal string CollectionMatchEvaluator(System.Text.RegularExpressions.Match match)
+			{
+				string key = match.Groups["key"].Value;
+				string expression = match.Groups["expression"].Value;
+				StringBuilder result = new();
+				System.Collections.IEnumerable value = this.MailArgs[key] as System.Collections.IEnumerable;
+
+				if (value != null)
+				{
+					foreach (object item in value)
+					{
+						if (this.MailArgs.ContainsKey(item.GetType().Name))
+						{
+							this.MailArgs[item.GetType().Name] = item;
+						}
+						else
+						{
+							this.MailArgs.Add(item.GetType().Name, item);
+						}
+						result.Append(System.Text.RegularExpressions.Regex.Replace(expression, "{(.*?)}", MatchEvaluator));
+					}
+				}
+
+				return result.ToString();
 			}
 
 			internal string MatchEvaluator(System.Text.RegularExpressions.Match match)
@@ -128,7 +158,7 @@ namespace Nucleus.Core.Mail
 				}
 			}
 
-			private static string MatchStandaloneValue(string prop)
+			private string MatchStandaloneValue(string prop)
 			{
 				switch (prop)
 				{
@@ -139,7 +169,14 @@ namespace Nucleus.Core.Mail
 						return DateTime.Now.ToString();
 
 					default:
-						return "";
+						if (!this.MailArgs.ContainsKey(prop))
+						{
+							return "";
+						}
+						else
+						{
+							return this.MailArgs[prop].ToString();
+						}
 				}
 			}
 

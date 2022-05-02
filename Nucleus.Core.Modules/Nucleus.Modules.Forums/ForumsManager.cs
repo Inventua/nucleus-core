@@ -40,6 +40,7 @@ namespace Nucleus.Modules.Forums
 		private IDataProviderFactory DataProviderFactory { get; }
 		private ICacheManager CacheManager { get; }
 		private IFileSystemManager FileSystemManager { get; }
+
 		private IUserManager UserManager { get; }
 		private IListManager ListManager { get; }
 
@@ -151,6 +152,47 @@ namespace Nucleus.Modules.Forums
 		}
 
 		/// <summary>
+		/// List all moderator users for the specified forum.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <returns></returns>
+		public async Task<IList<User>> ListModerators(Forum forum)
+		{
+			List<User> users = new();
+
+			IEnumerable<Permission> permissions;
+			
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				if (forum.UseGroupSettings)
+				{
+					permissions = forum.Group.Permissions.Where(permission => permission.PermissionType.Scope == ForumsManager.PermissionScopes.FORUM_MODERATE);
+				}
+				else
+				{
+					permissions = forum.Permissions.Where(permission => permission.PermissionType.Scope == ForumsManager.PermissionScopes.FORUM_MODERATE);
+				}
+			}
+
+			// List roles with permission(s)
+			foreach (Role role in permissions.Select(permission => permission.Role).Distinct())
+			{
+				foreach (User user in await this.UserManager.ListUsersInRole(role))
+				{
+					// List distinct users in role(s)
+					if (!users.Where(existing => existing.Id == user.Id).Any())
+					{
+						users.Add(user);
+					}
+				}
+			}
+			
+			return users;
+		}
+
+
+
+		/// <summary>
 		/// Create or update a <see cref="Forum"/>.
 		/// </summary>
 		/// <param name="site"></param>
@@ -159,7 +201,7 @@ namespace Nucleus.Modules.Forums
 		{			
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				await provider .SaveForum(group, forum);
+				await provider.SaveForum(group, forum);
 
 				if (forum.Permissions != null)
 				{
@@ -226,27 +268,17 @@ namespace Nucleus.Modules.Forums
 			return false;
 		}
 
-		//public async Task<List<Permission>> ListPermissions(Forum forum)
-		//{
-		//	return await this .PermissionsManager.ListPermissions(forum.Id, PermissionScopeNamespaces.Forum);
-		//}
-
-		//public async Task<List<Permission>> ListPermissions(Group group)
-		//{	
-		//	return await this.PermissionsManager.ListPermissions(group.Id, PermissionScopeNamespaces.Forum);
-		//}
-
 		/// <summary>
 		/// Retrieve an existing <see cref="Forum"/> from the database.
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		public async Task<Post> GetForumPost(Site site, Guid forumPostId)
+		public async Task<Post> GetForumPost(Guid forumPostId)
 		{
 			Post post;
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				post = await provider .GetForumPost(forumPostId);
+				post = await provider.GetForumPost(forumPostId);
 			}
 
 			return post;
@@ -257,7 +289,7 @@ namespace Nucleus.Modules.Forums
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		public async Task<Reply> GetForumPostReply(Site site, Guid replyId)
+		public async Task<Reply> GetForumPostReply(Guid replyId)
 		{
 			Reply reply;
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
@@ -269,7 +301,7 @@ namespace Nucleus.Modules.Forums
 		}
 
 
-		public async Task<IList<Post>> ListPosts(Site site, Forum forum, ClaimsPrincipal user, Models.FlagStates approved)
+		public async Task<IList<Post>> ListPosts(Forum forum, ClaimsPrincipal user, Models.FlagStates approved)
 		{
 			IList<Post> posts;
 
@@ -632,6 +664,14 @@ namespace Nucleus.Modules.Forums
 				{
 					await provider.SaveMailQueue(mailQueue);
 				}
+			}
+		}
+
+		public async Task<IList<MailQueue>> ListMailQueue()
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				return await provider.ListMailQueue();				
 			}
 		}
 	}

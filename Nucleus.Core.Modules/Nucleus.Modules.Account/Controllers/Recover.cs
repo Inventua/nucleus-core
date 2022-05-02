@@ -94,13 +94,13 @@ namespace Nucleus.Modules.Account.Controllers
 								MailArgs args = new()
 								{
 									{ "Site", this.Context.Site },
-									{ "User", GetCensoredUser(user) },
+									{ "User", user.GetCensored() },
 									{ "Urls.Login", GetLoginPageUri() }
 								};
 
 								Logger.LogTrace("Sending account name reminder email {0} to user {1}.", template.Name, user.Id);
 
-								using (IMailClient mailClient = this.MailClientFactory.Create())
+								using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
 								{
 									mailClient.Send(template, args, viewModel.Email);
 									return Json(new { Title = "Recover Account", Message = "Account Name Reminder email sent." });
@@ -126,21 +126,7 @@ namespace Nucleus.Modules.Account.Controllers
 			return View("Recover", viewModel);
 		}
 
-		/// <summary>
-		/// Return a copy of the supplied user with sensitive data removed.
-		/// </summary>
-		/// <param name="user"></param>
-		/// <returns></returns>
-		private static User GetCensoredUser(User user)
-		{
-			return new User()
-			{
-				Id = user.Id,
-				Profile = user.Profile,
-				UserName = user.UserName,
-				Secrets = new() { PasswordResetToken = user.Secrets?.PasswordResetToken}
-			};
-		}		
+		
 
 		[HttpPost]
 		public async Task<ActionResult> RecoverPassword(ViewModels.Recover viewModel)
@@ -176,13 +162,13 @@ namespace Nucleus.Modules.Account.Controllers
 							MailArgs args = new()
 							{
 								{ "Site", this.Context.Site },
-								{ "User", GetCensoredUser(user) },
+								{ "User", user.GetCensored() },
 								{ "Urls", new Dictionary<string, object> { { "ResetPassword", new System.Uri(await GetLoginPageUri(), $"?token={user.Secrets.PasswordResetToken}") } } }
 							};
 
 							Logger.LogTrace("Sending password reset email {0} to user {1}.", template.Name, user.Id);
 
-							using (IMailClient mailClient = this.MailClientFactory.Create())
+							using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
 							{
 								mailClient.Send(template, args, viewModel.Email);
 								return Json(new { Title = "Password Reset", Message = "Password Reset email sent." });

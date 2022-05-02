@@ -152,11 +152,6 @@ namespace Nucleus.Web
 				});
 			}
 
-			//builder.AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver());
-
-			// SetCompatibilityVersion is obsolete in .NET 6
-			//builder.SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Latest);
-
 			// Read HostOptions settings from config
 			services.Configure<HostOptions>(Configuration.GetSection("HostOptions"));
 

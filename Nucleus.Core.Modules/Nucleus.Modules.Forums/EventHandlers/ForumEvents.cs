@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Forums
 {
-	internal class Approved
-	{
+	internal class Approved	{	}
+	internal class Rejected { }
 
-	}
 }

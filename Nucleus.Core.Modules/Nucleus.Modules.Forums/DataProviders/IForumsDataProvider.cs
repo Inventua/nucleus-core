@@ -30,7 +30,6 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public Task SetForumPostApproved(Post post, Boolean value);
 		public Task SetForumPostStatus(Post post, Nucleus.Abstractions.Models.ListItem value);
 
-
 		public Task<IList<Reply>> ListForumPostReplies(Post post, FlagStates approved);
 		public Task<Reply> GetForumPostReply(Guid replyId);
 		public Task SaveForumPostReply(Post post, Reply reply);
@@ -60,7 +59,9 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 		public Task<Boolean> IsQueued(MailQueue mailQueue);
 		public Task SaveMailQueue(MailQueue mailQueue);
+		public Task SetMailQueueStatus(MailQueue mailQueue);
+
 		public Task DeleteMailQueue(MailQueue mailQueue);
-		public Task<List<MailQueue>> ListMailQueue();
+		public Task<IList<MailQueue>> ListMailQueue();
 	}
 }

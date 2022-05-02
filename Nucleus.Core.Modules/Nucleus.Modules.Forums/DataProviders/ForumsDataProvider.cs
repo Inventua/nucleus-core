@@ -830,7 +830,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public async Task<Boolean> IsQueued(MailQueue mailQueue)
 		{
 			return await this.Context.MailQueue
-				.Where(existing => existing.UserId == mailQueue.UserId && existing.Post.Id == mailQueue.Post.Id && (mailQueue.Reply == null && existing.Reply == null) || (mailQueue.Reply != null && existing.Reply.Id == mailQueue.Reply.Id))
+				.Where(existing => existing.UserId == mailQueue.UserId && existing.MailTemplateId == mailQueue.MailTemplateId && existing.Post.Id == mailQueue.Post.Id && (mailQueue.Reply == null && existing.Reply == null) || (mailQueue.Reply != null && existing.Reply.Id == mailQueue.Reply.Id))
 				.AnyAsync();
 		}
 
@@ -852,6 +852,21 @@ namespace Nucleus.Modules.Forums.DataProviders
 			await this.Context.SaveChangesAsync<MailQueue>();
 		}
 
+		public async Task SetMailQueueStatus(MailQueue mailQueue)
+		{
+			MailQueue existing = await this.Context.MailQueue
+				.Where(existing => existing.Id == mailQueue.Id)
+				.FirstOrDefaultAsync();
+
+			if (existing != null)
+			{
+				this.Context.Entry(mailQueue).Property(mailQueue=>mailQueue.Status).IsModified = true;
+				this.Context.Entry(mailQueue).State = EntityState.Modified;
+			}
+
+			await this.Context.SaveChangesAsync<MailQueue>();
+		}
+
 		public async Task DeleteMailQueue(MailQueue mailQueue)
 		{
 			MailQueue item = await this.Context.MailQueue
@@ -865,11 +880,28 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			await this.Context.SaveChangesAsync<MailQueue>();
 		}
-		
-		public async Task<List<MailQueue>> ListMailQueue()
+
+		/// <summary>
+		/// Return a list of queued mail queue items.
+		/// </summary>
+		/// <returns></returns>
+	  /// <remarks>
+		/// The list is sorted by user, module, post and reply for performance, because this function is called by the email sending scheduled task, which groups notifications 
+		/// for a user into a single email.
+		/// </remarks>
+
+		public async Task<IList<MailQueue>> ListMailQueue()
 		{
 			return await this.Context.MailQueue
 				.Where(item => item.Status == MailQueue.MailQueueStatus.Queued)
+				.Include(item => item.Post)
+				.Include(item => item.Reply)
+				.OrderBy(item => item.UserId)
+					.ThenBy(item => item.ModuleId )
+					.ThenBy(item => item.MailTemplateId )
+					.ThenBy(item => item.Post.Id)
+					.ThenBy(item => item.Reply.Id)
+					.ThenBy(item => item.DateAdded)
 				.ToListAsync();
 		}
 

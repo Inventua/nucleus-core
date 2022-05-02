@@ -66,7 +66,7 @@ namespace Nucleus.Core.EventHandlers
 
 							Logger.LogTrace("Sending Welcome email {emailTemplateName} to user {userid}.", template.Name, user.Id);
 
-							using (IMailClient mailClient = this.MailClientFactory.Create())
+							using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
 							{
 								mailClient.Send(template, args, mailTo.Value);
 							}

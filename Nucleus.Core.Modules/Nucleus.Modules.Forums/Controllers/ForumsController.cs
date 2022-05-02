@@ -485,7 +485,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			}
 
 			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
-			Models.Post post = await this.ForumsManager.GetForumPost(this.Context.Site, viewModel.Post.Id);
+			Models.Post post = await this.ForumsManager.GetForumPost(viewModel.Post.Id);
 
 			if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_REPLY_POST))
 			{
@@ -500,14 +500,14 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> DeleteForumPostReply(Guid replyId)
 		{
-			Models.Reply reply = await this.ForumsManager.GetForumPostReply(this.Context.Site, replyId);
+			Models.Reply reply = await this.ForumsManager.GetForumPostReply(replyId);
 
 			if (reply == null)
 			{
 				return BadRequest();
 			}
 
-			Models.Post post = await this.ForumsManager.GetForumPost(this.Context.Site, reply.Post.Id);
+			Models.Post post = await this.ForumsManager.GetForumPost(reply.Post.Id);
 
 			if (post == null)
 			{
@@ -607,11 +607,11 @@ namespace Nucleus.Modules.Forums.Controllers
 
 					if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE))
 					{
-						viewModel.Posts = await this.ForumsManager.ListPosts(this.Context.Site, forum, HttpContext.User,  Models.FlagStates.IsAny);
+						viewModel.Posts = await this.ForumsManager.ListPosts(forum, HttpContext.User,  Models.FlagStates.IsAny);
 					}
 					else
 					{
-						viewModel.Posts = await this.ForumsManager.ListPosts(this.Context.Site, forum, HttpContext.User, Models.FlagStates.IsTrue);
+						viewModel.Posts = await this.ForumsManager.ListPosts(forum, HttpContext.User, Models.FlagStates.IsTrue);
 					}
 
 					viewModel.Subscription = await this.ForumsManager.GetSubscription(forum, HttpContext.User);
@@ -639,7 +639,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			if (forumPostId != Guid.Empty)
 			{
-				post = await this.ForumsManager.GetForumPost(this.Context.Site, forumPostId);
+				post = await this.ForumsManager.GetForumPost(forumPostId);
 				forum = await this.ForumsManager.Get(post.ForumId);
 				subscription = await this.ForumsManager.GetSubscription(post, HttpContext.User);
 			}
@@ -787,12 +787,12 @@ namespace Nucleus.Modules.Forums.Controllers
 			Models.Post post;
 			Models.Reply reply = null;
 
-			post = await this.ForumsManager.GetForumPost(this.Context.Site, forumPostId);
+			post = await this.ForumsManager.GetForumPost(forumPostId);
 			forum = await this.ForumsManager.Get(post.ForumId);
 
 			if (replyId != Guid.Empty)
 			{
-				reply = await this.ForumsManager.GetForumPostReply(this.Context.Site, replyId);
+				reply = await this.ForumsManager.GetForumPostReply(replyId);
 			}
 
 			if (reply != null)

@@ -119,7 +119,15 @@ namespace Nucleus.OAuth.Client
 						if (userPropertyValue != null)
 						{
 							Logger?.LogTrace("Adding profile value {name}:'{value}'.", prop.TypeUri, userPropertyValue);
-							loginUser.Profile.Add(new UserProfileValue() { UserProfileProperty = prop, Value = userPropertyValue });
+							UserProfileValue existing = loginUser.Profile.Where(value => value.UserProfileProperty.TypeUri == prop.TypeUri).FirstOrDefault();
+							if (existing == null)
+							{
+								loginUser.Profile.Add(new UserProfileValue() { UserProfileProperty = prop, Value = userPropertyValue });
+							}
+							else
+							{
+								existing.Value = userPropertyValue;
+							}
 						}
 					}
 

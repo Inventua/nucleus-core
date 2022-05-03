@@ -902,6 +902,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 					.ThenBy(item => item.Post.Id)
 					.ThenBy(item => item.Reply.Id)
 					.ThenBy(item => item.DateAdded)
+				.AsSingleQuery()
 				.ToListAsync();
 		}
 

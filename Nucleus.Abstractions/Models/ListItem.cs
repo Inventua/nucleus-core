@@ -14,12 +14,12 @@ namespace Nucleus.Abstractions.Models
 	/// <remarks>
 	/// </remarks>
 	public class ListItem : ModelBase, IComparable
-	{	
+	{
 		/// <summary>
 		/// Unique record identifier.
 		/// </summary>
 		public Guid Id { get; set; }
-			
+
 		/// <summary>
 		/// Item Name
 		/// </summary>
@@ -49,5 +49,14 @@ namespace Nucleus.Abstractions.Models
 			ListItem otherListItem = other as ListItem;
 			return this.Name.CompareTo(otherListItem.Name);
 		}
+
+		/// <summary>
+		///	Return the list item value.
+		/// </summary>
+		/// <returns></returns>
+		public override string ToString()
+    {
+			return this.Value;
+    }
 	}
 }

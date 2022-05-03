@@ -912,6 +912,7 @@ namespace Nucleus.Core.DataProviders
 				.Include(user => user.Roles)
 				.Include(user => user.Profile)
 					.ThenInclude(profilevalue => profilevalue.UserProfileProperty)
+				.AsSplitQuery()
 				.AsNoTracking()
 				.ToListAsync();
 

@@ -61,7 +61,7 @@ namespace Nucleus.Core.EventHandlers
 							MailArgs args = new()
 							{
 								{ "Site", this.Context.Site },
-								{ "User", user }
+								{ "User", user.GetCensored() }
 							};
 
 							Logger.LogTrace("Sending Welcome email {emailTemplateName} to user {userid}.", template.Name, user.Id);

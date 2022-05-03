@@ -203,11 +203,18 @@ namespace Nucleus.Core.Mail
 					}
 					else
 					{
-						System.Reflection.PropertyInfo propInfo = value.GetType().GetProperty(part, System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance );
-
-						if (propInfo != null && propInfo.CanRead)
+						if (value != null)
 						{
-							value = propInfo.GetValue(value);
+							System.Reflection.PropertyInfo propInfo = value.GetType().GetProperty(part, System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance);
+
+							if (propInfo != null && propInfo.CanRead)
+							{
+								value = propInfo.GetValue(value);
+							}
+							else
+							{
+								return "";
+							}
 						}
 						else
 						{

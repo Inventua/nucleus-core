@@ -84,7 +84,7 @@ namespace Nucleus.Core.Mail
 		{
 			string result = template;
 
-			result = System.Text.RegularExpressions.Regex.Replace(result, "\\[(?<key>[A-Za-z]*)\\((?<expression>.*)\\)\\]", new TemplateParser(args).CollectionMatchEvaluator);
+			result = System.Text.RegularExpressions.Regex.Replace(result, "\\[(?<key>[A-Za-z]*)[^(]*\\((?<expression>[^)]*?)\\)\\]", new TemplateParser(args).CollectionMatchEvaluator, System.Text.RegularExpressions.RegexOptions.Singleline );
 
 			result = System.Text.RegularExpressions.Regex.Replace(result, "{(.*?)}", new TemplateParser(args).MatchEvaluator);
 

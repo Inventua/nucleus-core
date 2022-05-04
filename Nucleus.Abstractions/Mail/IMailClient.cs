@@ -24,5 +24,13 @@ namespace Nucleus.Abstractions.Mail
 		/// <param name="to"></param>
 		public void Send(MailTemplate template, MailArgs args, string to);
 
+		/// <summary>
+		/// Parse the specified template, and send the resulting email to the specified to address.
+		/// </summary>
+		/// <param name="template"></param>
+		/// <param name="model"></param>
+		/// <param name="to"></param>
+		public void Send(MailTemplate template, Object model, string to);
+
 	}
 }

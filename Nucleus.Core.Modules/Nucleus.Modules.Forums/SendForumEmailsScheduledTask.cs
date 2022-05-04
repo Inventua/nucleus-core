@@ -54,23 +54,26 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 			Page page = null;
 			PageModule module = null;
 
-			var data = (await this.ForumsManager.ListMailQueue()).GroupBy(item => new { item.UserId, item.MailTemplateId });
+			var data = (await this.ForumsManager.ListMailQueue()).GroupBy(item => new { item.UserId, item.MailTemplateId, ForumId = item.Post.ForumId });
 
 			foreach (var group in data)
 			{
+				Models.MailTemplate.Model model = new Models.MailTemplate.Model();
+				User user = await this.UserManager.Get(group.Key.UserId);
+				UserProfileValue email = user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault();
+				MailTemplate template = await MailTemplateManager.Get(group.Key.MailTemplateId);
+
 				if (cancellationToken.IsCancellationRequested)
 				{
 					return;
 				}
 
-				User user = await this.UserManager.Get(group.Key.UserId);
-				MailTemplate template = await MailTemplateManager.Get(group.Key.MailTemplateId);
-				UserProfileValue email = user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault();
-
 				if (template != null && !String.IsNullOrEmpty(email?.Value))
 				{
-					foreach (var moduleGroup in group.GroupBy(item => item.ModuleId))
+					foreach (var moduleGroup in group.GroupBy(item =>item.ModuleId))
 					{
+						Forum forum = await this.ForumsManager.Get(group.Key.ForumId);
+											
 						// only re-populate the module, page, site variables if this item's module id is different to the previous one (for performance).
 						if (module == null || module.Id != moduleGroup.Key)
 						{
@@ -81,25 +84,28 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 
 						List<Post> posts = moduleGroup.Where(queueItem => queueItem.Reply == null).Select(queueItem => queueItem.Post).ToList();
 						List<Reply> replies = moduleGroup.Where(queueItem => queueItem.Reply != null).Select(queueItem => queueItem.Reply).ToList();
-												
-						MailArgs args = new()
-						{
-							{ "Page", page },
-							{ "User", user.GetCensored() },
-							{ "Posts", posts },
-							{ "Replies", replies }
-						};
 
-						Logger.LogTrace("Sending account name reminder email {0} to user {1}.", template.Name, user.Id);
-
-						using (IMailClient mailClient = this.MailClientFactory.Create(site))
-						{
-							mailClient.Send(template, args, email.Value);
-						}
-						
-
+						model.Forums.Add(new Models.MailTemplate.Forum(forum, posts, replies));
 					}
+				}
 
+				model.Site = site;
+				model.Page = page;
+				model.User = user;
+
+				Logger.LogTrace("Sending forum email template {name} to user {userid}.", template.Name, user.Id);
+
+				using (IMailClient mailClient = this.MailClientFactory.Create(site))
+				{
+					try
+					{
+						mailClient.Send(template, model, email.Value);
+					}
+					catch (Exception ex)
+					{
+						// don't fail the entire task if an email can't be parsed/sent
+						this.Logger?.LogError(ex, "Error sending template {template}", template.Name);
+					}
 				}
 			}
 

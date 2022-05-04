@@ -18,7 +18,8 @@
 	</SettingsControl>
 
 	<SettingsControl caption="Body" helptext="Body">
-		@Html.TextAreaFor(model => model.MailTemplate.Body, 12, 60, new { @class = "HtmlEditorControl" })
+		@*@Html.TextAreaFor(model => model.MailTemplate.Body, 12, 60, new { @class = "HtmlEditorControl" })*@
+		@Html.TextAreaFor(model => model.MailTemplate.Body, 12, 60, new { @class = "font-monospace" })
 	</SettingsControl>
 
 </fieldset>

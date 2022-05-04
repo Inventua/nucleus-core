@@ -895,17 +895,23 @@ namespace Nucleus.Modules.Forums.DataProviders
 			return await this.Context.MailQueue
 				.Where(item => item.Status == MailQueue.MailQueueStatus.Queued)
 				.Include(item => item.Post)
+					.ThenInclude(post => post.Status)
+				.Include(item => item.Post)
+					.ThenInclude(post => post.PostedBy)
 				.Include(item => item.Reply)
+					.ThenInclude(reply => reply.ReplyTo)
+				.Include(item => item.Reply)
+					.ThenInclude(reply => reply.PostedBy)
 				.OrderBy(item => item.UserId)
-					.ThenBy(item => item.ModuleId )
+					.ThenBy(item => item.ModuleId)
+					.ThenBy(item => item.Post.ForumId)
 					.ThenBy(item => item.MailTemplateId )
 					.ThenBy(item => item.Post.Id)
 					.ThenBy(item => item.Reply.Id)
 					.ThenBy(item => item.DateAdded)
-				.AsSingleQuery()
+				.AsSplitQuery()
 				.ToListAsync();
 		}
-
 
 		#endregion
 	}

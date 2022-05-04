@@ -25,6 +25,7 @@
 
 	<ItemGroup>
 	  <PackageReference Include="Markdig" Version="0.26.0" />
+	  <PackageReference Include="RazorEngineCore" Version="2022.1.2" />
 	</ItemGroup>
 	
   <ItemGroup>

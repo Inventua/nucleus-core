@@ -113,7 +113,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.GoogleAn
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.OAuth.Client", "Nucleus.Special.Modules\Nucleus.OAuth.Client\Nucleus.OAuth.Client.csproj", "{9B8F6A43-6BD1-4F80-A56F-4C13ADEF2BA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.OAuth.Server", "Nucleus.Special.Modules\Nucleus.OAuth.Server\Nucleus.OAuth.Server.csproj", "{883F62B7-2FF9-48CF-BD6A-AE0D04B44BFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.OAuth.Server", "Nucleus.Special.Modules\Nucleus.OAuth.Server\Nucleus.OAuth.Server.csproj", "{883F62B7-2FF9-48CF-BD6A-AE0D04B44BFA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

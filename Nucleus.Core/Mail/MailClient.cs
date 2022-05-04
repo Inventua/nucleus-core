@@ -10,6 +10,8 @@ using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Options;
 using MailKit;
 using Nucleus.Abstractions.Mail;
+using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Razor;
 
 namespace Nucleus.Core.Mail
 {
@@ -18,11 +20,11 @@ namespace Nucleus.Core.Mail
 	/// </summary>
 	public class MailClient : IMailClient, IDisposable
 	{
-		public MailSettings MailSettings { get; private set; }
-			
-		//internal MailClient (Context context, IOptions<SmtpMailOptions> smtpMailOptions) : this(context.Site, smtpMailOptions)	{	}
+		private ILogger<MailClient> Logger { get; }
 
-		internal MailClient(Site site, IOptions<SmtpMailOptions> smtpMailOptions)
+		public MailSettings MailSettings { get; private set; }
+		
+		public MailClient(Site site, IOptions<SmtpMailOptions> smtpMailOptions, ILogger<MailClient> logger)
 		{
 			if (site == null)
 			{
@@ -31,6 +33,25 @@ namespace Nucleus.Core.Mail
 
 			// Apply site settings
 			this.MailSettings = site.GetSiteMailSettings(smtpMailOptions.Value);
+			
+			this.Logger = logger;
+		}
+
+		public void Send(MailTemplate template, MailArgs args, string to)
+		{
+			System.Dynamic.ExpandoObject model = new();
+
+			foreach (var value in args)
+			{
+				model.TryAdd(value.Key, value.Value);
+			}
+
+			Send(template, model, to);			
+		}
+
+		public void Send(MailTemplate template, Object model, string to) 
+		{
+			Send<MailRazorTemplateBase>(template, model, to);
 		}
 
 		/// <summary>
@@ -40,7 +61,8 @@ namespace Nucleus.Core.Mail
 		/// <param name="template"></param>
 		/// <param name="args"></param>
 		/// <param name="to"></param>
-		public void Send(MailTemplate template, MailArgs args, string to)
+		public void Send<TRazorTemplateBase>(MailTemplate template, Object model, string to)
+			where TRazorTemplateBase : MailRazorTemplateBase
 		{
 			MimeKit.MimeMessage message = new();
 			MimeKit.BodyBuilder builder = new();
@@ -51,9 +73,10 @@ namespace Nucleus.Core.Mail
       {
 				message.To.Add(MimeKit.MailboxAddress.Parse(address));
 			}
-
-			message.Subject = ParseTemplate(template.Subject, args);
-			builder.HtmlBody = ParseTemplate(template.Body, args);
+			
+			message.Subject = template.Subject.ParseTemplate<TRazorTemplateBase>(model);// ParseTemplate<TRazorTemplateBase>(template.Subject, model);
+			builder.HtmlBody = template.Body.ParseTemplate<TRazorTemplateBase>(model); //ParseTemplate<TRazorTemplateBase>(template.Body, model);
+			
 			message.Body = builder.ToMessageBody();
 
 			if (this.MailSettings.DeliveryMethod == System.Net.Mail.SmtpDeliveryMethod.SpecifiedPickupDirectory)
@@ -74,22 +97,6 @@ namespace Nucleus.Core.Mail
 			}
 		}
 
-		/// <summary>
-		/// Parse a template string, replacing template values in the form {key.property} with values from the args dictionary.
-		/// </summary>
-		/// <param name="template"></param>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		private static string ParseTemplate(string template, MailArgs args)
-		{
-			string result = template;
-
-			result = System.Text.RegularExpressions.Regex.Replace(result, "\\[(?<key>[A-Za-z]*)[^(]*\\((?<expression>[^)]*?)\\)\\]", new TemplateParser(args).CollectionMatchEvaluator, System.Text.RegularExpressions.RegexOptions.Singleline );
-
-			result = System.Text.RegularExpressions.Regex.Replace(result, "{(.*?)}", new TemplateParser(args).MatchEvaluator);
-
-			return result;
-		}
 
 		public void Dispose()
 		{
@@ -97,135 +104,5 @@ namespace Nucleus.Core.Mail
 			GC.SuppressFinalize(this);
 		}
 
-		private class TemplateParser
-		{
-			private MailArgs MailArgs { get; }
-
-			public TemplateParser(MailArgs args)
-			{
-				this.MailArgs = args;
-			}
-
-			internal string CollectionMatchEvaluator(System.Text.RegularExpressions.Match match)
-			{
-				string key = match.Groups["key"].Value;
-				string expression = match.Groups["expression"].Value;
-				StringBuilder result = new();
-				System.Collections.IEnumerable value = this.MailArgs[key] as System.Collections.IEnumerable;
-
-				if (value != null)
-				{
-					foreach (object item in value)
-					{
-						if (this.MailArgs.ContainsKey(item.GetType().Name))
-						{
-							this.MailArgs[item.GetType().Name] = item;
-						}
-						else
-						{
-							this.MailArgs.Add(item.GetType().Name, item);
-						}
-						result.Append(System.Text.RegularExpressions.Regex.Replace(expression, "{(.*?)}", MatchEvaluator));
-					}
-				}
-
-				return result.ToString();
-			}
-
-			internal string MatchEvaluator(System.Text.RegularExpressions.Match match)
-			{
-				string key;
-				string prop;
-
-				if (match.Groups.Count > 1 && match.Groups[1].Value.Contains('.'))
-				{
-					key = match.Groups[1].Value.Split('.')[0];
-					prop = match.Groups[1].Value[(key.Length + 1)..];
-				}
-				else
-				{
-					key = "";
-					prop = match.Groups[1].Value;
-				}
-
-				switch (key)
-				{
-					case "":
-						// handle standalone values
-						return MatchStandaloneValue(prop);
-					default:
-						return MatchDictionaryValue(key, prop);
-				}
-			}
-
-			private string MatchStandaloneValue(string prop)
-			{
-				switch (prop)
-				{
-					case "time":
-						return DateTime.Now.TimeOfDay.ToString();
-
-					case "date":
-						return DateTime.Now.ToString();
-
-					default:
-						if (!this.MailArgs.ContainsKey(prop))
-						{
-							return "";
-						}
-						else
-						{
-							return this.MailArgs[prop].ToString();
-						}
-				}
-			}
-
-			private string MatchDictionaryValue(string key, string prop)
-			{
-				
-				if (!this.MailArgs.ContainsKey(key))
-				{
-					return "";
-				}
-
-				// loop through '.' separated property name - to handle properties of objects (like User.Secrets.PasswordResetToken).  A single 
-				// property (like User.UserName) will only loop through once.
-				object value = this.MailArgs[key];
-
-				foreach (string part in prop.Split('.', StringSplitOptions.RemoveEmptyEntries))
-				{
-					if (value is IDictionary<string, object>)
-					{
-						if ((value as IDictionary<string, object>).ContainsKey(part))
-						{
-							value = (value as IDictionary<string, object>)[part];
-						}
-					}
-					else
-					{
-						if (value != null)
-						{
-							System.Reflection.PropertyInfo propInfo = value.GetType().GetProperty(part, System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance);
-
-							if (propInfo != null && propInfo.CanRead)
-							{
-								value = propInfo.GetValue(value);
-							}
-							else
-							{
-								return "";
-							}
-						}
-						else
-						{
-							return "";
-						}
-					}
-				}				
-
-				return value.ToString();
-				//return "";
-			}
-		}
 	}
 }

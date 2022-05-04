@@ -5,57 +5,83 @@
 @using Nucleus.Modules.ContactUs.ViewModels
 @Html.AddStyle("~!/../viewer.css")
 @Html.AddStyle("~/Resources/css/forms.css")
-@using (Html.BeginNucleusForm("Send", "ContactUs", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+@if (Model.MessageSent)
 {
-	<fieldset aria-label="Contact Us">
-		@if (Model.ShowName)
+	<div class="alert alert-info">Your message has been sent.</div>
+}
+else
+{
+	@if (String.IsNullOrEmpty(Model.SendTo))
+	{
+		@if (Model.IsAdmin)
 		{
-			<div class="nucleus-flex-fields">
-				<SettingsControl caption="First Name" helptext="Please enter your first name.">
-					@Html.TextBoxFor(model => model.Message.FirstName, new { @maxlength = 256, @autocomplete="given-name" })
+			<div class="alert alert-warning">No email recipients have been configured. This module will not display to end users.</div>
+		}
+	}
+	@if (Model.MailTemplateId == Guid.Empty)
+	{
+		@if (Model.IsAdmin)
+		{
+			<div class="alert alert-warning">No email template has been configured. This module will not display to end users.</div>
+		}
+	}
+
+	@if (!string.IsNullOrEmpty(Model.SendTo) && Model.MailTemplateId != Guid.Empty)
+	{
+		@using (Html.BeginNucleusForm("Send", "ContactUs", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+		{
+			<fieldset aria-label="Contact Us">
+				@if (Model.ShowName)
+				{
+					<div class="nucleus-flex-fields">
+						<SettingsControl caption="First Name" helptext="Please enter your first name.">
+							@Html.TextBoxFor(model => model.Message.FirstName, new { @maxlength = 256, @autocomplete="given-name" })
+						</SettingsControl>
+						<SettingsControl caption="Last Name" helptext="Please enter your last name.">
+							@Html.TextBoxFor(model => model.Message.LastName, new { @maxlength = 256, @autocomplete="family-name" })
+						</SettingsControl>
+					</div>
+				}
+
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Email" helptext="Please enter your email address.">
+						@Html.TextBoxFor(model => model.Message.Email, new { @maxlength = 256, @autocomplete="email" })
+					</SettingsControl>
+					@if (Model.ShowPhoneNumber)
+					{
+						<SettingsControl caption="Phone Number" helptext="Please enter your phone number.">
+							@Html.TextBoxFor(model => model.Message.PhoneNumber, new { @maxlength = 64, @autocomplete="tel" })
+						</SettingsControl>
+					}
+				</div>
+
+				@if (Model.ShowCompany)
+				{
+					<SettingsControl caption="Company" helptext="Please enter the name of your company.">
+						@Html.TextBoxFor(model => model.Message.Company, new { @maxlength = 256, @autocomplete="organization" })
+					</SettingsControl>
+				}
+
+				@if (Model.ShowCategory && Model.CategoryList != null)
+				{
+					<SettingsControl caption="@Model.CategoryList.Name" helptext="Select the most appropriate category related to your enquiry.">
+						@Html.DropDownListFor(model => model.Message.Category.Id, new SelectList(Model.CategoryList.Items, "Id", "Name"), "(not selected)")
+					</SettingsControl>
+				}
+				@if (Model.ShowSubject)
+				{
+					<SettingsControl caption="Subject" helptext="Please enter the subject of your enquiry.">
+						@Html.TextBoxFor(model => model.Message.Subject, new { @maxlength = 256 })
+					</SettingsControl>
+				}
+				<SettingsControl caption="Message Body" helptext="Please enter your message in detail.">
+					@Html.TextAreaFor(model => model.Message.Body, new { @rows=10 })
 				</SettingsControl>
-				<SettingsControl caption="Last Name" helptext="Please enter your last name.">
-					@Html.TextBoxFor(model => model.Message.LastName, new { @maxlength = 256, @autocomplete="family-name" })
-				</SettingsControl>
+			</fieldset>
+
+			<div class="Tools">
+				@Html.SubmitButton("", "Send", @Url.NucleusAction("Send", "ContactUs", "ContactUs"), new { @data_target = "form.parent()" })
 			</div>
 		}
-		<SettingsControl caption="Email" helptext="Please enter your email address.">
-			@Html.TextBoxFor(model => model.Message.Email, new { @maxlength = 256, @autocomplete="email" })
-		</SettingsControl>
-
-		<div class="nucleus-flex-fields">
-			@if (Model.ShowCompany)
-			{
-				<SettingsControl caption="Company" helptext="Please enter the name of your company.">
-					@Html.TextBoxFor(model => model.Message.Company, new { @maxlength = 256 })
-				</SettingsControl>
-			}
-			@if (Model.ShowPhoneNumber)
-			{
-				<SettingsControl caption="Phone Number" helptext="Please enter your phone number.">
-					@Html.TextBoxFor(model => model.Message.PhoneNumber, new { @maxlength = 64 })
-				</SettingsControl>
-			}
-		</div>
-
-		@if (Model.ShowCategory && Model.CategoryList != null)
-		{
-			<SettingsControl caption="@Model.CategoryList.Name" helptext="Select the most appropriate category related to your enquiry.">
-				@Html.DropDownListFor(model => model.Message.Category.Id, new SelectList(Model.CategoryList.Items, "Id", "Name"), "(not selected)")
-			</SettingsControl>
-		}
-		@if (Model.ShowSubject)
-		{
-			<SettingsControl caption="Subject" helptext="Please enter the subject of your enquiry.">
-				@Html.TextBoxFor(model => model.Message.Subject, new { @maxlength = 256 })
-			</SettingsControl>
-		}
-		<SettingsControl caption="Message Body" helptext="Please enter your message in detail.">
-			@Html.TextAreaFor(model => model.Message.Body, new { })
-		</SettingsControl>
-	</fieldset>
-
-	<div class="Tools">
-		@Html.SubmitButton("", "Send", @Url.NucleusAction("Send", "ContactUs", "ContactUs"), new { @data_target = "form.parent()" })
-	</div>
+	}
 }

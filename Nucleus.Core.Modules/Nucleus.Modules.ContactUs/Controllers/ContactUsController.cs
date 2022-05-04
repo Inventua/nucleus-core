@@ -5,13 +5,14 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Mail;
 using Nucleus.Abstractions.Models.FileSystem;
+using Nucleus.Abstractions.Mail;
 using Nucleus.Extensions;
+using Nucleus.Extensions.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Nucleus.Abstractions.Mail;
 
 namespace Nucleus.Modules.ContactUs.Controllers
 {
@@ -87,13 +88,17 @@ namespace Nucleus.Modules.ContactUs.Controllers
 			Models.Settings settings = new();
 			settings.ReadSettings(this.Context.Module);
 
+			viewModel.Message.Category = await this.ListManager.GetListItem(viewModel.Message.Category.Id);
+
+			ModelState.Clear();
+			this.TryValidateModel(viewModel);
+
 			Validate(viewModel, settings);
 
 			if (!ControllerContext.ModelState.IsValid)
 			{
 				return BadRequest(ControllerContext.ModelState);
 			}
-
 
 			// send welcome email (if set and the new user has an email address)
 
@@ -115,10 +120,18 @@ namespace Nucleus.Modules.ContactUs.Controllers
 
 							Logger.LogTrace("Sending contact email {emailTemplateName} to '{sendTo}'.", template.Name, settings.SendTo);
 
-							using (IMailClient mailClient = this.MailClientFactory.Create())
+							try
 							{
-								mailClient.Send(template, args, settings.SendTo);
+								using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
+								{
+									mailClient.Send(template, args, settings.SendTo);
+								}
 							}
+							catch (Exception ex)
+              {
+								Logger.LogError(ex, "Error sending contact email {emailTemplateName} to '{sendTo}'.", template.Name, settings.SendTo);
+								return Problem("There was an error sending the contact email.", null, (int)System.Net.HttpStatusCode.InternalServerError, "Error Sending Email");
+              }
 						}
 					}
 					else
@@ -133,8 +146,10 @@ namespace Nucleus.Modules.ContactUs.Controllers
 
 			}
 
-			return Ok();
-			//return View("Viewer", await BuildViewModel());
+			viewModel.MessageSent = true;
+
+			//return Ok();
+			return View("Viewer", viewModel);
 		}
 
 
@@ -152,6 +167,7 @@ namespace Nucleus.Modules.ContactUs.Controllers
 		{
 			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_CATEGORYLIST_ID, viewModel.CategoryList.Id);
 			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_MAILTEMPLATE_ID, viewModel.MailTemplateId);
+			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_SEND_TO, viewModel.SendTo);
 
 			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_SHOWNAME, viewModel.ShowName);
 			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_SHOWCOMPANY, viewModel.ShowCompany);
@@ -174,9 +190,19 @@ namespace Nucleus.Modules.ContactUs.Controllers
 		{
 			ViewModels.Viewer viewModel = new();
 
+			viewModel.IsAdmin = User.IsSiteAdmin(this.Context.Site);
 			viewModel.ReadSettings(this.Context.Module);
 			viewModel.CategoryList = (await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(Models.Settings.MODULESETTING_CATEGORYLIST_ID, Guid.Empty)));
 		
+			// default values if user is logged on
+			if (User.Identity.IsAuthenticated)
+      {
+				viewModel.Message.FirstName = User.GetUserClaim<String>(System.Security.Claims.ClaimTypes.GivenName);
+				viewModel.Message.LastName = User.GetUserClaim<String>(System.Security.Claims.ClaimTypes.Surname);
+				viewModel.Message.Email = User.GetUserClaim<String>(System.Security.Claims.ClaimTypes.Email);
+				viewModel.Message.PhoneNumber = User.GetUserClaim<String>(System.Security.Claims.ClaimTypes.OtherPhone);
+			}
+
 			return viewModel;
 		}
 

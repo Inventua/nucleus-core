@@ -28,7 +28,7 @@ namespace Nucleus.Extensions.Razor
 
 			// Parse the template as "simple"
 			result = SimpleParser.Parse(result, model);
-			
+
 			return result;
 		}
 	}

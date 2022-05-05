@@ -30,9 +30,9 @@ namespace Nucleus.Extensions.Razor
 			//else
 			//{
 			compiledTemplate = engine.Compile<RazorEngineTemplate<T>>(template, BuildRazorOptions);
-				//CompiledTemplateCache.Add(templateKey, (IRazorEngineCompiledTemplate<T>)compiledTemplate);
+			//CompiledTemplateCache.Add(templateKey, (IRazorEngineCompiledTemplate<T>)compiledTemplate);
 			//}
-			
+
 			return compiledTemplate.Run(instance =>
 			{
 				instance.Model = model;
@@ -53,11 +53,11 @@ namespace Nucleus.Extensions.Razor
 		private static string Hash(string value)
 		{
 			var objData = Encoding.UTF8.GetBytes(value);
-			
+
 			using (System.Security.Cryptography.HashAlgorithm provider = System.Security.Cryptography.SHA256.Create())
 			{
 				return Convert.ToBase64String(provider.ComputeHash(objData, 0, objData.Length));
-			}			
+			}
 		}
 	}
 }

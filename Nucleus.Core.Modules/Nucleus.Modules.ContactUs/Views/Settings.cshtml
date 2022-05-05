@@ -8,6 +8,11 @@
 {
 	<fieldset role="group" aria-labelledby="heading">
 		<h2>Settings</h2>
+
+		<SettingsControl caption="Send To Recipients" helptext="Please enter the email recipients as a comma-separated string.">
+			@Html.TextAreaFor(model => model.SendTo, new { @rows=2 })
+		</SettingsControl>
+
 		<div class="nucleus-flex-fields">
 			<SettingsControl caption="Categories List" helptext="Select the list to use for categories for this module instance.  Lists are managed in the Nucleus Lists manager.">
 				@Html.DropDownListFor(model => model.CategoryList.Id, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")
@@ -18,7 +23,10 @@
 			</SettingsControl>
 		</div>
 
-		<h2>Fields</h2>
+		<div class="nucleus-flex-fields">
+			<h2 class="flex-grow-1">Visibility</h2>
+			<h2 class="flex-grow-1">Required</h2>
+		</div>
 		<div class="nucleus-flex-fields">
 			<SettingsControl caption="Show Name?" class="inner-inline" rendermode="LabelLast" helptext="Show the first name and last name fields.">
 				@Html.CheckBoxFor(model => model.ShowName, new { @class = "ToggleSwitch" })
@@ -29,21 +37,21 @@
 			</SettingsControl>
 		</div>
 		<div class="nucleus-flex-fields">
-			<SettingsControl caption="Show Company?" class="inner-inline" rendermode="LabelLast" helptext="Show the company name field.">
-				@Html.CheckBoxFor(model => model.ShowCompany, new { @class = "ToggleSwitch" })
-			</SettingsControl>
-
-			<SettingsControl caption="Require Company?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the company name field is mandatory.">
-				@Html.CheckBoxFor(model => model.RequireCompany, new { @class = "ToggleSwitch" })
-			</SettingsControl>
-		</div>
-		<div class="nucleus-flex-fields">
 			<SettingsControl caption="Show Phone Number?" class="inner-inline" rendermode="LabelLast" helptext="Show the phone number field.">
 				@Html.CheckBoxFor(model => model.ShowPhoneNumber, new { @class = "ToggleSwitch" })
 			</SettingsControl>
 
 			<SettingsControl caption="Require Phone Number?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the phone number field is mandatory.">
 				@Html.CheckBoxFor(model => model.RequirePhoneNumber, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+		</div>
+		<div class="nucleus-flex-fields">
+			<SettingsControl caption="Show Company?" class="inner-inline" rendermode="LabelLast" helptext="Show the company name field.">
+				@Html.CheckBoxFor(model => model.ShowCompany, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+
+			<SettingsControl caption="Require Company?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the company name field is mandatory.">
+				@Html.CheckBoxFor(model => model.RequireCompany, new { @class = "ToggleSwitch" })
 			</SettingsControl>
 		</div>
 		<div class="nucleus-flex-fields">

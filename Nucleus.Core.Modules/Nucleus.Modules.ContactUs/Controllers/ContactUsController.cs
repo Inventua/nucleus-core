@@ -176,13 +176,13 @@ namespace Nucleus.Modules.ContactUs.Controllers
 						MailTemplate template = await this.MailTemplateManager.Get(settings.MailTemplateId);
 						if (template != null)
 						{
-							MailArgs args = new()
-							{
-								{ "Site", this.Context.Site },
-								{ "Message", viewModel.Message }
-							};
+              Models.Mail.TemplateModel args = new()
+              {
+                Site = this.Context.Site,
+                Message = viewModel.Message
+              };
 
-							Logger.LogTrace("Sending contact email {emailTemplateName} to '{sendTo}'.", template.Name, settings.SendTo);
+              Logger.LogTrace("Sending contact email {emailTemplateName} to '{sendTo}'.", template.Name, settings.SendTo);
 
 							try
 							{

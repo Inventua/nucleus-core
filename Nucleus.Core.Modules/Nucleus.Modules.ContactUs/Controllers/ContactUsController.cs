@@ -5,13 +5,15 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Mail;
 using Nucleus.Abstractions.Models.FileSystem;
+using Nucleus.Abstractions.Mail;
 using Nucleus.Extensions;
+using Nucleus.Extensions.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Nucleus.Abstractions.Mail;
 
 namespace Nucleus.Modules.ContactUs.Controllers
 {
@@ -46,46 +48,116 @@ namespace Nucleus.Modules.ContactUs.Controllers
 			return View("Viewer", await BuildViewModel());
 		}
 
-		private void Validate(ViewModels.Viewer viewModel, Models.Settings settings)
+		private void Validate(Boolean isRequired, string value, string propertyName, string message)
+    {
+			if (isRequired && string.IsNullOrEmpty(value))
+      {
+				ModelState.AddModelError(propertyName, message);
+      }
+    }
+
+		private void ValidateGuid(Boolean isRequired, ListItem value, string propertyName, string message)
 		{
-			if (settings.RequireName && string.IsNullOrEmpty(viewModel.Message.FirstName))
+			if (isRequired && (value == null || value.Id == Guid.Empty))
 			{
-				ControllerContext.ModelState.AddModelError(nameof(viewModel.Message.FirstName), "Please enter your first name");	
+				ModelState.AddModelError(propertyName, message);
 			}
-
-			if (settings.RequireName && string.IsNullOrEmpty(viewModel.Message.LastName))
-			{
-				ControllerContext.ModelState.AddModelError(nameof(viewModel.Message.LastName), "Please enter your last name");
-			}
-
-			if (settings.RequirePhoneNumber && string.IsNullOrEmpty(viewModel.Message.PhoneNumber))
-			{
-				ControllerContext.ModelState.AddModelError(nameof(viewModel.Message.PhoneNumber), "Please enter your phone number");
-			}
-
-			if (settings.RequireCompany && string.IsNullOrEmpty(viewModel.Message.Company))
-			{
-				ControllerContext.ModelState.AddModelError(nameof(viewModel.Message.Company), "Please enter your company name");
-			}
-
-			if (settings.RequireCategory && viewModel.Message.Category.Id == Guid.Empty)
-			{
-				ControllerContext.ModelState.AddModelError(nameof(viewModel.Message.Category), "Please select a category related to your enquiry.");
-			}
-
-			if (settings.RequireSubject && string.IsNullOrEmpty(viewModel.Message.Subject))
-			{
-				ControllerContext.ModelState.AddModelError(nameof(viewModel.Message.Subject), "Please enter the subject of your enquiry");
-			}
-
 		}
 
+		//private void Validate<TModel>(Boolean isRequired, Expression<Func<TModel, string>> expression, string message)
+		//{
+		//	TModel value = (TModel)Expression.Lambda(expression).Compile().DynamicInvoke();
+
+		//	if (isRequired && string.IsNullOrEmpty(value))
+		//	{
+		//		ModelState.AddModelError(propertyName, message);
+		//	}
+		//}
+
+		//private void Validate<TModel, TProperty>(Boolean isRequired, Expression<Func<TModel, TProperty>> expression, string message)
+		//{
+		//	//string value = (Func<string>)Expression.Lambda(expression).Compile().DynamicInvoke();
+		//	Func<string> value = expression.Compile().;
+
+		//	object propertyValue = expression.Compile()(expression.);
+
+		//	//string value = (Func<string>) expression.Compile().DynamicInvoke();
+
+		//	string something = expression.Compile().Invoke();
+
+		//	if (isRequired && string.IsNullOrEmpty(value()))
+		//	{
+		//		ModelState.AddModelError(expression.Name, message);
+		//	}
+		//}
+
+
+		private void Validate(ViewModels.Viewer viewModel, Models.Settings settings)
+		{
+
+      //   Validate<Models.Message, string>(settings.RequireName, model => viewModel.Message.FirstName, "Please enter your first name");
+
+      //Expression<Func<string>> expression;
+
+      //Validate(settings.RequireName, expression = () => viewModel.Message.FirstName, "Please enter your first name");
+
+      //Validate(settings.RequireName, expression = () => viewModel.Message.LastName, "Please enter your last name");
+
+      Validate(settings.RequireName, viewModel.Message.FirstName, nameof(viewModel.Message.FirstName), "Please enter your first name.");
+
+      Validate(settings.RequireName, viewModel.Message.LastName, nameof(viewModel.Message.LastName), "Please enter your last name.");
+
+			Validate(settings.RequirePhoneNumber, viewModel.Message.PhoneNumber, nameof(viewModel.Message.PhoneNumber), "Please enter your phone number.");
+
+			Validate(settings.RequireCompany, viewModel.Message.Company, nameof(viewModel.Message.Company), "Please enter your company name.");
+
+			ValidateGuid(settings.RequireCategory, viewModel.Message.Category, nameof(viewModel.Message.Category), "Please select a category related to your enquiry.");
+
+			Validate(settings.RequireSubject, viewModel.Message.Subject, nameof(viewModel.Message.Subject), "Please enter the subject of your enquiry.");
+
+
+
+			//if (settings.RequireName && string.IsNullOrEmpty(viewModel.Message.FirstName))
+			//{
+			//	ModelState.AddModelError(nameof(viewModel.Message.FirstName), "Please enter your first name");	
+			//}
+
+			//if (settings.RequireName && string.IsNullOrEmpty(viewModel.Message.LastName))
+			//{
+			//	ModelState.AddModelError(nameof(viewModel.Message.LastName), "Please enter your last name");
+			//}
+
+			//if (settings.RequirePhoneNumber && string.IsNullOrEmpty(viewModel.Message.PhoneNumber))
+			//{
+			//	ModelState.AddModelError(nameof(viewModel.Message.PhoneNumber), "Please enter your phone number");
+			//}
+
+			//if (settings.RequireCompany && string.IsNullOrEmpty(viewModel.Message.Company))
+			//{
+			//	ModelState.AddModelError(nameof(viewModel.Message.Company), "Please enter your company name");
+			//}
+
+			//if (settings.RequireCategory && viewModel.Message.Category.Id == Guid.Empty)
+			//{
+			//	ModelState.AddModelError(nameof(viewModel.Message.Category), "Please select a category related to your enquiry.");
+			//}
+
+			//if (settings.RequireSubject && string.IsNullOrEmpty(viewModel.Message.Subject))
+			//{
+			//	ModelState.AddModelError(nameof(viewModel.Message.Subject), "Please enter the subject of your enquiry");
+			//}
+		}
 
 		[HttpPost]
 		public async Task<ActionResult> Send(ViewModels.Viewer viewModel)
 		{
 			Models.Settings settings = new();
 			settings.ReadSettings(this.Context.Module);
+
+			viewModel.Message.Category = await this.ListManager.GetListItem(viewModel.Message.Category.Id);
+
+			ModelState.Clear();
+			this.TryValidateModel(viewModel);
 
 			Validate(viewModel, settings);
 
@@ -94,12 +166,9 @@ namespace Nucleus.Modules.ContactUs.Controllers
 				return BadRequest(ControllerContext.ModelState);
 			}
 
-
-			// send welcome email (if set and the new user has an email address)
-
 			if (this.Context != null && this.Context.Site != null)
-			{
-				
+			{				
+				// send contact email (if recipients and mail template have been set)
 				if (!String.IsNullOrEmpty(settings.SendTo))
 				{
 					if (settings.MailTemplateId != Guid.Empty)
@@ -107,18 +176,26 @@ namespace Nucleus.Modules.ContactUs.Controllers
 						MailTemplate template = await this.MailTemplateManager.Get(settings.MailTemplateId);
 						if (template != null)
 						{
-							MailArgs args = new()
-							{
-								{ "Site", this.Context.Site },
-								{ "Message", viewModel.Message }
-							};
+              Models.Mail.TemplateModel args = new()
+              {
+                Site = this.Context.Site,
+                Message = viewModel.Message
+              };
 
-							Logger.LogTrace("Sending contact email {emailTemplateName} to '{sendTo}'.", template.Name, settings.SendTo);
+              Logger.LogTrace("Sending contact email {emailTemplateName} to '{sendTo}'.", template.Name, settings.SendTo);
 
-							using (IMailClient mailClient = this.MailClientFactory.Create())
+							try
 							{
-								mailClient.Send(template, args, settings.SendTo);
+								using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
+								{
+									mailClient.Send(template, args, settings.SendTo);
+								}
 							}
+							catch (Exception ex)
+              {
+								Logger.LogError(ex, "Error sending contact email {emailTemplateName} to '{sendTo}'.", template.Name, settings.SendTo);
+								return Problem("There was an error sending the contact email.", null, (int)System.Net.HttpStatusCode.InternalServerError, "Error Sending Email");
+              }
 						}
 					}
 					else
@@ -130,13 +207,12 @@ namespace Nucleus.Modules.ContactUs.Controllers
 				{
 					Logger.LogTrace("Not sending contact email to '{sendTo}' because the module does not have a send to value set.", settings.SendTo);
 				}
-
 			}
 
-			return Ok();
-			//return View("Viewer", await BuildViewModel());
-		}
+			viewModel.MessageSent = true;
 
+			return View("Viewer", viewModel);
+		}
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpGet]
@@ -152,6 +228,7 @@ namespace Nucleus.Modules.ContactUs.Controllers
 		{
 			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_CATEGORYLIST_ID, viewModel.CategoryList.Id);
 			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_MAILTEMPLATE_ID, viewModel.MailTemplateId);
+			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_SEND_TO, viewModel.SendTo);
 
 			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_SHOWNAME, viewModel.ShowName);
 			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_SHOWCOMPANY, viewModel.ShowCompany);
@@ -174,9 +251,19 @@ namespace Nucleus.Modules.ContactUs.Controllers
 		{
 			ViewModels.Viewer viewModel = new();
 
+			viewModel.IsAdmin = User.IsSiteAdmin(this.Context.Site);
 			viewModel.ReadSettings(this.Context.Module);
 			viewModel.CategoryList = (await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(Models.Settings.MODULESETTING_CATEGORYLIST_ID, Guid.Empty)));
 		
+			// default values if user is logged on
+			if (User.Identity.IsAuthenticated)
+      {
+				viewModel.Message.FirstName = User.GetUserClaim<String>(System.Security.Claims.ClaimTypes.GivenName);
+				viewModel.Message.LastName = User.GetUserClaim<String>(System.Security.Claims.ClaimTypes.Surname);
+				viewModel.Message.Email = User.GetUserClaim<String>(System.Security.Claims.ClaimTypes.Email);
+				viewModel.Message.PhoneNumber = User.GetUserClaim<String>(System.Security.Claims.ClaimTypes.OtherPhone);
+			}
+
 			return viewModel;
 		}
 

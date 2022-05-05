@@ -13,6 +13,6 @@
 //	/// </summary>
 //	public class MailTemplateModelBase<T> : RazorEngineTemplateBase <T>
 //	{
-		
+
 //	}
 //}

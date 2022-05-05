@@ -70,10 +70,10 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 
 				if (template != null && !String.IsNullOrEmpty(email?.Value))
 				{
-					foreach (var moduleGroup in group.GroupBy(item =>item.ModuleId))
+					foreach (var moduleGroup in group.GroupBy(item => item.ModuleId))
 					{
 						Forum forum = await this.ForumsManager.Get(group.Key.ForumId);
-											
+
 						// only re-populate the module, page, site variables if this item's module id is different to the previous one (for performance).
 						if (module == null || module.Id != moduleGroup.Key)
 						{

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Nucleus.Extensions.Razor
-{	
+{
 	/// <summary>
 	/// Simple template parser.
 	/// </summary>

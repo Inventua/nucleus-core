@@ -7,7 +7,7 @@ using Nucleus.Abstractions.Models;
 
 namespace Nucleus.Modules.Forums.Models.MailTemplate
 {
-	public class Model 
+	public class Model
 	{
 		public List<Forum> Forums { get; } = new();
 		public Site Site { get; set; }

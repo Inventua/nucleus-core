@@ -16,13 +16,21 @@ namespace Nucleus.Abstractions.Mail
 	/// </summary>
 	public interface IMailClient : IDisposable
 	{
-		/// <summary>
-		/// Parse the specified template, and send the resulting email to the specified to address.
-		/// </summary>
-		/// <param name="template"></param>
-		/// <param name="args"></param>
-		/// <param name="to"></param>
-		public void Send(MailTemplate template, MailArgs args, string to);
+		///// <summary>
+		///// Parse the specified template, and send the resulting email to the specified to address.
+		///// </summary>
+		///// <param name="template"></param>
+		///// <param name="args"></param>
+		///// <param name="to"></param>
+		//public void Send(MailTemplate template, MailArgs args, string to);
+
+		///// <summary>
+		///// Parse the specified template, and send the resulting email to the specified to address.
+		///// </summary>
+		///// <param name="template"></param>
+		///// <param name="model"></param>
+		///// <param name="to"></param>
+		//public void Send(MailTemplate template, Object model, string to);
 
 		/// <summary>
 		/// Parse the specified template, and send the resulting email to the specified to address.
@@ -30,7 +38,7 @@ namespace Nucleus.Abstractions.Mail
 		/// <param name="template"></param>
 		/// <param name="model"></param>
 		/// <param name="to"></param>
-		public void Send(MailTemplate template, Object model, string to);
-
+		public void Send<TModel>(MailTemplate template, TModel model, string to)
+			where TModel : MailTemplateModelBase<TModel>;
 	}
 }

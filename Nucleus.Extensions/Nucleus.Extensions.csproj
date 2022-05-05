@@ -15,7 +15,8 @@
 		<Product>Nucleus</Product>
 		<Description>Nucleus extension classes.</Description>
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
-		<VersionPrefix>1.0.0.1</VersionPrefix>
+		<VersionPrefix>1.0.0.3</VersionPrefix>
+		<VersionSuffix>a2</VersionSuffix>
   </PropertyGroup>
 
 	<ItemGroup>

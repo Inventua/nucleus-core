@@ -24,7 +24,8 @@
 		<Product>Nucleus</Product>
 		<Description>Models, interfaces and extensions used by the Nucleus runtime and by Nucleus extensions.</Description>
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
-		<VersionPrefix>1.0.0.7</VersionPrefix>
+		<VersionPrefix>1.0.0.8</VersionPrefix>
+		<VersionSuffix>a3</VersionSuffix>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -46,5 +47,6 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="RazorEngineCore" Version="2022.1.2" />
 	</ItemGroup>
 </Project>

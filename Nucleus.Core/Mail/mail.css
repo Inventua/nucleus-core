@@ -1,0 +1,4 @@
+﻿body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif }
+h1, h2, h3, h4, h5 { margin: 0.5em 0 0.5em 0 }
+table { width: 100%; margin: 0.25em 0 0.25em 0; border: 1px solid #888 }
+th, td { text-align: left }

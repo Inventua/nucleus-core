@@ -488,10 +488,11 @@ function _Page()
 		{
 			if (request.status === 400)
 			{
-				// bad request.  Look for ModelState errors		
+				// bad request.  Parse ModelState errors		
 				var messages = new Array(request.responseJSON.length);
 				var elementSelector ='';
 
+				// get a list of elements with validation errors
 				for (var prop in request.responseJSON)
 				{
 					var element = jQuery('[name="' + prop + '"]');
@@ -503,28 +504,23 @@ function _Page()
 
 				var elements = jQuery(elementSelector);
 
+				// sort the messages by element ordinal position
 				for (var prop in request.responseJSON)
 				{
 					var element = jQuery('[name="' + prop + '"]');
 					var index = _getElementIndex(elements, element.attr('id'));
 					if (index !== undefined)
 					{
-						messages[index] = request.responseJSON[prop].toString();
+						message = request.responseJSON[prop].toString();
+						if (!message.endsWith("."))
+						{
+							message += '.';
+						}
+						messages[index] = '<li>' + message + '</li>';
 					}
         }
 
-				var validationMessage = '<ul>';		
-				for (count = 0; count < messages.length;count++)
-				{
-					var message = messages[count];
-					if (!message.endsWith("."))
-					{
-						message += '.';
-					}
-
-					validationMessage += '<li>' + message + '</li>';
-				}
-				validationMessage += '</ul>';
+				var validationMessage = '<ul>' + messages.join('') + '</ul>';		
 
 				errorData = new Object();
 				errorData.title = 'Validation Error';

@@ -268,7 +268,6 @@ namespace Nucleus.Core.Services
 
 				await TaskRunning(history);
 
-
 				runningTask.Task = Task.Run(async () =>
 				{
 					using (this.Logger.BeginScope(runningTask))

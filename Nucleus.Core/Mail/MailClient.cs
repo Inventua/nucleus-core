@@ -37,32 +37,33 @@ namespace Nucleus.Core.Mail
 			this.Logger = logger;
 		}
 
-		public void Send(MailTemplate template, MailArgs args, string to)
-		{
-			System.Dynamic.ExpandoObject model = new();
+		//public void Send(MailTemplate template, MailArgs args, string to)
+		//{
+		//	System.Dynamic.ExpandoObject model = new();
 
-			foreach (var value in args)
-			{
-				model.TryAdd(value.Key, value.Value);
-			}
+		//	foreach (var value in args)
+		//	{
+		//		model.TryAdd(value.Key, value.Value);
+		//	}
 
-			Send(template, model, to);			
-		}
+		//	Send<MailTemplateModelBase>(template, model, to);			
+		//}
 
-		public void Send(MailTemplate template, Object model, string to) 
-		{
-			Send<MailRazorTemplateBase>(template, model, to);
-		}
+		//public void Send<TModel>(MailTemplate template, TModel model, string to)
+		//	where TModel : MailTemplateModelBase
+		//{
+		//	Send<TModel>(template, model, to);
+		//}
 
 		/// <summary>
-		/// Parse the specified template, and send the resulting email to the specified 'to' address. The 'to' address can be a list of email addresses
-		/// separated by commas or semicolons.
+		/// Parse the specified template, and send the resulting email to the specified 'to' address. The 'to' address can be a list 
+		/// of email addresses separated by commas or semicolons.
 		/// </summary>
 		/// <param name="template"></param>
 		/// <param name="args"></param>
 		/// <param name="to"></param>
-		public void Send<TRazorTemplateBase>(MailTemplate template, Object model, string to)
-			where TRazorTemplateBase : MailRazorTemplateBase
+		public void Send<TMailTemplateModel>(MailTemplate template, TMailTemplateModel model, string to)
+			where TMailTemplateModel : MailTemplateModelBase<TMailTemplateModel>
 		{
 			MimeKit.MimeMessage message = new();
 			MimeKit.BodyBuilder builder = new();
@@ -74,8 +75,8 @@ namespace Nucleus.Core.Mail
 				message.To.Add(MimeKit.MailboxAddress.Parse(address));
 			}
 			
-			message.Subject = template.Subject.ParseTemplate<TRazorTemplateBase>(model);// ParseTemplate<TRazorTemplateBase>(template.Subject, model);
-			builder.HtmlBody = template.Body.ParseTemplate<TRazorTemplateBase>(model); //ParseTemplate<TRazorTemplateBase>(template.Body, model);
+			message.Subject = template.Subject.ParseTemplate<TMailTemplateModel>(model);
+			builder.HtmlBody = ApplyDefaultCss() + template.Body.ParseTemplate<TMailTemplateModel>(model); 
 			
 			message.Body = builder.ToMessageBody();
 
@@ -97,6 +98,14 @@ namespace Nucleus.Core.Mail
 			}
 		}
 
+		private string ApplyDefaultCss()
+		{
+			using (System.IO.Stream cssStream = this.GetType().Assembly.GetManifestResourceStream(this.GetType().FullName.Replace(this.GetType().Name, "mail.css")))
+			{
+				System.IO.StreamReader reader = new(cssStream);
+				return "<style>" + reader.ReadToEnd() + "</style>";
+			}
+		}
 
 		public void Dispose()
 		{

@@ -5,15 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 
-namespace Nucleus.Modules.Forums.Models.MailTemplate
+namespace Nucleus.Modules.Account.Models.Mail
 {
-	public class Model : Nucleus.Abstractions.Mail.MailTemplateModelBase<Model>
+	public class RecoveryEmailModel : Nucleus.Abstractions.Mail.MailTemplateModelBase<RecoveryEmailModel>
 	{
-		public List<Forum> Forums { get; } = new();
 		public Site Site { get; set; }
-		public Page Page { get; set; }
 		public User User { get; set; }
+		public string Url { get; set; }	
 
 	}
-
 }

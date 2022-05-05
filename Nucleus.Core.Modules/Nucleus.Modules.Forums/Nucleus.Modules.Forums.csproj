@@ -66,9 +66,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nucleus.Abstractions" Version="1.0.0.7" />
+    <PackageReference Include="Nucleus.Abstractions" Version="1.0.0.8-a3" />
     <PackageReference Include="Nucleus.Data.EntityFramework" Version="1.0.0" />
-    <PackageReference Include="Nucleus.Extensions" Version="1.0.0.1" />
+    <PackageReference Include="Nucleus.Extensions" Version="1.0.0.3-a2" />
     <PackageReference Include="Nucleus.ViewFeatures" Version="1.0.0.2" />
   </ItemGroup>
 

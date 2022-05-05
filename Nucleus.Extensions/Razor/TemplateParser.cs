@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Nucleus.Abstractions.Mail;
 
 namespace Nucleus.Extensions.Razor
 {
@@ -17,13 +18,13 @@ namespace Nucleus.Extensions.Razor
 		/// <param name="template"></param>
 		/// <param name="model"></param>
 		/// <returns></returns>
-		public static string ParseTemplate<TRazorTemplateBase>(this string template, Object model)
-			where TRazorTemplateBase : MailRazorTemplateBase
+		public static string ParseTemplate<T>(this string template, T model)
+			where T : MailTemplateModelBase<T>
 		{
 			string result;
 
 			// Parse the template as Razor 
-			result = RazorParser.Parse<TRazorTemplateBase>(template, model);
+			result = RazorParser.Parse<T>(template, model);
 
 			// Parse the template as "simple"
 			SimpleParser.Parse(result, model);

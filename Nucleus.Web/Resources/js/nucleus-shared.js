@@ -488,19 +488,35 @@ function _Page()
 		{
 			if (request.status === 400)
 			{
-				var validationMessage = '<ul>';
-				// bad request.  Look for ModelState errors				
+				// bad request.  Look for ModelState errors		
+				var messages = new Array(request.responseJSON.length);
+				var elementSelector ='';
+
 				for (var prop in request.responseJSON)
 				{
-					//if (validationMessage !== '')
-					//{
-					//	validationMessage += ', ';
-					//}
+					var element = jQuery('[name="' + prop + '"]');
+					element.addClass('ValidationError');
 
-					jQuery('[name="' + prop + '"]').addClass('ValidationError');
+					if (elementSelector !== '') elementSelector += ',';
+					elementSelector += '#' + element.attr('id');
+				}
 
-					var message = request.responseJSON[prop].toString();
+				var elements = jQuery(elementSelector);
 
+				for (var prop in request.responseJSON)
+				{
+					var element = jQuery('[name="' + prop + '"]');
+					var index = _getElementIndex(elements, element.attr('id'));
+					if (index !== undefined)
+					{
+						messages[index] = request.responseJSON[prop].toString();
+					}
+        }
+
+				var validationMessage = '<ul>';		
+				for (count = 0; count < messages.length;count++)
+				{
+					var message = messages[count];
 					if (!message.endsWith("."))
 					{
 						message += '.';
@@ -508,7 +524,6 @@ function _Page()
 
 					validationMessage += '<li>' + message + '</li>';
 				}
-
 				validationMessage += '</ul>';
 
 				errorData = new Object();
@@ -542,6 +557,14 @@ function _Page()
 		}
 
 		_dialog(errorData.title, errorData.detail)
+	}
+
+	function _getElementIndex(items, id)
+	{
+		for (count = 0; count < items.length; count++)
+		{
+			if (jQuery(items[count]).attr('id') === id) return count;
+    }
 	}
 
 	function _dialog(title, message, okCaption, cancelCaption, action)

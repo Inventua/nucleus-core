@@ -99,7 +99,7 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 				{
 					try
 					{
-						mailClient.Send(template, model, email.Value);
+						mailClient.Send<Models.MailTemplate.Model>(template, model, email.Value);
 					}
 					catch (Exception ex)
 					{

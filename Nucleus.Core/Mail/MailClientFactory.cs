@@ -3,6 +3,7 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Abstractions.Mail;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 
 namespace Nucleus.Core.Mail
 {
@@ -10,8 +11,9 @@ namespace Nucleus.Core.Mail
 	{
 		//private Context Context { get; }
 		private IOptions<SmtpMailOptions> SmtpMailOptions { get; }
+		private ILogger<MailClient> Logger { get; }
 
-		public MailClientFactory(IOptions<SmtpMailOptions> smtpMailOptions)
+		public MailClientFactory(IOptions<SmtpMailOptions> smtpMailOptions, ILogger<MailClient> logger)
 		{
 			//this.Context = context;
 			this.SmtpMailOptions = smtpMailOptions;
@@ -25,7 +27,7 @@ namespace Nucleus.Core.Mail
 
 		public IMailClient Create(Site site)
 		{
-			return new MailClient(site, this.SmtpMailOptions);
+			return new MailClient(site, this.SmtpMailOptions, this.Logger);
 		}
 	}
 }

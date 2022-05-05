@@ -35,8 +35,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Nucleus.Abstractions" Version="1.0.0.6" />
-		<PackageReference Include="Nucleus.Extensions" Version="1.0.0.1" />
+		<PackageReference Include="Nucleus.Abstractions" Version="1.0.0.1" />
 		<PackageReference Include="Nucleus.ViewFeatures" Version="1.0.1" />
 	</ItemGroup>
 

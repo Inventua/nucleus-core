@@ -12,7 +12,6 @@ namespace Nucleus.Modules.ContactUs.Models
 	{
 		public const string MODULESETTING_CATEGORYLIST_ID = "contactus:categorylist:id";
 		public const string MODULESETTING_MAILTEMPLATE_ID = "contactus:mailtemplate:id";
-		public const string MODULESETTING_SEND_TO = "contactus:sendto";
 
 		public const string MODULESETTING_SHOWNAME = "contactus:show-name";
 		public const string MODULESETTING_SHOWCOMPANY = "contactus:show-company";
@@ -54,7 +53,6 @@ namespace Nucleus.Modules.ContactUs.Models
 		public void ReadSettings(PageModule module)
 		{
 			this.MailTemplateId = module.ModuleSettings.Get(Models.Settings.MODULESETTING_MAILTEMPLATE_ID, Guid.Empty);
-			this.SendTo = module.ModuleSettings.Get(Models.Settings.MODULESETTING_SEND_TO, "");
 
 			this.ShowName = module.ModuleSettings.Get(ViewModels.Settings.MODULESETTING_SHOWNAME, true);
 			this.ShowCompany = module.ModuleSettings.Get(ViewModels.Settings.MODULESETTING_SHOWCOMPANY, true);

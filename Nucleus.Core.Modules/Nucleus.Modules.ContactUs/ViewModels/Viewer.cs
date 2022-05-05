@@ -11,10 +11,7 @@ namespace Nucleus.Modules.ContactUs.ViewModels
 {
 	public class Viewer : Models.Settings
 	{
-		public Boolean MessageSent { get; set; }
+		public Models.Message Message { get; set; }
 
-		public Models.Message Message { get; set; } = new();
-
-		public Boolean IsAdmin { get; set; }
 	}
 }

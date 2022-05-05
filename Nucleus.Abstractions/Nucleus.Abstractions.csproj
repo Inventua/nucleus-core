@@ -24,7 +24,8 @@
 		<Product>Nucleus</Product>
 		<Description>Models, interfaces and extensions used by the Nucleus runtime and by Nucleus extensions.</Description>
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
-		<VersionPrefix>1.0.0.6</VersionPrefix>
+		<VersionPrefix>1.0.0.8</VersionPrefix>
+		<VersionSuffix>a4</VersionSuffix>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

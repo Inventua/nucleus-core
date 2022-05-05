@@ -488,23 +488,28 @@ function _Page()
 		{
 			if (request.status === 400)
 			{
-				var validationMessage = '';
+				var validationMessage = '<ul>';
 				// bad request.  Look for ModelState errors				
 				for (var prop in request.responseJSON)
 				{
-					if (validationMessage !== '')
-					{
-						validationMessage += ', ';
-					}
+					//if (validationMessage !== '')
+					//{
+					//	validationMessage += ', ';
+					//}
 
 					jQuery('[name="' + prop + '"]').addClass('ValidationError');
-					validationMessage += request.responseJSON[prop];
+
+					var message = request.responseJSON[prop].toString();
+
+					if (!message.endsWith("."))
+					{
+						message += '.';
+					}
+
+					validationMessage += '<li>' + message + '</li>';
 				}
 
-				if (!validationMessage.endsWith("."))
-				{
-					validationMessage = validationMessage + '.';
-				}
+				validationMessage += '</ul>';
 
 				errorData = new Object();
 				errorData.title = 'Validation Error';

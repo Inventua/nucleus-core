@@ -38,7 +38,6 @@ namespace Nucleus.Core.Logging
 			this.Category = Category;			
 		}
 
-		[EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
 		public TextFileLogger(string Category)
 		{
 			this.Category = Category;

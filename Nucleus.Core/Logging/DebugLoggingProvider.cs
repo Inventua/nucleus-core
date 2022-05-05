@@ -12,7 +12,6 @@ namespace Nucleus.Core.Logging
   /// </summary>
   public class DebugLoggingProvider : ILoggerProvider
   {
-    [EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
     public ILogger CreateLogger(string categoryName)
     {
       return new DebugLogger(categoryName);
@@ -20,7 +19,6 @@ namespace Nucleus.Core.Logging
 
     private bool disposedValue; // To detect redundant calls
 
-    [EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
     protected virtual void Dispose(bool disposing)
     {
       if (!disposedValue)
@@ -32,7 +30,6 @@ namespace Nucleus.Core.Logging
       disposedValue = true;
     }
 
-    [EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
     public void Dispose()
     {
       // Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.

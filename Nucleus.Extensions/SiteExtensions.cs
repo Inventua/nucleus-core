@@ -281,6 +281,41 @@ namespace Nucleus.Extensions
 			return System.Convert.ToBase64String(bytesOut);
 		}
 
-		
+		/// <summary>
+		/// Return the absolute Url for the specified site.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="useSSL"></param>
+		/// <returns></returns>
+		public static string AbsoluteUrl(this Site site, Boolean useSSL)
+		{
+			return $"http{(useSSL ? "s" : "")}://{site.DefaultSiteAlias.Alias}/";
+		}
+
+		/// <summary>
+		/// Return the absolute Url for the specified site and page.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="page"></param>
+		/// <param name="useSSL"></param>
+		/// <returns></returns>
+		public static string AbsoluteUrl(this Site site, Page page, Boolean useSSL)
+		{
+			return $"http{(useSSL ? "s" : "")}://{site.DefaultSiteAlias.Alias}/{page.DefaultPageRoute().Path}/";
+		}
+
+		/// <summary>
+		/// Return the absolute Url for the specified site and page and relative url.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="page"></param>
+		/// <param name="relativeUrl"></param>
+		/// <param name="useSSL"></param>
+		/// <returns></returns>
+		public static string AbsoluteUrl(this Site site, Page page, string relativeUrl, Boolean useSSL)
+		{
+			return $"http{(useSSL ? "s" :"")}://{site.DefaultSiteAlias.Alias}/{page.DefaultPageRoute().Path}/{relativeUrl}/";
+		}
+
 	}
 }

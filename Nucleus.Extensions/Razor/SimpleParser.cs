@@ -63,13 +63,17 @@ namespace Nucleus.Extensions.Razor
 
 			if (result != null)
 			{
-				if (typeof(TModel) is object)
+				if (typeof(TModel) == typeof(string))
 				{
-					return (TModel)result;
+					return (TModel)Convert.ChangeType(result.ToString(), typeof(TModel));
+				}
+				else if (typeof(TModel).IsValueType)
+				{
+					return (TModel)Convert.ChangeType(result, typeof(TModel));
 				}
 				else
 				{
-					return (TModel)Convert.ChangeType(result, typeof(TModel));
+					return (TModel)result;
 				}
 			}
 

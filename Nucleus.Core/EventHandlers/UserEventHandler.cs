@@ -58,10 +58,10 @@ namespace Nucleus.Core.EventHandlers
 						MailTemplate template = await this.MailTemplateManager.Get(templateSelections.WelcomeNewUserTemplateId.Value);
 						if (template != null)
 						{
-							MailArgs args = new()
+							UserEventMailModel args = new()
 							{
-								{ "Site", this.Context.Site },
-								{ "User", user.GetCensored() }
+								Site = this.Context.Site,
+								User = user.GetCensored() 
 							};
 
 							Logger.LogTrace("Sending Welcome email {emailTemplateName} to user {userid}.", template.Name, user.Id);

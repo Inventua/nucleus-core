@@ -6,7 +6,7 @@
 @using Nucleus.Modules.Search.ViewModels
 @if (Model.SearchResults?.Results?.Any() == true)
 {
-	<ul class="suggestions-result">
+	<ul class="suggestions-result" aria-hidden="true">
 		@if (Model.SearchResults.Results.Any())
 		{
 			@foreach (var result in Model.SearchResults.Results)

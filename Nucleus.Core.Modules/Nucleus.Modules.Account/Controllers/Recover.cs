@@ -91,11 +91,11 @@ namespace Nucleus.Modules.Account.Controllers
 							MailTemplate template = await this.MailTemplateManager.Get(templateSelections.AccountNameReminderTemplateId.Value);
 							if (template != null && viewModel.Email != null)
 							{
-								MailArgs args = new()
+								Models.Mail.RecoveryEmailModel args = new()
 								{
-									{ "Site", this.Context.Site },
-									{ "User", user.GetCensored() },
-									{ "Urls.Login", GetLoginPageUri() }
+									Site = this.Context.Site ,
+									User = user.GetCensored() ,
+									Url = GetLoginPageUri().ToString()
 								};
 
 								Logger.LogTrace("Sending account name reminder email {0} to user {1}.", template.Name, user.Id);
@@ -159,11 +159,11 @@ namespace Nucleus.Modules.Account.Controllers
 						{
 							await this.UserManager.SetPasswordResetToken(user);
 
-							MailArgs args = new()
+							Models.Mail.RecoveryEmailModel args = new()
 							{
-								{ "Site", this.Context.Site },
-								{ "User", user.GetCensored() },
-								{ "Urls", new Dictionary<string, object> { { "ResetPassword", new System.Uri(await GetLoginPageUri(), $"?token={user.Secrets.PasswordResetToken}") } } }
+								Site= this.Context.Site ,
+								User= user.GetCensored(),
+								Url = new System.Uri(await GetLoginPageUri(), $"?token={user.Secrets.PasswordResetToken}").ToString()
 							};
 
 							Logger.LogTrace("Sending password reset email {0} to user {1}.", template.Name, user.Id);

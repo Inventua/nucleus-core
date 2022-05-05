@@ -51,6 +51,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Remove="Index.cshtml" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Remove="LICENSE" />
 	  <None Remove="module.build.targets" />
 	  <None Remove="package.xsd" />
@@ -121,6 +125,10 @@
 	  <Content Include="Resources\Libraries\Trumbowyg\ui\trumbowyg.min.css" />
 	  <Content Include="Resources\material-icons.woff2" />
 	  <Content Include="Shared\Controls\Views\PagingControl.css" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Include="Index.cshtml" />
 	</ItemGroup>
 
 	<ItemGroup>

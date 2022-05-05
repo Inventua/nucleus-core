@@ -675,7 +675,8 @@ ul.nucleus-control-panel-items a
 .nucleus-log-level
 {
 	display: block;
-	padding: 0 8px 0 8px;
+	padding: 0;
+	width: 7.5rem;
 }
 
 .nucleus-log-level-warning

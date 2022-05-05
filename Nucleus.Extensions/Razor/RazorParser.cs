@@ -45,6 +45,7 @@ namespace Nucleus.Extensions.Razor
 			builder.AddAssemblyReference(typeof(Nucleus.Extensions.AssemblyExtensions).Assembly);
 			builder.AddAssemblyReference(typeof(Nucleus.Abstractions.Models.Page).Assembly);
 
+			builder.AddUsing("System");
 			builder.AddUsing("Nucleus.Extensions");
 			builder.AddUsing("Nucleus.Abstractions");
 			builder.AddUsing("Nucleus.Abstractions.Models");

@@ -24,11 +24,11 @@
 						@{
 							Dictionary<string, object> parameters = new();
 							ClaimTypeOption claimTypeOption = Model.User.Profile[profileValueCount].UserProfileProperty.ClaimTypeOption(Model.ClaimTypeOptions);
-							if (claimTypeOption.InputType != null)
+							if (!String.IsNullOrEmpty(claimTypeOption.InputType))
 							{
 								parameters.Add("type", claimTypeOption.InputType);
 							}
-							if (claimTypeOption.Pattern != null)
+							if (!String.IsNullOrEmpty(claimTypeOption.Pattern))
 							{
 								parameters.Add("pattern", claimTypeOption.Pattern);
 							}

@@ -17,21 +17,21 @@ namespace Nucleus.Extensions.Razor
 		public static string Parse<T>(string template, T model)
 			where T : class
 		{
-			// https://github.com/adoconnection/RazorEngineCore
 			IRazorEngine engine = new RazorEngine();
-			IRazorEngineCompiledTemplate<RazorEngineTemplate<T>> compiledTemplate;
-			RazorEngineTemplate<T> templateBase = new();
+			IRazorEngineCompiledTemplate<RazorEngineTemplate<T>> compiledTemplate = null;
+			
 			string templateKey = typeof(T).FullName + Hash(template);
 
-			//if (CompiledTemplateCache.TryGetValue(templateKey, out IRazorEngineCompiledTemplate<T> cachedTemplate))
-			//{
-			//	compiledTemplate = (IRazorEngineCompiledTemplate<T>)cachedTemplate;
-			//}
-			//else
-			//{
-			compiledTemplate = engine.Compile<RazorEngineTemplate<T>>(template, BuildRazorOptions);
-			//CompiledTemplateCache.Add(templateKey, (IRazorEngineCompiledTemplate<T>)compiledTemplate);
-			//}
+			if (CompiledTemplateCache.TryGetValue(templateKey, out object cachedTemplate))
+			{
+				compiledTemplate = cachedTemplate as IRazorEngineCompiledTemplate<RazorEngineTemplate<T>>;
+			}
+			
+			if (compiledTemplate == null)
+			{
+				compiledTemplate = engine.Compile<RazorEngineTemplate<T>>(template, BuildRazorOptions);
+				CompiledTemplateCache.Add(templateKey, compiledTemplate);
+			}
 
 			return compiledTemplate.Run(instance =>
 			{

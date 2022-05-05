@@ -25,7 +25,11 @@ namespace Nucleus.Core.Logging
 		private readonly static object syncObj = new();
 		private TextFileLoggingProvider Provider { get; }
 		private TextFileLoggerOptions Options { get; }
-		private AsyncLocal<System.Collections.Stack> ScopeStack { get; } = new();
+
+		// The scope stack must be static, because classes which call logging methods will have their own logger instances (created
+		// on-demand by TextFileLoggingProvider).  The AsyncLocal class is used to persist data within an async thread chain.  
+		// The scope stack is used to determine when logged messages are from a scheduled task and write them to separate files.
+		private static AsyncLocal<System.Collections.Stack> ScopeStack { get; } = new();
 
 		public TextFileLogger(TextFileLoggingProvider Provider, TextFileLoggerOptions Options, string Category)
 		{
@@ -34,7 +38,6 @@ namespace Nucleus.Core.Logging
 			this.Category = Category;			
 		}
 
-		[EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
 		public TextFileLogger(string Category)
 		{
 			this.Category = Category;
@@ -91,7 +94,7 @@ namespace Nucleus.Core.Logging
 				ScopeStack.Value = new();
 			}
 			ScopeStack.Value.Push(state);
-			return new DisposableScope(this.ScopeStack);
+			return new DisposableScope(ScopeStack);
 		}
 
 		private class DisposableScope : IDisposable

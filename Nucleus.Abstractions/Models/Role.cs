@@ -100,7 +100,6 @@ namespace Nucleus.Abstractions.Models
 		/// <remarks>
 		/// This implementation exists to prevent a CS0659 compiler warning
 		/// </remarks>
-		[EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
 		public override int GetHashCode()
 		{
 			return this.Id.GetHashCode();

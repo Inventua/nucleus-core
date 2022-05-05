@@ -15,13 +15,11 @@ namespace Nucleus.Core.Logging
   {
     private string Category { get; }
 
-    [EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
     public DebugLogger(string Category)
     {
       this.Category = Category;
     }
 
-    [EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
     {
       //if (this.Category.ToLower() != "microsoft.aspnetcore.localization.requestlocalizationmiddleware")
@@ -57,13 +55,11 @@ namespace Nucleus.Core.Logging
       //}
     }
 
-    [EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
     public bool IsEnabled(LogLevel logLevel)
     {
       return true;
     }
 
-    [EditorBrowsable(EditorBrowsableState.Never)]  // prevents inclusion in docfx-generated documentation
     public IDisposable BeginScope<TState>(TState state)
     {
       return null;

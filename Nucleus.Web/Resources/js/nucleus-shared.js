@@ -488,28 +488,39 @@ function _Page()
 		{
 			if (request.status === 400)
 			{
-				var validationMessage = '<ul>';
-				// bad request.  Look for ModelState errors				
+				// bad request.  Parse ModelState errors		
+				var messages = new Array(request.responseJSON.length);
+				var elementSelector ='';
+
+				// get a list of elements with validation errors
 				for (var prop in request.responseJSON)
 				{
-					//if (validationMessage !== '')
-					//{
-					//	validationMessage += ', ';
-					//}
+					var element = jQuery('[name="' + prop + '"]');
+					element.addClass('ValidationError');
 
-					jQuery('[name="' + prop + '"]').addClass('ValidationError');
-
-					var message = request.responseJSON[prop].toString();
-
-					if (!message.endsWith("."))
-					{
-						message += '.';
-					}
-
-					validationMessage += '<li>' + message + '</li>';
+					if (elementSelector !== '') elementSelector += ',';
+					elementSelector += '#' + element.attr('id');
 				}
 
-				validationMessage += '</ul>';
+				var elements = jQuery(elementSelector);
+
+				// sort the messages by element ordinal position
+				for (var prop in request.responseJSON)
+				{
+					var element = jQuery('[name="' + prop + '"]');
+					var index = _getElementIndex(elements, element.attr('id'));
+					if (index !== undefined)
+					{
+						message = request.responseJSON[prop].toString();
+						if (!message.endsWith("."))
+						{
+							message += '.';
+						}
+						messages[index] = '<li>' + message + '</li>';
+					}
+        }
+
+				var validationMessage = '<ul>' + messages.join('') + '</ul>';		
 
 				errorData = new Object();
 				errorData.title = 'Validation Error';
@@ -542,6 +553,14 @@ function _Page()
 		}
 
 		_dialog(errorData.title, errorData.detail)
+	}
+
+	function _getElementIndex(items, id)
+	{
+		for (count = 0; count < items.length; count++)
+		{
+			if (jQuery(items[count]).attr('id') === id) return count;
+    }
 	}
 
 	function _dialog(title, message, okCaption, cancelCaption, action)

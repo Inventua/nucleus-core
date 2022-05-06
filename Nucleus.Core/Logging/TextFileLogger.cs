@@ -125,7 +125,10 @@ namespace Nucleus.Core.Logging
 				if (disposing)
 				{
 					// dispose managed state (managed objects).
-					ScopeStack.Value.Pop();
+					if (ScopeStack.Value.Count > 0)
+					{
+						ScopeStack.Value.Pop();
+					}
 				}
 
 				// TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.

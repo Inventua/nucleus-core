@@ -128,6 +128,9 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 						scriptOutput.AppendHtml(builder);
 					}
 				}
+
+				// Once consumed, clear the scripts item to prevent double-rendering in case RenderScripts is called twice.
+				htmlHelper.ViewContext.HttpContext.Items.Remove(ITEMS_KEY);
 			}
 
 			return scriptOutput;

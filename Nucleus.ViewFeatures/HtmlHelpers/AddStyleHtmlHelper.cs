@@ -32,7 +32,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// Register the specified style to be added to the Layout or module's CSS styles.
 		/// </summary>
 		/// <param name="htmlHelper"></param>
-		/// <param name="scriptPath"></param>
+		/// <param name="stylesheetPath"></param>
 		/// <returns></returns>
 		/// <remarks>
 		/// Extensions (modules) can use this Html Helper to add CSS stylesheets to the HEAD block.  The scriptPath can contain the 
@@ -41,16 +41,16 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// <example>
 		/// @Html.AddScript("~/Extensions/MyModule/MyModule.css")
 		/// </example>
-		public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string scriptPath)
+		public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath)
 		{
-			Dictionary<string, System.Version> scripts = (Dictionary<string, System.Version>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
+			Dictionary<string, System.Version> stylesheets = (Dictionary<string, System.Version>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
 
-			scriptPath = htmlHelper.ResolveExtensionUrl(scriptPath);			
+			stylesheetPath = htmlHelper.ResolveExtensionUrl(stylesheetPath);			
 
-			if (!scripts.ContainsKey(scriptPath))
+			if (!stylesheets.ContainsKey(stylesheetPath))
 			{
-				scripts.Add(scriptPath, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
-				htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] = scripts;
+				stylesheets.Add(stylesheetPath, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
+				htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] = stylesheets;
 			}
 
 			return new HtmlContentBuilder();
@@ -65,10 +65,10 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		{
 			HtmlContentBuilder scriptOutput = new();
 
-			Dictionary<string, System.Version> styles = (Dictionary<string, System.Version>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY];
-			if (styles != null)
+			Dictionary<string, System.Version> stylesheets = (Dictionary<string, System.Version>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY];
+			if (stylesheets != null)
 			{
-				foreach (KeyValuePair<string, System.Version> style in styles)
+				foreach (KeyValuePair<string, System.Version> style in stylesheets)
 				{
 					if (!String.IsNullOrEmpty(style.Key))
 					{
@@ -80,6 +80,9 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 						scriptOutput.AppendHtml(builder);
 					}
 				}
+
+				// Once consumed, clear the stylesheets item to prevent double-rendering in case RenderStyles is called twice.
+				htmlHelper.ViewContext.HttpContext.Items.Remove(ITEMS_KEY);
 			}
 
 			return scriptOutput;

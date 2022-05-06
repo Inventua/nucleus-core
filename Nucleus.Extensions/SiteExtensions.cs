@@ -282,18 +282,29 @@ namespace Nucleus.Extensions
 		}
 
 		/// <summary>
-		/// Return the absolute Url for the specified site.
+		/// Return the absolute Uri for the specified site as a string.
 		/// </summary>
 		/// <param name="site"></param>
 		/// <param name="useSSL"></param>
 		/// <returns></returns>
 		public static string AbsoluteUrl(this Site site, Boolean useSSL)
 		{
-			return $"http{(useSSL ? "s" : "")}://{site.DefaultSiteAlias.Alias}/";
+			return AbsoluteUri(site, useSSL).ToString(); 
 		}
 
 		/// <summary>
-		/// Return the absolute Url for the specified site and page.
+		/// Return the absolute Uri for the specified site.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="useSSL"></param>
+		/// <returns></returns>
+		public static System.Uri AbsoluteUri(this Site site, Boolean useSSL)
+		{
+			return new($"http{(useSSL ? "s" : "")}://{site.DefaultSiteAlias.Alias}/");
+		}
+
+		/// <summary>
+		/// Return the absolute Uri for the specified site and page as a string.
 		/// </summary>
 		/// <param name="site"></param>
 		/// <param name="page"></param>
@@ -301,11 +312,23 @@ namespace Nucleus.Extensions
 		/// <returns></returns>
 		public static string AbsoluteUrl(this Site site, Page page, Boolean useSSL)
 		{
-			return $"http{(useSSL ? "s" : "")}://{site.DefaultSiteAlias.Alias}/{page.DefaultPageRoute().Path}/";
+			return AbsoluteUri(site, page, useSSL).ToString();
 		}
 
 		/// <summary>
-		/// Return the absolute Url for the specified site and page and relative url.
+		/// Return the absolute Uri for the specified site and page.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="page"></param>
+		/// <param name="useSSL"></param>
+		/// <returns></returns>
+		public static System.Uri AbsoluteUri(this Site site, Page page, Boolean useSSL)
+		{
+			return new System.Uri(AbsoluteUri(site, useSSL), page.DefaultPageRoute().Path + "/");
+		}
+
+		/// <summary>
+		/// Return the absolute Uri for the specified site and page and relative url as a string.
 		/// </summary>
 		/// <param name="site"></param>
 		/// <param name="page"></param>
@@ -314,7 +337,20 @@ namespace Nucleus.Extensions
 		/// <returns></returns>
 		public static string AbsoluteUrl(this Site site, Page page, string relativeUrl, Boolean useSSL)
 		{
-			return $"http{(useSSL ? "s" :"")}://{site.DefaultSiteAlias.Alias}/{page.DefaultPageRoute().Path}/{relativeUrl}/";
+			return AbsoluteUri(site, page, relativeUrl, useSSL).ToString();
+		}
+
+		/// <summary>
+		/// Return the absolute Uri for the specified site and page and relative url.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="page"></param>
+		/// <param name="relativeUrl"></param>
+		/// <param name="useSSL"></param>
+		/// <returns></returns>
+		public static System.Uri AbsoluteUri(this Site site, Page page, string relativeUrl, Boolean useSSL)
+		{
+			return new System.Uri(AbsoluteUri(site, page, useSSL), relativeUrl + "/");
 		}
 
 	}

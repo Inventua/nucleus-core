@@ -156,7 +156,7 @@ namespace Nucleus.Modules.Forums
 		/// </summary>
 		/// <param name="site"></param>
 		/// <returns></returns>
-		public async Task<IList<User>> ListModerators(Forum forum)
+		public async Task<IList<User>> ListForumModerators(Forum forum)
 		{
 			List<User> users = new();
 
@@ -166,11 +166,11 @@ namespace Nucleus.Modules.Forums
 			{
 				if (forum.UseGroupSettings)
 				{
-					permissions = forum.Group.Permissions.Where(permission => permission.PermissionType.Scope == ForumsManager.PermissionScopes.FORUM_MODERATE);
+					permissions = forum.Group.Permissions.Where(permission => permission.PermissionType.Scope == ForumsManager.PermissionScopes.FORUM_MODERATE && permission.AllowAccess);
 				}
 				else
 				{
-					permissions = forum.Permissions.Where(permission => permission.PermissionType.Scope == ForumsManager.PermissionScopes.FORUM_MODERATE);
+					permissions = forum.Permissions.Where(permission => permission.PermissionType.Scope == ForumsManager.PermissionScopes.FORUM_MODERATE && permission.AllowAccess);
 				}
 			}
 
@@ -180,7 +180,7 @@ namespace Nucleus.Modules.Forums
 				foreach (User user in await this.UserManager.ListUsersInRole(role))
 				{
 					// List distinct users in role(s)
-					if (!users.Where(existing => existing.Id == user.Id).Any())
+					if (!user.IsSystemAdministrator && !users.Where(existing => existing.Id == user.Id).Any())
 					{
 						users.Add(user);
 					}

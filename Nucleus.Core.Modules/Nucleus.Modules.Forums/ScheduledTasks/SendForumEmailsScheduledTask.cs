@@ -53,16 +53,12 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 			Site site = null;
 			Page page = null;
 			PageModule module = null;
-			//Dictionary<Site, List<MailQueue>> queueItems = new();
 
-			//foreach (MailQueue item in await this.ForumsManager.ListMailQueue())
-			//{
-				
-			//}
+			var queue = (await this.ForumsManager.ListMailQueue())
+				.GroupBy(item => new { item.UserId, ForumId = item.Post.ForumId, item.MailTemplateId })
+				.Select(group => new { Key = group.Key, GroupedItems = group , MailQueueItem = group.Select(gr => gr).FirstOrDefault() } );
 
-			var data = (await this.ForumsManager.ListMailQueue()).GroupBy(item => new { item.UserId, ForumId = item.Post.ForumId, item.MailTemplateId });
-
-			foreach (var group in data)
+			foreach (var group in queue)
 			{
 				Models.MailTemplate.Model model = new Models.MailTemplate.Model();
 
@@ -77,7 +73,7 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 
 				if (template != null && !String.IsNullOrEmpty(email?.Value))
 				{
-					foreach (var moduleGroup in group.GroupBy(item => item.ModuleId))
+					foreach (var moduleGroup in group.GroupedItems.GroupBy(item => item.ModuleId))
 					{
 						Forum forum = await this.ForumsManager.Get(group.Key.ForumId);
 
@@ -107,7 +103,11 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 						{
 							mailClient.Send<Models.MailTemplate.Model>(template, model, email.Value);
 
-							//await this.ForumsManager.SetMailQueueStatus(group.);
+							foreach (MailQueue item in queue.Select(data => data.MailQueueItem))
+							{
+								item.Status = MailQueue.MailQueueStatus.Sent;
+								await this.ForumsManager.SetMailQueueStatus(item);
+							}							
 						}
 						catch (Exception ex)
 						{

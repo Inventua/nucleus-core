@@ -71,7 +71,14 @@ namespace Nucleus.Modules.Account.Controllers
 			User existing = await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId());
 			existing.Profile = viewModel.User.Profile;
 
-			await this.UserManager.Save(this.Context.Site, existing);
+			if (existing.IsSystemAdministrator)
+			{
+				await this.UserManager.SaveSystemAdministrator(existing);
+			}
+			else
+			{
+				await this.UserManager.Save(this.Context.Site, existing); 
+			}			
 			
 			return Redirect(String.IsNullOrEmpty(viewModel.ReturnUrl) ? "/" : viewModel.ReturnUrl);
 		}

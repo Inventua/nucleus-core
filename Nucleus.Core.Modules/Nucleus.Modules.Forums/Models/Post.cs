@@ -33,6 +33,7 @@ namespace Nucleus.Modules.Forums.Models
 		public Boolean IsLocked { get; set; }
 		public Boolean IsPinned { get; set; }
 		public Boolean IsApproved { get; set; }
+		public Boolean? IsRejected { get; set; }
 
 		public List<Reply> Replies { get; set; }
 

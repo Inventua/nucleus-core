@@ -385,7 +385,7 @@ namespace Nucleus.Modules.Forums.Controllers
 				}
 			}
 
-			await this.ForumsManager.RejectForumPost(viewModel.Forum, viewModel.Post);
+			await this.ForumsManager.RejectForumPost(forum, viewModel.Post);
 
 			return await ViewForum(forum.Id);
 		}
@@ -616,7 +616,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 					viewModel.Subscription = await this.ForumsManager.GetSubscription(forum, HttpContext.User);
 					viewModel.CanPost = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_CREATE_POST);
-					viewModel.CanSubscribe = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE) && !HttpContext.User.IsSystemAdministrator();										
+					viewModel.CanSubscribe = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE);										
 				}
 				else
 				{
@@ -688,7 +688,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			viewModel.CanPinPost = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_PIN_POST);
 			viewModel.CanLockPost = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_LOCK_POST);
 			viewModel.CanDeletePost = viewModel.Forum.EffectiveSettings().Enabled && (viewModel.Post.AddedBy.Equals(HttpContext.User.GetUserId()) || HttpContext.User.IsSiteAdmin(Context.Site))  &&  this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_DELETE_POST);
-			viewModel.CanSubscribe = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE) && !HttpContext.User.IsSystemAdministrator();
+			viewModel.CanSubscribe = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE);
 			viewModel.CanApprovePost = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_MODERATE);
 			viewModel.Replies = readReplies ? await ListReplies(viewModel.Forum, viewModel.Post) : new List<Models.Reply>();
 
@@ -815,7 +815,7 @@ namespace Nucleus.Modules.Forums.Controllers
 						Post = post,
 						Reply = reply,
 						CanAttach = this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_ATTACH_POST),
-						CanSubscribe = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE) && !HttpContext.User.IsSystemAdministrator()
+						CanSubscribe = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE)
 					};
 				}
 			}

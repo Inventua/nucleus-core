@@ -70,7 +70,7 @@ namespace Nucleus.Modules.Forums.EventHandlers
 
 			if (forum.EffectiveSettings().ModerationRequiredMailTemplateId.HasValue)
 			{
-				IList<User> moderators = await forumsManager.ListModerators(forum);
+				IList<User> moderators = await forumsManager.ListForumModerators(forum);
 
 				foreach (User moderator in moderators)
 				{
@@ -95,7 +95,7 @@ namespace Nucleus.Modules.Forums.EventHandlers
 
 			if (forum.EffectiveSettings().IsModerated && forum.EffectiveSettings().ModerationRequiredMailTemplateId.HasValue)
 			{
-				IList<User> moderators = await forumsManager.ListModerators(forum);
+				IList<User> moderators = await forumsManager.ListForumModerators(forum);
 
 				foreach (User moderator in moderators)
 				{

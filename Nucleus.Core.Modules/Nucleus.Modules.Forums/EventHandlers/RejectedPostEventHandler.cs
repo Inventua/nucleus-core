@@ -27,7 +27,7 @@ namespace Nucleus.Modules.Forums.EventHandlers
 			// Re-get the post, as it may not be fully populated
 			post = await this.ForumsManager.GetForumPost(post.Id);
 
-			if (!post.IsApproved)
+			if (post.IsRejected == true)
 			{
 				await post.CreateModerationRejectedEmail(this.ForumsManager, this.UserManager);
 			}

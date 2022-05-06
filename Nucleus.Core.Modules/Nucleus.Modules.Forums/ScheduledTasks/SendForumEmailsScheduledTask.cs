@@ -53,12 +53,19 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 			Site site = null;
 			Page page = null;
 			PageModule module = null;
+			//Dictionary<Site, List<MailQueue>> queueItems = new();
 
-			var data = (await this.ForumsManager.ListMailQueue()).GroupBy(item => new { item.UserId, item.MailTemplateId, ForumId = item.Post.ForumId });
+			//foreach (MailQueue item in await this.ForumsManager.ListMailQueue())
+			//{
+				
+			//}
+
+			var data = (await this.ForumsManager.ListMailQueue()).GroupBy(item => new { item.UserId, ForumId = item.Post.ForumId, item.MailTemplateId });
 
 			foreach (var group in data)
 			{
 				Models.MailTemplate.Model model = new Models.MailTemplate.Model();
+
 				User user = await this.UserManager.Get(group.Key.UserId);
 				UserProfileValue email = user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault();
 				MailTemplate template = await MailTemplateManager.Get(group.Key.MailTemplateId);
@@ -87,24 +94,26 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 
 						model.Forums.Add(new Models.MailTemplate.Forum(forum, posts, replies));
 					}
-				}
 
-				model.Site = site;
-				model.Page = page;
-				model.User = user;
+					model.Site = site;
+					model.Page = page;
+					model.User = user.GetCensored();
 
-				Logger.LogTrace("Sending forum email template {name} to user {userid}.", template.Name, user.Id);
+					Logger.LogTrace("Sending forum email template {name} to user {userid}.", template.Name, user.Id);
 
-				using (IMailClient mailClient = this.MailClientFactory.Create(site))
-				{
-					try
+					using (IMailClient mailClient = this.MailClientFactory.Create(site))
 					{
-						mailClient.Send<Models.MailTemplate.Model>(template, model, email.Value);
-					}
-					catch (Exception ex)
-					{
-						// don't fail the entire task if an email can't be parsed/sent
-						this.Logger?.LogError(ex, "Error sending template {template}", template.Name);
+						try
+						{
+							mailClient.Send<Models.MailTemplate.Model>(template, model, email.Value);
+
+							//await this.ForumsManager.SetMailQueueStatus(group.);
+						}
+						catch (Exception ex)
+						{
+							// don't fail the entire task if an email can't be parsed/sent
+							this.Logger?.LogError(ex, "Error sending template {template}", template.Name);
+						}
 					}
 				}
 			}

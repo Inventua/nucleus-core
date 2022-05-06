@@ -67,3 +67,6 @@ Use the `Forums` tab to add forums to a forum group.  The `Forums` tab is not av
 | Use Group Settings          | Specifies whether to inherit settings from the forum's forum group, or whether to specify settings which are specific for the forum.  |
 
 > The other settings and permissions for forums are the same as for forum groups (see above).
+
+## Notes
+System administrator users do not receive moderation notification emails, because system administrators can't be assigned to a role.

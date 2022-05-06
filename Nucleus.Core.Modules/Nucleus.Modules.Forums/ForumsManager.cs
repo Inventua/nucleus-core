@@ -180,7 +180,7 @@ namespace Nucleus.Modules.Forums
 				foreach (User user in await this.UserManager.ListUsersInRole(role))
 				{
 					// List distinct users in role(s)
-					if (!user.IsSystemAdministrator && !users.Where(existing => existing.Id == user.Id).Any())
+					if (!users.Where(existing => existing.Id == user.Id).Any())
 					{
 						users.Add(user);
 					}
@@ -388,7 +388,7 @@ namespace Nucleus.Modules.Forums
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				await provider.SetForumPostApproved(post, false);
+				await provider.SetForumPostRejected(post, true);
 
 				if (forum.EffectiveSettings().StatusList != null)
 				{
@@ -672,6 +672,14 @@ namespace Nucleus.Modules.Forums
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
 				return await provider.ListMailQueue();				
+			}
+		}
+
+		public async Task SetMailQueueStatus(MailQueue mailQueue)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				await provider.SetMailQueueStatus(mailQueue);
 			}
 		}
 	}

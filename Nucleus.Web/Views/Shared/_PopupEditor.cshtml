@@ -1,4 +1,5 @@
-﻿@using Nucleus.ViewFeatures.HtmlHelpers
+﻿@* This layout is used by the "edit (current) page settings, and the module settings editor popups. *@
+@using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Abstractions
 <!DOCTYPE html>
 <html lang="en">
@@ -27,7 +28,7 @@
 	</merge-scripts>
 </head>
 <body>
-	<div class="nucleus-adminpage nucleus-admin-content">
+	<div class="nucleus-adminpage nucleus-admin-content nucleus-settings-frame">
 		@RenderBody()
 	</div>
 	<modal id="PopupDialog" title="Settings"></modal>

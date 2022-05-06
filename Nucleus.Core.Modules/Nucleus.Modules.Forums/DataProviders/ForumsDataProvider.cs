@@ -723,7 +723,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.ToListAsync();
 
 			return await this.Context.Users
-				.Where(user => subscriptionUsers.Contains(user.Id))
+				.Where(user => subscriptionUsers.Contains(user.Id) && !user.IsSystemAdministrator)
 				.ToListAsync();
 
 		}

@@ -21,6 +21,8 @@ namespace Nucleus.Modules.Forums.Models
 		public string Body { get; set; }
 
 		public Boolean IsApproved { get; set; }
+		public Boolean? IsRejected { get; set; }
+
 
 		public User PostedBy { get; private set; }
 

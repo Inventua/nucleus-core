@@ -49,10 +49,15 @@
 							{
 								<span title="Pinned">@Html.Raw("&#xe897;")</span>
 							}
+							else if (post.IsRejected == true)
+							{
+								<span title="Rejected">@Html.Raw("&#xe8db;")</span>
+							}
 							else if (!post.IsApproved)
 							{
-								<span title="Not Approved">@Html.Raw("&#xef64;")</span>
+								<span title="Awaiting Approval">@Html.Raw("&#xef64;")</span>
 							}
+							
 						</span>
 						@post.Subject
 					</a>

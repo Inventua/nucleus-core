@@ -48,7 +48,14 @@
 				}
 				else
 				{
-					<span>Not Approved</span>
+					@if (Model.Post.IsRejected == true)
+					{
+						<span>Rejected</span>
+					}
+					else
+					{
+						<span>Not Approved</span>
+					}
 				}
 			</div>
 			<div class="body">@Html.Raw(@Model.Post.Body)</div>
@@ -82,7 +89,10 @@
 					@if (Model.CanApprovePost && !Model.Post.IsApproved)
 					{
 						@Html.SubmitButton("", "Approve", Url.NucleusAction("ApproveForumPost", "Forums", "Forums"), new { @data_target = "form.parent()" })
-						@Html.SubmitButton("", "Reject", Url.NucleusAction("RejectForumForumPost", "Forums", "Forums"), new { @data_target = "form.parent()" })
+					}
+					@if (Model.CanApprovePost && !Model.Post.IsRejected == true)
+					{
+						@Html.SubmitButton("", "Reject", Url.NucleusAction("RejectForumPost", "Forums", "Forums"), new { @data_target = "form.parent()" })
 					}
 					@if (Model.CanLockPost && !Model.Post.IsLocked)
 					{

@@ -385,7 +385,7 @@ namespace Nucleus.Modules.Forums.Controllers
 				}
 			}
 
-			await this.ForumsManager.RejectForumPost(viewModel.Forum, viewModel.Post);
+			await this.ForumsManager.RejectForumPost(forum, viewModel.Post);
 
 			return await ViewForum(forum.Id);
 		}
@@ -815,7 +815,7 @@ namespace Nucleus.Modules.Forums.Controllers
 						Post = post,
 						Reply = reply,
 						CanAttach = this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_ATTACH_POST),
-						CanSubscribe = this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE)
+						CanSubscribe = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE)
 					};
 				}
 			}

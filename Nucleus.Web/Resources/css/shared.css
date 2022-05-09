@@ -19,6 +19,11 @@ body
   font-display: auto;
 }
 
+a *
+{
+  cursor: pointer;
+}
+
 .nucleus-material-icon
 {
 	font-family: 'Material Icons'!important; 

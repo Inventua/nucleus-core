@@ -54,11 +54,14 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 			Page page = null;
 			PageModule module = null;
 
-			var data = (await this.ForumsManager.ListMailQueue()).GroupBy(item => new { item.UserId, item.MailTemplateId, ForumId = item.Post.ForumId });
+			var queue = (await this.ForumsManager.ListMailQueue())
+				.GroupBy(item => new { item.UserId, ForumId = item.Post.ForumId, item.MailTemplateId })
+				.Select(group => new { Key = group.Key, GroupedItems = group , MailQueueItem = group.Select(gr => gr).FirstOrDefault() } );
 
-			foreach (var group in data)
+			foreach (var group in queue)
 			{
 				Models.MailTemplate.Model model = new Models.MailTemplate.Model();
+
 				User user = await this.UserManager.Get(group.Key.UserId);
 				UserProfileValue email = user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault();
 				MailTemplate template = await MailTemplateManager.Get(group.Key.MailTemplateId);
@@ -70,7 +73,7 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 
 				if (template != null && !String.IsNullOrEmpty(email?.Value))
 				{
-					foreach (var moduleGroup in group.GroupBy(item => item.ModuleId))
+					foreach (var moduleGroup in group.GroupedItems.GroupBy(item => item.ModuleId))
 					{
 						Forum forum = await this.ForumsManager.Get(group.Key.ForumId);
 
@@ -87,24 +90,30 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 
 						model.Forums.Add(new Models.MailTemplate.Forum(forum, posts, replies));
 					}
-				}
 
-				model.Site = site;
-				model.Page = page;
-				model.User = user;
+					model.Site = site;
+					model.Page = page;
+					model.User = user.GetCensored();
 
-				Logger.LogTrace("Sending forum email template {name} to user {userid}.", template.Name, user.Id);
+					Logger.LogTrace("Sending forum email template {name} to user {userid}.", template.Name, user.Id);
 
-				using (IMailClient mailClient = this.MailClientFactory.Create(site))
-				{
-					try
+					using (IMailClient mailClient = this.MailClientFactory.Create(site))
 					{
-						mailClient.Send<Models.MailTemplate.Model>(template, model, email.Value);
-					}
-					catch (Exception ex)
-					{
-						// don't fail the entire task if an email can't be parsed/sent
-						this.Logger?.LogError(ex, "Error sending template {template}", template.Name);
+						try
+						{
+							mailClient.Send<Models.MailTemplate.Model>(template, model, email.Value);
+
+							foreach (MailQueue item in queue.Select(data => data.MailQueueItem))
+							{
+								item.Status = MailQueue.MailQueueStatus.Sent;
+								await this.ForumsManager.SetMailQueueStatus(item);
+							}							
+						}
+						catch (Exception ex)
+						{
+							// don't fail the entire task if an email can't be parsed/sent
+							this.Logger?.LogError(ex, "Error sending template {template}", template.Name);
+						}
 					}
 				}
 			}

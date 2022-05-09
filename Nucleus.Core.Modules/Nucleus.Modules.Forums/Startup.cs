@@ -30,8 +30,12 @@ namespace Nucleus.Modules.Forums
 				// Event handlers manage the mail queue
 				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Post, Create>, EventHandlers.CreatePostEventHandler>();
 				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Reply, Create>, EventHandlers.CreateReplyEventHandler>();
+
 				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Post, Approved>, EventHandlers.ApprovedPostEventHandler>();
 				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Reply, Approved>, EventHandlers.ApprovedReplyEventHandler>();
+
+				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Post, Rejected>, EventHandlers.RejectedPostEventHandler>();
+				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Reply, Rejected>, EventHandlers.RejectedReplyEventHandler>();
 
 				// Handle migration (install) events
 				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEvent, Migrate>, MigrationEventHandler>();

@@ -213,10 +213,15 @@ namespace Nucleus.Core.Managers
 
 			if ( result != null)
 			{
-				Site site;
-				using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+				Site site = null;
+
+				// System administrators don't have a site
+				if (result.SiteId.HasValue)
 				{
-					site = await provider.GetSite(result.SiteId.Value);
+					using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+					{
+						site = await provider.GetSite(result.SiteId.Value);
+					}
 				}
 				
 				if (site != null && result != null)

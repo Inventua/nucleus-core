@@ -1,5 +1,5 @@
 ## Contact Us module
-The contact us module allows the end-user to send a message to email recipients. 
+The contact us module allows the end user to send a message to email recipients. 
 
 ![Contact Us Module Screenshot](ContactUs.png)
 
@@ -12,7 +12,7 @@ To change settings for the module, click the `Settings` tab.
 |----------------------|--------------------------------------------------------------------------------------|
 | Send To Recipients   | Specifies the email recipients of the message.  You can specify multiple recipients by using commas to separate them.
 | Categories List      | Specifies the list that is used by this module for categories.  If specified, users can assign a category from the list to their nature of enquiry. Lists are managed in the `Lists` editor in the `Manage` control panel. |
-| Mail Template        | Specifies the mail template used to inform the email recipients of inquiry/feedback from end-user.  |
+| Mail Template        | Specifies the mail template used to inform the email recipients of inquiry/feedback from end user.  |
 | Show Name            | Specifies whether to display the first and last names on-screen.  |
 | Show Phone Number    | Specifies whether to display the phone number on-screen.  |
 | Show Company         | Specifies whether to display the company name on-screen.  |
@@ -24,12 +24,15 @@ To change settings for the module, click the `Settings` tab.
 | Require Category     | Specifies whether the category list is mandatory on-screen.  |
 | Require Subject      | Specifies whether the subject of the message is mandatory on-screen.  |
 
-> If there are no recipients specified, the module will display a warning to administrators and will be blank for end-users.
-> If a mail template is not selected, the module will display a warning to administrators and will be blank for end-users.
+> If there are no recipients specified, the module will display a warning to administrators and will be blank for end users.
+> If a mail template is not selected, the module will display a warning to administrators and will be blank for end users.
 
 
 ## Mail Template
-The mail template specifies the format and content of email sent to the specified recipients. The mail template arguments specific to the Contact Us module are:
+The mail template specifies the format and content of email sent to the specified recipients. The mail templates can be written with either ordinary arguments or 
+with the Razor language. It is very strongly recommended not to combine the two as unintended results may occur.
+
+The mail template arguments specific to the Contact Us module are:
 |                     |                                                                                      |
 |---------------------|--------------------------------------------------------------------------------------|
 | Message.FirstName   | The first name of the sender. |
@@ -37,22 +40,33 @@ The mail template specifies the format and content of email sent to the specifie
 | Message.Company     | The company name of the sender. |
 | Message.Email       | The email address of the sender. |
 | Message.PhoneNumber | The phone number of the sender.  |
-| Message.Category    | The category pertaining to the message. |
+| Message.Category    | The category selected by the sender. |
 | Message.Subject     | The subject of the message.  |
 | Message.Body        | The body of the message. |
 | Site                | A site object representing the current site. |
 
 
-### Example
+### Example using plain HTML and placeholders
 ```
-A new message was sent from the {Site.Name} portal by {Message.FirstName} {Message.LastName} from {Message.Company}.
-
-Email: {Message.Email}
-
-Phone Number: {Message.PhoneNumber}
-
-Category: {Message.Category}
-
-{Message.Body}
+  <p>A new message was sent from the (~Site.Name) portal by (~Message.FirstName) (~Message.LastName) from (~Message.Company).</p>
+  <p>Email: (~Message.Email)</p>
+  <p>Phone Number: (~Message.PhoneNumber)</p>
+  <p>Category: (~Message.Category)</p>
+  (~Message.Body)
 ```
 
+### Example using HTML and Razor language
+```
+  <p>A new message was sent from the @Model.Site.Name portal by @Model.Message.FirstName @Model.Message.LastName.</p>
+
+  @if (!String.IsNullOrEmpty(Model.Message.Company)) 
+  {
+    <p>Company: @Model.Message.Company</p>
+  }
+
+  <p>Email: @Model.Message.Email</p>
+  <p>Phone Number: @Model.Message.PhoneNumber</p>
+  <p>Category: @Model.Message.Category</p>
+
+  @Model.Message.Body
+```

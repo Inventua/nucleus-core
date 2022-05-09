@@ -1,0 +1,25 @@
+﻿@*
+  _ViewStart.cshtml (this code) is always executed before a view is rendered.  It sets the layout to _Layout by default when the model is 
+	Nucleus.ViewFeatures.ViewModels.Layout (which is the case when Nucleus.Web.Controllers.DefaultController is rendering a page).  For all other
+	view rendering, the layout is set to _Partial in order to make the Html.AddScript and Html.AddStyle helpers work properly, unless the view
+	is being rendered as part of a page (that is, by the ModuleContentRenderer).  The Layout set here is a default value which can be overridden 
+	by individual views.
+*@
+@{
+	const string IS_RENDERING_PAGE = "nucleus:is-rendering-page";
+	if (this.Model is Nucleus.ViewFeatures.ViewModels.Layout)
+	{
+		Layout = "_Layout";
+		@if (!Context.Items.ContainsKey(IS_RENDERING_PAGE))
+		{
+			Context.Items.Add(IS_RENDERING_PAGE, true);
+		}
+	}
+	else
+	{
+		if (!this.Context.Items.ContainsKey(IS_RENDERING_PAGE))
+		{
+			Layout = "_Partial";
+		}
+	}
+}

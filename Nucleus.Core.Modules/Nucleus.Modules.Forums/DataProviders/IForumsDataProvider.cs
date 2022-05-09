@@ -28,6 +28,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public Task SetForumPostPinned(Post post, Boolean value);
 		public Task SetForumPostLocked(Post post, Boolean value);
 		public Task SetForumPostApproved(Post post, Boolean value);
+		public Task SetForumPostRejected(Post post, Boolean value);
 		public Task SetForumPostStatus(Post post, Nucleus.Abstractions.Models.ListItem value);
 
 		public Task<IList<Reply>> ListForumPostReplies(Post post, FlagStates approved);

@@ -13,7 +13,7 @@ namespace Nucleus.Modules.Forums.Models
 
 		public Guid Id { get; set; }
 
-		public Group Group {get; private set; }
+		public Group Group {get; set; }
 
 		public string Name { get; set; }
 		public string Description { get; set; }

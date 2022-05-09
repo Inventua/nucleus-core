@@ -156,7 +156,7 @@ namespace Nucleus.Modules.Forums
 		/// </summary>
 		/// <param name="site"></param>
 		/// <returns></returns>
-		public async Task<IList<User>> ListModerators(Forum forum)
+		public async Task<IList<User>> ListForumModerators(Forum forum)
 		{
 			List<User> users = new();
 
@@ -166,11 +166,11 @@ namespace Nucleus.Modules.Forums
 			{
 				if (forum.UseGroupSettings)
 				{
-					permissions = forum.Group.Permissions.Where(permission => permission.PermissionType.Scope == ForumsManager.PermissionScopes.FORUM_MODERATE);
+					permissions = forum.Group.Permissions.Where(permission => permission.PermissionType.Scope == ForumsManager.PermissionScopes.FORUM_MODERATE && permission.AllowAccess);
 				}
 				else
 				{
-					permissions = forum.Permissions.Where(permission => permission.PermissionType.Scope == ForumsManager.PermissionScopes.FORUM_MODERATE);
+					permissions = forum.Permissions.Where(permission => permission.PermissionType.Scope == ForumsManager.PermissionScopes.FORUM_MODERATE && permission.AllowAccess);
 				}
 			}
 
@@ -388,7 +388,7 @@ namespace Nucleus.Modules.Forums
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				await provider.SetForumPostApproved(post, false);
+				await provider.SetForumPostRejected(post, true);
 
 				if (forum.EffectiveSettings().StatusList != null)
 				{
@@ -672,6 +672,14 @@ namespace Nucleus.Modules.Forums
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
 				return await provider.ListMailQueue();				
+			}
+		}
+
+		public async Task SetMailQueueStatus(MailQueue mailQueue)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				await provider.SetMailQueueStatus(mailQueue);
 			}
 		}
 	}

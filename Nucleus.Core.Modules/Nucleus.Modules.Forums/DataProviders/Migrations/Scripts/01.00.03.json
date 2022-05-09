@@ -1,0 +1,22 @@
+{
+	"schemaName": "Nucleus.Modules.Forums",
+	"version": "01.00.03",
+	"operations": [
+		{
+			"addColumn": {
+				"table": "ForumPosts",
+				"name": "IsRejected",
+				"clrType": "Boolean",
+				"isnullable": true
+			}
+		},
+		{
+			"addColumn": {
+				"table": "ForumReplies",
+				"name": "IsRejected",
+				"clrType": "Boolean",
+				"isnullable": true
+			}
+		}
+	]
+}

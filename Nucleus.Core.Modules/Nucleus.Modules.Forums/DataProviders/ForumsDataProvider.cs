@@ -568,9 +568,34 @@ namespace Nucleus.Modules.Forums.DataProviders
 			if (existing != null)
 			{
 				post.IsApproved = value;
+				if (value)
+				{
+					this.Context.Entry(existing).Property(existing => existing.IsRejected).CurrentValue = false ;
+				}
 				this.Context.Entry(existing).Property(existing => existing.IsApproved).CurrentValue = value;
 				await this.Context.SaveChangesAsync<Post>();
+
 				this.EventManager.RaiseEvent<Post, Approved>(post);
+			}
+		}
+
+		public async Task SetForumPostRejected(Post post, Boolean value)
+		{
+			Post existing = await this.Context.Posts
+				.Where(existing => existing.Id == post.Id)
+				.FirstOrDefaultAsync();
+
+			if (existing != null)
+			{
+				post.IsRejected = value;
+				if (value)
+				{
+					this.Context.Entry(existing).Property(existing => existing.IsApproved).CurrentValue = false;					
+				}
+				this.Context.Entry(existing).Property(existing => existing.IsRejected).CurrentValue = value;
+				await this.Context.SaveChangesAsync<Post>();
+
+				this.EventManager.RaiseEvent<Post, Rejected>(post);
 			}
 		}
 

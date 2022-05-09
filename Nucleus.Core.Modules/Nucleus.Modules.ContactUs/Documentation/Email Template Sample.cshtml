@@ -1,0 +1,14 @@
+﻿@model Nucleus.Modules.ContactUs.Models.Mail.TemplateModel
+
+<p>A new message was sent from the @Model.Site.Name portal by @Model.Message.FirstName @Model.Message.LastName.</p>
+
+@if (!String.IsNullOrEmpty(Model.Message.Company)) 
+{
+  <p>Company: @Model.Message.Company</p>
+}
+
+<p>Email: @Model.Message.Email</p>
+<p>Phone Number: @Model.Message.PhoneNumber</p>
+<p>Category: @Model.Message.Category</p>
+
+@Model.Message.Body

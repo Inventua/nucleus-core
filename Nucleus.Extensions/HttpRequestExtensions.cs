@@ -212,7 +212,6 @@ namespace Nucleus.Extensions
 							break;
 						}
 
-					case "soapaction":
 					case "user-agent":
 						{
 							canonicalizedParameters = canonicalizedParameters + PercentEncode(value);

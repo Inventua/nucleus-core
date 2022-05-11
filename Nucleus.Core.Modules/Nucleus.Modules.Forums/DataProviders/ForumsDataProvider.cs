@@ -732,14 +732,19 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.Where(subscription => subscription.ForumId == forumId && subscription.UserId == userId)
 				.FirstOrDefaultAsync();
 
+			IEnumerable<MailQueue> mailQueue = await this.Context.MailQueue
+				.Where(queue => queue.UserId == userId && queue.Post.ForumId == forumId)
+				.ToListAsync();
+
 			if (subscription != null)
 			{
 				this.Context.Remove(subscription);
-			}
+				this.Context.RemoveRange(mailQueue);
 
-			await this.Context.SaveChangesAsync<ForumSubscription>();
+				await this.Context.SaveChangesAsync();
+			}			
 		}
-
+				
 		public async Task<List<User>> ListForumSubscribers(Guid forumId)
 		{
 			List<Guid> subscriptionUsers = await this.Context.ForumSubscriptions
@@ -885,8 +890,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			if (existing != null)
 			{
-				this.Context.Entry(mailQueue).Property(mailQueue=>mailQueue.Status).IsModified = true;
-				this.Context.Entry(mailQueue).State = EntityState.Modified;
+				this.Context.Entry(existing).Property(mailQueue=>mailQueue.Status).CurrentValue = mailQueue.Status;
+				this.Context.Entry(existing).State = EntityState.Modified;
 			}
 
 			await this.Context.SaveChangesAsync<MailQueue>();
@@ -936,6 +941,22 @@ namespace Nucleus.Modules.Forums.DataProviders
 					.ThenBy(item => item.DateAdded)
 				.AsSplitQuery()
 				.ToListAsync();
+		}
+
+		public async Task TruncateMailQueue(TimeSpan sentBefore)
+		{
+			DateTime beforeDate = DateTime.Now.Add(-sentBefore);
+
+			IEnumerable<MailQueue> items = await this.Context.MailQueue
+				.Where(item => item.Status == MailQueue.MailQueueStatus.Sent && item.DateChanged < beforeDate)
+				.ToListAsync();
+
+			if (items.Any())
+			{
+				this.Context.RemoveRange(items);
+			}
+
+			await this.Context.SaveChangesAsync<MailQueue>();
 		}
 
 		#endregion

@@ -8,11 +8,24 @@
 {
 	<h1 class="nucleus-control-panel-heading">Search Settings</h1>
 	<fieldset role="group" aria-label="Search Settings">
+		<SettingsControl caption="Api Key" helptext="Select the API key used to access site pages when feeding the index.">
+			@Html.DropDownListFor(model => model.ApiKey.Id, new SelectList(Model.ApiKeys, "Id", "Name"), "(none selected)")
+		</SettingsControl>
+		
 		<div class="nucleus-flex-fields">
-			<SettingsControl caption="Api Key" helptext="Select the API key used to access site pages when feeding the index.">
-				@Html.DropDownListFor(model => model.ApiKey.Id, new SelectList(Model.ApiKeys, "Id", "Name"), "(none selected)")
+			<SettingsControl caption="Index Public Pages Only" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to index all pages, or just pages which are visible to 'All Users'.">
+				@Html.CheckBoxFor(model => model.IndexPublicPagesOnly, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+
+			<SettingsControl caption="Index Public Files Only" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to index all files, or just files which are visible to 'All Users'.">
+				@Html.CheckBoxFor(model => model.IndexPublicFilesOnly, new { @class = "ToggleSwitch" })
 			</SettingsControl>
 		</div>
+
+		<SettingsControl caption="Use SSL to Retrieve Page Content" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to use SSL (https) to retrieve page content when indexing pages.">
+			@Html.CheckBoxFor(model => model.IndexPagesUseSsl, new { @class = "ToggleSwitch" })
+		</SettingsControl>
+
 	</fieldset>
 
 	<div class="nucleus-button-panel">

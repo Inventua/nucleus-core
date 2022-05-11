@@ -33,6 +33,7 @@ namespace Nucleus.Core.Search
 		{
 			List<ContentMetaData> results = new();
 			ApiKey apiKey = null;
+			Boolean indexPublicPagesOnly = false;
 
 			if (site.DefaultSiteAlias == null)
 			{
@@ -45,16 +46,25 @@ namespace Nucleus.Core.Search
 					apiKey = await this.ApiKeyManager.Get(result);
 				}
 
+				site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PUBLIC_PAGES_ONLY, out indexPublicPagesOnly);
+
 				foreach (Page page in (await this.PageManager.List(site)).Where(page => !page.Disabled))
 				{
-					Logger.LogInformation("Building meta-data for page {pageId} [{pageName}]", page.Id, page.Name);
-					// we have to .Get the site and page because the .List methods don't return fully-populated page objects
-					ContentMetaData metaData = await BuildContentMetaData(site, apiKey, await this.PageManager.Get(page.Id));
+					if (!indexPublicPagesOnly || page.Permissions.Where(permission => permission.IsPageViewPermission() && permission.AllowAccess).Any())
+					{ 
+						Logger.LogInformation("Building meta-data for page {pageId} [{pageName}]", page.Id, page.Name);
+						// we have to .Get the site and page because the .List methods don't return fully-populated page objects
+						ContentMetaData metaData = await BuildContentMetaData(site, apiKey, await this.PageManager.Get(page.Id));
 
-					if (metaData != null)
-					{
-						results.Add(metaData);
+						if (metaData != null)
+						{
+							results.Add(metaData);							
+						}
 					}
+					else
+					{
+						Logger.LogInformation("Skipping page {pageId} [{pageName}] because it is not visible to all users, and 'Index Public Pages Only' is set.", page.Id, page.Name);
+					}						
 				}
 			}
 
@@ -65,10 +75,13 @@ namespace Nucleus.Core.Search
 		{
 			System.IO.MemoryStream htmlContent = new();
 			string pageRelativeUrl = PageLink(page);
+			Boolean useSsl = true;
+
+			site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PAGES_USE_SSL, out useSsl);
 
 			if (!String.IsNullOrEmpty(pageRelativeUrl))
 			{
-				Uri pageUri = new(new Uri("http" + Uri.SchemeDelimiter + site.DefaultSiteAlias.Alias), pageRelativeUrl);
+				Uri pageUri = new(new Uri((useSsl ? "https": "http") + Uri.SchemeDelimiter + site.DefaultSiteAlias.Alias), pageRelativeUrl);
 
 				ContentMetaData contentItem = new()
 				{

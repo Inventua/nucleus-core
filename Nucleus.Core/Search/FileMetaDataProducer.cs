@@ -30,6 +30,9 @@ namespace Nucleus.Core.Search
 		public async override Task<IEnumerable<ContentMetaData>> ListItems(Site site)
 		{
 			List<ContentMetaData> results = new();
+			Boolean indexPublicFilesOnly = false;
+
+			site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PUBLIC_FILES_ONLY, out indexPublicFilesOnly);
 
 			if (site.DefaultSiteAlias == null)
 			{
@@ -40,34 +43,42 @@ namespace Nucleus.Core.Search
 				foreach (Abstractions.FileSystemProviders.FileSystemProviderInfo provider in this.FileSystemManager.ListProviders())
 				{
 					Folder rootFolder = await this.FileSystemManager.GetFolder(site, provider.Key, "");
-					results.AddRange(await GetFiles(site, rootFolder));
+					results.AddRange(await GetFiles(site, rootFolder, indexPublicFilesOnly));
 				}
 			}
 
 			return results;
 		}		
 
-		private async Task<List<ContentMetaData>> GetFiles(Site site, Folder parentFolder)
+		private async Task<List<ContentMetaData>> GetFiles(Site site, Folder parentFolder, Boolean indexPublicFilesOnly)
 		{
 			List<ContentMetaData> results = new();
 
 			Folder folder = await this.FileSystemManager.ListFolder(site, parentFolder.Id, "");
 
-			foreach (File file in folder.Files)
+			if (!indexPublicFilesOnly || folder.Permissions.Where(permission => permission.IsFolderViewPermission() && permission.AllowAccess).Any())
 			{
-				Logger.LogInformation("Building meta-data for file {0}[{1}/{2}]", file.Id, file.Provider, file.Path);
-				ContentMetaData metaData = await BuildContentMetaData(site, file);
-
-				if (metaData != null)
+				foreach (File file in folder.Files)
 				{
-					results.Add(metaData);
+					Logger.LogInformation("Building meta-data for file {0}[{1}/{2}]", file.Id, file.Provider, file.Path);
+					ContentMetaData metaData = await BuildContentMetaData(site, file);
+
+					if (metaData != null)
+					{
+						results.Add(metaData);					
+					}
+				}
+
+				foreach (Folder subFolder in folder.Folders)
+				{
+					results.AddRange(await GetFiles(site, subFolder, indexPublicFilesOnly));				
 				}
 			}
-
-			foreach (Folder subFolder in folder.Folders)
+			else
 			{
-				results.AddRange(await GetFiles(site, subFolder));				
+				Logger.LogInformation("Skipping folder {0}[{1}/{2}] because it is not visible to 'All users' and 'Index Public Files Only' is set.", folder.Id, folder.Provider, folder.Path);
 			}
+			
 
 			return results;
 		}

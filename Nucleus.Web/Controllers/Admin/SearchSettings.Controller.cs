@@ -53,6 +53,9 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 
 			this.Context.Site.SiteSettings.TrySetValue(Site.SiteSearchSettingsKeys.APIKEY_ID, viewModel.ApiKey.Id);
+			this.Context.Site.SiteSettings.TrySetValue(Site.SiteSearchSettingsKeys.INDEX_PUBLIC_FILES_ONLY, viewModel.IndexPublicFilesOnly);
+			this.Context.Site.SiteSettings.TrySetValue(Site.SiteSearchSettingsKeys.INDEX_PUBLIC_PAGES_ONLY, viewModel.IndexPublicPagesOnly);
+			this.Context.Site.SiteSettings.TrySetValue(Site.SiteSearchSettingsKeys.INDEX_PAGES_USE_SSL, viewModel.IndexPagesUseSsl);
 
 			await this.SiteManager.Save(this.Context.Site);
 
@@ -63,13 +66,30 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			ViewModels.Admin.SearchSettings viewModel = new();
 
-			if (this.Context.Site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.APIKEY_ID, out Guid result))
+			if (this.Context.Site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.APIKEY_ID, out Guid apiKeyId))
 			{
-				viewModel.ApiKey = await this.ApiKeyManager.Get(result);
+				viewModel.ApiKey = await this.ApiKeyManager.Get(apiKeyId);
 			}
 
-			viewModel.ApiKeys = await this.ApiKeyManager.List();
+			if (this.Context.Site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PUBLIC_FILES_ONLY, out Boolean indexPublicFilesOnly))
+			{
+				viewModel.IndexPublicFilesOnly = indexPublicFilesOnly;
+			}
 
+			if (this.Context.Site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PUBLIC_PAGES_ONLY, out Boolean indexPublicPagesOnly))
+			{
+				viewModel.IndexPublicPagesOnly = indexPublicPagesOnly;
+			}
+
+			if (this.Context.Site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PAGES_USE_SSL, out Boolean indexPagesUseSsl))
+			{
+				viewModel.IndexPagesUseSsl = indexPagesUseSsl;
+			}
+
+			
+
+			viewModel.ApiKeys = await this.ApiKeyManager.List();
+			
 			return viewModel;
 		}
 

@@ -1,4 +1,5 @@
-﻿using Nucleus.Abstractions.Models;
+﻿using System;
+using Nucleus.Abstractions.Models;
 using System.Collections.Generic;
 
 namespace Nucleus.Web.ViewModels.Admin
@@ -8,5 +9,9 @@ namespace Nucleus.Web.ViewModels.Admin
     public ApiKey ApiKey { get; set; }
     public IEnumerable<ApiKey> ApiKeys { get; set; }
 
+    public Boolean IndexPublicPagesOnly { get; set; }
+    public Boolean IndexPublicFilesOnly { get; set; }
+
+    public Boolean IndexPagesUseSsl { get; set; } = true;
   }
 }

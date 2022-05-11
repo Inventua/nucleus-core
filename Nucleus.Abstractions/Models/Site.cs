@@ -79,6 +79,21 @@ namespace Nucleus.Abstractions.Models
 			/// API key for the search feeder to use for reading page content.
 			/// </summary>
 			public const string APIKEY_ID = "searchfeeder:apikey:id";
+			
+			/// <summary>
+			/// Specifies whether to index pages which are not available for "all users"
+			/// </summary>
+			public const string INDEX_PUBLIC_PAGES_ONLY = "searchfeeder:include-public-pages-only";
+
+			/// <summary>
+			/// Specifies whether to use https when indexing pages
+			/// </summary>
+			public const string INDEX_PAGES_USE_SSL = "searchfeeder:pages-use-ssl";
+
+			/// <summary>
+			/// Specifies whether to index files which are not available for "all users"
+			/// </summary>
+			public const string INDEX_PUBLIC_FILES_ONLY = "searchfeeder:include-public-files-only";
 		}
 
 		/// <summary>

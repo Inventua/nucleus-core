@@ -72,6 +72,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup and Configuration", "
 		Documentation\Setup and Configuration\Scheduled-Tasks-Editor.png = Documentation\Setup and Configuration\Scheduled-Tasks-Editor.png
 		Documentation\Setup and Configuration\Scheduled-Tasks.md = Documentation\Setup and Configuration\Scheduled-Tasks.md
 		Documentation\Setup and Configuration\Scheduled-Tasks.png = Documentation\Setup and Configuration\Scheduled-Tasks.png
+		Documentation\Setup and Configuration\Search-Settings.md = Documentation\Setup and Configuration\Search-Settings.md
 		Documentation\Setup and Configuration\Site-Settings-Editor.png = Documentation\Setup and Configuration\Site-Settings-Editor.png
 		Documentation\Setup and Configuration\Site-Settings.md = Documentation\Setup and Configuration\Site-Settings.md
 		Documentation\Setup and Configuration\Site-Settings.png = Documentation\Setup and Configuration\Site-Settings.png

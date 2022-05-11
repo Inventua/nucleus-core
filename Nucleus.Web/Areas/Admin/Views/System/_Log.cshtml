@@ -1,13 +1,14 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.SystemIndex
-@if (Model.LogContent != null)
+@if (Model.LogContent?.Items != null)
 {
+	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.LogContent, propertyName = "LogContent", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
 	<table class="table font-monospace">
 		<tr>
 			<th>Date</th>
 			<th>Level</th>
 			<th>Message</th>
 		</tr>
-		@foreach (var entry in Model.LogContent.Where(log => log.IsValid))
+		@foreach (var entry in Model.LogContent.Items.Where(log => log.IsValid))
 		{
 			<tr>
 				<td>@entry.Date.FormatDate(this.Context.Request.GetUserTimeZone())</td>

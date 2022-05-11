@@ -64,5 +64,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 		public Task DeleteMailQueue(MailQueue mailQueue);
 		public Task<IList<MailQueue>> ListMailQueue();
+		
+		public Task TruncateMailQueue(TimeSpan sentBefore);
 	}
 }

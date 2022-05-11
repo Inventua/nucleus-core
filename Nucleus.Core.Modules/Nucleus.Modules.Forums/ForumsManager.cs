@@ -682,6 +682,14 @@ namespace Nucleus.Modules.Forums
 				await provider.SetMailQueueStatus(mailQueue);
 			}
 		}
+
+		public async Task TruncateMailQueue(TimeSpan sentBefore)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				await provider.TruncateMailQueue(sentBefore);
+			}
+		}
 	}
 
 }

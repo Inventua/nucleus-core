@@ -21,6 +21,7 @@
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="settings.css" />
+    <None Remove="Views\Email Template Sample.cshtml" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
   </ItemGroup>

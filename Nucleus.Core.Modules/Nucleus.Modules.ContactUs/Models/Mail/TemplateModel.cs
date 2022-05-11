@@ -11,6 +11,6 @@ namespace Nucleus.Modules.ContactUs.Models.Mail
   {
     public Site Site { get; set; }
     public Models.Message Message { get; set; }
-
+    public Models.Settings Settings { get; set; }
   }
 }

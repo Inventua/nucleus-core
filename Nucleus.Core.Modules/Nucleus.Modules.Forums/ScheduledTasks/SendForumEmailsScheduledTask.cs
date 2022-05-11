@@ -46,6 +46,9 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 		public async Task InvokeAsync(RunningTask task, IProgress<ScheduledTaskProgress> progress, CancellationToken cancellationToken)
 		{
 			await SendMessages(progress, cancellationToken);
+			await TruncateMailQueue(progress, cancellationToken);
+
+			progress.Report(new ScheduledTaskProgress() { Status = ScheduledTaskProgress.State.Succeeded });
 		}
 
 		private async Task SendMessages(IProgress<ScheduledTaskProgress> progress, CancellationToken cancellationToken)
@@ -54,9 +57,11 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 			Page page = null;
 			PageModule module = null;
 
+			this.Logger.LogInformation("Sending forum messages.");
+
 			var queue = (await this.ForumsManager.ListMailQueue())
 				.GroupBy(item => new { item.UserId, ForumId = item.Post.ForumId, item.MailTemplateId })
-				.Select(group => new { Key = group.Key, GroupedItems = group , MailQueueItem = group.Select(gr => gr).FirstOrDefault() } );
+				.Select(group => new { Key = group.Key, GroupedItems = group, MailQueueItem = group.Select(gr => gr).FirstOrDefault() });
 
 			foreach (var group in queue)
 			{
@@ -101,13 +106,13 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 					{
 						try
 						{
-							mailClient.Send<Models.MailTemplate.Model>(template, model, email.Value);
+							await mailClient.Send<Models.MailTemplate.Model>(template, model, email.Value);
 
 							foreach (MailQueue item in queue.Select(data => data.MailQueueItem))
 							{
 								item.Status = MailQueue.MailQueueStatus.Sent;
 								await this.ForumsManager.SetMailQueueStatus(item);
-							}							
+							}
 						}
 						catch (Exception ex)
 						{
@@ -117,10 +122,19 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 					}
 				}
 			}
-
-			progress.Report(new ScheduledTaskProgress() { Status = ScheduledTaskProgress.State.Succeeded });
-
 		}
 
+		private async Task TruncateMailQueue(IProgress<ScheduledTaskProgress> progress, CancellationToken cancellationToken)
+		{
+			try
+			{
+				this.Logger?.LogInformation("Truncating mail queue.");
+				await this.ForumsManager.TruncateMailQueue(TimeSpan.FromDays(30));
+			}
+			catch (Exception ex)
+			{
+				this.Logger?.LogError(ex, "Error truncating mail queue.");
+			}
+		}
 	}
 }

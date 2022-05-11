@@ -102,7 +102,7 @@ namespace Nucleus.Modules.Account.Controllers
 
 								using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
 								{
-									mailClient.Send(template, args, viewModel.Email);
+									await mailClient.Send(template, args, viewModel.Email);
 									return Json(new { Title = "Recover Account", Message = "Account Name Reminder email sent." });
 									//viewModel.Message = "Account Name Reminder email sent." ;
 								}
@@ -170,7 +170,7 @@ namespace Nucleus.Modules.Account.Controllers
 
 							using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
 							{
-								mailClient.Send(template, args, viewModel.Email);
+								await mailClient.Send(template, args, viewModel.Email);
 								return Json(new { Title = "Password Reset", Message = "Password Reset email sent." });
 								//viewModel.Message = "Password Reset email sent.";
 							}

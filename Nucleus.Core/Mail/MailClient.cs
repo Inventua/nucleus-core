@@ -37,24 +37,6 @@ namespace Nucleus.Core.Mail
 			this.Logger = logger;
 		}
 
-		//public void Send(MailTemplate template, MailArgs args, string to)
-		//{
-		//	System.Dynamic.ExpandoObject model = new();
-
-		//	foreach (var value in args)
-		//	{
-		//		model.TryAdd(value.Key, value.Value);
-		//	}
-
-		//	Send<MailTemplateModelBase>(template, model, to);			
-		//}
-
-		//public void Send<TModel>(MailTemplate template, TModel model, string to)
-		//	where TModel : MailTemplateModelBase
-		//{
-		//	Send<TModel>(template, model, to);
-		//}
-
 		/// <summary>
 		/// Parse the specified template, and send the resulting email to the specified 'to' address. The 'to' address can be a list 
 		/// of email addresses separated by commas or semicolons.
@@ -62,7 +44,7 @@ namespace Nucleus.Core.Mail
 		/// <param name="template"></param>
 		/// <param name="args"></param>
 		/// <param name="to"></param>
-		public void Send<TModel>(MailTemplate template, TModel model, string to)
+		public async Task Send<TModel>(MailTemplate template, TModel model, string to)
 			where TModel : class
 		{
 			MimeKit.MimeMessage message = new();
@@ -75,8 +57,8 @@ namespace Nucleus.Core.Mail
 				message.To.Add(MimeKit.MailboxAddress.Parse(address));
 			}
 			
-			message.Subject = template.Subject.ParseTemplate<TModel>(model);
-			builder.HtmlBody = ApplyDefaultCss() + template.Body.ParseTemplate<TModel>(model); 
+			message.Subject = await template.Subject.ParseTemplate<TModel>(model);
+			builder.HtmlBody = ApplyDefaultCss() + await template.Body.ParseTemplate<TModel>(model); 
 			
 			message.Body = builder.ToMessageBody();
 

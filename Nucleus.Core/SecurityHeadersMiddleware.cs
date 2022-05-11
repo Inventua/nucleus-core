@@ -44,7 +44,7 @@ namespace Nucleus.Core.Layout
 			await next(context);
 		}
 
-		private void AddHeader(HttpContext context, string name, string value)
+		private static void AddHeader(HttpContext context, string name, string value)
 		{
 			if (!string.IsNullOrEmpty(name))
 			{
@@ -58,7 +58,7 @@ namespace Nucleus.Core.Layout
 			}
 		}
 
-		private static HashSet<string> HtmlOnlyHeaderNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
+		private static readonly HashSet<string> HtmlOnlyHeaderNames = new(StringComparer.OrdinalIgnoreCase) 
 		{
 			"Content-Security-Policy", 
 			"X-Content-Security-Policy",
@@ -67,7 +67,7 @@ namespace Nucleus.Core.Layout
 			"X-XSS-Protection"
 		};
 
-		private Boolean IsHtmlOnlyHeader(string name)
+		private static Boolean IsHtmlOnlyHeader(string name)
 		{
 			return HtmlOnlyHeaderNames.Contains(name);
 		}

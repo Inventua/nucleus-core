@@ -48,30 +48,30 @@ namespace Nucleus.Core.Layout
 
 			if (Guid.TryParse(context.Request.Query["pageid"], out Guid pageId))
 			{
-				Logger.LogTrace("Request for page id {0}.", pageId);
+				Logger.LogTrace("Request for page id {pageid}.", pageId);
 				this.Context.Page = await this.PageManager.Get(pageId);
 
 				if (this.Context.Page != null)
 				{
 					if (this.Context.Page.Disabled)
 					{
-						Logger.LogTrace("Page id {0} is disabled.", pageId);
+						Logger.LogTrace("Page id {pageid} is disabled.", pageId);
 						this.Context.Page = null;
 					}
 					else
 					{
-						Logger.LogTrace("Page id {0} found.", pageId);
+						Logger.LogTrace("Page id {pageid} found.", pageId);
 						this.Context.Site = await this.SiteManager.Get(this.Context.Page);
 					}
 				}
 				else
 				{
-					Logger.LogTrace("Page id not {0} found.", pageId);
+					Logger.LogTrace("Page id not {pageid} found.", pageId);
 				}
 			}
 			else
 			{
-				Logger.LogTrace("Matching site by host {0} and pathbase {1}.", context.Request.Host, context.Request.PathBase);
+				Logger.LogTrace("Matching site by host {host} and pathbase {pathbase}.", context.Request.Host, context.Request.PathBase);
 
 				try
 				{
@@ -117,8 +117,8 @@ namespace Nucleus.Core.Layout
 				{
 					string localPath = System.Web.HttpUtility.UrlDecode(context.Request.Path);
 
-					Logger.LogTrace("Using site {0}.", this.Context.Site.Id);
-					Logger.LogTrace("Lookup page by path {0}.", localPath);
+					Logger.LogTrace("Using site {siteid}.", this.Context.Site.Id);
+					Logger.LogTrace("Lookup page by path {path}.", localPath);
 					this.Context.Page = await this.PageManager.Get(this.Context.Site, localPath);
 
 					string partPath = localPath;
@@ -156,17 +156,17 @@ namespace Nucleus.Core.Layout
 					{
 						if (this.Context.Page.Disabled)
 						{
-							Logger.LogTrace("Page id {0} is disabled.", pageId);
+							Logger.LogTrace("Page id {pageid} is disabled.", pageId);
 							this.Context.Page = null;
 						}
 						else
 						{
-							Logger.LogTrace("Page found: {0}.", this.Context.Page.Id);
+							Logger.LogTrace("Page found: {pageid}.", this.Context.Page.Id);
 						}
 					}
 					else
 					{
-						Logger.LogTrace("Path {0} is not a page.", localPath);
+						Logger.LogTrace("Path {path} is not a page.", localPath);
 					}
 				}
 			}

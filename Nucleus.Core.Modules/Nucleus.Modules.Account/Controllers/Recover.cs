@@ -49,7 +49,7 @@ namespace Nucleus.Modules.Account.Controllers
 		[HttpGet]
 		public ActionResult Edit(string returnUrl)
 		{
-			return View("RecoverSettings", new ViewModels.Signup());
+			return View("RecoverSettings", new ViewModels.Signup() { ReturnUrl = returnUrl });
 		}
 
 		[HttpPost]
@@ -98,7 +98,7 @@ namespace Nucleus.Modules.Account.Controllers
 									Url = GetLoginPageUri().ToString()
 								};
 
-								Logger.LogTrace("Sending account name reminder email {0} to user {1}.", template.Name, user.Id);
+								Logger.LogTrace("Sending account name reminder email {templateName} to user {userId}.", template.Name, user.Id);
 
 								using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
 								{
@@ -111,7 +111,7 @@ namespace Nucleus.Modules.Account.Controllers
 
 						else
 						{
-							Logger.LogTrace("Not sending account name reminder to user {0} because no Account Name Reminder Template is configured for site {1}.", user.Id, this.Context.Site.Id);
+							Logger.LogTrace("Not sending account name reminder to user {userId} because no Account Name Reminder Template is configured for site {siteId}.", user.Id, this.Context.Site.Id);
 							return Json(new { Title = "Recover Account", Message = "Your site administrator has not configured an Account Name Reminder email template.  Please contact the site administrator for help." });
 							//viewModel.Message = "Your site administrator has not configured an Account Name Reminder email template.  Please contact the site administrator for help.";				
 						}
@@ -166,7 +166,7 @@ namespace Nucleus.Modules.Account.Controllers
 								Url = new System.Uri(await GetLoginPageUri(), $"?token={user.Secrets.PasswordResetToken}").ToString()
 							};
 
-							Logger.LogTrace("Sending password reset email {0} to user {1}.", template.Name, user.Id);
+							Logger.LogTrace("Sending password reset email {templateName} to user {userId}.", template.Name, user.Id);
 
 							using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
 							{
@@ -178,7 +178,7 @@ namespace Nucleus.Modules.Account.Controllers
 					}
 					else
 					{
-						Logger.LogTrace("Not sending password reset to user {0} because no password reset template is configured for site {1}.", user.Id, this.Context.Site.Id);
+						Logger.LogTrace("Not sending password reset to user {userId} because no password reset template is configured for site {siteId}.", user.Id, this.Context.Site.Id);
 						//viewModel.Message = "Your site administrator has not configured a password reset email template.  Please contact the site administrator for help.";
 						return Json(new { Title = "Password Reset", Message = "Your site administrator has not configured a password reset email template.  Please contact the site administrator for help." });
 					}

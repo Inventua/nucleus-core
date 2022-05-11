@@ -107,9 +107,7 @@ namespace Nucleus.Core.FileProviders
 
 						if (Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS.Contains(root))
 						{
-							PhysicalFileProvider fileProvider = new PhysicalFileProvider(System.IO.Path.Combine(
-								this.FolderOptions.Value.GetWebRootFolder(),
-								""));
+							PhysicalFileProvider fileProvider = new(System.IO.Path.Combine(this.FolderOptions.Value.GetWebRootFolder(), ""));
 
 							if (TryProvider(fileProvider, path, mergedcontent))
 							{
@@ -149,7 +147,7 @@ namespace Nucleus.Core.FileProviders
 			await next(context);
 		}
 
-		private async Task WriteFile(IFileInfo input, HttpResponse response, string contentType, DateTime lastModified)
+		private static async Task WriteFile(IFileInfo input, HttpResponse response, string contentType, DateTime lastModified)
 		{
 			response.ContentType = contentType;
 			response.ContentLength = input.Length;
@@ -159,7 +157,7 @@ namespace Nucleus.Core.FileProviders
 			await response.SendFileAsync(input);
 		}
 				
-		private string GenerateETag(DateTime lastModified)
+		private static string GenerateETag(DateTime lastModified)
 		{
 			return "\"" + Encode(lastModified.ToString()) + "\"";
 		}
@@ -194,7 +192,7 @@ namespace Nucleus.Core.FileProviders
 
 		private void ClearCache()
 		{
-			Logger.LogInformation("Cache folder is {0}.  Clearing cache after restart.", CacheFolder());
+			Logger.LogInformation("Cache folder is {folder}.  Clearing cache after restart.", CacheFolder());
 
 			foreach (string cachedFileName in Directory.EnumerateFiles(CacheFolder()))
 			{
@@ -266,7 +264,7 @@ namespace Nucleus.Core.FileProviders
 				// if there is an IO exception here, it generally means that the file is in use, because another process is already 
 				// writing to the cache for the specified subpath.  In this case, we can ignore and return, as the file content already
 				// in the process of being written are the same as what we would be writing.
-				Logger.LogError(e, "An error was encountered writing a cache file named {0}", cachedFilePath);
+				Logger.LogError(e, "An error was encountered writing a cache file named {filepath}", cachedFilePath);
 			}
 		}
 

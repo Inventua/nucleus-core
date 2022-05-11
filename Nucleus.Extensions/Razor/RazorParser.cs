@@ -12,7 +12,7 @@ namespace Nucleus.Extensions.Razor
 {
 	internal class RazorParser
 	{
-		private static Dictionary<string, object> CompiledTemplateCache = new();
+		private static readonly Dictionary<string, object> CompiledTemplateCache = new();
 
 		public static async Task<string> Parse<T>(string template, T model)
 			where T : class

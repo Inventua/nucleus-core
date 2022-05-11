@@ -43,7 +43,7 @@ namespace Nucleus.Core.FileSystemProviders
 				{
 					if (context.User.IsInRole(this.Context.Site.AnonymousUsersRole.Name))
 					{
-						Logger.LogWarning("File upload by anonymous user [filename: {0}] blocked.", file.FileName);
+						Logger.LogWarning("File upload by anonymous user [filename: {filename}] blocked.", file.FileName);
 						context.Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
 						return;
 					}
@@ -60,7 +60,7 @@ namespace Nucleus.Core.FileSystemProviders
 					{
 						if (fileType.Restricted && !context.User.IsSiteAdmin(this.Context.Site))
 						{
-							Logger.LogWarning("File upload [filename: {0}] blocked: File type Permission Denied.", file.FileName);
+							Logger.LogWarning("File upload [filename: {filename}] blocked: File type Permission Denied.", file.FileName);
 							context.Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
 							return;
 						}
@@ -76,7 +76,7 @@ namespace Nucleus.Core.FileSystemProviders
 
 						if (!isValid)
 						{
-							Logger.LogError("ALERT: File content of file '{0}' uploaded by {1} : signature [{2}] does not match any of the file signatures for file type {3}.", file.FileName, context.User.GetUserId(), BitConverter.ToString(sample).Replace("-", ""), System.IO.Path.GetExtension(file.FileName));
+							Logger.LogError("ALERT: File content of file '{filename}' uploaded by {userid} : signature [{sample}] does not match any of the file signatures for file type {filetype}.", file.FileName, context.User.GetUserId(), BitConverter.ToString(sample).Replace("-", ""), System.IO.Path.GetExtension(file.FileName));
 							context.Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
 							await context.Response.WriteAsync($"Invalid file content.  The file that you have uploaded is not a valid {System.IO.Path.GetExtension(file.FileName)} file.");
 							return;
@@ -84,7 +84,7 @@ namespace Nucleus.Core.FileSystemProviders
 					}
 					else
 					{
-						Logger.LogError("ALERT: Unsupported file type.  File '{0}' uploaded by {1} does not match any of the allowed file extensions.", file.FileName, context.User.GetUserId());
+						Logger.LogError("ALERT: Unsupported file type.  File '{filename}' uploaded by {userid} does not match any of the allowed file extensions.", file.FileName, context.User.GetUserId());
 						context.Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
 						await context.Response.WriteAsync($"Invalid file content.  The file type of the file that you have uploaded is not allowed.");
 						return;
@@ -100,7 +100,7 @@ namespace Nucleus.Core.FileSystemProviders
 			//byte[] signatureBytes = StringToBytes(signature);
 			List<string> signatureBytes = new();
 
-			for (int count = 0; count < (int)Math.Floor(signature.Length / (double)2); count = count + 2)
+			for (int count = 0; count < (int)Math.Floor(signature.Length / (double)2); count += 2)
 			{
 				signatureBytes.Add(signature.Substring(count, 2));
 			}

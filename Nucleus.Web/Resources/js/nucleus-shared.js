@@ -159,8 +159,10 @@ function _Page()
 	{
 		if (jQuery(this).attr('data-autopostbackevent') === event.type)
 		{
-			jQuery(this).parents('form').submit();
 			event.preventDefault();
+			event.stopImmediatePropagation();
+
+			jQuery(this).parents('form').submit();			
 		}
 	}
 

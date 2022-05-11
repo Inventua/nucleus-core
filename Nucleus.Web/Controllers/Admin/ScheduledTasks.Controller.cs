@@ -108,15 +108,15 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", await BuildViewModel());
 		}
 
-		private async Task<List<ViewModels.Admin.SystemIndex.LogEntry>> ReadLogFile(ViewModels.Admin.ScheduledTaskEditor viewModelInput)
+		private async Task ReadLogFile(Nucleus.Abstractions.Models.Paging.PagingSettings settings, ViewModels.Admin.ScheduledTaskEditor viewModel)
 		{
 			List<ViewModels.Admin.SystemIndex.LogEntry> results = new();
 
-			if (!String.IsNullOrEmpty(viewModelInput.LogFile))
+			if (!String.IsNullOrEmpty(viewModel.LogFile))
 			{
-				ScheduledTask existing = await this.ScheduledTaskManager.Get(viewModelInput.ScheduledTask.Id);
-				string logFilePath = System.IO.Path.Combine(LogFolder(existing).FullName, viewModelInput.LogFile);
-				
+				ScheduledTask existing = await this.ScheduledTaskManager.Get(viewModel.ScheduledTask.Id);
+				string logFilePath = System.IO.Path.Combine(LogFolder(existing).FullName, viewModel.LogFile);
+
 				if (System.IO.File.Exists(logFilePath))
 				{
 					foreach (string line in System.IO.File.ReadAllLines(logFilePath))
@@ -126,14 +126,19 @@ namespace Nucleus.Web.Controllers.Admin
 				}
 			}
 
-			return results;
-		}
+			viewModel.LogContent = new(settings);
+			viewModel.LogContent.TotalCount = results.Count;
 
+			viewModel.LogContent.Items = results
+				.Skip(viewModel.LogContent.FirstRowIndex)
+				.Take(viewModel.LogContent.PageSize)
+				.ToList();
+		}
 
 		[HttpPost]
 		public async Task<ActionResult> GetLogFile(ViewModels.Admin.ScheduledTaskEditor viewModel)
 		{
-			viewModel.LogContent = await ReadLogFile(viewModel);
+			await ReadLogFile(viewModel.LogContent, viewModel);
 
 			return View("_Log", viewModel);
 		}
@@ -204,12 +209,7 @@ namespace Nucleus.Web.Controllers.Admin
 			
 			if (!String.IsNullOrEmpty(viewModel.LogFile))
 			{
-				viewModel.LogContent = await ReadLogFile(viewModel);
-				//string logFilePath = System.IO.Path.Combine(this.LogFolderPath, viewModel.LogFile);
-				//if (System.IO.File.Exists(logFilePath))
-				//{
-				//	viewModel.LogContent = System.Net.WebUtility.HtmlEncode(System.IO.File.ReadAllText(logFilePath));
-				//}
+				await ReadLogFile(viewModel.LogContent, viewModel);
 			}
 
 			return viewModel;

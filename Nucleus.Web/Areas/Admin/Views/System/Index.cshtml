@@ -138,7 +138,6 @@
 			@using (Html.BeginAreaForm("GetLogFile", "System", "Admin", FormMethod.Post, new { @data_target = ".LogContent", @autocomplete = "off" }))
 			{
 				@Html.DropDownListFor(model => model.LogFile, new SelectList(Model.LogFiles, "Filename", "Title"), "(select)", new { @class = "LogFile" })
-				@*<div class="LogContent"><pre>@Model.LogContent</pre></div>*@
 				<div class="LogContent">
 					@if (String.IsNullOrEmpty(Model.LogMessage))
 					{

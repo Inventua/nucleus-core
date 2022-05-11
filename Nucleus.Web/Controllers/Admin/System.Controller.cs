@@ -103,7 +103,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 				viewModelOutput.LogFiles = logs.OrderByDescending(log => log.LogDate).ToList();
 
-				viewModelOutput.LogContent = ReadLogFile(viewModelInput);
+				ReadLogFile(viewModelInput.LogContent, viewModelOutput);
 			}
 			else
 			{
@@ -156,13 +156,13 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", viewModelOutput);
 		}
 
-		private List<ViewModels.Admin.SystemIndex.LogEntry> ReadLogFile(ViewModels.Admin.SystemIndex viewModelInput)
+		private void ReadLogFile(Nucleus.Abstractions.Models.Paging.PagingSettings settings, ViewModels.Admin.SystemIndex viewModel)
 		{
 			List<ViewModels.Admin.SystemIndex.LogEntry> results = new();
-
-			if (!String.IsNullOrEmpty(viewModelInput.LogFile))
+			
+			if (!String.IsNullOrEmpty(viewModel.LogFile))
 			{
-				string logFilePath = System.IO.Path.Combine(this.LogFolderPath, viewModelInput.LogFile);
+				string logFilePath = System.IO.Path.Combine(this.LogFolderPath, viewModel.LogFile);
 				if (System.IO.File.Exists(logFilePath))
 				{
 					foreach (string line in System.IO.File.ReadAllLines(logFilePath))
@@ -172,13 +172,19 @@ namespace Nucleus.Web.Controllers.Admin
 				}
 			}
 
-			return results;
+			viewModel.LogContent = new(settings);
+			viewModel.LogContent.TotalCount = results.Count;
+
+			viewModel.LogContent.Items = results
+				.Skip(viewModel.LogContent.FirstRowIndex)
+				.Take(viewModel.LogContent.PageSize)
+				.ToList();
 		}
 
 		[HttpPost]
 		public ActionResult GetLogFile(ViewModels.Admin.SystemIndex viewModelInput)
 		{
-			viewModelInput.LogContent = ReadLogFile(viewModelInput);
+			ReadLogFile(viewModelInput.LogContent, viewModelInput);
 
 			return View("_Log", viewModelInput);
 

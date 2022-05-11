@@ -25,7 +25,8 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public string LogFile { get; set; }
 
-		public List<LogEntry> LogContent { get; set; }
+		public Nucleus.Abstractions.Models.Paging.PagedResult<LogEntry> LogContent { get; set; } = new() { PageSize = 100, PageSizes = new List<int>() { 100, 250, 500 } };
+
 		public string LogMessage { get; set; }
 
 		public string Configuration { get; set; }

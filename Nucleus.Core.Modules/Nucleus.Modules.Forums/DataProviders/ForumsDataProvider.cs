@@ -363,7 +363,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public async Task<IList<Post>> ListForumPosts(Forum forum, FlagStates approved)
 		{
 			IList<Post> results = await this.Context.Posts
-				.Where(post => post.ForumId == forum.Id && (approved == FlagStates.IsAny || (post.IsApproved == (approved == FlagStates.IsTrue ? true : false))))
+				.Where(post => post.ForumId == forum.Id && (approved == FlagStates.IsAny || (post.IsApproved == (approved == FlagStates.IsTrue))))
 				.Include(post => post.Status)
 				.Include(post => post.Attachments)
 					.ThenInclude(attachment => attachment.File)
@@ -646,7 +646,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public async Task<IList<Reply>> ListForumPostReplies(Post post, FlagStates approved)
 		{
 			return await this.Context.Replies
-				.Where(reply => reply.Post.Id == post.Id && (approved == FlagStates.IsAny || (post.IsApproved == (approved == FlagStates.IsTrue ? true : false))))
+				.Where(reply => reply.Post.Id == post.Id && (approved == FlagStates.IsAny || (post.IsApproved == (approved == FlagStates.IsTrue))))
 				.Include(reply => reply.Attachments)
 					.ThenInclude(attachment => attachment.File)
 				.Include(reply => reply.Post)

@@ -12,7 +12,7 @@ namespace Nucleus.Extensions
 	public static class HttpRequestExtensions
 	{
 		// Specifies the allowed variation between signature dates and the server date
-		private static TimeSpan DateThreshold = TimeSpan.FromMinutes(10);
+		private static readonly TimeSpan DateThreshold = TimeSpan.FromMinutes(10);
 
 		/// <summary>
 		/// Scheme name for the authorization header used to send the request signature.
@@ -31,7 +31,7 @@ namespace Nucleus.Extensions
 			{
 				request.Headers.Date = DateTimeOffset.UtcNow;
 			}
-			request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(AUTHORIZATION_SCHEME, $"{accessKey}:{GenerateSignature(request, accessKey, secret)}");
+			request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(AUTHORIZATION_SCHEME, $"{accessKey}:{GenerateSignature(request, secret)}");
 		}
 
 		/// <summary>
@@ -157,11 +157,10 @@ namespace Nucleus.Extensions
 		/// Generate a HMAC signature string
 		/// </summary>
 		/// <param name="request"></param>
-		/// <param name="accessKey"></param>
 		/// <param name="secret"></param>
 		/// <returns></returns>
 		/// <exception cref="ArgumentException"></exception>
-		public static string GenerateSignature(System.Net.Http.HttpRequestMessage request, Guid accessKey, string secret)
+		public static string GenerateSignature(System.Net.Http.HttpRequestMessage request, string secret)
 		{
 			string signatureSource;
 			var parameterKeys = new SortedDictionary<string, string>();
@@ -181,7 +180,7 @@ namespace Nucleus.Extensions
 					hostHeaderProcessed = true;
 				}
 
-				if (header.Value.Count() > 0)
+				if (header.Value.Any())
 				{
 					parameterKeys.Add(header.Key, ConcatenateHeaderValues(header.Value));
 				}
@@ -196,16 +195,16 @@ namespace Nucleus.Extensions
 				{
 					case "date":
 						{
-							canonicalizedParameters = canonicalizedParameters + PercentEncode(value);
+							canonicalizedParameters += PercentEncode(value);
 							if (!hostHeaderProcessed)
 							{
 								value = request.RequestUri.Host;
-								if (value.IndexOf(':') >= 0)
+								if (value.Contains(':'))
 								{
 									value = value.Substring(0, value.IndexOf(':'));
 								}
 
-								canonicalizedParameters = canonicalizedParameters + PercentEncode(value);
+								canonicalizedParameters += PercentEncode(value);
 								hostHeaderProcessed = true;
 							}
 
@@ -214,18 +213,18 @@ namespace Nucleus.Extensions
 
 					case "user-agent":
 						{
-							canonicalizedParameters = canonicalizedParameters + PercentEncode(value);
+							canonicalizedParameters += PercentEncode(value);
 							break;
 						}
 
 					case "host":
 						{
-							if (value.IndexOf(':') >= 0)
+							if (value.Contains(':'))
 							{
 								value = value.Substring(0, value.IndexOf(':'));
 							}
 
-							canonicalizedParameters = canonicalizedParameters + PercentEncode(value);
+							canonicalizedParameters += PercentEncode(value);
 							break;
 						}
 
@@ -269,7 +268,7 @@ namespace Nucleus.Extensions
 					hostHeaderProcessed = true;
 				}
 
-				if (header.Value.Count() > 0)
+				if (header.Value.Count > 0)
 				{
 					parameterKeys.Add(header.Key, ConcatenateHeaderValues(header.Value));
 				}
@@ -284,11 +283,11 @@ namespace Nucleus.Extensions
 				{
 					case "date":
 						{
-							canonicalizedParameters = canonicalizedParameters + PercentEncode(value);
+							canonicalizedParameters += PercentEncode(value);
 							if (!hostHeaderProcessed)
 							{
 								value = request.Host.Host;
-								canonicalizedParameters = canonicalizedParameters + PercentEncode(value);
+								canonicalizedParameters += PercentEncode(value);
 								hostHeaderProcessed = true;
 							}
 
@@ -298,18 +297,18 @@ namespace Nucleus.Extensions
 					case "soapaction":
 					case "user-agent":
 						{
-							canonicalizedParameters = canonicalizedParameters + PercentEncode(value);
+							canonicalizedParameters += PercentEncode(value);
 							break;
 						}
 
 					case "host":
 						{
-							if (value.IndexOf(':') >= 0)
+							if (value.Contains(':'))
 							{
 								value = value.Substring(0, value.IndexOf(':'));
 							}
 
-							canonicalizedParameters = canonicalizedParameters + PercentEncode(value);
+							canonicalizedParameters += PercentEncode(value);
 							break;
 						}
 
@@ -334,10 +333,10 @@ namespace Nucleus.Extensions
 			{
 				if (!string.IsNullOrEmpty(strResult))
 				{
-					strResult = strResult + " ";
+					strResult += " ";
 				}
 
-				strResult = strResult + strValue;
+				strResult += strValue;
 			}
 
 			return strResult;
@@ -356,7 +355,7 @@ namespace Nucleus.Extensions
 			{
 				if (char.IsLetterOrDigit(character) || new char[] { '-', '_', '.', '~' }.Contains(character))
 				{
-					result = result + character;
+					result += character;
 				}
 				else
 				{

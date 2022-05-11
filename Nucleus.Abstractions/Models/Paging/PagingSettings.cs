@@ -123,7 +123,7 @@ namespace Nucleus.Abstractions.Models.Paging
     {
       get
       {
-        List<int> objPages = new List<int>();
+        List<int> objPages = new();
         int intStart;
         int intFinish;
 

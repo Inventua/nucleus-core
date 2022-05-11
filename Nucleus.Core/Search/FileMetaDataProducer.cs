@@ -36,7 +36,7 @@ namespace Nucleus.Core.Search
 
 			if (site.DefaultSiteAlias == null)
 			{
-				this.Logger.LogWarning("Site {0} skipped because it does not have a default alias.", site.Id);
+				this.Logger.LogWarning("Site {siteid} skipped because it does not have a default alias.", site.Id);
 			}
 			else
 			{
@@ -60,7 +60,7 @@ namespace Nucleus.Core.Search
 			{
 				foreach (File file in folder.Files)
 				{
-					Logger.LogInformation("Building meta-data for file {0}[{1}/{2}]", file.Id, file.Provider, file.Path);
+					Logger.LogInformation("Building meta-data for file {fileid}[{provider}/{path}]", file.Id, file.Provider, file.Path);
 					ContentMetaData metaData = await BuildContentMetaData(site, file);
 
 					if (metaData != null)
@@ -76,7 +76,7 @@ namespace Nucleus.Core.Search
 			}
 			else
 			{
-				Logger.LogInformation("Skipping folder {0}[{1}/{2}] because it is not visible to 'All users' and 'Index Public Files Only' is set.", folder.Id, folder.Provider, folder.Path);
+				Logger.LogInformation("Skipping folder {folderid}[{provider}/{path}] because it is not visible to 'All users' and 'Index Public Files Only' is set.", folder.Id, folder.Provider, folder.Path);
 			}
 			
 

@@ -41,7 +41,7 @@ namespace Nucleus.Web
 			// The app can start with the current directory set to /bin, or /bin/debug/net5.0 but we want it set to the application root.  This 
 			// code has not effect in a production environment, because the app will start in the application root, and there won't be a /bin 
 			// folder.
-			System.IO.DirectoryInfo workingDirectory = new System.IO.DirectoryInfo(System.Environment.CurrentDirectory);
+			System.IO.DirectoryInfo workingDirectory = new(System.Environment.CurrentDirectory);
 			while (workingDirectory.Parent != null)
 			{
 				if (workingDirectory.Name.Equals("bin", StringComparison.OrdinalIgnoreCase))
@@ -57,7 +57,7 @@ namespace Nucleus.Web
 				if (isRestart)
 				{
 					WebHost.Dispose();
-					WebHost?.Logger().LogInformation($"Restarted at {DateTime.Now}.");
+					WebHost?.Logger().LogInformation("Restarted at {now}.", DateTime.Now);
 
 					Nucleus.Core.Plugins.AssemblyLoader.UnloadAll();
 					WebHost.StopAsync().Wait();
@@ -105,7 +105,7 @@ namespace Nucleus.Web
 		/// <param name="e"></param>
 		static async void FileChanged(object sender, FileSystemEventArgs e)
 		{
-			WebHost.Logger().LogInformation($"Detected assembly file change {e.FullPath} [{e.ChangeType}].");
+			WebHost.Logger().LogInformation("Detected assembly file change {fullPath} [{changeType}].", e.FullPath, e.ChangeType);
 
 			doRestart = true;
 			isRestart = true;

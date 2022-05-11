@@ -130,7 +130,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 				if (connection != null)
 				{
-					ViewModels.Admin.SystemIndex.DatabaseConnection databaseConnection = new ViewModels.Admin.SystemIndex.DatabaseConnection() { Schema = schema.Name, DatabaseType = connection.Type, ConnectionString = Sanitize(connection.ConnectionString) };
+					ViewModels.Admin.SystemIndex.DatabaseConnection databaseConnection = new() { Schema = schema.Name, DatabaseType = connection.Type, ConnectionString = Sanitize(connection.ConnectionString) };
 					databaseConnection.DatabaseInformation = Nucleus.Data.Common.DataProviderExtensions.GetDataProviderInformation(ControllerContext.HttpContext.RequestServices, schema.Name);
 
 					connections.Add(databaseConnection);

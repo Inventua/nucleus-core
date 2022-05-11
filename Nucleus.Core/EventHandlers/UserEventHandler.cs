@@ -68,7 +68,7 @@ namespace Nucleus.Core.EventHandlers
 
 							using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
 							{
-								mailClient.Send(template, args, mailTo.Value);
+								await mailClient.Send(template, args, mailTo.Value);
 							}
 						}
 					}

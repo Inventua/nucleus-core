@@ -14,7 +14,7 @@ namespace Nucleus.Extensions.Razor
 	{
 		private static Dictionary<string, object> CompiledTemplateCache = new();
 
-		public static string Parse<T>(string template, T model)
+		public static async Task<string> Parse<T>(string template, T model)
 			where T : class
 		{
 			IRazorEngine engine = new RazorEngine();
@@ -29,11 +29,11 @@ namespace Nucleus.Extensions.Razor
 			
 			if (compiledTemplate == null)
 			{
-				compiledTemplate = engine.Compile<RazorEngineTemplate<T>>(template, BuildRazorOptions);
+				compiledTemplate = await engine.CompileAsync<RazorEngineTemplate<T>>(template, BuildRazorOptions);
 				CompiledTemplateCache.Add(templateKey, compiledTemplate);
 			}
 
-			return compiledTemplate.Run(instance =>
+			return await compiledTemplate.RunAsync(instance =>
 			{
 				instance.Model = model;
 			});
@@ -46,6 +46,10 @@ namespace Nucleus.Extensions.Razor
 			builder.AddAssemblyReference(typeof(Nucleus.Abstractions.Models.Page).Assembly);
 
 			builder.AddUsing("System");
+			builder.AddUsing("System.Collections.Generic");
+			builder.AddUsing("System.Linq");
+			builder.AddUsing("System.Text");
+
 			builder.AddUsing("Nucleus.Extensions");
 			builder.AddUsing("Nucleus.Abstractions");
 			builder.AddUsing("Nucleus.Abstractions.Models");

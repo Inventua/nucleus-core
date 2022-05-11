@@ -59,6 +59,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup and Configuration", "Setup and Configuration", "{ECD9AE80-AE2F-46F1-8EB1-E48F1ED7EAA8}"
 	ProjectSection(SolutionItems) = preProject
+		Documentation\Setup and Configuration\Api-Keys.md = Documentation\Setup and Configuration\Api-Keys.md
+		Documentation\Setup and Configuration\Api-Keys.png = Documentation\Setup and Configuration\Api-Keys.png
 		Documentation\Setup and Configuration\Azure-App-Service.md = Documentation\Setup and Configuration\Azure-App-Service.md
 		Documentation\Setup and Configuration\Configuration.md = Documentation\Setup and Configuration\Configuration.md
 		Documentation\Setup and Configuration\Install-Extensions.md = Documentation\Setup and Configuration\Install-Extensions.md

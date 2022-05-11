@@ -898,19 +898,19 @@
 			<Id>{$guid12}</Id>
 			<Name>Welcome new user</Name>
 			<Subject>Welcome new user</Subject>
-			<Body>Welcome {User.UserName}</Body>
+			<Body>Welcome (~User.UserName)</Body>
 		</MailTemplate>
 		<MailTemplate>
 			<Id>{$guid21}</Id>
 			<Name>User name reminder</Name>
 			<Subject>Your user name reminder</Subject>
-			<Body>A user requested a user name reminder for the site.&amp;nbsp; Your user name is {User.UserName}.</Body>
+			<Body>A user requested a user name reminder for the site. Your user name is (~User.UserName).</Body>
 		</MailTemplate>
 		<MailTemplate>
 			<Id>{$guid13}</Id>
 			<Name>Password reset</Name>
 			<Subject>Password reset</Subject>
-			<Body>&lt;p&gt;Attn: {User.UserName}.&amp;nbsp; Your password reset code is {User.Secrets.PasswordResetToken}.&amp;nbsp; Visit&amp;nbsp;&lt;a href="{Urls.ResetPassword}"&gt;{Urls.ResetPassword}&lt;/a&gt; to reset your password.&lt;/p&gt;</Body>
+			<Body>&lt;p&gt;Attn: (~User.UserName). Your password reset code is (~User.Secrets.PasswordResetToken). Visit &amp;nbsp;&lt;a href="(~Url)"&gt;(~Url)&lt;/a&gt; to reset your password.&lt;/p&gt;</Body>
 		</MailTemplate>
 	</MailTemplates>
 </site-template>

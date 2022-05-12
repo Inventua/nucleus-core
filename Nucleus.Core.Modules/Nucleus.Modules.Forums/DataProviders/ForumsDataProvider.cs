@@ -695,6 +695,47 @@ namespace Nucleus.Modules.Forums.DataProviders
 			raiseEvent.Invoke();
 		}
 
+
+		public async Task SetForumPostReplyApproved(Reply reply, Boolean value)
+		{
+			Reply existing = await this.Context.Replies
+				.Where(existing => existing.Id == reply.Id)
+				.FirstOrDefaultAsync();
+
+			if (existing != null)
+			{
+				reply.IsApproved = value;
+				if (value)
+				{
+					this.Context.Entry(existing).Property(existing => existing.IsRejected).CurrentValue = false;
+				}
+				this.Context.Entry(existing).Property(existing => existing.IsApproved).CurrentValue = value;
+				await this.Context.SaveChangesAsync<Reply>();
+
+				this.EventManager.RaiseEvent<Reply, Approved>(reply);
+			}
+		}
+
+		public async Task SetForumPostReplyRejected(Reply reply, Boolean value)
+		{
+			Reply existing = await this.Context.Replies
+				.Where(existing => existing.Id == reply.Id)
+				.FirstOrDefaultAsync();
+
+			if (existing != null)
+			{
+				reply.IsRejected = value;
+				if (value)
+				{
+					this.Context.Entry(existing).Property(existing => existing.IsApproved).CurrentValue = false;
+				}
+				this.Context.Entry(existing).Property(existing => existing.IsRejected).CurrentValue = value;
+				await this.Context.SaveChangesAsync<Reply>();
+
+				this.EventManager.RaiseEvent<Reply, Rejected>(reply);
+			}
+		}
+
 		private async Task<Reply> GetLastReply(Guid postId)
 		{
 			return await this.Context.Replies

@@ -258,6 +258,35 @@ namespace Nucleus.Extensions.Authorization
 		}
 
 		/// <summary>
+		/// Returns a true/false value indicating whether the user has the specified permission.
+		/// </summary>
+		/// <param name="user"></param>
+		/// <param name="site"></param>
+		/// <param name="permissions"></param>
+		/// <param name="scope"></param>
+		/// <returns></returns>
+		public static Boolean HasPermission(this System.Security.Claims.ClaimsPrincipal user, Site site, List<Permission> permissions, string scope)
+		{
+			if (user.IsSystemAdministrator() || user.IsSiteAdmin(site))
+			{
+				return true;
+			}
+
+			foreach (Permission permission in permissions)
+			{
+				if (permission.PermissionType.Scope == scope)
+				{
+					if (permission.IsValid(site, user))
+					{
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Returns a true/false value indicating whether the user has view rights for the module.
 		/// </summary>
 		/// <param name="user"></param>

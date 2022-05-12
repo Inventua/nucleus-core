@@ -116,9 +116,17 @@
 						<div class="heading">
 							<span>@reply.PostedBy.UserName replied on</span><span>@reply.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</span>
 							<span class="controls">
+								@if (Model.CanApprovePost && !reply.IsApproved)
+								{
+									@Html.SubmitButton("", "Approve", Url.NucleusAction("ApproveForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()" })
+								}
+								@if (Model.CanApprovePost && !reply.IsRejected == true)
+								{
+									@Html.SubmitButton("", "Reject", Url.NucleusAction("RejectForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()" })
+								}
 								@if (Model.CanDeletePost)
 								{
-									@Html.SubmitButton("&#xe14c;", "", Url.NucleusAction("DeleteForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @data_confirm = "Delete this reply?" })
+									@Html.SubmitButton("&#xe14c;", "", Url.NucleusAction("DeleteForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @class="btn btn-danger", @data_confirm = "Delete this reply?" })
 								}
 								@if (Model.CanEditPost)
 								{
@@ -126,7 +134,23 @@
 								}
 							</span>
 						</div>
-
+						<div class="reply-flags">
+							@if (reply.IsApproved)
+							{
+								<span>Approved</span>
+							}
+							else
+							{
+								@if (reply.IsRejected == true)
+								{
+									<span>Rejected</span>
+								}
+								else
+								{
+									<span>Not Approved</span>
+								}
+							}
+						</div>
 						<div class="body">
 							@Html.Raw(reply.Body)
 						</div>

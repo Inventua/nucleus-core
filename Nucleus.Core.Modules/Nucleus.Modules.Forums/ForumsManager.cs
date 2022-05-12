@@ -35,6 +35,7 @@ namespace Nucleus.Modules.Forums
 
 			public const string FORUM_PIN_POST = PermissionScopeNamespaces.Forum + "/pin";
 			public const string FORUM_MODERATE = PermissionScopeNamespaces.Forum + "/moderate";
+			public const string FORUM_UNMODERATED = PermissionScopeNamespaces.Forum + "/unmoderated";
 		}
 
 		private IDataProviderFactory DataProviderFactory { get; }
@@ -327,13 +328,13 @@ namespace Nucleus.Modules.Forums
 		/// <param name="forum"></param>
 		/// <param name="post"></param>
 		/// <returns></returns>
-		public async Task SavePost(Site site, Forum forum, Post post)
+		public async Task SavePost(Site site, ClaimsPrincipal user, Forum forum, Post post)
 		{
 			List<Attachment> originalAttachments;
 
 			if (post.Id == Guid.Empty)
 			{
-				if (!forum.EffectiveSettings().IsModerated)
+				if (!forum.EffectiveSettings().IsModerated || user.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_MODERATE))
 				{
 					post.IsApproved = true;
 				}
@@ -400,7 +401,7 @@ namespace Nucleus.Modules.Forums
 		}
 
 		/// <summary>
-		/// Approve a <see cref="Post"/>.
+		/// Set status for a <see cref="Post"/>.
 		/// </summary>
 		/// <param name="forum"></param>
 		/// <param name="post"></param>
@@ -467,14 +468,15 @@ namespace Nucleus.Modules.Forums
 		/// <param name="post"></param>
 		/// <param name="reply"></param>
 		/// <returns></returns>
-		public async Task SavePostReply(Site site, Post post, Reply reply)
+		public async Task SavePostReply(Site site, ClaimsPrincipal user, Post post, Reply reply)
 		{
+
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
 				if (reply.Id == Guid.Empty)
 				{
 					Models.Forum forum = await provider.GetForum(post.ForumId);
-					reply.IsApproved = !forum.EffectiveSettings().IsModerated;
+					reply.IsApproved = !forum.EffectiveSettings().IsModerated || user.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_MODERATE);
 				}
 
 				// List attachments before save, so we can compare to the post, to delete files for removed attachments
@@ -490,6 +492,35 @@ namespace Nucleus.Modules.Forums
 						await this.FileSystemManager.DeleteFile(site, await this.FileSystemManager.GetFile(site, original.File.Id));
 					}
 				}
+			}
+		}
+
+		/// <summary>
+		/// Approve a <see cref="Post"/>.
+		/// </summary>
+		/// <param name="forum"></param>
+		/// <param name="post"></param>
+		/// <returns></returns>
+		public async Task ApproveForumPostReply(Reply reply, Boolean value)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				await provider.SetForumPostReplyApproved(reply, value);
+			}
+		}
+
+		/// <summary>
+		/// Reject a <see cref="Post"/>.
+		/// </summary>
+		/// <param name="forum"></param>
+		/// <param name="post"></param>
+		/// <returns></returns>
+		public async Task RejectForumPostReply(Reply reply)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				await provider.SetForumPostReplyRejected(reply, true);
+
 			}
 		}
 

@@ -74,6 +74,7 @@ namespace Nucleus.Modules.Forums
 					CreatePermissionType(new Guid("29455DD9-EADC-42D5-A2CD-5F2F5932D4D3"), ForumsManager.PermissionScopes.FORUM_SUBSCRIBE, "Subscribe", 80);
 					CreatePermissionType(new Guid("EEA8A7FD-55A4-4761-A0C2-415412FF73E0"), ForumsManager.PermissionScopes.FORUM_PIN_POST, "Pin", 90);
 					CreatePermissionType(new Guid("6B464A41-7F8F-4B61-8E96-251001F6A444"), ForumsManager.PermissionScopes.FORUM_MODERATE, "Moderate", 100);
+					CreatePermissionType(new Guid("84002ADD-71FF-44A9-92B1-67BA36E78CE4"), ForumsManager.PermissionScopes.FORUM_UNMODERATED, "Unmoderated", 110);
 				}
 			}
 			return Task.CompletedTask;

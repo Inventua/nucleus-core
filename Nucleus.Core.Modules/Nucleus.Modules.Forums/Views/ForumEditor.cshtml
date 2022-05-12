@@ -8,7 +8,7 @@
 {
 	<Tab>
 		<TabItem target="#forum-properties" caption="Properties" active="true"></TabItem>
-		<TabItem target="#forum-permissions" caption="Permissions"></TabItem>
+		<TabItem id="forum-permissions-select" target="#forum-permissions" caption="Permissions"></TabItem>
 	</Tab>
 
 	<TabContent>
@@ -159,11 +159,17 @@
 		{
 			jQuery('#forum-properties .ForumSettings').css('opacity', '0.25');
 			jQuery('#forum-properties .ForumSettings *').attr('disabled', 'disabled');
+			
+			jQuery('#forum-permissions-select, #forum-permissions').css('opacity', '0.25');
+			jQuery('#forum-permissions-select, #forum-permissions').attr('disabled', 'disabled');
 		}
 		else
 		{
 			jQuery('#forum-properties .ForumSettings').css('opacity', '1.0');
 			jQuery('#forum-properties .ForumSettings *').removeAttr('disabled');
+
+			jQuery('#forum-permissions-select, #forum-permissions').css('opacity', '1.0');
+			jQuery('#forum-permissions-select, #forum-permissions').removeAttr('disabled');
 		}
 
 		if (!jQuery('#forum-properties .AllowAttachments input[type=checkbox]').is(':checked'))

@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Nucleus.DeveloperTools.VisualStudioTemplates")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Nucleus Visual Studio Templates")]
+[assembly: AssemblyDescription("Nucleus Visual Studio Templates")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Inventua Pty Ltd")]
 [assembly: AssemblyProduct("Nucleus.DeveloperTools.VisualStudioTemplates")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyCopyright("(c) Inventua Pty Ltd")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.2.3")]
-[assembly: AssemblyFileVersion("1.0.2.3")]
+[assembly: AssemblyVersion("1.0.3.3")]
+[assembly: AssemblyFileVersion("1.0.3.3")]

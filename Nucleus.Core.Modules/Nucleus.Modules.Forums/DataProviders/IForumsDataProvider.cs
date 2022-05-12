@@ -35,6 +35,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public Task<Reply> GetForumPostReply(Guid replyId);
 		public Task SaveForumPostReply(Post post, Reply reply);
 		public Task DeleteForumPostReply(Reply reply);
+		public Task SetForumPostReplyApproved(Reply reply, Boolean value);
+		public Task SetForumPostReplyRejected(Reply reply, Boolean value);
 
 		public Task<List<Attachment>> ListPostAttachments(Guid postId);
 		public Task<List<Attachment>> ListReplyAttachments(Guid postId, Guid replyId);

@@ -274,7 +274,7 @@ namespace Nucleus.Modules.Forums.Controllers
 				}
 			}
 
-			await this.ForumsManager.SavePost(this.Context.Site, forum, viewModel.Post);
+			await this.ForumsManager.SavePost(this.Context.Site, User, forum, viewModel.Post);
 			await this.ForumsManager.SavePostTracking(viewModel.Post, HttpContext.User);
 
 			return await ViewForum(forum.Id);
@@ -492,10 +492,50 @@ namespace Nucleus.Modules.Forums.Controllers
 				return Unauthorized();
 			}
 
-			await this.ForumsManager.SavePostReply(this.Context.Site, post, viewModel.Reply);
+			await this.ForumsManager.SavePostReply(this.Context.Site, User, post, viewModel.Reply);
 
 			return await ViewPost(viewModel.Post.Id);
 		}
+
+		[HttpPost]
+		public async Task<ActionResult> ApproveForumPostReply(ViewModels.ViewForumPost viewModel, Guid replyId)
+		{
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
+			Models.Reply reply = await this.ForumsManager.GetForumPostReply(replyId);
+
+			if (viewModel.Post.Id == Guid.Empty)
+			{
+				if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE))
+				{
+					return Unauthorized();
+				}
+			}
+
+			await this.ForumsManager.ApproveForumPostReply(reply, true);
+
+			return await ViewPost(viewModel.Post.Id);
+		}
+
+
+		[HttpPost]
+		public async Task<ActionResult> RejectForumPostReply(ViewModels.ViewForumPost viewModel, Guid replyId)
+		{
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
+			Models.Reply reply = await this.ForumsManager.GetForumPostReply(replyId);
+
+			if (viewModel.Post.Id == Guid.Empty)
+			{
+				if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE))
+				{
+					return Unauthorized();
+				}
+			}
+
+			await this.ForumsManager.RejectForumPostReply(reply);
+
+			return await ViewPost(viewModel.Post.Id);
+		}
+
 
 		[HttpPost]
 		public async Task<ActionResult> DeleteForumPostReply(Guid replyId)

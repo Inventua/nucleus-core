@@ -56,7 +56,7 @@
   padding: 1px 2px;
 }
 
-.Forums .post .post-flags 
+.Forums .post .post-flags, .Forums .reply .reply-flags 
 {
   display: flex;
   gap: 4px;  
@@ -65,7 +65,7 @@
   justify-content: flex-end;
 }
 
-.Forums .post .post-flags span
+.Forums .post .post-flags span, .Forums .reply .reply-flags span
 {
   /*border-radius: 2px;
   background-color: #777;

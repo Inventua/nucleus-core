@@ -62,6 +62,7 @@ namespace Nucleus.Core.Search
 						this.Logger.LogTrace("Getting search content from {type}.", contentProvider.GetType().FullName);
 						foreach (ContentMetaData item in await contentProvider.ListItems(fullSite))
 						{
+							item.Url = ParseUrl(item.Url);
 							this.Logger.LogTrace("Adding {url} to index.", item.Url);
 
 							foreach (ISearchIndexManager searchIndexManager in this.SearchIndexManagers)
@@ -97,6 +98,21 @@ namespace Nucleus.Core.Search
 
 			this.Logger.LogInformation("Search Index Feeder Completed.");
 			progress.Report(new ScheduledTaskProgress() { Status = ScheduledTaskProgress.State.Succeeded });
+		}
+
+		private string ParseUrl(string url)
+		{
+			if (url.StartsWith('~'))
+			{
+				url = url.Substring(1);
+			}
+			
+			if (!url.EndsWith('/'))
+			{
+				url += "/";
+			}
+
+			return url;
 		}
 	}
 }

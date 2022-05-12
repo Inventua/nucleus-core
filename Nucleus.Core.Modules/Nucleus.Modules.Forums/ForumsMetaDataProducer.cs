@@ -75,21 +75,18 @@ namespace Nucleus.Modules.Forums
 		private async Task<List<ContentMetaData>> BuildContentMetaData(Site site, PageModule module, Models.Forum forum)
 		{
 			Page page = await this.PageManager.Get(module.PageId);
-			Uri pageUri = null;
+			//Uri pageUri = null;
 			List<ContentMetaData> results = new();
-
+			
 			if (page != null)
 			{
 				string pageUrl = UrlHelperExtensions.RelativePageLink(page);
 
-				if (!String.IsNullOrEmpty(pageUrl))
-				{
-					pageUri = new System.Uri(new System.Uri("http" + Uri.SchemeDelimiter + site.DefaultSiteAlias.Alias), pageUrl.Replace("~", ""));
-				}
-			}
-
-			if (pageUri != null)
-			{
+				//if (!String.IsNullOrEmpty(pageUrl))
+				//{
+				//	pageUri = new System.Uri(new System.Uri((useSsl ? "https" : "http") + Uri.SchemeDelimiter + site.DefaultSiteAlias.Alias), pageUrl.Replace("~", ""));
+				//}
+			
 				foreach (Models.Post post in await this.ForumsManager.ListPosts(forum, null, Models.FlagStates.IsTrue))
 				{
 					StringBuilder content = new(post.Body);
@@ -98,7 +95,7 @@ namespace Nucleus.Modules.Forums
 					{
 						Site = site,
 						Title = post.Subject,
-						Url = new System.Uri(pageUri, forum.Name.FriendlyEncode() + $"/{post.Id}").ToString(),
+						Url = pageUrl + forum.Name.FriendlyEncode() + $"/{post.Id}",
 						PublishedDate = post.DateAdded,
 						SourceId = post.Id,
 						Scope = Models.Post.URN,
@@ -121,7 +118,7 @@ namespace Nucleus.Modules.Forums
 
 			return null;
 		}
-
+			
 		private List<Role> GetViewRoles(Models.Forum forum)
 		{
 			return

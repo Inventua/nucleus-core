@@ -40,7 +40,7 @@ namespace Nucleus.Modules.Documents
 		{
 			// This must match the value in package.xml
 			Guid moduleDefinitionId = Guid.Parse("28df7ff3-6407-459e-8608-c1ef4181807c");
-
+			
 			List<ContentMetaData> results = new();
 
 			if (site.DefaultSiteAlias == null)
@@ -61,6 +61,7 @@ namespace Nucleus.Modules.Documents
 			return results.Where(result=>result != null);
 		}
 
+		
 		/// <summary>
 		/// Return a meta-data entry for the document meta-data
 		/// </summary>
@@ -73,26 +74,17 @@ namespace Nucleus.Modules.Documents
 			// Get document meta-data, using the linked file as "content"
 			//Guid pageId = this.PageModuleManager.GetPageId(module);
 			Page page = await this.PageManager.Get(module.PageId);
-			Uri pageUri = null;
-
+			
 			if (page != null && document.File != null)
 			{
 				string pageUrl = UrlHelperExtensions.RelativePageLink(page);
 
-				if (!String.IsNullOrEmpty(pageUrl))
-				{
-					pageUri = new System.Uri(new System.Uri("http" + Uri.SchemeDelimiter + site.DefaultSiteAlias.Alias), pageUrl.Replace("~", ""));
-				}
-			}
-
-			if (pageUri != null)
-			{
 				ContentMetaData documentContentItem = new()
 				{
 					Site = site,
-					Title = !String.IsNullOrEmpty(module.Title) ? module.Title : !String.IsNullOrEmpty(page.Title) ? page.Title : page.Name,
-					Url = pageUri.ToString(),
-					PublishedDate = page.DateChanged.HasValue ? page.DateChanged : page.DateAdded,
+					Title = (!String.IsNullOrEmpty(module.Title) ? module.Title : !String.IsNullOrEmpty(page.Title) ? page.Title : page.Name) + (!String.IsNullOrEmpty(document.Title) ? " - " + document.Title : ""),
+					Url =  pageUrl,
+					PublishedDate = document.File.DateChanged.HasValue ? document.File.DateChanged : document.File.DateAdded,
 					SourceId = document.Id,
 					Scope = Models.Document.URN,
 					Roles = await GetViewRoles(module),

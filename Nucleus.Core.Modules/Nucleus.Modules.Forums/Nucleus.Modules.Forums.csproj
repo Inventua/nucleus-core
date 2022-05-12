@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup Label="Globals">
     <SccProjectName></SccProjectName>
     <SccProvider></SccProvider>
@@ -10,7 +10,7 @@
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
 		<RootNamespace>Nucleus.Modules.Forums</RootNamespace>
-  </PropertyGroup>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -72,6 +72,10 @@
     <PackageReference Include="Nucleus.Data.EntityFramework" Version="1.0.0" />
     <PackageReference Include="Nucleus.Extensions" Version="1.0.0.3-a4" />
     <PackageReference Include="Nucleus.ViewFeatures" Version="1.0.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="EmailTemplates\" />
   </ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

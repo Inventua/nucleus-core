@@ -118,7 +118,7 @@ namespace Nucleus.Extensions.ElasticSearch
 				Scope = document.Scope,
 				SourceId = document.SourceId,
 				ContentType = document.ContentType,
-				PublishedDate = document.PublishedDate.Value,
+				PublishedDate = document.PublishedDate,
 
 				Size = document.Size,
 				Keywords = document.Keywords,

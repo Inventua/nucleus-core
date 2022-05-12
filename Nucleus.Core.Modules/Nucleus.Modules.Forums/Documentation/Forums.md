@@ -70,3 +70,5 @@ Use the `Forums` tab to add forums to a forum group.  The `Forums` tab is not av
 
 ## Notes
 System administrator users do not receive moderation notification emails, because system administrators can't be assigned to a role.
+
+The forums module includes a content meta-data (search content) provider, which provides content from forum posts for the search engine.

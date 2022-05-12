@@ -88,7 +88,7 @@ namespace Nucleus.Core.Search
 					Site = site,
 					Title = !string.IsNullOrEmpty(page.Title) ? page.Title : page.Name,
 					Summary = page.Description,
-					Url = pageUri.ToString(),
+					Url = pageRelativeUrl,
 					PublishedDate = page.DateChanged.HasValue ? page.DateChanged : page.DateAdded,
 					SourceId = page.Id,
 					Scope = Page.URN,

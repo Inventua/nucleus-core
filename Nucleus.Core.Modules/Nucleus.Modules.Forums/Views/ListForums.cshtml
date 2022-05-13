@@ -6,6 +6,9 @@
 @Html.AddStyle("~!/../viewer.css")
 @Html.AddStyle("~/Resources/css/forms.css")
 <div class="Forums">
+	<div class="nucleus-form-tools">
+	@Html.LinkButton("","Manage Subscriptions", Url.NucleusAction("ManageSubscriptions", "Forums", "Forums"), new { @class = "btn btn-primary", @data_target = ".Forums.parent()" })
+	</div>
 	@foreach (var group in Model.Groups)
 	{
 		<table class="forums-list">

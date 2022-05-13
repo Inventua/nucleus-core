@@ -33,6 +33,7 @@
     <None Remove="Views\ForumEditor.cshtml" />
     <None Remove="Views\GroupEditor.cshtml" />
     <None Remove="Views\ListForums.cshtml" />
+    <None Remove="Views\ManageSubscriptions.cshtml" />
     <None Remove="Views\ReplyPost.cshtml" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\ViewForum.cshtml" />
@@ -46,6 +47,7 @@
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
     <Content Include="settings.css" />
+    <Content Include="Views\ManageSubscriptions.cshtml" />
     <Content Include="Views\_ForumList.cshtml" />
     <Content Include="Views\ReplyPost.cshtml" />
     <Content Include="Views\ForumEditor.cshtml" />

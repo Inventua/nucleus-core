@@ -77,6 +77,12 @@ namespace Nucleus.Modules.Forums.Controllers
 			}
 		}
 
+		[HttpGet]
+		public async Task<ActionResult> ManageSubscriptions()
+		{
+			return View("ManageSubscriptions", await BuildSubscriptionsViewModel());			
+		}
+
 		[HttpPost]
 		public async Task<ActionResult> ViewForum(ViewModels.ViewForum viewModel)
 		{
@@ -319,11 +325,23 @@ namespace Nucleus.Modules.Forums.Controllers
 		{
 			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
-			// UnSubscribe from the forum 
+			// Unsubscribe from the forum 
 			await this.ForumsManager.UnSubscribe(forum, HttpContext.User);
 
 			return await BuildViewForumView(forum.Id, viewModel.Posts);
 		}
+
+		[HttpPost]
+		public async Task<ActionResult> ManageUnSubscribeForum(ViewModels.ManageSubscriptions viewModel, Guid forumId)
+		{
+			Models.Forum forum = await this.ForumsManager.Get(forumId);
+
+			// Unsubscribe from the forum 
+			await this.ForumsManager.UnSubscribe(forum, HttpContext.User);
+
+			return View("ManageSubscriptions", await BuildSubscriptionsViewModel());
+		}
+
 
 		[HttpPost]
 		public async Task<ActionResult> SubscribePost(ViewModels.ViewForumPost viewModel)
@@ -346,10 +364,21 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> UnSubscribePost(ViewModels.ViewForumPost viewModel)
 		{
-			// UnSubscribe from the forum post
+			// Unsubscribe from the forum post
 			await this.ForumsManager.UnSubscribe(viewModel.Post, HttpContext.User);
 
 			return await ViewPost(viewModel.Post.Id);
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> ManageUnSubscribePost(ViewModels.ManageSubscriptions viewModel, Guid forumPostId)
+		{
+			Post post = await this.ForumsManager.GetForumPost(forumPostId);
+
+			// Unsubscribe from the forum post
+			await this.ForumsManager.UnSubscribe(post, HttpContext.User);
+
+			return View("ManageSubscriptions", await BuildSubscriptionsViewModel());
 		}
 
 		[HttpPost]
@@ -872,6 +901,13 @@ namespace Nucleus.Modules.Forums.Controllers
 			ViewModels.Settings viewModel = new();
 			viewModel.Groups = await this.GroupsManager.List(this.Context.Module);
 			return viewModel;
+		}
+
+		private async Task<ViewModels.ManageSubscriptions> BuildSubscriptionsViewModel()
+		{
+			ViewModels.ManageSubscriptions manageSubscriptions = new();
+			manageSubscriptions.Subscriptions = await this.ForumsManager.GetUserSubscriptions(User);
+			return manageSubscriptions;
 		}
 	}
 }

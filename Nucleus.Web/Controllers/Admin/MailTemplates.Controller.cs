@@ -70,6 +70,29 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
+		public async Task<ActionResult> Verify(ViewModels.Admin.MailTemplateEditor viewModel)
+		{
+			{
+				var result = await Nucleus.Extensions.Razor.RazorParser.TestCompile(viewModel.MailTemplate.Subject);
+				if (!result.Success)
+				{
+					return Json(new { Title = "Error Compiling Subject", Message = result.Errors });
+				}
+			}
+
+			{
+				var result = await Nucleus.Extensions.Razor.RazorParser.TestCompile(viewModel.MailTemplate.Body);
+				if (!result.Success)
+				{
+					return Json(new { Title = "Error Compiling Body", Message = result.Errors });
+				}
+			}
+
+			return Json(new { Title = "Verify", Message = "The subject and message body were test-compiled successfully." });
+		}
+
+
+		[HttpPost]
 		public async Task<ActionResult> Save(ViewModels.Admin.MailTemplateEditor viewModel)
 		{
 			if (!ControllerContext.ModelState.IsValid)

@@ -1,16 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Label="Globals">
-    <SccProjectName></SccProjectName>
-    <SccProvider></SccProvider>
-    <SccAuxPath></SccAuxPath>
-    <SccLocalPath></SccLocalPath>
-  </PropertyGroup>
-	
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">	
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<RootNamespace>Nucleus.Extensions.ElasticSearch</RootNamespace>
+		<EnableDefaultContentItems>false</EnableDefaultContentItems>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+		<RazorCompileOnBuild>false</RazorCompileOnBuild>
   </PropertyGroup>
 
 	<ItemGroup>

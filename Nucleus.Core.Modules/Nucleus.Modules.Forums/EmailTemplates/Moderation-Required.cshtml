@@ -1,0 +1,41 @@
+﻿@Model.User.UserName,
+
+<p>New messages have been posted that require moderation in the forums at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>: </p>
+
+@foreach (var forum in Model.Forums)
+{
+	<a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
+
+	<table>
+		<tr>
+			<th>Subject</th>
+			<th>Author</th>
+			<th>Date</th>
+		</tr>
+		<tr>
+			<td colspan="3"><h2>Posts</h2></td>
+		</tr>
+		@foreach (var post in forum.Posts)
+		{
+		<tr>
+			<td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
+			<td>@post.PostedBy.UserName</td>
+			<td>@post.DateAdded</td>
+		</tr>
+		}
+		@if (((IEnumerable<object>)forum.Replies).Any())
+		{
+			<tr>
+				<td colspan="3"><h2>Replies</h2></td>
+			</tr>
+			@foreach (var reply in forum.Replies)
+			{
+				<tr>
+					<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
+					<td>@reply.PostedBy.UserName</td>
+					<td>@reply.DateAdded</td>
+				</tr>
+			}
+		}
+	</table>
+}

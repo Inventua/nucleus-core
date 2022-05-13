@@ -54,10 +54,13 @@ namespace Nucleus.Modules.Forums.Controllers
 			}
 			else
 			{
-				//if (postId == Guid.Empty)
-				//{
-				// display selected forum (and post, if specified)
 				string[] parameters = this.Context.Parameters.Split('/');
+
+				if (parameters.FirstOrDefault() == "manage-subscriptions")
+				{
+					return View("ManageSubscriptions", await BuildSubscriptionsViewModel());
+				}
+
 				Models.Forum forum = await this.GroupsManager.FindForum(this.Context.Module, parameters[0]);
 				if (forum != null)
 				{

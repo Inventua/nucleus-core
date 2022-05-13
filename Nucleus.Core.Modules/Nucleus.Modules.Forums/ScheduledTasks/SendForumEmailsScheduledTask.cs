@@ -99,7 +99,7 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 					model.Site = site;
 					model.Page = page;
 					model.User = user.GetCensored();
-
+					
 					Logger.LogTrace("Sending forum email template {name} to user {userid}.", template.Name, user.Id);
 
 					using (IMailClient mailClient = this.MailClientFactory.Create(site))

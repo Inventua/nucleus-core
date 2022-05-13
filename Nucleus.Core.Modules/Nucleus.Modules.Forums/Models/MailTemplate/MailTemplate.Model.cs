@@ -12,7 +12,7 @@ namespace Nucleus.Modules.Forums.Models.MailTemplate
 		public List<Forum> Forums { get; } = new();
 		public Site Site { get; set; }
 		public Page Page { get; set; }
-		public User User { get; set; }
+		public User User { get; set; }		
 
 	}
 

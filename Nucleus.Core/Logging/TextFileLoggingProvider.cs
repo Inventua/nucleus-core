@@ -22,15 +22,17 @@ namespace Nucleus.Core.Logging
   {
     internal DateTime LastExpiredDocumentsCheckDate { get; set; }
     public TextFileLoggerOptions Options { get; }
-    
-    public TextFileLoggingProvider(IOptions<TextFileLoggerOptions> TextFileLoggerOptions)
+    private IExternalScopeProvider ScopeProvider { get; set; }
+
+    public TextFileLoggingProvider(IOptions<TextFileLoggerOptions> TextFileLoggerOptions, IExternalScopeProvider scopeProvider)
 		{
       this.Options = TextFileLoggerOptions.Value;
+      this.ScopeProvider = scopeProvider;
     }
 
 		public ILogger CreateLogger(string categoryName)
 		{
-      return new TextFileLogger(this, Options, categoryName);
+      return new TextFileLogger(this, this.Options, this.ScopeProvider, categoryName);
 		}
 
 		public void Dispose()

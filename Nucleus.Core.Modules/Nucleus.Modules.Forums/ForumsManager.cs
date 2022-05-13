@@ -301,22 +301,21 @@ namespace Nucleus.Modules.Forums
 			return reply;
 		}
 
-
-		public async Task<IList<Post>> ListPosts(Forum forum, ClaimsPrincipal user, Models.FlagStates approved)
+		public async Task<IList<Post>> ListPosts(Forum forum, Models.FlagStates approved)
 		{
-			IList<Post> posts;
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				return await provider.ListForumPosts(forum, approved);
+			}
+		}
+
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListPosts(Forum forum, ClaimsPrincipal user, Nucleus.Abstractions.Models.Paging.PagingSettings settings, Models.FlagStates approved)
+		{
+			Nucleus.Abstractions.Models.Paging.PagedResult<Post> posts;
 
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				posts = await provider.ListForumPosts(forum, approved);
-
-				if (user != null)
-				{
-					foreach (Post post in posts)
-					{
-						post.Tracking = await GetPostTracking(post, user);
-					}
-				}
+				posts = await provider.ListForumPosts(forum, settings, approved);
 			}
 
 			return posts;

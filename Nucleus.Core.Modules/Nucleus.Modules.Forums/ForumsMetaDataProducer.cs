@@ -75,19 +75,13 @@ namespace Nucleus.Modules.Forums
 		private async Task<List<ContentMetaData>> BuildContentMetaData(Site site, PageModule module, Models.Forum forum)
 		{
 			Page page = await this.PageManager.Get(module.PageId);
-			//Uri pageUri = null;
 			List<ContentMetaData> results = new();
 			
 			if (page != null)
 			{
 				string pageUrl = UrlHelperExtensions.RelativePageLink(page);
-
-				//if (!String.IsNullOrEmpty(pageUrl))
-				//{
-				//	pageUri = new System.Uri(new System.Uri((useSsl ? "https" : "http") + Uri.SchemeDelimiter + site.DefaultSiteAlias.Alias), pageUrl.Replace("~", ""));
-				//}
-			
-				foreach (Models.Post post in await this.ForumsManager.ListPosts(forum, null, Models.FlagStates.IsTrue))
+							
+				foreach (Models.Post post in await this.ForumsManager.ListPosts(forum, Models.FlagStates.IsTrue))
 				{
 					StringBuilder content = new(post.Body);
 					

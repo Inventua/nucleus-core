@@ -22,7 +22,10 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public Task DeleteGroup(Group group);
 
 		public Task<Post> GetForumPost(Guid id);
+
 		public Task<IList<Post>> ListForumPosts(Forum forum, FlagStates approved);
+		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListForumPosts(Forum forum, Nucleus.Abstractions.Models.Paging.PagingSettings settings, FlagStates approved);
+
 		public Task SaveForumPost(Forum forum, Post post);
 		public Task DeleteForumPost(Post post);
 		public Task SetForumPostPinned(Post post, Boolean value);

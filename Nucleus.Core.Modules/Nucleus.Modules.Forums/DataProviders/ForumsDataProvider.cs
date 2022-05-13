@@ -361,8 +361,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 		}
 
 		public async Task<IList<Post>> ListForumPosts(Forum forum, FlagStates approved)
-		{
-			IList<Post> results = await this.Context.Posts
+		{			
+			return await this.Context.Posts
 				.Where(post => post.ForumId == forum.Id && (approved == FlagStates.IsAny || (post.IsApproved == (approved == FlagStates.IsTrue))))
 				.Include(post => post.Status)
 				.Include(post => post.Attachments)
@@ -372,11 +372,38 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.ThenByDescending(post => post.DateAdded)
 				.AsSplitQuery()
 				.ToListAsync();
+		}
 
-			foreach (Post result in results)
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListForumPosts(Forum forum, Nucleus.Abstractions.Models.Paging.PagingSettings settings, FlagStates approved)
+		{
+			Nucleus.Abstractions.Models.Paging.PagedResult<Post> results = new(settings);
+
+			var query = this.Context.Posts
+				.Where(post => post.ForumId == forum.Id && (approved == FlagStates.IsAny || (post.IsApproved == (approved == FlagStates.IsTrue))))
+				.Include(post => post.Status)
+				.Include(post => post.Attachments)
+					.ThenInclude(attachment => attachment.File)
+				.Include(post => post.PostedBy);
+
+			results.TotalCount = await query
+				.OrderByDescending(post => post.IsPinned)
+				.ThenByDescending(post => post.DateAdded)
+				.CountAsync();
+
+			IList<Post> posts = await query
+				.OrderByDescending(post => post.IsPinned)
+				.ThenByDescending(post => post.DateAdded)
+				.Skip(settings.FirstRowIndex)
+				.Take(settings.PageSize)
+				.AsSplitQuery()
+				.ToListAsync();
+
+			foreach (Post post in posts)
 			{
-				result.Statistics = await GetPostStatistics(result.Id);
+				post.Statistics = await GetPostStatistics(post.Id);
 			}
+
+			results.Items = posts;
 
 			return results;
 		}

@@ -38,7 +38,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult> Index()//Guid postId
+		public async Task<ActionResult> Index()
 		{
 			if (String.IsNullOrEmpty(this.Context.Parameters))
 			{
@@ -56,39 +56,38 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				//if (postId == Guid.Empty)
 				//{
-					// display selected forum (and post, if specified)
-					string[] parameters = this.Context.Parameters.Split('/');
-					Models.Forum forum = await this.GroupsManager.FindForum(this.Context.Module, parameters[0]);
-					if (forum != null)
+				// display selected forum (and post, if specified)
+				string[] parameters = this.Context.Parameters.Split('/');
+				Models.Forum forum = await this.GroupsManager.FindForum(this.Context.Module, parameters[0]);
+				if (forum != null)
+				{
+					if (parameters.Length > 1)
 					{
-						if (parameters.Length > 1)
-						{ 
-							return await ViewPost(Guid.Parse(parameters[1]));
-						}
-						else
-						{
-							return await ViewForum(forum.Id);
-						}
+						return await ViewPost(Guid.Parse(parameters[1]));
 					}
 					else
 					{
-						return NotFound();
+						return await BuildViewForumView(forum.Id, new());
 					}
-				//}
-				//else
-				//{
-				//	// display selected post
-				//	return await ViewPost(postId);
-				//}
-
+				}
+				else
+				{
+					return NotFound();
+				}
 			}
 		}
 
-		private async Task<ActionResult> ViewForum(Guid forumId)
+		[HttpPost]
+		public async Task<ActionResult> ViewForum(ViewModels.ViewForum viewModel)
+		{
+			return await BuildViewForumView(viewModel.Forum.Id, viewModel.Posts);
+		}
+
+		private async Task<ActionResult> BuildViewForumView(Guid forumId, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
 		{
 			try
 			{
-				return View("ViewForum", await BuildViewForumViewModel(forumId));
+				return View("ViewForum", await BuildViewForumViewModel(forumId, pagingSettings));
 			}
 			catch (UnauthorizedAccessException)
 			{
@@ -136,9 +135,9 @@ namespace Nucleus.Modules.Forums.Controllers
 				viewModel.Forum.EffectiveSettings().AttachmentsFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Forum.EffectiveSettings().AttachmentsFolder.Id);
 				using (System.IO.Stream fileStream = mediaFile.OpenReadStream())
 				{
-					Models.Attachment attachment = new() 
-					{ 
-						 File = await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.Forum.EffectiveSettings().AttachmentsFolder.Provider, viewModel.Forum.EffectiveSettings().AttachmentsFolder.Path, mediaFile.FileName, fileStream, false)
+					Models.Attachment attachment = new()
+					{
+						File = await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.Forum.EffectiveSettings().AttachmentsFolder.Provider, viewModel.Forum.EffectiveSettings().AttachmentsFolder.Path, mediaFile.FileName, fileStream, false)
 					};
 
 					viewModel.Post.Attachments.Add(attachment);
@@ -204,7 +203,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		{
 			viewModel.Forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
-			Models.Attachment attachment = viewModel.Reply.Attachments.Where(attachment=>attachment.Id == id).FirstOrDefault();
+			Models.Attachment attachment = viewModel.Reply.Attachments.Where(attachment => attachment.Id == id).FirstOrDefault();
 			if (attachment != null)
 			{
 				viewModel.Reply.Attachments.Remove(attachment);
@@ -224,7 +223,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		{
 			ViewModels.ViewForumPost viewModel = await BuildPostViewModel(Guid.Empty, id, true);
 
-			if (viewModel.Forum!= null && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_VIEW))
+			if (viewModel.Forum != null && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_VIEW))
 			{
 				await this.ForumsManager.SavePostTracking(viewModel.Post, HttpContext.User);
 				return View("ViewPost", viewModel);
@@ -277,8 +276,8 @@ namespace Nucleus.Modules.Forums.Controllers
 			await this.ForumsManager.SavePost(this.Context.Site, User, forum, viewModel.Post);
 			await this.ForumsManager.SavePostTracking(viewModel.Post, HttpContext.User);
 
-			return await ViewForum(forum.Id);
-			
+			return await BuildViewForumView(forum.Id, new());
+
 		}
 
 		[HttpPost]
@@ -311,7 +310,7 @@ namespace Nucleus.Modules.Forums.Controllers
 				return BadRequest();
 			}
 
-			return await ViewForum(forum.Id);			
+			return await BuildViewForumView(forum.Id, viewModel.Posts);
 		}
 
 
@@ -323,7 +322,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			// UnSubscribe from the forum 
 			await this.ForumsManager.UnSubscribe(forum, HttpContext.User);
 
-			return await ViewForum(forum.Id);
+			return await BuildViewForumView(forum.Id, viewModel.Posts);
 		}
 
 		[HttpPost]
@@ -368,7 +367,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.ApproveForumPost(viewModel.Post, true);
 
-			return await ViewForum(forum.Id);
+			return await BuildViewForumView(forum.Id, new());
 		}
 
 
@@ -387,7 +386,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.RejectForumPost(forum, viewModel.Post);
 
-			return await ViewForum(forum.Id);
+			return await BuildViewForumView(forum.Id, new());
 		}
 
 		[HttpPost]
@@ -405,7 +404,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.PinForumPost(viewModel.Post, true);
 
-			return await ViewForum(forum.Id);
+			return await BuildViewForumView(forum.Id, new());
 		}
 
 		[HttpPost]
@@ -423,7 +422,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.LockForumPost(viewModel.Post, true);
 
-			return await ViewForum(forum.Id);
+			return await BuildViewForumView(forum.Id, new());
 		}
 
 		[HttpPost]
@@ -441,7 +440,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.DeleteForumPost(forum, viewModel.Post);
 
-			return await ViewForum(forum.Id);
+			return await BuildViewForumView(forum.Id, new());
 		}
 
 
@@ -630,7 +629,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		/// Create a "view forum" viewmodel and populate it
 		/// </summary>
 		/// <returns></returns>
-		private async Task<ViewModels.ViewForum> BuildViewForumViewModel(Guid forumId)
+		private async Task<ViewModels.ViewForum> BuildViewForumViewModel(Guid forumId, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
 		{
 			ViewModels.ViewForum viewModel = new();
 
@@ -647,16 +646,16 @@ namespace Nucleus.Modules.Forums.Controllers
 
 					if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE))
 					{
-						viewModel.Posts = await this.ForumsManager.ListPosts(forum, HttpContext.User,  Models.FlagStates.IsAny);
+						viewModel.Posts = await this.ForumsManager.ListPosts(forum, HttpContext.User, pagingSettings, Models.FlagStates.IsAny);
 					}
 					else
 					{
-						viewModel.Posts = await this.ForumsManager.ListPosts(forum, HttpContext.User, Models.FlagStates.IsTrue);
+						viewModel.Posts = await this.ForumsManager.ListPosts(forum, HttpContext.User, pagingSettings, Models.FlagStates.IsTrue);
 					}
 
 					viewModel.Subscription = await this.ForumsManager.GetSubscription(forum, HttpContext.User);
 					viewModel.CanPost = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_CREATE_POST);
-					viewModel.CanSubscribe = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE);										
+					viewModel.CanSubscribe = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE);
 				}
 				else
 				{
@@ -689,7 +688,7 @@ namespace Nucleus.Modules.Forums.Controllers
 				post = new();
 				subscription = null;
 			}
-						
+
 			// Check forum (view) permissions			
 			if (forum != null)
 			{
@@ -727,7 +726,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			viewModel.CanAttach = viewModel.Forum.EffectiveSettings().AllowAttachments && viewModel.Forum.EffectiveSettings().AttachmentsFolder != null && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_ATTACH_POST);
 			viewModel.CanPinPost = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_PIN_POST);
 			viewModel.CanLockPost = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_LOCK_POST);
-			viewModel.CanDeletePost = viewModel.Forum.EffectiveSettings().Enabled && (viewModel.Post.AddedBy.Equals(HttpContext.User.GetUserId()) || HttpContext.User.IsSiteAdmin(Context.Site))  &&  this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_DELETE_POST);
+			viewModel.CanDeletePost = viewModel.Forum.EffectiveSettings().Enabled && (viewModel.Post.AddedBy.Equals(HttpContext.User.GetUserId()) || HttpContext.User.IsSiteAdmin(Context.Site)) && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_DELETE_POST);
 			viewModel.CanSubscribe = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE);
 			viewModel.CanApprovePost = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_MODERATE);
 			viewModel.Replies = readReplies ? await ListReplies(viewModel.Forum, viewModel.Post) : new List<Models.Reply>();
@@ -776,7 +775,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		/// </remarks>
 		private Boolean CanEditPost(Models.Forum forum, Models.Post post)
 		{
-			if (!forum.EffectiveSettings().Enabled) return false; 
+			if (!forum.EffectiveSettings().Enabled) return false;
 
 			if (HttpContext.User.IsSystemAdministrator() || HttpContext.User.IsSiteAdmin(this.Context.Site))
 			{

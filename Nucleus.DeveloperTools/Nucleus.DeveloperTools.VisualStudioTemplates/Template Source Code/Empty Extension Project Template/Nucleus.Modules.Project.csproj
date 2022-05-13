@@ -4,6 +4,9 @@
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
 		<RootNamespace>$nucleus_extension_namespace$</RootNamespace>
+		<EnableDefaultContentItems>false</EnableDefaultContentItems>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+		<RazorCompileOnBuild>false</RazorCompileOnBuild>
   </PropertyGroup>
 
 	<ItemGroup>

@@ -1,16 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Label="Globals">
-    <SccProjectName></SccProjectName>
-    <SccProvider></SccProvider>
-    <SccAuxPath></SccAuxPath>
-    <SccLocalPath></SccLocalPath>
-  </PropertyGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
 		<RootNamespace>Nucleus.XmlDocumentation</RootNamespace>
-  </PropertyGroup>
+		<EnableDefaultContentItems>false</EnableDefaultContentItems>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+	</PropertyGroup>
+	
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>

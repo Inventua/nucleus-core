@@ -43,6 +43,7 @@ namespace Nucleus.Core.Logging
 			builder.Services.ConfigureOptions<ConfigureTextFileLogger>();
 
 			builder.Services.AddSingleton<ILoggerProvider, TextFileLoggingProvider>();
+			builder.Services.AddTransient<IExternalScopeProvider, LoggerExternalScopeProvider>();
 
 			// The TextFileLogger is used by the StartupLogger for logging during dependency injection setup.  The IOptions<FolderOptions> instance which is added to the  
 			// Dependency Injection container won't be configured yet when ConfigureTextFileLogger.PostConfigure is called for the instance which is used by StartupLogger,

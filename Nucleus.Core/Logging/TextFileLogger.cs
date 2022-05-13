@@ -11,7 +11,7 @@ using Nucleus.Abstractions.Models.TaskScheduler;
 namespace Nucleus.Core.Logging
 {
 	/// <summary>
-	/// The Text file logger writes log messages to files in %CommonApplicationData%\Nucleus\Logs.  
+	/// The Text file logger writes log messages to files in the folder specified by Options.Path.  
 	/// </summary>
 	/// <remarks>
 	/// A Text file logger is created by the <see cref="TextFileLoggingProvider"/>.  Text file logs are
@@ -25,17 +25,14 @@ namespace Nucleus.Core.Logging
 		private readonly static object syncObj = new();
 		private TextFileLoggingProvider Provider { get; }
 		private TextFileLoggerOptions Options { get; }
+		private IExternalScopeProvider ScopeProvider { get; set; }
 
-		// The scope stack must be static, because classes which call logging methods will have their own logger instances (created
-		// on-demand by TextFileLoggingProvider).  The AsyncLocal class is used to persist data within an async thread chain.  
-		// The scope stack is used to determine when logged messages are from a scheduled task and write them to separate files.
-		private static AsyncLocal<System.Collections.Stack> ScopeStack { get; } = new();
-
-		public TextFileLogger(TextFileLoggingProvider Provider, TextFileLoggerOptions Options, string Category)
+		public TextFileLogger(TextFileLoggingProvider Provider, TextFileLoggerOptions Options, IExternalScopeProvider scopeProvider, string Category)
 		{
 			this.Provider = Provider;
 			this.Options = Options;
 			this.Category = Category;			
+			this.ScopeProvider = scopeProvider;
 		}
 
 		public TextFileLogger(string Category)
@@ -50,19 +47,25 @@ namespace Nucleus.Core.Logging
 			if (IsEnabled(logLevel))
 			{
 				try
-				{
+				{					
 					message = FormatMessage(logLevel, eventId, state, exception, formatter);
+					
+					// Log message to the standard log file location
 					LogMessage(message);
-										
-					if (ScopeStack.Value?.Count > 0 && ScopeStack.Value?.Peek() is RunningTask)
+
+					// If the log scope contains a <RunningTask>, log message to the scheduled task log file location
+
+					// nullState isn't used for anything here.  The IExternalScopeProvider.ForEachScope method requires a TState & state object which allows
+					// an object to be passed to the callback but we don't need to do that.
+					Object nullState = null;
+					
+					this.ScopeProvider.ForEachScope<Object>((scope, state) =>
 					{
-						RunningTask logInfo = ScopeStack.Value?.Peek() as RunningTask;
-						// Log message again to the scheduled task log
-						if (logInfo != null)
+						if (scope as RunningTask != null)
 						{
-							LogMessage(logInfo, message);
+							LogMessage(scope as RunningTask, message);
 						}
-					}
+					}, nullState);
 				}
 				catch (Exception)
 				{
@@ -87,61 +90,7 @@ namespace Nucleus.Core.Logging
 			return true;
 		}
 
-		public IDisposable BeginScope<TState>(TState state)
-		{
-			if (ScopeStack.Value == null)
-			{
-				ScopeStack.Value = new();
-			}
-			ScopeStack.Value.Push(state);
-			return new DisposableScope(ScopeStack);
-		}
-
-		private class DisposableScope : IDisposable
-		{
-			Boolean _disposed = false;
-			AsyncLocal<System.Collections.Stack> ScopeStack;
-
-			public DisposableScope(AsyncLocal<System.Collections.Stack> scopeStack)
-			{
-				this.ScopeStack = scopeStack;
-			}
-
-			public void Dispose()
-			{
-				// Dispose of unmanaged resources.
-				Dispose(true);
-				// Suppress finalization.
-				GC.SuppressFinalize(this);
-			}
-
-			protected virtual void Dispose(bool disposing)
-			{
-				if (_disposed)
-				{
-					return;
-				}
-
-				if (disposing)
-				{
-					// dispose managed state (managed objects).
-					if (ScopeStack.Value.Count > 0)
-					{
-						ScopeStack.Value.Pop();
-					}
-				}
-
-				// TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-				// TODO: set large fields to null.
-
-				_disposed = true;
-			}
-
-			//public void Dispose(Boolean disposing)
-			//{
-			//	ScopeStack.Value.Pop();
-			//}
-		}
+		public IDisposable BeginScope<TState>(TState state) => ScopeProvider?.Push(state);
 
 		private void LogMessage(RunningTask task, string message)
 		{

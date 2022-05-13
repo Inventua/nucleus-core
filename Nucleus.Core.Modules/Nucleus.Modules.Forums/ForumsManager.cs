@@ -162,7 +162,7 @@ namespace Nucleus.Modules.Forums
 			List<User> users = new();
 
 			IEnumerable<Permission> permissions;
-			
+
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
 				if (forum.UseGroupSettings)
@@ -187,7 +187,7 @@ namespace Nucleus.Modules.Forums
 					}
 				}
 			}
-			
+
 			return users;
 		}
 
@@ -199,7 +199,7 @@ namespace Nucleus.Modules.Forums
 		/// <param name="site"></param>
 		/// <param name="Forums"></param>
 		public async Task Save(Group group, Forum forum)
-		{			
+		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
 				await provider.SaveForum(group, forum);
@@ -245,7 +245,7 @@ namespace Nucleus.Modules.Forums
 			}
 
 		}
-		
+
 		public Boolean CheckPermission(Site site, ClaimsPrincipal user, Forum forum, string permissionScope)
 		{
 			if (user.IsSystemAdministrator() || user.IsSiteAdmin(site))
@@ -295,7 +295,7 @@ namespace Nucleus.Modules.Forums
 			Reply reply;
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				reply = await provider .GetForumPostReply(replyId);
+				reply = await provider.GetForumPostReply(replyId);
 			}
 
 			return reply;
@@ -341,7 +341,7 @@ namespace Nucleus.Modules.Forums
 				if (forum.EffectiveSettings().StatusList != null)
 				{
 					// Status list won't be fully populated on postback so we have to read it 
-					forum.EffectiveSettings().StatusList = await this .ListManager.Get(forum.EffectiveSettings().StatusList.Id);
+					forum.EffectiveSettings().StatusList = await this.ListManager.Get(forum.EffectiveSettings().StatusList.Id);
 					post.Status = forum.EffectiveSettings().StatusList.Items.Where(item => item.Value.Equals("default", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 				}
 			}
@@ -349,8 +349,8 @@ namespace Nucleus.Modules.Forums
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
 				// List attachments before save, so we can compare to the post, to delete files for removed attachments
-				originalAttachments = await provider .ListPostAttachments(post.Id);
-			
+				originalAttachments = await provider.ListPostAttachments(post.Id);
+
 				await provider.SaveForumPost(forum, post);
 
 				foreach (Attachment original in originalAttachments)
@@ -394,7 +394,7 @@ namespace Nucleus.Modules.Forums
 				{
 					// Status list won't be fully populated on postback so we have to read it 
 					forum.EffectiveSettings().StatusList = await this.ListManager.Get(forum.EffectiveSettings().StatusList.Id);
-					await provider.SetForumPostStatus(post, forum.EffectiveSettings().StatusList.Items.Where(item => item.Value.Equals("rejected", StringComparison.OrdinalIgnoreCase)).FirstOrDefault());					
+					await provider.SetForumPostStatus(post, forum.EffectiveSettings().StatusList.Items.Where(item => item.Value.Equals("rejected", StringComparison.OrdinalIgnoreCase)).FirstOrDefault());
 				}
 			}
 		}
@@ -548,7 +548,7 @@ namespace Nucleus.Modules.Forums
 
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				results = await provider .ListForumPostReplies(post, approved);
+				results = await provider.ListForumPostReplies(post, approved);
 			}
 
 			return results;
@@ -612,7 +612,7 @@ namespace Nucleus.Modules.Forums
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				return await provider.GetForumSubscription(forum.Id, user.GetUserId()); 
+				return await provider.GetForumSubscription(forum.Id, user.GetUserId());
 			}
 		}
 
@@ -666,7 +666,7 @@ namespace Nucleus.Modules.Forums
 				return await provider.GetPostTracking(post.Id, user.GetUserId());
 			}
 		}
-		
+
 		public async Task SavePostTracking(Post post, ClaimsPrincipal user)
 		{
 			if (user.Identity.IsAuthenticated)
@@ -701,7 +701,7 @@ namespace Nucleus.Modules.Forums
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				return await provider.ListMailQueue();				
+				return await provider.ListMailQueue();
 			}
 		}
 
@@ -720,6 +720,13 @@ namespace Nucleus.Modules.Forums
 				await provider.TruncateMailQueue(sentBefore);
 			}
 		}
-	}
 
+		public async Task<UserSubscriptions> GetUserSubscriptions(ClaimsPrincipal user)
+		{
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				return await provider.ListUserSubscriptions(user.GetUserId());
+			}
+		}
+	}
 }

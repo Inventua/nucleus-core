@@ -1,0 +1,41 @@
+﻿@model Nucleus.Modules.Forums.ViewModels.ManageSubscriptions
+@using Nucleus.Extensions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Forums.ViewModels
+@if (!Model.Subscriptions.Forums.Any() && !Model.Subscriptions.Posts.Any())
+{
+	<h2>Manage Subscriptions</h2>
+	<div class="alert alert-primary" role="alert">You are not subscribed to any forums or posts.</div>
+}
+
+@using (Html.BeginNucleusForm("UnsubscribeForum", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = "form.parent()" }))
+{
+	@if (Model.Subscriptions.Forums.Any())
+	{
+		<h2>Forum Subscriptions</h2>
+		<table class="w-100">
+			@foreach (var forum in Model.Subscriptions.Forums)
+			{
+				<tr>
+					<td>@forum.Name</td>
+					<td class="w-25 text-end">@Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForum", "Forums", "Forums", new { forumId = forum.Id }), new { @class="btn btn-danger", @data_target = "form.parent()" })
+				</tr>
+			}
+		</table>
+	}
+
+	@if (Model.Subscriptions.Posts.Any())
+	{
+		<h2>Forum Post Subscriptions</h2>
+		<table class="w-100">
+			@foreach (var post in Model.Subscriptions.Posts)
+			{
+				<tr>
+					<td>@post.Subject</td>
+					<td class="w-25 text-end">@Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForumPost", "Forums", "Forums", new { forumPostId = post.Id }), new { @class="btn btn-danger", @data_target = "form.parent()" })</td>
+				</tr>
+			}
+		</table>
+	}
+}

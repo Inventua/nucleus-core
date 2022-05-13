@@ -1028,6 +1028,26 @@ namespace Nucleus.Modules.Forums.DataProviders
 		}
 
 		#endregion
+
+		public async Task<UserSubscriptions> ListUserSubscriptions(Guid userId)
+		{
+			UserSubscriptions results = new();
+
+			foreach (ForumSubscription subscription in await this.Context.ForumSubscriptions.Where(item => item.UserId == userId).ToListAsync())
+			{
+				Forum forum = await GetForum(subscription.ForumId);
+				results.Forums.Add(forum);
+			}
+
+			foreach (PostSubscription subscription in await this.Context.PostSubscriptions.Where(item => item.UserId == userId).ToListAsync())
+			{
+				Post post = await GetForumPost(subscription.ForumPostId);
+				results.Posts.Add(post);
+			}
+
+			return results;
+		}
+
 	}
 }
 

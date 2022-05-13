@@ -15,7 +15,7 @@ namespace Nucleus.Modules.Forums.ViewModels
 	{
 		public Page Page { get; set; }
 		public Forum Forum { get; set; }
-		public Nucleus.Abstractions.Models.Paging.PagedResult<Post> Posts { get; set; }
+		public Nucleus.Abstractions.Models.Paging.PagedResult<Post> Posts { get; set; } = new();
 		public ForumSubscription Subscription { get; set; }
 		public Boolean CanPost { get; set; }
 		public Boolean CanSubscribe { get; set; }

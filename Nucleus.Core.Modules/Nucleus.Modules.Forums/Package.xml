@@ -35,6 +35,7 @@
 				<file name="ViewPost.cshtml" />
 				<file name="EditPost.cshtml" />
 				<file name="ReplyPost.cshtml" />
+				<file name="ManageSubscriptions.cshtml" />
 			</folder>
 			
 		</component>

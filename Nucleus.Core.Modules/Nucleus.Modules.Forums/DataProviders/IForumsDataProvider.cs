@@ -71,5 +71,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public Task<IList<MailQueue>> ListMailQueue();
 		
 		public Task TruncateMailQueue(TimeSpan sentBefore);
+
+		public Task<UserSubscriptions> ListUserSubscriptions(Guid userId);
 	}
 }

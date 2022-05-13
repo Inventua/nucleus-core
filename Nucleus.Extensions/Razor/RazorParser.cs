@@ -10,10 +10,21 @@ using Nucleus.Abstractions.Mail;
 
 namespace Nucleus.Extensions.Razor
 {
-	internal class RazorParser
+	/// <summary>
+	/// Razor Parser methods.
+	/// </summary>
+	public class RazorParser
 	{
 		private static readonly Dictionary<string, object> CompiledTemplateCache = new();
+		private readonly static string[] UsingNamespaces = { "System" ,"System.Collections.Generic", "System.Linq", "System.Text", "Nucleus.Extensions", "Nucleus.Abstractions", "Nucleus.Abstractions.Models" };
 
+		/// <summary>
+		/// Compile and execute the template, using the supplied model as input.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="template"></param>
+		/// <param name="model"></param>
+		/// <returns></returns>
 		public static async Task<string> Parse<T>(string template, T model)
 			where T : class
 		{
@@ -37,14 +48,81 @@ namespace Nucleus.Extensions.Razor
 			{
 				instance.Model = model;
 			});
-
 		}
+
+		/// <summary>
+		/// Test-compile the template, throwing an exception on error.
+		/// </summary>
+		/// <param name="template"></param>
+		/// <returns></returns>
+		public static async Task<TestCompileResult> TestCompile(string template)
+		{
+			IRazorEngine engine = new RazorEngine();
+			IRazorEngineCompiledTemplate compiledTemplate = null;
+
+			try
+			{
+				compiledTemplate = await engine.CompileAsync(template, BuildRazorOptions);
+			}
+			catch (RazorEngineCompilationException ex)
+			{
+				return new TestCompileResult(false, ex.Errors.Select(err => $"{err.GetMessage()}, position {err.Location.GetLineSpan().StartLinePosition.Character} in source: <code>{GetSource(ex.GeneratedCode, err)}</code>"));				
+			}
+
+			return new TestCompileResult(true);
+		}
+
+		private static string GetSource(string code, Microsoft.CodeAnalysis.Diagnostic error)
+		{
+			string[] codeLines = code.Split(Environment.NewLine);
+
+			Microsoft.CodeAnalysis.FileLinePositionSpan location = error.Location.GetLineSpan();
+
+			return String.Join(" ", codeLines
+				.Skip(location.StartLinePosition.Line)
+				.Take(location.EndLinePosition.Line - location.StartLinePosition.Line+1));
+		}
+
+		/// <summary>
+		/// Return value for the TestCompile function.
+		/// </summary>
+		public class TestCompileResult
+		{
+			/// <summary>
+			/// Indicates that the template was compiled successfully (true) or had errors (false)
+			/// </summary>
+			public Boolean Success { get; }
+
+			/// <summary>
+			/// List of error messages when Success=false.
+			/// </summary>
+			public IEnumerable<string> Errors { get; }
+
+			internal TestCompileResult(Boolean success)
+			{
+				this.Success = success;
+			}
+
+			internal TestCompileResult(Boolean success, IEnumerable<string> errors)
+			{
+				this.Success = success;
+				this.Errors = errors;
+			}
+		}
+
 		private static void BuildRazorOptions(IRazorEngineCompilationOptionsBuilder builder)
 		{
+			builder.Options.TemplateFilename = " ";
+			builder.Options.DefaultUsings = new();
+
 			builder.AddAssemblyReference(typeof(System.Collections.Generic.CollectionExtensions).Assembly);
 			builder.AddAssemblyReference(typeof(Nucleus.Extensions.AssemblyExtensions).Assembly);
 			builder.AddAssemblyReference(typeof(Nucleus.Abstractions.Models.Page).Assembly);
 
+			foreach (string ns in UsingNamespaces)
+			{
+				builder.AddUsing(ns);
+			}
 			builder.AddUsing("System");
 			builder.AddUsing("System.Collections.Generic");
 			builder.AddUsing("System.Linq");

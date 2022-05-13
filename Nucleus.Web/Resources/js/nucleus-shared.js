@@ -580,6 +580,22 @@ function _Page()
 			okButton = '<button type="button" class="btn btn-primary" data-bs-dismiss="modal">' + okCaption + '</button>';
 		}
 
+		// convert array of messages into a list
+		if (Array.isArray(message))
+		{
+			var messages = new Array(message.length);
+			for (index = 0; index < message.length; index++)
+			{
+				messageItem = message[index].toString();
+				if (!messageItem.endsWith("."))
+				{
+					messageItem += '.';
+				}
+				messages[index] = '<li>' + messageItem + '</li>';
+			}
+			message = '<ul>' + messages.join('') + '</ul>';
+		}
+		
 		var dialogMarkup = jQuery(
 			'<div class="modal fade" id="' + DIALOG_ID + '" tabindex="-1" aria-label="' + title + '">' +
 			'  <div class="modal-dialog modal-dialog-centered modal-lg">' +

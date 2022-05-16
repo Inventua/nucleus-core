@@ -40,7 +40,16 @@ namespace Nucleus.Extensions.Authorization
 		/// <returns></returns>
 		public static Boolean IsSystemAdministrator(this System.Security.Claims.ClaimsPrincipal user)
 		{
-			return user.HasClaim(claim => claim.Type == Nucleus.Abstractions.Authentication.Constants.SYSADMIN_CLAIMTYPE);			
+			if (user.IsApproved() && user.IsVerified())
+			{
+				return user.HasClaim(claim => claim.Type == Nucleus.Abstractions.Authentication.Constants.SYSADMIN_CLAIMTYPE);
+			}
+			else
+			{
+				// If the user account isn't approved and verified, the user doesn't have system admin rights.  System admins can be 
+				// "un-approved" and/or "un-verified"
+				return false;
+			}		
 		}
 
 		/// <summary>
@@ -51,7 +60,15 @@ namespace Nucleus.Extensions.Authorization
 		/// <returns></returns>
 		public static Boolean IsSiteAdmin(this ClaimsPrincipal user, Site site)
 		{
-			return user.IsSystemAdministrator() || (site.AdministratorsRole != null &&  user.IsInRole(site.AdministratorsRole.Name));
+			if (user.IsApproved() && user.IsVerified())
+			{
+				return user.IsSystemAdministrator() || (site.AdministratorsRole != null && user.IsInRole(site.AdministratorsRole.Name));
+			}
+			else
+			{
+				// If the user account isn't approved and verified, the user doesn't have site admin rights
+				return false;
+			}
 		}
 
 		/// <summary>

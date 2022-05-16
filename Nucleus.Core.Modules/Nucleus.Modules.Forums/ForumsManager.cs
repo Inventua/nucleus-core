@@ -254,13 +254,21 @@ namespace Nucleus.Modules.Forums
 			}
 			else
 			{
-				foreach (Permission permission in forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions)
+				if (!user.IsApproved() || !user.IsVerified())
 				{
-					if (permission.PermissionType.Scope == permissionScope)
+					// if the user is not approved/verified, they don't have permission
+					return false;
+				}
+				else
+				{
+					foreach (Permission permission in forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions)
 					{
-						if (permission.IsValid(site, user))
+						if (permission.PermissionType.Scope == permissionScope)
 						{
-							return true;
+							if (permission.IsValid(site, user))
+							{
+								return true;
+							}
 						}
 					}
 				}

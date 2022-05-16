@@ -12,7 +12,7 @@
 		<div class="nucleus-form-tools">
 			@if (Model.CanReply && !Model.Post.IsLocked)
 			{
-				@Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @data_target = ".Forums.parent()" })
+				@Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @class = "btn btn-primary", @data_target = ".Forums.parent()" })
 			}
 			@if (Model.CanSubscribe && Model.Subscription == null)
 			{
@@ -74,7 +74,7 @@
 			<div class="nucleus-form-tools">
 				@if (Model.CanEditPost)
 				{
-					@Html.LinkButton("&#xe3c9;", "Edit", Url.NucleusAction("EditPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @class = "btn btn-primary", @data_target = ".Forums.parent()" })
+					@Html.LinkButton("&#xe3c9;", "Edit", Url.NucleusAction("EditPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @class = "btn btn-secondary", @data_target = ".Forums.parent()" })
 				}
 				@if (Model.CanDeletePost)
 				{
@@ -88,19 +88,19 @@
 					}
 					@if (Model.CanApprovePost && !Model.Post.IsApproved)
 					{
-						@Html.SubmitButton("", "Approve", Url.NucleusAction("ApproveForumPost", "Forums", "Forums"), new { @data_target = "form.parent()" })
+						@Html.SubmitButton("", "Approve", Url.NucleusAction("ApproveForumPost", "Forums", "Forums"), new { @class = "btn btn-success", @data_target = "form.parent()" })
 					}
 					@if (Model.CanApprovePost && !Model.Post.IsRejected == true)
 					{
-						@Html.SubmitButton("", "Reject", Url.NucleusAction("RejectForumPost", "Forums", "Forums"), new { @data_target = "form.parent()" })
+						@Html.SubmitButton("", "Reject", Url.NucleusAction("RejectForumPost", "Forums", "Forums"), new { @class = "btn btn-secondary", @data_target = "form.parent()" })
 					}
 					@if (Model.CanLockPost && !Model.Post.IsLocked)
 					{
-						@Html.SubmitButton("", "Lock", Url.NucleusAction("LockForumPost", "Forums", "Forums"), new { @data_target = "form.parent()" })
+						@Html.SubmitButton("", "Lock", Url.NucleusAction("LockForumPost", "Forums", "Forums"), new { @class = "btn btn-secondary", @data_target = "form.parent()" })
 					}
 					@if (Model.CanPinPost && !Model.Post.IsPinned)
 					{
-						@Html.SubmitButton("", "Pin", Url.NucleusAction("PinForumPost", "Forums", "Forums"), new { @data_target = "form.parent()" })
+						@Html.SubmitButton("", "Pin", Url.NucleusAction("PinForumPost", "Forums", "Forums"), new { @class = "btn btn-secondary", @data_target = "form.parent()" })
 					}
 				</div>
 			</div>

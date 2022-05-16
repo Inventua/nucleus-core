@@ -85,7 +85,21 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpGet]
 		public async Task<ActionResult> ManageSubscriptions()
 		{
-			return View("ManageSubscriptions", await BuildSubscriptionsViewModel());			
+			if (User.Identity.IsAuthenticated)
+			{
+				if (User.IsApproved() && User.IsVerified())
+				{
+					return View("ManageSubscriptions", await BuildSubscriptionsViewModel());
+				}
+				else
+				{
+					return Forbid();
+				}
+			}
+			else
+			{
+				return Unauthorized();
+			}
 		}
 
 		[HttpPost]

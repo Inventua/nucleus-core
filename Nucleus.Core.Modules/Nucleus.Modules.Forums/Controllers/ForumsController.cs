@@ -541,6 +541,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			}
 
 			await this.ForumsManager.SavePostReply(this.Context.Site, User, post, viewModel.Reply);
+			await this.ForumsManager.Subscribe(viewModel.Reply.Post, HttpContext.User);
 
 			return await ViewPost(viewModel.Post.Id);
 		}

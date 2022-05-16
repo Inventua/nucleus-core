@@ -36,7 +36,7 @@ You requested a user name reminder for (~Site.Name).  Your user name is (~User.U
 ```
 
 ### Collections
-The simple token parser can repeat a section if the data is represented as a collection type by using the `[~collection_object(content)]` syntax.
+The simple token parser can repeat a section if the data is represented as a collection type by using the `[~objectName(content)]` syntax.
 
 #### Example
 ```
@@ -52,20 +52,22 @@ The simple token parser can repeat a section if the data is represented as a col
 In the example above, the "posts" object is a collection of post objects.  The content is repeated for each item ("post") in the collection.
 
 ### Razor Templates
-The email template parser can parse Razor code.  Razor templates are used to implement more complex logic when generating emails.  Razor templates can also 
+The email template parser can parse [Razor](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor) code.  Razor templates are used to implement more complex logic when generating emails.  Razor templates can also 
 make use of the extension methods implemented in the Nucleus.Extensions assembly, which makes it easier to generate site and page Urls.
 
 #### Example
 ```
-You requested a user name reminder for <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name<a>.  Your user name is (~User.UserName).
+You requested a user name reminder for <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name<a>.  Your user name is @Model.User.UserName.
 ```
 
 Razor templates are more powerful than simple tokens, but are more difficult to prepare.  Razor templates must conform to Razor syntax rules, object names and 
 properties are case-sensitive, and if you refer to an object or property which does not exist or the template has any other errors, the email template parser will generate 
-an error, and the email will not be sent.  Errors are written to the Nucleus logs.
+an error, and the email will not be sent.  Errors are written to the Nucleus logs.  The mail template editor page has a "Verify Template" button which you can use to 
+test-compile your template.  This function won't detect all possible problems (some could happen at execution time), but it will test the syntax of your template.
 
-Unlike the .net core asp.net razor engine, the Razor template parser does not allow @model, @using or other directives.  `Using` directives for the `System`, 
-`System.Collections.Generic`, `System.Linq`, `System.Text`, `Nucleus.Extensions`, `Nucleus.Abstractions`, and `Nucleus.Abstractions.Models` namespaces are automatically 
-applied.
-
+#### Razor Parser Notes
+Unlike .Net Core ASP.net Razor, the Razor email template parser does not allow:
+- Html Helpers, because the Razor code is not executed as part of a Http request.
+- Tag Helpers
+- @model, @using or any other directives.  `Using` directives for the `System`, `System.Collections.Generic`, `System.Linq`, `System.Text`, `Nucleus.Extensions`, `Nucleus.Abstractions`, and `Nucleus.Abstractions.Models` namespaces are automatically applied.
 

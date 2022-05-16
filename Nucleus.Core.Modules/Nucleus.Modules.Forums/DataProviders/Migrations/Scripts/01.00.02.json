@@ -87,7 +87,7 @@
 						"Columns": [ "ReplyId" ],
 						"PrincipalTable": "ForumReplies",
 						"PrincipalColumns": [ "Id" ],
-						"OnDelete": "Cascade"
+						"OnDelete": "NoAction"
 					}
 				]
 			}

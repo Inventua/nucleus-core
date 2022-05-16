@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Forums.Models
 {
-	public class PostSubscription
+	public class PostSubscription : ModelBase
 	{
 		public Guid UserId { get; set; }
 		

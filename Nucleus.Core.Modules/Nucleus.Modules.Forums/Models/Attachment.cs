@@ -8,11 +8,10 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Forums.Models
 {
-	public class Attachment
+	public class Attachment : ModelBase 
 	{
 		public Guid Id { get; set; }
-		//public Guid ForumPostId { get; set; }
-		//public Guid ForumReplyId { get; set; }
+
 		public File File { get; set; }
 	}
 }

@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Nucleus.Modules.Forums.Models
 {
-	public class Group
+	public class Group : ModelBase
 	{
 		// Groups and forums have the same permissions namespace
 		public const string URN = Forum.URN;

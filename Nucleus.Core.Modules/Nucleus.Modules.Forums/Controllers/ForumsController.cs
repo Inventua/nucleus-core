@@ -26,6 +26,8 @@ namespace Nucleus.Modules.Forums.Controllers
 		private IRoleManager RoleManager { get; }
 		private IFileSystemManager FileSystemManager { get; }
 
+		internal const string MANAGE_SUBSCRIPTIONS_PATH = "manage-subscriptions";
+
 		public ForumsController(IWebHostEnvironment webHostEnvironment, Context Context, IPageModuleManager pageModuleManager, GroupsManager groupsManager, ForumsManager forumsManager, IMailTemplateManager mailTemplateManager, IRoleManager roleManager, IFileSystemManager fileSystemManager)
 		{
 			this.Context = Context;
@@ -56,7 +58,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				string[] parameters = this.Context.Parameters.Split('/');
 
-				if (parameters.FirstOrDefault() == "manage-subscriptions")
+				if (parameters.FirstOrDefault() == MANAGE_SUBSCRIPTIONS_PATH)
 				{
 					return View("ManageSubscriptions", await BuildSubscriptionsViewModel());
 				}
@@ -284,6 +286,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.SavePost(this.Context.Site, User, forum, viewModel.Post);
 			await this.ForumsManager.SavePostTracking(viewModel.Post, HttpContext.User);
+			await this.ForumsManager.Subscribe(viewModel.Post, HttpContext.User);
 
 			return await BuildViewForumView(forum.Id, new());
 

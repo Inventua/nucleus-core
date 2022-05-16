@@ -18,7 +18,7 @@
 		@foreach (var post in forum.Posts)
 		{
 		<tr>
-			<td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
+			<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
 			<td>@post.PostedBy.UserName</td>
 			<td>@post.DateAdded</td>
 		</tr>
@@ -39,3 +39,7 @@
 		}
 	</table>
 }
+
+You were sent this email because you are subscribed to a forum or post at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>, or are the
+original poster of this forum message.  You can <a href="@Model.Site.AbsoluteUrl(@Model.UnsubscribeRelativeUrl, true)">manage your subscriptions</a> 
+at <a href="@Model.Site.AbsoluteUrl(@Model.UnsubscribeRelativeUrl, true)">@Model.Site.AbsoluteUrl(@Model.UnsubscribeRelativeUrl, true)</a>.

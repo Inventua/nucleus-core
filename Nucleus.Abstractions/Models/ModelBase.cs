@@ -36,32 +36,32 @@ namespace Nucleus.Abstractions.Models
 		[XmlIgnore] 
 		public DateTime? DateChanged { get; set; }
 
-		///// <summary>
-		///// Copy the object to a new object
-		///// </summary>
-		///// <typeparam name="T"></typeparam>
-		///// <returns></returns>
-		//public T Copy<T>() where T : class
-		//{
-		//	string thisObject = Newtonsoft.Json.JsonConvert.SerializeObject(this);
-		//	return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(thisObject);			
-		//}
+		/// <summary>
+		/// Copy the object to a new object
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public T Copy<T>() where T : class
+		{
+			string thisObject = Newtonsoft.Json.JsonConvert.SerializeObject(this);
+			return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(thisObject);
+		}
 
-		///// <summary>
-		///// Shallow-copy the object to an existing object
-		///// </summary>
-		///// <typeparam name="T"></typeparam>
-		///// <returns></returns>
-		//public void CopyTo<T>(T target) where T : class
-		//{
-		//	foreach (System.Reflection.PropertyInfo prop in typeof(T).GetProperties())
-		//	{
-		//		System.Reflection.PropertyInfo thisProp = this.GetType().GetProperty(prop.Name);
-		//		if (thisProp != null && thisProp.CanRead && prop.CanWrite)
-		//		{
-		//			prop.SetValue(target, thisProp.GetValue(this));
-		//		}
-		//	}
-		//}
+		/// <summary>
+		/// Shallow-copy the object to an existing object
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <returns></returns>
+		public void CopyTo<T>(T target) where T : class
+		{
+			foreach (System.Reflection.PropertyInfo prop in typeof(T).GetProperties())
+			{
+				System.Reflection.PropertyInfo thisProp = this.GetType().GetProperty(prop.Name);
+				if (thisProp != null && thisProp.CanRead && prop.CanWrite)
+				{
+					prop.SetValue(target, thisProp.GetValue(this));
+				}
+			}
+		}
 	}
 }

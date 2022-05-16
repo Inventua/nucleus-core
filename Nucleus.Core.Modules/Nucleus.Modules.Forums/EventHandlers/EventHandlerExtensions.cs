@@ -22,19 +22,26 @@ namespace Nucleus.Modules.Forums.EventHandlers
 
 				foreach (User subscriber in subscribers)
 				{
-					MailQueue item = new()
+					// do not send a notification to the person who posted the message
+					if (subscriber.Id != post.AddedBy)
 					{
-						ModuleId = forum.Group.ModuleId,
-						UserId = subscriber.Id,
-						MailTemplateId = forum.EffectiveSettings().SubscriptionMailTemplateId.Value,
-						Post = post,
-						Reply = null
-					};
+						// do not send notifications to un-approved or un-verified users
+						if (subscriber.Approved && subscriber.Verified)
+						{
+							MailQueue item = new()
+							{
+								ModuleId = forum.Group.ModuleId,
+								UserId = subscriber.Id,
+								MailTemplateId = forum.EffectiveSettings().SubscriptionMailTemplateId.Value,
+								Post = post,
+								Reply = null
+							};
 
-					await forumsManager.SaveMailQueue(item);
+							await forumsManager.SaveMailQueue(item);
+						}
+					}
 				}
 			}
-
 		}
 
 		public static async Task CreateSubscriptionEmail(this Reply reply, ForumsManager forumsManager)
@@ -44,20 +51,28 @@ namespace Nucleus.Modules.Forums.EventHandlers
 
 			if (forum.EffectiveSettings().SubscriptionMailTemplateId.HasValue)
 			{
-				List<User> subscribers = await forumsManager.ListPostSubscribers(reply.Id);
+				List<User> subscribers = await forumsManager.ListPostSubscribers(reply.Post.Id);
 
 				foreach (User subscriber in subscribers)
 				{
-					MailQueue item = new()
+					// do not send a notification to the person who posted the reply
+					if (subscriber.Id != reply.AddedBy)
 					{
-						ModuleId = forum.Group.ModuleId,
-						UserId = subscriber.Id,
-						MailTemplateId = forum.EffectiveSettings().SubscriptionMailTemplateId.Value,
-						Post = reply.Post,
-						Reply = reply
-					};
+						// do not send notifications to un-approved or un-verified users
+						if (subscriber.Approved && subscriber.Verified)
+						{
+							MailQueue item = new()
+							{
+								ModuleId = forum.Group.ModuleId,
+								UserId = subscriber.Id,
+								MailTemplateId = forum.EffectiveSettings().SubscriptionMailTemplateId.Value,
+								Post = reply.Post,
+								Reply = reply
+							};
 
-					await forumsManager.SaveMailQueue(item);
+							await forumsManager.SaveMailQueue(item);
+						}
+					}
 				}
 			}
 		}

@@ -1,6 +1,6 @@
 ﻿@Model.User.UserName,
 
-<p>New messages have been posted to a forum that you are tracking at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>: </p>
+<p>New messages have been posted to forums or forum posts that you are tracking at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>: </p>
 
 @foreach (var forum in Model.Forums)
 {
@@ -40,6 +40,8 @@
 	</table>
 }
 
+<div>
 You were sent this email because you are subscribed to a forum or post at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>, or are the
 original poster of this forum message.  You can <a href="@Model.Site.AbsoluteUrl(@Model.UnsubscribeRelativeUrl, true)">manage your subscriptions</a> 
 at <a href="@Model.Site.AbsoluteUrl(@Model.UnsubscribeRelativeUrl, true)">@Model.Site.AbsoluteUrl(@Model.UnsubscribeRelativeUrl, true)</a>.
+</div>

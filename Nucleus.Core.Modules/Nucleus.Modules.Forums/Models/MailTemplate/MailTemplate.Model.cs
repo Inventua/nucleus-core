@@ -13,8 +13,6 @@ namespace Nucleus.Modules.Forums.Models.MailTemplate
 		public Site Site { get; set; }
 		public Page Page { get; set; }
 		public User User { get; set; }		
-		public string UnsubscribeRelativeUrl { get; set; }
-
 	}
 
 }

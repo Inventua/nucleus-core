@@ -23,7 +23,7 @@
 			<td>@post.DateAdded</td>
 		</tr>
 		}
-		@if (((IEnumerable<object>)forum.Replies).Any())
+		@if (forum.Replies.Any())
 		{
 			<tr>
 				<td colspan="3"><h2>Replies</h2></td>

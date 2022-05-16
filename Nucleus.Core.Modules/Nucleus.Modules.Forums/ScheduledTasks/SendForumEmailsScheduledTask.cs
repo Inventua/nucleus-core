@@ -96,10 +96,9 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 						model.Forums.Add(new Models.MailTemplate.Forum(forum, posts, replies));
 					}
 
-					model.Site = site;
-					model.Page = page;
+					model.Site = site.Copy<Site>();
+					model.Page = Models.MailTemplate.Page.Create(page, page.DefaultPageRoute().Path + $"/{Controllers.ForumsController.MANAGE_SUBSCRIPTIONS_PATH}");
 					model.User = user.GetCensored();
-					model.UnsubscribeRelativeUrl = model.Page.DefaultPageRoute().Path + $"/{Controllers.ForumsController.MANAGE_SUBSCRIPTIONS_PATH}";
 
 					Logger.LogTrace("Sending forum email template {name} to user {userid}.", template.Name, user.Id);
 

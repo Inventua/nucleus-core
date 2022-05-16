@@ -17,7 +17,7 @@ namespace Nucleus.Modules.Forums.Models
 		IsAny
 	}
 
-	public class Post : Nucleus.Abstractions.Models.ModelBase
+	public class Post : ModelBase
 	{
 		public const string URN = "urn:nucleus:entities:forum-post";
 

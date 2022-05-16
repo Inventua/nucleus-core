@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Nucleus.Modules.Forums.Models
 {
-	public class Reply : Nucleus.Abstractions.Models.ModelBase
+	public class Reply : ModelBase
 	{
 		public Guid Id { get; set; }
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Forums.Models
 {
-	public class Forum
+	public class Forum : ModelBase 
 	{
 		public const string URN = "urn:nucleus:entities:forum";
 

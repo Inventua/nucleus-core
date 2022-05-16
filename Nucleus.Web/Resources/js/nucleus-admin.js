@@ -59,10 +59,12 @@ function _handleContentLoaded(event, page, target, data, url, triggerEvent, stat
 	jQuery('.nucleus-control-panel .nucleus-control-panel-sidebar LI:not(#nucleus-edit-content-btn)').on('click.sidebar', AdminMenuItem_Click);
 
 	// Close the admin frame when the user clicks the close button at the top-right
-	jQuery('.nucleus-btn-close-frame').on('click', function () { ShowAdminFrame(false, ''); return false; });
+	jQuery('.nucleus-btn-close-frame').off('click.closeframe');
+	jQuery('.nucleus-btn-close-frame').on('click.closeframe', function () { ShowAdminFrame(false, ''); return false; });
 
 	// Edit button handler (toggle edit mode)
-	jQuery('#nucleus-edit-content-btn').on('click', ToggleEditMode);
+	jQuery('#nucleus-edit-content-btn').off('click.toggleMode');
+	jQuery('#nucleus-edit-content-btn').on('click.toggleMode', ToggleEditMode);
 	
 	function AdminMenuItem_Click(event)
 	{
@@ -148,7 +150,8 @@ function _handleContentLoaded(event, page, target, data, url, triggerEvent, stat
 	}
 
 	// Handler for the search results 'close' button
-	target.find('.nucleus-btn-close-results').on('click', function (event) { jQuery(this).parents('.nucleus-search-results').hide();});
+	target.find('.nucleus-btn-close-results').off('click.closeResults');
+	target.find('.nucleus-btn-close-results').on('click.closeResults', function (event) { jQuery(this).parents('.nucleus-search-results').hide();});
 
 	// initialize plugins
 	if (jQuery().HtmlEditor) { target.find('.HtmlEditorControl').HtmlEditor(); }

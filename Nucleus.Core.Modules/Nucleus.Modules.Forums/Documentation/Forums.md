@@ -1,9 +1,6 @@
 ## Forums module
 The forums module is a message board which allows your user community to participate in discussions, post questions and answers.
 
-> In version 1, the forums module is incomplete.  The subscription, moderation (all email notifications), post tracking (read/unread) and 
-search indexing features are not implemented.
-
 ## Groups
 Forums are always displayed within a forum group, and all forums must belong to a group.  Most settings for forums can be set at the 
 group level, but you can choose whether to use group settings or assign settings for each individual forum.
@@ -69,6 +66,275 @@ Use the `Forums` tab to add forums to a forum group.  The `Forums` tab is not av
 > The other settings and permissions for forums are the same as for forum groups (see above).
 
 ## Notes
-System administrator users do not receive moderation notification emails, because system administrators can't be assigned to a role.
+- System administrator users do not receive moderation notification emails, because system administrators can't be assigned to a role, and roles are used to control which users can moderate forum posts and replies.  
+- Users who create a reply or post are automatically subscribed to the post.
+- Users who are subscribed to a forum or post do not receive a subscription notification for their own messages.
+- The forums module includes a content meta-data (search content) provider, which provides content from forum posts for the search engine.
 
-The forums module includes a content meta-data (search content) provider, which provides content from forum posts for the search engine.
+## Email Templates
+The forums module can send email notifications for:
+- Subscriptions, to inform subscribed users of new posts and replies.
+- Moderators, to inform moderators that new posts or replies require approval.
+- Users who have created a new post or reply, to inform them that their message was approved or rejected.
+
+Email templates are managed by system administrators or site administrators in the `Manage`/`Mail Templates` control panel.  Refer 
+[here](/manage/mail-templates/) for more information on mail templates.  You must manually create mail templates for the forums to use.  After 
+you create the mail template(s), assign them to the forum in the forum group or forum configuration.
+
+### Scheduled Task
+You must set up a scheduled task to send forum notifications.  Use the `Settings`/`Scheduler` control panel to create a new scheduled task.  Refer 
+[here](/manage/task-scheduler/) for more information on scheduled tasks.
+
+|                             |                                                                                      |
+|-----------------------------|--------------------------------------------------------------------------------------|
+| Name                        | You can name your scheduled task anything you want.  A good example would be 'Send Forum Emails'.  |
+| Type Name                   | The type name is selected from a drop-down list.  Select `Nucleus.Modules.Forums.ScheduledTasks.SendForumsEmailsScheduledTask,Nucleus.Modules.Forums`.  |
+| Enabled                     | Set the task to enabled. |
+| Inverval                    | Select the interval and interval type.  This is how often a notification will be sent to users.  The forums subscription email is designed to be a summary of all activity in subscribed forums and posts (per forum module instance), sent as a single email, so you would generally want to set this to about 1 day. |
+| Instance Type               | Select 'Per Instance'. |
+| Keep History                | You can set this to whatever setting you require. |
+
+### Forum Email Data
+Email templates for forum messages can use the following data objects:
+
+| Site                        | Information on the site which has forums with new activity.                          |
+|-----------------------------|--------------------------------------------------------------------------------------|
+| Name                        | Site name.  |
+
+You can use the site as a parameter for the AbsoluteUrl() extension to create a link to the site.  You must provide a `UseSsl` value 
+of true (use https) or false (use http).  You should only use `false` if your site does not support SSL.
+
+```
+<a href="@Model.Site.AbsoluteUrl(true)">@post.Subject</a>
+```
+
+| Page                        | Information on the forum page.                                                       |
+|-----------------------------|--------------------------------------------------------------------------------------|
+| Name                        | Page name.  |
+| 
+
+You can use the page as a parameter for the AbsoluteUrl() extension to create a link to the page.  
+
+```
+<a href="@Model.Site.AbsoluteUrl(@Model.Page, true)">Click here to visit the forums page</a>
+```
+
+| Forums                      | A list of forums with new activity.                                                  |
+|-----------------------------|--------------------------------------------------------------------------------------|
+| Name                        | Forum name.  |
+| Description                 | Forum description.  |
+| Posts                       | A list of posts with new activity.  |
+| Replies                     | Specifies whether to inherit settings from the forum's forum group, or whether to specify settings which are specific for the forum.  |
+
+You can use the forum as a parameter for the AbsoluteUrl() extension to create a link to the forum.  
+
+```
+<a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
+```
+
+| Post                        | An item in each forum's `Posts` list, representing a post with activity.             | 
+|-----------------------------|--------------------------------------------------------------------------------------|
+| Subject                     | The post subject.  |
+
+You can use the post as a parameter for the AbsoluteUrl() extension to create a link to the forum.  
+
+```
+<a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a>
+```
+
+| Reply                       | An item in each forum's `Replies` list, representing a new post reply.             | 
+|-----------------------------|--------------------------------------------------------------------------------------|
+
+The reply object doesn't contain any data that you would want to include in a mail message, but you can use it to generate links to the forum post that it belongs to:
+
+```
+<a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a>
+```
+
+## Mail Template Samples
+
+### Subscription
+```
+@Model.User.UserName,
+
+<p>New messages have been posted to forums or forum posts that you are tracking at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>: </p>
+
+@foreach (var forum in Model.Forums)
+{
+	<a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
+
+	<table>
+		<tr>
+			<th>Subject</th>
+			<th>Author</th>
+			<th>Date</th>
+		</tr>
+		<tr>
+			<td colspan="3"><h2>Posts</h2></td>
+		</tr>
+		@foreach (var post in forum.Posts)
+		{
+		<tr>
+			<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
+			<td>@post.PostedBy.UserName</td>
+			<td>@post.DateAdded</td>
+		</tr>
+		}
+		@if (forum.Replies.Any())
+		{
+			<tr>
+				<td colspan="3"><h2>Replies</h2></td>
+			</tr>
+			@foreach (var reply in forum.Replies)
+			{
+				<tr>
+					<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
+					<td>@reply.PostedBy.UserName</td>
+					<td>@reply.DateAdded</td>
+				</tr>
+			}
+		}
+	</table>
+}
+
+<div>
+You were sent this email because you are subscribed to a forum or post at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>, or are the
+original poster of this forum message.  <a href="@Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true)">Click here</a> 
+to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true).
+</div>
+```
+
+### Moderation
+```
+@Model.User.UserName,
+
+<p>New messages have been posted that require moderation in the forums at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>: </p>
+
+@foreach (var forum in Model.Forums)
+{
+	<a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
+
+	<table>
+		<tr>
+			<th>Subject</th>
+			<th>Author</th>
+			<th>Date</th>
+		</tr>
+		<tr>
+			<td colspan="3"><h2>Posts</h2></td>
+		</tr>
+		@foreach (var post in forum.Posts)
+		{
+		<tr>
+			<td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
+			<td>@post.PostedBy.UserName</td>
+			<td>@post.DateAdded</td>
+		</tr>
+		}
+		@if (forum.Replies.Any())
+		{
+			<tr>
+				<td colspan="3"><h2>Replies</h2></td>
+			</tr>
+			@foreach (var reply in forum.Replies)
+			{
+				<tr>
+					<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
+					<td>@reply.PostedBy.UserName</td>
+					<td>@reply.DateAdded</td>
+				</tr>
+			}
+		}
+	</table>
+}
+```
+
+### Post Approved
+```
+@Model.User.UserName,
+
+<p>One or more of your forum posts have been approved at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>: </p>
+
+@foreach (var forum in Model.Forums)
+{
+	<a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
+
+	<table>
+		<tr>
+			<th>Subject</th>
+			<th>Author</th>
+			<th>Date</th>
+		</tr>
+		<tr>
+			<td colspan="3"><h2>Posts</h2></td>
+		</tr>
+		@foreach (var post in forum.Posts)
+		{
+		<tr>
+			<td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
+			<td>@post.PostedBy.UserName</td>
+			<td>@post.DateAdded</td>
+		</tr>
+		}
+		@if (forum.Replies.Any())
+		{
+			<tr>
+				<td colspan="3"><h2>Replies</h2></td>
+			</tr>
+			@foreach (var reply in forum.Replies)
+			{
+				<tr>
+					<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
+					<td>@reply.PostedBy.UserName</td>
+					<td>@reply.DateAdded</td>
+				</tr>
+			}
+		}
+	</table>
+}
+```
+
+### Post Rejected
+```
+@Model.User.UserName,
+
+<p>One or more of your forum posts have been rejected <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>: </p>
+
+@foreach (var forum in Model.Forums)
+{
+	<a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
+
+	<table>
+		<tr>
+			<th>Subject</th>
+			<th>Author</th>
+			<th>Date</th>
+		</tr>
+		<tr>
+			<td colspan="3"><h2>Posts</h2></td>
+		</tr>
+		@foreach (var post in forum.Posts)
+		{
+		<tr>
+			<td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
+			<td>@post.PostedBy.UserName</td>
+			<td>@post.DateAdded</td>
+		</tr>
+		}
+		@if (forum.Replies.Any())
+		{
+			<tr>
+				<td colspan="3"><h2>Replies</h2></td>
+			</tr>
+			@foreach (var reply in forum.Replies)
+			{
+				<tr>
+					<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
+					<td>@reply.PostedBy.UserName</td>
+					<td>@reply.DateAdded</td>
+				</tr>
+			}
+		}
+	</table>
+}
+```

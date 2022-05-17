@@ -16,10 +16,10 @@ namespace Nucleus.Modules.Forums
 {
 	public class ForumsMetaDataProducer : IContentMetaDataProducer
 	{
-		private Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider ExtensionProvider  { get; } = new();
+		private Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider ExtensionProvider { get; } = new();
 
 		private IFileSystemManager FileSystemManager { get; }
-		private GroupsManager GroupsManager { get; }		
+		private GroupsManager GroupsManager { get; }
 		private ForumsManager ForumsManager { get; }
 		private IExtensionManager ExtensionManager { get; }
 		private IPageManager PageManager { get; }
@@ -53,17 +53,26 @@ namespace Nucleus.Modules.Forums
 			{
 				foreach (PageModule module in await this.ExtensionManager.ListPageModules(new Nucleus.Abstractions.Models.ModuleDefinition() { Id = moduleDefinitionId }))
 				{
-					foreach (Models.Group group in await this.GroupsManager.List(module))
+					Page page = await this.PageManager.Get(module.PageId);
+
+					if (!page.IncludeInSearch)
 					{
-						foreach (Models.Forum forum in await this.ForumsManager.List(group))
+						Logger?.LogInformation("Skipping forums on page {pageid}/{pagename} because the page's 'Include in search' setting is false.", page.Id, page.Name);
+					}
+					else
+					{
+						foreach (Models.Group group in await this.GroupsManager.List(module))
 						{
-							results.AddRange(await BuildContentMetaData(site, module, forum));
+							foreach (Models.Forum forum in await this.ForumsManager.List(group))
+							{
+								results.AddRange(await BuildContentMetaData(site, page, module, forum));
+							}
 						}
 					}
 				}
 			}
 
-			return results.Where(result=>result != null);
+			return results.Where(result => result != null);
 		}
 
 		/// <summary>
@@ -72,19 +81,18 @@ namespace Nucleus.Modules.Forums
 		/// <param name="site"></param>
 		/// <param name="document"></param>
 		/// <returns></returns>
-		private async Task<List<ContentMetaData>> BuildContentMetaData(Site site, PageModule module, Models.Forum forum)
+		private async Task<List<ContentMetaData>> BuildContentMetaData(Site site, Page page, PageModule module, Models.Forum forum)
 		{
-			Page page = await this.PageManager.Get(module.PageId);
 			List<ContentMetaData> results = new();
-			
+
 			if (page != null)
 			{
 				string pageUrl = UrlHelperExtensions.RelativePageLink(page);
-							
+
 				foreach (Models.Post post in await this.ForumsManager.ListPosts(forum, Models.FlagStates.IsTrue))
 				{
 					StringBuilder content = new(post.Body);
-					
+
 					ContentMetaData forumPostContentItem = new()
 					{
 						Site = site,
@@ -99,12 +107,13 @@ namespace Nucleus.Modules.Forums
 
 					foreach (Models.Reply reply in await this.ForumsManager.ListPostReplies(site, post, Models.FlagStates.IsTrue))
 					{
-						content.Append(reply.Body);						
+						content.Append(reply.Body);
 					}
 
 					forumPostContentItem.Content = System.Text.Encoding.UTF8.GetBytes(content.ToString());
 
 					results.Add(forumPostContentItem);
+
 				}
 
 				return results;
@@ -112,7 +121,7 @@ namespace Nucleus.Modules.Forums
 
 			return null;
 		}
-			
+
 		private List<Role> GetViewRoles(Models.Forum forum)
 		{
 			return

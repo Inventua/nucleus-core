@@ -36,7 +36,7 @@
 
 	<TabContent>
 		<TabPanel id="page-properties" active="true">
-			<fieldset role="group" aria-labelledby="heading">
+			<fieldset role="group" aria-label="Basic Properties">
 								
 				@*<h2>Basic Properties</h2>*@
 				@Html.HiddenFor((model) => model.PageEditorMode)
@@ -63,9 +63,15 @@
 					@Html.TextAreaFor(model => model.Page.Description, new { @maxlength = 512 })
 				</SettingsControl>
 
-				<SettingsControl caption="Page Disabled?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the page is available.  Disabled pages are not displayed in menus, and navigating to a disabled page will generate a '404: Not found' response.">
-					@Html.CheckBoxFor(model => model.Page.Disabled, new { @class = "ToggleSwitch" })
-				</SettingsControl>
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Page Disabled?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the page is available.  Disabled pages are not displayed in menus, and navigating to a disabled page will generate a '404: Not found' response.">
+						@Html.CheckBoxFor(model => model.Page.Disabled, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+
+					<SettingsControl caption="Include in Search?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the page is included in the search index, if search is enabled for your site.">
+						@Html.CheckBoxFor(model => model.Page.IncludeInSearch, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+				</div>
 			</fieldset>
 
 			<fieldset role="group" aria-labelledby="heading">

@@ -54,8 +54,7 @@ namespace Nucleus.Core.Managers
 
 					if (folderData != null)
 					{
-						folder.Id = folderData.Id;
-
+						folderData.CopyDatabaseValuesTo(folder);						
 						return folder;
 					}
 				}
@@ -77,7 +76,8 @@ namespace Nucleus.Core.Managers
 				if (folderData != null)
 				{
 					Folder folder = this.FileSystemProviderFactory.Get(site, folderData.Provider).GetFolder(folderData.Path);
-					folder.Id = folderData.Id;
+					folderData.CopyDatabaseValuesTo(folder);
+
 					return folder;
 				}
 			}
@@ -101,8 +101,9 @@ namespace Nucleus.Core.Managers
 				if (fileData != null)
 				{
 					File file = this.FileSystemProviderFactory.Get(site, fileData.Provider).GetFile(fileData.Path);
-					file.Id = fileData.Id;
-					await GetDatabaseId(site, file.Parent);
+					fileData.CopyDatabaseValuesTo(file);
+
+					await GetDatabaseProperties(site, file.Parent);
 					return file;
 				}
 			}
@@ -131,8 +132,8 @@ namespace Nucleus.Core.Managers
 
 					if (fileData != null)
 					{
-						file.Id = fileData.Id;
-						await GetDatabaseId(site, file.Parent);
+						fileData.CopyDatabaseValuesTo(file);
+						await GetDatabaseProperties(site, file.Parent);
 						return file;
 					}
 				}
@@ -387,45 +388,45 @@ namespace Nucleus.Core.Managers
 
 			Folder folder = provider.ListFolder(existingFolder.Path, pattern);
 
-			await GetDatabaseId(site, folder);
-			await GetDatabaseId(site, folder.Parent);
-			await GetDatabaseId(site, folder.Folders);
-			await GetDatabaseId(site, folder.Files);
+			await GetDatabaseProperties(site, folder);
+			await GetDatabaseProperties(site, folder.Parent);
+			await GetDatabaseProperties(site, folder.Folders);
+			await GetDatabaseProperties(site, folder.Files);
 			return folder;
 		}
 
-		private async Task GetDatabaseId(Site site, List<File> files)
+		private async Task GetDatabaseProperties(Site site, List<File> files)
 		{
 			foreach (File file in files)
 			{
-				await GetDatabaseId(site, file);
+				await GetDatabaseProperties(site, file);
 			}
 		}
 
-		private async Task<File> GetDatabaseId(Site site, File file)
+		private async Task<File> GetDatabaseProperties(Site site, File file)
 		{
 			File fileData = await this.GetFile(site, file.Provider, file.Path);
 			if (fileData != null)
 			{
-				file.Id = fileData.Id;
+				fileData.CopyDatabaseValuesTo(file);				
 			}
 			return file;
 		}
 
-		private async Task GetDatabaseId(Site site, List<Folder> folders)
+		private async Task GetDatabaseProperties(Site site, List<Folder> folders)
 		{
 			foreach (Folder folder in folders)
 			{
-				await GetDatabaseId(site, folder);
+				await GetDatabaseProperties(site, folder);
 			}
 		}
 
-		private async Task<Folder> GetDatabaseId(Site site, Folder folder)
+		private async Task<Folder> GetDatabaseProperties(Site site, Folder folder)
 		{
 			Folder folderData = await this.GetFolder(site, folder.Provider, folder.Path);
 			if (folderData != null)
 			{
-				folder.Id = folderData.Id;
+				folderData.CopyDatabaseValuesTo(folder);
 			}
 			return folder;
 		}
@@ -490,6 +491,14 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
+		public async Task<Folder> SaveFolder(Site site, Folder folder)
+		{
+			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
+			{
+				return await dataProvider.SaveFolder(site, folder);
+			}
+		}
+
 		public async Task<File> SaveFile(Site site, string providerName, string parentPath, string newFileName, System.IO.Stream content, Boolean overwrite)
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, providerName);
@@ -506,7 +515,7 @@ namespace Nucleus.Core.Managers
 
 				File file = await provider.SaveFile(parentPath, newFileName, content, overwrite);
 
-				await GetDatabaseId(site, file);
+				await GetDatabaseProperties(site, file);
 				return file;
 			}
 			else

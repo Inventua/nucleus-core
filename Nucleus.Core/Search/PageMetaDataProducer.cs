@@ -50,21 +50,28 @@ namespace Nucleus.Core.Search
 
 				foreach (Page page in (await this.PageManager.List(site)).Where(page => !page.Disabled))
 				{
-					if (!indexPublicPagesOnly || page.Permissions.Where(permission => permission.IsPageViewPermission() && permission.AllowAccess).Any())
-					{ 
-						Logger.LogInformation("Building meta-data for page {pageId} [{pageName}]", page.Id, page.Name);
-						// we have to .Get the site and page because the .List methods don't return fully-populated page objects
-						ContentMetaData metaData = await BuildContentMetaData(site, apiKey, await this.PageManager.Get(page.Id));
-
-						if (metaData != null)
-						{
-							results.Add(metaData);							
-						}
+					if (!page.IncludeInSearch)
+					{
+						Logger.LogInformation("Skipping page {pageId} [{pageName}] because its 'Include in search' setting is false.", page.Id, page.Name);
 					}
 					else
 					{
-						Logger.LogInformation("Skipping page {pageId} [{pageName}] because it is not visible to all users, and 'Index Public Pages Only' is set.", page.Id, page.Name);
-					}						
+						if (!indexPublicPagesOnly || page.Permissions.Where(permission => permission.IsPageViewPermission() && permission.AllowAccess).Any())
+						{
+							Logger.LogInformation("Building meta-data for page {pageId} [{pageName}]", page.Id, page.Name);
+							// we have to .Get the site and page because the .List methods don't return fully-populated page objects
+							ContentMetaData metaData = await BuildContentMetaData(site, apiKey, await this.PageManager.Get(page.Id));
+
+							if (metaData != null)
+							{
+								results.Add(metaData);
+							}
+						}
+						else
+						{
+							Logger.LogInformation("Skipping page {pageId} [{pageName}] because it is not visible to all users, and 'Index Public Pages Only' is set.", page.Id, page.Name);
+						}
+					}
 				}
 			}
 

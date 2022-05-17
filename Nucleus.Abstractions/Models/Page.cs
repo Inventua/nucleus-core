@@ -92,6 +92,11 @@ namespace Nucleus.Abstractions.Models
 		public Boolean ShowInMenu { get; set; } = true;
 
 		/// <summary>
+		/// Flag used to determine whether the page is included in the search index.
+		/// </summary>
+		public Boolean IncludeInSearch { get; set; } = true;
+
+		/// <summary>
 		/// Flag used to render the page in menus without a hyperlink.
 		/// </summary>
 		/// <remarks>

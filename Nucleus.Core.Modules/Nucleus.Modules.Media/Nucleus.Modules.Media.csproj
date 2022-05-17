@@ -46,8 +46,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
-	  <ProjectReference Include="..\..\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
+	  <PackageReference Include="Nucleus.Abstractions" Version="1.0.0" />
+	  <PackageReference Include="Nucleus.ViewFeatures" Version="1.0.0" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

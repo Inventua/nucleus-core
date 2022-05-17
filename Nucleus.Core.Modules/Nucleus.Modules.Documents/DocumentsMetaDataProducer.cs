@@ -51,6 +51,12 @@ namespace Nucleus.Modules.Documents
 			{
 				foreach (PageModule module in await this.ExtensionManager.ListPageModules(new Nucleus.Abstractions.Models.ModuleDefinition() { Id = moduleDefinitionId }))
 				{
+					Page page = await this.PageManager.Get(module.PageId);
+
+					if (!page.IncludeInSearch )
+					{
+						Logger?.LogInformation("Skipping documents module on page {pageid}/{pagename} because the page's 'Include in search' setting is false.", page.Id, page.Name);
+					}
 					foreach (Models.Document document in await this.DocumentsManager.List(site, module))
 					{
 						results.Add(await BuildContentMetaData(site, module, document));

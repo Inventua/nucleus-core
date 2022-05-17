@@ -73,9 +73,9 @@ namespace Nucleus.Web.Controllers.Admin
 		/// <param name="path"></param>
 		/// <returns></returns>
 		[HttpPost]
-		public async Task<ActionResult> EditFolderPermissions(ViewModels.Admin.FileSystem viewModel)
+		public async Task<ActionResult> EditFolderSettings(ViewModels.Admin.FileSystem viewModel)
 		{			
-			return View("FolderPermissions", await BuildViewModel(viewModel, true));
+			return View("FolderSettings", await BuildViewModel(viewModel, true));
 		}
 
 		[HttpPost]
@@ -88,7 +88,7 @@ namespace Nucleus.Web.Controllers.Admin
 				await this.FileSystemManager.CreatePermissions(this.Context.Site, viewModel.Folder, await this.RoleManager.Get(viewModel.SelectedFolderRoleId));
 			}
 
-			return View("FolderPermissions", await BuildViewModel(viewModel, false));			
+			return View("FolderSettings", await BuildViewModel(viewModel, false));			
 		}
 
 		[HttpPost]
@@ -106,20 +106,21 @@ namespace Nucleus.Web.Controllers.Admin
 
 			viewModel.FolderPermissions = viewModel.Folder.Permissions.ToPermissionsList(this.Context.Site);
 
-			return View("FolderPermissions", await BuildViewModel(viewModel, false));
+			return View("FolderSettings", await BuildViewModel(viewModel, false));
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> SaveFolderPermissions(ViewModels.Admin.FileSystem viewModel)
+		public async Task<ActionResult> SaveFolderSettings(ViewModels.Admin.FileSystem viewModel)
 		{
-			viewModel.Folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Folder.Id);
-			viewModel.Folder.Permissions = await ConvertPermissions(viewModel.FolderPermissions);
+			Folder folder  = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Folder.Id);
+			viewModel.Folder.CopyDatabaseValuesTo(folder);
+			folder.Permissions = await ConvertPermissions(viewModel.FolderPermissions);
 
-			await this.FileSystemManager.SaveFolderPermissions(this.Context.Site, viewModel.Folder);
+			await this.FileSystemManager.SaveFolder(this.Context.Site, folder);			
+			await this.FileSystemManager.SaveFolderPermissions(this.Context.Site, folder);
 
 			return Ok();
 		}
-
 
 		/// <summary>
 		/// Create the specified folder

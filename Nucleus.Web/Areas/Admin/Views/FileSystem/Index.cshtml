@@ -44,7 +44,7 @@
 			{
 				@Html.SubmitButton("", "Rename", @Url.AreaAction("ShowRenameDialog", "FileSystem", "Admin"), new { @data_target = "#PopupDialog .modal-body", @class = "btn btn-secondary" })
 			}
-			@Html.SubmitButton("&#xe897;", "Folder Permissions", @Url.AreaAction("EditFolderPermissions", "FileSystem", "Admin", new { folderId = Model.Folder.Id }), new { @data_target = "#PopupDialog .modal-body", @class = "btn btn-secondary" })
+			@Html.SubmitButton("&#xe897;", "Folder Settings", @Url.AreaAction("EditFolderSettings", "FileSystem", "Admin", new { folderId = Model.Folder.Id }), new { @data_target = "#PopupDialog .modal-body", @class = "btn btn-secondary" })
 		</div>
 
 		<div>

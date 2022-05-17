@@ -64,6 +64,13 @@ namespace Nucleus.Abstractions.Managers
 		public Task CreatePermissions(Site site, Folder folder, Role role);
 
 		/// <summary>
+		/// Save <see cref="Folder"/> data to the database.
+		/// </summary>
+		/// <param name="folder"></param>
+		/// <param name="site"></param>
+		public Task<Folder> SaveFolder(Site site, Folder folder);
+
+		/// <summary>
 		/// Save permissions for the specified <see cref="Folder"/>.
 		/// </summary>
 		/// <param name="folder"></param>

@@ -15,16 +15,16 @@ namespace Nucleus.Core.Search
 {
 	public class FileMetaDataProducer : IContentMetaDataProducer
 	{
-		private Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider ExtensionProvider  { get; } = new();
+		private Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider ExtensionProvider { get; } = new();
 
 		private IFileSystemManager FileSystemManager { get; }
-		
+
 		private ILogger<FileMetaDataProducer> Logger { get; }
 
 		public FileMetaDataProducer(ISiteManager siteManager, IFileSystemManager fileSystemManager, ILogger<FileMetaDataProducer> logger)
 		{
 			this.FileSystemManager = fileSystemManager;
-			this.Logger = logger;			
+			this.Logger = logger;
 		}
 
 		public async override Task<IEnumerable<ContentMetaData>> ListItems(Site site)
@@ -48,7 +48,7 @@ namespace Nucleus.Core.Search
 			}
 
 			return results;
-		}		
+		}
 
 		private async Task<List<ContentMetaData>> GetFiles(Site site, Folder parentFolder, Boolean indexPublicFilesOnly)
 		{
@@ -56,41 +56,47 @@ namespace Nucleus.Core.Search
 
 			Folder folder = await this.FileSystemManager.ListFolder(site, parentFolder.Id, "");
 
-			if (!indexPublicFilesOnly || folder.Permissions.Where(permission => permission.IsFolderViewPermission() && permission.AllowAccess).Any())
+			if (!parentFolder.IncludeInSearch)
 			{
-				foreach (File file in folder.Files)
+				Logger.LogInformation("Skipping folder {folderid}[{provider}/{path}] because its 'Include in search' setting is false.", folder.Id, folder.Provider, folder.Path);
+			}
+			else
+			{
+				if (!indexPublicFilesOnly || folder.Permissions.Where(permission => permission.IsFolderViewPermission() && permission.AllowAccess).Any())
 				{
-					Logger.LogInformation("Building meta-data for file {fileid}[{provider}/{path}]", file.Id, file.Provider, file.Path);
-					ContentMetaData metaData = await BuildContentMetaData(site, file);
-
-					if (metaData != null)
+					foreach (File file in folder.Files)
 					{
-						results.Add(metaData);					
+						Logger.LogInformation("Building meta-data for file {fileid}[{provider}/{path}]", file.Id, file.Provider, file.Path);
+						ContentMetaData metaData = await BuildContentMetaData(site, file);
+
+						if (metaData != null)
+						{
+							results.Add(metaData);
+						}
 					}
+				}
+				else
+				{
+					Logger.LogInformation("Skipping folder {folderid}[{provider}/{path}] because it is not visible to 'All users' and 'Index Public Files Only' is set.", folder.Id, folder.Provider, folder.Path);
 				}
 
 				foreach (Folder subFolder in folder.Folders)
 				{
-					results.AddRange(await GetFiles(site, subFolder, indexPublicFilesOnly));				
+					results.AddRange(await GetFiles(site, subFolder, indexPublicFilesOnly));
 				}
 			}
-			else
-			{
-				Logger.LogInformation("Skipping folder {folderid}[{provider}/{path}] because it is not visible to 'All users' and 'Index Public Files Only' is set.", folder.Id, folder.Provider, folder.Path);
-			}
-			
 
 			return results;
 		}
 
 		private async Task<ContentMetaData> BuildContentMetaData(Site site, File file)
 		{
-			file = await this .FileSystemManager.GetFile(site, file.Id);
+			file = await this.FileSystemManager.GetFile(site, file.Id);
 
 			string fileRelativeUrl = RelativeFileLink(file);
 
 			if (!String.IsNullOrEmpty(fileRelativeUrl))
-			{				
+			{
 				ContentMetaData contentItem = new()
 				{
 					Site = site,
@@ -102,7 +108,7 @@ namespace Nucleus.Core.Search
 					Scope = File.URN,
 					Roles = await GetViewRoles(file.Parent)
 				};
-												
+
 				using (System.IO.Stream responseStream = this.FileSystemManager.GetFileContents(site, file))
 				{
 					contentItem.Content = new byte[responseStream.Length];
@@ -124,16 +130,16 @@ namespace Nucleus.Core.Search
 
 		private async Task<List<Role>> GetViewRoles(Folder folder)
 		{
-			return 
+			return
 				(await this.FileSystemManager.ListPermissions(folder))
 					.Where(permission => permission.AllowAccess && permission.IsFolderViewPermission())
-					.Select(permission => permission.Role).ToList();		
+					.Select(permission => permission.Role).ToList();
 		}
 
 		private static string RelativeFileLink(File file)
 		{
 			string encodedPath = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{file.Id}"));
-			return $"~/files/{encodedPath}";			
+			return $"~/files/{encodedPath}";
 		}
 	}
 }

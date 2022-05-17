@@ -31,6 +31,11 @@ namespace Nucleus.Abstractions.Models.FileSystem
 		/// </summary>
 		public List<Permission> Permissions { get; set; } = new();
 
+		/// <summary>
+		/// Specifies whether to include the files within the folder in the search index.
+		/// </summary>
+		public Boolean IncludeInSearch { get; set; } = true;
+
 
 		/// <summary>
 		/// Specifies a list of name validation rules (regular expressions) and error messages for folders within this folder.
@@ -41,5 +46,17 @@ namespace Nucleus.Abstractions.Models.FileSystem
 		/// Specifies a list of name validation rules (regular expressions) and error messages for files within this folder.
 		/// </summary>
 		public IEnumerable<FileSystemValidationRule> FileValidationRules { get; set; }
+
+		/// <summary>
+		/// Data for folder items is retrieved from the database, and from the file system.  This function "merges" a Folder
+		/// object which has been retrieved from the file system with one from the database by copying the fields that are only
+		/// present in the database (that is, can't be retrieved from the file system).
+		/// </summary>
+		/// <param name="target"></param>
+		public void CopyDatabaseValuesTo(Folder target)
+		{
+			target.Id = this.Id;
+			target.IncludeInSearch = this.IncludeInSearch;
+		}
 	}
 }

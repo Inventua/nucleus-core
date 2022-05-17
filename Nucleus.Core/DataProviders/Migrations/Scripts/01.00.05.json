@@ -1,0 +1,24 @@
+{
+	"schemaName": "Nucleus.Core",
+	"version": "01.00.05",
+	"operations": [
+		{
+			"addColumn": {
+				"table": "Pages",
+				"name": "IncludeInSearch",
+				"clrType": "Boolean",
+				"isnullable": false,
+				"defaultvaluesql": 1
+			}
+		},
+		{
+			"addColumn": {
+				"table": "Folders",
+				"name": "IncludeInSearch",
+				"clrType": "Boolean",
+				"isnullable": false,
+				"defaultvaluesql": 1
+			}
+		}
+	]
+}

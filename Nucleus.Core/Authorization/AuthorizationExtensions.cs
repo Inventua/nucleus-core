@@ -38,7 +38,16 @@ namespace Nucleus.Core.Authorization
 
 						if (loginPageRoute != null)
 						{
-							string url = loginPageRoute.Path + $"?returnUrl={System.Uri.EscapeDataString(context.HttpContext.Request.Path)}";
+							string url;
+
+							if (context.HttpContext.Request.Path.StartsWithSegments("/admin"))
+							{
+								url = loginPageRoute.Path + $"?returnUrl={System.Uri.EscapeDataString("/")}";
+							}
+							else
+							{
+								url = loginPageRoute.Path + $"?returnUrl={System.Uri.EscapeDataString(context.HttpContext.Request.Path)}";
+							}
 
 							context.HttpContext.Response.Redirect(url);
 						}

@@ -39,7 +39,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Nucleus.Abstractions" Version="1.0.0" />
-		<PackageReference Include="Nucleus.ViewFeatures" Version="1.0.0.1" />
+		<PackageReference Include="Nucleus.ViewFeatures" Version="1.0.0" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

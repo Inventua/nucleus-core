@@ -41,13 +41,8 @@
 
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
-    <ProjectReference Include="..\..\Nucleus.Data.Common\Nucleus.Data.Common.csproj" />
-    <ProjectReference Include="..\..\Nucleus.Extensions\Nucleus.Extensions.csproj" />
-    <ProjectReference Include="..\..\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
+    <PackageReference Include="Nucleus.Abstractions" Version="1.0.0" />
+    <PackageReference Include="Nucleus.ViewFeatures" Version="1.0.0" />
   </ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

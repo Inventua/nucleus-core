@@ -54,13 +54,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Nucleus.Abstractions\Nucleus.Abstractions.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Nucleus.Data.EntityFramework\Nucleus.Data.EntityFramework.csproj" />
-    <ProjectReference Include="..\..\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj">
-      <Private>false</Private>
-    </ProjectReference>
+    <PackageReference Include="Nucleus.Abstractions" Version="1.0.0" />
+    <PackageReference Include="Nucleus.Data.EntityFramework" Version="1.0.0" />
+    <PackageReference Include="Nucleus.ViewFeatures" Version="1.0.0" />
   </ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

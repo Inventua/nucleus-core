@@ -131,6 +131,10 @@
 	  <Page Include="Index.cshtml" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Properties\ServiceDependencies\" />
+	</ItemGroup>
+
 	<ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="nucleus.schema.json" /></VisualStudio></ProjectExtensions>
 	
 </Project>

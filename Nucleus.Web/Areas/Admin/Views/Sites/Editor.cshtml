@@ -273,6 +273,9 @@
 						}
 					</SettingsControl>
 				</div>
+
+				<button type="submit" class="btn btn-success" formaction="@Url.AreaAction("TestMailSettings", "Sites", "Admin")" data-target=".nucleus-adminpage">Test Mail Settings</button>
+
 			</fieldset>
 		</TabPanel>
 
@@ -315,34 +318,35 @@
 	$(document).ready(function() 
 	{
 		EnableRegistrationControls(jQuery('.allow-registration').is(':checked'));
-	});
 
-	// Read the child pages of the item containing the "+" button
-	jQuery('#site-sitepages').on('click', '.nucleus-get-childpages', function (e)
-	{
-		// Add a ul to contain the new pages
-		Page.LoadPartialContent(e, '@Url.AreaAction("GetChildPages", "Sites", "Admin")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+		// Read the child pages of the item containing the "+" button
+		jQuery('#site-sitepages').on('click', '.nucleus-get-childpages', function (e)
+		{
+			// Add a ul to contain the new pages
+			Page.LoadPartialContent(e, '@Url.AreaAction("GetChildPages", "Sites", "Admin")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
 
-		// hide the "+" button
-		jQuery(this).removeClass('show');
+			// hide the "+" button
+			jQuery(this).removeClass('show');
 
-	});
+		});
 
-	// Hide the child pages of the item containing the "-" button
-	jQuery('#site-sitepages').on('click', '.nucleus-hide-childpages', function (e)
-	{
-		// hide the "-" button
-		jQuery(this).removeClass('show');
+		// Hide the child pages of the item containing the "-" button
+		jQuery('#site-sitepages').on('click', '.nucleus-hide-childpages', function (e)
+		{
+			// hide the "-" button
+			jQuery(this).removeClass('show');
 
-		// show the "+" button
-		jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
+			// show the "+" button
+			jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
 
-		jQuery(this).closest('li').find('ul').remove();
-	});
+			jQuery(this).closest('li').find('ul').remove();
+		});
 
-	jQuery('.allow-registration').on('change', function (e)
-	{
-		EnableRegistrationControls(jQuery(this).is(':checked'));		
+		jQuery('.allow-registration').on('change', function (e)
+		{
+			EnableRegistrationControls(jQuery(this).is(':checked'));		
+		});
+
 	});
 
 	function EnableRegistrationControls(enable)

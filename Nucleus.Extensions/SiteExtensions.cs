@@ -241,6 +241,19 @@ namespace Nucleus.Extensions
 		}
 
 		/// <summary>
+		/// Get (decrypt) the <see cref="MailSettings"/> password.
+		/// </summary>
+		/// <param name="site"></param>
+		public static string GetPassword(this Site site)
+		{
+			if (site.SiteSettings.TryGetValue(Site.SiteMailSettingKeys.MAIL_PASSWORD, out string encryptedPassword))
+			{
+				return DecryptPassword(site, encryptedPassword);
+			}
+			return "";
+		}
+
+		/// <summary>
 		/// Encrypt and encode a password and return the result.
 		/// </summary>
 		/// <param name="site"></param>
@@ -279,6 +292,47 @@ namespace Nucleus.Extensions
 
 			// Convert to string and return result value
 			return System.Convert.ToBase64String(bytesOut);
+		}
+
+		/// <summary>
+		/// Encrypt and encode a password and return the result.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="password"></param>
+		/// <returns></returns>
+		private static string DecryptPassword(Site site, string password)
+		{
+			if (String.IsNullOrEmpty(password))
+			{
+				return null;
+			}
+
+			// Convert string to byte array
+			byte[] bytesIn = System.Convert.FromBase64String(password);
+
+			// Preparing the memory stream for encrypted string.
+			System.IO.MemoryStream msOut = new();
+
+			// Create the ICryptoTransform instance.
+			System.Security.Cryptography.Aes aes = System.Security.Cryptography.Aes.Create();
+			aes.Key = site.Id.ToByteArray();
+			aes.IV = site.Id.ToByteArray();
+
+			// Create the CryptoStream instance.
+			System.Security.Cryptography.CryptoStream cryptStreem = new(msOut, aes.CreateDecryptor(aes.Key, aes.IV), System.Security.Cryptography.CryptoStreamMode.Write);
+
+			// Encoding.
+			cryptStreem.Write(bytesIn, 0, bytesIn.Length);
+			cryptStreem.FlushFinalBlock();
+
+			// Get the encrypted byte array.
+			byte[] bytesOut = msOut.ToArray();
+
+			cryptStreem.Close();
+			msOut.Close();
+
+			// Convert to string and return result value
+			return System.Text.Encoding.UTF8.GetString(bytesOut);
 		}
 
 		/// <summary>

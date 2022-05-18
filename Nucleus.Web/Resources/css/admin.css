@@ -89,11 +89,10 @@ body
 	font-size: 14px;	
 }
 
-/*.nucleus-admin-content fieldset h3
+.nucleus-admin-content fieldset h3
 {
-	margin-top: 2em;
-}*/
-
+	margin-top: 1rem;
+}
 
 .nucleus-admin-search
 {

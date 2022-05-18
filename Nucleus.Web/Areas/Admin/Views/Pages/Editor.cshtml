@@ -12,7 +12,7 @@
 	<div class="position-absolute end-0">
 		@if (Model.Page.Id != Guid.Empty)
 		{
-			<button class="btn btn-success nucleus-open-page" accesskey="O">Open</button>
+			<button class="btn btn-success nucleus-open-page" accesskey="O">Open Page</button>
 		}
 		@if (Model.PageEditorMode == Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default && Model.Page.Id != Guid.Empty && !Model.Page.IsFirst)
 		{

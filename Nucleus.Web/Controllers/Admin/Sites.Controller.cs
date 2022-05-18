@@ -11,6 +11,7 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions;
 using Microsoft.AspNetCore.Http;
 using Nucleus.Data.Common;
+using Nucleus.Abstractions.Mail;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -23,18 +24,21 @@ namespace Nucleus.Web.Controllers.Admin
 		private IRoleManager RoleManager { get; }
 		private IPageManager PageManager { get; }
 		private IMailTemplateManager MailTemplateManager { get; }
+		private IMailClientFactory MailClientFactory { get; }
+
 		private IFileSystemManager FileSystemManager { get; }		
 		private Context Context { get; }
 		private ILayoutManager LayoutManager { get; }
 		private IContainerManager ContainerManager { get; }
 
-		public SitesController(Context context, ILogger<SitesController> logger, ISiteManager siteManager, IPageManager pageManager, IMailTemplateManager mailTemplateManager, IRoleManager roleManager, ILayoutManager layoutManager, IContainerManager containerManager, IFileSystemManager fileSystemManager)
+		public SitesController(Context context, ILogger<SitesController> logger, ISiteManager siteManager, IPageManager pageManager, IMailTemplateManager mailTemplateManager, IMailClientFactory mailClientFactory, IRoleManager roleManager, ILayoutManager layoutManager, IContainerManager containerManager, IFileSystemManager fileSystemManager)
 		{
 			this.Context = context;
 			this.Logger = logger;
 			this.SiteManager = siteManager;
 			this.PageManager = pageManager;
 			this.MailTemplateManager = mailTemplateManager;
+			this.MailClientFactory = mailClientFactory;
 			this.RoleManager = roleManager;
 			this.LayoutManager = layoutManager;
 			this.ContainerManager = containerManager;
@@ -389,7 +393,31 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 		}
 
-		private async Task<ViewModels.Admin.SiteIndex> BuildViewModel()
+		[HttpPost]
+		public async Task<ActionResult> TestMailSettings(ViewModels.Admin.SiteEditor viewModel)
+		{
+			// we must retrieve the site from the database because the user may be using the "test" button just after loading
+			// data - and in that case the password will be set to a dummy value.
+			Site site = await this.SiteManager.Get(viewModel.Site.Id);
+			site.SetSiteMailSettings(viewModel.MailSettings);
+
+			using (IMailClient client = this.MailClientFactory.Create(site))
+			{
+				try
+				{
+					await client.Send(new Abstractions.Models.Mail.MailTemplate() { Subject = $"Email Configuration Test from {viewModel.Site.Name}, {DateTime.Now}", Body =  $"This email was generated as a test by the user {User.Identity.Name} at {DateTime.Now}.  If you received it, then your site's email configuration is working correctly." }, new object(), viewModel.MailSettings.Sender);
+				}
+				catch (Exception ex)
+				{
+					return BadRequest(ex.Message);
+				}
+			}
+
+			return Json(new { Title = "Test Email Settings", Message = $"A test email was sent successfully to '{viewModel.MailSettings.Sender}'." });
+		}
+
+
+			private async Task<ViewModels.Admin.SiteIndex> BuildViewModel()
 		{
 			ViewModels.Admin.SiteIndex viewModel = new();
 

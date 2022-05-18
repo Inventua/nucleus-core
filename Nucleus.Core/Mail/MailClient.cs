@@ -33,7 +33,7 @@ namespace Nucleus.Core.Mail
 
 			// Apply site settings
 			this.MailSettings = site.GetSiteMailSettings(smtpMailOptions.Value);
-			
+			this.MailSettings.Password = site.GetPassword();
 			this.Logger = logger;
 		}
 
@@ -68,7 +68,7 @@ namespace Nucleus.Core.Mail
 			}
 			else
 			{
-				using (MailKit.Net.Smtp.SmtpClient client = new())
+				using (MailKit.Net.Smtp.SmtpClient client = new (new ProtocolLogger(this.Logger)))
 				{
 					client.Connect(this.MailSettings.HostName, this.MailSettings.Port, MailKit.Security.SecureSocketOptions.Auto);
 					client.Authenticate(this.MailSettings.UserName, this.MailSettings.Password);
@@ -95,5 +95,47 @@ namespace Nucleus.Core.Mail
 			GC.SuppressFinalize(this);
 		}
 
+		internal class ProtocolLogger : IProtocolLogger
+		{
+			public IAuthenticationSecretDetector AuthenticationSecretDetector { get; set; }
+			private ILogger<MailClient> Logger { get; }
+
+			internal ProtocolLogger(ILogger<MailClient> logger)
+			{
+				this.Logger = logger;
+			}
+
+			public void Dispose()
+			{
+				
+			}
+
+			private string Decode(byte[] buffer, int offset, int count)
+			{
+				string result = System.Text.Encoding.UTF8.GetString(buffer, offset, count);
+
+				// remove trailing CRLF, as our logging components add a CRLF automatically
+				if (result.EndsWith("\r\n"))
+				{
+					result = result[0..^2];
+				}
+				return result;
+			}
+
+			public void LogClient(byte[] buffer, int offset, int count)
+			{
+				this?.Logger.LogTrace(Decode(buffer, offset, count));
+			}
+
+			public void LogConnect(Uri uri)
+			{
+				this?.Logger.LogTrace("Connected to {uri}.", uri);
+			}
+
+			public void LogServer(byte[] buffer, int offset, int count)
+			{
+				this?.Logger.LogTrace(Decode(buffer, offset, count));
+			}
+		}
 	}
 }

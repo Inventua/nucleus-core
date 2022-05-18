@@ -405,7 +405,7 @@ namespace Nucleus.Web.Controllers.Admin
 			{
 				try
 				{
-					await client.Send(new Abstractions.Models.Mail.MailTemplate() { Subject = $"Email Configuration Test from {viewModel.Site.Name}", Body = "This email was generated as a test.  If you received it, then your site's email configuration is working correctly." }, new object(), viewModel.MailSettings.Sender);
+					await client.Send(new Abstractions.Models.Mail.MailTemplate() { Subject = $"Email Configuration Test from {viewModel.Site.Name}, {DateTime.Now}", Body =  $"This email was generated as a test by the user {User.Identity.Name} at {DateTime.Now}.  If you received it, then your site's email configuration is working correctly." }, new object(), viewModel.MailSettings.Sender);
 				}
 				catch (Exception ex)
 				{

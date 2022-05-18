@@ -17,6 +17,7 @@ namespace Nucleus.Core.Mail
 		{
 			//this.Context = context;
 			this.SmtpMailOptions = smtpMailOptions;
+			this.Logger = logger;
 		}
 
 		/// <summary>

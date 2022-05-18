@@ -195,7 +195,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
 			else
 			{
 				// no <link>s found, write out content unmodified
-				Logger.LogWarning("No <link> elements found");
+				Logger.LogTrace("No <link> elements found");
 				WriteOriginalContent(output, originalContent);
 				return;
 			}

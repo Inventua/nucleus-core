@@ -151,7 +151,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
 			else
 			{
 				// no <scripts> found, write out content unmodified
-				Logger.LogInformation("No <script> elements found");
+				Logger.LogTrace("No <script> elements found");
 				WriteOriginalContent(output, originalContent);
 				return;
 			}

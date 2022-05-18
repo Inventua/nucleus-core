@@ -25,14 +25,17 @@
       // handle clicks on the toggle control (range control)
       switchElement.on('click', function ()
       {
-        targetControl = jQuery(this).siblings('input[type=checkbox]');
+        targetControl = jQuery(this).prev();
+        if (!(targetControl).is('input[type=checkbox]')) return;
         toggle(targetControl, jQuery(this));
       });
 
       // handle clicks on an associated label control
       targetControl.on('click', function ()
       {
-        toggleControl = jQuery(this).siblings('.ToggleSwitch');
+        toggleControl = jQuery(this).prev();
+        if (!(toggleControl).is('input[type=range]')) return;
+
         toggleControl.val(toggleControl.val() === '1' ? '2' : '1');
         toggle(jQuery(this), toggleControl);
       });

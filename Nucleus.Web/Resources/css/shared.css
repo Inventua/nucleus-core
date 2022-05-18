@@ -269,7 +269,14 @@ a *
 
 .nucleus-menu .dropdown-submenu > .nucleus-menu .ribbon-item.RibbonPortrait
 {
-  flex-direction: column;
+  flex-direction: column;  
+
+}
+
+.nucleus-menu .dropdown-submenu > .ribbon-item.RibbonPortrait 
+{
+  grid-template-columns: repeat(4, max-content);
+  grid-auto-rows: auto;
 }
 
 .nucleus-menu .dropdown-submenu > .ribbon-item.RibbonLandscape
@@ -284,10 +291,15 @@ a *
   transform: translateX(-50%);
 }
 
-.nucleus-menu .dropdown-submenu > .ribbon-item.show
+.nucleus-menu .dropdown-submenu > .ribbon-item.show 
 {
-  display: flex;
+  display: flex; 
   gap: 0.25rem;
+}
+
+.nucleus-menu .dropdown-submenu > .ribbon-item.RibbonPortrait.show
+{
+  display: grid;
 }
 
 .nucleus-menu .dropdown-submenu > .ribbon-item > li

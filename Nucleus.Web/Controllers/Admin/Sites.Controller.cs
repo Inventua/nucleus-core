@@ -396,13 +396,16 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> TestMailSettings(ViewModels.Admin.SiteEditor viewModel)
 		{
-			viewModel.Site.SetSiteMailSettings(viewModel.MailSettings);
+			// we must retrieve the site from the database because the user may be using the "test" button just after loading
+			// data - and in that case the password will be set to a dummy value.
+			Site site = await this.SiteManager.Get(viewModel.Site.Id);
+			site.SetSiteMailSettings(viewModel.MailSettings);
 
-			using (IMailClient client = this.MailClientFactory.Create(viewModel.Site))
+			using (IMailClient client = this.MailClientFactory.Create(site))
 			{
 				try
 				{
-					await client.Send(new Abstractions.Models.Mail.MailTemplate() { Subject=$"Email Test from {viewModel.Site.Name}", Body = "This email was generated as a test." }, new object(), viewModel.MailSettings.Sender);
+					await client.Send(new Abstractions.Models.Mail.MailTemplate() { Subject = $"Email Configuration Test from {viewModel.Site.Name}", Body = "This email was generated as a test.  If you received it, then your site's email configuration is working correctly." }, new object(), viewModel.MailSettings.Sender);
 				}
 				catch (Exception ex)
 				{

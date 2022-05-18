@@ -21,7 +21,7 @@
 			@Html.TextBoxFor(model => model.ClientApp.TokenExpiryMinutes)
 		</SettingsControl>
 
-		<SettingsControl caption="Redirect Uri" helptext="Enter one or more Redirect Uri values separated by commas.">
+		<SettingsControl caption="Redirect Uri" helptext="Enter one or more Redirect Uri values separated by new lines.">
 			@Html.TextAreaFor(model => model.ClientApp.RedirectUri, new { @rows = 4 })
 		</SettingsControl>
 

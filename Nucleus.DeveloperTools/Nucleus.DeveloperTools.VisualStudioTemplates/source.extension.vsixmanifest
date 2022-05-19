@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="Nucleus.DeveloperTools.VisualStudioTemplates.69c392ae-8843-488a-ab8b-ee7937873dcc" Version="1.0.3.1" Language="en-US" Publisher="Inventua" />
+        <Identity Id="Nucleus.DeveloperTools.VisualStudioTemplates.69c392ae-8843-488a-ab8b-ee7937873dcc" Version="1.0.0" Language="en-US" Publisher="Inventua" />
         <DisplayName>Nucleus Templates</DisplayName>
         <Description xml:space="preserve">Nucleus Visual Studio Templates</Description>
         <MoreInfo>https://www.nucleus-cms.com/develop-extensions/</MoreInfo>
-        <License>LICENSE</License>
+        <License>LICENSE.txt</License>
         <Preview>true</Preview>
     </Metadata>
     <Installation>

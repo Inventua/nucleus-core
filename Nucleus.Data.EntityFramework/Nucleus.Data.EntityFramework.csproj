@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup Label="Globals">
     <SccProjectName></SccProjectName>
@@ -36,14 +36,6 @@
 	<ItemGroup>
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="LICENSE.txt" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Content Include="LICENSE.txt" />
 	</ItemGroup>
 	
   <ItemGroup>

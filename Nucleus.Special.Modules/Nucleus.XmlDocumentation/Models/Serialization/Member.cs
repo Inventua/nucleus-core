@@ -42,5 +42,8 @@ namespace Nucleus.XmlDocumentation.Models.Serialization
 		[XmlElement(ElementName = "typeparam")]
 		public TypeParam[] TypeParams { get; set; }
 
+		[XmlElement(ElementName = "hidden")]
+		public Hidden Hidden { get; set; }
+
 	}
 }

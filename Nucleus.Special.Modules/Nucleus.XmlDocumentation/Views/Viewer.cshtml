@@ -81,7 +81,7 @@
 							@foreach (var apiClass in Model.SelectedDocument.Classes)
 							{
 								<li class="list-group-item">
-									<a class="list-group-item-action" href="@Url.PageLink(Model.Page, $"{Model.SelectedDocument.SourceFileName}/{apiClass.FullName}/#mnu-{@apiClass.ControlId()}"))">@apiClass.Name Class</a>
+									<a class="list-group-item-action" href="@Url.PageLink(Model.Page, $"{Model.SelectedDocument.SourceFileName}/{apiClass.FullName}/#mnu-{@apiClass.ControlId()}"))">@apiClass.Name class</a>
 									<div>
 										@await Html.PartialAsync("_RenderMixedContent.cshtml", apiClass.Summary)
 									</div>

@@ -24,10 +24,10 @@
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
-<ItemGroup>
-		<None Include="LICENSE.txt" Pack="true" PackagePath="" />
-	</ItemGroup>	
 	
+	<ItemGroup>
+		<None Include="LICENSE.txt" Pack="true" PackagePath="" />
+	</ItemGroup>		
 	
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -42,16 +42,6 @@
 	<ItemGroup>
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-	  <None Remove="LICENSE.txt" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-	  <Content Include="LICENSE.txt" />
 	</ItemGroup>
 
 </Project>

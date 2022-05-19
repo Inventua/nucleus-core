@@ -13,7 +13,7 @@
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Authors>Inventua Pty Ltd</Authors>
 		<Product>Nucleus</Product>
-		<Description>Nucleus extension classes.</Description>
+		<Description>Provides extension methods for Nucleus and .Net core classes which provide functionality required by Nucleus core and extensions.</Description>
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
 		<VersionPrefix>1.0.0.0</VersionPrefix>
 		<!--<VersionSuffix>a1</VersionSuffix>-->
@@ -21,6 +21,7 @@
 		<PackageTags>Nucleus</PackageTags>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<PackageId>Inventua.$(AssemblyName)</PackageId>
   </PropertyGroup>
 
 	<ItemGroup>

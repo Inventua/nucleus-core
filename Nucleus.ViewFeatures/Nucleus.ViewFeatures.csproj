@@ -15,12 +15,20 @@
 		<PackageId>Nucleus.ViewFeatures</PackageId>
 		<Authors>Inventua Pty Ltd</Authors>
 		<Product>Nucleus</Product>
-		<Description>Html Helpers, Tag Helpers, Url Helpers and shared controls used by Nucleus modules.</Description>
+		<Description>Html Helpers, Tag Helpers, Url Helpers and shared controls used by Nucleus extensions.</Description>
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
 		<VersionPrefix>1.0.0.0</VersionPrefix>
 		<!--<VersionSuffix>a1</VersionSuffix>-->
+		<PackageTags>Nucleus</PackageTags>
+		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
-
+<ItemGroup>
+		<None Include="LICENSE.txt" Pack="true" PackagePath="" />
+	</ItemGroup>	
+	
+	
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
@@ -34,6 +42,16 @@
 	<ItemGroup>
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <None Remove="LICENSE.txt" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <Content Include="LICENSE.txt" />
 	</ItemGroup>
 
 </Project>

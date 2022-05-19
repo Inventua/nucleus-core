@@ -26,8 +26,17 @@
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
 		<VersionPrefix>1.0.0.0</VersionPrefix>
 		<!--<VersionSuffix>a1</VersionSuffix>-->
+		<Copyright>(c) Inventua Pty Ptd</Copyright>
+		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>
+		<PackageTags>Nucleus</PackageTags>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<None Include="LICENSE.txt" Pack="true" PackagePath="" />
+	</ItemGroup>
+	
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<WarningsAsErrors>;NU1605</WarningsAsErrors>
 		<WarningLevel>4</WarningLevel>

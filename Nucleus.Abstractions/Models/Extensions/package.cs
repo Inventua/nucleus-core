@@ -50,7 +50,9 @@ namespace Nucleus.Abstractions.Models.Extensions
 		public string id;
 	}
 
-	/// <remarks/>
+	/// <hidden>
+	/// Internal use class used for XML serialization.
+	/// </hidden>
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.4084.0")]
 	[System.SerializableAttribute()]
 	[System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -72,7 +74,9 @@ namespace Nucleus.Abstractions.Models.Extensions
 		public string email;
 	}
 
-	/// <remarks/>
+	/// <hidden>
+	/// Internal use class used for XML serialization.
+	/// </hidden>
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.4084.0")]
 	[System.SerializableAttribute()]
 	[System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -90,7 +94,9 @@ namespace Nucleus.Abstractions.Models.Extensions
 		public object[] Items;
 	}
 
-	/// <remarks/>
+	/// <hidden>
+	/// Internal use class used for XML serialization.
+	/// </hidden>
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.4084.0")]
 	[System.SerializableAttribute()]
 	[System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -110,7 +116,9 @@ namespace Nucleus.Abstractions.Models.Extensions
 		public string id;
 	}
 
-	/// <remarks/>
+	/// <hidden>
+	/// Internal use class used for XML serialization.
+	/// </hidden>
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.4084.0")]
 	[System.SerializableAttribute()]
 	[System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -124,7 +132,9 @@ namespace Nucleus.Abstractions.Models.Extensions
 		public string name;
 	}
 
-	/// <remarks/>
+	/// <hidden>
+	/// Internal use class used for XML serialization.
+	/// </hidden>
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.4084.0")]
 	[System.SerializableAttribute()]
 	[System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -143,7 +153,9 @@ namespace Nucleus.Abstractions.Models.Extensions
 		public string name;
 	}
 
-	/// <remarks/>
+	/// <hidden>
+	/// Internal use class used for XML serialization.
+	/// </hidden>
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.4084.0")]
 	[System.SerializableAttribute()]
 	[System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -163,7 +175,9 @@ namespace Nucleus.Abstractions.Models.Extensions
 		public string id;
 	}
 
-	/// <remarks/>
+	/// <hidden>
+	/// Internal use class used for XML serialization.
+	/// </hidden>
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.4084.0")]
 	[System.SerializableAttribute()]
 	[System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -192,7 +206,9 @@ namespace Nucleus.Abstractions.Models.Extensions
 		public string id;
 	}
 
-	/// <remarks/>
+	/// <hidden>
+	/// Internal use class used for XML serialization.
+	/// </hidden>
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.4084.0")]
 	[System.SerializableAttribute()]
 	[System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -224,7 +240,9 @@ namespace Nucleus.Abstractions.Models.Extensions
 		public string id;
 	}
 
-	/// <remarks/>
+	/// <hidden>
+	/// Internal use class used for XML serialization.
+	/// </hidden>
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.4084.0")]
 	[System.SerializableAttribute()]
 	[System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:nucleus/schemas/package/1.0")]
@@ -238,7 +256,9 @@ namespace Nucleus.Abstractions.Models.Extensions
 		Site,
 	}
 
-	/// <remarks/>
+	/// <hidden>
+	/// Internal use class used for XML serialization.
+	/// </hidden>
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.4084.0")]
 	[System.SerializableAttribute()]
 	[System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -266,7 +286,9 @@ namespace Nucleus.Abstractions.Models.Extensions
 		public bool optional;
 	}
 
-	/// <remarks/>
+	/// <hidden>
+	/// Internal use class used for XML serialization.
+	/// </hidden>
 	[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.4084.0")]
 	[System.SerializableAttribute()]
 	[System.Diagnostics.DebuggerStepThroughAttribute()]

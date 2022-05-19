@@ -39,7 +39,7 @@ namespace Nucleus.XmlDocumentation
 				Dictionary<string, ApiClass> classes = new();
 				ApiClass apiClass = null;
 
-				foreach (Models.Serialization.Member member in this.Source.Members)
+				foreach (Models.Serialization.Member member in this.Source.Members.Where(member => member.Hidden == null))
 				{
 					ApiMember apiMember = new(member, this.Source.Assembly.Name);
 

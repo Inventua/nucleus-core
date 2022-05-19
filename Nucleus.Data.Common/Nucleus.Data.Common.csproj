@@ -13,15 +13,24 @@
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Authors>Inventua Pty Ltd</Authors>
 		<Product>Nucleus</Product>
-		<Description>Common data provider base classes and interfaces.</Description>
+		<Description>Common data provider base classes and interfaces.  Nucleus Extension developers would typically reference the Nucleus.Data.EntityFramework package rather than this package.</Description>
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
+		<Copyright>(c) Inventua Pty Ltd</Copyright>
+		<PackageTags>Nucleus</PackageTags>
+		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
+
+	<ItemGroup>
+		<None Include="LICENSE.txt" Pack="true" PackagePath="" />
+	</ItemGroup>
 	
 	<ItemGroup>
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
 	</ItemGroup>
-	
+		
   <ItemGroup>
     <ProjectReference Include="..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
   </ItemGroup>

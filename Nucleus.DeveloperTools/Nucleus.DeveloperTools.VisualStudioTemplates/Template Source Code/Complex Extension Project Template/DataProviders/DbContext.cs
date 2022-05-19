@@ -14,9 +14,9 @@ namespace $nucleus_extension_namespace$.DataProviders
 {
 	public class $nucleus_extension_name$DbContext : Nucleus.Data.EntityFramework.DbContext
 	{
-		public DbSet<$nucleus_extension_name$> $nucleus_extension_name$ { get; set; }
+		public DbSet<$nucleus_extension_name_singular$> $nucleus_extension_name$ { get; set; }
 
-		public LinksDbContext(DbContextConfigurator<$nucleus_extension_name$DataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
+		public $nucleus_extension_name$DbContext(DbContextConfigurator<$nucleus_extension_name$DataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
 		{
 			
 		}

@@ -35,7 +35,48 @@ namespace Nucleus.Extensions
 		public static Guid Get(this List<ModuleSetting> settings, string key, Guid defaultValue)
 		{
 			ModuleSetting value = settings.Where(setting => setting.SettingName == key).FirstOrDefault();
-			return value == null ? defaultValue : Guid.Parse(value.SettingValue);
+			if (value == null)
+			{
+				return defaultValue;
+			}
+			else
+			{
+				if (Guid.TryParse(value.SettingValue, out Guid result))
+				{
+					return result;
+				}
+				else
+				{
+					return defaultValue;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets the specified value or returns an empty string if the key is not present.
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="key"></param>
+		/// <param name="defaultValue"></param>
+		/// <returns></returns>
+		public static DateTime? Get(this List<ModuleSetting> settings, string key, DateTime? defaultValue)
+		{
+			ModuleSetting value = settings.Where(setting => setting.SettingName == key).FirstOrDefault();
+			if (value == null)
+			{
+				return defaultValue;
+			}
+			else
+			{
+				if (DateTime.TryParse(value.SettingValue, out DateTime result))
+				{
+					return result;
+				}
+				else
+				{
+					return defaultValue;
+				}
+			}
 		}
 
 		/// <summary>
@@ -166,6 +207,26 @@ namespace Nucleus.Extensions
 			if (existing != null)
 			{
 				existing.SettingValue = value.ToString();
+			}
+			else
+			{
+				settings.Add(new ModuleSetting() { SettingName = key, SettingValue = value.ToString() });
+			}
+		}
+
+		/// <summary>
+		/// Adds or replaces the value for the specified key.
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <param name="key"></param>
+		/// <param name="value"></param>
+		public static void Set(this List<ModuleSetting> settings, string key, DateTime? value)
+		{
+			string serializedValue = value.HasValue ? value.Value.ToString("O") : "";
+			ModuleSetting existing = settings.Where(setting => setting.SettingName == key).FirstOrDefault();
+			if (existing != null)
+			{
+				existing.SettingValue = serializedValue;
 			}
 			else
 			{

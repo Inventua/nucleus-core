@@ -32,6 +32,7 @@
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<PackageId>Inventua.$(AssemblyName)</PackageId>
+		
 	</PropertyGroup>
 
 	<ItemGroup>

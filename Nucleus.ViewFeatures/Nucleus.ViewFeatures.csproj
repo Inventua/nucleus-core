@@ -24,6 +24,7 @@
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<PackageId>Inventua.$(AssemblyName)</PackageId>
+		<Copyright>(c) Inventua Pty Ltd</Copyright>
 	</PropertyGroup>
 	
 	<ItemGroup>

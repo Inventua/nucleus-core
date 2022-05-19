@@ -8,7 +8,7 @@ using Nucleus.Abstractions.Models.FileSystem;
 
 namespace $nucleus_extension_namespace$.Models
 {
-	public class $nucleus_extension_name_singular_lcase$
+	public class $nucleus_extension_name_singular$
 	{
 		public Guid Id { get; set; }				
 	}

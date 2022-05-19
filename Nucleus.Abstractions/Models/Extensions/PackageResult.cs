@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Nucleus.Abstractions.Models.Extensions
 {
 	/// <summary>
-	/// Pacakge validation result
+	/// Package validation result returned by the extension manager .ValidatePackage method.
 	/// </summary>
 	public class PackageResult
 	{

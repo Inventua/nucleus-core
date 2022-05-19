@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 namespace Nucleus.Abstractions
 {
 	/// <summary>
-	/// Nucleus.Abstractions classes include models, and common extensions.
+	/// Nucleus.Abstractions includes models, base classes, interfaces and constants for use by both Nucleus Core and Extensions.  Most 
+	/// extensions developed for Nucleus should reference this assembly.
 	/// </summary>
 	[System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
 	class NamespaceDoc

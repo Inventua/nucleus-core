@@ -126,7 +126,7 @@ namespace Nucleus.Modules.ContactUs.Controllers
               {
                 using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
                 {
-                  mailClient.Send(template, args, settings.SendTo);
+                  await mailClient.Send(template, args, settings.SendTo);
                 }
               }
               catch (Exception ex)

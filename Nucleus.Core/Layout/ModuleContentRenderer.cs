@@ -198,7 +198,7 @@ namespace Nucleus.Core.Layout
 						}
 
 						// copy values from the module response to the "real" response.  Note: Returning Redirect() or one of the other ActionResult types
-						// doesn't actually set any response values, so extension developers have to set the actual response properties to use this.
+						// doesn't set any response properties, so extension developers have to set the HttpContext.Response properties to use this.
 						foreach (var header in moduleOutput.Headers)
 						{
 							switch (header.Key)

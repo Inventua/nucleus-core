@@ -404,9 +404,17 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			await this.PageModuleManager.Delete(mid);
 
-			return View("_PageModules", await BuildPageEditorViewModel(viewModel.Page, null, true));
+			return View("_PageModules", await BuildPageEditorViewModel(viewModel.Page, null, true));		
 		}
 
+		[HttpPost]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		public async Task<ActionResult> DeletePageModuleInline(ViewModels.Admin.PageEditor viewModel, Guid mid)
+		{
+			await this.PageModuleManager.Delete(mid);
+			
+			return Ok();			
+		}
 
 		[HttpPost]
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]

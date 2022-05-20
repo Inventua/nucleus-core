@@ -199,6 +199,10 @@ namespace Nucleus.Core.Layout
 
 				TagBuilder formBuilder = new("form");
 				formBuilder.Attributes.Add("class", "nucleus-inline-edit-controls");
+
+				// #refresh is a dummy value - we want nucleus-shared.js#_postPartialContent to process the clicks for the inline editing functions, so we need a 
+				// non-blank data-target attribute so that the click event is bound to _postPartialContent.  
+				// The value that we are using - "#refresh" - doesn't have any special meaning or code to process it in nucleus-shared.js.
 				formBuilder.Attributes.Add("data-target", "#refresh");
 
 				formBuilder.InnerHtml.AppendHtml(BuildEditButton("&#xe3c9;", "Edit", urlHelper.Content("~/Admin/Pages/EditModule"), moduleInfo, null));
@@ -207,7 +211,7 @@ namespace Nucleus.Core.Layout
 				if (user.HasEditPermission(this.Context.Site, this.Context.Page))
 				{
 					formBuilder.InnerHtml.AppendHtml(BuildEditButton("&#xe8b8;", "Settings", urlHelper.Content("~/Admin/Pages/EditModuleCommonSettings"), moduleInfo, null));
-					formBuilder.InnerHtml.AppendHtml(BuildDeleteButton("&#xe14c;", "Delete", urlHelper.Content("~/Admin/Pages/DeletePageModule"), moduleInfo, null));
+					formBuilder.InnerHtml.AppendHtml(BuildDeleteButton("&#xe14c;", "Delete", urlHelper.Content("~/Admin/Pages/DeletePageModuleInline"), moduleInfo, null));
 				}
 
 				editorBuilder.InnerHtml.AppendHtml(formBuilder);

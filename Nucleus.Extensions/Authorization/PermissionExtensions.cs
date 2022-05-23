@@ -7,6 +7,7 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
 using System.Security.Claims;
 using Nucleus.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Nucleus.Extensions.Authorization
 {
@@ -182,11 +183,13 @@ namespace Nucleus.Extensions.Authorization
 		/// <param name="context"></param>
 		/// <returns></returns>
 		public static Boolean IsEditing(this System.Security.Claims.ClaimsPrincipal user, Microsoft.AspNetCore.Http.HttpContext context)
-		{			
-			if (Boolean.TryParse(context.Request.Cookies[EDIT_COOKIE_NAME], out Boolean isEditMode))
+		{
+			Context nucleusContext = context.RequestServices.GetService<Context>();
+
+			if (user.HasEditPermission(nucleusContext.Site, nucleusContext.Page, nucleusContext.Module))
 			{
-				return isEditMode;
-			}			
+				return IsEditModeOn(context);
+			}
 
 			return false;
 		}
@@ -205,21 +208,33 @@ namespace Nucleus.Extensions.Authorization
 		{
 			if (user.HasEditPermission(site, page, module))
 			{
-				return IsEditing(user, context);				
+				return IsEditModeOn(context);
 			}
 
 			return false;
 		}
 
+		/// <summary>
 		/// Returns a value specifying whether the user has permissions to edit the specified page and has clicked the control panel button to enable
 		/// editing (which sets a cookie).
+		/// </summary>
 		public static Boolean IsEditing(this System.Security.Claims.ClaimsPrincipal user, Microsoft.AspNetCore.Http.HttpContext context, Site site, Page page)
 		{
 			if (user.CanEditContent(site, page))
 			{
-				return IsEditing(user, context);
+				return IsEditModeOn(context);
 			}
 
+			return false;
+		}
+
+		private static Boolean IsEditModeOn(Microsoft.AspNetCore.Http.HttpContext context)
+		{
+			if (Boolean.TryParse(context.Request.Cookies[EDIT_COOKIE_NAME], out Boolean isEditMode))
+			{
+				return isEditMode;
+			}
+			
 			return false;
 		}
 

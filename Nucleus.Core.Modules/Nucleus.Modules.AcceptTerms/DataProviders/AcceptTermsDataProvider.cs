@@ -31,7 +31,7 @@ namespace Nucleus.Modules.AcceptTerms.DataProviders
 
     public async Task<UserAcceptedTerms> Get(Guid moduleId, Guid userId)
     {
-      return await this.Context.UserTermsAcceptance
+      return await this.Context.UserAcceptedTerms
         .Where(acceptTerm => EF.Property<Guid>(acceptTerm, "ModuleId") == moduleId && acceptTerm.UserId == userId)
         .AsNoTracking()
         .FirstOrDefaultAsync();
@@ -39,7 +39,7 @@ namespace Nucleus.Modules.AcceptTerms.DataProviders
 
     public async Task Save(PageModule pageModule, UserAcceptedTerms acceptTerm)
     {
-      UserAcceptedTerms existing = await this.Context.UserTermsAcceptance
+      UserAcceptedTerms existing = await this.Context.UserAcceptedTerms
         .Where(existing => EF.Property<Guid>(existing, "ModuleId") == pageModule.Id && existing.UserId == acceptTerm.UserId)
         .FirstOrDefaultAsync();
 

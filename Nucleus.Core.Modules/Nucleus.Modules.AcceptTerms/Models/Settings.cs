@@ -33,10 +33,10 @@ namespace Nucleus.Modules.AcceptTerms.Models
       this.CancelText = module.ModuleSettings.Get(MODULESETTING_CANCELTEXT, "Cancel");
 
       DateTime? effectiveDateUtc = module.ModuleSettings.Get(MODULESETTING_EFFECTIVEDATE, (DateTime?)null);
-       
+     
       if (effectiveDateUtc.HasValue)
       {
-        this.EffectiveDate = System.TimeZoneInfo.ConvertTimeFromUtc(effectiveDateUtc.Value, userTimeZoneInfo);
+        this.EffectiveDate = System.TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(effectiveDateUtc.Value, DateTimeKind.Utc), userTimeZoneInfo);
       }
       else
       {

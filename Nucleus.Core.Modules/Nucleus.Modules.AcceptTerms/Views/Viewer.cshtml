@@ -1,18 +1,27 @@
 ﻿@model Nucleus.Modules.AcceptTerms.ViewModels.Viewer
-@*@Html.AddStyle("~!/../viewer.css")*@
-<div class="modal" tabindex="-1">
-	<div class="modal-dialog modal-auto-size modal-dialog-scrollable modal-dialog-centered">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">@Model.Title</h5>
-			</div>
-			<div class="modal-body">
-				@Model.AgreementBody?.ToHtml()
-			</div>
-			<div class="nucleus-form-buttonrow">
-				@Html.SubmitButton("", @Model.AcceptText, @Url.NucleusAction("SaveUserAcceptedTerms", "AcceptTerms", "AcceptTerms"), new { @class="btn btn-primary",  @aria_label = @Model.AcceptText, @data_target = "form.parent()" })
-				@Html.SubmitButton("", @Model.CancelText, @Url.NucleusAction("CancelTerms", "AcceptTerms", "AcceptTerms"), new { @class="btn btn-secondary",  @aria_label = @Model.CancelText })
+@using (Html.BeginNucleusForm("SaveUserAcceptedTerms", "AcceptTerms", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+	<div class="modal accept-terms-modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+		<div class="modal-dialog modal-auto-size modal-dialog-scrollable modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">@Model.Title</h5>
+				</div>
+				<div class="modal-body">
+					@Html.Raw(@Model.AgreementBody?.ToHtml())
+				</div>
+				<div class="modal-footer">
+					@Html.SubmitButton("", @Model.AcceptText, @Url.NucleusAction("SaveUserAcceptedTerms", "AcceptTerms", "AcceptTerms"), new { @class="btn btn-primary",  @aria_label = @Model.AcceptText, @data_target = "form.parent()" })
+					@Html.SubmitButton("", @Model.CancelText, @Url.NucleusAction("CancelTerms", "AcceptTerms", "AcceptTerms"), new { @class="btn btn-secondary",  @aria_label = @Model.CancelText, @data_target = "form.parent()" })
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
+}
+<script type="text/javascript">
+	jQuery(document).ready(function ()
+	{
+		var modal = new bootstrap.Modal(jQuery('.accept-terms-modal'));
+		modal.show();
+	});
+</script>

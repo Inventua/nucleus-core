@@ -1,0 +1,83 @@
+{
+	"schemaName": "Nucleus.Modules.AcceptTerms",
+	"version": "01.00.00",
+	"operations": [
+		{
+			"createTable": {
+				"name": "UserAcceptedTerms",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ModuleId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "UserId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "DateAccepted",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_UserAcceptedTerms",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_UserAcceptedTerms_ModuleId",
+						"Columns": [ "ModuleId" ],
+						"PrincipalTable": "PageModules",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_UserAcceptedTerms_ModuleId",
+				"table": "UserAcceptedTerms",
+				"isunique": false,
+				"columns": [ "ModuleId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_UserAcceptedTerms_ModuleId_UserId",
+				"table": "UserAcceptedTerms",
+				"isunique": true,
+				"columns": [ "ModuleId", "UserId" ]
+			}
+		}
+	]
+}

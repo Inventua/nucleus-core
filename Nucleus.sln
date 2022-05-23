@@ -120,6 +120,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.OAuth.Server", "Nuc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Modules.ContactUs", "Nucleus.Core.Modules\Nucleus.Modules.ContactUs\Nucleus.Modules.ContactUs.csproj", "{31AE9954-A4D8-4902-AEDF-56264BF3EEB9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Modules.AcceptTerms", "Nucleus.Core.Modules\Nucleus.Modules.AcceptTerms\Nucleus.Modules.AcceptTerms.csproj", "{6CC1F90F-7EA0-4992-9AF8-E641B3EDB4E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -250,6 +252,10 @@ Global
 		{31AE9954-A4D8-4902-AEDF-56264BF3EEB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31AE9954-A4D8-4902-AEDF-56264BF3EEB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31AE9954-A4D8-4902-AEDF-56264BF3EEB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CC1F90F-7EA0-4992-9AF8-E641B3EDB4E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CC1F90F-7EA0-4992-9AF8-E641B3EDB4E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CC1F90F-7EA0-4992-9AF8-E641B3EDB4E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CC1F90F-7EA0-4992-9AF8-E641B3EDB4E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -278,6 +284,7 @@ Global
 		{9B8F6A43-6BD1-4F80-A56F-4C13ADEF2BA5} = {CD49EF69-179E-461A-9C51-041EA3B901CE}
 		{883F62B7-2FF9-48CF-BD6A-AE0D04B44BFA} = {CD49EF69-179E-461A-9C51-041EA3B901CE}
 		{31AE9954-A4D8-4902-AEDF-56264BF3EEB9} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
+		{6CC1F90F-7EA0-4992-9AF8-E641B3EDB4E1} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D84CD364-9C8E-400E-84AA-45562061ED44}

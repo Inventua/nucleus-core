@@ -1,0 +1,40 @@
+﻿@model Nucleus.Modules.AcceptTerms.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<div>
+	@using (Html.BeginNucleusForm("Settings", "AcceptTerms", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+	{
+		<fieldset role="group" aria-labelledby="heading">
+			<h2 class="nucleus-control-panel-heading">Settings</h2>
+			@Html.HiddenFor(model => model.AgreementBody.Id)
+			<SettingsControl caption="Title" helptext="Enter the title for the user agreement.">
+				@Html.TextBoxFor(model => model.Title, new {  })
+			</SettingsControl>
+
+			<SettingsControl caption="Agreement Text" helptext="Enter the agreement text to display to the user.">
+				@Html.TextAreaFor(model => model.AgreementBody.Value, new { @class = "HtmlEditorControl" })
+			</SettingsControl>
+
+			<div class="nucleus-flex-fields">
+				<SettingsControl caption="Accept Button Text" helptext="Enter the text for the accept button.">
+					@Html.TextBoxFor(model => model.AcceptText, new { })
+				</SettingsControl>
+
+				<SettingsControl caption="Cancel Button Text" helptext="Enter the text for the cancel button.">
+					@Html.TextBoxFor(model => model.CancelText, new { })
+				</SettingsControl>
+
+				<SettingsControl caption="Effective Date" helptext="Select the effective date for the agreement. Update the effective date to invalidate user acceptances from before the effective date. The effective date should be entered in your local time/timezone. It is automatically converted to/from UTC.">
+					@Html.TextBoxFor(model => model.EffectiveDate, new { @type = "date", @class="nucleus-accept-terms-effective-date" })
+				</SettingsControl>
+			</div>
+
+			<div class="Tools">
+				@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "AcceptTermsAdmin", "AcceptTerms"), new { @class = "btn btn-primary" })
+			</div>
+		</fieldset>
+	}
+</div>

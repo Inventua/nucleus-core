@@ -161,6 +161,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 		{			
 			TagBuilder listBuilder = new("ul");
 			listBuilder.AddCssClass("dropdown-menu");
+			listBuilder.Attributes.Add("aria-live", "polite");
 			AddChildren(menuStyle, listBuilder, urlHelper, childItem, maxLevels, thisLevel + 1);
 
 			return listBuilder;

@@ -31,6 +31,8 @@
     <None Remove="Views\Viewer.cshtml" />
     <None Remove="Views\ViewerLayouts\Ordered List.cshtml" />
     <None Remove="Views\ViewerLayouts\Table.cshtml" />
+    <None Remove="Views\ViewerLayouts\Tile.cshtml" />
+    <None Remove="Views\ViewerLayouts\Tile.css" />
     <None Remove="Views\ViewerLayouts\Unordered List.cshtml" />
     <None Remove="Views\_LinksList.cshtml" />
     <None Remove="Views\_PageMenu.cshtml" />
@@ -43,6 +45,8 @@
     <Content Include="readme.txt" />
     <Content Include="settings.css" />
     <Content Include="Views\Editor.cshtml" />
+    <Content Include="Views\ViewerLayouts\Tile.cshtml" />
+    <Content Include="Views\ViewerLayouts\Tile.css" />
     <Content Include="Views\ViewerLayouts\Unordered List.cshtml" />
     <Content Include="Views\_LinksList.cshtml" />
     <Content Include="Views\Viewer.cshtml" />

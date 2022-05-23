@@ -54,7 +54,7 @@
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>TextHtml</ExtensionFolder>
-		<Version>2.0.0</Version>
+		<Version>1.0.0</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 	</PropertyGroup>
 

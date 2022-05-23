@@ -93,6 +93,7 @@ namespace Nucleus.Modules.Links.DataProviders
 			List<Link> results = await this.Context.Links
 				.Where(link => EF.Property<Guid>(link, "ModuleId") == pageModule.Id)
 				.OrderBy(link => link.SortOrder)
+				.AsNoTracking()
 				.ToListAsync();
 
 			foreach (Link result in results)
@@ -124,7 +125,9 @@ namespace Nucleus.Modules.Links.DataProviders
 		{
 			Action raiseEvent;
 
-			Boolean isNew = !this.Context.Links.Where(existing => existing.Id == link.Id).Any();
+			Boolean isNew = !this.Context.Links.Where(existing => existing.Id == link.Id)
+				.AsNoTracking()
+				.Any();
 
 			this.Context.Attach(link);
 			this.Context.Entry(link).Property("ModuleId").CurrentValue = pageModule.Id;
@@ -164,6 +167,7 @@ namespace Nucleus.Modules.Links.DataProviders
 			Link link = await this.Context.Links
 				.Where(link => EF.Property<Guid>(link, "ModuleId") == moduleId)
 				.OrderByDescending(link => link.SortOrder)
+				.AsNoTracking()
 				.FirstOrDefaultAsync();
 
 			return link == null ? 10 : link.SortOrder;

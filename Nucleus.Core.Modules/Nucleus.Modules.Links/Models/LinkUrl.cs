@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Links.Models
 {
-	public class LinkUrl 
+	public class LinkUrl : ModelBase
 	{
 		public string Url { get; set; }
 	}

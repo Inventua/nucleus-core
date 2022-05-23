@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Links.Models
 {
-	public class LinkFile
+	public class LinkFile : ModelBase
 	{
 		public File File { get; set; }
 	}

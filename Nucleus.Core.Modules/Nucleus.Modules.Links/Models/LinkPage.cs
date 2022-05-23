@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Links.Models
 {
-	public class LinkPage
+	public class LinkPage : ModelBase
 	{
 		public Page Page { get; set; }
 	}

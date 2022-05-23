@@ -19,6 +19,8 @@
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<PackageId>Inventua.$(AssemblyName)</PackageId>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<Authors>Inventua Pty Ltd</Authors>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -43,6 +45,13 @@
     <ProjectReference Include="..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
     <ProjectReference Include="..\Nucleus.Data.Common\Nucleus.Data.Common.csproj" />
     <ProjectReference Include="..\Nucleus.Extensions\Nucleus.Extensions.csproj" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <None Update="README.md">
+      <PackagePath>\</PackagePath>
+      <Pack>True</Pack>
+    </None>
   </ItemGroup>
 
 </Project>

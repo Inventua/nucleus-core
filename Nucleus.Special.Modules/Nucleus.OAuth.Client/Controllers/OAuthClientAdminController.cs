@@ -39,11 +39,11 @@ namespace Nucleus.OAuth.Client.Controllers
 			this.Options = options;
 		}
 
-		private string BuildRedirectUrl(string returnUrl)
-		{
-			// Only allow a relative path for redirectUri (that is, the url must start with "/"), to ensure that it points to "this" site.					
-			return String.IsNullOrEmpty(returnUrl) || !returnUrl.StartsWith("/") ? "/" : returnUrl;
-		}
+		//private string BuildRedirectUrl(string returnUrl)
+		//{
+		//	// Only allow a relative path for redirectUri (that is, the url must start with "/"), to ensure that it points to "this" site.					
+		//	return String.IsNullOrEmpty(returnUrl) || !returnUrl.StartsWith("/") ? "~/" : returnUrl;
+		//}
 
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]

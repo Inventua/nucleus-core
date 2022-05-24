@@ -69,8 +69,8 @@ namespace Nucleus.Web.Controllers
 
 				viewModel.IsEditing = User.IsEditing(HttpContext, this.Context.Site, this.Context.Page);
 				viewModel.CanEdit = User.CanEditContent(this.Context.Site, this.Context.Page);
-				viewModel.SiteIconPath = await Context.Site.GetIconPath(this.FileSystemManager);
-				viewModel.SiteCssFilePath = await Context.Site.GetCssFilePath(this.FileSystemManager);
+				viewModel.SiteIconPath = Url.Content(await Context.Site.GetIconPath(this.FileSystemManager));
+				viewModel.SiteCssFilePath = Url.Content(await Context.Site.GetCssFilePath(this.FileSystemManager));
 
 				return View(this.Context.Page.LayoutPath(this.Context.Site), viewModel);
 			}

@@ -20,7 +20,7 @@
 	margin-bottom: 0.75rem;
 }
 
-#site-wizard .installable-package label span
+#site-wizard .installable-package label *
 {
 	display: inline-block;
 	vertical-align: middle;

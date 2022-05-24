@@ -155,8 +155,8 @@ namespace Nucleus.Modules.Account.Controllers
 						UserSession session = await this.SessionManager.CreateNew(this.Context.Site, loginUser, viewModel.AllowRememberMe && viewModel.RememberMe, ControllerContext.HttpContext.Connection.RemoteIpAddress);
 						await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
 
-						string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.GetAbsoluteUri("/").ToString() : Url.GetAbsoluteUri(viewModel.ReturnUrl).ToString();
-						ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
+						string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/").ToString() :viewModel.ReturnUrl;
+						ControllerContext.HttpContext.Response.Headers.Add("X-Location", Url.Content(location));
 						return StatusCode((int)System.Net.HttpStatusCode.Found);
 					}
 				}
@@ -167,7 +167,7 @@ namespace Nucleus.Modules.Account.Controllers
 		{
 			await this.SessionManager.SignOut(HttpContext);
 			
-			return Redirect(String.IsNullOrEmpty(returnUrl) ? "/" : returnUrl);
+			return Redirect(String.IsNullOrEmpty(returnUrl) ? "~/" : returnUrl);
 		}
 
 		private ViewModels.Login BuildViewModel(string returnUrl)

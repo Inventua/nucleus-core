@@ -116,7 +116,10 @@ namespace Nucleus.Modules.Account.Controllers
 					{
 						loginUser.Secrets.SetPassword(viewModel.NewPassword);
 						await this.UserManager.SaveSecrets(loginUser);
-						return Redirect(String.IsNullOrEmpty(viewModel.ReturnUrl) ? "/" : viewModel.ReturnUrl);
+						
+						string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
+						ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
+						return StatusCode((int)System.Net.HttpStatusCode.Found);
 					}
 				}
 			}

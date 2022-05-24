@@ -78,9 +78,11 @@ namespace Nucleus.Modules.Account.Controllers
 			else
 			{
 				await this.UserManager.Save(this.Context.Site, existing); 
-			}			
-			
-			return Redirect(String.IsNullOrEmpty(viewModel.ReturnUrl) ? "/" : viewModel.ReturnUrl);
+			}
+
+			string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
+			ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
+			return StatusCode((int)System.Net.HttpStatusCode.Found);
 		}
 	}
 }

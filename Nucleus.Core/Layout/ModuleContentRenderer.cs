@@ -175,6 +175,7 @@ namespace Nucleus.Core.Layout
 					// can always edit settings.
 					if (!isEditing)
 					{
+						moduleOutput.StatusCode = (int)System.Net.HttpStatusCode.OK;
 						return output;
 					}
 				}
@@ -190,6 +191,7 @@ namespace Nucleus.Core.Layout
 						{
 							case System.Net.HttpStatusCode.NoContent:
 								// only copy status code if it is not .NoContent, as .NoContent from a module has special meaning
+								moduleOutput.StatusCode = (int)System.Net.HttpStatusCode.OK;
 								break;
 
 							default:

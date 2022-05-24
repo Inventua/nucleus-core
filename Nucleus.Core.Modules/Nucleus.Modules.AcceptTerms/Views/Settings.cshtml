@@ -28,7 +28,7 @@
 				</SettingsControl>
 
 				<SettingsControl caption="Effective Date" helptext="Select the effective date for the agreement. Update the effective date to invalidate user acceptances from before the effective date. The effective date should be entered in your local time/timezone. It is automatically converted to/from UTC.">
-					@Html.TextBoxFor(model => model.EffectiveDate, new { @type = "date", @class="nucleus-accept-terms-effective-date" })
+					@Html.TextBoxFor(model => model.EffectiveDate, "{0:yyyy-MM-ddThh:mm}", new { @class="nucleus-accept-terms-effective-date", @type = "datetime-local" })
 				</SettingsControl>
 			</div>
 

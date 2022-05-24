@@ -37,6 +37,7 @@
 					<file name="Table.cshtml" />
 					<file name="Ordered List.cshtml" />
 					<file name="Unordered List.cshtml" />
+					<file name="Tile.cshtml" />
 				</folder>
 			</folder>
 			

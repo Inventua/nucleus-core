@@ -97,12 +97,19 @@
 
 		<Copy SourceFiles="@(OutputAssemblies)" DestinationFolder="AppPackage\bin\%(RecursiveDir)" Retries="2" />
 		<Copy SourceFiles="@(Content)" DestinationFolder="AppPackage\%(RelativeDir)\%(RecursiveDir)" Retries="2" />
-		<Delete Files="$(ExtensionFolder)_Extension.zip" />
+		<Delete Files="$(ExtensionFolder)_Extension_$(PackageVersion).zip" />
 		
-		<ZipDirectory SourceDirectory="AppPackage" DestinationFile="$(ExtensionFolder)_Extension.zip" Overwrite="true" />
+		<ZipDirectory SourceDirectory="AppPackage" DestinationFile="$(ExtensionFolder)_Extension_$(PackageVersion).zip" Overwrite="true" />
 
 		<RemoveDir Directories="AppPackage" />
+	</Target>
 
-		<Copy SourceFiles="$(ExtensionFolder)_Extension.zip" DestinationFolder="$(NUCLEUS_PATH)\Setup\Extensions\" Retries="2" Condition="$(CopyToDefaultSetup) != false " />
+	<Target Name="CopyToWebSetup" AfterTargets="PostBuildEvent" Condition="$(CopyToDefaultSetup) != false">
+		<ItemGroup>
+			<FilesToDelete Include="$(NUCLEUS_PATH)\Setup\Extensions\$(ExtensionFolder)_Extension*.zip"/>
+		</ItemGroup>
+		<Message Importance="high" Text="Removing old install packages from $(NUCLEUS_PATH)\Setup\Extensions\: @(FilesToDelete)" />
+		<Delete Files="@(FilesToDelete)" />
+		<Copy SourceFiles="$(ExtensionFolder)_Extension_$(PackageVersion).zip" DestinationFolder="$(NUCLEUS_PATH)\Setup\Extensions\" Retries="2" />
 	</Target>
 </Project>

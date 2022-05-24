@@ -21,6 +21,7 @@
 	</ItemGroup>
 
   <ItemGroup>
+    <None Remove="LICENSE" />
     <None Remove="viewer.css" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
@@ -33,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="LICENSE" />
     <Content Include="viewer.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
@@ -62,12 +64,6 @@
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 		<CopyToDefaultSetup>false</CopyToDefaultSetup>
 	</PropertyGroup>
-
-	<!--<Target Name="FilterCopyLocalItems" AfterTargets="ResolveLockFileCopyLocalFiles">
-		<ItemGroup>
-			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="!($([System.String]::new('%(DestinationSubPath)').StartsWith('Microsoft.AspNetCore.Authentication')) OR '%(DestinationSubPath)' == 'Microsoft.IdentityModel.Protocols.OpenIdConnect.dll' OR '%(DestinationSubPath)' == 'Microsoft.IdentityModel.Tokens.dll' OR '%(DestinationSubPath)' == 'Microsoft.IdentityModel.Protocols.dll' OR '%(DestinationSubPath)' == 'System.IdentityModel.Tokens.Jwt.dll' OR '%(DestinationSubPath)' == 'Microsoft.IdentityModel.Logging.dll'  OR '%(DestinationSubPath)' == 'Microsoft.IdentityModel.JsonWebTokens.dll')" />
-		</ItemGroup>
-	</Target>-->
 	
 	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
 </Project>

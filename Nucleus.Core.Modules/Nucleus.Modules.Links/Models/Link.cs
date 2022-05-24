@@ -15,7 +15,7 @@ namespace Nucleus.Modules.Links.Models
 		public const string Page = Nucleus.Abstractions.Models.Page.URN;
 	}
 
-	public class Link
+	public class Link : ModelBase
 	{
 		public Guid Id { get; set; }
 		public string Title { get; set; }

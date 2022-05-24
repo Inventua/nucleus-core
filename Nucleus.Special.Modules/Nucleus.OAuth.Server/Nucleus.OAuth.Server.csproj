@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <None Remove="DataProviders\Migrations\Scripts\01.00.00.json" />
+    <None Remove="LICENSE" />
     <None Remove="settings.css" />
     <None Remove="viewer.css" />
     <None Remove="package.xml" />
@@ -33,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="LICENSE" />
     <Content Include="viewer.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
@@ -63,6 +65,7 @@
 		<ExtensionFolder>OAuth Server</ExtensionFolder>
 		<Version>1.0.0</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+		<CopyToDefaultSetup>false</CopyToDefaultSetup>
 	</PropertyGroup>
 
 	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />

@@ -14,7 +14,7 @@ namespace Nucleus.Modules.AcceptTerms.DataProviders
 {
   public class AcceptTermsDbContext : Nucleus.Data.EntityFramework.DbContext
   {
-    public DbSet<UserAcceptedTerms> UserTermsAcceptance { get; set; }
+    public DbSet<UserAcceptedTerms> UserAcceptedTerms { get; set; }
 
     public AcceptTermsDbContext(DbContextConfigurator<AcceptTermsDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
     {
@@ -34,6 +34,7 @@ namespace Nucleus.Modules.AcceptTerms.DataProviders
     {
       base.OnModelCreating(builder);
 
+      builder.Entity<UserAcceptedTerms>().ToTable("UserAcceptedTerms");
       builder.Entity<UserAcceptedTerms>().Property<Guid>("ModuleId");
 
     }

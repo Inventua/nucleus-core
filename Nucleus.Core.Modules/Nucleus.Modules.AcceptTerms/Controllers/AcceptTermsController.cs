@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
+using Nucleus.ViewFeatures;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
 using Nucleus.Modules.AcceptTerms.Models;
@@ -32,7 +33,7 @@ namespace Nucleus.Modules.AcceptTerms.Controllers
     [HttpGet]
     public async Task<ActionResult> Index()
     {
-      Settings settings = new ViewModels.Settings();
+      Settings settings = new ViewModels.Viewer();
       settings.ReadSettings(this.Context.Module, this.HttpContext.Request.GetUserTimeZone());
       settings.AgreementBody = (await this.ContentManager.List(this.Context.Module)).FirstOrDefault();
 
@@ -46,7 +47,7 @@ namespace Nucleus.Modules.AcceptTerms.Controllers
         else
         { 
           UserAcceptedTerms userAcceptedTerms = await this.AcceptTermsManager.Get(this.Context.Module, User);
-          if (userAcceptedTerms != null && (!settings.EffectiveDate.HasValue && userAcceptedTerms.DateAccepted >= settings.EffectiveDate))
+          if (userAcceptedTerms != null && (!settings.EffectiveDate.HasValue || userAcceptedTerms.DateAccepted >= settings.EffectiveDate))
           {
             // do nothing, user has accepted terms already
             return NoContent();
@@ -60,16 +61,21 @@ namespace Nucleus.Modules.AcceptTerms.Controllers
     [HttpPost]
     public async Task<ActionResult> SaveUserAcceptedTerms()
     {
-      await this.AcceptTermsManager.Save(this.Context.Module, User);
-      return await Index();
+      if (User.Identity.IsAuthenticated)
+      {
+        await this.AcceptTermsManager.Save(this.Context.Module, User);
+      }
+      return Ok();
+      //return await Index();
     }
 
     [HttpPost]
     public ActionResult CancelTerms()
     {
-      return Redirect("/");
+      string location = Url.GetAbsoluteUri("/").ToString();
+      ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
+      return StatusCode((int)System.Net.HttpStatusCode.Found);
     }
-
 
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
     [HttpGet]

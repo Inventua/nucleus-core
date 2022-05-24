@@ -94,7 +94,7 @@ namespace Nucleus.Modules.Account.Controllers
 					await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
 				}
 
-				string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.GetAbsoluteUri("/").ToString() : Url.GetAbsoluteUri(viewModel.ReturnUrl).ToString();
+				string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
 				ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
 				return StatusCode((int)System.Net.HttpStatusCode.Found);
 

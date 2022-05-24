@@ -49,7 +49,7 @@
 		}
 		<div class="mt-2">
 			<input type="submit" value="Login" class="btn btn-primary" data-target="form.parent()" />
-			<a href="/" class="btn btn-secondary">Cancel</a>
+			<a href="@Url.Content("~/")" class="btn btn-secondary">Cancel</a>
 
 			@if (Model.AllowUsernameRecovery | Model.AllowPasswordReset)
 			{

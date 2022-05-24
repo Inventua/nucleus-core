@@ -72,7 +72,7 @@ namespace Nucleus.Modules.AcceptTerms.Controllers
     [HttpPost]
     public ActionResult CancelTerms()
     {
-      string location = Url.GetAbsoluteUri("/").ToString();
+      string location = Url.Content("~/");
       ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
       return StatusCode((int)System.Net.HttpStatusCode.Found);
     }

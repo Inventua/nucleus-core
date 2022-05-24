@@ -37,9 +37,11 @@ namespace Nucleus.OAuth.Client.Models.Configuration
 		/// The 'proper' way to start authentication is to call Challenge(), but this would add an extra redirect, and it makes
 		/// no difference to just call the Url directly.
 		/// </remarks
-		public string AuthenticateEndpoint(string returnUrl)
+		public string AuthenticateEndpoint(Microsoft.AspNetCore.Mvc.IUrlHelper urlHelper, string returnUrl)
 		{
-			return $"/extensions/OAuthClient/Authenticate/{this.Name ?? this.Type}?returnUrl={returnUrl ?? "/"}";
+			string path = $"~/extensions/OAuthClient/Authenticate/{this.Name ?? this.Type}";
+
+			return $"{urlHelper.Content(path)}?returnUrl={returnUrl ?? urlHelper.Content("~/")}";
 		}
 	}
 }

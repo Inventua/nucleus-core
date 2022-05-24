@@ -80,6 +80,13 @@ namespace Nucleus.Core.Managers
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
 				Guid pageId = await provider.FindPage(site, path);
+
+				if (pageId == Guid.Empty && String.IsNullOrEmpty(path))
+				{
+					// treat empty local path as "/"
+					pageId = await provider.FindPage(site, "/");
+				}
+				
 				if (pageId == Guid.Empty)
 				{
 					return null;

@@ -83,9 +83,13 @@ namespace Nucleus.Web.Controllers.Setup
 				// Build the site
 				await BuildSite(viewModel);
 
-				this.HostApplicationLifetime.StopApplication();
+				// Wait 3 seconds after returning and restart
+				Task restartTask = Task.Run(async () => {
+					await Task.Delay(3000);
+					this.HostApplicationLifetime.StopApplication();
+				});
 
-				return Redirect(viewModel.Site.Aliases.First().Alias);
+				return View("complete", new ViewModels.Setup.SiteWizardComplete() { SiteUrl = Url.Content(Request.Scheme + System.Uri.SchemeDelimiter + viewModel.Site.Aliases.First().Alias) });				
 			}
 			else
 			{
@@ -105,13 +109,10 @@ namespace Nucleus.Web.Controllers.Setup
 			}
 
 			// create site
-			//using (Stream templateFile = System.IO.File.OpenRead(System.IO.Path.Combine(TemplatesFolder().FullName, viewModel.TemplateTempFileName)))
-			//{
-			//Nucleus.Abstractions.Models.Export.SiteTemplate template = this.SiteManager.ParseTemplate(templateFile);
 			Nucleus.Abstractions.Models.Export.SiteTemplate template = await this.SiteManager.ReadTemplateTempFile(viewModel.TemplateTempFileName);
 
 			template.Site.Name = viewModel.Site.Name;
-			//viewModel.Site.Aliases.First().Alias = this.HttpContext.Request.Host.Value;
+			
 			viewModel.Site.DefaultSiteAlias.Id = Guid.NewGuid();
 			template.Site.Aliases = new() { viewModel.Site.DefaultSiteAlias };
 			template.Site.DefaultSiteAlias = viewModel.Site.DefaultSiteAlias;
@@ -126,8 +127,7 @@ namespace Nucleus.Web.Controllers.Setup
 			template.Site.HomeDirectory = viewModel.Site.HomeDirectory;
 
 			viewModel.Site = await this.SiteManager.Import(template);
-			//}
-
+			
 			// create users
 
 			// only create a system admin user if there isn't already one in the database
@@ -140,7 +140,8 @@ namespace Nucleus.Web.Controllers.Setup
 				};
 				sysAdminUser.Secrets = new();
 				sysAdminUser.Secrets.SetPassword(viewModel.SystemAdminPassword);
-
+				sysAdminUser.Approved = true;
+				sysAdminUser.Verified = true;
 				await this.UserManager.SaveSystemAdministrator(sysAdminUser);
 			}
 
@@ -152,9 +153,10 @@ namespace Nucleus.Web.Controllers.Setup
 			siteAdminUser.Secrets = new();
 			siteAdminUser.Secrets.SetPassword(viewModel.SiteAdminPassword);
 			siteAdminUser.Roles = new List<Role>() { viewModel.Site.AdministratorsRole };
+			siteAdminUser.Approved = true;
+			siteAdminUser.Verified = true;
 
 			await this.UserManager.Save(viewModel.Site, siteAdminUser);
-
 		}
 
 		private async Task<ViewModels.Setup.SiteWizard> BuildViewModel(ViewModels.Setup.SiteWizard viewModel)
@@ -183,10 +185,7 @@ namespace Nucleus.Web.Controllers.Setup
 					Nucleus.Abstractions.Models.Export.SiteTemplate template = await this.SiteManager.ParseTemplate(templateFile);
 
 					viewModel.Site = template.Site;
-					if (String.IsNullOrEmpty(viewModel.Site.DefaultSiteAlias?.Alias))
-					{
-						viewModel.Site.DefaultSiteAlias = new SiteAlias() { Alias = ControllerContext.HttpContext.Request.Host + ControllerContext.HttpContext.Request.PathBase };
-					}
+					
 					modulesInTemplate = template.Pages
 						.SelectMany(page => page.Modules)
 						.Select(module => module.ModuleDefinition)
@@ -306,9 +305,7 @@ namespace Nucleus.Web.Controllers.Setup
 			viewModel.InstallableExtensions = installableExtensions.OrderBy(ext => ext.Name).ToList();
 			viewModel.Layouts = (await this.LayoutManager.List()).InsertDefaultListItem();
 			viewModel.Containers = (await this.ContainerManager.List()).InsertDefaultListItem();
-
-			viewModel.Site.DefaultSiteAlias.Alias = this.HttpContext.Request.Host.Value;
-
+						
 			return viewModel;
 		}
 
@@ -316,6 +313,11 @@ namespace Nucleus.Web.Controllers.Setup
 		{
 			ViewModels.Setup.SiteWizard viewModel = await BuildViewModel(new());
 
+			viewModel.Site.DefaultSiteAlias = new SiteAlias() { Alias = $"{ControllerContext.HttpContext.Request.Host}{ControllerContext.HttpContext.Request.PathBase}" };			
+			if (ControllerContext.HttpContext.Request.Host.Port.HasValue)
+			{
+				viewModel.Site.DefaultSiteAlias.Alias += $":{ControllerContext.HttpContext.Request.Host.Port}";
+			}
 
 			return viewModel;
 		}

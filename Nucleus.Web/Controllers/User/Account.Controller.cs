@@ -136,7 +136,7 @@ namespace Nucleus.Web.Controllers
 						UserSession session = await this.SessionManager.CreateNew(this.Context.Site, loginUser, viewModel.RememberMe, ControllerContext.HttpContext.Connection.RemoteIpAddress);
 						await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
 
-						string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.GetAbsoluteUri("/").ToString() : Url.GetAbsoluteUri(viewModel.ReturnUrl).ToString();
+						string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
 						ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
 						return StatusCode((int)System.Net.HttpStatusCode.Found);
 					}
@@ -148,7 +148,7 @@ namespace Nucleus.Web.Controllers
 		{
 			await this.SessionManager.SignOut(HttpContext);
 			
-			return Redirect(String.IsNullOrEmpty(returnUrl) ? "/" : returnUrl);
+			return Redirect(Url.Content(String.IsNullOrEmpty(returnUrl) ? "~/" : returnUrl));
 		}
 
 		[HttpGet]
@@ -204,7 +204,7 @@ namespace Nucleus.Web.Controllers
 					{
 						loginUser.Secrets.SetPassword(viewModel.NewPassword);
 						await this.UserManager.SaveSecrets(loginUser);
-						return Redirect(String.IsNullOrEmpty(viewModel.ReturnUrl) ? "/" : viewModel.ReturnUrl);
+						return Redirect(Url.Content(String.IsNullOrEmpty(viewModel.ReturnUrl) ? "~/" : viewModel.ReturnUrl));
 					}
 				}
 			}
@@ -248,7 +248,7 @@ namespace Nucleus.Web.Controllers
 				await this.UserManager.Save(this.Context.Site, existing);
 			}
 
-			return Redirect(String.IsNullOrEmpty(viewModel.ReturnUrl) ? "/" : viewModel.ReturnUrl);
+			return Redirect(Url.Content(String.IsNullOrEmpty(viewModel.ReturnUrl) ? "~/" : viewModel.ReturnUrl));
 		}
 	}
 }

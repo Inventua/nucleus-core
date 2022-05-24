@@ -50,7 +50,7 @@
 
   function buildModal(editor, targetSelector)
   {
-    var url = '/User/PageSelector/Index';
+    var url = document.baseURI + 'User/PageSelector/Index';
     jQuery.ajax({
       url: url,
       method: 'GET',

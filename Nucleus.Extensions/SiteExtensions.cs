@@ -201,6 +201,9 @@ namespace Nucleus.Extensions
 		/// Return a direct link if the file system provider supports it (because it is faster than returning a redirect to azure storage).  This "skips"
 		/// the Nucleus permissions check, but the performance difference is > 200ms.  This function should only be used for cases where it is ok to
 		/// skip the permission check, like site logo/css/favicon.
+		/// 
+		/// If the file system provider does not support a direct link, a link to the FileController with an encoded file id parameter
+		/// is returned, with a ~/ prefix.  Callers must call IUrlHelper.Content on the result of this function.
 		/// </remarks>
 		private async static Task<string> GetDirectFilePath(this Site site, Guid fileId, IFileSystemManager fileSystemManager)
 		{
@@ -221,7 +224,7 @@ namespace Nucleus.Extensions
 			}
 			else
 			{
-				return $"/files/{FileExtensions.EncodeFileId(file.Id)}";
+				return $"~/files/{FileExtensions.EncodeFileId(file.Id)}";
 			}
 
 

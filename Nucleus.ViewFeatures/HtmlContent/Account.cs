@@ -98,7 +98,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 					PageRoute accountSettingsPageRoute = await GetPageRoute(sitePages.UserProfilePageId, pageManager);
 					accountProfileLinkBuilder.Attributes.Add("href",
-						accountSettingsPageRoute == null ? urlHelper.AreaAction("EditAccountSettings", "Account", "User") : urlHelper.Content("~" + accountSettingsPageRoute.Path) + $"?returnUrl={System.Uri.EscapeDataString(context.HttpContext.Request.Path)}");
+						accountSettingsPageRoute == null ? urlHelper.AreaAction("EditAccountSettings", "Account", "User") : urlHelper.Content("~" + accountSettingsPageRoute.Path) + $"?returnUrl={GetReturnUrl(context.HttpContext, urlHelper)}");
 
 					accountProfileItemBuilder.InnerHtml.AppendHtml(accountProfileLinkBuilder);
 					accountMenuBuilder.InnerHtml.AppendHtml(accountProfileItemBuilder);
@@ -114,7 +114,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 					PageRoute changePasswordPageRoute = await GetPageRoute(sitePages.UserChangePasswordPageId, pageManager);
 
 					changePasswordLinkBuilder.Attributes.Add("href", 
-						changePasswordPageRoute == null ? urlHelper.AreaAction("EditPassword", "Account", "User") : urlHelper.Content("~" + changePasswordPageRoute.Path) + $"?returnUrl={System.Uri.EscapeDataString(context.HttpContext.Request.Path)}");
+					changePasswordPageRoute == null ? urlHelper.AreaAction("EditPassword", "Account", "User") : urlHelper.Content("~" + changePasswordPageRoute.Path) + $"?returnUrl={GetReturnUrl(context.HttpContext, urlHelper)}");
 
 					changePasswordItemBuilder.InnerHtml.AppendHtml(changePasswordLinkBuilder);
 					accountMenuBuilder.InnerHtml.AppendHtml(changePasswordItemBuilder);
@@ -124,7 +124,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				TagBuilder logoutLinkBuilder = new("a");
 				logoutLinkBuilder.AddCssClass("dropdown-item");
 				logoutLinkBuilder.InnerHtml.Append("Log Out");
-				logoutLinkBuilder.Attributes.Add("href", $"{urlHelper.AreaAction("Logout", "Account", "User")}?returnUrl={System.Uri.EscapeDataString(context.HttpContext.Request.Path)}");
+				logoutLinkBuilder.Attributes.Add("href", $"{urlHelper.AreaAction("Logout", "Account", "User")}?returnUrl={GetReturnUrl(context.HttpContext, urlHelper)}");
 
 				logoutItemBuilder.InnerHtml.AppendHtml(logoutLinkBuilder);
 				accountMenuBuilder.InnerHtml.AppendHtml(logoutItemBuilder);
@@ -147,7 +147,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 						registerLinkBuilder.AddCssClass("btn btn-secondary");
 						registerLinkBuilder.InnerHtml.Append("Register");
-						registerLinkBuilder.Attributes.Add("href", urlHelper.Content("~" + registerPageRoute.Path + $"?returnUrl={System.Uri.EscapeDataString(context.HttpContext.Request.Path)}"));
+						registerLinkBuilder.Attributes.Add("href", urlHelper.Content("~" + registerPageRoute.Path + $"?returnUrl={GetReturnUrl(context.HttpContext, urlHelper)}"));
 
 						buttonRowBuilder.InnerHtml.AppendHtml(registerLinkBuilder);
 					}
@@ -163,7 +163,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				//loginLinkBuilder.Attributes.Add("data-target", "#LoginDialog");
 								
 				loginLinkBuilder.Attributes.Add("href",
-					loginPageRoute == null ? urlHelper.AreaAction("", "Account", "User") : urlHelper.Content("~" + loginPageRoute.Path) + $"?returnUrl={System.Uri.EscapeDataString(context.HttpContext.Request.Path)}");
+					loginPageRoute == null ? urlHelper.AreaAction("", "Account", "User") : urlHelper.Content("~" + loginPageRoute.Path) + $"?returnUrl={GetReturnUrl(context.HttpContext, urlHelper)}");
 
 				buttonRowBuilder.InnerHtml.AppendHtml(loginLinkBuilder);
 
@@ -173,7 +173,12 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			outputBuilder.MergeAttributes(htmlAttributes);
 
 			return outputBuilder;
-		}		
+		}
+
+		private static string GetReturnUrl(HttpContext context, IUrlHelper urlHelper)
+		{
+			return System.Uri.EscapeDataString(urlHelper.Content("~" + context.Request.Path));
+	}
 
 		private async static Task<PageRoute> GetPageRoute(Guid? pageId, IPageManager pageManager)
 		{

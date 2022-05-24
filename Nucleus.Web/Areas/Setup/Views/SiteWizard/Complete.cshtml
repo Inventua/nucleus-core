@@ -1,0 +1,29 @@
+﻿@model Nucleus.Web.ViewModels.Setup.SiteWizardComplete
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+@{
+	Layout = "_Generic";
+	ViewData["title"] = "Nucleus Setup Wizard";
+}
+@Html.AddStyle("~!index.css")
+
+<Modal id="site-wizard" title="Nucleus Setup Wizard" can-close="false">
+	<h1>Setup Complete.</h1>
+
+	<p>
+		Your site has been set up succesfully, and Nucleus is restarting in order to load any extensions which have been installed.
+	</p>
+
+	<p>
+		Please wait a few seconds for the site to restart, then <a href="@Model.SiteUrl">click here</a> to navigate to your site.
+	</p>
+</Modal>
+
+
+<script type="text/javascript">
+	jQuery(document).ready(function ()
+	{
+		jQuery('#site-wizard').modal('show');
+	});
+</script>

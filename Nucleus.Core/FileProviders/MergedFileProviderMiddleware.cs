@@ -103,15 +103,29 @@ namespace Nucleus.Core.FileProviders
 					{
 						string path = fullPath.IndexOf('?') > 0 ? fullPath.Substring(0, fullPath.IndexOf('?')) : fullPath;
 						string[] pathParts = path.Split(new char[] { System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
-						string root = pathParts[0];
+						string pathBase = context.Request.PathBase.Value;
+						string requestedPathRoot = pathParts[0];
 
-						if (Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS.Contains(root))
+						// check to see if the first part of the path is Request.PathBase.  If it is, use the next part of the path as the root 
+						// path to validate (this is what happens when an application is run in an IIS virtual directory)
+						if (pathBase.StartsWith( System.IO.Path.DirectorySeparatorChar) || pathBase.StartsWith(System.IO.Path.AltDirectorySeparatorChar))
+						{
+							pathBase = pathBase[1..];
+						}
+
+						if (requestedPathRoot.Equals(pathBase, StringComparison.OrdinalIgnoreCase))
+						{
+							requestedPathRoot = pathParts[1];
+							path = path.Substring(requestedPathRoot.Length);
+						}
+
+						if (Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS.Contains(requestedPathRoot))
 						{
 							PhysicalFileProvider fileProvider = new(System.IO.Path.Combine(this.FolderOptions.Value.GetWebRootFolder(), ""));
 
 							if (TryProvider(fileProvider, path, mergedcontent))
 							{
-								Logger.LogTrace("Added {path} to result", path);
+								Logger.LogTrace("Added {path} to result.", path);
 																
 								// signal that at least one file was found
 								isFound = true;
@@ -122,13 +136,13 @@ namespace Nucleus.Core.FileProviders
 								}
 								else if (extension != System.IO.Path.GetExtension(path).ToLower())
 								{
-									Logger.LogWarning("File Extension mismatch on path {path}, expected {extension}", path, extension);
+									Logger.LogWarning("File Extension mismatch on path {path}, expected {extension}.", path, extension);
 								}
 							}
 							else
 							{
 								// one of the files was not found, fail the whole request
-								Logger.LogWarning("File not found - {path}", path);
+								Logger.LogWarning("File not found - {path}.", path);
 							}
 						}
 

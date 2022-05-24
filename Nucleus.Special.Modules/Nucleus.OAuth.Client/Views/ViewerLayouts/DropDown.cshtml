@@ -9,7 +9,7 @@
 		<select id="oauthclient-viewer-select">
 			@foreach (var option in Model.Options)
 			{
-				<option value="@option.AuthenticateEndpoint(Model.ReturnUrl)">@option.DisplayName()</option>
+				<option value="@option.AuthenticateEndpoint(Url, Model.ReturnUrl)">@option.DisplayName()</option>
 			}
 		</select>	
 		<button id="oauth-viewer-login" class="btn btn-primary ms-1" type="button">Log in</button>

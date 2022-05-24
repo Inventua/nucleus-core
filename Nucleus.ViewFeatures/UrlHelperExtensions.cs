@@ -292,6 +292,10 @@ namespace Nucleus.ViewFeatures
 		/// <param name="helper"></param>
 		/// <param name="localPath"></param>
 		/// <returns></returns>
+		/// <remarks>
+		/// If required, callers must call IUriHelper.Content to parse '~' in the path, this function assumes that localPath is an actual
+		/// path with no special characters
+		/// </remarks>
 		public static System.Uri GetAbsoluteUri(this IUrlHelper helper, string localPath)
 		{
 			if (!localPath.StartsWith('/'))

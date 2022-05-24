@@ -7,6 +7,6 @@
 <ul>
 	@foreach (var option in Model.Options)
 	{
-		<li><a href="@option.AuthenticateEndpoint(Model.ReturnUrl)">@option.DisplayName()</a></li>
+		<li><a href="@option.AuthenticateEndpoint(Url, Model.ReturnUrl)">@option.DisplayName()</a></li>
 	}
 </ul>	

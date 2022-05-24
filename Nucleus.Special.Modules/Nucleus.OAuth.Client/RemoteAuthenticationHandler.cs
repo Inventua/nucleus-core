@@ -248,8 +248,8 @@ namespace Nucleus.OAuth.Client
 				}
 
 				UserSession session = await this.SessionManager.CreateNew(this.CurrentContext.Site, loginUser, false, base.Context.Connection.RemoteIpAddress);
-				await this.SessionManager.SignIn(session, base.Context, properties.RedirectUri ?? "/");
-				string url = properties.RedirectUri ?? "/";
+				await this.SessionManager.SignIn(session, base.Context, properties.RedirectUri ?? "~/");
+				string url = properties.RedirectUri ?? "~/";
 				Logger?.LogTrace("Signin for user '{name}' was successful, redirecting to '{url}'.", loginUser.UserName, url);
 				base.Response.Redirect(url);
 			}

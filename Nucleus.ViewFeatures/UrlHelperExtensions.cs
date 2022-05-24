@@ -294,8 +294,6 @@ namespace Nucleus.ViewFeatures
 		/// <returns></returns>
 		public static System.Uri GetAbsoluteUri(this IUrlHelper helper, string localPath)
 		{
-			localPath = helper.Content(localPath);
-
 			if (!localPath.StartsWith('/'))
 			{
 				localPath = $"/{localPath}";

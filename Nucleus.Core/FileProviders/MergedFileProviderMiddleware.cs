@@ -145,7 +145,10 @@ namespace Nucleus.Core.FileProviders
 								Logger.LogWarning("File not found - {path}.", path);
 							}
 						}
-
+            else
+            {
+							Logger.LogWarning("Invalid merged file request for {path}.", path);
+            }
 					}
 
 					if (isFound)

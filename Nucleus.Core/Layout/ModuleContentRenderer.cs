@@ -179,53 +179,7 @@ namespace Nucleus.Core.Layout
 						return output;
 					}
 				}
-				else
-				{
-					// Copy values from the module output response to the "real" response object
-
-					HttpResponse response = htmlHelper.ViewContext?.HttpContext.Response;
-					if (response != null)
-					{
-						
-						switch ((System.Net.HttpStatusCode)moduleOutput.StatusCode)
-						{
-							case System.Net.HttpStatusCode.NoContent:
-								// only copy status code if it is not .NoContent, as .NoContent from a module has special meaning
-								moduleOutput.StatusCode = (int)System.Net.HttpStatusCode.OK;
-								break;
-
-							default:
-								response.StatusCode = moduleOutput.StatusCode;
-								break;
-						}
-
-						// copy values from the module response to the "real" response.  Note: Returning Redirect() or one of the other ActionResult types
-						// doesn't set any response properties, so extension developers have to set the HttpContext.Response properties to use this.
-						foreach (var header in moduleOutput.Headers.ToList())
-						{
-							switch (header.Key)
-							{
-								case "Set-Cookie":
-									response.Headers.SetCookie = header.Value;
-									break;
-								case "Location":
-									if (response.StatusCode == (int)System.Net.HttpStatusCode.Found || response.StatusCode == (int)System.Net.HttpStatusCode.MovedPermanently)
-									{
-										// If a module view returns a redirect, substitute an X-Location header for Location.  This is to prevent browsers from automatically following
-										// the redirect when it is returned to an ajax call.  This is dealt with in nucleus.shared.js#_handleError.
-										response.Headers.Add("X-Location", header.Value);
-									}
-									break;
-							}
-						}
-
-						if (moduleOutput.HasStarted)
-						{
-							await response.StartAsync();
-						}
-					}
-				}
-
+				
 				// create a wrapping div to contain CSS classes defined for the module, and to contain the editing controls (if rendered) and the
 				// module output.  We always render a wrapping div even if no module "styles" are defined/user is not editing, because we want the 
 				// output DOM to be consistent, so that CSS for the layout/container/module can always target the same DOM structure.

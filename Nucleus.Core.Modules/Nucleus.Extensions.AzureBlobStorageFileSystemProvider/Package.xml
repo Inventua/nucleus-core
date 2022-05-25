@@ -10,12 +10,6 @@
 	
 	<components>
 		<component folderName="AzureBlobStorageFileSystemProvider" optional="false">
-			<moduleDefinition id="57fe31bb-b10a-4dba-87fe-5d0a7fc169b7">
-				<friendlyName>Azure Blob Storage File System Provider</friendlyName>
-				<classTypeName>Nucleus.Extensions.AzureBlobStorageFileSystemProvider.Controllers.AzureBlobStorageFileSystemProviderController,Nucleus.Extensions.AzureBlobStorageFileSystemProvider</classTypeName>
-				<viewAction>Index</viewAction>
-				<editAction>Settings</editAction>
-			</moduleDefinition>
 
 			<file name="readme.txt" />
 

@@ -30,26 +30,30 @@ namespace Nucleus.Core.Authorization
 				{
 					if (context.HttpContext.Response.StatusCode == (int)System.Net.HttpStatusCode.Unauthorized || context.HttpContext.Response.StatusCode == (int)System.Net.HttpStatusCode.Forbidden)
 					{
-						IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
-
-						SitePages sitePages = context.HttpContext.RequestServices.GetService<Context>().Site.GetSitePages();
-						PageRoute loginPageRoute = await GetPageRoute(sitePages.LoginPageId, pageManager);
-
-
-						if (loginPageRoute != null)
+						if (!context.HttpContext.Request.Path.StartsWithSegments("/files"))
 						{
-							string url;
+							IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
 
-							if (context.HttpContext.Request.Path.StartsWithSegments("/admin"))
-							{
-								url = loginPageRoute.Path + $"?returnUrl={System.Uri.EscapeDataString("/")}";
-							}
-							else
-							{
-								url = loginPageRoute.Path + $"?returnUrl={System.Uri.EscapeDataString(context.HttpContext.Request.Path)}";
-							}
+							SitePages sitePages = context.HttpContext.RequestServices.GetService<Context>().Site.GetSitePages();
+							PageRoute loginPageRoute = await GetPageRoute(sitePages.LoginPageId, pageManager);
 
-							context.HttpContext.Response.Redirect(url);
+							if (loginPageRoute != null)
+							{
+								string returnUrl;
+																
+								if (context.HttpContext.Request.Path.StartsWithSegments("/admin"))
+								{
+									// if we are processing a request to an endpoint in the admin UI, set the return Url to the site root
+									returnUrl = context.HttpContext.Request.PathBase + "/";
+								}
+								else
+								{
+									// otherwise, the return Url is the requested endpoint uri
+									returnUrl = context.HttpContext.Request.PathBase + context.HttpContext.Request.Path;
+								}
+
+								context.HttpContext.Response.Redirect($"{context.HttpContext.Request.PathBase}{loginPageRoute.Path}?returnUrl={ System.Uri.EscapeDataString(returnUrl)}");
+							}
 						}
 					}
 				}

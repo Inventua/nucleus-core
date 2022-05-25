@@ -332,7 +332,7 @@ namespace Nucleus.Core.Authentication
 					}
 					else
 					{
-						string redirectUrl = loginPageRoute.Path + $"?returnUrl={System.Uri.EscapeDataString(this.Context.Request.Path)}";
+						string redirectUrl = this.Context.Request.PathBase + loginPageRoute.Path + $"?returnUrl={GetReturnUrl(this.Context)}";// {System.Uri.EscapeDataString(this.Context.Request.Path)}";
 						Logger.LogTrace("Challenge: Redirecting to site login page {redirectUrl}", redirectUrl);
 						this.Context.Response.Redirect(redirectUrl);
 					}
@@ -344,6 +344,11 @@ namespace Nucleus.Core.Authentication
 				}
 			}
 
+		}
+
+		private string GetReturnUrl(HttpContext context)
+		{			
+			return System.Uri.EscapeDataString(context.Request.PathBase + context.Request.Path);
 		}
 
 		/// <summary>

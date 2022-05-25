@@ -49,6 +49,10 @@ namespace Nucleus.Web.Controllers.Setup
 		[HttpPost]
 		public async Task<IActionResult> Index(ViewModels.Setup.SiteWizard viewModel)
 		{
+			if (await this.UserManager.CountSystemAdministrators() != 0)
+			{
+				return BadRequest();
+			}
 			return View("Index", await BuildViewModel(viewModel));
 		}
 
@@ -57,8 +61,9 @@ namespace Nucleus.Web.Controllers.Setup
 		{
 			if (await this.UserManager.CountSystemAdministrators() != 0)
 			{
-				ModelState.Remove(nameof(viewModel.SystemAdminUserName));
-				ModelState.Remove(nameof(viewModel.SystemAdminPassword));
+				return BadRequest();
+				//ModelState.Remove(nameof(viewModel.SystemAdminUserName));
+				//ModelState.Remove(nameof(viewModel.SystemAdminPassword));
 			}
 
 			if (ModelState.IsValid)

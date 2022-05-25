@@ -309,7 +309,7 @@ namespace Nucleus.OAuth.Client
 				}
 				else
 				{
-					string redirectUrl = loginPageRoute.Path + $"?reason={reason}";
+					string redirectUrl = this.Context.Request.PathBase + loginPageRoute.Path + $"?reason={reason}";
 					Logger?.LogTrace("Challenge: Redirecting to site login page {redirectUrl}", redirectUrl);
 					this.Context.Response.Redirect(redirectUrl);
 				}

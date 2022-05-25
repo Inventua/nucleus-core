@@ -44,14 +44,15 @@ namespace Nucleus.Web
 			System.IO.DirectoryInfo workingDirectory = new(System.Environment.CurrentDirectory);
 			while (workingDirectory.Parent != null)
 			{
-				if (workingDirectory.Name.Equals("bin", StringComparison.OrdinalIgnoreCase))
+				//if (workingDirectory.Name.Equals("bin", StringComparison.OrdinalIgnoreCase))
+				if (workingDirectory.EnumerateFiles("appSettings.json").Any())
 				{
-					System.Environment.CurrentDirectory = workingDirectory.Parent.FullName;
+					System.Environment.CurrentDirectory = workingDirectory.FullName;
 					break;
 				}
 				workingDirectory = workingDirectory.Parent;
 			}
-						
+
 			while (doRestart)
 			{
 				if (isRestart)
@@ -71,6 +72,7 @@ namespace Nucleus.Web
 				Nucleus.Core.Managers.ExtensionManager.CleanupBackups(WebHost?.Logger());
 				
 				WebHost = CreateHostBuilder(args)
+					.UseContentRoot(Directory.GetCurrentDirectory())
 					.ConfigureAppConfiguration(Startup.ConfigureAppConfiguration)
 					.Build();
 

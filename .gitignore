@@ -367,7 +367,7 @@ FodyWeavers.xsd
 *.Development.json
 
 # Developent web.config
-iis-dev/*.*
+Nucleus.Web/iis-dev/**/*.*
 
 # Nucleus.Web extensions folder
 Extensions/

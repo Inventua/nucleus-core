@@ -34,17 +34,21 @@
 
 	<ItemGroup>
 		<Compile Remove="Extensions\**" />
+		<Compile Remove="iis-dev\logs\**" />
 		<Compile Remove="logs\**" />
 		<Compile Remove="publish\**" />
 		<Content Remove="Extensions\**" />
+		<Content Remove="iis-dev\logs\**" />
 		<Content Remove="logs\**" />
 		<Content Remove="publish\**" />
 		<EmbeddedResource Remove="Extensions\**" />
+		<EmbeddedResource Remove="iis-dev\logs\**" />
 		<EmbeddedResource Remove="logs\**" />
 		<EmbeddedResource Remove="publish\**" />
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
 		<None Remove="Extensions\**" />
+		<None Remove="iis-dev\logs\**" />
 		<None Remove="logs\**" />
 		<None Remove="publish\**" />
 		<None Remove="Setup\Extensions\**" />
@@ -134,7 +138,4 @@
 	<ItemGroup>
 	  <Folder Include="Properties\ServiceDependencies\" />
 	</ItemGroup>
-
-	<ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="nucleus.schema.json" /></VisualStudio></ProjectExtensions>
-	
 </Project>

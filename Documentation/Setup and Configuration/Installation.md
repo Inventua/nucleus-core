@@ -5,12 +5,29 @@ in Windows/Internet Information Services using the Sqlite database provider and 
 ## Basic Setup 
 1. Download the install set (zip format) from the [downloads](/downloads) page.
 2. Create an installation folder, and un-zip the install set to that folder.
-3. Install the [.NET Core runtime](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
-4. In Internet Information Services (IIS) manager, add a web site or application with the path set to your installation folder.  Nucleus ships
-   with a web.config which is pre-configured with settings to run Nucleus in IIS.  Make sure that the IIS application has a unique application 
-   pool, set to use NET CLR version v4.0.30319 and integrated pipeline.
-5. If you want to use a different database or file system provider, refer to the sections below.
-6. Browse to your web site address.  The new site wizard will appear, prompting you to set your site properties and administrator users.
+3. Install the [.Net Core Hosting Bundle](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/iis/hosting-bundle).  You 
+may need to install the .Net Core Hosting Bundle and do a "Repair" install if IIS returns an error message and your Windows application event log 
+contains an entry with the message '... Ensure that the versions of Microsoft.NetCore.App and Microsoft.AspNetCore.App targeted by the application 
+are installed.'.  
+4. In Internet Information Services (IIS) manager, add an application pool for your IIS application to use.  .Net core applications
+require a unique (not shared) application pool, set to use NET CLR version v4.0.30319 and integrated pipeline.  
+5. In Internet Information Services (IIS) manager, add a web site or application with the path set to your installation folder, and assign
+the application pool that you created.  Nucleus ships with a web.config which is pre-configured with settings to run Nucleus in IIS.  
+6. Assign 'Full Control' permissions to your Nucleus data folder for the `IIS AppPool\[AppPool Name]` user.  By default, your data folder 
+is `C:\ProgramData\Nucleus`.  You may need to create the folder in order to assign permissions to it. The Nucleus data folder is used for cached 
+files, logs and the database file, if you are using Sqlite.
+You can use the command-line command:
+```
+    ICACLS "C:\ProgramData\Nucleus" /grant "IIS AppPool\NucleusAppPool:(OI)(CI)F"
+```
+7.  Assign 'Read' permissions to your installation folder for the `IIS AppPool\[AppPool Name]` user. 
+You can use the command-line command:
+```
+    ICACLS "[your-installation-folder]" /grant "IIS AppPool\NucleusAppPool:(OI)(CI)RX"
+```
+
+7. If you want to use a different database or file system provider, refer to the sections below.
+8. Browse to your web site address.  The new site wizard will appear, prompting you to set your site properties and administrator users.
 
 ## Using a different database provider
 1. Create a database in your database server.

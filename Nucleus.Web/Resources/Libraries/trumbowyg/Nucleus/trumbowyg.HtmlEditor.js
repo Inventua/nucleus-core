@@ -3,7 +3,8 @@
 (function ($)
 {
   jQuery.fn.HtmlEditor = function (conf)
-  {    
+  {
+    jQuery.trumbowyg.svgAbsoluteUseHref = true;
     // For every element passed to the plug-in
     return this.each(function (index, value)
     {
@@ -28,7 +29,7 @@
         plugins: {
           insertNucleusImage: {},
           insertNucleusPage: {}
-        },
+        },        
         svgPath: document.baseURI + "Resources/Libraries/Trumbowyg/ui/icons.svg"
       });
 

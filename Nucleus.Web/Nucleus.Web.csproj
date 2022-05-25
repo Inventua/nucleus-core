@@ -138,4 +138,12 @@
 	<ItemGroup>
 	  <Folder Include="Properties\ServiceDependencies\" />
 	</ItemGroup>
+
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="Exists('iis-dev')">
+		<Touch Files="iis-dev\App_Offline.htm" AlwaysCreate="true" />
+	</Target>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('iis-dev')">
+		<Delete Files="iis-dev\App_Offline.htm" />
+	</Target>
 </Project>

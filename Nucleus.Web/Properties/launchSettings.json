@@ -23,7 +23,7 @@
       },
       "applicationUrl": "https://localhost:5001"
     },
-    "Nucleus.Web.Golem": {
+    "Nucleus.Web.Golem-Kestrel": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
@@ -31,7 +31,7 @@
       },
       "applicationUrl": "https://golem.inventua.com:5001"
     },
-    "Nucleus.Web.Minion": {
+    "Nucleus.Web.Minion-Kestrel": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
@@ -39,7 +39,22 @@
       },
       "applicationUrl": "https://minion.inventua.com:5001"
     },
-    
+    "Nucleus.Web.Golem-IIS": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://golem.inventua.com/nucleus"
+    },
+    "Nucleus.Web.Minion-IIS": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://minion.inventua.com/nucleus"
+    },
     "WSL": {
       "commandName": "WSL2",
       "launchBrowser": true,

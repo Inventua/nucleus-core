@@ -5,20 +5,20 @@
 	
 		<Import Project="$(NUCLEUS_PATH)\NucleusPlugin.build.targets" />			
 -->
-<Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003' ToolsVersion="15.0">	
+<Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003' ToolsVersion="15.0">
 	<Target Name="Messages" AfterTargets="PostBuildEvent">
 		<Message Text="ExtensionFolder: $(ExtensionFolder)" Importance="high" />
 		<Message Text="Nucleus Path: $(NUCLEUS_PATH)" Importance="high" />
 	</Target>
-			
+
 	<Target Name="ValidateExtensionFolder" AfterTargets="PostBuildEvent">
 		<Warning
 			Condition="'$(Configuration)' == 'Debug' AND '$(ExtensionFolder)' == ''"
 			Text="The ExtensionFolder property path is not set, your plugin will not be copied." />
 	</Target>
-	
+
 	<Target Name="ValidateNucleusPath" AfterTargets="PostBuildEvent">
-		<Warning 
+		<Warning
 			Condition="'$(Configuration)' == 'Debug' AND '$(NUCLEUS_PATH)' == ''"
 			Text="The %NUCLEUS_PATH% environment path is not set, your plugin will not be copied." />
 	</Target>
@@ -31,7 +31,7 @@
 			<PackageAssemblies Include="@(_XmlPackageAssemblies->'bin\$(Configuration)\$(TargetFramework)\%(Identity)')" />
 		</ItemGroup>
 	</Target>
-	
+
 	<Target Name="test" AfterTargets="PostBuildEvent">
 		<Message Importance="high" Text="Package assembles: @(PackageAssemblies)" />
 	</Target>
@@ -56,7 +56,7 @@
 	<Target Name="GetOutputAssemblies" AfterTargets="PostBuildEvent">
 		<ItemGroup>
 			<!--<ReferenceAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\ref\*.dll" />-->
-			
+
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Abstractions.dll"></ExcludedAssemblies>
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.ViewFeatures.dll"></ExcludedAssemblies>
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Core.dll"></ExcludedAssemblies>
@@ -67,44 +67,44 @@
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Data.Sqlite.dll"></ExcludedAssemblies>
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Data.PostgreSql.dll"></ExcludedAssemblies>
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Data.MySql.dll"></ExcludedAssemblies>
-			
+
 			<Message Importance="high" Text="Reference assembles: @(ReferenceAssemblies)" />
 			<Message Importance="high" Text="Excluded assembles: @(ExcludedAssemblies)" />
 			<!--<AllAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\*.dll" />-->
 			<!--<OutputAssemblies Include="@(AllAssemblies);@(PackageAssemblies)" Exclude="@(ReferenceAssemblies);@(ExcludedAssemblies)" />-->
 			<OutputAssemblies Include="@(PackageAssemblies)" Exclude="@(ExcludedAssemblies)" />
-		</ItemGroup>		
+		</ItemGroup>
 	</Target>
-	
+
 	<Target Name="CopyToExtensionsFolder" AfterTargets="PostBuildEvent" Condition="'$(NUCLEUS_PATH)' != '' AND '$(ExtensionFolder)' != '' AND Exists('$(NUCLEUS_PATH)Extensions')">
-		<ItemGroup>			
-		  <RenameExtensionFiles Include="$(NUCLEUS_PATH)Extensions\$(ExtensionFolder)\**\$(ProjectName)\*.*" />
-  	</ItemGroup>
+		<ItemGroup>
+			<RenameExtensionFiles Include="$(NUCLEUS_PATH)Extensions\$(ExtensionFolder)\**\$(ProjectName)\*.*" />
+		</ItemGroup>
 
 		<RemoveDir Directories="$(NUCLEUS_PATH)\_OLD" />
 
 		<Message Importance="high" Text="Output assembles: @(OutputAssemblies)" />
-		
+
 		<Move SourceFiles="@(RenameExtensionFiles)" DestinationFolder="$(NUCLEUS_PATH)_OLD" />
 		<Copy SourceFiles="@(OutputAssemblies)" DestinationFolder="$(NUCLEUS_PATH)Extensions\$(ExtensionFolder)\bin\%(RecursiveDir)" Retries="2" />
 		<Copy SourceFiles="@(Content)" DestinationFolder="$(NUCLEUS_PATH)Extensions\$(ExtensionFolder)\%(RelativeDir)\%(RecursiveDir)" Retries="2" />
-		
+
 		<RemoveDir Directories="$(NUCLEUS_PATH)\_OLD" />
 	</Target>
 
-	<Target Name="PackageExtension" AfterTargets="PostBuildEvent" Condition = "'$(Configuration)' == 'Release' AND $(ExtensionFolder) != '' AND $(NUCLEUS_PATH) != '' AND Exists('$(NUCLEUS_PATH)Setup')">		
+	<Target Name="PackageExtension" AfterTargets="PostBuildEvent" Condition = "'$(Configuration)' == 'Release' AND $(ExtensionFolder) != '' AND $(NUCLEUS_PATH) != '' AND Exists('$(NUCLEUS_PATH)Setup')">
 		<RemoveDir Directories="AppPackage" />
 
 		<Copy SourceFiles="@(OutputAssemblies)" DestinationFolder="AppPackage\bin\%(RecursiveDir)" Retries="2" />
 		<Copy SourceFiles="@(Content)" DestinationFolder="AppPackage\%(RelativeDir)\%(RecursiveDir)" Retries="2" />
 		<Delete Files="$(ExtensionFolder)_Extension_$(PackageVersion).zip" />
-		
+
 		<ZipDirectory SourceDirectory="AppPackage" DestinationFile="$(ExtensionFolder)_Extension_$(PackageVersion).zip" Overwrite="true" />
 
 		<RemoveDir Directories="AppPackage" />
 	</Target>
 
-	<Target Name="CopyToWebSetup" AfterTargets="PostBuildEvent" Condition="$(CopyToDefaultSetup) != false">
+	<Target Name="CopyToWebSetup" AfterTargets="PostBuildEvent" Condition="$(CopyToDefaultSetup) != false AND '$(Configuration)' == 'Release' AND $(ExtensionFolder) != '' AND $(NUCLEUS_PATH) != '' AND Exists('$(NUCLEUS_PATH)Setup')">
 		<ItemGroup>
 			<FilesToDelete Include="$(NUCLEUS_PATH)\Setup\Extensions\$(ExtensionFolder)_Extension*.zip"/>
 		</ItemGroup>

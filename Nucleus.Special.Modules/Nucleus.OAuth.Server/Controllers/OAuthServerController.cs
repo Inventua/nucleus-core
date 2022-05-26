@@ -135,6 +135,11 @@ namespace Nucleus.OAuth.Server.Controllers
 		{
 			ClientAppToken token = await this.ClientAppTokenManager.Get(id);
 
+			if (token == null)
+			{
+				return BadRequest("Your login session has expired.");
+			}
+
 			Logger?.LogTrace("Populating OAUTH token.");
 			token.UserId = User.GetUserId();
 

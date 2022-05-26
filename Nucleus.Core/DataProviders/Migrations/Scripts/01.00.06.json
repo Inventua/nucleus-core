@@ -1,0 +1,30 @@
+{
+	"schemaName": "Nucleus.Core",
+	"version": "01.00.06",
+	"operations": [
+		{
+			"addColumn": {
+				"table": "ModuleDefinitions",
+				"name": "Extension",
+				"clrType": "String",
+				"isnullable": true
+			}
+		},
+		{
+			"addColumn": {
+				"table": "ModuleDefinitions",
+				"name": "ViewController",
+				"clrType": "String",
+				"isnullable": true
+			}
+		},
+		{
+			"addColumn": {
+				"table": "ModuleDefinitions",
+				"name": "SettingsController",
+				"clrType": "String",
+				"isnullable": true
+			}
+		}
+	]
+}

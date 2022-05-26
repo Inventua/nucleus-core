@@ -157,7 +157,7 @@ namespace Nucleus.Core.Layout
 
 			if (HasViewPermission(moduleInfo, this.Context.Site, user))
 			{
-				HttpResponse moduleOutput = await BuildModuleOutput(htmlHelper, moduleInfo, moduleInfo.ModuleDefinition.ViewAction, renderContainer);
+				HttpResponse moduleOutput = await BuildModuleOutput(htmlHelper, moduleInfo, moduleInfo.ModuleDefinition.ViewController, moduleInfo.ModuleDefinition.ViewAction, renderContainer);
 
 				if (moduleOutput.StatusCode == (int)System.Net.HttpStatusCode.Forbidden)
 				{
@@ -289,7 +289,7 @@ namespace Nucleus.Core.Layout
 		{
 			if (HasEditPermission(moduleInfo, this.Context.Site, htmlHelper.ViewContext.HttpContext.User))
 			{
-				HttpResponse moduleOutput = await BuildModuleOutput(htmlHelper, moduleInfo, moduleInfo.ModuleDefinition.EditAction, renderContainer);
+				HttpResponse moduleOutput = await BuildModuleOutput(htmlHelper, moduleInfo, String.IsNullOrEmpty(moduleInfo.ModuleDefinition.SettingsController) ? moduleInfo.ModuleDefinition.ViewController : moduleInfo.ModuleDefinition.SettingsController, moduleInfo.ModuleDefinition.EditAction, renderContainer);
 
 				return ToHtmlContent(moduleOutput);
 			}
@@ -307,7 +307,7 @@ namespace Nucleus.Core.Layout
 		/// <param name="action">Specifies the name of the action being rendered.</param>
 		/// <param name="RenderContainer">Specifies whether to wrap the module output in a container.</param>
 		/// <returns></returns>
-		private async Task<HttpResponse> BuildModuleOutput(IHtmlHelper htmlHelper, PageModule moduleinfo, string action, Boolean RenderContainer)
+		private async Task<HttpResponse> BuildModuleOutput(IHtmlHelper htmlHelper, PageModule moduleinfo, string controller, string action, Boolean RenderContainer)
 		{
 			Context scopedContext;
 			IServiceProvider originalServiceProvider;
@@ -337,29 +337,49 @@ namespace Nucleus.Core.Layout
 					// executed, it gets DI objects from the module scope
 					newHttpContext.RequestServices = moduleScope.ServiceProvider;
 
-					using (System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope scope = Nucleus.Core.Plugins.AssemblyLoader.EnterExtensionContext(moduleinfo.ModuleDefinition.ClassTypeName))
+					IActionDescriptorCollectionProvider actionDescriptorProvider = moduleScope.ServiceProvider.GetRequiredService<IActionDescriptorCollectionProvider>();
+					ControllerActionDescriptor actionDescriptor = null;
+
+					if (String.IsNullOrEmpty(controller) || String.IsNullOrEmpty(moduleinfo.ModuleDefinition.Extension))
 					{
-						TypeInfo moduleControllerTypeInfo;
+						// backward compatibility
+						TypeInfo moduleControllerTypeInfo = null;
 						Type moduleControllerType = Type.GetType(moduleinfo.ModuleDefinition.ClassTypeName);
 
-						if (moduleControllerType == null)
+						if (moduleControllerType != null)
 						{
-							// Module definition controller type is invalid
-							throw new InvalidOperationException($"Module Definition is invalid: {moduleinfo.ModuleDefinition.ClassTypeName} not found.");
+							moduleControllerTypeInfo = moduleControllerType.GetTypeInfo();
 						}
 
-						moduleControllerTypeInfo = moduleControllerType.GetTypeInfo();
+						moduleinfo.ModuleDefinition.Extension = Nucleus.Core.Plugins.AssemblyLoader.GetExtensionFolderName(moduleControllerTypeInfo.Assembly.Location).Replace(" ", "");
+						controller = moduleControllerType.Name;						
+						if (controller.EndsWith("Controller"))
+						{
+							controller = controller.Substring(0, controller.Length - "Controller".Length);
+						}
+					}
 
-						IActionDescriptorCollectionProvider actionDescriptorProvider = moduleScope.ServiceProvider.GetRequiredService<IActionDescriptorCollectionProvider>();
-						ControllerActionDescriptor actionDescriptor = (ControllerActionDescriptor)actionDescriptorProvider.ActionDescriptors.Items
-							.Where(descriptor => ((ControllerActionDescriptor)descriptor).ControllerTypeInfo.Equals(moduleControllerTypeInfo))
-							.Where(descriptor => ((ControllerActionDescriptor)descriptor).ActionName.Equals(action))
+					if (!String.IsNullOrEmpty(controller))
+					{
+						//actionDescriptor = (ControllerActionDescriptor)actionDescriptorProvider.ActionDescriptors.Items
+						//	.Where(descriptor => ((ControllerActionDescriptor)descriptor).ControllerName.Equals(controller))
+						//	.Where(descriptor => ((ControllerActionDescriptor)descriptor).ActionName.Equals(action))
+						//	.Where(descriptor => ((ControllerActionDescriptor)descriptor).RouteValues["extension"].Equals(moduleinfo.ModuleDefinition.Extension))
+						//	.FirstOrDefault();
+
+						actionDescriptor = (ControllerActionDescriptor)actionDescriptorProvider.ActionDescriptors.Items
+							.Where(descriptor => descriptor is ControllerActionDescriptor)
+							.Where(descriptor => IsMatch((ControllerActionDescriptor)descriptor, action, controller, moduleinfo.ModuleDefinition.Extension))
 							.FirstOrDefault();
 
+					}
+					
+					using (System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope scope = Nucleus.Core.Plugins.AssemblyLoader.EnterExtensionContext(actionDescriptor.ControllerTypeInfo.AssemblyQualifiedName))
+					{
 						// Report common error (Module definition invalid)
 						if (actionDescriptor == null || actionDescriptor.MethodInfo == null)
 						{
-							throw new InvalidOperationException($"Module Definition is invalid: Action {action} does not exist in {moduleControllerTypeInfo}.");
+							throw new InvalidOperationException($"Module Definition is invalid: Action '{action}' does not exist in extension '{moduleinfo.ModuleDefinition.Extension}', controller '{controller}'.");
 						}
 
 						// Populate the actionDescriptor.Parameters list with action (method) parameters so that they are bound
@@ -375,13 +395,15 @@ namespace Nucleus.Core.Layout
 							actionDescriptor.Parameters.Add(paramDesc);
 						}
 
+						// TODO Use routeData from actionDescriptor? ****
+
 						// We must create a NEW routeData object (don't use htmlHelper.ViewContext.RouteData), because we must provide the controller, area and
 						// action names for the module, rather than the route values for the original http request.
 						foreach (var routeValue in actionDescriptor.RouteValues)
 						{
 							routeData.Values[routeValue.Key] = routeValue.Value;
 						}
-						routeData.Values["extension"] = Nucleus.Core.Plugins.AssemblyLoader.GetExtensionFolderName(moduleControllerTypeInfo.Assembly.Location);
+						routeData.Values["extension"] = moduleinfo.ModuleDefinition.Extension; //Nucleus.Core.Plugins.AssemblyLoader.GetExtensionFolderName(moduleControllerTypeInfo.Assembly.Location);
 
 						ActionContext actionContext = new(newHttpContext, routeData, actionDescriptor);					
 						ControllerContext controllerContext = new(actionContext);
@@ -414,6 +436,16 @@ namespace Nucleus.Core.Layout
 					return newHttpContext.Response;
 				}
 			}
+		}
+
+		private Boolean IsMatch(ControllerActionDescriptor actionDescriptor, string action, string controller, string extension)
+		{
+			return
+				actionDescriptor.ControllerName.Equals(controller) &&
+				actionDescriptor.ActionName.Equals(action) &&
+				actionDescriptor.RouteValues.ContainsKey("extension") &&
+				actionDescriptor.RouteValues["extension"] != null &&
+				actionDescriptor.RouteValues["extension"].Equals(extension);
 		}
 
 		/// <summary>

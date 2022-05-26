@@ -12,7 +12,9 @@
 		<component folderName="AcceptTerms" optional="false">
 			<moduleDefinition id="45963833-c2b2-4673-a25b-85ac7b2b5b49">
 				<friendlyName>Accept Terms</friendlyName>
-				<classTypeName>Nucleus.Modules.AcceptTerms.Controllers.AcceptTermsController,Nucleus.Modules.AcceptTerms</classTypeName>
+				<extension>AcceptTerms</extension>
+				<viewController>AcceptTerms</viewController>
+				<settingsController>AcceptTermsAdmin</settingsController>
 				<viewAction>Index</viewAction>
 				<editAction>Settings</editAction>
 			</moduleDefinition>

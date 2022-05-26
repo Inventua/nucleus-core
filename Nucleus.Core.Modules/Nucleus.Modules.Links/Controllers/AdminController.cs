@@ -177,7 +177,6 @@ namespace Nucleus.Modules.Links.Controllers
 
 			viewModel.Lists = await this.ListManager.List(this.Context.Site);
 
-			//viewModel.ModuleId = this.Context.Module.Id;
 			viewModel.Links = await this.LinksManager.List(this.Context.Site, this.Context.Module);
 
 

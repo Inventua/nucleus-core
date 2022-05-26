@@ -12,7 +12,8 @@
 		<component folderName="Media" optional="false">
 			<moduleDefinition id="2ffdf8a4-edab-48e5-80c6-7b068e4721bb">
 				<friendlyName>Media</friendlyName>
-				<classTypeName>Nucleus.Modules.Media.Controllers.MediaController,Nucleus.Modules.Media</classTypeName>
+				<extension>Media</extension>
+				<viewController>Media</viewController>
 				<viewAction>Index</viewAction>
 				<editAction>Edit</editAction>
 				<categories>Media</categories>

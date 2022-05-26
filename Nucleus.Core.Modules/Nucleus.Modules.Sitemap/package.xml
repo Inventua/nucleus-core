@@ -12,7 +12,8 @@
 		<component folderName="Sitemap" optional="false">
 			<moduleDefinition id="0392bf73-c646-4ccc-bcb5-372a75b9ea84">
 				<friendlyName>Sitemap</friendlyName>
-				<classTypeName>Nucleus.Modules.Sitemap.Controllers.SitemapController,Nucleus.Modules.Sitemap</classTypeName>
+				<extension>SiteMap</extension>
+				<viewController>Sitemap</viewController>
 				<viewAction>Index</viewAction>
 				<editAction>Edit</editAction>
 			</moduleDefinition>

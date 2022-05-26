@@ -76,27 +76,5 @@ namespace Nucleus.Modules.AcceptTerms.Controllers
       ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
       return StatusCode((int)System.Net.HttpStatusCode.Found);
     }
-
-    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-    [HttpGet]
-    [HttpPost]
-    public async Task<ActionResult> Settings(ViewModels.Settings viewModel)
-    {
-      return View("Settings", await BuildSettingsViewModel(viewModel));
-    }
-
-    private async Task<ViewModels.Settings> BuildSettingsViewModel(ViewModels.Settings viewModel)
-    {
-      if (viewModel == null)
-      {
-        viewModel = new();
-      }
-
-      viewModel.ReadSettings(this.Context.Module, this.HttpContext.Request.GetUserTimeZone());
-      viewModel.AgreementBody = (await this.ContentManager.List(this.Context.Module)).FirstOrDefault();
-
-      return viewModel;
-    }
-
   }
 }

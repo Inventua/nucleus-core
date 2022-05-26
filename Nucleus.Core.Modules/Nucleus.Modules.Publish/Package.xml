@@ -12,7 +12,9 @@
 		<component folderName="Publish" optional="false">
 			<moduleDefinition id="20af00b8-1d72-4c94-bce7-b175e0b173af">
 				<friendlyName>Publish</friendlyName>
-				<classTypeName>Nucleus.Modules.Publish.Controllers.PublishController,Nucleus.Modules.Publish</classTypeName>
+				<extension>Publish</extension>
+				<viewController>Publish</viewController>
+				<settingsController>Publish</settingsController>
 				<viewAction>Index</viewAction>
 				<editAction>Settings</editAction>
 				<categories>Content</categories>

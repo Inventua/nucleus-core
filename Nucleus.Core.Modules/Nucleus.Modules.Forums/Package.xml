@@ -12,7 +12,9 @@
 		<component folderName="Forums" optional="false">
 			<moduleDefinition id="ea9b5d66-b791-414c-8c52-a20536cfa9f5">
 				<friendlyName>Forums</friendlyName>
-				<classTypeName>Nucleus.Modules.Forums.Controllers.ForumsController,Nucleus.Modules.Forums</classTypeName>
+				<extension>Forums</extension>
+				<viewController>Forums</viewController>
+				<settingsController>ForumsAdmin</settingsController>
 				<viewAction>Index</viewAction>
 				<editAction>Settings</editAction>
 			</moduleDefinition>

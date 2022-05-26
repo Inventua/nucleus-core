@@ -12,7 +12,8 @@
 		<component folderName="TextHtml" optional="false">
 			<moduleDefinition id="b516d8dd-c793-4776-be33-902eb704bef6">
 				<friendlyName>Html</friendlyName>
-				<classTypeName>Nucleus.Modules.TextHtml.Controllers.TextHtmlController,Nucleus.Modules.TextHtml</classTypeName>
+				<extension>TextHtml</extension>
+				<viewController>TextHtml</viewController>
 				<viewAction>Index</viewAction>
 				<editAction>Edit</editAction>
 				<categories>Content</categories>

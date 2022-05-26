@@ -12,7 +12,8 @@
 		<component folderName="Search" optional="false">
 			<moduleDefinition id="c225f388-e5c1-48e2-9352-237cd8d0d2b6">
 				<friendlyName>Search</friendlyName>
-				<classTypeName>Nucleus.Modules.Search.Controllers.SearchController,Nucleus.Modules.Search</classTypeName>
+				<extension>Search</extension>
+				<viewController>Search</viewController>
 				<viewAction>Index</viewAction>
 				<editAction>Settings</editAction>
 				<categories>Search</categories>

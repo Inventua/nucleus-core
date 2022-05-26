@@ -12,7 +12,8 @@
 		<component folderName="ErrorReport" optional="false">
 			<moduleDefinition id="e1d1db07-be39-4796-abca-56cd44b27420">
 				<friendlyName>Error Report</friendlyName>
-				<classTypeName>Nucleus.Modules.ErrorReport.Controllers.ErrorReportController,Nucleus.Modules.ErrorReport</classTypeName>
+				<extension>ErrorReport</extension>
+				<viewController>ErrorReport</viewController>
 				<viewAction>Index</viewAction>
 				<editAction>Settings</editAction>
 			</moduleDefinition>

@@ -190,7 +190,13 @@ namespace Nucleus.Abstractions.Models.Extensions
 		public string friendlyName;
 
 		/// <remarks/>
-		public string classTypeName;
+		public string extension;
+
+		/// <remarks/>
+		public string viewController;
+
+		/// <remarks/>
+		public string settingsController;
 
 		/// <remarks/>
 		public string viewAction;

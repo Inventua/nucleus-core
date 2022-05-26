@@ -37,15 +37,7 @@ namespace Nucleus.Modules.Links.Controllers
 		public async Task<ActionResult> Index()
 		{
 			return View("Viewer", await BuildViewModel());
-		}
-
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-		[HttpGet]
-		[HttpPost]
-		public async Task<ActionResult> Settings(ViewModels.Settings viewModel)
-		{
-			return View("Settings", await BuildSettingsViewModel(viewModel));
-		}
+		}		
 
 		private async Task<ViewModels.Viewer> BuildViewModel()
 		{
@@ -92,33 +84,6 @@ namespace Nucleus.Modules.Links.Controllers
 
 
 			return viewModel;
-		}
-
-		private async Task<ViewModels.Settings> BuildSettingsViewModel(ViewModels.Settings viewModel)
-		{
-			if (viewModel == null)
-			{
-				viewModel = new();
-			}
-
-			viewModel.CategoryList = await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(AdminController.MODULESETTING_CATEGORYLIST_ID, Guid.Empty));
-			viewModel.Layout = this.Context.Module.ModuleSettings.Get(AdminController.MODULESETTING_LAYOUT, "Table");
-			viewModel.NewWindow = this.Context.Module.ModuleSettings.Get(AdminController.MODULESETTING_OPEN_NEW_WINDOW, false);
-
-			viewModel.Lists = await this.ListManager.List(this.Context.Site);
-
-			//viewModel.ModuleId = this.Context.Module.Id;
-			viewModel.Links = await this.LinksManager.List(this.Context.Site, this.Context.Module);
-
-
-			viewModel.Layouts = new();
-			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{RoutingConstants.EXTENSIONS_ROUTE_PATH}\\Links\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
-			{
-				viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
-			}
-
-			return viewModel;
-		}
-
+		}		
 	}
 }

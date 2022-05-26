@@ -12,7 +12,9 @@
 		<component folderName="Links" optional="false">
 			<moduleDefinition id="374e62b5-024d-4d8d-95a2-e56f476fe887">
 				<friendlyName>Links</friendlyName>
-				<classTypeName>Nucleus.Modules.Links.Controllers.LinksController,Nucleus.Modules.Links</classTypeName>
+				<extension>Links</extension>
+				<viewController>Links</viewController>
+				<settingsController>Admin</settingsController>
 				<viewAction>Index</viewAction>
 				<editAction>Settings</editAction>
 				<categories>Content</categories>

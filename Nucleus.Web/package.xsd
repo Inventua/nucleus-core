@@ -64,7 +64,9 @@
 	<xs:complexType name="moduleDefinition">
 		<xs:sequence>
 			<xs:element name="friendlyName" type="xs:string" minOccurs="1" maxOccurs="1" />
-			<xs:element name="classTypeName" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="extension" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="viewController" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="settingsController" type="xs:string" minOccurs="0" maxOccurs="1" />
 			<xs:element name="viewAction" type="xs:string" minOccurs="1" maxOccurs="1" />
 			<xs:element name="editAction" type="xs:string" minOccurs="0" maxOccurs="1" />
 			<xs:element name="categories" type="xs:string" minOccurs="0" maxOccurs="1" />

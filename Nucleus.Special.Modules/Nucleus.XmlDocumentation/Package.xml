@@ -12,15 +12,16 @@
 		<component folderName="XmlDocumentation" optional="false">
 			<moduleDefinition id="0595de3d-1ba7-49df-99f0-2e80fb00d156">
 				<friendlyName>XmlDocumentation</friendlyName>
-				<classTypeName>Nucleus.XmlDocumentation.Controllers.XmlDocumentationController,Nucleus.XmlDocumentation</classTypeName>
+				<extension>XmlDocumentation</extension>
+				<viewController>XmlDocumentation</viewController>
 				<viewAction>Index</viewAction>
 				<editAction>Settings</editAction>
+				<categories>Content</categories>
 			</moduleDefinition>
 
 			<file name="readme.txt" />
 			<file name="viewer.css" />
 			<file name="settings.css" />
-			<!--<file name="disable-private-loadcontext.json" />-->
 			
 			<folder name="Bin">
 				<file name="Nucleus.XmlDocumentation.dll" />

@@ -12,7 +12,8 @@
 		<component folderName="Documents" optional="false">
 			<moduleDefinition id="28df7ff3-6407-459e-8608-c1ef4181807c">
 				<friendlyName>Documents</friendlyName>
-				<classTypeName>Nucleus.Modules.Documents.Controllers.DocumentsController,Nucleus.Modules.Documents</classTypeName>
+				<extension>Documents</extension>
+				<viewController>Documents</viewController>
 				<viewAction>Index</viewAction>
 				<editAction>Settings</editAction>
 				<categories>Content</categories>

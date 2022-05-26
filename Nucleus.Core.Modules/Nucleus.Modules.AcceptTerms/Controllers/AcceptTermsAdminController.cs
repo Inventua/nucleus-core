@@ -40,12 +40,6 @@ namespace Nucleus.Modules.AcceptTerms.Controllers
     [HttpPost]
     public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
     {
-      //DateTime effectiveDateUtc;
-      //if (viewModel.EffectiveDate.HasValue)
-      //{
-      //  effectiveDateUtc = System.TimeZoneInfo.ConvertTimeToUtc(viewModel.EffectiveDate.Value, this.HttpContext.Request.GetUserTimeZone());
-      //}
-
       DateTime? effectiveDateUtc = (viewModel.EffectiveDate.HasValue ? System.TimeZoneInfo.ConvertTimeToUtc(viewModel.EffectiveDate.Value, this.HttpContext.Request.GetUserTimeZone()) : (DateTime?)null);
 
       this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_TITLE, viewModel.Title);
@@ -57,7 +51,6 @@ namespace Nucleus.Modules.AcceptTerms.Controllers
 
       await this.PageModuleManager.SaveSettings(this.Context.Module);
 
-      //return View("Settings", await BuildSettingsViewModel(viewModel));
       return Ok();
     }
 

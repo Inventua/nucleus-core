@@ -30,6 +30,24 @@ namespace Nucleus.Abstractions.Models
 		public string ClassTypeName { get; set; }
 
 		/// <summary>
+		/// Name of the extension that the module belongs to.
+		/// </summary>
+		public string Extension { get; set; }
+
+		/// <summary>
+		/// Controller name for the view action.
+		/// </summary>
+		public string ViewController { get; set; }
+
+		/// <summary>
+		/// Controller name for the Edit (settings) action.  
+		/// </summary>
+		/// <remarks>
+		/// This value is optional.  If it is not set, the ViewController will be used instead.
+		/// </remarks>
+		public string SettingsController { get; set; }
+
+		/// <summary>
 		/// The Action name for the default "View" of the module.
 		/// </summary>
 		public string ViewAction { get; set; }

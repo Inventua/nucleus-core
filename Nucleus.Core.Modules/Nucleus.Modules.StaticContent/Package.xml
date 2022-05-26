@@ -12,7 +12,9 @@
 		<component folderName="StaticContent" optional="false">
 			<moduleDefinition id="0930d4fe-0469-47e6-a28b-7c42d85a61fd">
 				<friendlyName>Static Content</friendlyName>
-				<classTypeName>Nucleus.Modules.StaticContent.Controllers.StaticContentController,Nucleus.Modules.StaticContent</classTypeName>
+				<extension>StaticContent</extension>
+				<viewController>StaticContent</viewController>
+				<settingsController>StaticContentAdmin</settingsController>
 				<viewAction>Index</viewAction>
 				<editAction>Settings</editAction>
 				<categories>Content</categories>

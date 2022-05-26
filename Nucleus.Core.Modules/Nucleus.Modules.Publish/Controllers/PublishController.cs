@@ -58,14 +58,6 @@ namespace Nucleus.Modules.Publish.Controllers
 			}			
 		}
 
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-		[HttpGet]
-		[HttpPost]
-		public async Task<ActionResult> Settings(ViewModels.Settings viewModel)
-		{
-			return View("Settings", await BuildSettingsViewModel(viewModel));
-		}
-
 		private async Task<ViewModels.Viewer> BuildViewerViewModel (ViewModels.Viewer viewModel)
 		{
 			PagingSettings settings;					
@@ -97,27 +89,5 @@ namespace Nucleus.Modules.Publish.Controllers
 			return Task.FromResult(viewModel);
 		}
 
-		private async Task<ViewModels.Settings> BuildSettingsViewModel(ViewModels.Settings viewModel)
-		{
-			{
-				if (viewModel == null)
-				{
-					viewModel = new();
-				}
-
-				viewModel.Articles = await this.ArticlesManager.List(this.Context.Module);
-				viewModel.Lists = await this.ListManager.List(this.Context.Site);
-				viewModel.CategoryList = await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(MODULESETTING_CATEGORYLIST_ID, Guid.Empty));
-				viewModel.Layout = this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table");
-
-				viewModel.Layouts = new();
-				foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{RoutingConstants.EXTENSIONS_ROUTE_PATH}\\Publish\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout=>layout))
-				{
-					viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
-				}
-
-				return viewModel;
-			}
-		}
 	}
 }

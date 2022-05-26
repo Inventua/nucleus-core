@@ -620,14 +620,6 @@ namespace Nucleus.Modules.Forums.Controllers
 			return await ViewPost(post.Id);
 		}
 
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-		[HttpGet]
-		[HttpPost]
-		public async Task<ActionResult> Settings(ViewModels.GroupSettings viewModel)
-		{
-			return View("Settings", await BuildSettingsViewModel());
-		}
-
 		/// <summary>
 		/// Create a "list forums" viewmodel and populate it
 		/// </summary>
@@ -911,17 +903,6 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			// if permission check failed, return an empty viewmodel to prevent successful editing
 			return new();
-		}
-
-		/// <summary>
-		/// Create a "settings" viewmodel and populate it
-		/// </summary>
-		/// <returns></returns>
-		private async Task<ViewModels.Settings> BuildSettingsViewModel()
-		{
-			ViewModels.Settings viewModel = new();
-			viewModel.Groups = await this.GroupsManager.List(this.Context.Module);
-			return viewModel;
 		}
 
 		private async Task<ViewModels.ManageSubscriptions> BuildSubscriptionsViewModel()

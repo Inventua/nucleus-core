@@ -121,25 +121,6 @@ namespace Nucleus.OAuth.Client.Controllers
 			}			
 		}
 
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-		[HttpGet]
-		[HttpPost]
-		public ActionResult Settings(ViewModels.Settings viewModel)
-		{
-			return View("Settings", BuildSettingsViewModel(viewModel));
-		}
-
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-		[HttpPost]
-		public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
-		{
-			this.Context.Module.ModuleSettings.Set(ViewModels.Settings.MODULESETTING_AUTOLOGIN, viewModel.AutoLogin);
-			this.Context.Module.ModuleSettings.Set(ViewModels.Settings.MODULESETTING_LAYOUT, viewModel.Layout);
-
-			await this.PageModuleManager.SaveSettings(this.Context.Module);
-
-			return Ok();
-		}
 
 		private ViewModels.Viewer BuildViewModel(string redirectUri)
 		{
@@ -172,23 +153,6 @@ namespace Nucleus.OAuth.Client.Controllers
 		}
 
 
-		private ViewModels.Settings BuildSettingsViewModel(ViewModels.Settings viewModel)
-		{
-			if (viewModel == null)
-			{
-				viewModel = new();
-			}
-
-			viewModel.ReadSettings(this.Context.Module);
-
-			viewModel.Layouts = new();
-			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\OAuth Client\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
-			{
-				viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
-			}
-						
-			return viewModel;
-		}
 
 	}
 }

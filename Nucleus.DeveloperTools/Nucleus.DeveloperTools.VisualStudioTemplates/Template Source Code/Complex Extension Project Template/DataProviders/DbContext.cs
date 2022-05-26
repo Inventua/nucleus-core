@@ -14,7 +14,7 @@ namespace $nucleus_extension_namespace$.DataProviders
 {
 	public class $nucleus_extension_name$DbContext : Nucleus.Data.EntityFramework.DbContext
 	{
-		public DbSet<$nucleus_extension_name_singular$> $nucleus_extension_name$ { get; set; }
+		public DbSet<$nucleus_extension_modelname$> $nucleus_extension_modelname$s { get; set; }
 
 		public $nucleus_extension_name$DbContext(DbContextConfigurator<$nucleus_extension_name$DataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
 		{
@@ -34,13 +34,12 @@ namespace $nucleus_extension_namespace$.DataProviders
 		{
 			base.OnModelCreating(builder);
 
-			builder.Entity<$nucleus_extension_name$> ().Property<Guid>("ModuleId");
+			builder.Entity<$nucleus_extension_modelname$>().Property<Guid>("ModuleId");
 
-		//builder.Entity<$nucleus_extension_name$>()
-		//	.HasOne($nucleus_extension_name$ => $nucleus_extension_name$.Category)
-		//	.WithMany()
-		//	.HasForeignKey("CategoryId");
-
+			//builder.Entity<$nucleus_extension_name$>()
+			//	.HasOne($nucleus_extension_name$ => $nucleus_extension_name$.Category)
+			//	.WithMany()
+			//	.HasForeignKey("CategoryId");
 	}
 }
 }

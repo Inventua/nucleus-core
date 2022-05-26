@@ -1,10 +1,10 @@
 //{
-//	"schemaName": "Nucleus.Modules.Documents",
+//	"schemaName": "$nucleus_extension_namespace$",
 //	"version": "01.00.00",
 //	"operations": [
 //		{
 //			"createTable": {
-//				"name": "Documents",
+//				"name": "$nucleus_extension_modelname$",
 //				"columns": [
 //					{
 //						"name": "Id",
@@ -21,27 +21,6 @@
 //						"clrType": "string",
 //						"maxLength": 256,
 //						"isnullable": false
-//					},
-//					{
-//						"name": "Description",
-//						"clrType": "string",
-//						"maxLength": 512,
-//						"isnullable": true
-//					},
-//					{
-//						"name": "CategoryId",
-//						"clrType": "guid",
-//						"isnullable": true
-//					},
-//					{
-//						"name": "SortOrder",
-//						"clrType": "int",
-//						"isnullable": true
-//					},
-//					{
-//						"name": "FileId",
-//						"clrType": "guid",
-//						"isnullable": true
 //					},
 //					{
 //						"name": "DateAdded",
@@ -65,13 +44,13 @@
 //					}
 //				],
 //				"primaryKey": {
-//					"name": "PK_Documents",
+//					"name": "PK_$nucleus_extension_modelname$",
 //					"isclustered": true,
 //					"columns": [ "Id" ]
 //				},
 //				"foreignKeys": [
 //					{
-//						"name": "FK_Documents_ModuleId",
+//						"name": "FK_$nucleus_extension_modelname$_ModuleId",
 //						"Columns": [ "ModuleId" ],
 //						"PrincipalTable": "PageModules",
 //						"PrincipalColumns": [ "Id" ],
@@ -82,8 +61,8 @@
 //		},
 //		{
 //			"createIndex": {
-//				"name": "IX_Documents_ModuleId",
-//				"table": "Documents",
+//				"name": "IX_$nucleus_extension_modelname$_ModuleId",
+//				"table": "$nucleus_extension_modelname$",
 //				"isunique": false,
 //				"columns": [ "ModuleId" ]
 //			}

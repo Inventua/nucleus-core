@@ -29,46 +29,44 @@ namespace $nucleus_extension_namespace$.DataProviders
 			this.Context = context;
 		}
 
-		public async Task<$nucleus_extension_name$> Get(Guid id)
+		public async Task<$nucleus_extension_modelname$> Get(Guid id)
 		{
-			return await this.Context.$nucleus_extension_name$
-				.Where($nucleus_extension_name_singular_lcase$ => $nucleus_extension_name_singular_lcase$.Id == id)
-				//.Include($nucleus_extension_name_singular_lcase$ => $nucleus_extension_name_singular_lcase$.Category)
-				//.Include($nucleus_extension_name_singular_lcase$ => $nucleus_extension_name_singular_lcase$.File)
+			return await this.Context.$nucleus_extension_modelname$s
+				.Where($nucleus_extension_modelname_lcase$ => $nucleus_extension_modelname_lcase$.Id == id)
 				.AsNoTracking()
 				.FirstOrDefaultAsync();
 		}
 
-		public async Task<IList<$nucleus_extension_name$>> List(PageModule pageModule)
+		public async Task<IList<$nucleus_extension_modelname$>> List(PageModule pageModule)
 		{
-			return await this.Context.$nucleus_extension_name$
-				.Where($nucleus_extension_name_singular_lcase$ => EF.Property<Guid>($nucleus_extension_name_singular_lcase$, "ModuleId") == pageModule.Id)
-				//.Include($nucleus_extension_name_singular_lcase$ => $nucleus_extension_name_singular_lcase$.Category)
-				//.Include($nucleus_extension_name_singular_lcase$ => $nucleus_extension_name_singular_lcase$.File)
+			return await this.Context.$nucleus_extension_modelname$s
+				.Where($nucleus_extension_modelname_lcase$ => EF.Property<Guid>($nucleus_extension_modelname_lcase$, "ModuleId") == pageModule.Id)
 				.AsNoTracking()
 				.AsSingleQuery()
-				.OrderBy($nucleus_extension_name_singular_lcase$ => $nucleus_extension_name_singular_lcase$.SortOrder)
 				.ToListAsync();
 		}
 
-		public async Task Save(PageModule pageModule, $nucleus_extension_name$ $nucleus_extension_name_singular_lcase$)
+		public async Task Save(PageModule pageModule, $nucleus_extension_modelname$ $nucleus_extension_modelname_lcase$)
 		{
 			Action raiseEvent;
 
-			Boolean isNew = !await this.Context.$nucleus_extension_name$.Where(existing => existing.Id == $nucleus_extension_name_singular_lcase$.Id).AnyAsync();
+			Boolean isNew = !await this.Context.$nucleus_extension_modelname$s
+				.Where(existing => existing.Id == $nucleus_extension_modelname_lcase$.Id)
+				.AsNoTracking()
+				.AnyAsync();
 
-			this.Context.Attach($nucleus_extension_name_singular_lcase$);
-			this.Context.Entry($nucleus_extension_name_singular_lcase$).Property("ModuleId").CurrentValue = pageModule.Id;
+			this.Context.Attach($nucleus_extension_modelname_lcase$);
+			this.Context.Entry($nucleus_extension_modelname_lcase$).Property("ModuleId").CurrentValue = pageModule.Id;
 
 			if (isNew)
 			{
-				this.Context.Entry($nucleus_extension_name_singular_lcase$).State = EntityState.Added;
-				raiseEvent = new(() => { this.EventManager.RaiseEvent<$nucleus_extension_name_singular$, Create >($nucleus_extension_name_singular_lcase$); });
+				this.Context.Entry($nucleus_extension_modelname_lcase$).State = EntityState.Added;
+				raiseEvent = new(() => { this.EventManager.RaiseEvent<$nucleus_extension_modelname$, Create >($nucleus_extension_modelname_lcase$); });
 			}
 			else
 			{
-				this.Context.Entry($nucleus_extension_name_singular_lcase$).State = EntityState.Modified;
-				raiseEvent = new(() => { this.EventManager.RaiseEvent<$nucleus_extension_name_singular$, Update>($nucleus_extension_name_singular_lcase$); });
+				this.Context.Entry($nucleus_extension_modelname_lcase$).State = EntityState.Modified;
+				raiseEvent = new(() => { this.EventManager.RaiseEvent<$nucleus_extension_modelname$, Update>($nucleus_extension_modelname_lcase$); });
 			}
 
 			await this.Context.SaveChangesAsync();
@@ -76,11 +74,10 @@ namespace $nucleus_extension_namespace$.DataProviders
 			raiseEvent.Invoke();
 		}
 
-		public async Task Delete($nucleus_extension_name_singular$ $nucleus_extension_name_singular_lcase$)
+		public async Task Delete($nucleus_extension_modelname$ $nucleus_extension_modelname_lcase$)
 		{
-			this.Context.Remove($nucleus_extension_name_singular_lcase$);
-			await this.Context.SaveChangesAsync<$nucleus_extension_name_singular$> ();
+			this.Context.Remove($nucleus_extension_modelname_lcase$);
+			await this.Context.SaveChangesAsync<$nucleus_extension_modelname$>();
 		}
-
 	}
 }

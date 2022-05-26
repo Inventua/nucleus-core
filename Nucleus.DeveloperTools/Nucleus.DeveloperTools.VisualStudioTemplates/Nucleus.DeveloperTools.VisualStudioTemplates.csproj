@@ -63,6 +63,9 @@
     <CopyVsixExtensionFiles>False</CopyVsixExtensionFiles>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="Template Source Code\Simple Extension Project Template\Models\Settings.cs" />
+    <None Include="Template Source Code\Complex Extension Project Template\Models\Settings.cs" />
+    <None Include="Template Source Code\Simple Extension Project Template\Controllers\Admin.cs" />
     <Content Include="module.build.targets">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -88,7 +91,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="Template Source Code\Empty Extension Project Template\Nucleus.Modules.Project.csproj" />
-    <None Include="Template Source Code\Empty Extension Project Template\_ViewImports.cshtml" />
     <None Include="Template Source Code\Simple Extension Project Template\package.xml" />
     <None Include="Template Source Code\Simple Extension Project Template\Project.vstemplate" />
     <None Include="Template Source Code\Simple Extension Project Template\readme.txt" />
@@ -101,7 +103,7 @@
     <None Include="Template Source Code\Simple Extension Project Template\Nucleus.Modules.Project.csproj" />
     <None Include="Template Source Code\Simple Extension Project Template\Views\Settings.cshtml" />
     <None Include="Template Source Code\Simple Extension Project Template\Views\Viewer.cshtml" />
-    <None Include="Template Source Code\Simple Extension Project Template\_ViewImports.cshtml" />
+    <None Include="Template Source Code\Simple Extension Project Template\Views\_ViewImports.cshtml" />
     <None Include="Nucleus.DeveloperTools.VisualStudioTemplates.pfx" />
     <None Include="Template Source Code\Complex Extension Project Template\CacheExtensions.cs" />
     <None Include="Template Source Code\Complex Extension Project Template\Controllers\Controller.cs" />
@@ -131,7 +133,7 @@
     <None Include="Template Source Code\Complex Extension Project Template\Nucleus.Modules.Project.csproj" />
     <None Include="Template Source Code\Complex Extension Project Template\Views\Settings.cshtml" />
     <None Include="Template Source Code\Complex Extension Project Template\Views\Viewer.cshtml" />
-    <None Include="Template Source Code\Complex Extension Project Template\_ViewImports.cshtml" />
+    <None Include="Template Source Code\Complex Extension Project Template\Views\_ViewImports.cshtml" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>

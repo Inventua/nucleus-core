@@ -19,13 +19,11 @@ namespace $nucleus_extension_namespace$.Controllers
 	{
 		private Context Context { get; }
 		private IPageModuleManager PageModuleManager { get; }
-		private $nucleus_extension_name$Manager $nucleus_extension_name$Manager { get; }
-
-		public $nucleus_extension_name$AdminController(Context Context, IPageModuleManager pageModuleManager, $nucleus_extension_name$Manager $nucleus_extension_name_lcase$Manager)
+		
+		public $nucleus_extension_name$AdminController(Context Context, IPageModuleManager pageModuleManager)
 		{
 			this.Context = Context;
-			this.PageModuleManager = pageModuleManager;
-			this.$nucleus_extension_name$Manager = $nucleus_extension_name_lcase$Manager;			
+			this.PageModuleManager = pageModuleManager;	
 		}
 
 		[HttpGet]

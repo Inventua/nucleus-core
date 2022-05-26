@@ -52,24 +52,44 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 			{
 				if (runKind == WizardRunKind.AsNewProject)
 				{
-					ProjectWizardForm ProjectOptionsForm = new ProjectWizardForm
+					Boolean isSimpleExtension = false;
+
+					if (customParams != null && customParams.Length > 0)
 					{
-						ExtensionNamespace = Get(replacementsDictionary, "$projectname$"),
-						ExtensionName = Get(replacementsDictionary, "$projectname$"),
-						PublisherName = Get(replacementsDictionary, "$registeredorganization$")
+						isSimpleExtension = !(customParams[0].ToString().Contains("Complex Extension"));
+					}
+
+					string defaultExtensionName = Get(replacementsDictionary, "$safeprojectname$");
+					string[] defaultExtensionNameParts = defaultExtensionName.Split('.');
+					if (defaultExtensionNameParts.Length > 1)
+					{
+						defaultExtensionName = defaultExtensionNameParts[defaultExtensionNameParts.Length - 1];
+					}
+					string defaultModelName = defaultExtensionName;
+
+					ProjectWizardForm projectOptionsForm = new ProjectWizardForm
+					{
+						ClassNameEnabled = !isSimpleExtension,
+						ExtensionNamespace = Get(replacementsDictionary, "$safeprojectname$"),
+						ExtensionName = defaultExtensionName,
+						FriendlyName = defaultExtensionName,
+						PublisherName = Get(replacementsDictionary, "$registeredorganization$"),
+						ModelClassName = defaultModelName,
 					};
-
-
-					if (ProjectOptionsForm.ShowDialog() == DialogResult.OK)
+									
+					if (projectOptionsForm.ShowDialog() == DialogResult.OK)
 					{
 						// Add custom parameters.
-						replacementsDictionary.Add("$nucleus_extension_name$", ProjectOptionsForm.ExtensionName);
-						replacementsDictionary.Add("$nucleus_extension_namespace$", ProjectOptionsForm.ExtensionNamespace);
-						replacementsDictionary.Add("$nucleus_extension_name_lcase$", ProjectOptionsForm.ExtensionName.Substring(0, 1).ToLower() + ProjectOptionsForm.ExtensionName.Substring(1));
-						replacementsDictionary.Add("$nucleus_extension_description$", ProjectOptionsForm.ExtensionDescription);
-						replacementsDictionary.Add("$nucleus_extension_friendlyname$", ProjectOptionsForm.FriendlyName);
+						replacementsDictionary.Add("$nucleus_extension_name$", projectOptionsForm.ExtensionName);
+						replacementsDictionary.Add("$nucleus_extension_namespace$", projectOptionsForm.ExtensionNamespace);
+						replacementsDictionary.Add("$nucleus_extension_name_lcase$", projectOptionsForm.ExtensionName.Substring(0, 1).ToLower() + projectOptionsForm.ExtensionName.Substring(1));
+						replacementsDictionary.Add("$nucleus_extension_description$", projectOptionsForm.ExtensionDescription);
+						replacementsDictionary.Add("$nucleus_extension_friendlyname$", projectOptionsForm.FriendlyName);
+						replacementsDictionary.Add("$nucleus_extension_modelname$", projectOptionsForm.ModelClassName);
 
-						string extensionNameSingular = ProjectOptionsForm.ExtensionName;
+						replacementsDictionary.Add("$nucleus_extension_modelname_lcase$", projectOptionsForm.ModelClassName.Substring(0, 1).ToLower() + projectOptionsForm.ModelClassName.Substring(1));
+
+						string extensionNameSingular = projectOptionsForm.ExtensionName;
 						if (extensionNameSingular.EndsWith("s"))
 						{
 							extensionNameSingular = extensionNameSingular.Substring(0, extensionNameSingular.Length - 1);
@@ -77,11 +97,12 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 
 						replacementsDictionary.Add("$nucleus_extension_name_singular$", extensionNameSingular);
 						replacementsDictionary.Add("$nucleus_extension_name_singular_lcase$", extensionNameSingular.Substring(0, 1).ToLower() + extensionNameSingular.Substring(1));
-						
 
-						replacementsDictionary.Add("$publisher_name$", ProjectOptionsForm.PublisherName);
-						replacementsDictionary.Add("$publisher_url$", ProjectOptionsForm.PublisherUrl);
-						replacementsDictionary.Add("$publisher_email$", ProjectOptionsForm.PublisherEmail);
+
+
+						replacementsDictionary.Add("$publisher_name$", projectOptionsForm.PublisherName);
+						replacementsDictionary.Add("$publisher_url$", projectOptionsForm.PublisherUrl);
+						replacementsDictionary.Add("$publisher_email$", projectOptionsForm.PublisherEmail);
 					}
 					else
 					{

@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
-using Nucleus.Abstractions.Models.FileSystem;
 
 namespace $nucleus_extension_namespace$.Models
 {
-	public class $nucleus_extension_name_singular$
+	public class $nucleus_extension_modelname$ : ModelBase
 	{
 		public Guid Id { get; set; }				
 	}

@@ -10,16 +10,9 @@
 	
 	<components>
 		<component folderName="$nucleus_extension_name$" optional="false">
-			<moduleDefinition id="$guid2$">
-				<friendlyName>$nucleus_extension_friendlyname$</friendlyName>
-				<classTypeName>$nucleus_extension_namespace$.Controllers.$nucleus_extension_name$Controller,$nucleus_extension_namespace$</classTypeName>
-				<viewAction>Index</viewAction>
-				<editAction>Settings</editAction>
-			</moduleDefinition>
-
 			<file name="readme.txt" />
 
-			<folder name="Bin">
+			<folder name="bin">
 				<file name="$nucleus_extension_namespace$.dll" />
 			</folder>
 			

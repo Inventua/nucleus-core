@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace $nucleus_extension_namespace$.ViewModels
 {
-	public class Viewer
+	public class Viewer : Models.Settings
 	{
 		
 	}

@@ -10,7 +10,7 @@ using Nucleus.Abstractions.Models;
 
 namespace $nucleus_extension_namespace$.ViewModels
 {
-	public class Settings
+	public class Settings : Models.Settings
 	{		
 
 	}

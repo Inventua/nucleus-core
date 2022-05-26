@@ -18,7 +18,7 @@ namespace $nucleus_extension_namespace$
 		{
 			builder.ConfigureServices((context, services) => 
 			{
-				services.AddSingleton<$nucleus_extension_name$Manager > ();
+				services.AddSingleton<$nucleus_extension_name$Manager>();
 				services.AddDataProvider<I$nucleus_extension_name$DataProvider, DataProviders.$nucleus_extension_name$DataProvider, DataProviders.$nucleus_extension_name$DbContext > (context.Configuration);
 			});
 		}

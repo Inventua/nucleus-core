@@ -11,9 +11,9 @@ namespace $nucleus_extension_namespace$
 {
 	public static	class CacheExtensions
 	{
-		public static CacheCollection<Guid, $nucleus_extension_name$> $nucleus_extension_name$Cache(this ICacheManager cacheManager)
+		public static CacheCollection<Guid, $nucleus_extension_modelname$> $nucleus_extension_modelname$sCache(this ICacheManager cacheManager)
 		{
-			return cacheManager.Get<Guid, $nucleus_extension_name$> ();
+			return cacheManager.Get<Guid, $nucleus_extension_modelname$> ();
 		}
 	}
 }

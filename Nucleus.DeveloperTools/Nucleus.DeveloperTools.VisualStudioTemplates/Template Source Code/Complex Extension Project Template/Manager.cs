@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
-using Nucleus.Abstractions.FileSystemProviders;
 using Nucleus.Data.Common;
 using $nucleus_extension_namespace$.DataProviders;
 using $nucleus_extension_namespace$.Models;
@@ -13,7 +12,7 @@ using $nucleus_extension_namespace$.Models;
 namespace $nucleus_extension_namespace$
 {
 	/// <summary>
-	/// Provides functions to manage database data for <see cref="$nucleus_extension_name$"/>s.
+	/// Provides functions to manage database data.
 	/// </summary>
 	public class $nucleus_extension_name$Manager
 	{
@@ -27,28 +26,28 @@ namespace $nucleus_extension_namespace$
 		}
 
 		/// <summary>
-		/// Create a new <see cref="$nucleus_extension_name$"/> with default values.
+		/// Create a new <see cref="$nucleus_extension_modelname$"/> with default values.
 		/// </summary>
 		/// <param name="site"></param>
 		/// <returns></returns>
 		/// <remarks>
-		/// The new <see cref="$nucleus_extension_name$"/> is not saved to the database until you call <see cref="Save(PageModule, $nucleus_extension_name$)"/>.
+		/// The new <see cref="$nucleus_extension_modelname$"/> is not saved to the database until you call <see cref="Save(PageModule, $nucleus_extension_modelname$)"/>.
 		/// </remarks>
-		public $nucleus_extension_name$ CreateNew()
+		public $nucleus_extension_modelname$ CreateNew()
 		{
-			$nucleus_extension_name$ result = new();
+			$nucleus_extension_modelname$ result = new();
 
 			return result;
 		}
 
 		/// <summary>
-		/// Retrieve an existing <see cref="$nucleus_extension_name$"/> from the database.
+		/// Retrieve an existing <see cref="$nucleus_extension_modelname$"/> from the database.
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		public async Task<$nucleus_extension_name$> Get(Guid id)
+		public async Task<$nucleus_extension_modelname$> Get(Guid id)
 		{
-			return await this.CacheManager.$nucleus_extension_name$Cache().GetAsync(id, async id =>
+			return await this.CacheManager.$nucleus_extension_modelname$sCache().GetAsync(id, async id =>
 			{
 				using (I$nucleus_extension_name$DataProvider provider = this.DataProviderFactory.CreateProvider<I$nucleus_extension_name$DataProvider>())
 				{
@@ -58,24 +57,24 @@ namespace $nucleus_extension_namespace$
 		}
 
 		/// <summary>
-		/// Delete the specified <see cref="$nucleus_extension_name$"/> from the database.
+		/// Delete the specified <see cref="$nucleus_extension_modelname$"/> from the database.
 		/// </summary>
-		/// <param name="$nucleus_extension_name$"></param>
-		public async Task Delete($nucleus_extension_name$ $nucleus_extension_name_lcase$)
+		/// <param name="$nucleus_extension_modelname$"></param>
+		public async Task Delete($nucleus_extension_modelname$ $nucleus_extension_modelname_lcase$)
 		{
 			using (I$nucleus_extension_name$DataProvider provider = this.DataProviderFactory.CreateProvider<I$nucleus_extension_name$DataProvider>())
 			{
-				await provider.Delete($nucleus_extension_name_lcase$);
-				this.CacheManager.$nucleus_extension_name$Cache().Remove($nucleus_extension_name_lcase$.Id);
+				await provider.Delete($nucleus_extension_modelname_lcase$);
+				this.CacheManager.$nucleus_extension_modelname$sCache().Remove($nucleus_extension_modelname_lcase$.Id);
 			}
 		}
 
 		/// <summary>
-		/// List all <see cref="$nucleus_extension_name$"/>s within the specified site.
+		/// List all <see cref="$nucleus_extension_modelname$"/>s within the specified site.
 		/// </summary>
-		/// <param name="site"></param>
+		/// <param name="module"></param>
 		/// <returns></returns>
-		public async Task<IList<$nucleus_extension_name$>> List(PageModule module)
+		public async Task<IList<$nucleus_extension_modelname$>> List(PageModule module)
 		{
 			using (I$nucleus_extension_name$DataProvider provider = this.DataProviderFactory.CreateProvider<I$nucleus_extension_name$DataProvider>())
 			{
@@ -84,16 +83,16 @@ namespace $nucleus_extension_namespace$
 		}
 
 		/// <summary>
-		/// Create or update a <see cref="$nucleus_extension_name$"/>.
+		/// Create or update a <see cref="$nucleus_extension_modelname$"/>.
 		/// </summary>
-		/// <param name="site"></param>
-		/// <param name="$nucleus_extension_name$"></param>
-		public async Task Save(PageModule module, $nucleus_extension_name$ $nucleus_extension_name_lcase$)
+		/// <param name="module"></param>
+		/// <param name="$nucleus_extension_modelname$"></param>
+		public async Task Save(PageModule module, $nucleus_extension_modelname$ $nucleus_extension_modelname_lcase$)
 		{
 			using (I$nucleus_extension_name$DataProvider provider = this.DataProviderFactory.CreateProvider<I$nucleus_extension_name$DataProvider>())
 			{
-				await provider.Save(module, $nucleus_extension_name_lcase$);
-				this.CacheManager.$nucleus_extension_name$Cache().Remove($nucleus_extension_name_lcase$.Id);				
+				await provider.Save(module, $nucleus_extension_modelname_lcase$);
+				this.CacheManager.$nucleus_extension_modelname$sCache().Remove($nucleus_extension_modelname_lcase$.Id);				
 			}
 		}
 

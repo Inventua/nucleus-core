@@ -10,7 +10,7 @@ using $nucleus_extension_namespace$.Models;
 
 namespace $nucleus_extension_namespace$.ViewModels
 {
-	public class Viewer
+	public class Viewer : Models.Settings
 	{
 		
 	}

@@ -48,6 +48,30 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 			}
 		}
 
+		public Boolean ClassNameEnabled
+		{
+			get
+			{
+				return this.txtModelName.Enabled;
+			}
+			set 
+			{
+				this.txtModelName.Enabled = value;
+			}
+		}
+
+		public string ModelClassName
+		{
+			get
+			{
+				return this.txtModelName.Text;
+			}
+			set
+			{
+				this.txtModelName.Text = value;
+			}
+		}
+
 		public string ExtensionDescription
 		{
 			get

@@ -35,6 +35,7 @@
 			</Folder>
 			<Folder Name="Models" TargetFolderName="Models">
 				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$.cs">Model.cs</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="Settings.cs">Settings.cs</ProjectItem>
 			</Folder>
 			<Folder Name="ViewModels" TargetFolderName="ViewModels">
 				<ProjectItem ReplaceParameters="true" TargetFileName="Settings.cs">Settings.cs</ProjectItem>
@@ -43,10 +44,10 @@
 			<Folder Name="Views" TargetFolderName="Views">
 				<ProjectItem ReplaceParameters="true" TargetFileName="Settings.cshtml">Settings.cshtml</ProjectItem>
 				<ProjectItem ReplaceParameters="true" TargetFileName="Viewer.cshtml">Viewer.cshtml</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="_ViewImports.cshtml">_ViewImports.cshtml</ProjectItem>
 			</Folder>
-      <ProjectItem ReplaceParameters="true" TargetFileName="_ViewImports.cshtml">_ViewImports.cshtml</ProjectItem>
-      <ProjectItem ReplaceParameters="true" TargetFileName="CacheExtensions.cs">CacheExtensions.cs</ProjectItem>
-      <ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$Manager.cs">Manager.cs</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="CacheExtensions.cs">CacheExtensions.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$Manager.cs">Manager.cs</ProjectItem>																														
 			<ProjectItem ReplaceParameters="true" TargetFileName="Package.xml">Package.xml</ProjectItem>
 			<ProjectItem ReplaceParameters="true" TargetFileName="readme.txt">readme.txt</ProjectItem>
 			<ProjectItem ReplaceParameters="true" TargetFileName="settings.css">settings.css</ProjectItem>
@@ -56,7 +57,7 @@
   </TemplateContent>
 	
 	<WizardExtension>
-		<Assembly>Nucleus.DeveloperTools.VisualStudioTemplates, Version=1.0.0.0, Culture=Neutral, PublicKeyToken=2cc815f0f52d0477</Assembly>
+		<Assembly>Nucleus.DeveloperTools.VisualStudioTemplates, Version=1.0.0.1, Culture=Neutral, PublicKeyToken=2cc815f0f52d0477</Assembly>
 		<FullClassName>Nucleus.DeveloperTools.VisualStudioTemplates.ProjectWizard</FullClassName>
 	</WizardExtension>
 

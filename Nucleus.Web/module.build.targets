@@ -104,7 +104,7 @@
 		<RemoveDir Directories="AppPackage" />
 	</Target>
 
-	<Target Name="CopyToWebSetup" AfterTargets="PostBuildEvent" Condition="$(CopyToDefaultSetup) != false">
+	<Target Name="CopyToWebSetup" AfterTargets="PostBuildEvent" Condition="$(CopyToDefaultSetup) != false AND '$(Configuration)' == 'Release' AND $(ExtensionFolder) != '' AND $(NUCLEUS_PATH) != '' AND Exists('$(NUCLEUS_PATH)Setup')">
 		<ItemGroup>
 			<FilesToDelete Include="$(NUCLEUS_PATH)\Setup\Extensions\$(ExtensionFolder)_Extension*.zip"/>
 		</ItemGroup>

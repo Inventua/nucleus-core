@@ -38,6 +38,19 @@ namespace Nucleus.Abstractions.Search
 		public Boolean StrictSearchTerms { get; set; }
 
 		/// <summary>
+		/// Specifies scopes to include.
+		/// </summary>
+		public List<string> IncludedScopes { get; set; } = new List<string>();
+
+		/// <summary>
+		/// Specifies scopes to include.
+		/// </summary>
+		/// <remarks>
+		/// Search meta-data producers set the scope for their search content items, and the search index scope indicates the content source, for example the scope for a nucleus page is urn:nucleus:entities:page
+		/// </remarks>
+		public List<string> ExcludedScopes { get; set; } = new List<string>();
+
+		/// <summary>
 		/// Specifies which page of search results to return.
 		/// </summary>
 		public Models.Paging.PagingSettings PagingSettings { get; set; } = new();

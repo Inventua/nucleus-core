@@ -368,7 +368,7 @@ namespace Nucleus.Extensions.ElasticSearch
 				Query = BuildSearchQuery(query),
 				Source = new SourceFilter { Includes = "*", Excludes = new List<string>() { nameof(ElasticSearchDocument.Attachment), nameof(ElasticSearchDocument.Roles) }.ToArray() },
 				Suggest = suggest,
-				PostFilter = BuildSiteFilter(query) & BuildRolesFilter(query) & BuildArgsFilter(query),
+				PostFilter = BuildSiteFilter(query) & BuildRolesFilter(query) & BuildArgsFilter(query) & BuildScopeFilter(query),
 				Sort = new List<ISort>()
 				{
 					new FieldSort()
@@ -419,7 +419,7 @@ namespace Nucleus.Extensions.ElasticSearch
 					Size = query.PagingSettings.PageSize,
 					From = (query.PagingSettings.CurrentPageIndex - 1) * query.PagingSettings.PageSize,
 					Highlight = BuildHighlighter(),
-					PostFilter = BuildSiteFilter(query) & BuildRolesFilter(query) & BuildArgsFilter(query),
+					PostFilter = BuildSiteFilter(query) & BuildRolesFilter(query) & BuildArgsFilter(query) & BuildScopeFilter(query),
 					Sort = BuildSortFilter(query)
 				};
 
@@ -552,6 +552,23 @@ namespace Nucleus.Extensions.ElasticSearch
 			return BuildTermQuery(ParseField(nameof(ElasticSearchDocument.SiteId)), query.Site.Id.ToString());
 		}
 
+		private Nest.QueryContainer BuildScopeFilter(SearchQuery query)
+		{
+			Nest.BoolQuery result = new();
+
+			if (query.IncludedScopes.Any())
+			{
+				result.Must = new QueryContainer[] { BuildTermsQuery(nameof(ElasticSearchDocument.Scope), query.IncludedScopes) };
+			}
+
+			if (query.ExcludedScopes.Any())
+			{
+				result.MustNot = new QueryContainer[] { BuildTermsQuery(nameof(ElasticSearchDocument.Scope), query.ExcludedScopes) };				
+			}
+
+			return result;
+		}
+
 		private Nest.QueryContainer BuildArgsFilter(SearchQuery query)
 		{
 			// when we add more criteria to the SearchQuery class, this function will add code to filter based
@@ -578,6 +595,15 @@ namespace Nucleus.Extensions.ElasticSearch
 			{
 				Field = ParseField(fieldName),
 				Value = value
+			};
+		}
+
+		private Nest.QueryContainer BuildTermsQuery(string fieldName, List<string> values)
+		{
+			return new TermsQuery()
+			{
+				Field = ParseField(fieldName),
+				Terms =  values				
 			};
 		}
 

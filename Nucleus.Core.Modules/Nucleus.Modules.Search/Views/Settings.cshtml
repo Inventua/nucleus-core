@@ -9,8 +9,12 @@
 	{
 		<fieldset role="group" aria-labelledby="heading">
 			<h2>Settings</h2>
-			<div class="nucleus-flex-fields">
 
+			<SettingsControl caption="Include Files in Results?" rendermode="LabelLast" class="inner-inline" helptext="Specify whether to include files in search results.">
+				@Html.CheckBoxFor(model => model.IncludeFiles, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+
+			<div class="nucleus-flex-fields">
 				<SettingsControl caption="Show Categories?" rendermode="LabelLast" class="inner-inline" helptext="Display search result categories.">
 					@Html.CheckBoxFor(model => model.ShowCategories, new { @class = "ToggleSwitch" })
 				</SettingsControl>

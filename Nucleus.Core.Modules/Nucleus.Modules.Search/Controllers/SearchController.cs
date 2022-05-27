@@ -22,8 +22,9 @@ namespace Nucleus.Modules.Search.Controllers
 		private IUserManager UserManager { get; }
 		private IEnumerable<ISearchProvider> SearchProviders { get; }
 
-		private const string MODULESETTING_SHOW_URL = "multicontent:show-url"; 
-		private const string MODULESETTING_SHOW_CATEGORIES = "multicontent:show-categories";
+		private const string MODULESETTING_INCLUDE_FILES = "search:include-files";
+		private const string MODULESETTING_SHOW_URL = "search:show-url"; 
+		private const string MODULESETTING_SHOW_CATEGORIES = "search:show-categories";
 		private const string MODULESETTING_SHOW_PUBLISHEDDATE = "search:show-publisheddate";
 		private const string MODULESETTING_SHOW_SIZE = "search:show-size";
 		private const string MODULESETTING_SHOW_SCORE = "search:show-score";
@@ -62,6 +63,7 @@ namespace Nucleus.Modules.Search.Controllers
 		[HttpPost]
 		public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
 		{
+			this.Context.Module.ModuleSettings.Set(MODULESETTING_INCLUDE_FILES, viewModel.IncludeFiles);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_URL, viewModel.ShowUrl); 
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_CATEGORIES, viewModel.ShowCategories);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_PUBLISHEDDATE, viewModel.ShowPublishDate);
@@ -82,6 +84,7 @@ namespace Nucleus.Modules.Search.Controllers
 				viewModel = new();				
 			}
 
+			viewModel.Settings.IncludeFiles = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true);
 			viewModel.Settings.ShowUrl = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_URL, false);
 			viewModel.Settings.ShowCategories = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_CATEGORIES, true);
 			viewModel.Settings.ShowPublishDate = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_PUBLISHEDDATE, true);
@@ -108,6 +111,11 @@ namespace Nucleus.Modules.Search.Controllers
 					viewModel.Roles = (await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId()))?.Roles;
 				}
 				
+				if (!viewModel.Settings.IncludeFiles)
+				{
+					viewModel.ExcludedScopes.Add(Abstractions.Models.FileSystem.File.URN);
+				}
+
 				SearchResults results = await searchProvider.Search(viewModel);
 
 				viewModel.PagingSettings.TotalCount = Convert.ToInt32(results.Total);
@@ -120,7 +128,7 @@ namespace Nucleus.Modules.Search.Controllers
 		private async Task<ViewModels.Suggestions> BuildSuggestViewModel(ViewModels.Suggestions viewModel)
 		{
 			ISearchProvider searchProvider = null;
-
+			
 			if (viewModel == null)
 			{
 				viewModel = new();
@@ -143,6 +151,11 @@ namespace Nucleus.Modules.Search.Controllers
 				if (!(HttpContext.User.IsSystemAdministrator() | HttpContext.User.IsSiteAdmin(this.Context.Site)))
 				{
 					viewModel.Roles = (await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId()))?.Roles;
+				}
+
+				if (!this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true))
+				{
+					viewModel.ExcludedScopes.Add(Abstractions.Models.FileSystem.File.URN);
 				}
 
 				try
@@ -169,6 +182,7 @@ namespace Nucleus.Modules.Search.Controllers
 				viewModel = new();
 			}
 
+			viewModel.IncludeFiles = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true);
 			viewModel.ShowUrl = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_URL, false);
 			viewModel.ShowCategories = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_CATEGORIES, true);
 			viewModel.ShowPublishDate = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_PUBLISHEDDATE, true);

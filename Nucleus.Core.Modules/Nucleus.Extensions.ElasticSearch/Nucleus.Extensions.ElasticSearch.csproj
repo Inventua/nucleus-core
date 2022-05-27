@@ -39,7 +39,7 @@
 
   <ItemGroup>
 		<PackageReference Include="NEST" Version="7.17.1" />
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.0" />
+		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.0.1" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.0.0" />
   </ItemGroup>
 
@@ -47,6 +47,7 @@
 		<ExtensionFolder>ElasticSearch</ExtensionFolder>
 		<Version>1.0.0</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+		<CopyToDefaultSetup>false</CopyToDefaultSetup>
 	</PropertyGroup>
 	
 	<Target Name="FilterCopyLocalItems" AfterTargets="ResolveLockFileCopyLocalFiles">

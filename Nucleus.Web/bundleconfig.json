@@ -1,0 +1,98 @@
+[
+  {
+    "outputFileName": "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.HtmlEditor.min.css",
+    "inputFiles": [
+      "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.HtmlEditor.css"
+    ]
+  },
+  {
+    "outputFileName": "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.HtmlEditor.min.js",
+    "inputFiles": [
+      "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.HtmlEditor.js"
+    ]
+  },
+  {
+    "outputFileName": "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.images.min.js",
+    "inputFiles": [
+      "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.images.js"
+    ]
+  },
+  {
+    "outputFileName": "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.pages.min.js",
+    "inputFiles": [
+      "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.pages.js"
+    ]
+  },
+  {
+    "outputFileName": "Resources/js/jquery-pagelist.min.js",
+    "inputFiles": [
+      "Resources/js/jquery-pagelist.js"
+    ]
+  },
+  {
+    "outputFileName": "Resources/js/jquery-toggleswitch.min.js",
+    "inputFiles": [
+      "Resources/js/jquery-toggleswitch.js"
+    ]
+  },
+  {
+    "outputFileName": "Resources/js/nucleus-admin.min.js",
+    "inputFiles": [
+      "Resources/js/nucleus-admin.js"
+    ]
+  },
+  {
+    "outputFileName": "Resources/js/nucleus-shared.min.js",
+    "inputFiles": [
+      "Resources/js/nucleus-shared.js"
+    ]
+  },
+  {
+    "outputFileName": "Resources/css/admin.min.css",
+    "inputFiles": [
+      "Resources/css/admin.css"
+    ]
+  },
+  {
+    "outputFileName": "Resources/css/editmode.min.css",
+    "inputFiles": [
+      "Resources/css/editmode.css"
+    ]
+  },
+  {
+    "outputFileName": "Resources/css/forms.min.css",
+    "inputFiles": [
+      "Resources/css/forms.css"
+    ]
+  },
+  {
+    "outputFileName": "Resources/css/main.min.css",
+    "inputFiles": [
+      "Resources/css/main.css"
+    ]
+  },
+  {
+    "outputFileName": "Resources/css/shared.min.css",
+    "inputFiles": [
+      "Resources/css/shared.css"
+    ]
+  },
+  {
+    "outputFileName": "Shared/Containers/default.min.css",
+    "inputFiles": [
+      "Shared/Containers/default.css"
+    ]
+  },
+  {
+    "outputFileName": "Shared/Layouts/default.min.css",
+    "inputFiles": [
+      "Shared/Layouts/default.css"
+    ]
+  },
+  {
+    "outputFileName": "Shared/Controls/Views/PagingControl.min.css",
+    "inputFiles": [
+      "Shared/Controls/Views/PagingControl.css"
+    ]
+  }
+]

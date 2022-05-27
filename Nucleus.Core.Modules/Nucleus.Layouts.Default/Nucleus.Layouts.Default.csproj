@@ -25,8 +25,10 @@
     <None Remove="Containers\no-title.cshtml" />
     <None Remove="Layouts\default-2-column.cshtml" />
     <None Remove="Layouts\default-2-column.css" />
+    <None Remove="Layouts\default-2-column.min.css" />
     <None Remove="Layouts\default-3-column.cshtml" />
     <None Remove="Layouts\default-3-column.css" />
+    <None Remove="Layouts\default-3-column.min.css" />
     <None Remove="Layouts\_banner.cshtml" />
     <None Remove="LICENSE" />
     <None Remove="package.xml" />    
@@ -50,11 +52,13 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Include="Layouts\default-2-column.css" />
+    <Content Include="Layouts\default-2-column.min.css" />
     <Content Include="Layouts\default-3-column.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Include="Layouts\default-3-column.css" />
+    <Content Include="Layouts\default-3-column.min.css" />
     <Content Include="Layouts\_banner.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

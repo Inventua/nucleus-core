@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Nucleus.Abstractions.Models.Configuration
+{
+	/// <summary>
+	/// Class used to retrieve resource options from configuration files.
+	/// </summary>
+	public class ResourceFileOptions
+	{
+		/// <summary>
+		/// Configuration file section key
+		/// </summary>
+		public const string Section = "Nucleus:ResourceFileOptions";
+
+		/// <summary>
+		/// Specifies whether to use minified javascript files, if available.
+		/// </summary>
+		public Boolean UseMinifedJs { get; private set; } = true;
+
+		/// <summary>
+		/// Specifies whether to use minified css files, if available.
+		/// </summary>
+		public Boolean UseMinifedCss { get; private set; } = true;
+	}
+}

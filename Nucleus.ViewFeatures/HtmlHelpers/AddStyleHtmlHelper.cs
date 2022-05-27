@@ -8,16 +8,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Routing;
-using System.Reflection;
-using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.Extensions.Options;
 
 namespace Nucleus.ViewFeatures.HtmlHelpers
 {
@@ -43,13 +37,52 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// </example>
 		public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath)
 		{
-			Dictionary<string, System.Version> stylesheets = (Dictionary<string, System.Version>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
+			return AddStyle(htmlHelper, stylesheetPath, true);
+		}
 
-			stylesheetPath = htmlHelper.ResolveExtensionUrl(stylesheetPath);			
+		/// <summary>
+		/// Register the specified style to be added to the Layout or module's CSS styles.
+		/// </summary>
+		/// <param name="htmlHelper"></param>
+		/// <param name="stylesheetPath"></param>
+		/// <param name="defer"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// Extensions (modules) can use this Html Helper to add CSS stylesheets to the HEAD block.  The scriptPath can contain the 
+		///  ~! for the currently executing view path, or ~# for the currently executing extension. 
+		/// </remarks>
+		/// <example>
+		/// @Html.AddScript("~/Extensions/MyModule/MyModule.css")
+		/// </example>
+		public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, Boolean defer)
+		{
+			ResourceFileOptions resourceFileOptions = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IOptions<ResourceFileOptions>>().Value;
+			Dictionary<string, StylesheetInfo> stylesheets = (Dictionary<string, StylesheetInfo>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
 
+			stylesheetPath = new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(htmlHelper.ResolveExtensionUrl(stylesheetPath));
+			
 			if (!stylesheets.ContainsKey(stylesheetPath))
 			{
-				stylesheets.Add(stylesheetPath, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
+				string finalStylesheetPath = stylesheetPath;
+
+				if (resourceFileOptions.UseMinifedJs && stylesheetPath.StartsWith("/") && !stylesheetPath.EndsWith(".min.css"))
+				{
+					Microsoft.AspNetCore.Hosting.IWebHostEnvironment webHostingEnvironment = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
+					string minifiedPath = System.IO.Path.Join(webHostingEnvironment.ContentRootPath, System.IO.Path.GetDirectoryName(stylesheetPath.Replace('/', Path.DirectorySeparatorChar)), System.IO.Path.GetFileNameWithoutExtension(stylesheetPath)) + ".min" + System.IO.Path.GetExtension(stylesheetPath);
+					if (System.IO.File.Exists(minifiedPath))
+					{
+						finalStylesheetPath = stylesheetPath.Substring(0, stylesheetPath.Length - System.IO.Path.GetFileName(stylesheetPath).Length) + System.IO.Path.GetFileNameWithoutExtension(stylesheetPath) + ".min" + System.IO.Path.GetExtension(stylesheetPath);
+						// finalStylesheetPath = minifiedPath.Substring(webHostingEnvironment.ContentRootPath.Length);
+					}
+				}
+
+				stylesheets.Add(stylesheetPath, new StylesheetInfo() 
+				{ 
+					Path = finalStylesheetPath, 
+					Defer = defer, 
+					Version = ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version 
+				});
+
 				htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] = stylesheets;
 			}
 
@@ -64,18 +97,22 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		public static IHtmlContent RenderStyles(this IHtmlHelper htmlHelper)
 		{
 			HtmlContentBuilder scriptOutput = new();
+			Dictionary<string, StylesheetInfo> stylesheets = (Dictionary<string, StylesheetInfo>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
 
-			Dictionary<string, System.Version> stylesheets = (Dictionary<string, System.Version>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY];
 			if (stylesheets != null)
 			{
-				foreach (KeyValuePair<string, System.Version> style in stylesheets)
+				foreach (KeyValuePair<string, StylesheetInfo> style in stylesheets)
 				{
 					if (!String.IsNullOrEmpty(style.Key))
 					{
 						TagBuilder builder = new("link");
 						builder.Attributes.Add("rel", "stylesheet");
-						builder.Attributes.Add("href", new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(style.Key) + "?v=" + style.Value.ToString());
-						builder.Attributes.Add("defer", "");
+						builder.Attributes.Add("href", style.Value.Path + (style.Value.Version != null ? "?v=" + style.Value.Version.ToString() : ""));
+
+						if (style.Value.Defer)
+						{
+							builder.Attributes.Add("defer", "");
+						}
 
 						scriptOutput.AppendHtml(builder);
 					}
@@ -86,6 +123,14 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			}
 
 			return scriptOutput;
+		}
+
+
+		private class StylesheetInfo
+		{
+			public System.Version Version { get; set; }
+			public Boolean Defer { get; set; }
+			public string Path { get; set; }			
 		}
 	}
 }

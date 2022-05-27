@@ -1,0 +1,14 @@
+[
+  {
+    "outputFileName": "Layouts/default-2-column.min.css",
+    "inputFiles": [
+      "Layouts/default-2-column.css"
+    ]
+  },
+  {
+    "outputFileName": "Layouts/default-3-column.min.css",
+    "inputFiles": [
+      "Layouts/default-3-column.css"
+    ]
+  }
+]

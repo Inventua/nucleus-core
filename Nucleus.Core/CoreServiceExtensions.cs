@@ -106,6 +106,7 @@ namespace Nucleus.Core
 			services.AddHostedService<Services.TaskScheduler>();
 
 			// config options
+			AddOption<ResourceFileOptions>(services, configuration, ResourceFileOptions.Section);
 			AddOption<PasswordOptions>(services, configuration, PasswordOptions.Section);
 			AddOption<ClaimTypeOptions>(services, configuration, ClaimTypeOptions.Section);			
 			AddOption<SmtpMailOptions>(services, configuration, SmtpMailOptions.Section);

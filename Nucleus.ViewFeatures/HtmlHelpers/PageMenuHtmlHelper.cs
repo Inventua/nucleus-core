@@ -123,7 +123,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		internal static TagBuilder RenderExpandButton(Page page, Boolean show)
 		{
 			TagBuilder expandlinkBuilder = new("button");
-			expandlinkBuilder.AddCssClass($"btn nucleus-get-childpages nucleus-material-icon collapse{(show ? " show" : "")}");
+			expandlinkBuilder.AddCssClass($"btn btn-none nucleus-get-childpages nucleus-material-icon collapse{(show ? " show" : "")}");
 			expandlinkBuilder.Attributes.Add("type", "button");
 			expandlinkBuilder.Attributes.Add("data-id", page.Id.ToString());
 			expandlinkBuilder.Attributes.Add("tabindex", "0");
@@ -135,7 +135,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		internal static TagBuilder RenderCollapseButton(Page page, Boolean show)
 		{
 			TagBuilder collapselinkBuilder = new("button");
-			collapselinkBuilder.AddCssClass($"btn nucleus-hide-childpages nucleus-material-icon collapse{(show ? " show" : "")}");
+			collapselinkBuilder.AddCssClass($"btn btn-none nucleus-hide-childpages nucleus-material-icon collapse{(show ? " show" : "")}");
 			collapselinkBuilder.Attributes.Add("type", "button");
 			collapselinkBuilder.Attributes.Add("data-id", page.Id.ToString());
 			collapselinkBuilder.Attributes.Add("tabindex", "0");

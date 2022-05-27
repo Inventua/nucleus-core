@@ -8,15 +8,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Routing;
-using System.Reflection;
-using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Nucleus.ViewFeatures.HtmlHelpers
 {
@@ -63,18 +58,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// </example>
 		public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, string scriptPath, Boolean isAsync)
 		{
-			//Dictionary<string, System.Version> scripts = (Dictionary<string, System.Version>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
-			Dictionary<string, ScriptInfo> scripts = (Dictionary<string, ScriptInfo>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
-
-			scriptPath = htmlHelper.ResolveExtensionUrl(scriptPath);
-
-			if (!scripts.ContainsKey(scriptPath))
-			{
-				scripts.Add(scriptPath, new ScriptInfo() { Path = scriptPath, IsAsync = isAsync, Version = ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version });
-				htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] = scripts;
-			}
-
-			return new HtmlContentBuilder();
+			return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(scriptPath), isAsync, 0, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);				
 		}
 
 		/// <summary>
@@ -91,11 +75,36 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// </remarks>
 		public static IHtmlContent AddScript(this HttpContext context, string scriptPath, Boolean isAsync, int order)
 		{
+			return AddScript(context, scriptPath, isAsync, order, null);
+		}
+
+		private static IHtmlContent AddScript(HttpContext context, string scriptPath, Boolean isAsync, int order, Version version)
+		{
+			ResourceFileOptions resourceFileOptions = context.RequestServices.GetService<IOptions<ResourceFileOptions>>().Value;
 			Dictionary<string, ScriptInfo> scripts = (Dictionary<string, ScriptInfo>)context.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
 						
 			if (!scripts.ContainsKey(scriptPath))
 			{
-				scripts.Add(scriptPath, new ScriptInfo() { Path = scriptPath, IsAsync = isAsync, Order = order });
+				string finalScriptPath = scriptPath;
+
+				if (resourceFileOptions.UseMinifedJs && scriptPath.StartsWith("/") && !scriptPath.EndsWith(".min.js"))
+				{
+					Microsoft.AspNetCore.Hosting.IWebHostEnvironment webHostingEnvironment = context.RequestServices.GetService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
+					string minifiedPath = System.IO.Path.Join(webHostingEnvironment.ContentRootPath, System.IO.Path.GetDirectoryName(scriptPath.Replace('/', Path.DirectorySeparatorChar)), System.IO.Path.GetFileNameWithoutExtension(scriptPath)) + ".min" + System.IO.Path.GetExtension(scriptPath);
+					if (System.IO.File.Exists(minifiedPath))
+					{
+						finalScriptPath = scriptPath.Substring(0, scriptPath.Length - System.IO.Path.GetFileName(scriptPath).Length) + System.IO.Path.GetFileNameWithoutExtension(scriptPath) + ".min" + System.IO.Path.GetExtension(scriptPath);
+							// minifiedPath.Substring(webHostingEnvironment.ContentRootPath.Length);
+					}
+				}
+				
+				scripts.Add(scriptPath, new ScriptInfo() 
+				{ 
+					Path = finalScriptPath, 
+					IsAsync = isAsync, 
+					Order = order, 
+					Version = version 
+				});
 				context.Items[ITEMS_KEY] = scripts;
 			}
 
@@ -120,7 +129,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 					{
 						TagBuilder builder = new("script");
 						builder.Attributes.Add("type", "text/javascript");
-						builder.Attributes.Add("src", new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(script.Key) + (script.Value.Version != null ? "?v=" + script.Value.Version.ToString() : ""));
+						builder.Attributes.Add("src", script.Value.Path + (script.Value.Version != null ? "?v=" + script.Value.Version.ToString() : ""));
 						if (script.Value.IsAsync)
 						{
 							builder.Attributes.Add("async", "");

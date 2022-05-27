@@ -55,8 +55,10 @@
 				<file name="_banner.cshtml" />
 				<file name="default-2-column.cshtml" />
 				<file name="default-2-column.css" />
+				<file name="default-2-column.min.css" />
 				<file name="default-3-column.cshtml" />
 				<file name="default-3-column.css" />
+				<file name="default-3-column.min.css" />
 			</folder>
 
 			<folder name="Containers">

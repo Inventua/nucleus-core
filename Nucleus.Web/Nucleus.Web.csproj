@@ -55,6 +55,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Remove="bundleconfig.json" />
 	  <Content Remove="Index.cshtml" />
 	</ItemGroup>
 
@@ -63,12 +64,21 @@
 	  <None Remove="module.build.targets" />
 	  <None Remove="package.xsd" />
 	  <None Remove="Resources\css\admin.css" />
+	  <None Remove="Resources\css\admin.min.css" />
 	  <None Remove="Resources\css\editmode.css" />
+	  <None Remove="Resources\css\editmode.min.css" />
 	  <None Remove="Resources\css\forms.css" />
+	  <None Remove="Resources\css\forms.min.css" />
 	  <None Remove="Resources\css\main.css" />
+	  <None Remove="Resources\css\main.min.css" />
 	  <None Remove="Resources\css\shared.css" />
+	  <None Remove="Resources\css\shared.min.css" />
 	  <None Remove="Resources\js\jquery-3.6.0.min.js" />
+	  <None Remove="Resources\js\jquery-pagelist.min.js" />
+	  <None Remove="Resources\js\jquery-toggleswitch.min.js" />
 	  <None Remove="Resources\js\nucleus-admin.js" />
+	  <None Remove="Resources\js\nucleus-admin.min.js" />
+	  <None Remove="Resources\js\nucleus-shared.min.js" />
 	  <None Remove="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_444444_256x240.png" />
 	  <None Remove="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_555555_256x240.png" />
 	  <None Remove="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_777620_256x240.png" />
@@ -86,7 +96,9 @@
 	  <None Remove="Resources\Libraries\Trumbowyg\ui\trumbowyg.css" />
 	  <None Remove="Resources\Libraries\Trumbowyg\ui\trumbowyg.min.css" />
 	  <None Remove="Resources\material-icons.woff2" />
+	  <None Remove="Shared\Containers\default.min.css" />
 	  <None Remove="Shared\Controls\Views\PagingControl.css" />
+	  <None Remove="Shared\Controls\Views\PagingControl.min.css" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -104,11 +116,20 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Include="Resources\css\admin.css" />
+	  <Content Include="Resources\css\admin.min.css" />
+	  <Content Include="Resources\css\editmode.min.css" />
 	  <Content Include="Resources\css\forms.css" />
+	  <Content Include="Resources\css\forms.min.css" />
 	  <Content Include="Resources\css\main.css" />
 	  <Content Include="Resources\css\editmode.css" />
+	  <Content Include="Resources\css\main.min.css" />
 	  <Content Include="Resources\css\shared.css" />
+	  <Content Include="Resources\css\shared.min.css" />
+	  <Content Include="Resources\js\jquery-pagelist.min.js" />
+	  <Content Include="Resources\js\jquery-toggleswitch.min.js" />
 	  <Content Include="Resources\js\nucleus-admin.js" />
+	  <Content Include="Resources\js\nucleus-admin.min.js" />
+	  <Content Include="Resources\js\nucleus-shared.min.js" />
 	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_444444_256x240.png" />
 	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_555555_256x240.png" />
 	  <Content Include="Resources\Libraries\jQuery-UI\01.12.01\images\ui-icons_777620_256x240.png" />
@@ -128,7 +149,9 @@
 	  <Content Include="Resources\Libraries\Trumbowyg\ui\trumbowyg.css" />
 	  <Content Include="Resources\Libraries\Trumbowyg\ui\trumbowyg.min.css" />
 	  <Content Include="Resources\material-icons.woff2" />
+	  <Content Include="Shared\Containers\default.min.css" />
 	  <Content Include="Shared\Controls\Views\PagingControl.css" />
+	  <Content Include="Shared\Controls\Views\PagingControl.min.css" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -137,6 +160,10 @@
 
 	<ItemGroup>
 	  <Folder Include="Properties\ServiceDependencies\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="bundleconfig.json" />
 	</ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="Exists('iis-dev')">

@@ -78,7 +78,7 @@ namespace Nucleus.Web
 			{
 				string filename = System.IO.Path.GetFileName(configFile);
 
-				if (!filename.EndsWith(".schema.json"))
+				if (!filename.EndsWith(".schema.json") && filename != "bundleconfig.json")
 				{
 					AddSingleConfigFile(configFiles, configFile);
 				}

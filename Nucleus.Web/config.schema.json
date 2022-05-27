@@ -68,7 +68,7 @@
 					"$id": "#root/Nucleus/FileSystems",
 					"title": "Filesystems",
 					"type": "object"
-					],
+				},
 					"properties": {
 						"AllowedFileTypes": {
 							"$id": "#root/Nucleus/FileSystems/Providers/local/AllowedFileTypes",

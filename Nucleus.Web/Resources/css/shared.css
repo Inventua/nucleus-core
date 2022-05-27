@@ -19,6 +19,12 @@ body
   font-display: auto;
 }
 
+.btn.btn-none
+{
+  background-color: transparent;
+  border-color: transparent;
+}
+
 a *
 {
   cursor: pointer;

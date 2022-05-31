@@ -91,7 +91,8 @@ namespace Nucleus.Modules.Forums.Controllers
 		public async Task<ActionResult> DeleteGroup(ViewModels.GroupSettings viewModel)
 		{
 			await this.GroupsManager.Delete(viewModel.Group);
-			return Ok();
+			return View("Settings", await BuildSettingsViewModel());
+			//return Ok();
 		}
 
 		[HttpPost]

@@ -140,10 +140,14 @@ namespace Nucleus.Modules.Forums
 				}
 
 				this.CacheManager.GroupsCache().Remove(group.Id);
-				// forums can inherit group settings, so we need to expire them too
-				foreach (Forum forum in group.Forums)
+
+        // forums can inherit group settings, so we need to expire them too
+				if (group.Forums?.Any() == true)
 				{
-					this.CacheManager.ForumsCache().Remove(forum.Id);
+					foreach (Forum forum in group.Forums)
+					{
+						this.CacheManager.ForumsCache().Remove(forum.Id);
+					}
 				}
 			}
 		}

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 using Nucleus.Abstractions;
 using Nucleus.Extensions.Authorization;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.ViewFeatures;
+using Nucleus.Modules.StaticContent.Models;
 
 namespace Nucleus.Modules.StaticContent.Controllers
 {
@@ -31,63 +33,42 @@ namespace Nucleus.Modules.StaticContent.Controllers
     [HttpGet]
     public async Task<ActionResult> Index()
     {
+
+      ViewModels.Viewer viewModel = await BuildViewModel();
+
       try
       {
-        ViewModels.Viewer viewModel = await BuildViewModel();
-
-        File file;
-        if (!String.IsNullOrEmpty(this.Context.Parameters))
-        {
-          file = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SourceFolder.Provider, viewModel.SourceFolder.Path + (String.IsNullOrEmpty(viewModel.SourceFolder.Path) ? "" : "/") + this.Context.Parameters);
-          if (file == null)
-          {
-            return NotFound();
-          }
-        }
-        else
-        {
-          if (viewModel.DefaultFile == null)
-          {
-            return NotFound();
-          }
-          file = viewModel.DefaultFile;
-        }
-
-        if (file != null && file.Id != Guid.Empty)
+        if (viewModel.DefaultFile != null && viewModel.DefaultFileId != Guid.Empty)
         {
           // Check that the user has permission to view the static file
-          file.Parent.Permissions = await this.FileSystemManager.ListPermissions(file.Parent);
+          viewModel.DefaultFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.DefaultFile.Parent);
 
-          if (!User.HasViewPermission(this.Context.Site, file.Parent))
+          if (!User.HasViewPermission(this.Context.Site, viewModel.DefaultFile.Parent))
           {
             viewModel.Content = "";
           }
           else
           {
-            using (System.IO.Stream content = this.FileSystemManager.GetFileContents(this.Context.Site, file))
+            using (System.IO.Stream content = this.FileSystemManager.GetFileContents(this.Context.Site, viewModel.DefaultFile))
             {
-              if (file.IsMarkdown())
+              if (viewModel.DefaultFile.IsMarkdown())
               {
                 viewModel.Content = ContentExtensions.ToHtml(GetStreamAsString(content), "text/markdown");
               }
-              else if (file.IsText())
+              else if (viewModel.DefaultFile.IsText())
               {
                 viewModel.Content = ContentExtensions.ToHtml(GetStreamAsString(content), "text/plain");
               }
-              else if (file.IsContent())
+              else if (viewModel.DefaultFile.IsContent())
               {
                 viewModel.Content = GetStreamAsString(content);
               }
               else
               {
-                //System.IO.MemoryStream data = new();
-                //content.Position = 0;
-                //content.CopyTo(data);
-                //return File(data.ToArray(), GetMimeType(file));
                 // Redirect to the file.
-                if (file.Capabilities.CanDirectLink)
+                if (viewModel.DefaultFile.Capabilities.CanDirectLink)
                 {
-                  System.Uri uri = this.FileSystemManager.GetFileDirectUrl(this.Context.Site, file);
+                  System.Uri uri = this.FileSystemManager.GetFileDirectUrl(this.Context.Site, viewModel.DefaultFile);
                   if (uri != null)
                   {
                     return new RedirectResult(uri.AbsoluteUri, true);
@@ -99,7 +80,7 @@ namespace Nucleus.Modules.StaticContent.Controllers
                 }
                 else
                 {
-                  return new RedirectResult(Url.FileLink(file), true);
+                  return new RedirectResult(Url.FileLink(viewModel.DefaultFile), true);
                 }
               }
             }
@@ -124,6 +105,7 @@ namespace Nucleus.Modules.StaticContent.Controllers
       {
         return NotFound();
       }
+
     }
 
     private async Task ReplaceAttribute(ViewModels.Viewer viewModel, HtmlAgilityPack.HtmlDocument document, string nodeType, string attributeName)
@@ -158,7 +140,7 @@ namespace Nucleus.Modules.StaticContent.Controllers
               // attribute is a relative path
               try
               {
-                File file = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SourceFolder.Provider, viewModel.SourceFolder.Path + (String.IsNullOrEmpty(viewModel.SourceFolder.Path) ? "" : "/") + localPath);
+                File file = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.DefaultFile.Provider, viewModel.DefaultFile.Parent.Path + (String.IsNullOrEmpty(viewModel.DefaultFile.Parent.Path) ? "" : "/") + localPath);
 
                 if (file != null && file.Capabilities.CanDirectLink)
                 {
@@ -182,14 +164,6 @@ namespace Nucleus.Modules.StaticContent.Controllers
       }
     }
 
-    private string GetMimeType(File file)
-    {
-      Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider extensionProvider = new();
-      string mimeType = "application/octet-stream";
-      extensionProvider.TryGetContentType(file.Path, out mimeType);
-      return mimeType;
-    }
-
     private string GetStreamAsString(System.IO.Stream stream)
     {
       using (System.IO.StreamReader reader = new(stream))
@@ -198,23 +172,29 @@ namespace Nucleus.Modules.StaticContent.Controllers
       }
     }
 
-    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-    [HttpGet]
-    [HttpPost]
-    public async Task<ActionResult> Settings(ViewModels.Settings viewModel)
-    {
-      return View("Settings", await BuildSettingsViewModel());
-    }
-
     private async Task<ViewModels.Viewer> BuildViewModel()
     {
-      return await StaticContentAdminController.BuildSettingsViewModel<ViewModels.Viewer>(null, this.Context.Site, this.Context.Module, this.FileSystemManager);
-    }
+      ViewModels.Viewer viewModel = new();
 
-    private async Task<ViewModels.Settings> BuildSettingsViewModel()
-    {
-      return await StaticContentAdminController.BuildSettingsViewModel<ViewModels.Settings>(null, this.Context.Site, this.Context.Module, this.FileSystemManager);
-    }
+      viewModel.ReadSettings(this.Context.Module);
 
+      try
+      {
+        if (viewModel.DefaultFileId != Guid.Empty)
+        {
+          viewModel.DefaultFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.DefaultFileId);
+        }
+        else 
+        { 
+          viewModel.DefaultFile = null;
+        }
+      }
+      catch (System.IO.FileNotFoundException)
+      {
+        viewModel.DefaultFile = null;
+      }
+
+      return viewModel;
+    }
   }
 }

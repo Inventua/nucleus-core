@@ -9,16 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Nucleus.Modules.StaticContent.Controllers
 {
 	[Extension("StaticContent")]
-	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 	public class StaticContentAdminController : Controller
 	{
-		internal const string MODULESETTING_SOURCE_FOLDER_ID = "staticcontent:sourcefolder-id";
-		internal const string MODULESETTING_DEFAULT_FILE_ID = "staticcontent:defaultfile-id";
-
 		private Context Context { get; }
 		private IPageModuleManager PageModuleManager { get; }
 		private IFileSystemManager FileSystemManager { get; }
@@ -30,92 +27,72 @@ namespace Nucleus.Modules.StaticContent.Controllers
 			this.FileSystemManager = fileSystemManager;
 		}
 
-		[HttpGet]
-		public ActionResult Index()
-		{
-			return View("Viewer", BuildViewModel());
-		}
-
-		[HttpGet]
+    [HttpGet]
 		[HttpPost]
 		public async Task<ActionResult> Settings(ViewModels.Settings viewModel)
 		{
 			return View("Settings", await BuildSettingsViewModel(viewModel));
 		}
 
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpPost]
 		public ActionResult SaveSettings(ViewModels.Settings viewModel)
 		{
-			this.Context.Module.ModuleSettings.Set(MODULESETTING_SOURCE_FOLDER_ID, viewModel.SourceFolder.Id);
-
-			if (viewModel.DefaultFile == null)
-			{
-				this.Context.Module.ModuleSettings.Set(MODULESETTING_DEFAULT_FILE_ID, Guid.Empty);
-			}
-			else
-			{
-				this.Context.Module.ModuleSettings.Set(MODULESETTING_DEFAULT_FILE_ID, viewModel.DefaultFile.Id);
-			}
+			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_DEFAULT_FILE_ID, viewModel.DefaultFile.Id);
 
 			this.PageModuleManager.SaveSettings(this.Context.Module);
-
 			return Ok();
-		}
-
-		private async Task<ViewModels.Viewer> BuildViewModel()
-		{
-			return await BuildSettingsViewModel<ViewModels.Viewer>(null, this.Context.Site, this.Context.Module, this.FileSystemManager);
 		}
 
 		private async Task<ViewModels.Settings> BuildSettingsViewModel(ViewModels.Settings viewModel)
 		{
-			return await BuildSettingsViewModel(viewModel, this.Context.Site, this.Context.Module, this.FileSystemManager);
-		}
-
-		internal static async Task<T> BuildSettingsViewModel<T>(T viewModel, Site site, PageModule module, IFileSystemManager fileSystemManager)
-			where T: ViewModels.Settings, new()
-		{
 			if (viewModel == null)
 			{
 				viewModel = new();
-
-				try
-				{
-					viewModel.SourceFolder = await fileSystemManager.GetFolder(site, module.ModuleSettings.Get(MODULESETTING_SOURCE_FOLDER_ID, Guid.Empty));
-				}
-				catch (System.IO.FileNotFoundException)
-				{ 
-				}
-
-				try
-				{
-					viewModel.DefaultFile = await fileSystemManager.GetFile(site, module.ModuleSettings.Get(MODULESETTING_DEFAULT_FILE_ID, Guid.Empty));
-				}
-				catch (System.IO.FileNotFoundException)
-				{
-				}
-
-				if (viewModel.DefaultFile == null)
-				{
-					viewModel.DefaultFile = new() { Id = module.ModuleSettings.Get(MODULESETTING_DEFAULT_FILE_ID, Guid.Empty) };
-				}
 			}
+			viewModel.ReadSettings(this.Context.Module);
 
-			// We have to list the contents of the source folder in order to populate the default file dropdown
-			if (viewModel.SourceFolder != null)
+			if (viewModel.DefaultFile == null)
 			{
-				Folder folder = await fileSystemManager.GetFolder(site, viewModel.SourceFolder.Id);
-
-				// handle provider change
-				if (folder.Provider != viewModel.SourceFolder.Provider)
+				if (viewModel.DefaultFileId != Guid.Empty)
 				{
-					folder = await fileSystemManager.GetFolder(site, viewModel.SourceFolder.Provider, "");
+					try
+					{
+						viewModel.DefaultFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.DefaultFileId);
+					}
+					catch (System.IO.FileNotFoundException)
+					{
+						viewModel.DefaultFile = null;
+					}
 				}
-				viewModel.SourceFolder = await fileSystemManager.ListFolder(site, folder.Id, "");
 			}
 
 			return viewModel;
+		}
+
+    [HttpPost]
+		public ActionResult SelectAnother(ViewModels.Settings viewModel)
+		{
+			viewModel.DefaultFile.ClearSelection();
+
+			return View("Settings", viewModel); 
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> UploadFile(ViewModels.Settings viewModel, [FromForm] IFormFile mediaFile)
+		{
+			if (mediaFile != null)
+			{
+				using (System.IO.Stream fileStream = mediaFile.OpenReadStream())
+				{
+					viewModel.DefaultFile = await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.DefaultFile.Provider, viewModel.DefaultFile.Parent.Path, mediaFile.FileName, fileStream, false);
+				}
+			}
+			else
+			{
+				return BadRequest();
+			}
+
+			return View("Settings", viewModel);
 		}
 	}
 }

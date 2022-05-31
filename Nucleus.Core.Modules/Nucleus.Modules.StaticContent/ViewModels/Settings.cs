@@ -10,9 +10,8 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.StaticContent.ViewModels
 {
-	public class Settings
+	public class Settings : Models.Settings
 	{
-		public Folder SourceFolder { get; set; }
 		public File DefaultFile { get; set; }
 	}
 }

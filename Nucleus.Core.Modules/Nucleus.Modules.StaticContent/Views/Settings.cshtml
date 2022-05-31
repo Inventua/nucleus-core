@@ -5,27 +5,18 @@
 @using Nucleus.Modules.StaticContent.ViewModels
 @Html.AddStyle("~!/../settings.css")
 <div>
-	@using (Html.BeginNucleusForm("Settings", "StaticContentAdmin", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+	@using (Html.BeginNucleusForm("Settings", "StaticContentAdmin", "StaticContent", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 	{
 	<fieldset role="group" aria-labelledby="heading">
 		<h2>Settings</h2>
-
-		<SettingsControl caption="Documents Folder" helptext="Select the folder containing your static files.">
+		<SettingsControl caption="Select File" helptext="Select the default file to display.">
 			<div class="nucleus-flex-fields nucleus-fileselector">
-				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FolderSelector), new { model = Model.SourceFolder, PropertyName = nameof(Settings.SourceFolder) })
+				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.DefaultFile, propertyName = "DefaultFile" })
+				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { })
 			</div>
 		</SettingsControl>
-
-		@if (Model.SourceFolder?.Files != null && Model.SourceFolder.Files.Any())
-		{
-			<SettingsControl caption="Default File" helptext="Select the default file to display.">
-				@Html.DropDownListFor(model => model.DefaultFile.Id, new SelectList(Model.SourceFolder?.Files, "Id", "Name"))
-			</SettingsControl>
-		}
-
 		<div class="Tools">
-			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "StaticContentAdmin", "StaticContent"), new { })
-
+			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "StaticContentAdmin", "StaticContent"), new { @class = "btn btn-primary" })
 		</div>
 	</fieldset>
 	}

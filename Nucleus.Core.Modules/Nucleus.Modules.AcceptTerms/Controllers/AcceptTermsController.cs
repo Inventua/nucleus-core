@@ -49,7 +49,7 @@ namespace Nucleus.Modules.AcceptTerms.Controllers
           UserAcceptedTerms userAcceptedTerms = await this.AcceptTermsManager.Get(this.Context.Module, User);
           if (userAcceptedTerms != null && (!settings.EffectiveDate.HasValue || userAcceptedTerms.DateAccepted >= settings.EffectiveDate))
           {
-            // do nothing, user has accepted terms already
+            // suppress module output, user has accepted terms already
             return NoContent();
           }
         }

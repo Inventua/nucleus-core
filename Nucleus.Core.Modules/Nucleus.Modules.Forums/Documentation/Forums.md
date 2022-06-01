@@ -177,7 +177,7 @@ The reply object doesn't contain any data that you would want to include in a ma
 		<tr>
 			<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
 			<td>@post.PostedBy.UserName</td>
-			<td>@post.DateAdded</td>
+			<td>@post.DateAdded (UTC)</td>
 		</tr>
 		}
 		@if (forum.Replies.Any())
@@ -190,7 +190,7 @@ The reply object doesn't contain any data that you would want to include in a ma
 				<tr>
 					<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
 					<td>@reply.PostedBy.UserName</td>
-					<td>@reply.DateAdded</td>
+					<td>@reply.DateAdded (UTC)</td>
 				</tr>
 			}
 		}
@@ -228,7 +228,7 @@ to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.M
 		<tr>
 			<td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
 			<td>@post.PostedBy.UserName</td>
-			<td>@post.DateAdded</td>
+			<td>@post.DateAdded (UTC)</td>
 		</tr>
 		}
 		@if (forum.Replies.Any())
@@ -241,7 +241,7 @@ to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.M
 				<tr>
 					<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
 					<td>@reply.PostedBy.UserName</td>
-					<td>@reply.DateAdded</td>
+					<td>@reply.DateAdded (UTC)</td>
 				</tr>
 			}
 		}
@@ -273,7 +273,7 @@ to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.M
 		<tr>
 			<td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
 			<td>@post.PostedBy.UserName</td>
-			<td>@post.DateAdded</td>
+			<td>@post.DateAdded (UTC)</td>
 		</tr>
 		}
 		@if (forum.Replies.Any())
@@ -286,7 +286,7 @@ to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.M
 				<tr>
 					<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
 					<td>@reply.PostedBy.UserName</td>
-					<td>@reply.DateAdded</td>
+					<td>@reply.DateAdded (UTC)</td>
 				</tr>
 			}
 		}
@@ -318,7 +318,7 @@ to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.M
 		<tr>
 			<td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
 			<td>@post.PostedBy.UserName</td>
-			<td>@post.DateAdded</td>
+			<td>@post.DateAdded (UTC)</td>
 		</tr>
 		}
 		@if (forum.Replies.Any())
@@ -331,7 +331,7 @@ to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.M
 				<tr>
 					<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
 					<td>@reply.PostedBy.UserName</td>
-					<td>@reply.DateAdded</td>
+					<td>@reply.DateAdded (UTC)</td>
 				</tr>
 			}
 		}

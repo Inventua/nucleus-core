@@ -54,12 +54,51 @@ namespace Nucleus.Abstractions.Models
 		/// <returns></returns>
 		public void CopyTo<T>(T target) where T : class
 		{
-			foreach (System.Reflection.PropertyInfo prop in typeof(T).GetProperties())
+			foreach (System.Reflection.PropertyInfo targetProp in typeof(T).GetProperties())
 			{
-				System.Reflection.PropertyInfo thisProp = this.GetType().GetProperty(prop.Name);
-				if (thisProp != null && thisProp.CanRead && prop.CanWrite)
-				{
-					prop.SetValue(target, thisProp.GetValue(this));
+				System.Reflection.PropertyInfo sourceProp = this.GetType().GetProperty(targetProp.Name);
+
+				if (sourceProp != null)
+				{ 
+					if ( sourceProp.CanRead && targetProp.SetMethod != null)
+					{
+						targetProp.SetValue(target, sourceProp.GetValue(this));
+					}
+					else if (sourceProp.CanRead && targetProp.CanRead && sourceProp.PropertyType.IsAssignableTo(typeof(System.Collections.IList)) && targetProp.PropertyType.IsAssignableTo(typeof(System.Collections.IList)))
+					{
+						Boolean canCopyList = false;
+						if (targetProp.PropertyType.IsGenericType && sourceProp.PropertyType.IsGenericType)
+            {
+							// property is a generic list, make sure that the target is the same as the source.
+							if (targetProp.PropertyType.GenericTypeArguments != null && sourceProp.PropertyType.GenericTypeArguments != null)
+							{
+								if (targetProp.PropertyType.GenericTypeArguments.Any() && sourceProp.PropertyType.GenericTypeArguments.Any())
+								{
+									if (targetProp.PropertyType.GenericTypeArguments[0].IsAssignableFrom(sourceProp.PropertyType.GenericTypeArguments[0]))
+									{
+										canCopyList = true;
+									}
+								}
+							} 
+						}
+						else
+            {
+							// property is not a generic list.
+							canCopyList = true;
+            }
+
+						if (canCopyList)
+						{ 
+							// copy items from source to target when property is a collection and doesn't have a setter.
+							System.Collections.IList sourceCollection = (System.Collections.IList)sourceProp.GetValue(this);
+							System.Collections.IList targetCollection = (System.Collections.IList)targetProp.GetValue(target);
+
+							foreach (Object sourceItem in sourceCollection)
+							{ 
+								targetCollection.Add(sourceItem);
+							}
+						}
+					}
 				}
 			}
 		}

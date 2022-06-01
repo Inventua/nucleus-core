@@ -56,6 +56,7 @@
 
 	<ItemGroup>
 	  <Content Remove="bundleconfig.json" />
+	  <Content Remove="iis-dev\web.config" />
 	  <Content Remove="Index.cshtml" />
 	</ItemGroup>
 
@@ -164,6 +165,7 @@
 
 	<ItemGroup>
 	  <None Include="bundleconfig.json" />
+	  <None Include="iis-dev\web.config" />
 	</ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="Exists('iis-dev')">

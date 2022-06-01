@@ -78,9 +78,14 @@ namespace Nucleus.Core.Managers
 		/// </remarks>
 		public async Task<Boolean> VerifyPassword(User user, string password)
 		{
+			if (user.Secrets == null)
+      {
+				this.Logger.LogInformation("Login denied for user {0} - user secrets not set.", user.UserName);
+				return false;
+      }
+
 			if (user.Secrets.IsLockedOut)
 			{
-				//if (user.Secrets.LastLockoutDate < DateTime.UtcNow.AddMinutes(-LOCKOUT_RESET_MINUTES))
 				if (user.Secrets.LastLockoutDate < DateTime.UtcNow.Subtract(this.PasswordOptions.FailedPasswordLockoutReset))					
 				{
 					// lockout time has passed, allow login attempt.  The account will be unlocked only if the login attempt is successful
@@ -93,7 +98,7 @@ namespace Nucleus.Core.Managers
 				}
 			}
 
-			if (String.IsNullOrEmpty(password) || user.Secrets == null || !user.Secrets.VerifyPassword(password))
+			if (String.IsNullOrEmpty(password) || !user.Secrets.VerifyPassword(password))
 			{
 				if (user.Secrets.FailedPasswordWindowStart < DateTime.UtcNow.Subtract(this.PasswordOptions.FailedPasswordWindowTimeout))
 				{

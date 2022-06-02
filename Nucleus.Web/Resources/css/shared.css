@@ -30,6 +30,11 @@ body
   border-color: #ccc;
 }
 
+.btn.btn-none:focus-visible
+{
+  outline: -webkit-focus-ring-color auto 1px;
+}
+
 a *
 {
   cursor: pointer;

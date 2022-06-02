@@ -145,6 +145,9 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			
 			if (renderChildren)
 			{
+				// Tag the item as a dropdown-toggle control so that down arrow opens the sub-menu
+				linkBuilder.Attributes.Add("data-bs-toggle", "dropdown");
+
 				// down arrow icon to expand display (show child pages)
 				TagBuilder toggleLinkBuilder = new("button");
 				toggleLinkBuilder.AddCssClass("dropdown-toggle nav-link d-inline-flex btn btn-none");
@@ -211,7 +214,9 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			}
 			else
 			{
-				linkBuilder = new("span");
+				linkBuilder = new("button");
+				linkBuilder.Attributes.Add("class", "btn btn-none");
+				linkBuilder.Attributes.Add("type", "button");
 				// for disabled items, apply disabled class if the item has no children, otherwise render as a LI/SPAN with no href
 				if (!childItem.Children.Any())
 				{

@@ -109,21 +109,35 @@ namespace Nucleus.Web.Controllers.Admin
 				return BadRequest(ControllerContext.ModelState);
 			}
 
-			if (viewModel.User.Secrets == null)
-			{
-				viewModel.User.Secrets = new();
-			}
-
 			// only save a password for a new user (and if they entered one)
-			if (viewModel.User.Id == Guid.Empty && !String.IsNullOrEmpty(viewModel.EnteredPassword))
+			if (viewModel.User.Id == Guid.Empty)
 			{
-				Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState = await this.UserManager.ValidatePasswordComplexity(nameof(viewModel.EnteredPassword), viewModel.EnteredPassword);
-				if (!modelState.IsValid)
+				if (viewModel.User.Secrets == null)
 				{
-					return BadRequest(modelState);
+					viewModel.User.Secrets = new();
 				}
+
+				if (!String.IsNullOrEmpty(viewModel.EnteredPassword))
+        {
+					Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState = await this.UserManager.ValidatePasswordComplexity(nameof(viewModel.EnteredPassword), viewModel.EnteredPassword);
+					if (!modelState.IsValid)
+					{
+						return BadRequest(modelState);
+					}
 								
-				viewModel.User.Secrets.SetPassword(viewModel.EnteredPassword);
+					viewModel.User.Secrets.SetPassword(viewModel.EnteredPassword);
+				}
+        else
+        {
+					return BadRequest("Please enter a password.");
+        }
+			}
+			else
+      {
+				// We must NULL viewModel.User.Secrets for existing users because model binding always creates a new (empty) .Secrets object, which would cause
+				// the data provider to overwrite an existing user's secrets record with blanks.  Setting to null prevents the data provider 
+				// from saving secrets.
+				viewModel.User.Secrets = null;
 			}
 
 			// If the user has no roles assigned (or they have all been deleted), model binding will set .Roles to null - which is interpreted
@@ -145,11 +159,6 @@ namespace Nucleus.Web.Controllers.Admin
 					viewModel.User.Approved = existing.Approved;
 				}
 			}
-
-			// We must NULL viewModel.User.Secrets because model binding always creates a new (empty) .Secrets object, which would cause
-			// the data provider to overwrite an existing user's secrets record with blanks.  Setting to null prevents the data provider 
-			// from saving secrets.
-			viewModel.User.Secrets = null;
 
 			await this.UserManager.Save(this.Context.Site, viewModel.User);
 

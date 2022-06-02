@@ -83,6 +83,8 @@ function _Page()
 		});
 
 		/* menu-submenu handling */
+
+		/* Make left/right keys work the same as up/down */
 		jQuery('.nucleus-menu .dropdown-menu').on('keydown', function (e)
 		{
 			if ([37, 39].includes(e.which))  // left arrow, right arrow

@@ -83,8 +83,33 @@ function _Page()
 		});
 
 		/* menu-submenu handling */
+		jQuery('.nucleus-menu .dropdown-menu').on('keydown', function (e)
+		{
+			if ([37, 39].includes(e.which))  // left arrow, right arrow
+			{
+				var getToggleButton = jQuery(this).siblings('[data-bs-toggle="dropdown"]:not(.disabled):not(:disabled)');
 
-		/* Show submenus when mouse is hovered over (sub)menu item */
+				if (getToggleButton.length === 0) return;
+				var instance = bootstrap.Dropdown.getOrCreateInstance(getToggleButton);
+
+				if (e.which === 37)  // left arrow
+				{
+					e.key = 'ArrowUp';
+				}
+
+				if (e.which == 39)  // right arrow
+				{
+					e.key = 'ArrowDown';
+				}
+
+				event.stopPropagation();
+				instance.show();
+				instance._selectMenuItem(e);
+				return;
+			}
+		});
+
+		/* Show submenus on (sub)menu item mouse click */
 		jQuery('.dropdown-submenu .dropdown-toggle').on('click', function (e)
 		{
 			var subMenu = jQuery(this).next('.dropdown-menu');

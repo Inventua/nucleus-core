@@ -145,11 +145,14 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 			if (renderChildren)
 			{
-				TagBuilder toggleLinkBuilder = new("a");
-				toggleLinkBuilder.AddCssClass("dropdown-toggle nav-link d-inline-flex");
+				TagBuilder toggleLinkBuilder = new("button");
+				toggleLinkBuilder.AddCssClass("dropdown-toggle nav-link d-inline-flex btn btn-none");
+				toggleLinkBuilder.Attributes.Add("type", "button");
 				toggleLinkBuilder.Attributes.Add("title", "open");
 				toggleLinkBuilder.Attributes.Add("role", "button");
 				toggleLinkBuilder.Attributes.Add("aria-expanded", "false");
+				toggleLinkBuilder.Attributes.Add("tabindex", "0");
+
 				itemBuilder.InnerHtml.AppendHtml(toggleLinkBuilder);
 			}
 		
@@ -172,22 +175,6 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			string caption = String.IsNullOrWhiteSpace(childItem.Page.Title) ? childItem.Page.Name : childItem.Page.Title;
 			TagBuilder itemBuilder = new("li");
 		
-			//TagBuilder linkBuilder = new("a");
-			//linkBuilder.AddCssClass("nav-link");
-		//	linkBuilder.InnerHtml.SetContent(caption);
-
-			//if (!childItem.Page.DisableInMenu)
-			//{
-			//	defaultRoute = childItem.Page.DefaultPageRoute();
-			//	if (defaultRoute == null)
-			//	{
-			//		linkBuilder.AddCssClass("disabled");
-			//	}
-			//}			
-			//else
-			//{
-			//	linkBuilder.Attributes.Add("href", Nucleus.ViewFeatures.UrlHelperExtensions.PageLink(urlHelper, childItem.Page));
-			//}
 			TagBuilder linkBuilder = SetLinkUrl(childItem, urlHelper);
 			linkBuilder.InnerHtml.SetContent(caption);
 

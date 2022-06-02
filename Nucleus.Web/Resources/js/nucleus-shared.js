@@ -678,14 +678,6 @@ function _Page()
 
 	function _postRender(target, source, data, status, request)
 	{
-		//var overlay = jQuery(target.attr('data-overlay'));
-
-		//if (overlay.length === 0)
-		//{
-		//	// target doesn't have a data-overlay attribute, try finding a parent element overlay
-		//	overlay = jQuery(target.parents('[data-overlay]').attr('data-overlay'));
-		//}
-
 		if (!target.is(':visible') && data !== '')
 		{
 			target.show();
@@ -706,7 +698,8 @@ function _Page()
 
 		if (target.parents('.modal').length !== 0)
 		{
-			// target is in a modal.  If content was returned, check/set the modal caption, set any empty data-targets.  If content is empty, close the modal.
+			// target is in a modal.  If content was returned, check/set the modal caption, set any empty data-targets.  If content is 
+			// empty, close the modal.
 			var wrapper = target.parents('.modal');
 			var settingsDialog;
 
@@ -767,8 +760,16 @@ function _Page()
 			return;
 		}
 
-		// attempt to set focus to the first input control in the response
-		target.find(':input:not(:hidden,:button)').first().focus();
+		// attempt to set focus to the first control in the response
+
+		// prefer an INPUT/SELECT/TEXTAREA
+		var focusableElement = target.find('input:not([type="hidden"]), select, textarea').first();
+		if (focusableElement.length === 0)
+		{
+			// set focus to another element type if no INPUT/SELECT/TEXTAREA was found
+			focusableElement = target.find('button, a, [tabindex]:not([tabindex="-1"])').first();
+		}
+		focusableElement.focus();
 
 		// adjust dates from UTC to local
 		_setupDateFields(target);

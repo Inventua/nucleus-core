@@ -35,6 +35,16 @@
 		Page.LoadPartialContent(e, '@Url.Content("~/Admin/Pages/Editor?id=")' + jQuery(this).attr('data-id'), '#nucleus-page-editor');
 	});
 
+	jQuery('.nucleus-index-wrapper').on('keydown', 'a', function (event)
+  {
+    // trigger click event when the user presses ENTER or space 
+    if (event.which === 13 || event.which === 32)
+    {
+			jQuery(this.click());
+      event.preventDefault();
+		}
+  });			
+
 	// Read the child pages of the item containing the "+" button
 	jQuery('.nucleus-index-wrapper').on('click', '.nucleus-get-childpages', function (e)
 	{

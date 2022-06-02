@@ -25,6 +25,11 @@ body
   border-color: transparent;
 }
 
+.btn.btn-none:focus
+{
+  border-color: #ccc;
+}
+
 a *
 {
   cursor: pointer;
@@ -212,7 +217,8 @@ a *
 
 .nucleus-menu .nav-link:nth-child(2)
 {
-  padding-left: 0;
+  margin-left: -4px;
+  /*padding-left: 0;*/
 }
 
 .nucleus-menu .dropdown-menu .dropdown-toggle::after 

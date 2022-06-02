@@ -249,6 +249,7 @@ body
 
 .nucleus-control-panel-sidebar li .Label
 {
+	color: white;
 	display: block;
 	text-transform: uppercase;
 	text-align: center;
@@ -264,23 +265,17 @@ body
 	text-align: center;
 }
 
-.nucleus-control-panel-sidebar a span
+.nucleus-control-panel-sidebar a span.nucleus-index-icon
 {
 	display: block;
-	height: 48px;
+	height: auto;
 	width: 48px;
 	margin: auto;
 	box-sizing: border-box;
 	font-family: 'Material Icons'; 
 	font-size: 42px;
+	line-height: normal;
 }
-
-
-
-/*.nucleus-small-cell btn
-{
-	margin-right: 0;
-}*/
 
 .nucleus-control-panel-items
 {
@@ -481,38 +476,57 @@ ul.nucleus-control-panel-items a
 {
 	padding: 4px 8px;
 	text-decoration: none;
-	margin: 0;/* 0 4px 0;*/
+	margin: 0;
 	color: black;
+}
+
+.nucleus-index-items li a, .nucleus-index-items .nucleus-get-childpages, .nucleus-index-items .nucleus-hide-childpages
+{
+	border: solid transparent 2px;	
 }
 
 .nucleus-index-items li a:first-child
 {
-	flex-grow: 1 ;
+	flex-grow: 1;
 }
 
-.nucleus-index-items a:hover
+/*.nucleus-index-items a:hover, .nucleus-index-items a:focus
 {
 	background-color: #CCC;
 	border-radius: 4px;
 	color: white;
+}*/
+
+.nucleus-index-items li a:hover, .nucleus-index-items li a:focus, 
+.nucleus-index-items .nucleus-get-childpages:hover, .nucleus-index-items .nucleus-get-childpages:focus,
+.nucleus-index-items .nucleus-hide-childpages:hover, .nucleus-index-items .nucleus-hide-childpages:focus
+{
+	background-color: #ccc;
+	color: white;
+	border: solid black 2px;
 }
 
-.nucleus-index-items li.selected a:hover
+.nucleus-index-items li.selected a:hover, .nucleus-index-items li.selected a:focus
 {
 	border-radius: 0;
 }
 
-.nucleus-index-items li.selected > a, .nucleus-index-items li.selected > a:hover, .nucleus-index-items li.selected > a:active
-/*, .nucleus-index-items li.selected > button*/
+.nucleus-index-items li.selected > a, .nucleus-index-items li.selected > a:hover, .nucleus-index-items li.selected > a:focus
 {
 	background-color: #197ba4;
 	color: white;
 }
 
-.nucleus-index-items li.selected .nucleus-get-childpages
+.nucleus-index-items li.selected .nucleus-get-childpages, .nucleus-index-items li.selected .nucleus-hide-childpages
 {
 	border-radius: 0;
 }
+
+/*.nucleus-index-items .nucleus-get-childpages:hover, .nucleus-index-items .nucleus-get-childpages:focus
+{
+	background-color: #197ba4;
+	color: white;
+}*/
 
 .nucleus-admin-content .nucleus-editor-panel
 {
@@ -653,6 +667,11 @@ ul.nucleus-control-panel-items a
 	flex-wrap: wrap;
 }
 
+.nucleus-page-list li a, .nucleus-page-list .nucleus-get-childpages, .nucleus-page-list .nucleus-hide-childpages
+{	
+	border: solid transparent 2px;	
+}
+
 .nucleus-page-list li .btn
 {
 	padding: 0 0.75rem;
@@ -667,10 +686,13 @@ ul.nucleus-control-panel-items a
 	color: inherit;
 }
 
-.nucleus-page-list li a:hover
+.nucleus-page-list li a:hover, .nucleus-page-list li a:focus, 
+.nucleus-page-list .nucleus-get-childpages:hover, .nucleus-page-list .nucleus-get-childpages:focus,
+.nucleus-page-list .nucleus-hide-childpages:hover, .nucleus-page-list .nucleus-hide-childpages:focus
 {
-	opacity: 1;
-	background-color: #ccc;		
+	background-color: #ccc;
+	color: white;
+	border: solid black 2px;	
 }
 
 .nucleus-log-level

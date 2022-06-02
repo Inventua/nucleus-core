@@ -20,6 +20,7 @@
 			<fieldset role="group" aria-labelledby="heading">
 				<h2>Properties</h2>
 				@Html.HiddenFor(model => model.Group.Id)
+				@Html.HiddenFor(model => model.Group.SortOrder)
 
 				<SettingsControl caption="Name" helptext="Group name">
 					@Html.TextBoxFor(model => model.Group.Name)

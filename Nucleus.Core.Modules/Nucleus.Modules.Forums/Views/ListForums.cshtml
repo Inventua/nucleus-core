@@ -36,7 +36,7 @@
 							}
 						</span>
 
-						<a href="@forum.Name.FriendlyEncode()/">@forum.Name</a>
+						<a href="@Url.PageLink(Model.Page, forum.Name.FriendlyEncode())">@forum.Name</a>
 
 						@if (!String.IsNullOrEmpty(forum.Description))
 						{

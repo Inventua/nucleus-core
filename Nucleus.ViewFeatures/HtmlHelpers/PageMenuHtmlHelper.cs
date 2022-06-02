@@ -61,6 +61,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
 			linkBuilder.Attributes.Add("data-id", fromPage.Id.ToString());
 			linkBuilder.Attributes.Add("data-linkurl", urlHelper.PageLink(fromPage));
+			linkBuilder.Attributes.Add("tabindex", "0");
 			linkBuilder.InnerHtml.SetContent(caption);
 
 			outputBuilder.AppendHtml(linkBuilder);
@@ -95,6 +96,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 				// We append a "/" so that if the path contains dots the net core static file provider doesn't interpret the path as a file
 				//itemUrl = url.Replace("{id}", childItem.Page.Id.ToString());
 				//linkBuilder.Attributes.Add("href", itemUrl);
+				linkBuilder.Attributes.Add("tabindex", "0");
 				linkBuilder.Attributes.Add("data-id", childItem.Page.Id.ToString());
 				linkBuilder.Attributes.Add("data-linkurl", urlHelper.PageLink(childItem.Page));
 				linkBuilder.InnerHtml.SetContent(caption);

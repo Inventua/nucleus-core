@@ -133,23 +133,28 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			}
 			
 			string caption = String.IsNullOrWhiteSpace(childItem.Page.Title) ? childItem.Page.Name : childItem.Page.Title;
-			TagBuilder linkBuilder = SetLinkUrl(childItem, urlHelper);
+			TagBuilder linkBuilder = BuildLinkElement(childItem, urlHelper);
 			
-			if (thisLevel != 0)
+			if (thisLevel != 0)			
 			{
 				linkBuilder.AddCssClass("dropdown-item");
 			}
 			linkBuilder.InnerHtml.SetContent(caption);
 
-			itemBuilder.InnerHtml.AppendHtml(linkBuilder);	
-
+			itemBuilder.InnerHtml.AppendHtml(linkBuilder);
+			
 			if (renderChildren)
 			{
-				TagBuilder toggleLinkBuilder = new("a");
-				toggleLinkBuilder.AddCssClass("dropdown-toggle nav-link d-inline-flex");
+				// down arrow icon to expand display (show child pages)
+				TagBuilder toggleLinkBuilder = new("button");
+				toggleLinkBuilder.AddCssClass("dropdown-toggle nav-link d-inline-flex btn btn-none");
+				toggleLinkBuilder.Attributes.Add("type", "button");
 				toggleLinkBuilder.Attributes.Add("title", "open");
 				toggleLinkBuilder.Attributes.Add("role", "button");
 				toggleLinkBuilder.Attributes.Add("aria-expanded", "false");
+				toggleLinkBuilder.Attributes.Add("tabindex", "0");
+				toggleLinkBuilder.Attributes.Add("data-bs-toggle", "dropdown");
+
 				itemBuilder.InnerHtml.AppendHtml(toggleLinkBuilder);
 			}
 		
@@ -172,23 +177,13 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			string caption = String.IsNullOrWhiteSpace(childItem.Page.Title) ? childItem.Page.Name : childItem.Page.Title;
 			TagBuilder itemBuilder = new("li");
 		
-			//TagBuilder linkBuilder = new("a");
-			//linkBuilder.AddCssClass("nav-link");
-		//	linkBuilder.InnerHtml.SetContent(caption);
+			TagBuilder linkBuilder = BuildLinkElement(childItem, urlHelper);
 
-			//if (!childItem.Page.DisableInMenu)
-			//{
-			//	defaultRoute = childItem.Page.DefaultPageRoute();
-			//	if (defaultRoute == null)
-			//	{
-			//		linkBuilder.AddCssClass("disabled");
-			//	}
-			//}			
-			//else
-			//{
-			//	linkBuilder.Attributes.Add("href", Nucleus.ViewFeatures.UrlHelperExtensions.PageLink(urlHelper, childItem.Page));
-			//}
-			TagBuilder linkBuilder = SetLinkUrl(childItem, urlHelper);
+			if (thisLevel != 0)
+			{
+				linkBuilder.AddCssClass("dropdown-item");
+			}
+
 			linkBuilder.InnerHtml.SetContent(caption);
 
 			itemBuilder.InnerHtml.AppendHtml(linkBuilder);
@@ -196,7 +191,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			return itemBuilder;
 		}
 
-		private static TagBuilder SetLinkUrl(PageMenu childItem, IUrlHelper urlHelper)
+		private static TagBuilder BuildLinkElement(PageMenu childItem, IUrlHelper urlHelper)
 		{
 			TagBuilder linkBuilder;
 			

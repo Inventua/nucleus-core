@@ -24,7 +24,11 @@ namespace Nucleus.Extensions
 				Id = user.Id,
 				Profile = user.Profile,
 				UserName = user.UserName,
-				Secrets = new() { PasswordResetToken = user.Secrets?.PasswordResetToken }
+				Secrets = new() 
+				{ 
+					PasswordResetToken = user.Secrets?.PasswordResetToken, 
+					VerificationToken = user.Secrets?.VerificationToken 
+				}
 			};
 		}
 	}

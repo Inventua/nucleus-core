@@ -134,8 +134,7 @@
 
 						if (!wrapper.is(':visible'))
 						{
-							var settingsDialog = new bootstrap.Modal(wrapper);
-							//var settingsDialog = wrapper.modal();
+							var settingsDialog = new bootstrap.Modal(wrapper, { backdrop: 'static' });
 							wrapper.on('hidden.bs.modal', function () { jQuery('body').fadeTo('opacity', '0.3'); window.location.reload(true); });
 							settingsDialog.show();
 						}

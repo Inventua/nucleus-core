@@ -697,8 +697,6 @@ function _Page()
 			if (source.parents('.modal').find(target).length === 0)
 			{
 				source.parents('.modal').modal('hide');
-				//settingsDialog = bootstrap.Modal.getInstance(source.parents('.modal'));
-				//settingsDialog.hide();
 			}
 		}
 	}
@@ -761,7 +759,10 @@ function _Page()
 					}
 				});
 
-				wrapper.modal('show');
+				//wrapper.modal('show');
+				var modal = new bootstrap.Modal(wrapper, { backdrop: 'static' });
+				modal.show();
+
 				wrapper.on('hidden.bs.modal', function () { jQuery('.modal-backdrop').remove(); });
 
 			}

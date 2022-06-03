@@ -19,7 +19,7 @@
 						@foreach (var document in Model.Documents)
 						{
 							<h2 id="asm-@document.Namespace.ControlId()" class="accordion-header">
-								<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#mnu-@document.Namespace.ControlId()" aria-expanded="@(Model.DefaultOpen || Model.SelectedDocument==document ? "true": "false")" aria-controls="mnu-@document.Namespace.ControlId()">
+								<button class="accordion-button@(Model.DefaultOpen || Model.SelectedDocument==document ? "": " collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#mnu-@document.Namespace.ControlId()" aria-expanded="@(Model.DefaultOpen || Model.SelectedDocument==document ? "true": "false")" aria-controls="mnu-@document.Namespace.ControlId()">
 									@document.AssemblyName
 								</button>
 							</h2>
@@ -34,7 +34,6 @@
 									}
 								</ul>
 							</div>
-
 						}
 					</div>
 				</nav>

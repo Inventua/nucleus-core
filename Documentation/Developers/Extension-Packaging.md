@@ -4,13 +4,13 @@ An extension package is a zip file which contains all of the files needed for yo
 on how to install your components.  If you use one of the Nucleus Visual Studio project templates, your project file will contain entries which will automatically create a package (zip)
 file when you build your project using `Release` configuration.
 
-> **_Tip:_**  Set the build action of files in your extension project to `Content` in order to have them included in the package automatically.  The project assembly is automatically 
-included.  
-
-> **_Tip:_**  Visual Studio (MSBuild/Nuget) does not always include third-party assemblies for class library projects.  You may need to alter your project file or manually include 
-third-party assemblies and other required files in your package (zip) file.
+> **_Tip:_**  Set the build action of files in your extension project to `Content` in order to have them included in the package automatically.  Any other files which are included in
+your manifest (package.xml) file are automatically included, including assemblies in the folder named "bin". 
 
 ### Sample package.xml
+Replace `{generate-guid}` with a guid that you have generated yourself.  There are many web sites including [https://www.guidgen.com/](https://www.guidgen.com/) which can generate Guids 
+for you, as well as Visual Studio extensions, and the `uuidgen` command line tool available from the developer command prompt in Visual Studio.
+
 ```
 <?xml version="1.0" encoding="utf-8" ?>
 <package id="{generate-guid}" xmlns="urn:nucleus/schemas/package/1.0">

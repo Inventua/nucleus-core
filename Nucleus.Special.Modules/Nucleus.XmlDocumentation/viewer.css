@@ -85,13 +85,6 @@
 	border-bottom: solid 1px #eee;
 }
 
-.XmlDocumentation .api-content mark
-{
-	margin-right: -0.3em;
-	background-color: #ced4da;
-	padding: 0.1em 0.2em;
-}
-
 .XmlDocumentation .api-content code
 {
 	padding: 1.2em;

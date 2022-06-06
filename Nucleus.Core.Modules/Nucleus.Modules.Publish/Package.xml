@@ -14,7 +14,7 @@
 				<friendlyName>Publish</friendlyName>
 				<extension>Publish</extension>
 				<viewController>Publish</viewController>
-				<settingsController>Publish</settingsController>
+				<settingsController>Admin</settingsController>
 				<viewAction>Index</viewAction>
 				<editAction>Settings</editAction>
 				<categories>Content</categories>

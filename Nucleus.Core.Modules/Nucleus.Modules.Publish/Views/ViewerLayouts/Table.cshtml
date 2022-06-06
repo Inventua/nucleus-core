@@ -19,7 +19,7 @@
 					@article.Summary
 				</td>
 				<td>
-					<a href="@article.Title.FriendlyEncode()" class="btn btn-secondary">Read more</a>
+					<a href="@Url.PageLink(@article.Title.FriendlyEncode())" class="btn btn-secondary">Read more</a>
 				</td>
 			</tr>
 		}

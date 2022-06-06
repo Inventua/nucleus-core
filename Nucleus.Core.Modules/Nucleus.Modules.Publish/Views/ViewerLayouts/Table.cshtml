@@ -13,7 +13,7 @@
 		{
 			<tr>
 				<td class="title">
-					<a href="@article.Title.FriendlyEncode()">@article.Title</a>
+					<a href="@Url.PageLink(@article.Title.FriendlyEncode())">@article.Title</a>
 				</td>
 				<td class="summary">
 					@article.Summary

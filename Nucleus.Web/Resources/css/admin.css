@@ -421,7 +421,8 @@ ul.nucleus-control-panel-items a
 	flex: 1;
 	flex-basis: 100%;
 	flex-direction: row;	
-	height: 100%;
+	/*height: 100%;*/
+	overflow: auto;
 }
 
 .nucleus-admin-content .nucleus-index-wrapper a
@@ -433,10 +434,10 @@ ul.nucleus-control-panel-items a
 {
 	display: flex;
 	flex-direction: column;
-	/*display: inline-block;*/
 	vertical-align: top;
 	flex-grow: 1;
 	max-width: 20rem;	
+	flex-basis: 100%;
 	align-self: stretch;
 }
 
@@ -444,7 +445,7 @@ ul.nucleus-control-panel-items a
 {
 	width: 100%;
 	min-width: 200px;	
-	height: 100%;
+	flex-basis: 100%;
 	overflow-y: auto;
 	padding: 4px;
 	border: solid 1px #AAA;

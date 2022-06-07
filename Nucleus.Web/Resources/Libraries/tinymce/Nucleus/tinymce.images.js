@@ -53,7 +53,7 @@
 
 	/* Add a button that opens a window */
 	editor.ui.registry.addButton('images', {
-		//text: 'Insert Image',
+		tooltip: 'Insert Image',
 		icon: 'image',
 		onAction: function ()
 		{

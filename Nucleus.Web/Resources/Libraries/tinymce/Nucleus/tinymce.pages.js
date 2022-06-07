@@ -60,8 +60,8 @@
 
 	/* Add a button that opens a window */
 	editor.ui.registry.addButton('pages', {
-		//text: 'Insert Page Link',
-		icon: 'embed-page',
+		tooltip: 'Insert Page Link',
+		icon: 'browse',
 		onAction: function ()
 		{
 			/* Open window */

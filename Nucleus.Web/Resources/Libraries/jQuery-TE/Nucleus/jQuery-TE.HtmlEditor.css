@@ -1,0 +1,23 @@
+﻿/*  Styling corrections for jQueryTE default css */
+.jqte_tool.jqte_tool_1 .jqte_tool_label
+{
+	height: auto;
+}
+
+.jqte_tool:hover
+{
+	background-color: transparent;
+	border: transparent 1px solid;
+}
+
+.jqte_toolbar
+{
+	display: flex;
+	gap: 0.75rem;
+}
+
+.jqte_tool_icon
+{
+	width: 26px;
+	height: 26px;
+}

@@ -85,6 +85,32 @@ namespace Nucleus.Web.Controllers.Admin
 				return BadRequest(ControllerContext.ModelState);
 			}
 
+			// Read role type from the database.  We don't want to remove existing type flags, but we also don't want to
+			// add it as a <hidden> in the UI, because the other values are sensitive.
+			if (viewModel.Role.Id != Guid.Empty)
+			{
+				viewModel.Role.Type = (await this.RoleManager.Get(viewModel.Role.Id))?.Type ?? Role.RoleType.Normal;
+			}
+
+			if (viewModel.IsAutoRole)
+			{
+				if (viewModel.Role.Type.HasFlag(Role.RoleType.Restricted))
+				{
+					// restricted roles can't have users added or removed
+					return BadRequest("Role types restricted and auto cannot be combined.");
+				}
+				else
+				{
+					// add auto flag
+					viewModel.Role.Type = viewModel.Role.Type | Role.RoleType.Auto;
+				}
+			}
+			else
+			{
+				// remove auto flag
+				viewModel.Role.Type = viewModel.Role.Type &~ Role.RoleType.Auto;
+			}
+
 			await this.RoleManager.Save(this.Context.Site, viewModel.Role);
 			
 			return View("Index", await BuildViewModel());
@@ -117,7 +143,9 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			ViewModels.Admin.RoleEditor viewModel = new();
 
-			viewModel.Role = role;					
+			viewModel.Role = role;
+			viewModel.IsAutoRole = role.Type.HasFlag(Role.RoleType.Auto);
+
 			viewModel.RoleGroups = await this.RoleGroupManager.List(this.Context.Site);							
 
 			return viewModel;

@@ -26,14 +26,21 @@ namespace Nucleus.Abstractions.Models
 			/// Normal roles have no restrictions
 			/// </summary>
 			Normal = 0,	
+
 			/// <summary>
 			/// System roles cannot be deleted or modified, but can have users added and removed from them.
 			/// </summary>
 			System = 1,
+
 			/// <summary>
 			/// Restricted roles cannot have users added or removed from them.
 			/// </summary>
-			Restricted = 2
+			Restricted = 2,
+
+			/// <summary>
+			/// Auto roles are automatically assigned to new users.
+			/// </summary>
+			Auto = 4
 		}
 
 		/// <summary>

@@ -10,16 +10,22 @@
 		@Html.HiddenFor(model => model.Role.Id)
 
 		<SettingsControl caption="Name" helptext="Role name.  This value is displayed in on-screen controls which refer to roles.">
-			@Html.TextBoxFor(model => model.Role.Name, ((Model.Role.Type & Role.RoleType.System) == Role.RoleType.System ? new { @disabled = "", @maxlength = 256 } : new { @maxlength = 256 }))
+			@Html.TextBoxFor(model => model.Role.Name, (Model.Role.Type.HasFlag(Role.RoleType.System) ? new { @disabled = "", @maxlength = 256 } : new { @maxlength = 256 }))
 		</SettingsControl>
 
 		<SettingsControl caption="Description" helptext="The role description is for your reference in the control panel pages.">
-			@Html.TextAreaFor(model => model.Role.Description, ((Model.Role.Type & Role.RoleType.System) == Role.RoleType.System ? new { @disabled = "", @maxlength = 512 } : new { @maxlength = 512 }))
+			@Html.TextAreaFor(model => model.Role.Description, (Model.Role.Type.HasFlag(Role.RoleType.System) ? new { @disabled = "", @maxlength = 512 } : new { @maxlength = 512 }))
 		</SettingsControl>
 
+		@if (!Model.Role.Type.HasFlag(Role.RoleType.System))
+		{
+			<SettingsControl caption="Auto Role?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the role is automatically assigned to new users.">			
+				@Html.CheckBoxFor(model => model.IsAutoRole, new { @class = "ToggleSwitch" })			
+			</SettingsControl>
+		}
 
 		<SettingsControl caption="Role Group" helptext="Role groups are used to group together in drop-down lists.">
-			@if (!((Model.Role.Type & Role.RoleType.System) == Role.RoleType.System))
+			@if (!Model.Role.Type.HasFlag(Role.RoleType.System))
 			{
 				@Html.DropDownListFor(model => model.Role.RoleGroup.Id, new SelectList(Model.RoleGroups, "Id", "Name"), "(none selected)")
 			}
@@ -31,7 +37,7 @@
 		</SettingsControl>
 	</fieldset>
 	
-	@if (!((Model.Role.Type & Role.RoleType.System) == Role.RoleType.System))
+	@if (!Model.Role.Type.HasFlag(Role.RoleType.System))
 	{
 		<div class="nucleus-button-panel">
 			<input type="submit" class="btn btn-primary" value="Save Changes" />
@@ -46,6 +52,13 @@
 	{
 		<div class="alert alert-warning">
 			This is a system role.  You can't change any settings for this role.
+		</div>
+	}
+
+	@if (Model.Role.Type.HasFlag(Role.RoleType.Restricted))
+	{
+		<div class="alert alert-warning">
+			This is a restricted role.  You can't add or remove users from this role.
 		</div>
 	}
 }

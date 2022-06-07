@@ -10,6 +10,7 @@ namespace Nucleus.Web.ViewModels.Admin
 	{
 		public Role Role { get; set; }
 		public IEnumerable<RoleGroup> RoleGroups { get; set; } = new List<RoleGroup>();
+		public Boolean IsAutoRole { get; set; }	
 
 	}
 }

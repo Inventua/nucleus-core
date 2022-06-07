@@ -181,7 +181,7 @@ namespace Nucleus.Core.Managers
 		/// <remarks>
 		/// This function does not save the new <see cref="User"/> to the database.  Call <see cref="Save(Site, User)"/> to save the role group.
 		/// </remarks>
-		public Task<User> CreateNew(Site site)
+		public async Task<User> CreateNew(Site site)
 		{
 			User result = new();
 			result.Roles = new();
@@ -192,13 +192,19 @@ namespace Nucleus.Core.Managers
 				result.Roles.Add(site.RegisteredUsersRole);
 			}
 
+			// add auto roles
+			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+			{
+				result.Roles.AddRange((await provider.ListRoles(site)).Where(role => role != site.RegisteredUsersRole && role.Type.HasFlag(Role.RoleType.Auto)));
+			}			
+
 			// add user profile properties for the site
 			foreach (UserProfileProperty property in site.UserProfileProperties)
 			{
 				result.Profile.Add(new UserProfileValue() { UserProfileProperty = property });
 			}
 
-			return Task.FromResult(result);
+			return result;
 		}
 
 		/// <summary>

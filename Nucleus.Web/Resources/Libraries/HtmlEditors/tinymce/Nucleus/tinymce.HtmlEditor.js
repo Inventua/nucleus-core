@@ -14,8 +14,8 @@
         toolbar: 'code | undo redo | blocks | bold italic | link pages unlink | images | alignleft aligncenter alignright alignjustify | bullist numlist | hr | removeformat',
         statusbar: false,
         external_plugins: {
-          pages: 'Nucleus/tinymce.pages.js',
-          images: 'Nucleus/tinymce.images.js'
+          pages: '../Nucleus/tinymce.pages.js',
+          images: '../Nucleus/tinymce.images.js'
         }
       });
 

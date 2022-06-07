@@ -1,26 +1,26 @@
 [
   {
-    "outputFileName": "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.HtmlEditor.min.css",
+    "outputFileName": "Resources/Libraries/HtmlEditors/trumbowyg/Nucleus/trumbowyg.HtmlEditor.min.css",
     "inputFiles": [
-      "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.HtmlEditor.css"
+      "Resources/Libraries/HtmlEditors/trumbowyg/Nucleus/trumbowyg.HtmlEditor.css"
     ]
   },
   {
-    "outputFileName": "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.HtmlEditor.min.js",
+    "outputFileName": "Resources/Libraries/HtmlEditors/trumbowyg/Nucleus/trumbowyg.HtmlEditor.min.js",
     "inputFiles": [
-      "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.HtmlEditor.js"
+      "Resources/Libraries/HtmlEditors/trumbowyg/Nucleus/trumbowyg.HtmlEditor.js"
     ]
   },
   {
-    "outputFileName": "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.images.min.js",
+    "outputFileName": "Resources/Libraries/HtmlEditors/trumbowyg/Nucleus/trumbowyg.images.min.js",
     "inputFiles": [
-      "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.images.js"
+      "Resources/Libraries/HtmlEditors/trumbowyg/Nucleus/trumbowyg.images.js"
     ]
   },
   {
-    "outputFileName": "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.pages.min.js",
+    "outputFileName": "Resources/Libraries/HtmlEditors/trumbowyg/Nucleus/trumbowyg.pages.min.js",
     "inputFiles": [
-      "Resources/Libraries/trumbowyg/Nucleus/trumbowyg.pages.js"
+      "Resources/Libraries/HtmlEditors/trumbowyg/Nucleus/trumbowyg.pages.js"
     ]
   },
   {

@@ -1,4 +1,11 @@
 ﻿/*  Styling corrections for jQueryTE default css */
+.jqte *
+{
+	font-family: unset;
+	color: unset;
+	font-size: unset;
+}
+
 .jqte_tool.jqte_tool_1 .jqte_tool_label
 {
 	height: auto;
@@ -20,4 +27,10 @@
 {
 	width: 26px;
 	height: 26px;
+}
+
+.jqte_editor *
+{
+	float: unset!important;
+	margin: unset!important;
 }

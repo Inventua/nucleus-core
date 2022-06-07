@@ -30,7 +30,7 @@
           insertNucleusImage: {},
           insertNucleusPage: {}
         },        
-        svgPath: document.baseURI + "Resources/Libraries/Trumbowyg/ui/icons.svg"
+        svgPath: document.baseURI + "Resources/Libraries/HtmlEditors/Trumbowyg/02.25.01/ui/icons.svg"
       });
 
       // this is a workaround.  contenteditable divs don't always get focus on click in Edge, especially in popups

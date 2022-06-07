@@ -624,75 +624,75 @@ ul.nucleus-control-panel-items a
 	padding: 4px 8px;
 }
 
-
+/*  The !important on all of the .nucleus-page-list styles is to override the styles imposed by the default "minimum" styles of various html editors  */
 .nucleus-page-list 
 {
-	position: relative;
-	display: flex;
+	position: relative!important;
+	display: flex!important;
 }
 
 .nucleus-page-list > ul
 {
-	padding: 0;
-	margin: 0;
-	max-height: 12rem;
-	overflow: auto;
-	border: solid 1px #333;
-	position: absolute;
-	background-color: white;
-	flex-grow: 1;
-	width: 100%;
-	z-index: 1;
+	padding: 0!important;
+	margin: 0!important;
+	max-height: 12rem!important;
+	overflow: auto!important;
+	border: solid 1px #333!important;
+	position: absolute!important;
+	background-color: white!important;
+	flex-grow: 1!important;
+	width: 100%!important;
+	z-index: 1!important;
 }
 
 .nucleus-page-list .nucleus-page-list-selected
 {
-	border: solid 1px #767676;
-	border-radius: 2px;
-	padding: 2px 3px;
-	flex-grow: 1;
+	border: solid 1px #767676!important;
+	border-radius: 2px!important;
+	padding: 2px 3px!important;
+	flex-grow: 1!important;
 }
 
 .nucleus-page-list ul ul
 {
-	width: 100%;
+	width: 100%!important;
 }
 
 .nucleus-page-list li
 {
-	opacity: 0.9;
-	cursor: default;		
-	list-style-type: none;
-	display: flex;
-	flex-wrap: wrap;
+	opacity: 0.9!important;
+	cursor: default!important;		
+	list-style-type: none!important;
+	display: flex!important;
+	flex-wrap: wrap!important;
 }
 
 .nucleus-page-list li a, .nucleus-page-list .nucleus-get-childpages, .nucleus-page-list .nucleus-hide-childpages
 {	
-	border: solid transparent 2px;	
+	border: solid transparent 2px!important;	
 }
 
 .nucleus-page-list li .btn
 {
-	padding: 0 0.75rem;
+	padding: 0 0.75rem!important;
 }
 
 .nucleus-page-list li a, .nucleus-page-list li span
 {	
-	padding: 4px;
+	padding: 4px!important;
 	font-size: inherit!important;
-	flex-grow: 1;
-	text-decoration: none;
-	color: inherit;
+	flex-grow: 1!important;
+	text-decoration: none!important;
+	color: inherit!important;
 }
 
 .nucleus-page-list li a:hover, .nucleus-page-list li a:focus, 
 .nucleus-page-list .nucleus-get-childpages:hover, .nucleus-page-list .nucleus-get-childpages:focus,
 .nucleus-page-list .nucleus-hide-childpages:hover, .nucleus-page-list .nucleus-hide-childpages:focus
 {
-	background-color: #ccc;
-	color: white;
-	border: solid black 2px;	
+	background-color: #ccc!important;
+	color: white!important;
+	/*border: solid black 2px!important;	*/
 }
 
 .nucleus-log-level

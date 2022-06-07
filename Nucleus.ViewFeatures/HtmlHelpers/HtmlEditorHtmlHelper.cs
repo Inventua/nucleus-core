@@ -25,16 +25,42 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		{
 			HtmlEditorOptions options = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IOptions<HtmlEditorOptions>>().Value;
 
-			foreach (HtmlEditorScript option in options.Scripts)
+			if (options.HtmlEditors.Any())
 			{
-				switch (option.Type)
+				// If the cached default is set, use it
+				HtmlEditorConfig defaultEditor = options.DefaultHtmlEditorConfig;
+
+				// If the cached default is not set, determine the default editor
+				if (defaultEditor == null)
 				{
-					case HtmlEditorScript.Types.javascript:
-						htmlHelper.AddScript(option.Path);
-						break;
-					case HtmlEditorScript.Types.stylesheet:
-						htmlHelper.AddStyle(option.Path);
-						break;
+					// Default to the first Html editor if no default is specified
+					if (String.IsNullOrEmpty(options.Default))
+					{
+						options.Default = options.HtmlEditors.First().Key;
+					}
+
+					defaultEditor = options.HtmlEditors.Where(editor => editor.Key.Equals(options.Default, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+					if (defaultEditor == null)
+					{
+						// If the default doesn't match the key of any Html editor configs, use the first one
+						options.Default = options.HtmlEditors.First().Key;
+						defaultEditor = options.HtmlEditors.First();
+						options.SetDefaultHtmlEditorConfig(defaultEditor);
+					}
+				}
+
+				// Add the specified stylesheets and javascript for the default Html editor.
+				foreach (HtmlEditorScript option in defaultEditor.Scripts)
+				{
+					switch (option.Type)
+					{
+						case HtmlEditorScript.Types.javascript:
+							htmlHelper.AddScript(option.Path);
+							break;
+						case HtmlEditorScript.Types.stylesheet:
+							htmlHelper.AddStyle(option.Path);
+							break;
+					}
 				}
 			}
 

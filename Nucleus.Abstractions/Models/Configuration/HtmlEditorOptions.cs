@@ -17,8 +17,27 @@ namespace Nucleus.Abstractions.Models.Configuration
 		public const string Section = "Nucleus:HtmlEditor";
 
 		/// <summary>
-		/// Html editor scripts (css and javascript), read from configuration.
+		/// Default selected Html editor, specified by key.  If not specified, the first editor will be selected as default.
 		/// </summary>
-		public List<HtmlEditorScript> Scripts { get; private set; } = new();
+		public string Default { get; set; }
+
+		/// <summary>
+		/// Cached default config, used to improve runtime performance.
+		/// </summary>
+		public HtmlEditorConfig DefaultHtmlEditorConfig { get; private set; }
+
+		/// <summary>
+		/// Html editor configurations.
+		/// </summary>
+		public List<HtmlEditorConfig> HtmlEditors { get; private set; } = new();
+
+		/// <summary>
+		/// Set cached default config, used to improve runtime performance.
+		/// </summary>
+		/// <param name="config"></param>
+		public void SetDefaultHtmlEditorConfig(HtmlEditorConfig config)
+		{
+			this.DefaultHtmlEditorConfig = config;
+		}
 	}
 }

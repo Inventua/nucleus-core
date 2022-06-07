@@ -21,6 +21,18 @@ namespace Nucleus.Extensions
 		public const string UNCHANGED_PASSWORD = "#$UNCHANGED";
 
 		/// <summary>
+		/// Returns a value which specifies whether the site's user profile values contains a property with the specified 
+		/// <paramref name="typeUri"/>.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="typeUri"></param>
+		/// <returns></returns>
+		static public Boolean HasProperty(this Site site, string typeUri)
+		{
+			return site.UserProfileProperties.Exists(prop => prop.TypeUri == typeUri);
+		}
+
+		/// <summary>
 		/// Sets <see cref="Site.SiteSettings"/> based on a <see cref="SiteTemplateSelections"/> object.
 		/// </summary>
 		/// <param name="site"></param>
@@ -96,8 +108,7 @@ namespace Nucleus.Extensions
 				UseSsl = defaultValues.UseSsl
 			};
 
-			//result.HostName = 
-			if(site.SiteSettings.TryGetValue(Site.SiteMailSettingKeys.MAIL_HOSTNAME, out string hostName))
+			if (site.SiteSettings.TryGetValue(Site.SiteMailSettingKeys.MAIL_HOSTNAME, out string hostName))
 			{
 				result.HostName = hostName;
 			}

@@ -44,5 +44,7 @@ namespace Nucleus.Core.DataProviders
 		abstract Task DeleteRole(Role role);
 
 		abstract Task<IList<User>> ListUsersInRole(Guid roleId);
+
+		abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListUsersInRole(Guid roleId, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 	}
 }

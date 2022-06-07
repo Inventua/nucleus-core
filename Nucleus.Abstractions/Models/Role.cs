@@ -40,7 +40,7 @@ namespace Nucleus.Abstractions.Models
 			/// <summary>
 			/// Auto roles are automatically assigned to new users.
 			/// </summary>
-			Auto = 4
+			AutoAssign = 4
 		}
 
 		/// <summary>

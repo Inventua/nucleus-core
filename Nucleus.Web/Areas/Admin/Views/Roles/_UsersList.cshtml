@@ -1,0 +1,49 @@
+﻿@model Nucleus.Web.ViewModels.Admin.RoleEditor
+@using (Html.BeginAreaForm("ListUsersInRole", "Roles", "Admin", FormMethod.Post, new { @data_target = ".nucleus-role-users", @autocomplete = "off" }))
+{
+	@Html.HiddenFor(model => model.Role.Id)
+	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.Users, propertyName = "Users", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Standard })
+
+	<table>
+		<tr>
+			<th>User Name</th>
+			@if (Model.Site.HasProperty(System.Security.Claims.ClaimTypes.GivenName) || Model.Site.HasProperty(System.Security.Claims.ClaimTypes.Surname))
+			{
+				<th>Full Name</th>
+			}
+			@if (Model.Site.HasProperty(System.Security.Claims.ClaimTypes.Email))
+			{
+				<th>Email</th>
+			}
+		</tr>
+		@foreach (var user in Model.Users.Items)
+		{
+			<tr>
+				<td>
+					@user.UserName
+				</td>
+				@if (Model.Site.HasProperty(System.Security.Claims.ClaimTypes.GivenName) || Model.Site.HasProperty(System.Security.Claims.ClaimTypes.Surname))
+				{
+					<td>
+						@if (Model.Site.HasProperty(System.Security.Claims.ClaimTypes.GivenName))
+						{
+							@user.Profile.GetProperty(System.Security.Claims.ClaimTypes.GivenName)?.Value
+						}
+
+						@if (Model.Site.HasProperty(System.Security.Claims.ClaimTypes.Surname))
+						{
+							@user.Profile.GetProperty(System.Security.Claims.ClaimTypes.Surname)?.Value
+						}
+					</td>
+				}
+				@if (Model.Site.HasProperty(System.Security.Claims.ClaimTypes.Email))
+				{
+					<td>
+						@user.Profile.GetProperty(System.Security.Claims.ClaimTypes.Email)?.Value
+					</td>
+				}
+				<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("DeleteUserRole", "Roles", "Admin")?userid=@user.Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target=".nucleus-role-users" data-confirm="Delete this user role?" /></td>
+			</tr>
+		}
+	</table>
+}

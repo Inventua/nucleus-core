@@ -195,7 +195,7 @@ namespace Nucleus.Core.Managers
 			// add auto roles
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{
-				result.Roles.AddRange((await provider.ListRoles(site)).Where(role => role != site.RegisteredUsersRole && role.Type.HasFlag(Role.RoleType.Auto)));
+				result.Roles.AddRange((await provider.ListRoles(site)).Where(role => role != site.RegisteredUsersRole && role.Type.HasFlag(Role.RoleType.AutoAssign)));
 			}			
 
 			// add user profile properties for the site
@@ -386,6 +386,20 @@ namespace Nucleus.Core.Managers
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{
 				return await provider.ListUsersInRole(role.Id);
+			}
+		}
+
+		/// <summary>
+		/// List the <see cref="User"/>s who are members of the specified <see cref="Role"/> with paging.
+		/// </summary>
+		/// <param name="role"></param>
+		/// <param name="pagingSettings"></param>
+		/// <returns></returns>
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListUsersInRole(Role role, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		{
+			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+			{
+				return await provider.ListUsersInRole(role.Id, pagingSettings);
 			}
 		}
 

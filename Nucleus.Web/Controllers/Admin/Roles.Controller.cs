@@ -19,15 +19,17 @@ namespace Nucleus.Web.Controllers.Admin
 	{
 		private ILogger<RolesController> Logger { get; }
 		private IRoleManager RoleManager { get; }
+		private IUserManager UserManager { get; }
 		private IRoleGroupManager RoleGroupManager { get; }
 		private Context Context { get; }
 
-		public RolesController(Context context, ILogger<RolesController> logger, IRoleManager roleManager, IRoleGroupManager roleGroupManager)
+		public RolesController(Context context, ILogger<RolesController> logger, IRoleManager roleManager, IUserManager userManager, IRoleGroupManager roleGroupManager)
 		{
 			this.Context = context;
 			this.Logger = logger;
 			this.RoleManager = roleManager;
 			this.RoleGroupManager = roleGroupManager;
+			this.UserManager = userManager;
 		}
 
 		/// <summary>
@@ -102,13 +104,13 @@ namespace Nucleus.Web.Controllers.Admin
 				else
 				{
 					// add auto flag
-					viewModel.Role.Type = viewModel.Role.Type | Role.RoleType.Auto;
+					viewModel.Role.Type = viewModel.Role.Type | Role.RoleType.AutoAssign;
 				}
 			}
 			else
 			{
 				// remove auto flag
-				viewModel.Role.Type = viewModel.Role.Type &~ Role.RoleType.Auto;
+				viewModel.Role.Type = viewModel.Role.Type &~ Role.RoleType.AutoAssign;
 			}
 
 			await this.RoleManager.Save(this.Context.Site, viewModel.Role);
@@ -127,6 +129,31 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", await BuildViewModel());
 		}
 
+		[HttpPost]		
+		public async Task<ActionResult> DeleteUserRole(ViewModels.Admin.RoleEditor viewModel, Guid userId)
+		{
+			User user = await this.UserManager.Get(userId);
+
+			await this.UserManager.RemoveRole(user, viewModel.Role.Id);
+			await this.UserManager.Save(this.Context.Site, user);	
+
+			return await ListUsersInRole(viewModel);
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> ListUsersInRole(ViewModels.Admin.RoleEditor viewModel)
+		{
+			viewModel.Site = this.Context.Site;
+
+			if (!viewModel.Role.Type.HasFlag(Role.RoleType.Restricted))
+			{
+				// read users
+				viewModel.Users = await this.UserManager.ListUsersInRole(viewModel.Role, viewModel.Users);
+			}
+
+			return View("_UsersList", viewModel);
+		}
+
 		private async Task<ViewModels.Admin.RoleIndex> BuildViewModel()
 		{
 			return await BuildViewModel(new ViewModels.Admin.RoleIndex());
@@ -143,10 +170,18 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			ViewModels.Admin.RoleEditor viewModel = new();
 
-			viewModel.Role = role;
-			viewModel.IsAutoRole = role.Type.HasFlag(Role.RoleType.Auto);
+			viewModel.Site = this.Context.Site;
 
-			viewModel.RoleGroups = await this.RoleGroupManager.List(this.Context.Site);							
+			viewModel.Role = role;
+			viewModel.IsAutoRole = role.Type.HasFlag(Role.RoleType.AutoAssign);
+
+			viewModel.RoleGroups = await this.RoleGroupManager.List(this.Context.Site);
+
+			if(!viewModel.Role.Type.HasFlag(Role.RoleType.Restricted))
+			{
+				// read users
+				viewModel.Users = await this.UserManager.ListUsersInRole(viewModel.Role, viewModel.Users);
+			}
 
 			return viewModel;
 		}

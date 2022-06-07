@@ -187,5 +187,12 @@ namespace Nucleus.Abstractions.Managers
 		/// <returns></returns>
 		public Task<IList<User>> ListUsersInRole(Role role);
 
+		/// <summary>
+		/// List the <see cref="User"/>s who are members of the specified <see cref="Role"/> with paging.
+		/// </summary>
+		/// <param name="role"></param>
+		/// <param name="pagingSettings"></param>
+		/// <returns></returns>
+		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListUsersInRole(Role role, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 	}
 }

@@ -1245,7 +1245,31 @@ namespace Nucleus.Core.DataProviders
 		{
 			return await this.Context.Users
 				.Where(user => user.Roles.Where(role => role.Id == roleId).Any())
+				.OrderBy(user => user.UserName)
+				.AsNoTracking()
 				.ToListAsync();
+		}
+
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListUsersInRole(Guid roleId, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		{
+			List<User> results;
+
+			pagingSettings.TotalCount = await this.Context.Users
+				.Where(user => user.Roles.Where(role => role.Id == roleId).Any())
+				.AsNoTracking()
+				.CountAsync();
+
+			results = await this.Context.Users
+				.Where(user => user.Roles.Where(role => role.Id == roleId).Any())
+				.AsNoTracking()
+				.Skip(pagingSettings.FirstRowIndex)
+				.Take(pagingSettings.PageSize)
+				.Include(user => user.Profile)
+					.ThenInclude(value => value.UserProfileProperty)
+				.OrderBy(user => user.UserName)
+				.ToListAsync();
+			
+			return new Nucleus.Abstractions.Models.Paging.PagedResult<User>(pagingSettings, results);
 		}
 
 		public async Task<Guid> AddPermissionType(PermissionType permissionType)

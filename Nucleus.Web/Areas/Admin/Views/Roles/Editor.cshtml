@@ -3,63 +3,84 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
-@using (Html.BeginAreaForm("Save", "Roles", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @autocomplete = "off" }))
-{
-	<fieldset role="group" aria-labelledby="heading">
-		<h2>Role</h2>
-		@Html.HiddenFor(model => model.Role.Id)
+<Tab>
+	<TabItem active="true" target="#role-properties" caption="Properties"></TabItem>
+	@if (!Model.Role.Type.HasFlag(Role.RoleType.Restricted))
+	{
+		<TabItem target="#role-users" caption="Users"></TabItem>
+	}
+</Tab>
 
-		<SettingsControl caption="Name" helptext="Role name.  This value is displayed in on-screen controls which refer to roles.">
-			@Html.TextBoxFor(model => model.Role.Name, (Model.Role.Type.HasFlag(Role.RoleType.System) ? new { @disabled = "", @maxlength = 256 } : new { @maxlength = 256 }))
-		</SettingsControl>
+<TabContent>
+	<TabPanel id="role-properties" active="true">
 
-		<SettingsControl caption="Description" helptext="The role description is for your reference in the control panel pages.">
-			@Html.TextAreaFor(model => model.Role.Description, (Model.Role.Type.HasFlag(Role.RoleType.System) ? new { @disabled = "", @maxlength = 512 } : new { @maxlength = 512 }))
-		</SettingsControl>
-
-		@if (!Model.Role.Type.HasFlag(Role.RoleType.System))
+		@using (Html.BeginAreaForm("Save", "Roles", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @autocomplete = "off" }))
 		{
-			<SettingsControl caption="Auto Role?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the role is automatically assigned to new users.">			
-				@Html.CheckBoxFor(model => model.IsAutoRole, new { @class = "ToggleSwitch" })			
-			</SettingsControl>
-		}
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Role</h2>
+				@Html.HiddenFor(model => model.Role.Id)
 
-		<SettingsControl caption="Role Group" helptext="Role groups are used to group together in drop-down lists.">
+				<SettingsControl caption="Name" helptext="Role name.  This value is displayed in on-screen controls which refer to roles.">
+					@Html.TextBoxFor(model => model.Role.Name, (Model.Role.Type.HasFlag(Role.RoleType.System) ? new { @disabled = "", @maxlength = 256 } : new { @maxlength = 256 }))
+				</SettingsControl>
+
+				<SettingsControl caption="Description" helptext="The role description is for your reference in the control panel pages.">
+					@Html.TextAreaFor(model => model.Role.Description, (Model.Role.Type.HasFlag(Role.RoleType.System) ? new { @disabled = "", @maxlength = 512 } : new { @maxlength = 512 }))
+				</SettingsControl>
+
+				@if (!Model.Role.Type.HasFlag(Role.RoleType.System))
+				{
+					<SettingsControl caption="Auto Role?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the role is automatically assigned to new users.">
+						@Html.CheckBoxFor(model => model.IsAutoRole, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+				}
+
+				<SettingsControl caption="Role Group" helptext="Role groups are used to group together in drop-down lists.">
+					@if (!Model.Role.Type.HasFlag(Role.RoleType.System))
+					{
+						@Html.DropDownListFor(model => model.Role.RoleGroup.Id, new SelectList(Model.RoleGroups, "Id", "Name"), "(none selected)")
+					}
+					else
+					{
+						<div>System</div>
+					}
+
+				</SettingsControl>
+			</fieldset>
+
 			@if (!Model.Role.Type.HasFlag(Role.RoleType.System))
 			{
-				@Html.DropDownListFor(model => model.Role.RoleGroup.Id, new SelectList(Model.RoleGroups, "Id", "Name"), "(none selected)")
+				<div class="nucleus-button-panel">
+					<input type="submit" class="btn btn-primary" value="Save Changes" />
+
+					@if (Model.Role.Id != Guid.Empty)
+					{
+						<input type="submit" class="btn btn-danger" value="Delete Role" formaction="@Url.AreaAction("DeleteRole", "Roles", "Admin")" data-confirm="Delete this role?" />
+					}
+				</div>
 			}
 			else
 			{
-				<div>System</div>
+				<div class="alert alert-warning">
+					This is a system role.  You can't change any settings for this role.
+				</div>
 			}
 
-		</SettingsControl>
-	</fieldset>
-	
-	@if (!Model.Role.Type.HasFlag(Role.RoleType.System))
-	{
-		<div class="nucleus-button-panel">
-			<input type="submit" class="btn btn-primary" value="Save Changes" />
-
-			@if (Model.Role.Id != Guid.Empty)
+			@if (Model.Role.Type.HasFlag(Role.RoleType.Restricted))
 			{
-				<input type="submit" class="btn btn-danger" value="Delete Role" formaction="@Url.AreaAction("DeleteRole", "Roles", "Admin")" data-confirm="Delete this role?" />
+				<div class="alert alert-warning">
+					This is a restricted role.  You can't add or remove users from this role.
+				</div>
 			}
-		</div>
-	}
-	else
-	{
-		<div class="alert alert-warning">
-			This is a system role.  You can't change any settings for this role.
-		</div>
-	}
+		}
+	</TabPanel>
 
-	@if (Model.Role.Type.HasFlag(Role.RoleType.Restricted))
+	@if (!Model.Role.Type.HasFlag(Role.RoleType.Restricted) && Model.Users?.Items?.Any() == true)
 	{
-		<div class="alert alert-warning">
-			This is a restricted role.  You can't add or remove users from this role.
-		</div>
+		<TabPanel id="role-users">
+			<div class="nucleus-role-users">
+				@await Html.PartialAsync("_UsersList", Model)			
+			</div>
+		</TabPanel>
 	}
-}
-
+</TabContent>

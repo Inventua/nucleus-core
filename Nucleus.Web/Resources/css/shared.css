@@ -420,6 +420,18 @@ input[type=range].ToggleSwitch.checked:after
 	left: 28px;
 }
 
+/* Set default styles for Html Editors */
+.trumbowyg-editor, .trumbowyg-textarea,
+.tox.tox-tinymce,
+.nucleus-htmleditordefaults
+{
+	height: auto!important;	
+	background-color: white;
+	padding: 4px;
+	min-height: 30vh;
+	flex-grow: 1;
+}
+
 .comma-separated li:not(:last-child)::after
 {
   content: ', ';

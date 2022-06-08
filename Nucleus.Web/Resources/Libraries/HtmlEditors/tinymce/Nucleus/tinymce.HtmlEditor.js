@@ -2,6 +2,8 @@
 {
   jQuery.fn.HtmlEditor = function (conf)
   {
+    tinymce.EditorManager.remove();
+
     // For every element passed to the plug-in
     return this.each(function (index, value)
     {

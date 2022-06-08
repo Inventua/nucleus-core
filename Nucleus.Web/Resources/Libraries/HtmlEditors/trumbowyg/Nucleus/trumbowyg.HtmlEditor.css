@@ -16,7 +16,6 @@
 	flex-direction: column;
 	overflow: auto;
 	flex-grow: 1;
-	/*height: 100%!important;*/
 }
 
 .trumbowyg-modal-box
@@ -28,21 +27,6 @@
 {
 	max-width: none;
 }
-
-.trumbowyg-editor, .trumbowyg-textarea
-{	
-	height: auto!important;	
-	background-color: white;
-	padding: 4px;
-	height: auto;
-	min-height: 30vh;
-	flex-grow: 1;
-}
-
-/*.trumbowyg-editor p
-{
-	margin: 0;
-}*/
 
 .trumbowyg-modal form.nucleus-fileselectorform, .trumbowyg-modal .nucleus-fileselector, .trumbowyg-modal .nucleus-pageselector
 {
@@ -58,6 +42,4 @@
 {
 	flex-grow: 1;
 	margin-bottom: 1rem;
-	/*min-height: 3rem;
-	min-width: 40rem;*/
 }

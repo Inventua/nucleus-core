@@ -4,11 +4,6 @@
 	overflow: visible!important;
 }
 
-.tox.tox-tinymce
-{
-	flex-grow: 1;
-}
-
 .tox .tox-dialog button.btn-primary
 {
 	background-color: #0d6efd;

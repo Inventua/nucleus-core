@@ -11,6 +11,7 @@ namespace Nucleus.Core.DataProviders
 	/// Provides create, read, update and delete functionality for the <see cref="User"/>, <see cref="Role"/> and <see cref="RoleGroup"/> classes.
 	public interface IUserDataProvider : IDisposable//, IDataProvider<IUserDataProvider>
 	{
+		abstract Task<IList<User>> ListUsers(Site site);
 		abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListUsers(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 		abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> SearchUsers(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 		abstract Task<User> GetUser(Guid userId);

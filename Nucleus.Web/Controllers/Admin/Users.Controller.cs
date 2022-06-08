@@ -58,7 +58,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// 
+		/// Search for users containing the specified search term.
 		/// </summary>
 		/// <returns></returns>
 		[HttpPost]
@@ -68,6 +68,30 @@ namespace Nucleus.Web.Controllers.Admin
 			
 			return View("SearchResults", viewModel);
 		}
+
+		/// <summary>
+		/// Export all users to excel.
+		/// </summary>
+		/// <returns></returns>
+		[HttpGet]
+		public async Task<ActionResult> Export()
+		{
+			IList<User> users = await this.UserManager.List(this.Context.Site);
+
+			var exporter = new Nucleus.Extensions.Exporter<User>
+			(
+				Exporter<User>.Modes.AutoDetectAndExcludeSpecifiedProperties,
+				nameof(Nucleus.Abstractions.Models.User.IsSystemAdministrator),
+				nameof(Nucleus.Abstractions.Models.User.Secrets),
+				nameof(Nucleus.Abstractions.Models.User.Profile),
+				nameof(Nucleus.Abstractions.Models.User.AddedBy),
+				nameof(Nucleus.Abstractions.Models.User.ChangedBy)
+			);
+
+			exporter.Export(users);
+
+			return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");			
+		}		
 
 		/// <summary>
 		/// Display the user editor

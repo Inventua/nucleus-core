@@ -368,6 +368,21 @@ namespace Nucleus.Core.Managers
 		/// </summary>
 		/// <param name="site"></param>
 		/// <returns></returns>
+		public async Task<IList<User>> List(Site site)
+		{
+			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+			{
+				return await provider.ListUsers(site);
+			}
+		}
+
+
+		/// <summary>
+		/// List a page of <see cref="User"/>s who belong to the specified <see cref="Site"/>.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="pagingSettings"></param>
+		/// <returns></returns>
 		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> List(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
 		{
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())

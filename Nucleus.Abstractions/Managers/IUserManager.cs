@@ -119,6 +119,13 @@ namespace Nucleus.Abstractions.Managers
 		/// List all <see cref="User"/>s who belong to the specified <see cref="Site"/>.
 		/// </summary>
 		/// <param name="site"></param>
+		/// <returns></returns>
+		public Task<IList<User>> List(Site site);
+
+		/// <summary>
+		/// List a page of <see cref="User"/>s who belong to the specified <see cref="Site"/>.
+		/// </summary>
+		/// <param name="site"></param>
 		/// <param name="pagingSettings"></param>
 		/// <returns></returns>
 		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> List(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);

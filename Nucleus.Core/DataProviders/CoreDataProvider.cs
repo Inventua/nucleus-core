@@ -841,6 +841,18 @@ namespace Nucleus.Core.DataProviders
 			}
 		}
 
+		public async Task<IList<User>> ListUsers(Site site)
+		{
+			return await this.Context.Users
+				.Where(user => user.IsSystemAdministrator == false && user.SiteId == site.Id)
+				.Include(user => user.Roles)
+				.Include(user => user.Profile)
+				.OrderBy(user => user.UserName)
+				.AsSplitQuery()
+				.AsNoTracking()
+				.ToListAsync();
+		}
+
 		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListUsers(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
 		{
 			List<User> results;

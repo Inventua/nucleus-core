@@ -73,13 +73,12 @@ namespace Nucleus.Modules.Forums
 			return Task.FromResult(result);
 		}
 
-
-		/// <summary>
-		/// Retrieve an existing <see cref="Forum"/> from the database.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		public async Task<Forum> Get(Guid id)
+    /// <summary>
+    /// Retrieve an existing <see cref="Forum"/> from the database.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task<Forum> Get(Guid id)
 		{
 			return await this.CacheManager.ForumsCache().GetAsync(id, async id =>
 			{
@@ -92,7 +91,7 @@ namespace Nucleus.Modules.Forums
 						{
 							forum.Settings = new();
 						}
-						await CheckPermissions(forum);
+						await CheckPermissions(forum);						
 					}
 					return forum;
 				}
@@ -323,7 +322,7 @@ namespace Nucleus.Modules.Forums
 
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				posts = await provider.ListForumPosts(forum, settings, approved);
+				posts = await provider.ListForumPosts(forum, user, settings, approved);
 			}
 
 			return posts;
@@ -370,6 +369,9 @@ namespace Nucleus.Modules.Forums
 					}
 				}
 			}
+
+			// drop forum from cache so that next read updates statistics
+			this.CacheManager.ForumsCache().Remove(forum.Id);
 		}
 
 		/// <summary>
@@ -467,6 +469,8 @@ namespace Nucleus.Modules.Forums
 				await provider.DeleteForumPost(post);
 			}
 
+			// drop forum from cache so that next read updates statistics
+			this.CacheManager.ForumsCache().Remove(forum.Id);
 		}
 
 		/// <summary>
@@ -477,7 +481,6 @@ namespace Nucleus.Modules.Forums
 		/// <returns></returns>
 		public async Task SavePostReply(Site site, ClaimsPrincipal user, Post post, Reply reply)
 		{
-
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
 				if (reply.Id == Guid.Empty)
@@ -500,6 +503,9 @@ namespace Nucleus.Modules.Forums
 					}
 				}
 			}
+
+			// drop forum from cache so that next read updates statistics
+			this.CacheManager.ForumsCache().Remove(post.ForumId);
 		}
 
 		/// <summary>
@@ -527,7 +533,6 @@ namespace Nucleus.Modules.Forums
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
 				await provider.SetForumPostReplyRejected(reply, true);
-
 			}
 		}
 
@@ -550,6 +555,13 @@ namespace Nucleus.Modules.Forums
 			}
 		}
 
+		/// <summary>
+		///	List forum post replies.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="post"></param>
+		/// <param name="approved"></param>
+		/// <returns></returns>
 		public async Task<IList<Reply>> ListPostReplies(Site site, Post post, FlagStates approved)
 		{
 			IList<Reply> results;
@@ -557,6 +569,26 @@ namespace Nucleus.Modules.Forums
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
 				results = await provider.ListForumPostReplies(post, approved);
+			}
+
+			return results;
+		}
+
+		/// <summary>
+		///	List forum post replies, include unapproved replies which were posted by the specified user.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="post"></param>
+		/// <param name="user"></param>
+		/// <param name="approved"></param>
+		/// <returns></returns>
+		public async Task<IList<Reply>> ListPostReplies(Site site, Post post, ClaimsPrincipal user, FlagStates approved)
+		{
+			IList<Reply> results;
+
+			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+			{
+				results = await provider.ListForumPostReplies(post, user, approved);
 			}
 
 			return results;

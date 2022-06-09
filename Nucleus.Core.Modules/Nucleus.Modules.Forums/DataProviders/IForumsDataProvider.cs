@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace Nucleus.Modules.Forums.DataProviders
 {
@@ -24,7 +25,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public Task<Post> GetForumPost(Guid id);
 
 		public Task<IList<Post>> ListForumPosts(Forum forum, FlagStates approved);
-		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListForumPosts(Forum forum, Nucleus.Abstractions.Models.Paging.PagingSettings settings, FlagStates approved);
+		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListForumPosts(Forum forum, ClaimsPrincipal user, Nucleus.Abstractions.Models.Paging.PagingSettings settings, FlagStates approved);
 
 		public Task SaveForumPost(Forum forum, Post post);
 		public Task DeleteForumPost(Post post);
@@ -35,6 +36,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public Task SetForumPostStatus(Post post, Nucleus.Abstractions.Models.ListItem value);
 
 		public Task<IList<Reply>> ListForumPostReplies(Post post, FlagStates approved);
+		public Task<IList<Reply>> ListForumPostReplies(Post post, ClaimsPrincipal user, FlagStates approved);
 		public Task<Reply> GetForumPostReply(Guid replyId);
 		public Task SaveForumPostReply(Post post, Reply reply);
 		public Task DeleteForumPostReply(Reply reply);

@@ -78,7 +78,7 @@
 
 <div class="nucleus-form-tools">
 	<input type="submit" formaction="@Url.NucleusAction("SaveForumPost", "Forums", "Forums")" value="Save" class="btn btn-primary" data-target="form.parent()" />
-	@Html.LinkButton("", "Back", Url.PageLink(Model.Page, @$"{Model.Forum.Name.FriendlyEncode()}/{Model.Post.Id}"), new { @class="btn btn-secondary" })
+	@Html.LinkButton("", "Back", Url.PageLink(Model.Page, @$"{Model.Forum.Name.FriendlyEncode()}/{(Model.Post.Id == Guid.Empty ? "" : Model.Post.Id)}"), new { @class="btn btn-secondary" })
 </div>
 }
 <script type="text/javascript">

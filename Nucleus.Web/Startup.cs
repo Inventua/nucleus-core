@@ -206,6 +206,8 @@ namespace Nucleus.Web
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
+			app.UseMiddleware<SecurityHeadersMiddleware>();
+
 			app.UseExceptionHandler($"/{RoutingConstants.ERROR_ROUTE_PATH}");		
 
 			if (this.Configuration.GetValue<Boolean>(SETTING_ENABLEFORWARDEDHEADERS))
@@ -252,7 +254,6 @@ namespace Nucleus.Web
 			// the order here is important.  The page routing and module routing middleware sets the Nucleus context, which is used by some of the
 			// authorization handlers, but ModuleRoutingMiddleware does a permission check, which requires that Authentication has run - and
 			// middleware is executed in the order of the code below
-			app.UseMiddleware<SecurityHeadersMiddleware>();
 			app.UseMiddleware<MergedFileProviderMiddleware>();
 			app.UseMiddleware<PageRoutingMiddleware>();
 			app.UseAuthentication();

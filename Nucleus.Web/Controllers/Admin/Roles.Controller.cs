@@ -10,6 +10,7 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
+using Nucleus.Extensions;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -152,6 +153,33 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 
 			return View("_UsersList", viewModel);
+		}
+
+		/// <summary>
+		/// Export all users to excel.
+		/// </summary>
+		/// <returns></returns>
+		[HttpGet]
+		public async Task<ActionResult> Export()
+		{
+			IEnumerable<Role> roles = await this.RoleManager.List(this.Context.Site);
+
+			var exporter = new Nucleus.Extensions.ExcelWriter<Role>();
+
+			exporter.AddColumn(role => role.Id);
+			exporter.AddColumn(role => role.Name);
+			exporter.AddColumn(role => role.Description);
+
+			// exporter.AddColumn("TEST", "TEST", ClosedXML.Excel.XLDataType.DateTime, () => DateTime.Now);
+			exporter.AddColumn("RoleGroup", "Role Group", ClosedXML.Excel.XLDataType.Text, role => role.RoleGroup == null ? "" : role.RoleGroup.Name);
+
+			exporter.AddColumn(role => role.Type);
+			exporter.AddColumn(role => role.DateAdded);
+			exporter.AddColumn(role => role.DateChanged);
+
+			exporter.Export(roles);
+
+			return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Roles Export {DateTime.Now}.xlsx");
 		}
 
 		private async Task<ViewModels.Admin.RoleIndex> BuildViewModel()

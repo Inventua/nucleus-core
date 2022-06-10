@@ -78,9 +78,9 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			IList<User> users = await this.UserManager.List(this.Context.Site);
 
-			var exporter = new Nucleus.Extensions.Exporter<User>
+			var exporter = new Nucleus.Extensions.ExcelWriter<User>
 			(
-				Exporter<User>.Modes.AutoDetectAndExcludeSpecifiedProperties,
+				ExcelWriter<User>.Modes.AutoDetectAndExcludeSpecifiedProperties,
 				nameof(Nucleus.Abstractions.Models.User.IsSystemAdministrator),
 				nameof(Nucleus.Abstractions.Models.User.Secrets),
 				nameof(Nucleus.Abstractions.Models.User.Profile),
@@ -90,7 +90,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 			exporter.Export(users);
 
-			return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");			
+			return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Users Export {DateTime.Now}.xlsx");			
 		}		
 
 		/// <summary>

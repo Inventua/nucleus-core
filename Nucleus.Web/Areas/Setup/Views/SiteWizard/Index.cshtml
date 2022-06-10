@@ -7,7 +7,8 @@
 	ViewData["title"] = "Nucleus Setup Wizard";
 }
 @Html.AddStyle("~!index.css")
-@using (Html.BeginAreaForm("Install", "SiteWizard", "Setup", FormMethod.Post, new { @data_target = "#site-wizard" }))
+
+@using (Html.BeginAreaForm("Install", "SiteWizard", "Setup", FormMethod.Post, new { @data_target = "window" }))
 {
 	<Modal id="site-wizard" title="Nucleus Setup Wizard" can-close="false">
 		<h1>Welcome to Nucleus.</h1>

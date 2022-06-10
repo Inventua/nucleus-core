@@ -156,7 +156,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Export all users to excel.
+		/// Export all roles to excel.
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet]
@@ -177,6 +177,7 @@ namespace Nucleus.Web.Controllers.Admin
 			exporter.AddColumn(role => role.DateAdded);
 			exporter.AddColumn(role => role.DateChanged);
 
+			exporter.Worksheet.Name = "Roles";
 			exporter.Export(roles);
 
 			return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Roles Export {DateTime.Now}.xlsx");

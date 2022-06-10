@@ -80,7 +80,8 @@ namespace Nucleus.Web.Controllers.Admin
 
 			var exporter = new Nucleus.Extensions.ExcelWriter<User>
 			(
-				ExcelWriter<User>.Modes.AutoDetectAndExcludeSpecifiedProperties,
+				ExcelWriter<User>.Modes.AutoDetect,
+				nameof(Nucleus.Abstractions.Models.User.SiteId),
 				nameof(Nucleus.Abstractions.Models.User.IsSystemAdministrator),
 				nameof(Nucleus.Abstractions.Models.User.Secrets),
 				nameof(Nucleus.Abstractions.Models.User.Profile),
@@ -88,6 +89,7 @@ namespace Nucleus.Web.Controllers.Admin
 				nameof(Nucleus.Abstractions.Models.User.ChangedBy)
 			);
 
+			exporter.Worksheet.Name = "Users";
 			exporter.Export(users);
 
 			return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Users Export {DateTime.Now}.xlsx");			

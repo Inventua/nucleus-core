@@ -89,6 +89,27 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", await BuildViewModel());
 		}
 
+		/// <summary>
+		/// Export all role groups to excel.
+		/// </summary>
+		/// <returns></returns>
+		[HttpGet]
+		public async Task<ActionResult> Export()
+		{
+			IEnumerable<RoleGroup> roleGroups = await this.RoleGroupManager.List(this.Context.Site);
+
+			var exporter = new Nucleus.Extensions.ExcelWriter<RoleGroup>
+			( 
+				Extensions.ExcelWriter<RoleGroup>.Modes.AutoDetect,
+				nameof(RoleGroup.AddedBy), 
+				nameof(RoleGroup.ChangedBy)
+			);
+			exporter.Worksheet.Name = "Role Groups";
+			exporter.Export(roleGroups);
+
+			return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Role Groups Export {DateTime.Now}.xlsx");
+		}
+
 		private async Task<ViewModels.Admin.RoleGroupIndex> BuildViewModel()
 		{
 			return await BuildViewModel(new ViewModels.Admin.RoleGroupIndex());

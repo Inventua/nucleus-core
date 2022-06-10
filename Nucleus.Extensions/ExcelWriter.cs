@@ -21,38 +21,34 @@ namespace Nucleus.Extensions
 		public enum Modes
 		{
 			/// <summary>
-			/// Auto-detect columns to export and specify any columns to exclude
+			/// Include only specified columns
 			/// </summary>
 			IncludeSpecifiedPropertiesOnly,
 
 			/// <summary>
-			/// Include only specified columns
+			/// Auto-detect columns to export and specify any columns to exclude
 			/// </summary>
-			AutoDetectAndExcludeSpecifiedProperties,
-
+			AutoDetect
 		}
 
 		/// <summary>
 		/// Use this constructor if you want to set up columns manually using the AddColumn/AddColumns methods.
 		/// </summary>
-		public ExcelWriter() : this(Modes.IncludeSpecifiedPropertiesOnly, Array.Empty<string>())
-		{
-
-		}
-
+		public ExcelWriter() : this(Modes.IncludeSpecifiedPropertiesOnly, Array.Empty<string>()) { }
+		
 		/// <summary>
 		/// Use this constructor to automatically set up columns.
 		/// </summary>
-		/// <param name="includeProperties">Specifies whether to include the properties in the properies argument or exclude them.</param>
+		/// <param name="mode">Specifies whether to include the properties in the properies argument or exclude them.</param>
 		/// <param name="properties"></param>
-		public ExcelWriter(Modes includeProperties, params string[] properties)
+		public ExcelWriter(Modes mode, params string[] properties)
 		{
 			base.Workbook = new XLWorkbook();
 			base.Worksheet = base.Workbook.Worksheets.Add(typeof(T).Name);
 
 			PropertyInfo[] typeProperties = typeof(T).GetProperties();
 
-			if (includeProperties == Modes.IncludeSpecifiedPropertiesOnly)
+			if (mode == Modes.IncludeSpecifiedPropertiesOnly)
 			{
 				// Don't auto-detect properties, only include those in the properties argument				
 				foreach (string propertyName in properties)
@@ -201,7 +197,7 @@ namespace Nucleus.Extensions
 		/// <remarks>
 		/// Callers can create multiple worksheets by calling WorkBook.WorkSheets.Add.
 		/// </remarks>
-		protected IXLWorksheet Worksheet { get; set; }
+		public IXLWorksheet Worksheet { get; set; }
 
 		/// <summary>
 		/// List of worksheet columns.

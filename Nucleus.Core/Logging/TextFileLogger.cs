@@ -7,6 +7,7 @@ using System.ComponentModel;
 using Nucleus.Abstractions;
 using System.Threading;
 using Nucleus.Abstractions.Models.TaskScheduler;
+using System.Collections.Generic;
 
 namespace Nucleus.Core.Logging
 {
@@ -22,10 +23,12 @@ namespace Nucleus.Core.Logging
 		private string Category { get; }
 		private const int LOG_FILE_RETENTION_DAYS = 7;
 		
-		private readonly static object syncObj = new();
+		//private readonly static object syncObj = new();
 		private TextFileLoggingProvider Provider { get; }
 		private TextFileLoggerOptions Options { get; }
 		private IExternalScopeProvider ScopeProvider { get; set; }
+		private Queue<string> Queue { get; } = new();
+		private SemaphoreSlim FileAccessSemaphore { get; } = new(1);
 
 		public TextFileLogger(TextFileLoggingProvider Provider, TextFileLoggerOptions Options, IExternalScopeProvider scopeProvider, string Category)
 		{
@@ -49,28 +52,50 @@ namespace Nucleus.Core.Logging
 				try
 				{					
 					message = FormatMessage(logLevel, eventId, state, exception, formatter);
-					
-					// Log message to the standard log file location
-					LogMessage(message);
 
-					// If the log scope contains a <RunningTask>, log message to the scheduled task log file location
-
-					// nullState isn't used for anything here.  The IExternalScopeProvider.ForEachScope method requires a TState & state object which allows
-					// an object to be passed to the callback but we don't need to do that.
-					Object nullState = null;
-					
-					this.ScopeProvider.ForEachScope<Object>((scope, state) =>
+					if (this.FileAccessSemaphore.CurrentCount > 0)
 					{
-						if (scope as RunningTask != null)
+						this.FileAccessSemaphore.Wait();
+
+						foreach (string queuedMessage in this.Queue)
 						{
-							LogMessage(scope as RunningTask, message);
+							WriteMessage(queuedMessage);
 						}
-					}, nullState);
+
+						WriteMessage(message);
+
+						this.FileAccessSemaphore.Release();
+					}
+					else
+					{
+						this.Queue.Enqueue(message);
+					}
+
 				}
 				catch (Exception)
 				{
 				}
 			}			
+		}
+
+		private void WriteMessage(string message)
+		{
+			// Log message to the standard log file location
+			LogMessage(message);
+
+			// If the log scope contains a <RunningTask>, log message to the scheduled task log file location
+
+			// nullState isn't used for anything here.  The IExternalScopeProvider.ForEachScope method requires a TState & state object which allows
+			// an object to be passed to the callback but we don't need to do that.
+			Object nullState = null;
+
+			this.ScopeProvider.ForEachScope<Object>((scope, state) =>
+			{
+				if (scope as RunningTask != null)
+				{
+					LogMessage(scope as RunningTask, message);
+				}
+			}, nullState);
 		}
 
 		private string FormatMessage<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
@@ -110,15 +135,12 @@ namespace Nucleus.Core.Logging
 		{
 			string logFilePath = Path.Combine(path, fileName);
 
-			lock (syncObj)
+			if (!System.IO.Directory.Exists(path))
 			{
-				if (!System.IO.Directory.Exists(path))
-				{
-					System.IO.Directory.CreateDirectory(path);
-				}
-				File.AppendAllText(logFilePath, Message + Environment.NewLine);
+				System.IO.Directory.CreateDirectory(path);
 			}
-
+			File.AppendAllText(logFilePath, Message + Environment.NewLine);
+			
 			if (this.Provider != null)
 			{
 				if (this.Provider.LastExpiredDocumentsCheckDate.Date < DateTime.UtcNow.Date)

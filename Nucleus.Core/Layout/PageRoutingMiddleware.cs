@@ -147,7 +147,7 @@ namespace Nucleus.Core.Layout
 							this.Context.Page = await this.PageManager.Get(this.Context.Site, partPath);
 							if (this.Context.Page != null)
 							{
-								this.Context.Parameters = parameters;
+								this.Context.LocalPath = new(parameters);
 							}
 						}
 					}

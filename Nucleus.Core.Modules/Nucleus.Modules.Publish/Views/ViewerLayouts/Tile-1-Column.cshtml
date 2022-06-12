@@ -42,7 +42,7 @@
 				</div>
 			}
 			<div class="nucleus-button-row">
-				<a href="@article.Title.FriendlyEncode()" class="btn btn-secondary">Read more</a>
+				<a href="@Url.PageLink(Model.Page, @article.Title.FriendlyEncode())" class="btn btn-secondary">Read more</a>
 			</div>
 		</div>
 	}

@@ -37,6 +37,6 @@ namespace Nucleus.Abstractions.Models
 		/// <summary>
 		/// Parameters at the end of the local (page route) path.
 		/// </summary>
-		public string Parameters { get; set; }
+		public LocalPath LocalPath { get; set; } = new("");
 	}
 }

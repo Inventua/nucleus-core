@@ -39,14 +39,14 @@ namespace Nucleus.Modules.Publish.Controllers
 		[HttpPost]
 		public async Task<ActionResult> Index(ViewModels.Viewer viewModel)
 		{
-			if (String.IsNullOrEmpty(this.Context.Parameters))
+			if (!this.Context.LocalPath.HasValue)
 			{
 				return View("Viewer", await BuildViewerViewModel(viewModel));
 			}
 			else
 			{
 				// display selected article
-				Models.Article article = await this.ArticlesManager.Find(this.Context.Site, this.Context.Module, this.Context.Parameters);
+				Models.Article article = await this.ArticlesManager.Find(this.Context.Site, this.Context.Module, this.Context.LocalPath.FullPath);
 				if (article != null)
 				{
 					return View("ViewArticle", await BuildViewerViewModel(article));
@@ -73,6 +73,7 @@ namespace Nucleus.Modules.Publish.Controllers
 
 			ModelState.Clear();
 
+			viewModel.Page = this.Context.Page;
 			viewModel.ModuleId = this.Context.Module.Id;
 			viewModel.Layout = $"ViewerLayouts/{this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table")}.cshtml";
 			viewModel.Articles = await this.ArticlesManager.List(this.Context.Site, this.Context.Module, settings);

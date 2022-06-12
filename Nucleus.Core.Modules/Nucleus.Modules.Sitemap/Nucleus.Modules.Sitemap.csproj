@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.0" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.0.2" />
     <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.0.0" />
   </ItemGroup>
 

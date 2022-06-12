@@ -323,7 +323,7 @@ namespace Nucleus.Core.Layout
 				scopedContext.Module = moduleinfo;
 				scopedContext.Page = this.Context.Page;
 				scopedContext.Site = this.Context.Site;
-				scopedContext.Parameters = this.Context.Parameters;
+				scopedContext.LocalPath = this.Context.LocalPath;
 
 				// If we don't store and restore the original newHttpContext.RequestServices, the htmlHelper.ViewContext?.HttpContext.RequestServices 
 				// object gets disposed in between calls (when there are multiple modules on a page).

@@ -42,7 +42,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpGet]
 		public async Task<ActionResult> Index()
 		{
-			if (String.IsNullOrEmpty(this.Context.Parameters))
+			if (!this.Context.LocalPath.HasValue)
 			{
 				try
 				{
@@ -56,19 +56,17 @@ namespace Nucleus.Modules.Forums.Controllers
 			}
 			else
 			{
-				string[] parameters = this.Context.Parameters.Split('/');
-
-				if (parameters.FirstOrDefault() == MANAGE_SUBSCRIPTIONS_PATH)
+				if (this.Context.LocalPath.Segments.FirstOrDefault() == MANAGE_SUBSCRIPTIONS_PATH)
 				{
 					return View("ManageSubscriptions", await BuildSubscriptionsViewModel());
 				}
 
-				Models.Forum forum = await this.GroupsManager.FindForum(this.Context.Module, parameters[0]);
+				Models.Forum forum = await this.GroupsManager.FindForum(this.Context.Module, this.Context.LocalPath.Segments[0]);
 				if (forum != null)
 				{
-					if (parameters.Length > 1)
+					if (this.Context.LocalPath.Segments.Length > 1)
 					{
-						return await ViewPost(Guid.Parse(parameters[1]));
+						return await ViewPost(Guid.Parse(this.Context.LocalPath.Segments[1]));
 					}
 					else
 					{

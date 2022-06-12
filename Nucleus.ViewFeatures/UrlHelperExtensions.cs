@@ -65,22 +65,23 @@ namespace Nucleus.ViewFeatures
 			return PageLink(helper, page) + relativePath;
 		}
 
-		/// <summary>
-		/// Output an url for the current <see cref="Page"/> with <paramref name="relativePath"/> appended."/>.
-		/// </summary>
-		/// <param name="helper"></param>
-		/// <param name="relativePath"></param>
-		/// <returns></returns>
-		public static string PageLink(this IUrlHelper helper, string relativePath)
-		{
-			Nucleus.Abstractions.Models.Context context = helper.ActionContext.HttpContext.RequestServices.GetService<Nucleus.Abstractions.Models.Context>();
+		// AG: Removed.  This overload clashes with the .net built-in PageLink extension method.
+		///// <summary>
+		///// Output an url for the current <see cref="Page"/> with <paramref name="relativePath"/> appended."/>.
+		///// </summary>
+		///// <param name="helper"></param>
+		///// <param name="relativePath"></param>
+		///// <returns></returns>
+		//public static string PageLink(this IUrlHelper helper, string relativePath)
+		//{
+		//	Nucleus.Abstractions.Models.Context context = helper.ActionContext.HttpContext.RequestServices.GetService<Nucleus.Abstractions.Models.Context>();
 
-			if (relativePath.StartsWith("/"))
-			{
-				relativePath = relativePath[1..];
-			}
-			return PageLink(helper, context.Page) + relativePath;
-		}
+		//	if (relativePath.StartsWith("/"))
+		//	{
+		//		relativePath = relativePath[1..];
+		//	}
+		//	return PageLink(helper, context.Page) + relativePath;
+		//}
 
 		/// <summary>
 		/// Output an url for the specified <see cref="File"/>.

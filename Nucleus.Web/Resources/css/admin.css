@@ -503,9 +503,14 @@ ul.nucleus-control-panel-items a
 .nucleus-index-items .nucleus-get-childpages:hover, .nucleus-index-items .nucleus-get-childpages:focus,
 .nucleus-index-items .nucleus-hide-childpages:hover, .nucleus-index-items .nucleus-hide-childpages:focus
 {
-	background-color: #ccc;
-	color: white;
 	border: solid black 2px;
+}
+
+.nucleus-index-items li a:hover, .nucleus-index-items li a:focus
+{
+	background-color: #3983a3;
+	color: white!important;
+	
 }
 
 .nucleus-index-items li.selected a:hover, .nucleus-index-items li.selected a:focus
@@ -523,12 +528,6 @@ ul.nucleus-control-panel-items a
 {
 	border-radius: 0;
 }
-
-/*.nucleus-index-items .nucleus-get-childpages:hover, .nucleus-index-items .nucleus-get-childpages:focus
-{
-	background-color: #197ba4;
-	color: white;
-}*/
 
 .nucleus-admin-content .nucleus-editor-panel
 {

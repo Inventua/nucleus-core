@@ -167,6 +167,7 @@ namespace Nucleus.Modules.Documents.Controllers
 			viewModel.SortKey = sortkey;
 			viewModel.SortDescending = descending;
 
+			viewModel.Page = this.Context.Page;
 			viewModel.AllowSorting = this.Context.Module.ModuleSettings.Get(MODULESETTING_ALLOWSORTING, false);
 			viewModel.ShowCategory = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_CATEGORY, true);
 			viewModel.ShowDescription = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_DESCRIPTION, true);

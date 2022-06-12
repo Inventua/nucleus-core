@@ -7,11 +7,14 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Models.FileSystem;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Nucleus.Modules.Documents.Models;
+using Nucleus.Abstractions.Models;
 
 namespace Nucleus.Modules.Documents.ViewModels
 {
 	public class Viewer
 	{
+		public Page Page { get; set; }
+
 		public Boolean AllowSorting { get; set; }
 		public string SortKey { get; set; }
 		public Boolean SortDescending { get; set; }

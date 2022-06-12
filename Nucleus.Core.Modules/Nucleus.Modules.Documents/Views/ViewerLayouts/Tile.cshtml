@@ -12,31 +12,28 @@
     <div class="document-sort-list" aria-label="Sort By">
       <div class="document-sort-list-selected">
         <span>@(String.IsNullOrEmpty(Model.SortKey) ? "(none)" : (Model.SortKey == nameof(Viewer.DocumentInfo.ModifiedDate) ? "Modified Date" : Model.SortKey))</span>
-        <button class="btn nucleus-material-icon" type="button">&#xe5cf;</button>
+        <button class="btn btn-none nucleus-material-icon" type="button">&#xe5cf;</button>
       </div>
 
       <ul class="collapse">
-        <li>@Html.LinkButton("", "Title", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Title)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</li>
+        <li>@Html.LinkButton("", "Title", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Title)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Title)}", false, new { data_target = ".Documents.parent()" })</li>
         @if (Model.ShowCategory)
         {
-          <li>@Html.LinkButton("", "Category", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Category)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</li>
+          <li>@Html.LinkButton("", "Category", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Category)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Category)}", false, new { data_target = ".Documents.parent()" })</li>
         }
         @if (Model.ShowModifiedDate)
         {
-          <li>@Html.LinkButton("", "Modified Date", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.ModifiedDate)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</li>
+          <li>@Html.LinkButton("", "Modified Date", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.ModifiedDate)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.ModifiedDate)}", false, new { data_target = ".Documents.parent()" })</li>
         }
         @if (Model.ShowSize)
         {
-          <li>@Html.LinkButton("", "Size", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Size)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</li>
+          <li>@Html.LinkButton("", "Size", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Size)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Size)}", false, new { data_target = ".Documents.parent()" })</li>
         }
         @if (Model.ShowDescription)
         {
-          <li>@Html.LinkButton("", "Description", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Description)}&descending={!Model.SortDescending}", false, new { data_target = ".Documents.parent()" })</li>
+          <li>@Html.LinkButton("", "Description", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Description)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Description)}", false, new { data_target = ".Documents.parent()" })</li>
         }
       </ul>
-
-
-
     </div>
   }
 
@@ -73,7 +70,7 @@
 @if (Model.AllowSorting)
 {
   <script type="text/javascript">
-    // allow clicks outside the control to close it
+    // allow clicks outside the dropdown to close it
     jQuery(document).on('click', function (event)
     {
       jQuery('.document-sort-list ul').removeClass('show');

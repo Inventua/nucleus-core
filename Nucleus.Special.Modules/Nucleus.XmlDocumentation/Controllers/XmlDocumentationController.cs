@@ -99,16 +99,15 @@ namespace Nucleus.XmlDocumentation.Controllers
 				viewModel.Documents = new();
 			}
 
-			if (!String.IsNullOrEmpty(this.Context.Parameters))
+			if (this.Context.LocalPath.HasValue)
 			{
-				string[] routeParts = this.Context.Parameters.Split( new char[] { '/' ,'\\'}, StringSplitOptions.RemoveEmptyEntries);
-				if (routeParts.Length > 0)
+				if (this.Context.LocalPath.Segments.Length > 0)
 				{
-					viewModel.SelectedDocument = viewModel.Documents.Where(document => document.SourceFileName.Equals(routeParts[0], StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+					viewModel.SelectedDocument = viewModel.Documents.Where(document => document.SourceFileName.Equals(this.Context.LocalPath.Segments[0], StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 				}
-				if (viewModel.SelectedDocument != null && routeParts.Length > 1)
+				if (viewModel.SelectedDocument != null && this.Context.LocalPath.Segments.Length > 1)
 				{
-					viewModel.SelectedClass = viewModel.SelectedDocument.Classes.Where(cls => cls.FullName.Equals(routeParts[1], StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+					viewModel.SelectedClass = viewModel.SelectedDocument.Classes.Where(cls => cls.FullName.Equals(this.Context.LocalPath.Segments[1], StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 				}
 			}
 

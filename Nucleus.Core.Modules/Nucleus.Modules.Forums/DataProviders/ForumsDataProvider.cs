@@ -15,6 +15,7 @@ using Nucleus.Modules.Forums.Models;
 using Microsoft.EntityFrameworkCore;
 using Nucleus.Abstractions.Managers;
 using System.Threading.Tasks;
+using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Modules.Forums.DataProviders
 {
@@ -174,7 +175,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 		private async Task<ForumStatistics> GetForumStatistics(Guid forumId)
 		{
 			ForumStatistics result = new();
-
+			
 			result.PostCount = await this.Context.Posts
 				.Where(post => post.ForumId == forumId)
 				.CountAsync();
@@ -353,8 +354,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 						.Include(attachment => attachment.File)
 						.AsNoTracking()
 						.ToList();
-
-				result.Statistics = await GetPostStatistics(id);
+			
+				result.Statistics = await GetPostStatistics(id, FlagStates.IsAny);
 			}
 
 			return result;
@@ -374,12 +375,12 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.ToListAsync();
 		}
 
-		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListForumPosts(Forum forum, Nucleus.Abstractions.Models.Paging.PagingSettings settings, FlagStates approved)
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListForumPosts(Forum forum, ClaimsPrincipal user, Nucleus.Abstractions.Models.Paging.PagingSettings settings, FlagStates approved)
 		{
 			Nucleus.Abstractions.Models.Paging.PagedResult<Post> results = new(settings);
 
 			var query = this.Context.Posts
-				.Where(post => post.ForumId == forum.Id && (approved == FlagStates.IsAny || (post.IsApproved == (approved == FlagStates.IsTrue))))
+				.Where(post => post.ForumId == forum.Id && (post.AddedBy == user.GetUserId() || (approved == FlagStates.IsAny || (post.IsApproved == (approved == FlagStates.IsTrue)))))
 				.Include(post => post.Status)
 				.Include(post => post.Attachments)
 					.ThenInclude(attachment => attachment.File)
@@ -400,7 +401,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			foreach (Post post in posts)
 			{
-				post.Statistics = await GetPostStatistics(post.Id);
+				post.Statistics = await GetPostStatistics(post.Id, approved);
 			}
 
 			results.Items = posts;
@@ -433,6 +434,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 				
 				// These properties can only be set for new records, or by calling the SetForumPostApproved/Locked/Pinned/Status functions
 				this.Context.Entry(post).Property(post => post.IsApproved).IsModified = false;
+				this.Context.Entry(post).Property(post => post.IsRejected).IsModified = false;
 				this.Context.Entry(post).Property(post => post.IsLocked).IsModified = false;
 				this.Context.Entry(post).Property(post => post.IsPinned).IsModified = false;
 				this.Context.Entry(post).Reference(post => post.Status).IsModified = false;
@@ -626,12 +628,12 @@ namespace Nucleus.Modules.Forums.DataProviders
 			}
 		}
 
-		private async Task<PostStatistics> GetPostStatistics(Guid postId)
+		private async Task<PostStatistics> GetPostStatistics(Guid postId, FlagStates approved)
 		{
 			PostStatistics result = new();
 
 			result.ReplyCount = await this.Context.Replies
-				.Where(reply => reply.Post.Id == postId)
+				.Where(reply => reply.Post.Id == postId && (approved == FlagStates.IsAny || (reply.IsApproved == (approved == FlagStates.IsTrue))))
 				.CountAsync();
 
 			result.LastReply = await GetLastReply(postId);
@@ -684,6 +686,20 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.ToListAsync();
 		}
 
+		public async Task<IList<Reply>> ListForumPostReplies(Post post, ClaimsPrincipal user, FlagStates approved)
+		{
+			return await this.Context.Replies
+				.Where(reply => reply.Post.Id == post.Id && (reply.AddedBy == user.GetUserId() || (approved == FlagStates.IsAny || (post.IsApproved == (approved == FlagStates.IsTrue)))))
+				.Include(reply => reply.Attachments)
+					.ThenInclude(attachment => attachment.File)
+				.Include(reply => reply.Post)
+				.Include(reply => reply.ReplyTo)
+				.Include(reply => reply.PostedBy)
+				.AsSplitQuery()
+				.OrderBy(reply => reply.DateAdded)
+				.ToListAsync();
+		}
+
 		public async Task DeleteForumPostReply(Reply reply)
 		{
 			this.Context.Replies.Remove(reply);
@@ -707,6 +723,11 @@ namespace Nucleus.Modules.Forums.DataProviders
 			else
 			{
 				this.Context.Entry(reply).State = EntityState.Modified;
+
+				// These properties can only be set for new records, or by calling the SetForumPostApproved/Locked/Pinned/Status functions
+				this.Context.Entry(reply).Property(reply => reply.IsApproved).IsModified = false;
+				this.Context.Entry(reply).Property(reply => reply.IsRejected).IsModified = false;
+
 				raiseEvent = new(() => { this.EventManager.RaiseEvent<Reply, Update>(reply); });
 			}
 

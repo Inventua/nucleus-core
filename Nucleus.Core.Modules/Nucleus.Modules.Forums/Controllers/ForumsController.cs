@@ -155,6 +155,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			if (mediaFile != null)
 			{
 				viewModel.Forum = await this.ForumsManager.Get(viewModel.Forum.Id);
+
 				viewModel.Forum.EffectiveSettings().AttachmentsFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Forum.EffectiveSettings().AttachmentsFolder.Id);
 				using (System.IO.Stream fileStream = mediaFile.OpenReadStream())
 				{
@@ -533,15 +534,15 @@ namespace Nucleus.Modules.Forums.Controllers
 			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 			Models.Post post = await this.ForumsManager.GetForumPost(viewModel.Post.Id);
 
-			if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_REPLY_POST))
+			if (!this.ForumsManager.CheckPermission(this.Context.Site, User, forum, ForumsManager.PermissionScopes.FORUM_REPLY_POST))
 			{
 				return Unauthorized();
 			}
 
 			await this.ForumsManager.SavePostReply(this.Context.Site, User, post, viewModel.Reply);
-			await this.ForumsManager.Subscribe(viewModel.Reply.Post, HttpContext.User);
+			await this.ForumsManager.Subscribe(post, User);
 
-			return await ViewPost(viewModel.Post.Id);
+			return await ViewPost(post.Id);
 		}
 
 		[HttpPost]
@@ -660,6 +661,7 @@ namespace Nucleus.Modules.Forums.Controllers
 				}
 			}
 
+			viewModel.Page = this.Context.Page;
 			viewModel.Groups = groups;
 
 			return viewModel;
@@ -781,11 +783,11 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE))
 			{
-				results = await this.ForumsManager.ListPostReplies(this.Context.Site, post, Models.FlagStates.IsAny);
+				results = await this.ForumsManager.ListPostReplies(this.Context.Site, post, HttpContext.User, Models.FlagStates.IsAny);
 			}
 			else
 			{
-				results = await this.ForumsManager.ListPostReplies(this.Context.Site, post, Models.FlagStates.IsTrue);
+				results = await this.ForumsManager.ListPostReplies(this.Context.Site, post, HttpContext.User, Models.FlagStates.IsTrue);
 			}
 
 			foreach (Models.Reply reply in results)

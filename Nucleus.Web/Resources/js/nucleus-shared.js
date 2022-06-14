@@ -677,9 +677,23 @@ function _Page()
 			}
 			else
 			{
-				target.empty();
-				target.html(data);
-				target.attr('data-src', url);
+				// keep passwords 
+				var passwords = new Array();
+				target.find('input[type=password]').each(function (index, value)
+				{
+					var element = jQuery(value);
+					passwords[index] = new Object({ name: element.prop('name'), value: element.val() });
+				});
+
+				target.empty().html(data).attr('data-src', url);
+
+				// restore passwords
+				jQuery(passwords).each(function (index, value)
+				{
+					target.find('input[type=password][name=' + passwords[index].name + ']').val(passwords[index].value);
+				});
+
+				passwords = null;
 			}
 		}
 

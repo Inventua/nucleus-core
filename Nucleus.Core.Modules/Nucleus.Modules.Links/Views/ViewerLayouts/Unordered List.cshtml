@@ -2,6 +2,7 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Links.ViewModels
+@using Nucleus.Modules.Links.HtmlHelpers
 @Html.AddStyle("~!/../../viewer.css")
 <ul class="Links">
 	@foreach (var link in Model.Links)
@@ -22,6 +23,7 @@
 		@if (!String.IsNullOrEmpty(url))
 		{
 			<li>
+				@Html.AddEditingControls(@link.Id)
 				<a href="@url" alt="@link.Title" target="@(Model.NewWindow ? "_blank" : "")">@link.Title</a>
 
 				@if (Model.CategoryList != null)

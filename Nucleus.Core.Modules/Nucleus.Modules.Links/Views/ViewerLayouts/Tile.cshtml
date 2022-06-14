@@ -1,5 +1,6 @@
 ﻿@model Nucleus.Modules.Links.ViewModels.Viewer
 @using Nucleus.Modules.Links.ViewModels
+@using Nucleus.Modules.Links.HtmlHelpers
 @Html.AddStyle("~!/Tile.css")
 <div class="Links">
 	<div class="link-tiles">
@@ -22,6 +23,7 @@
 			{
 
 				<div>
+					@Html.AddEditingControls(@link.Id)
 					<div class="document-title">
 						<a href="@url" alt="@link.Title" target="@(Model.NewWindow ? "_blank" : "")">
 							@link.Title

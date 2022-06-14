@@ -23,6 +23,11 @@
 		<Product>Nucleus</Product>
 		<Copyright>© Inventua Pty Ltd</Copyright>
 		<StartupObject>Nucleus.Web.Program</StartupObject>
+		<DebugType>portable</DebugType>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <Optimize>False</Optimize>
 	</PropertyGroup>
 	
   <ItemGroup>

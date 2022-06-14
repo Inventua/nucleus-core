@@ -39,30 +39,23 @@
 
 	<ItemGroup>
 		<Compile Remove="Extensions\**" />
-		<Compile Remove="iis-dev\logs\**" />
 		<Compile Remove="logs\**" />
 		<Compile Remove="publish\**" />
 		<Content Remove="Extensions\**" />
-		<Content Remove="iis-dev\logs\**" />
 		<Content Remove="logs\**" />
 		<Content Remove="publish\**" />
+		<Content Remove="bundleconfig.json" />
+		<Content Remove="iis-dev\**\*" />
+		<Content Remove="iis-dev\web.config" />
 		<EmbeddedResource Remove="Extensions\**" />
-		<EmbeddedResource Remove="iis-dev\logs\**" />
 		<EmbeddedResource Remove="logs\**" />
 		<EmbeddedResource Remove="publish\**" />
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
 		<None Remove="Extensions\**" />
-		<None Remove="iis-dev\logs\**" />
 		<None Remove="logs\**" />
 		<None Remove="publish\**" />
 		<None Remove="Setup\Extensions\**" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Content Remove="bundleconfig.json" />
-	  <Content Remove="iis-dev\web.config" />
-	  <Content Remove="Index.cshtml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -170,7 +163,8 @@
 
 	<ItemGroup>
 	  <None Include="bundleconfig.json" />
-	  <None Include="iis-dev\web.config" />
+	  <None Include="iis-dev\**\*" />
+		<None Include="iis-dev\web.config" />
 	</ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="Exists('iis-dev')">

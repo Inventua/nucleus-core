@@ -244,6 +244,9 @@ function _Page()
 	{
 		var originalSelector = targetSelector;
 
+		if (originalSelector === 'window') return jQuery(window);
+		if (originalSelector === 'document') return jQuery(document);
+
 		if (originalSelector.endsWith('.parent()'))
 		{
 			targetSelector = targetSelector.substring(0, targetSelector.lastIndexOf('.parent()'));

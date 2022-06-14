@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
@@ -12,7 +13,7 @@ namespace Nucleus.Extensions
 	/// 
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class Exporter<T> : Exporter
+	public class ExcelWriter<T> : ExcelWriter
 	{
 		/// <summary>
 		/// Specifies whether to auto-detect columns to export and specify any columns to exclude, or whether to include only specified columns.
@@ -20,37 +21,34 @@ namespace Nucleus.Extensions
 		public enum Modes
 		{
 			/// <summary>
-			/// Auto-detect columns to export and specify any columns to exclude
+			/// Include only specified columns
 			/// </summary>
 			IncludeSpecifiedPropertiesOnly,
 
 			/// <summary>
-			/// Include only specified columns
+			/// Auto-detect columns to export and specify any columns to exclude
 			/// </summary>
-			AutoDetectAndExcludeSpecifiedProperties
+			AutoDetect
 		}
 
 		/// <summary>
 		/// Use this constructor if you want to set up columns manually using the AddColumn/AddColumns methods.
 		/// </summary>
-		public Exporter() : this(Modes.AutoDetectAndExcludeSpecifiedProperties, Array.Empty<string>())
-		{
+		public ExcelWriter() : this(Modes.IncludeSpecifiedPropertiesOnly, Array.Empty<string>()) { }
 		
-		}
-
 		/// <summary>
 		/// Use this constructor to automatically set up columns.
 		/// </summary>
-		/// <param name="includeProperties">Specifies whether to include the properties in the properies argument or exclude them.</param>
+		/// <param name="mode">Specifies whether to include the properties in the properies argument or exclude them.</param>
 		/// <param name="properties"></param>
-		public Exporter(Modes includeProperties, params string[] properties)
+		public ExcelWriter(Modes mode, params string[] properties)
 		{
 			base.Workbook = new XLWorkbook();
 			base.Worksheet = base.Workbook.Worksheets.Add(typeof(T).Name);
 
 			PropertyInfo[] typeProperties = typeof(T).GetProperties();
 
-			if (includeProperties == Modes.IncludeSpecifiedPropertiesOnly)
+			if (mode == Modes.IncludeSpecifiedPropertiesOnly)
 			{
 				// Don't auto-detect properties, only include those in the properties argument				
 				foreach (string propertyName in properties)
@@ -87,6 +85,61 @@ namespace Nucleus.Extensions
 		}
 
 		/// <summary>
+		/// Add a column using an expression to specify the column.
+		/// </summary>
+		/// <param name="expression"></param>
+		/// <returns></returns>
+		public WorksheetColumn AddColumn<TType>(Expression<Func<T, TType>> expression)
+		{
+			var memberExpression = expression.Body as MemberExpression;
+			if (memberExpression == null)
+			{
+				throw new ArgumentException("Expression must be a member expression.");
+			}
+
+			string name = memberExpression.Member.Name;
+
+			WorksheetColumn result = new(name, name, null);
+			this.WorksheetColumns.Add(result);
+
+			return result;
+		}
+
+		/// <summary>
+		/// Add a column with an expression which is called to determine the output value.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="caption"></param>
+		/// <param name="dataType"></param>
+		/// <param name="expression"></param>
+		/// <returns></returns>
+		public WorksheetColumn AddColumn<TValue>(string name, string caption, XLDataType dataType, Expression<Func<T, TValue>> expression)
+		{
+			WorksheetColumn result = new(name, caption, dataType, expression);
+			this.WorksheetColumns.Add(result);
+
+			return result;
+		}
+
+		/// <summary>
+		/// Add a column with an expression which is called to determine the output value.  This overload is for lambda expressions which do
+		/// not reference the object being exported.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="caption"></param>
+		/// <param name="dataType"></param>
+		/// <param name="expression"></param>
+		/// <returns></returns>
+		public WorksheetColumn AddColumn<TValue>(string name, string caption, XLDataType dataType, Expression<Func<TValue>> expression)
+		{
+			WorksheetColumn result = new(name, caption, dataType, expression);
+			this.WorksheetColumns.Add(result);
+
+			return result;
+		}
+
+
+		/// <summary>
 		/// Automatically export items to the current worksheet.
 		/// </summary>
 		/// <param name="items"></param>
@@ -95,14 +148,25 @@ namespace Nucleus.Extensions
 		{
 			base.WriteHeadingRow();
 
-			foreach (T item in items)			
+			foreach (T item in items)
 			{
 				List<object> values = new();
 				foreach (WorksheetColumn column in base.WorksheetColumns)
 				{
-					if (column.PropertyInfo == null)
+					if (column.Expression != null)
 					{
-						values.Add(typeof(T).GetProperty(column.Name).GetValue(item, null));						
+						if (column.Expression.Parameters.Any())
+						{
+							values.Add(Expression.Lambda(column.Expression.Body, column.Expression.Parameters).Compile().DynamicInvoke(item));
+						}
+						else
+						{
+							values.Add(Expression.Lambda(column.Expression.Body, column.Expression.Parameters).Compile().DynamicInvoke());
+						}
+					}
+					else if (column.PropertyInfo == null)
+					{
+						values.Add(typeof(T).GetProperty(column.Name).GetValue(item, null));
 					}
 					else
 					{
@@ -120,7 +184,7 @@ namespace Nucleus.Extensions
 	/// <summary>
 	/// Non-generic exporter.
 	/// </summary>
-	public class Exporter
+	public class ExcelWriter
 	{
 		/// <summary>
 		/// Excel workbook being created.
@@ -133,7 +197,7 @@ namespace Nucleus.Extensions
 		/// <remarks>
 		/// Callers can create multiple worksheets by calling WorkBook.WorkSheets.Add.
 		/// </remarks>
-		protected IXLWorksheet Worksheet { get; set; }
+		public IXLWorksheet Worksheet { get; set; }
 
 		/// <summary>
 		/// List of worksheet columns.
@@ -148,14 +212,14 @@ namespace Nucleus.Extensions
 		/// <summary>
 		/// Constructor, used by the generic Exporter&lt;T&gt; class. 
 		/// </summary>
-		public Exporter() { }
+		public ExcelWriter() { }
 
 		/// <summary>
 		/// Use this constructor if you want to create columns and output rows manually.  The generic Exporter&lt;T&gt; class
 		/// can auto-detect columns.
 		/// </summary>
 		/// <param name="worksheet"></param>
-		public Exporter(IXLWorksheet worksheet)
+		public ExcelWriter(IXLWorksheet worksheet)
 		{
 			this.Workbook = worksheet.Workbook;
 			this.Worksheet = worksheet;
@@ -205,7 +269,7 @@ namespace Nucleus.Extensions
 		/// <param name="name"></param>
 		public void RemoveColumn(string name)
 		{
-			WorksheetColumn column = this.WorksheetColumns.Where(column=>column.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+			WorksheetColumn column = this.WorksheetColumns.Where(column => column.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
 			if (column != null)
 			{
@@ -221,7 +285,7 @@ namespace Nucleus.Extensions
 			int cellIndex = 1;
 
 			foreach (WorksheetColumn column in this.WorksheetColumns)
-			{				
+			{
 				// We set the *column* data type rather than each cell, because it results in a smaller output file.  
 				// Individual cells data types can override this setting.
 				if (column.DataType.HasValue)
@@ -242,7 +306,7 @@ namespace Nucleus.Extensions
 				// stop excel from "interpreting" the value and mangling data
 				this.Worksheet.Cell(this.RowIndex, cellIndex).Style.IncludeQuotePrefix = true;
 				this.Worksheet.Cell(this.RowIndex, cellIndex).SetValue(column.Caption);
-											
+
 				cellIndex++;
 			}
 
@@ -314,10 +378,11 @@ namespace Nucleus.Extensions
 					else
 					{
 						// We don't need to set the cell format to text, because the default is text
-						
+
 						// stop excel from "interpreting" the value and mangling data
 						this.Worksheet.Cell(this.RowIndex, cellIndex).Style.IncludeQuotePrefix = true;
-						this.Worksheet.Cell(this.RowIndex, cellIndex).SetValue(value.ToString());
+						SetValue(cellIndex, value);
+						//this.Worksheet.Cell(this.RowIndex, cellIndex).SetValue(value.ToString());
 
 						customValueSet = true;
 					}
@@ -333,7 +398,8 @@ namespace Nucleus.Extensions
 					}
 					else
 					{
-						this.Worksheet.Cell(this.RowIndex, cellIndex).SetValue(value);
+						SetValue(cellIndex, value);
+						//this.Worksheet.Cell(this.RowIndex, cellIndex).SetValue(value.ToString());
 					}
 				}
 
@@ -343,6 +409,18 @@ namespace Nucleus.Extensions
 			this.RowIndex++;
 		}
 
+		private void SetValue(int cellIndex, object value)
+		{
+			if (value != null)
+			{
+				this.Worksheet.Cell(this.RowIndex, cellIndex).SetValue(value.ToString());
+			}
+			else
+			{
+				this.Worksheet.Cell(this.RowIndex, cellIndex).SetValue("");
+			}
+		}
+
 		/// <summary>
 		/// Convert a list of items to a comma-separated string.
 		/// </summary>
@@ -350,6 +428,8 @@ namespace Nucleus.Extensions
 		/// <returns></returns>
 		private string ListToString(System.Collections.IList value)
 		{
+			if (value == null) return "";
+
 			Type valueType = value.GetType().GenericTypeArguments.FirstOrDefault();
 
 			if (valueType != null)
@@ -363,7 +443,7 @@ namespace Nucleus.Extensions
 					{
 						listValues.Add(prop.GetValue(valueObj, null).ToString());
 					}
-										
+
 					return String.Join(',', listValues.OrderBy(x => x));
 				}
 			}
@@ -397,7 +477,7 @@ namespace Nucleus.Extensions
 			{
 				return XLDataType.Boolean;
 			}
-			else if (type.IsAssignableTo(typeof(Int32)) || type.IsAssignableTo(typeof(double)) || type.IsAssignableTo(typeof(float))) 
+			else if (type.IsAssignableTo(typeof(Int32)) || type.IsAssignableTo(typeof(double)) || type.IsAssignableTo(typeof(float)))
 			{
 				return XLDataType.Number;
 			}
@@ -422,6 +502,11 @@ namespace Nucleus.Extensions
 		/// performance.
 		/// </summary>
 		public PropertyInfo PropertyInfo { get; }
+
+		/// <summary>
+		/// If set, specifies the expression to evaluate in order to derive a value.
+		/// </summary>
+		public LambdaExpression Expression { get; }
 
 		/// <summary>
 		/// Column name.  This is the unique identifier for the column.
@@ -453,16 +538,32 @@ namespace Nucleus.Extensions
 		}
 
 		/// <summary>
+		/// Constructor used when you want to specify the name, caption and data type, and an expression to evaluate the data to output.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="caption"></param>
+		/// <param name="dataType"></param>
+		/// <param name="expression"></param>
+
+		public WorksheetColumn(string name, string caption, XLDataType? dataType, LambdaExpression expression)
+		{
+			this.Name = name;
+			this.Caption = caption;
+			this.DataType = dataType;
+			this.Expression = expression;
+		}
+
+		/// <summary>
 		/// Constructed used to auto-detect column properties.
 		/// </summary>
 		/// <param name="propertyInfo"></param>
-		
+
 		public WorksheetColumn(PropertyInfo propertyInfo)
 		{
 			this.PropertyInfo = propertyInfo;
 			this.Name = propertyInfo.Name;
 			this.Caption = propertyInfo.Name;
-			this.DataType = Exporter.GetXLDataType(propertyInfo.PropertyType);
+			this.DataType = ExcelWriter.GetXLDataType(propertyInfo.PropertyType);
 		}
 
 	}

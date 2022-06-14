@@ -708,8 +708,15 @@ namespace Nucleus.Core
 				// backups.   Nucleus.Web.Program watches for changes to files in extensions folders & automatically restarts after a few seconds.
 				if (System.IO.File.Exists(BuildExtensionFilePath(componentFolder, localFilePath)) && System.IO.Path.GetExtension(file.name).Equals(".dll", StringComparison.OrdinalIgnoreCase))
 				{
+					int backupCounter = 1;
+					while (System.IO.File.Exists(renamePath))
+					{
+						renamePath = BuildExtensionFilePath(componentFolder, localFilePath) + "." + backupCounter++.ToString() + IExtensionManager.BACKUP_FILE_EXTENSION;						
+					};
+					
 					this.Logger?.LogInformation("Renaming {target} to {renamePath}.", target, renamePath);
 					System.IO.File.Move(target, renamePath);
+					
 				}
 
 				this.Logger?.LogInformation("Writing {target} from zip.", target);

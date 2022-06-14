@@ -159,6 +159,24 @@ a *
   min-height: 90%;
 }
 
+/*  Indeterminate progress bar, for use with bootstrap progress class*/
+@keyframes indeterminate 
+{
+  0% {
+    margin-left: 0;
+  }
+  100% {
+    margin-left: 55%;
+  }
+}
+
+.progress .indeterminate {
+  animation: indeterminate 2.5s linear infinite alternate;
+  border-radius: 1rem;
+  width: 45% !important;
+}
+
+
 .nucleus-small-cell
 {
 	width: 20px;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
@@ -21,6 +21,7 @@ using Nucleus.Core.Authorization;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Layout;
 using Nucleus.Extensions.Authorization;
+using Nucleus.Extensions;
 
 namespace Nucleus.Core.Layout
 {
@@ -205,7 +206,8 @@ namespace Nucleus.Core.Layout
 
 		private void AddModuleEditControls(IHtmlHelper htmlHelper, TagBuilder editorBuilder, PageModule moduleInfo, System.Security.Claims.ClaimsPrincipal user)
 		{
-			IUrlHelper urlHelper = new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext);
+			//IUrlHelper urlHelper = new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext);
+			IUrlHelper urlHelper = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(htmlHelper.ViewContext);
 
 			// Render edit controls
 			editorBuilder.AddCssClass("nucleus-module-editing");
@@ -218,66 +220,19 @@ namespace Nucleus.Core.Layout
 			// The value that we are using - "#refresh" - doesn't have any special meaning or code to process it in nucleus-shared.js.
 			formBuilder.Attributes.Add("data-target", "#refresh");
 
-			formBuilder.InnerHtml.AppendHtml(BuildEditButton("&#xe3c9;", "Edit", urlHelper.Content("~/Admin/Pages/EditModule"), moduleInfo, null));
+			formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe3c9;", "Edit", urlHelper.Content("~/Admin/Pages/EditModule"), null));
 
 			// only render the "common settings" and delete controls if the user has page-edit permissions
 			if (user.HasEditPermission(this.Context.Site, this.Context.Page))
 			{
-				formBuilder.InnerHtml.AppendHtml(BuildEditButton("&#xe8b8;", "Settings", urlHelper.Content("~/Admin/Pages/EditModuleCommonSettings"), moduleInfo, null));
-				formBuilder.InnerHtml.AppendHtml(BuildDeleteButton("&#xe14c;", "Delete", urlHelper.Content("~/Admin/Pages/DeletePageModuleInline"), moduleInfo, null));
+				formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe8b8;", "Settings", urlHelper.Content("~/Admin/Pages/EditModuleCommonSettings"), null));
+				formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildDeleteButton("&#xe14c;", "Delete", urlHelper.Content("~/Admin/Pages/DeletePageModuleInline"), null));
 			}
 
 			editorBuilder.InnerHtml.AppendHtml(formBuilder);
 		}
 
-		private HtmlString BuildEditButton(string text, string title, string formaction, PageModule moduleInfo, IDictionary<string, string> attributes)
-		{
-			TagBuilder editControlBuilder = new("button");
-			editControlBuilder.InnerHtml.SetContent(text);
-			editControlBuilder.Attributes.Add("class", "nucleus-material-icon btn btn-secondary");
-			editControlBuilder.Attributes.Add("title", title);
-			editControlBuilder.Attributes.Add("type", "button");
-			editControlBuilder.Attributes.Add("data-frametarget", ".nucleus-modulesettings-frame");
-			editControlBuilder.Attributes.Add("formaction", $"{formaction}?mid={moduleInfo.Id}&mode=Standalone");
-
-			if (attributes != null)
-			{
-				foreach (KeyValuePair<string, string> item in attributes)
-				{
-					editControlBuilder.Attributes.Add(item.Key, item.Value);
-				}
-			}
-
-			StringWriter writer = new();
-			editControlBuilder.WriteTo(writer, System.Text.Encodings.Web.HtmlEncoder.Default);
-
-			return new HtmlString(System.Web.HttpUtility.HtmlDecode(writer.ToString()));
-		}
-
-		private HtmlString BuildDeleteButton(string text, string title, string formaction, PageModule moduleInfo, IDictionary<string, string> attributes)
-		{
-			TagBuilder deleteControlBuilder = new("button");
-			deleteControlBuilder.InnerHtml.SetContent(text);
-			deleteControlBuilder.Attributes.Add("class", "nucleus-material-icon btn btn-danger");
-			deleteControlBuilder.Attributes.Add("title", title);
-			deleteControlBuilder.Attributes.Add("type", "submit");
-			deleteControlBuilder.Attributes.Add("formaction", $"{formaction}?mid={moduleInfo.Id}");
-			deleteControlBuilder.Attributes.Add("data-confirm", "Delete this module?");
-
-			if (attributes != null)
-			{
-				foreach (KeyValuePair<string, string> item in attributes)
-				{
-					deleteControlBuilder.Attributes.Add(item.Key, item.Value);
-				}
-			}
-
-			StringWriter writer = new();
-			deleteControlBuilder.WriteTo(writer, System.Text.Encodings.Web.HtmlEncoder.Default);
-
-			return new HtmlString(System.Web.HttpUtility.HtmlDecode(writer.ToString()));
-		}
-
+		
 		/// <summary>
 		/// Render a module's "Edit" action.
 		/// </summary>

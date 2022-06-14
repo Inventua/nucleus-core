@@ -15,7 +15,7 @@
 		<Product>Nucleus</Product>
 		<Description>Provides extension methods for Nucleus and .Net core classes which provide functionality required by Nucleus core and extensions.</Description>
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
-		<VersionPrefix>1.0.0.0</VersionPrefix>
+		<VersionPrefix>1.0.0.1</VersionPrefix>
 		<!--<VersionSuffix>a1</VersionSuffix>-->
 		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>
 		<PackageTags>Nucleus</PackageTags>

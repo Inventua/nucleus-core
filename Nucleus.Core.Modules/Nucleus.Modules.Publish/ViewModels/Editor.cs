@@ -13,6 +13,7 @@ namespace Nucleus.Modules.Publish.ViewModels
 {
 	public class Editor
 	{
+		public string UseLayout { get; set; }
 		public Models.Article Article { get; set; }
 		
 		public IEnumerable<List> Lists { get; set; }

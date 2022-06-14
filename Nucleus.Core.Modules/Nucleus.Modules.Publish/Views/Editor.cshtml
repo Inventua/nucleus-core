@@ -3,6 +3,10 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
+@if (!String.IsNullOrEmpty(Model.UseLayout))
+{
+	Layout = Model.UseLayout;
+}
 @Html.AddStyle("~!/../settings.css")
 <h2 class="nucleus-modal-caption">Article Settings</h2>
 @using (Html.BeginNucleusForm("Edit", "Admin", "Publish", FormMethod.Post, new { @enctype = "multipart/form-data", @data_target="#ArticleEditor.parent()" }))
@@ -22,6 +26,8 @@
 				<h2>Article Properties</h2>
 
 				@Html.HiddenFor(model => model.Article.Id)
+				@Html.HiddenFor(Model => Model.UseLayout)
+	
 				<SettingsControl caption="Title" helptext="Article title.">
 					@Html.TextBoxFor(model => model.Article.Title)
 				</SettingsControl>

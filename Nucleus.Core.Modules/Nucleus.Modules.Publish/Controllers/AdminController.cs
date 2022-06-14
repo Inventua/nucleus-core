@@ -54,8 +54,13 @@ namespace Nucleus.Modules.Publish.Controllers
 
 		[HttpGet]
 		[HttpPost]
-		public async Task<ActionResult> Edit(ViewModels.Editor viewModel, Guid id)
+		public async Task<ActionResult> Edit(ViewModels.Editor viewModel, Guid id, string mode)
 		{
+			if (mode == "Standalone")
+			{
+				//if (mode == ViewModels.Admin.PageEditor.PageEditorModes.Standalone)				
+				viewModel.UseLayout = "_PopupEditor";				
+			}
 			return View("Editor", await BuildEditorViewModel(viewModel, id));
 		}
 
@@ -124,7 +129,14 @@ namespace Nucleus.Modules.Publish.Controllers
 
 			await this.ArticlesManager.Save(this.Context.Module, viewModel.Article);
 
-			return View("Settings", await BuildSettingsViewModel());
+			if (viewModel.UseLayout == "_PopupEditor")
+			{
+				return Ok();
+			}
+			else
+			{
+				return View("Settings", await BuildSettingsViewModel());
+			}
 		}
 
 		[HttpPost]

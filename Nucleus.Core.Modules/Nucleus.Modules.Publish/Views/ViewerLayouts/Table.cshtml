@@ -1,6 +1,7 @@
 ﻿@model Nucleus.Modules.Publish.ViewModels.Viewer
 @using Nucleus.Extensions
 @using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Publish.HtmlHelpers
 @Html.AddStyle("~!/../../viewer.css")
 <div class="Articles table">
 	<table>
@@ -13,6 +14,7 @@
 		{
 			<tr>
 				<td class="title">
+					@Html.AddEditingControls(@article.Id)
 					<a href="@Url.PageLink(Model.Page, @article.Title.FriendlyEncode())">@article.Title</a>
 				</td>
 				<td class="summary">

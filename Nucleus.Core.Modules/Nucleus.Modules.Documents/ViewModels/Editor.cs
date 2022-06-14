@@ -13,6 +13,8 @@ namespace Nucleus.Modules.Documents.ViewModels
 {
 	public class Editor
 	{				
+		public string UseLayout { get; set; }
+
 		public Document SelectedDocument { get; set; }
 		
 		public IList<ListItem> Categories { get; set; }

@@ -14,6 +14,7 @@
 		<h2 class="nucleus-modal-caption">Link Properties</h2>
 		@Html.HiddenFor(model => model.Link.Id)
 		@Html.HiddenFor(model => model.UseLayout)
+		@Html.HiddenFor(model => model.Link.SortOrder)
 
 		<SettingsControl caption="Title" helptext="Document title">
 			@Html.TextBoxFor(model => model.Link.Title)

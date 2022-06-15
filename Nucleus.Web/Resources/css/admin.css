@@ -547,13 +547,6 @@ ul.nucleus-control-panel-items a
 }
 
 /* page-specific styles */
-.nucleus-adminpage .System select, .nucleus-adminpage .ScheduledTasks select
-{
-	min-width: 200px;
-	font-family: 'Segoe UI', sans-serif;
-	font-size: 14px;
-}
-
 .nucleus-adminpage .ScheduledTasks .interval .settings-control
 {
 	flex-grow: 2;

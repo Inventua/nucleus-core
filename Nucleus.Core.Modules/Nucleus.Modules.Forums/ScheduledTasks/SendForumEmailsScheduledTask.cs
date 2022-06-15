@@ -17,6 +17,7 @@ using Nucleus.Extensions;
 
 namespace Nucleus.Modules.Forums.ScheduledTasks
 {
+	[System.ComponentModel.DisplayName("Nucleus Forums: Send forum emails")]
 	public class SendForumEmailsScheduledTask : IScheduledTask
 	{
 		private ForumsManager ForumsManager { get; }

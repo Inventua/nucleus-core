@@ -13,7 +13,7 @@
 			<tr>
 				<td>@entry.Date.FormatDate(this.Context.Request.GetUserTimeZone())</td>
 				<td><span class="nucleus-log-level nucleus-log-level-@entry.Level.ToLower()">@entry.Level</span></td>				
-				<td class="text-break"><div class="nucleus-log-category">@entry.Category</div><div class="nucleus-log-message">@System.Web.HttpUtility.HtmlEncode(entry.Message)</div></td>
+				<td class="text-break"><div class="nucleus-log-category">@entry.Category</div><div class="nucleus-log-message">@Html.Raw(System.Web.HttpUtility.HtmlEncode(entry.Message))</div></td>
 			</tr>
 		}
 	</table>					

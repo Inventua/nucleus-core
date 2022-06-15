@@ -7,6 +7,7 @@ using Nucleus.Abstractions.Managers;
 
 namespace Nucleus.Core.ScheduledTasks
 {
+	[System.ComponentModel.DisplayName("Nucleus Core: User Session Cleanup")]
 	public class CollectSessionsScheduledTask : IScheduledTask
 	{
 		private ISessionManager SessionManager { get; }

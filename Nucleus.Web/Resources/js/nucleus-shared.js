@@ -690,7 +690,7 @@ function _Page()
 				// restore passwords
 				jQuery(passwords).each(function (index, value)
 				{
-					target.find('input[type=password][name=' + passwords[index].name + ']').val(passwords[index].value);
+					target.find('input[type=password][name="' + passwords[index].name + '"]').val(passwords[index].value);
 				});
 
 				passwords = null;

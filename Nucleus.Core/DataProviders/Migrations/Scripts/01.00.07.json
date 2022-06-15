@@ -1,0 +1,20 @@
+﻿{
+  "schemaName": "Nucleus.Core",
+  "version": "01.00.07",
+  "operations": [
+    {
+      "dropIndex": {
+        "name": "IX_RoleGroups_SiteId",
+        "table": "RoleGroups"
+      }
+    },
+    {
+      "createIndex": {
+        "name": "IX_RoleGroups_SiteId",
+        "table": "RoleGroups",
+        "columns": [ "SiteId" ],
+        "isUnique": false
+      }
+    }
+  ]
+}

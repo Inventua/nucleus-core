@@ -646,10 +646,6 @@ namespace Nucleus.Modules.Forums.Controllers
 						{
 							forums.Add(forum);
 						}
-						else
-						{
-							throw new UnauthorizedAccessException();
-						}
 					}
 				}
 

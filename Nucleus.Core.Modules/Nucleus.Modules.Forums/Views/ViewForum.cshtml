@@ -7,6 +7,7 @@
 @Html.AddStyle("~/Resources/css/forms.css")
 @if (Model.Forum != null)
 {
+	<h2>@Model.Forum.Name</h2>
 	<div class="Forums">
 		@using (Html.BeginNucleusForm("SubscribeForum", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off" }))
 		{

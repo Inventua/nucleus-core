@@ -4,6 +4,10 @@
 @using Nucleus.Abstractions.Models.FileSystem
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
+@if (!String.IsNullOrEmpty(Model.UseLayout))
+{
+	this.Layout = Model.UseLayout;
+}
 @using (Html.BeginNucleusForm("Edit", "Documents", FormMethod.Post, new { @enctype = "multipart/form-data", @data_target = "#DocumentEditor" }))
 {
 	<Tab>
@@ -15,7 +19,7 @@
 				<h2>Basic Properties</h2>
 				@Html.HiddenFor(model => model.SelectedDocument.Id)
 				@Html.HiddenFor(model => model.SelectedDocument.SortOrder)
-
+				@Html.HiddenFor(model => model.UseLayout)
 				<SettingsControl caption="Title" helptext="Document title">
 					@Html.TextBoxFor(model => model.SelectedDocument.Title, new { @maxlength = 256 })
 				</SettingsControl>

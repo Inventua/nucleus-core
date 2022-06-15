@@ -72,8 +72,12 @@ namespace Nucleus.Modules.Documents.Controllers
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpGet]
 		[HttpPost]
-		public async Task<ActionResult> Edit(ViewModels.Editor viewModel, Guid id)
+		public async Task<ActionResult> Edit(ViewModels.Editor viewModel, Guid id, string mode)
 		{
+			if (mode == "Standalone")
+			{
+				viewModel.UseLayout = "_PopupEditor";
+			}
 			return View("Editor", await BuildEditorViewModel(viewModel, id));
 		}
 
@@ -111,7 +115,14 @@ namespace Nucleus.Modules.Documents.Controllers
 		{
 			await this .DocumentsManager.Save(this.Context.Module, viewModel.SelectedDocument);
 
-			return View("Settings", await BuildSettingsViewModel(new ViewModels.Settings()));
+			if (viewModel.UseLayout == "_PopupEditor")
+			{
+				return Ok();
+			}
+			else
+			{
+				return View("Settings", await BuildSettingsViewModel(new ViewModels.Settings()));
+			}
 		}
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]

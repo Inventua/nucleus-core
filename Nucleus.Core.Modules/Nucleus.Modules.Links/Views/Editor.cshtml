@@ -4,12 +4,16 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 @Html.AddStyle("~!/../settings.css")
-
+@if (!String.IsNullOrEmpty(Model.UseLayout))
+{
+	this.Layout = Model.UseLayout;
+}
 @using (Html.BeginNucleusForm("Editor", "Admin", "Links", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
 	<fieldset role="group" aria-labelledby="heading">
 		<h2 class="nucleus-modal-caption">Link Properties</h2>
 		@Html.HiddenFor(model => model.Link.Id)
+		@Html.HiddenFor(model => model.UseLayout)
 
 		<SettingsControl caption="Title" helptext="Document title">
 			@Html.TextBoxFor(model => model.Link.Title)

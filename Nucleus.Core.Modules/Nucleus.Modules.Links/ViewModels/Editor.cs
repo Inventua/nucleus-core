@@ -13,6 +13,8 @@ namespace Nucleus.Modules.Links.ViewModels
 {
   public class Editor
   {
+    public string UseLayout { get; set; }
+
     public Link Link { get; set; }
     public string Message { get; set; }
 

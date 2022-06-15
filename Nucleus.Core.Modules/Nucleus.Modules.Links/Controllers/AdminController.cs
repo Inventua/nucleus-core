@@ -51,14 +51,14 @@ namespace Nucleus.Modules.Links.Controllers
 		[HttpPost]
 		public async Task<ActionResult> Create()
 		{
-			return View("Editor", await BuildEditorViewModel(null, Guid.Empty));
+			return View("Editor", await BuildEditorViewModel(null, Guid.Empty, false));
 		}
 
 		[HttpGet]
 		[HttpPost]
-		public async Task<ActionResult> Editor(ViewModels.Editor viewModel, Guid id)
+		public async Task<ActionResult> Editor(ViewModels.Editor viewModel, Guid id, string mode)
 		{
-			return View("Editor", await BuildEditorViewModel(viewModel, id));
+			return View("Editor", await BuildEditorViewModel(viewModel, id, mode == "Standalone"));
 		}
 
 		[HttpGet]
@@ -75,7 +75,7 @@ namespace Nucleus.Modules.Links.Controllers
 		{
 			viewModel.Link.LinkFile.File.ClearSelection();
 
-			return View("Editor", await BuildEditorViewModel(viewModel, Guid.Empty));
+			return View("Editor", await BuildEditorViewModel(viewModel, Guid.Empty, viewModel.UseLayout=="_PopupEditor"));
 		}
 
 		[HttpPost]
@@ -149,7 +149,14 @@ namespace Nucleus.Modules.Links.Controllers
 				return BadRequest(ModelState);
 			}
 
-			return View("_LinksList", await BuildSettingsViewModel(null));
+			if (viewModel.UseLayout == "_PopupEditor")
+			{
+				return Ok();
+			}
+			else
+			{
+				return View("_LinksList", await BuildSettingsViewModel(null));
+			}
 		}
 
 		[HttpPost]
@@ -189,7 +196,7 @@ namespace Nucleus.Modules.Links.Controllers
 			return viewModel;
 		}
 
-		private async Task<ViewModels.Editor> BuildEditorViewModel(ViewModels.Editor input, Guid id)
+		private async Task<ViewModels.Editor> BuildEditorViewModel(ViewModels.Editor input, Guid id, Boolean standalone)
 		{
 			ViewModels.Editor viewModel;
 
@@ -200,6 +207,11 @@ namespace Nucleus.Modules.Links.Controllers
 			else
 			{
 				viewModel = input;
+			}
+
+			if (standalone)
+			{
+				viewModel.UseLayout = "_PopupEditor";
 			}
 
 			if (viewModel.Link == null)

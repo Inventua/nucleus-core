@@ -3,6 +3,7 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Documents.ViewModels
+@using Nucleus.Modules.Documents.HtmlHelpers
 @Html.AddStyle("~!/Tile.css")
 <div class="Documents">
   @if (Model.AllowSorting)
@@ -41,6 +42,7 @@
     @for (int documentCount = 0; documentCount < Model.Documents.Count; documentCount++)
     {
       <div>
+        @Html.AddEditingControls(Model.Documents[documentCount].Id)
         <div class="document-title">
           <a href="@Url.FileLink(Model.Documents[documentCount].File)" alt="Model.Documents[documentCount].Title">
             @Model.Documents[documentCount].Title

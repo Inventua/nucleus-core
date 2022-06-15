@@ -415,11 +415,22 @@ namespace Nucleus.Data.EntityFramework
 			{
 				if (DatabaseObjectExists((operation as CreateIndexOperation).Name, DatabaseObjectTypes.Index))
 				{
-					// table already exists
+					// index already exists
 					this?.Logger.LogInformation("Index {0} already exists, create index operation skipped.", (operation as CreateIndexOperation).Name);
 					return;
 				}
 			}
+
+			if (operation is DropIndexOperation)
+			{
+				if (!DatabaseObjectExists((operation as DropIndexOperation).Name, DatabaseObjectTypes.Index))
+				{
+					// index does not exist 
+					this?.Logger.LogInformation("Index {0} does not exist, drop index operation skipped.", (operation as DropIndexOperation).Name);
+					return;
+				}
+			}
+
 
 			IMigrationsSqlGenerator sqlGenerator = this.DbContext.GetInfrastructure().GetService<IMigrationsSqlGenerator>();
 

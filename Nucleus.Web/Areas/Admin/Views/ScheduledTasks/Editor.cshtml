@@ -25,7 +25,7 @@
 					</SettingsControl>
 
 					<SettingsControl caption="Type Name" helptext="Scheduled task type name.  All available scheduled tasks are automatically displayed in this list.">
-						@Html.DropDownListFor(model => model.ScheduledTask.TypeName, new SelectList(Model.AvailableServiceTypes), "(select)")
+						@Html.DropDownListFor(model => model.ScheduledTask.TypeName, new SelectList(Model.AvailableServiceTypes, "TypeName", "FriendlyName"), "(select)")
 					</SettingsControl>
 
 					<div class="nucleus-flex-fields interval">
@@ -111,7 +111,7 @@
 				@using (Html.BeginAreaForm("GetLogFile", "ScheduledTasks", "Admin", FormMethod.Post, new { @data_target = ".LogContent", @autocomplete = "off" }))
 				{
 					@Html.HiddenFor(model => model.ScheduledTask.Id)
-					@Html.DropDownListFor(model => model.LogFile, new SelectList(Model.LogFiles, "Filename", "Title"), "(select)", new { @class = "LogFile" })
+					@Html.DropDownListFor(model => model.LogFile, new SelectList(Model.LogFiles, "Filename", "Title"), "(select)", new { @class = "LogFile mb-1" })
 				}
 				<div class="LogContent">
 					@if (String.IsNullOrEmpty(Model.LogMessage))

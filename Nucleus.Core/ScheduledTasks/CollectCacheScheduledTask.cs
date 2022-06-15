@@ -12,6 +12,7 @@ using Nucleus.Abstractions.Managers;
 
 namespace Nucleus.Core.ScheduledTasks
 {
+	[System.ComponentModel.DisplayName("Nucleus Core: Cache Cleanup")]
 	public class CollectCacheScheduledTask : IScheduledTask
 	{
 		private ICacheManager CacheManager { get; }

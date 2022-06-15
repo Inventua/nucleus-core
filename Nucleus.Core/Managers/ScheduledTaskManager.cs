@@ -84,15 +84,17 @@ namespace Nucleus.Core.Managers
 		/// Returns a list of installed Scheduled task classes.
 		/// </summary>
 		/// <returns></returns>
-		public Task<IEnumerable<string>> ListBackgroundServices()
+		public Task<IEnumerable<System.Type>> ListBackgroundServices()
 		{
-			List<string> results = new();
-			foreach (Type type in Plugins.AssemblyLoader.GetTypes<IScheduledTask>())
-			{
-				results.Add($"{type.FullName},{type.Assembly.GetName().Name}");
-			}
+			return Task.FromResult(Plugins.AssemblyLoader.GetTypes<IScheduledTask>());
 
-			return Task.FromResult(results as IEnumerable<string>);			
+			//List<string> results = new();
+			//foreach (Type type in Plugins.AssemblyLoader.GetTypes<IScheduledTask>())
+			//{
+			//	results.Add($"{type.FullName},{type.Assembly.GetName().Name}");
+			//}
+
+			//return Task.FromResult(results as IEnumerable<string>);			
 		}
 
 		///// <summary>

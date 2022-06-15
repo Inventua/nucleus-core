@@ -12,6 +12,7 @@ using Nucleus.Abstractions.Managers;
 
 namespace Nucleus.OAuth.Server
 {
+	[System.ComponentModel.DisplayName("Nucleus OAuth Server: Clean up Expired Tokens")]
 	public class ExpireTokensScheduledTask : IScheduledTask
 	{
 		private ClientAppTokenManager ClientAppTokenManager { get; }

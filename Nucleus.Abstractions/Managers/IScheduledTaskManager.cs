@@ -46,7 +46,7 @@ namespace Nucleus.Abstractions.Managers
 		/// Returns a list of installed Scheduled task classes.
 		/// </summary>
 		/// <returns></returns>
-		public Task<IEnumerable<string>> ListBackgroundServices();
+		public Task<IEnumerable<System.Type>> ListBackgroundServices();
 
 		///// <summary>
 		///// Update the <see cref="ScheduledTask.NextScheduledRun"/>.

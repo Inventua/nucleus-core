@@ -14,6 +14,7 @@ using Nucleus.Core.Logging;
 
 namespace Nucleus.Core.Search
 {
+	[System.ComponentModel.DisplayName("Nucleus Core: Search Index Feeder")]
 	public class SearchIndexFeeder : IScheduledTask
 	{
 		private ISiteManager SiteManager { get; }

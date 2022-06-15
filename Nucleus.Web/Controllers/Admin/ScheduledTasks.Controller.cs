@@ -160,12 +160,33 @@ namespace Nucleus.Web.Controllers.Admin
 			return viewModel;
 		}
 
+		private string GetFriendlyName(System.Type type)
+		{
+			System.ComponentModel.DisplayNameAttribute displayNameAttribute = type.GetCustomAttributes(false)
+				.Where(attr => attr is System.ComponentModel.DisplayNameAttribute)
+				.Select(attr => attr as System.ComponentModel.DisplayNameAttribute)
+				.FirstOrDefault();
+
+			if (displayNameAttribute == null)
+			{
+				return $"{type.FullName}";	
+			}
+			else
+			{
+				return displayNameAttribute.DisplayName;
+			}
+
+		}
+
 		private async Task<ViewModels.Admin.ScheduledTaskEditor> BuildViewModel(ScheduledTask scheduledTask)
 		{
 			ViewModels.Admin.ScheduledTaskEditor viewModel = new();
 
 			viewModel.ScheduledTask = scheduledTask;
-			viewModel.AvailableServiceTypes = await this.ScheduledTaskManager.ListBackgroundServices();
+			viewModel.AvailableServiceTypes = 
+				(await this.ScheduledTaskManager.ListBackgroundServices())
+				.Select(type=> new ViewModels.Admin.ScheduledTaskEditor.ServiceType(GetFriendlyName(type), $"{type.FullName},{type.Assembly.GetName().Name}"));
+
 			viewModel.History = await this.ScheduledTaskManager.ListHistory(scheduledTask);
 			viewModel.LatestHistory = await this.ScheduledTaskManager.GetMostRecentHistory(scheduledTask, !scheduledTask.InstanceType.HasValue || scheduledTask.InstanceType == ScheduledTask.InstanceTypes.PerInstance ? null : Environment.MachineName);
 

@@ -11,6 +11,7 @@ using Nucleus.Abstractions.Models.TaskScheduler;
 
 namespace Nucleus.Core.ScheduledTasks
 {
+	[System.ComponentModel.DisplayName("Nucleus Core: Truncate Scheduled Task History")]
 	public class TruncateScheduledTaskHistoryScheduledTask : IScheduledTask
 	{
 		private IScheduledTaskManager ScheduledTaskManager { get; }

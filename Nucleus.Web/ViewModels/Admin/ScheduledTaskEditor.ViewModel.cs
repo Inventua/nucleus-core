@@ -16,7 +16,7 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public List<ScheduledTaskHistory> History { get; set; }
 
-		public IEnumerable<string> AvailableServiceTypes { get; set; }
+		public IEnumerable<ServiceType> AvailableServiceTypes { get; set; }
 
 		public List<Shared.LogFileInfo> LogFiles { get; set; }
 
@@ -26,5 +26,18 @@ namespace Nucleus.Web.ViewModels.Admin
 		
 		public string LogMessage { get; set; }
 
+		public class ServiceType
+		{
+			public string FriendlyName { get; set; }
+			public string TypeName { get; set; }
+
+			public ServiceType(string friendlyName, string typeName)
+			{
+				this.FriendlyName = friendlyName;
+				this.TypeName = typeName;
+			}
+		}
 	}
+
+	
 }

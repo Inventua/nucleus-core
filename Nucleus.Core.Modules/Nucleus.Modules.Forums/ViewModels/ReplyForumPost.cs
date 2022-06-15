@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Modules.Forums.Models;
 using System;
@@ -12,6 +13,8 @@ namespace Nucleus.Modules.Forums.ViewModels
 {
 	public class ReplyForumPost
 	{
+		public Page Page { get; set; }
+
 		public Forum Forum { get; set; }
 		public Post Post { get; set; }
 		public Reply Reply { get; set; }

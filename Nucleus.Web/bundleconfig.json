@@ -94,5 +94,11 @@
     "inputFiles": [
       "Shared/Controls/Views/PagingControl.css"
     ]
+  },
+  {
+    "outputFileName": "Resources/Libraries/HtmlEditors/tinymce/Nucleus/tinymce.HtmlEditor.min.js",
+    "inputFiles": [
+      "Resources/Libraries/HtmlEditors/tinymce/Nucleus/tinymce.HtmlEditor.js"
+    ]
   }
 ]

@@ -13,10 +13,10 @@
 
 	<TabContent>
 		<TabPanel id="forum-properties" active="true">
-			<fieldset role="group" aria-labelledby="heading">
-				<h2>Properties</h2>
+			<fieldset role="group" aria-label="Properties">
 				@Html.HiddenFor(model => model.Forum.Id)
 				@Html.HiddenFor(model => model.GroupId)
+				@Html.HiddenFor(model => model.Forum.SortOrder)
 
 				<SettingsControl caption="Name" helptext="Forum name">
 					@Html.TextBoxFor(model => model.Forum.Name)
@@ -32,6 +32,14 @@
 
 				<div class="ForumSettings">
 					<div class="nucleus-flex-fields">
+						<SettingsControl caption="Moderated?" class="inner-inline" rendermode="LabelLast" helptext="Posts and replies to moderated forums must be approved by a moderator before they can be seen by others.">
+							@Html.CheckBoxFor(model => model.Forum.Settings.IsModerated, new { @class = "ToggleSwitch" })
+						</SettingsControl>
+
+						<SettingsControl caption="Allow search indexing?" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether search indexing engines should include forum posts in their search index.">
+							@Html.CheckBoxFor(model => model.Forum.Settings.AllowSearchIndexing, new { @class = "ToggleSwitch" })
+						</SettingsControl>
+
 						<SettingsControl caption="Enabled?" class="inner-inline" rendermode="LabelLast" helptext="Disabled forums are visible, but users cannot view, create or reply to posts.">
 							@Html.CheckBoxFor(model => model.Forum.Settings.Enabled, new { @class = "ToggleSwitch" })
 						</SettingsControl>
@@ -39,7 +47,6 @@
 						<SettingsControl caption="Visible?" class="inner-inline" rendermode="LabelLast" helptext="Forums which are not visible are not displayed, but users can view, create or reply to existing posts.">
 							@Html.CheckBoxFor(model => model.Forum.Settings.Visible, new { @class = "ToggleSwitch" })
 						</SettingsControl>
-
 					</div>
 
 					<SettingsControl caption="Allow attachments?" class="inner-inline AllowAttachments" rendermode="LabelLast" helptext="Specifies whether users can attach documents to posts or replies.">
@@ -52,16 +59,6 @@
 						</div>
 					</SettingsControl>
 
-					<div class="nucleus-flex-fields">
-						<SettingsControl caption="Moderated?" class="inner-inline" rendermode="LabelLast" helptext="Posts and replies to moderated forums must be approved by a moderator before they can be seen by others.">
-							@Html.CheckBoxFor(model => model.Forum.Settings.IsModerated, new { @class = "ToggleSwitch" })
-						</SettingsControl>
-
-						<SettingsControl caption="Allow search indexing?" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether search indexing engines should include forum posts in their search index.">
-							@Html.CheckBoxFor(model => model.Forum.Settings.AllowSearchIndexing, new { @class = "ToggleSwitch" })
-						</SettingsControl>
-						<div></div>
-					</div>
 
 					<SettingsControl caption="Status List" helptext="Select the list to use for post statuses for this group.  Lists are managed in the Nucleus Lists manager.">
 						@Html.DropDownListFor(model => model.Forum.Settings.StatusList.Id, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")

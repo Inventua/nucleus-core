@@ -124,11 +124,11 @@
 								{
 									@Html.SubmitButton("", "Reject", Url.NucleusAction("RejectForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()" })
 								}
-								@if (Model.CanDeletePost)
+								@if (reply.CanDeleteReply && !Model.Post.IsLocked)
 								{
 									@Html.SubmitButton("&#xe14c;", "", Url.NucleusAction("DeleteForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @class="btn btn-danger", @data_confirm = "Delete this reply?" })
 								}
-								@if (Model.CanEditPost)
+								@if (reply.CanEditReply && !Model.Post.IsLocked)
 								{
 									@Html.LinkButton("&#xe3c9;", "", Url.NucleusAction("EditForumPostReply", "Forums", "Forums", new { postId = Model.Post.Id, replyId = reply.Id }), new { @data_target = "form.parent()" })
 								}

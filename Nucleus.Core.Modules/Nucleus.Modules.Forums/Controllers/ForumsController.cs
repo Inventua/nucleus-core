@@ -764,11 +764,19 @@ namespace Nucleus.Modules.Forums.Controllers
 			viewModel.CanAttach = viewModel.Forum.EffectiveSettings().AllowAttachments && viewModel.Forum.EffectiveSettings().AttachmentsFolder != null && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_ATTACH_POST);
 			viewModel.CanPinPost = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_PIN_POST);
 			viewModel.CanLockPost = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_LOCK_POST);
-			viewModel.CanDeletePost = viewModel.Forum.EffectiveSettings().Enabled && (viewModel.Post.AddedBy.Equals(HttpContext.User.GetUserId()) || HttpContext.User.IsSiteAdmin(Context.Site)) && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_DELETE_POST);
+			viewModel.CanDeletePost = CanDeletePost(viewModel.Forum, viewModel.Post);
 			viewModel.CanSubscribe = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE);
 			viewModel.CanApprovePost = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_MODERATE);
 			viewModel.Replies = readReplies ? await ListReplies(viewModel.Forum, viewModel.Post) : new List<Models.Reply>();
 
+			if (viewModel.Replies != null)
+      {
+				foreach(Reply reply in viewModel.Replies)
+        {
+					reply.CanEditReply = CanEditReply(viewModel.Forum, reply);
+					reply.CanDeleteReply = CanDeleteReply(viewModel.Forum, reply);
+				}
+			}
 			return viewModel;
 		}
 
@@ -823,7 +831,26 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_EDIT_POST))
 				{
-					return (post.AddedBy == HttpContext.User.GetUserId());
+					return (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE) || post.AddedBy == HttpContext.User.GetUserId());
+				}
+			}
+
+			return false;
+		}
+
+		private Boolean CanDeletePost(Models.Forum forum, Models.Post post)
+    {
+			if (!forum.EffectiveSettings().Enabled) return false;
+
+			if (HttpContext.User.IsSystemAdministrator() || HttpContext.User.IsSiteAdmin(this.Context.Site))
+			{
+				return true;
+			}
+			else
+			{
+				if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_DELETE_POST))
+				{
+					return (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE) || post.AddedBy == HttpContext.User.GetUserId());
 				}
 			}
 
@@ -852,6 +879,44 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				return (post.AddedBy == HttpContext.User.GetUserId()) || (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_REPLY_POST));
 			}
+		}
+
+		private Boolean CanEditReply(Models.Forum forum, Models.Reply reply)
+		{
+			if (!forum.EffectiveSettings().Enabled) return false;
+
+			if (HttpContext.User.IsSystemAdministrator() || HttpContext.User.IsSiteAdmin(this.Context.Site))
+			{
+				return true;
+			}
+			else
+			{
+				if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_EDIT_POST))
+				{
+					return (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE) || reply.AddedBy == HttpContext.User.GetUserId());
+				}
+			}
+
+			return false;
+		}
+
+		private Boolean CanDeleteReply(Models.Forum forum, Models.Reply reply)
+		{
+			if (!forum.EffectiveSettings().Enabled) return false;
+
+			if (HttpContext.User.IsSystemAdministrator() || HttpContext.User.IsSiteAdmin(this.Context.Site))
+			{
+				return true;
+			}
+			else
+			{
+				if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_DELETE_POST))
+				{
+					return (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE) || reply.AddedBy == HttpContext.User.GetUserId());
+				}
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -888,7 +953,8 @@ namespace Nucleus.Modules.Forums.Controllers
 				{
 					return new ViewModels.ReplyForumPost
 					{
-						Forum = forum,
+            Page = this.Context.Page,
+            Forum = forum,
 						Post = post,
 						Reply = reply,
 						CanAttach = this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_ATTACH_POST),

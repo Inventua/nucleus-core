@@ -74,9 +74,9 @@
 								<span class="post-status">@post.Status.Name</span>
 							}
 						</td>
-						<td class="forum-author">@post.PostedBy.UserName</td>
-						<td>@post.Statistics.ReplyCount</td>
-						<td>
+						<td class="forum-author compact-cell">@post.PostedBy.UserName</td>
+						<td class="compact-cell">@post.Statistics.ReplyCount</td>
+						<td class="compact-cell">
 							@if (post.Statistics.LastReply != null)
 							{
 								<div>@post.Statistics.LastReply.PostedBy.UserName</div>

@@ -23,6 +23,18 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// </summary>
 		private const string TEMP_FOLDER = "Temp";
 
+		// Data paths    
+		/// <summary>
+		/// Sub folder name (within the Nucleus data folder) used for log files
+		/// </summary>
+		private const string LOG_FOLDER = "Logs";
+
+		// Data paths    
+		/// <summary>
+		/// Sub folder name (within the Nucleus data folder) used for cache files
+		/// </summary>
+		private const string CACHE_FOLDER = "Cache";
+
 		// Application paths
 
 		/// <summary>
@@ -179,30 +191,76 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string DataFolder { get; set; }
 		
+		private string EnsureExists(string path)
+		{
+			if (!System.IO.Directory.Exists(path))
+			{
+				System.IO.Directory.CreateDirectory(path);
+			}
+
+			return path;
+		}
+
 		/// <summary>
-		/// Gets the default application data storage folder location, used for logs and database files.
+		/// Gets the data storage folder location for temporary files.
 		/// </summary>
+		/// <remarks>
+		/// If the folder does not exist, it is created.
+		/// </remarks>
 		/// <returns></returns>
 		public string GetTempFolder()
 		{
-			return this.GetDataFolder(TEMP_FOLDER);
+			return EnsureExists(this.GetDataFolder(TEMP_FOLDER));
 		}
+
+		/// <summary>
+		/// Gets the data storage folder location for log files.
+		/// </summary>
+		/// <remarks>
+		/// If the folder does not exist, it is created.
+		/// </remarks>
+		/// <returns></returns>
+		public string GetLogFolder()
+		{
+			return EnsureExists(this.GetDataFolder(LOG_FOLDER));
+		}
+
+		/// <summary>
+		/// Gets the data storage folder location for cache files.
+		/// </summary>
+		/// <remarks>
+		/// If the folder does not exist, it is created.
+		/// </remarks>
+		/// <returns></returns>
+		public string GetCacheFolder()
+		{
+			return EnsureExists(this.GetDataFolder(CACHE_FOLDER));
+		}
+
+		/// <summary>
+		/// Gets the data storage folder location for cache files and appends the specified sub-folder.
+		/// </summary>
+		/// <remarks>
+		/// If the folder does not exist, it is created.
+		/// </remarks>
+		/// <returns></returns>
+		public string GetCacheFolder(string subFolder)
+		{
+			return EnsureExists(System.IO.Path.Combine(this.GetDataFolder(CACHE_FOLDER), subFolder));
+		}
+
 
 		/// <summary>
 		/// Gets an application data storage folder sub-folder. 
 		/// </summary>
-		/// <param name="SubFolder"></param>
+		/// <param name="subFolder"></param>
+		/// <remarks>
+		/// If the folder does not exist, it is created.
+		/// </remarks>
 		/// <returns></returns>
-		public string GetDataFolder(string SubFolder)
+		public string GetDataFolder(string subFolder)
 		{
-			string result = System.IO.Path.Combine(this.DataFolder, SubFolder);
-
-			if (!System.IO.Directory.Exists(result))
-			{
-				System.IO.Directory.CreateDirectory(result);				
-			}
-
-			return result;
+			return EnsureExists(System.IO.Path.Combine(this.DataFolder, subFolder));
 		}
 
 	}

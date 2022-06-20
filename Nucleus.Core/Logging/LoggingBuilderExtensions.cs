@@ -90,7 +90,7 @@ namespace Nucleus.Core.Logging
 
 				if (String.IsNullOrEmpty(options.Path))
 				{
-					options.Path = this.FolderOptions.Value.GetDataFolder("Logs");
+					options.Path = this.FolderOptions.Value.GetLogFolder();
 				}
 			}
 		}

@@ -202,7 +202,7 @@ namespace Nucleus.Core.FileProviders
 
 		private string CacheFolder()
 		{
-			return this.FolderOptions.Value.GetDataFolder("Cache\\MergedFileProvider");
+			return this.FolderOptions.Value.GetCacheFolder("MergedFileProvider");
 		}
 
 		private void ClearCache()

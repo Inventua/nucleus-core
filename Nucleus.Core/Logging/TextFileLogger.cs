@@ -22,19 +22,19 @@ namespace Nucleus.Core.Logging
 	{
 		private string Category { get; }
 		private const int LOG_FILE_RETENTION_DAYS = 7;
-		
+
 		//private readonly static object syncObj = new();
 		private TextFileLoggingProvider Provider { get; }
 		private TextFileLoggerOptions Options { get; }
 		private IExternalScopeProvider ScopeProvider { get; set; }
-		private Queue<string> Queue { get; } = new();
+		private System.Collections.Concurrent.ConcurrentQueue<string> Queue { get; } = new();
 		private SemaphoreSlim FileAccessSemaphore { get; } = new(1);
-
+		
 		public TextFileLogger(TextFileLoggingProvider Provider, TextFileLoggerOptions Options, IExternalScopeProvider scopeProvider, string Category)
 		{
 			this.Provider = Provider;
 			this.Options = Options;
-			this.Category = Category;			
+			this.Category = Category;
 			this.ScopeProvider = scopeProvider;
 		}
 
@@ -50,32 +50,36 @@ namespace Nucleus.Core.Logging
 			if (IsEnabled(logLevel))
 			{
 				try
-				{					
+				{
 					message = FormatMessage(logLevel, eventId, state, exception, formatter);
 
-					if (this.FileAccessSemaphore.CurrentCount > 0)
+					try
 					{
-						this.FileAccessSemaphore.Wait();
-
-						foreach (string queuedMessage in this.Queue)
+						if (this.FileAccessSemaphore.CurrentCount > 0)
 						{
-							WriteMessage(queuedMessage);
+							this.FileAccessSemaphore.Wait();
+
+							string queuedMessage;
+
+							while (this.Queue.TryDequeue(out queuedMessage))
+							{
+								WriteMessage(queuedMessage);
+							}
 						}
-
-						WriteMessage(message);
-
+						else
+						{
+							this.Queue.Enqueue(message);
+						}
+					}
+					finally
+					{
 						this.FileAccessSemaphore.Release();
 					}
-					else
-					{
-						this.Queue.Enqueue(message);
-					}
-
 				}
 				catch (Exception)
 				{
 				}
-			}			
+			}
 		}
 
 		private void WriteMessage(string message)
@@ -122,13 +126,13 @@ namespace Nucleus.Core.Logging
 			string logPath = System.IO.Path.Combine(this.Options.Path, ScheduledTask.SCHEDULED_TASKS_LOG_SUBPATH, task.ScheduledTask.Name);
 			string logFileName = $"{task.StartDate.ToString(LogFileConstants.DATETIME_FILENAME_FORMAT)}_{Environment.MachineName}.log";
 
-			LogMessage (message, logPath, logFileName);
+			LogMessage(message, logPath, logFileName);
 		}
 
 		private void LogMessage(string message)
 		{
 			string fileName = $"{DateTime.UtcNow.ToString(LogFileConstants.DATE_FILENAME_FORMAT)}_{Environment.MachineName}.log";
-			LogMessage(message, this.Options.Path, fileName);			
+			LogMessage(message, this.Options.Path, fileName);
 		}
 
 		private void LogMessage(string Message, string path, string fileName)
@@ -140,7 +144,7 @@ namespace Nucleus.Core.Logging
 				System.IO.Directory.CreateDirectory(path);
 			}
 			File.AppendAllText(logFilePath, Message + Environment.NewLine);
-			
+
 			if (this.Provider != null)
 			{
 				if (this.Provider.LastExpiredDocumentsCheckDate.Date < DateTime.UtcNow.Date)

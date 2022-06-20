@@ -109,14 +109,10 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 		public async Task DeleteGroup(Group group)
 		{
-			if (group.Forums != null)
-			{
-				foreach (Forum forum in group.Forums)
-				{
-					await DeleteForum(forum);
-					this.Context.ChangeTracker.Clear();
-				}
-			}
+			if (await this.Context.Forums.Where(forum => forum.Group.Id == group.Id).AnyAsync())
+      {
+				throw new InvalidOperationException("Cannot delete a forum group with one or more forums.");
+      }
 
 			Settings settings = this.Context.Settings.Where(setting => EF.Property<Guid>(setting, "RelatedId") == group.Id).FirstOrDefault();
 
@@ -266,13 +262,20 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 		public async Task DeleteForum(Forum forum)
 		{
+			if (await this.Context.Posts.Where(post => post.ForumId == forum.Id).AnyAsync())
+      {
+				throw new InvalidOperationException("Cannot delete a forum with posts.  Mark the forum as disabled instead.");
+      }
+
 			Settings settings = this.Context.Settings.Where(setting => EF.Property<Guid>(setting, "RelatedId") == forum.Id).FirstOrDefault();
 			
 			if (settings != null)
 			{
 				this.Context.Entry(settings).State = EntityState.Deleted;
 			}
-			
+
+			await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM ForumSubscriptions WHERE ForumId={forum.Id}");
+
 			this.Context.Remove(forum);
 			await this.Context.SaveChangesAsync();
 		}
@@ -411,6 +414,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 		public async Task DeleteForumPost(Post post)
 		{
+			await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM ForumPostSubscriptions WHERE ForumPostId={post.Id}");
+
 			this.Context.Posts.Remove(post);
 			await this.Context.SaveChangesAsync<Post>();
 		}

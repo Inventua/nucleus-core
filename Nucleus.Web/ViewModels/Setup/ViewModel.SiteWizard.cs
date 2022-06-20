@@ -10,6 +10,8 @@ namespace Nucleus.Web.ViewModels.Setup
 {
 	public class SiteWizard
 	{
+		public Nucleus.Abstractions.IPreflight.ValidationResults Preflight { get; set; }
+
 		public string SelectedTemplate { get; set; }
 		public List<SiteTemplate> Templates { get; set; }
 

@@ -38,11 +38,12 @@ namespace Nucleus.Data.EntityFramework
 
 			services.AddDbContext<TDbContext>(ServiceLifetime.Transient);
 
-			// we add the *same instance* of the data provider with two interfaces - one for TDataProviderInterface, to be used by the module, and one
-			// as "itself", so that any configured DataProviderMigration classes can get an instance if required.
+			// we add the *same instance* of the data provider with 3 interfaces - one for TDataProviderInterface, to be used by the module, and one
+			// as "itself", so that any configured DataProviderMigration classes can get an instance if required, and one as DataProvider, so that elements
+			// of Nucleus can get a list of Data providers and perform diagnostics.
 			services.AddTransient<TDataProvider>();
-			services.AddTransient<TDataProviderInterface>(serviceProvider => serviceProvider.GetRequiredService<TDataProvider>()); ;
-
+			services.AddTransient<TDataProviderInterface>(serviceProvider => serviceProvider.GetRequiredService<TDataProvider>());
+			services.AddTransient<Nucleus.Data.Common.DataProvider>(serviceProvider => serviceProvider.GetRequiredService<TDataProvider>());
 			return services;
 		}
 

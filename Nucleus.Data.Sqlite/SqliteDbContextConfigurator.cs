@@ -31,6 +31,7 @@ namespace Nucleus.Data.Sqlite
 		{
 			this.DatabaseOptions = databaseOptions;
 			this.FolderOptions = folderOptions;
+			this.DatabaseConnectionOption = this.DatabaseOptions.Value.GetDatabaseConnection(typeof(TDataProvider).GetDefaultSchemaName());			
 		}
 
 		/// <summary>
@@ -40,14 +41,12 @@ namespace Nucleus.Data.Sqlite
 		/// <returns></returns>
 		public override Boolean Configure(DbContextOptionsBuilder options)
 		{
-			DatabaseConnectionOption connectionOption = this.DatabaseOptions.Value.GetDatabaseConnection(typeof(TDataProvider).GetDefaultSchemaName());
-
-			if (connectionOption != null)
+			if (this.DatabaseConnectionOption != null)
 			{
 				// Special case for Sqlite - ensure that the folder exists
 				FolderOptions folderOptions = this.FolderOptions.Value;
 
-				Microsoft.Data.Sqlite.SqliteConnection connection = new(folderOptions.Parse(connectionOption.ConnectionString));
+				Microsoft.Data.Sqlite.SqliteConnection connection = new(folderOptions.Parse(this.DatabaseConnectionOption.ConnectionString));
 				if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(connection.DataSource)))
 				{
 					System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(connection.DataSource));

@@ -61,8 +61,9 @@ namespace Nucleus.Core
 			
 			// General-use services 
 			services.AddSingleton<IEventDispatcher, Services.EventDispatcher>();
-			services.AddTransient<IMailClientFactory, Mail.MailClientFactory>(); 
-			
+			services.AddTransient<IMailClientFactory, Mail.MailClientFactory>();
+			services.AddTransient<Abstractions.IPreflight, Nucleus.Core.Services.Preflight>();
+
 			services.AddSingleton<ICacheManager, Managers.CacheManager>();
 
 			// Extension managers

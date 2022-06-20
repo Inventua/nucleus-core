@@ -27,6 +27,7 @@ namespace Nucleus.Data.MySql
 		public MySqlDbContextConfigurator(IOptions<DatabaseOptions> databaseOptions)
 		{
 			this.DatabaseOptions = databaseOptions;
+			this.DatabaseConnectionOption = this.DatabaseOptions.Value.GetDatabaseConnection(typeof(TDataProvider).GetDefaultSchemaName());			
 		}
 
 		/// <summary>
@@ -35,11 +36,9 @@ namespace Nucleus.Data.MySql
 		/// <param name="options"></param>
 		public override Boolean Configure(DbContextOptionsBuilder options)
 		{
-			DatabaseConnectionOption connectionOption = this.DatabaseOptions.Value.GetDatabaseConnection(typeof(TDataProvider).GetDefaultSchemaName());
-
-			if (connectionOption != null)
+			if (this.DatabaseConnectionOption != null)
 			{
-					options.UseMySql(connectionOption.ConnectionString, ServerVersion.AutoDetect(connectionOption.ConnectionString));
+					options.UseMySql(this.DatabaseConnectionOption.ConnectionString, ServerVersion.AutoDetect(this.DatabaseConnectionOption.ConnectionString));
 					return true;
 			}
 

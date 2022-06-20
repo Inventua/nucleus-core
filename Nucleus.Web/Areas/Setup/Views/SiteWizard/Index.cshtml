@@ -49,12 +49,52 @@
 		else
 		{
 			<Tab class="nav-pills nav-justified">
-				<TabItem caption="Install" active="true" target="#site-install"></TabItem>
+				@if (Model.Preflight != null)
+				{
+					<TabItem caption="Pre-Flight Checks" active="true" target="#site-preflight"></TabItem>
+				}
+				<TabItem caption="Install" active="@(Model.Preflight == null ? true : false)" target="#site-install"></TabItem>
 				<TabItem caption="Site" target="#site-settings"></TabItem>
 				<TabItem caption="Users" target="#user-settings"></TabItem>
 			</Tab>
 			<TabContent>
-				<TabPanel id="site-install" active="true">
+				@if (Model.Preflight != null)
+				{
+					<TabPanel id="site-preflight" active="true">
+						<table class="table">
+							<thead class="table-dark">
+							<tr>
+								<th scope="col">Status</th>
+								<th scope="col">Message</th>
+								<th scope="col">Code</th>
+							</tr>
+							</thead>
+							@foreach (var result in Model.Preflight)
+							{
+								<tr>
+									<td class="nucleus-material-icon">
+										@switch (result.Status)
+										{
+											case IPreflight.Status.OK:
+												@Html.Raw("&#xe5ca;")
+												break;
+											case IPreflight.Status.Warning:
+												@Html.Raw("&#xe002;")
+												break;
+											case IPreflight.Status.Error:
+												@Html.Raw("&#xe000;")
+												break;
+										}
+									</td>
+									<td>@result.Message</td>
+									<td>@result.Code</td>
+								</tr>
+							}
+						</table>
+					</TabPanel>
+				}
+
+				<TabPanel id="site-install" active="@(Model.Preflight == null ? true : false)">
 					<fieldset role="group" aria-labelledby="heading">
 						<h2>Install Extensions</h2>
 						<p>

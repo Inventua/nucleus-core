@@ -47,9 +47,27 @@ namespace Nucleus.Data.EntityFramework
 			}
 			catch(Exception e)
 			{
-				Logger?.LogError("An error occurred while connecting to the database.", e);
-				throw;
+				Nucleus.Data.Common.ConnectionException wrapped = new(this.Context.Database.GetDbConnection(), this.Context.DbContextConfigurator.DatabaseConnectionOption, e);
+				Logger?.LogError(wrapped, "");
+				throw wrapped;
 			}
+		}
+
+		/// <summary>
+		/// Get the key for the database which corresponds to a section in the database configuration settings file.
+		/// </summary>
+		/// <returns></returns>
+		public override string GetDatabaseKey()
+		{			
+			Nucleus.Data.EntityFramework.DbContext context = this.Context as Nucleus.Data.EntityFramework.DbContext;
+
+			if (context != null && context.DbContextConfigurator != null && context.DbContextConfigurator.DatabaseConnectionOption != null)
+			{
+				return (this.Context as Nucleus.Data.EntityFramework.DbContext).DbContextConfigurator.DatabaseConnectionOption?.Key;
+			}
+
+			return "";
+
 		}
 	}
 

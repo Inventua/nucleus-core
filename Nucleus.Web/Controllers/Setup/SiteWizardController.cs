@@ -28,11 +28,13 @@ namespace Nucleus.Web.Controllers.Setup
 		private IUserManager UserManager { get; }
 		private ILayoutManager LayoutManager { get; }
 		private IContainerManager ContainerManager { get; }
+		private Abstractions.IPreflight PreFlight { get; }
 
-		public SiteWizardController(IWebHostEnvironment webHostEnvironment, IHostApplicationLifetime hostApplicationLifetime, IExtensionManager extensionManager, ISiteManager siteManager, IUserManager userManager, ILayoutManager layoutManager, IContainerManager containerManager)
+		public SiteWizardController(IWebHostEnvironment webHostEnvironment, IHostApplicationLifetime hostApplicationLifetime, Abstractions.IPreflight preFlight, IExtensionManager extensionManager, ISiteManager siteManager, IUserManager userManager, ILayoutManager layoutManager, IContainerManager containerManager)
 		{
 			this.WebHostEnvironment = webHostEnvironment;
 			this.HostApplicationLifetime = hostApplicationLifetime;
+			this.PreFlight = preFlight;
 			this.ExtensionManager = extensionManager;
 			this.SiteManager = siteManager;
 			this.UserManager = userManager;
@@ -42,8 +44,16 @@ namespace Nucleus.Web.Controllers.Setup
 
 		[HttpGet]
 		public async Task<IActionResult> Index()
-		{
-			return View("Index", await BuildViewModel());
+		{			
+			if (await this.UserManager.CountSystemAdministrators() != 0)
+			{
+				return BadRequest();
+			}
+
+			// pre-flight checks
+			IPreflight.ValidationResults results = this.PreFlight.Validate();
+
+			return View("Index", await BuildViewModel(results) );
 		}
 
 		[HttpPost]
@@ -53,6 +63,8 @@ namespace Nucleus.Web.Controllers.Setup
 			{
 				return BadRequest();
 			}
+
+
 			return View("Index", await BuildViewModel(viewModel));
 		}
 
@@ -62,8 +74,6 @@ namespace Nucleus.Web.Controllers.Setup
 			if (await this.UserManager.CountSystemAdministrators() != 0)
 			{
 				return BadRequest();
-				//ModelState.Remove(nameof(viewModel.SystemAdminUserName));
-				//ModelState.Remove(nameof(viewModel.SystemAdminPassword));
 			}
 
 			if (ModelState.IsValid)
@@ -316,13 +326,21 @@ namespace Nucleus.Web.Controllers.Setup
 
 		private async Task<ViewModels.Setup.SiteWizard> BuildViewModel()
 		{
-			ViewModels.Setup.SiteWizard viewModel = await BuildViewModel(new());
+			ViewModels.Setup.SiteWizard viewModel = await BuildViewModel(new ViewModels.Setup.SiteWizard());
 
 			viewModel.Site.DefaultSiteAlias = new SiteAlias() { Alias = $"{ControllerContext.HttpContext.Request.Host}{ControllerContext.HttpContext.Request.PathBase}" };			
 			if (ControllerContext.HttpContext.Request.Host.Port.HasValue)
 			{
 				viewModel.Site.DefaultSiteAlias.Alias += $":{ControllerContext.HttpContext.Request.Host.Port}";
 			}
+
+			return viewModel;
+		}
+
+		private async Task<ViewModels.Setup.SiteWizard> BuildViewModel(IPreflight.ValidationResults results)
+		{
+			ViewModels.Setup.SiteWizard viewModel = await BuildViewModel();
+			viewModel.Preflight = results;
 
 			return viewModel;
 		}

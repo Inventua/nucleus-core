@@ -39,5 +39,11 @@ namespace Nucleus.Data.EntityFramework
 		/// their specific implementation.
 		/// </remarks>
 		public abstract Boolean Configure(DbContextOptionsBuilder options);
+
+		/// <summary>
+		/// Gets the database connection option for this DbContextConfigurator.
+		/// </summary>
+		public Nucleus.Abstractions.Models.Configuration.DatabaseConnectionOption DatabaseConnectionOption { get; protected set; }
+
 	}
 }

@@ -9,6 +9,7 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions;
 using Nucleus.ViewFeatures;
+using System.Reflection;
 
 namespace Nucleus.Web.Controllers
 {
@@ -81,12 +82,18 @@ namespace Nucleus.Web.Controllers
 				{
 					if (IsConnectionFailure(exceptionDetails.Error))
 					{
+						string innerMessage = UnwrapInnerExceptions(exceptionDetails.Error);	
+						if (!String.IsNullOrEmpty(innerMessage))
+						{
+							innerMessage = "\n\n- " + innerMessage;
+						}
+
 						// Special case.  Display database connection errors regardless of user, because database connection configuration is a likely/common misconfiguration.
 						return new Microsoft.AspNetCore.Mvc.ContentResult()
 						{
 							ContentType = "text/plain",
 							StatusCode = data.Status.Value,
-							Content = $"{System.Reflection.Assembly.GetExecutingAssembly().Product()} version {System.Reflection.Assembly.GetExecutingAssembly().Version()}\n- {data.Detail}"
+							Content = $"{Assembly.GetExecutingAssembly().Product()} version {Assembly.GetExecutingAssembly().Version()}.\n\n{exceptionDetails.Error.Message}{innerMessage}"
 						};
 					}
 					// write the error message to the response if the user is a system admin
@@ -120,10 +127,33 @@ namespace Nucleus.Web.Controllers
 			};
 		}
 
+		private static string UnwrapInnerExceptions(Exception e)
+		{
+			string message = "";
+
+			while (e.InnerException != null)
+			{
+				if (!String.IsNullOrEmpty(message))
+				{
+					message += "\n- ";
+				}
+
+				message += e.InnerException.Message;
+				e = e.InnerException;
+			}
+
+			return message;
+		}
+
 		private static Boolean IsConnectionFailure(Exception e)
 		{
 			const string CHECK_CONNECTION_FUNCTION = "CheckConnection()";
-		
+
+			if (e is Nucleus.Data.Common.ConnectionException)
+			{
+				return true;
+			}
+			
 			if (e is System.Data.Common.DbException)
 			{
 				return e.StackTrace.Contains(CHECK_CONNECTION_FUNCTION);

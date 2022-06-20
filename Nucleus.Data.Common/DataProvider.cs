@@ -47,6 +47,11 @@ namespace Nucleus.Data.Common
 			return DataProviderExtensions.GetDataProviderInformation(services, schemaName);			
 		}
 
+		/// <summary>
+		/// Get a "friendly" name for the database.
+		/// </summary>
+		/// <returns></returns>
+		public abstract string GetDatabaseKey();
 
 		/// <summary>
 		/// Dispose of resources.

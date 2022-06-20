@@ -44,7 +44,7 @@ namespace Nucleus.Data.EntityFramework
 		/// <summary>
 		/// 
 		/// </summary>
-		protected DbContextConfigurator DbContextConfigurator { get; }
+		internal DbContextConfigurator DbContextConfigurator { get; }
 		
 		internal DbSet<Nucleus.Abstractions.Models.Internal.Schema> Schema { get; set; }
 

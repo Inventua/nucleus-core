@@ -19,11 +19,11 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <summary>
 		/// Specifies whether to use minified javascript files, if available.
 		/// </summary>
-		public Boolean UseMinifedJs { get; private set; } = true;
+		public Boolean UseMinifiedJs { get; private set; } = true;
 
 		/// <summary>
 		/// Specifies whether to use minified css files, if available.
 		/// </summary>
-		public Boolean UseMinifedCss { get; private set; } = true;
+		public Boolean UseMinifiedCss { get; private set; } = true;
 	}
 }

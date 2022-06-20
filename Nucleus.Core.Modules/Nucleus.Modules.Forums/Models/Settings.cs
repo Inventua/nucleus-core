@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Nucleus.Abstractions.Models;
 
 using Nucleus.Abstractions.Models.FileSystem;
 
 namespace Nucleus.Modules.Forums.Models
 {
-	public class Settings
+	public class Settings : ModelBase
 	{
 		public Boolean Enabled { get; set; } = true;
 		public Boolean Visible { get; set; } = true;

@@ -67,7 +67,9 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.WithOne()
 				.HasForeignKey("ForumPostId");
 
-			builder.Entity<Reply>().ToTable("ForumReplies");
+			builder.Entity<Reply>().ToTable("ForumReplies")
+				.Ignore(reply => reply.CanEditReply)
+				.Ignore(reply => reply.CanDeleteReply);
 
 			builder.Entity<Reply>()
 				.HasOne(reply => reply.PostedBy)

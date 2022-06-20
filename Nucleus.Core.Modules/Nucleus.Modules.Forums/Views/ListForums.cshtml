@@ -7,25 +7,22 @@
 @Html.AddStyle("~/Resources/css/forms.css")
 <div class="Forums">
 	<div class="nucleus-form-tools">
-	@Html.LinkButton("","Manage Subscriptions", Url.NucleusAction("ManageSubscriptions", "Forums", "Forums"), new { @class = "btn btn-primary", @data_target = ".Forums.parent()" })
+		@Html.LinkButton("","Manage Subscriptions", Url.NucleusAction("ManageSubscriptions", "Forums", "Forums"), new { @class = "btn btn-primary", @data_target = ".Forums.parent()" })
 	</div>
-	@foreach (var group in Model.Groups)
-	{
-		<table class="forums-list">
-			<tr>
-				<th colspan="4">@group.Name</th>
-			</tr>
-			<tr>
-				<th class="forum-title">Forum Name</th>
+	<table class="forums-list">
+		@foreach (var group in Model.Groups)
+		{
+			<tr class="group-header">
+				<th class="group-title">@group.Name</th>
 				<th>Posts</th>
 				<th>Replies</th>
 				<th>Most Recent</th>
 			</tr>
 			@foreach (var forum in group.Forums)
 			{
-				<tr class="forum-item @(forum.EffectiveSettings().Enabled ? "enabled" : "disabled")">					
-					<td class="forum-title">						
-						<span class="nucleus-material-icon">
+				<tr class="forum-item @(forum.EffectiveSettings().Enabled ? "enabled" : "disabled")">
+					<td class="forum-title">
+						<div class="nucleus-material-icon">
 							@if (forum.EffectiveSettings().Enabled)
 							{
 								@Html.Raw("&#xe0bf;")
@@ -34,27 +31,31 @@
 							{
 								<span title="Disabled forum">@Html.Raw("&#xf236;")</span>
 							}
-						</span>
+						</div>
+						<div>
+							<div>
+								<a href="@Url.PageLink(Model.Page, forum.Name.FriendlyEncode())">@forum.Name</a>
+							</div>
 
-						<a href="@Url.PageLink(Model.Page, forum.Name.FriendlyEncode())">@forum.Name</a>
-
-						@if (!String.IsNullOrEmpty(forum.Description))
-						{
-							<div>@forum.Description</div>
-						}
+							@if (!String.IsNullOrEmpty(forum.Description))
+							{
+								<div>
+									@forum.Description
+								</div>
+							}
+						</div>
 					</td>
-					<td>@forum.Statistics.PostCount</td>
-					<td>@forum.Statistics.ReplyCount</td>
-					<td>
+					<td class="compact-cell">@forum.Statistics.PostCount</td>
+					<td class="compact-cell">@forum.Statistics.ReplyCount</td>
+					<td class="compact-cell">
 						@if (forum.Statistics.LastPost != null)
 						{
 							<div>@forum.Statistics.LastPost.Subject</div>
-							<div>@forum.Statistics.LastPost.PostedBy.UserName</div>
-							<div>@forum.Statistics.LastPost.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
+							<div>@forum.Statistics.LastPost.PostedBy.UserName, @forum.Statistics.LastPost.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
 						}
 					</td>
 				</tr>
 			}
-		</table>
-	}
+		}
+	</table>
 </div>

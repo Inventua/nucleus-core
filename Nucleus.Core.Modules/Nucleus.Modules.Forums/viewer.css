@@ -5,23 +5,38 @@
   margin-bottom: 12px;
 }
 
-.Forums .forums-list th, .Forums .forums-list td, .Forums .forum-posts th, .Forums .forum-posts td 
+.Forums table th, .Forums TABLE td
 {
-  padding: 4px;
+  padding: 4px 12px;
 	text-align: left;
   vertical-align: middle;
-  width: 5em;
 }
 
-/*.Forums .forums-list th:first-child, .Forums .forums-list td:first-child,
-.Forums .forum-posts th:first-child, .Forums .forum-posts td:first-child
+.Forums .group-header:not(:first-child)
 {
-  width: 1em;
-}*/
+  border-top: 1px solid #ccc;
+}
+
+.Forums .group-header:not(:first-child) th
+{
+  padding-top: 1rem;
+}
 
 .Forums .forums-list .forum-title
 {
+  display: flex;
   width: auto;
+  white-space: nowrap;
+}
+
+.Forums .forums-list .forum-title > div
+{
+  display: inline-block;
+}
+
+.Forums .compact-cell
+{
+  width: 1%;
   white-space: nowrap;
 }
 

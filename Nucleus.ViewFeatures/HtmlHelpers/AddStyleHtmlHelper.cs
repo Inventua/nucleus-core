@@ -65,7 +65,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			{
 				string finalStylesheetPath = stylesheetPath;
 
-				if (resourceFileOptions.UseMinifedJs && stylesheetPath.StartsWith("/") && !stylesheetPath.EndsWith(".min.css"))
+				if (resourceFileOptions.UseMinifiedJs && stylesheetPath.StartsWith("/") && !stylesheetPath.EndsWith(".min.css"))
 				{
 					Microsoft.AspNetCore.Hosting.IWebHostEnvironment webHostingEnvironment = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
 					string minifiedPath = System.IO.Path.Join(webHostingEnvironment.ContentRootPath, System.IO.Path.GetDirectoryName(stylesheetPath.Replace('/', Path.DirectorySeparatorChar)), System.IO.Path.GetFileNameWithoutExtension(stylesheetPath)) + ".min" + System.IO.Path.GetExtension(stylesheetPath);

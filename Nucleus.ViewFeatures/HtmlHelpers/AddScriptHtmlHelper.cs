@@ -87,7 +87,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			{
 				string finalScriptPath = scriptPath;
 
-				if (resourceFileOptions.UseMinifedJs && scriptPath.StartsWith("/") && !scriptPath.EndsWith(".min.js"))
+				if (resourceFileOptions.UseMinifiedJs && scriptPath.StartsWith("/") && !scriptPath.EndsWith(".min.js"))
 				{
 					Microsoft.AspNetCore.Hosting.IWebHostEnvironment webHostingEnvironment = context.RequestServices.GetService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
 					string minifiedPath = System.IO.Path.Join(webHostingEnvironment.ContentRootPath, System.IO.Path.GetDirectoryName(scriptPath.Replace('/', Path.DirectorySeparatorChar)), System.IO.Path.GetFileNameWithoutExtension(scriptPath)) + ".min" + System.IO.Path.GetExtension(scriptPath);

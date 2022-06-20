@@ -27,5 +27,9 @@ namespace Nucleus.Modules.Forums.Models
 		public User PostedBy { get; private set; }
 
 		public List<Attachment> Attachments { get; set; } = new();
+
+		public Boolean CanEditReply{ get; set; }
+		public Boolean CanDeleteReply { get; set; }
+
 	}
 }

@@ -15,6 +15,11 @@
 	margin-bottom: 1rem;
 }
 
+#site-wizard .nav-item
+{
+	max-width: 25%;
+}
+
 #site-wizard .installable-package
 {
 	margin-bottom: 0.75rem;
@@ -24,6 +29,11 @@
 {
 	display: inline-block;
 	vertical-align: middle;
+}
+
+#site-preflight button
+{
+	max-height: 2.5rem;
 }
 
 #site-wizard .nucleus-button-panel
@@ -46,4 +56,26 @@
 {
 	transform: scale(1.2);
 	vertical-align: middle;
+}
+
+#site-wizard .status-col
+{
+	width: 3rem;
+	font-size: 1.2rem;
+}
+
+#site-wizard .code-col
+{
+	width: 3rem;
+	white-space: nowrap;
+}
+
+#site-wizard .status-col-ok
+{
+	color: green;
+}
+
+#site-wizard .status-col-error
+{
+	color: red;
 }

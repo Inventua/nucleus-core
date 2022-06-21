@@ -269,9 +269,14 @@ namespace Nucleus.Core.Plugins
 		{
 			TypeContextCache.Clear();
 
-			foreach (string path in System.IO.Directory.GetDirectories(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic()))
+			string extensionsFolder = Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic(false);
+
+			if (System.IO.Directory.Exists(extensionsFolder))
 			{
-				UnloadPlugin(GetExtensionFolderName(path));
+				foreach (string path in System.IO.Directory.GetDirectories(extensionsFolder))
+				{
+					UnloadPlugin(GetExtensionFolderName(path));
+				}
 			}
 
 			ExtensionLoadContexts.Clear();
@@ -311,23 +316,22 @@ namespace Nucleus.Core.Plugins
 		/// </remarks>
 		private static IEnumerable<string> EnumerateAssemblyNames()
 		{
-			//List<string> results = new();
-
 			// get all assemblies (dlls) in /bin 			
 			foreach (string filename in System.IO.Directory.EnumerateFiles(System.IO.Path.GetDirectoryName(typeof(AssemblyLoader).Assembly.Location), "*.dll", System.IO.SearchOption.AllDirectories))
 			{
 				yield return filename;
 			}
-			//results.AddRange(System.IO.Directory.EnumerateFiles(System.IO.Path.GetDirectoryName(typeof(AssemblyLoader).Assembly.Location), "*.dll", System.IO.SearchOption.AllDirectories));
 
-			// get all extension assemblies (dlls) in /extensions/*
-			foreach (string foldername in System.IO.Directory.EnumerateFiles(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic(), "*.dll", System.IO.SearchOption.AllDirectories))
+			string extensionsFolder = Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic(false);
+
+			if (System.IO.Directory.Exists(extensionsFolder))
 			{
-				yield return foldername;
+				// get all extension assemblies (dlls) in /extensions/*
+				foreach (string foldername in System.IO.Directory.EnumerateFiles(extensionsFolder, "*.dll", System.IO.SearchOption.AllDirectories))
+				{
+					yield return foldername;
+				}
 			}
-			//results.AddRange(System.IO.Directory.EnumerateFiles(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic(), "*.dll", System.IO.SearchOption.AllDirectories));
-
-			//return results;
 		}
 
 		/// <summary>
@@ -394,11 +398,11 @@ namespace Nucleus.Core.Plugins
 					logger?.LogError(e, "Unable to load assembly {0}", assembly.FullName);
 					type = null;
 				}
-				
+
 				if (type != null)
 				{
 					yield return assembly;
-				}				
+				}
 			}
 		}
 
@@ -416,11 +420,11 @@ namespace Nucleus.Core.Plugins
 			{
 				if (assembly != null)
 				{
-					foreach(Type type in GetTypes(assembly)
+					foreach (Type type in GetTypes(assembly)
 						.Where(type => !type.IsAbstract && typeof(T).IsAssignableFrom(type) && !type.Equals(typeof(T))))
 					{
 						yield return type;
-					}						
+					}
 				}
 			}
 		}
@@ -447,7 +451,7 @@ namespace Nucleus.Core.Plugins
 		/// </remarks>
 		private static IEnumerable<Assembly> LoadAssemblies()
 		{
-			List<Assembly> assemblies = new List<Assembly>();	
+			List<Assembly> assemblies = new List<Assembly>();
 
 			// All assemblies must be loaded into their correct AssemblyLoadContexts in this function (don't use yield return).  This is to ensure that
 			// assemblies which reference other assemblies (in an extension/bin folder) load them from the correct folder and using the correct AssemmblyLoadContext.

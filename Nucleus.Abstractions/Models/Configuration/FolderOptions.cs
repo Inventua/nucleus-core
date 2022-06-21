@@ -119,25 +119,36 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <summary>
 		/// Gets the full path to the extensions folder.
 		/// </summary>
+		/// If the folder does not exist, it is created.
 		/// <returns></returns>
 		public string GetExtensionsFolder()
 		{
-			return GetExtensionsFolderStatic();
+			return GetExtensionsFolder(true);
+		}
+
+		/// <summary>
+		/// Gets the full path to the extensions folder.
+		/// </summary>
+		/// <param name="create">Specifies whether to create the folder if it does not already exist.</param>
+		/// <returns></returns>
+		public string GetExtensionsFolder(Boolean create)
+		{
+			return GetExtensionsFolderStatic(create);
 		}
 
 		/// <summary>
 		/// Gets the full path to the extensions folder.
 		/// </summary>
 		/// <returns></returns>
-		public static string GetExtensionsFolderStatic()
+		public static string GetExtensionsFolderStatic(Boolean create)
 		{
 			string appsFolder;
 
 			appsFolder = System.IO.Path.Combine(System.Environment.CurrentDirectory, EXTENSIONS_FOLDER);
 
-			if (!System.IO.Directory.Exists(appsFolder))
+			if (create)
 			{
-				System.IO.Directory.CreateDirectory(appsFolder);
+				return EnsureExistsStatic(appsFolder);
 			}
 
 			return appsFolder;
@@ -151,7 +162,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public static string GetExtensionFolderStatic(string name, Boolean create)
 		{
-			string result = System.IO.Path.Combine(GetExtensionsFolderStatic(), name);
+			string result = System.IO.Path.Combine(GetExtensionsFolderStatic(create), name);
 
 			if (create)
 			{
@@ -176,10 +187,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 
 			if (create)
 			{
-				if (!System.IO.Directory.Exists(result))
-				{
-					System.IO.Directory.CreateDirectory(result);
-				}
+				EnsureExists(result);
 			}
 
 			return result;
@@ -190,14 +198,29 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// </summary>
 		/// <returns></returns>
 		public string DataFolder { get; set; }
-		
-		private string EnsureExists(string path)
+
+		/// <summary>
+		/// Check whether the specified folder exists, and create it if it does not.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		public string EnsureExists(string path)
+		{
+			return EnsureExistsStatic(path);
+		}
+
+		/// <summary>
+		/// Check whether the specified folder exists, and create it if it does not.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		private static string EnsureExistsStatic(string path)
 		{
 			if (!System.IO.Directory.Exists(path))
 			{
 				System.IO.Directory.CreateDirectory(path);
 			}
-
+			
 			return path;
 		}
 
@@ -210,7 +233,17 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string GetTempFolder()
 		{
-			return EnsureExists(this.GetDataFolder(TEMP_FOLDER));
+			return this.GetTempFolder(true);
+		}
+
+		/// <summary>
+		/// Gets the data storage folder location for temporary files.
+		/// </summary>
+		/// <param name="create">Specifies whether to check that the folder exists and create it if not.</param>
+		/// <returns></returns>
+		public string GetTempFolder(Boolean create)
+		{
+			return this.GetDataFolder(TEMP_FOLDER, create);
 		}
 
 		/// <summary>
@@ -222,7 +255,53 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string GetLogFolder()
 		{
-			return EnsureExists(this.GetDataFolder(LOG_FOLDER));
+			return this.GetLogFolder(true);
+		}
+
+		/// <summary>
+		/// Gets the data storage folder location for log files.
+		/// </summary>
+		/// <remarks>
+		/// <param name="create">Specifies whether to check that the folder exists and create it if not.</param>
+		/// </remarks>
+		/// <returns></returns>
+		public string GetLogFolder(Boolean create)
+		{
+			return this.GetDataFolder(LOG_FOLDER, create);
+		}
+
+		/// <summary>
+		/// Gets the data storage folder location for log files.
+		/// </summary>
+		/// <remarks>
+		/// <param name="subFolder"/>
+		/// <remarks>
+		/// If the folder does not exist, it is created.
+		/// </remarks>
+		/// <returns></returns>
+		public string GetLogFolder(string subFolder)
+		{
+			return this.GetLogFolder(subFolder, true);
+		}
+
+		/// <summary>
+		/// Gets the data storage folder location for log files.
+		/// </summary>
+		/// <remarks>
+		/// <param name="subFolder"/>
+		/// <param name="create">Specifies whether to check that the folder exists and create it if not.</param>
+		/// </remarks>
+		/// <returns></returns>
+		public string GetLogFolder(string subFolder, Boolean create)
+		{
+			if (create)
+			{
+				return EnsureExists(System.IO.Path.Combine(this.GetDataFolder(LOG_FOLDER, create), subFolder));
+			}
+			else
+			{
+				return System.IO.Path.Combine(this.GetDataFolder(LOG_FOLDER, create), subFolder);
+			}
 		}
 
 		/// <summary>
@@ -234,7 +313,17 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string GetCacheFolder()
 		{
-			return EnsureExists(this.GetDataFolder(CACHE_FOLDER));
+			return this.GetCacheFolder(true);
+		}
+
+		/// <summary>
+		/// Gets the data storage folder location for cache files.
+		/// </summary>
+		/// <param name="create">Specifies whether to check that the folder exists and create it if not.</param>
+		/// <returns></returns>
+		public string GetCacheFolder(Boolean create)
+		{
+			return this.GetDataFolder(CACHE_FOLDER, create);
 		}
 
 		/// <summary>
@@ -246,7 +335,25 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string GetCacheFolder(string subFolder)
 		{
-			return EnsureExists(System.IO.Path.Combine(this.GetDataFolder(CACHE_FOLDER), subFolder));
+			return GetCacheFolder(subFolder, true);			
+		}
+
+		/// <summary>
+		/// Gets the data storage folder location for cache files and appends the specified sub-folder.
+		/// </summary>
+		/// <param name="subFolder">Specifies a sub-folder of the cache folder.</param>
+		/// <param name="create">Specifies whether to check that the folder exists and create it if not.</param>
+		/// <returns></returns>
+		public string GetCacheFolder(string subFolder, Boolean create)
+		{
+			if (create)
+			{
+				return EnsureExists(System.IO.Path.Combine(this.GetDataFolder(CACHE_FOLDER, create), subFolder));
+			}
+			else
+			{
+				return System.IO.Path.Combine(this.GetDataFolder(CACHE_FOLDER, create), subFolder);
+			}
 		}
 
 
@@ -254,13 +361,23 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// Gets an application data storage folder sub-folder. 
 		/// </summary>
 		/// <param name="subFolder"></param>
+		/// <param name="create">Specifies whether to check that the folder exists and create it if not.</param>
 		/// <remarks>
 		/// If the folder does not exist, it is created.
 		/// </remarks>
 		/// <returns></returns>
-		public string GetDataFolder(string subFolder)
+		public string GetDataFolder(string subFolder, Boolean create)
 		{
-			return EnsureExists(System.IO.Path.Combine(this.DataFolder, subFolder));
+			string folderName = System.IO.Path.Combine(this.DataFolder, subFolder);
+
+			if (create)
+			{
+				return EnsureExists(folderName);
+			}
+			else
+			{
+				return folderName;
+			}
 		}
 
 	}

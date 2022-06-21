@@ -8,6 +8,11 @@
 }
 @Html.AddStyle("~!index.css")
 
+@{
+	var disabledAttr = new { disabled = "disabled" };
+	var enabledAttr = new { };
+}
+
 @using (Html.BeginAreaForm("Install", "SiteWizard", "Setup", FormMethod.Post, new { @data_target = "window" }))
 {
 	<Modal id="site-wizard" title="Nucleus Setup Wizard" can-close="false">
@@ -16,7 +21,7 @@
 
 		@Html.HiddenFor(model => model.SelectedTemplate)
 		@Html.HiddenFor(model => model.TemplateTempFileName)
-		@if (Model.SelectedTemplate == null || Model.MissingExtensionWarnings.Count() > 0)
+		@if ((Model.Preflight == null || Model.Preflight.IsValid()) && (Model.SelectedTemplate == null || Model.MissingExtensionWarnings.Count() > 0))
 		{
 			<h2>Site Template</h2>
 			<p>
@@ -51,28 +56,51 @@
 			<Tab class="nav-pills nav-justified">
 				@if (Model.Preflight != null)
 				{
-					<TabItem caption="Pre-Flight Checks" active="true" target="#site-preflight"></TabItem>
+					<TabItem caption="Configuration Checks" active="true" target="#site-preflight"></TabItem>
 				}
-				<TabItem caption="Install" active="@(Model.Preflight == null ? true : false)" target="#site-install"></TabItem>
-				<TabItem caption="Site" target="#site-settings"></TabItem>
-				<TabItem caption="Users" target="#user-settings"></TabItem>
+
+				@if (Model.Preflight == null || Model.Preflight.IsValid())
+				{
+					<TabItem caption="Install" active="@(Model.Preflight == null ? true : false)" target="#site-install"></TabItem>
+					<TabItem caption="Site" target="#site-settings"></TabItem>
+					<TabItem caption="Users" target="#user-settings"></TabItem>
+				}
 			</Tab>
 			<TabContent>
 				@if (Model.Preflight != null)
 				{
 					<TabPanel id="site-preflight" active="true">
-						<table class="table">
+						<div class="mb-1 d-flex">
+							@if (Model.Preflight != null)
+							{
+								@if (!Model.Preflight.IsValid())
+								{
+									<span>
+										Configuration checks have failed (@Model.Preflight.ErrorCount() error@(@Model.Preflight.ErrorCount() == 1 ? "" : "s")).  Please address the errors below and click 'Retry'.  
+										<br/>
+										If you need to modify configuration files you may need to restart Nucleus for changes to take effect.
+									</span>
+								}
+								else
+								{
+									<span>Configuration checks were successful.</span>
+								}								
+							}
+
+							<button type="button" class="btn btn-secondary ms-auto" onclick="window.location='@Url.AreaAction("Index", "SiteWizard", "Setup")';">Retry</button>
+						</div>
+						<table class="table table-sm small">
 							<thead class="table-dark">
-							<tr>
-								<th scope="col">Status</th>
-								<th scope="col">Message</th>
-								<th scope="col">Code</th>
-							</tr>
+								<tr>
+									<th scope="col"></th>
+									<th scope="col">Message</th>
+									<th scope="col">Code</th>
+								</tr>
 							</thead>
 							@foreach (var result in Model.Preflight)
 							{
 								<tr>
-									<td class="nucleus-material-icon">
+									<td class="nucleus-material-icon text-center status-col status-col-@(result.Status.ToString().ToLower())" style="width: 3rem">
 										@switch (result.Status)
 										{
 											case IPreflight.Status.OK:
@@ -87,172 +115,176 @@
 										}
 									</td>
 									<td>@result.Message</td>
-									<td>@result.Code</td>
+									<td class="code-col">@result.Code</td>
 								</tr>
 							}
 						</table>
 					</TabPanel>
 				}
 
-				<TabPanel id="site-install" active="@(Model.Preflight == null ? true : false)">
-					<fieldset role="group" aria-labelledby="heading">
-						<h2>Install Extensions</h2>
-						<p>
-							Select the extensions that you want to install.  You can install more extensions later.  Extensions with a disabled checkbox
-							are required because they are used by the site template.
-						</p>
-						@{
-							var disabledAttr = new { disabled = "disabled" };
-							var enabledAttr = new { };
-						}
-						@for (var count = 0; count < Model.InstallableExtensions.Count(); count++)
-						{
-							<div class="installable-package">
-								<label>
-									@Html.HiddenFor(model => model.InstallableExtensions[count].Filename)
-									@if (Model.InstallableExtensions[count].IsRequired)
-									{
-										@Html.HiddenFor(model => model.InstallableExtensions[count].IsSelected)
-										<span class="nucleus-material-icon placeholder-checkbox">&#xe834;</span>
-									}
-									else
-									{
-										@Html.CheckBoxFor(model => model.InstallableExtensions[count].IsSelected, Model.InstallableExtensions[count].IsRequired ? disabledAttr : enabledAttr)
-									}
-									<span>@Model.InstallableExtensions[count].Name</span>
+				@if (Model.Preflight == null || Model.Preflight.IsValid())
+				{
+					<TabPanel id="site-install" active="@(Model.Preflight == null ? true : false)">
+						<fieldset role="group" aria-labelledby="heading">
+							<h2>Install Extensions</h2>
+							<p>
+								Select the extensions that you want to install.  You can install more extensions later.  Extensions with a disabled checkbox
+								are required because they are used by the site template.
+							</p>
 
-									<span class="d-block">@Model.InstallableExtensions[count].Description</span>
-									<span class="d-block">
-										<span class="fst-italic">Publisher</span> <span>@Model.InstallableExtensions[count].Publisher</span>
-										<a href="@Model.InstallableExtensions[count].PublisherUrl">Web site</a>
-										<a href="mailto:@Model.InstallableExtensions[count].PublisherEmail">Support Email</a>
-									</span>
-								</label>
+							@for (var count = 0; count < Model.InstallableExtensions.Count(); count++)
+							{
+								<div class="installable-package">
+									<label>
+										@Html.HiddenFor(model => model.InstallableExtensions[count].Filename)
+										@if (Model.InstallableExtensions[count].IsRequired)
+										{
+											@Html.HiddenFor(model => model.InstallableExtensions[count].IsSelected)
+											<span class="nucleus-material-icon placeholder-checkbox">&#xe834;</span>
+										}
+										else
+										{
+											@Html.CheckBoxFor(model => model.InstallableExtensions[count].IsSelected, Model.InstallableExtensions[count].IsRequired ? disabledAttr : enabledAttr)
+										}
+										<span>@Model.InstallableExtensions[count].Name</span>
+
+										<span class="d-block">@Model.InstallableExtensions[count].Description</span>
+										<span class="d-block">
+											<span class="fst-italic">Publisher</span> <span>@Model.InstallableExtensions[count].Publisher</span>
+											<a href="@Model.InstallableExtensions[count].PublisherUrl">Web site</a>
+											<a href="mailto:@Model.InstallableExtensions[count].PublisherEmail">Support Email</a>
+										</span>
+									</label>
+								</div>
+							}
+						</fieldset>
+					</TabPanel>
+
+					<TabPanel id="site-settings">
+						<fieldset role="group" aria-labelledby="heading">
+							<h2>Site Settings</h2>
+
+							<SettingsControl caption="Site Name" helptext="Site name">
+								@Html.HiddenFor(model => model.Site.Id)
+								@Html.TextBoxFor(model => model.Site.Name)
+							</SettingsControl>
+
+							<SettingsControl caption="Default Alias (url)" helptext="Enter the primary url for your new site, omitting the http/https scheme (example: mysite.com/site1).">
+								@Html.HiddenFor(model => model.Site.DefaultSiteAlias.Id)
+								@Html.TextBoxFor(model => model.Site.DefaultSiteAlias.Alias)
+							</SettingsControl>
+
+							<SettingsControl caption="Home directory" helptext="Enter the home directory for this site's files, relative to the Nucleus files folder root.'">
+								@Html.TextBoxFor(model => model.Site.HomeDirectory)
+							</SettingsControl>
+
+							<h3>Appearance</h3>
+							<div class="nucleus-flex-fields">
+								<SettingsControl caption="Default Layout" helptext="Description">
+									@Html.DropDownListFor(model => model.Site.DefaultLayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
+								</SettingsControl>
+
+								<SettingsControl caption="Default Container" helptext="Page default container">
+									@Html.DropDownListFor((model) => model.Site.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
+								</SettingsControl>
 							</div>
-						}
-					</fieldset>
-				</TabPanel>
 
-				<TabPanel id="site-settings">
-					<fieldset role="group" aria-labelledby="heading">
-						<h2>Site Settings</h2>
+							<h3>Security Roles</h3>
+							<div class="nucleus-flex-fields">
+								<SettingsControl caption="Administrators Role" helptext="Administrators Role">
+									@Html.HiddenFor(model => model.Site.AdministratorsRole.Id)
+									@Html.HiddenFor(model => model.Site.AdministratorsRole.Description)
+									@if (Model.Site.AdministratorsRole.RoleGroup != null)
+									{
+										@Html.HiddenFor(model => model.Site.AdministratorsRole.RoleGroup.Id)
+									}
+									@Html.HiddenFor(model => model.Site.AdministratorsRole.Type)
+									@Html.TextBoxFor(model => model.Site.AdministratorsRole.Name)
+								</SettingsControl>
 
-						<SettingsControl caption="Site Name" helptext="Site name">
-							@Html.HiddenFor(model => model.Site.Id)
-							@Html.TextBoxFor(model => model.Site.Name)
-						</SettingsControl>
+								<SettingsControl caption="Registered Users Role" helptext="Registered users role">
+									@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Id)
+									@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Description)
+									@if (Model.Site.RegisteredUsersRole.RoleGroup != null)
+									{
+										@Html.HiddenFor(model => model.Site.RegisteredUsersRole.RoleGroup.Id)
+									}
+									@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Type)
+									@Html.TextBoxFor(model => model.Site.RegisteredUsersRole.Name)
+								</SettingsControl>
+							</div>
 
-						<SettingsControl caption="Default Alias (url)" helptext="Enter the primary url for your new site, omitting the http/https scheme (example: mysite.com/site1).">
-							@Html.HiddenFor(model => model.Site.DefaultSiteAlias.Id)
-							@Html.TextBoxFor(model => model.Site.DefaultSiteAlias.Alias)
-						</SettingsControl>
+							<div class="nucleus-flex-fields">
+								<SettingsControl caption="Anonymous Users Role" helptext="Anonymous users role">
+									@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Id)
+									@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Description)
+									@if (Model.Site.AnonymousUsersRole.RoleGroup != null)
+									{
+										@Html.HiddenFor(model => model.Site.AnonymousUsersRole.RoleGroup.Id)
+									}
+									@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Type)
+									@Html.TextBoxFor(model => model.Site.AnonymousUsersRole.Name)
+								</SettingsControl>
 
-						<SettingsControl caption="Home directory" helptext="Enter the home directory for this site's files, relative to the Nucleus files folder root.'">
-							@Html.TextBoxFor(model => model.Site.HomeDirectory)
-						</SettingsControl>
+								<SettingsControl caption="All Users Role" helptext="All users role">
+									@Html.HiddenFor(model => model.Site.AllUsersRole.Id)
+									@Html.HiddenFor(model => model.Site.AllUsersRole.Description)
+									@if (Model.Site.AllUsersRole.RoleGroup != null)
+									{
+										@Html.HiddenFor(model => model.Site.AllUsersRole.RoleGroup.Id)
+									}
+									@Html.HiddenFor(model => model.Site.AllUsersRole.Type)
+									@Html.TextBoxFor(model => model.Site.AllUsersRole.Name)
+								</SettingsControl>
+							</div>
+						</fieldset>
+					</TabPanel>
 
-						<h3>Appearance</h3>
-						<div class="nucleus-flex-fields">
-							<SettingsControl caption="Default Layout" helptext="Description">
-								@Html.DropDownListFor(model => model.Site.DefaultLayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
-							</SettingsControl>
+					<TabPanel id="user-settings">
+						<fieldset role="group" aria-labelledby="heading">
+							<h2>User Settings</h2>
 
-							<SettingsControl caption="Default Container" helptext="Page default container">
-								@Html.DropDownListFor((model) => model.Site.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
-							</SettingsControl>
-						</div>
+							@if (Model.CreateSystemAdministratorUser)
+							{
+								<SettingsControl caption="System Administrator User Name" helptext="Enter a name for your system administrator user.  This user can manage all sites.">
+									@Html.TextBoxFor(model => model.SystemAdminUserName)
+								</SettingsControl>
 
-						<h3>Security Roles</h3>
-						<div class="nucleus-flex-fields">
-							<SettingsControl caption="Administrators Role" helptext="Administrators Role">
-								@Html.HiddenFor(model => model.Site.AdministratorsRole.Id)
-								@Html.HiddenFor(model => model.Site.AdministratorsRole.Description)
-								@if (Model.Site.AdministratorsRole.RoleGroup != null)
-								{
-									@Html.HiddenFor(model => model.Site.AdministratorsRole.RoleGroup.Id)
-								}
-								@Html.HiddenFor(model => model.Site.AdministratorsRole.Type)
-								@Html.TextBoxFor(model => model.Site.AdministratorsRole.Name)
-							</SettingsControl>
-
-							<SettingsControl caption="Registered Users Role" helptext="Registered users role">
-								@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Id)
-								@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Description)
-								@if (Model.Site.RegisteredUsersRole.RoleGroup != null)
-								{
-									@Html.HiddenFor(model => model.Site.RegisteredUsersRole.RoleGroup.Id)
-								}
-								@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Type)
-								@Html.TextBoxFor(model => model.Site.RegisteredUsersRole.Name)
-							</SettingsControl>
-						</div>
-
-						<div class="nucleus-flex-fields">
-							<SettingsControl caption="Anonymous Users Role" helptext="Anonymous users role">
-								@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Id)
-								@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Description)
-								@if (Model.Site.AnonymousUsersRole.RoleGroup != null)
-								{
-									@Html.HiddenFor(model => model.Site.AnonymousUsersRole.RoleGroup.Id)
-								}
-								@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Type)
-								@Html.TextBoxFor(model => model.Site.AnonymousUsersRole.Name)
-							</SettingsControl>
-
-							<SettingsControl caption="All Users Role" helptext="All users role">
-								@Html.HiddenFor(model => model.Site.AllUsersRole.Id)
-								@Html.HiddenFor(model => model.Site.AllUsersRole.Description)
-								@if (Model.Site.AllUsersRole.RoleGroup != null)
-								{
-									@Html.HiddenFor(model => model.Site.AllUsersRole.RoleGroup.Id)
-								}
-								@Html.HiddenFor(model => model.Site.AllUsersRole.Type)
-								@Html.TextBoxFor(model => model.Site.AllUsersRole.Name)
-							</SettingsControl>
-						</div>
-					</fieldset>
-				</TabPanel>
-
-				<TabPanel id="user-settings">
-					<fieldset role="group" aria-labelledby="heading">
-						<h2>User Settings</h2>
-
-						@if (Model.CreateSystemAdministratorUser)
-						{
-							<SettingsControl caption="System Administrator User Name" helptext="Enter a name for your system administrator user.  This user can manage all sites.">
-								@Html.TextBoxFor(model => model.SystemAdminUserName)
+								<div class="nucleus-flex-fields">
+									<SettingsControl caption="System Administrator User Password" helptext="Enter a password for the user">
+										@Html.PasswordFor(model => model.SystemAdminPassword)
+									</SettingsControl>
+									<SettingsControl caption="Confirm Password" helptext="Enter a password for the user">
+										@Html.PasswordFor(model => model.SystemAdminConfirmPassword)
+									</SettingsControl>
+								</div>
+							}
+							<SettingsControl caption="Site Administrator User Name" helptext="Enter a name for your site administrator user.  This user can manage a single site only.">
+								@Html.TextBoxFor(model => model.SiteAdminUserName)
 							</SettingsControl>
 
 							<div class="nucleus-flex-fields">
-								<SettingsControl caption="System Administrator User Password" helptext="Enter a password for the user">
-									@Html.PasswordFor(model => model.SystemAdminPassword)
+								<SettingsControl caption="Site Administrator User Password" helptext="Enter a password for the user">
+									@Html.PasswordFor(model => model.SiteAdminPassword)
 								</SettingsControl>
 								<SettingsControl caption="Confirm Password" helptext="Enter a password for the user">
-									@Html.PasswordFor(model => model.SystemAdminConfirmPassword)
+									@Html.PasswordFor(model => model.SiteAdminConfirmPassword)
 								</SettingsControl>
 							</div>
-						}
-						<SettingsControl caption="Site Administrator User Name" helptext="Enter a name for your site administrator user.  This user can manage a single site only.">
-							@Html.TextBoxFor(model => model.SiteAdminUserName)
-						</SettingsControl>
 
-						<div class="nucleus-flex-fields">
-							<SettingsControl caption="Site Administrator User Password" helptext="Enter a password for the user">
-								@Html.PasswordFor(model => model.SiteAdminPassword)
-							</SettingsControl>
-							<SettingsControl caption="Confirm Password" helptext="Enter a password for the user">
-								@Html.PasswordFor(model => model.SiteAdminConfirmPassword)
-							</SettingsControl>
-						</div>
-
-					</fieldset>
-				</TabPanel>
+						</fieldset>
+					</TabPanel>
+				}
 			</TabContent>
 
 			<div class="nucleus-button-panel justify-content-end">
 				<button id="wizard-button-back" class="collapse btn btn-secondary" type="button" title="Back">Back</button>
-				<button id="wizard-button-next" class="collapse show btn btn-primary" type="button" title="Next">Next</button>
-				<button id="wizard-button-finish" class="collapse btn btn-success" type="submit" title="Finish">Finish</button>
+
+				@if (Model.Preflight == null || Model.Preflight.IsValid())
+				{
+					<button id="wizard-button-next" class="collapse show btn btn-primary" type="button" title="Next">Next</button>
+					<button id="wizard-button-finish" class="collapse btn btn-success" type="submit" title="Finish">Finish</button>
+				}
 			</div>
 		}
 

@@ -96,6 +96,16 @@ namespace Nucleus.Web.Controllers
 							Content = $"{Assembly.GetExecutingAssembly().Product()} version {Assembly.GetExecutingAssembly().Version()}.\n\n{exceptionDetails.Error.Message}{innerMessage}"
 						};
 					}
+					else if (exceptionDetails.Error is System.UnauthorizedAccessException)
+					{
+						// Special case.  File permissions errors regardless of user, because file permission errors are a likely/common misconfiguration.
+						return new Microsoft.AspNetCore.Mvc.ContentResult()
+						{
+							ContentType = "text/plain",
+							StatusCode = data.Status.Value,
+							Content = $"{Assembly.GetExecutingAssembly().Product()} version {Assembly.GetExecutingAssembly().Version()}.\n\n{exceptionDetails.Error.Message}"
+						};
+					}
 					// write the error message to the response if the user is a system admin
 					else if (ControllerContext.HttpContext.User.IsSystemAdministrator())
 					{

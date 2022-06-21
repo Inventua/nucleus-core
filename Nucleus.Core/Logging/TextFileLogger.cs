@@ -116,7 +116,7 @@ namespace Nucleus.Core.Logging
 
 		public bool IsEnabled(LogLevel logLevel)
 		{
-			return true;
+			return this.Options.Enabled;
 		}
 
 		public IDisposable BeginScope<TState>(TState state) => ScopeProvider?.Push(state);

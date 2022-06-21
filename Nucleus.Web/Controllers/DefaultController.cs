@@ -27,13 +27,15 @@ namespace Nucleus.Web.Controllers
 		private IPageManager PageManager { get; }
 		private ISiteManager SiteManager { get; }
 		private IUserManager UserManager { get; }
+		private Application Application { get; }
 
 		// Files and extensions in these lists do not show the site error page, they always return a 404 if they are not found.
 		private static readonly HashSet<string> filteredFilenames = new(new string[] { "favicon.ico", "robots.txt" }, StringComparer.OrdinalIgnoreCase);
 		private static readonly HashSet<string> filteredFileExtensions = new(new string[] { ".txt", ".css", ".js", ".map" }, StringComparer.OrdinalIgnoreCase);
 
-		public DefaultController(ILogger<DefaultController> logger, Context context, ISiteManager siteManager, IUserManager userManager, IFileSystemManager fileSystemManager, IPageManager pageManager)
+		public DefaultController(ILogger<DefaultController> logger, Context context, Application application, ISiteManager siteManager, IUserManager userManager, IFileSystemManager fileSystemManager, IPageManager pageManager)
 		{
+			this.Application = application;
 			this.Logger = logger;
 			this.Context = context;
 			this.FileSystemManager = fileSystemManager;
@@ -51,7 +53,8 @@ namespace Nucleus.Web.Controllers
 			// If the site hasn't been set up yet (empty database), redirect to the site wizard.
 			if (this.Context.Site == null && this.Context.Page == null)
 			{
-				if (await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0)
+				//if (await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0)
+				if (!this.Application.IsInstalled || (await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0))
 				{
 					return RedirectToAction("Index", "SiteWizard", new { area = "Setup" });
 				}

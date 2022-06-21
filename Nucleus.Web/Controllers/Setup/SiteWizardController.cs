@@ -13,6 +13,7 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace Nucleus.Web.Controllers.Setup
 {
@@ -29,11 +30,15 @@ namespace Nucleus.Web.Controllers.Setup
 		private ILayoutManager LayoutManager { get; }
 		private IContainerManager ContainerManager { get; }
 		private Abstractions.IPreflight PreFlight { get; }
+		private Abstractions.Models.Configuration.FolderOptions FolderOptions { get; }
+		private Abstractions.Models.Application Application { get; }
 
-		public SiteWizardController(IWebHostEnvironment webHostEnvironment, IHostApplicationLifetime hostApplicationLifetime, Abstractions.IPreflight preFlight, IExtensionManager extensionManager, ISiteManager siteManager, IUserManager userManager, ILayoutManager layoutManager, IContainerManager containerManager)
+		public SiteWizardController(IWebHostEnvironment webHostEnvironment, IHostApplicationLifetime hostApplicationLifetime, Abstractions.Models.Application application, IOptions<Abstractions.Models.Configuration.FolderOptions> folderOptions, Abstractions.IPreflight preFlight, IExtensionManager extensionManager, ISiteManager siteManager, IUserManager userManager, ILayoutManager layoutManager, IContainerManager containerManager)
 		{
 			this.WebHostEnvironment = webHostEnvironment;
 			this.HostApplicationLifetime = hostApplicationLifetime;
+			this.Application = application;
+			this.FolderOptions = folderOptions.Value;
 			this.PreFlight = preFlight;
 			this.ExtensionManager = extensionManager;
 			this.SiteManager = siteManager;
@@ -45,7 +50,7 @@ namespace Nucleus.Web.Controllers.Setup
 		[HttpGet]
 		public async Task<IActionResult> Index()
 		{			
-			if (await this.UserManager.CountSystemAdministrators() != 0)
+			if (this.Application.IsInstalled && await this.UserManager.CountSystemAdministrators() != 0)
 			{
 				return BadRequest();
 			}
@@ -97,6 +102,9 @@ namespace Nucleus.Web.Controllers.Setup
 
 				// Build the site
 				await BuildSite(viewModel);
+
+				// write a file to record installation information
+				this.Application.SetInstalled();
 
 				// Wait 3 seconds after returning and restart
 				Task restartTask = Task.Run(async () => {
@@ -339,7 +347,17 @@ namespace Nucleus.Web.Controllers.Setup
 
 		private async Task<ViewModels.Setup.SiteWizard> BuildViewModel(IPreflight.ValidationResults results)
 		{
-			ViewModels.Setup.SiteWizard viewModel = await BuildViewModel();
+			ViewModels.Setup.SiteWizard viewModel;
+
+			if (results.IsValid())
+			{
+				viewModel = await BuildViewModel();
+			}
+			else
+			{
+				viewModel = new();
+			}
+
 			viewModel.Preflight = results;
 
 			return viewModel;

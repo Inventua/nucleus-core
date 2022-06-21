@@ -47,9 +47,18 @@ namespace Nucleus.Data.Sqlite
 				FolderOptions folderOptions = this.FolderOptions.Value;
 
 				Microsoft.Data.Sqlite.SqliteConnection connection = new(folderOptions.Parse(this.DatabaseConnectionOption.ConnectionString));
-				if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(connection.DataSource)))
+
+				try
 				{
-					System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(connection.DataSource));
+					if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(connection.DataSource)))
+					{
+						System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(connection.DataSource));
+					}
+				}
+				catch (System.UnauthorizedAccessException ex)
+				{
+					// permissions error on the Sqlite database folder.  Ignore here, and allow a database connection error
+					// when Nucleus tries to connect to the database.
 				}
 
 				options.UseSqlite(connection.ConnectionString);

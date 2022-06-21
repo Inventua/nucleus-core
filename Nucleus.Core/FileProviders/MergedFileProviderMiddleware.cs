@@ -37,6 +37,7 @@ namespace Nucleus.Core.FileProviders
 		private ILogger<MergedFileProviderMiddleware> Logger { get; }
 		
 		private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
+		private string _cacheFolder;
 
 		public MergedFileProviderMiddleware(IOptions<MergedFileProviderOptions> options, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions, ILogger<MergedFileProviderMiddleware> Logger)
 		{
@@ -202,13 +203,32 @@ namespace Nucleus.Core.FileProviders
 
 		private string CacheFolder()
 		{
-			return this.FolderOptions.Value.GetCacheFolder("MergedFileProvider");
+			if (String.IsNullOrEmpty(_cacheFolder))
+			{
+				_cacheFolder = this.FolderOptions.Value.GetCacheFolder("MergedFileProvider"); 
+			}
+
+			return _cacheFolder;
 		}
 
 		private void ClearCache()
 		{
-			Logger.LogInformation("Cache folder is {folder}.  Clearing cache after restart.", CacheFolder());
+			// If the cache folder does not exist (because of a permissions error), it doesn't need to be cleared.
+			try
+			{
+				if (!System.IO.Directory.Exists(CacheFolder()))
+				{
+					return;
+				}
+			}
+			catch (System.UnauthorizedAccessException)
+			{
+				// folder permissions error, ignore
+				return;
+			}
 
+			Logger.LogInformation("Cache folder is {folder}.  Clearing cache after restart.", CacheFolder());
+			
 			foreach (string cachedFileName in Directory.EnumerateFiles(CacheFolder()))
 			{
 				try

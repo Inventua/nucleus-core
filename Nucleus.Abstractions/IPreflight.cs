@@ -50,6 +50,15 @@ namespace Nucleus.Abstractions
 			{
 				return !this.Where(result => result.Status == Status.Error).Any();
 			}
+
+			/// <summary>
+			/// Returns a count of errors.
+			/// </summary>
+			/// <returns></returns>
+			public int ErrorCount()
+			{
+				return this.Where(result => result.Status == Status.Error).Count();
+			}
 		}
 
 

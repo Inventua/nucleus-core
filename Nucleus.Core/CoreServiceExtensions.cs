@@ -58,8 +58,9 @@ namespace Nucleus.Core
 		public static IServiceCollection AddNucleusCoreServices(this IServiceCollection services, IConfiguration configuration)
 		{
 			services.AddNucleusLayout();
-			
+
 			// General-use services 
+			services.AddSingleton<Nucleus.Abstractions.Models.Application>();
 			services.AddSingleton<IEventDispatcher, Services.EventDispatcher>();
 			services.AddTransient<IMailClientFactory, Mail.MailClientFactory>();
 			services.AddTransient<Abstractions.IPreflight, Nucleus.Core.Services.Preflight>();
@@ -141,9 +142,14 @@ namespace Nucleus.Core
 					options.DataFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Nucleus");
 				}
 
-				if (!System.IO.Directory.Exists(options.DataFolder))
+				try
 				{
-					System.IO.Directory.CreateDirectory(options.DataFolder);
+					options.EnsureExists(options.DataFolder);
+				}
+				catch (System.UnauthorizedAccessException)
+				{
+					// file permissions error.  Ignore so that the install wizard can report the permissions error when it 
+					// does config checking.
 				}
 			}
 		}

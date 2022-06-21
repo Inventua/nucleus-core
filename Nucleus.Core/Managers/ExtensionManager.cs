@@ -250,9 +250,14 @@ namespace Nucleus.Core.Managers
 		/// </summary>
 		public static void CleanupBackups(ILogger logger)
 		{
-			foreach (string extensionFolder in System.IO.Directory.GetDirectories(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic()))
+			string extensionsFolder = Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic(false);
+
+			if (System.IO.Directory.Exists(extensionsFolder))
 			{
-				CleanupBackups(extensionFolder, logger);
+				foreach (string extensionFolder in System.IO.Directory.GetDirectories(extensionsFolder))
+				{
+					CleanupBackups(extensionFolder, logger);
+				}
 			}
 		}
 

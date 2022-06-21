@@ -13,6 +13,8 @@ namespace Nucleus.Core.Logging
 
 		private string _path;
 
+		public Boolean Enabled { get; set; } = true;
+
 		/// <summary>
 		/// Gets or sets the <see cref="TextFileLogger"/> log file path.
 		/// </summary>
@@ -27,16 +29,8 @@ namespace Nucleus.Core.Logging
 			}
 			internal set
 			{
-				_path = Environment.ExpandEnvironmentVariables(value); ;
-
-				if (!System.IO.Directory.Exists(_path))
-				{
-					System.IO.Directory.CreateDirectory(_path);
-				}
+				_path = Environment.ExpandEnvironmentVariables(value); 
 			}
-		}
-
-
-		
+		}		
 	}
 }

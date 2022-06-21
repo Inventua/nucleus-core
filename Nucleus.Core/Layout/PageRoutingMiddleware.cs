@@ -21,16 +21,18 @@ namespace Nucleus.Core.Layout
 	public class PageRoutingMiddleware : Microsoft.AspNetCore.Http.IMiddleware
 	{		
 		private Context Context { get; }
+		private Application Application { get; }
 		private IPageManager PageManager { get; }
 		private ISiteManager SiteManager { get; }
 		private ILogger<PageRoutingMiddleware> Logger { get; }
 
 		private ICacheManager CacheManager { get; }
 
-		public PageRoutingMiddleware(ILogger<PageRoutingMiddleware> logger, Context context, IPageManager pageManager, ISiteManager siteManager, ICacheManager cacheManager)
+		public PageRoutingMiddleware(ILogger<PageRoutingMiddleware> logger, Context context, Application application, IPageManager pageManager, ISiteManager siteManager, ICacheManager cacheManager)
 		{
 			this.Logger = logger;
 			this.Context = context;
+			this.Application = application;
 			this.PageManager = pageManager;
 			this.SiteManager = siteManager;
 			this.CacheManager = cacheManager;
@@ -60,38 +62,29 @@ namespace Nucleus.Core.Layout
 					}
 					else
 					{
-						Logger.LogTrace("Page id {pageid} found.", pageId);
+						Logger.LogTrace("Page id '{pageid}' found.", pageId);
 						this.Context.Site = await this.SiteManager.Get(this.Context.Page);
 					}
 				}
 				else
 				{
-					Logger.LogTrace("Page id not {pageid} found.", pageId);
+					Logger.LogTrace("Page id '{pageid}' not found.", pageId);
 				}
 			}
 			else
 			{
-				Logger.LogTrace("Matching site by host {host} and pathbase {pathbase}.", context.Request.Host, context.Request.PathBase);
+				if (await SkipSiteDetection(context))
+				{
+					Logger.LogTrace("Skipped site detection for '{request}'.", context.Request.Path);
 
-				try
-				{
-					this.Context.Site = await this.SiteManager.Get(context.Request.Host, context.Request.PathBase);
+					this.Context.Site = null;
+					await next(context);
+					return;
 				}
-				catch 
-				{
-					if (context.Request.Path.Value == "/" + Nucleus.Abstractions.RoutingConstants.ERROR_ROUTE_PATH)
-					{
-						// Special case.  If an error occurs trying to read page data for the error page, then it is most likely a database connection error.  Suppress the exception
-						// so that the error handler (Nucleus.Web.Controllers.Error) can handle the original error.
-						this.Context.Site = null;
-						await next(context);
-						return;
-					}
-					else
-					{
-						throw;
-					}
-				}
+
+				Logger.LogTrace("Matching site by host '{host}' and pathbase '{pathbase}'.", context.Request.Host, context.Request.PathBase);
+
+				this.Context.Site = await this.SiteManager.Get(context.Request.Host, context.Request.PathBase);				
 
 				if (this.Context.Site == null)
 				{
@@ -117,8 +110,8 @@ namespace Nucleus.Core.Layout
 				{
 					string localPath = System.Web.HttpUtility.UrlDecode(context.Request.Path);
 
-					Logger.LogTrace("Using site {siteid}.", this.Context.Site.Id);
-					Logger.LogTrace("Lookup page by path {path}.", localPath);
+					Logger.LogTrace("Using site '{siteid}'.", this.Context.Site.Id);
+					Logger.LogTrace("Lookup page by path '{path}'.", localPath);
 					this.Context.Page = await this.PageManager.Get(this.Context.Site, localPath);
 
 					string partPath = localPath;
@@ -156,23 +149,61 @@ namespace Nucleus.Core.Layout
 					{
 						if (this.Context.Page.Disabled)
 						{
-							Logger.LogTrace("Page id {pageid} is disabled.", pageId);
+							Logger.LogTrace("Page id '{pageid}' is disabled.", pageId);
 							this.Context.Page = null;
 						}
 						else
 						{
-							Logger.LogTrace("Page found: {pageid}.", this.Context.Page.Id);
+							Logger.LogTrace("Page found: '{pageid}'.", this.Context.Page.Id);
 						}
 					}
 					else
 					{
-						Logger.LogTrace("Path {path} is not a page.", localPath);
+						Logger.LogTrace("Path '{path}' is not a page.", localPath);
 					}
 				}
 			}
 
 			await next(context);
-			
+
+		}
+
+		/// <summary>
+		/// Gets whether to skip site detection
+		/// </summary>
+		/// <returns></returns>
+		/// <remarks>
+		/// Skip attempt to identify the current site when the http request is for:					
+		///  - The setup wizard.  This is mainly to avoid a database connection error before the wizard can do 
+		///		 configuration checks and report problems to the user.
+		///  - The error controller. If an error occurs trying to read page data for the error page, then it is most likely a database connection error.
+		///    Suppress the exception so that the error handler (Nucleus.Web.Controllers.Error) can handle the original error and
+		///    report it as a plain-text error.
+		///  - favicon.ico
+		/// </remarks>
+		private async Task<Boolean> SkipSiteDetection(HttpContext context)
+		{
+			if (context.Request.Path.Value.Equals("/favicon.ico", StringComparison.OrdinalIgnoreCase))
+			{
+				return true;
+			}
+
+			if (!this.Application.IsInstalled || (await this.SiteManager.Count() == 0))
+			{
+				return true;
+			}
+
+			if (context.Request.Path.Value.StartsWith("/Setup/SiteWizard", StringComparison.OrdinalIgnoreCase))
+			{
+				return true;
+			}
+
+			if (context.Request.Path.Value.StartsWith("/" + Nucleus.Abstractions.RoutingConstants.ERROR_ROUTE_PATH, StringComparison.OrdinalIgnoreCase))
+			{
+				return true;
+			}
+
+			return false;
 		}
 	}
 }

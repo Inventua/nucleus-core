@@ -17,14 +17,14 @@ namespace Nucleus.Core.Services
 	{
 		private IWebHostEnvironment WebHostEnvironment { get; }
 		private Nucleus.Abstractions.Models.Configuration.FolderOptions FolderOptions { get; }
-		private Nucleus.Abstractions.Models.Configuration.DatabaseOptions DatabaseOptions {get;}
+		private Nucleus.Abstractions.Models.Configuration.DatabaseOptions DatabaseOptions { get; }
 		private IServiceProvider ServiceProvider { get; }
 
 		/// <summary>
 		/// Constructor used by dependency injection.
 		/// </summary>
 		public Preflight(IWebHostEnvironment webHostEnvironment, IServiceProvider serviceProvider, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions, IOptions<Nucleus.Abstractions.Models.Configuration.DatabaseOptions> databaseOptions)
-		{			
+		{
 			this.WebHostEnvironment = webHostEnvironment;
 			this.ServiceProvider = serviceProvider;
 			this.FolderOptions = folderOptions.Value;
@@ -39,14 +39,11 @@ namespace Nucleus.Core.Services
 		{
 			IPreflight.ValidationResults results = new();
 
-			// check permissions on standard aspnet paths
-			results.Add(CheckFolder("FOLDER-CONTENTROOT", this.WebHostEnvironment.ContentRootPath));
-
 			// check permissions on log, cache folders
 			results.Add(CheckFolder("FOLDER-DATA", this.FolderOptions.DataFolder));
-			results.Add(CheckFolder("FOLDER-LOGS", this.FolderOptions.GetLogFolder()));
-			results.Add(CheckFolder("FOLDER-CACHE", this.FolderOptions.GetCacheFolder()));
-			results.Add(CheckFolder("FOLDER-TEMP", this.FolderOptions.GetTempFolder()));
+			results.Add(CheckFolder("FOLDER-LOGS", this.FolderOptions.GetLogFolder(false)));
+			results.Add(CheckFolder("FOLDER-CACHE", this.FolderOptions.GetCacheFolder(false)));
+			results.Add(CheckFolder("FOLDER-TEMP", this.FolderOptions.GetTempFolder(false)));
 
 			// check database connection
 			results.AddRange(CheckDatabaseConnections());
@@ -58,7 +55,8 @@ namespace Nucleus.Core.Services
 		{
 			return $"{System.Environment.UserDomainName}/{System.Environment.UserName}";
 		}
-				private IPreflight.ValidationResult CheckFolder(string code, string path)
+
+		private IPreflight.ValidationResult CheckFolder(string code, string path)
 		{
 			Boolean folderExists;
 			// ensure that the folder exists / create it
@@ -86,7 +84,7 @@ namespace Nucleus.Core.Services
 			// check read/write/delete
 			try
 			{
-				System.IO.File.WriteAllText(System.IO.Path.Combine(path, "permissions-test.txt"), "ABCDEFG");				
+				System.IO.File.WriteAllText(System.IO.Path.Combine(path, "permissions-test.txt"), "ABCDEFG");
 			}
 			catch (Exception ex)
 			{
@@ -102,7 +100,7 @@ namespace Nucleus.Core.Services
 				return new IPreflight.ValidationResult(code, IPreflight.Status.Error, $"Unable to delete file 'permissions-test.txt' from folder '{path}': [user: {GetUserName()}]: {ex.Message}");
 			}
 
-			return new IPreflight.ValidationResult(code, IPreflight.Status.OK, $"Folder '{path}' OK.");
+			return new IPreflight.ValidationResult(code, IPreflight.Status.OK, $"Read, Write and Delete permissions for folder '{path}' OK.");
 		}
 
 		public IEnumerable<IPreflight.ValidationResult> CheckDatabaseConnections()
@@ -110,16 +108,17 @@ namespace Nucleus.Core.Services
 			IEnumerable<Nucleus.Data.Common.DataProvider> dataProviders = this.ServiceProvider.GetServices<Nucleus.Data.Common.DataProvider>();
 			List<IPreflight.ValidationResult> results = new();
 
-			foreach (Nucleus.Data.Common.DataProvider dataProvider in dataProviders.DistinctBy(provider=>provider.GetDatabaseKey()))
+			foreach (Nucleus.Data.Common.DataProvider dataProvider in dataProviders.DistinctBy(provider => provider.GetDatabaseKey()))
 			{
 				try
 				{
-					results.Add(new IPreflight.ValidationResult("DATABASE", IPreflight.Status.OK, $"Connected to database {dataProvider.GetDatabaseKey()}."));
+					dataProvider.CheckConnection();
+					results.Add(new IPreflight.ValidationResult("DATABASE", IPreflight.Status.OK, $"Connected to database {dataProvider.GetDatabaseKey()} OK."));
 				}
 				catch (Exception ex)
 				{
-					results.Add(new IPreflight.ValidationResult("DATABASE", IPreflight.Status.Error, $"Unable to connect to database '{dataProvider.GetDatabaseKey()}': {ex.Message}"));
-				}				
+					results.Add(new IPreflight.ValidationResult("DATABASE", IPreflight.Status.Error, $"Unable to connect to database '{dataProvider.GetDatabaseKey()}': {ex.Message} {ex.InnerException?.Message}"));
+				}
 			}
 
 			return results;

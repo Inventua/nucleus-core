@@ -90,7 +90,15 @@ namespace Nucleus.Core.Logging
 
 				if (String.IsNullOrEmpty(options.Path))
 				{
-					options.Path = this.FolderOptions.Value.GetLogFolder();
+					try
+					{
+						options.Path = this.FolderOptions.Value.GetLogFolder();
+					}
+					catch (System.UnauthorizedAccessException)
+					{
+						// if there's a permissions error on the data/log file path, set the text file logger to disabled
+						options.Enabled = false;
+					}
 				}
 			}
 		}

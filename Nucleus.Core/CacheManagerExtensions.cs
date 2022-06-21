@@ -22,7 +22,9 @@ namespace Nucleus.Core
 		public static CacheCollection<Guid, Role> RoleCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, Role>(); }
 		public static CacheCollection<Guid, UserSession> SessionCache(this ICacheManager cacheManager) { return cacheManager.Get<Guid, UserSession>(); }
 
-		public static CacheCollection<Guid, Site> SiteCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, Site>(); } 
+		public static CacheCollection<Guid, Site> SiteCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, Site>(); }
+		public static CacheCollection<string, Site> SiteDetectCache(this ICacheManager cacheManager) { return cacheManager.Get<string, Site>(); }
+
 		public static CacheCollection<Guid, User> UserCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, User>(); } 
 		public static CacheCollection<Guid, MailTemplate> MailTemplateCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, MailTemplate>(); } 
 

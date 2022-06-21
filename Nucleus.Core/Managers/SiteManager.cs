@@ -22,6 +22,8 @@ namespace Nucleus.Core.Managers
 		private ICacheManager CacheManager { get; }
 		private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
 
+		private long _siteCount = -1;
+
 		public SiteManager(IDataProviderFactory dataProviderFactory, ICacheManager cacheManager, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
 		{
 			this.CacheManager = cacheManager;
@@ -64,24 +66,25 @@ namespace Nucleus.Core.Managers
 		/// Retrieve an existing <see cref="Site"/> from the database which has a <see cref="SiteAlias"/> which matches the specified 
 		/// requestUri and pathBase.
 		/// </summary>
-		/// <param name="id"></param>
+		/// <param name="requestUri"></param>
+		/// <param name="pathBase"></param>
 		/// <returns></returns>
 		public async Task<Site> Get(Microsoft.AspNetCore.Http.HostString requestUri, string pathBase)
 		{
-			//string siteDetectCacheKey = (requestUri + "^" + pathBase).ToLower();
-
-			//return this.CacheManager.SiteDetectCache().Get(siteDetectCacheKey, id =>
-			//{
+			string siteDetectCacheKey = (requestUri + "^" + pathBase).ToLower();
+						
+			return await this.CacheManager.SiteDetectCache().GetAsync(siteDetectCacheKey, async siteDetectCacheKey =>
+			{
 				using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 				{
 					Guid siteId = await provider.DetectSite(requestUri, pathBase);
 					if (siteId == Guid.Empty)
 					{
-						return null;
+						return default(Site);
 					}
 					return await this.Get(siteId);
 				}
-			//});
+			});
 		}
 
 		/// <summary>
@@ -103,8 +106,14 @@ namespace Nucleus.Core.Managers
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
 				await provider.DeleteSite(site);
-				this.CacheManager.SiteCache().Remove(site.Id);				
+				this.CacheManager.SiteCache().Remove(site.Id);
+				ResetSiteCount();
 			}
+		}
+
+		private void ResetSiteCount()
+		{
+			_siteCount = -1;
 		}
 
 		/// <summary>
@@ -239,10 +248,14 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		public async Task<long> Count()
 		{
-			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+			if (_siteCount < 0)
 			{
-				return await provider.CountSites();
+				using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+				{
+					_siteCount = await provider.CountSites();
+				}
 			}
+			return _siteCount;
 		}
 
 		/// <summary>
@@ -272,7 +285,8 @@ namespace Nucleus.Core.Managers
 			{
 				await provider.SaveSite(site);
 				this.CacheManager.SiteCache().Remove(site.Id);
-				
+				this.CacheManager.SiteDetectCache().Clear();
+				ResetSiteCount();
 			}
 		}
 
@@ -286,10 +300,10 @@ namespace Nucleus.Core.Managers
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
 				await provider.SaveSiteAlias(site.Id, siteAlias);
-				this.CacheManager.SiteCache().Remove(site.Id);				
+				this.CacheManager.SiteCache().Remove(site.Id);
+				this.CacheManager.SiteDetectCache().Clear();
 			}
 		}
-
 
 		/// <summary>
 		/// Delete the specified <see cref="SiteAlias"/> from the database.
@@ -302,7 +316,6 @@ namespace Nucleus.Core.Managers
 			{
 				await provider.DeleteSiteAlias(site.Id, id);
 				this.CacheManager.SiteCache().Remove(site.Id);
-
 			}
 		}
 
@@ -572,7 +585,7 @@ namespace Nucleus.Core.Managers
 			// can't set the DefaultSiteAlias on add.  Same for roles, they aren't added until after the site has been created.
 			// So we need to call .Save again in order to do an update, to set the default alias and system roles.
 			await this.Save(template.Site);
-
+			
 			return template.Site;
 		}
 

@@ -376,3 +376,4 @@ Setup/Extensions/
 Setup/Extensions/*.*
 Nucleus.Core.Modules/**/*.zip
 Nucleus.Special.Modules/**/*.zip
+/Nucleus.Web/Setup/install-log.config

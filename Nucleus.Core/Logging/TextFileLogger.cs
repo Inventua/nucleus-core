@@ -23,13 +23,12 @@ namespace Nucleus.Core.Logging
 		private string Category { get; }
 		private const int LOG_FILE_RETENTION_DAYS = 7;
 
-		//private readonly static object syncObj = new();
 		private TextFileLoggingProvider Provider { get; }
 		private TextFileLoggerOptions Options { get; }
 		private IExternalScopeProvider ScopeProvider { get; set; }
 		private System.Collections.Concurrent.ConcurrentQueue<string> Queue { get; } = new();
-		private SemaphoreSlim FileAccessSemaphore { get; } = new(1);
-		
+		private static SemaphoreSlim _fileAccessSemaphore { get; } = new(1);
+
 		public TextFileLogger(TextFileLoggingProvider Provider, TextFileLoggerOptions Options, IExternalScopeProvider scopeProvider, string Category)
 		{
 			this.Provider = Provider;
@@ -49,35 +48,27 @@ namespace Nucleus.Core.Logging
 
 			if (IsEnabled(logLevel))
 			{
-				try
-				{
-					message = FormatMessage(logLevel, eventId, state, exception, formatter);
+				message = FormatMessage(logLevel, eventId, state, exception, formatter);
 
+				if (_fileAccessSemaphore.CurrentCount > 0)
+				{
 					try
 					{
-						if (this.FileAccessSemaphore.CurrentCount > 0)
-						{
-							this.FileAccessSemaphore.Wait();
+						_fileAccessSemaphore.Wait();
 
-							string queuedMessage;
-
-							while (this.Queue.TryDequeue(out queuedMessage))
-							{
-								WriteMessage(queuedMessage);
-							}
-						}
-						else
+						while (this.Queue.TryDequeue(out string queuedMessage))
 						{
-							this.Queue.Enqueue(message);
+							WriteMessage(queuedMessage);
 						}
 					}
 					finally
 					{
-						this.FileAccessSemaphore.Release();
+						_fileAccessSemaphore.Release();
 					}
 				}
-				catch (Exception)
+				else
 				{
+					this.Queue.Enqueue(message);					
 				}
 			}
 		}

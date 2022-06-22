@@ -201,7 +201,7 @@ namespace Nucleus.Core.Layout
 				return true;
 			}
 
-			if (!this.Application.IsInstalled || (await this.SiteManager.Count() == 0))
+			if (!this.Application.IsInstalled && await this.SiteManager.Count() == 0)
 			{
 				return true;
 			}

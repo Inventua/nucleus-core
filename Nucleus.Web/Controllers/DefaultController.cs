@@ -54,7 +54,7 @@ namespace Nucleus.Web.Controllers
 			if (this.Context.Site == null && this.Context.Page == null)
 			{
 				//if (await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0)
-				if (!this.Application.IsInstalled || (await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0))
+				if ((!this.Application.IsInstalled && (await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0)) || (await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0))
 				{
 					return RedirectToAction("Index", "SiteWizard", new { area = "Setup" });
 				}
@@ -128,6 +128,24 @@ namespace Nucleus.Web.Controllers
 			}
 
 			return View(this.Context.Page.LayoutPath(this.Context.Site), viewModel);
+		}
+
+		private async Task<Boolean> RedirectToInstallWizard()
+    {
+			// if the wizard hasn't run AND there are no sites AND no system administrators, run the wizard
+			if (!this.Application.IsInstalled && await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0)
+			{
+				return true;
+      }
+
+			// if nucleus thinks that the wizard HAS run but there are no sites AND no system administrators, run the wizard.  The logic here
+			// is repeated from the previous case because this.Application.IsInstalled returns quickly and this function is called frequently.
+			if (await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0)
+      {
+				return true;
+      }
+
+			return false;
 		}
 
 		/// <summary>

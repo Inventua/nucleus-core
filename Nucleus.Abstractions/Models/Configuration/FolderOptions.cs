@@ -273,7 +273,6 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <summary>
 		/// Gets the data storage folder location for log files.
 		/// </summary>
-		/// <remarks>
 		/// <param name="subFolder"/>
 		/// <remarks>
 		/// If the folder does not exist, it is created.

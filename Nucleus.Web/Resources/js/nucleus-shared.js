@@ -625,7 +625,7 @@ function _Page()
 			}
 			message = '<ul>' + messages.join('') + '</ul>';
 		}
-		
+
 		var dialogMarkup = jQuery(
 			'<div class="modal fade" id="' + DIALOG_ID + '" tabindex="-1" aria-label="' + title + '">' +
 			'  <div class="modal-dialog modal-dialog-centered modal-lg">' +
@@ -634,7 +634,7 @@ function _Page()
 			'        <h5 class="modal-title">' + title + '</h5>' +
 			'        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="' + cancelCaption + '"></button>' +
 			'      </div>' +
-			'      <div class="modal-body">' + message + '</div>' +
+			'      <div class="modal-body">' + message.replace(new RegExp('\n', 'g'), '<br/>') + '</div>' +
 			'      <div class="modal-footer">' +
 			okButton +
 			'        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">' + cancelCaption + '</button>' +

@@ -55,32 +55,53 @@
 
 					@if (Model.Role.Id != Guid.Empty)
 					{
-						<input type="submit" class="btn btn-danger" value="Delete Role" formaction="@Url.AreaAction("DeleteRole", "Roles", "Admin")" data-confirm="Delete this role?" />
+						var prompt = "";
+						if (Model.Users.Items.Any())
+						{
+							prompt = "Deleting this role will automatically remove any user-role assignments and permissions which apply to the role.\n\nDo you want to delete this role?";
+						}
+						else
+						{
+							prompt = "This role has no users assigned. Deleting this role will automatically remove any permissions which apply to the role.\n\nDo you want to delete this role?";
+						}
+
+						<input type="submit" class="btn btn-danger" value="Delete Role" formaction="@Url.AreaAction("DeleteRole", "Roles", "Admin")" data-confirm="@prompt" />
 					}
+				</div>
+			}
+			
+			@if (Model.Role.Type.HasFlag(Role.RoleType.System) || Model.Role.Type.HasFlag(Role.RoleType.Restricted))
+			{
+				<div class="alert alert-warning">
+					@if (Model.Role.Type.HasFlag(Role.RoleType.System))
+					{
+						<div>This is a system role.  You can't change any settings for this role.</div>
+					}
+
+					@if (Model.Role.Type.HasFlag(Role.RoleType.Restricted))
+					{
+						<div>This is a restricted role.  You can't add or remove users from this role.</div>
+					}
+				</div>
+			}			
+		}
+	</TabPanel>
+
+	@if (!Model.Role.Type.HasFlag(Role.RoleType.Restricted))
+	{
+		<TabPanel id="role-users">
+			@if (Model.Users?.Items?.Any() == true)
+			{
+				<div class="nucleus-role-users">
+					@await Html.PartialAsync("_UsersList", Model)
 				</div>
 			}
 			else
 			{
-				<div class="alert alert-warning">
-					This is a system role.  You can't change any settings for this role.
+				<div class="alert alert-info">
+					There are no users in this role.
 				</div>
 			}
-
-			@if (Model.Role.Type.HasFlag(Role.RoleType.Restricted))
-			{
-				<div class="alert alert-warning">
-					This is a restricted role.  You can't add or remove users from this role.
-				</div>
-			}
-		}
-	</TabPanel>
-
-	@if (!Model.Role.Type.HasFlag(Role.RoleType.Restricted) && Model.Users?.Items?.Any() == true)
-	{
-		<TabPanel id="role-users">
-			<div class="nucleus-role-users">
-				@await Html.PartialAsync("_UsersList", Model)			
-			</div>
 		</TabPanel>
 	}
 </TabContent>

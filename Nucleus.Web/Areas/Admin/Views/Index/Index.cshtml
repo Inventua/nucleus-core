@@ -38,45 +38,20 @@
 				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("System", "System", "~/Admin/System/Index", "Y", "&#xe871;", "SystemIcon"))
 				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Pages", "Pages", "~/Admin/Pages/Index", "P", "&#xef42;", "PagesIcon"))
 				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Manage", "Manage", "~/Admin/Manage/Index", "M", "&#xf02e;", "ManageIcon"))
-@*
-				<li data-target=".nucleus-adminpage" class="PagesIcon">
-					<a title="Pages" class="Pages" href="@Url.Content("~/Admin/Pages/Index")" accesskey="P"><span>&#xef42;</span></a>
-					<span class="Label">Pages</span>
-				</li>
-				<li data-target=".nucleus-adminpage" class="ManageIcon">
-					<a title="Manage" class="Manage" href="@Url.Content("~/Admin/Manage/Index")" accesskey="M"><span>&#xf02e;</span></a>
-					<span class="Label">Manage</span>
-				</li>*@
 			}
 			@if (Model.IsSystemAdministrator)
 			{
 				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Extensions", "Extensions", "~/Admin/Extensions/Index", "E", "&#xe87b;", "ExtensionsIcon"))
 				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Settings", "Settings", "~/Admin/Settings/Index", "S", "&#xe8b8;", "SettingsIcon"))
-@*
-				<li data-target=".nucleus-adminpage" class="ExtensionsIcon">
-					<a title="Extensions" class="Extensions" href="@Url.Content("~/Admin/Extensions/Index")" accesskey="E"><span>&#xe87b;</span></a>
-					<span class="Label">Extensions</span>
-				</li>
-				<li data-target=".nucleus-adminpage" class="SettingsIcon">
-					<a title="Settings" class="Settings" href="@Url.Content("~/Admin/Settings/Index")" accesskey="S"><span>&#xe8b8;</span></a>
-					<span class="Label">Settings</span>
-				</li>*@
 			}
 
-			@if (Model.CanEdit)
+			@if (Model.CanEditPage)
 			{
 				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-page-btn", "Edit Page", "Edit Page", "~/Admin/Pages/Editor" + "?id=" + @Model.CurrentPage.Id + "&mode=Single", "E", "&#xef42;", "nucleus-control-panel-sidebar-bottom"))
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-content-btn", "Edit Content", "Edit Content", "~/Admin/Settings/Index", "S", "&#xe3c9;", "nucleus-control-panel-sidebar-bottom" + (Model.IsEditMode ? "-active" : "")))
-
-				//<li id="nucleus-edit-page-btn" class="nucleus-control-panel-sidebar-bottom" data-target=".nucleus-adminpage">
-				//	<a title="Edit Page" class="EditPageButton" href="@Url.Content("~/Admin/Pages/Editor")?id=@Model.CurrentPage.Id&mode=Single"><span>&#xef42;</span></a>
-				//	<span class="Label">Edit Page Settings</span>
-				//</li>
-
-				//<li id="nucleus-edit-content-btn" class="nucleus-control-panel-sidebar-bottom@(Model.IsEditMode ? "-active" : "")">
-				//	<a title="Edit Content" href="@Url.Content("~/Admin/Settings/Index")"><span>&#xe3c9;</span></a>
-				//	<span class="Label">Edit Content</span>
-				//</li>
+			}
+			@if (Model.CanEditContent)
+			{
+				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-content-btn", "Edit Content", "Edit Content", "~/Admin/Settings/Index", "S", "&#xe3c9;", "nucleus-control-panel-sidebar-bottom nucleus-control-panel-sidebar-bottom" + (Model.IsEditMode ? "-active" : "")))
 			}
 		</ul>
 

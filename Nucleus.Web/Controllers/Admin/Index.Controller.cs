@@ -50,8 +50,9 @@ namespace Nucleus.Web.Controllers.Admin
 			// We pass the page Id in to the admin request as a query string element.
 			Page page = await this.PageManager.Get(pageId);
 
-			viewModel.CanEdit = ControllerContext.HttpContext.User.CanEditContent(this.Context.Site, page);
-			viewModel.IsEditMode = (viewModel.CanEdit && ControllerContext.HttpContext.User.IsEditing(ControllerContext.HttpContext));
+			viewModel.CanEditPage = ControllerContext.HttpContext.User.HasEditPermission(this.Context.Site, page);
+			viewModel.CanEditContent = ControllerContext.HttpContext.User.CanEditContent(this.Context.Site, page);
+			viewModel.IsEditMode = (viewModel.CanEditContent && ControllerContext.HttpContext.User.IsEditing(ControllerContext.HttpContext));
 
 			return View("Index", viewModel);
 		}

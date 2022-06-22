@@ -32,7 +32,7 @@
 	<div class="nucleus-adminpage nucleus-admin-content nucleus-settings-frame">
 		@RenderBody()
 	</div>
-	<modal id="PopupDialog" title="Settings"></modal>
+	<modal id="nucleus-popupdialog" title="Settings"></modal>
 	
 	<script type="text/javascript">
 		jQuery(Page).on("ready.admin", _handleContentLoaded);
@@ -54,7 +54,8 @@
 
 		function _initializePopup()
 		{
-			// If the content contains a heading caption, and we are in an iframe, set the iframe title to its content.  InitFrame will automatically set the modal's caption to the iframe title.
+			// If the content contains a heading caption, and we are in an iframe, set the iframe title to its content.  
+			// InitFrame will automatically set the modal's caption to the iframe title.
 			if (window.frameElement)
 			{
 				var heading = jQuery('.nucleus-modal-caption').first();
@@ -65,7 +66,7 @@
 				}
 			}
 
-			// Set the target of forms to form.parent() for the module edit view 'save' button, controller methods generally return no content.
+			// Set the target of forms to form.parent() if data-target is not already specifed for the form.
 			jQuery('form').each(function (index, element)
 			{
 				element = jQuery(element);

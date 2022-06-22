@@ -22,7 +22,7 @@
 			{
 				@Html.LinkButton("&#xe5c4;", "Back", @Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = Model.Folder.Parent.Id }), new { @data_target = ".nucleus-adminpage", @class = "btn btn-secondary" })
 			}
-			@Html.AreaActionLink("Create Folder", "ShowCreateFolderDialog", "FileSystem", "Admin", new { folderId = Model.Folder.Id }, new { @class = "btn btn-secondary", @data_target = "#PopupDialog .modal-body" })
+			@Html.AreaActionLink("Create Folder", "ShowCreateFolderDialog", "FileSystem", "Admin", new { folderId = Model.Folder.Id }, new { @class = "btn btn-secondary", @data_target = "#nucleus-popupdialog .modal-body" })
 			@if (Model.Folder.Capabilities.CanStoreFiles)
 			{
 				<div class="FileBrowser BrowseFile btn btn-secondary">
@@ -38,13 +38,13 @@
 			}
 			@if (Model.EnableDelete)
 			{
-				@Html.SubmitButton("", "Delete", @Url.AreaAction("ShowDeleteDialog", "FileSystem", "Admin"), new { @data_target = "#PopupDialog .modal-body", @class = "btn btn-danger" })
+				@Html.SubmitButton("", "Delete", @Url.AreaAction("ShowDeleteDialog", "FileSystem", "Admin"), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-danger" })
 			}
 			@if (Model.EnableRename)
 			{
-				@Html.SubmitButton("", "Rename", @Url.AreaAction("ShowRenameDialog", "FileSystem", "Admin"), new { @data_target = "#PopupDialog .modal-body", @class = "btn btn-secondary" })
+				@Html.SubmitButton("", "Rename", @Url.AreaAction("ShowRenameDialog", "FileSystem", "Admin"), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary" })
 			}
-			@Html.SubmitButton("&#xe897;", "Folder Settings", @Url.AreaAction("EditFolderSettings", "FileSystem", "Admin", new { folderId = Model.Folder.Id }), new { @data_target = "#PopupDialog .modal-body", @class = "btn btn-secondary" })
+			@Html.SubmitButton("&#xe897;", "Folder Settings", @Url.AreaAction("EditFolderSettings", "FileSystem", "Admin", new { folderId = Model.Folder.Id }), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary" })
 		</div>
 
 		<div>

@@ -31,7 +31,7 @@ namespace Nucleus.Core.Managers
 			return $"{typeof(TKey).FullName} {typeof(TModel).FullName}";
 		}
 
-		private CacheCollection<TKey, TModel> Add<TKey, TModel>() where TModel : class
+		private CacheCollection<TKey, TModel> Add<TKey, TModel>(string configItemName) where TModel : class
 		{
 
 			if (!this.Caches.ContainsKey(CacheKey<TKey, TModel>()))
@@ -41,7 +41,8 @@ namespace Nucleus.Core.Managers
 					if (!this.Caches.ContainsKey(CacheKey<TKey, TModel>()))
 					{
 						CacheOption options = new();
-						this.Configuration.GetSection($"{CacheOption.Section}:{typeof(TModel).Name}Cache").Bind(options, binderOptions => binderOptions.BindNonPublicProperties = true);
+						//this.Configuration.GetSection($"{CacheOption.Section}:{typeof(TModel).Name}Cache").Bind(options, binderOptions => binderOptions.BindNonPublicProperties = true);
+						this.Configuration.GetSection($"{CacheOption.Section}:{configItemName}").Bind(options, binderOptions => binderOptions.BindNonPublicProperties = true);
 
 						CacheCollection<TKey, TModel> result = new(options);
 						this.Caches.Add(CacheKey<TKey, TModel>(), result);
@@ -53,7 +54,7 @@ namespace Nucleus.Core.Managers
 			return this.Caches[CacheKey<TKey, TModel>()] as CacheCollection<TKey, TModel>;
 		}
 
-		public CacheCollection<TKey, TModel> Get<TKey, TModel>() where TModel : class
+		public CacheCollection<TKey, TModel> Get<TKey, TModel>([System.Runtime.CompilerServices.CallerMemberName] string caller = "") where TModel : class
 		{
 			if (this.Caches.TryGetValue(CacheKey<TKey, TModel>(), out ICacheCollection result))
 			{
@@ -63,7 +64,7 @@ namespace Nucleus.Core.Managers
 				}
 			}
 
-			return Add<TKey, TModel>();
+			return Add<TKey, TModel>(caller);
 		}
 
 		public void Collect()

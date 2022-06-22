@@ -28,7 +28,7 @@ namespace Nucleus.Abstractions.Managers
 		/// Cache options for the specified entity are automatically read from configuration.  The configuration file key is 
 		/// Nucleus:CacheOptions:[EntityType.Name]Cache
 		/// </remarks>
-		public CacheCollection<TKey, TModel> Get<TKey, TModel>() where TModel : class;
+		public CacheCollection<TKey, TModel> Get<TKey, TModel>([System.Runtime.CompilerServices.CallerMemberName] string caller = "") where TModel : class;
 
 		/// <summary>
 		/// Remove expired items from all caches.

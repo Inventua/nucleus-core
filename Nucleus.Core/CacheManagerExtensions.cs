@@ -15,7 +15,9 @@ namespace Nucleus.Core
 	public static class CacheManagerExtensions
 	{
 		public static CacheCollection<string, PageMenu> PageMenuCache (this ICacheManager cacheManager)  { return cacheManager.Get<string, PageMenu>(); } 
-		public static CacheCollection<Guid, Page> PageCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, Page>(); } 
+		public static CacheCollection<Guid, Page> PageCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, Page>(); }
+		public static CacheCollection<string, Page> PageRouteCache(this ICacheManager cacheManager) { return cacheManager.Get<string, Page>(); }
+
 		public static CacheCollection<Guid, PageModule> PageModuleCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, PageModule>(); } 
 		public static CacheCollection<Guid, RoleGroup> RoleGroupCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, RoleGroup>(); } 
 		

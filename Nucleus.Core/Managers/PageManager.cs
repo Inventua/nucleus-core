@@ -77,25 +77,60 @@ namespace Nucleus.Core.Managers
 				path = path[0..^1];
 			}
 
-			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
-			{
-				Guid pageId = await provider.FindPage(site, path);
+			return await FindPage(site, path);
+			//using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+			//{
+			//	Guid pageId = await provider.FindPage(site, path);
 
-				if (pageId == Guid.Empty && String.IsNullOrEmpty(path))
-				{
-					// treat empty local path as "/"
-					pageId = await provider.FindPage(site, "/");
-				}
+			//	if (pageId == Guid.Empty && String.IsNullOrEmpty(path))
+			//	{
+			//		// treat empty local path as "/"
+			//		pageId = await provider.FindPage(site, "/");
+			//	}
 				
-				if (pageId == Guid.Empty)
+			//	if (pageId == Guid.Empty)
+			//	{
+			//		return null;
+			//	}
+			//	else
+			//	{
+			//		return await Get(pageId);
+			//	}
+			//}
+		}
+
+		/// <summary>
+		/// Return the page matching the specified path, utilizing the cache.  Return null if there is no match.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		private async Task<Page> FindPage(Site site, string path)
+		{
+			string pagePathCacheKey = (site.Id.ToString() + "^" + path).ToLower();
+
+			return await this.CacheManager.PageRouteCache().GetAsync(pagePathCacheKey, async pagePathCacheKey =>
+			{
+				using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 				{
-					return null;
+					Guid pageId = await provider.FindPage(site, path);
+
+					if (pageId == Guid.Empty && String.IsNullOrEmpty(path))
+					{
+						// treat empty local path as "/"
+						pageId = await provider.FindPage(site, "/");
+					}
+
+					if (pageId == Guid.Empty)
+					{
+						return null;
+					}
+					else
+					{
+						return await Get(pageId);
+					}
 				}
-				else
-				{
-					return await Get(pageId);
-				}
-			}
+			});			
 		}
 
 		/// <summary>
@@ -149,10 +184,12 @@ namespace Nucleus.Core.Managers
 
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
-				await provider.DeletePage(page);
-				this.CacheManager.PageCache().Remove(page.Id);
-				this.CacheManager.PageMenuCache().Clear();
+				await provider.DeletePage(page);				
 			}
+
+			this.CacheManager.PageCache().Remove(page.Id);
+			this.CacheManager.PageMenuCache().Clear();
+			this.CacheManager.PageRouteCache().Clear();
 		}
 
 		/// <summary>
@@ -294,9 +331,11 @@ namespace Nucleus.Core.Managers
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
 				await provider.SavePage(site, page);
-				this.CacheManager.PageCache().Remove(page.Id);
-				this.CacheManager.PageMenuCache().Clear();
 			}
+
+			this.CacheManager.PageCache().Remove(page.Id);
+			this.CacheManager.PageMenuCache().Clear();
+			this.CacheManager.PageRouteCache().Clear();
 		}
 
 		/// <summary>

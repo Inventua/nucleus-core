@@ -2,11 +2,15 @@
 {
   jQuery.fn.HtmlEditor = function (conf)
   {
-    tinymce.EditorManager.remove();
-
+    
     // For every element passed to the plug-in
     return this.each(function (index, value)
     {
+      if (tinymce.activeEditor !== null && !document.body.contains(tinymce.activeEditor.getElement()))
+      {
+        tinymce.EditorManager.remove();
+      }
+
       var htmlEditor = tinymce.init({
         target: value,
         height: '100%',

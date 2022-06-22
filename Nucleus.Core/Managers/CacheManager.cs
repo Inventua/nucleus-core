@@ -54,7 +54,7 @@ namespace Nucleus.Core.Managers
 			return this.Caches[CacheKey<TKey, TModel>()] as CacheCollection<TKey, TModel>;
 		}
 
-		public CacheCollection<TKey, TModel> Get<TKey, TModel>([System.Runtime.CompilerServices.CallerMemberName] string caller = "") where TModel : class
+		public CacheCollection<TKey, TModel> Get<TKey, TModel>([System.Runtime.CompilerServices.CallerMemberName] string caller = "Default") where TModel : class
 		{
 			if (this.Caches.TryGetValue(CacheKey<TKey, TModel>(), out ICacheCollection result))
 			{

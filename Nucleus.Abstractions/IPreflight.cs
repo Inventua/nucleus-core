@@ -85,6 +85,7 @@ namespace Nucleus.Abstractions
 			/// <summary>
 			/// Constructor
 			/// </summary>
+			/// <param name="code"></param>
 			/// <param name="status"></param>
 			/// <param name="message"></param>
 			public ValidationResult(string code, Status status, string message)

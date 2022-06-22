@@ -11,6 +11,9 @@ namespace Nucleus.Data.Common
 	/// </summary>
 	public class ConnectionException : System.Data.Common.DbException
 	{
+		/// <summary>
+		/// Database connection object which caused the exception.
+		/// </summary>
 		public System.Data.Common.DbConnection Connection { get; }
 
 		/// <summary>

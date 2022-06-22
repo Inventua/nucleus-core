@@ -28,6 +28,14 @@ namespace Nucleus.Core.Layout
 
 		private ICacheManager CacheManager { get; }
 
+		private static readonly string[] KNOWN_NON_PAGE_PATHS =
+		{
+			Nucleus.Abstractions.RoutingConstants.API_ROUTE_PATH,
+			Nucleus.Abstractions.RoutingConstants.EXTENSIONS_ROUTE_PATH,
+			Nucleus.Abstractions.RoutingConstants.SITEMAP_ROUTE_PATH,
+			Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH,
+		};
+
 		public PageRoutingMiddleware(ILogger<PageRoutingMiddleware> logger, Context context, Application application, IPageManager pageManager, ISiteManager siteManager, ICacheManager cacheManager)
 		{
 			this.Logger = logger;
@@ -111,36 +119,40 @@ namespace Nucleus.Core.Layout
 					string localPath = System.Web.HttpUtility.UrlDecode(context.Request.Path);
 
 					Logger.LogTrace("Using site '{siteid}'.", this.Context.Site.Id);
-					Logger.LogTrace("Lookup page by path '{path}'.", localPath);
-					this.Context.Page = await this.PageManager.Get(this.Context.Site, localPath);
 
-					string partPath = localPath;
-					string parameters = "";
-
-					while (this.Context.Page == null && !String.IsNullOrEmpty(partPath))
+					if (!SkipPageDetection(context))
 					{
-						int lastIndexOfSeparator = partPath.LastIndexOf('/');
-						string nextParameterPart = partPath[(lastIndexOfSeparator + 1)..];
-						if (nextParameterPart.Length > 0)
-						{
-							if (!String.IsNullOrEmpty(parameters))
-							{
-								parameters = nextParameterPart + "/" + parameters;
-							}
-							else
-							{
-								parameters = nextParameterPart;
-							}
-						}
+						Logger.LogTrace("Lookup page by path '{path}'.", localPath);
+						this.Context.Page = await this.PageManager.Get(this.Context.Site, localPath);
 
-						partPath = partPath.Substring(0, lastIndexOfSeparator);
+						string partPath = localPath;
+						string parameters = "";
 
-						if (!String.IsNullOrEmpty(partPath))
+						while (this.Context.Page == null && !String.IsNullOrEmpty(partPath))
 						{
-							this.Context.Page = await this.PageManager.Get(this.Context.Site, partPath);
-							if (this.Context.Page != null)
+							int lastIndexOfSeparator = partPath.LastIndexOf('/');
+							string nextParameterPart = partPath[(lastIndexOfSeparator + 1)..];
+							if (nextParameterPart.Length > 0)
 							{
-								this.Context.LocalPath = new(parameters);
+								if (!String.IsNullOrEmpty(parameters))
+								{
+									parameters = nextParameterPart + "/" + parameters;
+								}
+								else
+								{
+									parameters = nextParameterPart;
+								}
+							}
+
+							partPath = partPath.Substring(0, lastIndexOfSeparator);
+
+							if (!String.IsNullOrEmpty(partPath))
+							{
+								this.Context.Page = await this.PageManager.Get(this.Context.Site, partPath);
+								if (this.Context.Page != null)
+								{
+									this.Context.LocalPath = new(parameters);
+								}
 							}
 						}
 					}
@@ -183,6 +195,7 @@ namespace Nucleus.Core.Layout
 		/// </remarks>
 		private async Task<Boolean> SkipSiteDetection(HttpContext context)
 		{
+			// Browsers often send a request for /favicon.ico even when the page doesn't specify an icon
 			if (context.Request.Path.Value.Equals("/favicon.ico", StringComparison.OrdinalIgnoreCase))
 			{
 				return true;
@@ -201,6 +214,38 @@ namespace Nucleus.Core.Layout
 			if (context.Request.Path.Value.StartsWith("/" + Nucleus.Abstractions.RoutingConstants.ERROR_ROUTE_PATH, StringComparison.OrdinalIgnoreCase))
 			{
 				return true;
+			}
+
+			return false;
+		}
+
+
+		/// <summary>
+		/// Gets whether to skip page detection
+		/// </summary>
+		/// <returns></returns>
+		/// <remarks>
+		/// Skip attempt to identify the current page when the http request is for:					
+		///  - A file
+		/// </remarks>
+		private Boolean SkipPageDetection(HttpContext context)
+		{
+			if (context.Request.Path.HasValue && context.Request.Path != "/")
+			{
+				// skip page detection when the request is for a known reserved path.
+				foreach (string knownPath in KNOWN_NON_PAGE_PATHS)
+				{
+					if (context.Request.Path.StartsWithSegments("/" + knownPath))
+					{
+						return true;
+					}
+				}
+				//// skip page detection when the request is for a known reserved path.  The Substring[1..] is to skip the leading "/" which
+				//// is always present.
+				//if (KNOWN_NON_PAGE_PATHS.Contains(context.Request.Path.Value[1..], StringComparer.OrdinalIgnoreCase))
+				//{
+				//	return true;
+				//}
 			}
 
 			return false;

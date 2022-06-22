@@ -3,7 +3,7 @@ using System;
 
 namespace Nucleus.Modules.Publish.Models
 {
-	public class Category
+	public class Category : ModelBase
 	{
 		public Guid Id { get; set; }
 		public Guid ArticleId { get; set; }

@@ -58,14 +58,14 @@
 						var prompt = "";
 						if (Model.Users.Items.Any())
 						{
-							prompt = "Deleting this role will automatically remove any user-role assignments and permissions which apply to the role.\n\nDo you want to delete this role?";
+							prompt = "This role has one or more users assigned. Deleting this role will automatically remove any user-role assignments and permissions which apply to the role.\n\nDo you want to delete this role?";
 						}
 						else
 						{
 							prompt = "This role has no users assigned. Deleting this role will automatically remove any permissions which apply to the role.\n\nDo you want to delete this role?";
 						}
 
-						<input type="submit" class="btn btn-danger" value="Delete Role" formaction="@Url.AreaAction("DeleteRole", "Roles", "Admin")" data-confirm="@prompt" />
+						<input type="submit" class="btn btn-danger" value="Delete Role" formaction="@Url.AreaAction("DeleteRole", "Roles", "Admin")" data-confirm="@prompt" data-confirm-title="Delete Role" />
 					}
 				</div>
 			}

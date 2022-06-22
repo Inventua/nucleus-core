@@ -100,5 +100,23 @@
     "inputFiles": [
       "Resources/Libraries/HtmlEditors/tinymce/Nucleus/tinymce.HtmlEditor.js"
     ]
+  },
+  {
+    "outputFileName": "Resources/Libraries/HtmlEditors/tinymce/Nucleus/content.min.css",
+    "inputFiles": [
+      "Resources/Libraries/HtmlEditors/tinymce/Nucleus/content.css"
+    ]
+  },
+  {
+    "outputFileName": "Resources/Libraries/HtmlEditors/tinymce/Nucleus/tinymce.images.min.js",
+    "inputFiles": [
+      "Resources/Libraries/HtmlEditors/tinymce/Nucleus/tinymce.images.js"
+    ]
+  },
+  {
+    "outputFileName": "Resources/Libraries/HtmlEditors/tinymce/Nucleus/tinymce.pages.min.js",
+    "inputFiles": [
+      "Resources/Libraries/HtmlEditors/tinymce/Nucleus/tinymce.pages.js"
+    ]
   }
 ]

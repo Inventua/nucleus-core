@@ -148,7 +148,7 @@
 				<fieldset role="group" aria-labelledby="heading">
 					<h2>Modules on this page</h2>
 					<div class="nucleus-form-tools">
-						<input type="submit" formaction="@Url.AreaAction("AddModule", "Pages", "Admin")" value="Add Module" data-target="#PopupDialog .modal-body" class="btn btn-secondary" />
+						<input type="submit" formaction="@Url.AreaAction("AddModule", "Pages", "Admin")" value="Add Module" data-target="#nucleus-popupdialog .modal-body" class="btn btn-secondary" />
 					</div>
 					<div id="pageeditor_pagemodules">
 						@await Html.PartialAsync("_PageModules.cshtml", Model)

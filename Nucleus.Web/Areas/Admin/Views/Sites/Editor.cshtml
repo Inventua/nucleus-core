@@ -167,7 +167,7 @@
 			<TabPanel id="site-aliases">
 				<h2>Aliases</h2>
 				<div class="nucleus-form-tools">
-					<input type="submit" formaction="@Url.AreaAction("AddAlias", "Sites", "Admin")" value="Add Alias" data-target="#PopupDialog .modal-body" class="btn btn-secondary" />
+					<input type="submit" formaction="@Url.AreaAction("AddAlias", "Sites", "Admin")" value="Add Alias" data-target="#nucleus-popupdialog .modal-body" class="btn btn-secondary" />
 				</div>
 				<div id="AliasList">
 					@await Html.PartialAsync("_AliasList.cshtml", Model)
@@ -178,7 +178,7 @@
 				<h2>User Profile Properties</h2>
 
 				<div class="nucleus-form-tools">
-					<input type="submit" formaction="@Url.AreaAction("AddUserProfileProperty", "Sites", "Admin")" value="Add Property" data-target="#PopupDialog .modal-body" class="btn btn-secondary" />
+					<input type="submit" formaction="@Url.AreaAction("AddUserProfileProperty", "Sites", "Admin")" value="Add Property" data-target="#nucleus-popupdialog .modal-body" class="btn btn-secondary" />
 				</div>
 				<div id="UserProfilePropertiesList">
 					@await Html.PartialAsync("_UserProfilePropertiesList.cshtml", Model)

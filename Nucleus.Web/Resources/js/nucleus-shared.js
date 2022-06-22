@@ -179,7 +179,7 @@ function _Page()
 			jQuery('.PopupMenu').fadeOut();
 		});
 
-		jQuery(Page).trigger("ready", [Page]);
+		jQuery(Page).trigger("ready", [{ page: Page }]);
 	});
 
 	function _handleAutoPostBack(event)
@@ -387,7 +387,7 @@ function _Page()
 		if (typeof (event.originalEvent) !== 'undefined' && typeof (event.originalEvent.submitter) !== 'undefined' && typeof (jQuery(event.originalEvent.submitter).attr('data-confirm')) !== 'undefined')
 		{
 			// submit form after confirmation
-			if (!_confirm(jQuery(event.originalEvent.submitter).attr('data-confirm'), function () { action.call(this); }))
+			if (!_confirm(jQuery(event.originalEvent.submitter).attr('data-confirm'), jQuery(event.originalEvent.submitter).attr('data-confirm-title'), function () { action.call(this); }))
 			{
 				// confirm function returned false to indicate that dialog plugin is not available, submit form with no confirmation
 				action.call(this);
@@ -491,9 +491,13 @@ function _Page()
 		return false;
 	}
 
-	function _confirm(message, action)
+	function _confirm(message, title, action)
 	{
-		_dialog('Confirm', message, 'Ok', 'Cancel', action);
+		if (typeof (title) === 'undefined' || title === '')
+		{
+			title = 'Confirm';
+		}
+		_dialog(title, message, 'question', 'Ok', 'Cancel', action);
 		return true;
 	}
 
@@ -584,7 +588,7 @@ function _Page()
 			errorData.statusCode = request.status;
 		}
 
-		_dialog(errorData.title, errorData.detail)
+		_dialog(errorData.title, errorData.detail, 'error')
 	}
 
 	function _getElementIndex(items, id)
@@ -595,7 +599,7 @@ function _Page()
     }
 	}
 
-	function _dialog(title, message, okCaption, cancelCaption, action)
+	function _dialog(title, message, icon, okCaption, cancelCaption, action)
 	{
 		var DIALOG_ID = 'nucleus-dialog';
 
@@ -608,6 +612,27 @@ function _Page()
 		if (typeof (action) !== 'undefined')
 		{
 			okButton = '<button type="button" class="btn btn-primary" data-bs-dismiss="modal">' + okCaption + '</button>';
+		}
+
+		var iconElement = '';
+		var iconClass = '';
+		if (typeof (icon) !== 'undefined')
+		{
+			switch (icon)
+			{
+				case 'question':
+					iconClass = ' icon-question';
+					iconElement = '<div class="dialog-icon"><span class="nucleus-material-icon">&#xe887;</span></div>';
+					break;
+				case 'warning':
+					iconClass = ' icon-warning';
+					iconElement = '<div class="dialog-icon"><span class="nucleus-material-icon">&#xe002;</span></div>';
+					break;
+				case 'error':
+					iconClass = ' icon-error';
+					iconElement = '<div class="dialog-icon"><span class="nucleus-material-icon">&#xe000;</span></div>';
+					break;
+			}
 		}
 
 		// convert array of messages into a list
@@ -627,14 +652,17 @@ function _Page()
 		}
 
 		var dialogMarkup = jQuery(
-			'<div class="modal fade" id="' + DIALOG_ID + '" tabindex="-1" aria-label="' + title + '">' +
+			'<div class="modal fade' + iconClass + '" id="' + DIALOG_ID + '" tabindex="-1" aria-label="' + title + '">' +
 			'  <div class="modal-dialog modal-dialog-centered modal-lg">' +
 			'    <div class="modal-content">' +
 			'      <div class="modal-header">' +
 			'        <h5 class="modal-title">' + title + '</h5>' +
 			'        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="' + cancelCaption + '"></button>' +
 			'      </div>' +
-			'      <div class="modal-body">' + message.replace(new RegExp('\n', 'g'), '<br/>') + '</div>' +
+			'      <div class="modal-body">' +
+			iconElement +
+			'        <div class="dialog-message">' + message.replace(new RegExp('\n', 'g'), '<br/>') + '</div>' +
+			'      </div>' +
 			'      <div class="modal-footer">' +
 			okButton +
 			'        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">' + cancelCaption + '</button>' +
@@ -698,7 +726,7 @@ function _Page()
 		}
 
 		_postRender(target, source, data, status, request);
-		jQuery(Page).trigger("ready", [Page, target, data, url, event, status, request]);
+		jQuery(Page).trigger("ready", [{ page: Page, target: target, data: data, url: url, event: event, status: status, request: request }]);
 		_initializeControls(target, data, status, request);
 	}
 

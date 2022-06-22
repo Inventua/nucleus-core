@@ -31,8 +31,8 @@ else
 				<tr>
 					<td>@(String.IsNullOrEmpty(module.Title) ? "-" : module.Title)</td>
 					<td>@module.ModuleDefinition.FriendlyName</td>
-					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("EditModule", "Pages", "Admin")?mid=@module.Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-outline-secondary" title="Edit" data-target="#PopupDialog .modal-body" /></td>
-					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("EditModuleCommonSettings", "Pages", "Admin")?mid=@module.Id" value="&#xe8b8;" title="Settings" class="nucleus-material-icon btn btn-outline-secondary" data-target="#PopupDialog .modal-body" /></td>
+					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("EditModule", "Pages", "Admin")?mid=@module.Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-outline-secondary" title="Edit" data-target="#nucleus-popupdialog .modal-body" /></td>
+					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("EditModuleCommonSettings", "Pages", "Admin")?mid=@module.Id" value="&#xe8b8;" title="Settings" class="nucleus-material-icon btn btn-outline-secondary" data-target="#nucleus-popupdialog .modal-body" /></td>
 					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("DeleteModule", "Pages", "Admin")?mid=@module.Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target="#pageeditor_pagemodules" data-confirm="Delete this module?" /></td>
 					<td class="nucleus-small-cell">
 						@if (count != 0)

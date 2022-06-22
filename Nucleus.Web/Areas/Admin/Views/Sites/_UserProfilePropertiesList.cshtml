@@ -20,7 +20,7 @@
 			<tr>
 				<td>@prop.Name</td>
 				<td>@(prop.TypeUri ?? "")</td>
-				<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("EditUserProfileProperty", "Sites", "Admin")?id=@prop.Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-secondary" data-target="#PopupDialog .modal-body" /></td>
+				<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("EditUserProfileProperty", "Sites", "Admin")?id=@prop.Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-secondary" data-target="#nucleus-popupdialog .modal-body" /></td>
 				<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("DeleteUserProfileProperty", "Sites", "Admin")?id=@prop.Id" value="&#xe14c;" title="Delete user profile property" class="nucleus-material-icon btn btn-danger" data-target="#UserProfilePropertiesList" data-confirm="This will delete the '@prop.Name' user property so that it no longer appears on user data input forms, but it will not remove data from existing users.  Delete this property?" /></td>
 				<td class="nucleus-small-cell">
 					@if (count != 0)

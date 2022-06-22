@@ -151,9 +151,13 @@ a *
   width: auto;
 }
 
+.modal-body
+{
+  display: flex;  
+}
+
 .modal-auto-size .modal-body
 {
-  display: flex;
   flex-direction: column;
   justify-content: stretch;
 }
@@ -161,6 +165,34 @@ a *
 .modal-auto-size .modal-content
 {
   min-height: 90%;
+}
+
+.modal-dialog .dialog-icon
+{
+   font-size: 5rem;
+  flex-grow: 1;
+  margin-right: 1rem;
+  line-height: normal;
+}
+
+.modal.icon-error .modal-dialog .dialog-icon 
+{
+  color: #ec1111;
+}
+
+.modal.icon-warning .modal-dialog .dialog-icon 
+{
+  color: #f9b512;
+}
+
+.modal.icon-question .modal-dialog .dialog-icon 
+{
+  color: #0d6efd; 
+}
+
+.modal-dialog .dialog-message
+{
+  flex-grow: 5;
 }
 
 /*  Indeterminate progress bar, for use with bootstrap progress class*/

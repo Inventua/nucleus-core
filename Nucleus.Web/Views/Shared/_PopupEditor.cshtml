@@ -43,10 +43,10 @@
 			_initializePopup();
 		});
 
-		function _handleContentLoaded(event, page, target, data, url, triggerEvent, status, request)
+		function _handleContentLoaded(e, args)
 		{
 			// initialize popup after partial content update
-			if (data !== '')
+			if (args.data !== '')
 			{
 				_initializePopup();
 			}

@@ -7,16 +7,16 @@ jQuery(Page).on("ready.admin", _handleContentLoaded);
 
 var navstack = [];
 
-function _handleContentLoaded(event, page, target, data, url, triggerEvent, status, request)
+function _handleContentLoaded(e, args)
 {
 	var form;
 
-	if (target === null || typeof (target) === 'undefined')
+	if (args.target === null || typeof (args.target) === 'undefined')
 	{
-		target = jQuery(document);
+		args.target = jQuery(document);
 	}
 
-	if (data === '' && target.parents('.nucleus-control-panel-content').length !== 0)
+	if (args.data === '' && args.target.parents('.nucleus-control-panel-content').length !== 0)
 	{
 		// if we received an empty response, close the slide-out
 		window.parent.document.dispatchEvent(new CustomEvent('ExpandAdminFrame', { detail: { expand: false } }));
@@ -25,17 +25,17 @@ function _handleContentLoaded(event, page, target, data, url, triggerEvent, stat
 
 	// Attach module editor forms and form-submit controls _PostPartialContent
 	jQuery(document).off('submit.admin');
-	jQuery(document).on('submit.admin', '.ModuleEditor form, .ModuleEditor form input[type="submit"], .ModuleEditor form button[type="submit"]', page.PostPartialContent);	
+	jQuery(document).on('submit.admin', '.ModuleEditor form, .ModuleEditor form input[type="submit"], .ModuleEditor form button[type="submit"]', args.page.PostPartialContent);	
 
 	// If an editor panel has been populated, hide search results
-	if (target.is('.nucleus-editor-panel'))
+	if (args.target.is('.nucleus-editor-panel'))
 	{
 		jQuery('.nucleus-search-results-wrapper').hide();
 	}
 
 	// If the new content contains a form which which does not have a data-target attribute or the data-target is an empty string, set the data-target to form.parent().  This
 	// allows module edit controls to correctly participate in the admin UI/partial rendering without module developers having to know anything about the admin UI implementation.
-	form = target.find('form');
+	form = args.target.find('form');
 				
 	if (form.length !== 0)
 	{
@@ -116,7 +116,7 @@ function _handleContentLoaded(event, page, target, data, url, triggerEvent, stat
 		navstack.pop();		
 	});
 
-	if (navstack.length !== 0 && navstack[navstack.length - 1] !== url)
+	if (navstack.length !== 0 && navstack[navstack.length - 1] !== args.url)
 	{
 		jQuery('.nucleus-btn-page-back').attr('href', navstack[navstack.length-1]).show();
 	}
@@ -125,37 +125,37 @@ function _handleContentLoaded(event, page, target, data, url, triggerEvent, stat
 		jQuery('.nucleus-btn-page-back').removeAttr('href').hide();
 	}
 
-	if (typeof (url) !== 'undefined' && navstack[navstack.length - 1] !== url)
+	if (typeof (args.url) !== 'undefined' && navstack[navstack.length - 1] !== args.url)
 	{
-		navstack.push(url);
+		navstack.push(args.url);
 	}
 
 	// For clicked items within a list, apply the 'selected' css class to the selected LI, and remove from other LI elements in the parent list
-	if (typeof (triggerEvent) !== 'undefined' && triggerEvent !== null)
+	if (typeof (args.triggerEvent) !== 'undefined' && args.triggerEvent !== null)
 	{
-		jQuery(triggerEvent.currentTarget).parents('ul, ol').find('LI.selected').removeClass('selected');
-		if (jQuery(triggerEvent.currentTarget).is('li'))
+		jQuery(args.triggerEvent.currentTarget).parents('ul, ol').find('LI.selected').removeClass('selected');
+		if (jQuery(args.triggerEvent.currentTarget).is('li'))
 		{
-			jQuery(triggerEvent.currentTarget).addClass('selected');
+			jQuery(args.triggerEvent.currentTarget).addClass('selected');
 		}
 		else
 		{
-			jQuery(triggerEvent.currentTarget).parent('li').addClass('selected');
+			jQuery(args.triggerEvent.currentTarget).parent('li').addClass('selected');
 		}
 
-		if (triggerEvent.currentTarget.scrollIntoView)
+		if (args.triggerEvent.currentTarget.scrollIntoView)
 		{
-			triggerEvent.currentTarget.scrollIntoView({ behavior: 'smooth' });
+			args.triggerEvent.currentTarget.scrollIntoView({ behavior: 'smooth' });
 		}
 	}
 
 	// Handler for the search results 'close' button
-	target.find('.nucleus-btn-close-results').off('click.closeResults');
-	target.find('.nucleus-btn-close-results').on('click.closeResults', function (event) { jQuery(this).parents('.nucleus-search-results').hide();});
+	args.target.find('.nucleus-btn-close-results').off('click.closeResults');
+	args.target.find('.nucleus-btn-close-results').on('click.closeResults', function (event) { jQuery(this).parents('.nucleus-search-results').hide();});
 
 	// initialize plugins
-	if (jQuery().HtmlEditor) { target.find('.HtmlEditorControl').HtmlEditor(); }
-	if (jQuery().ToggleSwitch) { target.find('.ToggleSwitch').ToggleSwitch(); }
-	if (jQuery().PageList) { target.find('.nucleus-page-list').PageList(); }
+	if (jQuery().HtmlEditor) { args.target.find('.HtmlEditorControl').HtmlEditor(); }
+	if (jQuery().ToggleSwitch) { args.target.find('.ToggleSwitch').ToggleSwitch(); }
+	if (jQuery().PageList) { args.target.find('.nucleus-page-list').PageList(); }
 	
 }

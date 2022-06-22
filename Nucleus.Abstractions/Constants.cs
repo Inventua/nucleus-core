@@ -48,10 +48,17 @@ namespace Nucleus.Abstractions
 		/// Root path for the admin route.
 		/// </summary>
 		public const string ADMIN_ROUTE_PATH = "admin";
+
 		/// <summary>
 		/// Root path for the Api route.
 		/// </summary>
 		public const string API_ROUTE_PATH = "api";
+
+		/// <summary>
+		/// Root path for file requests.
+		/// </summary>
+		public const string FILES_ROUTE_PATH = "files";
+
 		/// <summary>
 		/// Root path for the extensions route.
 		/// </summary>

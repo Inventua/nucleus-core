@@ -32,9 +32,27 @@ namespace Nucleus.Extensions
 		/// <returns></returns>
 		public static string EncodeFileId(Guid fileId)
 		{
-			return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{fileId}"));
+			return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(fileId.ToString()));
 		}
 
+		/// <summary>
+		/// Return a decoded file path for the specified encoded path.
+		/// </summary>
+		/// <param name="encodedPath"></param>
+		/// <returns></returns>
+		public static Guid DecodeFileId(string encodedPath)
+		{
+			string idString = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedPath));
+
+			if (!Guid.TryParse(idString, out Guid id))
+			{
+				throw new InvalidOperationException($"Encoded path {encodedPath} is not valid.");
+			}
+			else
+			{
+				return id;
+			}
+		}
 		
 	}
 }

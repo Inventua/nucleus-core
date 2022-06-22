@@ -33,7 +33,7 @@ namespace Nucleus.Web.Controllers
 		}
 
 		[HttpGet]
-		[Route("/files/{providerKey}/{path}")]
+		[Route("/" + Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH + "/{providerKey}/{path}")]
 		public async Task<ActionResult> Index(string providerKey, string path, Boolean inline)
 		{
 			this.Logger.LogInformation("File {providerKey}/{path} requested.", providerKey, path);
@@ -60,24 +60,35 @@ namespace Nucleus.Web.Controllers
 		}
 
 		[HttpGet]
-		[Route("/files/{encodedpath}")]
+		[Route("/" + Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH + "/{encodedpath}")]
 		public async Task<ActionResult> Index(string encodedPath, Boolean inline)
 		{
-			string idString;
+			//string idString;
+			Guid fileId;
 
 			this.Logger.LogInformation("File with encoded path {encodedPath} requested.", encodedPath);
 
-			idString = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedPath));
-
-			if (!Guid.TryParse(idString, out Guid id))
+			try
 			{
-				this.Logger.LogInformation("Encoded path {encodedPath} is not valid.", encodedPath);
+				fileId = Nucleus.Extensions.FileExtensions.DecodeFileId(encodedPath);
+			}
+			catch (InvalidOperationException ex)
+			{
+				this.Logger.LogError(ex, "Encoded path {encodedPath} is not valid.", encodedPath);
 				return BadRequest();
 			}
 
+			//idString = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedPath));
+
+			//if (!Guid.TryParse(idString, out Guid id))
+			//{
+			//	this.Logger.LogInformation("Encoded path {encodedPath} is not valid.", encodedPath);
+			//	return BadRequest();
+			//}
+
 			try
 			{
-				File file = await this.FileSystemManager.GetFile(this.Context.Site, id);
+				File file = await this.FileSystemManager.GetFile(this.Context.Site, fileId);
 
 				if (file != null)
 				{
@@ -85,13 +96,13 @@ namespace Nucleus.Web.Controllers
 				}
 				else
 				{
-					this.Logger.LogInformation("File {id} not found.", id);
+					this.Logger.LogInformation("File {id} not found.", fileId);
 					return NotFound();
 				}
 			}
 			catch (System.IO.FileNotFoundException)
 			{
-				this.Logger.LogInformation("File {id} not found.", id);
+				this.Logger.LogInformation("File {id} not found.", fileId);
 				return NotFound();
 			}
 		}

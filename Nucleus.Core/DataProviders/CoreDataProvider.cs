@@ -302,12 +302,12 @@ namespace Nucleus.Core.DataProviders
 
       if (result != null)
       {
-        // Entity framework 5 doesn't correctly order "child" collections so we have to do it client-side
+        // Entity framework doesn't correctly order "child" collections so we have to do it client-side
         result.Modules = result.Modules.OrderBy(module => module.SortOrder).ToList();
 
         foreach (PageModule module in result.Modules)
         {
-          result.Permissions = await ListPermissions(module.Id, PageModule.URN);
+          module.Permissions = await ListPermissions(module.Id, PageModule.URN);
         }
 
         result.IsFirst = await GetFirstPageSortOrder(result.SiteId, result.ParentId) == result.SortOrder;

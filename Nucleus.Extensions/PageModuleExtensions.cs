@@ -28,7 +28,7 @@ namespace Nucleus.Extensions
 		{
 			TagBuilder editControlBuilder = new("button");
 			editControlBuilder.InnerHtml.SetContent(text);
-			editControlBuilder.Attributes.Add("class", "nucleus-material-icon btn btn-secondary");
+			editControlBuilder.Attributes.Add("class", "nucleus-material-icon btn btn-primary");
 			editControlBuilder.Attributes.Add("title", title);
 			editControlBuilder.Attributes.Add("type", "button");
 			editControlBuilder.Attributes.Add("data-frametarget", ".nucleus-modulesettings-frame");

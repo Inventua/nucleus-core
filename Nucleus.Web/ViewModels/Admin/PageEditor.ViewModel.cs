@@ -20,6 +20,7 @@ namespace Nucleus.Web.ViewModels.Admin
 		public string UseLayout { get; set; }
 		public PageEditorModes PageEditorMode { get; set; }
 
+		public Boolean CanDeletePage { get; set; }
 		public Page Page { get; set; } = new Page();
 
 		public IEnumerable<Page> Pages { get; set; }

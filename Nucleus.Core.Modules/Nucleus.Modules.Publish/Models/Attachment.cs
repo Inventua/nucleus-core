@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Publish.Models
 {
-	public class Attachment
+	public class Attachment : ModelBase
 	{
 		public Guid Id { get; set; }
 		public File File { get; set; }

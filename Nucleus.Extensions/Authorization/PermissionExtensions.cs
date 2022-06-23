@@ -185,12 +185,20 @@ namespace Nucleus.Extensions.Authorization
 		public static Boolean IsEditing(this System.Security.Claims.ClaimsPrincipal user, Microsoft.AspNetCore.Http.HttpContext context)
 		{
 			Context nucleusContext = context.RequestServices.GetService<Context>();
-
-			if (user.HasEditPermission(nucleusContext.Site, nucleusContext.Page, nucleusContext.Module))
+							
+			if (user.CanEditContent(nucleusContext.Site, nucleusContext.Page))
 			{
 				return IsEditModeOn(context);
 			}
 
+			if (nucleusContext.Module != null)
+			{
+				if (user.HasEditPermission(nucleusContext.Site, nucleusContext.Page, nucleusContext.Module))
+				{
+					return IsEditModeOn(context);
+				}
+			}
+			
 			return false;
 		}
 
@@ -239,7 +247,7 @@ namespace Nucleus.Extensions.Authorization
 		}
 
 		/// <summary>
-		/// Returns a value specifying whether the user has permission to edit the specified page.
+		/// Returns a value specifying whether the user has permission to edit content in any module on the specified page.
 		/// </summary>
 		/// <param name="user"></param>
 		/// <param name="site"></param>
@@ -425,7 +433,7 @@ namespace Nucleus.Extensions.Authorization
 		}
 
 		/// <summary>
-		/// Returns a true/false value indicating whether the user has edit rights for the module.
+		/// Returns a true/false value indicating whether the user has edit rights for the specified module.
 		/// </summary>
 		/// <param name="user"></param>
 		/// <param name="site"></param>
@@ -438,12 +446,11 @@ namespace Nucleus.Extensions.Authorization
 			{
 				return true;
 			}
-						
+
 			if (moduleInfo.InheritPagePermissions)
 			{
 				foreach (Permission permission in page.Permissions)
 				{
-
 					if (permission.IsPageEditPermission())
 					{
 						if (permission.IsValid(site, user))

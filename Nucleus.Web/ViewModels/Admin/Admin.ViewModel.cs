@@ -11,7 +11,8 @@ namespace Nucleus.Web.ViewModels.Admin
 		public Page CurrentPage { get; set; }
 		public Boolean IsSiteAdmin { get; set; }
 		public Boolean IsSystemAdministrator { get; set; }
-		public Boolean CanEdit { get; set; }
+		public Boolean CanEditPage { get; set; }
+		public Boolean CanEditContent { get; set; }
 		public Boolean IsEditMode { get; set; }
 
 	}

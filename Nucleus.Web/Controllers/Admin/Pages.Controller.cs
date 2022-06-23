@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Hosting;
 using Nucleus.Abstractions.Models.Permissions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nucleus.ViewFeatures;
+using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -75,7 +76,7 @@ namespace Nucleus.Web.Controllers.Admin
 		/// </summary>
 		/// <returns></returns>
 		[HttpGet]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> Editor(Guid id, ViewModels.Admin.PageEditor.PageEditorModes mode)
 		{
 			ViewModels.Admin.PageEditor viewModel;
@@ -99,7 +100,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> DeletePage(ViewModels.Admin.PageEditor viewModel)
 		{
 			await this.PageManager.Delete(viewModel.Page);
@@ -108,7 +109,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> AddPageRoute(ViewModels.Admin.PageEditor viewModel)
 		{
 			viewModel.Page.Routes.Add(new PageRoute());
@@ -128,7 +129,7 @@ namespace Nucleus.Web.Controllers.Admin
 		/// to the database.
 		/// </remarks>
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> DeletePageRoute(ViewModels.Admin.PageEditor viewModel, Guid id)
 		{
 			
@@ -145,7 +146,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> DeletePagePermissionRole(ViewModels.Admin.PageEditor viewModel, Guid id)
 		{
 			viewModel.Page.Permissions = await RebuildPermissions(viewModel.PagePermissions);
@@ -164,27 +165,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
-		public async Task<ActionResult> DeleteModulePermissionRole(ViewModels.Admin.PageEditor viewModel, Guid id)
-		{
-			viewModel.Module.Permissions = await RebuildPermissions(viewModel.ModulePermissions);
-
-			foreach (Permission permission in viewModel.Module.Permissions.ToList())
-			{
-				if (permission.Role.Id == id)
-				{
-					viewModel.Module.Permissions.Remove(permission);
-				}
-			}
-
-			viewModel.ModulePermissions = viewModel.Module.Permissions.ToPermissionsList(this.Context.Site);
-
-			return View("ModuleCommonSettings", await BuildPageViewModel (viewModel.Page, viewModel.Module, viewModel.ModulePermissions, false));
-		}
-
-
-		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> Save(ViewModels.Admin.PageEditor viewModel)
 		{
 			if (!ControllerContext.ModelState.IsValid)
@@ -216,8 +197,26 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 		}
 
+		[HttpPost]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		public async Task<ActionResult> MovePageDown(ViewModels.Admin.PageEditor viewModel, Guid id)
+		{
+			await this.PageManager.MoveDown(this.Context.Site, id);
+
+			return View("Index", await BuildIndexViewModel(id));
+		}
 
 		[HttpPost]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		public async Task<ActionResult> MovePageUp(ViewModels.Admin.PageEditor viewModel, Guid id)
+		{
+			await this.PageManager.MoveUp(this.Context.Site, id);
+
+			return View("Index", await BuildIndexViewModel(id));
+		}
+
+		[HttpPost]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		public async Task<ActionResult> SaveModule(ViewModels.Admin.PageEditor viewModel)
 		{
 			await this.PageModuleManager.Save(viewModel.Page, viewModel.Module);
@@ -225,7 +224,26 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+		public async Task<ActionResult> DeleteModulePermissionRole(ViewModels.Admin.PageEditor viewModel, Guid id)
+		{
+			viewModel.Module.Permissions = await RebuildPermissions(viewModel.ModulePermissions);
+
+			foreach (Permission permission in viewModel.Module.Permissions.ToList())
+			{
+				if (permission.Role.Id == id)
+				{
+					viewModel.Module.Permissions.Remove(permission);
+				}
+			}
+
+			viewModel.ModulePermissions = viewModel.Module.Permissions.ToPermissionsList(this.Context.Site);
+
+			return View("ModuleCommonSettings", await BuildPageViewModel(viewModel.Page, viewModel.Module, viewModel.ModulePermissions, false));
+		}
+
+		[HttpPost]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> AddModule(ViewModels.Admin.PageEditor viewModel)
 		{
 			PageModule module = await this.PageModuleManager.CreateNew(this.Context.Site);
@@ -235,7 +253,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		public async Task<ActionResult> EditModuleCommonSettings(ViewModels.Admin.PageEditor viewModel, Guid mid, ViewModels.Admin.PageEditor.PageEditorModes mode)
 		{
 			PageModule module = await this.PageModuleManager.Get(mid);
@@ -251,7 +269,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpGet]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		public async Task<ActionResult> EditModuleCommonSettings(Guid mid, ViewModels.Admin.PageEditor.PageEditorModes mode)
 		{
 			ViewModels.Admin.PageEditor viewModel;
@@ -271,7 +289,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> CreateModule(ViewModels.Admin.PageEditor viewModel)
 		{
 			if (viewModel.Module.ModuleDefinition == null || viewModel.Module.ModuleDefinition.Id == Guid.Empty)
@@ -295,7 +313,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		public async Task<ActionResult> SaveModuleCommonSettings(ViewModels.Admin.PageEditor viewModel)
 		{
 			if (viewModel.Module.ModuleDefinition == null || viewModel.Module.ModuleDefinition.Id == Guid.Empty)
@@ -341,7 +359,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		public async Task<ActionResult> EditModulePermissions(Guid mid)
 		{
 			ViewModels.Admin.PageEditor viewModel;
@@ -354,7 +372,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		public async Task<ActionResult> AddModulePermissionRole(ViewModels.Admin.PageEditor viewModel, [FromQuery ]Boolean Standalone)
 		{
 			if (viewModel.SelectedModuleRoleId != Guid.Empty)
@@ -378,7 +396,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		public async Task<ActionResult> SaveModulePermissions(ViewModels.Admin.PageEditor viewModel, Guid mid)
 		{
 			PageModule module = await this.PageModuleManager.Get(mid);
@@ -389,26 +407,17 @@ namespace Nucleus.Web.Controllers.Admin
 			return Ok();
 		}
 
-		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
-		public async Task<ActionResult> DeleteModule(ViewModels.Admin.PageEditor viewModel, Guid mid)
-		{
-			await this.PageModuleManager.Delete(mid);
+    [HttpPost]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
+    public async Task<ActionResult> DeleteModule(ViewModels.Admin.PageEditor viewModel, Guid mid)
+    {
+      await this.PageModuleManager.Delete(mid);
 
-			return View("_PageModules", await BuildPageEditorViewModel(viewModel.Page, null, true));
-		}
-
-		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
-		public async Task<ActionResult> DeletePageModule(ViewModels.Admin.PageEditor viewModel, Guid mid)
-		{
-			await this.PageModuleManager.Delete(mid);
-
-			return View("_PageModules", await BuildPageEditorViewModel(viewModel.Page, null, true));		
-		}
+      return View("_PageModules", await BuildPageEditorViewModel(viewModel.Page, null, true));
+    }
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> DeletePageModuleInline(ViewModels.Admin.PageEditor viewModel, Guid mid)
 		{
 			await this.PageModuleManager.Delete(mid);
@@ -417,25 +426,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
-		public async Task<ActionResult> MovePageDown(ViewModels.Admin.PageEditor viewModel, Guid id)
-		{
-			await this.PageManager.MoveDown(this.Context.Site, id);
-
-			return View("Index", await BuildIndexViewModel(id));
-		}
-
-		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
-		public async Task<ActionResult> MovePageUp(ViewModels.Admin.PageEditor viewModel, Guid id)
-		{
-			await this.PageManager.MoveUp(this.Context.Site, id);
-
-			return View("Index", await BuildIndexViewModel(id));
-		}
-
-		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> MoveModuleDown(ViewModels.Admin.PageEditor viewModel, Guid mid )
 		{
 			await this.PageModuleManager.MoveDown(mid);
@@ -446,7 +437,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> MoveModuleUp(ViewModels.Admin.PageEditor viewModel, Guid mid)
 		{
 			await this.PageModuleManager.MoveUp(mid);
@@ -457,7 +448,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> AddPagePermissionRole(ViewModels.Admin.PageEditor viewModel)
 		{			
 			if (viewModel.SelectedPageRoleId != Guid.Empty)
@@ -556,6 +547,7 @@ namespace Nucleus.Web.Controllers.Admin
 			ViewModels.Admin.PageEditor viewModel = new();
 
 			viewModel.Page = page;
+			viewModel.CanDeletePage = User.HasEditPermission(this.Context.Site, viewModel.Page);
 			viewModel.PagePermissions = pagePermissions;
 
 			viewModel.Page.Modules = await this .PageManager.ListModules(viewModel.Page);

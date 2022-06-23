@@ -130,7 +130,7 @@ namespace Nucleus.Web.Controllers.Admin
 		/// </remarks>
 		[HttpPost]
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
-		public async Task<ActionResult> DeletePageRoute(ViewModels.Admin.PageEditor viewModel, Guid id)
+		public async Task<ActionResult> RemovePageRoute(ViewModels.Admin.PageEditor viewModel, Guid id)
 		{
 			
 			foreach (PageRoute route in viewModel.Page.Routes)
@@ -147,7 +147,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 		[HttpPost]
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
-		public async Task<ActionResult> DeletePagePermissionRole(ViewModels.Admin.PageEditor viewModel, Guid id)
+		public async Task<ActionResult> RemovePagePermissionRole(ViewModels.Admin.PageEditor viewModel, Guid id)
 		{
 			viewModel.Page.Permissions = await RebuildPermissions(viewModel.PagePermissions);
 
@@ -225,7 +225,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 		[HttpPost]
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-		public async Task<ActionResult> DeleteModulePermissionRole(ViewModels.Admin.PageEditor viewModel, Guid id)
+		public async Task<ActionResult> RemoveModulePermissionRole(ViewModels.Admin.PageEditor viewModel, Guid id)
 		{
 			viewModel.Module.Permissions = await RebuildPermissions(viewModel.ModulePermissions);
 
@@ -416,6 +416,22 @@ namespace Nucleus.Web.Controllers.Admin
       return View("_PageModules", await BuildPageEditorViewModel(viewModel.Page, null, true));
     }
 
+		[HttpGet]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
+		public ActionResult DeleteModule(Guid mid)
+		{
+			// this action exists to return an error if a user tries to enter the DeleteModule url into their browser
+			return BadRequest();
+		}
+
+		[HttpGet]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
+		public ActionResult DeletePageModuleInline(Guid mid)
+		{
+			// this action exists to return an error if a user tries to enter the DeletePageModuleInline url into their browser
+			return BadRequest();
+		}
+
 		[HttpPost]
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> DeletePageModuleInline(ViewModels.Admin.PageEditor viewModel, Guid mid)
@@ -547,7 +563,6 @@ namespace Nucleus.Web.Controllers.Admin
 			ViewModels.Admin.PageEditor viewModel = new();
 
 			viewModel.Page = page;
-			viewModel.CanDeletePage = User.HasEditPermission(this.Context.Site, viewModel.Page);
 			viewModel.PagePermissions = pagePermissions;
 
 			viewModel.Page.Modules = await this .PageManager.ListModules(viewModel.Page);
@@ -573,6 +588,8 @@ namespace Nucleus.Web.Controllers.Admin
 				await RebuildPermissions(viewModel.PagePermissions);
 			}
 
+			viewModel.CanDeletePage = User.HasEditPermission(this.Context.Site, viewModel.Page);
+			
 			// re-read the selected layout (viewmodel will only contain ID, and we need RelativePath for the call to ListLayoutPanes)
 			if (viewModel.Page.LayoutDefinition != null)
 			{

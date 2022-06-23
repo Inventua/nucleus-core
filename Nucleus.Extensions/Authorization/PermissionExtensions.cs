@@ -395,16 +395,17 @@ namespace Nucleus.Extensions.Authorization
 		/// <returns></returns>
 		public static Boolean HasViewPermission(this System.Security.Claims.ClaimsPrincipal user, Site site, Page page, PageModule moduleInfo)
 		{
+			// system administrators and site administrators always have view permission
 			if (user.IsSystemAdministrator() || user.IsSiteAdmin(site))
 			{
 				return true;
 			}
 
+			// for view permissions checking it is possible for a user to have page view permission but not have view permission for a specific module
 			if (moduleInfo.InheritPagePermissions)
 			{
 				foreach (Permission permission in page.Permissions)
 				{
-
 					if (permission.IsPageViewPermission())
 					{
 						if (permission.IsValid(site, user))
@@ -418,7 +419,6 @@ namespace Nucleus.Extensions.Authorization
 			{
 				foreach (Permission permission in moduleInfo.Permissions)
 				{
-
 					if (permission.IsModuleViewPermission())
 					{
 						if (permission.IsValid(site, user))
@@ -442,29 +442,29 @@ namespace Nucleus.Extensions.Authorization
 		/// <returns></returns>
 		public static Boolean HasEditPermission(this System.Security.Claims.ClaimsPrincipal user, Site site, Page page, PageModule moduleInfo)
 		{
+			// system administrators and site administrators always have edit permission
 			if (user.IsSystemAdministrator() || user.IsSiteAdmin(site))
 			{
 				return true;
 			}
 
-			if (moduleInfo.InheritPagePermissions)
+			// user who have page edit permissions always have module edit permissions for modules on the page
+			foreach (Permission permission in page.Permissions)
 			{
-				foreach (Permission permission in page.Permissions)
+				if (permission.IsPageEditPermission())
 				{
-					if (permission.IsPageEditPermission())
+					if (permission.IsValid(site, user))
 					{
-						if (permission.IsValid(site, user))
-						{
-							return true;
-						}
+						return true;
 					}
 				}
 			}
-			else
+
+			// only check module edit permissions if the module is not inheriting page permissions
+			if (!moduleInfo.InheritPagePermissions)
 			{
 				foreach (Permission permission in moduleInfo.Permissions)
 				{
-
 					if (permission.IsModuleEditPermission())
 					{
 						if (permission.IsValid(site, user))
@@ -507,12 +507,13 @@ namespace Nucleus.Extensions.Authorization
 		/// <returns></returns>
 		public static Boolean HasViewPermission(this System.Security.Claims.ClaimsPrincipal user, Site site, Folder folder)
 		{
+			if (folder == null) return false;
+			
+			// system administrators and site administrators always have view permission
 			if (user.IsSystemAdministrator() || user.IsSiteAdmin(site))
 			{
 				return true;
 			}
-
-			if (folder == null) return false;
 
 			foreach (Permission permission in folder.Permissions)
 			{

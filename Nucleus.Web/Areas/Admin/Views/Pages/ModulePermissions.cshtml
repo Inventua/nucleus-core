@@ -51,7 +51,7 @@
 						</td>
 					}
 
-					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("DeleteModulePermissionRole", "Pages", "Admin", new { id = item.Role.Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target="form.parent()" /></td>
+					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("RemoveModulePermissionRole", "Pages", "Admin", new { id = item.Role.Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Remove" data-target="form.parent()" /></td>
 				</tr>
 			}
 		</table>

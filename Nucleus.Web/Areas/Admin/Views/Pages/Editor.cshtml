@@ -130,7 +130,7 @@
 
 					<td class="ps-1">@Html.DropDownListFor(model => model.Page.Routes[urlCount].Type, Html.GetEnumSelectList<PageRoute.PageRouteTypes>())</td>
 					<td class="text-center">@Html.RadioButtonFor(model => model.Page.DefaultPageRouteId, @Model.Page.Routes[urlCount].Id)</td>
-					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("DeletePageRoute", "Pages", "Admin", new { id = Model.Page.Routes[urlCount].Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target="form.parent()" /></td>
+					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("RemovePageRoute", "Pages", "Admin", new { id = Model.Page.Routes[urlCount].Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Remove" data-target="form.parent()" /></td>
 				</tr>
 					}
 				</table>

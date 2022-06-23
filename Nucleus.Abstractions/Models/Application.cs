@@ -46,7 +46,7 @@ namespace Nucleus.Abstractions.Models
 			System.IO.File.WriteAllText(GetInstallLogPath(),
 				System.Text.Json.JsonSerializer.Serialize(new
 				{
-					InstallDate = DateTime.Now,
+					InstallDate = DateTime.UtcNow,
 					InstallVersion = version
 				}));
 		}

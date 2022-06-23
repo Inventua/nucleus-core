@@ -167,6 +167,7 @@ a *
   min-height: 90%;
 }
 
+/* Nucleus (shared.js:_dialog) css */
 .modal-dialog .dialog-icon
 {
    font-size: 5rem;
@@ -193,6 +194,14 @@ a *
 .modal-dialog .dialog-message
 {
   flex-grow: 5;
+}
+
+/*  Extend bootstrap width classes to provide a "width 1", which is generally used for table cells to specify that the cell should be as small as */
+/*  possible while extending to fit content (table rendering ignores width if the content can't fit) */
+.w-min-fit-content
+{
+  width: 1px;
+  white-space: nowrap;
 }
 
 /*  Indeterminate progress bar, for use with bootstrap progress class*/

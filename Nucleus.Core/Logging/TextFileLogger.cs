@@ -55,6 +55,7 @@ namespace Nucleus.Core.Logging
 					try
 					{
 						_fileAccessSemaphore.Wait();
+						WriteMessage(message);
 
 						while (this.Queue.TryDequeue(out string queuedMessage))
 						{
@@ -81,7 +82,7 @@ namespace Nucleus.Core.Logging
 			// If the log scope contains a <RunningTask>, log message to the scheduled task log file location
 
 			// nullState isn't used for anything here.  The IExternalScopeProvider.ForEachScope method requires a TState & state object which allows
-			// an object to be passed to the callback but we don't need to do that.
+			// an object to be passed to the callback but we don't need a state object.
 			Object nullState = null;
 
 			this.ScopeProvider.ForEachScope<Object>((scope, state) =>

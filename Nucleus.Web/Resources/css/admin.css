@@ -228,7 +228,8 @@ body
 }
 
 /* apply margin-top: auto to the first .nucleus-control-panel-sidebar-bottom in .nucleus-control-panel-sidebar to align it and any following to the bottom*/
-.nucleus-control-panel-sidebar li:not(.nucleus-control-panel-sidebar-bottom) + .nucleus-control-panel-sidebar-bottom
+.nucleus-control-panel-sidebar li:not(.nucleus-control-panel-sidebar-bottom) + .nucleus-control-panel-sidebar-bottom,
+.nucleus-control-panel-sidebar li.nucleus-control-panel-sidebar-bottom:first-child
 {
 	margin-top: auto;
 }

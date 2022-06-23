@@ -160,7 +160,7 @@
 
 	<div class="nucleus-button-panel">
 		<input type="submit" class="btn btn-primary nucleus-dialogresult" value="Save Changes" formaction="@Url.AreaAction("Save", "Pages", "Admin")" />
-		@if (Model.Page.Id != Guid.Empty)
+		@if (Model.Page.Id != Guid.Empty && Model.CanDeletePage)
 		{
 			<input type="submit" class="btn btn-danger" value="Delete Page" formaction="@Url.AreaAction("DeletePage", "Pages", "Admin")" data-confirm="Delete this page?" />
 		}

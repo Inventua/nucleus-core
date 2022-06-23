@@ -109,10 +109,9 @@ namespace Nucleus.Core.Managers
 				List<Permission> originalPermissions = await provider .ListPermissions(module.Id, PageModule.URN);
 
 				await provider.SavePermissions(module.Id, module.Permissions, originalPermissions);
-				this.CacheManager.PageModuleCache().Remove(module.Id);
-				// Modules are cached as part of their parent page, so we have invalidate the cache for the page
-				this.CacheManager.PageCache().Remove(module.PageId);
 			}
+
+			InvalidateCache(module);
 		}
 
 		/// <summary>
@@ -161,10 +160,9 @@ namespace Nucleus.Core.Managers
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
 				await provider.SavePageModule(page.Id, module);
-				this.CacheManager.PageModuleCache().Remove(module.Id);
-				// Modules are cached as part of their parent page, so we have invalidate the cache for the page
-				this.CacheManager.PageCache().Remove(module.PageId);
 			}
+
+			InvalidateCache(module);
 		}
 
 		/// <summary>
@@ -176,11 +174,9 @@ namespace Nucleus.Core.Managers
 			using (DataProviders.ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
 				await provider.SavePageModuleSettings(module.Id, module.ModuleSettings);
-				this.CacheManager.PageModuleCache().Remove(module.Id);
-								
-				// Modules are cached as part of their parent page, so we have invalidate the cache for the page
-				this.CacheManager.PageCache().Remove(module.PageId);
 			}
+
+			InvalidateCache(module);
 		}
 
 		/// <summary>
@@ -257,9 +253,7 @@ namespace Nucleus.Core.Managers
 							await provider.SavePageModule(thisModule.PageId, module);
 
 							this.CacheManager.PageModuleCache().Remove(previousModule.Id);
-							this.CacheManager.PageModuleCache().Remove(module.Id);
-							// Modules are cached as part of their parent page, so we have invalidate the cache for the page
-							this.CacheManager.PageCache().Remove(module.PageId);
+							InvalidateCache(module);
 							break;
 						}
 					}
@@ -301,9 +295,7 @@ namespace Nucleus.Core.Managers
 							await provider.SavePageModule(thisModule.PageId, module);
 							
 							this.CacheManager.PageModuleCache().Remove(previousModule.Id);
-							this.CacheManager.PageModuleCache().Remove(module.Id);
-							// Modules are cached as part of their parent page, so we have invalidate the cache for the page
-							this.CacheManager.PageCache().Remove(thisModule.PageId);
+							InvalidateCache(module);
 							break;
 						}
 					}
@@ -333,11 +325,18 @@ namespace Nucleus.Core.Managers
 					}
 
 					await provider.DeletePageModule(module);
-					this.CacheManager.PageModuleCache().Remove(Id);
-					// Modules are cached as part of their parent page, so we invalidate the cache for the page
-					this.CacheManager.PageCache().Remove(module.PageId);
+
+					InvalidateCache(module);
 				}			
 			}
+		}
+
+		private void InvalidateCache(PageModule module)
+    {
+			this.CacheManager.PageModuleCache().Remove(module.Id);
+			// Modules are cached as part of their parent page, so we have invalidate the cache for the page
+			this.CacheManager.PageCache().Remove(module.PageId);
+			this.CacheManager.PageRouteCache().Clear();
 		}
 	}
 }

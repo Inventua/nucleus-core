@@ -166,7 +166,9 @@
 	  <None Include="bundleconfig.json" />
 	  <None Include="iis-dev\**\*" />
 		<None Include="iis-dev\web.config" />
-		<None Include="Setup\install-log.config" />
+		<None Include="Setup\install-log.config">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="Exists('iis-dev')">

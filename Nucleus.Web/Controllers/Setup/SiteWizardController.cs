@@ -337,7 +337,7 @@ namespace Nucleus.Web.Controllers.Setup
 			ViewModels.Setup.SiteWizard viewModel = await BuildViewModel(new ViewModels.Setup.SiteWizard());
 
 			viewModel.Site.DefaultSiteAlias = new SiteAlias() { Alias = $"{ControllerContext.HttpContext.Request.Host}{ControllerContext.HttpContext.Request.PathBase}" };			
-			if (ControllerContext.HttpContext.Request.Host.Port.HasValue)
+			if (ControllerContext.HttpContext.Request.Host.Port.HasValue && !viewModel.Site.DefaultSiteAlias.Alias.Contains(':'))
 			{
 				viewModel.Site.DefaultSiteAlias.Alias += $":{ControllerContext.HttpContext.Request.Host.Port}";
 			}

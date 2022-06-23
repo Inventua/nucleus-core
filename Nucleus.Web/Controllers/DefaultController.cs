@@ -53,9 +53,8 @@ namespace Nucleus.Web.Controllers
 			// If the site hasn't been set up yet (empty database), redirect to the site wizard.
 			if (this.Context.Site == null && this.Context.Page == null)
 			{
-				//if (await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0)
-				if ((!this.Application.IsInstalled && (await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0)) || (await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0))
-				{
+				if (this.RedirectToSetupWizard())
+				{					
 					return RedirectToAction("Index", "SiteWizard", new { area = "Setup" });
 				}
 			}
@@ -128,6 +127,11 @@ namespace Nucleus.Web.Controllers
 			}
 
 			return View(this.Context.Page.LayoutPath(this.Context.Site), viewModel);
+		}
+
+		private Boolean RedirectToSetupWizard()
+		{
+			return (!this.Application.IsInstalled);
 		}
 
 		private async Task<Boolean> RedirectToInstallWizard()

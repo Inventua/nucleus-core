@@ -35,6 +35,33 @@ namespace Nucleus.Data.Sqlite
 		}
 
 		/// <summary>
+		/// Perform (or retry) pre-configuration checks.
+		/// </summary>
+		/// <returns></returns>
+		public override Boolean PreConfigure()
+		{
+			// Special case for Sqlite - ensure that the folder exists
+			FolderOptions folderOptions = this.FolderOptions.Value;
+
+			Microsoft.Data.Sqlite.SqliteConnection connection = new(folderOptions.Parse(this.DatabaseConnectionOption.ConnectionString));
+
+			try
+			{
+				if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(connection.DataSource)))
+				{
+					System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(connection.DataSource));
+				}
+				return true;
+			}
+			catch (System.UnauthorizedAccessException ex)
+			{
+				// permissions error on the Sqlite database folder.  Ignore here, and allow a database connection error
+				// when Nucleus tries to connect to the database.
+				return false;
+			}
+		}
+
+		/// <summary>
 		/// Configure the DbContextOptionsBuilder for Sqlite
 		/// </summary>
 		/// <param name="options"></param>
@@ -43,24 +70,9 @@ namespace Nucleus.Data.Sqlite
 		{
 			if (this.DatabaseConnectionOption != null)
 			{
-				// Special case for Sqlite - ensure that the folder exists
 				FolderOptions folderOptions = this.FolderOptions.Value;
 
 				Microsoft.Data.Sqlite.SqliteConnection connection = new(folderOptions.Parse(this.DatabaseConnectionOption.ConnectionString));
-
-				try
-				{
-					if (!System.IO.Directory.Exists(System.IO.Path.GetDirectoryName(connection.DataSource)))
-					{
-						System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(connection.DataSource));
-					}
-				}
-				catch (System.UnauthorizedAccessException ex)
-				{
-					// permissions error on the Sqlite database folder.  Ignore here, and allow a database connection error
-					// when Nucleus tries to connect to the database.
-				}
-
 				options.UseSqlite(connection.ConnectionString);
 
 				return true;

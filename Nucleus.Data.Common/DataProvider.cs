@@ -48,7 +48,7 @@ namespace Nucleus.Data.Common
 		}
 
 		/// <summary>
-		/// Get a "friendly" name for the database.
+		/// Get the configuration key for the database.
 		/// </summary>
 		/// <returns></returns>
 		public abstract string GetDatabaseKey();

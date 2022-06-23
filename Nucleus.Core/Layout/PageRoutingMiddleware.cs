@@ -81,7 +81,7 @@ namespace Nucleus.Core.Layout
 			}
 			else
 			{
-				if (await SkipSiteDetection(context))
+				if (SkipSiteDetection(context))
 				{
 					Logger.LogTrace("Skipped site detection for '{request}'.", context.Request.Path);
 
@@ -193,19 +193,14 @@ namespace Nucleus.Core.Layout
 		///    report it as a plain-text error.
 		///  - favicon.ico
 		/// </remarks>
-		private async Task<Boolean> SkipSiteDetection(HttpContext context)
+		private Boolean SkipSiteDetection(HttpContext context)
 		{
 			// Browsers often send a request for /favicon.ico even when the page doesn't specify an icon
 			if (context.Request.Path.Value.Equals("/favicon.ico", StringComparison.OrdinalIgnoreCase))
 			{
 				return true;
 			}
-
-			if (!this.Application.IsInstalled && await this.SiteManager.Count() == 0)
-			{
-				return true;
-			}
-
+					
 			if (context.Request.Path.Value.StartsWith("/Setup/SiteWizard", StringComparison.OrdinalIgnoreCase))
 			{
 				return true;
@@ -216,9 +211,13 @@ namespace Nucleus.Core.Layout
 				return true;
 			}
 
-			return false;
-		}
+			if (!this.Application.IsInstalled)
+			{
+				return true;
+			}
 
+			return false;	
+		}
 
 		/// <summary>
 		/// Gets whether to skip page detection

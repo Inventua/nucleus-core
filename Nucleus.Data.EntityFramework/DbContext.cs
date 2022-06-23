@@ -74,11 +74,12 @@ namespace Nucleus.Data.EntityFramework
 				#if DEBUG
 				warnings.Default(WarningBehavior.Throw);
 				#endif
-				// EF generates this one when we use .FirstOrDefault() or .SingleOrDefault() without an ORDER BY, which we\
+				// EF generates this one when we use .FirstOrDefault() or .SingleOrDefault() without an ORDER BY, which we
 				// do all the time when retrieving a single row by id.
 				warnings.Ignore(CoreEventId.RowLimitingOperationWithoutOrderByWarning);				
 			});
 
+			this.DbContextConfigurator.PreConfigure();
 			this.DbContextConfigurator.Configure(options);
 		}
 

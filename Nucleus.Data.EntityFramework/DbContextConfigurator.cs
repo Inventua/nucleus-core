@@ -41,6 +41,13 @@ namespace Nucleus.Data.EntityFramework
 		public abstract Boolean Configure(DbContextOptionsBuilder options);
 
 		/// <summary>
+		/// Perform (or retry) pre-configuration checks.
+		/// </summary>
+		/// <returns></returns>
+		public virtual Boolean PreConfigure() { return true; }
+
+
+		/// <summary>
 		/// Gets the database connection option for this DbContextConfigurator.
 		/// </summary>
 		public Nucleus.Abstractions.Models.Configuration.DatabaseConnectionOption DatabaseConnectionOption { get; protected set; }

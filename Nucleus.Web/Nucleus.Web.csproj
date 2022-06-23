@@ -47,6 +47,7 @@
 		<Content Remove="bundleconfig.json" />
 		<Content Remove="iis-dev\**\*" />
 		<Content Remove="iis-dev\web.config" />
+		<Content Remove="Setup\install-log.config" />
 		<EmbeddedResource Remove="Extensions\**" />
 		<EmbeddedResource Remove="logs\**" />
 		<EmbeddedResource Remove="publish\**" />
@@ -165,6 +166,7 @@
 	  <None Include="bundleconfig.json" />
 	  <None Include="iis-dev\**\*" />
 		<None Include="iis-dev\web.config" />
+		<None Include="Setup\install-log.config" />
 	</ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="Exists('iis-dev')">

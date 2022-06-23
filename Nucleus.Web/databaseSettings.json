@@ -12,7 +12,7 @@
         {
           "Key": "CoreSqlite",
           "Type": "Sqlite",
-          "ConnectionString": "Data Source={DataFolder}//Data/Nucleus.db"
+          "ConnectionString": "Data Source={DataFolder}/Data/Nucleus.db"
         },
         {
           "Key": "CoreSqlServer",

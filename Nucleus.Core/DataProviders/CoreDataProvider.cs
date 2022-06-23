@@ -440,14 +440,23 @@ namespace Nucleus.Core.DataProviders
         .Select(page => page.ParentId)
         .FirstOrDefaultAsync();
 
-      Boolean isNew = !this.Context.Pages.Where(existing => existing.Id == page.Id).Any();
+      //Boolean isNew = !await this.Context.Pages
+      //  .Where(existing => existing.Id == page.Id)
+      //  .AsNoTracking()
+      //  .AnyAsync();
+      Page existingPage = await this.Context.Pages
+        .Where(existing => existing.Id == page.Id)
+        .Include(existing => existing.Routes)
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
 
       if (page.ParentId == Guid.Empty)
       {
         page.ParentId = null;
       }
 
-      if (isNew)
+      // new record
+      if (existingPage == null)
       {
         page.SortOrder = await GetLastPageSortOrder(site.Id, page.ParentId) + 10;
       }
@@ -458,6 +467,12 @@ namespace Nucleus.Core.DataProviders
           // the user has moved this page to a different parent, reset sort order to prevent collisions
           page.SortOrder = await GetLastPageSortOrder(site.Id, page.ParentId) + 10;
         }
+      }
+
+      // if no default route is selected set the first route as default
+      if (!page.DefaultPageRouteId.HasValue || page.DefaultPageRouteId == Guid.Empty)
+      {
+        page.DefaultPageRouteId = page.Routes.FirstOrDefault()?.Id;
       }
 
       // We need to create a new <Page> CLR object to work with, because EF alters properties when SaveChanges is called, and we want
@@ -472,12 +487,12 @@ namespace Nucleus.Core.DataProviders
       this.Context.Entry(pageClone).Property("LayoutDefinitionId").CurrentValue =
         page.LayoutDefinition == null || page.LayoutDefinition.Id == Guid.Empty ? null : page.LayoutDefinition?.Id;
 
-      this.Context.Entry(pageClone).State = isNew ? EntityState.Added : EntityState.Modified;
+      this.Context.Entry(pageClone).State = (existingPage == null) ? EntityState.Added : EntityState.Modified;
 
       // New pages can't save a default page route, because routes can't be created until the page exists.  So we have to 
       // store the default page route value, save the page, then save the routes, then update the page with the selected default
       // page route
-      if (isNew)
+      if (existingPage == null)
       {
         this.Context.Entry(pageClone).Property("DefaultPageRouteId").CurrentValue = null;
         await this.Context.SaveChangesAsync<Page>();
@@ -489,20 +504,18 @@ namespace Nucleus.Core.DataProviders
       }
 
       this.Context.ChangeTracker.Clear();
-      await SavePageRoutes(site, page);
+      await SavePageRoutes(site, page, existingPage?.Routes);
 
       this.Context.ChangeTracker.Clear();
       await SavePermissions(page.Id, page.Permissions, currentPermissions);
 
-      if (isNew)
+      if (existingPage == null)
       {
+        // new record
         this.Context.Entry(pageClone).Property("DefaultPageRouteId").CurrentValue = page.DefaultPageRouteId;
         this.Context.Update(pageClone);
         await this.Context.SaveChangesAsync<Page>();
-      }
 
-      if (isNew)
-      {
         this.EventManager.RaiseEvent<Page, Create>(page);
       }
       else
@@ -533,39 +546,52 @@ namespace Nucleus.Core.DataProviders
       return lastPage == null ? 0 : lastPage.SortOrder;
     }
 
-    private async Task SavePageRoutes(Site site, Page page)
+    private async Task SavePageRoutes(Site site, Page page, List<PageRoute> originalRoutes)
     {
-      if (page.Routes?.Any() == true)
+      if (page.Routes != null)
       {
-        foreach (PageRoute newPageRoute in page.Routes.ToList())
+        // remove deleted page routes
+        if (originalRoutes != null)
         {
-          if (!newPageRoute.Path.StartsWith('/'))
+          foreach (PageRoute originalPageRoute in originalRoutes.Where(route => !page.Routes.Where(pageRoute => pageRoute.Id == route.Id).Any()))
           {
-            newPageRoute.Path = $"/{newPageRoute.Path}";
+            this.Context.Remove(originalPageRoute);
           }
-
-          PageRoute existingRoute = await this.Context.Set<PageRoute>()
-            .Where(existing => existing.Id == newPageRoute.Id)
-            .FirstOrDefaultAsync();
-
-          if (existingRoute != null)
-          {
-            // route already exists for page
-            existingRoute.Path = newPageRoute.Path;
-            existingRoute.Type = newPageRoute.Type;
-            this.Context.Entry(existingRoute).State = EntityState.Modified;
-          }
-          else
-          {
-            // route does not exist for page
-            this.Context.Set<PageRoute>().Add(newPageRoute);
-            this.Context.Entry(newPageRoute).Property("PageId").CurrentValue = page.Id;
-            this.Context.Entry(newPageRoute).Property("SiteId").CurrentValue = site.Id;
-            this.Context.Entry(newPageRoute).State = EntityState.Added;
-          }
-
-          await this.Context.SaveChangesAsync<PageRoute>();
         }
+
+        // add/update routes
+        if (page.Routes.Any() == true)
+        {
+          foreach (PageRoute newPageRoute in page.Routes.ToList())
+          {
+            if (!newPageRoute.Path.StartsWith('/'))
+            {
+              newPageRoute.Path = $"/{newPageRoute.Path}";
+            }
+
+            PageRoute existingRoute = await this.Context.Set<PageRoute>()
+              .Where(existing => existing.Id == newPageRoute.Id)
+              .FirstOrDefaultAsync();
+
+            if (existingRoute != null)
+            {
+              // route already exists for page
+              existingRoute.Path = newPageRoute.Path;
+              existingRoute.Type = newPageRoute.Type;
+              this.Context.Entry(existingRoute).State = EntityState.Modified;
+            }
+            else
+            {
+              // route does not exist for page
+              this.Context.Set<PageRoute>().Add(newPageRoute);
+              this.Context.Entry(newPageRoute).Property("PageId").CurrentValue = page.Id;
+              this.Context.Entry(newPageRoute).Property("SiteId").CurrentValue = site.Id;
+              this.Context.Entry(newPageRoute).State = EntityState.Added;
+            }
+          }
+        }
+
+        await this.Context.SaveChangesAsync<PageRoute>();
       }
     }
 
@@ -1246,9 +1272,9 @@ namespace Nucleus.Core.DataProviders
     public async Task DeleteRole(Role role)
     {
       using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await this.Context.Database.BeginTransactionAsync();
-      
-      try 
-      { 
+
+      try
+      {
         await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM UserRoles WHERE RoleId={role.Id}");
         await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM Permissions WHERE RoleId={role.Id}");
 
@@ -1257,7 +1283,7 @@ namespace Nucleus.Core.DataProviders
 
         transaction.Commit();
       }
-      catch(Exception)
+      catch (Exception)
       {
         transaction.Rollback();
         throw;

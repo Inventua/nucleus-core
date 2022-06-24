@@ -440,10 +440,6 @@ namespace Nucleus.Core.DataProviders
         .Select(page => page.ParentId)
         .FirstOrDefaultAsync();
 
-      //Boolean isNew = !await this.Context.Pages
-      //  .Where(existing => existing.Id == page.Id)
-      //  .AsNoTracking()
-      //  .AnyAsync();
       Page existingPage = await this.Context.Pages
         .Where(existing => existing.Id == page.Id)
         .Include(existing => existing.Routes)
@@ -491,7 +487,7 @@ namespace Nucleus.Core.DataProviders
 
       // New pages can't save a default page route, because routes can't be created until the page exists.  So we have to 
       // store the default page route value, save the page, then save the routes, then update the page with the selected default
-      // page route
+      // page route (to avoid a database foreign key violation error)
       if (existingPage == null)
       {
         this.Context.Entry(pageClone).Property("DefaultPageRouteId").CurrentValue = null;
@@ -503,12 +499,14 @@ namespace Nucleus.Core.DataProviders
         await this.Context.SaveChangesAsync<Page>();
       }
 
+      // add/update/remove related records
       this.Context.ChangeTracker.Clear();
       await SavePageRoutes(site, page, existingPage?.Routes);
 
       this.Context.ChangeTracker.Clear();
       await SavePermissions(page.Id, page.Permissions, currentPermissions);
 
+      // update default page route & raise events
       if (existingPage == null)
       {
         // new record
@@ -1029,7 +1027,7 @@ namespace Nucleus.Core.DataProviders
       this.Context.ChangeTracker.Clear();
       if (userRoles != null)
       {
-        await SaveRoles(user.Id, userRoles);
+        await SaveUserRoles(user.Id, userRoles);
       }
 
       if (existing == null)
@@ -1043,7 +1041,7 @@ namespace Nucleus.Core.DataProviders
 
     }
 
-    private async Task SaveRoles(Guid userId, List<Role> roles)
+    private async Task SaveUserRoles(Guid userId, List<Role> roles)
     {
       User existing = await this.Context.Users
         .Where(existing => existing.Id == userId)
@@ -1052,6 +1050,18 @@ namespace Nucleus.Core.DataProviders
 
       if (existing != null)
       {
+        // delete removed role assignments
+        foreach (Role existingRole in existing.Roles.ToList())
+        {
+          if (!roles.Where(userRole => userRole.Id == existingRole.Id).Any())
+          {
+            // delete role assignment
+            this.Context.Entry(existing).Collection(user => user.Roles).FindEntry(existingRole).State = EntityState.Deleted;
+            // we don't want to change the actual role data, just the user-role assignment
+            this.Context.Entry(existingRole).State = EntityState.Unchanged;
+          }
+        }
+
         // add new role assignments
         if (roles != null)
         {
@@ -1067,19 +1077,6 @@ namespace Nucleus.Core.DataProviders
 
             }
             // existing role assignments do not need to be updated
-          }
-        }
-
-        // delete removed role assignments
-
-        foreach (Role existingRole in existing.Roles.ToList())
-        {
-          if (!roles.Where(userRole => userRole.Id == existingRole.Id).Any())
-          {
-            // delete role assignment
-            this.Context.Entry(existing).Collection(user => user.Roles).FindEntry(existingRole).State = EntityState.Deleted;
-            // we don't want to change the actual role data, just the user-role assignment
-            this.Context.Entry(existingRole).State = EntityState.Unchanged;
           }
         }
       }
@@ -1405,6 +1402,7 @@ namespace Nucleus.Core.DataProviders
             this.Context.Entry(oldPermission.PermissionType).State = EntityState.Detached;
           }
         }
+
         await this.Context.SaveChangesAsync<Permission>();
       }
 
@@ -1416,7 +1414,7 @@ namespace Nucleus.Core.DataProviders
         if (existing == null)
         {
           newPermission.RelatedId = relatedId;
-          //existingPermissions.Add(newPermission);
+
           this.Context.Set<Permission>().Attach(newPermission);
           this.Context.Entry(newPermission).State = EntityState.Added;
 
@@ -2113,6 +2111,18 @@ namespace Nucleus.Core.DataProviders
 
       if (list.Items != null)
       {
+        // delete removed list items
+        if (existing != null)
+        {
+          foreach (ListItem existingItem in existing.Items.ToList())
+          {
+            if (!list.Items.Where(item => item.Id == existingItem.Id).Any())
+            {
+              this.Context.Remove(existingItem);
+            }
+          }
+        }
+
         // Add new list items and update existing list items
         foreach (ListItem item in list.Items)
         {
@@ -2130,18 +2140,6 @@ namespace Nucleus.Core.DataProviders
             // Add setting
             existing.Items.Add(item);
             this.Context.Entry(item).State = EntityState.Added;
-          }
-        }
-
-        // remove deleted list items
-        if (existing != null)
-        {
-          foreach (ListItem existingItem in existing.Items.ToList())
-          {
-            if (!list.Items.Where(item => item.Id == existingItem.Id).Any())
-            {
-              this.Context.Remove(existingItem);
-            }
           }
         }
       }

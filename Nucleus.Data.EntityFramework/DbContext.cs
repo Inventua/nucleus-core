@@ -68,7 +68,8 @@ namespace Nucleus.Data.EntityFramework
 		protected override void OnConfiguring(DbContextOptionsBuilder options)
 		{
 			options.UseLoggerFactory(this.LoggerFactory);
-			
+			options.AddInterceptors(new ExceptionInterceptor());
+
 			options.ConfigureWarnings(warnings =>
 			{
 				#if DEBUG

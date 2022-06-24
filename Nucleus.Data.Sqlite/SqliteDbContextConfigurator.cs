@@ -9,9 +9,11 @@ using Microsoft.Extensions.Options;
 using Nucleus.Abstractions;
 using Nucleus.Data.Common;
 using Nucleus.Abstractions.Models.Configuration;
+using static SQLitePCL.raw;
+using System.Text.RegularExpressions;
 
 namespace Nucleus.Data.Sqlite
-{	
+{
 	/// <summary>
 	/// DbContext options configuration class for Sqlite
 	/// </summary>
@@ -19,7 +21,6 @@ namespace Nucleus.Data.Sqlite
 	public class SqliteDbContextConfigurator<TDataProvider> : DbContextConfigurator<TDataProvider>
 		where TDataProvider : Nucleus.Data.Common.DataProvider
 	{
-		private IOptions<DatabaseOptions> DatabaseOptions { get; }
 		private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
 
 		/// <summary>
@@ -27,12 +28,11 @@ namespace Nucleus.Data.Sqlite
 		/// </summary>
 		/// <param name="databaseOptions"></param>
 		/// <param name="folderOptions"></param>
-		public SqliteDbContextConfigurator(IOptions<DatabaseOptions> databaseOptions, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
+		public SqliteDbContextConfigurator(IOptions<DatabaseOptions> databaseOptions, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions) : base(databaseOptions)
 		{
-			this.DatabaseOptions = databaseOptions;
 			this.FolderOptions = folderOptions;
-			this.DatabaseConnectionOption = this.DatabaseOptions.Value.GetDatabaseConnection(typeof(TDataProvider).GetDefaultSchemaName());			
 		}
+
 
 		/// <summary>
 		/// Perform (or retry) pre-configuration checks.
@@ -53,7 +53,7 @@ namespace Nucleus.Data.Sqlite
 				}
 				return true;
 			}
-			catch (System.UnauthorizedAccessException ex)
+			catch (System.UnauthorizedAccessException)
 			{
 				// permissions error on the Sqlite database folder.  Ignore here, and allow a database connection error
 				// when Nucleus tries to connect to the database.
@@ -79,6 +79,61 @@ namespace Nucleus.Data.Sqlite
 			}
 
 			return false;
-		}		
+		}
+
+		/// <inheritdoc/>
+		public override void ParseException(DbUpdateException exception)
+		{
+			// This code is inspired by, and uses code from https://github.com/Giorgi/EntityFramework.Exceptions.  https://www.apache.org/licenses/LICENSE-2.0
+
+			if (exception.InnerException is Microsoft.Data.Sqlite.SqliteException)
+			{
+				string message = "";
+
+				Microsoft.Data.Sqlite.SqliteException dbException = exception.InnerException as Microsoft.Data.Sqlite.SqliteException;
+					
+				if (dbException.SqliteErrorCode ==  SQLITE_CONSTRAINT || dbException.SqliteErrorCode == SQLITE_TOOBIG)
+				{
+					switch (dbException.SqliteExtendedErrorCode)
+					{
+						case SQLITE_TOOBIG:
+							// This error is generated when a blob is more than a million bytes.  This would typically be caused by a bug rather than user action, 
+							// so we don't parse them.
+							break;
+						case SQLITE_CONSTRAINT_NOTNULL:
+							message = ParseException(dbException, Messages.NOT_NULL_PATTERN, Messages.NOT_NULL_MESSAGE);
+							break;
+						case SQLITE_CONSTRAINT_UNIQUE:
+							message = ParseException(dbException, Messages.UNIQUE_CONSTRAINT_PATTERN, Messages.UNIQUE_CONSTRAINT_MESSAGE);
+							break;
+						case SQLITE_CONSTRAINT_PRIMARYKEY:
+							// primary key constraint failed errors would typically be caused by a bug rather than user action, so we don't parse them.
+							break;
+						case SQLITE_CONSTRAINT_FOREIGNKEY:
+							// SQLite doesn't provide any useful information in the error message when a foreign key constraint fails, so the parsing for this
+							// isn't very useful - it just generates an exception with message 'FOREIGN KEY constraint failed' .
+							message = ParseException(dbException, Messages.FOREIGN_KEY_PATTERN, Messages.FOREIGN_KEY_MESSAGE);
+							break;
+					};
+
+					if (!String.IsNullOrEmpty(message))
+					{
+						throw new Nucleus.Abstractions.DataProviderException(message, exception);
+					}
+				}
+			}
+		}
+		
+		internal class Messages
+		{
+			internal const string UNIQUE_CONSTRAINT_PATTERN = @"SQLite Error 19: 'UNIQUE constraint failed: (?<columns>.*)'.";
+			internal const string UNIQUE_CONSTRAINT_MESSAGE = @"The combination of {columns} must be unique.";
+
+			internal const string NOT_NULL_PATTERN = @"SQLite Error 19: 'NOT NULL constraint failed: (?<table>.*)\.(?<column>.*)'.";
+			internal const string NOT_NULL_MESSAGE = "The '{column}' field is required.";
+
+			internal const string FOREIGN_KEY_PATTERN = @"SQLite Error 19: 'FOREIGN KEY constraint failed.";
+			internal const string FOREIGN_KEY_MESSAGE = @"FOREIGN KEY constraint failed.";
+		}
 	}
 }

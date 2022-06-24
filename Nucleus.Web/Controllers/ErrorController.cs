@@ -35,11 +35,11 @@ namespace Nucleus.Web.Controllers
 				
 			if (exceptionDetails?.Error != null)
 			{
-				// try to convert database errors to a more friendly message
-				Exception ex = exceptionDetails.Error.Parse();
-
-				data = WrapException(ex);
-
+				//// try to convert database errors to a more friendly message
+				//// This code has been moved to individial database providers which are called by Nucleus.Data.EntityFramework.ExceptionInterceptor
+				//// Exception ex = exceptionDetails.Error.Parse();
+				//// data = WrapException(ex);
+				data = WrapException(exceptionDetails.Error);
 				if (ControllerContext.HttpContext.Request.Headers[Microsoft.Net.Http.Headers.HeaderNames.Accept].ToString().Contains("application/json"))
 				{
 					ControllerContext.HttpContext.Response.ContentType = "application/json";

@@ -22,11 +22,7 @@ namespace Nucleus.Core.DataProviders
 		/// Constructor
 		/// </summary>
 		/// <param name="databaseOptions"></param>
-		/// <param name="folderOptions"></param>
-		public EFToolsDbContextConfigurator()
-		{
-			
-		}
+		public EFToolsDbContextConfigurator(IOptions<Nucleus.Abstractions.Models.Configuration.DatabaseOptions> options) : base(options) { }
 
 		/// <summary>
 		/// Configure the DbContextOptionsBuilder for Sqlite
@@ -38,5 +34,12 @@ namespace Nucleus.Core.DataProviders
 			options.UseSqlite();
 			return true;
 		}
+
+		/// <inheritdoc/>
+		public override void ParseException(DbUpdateException exception)
+		{
+			// no implementation
+		}
+
 	}
 }

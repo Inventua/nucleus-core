@@ -142,7 +142,7 @@ namespace Nucleus.Core.Managers
 			{
 				foreach (ScheduledTaskHistory history in (await provider.ListScheduledTaskHistory(scheduledTask.Id)).OrderByDescending(history=>history.StartDate).Skip(scheduledTask.KeepHistoryCount))
 				{
-					await provider .DeleteScheduledTaskHistory(history);
+					await provider.DeleteScheduledTaskHistory(history);
 				}
 			}
 		}

@@ -1,0 +1,14 @@
+﻿{
+  "schemaName": "Nucleus.Core",
+  "version": "01.00.08",
+  "operations": [
+    {
+      "createIndex": {
+        "name": "IX_ApiKeys_Name",
+        "table": "ApiKeys",
+        "columns": [ "Name" ],
+        "isUnique": true
+      }
+    }
+  ]
+}

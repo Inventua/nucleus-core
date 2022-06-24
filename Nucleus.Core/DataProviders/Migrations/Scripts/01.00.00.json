@@ -1431,7 +1431,7 @@
 				"name": "IX_RoleGroups_SiteId",
 				"table": "RoleGroups",
 				"columns": [ "SiteId" ],
-				"isUnique": true
+				"isUnique": true // This is a mistake (this index should not be unique).  This is corrected in 01.00.07.json
 			}
 		},
 		{

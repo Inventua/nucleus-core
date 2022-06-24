@@ -48,6 +48,12 @@ namespace Nucleus.Extensions
 		private const string SQLITE_FOREIGN_KEY_PATTERN = @"SQLite Error 19: 'FOREIGN KEY constraint failed.";
 		private const string SQLITE_FOREIGN_KEY_MESSAGE = @"SQLite Error 19: 'FOREIGN KEY constraint failed.";
 
+		private const string SQLITE_FOREIGN_KEY_PATTERN_LISTITEMS = @"SQLite Error 19: 'UNIQUE constraint failed: ListItems.ListId, ListItems.Name'.";
+		private const string SQLITE_FOREIGN_KEY_MESSAGE_LISTITEMS = @"One of your list items has a duplicate name. List item names must be unique within the list.";
+
+		private const string SQLITE_UNIQUE_CONSTRAINT_PATTERN = @"SQLite Error 19: 'UNIQUE constraint failed: (?<columns>.*)'.";
+		private const string SQLITE_UNIQUE_CONSTRAINT_MESSAGE = @"The combination of {columns} must be unique.";
+
 		private const string SQLSERVER_FOREIGN_KEY_PATTERN = "the delete statement conflicted .*constraint \"(?<constraint>.*?)\"";
 		private const string SQLSERVER_FOREIGN_KEY_MESSAGE = "{constraint}";
 
@@ -75,7 +81,9 @@ namespace Nucleus.Extensions
 			new() { Pattern = MYSQL_FOREIGN_KEY_PATTERN, Message = MYSQL_FOREIGN_KEY_MESSAGE },
 			new() { Pattern = MYSQL_NOT_NULL_PATTERN, Message = MYSQL_NOT_NULL_MESSAGE },
 			new() { Pattern = POSTGRES_FOREIGN_KEY_PATTERN, Message = POSTGRES_FOREIGN_KEY_MESSAGE },
-			new() { Pattern = POSTGRES_NOT_NULL_PATTERN, Message = POSTGRES_NOT_NULL_MESSAGE }
+			new() { Pattern = POSTGRES_NOT_NULL_PATTERN, Message = POSTGRES_NOT_NULL_MESSAGE },
+			new() { Pattern = SQLITE_FOREIGN_KEY_PATTERN_LISTITEMS, Message = SQLITE_FOREIGN_KEY_MESSAGE_LISTITEMS },
+			new() { Pattern = SQLITE_UNIQUE_CONSTRAINT_PATTERN, Message = SQLITE_UNIQUE_CONSTRAINT_MESSAGE }
 		};
 
 		private static Dictionary<string, string> ConstraintMessages = new(StringComparer.OrdinalIgnoreCase)

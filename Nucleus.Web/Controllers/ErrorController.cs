@@ -35,6 +35,7 @@ namespace Nucleus.Web.Controllers
 				
 			if (exceptionDetails?.Error != null)
 			{
+				// try to convert database errors to a more friendly message
 				Exception ex = exceptionDetails.Error.Parse();
 
 				data = WrapException(ex);
@@ -157,23 +158,24 @@ namespace Nucleus.Web.Controllers
 
 		private static Boolean IsConnectionFailure(Exception e)
 		{
-			const string CHECK_CONNECTION_FUNCTION = "CheckConnection()";
+			return e is Nucleus.Data.Common.ConnectionException;
+			//const string CHECK_CONNECTION_FUNCTION = "CheckConnection()";
 
-			if (e is Nucleus.Data.Common.ConnectionException)
-			{
-				return true;
-			}
+			//if (e is Nucleus.Data.Common.ConnectionException)
+			//{
+			//	return true;
+			//}
 			
-			if (e is System.Data.Common.DbException)
-			{
-				return e.StackTrace.Contains(CHECK_CONNECTION_FUNCTION);
-			}
-			else if (e.InnerException != null && e.InnerException is System.Data.Common.DbException)
-			{
-				return e.StackTrace.Contains(CHECK_CONNECTION_FUNCTION);
-			}
+			//if (e is System.Data.Common.DbException)
+			//{
+			//	return e.StackTrace.Contains(CHECK_CONNECTION_FUNCTION);
+			//}
+			//else if (e.InnerException != null && e.InnerException is System.Data.Common.DbException)
+			//{
+			//	return e.StackTrace.Contains(CHECK_CONNECTION_FUNCTION);
+			//}
 
-			return false;
+			//return false;
 		}
 
 		private static Microsoft.AspNetCore.Mvc.ProblemDetails WrapException(Exception ex)

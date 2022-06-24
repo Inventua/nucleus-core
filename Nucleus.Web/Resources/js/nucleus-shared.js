@@ -7,6 +7,7 @@ function _Page()
 	this.GetPartialContent = _getPartialContent;
 	this.LoadPartialContent = _loadPartialContent;
 	this.GetCookie = _getCookie;
+	this.AddEventHandlers = _addEventHandlers;
 
 	// Attach Nucleus-standard event handlers when document is ready
 	jQuery(document).ready(function ()
@@ -804,7 +805,10 @@ function _Page()
 					}
 				});
 
-				//wrapper.modal('show');
+				// if there are any existing modal backdrops (overlays), remove them so that they don't get drawn on top of 
+				// one another after a postback & increase the opacity of the backdrop.
+				jQuery('.modal-backdrop').remove();
+
 				var modal = new bootstrap.Modal(wrapper, { backdrop: 'static' });
 				modal.show();
 
@@ -885,5 +889,71 @@ function _Page()
 		function escape(s) { return s.replace(/([.*+?\^$(){}|\[\]\/\\])/g, '\\$1'); }
 		var match = document.cookie.match(RegExp('(?:^|;\\s*)' + escape(name) + '=([^;]*)'));
 		return match ? match[1] : null;
+	}
+
+	// Add _Layout.cshtml event handlers, which are used to communicate/execute events from the admin iframe to the main window.
+
+	// ExpandAdminFrame:  Show or hide the admin iframe
+	function _addEventHandlers(toggleEditCookieName)
+	{
+		window.document.addEventListener('ExpandAdminFrame', function (args)
+		{
+			var adminFrame = jQuery('#AdminFrame');
+			args.detail !== null && args.detail.expand ? adminFrame.addClass('Expanded') : adminFrame.removeClass('Expanded');
+		}, false);
+
+		// Refresh event. Set or clear the edit-mode cookie, fade out the display and reload the current Url
+		window.document.addEventListener('Refresh',	function (args)
+		{			
+			if (args.detail !== null && typeof (args.detail.setEditMode) !== 'undefined')
+			{
+				var cookieValue = args.detail.setEditMode ? 'true' : '';
+				var cookieAge = args.detail.setEditMode ? '3600' : '0';
+				document.cookie = toggleEditCookieName + '=' + cookieValue + '; Path=/; max-age=' + cookieAge;
+			}
+
+			jQuery('body').fadeTo('opacity', '0.3');
+			window.location.reload(true);
+		}, false);
+
+		// Open event.  Navigate to the Url specified by args.detail.target
+		window.document.addEventListener('Open', function (args)
+		{
+			if (args.detail !== null && typeof (args.detail.target) !== 'undefined')
+			{
+				jQuery('body').fadeTo('opacity', '0.3');
+				window.location = args.detail.target;
+			}
+		}, false);
+
+
+	// Initialize a popup iframe (from _PopupEditor.cshtml) by finding it's parent .modal, and creating a Bootstrap modal.
+	window.document.addEventListener('InitFrame',
+		function (args)
+		{
+			if (args.detail !== null && typeof (args.detail.element) !== 'undefined')
+			{
+				// find the modal which contains the args.detail.element DOM element (the iframe)
+				var element = jQuery(args.detail.element);
+				if (!element.is('iframe')) return;
+				var wrapper = element.parents('.modal');
+
+				// Set modal's title to the iframe title
+				var titleElement = wrapper.find('.modal-title');
+				titleElement.html(args.detail.element.title);
+
+				if (!wrapper.is(':visible'))
+				{
+					// Create the modal
+					var newDialog = new bootstrap.Modal(wrapper, { backdrop: 'static' });
+					// when the modal containing the popup dialog is hidden, fade it out for .3 seconds and (at the same time) reload the page
+					wrapper.on('hidden.bs.modal', function () { jQuery('body').fadeTo('opacity', '0.3'); window.location.reload(true); });
+					// show the modal
+					newDialog.show();
+				}
+				// make sure the iframe is visible
+				element.show();
+			}
+		}, false);
 	}
 }

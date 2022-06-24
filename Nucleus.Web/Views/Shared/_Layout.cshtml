@@ -23,9 +23,9 @@
 	<title>@Model.Context.Page.Title</title>
 	@Html.AddScript("~/Resources/Libraries/jQuery/03.06.00/jquery.js", false)
 	@Html.AddScript("~/Resources/Libraries/Bootstrap/5.2.0/js/bootstrap.bundle.js", false)
-	@* 
+	@*
 		// the isAsync parameter must be false for nucleus-shared.js.  If async is used, event handlers can be attached after google analytics has attached it's
-		// event handlers, which causes <a> elements with data-target attributes to be followed (intermittently) even though they have already been handled by 
+		// event handlers, which causes <a> elements with data-target attributes to be followed (intermittently) even though they have already been handled by
 		// _getPartialContent.
 	*@
 	@Html.AddScript("~/Resources/js/nucleus-shared.js", false)
@@ -35,18 +35,19 @@
 	{
 		@Html.AddStyle("~/Resources/css/editmode.css")
 	}
-	@Html.AddHtmlEditor()		
+	@Html.AddHtmlEditor()
 	@RenderSection("styles", false)
 	@if (!String.IsNullOrEmpty(Model.SiteCssFilePath))
 	{
-		@Html.AddStyle(Model.SiteCssFilePath);
+		@Html.AddStyle(Model.SiteCssFilePath)
+		;
 	}
 	@RenderSection("scripts", false)
 	<merge-stylesheets>
-	@Html.RenderStyles()
+		@Html.RenderStyles()
 	</merge-stylesheets>
 	<merge-scripts>
-	@Html.RenderScripts()	
+		@Html.RenderScripts()
 	</merge-scripts>
 </head>
 <body>
@@ -79,68 +80,10 @@
 		<script type="text/javascript">
 			jQuery(document).ready(function ()
 			{
-				
+				Page.AddEventHandlers('@PermissionExtensions.EDIT_COOKIE_NAME');
 			});
 
-			window.document.addEventListener('ExpandAdminFrame',
-				function (args)
-				{
-					if (args.detail !== null && args.detail.expand)
-						jQuery('#AdminFrame').addClass('Expanded');
-					else
-						jQuery('#AdminFrame').removeClass('Expanded');
-				}, false);
-
-			window.document.addEventListener('Refresh',
-				function (args)
-				{
-					if (args.detail !== null && typeof (args.detail.setEditMode) !== 'undefined')
-					{
-						if (args.detail.setEditMode)
-						{
-							document.cookie = "@PermissionExtensions.EDIT_COOKIE_NAME=true; Path=/; max-age=3600";
-						}
-						else
-						{
-							document.cookie = "@PermissionExtensions.EDIT_COOKIE_NAME=; Path=/; max-age=0";
-						}
-					}
-
-					jQuery('body').fadeTo('opacity', '0.3');
-					window.location.reload(true);
-				}, false);
-
-			window.document.addEventListener('Open',
-				function (args)
-				{
-					if (args.detail !== null && typeof (args.detail.target) !== 'undefined')					
-					{
-						jQuery('body').fadeTo('opacity', '0.3');
-						window.location = args.detail.target;
-					}
-				}, false);
-
-
-			window.document.addEventListener('InitFrame',
-				function (args)
-				{
-					if (args.detail !== null && typeof (args.detail.element) !== 'undefined')
-					{
-						var element = jQuery(args.detail.element);
-						var wrapper = element.parents('.modal');
-												
-						var titleElement = wrapper.find('.modal-title');
-						titleElement.html(args.detail.element.title);
-
-						if (!wrapper.is(':visible'))
-						{
-							var settingsDialog = new bootstrap.Modal(wrapper, { backdrop: 'static' });
-							wrapper.on('hidden.bs.modal', function () { jQuery('body').fadeTo('opacity', '0.3'); window.location.reload(true); });
-							settingsDialog.show();
-						}
-						element.show();
-					}
-				}, false);
+			
 		</script>
 	}
 </body>

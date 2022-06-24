@@ -8,19 +8,18 @@
 @using (Html.BeginNucleusForm("Settings", "ElasticSearch", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
 <fieldset role="group" aria-labelledby="heading">
-	<div class="Flex">
 		<SettingsControl caption="Elastic Search Server Url" helptext="Enter the URL for your Elastic Search server, including the port.">
 			@Html.TextBoxFor(model => model.ServerUrl)
 		</SettingsControl>
+	<div class="nucleus-flex-fields">
 		<SettingsControl caption="Index Name" helptext="Enter the index name to use for this site.">
 			@Html.TextBoxFor(model => model.IndexName)
 		</SettingsControl>
+		<SettingsControl caption="Attachments Size Limit (mb)" helptext="Enter maximum file size to submit to the Elastic search server for indexing. A value of zero specifies no limit.">
+			@Html.TextBoxFor(model => model.AttachmentMaxSize, new { @type = "number" })
+		</SettingsControl>
 	</div>
-
-	<SettingsControl caption="Attachments Size Limit (mb)" helptext="Enter maximum file size to submit to the Elastic search server for indexing.">
-		@Html.TextBoxFor(model => model.AttachmentMaxSize)
-	</SettingsControl>
-
+	
 	<h3>Boost</h3>
 	<div class="w-75">
 		<SettingsControl caption="Title" helptext="Title boost.  The default value is 1.">

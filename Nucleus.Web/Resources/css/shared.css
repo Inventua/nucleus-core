@@ -170,7 +170,7 @@ a *
 /* Nucleus (shared.js:_dialog) css */
 .modal-dialog .dialog-icon
 {
-   font-size: 5rem;
+  font-size: 3rem;
   flex-grow: 1;
   margin-right: 1rem;
   line-height: normal;
@@ -194,6 +194,7 @@ a *
 .modal-dialog .dialog-message
 {
   flex-grow: 5;
+  margin: auto;
 }
 
 /*  Extend bootstrap width classes to provide a "width 1", which is generally used for table cells to specify that the cell should be as small as */

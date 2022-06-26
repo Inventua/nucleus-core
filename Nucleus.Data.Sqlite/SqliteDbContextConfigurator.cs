@@ -111,7 +111,8 @@ namespace Nucleus.Data.Sqlite
 							break;
 						case SQLITE_CONSTRAINT_FOREIGNKEY:
 							// SQLite doesn't provide any useful information in the error message when a foreign key constraint fails, so the parsing for this
-							// isn't very useful - it just generates an exception with message 'FOREIGN KEY constraint failed' .
+							// isn't very useful - it just generates an exception with message 'FOREIGN KEY constraint failed'.  Foreign key
+							// constraint errors are not normally caused by a user action, so this should not be a serious issue.
 							message = ParseException(dbException, Messages.FOREIGN_KEY_PATTERN, Messages.FOREIGN_KEY_MESSAGE);
 							break;
 					};

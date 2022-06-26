@@ -172,6 +172,7 @@ a *
 {
   font-size: 3rem;
   flex-grow: 1;
+  max-width: 3rem;
   margin-right: 1rem;
   line-height: normal;
 }

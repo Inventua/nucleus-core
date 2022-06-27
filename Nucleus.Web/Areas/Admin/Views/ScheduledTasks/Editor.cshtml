@@ -8,8 +8,11 @@
 <div class="ScheduledTasks">
 	<Tab>
 		<TabItem target="#task-properties" caption="Properties" active="true"></TabItem>
-		<TabItem target="#task-history" caption="History"></TabItem>
-		<TabItem target="#task-logs" caption="Logs"></TabItem>
+		@if (Model.ScheduledTask.Id != Guid.Empty)
+		{
+			<TabItem target="#task-history" caption="History"></TabItem>
+			<TabItem target="#task-logs" caption="Logs"></TabItem>
+		}
 	</Tab>
 
 	<TabContent>
@@ -83,50 +86,53 @@
 			}
 		</TabPanel>
 
-		<TabPanel id="task-history">
-			<table>
-				<tr>
-					<th>Start Date</th>
-					<th>Finish Date</th>
-					<th>Next Run Date</th>
-					<th>Server</th>
-					<th>Status</th>
-				</tr>
-				@foreach (var item in Model.History)
-				{
+		@if (Model.ScheduledTask.Id != Guid.Empty)
+		{
+			<TabPanel id="task-history">
+				<table>
 					<tr>
-						<td>@item.StartDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-						<td>@item.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-						<td>@item.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-						<td>@item.Server</td>
-						<td>@item.Status</td>
+						<th>Start Date</th>
+						<th>Finish Date</th>
+						<th>Next Run Date</th>
+						<th>Server</th>
+						<th>Status</th>
 					</tr>
-				}
-			</table>
-		</TabPanel>
-
-		<TabPanel id="task-logs">
-			@if (Model.LogFiles != null)
-			{
-				@using (Html.BeginAreaForm("GetLogFile", "ScheduledTasks", "Admin", FormMethod.Post, new { @data_target = ".LogContent", @autocomplete = "off" }))
-				{
-					@Html.HiddenFor(model => model.ScheduledTask.Id)
-					@Html.DropDownListFor(model => model.LogFile, new SelectList(Model.LogFiles, "Filename", "Title"), "(select)", new { @class = "LogFile mb-1" })
-				}
-				<div class="LogContent">
-					@if (String.IsNullOrEmpty(Model.LogMessage))
+					@foreach (var item in Model.History)
 					{
-						@Model.LogMessage
+						<tr>
+							<td>@item.StartDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+							<td>@item.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+							<td>@item.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+							<td>@item.Server</td>
+							<td>@item.Status</td>
+						</tr>
 					}
+				</table>
+			</TabPanel>
 
-					@await Html.PartialAsync("_Log", Model)
-				</div>
-			}
-			else
-			{
-				<span>There are no log files for this scheduled task.</span>
-			}
-		</TabPanel>
+			<TabPanel id="task-logs">
+				@if (Model.LogFiles != null)
+				{
+					@using (Html.BeginAreaForm("GetLogFile", "ScheduledTasks", "Admin", FormMethod.Post, new { @data_target = ".LogContent", @autocomplete = "off" }))
+					{
+						@Html.HiddenFor(model => model.ScheduledTask.Id)
+						@Html.DropDownListFor(model => model.LogFile, new SelectList(Model.LogFiles, "Filename", "Title"), "(select)", new { @class = "LogFile mb-1" })
+					}
+					<div class="LogContent">
+						@if (String.IsNullOrEmpty(Model.LogMessage))
+						{
+							@Model.LogMessage
+						}
+
+						@await Html.PartialAsync("_Log", Model)
+					</div>
+				}
+				else
+				{
+					<span>There are no log files for this scheduled task.</span>
+				}
+			</TabPanel>
+		}
 	</TabContent>
 </div>
 

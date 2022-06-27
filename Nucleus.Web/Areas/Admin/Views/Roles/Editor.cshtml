@@ -5,7 +5,7 @@
 @using Nucleus.Abstractions.Models
 <Tab>
 	<TabItem active="true" target="#role-properties" caption="Properties"></TabItem>
-	@if (!Model.Role.Type.HasFlag(Role.RoleType.Restricted))
+	@if (Model.Role.Id != Guid.Empty && !Model.Role.Type.HasFlag(Role.RoleType.Restricted))
 	{
 		<TabItem target="#role-users" caption="Users"></TabItem>
 	}
@@ -87,7 +87,7 @@
 		}
 	</TabPanel>
 
-	@if (!Model.Role.Type.HasFlag(Role.RoleType.Restricted))
+	@if (Model.Role.Id != Guid.Empty && !Model.Role.Type.HasFlag(Role.RoleType.Restricted))
 	{
 		<TabPanel id="role-users">
 			@if (Model.Users?.Items?.Any() == true)

@@ -27,13 +27,12 @@ namespace Nucleus.Core.Plugins
 		public static IMvcBuilder AddPlugins(this IMvcBuilder builder, string contentRootPath)
 		{
 			builder.AddExternalControllers();
-
 			builder.AddCompiledRazorViews();
 			builder.AddScheduledTasks();
 
 			builder.Services.Configure<RazorViewEngineOptions>(options =>
 			{
-				options.ViewLocationExpanders.Add(new ModuleViewLocationExpander());				
+				options.ViewLocationExpanders.Add(new ExtensionViewLocationExpander());				
 			});
 
 			return builder;
@@ -49,7 +48,7 @@ namespace Nucleus.Core.Plugins
 		{			
 			foreach (Assembly assembly in AssemblyLoader.GetAssembliesImplementing<Controller>(builder.Logger()))
 			{
-				builder.Logger().LogInformation($"Adding controllers from {assembly.FullName}.");
+				builder.Logger()?.LogInformation("Adding controllers from {assemblyname} [{assemblyLocation}].", assembly.FullName,		assembly.Location.Replace(Environment.CurrentDirectory, ""));
 
 				Microsoft.AspNetCore.Mvc.ApplicationParts.AssemblyPart part = new(assembly);
 
@@ -77,7 +76,7 @@ namespace Nucleus.Core.Plugins
 		{
 			foreach (Type type in AssemblyLoader.GetTypes<Nucleus.Abstractions.IScheduledTask>())
 			{
-				builder.Logger().LogInformation($"Adding Scheduled Task type {type.FullName}");
+				builder.Logger()?.LogInformation("Adding scheduled task type {typeName} from {assemblyName} [{assemblyLocation}]", type.FullName, type.Assembly.FullName, type.Assembly.Location.Replace(Environment.CurrentDirectory, ""));
 				builder.Services.AddTransient(type);
 			}
 

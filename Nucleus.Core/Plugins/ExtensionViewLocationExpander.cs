@@ -12,7 +12,7 @@ using Nucleus.Abstractions;
 
 namespace Nucleus.Core.Plugins
 {
-	public class ModuleViewLocationExpander : IViewLocationExpander
+	public class ExtensionViewLocationExpander : IViewLocationExpander
 	{
 		/// <summary>
 		/// If the request is for an assembly located in the extensions folder, return view location patterns which point to the relevant

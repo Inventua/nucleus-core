@@ -42,6 +42,16 @@ namespace Nucleus.Data.EntityFramework
 		protected IHttpContextAccessor HttpContextAccessor { get; }
 
 		/// <summary>
+		/// Get or set whether Nucleus entities should be configured in OnModelCreating. 
+		/// </summary>
+		/// <remarks>
+		/// The default value is true.  Data providers for business applications which reside in a different database to 
+		/// the Nucleus data objects can set this value to false in their constructor in order to prevent Nucleus entities
+		/// from being added to the entity framework model for this context.
+		/// </remarks>
+		protected Boolean ConfigureNucleusEntities { get; init; } = true;
+
+		/// <summary>
 		/// 
 		/// </summary>
 		internal DbContextConfigurator DbContextConfigurator { get; }
@@ -92,12 +102,15 @@ namespace Nucleus.Data.EntityFramework
 		{
 			base.OnModelCreating(builder);
 
-			builder.ConfigureInstanceEntities();
-			builder.ConfigureSiteEntities();
-			builder.ConfigurePageEntities();
-			builder.ConfigureUserEntities();
-			builder.ConfigureModuleEntities();
-			builder.ConfigureFileSystemEntities();
+			if (this.ConfigureNucleusEntities)
+			{
+				builder.ConfigureInstanceEntities();
+				builder.ConfigureSiteEntities();
+				builder.ConfigurePageEntities();
+				builder.ConfigureUserEntities();
+				builder.ConfigureModuleEntities();
+				builder.ConfigureFileSystemEntities();
+			}
 		}
 
 		/// <summary>

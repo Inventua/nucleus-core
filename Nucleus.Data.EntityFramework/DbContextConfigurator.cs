@@ -122,38 +122,58 @@ namespace Nucleus.Data.EntityFramework
 		{
 			switch (name)
 			{
+				// Unique constraints.  We only provide "friendly" messages for the ones that can happen due to user input.
 				case "IX_ScheduledTasks_Name":
-					return "Another scheduled task in this site already has the name that you entered.";
+					return "The name that you entered is already used by an existing Scheduled Task.  Please enter a unique name.";
 				case "IX_SiteGroups_PrimarySiteId":
 					return "Another site group is already assigned to the primary site that you have selected.";
 				case "IX_SiteGroups_Name":
-					return "Another site group already has the name that you entered.";
+					return "The name that you entered is already used by an existing site group.  Please enter a unique name.";
 				case "IX_Sites_Name":
-					return "Another site already has the name that you entered for this site.  Site names must be unique.";
+					return "The name that you entered is already used by an existing site.  Please enter a unique name.";
 				case "IX_SiteAlias_Alias":
 					return "Another site is already using the alias that you entered.";
 				case "IX_Pages_Name":
-					return "Another page in this site already has the name that you entered.";
+					return "The name that you entered is already used by an existing page.  Please enter a unique name.";
 				case "IX_PageRoutes_Path":
 					return "Another page is already using the page route that you entered.";
 				case "IX_Users_SiteUser":
-					return "Another user in this site already has the user name that you entered.";
+					return "The name that you entered is already used by an existing user.  Please enter a unique name.";
 				case "IX_RoleGroups_Name":
-					return "Another role group in this site already has the name that you entered.";
+					return "The name that you entered is already used by an existing role group.  Please enter a unique name.";
 				case "IX_Roles_Name":
-					return "Another role in this site already has the name that you entered.";
+					return "The name that you entered is already used by an existing role.  Please enter a unique name.";
 				case "IX_UserProfileProperties_SiteId_TypeUri":
 					return "The Type Uri that you entered has already been used.";
 				case "IX_UserProfileProperties_Name":
-					return "The user profile property name that you entered has already been used.";
+					return "The name that you entered is already used by an existing user profile property.  Please enter a unique name.";
 				case "IX_MailTemplates_SiteId_Name":
-					return "The mail template name that you entered has already been used.";
+					return "The name that you entered is already used by an existing mail template.  Please enter a unique name.";
 				case "IX_Lists_Name":
-					return "The list name that you entered has already been used.";
+					return "The name that you entered is already used by an existing list.  Please enter a unique name.";
 				case "IX_ListItems_Name":
-					return "The list item name has already been used in this list.";
+					return "The name that you entered is already used by an existing list item.  Please enter a unique name.";
 				case "IX_ApiKeys_Name":
-					return "The Api key name that you entered has already been used.";
+					return "The name that you entered is already used by an existing Api key.  Please enter a unique name.";
+
+				// Foreign key constraints.  Most of these will never happen unless there is a bug in the UI/Controllers.
+				case "FK_SiteGroups_PrimarySiteId":
+					return "Primary site is invalid.";				
+				case "FK_Sites_AdministratorsRoleId":
+					return "Administrator role is invalid.";
+				case "FK_Sites_AllUsersRoleId":
+					return "All users role is invalid";
+				case "FK_Sites_AnonymousUsersRoleId":
+					return "Anonymous users role is invalid";
+				case "FK_Sites_RegisteredUsersRoleId":
+					return "Registered users role is invalid";
+				case "FK_Pages_SiteId":
+					return "Site is invalid.";
+				case "FK_Pages_ParentId":
+					return "Parent page is invalid.";
+				case "FK_Roles_RoleGroupId":
+					return "Role group is invalid.";
+
 				default:
 					return "";
 			}

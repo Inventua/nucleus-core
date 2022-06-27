@@ -85,17 +85,16 @@ namespace Nucleus.Data.SqlServer
 
 	internal class Messages
 	{
-		internal const string UNIQUE_CONSTRAINT_PATTERN = @"Cannot insert duplicate key row in object 'dbo\.(?<table>.*)' with unique index '(?<constraint_name>.*)'\. The duplicate key value is .*\.";
+		internal const string UNIQUE_CONSTRAINT_PATTERN = @"duplicate key row in object '.*\.(?<table>.*)' with unique index '(?<constraint_name>.*)'";
 		// Message is empty so that if the Nucleus.Data.EntityFramework.DbContextConfigurator.ConstraintMessage method
-		// does not have a value for the index name, the original exception is used, because Sql server messages do not
-		// contain the values which caused the error.
-		internal const string UNIQUE_CONSTRAINT_MESSAGE = @"";
+		// does not have a value for the index name, the original exception is used.
+		internal const string UNIQUE_CONSTRAINT_MESSAGE = "";
 
 		internal const string NOT_NULL_PATTERN = @"cannot insert the value NULL into column '(?<column>.*?)', table '.*\..*\.(?<table>.*?)'";
 		internal const string NOT_NULL_MESSAGE = "The '{column}' field is required.";
 
-		internal const string FOREIGN_KEY_PATTERN = "the delete statement conflicted .*constraint \"(?<constraint>.*?)\"";
-		internal const string FOREIGN_KEY_MESSAGE = "{constraint_name}";
+		internal const string FOREIGN_KEY_PATTERN = "FOREIGN KEY constraint \"(?<constraint_name>.*?)\"";
+		internal const string FOREIGN_KEY_MESSAGE = "";
 	}
 
 }

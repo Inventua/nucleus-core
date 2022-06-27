@@ -127,13 +127,13 @@ namespace Nucleus.Data.Sqlite
 		
 		internal class Messages
 		{
-			internal const string UNIQUE_CONSTRAINT_PATTERN = @"SQLite Error 19: 'UNIQUE constraint failed: (?<columns>.*)'.";
+			internal const string UNIQUE_CONSTRAINT_PATTERN = @"'UNIQUE constraint failed: (?<columns>.*)'.";
 			internal const string UNIQUE_CONSTRAINT_MESSAGE = @"The combination of {columns} must be unique.";
 
-			internal const string NOT_NULL_PATTERN = @"SQLite Error 19: 'NOT NULL constraint failed: (?<table>.*)\.(?<column>.*)'.";
+			internal const string NOT_NULL_PATTERN = @"NOT NULL constraint failed: (?<table>.*)\.(?<column>.*)'";
 			internal const string NOT_NULL_MESSAGE = "The '{column}' field is required.";
 
-			internal const string FOREIGN_KEY_PATTERN = @"SQLite Error 19: 'FOREIGN KEY constraint failed.";
+			internal const string FOREIGN_KEY_PATTERN = @"FOREIGN KEY constraint failed.";
 			internal const string FOREIGN_KEY_MESSAGE = @"FOREIGN KEY constraint failed.";
 		}
 	}

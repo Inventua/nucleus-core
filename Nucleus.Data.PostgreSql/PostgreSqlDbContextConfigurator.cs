@@ -81,7 +81,7 @@ namespace Nucleus.Data.PostgreSql
 		internal const string UNIQUE_CONSTRAINT_PATTERN = "duplicate key value violates unique constraint \"(?<constraint_name>.*?)\"";
 		// Message is empty so that if the Nucleus.Data.EntityFramework.DbContextConfigurator.ConstraintMessage method
 		// does not have a value for the constraint name, the original exception is used.
-		internal const string UNIQUE_CONSTRAINT_MESSAGE = @"";
+		internal const string UNIQUE_CONSTRAINT_MESSAGE = "";
 
 		internal const string NOT_NULL_PATTERN = "null value in column \"(?<column>.*?)\" of relation \"(?<table>.*?)\" violates not-null constraint";
 		internal const string NOT_NULL_MESSAGE = "The '{column}' field is required.";
@@ -89,7 +89,7 @@ namespace Nucleus.Data.PostgreSql
 		internal const string FOREIGN_KEY_PATTERN = "insert or update on table \"(?<table>.*?)\" violates foreign key constraint \"(?<constraint_name>.*?)\"";
 		// Message is empty so that if the Nucleus.Data.EntityFramework.DbContextConfigurator.ConstraintMessage method
 		// does not have a value for the constraint name, the original exception is used.
-		internal const string FOREIGN_KEY_MESSAGE = "{constraint_name}";
+		internal const string FOREIGN_KEY_MESSAGE = "";
 	}
 	
 }

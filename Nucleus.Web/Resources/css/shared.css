@@ -174,7 +174,6 @@ a *
   flex-grow: 1;
   max-width: 3rem;
   margin-right: 1rem;
-  line-height: normal;
 }
 
 .modal.icon-error .modal-dialog .dialog-icon 

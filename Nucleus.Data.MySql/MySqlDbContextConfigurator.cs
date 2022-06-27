@@ -87,7 +87,7 @@ namespace Nucleus.Data.MySql
 
 		internal class Messages
 		{
-			internal const string UNIQUE_CONSTRAINT_PATTERN = "Duplicate entry '.*' for key '(?<constraint_name>.*?)'";
+			internal const string UNIQUE_CONSTRAINT_PATTERN = @"Duplicate entry '.*' for key '(?<table>.*?)\.?(?<constraint_name>[^.]*?)'";
 			// Message is empty so that if the Nucleus.Data.EntityFramework.DbContextConfigurator.ConstraintMessage method
 			// does not have a value for the constraint name, the original exception is used.
 			internal const string UNIQUE_CONSTRAINT_MESSAGE = "";

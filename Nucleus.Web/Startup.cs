@@ -102,7 +102,7 @@ namespace Nucleus.Web
 
 			services.Logger().LogInformation(new[]
 			{
-				$"{System.Reflection.Assembly.GetExecutingAssembly().Product()} version {System.Reflection.Assembly.GetExecutingAssembly().Version()}. {System.Reflection.Assembly.GetExecutingAssembly().Copyright()}",
+				$"{System.Reflection.Assembly.GetExecutingAssembly().Product()} version {this.GetType().Assembly.GetName().Version}. {this.GetType().Assembly.Copyright()}",
 				$"Application Root folder: [{System.Environment.CurrentDirectory}]",
 				$"Configuration folder:    [{ConfigFolder()}]",
 				$"Content Root:            [{this.Environment.ContentRootPath}]",

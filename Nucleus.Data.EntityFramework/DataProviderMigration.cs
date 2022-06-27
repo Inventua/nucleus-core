@@ -172,8 +172,28 @@ namespace Nucleus.Data.EntityFramework
 				.OrderBy(script => script.Version))
 			{
 				// Run the script
-				RunScript(schemaName, script);
+				if ((this.DbContext as Nucleus.Data.EntityFramework.DbContext).DbContextConfigurator.GetType().Assembly.GetName().Name == "Nucleus.Data.MySql")
+				{
+					// MySql automatically commits transactions when it executes most data definition language commands, so we can't use 
+					// transactions to wrap the script and schema table update.
+					// https://dev.mysql.com/doc/refman/8.0/en/implicit-commit.html
+					RunScript(schemaName, script);
+				}
+				else
+				{
+					using IDbContextTransaction transaction = this.DbContext.Database.BeginTransaction();
+					try
+					{
+						RunScript(schemaName, script);
 
+						transaction.Commit();
+					}
+					catch (Exception)
+					{
+						transaction.Rollback();
+						throw;
+					}
+				}
 				this.EventDispatcher?.RaiseEvent<MigrateEvent, Migrate>(new MigrateEvent(schemaName, script.FullName, currentSchemaVersion, script.Version));
 			}
 		}
@@ -191,73 +211,60 @@ namespace Nucleus.Data.EntityFramework
 		/// </remarks>
 		private bool RunScript(string schemaName, DatabaseSchemaScript script)
 		{
-			try
+			Logger.LogTrace("Running schema update script {0}.", script.FullName);
+
+			// Execute the entire script and schema table update in a transaction, so that it succeeds or fails as an atomic block.				
+			if (script.FullName.EndsWith(".sql", StringComparison.OrdinalIgnoreCase))
 			{
-				Logger.LogTrace("Running schema update script {0}.", script.FullName);
 
-				// Execute the entire script and schema table update in a transaction, so that it succeeds or fails as an atomic block.
-				this.DbContext.Database.BeginTransaction();
-
-				if (script.FullName.EndsWith(".sql", StringComparison.OrdinalIgnoreCase))
+				foreach (string command in script.Content.Split(new string[] { "GO\r\n", "GO\n", "GO\r" }, StringSplitOptions.RemoveEmptyEntries))
 				{
-
-					foreach (string command in script.Content.Split(new string[] { "GO\r\n", "GO\n", "GO\r" }, StringSplitOptions.RemoveEmptyEntries))
-					{
-						ExecuteCommand(script, command);
-					}
+					ExecuteCommand(script, command);
 				}
-				else if (script.FullName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+			}
+			else if (script.FullName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+			{
+				DataDefinition definition = Newtonsoft.Json.JsonConvert.DeserializeObject<DataDefinition>(script.Content, new Newtonsoft.Json.JsonConverter[] { new MigrationOperationConverter(this.DbContext.Database.ProviderName), new SystemTypeConverter() });
+
+				if (definition.SchemaName != schemaName)
 				{
-					DataDefinition definition = Newtonsoft.Json.JsonConvert.DeserializeObject<DataDefinition>(script.Content, new Newtonsoft.Json.JsonConverter[] { new MigrationOperationConverter(this.DbContext.Database.ProviderName), new SystemTypeConverter() });
+					throw new InvalidOperationException($"The schema script {script.FullName} schema name {definition.SchemaName} does not match the expected schema name {schemaName}.");
+				}
 
-					if (definition.SchemaName != schemaName)
+				if (!definition.Version.Equals(script.Version))
+				{
+					throw new InvalidOperationException($"The schema script {script.FullName} version {definition.Version} does not match the expected schema name {script.Version}.");
+				}
+
+				foreach (MigrationOperation operation in definition.Operations)
+				{
+					// Operations wrapped in a DatabaseProviderSpecificOperation can be returned as null if conditions are not met, skip nulls them
+					if (operation != null)
 					{
-						throw new InvalidOperationException($"The schema script {script.FullName} schema name {definition.SchemaName} does not match the expected schema name {schemaName}.");
-					}
+						ApplyCorrections(operation);
 
-					if (!definition.Version.Equals(script.Version))
-					{
-						throw new InvalidOperationException($"The schema script {script.FullName} version {definition.Version} does not match the expected schema name {script.Version}.");
-					}
-
-
-					foreach (MigrationOperation operation in definition.Operations)
-					{
-						// Operations wrapped in a DatabaseProviderSpecificOperation can be returned as null if conditions are not met, skip nulls them
-						if (operation != null)
+						if (operation.GetType() == typeof(DatabaseProviderSpecificOperation))
 						{
-							ApplyCorrections(operation);
-
-							if (operation.GetType() == typeof(DatabaseProviderSpecificOperation))
+							if ((operation as DatabaseProviderSpecificOperation).IsValidFor(this.DbContext.Database.ProviderName))
 							{
-								if ((operation as DatabaseProviderSpecificOperation).IsValidFor(this.DbContext.Database.ProviderName))
-								{
-									ExecuteCommand(script, (operation as DatabaseProviderSpecificOperation).Operation);
-								}
+								ExecuteCommand(script, (operation as DatabaseProviderSpecificOperation).Operation);
 							}
-							else
-							{
-								ExecuteCommand(script, operation);
-							}
+						}
+						else
+						{
+							ExecuteCommand(script, operation);
 						}
 					}
 				}
-				else
-				{
-					throw new InvalidOperationException($"Script {script.FullName} is not recognized.  Migration script names must end in '.sql' or '.json'. ");
-				}
-
-				// Add/Update the version number that was executed 
-				UpdateSchemaVersion(schemaName, script.Version);
-
-				this.DbContext.Database.CommitTransaction();
-
 			}
-			catch (Exception)
+			else
 			{
-				this.DbContext.Database.RollbackTransaction();
-				throw;
+				throw new InvalidOperationException($"Script {script.FullName} is not recognized.  Migration script names must end in '.sql' or '.json'. ");
 			}
+
+			// Add/Update the version number that was executed 
+			UpdateSchemaVersion(schemaName, script.Version);
+
 
 			return true;
 		}
@@ -352,7 +359,7 @@ namespace Nucleus.Data.EntityFramework
 			}
 
 			if (operation.ClrType == typeof(Boolean))
-			{	
+			{
 				if (DbContext.Database.ProviderName.EndsWith("PostgreSQL", StringComparison.OrdinalIgnoreCase))
 				{
 					// For Postgres, booleans are "true" or "false" rather than "1" or "0"

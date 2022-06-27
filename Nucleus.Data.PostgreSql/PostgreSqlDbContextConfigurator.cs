@@ -78,14 +78,18 @@ namespace Nucleus.Data.PostgreSql
 
 	internal class Messages
 	{
-		internal const string UNIQUE_CONSTRAINT_PATTERN = @"SQLite Error 19: 'UNIQUE constraint failed: (?<columns>.*)'.";
-		internal const string UNIQUE_CONSTRAINT_MESSAGE = @"The combination of {columns} must be unique.";
+		internal const string UNIQUE_CONSTRAINT_PATTERN = "duplicate key value violates unique constraint \"(?<constraint_name>.*?)\"";
+		// Message is empty so that if the Nucleus.Data.EntityFramework.DbContextConfigurator.ConstraintMessage method
+		// does not have a value for the constraint name, the original exception is used.
+		internal const string UNIQUE_CONSTRAINT_MESSAGE = @"";
 
-		internal const string NOT_NULL_PATTERN = @"cannot insert the value NULL into column '(?<column>.*?)', table '.*\..*\.(?<table>.*?)'";
+		internal const string NOT_NULL_PATTERN = "null value in column \"(?<column>.*?)\" of relation \"(?<table>.*?)\" violates not-null constraint";
 		internal const string NOT_NULL_MESSAGE = "The '{column}' field is required.";
 
-		internal const string FOREIGN_KEY_PATTERN = "the delete statement conflicted .*constraint \"(?<constraint>.*?)\"";
-		internal const string FOREIGN_KEY_MESSAGE = "{constraint}";
+		internal const string FOREIGN_KEY_PATTERN = "insert or update on table \"(?<table>.*?)\" violates foreign key constraint \"(?<constraint_name>.*?)\"";
+		// Message is empty so that if the Nucleus.Data.EntityFramework.DbContextConfigurator.ConstraintMessage method
+		// does not have a value for the constraint name, the original exception is used.
+		internal const string FOREIGN_KEY_MESSAGE = "{constraint_name}";
 	}
 	
 }

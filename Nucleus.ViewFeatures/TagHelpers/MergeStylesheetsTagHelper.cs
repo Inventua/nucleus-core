@@ -88,7 +88,11 @@ namespace Nucleus.ViewFeatures.TagHelpers
 								{
 									case "link":
 										LinkElement link = new LinkElement { Href = reader.GetAttribute("href"), Rel = reader.GetAttribute("rel") };
-										if (link.Href.StartsWith("/"))  // only operate on scripts with a relative path
+										//string isDynamic = reader.GetAttribute("data-dynamic");
+
+										Boolean.TryParse(reader.GetAttribute("data-dynamic"), out bool isDynamic);
+
+										if (!isDynamic && link.Href.StartsWith("/"))  // only operate on scripts with a relative path
 										{
 											Logger.LogInformation("Merging [{0}] {1}", link.Rel, link.Href);
 

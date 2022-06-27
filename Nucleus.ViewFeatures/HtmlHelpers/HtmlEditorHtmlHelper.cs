@@ -55,10 +55,10 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 					switch (option.Type)
 					{
 						case HtmlEditorScript.Types.javascript:
-							htmlHelper.AddScript(option.Path);
+							htmlHelper.AddScript(option.Path, false, option.IsDynamic);
 							break;
 						case HtmlEditorScript.Types.stylesheet:
-							htmlHelper.AddStyle(option.Path);
+							htmlHelper.AddStyle(option.Path, true, option.IsDynamic);
 							break;
 					}
 				}

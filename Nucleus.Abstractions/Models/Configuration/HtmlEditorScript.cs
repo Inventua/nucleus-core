@@ -34,5 +34,10 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// Gets a value that indicates the relative script path.
 		/// </summary>
 		public string Path { get; private set; }
+
+		/// <summary>
+		/// Gets a value that indicates that the script does dynamic loading, and should be excluded from being included in script merging.
+		/// </summary>
+		public Boolean IsDynamic { get; private set; }
 	}
 }

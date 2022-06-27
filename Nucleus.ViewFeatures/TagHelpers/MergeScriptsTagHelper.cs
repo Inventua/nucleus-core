@@ -84,8 +84,9 @@ namespace Nucleus.ViewFeatures.TagHelpers
 								{
 									case "script":
 										ScriptElement script = new ScriptElement { Src = reader.GetAttribute("src"), Type = reader.GetAttribute("type") };
+										Boolean.TryParse(reader.GetAttribute("data-dynamic"), out bool isDynamic);
 
-										if (script.Src.StartsWith("/"))  // only operate on scripts with a relative path
+										if (!isDynamic && script.Src.StartsWith("/"))  // only operate on scripts with a relative path
 										{
 											Logger.LogInformation("Merging [{0}] {1}", script.Type, script.Src);
 
@@ -104,12 +105,12 @@ namespace Nucleus.ViewFeatures.TagHelpers
 											unmergedcontent += script.ToString();
 										}
 										break;
+
 									default:
 										// taghelper contains something else, write child content out unmodified
 										Logger.LogInformation("Found unexpected element {0}, merge skipped", reader.Name);
 										WriteOriginalContent(output, originalContent);
 										return;
-
 								}
 							}
 							break;

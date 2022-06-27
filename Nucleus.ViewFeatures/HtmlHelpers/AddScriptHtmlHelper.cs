@@ -58,7 +58,28 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// </example>
 		public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, string scriptPath, Boolean isAsync)
 		{
-			return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(scriptPath), isAsync, 0, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);				
+			return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(scriptPath), isAsync, false, 0, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);				
+		}
+
+		/// <summary>
+		/// Register the specified script to be added to the Layout or module's scripts.
+		/// </summary>
+		/// <param name="htmlHelper"></param>
+		/// <param name="scriptPath"></param>
+		/// <param name="isAsync"></param>
+		/// <param name="isDynamic"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// Extensions (modules) can use this Html Helper to add scripts to the HEAD block.  The scriptPath can contain the 
+		/// tilde (~) character to specify an app-relative path.  Your script path should include the extensions folder and your
+		/// extension folder name.
+		/// </remarks>
+		/// <example>
+		/// @Html.AddScript("~/Extensions/MyModule/MyModule.js")
+		/// </example>
+		public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, string scriptPath, Boolean isAsync, Boolean isDynamic)
+		{
+			return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(scriptPath), isAsync, isDynamic, 0, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
 		}
 
 		/// <summary>
@@ -75,10 +96,10 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// </remarks>
 		public static IHtmlContent AddScript(this HttpContext context, string scriptPath, Boolean isAsync, int order)
 		{
-			return AddScript(context, scriptPath, isAsync, order, null);
+			return AddScript(context, scriptPath, isAsync, false, order, null);
 		}
 
-		private static IHtmlContent AddScript(HttpContext context, string scriptPath, Boolean isAsync, int order, Version version)
+		private static IHtmlContent AddScript(HttpContext context, string scriptPath, Boolean isAsync, Boolean isDynamic, int order, Version version)
 		{
 			ResourceFileOptions resourceFileOptions = context.RequestServices.GetService<IOptions<ResourceFileOptions>>().Value;
 			Dictionary<string, ScriptInfo> scripts = (Dictionary<string, ScriptInfo>)context.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
@@ -102,6 +123,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 				{ 
 					Path = finalScriptPath, 
 					IsAsync = isAsync, 
+					IsDynamic = isDynamic,
 					Order = order, 
 					Version = version 
 				});
@@ -128,7 +150,11 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 					if (!String.IsNullOrEmpty(script.Key))
 					{
 						TagBuilder builder = new("script");
-						builder.Attributes.Add("type", "text/javascript");
+						builder.Attributes.Add("type", "text/javascript");						
+						if (script.Value.IsDynamic)
+						{
+							builder.Attributes.Add("data-dynamic", "true");
+						}
 						builder.Attributes.Add("src", script.Value.Path + (script.Value.Version != null ? "?v=" + script.Value.Version.ToString() : ""));
 						if (script.Value.IsAsync)
 						{
@@ -149,6 +175,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		{
 			public System.Version Version { get; set; }	
 			public Boolean IsAsync { get; set; }
+			public Boolean IsDynamic { get; set; }
 			public string Path { get; set; }
 			public int Order { get; set; } = 0;
 

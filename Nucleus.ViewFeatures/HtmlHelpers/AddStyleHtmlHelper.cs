@@ -56,6 +56,26 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// </example>
 		public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, Boolean defer)
 		{
+			return AddStyle(htmlHelper, stylesheetPath, defer, false);
+		}
+
+		/// <summary>
+		/// Register the specified style to be added to the Layout or module's CSS styles.
+		/// </summary>
+		/// <param name="htmlHelper"></param>
+		/// <param name="stylesheetPath"></param>
+		/// <param name="defer"></param>
+		/// <param name="isDynamic"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// Extensions (modules) can use this Html Helper to add CSS stylesheets to the HEAD block.  The scriptPath can contain the 
+		///  ~! for the currently executing view path, or ~# for the currently executing extension. 
+		/// </remarks>
+		/// <example>
+		/// @Html.AddScript("~/Extensions/MyModule/MyModule.css")
+		/// </example>
+		public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, Boolean defer, Boolean isDynamic)
+		{
 			ResourceFileOptions resourceFileOptions = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IOptions<ResourceFileOptions>>().Value;
 			Dictionary<string, StylesheetInfo> stylesheets = (Dictionary<string, StylesheetInfo>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
 
@@ -80,6 +100,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 				{ 
 					Path = finalStylesheetPath, 
 					Defer = defer, 
+					IsDynamic = isDynamic,
 					Version = ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version 
 				});
 
@@ -107,6 +128,11 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 					{
 						TagBuilder builder = new("link");
 						builder.Attributes.Add("rel", "stylesheet");
+						if (style.Value.IsDynamic)
+						{
+							builder.Attributes.Add("data-dynamic", "true");
+						}
+
 						builder.Attributes.Add("href", style.Value.Path + (style.Value.Version != null ? "?v=" + style.Value.Version.ToString() : ""));
 
 						if (style.Value.Defer)
@@ -130,6 +156,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		{
 			public System.Version Version { get; set; }
 			public Boolean Defer { get; set; }
+			public Boolean IsDynamic { get; set; }
 			public string Path { get; set; }			
 		}
 	}

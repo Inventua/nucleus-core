@@ -1,5 +1,7 @@
 ﻿@model Nucleus.OAuth.Server.ViewModels.Settings
-@using (Html.BeginAreaForm("List", "OAuthServerAdmin", "OAuthServer", FormMethod.Post, new { @data_target = ".nucleus-index-items", @autocomplete = "off" }))
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using (Html.BeginNucleusForm("List", "OAuthServerAdmin", "OAuthServer", FormMethod.Post, new { @data_target = ".nucleus-index-items", @autocomplete = "off" }))
 {
 	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.ClientApps, propertyName = "ClientApps", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
 }

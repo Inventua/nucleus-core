@@ -4,7 +4,7 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 @Html.AddStyle("~!/../settings.css")
-<div>
+<div class="nucleus-editor-panel">
 	@using (Html.BeginNucleusForm("SaveSiteSettings", "OAuthClientAdmin", "OAuthClient", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 	{
 		<fieldset role="group" aria-labelledby="heading">
@@ -65,11 +65,11 @@
 					</SettingsControl>
 				</div>
 			</div>
-
-			<div class="Tools">
-				@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSiteSettings", "OAuthClientAdmin", "OAuthClient"), new { })				
-			</div>
 		</fieldset>
+
+		<div class="Tools">
+			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSiteSettings", "OAuthClientAdmin", "OAuthClient"), new { })				
+		</div>
 	}
 </div>
 
@@ -80,7 +80,6 @@
 		
 		jQuery('.nucleus-oauth-create-user-control').on('change', function() 
 		{
-			//jQuery('.nucleus-oauth-new-user-controls input').toggleClass('disabled');
 			EnableControls(jQuery(this).is(':checked'), '.nucleus-oauth-create-user-controls');
 		});	
 
@@ -88,7 +87,6 @@
 		
 		jQuery('.nucleus-oauth-sync-roles-control').on('change', function() 
 		{
-			//jQuery('.nucleus-oauth-sync-roles-controls input').toggleClass('disabled');
 			EnableControls(jQuery(this).is(':checked'), '.nucleus-oauth-sync-roles-controls');
 		});	
 	});

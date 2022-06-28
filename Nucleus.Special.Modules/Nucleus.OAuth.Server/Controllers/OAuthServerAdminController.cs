@@ -44,6 +44,12 @@ namespace Nucleus.OAuth.Server.Controllers
 			return View("Editor", await BuildSettingsViewModel(id == Guid.Empty ? await this.ClientAppManager.CreateNew() : await this.ClientAppManager.Get(id)));
 		}
 
+		[HttpPost]
+		public async Task<ActionResult> List(ViewModels.Settings viewModel)
+		{
+			return View("_ClientAppsList", await BuildSettingsViewModel(viewModel));
+		}
+
 		[HttpGet]
 		public async Task<ActionResult> GetChildPages(Guid id)
 		{

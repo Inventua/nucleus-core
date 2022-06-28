@@ -90,11 +90,11 @@ function _handleContentLoaded(e, args)
 
 		if (show)
 		{
-			jQuery('.nucleus-control-panel-content').addClass('show');
+			jQuery('.nucleus-control-panel-content').addClass('show').attr('aria-expanded', 'true');
 		}
 		else 
 		{
-			jQuery('.nucleus-control-panel-content').removeClass('show');
+			jQuery('.nucleus-control-panel-content').removeClass('show').attr('aria-expanded', 'false');;
 			Reload();
 		}
 	}

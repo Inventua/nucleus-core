@@ -89,11 +89,11 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 
 			if (response.IsValid)
 			{
-				return Json(new { Title = "Get Index Settings", Message = $"<pre>{response.DebugInformation}</pre>" });
+				return Json(new { Title = "Get Index Settings", Message = System.Net.WebUtility.HtmlEncode(response.DebugInformation) });
 			}
 			else
 			{
-				return Json(new { Title = "Get Index Settings", Message = $"<pre>{response.DebugInformation}</pre>" });
+				return Json(new { Title = "Get Index Settings", Message = System.Net.WebUtility.HtmlEncode( response.DebugInformation) });
 			}
 		}
 

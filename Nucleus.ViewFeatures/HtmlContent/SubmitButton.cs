@@ -32,8 +32,6 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			IUrlHelper urlHelper = context.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(context);
 						
 			TagBuilder outputBuilder = new("button");
-			TagBuilder labelBuilder = new("div");
-			TagBuilder spanBuilder = new("span");
 			Boolean blnSuppressAutoClass = false;
 
 			outputBuilder.Attributes.Add("type", "submit");
@@ -55,13 +53,26 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			outputBuilder.Attributes.Add("formaction", urlHelper.Content(formaction));
 			outputBuilder.MergeAttributes(htmlAttributes);
 
-			spanBuilder.InnerHtml.SetHtmlContent(glyph);
-			spanBuilder.AddCssClass("nucleus-material-icon");
+			if (!string.IsNullOrEmpty(glyph))
+			{
+				TagBuilder spanBuilder = new("span");
+				spanBuilder.InnerHtml.SetHtmlContent(glyph);
+				spanBuilder.AddCssClass("nucleus-material-icon");
+				spanBuilder.AddCssClass("me-2");
 
-			labelBuilder.InnerHtml.AppendHtml(spanBuilder);
-			labelBuilder.InnerHtml.Append(caption);
+				TagBuilder labelBuilder = new("div");
 
-			outputBuilder.InnerHtml.AppendHtml(labelBuilder);
+				labelBuilder.InnerHtml.AppendHtml(spanBuilder);
+
+				labelBuilder.AddCssClass("d-flex");		
+				labelBuilder.InnerHtml.Append(caption);
+
+				outputBuilder.InnerHtml.AppendHtml(labelBuilder);
+			}
+			else
+			{
+				outputBuilder.InnerHtml.Append(caption);
+			}
 
 			return outputBuilder;			
 		}		

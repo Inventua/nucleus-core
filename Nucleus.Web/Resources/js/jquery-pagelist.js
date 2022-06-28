@@ -60,8 +60,17 @@
         event.preventDefault();
         event.stopPropagation();
 
-        jQuery(this).siblings().removeClass("selected");
-        jQuery(this).addClass("selected");
+        jQuery(args.event.currentTarget).parents('ul, ol').find('LI.selected').removeClass('selected');
+        if (jQuery(args.event.currentTarget).is('li'))
+        {
+          jQuery(args.event.currentTarget).addClass('selected');
+        }
+        else
+        {
+          jQuery(args.event.currentTarget).parent('li').addClass('selected');
+        }
+        //jQuery(this).siblings().removeClass("selected");
+        //jQuery(this).addClass("selected");
         jQuery(this).closest('.nucleus-page-list').find('input[type=hidden]').val(jQuery(this).attr('data-id'));
         jQuery(this).closest('.nucleus-page-list').find('.nucleus-page-list-selected').html(jQuery(this).html());
 

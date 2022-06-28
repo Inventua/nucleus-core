@@ -90,11 +90,11 @@ function _handleContentLoaded(e, args)
 
 		if (show)
 		{
-			jQuery('.nucleus-control-panel-content').addClass('show');
+			jQuery('.nucleus-control-panel-content').addClass('show').attr('aria-expanded', 'true');
 		}
 		else 
 		{
-			jQuery('.nucleus-control-panel-content').removeClass('show');
+			jQuery('.nucleus-control-panel-content').removeClass('show').attr('aria-expanded', 'false');;
 			Reload();
 		}
 	}
@@ -131,21 +131,21 @@ function _handleContentLoaded(e, args)
 	}
 
 	// For clicked items within a list, apply the 'selected' css class to the selected LI, and remove from other LI elements in the parent list
-	if (typeof (args.triggerEvent) !== 'undefined' && args.triggerEvent !== null)
+	if (typeof (args.event) !== 'undefined' && args.event !== null)
 	{
-		jQuery(args.triggerEvent.currentTarget).parents('ul, ol').find('LI.selected').removeClass('selected');
-		if (jQuery(args.triggerEvent.currentTarget).is('li'))
+		jQuery(args.event.currentTarget).parents('ul, ol').find('LI.selected').removeClass('selected');
+		if (jQuery(args.event.currentTarget).is('li'))
 		{
-			jQuery(args.triggerEvent.currentTarget).addClass('selected');
+			jQuery(args.event.currentTarget).addClass('selected');
 		}
 		else
 		{
-			jQuery(args.triggerEvent.currentTarget).parent('li').addClass('selected');
+			jQuery(args.event.currentTarget).parent('li').addClass('selected');
 		}
 
-		if (args.triggerEvent.currentTarget.scrollIntoView)
+		if (args.event.currentTarget.scrollIntoView)
 		{
-			args.triggerEvent.currentTarget.scrollIntoView({ behavior: 'smooth' });
+			args.event.currentTarget.scrollIntoView({ behavior: 'smooth' });
 		}
 	}
 

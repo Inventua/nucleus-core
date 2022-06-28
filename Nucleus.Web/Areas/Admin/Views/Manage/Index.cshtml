@@ -1,72 +1,22 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.Manage
+@using Nucleus.Web.ViewModels.Admin
 @using Nucleus.ViewFeatures
 @using Nucleus.Extensions;
 @addTagHelper "*, Nucleus.ViewFeatures"
 <h1 class="nucleus-control-panel-heading">Manage</h1>
 <ul class="nucleus-control-panel-items">
-	<li class="UsersIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/Users/Index")" accesskey="U"></a>
-		<span>&#xf02e;</span>
-		<h3>Users</h3>
-		Create and Manage user accounts, profile settings and user role assignments.
-	</li>
-
-	<li class="RoleGroupsIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/RoleGroups/Index")" accesskey="G"></a>
-		<span>&#xf233;</span>
-		<h3>Role Groups</h3>
-		Create and Manage Role Groups.
-	</li>
-
-	<li class="RolesIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/Roles/Index")" accesskey="R"></a>
-		<span>&#xe7ef;</span>
-		<h3>Roles</h3>
-		Create and Manage Security Roles.
-	</li>
-
-	<li class="SiteIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/Sites/EditCurrentSite")" accesskey="S"></a>
-		<span>&#xe051;</span>
-		<h3>Site</h3>
-		Manage settings for the current site.
-	</li>
-
-	<li class="MailIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/MailTemplates/Index")" accesskey="M"></a>
-		<span>&#xe0be;</span>
-		<h3>Mail Templates</h3>
-		Manage e-mail templates for the current site.
-	</li>
-
-	<li class="FilesIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/FileSystem/Index")" accesskey="F"></a>
-		<span>&#xe2c7;</span>
-		<h3>Files</h3>
-		Manage file system providers, folders and files.
-	</li>
-
-	<li class="ListsIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/Lists/Index")" accesskey="L"></a>
-		<span>&#xe7ef;</span>
-		<h3>Lists</h3>
-		Create and Manage Lists, which can be used by modules or other parts of the system.
-	</li>
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Users", "Users", "Create and Manage user accounts, profile settings and user role assignments.", "~/Admin/Users/Index", "U", "&#xf02e;", "UsersIcon"))
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Role Groups", "Role Groups", "Create and Manage Role Groups.", "~/Admin/RoleGroups/Index", "G", "&#xf233;", "RoleGroupsIcon"))
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Roles", "Roles", "Create and Manage Security Roles.", "~/Admin/Roles/Index", "R", "&#xe7ef;", "UsersIcon"))
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Site", "Site", "Manage settings for the current site.", "~/Admin/Sites/EditCurrentSite", "S", "&#xe051;", "SiteIcon"))
 	
-	<li class="SearchSettingsIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/SearchSettings/Settings")" accesskey="R"></a>
-		<span>&#xe8b6;</span>
-		<h3>Search Settings</h3>
-		Manage search settings.
-	</li>
-
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Mail Templates", "Mail Templates", "Manage e-mail templates for the current site.", "~/Admin/Users/Index", "M", "&#xe0be;", "MailIcon"))
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Files", "Files", "Manage file system providers, folders and files.", "~/Admin/FileSystem/Index", "F", "&#xe2c7;", "FilesIcon"))
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Lists", "Lists", "Create and Manage Lists, which can be used by modules or other parts of the system.", "~/Admin/Lists/Index", "L", "&#xe7ef;", "ListsIcon"))
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Search Settings", "Search Settings", "Manage search settings.", "~/Admin/SearchSettings/Settings", "R", "&#xe8b6;", "SearchSettingsIcon"))
+	
 	@foreach (var extension in Model.Extensions)
 	{
-	<li class="ExtensionIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.NucleusAction(extension.EditAction, extension.ControllerName, extension.ExtensionName)" accesskey="@extension.FriendlyName.Substring(0,1)"></a>
-		<span>&#xe87b;</span>
-		<h3>@extension.FriendlyName</h3>
-		@extension.Description
-	</li>
+		@await Html.PartialAsync("_ManageIcon", new ManageIcon(@extension.FriendlyName, @extension.FriendlyName, @extension.Description, @Url.NucleusAction(extension.EditAction, extension.ControllerName, extension.ExtensionName), @extension.FriendlyName.Substring(0,1), "&#xe87b;", "ExtensionIcon"))
 	}
 </ul>

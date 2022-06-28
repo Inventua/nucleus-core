@@ -1,52 +1,19 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.Settings
+@using Nucleus.Web.ViewModels.Admin
 @using Nucleus.ViewFeatures
 @using Nucleus.Extensions;
 @addTagHelper "*, Nucleus.ViewFeatures"
 <h1 class="nucleus-control-panel-heading">Settings</h1>
 <ul class="nucleus-control-panel-items">
-	<li class="SysAdminsIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/SystemAdministrators/Index")" accesskey="A"></a>
-		<span>&#xef3d;</span>
-		<h3>System Administrators</h3>
-		Create and manage System Administrator users.  System Administrator users can manage all features of all sites.
-	</li>
-
-	<li class="SiteGroupsIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/SiteGroups/Index")" accesskey="G"></a>
-		<span>&#xe051;</span>
-		<h3>Site Groups</h3>
-		Create and manage sites groups.  Sites can be added to a site group to share users, roles and other data.
-	</li>
-
-	<li class="SitesIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/Sites/Index")" accesskey="S"></a>
-		<span>&#xe051;</span>
-		<h3>Sites</h3>
-		Create and manage sites (Tenants).
-	</li>
-
-	<li class="ScheduledTasksIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/ScheduledTasks/Index")" accesskey="T"></a>
-		<span>&#xe8b5;</span>
-		<h3>Scheduler</h3>
-		Create and manage scheduled tasks.
-	</li>
-
-	<li class="ApiKeysIcon" data-target=".nucleus-adminpage">
-		<a href="@Url.Content("~/Admin/ApiKeys/Index")" accesskey="K"></a>
-		<span>&#xf1b7;</span>
-		<h3>API Keys</h3>
-		Create and manage scheduled API keys.
-	</li>
-
+	@await Html.PartialAsync("../Manage/_ManageIcon", new ManageIcon("System Administrators", "System Administrators", "Create and manage System Administrator users.  System Administrator users can manage all features of all sites.", "~/Admin/SystemAdministrators/Index", "A", "&#xef3d;", "SysAdminsIcon"))
+	@await Html.PartialAsync("../Manage/_ManageIcon", new ManageIcon("Site Groups", "Site Groups", "Create and manage sites groups.  Sites can be added to a site group to share users, roles and other data.", "~/Admin/SiteGroups/Index", "G", "&#xe051;", "SiteGroupsIcon"))
+	@await Html.PartialAsync("../Manage/_ManageIcon", new ManageIcon("Sites", "Sites", "Create and manage sites.", "~/Admin/Sites/Index", "S", "&#xe051;", "SitesIcon"))
+	@await Html.PartialAsync("../Manage/_ManageIcon", new ManageIcon("Scheduler", "Scheduler", "Create and manage scheduled tasks.", "~/Admin/ScheduledTasks/Index", "T", "&#xe8b5;", "ScheduledTasksIcon"))
+	@await Html.PartialAsync("../Manage/_ManageIcon", new ManageIcon("API Keys", "API Keys", "Create and manage scheduled API keys.", "~/Admin/ApiKeys/Index", "K", "&#xf1b7;", "ApiKeysIcon"))
+	
 	@foreach (var extension in Model.Extensions)
 	{
-		<li class="ExtensionIcon" data-target=".nucleus-adminpage">
-			<a href="@Url.NucleusAction(extension.EditAction, extension.ControllerName, extension.ExtensionName)"></a>
-			<span>&#xe87b;</span>
-			<h3>@extension.FriendlyName</h3>
-			@extension.Description
-		</li>
+		@await Html.PartialAsync("../Manage/_ManageIcon", new ManageIcon(@extension.FriendlyName, @extension.FriendlyName, @extension.Description, @Url.NucleusAction(extension.EditAction, extension.ControllerName, extension.ExtensionName), @extension.FriendlyName.Substring(0,1), "&#xe87b;", "ExtensionIcon"))	
 	}
 </ul>
 

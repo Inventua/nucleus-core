@@ -11,7 +11,7 @@
 	@using (Html.BeginAreaForm("Index", "FileSystem", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
 	{
 		<div class="nucleus-form-tools flex">
-			@Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey" })
+			@Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control" })
 			<span>@Model.Folder.Name</span>
 		</div>
 		@Html.HiddenFor(model => model.SelectedProviderKey)

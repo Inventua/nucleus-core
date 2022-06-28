@@ -61,6 +61,7 @@ namespace Nucleus.Web.Controllers.Admin
 									viewModel.FileId = result.FileId;
 									viewModel.Package = result.Package;
 									viewModel.Readme = result.Readme;
+									viewModel.License = result.License;
 								}
 								else
 								{

@@ -31,6 +31,11 @@ namespace Nucleus.Abstractions.Models.Extensions
 		public string Readme { get; set; }
 
 		/// <summary>
+		/// Package license
+		/// </summary>
+		public string License { get; set; }
+
+		/// <summary>
 		/// Validation result
 		/// </summary>
 		public Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary Messages { get; set; }

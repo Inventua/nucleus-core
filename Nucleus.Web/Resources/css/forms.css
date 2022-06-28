@@ -151,7 +151,7 @@ input[type=search], select
 	display: flex;
 	flex-direction: row;
 	margin-bottom: 4px;
-	gap: 4px;	
+	gap: 8px;	
 }
 
 .nucleus-form-buttonrow

@@ -20,6 +20,7 @@
 			</moduleDefinition>
 
 			<file name="readme.txt" />
+			<file name="license.txt" />
 			<file name="documents.css" />
 			<file name="settings.css" />
 			

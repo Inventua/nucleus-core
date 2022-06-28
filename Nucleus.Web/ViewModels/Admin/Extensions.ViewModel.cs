@@ -9,6 +9,7 @@ namespace Nucleus.Web.ViewModels.Admin
 	public class Extensions
 	{
 		public string Readme { get; set; }
+		public string License { get; set; }
 		public Nucleus.Abstractions.Models.Extensions.package Package { get; set; }
 		public string FileId { get; set; }
 

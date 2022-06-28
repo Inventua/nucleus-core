@@ -73,19 +73,22 @@ namespace Nucleus.Core.Managers
 					result.FileId = await installer.SaveTempFile();
 					result.Package = await installer.GetPackage();
 
-					if (installer.FileExists("readme.txt"))
-					{
-						System.IO.Stream readmeStream = await installer.GetFileStream("readme.txt");
+					result.Readme = await GetDocumentationFileContents(installer, "readme.txt", "readme.htm", "readme.md", "readme");
+					result.License = await GetDocumentationFileContents(installer, "license.txt", "license.htm", "license.md", "license");
 
-						if (readmeStream != null)
-						{
-							readmeStream.Position = 0;
-							using (StreamReader reader = new(readmeStream))
-							{
-								result.Readme = reader.ReadToEnd();
-							}
-						}
-					}					
+					//if (installer.FileExists())
+					//{
+					//	System.IO.Stream readmeStream = await installer.GetFileStream("readme.txt");
+
+					//	if (readmeStream != null)
+					//	{
+					//		readmeStream.Position = 0;
+					//		using (StreamReader reader = new(readmeStream))
+					//		{
+					//			result.Readme = reader.ReadToEnd();
+					//		}
+					//	}
+					//}					
 				}
 				else
 				{
@@ -95,6 +98,47 @@ namespace Nucleus.Core.Managers
 			}
 
 			return result;
+		}
+
+		private async Task<string> GetDocumentationFileContents(ExtensionInstaller installer, params string[] filenames)
+		{
+			foreach (string filename in filenames)
+			{
+				if (installer.FileExists(filename))
+				{
+					System.IO.Stream readmeStream = await installer.GetFileStream(filename);
+
+					if (readmeStream != null)
+					{
+						string contentType;
+						switch (System.IO.Path.GetExtension(filename).ToLower())
+						{
+							case ".md":
+								contentType = "text/markdown";
+								break;
+
+							case ".txt":
+							case "":
+								contentType = "text/plain";
+								break;
+
+							case ".htm":
+							case ".html":
+							default:
+								contentType = "text/html";
+								break;
+						}
+
+						readmeStream.Position = 0;
+						using (StreamReader reader = new(readmeStream))
+						{
+							return Nucleus.Extensions.ContentExtensions.ToHtml(reader.ReadToEnd(), contentType);							
+						}
+					}
+				}
+			}
+
+			return null;
 		}
 
 		/// <summary>

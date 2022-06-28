@@ -57,7 +57,9 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 			spanBuilder.InnerHtml.SetHtmlContent(glyph);
 			spanBuilder.AddCssClass("nucleus-material-icon");
+			spanBuilder.AddCssClass("me-2");
 
+			labelBuilder.AddCssClass("d-flex");
 			labelBuilder.InnerHtml.AppendHtml(spanBuilder);
 			labelBuilder.InnerHtml.Append(caption);
 

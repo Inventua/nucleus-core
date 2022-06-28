@@ -555,7 +555,11 @@ ul.nucleus-control-panel-items a
 .nucleus-admin-content .nucleus-editor-panel form, .nucleus-admin-content .nucleus-editor-panel form fieldset
 {
 	display: flex;
-	flex-direction: column;
+	flex-direction: column;	
+}
+
+.nucleus-admin-content .nucleus-editor-panel form, .nucleus-admin-content
+{
 	flex-basis: 100%;
 }
 

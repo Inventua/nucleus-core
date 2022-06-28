@@ -49,22 +49,37 @@
 	white-space: nowrap;
 }
 
-.Articles.tile-1-column h2, .Articles.tile-2-column h2
+.Articles.tile-1-column, .Articles.tile-2-column
+{
+	display: grid;
+	grid-auto-rows: 1fr;
+	gap: 0.5rem;
+}
+
+/*.Articles.tile-1-column h2, .Articles.tile-2-column h2
 {
 	font-size: 1.0rem;
+}*/
+
+.Articles.tile-1-column 
+{
+	grid-template-columns: repeat(1, 1fr);
 }
 
 .Articles.tile-2-column 
 {
-	display: grid;
 	grid-template-columns: repeat(2, 1fr);
-	grid-auto-rows: 1fr;
 }
 
 .Articles.tile-1-column .Article, .Articles.tile-2-column .Article
 {
 	overflow: hidden;
 	max-width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding: 0.75rem;
+	border: solid 1px #ddd;
 }
 
 .Articles.tile-1-column .Article .title, .Articles.tile-2-column .Article .title
@@ -73,3 +88,18 @@
 	white-space: nowrap;
 	overflow: hidden;
 }
+
+.Articles .Article .nucleus-button-row
+{
+	display: flex;
+	align-self: flex-end;
+	margin-top: auto;
+}
+
+/*
+.Articles.tile-1-column > div.Article 
+{
+	padding: 0.75rem;
+	border: solid 1px #ddd;
+}
+*/

@@ -22,8 +22,8 @@ namespace Nucleus.Core.Plugins
 	/// <see cref="https://github.com/dotnet/coreclr/blob/master/Documentation/design-docs/AssemblyLoadContext.ContextualReflection.md" />
 	public class AssemblyLoader
 	{
-		private static Dictionary<string, AssemblyLoadContext> ExtensionLoadContexts { get; } = new(StringComparer.OrdinalIgnoreCase);
-		private static Dictionary<string, AssemblyLoadContext> TypeContextCache { get; } = new(StringComparer.OrdinalIgnoreCase);
+		private static System.Collections.Concurrent.ConcurrentDictionary<string, AssemblyLoadContext> ExtensionLoadContexts { get; } = new(StringComparer.OrdinalIgnoreCase);
+		private static System.Collections.Concurrent.ConcurrentDictionary<string, AssemblyLoadContext> TypeContextCache { get; } = new(StringComparer.OrdinalIgnoreCase);
 
 		private static Boolean isResolvingEventHooked = false;
 
@@ -81,7 +81,7 @@ namespace Nucleus.Core.Plugins
 				else
 				{
 					assemblyLoadContext = new PluginLoadContext(extensionFolder, pluginPath);
-					ExtensionLoadContexts.Add(extensionFolder, assemblyLoadContext);
+					ExtensionLoadContexts.TryAdd(extensionFolder, assemblyLoadContext);
 				}
 			}
 
@@ -246,7 +246,6 @@ namespace Nucleus.Core.Plugins
 					System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope scope = context.EnterContextualReflection();
 
 					if (Type.GetType(typeName) != null)
-					//	if (context.Assemblies.Where(asm => asm.GetType(typeName.Split(',')[0], false, true) != null).Any())
 					{
 						TypeContextCache.TryAdd(typeName, context);
 						return scope;
@@ -295,7 +294,7 @@ namespace Nucleus.Core.Plugins
 			{
 				AssemblyLoadContext context = ExtensionLoadContexts[pluginName];
 
-				ExtensionLoadContexts.Remove(pluginName);
+				ExtensionLoadContexts.Remove(pluginName, out AssemblyLoadContext removed);
 
 				context.Unload();
 				context = null;

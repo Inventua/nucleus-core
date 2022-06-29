@@ -95,13 +95,15 @@ namespace Nucleus.Web
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			// This must be called before .AddStartupLogger, because the TextFileLogger uses its values.
-			services.AddFolderOptions(this.Configuration);
-
-			services.AddStartupLogger(this.Configuration);
-
-			services.Logger().LogInformation(new[]
+			try
 			{
+				// This must be called before .AddStartupLogger, because the TextFileLogger uses its values.
+				services.AddFolderOptions(this.Configuration);
+
+				services.AddStartupLogger(this.Configuration);
+
+				services.Logger().LogInformation(new[]
+				{
 				$"{System.Reflection.Assembly.GetExecutingAssembly().Product()} version {this.GetType().Assembly.GetName().Version}. {this.GetType().Assembly.Copyright()}",
 				$"Application Root folder: [{System.Environment.CurrentDirectory}]",
 				$"Configuration folder:    [{ConfigFolder()}]",
@@ -110,96 +112,108 @@ namespace Nucleus.Web
 				$"Urls:                    [{this.Configuration.GetValue<string>(Microsoft.AspNetCore.Hosting.WebHostDefaults.ServerUrlsKey)}]"
 			});
 
-			services.AddHttpContextAccessor();  // required by many elements of the system
-			services.AddHttpClient();
+				services.AddHttpContextAccessor();  // required by many elements of the system
+				services.AddHttpClient();
 
-			IMvcBuilder builder = services.AddControllersWithViews();
+				IMvcBuilder builder = services.AddControllersWithViews();
 
-			builder.AddRazorRuntimeCompilation();
+				builder.AddRazorRuntimeCompilation();
 
-			// services.AddLocalization(options => options.ResourcesPath = "LocalizationResources");
+				// services.AddLocalization(options => options.ResourcesPath = "LocalizationResources");
 
-			// Enable logging
-			services.AddLogging(logging =>
-			{
-				logging.ClearProviders();
-				logging.AddConsole();
-				logging.AddDebugLogger();
-				logging.AddTextFileLogger(this.Configuration);
-				logging.AddAzureWebAppDiagnostics();
-			});
-
-			services.Logger().LogInformation($"App Data Folder:         [{Core.Logging.LoggingBuilderExtensions.DataFolder}]");
-				
-			// Enable compression
-			if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
-			{
-				services.Logger().LogInformation($"Adding Response Compression");
-				services.AddResponseCompression(options =>
+				// Enable logging
+				services.AddLogging(logging =>
 				{
-					options.Providers.Add(typeof(Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider));
-					options.Providers.Add(typeof(Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider));
-					options.EnableForHttps = true;
+					logging.ClearProviders();
+					logging.AddConsole();
+					logging.AddDebugLogger();
+					logging.AddTextFileLogger(this.Configuration);
+					logging.AddAzureWebAppDiagnostics();
 				});
-			};
 
-			if (this.Configuration.GetValue<Boolean>(SETTING_ENABLEFORWARDEDHEADERS))
-			{
-				services.Configure<ForwardedHeadersOptions>(options =>
+				services.Logger().LogInformation($"App Data Folder:         [{Core.Logging.LoggingBuilderExtensions.DataFolder}]");
+
+				// Enable compression
+				if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
 				{
-					options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.All;
+					services.Logger().LogInformation("Adding Response Compression");
+					services.AddResponseCompression(options =>
+					{
+						options.Providers.Add(typeof(Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider));
+						options.Providers.Add(typeof(Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider));
+						options.EnableForHttps = true;
+					});
+				};
+
+				if (this.Configuration.GetValue<Boolean>(SETTING_ENABLEFORWARDEDHEADERS))
+				{
+					services.Logger().LogInformation("Adding Forwarded Headers");
+					services.Configure<ForwardedHeadersOptions>(options =>
+					{
+						options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.All;
+					});
+				}
+
+				// Read HostOptions settings from config
+				services.Logger().LogInformation("Setting Host Options");
+				services.Configure<HostOptions>(Configuration.GetSection("HostOptions"));
+
+				services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(Configuration.GetSection("FormOptions"));
+				services.Configure<KestrelServerOptions>(Configuration.GetSection("KestrelServerOptions"));
+				services.Configure<IISServerOptions>(Configuration.GetSection("IISServerOptions"));
+				services.Configure<IISOptions>(Configuration.GetSection("IISOptions"));
+
+				// Set (override) all of the various "max size" settings from one config value (if it is present)
+				string maxRequestSize = Configuration.GetSection("Nucleus:MaxRequestSize").Value;
+				if (long.TryParse(maxRequestSize, out long maxRequestSizeValue))
+				{
+					services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options => options.MultipartBodyLengthLimit = maxRequestSizeValue);
+					services.Configure<IISServerOptions>(options => { options.MaxRequestBodySize = maxRequestSizeValue; });
+
+					// We set KestrelServerOptions options.Limits.MaxRequestBodySize to unlimited because the exception that it generates 
+					// (Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException) causes problems with exception handling.  The other limits
+					// encapsulate this limit anyway, and provide better error messages.
+					services.Configure<KestrelServerOptions>(options => { options.Limits.MaxRequestBodySize = long.MaxValue; });
+				}
+
+				services.Logger().LogInformation("Adding Security Headers Middleware");
+				services.AddSecurityHeadersMiddleware(this.Configuration);
+
+				// Add merged file provider.  
+				services.Logger().LogInformation("Adding Merged File Middleware");
+				services.AddMergedFileMiddleware(this.Configuration);
+
+				services.Logger().LogInformation("Adding Data Provider Services");
+				services.AddDataProviderFactory(this.Configuration);
+				services.AddCoreDataProvider(this.Configuration);
+
+				services.Logger().LogInformation("Adding Nucleus core services");
+				services.AddNucleusCoreServices(this.Configuration);
+				services.AddScoped<IContainerController, Nucleus.Web.Controllers.ContainerController>();
+
+				services.Logger().LogInformation("Adding Plugins");
+				builder.AddPlugins(Environment.ContentRootPath);
+
+				services.AddRazorPages();
+
+				services.AddCoreAuthentication(this.Configuration);
+				services.AddCoreAuthorization();
+
+				services.AddAntiforgery();
+
+				// default response caching to no caching
+				services.AddResponseCaching(options =>
+				{
+					options.SizeLimit = 0;
+					options.MaximumBodySize = 0;
 				});
+				services.Logger().LogInformation("Startup.ConfigureServices Complete.");
 			}
-
-			// Read HostOptions settings from config
-			services.Configure<HostOptions>(Configuration.GetSection("HostOptions"));
-
-			services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(Configuration.GetSection("FormOptions"));
-			services.Configure<KestrelServerOptions>(Configuration.GetSection("KestrelServerOptions"));
-			services.Configure<IISServerOptions>(Configuration.GetSection("IISServerOptions"));
-			services.Configure<IISOptions>(Configuration.GetSection("IISOptions"));
-
-			// Set (override) all of the various "max size" settings from one config value (if it is present)
-			string maxRequestSize = Configuration.GetSection("Nucleus:MaxRequestSize").Value;
-			if (long.TryParse(maxRequestSize, out long maxRequestSizeValue))
+			catch (Exception ex)
 			{
-				services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options => options.MultipartBodyLengthLimit = maxRequestSizeValue);
-				services.Configure<IISServerOptions>(options => { options.MaxRequestBodySize = maxRequestSizeValue; });
-
-				// We set KestrelServerOptions options.Limits.MaxRequestBodySize to unlimited because the exception that it generates 
-				// (Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException) causes problems with exception handling.  The other limits
-				// encapsulate this limit anyway, and provide better error messages.
-				services.Configure<KestrelServerOptions>(options => { options.Limits.MaxRequestBodySize = long.MaxValue; });
+				services.Logger().LogError(ex, "Startup.ConfigureServices Error.");
+				throw;
 			}
-
-			services.AddSecurityHeadersMiddleware(this.Configuration);
-
-			// Add merged file provider.  
-			services.AddMergedFileMiddleware(this.Configuration);
-
-			services.AddDataProviderFactory(this.Configuration);
-			services.AddCoreDataProvider(this.Configuration);
-
-			services.Logger().LogInformation($"Adding Nucleus core services");
-			services.AddNucleusCoreServices(this.Configuration);
-			services.AddScoped<IContainerController, Nucleus.Web.Controllers.ContainerController>();
-
-			builder.AddPlugins(Environment.ContentRootPath);
-
-			services.AddRazorPages();
-
-			services.AddCoreAuthentication(this.Configuration);
-			services.AddCoreAuthorization();
-
-			services.AddAntiforgery();
-
-			// default response caching to no caching
-			services.AddResponseCaching(options =>
-			{
-				options.SizeLimit = 0;
-				options.MaximumBodySize = 0;
-			});
-
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

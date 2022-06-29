@@ -9,13 +9,13 @@
 	<meta charset="utf-8">
 	<meta content="text/html" http-equiv="Content-Type" />
 	<title>Nucleus Editor</title>
-	@Html.AddStyle("~/Resources/Libraries/Bootstrap/5.2.0/css/bootstrap.css")
+	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.BOOTSTRAP)
 	@Html.AddStyle("~/Resources/css/main.css")
 	@Html.AddStyle("~/Resources/css/shared.css")
 	@Html.AddStyle("~/Resources/css/admin.css")
 	@Html.AddStyle("~/Resources/css/forms.css")
-	@Html.AddScript("~/Resources/Libraries/jQuery/03.06.00/jquery.js")
-	@Html.AddScript("~/Resources/Libraries/Bootstrap/5.2.0/js/bootstrap.bundle.js")
+	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
+	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.BOOTSTRAP)
 	@Html.AddScript("~/Resources/js/jquery-toggleswitch.js")
 	@Html.AddScript("~/Resources/js/jquery-pagelist.js")
 	@Html.AddScript("~/Resources/js/nucleus-shared.js")

@@ -27,15 +27,10 @@
 	<meta content="text/css" http-equiv="Content-Style-Type" />
 	<link rel="canonical" href="@Model.DefaultPageUri" />
 	<title>@Model.Context.Page.Title</title>
-	@Html.AddScript("~/Resources/Libraries/jQuery/03.06.00/jquery.js", false)
-	@Html.AddScript("~/Resources/Libraries/Bootstrap/5.2.0/js/bootstrap.bundle.js", false)
-	@*
-		// the isAsync parameter must be false for nucleus-shared.js.  If async is used, event handlers can be attached after google analytics has attached it's
-		// event handlers, which causes <a> elements with data-target attributes to be followed (intermittently) even though they have already been handled by
-		// _getPartialContent.
-	*@
-	@Html.AddScript("~/Resources/js/nucleus-shared.js", false)
-	@Html.AddStyle("~/Resources/Libraries/Bootstrap/5.2.0/css/bootstrap.css")
+	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
+	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.BOOTSTRAP)
+	@Html.AddScript("~/Resources/js/nucleus-shared.js")
+	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.BOOTSTRAP)
 	@Html.AddStyle("~/Resources/css/shared.css")
 	@if (Model.IsEditing)
 	{

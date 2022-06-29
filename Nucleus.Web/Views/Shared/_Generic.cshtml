@@ -14,11 +14,11 @@
 	<meta content="text/javascript" http-equiv="Content-Script-Type" />
 	<meta content="text/css" http-equiv="Content-Style-Type" />
 	<title>@ViewData["title"]</title>
-	@Html.AddStyle("~/Resources/Libraries/Bootstrap/5.2.0/css/bootstrap.css")
+	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.BOOTSTRAP)
 	@Html.AddStyle("~/Resources/css/shared.css")
 	@Html.AddStyle("~/Resources/css/forms.css")
-	@Html.AddScript("~/Resources/Libraries/jQuery/03.06.00/jquery.js")
-	@Html.AddScript("~/Resources/Libraries/Bootstrap/5.2.0/js/bootstrap.bundle.js")
+	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
+	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.BOOTSTRAP)
 	@Html.AddScript("~/Resources/js/nucleus-shared.js")
 	<merge-stylesheets>
 	@Html.RenderStyles()

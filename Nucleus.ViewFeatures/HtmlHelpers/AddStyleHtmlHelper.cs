@@ -23,6 +23,45 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		private const string ITEMS_KEY = "STYLESHEETS_SECTION";
 
 		/// <summary>
+		/// Constant (enum) values used for the (this IHtmlHelper htmlHelper, WellKnownScripts script) overload.
+		/// </summary>
+		public enum WellKnownScripts
+		{
+			/// <summary>
+			/// Bootstrap
+			/// </summary>
+			BOOTSTRAP
+		}
+
+		/// <summary>
+		/// Add a well-known script.
+		/// </summary>
+		/// <param name="htmlHelper"></param>
+		/// <param name="script"></param>
+		/// <returns></returns>
+		public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, WellKnownScripts script)
+		{
+			string stylesheetPath = "";
+
+			switch (script)
+			{
+				case WellKnownScripts.BOOTSTRAP:
+					stylesheetPath = "~/Resources/Libraries/Bootstrap/5.0.2/css/bootstrap.css";
+					break;
+			}
+
+			if (!String.IsNullOrEmpty(stylesheetPath))
+			{
+				return AddStyle(htmlHelper, stylesheetPath);
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+
+		/// <summary>
 		/// Register the specified style to be added to the Layout or module's CSS styles.
 		/// </summary>
 		/// <param name="htmlHelper"></param>

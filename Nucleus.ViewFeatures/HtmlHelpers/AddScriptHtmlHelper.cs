@@ -23,6 +23,48 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		private const string ITEMS_KEY = "SCRIPT_SECTION";
 
 		/// <summary>
+		/// Constant (enum) values used for the (this IHtmlHelper htmlHelper, WellKnownScripts script) overload.
+		/// </summary>
+		public enum WellKnownScripts
+		{
+			/// <summary>
+			/// Bootstrap
+			/// </summary>
+			BOOTSTRAP,
+			JQUERY
+		}
+
+		/// <summary>
+		/// Add a well-known script.
+		/// </summary>
+		/// <param name="htmlHelper"></param>
+		/// <param name="script"></param>
+		/// <returns></returns>
+		public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, WellKnownScripts script)
+		{
+			string scriptPath = "";
+
+			switch (script)
+			{
+				case WellKnownScripts.BOOTSTRAP:
+					scriptPath = "~/Resources/Libraries/Bootstrap/5.0.2/js/bootstrap.bundle.js";
+					break;
+				case WellKnownScripts.JQUERY:
+					scriptPath = "~/Resources/Libraries/jQuery/03.06.00/jquery.js";
+					break;
+			}
+
+			if (!String.IsNullOrEmpty(scriptPath))
+			{
+				return AddScript(htmlHelper, scriptPath);
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		/// <summary>
 		/// Register the specified script to be added to the Layout or module's scripts.
 		/// </summary>
 		/// <param name="htmlHelper"></param>

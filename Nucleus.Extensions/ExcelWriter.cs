@@ -16,19 +16,20 @@ namespace Nucleus.Extensions
 	public class ExcelWriter<T> : ExcelWriter
 	{
 		/// <summary>
-		/// Specifies whether to auto-detect columns to export and specify any columns to exclude, or whether to include only specified columns.
+		/// Used as a constructor parameter, specifies whether to auto-detect columns to export and specify any columns to exclude, or whether to 
+		/// include only specified columns.
 		/// </summary>
 		public enum Modes
 		{
 			/// <summary>
-			/// Include only specified columns
+			/// Auto-detect columns to export and specify any columns to exclude.
 			/// </summary>
-			IncludeSpecifiedPropertiesOnly,
+			AutoDetect,
 
 			/// <summary>
-			/// Auto-detect columns to export and specify any columns to exclude
+			/// Include only specified columns.
 			/// </summary>
-			AutoDetect
+			IncludeSpecifiedPropertiesOnly,
 		}
 
 		/// <summary>
@@ -210,7 +211,7 @@ namespace Nucleus.Extensions
 		public int RowIndex { get; set; } = 1;
 
 		/// <summary>
-		/// Constructor, used by the generic Exporter&lt;T&gt; class. 
+		/// Constructor, used by the generic ExcelWriter&lt;T&gt; class. 
 		/// </summary>
 		public ExcelWriter() { }
 

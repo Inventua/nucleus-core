@@ -6,14 +6,14 @@ using System.Reflection;
 namespace Nucleus.Extensions
 {
 	/// <summary>
-	/// The AssemblyExtensions class extends the System.Assembly class and provides access to assembly attributes.
+	/// The AssemblyExtensions class extends the System.Assembly class and provides easy access to assembly attributes.
 	/// </summary>
 	public static class AssemblyExtensions
 	{
 		/// <summary>
 		/// Gets the assembly product name.
 		/// </summary>
-		/// <param name="assembly"></param>
+		/// <param name="assembly">The <see href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly">Assembly</see> to read data from.</param>
 		/// <returns></returns>
 		public static string Product(this Assembly assembly)
 		{
@@ -24,7 +24,7 @@ namespace Nucleus.Extensions
 		/// <summary>
 		/// Gets the assembly title.
 		/// </summary>
-		/// <param name="assembly"></param>
+		/// <param name="assembly">The <see href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly">Assembly</see> to read data from.</param>
 		/// <returns></returns>
 		public static string Title(this Assembly assembly)
 		{
@@ -35,7 +35,7 @@ namespace Nucleus.Extensions
 		/// <summary>
 		/// Gets the assembly company.
 		/// </summary>
-		/// <param name="assembly"></param>
+		/// <param name="assembly">The <see href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly">Assembly</see> to read data from.</param>
 		/// <returns></returns>
 		public static string Company(this Assembly assembly)
 		{
@@ -46,7 +46,7 @@ namespace Nucleus.Extensions
 		/// <summary>
 		/// Gets the assembly version.
 		/// </summary>
-		/// <param name="assembly"></param>
+		/// <param name="assembly">The <see href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly">Assembly</see> to read data from.</param>
 		/// <returns></returns>
 		public static string Version(this Assembly assembly)
 		{
@@ -57,7 +57,7 @@ namespace Nucleus.Extensions
 		/// <summary>
 		/// Gets the assembly copyright.
 		/// </summary>
-		/// <param name="assembly"></param>
+		/// <param name="assembly">The <see href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly">Assembly</see> to read data from.</param>
 		/// <returns></returns>
 		public static string Copyright(this Assembly assembly)
 		{

@@ -42,7 +42,7 @@
 				@if (Model.SelectedClass != null)
 				{
 					// Class page
-					@await Html.PartialAsync("_RenderClass.cshtml", Model.SelectedClass)
+					@await Html.PartialAsync("_RenderClass.cshtml", new ApiClass(Model.Page, Model.SelectedClass))
 				}
 				else if (Model.SelectedDocument != null)
 				{
@@ -51,7 +51,7 @@
 					@if (Model.SelectedDocument.Namespace.Summary != null)
 					{
 						<div class="api-summary">
-							@await Html.PartialAsync("_RenderMixedContent.cshtml", Model.SelectedDocument.Namespace.Summary)
+							@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, Model.SelectedDocument.Namespace.Summary))
 						</div>
 					}
 					@if (Model.SelectedDocument.Namespace.Remarks != null)
@@ -59,7 +59,7 @@
 						<div class="api-remarks">
 							<h3>Remarks</h3>
 							<div>
-								@await Html.PartialAsync("_RenderMixedContent.cshtml", Model.SelectedDocument.Namespace.Remarks)
+								@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, Model.SelectedDocument.Namespace.Remarks))
 							</div>
 						</div>
 					}
@@ -82,7 +82,7 @@
 								<li class="list-group-item">
 									<a class="list-group-item-action" href="@Url.PageLink(Model.Page, $"{Model.SelectedDocument.SourceFileName}/{apiClass.FullName}/#mnu-{@apiClass.ControlId()}"))">@apiClass.Name class</a>
 									<div>
-										@await Html.PartialAsync("_RenderMixedContent.cshtml", apiClass.Summary)
+										@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, apiClass.Summary))
 									</div>
 								</li>
 							}

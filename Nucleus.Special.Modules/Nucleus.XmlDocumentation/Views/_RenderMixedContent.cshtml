@@ -1,13 +1,13 @@
-﻿@model Nucleus.XmlDocumentation.Models.Serialization.MixedContent
+﻿@model Nucleus.XmlDocumentation.ViewModels.MixedContent
 @using Nucleus.XmlDocumentation
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.XmlDocumentation.ViewModels
 @* Renders a MixedContent class instance.  The MixedContent class is used by any element which can contain the various *@
 @* tags which can be included in XML documentation comments. *@
-@if (Model != null && Model.Items != null)
+@if (Model != null && Model.Content?.Items != null)
 {
-	@foreach (var item in Model.Items)
+	@foreach (var item in Model.Content.Items)
 	{
 		if (item is String)
 		{
@@ -24,7 +24,7 @@
 			{
 				@if (seeItem.Uri != null)
 				{
-					<a class="link-primary" href="@(seeItem.Uri.IsAbsoluteUri ? seeItem.Uri.ToString() : Url.PageLink(seeItem.Uri.ToString()))">@seeItem.LinkText</a>
+					<a class="link-primary" href="@(seeItem.Uri.IsAbsoluteUri ? seeItem.Uri.ToString() : Url.PageLink(Model.Page, seeItem.Uri.ToString()))">@seeItem.LinkText</a>
 				}
 				else
 				{

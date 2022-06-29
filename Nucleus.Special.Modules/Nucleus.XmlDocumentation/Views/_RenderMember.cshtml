@@ -2,8 +2,9 @@
 @using Nucleus.XmlDocumentation
 @using Nucleus.ViewFeatures
 @using Nucleus.XmlDocumentation.Models
+@using Nucleus.XmlDocumentation.ViewModels
 @* Renders documentation for a member (a constructor, property, field, method or event), of a class *@
-@if (Model != null && Model.Members.Any())
+@if (Model != null && Model.Members?.Any() == true)
 {
 	<div class="@Model.CssClass">
 		<h3>@Model.Caption</h3>
@@ -24,7 +25,7 @@
 				@if (member?.Summary?.Items?.Any() == true)
 				{
 					<div class="api-summary">
-						@await Html.PartialAsync("_RenderMixedContent.cshtml", member.Summary)
+						@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, member.Summary))
 					</div>
 				}
 
@@ -114,7 +115,7 @@
 				{
 					<div class="api-returns">
 						<h5>Returns</h5>
-						<div>@await Html.PartialAsync("_RenderMixedContent.cshtml", member.Returns)</div>
+						<div>@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, member.Returns))</div>
 					</div>
 				}
 
@@ -134,7 +135,7 @@
 					<div class="api-remarks">
 						<h5>Remarks</h5>
 						<div>
-							@await Html.PartialAsync("_RenderMixedContent.cshtml", member.Remarks)
+							@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, member.Remarks))
 						</div>
 					</div>
 				}

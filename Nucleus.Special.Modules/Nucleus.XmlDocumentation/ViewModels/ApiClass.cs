@@ -7,11 +7,15 @@ using Nucleus.Abstractions.Models;
 
 namespace Nucleus.XmlDocumentation.ViewModels
 {
-	public class Section
+	public class ApiClass
 	{
 		public Page Page { get; set; }
-		public string Caption { get; set; }
-		public string CssClass { get; set; }
-		public IList<Nucleus.XmlDocumentation.Models.ApiMember> Members { get; set; }
+		public Nucleus.XmlDocumentation.Models.ApiClass Content { get; set; }
+
+		public ApiClass(Page page, Nucleus.XmlDocumentation.Models.ApiClass apiClass)
+		{
+			this.Page = page;
+			this.Content = apiClass;
+		}
 	}
 }

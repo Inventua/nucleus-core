@@ -1,4 +1,4 @@
-﻿@model Nucleus.XmlDocumentation.Models.ApiClass
+﻿@model Nucleus.XmlDocumentation.ViewModels.ApiClass
 @using Nucleus.XmlDocumentation
 @using Nucleus.ViewFeatures
 @using Nucleus.XmlDocumentation.ViewModels
@@ -6,21 +6,21 @@
 @if (Model != null)
 {
 <div class="api-class">
-	<h2>@Model.Name Class</h2>
-	<div><small class="text-muted">Namespace: @Model.Namespace</small></div>
-	<div><small class="text-muted">Assembly: @(Model.AssemblyName + ".dll")</small></div>
-	@if (Model?.Summary?.Items?.Any() == true)
+	<h2>@Model.Content.Name Class</h2>
+	<div><small class="text-muted">Namespace: @Model.Content.Namespace</small></div>
+	<div><small class="text-muted">Assembly: @(Model.Content.AssemblyName + ".dll")</small></div>
+	@if (Model.Content.Summary?.Items?.Any() == true)
 	{
 		<div class="api-summary">
-			@await Html.PartialAsync("_RenderMixedContent.cshtml", Model.Summary)
+			@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, Model.Content.Summary))
 		</div>
 	}
-	@if (Model?.TypeParams?.Any() == true)
+	@if (Model.Content.TypeParams?.Any() == true)
 	{
 		<div class="api-typeparameters">
 			<h5>Type Parameters</h5>
 			<table>
-				@foreach (var parameter in Model.TypeParams)
+				@foreach (var parameter in Model.Content.TypeParams)
 				{
 					<tr>
 						<td>@parameter.Name</td>
@@ -30,56 +30,56 @@
 			</table>
 		</div>
 	}
-	@if (Model?.Remarks?.Items?.Any() == true)
+	@if (Model.Content.Remarks?.Items?.Any() == true)
 	{
 		<div class="api-remarks">
 			<h3>Remarks</h3>
 			<div>
-				@await Html.PartialAsync("_RenderMixedContent.cshtml", Model.Remarks)
+				@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, Model.Content.Remarks))
 			</div>
 		</div>
 	}
-	@if (Model?.Examples?.Any() == true)
+	@if (Model.Content.Examples?.Any() == true)
 	{
 		<div class="api-examples">
 			<h3>Examples</h3>
-			@foreach (var example in Model.Examples)
+			@foreach (var example in Model.Content.Examples)
 			{
 				<code>@example.FilterXMLWhiteSpace()</code>
 			}
 		</div>
 	}
 
-	@if (Model?.Constructors?.Any() == true)
+	@if (Model.Content.Constructors?.Any() == true)
 	{
-		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Caption = "Constructors", CssClass = "api-constructors", Members = Model.Constructors })
+		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = "Constructors", CssClass = "api-constructors", Members = Model.Content.Constructors })
 	}
 
-	@if (Model?.Properties.Any() == true)
+	@if (Model.Content.Properties.Any() == true)
 	{
-		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Caption = "Properties", CssClass = "api-properties", Members = Model.Properties })
+		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = "Properties", CssClass = "api-properties", Members = Model.Content.Properties })
 	}
 
-	@if (Model?.Fields?.Any() == true)
+	@if (Model.Content.Fields?.Any() == true)
 	{
-		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Caption = "Fields", CssClass = "api-fields", Members = Model.Fields })
+		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = "Fields", CssClass = "api-fields", Members = Model.Content.Fields })
 	}
 
-	@if (Model?.Methods?.Any() == true)
+	@if (Model.Content.Methods?.Any() == true)
 	{
-		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Caption = "Methods", CssClass = "api-methods", Members = Model.Methods })
+		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = "Methods", CssClass = "api-methods", Members = Model.Content.Methods })
 	}
 
-	@if (Model?.Events?.Any() == true)
+	@if (Model.Content.Events?.Any() == true)
 	{
-		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Caption = "Events", CssClass = "api-events", Members = Model.Events })
+		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = "Events", CssClass = "api-events", Members = Model.Content.Events })
 	}
 
-	@if (Model?.SeeAlso?.Any() == true)
+	@if (Model.Content.SeeAlso?.Any() == true)
 	{
 		<div class="api-seealso">
 			<h5>See Also</h5>
-			@foreach (var seeAlso in Model.SeeAlso)
+			@foreach (var seeAlso in Model.Content.SeeAlso)
 			{
 				@if (seeAlso.Uri != null)
 				{

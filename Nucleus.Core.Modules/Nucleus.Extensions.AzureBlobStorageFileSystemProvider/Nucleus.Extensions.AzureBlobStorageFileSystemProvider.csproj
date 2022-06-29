@@ -33,7 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.12.0" />
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.0.2" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.0.3" />
     <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.0.0" />
   </ItemGroup>
 

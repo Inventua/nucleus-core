@@ -9,6 +9,18 @@ namespace Nucleus.XmlDocumentation
 	public static class StringExtensions
 	{
 		/// <summary>
+		/// Removes the namespace from full class name and returns the "simple" name for the type.
+		/// </summary>
+		/// <param name="value"></param>
+		public static string GetSimpleParameterType(this string value)
+		{
+			if (String.IsNullOrEmpty(value)) return "";
+			string parameterType = value.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+			if (String.IsNullOrEmpty(parameterType)) return "";
+			return parameterType.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
+		}
+
+		/// <summary>
 		/// Filter characters from descriptions in XML files so that we can use multiple lines, etc in XML but show
 		/// the description HTML-style, without line breaks and multi-spaces/tabs.
 		/// </summary>

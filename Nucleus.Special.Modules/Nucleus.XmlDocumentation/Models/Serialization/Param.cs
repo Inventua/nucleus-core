@@ -7,13 +7,12 @@ using System.Xml.Serialization;
 
 namespace Nucleus.XmlDocumentation.Models.Serialization
 {
-	public class Param
+	public class Param : MixedContent
 	{
 		[XmlAttribute(AttributeName = "name")]
 		public string Name { get; set; }
-
-		[XmlText]
-		public string Description { get; set; }
+				
+		//public MixedContent Description { get; set; }
 
 		[XmlIgnore]
 		public string Type { get; set; }

@@ -95,12 +95,6 @@
 	margin-bottom: 1rem;
 }
 
-.XmlDocumentation .api-parameters table, .XmlDocumentation .api-typeparameters table
-{
-	width: 100%;
-	font-size: 0.8em;
-}
-
 .XmlDocumentation .api-parameters table tr td, .XmlDocumentation .api-typeparameters table tr td
 {
 	padding: 4px 8px;

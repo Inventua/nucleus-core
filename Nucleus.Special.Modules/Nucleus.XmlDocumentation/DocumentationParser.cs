@@ -289,6 +289,14 @@ namespace Nucleus.XmlDocumentation
 						ParseCrefs(results, member.Returns);
 						ParseCrefs(results, member.Summary);
 
+						if (member.Params != null)
+						{
+							foreach (Param param in member.Params)
+							{
+								ParseCrefs(results, param);
+							}
+						}
+
 						TrimStrings(member.Remarks);
 						TrimStrings(member.Returns);
 						TrimStrings(member.Summary);

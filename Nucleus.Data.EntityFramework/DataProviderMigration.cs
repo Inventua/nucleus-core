@@ -194,7 +194,7 @@ namespace Nucleus.Data.EntityFramework
 						throw;
 					}
 				}
-				this.EventDispatcher?.RaiseEvent<MigrateEvent, Migrate>(new MigrateEvent(schemaName, script.FullName, currentSchemaVersion, script.Version));
+				this.EventDispatcher?.RaiseEvent<MigrateEventArgs, MigrateEvent>(new MigrateEventArgs(schemaName, script.FullName, currentSchemaVersion, script.Version));
 			}
 		}
 

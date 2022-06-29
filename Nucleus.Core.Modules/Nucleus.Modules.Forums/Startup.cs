@@ -38,7 +38,7 @@ namespace Nucleus.Modules.Forums
 				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Reply, Rejected>, EventHandlers.RejectedReplyEventHandler>();
 
 				// Handle migration (install) events
-				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEvent, Migrate>, MigrationEventHandler>();
+				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>, MigrationEventHandler>();
 			});
 		}
 	}
@@ -49,7 +49,7 @@ namespace Nucleus.Modules.Forums
 	/// <remarks>
 	/// When the forums data objects are created, create permission types for forums.
 	/// </remarks>
-	public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEvent, Migrate>
+	public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>
 	{
 		private IPermissionsManager PermissionsManager { get; }
 
@@ -58,7 +58,7 @@ namespace Nucleus.Modules.Forums
 			this.PermissionsManager = permissionsManager;
 		}
 
-		public Task Invoke(MigrateEvent item)
+		public Task Invoke(MigrateEventArgs item)
 		{
 			if (item.SchemaName == "Nucleus.Modules.Forums")
 			{

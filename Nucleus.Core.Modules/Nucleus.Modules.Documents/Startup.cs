@@ -25,15 +25,15 @@ namespace Nucleus.Modules.Documents
 				services.AddTransient<IContentMetaDataProducer, DocumentsMetaDataProducer>();
 				services.AddDataProvider<IDocumentsDataProvider, DataProviders.DocumentsDataProvider, DataProviders.DocumentsDbContext>(context.Configuration);
 
-				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEvent, Migrate>, MigrationEventHandler>();
+				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>, MigrationEventHandler>();
 			});
 		}
 	}
 
 
-	public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEvent, Migrate>
+	public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>
 	{
-		public Task Invoke(MigrateEvent item)
+		public Task Invoke(MigrateEventArgs item)
 		{
 			if (item.SchemaName == "Nucleus.Modules.Documents")
 			{

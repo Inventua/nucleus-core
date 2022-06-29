@@ -10,12 +10,12 @@ namespace Nucleus.Data.Common
 	/// <summary>
 	/// Type representing a migration script operation (event).  This class has no methods or properties, it is used as a key for the <see cref="ISystemEventHandler&lt;TModel, TEvent&gt;"/> class.
 	/// </summary>
-	public class Migrate { }
+	public class MigrateEvent { }
 
 	/// <summary>
 	/// Event data for a successful migrate (script execution) event
 	/// </summary>
-	public class MigrateEvent
+	public class MigrateEventArgs
 	{
 		/// <summary>
 		/// Extension schema name.
@@ -44,7 +44,7 @@ namespace Nucleus.Data.Common
 		/// <param name="filename"></param>
 		/// <param name="fromVersion"></param>
 		/// <param name="toVersion"></param>
-		public MigrateEvent(string schemaName, string filename, System.Version fromVersion, System.Version toVersion)
+		public MigrateEventArgs(string schemaName, string filename, System.Version fromVersion, System.Version toVersion)
 		{
 			this.SchemaName = schemaName;
 			this.FileName = filename;

@@ -25,18 +25,20 @@ namespace Nucleus.XmlDocumentation.Controllers
 		private Context Context { get; }
 		private IPageModuleManager PageModuleManager { get; }
 		private IFileSystemManager FileSystemManager { get; }
+		private ICacheManager CacheManager { get; }
 
-		public XmlDocumentationController(Context Context, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager)
+		public XmlDocumentationController(Context Context, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager)
 		{
 			this.Context = Context;
 			this.PageModuleManager = pageModuleManager;
 			this.FileSystemManager = fileSystemManager;
+			this.CacheManager = cacheManager;
 		}
 
 		[HttpGet]
 		public async Task<ActionResult> Index()
 		{
-			return View("Viewer", await BuildViewModel ());
+			return View("Viewer", await BuildViewModel());
 		}
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
@@ -53,8 +55,10 @@ namespace Nucleus.XmlDocumentation.Controllers
 		{
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_DOCUMENTATION_FOLDER_ID, viewModel.DocumentationFolder.Id);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_DOCUMENTATION_DEFAULTOPEN, viewModel.DefaultOpen);
-			
+
 			await this.PageModuleManager.SaveSettings(this.Context.Module);
+
+			this.CacheManager.XmlDocumentationCache().Remove(this.Context.Module.Id);
 
 			return Ok();
 		}
@@ -66,38 +70,44 @@ namespace Nucleus.XmlDocumentation.Controllers
 
 			viewModel.Page = this.Context.Page;
 
-			try
+			viewModel.Documents = await this.CacheManager.XmlDocumentationCache().GetAsync(this.Context.Module.Id, async id =>
 			{
-				documentationFolder = await this.FileSystemManager.ListFolder(this.Context.Site, this.Context.Module.ModuleSettings.Get(MODULESETTING_DOCUMENTATION_FOLDER_ID, Guid.Empty), "(.xml)");
-				viewModel.DefaultOpen = this.Context.Module.ModuleSettings.Get(MODULESETTING_DOCUMENTATION_DEFAULTOPEN, true);
+				List<ApiDocument> results = new();
 
-				// parse the documentation file, render results
 				try
 				{
-					viewModel.Documents = new();
-				
-					foreach (File xmlDocument in documentationFolder.Files)
-					{
-						DocumentationParser parser = new(this.FileSystemManager.GetFileContents(this.Context.Site, xmlDocument), xmlDocument.Name);
-						if (parser.IsValid)
-						{
-							viewModel.Documents.Add(parser.Document);
-						}
-					}
+					documentationFolder = await this.FileSystemManager.ListFolder(this.Context.Site, this.Context.Module.ModuleSettings.Get(MODULESETTING_DOCUMENTATION_FOLDER_ID, Guid.Empty), "(.xml)");
+					viewModel.DefaultOpen = this.Context.Module.ModuleSettings.Get(MODULESETTING_DOCUMENTATION_DEFAULTOPEN, true);
 
-					DocumentationParser.ParseMixedContent(viewModel.Documents);
+					// parse the documentation file, render results
+					try
+					{
+
+						foreach (File xmlDocument in documentationFolder.Files)
+						{
+							DocumentationParser parser = new(this.FileSystemManager.GetFileContents(this.Context.Site, xmlDocument), xmlDocument.Name);
+							if (parser.IsValid)
+							{
+								results.Add(parser.Document);
+							}
+						}
+
+						DocumentationParser.ParseMixedContent(results);
+					}
+					catch (System.Exception e)
+					{
+						viewModel.Message = e.Message;
+						results = new();
+					}
 				}
-				catch (System.Exception e)
+				catch (System.IO.FileNotFoundException)
 				{
-					viewModel.Message = e.Message;
-					viewModel.Documents = new();
+					viewModel.Message = "Documentation folder not set.";
+					results = new();
 				}
-			}
-			catch (System.IO.FileNotFoundException)
-			{
-				viewModel.Message = "Documentation folder not set.";
-				viewModel.Documents = new();
-			}
+
+				return results;
+			});
 
 			if (this.Context.LocalPath.HasValue)
 			{

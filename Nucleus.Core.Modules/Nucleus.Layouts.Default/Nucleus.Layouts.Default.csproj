@@ -68,9 +68,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.0.3" />
-    <PackageReference Include="Inventua.Nucleus.Extensions" Version="1.0.0.1" />
-    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.0.0" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.0.0" />
+    <PackageReference Include="Inventua.Nucleus.Extensions" Version="1.0.0.0" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.0.0.0" />
   </ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

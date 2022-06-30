@@ -64,8 +64,7 @@ namespace Nucleus.Data.Common
 			// Find IConfigureDataProvider implementations		
 			List<Type> dataProviderConfigImplementations = System.Runtime.Loader.AssemblyLoadContext.All
 				.SelectMany(context => context.Assemblies)
-				.SelectMany(assm => GetTypes(assm))// assm => assm.GetTypes())
-				.Where(type => typeof(IDatabaseProvider).IsAssignableFrom(type) && !type.Equals(typeof(IDatabaseProvider)))
+				.SelectMany(assm => GetTypes(assm).Where(type => typeof(IDatabaseProvider).IsAssignableFrom(type) && !type.Equals(typeof(IDatabaseProvider))))
 				.ToList();
 
 			// Add data provider objects for the data provider specified by <T>.  The database provider required for <T> is specified in

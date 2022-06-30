@@ -7,14 +7,13 @@
 	@foreach (var content in Model.Contents)
 	{
 		<div class="accordion-item">
-			@if (!String.IsNullOrEmpty(content.Title))
-			{
+			
 				<h3 class="accordion-header" id="accordion-head-@content.Id">
 					<button class="accordion-button @(Model.LayoutSettings.OpenFirst && content == Model.Contents.First() ? "" : "collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-item-@content.Id" aria-expanded="@(content == Model.Contents.First() ? "true" : "false")" aria-controls="accordion-item-@content.Id">
-						@content.Title
+						@(!String.IsNullOrEmpty(content.Title) ? content.Title : "No title")
 					</button>
 				</h3>
-			}
+			
 			<div id="accordion-item-@content.Id" class="accordion-collapse collapse@(Model.LayoutSettings.OpenFirst && content == Model.Contents.First() ? " show" : "")" data-bs-parent="#accordion-@Model.Module.Id" aria-labelledby="accordion-head-@content.Id">
 				<div class="accordion-body">
 					@Html.Raw(content.ToHtml())

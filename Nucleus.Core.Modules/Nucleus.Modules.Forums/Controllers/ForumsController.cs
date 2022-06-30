@@ -51,7 +51,7 @@ namespace Nucleus.Modules.Forums.Controllers
 				}
 				catch (UnauthorizedAccessException)
 				{
-					return Unauthorized();
+					return Forbid();
 				}
 			}
 			else
@@ -114,7 +114,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			}
 			catch (UnauthorizedAccessException)
 			{
-				return Unauthorized();
+				return Forbid();
 			}
 		}
 
@@ -130,7 +130,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			}
 			else
 			{
-				return Unauthorized();
+				return Forbid();
 			}
 		}
 
@@ -145,7 +145,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			}
 			else
 			{
-				return Unauthorized();
+				return Forbid();
 			}
 		}
 
@@ -254,7 +254,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			}
 			else
 			{
-				return Unauthorized();
+				return Forbid();
 			}
 		}
 
@@ -272,12 +272,12 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_CREATE_POST))
 				{
-					return Unauthorized();
+					return Forbid();
 				}
 			}
 			else if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_EDIT_POST))
 			{
-				return Unauthorized();
+				return Forbid();
 			}
 
 			// make sure that pinned, locked status hasn't been set by users who don't have rights
@@ -285,7 +285,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				if (viewModel.Post.IsPinned)
 				{
-					return Unauthorized();
+					return Forbid();
 				}
 			}
 
@@ -293,7 +293,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				if (viewModel.Post.IsLocked)
 				{
-					return Unauthorized();
+					return Forbid();
 				}
 			}
 
@@ -312,7 +312,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_EDIT_POST))
 			{
-				return Unauthorized();
+				return Forbid();
 			}
 
 			await this.ForumsManager.SetForumPostStatus(viewModel.Post, viewModel.Post.Status);
@@ -409,7 +409,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE))
 				{
-					return Unauthorized();
+					return Forbid();
 				}
 			}
 
@@ -428,7 +428,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE))
 				{
-					return Unauthorized();
+					return Forbid();
 				}
 			}
 
@@ -446,11 +446,29 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_PIN_POST))
 				{
-					return Unauthorized();
+					return Forbid();
 				}
 			}
 
 			await this.ForumsManager.PinForumPost(viewModel.Post, true);
+
+			return await BuildViewForumView(forum.Id, new());
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> UnPinForumPost(ViewModels.ViewForumPost viewModel)
+		{
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
+
+			if (viewModel.Post.Id == Guid.Empty)
+			{
+				if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_PIN_POST))
+				{
+					return Forbid();
+				}
+			}
+
+			await this.ForumsManager.PinForumPost(viewModel.Post, false);
 
 			return await BuildViewForumView(forum.Id, new());
 		}
@@ -464,11 +482,29 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_LOCK_POST))
 				{
-					return Unauthorized();
+					return Forbid();
 				}
 			}
 
 			await this.ForumsManager.LockForumPost(viewModel.Post, true);
+
+			return await BuildViewForumView(forum.Id, new());
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> UnlockForumPost(ViewModels.ViewForumPost viewModel)
+		{
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
+
+			if (viewModel.Post.Id == Guid.Empty)
+			{
+				if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_LOCK_POST))
+				{
+					return Forbid();
+				}
+			}
+
+			await this.ForumsManager.LockForumPost(viewModel.Post, false);
 
 			return await BuildViewForumView(forum.Id, new());
 		}
@@ -482,7 +518,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_DELETE_POST))
 				{
-					return Unauthorized();
+					return Forbid();
 				}
 			}
 
@@ -499,7 +535,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_REPLY_POST))
 			{
-				return Unauthorized();
+				return Forbid();
 			}
 
 			return View("ReplyPost", viewModel);
@@ -512,7 +548,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			if (!(this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_REPLY_POST)) && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_EDIT_POST))
 			{
-				return Unauthorized();
+				return Forbid();
 			}
 
 			return View("ReplyPost", viewModel);
@@ -536,7 +572,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			if (!this.ForumsManager.CheckPermission(this.Context.Site, User, forum, ForumsManager.PermissionScopes.FORUM_REPLY_POST))
 			{
-				return Unauthorized();
+				return Forbid();
 			}
 
 			await this.ForumsManager.SavePostReply(this.Context.Site, User, post, viewModel.Reply);
@@ -555,7 +591,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE))
 				{
-					return Unauthorized();
+					return Forbid();
 				}
 			}
 
@@ -575,7 +611,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			{
 				if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE))
 				{
-					return Unauthorized();
+					return Forbid();
 				}
 			}
 
@@ -611,7 +647,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_REPLY_POST))
 			{
-				return Unauthorized();
+				return Forbid();
 			}
 
 			await this.ForumsManager.DeletePostReply(forum, reply);

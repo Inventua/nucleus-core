@@ -27,7 +27,7 @@
 						@Html.TextBoxFor(model => model.ScheduledTask.Name, new { @maxlength = 256 })
 					</SettingsControl>
 
-					<SettingsControl caption="Type Name" helptext="Scheduled task type name.  All available scheduled tasks are automatically displayed in this list.">
+					<SettingsControl caption="Task" helptext="Select the scheduled task to run.">
 						@Html.DropDownListFor(model => model.ScheduledTask.TypeName, new SelectList(Model.AvailableServiceTypes, "TypeName", "FriendlyName"), "(select)")
 					</SettingsControl>
 

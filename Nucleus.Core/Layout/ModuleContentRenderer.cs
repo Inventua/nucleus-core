@@ -33,8 +33,9 @@ namespace Nucleus.Core.Layout
 		private Context Context { get; }
 		private IActionInvokerFactory ActionInvokerFactory { get; }
 		private IHttpContextFactory HttpContextFactory { get; }
+		private ILogger<ModuleContentRenderer> Logger { get; }
 
-		public ModuleContentRenderer(Context context, IActionInvokerFactory actionInvokerFactory, IHttpContextFactory httpContextFactory)
+		public ModuleContentRenderer(Context context, ILogger<ModuleContentRenderer> logger, IActionInvokerFactory actionInvokerFactory, IHttpContextFactory httpContextFactory)
 		{
 			this.Context = context;
 			this.ActionInvokerFactory = actionInvokerFactory;
@@ -83,9 +84,9 @@ namespace Nucleus.Core.Layout
 						{
 							// If the specified container was not found, and the user is an admin, display the error message in place of the module
 							// content.  If the user is not an admin, suppress output of the module.
-							if (e.Message.Contains("The view") && e.Message.Contains("was not found"))
+							if (e.Message.Contains("The view", StringComparison.OrdinalIgnoreCase) && e.Message.Contains("was not found", StringComparison.OrdinalIgnoreCase))
 							{
-								htmlHelper.ViewContext.HttpContext.RequestServices.GetService<ILogger<ModuleContentRenderer>>()?.LogError(e, "Error rendering {pane}.", moduleInfo.Pane);
+								this.Logger?.LogError(e, "Error rendering {pane}.", moduleInfo.Pane);
 								if (htmlHelper.ViewContext.HttpContext.User.IsSiteAdmin(this.Context.Site))
 								{
 									output.AppendHtml(e.Message);
@@ -93,6 +94,7 @@ namespace Nucleus.Core.Layout
 							}
 							else
 							{
+								this.Logger?.LogError(e, "Unable to render pane '{pane}' for page {pageid} [{pagename}]", paneName, this.Context.Page.Id, this.Context.Page.Name);
 								throw;
 							}
 						}
@@ -317,19 +319,17 @@ namespace Nucleus.Core.Layout
 
 					if (!String.IsNullOrEmpty(controller))
 					{
-						//actionDescriptor = (ControllerActionDescriptor)actionDescriptorProvider.ActionDescriptors.Items
-						//	.Where(descriptor => ((ControllerActionDescriptor)descriptor).ControllerName.Equals(controller))
-						//	.Where(descriptor => ((ControllerActionDescriptor)descriptor).ActionName.Equals(action))
-						//	.Where(descriptor => ((ControllerActionDescriptor)descriptor).RouteValues["extension"].Equals(moduleinfo.ModuleDefinition.Extension))
-						//	.FirstOrDefault();
-
 						actionDescriptor = (ControllerActionDescriptor)actionDescriptorProvider.ActionDescriptors.Items
 							.Where(descriptor => descriptor is ControllerActionDescriptor)
 							.Where(descriptor => IsMatch((ControllerActionDescriptor)descriptor, action, controller, moduleinfo.ModuleDefinition.Extension))
 							.FirstOrDefault();
-
 					}
 					
+					if (actionDescriptor == null)
+					{
+						throw new InvalidOperationException($"Unable to load an action descriptor for the module '{moduleinfo.ModuleDefinition.FriendlyName}' [{controller}.{action}].");
+					}
+
 					using (System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope scope = Nucleus.Core.Plugins.AssemblyLoader.EnterExtensionContext(actionDescriptor.ControllerTypeInfo.AssemblyQualifiedName))
 					{
 						// Report common error (Module definition invalid)

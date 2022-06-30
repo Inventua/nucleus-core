@@ -206,10 +206,11 @@ namespace Nucleus.Core.Layout
 				return true;
 			}
 
-			if (context.Request.Path.Value.StartsWith("/" + Nucleus.Abstractions.RoutingConstants.ERROR_ROUTE_PATH, StringComparison.OrdinalIgnoreCase))
-			{
-				return true;
-			}
+			// We need to detect the site when using the custom error route so that ErrorController has a Context.Site to read the selected error page id from
+			////if (context.Request.Path.Value.StartsWith("/" + Nucleus.Abstractions.RoutingConstants.ERROR_ROUTE_PATH, StringComparison.OrdinalIgnoreCase))
+			////{
+			////	return true;
+			////}
 
 			if (!this.Application.IsInstalled)
 			{

@@ -846,11 +846,25 @@ function _Page()
 			// set focus to another element type if no INPUT/SELECT/TEXTAREA was found
 			focusableElement = target.find('button, a, [tabindex]:not([tabindex="-1"])').first();
 		}
-		focusableElement.first().focus();
+
+		// only focus on the "found" element if it is in view to prevent scrolling.
+		if (focusableElement.length > 0 && _isInView(focusableElement.first()))
+		{
+			focusableElement.first().focus();
+		}
 
 		// adjust dates from UTC to local
 		_setupDateFields(target);
 	}
+
+	function _isInView (element)
+	{
+		var elementTop = element.offset().top;
+		var elementBottom = elementTop + element.outerHeight();
+		var viewportTop = jQuery(window).scrollTop();
+		var viewportBottom = viewportTop + jQuery(window).height();
+		return elementBottom > viewportTop && elementTop < viewportBottom;
+	};
 
 	function _setupDateFields(target)
 	{

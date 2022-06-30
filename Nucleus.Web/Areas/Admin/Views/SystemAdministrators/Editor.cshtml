@@ -55,15 +55,14 @@
 							@{Dictionary<string, object> parameters = new();
 								parameters.Add("maxlength", 512); 
 								ClaimTypeOption claimTypeOption = Model.User.Profile[profileValueCount].UserProfileProperty.ClaimTypeOption(Model.ClaimTypeOptions);
-								if (claimTypeOption.InputType != null)
+								if (!String.IsNullOrEmpty(claimTypeOption.InputType))
 								{
 									parameters.Add("type", claimTypeOption.InputType);
 								}
-								if (claimTypeOption.Pattern != null)
+								if (!String.IsNullOrEmpty(claimTypeOption.Pattern))
 								{
 									parameters.Add("pattern", claimTypeOption.Pattern);
-								} 
-								}
+								} }
 							@Html.TextBoxFor(model => model.User.Profile[profileValueCount].Value, parameters)
 						</label>
 						@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Id)

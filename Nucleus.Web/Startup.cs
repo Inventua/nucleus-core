@@ -219,69 +219,71 @@ namespace Nucleus.Web
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
-			app.UseMiddleware<SecurityHeadersMiddleware>();
-
-			app.UseExceptionHandler($"/{RoutingConstants.ERROR_ROUTE_PATH}");		
-
-			if (this.Configuration.GetValue<Boolean>(SETTING_ENABLEFORWARDEDHEADERS))
+			try
 			{
-				app.UseForwardedHeaders();
-			}
+				app.UseMiddleware<SecurityHeadersMiddleware>();
 
-			// Call .UseStaticFiles multiple times to add additional paths.  We expose specific folders only, rather than adding 
-			// env.ContentRootPath so that only defined folders can serve static resources.
-			foreach (string folderName in Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS)
-			{
-				string path = System.IO.Path.Combine(env.ContentRootPath, folderName);
+				app.UseExceptionHandler($"/{RoutingConstants.ERROR_ROUTE_PATH}");
 
-				if (System.IO.Directory.Exists(path))
+				if (this.Configuration.GetValue<Boolean>(SETTING_ENABLEFORWARDEDHEADERS))
 				{
-					app.Logger()?.LogInformation("Adding static file path: [{path}]", path.Replace(Environment.ContentRootPath, ""));
-
-					app.UseStaticFiles(new StaticFileOptions
-					{
-						FileProvider = new PhysicalFileProvider(path),
-						RequestPath = "/" + folderName,
-						OnPrepareResponse = context =>
-						{
-							if (context.Context.Response.ContentType.StartsWith("text/") && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
-							{
-								context.Context.Response.ContentType += "; charset=utf-8";
-							}
-						}
-					});
+					app.UseForwardedHeaders();
 				}
-			}
 
-			app.UseAuthorizationRedirect();
+				// Call .UseStaticFiles multiple times to add additional paths.  We expose specific folders only, rather than adding 
+				// env.ContentRootPath so that only defined folders can serve static resources.
+				foreach (string folderName in Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS)
+				{
+					string path = System.IO.Path.Combine(env.ContentRootPath, folderName);
 
-			app.UseCookiePolicy(new CookiePolicyOptions() 
-			{
-				//HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
-				Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest,
-				//MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Strict
-			});
+					if (System.IO.Directory.Exists(path))
+					{
+						app.Logger()?.LogInformation("Adding static file path: [{path}]", path.Replace(Environment.ContentRootPath, ""));
 
-			app.UseRouting();
+						app.UseStaticFiles(new StaticFileOptions
+						{
+							FileProvider = new PhysicalFileProvider(path),
+							RequestPath = "/" + folderName,
+							OnPrepareResponse = context =>
+							{
+								if (context.Context.Response.ContentType.StartsWith("text/") && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
+								{
+									context.Context.Response.ContentType += "; charset=utf-8";
+								}
+							}
+						});
+					}
+				}
 
-			// the order here is important.  The page routing and module routing middleware sets the Nucleus context, which is used by some of the
-			// authorization handlers, but ModuleRoutingMiddleware does a permission check, which requires that Authentication has run - and
-			// middleware is executed in the order of the code below
-			app.UseMiddleware<MergedFileProviderMiddleware>();
-			app.UseMiddleware<PageRoutingMiddleware>();
-			app.UseAuthentication();
-			app.UseMiddleware<Nucleus.Core.FileSystemProviders.FileIntegrityCheckerMiddleware>();
-			app.UseMiddleware<ModuleRoutingMiddleware>();
-			app.UseAuthorization();
+				app.UseAuthorizationRedirect();
 
-			if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
-			{
-				app.Logger().LogInformation($"Using Response Compression.");
-				app.UseResponseCompression();
-			}
+				app.UseCookiePolicy(new CookiePolicyOptions()
+				{
+					//HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
+					Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest,
+					//MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Strict
+				});
 
-			app.UseEndpoints(routes =>
-			{
+				app.UseRouting();
+
+				// the order here is important.  The page routing and module routing middleware sets the Nucleus context, which is used by some of the
+				// authorization handlers, but ModuleRoutingMiddleware does a permission check, which requires that Authentication has run - and
+				// middleware is executed in the order of the code below
+				app.UseMiddleware<MergedFileProviderMiddleware>();
+				app.UseMiddleware<PageRoutingMiddleware>();
+				app.UseAuthentication();
+				app.UseMiddleware<Nucleus.Core.FileSystemProviders.FileIntegrityCheckerMiddleware>();
+				app.UseMiddleware<ModuleRoutingMiddleware>();
+				app.UseAuthorization();
+
+				if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
+				{
+					app.Logger().LogInformation($"Using Response Compression.");
+					app.UseResponseCompression();
+				}
+
+				app.UseEndpoints(routes =>
+				{
 				// All routes that don't match a controller/action or other defined endpoint go to the index controller and are
 				// treated as CMS pages.  By specifying the pattern argument (first argument) we ensure that requests that "look like"
 				// filenames (that is, contains a dot) are routed to the default page controller, the standard overload uses a pattern 
@@ -304,40 +306,46 @@ namespace Nucleus.Web
 				//	name: RoutingConstants.MERGED_CSS_ROUTE_NAME,
 				//	pattern: "/{linkpath}/merged.css/{*src}",
 				//	defaults: new { controller = "MergedFile", action = "Index" });
-				
+
 				// Map the error page
 				routes.MapControllerRoute(
-					name: RoutingConstants.ERROR_ROUTE_NAME,
-					pattern: $"/{RoutingConstants.ERROR_ROUTE_PATH}",
-					defaults: new { controller = "Error", action = "Index" });
+						name: RoutingConstants.ERROR_ROUTE_NAME,
+						pattern: $"/{RoutingConstants.ERROR_ROUTE_PATH}",
+						defaults: new { controller = "Error", action = "Index" });
 
 				// map area routes for the admin controllers
 				routes.MapControllerRoute(
-						name: RoutingConstants.AREA_ROUTE_NAME,
-						pattern: "/{area}/{controller}/{action=Index}/{id?}");
+							name: RoutingConstants.AREA_ROUTE_NAME,
+							pattern: "/{area}/{controller}/{action=Index}/{id?}");
 
 				// map routes for extension controllers
 				routes.MapControllerRoute(
-					name: RoutingConstants.EXTENSIONS_ROUTE_NAME,
-					pattern: $"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
+						name: RoutingConstants.EXTENSIONS_ROUTE_NAME,
+						pattern: $"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
 
 				// we're not currently using this route for anything
 				routes.MapControllerRoute(
-					name: RoutingConstants.API_ROUTE_NAME,
-					pattern: $"/{RoutingConstants.API_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
+						name: RoutingConstants.API_ROUTE_NAME,
+						pattern: $"/{RoutingConstants.API_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
 
 				// Map the search engines "site map" controller to /sitemap.xml
 				routes.MapControllerRoute(
-					name: RoutingConstants.SITEMAP_ROUTE_NAME,
-					pattern: $"/{RoutingConstants.SITEMAP_ROUTE_PATH}",
-					defaults: new { controller = "Sitemap", action = "Index" });
+						name: RoutingConstants.SITEMAP_ROUTE_NAME,
+						pattern: $"/{RoutingConstants.SITEMAP_ROUTE_PATH}",
+						defaults: new { controller = "Sitemap", action = "Index" });
 
 
 				// Configure controller routes using attribute-based routing
 				routes.MapControllers();
-			});
+				});
 
-			app.Logger().LogInformation($"Startup complete.  Nucleus is running.");
+				app.Logger().LogInformation($"Startup complete.  Nucleus is running.");
+			}
+			catch (Exception ex)
+			{
+				app.Logger().LogError(ex, "Startup.Configure Error.");
+				throw;
+			}
 		}
 
 		private static string ConfigFolder()

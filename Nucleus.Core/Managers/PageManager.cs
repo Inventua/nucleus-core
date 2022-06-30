@@ -322,10 +322,14 @@ namespace Nucleus.Core.Managers
 			// check for reserved routes
 			foreach (PageRoute route in page.Routes)
 			{
-				if (RoutingConstants.RESERVED_ROUTES.Contains(route.Path.StartsWith('/') ? route.Path[1..] : route.Path, StringComparer.OrdinalIgnoreCase))
+				string path = route.Path.Split('/', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+				if (!String.IsNullOrEmpty(path))
 				{
-					throw new InvalidOperationException($"The page route '{route.Path}' is reserved.");
-				}
+					if (RoutingConstants.RESERVED_ROUTES.Contains(path, StringComparer.OrdinalIgnoreCase))
+					{
+						throw new InvalidOperationException($"Page routes starting with '{path}' are reserved.");
+					}
+				}				
 			}
 
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())

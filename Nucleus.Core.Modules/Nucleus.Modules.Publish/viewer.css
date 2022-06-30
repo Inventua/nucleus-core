@@ -34,16 +34,6 @@
 	font-weight: bold;
 }
 
-.Articles TABLE
-{
-	width: 100%;
-}
-
-.Articles TABLE th, .Articles TABLE td
-{
-	text-align: left;
-}
-
 .Articles TABLE .btn
 {
 	white-space: nowrap;
@@ -55,11 +45,6 @@
 	grid-auto-rows: 1fr;
 	gap: 0.5rem;
 }
-
-/*.Articles.tile-1-column h2, .Articles.tile-2-column h2
-{
-	font-size: 1.0rem;
-}*/
 
 .Articles.tile-1-column 
 {
@@ -95,11 +80,3 @@
 	align-self: flex-end;
 	margin-top: auto;
 }
-
-/*
-.Articles.tile-1-column > div.Article 
-{
-	padding: 0.75rem;
-	border: solid 1px #ddd;
-}
-*/

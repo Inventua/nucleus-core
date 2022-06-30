@@ -60,7 +60,7 @@ namespace Nucleus.Modules.Publish.DataProviders
 
 		public async Task<PagedResult<Article>> List(PageModule pageModule, PagingSettings settings)
 		{
-			PagedResult<Article> results = new();
+			PagedResult<Article> results = new(settings);
 
 			IQueryable<Article> query = this.Context.Articles
 				.Where

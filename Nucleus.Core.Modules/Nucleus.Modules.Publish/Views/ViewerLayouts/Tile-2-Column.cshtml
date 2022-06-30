@@ -14,7 +14,7 @@
       </h2>
       <div class="metadata">
         <div class="publish-date">
-          @((article.PublishDate != DateTimeOffset.MinValue ? article.PublishDate : @article.DateAdded).FormatDate(this.Context.Request.GetUserTimeZone()))
+          @((article.PublishDate.HasValue ? article.PublishDate : article.DateAdded).FormatDate(this.Context.Request.GetUserTimeZone()))
         </div>
         @if (article.Categories.Count > 0 || article.Featured)
         {

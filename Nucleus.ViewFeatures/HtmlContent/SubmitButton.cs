@@ -58,16 +58,23 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				TagBuilder spanBuilder = new("span");
 				spanBuilder.InnerHtml.SetHtmlContent(glyph);
 				spanBuilder.AddCssClass("nucleus-material-icon");
-				spanBuilder.AddCssClass("me-2");
 
-				TagBuilder labelBuilder = new("div");
+				if (!String.IsNullOrEmpty(caption))
+				{ 
+					spanBuilder.AddCssClass("me-2");
+					TagBuilder labelBuilder = new("div");
 
-				labelBuilder.InnerHtml.AppendHtml(spanBuilder);
+					labelBuilder.InnerHtml.AppendHtml(spanBuilder);
 
-				labelBuilder.AddCssClass("d-flex");		
-				labelBuilder.InnerHtml.Append(caption);
+					labelBuilder.AddCssClass("d-flex");		
+					labelBuilder.InnerHtml.Append(caption);
 
-				outputBuilder.InnerHtml.AppendHtml(labelBuilder);
+					outputBuilder.InnerHtml.AppendHtml(labelBuilder);
+				}
+				else
+				{
+					outputBuilder.InnerHtml.AppendHtml(spanBuilder);
+				}
 			}
 			else
 			{

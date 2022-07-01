@@ -60,7 +60,6 @@ namespace Nucleus.Core.Services
 
 			return Task.CompletedTask;
 		}
-
 		public void Dispose()
 		{
 			this.Timer?.Dispose();
@@ -115,51 +114,19 @@ namespace Nucleus.Core.Services
 				if (queueItem.Task == null || queueItem.Task.IsCompleted)
 				{
 					await SignalCompleted(queueItem);
-					//// re-schedule the task
-					//await RescheduleTask(queueItem.ScheduledTask, queueItem.ScheduledTask.NextScheduledRun.HasValue ? queueItem.ScheduledTask.NextScheduledRun.Value : queueItem.StartDate);
-
-					//queueItem.History.FinishDate = DateTime.UtcNow;
-					//queueItem.History.NextScheduledRun = queueItem.ScheduledTask.NextScheduledRun;
-					//TaskSucceeded(queueItem.History);
-
-					//this.Queue.Remove(queueItem.ScheduledTask);
 				}
 			}
 		}
 
 		private async Task SignalCompleted(RunningTask runningTask)
 		{
-			// re-schedule the task
-			//await RescheduleTask(runningTask.ScheduledTask, runningTask.ScheduledTask.NextScheduledRun.HasValue ? runningTask.ScheduledTask.NextScheduledRun.Value : runningTask.StartDate);
-
 			runningTask.History.FinishDate = DateTime.UtcNow;
-			//runningTask.History.NextScheduledRun = runningTask.ScheduledTask.NextScheduledRun;
 			runningTask.History.NextScheduledRun = CalculateInterval(runningTask.StartDate, runningTask.ScheduledTask.IntervalType, runningTask.ScheduledTask.Interval);
 
 			await TaskSucceeded(runningTask.History);
 
 			this.Queue.Remove(runningTask.ScheduledTask);
 		}
-
-		///// <summary>
-		///// Update the <see cref="ScheduledTask.NextScheduledRun"/> based on task settings.
-		///// </summary>
-		///// <param name="thisTask"></param>
-		///// <param name="thisRunDateTime"></param>
-		//private async Task RescheduleTask(ScheduledTask thisTask, DateTime thisRunDateTime)
-		//{
-		//	DateTime nextRunDateTime;
-
-		//	// re-get the task in case its interval has changed (or it has been deleted!) since we invoked it
-		//	ScheduledTask task = await this.ScheduledTaskManager.Get(thisTask.Id);
-
-		//	// only re-schedule the task if it was not already re-scheduled while the task was running (a user clicked "run now").
-		//	if (task != null && task.NextScheduledRun <= thisRunDateTime)
-		//	{
-		//		nextRunDateTime = CalculateInterval(thisRunDateTime, task.IntervalType, task.Interval);
-		//		await this.ScheduledTaskManager.ScheduleNextRun(task, nextRunDateTime);
-		//	}
-		//}
 
 		private DateTime CalculateInterval(DateTime thisRunDateTime, ScheduledTask.Intervals intervalType, int interval)
 		{
@@ -185,7 +152,6 @@ namespace Nucleus.Core.Services
 
 				default:  // case ScheduledTask.IntervalTypes.None:
 					return thisRunDateTime;
-
 			}
 		}
 
@@ -206,7 +172,6 @@ namespace Nucleus.Core.Services
 			history.Status = ScheduledTaskProgress.State.Succeeded;
 			await this.ScheduledTaskManager.SaveHistory(history);
 		}
-
 
 		/// <summary>
 		/// Start the <see cref="IScheduledTask"/> represented by the specified <see cref="ScheduledTask"/>.
@@ -250,18 +215,6 @@ namespace Nucleus.Core.Services
 					await TaskFailed(history);
 					return;
 				}
-
-				//if (!task.NextScheduledRun.HasValue)
-				//{
-				//	// when tasks are first created, they have a null date.  If the date is null, we set the  NextScheduledRun 
-				//	// to DateTime.UtcNow so that the re-schedule calculation is based on the current date/time.				
-				//	task.NextScheduledRun = DateTime.UtcNow;
-				//}
-				//else if (CalculateInterval(task.NextScheduledRun.Value, task.IntervalType, task.Interval) < DateTime.UtcNow)
-				//{
-				//	// If the system was stopped and missed the next scheduled run, bump the time up to now
-				//	task.NextScheduledRun = DateTime.UtcNow;
-				//}
 
 				RunningTask runningTask = this.Queue.Add(task, history);
 				runningTask.OnProgress += HandleProgress;

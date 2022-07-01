@@ -19,7 +19,8 @@ namespace Nucleus.Core.ScheduledTasks
 
 		public Task InvokeAsync(RunningTask task, IProgress<ScheduledTaskProgress> progress, CancellationToken cancellationToken)
 		{
-			return Task.Run(async () => await CollectExpiredSessions(progress));			
+			//return Task.Run(async () => await CollectExpiredSessions(progress));			
+			return CollectExpiredSessions(progress);
 		}
 		
 		private async Task CollectExpiredSessions(IProgress<ScheduledTaskProgress> progress)

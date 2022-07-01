@@ -24,32 +24,14 @@ namespace Nucleus.Core.ScheduledTasks
 
 		public Task InvokeAsync(RunningTask task, IProgress<ScheduledTaskProgress> progress, CancellationToken cancellationToken)
 		{
-			return Task.Run(()=> CollectCache(progress));
+			//return Task.Run(()=> CollectCache(progress));
+			return Task.Run(() => CollectCache(progress));
 		}
 		
 		private void CollectCache(IProgress<ScheduledTaskProgress> progress)
 		{
 			this.CacheManager.Collect();
-			
-			//this.CacheManager.PageCache().Collect();
-			//this.CacheManager.PageMenuCache().Collect();
-			//this.CacheManager.MailTemplateCache().Collect();
-			//this.CacheManager.PageModuleCache().Collect();
-
-			//this.CacheManager.RoleCache().Collect();
-			//this.CacheManager.RoleGroupCache().Collect();
-			//this.CacheManager.ScheduledTaskCache().Collect();
-			//this.CacheManager.SiteCache().Collect();
-
-			//this.CacheManager.SiteGroupCache().Collect();
-			//this.CacheManager.UserCache().Collect();
-			//this.CacheManager.FolderCache().Collect();
-			//this.CacheManager.ListCache().Collect();
-
-			//this.CacheManager.ContentCache().Collect();
-
-			progress.Report(new ScheduledTaskProgress() { Status = ScheduledTaskProgress.State.Succeeded });
-			
+			progress.Report(new ScheduledTaskProgress() { Status = ScheduledTaskProgress.State.Succeeded });			
 		}
 
 	}

@@ -23,7 +23,8 @@ namespace Nucleus.Core.ScheduledTasks
 
 		public Task InvokeAsync(RunningTask task, IProgress<ScheduledTaskProgress> progress, CancellationToken cancellationToken)
 		{
-			return Task.Run(() => TruncateScheduledTaskHistory(progress));
+			//return Task.Run(() => TruncateScheduledTaskHistory(progress));
+			return TruncateScheduledTaskHistory(progress);
 		}
 
 		private async Task TruncateScheduledTaskHistory(IProgress<ScheduledTaskProgress> progress)

@@ -22,16 +22,16 @@ namespace Nucleus.ViewFeatures.TagHelpers
 	public class SettingsControlTagHelper : TagHelper
 	{
 		/// <summary>
-		/// Specifies whether to render the label before or after the control content.
+		/// Specifies whether to render the settings control label before or after the control content.
 		/// </summary>
 		public enum RenderModes
 		{
 			/// <summary>
-			/// Render the label first
+			/// Render the label before (to the left of) the control content.
 			/// </summary>
 			LabelFirst,
 			/// <summary>
-			/// Render the label last
+			/// Render the label after (to the right of) the control content.
 			/// </summary>
 			LabelLast
 		}

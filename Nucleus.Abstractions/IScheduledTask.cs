@@ -11,6 +11,12 @@ namespace Nucleus.Abstractions
 	/// <summary>
 	/// Scheduled task class interface.
 	/// </summary>
+	/// <remarks>
+	/// Scheduled Tasks implement the InvokeAsync method to perform their work. The implementation of InvokeAsync should execute asynchronously (either 
+	/// return a Task object, or if your implementation doesn't use async methods, use Task.Run to call a function then return immediately) so that 
+	/// scheduled tasks can run in parallel. The progress object should be used to report success or failure by calling progress.Report.
+	/// </remarks>
+	/// <seealso href="https://www.nucleus-cms.com/develop-extensions/scheduled-tasks/">Scheduled Tasks Documentation</seealso>
 	public interface IScheduledTask
 	{
 		/// <summary>

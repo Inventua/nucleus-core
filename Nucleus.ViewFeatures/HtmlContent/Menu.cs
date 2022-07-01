@@ -145,8 +145,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			
 			if (renderChildren)
 			{
-				// Tag the item as a dropdown-toggle control so that down arrow opens the sub-menu
-				linkBuilder.Attributes.Add("data-bs-toggle", "dropdown");
+				// Tag the item as a dropdown-toggle control "keyboard only" control so that arrow keys work (handling code in in nucleus-shared.js)
+				linkBuilder.Attributes.Add("data-bs-toggle", "dropdown-keyboardonly");
 
 				// down arrow icon to expand display (show child pages)
 				TagBuilder toggleLinkBuilder = new("button");

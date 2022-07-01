@@ -85,30 +85,43 @@ function _Page()
 
 		/* menu-submenu handling */
 
+		/* 
+		  Handle keyboard events (arrow keys) on menu items which are links to a page but which which also have children.  These have
+		  a toggle button immediately following them, which is what we 
+		*/
+		jQuery('.nucleus-menu [data-bs-toggle="dropdown-keyboardonly"]').on('keydown', function (e)
+		{
+			if ([37, 38, 39, 40].includes(e.which))  // arrow keys: 37,38,39,40: left/up/right/down
+			{
+				var menuToggleButton = jQuery(this).siblings('[data-bs-toggle="dropdown"]:not(.disabled):not(:disabled)');
+				if (menuToggleButton.length > 0)
+				{
+					var instance = bootstrap.Dropdown.getOrCreateInstance(menuToggleButton);
+					e.key = [37, 38].includes(e.which) ? 'ArrowUp' : 'ArrowDown';
+
+					event.stopPropagation();
+					instance.show();
+					instance._selectMenuItem(e);
+				}
+			}
+		});
+
 		/* Make left/right keys work the same as up/down */
 		jQuery('.nucleus-menu .dropdown-menu').on('keydown', function (e)
 		{
 			if ([37, 39].includes(e.which))  // left arrow, right arrow
 			{
-				var getToggleButton = jQuery(this).siblings('[data-bs-toggle="dropdown"]:not(.disabled):not(:disabled)');
+				var menuToggleButton = jQuery(this).siblings('[data-bs-toggle="dropdown"]:not(.disabled):not(:disabled)');
 
-				if (getToggleButton.length === 0) return;
-				var instance = bootstrap.Dropdown.getOrCreateInstance(getToggleButton);
-
-				if (e.which === 37)  // left arrow
+				if (menuToggleButton.length > 0)
 				{
-					e.key = 'ArrowUp';
-				}
+					var instance = bootstrap.Dropdown.getOrCreateInstance(menuToggleButton);
+					e.Key = e.which === 37 ? 'ArrowUp' : 'ArrowDown';
 
-				if (e.which == 39)  // right arrow
-				{
-					e.key = 'ArrowDown';
+					event.stopPropagation();
+					instance.show();
+					instance._selectMenuItem(e);
 				}
-
-				event.stopPropagation();
-				instance.show();
-				instance._selectMenuItem(e);
-				return;
 			}
 		});
 

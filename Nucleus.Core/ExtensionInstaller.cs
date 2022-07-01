@@ -500,6 +500,11 @@ namespace Nucleus.Core
 				// Validate that referenced files are present in the package
 				foreach (Nucleus.Abstractions.Models.Extensions.component component in package.components)
 				{
+					if (System.IO.Path.IsPathRooted(component.folderName) || PathUtils.PathNavigatesAboveRoot(component.folderName) || PathUtils.HasInvalidPathChars(component.folderName))
+					{
+						throw new InvalidOperationException($"Component folder name '{component.folderName}' is invalid.");
+					}
+
 					// top level files
 					foreach (Nucleus.Abstractions.Models.Extensions.file file in component.Items.OfType<Abstractions.Models.Extensions.file>())
 					{
@@ -536,7 +541,11 @@ namespace Nucleus.Core
 
 			foreach (Nucleus.Abstractions.Models.Extensions.folder subfolder in folder.Items.OfType<Nucleus.Abstractions.Models.Extensions.folder>())
 			{
-				//subfolder.name = folder.name + "/" + subfolder.name;
+				if (System.IO.Path.IsPathRooted(subfolder.name) || PathUtils.PathNavigatesAboveRoot(subfolder.name) || PathUtils.HasInvalidPathChars(subfolder.name))
+				{
+					throw new InvalidOperationException($"Folder name '{subfolder.name}' is invalid.");
+				}
+				
 				ValidateFolder(componentFolder, path + "/" + subfolder.name, subfolder);
 			}
 

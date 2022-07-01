@@ -34,21 +34,28 @@
   display: inline-block;
 }
 
+.Forums .forums-list .forum-subject
+{
+  text-overflow: ellipsis;
+  max-width: 16em;
+  overflow: hidden;
+}
+
 .Forums .compact-cell
 {
   width: 1%;
   white-space: nowrap;
 }
 
-.Forums .forums-list th:last-child, .Forums .forums-list td:last-child
-.Forums .forum-posts th:last-child, .Forums .forum-posts td:last-child
+.Forums .forums-list th, .Forums .forum-posts th
 {
-  width: 20%;
+  white-space: nowrap;
 }
 
 .Forums .forums-list td:last-child, .Forums .forum-posts td:last-child
 {
-  font-size: 0.75em;
+  font-size: 0.9rem;
+  line-height: 1.2;
 }
 
 .Forums .post
@@ -62,10 +69,6 @@
 {
   font-size: 0.8em;
   color: #333;
-}
-
-.Forums .post-status
-{
   text-transform: capitalize;
   border: dashed 1px #bbb;
   padding: 1px 2px;
@@ -82,13 +85,8 @@
 
 .Forums .post .post-flags span, .Forums .reply .reply-flags span
 {
-  /*border-radius: 2px;
-  background-color: #777;
-  color: white;
   font-size: 0.8em;
-  padding: 2px 4px;*/
-  font-size: 0.8em;
-   text-transform: capitalize;
+  text-transform: capitalize;
   border: dashed 1px #bbb;
   padding: 1px 2px;
 }
@@ -120,10 +118,6 @@
   margin: 0;
 }
 
-.Forums .post .body
-{
-}
-
 .Forums .reply
 {
   border: dotted 2px #21A3DA;
@@ -143,7 +137,6 @@
   display: inline-flex;
   flex-direction: row-reverse;
   flex-grow: 1;
-  /*text-align: right;*/
   gap: 4px;
 }
 

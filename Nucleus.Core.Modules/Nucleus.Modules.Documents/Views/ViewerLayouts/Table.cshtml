@@ -10,22 +10,22 @@
 		<tr>
 			@if (Model.AllowSorting)
 			{
-				<th>@Html.LinkButton("", "Title", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Title)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Title)}", false, new { data_target = ".Documents.parent()" })</th>
+				<th>@Html.LinkButton("", "Title", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Title)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Title)}", false, new { data_target = ".Documents.parent()" })</th>
 				@if (Model.ShowCategory)
 				{
-					<th>@Html.LinkButton("", "Category", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Category)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Category)}", false, new { data_target = ".Documents.parent()" })</th>
+					<th>@Html.LinkButton("", "Category", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Category)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Category)}", false, new { data_target = ".Documents.parent()" })</th>
 				}
 				@if (Model.ShowModifiedDate)
 				{
-					<th>@Html.LinkButton("", "Modified Date", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.ModifiedDate)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.ModifiedDate)}", false, new { data_target = ".Documents.parent()" })</th>
+					<th>@Html.LinkButton("", "Modified Date", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.ModifiedDate)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.ModifiedDate)}", false, new { data_target = ".Documents.parent()" })</th>
 				}
 				@if (Model.ShowSize)
 				{
-					<th>@Html.LinkButton("", "Size", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Size)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Size)}", false, new { data_target = ".Documents.parent()" })</th>
+					<th>@Html.LinkButton("", "Size", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Size)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Size)}", false, new { data_target = ".Documents.parent()" })</th>
 				}
 				@if (Model.ShowDescription)
 				{
-					<th>@Html.LinkButton("", "Description", $"{Url.PageLink()}?sortkey={nameof(Viewer.DocumentInfo.Description)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Description)}", false, new { data_target = ".Documents.parent()" })</th>
+					<th>@Html.LinkButton("", "Description", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Description)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Description)}", false, new { data_target = ".Documents.parent()" })</th>
 				}
 			}
 			else

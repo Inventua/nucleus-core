@@ -22,7 +22,7 @@
 			{
 				<tr class="forum-item @(forum.EffectiveSettings().Enabled ? "enabled" : "disabled")">
 					<td class="forum-title">
-						<div class="nucleus-material-icon">
+						<div class="nucleus-material-icon me-1">
 							@if (forum.EffectiveSettings().Enabled)
 							{
 								@Html.Raw("&#xe0bf;")
@@ -50,7 +50,7 @@
 					<td class="compact-cell">
 						@if (forum.Statistics.LastPost != null)
 						{
-							<div>@forum.Statistics.LastPost.Subject</div>
+							<div class="forum-subject">@forum.Statistics.LastPost.Subject</div>
 							<div>@forum.Statistics.LastPost.PostedBy.UserName, @forum.Statistics.LastPost.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
 						}
 					</td>

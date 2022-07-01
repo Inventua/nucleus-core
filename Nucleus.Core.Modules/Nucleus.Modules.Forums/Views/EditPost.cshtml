@@ -5,7 +5,8 @@
 @using Nucleus.Modules.Forums.ViewModels
 @Html.AddStyle("~!/../viewer.css")
 @Html.AddStyle("~/Resources/css/forms.css")
-@using (Html.BeginNucleusForm("SaveForumPost", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = "form.parent()", @enctype = "multipart/form-data" }))
+@Html.AddScript("~/Resources/js/jquery-toggleswitch.js")
+@using (Html.BeginNucleusForm("SaveForumPost", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = "form.parent()", @enctype = "multipart/form-data", @class = "forums-edit-post" }))
 {
 <fieldset>
 	@Html.HiddenFor(model => model.Forum.Id)
@@ -82,5 +83,8 @@
 </div>
 }
 <script type="text/javascript">
-	jQuery('.HtmlEditorControl').HtmlEditor({isAdminMode: false});
+	jQuery(document).ready(function() {
+		jQuery('.forums-edit-post .HtmlEditorControl').HtmlEditor({isAdminMode: false});
+		if (jQuery().ToggleSwitch) { jQuery('.forums-edit-post .ToggleSwitch').ToggleSwitch(); }
+	});
 </script>

@@ -134,7 +134,9 @@ namespace Nucleus.XmlDocumentation.Models
 						{
 							this.Params[count].IsRef = true;
 						}
-						this.Params[count].Type = matchParamList.Groups[1].Value.Replace('{', '(').Replace('}', ')').Replace("@", String.Empty);
+						this.Params[count].Type = matchParamList.Groups[1].Value.Replace('{', '(').Replace('}', ')').Replace("@", String.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+					
+						SetTypeUrl(this.Params[count]);
 					}
 
 					matchParamList = matchParamList.NextMatch();
@@ -145,6 +147,28 @@ namespace Nucleus.XmlDocumentation.Models
 			if (!String.IsNullOrEmpty(this.Parameters))
 			{
 				this.Parameters = this.Parameters.Replace("@", String.Empty);
+			}
+		}
+
+		private void SetTypeUrl(Param param)
+		{
+			if (String.IsNullOrEmpty(param.Type)) return;
+
+			string rootNamespace = param.Type.Split('.', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+
+			if (string.IsNullOrEmpty(rootNamespace)) return;
+
+			switch (rootNamespace)
+			{
+				case "Microsoft":
+				case "System":
+					param.Url = $"https://docs.microsoft.com/en-us/dotnet/api/{param.Type}";
+					break;
+				case "Nucleus":
+					string namespaceName = param.Type.Substring(0, param.Type.LastIndexOf('.'));
+					if (String.IsNullOrEmpty(namespaceName)) return;
+					param.Url = $"https://www.nucleus-cms.com/api-documentation/{namespaceName}.xml/{param.Type}/#{param.Type}"; 					
+					break;
 			}
 		}
 

@@ -19,5 +19,8 @@ namespace Nucleus.XmlDocumentation.Models.Serialization
 
 		[XmlIgnore]
 		public Boolean IsRef { get; set; }
+
+		[XmlIgnore]
+		public string Url { get; set; }
 	}
 }

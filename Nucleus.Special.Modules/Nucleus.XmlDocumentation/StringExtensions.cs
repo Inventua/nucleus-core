@@ -9,15 +9,21 @@ namespace Nucleus.XmlDocumentation
 	public static class StringExtensions
 	{
 		/// <summary>
-		/// Removes the namespace from full class name and returns the "simple" name for the type.
+		/// Removes the namespace from parameters string with full class names and returns the "simple" name for the parameters.  Multiple types may be separated by commas.
 		/// </summary>
 		/// <param name="value"></param>
-		public static string GetSimpleParameterType(this string value)
+		public static string GetSimpleParameterTypes(this string value)
 		{
+			List<string> results = new();
 			if (String.IsNullOrEmpty(value)) return "";
-			string parameterType = value.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
-			if (String.IsNullOrEmpty(parameterType)) return "";
-			return parameterType.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
+			foreach (string parameter in value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+			{
+				string parameterType = parameter.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+				if (String.IsNullOrEmpty(parameterType)) return "";
+				results.Add(parameterType.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault());
+			}
+
+			return String.Join(',', results);
 		}
 
 		/// <summary>

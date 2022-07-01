@@ -17,7 +17,7 @@
 					@switch (member.Type)
 					{
 						case ApiMember.MemberTypes.Method:
-							var typeName = member.Parameters.GetSimpleParameterType();
+							var typeName = member.Parameters.GetSimpleParameterTypes();
 							if (!String.IsNullOrEmpty(typeName))
 							{
 								@Html.Raw($"({typeName})")
@@ -33,7 +33,7 @@
 					case ApiMember.MemberTypes.Namespace:
 					case ApiMember.MemberTypes.Class:
 					case ApiMember.MemberTypes.Constructor:
-					case ApiMember.MemberTypes.Method:							
+					case ApiMember.MemberTypes.Method:
 						<code>@member.Name@(!String.IsNullOrEmpty(member.Parameters) ? $" ({member.Parameters})" : "()")</code>
 						break;
 				}
@@ -84,12 +84,24 @@
 								<th>Name</th>
 								<th>Type</th>
 								<th></th>
-							</tr>							
+							</tr>
 							@foreach (var parameter in member.Params)
 							{
 								<tr>
-									<td>@parameter.Name</td>
-									<td>@(parameter.IsRef ? "ref " : "")@parameter.Type</td>
+									<td>
+										@parameter.Name
+									</td>
+									<td>
+										@(parameter.IsRef ? "ref " : "")
+										@if (!String.IsNullOrEmpty(parameter.Url))
+										{
+											<a href="@parameter.Url">@parameter.Type</a>
+										}
+										else
+										{
+											@parameter.Type
+										}
+									</td>
 									<td>@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, parameter))</td>
 								</tr>
 							}

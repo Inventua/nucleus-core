@@ -148,14 +148,6 @@ namespace Nucleus.XmlDocumentation
 		private static void ParseTypeParams(ApiClass apiClass)
 		{
 			apiClass.Name = ParseTypeParams(apiClass, null, apiClass.Name);
-			//System.Text.RegularExpressions.Match typeParams = System.Text.RegularExpressions.Regex.Match(apiClass.Name, "<(.*)>");
-
-			//if (typeParams.Success)
-			//{
-			//	return System.Text.RegularExpressions.Regex.Replace(apiClass.Name, "<(.*)>", ReplaceTypeParams(apiClass, null, typeParams));
-			//}
-
-			//return apiClass.Name;
 		}
 
 		/// <remarks>
@@ -176,14 +168,6 @@ namespace Nucleus.XmlDocumentation
 			}
 
 			apiMember.Name = ParseTypeParams(apiClass, apiMember, apiMember.Name);
-			//System.Text.RegularExpressions.Match typeParams = System.Text.RegularExpressions.Regex.Match(apiMember.Name, "<(.*)>");
-
-			//if (typeParams.Success)
-			//{
-			//	return System.Text.RegularExpressions.Regex.Replace(apiMember.Name, "<(.*)>", ReplaceTypeParams(apiClass, apiMember, typeParams));
-			//}
-
-			//return apiMember.Name;
 		}
 
 		/// <remarks>

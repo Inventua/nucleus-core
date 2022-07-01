@@ -145,7 +145,7 @@ function _handleContentLoaded(e, args)
 
 		if (args.event.currentTarget.scrollIntoView)
 		{
-			args.event.currentTarget.scrollIntoView({ behavior: 'smooth' });
+			args.event.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" } );
 		}
 	}
 

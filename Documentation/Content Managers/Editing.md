@@ -8,3 +8,4 @@ When editing mode is on, you can hover your mouse pointer over a module to see t
 can also edit content using the `Edit Page Settings` button or by clicking `Pages` , navigating to your page and choosing the `Modules` tab.  Use the page settings 
 page to add new modules.
 
+> You can also edit module settings (content) in the `Pages` control panel - choose the `Modules` tab and click the edit button there.

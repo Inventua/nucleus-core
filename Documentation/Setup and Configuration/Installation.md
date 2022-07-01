@@ -57,6 +57,9 @@ databaseSettings.Production.json.  If you are setting up a development environme
       }
     }
 ```
+
+> If you are editing an existing configuration file which already contains a `Database` section, update the existing section. 
+
   4.  The process is the same if you want to use MySql, MariaDB or PostgreSQL, but the connection type (shown as "SqlServer" in the example above) will change, as does
   the format of the connection string.
 
@@ -68,9 +71,9 @@ databaseSettings.Production.json.  If you are setting up a development environme
   | PostgreSQL        | PostgreSql | Server=DATABASE-SERVER;Database=DATABASE-NAME;User Id=DATABASE-USERNAME;Password=DATABASE-PASSWORD;                                        |
   | Azure Sql Server  | SqlServer  | Use the connection string from Azure Portal.  Select your database, and click "Show database connection strings" in the overview page.     |
 
-  Note: The database type for MariaDb is 'MySql'.  MariaDb is based on MySql and uses the same database provider.
+> The database type for MariaDb is 'MySql'.  MariaDb is based on MySql and uses the same database provider.
 
-  If your database administrator provides a connection string in a different format, you should use the format that they provide - the connection strings above are just examples.  
+> If your database administrator provides a connection string in a different format, you should use the format that they provide - the connection strings above are just examples.  
 
 ## Using a different File System provider
 If you want to use the Azure Blob Storage file system provider, you can either add it, so that both the Azure Blob Storage and Local File System providers are available, or

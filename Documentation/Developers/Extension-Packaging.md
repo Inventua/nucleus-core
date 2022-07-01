@@ -1,11 +1,13 @@
 A Nucleus extension is installed by installing a **package** using the `Extensions` page.
 
-An extension package is a zip file which contains all of the files needed for your extension, along with a Extension Packaging (package.xml) file with instructions for Nucleus
-on how to install your components.  If you use one of the Nucleus Visual Studio project templates, your project file will contain entries which will automatically create a package (zip)
-file when you build your project using `Release` configuration.
+An extension package is a zip file which contains all of the files needed for your extension, along with a Extension Packaging manifest `package.xml` file with instructions for Nucleus
+on how to install your components.  If you use one of the Nucleus Visual Studio project templates, your project file will contain MSBuild commands which will automatically create a 
+package (zip) file when you build your project using `Release` configuration.
 
-> **_Tip:_**  Set the build action of files in your extension project to `Content` in order to have them included in the package automatically.  Any other files which are included in
-your manifest (package.xml) file are automatically included, including assemblies in the folder named "bin". 
+> **_Tip:_**  Set the build action of files in your extension project to `Content` in order to have them included in the package automatically.  Any assemblies which are listed in 
+the a `<folder path="bin">` element in your package file are also automatically included in the package zip. 
+
+> Your extension is installed into the extensions\ folder, in the sub-directory specified by the folderName attribute of your `<component>` element.  
 
 ### Sample package.xml
 Replace `{generate-guid}` with a guid that you have generated yourself.  There are many web sites including [https://www.guidgen.com/](https://www.guidgen.com/) which can generate Guids 
@@ -71,7 +73,16 @@ The package element contains:
 
 The `maxVersion` attribute is not required, but is recommended.  You can use '*' in place of any parts of the version.
 
-## Component Types
+
+## `<components>` 
+The `<components>` element wraps one or more `<component>` elements.
+
+## `<component>` 
+| Name             | Required? | Description                                                                          |
+|------------------|-----------|--------------------------------------------------------------------------------------|
+| folderName       | Yes       | (attribute) Specifies the folder within the /extensions folder that your files will be installed to. |
+| optional         | Yes       | (attribute) Specifies whether the user can choose whether to install the component. This feature is not yet implemented.  |
+
 The `<components>` element can contain any combination of:  moduleDefinition, layoutDefinition, containerDefinition, controlPanelExtensionDefinition, 
 file, folder, cleanup.
 
@@ -131,14 +142,14 @@ the file element is a child of the `<components>`, or a sub-folder if the `<file
 | name             | Yes       | (attribute) File name. |
 
 ## `<folder>` 
-Specifies a folder.  `<folder>` elements can contain `<file>` elements or `<folder>` elements to represent the target directory structure.
+Specifies a folder.  `<folder>` elements can contain `<file>` elements or nested `<folder>` elements to represent the target folder structure within the /extensions/[folder-name] folder.
 
 | Name             | Required? | Description                                                              |
 |------------------|-----------|--------------------------------------------------------------------------|
-| name             | Yes       | (attribute) Folder name. |
+| name             | Yes       | (attribute) Folder name, relative to the component folder name. |
 
 ## `<cleanup>` 
 Use the `<cleanup>` element to remove components during an upgrade when they are no longer needed.
 
 The `<cleanup>` element can contain any number of moduleDefinition, layoutDefinition, containerDefinition, controlPanelExtensionDefinition, 
-file or folder elements.  Items in the `<cleanup>` element are removed during installation.
+file or folder elements.  Items within the `<cleanup>` element are removed during installation.

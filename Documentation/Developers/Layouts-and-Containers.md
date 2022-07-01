@@ -1,6 +1,11 @@
+Layouts and containers control the visual presentation of modules on a page.  Each layout contains one or more `panes`, which can contain module
+instances.  Each module can have a container, which is rendered as a wrapper to the module content.
+
+![Layouts and Containers](Layouts-and-Containers.png)
+
 ### Layouts
 Layouts control the visual presentation of modules on a page.  Layouts are often called "Themes" or "Skins" in other content management systems.  Layouts 
-are Razor pages which use the built-in Nucleus _Layout, define sections of the page (`Panes`) using HTML, and use @await Html.RenderPaneAsync("PANE-NAME")
+are partial Razor pages which define sections of the page (`Panes`) using HTML, and use `@await Html.RenderPaneAsync("PANE-NAME")`
 to render modules which have been assigned to a pane.  An associated CSS file is used to style the page and panes.
 
 > **_Tip:_**  You can name your panes anything you want, but keep in mind that your pane names are how your users identify which area of the page that they
@@ -23,20 +28,45 @@ prefer.
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Extensions
-@{
-  Layout = "_Layout";
-}
 
+@*
+  Use the AddStyle Html helper to add stylesheet (CSS) files required by your layout.  The AddStyle Html helper can resolve the Url to your stylesheet,
+  and ensures that no duplicate links to stylesheets are rendered.
+  The AddStyle Html helper parses the leading ~! characters and renders an Url which is relative the currently executing view path (the folder which contains 
+  your layout .cshtml file).
+*@
 @Html.AddStyle("~!/your-layout.css")
 
 <div class="LayoutWrapper">
   <div class="BannerPane">
     <div class="d-flex">
+      @*  
+        The Logo tag helper displays the logo image which is set in the site settings control panel, wrapped by a link to your home page.  If no logo image 
+        is configured, nothing is rendered.  You can optionally include a caption attribute to override the title attribute which is set on the image element, 
+        otherwise the title is set to the site's name.  A Logo Html Helper is also available, with the same functionality.
+      *@
       <Logo />
+
+      @*  
+        The Account tag helper displays the logged-on user name, or if the user is not logged on, a button which navigates to to the site's login page. 
+        If the user is logged in, a drop-down menu with links to the account settings, change password and logout functions is displayed.  
+        An account Html Helper is also available, with the same functionality.
+      *@
       <account class="AccountControl navbar ms-auto flex-row justify-content-end"></account>
     </div>
+
+    @*  
+      The menu tag helper displays a site menu.  You can set the maximum number of levels and menu style.  Available menu styles are DropDown, RibbonLandscape 
+      and RibbonPortrait.
+      A menu Html Helper is also available, with the same functionality.
+    *@
     <menu maxLevels="3" menuStyle="RibbonPortrait"></menu>
-    @Html.Breadcrumb()
+
+    @*
+      The breadcrumb Html helper renders a breadcrumb control showing the path to the current page.  You can use the hideTopLevel parameter to 
+      suppress display of the top-level page, and you can include html attributes.  You can also use the simple form - @Html.Breadcrumb() with no parameters.
+    *@
+    @Html.Breadcrumb(false, new { @class = "my-breadcrumbs" })
     @await Html.RenderPaneAsync("BannerPane")
   </div>
 
@@ -69,7 +99,8 @@ prefer.
 }
 ```
 
-> **_Note:_**  You must set the Layout property to `_Layout`.  The built-in _Layout renders a full HTML page including all required elements.
+> **_Note:_**  A Nucleus layout is a Razor view which renders partial HTML - it does not contain `<html>` or `<body>` tags.  Nucleus renders a full HTML 
+page including all required elements "around" your layout.
 
 > **_Tip:_**  Use `@Html.AddStyle` to add your CSS stylesheets.  Nucleus automatically detects duplicate CSS stylesheets, and renders `<link>` tags with the appropriate attributes.  Use
 the special characters `~!` to represent the path of your layout (cshtml file) - the example above is referencing a default.css file in the same location as the layout.  The AddStyle function is

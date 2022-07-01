@@ -43,14 +43,14 @@ namespace Nucleus.Modules.Documents
         services.AddTransient<IContentMetaDataProducer, DocumentsMetaDataProducer>();
         services.AddDataProvider<IDocumentsDataProvider, DataProviders.DocumentsDataProvider, DataProviders.DocumentsDbContext>(context.Configuration);
 
-        services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEvent, Migrate>, MigrationEventHandler>();
+        services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>, MigrationEventHandler>();
       });
     }
   }
 
-  public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEvent, Migrate>
+  public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>
   {
-    public Task Invoke(MigrateEvent item)
+    public Task Invoke(MigrateEventArgs item)
     {
       if (item.SchemaName == "Nucleus.Modules.Documents")
       {
@@ -68,7 +68,8 @@ namespace Nucleus.Modules.Documents
 ```
 
 > **_Note:_**:  The Data migration event (`MigrateEvent`) is sent to **all** subscribers, so you must check the `.SchemaName` property of the event to 
-make sure that it applies to your extension.  
+make sure that it applies to your extension.  Data schema migration doesn't happen immediately when you install an update, it runs the first time the
+extension accesses the database.
 
-> **_Note:_**:  You aren't limited to adding Nucleus services to dependency injection, you can do anything you like.  But be careful, the actions that you execute 
-in a startup class affect all of Nucleus, so you could potentially prevent Nucleus from successfully starting.
+> **_Note:_**:  In a Startup class, you aren't limited to adding Nucleus services to dependency injection, you can do anything you like.  But be careful, 
+the actions that you execute in a startup class affect all of Nucleus, so you could potentially prevent Nucleus from successfully starting.

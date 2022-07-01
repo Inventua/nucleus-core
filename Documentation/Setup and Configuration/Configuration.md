@@ -19,7 +19,7 @@ Nucleus automatically loads configuration in this order:
 9. Command line arguments
 
 > **_NOTE:_**    Enviroment-specific settings are commonly used in order to run with different settings in your production, development or testing 
-> environments.  A best practise is to always leave the default `appSettings.json` and `databaseSettings.jso`n files as-is, and make all of your changes
+> environments.  Where possible, a best practise is to always leave the default `appSettings.json` and `databaseSettings.json` files as-is, and make all of your changes
 > in enviroment-specific json files.
 > The `{enviroment}` used in configuration filenames can be configured in a variety of ways.
 > Refer to [Use multiple environments in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/environments) for more information.

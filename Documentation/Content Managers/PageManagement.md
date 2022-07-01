@@ -40,7 +40,7 @@ Page paths are the Url for your page.  Each page must have at least one path in 
 | Type             | Active paths will respond normally when requested.  Permanent Redirect paths will respond with a 301: Moved Permanently response, which will redirect to the default path for the page. |
 | Default          | Specifies the default path for the page.  A page can have only one default path.  If none are specified, the first path is treated as the default.   |
 
-> **_AVOID:_**  spaces in paths.  Browsers will replace spaces with %20% - which works, but doesn't present well.  Use a '-' or other character for word breaks.  You should
+> **_AVOID:_**  spaces in paths.  Browsers will replace spaces with %20% - which works, but doesn't look good in the browser address bar.  Instead, use a '-' or another character for word breaks.  You should
 also avoid non-alphanumeric characters, apart from '-' because most of these will be url-encoded as well.
 
 > **_TIP:_**  You can use `Permanent Redirect` paths to maintain compatibility with old versions of your site.

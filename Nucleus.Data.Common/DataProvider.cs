@@ -9,10 +9,10 @@ using Microsoft.Extensions.Configuration;
 namespace Nucleus.Data.Common
 {
 	/// <summary>
-	/// Base class used by data providers.
+	/// Base class used by database providers.
 	/// </summary>
 	/// <remarks>
-	/// Nucleus core and module data provider classes inherit this class.
+	/// Nucleus data provider classes inherit this class.  Modules generally inherit Nucleus.Data.EntityFramework.DataProvider instead.
 	/// </remarks>
 	public abstract class DataProvider : IDisposable
 	{

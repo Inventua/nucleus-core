@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 
 // REFERENCES:
 // https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.iauthenticationservice?view=aspnetcore-6.0

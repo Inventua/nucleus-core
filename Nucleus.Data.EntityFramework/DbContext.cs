@@ -10,6 +10,7 @@ using Nucleus.Abstractions.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Extensions.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore.Diagnostics;

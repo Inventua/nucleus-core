@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.TaskScheduler;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions;
 using Microsoft.AspNetCore.Hosting;

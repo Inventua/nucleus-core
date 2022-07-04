@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Nucleus.Data.EntityFramework;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using Nucleus.Abstractions.Models;

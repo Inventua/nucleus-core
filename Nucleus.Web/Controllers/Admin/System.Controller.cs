@@ -7,6 +7,7 @@ using Nucleus.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Nucleus.Abstractions;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.TaskScheduler;
 using Nucleus.Abstractions.Models.Configuration;

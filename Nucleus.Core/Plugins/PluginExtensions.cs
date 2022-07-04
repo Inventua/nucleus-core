@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using System.Runtime.Loader;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc;

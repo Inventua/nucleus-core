@@ -10,6 +10,7 @@ using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Core.Search
 {

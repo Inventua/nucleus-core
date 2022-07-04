@@ -15,6 +15,7 @@ using Nucleus.ViewFeatures;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.OAuth.Server.Controllers
 {

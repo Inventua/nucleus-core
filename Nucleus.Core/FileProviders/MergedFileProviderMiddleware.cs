@@ -6,6 +6,7 @@ using Microsoft.Extensions.Primitives;
 using System.IO;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Http;

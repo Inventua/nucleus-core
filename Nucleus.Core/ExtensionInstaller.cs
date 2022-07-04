@@ -12,6 +12,7 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Core
 {

@@ -10,6 +10,7 @@ using Nucleus.Abstractions.Layout;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using System.Net.Http;
 
 namespace Nucleus.Core.Search

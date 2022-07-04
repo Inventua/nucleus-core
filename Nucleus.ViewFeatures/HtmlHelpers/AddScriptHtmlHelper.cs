@@ -31,6 +31,10 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			/// Bootstrap
 			/// </summary>
 			BOOTSTRAP,
+
+			/// <summary>
+			/// jQuery
+			/// </summary>
 			JQUERY
 		}
 

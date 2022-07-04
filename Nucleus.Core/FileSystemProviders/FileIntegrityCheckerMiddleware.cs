@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Extensions.Authorization;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Models;

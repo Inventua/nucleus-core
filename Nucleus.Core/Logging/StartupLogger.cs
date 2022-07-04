@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
+using Nucleus.Extensions;
 
 namespace Nucleus.Core.Logging
 {
@@ -22,7 +24,7 @@ namespace Nucleus.Core.Logging
 	public static class StartupLoggerExtensions
 	{		
 		private static ILogger _startupLogger;
-
+		
 		/// <summary>
 		/// Create logger for logging during startup
 		/// </summary>
@@ -110,10 +112,7 @@ namespace Nucleus.Core.Logging
 			}
 			return _startupLogger;
 		}
-
 		
-		
-
 		/// <summary>
 		/// Extension for the <see cref="ILogger.LogInformation"/> method to log multiple lines in one log entry.
 		/// </summary>
@@ -127,7 +126,5 @@ namespace Nucleus.Core.Logging
 				logger.LogInformation(message, args);
 			}
 		}
-
-	}
-		
+	}		
 }

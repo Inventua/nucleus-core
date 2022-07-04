@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Data.Common;
 using Nucleus.Data.EntityFramework;
 using Nucleus.OAuth.Server.Models;

@@ -16,18 +16,13 @@ the application pool that you created.  Nucleus ships with a web.config which is
 6. Assign 'Full Control' permissions to your Nucleus data folder for the `IIS AppPool\[AppPool Name]` user.  By default, your data folder 
 is `C:\ProgramData\Nucleus`.  You may need to create the folder in order to assign permissions to it. The Nucleus data folder is used for cached 
 files, logs and the database file, if you are using Sqlite.
-You can use the command-line command:
-```
-    ICACLS "C:\ProgramData\Nucleus" /grant "IIS AppPool\NucleusAppPool:(OI)(CI)F"
-```
+You can use the command-line command:  
+<kbd>ICACLS "C:\ProgramData\Nucleus" /grant "IIS AppPool\NucleusAppPool:(OI)(CI)F"</kbd>
 7.  Assign 'Read' permissions to your installation folder for the `IIS AppPool\[AppPool Name]` user. 
-You can use the command-line command:
-```
-    ICACLS "[your-installation-folder]" /grant "IIS AppPool\NucleusAppPool:(OI)(CI)RX"
-```
-
-7. If you want to use a different database or file system provider, refer to the sections below.
-8. Browse to your web site address.  The new site wizard will appear, prompting you to set your site properties and administrator users.
+You can use the command-line command:  
+<kbd>ICACLS "[your-installation-folder]" /grant "IIS AppPool\NucleusAppPool:(OI)(CI)RX"</kbd>
+8. If you want to use a different database or file system provider, refer to the sections below.
+9. Browse to your web site address.  The new site wizard will appear, prompting you to set your site properties and administrator users.
 
 ## Using a different database provider
 1. Create a database in your database server.
@@ -40,11 +35,13 @@ databaseSettings.Production.json.  If you are setting up a development environme
       "Nucleus": {
         "Database": {
           "Connections": [
-            // Database connections are available to the core and modules, but must be configured in the Schemas section in order to be used.
+            // Database connections are available to the core and modules, but must be configured in the Schemas 
+            // section in order to be used.
             {
               "Key": "nucleus",
               "Type": "SqlServer",
-              "ConnectionString": "Data Source=DATABASE-SERVER;Initial Catalog=DATABASE-NAME;User ID=SQL-USERNAME;Password=SQL-PASSWORD"
+              "ConnectionString": 
+                "Data Source=DATABASE-SERVER;Initial Catalog=DATABASE-NAME;User ID=SQL-USERNAME;Password=SQL-PASSWORD"
             }
           ],
           "Schemas": [
@@ -88,13 +85,14 @@ appSettings.Production.json.  If you are setting up a development environment, n
 ```json
     "FileSystems": {
       "Providers": [
-        // File providers have a key, name, provider type and root folder.  You can specify multiple file providers, and the user
-        // will be presented with a list.  The "Name" property is shown to the user.  Each entry has a key which uniquely identifies 
-        // the provider entry.
+        // File providers have a key, name, provider type and root folder.  You can specify multiple file providers, 
+        // and the user will be presented with a list.  The "Name" property is shown to the user.  Each entry has a 
+        // key which uniquely identifies the provider entry.
         {
           "Key": "Azure",
           "Name": "Azure",
-          "ProviderType": "Nucleus.Extensions.AzureBlobStorageFileSystemProvider.FileSystemProvider,Nucleus.Extensions.AzureBlobStorageFileSystemProvider",
+          "ProviderType": 
+            "Nucleus.Extensions.AzureBlobStorageFileSystemProvider.FileSystemProvider,Nucleus.Extensions.AzureBlobStorageFileSystemProvider",
           "ConnectionString": "STORAGE_ACCOUNT_CONNECTIONSTRING"
         },
         {
@@ -104,6 +102,7 @@ appSettings.Production.json.  If you are setting up a development environment, n
           "RootFolder": "{DataFolder}//Content"
         }
       ]
+    }
 ```
 
 Replace the STORAGE_ACCOUNT_CONNECTIONSTRING value for the Azure Blob Storage connection string with the value in Azure Portal.  In Azure Portal, navigate to Settings > Access keys 
@@ -112,7 +111,7 @@ in your storage account's menu blade to see connection strings for both primary 
 If you are adding the Azure Blob Storage provider, you must also install the Azure Blob Storage provider extension.
 
 If you don't want the local file system provider, remove that section, including the comma between sections.  If you are using the local file system provider, the {DataFolder} token
-refers to %PROGRAMDATA%\Nucleus.  You can change this value if you need to, but it should not be set to a path within your web root (installation folder) in order to ensure that
-access to files is controlled by Nucleus - otherwise IIS may serve static files without Nucleus being able to check permissions.
+refers to `%PROGRAMDATA%\Nucleus`.  You can change this value if you need to, but it should not be set to a path within your web root (installation folder) in order to ensure that
+access to files is controlled by Nucleus - otherwise your web server may serve static files without Nucleus being able to check permissions.
 
 The "Key" value is saved in the database when you add files and folders, so you can't change it later.  The "Name" is shown on-screen, and you can change it any time.

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Paging;
 using Nucleus.Abstractions.EventHandlers;

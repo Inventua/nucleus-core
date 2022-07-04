@@ -10,6 +10,7 @@ using Nucleus.Abstractions.Models.TaskScheduler;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Search;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Core.Logging;
 
 namespace Nucleus.Core.Search

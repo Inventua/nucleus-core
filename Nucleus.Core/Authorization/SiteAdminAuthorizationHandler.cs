@@ -8,6 +8,7 @@ using Nucleus.Abstractions.Models;
 using System.Security.Claims;
 using Nucleus.Core.Authorization;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Core.Authorization

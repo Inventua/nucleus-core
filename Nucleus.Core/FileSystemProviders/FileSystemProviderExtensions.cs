@@ -1,18 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
-using System.Reflection;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Http;
-using System.ComponentModel;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Nucleus.Abstractions.FileSystemProviders;
 using Nucleus.Abstractions.Models.Configuration;
 

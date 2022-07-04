@@ -1,6 +1,7 @@
 ﻿using System;
 using Nucleus.Abstractions.Models;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using System.Data;

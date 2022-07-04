@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models;
 using Microsoft.AspNetCore.Authentication;

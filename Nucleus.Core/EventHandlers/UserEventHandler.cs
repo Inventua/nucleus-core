@@ -10,6 +10,7 @@ using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
 using System.Security.Claims;
 using Nucleus.Abstractions.Mail;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace Nucleus.Core.EventHandlers

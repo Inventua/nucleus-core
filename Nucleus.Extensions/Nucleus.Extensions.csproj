@@ -42,7 +42,6 @@
 	
   <ItemGroup>
     <ProjectReference Include="..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
-    <ProjectReference Include="..\Nucleus.Data.Common\Nucleus.Data.Common.csproj" />
   </ItemGroup>
 	
   <ItemGroup>

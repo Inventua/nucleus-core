@@ -2,6 +2,7 @@
 using Nucleus.Data.EntityFramework;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Nucleus.Modules.Documents.Models;
 

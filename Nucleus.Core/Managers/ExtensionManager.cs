@@ -8,6 +8,7 @@ using Nucleus.Core.DataProviders;
 using System.IO;
 using Nucleus.Abstractions;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Microsoft.Extensions.Options;

@@ -9,6 +9,7 @@ using Nucleus.Abstractions.Mail;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;

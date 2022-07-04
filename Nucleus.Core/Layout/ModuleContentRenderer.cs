@@ -19,6 +19,7 @@ using Nucleus.Abstractions.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Core.Authorization;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Layout;
 using Nucleus.Extensions.Authorization;
 using Nucleus.Extensions;

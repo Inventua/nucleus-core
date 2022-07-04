@@ -15,7 +15,7 @@
 	</ItemGroup>
 	
   <ItemGroup>
-    <None Remove="LICENSE" />
+    <None Remove="license.txt" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="sitemap.css" />
@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="LICENSE" />
+    <Content Include="license.txt" />
     <Content Include="sitemap.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />

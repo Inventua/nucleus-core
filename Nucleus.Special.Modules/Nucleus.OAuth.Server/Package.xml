@@ -20,6 +20,8 @@
 			</controlPanelExtensionDefinition>
 			
 			<file name="readme.txt" />
+			<file name="license.txt" />
+			
 			<file name="viewer.css" />
 			<file name="settings.css" />
 			

@@ -19,6 +19,8 @@
 			</moduleDefinition>
 
 			<file name="readme.txt" />
+			<file name="license.txt" />
+			
 			<file name="Sitemap.css" />
 			
 			<folder name="Bin">

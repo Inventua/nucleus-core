@@ -13,16 +13,13 @@ using System.Threading.Tasks;
 namespace Nucleus.ViewFeatures.HtmlContent
 {
 	/// <summary>
-	/// Renders an Breadcrumb control.
+	/// Renders a breadcrumb control.
 	/// </summary>
 	/// <remarks>
-	///   
-	/// This function is used by the <see cref="HtmlHelpers.BreadcrumbHtmlHelper"/> and <see cref="TagHelpers.BreadcrumbTagHelper"/>.  The output is structured per
-	/// https://developers.google.com/search/docs/data-types/breadcrumb#html
+	/// This function is used by the <see cref="HtmlHelpers.BreadcrumbHtmlHelper"/> and <see cref="TagHelpers.BreadcrumbTagHelper"/>.
 	/// </remarks>
 	internal static class Breadcrumb
 	{
-
 		internal static async Task<TagBuilder> Build(ViewContext context, Boolean hideTopLevel, object htmlAttributes)
 		{
 			TagBuilder outputBuilder = new("nav");

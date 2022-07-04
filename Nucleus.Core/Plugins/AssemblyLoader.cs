@@ -4,6 +4,7 @@ using System.Runtime.Loader;
 using System.Reflection;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Nucleus.Abstractions;
 using Nucleus.Core;

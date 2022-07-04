@@ -9,6 +9,7 @@ using Nucleus.Core.DataProviders;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Managers;
 
 namespace Nucleus.Core.Managers

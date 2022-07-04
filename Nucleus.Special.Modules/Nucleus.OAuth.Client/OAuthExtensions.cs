@@ -13,6 +13,7 @@ using Nucleus.Abstractions;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.OAuth.Client
 {

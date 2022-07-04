@@ -8,6 +8,7 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.TaskScheduler;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Data.EntityFramework;
 
 namespace Nucleus.Core.DataProviders

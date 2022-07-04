@@ -4,6 +4,7 @@ using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Abstractions.Mail;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Core.Mail
 {

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using MailKit;
 using Nucleus.Abstractions.Mail;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Extensions.Razor;
 
 namespace Nucleus.Core.Mail

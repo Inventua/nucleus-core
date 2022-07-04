@@ -30,10 +30,10 @@ prefer.
 @using Nucleus.Extensions
 
 @*
-  Use the AddStyle Html helper to add stylesheet (CSS) files required by your layout.  The AddStyle Html helper can resolve the Url to your stylesheet,
-  and ensures that no duplicate links to stylesheets are rendered.
-  The AddStyle Html helper parses the leading ~! characters and renders an Url which is relative the currently executing view path (the folder which contains 
-  your layout .cshtml file).
+  Use the AddStyle Html helper to add stylesheet (CSS) files required by your layout.  The AddStyle Html 
+  helper can resolve the Url to your stylesheet, and ensures that no duplicate links to stylesheets are 
+  rendered. The AddStyle Html helper parses the leading ~! characters and renders an Url which is relative 
+  the currently executing view path (the folder which contains your layout .cshtml file).
 *@
 @Html.AddStyle("~!/your-layout.css")
 
@@ -41,30 +41,33 @@ prefer.
   <div class="BannerPane">
     <div class="d-flex">
       @*  
-        The Logo tag helper displays the logo image which is set in the site settings control panel, wrapped by a link to your home page.  If no logo image 
-        is configured, nothing is rendered.  You can optionally include a caption attribute to override the title attribute which is set on the image element, 
-        otherwise the title is set to the site's name.  A Logo Html Helper is also available, with the same functionality.
+        The Logo tag helper displays the logo image which is set in the site settings control panel, wrapped by a
+        link to your home page.  If no logo image is configured, nothing is rendered.  You can optionally include 
+        a caption attribute to override the title attribute which is set on the image element, otherwise 
+        the title is set to the site's name.  A Logo Html Helper is also available, with the same functionality.
       *@
       <Logo />
 
       @*  
-        The Account tag helper displays the logged-on user name, or if the user is not logged on, a button which navigates to to the site's login page. 
-        If the user is logged in, a drop-down menu with links to the account settings, change password and logout functions is displayed.  
+        The Account tag helper displays the logged-on user name, or if the user is not logged on, a button 
+        which navigates to to the site's login page. If the user is logged in, a drop-down menu with links 
+        to the account settings, change password and logout functions is displayed.  
         An account Html Helper is also available, with the same functionality.
       *@
       <account class="AccountControl navbar ms-auto flex-row justify-content-end"></account>
     </div>
 
     @*  
-      The menu tag helper displays a site menu.  You can set the maximum number of levels and menu style.  Available menu styles are DropDown, RibbonLandscape 
-      and RibbonPortrait.
+      The menu tag helper displays a site menu.  You can set the maximum number of levels and menu style.  
+      Available menu styles are DropDown, RibbonLandscape and RibbonPortrait.
       A menu Html Helper is also available, with the same functionality.
     *@
     <menu maxLevels="3" menuStyle="RibbonPortrait"></menu>
 
     @*
-      The breadcrumb Html helper renders a breadcrumb control showing the path to the current page.  You can use the hideTopLevel parameter to 
-      suppress display of the top-level page, and you can include html attributes.  You can also use the simple form - @Html.Breadcrumb() with no parameters.
+      The breadcrumb Html helper renders a breadcrumb control showing the path to the current page.  You can 
+      use the hideTopLevel parameter to suppress display of the top-level page, and you can include html 
+      attributes.  You can also use the simple form - @Html.Breadcrumb() with no parameters.
     *@
     @Html.Breadcrumb(false, new { @class = "my-breadcrumbs" })
     @await Html.RenderPaneAsync("BannerPane")

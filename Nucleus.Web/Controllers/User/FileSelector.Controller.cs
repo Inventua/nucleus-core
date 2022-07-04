@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Nucleus.Abstractions;

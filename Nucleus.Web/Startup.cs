@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 using Nucleus.Abstractions;
@@ -21,6 +20,8 @@ using Nucleus.Abstractions.Layout;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Nucleus.Data.Common;
 using System.Linq;
+using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Web
 {

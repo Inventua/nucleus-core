@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Data.Common;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;

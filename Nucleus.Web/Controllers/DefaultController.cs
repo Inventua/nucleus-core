@@ -2,6 +2,7 @@
 using System;
 using Nucleus.Abstractions.Models;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Microsoft.AspNetCore.Authorization;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions;

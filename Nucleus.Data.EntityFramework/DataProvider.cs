@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using System.Linq;
 
 namespace Nucleus.Data.EntityFramework

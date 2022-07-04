@@ -4,6 +4,7 @@ using Nucleus.Abstractions.Models.Mail;
 using Nucleus.Abstractions.Models.TaskScheduler;
 using Nucleus.Data.Common;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;

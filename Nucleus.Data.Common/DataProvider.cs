@@ -2,6 +2,7 @@
 using Nucleus.Data.Common;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.EventHandlers;
 using System.Linq;
 using Microsoft.Extensions.Configuration;

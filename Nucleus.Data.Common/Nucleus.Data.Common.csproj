@@ -35,6 +35,7 @@
 		
   <ItemGroup>
     <ProjectReference Include="..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
+    <ProjectReference Include="..\Nucleus.Extensions\Nucleus.Extensions.csproj" />
   </ItemGroup>
 		
   <ItemGroup>

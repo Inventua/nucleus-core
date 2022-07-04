@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using Nucleus.Abstractions;
-using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Models;
 
 namespace Nucleus.Abstractions.Managers

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Nucleus.Abstractions.Models;
 using System.Security.Claims;
 using Microsoft.Extensions.Logging;
+using Nucleus.Extensions.Logging;
 using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Core.Authorization

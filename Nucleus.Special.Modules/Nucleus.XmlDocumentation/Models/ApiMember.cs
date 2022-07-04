@@ -265,7 +265,7 @@ namespace Nucleus.XmlDocumentation.Models
 		/// <returns></returns>
 		string SimplifyParameterType(string value)
 		{
-			System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(value, "System.([^.]*)$");
+			System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(value.Trim(), "^[ ]*System.([^.]*)$");
 
 			if (match.Success)
 			{

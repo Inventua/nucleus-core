@@ -21,7 +21,7 @@
 		<!--<VersionSuffix>a1</VersionSuffix>-->
 		<PackageTags>Nucleus</PackageTags>
 		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>
-		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageLicenseFile>license.txt</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<PackageId>Inventua.$(AssemblyName)</PackageId>
 		<Copyright>(c) Inventua Pty Ltd</Copyright>
@@ -29,11 +29,11 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<None Include="LICENSE.txt" Pack="true" PackagePath="" />
+		<None Include="license.txt" Pack="true" PackagePath="" />
 	</ItemGroup>
 	
 	<ItemGroup>
-		<None Update="README.md">
+		<None Update="readme.md">
 			<PackagePath>\</PackagePath>
 			<Pack>True</Pack>
 		</None>
@@ -56,7 +56,7 @@
 
 
 	<ItemGroup>
-	  <None Update="README.md">
+	  <None Update="readme.md">
 	    <PackagePath>\</PackagePath>
 	    <Pack>True</Pack>
 	  </None>

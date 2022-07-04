@@ -51,6 +51,8 @@
 				<relativePath>Containers\centered.cshtml</relativePath>
 			</containerDefinition>
 
+			<file name="license.txt" />
+			
 			<folder name="Layouts">
 				<file name="_banner.cshtml" />
 				<file name="default-2-column.cshtml" />

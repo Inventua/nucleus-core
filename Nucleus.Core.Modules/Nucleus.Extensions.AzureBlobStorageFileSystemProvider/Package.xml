@@ -10,9 +10,9 @@
 	
 	<components>
 		<component folderName="AzureBlobStorageFileSystemProvider" optional="false">
-
 			<file name="readme.txt" />
-
+			<file name="license.txt" />
+			
 			<folder name="Bin">
 				<file name="Nucleus.Extensions.AzureBlobStorageFileSystemProvider.dll" />
 				<file name="Azure.Core.dll" />

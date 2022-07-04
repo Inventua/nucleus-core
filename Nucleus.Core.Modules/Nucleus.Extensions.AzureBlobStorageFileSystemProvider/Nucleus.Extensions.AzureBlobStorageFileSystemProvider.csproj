@@ -20,13 +20,13 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <None Remove="LICENSE" />
+    <None Remove="LICENSE.txt" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />    
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="LICENSE" />
+    <Content Include="license.txt" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />    
   </ItemGroup>

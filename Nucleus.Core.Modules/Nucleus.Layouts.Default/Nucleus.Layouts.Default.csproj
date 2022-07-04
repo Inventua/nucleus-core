@@ -30,7 +30,7 @@
     <None Remove="Layouts\default-3-column.css" />
     <None Remove="Layouts\default-3-column.min.css" />
     <None Remove="Layouts\_banner.cshtml" />
-    <None Remove="LICENSE" />
+    <None Remove="license.txt" />
     <None Remove="package.xml" />    
   </ItemGroup>
 
@@ -63,7 +63,7 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="LICENSE" />
+    <Content Include="license.txt" />
     <Content Include="package.xml" />    
   </ItemGroup>
 

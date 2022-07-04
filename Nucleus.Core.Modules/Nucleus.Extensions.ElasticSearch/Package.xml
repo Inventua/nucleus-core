@@ -20,6 +20,7 @@
 			</controlPanelExtensionDefinition>
 
 			<file name="readme.txt" />
+			<file name="license.txt" />
 			<file name="settings.css" />
 			<file name="disable-private-loadcontext.json" />
 			

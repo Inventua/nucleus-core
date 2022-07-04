@@ -41,7 +41,6 @@
 	@if (!String.IsNullOrEmpty(Model.SiteCssFilePath))
 	{
 		@Html.AddStyle(Model.SiteCssFilePath)
-		;
 	}
 	@RenderSection("scripts", false)
 	<merge-stylesheets>

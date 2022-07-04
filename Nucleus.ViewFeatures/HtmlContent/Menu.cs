@@ -139,6 +139,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			{
 				linkBuilder.AddCssClass("dropdown-item");
 			}
+			
 			linkBuilder.InnerHtml.SetContent(caption);
 
 			itemBuilder.InnerHtml.AppendHtml(linkBuilder);
@@ -222,6 +223,11 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				{
 					linkBuilder.AddCssClass("disabled");
 				}
+			}
+
+			if (childItem.Children.Any())
+			{
+				linkBuilder.AddCssClass("has-child-items");
 			}
 
 			linkBuilder.AddCssClass("nav-link");

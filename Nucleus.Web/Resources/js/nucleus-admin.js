@@ -1,8 +1,4 @@
-﻿/**
- * Admin UI client-side handlers and behaviours
- * @requires nucleus-shared.js
- */
-
+﻿/*! nucleus-admin | Nucleus Admin UI client-side handlers and behaviours | (c) Inventua Pty Ptd.  www.nucleus-cms.com */
 jQuery(Page).on("ready.admin", _handleContentLoaded);
 
 var navstack = [];

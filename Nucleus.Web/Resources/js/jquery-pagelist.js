@@ -1,4 +1,5 @@
-﻿(function ($)
+﻿/*! jquery-pagelist | Provides a page list expandable drop-down for admin pages in Nucleus CMS.  (c) Inventua Pty Ptd.  www.nucleus-cms.com */
+(function ($)
 {
   jQuery.fn.PageList = function (conf)
   {

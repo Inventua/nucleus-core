@@ -1,5 +1,5 @@
-﻿var Page = new _Page();
-
+﻿/*! nucleus-shared | Nucleus shared client-side handlers and behaviours | (c) Inventua Pty Ptd.  www.nucleus-cms.com */
+var Page = new _Page();
 function _Page()
 {
 	// Public methods

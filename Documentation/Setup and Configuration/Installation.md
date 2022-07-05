@@ -27,7 +27,8 @@ You can use the command-line command:
 ## Using a different database provider
 1. Create a database in your database server.
 2. In your installation folder, create a new database configuration file.  If you are setting up a production environment, the file should be named 
-databaseSettings.Production.json.  If you are setting up a development environment, name your file databaseSettings.Development.json.
+databaseSettings.Production.json.  If you are setting up a development environment, name your file databaseSettings.Development.json.  Refer to the 
+[Configuration Files](https://www.nucleus-cms.com/Configuration/) page for more information.
 3. Edit your new file and add the following, substituting your SQL server name, database name and credentials:
 ```json
     {

@@ -39,11 +39,14 @@ namespace Nucleus.Core.Authorization
         return Task.CompletedTask;
       }
 
-      if (context.User.IsSiteAdmin(this.CurrentContext.Site))
+      if (this.CurrentContext.Site != null)
       {
-        Logger.LogTrace("User {0}: Access granted (Site administrator).", context.User.GetUserId());
-        context.Succeed(requirement);
-        return Task.CompletedTask;
+        if (context.User.IsSiteAdmin(this.CurrentContext.Site))
+        {
+          Logger.LogTrace("User {0}: Access granted (Site administrator).", context.User.GetUserId());
+          context.Succeed(requirement);
+          return Task.CompletedTask;
+        }
       }
 
       // match user roles to this.CurrentContext.Page.Permissions.  This class checks VIEW permissions only.

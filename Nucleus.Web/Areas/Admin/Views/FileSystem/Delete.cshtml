@@ -9,8 +9,9 @@
 {
 	<p>Delete selected files and folders?</p>
 
-	<input type="submit" value="Delete" class="btn btn-danger" formaction="@Url.AreaAction("DeleteSelected", "FileSystem", "Admin")" data-target=".nucleus-adminpage" />
-
+	<div class="nucleus-form-tools">
+		<input type="submit" value="Delete" class="btn btn-danger" formaction="@Url.AreaAction("DeleteSelected", "FileSystem", "Admin")" data-target=".nucleus-adminpage" />
+	</div>
 	@Html.HiddenFor(model => Model.Folder.Id)
 
 	for (var folderCount = 0; folderCount < Model.SelectedFolders.Count; folderCount++)

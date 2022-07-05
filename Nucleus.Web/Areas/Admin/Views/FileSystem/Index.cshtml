@@ -10,9 +10,12 @@
 
 	@using (Html.BeginAreaForm("Index", "FileSystem", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
 	{
-		<div class="nucleus-form-tools flex">
+		<div class="nucleus-form-tools d-flex">
 			@Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control" })
-			<span>@Model.Folder.Name</span>
+			<label class="align-self-center ms-1">
+				Current Folder:
+				<span>@Model.Folder.Name</span>
+			</label>			
 		</div>
 		@Html.HiddenFor(model => model.SelectedProviderKey)
 		@Html.HiddenFor(model => model.Folder.Id)
@@ -57,50 +60,57 @@
 				</div>
 			</div>
 
-			<table class="FileSystemItems">
-				<tr>
-					<th />
-					<th>Name</th>
-					<th>Type</th>
-					<th>Modified Date</th>
-					<th>Size</th>
-				</tr>
-
-				@for (var folderCount = 0; folderCount < Model.Folder?.Folders.Count; folderCount++)
-				{
+			@if (!Model.Folder?.Folders.Any() == true)
+			{
+				<div class="alert alert-warning">This folder is empty</div>
+			}
+			else
+			{
+				<table class="FileSystemItems">
 					<tr>
-						<td>
-							@if (Model.Folder.Folders[folderCount].Capabilities.CanRename || Model.Folder.Folders[folderCount].Capabilities.CanDelete)
-							{
-								@Html.CheckBoxFor(model => model.Folder.Folders[folderCount].IsSelected, new { @class = "nucleus-filesystem-folderselector" })
-							}
-							@Html.HiddenFor(model => model.Folder.Folders[folderCount].Id)
-						</td>
-						<td>
-							@Html.AreaActionLink(Model.Folder.Folders[folderCount].Name, "Index", "FileSystem", "Admin", new { folderId = @Model.Folder.Folders[folderCount].Id }, new { @class = "NavigateLink", @data_target = ".nucleus-adminpage" })
-						</td>
-						<td>Folder</td>
-						<td>@Model.Folder.Folders[folderCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-						<td />
+						<th />
+						<th>Name</th>
+						<th>Type</th>
+						<th>Modified Date</th>
+						<th>Size</th>
 					</tr>
-				}
 
-				@for (var fileCount = 0; fileCount < Model.Folder?.Files.Count; fileCount++)
-				{
-					<tr>
-						<td>
-							@Html.CheckBoxFor(model => model.Folder.Files[fileCount].IsSelected, new { @class = "nucleus-filesystem-fileselector" })
-						</td>
-						<td>
-							@Model.Folder.Files[fileCount].Name
-							@Html.HiddenFor(model => model.Folder.Files[fileCount].Id)
-						</td>
-						<td>File</td>
-						<td>@Model.Folder.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-						<td>@((Model.Folder.Files[fileCount] as File).Size.FormatFileSize())</td>
-					</tr>
-				}
-			</table>
+					@for (var folderCount = 0; folderCount < Model.Folder?.Folders.Count; folderCount++)
+					{
+						<tr>
+							<td>
+								@if (Model.Folder.Folders[folderCount].Capabilities.CanRename || Model.Folder.Folders[folderCount].Capabilities.CanDelete)
+								{
+									@Html.CheckBoxFor(model => model.Folder.Folders[folderCount].IsSelected, new { @class = "nucleus-filesystem-folderselector" })
+								}
+								@Html.HiddenFor(model => model.Folder.Folders[folderCount].Id)
+							</td>
+							<td>
+								@Html.AreaActionLink(Model.Folder.Folders[folderCount].Name, "Index", "FileSystem", "Admin", new { folderId = @Model.Folder.Folders[folderCount].Id }, new { @class = "NavigateLink", @data_target = ".nucleus-adminpage" })
+							</td>
+							<td>Folder</td>
+							<td>@Model.Folder.Folders[folderCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+							<td />
+						</tr>
+					}
+
+					@for (var fileCount = 0; fileCount < Model.Folder?.Files.Count; fileCount++)
+					{
+						<tr>
+							<td>
+								@Html.CheckBoxFor(model => model.Folder.Files[fileCount].IsSelected, new { @class = "nucleus-filesystem-fileselector" })
+							</td>
+							<td>
+								@Model.Folder.Files[fileCount].Name
+								@Html.HiddenFor(model => model.Folder.Files[fileCount].Id)
+							</td>
+							<td>File</td>
+							<td>@Model.Folder.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+							<td>@((Model.Folder.Files[fileCount] as File).Size.FormatFileSize())</td>
+						</tr>
+					}
+				</table>
+			}
 		</div>
 	}
 </div>

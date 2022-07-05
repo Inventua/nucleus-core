@@ -13,5 +13,7 @@
 			@Html.TextBoxFor((model) => model.NewFolder)
 		</SettingsControl>
 	</fieldset>
-	<input type="submit" value="Create Folder" class="btn btn-primary" formaction="@Url.AreaAction("CreateFolder", "FileSystem", "Admin")" data-target=".nucleus-adminpage" />
+	<div class="nucleus-form-tools">
+		<input type="submit" value="Create Folder" class="btn btn-primary" formaction="@Url.AreaAction("CreateFolder", "FileSystem", "Admin")" data-target=".nucleus-adminpage" />
+	</div>
 }

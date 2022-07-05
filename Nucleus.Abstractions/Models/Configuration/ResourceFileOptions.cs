@@ -25,5 +25,15 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// Specifies whether to use minified css files, if available.
 		/// </summary>
 		public Boolean UseMinifiedCss { get; private set; } = true;
+
+		/// <value>
+		/// Specifies whether to merge requests for Javascript files.
+		/// </value>
+		public Boolean MergeJs { get; set; } = false;
+
+		/// <value>
+		/// Specifies whether to merge requests for CSS files.
+		/// </value>
+		public Boolean MergeCss { get; set; } = false;
 	}
 }

@@ -33,7 +33,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
 
 		private ILogger<MergeScriptsTagHelper> Logger { get; }
 
-		private MergedFileProviderOptions Options { get; }
+		private ResourceFileOptions Options { get; }
 
 		/// <summary>
 		/// Provides access to view context.
@@ -47,7 +47,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
 		/// </summary>
 		/// <param name="options"></param>
 		/// <param name="Logger"></param>
-		public MergeScriptsTagHelper(IOptions<MergedFileProviderOptions> options, ILogger<MergeScriptsTagHelper> Logger)
+		public MergeScriptsTagHelper(IOptions<ResourceFileOptions> options, ILogger<MergeScriptsTagHelper> Logger)
 		{
 			this.Options = options.Value;
 			this.Logger = Logger;

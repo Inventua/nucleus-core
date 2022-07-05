@@ -35,14 +35,14 @@ namespace Nucleus.ViewFeatures.TagHelpers
 	{
 		private const char SEPARATOR_CHAR = ',';
 		private ILogger<MergeStylesheetsTagHelper> Logger { get; }
-		private MergedFileProviderOptions Options { get; }
+		private ResourceFileOptions Options { get; }
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="options"></param>
 		/// <param name="Logger"></param>
-		public MergeStylesheetsTagHelper(IOptions<MergedFileProviderOptions> options, ILogger<MergeStylesheetsTagHelper> Logger)
+		public MergeStylesheetsTagHelper(IOptions<ResourceFileOptions> options, ILogger<MergeStylesheetsTagHelper> Logger)
 		{
 			this.Options = options.Value;
 			this.Logger = Logger;

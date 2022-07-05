@@ -34,13 +34,13 @@ namespace Nucleus.Core.FileProviders
 	{
 		public const char SEPARATOR_CHAR = ',';
 
-		private IOptions<MergedFileProviderOptions> Options { get; }
+		private IOptions<ResourceFileOptions> Options { get; }
 		private ILogger<MergedFileProviderMiddleware> Logger { get; }
 		
 		private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
 		private string _cacheFolder;
 
-		public MergedFileProviderMiddleware(IOptions<MergedFileProviderOptions> options, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions, ILogger<MergedFileProviderMiddleware> Logger)
+		public MergedFileProviderMiddleware(IOptions<ResourceFileOptions> options, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions, ILogger<MergedFileProviderMiddleware> Logger)
 		{
 			this.Options = options;
 			this.Logger = Logger;

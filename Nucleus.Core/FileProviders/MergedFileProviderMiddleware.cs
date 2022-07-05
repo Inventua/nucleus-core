@@ -115,8 +115,8 @@ namespace Nucleus.Core.FileProviders
 
 						if (requestedPathRoot.Equals(pathBase, StringComparison.OrdinalIgnoreCase))
 						{
+							path = String.Join(System.IO.Path.AltDirectorySeparatorChar, pathParts.Skip(1)); //path.Substring(requestedPathRoot.Length);
 							requestedPathRoot = pathParts[1];
-							path = path.Substring(requestedPathRoot.Length);
 						}
 
 						if (Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS.Contains(requestedPathRoot))

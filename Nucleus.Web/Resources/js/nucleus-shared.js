@@ -546,7 +546,14 @@ function _Page()
 				for (var prop in request.responseJSON)
 				{
 					var element = jQuery('[name="' + prop + '"]');
-					element.addClass('ValidationError');
+					if (!element.is('.HtmlEditorControl'))
+					{
+						element.addClass('ValidationError');
+					}
+					else
+					{
+						element.parents('.settings-control').first().addClass('ValidationError');
+					}
 
 					if (elementSelector !== '') elementSelector += ',';
 					elementSelector += '#' + element.attr('id');
@@ -753,9 +760,9 @@ function _Page()
 		// if the original element is in a modal, and the target is not inside the same modal, close the modal 
 		if (source !== null && source.parents('.modal').length !== 0)
 		{
-			if (source.parents('.modal').find(target).length === 0)
+			if (source.parents('.modal').first().find(target).length === 0)
 			{
-				source.parents('.modal').modal('hide');
+				source.parents('.modal').first().modal('hide');
 			}
 		}
 	}
@@ -772,10 +779,10 @@ function _Page()
 			// if the source element is in a modal, and the target is not inside the same modal, close the modal
 			if (source !== null && source.parents('.modal').length !== 0)
 			{
-				if (source.parents('.modal').find(target).length === 0)
+				if (source.parents('.modal').first().find(target).length === 0)
 				{
 					// a modal is visible, data is non-blank, target is not the modal or one of its descendants, hide the modal
-					jQuery('.modal:visible').modal('hide');					
+					jQuery('.modal:visible').first().modal('hide');							
 				}
 			}
 		}
@@ -818,15 +825,10 @@ function _Page()
 					}
 				});
 
-				// if there are any existing modal backdrops (overlays), remove them so that they don't get drawn on top of 
-				// one another after a postback & increase the opacity of the backdrop.
-				jQuery('.modal-backdrop').remove();
-
 				var modal = new bootstrap.Modal(wrapper, { backdrop: 'static' });
 				modal.show();
 
-				wrapper.on('hidden.bs.modal', function () { jQuery('.modal-backdrop').remove(); });
-
+				wrapper.one('shown.bs.modal', function () { _removeDuplicateOverlays(); });
 			}
 			else
 			{
@@ -868,6 +870,17 @@ function _Page()
 
 		// adjust dates from UTC to local
 		_setupDateFields(target);
+	}
+
+	// Remove duplicate .modal-backdrop elements with the same parent.  When we do a partial render and replace/re-open a modal, 
+	// Bootstrap doesn't know about it, so it renders extra overlays - this code removes all duplicate overlays with the same parent, 
+	// leaving only one behind.
+	function _removeDuplicateOverlays()
+	{
+		jQuery.uniqueSort(jQuery('.modal-backdrop').parent()).each(function (index, parentElement)
+		{
+			jQuery(parentElement).find('.modal-backdrop:not(:first)').remove();
+		});
 	}
 
 	function _isInView (element)

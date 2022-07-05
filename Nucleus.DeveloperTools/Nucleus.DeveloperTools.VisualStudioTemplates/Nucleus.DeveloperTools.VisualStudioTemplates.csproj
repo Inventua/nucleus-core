@@ -69,7 +69,7 @@
     <Content Include="module.build.targets">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="LICENSE.txt">
+    <Content Include="license.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

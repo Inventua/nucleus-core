@@ -224,18 +224,17 @@ namespace Nucleus.Core.Layout
 			formBuilder.Attributes.Add("data-target", "#refresh");
 						
 			// users with module edit permissions can edit module settings and common settings
-			formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe3c9;", "Edit", urlHelper.Content("~/Admin/Pages/EditModule"), null));
-			formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe8b8;", "Settings", urlHelper.Content("~/Admin/Pages/EditModuleCommonSettings"), null));
+			formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe3c9;", "Edit Content/Settings", urlHelper.Content("~/Admin/Pages/EditModule"), null));
+			formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe8b8;", "Layout and Permissions Settings", urlHelper.Content("~/Admin/Pages/EditModuleCommonSettings"), null));
 
 			// only render the delete control if the user has page-edit permissions
 			if (user.HasEditPermission(this.Context.Site, this.Context.Page))
 			{
-				formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildDeleteButton("&#xe14c;", "Delete", urlHelper.Content("~/Admin/Pages/DeletePageModuleInline"), null));
+				formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildDeleteButton("&#xe14c;", "Delete Module", urlHelper.Content("~/Admin/Pages/DeletePageModuleInline"), null));
 			}
 
 			editorBuilder.InnerHtml.AppendHtml(formBuilder);
 		}
-
 		
 		/// <summary>
 		/// Render a module's "Edit" action.

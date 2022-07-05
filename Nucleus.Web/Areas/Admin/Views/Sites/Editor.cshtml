@@ -151,9 +151,12 @@
 					</div>
 				}
 
-				<SettingsControl caption="Site Group" helptext="Site Group.  Sites which are in a site group use the user, role, mail templates and lists of the site which is configured as the site group primary site.">
-					@Html.DropDownListFor(model => model.Site.SiteGroupId, new SelectList(Model.SiteGroups, "Id", "Name"), "(none selected)")
-				</SettingsControl>
+				@if (Model.SiteGroups.Any())
+				{
+					<SettingsControl caption="Site Group" helptext="Site Group.  Sites which are in a site group use the user, role, mail templates and lists of the site which is configured as the site group primary site.">
+						@Html.DropDownListFor(model => model.Site.SiteGroupId, new SelectList(Model.SiteGroups, "Id", "Name"), "(none selected)")
+					</SettingsControl>
+				}
 
 				<SettingsControl caption="Home Directory" helptext="The site home directory is a sub-directory (for every file provider) which contains the files for this site.">
 					@Html.TextBoxFor(model => model.Site.HomeDirectory, new { @maxlength = 1024 })

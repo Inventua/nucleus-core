@@ -6,7 +6,10 @@
 <h1 class="nucleus-control-panel-heading">Settings</h1>
 <ul class="nucleus-control-panel-items">
 	@await Html.PartialAsync("../Manage/_ManageIcon", new ManageIcon("System Administrators", "System Administrators", "Create and manage System Administrator users.  System Administrator users can manage all features of all sites.", "~/Admin/SystemAdministrators/Index", "A", "&#xef3d;", "SysAdminsIcon"))
-	@await Html.PartialAsync("../Manage/_ManageIcon", new ManageIcon("Site Groups", "Site Groups", "Create and manage sites groups.  Sites can be added to a site group to share users, roles and other data.", "~/Admin/SiteGroups/Index", "G", "&#xe051;", "SiteGroupsIcon"))
+	@if (Model.IsDevelopment)
+	{
+		@await Html.PartialAsync("../Manage/_ManageIcon", new ManageIcon("Site Groups", "Site Groups", "Create and manage sites groups.  Sites can be added to a site group to share users, roles and other data.", "~/Admin/SiteGroups/Index", "G", "&#xe051;", "SiteGroupsIcon"))
+	}
 	@await Html.PartialAsync("../Manage/_ManageIcon", new ManageIcon("Sites", "Sites", "Create and manage sites.", "~/Admin/Sites/Index", "S", "&#xe051;", "SitesIcon"))
 	@await Html.PartialAsync("../Manage/_ManageIcon", new ManageIcon("Scheduler", "Scheduler", "Create and manage scheduled tasks.", "~/Admin/ScheduledTasks/Index", "T", "&#xe8b5;", "ScheduledTasksIcon"))
 	@await Html.PartialAsync("../Manage/_ManageIcon", new ManageIcon("API Keys", "API Keys", "Create and manage scheduled API keys.", "~/Admin/ApiKeys/Index", "K", "&#xf1b7;", "ApiKeysIcon"))

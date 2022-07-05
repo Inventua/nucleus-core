@@ -9,6 +9,6 @@ namespace Nucleus.Web.ViewModels.Admin
 	public class Settings
 	{
 		public IEnumerable<ControlPanelExtensionDefinition> Extensions { get; set; }
-
+		public Boolean IsDevelopment { get; set; }
 	}
 }

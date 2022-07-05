@@ -12,8 +12,8 @@
 
       if (isAdminMode)
       {
-        plugins = 'code link lists'
-        toolbar = 'code | undo redo | blocks | bold italic | link pages unlink | images | alignleft aligncenter alignright alignjustify | bullist numlist | hr | removeformat';
+        plugins = 'code link lists paste'
+        toolbar = 'code | paste | undo redo | blocks | bold italic | link pages unlink | images | alignleft aligncenter alignright alignjustify | bullist numlist | hr | removeformat';
         external_plugins = {
           pages: '../Nucleus/tinymce.pages.min.js',
           images: '../Nucleus/tinymce.images.min.js'
@@ -39,6 +39,9 @@
         menubar: false,
         toolbar: toolbar,
         statusbar: false,
+        paste_block_drop: false,
+        paste_data_images: true,
+        paste_as_text: true,
         external_plugins: external_plugins
       });
 

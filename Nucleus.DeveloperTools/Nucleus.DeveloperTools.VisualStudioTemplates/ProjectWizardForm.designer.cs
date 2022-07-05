@@ -90,6 +90,7 @@
 			this.cmdNext.TabIndex = 7;
 			this.cmdNext.Text = "Next";
 			this.cmdNext.UseVisualStyleBackColor = true;
+			this.cmdNext.Click += new System.EventHandler(this.cmdNext_Click);
 			// 
 			// cmdBack
 			// 
@@ -278,7 +279,7 @@
 			this.txtFriendlyName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
 			this.txtFriendlyName.Name = "txtFriendlyName";
 			this.txtFriendlyName.Size = new System.Drawing.Size(448, 23);
-			this.txtFriendlyName.TabIndex = 5;
+			this.txtFriendlyName.TabIndex = 4;
 			// 
 			// label11
 			// 
@@ -317,7 +318,7 @@
 			this.txtModelName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
 			this.txtModelName.Name = "txtModelName";
 			this.txtModelName.Size = new System.Drawing.Size(448, 23);
-			this.txtModelName.TabIndex = 28;
+			this.txtModelName.TabIndex = 5;
 			// 
 			// label10
 			// 

@@ -147,7 +147,7 @@ namespace Nucleus.Web.Controllers.Setup
 
 			template.Site.DefaultContainerDefinition = viewModel.Site.DefaultContainerDefinition;
 			template.Site.DefaultLayoutDefinition = viewModel.Site.DefaultLayoutDefinition;
-			template.Site.HomeDirectory = viewModel.Site.HomeDirectory;
+			template.Site.HomeDirectory = viewModel.Site.Name;
 
 			viewModel.Site = await this.SiteManager.Import(template);
 			

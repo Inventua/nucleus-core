@@ -78,13 +78,15 @@ namespace Nucleus.Abstractions.Models.Configuration
 			Nucleus.Abstractions.Models.Configuration.FolderOptions.AREAS_FOLDER
 		};
 
+		private static string WebRootFolder { get; } = System.Environment.CurrentDirectory;
+
 		/// <summary>
 		/// Gets the application root folder.
 		/// </summary>
 		/// <returns></returns>
 		public string GetWebRootFolder()
 		{
-			return System.Environment.CurrentDirectory;
+			return WebRootFolder;
 		}
 
 		/// <summary>
@@ -111,9 +113,9 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string Parse(string value)
 		{
-			return value
-					.Replace("{DataFolder}", DataFolder)
-					.Replace("{WebRootFolder}", System.Environment.CurrentDirectory);
+			return Environment.ExpandEnvironmentVariables(value)
+					.Replace("{DataFolder}", this.DataFolder)
+					.Replace("{WebRootFolder}", this.GetWebRootFolder());
 		}
 
 		/// <summary>
@@ -144,7 +146,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		{
 			string appsFolder;
 
-			appsFolder = System.IO.Path.Combine(System.Environment.CurrentDirectory, EXTENSIONS_FOLDER);
+			appsFolder = System.IO.Path.Combine(WebRootFolder, EXTENSIONS_FOLDER);
 
 			if (create)
 			{
@@ -197,7 +199,26 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// Gets the default application data storage folder location, used for logs and database files.
 		/// </summary>
 		/// <returns></returns>
-		public string DataFolder { get; set; }
+		private string DataFolder { get; set; }
+
+		/// <summary>
+		/// Sets the data folder to a default value if its current value is empty, after replacing environment variables.
+		/// </summary>
+		/// <param name="ensureExists">Specifies whether to ensure that the path exists by creating the folder if it does not already exist.</param>
+		public string SetDefaultDataFolder(Boolean ensureExists)
+		{
+			const string DEFAULT_FOLDER = "%ProgramData%/Nucleus";
+
+			this.DataFolder = Parse(String.IsNullOrEmpty(this.DataFolder) ? DEFAULT_FOLDER : this.DataFolder)
+				.Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+			
+			if (ensureExists)
+			{
+				EnsureExists(this.DataFolder);
+			}
+
+			return this.DataFolder;
+		}
 
 		/// <summary>
 		/// Check whether the specified folder exists, and create it if it does not.
@@ -222,6 +243,15 @@ namespace Nucleus.Abstractions.Models.Configuration
 			}
 			
 			return path;
+		}
+
+		/// <summary>
+		/// Gets the root data storage folder location.
+		/// </summary>
+		/// <returns></returns>
+		public string GetDataFolder()
+		{
+			return this.DataFolder;
 		}
 
 		/// <summary>

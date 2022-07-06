@@ -52,13 +52,13 @@ namespace Nucleus.Core.Logging
 			// that setting to be optional.
 			Nucleus.Abstractions.Models.Configuration.FolderOptions folderOptions = new();
 			configuration.GetSection(Nucleus.Abstractions.Models.Configuration.FolderOptions.Section).Bind(folderOptions);
-						
-			DataFolder = folderOptions.DataFolder;
-			if (String.IsNullOrEmpty(DataFolder))
-			{
-				DataFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Nucleus");
-			}
-			DataFolder = folderOptions.Parse(DataFolder);
+			DataFolder = folderOptions.SetDefaultDataFolder(false);
+			//DataFolder = folderOptions.DataFolder;
+			//if (String.IsNullOrEmpty(DataFolder))
+			//{
+			//	DataFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Nucleus");
+			//}
+			//DataFolder = folderOptions.Parse(DataFolder);
 
 			return builder;
 		}
@@ -74,19 +74,23 @@ namespace Nucleus.Core.Logging
 
 			public void PostConfigure(string name, TextFileLoggerOptions options)
 			{
-				if (String.IsNullOrEmpty(this.FolderOptions.Value.DataFolder))
-				{
-					//  Special case:  When the text file logger is added to the StartupLogger, dependency injection hasn't been set up yet and folderOptions hasn't
-					// been initialized, so we have to use the DataPath that we read ourselves in AddTextFileLogger.				
-					this.FolderOptions.Value.DataFolder = DataFolder;
+				//  Special case:  When the text file logger is added to the StartupLogger, dependency injection hasn't been set up yet and folderOptions hasn't
+				// been initialized, so we have to use the DataPath that we read ourselves in AddTextFileLogger.
+				CoreServiceExtensions.ConfigureFolderOptions.PostConfigure(this.FolderOptions.Value);
 
-					// If the config files don't have an entry, initialize to default.  This also happens in CoreServiceExtensions.ConfigureFolderOptions.PostConfigure,
-					// but that doesn't run in time for the StartupLogger
-					if (String.IsNullOrEmpty(this.FolderOptions.Value.DataFolder))
-					{
-						CoreServiceExtensions.ConfigureFolderOptions.PostConfigure(this.FolderOptions.Value);
-					}
-				}
+				////if (String.IsNullOrEmpty(this.FolderOptions.Value.DataFolder))
+				////{
+				////	//  Special case:  When the text file logger is added to the StartupLogger, dependency injection hasn't been set up yet and folderOptions hasn't
+				////	// been initialized, so we have to use the DataPath that we read ourselves in AddTextFileLogger.				
+				////	this.FolderOptions.Value.DataFolder = DataFolder;
+
+				////	// If the config files don't have an entry, initialize to default.  This also happens in CoreServiceExtensions.ConfigureFolderOptions.PostConfigure,
+				////	// but that doesn't run in time for the StartupLogger
+				////	if (String.IsNullOrEmpty(this.FolderOptions.Value.DataFolder))
+				////	{
+				////		CoreServiceExtensions.ConfigureFolderOptions.PostConfigure(this.FolderOptions.Value);
+				////	}
+				////}
 
 				if (String.IsNullOrEmpty(options.Path))
 				{
@@ -100,6 +104,8 @@ namespace Nucleus.Core.Logging
 						options.Enabled = false;
 					}
 				}
+
+				options.Path = this.FolderOptions.Value.Parse(options.Path);
 			}
 		}
 	}

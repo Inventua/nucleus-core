@@ -119,11 +119,11 @@ namespace Nucleus.Core.Logging
 		/// <param name="logger">Logger that this method extends.</param>
 		/// <param name="messages">String array of messages.</param>
 		/// <param name="args">Values to substitute in messages.</param>
-		public static void LogInformation(this ILogger logger, string[] messages, params object[] args)
+		public static void LogInformation(this ILogger logger, string[] messages)
 		{
 			foreach (string message in messages)
 			{
-				logger.LogInformation(message, args);
+				logger.LogInformation(message);
 			}
 		}
 	}		

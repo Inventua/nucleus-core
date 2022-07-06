@@ -137,14 +137,9 @@ namespace Nucleus.Core
 
 			public static void PostConfigure(Nucleus.Abstractions.Models.Configuration.FolderOptions options)
 			{
-				if (String.IsNullOrEmpty(options.DataFolder))
-				{
-					options.DataFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Nucleus");
-				}
-
 				try
 				{
-					options.EnsureExists(options.DataFolder);
+					options.SetDefaultDataFolder(true);
 				}
 				catch (System.UnauthorizedAccessException)
 				{

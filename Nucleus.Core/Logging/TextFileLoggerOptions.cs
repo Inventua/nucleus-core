@@ -11,7 +11,7 @@ namespace Nucleus.Core.Logging
 	{
 		internal const string Section = "Nucleus:TextFileLoggerOptions";
 
-		private string _path;
+		//private string _path;
 
 		public Boolean Enabled { get; set; } = true;
 
@@ -21,16 +21,16 @@ namespace Nucleus.Core.Logging
 		/// <remarks>
 		/// If the specified path does not exist, it is automatically created.
 		/// </remarks>
-		public string Path 
-		{ 
-			get
-			{
-				return _path;
-			}
-			internal set
-			{
-				_path = Environment.ExpandEnvironmentVariables(value); 
-			}
-		}		
+		public string Path { get; set; }
+		//{ 
+		//	get
+		//	{
+		//		return _path;
+		//	}
+		//	internal set
+		//	{
+		//		_path = Nucleus.Abstractions.Models.Configuration.FolderOptions.Parse(value);// Environment.ExpandEnvironmentVariables(value); 
+		//	}
+		//}		
 	}
 }

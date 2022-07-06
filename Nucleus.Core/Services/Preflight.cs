@@ -40,7 +40,7 @@ namespace Nucleus.Core.Services
 			IPreflight.ValidationResults results = new();
 
 			// check permissions on log, cache folders
-			results.Add(CheckFolder("FOLDER-DATA", this.FolderOptions.DataFolder));
+			results.Add(CheckFolder("FOLDER-DATA", this.FolderOptions.GetDataFolder()));
 			results.Add(CheckFolder("FOLDER-LOGS", this.FolderOptions.GetLogFolder(false)));
 			results.Add(CheckFolder("FOLDER-CACHE", this.FolderOptions.GetCacheFolder(false)));
 			results.Add(CheckFolder("FOLDER-TEMP", this.FolderOptions.GetTempFolder(false)));

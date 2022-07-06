@@ -18,7 +18,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 
 		/// <summary>
 		/// Header value.
-		/// </summary>
+		/// </summary> 
 		public string HeaderValue { get; private set; }
 
 	}

@@ -152,6 +152,11 @@ namespace Nucleus.Modules.StaticContent.Controllers
                   }
                   node.SetAttributeValue(attributeName, fileUri + query);
                 }
+                else
+								{
+                  string fileUri = Url.FileLink(file);
+                  node.SetAttributeValue(attributeName, fileUri + query);
+                }
               }
               catch (System.IO.FileNotFoundException)
               {

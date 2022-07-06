@@ -135,7 +135,19 @@ namespace Nucleus.Core.Logging
 			{
 				System.IO.Directory.CreateDirectory(path);
 			}
-			File.AppendAllText(logFilePath, Message + Environment.NewLine);
+
+			try
+			{
+				File.AppendAllText(logFilePath, Message + Environment.NewLine);
+			}			
+			catch(System.UnauthorizedAccessException)
+			{
+				// stop unauthorized access exception (for logs folder) from stopping the application from running.  Logging
+				// providers other than the text file logger will often be enabled/available for troubleshooting, also this is
+				// a potentially common error during first-time install which is reported by the installation wizard so we
+				// want Nucleus to be able to run so it can show the wizard.
+				return;
+			}
 
 			if (this.Provider != null)
 			{

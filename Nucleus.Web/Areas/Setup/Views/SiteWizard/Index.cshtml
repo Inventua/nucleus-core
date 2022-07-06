@@ -75,7 +75,8 @@
 							{
 								@if (!Model.Preflight.IsValid())
 								{
-									<span>
+									<span class="nucleus-material-icon status-error medium-icon">!</span>
+									<span class="medium-icon-text">
 										Configuration checks have failed (@Model.Preflight.ErrorCount() error@(@Model.Preflight.ErrorCount() == 1 ? "" : "s")).  Please address the errors below and click 'Retry'.  
 										<br/>
 										If you need to modify configuration files you may need to restart Nucleus for changes to take effect.
@@ -83,13 +84,13 @@
 								}
 								else
 								{
-									<span>Configuration checks were successful.</span>
+									<span class="nucleus-material-icon status-ok medium-icon">&#xe5ca;</span>
+									<span class="medium-icon-text">Configuration checks were successful.</span>
 								}								
 							}
-
 							<button type="button" class="btn btn-secondary ms-auto" onclick="window.location='@Url.AreaAction("Index", "SiteWizard", "Setup")';">Retry</button>
 						</div>
-						<table class="table table-sm small">
+						<table class="table table-sm small mt-2">
 							<thead class="table-dark">
 								<tr>
 									<th scope="col"></th>

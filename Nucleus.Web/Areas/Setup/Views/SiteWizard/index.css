@@ -79,3 +79,29 @@
 {
 	color: red;
 }
+
+#site-wizard .status-ok
+{
+	background-color: green;
+}
+
+#site-wizard .status-error
+{
+	background-color: red;
+}
+
+#site-wizard .medium-icon
+{
+	height: 3rem;
+	width: 3rem;
+	border-radius: 50%;
+	color: white;
+	font-size: 20px;
+	margin-right: 1rem;
+	text-align: center;
+}
+
+#site-wizard .medium-icon, #site-wizard .medium-icon-text
+{
+	line-height: 3rem;
+}

@@ -39,9 +39,9 @@ namespace Nucleus.Web
 
 		public static void Main(string[] args)
 		{
-			// The app can start with the current directory set to /bin, or /bin/debug/net5.0 but we want it set to the application root.  This 
-			// code has not effect in a production environment, because the app will start in the application root, and there won't be a /bin 
-			// folder.
+			// The app can start with the current directory set to /bin, or /bin/debug/net5.0 but we want it set to the application root.  By
+			// design, this code has no effect in a production environment, because the app will start in the application root, and there
+			// won't be a /bin folder.
 			System.IO.DirectoryInfo workingDirectory = new(System.Environment.CurrentDirectory);
 			while (workingDirectory.Parent != null)
 			{

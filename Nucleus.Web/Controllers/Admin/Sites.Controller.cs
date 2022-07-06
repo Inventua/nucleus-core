@@ -460,7 +460,7 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.Layouts = (await this.LayoutManager.List()).InsertDefaultListItem();
 			viewModel.Containers = (await this.ContainerManager.List()).InsertDefaultListItem();
 
-			// todo
+			// In version 1, there is no implementation for site groups, and an empty site groups list prevents the site groups drop-down from appearing.
 			viewModel.SiteGroups = new List<SiteGroup>();
 
 			viewModel.SelectedCssFile = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.SelectedCssFile);

@@ -14,6 +14,7 @@
 			@Html.TextBoxFor(model => model.SelectedItem.Name)
 		</SettingsControl>
 	</fieldset>
-	<input type="submit" value="Rename" class="btn btn-primary" formaction="@Url.AreaAction("Rename", "FileSystem", "Admin")" data-target=".nucleus-adminpage" />
-
+	<div class="nucleus-form-tools">
+		<input type="submit" value="Rename" class="btn btn-primary" formaction="@Url.AreaAction("Rename", "FileSystem", "Admin")" data-target=".nucleus-adminpage" />
+	</div>
 }

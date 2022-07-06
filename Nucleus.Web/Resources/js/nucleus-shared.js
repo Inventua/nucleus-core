@@ -828,7 +828,10 @@ function _Page()
 				var modal = new bootstrap.Modal(wrapper, { backdrop: 'static' });
 				modal.show();
 
-				wrapper.one('shown.bs.modal', function () { _removeDuplicateOverlays(); });
+				wrapper.off('shown.bs.modal');
+				wrapper.on('shown.bs.modal', function () { _removeDuplicateOverlays(); });
+				wrapper.off('hide.bs.modal');
+				wrapper.on('hide.bs.modal', function () { _removeRelatedOverlays(this); });
 			}
 			else
 			{
@@ -881,6 +884,13 @@ function _Page()
 		{
 			jQuery(parentElement).find('.modal-backdrop:not(:first)').remove();
 		});
+	}
+
+	// Remove .modal-backdrop elements at the same level in the DOM as the specified element.  This is required because when we do a 
+	// partial render and replace content / re-open a modal, Bootstrap loses track of the overlay which is related to a modal.
+	function _removeRelatedOverlays(element)
+	{
+		jQuery(element).siblings('.modal-backdrop').remove();
 	}
 
 	function _isInView (element)

@@ -61,14 +61,14 @@
         event.preventDefault();
         event.stopPropagation();
 
-        jQuery(args.event.currentTarget).parents('ul, ol').find('LI.selected').removeClass('selected');
-        if (jQuery(args.event.currentTarget).is('li'))
+        jQuery(event.currentTarget).parents('ul, ol').find('LI.selected').removeClass('selected');
+        if (jQuery(event.currentTarget).is('li'))
         {
-          jQuery(args.event.currentTarget).addClass('selected');
+          jQuery(event.currentTarget).addClass('selected');
         }
         else
         {
-          jQuery(args.event.currentTarget).parent('li').addClass('selected');
+          jQuery(event.currentTarget).parent('li').addClass('selected');
         }
         //jQuery(this).siblings().removeClass("selected");
         //jQuery(this).addClass("selected");

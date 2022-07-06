@@ -30,7 +30,7 @@ namespace Nucleus.Core.FileProviders
 		/// <param name="configuration">.NET core configuration object used to access configuration items.</param>
 		public static void AddMergedFileMiddleware(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, IConfiguration configuration)
 		{			
-			services.Configure<MergedFileProviderOptions>(configuration.GetSection(MergedFileProviderOptions.Section));
+			services.Configure<ResourceFileOptions>(configuration.GetSection(ResourceFileOptions.Section));
 			services.AddSingleton<MergedFileProviderMiddleware>();
 		}
 

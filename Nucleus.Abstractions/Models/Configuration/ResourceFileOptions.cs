@@ -29,11 +29,11 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <value>
 		/// Specifies whether to merge requests for Javascript files.
 		/// </value>
-		public Boolean MergeJs { get; set; } = false;
+		public Boolean MergeJs { get; private set; } = false;
 
 		/// <value>
 		/// Specifies whether to merge requests for CSS files.
 		/// </value>
-		public Boolean MergeCss { get; set; } = false;
+		public Boolean MergeCss { get; private set; } = false;
 	}
 }

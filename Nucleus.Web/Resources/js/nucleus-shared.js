@@ -193,6 +193,7 @@ function _Page()
 			jQuery('.PopupMenu').fadeOut();
 		});
 
+		jQuery('.nucleus-default-control').focus();
 		jQuery(Page).trigger("ready", [{ page: Page }]);
 	});
 

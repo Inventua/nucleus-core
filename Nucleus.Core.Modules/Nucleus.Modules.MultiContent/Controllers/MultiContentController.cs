@@ -34,6 +34,7 @@ namespace Nucleus.Modules.MultiContent.Controllers
 		private const string MODULESETTING_ORIENTATION = "multicontent:orientation";
 		private const string MODULESETTING_FILL = "multicontent:fill";
 		private const string MODULESETTING_JUSTIFY = "multicontent:justify";
+		private const string MODULESETTING_ICON = "multicontent:icon";
 
 		public MultiContentController(IWebHostEnvironment webHostEnvironment, Context Context, IPageModuleManager pageModuleManager, IContentManager contentManager)
 		{
@@ -80,6 +81,7 @@ namespace Nucleus.Modules.MultiContent.Controllers
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_ORIENTATION, viewModel.LayoutSettings.Orientation);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_FILL, viewModel.LayoutSettings.Fill);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_JUSTIFY, viewModel.LayoutSettings.Justify);
+			this.Context.Module.ModuleSettings.Set(MODULESETTING_ICON, viewModel.LayoutSettings.Icon);
 
 			await this.PageModuleManager.SaveSettings(this.Context.Module);
 
@@ -165,6 +167,7 @@ namespace Nucleus.Modules.MultiContent.Controllers
 			settings.Alignment = this.Context.Module.ModuleSettings.Get(MODULESETTING_ALIGNMENT, ViewModels.LayoutSettings.AlignmentStyles.Left);
 			settings.Fill = this.Context.Module.ModuleSettings.Get(MODULESETTING_FILL, false);
 			settings.Justify = this.Context.Module.ModuleSettings.Get(MODULESETTING_JUSTIFY, false);
+			settings.Icon = this.Context.Module.ModuleSettings.Get(MODULESETTING_ICON, ViewModels.LayoutSettings.Icons.Default);
 
 			return settings;
 		}

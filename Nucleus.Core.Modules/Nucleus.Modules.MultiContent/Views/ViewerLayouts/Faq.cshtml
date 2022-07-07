@@ -1,0 +1,23 @@
+﻿@model Nucleus.Modules.MultiContent.ViewModels.Viewer
+@using Nucleus.Extensions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@Html.AddStyle("~!/../../viewer.css")
+<ol class="multi-content-faq accordion accordion-flush align-@(Model.LayoutSettings.Alignment.ToString().ToLower()) icon-@(Model.LayoutSettings.Icon.ToString().ToLower())" id="faq-@Model.Module.Id">
+	@foreach (var content in Model.Contents)
+	{
+		<li class="accordion-item">
+			<h3 class="accordion-header" id="accordion-head-@content.Id">
+				<button class="accordion-button @(Model.LayoutSettings.OpenFirst && content == Model.Contents.First() ? "" : "collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-item-@content.Id" aria-expanded="@(content == Model.Contents.First() ? "true" : "false")" aria-controls="accordion-item-@content.Id">
+					@(!String.IsNullOrEmpty(content.Title) ? content.Title : "No title")
+				</button>
+			</h3>
+
+			<div id="accordion-item-@content.Id" class="accordion-collapse collapse@(Model.LayoutSettings.OpenFirst && content == Model.Contents.First() ? " show" : "")" aria-labelledby="accordion-head-@content.Id">
+				<div class="accordion-body">
+					@Html.Raw(content.ToHtml())
+				</div>
+			</div>
+		</li>
+	}
+</ol>

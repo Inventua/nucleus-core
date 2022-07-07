@@ -26,11 +26,13 @@
     <None Remove="readme.txt" />
     <None Remove="settings.css" />
     <None Remove="Views\Editor.cshtml" />
+    <None Remove="Views\LayoutSettings\_FaqSettings.cshtml" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
     <None Remove="Views\ViewerLayouts\Accordion.cshtml" />
     <None Remove="Views\ViewerLayouts\Alert.cshtml" />
     <None Remove="Views\ViewerLayouts\Carousel.cshtml" />
+    <None Remove="Views\ViewerLayouts\Faq.cshtml" />
     <None Remove="Views\ViewerLayouts\Pills.cshtml" />
     <None Remove="Views\ViewerLayouts\Tabs.cshtml" />
     <None Remove="Views\ViewerLayouts\_AccordionSettings.cshtml" />
@@ -48,11 +50,13 @@
     <Content Include="readme.txt" />
     <Content Include="settings.css" />
     <Content Include="Views\Editor.cshtml" />
+    <Content Include="Views\LayoutSettings\_FaqSettings.cshtml" />
     <Content Include="Views\LayoutSettings\_AccordionSettings.cshtml" />
     <Content Include="Views\LayoutSettings\_AlertSettings.cshtml" />
     <Content Include="Views\LayoutSettings\_CarouselSettings.cshtml" />
     <Content Include="Views\LayoutSettings\_PillsSettings.cshtml" />
     <Content Include="Views\LayoutSettings\_TabsSettings.cshtml" />
+    <Content Include="Views\ViewerLayouts\Faq.cshtml" />
     <Content Include="Views\_ContentList.cshtml" />
     <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />

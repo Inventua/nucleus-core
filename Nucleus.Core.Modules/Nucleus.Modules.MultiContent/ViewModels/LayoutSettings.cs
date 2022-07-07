@@ -20,6 +20,20 @@ namespace Nucleus.Modules.MultiContent.ViewModels
 			Right = 2
 		}
 
+		public enum FaqAlignmentStyles
+		{
+			Left = AlignmentStyles.Left,
+			Right = AlignmentStyles.Right
+		}
+
+		public enum Icons
+		{
+			Default = 0,
+			[System.ComponentModel.DataAnnotations.Display(Name = "Plus/Minus")] Plus = 1,
+			Arrows = 2,
+			[System.ComponentModel.DataAnnotations.Display(Name = "Drop-down arrow")] DropDownArrows = 3
+		}
+
 		// Carousel settings
 		public Boolean RenderFlush { get; set; }
 		public Boolean ShowControls { get; set; }
@@ -38,5 +52,7 @@ namespace Nucleus.Modules.MultiContent.ViewModels
 		public AlignmentStyles Alignment { get; set; }
 		public Boolean Fill { get; set; }
 		public Boolean Justify { get; set; }
+
+		public Icons Icon { get; set; }
 	}
 }

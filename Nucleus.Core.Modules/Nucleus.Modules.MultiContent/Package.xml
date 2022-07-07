@@ -41,6 +41,7 @@
 					<file name="Carousel.cshtml" />
 					<file name="Tabs.cshtml" />
 					<file name="Pills.cshtml" />
+					<file name="Faq.cshtml" />
 				</folder>
 				
 				<folder name="LayoutSettings">
@@ -49,6 +50,7 @@
 					<file name="_CarouselSettings.cshtml" />
 					<file name="_TabsSettings.cshtml" />
 					<file name="_PillsSettings.cshtml" />
+					<file name="_FaqSettings.cshtml" />
 				</folder>
 			</folder>
 

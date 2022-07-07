@@ -4,7 +4,7 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 <div class="nucleus-flex-fields">
-	<SettingsControl caption="Open First?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the first item should default to open.">
+	<SettingsControl caption="Open First Item?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the first item should default to open.">
 		@Html.CheckBoxFor(model => model.LayoutSettings.OpenFirst, new { @class = "ToggleSwitch" })
 	</SettingsControl>
 

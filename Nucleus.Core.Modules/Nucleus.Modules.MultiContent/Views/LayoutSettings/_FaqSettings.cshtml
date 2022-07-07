@@ -1,0 +1,17 @@
+﻿@model Nucleus.Modules.MultiContent.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+<SettingsControl caption="Open First Item?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the first item should default to open.">
+	@Html.CheckBoxFor(model => model.LayoutSettings.OpenFirst, new { @class = "ToggleSwitch" })
+</SettingsControl>
+<div class="nucleus-flex-fields">
+	<SettingsControl caption="Alignment" helptext="Choose alignment.">
+		@Html.DropDownListFor(model => model.LayoutSettings.Alignment, Html.GetEnumSelectList<Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.FaqAlignmentStyles>())
+	</SettingsControl>
+
+	<SettingsControl caption="Icon" helptext="Choose expand icon.">
+		@Html.DropDownListFor(model => model.LayoutSettings.Icon, Html.GetEnumSelectList<Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.Icons>())
+	</SettingsControl>
+</div>

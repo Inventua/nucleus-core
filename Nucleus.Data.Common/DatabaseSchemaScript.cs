@@ -62,9 +62,20 @@ namespace Nucleus.Data.Common
 		}
 
 		/// <summary>
+		/// Determine whether the filename of an embedded resource file is a version number.
+		/// </summary>
+		/// <param name="scriptNamespace"></param>
+		/// <param name="resourceName">Name of an embedded database script.</param>
+		public static Boolean CanParseVersion(string scriptNamespace, string resourceName)
+		{
+			string shortResourceName = resourceName.Replace(scriptNamespace, "", StringComparison.OrdinalIgnoreCase);
+			return System.Version.TryParse(System.IO.Path.GetFileNameWithoutExtension(shortResourceName), out Version result);
+		}
+
+		/// <summary>
 		/// Parse the filename of an embedded resource file and return its version number.
 		/// </summary>
-		/// <param name="resourceName">Relative name of an embedded database script within the inventua.massy.osacloudfiles.dataprovider.scripts namespace.</param>
+		/// <param name="resourceName">Name of an embedded database script.</param>
 		/// <returns>System.Version containing the embedded script file version.  The version is the file name without the file extension.</returns>
 		private static System.Version ParseVersion(string resourceName)
 		{
@@ -74,7 +85,7 @@ namespace Nucleus.Data.Common
 			}
 			else
 			{
-				throw new ApplicationException($"Unexpected resource {resourceName} in dataprovider/scripts.");
+				throw new InvalidOperationException($"Unexpected resource {resourceName} in dataprovider/scripts.");
 			}
 		}
 	}

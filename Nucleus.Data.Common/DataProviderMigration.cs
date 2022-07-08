@@ -89,9 +89,11 @@ namespace Nucleus.Data.Common
 		/// Namespace of the embedded schema scripts.
 		/// </summary>
 		/// <remarks>
-		/// The default value for SchemaScriptsNamespace is the namespace of the class which inherits this class, with a ".Scripts." 
-		/// suffix.  Add your scripts to a sub-folder located at the same location in your project as your DataProviderMigration class,
-		/// named "Scripts".  Scripts must have a ".sql" extension.  This value is not case-sensitive.
+		/// The default value for SchemaScriptsNamespace is the namespace of the class which inherits this class, followed by
+		/// the database type, or 'Migrations' for database-agnostic screens, with a ".Scripts." suffix.  Add your scripts to the
+		/// DataProvider/database-type/scripts folder where database-type is 'Migrations', or the name of the data provider that the
+		/// script is for (Sqlite, MySql, SqlServer or PostgreSql).
+		/// Scripts must have a ".sql" extension or a ".json" extension.  This value is not case-sensitive.
 		/// </remarks>
 		public virtual IEnumerable<string> SchemaScriptsNamespaces { get; internal set; }
 
@@ -120,7 +122,10 @@ namespace Nucleus.Data.Common
 							(name.ToLower().EndsWith(".sql") || name.ToLower().EndsWith(".json"))
 					))
 					{
-						scripts.Add(Nucleus.Data.Common.DatabaseSchemaScript.BuildManifestSchemaScript(this.SchemaScriptsAssembly, schemaScriptsNamespace, script));
+						if (Nucleus.Data.Common.DatabaseSchemaScript.CanParseVersion(schemaScriptsNamespace, script))
+						{
+							scripts.Add(Nucleus.Data.Common.DatabaseSchemaScript.BuildManifestSchemaScript(this.SchemaScriptsAssembly, schemaScriptsNamespace, script));
+						}
 					}
 				}
 				return scripts;

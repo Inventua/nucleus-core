@@ -19,10 +19,13 @@ namespace Nucleus.Modules.StaticContent.Controllers
 		private Context Context { get; }
 		private IPageModuleManager PageModuleManager { get; }
 		private IFileSystemManager FileSystemManager { get; }
+				private ICacheManager CacheManager { get; }
 
-		public StaticContentAdminController(Context Context, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager)
+
+		public StaticContentAdminController(Context Context, ICacheManager cacheManager, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager)
 		{
 			this.Context = Context;
+			this.CacheManager = cacheManager;
 			this.PageModuleManager = pageModuleManager;
 			this.FileSystemManager = fileSystemManager;
 		}
@@ -38,8 +41,10 @@ namespace Nucleus.Modules.StaticContent.Controllers
 		public ActionResult SaveSettings(ViewModels.Settings viewModel)
 		{
 			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_DEFAULT_FILE_ID, viewModel.DefaultFile.Id);
-
 			this.PageModuleManager.SaveSettings(this.Context.Module);
+
+			this.CacheManager.StaticContentCache().Clear();
+
 			return Ok();
 		}
 

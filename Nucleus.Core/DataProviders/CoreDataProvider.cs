@@ -1247,20 +1247,26 @@ namespace Nucleus.Core.DataProviders
     {
       Action raiseEvent;
 
-      this.Context.Roles.Update(role);
-      this.Context.Entry(role).Property("SiteId").CurrentValue = site.Id;
-
-      if (!this.Context.Roles.Where(existing => existing.Id == role.Id).Any())
+      Role existing = await this.Context.Roles
+        .Where(existing => existing.Id == role.Id)
+        .FirstOrDefaultAsync();
+            
+      if (existing==null)
       {
         // New role
+        this.Context.Roles.Add(role);
         this.Context.Entry(role).State = EntityState.Added;
+        this.Context.Entry(role).Property("SiteId").CurrentValue = site.Id;
+
         raiseEvent = new(() => { this.EventManager.RaiseEvent<Role, Create>(role); });
       }
       else
       {
         // existing role
-        this.Context.Entry(role).State = EntityState.Modified;
-        raiseEvent = new(() => { this.EventManager.RaiseEvent<Role, Update>(role); });
+        this.Context.Entry(existing).CurrentValues.SetValues(role);
+        this.Context.Entry(existing).State = EntityState.Modified;
+        this.Context.Entry(existing).Property<Guid?>("RoleGroupId").CurrentValue = role.RoleGroup?.Id;
+        raiseEvent = new(() => { this.EventManager.RaiseEvent<Role, Update>(existing); });
       }
 
       await this.Context.SaveChangesAsync<Role>();

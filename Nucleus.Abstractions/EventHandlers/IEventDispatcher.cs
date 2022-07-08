@@ -11,11 +11,11 @@ namespace Nucleus.Abstractions.EventHandlers
 	/// from the dependency injection services container and raise or consume events.
 	/// </summary>
 	/// <remarks>
-	/// To handle an event, create an implementation of ISystemEventHandler{TModel, TEvent} and add it to the dependency 
+	/// To handle an event, create an implementation of <![CDATA[ISystemEventHandler<TModel, TEvent>]]> and add it to the dependency 
 	/// injection services container.  Any number of event handlers may exist for any number of combinations of TModel and TEvent.  ISystemEventHandlers
 	/// are invoked asynchronously in no particular order.
 	/// 
-	/// To raise an event, include IEventDispatcher in your constructor, and call <![CDATA[IEventDispatcher.RaiseEvent<TModel, TEvent>(myuser);]]>
+	/// To raise an event, include IEventDispatcher in your constructor, and call <![CDATA[IEventDispatcher.RaiseEvent<TModel, TEvent>(instanceOfTModel);]]>
 	/// 
 	/// TModel can be any class type.  TEvent can also be any class type, but is normally a class created specifically to mark an event type, with no methods 
 	/// or properties. The <see cref="SystemEventTypes"/> namespace contains classes for <see cref="SystemEventTypes.Create"/>, <see cref="SystemEventTypes.Delete"/>

@@ -38,7 +38,7 @@
 
 			@if (seeItem.Uri != null)
 			{
-				<a class="link-primary" href="@(seeItem.Uri.IsAbsoluteUri ? seeItem.Uri.ToString() : Url.PageLink(seeItem.Uri.ToString()))">@seeItem.LinkText</a>
+				<a class="link-primary" href="@(seeItem.Uri.IsAbsoluteUri ? seeItem.Uri.ToString() : Url.PageLink(Model.Page, seeItem.Uri.ToString()))">@seeItem.LinkText</a>
 			}
 			else
 			{

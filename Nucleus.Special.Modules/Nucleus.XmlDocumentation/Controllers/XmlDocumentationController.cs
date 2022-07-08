@@ -111,14 +111,24 @@ namespace Nucleus.XmlDocumentation.Controllers
 
 			if (this.Context.LocalPath.HasValue)
 			{
-				if (this.Context.LocalPath.Segments.Length > 0)
+				if (this.Context.LocalPath.Segments.Length > 0 && !this.Context.LocalPath.Segments[0].EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
 				{
+					// local path contains a single value (a namespace-qualified class name), use it to determine both the document and class name
+					viewModel.SelectedDocument = viewModel.Documents.Where(document => this.Context.LocalPath.Segments[0].StartsWith(System.IO.Path.GetFileNameWithoutExtension(document.SourceFileName), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+					if (viewModel.SelectedDocument != null)
+					{
+						viewModel.SelectedClass = viewModel.SelectedDocument.Classes.Where(cls => cls.FullName.Equals(this.Context.LocalPath.Segments[0], StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+					}
+				}
+				else
+				{
+					// local path contains the document name and class name separated by "/"
 					viewModel.SelectedDocument = viewModel.Documents.Where(document => document.SourceFileName.Equals(this.Context.LocalPath.Segments[0], StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-				}
-				if (viewModel.SelectedDocument != null && this.Context.LocalPath.Segments.Length > 1)
-				{
-					viewModel.SelectedClass = viewModel.SelectedDocument.Classes.Where(cls => cls.FullName.Equals(this.Context.LocalPath.Segments[1], StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-				}
+					if (viewModel.SelectedDocument != null && this.Context.LocalPath.Segments.Length > 1)
+					{
+						viewModel.SelectedClass = viewModel.SelectedDocument.Classes.Where(cls => cls.FullName.Equals(this.Context.LocalPath.Segments[1], StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+					}
+				}				
 			}
 
 			return viewModel;

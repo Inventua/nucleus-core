@@ -83,7 +83,7 @@
 			{
 				@if (seeAlso.Uri != null)
 				{
-					<mark><a href="@(seeAlso.Uri.IsAbsoluteUri ? seeAlso.Uri.ToString() : Url.PageLink(seeAlso.Uri.ToString()))">@seeAlso.LinkText</a></mark>
+					<mark><a href="@(seeAlso.Uri.IsAbsoluteUri ? seeAlso.Uri.ToString() : Url.PageLink(Model.Page, seeAlso.Uri.ToString()))">@seeAlso.LinkText</a></mark>
 				}
 				else
 				{

@@ -34,14 +34,23 @@ namespace Nucleus.XmlDocumentation
 		/// <returns></returns>
 		public static string FilterXMLWhiteSpace(this string value)
 		{
-			int leadingSpaces;
+			int leadingSpaces = 0;
 
 			if (value == null) return null;
 
 			// remove leading CRLF characters
 			value = System.Text.RegularExpressions.Regex.Replace(value, "^([\\r\\n]*)", "", System.Text.RegularExpressions.RegexOptions.Multiline);
 
-			leadingSpaces = CountLeadingSpaces(value);
+			// count the leading spaces in the first line if it is not a comment, or the first line that isn't a comment so that we can remove
+			// leading spaces from each line so that they render properly in a <code> block.
+			foreach (string line in value.Split("\n"))
+			{
+				if (!line.StartsWith('/'))
+				{
+					leadingSpaces = CountLeadingSpaces(line);
+					break;
+				}
+			}
 
 			// remove leading white space at the start of lines
 			value = value.Replace("\n" + new string(' ', leadingSpaces), "\n");

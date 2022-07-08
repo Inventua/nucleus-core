@@ -116,7 +116,7 @@
 						{
 							@if (eventInfo.Uri != null)
 							{
-								<mark><a href="@(eventInfo.Uri.IsAbsoluteUri ? eventInfo.Uri.ToString() : Url.PageLink(eventInfo.Uri.ToString()))">@eventInfo.Description</a></mark>
+								<mark><a href="@(eventInfo.Uri.IsAbsoluteUri ? eventInfo.Uri.ToString() : Url.PageLink(Model.Page, eventInfo.Uri.ToString()))">@eventInfo.Description</a></mark>
 							}
 							else
 							{
@@ -133,7 +133,7 @@
 						{
 							@if (exception.Uri != null)
 							{
-								<mark><a href="@(exception.Uri.IsAbsoluteUri ? exception.Uri.ToString() : Url.PageLink(exception.Uri.ToString()))">@exception.Description</a></mark>
+								<mark><a href="@(exception.Uri.IsAbsoluteUri ? exception.Uri.ToString() : Url.PageLink(Model.Page, exception.Uri.ToString()))">@exception.Description</a></mark>
 							}
 							else
 							{
@@ -180,7 +180,7 @@
 						{
 							@if (seeAlso.Uri != null)
 							{
-								<a class="link-primary" href="@(seeAlso.Uri.IsAbsoluteUri ? seeAlso.Uri.ToString() : Url.PageLink(seeAlso.Uri.ToString()))">@seeAlso.LinkText</a>
+								<a class="link-primary" href="@(seeAlso.Uri.IsAbsoluteUri ? seeAlso.Uri.ToString() : Url.PageLink(Model.Page, seeAlso.Uri.ToString()))">@seeAlso.LinkText</a>
 							}
 							else
 							{

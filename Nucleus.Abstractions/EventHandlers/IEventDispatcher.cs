@@ -11,7 +11,7 @@ namespace Nucleus.Abstractions.EventHandlers
 	/// from the dependency injection services container and raise or consume events.
 	/// </summary>
 	/// <remarks>
-	/// To handle an event, create an implementation of ISystemEventHandler{TModel, TEvent} and add it to the dependency 
+	/// To handle an event, create an implementation of <![CDATA[ISystemEventHandler<TModel, TEvent>]]> and add it to the dependency 
 	/// injection services container.  Any number of event handlers may exist for any number of combinations of TModel and TEvent.  ISystemEventHandlers
 	/// are invoked asynchronously in no particular order.
 	/// 

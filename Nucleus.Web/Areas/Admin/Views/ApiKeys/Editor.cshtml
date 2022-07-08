@@ -32,7 +32,7 @@
 			@Html.TextAreaFor(model => model.ApiKey.Secret, new { @maxlength = 256 })
 		</SettingsControl>
 
-		<SettingsControl caption="Scope" helptext="Line-feed separated list of scopes for the API key.  Scopes represent the claims that the API key is assigned during authentication.  The most common use is to assign a role, for example 'role:Registered Users'.'">
+		<SettingsControl caption="Scope" helptext="List of scopes for the API key, separated by line feeds.  Scopes represent the claims that the API key is assigned during authentication.  A common use is to assign a role, for example 'role:Registered Users', which would add an API client using this key to the 'Registered Users' role for the duration of the API call.">
 			@Html.TextAreaFor(model => model.ApiKey.Scope, new { @maxlength = 512, @rows = 8 })
 		</SettingsControl>
 

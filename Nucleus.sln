@@ -128,12 +128,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "module-walkthrough", "modul
 	ProjectSection(SolutionItems) = preProject
 		Documentation\Developers\module-walkthrough\add-project.png = Documentation\Developers\module-walkthrough\add-project.png
 		Documentation\Developers\module-walkthrough\configure-project.png = Documentation\Developers\module-walkthrough\configure-project.png
+		Documentation\Developers\module-walkthrough\Develop-Module-Walkthrough.md = Documentation\Developers\module-walkthrough\Develop-Module-Walkthrough.md
 		Documentation\Developers\module-walkthrough\extension-settings.png = Documentation\Developers\module-walkthrough\extension-settings.png
-		Documentation\Developers\module-walkthrough\middleware.png = Documentation\Developers\module-walkthrough\middleware.png
-		Documentation\Developers\module-walkthrough\package.png = Documentation\Developers\module-walkthrough\package.png
-		Documentation\Developers\module-walkthrough\settings-cs.png = Documentation\Developers\module-walkthrough\settings-cs.png
-		Documentation\Developers\module-walkthrough\settings-cshtml.png = Documentation\Developers\module-walkthrough\settings-cshtml.png
-		Documentation\Developers\module-walkthrough\vs-solution.png = Documentation\Developers\module-walkthrough\vs-solution.png
 	EndProjectSection
 EndProject
 Global

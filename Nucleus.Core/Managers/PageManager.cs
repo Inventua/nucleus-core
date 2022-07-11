@@ -12,6 +12,7 @@ using Nucleus.Core.Authorization;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions.Authorization;
+using System.Security.Cryptography;
 
 namespace Nucleus.Core.Managers
 {
@@ -78,25 +79,6 @@ namespace Nucleus.Core.Managers
 			}
 
 			return await FindPage(site, path);
-			//using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
-			//{
-			//	Guid pageId = await provider.FindPage(site, path);
-
-			//	if (pageId == Guid.Empty && String.IsNullOrEmpty(path))
-			//	{
-			//		// treat empty local path as "/"
-			//		pageId = await provider.FindPage(site, "/");
-			//	}
-				
-			//	if (pageId == Guid.Empty)
-			//	{
-			//		return null;
-			//	}
-			//	else
-			//	{
-			//		return await Get(pageId);
-			//	}
-			//}
 		}
 
 		/// <summary>
@@ -510,15 +492,30 @@ namespace Nucleus.Core.Managers
 			}
 			else
 			{
-				key = String.Join("|", user.Claims.Where(claim => claim.Type == System.Security.Claims.ClaimTypes.Role).Select(claim => claim.Value)) + $":{site.Id}:{ignoreSettings}:{(parentPage == null ? Guid.Empty : parentPage.Id)}";
+				string roles = String.Join(":", user.Claims.Where(claim => claim.Type == System.Security.Claims.ClaimTypes.Role).Select(claim => claim.Value));
+				if (String.IsNullOrEmpty(roles))
+				{
+					roles = "Anonymous User";
+				}
+				key = String.Join("|", Encode(roles) + $":{site.Id}:{ignoreSettings}:{(parentPage == null ? Guid.Empty : parentPage.Id)}");
 			}
 
 			return await this.CacheManager.PageMenuCache().GetAsync(key, async key =>
 			{
 				// read from database
-				PageMenuChildrenResult childrenResult = await GetPageMenuChildren(site, parentPage, user, 0, 0, ignoreSettings, ignoreSettings, ignoreSettings);
+				PageMenuChildrenResult childrenResult = await GetPageMenuChildren(site, parentPage, user, 0, 0, false, ignoreSettings, ignoreSettings);
 				return new PageMenu(null, childrenResult.Children, childrenResult.HasChildren);
 			});
+		}
+
+		private string Encode(string value)
+		{
+			byte[] valueBytes = System.Text.Encoding.UTF8.GetBytes(value);
+
+			using (MD5 md5 = MD5.Create())
+			{
+				return BitConverter.ToString(md5.ComputeHash(valueBytes)).Replace("-", "");
+			}
 		}
 
 		private async Task<PageMenuChildrenResult> GetPageMenuChildren(Site site, Page parentPage, ClaimsPrincipal user, int levels, int thisLevel, Boolean ignorePermissions, Boolean ignoreDisabled, Boolean ignoreShowInMenu)

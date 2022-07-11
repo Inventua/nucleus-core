@@ -151,7 +151,7 @@ namespace Nucleus.Abstractions.Managers
 		public Task<PageMenu> GetAdminMenu(Site site, Page parentPage, ClaimsPrincipal user, int levels, Boolean ignorePermissions, Boolean ignoreDisabled, Boolean ignoreShowInMenu);
 
 		/// <summary>
-		/// Retrieve a "tree" representation of site pages.
+		/// Retrieve a "tree" representation of site pages which the specified user has view permissions for.
 		/// </summary>
 		/// <param name="site"></param>
 		/// <param name="parentPage"></param>

@@ -16,190 +16,206 @@ using Nucleus.Modules.StaticContent.Models;
 
 namespace Nucleus.Modules.StaticContent.Controllers
 {
-  [Extension("StaticContent")]
-  public class StaticContentController : Controller
-  {
-    private Context Context { get; }
-    private IPageModuleManager PageModuleManager { get; }
-    private IFileSystemManager FileSystemManager { get; }
+	[Extension("StaticContent")]
+	public class StaticContentController : Controller
+	{
+		private Context Context { get; }
+		private IPageModuleManager PageModuleManager { get; }
+		private IFileSystemManager FileSystemManager { get; }
+		private ICacheManager CacheManager { get; }
 
-    public StaticContentController(Context Context, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager)
-    {
-      this.Context = Context;
-      this.PageModuleManager = pageModuleManager;
-      this.FileSystemManager = fileSystemManager;
-    }
+		public StaticContentController(Context Context, ICacheManager cacheManager, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager)
+		{
+			this.Context = Context;
+			this.CacheManager = cacheManager;
 
-    [HttpGet]
-    public async Task<ActionResult> Index()
-    {
+			this.PageModuleManager = pageModuleManager;
+			this.FileSystemManager = fileSystemManager;
+		}
 
-      ViewModels.Viewer viewModel = await BuildViewModel();
+		[HttpGet]
+		public async Task<ActionResult> Index()
+		{
+			RenderedContent renderedContent;
+			string key;
 
-      try
-      {
-        if (viewModel.DefaultFile != null && viewModel.DefaultFileId != Guid.Empty)
-        {
-          // Check that the user has permission to view the static file
-          viewModel.DefaultFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.DefaultFile.Parent);
+			ViewModels.Viewer viewModel = await BuildViewModel();
 
-          if (!User.HasViewPermission(this.Context.Site, viewModel.DefaultFile.Parent))
-          {
-            viewModel.Content = "";
-          }
-          else
-          {
-            using (System.IO.Stream content = this.FileSystemManager.GetFileContents(this.Context.Site, viewModel.DefaultFile))
-            {
-              if (viewModel.DefaultFile.IsMarkdown())
-              {
-                viewModel.Content = ContentExtensions.ToHtml(GetStreamAsString(content), "text/markdown");
-              }
-              else if (viewModel.DefaultFile.IsText())
-              {
-                viewModel.Content = ContentExtensions.ToHtml(GetStreamAsString(content), "text/plain");
-              }
-              else if (viewModel.DefaultFile.IsContent())
-              {
-                viewModel.Content = GetStreamAsString(content);
-              }
-              else
-              {
-                // Redirect to the file.
-                if (viewModel.DefaultFile.Capabilities.CanDirectLink)
-                {
-                  System.Uri uri = this.FileSystemManager.GetFileDirectUrl(this.Context.Site, viewModel.DefaultFile);
-                  if (uri != null)
-                  {
-                    return new RedirectResult(uri.AbsoluteUri, true);
-                  }
-                  else
-                  {
-                    return NotFound();
-                  }
-                }
-                else
-                {
-                  return new RedirectResult(Url.FileLink(viewModel.DefaultFile), true);
-                }
-              }
-            }
-          }
-        }
+			try
+			{
+				if (viewModel.DefaultFile != null && viewModel.DefaultFileId != Guid.Empty)
+				{
+					// Check that the user has permission to view the static file
+					viewModel.DefaultFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.DefaultFile.Parent);
 
-        if (!String.IsNullOrEmpty(viewModel.Content))
-        {   // Parse the output (html) for static file links
-          HtmlAgilityPack.HtmlDocument document = new();
-          document.LoadHtml(viewModel.Content);
-
-          await ReplaceAttribute(viewModel, document, "img", "src");
-          await ReplaceAttribute(viewModel, document, "link", "href");
-          await ReplaceAttribute(viewModel, document, "script", "src");
-
-          viewModel.Content = document.DocumentNode.OuterHtml;
-        }
-
-        return View("Viewer", viewModel);
-      }
-      catch (System.IO.FileNotFoundException)
-      {
-        return NotFound();
-      }
-
-    }
-
-    private async Task ReplaceAttribute(ViewModels.Viewer viewModel, HtmlAgilityPack.HtmlDocument document, string nodeType, string attributeName)
-    {
-      HtmlAgilityPack.HtmlNodeCollection nodes = document.DocumentNode.SelectNodes($"//{nodeType.ToLower()}");
-
-      if (nodes != null)
-      {
-
-        foreach (HtmlAgilityPack.HtmlNode node in nodes)
-        {
-          string attributeValue = node.GetAttributeValue(attributeName, "");
-          if (attributeValue != null)
-          {
-            if (!attributeValue.Contains(System.Uri.SchemeDelimiter))
-            {
-              string localPath;
-              string query;
-
-              int position = attributeValue.IndexOfAny(new char[] { '?', '#' });
-              if (position < 0)
-              {
-                localPath = attributeValue;
-                query = "";
-              }
-              else
-              {
-                localPath = attributeValue.Substring(0, position);
-                query = attributeValue.Substring(position);
-              }
-
-              // attribute is a relative path
-              try
-              {
-                File file = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.DefaultFile.Provider, viewModel.DefaultFile.Parent.Path + (String.IsNullOrEmpty(viewModel.DefaultFile.Parent.Path) ? "" : "/") + localPath);
-
-                if (file != null && file.Capabilities.CanDirectLink)
-                {
-                  // replace attribute with direct file link
-                  string fileUri = this.FileSystemManager.GetFileDirectUrl(this.Context.Site, file).ToString();
-                  if (fileUri.Contains('?') && query.StartsWith('?'))
-                  {
-                    query = $"&{query.Substring(1)}";
-                  }
-                  node.SetAttributeValue(attributeName, fileUri + query);
-                }
-                else
+					if (!User.HasViewPermission(this.Context.Site, viewModel.DefaultFile.Parent))
+					{
+						viewModel.Content = "";
+					}
+					else
+					{
+						if (viewModel.DefaultFile.IsMarkdown() || viewModel.DefaultFile.IsText() || viewModel.DefaultFile.IsContent())
+						{
+							key = this.Context.Site.Id + ":" + viewModel.DefaultFile.Id;
+							renderedContent = this.CacheManager.StaticContentCache().Get(key, key =>
+							{
+								using (System.IO.Stream content = this.FileSystemManager.GetFileContents(this.Context.Site, viewModel.DefaultFile))
 								{
-                  string fileUri = Url.FileLink(file);
-                  node.SetAttributeValue(attributeName, fileUri + query);
-                }
-              }
-              catch (System.IO.FileNotFoundException)
-              {
+									if (viewModel.DefaultFile.IsMarkdown())
+									{
+										return new RenderedContent(ContentExtensions.ToHtml(GetStreamAsString(content), "text/markdown"));
+									}
+									else if (viewModel.DefaultFile.IsText())
+									{
+										return new RenderedContent(ContentExtensions.ToHtml(GetStreamAsString(content), "text/plain"));
+									}
+									else if (viewModel.DefaultFile.IsContent())
+									{
+										return new RenderedContent(GetStreamAsString(content));
+									}
+								}
+								return new RenderedContent("");
+							});
 
-              }
+							viewModel.Content = renderedContent.Content;
+						}
+						else
+						{
+							// Redirect to the file.
+							if (viewModel.DefaultFile.Capabilities.CanDirectLink)
+							{
+								System.Uri uri = this.FileSystemManager.GetFileDirectUrl(this.Context.Site, viewModel.DefaultFile);
+								if (uri != null)
+								{
+									return new RedirectResult(uri.AbsoluteUri, true);
+								}
+								else
+								{
+									return NotFound();
+								}
+							}
+							else
+							{
+								return new RedirectResult(Url.FileLink(viewModel.DefaultFile), true);
+							}
+						}
 
-            }
-          }
-        }
-      }
-    }
+					}
+				}
 
-    private string GetStreamAsString(System.IO.Stream stream)
-    {
-      using (System.IO.StreamReader reader = new(stream))
-      {
-        return reader.ReadToEnd();
-      }
-    }
+				if (!String.IsNullOrEmpty(viewModel.Content))
+				{   // Parse the output (html) for static file links
+					HtmlAgilityPack.HtmlDocument document = new();
+					document.LoadHtml(viewModel.Content);
 
-    private async Task<ViewModels.Viewer> BuildViewModel()
-    {
-      ViewModels.Viewer viewModel = new();
+					await ReplaceAttribute(viewModel, document, "img", "src");
+					await ReplaceAttribute(viewModel, document, "link", "href");
+					await ReplaceAttribute(viewModel, document, "script", "src");
 
-      viewModel.ReadSettings(this.Context.Module);
+					viewModel.Content = document.DocumentNode.OuterHtml;
+				}
 
-      try
-      {
-        if (viewModel.DefaultFileId != Guid.Empty)
-        {
-          viewModel.DefaultFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.DefaultFileId);
-        }
-        else 
-        { 
-          viewModel.DefaultFile = null;
-        }
-      }
-      catch (System.IO.FileNotFoundException)
-      {
-        viewModel.DefaultFile = null;
-      }
+				return View("Viewer", viewModel);
+			}
+			catch (System.IO.FileNotFoundException)
+			{
+				return NotFound();
+			}
 
-      return viewModel;
-    }
-  }
+		}
+
+		private async Task ReplaceAttribute(ViewModels.Viewer viewModel, HtmlAgilityPack.HtmlDocument document, string nodeType, string attributeName)
+		{
+			HtmlAgilityPack.HtmlNodeCollection nodes = document.DocumentNode.SelectNodes($"//{nodeType.ToLower()}");
+
+			if (nodes != null)
+			{
+
+				foreach (HtmlAgilityPack.HtmlNode node in nodes)
+				{
+					string attributeValue = node.GetAttributeValue(attributeName, "");
+					if (attributeValue != null)
+					{
+						if (!attributeValue.Contains(System.Uri.SchemeDelimiter))
+						{
+							string localPath;
+							string query;
+
+							int position = attributeValue.IndexOfAny(new char[] { '?', '#' });
+							if (position < 0)
+							{
+								localPath = attributeValue;
+								query = "";
+							}
+							else
+							{
+								localPath = attributeValue.Substring(0, position);
+								query = attributeValue.Substring(position);
+							}
+
+							// attribute is a relative path
+							try
+							{
+								File file = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.DefaultFile.Provider, viewModel.DefaultFile.Parent.Path + (String.IsNullOrEmpty(viewModel.DefaultFile.Parent.Path) ? "" : "/") + localPath);
+
+								if (file != null && file.Capabilities.CanDirectLink)
+								{
+									// replace attribute with direct file link
+									string fileUri = this.FileSystemManager.GetFileDirectUrl(this.Context.Site, file).ToString();
+									if (fileUri.Contains('?') && query.StartsWith('?'))
+									{
+										query = $"&{query.Substring(1)}";
+									}
+									node.SetAttributeValue(attributeName, fileUri + query);
+								}
+								else
+								{
+									string fileUri = Url.FileLink(file);
+									node.SetAttributeValue(attributeName, fileUri + query);
+								}
+							}
+							catch (System.IO.FileNotFoundException)
+							{
+
+							}
+
+						}
+					}
+				}
+			}
+		}
+
+		private string GetStreamAsString(System.IO.Stream stream)
+		{
+			using (System.IO.StreamReader reader = new(stream))
+			{
+				return reader.ReadToEnd();
+			}
+		}
+
+		private async Task<ViewModels.Viewer> BuildViewModel()
+		{
+			ViewModels.Viewer viewModel = new();
+
+			viewModel.ReadSettings(this.Context.Module);
+
+			try
+			{
+				if (viewModel.DefaultFileId != Guid.Empty)
+				{
+					viewModel.DefaultFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.DefaultFileId);
+				}
+				else
+				{
+					viewModel.DefaultFile = null;
+				}
+			}
+			catch (System.IO.FileNotFoundException)
+			{
+				viewModel.DefaultFile = null;
+			}
+
+			return viewModel;
+		}
+	}
 }

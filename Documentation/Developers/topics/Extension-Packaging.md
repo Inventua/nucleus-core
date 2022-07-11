@@ -13,7 +13,7 @@ the a `<folder path="bin">` element in your package file are also automatically 
 Replace `{generate-guid}` with a guid that you have generated yourself.  There are many web sites including [https://www.guidgen.com/](https://www.guidgen.com/) which can generate Guids 
 for you, as well as Visual Studio extensions, and the `uuidgen` command line tool available from the developer command prompt in Visual Studio.
 
-```
+``` 
 <?xml version="1.0" encoding="utf-8" ?>
 <package id="{generate-guid}" xmlns="urn:nucleus/schemas/package/1.0">
   <name>My Sample Extension</name>

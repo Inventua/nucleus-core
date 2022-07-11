@@ -105,7 +105,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Developers", "Developers", "{3542AB19-07D1-46AE-8CC8-295F847A9741}"
 	ProjectSection(SolutionItems) = preProject
 		Documentation\Developers\Control-Panel-Extensions.md = Documentation\Developers\Control-Panel-Extensions.md
-		Documentation\Developers\Extension-Packaging.md = Documentation\Developers\Extension-Packaging.md
 		Documentation\Developers\Layouts-and-Containers.md = Documentation\Developers\Layouts-and-Containers.md
 		Documentation\Developers\Layouts-and-Containers.png = Documentation\Developers\Layouts-and-Containers.png
 		Documentation\Developers\Layouts-and-Containers.vsdx = Documentation\Developers\Layouts-and-Containers.vsdx
@@ -130,6 +129,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "module-walkthrough", "modul
 		Documentation\Developers\module-walkthrough\configure-project.png = Documentation\Developers\module-walkthrough\configure-project.png
 		Documentation\Developers\module-walkthrough\Develop-Module-Walkthrough.md = Documentation\Developers\module-walkthrough\Develop-Module-Walkthrough.md
 		Documentation\Developers\module-walkthrough\extension-settings.png = Documentation\Developers\module-walkthrough\extension-settings.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "topics", "topics", "{7E69EF3C-1AB8-44C4-A72F-DE7A761A493C}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Developers\topics\authorization.md = Documentation\Developers\topics\authorization.md
+		Documentation\Developers\topics\database-scripts.md = Documentation\Developers\topics\database-scripts.md
+		Documentation\Developers\topics\Extension-Packaging.md = Documentation\Developers\topics\Extension-Packaging.md
+		Documentation\Developers\topics\saving-settings.md = Documentation\Developers\topics\saving-settings.md
 	EndProjectSection
 EndProject
 Global
@@ -296,6 +303,7 @@ Global
 		{31AE9954-A4D8-4902-AEDF-56264BF3EEB9} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{6CC1F90F-7EA0-4992-9AF8-E641B3EDB4E1} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{430FAE0C-1B4E-4F15-92F7-AD2BE3F8D6D7} = {3542AB19-07D1-46AE-8CC8-295F847A9741}
+		{7E69EF3C-1AB8-44C4-A72F-DE7A761A493C} = {3542AB19-07D1-46AE-8CC8-295F847A9741}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D84CD364-9C8E-400E-84AA-45562061ED44}

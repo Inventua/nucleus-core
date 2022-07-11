@@ -60,7 +60,7 @@
 				</div>
 			</div>
 
-			@if (!Model.Folder?.Folders.Any() == true)
+			@if (!Model.Folder?.Folders.Any() == true && !Model.Folder?.Files.Any() == true)
 			{
 				<div class="alert alert-warning">This folder is empty</div>
 			}

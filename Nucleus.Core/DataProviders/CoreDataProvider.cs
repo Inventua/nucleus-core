@@ -611,6 +611,10 @@ namespace Nucleus.Core.DataProviders
       {
         if (result.Routes != null)
         {
+          // we must set DefaultPageRouteId to null so that we don't trigger FK_Pages_DefaultPageRouteId when we delete PageRoutes
+          result.DefaultPageRouteId = null;
+          await this.Context.SaveChangesAsync<Page>();
+
           foreach (PageRoute pageRoute in result.Routes)
           {
             this.Context.Remove(pageRoute);

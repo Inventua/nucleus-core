@@ -892,6 +892,7 @@ function _Page()
 	function _removeRelatedOverlays(element)
 	{
 		jQuery(element).siblings('.modal-backdrop').remove();
+		jQuery(element).parents('.nucleus-adminpage').first().siblings('.modal-backdrop').remove();
 	}
 
 	function _isInView (element)

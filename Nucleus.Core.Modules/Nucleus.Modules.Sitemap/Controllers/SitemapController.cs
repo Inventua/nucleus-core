@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions.Models;
@@ -26,9 +24,9 @@ namespace Nucleus.Modules.Sitemap.Controllers
 			public const string SETTINGS_SHOWDESCRIPTION = "sitemap:show-description";
 		}
 
-		public SitemapController(Context Context, IPageManager pageManager, IPageModuleManager pageModuleManager)
+		public SitemapController(Context context, IPageManager pageManager, IPageModuleManager pageModuleManager)
 		{
-			this.Context = Context;
+			this.Context = context;
 			this.PageManager = pageManager; 
 			this.PageModuleManager = pageModuleManager;			
 		}

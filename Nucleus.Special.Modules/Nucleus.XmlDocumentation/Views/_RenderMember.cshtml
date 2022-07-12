@@ -11,20 +11,20 @@
 
 		@foreach (var member in Model.Members)
 		{
-			<div class="api-member api-member-@(member.Type.ToString().ToLower())">
+			<div id="@member.IdString" class="api-member api-member-@(member.Type.ToString().ToLower())">
 				<h4>
 					@member.Name
 					@switch (member.Type)
 					{
 						case ApiMember.MemberTypes.Method:
-							var typeName = member.Parameters.GetSimpleParameterTypes();
-							if (!String.IsNullOrEmpty(typeName))
+							//var typeName = member.Parameters.GetSimpleParameterTypes();
+							if (!String.IsNullOrEmpty(member.Parameters))
 							{
-								@Html.Raw($"({typeName})")
+								<text>(@member.Parameters)</text>
 							}
 							break;
 						case ApiMember.MemberTypes.Constructor:
-							@Html.Raw("(constructor)")
+							<text>(constructor)</text>
 							break;
 					}
 				</h4>
@@ -34,7 +34,7 @@
 					case ApiMember.MemberTypes.Class:
 					case ApiMember.MemberTypes.Constructor:
 					case ApiMember.MemberTypes.Method:
-						<code>@member.Name@(!String.IsNullOrEmpty(member.Parameters) ? $" ({member.Parameters})" : "()")</code>
+						<code>@member.Name (@member.Parameters)</code>
 						break;
 				}
 				@if (member?.Summary?.Items?.Any() == true)

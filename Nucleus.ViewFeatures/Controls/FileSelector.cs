@@ -38,8 +38,9 @@ namespace Nucleus.ViewFeatures.Controls
 		/// <param name="propertyName"></param>
 		/// <param name="showSelectAnother"></param>
 		/// <param name="selectAnotherActionName"></param>
+		/// <param name="applicationAbsoluteUrl"></param>
 		/// <returns></returns>
-		public async Task<IViewComponentResult> InvokeAsync(File file, string pattern, string propertyName, string selectAnotherActionName, Boolean showSelectAnother = true)
+		public async Task<IViewComponentResult> InvokeAsync(File file, string pattern, string propertyName, string selectAnotherActionName, Boolean showSelectAnother = true, Boolean applicationAbsoluteUrl = true)
 		{
 			ViewModels.FileSelector viewModel = new() 
 			{
@@ -50,7 +51,8 @@ namespace Nucleus.ViewFeatures.Controls
 				Providers = this.FileSystemManager.ListProviders(),
 				PropertyName = propertyName ?? "SelectedFile",
 				ShowSelectAnother = showSelectAnother,
-				SelectAnotherActionName = selectAnotherActionName ?? "SelectAnother"
+				SelectAnotherActionName = selectAnotherActionName ?? "SelectAnother",
+				ApplicationAbsoluteUrl = applicationAbsoluteUrl
 			};
 
 			if (viewModel.SelectedFile == null)

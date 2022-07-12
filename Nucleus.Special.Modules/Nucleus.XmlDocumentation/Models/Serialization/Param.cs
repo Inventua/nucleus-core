@@ -22,5 +22,6 @@ namespace Nucleus.XmlDocumentation.Models.Serialization
 
 		[XmlIgnore]
 		public string Url { get; set; }
+				
 	}
 }

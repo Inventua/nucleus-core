@@ -8,44 +8,44 @@ namespace Nucleus.XmlDocumentation
 {
 	public static class StringExtensions
 	{
-		/////// <summary>
-		/////// Removes the namespace from parameters string with full class names and returns the "simple" name for the parameters.  Multiple types may be separated by commas.
-		/////// </summary>
-		/////// <param name="value"></param>
-		////public static string GetSimpleParameterTypes(this string value)
-		////{
-		////	List<string> results = new();
-		////	if (String.IsNullOrEmpty(value)) return "";
-		////	foreach (string parameter in value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-		////	{
-		////		string parameterType = parameter.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
-		////		if (String.IsNullOrEmpty(parameterType)) return "";
+		/// <summary>
+		/// Removes the namespace from parameters string with full class names and returns the "simple" name for the parameters.  Multiple types may be separated by commas.
+		/// </summary>
+		/// <param name="value"></param>
+		public static string GetSimpleParameterTypes(this string value)
+		{
+			List<string> results = new();
+			if (String.IsNullOrEmpty(value)) return "";
+			foreach (string parameter in value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+			{
+				string parameterType = parameter.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+				if (String.IsNullOrEmpty(parameterType)) return "";
 
-		////		if (parameterType.Contains('<') && parameterType.Contains('>'))
-		////		{
-		////			System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(parameterType, "(?<type1>[^<]*)<(?<type2>[^>]*)>.*");
-		////			if (match.Success && match.Groups.Count == 3)
-		////			{
-		////				results.Add($"{GetSimpleParameterType(match.Groups[1].Value)}<{GetSimpleParameterType(match.Groups[2].Value)}>");
-		////			}
-		////			else
-		////			{
-		////				results.Add(parameter);
-		////			}
-		////		}
-		////		else
-		////		{
-		////			results.Add(GetSimpleParameterType(parameterType));
-		////		}
-		////	}
+				if (parameterType.Contains('<') && parameterType.Contains('>'))
+				{
+					System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(parameterType, "(?<type1>[^<]*)<(?<type2>[^>]*)>.*");
+					if (match.Success && match.Groups.Count == 3)
+					{
+						results.Add($"{GetSimpleParameterType(match.Groups[1].Value)}<{GetSimpleParameterType(match.Groups[2].Value)}>");
+					}
+					else
+					{
+						results.Add(parameter);
+					}
+				}
+				else
+				{
+					results.Add(GetSimpleParameterType(parameterType));
+				}
+			}
 
-		////	return String.Join(',', results);
-		////}
+			return String.Join(',', results);
+		}
 
-		////private static string GetSimpleParameterType(string parameterType)
-		////{
-		////	return parameterType.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
-		////}
+		private static string GetSimpleParameterType(string parameterType)
+		{
+			return parameterType.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
+		}
 
 		/// <summary>
 		/// Filter characters from descriptions in XML files so that we can use multiple lines, etc in XML but show

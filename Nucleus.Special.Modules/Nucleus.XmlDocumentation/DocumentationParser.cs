@@ -127,10 +127,72 @@ namespace Nucleus.XmlDocumentation
 						case ApiMember.MemberTypes.Unknown:
 							break;
 					}
+
+					apiMember.UniqueId = $"{apiMember.Name}" + (apiMember.Params?.Any() == true ? $"({String.Join(',', apiMember.Params.Select(param => param.Type))})" : "");
+
+
 				}
 
 				result.Classes = classes.Values.ToList();
+
 				return result;
+			}
+		}
+
+
+		private static void SetTypeUrl(Param param, List<Models.ApiDocument> results)
+		{
+			if (String.IsNullOrEmpty(param.Type)) return;
+
+			string rootNamespace = param.Type.Split('.', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+
+			if (string.IsNullOrEmpty(rootNamespace)) return;
+
+			switch (rootNamespace)
+			{
+				case "Microsoft":
+				case "System":
+					param.Url = $"https://docs.microsoft.com/en-us/dotnet/api/{param.Type}";
+					break;
+				case "Nucleus":
+					string namespaceName = param.Type.Substring(0, param.Type.LastIndexOf('.'));
+
+					while (!results.Where(apiDoc => apiDoc.Namespace.Name == namespaceName).Any())
+					{
+						int position = namespaceName.LastIndexOf('.');
+						if (position<=0) break;
+						namespaceName = namespaceName.Substring(0, position);
+					}
+
+					if (String.IsNullOrEmpty(namespaceName)) return;
+					param.Url = $"https://www.nucleus-cms.com/api-documentation/{namespaceName}.xml/{param.Type}/#{param.Type}";
+					break;
+			}
+		}
+
+
+		/// <summary>
+		/// Simplify simple types in the System namespace (Change System.Int32 to just "Int32") 
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		private static string SimplifyParameterType(string value)
+		{
+			System.Text.RegularExpressions.Match matchNullable = System.Text.RegularExpressions.Regex.Match(value.Trim(), "^[ ]*System.Nullable{(.*)}$");
+			if (matchNullable.Success)
+			{
+				return SimplifyParameterType(matchNullable.Groups[1].Value) + "?";
+			}
+
+			System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(value.Trim(), "^[ ]*System.([^.]*)$");
+
+			if (match.Success)
+			{
+				return match.Groups[1].Value.Replace("@", String.Empty);
+			}
+			else
+			{
+				return value.Replace("@", String.Empty);
 			}
 		}
 
@@ -147,7 +209,7 @@ namespace Nucleus.XmlDocumentation
 		/// </remarks>
 		private static void ParseTypeParams(ApiClass apiClass)
 		{
-			apiClass.Name = ParseGenericTypeParams(apiClass, null, apiClass.Name);
+			apiClass.Name = ParseGenericTypeParams(apiClass, null, apiClass.Name);			
 		}
 
 		/// <remarks>
@@ -177,18 +239,22 @@ namespace Nucleus.XmlDocumentation
 		/// if typeparam  elements have been included in XML comments for the class.
 		private static string ParseGenericTypeParams(ApiClass apiClass, ApiMember apiMember, string value)
 		{
+			const string GENERIC_PARMS_REGEX = "<(?<genericTypes>.*)>";
+			//const string GENERIC_TYPE_REGEX = "(?<genericType>T[0-9]{1,3})";
 			if (value == null) return null;
-						
-			System.Text.RegularExpressions.Match typeParams = System.Text.RegularExpressions.Regex.Match(value, "<(?<genericType>.*)>");
 
-			if (typeParams.Success)
-			{
-				return System.Text.RegularExpressions.Regex.Replace(value, "<(?<genericType>.*)>", ReplaceTypeParams(apiClass, apiMember, typeParams));
-			}
-			else
-			{
-				return value.Replace("{", "<").Replace("}", ">");
-			}						
+			return System.Text.RegularExpressions.Regex.Replace(value, GENERIC_PARMS_REGEX, (System.Text.RegularExpressions.Match match) => ReplaceTypeParams(apiClass, apiMember, match));
+
+			//System.Text.RegularExpressions.Match typeParams = System.Text.RegularExpressions.Regex.Match(value, GENERIC_PARMS_REGEX);
+
+			//if (typeParams.Success)
+			//{
+			//	return System.Text.RegularExpressions.Regex.Replace(value, GENERIC_TYPE_REGEX, ReplaceTypeParams(apiClass, apiMember, typeParams));
+			//}
+			//else
+			//{
+			//	return value.Replace("{", "<").Replace("}", ">");
+			//}						
 		}
 
 		/// <summary>
@@ -205,37 +271,68 @@ namespace Nucleus.XmlDocumentation
 
 			System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches(match.Value, "(T[0-9]{1,3})");
 
-			foreach (System.Text.RegularExpressions.Match typeParamMatch in matches)
+			if (matches.Any())
 			{
-				// Type params are represented in the member name (by ApiMember.ReplaceGenericParameterCount) as T1, T2, ...
-				if (typeParamMatch.Value.StartsWith("T") && typeParamMatch.Value.Length > 1)
+				foreach (System.Text.RegularExpressions.Match typeParamMatch in matches)
 				{
-					if (int.TryParse(typeParamMatch.Value[1..], out int typeParamIndex))
+					// Type params are represented in the member name (by ApiMember.ReplaceGenericParameterCount) as T1, T2, ...
+					if (typeParamMatch.Value.StartsWith("T") && typeParamMatch.Value.Length > 1)
 					{
-						if (!String.IsNullOrEmpty(result))
+						if (int.TryParse(typeParamMatch.Value[1..], out int typeParamIndex))
 						{
-							result += ", ";
-						}
+							if (!String.IsNullOrEmpty(result))
+							{
+								result += ", ";
+							}
 
-						if (apiMember != null && apiMember.TypeParams != null && apiMember.TypeParams.Length > typeParamIndex)
-						{
-							result += apiMember.TypeParams[typeParamIndex].Name;
+							if (apiMember != null && apiMember.TypeParams != null && apiMember.TypeParams.Length > typeParamIndex)
+							{
+								result += apiMember.TypeParams[typeParamIndex].Name;
+							}
+							else if (apiClass.TypeParams != null && apiClass.TypeParams.Length > typeParamIndex)
+							{
+								result += apiClass.TypeParams[typeParamIndex].Name;
+							}
+							else
+							{
+								// The typeparam comment is missing for the specified API class		
+								System.Diagnostics.Debug.WriteLine($"{apiClass.FullName}{(apiMember == null ? "" : ", " + apiMember.FullName)} missing typeParam.");
+								result += $"T{typeParamIndex}";
+							}
 						}
-						else if (apiClass.TypeParams != null && apiClass.TypeParams.Length > typeParamIndex)
+					}
+				}
+
+				return $"<{result}>";
+			}
+			else
+			{
+				return match.Value;
+			}
+		}
+
+		public static void ParseParams(List<Models.ApiDocument> results)
+		{
+			foreach (ApiDocument apiDocument in results)
+			{
+				foreach (ApiClass apiClass in apiDocument.Classes.ToList())
+				{
+					foreach (ApiMember member in apiClass.AllMembers)
+					{
+						if (member.Params != null)
 						{
-							result += apiClass.TypeParams[typeParamIndex].Name;
-						}
-						else
-						{
-							// The typeparam comment is missing for the specified API class		
-							System.Diagnostics.Debug.WriteLine($"{apiClass.FullName}{(apiMember == null ? "" : ", " + apiMember.FullName)} missing typeParam.");
-							result += $"T{typeParamIndex}";
+							if (member.Params != null)
+							{
+								foreach (Param param in member.Params)
+								{
+									SetTypeUrl(param, results);
+									param.Type = SimplifyParameterType(param.Type);
+								}
+							}
 						}
 					}
 				}
 			}
-
-			return $"<{result}>";
 		}
 
 		/// <summary>

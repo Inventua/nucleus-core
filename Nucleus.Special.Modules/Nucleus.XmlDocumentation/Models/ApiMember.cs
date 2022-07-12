@@ -22,6 +22,9 @@ namespace Nucleus.XmlDocumentation.Models
 		}
 
 		public string Name { get; set; }
+
+		public string UniqueId { get; set; }
+
 		public MemberTypes Type { get; private set; }
 		public string FullName { get; }
 		public string IdString { get; }
@@ -148,9 +151,6 @@ namespace Nucleus.XmlDocumentation.Models
 								this.Params[count].Type = nullableTypeMatch.Groups[1].Value + "?";
 							}
 
-							SetTypeUrl(this.Params[count]);
-
-							this.Params[count].Type = SimplifyParameterType(this.Params[count].Type);
 						}
 
 						//matchParamList = matchParamList.NextMatch();
@@ -165,7 +165,7 @@ namespace Nucleus.XmlDocumentation.Models
 				this.Parameters = String.Join(", ", this.Params.Select(param => ParseParameter(param)));
 			}
 		}
-
+		
 		private string ParseParameter(Param param)
 		{			
 			return $"{GetSimpleParameterType(param.Type)} {param.Name}";
@@ -193,27 +193,6 @@ namespace Nucleus.XmlDocumentation.Models
 			}			
 		}
 
-		private void SetTypeUrl(Param param)
-		{
-			if (String.IsNullOrEmpty(param.Type)) return;
-
-			string rootNamespace = param.Type.Split('.', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
-
-			if (string.IsNullOrEmpty(rootNamespace)) return;
-
-			switch (rootNamespace)
-			{
-				case "Microsoft":
-				case "System":
-					param.Url = $"https://docs.microsoft.com/en-us/dotnet/api/{param.Type}";
-					break;
-				case "Nucleus":
-					string namespaceName = param.Type.Substring(0, param.Type.LastIndexOf('.'));
-					if (String.IsNullOrEmpty(namespaceName)) return;
-					param.Url = $"https://www.nucleus-cms.com/api-documentation/{namespaceName}.xml/{param.Type}/#{param.Type}"; 					
-					break;
-			}
-		}
 
 		/// <summary>
 		/// Parse a member name, which may include a ``N suffix, where N is an integer which represents the number of generic type parameters.
@@ -302,30 +281,6 @@ namespace Nucleus.XmlDocumentation.Models
 			//return value;
 		}
 
-		/// <summary>
-		/// Simplify simple types in the System namespace (Change System.Int32 to just "Int32") 
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		string SimplifyParameterType(string value)
-		{
-			System.Text.RegularExpressions.Match matchNullable = System.Text.RegularExpressions.Regex.Match(value.Trim(), "^[ ]*System.Nullable{(.*)}$");
-			if (matchNullable.Success)
-			{
-				return SimplifyParameterType(matchNullable.Groups[1].Value) + "?";
-			}
-
-			System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(value.Trim(), "^[ ]*System.([^.]*)$");
-
-			if (match.Success)
-			{
-				return match.Groups[1].Value.Replace("@", String.Empty);
-			}
-			else
-			{
-				return value.Replace("@", String.Empty);
-			}
-		}
 
 		string ReplaceGenericParameter(System.Text.RegularExpressions.Match match)
 		{

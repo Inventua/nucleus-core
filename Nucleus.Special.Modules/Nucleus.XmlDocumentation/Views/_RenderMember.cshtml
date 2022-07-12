@@ -11,21 +11,30 @@
 
 		@foreach (var member in Model.Members)
 		{
-			<div id="@member.IdString" class="api-member api-member-@(member.Type.ToString().ToLower())">
+			<div id="@member.UniqueId" class="api-member api-member-@(member.Type.ToString().ToLower())">
 				<h4>
 					@member.Name
 					@switch (member.Type)
 					{
 						case ApiMember.MemberTypes.Method:
-							//var typeName = member.Parameters.GetSimpleParameterTypes();
-							if (!String.IsNullOrEmpty(member.Parameters))
+							var typeName = member.Parameters.GetSimpleParameterTypes();
+							if (!String.IsNullOrEmpty(typeName))
 							{
-								<text>(@member.Parameters)</text>
+								<text>(@typeName) Method</text>
 							}
 							break;
 						case ApiMember.MemberTypes.Constructor:
-							<text>(constructor)</text>
+							<text>Constructor</text>
 							break;
+						case ApiMember.MemberTypes.Property:
+							<text>Property</text>
+							break;
+						case ApiMember.MemberTypes.Event:
+							<text>Event</text>
+							break;
+						case ApiMember.MemberTypes.Field:
+							<text>Field</text>
+							break;						
 					}
 				</h4>
 				@switch (member.Type)
@@ -83,7 +92,6 @@
 							<tr>
 								<th>Name</th>
 								<th>Type</th>
-								<th></th>
 							</tr>
 							@foreach (var parameter in member.Params)
 							{
@@ -101,8 +109,15 @@
 										{
 											@parameter.Type
 										}
+
+										@if (parameter.Items?.Any() == true)
+										{
+											<p>
+												@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, parameter))
+											</p>
+										}
 									</td>
-									<td>@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, parameter))</td>
+									
 								</tr>
 							}
 						</table>

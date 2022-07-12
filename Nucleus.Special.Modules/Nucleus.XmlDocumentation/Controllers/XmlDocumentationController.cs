@@ -92,6 +92,7 @@ namespace Nucleus.XmlDocumentation.Controllers
 							}
 						}
 
+						DocumentationParser.ParseParams(results);
 						DocumentationParser.ParseMixedContent(results);
 					}
 					catch (System.Exception e)

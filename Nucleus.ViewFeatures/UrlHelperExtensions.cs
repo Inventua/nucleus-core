@@ -121,6 +121,7 @@ namespace Nucleus.ViewFeatures
 			return FileLink(helper, file, inline, true);
 		}
 
+
 		/// <summary>
 		/// Output an url for the specified <see cref="File"/>.
 		/// </summary>
@@ -142,15 +143,13 @@ namespace Nucleus.ViewFeatures
 
 			if (!encodePath)
 			{
-				return helper.Content($"~/files/{file.Provider}/{file.Path}{inlineParm}");
+				return $"files/{file.Provider}/{file.Path}{inlineParm}";
 			}
 			else
 			{
-				return helper.Content($"~/files/{file.EncodeFileId()}{inlineParm}");
+				return $"files/{file.EncodeFileId()}{inlineParm}";
 			}
 		}
-
-
 
 		/// <summary>
 		/// Generates a fully qualified URL to an action method by using the specified action name, controller name and area name.

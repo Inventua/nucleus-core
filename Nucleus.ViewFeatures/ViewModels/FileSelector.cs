@@ -60,6 +60,5 @@ namespace Nucleus.ViewFeatures.ViewModels
 		/// </summary>
 		public File SelectedFile { get; set; } = new();
 
-		
 	}
 }

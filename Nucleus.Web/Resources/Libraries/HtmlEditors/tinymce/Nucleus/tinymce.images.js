@@ -2,7 +2,7 @@
 {
 	var buildInsertImageModal = function (targetSelector)
 	{
-		var url = document.baseURI + 'User/FileSelector/Index?pattern=(.gif)|(.png)|(.jpg)|(.jpeg)|(.bmp)|(.webp)&showSelectAnother=false';
+		var url = document.baseURI + 'User/FileSelector/Index?pattern=(.gif)|(.png)|(.jpg)|(.jpeg)|(.bmp)|(.webp)&showSelectAnother=false&applicationAbsoluteUrl=false';
 		jQuery.ajax({
 			url: url,
 			method: 'GET',

@@ -58,7 +58,7 @@ namespace Nucleus.Modules.Links.Controllers
 		[HttpPost]
 		public async Task<ActionResult> Editor(ViewModels.Editor viewModel, Guid id, string mode)
 		{
-			return View("Editor", await BuildEditorViewModel(viewModel, id, mode == "Standalone"));
+			return View("Editor", await BuildEditorViewModel(viewModel, id, mode.Equals("standalone", StringComparison.OrdinalIgnoreCase)));
 		}
 
 		[HttpGet]

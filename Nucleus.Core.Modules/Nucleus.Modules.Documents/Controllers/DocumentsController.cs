@@ -74,7 +74,7 @@ namespace Nucleus.Modules.Documents.Controllers
 		[HttpPost]
 		public async Task<ActionResult> Edit(ViewModels.Editor viewModel, Guid id, string mode)
 		{
-			if (mode == "Standalone")
+			if (mode.Equals("standalone", StringComparison.OrdinalIgnoreCase))
 			{
 				viewModel.UseLayout = "_PopupEditor";
 			}

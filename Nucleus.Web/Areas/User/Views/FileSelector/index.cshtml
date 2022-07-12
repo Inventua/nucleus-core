@@ -3,4 +3,4 @@
 @using Nucleus.Abstractions
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
-@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.File, propertyName = "File", pattern = Model.Pattern, showSelectAnother = Model.ShowSelectAnother })
+@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.File, propertyName = "File", pattern = Model.Pattern, showSelectAnother = Model.ShowSelectAnother, applicationAbsoluteUrl = Model.ApplicationAbsoluteUrl })

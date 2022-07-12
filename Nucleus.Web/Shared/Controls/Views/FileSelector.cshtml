@@ -13,7 +13,7 @@
 		</label>
 	</span>
 	}
-	<span class="file-link collapse">@Url.FileLink(Model.SelectedFile)</span>
+	<span class="file-link collapse">@Url.FileLink(Model.SelectedFile, false, true, Model.ApplicationAbsoluteUrl)</span>
 	@Html.Hidden(@Model.PropertyName + $".{nameof(File.Id)}", Model.SelectedFile.Id)
 	@Html.Hidden(@Model.PropertyName + $".{nameof(File.Provider)}", Model.SelectedFile.Provider)
 	@Html.Hidden(@Model.PropertyName + $".{nameof(File.Path)}", Model.SelectedFile.Path)

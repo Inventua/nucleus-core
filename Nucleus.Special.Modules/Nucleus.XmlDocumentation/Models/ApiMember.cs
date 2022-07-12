@@ -123,31 +123,74 @@ namespace Nucleus.XmlDocumentation.Models
 			// signature.
 			if (!String.IsNullOrEmpty(this.Parameters) && this.Params != null)
 			{
-				System.Text.RegularExpressions.Match matchParamList = System.Text.RegularExpressions.Regex.Match(this.Parameters, "([^{}]+?|.*{(.*)})(?:,|$| ,)");
-
 				int count = 0;
-				while (matchParamList.Success)
-				{
-					if (this.Params.Length > count)
-					{
-						if (matchParamList.Groups[1].Value.EndsWith('@'))
-						{
-							this.Params[count].IsRef = true;
-						}
-						this.Params[count].Type = matchParamList.Groups[1].Value.Replace('{', '(').Replace('}', ')').Replace("@", String.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
 					
-						SetTypeUrl(this.Params[count]);
-					}
+				foreach(string parameter in this.Parameters.Split(',', StringSplitOptions.RemoveEmptyEntries))
+				{
+					//System.Text.RegularExpressions.Match matchParamList = System.Text.RegularExpressions.Regex.Match(this.Parameters, "([^{}]+?|.*{(.*)})(?:,|$| ,)");
+					System.Text.RegularExpressions.Match matchParamList = System.Text.RegularExpressions.Regex.Match(parameter, "(?<type>.*) (?<name>.*)");
 
-					matchParamList = matchParamList.NextMatch();
-					count++;
+					if (matchParamList.Success)
+					{
+						if (this.Params.Length > count)
+						{
+							if (matchParamList.Groups[1].Value.EndsWith('@'))
+							{
+								this.Params[count].IsRef = true;
+							}
+
+							this.Params[count].Type = matchParamList.Groups[1].Value.Replace('{', '<').Replace('}', '>').Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+
+							System.Text.RegularExpressions.Match nullableTypeMatch = System.Text.RegularExpressions.Regex.Match(this.Params[count].Type, @"System.Nullable\((?<type>.*)\)");
+
+							if (nullableTypeMatch.Success)
+							{
+								this.Params[count].Type = nullableTypeMatch.Groups[1].Value + "?";
+							}
+
+							SetTypeUrl(this.Params[count]);
+
+							this.Params[count].Type = SimplifyParameterType(this.Params[count].Type);
+						}
+
+						//matchParamList = matchParamList.NextMatch();
+						count++;
+					}
+				}				
+			}
+
+			if (!String.IsNullOrEmpty(this.Parameters) && this.Params != null)
+			{
+				//this.Parameters = this.Parameters.Replace("@", String.Empty);
+				this.Parameters = String.Join(", ", this.Params.Select(param => ParseParameter(param)));
+			}
+		}
+
+		private string ParseParameter(Param param)
+		{			
+			return $"{GetSimpleParameterType(param.Type)} {param.Name}";
+		}
+
+		private static string GetSimpleParameterType(string parameterType)
+		{
+			if (String.IsNullOrEmpty(parameterType)) return "";
+
+			if (parameterType.Contains('<') && parameterType.Contains('>'))
+			{
+				System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(parameterType, "(?<type1>[^<]*)<(?<type2>[^>]*)>.*");
+				if (match.Success && match.Groups.Count == 3)
+				{
+					return $"{GetSimpleParameterType(match.Groups[1].Value)}<{GetSimpleParameterType(match.Groups[2].Value)}>";
+				}
+				else
+				{
+					return parameterType;
 				}
 			}
-
-			if (!String.IsNullOrEmpty(this.Parameters))
+			else
 			{
-				this.Parameters = this.Parameters.Replace("@", String.Empty);
-			}
+				return parameterType.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
+			}			
 		}
 
 		private void SetTypeUrl(Param param)
@@ -231,7 +274,8 @@ namespace Nucleus.XmlDocumentation.Models
 					// that matches the entire regular expression pattern.  We want the captured group, which starts at position 1
 					string parameter = match.Groups[1].Value;
 
-					parameter = SimplifyParameterType(parameter);
+					// This is done later in the process, so that we can preserve the "real" parameter types in order to attach Urls, etc
+					//parameter = SimplifyParameterType(parameter);
 
 					if (!String.IsNullOrEmpty(result))
 					{
@@ -265,15 +309,21 @@ namespace Nucleus.XmlDocumentation.Models
 		/// <returns></returns>
 		string SimplifyParameterType(string value)
 		{
+			System.Text.RegularExpressions.Match matchNullable = System.Text.RegularExpressions.Regex.Match(value.Trim(), "^[ ]*System.Nullable{(.*)}$");
+			if (matchNullable.Success)
+			{
+				return SimplifyParameterType(matchNullable.Groups[1].Value) + "?";
+			}
+
 			System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(value.Trim(), "^[ ]*System.([^.]*)$");
 
 			if (match.Success)
 			{
-				return match.Groups[1].Value;
+				return match.Groups[1].Value.Replace("@", String.Empty);
 			}
 			else
 			{
-				return value;
+				return value.Replace("@", String.Empty);
 			}
 		}
 

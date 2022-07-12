@@ -83,7 +83,7 @@ namespace Nucleus.XmlDocumentation
 							apiClass = Find(classes, apiMember.ClassName);
 							if (apiClass != null)
 							{
-								ParseTypeParams(apiClass, apiMember);
+								ParseGenericTypeParams(apiClass, apiMember);
 								apiClass.Constructors.Add(apiMember);
 							}
 							break;
@@ -92,7 +92,7 @@ namespace Nucleus.XmlDocumentation
 							apiClass = Find(classes, apiMember.ClassName);
 							if (apiClass != null)
 							{
-								ParseTypeParams(apiClass, apiMember);
+								ParseGenericTypeParams(apiClass, apiMember);
 								apiClass.Fields.Add(apiMember);
 							}
 							break;
@@ -101,7 +101,7 @@ namespace Nucleus.XmlDocumentation
 							apiClass = Find(classes, apiMember.ClassName);
 							if (apiClass != null)
 							{
-								ParseTypeParams(apiClass, apiMember);
+								ParseGenericTypeParams(apiClass, apiMember);
 								apiClass.Properties.Add(apiMember);
 							}
 							break;
@@ -110,7 +110,7 @@ namespace Nucleus.XmlDocumentation
 							apiClass = Find(classes, apiMember.ClassName);
 							if (apiClass != null)
 							{
-								ParseTypeParams(apiClass, apiMember);
+								ParseGenericTypeParams(apiClass, apiMember);
 								apiClass.Methods.Add(apiMember);
 							}
 							break;
@@ -119,7 +119,7 @@ namespace Nucleus.XmlDocumentation
 							apiClass = Find(classes, apiMember.ClassName);
 							if (apiClass != null)
 							{
-								ParseTypeParams(apiClass, apiMember);
+								ParseGenericTypeParams(apiClass, apiMember);
 								apiClass.Events.Add(apiMember);
 							}
 							break;
@@ -147,7 +147,7 @@ namespace Nucleus.XmlDocumentation
 		/// </remarks>
 		private static void ParseTypeParams(ApiClass apiClass)
 		{
-			apiClass.Name = ParseTypeParams(apiClass, null, apiClass.Name);
+			apiClass.Name = ParseGenericTypeParams(apiClass, null, apiClass.Name);
 		}
 
 		/// <remarks>
@@ -155,19 +155,19 @@ namespace Nucleus.XmlDocumentation
 		/// number of generic type parameters.  The apiMember class parses this value and substitites numbered type name, so the member name ends 
 		/// up like MemberName&lt;T0,T1&gt;.  This function matches the T0, T1 ... type parameters and substitutes the number for the actual 
 		/// typeparam name, if typeparam elements have been included in XML comments for the class.
-		private static void ParseTypeParams(ApiClass apiClass, ApiMember apiMember)
+		private static void ParseGenericTypeParams(ApiClass apiClass, ApiMember apiMember)
 		{
 			if (apiMember.Params != null)
 			{
 				foreach (Param param in apiMember.Params)
 				{
-					param.Type = ParseTypeParams(apiClass, apiMember, param.Type);
+					param.Type = ParseGenericTypeParams(apiClass, apiMember, param.Type);
 				}
 
-				apiMember.Parameters = ParseTypeParams(apiClass, apiMember, apiMember.Parameters);
+				apiMember.Parameters = ParseGenericTypeParams(apiClass, apiMember, apiMember.Parameters);
 			}
 
-			apiMember.Name = ParseTypeParams(apiClass, apiMember, apiMember.Name);
+			apiMember.Name = ParseGenericTypeParams(apiClass, apiMember, apiMember.Name);
 		}
 
 		/// <remarks>
@@ -175,15 +175,15 @@ namespace Nucleus.XmlDocumentation
 		/// parameters.  The apiMember class parses this value and substitites numbered type name, so the member name ends up like MemberName&lt;T0,T1&gt;.  
 		/// This function matches the T0, T1 ... type parameters in the supplied value and substitutes the number for the actual typeparam name, 
 		/// if typeparam  elements have been included in XML comments for the class.
-		private static string ParseTypeParams(ApiClass apiClass, ApiMember apiMember, string value)
+		private static string ParseGenericTypeParams(ApiClass apiClass, ApiMember apiMember, string value)
 		{
 			if (value == null) return null;
 						
-			System.Text.RegularExpressions.Match typeParams = System.Text.RegularExpressions.Regex.Match(value, "<(.*)>");
+			System.Text.RegularExpressions.Match typeParams = System.Text.RegularExpressions.Regex.Match(value, "<(?<genericType>.*)>");
 
 			if (typeParams.Success)
 			{
-				return System.Text.RegularExpressions.Regex.Replace(value, "<(.*)>", ReplaceTypeParams(apiClass, apiMember, typeParams));
+				return System.Text.RegularExpressions.Regex.Replace(value, "<(?<genericType>.*)>", ReplaceTypeParams(apiClass, apiMember, typeParams));
 			}
 			else
 			{

@@ -60,6 +60,9 @@ namespace Nucleus.ViewFeatures.ViewModels
 		/// </summary>
 		public File SelectedFile { get; set; } = new();
 
-		
+		/// <summary>
+		/// Specifies whether to return an application absolute url or whether to return a file path with no prefix.
+		/// </summary>
+		public Boolean ApplicationAbsoluteUrl { get; set; }	= true;
 	}
 }

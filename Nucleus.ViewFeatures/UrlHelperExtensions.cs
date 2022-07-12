@@ -134,6 +134,23 @@ namespace Nucleus.ViewFeatures
 		/// <returns></returns>
 		public static string FileLink(this IUrlHelper helper, File file, Boolean inline, Boolean encodePath)
 		{
+			return FileLink(helper, file, inline, encodePath, true);
+		}
+
+		/// <summary>
+		/// Output an url for the specified <see cref="File"/>.
+		/// </summary>
+		/// <param name="helper"></param>
+		/// <param name="file"></param>
+		/// <param name="inline">
+		///	Specifies whether the link should output a content-disposition header which renders the content inline, or as an attachment.  When
+		///	a file is output with content-disposition: attachment, browsers typically download the file rather than displaying it.
+		/// </param>
+		/// <param name="encodePath"></param>
+		/// <param name="applicationAbsolute">Specifies whether to prefix the output with ~/ to include virtual directory.</param>
+		/// <returns></returns>
+		public static string FileLink(this IUrlHelper helper, File file, Boolean inline, Boolean encodePath, Boolean applicationAbsolute)
+		{
 			string inlineParm = "";
 			if (inline)
 			{
@@ -142,15 +159,13 @@ namespace Nucleus.ViewFeatures
 
 			if (!encodePath)
 			{
-				return helper.Content($"~/files/{file.Provider}/{file.Path}{inlineParm}");
+				return helper.Content($"{(applicationAbsolute ? "~/" : "")}files/{file.Provider}/{file.Path}{inlineParm}");
 			}
 			else
 			{
-				return helper.Content($"~/files/{file.EncodeFileId()}{inlineParm}");
+				return helper.Content($"{(applicationAbsolute ? "~/" : "")}files/{file.EncodeFileId()}{inlineParm}");
 			}
 		}
-
-
 
 		/// <summary>
 		/// Generates a fully qualified URL to an action method by using the specified action name, controller name and area name.

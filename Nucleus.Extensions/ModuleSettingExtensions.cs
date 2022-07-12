@@ -258,7 +258,7 @@ namespace Nucleus.Extensions
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="key"></param>
-		/// <param name="value"></param>
+		/// <param name="value">The value of any enum type.</param>
 		public static void Set(this List<ModuleSetting> settings, string key, Enum value)
 		{
 			ModuleSetting existing = settings.Where(setting => setting.SettingName == key).FirstOrDefault();

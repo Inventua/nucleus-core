@@ -26,11 +26,10 @@ namespace Nucleus.Web.Controllers
 
 		[HttpGet]
 		[HttpPost]
-		public ActionResult Index(ViewModels.User.FileSelector viewModel, string pattern, Boolean showSelectAnother = true, Boolean applicationAbsoluteUrl = true)
+		public ActionResult Index(ViewModels.User.FileSelector viewModel, string pattern, Boolean showSelectAnother = true)
 		{
 			viewModel.Pattern = pattern;
 			viewModel.ShowSelectAnother = showSelectAnother;
-			viewModel.ApplicationAbsoluteUrl = applicationAbsoluteUrl;
 
 			return View("Index", viewModel);
 		}

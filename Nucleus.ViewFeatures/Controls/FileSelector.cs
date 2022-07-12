@@ -51,8 +51,7 @@ namespace Nucleus.ViewFeatures.Controls
 				Providers = this.FileSystemManager.ListProviders(),
 				PropertyName = propertyName ?? "SelectedFile",
 				ShowSelectAnother = showSelectAnother,
-				SelectAnotherActionName = selectAnotherActionName ?? "SelectAnother",
-				ApplicationAbsoluteUrl = applicationAbsoluteUrl
+				SelectAnotherActionName = selectAnotherActionName ?? "SelectAnother"
 			};
 
 			if (viewModel.SelectedFile == null)

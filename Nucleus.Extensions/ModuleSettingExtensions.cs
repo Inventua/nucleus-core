@@ -18,7 +18,7 @@ namespace Nucleus.Extensions
 		/// <param name="settings"></param>
 		/// <param name="key"></param>
 		/// <param name="defaultValue"></param>
-		/// <returns></returns>
+		/// <returns>string</returns>
 		public static string Get(this List<ModuleSetting> settings, string key, string defaultValue)
 		{
 			ModuleSetting value = settings.Where(setting => setting.SettingName == key).FirstOrDefault();
@@ -31,7 +31,7 @@ namespace Nucleus.Extensions
 		/// <param name="settings"></param>
 		/// <param name="key"></param>
 		/// <param name="defaultValue"></param>
-		/// <returns></returns>
+		/// <returns>Guid</returns>
 		public static Guid Get(this List<ModuleSetting> settings, string key, Guid defaultValue)
 		{
 			ModuleSetting value = settings.Where(setting => setting.SettingName == key).FirstOrDefault();

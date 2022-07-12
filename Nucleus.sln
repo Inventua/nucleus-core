@@ -136,6 +136,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "topics", "topics", "{7E69EF
 		Documentation\Developers\topics\authorization.md = Documentation\Developers\topics\authorization.md
 		Documentation\Developers\topics\database-scripts.md = Documentation\Developers\topics\database-scripts.md
 		Documentation\Developers\topics\Extension-Packaging.md = Documentation\Developers\topics\Extension-Packaging.md
+		Documentation\Developers\topics\razor-views.md = Documentation\Developers\topics\razor-views.md
 		Documentation\Developers\topics\saving-settings.md = Documentation\Developers\topics\saving-settings.md
 	EndProjectSection
 EndProject

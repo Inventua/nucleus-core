@@ -118,7 +118,7 @@ namespace Nucleus.XmlDocumentation.Controllers
 					viewModel.SelectedDocument = viewModel.Documents.Where(document => this.Context.LocalPath.Segments[0].StartsWith(System.IO.Path.GetFileNameWithoutExtension(document.SourceFileName), StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 					if (viewModel.SelectedDocument != null)
 					{
-						viewModel.SelectedClass = viewModel.SelectedDocument.Classes.Where(cls => cls.FullName.Equals(this.Context.LocalPath.Segments[0], StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+						viewModel.SelectedClass = viewModel.SelectedDocument.Classes.Where(cls => cls.FullName.Equals(this.Context.LocalPath.Segments[0], StringComparison.OrdinalIgnoreCase)).FirstOrDefault();						
 					}
 				}
 				else

@@ -129,10 +129,8 @@ namespace Nucleus.XmlDocumentation
 						case ApiMember.MemberTypes.Unknown:
 							break;
 					}
-
-					apiMember.UniqueId = $"{apiMember.Name}" + (apiMember.Params?.Any() == true ? $"({String.Join(',', apiMember.Params.Select(param => param.Type))})" : "");
-
-
+										
+					apiMember.UniqueId = $"{apiMember.Name}" + (apiMember.Params?.Any() == true ? $"({apiMember.Parameters.GetSimpleParameterTypes()})" : "");
 				}
 
 				result.Classes = classes.Values.ToList();
@@ -150,6 +148,12 @@ namespace Nucleus.XmlDocumentation
 
 			if (string.IsNullOrEmpty(rootNamespace)) return;
 
+			// dont make a doc page link for generic types like List<string> as there is no such documentation page
+			if (param.Type.Contains("<"))  
+			{
+				return;
+			}
+			
 			switch (rootNamespace)
 			{
 				case "Microsoft":

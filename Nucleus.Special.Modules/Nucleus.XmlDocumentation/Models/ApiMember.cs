@@ -157,10 +157,13 @@ namespace Nucleus.XmlDocumentation.Models
 								this.Params[count].IsRef = true;
 							}
 
-							this.Params[count].Type = matchParamList.Groups[1].Value.Replace('{', '<').Replace('}', '>').Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+							this.Params[count].Type = matchParamList.Groups[1].Value
+								.Replace("@", "")
+								.Replace('{', '<')
+								.Replace('}', '>')
+								.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
 
 							System.Text.RegularExpressions.Match nullableTypeMatch = System.Text.RegularExpressions.Regex.Match(this.Params[count].Type, @"System.Nullable\((?<type>.*)\)");
-
 							if (nullableTypeMatch.Success)
 							{
 								this.Params[count].Type = nullableTypeMatch.Groups[1].Value + "?";

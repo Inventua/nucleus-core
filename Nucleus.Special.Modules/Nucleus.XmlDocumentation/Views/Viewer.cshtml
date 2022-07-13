@@ -116,6 +116,11 @@
 <script type="text/javascript">
 	jQuery(document).ready(function()
 	{
+		var menuItem = jQuery('#mnu-@Model.SelectedClass?.ControlId()').first();
+		if (menuItem.length !== 0)
+		{
+			menuItem[0].scrollIntoView({ block: "center", inline: "nearest" } );
+		}
 		jQuery('.list-group.accordion-collapse').on('show.bs.collapse', function ()
 		{
 			var href = jQuery(this).children('.assembly-landing').first().attr('href');

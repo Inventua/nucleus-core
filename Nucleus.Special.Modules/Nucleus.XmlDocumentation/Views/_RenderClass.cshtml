@@ -2,11 +2,11 @@
 @using Nucleus.XmlDocumentation
 @using Nucleus.ViewFeatures
 @using Nucleus.XmlDocumentation.ViewModels
-@* Renders documentation for a class. *@
+@* Renders documentation for a class or interface. *@
 @if (Model != null)
 {
 <div class="api-class">
-	<h2>@Model.Content.Name Class</h2>
+	<h2>@Model.Content.Name @(Model.Content.Type== Nucleus.XmlDocumentation.Models.ApiMember.MemberTypes.Interface ? "Interface" : "Class")</h2>
 	<div><small class="text-muted">Namespace: @Model.Content.Namespace</small></div>
 	<div><small class="text-muted">Assembly: @(Model.Content.AssemblyName + ".dll")</small></div>
 	@if (Model.Content.Summary?.Items?.Any() == true)

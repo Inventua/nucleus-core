@@ -15,6 +15,7 @@ namespace Nucleus.XmlDocumentation.Models
 		public string FullName { get; set; }
 		public string Name { get; set; }
 
+		public ApiMember.MemberTypes Type { get; set; }
 		public MixedContent Summary { get; set; }
 
 		public MixedContent Remarks { get; set; }

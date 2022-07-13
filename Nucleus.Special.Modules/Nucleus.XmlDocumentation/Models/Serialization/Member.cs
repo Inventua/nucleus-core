@@ -45,5 +45,8 @@ namespace Nucleus.XmlDocumentation.Models.Serialization
 		[XmlElement(ElementName = "hidden")]
 		public Hidden Hidden { get; set; }
 
+		[XmlElement(ElementName = "type")]
+		public string Type { get; set; }
+
 	}
 }

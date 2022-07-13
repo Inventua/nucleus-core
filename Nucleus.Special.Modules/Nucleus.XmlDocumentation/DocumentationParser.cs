@@ -49,6 +49,7 @@ namespace Nucleus.XmlDocumentation
 							break;
 
 						case ApiMember.MemberTypes.Class:
+						case ApiMember.MemberTypes.Interface:
 							// Special handling for namespace documentation
 							if (apiMember.Name == "NamespaceDoc")
 							{
@@ -62,6 +63,7 @@ namespace Nucleus.XmlDocumentation
 								{
 									IdString = apiMember.IdString,
 									Name = apiMember.Name,
+									Type = apiMember.Type,
 									FullName = apiMember.FullName,
 									Namespace = apiMember.Namespace,
 									AssemblyName = this.Source.Assembly.Name,

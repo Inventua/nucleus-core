@@ -14,6 +14,7 @@ namespace Nucleus.XmlDocumentation.Models
 			Namespace,
 			Constructor,
 			Class,
+			Interface,
 			Field,
 			Property,
 			Method,
@@ -25,7 +26,7 @@ namespace Nucleus.XmlDocumentation.Models
 
 		public string UniqueId { get; set; }
 
-		public MemberTypes Type { get; private set; }
+		public MemberTypes Type { get; private set; } = MemberTypes.Unknown;
 		public string FullName { get; }
 		public string IdString { get; }
 		public string Namespace { get; }
@@ -68,14 +69,28 @@ namespace Nucleus.XmlDocumentation.Models
 			this.SeeAlso = member.SeeAlso;
 			this.TypeParams = member.TypeParams;
 
+			if (System.Enum.TryParse<MemberTypes>(member.Type, out MemberTypes type))
+			{
+				this.Type = type;
+			}
+
 			// Parse name value like: P:Nucleus.Abstractions.Models.Paging.PagingSettings.PageControlNumbers
 			// ID string format: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/
 			_match = System.Text.RegularExpressions.Regex.Match(member.Name, "^([A-Z]{1}):([^\\(\\)]*)");
 			if (_match.Success)
 			{
-				this.IdString = member.Name;// match.Groups[2].Value;
+				this.IdString = member.Name;
 
-				this.Type = ParseMemberType(_match.Groups[1].Value);
+				// Only determine the type if it hasn't been explictly specified in a XML commands <type> element.
+				if (this.Type == MemberTypes.Unknown)
+				{
+					this.Type = ParseMemberType(_match.Groups[1].Value);
+					if (this.Type == MemberTypes.Class && _match.Groups[2].Value.Split('.', StringSplitOptions.RemoveEmptyEntries).Last().StartsWith("I"))
+					{
+						this.Type = MemberTypes.Interface;
+					}
+				}
+
 				this.FullName = ParseName(_match.Groups[2].Value);
 			}
 		}
@@ -90,7 +105,7 @@ namespace Nucleus.XmlDocumentation.Models
 			{
 				if (_match.Success)
 				{
-					if (this.Type == MemberTypes.Class)
+					if (this.Type == MemberTypes.Class || this.Type == MemberTypes.Interface)
 					{
 						this.Name = this.FullName.Substring(assemblyName.Length + 1);  //ParseName(match.Groups[2].Value.Substring(match.Groups[2].Value.LastIndexOf('.') + 1));
 						this.ClassName = this.FullName; // ParseName(this.FullName.Substring(0, this.FullName.LastIndexOf('.')));

@@ -400,7 +400,7 @@ namespace Nucleus.XmlDocumentation
 			{
 				if (content.Items[count] is System.String)
 				{
-					content.Items[count] = (content.Items[count] as System.String).Replace("\r", "").Replace("\n", "").Trim();
+					content.Items[count] = (content.Items[count] as System.String).Replace("\r", "").Replace("\n", "");
 				}
 			}
 		}

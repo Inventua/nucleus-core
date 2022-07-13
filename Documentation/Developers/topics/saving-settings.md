@@ -8,14 +8,15 @@ parameter in your constructor.  You can access the current module from the ==Mod
 
 In the settings-related actions of your controller class, save module settings by adding or updating values 
 in the [PageModule.ModuleSettings](/api-documentation/Nucleus.Abstractions.Models.PageModule/#ModuleSettings) property by using 
-[ModuleSettingsExtensions.Set](/api-documentation/Nucleus.Extensions.ModuleSettingsExtensions/), then calling 
-[IPageModuleManager.SaveSettings](/api-documentation/Nucleus.Abstractions.Managers.IPageModuleManager/#SaveSettings(Nucleus.Abstractions.Models.PageModule)).  
+[ModuleSettingsExtensions.Set](/api-documentation/Nucleus.Extensions.ModuleSettingsExtensions/#Set(List<ModuleSetting>,String,String)), then calling 
+[IPageModuleManager.SaveSettings](/api-documentation/Nucleus.Abstractions.Managers.IPageModuleManager/#SaveSettings(PageModule)).  
 
-You can retrieve your settings by calling the [ModuleSettingsExtensions.Get](/api-documentation/Nucleus.Extensions.ModuleSettingsExtensions/) 
+You can retrieve your settings by calling the [ModuleSettingsExtensions.Get](/api-documentation/Nucleus.Extensions.ModuleSettingsExtensions/#Get(List<ModuleSetting>,String,String)) 
 extension on the [PageModule.ModuleSettings](/api-documentation/Nucleus.Abstractions.Models.PageModule/#ModuleSettings) property.
 
 > Each module setting consists of a ==SettingName== and a SettingValue.  Module setting values are limited to 512 characters and are 
-stored in the database as a string.  The .Set and .Get methods automatically convert your settings to and from ==Boolean==, ==Double==, 
+stored in the database as a string.  The ModuleSettingsExtensions [Set](/api-documentation/Nucleus.Extensions.ModuleSettingsExtensions/#Set(List<ModuleSetting>,String,String)) 
+and [Get](/api-documentation/Nucleus.Extensions.ModuleSettingsExtensions/#Get(List<ModuleSetting>,String,String)) methods automatically convert your settings to and from ==Boolean==, ==Double==, 
 ==Enum==, ==Guid==, ==DateTime== and ==int== types automatically.  By convention, setting names are in the form modulename:valuename.
 
 > This example is from the SiteMap module.  Code which does not demonstrate saving or retrieving module settings has been removed 
@@ -95,12 +96,12 @@ Obtain a reference to the current [Site](/api-documentation/Nucleus.Abstractions
 module from the ==Context.Site== property.
 
 In the settings-related actions of your controller class, save site settings by adding or updating values 
-in the [Site](/api-documentation/Nucleus.Abstractions.Models.Site).SiteSettings property by using 
-[SiteSettingsExtensions.TrySet](/api-documentation/Nucleus.Extensions.SiteSettingsExtensions/), then calling 
-[ISiteManager](/api-documentation/Nucleus.Abstractions.Managers.ISiteManager/).Save.  
+in the [Site.SiteSettings](/api-documentation/Nucleus.Abstractions.Models.Site/#SiteSettings) property by using 
+[SiteSettingsExtensions.TrySetValue](/api-documentation/Nucleus.Extensions.SiteSettingsExtensions/#TrySetValue(List<SiteSetting>,String,Nullable<Boolean>)), 
+then calling [ISiteManager.Save](/api-documentation/Nucleus.Abstractions.Managers.ISiteManager/#Save(Site)).  
 
-You can retrieve your settings by calling the [SiteSettingsExtensions.TryGet](/api-documentation/Nucleus.Extensions.SiteSettingsExtensions/) 
-extension of the [Site](/api-documentation/Nucleus.Abstractions.PageModule).SiteSettings property.
+You can retrieve your settings by calling the [SiteSettingsExtensions.TryGetValue](/api-documentation/Nucleus.Extensions.SiteSettingsExtensions/) 
+extension of the [Site.SiteSettings](/api-documentation/Nucleus.Abstractions.Models.Site/#SiteSettings) property.
 
 > Each site setting consists of a ==SettingName== and a SettingValue.  Site setting values are limited to 1024 characters and are 
 stored in the database as a string.  The .TrySet and .TryGet methods automatically convert your settings to and from ==Boolean==, ==Double==, 

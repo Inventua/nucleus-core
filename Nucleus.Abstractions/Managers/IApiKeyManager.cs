@@ -8,7 +8,7 @@ using Nucleus.Abstractions.Models;
 namespace Nucleus.Abstractions.Managers
 {
 	/// <summary>
-	/// Provides functions to manage database data for <see cref="Nucleus.Abstractions.Models.List"/>s.
+	/// Provides functions to manage database data for <see cref="Nucleus.Abstractions.Models.ApiKey"/>s.
 	/// </summary>
 	public interface IApiKeyManager
 	{

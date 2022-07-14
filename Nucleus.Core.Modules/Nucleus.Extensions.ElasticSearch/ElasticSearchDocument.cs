@@ -9,8 +9,10 @@ using Nucleus.Abstractions.Search;
 namespace Nucleus.Extensions.ElasticSearch
 {
 	[Nest.ElasticsearchType(IdProperty = nameof(Id))]
-	public class ElasticSearchDocument
+	public class ElasticSearchDocument : IDisposable
 	{
+		private bool disposedValue;
+
 		/// <summary>
 		/// Constructor used by NEST deserialization for search results.
 		/// </summary>
@@ -244,5 +246,27 @@ namespace Nucleus.Extensions.ElasticSearch
 			return false;
 		}
 
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				if (disposing)
+				{
+					// dispose managed state (managed objects).  Attachments and content can consume quite a bit of memory, so we 
+					// clean them up here.
+					this.Attachment = null;
+					this.Content = null;
+				}
+
+				disposedValue = true;
+			}
+		}
+
+		public void Dispose()
+		{
+			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
 	}
 }

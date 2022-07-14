@@ -38,8 +38,11 @@ namespace Nucleus.Extensions.ElasticSearch
 
 			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName);
 
-			Nest.IndexResponse response = request.IndexContent(new ElasticSearchDocument(metadata));			
+			ElasticSearchDocument document = new(metadata);
+			Nest.IndexResponse response = request.IndexContent(document);
 
+			// free up memory - file content is part of the feed data, and this can exhaust available memory 
+			document.Dispose();
 		}
 
 		public void Remove(ContentMetaData metadata)

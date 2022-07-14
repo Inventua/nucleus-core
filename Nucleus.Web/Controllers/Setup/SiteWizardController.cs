@@ -14,6 +14,7 @@ using Nucleus.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 
 namespace Nucleus.Web.Controllers.Setup
 {
@@ -32,10 +33,12 @@ namespace Nucleus.Web.Controllers.Setup
 		private Abstractions.IPreflight PreFlight { get; }
 		private Abstractions.Models.Configuration.FolderOptions FolderOptions { get; }
 		private Abstractions.Models.Application Application { get; }
+		private ILogger<SiteWizardController> Logger { get; }
 
-		public SiteWizardController(IWebHostEnvironment webHostEnvironment, IHostApplicationLifetime hostApplicationLifetime, Abstractions.Models.Application application, IOptions<Abstractions.Models.Configuration.FolderOptions> folderOptions, Abstractions.IPreflight preFlight, IExtensionManager extensionManager, ISiteManager siteManager, IUserManager userManager, ILayoutManager layoutManager, IContainerManager containerManager)
+		public SiteWizardController(IWebHostEnvironment webHostEnvironment, ILogger<SiteWizardController> logger, IHostApplicationLifetime hostApplicationLifetime, Abstractions.Models.Application application, IOptions<Abstractions.Models.Configuration.FolderOptions> folderOptions, Abstractions.IPreflight preFlight, IExtensionManager extensionManager, ISiteManager siteManager, IUserManager userManager, ILayoutManager layoutManager, IContainerManager containerManager)
 		{
 			this.WebHostEnvironment = webHostEnvironment;
+			this.Logger = logger;
 			this.HostApplicationLifetime = hostApplicationLifetime;
 			this.Application = application;
 			this.FolderOptions = folderOptions.Value;
@@ -252,8 +255,10 @@ namespace Nucleus.Web.Controllers.Setup
 
 			foreach (FileInfo extensionPackageFile in InstallableExtensionsFolder().EnumerateFiles("*.zip"))
 			{
+
 				using (Stream extensionStream = extensionPackageFile.OpenRead())
 				{
+					this.Logger?.LogInformation("Validating '{fileName}'.", extensionPackageFile.FullName);
 					PackageResult extensionResult = await this.ExtensionManager.ValidatePackage(extensionStream);
 
 					if (extensionResult.IsValid)

@@ -114,11 +114,11 @@ namespace Nucleus.Core
 			ZipArchiveEntry manifestEntry = null;
 
 			manifestEntry = this.Archive.Entries.Where(entry => entry.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
-
+			
 			if (manifestEntry == null)
 			{
 				this.ModelState.AddModelError($"missingfile:{fileName}", $"File '{fileName}' not found in package.");
-				throw new InvalidDataException("${fileName} not found.");
+				throw new InvalidDataException($"{fileName} not found.");
 			}
 			else
 			{

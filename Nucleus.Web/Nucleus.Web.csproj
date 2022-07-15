@@ -60,6 +60,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Areas\Setup\Views\SiteWizard\Complete.js" />
+	  <None Remove="Areas\Setup\Views\SiteWizard\index.css" />
+	  <None Remove="license.txt" />
 	  <None Remove="module.build.targets" />
 	  <None Remove="package.xsd" />
 	  <None Remove="Resources\css\admin.css" />
@@ -85,9 +88,12 @@
 	  <None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.css" />
 	  <None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.min.css" />
 	  <None Remove="Resources\material-icons.woff2" />
+	  <None Remove="Setup\Templates\Site\default-site-template.xml" />
+	  <None Remove="Shared\Containers\default.css" />
 	  <None Remove="Shared\Containers\default.min.css" />
 	  <None Remove="Shared\Controls\Views\PagingControl.css" />
 	  <None Remove="Shared\Controls\Views\PagingControl.min.css" />
+	  <None Remove="Shared\Layouts\default.css" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -96,6 +102,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Include="Areas\Setup\Views\SiteWizard\Complete.js">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Areas\Setup\Views\SiteWizard\index.css">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="license.txt">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	  <Content Include="module.build.targets" />
 	  <Content Include="package.xsd">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -124,9 +139,20 @@
 	  <Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.css" />
 	  <Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.min.css" />
 	  <Content Include="Resources\material-icons.woff2" />
+	  <Content Include="Setup\Templates\Site\default-site-template.xml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Shared\Containers\default.css">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	  <Content Include="Shared\Containers\default.min.css" />
-	  <Content Include="Shared\Controls\Views\PagingControl.css" />
+	  <Content Include="Shared\Controls\Views\PagingControl.css">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	  <Content Include="Shared\Controls\Views\PagingControl.min.css" />
+	  <Content Include="Shared\Layouts\default.css">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -144,6 +170,57 @@
 		<None Include="Setup\install-log.config">
 		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="appSettings.development.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="appSettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="databaseSettings.development.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="databaseSettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="hosting.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Shared\Containers\default.cshtml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Shared\Controls\Views\FileSelector.cshtml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Shared\Controls\Views\FileUpload.cshtml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Shared\Controls\Views\FolderSelector.cshtml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Shared\Controls\Views\PagingControl.cshtml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Shared\Layouts\default.cshtml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Shared\Layouts\_banner.cshtml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Views\Shared\_Generic.cshtml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Views\Shared\_Layout.cshtml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Views\Shared\_Partial.cshtml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Views\Shared\_PopupEditor.cshtml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="Exists('iis-dev')">

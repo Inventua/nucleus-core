@@ -55,4 +55,7 @@
     </None>
   </ItemGroup>
 
+	<Target Name="GetPackageAssemblies" AfterTargets="PostBuildEvent">
+		<Copy SourceFiles="bin\$(Configuration)\$(TargetFramework)\Nucleus.Data.EntityFramework.xml" DestinationFolder="$(SolutionDir)\..\Publish\XmlDocumentation" Retries="2" />
+	</Target>
 </Project>

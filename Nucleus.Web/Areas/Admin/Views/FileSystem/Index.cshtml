@@ -96,16 +96,17 @@
 
 					@for (var fileCount = 0; fileCount < Model.Folder?.Files.Count; fileCount++)
 					{
+						var isRecent = Math.Abs(Model.Folder.Files[fileCount].DateModified.Subtract(DateTime.UtcNow).TotalMinutes) < 5;
 						<tr>
 							<td>
 								@Html.CheckBoxFor(model => model.Folder.Files[fileCount].IsSelected, new { @class = "nucleus-filesystem-fileselector" })
 							</td>
-							<td>
+							<td class="@(isRecent ? "fw-bold" : "")">
 								@Model.Folder.Files[fileCount].Name
 								@Html.HiddenFor(model => model.Folder.Files[fileCount].Id)
 							</td>
 							<td>File</td>
-							<td>@Model.Folder.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+							<td class="Date@(isRecent ? " fw-bold" : "")">@Model.Folder.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
 							<td>@((Model.Folder.Files[fileCount] as File).Size.FormatFileSize())</td>
 						</tr>
 					}

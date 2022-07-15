@@ -35,7 +35,8 @@ namespace Nucleus.Core.DataProviders
 			return true;
 		}
 
-		/// <inheritdoc/>
+		/// <seealso cref="DbContextConfigurator.ParseException(DbUpdateException)"/>
+		/// <param name="exception"></param>
 		public override void ParseException(DbUpdateException exception)
 		{
 			// no implementation

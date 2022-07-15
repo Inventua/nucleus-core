@@ -15,7 +15,10 @@ namespace Nucleus.Data.EntityFramework
   /// </summary>
 	public class ExceptionInterceptor : SaveChangesInterceptor
   {
-    /// <inheritdoc/>
+    /// <summary>
+    /// Calls the relevant Nucleus data provider to parse exceptions from Entity-Framework and produce more friendly error messages.
+    /// </summary>
+    /// <param name="eventData"></param>
     public override void SaveChangesFailed(DbContextErrorEventData eventData)
     {
       DbUpdateException dbUpdateException = eventData.Exception as DbUpdateException;
@@ -30,7 +33,12 @@ namespace Nucleus.Data.EntityFramework
       base.SaveChangesFailed(eventData);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Calls the relevant Nucleus data provider to parse exceptions from Entity-Framework and produce more friendly error messages.
+    /// </summary>
+    /// <param name="eventData"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public override Task SaveChangesFailedAsync(DbContextErrorEventData eventData, CancellationToken cancellationToken = new CancellationToken())
     {
       SaveChangesFailed(eventData);

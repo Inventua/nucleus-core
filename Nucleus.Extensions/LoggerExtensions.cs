@@ -13,12 +13,16 @@ namespace Nucleus.Extensions.Logging
 	/// calling Log functions in order to avoid unnecessary object creation and memory usage.
 	/// </summary>
 	/// <remarks>
-	/// To use, reference Nucleus.Extensions and add a 'using Nucleus.Extensions.Logging;' line after the 
-	/// 'using Microsoft.Extensions.Logging;' line.
+	/// To use, reference Nucleus.Extensions and add a <code>'using Nucleus.Extensions.Logging;'</code> line after the 
+	/// <code>'using Microsoft.Extensions.Logging;'</code> line.  You don't need to change any of your logging code.
 	/// </remarks>
 	public static class LoggerExtensions 
 	{
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes an informational log message.
+		/// </summary>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
 		public static void LogInformation(this Microsoft.Extensions.Logging.ILogger logger, string message)
 		{
 			if (logger.IsEnabled(LogLevel.Information))
@@ -27,7 +31,13 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes an informational log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
 		public static void LogInformation<T0>(this Microsoft.Extensions.Logging.ILogger logger, string message, T0 arg0)
 		{
 			if (logger.IsEnabled(LogLevel.Information))
@@ -36,7 +46,15 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes an informational log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <typeparam name="T1"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
 		public static void LogInformation<T0,T1>(this Microsoft.Extensions.Logging.ILogger logger, string message, T0 arg0, T1 arg1)
 		{
 			if (logger.IsEnabled(LogLevel.Information))
@@ -45,7 +63,17 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes an informational log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <typeparam name="T1"></typeparam>
+		/// <typeparam name="T2"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
+		/// <param name="arg2"></param>
 		public static void LogInformation<T0, T1,T2>(this Microsoft.Extensions.Logging.ILogger logger, string message, T0 arg0, T1 arg1, T2 arg2)
 		{
 			if (logger.IsEnabled(LogLevel.Information))
@@ -54,7 +82,11 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes a warning log message.
+		/// </summary>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
 		public static void LogWarning(this Microsoft.Extensions.Logging.ILogger logger, string message)
 		{
 			if (logger.IsEnabled(LogLevel.Warning))
@@ -63,7 +95,13 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes a warning log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
 		public static void LogWarning<T0>(this Microsoft.Extensions.Logging.ILogger logger, string message, T0 arg0)
 		{
 			if (logger.IsEnabled(LogLevel.Warning))
@@ -72,7 +110,15 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes a warning log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <typeparam name="T1"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
 		public static void LogWarning<T0, T1>(this Microsoft.Extensions.Logging.ILogger logger, string message, T0 arg0, T1 arg1)
 		{
 			if (logger.IsEnabled(LogLevel.Warning))
@@ -81,7 +127,17 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes a warning log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <typeparam name="T1"></typeparam>
+		/// <typeparam name="T2"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
+		/// <param name="arg2"></param>
 		public static void LogWarning<T0, T1, T2>(this Microsoft.Extensions.Logging.ILogger logger, string message, T0 arg0, T1 arg1, T2 arg2)
 		{
 			if (logger.IsEnabled(LogLevel.Warning))
@@ -90,7 +146,11 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes a trace log message.
+		/// </summary>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
 		public static void LogTrace(this Microsoft.Extensions.Logging.ILogger logger, string message)
 		{
 			if (logger.IsEnabled(LogLevel.Trace))
@@ -99,7 +159,13 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes a trace log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
 		public static void LogTrace<T0>(this Microsoft.Extensions.Logging.ILogger logger, string message, T0 arg0)
 		{
 			if (logger.IsEnabled(LogLevel.Trace))
@@ -108,7 +174,15 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes a trace log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <typeparam name="T1"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
 		public static void LogTrace<T0, T1>(this Microsoft.Extensions.Logging.ILogger logger, string message, T0 arg0, T1 arg1)
 		{
 			if (logger.IsEnabled(LogLevel.Trace))
@@ -117,7 +191,17 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes a trace log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <typeparam name="T1"></typeparam>
+		/// <typeparam name="T2"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
+		/// <param name="arg2"></param>
 		public static void LogTrace<T0, T1, T2>(this Microsoft.Extensions.Logging.ILogger logger, string message, T0 arg0, T1 arg1, T2 arg2)
 		{
 			if (logger.IsEnabled(LogLevel.Trace))
@@ -126,7 +210,11 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes a debug log message.
+		/// </summary>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
 		public static void LogDebug(this Microsoft.Extensions.Logging.ILogger logger, string message)
 		{
 			if (logger.IsEnabled(LogLevel.Debug))
@@ -135,7 +223,13 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes a debug log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
 		public static void LogDebug<T0>(this Microsoft.Extensions.Logging.ILogger logger, string message, T0 arg0)
 		{
 			if (logger.IsEnabled(LogLevel.Debug))
@@ -144,7 +238,15 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes a debug log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <typeparam name="T1"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
 		public static void LogDebug<T0, T1>(this Microsoft.Extensions.Logging.ILogger logger, string message, T0 arg0, T1 arg1)
 		{
 			if (logger.IsEnabled(LogLevel.Debug))
@@ -153,7 +255,17 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes a debug log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <typeparam name="T1"></typeparam>
+		/// <typeparam name="T2"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
+		/// <param name="arg2"></param>
 		public static void LogDebug<T0, T1, T2>(this Microsoft.Extensions.Logging.ILogger logger, string message, T0 arg0, T1 arg1, T2 arg2)
 		{
 			if (logger.IsEnabled(LogLevel.Debug))
@@ -162,10 +274,12 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		// //
-
-
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes an error log message.
+		/// </summary>
+		/// <param name="logger"></param>
+		/// <param name="exception"></param>
+		/// <param name="message"></param>
 		public static void LogError(this Microsoft.Extensions.Logging.ILogger logger, Exception exception, string message)
 		{
 			if (logger.IsEnabled(LogLevel.Error))
@@ -174,7 +288,14 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes an error log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="exception"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
 		public static void LogError<T0>(this Microsoft.Extensions.Logging.ILogger logger, Exception exception, string message, T0 arg0)
 		{
 			if (logger.IsEnabled(LogLevel.Error))
@@ -183,7 +304,16 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes an error log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <typeparam name="T1"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="exception"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
 		public static void LogError<T0, T1>(this Microsoft.Extensions.Logging.ILogger logger, Exception exception, string message, T0 arg0, T1 arg1)
 		{
 			if (logger.IsEnabled(LogLevel.Error))
@@ -192,7 +322,18 @@ namespace Nucleus.Extensions.Logging
 			}
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Formats and writes an error log message.
+		/// </summary>
+		/// <typeparam name="T0"></typeparam>
+		/// <typeparam name="T1"></typeparam>
+		/// <typeparam name="T2"></typeparam>
+		/// <param name="logger"></param>
+		/// <param name="exception"></param>
+		/// <param name="message"></param>
+		/// <param name="arg0"></param>
+		/// <param name="arg1"></param>
+		/// <param name="arg2"></param>
 		public static void LogError<T0, T1, T2>(this Microsoft.Extensions.Logging.ILogger logger, Exception exception, string message, T0 arg0, T1 arg1, T2 arg2)
 		{
 			if (logger.IsEnabled(LogLevel.Error))

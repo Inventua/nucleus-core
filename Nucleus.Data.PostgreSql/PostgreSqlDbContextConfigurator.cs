@@ -40,7 +40,11 @@ namespace Nucleus.Data.PostgreSql
 			return false;
 		}
 
-		/// <inheritdoc/>
+		/// <summary>
+		/// Parse a database exception and match it to a friendly error message.  If a match is found, throw a <see cref="DataProviderException"/> to wrap the
+		/// original exception with a more friendly error message.
+		/// </summary>
+		/// <param name="exception"></param>
 		public override void ParseException(DbUpdateException exception)
 		{
 			// This code is inspired by, and uses code from https://github.com/Giorgi/EntityFramework.Exceptions.  https://www.apache.org/licenses/LICENSE-2.0

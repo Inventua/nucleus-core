@@ -9,7 +9,7 @@
 {
 	display: flex;
 	flex-direction: row;
-	gap: 1rem;
+	gap: 0.5rem;
 	overflow: auto;
 }
 
@@ -91,6 +91,11 @@
 	overflow: auto;
 }
 
+.XmlDocumentation .api-class
+{
+	margin-right: 0.5rem;
+}
+
 .XmlDocumentation .api-member
 {
 	margin: 1rem;
@@ -110,11 +115,8 @@
 .XmlDocumentation .api-parameters table tr td, .XmlDocumentation .api-typeparameters table tr td
 {
 	padding: 4px 8px;
-}
-
-.XmlDocumentation .api-parameters table tr td, .XmlDocumentation .api-typeparameters table tr td
-{
 	min-width: 10em;
+	word-break: break-all;
 }
 
 .XmlDocumentation .api-parameters table tr td:last-child, .XmlDocumentation .api-typeparameters table tr td:last-child

@@ -8,6 +8,7 @@ function _Page()
 	this.LoadPartialContent = _loadPartialContent;
 	this.GetCookie = _getCookie;
 	this.AddEventHandlers = _addEventHandlers;
+	this.CopyToClipboard = _copyToClipboard;
 
 	// Attach Nucleus-standard event handlers when document is ready
 	jQuery(document).ready(function ()
@@ -941,6 +942,15 @@ function _Page()
 		function escape(s) { return s.replace(/([.*+?\^$(){}|\[\]\/\\])/g, '\\$1'); }
 		var match = document.cookie.match(RegExp('(?:^|;\\s*)' + escape(name) + '=([^;]*)'));
 		return match ? match[1] : null;
+	}
+
+	function _copyToClipboard(element)
+	{
+		var temp = jQuery("<input>");
+		jQuery("body").append(temp);
+		temp.val(jQuery(element).val()).select();
+		document.execCommand("copy");
+		temp.remove();
 	}
 
 	// Add _Layout.cshtml event handlers, which are used to communicate/execute events from the admin iframe to the main window.

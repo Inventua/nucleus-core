@@ -19,6 +19,16 @@ body
   font-display: auto;
 }
 
+.fs-small
+{
+  font-size: 0.9rem;
+}
+
+.fs-smaller
+{
+  font-size: 0.8rem;
+}
+
 .btn.btn-none
 {
   background-color: transparent;

@@ -9,6 +9,7 @@
 		<h2>API Key</h2>
 		
 		<SettingsControl caption="ID" helptext="Api Key Id (guid).  This is the value used as an access key for API request signing, or as the client_id in an OAuth request.  If you are creating a new Api Key, you can enter this value in order to have it match the value from another environment, but you can't change the Id of an existing key.">
+			<button class="CopyApiKeyId nucleus-material-icon btn btn-none align-self-end position-absolute fs-small" type="button" title="Copy to Clipboard">&#xe14d;</button>
 			@if (Model.IsNew)
 			{
 				@Html.TextBoxFor(model => model.ApiKey.Id, new { @maxlength = 36 })
@@ -29,6 +30,7 @@
 		</SettingsControl>
 
 		<SettingsControl caption="Secret" helptext="API Key Secret.  This value is used when encrypting API data.">
+			<button class="CopyApiKeySecret nucleus-material-icon btn btn-none align-self-end position-absolute fs-small" type="button" title="Copy to Clipboard">&#xe14d;</button>
 			@Html.TextAreaFor(model => model.ApiKey.Secret, new { @maxlength = 256 })
 		</SettingsControl>
 
@@ -52,3 +54,27 @@
 	
 }
 
+<script type="text/javascript">
+	jQuery(document).ready(function() 
+	{
+		// prevent label controls from triggering the copy button
+		jQuery('.CopyApiKeyId, .CopyApiKeySecret').parents('label').on('click', function()
+		{
+			jQuery(this).children('input, textarea, select').first().focus();
+			event.preventDefault();
+		});
+
+		// copy button handlers
+		jQuery('.CopyApiKeyId').on('click', function()
+		{
+			Page.CopyToClipboard(jQuery('#ApiKey_Id'));
+			return false;
+		});
+		jQuery('.CopyApiKeySecret').on('click', function()
+		{
+			Page.CopyToClipboard(jQuery('#ApiKey_Secret'));
+			return false;
+		});
+		
+	});
+</script>

@@ -71,7 +71,8 @@ namespace Nucleus.XmlDocumentation
 									Examples = apiMember.Examples,
 									Remarks = apiMember.Remarks,
 									SeeAlso = apiMember.SeeAlso,
-									TypeParams = apiMember.TypeParams
+									TypeParams = apiMember.TypeParams,
+									Internal = apiMember.Internal
 								};
 
 								ParseTypeParams(apiClass);
@@ -364,9 +365,11 @@ namespace Nucleus.XmlDocumentation
 
 					ParseCrefs(results, apiClass.Remarks);
 					ParseCrefs(results, apiClass.Summary);
+					ParseCrefs(results, apiClass.Internal);
 
 					TrimStrings(apiClass.Remarks);
 					TrimStrings(apiClass.Summary);
+					TrimStrings(apiClass.Internal);
 
 					foreach (ApiMember member in apiClass.AllMembers)
 					{
@@ -375,6 +378,7 @@ namespace Nucleus.XmlDocumentation
 						ParseCrefs(results, member.Remarks);
 						ParseCrefs(results, member.Returns);
 						ParseCrefs(results, member.Summary);
+						ParseCrefs(results, member.Internal);
 
 						if (member.Params != null)
 						{
@@ -387,6 +391,7 @@ namespace Nucleus.XmlDocumentation
 						TrimStrings(member.Remarks);
 						TrimStrings(member.Returns);
 						TrimStrings(member.Summary);
+						TrimStrings(member.Internal);
 					}
 				}
 			}
@@ -565,8 +570,8 @@ namespace Nucleus.XmlDocumentation
 					foundReferenceName = document.Namespace.Name;
 					return new System.Uri($"{document.SourceFileName}/{document.Namespace.Name}/", UriKind.Relative);
 				}
-				
-				foreach (ApiClass apiClass in document.Classes)
+
+				foreach (ApiClass apiClass in document.Classes.Where(apiClass => apiClass.IdString == memberIdString || apiClass.AllMembers.Where(member => member.IdString == memberIdString).Any()))   // //document.Classes)
 				{
 					if (apiClass.IdString == memberIdString)
 					{

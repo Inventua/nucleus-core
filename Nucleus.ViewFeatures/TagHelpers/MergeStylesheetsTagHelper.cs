@@ -25,12 +25,17 @@ namespace Nucleus.ViewFeatures.TagHelpers
 	/// path - it will generate separate &lt;link&gt; tags for each path in order to preserve relative paths within your CSS files.
 	/// </summary>
 	/// <remarks>
-	/// The MergeScriptsTagHelper is implemented within the standard shared _Layout Razor layout and wraps all of the OsaAppCore scripts,
-	/// as well as any scripts that you add to the @styles section.  Under normal circumstances, you should not need to use the 
-	/// MergeStylesheetsTagHelper in your code.
+	/// The MergeScriptsTagHelper is implemented within the Nucleus shared _Layout Razor layout and wraps all scripts,
+	/// including any scripts that you add with <see cref="Nucleus.ViewFeatures.HtmlHelpers.AddStyleHtmlHelper.AddStyle(IHtmlHelper, string)"/>.  
+	/// Under normal circumstances, you should not need to use the MergeStylesheetsTagHelper in your code.
 	/// <br/><br/>
 	/// There is no HtmlHelper equivalent for the MergeStylesheetsTagHelper.
 	/// </remarks>
+	/// <internal>
+	/// The merge stylesheets tag helper is for internal use.  It is not intended for use by Nucleus extensions.  Extensions should use the AddStyle 
+	/// Html helper to add stylesheets to page output.  Scripts added with <see cref="Nucleus.ViewFeatures.HtmlHelpers.AddStyleHtmlHelper.AddStyle(IHtmlHelper, string)"/> are 
+	/// automatically merged, if your site is configured to merge stylesheets.
+	/// </internal>
 	public class MergeStylesheetsTagHelper : TagHelper
 	{
 		private const char SEPARATOR_CHAR = ',';

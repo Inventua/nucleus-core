@@ -48,5 +48,7 @@ namespace Nucleus.XmlDocumentation.Models.Serialization
 		[XmlElement(ElementName = "type")]
 		public string Type { get; set; }
 
+		[XmlElement(ElementName = "internal")]
+		public MixedContent Internal { get; set; }
 	}
 }

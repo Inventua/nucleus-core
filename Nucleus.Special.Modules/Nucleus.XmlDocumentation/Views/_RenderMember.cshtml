@@ -54,6 +54,21 @@
 					</div>
 				}
 
+				@if (member.Internal != null)
+				{
+					<div class="alert alert-warning" role="alert">			
+						<h3>Internal Use</h3>
+						@if (member.Internal?.Items?.Any() == true)
+						{
+							@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, member.Internal))
+						}
+						else
+						{
+							<div>This @(member.Type.ToString()) is marked as internal use only.  Internal use members are not intended for use by extensions, and backward and forward compatibility is not guaranteed.</div>
+						}
+					</div>
+				}
+
 				@if (member?.Values?.Any() == true)
 				{
 					<div class="api-typeparameters">

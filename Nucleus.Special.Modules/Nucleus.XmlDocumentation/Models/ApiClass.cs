@@ -29,6 +29,9 @@ namespace Nucleus.XmlDocumentation.Models
 		public List<ApiMember> Events { get; } = new();
 		public SeeAlso[] SeeAlso { get; set; }
 		public TypeParam[] TypeParams { get; set; }
+
+		public MixedContent Internal { get; set; }
+
 		public string ControlId()
 		{
 			return this.FullName.Replace('.', '-');

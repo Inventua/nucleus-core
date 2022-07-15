@@ -52,6 +52,8 @@ namespace Nucleus.XmlDocumentation.Models
 
 		public SeeAlso[] SeeAlso { get; set; }
 
+		public MixedContent Internal { get; set; }
+
 		private System.Text.RegularExpressions.Match _match;
 
 		/// <summary>
@@ -68,6 +70,7 @@ namespace Nucleus.XmlDocumentation.Models
 			this.Values = member.Values;
 			this.SeeAlso = member.SeeAlso;
 			this.TypeParams = member.TypeParams;
+			this.Internal = member.Internal;
 
 			if (System.Enum.TryParse<MemberTypes>(member.Type, out MemberTypes type))
 			{

@@ -21,12 +21,17 @@ namespace Nucleus.ViewFeatures.TagHelpers
 	/// single &lt;MergeScripts&gt; can wrap all of your script elements.  
 	/// </summary>
 	/// <remarks>
-	/// The MergeScriptsTagHelper is implemented within the standard shared _Layout Razor layout and wraps all of the javascript scripts,
-	/// as well as any scripts that you add to the @scripts section.  Under normal circumstances, you should not need to use the 
-	/// MergeScriptsTagHelper in your code.
+	/// The MergeScriptsTagHelper is implemented within the Nucleus shared _Layout Razor layout and wraps all javascript scripts,
+	/// including any scripts that you add by using <see cref="Nucleus.ViewFeatures.HtmlHelpers.AddScriptHtmlHelper.AddScript(IHtmlHelper, string)"/>.  
+	/// Under normal circumstances, you should not need to use the MergeScriptsTagHelper in your code.
 	/// <br/><br/>
 	/// There is no HtmlHelper equivalent for the MergeScriptsTagHelper.
 	/// </remarks>
+	/// <internal>
+	/// The merge scripts tag helper is for internal use.  It is not intended for use by Nucleus extensions.  Extensions should use the AddScript 
+	/// Html helper to add script tags to page output.  Scripts added with <see cref="Nucleus.ViewFeatures.HtmlHelpers.AddScriptHtmlHelper.AddScript(IHtmlHelper, string)"/> are 
+	/// automatically merged, if your site is configured to merge scripts.
+	/// </internal>
 	public class MergeScriptsTagHelper : TagHelper
 	{
 		private const char SEPARATOR_CHAR = ',';

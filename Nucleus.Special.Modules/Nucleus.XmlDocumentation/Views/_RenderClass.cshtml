@@ -15,6 +15,20 @@
 			@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, Model.Content.Summary))
 		</div>
 	}
+	@if (Model.Content.Internal != null)
+	{
+		<div class="alert alert-warning" role="alert">			
+			<h3>Internal Use</h3>
+			@if (Model.Content.Internal.Items?.Any() == true)
+			{
+				@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, Model.Content.Internal))
+			}
+			else
+			{
+				<div>This @(Model.Content.Type== Nucleus.XmlDocumentation.Models.ApiMember.MemberTypes.Interface ? "Interface" : "Class") is marked as internal use only.  Internal use classes are not intended for use by extensions, and backward and forward compatibility is not guaranteed.</div>
+			}
+		</div>
+	}
 	@if (Model.Content.TypeParams?.Any() == true)
 	{
 		<div class="api-typeparameters">

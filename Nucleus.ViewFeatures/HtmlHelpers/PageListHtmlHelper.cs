@@ -30,6 +30,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// The PageList control is used by the admin control panel (page editor and site editor) and requires supporting code in the hosting 
 		/// page and controller.  It will not work standalone.
 		/// </remarks>
+		/// <internal/>
 		public static IHtmlContent PageListFor<TModel, Guid>(this IHtmlHelper<TModel> htmlHelper, Expression<Func<TModel, Guid>> expression, Nucleus.Abstractions.Models.PageMenu pageMenu)
 		{
 

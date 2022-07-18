@@ -696,10 +696,10 @@ ul.nucleus-control-panel-items a
 	overflow: auto;
 }
 
-.nucleus-adminpage .FileBrowser label
+/*.nucleus-adminpage .FileBrowser label
 {
   cursor: pointer;
-}
+}*/
 
 .nucleus-adminpage .Restart
 {

@@ -28,7 +28,7 @@
 			@Html.AreaActionLink("Create Folder", "ShowCreateFolderDialog", "FileSystem", "Admin", new { folderId = Model.Folder.Id }, new { @class = "btn btn-secondary", @data_target = "#nucleus-popupdialog .modal-body" })
 			@if (Model.Folder.Capabilities.CanStoreFiles)
 			{
-				<div class="FileBrowser BrowseFile btn btn-secondary">
+				<div class="btn btn-secondary">
 					<label>
 						<span class="nucleus-material-icon">&#xe2c6</span> Upload File
 						<input type="file" name="mediaFile" class="collapse" formaction="@Url.AreaAction("UploadFile", "FileSystem", "Admin")">

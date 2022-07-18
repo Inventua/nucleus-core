@@ -57,6 +57,7 @@ namespace Nucleus.Abstractions.Models.FileSystem
 		{
 			target.Id = this.Id;
 			target.IncludeInSearch = this.IncludeInSearch;
+			target.Permissions = this.Permissions;
 		}
 	}
 }

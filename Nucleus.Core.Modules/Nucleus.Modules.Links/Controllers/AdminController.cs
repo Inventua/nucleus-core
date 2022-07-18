@@ -58,7 +58,7 @@ namespace Nucleus.Modules.Links.Controllers
 		[HttpPost]
 		public async Task<ActionResult> Editor(ViewModels.Editor viewModel, Guid id, string mode)
 		{
-			return View("Editor", await BuildEditorViewModel(viewModel, id, mode.Equals("standalone", StringComparison.OrdinalIgnoreCase)));
+			return View("Editor", await BuildEditorViewModel(viewModel, id, mode?.Equals("standalone", StringComparison.OrdinalIgnoreCase) == true));
 		}
 
 		[HttpGet]
@@ -231,7 +231,12 @@ namespace Nucleus.Modules.Links.Controllers
 			switch (viewModel.Link.LinkType)
 			{
 				//case Models.LinkTypes.Url:
-				//case Models.LinkTypes.File:
+				case Models.LinkTypes.File:
+					if (viewModel.Link.LinkFile != null)
+					{
+						viewModel.Link.LinkFile.File = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.Link.LinkFile?.File);
+					}
+					break;
 				case Models.LinkTypes.Page:
 					viewModel.PageMenu = (await this.PageManager.GetAdminMenu(this.Context.Site, null, ControllerContext.HttpContext.User, 1, true, false, true));
 					break;

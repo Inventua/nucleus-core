@@ -43,8 +43,18 @@
 				<SettingsControl caption="File" helptext="File">
 					<div class="nucleus-flex-fields nucleus-fileselector">
 						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.Link.LinkFile?.File, propertyName = "Link.LinkFile.File" })
-						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { })
+						
+						@if (Model.Link.LinkFile?.File?.Id != Guid.Empty)
+						{
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.Link.LinkFile?.File?.Parent })
+						}
 					</div>
+					@if (Model.Link.LinkFile?.File?.Id == Guid.Empty)
+					{
+						<div class="nucleus-flex-fields nucleus-fileselector">
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.Link.LinkFile?.File?.Parent })
+						</div>
+					}
 				</SettingsControl>
 				break;
 			case Nucleus.Modules.Links.Models.LinkTypes.Page:

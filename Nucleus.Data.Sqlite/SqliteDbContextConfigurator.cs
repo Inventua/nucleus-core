@@ -73,7 +73,12 @@ namespace Nucleus.Data.Sqlite
 				FolderOptions folderOptions = this.FolderOptions.Value;
 
 				Microsoft.Data.Sqlite.SqliteConnection connection = new(folderOptions.Parse(this.DatabaseConnectionOption.ConnectionString));
-				options.UseSqlite(connection.ConnectionString);
+				options.UseSqlite(connection.ConnectionString, options => 
+				{
+					// Sqlite locks the entire database during a write, so concurrent writes can cause SQLITE_BUSY ("Database is locked").  Entity
+					// framework (actually Microsoft.Data.Sqlite) retries writes automatically until the time frame specified by .CommandTimeout.
+					options.CommandTimeout(30);
+				});
 
 				return true;
 			}
@@ -89,6 +94,8 @@ namespace Nucleus.Data.Sqlite
 		public override void ParseException(DbUpdateException exception)
 		{
 			// This code is inspired by, and uses code from https://github.com/Giorgi/EntityFramework.Exceptions.  https://www.apache.org/licenses/LICENSE-2.0
+			if (exception == null) return;
+			if (exception.InnerException == null) return;
 
 			if (exception.InnerException is Microsoft.Data.Sqlite.SqliteException)
 			{

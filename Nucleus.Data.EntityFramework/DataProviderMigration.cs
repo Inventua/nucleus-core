@@ -399,7 +399,14 @@ namespace Nucleus.Data.EntityFramework
 				{
 					command = command[0..^2];
 				}
+
+				// Allow up to 4 minutes for migration commands, and reset back to the default command timeout after executing
+				int? timeout = this.DbContext.Database.GetCommandTimeout();
+				this.DbContext.Database.SetCommandTimeout(240);
+				
 				this.DbContext.Database.ExecuteSqlRaw(command);
+
+				this.DbContext.Database.SetCommandTimeout(timeout);
 			}
 			catch (Exception ex)
 			{
@@ -439,7 +446,6 @@ namespace Nucleus.Data.EntityFramework
 				}
 			}
 
-
 			IMigrationsSqlGenerator sqlGenerator = this.DbContext.GetInfrastructure().GetService<IMigrationsSqlGenerator>();
 
 			foreach (MigrationCommand migrationCommand in sqlGenerator.Generate(new List<MigrationOperation>() { operation }, null, MigrationsSqlGenerationOptions.NoTransactions))
@@ -447,7 +453,14 @@ namespace Nucleus.Data.EntityFramework
 				try
 				{
 					IRelationalConnection connection = this.DbContext.GetInfrastructure().GetService<Microsoft.EntityFrameworkCore.Storage.IRelationalConnection>();
+
+					// Allow up to 4 minutes for migration commands, and reset back to the default command timeout after executing
+					int? timeout = connection.CommandTimeout;
+					connection.CommandTimeout = 240;
+					
 					migrationCommand.ExecuteNonQuery(connection, null);
+
+					connection.CommandTimeout=timeout;
 				}
 				catch (Exception ex)
 				{

@@ -588,6 +588,12 @@ namespace Nucleus.XmlDocumentation
 				}
 			}
 
+			if (memberIdString.StartsWith("T:Microsoft"))
+			{
+				foundReferenceName = memberIdString.Substring(2);
+				return new System.Uri($"https://docs.microsoft.com/en-us/dotnet/api/{foundReferenceName}");
+			}
+
 			foundReferenceName = null;
 			return null;
 		}

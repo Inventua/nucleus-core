@@ -47,21 +47,38 @@ namespace Nucleus.Modules.Publish.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> Create()
+		public async Task<ActionResult> Create(ViewModels.Editor viewModel)
 		{
 			return View("Editor", await BuildEditorViewModel());
 		}
 
+		/// <summary>
+		/// Initial load for an existing record.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="mode"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// Sets the viewmodel "UseLayout" to _PopupEditor when mode=standalone in order to render a full page.
+		/// </remarks>
 		[HttpGet]
-		[HttpPost]
-		public async Task<ActionResult> Edit(ViewModels.Editor viewModel, Guid id, string mode)
+		public async Task<ActionResult> Edit(Guid id, string mode)
 		{
-			if (mode == "Standalone")
-			{
-				//if (mode == ViewModels.Admin.PageEditor.PageEditorModes.Standalone)				
-				viewModel.UseLayout = "_PopupEditor";				
-			}
-			return View("Editor", await BuildEditorViewModel(viewModel, id));
+			return View("Editor", await BuildEditorViewModel(id, mode?.Equals("standalone", StringComparison.OrdinalIgnoreCase) == true));
+		}
+
+		/// <summary>
+		/// Handles "Postback" of the editor when a user adds an attachment, etc.
+		/// </summary>
+		/// <param name="viewModel"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// This action does NOT set the viewmodel "UseLayout" to _PopupEditor when mode=standalone because we only want a partial page for "postbacks".
+		/// </remarks>
+		[HttpPost]
+		public async Task<ActionResult> Editor(ViewModels.Editor viewModel)
+		{
+			return View("Editor", await BuildEditorViewModel(viewModel));
 		}
 
 		[HttpPost]
@@ -80,7 +97,7 @@ namespace Nucleus.Modules.Publish.Controllers
 		{
 			viewModel.Article.ImageFile.ClearSelection();
 
-			return View("Editor", await BuildEditorViewModel(viewModel, viewModel.Article.Id));
+			return View("Editor", await BuildEditorViewModel(viewModel));
 		}
 
 		[HttpPost]
@@ -129,7 +146,7 @@ namespace Nucleus.Modules.Publish.Controllers
 
 			await this.ArticlesManager.Save(this.Context.Module, viewModel.Article);
 
-			if (viewModel.UseLayout == "_PopupEditor")
+			if (viewModel.Standalone)
 			{
 				return Ok();
 			}
@@ -154,7 +171,7 @@ namespace Nucleus.Modules.Publish.Controllers
 			if (viewModel.SelectedAttachmentFile != null)
 			{
 				viewModel.Article.Attachments.Add(new Models.Attachment() { File = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedAttachmentFile.Id) });
-				viewModel.SelectedAttachmentFile.Path = "";
+				viewModel.SelectedAttachmentFile.ClearSelection();
 			}
 			else
 			{
@@ -162,6 +179,14 @@ namespace Nucleus.Modules.Publish.Controllers
 			}
 
 			return View("Editor", viewModel);
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> SelectAnotherAttachment(ViewModels.Editor viewModel)
+		{
+			viewModel.SelectedAttachmentFile.ClearSelection();
+
+			return View("Editor", await BuildEditorViewModel(viewModel));
 		}
 
 		[HttpPost]
@@ -239,34 +264,45 @@ namespace Nucleus.Modules.Publish.Controllers
 
 		private async Task<ViewModels.Editor> BuildEditorViewModel()
 		{
-			return await BuildEditorViewModel(null, Guid.Empty);
+			ViewModels.Editor viewModel = new();
+			viewModel.Article = await this.ArticlesManager.CreateNew();
+			
+			await GetCategories(viewModel);
+			return viewModel;
 		}
 
-		private async Task<ViewModels.Editor> BuildEditorViewModel(ViewModels.Editor input, Guid id)
+		private async Task<ViewModels.Editor> BuildEditorViewModel(Guid id, Boolean standalone)
 		{
-			ViewModels.Editor viewModel;
-
-			if (input == null)
+			ViewModels.Editor viewModel = new ();
+			if (standalone)
 			{
-				viewModel = new ViewModels.Editor();
+				viewModel.Standalone = true;
+				viewModel.UseLayout = "_PopupEditor";
+			}
+
+			if (id != Guid.Empty)
+			{
+				viewModel.Article = await this.ArticlesManager.Get(this.Context.Site, id);
 			}
 			else
 			{
-				viewModel = input;
+				viewModel.Article = await this.ArticlesManager.CreateNew();
 			}
 
-			if (viewModel.Article == null)
-			{
-				if (id != Guid.Empty)
-				{
-					viewModel.Article = await this.ArticlesManager.Get(this.Context.Site, id);
-				}
-				else
-				{
-					viewModel.Article = await this.ArticlesManager.CreateNew();
-				}
-			}
+			await GetCategories(viewModel);
 
+			return viewModel;
+		}
+
+		private async Task<ViewModels.Editor> BuildEditorViewModel(ViewModels.Editor viewModel)
+		{
+			viewModel.SelectedAttachmentFile = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.SelectedAttachmentFile);
+			await GetCategories(viewModel);
+			return viewModel;
+		}
+
+		private async Task GetCategories(ViewModels.Editor viewModel)
+		{
 			Guid categoryListId = this.Context.Module.ModuleSettings.Get(MODULESETTING_CATEGORYLIST_ID, Guid.Empty);
 			if (categoryListId != Guid.Empty)
 			{
@@ -293,14 +329,11 @@ namespace Nucleus.Modules.Publish.Controllers
 							};
 							selection.IsSelected = false;
 						}
-						
+
 						viewModel.Categories.Add(selection);
 					}
 				}
 			}
-
-			return viewModel;
 		}
-
 	}
 }

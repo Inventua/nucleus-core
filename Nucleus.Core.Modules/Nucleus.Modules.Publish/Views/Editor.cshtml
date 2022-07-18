@@ -9,7 +9,7 @@
 }
 @Html.AddStyle("~!/../settings.css")
 <h2 class="nucleus-modal-caption">Article Settings</h2>
-@using (Html.BeginNucleusForm("Edit", "Admin", "Publish", FormMethod.Post, new { @enctype = "multipart/form-data", @data_target="#ArticleEditor.parent()" }))
+@using (Html.BeginNucleusForm("Editor", "Admin", "Publish", FormMethod.Post, new { @enctype = "multipart/form-data", @data_target = @Model.Standalone ? "form.parent()" : "#ArticleEditor" }))
 {
 	<Tab>
 		<TabItem target="#article-properties" caption="Properties" active="true"></TabItem>
@@ -26,7 +26,7 @@
 				<h2>Article Properties</h2>
 
 				@Html.HiddenFor(model => model.Article.Id)
-				@Html.HiddenFor(Model => Model.UseLayout)
+				@Html.HiddenFor(Model => Model.Standalone)
 	
 				<SettingsControl caption="Title" helptext="Article title.">
 					@Html.TextBoxFor(model => model.Article.Title)
@@ -42,8 +42,8 @@
 					
 				<SettingsControl caption="Image" helptext="Article image.">
 					<div class="nucleus-flex-fields nucleus-fileselector">
-						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.Article.ImageFile, propertyName = "Article.ImageFile", selectAnotherActionName = "SelectAnotherImage", pattern = "(.gif)|(.png)(.jpg)|(.jpeg)|(.bmp)" })
-						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { actionName = "UploadImageFile", Filter = "image/*" })
+						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.Article.ImageFile, propertyName = "Article.ImageFile", selectAnotherActionName = "SelectAnotherImage", pattern = "(.gif|.png|.jpg|.jpeg|.bmp)" })
+						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.Article.ImageFile?.Parent, actionName = "UploadImageFile", Filter = "image/*" })
 					</div>
 				</SettingsControl>
 
@@ -102,9 +102,18 @@
 
 				<SettingsControl caption="Image" helptext="Article image.">
 					<div class="nucleus-flex-fields nucleus-fileselector">
-						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.SelectedAttachmentFile, propertyName = "SelectedAttachmentFile" })
-						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { actionName = "UploadAttachment" })
+						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.SelectedAttachmentFile, propertyName = "SelectedAttachmentFile", selectAnotherActionName = "SelectAnotherAttachment" })
+						@if (Model.SelectedAttachmentFile?.Id != Guid.Empty)
+						{
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.SelectedAttachmentFile?.Parent, actionName = "UploadAttachment" })
+						}
 					</div>
+					@if (Model.SelectedAttachmentFile?.Id == Guid.Empty)
+					{
+						<div class="nucleus-flex-fields nucleus-fileselector">
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.SelectedAttachmentFile?.Parent, actionName = "UploadAttachment" })
+						</div>
+					}						
 				</SettingsControl>
 				@Html.SubmitButton("", "Add Attachment", @Url.NucleusAction("AddAttachment", "Admin", "Publish"), new { })
 
@@ -134,7 +143,7 @@
 	</TabContent>
 	<div class="nucleus-form-buttonrow">
 		<div class="nucleus-form-tools">
-			@Html.SubmitButton("", "Save Article", @Url.NucleusAction("SaveArticle", "Admin", "Publish"), new { })			
+			@Html.SubmitButton("", "Save Article", @Url.NucleusAction("SaveArticle", "Admin", "Publish"), new { @data_target="#ArticleEditor.parent()" })			
 		</div>
 	</div>
 }

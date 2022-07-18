@@ -1,7 +1,7 @@
 ﻿@model Nucleus.ViewFeatures.ViewModels.FileUpload
 @if (Model.Enabled)
 {
-	<span class="BrowseFile btn btn-secondary">
+	<span class="btn btn-secondary ms-auto mt-1">
 		<label>
 			<span class="nucleus-material-icon">&#xe2c6</span> Upload File
 			<input type="file" name="@Model.ControlName" class="collapse" formaction="@Url.NucleusAction(@Model.ActionName, @Model.ControllerName, @Model.AreaName, @Model.ExtensionName)" accept="@Model.Filter" >			
@@ -19,7 +19,7 @@
 }
 else
 {
-	<span class="BrowseFile btn btn-secondary disabled">
+	<span class="btn btn-secondary ms-auto mt-1 disabled">
 		<label>
 			<span class="nucleus-material-icon">&#xe2c6</span> Upload File
 		</label>

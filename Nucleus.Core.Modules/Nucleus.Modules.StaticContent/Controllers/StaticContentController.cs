@@ -96,7 +96,7 @@ namespace Nucleus.Modules.StaticContent.Controllers
 							}
 							else
 							{
-								return new RedirectResult(Url.FileLink(viewModel.DefaultFile), true);
+								return new RedirectResult("~/" + Url.FileLink(viewModel.DefaultFile), true);
 							}
 						}
 

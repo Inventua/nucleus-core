@@ -74,7 +74,7 @@ namespace Nucleus.Modules.Documents.Controllers
 		[HttpPost]
 		public async Task<ActionResult> Edit(ViewModels.Editor viewModel, Guid id, string mode)
 		{
-			if (mode.Equals("standalone", StringComparison.OrdinalIgnoreCase))
+			if (mode?.Equals("standalone", StringComparison.OrdinalIgnoreCase) == true)
 			{
 				viewModel.UseLayout = "_PopupEditor";
 			}
@@ -293,7 +293,7 @@ namespace Nucleus.Modules.Documents.Controllers
 			}
 
 			viewModel.SelectedDocument = input.SelectedDocument;
-
+			viewModel.SelectedDocument.File = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.SelectedDocument.File);
 			viewModel.Categories = (await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(MODULESETTING_CATEGORYLIST_ID, Guid.Empty)))?.Items;
 
 			return viewModel;

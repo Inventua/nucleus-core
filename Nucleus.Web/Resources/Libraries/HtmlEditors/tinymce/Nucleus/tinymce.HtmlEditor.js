@@ -33,6 +33,8 @@
 
       var htmlEditor = tinymce.init({
         target: value,
+        document_base_url: document.baseURI,
+        convert_urls: false,
         height: '100%',
         skin: 'tinymce-5',
         plugins: plugins,

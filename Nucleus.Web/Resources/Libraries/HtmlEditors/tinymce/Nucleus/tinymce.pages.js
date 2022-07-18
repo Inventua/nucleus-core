@@ -42,11 +42,11 @@
 			initialData: {},
 			onSubmit: function (api)
 			{
-				var pageSrc = jQuery('.nucleus-pageselector li > a.selected').attr('data-linkurl');
+				var pageSrc = jQuery('.nucleus-pageselector li.selected > a').attr('data-linkurl');
 				var pageText = editor.selection.getContent({ format: 'text' }); // editor.getRangeText();
 				if (pageText === '')
 				{
-					pageText = jQuery('.nucleus-pageselector li > a.selected').html();
+					pageText = jQuery('.nucleus-pageselector li.selected > a').html();
 				}
 
 				editor.insertContent('<a href="' + pageSrc + '">' + pageText + '</a>');

@@ -24,6 +24,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// The logo control renders an image for the site's selected logo.  If there is no logo configured for the site, nothing is rendered.
 	/// This function is used by the <see cref="HtmlHelpers.LogoHtmlHelper"/> and <see cref="TagHelpers.LogoTagHelper"/>.
 	/// </remarks>
+	/// <internal />
+	/// <hidden />
 	internal static class Logo
 	{
 		internal static async Task<TagBuilder> Build(ViewContext context, string caption, object htmlAttributes)

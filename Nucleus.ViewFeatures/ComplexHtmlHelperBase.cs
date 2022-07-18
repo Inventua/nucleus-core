@@ -9,6 +9,7 @@ namespace Nucleus.ViewFeatures
 	/// <summary>
 	/// The ComplexHtmlHelperBase abstract class is used used internally to provide shared rendering functionality for complex Html Helpers.
 	/// </summary>
+	/// <internal />
 	public abstract class ComplexHtmlHelperBase : IDisposable
 	{
 		internal IHtmlHelper Helper { get; }

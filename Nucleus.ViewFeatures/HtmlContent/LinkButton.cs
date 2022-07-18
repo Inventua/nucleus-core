@@ -26,6 +26,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// <remarks>
 	///
 	/// </remarks>
+	/// <internal />
+	/// <hidden />
 	internal static class LinkButton
 	{
 		internal static TagBuilder Build(ViewContext context, string glyph, string caption, string href, Boolean buttonStyle, object htmlAttributes)

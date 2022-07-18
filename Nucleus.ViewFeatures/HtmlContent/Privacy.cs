@@ -23,6 +23,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// The privacy control renders a link to the site's privacy page.  If there is no privacy page configured for the site, nothing is rendered.
 	/// This function is used by the <see cref="HtmlHelpers.PrivacyHtmlHelper"/> and <see cref="TagHelpers.PrivacyTagHelper"/>.
 	/// </remarks>
+	/// <internal />
+	/// <hidden />
 	internal static class Privacy
 	{
 		internal static async Task<TagBuilder> Build(ViewContext context, string caption, object htmlAttributes)

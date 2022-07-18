@@ -19,25 +19,27 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// <summary>
 	/// 
 	/// </summary>
+	/// <internal />
+	/// <hidden />
 	public class Menu
 	{
 		/// <summary>
-		/// Menu rendering styles
+		/// Menu rendering styles used by the <see cref="TagHelpers.MenuTagHelper"/> and <see cref="HtmlHelpers.MenuHtmlHelper"/>.
 		/// </summary>
 		public enum MenuStyles
 		{
 			/// <summary>
 			/// Drop-down/Flyout style menu
 			/// </summary>
-			DropDown,
+			DropDown = 0,
 			/// <summary>
 			/// Child items rendered horizontally as list blocks
 			/// </summary>
-			RibbonLandscape,
+			RibbonLandscape = 1,
 			/// <summary>
 			/// Child items rendered vertically as list blocks
 			/// </summary>
-			RibbonPortrait,
+			RibbonPortrait = 2,
 		}
 
 		internal static async Task<TagBuilder> Build(ViewContext context, MenuStyles menuStyle, int maxLevels, object htmlAttributes)

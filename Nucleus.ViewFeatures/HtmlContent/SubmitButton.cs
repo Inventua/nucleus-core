@@ -25,6 +25,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// <remarks>
 	///
 	/// </remarks>
+	/// <internal />
+	/// <hidden />
 	internal static class SubmitButton
 	{
 		internal static TagBuilder Build(ViewContext context, string glyph, string caption, string formaction, object htmlAttributes)

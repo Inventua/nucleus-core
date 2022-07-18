@@ -18,6 +18,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// <remarks>
 	/// This function is used by the <see cref="HtmlHelpers.BreadcrumbHtmlHelper"/> and <see cref="TagHelpers.BreadcrumbTagHelper"/>.
 	/// </remarks>
+	/// <internal />
+	/// <hidden />
 	internal static class Breadcrumb
 	{
 		internal static async Task<TagBuilder> Build(ViewContext context, Boolean hideTopLevel, object htmlAttributes)

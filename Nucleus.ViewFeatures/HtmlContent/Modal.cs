@@ -18,6 +18,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// <remarks>
 	///
 	/// </remarks>
+	/// <internal />
+	/// <hidden />
 	internal static class Modal
 	{
 		internal static TagBuilder Build(ViewContext context, string title, Boolean canClose, TagHelperContent content, object htmlAttributes)

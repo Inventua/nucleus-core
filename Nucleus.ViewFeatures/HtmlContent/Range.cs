@@ -15,6 +15,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// <summary>
 	/// Renders a PageMenu control.
 	/// </summary>
+	/// <internal />
+	/// <hidden />
 	internal static class Range
 	{
 		internal static TagBuilder Build(ViewContext context, string propertyId, string propertyName, double min, double max, double step, double value, object htmlAttributes)

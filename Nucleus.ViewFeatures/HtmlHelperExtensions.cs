@@ -11,15 +11,16 @@ namespace Nucleus.ViewFeatures
 	/// <summary>
 	/// Extensions which use the HtmlHelper class.
 	/// </summary>
+	/// <internal />
 	public static class HtmlHelperExtensions
 	{
 		/// <summary>
-		/// Special token used by the AddScript and AddStyle html helpers to represent the path of the currently executing view.
+		/// Special token (~!) used by the AddScript and AddStyle html helpers to represent the path of the currently executing view.
 		/// </summary>
 		public static string VIEWPATH_TOKEN = "~!";
 
 		/// <summary>
-		/// Special token used by the AddScript and AddStyle html helpers to represent the extension path of the currently executing view.
+		/// Special token (~#) used by the AddScript and AddStyle html helpers to represent the extension path of the currently executing view.
 		/// </summary>
 		public static string EXTENSIONPATH_TOKEN = "~#";
 

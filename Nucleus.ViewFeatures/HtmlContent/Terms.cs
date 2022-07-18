@@ -23,6 +23,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// The terms control renders a link to the site's terms of use page.  If there is no terms page configured for the site, nothing is rendered.
 	/// This function is used by the <see cref="HtmlHelpers.TermsHtmlHelper"/> and <see cref="TagHelpers.TermsTagHelper"/>.
 	/// </remarks>
+	/// <internal />
+	/// <hidden />
 	internal static class Terms
 	{
 		internal static async Task<TagBuilder> Build(ViewContext context, string caption, object htmlAttributes)

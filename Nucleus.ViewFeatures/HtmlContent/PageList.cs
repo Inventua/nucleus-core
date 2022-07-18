@@ -16,6 +16,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// <summary>
 	/// Renders a PageMenu control.
 	/// </summary>
+	/// <internal />
+	/// <hidden />
 	internal static class PageList
 	{
 		internal static async Task<TagBuilder> Build(ViewContext context, string propertyId, string propertyName, Guid selectedPageId, Guid? disabledPageId, Nucleus.Abstractions.Models.PageMenu pageMenu, string noSelectionText, object htmlAttributes)

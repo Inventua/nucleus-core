@@ -21,6 +21,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// <remarks>
 	///
 	/// </remarks>
+	/// <internal />
+	/// <hidden />
 	internal static class TabItem
 	{
 		internal static TagBuilder Build(ViewContext context, string target, string caption, Boolean active, object htmlAttributes)

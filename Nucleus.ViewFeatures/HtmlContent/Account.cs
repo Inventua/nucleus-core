@@ -25,6 +25,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// logged in, the account control displays a "Log in" button.  
 	/// This function is used by the <see cref="HtmlHelpers.AccountHtmlHelper"/> and <see cref="TagHelpers.AccountTagHelper"/>.
 	/// </remarks>
+	/// <internal />
+	/// <hidden />
 	internal static class Account
 	{
 		internal static async Task<TagBuilder> Build(ViewContext context, object htmlAttributes)

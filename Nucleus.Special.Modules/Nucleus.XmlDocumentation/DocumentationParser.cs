@@ -131,7 +131,7 @@ namespace Nucleus.XmlDocumentation
 							break;
 					}
 										
-					apiMember.UniqueId = $"{apiMember.Name}" + (apiMember.Params?.Any() == true ? $"({apiMember.Parameters.GetSimpleParameterTypes()})" : "");
+					apiMember.UniqueId = $"{apiMember.Name}" + (apiMember.Params?.Any() == true ? $"({apiMember.Parameters.GetSimpleParameterTypes().Replace(" ", "")})" : "");
 				}
 
 				result.Classes = classes.Values.ToList();

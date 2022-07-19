@@ -9,7 +9,8 @@ using Nucleus.Abstractions.Models.Configuration;
 namespace Nucleus.Abstractions.Models.Cache
 {
 	/// <summary>
-	/// Marker-only interface used so that extensions can add their own cache collections.
+	/// Non-generic interface for the <see cref="CacheCollection{TKey, TModel}"/> class, used when retrieving items from the cache (when the
+	/// full generic type is not known).
 	/// </summary>
 	public interface ICacheCollection 
 	{

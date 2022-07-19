@@ -56,6 +56,8 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		public async Task<Page> Get(Guid id)
 		{
+			if (id == Guid.Empty) return default;
+
 			return await this.CacheManager.PageCache().GetAsync(id, async id =>
 			{
 				using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())

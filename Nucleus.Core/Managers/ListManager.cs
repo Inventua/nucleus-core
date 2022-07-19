@@ -43,6 +43,8 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		public async Task<List> Get(Guid id)
 		{
+			if (id == Guid.Empty) return default;
+
 			return await this.CacheManager.ListCache().GetAsync(id, async id =>
 			{
 				using (IListDataProvider provider = this.DataProviderFactory.CreateProvider<IListDataProvider>())

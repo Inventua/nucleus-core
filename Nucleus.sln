@@ -134,6 +134,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "topics", "topics", "{7E69EF3C-1AB8-44C4-A72F-DE7A761A493C}"
 	ProjectSection(SolutionItems) = preProject
 		Documentation\Developers\topics\authorization.md = Documentation\Developers\topics\authorization.md
+		Documentation\Developers\topics\caching-data.md = Documentation\Developers\topics\caching-data.md
 		Documentation\Developers\topics\database-scripts.md = Documentation\Developers\topics\database-scripts.md
 		Documentation\Developers\topics\Extension-Packaging.md = Documentation\Developers\topics\Extension-Packaging.md
 		Documentation\Developers\topics\razor-views.md = Documentation\Developers\topics\razor-views.md

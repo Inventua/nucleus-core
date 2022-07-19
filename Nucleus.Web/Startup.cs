@@ -22,6 +22,7 @@ using Nucleus.Data.Common;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
 
 namespace Nucleus.Web
 {
@@ -250,6 +251,14 @@ namespace Nucleus.Web
 								if (context.Context.Response.ContentType.StartsWith("text/") && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
 								{
 									context.Context.Response.ContentType += "; charset=utf-8";
+								}
+								if (!context.Context.User.Identity.IsAuthenticated)
+								{
+									context.Context.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+									{
+										Public = true,
+										MaxAge = TimeSpan.FromDays(30)
+									};
 								}
 							}
 						});

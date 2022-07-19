@@ -93,8 +93,6 @@ namespace Nucleus.Abstractions.Models.Cache
 			return result;
 		}
 
-
-
 		/// <summary>
 		/// Get the item from the cache with the specified key.  
 		/// </summary>
@@ -116,16 +114,7 @@ namespace Nucleus.Abstractions.Models.Cache
 			{
 				if (result.Expires >= DateTime.UtcNow)
 				{
-					WeakReference<TModel> item = result.Item;
-					if (item.TryGetTarget(out TModel value))
-					{
-						return value;
-					} 
-					else
-					{
-						Remove(id);
-						return default;
-					}
+					return result.Item;
 				}
 				else
 				{

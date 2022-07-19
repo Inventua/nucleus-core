@@ -10,6 +10,8 @@ namespace Nucleus.Abstractions.Models.Cache
 	/// Represents a cached item, with an expiry date.
 	/// </summary>
 	/// <typeparam name="T">The type of the cached item.</typeparam>	
+	/// <internal/>
+	/// <hidden/>
 	public class CacheItem<T> where T : class
 	{
 		/// <summary>
@@ -20,7 +22,7 @@ namespace Nucleus.Abstractions.Models.Cache
 		/// <summary>
 		/// The cached item.
 		/// </summary>
-		public WeakReference<T> Item { get; }
+		public T Item { get; }
 
 		/// <summary>
 		/// Initialize a new instance of the CacheItem class.  CacheItem instances should be created by the CacheCollection object only. 
@@ -29,7 +31,7 @@ namespace Nucleus.Abstractions.Models.Cache
 		/// <param name="expires"></param>
 		internal CacheItem(T item, DateTime expires)
 		{
-			this.Item = new WeakReference<T>(item);
+			this.Item = item;
 			this.Expires = expires;
 		}
 	}

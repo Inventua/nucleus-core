@@ -12,7 +12,7 @@
 		<SettingsControl caption="Select File" helptext="Select the default file to display.">
 			<div class="nucleus-flex-fields nucleus-fileselector">
 				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.DefaultFile, propertyName = "DefaultFile" })
-				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { })
+				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.DefaultFile?.Parent })
 			</div>
 		</SettingsControl>
 		<div class="Tools">

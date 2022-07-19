@@ -30,7 +30,7 @@ namespace Nucleus.Abstractions.Authentication
 		public const string SYSADMIN_CLAIMTYPE = "urn:nucleus/identity/claims/issystemadministrator";
 
 		/// <summary>
-		/// Nucleus unverified user claim.
+		/// Nucleus unverified user claim Uri.
 		/// </summary>
 		public const string NOT_VERIFIED_CLAIMTYPE = "urn:nucleus/identity/claims/not-verified";
 
@@ -40,8 +40,12 @@ namespace Nucleus.Abstractions.Authentication
 		public const string NOT_APPROVED_CLAIMTYPE = "urn:nucleus/identity/claims/not-approved";
 
 		/// <summary>
-		/// 
+		/// Nucleus user claim Uri used to specify that the user was authenticated using a session cookie.
 		/// </summary>
+		/// <remarks>
+		/// In practise, this claim is used to determine whether a Nucleus user id claim will be present.  When
+		/// a request is received using an Api Key, this claim is not present, and no user id is available.
+		/// </remarks>
 		public const string AUTHENTICATED_BY_COOKIE = "cookie";
 
 

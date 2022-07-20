@@ -127,9 +127,9 @@ namespace Nucleus.Extensions.GoogleAnalytics.Controllers
 
     internal const string SETTING_ANALYTICS_ID = "googleanalytics:id";
 
-    public GoogleAnalyticsController(Context Context, ISiteManager siteManager)
+    public GoogleAnalyticsController(Context context, ISiteManager siteManager)
     {
-      this.Context = Context;
+      this.Context = context;
       this.SiteManager = siteManager;
     }
 

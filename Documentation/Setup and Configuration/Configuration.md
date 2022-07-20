@@ -57,10 +57,11 @@ The `databaseSettings.json` file contains database connection information and sc
   "Nucleus": {
     "Database": {
       "Connections": [
-        // Database connections are available to the core and modules, but must be configured in the Schemas section in order to be used.
+        // Database connections are available to the core and modules, but must be configured in the 
+        // Schemas section in order to be used.
         // Connection Properties:
-        //   Key:               Uniquely identifies the connection.  Can be any value.  This value is used to match schemas to 
-        //                      connections in the Schemas section.
+        //   Key:               Uniquely identifies the connection.  Can be any value.  This value is used 
+        //                      to match schemas to connections in the Schemas section.
         //   Type:              Must match the type string specified by the Nucleus database provider.
         //   ConnectionString:  Is a database provider specific connection string.
         {
@@ -75,11 +76,12 @@ The `databaseSettings.json` file contains database connection information and sc
         }
       ],
       "Schemas": [
-        // In theory, different modules (which define their own schemas) can use different database connections.  In practise,
-        // most modules will use the default connection, which has the name "*".  Enterprise modules which communicate with 
-        // another database may need to use their own connection.  Use the Schema.Name property to define which connection to use 
-        // for each schema.  The special schema name "*" is the default connection used when there isn't a specific connection 
-        // defined for a schema.  ConnectionKey must match one of the Database.Connections.Key values above.
+        // In theory, different modules (which define their own schemas) can use different database 
+        // connections.  In practise, most modules will use the default connection, which has the name "*".  Enterprise 
+        // modules which communicate with another database may need to use their own connection.  Use the Name 
+        // property to define which connection to use for each schema.  The special schema name "*" is the default 
+        // connection used when there isn't a specific connection defined for a schema.  ConnectionKey must match one 
+        of the Database:Connections:Key values above.
         {
           "Name": "*",
           "ConnectionKey": "CoreSqlite"

@@ -38,7 +38,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		public List<string> Signatures { get; private set; }
 
 		/// <summary>
-		/// Specifies whether uploads if the file type are restricted to site administrators.
+		/// Specifies whether uploads of the file type are restricted to site administrators.
 		/// </summary>
 		public Boolean Restricted { get; private set; }
 

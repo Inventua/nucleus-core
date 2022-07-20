@@ -36,10 +36,10 @@ namespace Nucleus.Modules.MultiContent.Controllers
 		private const string MODULESETTING_JUSTIFY = "multicontent:justify";
 		private const string MODULESETTING_ICON = "multicontent:icon";
 
-		public MultiContentController(IWebHostEnvironment webHostEnvironment, Context Context, IPageModuleManager pageModuleManager, IContentManager contentManager)
+		public MultiContentController(IWebHostEnvironment webHostEnvironment, Context context, IPageModuleManager pageModuleManager, IContentManager contentManager)
 		{
 			this.WebHostEnvironment = webHostEnvironment;
-			this.Context = Context;
+			this.Context = context;
 			this.PageModuleManager = pageModuleManager;
 			this.ContentManager = contentManager;
 		}

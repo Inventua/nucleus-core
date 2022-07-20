@@ -155,7 +155,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				TagBuilder toggleLinkBuilder = new("button");
 				toggleLinkBuilder.AddCssClass("dropdown-toggle nav-link d-inline-flex btn btn-none");
 				toggleLinkBuilder.Attributes.Add("type", "button");
-				toggleLinkBuilder.Attributes.Add("title", "open");
+				toggleLinkBuilder.Attributes.Add("title", "Open");
 				toggleLinkBuilder.Attributes.Add("role", "button");
 				toggleLinkBuilder.Attributes.Add("aria-expanded", "false");
 				toggleLinkBuilder.Attributes.Add("tabindex", "0");

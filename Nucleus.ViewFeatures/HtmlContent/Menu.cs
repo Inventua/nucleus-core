@@ -123,7 +123,9 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 		private static string GenerateControlId(Page page)
 		{
-			return System.Text.RegularExpressions.Regex.Replace(page.Name.Replace(" ", "-"), @"([^0-9A-Za-z\.\-_])", "").ToLower();
+			PageRoute route = page.DefaultPageRoute();
+			if (route?.Path == null) return "";
+			return System.Text.RegularExpressions.Regex.Replace(route.Path.Replace(" ", "-"), @"([^0-9A-Za-z\.\-_])", "").ToLower();
 		}
 
 		private static TagBuilder RenderDropDownItem(MenuStyles menuStyle, PageMenu childItem, IUrlHelper urlHelper, int thisLevel, int maxLevels, Boolean renderChildren)

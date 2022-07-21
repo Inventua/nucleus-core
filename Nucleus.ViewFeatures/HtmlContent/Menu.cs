@@ -121,9 +121,16 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			}
 		}
 
+		private static string GenerateControlId(Page page)
+		{
+			return System.Text.RegularExpressions.Regex.Replace(page.Name.Replace(" ", "-"), @"([^0-9A-Za-z\.\-_])", "").ToLower();
+		}
+
 		private static TagBuilder RenderDropDownItem(MenuStyles menuStyle, PageMenu childItem, IUrlHelper urlHelper, int thisLevel, int maxLevels, Boolean renderChildren)
 		{
 			TagBuilder itemBuilder = new("li");
+
+			itemBuilder.Attributes.Add("id", GenerateControlId(childItem.Page));
 
 			if (renderChildren)
 			{
@@ -182,7 +189,9 @@ namespace Nucleus.ViewFeatures.HtmlContent
 		{
 			string caption = String.IsNullOrWhiteSpace(childItem.Page.Title) ? childItem.Page.Name : childItem.Page.Title;
 			TagBuilder itemBuilder = new("li");
-		
+
+			itemBuilder.Attributes.Add("id", GenerateControlId(childItem.Page));
+
 			TagBuilder linkBuilder = BuildLinkElement(childItem, urlHelper);
 
 			if (thisLevel != 0)
@@ -200,7 +209,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 		private static TagBuilder BuildLinkElement(PageMenu childItem, IUrlHelper urlHelper)
 		{
 			TagBuilder linkBuilder;
-			
+
 			if (!childItem.Page.DisableInMenu)
 			{
 				PageRoute defaultRoute = childItem.Page.DefaultPageRoute();

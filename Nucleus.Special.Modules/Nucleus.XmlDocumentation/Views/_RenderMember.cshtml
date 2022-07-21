@@ -64,7 +64,7 @@
 						}
 						else
 						{
-							<div>This @(member.Type.ToString()) is marked as internal use only.  Internal use members are not intended for use by extensions, and backward and forward compatibility is not guaranteed.</div>
+							<div>This @(member.Type.ToString().ToLower()) is marked as internal use only.  Internal use members are not intended for use by extensions, and backward and forward compatibility is not guaranteed.</div>
 						}
 					</div>
 				}

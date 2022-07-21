@@ -11,9 +11,10 @@ namespace Nucleus.Abstractions
 	/// Attribute used to specify the extension name for a Nucleus extension.
 	/// </summary>
 	/// <remarks>
+	/// Add the ExtensionAttribute to your Nucleus extension controller classes.  This class is used to add an additional route key for asp.net/MVC routing.
 	/// The name that you supply in the constructor name parameter is used when building routes to your extension controller actions.
 	/// </remarks>
-	/// <seealso href="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing?view=aspnetcore-5.0">Routing in ASP.NET Core</seealso>
+	/// <seealso href="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/routing">Routing in ASP.NET Core</seealso>
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
 	public class ExtensionAttribute : RouteValueAttribute
 	{

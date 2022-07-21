@@ -12,6 +12,9 @@ namespace Nucleus.Abstractions.Managers
 	/// <summary>
 	/// Defines the interface for the scheduled task manager.
 	/// </summary>
+	/// <remarks>
+	/// Get an instance of this class from dependency injection by including a parameter in your class constructor.
+	/// </remarks>
 	public interface IScheduledTaskManager
 	{
 		/// <summary>

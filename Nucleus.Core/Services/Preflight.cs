@@ -13,6 +13,7 @@ namespace Nucleus.Core.Services
 	/// <summary>
 	/// Class used to execute validation steps for the Nucleus environment.
 	/// </summary>
+	/// <internal>This is an internal class used by the setup wizard.</internal>
 	public class Preflight : IPreflight
 	{
 		private IWebHostEnvironment WebHostEnvironment { get; }

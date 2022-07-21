@@ -10,6 +10,9 @@ namespace Nucleus.Abstractions.Managers
 	/// <summary>
 	/// Provides functions to manage database data for <see cref="Nucleus.Abstractions.Models.List"/>s.
 	/// </summary>
+	/// <remarks>
+	/// Get an instance of this class from dependency injection by including a parameter in your class constructor.
+	/// </remarks>
 	public interface IListManager
 	{
 		/// <summary>

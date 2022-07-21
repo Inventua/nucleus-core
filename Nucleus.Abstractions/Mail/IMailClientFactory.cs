@@ -21,7 +21,8 @@ namespace Nucleus.Abstractions.Mail
 		/// <param name="site"></param>
 		/// <returns></returns>
 		/// <remarks>
-		/// This constructor is for use by code which is not running in the context of a Http request, such as a scheduled task.
+		/// This constructor is for use by code which is not running in the context of a Http request, such as a scheduled task.  For
+		/// other uses, get an instance of this class from dependency injection by including a parameter in your class constructor.
 		/// </remarks>
 
 		public IMailClient Create(Site site);

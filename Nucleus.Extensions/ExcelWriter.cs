@@ -10,14 +10,14 @@ using System.Reflection;
 namespace Nucleus.Extensions
 {
 	/// <summary>
-	/// 
+	/// Class used to write (export) an Excel file from an IEnumerable of the class specified by <typeparamref name="TModel"/>.
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	public class ExcelWriter<T> : ExcelWriter
+	/// <typeparam name="TModel">Type being exported.</typeparam>
+	public class ExcelWriter<TModel> : ExcelWriter
 	{
 		/// <summary>
-		/// Used as a constructor parameter, specifies whether to auto-detect columns to export and specify any columns to exclude, or whether to 
-		/// include only specified columns.
+		/// Enumeration used by the <see cref="ExcelWriter{TModel}"/> constructor to specify whether the properties to export are 
+		/// automatically detected, or whether only specified columns are included.
 		/// </summary>
 		public enum Modes
 		{
@@ -33,21 +33,26 @@ namespace Nucleus.Extensions
 		}
 
 		/// <summary>
-		/// Use this constructor if you want to set up columns manually using the AddColumn/AddColumns methods.
+		/// Use this constructor if you want to set up columns manually using the <see cref="ExcelWriter.AddColumn(PropertyInfo)"/> method.
 		/// </summary>
 		public ExcelWriter() : this(Modes.IncludeSpecifiedPropertiesOnly, Array.Empty<string>()) { }
-		
+
 		/// <summary>
 		/// Use this constructor to automatically set up columns.
 		/// </summary>
-		/// <param name="mode">Specifies whether to include the properties in the properies argument or exclude them.</param>
+		/// <param name="mode">Specifies whether to include or exclude the properties in the properies argument.</param>
 		/// <param name="properties"></param>
+		/// <remarks>
+		/// When <paramref name="mode"/> is <see cref="Modes.AutoDetect"/>, all properties of <typeparamref name="TModel"/> are automatically included 
+		/// in the output, except for those listed in <paramref name="properties"/>.  When <paramref name="mode"/> is <see cref="Modes.IncludeSpecifiedPropertiesOnly"/>,
+		/// only the properties listed in <paramref name="properties"/> are included in the output.
+		/// </remarks>
 		public ExcelWriter(Modes mode, params string[] properties)
 		{
 			base.Workbook = new XLWorkbook();
-			base.Worksheet = base.Workbook.Worksheets.Add(typeof(T).Name);
+			base.Worksheet = base.Workbook.Worksheets.Add(typeof(TModel).Name);
 
-			PropertyInfo[] typeProperties = typeof(T).GetProperties();
+			PropertyInfo[] typeProperties = typeof(TModel).GetProperties();
 
 			if (mode == Modes.IncludeSpecifiedPropertiesOnly)
 			{
@@ -57,13 +62,13 @@ namespace Nucleus.Extensions
 					PropertyInfo prop = typeProperties.Where(prop => prop.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 					if (prop == null)
 					{
-						throw new ArgumentException($"'{propertyName}' is not a property of the '{typeof(T).Name}' class.");
+						throw new ArgumentException($"'{propertyName}' is not a property of the '{typeof(TModel).Name}' class.");
 					}
 					else
 					{
 						if (!prop.CanRead)
 						{
-							throw new ArgumentException($"'{typeof(T).Name}.{propertyName}' is not a readable property.");
+							throw new ArgumentException($"'{typeof(TModel).Name}.{propertyName}' is not a readable property.");
 						}
 						else
 						{
@@ -90,7 +95,7 @@ namespace Nucleus.Extensions
 		/// </summary>
 		/// <param name="expression"></param>
 		/// <returns></returns>
-		public WorksheetColumn AddColumn<TType>(Expression<Func<T, TType>> expression)
+		public WorksheetColumn AddColumn<TType>(Expression<Func<TModel, TType>> expression)
 		{
 			var memberExpression = expression.Body as MemberExpression;
 			if (memberExpression == null)
@@ -114,7 +119,7 @@ namespace Nucleus.Extensions
 		/// <param name="dataType"></param>
 		/// <param name="expression"></param>
 		/// <returns></returns>
-		public WorksheetColumn AddColumn<TValue>(string name, string caption, XLDataType dataType, Expression<Func<T, TValue>> expression)
+		public WorksheetColumn AddColumn<TValue>(string name, string caption, XLDataType dataType, Expression<Func<TModel, TValue>> expression)
 		{
 			WorksheetColumn result = new(name, caption, dataType, expression);
 			this.WorksheetColumns.Add(result);
@@ -145,11 +150,11 @@ namespace Nucleus.Extensions
 		/// </summary>
 		/// <param name="items"></param>
 		/// <returns></returns>
-		public void Export(IEnumerable<T> items)
+		public void Export(IEnumerable<TModel> items)
 		{
 			base.WriteHeadingRow();
 
-			foreach (T item in items)
+			foreach (TModel item in items)
 			{
 				List<object> values = new();
 				foreach (WorksheetColumn column in base.WorksheetColumns)
@@ -167,7 +172,7 @@ namespace Nucleus.Extensions
 					}
 					else if (column.PropertyInfo == null)
 					{
-						values.Add(typeof(T).GetProperty(column.Name).GetValue(item, null));
+						values.Add(typeof(TModel).GetProperty(column.Name).GetValue(item, null));
 					}
 					else
 					{
@@ -216,7 +221,7 @@ namespace Nucleus.Extensions
 		public ExcelWriter() { }
 
 		/// <summary>
-		/// Use this constructor if you want to create columns and output rows manually.  The generic Exporter&lt;T&gt; class
+		/// Use this constructor if you want to create columns and output rows manually.  The generic <see cref="ExcelWriter{TModel}"/> class
 		/// can auto-detect columns.
 		/// </summary>
 		/// <param name="worksheet"></param>

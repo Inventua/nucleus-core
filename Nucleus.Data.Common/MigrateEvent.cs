@@ -13,7 +13,7 @@ namespace Nucleus.Data.Common
 	public class MigrateEvent { }
 
 	/// <summary>
-	/// Event data for a successful migrate (script execution) event
+	/// Event data for a successful migrate (script execution) event.
 	/// </summary>
 	public class MigrateEventArgs
 	{
@@ -23,7 +23,7 @@ namespace Nucleus.Data.Common
 		public string SchemaName { get; }
 
 		/// <summary>
-		/// File name of the script file which was execited/
+		/// File name of the script file which was executed.
 		/// </summary>
 		public string FileName { get; }
 

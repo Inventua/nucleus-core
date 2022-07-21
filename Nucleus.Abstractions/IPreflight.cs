@@ -9,12 +9,15 @@ namespace Nucleus.Abstractions
 	/// <summary>
 	/// Class used to execute validation steps for the Nucleus environment.
 	/// </summary>
+	/// <internal>This class is an internal-use class, used by the setup wizard.</internal>
+	/// <hidden/>
 	public interface IPreflight
 	{
-
 		/// <summary>
-		/// Result status type
+		/// Result status type used by the <see cref="IPreflight"/> interface.
 		/// </summary>
+		/// <internal/>
+		/// <hidden/>
 		public enum Status
 		{
 			/// <summary>
@@ -38,8 +41,10 @@ namespace Nucleus.Abstractions
 		public ValidationResults Validate();
 
 		/// <summary>
-		/// Class used to represent pre-flight validation results 
+		/// Class used by the <see cref="IPreflight"/> interface to represent pre-flight validation results.
 		/// </summary>
+		/// <internal/>
+		/// <hidden/>
 		public class ValidationResults : List<ValidationResult>
 		{
 			/// <summary>
@@ -61,10 +66,11 @@ namespace Nucleus.Abstractions
 			}
 		}
 
-
 		/// <summary>
-		/// Class used to represent the result of each pre-flight validation step.
+		/// Class used by the <see cref="IPreflight"/> interface to represent the result of each pre-flight validation step.
 		/// </summary>
+		/// <internal/>
+		/// <hidden/>
 		public class ValidationResult
 		{
 			/// <summary>

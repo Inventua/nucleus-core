@@ -13,6 +13,7 @@ namespace Nucleus.Abstractions.Managers
 	/// <remarks>
 	/// Modules can store their content (Html, or another format) using the container manager.  For example, the TextHtml and MultiContent
 	/// modules use the content manager to save and retrieve their content, instead of using their own database tables.
+	/// Get an instance of this class from dependency injection by including a parameter in your class constructor.
 	/// </remarks>
 	public interface IContentManager
 	{

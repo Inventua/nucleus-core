@@ -13,6 +13,8 @@ namespace Nucleus.Abstractions.Layout
 	/// <remarks>
 	/// The container controller is used to render a container.  
 	/// </remarks>
+	/// <internal/>
+	/// <hidden/>
 	public interface IContainerController 
 	{
 		/// <summary>

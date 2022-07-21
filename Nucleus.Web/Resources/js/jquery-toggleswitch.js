@@ -1,4 +1,4 @@
-﻿/*! jquery-toggleswitch | Provides a toggle swtich in place of a checkbox, part of Nucleus CMS.  (c) Inventua Pty Ptd.  www.nucleus-cms.com */
+﻿/*! jquery-toggleswitch | Provides a toggle switch in place of a checkbox, part of Nucleus CMS.  (c) Inventua Pty Ptd.  www.nucleus-cms.com */
 (function ($)
 {
   jQuery.fn.ToggleSwitch = function (conf)

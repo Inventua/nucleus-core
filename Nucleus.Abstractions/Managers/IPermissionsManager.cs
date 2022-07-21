@@ -10,6 +10,9 @@ namespace Nucleus.Abstractions.Managers
 	/// <summary>
 	/// Defines the interface for the permissions manager.
 	/// </summary>
+	/// <remarks>
+	/// Get an instance of this class from dependency injection by including a parameter in your class constructor.
+	/// </remarks>
 	public interface IPermissionsManager
 	{
 		/// <summary>

@@ -8,9 +8,9 @@ namespace Nucleus.Abstractions.EventHandlers
 {
 	/// <summary>
 	/// System event handler abstract class.  Event handlers implement this class, and are added to the
-	/// dependency injection services collection with a call to services.AddTransient.
+	/// dependency injection services collection with a call to <see href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.servicecollectionserviceextensions.addtransient#microsoft-extensions-dependencyinjection-servicecollectionserviceextensions-addtransient(microsoft-extensions-dependencyinjection-iservicecollection-system-type)">AddTransient</see>.
 	/// </summary>
-	/// <typeparam name="TModel">The type of the data item which the event is for.  This can be any type.</typeparam>
+	/// <typeparam name="TModel">The type of the data item which the event is for.  This can be any type and is the object type which is passed to the Invoke method.</typeparam>
 	/// <typeparam name="TEvent">
 	/// The type of the event.  This can be any class.  The TEvent class is used to couple the subscription and 
 	/// ISystemEventHandler implementation to a specific type of event.  The TEvent type does not require any particular

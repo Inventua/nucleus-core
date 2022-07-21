@@ -11,6 +11,7 @@ namespace Nucleus.Abstractions.Managers
 	/// <summary>
 	/// Provides management functions for extensions.
 	/// </summary>
+	/// <internal/>
 	public interface IExtensionManager
 	{
 		/// <summary>

@@ -14,6 +14,7 @@ namespace Nucleus.Abstractions.Layout
 	/// <remarks>
 	/// This class is the Model passed into all Nucleus containers (which are implemented in Razor).
 	/// </remarks>
+	/// <internal/>
 	public class ContainerContext : Context
 	{
 		//// <summary>

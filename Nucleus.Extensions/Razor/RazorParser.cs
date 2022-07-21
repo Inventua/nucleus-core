@@ -19,28 +19,28 @@ namespace Nucleus.Extensions.Razor
 		private readonly static string[] UsingNamespaces = { "System" ,"System.Collections.Generic", "System.Linq", "System.Text", "Nucleus.Extensions", "Nucleus.Abstractions", "Nucleus.Abstractions.Models" };
 
 		/// <summary>
-		/// Compile and execute the template, using the supplied model as input.
+		/// Compile and execute the specified template, using the supplied model as input.
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="template"></param>
+		/// <typeparam name="TModel"></typeparam>
+		/// <param name="template">Razor-language template.</param>
 		/// <param name="model"></param>
 		/// <returns></returns>
-		public static async Task<string> Parse<T>(string template, T model)
-			where T : class
+		public static async Task<string> Parse<TModel>(string template, TModel model)
+			where TModel : class
 		{
 			IRazorEngine engine = new RazorEngine();
-			IRazorEngineCompiledTemplate<RazorEngineTemplate<T>> compiledTemplate = null;
+			IRazorEngineCompiledTemplate<RazorEngineTemplate<TModel>> compiledTemplate = null;
 			
-			string templateKey = typeof(T).FullName + Hash(template);
+			string templateKey = typeof(TModel).FullName + Hash(template);
 
 			if (CompiledTemplateCache.TryGetValue(templateKey, out object cachedTemplate))
 			{
-				compiledTemplate = cachedTemplate as IRazorEngineCompiledTemplate<RazorEngineTemplate<T>>;
+				compiledTemplate = cachedTemplate as IRazorEngineCompiledTemplate<RazorEngineTemplate<TModel>>;
 			}
 			
 			if (compiledTemplate == null)
 			{
-				compiledTemplate = await engine.CompileAsync<RazorEngineTemplate<T>>(template, BuildRazorOptions);
+				compiledTemplate = await engine.CompileAsync<RazorEngineTemplate<TModel>>(template, BuildRazorOptions);
 				CompiledTemplateCache.Add(templateKey, compiledTemplate);
 			}
 
@@ -53,7 +53,7 @@ namespace Nucleus.Extensions.Razor
 		/// <summary>
 		/// Test-compile the template, throwing an exception on error.
 		/// </summary>
-		/// <param name="template"></param>
+		/// <param name="template">Razor-language template.</param>
 		/// <returns></returns>
 		public static async Task<TestCompileResult> TestCompile(string template)
 		{

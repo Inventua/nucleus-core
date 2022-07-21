@@ -12,7 +12,7 @@ namespace Nucleus.Abstractions.Managers
 	///  Defines the interface for the session manager.
 	/// </summary>
 	/// <remarks>
-	/// User sessions are not cached.  This allows us to immediately log a user out, if required.
+	/// Get an instance of this class from dependency injection by including a parameter in your class constructor.
 	/// </remarks>
 	public interface ISessionManager
 	{

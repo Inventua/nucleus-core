@@ -10,7 +10,7 @@ can use Api Keys to authenticate applications which use their functionality.
 ## Properties
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
-| ID                               | The Api Key ID is the "access key"
+| ID                               | The Api Key ID is the "access key" |
 | Name                             | The name for the Api Key, used for your reference only.  |
 | Notes                            | Your notes for the Api Key.  You can add information on who the key was assigned to, it's intended use and any other information that you require.  Notes are displayed in the Api Key editor only.  |
 | Secret                           | The secret is an auto-generated string, which is shared with the user of an Api Key, and is used to create an Authentication token.  |
@@ -20,4 +20,4 @@ can use Api Keys to authenticate applications which use their functionality.
 ### Making a request using an Api Key
 Applications which make Http requests to Nucleus must specify an Authorization header, with a "scheme" of `Nucleus-HMAC256` and a value which is generated using 
 values from the request and the shared secret.  The `Nucleus.Extensions.HttpRequestExtensions` contains a `.Sign` method which will add the header to a Http Request 
-object.  Applications which do not want to reference the `Nucleus.Extensions` assembly can copy the source code into their project.
+object.  Applications which do not want to reference the `Nucleus.Extensions` assembly can copy the [source code](https://github.com/Inventua/nucleus-core/blob/main/Nucleus.Extensions/HttpRequestExtensions.cs) into their project.

@@ -6,46 +6,85 @@ loads configuration settings.
 > The default `appSettings.json` file contains a full set of available configuration settings (some are commented out), which 
 you should use as a reference for the file format.
 
-## About this page
-When configuration settings are read from .json files, they are part of a hierachy that begins with a `"Nucleus"` 
-element.  In this document, configuration items are specified using the `:` character to represent child elements.  For
-example, this configuration section would be represented as `Nucleus:ResourceFileOptions` and the `UseMinifiedJs` property
-would be represented as `Nucleus:ResourceFileOptions:UseMinifiedJs`.  
+> When Nucleus configuration settings are read from .json files, they are part of a hierachy that begins with a `"Nucleus"` 
+element.  In this document, configuration sections and items are specified using the `:` character to represent the hierachy 
+of configuration elements.  The configuration section in the example below would be represented as `Nucleus:ResourceFileOptions` and 
+the `UseMinifiedJs` property would be represented as `Nucleus:ResourceFileOptions:UseMinifiedJs`.  This is also how the .Net core
+configuration system 
 ```
 "Nucleus": {
     "ResourceFileOptions": {
-      "UseMinifiedJs": true
+      "UseMinifiedJs": true    // We would refer to this as Nucleus:ResourceFileOptions:UseMinifiedJs
     }
   }
 ```
 
 ## Configuration Settings
 
+> This page contains information on Nucleus-specific settings only, which reside within the `"Nucleus"` section of your 
+configuration files.  ASP.NET Core and third party components have their own configuration settings, and they may also be 
+present in your configuration files, but are not documented here.
+
 ### Nucleus
 General top-level settings.
+
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
-| EnableResponseCompression        | (Boolean) .  Default is true. | 
-| EnableForwardedHeaders           | (Boolean) .  Default is true. | 
-| MaxRequestSize                   | (long). Specifies the maximum MultipartBodyLengthLimit and IIS MaxRequestBodySize in bytes.  This value must be set high enough for the largest file upload that you want to allow.  If not specified, the .net core defaults (128mb and 28.6mb) will be used. | 
+| EnableResponseCompression        | (Boolean)  Default is true. | 
+| EnableForwardedHeaders           | (Boolean)  Default is true. | 
+| MaxRequestSize                   | (long) Specifies the maximum [MultipartBodyLengthLimit](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.features.formoptions.multipartbodylengthlimit) and [MaxRequestBodySize](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.server.kestrel.core.kestrelserverlimits.maxrequestbodysize) in bytes.  This value must be set high enough for the largest file upload that you want to allow.  If not specified, the .net core defaults are used. | 
+
+```
+"Nucleus": 
+{
+  "EnableResponseCompression": true,
+  "EnableForwardedHeaders": true,
+  "MaxRequestSize": 67108864
+  ...
+}
+```
 
 ### Nucleus:FolderOptions
+
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | DataFolder                       | (String) Specifies the name of the root folder that Nucleus uses to store files on the file system.  | 
 
+```
+"Nucleus": 
+{
+  "FolderOptions": 
+  {
+    "DataFolder": "%ProgramData%/Nucleus"
+  }
+  ...
+}
+```
+
 > The DataFolder setting can contain environment variables like `%ProgramData%`, which are resolved at run time.
 
-> `Nucleus:FolderOptions:DataFolder` is not the path that file-based database providers (Sqlite) uses to store database files.  Database files are 
-stored in a `/Data` subfolder of the folder specified by `Nucleus:FolderOptions:DataFolder`.
+> File-based database providers (Sqlite) store database files in a `/Data` subfolder of the folder specified by `Nucleus:FolderOptions:DataFolder`.
 
 ### Nucleus:TextFileLoggerOptions
+
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Path                             | (String) Specifies the name of the folder that the Nucleus text file logger uses to store log files on the file system.  By default, this value is the `Logs` subfolder of the folder specified by `Nucleus:FolderOptions:DataFolder`. | 
 
+```
+"Nucleus": 
+{
+  "TextFileLoggerOptions": 
+  {
+  "Path": "{DataFolder}/Logs"
+  }
+  ...
+}
+```
+
 ### Nucleus:ResourceFileOptions
 Controls use of minified and merged javascript and css stylesheets.  Developers may want to set these values to false in order to more easily debug client-side javascript and css. 
+
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | UseMinifiedJs                    | (Boolean) Specifies whether to use minified versions of .js files, when they are available.  Default value is true.  | 
@@ -53,9 +92,24 @@ Controls use of minified and merged javascript and css stylesheets.  Developers 
 | MergeJs                          | (Boolean) Specifies whether to merge .js files into a single file.  Default value is true. | 
 | MergeCss                         | (Boolean) Specifies whether to merge .css files into a single file.  Default value is true. | 
 
+```
+"Nucleus": 
+{
+  "ResourceFileOptions": 
+  {
+    "UseMinifiedJs": true,
+    "UseMinifiedCss": true,
+    "MergeJs": true,
+    "MergeCss": true
+  }
+  ...   
+}
+```
+
 ### Nucleus:HtmlEditor
 Specifies stylesheets and script files used by the Html editor.  More than one Html editor can be included, but only one can be selected.  This 
 section is automatically present in the default appSettings.config file, and users generally do not need to edit this section.
+
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Default                          | (String) Specifies the `Key` of the Html Editor that is in use.  This value does not have a default.  | 
@@ -63,6 +117,7 @@ section is automatically present in the default appSettings.config file, and use
 
 #### Nucleus:HtmlEditor[n]
 Each HtmlEditor has properties:
+
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Key                              | (String) Unique identifier for the Html Editor configuration section.  | 
@@ -70,6 +125,7 @@ Each HtmlEditor has properties:
 
 #### Nucleus:HtmlEditor[n]:Scripts[n]
 Each scripts section has properties:
+
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Type                             | (String) javascript or stylesheet.  | 
@@ -96,16 +152,21 @@ file types.
 | Restricted                       | (Boolean). Specifies whether uploads of the file type are restricted to site administrators.| 
 
 ```
-"FileSystems": {
-  "AllowedFileTypes": [
+"Nucleus": 
+{
+  "FileSystems": 
   {
-    "FileExtensions": [ ".jpg", ".jpeg" ],
-    "Signatures": [ "FFD8FFE0", "FFD8FFE1", "FFD8FFE2", "FFD8FFE3" ]
-  },
-  {
-    ...
+    "AllowedFileTypes": 
+    [
+      {
+        "FileExtensions": [ ".jpg", ".jpeg" ],
+        "Signatures": [ "FFD8FFE0", "FFD8FFE1", "FFD8FFE2", "FFD8FFE3" ]
+      },
+      {
+        ...
+      }
+    ]
   }
-  ]
 }
 ```
     
@@ -123,14 +184,21 @@ The `Nucleus:FileSystems:Providers` element is an array of file system provider 
 | ProviderType                     | (String). Assembly-qualified class name for the file system provider. | 
 
 ```
-"FileSystems": {
-  "Providers": [
+"Nucleus": 
+{
+  "FileSystems": 
   {
-    "Key": "local",
-    "Name": "Local File System",
-    "ProviderType": "Nucleus.Core.FileSystemProviders.LocalFileSystemProvider,Nucleus.Core"
+    "Providers": 
+    [
+      {
+        "Key": "local",
+        "Name": "Local File System",
+        "ProviderType": "Nucleus.Core.FileSystemProviders.LocalFileSystemProvider,Nucleus.Core"
+      }
+    ]
   }
-]
+  ...
+}
 ```
 
 ### Nucleus:FileSystems:PasswordOptions
@@ -144,6 +212,27 @@ Specifies authentication and password settings.
 | PasswordResetTokenExpiry         | (Timespan). Specifies the time span after which a password reset token expires.  Password reset tokens are sent to the user when they request a password reset.  Default value is 02:00:00 (2 hours). | 
 | PasswordComplexityRules          | (array). Array of password complexity rules. | 
 
+```
+"Nucleus": 
+{
+  "PasswordOptions": 
+  {
+    "FailedPasswordWindowTimeout": "0:15:00",
+    "FailedPasswordMaxAttempts": 3,
+    "FailedPasswordLockoutReset": "0:10:00",
+    "PasswordResetTokenExpiry": "02:00:00",   
+    "PasswordComplexityRules": 
+    [
+      {
+        "Pattern": "^(?=.*[A-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[\\\\!\\@\\#\\$\\%\\^\\&\\*\\(\\)\\[\\]])\\S{8,}$",
+        "Message": "Passwords must contain at least one upper case character, at least one lower case character, at least one number, at least one symbol and must be at least 8 characters long."
+      }
+    ]
+  }
+  ...
+}
+```
+
 ### Nucleus:FileSystems:PasswordOptions:PasswordComplexityRules
 Password complexity rules are regular expressions.  You can specify multiple password complexity rules and all of them must succeed (match) in order for a password to be valid.  
 
@@ -151,14 +240,6 @@ Password complexity rules are regular expressions.  You can specify multiple pas
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Pattern                          | (String) Regular expression which passwords must match in order to be valid.  | 
 | Message                          | (String) Error message when the pattern does not match the entered password. | 
-
-```
-"PasswordComplexityRules": [
-{
-  "Pattern": "^(?=.*[A-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[\\\\!\\@\\#\\$\\%\\^\\&\\*\\(\\)\\[\\]])\\S{8,}$",
-  "Message": "Passwords must contain at least one upper case character, at least one lower case character, at least one number, at least one symbol and must be at least 8 characters long."
-}]
-```
 
 ### Nucleus:ClaimTypeOptions
 Default available claim types.  User profile properties always have a claim type, specified by Uri.  If the site administrator configures a user profile property with a 
@@ -175,18 +256,25 @@ The `Nucleus:ClaimTypeOptions` element contains a "Types" element, which is an a
 | IsSiteDefault                    | (Boolean) If set to true, new sites will automatically have a user profile property added for the claim.  Default is false. | 
 
 ```
-"ClaimTypeOptions":
-  "Types": [
+"Nucleus": 
+{
+  "ClaimTypeOptions":
   {
-    "DefaultName": "First Name",
-    "Uri": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"
-  },
-  {
-    "DefaultName": "Mobile Phone",
-    "Uri": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone",
-    "InputType": "tel",
-    "IsSiteDefault": true
-  }]
+    "Types": 
+    [
+      {
+        "DefaultName": "First Name",
+        "Uri": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"
+      },
+      {
+        "DefaultName": "Mobile Phone",
+        "Uri": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone",
+        "InputType": "tel",
+        "IsSiteDefault": true
+      }
+    ]
+    }
+}
 ```
 
 ### Nucleus:CacheOptions

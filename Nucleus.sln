@@ -142,6 +142,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "topics", "topics", "{7E69EF
 		Documentation\Developers\topics\saving-settings.md = Documentation\Developers\topics\saving-settings.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reference", "Reference", "{487444E1-B18B-458A-81D7-6AADAFCAB951}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Reference\Configuration-Reference.md = Documentation\Reference\Configuration-Reference.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -307,6 +312,7 @@ Global
 		{6CC1F90F-7EA0-4992-9AF8-E641B3EDB4E1} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{430FAE0C-1B4E-4F15-92F7-AD2BE3F8D6D7} = {3542AB19-07D1-46AE-8CC8-295F847A9741}
 		{7E69EF3C-1AB8-44C4-A72F-DE7A761A493C} = {3542AB19-07D1-46AE-8CC8-295F847A9741}
+		{487444E1-B18B-458A-81D7-6AADAFCAB951} = {800D8125-BD40-410A-B1E9-C1E62224DC03}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D84CD364-9C8E-400E-84AA-45562061ED44}

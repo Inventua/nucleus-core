@@ -12,7 +12,7 @@ of configuration elements.  The configuration section in the example below would
 the `UseMinifiedJs` property would be represented as `Nucleus:ResourceFileOptions:UseMinifiedJs`.  This is also how the .Net core
 configuration system 
 ```
-"Nucleus": {
+"Nucleus": { 
     "ResourceFileOptions": {
       "UseMinifiedJs": true    // We would refer to this as Nucleus:ResourceFileOptions:UseMinifiedJs
     }

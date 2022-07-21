@@ -66,12 +66,6 @@
     ]
   },
   {
-    "outputFileName": "Resources/css/main.min.css",
-    "inputFiles": [
-      "Resources/css/main.css"
-    ]
-  },
-  {
     "outputFileName": "Resources/css/shared.min.css",
     "inputFiles": [
       "Resources/css/shared.css"

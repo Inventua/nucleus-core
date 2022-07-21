@@ -71,8 +71,6 @@
 	  <None Remove="Resources\css\editmode.min.css" />
 	  <None Remove="Resources\css\forms.css" />
 	  <None Remove="Resources\css\forms.min.css" />
-	  <None Remove="Resources\css\main.css" />
-	  <None Remove="Resources\css\main.min.css" />
 	  <None Remove="Resources\css\shared.css" />
 	  <None Remove="Resources\css\shared.min.css" />
 	  <None Remove="Resources\js\jquery-3.6.0.min.js" />
@@ -120,9 +118,7 @@
 	  <Content Include="Resources\css\editmode.min.css" />
 	  <Content Include="Resources\css\forms.css" />
 	  <Content Include="Resources\css\forms.min.css" />
-	  <Content Include="Resources\css\main.css" />
 	  <Content Include="Resources\css\editmode.css" />
-	  <Content Include="Resources\css\main.min.css" />
 	  <Content Include="Resources\css\shared.css" />
 	  <Content Include="Resources\css\shared.min.css" />
 	  <Content Include="Resources\js\jquery-pagelist.min.js" />

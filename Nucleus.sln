@@ -145,6 +145,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reference", "Reference", "{487444E1-B18B-458A-81D7-6AADAFCAB951}"
 	ProjectSection(SolutionItems) = preProject
 		Documentation\Reference\Configuration-Reference.md = Documentation\Reference\Configuration-Reference.md
+		Documentation\Reference\CSS-Reference.md = Documentation\Reference\CSS-Reference.md
 	EndProjectSection
 EndProject
 Global

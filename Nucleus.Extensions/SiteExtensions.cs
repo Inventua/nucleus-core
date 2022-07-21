@@ -209,7 +209,7 @@ namespace Nucleus.Extensions
 		/// <param name="fileSystemManager"></param>
 		/// <returns></returns>
 		/// <remarks>
-		/// Return a direct link if the file system provider supports it (because it is faster than returning a redirect to azure storage).  This "skips"
+		/// Return a direct link if the file system provider supports it (because it is faster than returning a redirect to Azure Blob Storage).  This "skips"
 		/// the Nucleus permissions check, but the performance difference is > 200ms.  This function should only be used for cases where it is ok to
 		/// skip the permission check, like site logo/css/favicon.
 		/// 
@@ -219,7 +219,7 @@ namespace Nucleus.Extensions
 		private async static Task<string> GetDirectFilePath(this Site site, Guid fileId, IFileSystemManager fileSystemManager)
 		{
 			File file = await fileSystemManager.GetFile(site, fileId);
-			// render a direct link if the file system provider supports it (because it is faster than returning a redirect to azure storage).  This "skips"
+			// render a direct link if the file system provider supports it (because it is faster than returning a redirect to Azure Blob Storage).  This "skips"
 			// the Nucleus permissions check, but the performance difference is > 200ms.
 			if (file.Capabilities.CanDirectLink)
 			{

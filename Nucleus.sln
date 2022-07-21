@@ -62,6 +62,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup and Configuration", "
 		Documentation\Setup and Configuration\Api-Keys.md = Documentation\Setup and Configuration\Api-Keys.md
 		Documentation\Setup and Configuration\Api-Keys.png = Documentation\Setup and Configuration\Api-Keys.png
 		Documentation\Setup and Configuration\Azure-App-Service.md = Documentation\Setup and Configuration\Azure-App-Service.md
+		Documentation\Setup and Configuration\Configuration-Reference.md = Documentation\Setup and Configuration\Configuration-Reference.md
 		Documentation\Setup and Configuration\Configuration.md = Documentation\Setup and Configuration\Configuration.md
 		Documentation\Setup and Configuration\Install-Extensions.md = Documentation\Setup and Configuration\Install-Extensions.md
 		Documentation\Setup and Configuration\Install-Extensions.png = Documentation\Setup and Configuration\Install-Extensions.png

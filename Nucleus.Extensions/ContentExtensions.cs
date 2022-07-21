@@ -42,6 +42,7 @@ namespace Nucleus.Extensions
 						pipeline = new Markdig.MarkdownPipelineBuilder()
 							.UseAdvancedExtensions()
 							.UsePipeTables()
+							.UseAutoIdentifiers()
 							.UseBootstrap()
 							.Build();
 					}

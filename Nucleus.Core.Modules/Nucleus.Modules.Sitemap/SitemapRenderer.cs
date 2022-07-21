@@ -77,7 +77,12 @@ namespace Nucleus.Modules.Sitemap
 			PageMenu pageMenu = await pageManager.GetMenu(nucleusContext.Site, rootPage, context.HttpContext.User, true);
 
 			outputBuilder = AddPageChildren(nucleusContext, urlHelper, pageMenu.Children, showDescription, 0, maxlevels);
-			outputBuilder.AddCssClass("Sitemap");
+
+			if (outputBuilder != null)
+			{
+				outputBuilder.AddCssClass("Sitemap");
+			}
+
 			return outputBuilder;
 		}
 

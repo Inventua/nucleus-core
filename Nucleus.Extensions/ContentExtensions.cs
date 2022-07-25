@@ -43,6 +43,7 @@ namespace Nucleus.Extensions
 							.UseAdvancedExtensions()
 							.UsePipeTables()
 							.UseAutoIdentifiers()
+							.UseGridTables()
 							.UseBootstrap()
 							.Build();
 					}

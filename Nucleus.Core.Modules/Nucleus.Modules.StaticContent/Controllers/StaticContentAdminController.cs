@@ -19,8 +19,7 @@ namespace Nucleus.Modules.StaticContent.Controllers
 		private Context Context { get; }
 		private IPageModuleManager PageModuleManager { get; }
 		private IFileSystemManager FileSystemManager { get; }
-				private ICacheManager CacheManager { get; }
-
+		private ICacheManager CacheManager { get; }
 
 		public StaticContentAdminController(Context Context, ICacheManager cacheManager, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager)
 		{

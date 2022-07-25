@@ -515,7 +515,14 @@ namespace Nucleus.Core.Managers
 
 				File file = await provider.SaveFile(parentPath, newFileName, content, overwrite);
 
+
 				await GetDatabaseProperties(site, file);
+
+				using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
+				{
+					await dataProvider.SaveFile(site, file);
+				}
+
 				return file;
 			}
 			else

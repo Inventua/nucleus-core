@@ -7,7 +7,7 @@ Admin CSS classes in `Resources/css/admin.css` can be used by ==Settings== views
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | .nucleus-button-panel            | Class used to wrap buttons at the bottom of a form.  Buttons are rendered side-by-side with a small gap between them and a small top and bottom margin. | 
-| .flex-fill                       | Specifies that a control should fill the available width.  Controls within a `<SettingsControl>` already fill the available width by default.  | 
+| .flex-fill                       | Specifies that a control should fill the available width.  Controls within a [`<SettingsControl>`](https://www.nucleus-cms.com/references/css-reference/#settingscontrol-tag-helper) already fill the available width by default.  | 
 | .nucleus-index-wrapper           | This class is intended to be used on a `div` which wraps a list of entries and an editor panel, which are rendered side-by-side. | 
 | .nucleus-index-items             | This class is intended to be used on a `div` which is a child of .nucleus-index-wrapper, and which wraps an `ul` element.  It sets styles on the list and list items so that "items lists" are presented consistently. | 
 | .nucleus-editor-panel            | When applied to a `div` which wraps an editor, applies flex styles to the panel (`div`), and any child forms or fieldsets so that they fill the available space. | 
@@ -37,6 +37,6 @@ adding a call to `@Html.AddStyle("~/Resources/css/forms.css")` as forms.css is o
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | .nucleus-flex-fields             | When applied to a `<div>` or another wrapper element, child elements are rendered in the same row (side-by-side). | 
-| .settings-control                | This class is used to style elements which are rendered by the `<SettingsControl>` tag helper.  It applies s | 
+| .settings-control                | This class is used to style elements which are rendered by the [`<SettingsControl>`](https://www.nucleus-cms.com/references/css-reference/#settingscontrol-tag-helper) tag helper.  It applies styles to present input, select and other controls consistently. | 
 | .nucleus-form-tools              | Class used to wrap buttons in the body of a form.  Buttons are rendered side-by-side with a small gap between them. | 
 | .nucleus-form-buttonrow          | Class used to wrap buttons at the bottom of a form.  Buttons are rendered side-by-side with a small gap between them and a small top margin. | 

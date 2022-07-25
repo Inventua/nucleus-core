@@ -32,6 +32,7 @@
 	margin-right: 8px;
 }
 
+/* Subtract 45px from the settings popup height to account for browsers which display link urls at the bottom left of the screen */
 .nucleus-adminpage
 {
 	height: calc(100% - 45px);	
@@ -42,7 +43,7 @@
 	padding: 4px;
 }
 
-/* We substract 45px from the settings popup height (in .nucleus-adminpage above) to account for browsers which display link urls at the bottom left of the screen when   */
+/* We subtract 45px from the settings popup height (in .nucleus-adminpage above) to account for browsers which display link urls at the bottom left of the screen when   */
 /* hovering over links, but when .nucleus-adminpage is in an iframe the modal doesn't normally use the full screen height, so we don't need to leave space at the bottom. */
 .nucleus-settings-frame.nucleus-adminpage 
 {

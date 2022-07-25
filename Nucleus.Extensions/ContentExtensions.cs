@@ -8,7 +8,6 @@ using Nucleus.Abstractions.Models;
 
 namespace Nucleus.Extensions
 {
-
 	/// <summary>
 	/// Content extensions.
 	/// </summary>
@@ -17,7 +16,7 @@ namespace Nucleus.Extensions
 	  private static MarkdownPipeline pipeline;
 
 		/// <summary>
-		/// Convert the specified content to Html
+		/// Converts the specified content to Html.
 		/// </summary>
 		/// <param name="content"></param>
 		/// <returns></returns>
@@ -27,11 +26,15 @@ namespace Nucleus.Extensions
 		}
 
 		/// <summary>
-		/// Convert the specified content to Html
+		/// Converts the specified string content to Html.
 		/// </summary>
 		/// <param name="content"></param>
-		/// <param name="contentType"></param>
+		/// <param name="contentType">MIME type of the original content.</param>
 		/// <returns></returns>
+		/// <remarks>
+		/// The contentType can be text/markdown or text/plain.  All other content type values are treated as text/html and
+		/// are not converted.
+		/// </remarks>
 		public static string ToHtml(string content, string contentType)
 		{
 			switch (contentType)

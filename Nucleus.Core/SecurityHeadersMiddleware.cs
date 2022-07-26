@@ -35,7 +35,8 @@ namespace Nucleus.Core.Layout
 
 			// Add defaults.  The AddHeader function checks whether the header is already present,
 			// so if the user specified a header in config, the default (these values) will be ignored.
-			AddHeader(context, "X-Frame-Options", "SAMEORIGIN");
+			//AddHeader(context, "X-Frame-Options", "SAMEORIGIN");
+			AddHeader(context, "Content-Security-Policy", "frame-ancestors 'self'");
 			AddHeader(context, "X-Content-Type-Options", "nosniff");
 			AddHeader(context, "X-XSS-Protection", "1; mode=block");
 			AddHeader(context, "Referrer-Policy", "same-origin");
@@ -50,7 +51,7 @@ namespace Nucleus.Core.Layout
 			{
 				if (!context.Response.Headers.ContainsKey(name))
 				{
-					if (!(context.Request.Headers.Accept.Contains("text/html") && IsHtmlOnlyHeader(name)))
+					if (context.Request.Headers.Accept.Contains("text/html") || !IsHtmlOnlyHeader(name))
 					{
 						context.Response.Headers.Add(name, value);
 					}

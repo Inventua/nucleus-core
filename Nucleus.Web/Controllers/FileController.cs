@@ -79,14 +79,6 @@ namespace Nucleus.Web.Controllers
 				return BadRequest();
 			}
 
-			//idString = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedPath));
-
-			//if (!Guid.TryParse(idString, out Guid id))
-			//{
-			//	this.Logger.LogInformation("Encoded path {encodedPath} is not valid.", encodedPath);
-			//	return BadRequest();
-			//}
-
 			try
 			{
 				File file = await this.FileSystemManager.GetFile(this.Context.Site, fileId);
@@ -159,7 +151,16 @@ namespace Nucleus.Web.Controllers
 						Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider extensionProvider = new();
 						
 						Response.Headers.Add(Microsoft.Net.Http.Headers.HeaderNames.ContentDisposition, contentDisposition.ToString());
-						Response.GetTypedHeaders().LastModified = lastModifiedDate;
+
+						Microsoft.AspNetCore.Http.Headers.ResponseHeaders headers = Response.GetTypedHeaders();
+
+						headers.LastModified = lastModifiedDate;
+
+						headers.CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+						{
+							Public = true,
+							MaxAge = TimeSpan.FromDays(30)
+						};
 
 						if (!extensionProvider.TryGetContentType(file.Path, out string mimeType))
 						{

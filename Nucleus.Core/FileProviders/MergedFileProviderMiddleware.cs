@@ -94,12 +94,6 @@ namespace Nucleus.Core.FileProviders
 					Logger.LogTrace("Served {cacheKey} from cache", cacheKey);
 					await WriteFile(result, context.Response, contentType, result.LastModified.UtcDateTime);
 
-					context.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
-					{
-						Public = true,
-						MaxAge = TimeSpan.FromDays(30)
-					};
-
 					return;
 				}
 				else
@@ -164,12 +158,6 @@ namespace Nucleus.Core.FileProviders
 						this.SetCacheValue(cacheKey, mergedcontent);
 						await WriteFile(result, context.Response, contentType, GetCacheEntryDate(cacheKey));
 
-						context.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
-						{
-							Public = true,
-							MaxAge = TimeSpan.FromDays(30)
-						};
-
 						return;
 					}
 				}
@@ -184,6 +172,13 @@ namespace Nucleus.Core.FileProviders
 			response.ContentLength = input.Length;
 			 
 			response.Headers.LastModified = lastModified.ToString("r");
+
+			response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+			{
+				Public = true,
+				MaxAge = TimeSpan.FromDays(30)
+			};
+
 			response.Headers.ETag = GenerateETag(lastModified);
 			await response.SendFileAsync(input);
 		}

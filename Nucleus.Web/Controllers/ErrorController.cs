@@ -8,7 +8,7 @@ using Nucleus.Extensions.Authorization;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions;
-using Nucleus.ViewFeatures;
+using Microsoft.AspNetCore.Http;
 using System.Reflection;
 
 namespace Nucleus.Web.Controllers
@@ -32,7 +32,13 @@ namespace Nucleus.Web.Controllers
 			IExceptionHandlerFeature exceptionDetails = ControllerContext.HttpContext.Features.Get<IExceptionHandlerFeature>();
 			Microsoft.AspNetCore.Mvc.ProblemDetails data;
 			Page errorPage = null;
-				
+
+			// An error response is dynamic content - specify no caching
+			ControllerContext.HttpContext.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+			{
+				NoCache = true
+			};
+
 			if (exceptionDetails?.Error != null)
 			{
 				//// try to convert database errors to a more friendly message

@@ -12,9 +12,9 @@
 			@Html.HiddenFor(model => model.Reply.Id)
 
 			<SettingsControl title="Original Post">
-				@Html.Raw(Model.Post.Subject)
+				@(new Microsoft.AspNetCore.Html.HtmlString(Model.Post.Subject))
 				<div>
-					@Html.Raw(Model.Post.Body)
+					@(new Microsoft.AspNetCore.Html.HtmlString(Model.Post.Body))
 				</div>
 			</SettingsControl>
 

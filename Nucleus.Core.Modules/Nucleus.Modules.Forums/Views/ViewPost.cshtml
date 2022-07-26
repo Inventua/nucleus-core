@@ -58,7 +58,7 @@
 					}
 				}
 			</div>
-			<div class="body">@Html.Raw(@Model.Post.Body)</div>
+			<div class="body">@(new Microsoft.AspNetCore.Html.HtmlString(@Model.Post.Body))</div>
 
 			<div class="attachments">
 				@for (var attachmentCount = 0; attachmentCount < Model.Post.Attachments.Count; attachmentCount++)
@@ -160,7 +160,7 @@
 							}
 						</div>
 						<div class="body">
-							@Html.Raw(reply.Body)
+							@(new Microsoft.AspNetCore.Html.HtmlString(reply.Body))
 						</div>
 
 						<div class="attachments">

@@ -45,7 +45,7 @@
 				<tr>
 					<td colspan="2" class="nucleus-package-readme">
 						<h3>Readme</h3>
-						<div>@Html.Raw(Model.Readme)</div>
+						<div>@(new Microsoft.AspNetCore.Html.HtmlString(Model.Readme))</div>
 					</td>
 				</tr>
 			}
@@ -54,7 +54,7 @@
 				<tr>
 					<td colspan="2" class="nucleus-package-license">
 						<h3>License</h3>
-						<div>@Html.Raw(Model.License)</div>
+						<div>@(new Microsoft.AspNetCore.Html.HtmlString(Model.License))</div>
 					</td>
 				</tr>
 			}

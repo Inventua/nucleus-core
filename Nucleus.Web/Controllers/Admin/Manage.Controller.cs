@@ -18,10 +18,13 @@ namespace Nucleus.Web.Controllers.Admin
 		private IExtensionManager ExtensionManager { get; }
 		private Context Context { get; }
 
+		private IEnumerable<System.Type> ControllerTypes { get; }
+
 		public ManageController(Context context, IExtensionManager extensionManager)
 		{
 			this.Context = context;
 			this.ExtensionManager = extensionManager;
+			this.ControllerTypes = Nucleus.Core.Plugins.AssemblyLoader.GetTypes<Controller>();
 		}
 
 		/// <summary>
@@ -41,7 +44,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Returnwhether the current user has permission to use the specified control panel extension.
+		/// Return whether the current user has permission to use the specified control panel extension.
 		/// </summary>
 		/// <param name="controlPanelExtension"></param>
 		/// <returns></returns>
@@ -54,11 +57,10 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			// Look for controller types with the same name and extension name as the control panel extension.  We have to do it this way
 			// because controlPanelExtension.ControllerName is actually a route value, not a fully-qualified type name.
-			Type controllerType = Nucleus.Core.Plugins.AssemblyLoader.GetTypes<Controller>()
+			Type controllerType = this.ControllerTypes
 				.Where(type => ControllerNameIs(type, controlPanelExtension.ControllerName) && ExtensionNameIs(type, controlPanelExtension.ExtensionName))
 				.FirstOrDefault();
-
-			//Type controllerType = Type.GetType(controlPanelExtension.ControllerName);
+						
 			if (controllerType == null)
 			{
 				// if the controller class could not be loaded, suppress display

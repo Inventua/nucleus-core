@@ -64,8 +64,9 @@ function _handleContentLoaded(e, args)
 	
 	function AdminMenuItem_Click(event)
 	{
-		var url = jQuery(event.currentTarget).find('A').attr('href');
-
+		var element = jQuery(event.currentTarget).find('[data-href]');
+		var url = element.attr('data-href');
+		
 		if (jQuery('.nucleus-adminpage').data("src") === url && navstack[navstack.length-1] === url)
 		{
 			ShowAdminFrame(false, '');
@@ -75,7 +76,8 @@ function _handleContentLoaded(e, args)
 		else
 		{
 			ShowAdminFrame(true, url);
-			// Don't return false, we want the event handler in nucleus-shared.js to execute after this
+			//Page.LoadPartialContent(event, url, jQuery('.nucleus-adminpage'));
+			//return false;
 		}
 	}
 

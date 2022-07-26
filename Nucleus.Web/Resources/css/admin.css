@@ -209,27 +209,27 @@
 	background-color: #0A0A0A;
 }
 
-.nucleus-control-panel-sidebar li.SystemIcon A
+.nucleus-control-panel-sidebar li.SystemIcon button
 {
 	color: #a4e4ff;
 }
 
-.nucleus-control-panel-sidebar li.PagesIcon A
+.nucleus-control-panel-sidebar li.PagesIcon button
 {
 	color: #f78f73;
 }
 
-.nucleus-control-panel-sidebar li.ManageIcon A
+.nucleus-control-panel-sidebar li.ManageIcon button
 {
 	color: #f1a4ff;
 }
 
-.nucleus-control-panel-sidebar li.ExtensionsIcon A
+.nucleus-control-panel-sidebar li.ExtensionsIcon button
 {
 	color: #ffdca4;
 }
 
-.nucleus-control-panel-sidebar li.SettingsIcon A
+.nucleus-control-panel-sidebar li.SettingsIcon button
 {
 	color: #a4ffe2;
 }
@@ -246,12 +246,12 @@
 	background-color: #111;
 }
 
-#nucleus-edit-page-btn a
+#nucleus-edit-page-btn button
 {
 	color: #a8c600;
 }
 
-#nucleus-edit-content-btn a
+#nucleus-edit-content-btn button
 {
 	color: #ff9e06;
 }
@@ -267,14 +267,22 @@
 }
 
 
-.nucleus-control-panel-sidebar a
+.nucleus-control-panel-sidebar button
 {	
 	display: block;
 	text-decoration: none;
 	text-align: center;
+	background-color: transparent;
+	padding: 0;
+	border: 0;
+	margin: auto;
 }
 
-.nucleus-control-panel-sidebar a span.nucleus-index-icon
+.nucleus-control-panel-sidebar li button
+{
+}
+
+.nucleus-control-panel-sidebar li span.nucleus-index-icon
 {
 	display: block;
 	height: auto;
@@ -291,7 +299,7 @@
 	white-space: initial;
 	display: flex;
 	flex-flow: wrap;
-	gap: 8px;
+	gap: 1rem;
 	padding-left: 0;
 	margin-top: 1rem;
 }
@@ -300,32 +308,37 @@ ul.nucleus-control-panel-items li
 {
 	list-style-type: none;
 	flex-basis: 0;
-	min-width: 20rem;
-	border-radius: 4px;
 	font-size: 12px;
 	vertical-align: top;
-	padding: 8px;
 	position: relative;	
 }
 
-ul.nucleus-control-panel-items a
+ul.nucleus-control-panel-items button
 {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
+	min-width: 20rem;	
+	min-height: 6rem;
+	border-radius: 4px;
+	display: flex;
+	background-color: transparent;
+	padding: 8px;
+	border: 0;
+	text-align: left;
 }
 
-.nucleus-control-panel-items span
+.nucleus-control-panel-items .nucleus-index-icon
 {
-	float: left;
-	margin: 0 8px 28px 0;
+	/*float: left;*/
+	margin: 0 8px 0 0;
 	font-family: 'Material Icons'; 
 	font-size: 42px;	
 }
 
-.nucleus-control-panel-items li:hover, .nucleus-control-panel-items li:active, .nucleus-control-panel-items li:hover span, .nucleus-control-panel-items li:active span 
+.nucleus-control-panel-items .nucleus-index-button-content
+{
+/*	margin-left: 70px;*/
+}
+
+.nucleus-control-panel-items li:hover, .nucleus-control-panel-items li:active, .nucleus-control-panel-items li:hover *, .nucleus-control-panel-items li:active * 
 {
 	background-color: #444;
 	color: white!important;
@@ -333,37 +346,37 @@ ul.nucleus-control-panel-items a
 	user-select: none;
 }
 
-.nucleus-control-panel-items li.UsersIcon span, .nucleus-control-panel-items li.SysAdminsIcon span
+.nucleus-control-panel-items li.UsersIcon .nucleus-index-icon, .nucleus-control-panel-items li.SysAdminsIcon .nucleus-index-icon
 {
 	color: #0033da;
 }
 
-.nucleus-control-panel-items li.RoleGroupsIcon span, .nucleus-control-panel-items li.SiteGroupsIcon span
+.nucleus-control-panel-items li.RoleGroupsIcon .nucleus-index-icon, .nucleus-control-panel-items li.SiteGroupsIcon .nucleus-index-icon
 {
 	color: #7900d6;
 }
 
-.nucleus-control-panel-items li.RolesIcon span
+.nucleus-control-panel-items li.RolesIcon .nucleus-index-icon
 {
 	color: #d600ce;
 }
 
-.nucleus-control-panel-items li.SiteIcon span, .nucleus-control-panel-items li.SitesIcon span
+.nucleus-control-panel-items li.SiteIcon .nucleus-index-icon, .nucleus-control-panel-items li.SitesIcon .nucleus-index-icon
 {
 	color: #444444;
 }
 
-.nucleus-control-panel-items li.MailIcon span
+.nucleus-control-panel-items li.MailIcon .nucleus-index-icon
 {
 	color: #a8c600;
 }
 
-.nucleus-control-panel-items li.FilesIcon span, .nucleus-control-panel-items li.ApiKeysIcon span
+.nucleus-control-panel-items li.FilesIcon .nucleus-index-icon, .nucleus-control-panel-items li.ApiKeysIcon .nucleus-index-icon
 {
 	color: #dd9700;
 }
 
-.nucleus-control-panel-items li.ListsIcon span, .nucleus-control-panel-items li.ScheduledTasksIcon span
+.nucleus-control-panel-items li.ListsIcon .nucleus-index-icon, .nucleus-control-panel-items li.ScheduledTasksIcon .nucleus-index-icon
 {
 	color: #00738c;
 }

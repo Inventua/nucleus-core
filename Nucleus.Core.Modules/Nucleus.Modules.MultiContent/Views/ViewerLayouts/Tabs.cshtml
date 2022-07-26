@@ -14,7 +14,7 @@
 		@foreach (var content in Model.Contents)
 		{
 			<div id="tab-@content.Id" role="tabpanel" aria-labelledby="tabpanel-@content.Id" class="tab-pane fade @(content == Model.Contents.First() ? "show active" : "")">
-				@Html.Raw(content.ToHtml())
+				@(new Microsoft.AspNetCore.Html.HtmlString(content.ToHtml()))
 			</div>
 		}
 	</div>

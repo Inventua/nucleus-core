@@ -46,7 +46,7 @@
 		{
 			<span class="image"><img src="@Url.FileLink(Model.Article.ImageFile)" /></span>
 		}
-		@Html.Raw(Model.Article.Body)
+		@(new Microsoft.AspNetCore.Html.HtmlString(Model.Article.Body))
 	</div>
 	@if (Model.Article.Attachments.Count > 0)
 	{

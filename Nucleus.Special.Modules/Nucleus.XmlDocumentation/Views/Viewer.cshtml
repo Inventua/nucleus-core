@@ -41,7 +41,11 @@
 			<div class="api-content">
 				@if (Model.SelectedDocument == null)
 				{
-					// no document selected, show "landing"" page
+					// no document selected, show "landing" page
+					if (!String.IsNullOrEmpty(Model.WelcomeMessage.Value))
+					{
+						@Model.WelcomeMessage
+					}
 					foreach (var document in Model.Documents)
 					{
 						<h2><a href="@Url.PageLink(Model.Page, @document.SourceFileName)">@document.Namespace.Name Assembly</a></h2>

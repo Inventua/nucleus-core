@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Html;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions;
@@ -49,7 +50,7 @@ namespace Nucleus.Modules.TextHtml.Controllers
 				// Text/Html only ever has one item
 				if (contents.Count > 0)
 				{
-					viewModel.Content = contents.First().ToHtml();					
+					viewModel.Content = new (contents.First().ToHtml());					
 				}
 			}
 

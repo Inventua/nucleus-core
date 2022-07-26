@@ -36,7 +36,7 @@ namespace Nucleus.Modules.StaticContent.Controllers
 		[HttpGet]
 		public async Task<ActionResult> Index()
 		{
-			RenderedContent renderedContent;
+			RenderedContent renderedContent = null;
 			string key;
 
 			ViewModels.Viewer viewModel = await BuildViewModel();
@@ -50,7 +50,7 @@ namespace Nucleus.Modules.StaticContent.Controllers
 
 					if (!User.HasViewPermission(this.Context.Site, viewModel.DefaultFile.Parent))
 					{
-						viewModel.Content = "";
+						viewModel.Content = null;
 					}
 					else
 					{
@@ -76,8 +76,6 @@ namespace Nucleus.Modules.StaticContent.Controllers
 								}
 								return new RenderedContent("");
 							});
-
-							viewModel.Content = renderedContent.Content;
 						}
 						else
 						{
@@ -103,16 +101,17 @@ namespace Nucleus.Modules.StaticContent.Controllers
 					}
 				}
 
-				if (!String.IsNullOrEmpty(viewModel.Content))
-				{   // Parse the output (html) for static file links
+				if (!String.IsNullOrEmpty(renderedContent?.Content))
+				{   
+					// Parse the output (html) for static file links
 					HtmlAgilityPack.HtmlDocument document = new();
-					document.LoadHtml(viewModel.Content);
+					document.LoadHtml(renderedContent.Content);
 
 					await ReplaceAttribute(viewModel, document, "img", "src");
 					await ReplaceAttribute(viewModel, document, "link", "href");
 					await ReplaceAttribute(viewModel, document, "script", "src");
 
-					viewModel.Content = document.DocumentNode.OuterHtml;
+					viewModel.Content = new(document.DocumentNode.OuterHtml);
 				}
 
 				return View("Viewer", viewModel);

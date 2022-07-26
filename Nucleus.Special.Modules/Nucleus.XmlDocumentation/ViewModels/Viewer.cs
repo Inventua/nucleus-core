@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Nucleus.Abstractions.Models.FileSystem;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Html;
 using Nucleus.Abstractions.Models;
 
 namespace Nucleus.XmlDocumentation.ViewModels
@@ -21,5 +20,6 @@ namespace Nucleus.XmlDocumentation.ViewModels
     public Models.ApiClass SelectedClass { get; set; }
 
     public string Message { get; set; }
+    public HtmlString WelcomeMessage { get; set; }
   }
 }

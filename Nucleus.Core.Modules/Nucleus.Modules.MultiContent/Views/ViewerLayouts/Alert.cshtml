@@ -14,7 +14,7 @@
 	{
 		<h3>@content.Title</h3>
 	}
-	@Html.Raw(content.ToHtml())
+	@(new Microsoft.AspNetCore.Html.HtmlString(content.ToHtml()))
 
 </div>
 }

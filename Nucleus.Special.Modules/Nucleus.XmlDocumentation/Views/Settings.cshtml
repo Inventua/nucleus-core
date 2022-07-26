@@ -20,9 +20,13 @@
 		@Html.CheckBoxFor(model => model.DefaultOpen, new { @class = "ToggleSwitch" })
 	</SettingsControl>
 
+	@Html.HiddenFor(model => model.WelcomeMessage.Id)
+	<SettingsControl caption="Welcome Message" helptext="Enter a message to display when the page is first visited.">
+		@Html.TextAreaFor(model => model.WelcomeMessage.Value, 12, 60, new { @class = "HtmlEditorControl" })
+	</SettingsControl>
+
 	<div class="nucleus-form-tools">
 		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "XmlDocumentation", "XmlDocumentation"), new { })
-
 	</div>
 </fieldset>
 }

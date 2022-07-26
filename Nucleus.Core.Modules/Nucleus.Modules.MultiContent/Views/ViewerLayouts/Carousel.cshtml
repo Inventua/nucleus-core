@@ -22,7 +22,7 @@
 					<h3>@content.Title</h3>
 				}
 				<div>
-					@Html.Raw(content.ToHtml())
+					@(new Microsoft.AspNetCore.Html.HtmlString(content.ToHtml()))
 				</div>
 			</div>
 		}

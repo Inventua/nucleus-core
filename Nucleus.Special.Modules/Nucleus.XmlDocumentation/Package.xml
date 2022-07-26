@@ -23,7 +23,7 @@
 			<file name="license.txt" />
 			
 			<file name="viewer.css" />
-			<file name="settings.css" />
+			<file name="viewer.min.css" />
 			
 			<folder name="Bin">
 				<file name="Nucleus.XmlDocumentation.dll" />

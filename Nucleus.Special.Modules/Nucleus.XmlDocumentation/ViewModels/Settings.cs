@@ -14,5 +14,7 @@ namespace Nucleus.XmlDocumentation.ViewModels
 	{
 		public Folder DocumentationFolder { get; set; }
 		public Boolean DefaultOpen { get; set; }
+
+		public Content WelcomeMessage { get; set; }
 	}
 }

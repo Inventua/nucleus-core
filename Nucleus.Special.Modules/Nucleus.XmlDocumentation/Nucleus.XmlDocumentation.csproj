@@ -29,7 +29,7 @@
     <None Remove="viewer.css" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
-    <None Remove="settings.css" />
+    <None Remove="viewer.min.css" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
     <None Remove="Views\_RenderClass.cshtml" />
@@ -43,7 +43,7 @@
     <Content Include="viewer.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
-    <Content Include="settings.css" />
+    <Content Include="viewer.min.css" />
     <Content Include="Views\_RenderClass.cshtml" />
     <Content Include="Views\_RenderMember.cshtml" />
     <Content Include="Views\_RenderMixedContent.cshtml" />

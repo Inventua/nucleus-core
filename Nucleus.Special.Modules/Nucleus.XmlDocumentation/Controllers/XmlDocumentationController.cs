@@ -26,11 +26,13 @@ namespace Nucleus.XmlDocumentation.Controllers
 		private IPageModuleManager PageModuleManager { get; }
 		private IFileSystemManager FileSystemManager { get; }
 		private ICacheManager CacheManager { get; }
+		private IContentManager ContentManager { get; }
 
-		public XmlDocumentationController(Context Context, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager)
+		public XmlDocumentationController(Context Context, IPageModuleManager pageModuleManager, IContentManager contentManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager)
 		{
 			this.Context = Context;
 			this.PageModuleManager = pageModuleManager;
+			this.ContentManager = contentManager;
 			this.FileSystemManager = fileSystemManager;
 			this.CacheManager = cacheManager;
 		}
@@ -57,6 +59,8 @@ namespace Nucleus.XmlDocumentation.Controllers
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_DOCUMENTATION_DEFAULTOPEN, viewModel.DefaultOpen);
 
 			await this.PageModuleManager.SaveSettings(this.Context.Module);
+
+			await this.ContentManager.Save(this.Context.Module, viewModel.WelcomeMessage);
 
 			this.CacheManager.XmlDocumentationCache().Remove(this.Context.Module.Id);
 
@@ -132,6 +136,8 @@ namespace Nucleus.XmlDocumentation.Controllers
 				}				
 			}
 
+			viewModel.WelcomeMessage = new((await this.ContentManager.List(this.Context.Module)).FirstOrDefault()?.ToHtml());
+
 			return viewModel;
 		}
 
@@ -154,6 +160,9 @@ namespace Nucleus.XmlDocumentation.Controllers
 					viewModel.DocumentationFolder = new();
 				}
 			}
+
+			viewModel.WelcomeMessage = (await this.ContentManager.List(this.Context.Module)).FirstOrDefault();
+
 
 			return viewModel;
 		}

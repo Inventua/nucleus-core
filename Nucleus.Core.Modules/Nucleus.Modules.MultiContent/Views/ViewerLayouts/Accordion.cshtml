@@ -16,7 +16,7 @@
 			
 			<div id="accordion-item-@content.Id" class="accordion-collapse collapse@(Model.LayoutSettings.OpenFirst && content == Model.Contents.First() ? " show" : "")" data-bs-parent="#accordion-@Model.Module.Id" aria-labelledby="accordion-head-@content.Id">
 				<div class="accordion-body">
-					@Html.Raw(content.ToHtml())
+					@(new Microsoft.AspNetCore.Html.HtmlString(content.ToHtml()))
 				</div>
 			</div>
 		</div>

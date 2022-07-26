@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 using Nucleus.Extensions.Authorization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 
 namespace Nucleus.Web.Controllers
 {
@@ -126,6 +126,13 @@ namespace Nucleus.Web.Controllers
 
 				ControllerContext.HttpContext.Response.Cookies.Append(PermissionExtensions.EDIT_COOKIE_NAME, "true", options);
 			}
+
+			// Dynamic content - specify no caching
+			ControllerContext.HttpContext.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+			{
+				NoCache = true,
+				NoStore = false
+			};
 
 			return View(this.Context.Page.LayoutPath(this.Context.Site), viewModel);
 		}

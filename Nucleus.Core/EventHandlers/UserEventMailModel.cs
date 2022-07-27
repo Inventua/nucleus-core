@@ -11,5 +11,9 @@ namespace Nucleus.Core.EventHandlers
 	{
 		public Site Site { get; set; }
 		public User User { get; set; }
+		public Page LoginPage { get;set; }
+		public Page PrivacyPage { get; set; }
+		public Page TermsPage { get; set; }
+
 	}
 }

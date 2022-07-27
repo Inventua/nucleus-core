@@ -29,13 +29,15 @@ namespace Nucleus.Core.EventHandlers
 		private IMailTemplateManager MailTemplateManager { get; }
 		private ILogger<UserEventHandler> Logger { get; }
 		private IUserManager UserManager { get; }
+		private IPageManager PageManager { get; }
 
-		public UserEventHandler(Context context, IMailClientFactory mailClientFactory, IUserManager userManager, IMailTemplateManager mailTemplateManager, ILogger<UserEventHandler> logger)
+		public UserEventHandler(Context context, IMailClientFactory mailClientFactory, IUserManager userManager, IPageManager pageManager, IMailTemplateManager mailTemplateManager, ILogger<UserEventHandler> logger)
 		{
 			this.Context = context;
 			this.MailClientFactory = mailClientFactory;
 			this.MailTemplateManager = mailTemplateManager;
 			this.UserManager = userManager;
+			this.PageManager = pageManager;
 			this.Logger = logger;
 		}
 
@@ -57,12 +59,17 @@ namespace Nucleus.Core.EventHandlers
 					if (templateSelections.WelcomeNewUserTemplateId.HasValue)
 					{
 						MailTemplate template = await this.MailTemplateManager.Get(templateSelections.WelcomeNewUserTemplateId.Value);
+						SitePages sitePages = this.Context.Site.GetSitePages();
+						
 						if (template != null)
 						{
 							UserEventMailModel args = new()
 							{
 								Site = this.Context.Site,
-								User = user.GetCensored() 
+								User = user.GetCensored(),
+								LoginPage = sitePages.LoginPageId.HasValue ? await this.PageManager.Get(sitePages.LoginPageId.Value) : null,
+								PrivacyPage = sitePages.PrivacyPageId.HasValue ? await this.PageManager.Get(sitePages.PrivacyPageId.Value) : null,
+								TermsPage = sitePages.TermsPageId.HasValue ? await this.PageManager.Get(sitePages.TermsPageId.Value) : null
 							};
 
 							Logger.LogTrace("Sending Welcome email {emailTemplateName} to user {userid}.", template.Name, user.Id);

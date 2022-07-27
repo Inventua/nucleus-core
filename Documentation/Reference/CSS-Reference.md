@@ -10,7 +10,8 @@ Admin CSS classes in `Resources/css/admin.css` can be used by ==Settings== views
 | .flex-fill                       | Specifies that a control should fill the available width.  Controls within a [`<SettingsControl>`](https://www.nucleus-cms.com/developers/razor-views/#settingscontrol-tag-helper) already fill the available width by default.  | 
 | .nucleus-index-wrapper           | This class is intended to be used on a `div` which wraps a list of entries and an editor panel, which are rendered side-by-side. | 
 | .nucleus-index-items             | This class is intended to be used on a `div` which is a child of .nucleus-index-wrapper, and which wraps an `ul` element.  It sets styles on the list and list items so that "items lists" are presented consistently. | 
-| .nucleus-editor-panel            | When applied to a `div` which wraps an editor, applies flex styles to the panel (`div`), and any child forms or fieldsets so that they fill the available space. | 
+| .nucleus-editor-panel            | When applied to a `div` which wraps an editor, applies flex styles to the panel (`div`), and any child forms or fieldsets so that they fill the available space. |
+| .nucleus-modal-caption           | When applied to a heading `h1,h2,h3,h4,h5,h6` element, specifies the caption for your settings page.  The content of the element is moved to the heading area of the dialog which contains your settings page.   |
 
 ## Shared
 CSS classes in `Resources/css/shared.css` are always available.  CSS Classes which are used by Nucleus but are not intended for use 

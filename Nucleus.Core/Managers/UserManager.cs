@@ -152,9 +152,13 @@ namespace Nucleus.Core.Managers
 			user.Secrets.VerificationToken = new Random().Next(100000, 999999).ToString();
 			user.Secrets.VerificationTokenExpiryDate = DateTime.UtcNow.Add(this.PasswordOptions.VerificationTokenExpiry);
 
-			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+			// Save, but only if the user already exists in the database
+			if (user.Id != Guid.Empty)
 			{
-				await provider.SaveUserSecrets(user);
+				using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+				{
+					await provider.SaveUserSecrets(user);
+				}
 			}
 		}
 

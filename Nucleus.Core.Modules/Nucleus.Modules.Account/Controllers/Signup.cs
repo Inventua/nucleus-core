@@ -87,6 +87,11 @@ namespace Nucleus.Modules.Account.Controllers
 				newUser.Secrets = new();
 				newUser.Secrets.SetPassword(viewModel.NewPassword);
 
+				if (!newUser.Verified)
+				{
+					await this.UserManager.SetVerificationToken(newUser);
+				}
+
 				await this.UserManager.Save(this.Context.Site, newUser);
 
 				if (newUser.Approved && newUser.Verified)

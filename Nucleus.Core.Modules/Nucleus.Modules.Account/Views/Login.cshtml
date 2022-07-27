@@ -15,7 +15,7 @@
 		<div>
 			<label>
 				<span>User name</span>
-				<span>@Html.TextBoxFor(model => model.Username, new { @class= "nucleus-default-control", @autocorrect = "off", @autocapitalize = "none" })</span>
+				<span>@Html.TextBoxFor(model => model.Username, new { @class= Model.ShowVerificationToken ? "" : "nucleus-default-control", @autocorrect = "off", @autocapitalize = "none" })</span>
 			</label>
 		</div>
 		<div>
@@ -33,7 +33,7 @@
 			<div>
 				<label>
 					<span>Verification Token</span>
-					<span>@Html.TextBoxFor(model => model.VerificationToken)</span>
+					<span>@Html.TextBoxFor(model => model.VerificationToken, new { @class= "nucleus-default-control" })</span>
 				</label>
 			</div>
 		}

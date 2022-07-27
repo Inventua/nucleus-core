@@ -5,7 +5,7 @@ To manage site settings, after logging in as a system administrator or site admi
 
 If you are logged on as a system administrator, you can also manage or add site from the `Settings` control panel.  Additional sites have their own set of pages and users.
 
-> **_NOTE:_**   Nucleus version 1.0 has user interface elements which allow you to set up `Site Groups` and assign sites to site groups.  In the future, this will allow you to 
+> **_NOTE:_**   Nucleus version 1.0 has user interface elements which allow you to set up `Site Groups`.  In the future, this will allow you to 
 share users between sites, but this functionality has not yet been implemented. 
 
 
@@ -82,3 +82,36 @@ Use the email templates tab to assign email templates to specific site functions
 | Welcome new user      | Email template used to generate a welcome email when a new user account is created.  |
 | Account name reminder | Email template used to generate an email when the user clicks 'Trouble Logging in' in the login page, and requests a user name reminder. |
 | Password Reset        | Email template used to generate an email when the user clicks 'Trouble Logging in' in the login page, and requests a password reset.  |
+
+> The default email templates are placeholders only - you will need to modify them to suit your needs.  
+[Mail templates Documentation](https://www.nucleus-cms.com/manage/mail-templates/).
+
+### Sample Welcome New User Email Template
+
+```
+<html>
+  <head>
+    <title>Welcome to @Model.Site.Name</title>
+  </head>
+  <body>
+    <h1>@Model.Site.Name</h1>
+
+    Welcome @Model.User.UserName,
+
+    <p>
+      Please verify your email address by logging in at <a href="@Model.Site.AbsoluteUrl(@Model.LoginPage, true)">@Model.Site.AbsoluteUrl(@Model.LoginPage, true)</a>.  
+    </p>
+    <p>
+      After you enter your user name and password, you will be prompted for a verification code, which is:
+
+      <h2>@Model.User.Secrets?.VerificationToken</h2>
+    </p>
+
+    <p>
+      You have received this message because you registered at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.AbsoluteUrl(true)</a>.  You 
+      can read our Privacy Policy at <a href="@Model.Site.AbsoluteUrl(@Model.PrivacyPage, true)">@Model.Site.AbsoluteUrl(@Model.PrivacyPage, true)</a>.
+    </p>
+  </body>
+</html>
+```
+

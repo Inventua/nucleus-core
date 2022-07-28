@@ -166,6 +166,10 @@ namespace Nucleus.Web.Controllers
 						{
 							mimeType = "application/octet-stream";
 						}
+						if ((mimeType.StartsWith("text/") || mimeType.Equals("application/javascript")) && !mimeType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
+						{
+							mimeType += "; charset=utf-8";
+						}
 
 						return File(this.FileSystemManager.GetFileContents(this.Context.Site, file), mimeType);
 					}

@@ -211,7 +211,6 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
           if (!String.IsNullOrEmpty(script.Key))
           {
             TagBuilder builder = new("script");
-            builder.Attributes.Add("type", "text/javascript");
             if (script.Value.IsDynamic)
             {
               builder.Attributes.Add("data-dynamic", "true");

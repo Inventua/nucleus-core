@@ -249,7 +249,7 @@ namespace Nucleus.Web
 							OnPrepareResponse = context =>
 							{
 								// Add charset=utf-8 to content-type for text content if it is not already present
-								if ((context.Context.Response.ContentType.StartsWith("text/") || context.Context.Response.ContentType.Equals("application/javascript")) && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
+								if (context.Context.Response.ContentType.StartsWith("text/") && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
 								{
 									context.Context.Response.ContentType += "; charset=utf-8";
 								}

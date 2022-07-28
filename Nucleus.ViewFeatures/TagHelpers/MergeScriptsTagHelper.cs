@@ -96,7 +96,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
 										{
 											Logger.LogInformation("Merging [{0}] {1}", script.Type, script.Src);
 
-											if (script.Type != "text/javascript")
+											if (!String.IsNullOrEmpty(script.Type) && script.Type != "text/javascript")
 											{
 												// one of the <script>s is not javascript, write child content out unmodified
 												WriteOriginalContent(output, originalContent);
@@ -138,8 +138,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
 
 				IUrlHelper urlHelper = this.ViewContext.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(this.ViewContext);
 
-				builder = new TagBuilder("script");
-				builder.Attributes.Add("type", "text/javascript");
+				builder = new TagBuilder("script");				
 				builder.Attributes.Add("src", urlHelper.Content($"~/merged.js?src={System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(scriptUrl))}{this.Version()}"));
 
 				Logger.LogInformation("Merged Uri {0}", builder.Attributes["src"]);
@@ -168,10 +167,10 @@ namespace Nucleus.ViewFeatures.TagHelpers
 		{
 			return "&v=" + this.GetType().Assembly.GetName().Version;
 		}
-		private void WriteOriginalContent(TagHelperOutput Output, string OriginalContent)
+		private void WriteOriginalContent(TagHelperOutput output, string originalContent)
 		{
-			Output.SuppressOutput();
-			Output.Content.AppendHtml(OriginalContent);
+			output.SuppressOutput();
+			output.Content.AppendHtml(originalContent);
 		}
 
 		private class ScriptElement
@@ -181,7 +180,14 @@ namespace Nucleus.ViewFeatures.TagHelpers
 
 			public override string ToString()
 			{
-				return $"<script type=\"{Type}\" src=\"{Src}\"></script>";
+				if (String.IsNullOrEmpty(this.Type))
+				{
+					return $"<script src=\"{Src}\"></script>";
+				}
+				else
+				{
+					return $"<script type=\"{Type}\" src=\"{Src}\"></script>";
+				}
 			}
 		}
 

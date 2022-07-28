@@ -56,7 +56,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 					TagBuilder outputBuilder = new("a");
 					outputBuilder.Attributes.Add("href", urlHelper.Content("~/"));
 					outputBuilder.Attributes.Add("title", linkTitle);
-
+					
 					TagBuilder imageBuilder = new("img");
 
 					// render a direct link if the file system provider supports it (because it is faster than returning a redirect to azure storage).  This "skips"
@@ -73,7 +73,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
 					{
 						imageBuilder.Attributes.Add("src", urlHelper.FileLink(logoFile));
 					}
-					
+
+					imageBuilder.Attributes.Add("alt", linkTitle);
 					imageBuilder.Attributes.Add("loading", "lazy");
 					imageBuilder.Attributes.Add("role", "presentation");
 

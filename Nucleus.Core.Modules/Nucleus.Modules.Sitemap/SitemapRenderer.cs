@@ -133,7 +133,7 @@ namespace Nucleus.Modules.Sitemap
 					if (showDescription && !String.IsNullOrEmpty(menuItem.Page.Description))
 					{
 						TagBuilder descriptionBuilder = new("div");
-						descriptionBuilder.InnerHtml.SetContent(menuItem.Page.Description);
+						descriptionBuilder.InnerHtml.SetContent(ContentExtensions.ToHtml(menuItem.Page.Description, "text/plain"));
 						listItemBuilder.InnerHtml.AppendHtml(descriptionBuilder);
 					}
 

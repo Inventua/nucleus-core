@@ -32,7 +32,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
 
 			List<Page> breadcrumbs = new();
-			outputBuilder.Attributes.Add("area-label", "breadcrumb");
+			outputBuilder.Attributes.Add("aria-label", "breadcrumb");
 			listBuilder.AddCssClass("breadcrumb");
 
 			Page breadcrumbPage = nucleusContext.Page;

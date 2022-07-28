@@ -4,7 +4,7 @@
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
 @Html.PageListFor(model => model.Page.Id, Model.PageMenu)
-<script type="text/javascript">
+<script>
 	if (jQuery().PageList) { jQuery('.nucleus-page-list').PageList(); }
 
 	// Read the child pages of the item containing the "+" button

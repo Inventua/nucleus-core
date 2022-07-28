@@ -82,7 +82,7 @@
 	@Html.LinkButton("", "Back", Url.PageLink(Model.Page, @$"{Model.Forum.Name.FriendlyEncode()}/{(Model.Post.Id == Guid.Empty ? "" : Model.Post.Id)}"), new { @class="btn btn-secondary" })
 </div>
 }
-<script type="text/javascript">
+<script>
 	jQuery(document).ready(function() {
 		jQuery('.forums-edit-post .HtmlEditorControl').HtmlEditor({isAdminMode: false});
 		if (jQuery().ToggleSwitch) { jQuery('.forums-edit-post .ToggleSwitch').ToggleSwitch(); }

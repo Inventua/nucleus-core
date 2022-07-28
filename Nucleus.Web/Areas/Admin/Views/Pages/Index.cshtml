@@ -24,11 +24,11 @@
 
 @if (Model.PageId != Guid.Empty)
 {
-	<script type="text/javascript">
+	<script>
 		Page.LoadPartialContent(null, '@Url.Content("~/Admin/Pages/Editor?id=")' + '@Model.PageId', '#nucleus-page-editor');
 	</script>
 }
-<script type="text/javascript">
+<script>
 	// Open a page for editing
 	jQuery('.nucleus-index-wrapper').on('click', 'li[data-target="#nucleus-page-editor"] a', function (e)
 	{

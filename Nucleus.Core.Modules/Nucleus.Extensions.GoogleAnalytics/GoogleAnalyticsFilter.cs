@@ -39,7 +39,7 @@ namespace Nucleus.Extensions.GoogleAnalytics
 							// Use the existing AddScript HtmlHelper to render the Google Analytics scripts.
 							Nucleus.ViewFeatures.HtmlHelpers.AddScriptHtmlHelper.AddScript(executingContext.HttpContext, $"https://www.googletagmanager.com/gtag/js?id={googleAnalyticsId}", true, 1000);
 							// Render the script (RenderGoogleAnalyticsScript) with an absolute Uri to prevent the MergedScriptsTagHelper from merging it with static js files.
-							Nucleus.ViewFeatures.HtmlHelpers.AddScriptHtmlHelper.AddScript(executingContext.HttpContext, urlHelper.NucleusAction("RenderGoogleAnalyticsScript", "GoogleAnalytics", "GoogleAnalytics"), false, 1001);
+							Nucleus.ViewFeatures.HtmlHelpers.AddScriptHtmlHelper.AddScript(executingContext.HttpContext, this.Context.Site.AbsoluteUrl(urlHelper.NucleusAction("RenderGoogleAnalyticsScript", "GoogleAnalytics", "GoogleAnalytics"), executingContext.HttpContext.Request.IsHttps), false, 1001);
 						}
 					}
 				}

@@ -248,18 +248,18 @@ namespace Nucleus.Web
 							RequestPath = "/" + folderName,
 							OnPrepareResponse = context =>
 							{
-								if (context.Context.Response.ContentType.StartsWith("text/") && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
+								// Add charset=utf-8 to content-type for text content if it is not already present
+								if ((context.Context.Response.ContentType.StartsWith("text/") || context.Context.Response.ContentType.Equals("application/javascript")) && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
 								{
 									context.Context.Response.ContentType += "; charset=utf-8";
 								}
-								if (!context.Context.User.Identity.IsAuthenticated)
+
+								// Cache static content for 30 days
+								context.Context.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
 								{
-									context.Context.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
-									{
-										Public = true,
-										MaxAge = TimeSpan.FromDays(30)
-									};
-								}
+									Public = true,
+									MaxAge = TimeSpan.FromDays(30)
+								};								
 							}
 						});
 					}
@@ -269,9 +269,7 @@ namespace Nucleus.Web
 
 				app.UseCookiePolicy(new CookiePolicyOptions()
 				{
-					//HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
-					Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest,
-					//MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Strict
+					Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest
 				});
 
 				app.UseRouting();

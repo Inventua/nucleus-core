@@ -130,8 +130,7 @@ namespace Nucleus.Web.Controllers
 			// Dynamic content - specify no caching
 			ControllerContext.HttpContext.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
 			{
-				NoCache = true,
-				NoStore = false
+				NoCache = true  
 			};
 
 			return View(this.Context.Page.LayoutPath(this.Context.Site), viewModel);

@@ -25,6 +25,7 @@ namespace Nucleus.Abstractions.Mail
 		/// <param name="template"></param>
 		/// <param name="model"></param>
 		/// <param name="to"></param>
+		/// <typeparam name="TModel"></typeparam>
 		public Task Send<TModel>(MailTemplate template, TModel model, string to)
 			where TModel : class;
 	}

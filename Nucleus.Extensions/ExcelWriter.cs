@@ -19,6 +19,7 @@ namespace Nucleus.Extensions
 		/// Enumeration used by the <see cref="ExcelWriter{TModel}"/> constructor to specify whether the properties to export are 
 		/// automatically detected, or whether only specified columns are included.
 		/// </summary>
+		/// <type>Enum</type>
 		public enum Modes
 		{
 			/// <summary>

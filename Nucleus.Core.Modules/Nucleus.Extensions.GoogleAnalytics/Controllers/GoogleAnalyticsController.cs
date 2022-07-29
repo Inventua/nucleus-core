@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Nucleus.Extensions.GoogleAnalytics.Controllers
 {
@@ -45,9 +46,17 @@ namespace Nucleus.Extensions.GoogleAnalytics.Controllers
 		}
 
 		[HttpGet]
-		public ActionResult RenderGoogleAnalyticsScript()
+		public ActionResult RenderGoogleAnalyticsScript(string id)
 		{
 			ControllerContext.HttpContext.Response.ContentType = "text/javascript";
+
+			Response.GetTypedHeaders().CacheControl =
+				new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
+				{
+					Public=true,
+					MaxAge = TimeSpan.FromDays(30)
+				};
+
 			return View("AnalyticsScript", BuildSettingsViewModel(null));
 		}
 

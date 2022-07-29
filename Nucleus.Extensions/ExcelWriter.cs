@@ -497,81 +497,81 @@ namespace Nucleus.Extensions
 				return XLDataType.Text;
 			}
 		}
-	}
 
-	/// <summary>
-	/// Class representing a worksheet column.
-	/// </summary>
-	public class WorksheetColumn
-	{
-		/// <summary>
-		/// PropertyInfo instance used when creating the column using reflection.  This value is used during export to improve
-		/// performance.
-		/// </summary>
-		public PropertyInfo PropertyInfo { get; }
 
 		/// <summary>
-		/// If set, specifies the expression to evaluate in order to derive a value.
+		/// Class representing a worksheet column in an Excel export.
 		/// </summary>
-		public LambdaExpression Expression { get; }
-
-		/// <summary>
-		/// Column name.  This is the unique identifier for the column.
-		/// </summary>
-		public string Name { get; }
-
-		/// <summary>
-		/// Caption used in the heading row.
-		/// </summary>
-		public string Caption { get; set; }
-
-		/// <summary>
-		/// Excel data type for the column.
-		/// </summary>
-		public XLDataType? DataType { get; set; }
-
-		/// <summary>
-		/// Constructor used when you want to specify the name, caption and data type.
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="caption"></param>
-		/// <param name="dataType"></param>
-
-		public WorksheetColumn(string name, string caption, XLDataType? dataType)
+		public class WorksheetColumn
 		{
-			this.Name = name;
-			this.Caption = caption;
-			this.DataType = dataType;
+			/// <summary>
+			/// PropertyInfo instance used when creating the column using reflection.  This value is used during export to improve
+			/// performance.
+			/// </summary>
+			public PropertyInfo PropertyInfo { get; }
+
+			/// <summary>
+			/// If set, specifies the expression to evaluate in order to derive a value.
+			/// </summary>
+			public LambdaExpression Expression { get; }
+
+			/// <summary>
+			/// Column name.  This is the unique identifier for the column.
+			/// </summary>
+			public string Name { get; }
+
+			/// <summary>
+			/// Caption used in the heading row.
+			/// </summary>
+			public string Caption { get; set; }
+
+			/// <summary>
+			/// Excel data type for the column.
+			/// </summary>
+			public XLDataType? DataType { get; set; }
+
+			/// <summary>
+			/// Constructor used when you want to specify the name, caption and data type.
+			/// </summary>
+			/// <param name="name"></param>
+			/// <param name="caption"></param>
+			/// <param name="dataType"></param>
+
+			public WorksheetColumn(string name, string caption, XLDataType? dataType)
+			{
+				this.Name = name;
+				this.Caption = caption;
+				this.DataType = dataType;
+			}
+
+			/// <summary>
+			/// Constructor used when you want to specify the name, caption and data type, and an expression to evaluate the data to output.
+			/// </summary>
+			/// <param name="name"></param>
+			/// <param name="caption"></param>
+			/// <param name="dataType"></param>
+			/// <param name="expression"></param>
+
+			public WorksheetColumn(string name, string caption, XLDataType? dataType, LambdaExpression expression)
+			{
+				this.Name = name;
+				this.Caption = caption;
+				this.DataType = dataType;
+				this.Expression = expression;
+			}
+
+			/// <summary>
+			/// Constructed used to auto-detect column properties.
+			/// </summary>
+			/// <param name="propertyInfo"></param>
+
+			public WorksheetColumn(PropertyInfo propertyInfo)
+			{
+				this.PropertyInfo = propertyInfo;
+				this.Name = propertyInfo.Name;
+				this.Caption = propertyInfo.Name;
+				this.DataType = ExcelWriter.GetXLDataType(propertyInfo.PropertyType);
+			}
 		}
-
-		/// <summary>
-		/// Constructor used when you want to specify the name, caption and data type, and an expression to evaluate the data to output.
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="caption"></param>
-		/// <param name="dataType"></param>
-		/// <param name="expression"></param>
-
-		public WorksheetColumn(string name, string caption, XLDataType? dataType, LambdaExpression expression)
-		{
-			this.Name = name;
-			this.Caption = caption;
-			this.DataType = dataType;
-			this.Expression = expression;
-		}
-
-		/// <summary>
-		/// Constructed used to auto-detect column properties.
-		/// </summary>
-		/// <param name="propertyInfo"></param>
-
-		public WorksheetColumn(PropertyInfo propertyInfo)
-		{
-			this.PropertyInfo = propertyInfo;
-			this.Name = propertyInfo.Name;
-			this.Caption = propertyInfo.Name;
-			this.DataType = ExcelWriter.GetXLDataType(propertyInfo.PropertyType);
-		}
-
 	}
 }

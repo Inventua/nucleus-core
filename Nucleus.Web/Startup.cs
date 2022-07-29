@@ -23,6 +23,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http;
 
 namespace Nucleus.Web
 {
@@ -181,6 +182,9 @@ namespace Nucleus.Web
 				services.Logger().LogInformation("Adding Security Headers Middleware");
 				services.AddSecurityHeadersMiddleware(this.Configuration);
 
+				services.Logger().LogInformation("Adding Default Cache Middleware");
+				services.AddDefaultCacheMiddleware(this.Configuration);				
+
 				// Add merged file provider.  
 				services.Logger().LogInformation("Adding Merged File Middleware");
 				services.AddMergedFileMiddleware(this.Configuration);
@@ -259,12 +263,15 @@ namespace Nucleus.Web
 								{
 									Public = true,
 									MaxAge = TimeSpan.FromDays(30)
-								};								
+								};
 							}
 						});
 					}
 				}
 
+				// Set default cache-control to NoCache.  This can be overridden by controllers or middleware.
+				app.UseMiddleware<DefaultNoCacheMiddleware>();
+				
 				app.UseAuthorizationRedirect();
 
 				app.UseCookiePolicy(new CookiePolicyOptions()
@@ -292,59 +299,46 @@ namespace Nucleus.Web
 
 				app.UseEndpoints(routes =>
 				{
-				// All routes that don't match a controller/action or other defined endpoint go to the index controller and are
-				// treated as CMS pages.  By specifying the pattern argument (first argument) we ensure that requests that "look like"
-				// filenames (that is, contains a dot) are routed to the default page controller, the standard overload uses a pattern 
-				// {*path:nonfile}, which does not route those Urls to the default page controller.
-				// Even though this is the first route defined, .MapFallbackToController always creates a route that is last in the
-				// routing order.
-				routes.MapFallbackToController("{*path}", "Index", "Default");
+					// All routes that don't match a controller/action or other defined endpoint go to the index controller and are
+					// treated as CMS pages.  By specifying the pattern argument (first argument) we ensure that requests that "look like"
+					// filenames (that is, contains a dot) are routed to the default page controller, the standard overload uses a pattern 
+					// {*path:nonfile}, which does not route those Urls to the default page controller.
+					// Even though this is the first route defined, .MapFallbackToController always creates a route that is last in the
+					// routing order, so any other mapped route will take precedence over this one.
+					routes.MapFallbackToController("{*path}", "Index", "Default");
 
-				// "Razor Pages" (Razor Pages is different to Razor views with controllers [MVC])
-				routes.MapRazorPages();
+					// "Razor Pages" (Razor Pages is different to Razor views with controllers [MVC])
+					routes.MapRazorPages();
 
-				// Map the merged.js route
-				//routes.MapControllerRoute(
-				//	name: RoutingConstants.MERGED_JS_ROUTE_NAME,
-				//	pattern: "/merged.js/{*src}",
-				//	defaults: new { controller = "MergedFile", action = "Index" });
+					// Map the error page route
+					routes.MapControllerRoute(
+							name: RoutingConstants.ERROR_ROUTE_NAME,
+							pattern: $"/{RoutingConstants.ERROR_ROUTE_PATH}",
+							defaults: new { controller = "Error", action = "Index" });
 
-				// Map the merged.css route
-				//routes.MapControllerRoute(
-				//	name: RoutingConstants.MERGED_CSS_ROUTE_NAME,
-				//	pattern: "/{linkpath}/merged.css/{*src}",
-				//	defaults: new { controller = "MergedFile", action = "Index" });
+					// map area routes for the admin controllers
+					routes.MapControllerRoute(
+								name: RoutingConstants.AREA_ROUTE_NAME,
+								pattern: "/{area}/{controller}/{action=Index}/{id?}");
 
-				// Map the error page
-				routes.MapControllerRoute(
-						name: RoutingConstants.ERROR_ROUTE_NAME,
-						pattern: $"/{RoutingConstants.ERROR_ROUTE_PATH}",
-						defaults: new { controller = "Error", action = "Index" });
+					// map routes for extension controllers
+					routes.MapControllerRoute(
+							name: RoutingConstants.EXTENSIONS_ROUTE_NAME,
+							pattern: $"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
 
-				// map area routes for the admin controllers
-				routes.MapControllerRoute(
-							name: RoutingConstants.AREA_ROUTE_NAME,
-							pattern: "/{area}/{controller}/{action=Index}/{id?}");
+					// we're not currently using this route for anything
+					routes.MapControllerRoute(
+							name: RoutingConstants.API_ROUTE_NAME,
+							pattern: $"/{RoutingConstants.API_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
 
-				// map routes for extension controllers
-				routes.MapControllerRoute(
-						name: RoutingConstants.EXTENSIONS_ROUTE_NAME,
-						pattern: $"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
+					// Map the search engines "site map" controller to /sitemap.xml
+					routes.MapControllerRoute(
+							name: RoutingConstants.SITEMAP_ROUTE_NAME,
+							pattern: $"/{RoutingConstants.SITEMAP_ROUTE_PATH}",
+							defaults: new { controller = "Sitemap", action = "Index" });
 
-				// we're not currently using this route for anything
-				routes.MapControllerRoute(
-						name: RoutingConstants.API_ROUTE_NAME,
-						pattern: $"/{RoutingConstants.API_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
-
-				// Map the search engines "site map" controller to /sitemap.xml
-				routes.MapControllerRoute(
-						name: RoutingConstants.SITEMAP_ROUTE_NAME,
-						pattern: $"/{RoutingConstants.SITEMAP_ROUTE_PATH}",
-						defaults: new { controller = "Sitemap", action = "Index" });
-
-
-				// Configure controller routes using attribute-based routing
-				routes.MapControllers();
+					// Configure controller routes using attribute-based routing
+					routes.MapControllers();
 				});
 
 				app.Logger().LogInformation($"Startup complete.  Nucleus is running.");

@@ -33,12 +33,6 @@ namespace Nucleus.Web.Controllers
 			Microsoft.AspNetCore.Mvc.ProblemDetails data;
 			Page errorPage = null;
 
-			// An error response is dynamic content - specify no caching
-			ControllerContext.HttpContext.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
-			{
-				NoCache = true
-			};
-
 			if (exceptionDetails?.Error != null)
 			{
 				//// try to convert database errors to a more friendly message

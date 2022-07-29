@@ -34,6 +34,19 @@ namespace Nucleus.Core
 			return services;
 		}
 
+		/// <summary>
+		/// Add and configure default cache middleware.
+		/// </summary>
+		/// <param name="services"></param>
+		/// <param name="configuration"></param>
+		/// <returns></returns>
+		public static IServiceCollection AddDefaultCacheMiddleware(this IServiceCollection services, IConfiguration configuration)
+		{
+			// Add middleware
+			services.AddScoped<DefaultNoCacheMiddleware>();
+			return services;
+		}
+
 
 		/// <summary>
 		/// Add and configure Nucleus folder options

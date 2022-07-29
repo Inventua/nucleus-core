@@ -127,12 +127,6 @@ namespace Nucleus.Web.Controllers
 				ControllerContext.HttpContext.Response.Cookies.Append(PermissionExtensions.EDIT_COOKIE_NAME, "true", options);
 			}
 
-			// Dynamic content - specify no caching
-			ControllerContext.HttpContext.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
-			{
-				NoCache = true  
-			};
-
 			return View(this.Context.Page.LayoutPath(this.Context.Site), viewModel);
 		}
 

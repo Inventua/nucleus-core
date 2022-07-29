@@ -11,7 +11,10 @@
 {
 	@foreach (var item in Model.Content.Items)
 	{
-		if (item is String){@(item as String)}
+		if (item is String)
+		{
+			@Html.Raw(item as String)
+		}
 		else if (item is Nucleus.XmlDocumentation.Models.Serialization.See)
 		{
 			var seeItem = item as Nucleus.XmlDocumentation.Models.Serialization.See;

@@ -7,22 +7,19 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 namespace Nucleus.XmlDocumentation
 {
 	/// <summary>
-	/// Returns an anchor (<![CDATA[a]]>) element which links to the site's Terms page.
+	/// Removes unwanted white space from the output.
 	/// </summary>	
 	/// <remarks>
-	/// If the site does not have a configured terms page, nothing is rendered.
+	/// The _RenderMixedContent razor view loops through elements in a <see cref="Models.Serialization.MixedContent"/> and renders
+	/// each item type as needed, but the Razor parser retains white space (CRLFs and tabs) between each mixed content item, which 
+	/// manifests as (visible) white space in the output.  This tag helper removes the unwanted space between each item.  A 
+	/// similar (but different) function is performed by <see cref="DocumentationParser.TrimStrings"/>, which removes unwanted white
+	/// space from XmlText elements in mixed content that results from the way that MSBuild outputs XML comments files.
 	/// </remarks>
 
 	[HtmlTargetElement("RemoveWhitespace")]
 	public class RemoveWhitespaceTagHelper : TagHelper
 	{
-		/// <summary>
-		/// Provides access to view context.
-		/// </summary>
-		[ViewContext]
-		[HtmlAttributeNotBound]
-		public ViewContext ViewContext { get; set; }
-
 		/// <summary>
 		/// Generate the output.
 		/// </summary>

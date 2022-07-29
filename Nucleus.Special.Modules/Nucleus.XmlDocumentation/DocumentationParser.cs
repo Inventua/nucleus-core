@@ -405,11 +405,16 @@ namespace Nucleus.XmlDocumentation
 		{
 			if (content?.Items == null) return;
 
-			for (int count=0; count < content.Items.Length; count++)
+			for (int count = 0; count < content.Items.Length; count++)
 			{
 				if (content.Items[count] is System.String)
 				{
-					content.Items[count] = (content.Items[count] as System.String).Replace("\r", "").Replace("\n", "");
+					string value = (content.Items[count] as System.String);
+
+					// replace multiple spaces with a single space
+					value = System.Text.RegularExpressions.Regex.Replace(value, "[ ]{2,}", " ");
+
+					content.Items[count] = value.Replace("\t", "").Replace("\n \n", "<br /><br />").Replace("\r", "").Replace("\n", "");
 				}
 			}
 		}

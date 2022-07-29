@@ -50,6 +50,7 @@ namespace Nucleus.XmlDocumentation
 
 						case ApiMember.MemberTypes.Class:
 						case ApiMember.MemberTypes.Interface:
+						case ApiMember.MemberTypes.Enum:
 							// Special handling for namespace documentation
 							if (apiMember.Name == "NamespaceDoc")
 							{

@@ -6,7 +6,7 @@
 @if (Model != null)
 {
 <div class="api-class">
-	<h2>@Model.Content.Name @(Model.Content.Type== Nucleus.XmlDocumentation.Models.ApiMember.MemberTypes.Interface ? "Interface" : "Class")</h2>
+	<h2>@Model.Content.Name @(Model.Content.Type)</h2>
 	<div><small class="text-muted">Namespace: @Model.Content.Namespace</small></div>
 	<div><small class="text-muted">Assembly: @(Model.Content.AssemblyName + ".dll")</small></div>
 	@if (Model.Content.Summary?.Items?.Any() == true)

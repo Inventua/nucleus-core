@@ -105,39 +105,36 @@ namespace Nucleus.XmlDocumentation.Models
 		/// <param name="member"></param>
 		/// <param name="assemblyName"></param>
 		public ApiMember(Models.Serialization.Member member, string assemblyName) : this(member)
-		{
+		{			
+			if (_match.Success)
 			{
-				if (_match.Success)
+				if (this.Type == MemberTypes.Class || this.Type == MemberTypes.Interface || this.Type == MemberTypes.Enum)
 				{
-					if (this.Type == MemberTypes.Class || this.Type == MemberTypes.Interface)
-					{
-						this.Name = this.FullName.Substring(assemblyName.Length + 1);  //ParseName(match.Groups[2].Value.Substring(match.Groups[2].Value.LastIndexOf('.') + 1));
-						this.ClassName = this.FullName; // ParseName(this.FullName.Substring(0, this.FullName.LastIndexOf('.')));
-					}
-					else
-					{
-						this.Name = ParseName(_match.Groups[2].Value.Substring(_match.Groups[2].Value.LastIndexOf('.') + 1));
-						this.ClassName = ParseName(this.FullName.Substring(0, this.FullName.LastIndexOf('.')));
-					}
-
-					if (this.Name.Contains("#ctor"))
-					{
-						this.Type = MemberTypes.Constructor;
-						this.Name = this.ClassName;
-					}
-
-					this.Namespace = this.ClassName.Substring(0, this.ClassName.LastIndexOf('.'));
+					this.Name = this.FullName.Substring(assemblyName.Length + 1);  
+					this.ClassName = this.FullName; 
 				}
-			}
+				else
+				{
+					this.Name = ParseName(_match.Groups[2].Value.Substring(_match.Groups[2].Value.LastIndexOf('.') + 1));
+					this.ClassName = ParseName(this.FullName.Substring(0, this.FullName.LastIndexOf('.')));
+				}
 
-			// Parse the parameters signature, which contains a comma-separated list of types
+				if (this.Name.Contains("#ctor"))
+				{
+					this.Type = MemberTypes.Constructor;
+					this.Name = this.ClassName;
+				}
+
+				this.Namespace = this.ClassName.Substring(0, this.ClassName.LastIndexOf('.'));
+			}
+			
+			// Parse the parameters signature, which contains a comma-separated list of types			
+			System.Text.RegularExpressions.Match matchParams = System.Text.RegularExpressions.Regex.Match(member.Name, "\\((.*)\\)");
+			if (matchParams.Success)
 			{
-				System.Text.RegularExpressions.Match matchParams = System.Text.RegularExpressions.Regex.Match(member.Name, "\\((.*)\\)");
-				if (matchParams.Success)
-				{
-					this.Parameters = ParseParameters(matchParams.Groups[1].Value.Replace(",", ", "));
-				}
+				this.Parameters = ParseParameters(matchParams.Groups[1].Value.Replace(",", ", "));
 			}
+			
 
 			// Match parameter types from the member type with documented parameters.  The parameters come from the member's ID string, documentation
 			// on encoding is at https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/documentation-comments
@@ -149,7 +146,6 @@ namespace Nucleus.XmlDocumentation.Models
 					
 				foreach(string parameter in this.Parameters.Split(',', StringSplitOptions.RemoveEmptyEntries))
 				{
-					//System.Text.RegularExpressions.Match matchParamList = System.Text.RegularExpressions.Regex.Match(this.Parameters, "([^{}]+?|.*{(.*)})(?:,|$| ,)");
 					System.Text.RegularExpressions.Match matchParamList = System.Text.RegularExpressions.Regex.Match(parameter, "(?<type>.*) (?<name>.*)");
 
 					if (matchParamList.Success)
@@ -172,10 +168,8 @@ namespace Nucleus.XmlDocumentation.Models
 							{
 								this.Params[count].Type = nullableTypeMatch.Groups[1].Value + "?";
 							}
-
 						}
 
-						//matchParamList = matchParamList.NextMatch();
 						count++;
 					}
 				}				
@@ -183,7 +177,6 @@ namespace Nucleus.XmlDocumentation.Models
 
 			if (!String.IsNullOrEmpty(this.Parameters) && this.Params != null)
 			{
-				//this.Parameters = this.Parameters.Replace("@", String.Empty);
 				this.Parameters = String.Join(", ", this.Params.Select(param => ParseParameter(param)));
 			}
 		}

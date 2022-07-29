@@ -303,7 +303,6 @@ namespace Nucleus.XmlDocumentation
 							else
 							{
 								// The typeparam comment is missing for the specified API class		
-								System.Diagnostics.Debug.WriteLine($"{apiClass.FullName}{(apiMember == null ? "" : ", " + apiMember.FullName)} missing typeParam.");
 								result += $"T{typeParamIndex}";
 							}
 						}

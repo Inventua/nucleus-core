@@ -19,6 +19,7 @@ namespace Nucleus.XmlDocumentation.Models
 			Property,
 			Method,
 			Event,
+			Enum,
 			Unknown
 		}
 

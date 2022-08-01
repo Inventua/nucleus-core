@@ -74,7 +74,7 @@ namespace Nucleus.Core.FileProviders
 				src = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(context.Request.Query["src"]));
 				Logger.LogTrace("Received Request for {src}", src);
 
-				contentType = subpath.EndsWith(".css") ? "text/css; charset=utf-8" : "application/javascript";
+				contentType = subpath.EndsWith(".css") ? "text/css; charset=utf-8" : "application/javascript; charset=utf-8";
 				result = GetCacheValue(cacheKey);
 
 				if (result != null && result.Exists)

@@ -48,7 +48,7 @@ namespace Nucleus.Extensions.GoogleAnalytics.Controllers
 		[HttpGet]
 		public ActionResult RenderGoogleAnalyticsScript(string id)
 		{
-			ControllerContext.HttpContext.Response.ContentType = "text/javascript";
+			ControllerContext.HttpContext.Response.ContentType = "text/javascript; charset=utf-8";
 
 			Response.GetTypedHeaders().CacheControl =
 				new Microsoft.Net.Http.Headers.CacheControlHeaderValue()

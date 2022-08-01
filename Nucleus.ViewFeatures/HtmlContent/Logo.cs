@@ -74,6 +74,15 @@ namespace Nucleus.ViewFeatures.HtmlContent
 						imageBuilder.Attributes.Add("src", urlHelper.FileLink(logoFile));
 					}
 
+					if (logoFile.Width.HasValue)
+					{
+						imageBuilder.Attributes.Add("width", logoFile.Width.Value.ToString());
+					}
+					if (logoFile.Height.HasValue)
+					{
+						imageBuilder.Attributes.Add("height", logoFile.Height.Value.ToString());
+					}
+
 					imageBuilder.Attributes.Add("alt", linkTitle);
 					imageBuilder.Attributes.Add("loading", "lazy");
 					imageBuilder.TagRenderMode = TagRenderMode.SelfClosing;

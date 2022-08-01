@@ -11,7 +11,7 @@ using Nucleus.Core.DataProviders;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.FileSystemProviders;
 using Nucleus.Core.FileSystemProviders;
-using System.Collections.ObjectModel;
+using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Core.Managers
@@ -536,10 +536,12 @@ namespace Nucleus.Core.Managers
 				}
 
 				File file = await provider.SaveFile(parentPath, newFileName, content, overwrite);
-
-
 				await GetDatabaseProperties(site, file);
 
+				// try to get the image dimensions and save them.  The GetImageDimensions extension checks that the file is
+				// an image and does nothing if it is not, so we don't need to check that here. 
+				file.GetImageDimensions(site, this);
+				
 				using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 				{
 					await dataProvider.SaveFile(site, file);

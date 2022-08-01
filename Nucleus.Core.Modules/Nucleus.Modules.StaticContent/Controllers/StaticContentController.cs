@@ -82,7 +82,7 @@ namespace Nucleus.Modules.StaticContent.Controllers
 							// Redirect to the file.
 							if (viewModel.DefaultFile.Capabilities.CanDirectLink)
 							{
-								System.Uri uri = this.FileSystemManager.GetFileDirectUrl(this.Context.Site, viewModel.DefaultFile);
+								System.Uri uri = await this.FileSystemManager.GetFileDirectUrl(this.Context.Site, viewModel.DefaultFile);
 								if (uri != null)
 								{
 									return new RedirectResult(uri.AbsoluteUri, true);
@@ -160,7 +160,7 @@ namespace Nucleus.Modules.StaticContent.Controllers
 								if (file != null && file.Capabilities.CanDirectLink)
 								{
 									// replace attribute with direct file link
-									string fileUri = this.FileSystemManager.GetFileDirectUrl(this.Context.Site, file).ToString();
+									string fileUri = (await this.FileSystemManager.GetFileDirectUrl(this.Context.Site, file)).ToString();
 									if (fileUri.Contains('?') && query.StartsWith('?'))
 									{
 										query = $"&{query.Substring(1)}";
@@ -171,6 +171,20 @@ namespace Nucleus.Modules.StaticContent.Controllers
 								{
 									string fileUri = Url.FileLink(file);
 									node.SetAttributeValue(attributeName, fileUri + query);
+								}
+
+								// For images, if we know the height/width of the image file, and if a height/width attribute is not already 
+								// specifed, add the attribute(s).
+								if (node.Name.Equals( "img" , StringComparison.OrdinalIgnoreCase ))
+								{
+									if (file.Width.HasValue && String.IsNullOrEmpty(node.GetAttributeValue("width", "")))
+									{
+										node.SetAttributeValue("width", file.Width.Value.ToString());
+									}
+									if (file.Height.HasValue && String.IsNullOrEmpty(node.GetAttributeValue("height", "")))
+									{
+										node.SetAttributeValue("height", file.Height.Value.ToString());
+									}
 								}
 							}
 							catch (System.IO.FileNotFoundException)

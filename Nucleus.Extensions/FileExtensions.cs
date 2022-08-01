@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
 
 namespace Nucleus.Extensions
@@ -53,6 +54,60 @@ namespace Nucleus.Extensions
 				return id;
 			}
 		}
-		
+
+		/// <summary>
+		/// Return the content type for the file, or application/octet-stream if the file extension was not matched to a MIME type.
+		/// </summary>
+		/// <param name="file"></param>
+		/// <param name="addCharset">Specifies whether to append charset=utf-8 to the MIME type for text and javascript files.</param>
+		/// <returns></returns>
+		public static string GetMIMEType(this File file, Boolean addCharset)
+		{
+			Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider extensionProvider = new();
+
+			if (!extensionProvider.TryGetContentType(file.Path, out string mimeType))
+			{
+				return "application/octet-stream";
+			}
+			else
+			{
+				if (mimeType.StartsWith("text/") && !mimeType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
+				{
+					mimeType += "; charset=utf-8";
+				}
+
+				return mimeType;
+			}
+		}
+
+		/// <summary>
+		/// Retrieve the height and width of the file (if its file extension indicates that it is an image) and set the height/width 
+		/// properties of the specified <paramref name="file"/>.
+		/// </summary>
+		/// <param name="file"></param>
+		/// <param name="site"></param>
+		/// <param name="fileSystemManager"></param>
+		/// <returns>
+		/// Returns true on success, or false if the file extension does not indicate that the file is an image, or there 
+		/// is an error rendering the image.
+		/// </returns>
+		public static Boolean GetImageDimensions(this File file, Site site, Nucleus.Abstractions.Managers.IFileSystemManager fileSystemManager)
+		{
+			if (GetMIMEType(file, false).StartsWith("image/"))
+			{
+				using System.IO.Stream imageStream = fileSystemManager.GetFileContents(site, file);
+				// The SkiaSharp is not directly referenced as a Nuget package, but is a dependency of DocumentPartner.ClosedXML,
+				// so it is available to us.
+				SkiaSharp.SKImage image = SkiaSharp.SKImage.FromEncodedData(imageStream);
+				if (image != null)
+				{
+					file.Width = image.Width;
+					file.Height = image.Height;
+					return true;
+				}
+			}
+
+			return false;
+		}
 	}
 }

@@ -62,9 +62,7 @@ namespace Nucleus.Core.Managers
 				{
 					return await provider.GetUserSession(id);
 				}
-			});
-
-			
+			});						
 		}
 
 		/// <summary>

@@ -171,8 +171,15 @@ namespace Nucleus.Extensions
 				}
 				else
 				{
-					return await GetDirectFilePath(site, fileId, fileSystemManager);
-					//return $"/files/{FileExtensions.EncodeFileId(fileId)}";
+					try
+					{
+						return await GetDirectFilePath(site, fileId, fileSystemManager);
+					}
+					catch(System.IO.FileNotFoundException)
+					{
+						// file not found
+						return "";
+					}
 				}
 			}
 			return null;
@@ -223,7 +230,7 @@ namespace Nucleus.Extensions
 			// the Nucleus permissions check, but the performance difference is > 200ms.
 			if (file.Capabilities.CanDirectLink)
 			{
-				System.Uri uri = fileSystemManager.GetFileDirectUrl(site, file);
+				System.Uri uri = await fileSystemManager.GetFileDirectUrl(site, file);
 				if (uri != null)
 				{
 					return uri.AbsoluteUri;

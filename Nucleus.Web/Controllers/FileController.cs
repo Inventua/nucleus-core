@@ -106,7 +106,8 @@ namespace Nucleus.Web.Controllers
 			{
 				if (file != null)
 				{
-					DateTime lastModifiedDate = file.DateModified;
+					Microsoft.AspNetCore.Http.Headers.ResponseHeaders headers = Response.GetTypedHeaders();
+	  			DateTime lastModifiedDate = file.DateModified;
 
 					this.Logger.LogInformation("File {provider}/{path} found.", file.Provider, file.Path);
 
@@ -130,45 +131,42 @@ namespace Nucleus.Web.Controllers
 							return StatusCode((int)System.Net.HttpStatusCode.NotModified);
 						}
 
-						// For file system providers that support it, we redirect to the "direct" url for files, so as
-						// to avoid additional data traffic charges in cloud-hosted environments.  
-						// By rendering a Nucleus file link (to this controller) and then returning a redirect, we still check
-						// for Nucleus permissions, but are using the direct link to serve the file.
-						if (file.Capabilities.CanDirectLink)
-						{
-							System.Uri uri = this.FileSystemManager.GetFileDirectUrl(this.Context.Site, file);
-							if (uri != null)
-							{
-								return Redirect(uri.AbsoluteUri);
-							}
-						}
-
-						System.Net.Http.Headers.ContentDispositionHeaderValue contentDisposition = new(inline ? "inline" : "attachment")
-						{
-							FileName = file.Name,
-						};
-
-						Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider extensionProvider = new();
-						
-						Response.Headers.Add(Microsoft.Net.Http.Headers.HeaderNames.ContentDisposition, contentDisposition.ToString());
-
-						Microsoft.AspNetCore.Http.Headers.ResponseHeaders headers = Response.GetTypedHeaders();
-
 						headers.LastModified = lastModifiedDate;
-
 						headers.CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
 						{
 							Public = true,
 							MaxAge = TimeSpan.FromDays(30)
 						};
 
+						// For file system providers that support it, we redirect to the "direct" url for files, so as
+						// to avoid additional data traffic charges in cloud-hosted environments.  
+						// By rendering a Nucleus file link (to this controller) and then returning a redirect, we still check
+						// for Nucleus permissions, but are using the direct link to serve the file.
+						if (file.Capabilities.CanDirectLink)
+						{
+							System.Uri uri = await this.FileSystemManager.GetFileDirectUrl(this.Context.Site, file);
+							if (uri != null)
+							{
+								return Redirect(uri.AbsoluteUri);
+							}
+						}
+
+						headers.ContentDisposition = new Microsoft.Net.Http.Headers.ContentDispositionHeaderValue(inline ? "inline" : "attachment")
+						{
+							FileName = file.Name,
+						};
+
+						Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider extensionProvider = new();
 						if (!extensionProvider.TryGetContentType(file.Path, out string mimeType))
 						{
 							mimeType = "application/octet-stream";
 						}
-						if (mimeType.StartsWith("text/") && !mimeType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
+						else
 						{
-							mimeType += "; charset=utf-8";
+							if (mimeType.StartsWith("text/") && !mimeType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
+							{
+								mimeType += "; charset=utf-8";
+							}
 						}
 
 						return File(this.FileSystemManager.GetFileContents(this.Context.Site, file), mimeType);

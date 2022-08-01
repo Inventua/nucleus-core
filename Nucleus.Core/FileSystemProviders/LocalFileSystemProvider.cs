@@ -185,7 +185,7 @@ namespace Nucleus.Core.FileSystemProviders
 		/// <remarks>
 		/// Returns null to indicate that a direct url could not be returned by the provider.
 		/// </remarks>
-		public override System.Uri GetFileDirectUrl(string path)
+		public override System.Uri GetFileDirectUrl(string path, DateTime expiresOn)
 		{
 			return null;
 		}

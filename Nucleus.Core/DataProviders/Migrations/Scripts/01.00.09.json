@@ -1,0 +1,38 @@
+﻿{
+  "schemaName": "Nucleus.Core",
+  "version": "01.00.09",
+  "operations": [
+    {
+      "addColumn": {
+        "table": "Files",
+        "name": "DirectUrl",
+        "clrType": "String",
+        "isnullable": true
+      }
+    },
+    {
+      "addColumn": {
+        "table": "Files",
+        "name": "DirectUrlExpiry",
+        "clrType": "DateTime",
+        "isnullable": true
+      }
+    },
+    {
+      "addColumn": {
+        "table": "Files",
+        "name": "Height",
+        "clrType": "int",
+        "isnullable": true
+      }
+    },
+    {
+      "addColumn": {
+        "table": "Files",
+        "name": "width",
+        "clrType": "int",
+        "isnullable": true
+      }
+    }
+  ]
+}

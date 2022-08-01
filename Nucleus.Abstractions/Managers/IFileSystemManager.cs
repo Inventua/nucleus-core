@@ -53,7 +53,7 @@ namespace Nucleus.Abstractions.Managers
 		/// Capabilities.CanDirectLink property to determine whether the file system provider is capable of 
 		/// providing direct links before calling this method.
 		/// </remarks>
-		public System.Uri GetFileDirectUrl(Site site, File file);
+		public Task<System.Uri> GetFileDirectUrl(Site site, File file);
 
 		/// <summary>
 		/// Create/add default permissions to the specified <see cref="Folder"/> for the specified <see cref="Role"/>.

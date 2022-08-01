@@ -81,11 +81,12 @@ namespace Nucleus.Abstractions.FileSystemProviders
 		///  Get an direct access Url for the file.
 		/// </summary>
 		/// <param name="path"></param>
+		/// <param name="expiresOn"></param>
 		/// <returns></returns>
 		/// <remarks>
 		/// This method can return null to indicate that the file system provider cannot provide a direct Url to the file.
 		/// </remarks>
-		public abstract System.Uri GetFileDirectUrl(string path);
+		public abstract System.Uri GetFileDirectUrl(string path, DateTime expiresOn);
 
 		/// <summary>
 		/// Retrieve the contents of an existing file and return as a stream.

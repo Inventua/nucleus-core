@@ -134,15 +134,38 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			}
 		}
 
-		public override System.Uri GetFileDirectUrl(string path)
+		public override System.Uri GetFileDirectUrl(string path, DateTime expiresOn)
 		{
+			// set cache expiry to 30 minutes less than the SAS token expiry so a browser doesn't ever try a direct url that won't work
+			long maxAge = (Int64)((expiresOn - DateTime.UtcNow).TotalHours - 0.5) * 60;
 			BlobClient blobClient = new(this.Options.ConnectionString, GetContainerName(path), GetBlobName(path));
-
+			
 			if (blobClient.CanGenerateSasUri)
 			{
 				try
 				{
-					return blobClient.GenerateSasUri(Azure.Storage.Sas.BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddMinutes(60));
+					Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider extensionProvider = new();
+
+					if (!extensionProvider.TryGetContentType(path, out string mimeType))
+					{
+						mimeType = "application/octet-stream";
+					}
+					else
+					{
+						if (mimeType.StartsWith("text/") && !mimeType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
+						{
+							mimeType += "; charset=utf-8";
+						}
+					}
+
+					Azure.Storage.Sas.BlobSasBuilder options = new(Azure.Storage.Sas.BlobSasPermissions.Read, expiresOn)
+					{ 
+						CacheControl = $"public, max-age={maxAge}",
+						ContentType = mimeType
+					};
+
+					return blobClient.GenerateSasUri(options);
+					//return blobClient.GenerateSasUri(Azure.Storage.Sas.BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddDays(30));
 				}
 				catch (Azure.RequestFailedException ex)
 				{
@@ -247,7 +270,6 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			// In Azure blob storage, top level cannot contain files (only containers)
 			if (!String.IsNullOrEmpty(path))
 			{
-				//Azure.Pageable<BlobItem> items = containerClient.GetBlobs(Azure.Storage.Blobs.Models.BlobTraits.None, BlobStates.None, GetBlobName(path));
 				string prefix = GetBlobName(path);
 				if (!String.IsNullOrEmpty(prefix))
 				{

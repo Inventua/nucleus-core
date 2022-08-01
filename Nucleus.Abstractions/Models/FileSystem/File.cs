@@ -20,7 +20,27 @@ namespace Nucleus.Abstractions.Models.FileSystem
 		/// The size of the file, in bytes.
 		/// </summary>
 		public long Size { get; set; }
-		
+
+		/// <summary>
+		/// The height of an image file, in pixels.
+		/// </summary>
+		public int? Height { get; set; }
+
+		/// <summary>
+		/// The width of an image file, in pixels.
+		/// </summary>
+		public int? Width { get; set; }
+
+		/// <summary>
+		/// A saved direct url to the file, for cloud file system providers.
+		/// </summary>
+		public string DirectUrl { get; set; }
+
+		/// <summary>
+		/// Date/time that the DirectUrl expires.
+		/// </summary>
+		public DateTime? DirectUrlExpiry { get; set; }
+
 		/// <summary>
 		/// Clear the file selection, leaving the provider and parent folder selection intact.
 		/// </summary>
@@ -36,13 +56,13 @@ namespace Nucleus.Abstractions.Models.FileSystem
 		/// present in the database (that is, can't be retrieved from the file system).
 		/// </summary>
 		/// <param name="target"></param>
-		/// <remarks>
-		/// At present, the only value that is exclusive to the database is 'Id', but this may change in the future, so we have
-		/// centralized this functionality here so that if we add fields to the database, we only need to change code here.
-		/// </remarks>
 		public void CopyDatabaseValuesTo(File target)
 		{
 			target.Id = this.Id;
+			target.DirectUrl= this.DirectUrl;
+			target.DirectUrlExpiry = this.DirectUrlExpiry;
+			target.Width = this.Width;
+			target.Height = this.Height;
 		}
 	}
 }

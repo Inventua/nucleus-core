@@ -97,7 +97,7 @@ namespace Nucleus.Core.Managers
 			using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
 				File fileData = await provider.GetFile(id);
-
+				
 				if (fileData != null)
 				{
 					File file = this.FileSystemProviderFactory.Get(site, fileData.Provider).GetFile(fileData.Path);
@@ -431,10 +431,32 @@ namespace Nucleus.Core.Managers
 			return folder;
 		}
 
-		public System.Uri GetFileDirectUrl(Site site, File file)
+		public async Task<System.Uri> GetFileDirectUrl(Site site, File file)
 		{
+			if (!String.IsNullOrEmpty(file.DirectUrl) && (!file.DirectUrlExpiry.HasValue || file.DirectUrlExpiry.Value > DateTime.UtcNow))
+			{
+				if (System.Uri.TryCreate(file.DirectUrl, UriKind.Absolute, out Uri uri))
+				{
+					return uri;
+				}
+			}
+
+			DateTime expiresOn = DateTime.UtcNow.AddDays(30);
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, file.Provider);
-			return provider.GetFileDirectUrl(file.Path);
+			System.Uri directUrl = provider.GetFileDirectUrl(file.Path, expiresOn);
+
+			if (directUrl != null)
+			{
+				file.DirectUrl = directUrl.ToString();
+				file.DirectUrlExpiry = expiresOn;
+
+				using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
+				{
+					await dataProvider.SaveFile(site, file);
+				}
+			}
+
+			return directUrl;
 		}
 
 		public System.IO.Stream GetFileContents(Site site, File file)

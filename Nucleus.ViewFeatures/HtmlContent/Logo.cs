@@ -63,7 +63,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 					// the Nucleus permissions check, but the performance difference is > 200ms.
 					if (logoFile.Capabilities.CanDirectLink)
 					{
-						System.Uri uri = fileSystemManager.GetFileDirectUrl(site, logoFile);
+						System.Uri uri = await fileSystemManager.GetFileDirectUrl(site, logoFile);
 						if (uri != null)
 						{
 							imageBuilder.Attributes.Add("src", uri.AbsoluteUri);

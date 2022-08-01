@@ -9,7 +9,7 @@
 		<div class="carousel-indicators">
 			@for (int count = 0; count < Model.Contents.Count; count++)
 			{
-				<button type="button" data-bs-target="#carousel-@Model.Module.Id" data-bs-slide-to="@count" class="@(Model.Contents[count] == Model.Contents.First() ? "active" : "")" aria-current="@(Model.Contents[count] == Model.Contents.First() ? true : false)" aria-label="@Model.Contents[count].Title"></button>
+				<button type="button" data-bs-target="#carousel-@Model.Module.Id" data-bs-slide-to="@count" class="@(Model.Contents[count] == Model.Contents.First() ? "active" : "")" aria-current="@(Model.Contents[count] == Model.Contents.First() ? "true" : "false")" aria-label="@Model.Contents[count].Title"></button>
 			}
 		</div>
 	}

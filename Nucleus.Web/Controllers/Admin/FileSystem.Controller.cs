@@ -301,6 +301,8 @@ namespace Nucleus.Web.Controllers.Admin
 				if (folder != null)
 				{
 					viewModel.Folder = await this.FileSystemManager.ListFolder(this.Context.Site, folder.Id, "");
+					viewModel.Folder.SortFolders(folder => folder.Name, false);
+					viewModel.Folder.SortFiles(file => file.Name, false);
 				}
 			}
 

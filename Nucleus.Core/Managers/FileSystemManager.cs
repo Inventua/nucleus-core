@@ -127,7 +127,12 @@ namespace Nucleus.Core.Managers
 					if (fileData == null)
 					{
 						// database entry does not exist, create 
-						fileData = await provider.SaveFile(site, new File() { Provider = providerName, Path = path });
+
+						// try to get the image dimensions.  The GetImageDimensions extension checks that the file is
+						// an image and does nothing if it is not, so we don't need to check that here. 
+						file.GetImageDimensions(site, this);
+						fileData = await provider.SaveFile(site, file);
+						//fileData = await provider.SaveFile(site, new File() { Provider = providerName, Path = path });
 					}
 
 					if (fileData != null)

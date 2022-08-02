@@ -82,8 +82,11 @@ namespace Nucleus.XmlDocumentation
 			// replace trailing white space at the end of lines with a single space
 			value = System.Text.RegularExpressions.Regex.Replace(value, "$[\\t\\ ]*", " ", System.Text.RegularExpressions.RegexOptions.Multiline);
 
-			// turn line feeds into CRLF
-			value = System.Text.RegularExpressions.Regex.Replace(value, "(\\n)", "\r\n", System.Text.RegularExpressions.RegexOptions.Multiline);
+			// turn CRLFs into just LF (HTML spec says CRLF is invalid HTML)
+			// ref: https://www.w3.org/TR/2017/REC-html52-20171214/syntax.html#character-references
+			// "...  allowed to reference any Unicode code point other than ... U+000D".
+			// U+000D is ASCII 13 (CR)
+			value = System.Text.RegularExpressions.Regex.Replace(value, "(\r\n)", "\n", System.Text.RegularExpressions.RegexOptions.Multiline);
 
 			// remove extra spaces at the start and end
 			value = value.Trim();

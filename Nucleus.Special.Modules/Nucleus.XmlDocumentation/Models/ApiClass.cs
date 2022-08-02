@@ -34,8 +34,14 @@ namespace Nucleus.XmlDocumentation.Models
 
 		public string ControlId()
 		{
-			return this.FullName.Replace('.', '-').Replace(" ", "").Replace("<", "").Replace(">", "").Replace(",", "");
+			return this.FullName.Replace(" ", "").Replace("<", "").Replace(">", "").Replace(",", "");
 		}
+
+		public string MenuId()
+		{
+			return $"mnu_{ControlId().Replace(".", "_")}";
+		}
+
 
 		public List<ApiMember> AllMembers
 		{

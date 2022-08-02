@@ -11,7 +11,7 @@
 
 		@foreach (var member in Model.Members)
 		{
-			<div id="@member.UniqueId" class="api-member api-member-@(member.Type.ToString().ToLower())">
+			<div id="@member.ControlId()" class="api-member api-member-@(member.Type.ToString().ToLower())">
 				<h4>
 					@member.Name
 					@switch (member.Type)

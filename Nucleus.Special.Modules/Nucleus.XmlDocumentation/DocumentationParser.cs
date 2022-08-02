@@ -132,7 +132,7 @@ namespace Nucleus.XmlDocumentation
 							break;
 					}
 										
-					apiMember.UniqueId = $"{apiMember.Name}" + (apiMember.Params?.Any() == true ? $"({apiMember.Parameters.GetSimpleParameterTypes().Replace(" ", "")})" : "");
+					//apiMember.ControlId = $"{apiMember.Name}" + (apiMember.Params?.Any() == true ? $"({apiMember.Parameters.GetSimpleParameterTypes().Replace(" ", "")})" : "");
 				}
 
 				result.Classes = classes.Values.ToList();
@@ -581,14 +581,14 @@ namespace Nucleus.XmlDocumentation
 					if (apiClass.IdString == memberIdString)
 					{
 						foundReferenceName = apiClass.Name;
-						return new System.Uri($"{document.SourceFileName}/{apiClass.FullName}/", UriKind.Relative);
+						return new System.Uri($"{document.SourceFileName}/{apiClass.ControlId()}/", UriKind.Relative);
 					}
 
 					ApiMember apiMember = apiClass.AllMembers.Where(member => member.IdString == memberIdString).SingleOrDefault();
 					if (apiMember != null)
 					{
 						foundReferenceName = apiMember.Name;
-						return new System.Uri($"{document.SourceFileName}/{apiMember.ClassName}/#{apiMember.Name}", UriKind.Relative);
+						return new System.Uri($"{document.SourceFileName}/{apiMember.ClassName}/#{apiMember.ControlId()}", UriKind.Relative);
 					}
 				}
 			}

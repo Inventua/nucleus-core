@@ -18,19 +18,19 @@
 					<div class="accordion-item">
 						@foreach (var document in Model.Documents)
 						{
-							<h2 id="asm-@document.Namespace.ControlId()" class="accordion-header">
-								<button class="accordion-button@(Model.DefaultOpen || Model.SelectedDocument==document ? "": " collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#mnu-@document.Namespace.ControlId()" aria-expanded="@(Model.DefaultOpen || Model.SelectedDocument==document ? "true": "false")" aria-controls="mnu-@document.Namespace.ControlId()">
+							<h2 id="hdr_@document.Namespace.MenuId()" class="accordion-header">
+								<button class="accordion-button@(Model.DefaultOpen || Model.SelectedDocument==document ? "": " collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#@document.Namespace.MenuId()" aria-expanded="@(Model.DefaultOpen || Model.SelectedDocument==document ? "true": "false")" aria-controls="@document.Namespace.MenuId()">
 									@document.AssemblyName
 								</button>
 							</h2>
 
-							<div id="mnu-@(document.Namespace.ControlId())" class="list-group accordion-collapse collapse @(Model.DefaultOpen || Model.SelectedDocument==document ? "show" : "")">
-								<a class="list-group-item assembly-landing" href="@Url.PageLink(Model.Page, $"{@document.SourceFileName}/#asm-{document.Namespace.ControlId()}")">@document.AssemblyName Assembly</a>
+							<div id="@document.Namespace.MenuId()" class="list-group accordion-collapse collapse @(Model.DefaultOpen || Model.SelectedDocument==document ? "show" : "")">
+								<a class="list-group-item assembly-landing" href="@Url.PageLink(Model.Page, $"{@document.SourceFileName}/#{document.Namespace.MenuId()}")">@document.AssemblyName Assembly</a>
 
 								<ul>
 									@foreach (var apiClass in document.Classes)
 									{
-										<li><a id="mnu-@(apiClass.ControlId())" class="list-group-item @(apiClass.FullName==Model.SelectedClass?.FullName ? "active" : "")" href="@Url.PageLink(Model.Page, $"{document.SourceFileName}/{apiClass.FullName}/#mnu-{apiClass.ControlId()}")">@apiClass.Name</a></li>
+										<li><a id="@apiClass.MenuId()" class="list-group-item @(apiClass.FullName==Model.SelectedClass?.FullName ? "active" : "")" href="@Url.PageLink(Model.Page, $"{document.SourceFileName}/{apiClass.ControlId()}/")">@apiClass.Name</a></li>
 									}
 								</ul>
 							</div>
@@ -100,7 +100,7 @@
 								@foreach (var apiClass in Model.SelectedDocument.Classes)
 								{
 									<li class="list-group-item">
-										<a class="list-group-item-action" href="@Url.PageLink(Model.Page, $"{Model.SelectedDocument.SourceFileName}/{apiClass.FullName}/#mnu-{@apiClass.ControlId()}"))">@apiClass.Name @(apiClass.Type == Nucleus.XmlDocumentation.Models.ApiMember.MemberTypes.Interface ? "Interface" : "Class")</a>
+										<a class="list-group-item-action" href="@Url.PageLink(Model.Page, $"{Model.SelectedDocument.SourceFileName}/{apiClass.ControlId()}/")">@apiClass.Name @apiClass.Type</a>
 										<div>
 											@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, apiClass.Summary))
 										</div>
@@ -120,10 +120,15 @@
 <script>
 	jQuery(document).ready(function()
 	{
-		var menuItem = jQuery('#mnu-@Model.SelectedClass?.ControlId()').first();
-		if (menuItem.length !== 0)
+		var selectedClassMenuId = '@Model.SelectedClass?.MenuId()';
+
+		if (selectedClassMenuId !== '')
 		{
-			menuItem[0].scrollIntoView({ block: "center", inline: "nearest" } );
+			var menuItem = jQuery('#' + selectedClassMenuId).first();
+			if (menuItem.length !== 0)
+			{
+				menuItem[0].scrollIntoView({ block: "center", inline: "nearest" } );
+			}
 		}
 		jQuery('.list-group.accordion-collapse').on('show.bs.collapse', function ()
 		{

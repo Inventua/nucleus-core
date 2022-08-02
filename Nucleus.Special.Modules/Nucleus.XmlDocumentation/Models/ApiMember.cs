@@ -25,7 +25,16 @@ namespace Nucleus.XmlDocumentation.Models
 
 		public string Name { get; set; }
 
-		public string UniqueId { get; set; }
+		//public string ControlId { get; set; }
+		public string ControlId()
+		{
+			//apiMember.ControlId = $"{apiMember.Name}" + (apiMember.Params?.Any() == true ? $"({apiMember.Parameters.GetSimpleParameterTypes().Replace(" ", "")})" : "");
+
+			//return this.Name.Replace(" ", "").Replace("<", "").Replace(">", "").Replace(",", "") + (this.Params?.Any() == true ? $"({this.Parameters.GetSimpleParameterTypes().Replace(" ", "")})" : "");
+
+			return (this.Name + (this.Params?.Any() == true ? $"({this.Parameters.GetSimpleParameterTypes()})" : ""))
+				.Replace(" ", "").Replace("<", "").Replace(">", "").Replace(",", "");
+		}
 
 		public MemberTypes Type { get; private set; } = MemberTypes.Unknown;
 		public string FullName { get; }

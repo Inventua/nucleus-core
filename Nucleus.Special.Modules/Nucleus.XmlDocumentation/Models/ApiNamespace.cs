@@ -25,5 +25,11 @@ namespace Nucleus.XmlDocumentation.Models
 		{
 			return this.Name.Replace('.', '-');
 		}
+
+		public string MenuId()
+		{
+			return $"asm_{ControlId().Replace(".", "_")}";
+		}
+
 	}
 }

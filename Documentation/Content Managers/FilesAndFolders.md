@@ -6,7 +6,7 @@ logging in as a system administrator or site administrator, you can access the f
 
 ![Manage Files and Folders](FilesAndFolders.png)
 
-Nucleus has support for the local file system as well as files hosted in Azure blob storage.  The file provider system is
+Nucleus has support for the local file system as well as files hosted in [Azure blob storage](https://azure.microsoft.com/en-au/services/storage/blobs/).  The file provider system is
 extensible, so you may have support for other file systems.  You can configure Nucleus with more than one file system.
 
 The file manager displays a drop-down list to select which file system provider to manage.  A list of files and folders is listed 
@@ -25,13 +25,13 @@ an error message.
 Navigate to a folder by clicking its link in the display.  Navigate back a level by clicking the `Back` button.
 
 ## Upload a file
-Click the `Upload File` button to upload a file.  Some file system providers (like Azure Storage) do not allow you to upload 
-files to the root folder.  If the upload button is disabled, you will need to create a sub-folder and upload your files to that 
-location.
+Click the `Upload File` button to upload a file.  Some file system providers (like [Azure Blob Storage](https://azure.microsoft.com/en-au/services/storage/blobs/)) 
+do not allow you to upload files to the root folder.  If the upload button is disabled, you will need to create a sub-folder and 
+upload your files there.
 
 > For security reasons, Nucleus restricts the file types that you can use.  You can't upload files
 with an extension that is not in the "allowed" list.  File contents are validated against a list of known "signatures", 
-so your file content must match its extension.  If you use external file management tools to copy a file with a restricted a 
+so your file content must match its extension.  If you use external file management tools to copy a file with a restricted 
 file extension to your file system, Nucleus will not display the file.  If you need to support file types that aren't in the default
 approved list, your system administrator can modify the Nucleus configuration files which control which file types are allowed.  
 

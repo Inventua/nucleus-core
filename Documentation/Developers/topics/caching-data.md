@@ -1,6 +1,6 @@
 Nucleus core caches most data entities in memory in order to improve performance.  Modules and extensions can use the Nucleus Cache Manager to cache their own
-data.  Caching is provided by the [CacheManager](/api-documentation/Nucleus.Abstractions.Managers.ICacheManager/#mnu-Nucleus-Abstractions-Managers-ICacheManager) 
-and [CacheCollection](/api-documentation/Nucleus.Abstractions.Models.Cache.CacheCollection<T0,%20T1>/#mnu-Nucleus-Abstractions-Models-Cache-CacheCollection<T0,T1>) 
+data.  Caching is provided by the [CacheManager](/api-documentation/Nucleus.Abstractions.Managers.ICacheManager) 
+and [CacheCollection](/api-documentation/Nucleus.Abstractions.Models.Cache.CacheCollectionT0T1) 
 classes.
 
 
@@ -25,8 +25,8 @@ namespace Nucleus.Modules.Links
 }
 ```
 
-> A CacheCollection object is automatically created by the [CacheManager](/api-documentation/Nucleus.Abstractions.Managers.ICacheManager/#mnu-Nucleus-Abstractions-Managers-ICacheManager)
-if one doesn't already exist when you call [CacheManager.Get](/api-documentation/Nucleus.Abstractions.Managers.ICacheManager/#Get%3CTKey%2CTModel%3E)
+> A CacheCollection object is automatically created by the [CacheManager](/api-documentation/Nucleus.Abstractions.Managers.ICacheManager)
+if one doesn't already exist when you call [CacheManager.Get](/api-documentation/Nucleus.Abstractions.Managers.ICacheManager/#GetKeyTModel)
 
 ## Getting a Cache Manager instance
 In your manager class (or anywhere else that you need it), add an ICacheManager parameter to your constructor so that 
@@ -52,7 +52,7 @@ namespace Nucleus.Modules.Links
 ```
 
 ## Using the Cache
-Wrap your database access ==Get== method implementation in a call to [GetAsync](/api-documentation/Nucleus.Abstractions.Models.Cache.CacheCollection<T0,%20T1>/#GetAsync(<TKey,TKey>))
+Wrap your database access ==Get== method implementation in a call to [GetAsync](/api-documentation/Nucleus.Abstractions.Models.Cache.CacheCollectionT0T1/#GetAsync(TKeyTKey))
 in order to check for a cache item matching your key (id) before invoking the code to retrieve it from the database.
 ```
 public async Task<Link> Get(Site site, Guid id)
@@ -79,14 +79,14 @@ public async Task<Link> Get(Site site, Guid id)
 
 ## Removing an item from the Cache
 If the cached entity is changed, you must remove it from the cache.  In your ==Manager== class `.Save` method (or any other method which 
-updates data), add a call to your cache extension's [Remove](/api-documentation/Nucleus.Abstractions.Models.Cache.CacheCollection<T0,%20T1>/#Remove(<TKey>))
+updates data), add a call to your cache extension's [Remove](/api-documentation/Nucleus.Abstractions.Models.Cache.CacheCollectionT0T1/#Remove(TKey))
 method, specifying the entity id.
 
 ```
 this.CacheManager.LinksCache().Remove(id);
 ```
 
-If you need to clear the entire cache, you can call [Clear](/api-documentation/Nucleus.Abstractions.Models.Cache.CacheCollection<T0,%20T1>/#Clear).
+If you need to clear the entire cache, you can call [Clear](/api-documentation/Nucleus.Abstractions.Models.Cache.CacheCollectionT0T1/#Clear).
 
 ```
 this.CacheManager.LinksCache().Clear();

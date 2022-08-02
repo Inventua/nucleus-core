@@ -140,6 +140,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "topics", "topics", "{7E69EF
 		Documentation\Developers\topics\Extension-Packaging.md = Documentation\Developers\topics\Extension-Packaging.md
 		Documentation\Developers\topics\razor-views.md = Documentation\Developers\topics\razor-views.md
 		Documentation\Developers\topics\saving-settings.md = Documentation\Developers\topics\saving-settings.md
+		Documentation\Developers\topics\startup.md = Documentation\Developers\topics\startup.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reference", "Reference", "{487444E1-B18B-458A-81D7-6AADAFCAB951}"

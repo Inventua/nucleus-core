@@ -11,12 +11,12 @@ in the [PageModule.ModuleSettings](/api-documentation/Nucleus.Abstractions.Model
 [ModuleSettingsExtensions.Set](/api-documentation/Nucleus.Extensions.ModuleSettingsExtensions/#Set(List<ModuleSetting>,String,String)), then calling 
 [IPageModuleManager.SaveSettings](/api-documentation/Nucleus.Abstractions.Managers.IPageModuleManager/#SaveSettings(PageModule)).  
 
-You can retrieve your settings by calling the [ModuleSettingsExtensions.Get](/api-documentation/Nucleus.Extensions.ModuleSettingsExtensions/#Get(List<ModuleSetting>,String,String)) 
+You can retrieve your settings by calling the [ModuleSettingsExtensions.Get](/api-documentation/Nucleus.Extensions.ModuleSettingsExtensions/#Get(ListModuleSettingStringString)) 
 extension on the [PageModule.ModuleSettings](/api-documentation/Nucleus.Abstractions.Models.PageModule/#ModuleSettings) property.
 
 > Each module setting consists of a ==SettingName== and a SettingValue.  Module setting values are limited to 512 characters and are 
-stored in the database as a string.  The ModuleSettingsExtensions [Set](/api-documentation/Nucleus.Extensions.ModuleSettingsExtensions/#Set(List<ModuleSetting>,String,String)) 
-and [Get](/api-documentation/Nucleus.Extensions.ModuleSettingsExtensions/#Get(List<ModuleSetting>,String,String)) methods automatically convert your settings to and from ==Boolean==, ==Double==, 
+stored in the database as a string.  The ModuleSettingsExtensions [Set](/api-documentation/Nucleus.Extensions.ModuleSettingsExtensions/#Set(ListModuleSettingStringString)) 
+and [Get](/api-documentation/Nucleus.Extensions.ModuleSettingsExtensions/#Get(ListModuleSettingStringString)) methods automatically convert your settings to and from ==Boolean==, ==Double==, 
 ==Enum==, ==Guid==, ==DateTime== and ==int== types automatically.  By convention, setting names are in the form modulename:valuename.
 
 > This example is from the SiteMap module.  Code which does not demonstrate saving or retrieving module settings has been removed 
@@ -97,7 +97,7 @@ module from the ==Context.Site== property.
 
 In the settings-related actions of your controller class, save site settings by adding or updating values 
 in the [Site.SiteSettings](/api-documentation/Nucleus.Abstractions.Models.Site/#SiteSettings) property by using 
-[SiteSettingsExtensions.TrySetValue](/api-documentation/Nucleus.Extensions.SiteSettingsExtensions/#TrySetValue(List<SiteSetting>,String,Nullable<Boolean>)), 
+[SiteSettingsExtensions.TrySetValue](/api-documentation/Nucleus.Extensions.SiteSettingsExtensions/#TrySetValue(ListSiteSettingStringNullableBoolean)), 
 then calling [ISiteManager.Save](/api-documentation/Nucleus.Abstractions.Managers.ISiteManager/#Save(Site)).  
 
 You can retrieve your settings by calling the [SiteSettingsExtensions.TryGetValue](/api-documentation/Nucleus.Extensions.SiteSettingsExtensions/) 
@@ -266,7 +266,6 @@ namespace Nucleus.Modules.MultiContent.Controllers
   }
 }
 ```
-
 
 ### Use you own database tables
 Complex settings which aren't just name/value pairs should be stored in database tables that you create for your extension.

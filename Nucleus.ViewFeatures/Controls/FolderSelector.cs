@@ -92,7 +92,8 @@ namespace Nucleus.ViewFeatures.Controls
 			{
 				if (viewModel.SelectedFolder.Id != Guid.Empty)
 				{					
-					viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFolder.Id, pattern);					
+					viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFolder.Id, pattern);
+					viewModel.SelectedFolder.SortFolders(folder => folder.Name, false);
 				}
 			}
 			catch (System.IO.FileNotFoundException)

@@ -93,8 +93,6 @@ namespace Nucleus.ViewFeatures.Controls
 			}
 
 			// Populate the folders list with "children" of the currently selected folder
-			//FileSystemProvider provider = this.FileSystemProviderFactory.Get(viewModel.SelectedFile.Provider);
-			//viewModel.SelectedFolder = this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFile.Provider, viewModel.SelectedFile.Parent?.Path, pattern);
 			if (viewModel.SelectedFile?.Parent != null && viewModel.SelectedFile.Parent.Id != Guid.Empty)
 			{
 				viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFile.Parent.Id, pattern);
@@ -105,7 +103,10 @@ namespace Nucleus.ViewFeatures.Controls
 				viewModel.SelectedFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFile.Provider, viewModel.SelectedFile.Parent?.Path);
 				viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFolder.Id, pattern);
 			}
-				
+
+			viewModel.SelectedFolder.SortFolders(folder => folder.Name, false);
+			viewModel.SelectedFolder.SortFiles(file => file.Name, false);
+
 			// Add the currently selected folder to the folders list (at the top)
 			viewModel.SelectedFolder.Folders.Insert(0, viewModel.SelectedFolder);
 

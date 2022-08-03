@@ -276,6 +276,19 @@ a *
   margin: 0 1rem 0 1rem; 
 }
 
+/* mobile-only elements */
+.nucleus-mobile-only
+{
+  display: none;
+}
+
+.navbar-nav.nucleus-mobile-menu
+{
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 /* supplement bootstrap menu to allow submenus */
 .nucleus-menu .dropdown-submenu 
 {

@@ -86,6 +86,7 @@ namespace Nucleus.Modules.StaticContent.Controllers
 		{
 			if (mediaFile != null)
 			{
+				viewModel.DefaultFile.Parent = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.DefaultFile.Parent.Id);
 				using (System.IO.Stream fileStream = mediaFile.OpenReadStream())
 				{
 					viewModel.DefaultFile = await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.DefaultFile.Provider, viewModel.DefaultFile.Parent.Path, mediaFile.FileName, fileStream, false);

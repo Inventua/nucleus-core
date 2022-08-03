@@ -97,6 +97,7 @@ namespace Nucleus.Modules.Links.Controllers
 		{
 			if (mediaFile != null)
 			{
+				viewModel.Link.LinkFile.File.Parent = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Link.LinkFile.File.Parent.Id);
 				using (System.IO.Stream fileStream = mediaFile.OpenReadStream())
 				{
 					viewModel.Link.LinkFile.File = await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.Link.LinkFile.File.Provider, viewModel.Link.LinkFile.File.Parent.Path, mediaFile.FileName, fileStream, false);

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Search;
 using Nucleus.Extensions.Authorization;
+using Nucleus.ViewFeatures;
 
 namespace Nucleus.Modules.Search.Controllers
 {
@@ -18,10 +19,14 @@ namespace Nucleus.Modules.Search.Controllers
 	public class SearchController : Controller
 	{
 		private Context Context { get; }
+		private IPageManager PageManager { get; }
 		private IPageModuleManager PageModuleManager { get; }
 		private IUserManager UserManager { get; }
 		private IEnumerable<ISearchProvider> SearchProviders { get; }
 
+		private const string MODULESETTING_DISPLAY_MODE = "search:display-mode";
+		private const string MODULESETTING_RESULTS_PAGE = "search:results-page";
+		private const string MODULESETTING_SEARCH_BUTTON_CAPTION = "search:search-button-caption";
 		private const string MODULESETTING_INCLUDE_FILES = "search:include-files";
 		private const string MODULESETTING_SHOW_URL = "search:show-url"; 
 		private const string MODULESETTING_SHOW_CATEGORIES = "search:show-categories";
@@ -29,19 +34,41 @@ namespace Nucleus.Modules.Search.Controllers
 		private const string MODULESETTING_SHOW_SIZE = "search:show-size";
 		private const string MODULESETTING_SHOW_SCORE = "search:show-score";
 
-		public SearchController(Context Context, IPageModuleManager pageModuleManager, IUserManager userManager, IEnumerable<ISearchProvider> searchProviders)
+		public SearchController(Context Context, IPageManager pageManager, IPageModuleManager pageModuleManager, IUserManager userManager, IEnumerable<ISearchProvider> searchProviders)
 		{
 			this.Context = Context;
+			this.PageManager= pageManager;
 			this.PageModuleManager = pageModuleManager;
 			this.UserManager = userManager;
 			this.SearchProviders = searchProviders;			
 		}
 
 		[HttpGet]
+		public async Task<ActionResult> Index(string search)
+		{
+			return View("Viewer", await BuildViewModel(new() { SearchTerm = search }));
+		}
+
 		[HttpPost]
 		public async Task<ActionResult> Index(ViewModels.Viewer viewModel)
 		{
-			return View("Viewer", await BuildViewModel(viewModel));
+			Page resultsPage = null;
+			Guid resultsPageId = this.Context.Module.ModuleSettings.Get(MODULESETTING_RESULTS_PAGE, Guid.Empty);
+			
+			if (resultsPageId != Guid.Empty)
+			{
+				resultsPage = await this.PageManager.Get(resultsPageId);		
+			}
+			
+			if (resultsPage == null)
+			{
+				return View("Viewer", await BuildViewModel(viewModel));
+			}
+			else
+			{
+				ControllerContext.HttpContext.Response.Headers.Add("X-Location", Url.Content(Url.PageLink(resultsPage) + $"?search={viewModel.SearchTerm}"));
+				return StatusCode((int)System.Net.HttpStatusCode.Found);
+			}
 		}
 
 		[HttpGet]
@@ -54,15 +81,36 @@ namespace Nucleus.Modules.Search.Controllers
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpGet]
 		[HttpPost]
-		public ActionResult Settings(ViewModels.Settings viewModel)
+		public async Task<ActionResult> Settings(ViewModels.Settings viewModel)
 		{
-			return View("Settings", BuildSettingsViewModel(viewModel));
+			return View("Settings", await BuildSettingsViewModel(viewModel));
+		}
+
+		[HttpGet]
+		public async Task<ActionResult> GetChildPages(Guid id)
+		{
+			ViewModels.PageIndexPartial viewModel = new();
+
+			viewModel.FromPage = await this.PageManager.Get(id);
+
+			viewModel.Pages = await this.PageManager.GetAdminMenu
+				(
+					this.Context.Site,
+					await this.PageManager.Get(id),
+					ControllerContext.HttpContext.User,
+					1
+				);
+
+			return View("_PageMenu", viewModel);
 		}
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpPost]
 		public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
 		{
+			this.Context.Module.ModuleSettings.Set(MODULESETTING_RESULTS_PAGE, viewModel.ResultsPageId);
+			this.Context.Module.ModuleSettings.Set(MODULESETTING_DISPLAY_MODE, viewModel.DisplayMode);
+			this.Context.Module.ModuleSettings.Set(MODULESETTING_SEARCH_BUTTON_CAPTION, viewModel.SearchButtonCaption);			
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_INCLUDE_FILES, viewModel.IncludeFiles);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_URL, viewModel.ShowUrl); 
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_CATEGORIES, viewModel.ShowCategories);
@@ -84,20 +132,14 @@ namespace Nucleus.Modules.Search.Controllers
 				viewModel = new();				
 			}
 
-			viewModel.Settings.IncludeFiles = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true);
-			viewModel.Settings.ShowUrl = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_URL, false);
-			viewModel.Settings.ShowCategories = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_CATEGORIES, true);
-			viewModel.Settings.ShowPublishDate = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_PUBLISHEDDATE, true);
-			viewModel.Settings.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
-			viewModel.Settings.ShowScore = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SCORE, true);
-
+			GetSettings(viewModel.Settings);
+			
 			if (!String.IsNullOrEmpty(viewModel.SearchTerm))
 			{
 				if (this.SearchProviders.Count() == 1)
 				{
 					searchProvider = this.SearchProviders.First();
 				}
-				//else if ()
 
 				if (searchProvider == null)
 				{
@@ -175,22 +217,32 @@ namespace Nucleus.Modules.Search.Controllers
 			return viewModel;
 		}
 
-		private ViewModels.Settings BuildSettingsViewModel(ViewModels.Settings viewModel)
+		private async Task<ViewModels.Settings> BuildSettingsViewModel(ViewModels.Settings viewModel)
 		{
 			if (viewModel == null)
 			{
 				viewModel = new();
 			}
 
-			viewModel.IncludeFiles = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true);
-			viewModel.ShowUrl = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_URL, false);
-			viewModel.ShowCategories = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_CATEGORIES, true);
-			viewModel.ShowPublishDate = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_PUBLISHEDDATE, true);
-			viewModel.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
-			viewModel.ShowScore = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SCORE, true);
+			GetSettings(viewModel);
+
+			viewModel.PageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, 1);
 
 			return viewModel;
 		}
 
+		private void GetSettings(ViewModels.Settings settings)
+		{
+			settings.ResultsPageId = this.Context.Module.ModuleSettings.Get(MODULESETTING_RESULTS_PAGE, Guid.Empty);
+			settings.DisplayMode = this.Context.Module.ModuleSettings.Get(MODULESETTING_DISPLAY_MODE, ViewModels.Settings.DisplayModes.Full);
+			settings.SearchButtonCaption = this.Context.Module.ModuleSettings.Get(MODULESETTING_SEARCH_BUTTON_CAPTION, "Search");
+			settings.IncludeFiles = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true);
+			settings.ShowUrl = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_URL, false);
+			settings.ShowCategories = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_CATEGORIES, true);
+			settings.ShowPublishDate = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_PUBLISHEDDATE, true);
+			settings.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
+			settings.ShowScore = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SCORE, true);
+
+		}
 	}
 }

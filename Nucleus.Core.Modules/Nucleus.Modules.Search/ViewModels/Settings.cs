@@ -12,14 +12,26 @@ namespace Nucleus.Modules.Search.ViewModels
 {
 	public class Settings
 	{
+		public enum DisplayModes
+		{
+			Full,
+			Compact
+		}
+		
+		public DisplayModes DisplayMode { get; set;}
+		public string SearchButtonCaption { get; set; }	
+
 		public Boolean ShowUrl { get; set; }
 		public Boolean ShowCategories { get; set; }
 		public Boolean ShowPublishDate { get; set; }
 		public Boolean ShowSize { get; set; }
 		public Boolean ShowScore { get; set; }
 
+		public Guid ResultsPageId { get; set; }
 
 		public Boolean IncludeFiles { get; set; } = true;
+
+		public PageMenu PageMenu { get; set; }
 
 	}
 }

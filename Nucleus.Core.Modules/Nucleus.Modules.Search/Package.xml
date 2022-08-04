@@ -23,7 +23,6 @@
 			<file name="license.txt" />
 			
 			<file name="viewer.css" />
-			<file name="settings.css" />
 			
 			<folder name="Bin">
 				<file name="Nucleus.Modules.Search.dll" />
@@ -32,6 +31,8 @@
 			<folder name="Views">
 				<file name="Viewer.cshtml" />
 				<file name="Settings.cshtml" />
+				<file name="_Suggestions.cshtml" />
+				<file name="_PageMenu.cshtml" />
 			</folder>
 			
 		</component>

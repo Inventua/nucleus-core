@@ -3,13 +3,33 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
-@Html.AddStyle("~!/../settings.css")
-<div>
-	@using (Html.BeginNucleusForm("Settings", "Search", FormMethod.Post, new { @enctype = "multipart/form-data" }))
-	{
+@using (Html.BeginNucleusForm("Settings", "Search", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+	<div id="search-settings" class="flex-grow-1">
+		<h2 class="nucleus-modal-caption">Search Settings</h2>		
 		<fieldset role="group" aria-labelledby="heading">
-			<h2>Settings</h2>
+			<label>Search Input</label>
+			<div class="nucleus-flex-fields">
+				<SettingsControl caption="Display Mode" helptext="Specify the search input controls display mode.">
+					@Html.DropDownListFor(model => model.DisplayMode, Html.GetEnumSelectList(typeof(Nucleus.Modules.Search.ViewModels.Settings.DisplayModes)))
+				</SettingsControl>
 
+				<SettingsControl caption="Search Button Caption" helptext="Specifies the text displayed in the search button.">
+					@Html.TextBoxFor(model => model.SearchButtonCaption, new {  })
+				</SettingsControl>
+			</div>
+
+			<SettingsControl caption="Results Page" helptext="Results Page.  This page should contain a search module.">
+				@Html.PageListFor(model => model.ResultsPageId, Model.PageMenu, Guid.Empty)
+			</SettingsControl>
+		</fieldset>
+
+		<div class="alert alert-info results-page-selected">
+			Results settings are configured in the search module instance on the results page.
+		</div>
+
+		<fieldset class="search-instance-settings">
+			<label>Results</label>
 			<SettingsControl caption="Include Files in Results?" rendermode="LabelLast" class="inner-inline" helptext="Specify whether to include files in search results.">
 				@Html.CheckBoxFor(model => model.IncludeFiles, new { @class = "ToggleSwitch" })
 			</SettingsControl>
@@ -31,11 +51,60 @@
 					@Html.CheckBoxFor(model => model.ShowScore, new { @class = "ToggleSwitch" })
 				</SettingsControl>
 			</div>
-
-			<div class="Tools">
-				@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "Search", "Search"), new { })
-			
-			</div>
 		</fieldset>
-	}
-</div>
+	</div>
+	<div class="nucleus-form-buttonrow">
+		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "Search", "Search"), new { })
+	</div>
+}
+<script>
+	$(document).ready(function()
+	{
+		// Read the child pages of the item containing the "+" button
+		jQuery('#search-settings').on('click', '.nucleus-get-childpages', function (e)
+		{
+			// Add a ul to contain the new pages
+			Page.LoadPartialContent(e, '@Url.NucleusAction("GetChildPages", "Search", "Search")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+
+			// hide the "+" button
+			jQuery(this).removeClass('show');
+		});
+
+		// Hide the child pages of the item containing the "-" button
+		jQuery('#search-settings').on('click', '.nucleus-hide-childpages', function (e)
+		{
+			// hide the "-" button
+			jQuery(this).removeClass('show');
+
+			// show the "+" button
+			jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
+
+			jQuery(this).closest('li').find('ul').remove();
+		});
+
+		/* enable/disable per-module settings */
+
+		/* on load */
+		enableInstanceSettings(jQuery('#ResultsPageId').val() === '00000000-0000-0000-0000-000000000000');
+
+		/* when the user changes the results page selection */
+		jQuery('#search-settings .nucleus-page-list a').on('click', function ()
+		{
+			enableInstanceSettings(jQuery(this).attr('data-id') === '00000000-0000-0000-0000-000000000000');
+		});
+
+		function enableInstanceSettings(enable)
+		{
+			if (enable)
+			{
+				jQuery('#search-settings .search-instance-settings').show();
+				jQuery('#search-settings .results-page-selected').hide();
+			}
+			else
+			{
+				jQuery('#search-settings .search-instance-settings').hide();
+				jQuery('#search-settings .results-page-selected').show();
+			}
+		}
+	});
+</script>

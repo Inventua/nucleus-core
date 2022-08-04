@@ -24,9 +24,9 @@
     <None Remove="viewer.css" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
-    <None Remove="settings.css" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
+    <None Remove="Views\_PageMenu.cshtml" />
     <None Remove="Views\_Suggestions.cshtml" />
   </ItemGroup>
 
@@ -35,7 +35,10 @@
     <Content Include="viewer.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
-    <Content Include="settings.css" />
+    <Content Include="Views\_PageMenu.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="Views\_Suggestions.cshtml" />
     <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />

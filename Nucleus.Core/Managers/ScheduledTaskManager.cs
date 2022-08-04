@@ -86,7 +86,7 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		public Task<IEnumerable<System.Type>> ListBackgroundServices()
 		{
-			return Task.FromResult(Plugins.AssemblyLoader.GetTypes<IScheduledTask>());
+			return Task.FromResult(Plugins.AssemblyLoader.GetTypes<IScheduledTask>().Distinct());
 
 			//List<string> results = new();
 			//foreach (Type type in Plugins.AssemblyLoader.GetTypes<IScheduledTask>())

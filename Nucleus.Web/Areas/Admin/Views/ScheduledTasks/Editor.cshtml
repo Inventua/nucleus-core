@@ -119,7 +119,7 @@
 						@Html.DropDownListFor(model => model.LogFile, new SelectList(Model.LogFiles, "Filename", "Title"), "(select)", new { @class = "LogFile mb-1" })
 					}
 					<div class="LogContent">
-						@if (String.IsNullOrEmpty(Model.LogMessage))
+						@if (!String.IsNullOrEmpty(Model.LogMessage))
 						{
 							@Model.LogMessage
 						}
@@ -129,6 +129,10 @@
 				}
 				else
 				{
+					@if (!String.IsNullOrEmpty(Model.LogMessage))
+					{
+						@Model.LogMessage
+					}
 					<span>There are no log files for this scheduled task.</span>
 				}
 			</TabPanel>

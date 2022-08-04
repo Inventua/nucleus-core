@@ -4,14 +4,13 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.TaskScheduler;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -23,15 +22,12 @@ namespace Nucleus.Web.Controllers.Admin
 		private IScheduledTaskManager ScheduledTaskManager { get; }
 		private string LogFolderPath { get; }
 
-		public ScheduledTasksController(ILogger<ScheduledTasksController> logger, ILoggerProvider logProvider, IScheduledTaskManager scheduledTaskManager)
+		public ScheduledTasksController(ILogger<ScheduledTasksController> logger, IOptions<Nucleus.Core.Logging.TextFileLoggerOptions> options, IScheduledTaskManager scheduledTaskManager)
 		{
 			this.Logger = logger;
 			this.ScheduledTaskManager = scheduledTaskManager;
 
-			if (logProvider is Nucleus.Core.Logging.TextFileLoggingProvider provider)
-			{
-				this.LogFolderPath = System.IO.Path.Combine(provider.Options.Path, ScheduledTask.SCHEDULED_TASKS_LOG_SUBPATH);
-			}
+			this.LogFolderPath = System.IO.Path.Combine(options.Value.Path, ScheduledTask.SCHEDULED_TASKS_LOG_SUBPATH);
 		}
 
 		/// <summary>

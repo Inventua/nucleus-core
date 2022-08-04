@@ -10,7 +10,7 @@
 }
 @using (Html.BeginNucleusForm("Editor", "Admin", "Links", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
-	<fieldset role="group" aria-labelledby="heading">
+	<fieldset role="group" aria-labelledby="heading" class="flex-grow-1">
 		<h2 class="nucleus-modal-caption">Link Properties</h2>
 		@Html.HiddenFor(model => model.Link.Id)
 		@Html.HiddenFor(model => model.UseLayout)

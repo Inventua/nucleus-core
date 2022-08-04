@@ -32,6 +32,10 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 		[HttpPost]
 		public ActionResult SaveSettings(ViewModels.Settings viewModel)
 		{
+			if (!viewModel.ServerUrl.StartsWith("http"))
+			{
+				viewModel.ServerUrl = "http://" + viewModel.ServerUrl;
+			}
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_SERVER_URL, viewModel.ServerUrl);
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_INDEX_NAME, viewModel.IndexName);
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_ATTACHMENT_MAXSIZE, viewModel.AttachmentMaxSize);

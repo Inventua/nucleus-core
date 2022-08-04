@@ -15,7 +15,8 @@ namespace Nucleus.Modules.Search.ViewModels
 		public enum DisplayModes
 		{
 			Full,
-			Compact
+			Compact,
+			Minimal
 		}
 		
 		public DisplayModes DisplayMode { get; set;}

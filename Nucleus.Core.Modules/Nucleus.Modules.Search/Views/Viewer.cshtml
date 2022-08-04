@@ -11,16 +11,19 @@
 	{
 		<SettingsControl caption="Search Term" helptext="Enter your search term.">
 			<div id="search-suggestions" aria-hidden="true"></div>
-			@Html.TextBoxFor(model => model.SearchTerm, new { @id = "", @class = "search-term align-middle nucleus-default-control", @data_autopostbackevent = "input", @autocomplete = "off" })
-			@Html.SubmitButton("", "Search", @Url.NucleusAction("Index", "Search", "Search"), new { @data_target = "form.parent()" })
+			@Html.TextBoxFor(model => model.SearchTerm, new { @id = "", @class = "search-term align-middle", @data_autopostbackevent = "input", @autocomplete = "off" })
+			@Html.SubmitButton("", Model.Settings.SearchButtonCaption, @Url.NucleusAction("Index", "Search", "Search"), new { @data_target = "form.parent()" })
 		</SettingsControl>
 	}
-	else if (Model.Settings.DisplayMode == Settings.DisplayModes.Compact)
+	else if (Model.Settings.DisplayMode == Settings.DisplayModes.Compact || Model.Settings.DisplayMode == Settings.DisplayModes.Minimal)
 	{
 		<div>
 			<div id="search-suggestions" aria-hidden="true"></div>
-			@Html.TextBoxFor(model => model.SearchTerm, new { @id = "", @class = "search-term align-middle nucleus-default-control", @placeholder = "Enter your search term",  @data_autopostbackevent = "input", @autocomplete = "off" })
-			@Html.SubmitButton("", "Search", @Url.NucleusAction("Index", "Search", "Search"), new { @class="btn btn-primary btn-sm", @data_target = "form.parent()" })
+			@Html.TextBoxFor(model => model.SearchTerm, new { @id = "", @class = "search-term align-middle", @placeholder = "Enter your search term",  @data_autopostbackevent = "input", @autocomplete = "off" })
+			@if (Model.Settings.DisplayMode == Settings.DisplayModes.Compact)
+			{
+				@Html.SubmitButton("", Model.Settings.SearchButtonCaption, @Url.NucleusAction("Index", "Search", "Search"), new { @class="btn btn-primary btn-sm", @data_target = "form.parent()" })
+			}
 		</div>
 	}
 }
@@ -107,5 +110,19 @@
 			textbox.val(selectedText);
 			button.click();
 		});
+
+		@if(Model.Settings.DisplayMode == Settings.DisplayModes.Minimal)
+		{
+			<text>
+				jQuery('.search-term').on('keydown', function(event)
+				{
+					if (event.keyCode === 13)
+					{
+						jQuery(this).parents('form').attr('action', '@Url.NucleusAction("Index", "Search", "Search")');
+						jQuery(this).parents('form').submit();
+					}
+				});
+			</text>
+		}
 	});
 </script>

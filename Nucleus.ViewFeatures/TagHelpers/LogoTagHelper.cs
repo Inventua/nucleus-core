@@ -53,8 +53,8 @@ namespace Nucleus.ViewFeatures.TagHelpers
 			}
 			else
 			{
-				output.TagMode = TagMode.StartTagAndEndTag;
 				output.TagName = builder.TagName;
+				output.TagMode = TagMode.StartTagAndEndTag;
 				output.MergeAttributes(builder);
 				output.Content.AppendHtml(builder.InnerHtml);
 			}

@@ -51,6 +51,8 @@ namespace Nucleus.ViewFeatures.TagHelpers
 			TagBuilder builder = Nucleus.ViewFeatures.HtmlContent.TabPanel.Build(this.ViewContext, this.Id, this.Active, null);
 
 			output.TagName = builder.TagName;
+			output.TagMode = TagMode.StartTagAndEndTag;
+
 			output.MergeAttributes(builder);
 
 			output.Content.AppendHtml(await output.GetChildContentAsync());

@@ -40,6 +40,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
 			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Account.Build(this.ViewContext, null);
 
 			output.TagName = builder.TagName;
+			output.TagMode = TagMode.StartTagAndEndTag;
 			output.MergeAttributes(builder);
 			output.Content.AppendHtml(builder.InnerHtml);
 

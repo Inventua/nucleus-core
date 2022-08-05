@@ -104,7 +104,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// </example>
     public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, string scriptPath, Boolean isAsync)
     {
-      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(scriptPath), isAsync, false, 0, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
+      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(htmlHelper.ResolveExtensionUrl(scriptPath)), isAsync, false, 0, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     {
       ResourceFileOptions resourceFileOptions = context.RequestServices.GetService<IOptions<ResourceFileOptions>>().Value;
       Dictionary<string, ScriptInfo> scripts = (Dictionary<string, ScriptInfo>)context.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
-
+      
       if (!scripts.ContainsKey(scriptPath))
       {
         string finalScriptPath = scriptPath;
@@ -171,7 +171,8 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
           IsAsync = isAsync,
           IsDynamic = isDynamic,
           Order = order,
-          Version = version
+          Version = version,
+          IsExtensionScript = scriptPath.StartsWith("/" + Nucleus.Abstractions.RoutingConstants.EXTENSIONS_ROUTE_PATH, StringComparison.OrdinalIgnoreCase)
         });
         context.Items[ITEMS_KEY] = scripts;
       }
@@ -206,7 +207,9 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       Dictionary<string, ScriptInfo> scripts = (Dictionary<string, ScriptInfo>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
       if (scripts != null)
       {
-        foreach (KeyValuePair<string, ScriptInfo> script in scripts.OrderBy(script => script.Value.Order))
+        // Sort to ensure that a specific order is most important, followed by whether the script belongs to an extension.  The sort by IsExtensionScript is
+        // so that extension scripts are rendered after core scripts.
+        foreach (KeyValuePair<string, ScriptInfo> script in scripts.OrderBy(script => script.Value.Order).ThenBy(script => script.Value.IsExtensionScript))
         {
           if (!String.IsNullOrEmpty(script.Key))
           {
@@ -238,6 +241,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       public Boolean IsDynamic { get; set; }
       public string Path { get; set; }
       public int Order { get; set; } = 0;
+      public Boolean IsExtensionScript { get; set; } = false;
 
     }
   }

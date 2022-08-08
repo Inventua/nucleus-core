@@ -114,9 +114,9 @@ namespace Nucleus.XmlDocumentation
 				ContentMetaData documentContentItem = new()
 				{
 					Site = site,
-					Title = document.Namespace.Name,
+					Title = $"{document.Namespace.Name} Namespace",
 					Summary = await RenderMixedContent(document.Namespace.Summary),
-					Keywords = document.Namespace.Name.Split('.', StringSplitOptions.RemoveEmptyEntries),
+					Keywords = document.Namespace.Name.Split('.', StringSplitOptions.RemoveEmptyEntries).Append(document.Namespace.Name),
 					Url = document.GenerateUrl(page),
 					PublishedDate = document.LastModifiedDate,
 					SourceId = null,
@@ -149,9 +149,9 @@ namespace Nucleus.XmlDocumentation
 				ContentMetaData documentContentItem = new()
 				{
 					Site = site,
-					Title = apiClass.FullName,
+					Title = $"{apiClass.Name} {apiClass.Type}",
 					Summary = await RenderMixedContent(apiClass.Summary),
-					Keywords = apiClass.FullName.Split('.', StringSplitOptions.RemoveEmptyEntries),
+					Keywords = apiClass.FullName.Split('.', StringSplitOptions.RemoveEmptyEntries).Append(apiClass.FullName),
 					Url = apiClass.GenerateUrl(page, document),
 					PublishedDate = document.LastModifiedDate,
 					SourceId = null,

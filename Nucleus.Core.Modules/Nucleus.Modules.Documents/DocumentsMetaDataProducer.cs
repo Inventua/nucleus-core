@@ -37,12 +37,12 @@ namespace Nucleus.Modules.Documents
 			this.Logger = logger;
 		}
 
-		public override async Task<IEnumerable<ContentMetaData>> ListItems(Site site)
+		public async override IAsyncEnumerable<ContentMetaData> ListItems(Site site)
 		{
 			// This must match the value in package.xml
 			Guid moduleDefinitionId = Guid.Parse("28df7ff3-6407-459e-8608-c1ef4181807c");
 			
-			List<ContentMetaData> results = new();
+			//List<ContentMetaData> results = new();
 
 			if (site.DefaultSiteAlias == null)
 			{
@@ -60,12 +60,13 @@ namespace Nucleus.Modules.Documents
 					}
 					foreach (Models.Document document in await this.DocumentsManager.List(site, module))
 					{
-						results.Add(await BuildContentMetaData(site, module, document));
+						yield return await BuildContentMetaData(site, module, document);
+						//results.Add(await BuildContentMetaData(site, module, document));
 					}
 				}
 			}
 
-			return results.Where(result=>result != null);
+			//return results.Where(result=>result != null);
 		}
 
 		

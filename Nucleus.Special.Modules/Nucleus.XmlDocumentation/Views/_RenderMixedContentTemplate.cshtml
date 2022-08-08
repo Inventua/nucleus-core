@@ -1,0 +1,71 @@
+﻿@* Renders a MixedContent class instance, for use in a search summary value *@
+@* This template resembles the _RenderMixedContent.cshtml razor view that is used to render on-screen data, but is simplified so that RazorEngineCore can use it.  *@
+@if (Model != null && Model.Items != null)
+{
+	@foreach (var item in Model.Items)
+	{
+		if (item is String)
+		{
+			<text>@(item as String)</text>
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.See)
+		{
+			var seeItem = item as Nucleus.XmlDocumentation.Models.Serialization.See;
+			@if (!String.IsNullOrEmpty(seeItem.Keyword))
+			{
+				<text>@seeItem.Keyword</text>
+			}
+			else
+			{
+				@if (!String.IsNullOrEmpty(seeItem.LinkText))
+				{
+					<text>seeItem.LinkText</text>
+				}
+				else
+				{
+					<text>@seeItem.CodeReference</text>
+				}
+			}
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.SeeAlso)
+		{
+			var seeItem = item as Nucleus.XmlDocumentation.Models.Serialization.SeeAlso;
+			@if (!String.IsNullOrEmpty(seeItem.LinkText))
+			{
+				<text>seeItem.LinkText</text>
+			}
+			else
+			{
+				<text>@seeItem.CodeReference</text>
+			}			
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.ParamRef)
+		{
+			<text>@((item as Nucleus.XmlDocumentation.Models.Serialization.ParamRef).Name)</text>
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.TypeParamRef)
+		{
+			<text>@((item as Nucleus.XmlDocumentation.Models.Serialization.TypeParamRef).Name)</text>
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.Value)
+		{
+			<text>@((item as Nucleus.XmlDocumentation.Models.Serialization.Value).Description)</text>
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.Paragraph)
+		{
+			<text>@((item as Nucleus.XmlDocumentation.Models.Serialization.Paragraph).Description)</text>
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.Code)
+		{
+			<text>@((item as Nucleus.XmlDocumentation.Models.Serialization.Code).Description)</text>
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.InlineCode)
+		{
+			<text>@((item as Nucleus.XmlDocumentation.Models.Serialization.Code).Description)</text>
+		}
+		else if (item is Nucleus.XmlDocumentation.Models.Serialization.Note)
+		{			
+			<text>@((item as Nucleus.XmlDocumentation.Models.Serialization.Note).Description)</text>
+		}
+	}
+}

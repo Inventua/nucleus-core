@@ -9,6 +9,8 @@ namespace Nucleus.XmlDocumentation.Models
 {
 	public class ApiClass
 	{
+		public const string URN = "urn:nucleus:entities:apiclass";
+
 		public string IdString { get; set; }
 		public string AssemblyName { get; set; }
 		public string Namespace { get; set; }
@@ -41,7 +43,6 @@ namespace Nucleus.XmlDocumentation.Models
 		{
 			return $"mnu_{ControlId().Replace(".", "_")}";
 		}
-
 
 		public List<ApiMember> AllMembers
 		{

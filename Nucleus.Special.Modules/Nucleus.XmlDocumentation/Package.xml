@@ -34,6 +34,7 @@
 				<file name="_RenderClass.cshtml" />
 				<file name="_RenderMember.cshtml" />
 				<file name="_RenderMixedContent.cshtml" />
+				<file name="_RenderMixedContentTemplate.cshtml" />
 				<file name="Settings.cshtml" />
 			</folder>
 			

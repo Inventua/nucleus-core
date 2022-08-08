@@ -19,7 +19,7 @@ namespace Nucleus.XmlDocumentation.Controllers
 	[Extension("XmlDocumentation")]
 	public class XmlDocumentationController : Controller
 	{
-		private const string MODULESETTING_DOCUMENTATION_FOLDER_ID = "xmldocumentation:folderid";
+		internal const string MODULESETTING_DOCUMENTATION_FOLDER_ID = "xmldocumentation:folderid";
 		private const string MODULESETTING_DOCUMENTATION_DEFAULTOPEN = "xmldocumentation:defaultopen";
 
 		private Context Context { get; }
@@ -89,7 +89,7 @@ namespace Nucleus.XmlDocumentation.Controllers
 
 						foreach (File xmlDocument in documentationFolder.Files)
 						{
-							DocumentationParser parser = new(this.FileSystemManager.GetFileContents(this.Context.Site, xmlDocument), xmlDocument.Name);
+							DocumentationParser parser = new(this.FileSystemManager,this.Context.Site, xmlDocument);
 							if (parser.IsValid)
 							{
 								results.Add(parser.Document);

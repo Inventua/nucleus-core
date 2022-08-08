@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Nucleus.XmlDocumentation.Models;
 using Nucleus.XmlDocumentation.Models.Serialization;
+using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Models.FileSystem;
+using Nucleus.Abstractions.Managers;
 
 namespace Nucleus.XmlDocumentation
 {
@@ -13,12 +16,15 @@ namespace Nucleus.XmlDocumentation
 		private Models.Serialization.Documentation Source { get; }
 		public string SourceFileName { get; }
 		public Boolean IsValid { get; }
+		public DateTime LastModifiedDate { get; }
 
-		public DocumentationParser(System.IO.Stream input, string sourceFileName)
+		public DocumentationParser(IFileSystemManager fileSystemManager, Site site, File file)//(System.IO.Stream input, string sourceFileName)
 		{
-			this.SourceFileName = sourceFileName;
+			System.IO.Stream input = fileSystemManager.GetFileContents(site, file);
+			this.SourceFileName = file.Name;
 			this.Source = DeserializeDocumentationFile(input);
 			this.IsValid = true;
+			this.LastModifiedDate = file.DateModified;
 			input.Close();
 		}
 
@@ -151,7 +157,7 @@ namespace Nucleus.XmlDocumentation
 			if (string.IsNullOrEmpty(rootNamespace)) return;
 
 			// dont make a doc page link for generic types like List<string> as there is no such documentation page
-			if (param.Type.Contains("<"))  
+			if (param.Type.Contains('<'))  
 			{
 				return;
 			}

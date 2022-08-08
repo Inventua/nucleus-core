@@ -3,6 +3,7 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.XmlDocumentation.ViewModels
+@using Nucleus.XmlDocumentation;
 
 @Html.AddStyle("~!/../viewer.css")
 <div class="XmlDocumentation">
@@ -25,12 +26,12 @@
 							</h2>
 
 							<div id="@document.Namespace.MenuId()" class="list-group accordion-collapse collapse @(Model.DefaultOpen || Model.SelectedDocument==document ? "show" : "")">
-								<a class="list-group-item assembly-landing" href="@Url.PageLink(Model.Page, $"{@document.SourceFileName}/#{document.Namespace.MenuId()}")">@document.AssemblyName Assembly</a>
+								<a class="list-group-item assembly-landing" href="@document.GenerateUrl(Model.Page)">@document.AssemblyName Assembly</a>
 
 								<ul>
 									@foreach (var apiClass in document.Classes)
 									{
-										<li><a id="@apiClass.MenuId()" class="list-group-item @(apiClass.FullName==Model.SelectedClass?.FullName ? "active" : "")" href="@Url.PageLink(Model.Page, $"{document.SourceFileName}/{apiClass.ControlId()}/")">@apiClass.Name</a></li>
+										<li><a id="@apiClass.MenuId()" class="list-group-item @(apiClass.FullName==Model.SelectedClass?.FullName ? "active" : "")" href="@apiClass.GenerateUrl(Model.Page, document)")">@apiClass.Name</a></li>
 									}
 								</ul>
 							</div>

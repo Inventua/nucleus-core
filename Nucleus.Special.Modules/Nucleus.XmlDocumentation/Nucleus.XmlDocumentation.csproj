@@ -35,6 +35,7 @@
     <None Remove="Views\_RenderClass.cshtml" />
     <None Remove="Views\_RenderMember.cshtml" />
     <None Remove="Views\_RenderMixedContent.cshtml" />
+    <None Remove="Views\_RenderMixedContentTemplate.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,6 +47,7 @@
     <Content Include="viewer.min.css" />
     <Content Include="Views\_RenderClass.cshtml" />
     <Content Include="Views\_RenderMember.cshtml" />
+    <Content Include="Views\_RenderMixedContentTemplate.cshtml" />
     <Content Include="Views\_RenderMixedContent.cshtml" />
     <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />

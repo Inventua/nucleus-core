@@ -24,6 +24,7 @@
 	border: 1px solid #ddd;	
 	margin: 0;
 	padding: 0.25rem;
+	box-shadow: 2px 2px 6px #bbb;
 }
 
 .suggestions-result li
@@ -32,7 +33,7 @@
 	list-style-type: none;
 	margin: 0;
 	cursor: default;
-	width: 25em;
+	min-width: 25em;
 	text-overflow: ellipsis;
 }
 

@@ -49,6 +49,17 @@ namespace Nucleus.Modules.Search.Controllers
 			return View("Viewer", await BuildViewModel(new() { SearchTerm = search }));
 		}
 
+		/// <summary>
+		/// This method is called when the paging control elements are used.
+		/// </summary>
+		/// <param name="viewModel"></param>
+		/// <returns></returns>
+		[HttpPost]
+		public async Task<ActionResult> Index(ViewModels.Viewer viewModel)
+		{
+			return View("Viewer", await BuildViewModel(viewModel));
+		}
+
 		[HttpGet]
 		[HttpPost]
 		public async Task<ActionResult> Suggest(ViewModels.Suggestions viewModel)
@@ -123,6 +134,10 @@ namespace Nucleus.Modules.Search.Controllers
 			if (resultsPage != null)
 			{
 				viewModel.ResultsUrl = resultsPage.DefaultPageRoute().Path;
+			}
+			else
+			{
+				viewModel.ResultsUrl = this.Context.Page.DefaultPageRoute().Path;
 			}
 
 			if (!String.IsNullOrEmpty(viewModel.SearchTerm))
@@ -238,6 +253,10 @@ namespace Nucleus.Modules.Search.Controllers
 			settings.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
 			settings.ShowScore = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SCORE, true);
 
+			if (String.IsNullOrWhiteSpace(settings.SearchButtonCaption))
+			{
+				settings.SearchButtonCaption = "Search";
+			}
 		}
 	}
 }

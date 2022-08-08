@@ -20,6 +20,7 @@
 			@await Html.PartialAsync("_ViewerInput.cshtml", Model)
 		</div>
 	}
+	<div class="search-suggestions collapse@(Model.SearchResults?.Results?.Any() == true ? " show" : "")"></div>
 }
 @if (Model.Settings.ResultsPageId == Guid.Empty)
 {

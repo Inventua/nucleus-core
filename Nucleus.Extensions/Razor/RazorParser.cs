@@ -16,7 +16,7 @@ namespace Nucleus.Extensions.Razor
 	public class RazorParser
 	{
 		private static readonly Dictionary<string, object> CompiledTemplateCache = new();
-		private readonly static string[] UsingNamespaces = { "System" ,"System.Collections.Generic", "System.Linq", "System.Text", "Nucleus.Extensions", "Nucleus.Abstractions", "Nucleus.Abstractions.Models" };
+		private readonly static string[] UsingNamespaces = { "System", "System.Collections.Generic", "System.Linq", "System.Text", "Nucleus.Extensions", "Nucleus.Abstractions", "Nucleus.Abstractions.Models" };
 
 		/// <summary>
 		/// Compile and execute the specified template, using the supplied model as input.
@@ -115,6 +115,7 @@ namespace Nucleus.Extensions.Razor
 			builder.Options.TemplateFilename = " ";
 			builder.Options.DefaultUsings = new();
 
+			builder.AddAssemblyReference(typeof(System.Uri).Assembly);
 			builder.AddAssemblyReference(typeof(System.Collections.Generic.CollectionExtensions).Assembly);
 			builder.AddAssemblyReference(typeof(Nucleus.Extensions.AssemblyExtensions).Assembly);
 			builder.AddAssemblyReference(typeof(Nucleus.Abstractions.Models.Page).Assembly);
@@ -123,14 +124,6 @@ namespace Nucleus.Extensions.Razor
 			{
 				builder.AddUsing(ns);
 			}
-			builder.AddUsing("System");
-			builder.AddUsing("System.Collections.Generic");
-			builder.AddUsing("System.Linq");
-			builder.AddUsing("System.Text");
-
-			builder.AddUsing("Nucleus.Extensions");
-			builder.AddUsing("Nucleus.Abstractions");
-			builder.AddUsing("Nucleus.Abstractions.Models");
 		}
 
 		private static string Hash(string value)

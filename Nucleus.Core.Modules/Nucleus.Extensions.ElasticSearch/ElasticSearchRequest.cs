@@ -417,7 +417,7 @@ namespace Nucleus.Extensions.ElasticSearch
 					Query = BuildSearchQuery(query),
 					Source = new SourceFilter { Includes = "*", Excludes = new List<string>() { nameof(ElasticSearchDocument.Attachment), nameof(ElasticSearchDocument.Roles) }.ToArray() },
 					Size = query.PagingSettings.PageSize,
-					From = (query.PagingSettings.CurrentPageIndex - 1) * query.PagingSettings.PageSize,
+					From = query.PagingSettings.FirstRowIndex,
 					Highlight = BuildHighlighter(),
 					PostFilter = BuildSiteFilter(query) & BuildRolesFilter(query) & BuildArgsFilter(query) & BuildScopeFilter(query),
 					Sort = BuildSortFilter(query)

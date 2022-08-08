@@ -24,7 +24,7 @@ namespace Nucleus.Modules.Search
 	/// <hidden />
 	internal static class SearchRenderer
 	{
-		internal static async Task<IHtmlContent> Build( IHtmlHelper htmlHelper, string resultsPageUrl, Nucleus.Modules.Search.ViewModels.Settings.DisplayModes displayMode, object htmlAttributes)
+		internal static async Task<IHtmlContent> Build(IHtmlHelper htmlHelper, string resultsPageUrl, Nucleus.Modules.Search.ViewModels.Settings.DisplayModes displayMode, object htmlAttributes)
 		{
 			ViewModels.Viewer model = new();
 
@@ -32,7 +32,8 @@ namespace Nucleus.Modules.Search
 			{
 				resultsPageUrl = '/' + resultsPageUrl;
 			}
-			
+
+			model.SearchTerm = htmlHelper.ViewContext.HttpContext.Request.Query["search"];
 			model.ResultsUrl = resultsPageUrl;
 			model.Settings.DisplayMode = displayMode;
 

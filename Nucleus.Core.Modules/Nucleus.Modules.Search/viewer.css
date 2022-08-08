@@ -5,18 +5,23 @@
 	border-bottom: dotted 1px #aaa;
 }
 
-#search-suggestions
+.search-suggestions
 {
 	position: fixed;
 	display: inline-block;
-	border: 1px solid #ddd;
-	margin-top: 2.5rem;
+	margin-top: 0.25rem;
 	z-index: 5;
 	background-color: white;
 }
 
+.search-display-compact .search-suggestions, .search-display-minimal .search-suggestions
+{
+	margin-top: 2rem;	
+}
+
 .suggestions-result 
 {
+	border: 1px solid #ddd;	
 	margin: 0;
 	padding: 0.25rem;
 }

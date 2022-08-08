@@ -5,124 +5,90 @@
 @using Nucleus.Extensions
 @using Nucleus.Modules.Search.ViewModels
 @Html.AddStyle("~!/../viewer.css")
-@using (Html.BeginNucleusForm("Suggest", "Search", FormMethod.Post, new { @data_target = "#search-suggestions", @role = "search" }))
+@Html.AddScript("~!/../viewer.js")
+@using (Html.BeginNucleusForm("Suggest", "Search", "Search", FormMethod.Post, new { @data_target = ".search-suggestions", @role = "search", @data_resultsurl = Model.ResultsUrl }))
 {
 	@if (Model.Settings.DisplayMode == Settings.DisplayModes.Full)
 	{
-		<SettingsControl caption="Search Term" helptext="Enter your search term.">
-			<div id="search-suggestions" aria-hidden="true"></div>
-			@Html.TextBoxFor(model => model.SearchTerm, new { @id = "", @class = "search-term align-middle", @data_autopostbackevent = "input", @autocomplete = "off" })
-			@Html.SubmitButton("", Model.Settings.SearchButtonCaption, @Url.NucleusAction("Index", "Search", "Search"), new { @data_target = "form.parent()" })
+		<SettingsControl caption="Search Term" helptext="Enter your search term." class="search-display-full">
+			@await Html.PartialAsync("_ViewerInput.cshtml", Model)
 		</SettingsControl>
 	}
 	else if (Model.Settings.DisplayMode == Settings.DisplayModes.Compact || Model.Settings.DisplayMode == Settings.DisplayModes.Minimal)
 	{
-		<div>
-			<div id="search-suggestions" aria-hidden="true"></div>
-			@Html.TextBoxFor(model => model.SearchTerm, new { @id = "", @class = "search-term align-middle", @placeholder = "Enter your search term",  @data_autopostbackevent = "input", @autocomplete = "off" })
-			@if (Model.Settings.DisplayMode == Settings.DisplayModes.Compact)
-			{
-				@Html.SubmitButton("", Model.Settings.SearchButtonCaption, @Url.NucleusAction("Index", "Search", "Search"), new { @class="btn btn-primary btn-sm", @data_target = "form.parent()" })
-			}
+		<div class="search-display-@Model.Settings.DisplayMode.ToString().ToLower()">
+			@await Html.PartialAsync("_ViewerInput.cshtml", Model)
 		</div>
 	}
 }
-
-@if (Model.SearchResults != null)
+@if (Model.Settings.ResultsPageId == Guid.Empty)
 {
-	<div>Search term: @Model.SearchTerm@Html.Raw(".")</div>
-	@if (Model.SearchResults.Total == 0)
+	@if (Model.SearchResults != null)
 	{
-		<div>No results.</div>
-	}
-	else
-	{
-		<div>Displaying search results @(((Model.PagingSettings.CurrentPageIndex - 1) * @Model.PagingSettings.PageSize) + 1) to @Model.PagingSettings.LastDisplayedRowIndex of @Model.SearchResults.Total@Html.Raw(".")</div>
-	}
-}
-
-@using (Html.BeginNucleusForm("Index", "Search", FormMethod.Post, new { @data_target = "form.parent()", @role = "search" }))
-{
-	@Html.HiddenFor(model => model.SearchTerm, new { @id = ""})
-	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.PagingSettings, propertyName = nameof(Model.PagingSettings) })
-
-	@if (Model.SearchResults?.Results?.Any() == true)
-	{
-		@foreach (var result in Model.SearchResults.Results)
+		<div>Search term: @Model.SearchTerm@Html.Raw(".")</div>
+		@if (Model.SearchResults.Total == 0)
 		{
-			<div class="search-result">
-				@if (Model.Settings.ShowUrl)
-				{
-					<span class="fst-italic small result-url">@Url.Content(result.Url)</span>
-				}
-				@if ((Model.Settings.ShowPublishDate || Model.Settings.ShowSize) && (result.PublishedDate.HasValue || result.Size.HasValue))
-				{
-					<div class="text-muted small fst-italic result-meta">
-						@if (Model.Settings.ShowPublishDate && result.PublishedDate.HasValue)
-						{
-							<span>Published: @result.PublishedDate.FormatDate(this.Context.Request.GetUserTimeZone())</span>
-						}
-						@if ((Model.Settings.ShowPublishDate && result.PublishedDate.HasValue) && (Model.Settings.ShowSize && result.Size.HasValue))
-						{
-							@Html.Raw(", ")
-						}
-						@if (Model.Settings.ShowSize && result.Size.HasValue)
-						{
-							<span>@result.Size.FormatFileSize()</span>
-						}
-					</div>
-				}
-
-				<a class="d-block result-link" href="@Url.Content(result.Url)" title="@result.Title">@result.Title</a>
-
-				@if (!String.IsNullOrEmpty(@result.Summary))
-				{
-					<div class="result-summary">@result.Summary</div>
-				}
-				@if (Model.Settings.ShowCategories && result.Categories != null && result.Categories.Any())
-				{
-					<ul class="list-inline comma-separated result-categories">
-						@foreach (var category in result.Categories)
-						{
-							<li class="list-inline-item">@category.Name</li>
-						}
-					</ul>
-				}
-				@if (Model.Settings.ShowScore)
-				{
-					<span class="fw-light d-block small result-score">Score: @result.Score</span>
-				}
-			</div>
+			<div>No results.</div>
+		}
+		else
+		{
+			<div>Displaying search results @(((Model.PagingSettings.CurrentPageIndex - 1) * @Model.PagingSettings.PageSize) + 1) to @Model.PagingSettings.LastDisplayedRowIndex of @Model.SearchResults.Total@Html.Raw(".")</div>
 		}
 	}
-}
 
-<script>
-	jQuery(document).ready(function ()
+	@using (Html.BeginNucleusForm("Index", "Search", "Search", FormMethod.Post, new { @data_target = "form.parent()", @role = "search" }))
 	{
-		jQuery(document).off('click.suggestion');
-		jQuery(document).on('click.suggestion', '.suggestions-result li', function (event)
-		{
-			var textbox = jQuery(event.currentTarget).parents('div').siblings('.search-term');
-			var button = jQuery(event.currentTarget).parents('div').siblings('button');
-			var selectedText = jQuery(event.currentTarget).html();
+		@Html.HiddenFor(model => model.SearchTerm, new { @id = ""})
+		@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.PagingSettings, propertyName = nameof(Model.PagingSettings) })
 
-			textbox.val(selectedText);
-			button.click();
-		});
-
-		@if(Model.Settings.DisplayMode == Settings.DisplayModes.Minimal)
+		@if (Model.SearchResults?.Results?.Any() == true)
 		{
-			<text>
-				jQuery('.search-term').on('keydown', function(event)
-				{
-					if (event.keyCode === 13)
+			@foreach (var result in Model.SearchResults.Results)
+			{
+				<div class="search-result">
+					@if (Model.Settings.ShowUrl)
 					{
-						jQuery(this).parents('form').attr('action', '@Url.NucleusAction("Index", "Search", "Search")');
-						jQuery(this).parents('form').submit();
+						<span class="fst-italic small result-url">@Url.Content(result.Url)</span>
 					}
-				});
-			</text>
+					@if ((Model.Settings.ShowPublishDate || Model.Settings.ShowSize) && (result.PublishedDate.HasValue || result.Size.HasValue))
+					{
+						<div class="text-muted small fst-italic result-meta">
+							@if (Model.Settings.ShowPublishDate && result.PublishedDate.HasValue)
+							{
+								<span>Published: @result.PublishedDate.FormatDate(this.Context.Request.GetUserTimeZone())</span>
+							}
+							@if ((Model.Settings.ShowPublishDate && result.PublishedDate.HasValue) && (Model.Settings.ShowSize && result.Size.HasValue))
+							{
+								@Html.Raw(", ")
+							}
+							@if (Model.Settings.ShowSize && result.Size.HasValue)
+							{
+								<span>@result.Size.FormatFileSize()</span>
+							}
+						</div>
+					}
+
+					<a class="d-block result-link" href="@Url.Content(result.Url)" title="@result.Title">@result.Title</a>
+
+					@if (!String.IsNullOrEmpty(@result.Summary))
+					{
+						<div class="result-summary">@result.Summary</div>
+					}
+					@if (Model.Settings.ShowCategories && result.Categories != null && result.Categories.Any())
+					{
+						<ul class="list-inline comma-separated result-categories">
+							@foreach (var category in result.Categories)
+							{
+								<li class="list-inline-item">@category.Name</li>
+							}
+						</ul>
+					}
+					@if (Model.Settings.ShowScore)
+					{
+						<span class="fw-light d-block small result-score">Score: @result.Score</span>
+					}
+				</div>
+			}
 		}
-	});
-</script>
+	}
+}

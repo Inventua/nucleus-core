@@ -14,6 +14,6 @@ namespace Nucleus.Modules.Search.ViewModels
   {
     public SearchResults SearchResults { get; set; }
     public Settings Settings { get; set; } = new();
-    
+    public string ResultsUrl { get; set; }
   }
 }

@@ -49,28 +49,6 @@ namespace Nucleus.Modules.Search.Controllers
 			return View("Viewer", await BuildViewModel(new() { SearchTerm = search }));
 		}
 
-		[HttpPost]
-		public async Task<ActionResult> Index(ViewModels.Viewer viewModel)
-		{
-			Page resultsPage = null;
-			Guid resultsPageId = this.Context.Module.ModuleSettings.Get(MODULESETTING_RESULTS_PAGE, Guid.Empty);
-			
-			if (resultsPageId != Guid.Empty)
-			{
-				resultsPage = await this.PageManager.Get(resultsPageId);		
-			}
-			
-			if (resultsPage == null)
-			{
-				return View("Viewer", await BuildViewModel(viewModel));
-			}
-			else
-			{
-				ControllerContext.HttpContext.Response.Headers.Add("X-Location", Url.Content(Url.PageLink(resultsPage) + $"?search={viewModel.SearchTerm}"));
-				return StatusCode((int)System.Net.HttpStatusCode.Found);
-			}
-		}
-
 		[HttpGet]
 		[HttpPost]
 		public async Task<ActionResult> Suggest(ViewModels.Suggestions viewModel)
@@ -133,7 +111,20 @@ namespace Nucleus.Modules.Search.Controllers
 			}
 
 			GetSettings(viewModel.Settings);
-			
+
+			Page resultsPage = null;
+			Guid resultsPageId = this.Context.Module.ModuleSettings.Get(MODULESETTING_RESULTS_PAGE, Guid.Empty);
+
+			if (resultsPageId != Guid.Empty)
+			{
+				resultsPage = await this.PageManager.Get(resultsPageId);
+			}
+
+			if (resultsPage != null)
+			{
+				viewModel.ResultsUrl = resultsPage.DefaultPageRoute().Path;
+			}
+
 			if (!String.IsNullOrEmpty(viewModel.SearchTerm))
 			{
 				if (this.SearchProviders.Count() == 1)
@@ -195,9 +186,13 @@ namespace Nucleus.Modules.Search.Controllers
 					viewModel.Roles = (await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId()))?.Roles;
 				}
 
-				if (!this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true))
+				// When we use the tag helper or Html helper, the module id is not set, so we can't read settings (because there aren't any)
+				if (this.Context.Module != null)
 				{
-					viewModel.ExcludedScopes.Add(Abstractions.Models.FileSystem.File.URN);
+					if (!this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true))
+					{
+						viewModel.ExcludedScopes.Add(Abstractions.Models.FileSystem.File.URN);
+					}
 				}
 
 				try

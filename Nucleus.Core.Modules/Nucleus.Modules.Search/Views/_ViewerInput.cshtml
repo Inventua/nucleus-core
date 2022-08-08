@@ -1,0 +1,17 @@
+﻿@model Nucleus.Modules.Search.ViewModels.Viewer
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+<div class="search-suggestions collapse@(Model.SearchResults?.Results?.Any() == true ? " show" : "")"></div>
+@Html.TextBoxFor(model => model.SearchTerm, new { @id = "", @class = "search-term align-middle", @autocomplete = "off", @placeholder="search term", @aria_label = "Enter search term." })
+@if (Model.Settings.DisplayMode != Nucleus.Modules.Search.ViewModels.Settings.DisplayModes.Minimal)
+{
+	@if (!String.IsNullOrEmpty(Model.ResultsUrl))
+	{
+		<button type="button" class="btn btn-primary@(Model.Settings.DisplayMode == Nucleus.Modules.Search.ViewModels.Settings.DisplayModes.Compact ? " btn-sm": "")" onclick="window.location = jQuery(this).parents('form').attr('data-resultsurl') + '?search=' + jQuery(this).siblings('.search-term').val();">@Model.Settings.SearchButtonCaption</button>
+	}
+	else
+	{
+		@Html.SubmitButton("", Model.Settings.SearchButtonCaption, @Url.NucleusAction("Index", "Search", "Search"), new { @data_target = "form.parent()", @class= Model.Settings.DisplayMode == Nucleus.Modules.Search.ViewModels.Settings.DisplayModes.Compact ? "btn btn-primary btn-sm": "btn btn-primary"  })
+	}
+}

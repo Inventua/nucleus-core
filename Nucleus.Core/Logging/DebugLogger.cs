@@ -38,13 +38,13 @@ namespace Nucleus.Core.Logging
             if (exception != null)
               System.Diagnostics.Debug.WriteLine
               (
-                string.Format("{0:dd-MMM-yyyy HH:mm:ss.fffffff} {1,-12} {2}", DateTime.UtcNow, "[" + logLevel.ToString() + "]", this.Category) + 
+                string.Format("{0:dd-MMM-yyyy HH:mm:ss.fffffff} {1,-13} {2}", DateTime.UtcNow, "[" + logLevel.ToString() + "]", this.Category) + 
                 string.Format("{0,-28} {1}", " ", formatter(state, exception) + " " + exception.Message + Environment.NewLine + exception.ToString())
               );
             else
               System.Diagnostics.Debug.WriteLine
               (
-                string.Format("{0:dd-MMM-yyyy HH:mm:ss.fffffff} {1,-12} {2} {3}", DateTime.UtcNow, "[" + logLevel.ToString() + "]", this.Category, strEventType) + 
+                string.Format("{0:dd-MMM-yyyy HH:mm:ss.fffffff} {1,-13} {2} {3}", DateTime.UtcNow, "[" + logLevel.ToString() + "]", this.Category, strEventType) + 
                 string.Format("{0,-28} {1}", " ", formatter(state, exception))
               );
           }

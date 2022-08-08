@@ -16,7 +16,7 @@ namespace Nucleus.Extensions.ElasticSearch
 		/// <summary>
 		/// Constructor used by NEST deserialization for search results.
 		/// </summary>
-		public ElasticSearchDocument() { }
+		public ElasticSearchDocument() { }	
 
 		/// <summary>
 		/// Constructor used when generating a feed.
@@ -24,7 +24,8 @@ namespace Nucleus.Extensions.ElasticSearch
 		/// <param name="content"></param>
 		public ElasticSearchDocument(ContentMetaData content)
 		{
-			this.Id = $"{content.Scope}/{content.SourceId}";
+			this.Id = GenerateId(content);
+
 			this.SiteId = content.Site.Id;
 			this.Url = content.Url;
 			this.Title = content.Title;
@@ -37,7 +38,7 @@ namespace Nucleus.Extensions.ElasticSearch
 
 			if (content.Content.Any())
 			{
-				this.Content = Convert.ToBase64String(content.Content);				
+				this.Content = Convert.ToBase64String(content.Content);
 			}
 			else
 			{
@@ -71,7 +72,19 @@ namespace Nucleus.Extensions.ElasticSearch
 			}
 
 			this.IsSecure = this.IsPublic(content.Site, content.Roles);
-		}					
+		}
+
+		public string GenerateId(ContentMetaData content)
+		{
+			if (content.SourceId.HasValue)
+			{
+				return $"{content.Scope}/{content.Url}/{content.SourceId}";
+			}
+			else
+			{
+				return $"{content.Scope}/{content.Url}/";
+			}
+		}
 
 		/// <summary>
 		/// Elastic search unique id for the document
@@ -127,7 +140,7 @@ namespace Nucleus.Extensions.ElasticSearch
 		/// This value is optional.  If set, it can be used to manage the individual search result for update and delete operations.
 		/// </remarks>
 		[Nest.Keyword]
-		public Guid SourceId { get; set; }
+		public Guid? SourceId { get; set; }
 
 		/// <summary>
 		/// Search entry content, used for content indexing.
@@ -193,7 +206,7 @@ namespace Nucleus.Extensions.ElasticSearch
 		/// Specifies whether the document is visible to anonymous users.
 		/// </summary>
 		public Boolean IsSecure { get; set; }
-				
+
 		// This is auto-populated by the ingest pipeline
 		public string FeedProcessingDateTime { get; set; }
 

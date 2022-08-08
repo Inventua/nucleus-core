@@ -75,10 +75,22 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		public async Task<Page> Get(Site site, string path)
 		{
-			if (path.EndsWith('/') && path != "/")
+			// ensure that path starts with '/' and does not end with '/', but if the path is equal to '/' leave as-is.  '/' is
+			// normally the route to the site's home page.
+			if (path != "/")
 			{
-				path = path[0..^1];
+				path = String.Concat(!path.StartsWith('/') ? "/" : "", path.EndsWith('/') ? path[0..^1] : path);
 			}
+
+			//if (path.EndsWith('/') && path != "/")
+			//{
+			//	path = path[0..^1];
+			//}
+
+			//if (!path.StartsWith('/'))
+			//{
+			//	path = $"/{path}";
+			//}
 
 			return await FindPage(site, path);
 		}

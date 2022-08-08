@@ -60,7 +60,7 @@ namespace Nucleus.Abstractions.Search
 		/// <remarks>
 		/// This value is optional.  If set, it can be used to manage the individual search result for update and delete operations.
 		/// </remarks>
-		public Guid SourceId { get; set; }
+		public Guid? SourceId { get; set; }
 
 		/// <summary>
 		/// Search entry content, used for content indexing.

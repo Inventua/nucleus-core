@@ -20,10 +20,10 @@ namespace Nucleus.Abstractions.Search
 		/// </summary>
 		/// <param name="site"></param>
 		/// <returns>
-		/// Implementations should return search items for all instances (in all sites and pages) of the entities which they support.
+		/// This overload returns a IAsyncEnumerable, so that implementations can use "async enumerables" (yield) to return items to the
+		/// caller as they are created.  Implementations should return search items for all instances (in all sites and pages) of the 
+		/// entities which they support.
 		/// </returns>
-		public abstract Task<IEnumerable<ContentMetaData>> ListItems(Site site);
-			
-		
+		public abstract IAsyncEnumerable<ContentMetaData> ListItems(Site site);
 	}
 }

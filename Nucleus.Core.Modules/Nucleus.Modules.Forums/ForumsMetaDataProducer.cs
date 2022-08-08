@@ -39,12 +39,12 @@ namespace Nucleus.Modules.Forums
 			this.Logger = logger;
 		}
 
-		public override async Task<IEnumerable<ContentMetaData>> ListItems(Site site)
+		public async override IAsyncEnumerable<ContentMetaData> ListItems(Site site)
 		{
 			// This must match the value in package.xml
 			Guid moduleDefinitionId = Guid.Parse("ea9b5d66-b791-414c-8c52-a20536cfa9f5");
 
-			List<ContentMetaData> results = new();
+			//List<ContentMetaData> results = new();
 
 			if (site.DefaultSiteAlias == null)
 			{
@@ -55,25 +55,37 @@ namespace Nucleus.Modules.Forums
 				foreach (PageModule module in await this.ExtensionManager.ListPageModules(new Nucleus.Abstractions.Models.ModuleDefinition() { Id = moduleDefinitionId }))
 				{
 					Page page = await this.PageManager.Get(module.PageId);
-
-					if (!page.IncludeInSearch)
+										
+					foreach (Models.Group group in await this.GroupsManager.List(module))
 					{
-						Logger?.LogInformation("Skipping forums on page {pageid}/{pagename} because the page's 'Include in search' setting is false.", page.Id, page.Name);
-					}
-					else
-					{
-						foreach (Models.Group group in await this.GroupsManager.List(module))
+						if (!group.Settings.AllowSearchIndexing)
+						{
+							Logger?.LogInformation("Skipping forum group {groupName} on page {pageid}/{pagename} because the group's 'Allow search indexing' setting is false.", group.Name, page.Id, page.Name);
+						}
+						else
 						{
 							foreach (Models.Forum forum in await this.ForumsManager.List(group))
 							{
-								results.AddRange(await BuildContentMetaData(site, page, module, forum));
+								if (!forum.EffectiveSettings().AllowSearchIndexing)
+								{
+									Logger?.LogInformation("Skipping forum {forumName} on page {pageid}/{pagename} because the forum's 'Allow search indexing' setting is false.", forum.Name, page.Id, page.Name);
+								}
+								else
+								{
+									await foreach (ContentMetaData metaData in BuildContentMetaData(site, page, module, forum))
+									{
+										yield return metaData;
+									}
+									//results.AddRange(await BuildContentMetaData(site, page, module, forum));
+								}
 							}
 						}
 					}
+					
 				}
 			}
 
-			return results.Where(result => result != null);
+			//return results.Where(result => result != null);
 		}
 
 		/// <summary>
@@ -82,9 +94,9 @@ namespace Nucleus.Modules.Forums
 		/// <param name="site"></param>
 		/// <param name="document"></param>
 		/// <returns></returns>
-		private async Task<List<ContentMetaData>> BuildContentMetaData(Site site, Page page, PageModule module, Models.Forum forum)
+		private async IAsyncEnumerable<ContentMetaData> BuildContentMetaData(Site site, Page page, PageModule module, Models.Forum forum)
 		{
-			List<ContentMetaData> results = new();
+			//List<ContentMetaData> results = new();
 
 			if (page != null)
 			{
@@ -113,14 +125,14 @@ namespace Nucleus.Modules.Forums
 
 					forumPostContentItem.Content = System.Text.Encoding.UTF8.GetBytes(content.ToString());
 
-					results.Add(forumPostContentItem);
+					yield return forumPostContentItem;
 
 				}
 
-				return results;
+				//return results;
 			}
 
-			return null;
+			//return null;
 		}
 
 		private List<Role> GetViewRoles(Models.Forum forum)

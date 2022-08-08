@@ -11,8 +11,10 @@ namespace Nucleus.Abstractions.Search
 	/// <summary>
 	/// The ContentMetaData class provides an entry to be submitted to a search index.
 	/// </summary>
-	public class ContentMetaData
+	public class ContentMetaData : IDisposable
 	{
+		private bool disposedValue;
+
 		/// <summary>
 		/// This site which the resource belongs to.
 		/// </summary>
@@ -125,6 +127,31 @@ namespace Nucleus.Abstractions.Search
 		/// </remarks>
 		public IEnumerable<Role> Roles { get; set; }
 
-		
+		/// <inheritdoc />
+		/// <hidden/>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				if (disposing)
+				{
+					// dispose managed state (managed objects)
+					this.Content = null;
+					this.Attachments = null;
+					this.Roles = null;
+				}
+
+				disposedValue = true;
+			}
+		}
+
+		/// <inheritdoc />
+		/// <hidden/>
+		public void Dispose()
+		{
+			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
 	}
 }

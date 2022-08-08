@@ -28,9 +28,9 @@ namespace Nucleus.Core.Search
 			this.Logger = logger;
 		}
 
-		public async override Task<IEnumerable<ContentMetaData>> ListItems(Site site)
+		public async override IAsyncEnumerable<ContentMetaData> ListItems(Site site)
 		{
-			List<ContentMetaData> results = new();
+			//List<ContentMetaData> results = new();
 			Boolean indexPublicFilesOnly = false;
 
 			site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PUBLIC_FILES_ONLY, out indexPublicFilesOnly);
@@ -44,16 +44,20 @@ namespace Nucleus.Core.Search
 				foreach (Abstractions.FileSystemProviders.FileSystemProviderInfo provider in this.FileSystemManager.ListProviders())
 				{
 					Folder rootFolder = await this.FileSystemManager.GetFolder(site, provider.Key, "");
-					results.AddRange(await GetFiles(site, rootFolder, indexPublicFilesOnly));
+					await foreach (ContentMetaData item in GetFiles(site, rootFolder, indexPublicFilesOnly))
+					{
+						yield return item;
+					}
 				}
 			}
 
-			return results;
+			//return results;
 		}
 
-		private async Task<List<ContentMetaData>> GetFiles(Site site, Folder parentFolder, Boolean indexPublicFilesOnly)
+		//private async Task<List<ContentMetaData>> GetFiles(Site site, Folder parentFolder, Boolean indexPublicFilesOnly)
+		public async IAsyncEnumerable<ContentMetaData> GetFiles(Site site, Folder parentFolder, Boolean indexPublicFilesOnly)
 		{
-			List<ContentMetaData> results = new();
+			//List<ContentMetaData> results = new();
 
 			Folder folder = await this.FileSystemManager.ListFolder(site, parentFolder.Id, "");
 
@@ -72,7 +76,8 @@ namespace Nucleus.Core.Search
 
 						if (metaData != null)
 						{
-							results.Add(metaData);
+							yield return metaData;
+							//results.Add(metaData);
 						}
 					}
 				}
@@ -83,11 +88,15 @@ namespace Nucleus.Core.Search
 
 				foreach (Folder subFolder in folder.Folders)
 				{
-					results.AddRange(await GetFiles(site, subFolder, indexPublicFilesOnly));
+					await foreach (ContentMetaData item in GetFiles(site, subFolder, indexPublicFilesOnly))
+					{
+						yield return item;
+					}
+					//results.AddRange(await GetFiles(site, subFolder, indexPublicFilesOnly));
 				}
 			}
 
-			return results;
+			//return results;
 		}
 
 		private async Task<ContentMetaData> BuildContentMetaData(Site site, File file)

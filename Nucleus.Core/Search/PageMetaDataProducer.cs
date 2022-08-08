@@ -30,9 +30,9 @@ namespace Nucleus.Core.Search
 			this.Logger = logger;
 		}
 
-		public async override Task<IEnumerable<ContentMetaData>> ListItems(Site site)
+		public async override IAsyncEnumerable<ContentMetaData> ListItems(Site site)
 		{
-			List<ContentMetaData> results = new();
+			//List<ContentMetaData> results = new();
 			ApiKey apiKey = null;
 			Boolean indexPublicPagesOnly = false;
 
@@ -65,7 +65,8 @@ namespace Nucleus.Core.Search
 
 							if (metaData != null)
 							{
-								results.Add(metaData);
+								yield return metaData;
+								//results.Add(metaData);
 							}
 						}
 						else
@@ -76,7 +77,7 @@ namespace Nucleus.Core.Search
 				}
 			}
 
-			return results;
+			//return results;
 		}
 
 		private async Task<ContentMetaData> BuildContentMetaData(Site site, ApiKey apiKey, Page page)

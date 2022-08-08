@@ -61,18 +61,18 @@ namespace Nucleus.Core.Search
 
 					try
 					{
-						this.Logger.LogTrace("Getting search content from {type}.", contentProvider.GetType().FullName);
-						foreach (ContentMetaData item in await contentProvider.ListItems(fullSite))
+						this.Logger.LogTrace("Getting search content from {type} for site '{site}'.", contentProvider.GetType().FullName, site.Name);
+						await foreach (ContentMetaData item in contentProvider.ListItems(fullSite))
 						{
 							item.Url = ParseUrl(item.Url);
-							this.Logger.LogTrace("Adding {url} to index.", item.Url);
+							this.Logger.LogTrace("Adding [{scope}] {url} to index.", item.Scope, item.Url);
 
 							foreach (ISearchIndexManager searchIndexManager in this.SearchIndexManagers)
 							{
 								try
 								{
 									searchIndexManager.Index(item);
-									this.Logger.LogTrace("{searchIndexManager}: Added {url} to index.", searchIndexManager.GetType(), item.Url);
+									this.Logger.LogTrace("Added [{scope}] {url} to index ({searchIndexManager}).", item.Scope, item.Url, searchIndexManager.GetType());
 								}
 								catch (NotImplementedException)
 								{
@@ -81,9 +81,11 @@ namespace Nucleus.Core.Search
 								catch (Exception e)
 								{
 									// error in .Index implementation
-									this.Logger.LogError(e, "Error adding {url} to index using {type}.Index()", item.Url, searchIndexManager.GetType().FullName);
+									this.Logger.LogError(e, "Error adding [{scope}] {url} to index using {type}.Index()", item.Scope, item.Url, searchIndexManager.GetType().FullName);
 								}
 							}
+
+							item.Dispose();
 						}
 					}
 					catch (NotImplementedException)

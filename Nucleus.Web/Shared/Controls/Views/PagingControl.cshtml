@@ -13,8 +13,8 @@ else
 				<span class="nucleus-paging-control-summary">Page @Model.Results.CurrentPageIndex of @Model.Results.TotalPages</span>
 				@if (Model.RenderMode == Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Standard)
 				{
-						<a class="nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == 1 ? " disabled" : "")" data-page="1">|&lt;</a>
-						<a class="nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == 1 ? " disabled" : "")" data-page="@(Model.Results.CurrentPageIndex - 1)">Previous</a>
+						<a class="btn nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == 1 ? " disabled" : "")" data-page="1">|&lt;</a>
+						<a class="btn nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == 1 ? " disabled" : "")" data-page="@(Model.Results.CurrentPageIndex - 1)">Previous</a>
 
 						@foreach (var pageInfo in Model.Results.Pages)
 						{
@@ -22,10 +22,10 @@ else
 							{
 								<span>...</span>
 							}
-							<a class="nucleus-pagingcontrol-pagebutton@(pageInfo.Key == Model.Results.CurrentPageIndex ? " Current" : "")" data-page="@pageInfo.Key">@pageInfo.Key</a>
+							<a class="btn nucleus-pagingcontrol-pagebutton@(pageInfo.Key == Model.Results.CurrentPageIndex ? " Current" : "")" data-page="@pageInfo.Key">@pageInfo.Key</a>
 						}
-						<a class="nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == Model.Results.TotalPages ? " disabled" : "")" data-page="@(Model.Results.CurrentPageIndex + 1)">Next</a>
-						<a class="nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == Model.Results.TotalPages ? " disabled" : "")" data-page="@Model.Results.TotalPages">&gt;|</a>
+						<a class="btn nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == Model.Results.TotalPages ? " disabled" : "")" data-page="@(Model.Results.CurrentPageIndex + 1)">Next</a>
+						<a class="btn nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == Model.Results.TotalPages ? " disabled" : "")" data-page="@Model.Results.TotalPages">&gt;|</a>
 				
 				}
 			</div>

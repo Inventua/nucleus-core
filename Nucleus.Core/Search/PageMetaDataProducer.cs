@@ -83,9 +83,8 @@ namespace Nucleus.Core.Search
 		{
 			System.IO.MemoryStream htmlContent = new();
 			string pageRelativeUrl = PageLink(page);
-			Boolean useSsl = true;
 
-			site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PAGES_USE_SSL, out useSsl);
+			site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PAGES_USE_SSL, out Boolean useSsl);
 
 			if (!String.IsNullOrEmpty(pageRelativeUrl))
 			{

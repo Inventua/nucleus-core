@@ -13,7 +13,7 @@
 	@Html.HiddenFor(model=>model.Settings.MaximumSuggestions)
 	@if (Model.Settings.DisplayMode == Settings.DisplayModes.Full)
 	{
-		<SettingsControl caption="Search Term" helptext="Enter your search term." class="search-display-full">
+		<SettingsControl caption=@Model.Settings.SearchCaption helptext="Enter your search term." class="search-display-full">
 			@await Html.PartialAsync("_ViewerInput.cshtml", Model)
 		</SettingsControl>
 	}

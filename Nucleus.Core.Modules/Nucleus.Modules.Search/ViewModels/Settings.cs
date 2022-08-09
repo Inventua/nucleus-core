@@ -20,6 +20,7 @@ namespace Nucleus.Modules.Search.ViewModels
 		}
 		
 		public DisplayModes DisplayMode { get; set;}
+		public string SearchCaption { get; set; }
 		public string SearchButtonCaption { get; set; }	
 
 		public Boolean ShowUrl { get; set; }

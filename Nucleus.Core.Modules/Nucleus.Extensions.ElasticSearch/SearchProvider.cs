@@ -83,7 +83,7 @@ namespace Nucleus.Extensions.ElasticSearch
 			}
 
 			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName);
-			Nest.ISearchResponse<ElasticSearchDocument> result = request.Suggest(query, 5);
+			Nest.ISearchResponse<ElasticSearchDocument> result = request.Suggest(query);
 
 			return new SearchResults()
 			{

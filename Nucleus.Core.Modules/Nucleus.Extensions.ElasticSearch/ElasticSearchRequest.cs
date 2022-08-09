@@ -355,19 +355,21 @@ namespace Nucleus.Extensions.ElasticSearch
 			return supportedTypes.Contains(contentType, StringComparer.OrdinalIgnoreCase);
 		}
 
-		public ISearchResponse<ElasticSearchDocument> Suggest(SearchQuery query, int maxSuggestions)
+		public ISearchResponse<ElasticSearchDocument> Suggest(SearchQuery query)
 		{
 			SearchRequest searchRequest;
 			ISearchResponse<ElasticSearchDocument> response;
 			SuggestContainer suggest = new SuggestContainer();
 
-			suggest.Add("suggest-title", BuildSuggestBucket(query.SearchTerm, ParseField(nameof(ElasticSearchDocument.SuggesterTitle)), maxSuggestions));
+			suggest.Add("suggest-title", BuildSuggestBucket(query.SearchTerm, ParseField(nameof(ElasticSearchDocument.SuggesterTitle)), query.PagingSettings.PageSize));
 
 			searchRequest = new SearchRequest(this.IndexName)
 			{
 				Query = BuildSearchQuery(query),
 				Source = new SourceFilter { Includes = "*", Excludes = new List<string>() { nameof(ElasticSearchDocument.Attachment), nameof(ElasticSearchDocument.Roles) }.ToArray() },
 				Suggest = suggest,
+				Size = query.PagingSettings.PageSize,
+				From = query.PagingSettings.FirstRowIndex,
 				PostFilter = BuildSiteFilter(query) & BuildRolesFilter(query) & BuildArgsFilter(query) & BuildScopeFilter(query),
 				Sort = new List<ISort>()
 				{

@@ -19,6 +19,16 @@
 	margin-top: 2rem;	
 }
 
+.search-term
+{
+	width: 25rem;
+}
+
+.search-display-compact .search-terms, .search-display-minimal .search-term
+{
+	width: 15rem;
+}
+
 .suggestions-result 
 {
 	border: 1px solid #ddd;	

@@ -10,8 +10,11 @@ using Nucleus.Abstractions.Search;
 
 namespace Nucleus.Modules.Search.ViewModels
 {
-  public class Viewer : SearchQuery
+  public class Viewer 
   {
+    public string SearchTerm { get; set; }
+    public Nucleus.Abstractions.Models.Paging.PagingSettings PagingSettings { get; set; } = new();
+
     public SearchResults SearchResults { get; set; }
     public Settings Settings { get; set; } = new();
     public string ResultsUrl { get; set; }

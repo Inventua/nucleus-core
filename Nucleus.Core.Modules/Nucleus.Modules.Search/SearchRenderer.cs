@@ -24,7 +24,7 @@ namespace Nucleus.Modules.Search
 	/// <hidden />
 	internal static class SearchRenderer
 	{
-		internal static async Task<IHtmlContent> Build(IHtmlHelper htmlHelper, string resultsPageUrl, Nucleus.Modules.Search.ViewModels.Settings.DisplayModes displayMode, object htmlAttributes)
+		internal static async Task<IHtmlContent> Build(IHtmlHelper htmlHelper, string resultsPageUrl, Nucleus.Modules.Search.ViewModels.Settings.DisplayModes displayMode, int maximumSuggestions, Boolean includeFiles, string includeScopes, object htmlAttributes)
 		{
 			ViewModels.Viewer model = new();
 
@@ -36,6 +36,9 @@ namespace Nucleus.Modules.Search
 			model.SearchTerm = htmlHelper.ViewContext.HttpContext.Request.Query["search"];
 			model.ResultsUrl = resultsPageUrl;
 			model.Settings.DisplayMode = displayMode;
+			model.Settings.MaximumSuggestions = maximumSuggestions;
+			model.Settings.IncludeFiles = includeFiles;
+			model.Settings.IncludeScopes = includeScopes;
 
 			// This (generally) gets called by a tag helper or Html helper in a layout, so the "current" folder is the layout's folder - so we 
 			// must specify a full path to the view.

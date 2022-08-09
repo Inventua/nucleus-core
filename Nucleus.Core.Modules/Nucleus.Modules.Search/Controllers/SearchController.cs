@@ -33,6 +33,8 @@ namespace Nucleus.Modules.Search.Controllers
 		private const string MODULESETTING_SHOW_PUBLISHEDDATE = "search:show-publisheddate";
 		private const string MODULESETTING_SHOW_SIZE = "search:show-size";
 		private const string MODULESETTING_SHOW_SCORE = "search:show-score";
+		private const string MODULESETTING_INCLUDE_SCOPES = "search:include-scopes";
+		private const string MODULESETTING_MAXIMUM_SUGGESTIONS = "search:maximum-suggestions";
 
 		public SearchController(Context Context, IPageManager pageManager, IPageModuleManager pageModuleManager, IUserManager userManager, IEnumerable<ISearchProvider> searchProviders)
 		{
@@ -97,6 +99,8 @@ namespace Nucleus.Modules.Search.Controllers
 		[HttpPost]
 		public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
 		{
+			if (viewModel.MaximumSuggestions > 100) viewModel.MaximumSuggestions = 100;
+
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_RESULTS_PAGE, viewModel.ResultsPageId);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_DISPLAY_MODE, viewModel.DisplayMode);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SEARCH_BUTTON_CAPTION, viewModel.SearchButtonCaption);			
@@ -106,6 +110,8 @@ namespace Nucleus.Modules.Search.Controllers
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_PUBLISHEDDATE, viewModel.ShowPublishDate);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SIZE, viewModel.ShowSize);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SCORE, viewModel.ShowScore);
+			this.Context.Module.ModuleSettings.Set(MODULESETTING_INCLUDE_SCOPES, viewModel.IncludeScopes);
+			this.Context.Module.ModuleSettings.Set(MODULESETTING_MAXIMUM_SUGGESTIONS, viewModel.MaximumSuggestions);
 
 			await this.PageModuleManager.SaveSettings(this.Context.Module);
 
@@ -114,8 +120,6 @@ namespace Nucleus.Modules.Search.Controllers
 
 		private async Task<ViewModels.Viewer> BuildViewModel(ViewModels.Viewer viewModel)
 		{
-			ISearchProvider searchProvider = null;
-
 			if (viewModel == null)
 			{
 				viewModel = new();				
@@ -142,6 +146,8 @@ namespace Nucleus.Modules.Search.Controllers
 
 			if (!String.IsNullOrEmpty(viewModel.SearchTerm))
 			{
+				ISearchProvider searchProvider = null;
+
 				if (this.SearchProviders.Count() == 1)
 				{
 					searchProvider = this.SearchProviders.First();
@@ -152,19 +158,7 @@ namespace Nucleus.Modules.Search.Controllers
 					throw new InvalidOperationException("There is no search provider available.");
 				}
 
-				viewModel.Site = this.Context.Site;
-
-				if (!(HttpContext.User.IsSystemAdministrator() | HttpContext.User.IsSiteAdmin(this.Context.Site)))
-				{
-					viewModel.Roles = (await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId()))?.Roles;
-				}
-				
-				if (!viewModel.Settings.IncludeFiles)
-				{
-					viewModel.ExcludedScopes.Add(Abstractions.Models.FileSystem.File.URN);
-				}
-
-				SearchResults results = await searchProvider.Search(viewModel);
+				SearchResults results= await searchProvider.Search(await BuildSearchQuery(viewModel.SearchTerm, viewModel.PagingSettings, viewModel.Settings.IncludeFiles,viewModel.Settings.IncludeScopes));
 
 				viewModel.PagingSettings.TotalCount = Convert.ToInt32(results.Total);
 				viewModel.SearchResults = results;
@@ -172,6 +166,41 @@ namespace Nucleus.Modules.Search.Controllers
 			
 			return viewModel;
 		}
+
+		private async Task<SearchQuery> BuildSearchQuery(string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings,Boolean includeFiles, string includeScopes)
+		{			
+			SearchQuery searchQuery = new()
+			{
+				Site = this.Context.Site,
+				SearchTerm = searchTerm,
+				PagingSettings = pagingSettings
+			};
+
+			// When we use the tag helper or Html helper, the module id is not set, so we can't read settings (because there aren't any)
+			//if (this.Context.Module != null)
+			//{
+			//	includeFiles = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true);
+			//	includeScopes = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_SCOPES, "");
+			//}
+
+			if (!(HttpContext.User.IsSystemAdministrator() | HttpContext.User.IsSiteAdmin(this.Context.Site)))
+			{
+				searchQuery.Roles = (await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId()))?.Roles;
+			}
+
+			if (!includeFiles)
+			{
+				searchQuery.ExcludedScopes.Add(Abstractions.Models.FileSystem.File.URN);
+			}
+
+			if (!String.IsNullOrEmpty(includeScopes))
+			{
+				searchQuery.IncludedScopes = includeScopes.Split('\n', StringSplitOptions.RemoveEmptyEntries).ToList();
+			}
+
+			return searchQuery;
+		}
+
 
 		private async Task<ViewModels.Suggestions> BuildSuggestViewModel(ViewModels.Suggestions viewModel)
 		{
@@ -194,32 +223,23 @@ namespace Nucleus.Modules.Search.Controllers
 					throw new InvalidOperationException("There is no search provider available.");
 				}
 
-				viewModel.Site = this.Context.Site;
-
-				if (!(HttpContext.User.IsSystemAdministrator() | HttpContext.User.IsSiteAdmin(this.Context.Site)))
-				{
-					viewModel.Roles = (await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId()))?.Roles;
-				}
-
-				// When we use the tag helper or Html helper, the module id is not set, so we can't read settings (because there aren't any)
-				if (this.Context.Module != null)
-				{
-					if (!this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true))
-					{
-						viewModel.ExcludedScopes.Add(Abstractions.Models.FileSystem.File.URN);
-					}
-				}
+				if (viewModel.Settings.MaximumSuggestions > 100) viewModel.Settings.MaximumSuggestions = 100;
 
 				try
 				{
-					SearchResults results = await searchProvider.Suggest(viewModel);
-
-					viewModel.PagingSettings.TotalCount = Convert.ToInt32(results.Total);
-					viewModel.SearchResults = results;
+					viewModel.SearchResults = await searchProvider.Suggest(await BuildSearchQuery
+						(
+						  viewModel.SearchTerm, 
+							new() 
+							{  
+								CurrentPageIndex = 1, PageSize = viewModel.Settings.MaximumSuggestions 
+							}, 
+							viewModel.Settings.IncludeFiles, 
+							viewModel.Settings.IncludeScopes
+						));
 				}
 				catch (NotImplementedException)
 				{
-					viewModel.PagingSettings.TotalCount = 0;
 					viewModel.SearchResults = null;
 				}				
 			}
@@ -252,6 +272,8 @@ namespace Nucleus.Modules.Search.Controllers
 			settings.ShowPublishDate = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_PUBLISHEDDATE, true);
 			settings.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
 			settings.ShowScore = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SCORE, true);
+			settings.IncludeScopes = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_SCOPES, "");
+			settings.MaximumSuggestions = this.Context.Module.ModuleSettings.Get(MODULESETTING_MAXIMUM_SUGGESTIONS, 5);
 
 			if (String.IsNullOrWhiteSpace(settings.SearchButtonCaption))
 			{

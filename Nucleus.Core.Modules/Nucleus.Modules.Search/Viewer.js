@@ -35,7 +35,7 @@
 			data.target.find('.suggestions-result li').on('click', function (event)
 			{
 				var textbox = jQuery(this).parents('form').find('.search-term');
-				textbox.val(jQuery(this).html());
+				textbox.val(jQuery(this).attr('title'));
 				_doSearch(this);
 			});
 

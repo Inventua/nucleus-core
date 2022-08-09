@@ -17,6 +17,10 @@
 				<SettingsControl caption="Search Button Caption" helptext="Specifies the text displayed in the search button.">
 					@Html.TextBoxFor(model => model.SearchButtonCaption, new {  })
 				</SettingsControl>
+
+				<SettingsControl caption="Maximum number of suggestions?" helptext="Specify how many suggestions to display while the user enters search terms.">
+					@Html.TextBoxFor(model => model.MaximumSuggestions, new { @type = "number", @min = "0", @max = "100" })
+				</SettingsControl>
 			</div>
 
 			<SettingsControl caption="Results Page" helptext="Results Page.  This page should contain a search module.">
@@ -30,6 +34,7 @@
 
 		<fieldset class="search-instance-settings">
 			<label>Results</label>
+
 			<SettingsControl caption="Include Files in Results?" rendermode="LabelLast" class="inner-inline" helptext="Specify whether to include files in search results.">
 				@Html.CheckBoxFor(model => model.IncludeFiles, new { @class = "ToggleSwitch" })
 			</SettingsControl>
@@ -51,6 +56,10 @@
 					@Html.CheckBoxFor(model => model.ShowScore, new { @class = "ToggleSwitch" })
 				</SettingsControl>
 			</div>
+
+			<SettingsControl caption="Include Scopes" helptext="Use this setting to restrict results to specified scopes, or leave blank for all scopes.  Specify included scopes by entering one or more scopes separated by line feeds.  A scope is the URN of the data type which was used to create a search entry.  This is an advanced setting which may not be supported by all search providers.">
+				@Html.TextAreaFor(model => model.IncludeScopes, new { @rows = 5})
+			</SettingsControl>
 		</fieldset>
 	</div>
 	<div class="nucleus-form-buttonrow">

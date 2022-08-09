@@ -38,6 +38,23 @@ namespace Nucleus.Modules.Search
 		/// </summary>
 		public string ResultsPageUrl { get; set; }
 
+		/// <summary>
+		/// Specifies whether to include files in results.
+		/// </summary>
+		public Boolean IncludeFiles { get; set; }
+
+		/// <summary>
+		/// Use this setting to restrict results to specified scopes, or leave blank for all scopes.  Specify included scopes by entering one 
+		/// or more scopes separated by line feeds.  A scope is the URN of the data type which was used to create a search entry.  This is 
+		/// an advanced setting which may not be supported by all search providers.
+		/// </summary>
+		public string IncludeScopes { get; set; }
+
+		/// <summary>
+		/// Specifies how many search suggestions to display.
+		/// </summary>
+		public int MaximumSuggestions { get; set; } = 5;
+
 		private IHtmlHelper HtmlHelper { get; }
 
 		public SearchTagHelper(IHtmlHelper htmlHelper)
@@ -56,7 +73,7 @@ namespace Nucleus.Modules.Search
 			output.SuppressOutput();
 			(this.HtmlHelper as IViewContextAware).Contextualize(this.ViewContext);
 
-			IHtmlContent searchControloutput = await SearchRenderer.Build(this.HtmlHelper, this.ResultsPageUrl, this.DisplayMode, null);
+			IHtmlContent searchControloutput = await SearchRenderer.Build(this.HtmlHelper, this.ResultsPageUrl, this.DisplayMode, this.MaximumSuggestions, this.IncludeFiles, this.IncludeScopes, null);
 			if (searchControloutput != null)
 			{
 				searchControloutput.WriteTo(this.ViewContext.Writer, System.Text.Encodings.Web.HtmlEncoder.Default);

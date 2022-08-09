@@ -33,6 +33,7 @@ namespace Nucleus.Modules.Search.ViewModels
 		public Boolean IncludeFiles { get; set; } = true;
 
 		public PageMenu PageMenu { get; set; }
-
+		public string IncludeScopes { get; set; }
+		public int MaximumSuggestions { get; set; }
 	}
 }

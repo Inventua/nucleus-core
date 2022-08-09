@@ -1,5 +1,6 @@
 ﻿@* Renders a MixedContent class instance, for use in a search summary value *@
-@* This template resembles the _RenderMixedContent.cshtml razor view that is used to render on-screen data, but is simplified so that RazorEngineCore can use it.  *@
+@* This template resembles the _RenderMixedContent.cshtml razor view that is used to render on-screen data, but is simplified so  *@
+@* that RazorEngineCore can use it, and to keep the summary content simple (no hyperlinks, special formatting, etc)  *@
 @if (Model != null && Model.Items != null)
 {
 	@foreach (var item in Model.Items)

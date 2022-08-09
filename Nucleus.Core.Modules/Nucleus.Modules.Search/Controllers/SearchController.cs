@@ -182,13 +182,6 @@ namespace Nucleus.Modules.Search.Controllers
 				PagingSettings = pagingSettings
 			};
 
-			// When we use the tag helper or Html helper, the module id is not set, so we can't read settings (because there aren't any)
-			//if (this.Context.Module != null)
-			//{
-			//	includeFiles = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true);
-			//	includeScopes = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_SCOPES, "");
-			//}
-
 			if (!(HttpContext.User.IsSystemAdministrator() | HttpContext.User.IsSiteAdmin(this.Context.Site)))
 			{
 				searchQuery.Roles = (await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId()))?.Roles;
@@ -201,7 +194,9 @@ namespace Nucleus.Modules.Search.Controllers
 
 			if (!String.IsNullOrEmpty(includeScopes))
 			{
-				searchQuery.IncludedScopes = includeScopes.Split('\n', StringSplitOptions.RemoveEmptyEntries).ToList();
+				// allow \n delimiter when the included scopes are entered in the settings page and ';' delimiter for when the Html Helper
+				// or tag helper is being used.
+				searchQuery.IncludedScopes = includeScopes.Split(new char[] { '\n', ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 			}
 
 			return searchQuery;

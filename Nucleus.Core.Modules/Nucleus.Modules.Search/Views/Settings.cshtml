@@ -26,20 +26,27 @@
 			<SettingsControl caption="Results Page" helptext="Results Page.  This page should contain a search module.">
 				@Html.PageListFor(model => model.ResultsPageId, Model.PageMenu, Guid.Empty)
 			</SettingsControl>
-		</fieldset>
 
-		<div class="alert alert-info results-page-selected">
-			Results settings are configured in the search module instance on the results page.
-		</div>
-
-		<fieldset class="search-instance-settings">
-			<label>Results</label>
-
+			<SettingsControl caption="Include Scopes" helptext="Use this setting to restrict results to specified scopes, or leave blank for all scopes.  Specify included scopes by entering one or more scopes separated by line feeds.  A scope is the URN of the data type which was used to create a search entry.  This setting affacts both search suggestions and search results.  This is an advanced setting which may not be supported by all search providers.">
+				@Html.TextAreaFor(model => model.IncludeScopes, new { @rows = 5})
+			</SettingsControl>
+						
 			<SettingsControl caption="Include Files in Results?" rendermode="LabelLast" class="inner-inline" helptext="Specify whether to include files in search results.">
 				@Html.CheckBoxFor(model => model.IncludeFiles, new { @class = "ToggleSwitch" })
 			</SettingsControl>
+		</fieldset>
 
+		<div class="alert alert-info results-page-selected">
+			Results display settings are configured in the search module instance on the results page.
+		</div>
+
+		<fieldset class="search-instance-settings">
+			<label>Results Display</label>
 			<div class="nucleus-flex-fields">
+				<SettingsControl caption="Show Summary?" rendermode="LabelLast" class="inner-inline" helptext="Display search result item summaries/descriptions.">
+					@Html.CheckBoxFor(model => model.ShowSummary, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+
 				<SettingsControl caption="Show Categories?" rendermode="LabelLast" class="inner-inline" helptext="Display search result categories.">
 					@Html.CheckBoxFor(model => model.ShowCategories, new { @class = "ToggleSwitch" })
 				</SettingsControl>
@@ -56,10 +63,6 @@
 					@Html.CheckBoxFor(model => model.ShowScore, new { @class = "ToggleSwitch" })
 				</SettingsControl>
 			</div>
-
-			<SettingsControl caption="Include Scopes" helptext="Use this setting to restrict results to specified scopes, or leave blank for all scopes.  Specify included scopes by entering one or more scopes separated by line feeds.  A scope is the URN of the data type which was used to create a search entry.  This is an advanced setting which may not be supported by all search providers.">
-				@Html.TextAreaFor(model => model.IncludeScopes, new { @rows = 5})
-			</SettingsControl>
 		</fieldset>
 	</div>
 	<div class="nucleus-form-buttonrow">

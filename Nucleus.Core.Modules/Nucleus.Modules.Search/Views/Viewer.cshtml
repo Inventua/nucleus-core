@@ -74,7 +74,7 @@
 
 					<a class="d-block result-link" href="@Url.Content(result.Url)" title="@result.Title">@result.Title</a>
 
-					@if (!String.IsNullOrEmpty(@result.Summary))
+					@if (Model.Settings.ShowSummary && !String.IsNullOrEmpty(@result.Summary))
 					{
 						<div class="result-summary">@result.Summary</div>
 					}

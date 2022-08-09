@@ -23,11 +23,11 @@
 				</SettingsControl>
 			</div>
 
-			<SettingsControl caption="Results Page" helptext="Results Page.  This page should contain a search module.">
+			<SettingsControl caption="Results Page" helptext="Results Page.  This page should contain a search module.  Select (none) to display results on the same page as the search module.">
 				@Html.PageListFor(model => model.ResultsPageId, Model.PageMenu, Guid.Empty)
 			</SettingsControl>
 
-			<SettingsControl caption="Include Scopes" helptext="Use this setting to restrict results to specified scopes, or leave blank for all scopes.  Specify included scopes by entering one or more scopes separated by line feeds.  A scope is the URN of the data type which was used to create a search entry.  This setting affacts both search suggestions and search results.  This is an advanced setting which may not be supported by all search providers.">
+			<SettingsControl caption="Include Scopes" helptext="Use this setting to restrict results to specified scopes, or leave blank for all scopes.  Specify included scopes by entering one or more scopes separated by line feeds.  A scope is the URN of the data type which was used to create a search entry (Examples: site pages - urn:nucleus:entities:page, files - urn:nucleus:entities:file).  This setting affects both search suggestions and search results.  This is an advanced setting which may not be supported by all search providers.">
 				@Html.TextAreaFor(model => model.IncludeScopes, new { @rows = 5})
 			</SettingsControl>
 						

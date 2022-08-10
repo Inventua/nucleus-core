@@ -16,7 +16,7 @@ namespace Nucleus.XmlDocumentation.Models.Serialization
 		public MixedContent Summary { get; set; }
 
 		[XmlElement(ElementName = "returns")]
-		public MixedContent Returns { get; set; }
+		public Returns Returns { get; set; }
 
 		[XmlElement(ElementName = "remarks")]
 		public MixedContent Remarks { get; set; }

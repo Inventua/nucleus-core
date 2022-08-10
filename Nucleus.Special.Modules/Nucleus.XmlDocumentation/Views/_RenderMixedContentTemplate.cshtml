@@ -20,7 +20,7 @@
 			{
 				@if (!String.IsNullOrEmpty(seeItem.LinkText))
 				{
-					<text>seeItem.LinkText</text>
+					<text>@seeItem.LinkText</text>
 				}
 				else
 				{
@@ -33,7 +33,7 @@
 			var seeItem = item as Nucleus.XmlDocumentation.Models.Serialization.SeeAlso;
 			@if (!String.IsNullOrEmpty(seeItem.LinkText))
 			{
-				<text>seeItem.LinkText</text>
+				<text>@seeItem.LinkText</text>
 			}
 			else
 			{

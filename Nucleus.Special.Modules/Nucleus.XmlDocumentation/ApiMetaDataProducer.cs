@@ -185,7 +185,7 @@ namespace Nucleus.XmlDocumentation
 		private async Task GetContent(Site site, ApiKey apiKey, ContentMetaData contentItem, Boolean useSsl)
 		{
 			System.IO.MemoryStream htmlContent = new();
-			Uri uri = new(new Uri((useSsl ? "https" : "http") + Uri.SchemeDelimiter + site.DefaultSiteAlias.Alias), contentItem.Url);
+			Uri uri = new(new Uri((useSsl ? "https" : "http") + Uri.SchemeDelimiter + site.DefaultSiteAlias.Alias), contentItem.Url + (contentItem.Url.Contains('?') ? '&' : '?') + "showapimenu=false");
 
 			System.Net.Http.HttpRequestMessage request = new(HttpMethod.Get, uri);
 

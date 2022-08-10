@@ -1,12 +1,11 @@
 Scheduled tasks perform their work periodically and are generally used to perform system maintenance, like expiring cache entries or updating a search 
-index.  Scheduled Tasks are added to an extension in order to execute actions in a batch, like cleanup tasks, or sending notification e-mails.  Some 
-examples of scheduled tasks in Nucleus are sending forum notification emails, populating search indexes and removing expired user session data from the 
-database.
+index, or sending notification e-mails. 
 
 To create a new scheduled task, create a class which inherits 
 [Nucleus.Abstractions.IScheduledTask](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.IScheduledTask/#mnu-Nucleus-Abstractions-IScheduledTask).  Nucleus 
-automatically detects implementations of `IScheduledTask` and adds them to the dependency injection container during startup, so that the task scheduler can
-create instances and execute them.  The site administrator must create a scheduled task entry in the Settings/Scheduler control panel so that your scheduled task runs.
+automatically detects implementations of [IScheduledTask](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.IScheduledTask/#mnu-Nucleus-Abstractions-IScheduledTask) 
+and adds them to the dependency injection container during startup, so that the task scheduler can create instances and execute them.  The site administrator must 
+create a scheduled task entry in the Settings/Scheduler control panel so that your scheduled task runs.
 
 As with other .NET core classes which participate in dependency injection, you should add parameters to your constructor to get references to services from the
 dependency injection container that your scheduled task requires.
@@ -71,8 +70,8 @@ log entries which originate from a scheduled task and writes log output to a fil
 to your scheduled task, `[LogFolder]\Scheduled Tasks\[schedule-name]`.  Log output from scheduled tasks is also written to the main Nucleus log. 
 Site administrators can review scheduled task logs in isolation from the rest of the system logs.  
 
-If required, use `appSettings.json` to configure different log levels for specific classes by adding a line to the `Logging/LogLevel` section. 
-For example: 
+If required, use `appSettings.json` or `appSettings.{environment}.json` to configure different log levels for specific classes by adding a line to the 
+`Logging/LogLevel` section. For example: 
 ```
 {
   "Logging": {
@@ -85,8 +84,9 @@ For example:
 ```
 
 > **_NOTE:_**   Nucleus automatically detects scheduled tasks in installed assemblies, so you don't need to add anything special to your
-extension manifest (other than including the assembly which contains your class).  Nucleus does not automatically configure a 
-schedule for installed scheduled Tasks - your users must use the [Task Scheduler](/manage/task-scheduler/) to create a schedule.
+extension manifest (other than including the assembly which contains your class), or any lines of code in your [startup](https://www.nucleus-cms.com/developers/startup-classes/)
+class.  Nucleus does not automatically configure a schedule for installed scheduled Tasks - your users must use the 
+[Task Scheduler](/manage/task-scheduler/) to create a schedule.
 
 
 

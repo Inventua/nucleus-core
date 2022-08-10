@@ -30,12 +30,21 @@
 
 .nucleus-paging-control .nucleus-pagingcontrol-left
 {
-	flex-grow: 5;
+	display: flex;
+	margin-right: auto;
+	gap: 4px;
+	/*flex-grow: 5;*/
 }
 
 .nucleus-paging-control .nucleus-paging-control-summary
 {
 	flex-grow: 2;
+}
+
+.nucleus-paging-control:not(.compact) .nucleus-paging-control-summary
+{
+	min-width: 12rem;
+	align-self: center;
 }
 
 .nucleus-paging-control .nucleus-paging-control-summary, .nucleus-paging-control label

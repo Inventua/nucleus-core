@@ -14,6 +14,7 @@ namespace Nucleus.ViewFeatures.ViewModels
 		/// <summary>
 		/// Enum representing control render mode.
 		/// </summary>
+		/// <type>Enum</type>
 		public enum RenderModes
 		{
 			/// <value>

@@ -976,8 +976,7 @@ function _Page()
 			}
 
 			jQuery('body').fadeTo('opacity', '0.3');
-			window.location.replace(window.location.href);
-			//window.location.reload(true);
+			window.location.reload();
 		}, false);
 
 		// Open event.  Navigate to the Url specified by args.detail.target

@@ -14,7 +14,7 @@ namespace Nucleus.Extensions
 		/// Gets the assembly product name.
 		/// </summary>
 		/// <param name="assembly">The <see href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly">Assembly</see> to read data from.</param>
-		/// <returns></returns>
+		/// <returns type="string"></returns>
 		public static string Product(this Assembly assembly)
 		{
 			AssemblyProductAttribute attr = assembly.GetCustomAttribute<AssemblyProductAttribute>();

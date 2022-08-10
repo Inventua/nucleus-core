@@ -25,7 +25,7 @@
 
 .nucleus-paging-control .nucleus-pagingcontrol-pagebutton.disabled
 {
-	opacity: 0;
+	visibility: hidden;
 }
 
 .nucleus-paging-control .nucleus-pagingcontrol-left
@@ -33,7 +33,6 @@
 	display: flex;
 	margin-right: auto;
 	gap: 4px;
-	/*flex-grow: 5;*/
 }
 
 .nucleus-paging-control .nucleus-paging-control-summary
@@ -47,7 +46,7 @@
 	align-self: center;
 }
 
-.nucleus-paging-control .nucleus-paging-control-summary, .nucleus-paging-control label
+.nucleus-paging-control span, .nucleus-paging-control label
 {
   color: white;
 }
@@ -75,6 +74,10 @@
 	border-radius: 0;
 }
 
+.nucleus-paging-control button:focus
+{
+	outline: solid;
+}
 
 .nucleus-paging-control .nucleus-pagingcontrol-pagebutton.Current
 {

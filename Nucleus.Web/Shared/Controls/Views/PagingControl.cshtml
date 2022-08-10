@@ -13,29 +13,29 @@ else
 				<span class="nucleus-paging-control-summary">Page @Model.Results.CurrentPageIndex of @Model.Results.TotalPages</span>
 				@if (Model.RenderMode == Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Standard)
 				{
-					<a class="btn nucleus-material-icon nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == 1 ? " disabled" : "")" data-page="1">&#xe5dc;</a>
-					<a class="btn nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == 1 ? " disabled" : "")" data-page="@(Model.Results.CurrentPageIndex - 1)">Previous</a>
+					<button type="button" class="btn nucleus-material-icon nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == 1 ? " disabled" : "")" aria-label = "Select First Page" data-page="1">&#xe5dc;</button>
+					<button type="button" class="btn nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == 1 ? " disabled" : "")" aria-label = "Select Previous Page" data-page="@(Model.Results.CurrentPageIndex - 1)">Previous</button>
 
 					@foreach (int pageNumber in Model.Results.PageControlNumbers)
 					{						
-						<a class="btn nucleus-pagingcontrol-pagebutton@(pageNumber == Model.Results.CurrentPageIndex ? " Current" : "")" data-page="@pageNumber">@pageNumber</a>
+						<button type="button" class="btn nucleus-pagingcontrol-pagebutton@(pageNumber == Model.Results.CurrentPageIndex ? " Current" : "")" aria-label = "Select Page @pageNumber" data-page="@pageNumber">@pageNumber</button>
 					}
 
 					@if (Model.Results.PageControlNumbers.Last() != Model.Results.TotalPages)
 					{
-						<span>...</span>
-						<a class="btn nucleus-pagingcontrol-pagebutton" data-page="@Model.Results.TotalPages">@Model.Results.TotalPages</a>
+						<span class="align-self-end" aria-hidden="true">...</span>
+						<button type="button" class="btn nucleus-pagingcontrol-pagebutton" data-page="@Model.Results.TotalPages">@Model.Results.TotalPages</button>
 					}
 
-					<a class="btn nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == Model.Results.TotalPages ? " disabled" : "")" data-page="@(Model.Results.CurrentPageIndex + 1)">Next</a>
-					<a class="btn nucleus-material-icon nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == Model.Results.TotalPages ? " disabled" : "")" data-page="@Model.Results.TotalPages">&#xe5dd;</a>
+					<button type="button" class="btn nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == Model.Results.TotalPages ? " disabled" : "")" aria-label = "Select Next Page" data-page="@(Model.Results.CurrentPageIndex + 1)">Next</button>
+					<button type="button" class="btn nucleus-material-icon nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == Model.Results.TotalPages ? " disabled" : "")" aria-label = "Select Last Page" data-page="@Model.Results.TotalPages">&#xe5dd;</button>
 				}
 			</div>
 
-			@Html.DropDownList(Model.PropertyName + ".CurrentPageIndex", new SelectList(Model.Results.Pages, "Key", "Value", Model.Results.CurrentPageIndex), new { @class = "nucleus-pagingcontrol-pagedropdown", @title = "Select Page", @data_autopostbackevent = "change" })
+			@Html.DropDownList(Model.PropertyName + ".CurrentPageIndex", new SelectList(Model.Results.Pages, "Key", "Value", Model.Results.CurrentPageIndex), new { @class = "nucleus-pagingcontrol-pagedropdown", @aria_label="Select Page", @title = "Select Page", @data_autopostbackevent = "change" })
 		}
 		<label class="nucleus-pagingcontrol-pagesizelabel">Page Size:</label>
-		@Html.DropDownList(Model.PropertyName + ".PageSize", new SelectList(Model.Results.PageSizes, Model.Results.PageSize), new { @class = "nucleus-pagingcontrol-pagesizedropdown", @title = "Page Size" })
+		@Html.DropDownList(Model.PropertyName + ".PageSize", new SelectList(Model.Results.PageSizes, Model.Results.PageSize), new { @class = "nucleus-pagingcontrol-pagesizedropdown", @title = "Page Size", @aria_label="Page Size" })
 	</div>
 }
 

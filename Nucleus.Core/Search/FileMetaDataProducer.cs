@@ -71,7 +71,7 @@ namespace Nucleus.Core.Search
 				{
 					foreach (File file in folder.Files)
 					{
-						Logger.LogInformation("Building meta-data for file {fileid}[{provider}/{path}]", file.Id, file.Provider, file.Path);
+						Logger.LogTrace("Building meta-data for file {fileid}[{provider}/{path}]", file.Id, file.Provider, file.Path);
 						ContentMetaData metaData = await BuildContentMetaData(site, file);
 
 						if (metaData != null)

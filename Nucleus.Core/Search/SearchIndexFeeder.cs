@@ -72,7 +72,7 @@ namespace Nucleus.Core.Search
 								try
 								{
 									searchIndexManager.Index(item);
-									this.Logger.LogTrace("Added [{scope}] {url} to index ({searchIndexManager}).", item.Scope, item.Url, searchIndexManager.GetType());
+									this.Logger.LogInformation("Added [{scope}] {url} to index ({searchIndexManager}).", item.Scope, item.Url, searchIndexManager.GetType());
 								}
 								catch (NotImplementedException)
 								{

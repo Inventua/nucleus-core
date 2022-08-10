@@ -40,11 +40,11 @@
 			</SettingsControl>
 		</fieldset>
 
-		<div class="alert alert-info results-page-selected">
+		<div class="alert alert-info results-page-selected collapse">
 			Results display settings are configured in the search module instance on the results page.
 		</div>
 
-		<fieldset class="search-instance-settings">
+		<fieldset class="search-instance-settings collapse show">
 			<label>Results Display</label>
 			<div class="nucleus-flex-fields">
 				<SettingsControl caption="Show Summary?" rendermode="LabelLast" class="inner-inline" helptext="Display search result item summaries/descriptions.">
@@ -113,13 +113,13 @@
 		{
 			if (enable)
 			{
-				jQuery('#search-settings .search-instance-settings').show();
-				jQuery('#search-settings .results-page-selected').hide();
+				jQuery('#search-settings .search-instance-settings').addClass('show');
+				jQuery('#search-settings .results-page-selected').removeClass('show');
 			}
 			else
 			{
-				jQuery('#search-settings .search-instance-settings').hide();
-				jQuery('#search-settings .results-page-selected').show();
+				jQuery('#search-settings .search-instance-settings').removeClass('show');
+				jQuery('#search-settings .results-page-selected').addClass('show');
 			}
 		}
 	});

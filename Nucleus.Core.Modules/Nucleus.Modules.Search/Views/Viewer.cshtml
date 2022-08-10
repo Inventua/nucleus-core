@@ -61,10 +61,7 @@
 							{
 								<span>Published: @result.PublishedDate.FormatDate(this.Context.Request.GetUserTimeZone())</span>
 							}
-							@if ((Model.Settings.ShowPublishDate && result.PublishedDate.HasValue) && (Model.Settings.ShowSize && result.Size.HasValue))
-							{
-								@Html.Raw(", ")
-							}
+							
 							@if (Model.Settings.ShowSize && result.Size.HasValue)
 							{
 								<span>@result.Size.FormatFileSize()</span>

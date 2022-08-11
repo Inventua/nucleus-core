@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
+using Microsoft.Extensions.Logging; 
 
 namespace Nucleus.Web.ViewModels.Admin
 {	
@@ -21,13 +22,7 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public string OperatingSystem { get; set; }
 
-		public List<Shared.LogFileInfo> LogFiles { get; set; }
-
-		public string LogFile { get; set; }
-
-		public Nucleus.Abstractions.Models.Paging.PagedResult<LogEntry> LogContent { get; set; } = new() { PageSize = 100, PageSizes = new List<int>() { 100, 250, 500 } };
-
-		public string LogMessage { get; set; }
+		public LogSettingsViewModel LogSettings { get; set; } = new();
 
 		public string Configuration { get; set; }
 
@@ -40,6 +35,26 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public SystemIndex()
 		{
+		}
+
+		public class LogSettingsViewModel
+		{
+			public Boolean LogSortDescending { get; set; }
+			public string LogFilterTerm { get; set; }
+			public Boolean LogIncludeInformation { get; set; } = true;
+			public Boolean LogIncludeWarning { get; set; } = true;
+			public Boolean LogIncludeTrace { get; set; } = true;
+			public Boolean LogIncludeError { get; set; } = true;
+
+			public List<KeyValuePair<Boolean, string>> LogSortOrders { get; } = new() { new(true, "Sort Descending"), new(false, "Sort Ascending") };
+
+			public List<Shared.LogFileInfo> LogFiles { get; set; }
+
+			public string LogFile { get; set; }
+
+			public Nucleus.Abstractions.Models.Paging.PagedResult<LogEntry> LogContent { get; set; } = new() { PageSize = 100, PageSizes = new List<int>() { 100, 250, 500 } };
+
+			public string LogMessage { get; set; }
 		}
 
 		public class LogEntry
@@ -70,6 +85,38 @@ namespace Nucleus.Web.ViewModels.Admin
 				{
 					// Prevent lines that aren't in the correct delimited form from being displayed.
 					this.IsValid = false;
+				}
+			}
+
+			public Boolean IsMatch(ViewModels.Admin.SystemIndex.LogSettingsViewModel logSettings)
+			{
+				if (!IsLevelSelected(logSettings))
+				{
+					return false;
+				}
+				else
+				{
+					return
+						String.IsNullOrEmpty(logSettings.LogFilterTerm) ||
+						this.Category.Contains(logSettings.LogFilterTerm, StringComparison.OrdinalIgnoreCase) ||
+						this.Message.Contains(logSettings.LogFilterTerm, StringComparison.OrdinalIgnoreCase);
+				}
+			}
+
+			private Boolean IsLevelSelected(ViewModels.Admin.SystemIndex.LogSettingsViewModel logSettings)
+			{
+				switch (this.Level)
+				{
+					case nameof(LogLevel.Trace):
+						return logSettings.LogIncludeTrace;
+					case nameof(LogLevel.Information):
+						return logSettings.LogIncludeInformation;
+					case nameof(LogLevel.Error):
+						return logSettings.LogIncludeError;
+					case nameof(LogLevel.Warning):
+						return logSettings.LogIncludeWarning;
+					default:
+						return true;
 				}
 			}
 		}

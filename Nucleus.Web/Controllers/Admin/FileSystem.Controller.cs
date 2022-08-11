@@ -20,6 +20,8 @@ namespace Nucleus.Web.Controllers.Admin
 	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
 	public class FileSystemController : Controller
 	{
+		private const string CURRENT_FOLDER_COOKIE_NAME = "nucleus-current-folder";
+
 		private ILogger<FileSystemController> Logger { get; }
 		private Context Context { get; }
 		private IFileSystemManager FileSystemManager { get; }
@@ -34,14 +36,35 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		///
+		/// Handle the initial GET request for the files page.
+		/// </summary>		
+		/// <remarks>
+		/// This action checks for a "current folder cookie".
+		/// </remarks>
+		[HttpGet]
+		public async Task<ActionResult> Index(Guid folderId)
+		{
+			if (folderId == Guid.Empty)
+			{
+				// Use the current folder cookie.  This cookie is created/updated in BuildViewModel().
+				_ = Guid.TryParse(ControllerContext.HttpContext.Request.Cookies["nucleus-current-folder"], out folderId);
+			}
+
+			return await Navigate(new(), folderId);
+		}
+
+		/// <summary>
+		/// Handle subsequent folder navigation.
 		/// </summary>
-		/// <returns></returns>
+		/// <remarks>
+		/// This action DOES NOT check for a "current folder cookie".
+		/// </remarks>
 		[HttpGet]
 		[HttpPost]
-		public async Task<ActionResult> Index(ViewModels.Admin.FileSystem viewModel, Guid folderId)
+		public async Task<ActionResult> Navigate(ViewModels.Admin.FileSystem viewModel, Guid folderId)
 		{
-			Folder folder;
+			Folder folder;			
+			
 			if (folderId == Guid.Empty)
 			{
 				folder = null;
@@ -52,6 +75,7 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 
 			viewModel = await BuildViewModel(viewModel, folder);
+
 			return View("Index", viewModel);
 		}
 
@@ -75,7 +99,7 @@ namespace Nucleus.Web.Controllers.Admin
 		/// <returns></returns>
 		[HttpPost]
 		public async Task<ActionResult> EditFolderSettings(ViewModels.Admin.FileSystem viewModel)
-		{			
+		{
 			return View("FolderSettings", await BuildViewModel(viewModel, true));
 		}
 
@@ -89,7 +113,7 @@ namespace Nucleus.Web.Controllers.Admin
 				await this.FileSystemManager.CreatePermissions(this.Context.Site, viewModel.Folder, await this.RoleManager.Get(viewModel.SelectedFolderRoleId));
 			}
 
-			return View("FolderSettings", await BuildViewModel(viewModel, false));			
+			return View("FolderSettings", await BuildViewModel(viewModel, false));
 		}
 
 		[HttpPost]
@@ -113,11 +137,11 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> SaveFolderSettings(ViewModels.Admin.FileSystem viewModel)
 		{
-			Folder folder  = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Folder.Id);
+			Folder folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Folder.Id);
 			viewModel.Folder.CopyDatabaseValuesTo(folder);
 			folder.Permissions = await ConvertPermissions(viewModel.FolderPermissions);
 
-			await this.FileSystemManager.SaveFolder(this.Context.Site, folder);			
+			await this.FileSystemManager.SaveFolder(this.Context.Site, folder);
 			await this.FileSystemManager.SaveFolderPermissions(this.Context.Site, folder);
 
 			return Ok();
@@ -140,7 +164,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 		[HttpPost]
 		public ActionResult ShowDeleteDialog(ViewModels.Admin.FileSystem viewModel)
-		{			
+		{
 			return View("Delete", BuildDeleteViewModel(viewModel));
 		}
 
@@ -213,7 +237,7 @@ namespace Nucleus.Web.Controllers.Admin
 					existing = null;
 				}
 			}
-			
+
 			if (existing == null)
 			{
 				return NotFound();
@@ -238,11 +262,11 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			viewModel.Folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Folder.Id);
 			if (mediaFile != null)
-			{				
+			{
 				using (System.IO.Stream fileStream = mediaFile.OpenReadStream())
 				{
 					await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedProviderKey, viewModel.Folder.Path, mediaFile.FileName, fileStream, true);
-				}				
+				}
 			}
 			else
 			{
@@ -297,7 +321,7 @@ namespace Nucleus.Web.Controllers.Admin
 				{
 					folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedProviderKey, "");
 				}
-				
+
 				if (folder != null)
 				{
 					viewModel.Folder = await this.FileSystemManager.ListFolder(this.Context.Site, folder.Id, "");
@@ -306,7 +330,7 @@ namespace Nucleus.Web.Controllers.Admin
 				}
 			}
 
-			viewModel.EnableDelete = 
+			viewModel.EnableDelete =
 				viewModel.Folder.Folders.Where(folder => folder.Capabilities.CanDelete).Any() ||
 				viewModel.Folder.Files.Where(file => file.Capabilities.CanDelete).Any();
 
@@ -319,6 +343,17 @@ namespace Nucleus.Web.Controllers.Admin
 			// https://newbedev.com/possible-bug-in-asp-net-mvc-with-form-values-being-replaced
 			ModelState.Clear();
 
+			// Remember the current folder for 5 minutes.  This cookie is checked/read in Index().
+			ControllerContext.HttpContext.Response.Cookies.Delete(CURRENT_FOLDER_COOKIE_NAME);
+			ControllerContext.HttpContext.Response.Cookies.Append(CURRENT_FOLDER_COOKIE_NAME, viewModel.Folder.Id.ToString(), new CookieOptions()
+			{
+				Expires = DateTime.Now.AddMinutes(5),
+				HttpOnly = true,
+				Path = "/",
+				Secure = ControllerContext.HttpContext.Request.IsHttps,
+				SameSite = SameSiteMode.Strict
+			});
+
 			return viewModel;
 		}
 
@@ -328,8 +363,8 @@ namespace Nucleus.Web.Controllers.Admin
 			{
 				if (getPermissions)
 				{
-				  viewModel.Folder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.Folder.Id, "");
-					viewModel.Folder.Permissions = await this.FileSystemManager.ListPermissions(viewModel.Folder);					
+					viewModel.Folder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.Folder.Id, "");
+					viewModel.Folder.Permissions = await this.FileSystemManager.ListPermissions(viewModel.Folder);
 				}
 			}
 

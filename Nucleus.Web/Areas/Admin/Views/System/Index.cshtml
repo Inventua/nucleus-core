@@ -130,21 +130,19 @@
 					</tr>
 				}
 			</table>
-
-
 		</TabPanel>
 
 		<TabPanel id="system-logs">
 			@using (Html.BeginAreaForm("GetLogFile", "System", "Admin", FormMethod.Post, new { @class = "d-flex flex-column", @data_target = ".LogContent", @autocomplete = "off" }))
 			{
-				@Html.DropDownListFor(model => model.LogFile, new SelectList(Model.LogFiles, "Filename", "Title"), "(select)", new { @class = "LogFile mb-1" })
+				@await Html.PartialAsync("_LogSettings", Model.LogSettings)
 				<div class="LogContent">
-					@if (String.IsNullOrEmpty(Model.LogMessage))
+					@if (String.IsNullOrEmpty(Model.LogSettings.LogMessage))
 					{
-						@Model.LogMessage
+						@Model.LogSettings.LogMessage
 					}
 
-					@await Html.PartialAsync("_Log", Model)
+					@await Html.PartialAsync("_Log", Model.LogSettings)
 				</div>
 			}
 		</TabPanel>

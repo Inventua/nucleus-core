@@ -111,27 +111,26 @@
 			</TabPanel>
 
 			<TabPanel id="task-logs">
-				@if (Model.LogFiles != null)
+				@if (Model.LogSettings.LogFiles != null)
 				{
-					@using (Html.BeginAreaForm("GetLogFile", "ScheduledTasks", "Admin", FormMethod.Post, new { @data_target = ".LogContent", @autocomplete = "off" }))
+					@using (Html.BeginAreaForm("GetLogFile", "ScheduledTasks", "Admin", new { id = Model.ScheduledTask.Id }, FormMethod.Post, new { @data_target = ".LogContent", @autocomplete = "off" }))
 					{
-						@Html.HiddenFor(model => model.ScheduledTask.Id)
-						@Html.DropDownListFor(model => model.LogFile, new SelectList(Model.LogFiles, "Filename", "Title"), "(select)", new { @class = "LogFile mb-1" })
+						@await Html.PartialAsync("../System/_LogSettings.cshtml", Model.LogSettings)
 						<div class="LogContent">
-							@if (!String.IsNullOrEmpty(Model.LogMessage))
+							@if (!String.IsNullOrEmpty(Model.LogSettings.LogMessage))
 							{
-								@Model.LogMessage
+								@Model.LogSettings.LogMessage
 							}
 
-							@await Html.PartialAsync("_Log", Model)
+							@await Html.PartialAsync("../System/_Log.cshtml", Model.LogSettings)
 						</div>
 					}
 				}
 				else
 				{
-					@if (!String.IsNullOrEmpty(Model.LogMessage))
+					@if (!String.IsNullOrEmpty(Model.LogSettings.LogMessage))
 					{
-						@Model.LogMessage
+						@Model.LogSettings.LogMessage
 					}
 					<span>There are no log files for this scheduled task.</span>
 				}

@@ -24,9 +24,7 @@ namespace Nucleus.Web.Controllers.Admin
 		private ISiteManager SiteManager { get; }
 
 		private Context Context { get; }
-
 		
-
 		public SearchSettingsController(Context context, ILogger<ApiKeysController> logger, ISiteManager siteManager, IApiKeyManager ApiKeyManager)
 		{
 			this.Context = context;
@@ -48,10 +46,23 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> Save(ViewModels.Admin.SearchSettings viewModel)
 		{
+			ControllerContext.ModelState.Remove($"{nameof(ViewModels.Admin.SearchSettings.ApiKey)}.{nameof(ViewModels.Admin.SearchSettings.ApiKey.Name)}");
+
 			if (!ControllerContext.ModelState.IsValid)
 			{
 				return BadRequest(ControllerContext.ModelState);
 			}
+
+			if (viewModel.ApiKey.Id == Guid.Empty)
+			{
+				// create a new Api Key
+				viewModel.ApiKey = await this.ApiKeyManager.CreateNew();
+				viewModel.ApiKey.Name = $"Search Feeder";
+				viewModel.ApiKey.Scope = "role:Registered Users";
+				viewModel.ApiKey.Notes = "API Key used by the search feeder to request page content for indexing.";
+			}
+
+			await this.ApiKeyManager.Save(viewModel.ApiKey);
 
 			this.Context.Site.SiteSettings.TrySetValue(Site.SiteSearchSettingsKeys.APIKEY_ID, viewModel.ApiKey.Id);
 			this.Context.Site.SiteSettings.TrySetValue(Site.SiteSearchSettingsKeys.INDEX_PUBLIC_FILES_ONLY, viewModel.IndexPublicFilesOnly);

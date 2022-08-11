@@ -21,8 +21,6 @@ namespace Nucleus.XmlDocumentation
 {
 	public class ApiMetaDataProducer : IContentMetaDataProducer
 	{
-		//private Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider ExtensionProvider  { get; } = new();
-
 		private IFileSystemManager FileSystemManager { get; }
 		private IExtensionManager ExtensionManager { get; }
 		private IPageManager PageManager { get; }
@@ -37,7 +35,6 @@ namespace Nucleus.XmlDocumentation
 		{
 			this.ApiKeyManager = apiKeyManager;
 			this.HttpClient = httpClient;
-			//this.UrlHelper = urlHelperFactory.;
 			this.FileSystemManager = fileSystemManager;
 			this.ExtensionManager = extensionManager;
 			this.PageManager = pageManager;
@@ -95,8 +92,6 @@ namespace Nucleus.XmlDocumentation
 			{
 				yield return await BuildContentMetaData(site, apiKey, module, document, apiClass, useSsl);
 			}
-
-			//return results;
 		}
 
 		/// <summary>
@@ -116,7 +111,7 @@ namespace Nucleus.XmlDocumentation
 					Site = site,
 					Title = $"{document.Namespace.Name} Namespace",
 					Summary = await RenderMixedContent(document.Namespace.Summary),
-					Keywords = document.Namespace.Name.Split('.', StringSplitOptions.RemoveEmptyEntries).Append(document.Namespace.Name),
+					Keywords = document.Namespace.Name.Split('.', StringSplitOptions.RemoveEmptyEntries).Concat(new string[] { document.AssemblyName, document.Namespace.Name }),
 					Url = document.GenerateUrl(page),
 					PublishedDate = document.LastModifiedDate,
 					SourceId = null,
@@ -151,7 +146,7 @@ namespace Nucleus.XmlDocumentation
 					Site = site,
 					Title = $"{apiClass.Name} {apiClass.Type}",
 					Summary = await RenderMixedContent(apiClass.Summary),
-					Keywords = apiClass.FullName.Split('.', StringSplitOptions.RemoveEmptyEntries).Append(apiClass.FullName),
+					Keywords = apiClass.FullName.Split('.', StringSplitOptions.RemoveEmptyEntries).Concat(new string[] { apiClass.FullName, apiClass.AssemblyName, apiClass.Namespace }),
 					Url = apiClass.GenerateUrl(page, document),
 					PublishedDate = document.LastModifiedDate,
 					SourceId = null,
@@ -172,14 +167,25 @@ namespace Nucleus.XmlDocumentation
 		private async Task<string> RenderMixedContent(Models.Serialization.MixedContent content)
 		{
 			if (content?.Items == null || !content.Items.Any()) return "";
-			string template = System.IO.File.ReadAllText("Extensions/XmlDocumentation/Views/_RenderMixedContentTemplate.cshtml");
-			return (await Nucleus.Extensions.Razor.RazorParser.Parse<Models.Serialization.MixedContent>(template, content)).Trim();
+			try
+			{
+				// This code runs outside the context of a request, so we have to specify the full relative path of the template file.
+				string template = System.IO.File.ReadAllText("Extensions/XmlDocumentation/Views/_RenderMixedContentTemplate.cshtml");
+				return (await Nucleus.Extensions.Razor.RazorParser.Parse<Models.Serialization.MixedContent>(template, content)).Trim();
+			}
+			catch(Exception ex)
+			{
+				// If the Razor parser can't generate a result, return an empty string and log the error so that any issues don't
+				// prevent the item from being added to search content.
+				this.Logger?.LogError(ex, "Rendering summary content.");
+				return "";
+			}
 		}
 
 		private async Task GetContent(Site site, ApiKey apiKey, ContentMetaData contentItem, Boolean useSsl)
 		{
 			System.IO.MemoryStream htmlContent = new();
-			Uri uri = new(new Uri((useSsl ? "https" : "http") + Uri.SchemeDelimiter + site.DefaultSiteAlias.Alias), contentItem.Url);
+			Uri uri = new(new Uri((useSsl ? "https" : "http") + Uri.SchemeDelimiter + site.DefaultSiteAlias.Alias), contentItem.Url + (contentItem.Url.Contains('?') ? '&' : '?') + "showapimenu=false");
 
 			System.Net.Http.HttpRequestMessage request = new(HttpMethod.Get, uri);
 

@@ -10,7 +10,7 @@
 	<h1 class="nucleus-control-panel-heading">Search Settings</h1>
 	<fieldset role="group" aria-label="Search Settings">
 		<SettingsControl caption="Api Key" helptext="Select the API key used to access site pages when feeding the index.">
-			@Html.DropDownListFor(model => model.ApiKey.Id, new SelectList(Model.ApiKeys, "Id", "Name"), "(none selected)")
+			@Html.DropDownListFor(model => model.ApiKey.Id, new SelectList(Model.ApiKeys, "Id", "Name"), "(create)")
 		</SettingsControl>
 		
 		<div class="nucleus-flex-fields">

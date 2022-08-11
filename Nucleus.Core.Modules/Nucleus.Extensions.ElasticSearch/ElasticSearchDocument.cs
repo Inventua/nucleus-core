@@ -78,12 +78,17 @@ namespace Nucleus.Extensions.ElasticSearch
 		{
 			if (content.SourceId.HasValue)
 			{
-				return $"{content.Scope}/{content.Url}/{content.SourceId}";
+				return Encode($"{content.Scope}/{content.Url}/{content.SourceId}");
 			}
 			else
 			{
-				return $"{content.Scope}/{content.Url}/";
+				return Encode($"{content.Scope}/{content.Url}/");
 			}
+		}
+
+		private string Encode(string value)
+		{
+			return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(value));
 		}
 
 		/// <summary>

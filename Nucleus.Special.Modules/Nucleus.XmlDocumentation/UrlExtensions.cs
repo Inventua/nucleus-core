@@ -15,7 +15,7 @@ namespace Nucleus.XmlDocumentation
 	{
 		public static string GenerateUrl(this ApiClass apiClass, Page page, ApiDocument document)
 		{
-			return PageLink(page, $"{document.SourceFileName}/{apiClass.ControlId()}/");
+			return PageLink(page, $"{document.SourceFileName}/{apiClass.ControlId()}");
 		}
 
 		public static string GenerateUrl(this ApiDocument document, Page page)

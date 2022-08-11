@@ -13,7 +13,7 @@
 	@Html.HiddenFor(model=>model.Settings.MaximumSuggestions)
 	@if (Model.Settings.DisplayMode == Settings.DisplayModes.Full)
 	{
-		<SettingsControl caption="Search Term" helptext="Enter your search term." class="search-display-full">
+		<SettingsControl caption=@Model.Settings.SearchCaption helptext="Enter your search term." class="search-display-full">
 			@await Html.PartialAsync("_ViewerInput.cshtml", Model)
 		</SettingsControl>
 	}
@@ -61,10 +61,7 @@
 							{
 								<span>Published: @result.PublishedDate.FormatDate(this.Context.Request.GetUserTimeZone())</span>
 							}
-							@if ((Model.Settings.ShowPublishDate && result.PublishedDate.HasValue) && (Model.Settings.ShowSize && result.Size.HasValue))
-							{
-								@Html.Raw(", ")
-							}
+							
 							@if (Model.Settings.ShowSize && result.Size.HasValue)
 							{
 								<span>@result.Size.FormatFileSize()</span>
@@ -74,7 +71,7 @@
 
 					<a class="d-block result-link" href="@Url.Content(result.Url)" title="@result.Title">@result.Title</a>
 
-					@if (!String.IsNullOrEmpty(@result.Summary))
+					@if (Model.Settings.ShowSummary && !String.IsNullOrEmpty(@result.Summary))
 					{
 						<div class="result-summary">@result.Summary</div>
 					}

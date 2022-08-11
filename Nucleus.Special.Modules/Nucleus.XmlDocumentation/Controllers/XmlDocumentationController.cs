@@ -38,9 +38,9 @@ namespace Nucleus.XmlDocumentation.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult> Index()
+		public async Task<ActionResult> Index(Boolean showApiMenu = true)
 		{
-			return View("Viewer", await BuildViewModel());
+			return View("Viewer", await BuildViewModel(showApiMenu));
 		}
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
@@ -67,12 +67,15 @@ namespace Nucleus.XmlDocumentation.Controllers
 			return Ok();
 		}
 
-		private async Task<ViewModels.Viewer> BuildViewModel()
+		private async Task<ViewModels.Viewer> BuildViewModel(Boolean showMenu)
 		{
-			ViewModels.Viewer viewModel = new();
 			Folder documentationFolder;
 
-			viewModel.Page = this.Context.Page;
+			ViewModels.Viewer viewModel = new() 
+			{
+				Page = this.Context.Page,
+				ShowMenu = showMenu 
+			};
 
 			viewModel.Documents = await this.CacheManager.XmlDocumentationCache().GetAsync(this.Context.Module.Id, async id =>
 			{

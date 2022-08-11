@@ -51,6 +51,7 @@ namespace Nucleus.Extensions.ElasticSearch
 		{
 			SingleNodeConnectionPool connectionPool = new SingleNodeConnectionPool(this.Uri);
 			Nest.ConnectionSettings connectionSettings = new Nest.ConnectionSettings(connectionPool);
+			PingResponse pingResponse;
 			CreateIndexResponse createIndexResponse;
 			PutMappingResponse mapResponse;
 			PutPipelineResponse attachmentPipelineResponse;
@@ -60,21 +61,22 @@ namespace Nucleus.Extensions.ElasticSearch
 			connectionSettings.DisableDirectStreaming(true);          // enables debug info
 			connectionSettings.RequestTimeout(new TimeSpan(0, 0, 30));
 
-			this.Client = new ElasticClient(connectionSettings);
+			ElasticClient client = new(connectionSettings);
 
-			if (this.Client.Ping(BuildPingRequest()).IsValid)
+			pingResponse = client.Ping(BuildPingRequest());
+			if (pingResponse.IsValid)
 			{
 				// Create index
-				if (!this.IndexExists())
+				if (!client.Indices.Exists(this.IndexName).Exists)
 				{
-					createIndexResponse = this.Client.Indices.Create(BuildIndexRequest(this.IndexName));
+					createIndexResponse = client.Indices.Create(BuildIndexRequest(this.IndexName));
 					if (!createIndexResponse.IsValid)
 					{
 						this.DebugInformation = createIndexResponse.DebugInformation;
 						throw createIndexResponse.OriginalException;
 					}
 
-					mapResponse = this.Client.Map<ElasticSearchDocument>(e => e.AutoMap());
+					mapResponse = client.Map<ElasticSearchDocument>(e => e.AutoMap());
 					if (!mapResponse.IsValid)
 					{
 						this.DebugInformation = mapResponse.DebugInformation;
@@ -82,14 +84,14 @@ namespace Nucleus.Extensions.ElasticSearch
 					}
 
 					// Configure a pipeline for attachments 
-					attachmentPipelineResponse = ConfigureAttachmentPipeline();
+					attachmentPipelineResponse = ConfigureAttachmentPipeline(client);
 					if (!attachmentPipelineResponse.IsValid)
 					{
 						this.DebugInformation = attachmentPipelineResponse.DebugInformation;
 						throw createIndexResponse.OriginalException;
 					}
 
-					noAttachmentPipelineResponse = ConfigureNoAttachmentPipeline();
+					noAttachmentPipelineResponse = ConfigureNoAttachmentPipeline(client);
 					if (!noAttachmentPipelineResponse.IsValid)
 					{
 						this.DebugInformation = noAttachmentPipelineResponse.DebugInformation;
@@ -97,7 +99,13 @@ namespace Nucleus.Extensions.ElasticSearch
 					}
 				}
 			}
+			else
+			{
+				this.DebugInformation = pingResponse.DebugInformation;
+				throw pingResponse.OriginalException;
+			}
 
+			this.Client = client;
 			return true;
 		}
 
@@ -116,7 +124,7 @@ namespace Nucleus.Extensions.ElasticSearch
 			return new IndexState() { };
 		}
 
-		private PutPipelineResponse ConfigureAttachmentPipeline()
+		private PutPipelineResponse ConfigureAttachmentPipeline(ElasticClient client)
 		{
 			PutPipelineResponse response;
 			PutPipelineRequest request;
@@ -200,12 +208,12 @@ namespace Nucleus.Extensions.ElasticSearch
 				}
 			};
 
-			response = this.Client.Ingest.PutPipeline(request);
+			response = client.Ingest.PutPipeline(request);
 
 			return response;
 		}
 
-		private PutPipelineResponse ConfigureNoAttachmentPipeline()
+		private PutPipelineResponse ConfigureNoAttachmentPipeline(ElasticClient client)
 		{
 			PutPipelineResponse objResponse;
 			PutPipelineRequest objRequest;
@@ -240,14 +248,9 @@ namespace Nucleus.Extensions.ElasticSearch
 				}
 			};
 
-			objResponse = this.Client.Ingest.PutPipeline(objRequest);
+			objResponse = client.Ingest.PutPipeline(objRequest);
 
 			return objResponse;
-		}
-
-		public bool IndexExists()
-		{
-			return this.Client.Indices.Exists(this.IndexName).Exists;
 		}
 
 		public long CountIndex()

@@ -294,12 +294,16 @@ namespace Nucleus.Data.EntityFramework
 			}
 		}
 
-		private Guid CurrentUserId()
+		/// <summary>
+		/// Retrieve the currently logged-on user's Id
+		/// </summary>
+		/// <returns></returns>
+		public Guid? CurrentUserId()
 		{
 			System.Security.Claims.ClaimsPrincipal user = this.HttpContextAccessor.HttpContext?.User;
 			if (user == null)
 			{
-				return Guid.Empty;
+				return null;
 			}
 			return user.GetUserId();
 		}

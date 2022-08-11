@@ -1032,7 +1032,8 @@ namespace Nucleus.Core.DataProviders
 			this.Context.ChangeTracker.Clear();
 			if (userRoles != null)
 			{
-				await SaveUserRoles(user.Id, userRoles);
+				user.Roles = userRoles;
+				await SaveUserRoles(user);
 			}
 
 			if (existing == null)
@@ -1046,47 +1047,49 @@ namespace Nucleus.Core.DataProviders
 
 		}
 
-		private async Task SaveUserRoles(Guid userId, List<Role> roles)
+		private async Task SaveUserRoles(User user)
 		{
-			User existing = await this.Context.Users
-				.Where(existing => existing.Id == userId)
+			User existingUser = await this.Context.Users
+				.Where(existing => existing.Id == user.Id)
 				.Include(existing => existing.Roles)
 				.FirstOrDefaultAsync();
-
-			if (existing != null)
+			
+			// don't update roles if user.roles is null (our data provider convention is to interpret a null collection property as a signal
+			// to not do anything to the data represented by that collection)
+			if (existingUser != null && user.Roles != null)
 			{
 				// delete removed role assignments
-				foreach (Role existingRole in existing.Roles.ToList())
+				foreach (Role existingRole in existingUser.Roles.ToList())
 				{
-					if (!roles.Where(userRole => userRole.Id == existingRole.Id).Any())
+					if (!user.Roles.Where(userRole => userRole.Id == existingRole.Id).Any())
 					{
 						// delete role assignment
-						this.Context.Entry(existing).Collection(user => user.Roles).FindEntry(existingRole).State = EntityState.Deleted;
+						this.Context.Entry(existingUser).Collection(userModel => userModel.Roles).FindEntry(existingRole).State = EntityState.Deleted;
 						// we don't want to change the actual role data, just the user-role assignment
 						this.Context.Entry(existingRole).State = EntityState.Unchanged;
 					}
 				}
 
-				// add new role assignments
-				if (roles != null)
+				// add new role assignments				
+				foreach (Role role in user.Roles)
 				{
-					foreach (Role role in roles)
+					if (!existingUser.Roles.Where(existingRole => existingRole.Id == role.Id).Any())
 					{
-						if (!existing.Roles.Where(existingRole => existingRole.Id == role.Id).Any())
-						{
-							// add new role assignment  
-							existing.Roles.Add(role);
-							this.Context.Entry(existing).Collection(newuser => newuser.Roles).FindEntry(role).State = EntityState.Added;
-							// we don't want to change the actual role data, just the user-role assignment
-							this.Context.Entry(role).State = EntityState.Unchanged;
-
-						}
-						// existing role assignments do not need to be updated
+						// add new role assignment  
+						existingUser.Roles.Add(role);
+						this.Context.Entry(existingUser).Collection(userModel => userModel.Roles).FindEntry(role).State = EntityState.Added;
+						// set audit field values on the shadow entity
+						this.Context.Entry(existingUser).Collection(userModel => userModel.Roles).FindEntry(role).Property<Guid?>(nameof(ModelBase.AddedBy)).CurrentValue = this.Context.CurrentUserId();
+						this.Context.Entry(existingUser).Collection(userModel => userModel.Roles).FindEntry(role).Property<DateTime?>(nameof(ModelBase.DateAdded)).CurrentValue = DateTime.UtcNow;           // we don't want to change the actual role data, just the user-role assignment
+						
+						// we don't want to change the actual role data, just the user-role assignment
+						this.Context.Entry(role).State = EntityState.Unchanged;
 					}
+					// existing role assignments do not need to be updated
 				}
+				
+				await this.Context.SaveChangesAsync();
 			}
-
-			await this.Context.SaveChangesAsync();
 		}
 
 		public async Task DeleteUser(User user)

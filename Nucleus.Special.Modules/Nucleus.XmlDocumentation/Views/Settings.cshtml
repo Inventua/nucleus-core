@@ -7,26 +7,24 @@
 <h1 class="nucleus-modal-caption">XML Documentation Viewer Settings</h1>
 @using (Html.BeginNucleusForm("Settings", "XmlDocumentation", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
-<fieldset role="group" aria-labelledby="heading">
-	<h2>Settings</h2>
+	<fieldset role="group" aria-label="Settings" class="flex-grow-1">
+		<SettingsControl caption="Documents Folder" helptext="Select the folder containing XML documentation files.">
+			<div class="nucleus-flex-fields nucleus-fileselector">
+				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FolderSelector), new { model = Model.DocumentationFolder, PropertyName = "DocumentationFolder" })
+			</div>
+		</SettingsControl>
 
-	<SettingsControl caption="Documents Folder" helptext="Select the folder containing XML documentation files.">
-		<div class="nucleus-flex-fields nucleus-fileselector">
-			@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FolderSelector), new { model = Model.DocumentationFolder, PropertyName = "DocumentationFolder" })
-		</div>
-	</SettingsControl>
+		<SettingsControl caption="Expand menu items by default?" rendermode="LabelLast" class="inner-inline" helptext="Specify whether to open (expand) all documentation menu items by default, or close them.">
+			@Html.CheckBoxFor(model => model.DefaultOpen, new { @class = "ToggleSwitch" })
+		</SettingsControl>
 
-	<SettingsControl caption="Expand menu items by default?" rendermode="LabelLast" class="inner-inline" helptext="Specify whether to open (expand) all documentation menu items by default, or close them.">
-		@Html.CheckBoxFor(model => model.DefaultOpen, new { @class = "ToggleSwitch" })
-	</SettingsControl>
+		@Html.HiddenFor(model => model.WelcomeMessage.Id)
+		<SettingsControl caption="Welcome Message" helptext="Enter a message to display when the page is first visited.">
+			@Html.TextAreaFor(model => model.WelcomeMessage.Value, 12, 60, new { @class = "HtmlEditorControl" })
+		</SettingsControl>
+	</fieldset>
 
-	@Html.HiddenFor(model => model.WelcomeMessage.Id)
-	<SettingsControl caption="Welcome Message" helptext="Enter a message to display when the page is first visited.">
-		@Html.TextAreaFor(model => model.WelcomeMessage.Value, 12, 60, new { @class = "HtmlEditorControl" })
-	</SettingsControl>
-
-	<div class="nucleus-form-tools">
+	<div class="nucleus-form-buttonrow">
 		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "XmlDocumentation", "XmlDocumentation"), new { })
 	</div>
-</fieldset>
 }

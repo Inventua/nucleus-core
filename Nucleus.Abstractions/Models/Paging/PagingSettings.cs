@@ -129,11 +129,14 @@ namespace Nucleus.Abstractions.Models.Paging
 
         if (this.TotalPages > this.MaxPageControls - 1)
         {
-          //this.IsPageControlsTruncated = true;
           if (this.CurrentPageIndex - (this.MaxPageControls / (double)2) - 1 < 0)
+          {
             intStart = 1;
+          }
           else
+          {
             intStart = this.CurrentPageIndex - Convert.ToInt32(Math.Floor(this.MaxPageControls / (double)2));
+          }
 
           if (intStart + this.MaxPageControls - 1 > this.TotalPages - 1)
             intFinish = this.TotalPages;
@@ -147,16 +150,13 @@ namespace Nucleus.Abstractions.Models.Paging
           {
             objPages.Add(intCount);
           }
-
-          // this.IsLastPageVisible = (intFinish == this.TotalPages);
         }
         else
         {
-          //this.IsPageControlsTruncated = false;
-          //this.IsLastPageVisible = true;
-
           for (int intCount = 1; intCount <= TotalPages; intCount++)
+          {
             objPages.Add(intCount);
+          }
         }
 
         return objPages;

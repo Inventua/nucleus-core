@@ -14,32 +14,43 @@
 					@Html.DropDownListFor(model => model.DisplayMode, Html.GetEnumSelectList(typeof(Nucleus.Modules.Search.ViewModels.Settings.DisplayModes)))
 				</SettingsControl>
 
-				<SettingsControl caption="Search Button Caption" helptext="Specifies the text displayed in the search button.">
+				<SettingsControl caption="Search Caption" helptext="Specifies the label displayed next to the search term.  This is only visible when display mode is set to 'Full'.">
+					@Html.TextBoxFor(model => model.SearchCaption, new {  })
+				</SettingsControl>
+
+				<SettingsControl caption="Search Button Caption" helptext="Specifies the text displayed in the search button.   This is only visible when display mode is set to 'Full' or 'Compact'.">
 					@Html.TextBoxFor(model => model.SearchButtonCaption, new {  })
 				</SettingsControl>
 
-				<SettingsControl caption="Maximum number of suggestions?" helptext="Specify how many suggestions to display while the user enters search terms.">
+				<SettingsControl caption="Maximum Number of Suggestions" helptext="Specify how many suggestions to display while the user enters search terms.">
 					@Html.TextBoxFor(model => model.MaximumSuggestions, new { @type = "number", @min = "0", @max = "100" })
 				</SettingsControl>
 			</div>
 
-			<SettingsControl caption="Results Page" helptext="Results Page.  This page should contain a search module.">
+			<SettingsControl caption="Results Page" helptext="Results Page.  This page should contain a search module.  Select (none) to display results on the same page as the search module.">
 				@Html.PageListFor(model => model.ResultsPageId, Model.PageMenu, Guid.Empty)
 			</SettingsControl>
-		</fieldset>
 
-		<div class="alert alert-info results-page-selected">
-			Results settings are configured in the search module instance on the results page.
-		</div>
-
-		<fieldset class="search-instance-settings">
-			<label>Results</label>
-
+			<SettingsControl caption="Include Scopes" helptext="Use this setting to restrict results to specified scopes, or leave blank for all scopes.  Specify included scopes by entering one or more scopes separated by line feeds.  A scope is the URN of the data type which was used to create a search entry (Examples: site pages - urn:nucleus:entities:page, files - urn:nucleus:entities:file).  This setting affects both search suggestions and search results.  This is an advanced setting which may not be supported by all search providers.">
+				@Html.TextAreaFor(model => model.IncludeScopes, new { @rows = 5})
+			</SettingsControl>
+						
 			<SettingsControl caption="Include Files in Results?" rendermode="LabelLast" class="inner-inline" helptext="Specify whether to include files in search results.">
 				@Html.CheckBoxFor(model => model.IncludeFiles, new { @class = "ToggleSwitch" })
 			</SettingsControl>
+		</fieldset>
 
+		<div class="alert alert-info results-page-selected collapse">
+			Results display settings are configured in the search module instance on the results page.
+		</div>
+
+		<fieldset class="search-instance-settings collapse show">
+			<label>Results Display</label>
 			<div class="nucleus-flex-fields">
+				<SettingsControl caption="Show Summary?" rendermode="LabelLast" class="inner-inline" helptext="Display search result item summaries/descriptions.">
+					@Html.CheckBoxFor(model => model.ShowSummary, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+
 				<SettingsControl caption="Show Categories?" rendermode="LabelLast" class="inner-inline" helptext="Display search result categories.">
 					@Html.CheckBoxFor(model => model.ShowCategories, new { @class = "ToggleSwitch" })
 				</SettingsControl>
@@ -56,10 +67,6 @@
 					@Html.CheckBoxFor(model => model.ShowScore, new { @class = "ToggleSwitch" })
 				</SettingsControl>
 			</div>
-
-			<SettingsControl caption="Include Scopes" helptext="Use this setting to restrict results to specified scopes, or leave blank for all scopes.  Specify included scopes by entering one or more scopes separated by line feeds.  A scope is the URN of the data type which was used to create a search entry.  This is an advanced setting which may not be supported by all search providers.">
-				@Html.TextAreaFor(model => model.IncludeScopes, new { @rows = 5})
-			</SettingsControl>
 		</fieldset>
 	</div>
 	<div class="nucleus-form-buttonrow">
@@ -106,13 +113,13 @@
 		{
 			if (enable)
 			{
-				jQuery('#search-settings .search-instance-settings').show();
-				jQuery('#search-settings .results-page-selected').hide();
+				jQuery('#search-settings .search-instance-settings').addClass('show');
+				jQuery('#search-settings .results-page-selected').removeClass('show');
 			}
 			else
 			{
-				jQuery('#search-settings .search-instance-settings').hide();
-				jQuery('#search-settings .results-page-selected').show();
+				jQuery('#search-settings .search-instance-settings').removeClass('show');
+				jQuery('#search-settings .results-page-selected').addClass('show');
 			}
 		}
 	});

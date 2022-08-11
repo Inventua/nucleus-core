@@ -17,17 +17,23 @@ namespace Nucleus.ViewFeatures.Controls
 	public class PagingControl : ViewComponent
 	{
 		private Context Context { get; }
-		private IFileSystemManager FileSystemManager { get; }
 
 		/// <summary>
-		/// Create an instance.
+		/// Constructor used by dependency injection to create an instance of the paging control.
 		/// </summary>
 		/// <param name="Context"></param>
-		/// <param name="fileSystemManager"></param>
-		public PagingControl(Context Context, IFileSystemManager fileSystemManager)
+		/// <remarks>
+		/// The paging control is an ASP.NET core view component. Users of the paging control do not create an instance of this class 
+		/// directly.  Instead, use 
+		/// <seealso href="https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-components#invoke-a-view-component">Component.InvokeAsync</seealso>
+		/// to invoke the control from Razor.
+		/// </remarks>
+		/// <example>
+		/// @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.ApiKeys, propertyName = "ApiKeys", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
+		/// </example>
+		public PagingControl(Context Context)
 		{
 			this.Context = Context;
-			this.FileSystemManager = fileSystemManager;
 		}
 
 		/// <summary>
@@ -36,7 +42,7 @@ namespace Nucleus.ViewFeatures.Controls
 		/// <param name="model"></param>
 		/// <param name="propertyName"></param>
 		/// <param name="renderMode"></param>
-		/// <returns></returns>
+		/// <returns type="IViewComponentResult"></returns>
 		public IViewComponentResult Invoke(PagingSettings model, string propertyName, ViewModels.PagingControl.RenderModes renderMode = ViewModels.PagingControl.RenderModes.Standard)
 		{
 			ViewModels.PagingControl viewModel = new()
@@ -51,7 +57,6 @@ namespace Nucleus.ViewFeatures.Controls
 			// https://newbedev.com/possible-bug-in-asp-net-mvc-with-form-values-being-replaced
 			ModelState.Remove(viewModel.PropertyName + nameof(PagedResult<object>.CurrentPageIndex));
 			ModelState.Remove(viewModel.PropertyName + nameof(PagedResult<object>.PageSize));
-
 
 			return View("~/Shared/Controls/Views/PagingControl.cshtml", viewModel);
 		}

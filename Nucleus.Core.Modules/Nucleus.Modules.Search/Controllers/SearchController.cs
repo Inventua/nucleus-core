@@ -26,11 +26,15 @@ namespace Nucleus.Modules.Search.Controllers
 
 		private const string MODULESETTING_DISPLAY_MODE = "search:display-mode";
 		private const string MODULESETTING_RESULTS_PAGE = "search:results-page";
+		private const string MODULESETTING_SEARCH_CAPTION = "search:search-caption";
 		private const string MODULESETTING_SEARCH_BUTTON_CAPTION = "search:search-button-caption";
 		private const string MODULESETTING_INCLUDE_FILES = "search:include-files";
-		private const string MODULESETTING_SHOW_URL = "search:show-url"; 
+
+		private const string MODULESETTING_SHOW_URL = "search:show-url";
+		private const string MODULESETTING_SHOW_SUMMARY = "search:show-summary";
 		private const string MODULESETTING_SHOW_CATEGORIES = "search:show-categories";
 		private const string MODULESETTING_SHOW_PUBLISHEDDATE = "search:show-publisheddate";
+
 		private const string MODULESETTING_SHOW_SIZE = "search:show-size";
 		private const string MODULESETTING_SHOW_SCORE = "search:show-score";
 		private const string MODULESETTING_INCLUDE_SCOPES = "search:include-scopes";
@@ -103,16 +107,21 @@ namespace Nucleus.Modules.Search.Controllers
 
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_RESULTS_PAGE, viewModel.ResultsPageId);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_DISPLAY_MODE, viewModel.DisplayMode);
+			
+			this.Context.Module.ModuleSettings.Set(MODULESETTING_SEARCH_CAPTION, viewModel.SearchCaption);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SEARCH_BUTTON_CAPTION, viewModel.SearchButtonCaption);			
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_INCLUDE_FILES, viewModel.IncludeFiles);
+			
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_URL, viewModel.ShowUrl); 
+			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SUMMARY, viewModel.ShowSummary);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_CATEGORIES, viewModel.ShowCategories);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_PUBLISHEDDATE, viewModel.ShowPublishDate);
+
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SIZE, viewModel.ShowSize);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SCORE, viewModel.ShowScore);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_INCLUDE_SCOPES, viewModel.IncludeScopes);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_MAXIMUM_SUGGESTIONS, viewModel.MaximumSuggestions);
-
+			
 			await this.PageModuleManager.SaveSettings(this.Context.Module);
 
 			return Ok();
@@ -176,13 +185,6 @@ namespace Nucleus.Modules.Search.Controllers
 				PagingSettings = pagingSettings
 			};
 
-			// When we use the tag helper or Html helper, the module id is not set, so we can't read settings (because there aren't any)
-			//if (this.Context.Module != null)
-			//{
-			//	includeFiles = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true);
-			//	includeScopes = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_SCOPES, "");
-			//}
-
 			if (!(HttpContext.User.IsSystemAdministrator() | HttpContext.User.IsSiteAdmin(this.Context.Site)))
 			{
 				searchQuery.Roles = (await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId()))?.Roles;
@@ -195,7 +197,9 @@ namespace Nucleus.Modules.Search.Controllers
 
 			if (!String.IsNullOrEmpty(includeScopes))
 			{
-				searchQuery.IncludedScopes = includeScopes.Split('\n', StringSplitOptions.RemoveEmptyEntries).ToList();
+				// allow \n delimiter when the included scopes are entered in the settings page and ';' delimiter for when the Html Helper
+				// or tag helper is being used.
+				searchQuery.IncludedScopes = includeScopes.Split(new char[] { '\n', ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 			}
 
 			return searchQuery;
@@ -265,11 +269,15 @@ namespace Nucleus.Modules.Search.Controllers
 		{
 			settings.ResultsPageId = this.Context.Module.ModuleSettings.Get(MODULESETTING_RESULTS_PAGE, Guid.Empty);
 			settings.DisplayMode = this.Context.Module.ModuleSettings.Get(MODULESETTING_DISPLAY_MODE, ViewModels.Settings.DisplayModes.Full);
+			settings.SearchCaption = this.Context.Module.ModuleSettings.Get(MODULESETTING_SEARCH_CAPTION, "Search Term");			
 			settings.SearchButtonCaption = this.Context.Module.ModuleSettings.Get(MODULESETTING_SEARCH_BUTTON_CAPTION, "Search");
 			settings.IncludeFiles = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true);
+
 			settings.ShowUrl = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_URL, false);
+			settings.ShowSummary = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SUMMARY, true);			
 			settings.ShowCategories = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_CATEGORIES, true);
 			settings.ShowPublishDate = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_PUBLISHEDDATE, true);
+
 			settings.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
 			settings.ShowScore = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SCORE, true);
 			settings.IncludeScopes = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_SCOPES, "");

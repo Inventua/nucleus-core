@@ -43,8 +43,10 @@
 					case ApiMember.MemberTypes.Class:
 					case ApiMember.MemberTypes.Interface:
 					case ApiMember.MemberTypes.Constructor:
-					case ApiMember.MemberTypes.Method:
 						<code>@member.Name (@member.Parameters)</code>
+						break;
+					case ApiMember.MemberTypes.Method:
+						<code>@(!String.IsNullOrEmpty(member.Returns?.Type) ? member.Returns.Type + " " : "")@member.Name (@member.Parameters)</code>
 						break;
 				}
 				@if (member?.Summary?.Items?.Any() == true)

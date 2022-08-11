@@ -39,7 +39,8 @@ namespace Nucleus.XmlDocumentation
 				{
 					AssemblyName = this.Source.Assembly.Name,
 					Namespace = new ApiNamespace(FindNamespace(this.Source.Members)),
-					SourceFileName = this.SourceFileName
+					SourceFileName = this.SourceFileName,
+					LastModifiedDate = this.LastModifiedDate
 				};
 
 				Dictionary<string, ApiClass> classes = new();

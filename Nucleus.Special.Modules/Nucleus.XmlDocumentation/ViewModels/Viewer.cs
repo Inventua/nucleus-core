@@ -12,7 +12,7 @@ namespace Nucleus.XmlDocumentation.ViewModels
   public class Viewer
   {
     public Page Page { get; set; }
-
+    public Boolean ShowMenu { get; set; } = true;
     public List<Models.ApiDocument> Documents { get; set; }
     public Boolean DefaultOpen { get; set; }
 

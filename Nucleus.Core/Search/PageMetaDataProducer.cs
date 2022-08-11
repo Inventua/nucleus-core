@@ -59,7 +59,7 @@ namespace Nucleus.Core.Search
 					{
 						if (!indexPublicPagesOnly || page.Permissions.Where(permission => permission.IsPageViewPermission() && permission.AllowAccess).Any())
 						{
-							Logger.LogInformation("Building meta-data for page {pageId} [{pageName}]", page.Id, page.Name);
+							Logger.LogTrace("Building meta-data for page {pageId} [{pageName}]", page.Id, page.Name);
 							// we have to .Get the site and page because the .List methods don't return fully-populated page objects
 							ContentMetaData metaData = await BuildContentMetaData(site, apiKey, await this.PageManager.Get(page.Id));
 

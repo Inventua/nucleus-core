@@ -49,15 +49,15 @@
 
 						<SettingsControl caption="Keep History (count)" helptext="The number of history records to retain in the database.">
 							@Html.DropDownListFor(model => model.ScheduledTask.KeepHistoryCount, new List<SelectListItem>
-							{
-								new SelectListItem{ Text="10", Value = "10" },
-								new SelectListItem{ Text="25", Value = "25" },
-								new SelectListItem{ Text="50", Value = "50" },
-								new SelectListItem{ Text="100", Value = "100" },
-								new SelectListItem{ Text="250", Value = "250" },
-								new SelectListItem{ Text="500", Value = "500" },
-								new SelectListItem{ Text="1000", Value = "1000" }
-							 })
+						{
+						new SelectListItem{ Text="10", Value = "10" },
+						new SelectListItem{ Text="25", Value = "25" },
+						new SelectListItem{ Text="50", Value = "50" },
+						new SelectListItem{ Text="100", Value = "100" },
+						new SelectListItem{ Text="250", Value = "250" },
+						new SelectListItem{ Text="500", Value = "500" },
+						new SelectListItem{ Text="1000", Value = "1000" }
+						})
 						</SettingsControl>
 					</div>
 
@@ -117,15 +117,15 @@
 					{
 						@Html.HiddenFor(model => model.ScheduledTask.Id)
 						@Html.DropDownListFor(model => model.LogFile, new SelectList(Model.LogFiles, "Filename", "Title"), "(select)", new { @class = "LogFile mb-1" })
-					}
-					<div class="LogContent">
-						@if (!String.IsNullOrEmpty(Model.LogMessage))
-						{
-							@Model.LogMessage
-						}
+						<div class="LogContent">
+							@if (!String.IsNullOrEmpty(Model.LogMessage))
+							{
+								@Model.LogMessage
+							}
 
-						@await Html.PartialAsync("_Log", Model)
-					</div>
+							@await Html.PartialAsync("_Log", Model)
+						</div>
+					}
 				}
 				else
 				{

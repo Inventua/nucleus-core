@@ -14,31 +14,35 @@
 	else
 	{
 		<div class="api-wrapper">
-			<div class="api-menu">
-				<nav class="accordion">
-					<div class="accordion-item">
-						@foreach (var document in Model.Documents)
-						{
-							<h2 id="hdr_@document.Namespace.MenuId()" class="accordion-header">
-								<button class="accordion-button@(Model.DefaultOpen || Model.SelectedDocument==document ? "": " collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#@document.Namespace.MenuId()" aria-expanded="@(Model.DefaultOpen || Model.SelectedDocument==document ? "true": "false")" aria-controls="@document.Namespace.MenuId()">
-									@document.AssemblyName
-								</button>
-							</h2>
+			@if (Model.ShowMenu)
+			{
+				<div class="api-menu">
+					<nav class="accordion">
+						<div class="accordion-item">
+							@foreach (var document in Model.Documents)
+							{
+								<h2 id="hdr_@document.Namespace.MenuId()" class="accordion-header">
+									<button class="accordion-button@(Model.DefaultOpen || Model.SelectedDocument==document ? "": " collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#@document.Namespace.MenuId()" aria-expanded="@(Model.DefaultOpen || Model.SelectedDocument==document ? "true": "false")" aria-controls="@document.Namespace.MenuId()">
+										@document.AssemblyName
+									</button>
+								</h2>
 
-							<div id="@document.Namespace.MenuId()" class="list-group accordion-collapse collapse @(Model.DefaultOpen || Model.SelectedDocument==document ? "show" : "")">
-								<a class="list-group-item assembly-landing" href="@document.GenerateUrl(Model.Page)">@document.AssemblyName Assembly</a>
+								<div id="@document.Namespace.MenuId()" class="list-group accordion-collapse collapse @(Model.DefaultOpen || Model.SelectedDocument==document ? "show" : "")">
+									<a class="list-group-item assembly-landing" href="@document.GenerateUrl(Model.Page)">@document.AssemblyName Assembly</a>
 
-								<ul>
-									@foreach (var apiClass in document.Classes)
-									{
-										<li><a id="@apiClass.MenuId()" class="list-group-item @(apiClass.FullName==Model.SelectedClass?.FullName ? "active" : "")" href="@apiClass.GenerateUrl(Model.Page, document)")">@apiClass.Name</a></li>
-									}
-								</ul>
-							</div>
-						}
-					</div>
-				</nav>
-			</div>
+									<ul>
+										@foreach (var apiClass in document.Classes)
+										{
+											<li><a id="@apiClass.MenuId()" class="list-group-item @(apiClass.FullName==Model.SelectedClass?.FullName ? "active" : "")" href="@apiClass.GenerateUrl(Model.Page, document)")">@apiClass.Name</a></li>
+										}
+									</ul>
+								</div>
+							}
+						</div>
+					</nav>
+				</div>	
+			}
+			
 			<div class="api-content">
 				@if (Model.SelectedDocument == null)
 				{

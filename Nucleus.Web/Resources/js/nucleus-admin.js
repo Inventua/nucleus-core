@@ -76,8 +76,9 @@ function _handleContentLoaded(e, args)
 		else
 		{
 			ShowAdminFrame(true, url);
-			//Page.LoadPartialContent(event, url, jQuery('.nucleus-adminpage'));
-			//return false;
+			Page.LoadPartialContent(event, url, jQuery('.nucleus-adminpage'));
+			event.preventDefault();
+			event.stopImmediatePropagation();
 		}
 	}
 

@@ -1,0 +1,36 @@
+﻿@model Nucleus.Web.ViewModels.Admin.SystemIndex.LogSettingsViewModel
+<div class="d-flex gap-2 mb-2">
+	@Html.DropDownListFor(model => model.LogFile, new SelectList(Model.LogFiles, "Filename", "Title"), "(select)", new { @class = "LogFile mb-1 flex-grow-1" })
+	<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="collapse" data-bs-target=".log-options">
+		Options <span class="nucleus-material-icon">&#xe5c5;</span>
+	</button>
+
+	<div class="collapse log-options">
+		<fieldset aria-label="Filtering and Sorting">
+			<SettingsControl caption="Filter" helptext="Log source filter term.">
+				<div class="d-flex gap-2">
+					@Html.TextBoxFor(model=>model.LogFilterTerm, new { @class = "flex-grow-1"} )
+					@Html.DropDownListFor(model => model.LogSortDescending, new SelectList(Model.LogSortOrders, "Key", "Value"))
+					<button type="submit" data-target=".LogContent" data-bs-toggle="collapse" data-bs-target=".log-options" class="btn btn-primary btn-sm">Apply</button>
+				</div>
+			</SettingsControl>
+
+			<SettingsControl caption="Include" helptext="Specify log levels to display.">
+				<div class="log-levels">
+					<SettingsControl caption="Information" rendermode="LabelLast" class="inner-inline" helptext="Include logs with log level: Information.">
+						@Html.CheckBoxFor(model=>model.LogIncludeInformation, new { @class = "ToggleSwitch"})
+					</SettingsControl>
+					<SettingsControl caption="Warning" rendermode="LabelLast" class="inner-inline" helptext="Include logs with log level: Warning.">
+						@Html.CheckBoxFor(model=>model.LogIncludeWarning, new { @class = "ToggleSwitch"})
+					</SettingsControl>
+					<SettingsControl caption="Trace" rendermode="LabelLast" class="inner-inline" helptext="Include logs with log level: Trace.">
+						@Html.CheckBoxFor(model=>model.LogIncludeTrace, new { @class = "ToggleSwitch"})
+					</SettingsControl>
+					<SettingsControl caption="Error" rendermode="LabelLast" class="inner-inline" helptext="Include logs with log level: Error.">
+						@Html.CheckBoxFor(model=>model.LogIncludeError, new { @class = "ToggleSwitch"})
+					</SettingsControl>
+				</div>
+			</SettingsControl>
+		</fieldset>
+	</div>
+</div>

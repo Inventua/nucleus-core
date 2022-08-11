@@ -105,13 +105,13 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", await BuildViewModel());
 		}
 
-		private async Task ReadLogFile(Nucleus.Abstractions.Models.Paging.PagingSettings settings, ViewModels.Admin.ScheduledTaskEditor viewModel)
+		private async Task ReadLogFile(Guid id, Nucleus.Abstractions.Models.Paging.PagingSettings settings, ViewModels.Admin.ScheduledTaskEditor.LogSettingsViewModel viewModel)
 		{
 			List<ViewModels.Admin.SystemIndex.LogEntry> results = new();
 
 			if (!String.IsNullOrEmpty(viewModel.LogFile))
 			{
-				ScheduledTask existing = await this.ScheduledTaskManager.Get(viewModel.ScheduledTask.Id);
+				ScheduledTask existing = await this.ScheduledTaskManager.Get(id);
 				string logFilePath = System.IO.Path.Combine(LogFolder(existing).FullName, viewModel.LogFile);
 
 				if (System.IO.File.Exists(logFilePath))
@@ -127,17 +127,23 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.LogContent.TotalCount = results.Count;
 
 			viewModel.LogContent.Items = results
+				.Where(logitem => logitem.IsMatch(viewModel))
 				.Skip(viewModel.LogContent.FirstRowIndex)
 				.Take(viewModel.LogContent.PageSize)
 				.ToList();
+
+			if (viewModel.LogSortDescending)
+			{
+				viewModel.LogContent.Items = viewModel.LogContent.Items.Reverse().ToList();
+			}
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> GetLogFile(ViewModels.Admin.ScheduledTaskEditor viewModel)
+		public async Task<ActionResult> GetLogFile(Guid id, ViewModels.Admin.ScheduledTaskEditor.LogSettingsViewModel viewModel)
 		{
-			await ReadLogFile(viewModel.LogContent, viewModel);
+			await ReadLogFile(id, viewModel.LogContent, viewModel);
 
-			return View("_Log", viewModel);
+			return View("../System/_Log", viewModel);
 		}
 
 		private System.IO.DirectoryInfo LogFolder(ScheduledTask scheduledTask)
@@ -221,13 +227,13 @@ namespace Nucleus.Web.Controllers.Admin
 						}					
 					}
 
-					viewModel.LogFiles = logs.OrderByDescending(log => log.LogDate).ToList();
+					viewModel.LogSettings.LogFiles = logs.OrderByDescending(log => log.LogDate).ToList();
 				}
 			}
 			
-			if (!String.IsNullOrEmpty(viewModel.LogFile))
+			if (!String.IsNullOrEmpty(viewModel.LogSettings.LogFile))
 			{
-				await ReadLogFile(viewModel.LogContent, viewModel);
+				await ReadLogFile(viewModel.ScheduledTask.Id, viewModel.LogSettings.LogContent, viewModel.LogSettings);
 			}
 
 			return viewModel;

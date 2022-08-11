@@ -61,11 +61,12 @@ namespace Nucleus.Web.Controllers.Admin
 				Copyright = this.GetType().Assembly.Copyright(),
 				Version = $"{this.GetType().Assembly.Version()}",
 				Framework = Environment.Version.ToString(),
-				OperatingSystem = Environment.OSVersion.ToString(),
-				LogFile = viewModelInput.LogFile
+				OperatingSystem = Environment.OSVersion.ToString()
 			};
 
-			viewModelOutput.LogMessage = "";
+			viewModelOutput.LogSettings.LogFile = viewModelInput.LogSettings.LogFile;
+
+			viewModelOutput.LogSettings.LogMessage = "";
 
 
 			if (!String.IsNullOrEmpty(this.LogFolderPath) && System.IO.Directory.Exists(this.LogFolderPath))
@@ -102,20 +103,20 @@ namespace Nucleus.Web.Controllers.Admin
 					}
 				}
 
-				viewModelOutput.LogFiles = logs.OrderByDescending(log => log.LogDate).ToList();
+				viewModelOutput.LogSettings.LogFiles = logs.OrderByDescending(log => log.LogDate).ToList();
 
-				ReadLogFile(viewModelInput.LogContent, viewModelOutput);
+				ReadLogFile(viewModelInput.LogSettings.LogContent, viewModelOutput.LogSettings);
 			}
 			else
 			{
-				viewModelOutput.LogFiles = new();
+				viewModelOutput.LogSettings.LogFiles = new();
 				if (String.IsNullOrEmpty(this.LogFolderPath))
 				{
-					viewModelOutput.LogMessage = $"The text file log folder is not set.";
+					viewModelOutput.LogSettings.LogMessage = $"The text file log folder is not set.";
 				}
 				else if (!System.IO.Directory.Exists(this.LogFolderPath))
 				{
-					viewModelOutput.LogMessage = $"The log folder {this.LogFolderPath} does not exist.";
+					viewModelOutput.LogSettings.LogMessage = $"The log folder {this.LogFolderPath} does not exist.";
 				}
 			}
 
@@ -157,7 +158,7 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", viewModelOutput);
 		}
 
-		private void ReadLogFile(Nucleus.Abstractions.Models.Paging.PagingSettings settings, ViewModels.Admin.SystemIndex viewModel)
+		private void ReadLogFile(Nucleus.Abstractions.Models.Paging.PagingSettings settings, ViewModels.Admin.SystemIndex.LogSettingsViewModel viewModel)
 		{
 			List<ViewModels.Admin.SystemIndex.LogEntry> results = new();
 			
@@ -177,27 +178,25 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.LogContent.TotalCount = results.Count;
 
 			viewModel.LogContent.Items = results
+				.Where(logitem => logitem.IsMatch(viewModel))
 				.Skip(viewModel.LogContent.FirstRowIndex)
 				.Take(viewModel.LogContent.PageSize)
 				.ToList();
+			
+			if (viewModel.LogSortDescending)
+			{
+				viewModel.LogContent.Items = viewModel.LogContent.Items.Reverse().ToList();
+			}
 		}
 
+		
+
 		[HttpPost]
-		public ActionResult GetLogFile(ViewModels.Admin.SystemIndex viewModelInput)
+		public ActionResult GetLogFile(ViewModels.Admin.SystemIndex.LogSettingsViewModel viewModelInput)
 		{
 			ReadLogFile(viewModelInput.LogContent, viewModelInput);
 
 			return View("_Log", viewModelInput);
-
-			//if (!String.IsNullOrEmpty(viewModelInput.LogFile))
-			//{
-			//	string logFilePath = System.IO.Path.Combine(this.LogFolderPath, viewModelInput.LogFile);
-			//	if (System.IO.File.Exists(logFilePath))
-			//	{
-			//		return File(System.Text.Encoding.UTF8.GetBytes(System.Net.WebUtility.HtmlEncode(System.IO.File.ReadAllText(logFilePath))), "text/plain");
-			//	}
-			//}
-			//return BadRequest();
 		}
 
 		/// <summary>
@@ -210,14 +209,6 @@ namespace Nucleus.Web.Controllers.Admin
 			const string TOKEN_REGEX = "(?<Pair>(?<Key>[^=;\"]+)=(?<Value>[^;]+))";
 
 			return System.Text.RegularExpressions.Regex.Replace(value, TOKEN_REGEX, new System.Text.RegularExpressions.MatchEvaluator(SanitizeToken));
-
-			//value = System.Text.RegularExpressions.Regex.Replace(value, "Password[:-=](.*)[ ,;]{0,1}.*$", "Password=********", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline);
-			//value = System.Text.RegularExpressions.Regex.Replace(value, "Pwd[:-=](.*)[ ,;]{0,1}.*$", "Pwd=********", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline);
-			//value = System.Text.RegularExpressions.Regex.Replace(value, "User ID[:-=](.*)[ ,;]{0,1}.*$", "User ID=********", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline);
-			//value = System.Text.RegularExpressions.Regex.Replace(value, "UserID[:-=](.*)[ ,;]{0,1}.*$", "UserID=********", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline);
-			//value = System.Text.RegularExpressions.Regex.Replace(value, "uid[:-=](.*)[ ,;]{0,1}.*$", "uid=********", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline);
-			//value = System.Text.RegularExpressions.Regex.Replace(value, "ConnectionString=(.*).*$", "ConnectionString=********", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Multiline);
-			//return value;
 		}
 
 		private static string SanitizeToken(System.Text.RegularExpressions.Match match)

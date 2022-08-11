@@ -7,7 +7,7 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.TaskScheduler;
 
 namespace Nucleus.Web.ViewModels.Admin
-{	
+{
 	public class ScheduledTaskEditor
 	{
 		public ScheduledTask ScheduledTask { get; set; }
@@ -18,13 +18,14 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public IEnumerable<ServiceType> AvailableServiceTypes { get; set; }
 
-		public List<Shared.LogFileInfo> LogFiles { get; set; }
+		public LogSettingsViewModel LogSettings { get; set; } = new();
+		//public List<Shared.LogFileInfo> LogFiles { get; set; }
 
-		public string LogFile { get; set; }
+		//public string LogFile { get; set; }
 
-		public Nucleus.Abstractions.Models.Paging.PagedResult<ViewModels.Admin.SystemIndex.LogEntry> LogContent { get; set; } = new() { PageSize = 100, PageSizes = new List<int>() { 100, 250, 500 } };
-		
-		public string LogMessage { get; set; }
+		//public Nucleus.Abstractions.Models.Paging.PagedResult<ViewModels.Admin.SystemIndex.LogEntry> LogContent { get; set; } = new() { PageSize = 100, PageSizes = new List<int>() { 100, 250, 500 } };
+
+		//public string LogMessage { get; set; }
 
 		public class ServiceType
 		{
@@ -37,6 +38,8 @@ namespace Nucleus.Web.ViewModels.Admin
 				this.TypeName = typeName;
 			}
 		}
+
+		public class LogSettingsViewModel : ViewModels.Admin.SystemIndex.LogSettingsViewModel {};
 	}
 
 	

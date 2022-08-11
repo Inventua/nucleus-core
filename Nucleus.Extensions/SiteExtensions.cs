@@ -399,8 +399,20 @@ namespace Nucleus.Extensions
 		/// <returns></returns>
 		public static System.Uri AbsoluteUri(this Site site, Page page, Boolean useSSL)
 		{
-			return new System.Uri(AbsoluteUri(site, useSSL), page.DefaultPageRoute().Path + "/");
+			return new System.Uri(AbsoluteUri(site, useSSL), RemoveLeadingSlash(page.DefaultPageRoute().Path) + "/");
 		}
+
+		private static string RemoveLeadingSlash(string relativeUrl)
+    {
+			if (!string.IsNullOrEmpty(relativeUrl))
+			{ 
+				if (relativeUrl.StartsWith('/') && relativeUrl.Length > 1)
+				{
+					return relativeUrl[1..];
+				}
+			}
+			return relativeUrl;
+    }
 
 		/// <summary>
 		/// Return the absolute Uri for the specified site and relative url.
@@ -411,7 +423,7 @@ namespace Nucleus.Extensions
 		/// <returns></returns>
 		public static System.Uri AbsoluteUri(this Site site, string relativeUrl, Boolean useSSL)
 		{
-			return new System.Uri(AbsoluteUri(site, useSSL), relativeUrl + "/");
+			return new System.Uri(AbsoluteUri(site, useSSL), RemoveLeadingSlash(relativeUrl) + "/");
 		}
 
 		/// <summary>
@@ -450,7 +462,7 @@ namespace Nucleus.Extensions
 		/// <returns></returns>
 		public static System.Uri AbsoluteUri(this Site site, Page page, string relativeUrl, Boolean useSSL)
 		{
-			return new System.Uri(AbsoluteUri(site, page, useSSL), relativeUrl + "/");
+			return new System.Uri(AbsoluteUri(site, page, useSSL), RemoveLeadingSlash(relativeUrl) + "/");
 		}
 
 	}

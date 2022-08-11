@@ -7,12 +7,14 @@
 			<Id>{$guid2}</Id>
 			<Name>Administrators</Name>
 			<RoleGroupId xsi:nil="true" />
+			<Description>This role provides access to all site administration functions.</Description>
 			<Type>System</Type>
 		</AdministratorsRole>
 		<RegisteredUsersRole>
 			<Id>{$guid3}</Id>
 			<Name>Registered Users</Name>
 			<RoleGroupId xsi:nil="true" />
+			<Description>This role represents all logged-on users.</Description>
 			<Type>System</Type>
 		</RegisteredUsersRole>
 		<AllUsersRole>

@@ -17,6 +17,7 @@ namespace Nucleus.Web.ViewModels.Setup
 
 		public string TemplateTempFileName { get; set; }
 
+		public IEnumerable<string> OtherWarnings { get; set; }
 		public IEnumerable<string> MissingExtensionWarnings { get; set; }
 
 		public Site Site { get; set; }

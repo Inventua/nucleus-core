@@ -52,7 +52,7 @@ namespace Nucleus.Web.Controllers.Setup
 
 		[HttpGet]
 		public async Task<IActionResult> Index()
-		{			
+		{
 			if (this.Application.IsInstalled && await this.UserManager.CountSystemAdministrators() != 0)
 			{
 				return BadRequest();
@@ -61,7 +61,7 @@ namespace Nucleus.Web.Controllers.Setup
 			// pre-flight checks
 			IPreflight.ValidationResults results = this.PreFlight.Validate();
 
-			return View("Index", await BuildViewModel(results) );
+			return View("Index", await BuildViewModel(results));
 		}
 
 		[HttpPost]
@@ -110,12 +110,13 @@ namespace Nucleus.Web.Controllers.Setup
 				this.Application.SetInstalled();
 
 				// Wait 3 seconds after returning and restart
-				Task restartTask = Task.Run(async () => {
+				Task restartTask = Task.Run(async () =>
+				{
 					await Task.Delay(3000);
 					this.HostApplicationLifetime.StopApplication();
 				});
 
-				return View("complete", new ViewModels.Setup.SiteWizardComplete() { SiteUrl = Url.Content(Request.Scheme + System.Uri.SchemeDelimiter + viewModel.Site.Aliases.First().Alias) });				
+				return View("complete", new ViewModels.Setup.SiteWizardComplete() { SiteUrl = Url.Content(Request.Scheme + System.Uri.SchemeDelimiter + viewModel.Site.Aliases.First().Alias) });
 			}
 			else
 			{
@@ -138,7 +139,7 @@ namespace Nucleus.Web.Controllers.Setup
 			Nucleus.Abstractions.Models.Export.SiteTemplate template = await this.SiteManager.ReadTemplateTempFile(viewModel.TemplateTempFileName);
 
 			template.Site.Name = viewModel.Site.Name;
-			
+
 			viewModel.Site.DefaultSiteAlias.Id = Guid.NewGuid();
 			template.Site.Aliases = new() { viewModel.Site.DefaultSiteAlias };
 			template.Site.DefaultSiteAlias = viewModel.Site.DefaultSiteAlias;
@@ -153,7 +154,7 @@ namespace Nucleus.Web.Controllers.Setup
 			template.Site.HomeDirectory = viewModel.Site.Name;
 
 			viewModel.Site = await this.SiteManager.Import(template);
-			
+
 			// create users
 
 			// only create a system admin user if there isn't already one in the database
@@ -191,6 +192,11 @@ namespace Nucleus.Web.Controllers.Setup
 			IEnumerable<LayoutDefinition> layoutsInTemplate = null;
 			IEnumerable<ContainerDefinition> containersInTemplate = null;
 
+			List<ViewModels.Setup.SiteWizard.InstallableExtension> installableExtensions = new();
+
+			List<string> otherWarnings = new();
+			List<string> missingExtensionWarnings = new();
+
 			viewModel.CreateSystemAdministratorUser = await this.UserManager.CountSystemAdministrators() == 0;
 
 			viewModel.Templates = new();
@@ -211,7 +217,7 @@ namespace Nucleus.Web.Controllers.Setup
 					Nucleus.Abstractions.Models.Export.SiteTemplate template = await this.SiteManager.ParseTemplate(templateFile);
 
 					viewModel.Site = template.Site;
-					
+
 					modulesInTemplate = template.Pages
 						.SelectMany(page => page.Modules)
 						.Select(module => module.ModuleDefinition)
@@ -250,61 +256,64 @@ namespace Nucleus.Web.Controllers.Setup
 				}
 			}
 
-
-			List<ViewModels.Setup.SiteWizard.InstallableExtension> installableExtensions = new();
-
 			foreach (FileInfo extensionPackageFile in InstallableExtensionsFolder().EnumerateFiles("*.zip"))
 			{
 
 				using (Stream extensionStream = extensionPackageFile.OpenRead())
 				{
 					this.Logger?.LogInformation("Validating '{fileName}'.", extensionPackageFile.FullName);
-					PackageResult extensionResult = await this.ExtensionManager.ValidatePackage(extensionStream);
 
-					if (extensionResult.IsValid)
+					try
 					{
-						ViewModels.Setup.SiteWizard.InstallableExtension installableExtension = new(extensionPackageFile.Name, extensionResult);
-
-						installableExtension.ModulesInPackage = extensionResult.Package.components
-							.SelectMany(component => component.Items.OfType<Nucleus.Abstractions.Models.Extensions.moduleDefinition>())
-							.Select(moduleDefinition => Guid.Parse(moduleDefinition.id))
-							.Distinct();
-
-						installableExtension.LayoutsInPackage = extensionResult.Package.components
-							.SelectMany(component => component.Items.OfType<Nucleus.Abstractions.Models.Extensions.layoutDefinition>())
-							.Select(layoutDefinition => Guid.Parse(layoutDefinition.id))
-							.Distinct();
-
-						installableExtension.ContainersInPackage = extensionResult.Package.components
-							.SelectMany(component => component.Items.OfType<Nucleus.Abstractions.Models.Extensions.containerDefinition>())
-							.Select(containerDefinition => Guid.Parse(containerDefinition.id))
-							.Distinct();
-
-						if
-							(
-								(modulesInTemplate != null && modulesInTemplate.Where(moduleDef => installableExtension.ModulesInPackage.Contains(moduleDef.Id)).Any()) ||
-								(layoutsInTemplate != null && layoutsInTemplate.Where(layoutDef => installableExtension.LayoutsInPackage.Contains(layoutDef.Id)).Any()) ||
-								(containersInTemplate != null && containersInTemplate.Where(containerDef => installableExtension.ContainersInPackage.Contains(containerDef.Id)).Any())
-							)
+						PackageResult extensionResult = await this.ExtensionManager.ValidatePackage(extensionStream);
+						if (extensionResult.IsValid)
 						{
-							// template contains one or more modules/layouts/containers that are in this extension (so the extension is required)
-							installableExtension.IsSelected = true;
-							installableExtension.IsRequired = true;
-						}
+							ViewModels.Setup.SiteWizard.InstallableExtension installableExtension = new(extensionPackageFile.Name, extensionResult);
 
-						installableExtensions.Add(installableExtension);
+							installableExtension.ModulesInPackage = extensionResult.Package.components
+								.SelectMany(component => component.Items.OfType<Nucleus.Abstractions.Models.Extensions.moduleDefinition>())
+								.Select(moduleDefinition => Guid.Parse(moduleDefinition.id))
+								.Distinct();
+
+							installableExtension.LayoutsInPackage = extensionResult.Package.components
+								.SelectMany(component => component.Items.OfType<Nucleus.Abstractions.Models.Extensions.layoutDefinition>())
+								.Select(layoutDefinition => Guid.Parse(layoutDefinition.id))
+								.Distinct();
+
+							installableExtension.ContainersInPackage = extensionResult.Package.components
+								.SelectMany(component => component.Items.OfType<Nucleus.Abstractions.Models.Extensions.containerDefinition>())
+								.Select(containerDefinition => Guid.Parse(containerDefinition.id))
+								.Distinct();
+
+							if
+								(
+									(modulesInTemplate != null && modulesInTemplate.Where(moduleDef => installableExtension.ModulesInPackage.Contains(moduleDef.Id)).Any()) ||
+									(layoutsInTemplate != null && layoutsInTemplate.Where(layoutDef => installableExtension.LayoutsInPackage.Contains(layoutDef.Id)).Any()) ||
+									(containersInTemplate != null && containersInTemplate.Where(containerDef => installableExtension.ContainersInPackage.Contains(containerDef.Id)).Any())
+								)
+							{
+								// template contains one or more modules/layouts/containers that are in this extension (so the extension is required)
+								installableExtension.IsSelected = true;
+								installableExtension.IsRequired = true;
+							}
+
+							installableExtensions.Add(installableExtension);
+						}
+					}
+					catch (Exception ex)
+					{
+						otherWarnings.Add($"Invalid extension: {extensionPackageFile.Name}: {ex.Message}");
 					}
 				}
 			}
 
-			List<string> warnings = new();
 			// check for missing modules					
 			foreach (ModuleDefinition moduleDefinition in modulesInTemplate)
 			{
 				if (!installableExtensions.Where(installableExtension => installableExtension.ModulesInPackage.Contains(moduleDefinition.Id)).Any())
 				{
 					// module is missing
-					warnings.Add($"Module '{moduleDefinition.FriendlyName}'.");
+					missingExtensionWarnings.Add($"Module '{moduleDefinition.FriendlyName}'.");
 				}
 			}
 
@@ -314,7 +323,7 @@ namespace Nucleus.Web.Controllers.Setup
 				if (!installableExtensions.Where(installableExtension => installableExtension.LayoutsInPackage.Contains(layoutDefinition.Id)).Any())
 				{
 					// layout is missing
-					warnings.Add($"Layout '{layoutDefinition.FriendlyName}'.");
+					missingExtensionWarnings.Add($"Layout '{layoutDefinition.FriendlyName}'.");
 				}
 			}
 
@@ -324,16 +333,17 @@ namespace Nucleus.Web.Controllers.Setup
 				if (!installableExtensions.Where(installableExtension => installableExtension.ContainersInPackage.Contains(containerDefinition.Id)).Any())
 				{
 					// container is missing
-					warnings.Add($"Container '{containerDefinition.FriendlyName}'.");
+					missingExtensionWarnings.Add($"Container '{containerDefinition.FriendlyName}'.");
 				}
 			}
 
-			viewModel.MissingExtensionWarnings = warnings.Distinct();
+			viewModel.MissingExtensionWarnings = missingExtensionWarnings.Distinct();
+			viewModel.OtherWarnings = otherWarnings.Distinct();
 
 			viewModel.InstallableExtensions = installableExtensions.OrderBy(ext => ext.Name).ToList();
 			viewModel.Layouts = (await this.LayoutManager.List()).InsertDefaultListItem();
 			viewModel.Containers = (await this.ContainerManager.List()).InsertDefaultListItem();
-						
+
 			return viewModel;
 		}
 
@@ -341,7 +351,7 @@ namespace Nucleus.Web.Controllers.Setup
 		{
 			ViewModels.Setup.SiteWizard viewModel = await BuildViewModel(new ViewModels.Setup.SiteWizard());
 
-			viewModel.Site.DefaultSiteAlias = new SiteAlias() { Alias = $"{ControllerContext.HttpContext.Request.Host}{ControllerContext.HttpContext.Request.PathBase}" };			
+			viewModel.Site.DefaultSiteAlias = new SiteAlias() { Alias = $"{ControllerContext.HttpContext.Request.Host}{ControllerContext.HttpContext.Request.PathBase}" };
 			if (ControllerContext.HttpContext.Request.Host.Port.HasValue && !viewModel.Site.DefaultSiteAlias.Alias.Contains(':'))
 			{
 				viewModel.Site.DefaultSiteAlias.Alias += $":{ControllerContext.HttpContext.Request.Host.Port}";

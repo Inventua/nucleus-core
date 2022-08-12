@@ -40,6 +40,8 @@ namespace Nucleus.Modules.StaticContent.Controllers
 		public ActionResult SaveSettings(ViewModels.Settings viewModel)
 		{
 			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_DEFAULT_FILE_ID, viewModel.DefaultFile.Id);
+			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_ADD_COPY_BUTTONS, viewModel.AddCopyButtons);
+
 			this.PageModuleManager.SaveSettings(this.Context.Module);
 
 			this.CacheManager.StaticContentCache().Clear();

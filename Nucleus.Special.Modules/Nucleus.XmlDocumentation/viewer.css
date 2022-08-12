@@ -103,11 +103,30 @@
 	border-bottom: solid 1px #eee;
 }
 
+
+.XmlDocumentation .api-content pre.code
+{
+	font-size: .875em;
+	word-wrap: break-word;
+	font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+	direction: ltr;
+	unicode-bidi: bidi-override;
+}
+
 .XmlDocumentation .api-content code
 {
-	padding: 1.2em;
+	background-color: #D8D8D8;
 	border: solid 1px #ccc;
+}
+
+.XmlDocumentation .api-content pre.code
+{
 	background-color: #F0F0F0;
+}
+
+.XmlDocumentation .api-content code, .XmlDocumentation .api-content pre.code
+{
+	padding: 1.2em;
 	white-space: pre-wrap;
 	display: block;
 	margin-bottom: 1rem;

@@ -125,6 +125,7 @@
 <script>
 	jQuery(document).ready(function()
 	{
+		// In the menu, scroll the currently-selected item into view 
 		var selectedClassMenuId = '@Model.SelectedClass?.MenuId()';
 
 		if (selectedClassMenuId !== '')
@@ -135,11 +136,15 @@
 				menuItem[0].scrollIntoView({ block: "center", inline: "nearest" } );
 			}
 		}
+
+		// Automatically load the assembly landing page when an accordion item is expanded
 		jQuery('.list-group.accordion-collapse').on('show.bs.collapse', function ()
 		{
 			var href = jQuery(this).children('.assembly-landing').first().attr('href');
 			document.location=href;
 			return false;
 		});
+
+		Page.AttachCopyButton('.XmlDocumentation code');
 	});
 </script>

@@ -8,6 +8,7 @@ function _Page()
 	this.LoadPartialContent = _loadPartialContent;
 	this.GetCookie = _getCookie;
 	this.AddEventHandlers = _addEventHandlers;
+	this.AttachCopyButton = _attachCopyButton;
 	this.CopyToClipboard = _copyToClipboard;
 
 	// Attach Nucleus-standard event handlers when document is ready
@@ -945,11 +946,49 @@ function _Page()
 		return match ? match[1] : null;
 	}
 
+	function _attachCopyButton(selector, childselector)
+	{
+		// Create copy buttons for selected elements
+		jQuery(selector).each(function (index, element) 
+		{
+			var copyButton = jQuery('<button class="nucleus-copy-button nucleus-material-icon btn btn-none d-block ms-auto mb-1 fs-small" type="button" title="Copy to Clipboard">&#xe14d;</button>');
+
+			if (typeof (childselector) !== 'undefined')
+			{
+				copyButton[0].CopyTarget = jQuery(element).find(childselector);
+			}
+			else
+			{
+				copyButton[0].CopyTarget = jQuery(element);
+			}
+						
+			// copy button handler
+			copyButton.on('click', function ()
+			{
+				_copyToClipboard(this.CopyTarget);
+				return false;
+			});
+
+			copyButton.insertBefore(jQuery(element));
+
+		});
+
+	}
+
 	function _copyToClipboard(element)
 	{
-		var temp = jQuery("<input>");
+		if (jQuery(element).length === 0) return;
+
+		var temp = jQuery("<textarea>");
 		jQuery("body").append(temp);
-		temp.val(jQuery(element).val()).select();
+		if (jQuery(element).is('input'))
+		{
+			temp.val(jQuery(element).val()).select();
+		}
+		else
+		{
+			temp.val(jQuery(element)[0].innerText).select();
+		}
 		document.execCommand("copy");
 		temp.remove();
 	}

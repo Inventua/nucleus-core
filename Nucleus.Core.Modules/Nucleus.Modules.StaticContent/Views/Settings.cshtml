@@ -15,7 +15,11 @@
 				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.DefaultFile?.Parent })
 			</div>
 		</SettingsControl>
-		<div class="Tools">
+		<SettingsControl caption="Add Copy Buttons?" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to automatically add a 'copy' button to <code> elements.">
+			@Html.CheckBoxFor(model => model.AddCopyButtons, new { @class = "ToggleSwitch" })
+		</SettingsControl>
+
+		<div class="nucleus-form-buttonrow">
 			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "StaticContentAdmin", "StaticContent"), new { @class = "btn btn-primary" })
 		</div>
 	</fieldset>

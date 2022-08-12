@@ -1,4 +1,15 @@
 ﻿@model Nucleus.Modules.StaticContent.ViewModels.Viewer
 @using Nucleus.Modules.StaticContent
 @Html.AddStyle("~!/../viewer.css")
+<div class="StaticContent">
 @Model.Content
+</div>
+@if (Model.AddCopyButtons)
+{
+	<script>
+		jQuery(document).ready(function()
+	{
+		Page.AttachCopyButton('.StaticContent pre', 'code');
+	});
+</script>
+}

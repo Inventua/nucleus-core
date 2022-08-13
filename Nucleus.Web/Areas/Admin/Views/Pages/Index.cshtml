@@ -16,7 +16,7 @@
 
 <div class="nucleus-index-wrapper">
 	<div class="nucleus-index-items">
-		@Html.PageMenu(Model.Pages, Model.PageId, -1, new { data_target = "#nucleus-page-editor" })
+		@Html.PageMenu(Model.Pages, Model.PageId, 1, new { data_target = "#nucleus-page-editor" })
 	</div>
 
 	<div id="nucleus-page-editor" class="nucleus-editor-panel"></div>
@@ -44,7 +44,7 @@
       event.preventDefault();
 		}
   });			
-
+	
 	// Read the child pages of the item containing the "+" button
 	jQuery('.nucleus-index-wrapper').on('click', '.nucleus-get-childpages', function (e)
 	{

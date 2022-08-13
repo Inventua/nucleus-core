@@ -126,7 +126,7 @@ namespace Nucleus.Core.Managers
 						return await Get(pageId);
 					}
 				}
-			});			
+			});
 		}
 
 		/// <summary>
@@ -180,7 +180,7 @@ namespace Nucleus.Core.Managers
 
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
-				await provider.DeletePage(page);				
+				await provider.DeletePage(page);
 			}
 
 			this.CacheManager.PageCache().Remove(page.Id);
@@ -241,11 +241,11 @@ namespace Nucleus.Core.Managers
 						if (isAnonymousOrAllUsers && !permissionType.IsPageViewPermission())
 						{
 							permission.AllowAccess = false;
-							permission.PermissionType = new() { Scope = PermissionType.PermissionScopeNamespaces.Disabled};
+							permission.PermissionType = new() { Scope = PermissionType.PermissionScopeNamespaces.Disabled };
 						}
 						else
 						{
-							permission.AllowAccess = permissionType.IsPageViewPermission();							
+							permission.AllowAccess = permissionType.IsPageViewPermission();
 							permission.PermissionType = permissionType;
 						}
 
@@ -325,7 +325,7 @@ namespace Nucleus.Core.Managers
 					{
 						throw new InvalidOperationException($"Page routes starting with '{path}' are reserved.");
 					}
-				}				
+				}
 			}
 
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
@@ -492,6 +492,54 @@ namespace Nucleus.Core.Managers
 			return await GetAdminMenu(site, parentPage, user, levels, true, true, true);
 		}
 
+		public async Task<PageMenu> GetAdminMenu(Site site, Page parentPage, ClaimsPrincipal user, Guid? selectedPageId)
+		{
+			if (selectedPageId.HasValue && selectedPageId != Guid.Empty)
+			{
+				// use "breadcrumb" logic to fill in the tree up to the selected page
+				List<Page> breadcrumbs = new();
+
+				Page breadcrumbPage = await Get(selectedPageId.Value);
+				do
+				{
+					if (breadcrumbPage != null)
+					{
+						breadcrumbs.Add(breadcrumbPage);
+					}
+
+					if (breadcrumbPage.ParentId.HasValue)
+					{
+						breadcrumbPage = await this.Get(breadcrumbPage.ParentId.Value);
+					}
+					else
+					{
+						breadcrumbPage = null;
+					}
+				} while (breadcrumbPage != null);
+
+				if (breadcrumbs.Any())
+				{
+					breadcrumbs.Reverse();
+
+					// get the top level
+					PageMenu menu = await GetAdminMenu(site, null, user, 1, true, true, true);
+					PageMenu subMenu = menu;
+
+					foreach (Page ancestor in breadcrumbs)
+					{
+						subMenu = subMenu.Children.Where(child => child.Page.Id == ancestor.Id).FirstOrDefault();
+						
+						PageMenuChildrenResult newChildren = await GetPageMenuChildren(site, subMenu.Page, user, 1, 0, true, true, true);
+						subMenu.UpdateChildren(newChildren.Children, newChildren.HasChildren);						
+					}
+
+					return menu;
+				}
+			}
+			
+			return await GetAdminMenu(site, parentPage, user, 1); ;
+		}
+
 
 		public async Task<PageMenu> GetMenu(Site site, Page parentPage, ClaimsPrincipal user, Boolean ignoreSettings)
 		{
@@ -516,8 +564,8 @@ namespace Nucleus.Core.Managers
 
 			return await this.CacheManager.PageMenuCache().GetAsync(key, async key =>
 			{
-				// read from database
-				PageMenuChildrenResult childrenResult = await GetPageMenuChildren(site, parentPage, user, 0, 0, false, ignoreSettings, ignoreSettings);
+			// read from database
+			PageMenuChildrenResult childrenResult = await GetPageMenuChildren(site, parentPage, user, 0, 0, false, ignoreSettings, ignoreSettings);
 				return new PageMenu(null, childrenResult.Children, childrenResult.HasChildren);
 			});
 		}
@@ -543,7 +591,7 @@ namespace Nucleus.Core.Managers
 				{
 					if (levels != 0 && thisLevel >= levels) return new PageMenuChildrenResult(true);
 
-					if ( (ignoreDisabled || !child.Disabled) && (ignoreShowInMenu || child.ShowInMenu) && (ignorePermissions || user.HasViewPermission(site, child)))
+					if ((ignoreDisabled || !child.Disabled) && (ignoreShowInMenu || child.ShowInMenu) && (ignorePermissions || user.HasViewPermission(site, child)))
 					{
 						PageMenuChildrenResult childrenResult = await GetPageMenuChildren(site, child, user, levels, thisLevel + 1, ignorePermissions, ignoreDisabled, ignoreShowInMenu);
 						children.Add(new PageMenu(child, childrenResult.Children, childrenResult.HasChildren));

@@ -194,7 +194,7 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 			else
 			{
-				return View("Index", await BuildIndexViewModel());
+				return View("Index", await BuildIndexViewModel(viewModel.Page.Id));
 			}
 		}
 
@@ -493,7 +493,7 @@ namespace Nucleus.Web.Controllers.Admin
 					this.Context.Site,
 					await this.PageManager.Get(id),
 					ControllerContext.HttpContext.User,
-					1
+					0
 				);
 
 			return View("PageMenu", viewModel);
@@ -501,7 +501,15 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private async Task<ViewModels.Admin.PageIndex> BuildIndexViewModel(Guid pageId)
 		{
-			ViewModels.Admin.PageIndex viewModel = await BuildIndexViewModel();
+			ViewModels.Admin.PageIndex viewModel = new();
+
+			viewModel.Pages = await this.PageManager.GetAdminMenu
+				(
+					this.Context.Site,
+					null,
+					ControllerContext.HttpContext.User,
+					pageId
+				);
 
 			viewModel.PageId = pageId;
 			return viewModel;
@@ -516,7 +524,7 @@ namespace Nucleus.Web.Controllers.Admin
 					this.Context.Site,
 					null,
 					ControllerContext.HttpContext.User,
-					1
+					0
 				);
 
 			return viewModel;
@@ -568,7 +576,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 			viewModel.Page.Modules = await this .PageManager.ListModules(viewModel.Page);
 
-			viewModel.PageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, 1);
+			viewModel.PageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, page.ParentId);
 			viewModel.Pages = (await this.PageManager.List(this.Context.Site)).Where((page) => page.Id != viewModel.Page.Id);
 
 			viewModel.AvailableModules = await GetAvailableModules();

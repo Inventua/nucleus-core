@@ -19,7 +19,7 @@ namespace Nucleus.Abstractions.Models
 		/// <summary>
 		/// List of the page's children.
 		/// </summary>
-		public IEnumerable<PageMenu> Children { get; }
+		public IEnumerable<PageMenu> Children { get; private set; }
 
 		/// <summary>
 		/// Flag indicating whether the page represented by this PageMenu has child pages.
@@ -35,6 +35,17 @@ namespace Nucleus.Abstractions.Models
 		public PageMenu(Page page, IEnumerable<PageMenu> children, Boolean hasChildren)
 		{
 			this.Page = page;
+			this.Children = children;
+			this.HasChildren = hasChildren;
+		}
+
+		/// <summary>
+		/// Update the children of this instance.
+		/// </summary>
+		/// <param name="children"></param>
+		/// <param name="hasChildren"></param>
+		public void UpdateChildren(IEnumerable<PageMenu> children, Boolean hasChildren)
+		{
 			this.Children = children;
 			this.HasChildren = hasChildren;
 		}

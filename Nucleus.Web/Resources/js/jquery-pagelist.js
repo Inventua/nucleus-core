@@ -42,6 +42,17 @@
       control.find('.nucleus-page-list-selected, button').on('click', function (event)
       {
         jQuery(this).siblings('ul').addClass('show');
+
+        // Bring the selected page into view
+        window.setTimeout(function ()
+        {
+          var selectedPageItem = jQuery('.nucleus-page-list li.selected');
+          if (selectedPageItem.length !== 0)
+          {
+            selectedPageItem[0].scrollIntoView({ block: "nearest", inline: "nearest" });
+          }
+        }, 100);
+
         event.preventDefault();
       });
 

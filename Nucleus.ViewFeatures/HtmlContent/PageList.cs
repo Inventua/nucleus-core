@@ -26,7 +26,6 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			outputBuilder.AddCssClass("nucleus-page-list");
 				
 			IUrlHelper urlHelper = context.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(context);
-			//Context nucleusContext = context.HttpContext.RequestServices.GetService<Context>();
 			IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
 			
 			TagBuilder selectedIdBuilder = new("input");
@@ -43,7 +42,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 			TagBuilder listBuilder = new("ul");
 			listBuilder.AddCssClass("collapse");
-			AddChildren(urlHelper, listBuilder, pageMenu, selectedPageId, disabledPageId, noSelectionText, 1, 0, htmlAttributes);
+			AddChildren(urlHelper, listBuilder, pageMenu, selectedPageId, disabledPageId, noSelectionText, 0, htmlAttributes);
 			listBuilder.MergeAttributes(htmlAttributes);
 			outputBuilder.InnerHtml.AppendHtml(listBuilder);
 
@@ -57,9 +56,9 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			return outputBuilder;
 		}
 
-		private static void AddChildren(IUrlHelper urlHelper, TagBuilder control, PageMenu menu, Guid selectedPageId, Guid? disabledPageId, string noSelectionText, int maxLevels, int thisLevel, object htmlAttributes)
+		private static void AddChildren(IUrlHelper urlHelper, TagBuilder control, PageMenu menu, Guid selectedPageId, Guid? disabledPageId, string noSelectionText, int thisLevel, object htmlAttributes)
 		{
-			if (thisLevel == maxLevels) return;
+			//if (thisLevel == maxLevels) return;
 
 			if (thisLevel == 0)
 			{
@@ -117,7 +116,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				if (childItem.Children != null && childItem.Children.Any())
 				{
 					TagBuilder childList = new("ul");
-					AddChildren(urlHelper, childList, childItem, selectedPageId, disabledPageId, noSelectionText, maxLevels, thisLevel + 1, htmlAttributes);
+					AddChildren(urlHelper, childList, childItem, selectedPageId, disabledPageId, noSelectionText, thisLevel + 1, htmlAttributes);
 					itemBuilder.InnerHtml.AppendHtml(childList);
 				}
 			}

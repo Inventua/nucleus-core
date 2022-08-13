@@ -552,7 +552,7 @@ ul.nucleus-control-panel-items button
 .nucleus-page-list li.selected > a, .nucleus-page-list li.selected > a:hover, .nucleus-page-list li.selected > a:focus
 {
 	background-color: #197ba4;
-	color: white;
+	color: white!important;
 }
 
 .nucleus-index-items li .btn, .nucleus-page-list li .btn

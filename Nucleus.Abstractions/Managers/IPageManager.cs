@@ -140,6 +140,22 @@ namespace Nucleus.Abstractions.Managers
 		public Task<PageMenu> GetAdminMenu(Site site, Page parentPage, ClaimsPrincipal user, int levels);
 
 		/// <summary>
+		/// Retrieve a "tree" representation of site pages, ignoring permissions and the disabled and show in menu
+		/// flags.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="parentPage"></param>
+		/// <param name="user"></param>
+		/// <param name="selectedPageId"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// This function is intended for page selection controls in admin/control panel pages, where all pages 
+		/// must be available regardless of settings.
+		/// This overload reads page levels "down to" the specifed selectedPageId.
+		/// </remarks>
+		public Task<PageMenu> GetAdminMenu(Site site, Page parentPage, ClaimsPrincipal user, Guid? selectedPageId);
+
+		/// <summary>
 		/// Retrieve a "tree" representation of site pages, with control over whether to ignore permissions, disabled flag and the show in menu flag
 		/// flags.
 		/// </summary>

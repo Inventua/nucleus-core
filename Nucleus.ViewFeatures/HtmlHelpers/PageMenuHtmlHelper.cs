@@ -76,51 +76,72 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			return outputBuilder;
 		}
 
+		private static Boolean IsInTree(PageMenu menu, Guid selectedPageId)
+		{
+			if (menu.Children != null && menu.Children?.Any() == true)
+			{
+				foreach (PageMenu child in menu.Children)
+				{
+					if (child.Page.Id == selectedPageId)
+					{
+						return true;
+					}
+					else
+					{
+						if (IsInTree(child, selectedPageId)) return true;
+					}
+				}
+			}
+			
+			return false;			
+		}
+
 		private static void AddChildren(IUrlHelper urlHelper, TagBuilder control, PageMenu menu, Guid selectedPageId, int maxLevels, int thisLevel, object htmlAttributes)
 		{
+			if (thisLevel == maxLevels && !IsInTree(menu, selectedPageId)) return;
 
-			if (thisLevel == maxLevels) return;
-
-			foreach (PageMenu childItem in menu.Children)
+			if (menu.HasChildren && menu.Children?.Any() == true)
 			{
-				TagBuilder itemBuilder = new("li");
-				
-				if (childItem.Page.Id == selectedPageId)
+				foreach (PageMenu childItem in menu.Children)
 				{
-					itemBuilder.AddCssClass("selected");
-				}
-								
-				string caption = !String.IsNullOrWhiteSpace(childItem.Page.Title) ? childItem.Page.Title : childItem.Page.Name;
-				
-				TagBuilder linkBuilder = new("a");
-				// We append a "/" so that if the path contains dots the net core static file provider doesn't interpret the path as a file
-				//itemUrl = url.Replace("{id}", childItem.Page.Id.ToString());
-				//linkBuilder.Attributes.Add("href", itemUrl);
-				linkBuilder.Attributes.Add("tabindex", "0");
-				linkBuilder.Attributes.Add("data-id", childItem.Page.Id.ToString());
-				linkBuilder.Attributes.Add("data-linkurl", urlHelper.PageLink(childItem.Page));
-				linkBuilder.InnerHtml.SetContent(caption);
+					TagBuilder itemBuilder = new("li");
 
-				itemBuilder.InnerHtml.AppendHtml(linkBuilder);				
+					if (childItem.Page.Id == selectedPageId)
+					{
+						itemBuilder.AddCssClass("selected");
+					}
 
-				itemBuilder.MergeAttributes(htmlAttributes);
+					string caption = !String.IsNullOrWhiteSpace(childItem.Page.Title) ? childItem.Page.Title : childItem.Page.Name;
 
-				control.InnerHtml.AppendHtml(itemBuilder);
+					TagBuilder linkBuilder = new("a");
+					// We append a "/" so that if the path contains dots the net core static file provider doesn't interpret the path as a file
+					//itemUrl = url.Replace("{id}", childItem.Page.Id.ToString());
+					//linkBuilder.Attributes.Add("href", itemUrl);
+					linkBuilder.Attributes.Add("tabindex", "0");
+					linkBuilder.Attributes.Add("data-id", childItem.Page.Id.ToString());
+					linkBuilder.Attributes.Add("data-linkurl", urlHelper.PageLink(childItem.Page));
+					linkBuilder.InnerHtml.SetContent(caption);
 
-				if (childItem.HasChildren)
-				{
-					itemBuilder.InnerHtml.AppendHtml(RenderExpandButton(childItem.Page, true));
-				}
+					itemBuilder.InnerHtml.AppendHtml(linkBuilder);
 
-				if (childItem.Children != null && childItem.Children.Any())
-				{
-					TagBuilder childList = new("ul");
-					AddChildren(urlHelper, childList, childItem, selectedPageId, maxLevels, thisLevel + 1, htmlAttributes);
-					itemBuilder.InnerHtml.AppendHtml(childList);
+					itemBuilder.MergeAttributes(htmlAttributes);
+
+					control.InnerHtml.AppendHtml(itemBuilder);
+
+					if (childItem.HasChildren)
+					{
+						itemBuilder.InnerHtml.AppendHtml(RenderExpandButton(childItem.Page, true));
+					}
+
+					if (childItem.Children != null && childItem.Children?.Any()==true)
+					{
+						TagBuilder childList = new("ul");
+						AddChildren(urlHelper, childList, childItem, selectedPageId, maxLevels, thisLevel + 1, htmlAttributes);
+						itemBuilder.InnerHtml.AppendHtml(childList);
+					}
 				}
 			}
 		}
-
 
 		internal static TagBuilder RenderExpandButton(Page page, Boolean show)
 		{

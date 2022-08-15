@@ -46,6 +46,7 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> Save(ViewModels.Admin.SearchSettings viewModel)
 		{
+			ControllerContext.ModelState.Remove($"{nameof(ViewModels.Admin.SearchSettings.ApiKey)}.{nameof(ViewModels.Admin.SearchSettings.ApiKey.Id)}"); 
 			ControllerContext.ModelState.Remove($"{nameof(ViewModels.Admin.SearchSettings.ApiKey)}.{nameof(ViewModels.Admin.SearchSettings.ApiKey.Name)}");
 
 			if (!ControllerContext.ModelState.IsValid)
@@ -57,7 +58,7 @@ namespace Nucleus.Web.Controllers.Admin
 			{
 				// create a new Api Key
 				viewModel.ApiKey = await this.ApiKeyManager.CreateNew();
-				viewModel.ApiKey.Name = $"Search Feeder";
+				viewModel.ApiKey.Name = $"Search Feeder - {this.Context.Site.Name}";
 				viewModel.ApiKey.Scope = "role:Registered Users";
 				viewModel.ApiKey.Notes = "API Key used by the search feeder to request page content for indexing.";
 			}

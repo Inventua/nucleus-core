@@ -493,7 +493,7 @@ namespace Nucleus.Web.Controllers.Admin
 					this.Context.Site,
 					await this.PageManager.Get(id),
 					ControllerContext.HttpContext.User,
-					0
+					1
 				);
 
 			return View("PageMenu", viewModel);

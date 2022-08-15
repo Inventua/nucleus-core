@@ -235,6 +235,12 @@ namespace Nucleus.Web
 				{
 					app.UseForwardedHeaders();
 				}
+				
+				if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
+				{
+					app.Logger().LogInformation($"Using Response Compression.");
+					app.UseResponseCompression();
+				}
 
 				// Call .UseStaticFiles multiple times to add additional paths.  We expose specific folders only, rather than adding 
 				// env.ContentRootPath so that only defined folders can serve static resources.
@@ -290,13 +296,7 @@ namespace Nucleus.Web
 				app.UseMiddleware<Nucleus.Core.FileSystemProviders.FileIntegrityCheckerMiddleware>();
 				app.UseMiddleware<ModuleRoutingMiddleware>();
 				app.UseAuthorization();
-
-				if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
-				{
-					app.Logger().LogInformation($"Using Response Compression.");
-					app.UseResponseCompression();
-				}
-
+								
 				app.UseEndpoints(routes =>
 				{
 					// All routes that don't match a controller/action or other defined endpoint go to the index controller and are

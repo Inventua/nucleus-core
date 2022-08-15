@@ -1031,6 +1031,12 @@ namespace Nucleus.Core.DataProviders
 			this.Context.ChangeTracker.Clear();
 			if (userRoles != null)
 			{
+				// Make sure that the role.Users property for roles assigned to the user is null so that entity-framework doesn't start tracking
+				// them & generate an error 
+				foreach(Role role in userRoles)
+				{
+					role.Users = null;
+				}
 				user.Roles = userRoles;
 				await SaveUserRoles(user);
 			}

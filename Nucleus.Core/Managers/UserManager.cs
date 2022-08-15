@@ -200,7 +200,12 @@ namespace Nucleus.Core.Managers
 			// add auto roles
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{
-				result.Roles.AddRange((await provider.ListRoles(site)).Where(role => role != site.RegisteredUsersRole && role.Type.HasFlag(Role.RoleType.AutoAssign)));
+				foreach (Role autoRole in (await provider.ListRoles(site)).Where(role => role != site.RegisteredUsersRole && role.Type.HasFlag(Role.RoleType.AutoAssign)))
+				{
+					// remove user list from role being assigned to new user
+					autoRole.Users = null;
+					result.Roles.Add(autoRole);
+				}
 			}			
 
 			// add user profile properties for the site

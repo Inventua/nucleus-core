@@ -4,7 +4,7 @@
 	<version>1.0.0</version>
 	<publisher name="Inventua Pty Ltd" url="http://www.inventua.com" email="support@inventua.com" />
 	<description>
-		The Contact Us module displays a form to site users to contact you by email.
+		The Contact Us module displays a form which allows site users to contact you by email.
 	</description>
 	<compatibility minVersion="1.0.0.0" maxVersion="*" />
 	

@@ -981,7 +981,7 @@ function _Page()
 
 		var temp = jQuery("<textarea>");
 		jQuery("body").append(temp);
-		if (jQuery(element).is('input'))
+		if (jQuery(element).is('input, textarea'))
 		{
 			temp.val(jQuery(element).val()).select();
 		}

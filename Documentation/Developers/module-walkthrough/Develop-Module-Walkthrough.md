@@ -69,21 +69,21 @@ you have more than one model class that can benefit from data caching, add addit
 CacheExtension class.  [Cache Manager Documentation](/api-documentation/Nucleus.Abstractions.Managers.ICacheManager/#mnu-Nucleus-Abstractions-Managers-ICacheManager).
 
 ```
-      using System;
-      using Nucleus.Abstractions.Managers;
-      using Nucleus.Abstractions.Models.Cache;
-      using Nucleus.Modules.Documents.Models;
+using System;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models.Cache;
+using Nucleus.Modules.Documents.Models;
 
-      namespace Nucleus.Modules.Documents
-      {
-        public static class CacheExtensions
-        {
-          public static CacheCollection<Guid, Document> DocumentCache (this ICacheManager cacheManager)
-          {
-            return cacheManager.Get<Guid, Document>();
-          }
-        }
-      }
+namespace Nucleus.Modules.Documents
+{
+  public static class CacheExtensions
+  {
+    public static CacheCollection<Guid, Document> DocumentCache (this ICacheManager cacheManager)
+    {
+      return cacheManager.Get<Guid, Document>();
+    }
+  }
+}
 ```
 
 7.  Create your Manager class\
@@ -113,30 +113,30 @@ Nucleus automatically checks that the user has ==View Permission== for a module,
 10.  Create your Settings View\
 The settings view is displayed in the Nucleus administration user interface.  It will display the current settings and will contain a button to save updates to settings.  
 ```
-      @model Nucleus.Extensions.GoogleAnalytics.ViewModels.Settings
-      @addTagHelper "*, Nucleus.ViewFeatures"
-      @using Nucleus.ViewFeatures.HtmlHelpers
-      @using Nucleus.ViewFeatures
-      @using Nucleus.Abstractions.Models
-      @Html.AddStyle("~!/../settings.css")
-      <div class="nucleus-editor-panel">
-        <h2 class="nucleus-control-panel-heading">Google Analytics Settings</h2>
-        @using (Html.BeginNucleusForm("Settings", "GoogleAnalytics", FormMethod.Post, new { @enctype = "multipart/form-data" }))
-        {
-          <fieldset role="group" aria-labelledby="heading">
-            <h2 class="nucleus-control-panel-heading">Settings</h2>
-            <div class="nucleus-flex-fields">
-              <SettingsControl caption="Google Analytics ID" helptext="Enter the Google Analytics ID for your site.  You can disable Google Analytics by setting a blank value.">
-                @Html.TextBoxFor(model => model.GoogleAnalyticsId)
-              </SettingsControl>
-            </div>
-
-            <div class="Tools">
-              @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "GoogleAnalytics", "GoogleAnalytics"), new { })
-            </div>
-          </fieldset>
-        }
+@model Nucleus.Extensions.GoogleAnalytics.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<div class="nucleus-editor-panel">
+  <h2 class="nucleus-control-panel-heading">Google Analytics Settings</h2>
+  @using (Html.BeginNucleusForm("Settings", "GoogleAnalytics", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+  {
+    <fieldset role="group" aria-labelledby="heading">
+      <h2 class="nucleus-control-panel-heading">Settings</h2>
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="Google Analytics ID" helptext="Enter the Google Analytics ID for your site.  You can disable Google Analytics by setting a blank value.">
+          @Html.TextBoxFor(model => model.GoogleAnalyticsId)
+        </SettingsControl>
       </div>
+
+      <div class="Tools">
+        @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "GoogleAnalytics", "GoogleAnalytics"), new { })
+      </div>
+    </fieldset>
+  }
+</div>
 ```
 [Nucleus.ViewFeatures](/api-documentation/nucleus.viewfeatures.xml) includes Html Helpers, Tag Helpers and Url extensions to make it easier to develop extensions.  
 

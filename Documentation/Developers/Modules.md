@@ -1,6 +1,9 @@
 In Nucleus, modules add functionality to your site.  A module adds on-screen content, and is a type of [extension](/develop-extensions/). Modules 
 are made up of one or more .NET Core MVC Controllers, ViewModels and Razor Views and are typically developed using Visual Studio and C#.
 
+> The step by step guide on [Developing a Nucleus Module](/develop/walkthroughs/developing-a-nucleus-module/) walks you through the process 
+of developing a Nucleus module.
+
 ## Project Templates
 The easiest way to develop a module is to start with one of the Visual Studio templates provided by the Nucleus [Developer Tools](/downloads).  
 
@@ -25,9 +28,6 @@ a package which contains layouts and containers, a search provider or a file sys
 
 Includes project references to the Nucleus Nuget packages, a sample manifest file, project file entries which link to the Nucleus MSBuild script, and a ViewImports 
 file to import the Nucleus namespaces used by modules, but no template controllers, views, data providers or other classes.  
-
-
-
 
 
 

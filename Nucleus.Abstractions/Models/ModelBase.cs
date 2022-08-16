@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Nucleus.Abstractions.Models
 {
@@ -45,16 +43,8 @@ namespace Nucleus.Abstractions.Models
 		/// <returns></returns>
 		public T Copy<T>() where T : class
 		{
-			JsonSerializerOptions options = new JsonSerializerOptions() 
-			{ 
-				IncludeFields=true, 
-				IgnoreReadOnlyProperties=false,
-				IgnoreReadOnlyFields=false,
-				ReferenceHandler = ReferenceHandler.IgnoreCycles
-			};
-			
-			string thisObject = JsonSerializer.Serialize(this, this.GetType(), options);
-			return JsonSerializer.Deserialize<T>(thisObject);
+			string thisObject = Newtonsoft.Json.JsonConvert.SerializeObject(this);
+			return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(thisObject);
 		}
 
 		/// <summary>

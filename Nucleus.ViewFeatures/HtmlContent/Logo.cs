@@ -84,7 +84,6 @@ namespace Nucleus.ViewFeatures.HtmlContent
 					}
 
 					imageBuilder.Attributes.Add("alt", linkTitle);
-					imageBuilder.Attributes.Add("loading", "lazy");
 					imageBuilder.TagRenderMode = TagRenderMode.SelfClosing;
 
 					outputBuilder.InnerHtml.AppendHtml(imageBuilder);

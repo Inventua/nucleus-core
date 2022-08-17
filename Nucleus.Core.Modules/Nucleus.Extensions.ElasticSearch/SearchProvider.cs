@@ -129,6 +129,8 @@ namespace Nucleus.Extensions.ElasticSearch
 
 		private async Task<IEnumerable<ListItem>> ToCategories(IEnumerable<Guid> idList)
 		{
+			if (idList == null) return default;
+
 			List<ListItem> results = new();
 
 			foreach (Guid id in idList)

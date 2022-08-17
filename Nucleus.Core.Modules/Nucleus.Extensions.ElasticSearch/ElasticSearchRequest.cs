@@ -388,7 +388,16 @@ namespace Nucleus.Extensions.ElasticSearch
 			searchRequest = new SearchRequest<ElasticSearchDocument>(this.IndexName)
 			{
 				Query = BuildSearchQuery(query),
-				Source = new SourceFilter { Includes = "*", Excludes = new List<string>() { ParseField(nameof(ElasticSearchDocument.Attachment)), ParseField(nameof(ElasticSearchDocument.Roles)) }.ToArray() },
+				Source = new SourceFilter 
+				{ 
+					Includes = "*", 
+					Excludes = new List<string>() 
+					{ 
+						ParseField(nameof(ElasticSearchDocument.Content)), 
+						ParseField(nameof(ElasticSearchDocument.Attachment)),
+						ParseField(nameof(ElasticSearchDocument.Roles)) 
+					}.ToArray() 
+				},
 				Suggest = suggest,
 				Size = query.PagingSettings.PageSize,
 				From = query.PagingSettings.FirstRowIndex,
@@ -431,7 +440,6 @@ namespace Nucleus.Extensions.ElasticSearch
 		public ISearchResponse<ElasticSearchDocument> Search(SearchQuery query)
 		{
 			SearchRequest searchRequest;
-			//SourceFilter fieldFilter;
 
 			if (query.SearchTerm == string.Empty)
 				throw new ApplicationException("No search term");
@@ -439,7 +447,16 @@ namespace Nucleus.Extensions.ElasticSearch
 				searchRequest = new SearchRequest(this.IndexName)
 				{
 					Query = BuildSearchQuery(query),
-					Source = new SourceFilter { Includes = "*", Excludes = new List<string>() { ParseField(nameof(ElasticSearchDocument.Attachment)), ParseField(nameof(ElasticSearchDocument.Roles)) }.ToArray() },
+					Source = new SourceFilter
+					{
+						Includes = "*",
+						Excludes = new List<string>()
+						{
+							//ParseField(nameof(ElasticSearchDocument.Content)),
+							ParseField(nameof(ElasticSearchDocument.Attachment)),
+							ParseField(nameof(ElasticSearchDocument.Roles))
+						}.ToArray()
+					},
 					Size = query.PagingSettings.PageSize,
 					From = query.PagingSettings.FirstRowIndex,
 					Highlight = BuildHighlighter(),

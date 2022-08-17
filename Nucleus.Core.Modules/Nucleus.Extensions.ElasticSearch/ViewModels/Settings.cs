@@ -17,7 +17,13 @@ namespace Nucleus.Extensions.ElasticSearch.ViewModels
 		// This constructor is used by model binding
 		public Settings() { }
 
-		public Settings(Site site) : base(site) {}
+		public Settings(Site site) : base(site) 
+		{
+			if (String.IsNullOrEmpty(base.EncryptedPassword))
+			{
+				this.Password = "";
+			}
+		}
 
 		public string Password { get; set; } = DUMMY_PASSWORD;
 	}

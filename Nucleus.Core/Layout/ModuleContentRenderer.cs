@@ -71,14 +71,14 @@ namespace Nucleus.Core.Layout
 			// Render the module output if the module pane is the specified pane, and the user has permission to view it
 			foreach (PageModule moduleInfo in this.Context.Page.Modules)
 			{
-				if (moduleInfo.Pane.Equals(paneName, StringComparison.OrdinalIgnoreCase))
+				if (paneName == "*" || moduleInfo.Pane.Equals(paneName, StringComparison.OrdinalIgnoreCase))
 				{
 					// "permission denied" for viewing a module is not a failure, it just means we don't render the module
 					if (HasViewPermission(moduleInfo, this.Context.Site, htmlHelper.ViewContext.HttpContext.User))
 					{
 						try
 						{
-							IHtmlContent moduleBody = await RenderModuleView(htmlHelper, moduleInfo, true);
+							IHtmlContent moduleBody = await RenderModuleView(htmlHelper, moduleInfo, paneName != "*");
 							output.AppendHtml(moduleBody);
 						}
 						catch (System.InvalidOperationException e)

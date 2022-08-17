@@ -196,6 +196,9 @@ namespace Nucleus.XmlDocumentation
 				request.Sign(apiKey.Id, apiKey.Secret);
 			}
 
+			// Signal Nucleus to only render module content
+			request.Headers.Add("X-Nucleus-OverrideLayout", "ContentOnly");
+
 			System.Net.Http.HttpResponseMessage response = this.HttpClient.Send(request);
 
 			if (!response.IsSuccessStatusCode)

@@ -111,6 +111,10 @@ namespace Nucleus.Core.Search
 					request.Headers.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("Nucleus-Search-Feeder", this.GetType().Assembly.GetName().Version.ToString()));
 					request.Sign(apiKey.Id, apiKey.Secret);
 				}
+				
+				// Signal Nucleus to only render module content
+				request.Headers.Add("X-Nucleus-OverrideLayout", "ContentOnly");
+					
 				System.Net.Http.HttpResponseMessage response = this.HttpClient.Send(request);
 
 				if (!response.IsSuccessStatusCode)

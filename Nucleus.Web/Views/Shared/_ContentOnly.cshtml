@@ -1,0 +1,19 @@
+﻿@*This is the used when rendering content for a search feed.  It renders modules only, no banner/anything else  *@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />	
+	@if (!String.IsNullOrEmpty(Model.Context.Page.Description))
+	{
+		<meta name="DESCRIPTION" content="@Model.Context.Page.Description" />
+	}
+	<link rel="canonical" href="@Model.DefaultPageUri" />
+	<title>@Model.Context.Page.Title</title>	
+</head>
+<body>
+@await Html.RenderPaneAsync("*")
+	@{
+		IgnoreBody();
+	}
+</body>
+</html>

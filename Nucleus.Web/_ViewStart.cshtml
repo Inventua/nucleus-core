@@ -7,9 +7,19 @@
 *@
 @{
 	const string IS_RENDERING_PAGE = "nucleus:is-rendering-page";
+
 	if (this.Model is Nucleus.ViewFeatures.ViewModels.Layout)
 	{
-		Layout = "_Layout";
+		// Special case: Search indexing
+		if (Context.Request.Headers.ContainsKey("X-Nucleus-OverrideLayout") && Context.Request.Headers["X-Nucleus-OverrideLayout"] == "ContentOnly")
+		{		
+			Layout = "_ContentOnly";			
+		}
+		else
+		{
+			Layout = "_Layout";	
+		}
+		
 		@if (!Context.Items.ContainsKey(IS_RENDERING_PAGE))
 		{
 			Context.Items.Add(IS_RENDERING_PAGE, true);
@@ -22,4 +32,5 @@
 			Layout = "_Partial";
 		}
 	}
+	
 }

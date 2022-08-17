@@ -231,7 +231,7 @@ namespace Nucleus.Web.Controllers
 				{
 					Title = "Error",
 					Status = (int)System.Net.HttpStatusCode.InternalServerError,
-					Detail = ex.Message
+					Detail = ex.GetBaseException().Message
 				};
 			}
 		}

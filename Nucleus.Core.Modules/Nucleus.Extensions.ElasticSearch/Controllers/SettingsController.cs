@@ -38,6 +38,16 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 			}
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_SERVER_URL, viewModel.ServerUrl);
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_INDEX_NAME, viewModel.IndexName);
+
+			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_SERVER_USERNAME, viewModel.Username);
+
+			if (viewModel.Password != ViewModels.Settings.DUMMY_PASSWORD)
+			{
+				this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_SERVER_PASSWORD, ConfigSettings.EncryptPassword(this.Context.Site, viewModel.Password));
+			}
+
+			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_SERVER_CERTIFICATE_THUMBPRINT, viewModel.CertificateThumbprint);
+
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_ATTACHMENT_MAXSIZE, viewModel.AttachmentMaxSize);
 
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_TITLE, viewModel.Boost.Title);
@@ -60,18 +70,31 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 		[HttpPost]
 		public ActionResult GetIndexCount(ViewModels.Settings viewModel)
 		{
-			ElasticSearchRequest request = new(new System.Uri(viewModel.ServerUrl), viewModel.IndexName);
+			ElasticSearchRequest request = new(new System.Uri(viewModel.ServerUrl), viewModel.IndexName, viewModel.Username, GetPassword(viewModel), viewModel.CertificateThumbprint);
 
 			long indexCount = request.CountIndex();
 
 			return Json(new { Title = "Index Count", Message = $"There are {indexCount} entries in the index." });			
 		}
 
+		private string GetPassword(ViewModels.Settings viewModel)
+		{
+			if (viewModel.Password == ViewModels.Settings.DUMMY_PASSWORD)
+			{
+				ConfigSettings settings = new(this.Context.Site);
+				return ConfigSettings.DecryptPassword(this.Context.Site, settings.EncryptedPassword);
+			}
+			else
+			{
+				return viewModel.Password;
+			}
+		}
+
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpPost]
 		public ActionResult ClearIndex(ViewModels.Settings viewModel)
 		{
-			ElasticSearchRequest request = new(new System.Uri(viewModel.ServerUrl), viewModel.IndexName);
+			ElasticSearchRequest request = new(new System.Uri(viewModel.ServerUrl), viewModel.IndexName, viewModel.Username, GetPassword(viewModel), viewModel.CertificateThumbprint);
 
 			if (request.DeleteIndex())
 			{
@@ -87,7 +110,7 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 		[HttpPost]
 		public ActionResult GetIndexSettings(ViewModels.Settings viewModel)
 		{
-			ElasticSearchRequest request = new(new System.Uri(viewModel.ServerUrl), viewModel.IndexName);
+			ElasticSearchRequest request = new(new System.Uri(viewModel.ServerUrl), viewModel.IndexName, viewModel.Username, GetPassword(viewModel), viewModel.CertificateThumbprint);
 
 			Nest.GetIndexSettingsResponse response = request.GetIndexSettings();
 

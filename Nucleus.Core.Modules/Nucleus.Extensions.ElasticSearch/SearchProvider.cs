@@ -42,7 +42,7 @@ namespace Nucleus.Extensions.ElasticSearch
 				throw new InvalidOperationException($"The Elastic search index name is not set for site '{query.Site.Name}'.");
 			}
 
-			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName);
+			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(query.Site, settings.EncryptedPassword), settings.CertificateThumbprint);
 
 			if (query.Boost == null)
 			{
@@ -82,7 +82,7 @@ namespace Nucleus.Extensions.ElasticSearch
 				query.Boost = settings.Boost;
 			}
 
-			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName);
+			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(query.Site, settings.EncryptedPassword), settings.CertificateThumbprint);
 			Nest.ISearchResponse<ElasticSearchDocument> result = request.Suggest(query);
 
 			return new SearchResults()
@@ -141,6 +141,8 @@ namespace Nucleus.Extensions.ElasticSearch
 
 		private async Task<IEnumerable<Role>> ToRoles(IEnumerable<Guid> idList)
 		{
+			if (idList == null) return default;
+
 			List<Role> results = new();
 
 			foreach (Guid id in idList)

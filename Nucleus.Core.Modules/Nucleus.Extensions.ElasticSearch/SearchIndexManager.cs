@@ -36,7 +36,7 @@ namespace Nucleus.Extensions.ElasticSearch
 				throw new InvalidOperationException($"The Elastic search index name is not set for site '{metadata.Site.Name}', content not indexed.");
 			}
 
-			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName);
+			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(metadata.Site, settings.EncryptedPassword), settings.CertificateThumbprint);
 
 			ElasticSearchDocument document = new(metadata);
 			Nest.IndexResponse response = request.IndexContent(document);
@@ -49,7 +49,7 @@ namespace Nucleus.Extensions.ElasticSearch
 		{
 			ConfigSettings settings = new(metadata.Site);
 
-			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName);
+			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(metadata.Site, settings.EncryptedPassword), settings.CertificateThumbprint);
 
 			request.RemoveContent(new ElasticSearchDocument(metadata));
 		}

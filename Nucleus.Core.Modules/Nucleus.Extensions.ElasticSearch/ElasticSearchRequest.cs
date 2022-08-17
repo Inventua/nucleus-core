@@ -15,6 +15,11 @@ namespace Nucleus.Extensions.ElasticSearch
 		public Uri Uri { get; }
 		public string IndexName { get; }
 
+		private string Username { get; }
+		private string Password { get; }
+		private string CertificateThumbprint { get; }
+
+
 		private ElasticClient _client { get; set; }
 
 		public string DebugInformation { get; internal set; }
@@ -22,10 +27,13 @@ namespace Nucleus.Extensions.ElasticSearch
 		private const string NOATTACHMENT_PIPELINE = "no-attachment-pipeline";
 		private const string ATTACHMENT_PIPELINE = "attachment-pipeline";
 
-		public ElasticSearchRequest(Uri uri, string indexName)
+		public ElasticSearchRequest(Uri uri, string indexName, string username, string password, string certificateThumbprint)
 		{
 			this.Uri = uri;
 			this.IndexName = indexName.ToLower();  // elastic search indexes must be lower case
+			this.Username = username;
+			this.Password = password;
+			this.CertificateThumbprint = certificateThumbprint;
 		}
 
 		public ElasticClient Client
@@ -60,6 +68,17 @@ namespace Nucleus.Extensions.ElasticSearch
 			connectionSettings.DefaultIndex(this.IndexName.ToLower());    // index name must be lowercase
 			connectionSettings.DisableDirectStreaming(true);          // enables debug info
 			connectionSettings.RequestTimeout(new TimeSpan(0, 0, 30));
+			connectionSettings.EnableApiVersioningHeader();
+
+			if (!String.IsNullOrEmpty(this.Username))
+			{
+				connectionSettings.BasicAuthentication(this.Username, this.Password);
+			}
+
+			if (!String.IsNullOrEmpty(this.CertificateThumbprint))
+			{
+				connectionSettings.CertificateFingerprint(this.CertificateThumbprint);
+			}
 
 			ElasticClient client = new(connectionSettings);
 
@@ -366,10 +385,10 @@ namespace Nucleus.Extensions.ElasticSearch
 
 			suggest.Add("suggest-title", BuildSuggestBucket(query.SearchTerm, ParseField(nameof(ElasticSearchDocument.SuggesterTitle)), query.PagingSettings.PageSize));
 
-			searchRequest = new SearchRequest(this.IndexName)
+			searchRequest = new SearchRequest<ElasticSearchDocument>(this.IndexName)
 			{
 				Query = BuildSearchQuery(query),
-				Source = new SourceFilter { Includes = "*", Excludes = new List<string>() { nameof(ElasticSearchDocument.Attachment), nameof(ElasticSearchDocument.Roles) }.ToArray() },
+				Source = new SourceFilter { Includes = "*", Excludes = new List<string>() { ParseField(nameof(ElasticSearchDocument.Attachment)), ParseField(nameof(ElasticSearchDocument.Roles)) }.ToArray() },
 				Suggest = suggest,
 				Size = query.PagingSettings.PageSize,
 				From = query.PagingSettings.FirstRowIndex,
@@ -420,7 +439,7 @@ namespace Nucleus.Extensions.ElasticSearch
 				searchRequest = new SearchRequest(this.IndexName)
 				{
 					Query = BuildSearchQuery(query),
-					Source = new SourceFilter { Includes = "*", Excludes = new List<string>() { nameof(ElasticSearchDocument.Attachment), nameof(ElasticSearchDocument.Roles) }.ToArray() },
+					Source = new SourceFilter { Includes = "*", Excludes = new List<string>() { ParseField(nameof(ElasticSearchDocument.Attachment)), ParseField(nameof(ElasticSearchDocument.Roles)) }.ToArray() },
 					Size = query.PagingSettings.PageSize,
 					From = query.PagingSettings.FirstRowIndex,
 					Highlight = BuildHighlighter(),

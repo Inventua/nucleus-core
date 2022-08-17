@@ -12,10 +12,13 @@ namespace Nucleus.Extensions.ElasticSearch.ViewModels
 {
 	public class Settings : ConfigSettings
 	{
+		public const string DUMMY_PASSWORD = "!@#NOT_CHANGED^&*";
+
 		// This constructor is used by model binding
 		public Settings() { }
 
 		public Settings(Site site) : base(site) {}
 
+		public string Password { get; set; } = DUMMY_PASSWORD;
 	}
 }

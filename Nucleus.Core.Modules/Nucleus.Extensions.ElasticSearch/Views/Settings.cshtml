@@ -12,14 +12,28 @@
 		<SettingsControl caption="Elastic Search Server Url" helptext="Enter the URL for your Elastic Search server, including the port.">
 			@Html.TextBoxFor(model => model.ServerUrl)
 		</SettingsControl>
+		
+		<SettingsControl caption="Index Name" helptext="Enter the index name to use for this site.">
+			@Html.TextBoxFor(model => model.IndexName)
+		</SettingsControl>
+
 		<div class="nucleus-flex-fields">
-			<SettingsControl caption="Index Name" helptext="Enter the index name to use for this site.">
-				@Html.TextBoxFor(model => model.IndexName)
+			<SettingsControl caption="User name" helptext="Enter the Elastic search user name.  If security is not configured on your Elastic search server, leave this value blank.">
+				@Html.TextBoxFor(model => model.Username)
 			</SettingsControl>
-			<SettingsControl caption="Attachments Size Limit (mb)" helptext="Enter maximum file size to submit to the Elastic search server for indexing. A value of zero specifies no limit.">
-				@Html.TextBoxFor(model => model.AttachmentMaxSize, new { @type = "number" })
+
+			<SettingsControl caption="Password" helptext="Enter the Elastic search password.  If security is not configured on your Elastic search server, leave this value blank.">
+				@Html.PasswordFor(model => model.Password, new { @value = Model.Password })
 			</SettingsControl>
 		</div>
+
+		<SettingsControl caption="Certificate Thumbprint" helptext="Enter the Elastic search certificate thumbprint.  If SSL is not configured on your Elastic search server, leave this value blank.  You can get this value from your Elastic Search console by entering the command openssl x509 -fingerprint -sha256 -in config/certs/http_ca.crt">
+			@Html.TextAreaFor(model => model.CertificateThumbprint)
+		</SettingsControl>
+
+		<SettingsControl caption="Attachments Size Limit (mb)" helptext="Enter maximum file size to submit to the Elastic search server for indexing. A value of zero specifies no limit.">
+			@Html.TextBoxFor(model => model.AttachmentMaxSize, new { @type = "number" })
+		</SettingsControl>
 
 		<h3>Boost</h3>
 		<div class="w-75">

@@ -12,6 +12,12 @@ namespace Nucleus.Extensions.ElasticSearch
 	{
 		internal const string SITESETTING_SERVER_URL = "elasticsearch:server-url";
 		internal const string SITESETTING_INDEX_NAME = "elasticsearch:indexname";
+
+		internal const string SITESETTING_SERVER_USERNAME = "elasticsearch:server-username";
+		internal const string SITESETTING_SERVER_PASSWORD = "elasticsearch:server-password";
+
+		internal const string SITESETTING_SERVER_CERTIFICATE_THUMBPRINT = "elasticsearch:server-certificate-thumbprint";
+
 		internal const string SITESETTING_ATTACHMENT_MAXSIZE = "elasticsearch:attachment-maxsize";
 
 		internal const string SITESETTING_BOOST_TITLE = "elasticsearch:boost-title";
@@ -30,6 +36,12 @@ namespace Nucleus.Extensions.ElasticSearch
 		public string IndexName { get; set; }
 		public int AttachmentMaxSize { get; set; }
 
+		public string Username { get; set; }
+		public string EncryptedPassword { get; set; }
+
+		public string CertificateThumbprint { get; set; }
+
+
 		public Nucleus.Abstractions.Search.SearchQuery.BoostSettings Boost { get; set; } = new();
 
 		// This constructor is used by model binding
@@ -45,6 +57,21 @@ namespace Nucleus.Extensions.ElasticSearch
 			if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_INDEX_NAME, out string indexName))
 			{
 				this.IndexName = indexName;
+			}
+
+			if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_SERVER_USERNAME, out string userName))
+			{
+				this.Username = userName;
+			}
+
+			if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_SERVER_PASSWORD, out string password))
+			{
+				this.EncryptedPassword = password;
+			}
+
+			if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_SERVER_CERTIFICATE_THUMBPRINT, out string certThumbprint))
+			{
+				this.CertificateThumbprint = certThumbprint;
 			}
 
 			if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_ATTACHMENT_MAXSIZE, out string maxSize))
@@ -79,6 +106,83 @@ namespace Nucleus.Extensions.ElasticSearch
 			}
 			return defaultValue;
 		}
+
+		public static string EncryptPassword(Site site, string password)
+		{
+			if (String.IsNullOrEmpty(password))
+			{
+				return null;
+			}
+
+			// Convert string to byte array
+			byte[] bytesIn = System.Text.Encoding.UTF8.GetBytes(password);
+
+			// Preparing the memory stream for encrypted string.
+			System.IO.MemoryStream msOut = new();
+
+			// Create the ICryptoTransform instance.
+			System.Security.Cryptography.Aes aes = System.Security.Cryptography.Aes.Create();
+			aes.Key = site.Id.ToByteArray();
+			aes.IV = site.Id.ToByteArray();
+
+			// Create the CryptoStream instance.
+			System.Security.Cryptography.CryptoStream cryptStreem = new(msOut, aes.CreateEncryptor(aes.Key, aes.IV), System.Security.Cryptography.CryptoStreamMode.Write);
+
+			// Encoding.
+			cryptStreem.Write(bytesIn, 0, bytesIn.Length);
+			cryptStreem.FlushFinalBlock();
+
+			// Get the encrypted byte array.
+			byte[] bytesOut = msOut.ToArray();
+
+			cryptStreem.Close();
+			msOut.Close();
+
+			// Convert to string and return result value
+			return System.Convert.ToBase64String(bytesOut);
+		}
+
+		/// <summary>
+		/// Encrypt and encode a password and return the result.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="password"></param>
+		/// <returns></returns>
+		public static string DecryptPassword(Site site, string password)
+		{
+			if (String.IsNullOrEmpty(password))
+			{
+				return null;
+			}
+
+			// Convert string to byte array
+			byte[] bytesIn = System.Convert.FromBase64String(password);
+
+			// Preparing the memory stream for encrypted string.
+			System.IO.MemoryStream msOut = new();
+
+			// Create the ICryptoTransform instance.
+			System.Security.Cryptography.Aes aes = System.Security.Cryptography.Aes.Create();
+			aes.Key = site.Id.ToByteArray();
+			aes.IV = site.Id.ToByteArray();
+
+			// Create the CryptoStream instance.
+			System.Security.Cryptography.CryptoStream cryptStreem = new(msOut, aes.CreateDecryptor(aes.Key, aes.IV), System.Security.Cryptography.CryptoStreamMode.Write);
+
+			// Encoding.
+			cryptStreem.Write(bytesIn, 0, bytesIn.Length);
+			cryptStreem.FlushFinalBlock();
+
+			// Get the encrypted byte array.
+			byte[] bytesOut = msOut.ToArray();
+
+			cryptStreem.Close();
+			msOut.Close();
+
+			// Convert to string and return result value
+			return System.Text.Encoding.UTF8.GetString(bytesOut);
+		}
+
 	}
 }
 

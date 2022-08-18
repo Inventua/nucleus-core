@@ -681,7 +681,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public async Task<IList<Reply>> ListForumPostReplies(Post post, FlagStates approved)
 		{
 			return await this.Context.Replies
-				.Where(reply => reply.Post.Id == post.Id && (approved == FlagStates.IsAny || (post.IsApproved == (approved == FlagStates.IsTrue))))
+				.Where(reply => reply.Post.Id == post.Id && (approved == FlagStates.IsAny || (reply.IsApproved == (approved == FlagStates.IsTrue))))
 				.Include(reply => reply.Attachments)
 					.ThenInclude(attachment => attachment.File)
 				.Include(reply => reply.Post)
@@ -695,7 +695,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public async Task<IList<Reply>> ListForumPostReplies(Post post, ClaimsPrincipal user, FlagStates approved)
 		{
 			return await this.Context.Replies
-				.Where(reply => reply.Post.Id == post.Id && (reply.AddedBy == user.GetUserId() || (approved == FlagStates.IsAny || (post.IsApproved == (approved == FlagStates.IsTrue)))))
+				.Where(reply => reply.Post.Id == post.Id && (reply.AddedBy == user.GetUserId() || (approved == FlagStates.IsAny || (reply.IsApproved == (approved == FlagStates.IsTrue)))))
 				.Include(reply => reply.Attachments)
 					.ThenInclude(attachment => attachment.File)
 				.Include(reply => reply.Post)

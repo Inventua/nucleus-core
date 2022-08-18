@@ -34,7 +34,7 @@
 							@Model.Articles[articleCount].Title
 						</td>
 
-						<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("Edit", "Admin", "Publish")?id=@Model.Articles[articleCount].Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-secondary" data-target="#ArticleEditor" title="Edit" /></td>
+						<td class="nucleus-small-cell"><a href="@Url.NucleusAction("Edit", "Admin", "Publish")?id=@Model.Articles[articleCount].Id" class="nucleus-material-icon btn btn-secondary" data-target="#ArticleEditor" title="Edit">&#xe3c9;</a></td>
 						<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("DeleteArticle", "Admin", "Publish")?id=@Model.Articles[articleCount].Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-confirm="Delete this article?" /></td>
 					</tr>
 				}

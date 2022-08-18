@@ -2,6 +2,7 @@
 To manage search settings, click "Manage", then choose "Search Settings".
 
 ## Properties
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Api Key                          | Specifies the Api key to use when retrieving page content during indexing.  Pages will be rendered using the permissions which have been assigned to the Api key.  |

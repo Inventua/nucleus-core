@@ -19,4 +19,5 @@ The database tab displays your configured database connection information, along
 server version and database size.  User ID and password values are replaced with '*' characters.
 
 ## Logs
-If you have configured the text file logger, you can select from a drop-down list of log files for the current web server.  
+If you have configured the text file logger, you view logs for the current web server by selecting a log from the drop-down list in the 
+==Logs== tab.  

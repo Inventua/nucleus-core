@@ -12,6 +12,8 @@ To change settings for the module, click the `Settings` tab.
 ![Settings](links-settings.png)
 
 ## Settings
+
+{.table-25-75}
 |                   |                                                                                      |
 |-------------------|--------------------------------------------------------------------------------------|
 | Categories List   | Specifies the list that is used by this module for categories.  If specified, users can assign a category from the list to each link.  Lists are managed in the `Lists` editor in the `Manage` control panel. |

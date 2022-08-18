@@ -10,6 +10,8 @@ search for pages by typing part of the page name, title, description or keywords
 automatically while you type.
 
 ## Basic Properties
+
+{.table-25-75}
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | Page Name        | The page name is displayed in control panel menus, in menus and by the site map.  |
@@ -19,11 +21,15 @@ automatically while you type.
 | Page Disabled    | Specifies whether the page is available.  Disabled pages are not displayed in menus, and navigating to a disabled page will generate a '404: Not found' response. |
 
 ## Meta Data/SEO
+
+{.table-25-75}
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | Keywords         | Enter page keywords separated by commas.  Keywords may be used by a built-in search indexing service.  They are not used by search engines like Google, and are not rendered within the page meta-data. |
 
-## Layout       
+## Layout
+
+{.table-25-75}
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | Layout           | Select a page layout for this page, or select '(default)' to use the default layout for this site. |
@@ -34,6 +40,7 @@ automatically while you type.
 ## Paths
 Page paths are the Url for your page.  Each page must have at least one path in order to be accessible by users.  
 
+{.table-25-75}
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | Path             | The url path for the page.  Paths start with a `/` character, which is automatically added if it is missing. |
@@ -54,6 +61,8 @@ The modules tab is not available for new tabs until you save.  Use the modules t
 pane, and delete it if it is no longer required.
 
 ### Module Settings
+
+{.table-25-75}
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | Module Type      | You can choose any of the installed modules to add.  After a module has been added, you can't change its type. |
@@ -62,7 +71,7 @@ pane, and delete it if it is no longer required.
 | Container        | Specifies the container for the module, or select '(default)' to use the default layout for this page.   |
 | Style Classes    | Use style classes to add a CSS class to the wrapper for the module.  Most of the time, containers should be used to apply different visual styles, but you can use style classes to apply bootstrap CSS styles, or styles which may be available from your layout or container. |
 
-> **_TIP:_**  It's a good idea to specify a title, so that you know what the module is fore, even if you don't want it shown on-screen.  Choose (or create) a container that doesn't 
+> **_TIP:_**  It's a good idea to specify a title, so that you know what the module is for, even if you don't want it shown on-screen.  Choose (or create) a container that doesn't 
 display the title if you don't want to display it.
 
 ## Module Permissions

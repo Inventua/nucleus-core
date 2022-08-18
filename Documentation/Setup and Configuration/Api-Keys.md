@@ -8,6 +8,8 @@ Nucleus endpoints.  The search feeder uses an Api Key to authenticate when retri
 can use Api Keys to authenticate applications which use their functionality.
 
 ## Properties
+
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | ID                               | The Api Key ID is the "access key" |
@@ -18,6 +20,8 @@ can use Api Keys to authenticate applications which use their functionality.
 | Enabled                          | Specifies whether the Api Key is enabled.  |
 
 ### Making a request using an Api Key
-Applications which make Http requests to Nucleus must specify an Authorization header, with a "scheme" of `Nucleus-HMAC256` and a value which is generated using 
-values from the request and the shared secret.  The `Nucleus.Extensions.HttpRequestExtensions` contains a `.Sign` method which will add the header to a Http Request 
-object.  Applications which do not want to reference the `Nucleus.Extensions` assembly can copy the [source code](https://github.com/Inventua/nucleus-core/blob/main/Nucleus.Extensions/HttpRequestExtensions.cs) into their project.
+Applications which make Http requests to Nucleus must specify an Authorization header, with a "scheme" of `Nucleus-HMAC256` and a value which 
+is generated using values from the request and the shared secret.  The [Nucleus.Extensions.HttpRequestExtensions](/api-documentation/Nucleus.Extensions.xml/Nucleus.Extensions.HttpRequestExtensions/) 
+class contains a `.Sign` method which will add the header to a Http Request object.  Applications which do not want to reference the 
+Nucleus.Extensions assembly can copy the [source code](https://github.com/Inventua/nucleus-core/blob/main/Nucleus.Extensions/HttpRequestExtensions.cs) 
+into their project.

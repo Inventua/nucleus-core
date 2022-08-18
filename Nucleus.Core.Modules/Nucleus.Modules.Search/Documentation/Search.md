@@ -18,6 +18,8 @@ You can control the presentation of the full results display in the module setti
 ![Settings](Search-Settings.png)
 
 ## Settings
+
+{.table-25-75}
 |                     |                                                                                      |
 |---------------------|--------------------------------------------------------------------------------------|
 | Display Mode                   | Specifies how the search module is displayed. Available settings are Full, Compact and Minimal.  |

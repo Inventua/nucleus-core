@@ -18,6 +18,7 @@ manage your site's Google Analytics ID.
 ```
 
 #### Control Panel Extension Definition Values
+{.table-25-75}
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | id               | Unique id (guid) for your control panel extension. |
@@ -32,6 +33,8 @@ manage your site's Google Analytics ID.
 set the control panel or dialog heading to the value of your header element and will remove the original header element.  This is recommended, 
 as it increases the vertical space available for your settings view contents.
 
-> Control Panel Extensions with a `Site` scope can save simple site-related settings using `Nucleus.Abstractions.Models.Context.Site.SiteSettings` - get a reference to 
-the current `Nucleus.Abstractions.Models.Context` by including it as a parameter in your controller constructor . Control Panel Extensions with a `Global` scope would need to 
-implement a data provider to save settings to extension-specific database tables (control panel extensions with a `Site` scope can do this too, if required).  
+> Control Panel Extensions with a `Site` scope can save simple site-related settings using [Context.Site.SiteSettings](/api-documentation/Nucleus.Extensions.xml/Nucleus.Extensions.SiteSettingsExtensions/) - get 
+a reference to the current [Context](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.Models.Context/) by including 
+it as a parameter in your controller constructor. Control Panel Extensions with a ==Global== scope need to implement their own data provider 
+to save settings to extension-specific database tables, because global settings don't belong to a specific site (control panel extensions 
+with a ==Site== scope can do this too, if required).  

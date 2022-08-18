@@ -5,6 +5,8 @@ page where it provides a summary of child pages with links.
 ![Settings](sitemap-settings.png)
 
 ## Settings
+
+{.table-25-75}
 |                     |                                                                                      |
 |---------------------|--------------------------------------------------------------------------------------|
 | Levels              | Specifies how many levels of descendant pages to display.  Set to 0 to show all levels.  |
@@ -13,6 +15,8 @@ page where it provides a summary of child pages with links.
 | Show Description    | Specifies whether to display the page description. |
 
 ### Root Page Types
+
+{.table-25-75}
 |                     |                                                                                      |
 |---------------------|--------------------------------------------------------------------------------------|
 | Site Root           | Start from the root of the site (pages with no parent set).  |

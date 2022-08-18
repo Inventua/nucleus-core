@@ -2,6 +2,8 @@
 Use the publish module to publish news, blogs and other content.
 
 ## Settings
+
+{.table-25-75}
 |                     |                                                                                      |
 |---------------------|--------------------------------------------------------------------------------------|
 | Categories List     | Specifies the list that is used by this module for categories.  If specified, users can assign a category from the list to articles. Lists are managed in the `Lists` editor in the `Manage` control panel.  |
@@ -10,6 +12,8 @@ Use the publish module to publish news, blogs and other content.
 To create a new article, click `Add Article`.  To edit an existing article, click the edit icon to the right of the article title.  
 
 ## Basic Properties
+
+{.table-25-75}
 |                     |                                                                                      |
 |---------------------|--------------------------------------------------------------------------------------|
 | Title               | The article title, shown on screen.  A simplified version of the article title is also used in the Url for the article.  |

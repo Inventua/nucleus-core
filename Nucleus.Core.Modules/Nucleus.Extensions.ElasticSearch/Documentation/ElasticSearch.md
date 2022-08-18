@@ -13,6 +13,8 @@ The Elastic Search extension settings are accessed in the `Manage` control panel
 ![Elastic Search Settings](elasticsearch.png)
 
 ## Settings
+
+{.table-25-75}
 |                           |                                                                                      |
 |---------------------------|--------------------------------------------------------------------------------------|
 | Elastic Search Server Url | Enter the domain name or address of the Elastic Search server, including the scheme (http: or https:) and port.  The default port is 9200.  For example, https://192.168.1.100:9200. |

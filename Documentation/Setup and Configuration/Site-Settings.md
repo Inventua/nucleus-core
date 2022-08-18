@@ -12,6 +12,7 @@ share users between sites, but this functionality has not yet been implemented.
 ![Site Settings](Site-Settings-Editor.png)
 
 ## Properties
+{.table-25-75}
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | Name             | A name for your site.  This is used in the control panel, and could be displayed on-screen, depending on your selected layout.  |
@@ -35,6 +36,7 @@ alias is used as the default.
 User properties are not fixed - you can add and remove them so that user registrations contain the information that you need.  User profile properties define which properties are included 
 in a user registration.
 
+{.table-25-75}
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | Name             | The property name.  This is displayed on-screen as the caption for user input.  |
@@ -51,6 +53,7 @@ authentication and other functions may require an email address, mobile phone nu
 ## Site Pages
 User management and other special-use pages are configurable.
 
+{.table-25-75}
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | Login Page       | A page containing a login module.  This page is used when the user clicks a logon button, or is redirected after trying to access a secure page.  |
@@ -65,6 +68,7 @@ User management and other special-use pages are configurable.
 ## Email Settings
 Email settings used to send messages to users.
 
+{.table-25-75}
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | SMTP host        | Your email server address.  |
@@ -77,6 +81,7 @@ Email settings used to send messages to users.
 ## Email Templates
 Use the email templates tab to assign email templates to specific site functions.  Email templates are created and managed by clicking "Manage" and then "Mail Templates".  
 
+{.table-25-75}
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | Welcome new user      | Email template used to generate a welcome email when a new user account is created.  |

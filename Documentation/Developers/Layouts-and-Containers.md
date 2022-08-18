@@ -22,6 +22,7 @@ Also note the use of the Bootstrap classes `navbar ms-auto flex-row justify-cont
 Most Nucleus view feature extensions that are indended for use in layouts are provided as both Tag Helpers and Html Helpers, so you can use whichever you 
 prefer.
 
+{.file-name}
 `your-layout.cshtml`
 ```
 @addTagHelper "*, Nucleus.ViewFeatures"
@@ -86,6 +87,7 @@ prefer.
 </div>
 ```
 
+{.file-name}
 `your-layout.css`
 ```
 .LayoutWrapper { display: flex;  flex-direction: column;  height: 100%; }
@@ -99,7 +101,6 @@ prefer.
 .ContentPane > div { display: flex; flex-direction: column; }
 .BottomPane { display: flex; flex-direction: column; background-color: #535353;  padding: 0.5rem; }
 .BottomPane * { color: white; }
-}
 ```
 
 > **_Note:_**  A Nucleus layout is a Razor view which renders partial HTML - it does not contain `<html>` or `<body>` tags.  Nucleus renders a full HTML 
@@ -114,23 +115,30 @@ path for your extension.
 Containers control the visual presentation of specific modules that they are assigned to.  Containers are "wrapped" around a module in a layout pane.
 
 #### Sample Container
-The simplest form of a container is one which simply renders `@Model.Content`, but your container may add other Html, as well as CSS styles to control prenentation.  You can also access 
-the properties of the container **Model**, which is of type `Nucleus.Abstractions.Layout.ContainerContext` to access the `Site`, `Page` and `Module` properties.  The example below uses 
-the `Model.Module.Title` property to draw the module's title.
+The simplest form of a container is one which simply renders `@Model.Content`, but your container will generally include other Html elements, as 
+well as CSS styles to control prenentation.  You can also access the properties of the container **Model**, which is of type 
+[Nucleus.Abstractions.Layout.ContainerContext](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.Layout.ContainerContext/) to 
+access the [Site](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.Models.Site/), 
+[Page](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.Models.Page/) and 
+[Module](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.Models.PageModule/) properties.  The example below uses 
+the [`Model.Module.Title`](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.Models.PageModule/#Title) property to output the 
+module's title as a heading.
 
+{.file-name}
 `your-container.cshtml`
 ```
 @model Nucleus.Abstractions.Layout.ContainerContext
 @Html.AddStyle("~!/your-container.css")
 <div class="layout-yourcontainer">
-	@if (!String.IsNullOrEmpty(Model.Module.Title))
-	{
-		<h2>@Model.Module.Title</h2>
-	}
-	@Model.Content
+  @if (!String.IsNullOrEmpty(Model.Module.Title))
+  {
+    <h2>@Model.Module.Title</h2>
+  }
+  @Model.Content
 </div>
 ```
 
+{.file-name}
 `your-container.css`
 ```
 .container-default { padding: 4px; display: flex; flex-direction: column; overflow: auto; }

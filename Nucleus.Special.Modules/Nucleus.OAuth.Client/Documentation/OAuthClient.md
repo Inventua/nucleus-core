@@ -12,6 +12,8 @@ The OAuth client extension settings are accessed in the `Manage` control panel. 
 ![OAuth Client Settings](OAuthClientSettings.png)
 
 ## Settings
+
+{.table-25-75}
 |                           |                                                                                      |
 |---------------------------|--------------------------------------------------------------------------------------|
 | User Matching             | |
@@ -35,6 +37,8 @@ The `OAuth Providers List` module displays a clickable list of available OAuth p
 pages.
 
 ### Settings
+
+{.table-25-75}
 |                           |                                                                                      |
 |---------------------------|--------------------------------------------------------------------------------------|
 | Layout                                 | Available OAuth providers can be displayed in a list with clickable links, or in a drop-down with a Login button. |
@@ -93,6 +97,8 @@ OAuth provider entry which does not have a name.
 > The Nucleus OAuth Server example above uses the generic `OAuth` provider, which can also be used to use other OAuth services.
 
 ### Configuration Settings
+
+{.table-25-75}
 |                         |                                                                                      |
 |-------------------------|--------------------------------------------------------------------------------------|
 | Type                    | (required). Specifies the provider type.  Must be Google, Facebook, Twitter, Microsoft, OAuth or OpenIdConnect. |

@@ -8,6 +8,8 @@ To change settings for the module, click the `Settings` tab.
 ![Settings](ContactUs-settings.png)
 
 ## Settings
+
+{.table-25-75}
 |                      |                                                                                      |
 |----------------------|--------------------------------------------------------------------------------------|
 | Send To Recipients   | Specifies the email recipients of the message.  You can specify multiple recipients by using commas to separate them.

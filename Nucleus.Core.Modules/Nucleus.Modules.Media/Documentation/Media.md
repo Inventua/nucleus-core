@@ -4,6 +4,8 @@ The media module presents multimedia content on a page.  It can be used to show 
 ![Settings](Media.png)
 
 ## Settings
+
+{.table-25-75}
 |                   |                                                                                      |
 |-------------------|--------------------------------------------------------------------------------------|
 | File              | Select the video, image, PDF or other file that you want to display.  |

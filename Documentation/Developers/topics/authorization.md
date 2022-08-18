@@ -9,6 +9,7 @@ attribute:
 ```
 
 ### Policies
+{.table-25-75}
 |                      |                                                                                      |
 |----------------------|--------------------------------------------------------------------------------------|
 | SYSTEM_ADMIN_POLICY  | Restricts access to system administrators. |

@@ -10,6 +10,8 @@ The Google Analytics extension settings are accessed in the `Manage` control pan
 ![Google Analytics Settings](GoogleAnalytics.png)
 
 ## Settings
+
+{.table-25-75}
 |                     |                                                                                      |
 |---------------------|--------------------------------------------------------------------------------------|
 | Google Analytics ID | Enter your Google Analytics measurement ID.  If you want to temporarily disable Google Analytics reporting, set this entry to blank.  |

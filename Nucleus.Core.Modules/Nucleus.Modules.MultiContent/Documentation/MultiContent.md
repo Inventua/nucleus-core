@@ -12,6 +12,8 @@ Use the settings tab to control content presentation.
 ![Settings](MultiContent-Settings.png)
 
 ## Settings
+
+{.table-25-75}
 |                   |                                                                                      |
 |-------------------|--------------------------------------------------------------------------------------|
 | Layout            | `Accordion`, `Alert`, `Carousel`, `Pills` or `Tabs`.  Each layout has its own set of options. |

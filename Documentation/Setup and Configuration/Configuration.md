@@ -29,10 +29,11 @@ You can organize your application settings any way you want to, the sections bel
 ## hosting.json
 Use the `hosting.json` file to configure the Urls that Nucleus listens on.  The urls setting is a standard .NET core setting.
 
-```
+```json
 {
   "urls": "http://0.0.0.0:5000",
-  "iisSettings": {
+  "iisSettings": 
+  {
     "windowsAuthentication": false,
     "anonymousAuthentication": true
   }
@@ -51,9 +52,8 @@ file is configured with settings which should suit most users.
 ## databaseSettings.json
 The `databaseSettings.json` file contains database connection information and schema-to-database-connection mappings.
 
-```
+```json
 {
-  "$schema": "./nucleus.schema.json",
   "Nucleus": {
     "Database": {
       "Connections": [
@@ -92,9 +92,7 @@ The `databaseSettings.json` file contains database connection information and sc
 }
 ```
 
-# IIS Configuration
-
-## web.config
+## IIS Configuration - web.config
 If you are hosting Nucleus in Internet Information Services, you need to configure the ASP.NET core module.  IIS Configuration settings are stored in `web.config`.
 More information is available on the Microsoft web site - [ASP.NET Core Module](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/aspnet-core-module).
 

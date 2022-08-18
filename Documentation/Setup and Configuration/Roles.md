@@ -5,6 +5,8 @@ control panel, then click `Roles`.
 ![Roles](Roles.png)
 
 ## Properties
+
+{.table-25-75}
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | Name             | The name of your role.  This is displayed anywhere that administrators need to select roles. |

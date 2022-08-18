@@ -33,11 +33,12 @@ upload your files there.
 with an extension that is not in the "allowed" list.  File contents are validated against a list of known "signatures", 
 so your file content must match its extension.  If you use external file management tools to copy a file with a restricted 
 file extension to your file system, Nucleus will not display the file.  If you need to support file types that aren't in the default
-approved list, your system administrator can modify the Nucleus configuration files which control which file types are allowed.  
+approved list, your system administrator can modify the Nucleus [configuration files](/configuration-files/) which control which file 
+types are allowed.  
 
 > The default allowed file extensions are web documents (css, htm, html), 
 images (ico, jpg and jpeg, gif, png, bmp, webp, tif and tiff), Microsoft Office documents (doc, docx, pptx, ppt, xls, xlsx, vsd),
-video and audio (mp4, mpg, mpeg, webm, mkv, mka), generic documents (txt, md, rtf, xml, xps) and zip files.
+video and audio (mp4, mpg, mpeg, webm, mkv, mka), common document formats (rtf, xps, pdf), plain-text (txt, md, xml) and zip files.
 
 ## Rename a file or folder
 Some file systems do not support rename operations (most cloud file systems).  If your file system provider supports it, use the 

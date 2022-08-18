@@ -4,6 +4,8 @@ To manage mail templates, after logging in as a system administrator or site adm
 ![Mail Templates](Mail-Templates.png)
 
 ## Properties
+
+{.table-25-75}
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | Name             | A name for your template.  This is for your reference only, it is displayed in the control panel and anywhere that an email template can be selected.  |
@@ -66,8 +68,9 @@ an error, and the email will not be sent.  Errors are written to the Nucleus log
 test-compile your template.  This function won't detect all possible problems (some could happen at execution time), but it will test the syntax of your template.
 
 #### Razor Parser Notes
-Unlike .Net Core ASP.net Razor, the Razor email template parser does not allow:
-- Html Helpers, because the Razor code is not executed as part of a Http request.
-- Tag Helpers
-- @model, @using or any other directives.  `Using` directives for the `System`, `System.Collections.Generic`, `System.Linq`, `System.Text`, `Nucleus.Extensions`, `Nucleus.Abstractions`, and `Nucleus.Abstractions.Models` namespaces are automatically applied.
+Unlike .Net Core ASP.net Razor:
+- You can't use Html Helpers, because the Razor code is not executed as part of a Http request.
+- You can't use Tag Helpers.
+- You can't use @model, @using or any other directives.  The `System`, `System.Collections.Generic`, `System.Linq`, `System.Text`, 
+`Nucleus.Extensions`, `Nucleus.Abstractions`, and `Nucleus.Abstractions.Models` namespaces are automatically available.
 

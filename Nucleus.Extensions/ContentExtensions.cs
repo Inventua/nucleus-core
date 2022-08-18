@@ -48,6 +48,7 @@ namespace Nucleus.Extensions
 							.UseAutoIdentifiers()
 							.UseGridTables()
 							.UseBootstrap()
+							.UseGenericAttributes()
 							.Build();
 					}
 					return Markdown.ToHtml(content, pipeline);

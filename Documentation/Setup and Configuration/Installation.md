@@ -31,45 +31,47 @@ databaseSettings.Production.json.  If you are setting up a development environme
 [Configuration Files](https://www.nucleus-cms.com/Configuration/) page for more information.
 3. Edit your new file and add the following, substituting your SQL server name, database name and credentials:
 ```json
-    {
-      "$schema": "./nucleus.schema.json",
-      "Nucleus": {
-        "Database": {
-          "Connections": [
-            // Database connections are available to the core and modules, but must be configured in the Schemas 
-            // section in order to be used.
-            {
-              "Key": "nucleus",
-              "Type": "SqlServer",
-              "ConnectionString": 
-                "Data Source=DATABASE-SERVER;Initial Catalog=DATABASE-NAME;User ID=SQL-USERNAME;Password=SQL-PASSWORD"
-            }
-          ],
-          "Schemas": [
-            {
-              "Name": "*",
-              "ConnectionKey": "nucleus"
-            }
-          ]
+{
+  "Nucleus": {
+    "Database": {
+      "Connections": [
+        // Database connections are available to the core and extensions, but must be configured in the Schemas 
+        // section in order to be used.
+        {
+          "Key": "nucleus",
+          "Type": "SqlServer",
+          "ConnectionString": 
+            "Data Source=DATABASE-SERVER;Initial Catalog=DATABASE-NAME;User ID=SQL-USERNAME;Password=SQL-PASSWORD"
         }
-      }
+      ],
+      "Schemas": [
+        {
+          // A name of "*" makes this schema the default.  Using the root namespace of an extension as the name will 
+          // make the schema apply to that extension only.
+          "Name": "*",
+          "ConnectionKey": "nucleus"
+        }
+      ]
     }
+  }
+}
 ```
 
-> If you are editing an existing configuration file which already contains a `Database` section, update the existing section. 
+> If you are editing an existing configuration file which already contains a ==Database== section, update the existing section. 
 
-  4.  The process is the same if you want to use MySql, MariaDB or PostgreSQL, but the connection type (shown as "SqlServer" in the example above) will change, as does
-  the format of the connection string.
+The process is the same if you want to use MySql, MariaDB or PostgreSQL, but the connection type (shown as "SqlServer" in the example above) 
+will change, as does the format of the [connection string](https://www.connectionstrings.com/).
 
-  | Database          | Type       | Connection String                                                                                                                          |
-  | ---------         | ---------- | ----------------------------                                                                                                               |
-  | Sql Server        | SqlServer  | Data Source=DATABASE-SERVER;Initial Catalog=DATABASE-NAME;User ID=DATABASE-USERNAME;Password=DATABASE-PASSWORD                             |
-  | MySql             | MySql      | Server=DATABASE-SERVER;Database=DATABASE-NAME;uid=DATABASE-USERNAME;pwd=DATABASE-PASSWORD                                                  |
-  | MariaDB           | MySql      | Server=DATABASE-SERVER;Database=DATABASE-NAME;uid=DATABASE-USERNAME;pwd=DATABASE-PASSWORD                                                  |
-  | PostgreSQL        | PostgreSql | Server=DATABASE-SERVER;Database=DATABASE-NAME;User Id=DATABASE-USERNAME;Password=DATABASE-PASSWORD;                                        |
-  | Azure Sql Server  | SqlServer  | Use the connection string from Azure Portal.  Select your database, and click "Show database connection strings" in the overview page.     |
+{.table-0-0-75}
+| Database          | Type       | Connection String                                                                                                                          |
+| ---------         | ---------- | ----------------------------                                                                                                               |
+| Sql Server        | SqlServer  | Data Source=DATABASE-SERVER;Initial Catalog=DATABASE-NAME;User ID=DATABASE-USERNAME;Password=DATABASE-PASSWORD                             |
+| MySql             | MySql      | Server=DATABASE-SERVER;Database=DATABASE-NAME;uid=DATABASE-USERNAME;pwd=DATABASE-PASSWORD                                                  |
+| MariaDB           | MySql      | Server=DATABASE-SERVER;Database=DATABASE-NAME;uid=DATABASE-USERNAME;pwd=DATABASE-PASSWORD                                                  |
+| PostgreSQL        | PostgreSql | Server=DATABASE-SERVER;Database=DATABASE-NAME;User Id=DATABASE-USERNAME;Password=DATABASE-PASSWORD;                                        |
+| Azure Sql Server  | SqlServer  | Use the connection string from Azure Portal.  Select your database, and click "Show database connection strings" in the overview page.     |
 
-> The database type for MariaDb is 'MySql'.  MariaDb is based on MySql and uses the same database provider.
+> The database type for MariaDb is 'MySql'.  MariaDb is [based on MySql](https://en.wikipedia.org/wiki/MariaDB) and uses the same database provider.
 
 > If your database administrator provides a connection string in a different format, you should use the format that they provide - the connection strings above are just examples.  
 
@@ -81,29 +83,34 @@ Local File System provider.  You can add another storage provider after you have
 To configure your file system providers:
 1. In your installation folder, edit your environment application configuration file, or create one if it does not exist.  If you are setting up a production environment, 
 the file should be named appSettings.Production.json.  If you are setting up a development environment, name your file appSettings.Development.json.
-2. Edit your new file and add a configuration section for your file system provider.  You may choose to remove or comment out the default file system provider.
+2. Edit your new file and add a configuration section for your file system provider (to the Nucleus section).  You may choose to remove or comment out the default file system provider.
 
 ```json
-    "FileSystems": {
-      "Providers": [
-        // File providers have a key, name and provider type.  You can specify multiple file providers, 
-        // and the user will be presented with a list.  The "Name" property is shown to the user.  Each entry has a 
-        // key which uniquely identifies the provider entry.
-        {
-          "Key": "Azure",
-          "Name": "Azure",
-          "ProviderType": 
-            "Nucleus.Extensions.AzureBlobStorageFileSystemProvider.FileSystemProvider,Nucleus.Extensions.AzureBlobStorageFileSystemProvider",
-          "ConnectionString": "STORAGE_ACCOUNT_CONNECTIONSTRING"
-        },
-        {
-          "Key": "local",
-          "Name": "Local",
-          "ProviderType": "Nucleus.Core.FileSystemProviders.LocalFileSystemProvider,Nucleus.Core",
-          "RootFolder": "{DataFolder}//Content"
-        }
-      ]
-    }
+"Nucleus": 
+[
+  "FileSystems": 
+  {
+    "Providers": 
+    [
+      // File providers have a key, name and provider type.  You can specify multiple file providers, 
+      // and the user will be presented with a list.  The "Name" property is shown to the user.  Each entry has a 
+      // key which uniquely identifies the provider entry.
+      {
+        "Key": "Azure",
+        "Name": "Azure",
+        "ProviderType": 
+          "Nucleus.Extensions.AzureBlobStorageFileSystemProvider.FileSystemProvider,Nucleus.Extensions.AzureBlobStorageFileSystemProvider",
+        "ConnectionString": "STORAGE_ACCOUNT_CONNECTIONSTRING"
+      },
+      {
+        "Key": "local",
+        "Name": "Local",
+        "ProviderType": "Nucleus.Core.FileSystemProviders.LocalFileSystemProvider,Nucleus.Core",
+        "RootFolder": "{DataFolder}//Content"
+      }
+    ]
+  }
+]
 ```
 
 Replace the ==STORAGE_ACCOUNT_CONNECTIONSTRING== value for the Azure Blob Storage connection string with the value from Azure Portal.  In Azure Portal, navigate to Settings > Access keys 
@@ -112,7 +119,7 @@ in your storage account's menu blade to see connection strings for both primary 
 > You must install the Azure Blob Storage provider extension before adding the configuration section for the Azure Blob Storage provider.
 
 If you don't want the local file system provider, you can remove or comment out that section, including the comma between sections.  If you are using the local file system provider, 
-the {DataFolder} token refers to `%PROGRAMDATA%\Nucleus`.  You can change this value if you need to, but it should not be set to a path within your web root (installation folder) in order to ensure that
+the {DataFolder} token refers to {.file-name}`%PROGRAMDATA%\Nucleus`.  You can change this value if you need to, but it should not be set to a path within your web root (installation folder) in order to ensure that
 access to files is controlled by Nucleus - otherwise your web server may serve static files without Nucleus being able to check folder permissions.
 
 The "Key" value is saved in the database when you add files and folders, so you can't change it later.  The "Name" is shown on-screen, and you can change it at any time.

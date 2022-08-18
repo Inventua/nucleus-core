@@ -14,6 +14,8 @@ To create a new schedule, click `New Scheduled Task`.  To modify an existing sch
 ![Task Scheduler](Scheduled-Tasks-Editor.png)
 
 ## Properties
+
+{.table-25-75}
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | Name             | The name of your schedule is displayed in administration pages, and is also the sub-directory name for scheduled task logs.  |

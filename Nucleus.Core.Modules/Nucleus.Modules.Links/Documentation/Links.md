@@ -26,6 +26,8 @@ To add a new link, click `Add Link`.  To edit an existing link, click the edit b
 ![Link Properties](links-properties.png)
 
 ## Link Properties
+
+{.table-25-75}
 |                   |                                                                                      |
 |-------------------|--------------------------------------------------------------------------------------|
 | Title             | The link title is displayed on-screen. |

@@ -49,6 +49,7 @@ The root element of a manifest file is the `<package>` element.  It must have a 
 
 The package element contains:
 
+{.table-0-0-75}
 | Name             | Required? | Description                                                                          |
 |------------------|-----------|--------------------------------------------------------------------------------------|
 | id               | Yes       | (attribute) A unique id (guid) to identify your installation package. |
@@ -59,6 +60,8 @@ The package element contains:
 | components       | Yes       | (element)   The components element contains one or more `<component>` elements which provide installation instructions to Nucleus.  |
 
 ## `<publisher>` 
+
+{.table-0-0-75}
 | Name             | Required? | Description                                                                          |
 |------------------|-----------|--------------------------------------------------------------------------------------|
 | name             | No        | (attribute) Your company name. |
@@ -66,6 +69,8 @@ The package element contains:
 | email            | No        | (attribute) A support email address for your extension.   |
 
 ## `<compatibility>` 
+
+{.table-0-0-75}
 | Name             | Required? | Description                                                                          |
 |------------------|-----------|--------------------------------------------------------------------------------------|
 | minVersion       | Yes       | (attribute) The minimum version of Nucleus supported by your extension in .NET System.Version format. |
@@ -78,6 +83,8 @@ The `maxVersion` attribute is not required, but is recommended.  You can use '*'
 The `<components>` element wraps one or more `<component>` elements.
 
 ## `<component>` 
+
+{.table-0-0-75}
 | Name             | Required? | Description                                                                          |
 |------------------|-----------|--------------------------------------------------------------------------------------|
 | folderName       | Yes       | (attribute) Specifies the folder within the /extensions folder that your files will be installed to. |
@@ -89,6 +96,7 @@ file, folder, cleanup.
 ## `<moduleDefinition>` 
 Modules must specify additional information for use by Nucleus.
 
+{.table-0-0-75}
 | Name             | Required? | Description                                                                          |
 |------------------|-----------|--------------------------------------------------------------------------------------|
 | id               | Yes       | (attribute) A unique id (guid) for your module. |
@@ -104,6 +112,7 @@ do not need to include version, culture or the public key token.
 ## `<layoutDefinition>` 
 Layouts must specify additional information for use by Nucleus.
 
+{.table-0-0-75}
 | Name             | Required? | Description                                                                          |
 |------------------|-----------|--------------------------------------------------------------------------------------|
 | id               | Yes       | (attribute) A unique id (guid) for your layout. |
@@ -113,6 +122,7 @@ Layouts must specify additional information for use by Nucleus.
 ## `<containerDefinition>` 
 Containers must specify additional information for use by Nucleus.
 
+{.table-0-0-75}
 | Name             | Required? | Description                                                                          |
 |------------------|-----------|--------------------------------------------------------------------------------------|
 | id               | Yes       | (attribute) A unique id (guid) for your container. |
@@ -122,6 +132,7 @@ Containers must specify additional information for use by Nucleus.
 ## `<controlPanelExtensionDefinition>` 
 Control panel extensions must specify additional information for use by Nucleus.
 
+{.table-0-0-75}
 | Name             | Required? | Description                                                              |
 |------------------|-----------|--------------------------------------------------------------------------|
 | id               | Yes       | (attribute) Unique id (guid) for your control panel extension. |
@@ -137,6 +148,7 @@ Specifies a file to copy during installation.  The file must be present in the p
 represented by the manifest's file/folder elements.  The file is copied to /Extensions/extension-name/folder, where folder is the root when 
 the file element is a child of the `<components>`, or a sub-folder if the `<file>` element is a child of a `<folder>` element.
 
+{.table-0-0-75}
 | Name             | Required? | Description                                                              |
 |------------------|-----------|--------------------------------------------------------------------------|
 | name             | Yes       | (attribute) File name. |
@@ -144,6 +156,7 @@ the file element is a child of the `<components>`, or a sub-folder if the `<file
 ## `<folder>` 
 Specifies a folder.  `<folder>` elements can contain `<file>` elements or nested `<folder>` elements to represent the target folder structure within the /extensions/[folder-name] folder.
 
+{.table-0-0-75}
 | Name             | Required? | Description                                                              |
 |------------------|-----------|--------------------------------------------------------------------------|
 | name             | Yes       | (attribute) Folder name, relative to the component folder name. |

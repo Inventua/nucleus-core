@@ -1,5 +1,5 @@
 ## Startup classes
-Startup classes add functionality to Nucleus during startup.  Use Startup classes to:
+Startup classes add functionality to Nucleus during startup, by providing an interface which extensions use to add classes to dependency injection.  Use Startup classes to:
 - Register an extension's data provider.
 - Register an [Event Handler](https://www.nucleus-cms.com/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.IEventDispatcher/).
 - Register Nucleus [Search Providers](https://www.nucleus-cms.com/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.Search.ISearchProvider/), 

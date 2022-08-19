@@ -16,7 +16,7 @@
 		<div class="api-wrapper">
 			@if (Model.ShowMenu)
 			{
-				<div class="api-menu">
+				<div class="api-menu" data-track-scroll="content-wrapper">
 					<nav class="accordion">
 						<div class="accordion-item">
 							@foreach (var document in Model.Documents)
@@ -43,7 +43,7 @@
 				</div>	
 			}
 			
-			<div class="api-content">
+			<div class="api-content" data-track-scroll="content-wrapper">
 				@if (Model.SelectedDocument == null)
 				{
 					// no document selected, show "landing" page

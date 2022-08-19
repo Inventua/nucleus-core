@@ -81,7 +81,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 			var exporter = new Nucleus.Extensions.ExcelWriter<User>
 			(
-				ExcelWriter<User>.Modes.AutoDetect,
+				ExcelWriter.Modes.AutoDetect,
 				nameof(Nucleus.Abstractions.Models.User.SiteId),
 				nameof(Nucleus.Abstractions.Models.User.IsSystemAdministrator),
 				nameof(Nucleus.Abstractions.Models.User.Secrets),

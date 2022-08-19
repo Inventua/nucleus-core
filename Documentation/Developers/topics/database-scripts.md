@@ -4,6 +4,7 @@ format for Nucleus database scripts is a json-based format which specifies one o
 ==Entity Framework==.  Database scripts are included in your extension assembly as ==Embedded Resources==, and must be located in 
 the DataProvider/database-type/scripts folder, where database-type is:
 
+{.table-25-75}
 | Name             |  Description                                                                          |
 |------------------|---------------------------------------------------------------------------------------|
 | Migrations       |  scripts which can be used with all of the database providers, normally in .json format.  |
@@ -31,6 +32,7 @@ also used to track whether a script has already been run.
 ### Syntax
 Script files in `.json` format consist of a schema name, version and operations element which contains one or more operations:
 
+{.table-25-75}
 | Name             |  Description                                                                          |
 |------------------|---------------------------------------------------------------------------------------|
 | schemaName       |  This is a unique name for your database objects (schema).  It is used to track whether a script has run, and must be unique to your extension.  It's a good idea to use your project namespace as the schema name.   |
@@ -106,6 +108,8 @@ MySql, the entire script is executed within a transaction.
 transaction when you are using a MySql or MariaDb database.
 
 ### Operations
+
+{.table-25-75}
 | Name             |  Description                                                                          |
 |------------------|---------------------------------------------------------------------------------------|
 | **createTable**  |  Creates a new table.  Must contain a name (table name) and one or more columns.  May contain a primary key and foreign keys. |

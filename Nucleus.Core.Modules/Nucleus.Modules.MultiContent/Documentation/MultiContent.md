@@ -22,6 +22,7 @@ Use the settings tab to control content presentation.
 ### Accordion Layout
 The `Accordion` layout displays one item at a time with a vertically stacked list of headings.  When the user chooses another item, the displayed item is hidden.
 
+{.table-25-75}
 |                   |                                                                                      |
 |-------------------|--------------------------------------------------------------------------------------|
 | Open First        | Make the first item visible by default.   |
@@ -30,6 +31,7 @@ The `Accordion` layout displays one item at a time with a vertically stacked lis
 ### Alert Layout
 The `Alert` layout displays all items in a highlighted container.  There are several alert styles to choose from.
 
+{.table-25-75}
 |                   |                                                                                      |
 |-------------------|--------------------------------------------------------------------------------------|
 | Alert Style       | Alert colors.  These are [Bootstrap syles](https://getbootstrap.com/docs/5.1/components/alerts/).   |
@@ -40,6 +42,7 @@ The `Alert` layout displays all items in a highlighted container.  There are sev
 ### Carousel Layout
 The `Carousel` layout cycles through your content items automatically.
 
+{.table-25-75}
 |                   |                                                                                      |
 |-------------------|--------------------------------------------------------------------------------------|
 | Show Controls     | Toggles whether to display forward/back controls to the user.  The carousel transitions through content items automatically, unless the user hovers the mouse over the display.   |
@@ -50,6 +53,7 @@ The `Carousel` layout cycles through your content items automatically.
 The `Tabs` layout draws multiple content items with navigation elements for the user to select which tab is visible. 
 The `Pills` layout is similar to tabs, but doesn't have borders on the navigation elements.
 
+{.table-25-75}
 |                   |                                                                                      |
 |-------------------|--------------------------------------------------------------------------------------|
 | Alignment         | Specifies the navigation element alignment (`Left`, `Center`, or `Right`).   |

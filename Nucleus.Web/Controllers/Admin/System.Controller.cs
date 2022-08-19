@@ -160,19 +160,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private void ReadLogFile(Nucleus.Abstractions.Models.Paging.PagingSettings settings, ViewModels.Admin.SystemIndex.LogSettingsViewModel viewModel)
 		{
-			List<ViewModels.Admin.SystemIndex.LogEntry> results = new();
-			
-			if (!String.IsNullOrEmpty(viewModel.LogFile))
-			{
-				string logFilePath = System.IO.Path.Combine(this.LogFolderPath, viewModel.LogFile);
-				if (System.IO.File.Exists(logFilePath))
-				{
-					foreach (string line in System.IO.File.ReadAllLines(logFilePath))
-					{
-						results.Add(new ViewModels.Admin.SystemIndex.LogEntry(line));
-					}
-				}
-			}
+			List<ViewModels.Admin.SystemIndex.LogEntry> results = ReadLogFile(viewModel.LogFile);					
 
 			viewModel.LogContent = new(settings);
 			viewModel.LogContent.TotalCount = results.Count;
@@ -189,6 +177,24 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 		}
 
+		private List<ViewModels.Admin.SystemIndex.LogEntry> ReadLogFile(string filename)
+		{
+			List<ViewModels.Admin.SystemIndex.LogEntry> results = new();
+
+			if (!String.IsNullOrEmpty(filename))
+			{
+				string logFilePath = System.IO.Path.Combine(this.LogFolderPath, filename);
+				if (System.IO.File.Exists(logFilePath))
+				{
+					foreach (string line in System.IO.File.ReadAllLines(logFilePath))
+					{
+						results.Add(new ViewModels.Admin.SystemIndex.LogEntry(line));
+					}
+				}
+			}
+
+			return results;
+		}
 		
 
 		[HttpPost]
@@ -197,6 +203,32 @@ namespace Nucleus.Web.Controllers.Admin
 			ReadLogFile(viewModelInput.LogContent, viewModelInput);
 
 			return View("_Log", viewModelInput);
+		}
+
+		[HttpGet]
+		public ActionResult DownloadLogFile(string logFile, string format)
+		{
+			if (String.IsNullOrEmpty(logFile))
+			{
+				return BadRequest();
+			}
+			else
+			{
+				List<ViewModels.Admin.SystemIndex.LogEntry> data = ReadLogFile(logFile);
+
+				switch (format)
+				{
+					case "excel":
+						var exporter = new Nucleus.Extensions.ExcelWriter<ViewModels.Admin.SystemIndex.LogEntry>(ExcelWriter.Modes.AutoDetect, nameof(ViewModels.Admin.SystemIndex.LogEntry.IsValid));
+						exporter.Worksheet.Name = System.IO.Path.GetFileNameWithoutExtension(logFile);
+						exporter.Export(data);
+						return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{exporter.Worksheet.Name}.xlsx");
+
+					default:
+						byte[] content = System.Text.Encoding.UTF8.GetBytes(String.Join("\r\n", data));
+						return File(content, "text/plain", logFile);				
+				}				
+			}
 		}
 
 		/// <summary>

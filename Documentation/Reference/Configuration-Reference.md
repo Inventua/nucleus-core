@@ -28,6 +28,7 @@ present in your configuration files, but are not documented here.
 ### Nucleus
 General top-level settings.
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | EnableResponseCompression        | (Boolean)  Default is true. | 
@@ -46,6 +47,7 @@ General top-level settings.
 
 ### Nucleus:FolderOptions
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | DataFolder                       | (String) Specifies the name of the root folder that Nucleus uses to store files on the file system.  | 
@@ -67,6 +69,7 @@ General top-level settings.
 
 ### Nucleus:TextFileLoggerOptions
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Path                             | (String) Specifies the name of the folder that the Nucleus text file logger uses to store log files on the file system.  By default, this value is the `Logs` subfolder of the folder specified by `Nucleus:FolderOptions:DataFolder`. | 
@@ -85,6 +88,7 @@ General top-level settings.
 ### Nucleus:ResourceFileOptions
 Controls use of minified and merged javascript and css stylesheets.  Developers may want to set these values to false in order to more easily debug client-side javascript and css. 
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | UseMinifiedJs                    | (Boolean) Specifies whether to use minified versions of .js files, when they are available.  Default value is true.  | 
@@ -110,6 +114,7 @@ Controls use of minified and merged javascript and css stylesheets.  Developers 
 Specifies stylesheets and script files used by the Html editor.  More than one Html editor can be included, but only one can be selected.  This 
 section is automatically present in the default appSettings.config file, and users generally do not need to edit this section.
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Default                          | (String) Specifies the `Key` of the Html Editor that is in use.  This value does not have a default.  | 
@@ -118,6 +123,7 @@ section is automatically present in the default appSettings.config file, and use
 #### Nucleus:HtmlEditor[n]
 Each HtmlEditor has properties:
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Key                              | (String) Unique identifier for the Html Editor configuration section.  | 
@@ -126,6 +132,7 @@ Each HtmlEditor has properties:
 #### Nucleus:HtmlEditor[n]:Scripts[n]
 Each scripts section has properties:
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Type                             | (String) javascript or stylesheet.  | 
@@ -145,6 +152,7 @@ The `Nucleus:FileSystems:AllowedFileTypes` element is an array of allowed file t
 default appSettings.config file, and users generally do not need to edit this section, unless there is a need to support upload of additional 
 file types.
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | FileExtensions                   | (array of string) Array of file extensions represented by this entry, including the leading `.` character.  Not case-sensitive.  | 
@@ -177,6 +185,7 @@ to the user.  Each entry has a key which uniquely identifies the provider entry.
 
 The `Nucleus:FileSystems:Providers` element is an array of file system provider type elements.  
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Key                              | (String) Unique identifier for the file system provider configuration entry.  | 
@@ -204,6 +213,7 @@ The `Nucleus:FileSystems:Providers` element is an array of file system provider 
 ### Nucleus:FileSystems:PasswordOptions
 Specifies authentication and password settings.
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | FailedPasswordWindowTimeout      | (Timespan) Specifies the time span for which the system remembers that a user has had a failed password attempt.  Repeated failures within the specified file will increment the failed password attempts count, and when the FailedPasswordMaxAttempts threshold is exceeded, the user account will be locked for a period of time.  Default value is 0:15:00 (15 minutes).  | 
@@ -236,6 +246,7 @@ Specifies authentication and password settings.
 ### Nucleus:FileSystems:PasswordOptions:PasswordComplexityRules
 Password complexity rules are regular expressions.  You can specify multiple password complexity rules and all of them must succeed (match) in order for a password to be valid.  
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Pattern                          | (String) Regular expression which passwords must match in order to be valid.  | 
@@ -248,6 +259,7 @@ IsSiteDefault property is true, new sites will automatically have a user profile
 
 The `Nucleus:ClaimTypeOptions` element contains a "Types" element, which is an array of file system provider type elements.  
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | DefaultName                      | (String) Default label caption for the type.  | 
@@ -287,6 +299,7 @@ ScheduledTaskCache, SiteCache, SiteDetectCache, UserCache, FolderCache, ListCach
 values, refer to each extension's documentation for the cache key name.  If configuration values are omitted, the default capacity is 
 1000, and expiry time is 5 minutes.
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Capacity                         | (Integer) Number of entities to cache in memory.  | 

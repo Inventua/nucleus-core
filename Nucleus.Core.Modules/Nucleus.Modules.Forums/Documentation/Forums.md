@@ -6,6 +6,8 @@ Forums are always displayed within a forum group, and all forums must belong to 
 group level, but you can choose whether to use group settings or assign settings for each individual forum.
 
 ### Group Properties
+
+{.table-25-75}
 |                             |                                                                                      |
 |-----------------------------|--------------------------------------------------------------------------------------|
 | Name                        | The group name is displayed to users in the forum menu and in the administrative user interface.  |
@@ -27,6 +29,7 @@ group level, but you can choose whether to use group settings or assign settings
 Forum groups have a set of permissions assigned to roles.  When users are in any role with the specified permission, they will have that 
 permission.  Forums can be configured to inherit group settings (including permissions) or can specify their own permissions.
 
+{.table-25-75}
 |                             |                                                                                      |
 |-----------------------------|--------------------------------------------------------------------------------------|
 | View                        | View the group, its forums and forum posts.  |
@@ -47,6 +50,7 @@ is in lower case, and has non-alphanumeric characters replaced with a dash.
 If the forum has a status list defined, users with edit rights to a post can select a status for the post.  When you create a list in 
 `Manage`\`Lists`, you can use list item special values (you can use any text values you like, and these are what are shown on screen):
 
+{.table-25-75}
 |                             |                                                                                      |
 |-----------------------------|--------------------------------------------------------------------------------------|
 | default                     | If a list item with the value `default` is present in the list, new posts have their status set to this value automatically.  |
@@ -57,6 +61,7 @@ Use the `Forums` tab to add forums to a forum group.  The `Forums` tab is not av
 
 ### Forum Properties
 
+{.table-25-75}
 |                             |                                                                                      |
 |-----------------------------|--------------------------------------------------------------------------------------|
 | Name                        | Forum name, shown on screen in the forums menu and in the administration user interface.  |
@@ -85,6 +90,7 @@ you create the mail template(s), assign them to the forum in the forum group or 
 You must set up a scheduled task to send forum notifications.  Use the `Settings`/`Scheduler` control panel to create a new scheduled task.  Refer 
 [here](/manage/task-scheduler/) for more information on scheduled tasks.
 
+{.table-25-75}
 |                             |                                                                                      |
 |-----------------------------|--------------------------------------------------------------------------------------|
 | Name                        | You can name your scheduled task anything you want.  A good example would be 'Send Forum Emails'.  |
@@ -97,6 +103,7 @@ You must set up a scheduled task to send forum notifications.  Use the `Settings
 ### Forum Email Data
 Email templates for forum messages can use the following data objects:
 
+{.table-25-75}
 | Site                        | Information on the site which has forums with new activity.                          |
 |-----------------------------|--------------------------------------------------------------------------------------|
 | Name                        | Site name.  |
@@ -108,6 +115,7 @@ of true (use https) or false (use http).  You should only use `false` if your si
 <a href="@Model.Site.AbsoluteUrl(true)">@post.Subject</a>
 ```
 
+{.table-25-75}
 | Page                        | Information on the forum page.                                                       |
 |-----------------------------|--------------------------------------------------------------------------------------|
 | Name                        | Page name.  |
@@ -119,6 +127,7 @@ You can use the page as a parameter for the AbsoluteUrl() extension to create a 
 <a href="@Model.Site.AbsoluteUrl(@Model.Page, true)">Click here to visit the forums page</a>
 ```
 
+{.table-25-75}
 | Forums                      | A list of forums with new activity.                                                  |
 |-----------------------------|--------------------------------------------------------------------------------------|
 | Name                        | Forum name.  |
@@ -132,6 +141,7 @@ You can use the forum as a parameter for the AbsoluteUrl() extension to create a
 <a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
 ```
 
+{.table-25-75}
 | Post                        | An item in each forum's `Posts` list, representing a post with activity.             | 
 |-----------------------------|--------------------------------------------------------------------------------------|
 | Subject                     | The post subject.  |
@@ -142,6 +152,7 @@ You can use the post as a parameter for the AbsoluteUrl() extension to create a 
 <a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a>
 ```
 
+{.table-25-75}
 | Reply                       | An item in each forum's `Replies` list, representing a new post reply.             | 
 |-----------------------------|--------------------------------------------------------------------------------------|
 

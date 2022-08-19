@@ -39,7 +39,13 @@ namespace Nucleus.Web.ViewModels.Admin
 			}
 		}
 
-		public class LogSettingsViewModel : ViewModels.Admin.SystemIndex.LogSettingsViewModel {};
+		public class LogSettingsViewModel : ViewModels.Admin.SystemIndex.LogSettingsViewModel 
+		{
+			public LogSettingsViewModel()
+			{
+				this.ControllerName = "ScheduledTasks";
+			}
+		};
 	}
 
 	

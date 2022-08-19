@@ -4,6 +4,7 @@
 
 Admin CSS classes in `Resources/css/admin.css` can be used by ==Settings== views and ==Control Panel Extensions==.
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | .nucleus-button-panel            | Class used to wrap buttons at the bottom of a form.  Buttons are rendered side-by-side with a small gap between them and a small top and bottom margin. | 
@@ -17,6 +18,7 @@ Admin CSS classes in `Resources/css/admin.css` can be used by ==Settings== views
 CSS classes in `Resources/css/shared.css` are always available.  CSS Classes which are used by Nucleus but are not intended for use 
 by extensions are not included here.
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | .fs-small                        | Render text at 0.9rem. | 
@@ -35,6 +37,7 @@ by extensions are not included here.
 Forms CSS classes can be used by any part of Nucleus, including extensions, but ==Viewer== views must include forms.css by 
 adding a call to `@Html.AddStyle("~/Resources/css/forms.css")` as forms.css is only automatically included in admin pages.
 
+{.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | .nucleus-flex-fields             | When applied to a `<div>` or another wrapper element, child elements are rendered in the same row (side-by-side). | 

@@ -39,6 +39,7 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public class LogSettingsViewModel
 		{
+			public string ControllerName { get; set; }
 			public Boolean LogSortDescending { get; set; }
 			public string LogFilterTerm { get; set; }
 			public Boolean LogIncludeInformation { get; set; } = true;
@@ -64,9 +65,12 @@ namespace Nucleus.Web.ViewModels.Admin
 			public string Category { get; set; }
 			public string Message { get; set; }
 			public Boolean IsValid { get; set; } = true;
+			private string Raw { get; set; }
 
 			public LogEntry(string input)
 			{
+				this.Raw=input;	
+
 				string[] parts = input.Split(',');
 
 				if (parts.Length >= 4)
@@ -118,6 +122,11 @@ namespace Nucleus.Web.ViewModels.Admin
 					default:
 						return true;
 				}
+			}
+
+			public override string ToString()
+			{
+				return this.Raw;
 			}
 		}
 

@@ -240,7 +240,11 @@ function _Page()
 		{
 			jQuery('document, [data-track-scroll]').each(function (index, element)
 			{
-				sessionStorage.setItem(_buildScrollPositionKey(element), jQuery(element).scrollTop().toString());
+				try
+				{
+					sessionStorage.setItem(_buildScrollPositionKey(element), jQuery(element).scrollTop().toString());
+				}
+				catch (ex){ } // suppress error
 			});			
 		});
 	}
@@ -251,10 +255,14 @@ function _Page()
 		jQuery('document, [data-track-scroll]').each(function (index, element)
 		{
 			var key = _buildScrollPositionKey(element);
-			if (sessionStorage[key])
+			try
 			{
-				jQuery(element).scrollTop(sessionStorage.getItem(key));
+				if (sessionStorage[key])
+				{
+					jQuery(element).scrollTop(sessionStorage.getItem(key));
+				}
 			}
+			catch (ex) { } // suppress error 
 		});		
 	}
 

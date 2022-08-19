@@ -6,6 +6,7 @@ using Nucleus.Extensions;
 using Nucleus.ViewFeatures;
 using Nucleus.Extensions.Authorization;
 using System.Threading.Tasks;
+using Nucleus.Abstractions;
 
 namespace Nucleus.Web.Controllers
 {
@@ -28,7 +29,7 @@ namespace Nucleus.Web.Controllers
 			foreach (Page page in await this.PageManager.List(this.Context.Site))
 			{
 				if (!page.Disabled)
-				{ 
+				{
 					// only include pages which can be accessed by users who have not logged on
 					page.Permissions = await this.PageManager.ListPermissions(page);
 					if (this.Context.Site.AllUsersRole?.HasViewPermission(page) == true)
@@ -56,5 +57,27 @@ namespace Nucleus.Web.Controllers
 
 			return File(output, "application/xml");
 		}
+
+		public ActionResult Robots()
+		{
+			string[] BLOCKED_ROUTES = { RoutingConstants.ADMIN_ROUTE_PATH, RoutingConstants.EXTENSIONS_ROUTE_PATH, RoutingConstants.API_ROUTE_PATH, "merged.css", "merged.js", "pages", "oauth2", RoutingConstants.ERROR_ROUTE_PATH };
+
+			string reservedPaths = "";			
+			foreach (string path in BLOCKED_ROUTES)
+			{
+				if (path.Contains('.'))
+				{
+					reservedPaths += $"Disallow: /{path}\r\n";
+				}
+				else
+				{ 
+					reservedPaths += $"Disallow: /{path}/\r\n";
+				}
+			}
+			
+			string output = $"Sitemap: {this.Context.Site.AbsoluteUri(RoutingConstants.SITEMAP_ROUTE_PATH, Request.IsHttps)}\r\nUser-agent: *\r\n{reservedPaths}";
+			return File(System.Text.Encoding.UTF8.GetBytes(output), "text/plain");
+		}
 	}
+
 }

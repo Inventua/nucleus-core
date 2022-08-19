@@ -99,24 +99,23 @@
 					@for (var fileCount = 0; fileCount < Model.Folder?.Files.Count; fileCount++)
 					{
 						var isRecent = Math.Abs(Model.Folder.Files[fileCount].DateModified.Subtract(DateTime.UtcNow).TotalMinutes) < 5;
-						var file = Model.Folder.Files[fileCount] as File;
 						<tr>
 							<td>
-								@Html.CheckBoxFor(model => file.IsSelected, new { @class = "nucleus-filesystem-fileselector" })
+								@Html.CheckBoxFor(model => Model.Folder.Files[fileCount].IsSelected, new { @class = "nucleus-filesystem-fileselector" })
 							</td>
 							<td class="@(isRecent ? "fw-bold" : "")">
-								@file.Name
-								@Html.HiddenFor(model => file.Id)
+								@Model.Folder.Files[fileCount].Name
+								@Html.HiddenFor(model => Model.Folder.Files[fileCount].Id)
 							</td>
 							<td>File</td>
-							<td class="Date@(isRecent ? " fw-bold" : "")">@file.DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+							<td class="Date@(isRecent ? " fw-bold" : "")">@Model.Folder.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
 							<td>
-								@file.Size.FormatFileSize()
+								@Model.Folder.Files[fileCount].Size.FormatFileSize()
 							</td>
 							<td>
-								@if (file.Width > 0 && file.Height > 0)
+								@if (Model.Folder.Files[fileCount].Width > 0 && Model.Folder.Files[fileCount].Height > 0)
 								{
-									@($"{file.Width} x {file.Height}")			
+									@($"{Model.Folder.Files[fileCount].Width} x {Model.Folder.Files[fileCount].Height}")			
 								}
 							</td>
 						</tr>

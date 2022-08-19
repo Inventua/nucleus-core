@@ -331,11 +331,18 @@ namespace Nucleus.Web
 							name: RoutingConstants.API_ROUTE_NAME,
 							pattern: $"/{RoutingConstants.API_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
 
-					// Map the search engines "site map" controller to /sitemap.xml
+					// Map the site map controller to /sitemap.xml
 					routes.MapControllerRoute(
 							name: RoutingConstants.SITEMAP_ROUTE_NAME,
 							pattern: $"/{RoutingConstants.SITEMAP_ROUTE_PATH}",
 							defaults: new { controller = "Sitemap", action = "Index" });
+
+					// Map the site map controller to /robots.txt
+					routes.MapControllerRoute(
+							name: RoutingConstants.ROBOTS_ROUTE_NAME,
+							pattern: $"/{RoutingConstants.ROBOTS_ROUTE_PATH}",
+							defaults: new { controller = "Sitemap", action = "Robots" });
+					
 
 					// Configure controller routes using attribute-based routing
 					routes.MapControllers();

@@ -30,6 +30,11 @@ namespace Nucleus.Abstractions
 		public const string SITEMAP_ROUTE_NAME = "route:sitemap";
 
 		/// <summary>
+		/// Key for the robots.txt route.
+		/// </summary>
+		public const string ROBOTS_ROUTE_NAME = "route:robots.txt";
+
+		/// <summary>
 		/// Key for the merges.css route.
 		/// </summary>
 		public const string MERGED_CSS_ROUTE_NAME = "route:merged.css";
@@ -70,15 +75,23 @@ namespace Nucleus.Abstractions
 		public const string SITEMAP_ROUTE_PATH = "sitemap.xml";
 
 		/// <summary>
+		/// Path for the robots.txt route.
+		/// </summary>
+		public const string ROBOTS_ROUTE_PATH = "robots.txt";
+
+		/// <summary>
 		/// Path for the error route.
 		/// </summary>
 		public const string ERROR_ROUTE_PATH = "error-handler";
 				
 		/// <summary>
-		/// Reserved route names.
+		/// Reserved routes.
 		/// </summary>
+		/// <remarks>
+		/// Routes in the reserved routes list can't be used as page routes.
+		/// </remarks>
 		// the "pages" route isn't currently used for anything, but is reserved in case we want to use it later
-		public static readonly string[] RESERVED_ROUTES = { ADMIN_ROUTE_PATH, EXTENSIONS_ROUTE_PATH, "pages", "oauth2", SITEMAP_ROUTE_PATH, ERROR_ROUTE_PATH };
+		public static readonly string[] RESERVED_ROUTES = { ADMIN_ROUTE_PATH, EXTENSIONS_ROUTE_PATH, "pages", "oauth2", SITEMAP_ROUTE_PATH, ERROR_ROUTE_PATH, API_ROUTE_PATH };	
 	}
 
 	/// <summary>

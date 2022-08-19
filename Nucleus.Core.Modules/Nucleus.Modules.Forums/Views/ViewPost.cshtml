@@ -82,7 +82,7 @@
 				}
 
 				<div class="AdminTools">
-					@if (Model.CanEditPost && Model.Forum.EffectiveSettings().StatusList != null)
+					@if (Model.CanEditPost && Model.Forum.EffectiveSettings().StatusList != null && Model.Forum.EffectiveSettings().StatusList.Items?.Any() == true)
 					{
 						@Html.DropDownListFor(model => model.Post.Status.Id, new SelectList(Model.Forum.EffectiveSettings().StatusList.Items, "Id", "Name"), new { @data_autopostbackevent = "change", @title= "Forum Post Status" })
 					}

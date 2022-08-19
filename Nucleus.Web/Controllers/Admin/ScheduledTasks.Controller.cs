@@ -11,6 +11,7 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
+using Nucleus.Extensions;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -105,23 +106,37 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", await BuildViewModel());
 		}
 
-		private async Task ReadLogFile(Guid id, Nucleus.Abstractions.Models.Paging.PagingSettings settings, ViewModels.Admin.ScheduledTaskEditor.LogSettingsViewModel viewModel)
+
+		[HttpGet]
+		public ActionResult DownloadLogFile(string logFile, string format)
 		{
-			List<ViewModels.Admin.SystemIndex.LogEntry> results = new();
-
-			if (!String.IsNullOrEmpty(viewModel.LogFile))
+			if (String.IsNullOrEmpty(logFile))
 			{
-				ScheduledTask existing = await this.ScheduledTaskManager.Get(id);
-				string logFilePath = System.IO.Path.Combine(LogFolder(existing).FullName, viewModel.LogFile);
+				return BadRequest();
+			}
+			else
+			{
+				List<ViewModels.Admin.SystemIndex.LogEntry> data = ReadLogFile(logFile);
 
-				if (System.IO.File.Exists(logFilePath))
+				switch (format)
 				{
-					foreach (string line in System.IO.File.ReadAllLines(logFilePath))
-					{
-						results.Add(new ViewModels.Admin.SystemIndex.LogEntry(line));
-					}
+					case "excel":
+						var exporter = new Nucleus.Extensions.ExcelWriter<ViewModels.Admin.SystemIndex.LogEntry>(ExcelWriter.Modes.AutoDetect, nameof(ViewModels.Admin.SystemIndex.LogEntry.IsValid));
+						exporter.Worksheet.Name = System.IO.Path.GetFileNameWithoutExtension(logFile);
+						exporter.Export(data);
+						return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{exporter.Worksheet.Name}.xlsx");
+
+					default:
+						byte[] content = System.Text.Encoding.UTF8.GetBytes(String.Join("\r\n", data));
+						return File(content, "text/plain", logFile);
 				}
 			}
+		}
+
+
+		private void ReadLogFile(Nucleus.Abstractions.Models.Paging.PagingSettings settings, ViewModels.Admin.ScheduledTaskEditor.LogSettingsViewModel viewModel)
+		{
+			List<ViewModels.Admin.SystemIndex.LogEntry> results = ReadLogFile(viewModel.LogFile);
 
 			viewModel.LogContent = new(settings);
 			viewModel.LogContent.TotalCount = results.Count;
@@ -138,10 +153,30 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 		}
 
-		[HttpPost]
-		public async Task<ActionResult> GetLogFile(Guid id, ViewModels.Admin.ScheduledTaskEditor.LogSettingsViewModel viewModel)
+		private List<ViewModels.Admin.SystemIndex.LogEntry> ReadLogFile(string filename)
 		{
-			await ReadLogFile(id, viewModel.LogContent, viewModel);
+			List<ViewModels.Admin.SystemIndex.LogEntry> results = new();
+
+			if (!String.IsNullOrEmpty(filename))
+			{
+				string logFilePath = System.IO.Path.Combine(this.LogFolderPath, filename);
+
+				if (System.IO.File.Exists(logFilePath))
+				{
+					foreach (string line in System.IO.File.ReadAllLines(logFilePath))
+					{
+						results.Add(new ViewModels.Admin.SystemIndex.LogEntry(line));
+					}
+				}
+			}
+
+			return results;
+		}
+
+		[HttpPost]
+		public ActionResult GetLogFile(Guid id, ViewModels.Admin.ScheduledTaskEditor.LogSettingsViewModel viewModel)
+		{
+			ReadLogFile(viewModel.LogContent, viewModel);
 
 			return View("../System/_Log", viewModel);
 		}
@@ -211,7 +246,7 @@ namespace Nucleus.Web.Controllers.Admin
 							{
 								logs.Add(new Nucleus.Web.ViewModels.Admin.Shared.LogFileInfo()
 								{
-									Filename = file.Name,
+									Filename = System.IO.Path.Join(scheduledTask.Name, file.Name),
 									Title = $"{logDate.ToLocalTime():dd MMM yyyy HH:mm} [{match.Groups[2].Value}]",
 									LogDate = logDate
 								});
@@ -233,7 +268,7 @@ namespace Nucleus.Web.Controllers.Admin
 			
 			if (!String.IsNullOrEmpty(viewModel.LogSettings.LogFile))
 			{
-				await ReadLogFile(viewModel.ScheduledTask.Id, viewModel.LogSettings.LogContent, viewModel.LogSettings);
+				ReadLogFile(viewModel.LogSettings.LogContent, viewModel.LogSettings);
 			}
 
 			return viewModel;

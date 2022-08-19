@@ -10,6 +10,7 @@ function _Page()
 	this.AddEventHandlers = _addEventHandlers;
 	this.AttachCopyButton = _attachCopyButton;
 	this.CopyToClipboard = _copyToClipboard;
+	this.Dialog = _dialog;
 
 	// Attach Nucleus-standard event handlers when document is ready
 	jQuery(document).ready(function ()

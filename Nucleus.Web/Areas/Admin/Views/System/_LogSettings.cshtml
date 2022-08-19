@@ -5,6 +5,24 @@
 		Options <span class="nucleus-material-icon">&#xe5c5;</span>
 	</button>
 
+	<button area-expanded="false" class="btn btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" type="button">
+		<span class="nucleus-material-icon">&#xf090;</span>
+		Download 
+	</button>
+
+	<ul class="dropdown-menu" data-boundary="viewport">
+		<li>
+			<a type="button" class="btn btn-primary btn-sm btn-sm dropdown-item download-log" href="@Url.AreaAction("downloadlogfile", Model.ControllerName ?? "system", "admin", new { format="plain" })">
+				Download as Text (csv)
+			</a>
+		</li>
+		<li>
+			<a type="button" class="btn btn-primary btn-sm btn-sm dropdown-item download-log" href="@Url.AreaAction("downloadlogfile", Model.ControllerName ?? "system", "admin", new { format="excel" })">
+				Download as Excel Format (xlsx)
+			</a>
+		</li>
+	</ul>
+
 	<div class="collapse log-options">
 		<fieldset aria-label="Filtering and Sorting">
 			<SettingsControl caption="Filter" helptext="Log source filter term.">
@@ -34,3 +52,16 @@
 		</fieldset>
 	</div>
 </div>
+<script>
+	jQuery('.download-log').on('click', function ()
+	{
+		if (jQuery('#LogFile').val() === '')
+		{
+			Page.Dialog('Download', 'Please select a log file.', 'warning', '', 'Close');
+			return false;
+		}
+
+		var href = jQuery(this).attr('href') + '&LogFile=' + jQuery('#LogFile').val();
+		jQuery(this).attr('href', href);
+	});
+</script>

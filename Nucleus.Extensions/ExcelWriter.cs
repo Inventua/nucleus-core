@@ -14,25 +14,7 @@ namespace Nucleus.Extensions
 	/// </summary>
 	/// <typeparam name="TModel">Type being exported.</typeparam>
 	public class ExcelWriter<TModel> : ExcelWriter
-	{
-		/// <summary>
-		/// Enumeration used by the <see cref="ExcelWriter{TModel}"/> constructor to specify whether the properties to export are 
-		/// automatically detected, or whether only specified columns are included.
-		/// </summary>
-		/// <type>Enum</type>
-		public enum Modes
-		{
-			/// <summary>
-			/// Auto-detect columns to export and specify any columns to exclude.
-			/// </summary>
-			AutoDetect,
-
-			/// <summary>
-			/// Include only specified columns.
-			/// </summary>
-			IncludeSpecifiedPropertiesOnly,
-		}
-
+	{		
 		/// <summary>
 		/// Use this constructor if you want to set up columns manually using the <see cref="ExcelWriter.AddColumn(PropertyInfo)"/> method.
 		/// </summary>
@@ -44,8 +26,8 @@ namespace Nucleus.Extensions
 		/// <param name="mode">Specifies whether to include or exclude the properties in the properies argument.</param>
 		/// <param name="properties"></param>
 		/// <remarks>
-		/// When <paramref name="mode"/> is <see cref="Modes.AutoDetect"/>, all properties of <typeparamref name="TModel"/> are automatically included 
-		/// in the output, except for those listed in <paramref name="properties"/>.  When <paramref name="mode"/> is <see cref="Modes.IncludeSpecifiedPropertiesOnly"/>,
+		/// When <paramref name="mode"/> is <see cref="ExcelWriter.Modes.AutoDetect"/>, all properties of <typeparamref name="TModel"/> are automatically included 
+		/// in the output, except for those listed in <paramref name="properties"/>.  When <paramref name="mode"/> is <see cref="ExcelWriter.Modes.IncludeSpecifiedPropertiesOnly"/>,
 		/// only the properties listed in <paramref name="properties"/> are included in the output.
 		/// </remarks>
 		public ExcelWriter(Modes mode, params string[] properties)
@@ -215,6 +197,24 @@ namespace Nucleus.Extensions
 		/// Current row index.
 		/// </summary>
 		public int RowIndex { get; set; } = 1;
+
+		/// <summary>
+		/// Enumeration used by the <see cref="ExcelWriter{TModel}"/> constructor to specify whether the properties to export are 
+		/// automatically detected, or whether only specified columns are included.
+		/// </summary>
+		/// <type>Enum</type>
+		public enum Modes
+		{
+			/// <summary>
+			/// Auto-detect columns to export and specify any columns to exclude.
+			/// </summary>
+			AutoDetect,
+
+			/// <summary>
+			/// Include only specified columns.
+			/// </summary>
+			IncludeSpecifiedPropertiesOnly,
+		}
 
 		/// <summary>
 		/// Constructor, used by the generic ExcelWriter&lt;T&gt; class. 
@@ -463,10 +463,7 @@ namespace Nucleus.Extensions
 		/// </summary>
 		public void AdjustColumnWidths()
 		{
-			foreach (IXLColumn column in this.Worksheet.Columns(1, this.WorksheetColumns.Count))
-			{
-				column.AdjustToContents();
-			}
+			this.Worksheet.ColumnsUsed().AdjustToContents();
 		}
 
 		/// <summary>

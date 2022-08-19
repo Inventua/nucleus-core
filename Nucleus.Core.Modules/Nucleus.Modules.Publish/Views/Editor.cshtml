@@ -29,15 +29,15 @@
 				@Html.HiddenFor(Model => Model.Standalone)
 	
 				<SettingsControl caption="Title" helptext="Article title.">
-					@Html.TextBoxFor(model => model.Article.Title)
+					@Html.TextBoxFor(model => model.Article.Title, new { @maxlength = 256} )
 				</SettingsControl>
 
 				<SettingsControl caption="Sub Title" helptext="Article sub-title.">
-					@Html.TextBoxFor(model => model.Article.SubTitle)
+					@Html.TextBoxFor(model => model.Article.SubTitle, new { @maxlength = 256} )
 				</SettingsControl>
 
 				<SettingsControl caption="Summary" helptext="Article summary.">
-					@Html.TextAreaFor(model => model.Article.Summary)
+					@Html.TextAreaFor(model => model.Article.Summary, new { @maxlength = 256} )
 				</SettingsControl>
 					
 				<SettingsControl caption="Image" helptext="Article image.">
@@ -48,7 +48,7 @@
 				</SettingsControl>
 
 				<SettingsControl caption="Description" helptext="Article description.">
-					@Html.TextAreaFor(model => model.Article.Description)
+					@Html.TextAreaFor(model => model.Article.Description, new { @maxlength = 512} )
 				</SettingsControl>
 
 

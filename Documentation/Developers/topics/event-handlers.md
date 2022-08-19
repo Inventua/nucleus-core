@@ -1,13 +1,28 @@
 ## Event Handlers
+Nucleus Extensions implement an Event Handler to execute code when a system or extension event is raised, and can raise events of their own
+to be handled within the extension, or by another extension.  The data provider for most Nucleus core entities 
+raises events when data is changed (when a record is created, modified or deleted), and the Nucleus entity framework 
+[migration](/api-documentation/Nucleus.Data.Common.xml/Nucleus.Data.Common.DataProviderMigration/) class raises 
+events when a database schema migration is completed.
 
+### Raising an Event
+To raise an event, add a reference to the Nucleus [IEventDispatcher](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.IEventDispatcher/)
+to your constructor.  Call [RaiseEvent](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.IEventDispatcher/#RaiseEventTModelTEvent(TModel)) to 
+raise an event.  
 
-/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.ISystemEventHandlerT0T1/
+### Handling an Event
+To handle an event, create a class which implements the [ISystemEventHandler](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.ISystemEventHandlerT0T1/)
+interface.  
 
+The functions used to raise and handle events both specify a TModel and TEvent.  The TModel type is the type of the model entity which has changed, and the TEvent 
+type represents the event which occurred.  TEvent can be any type, but Nucleus has classes for [create](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.SystemEventTypes.Create/),  
+[update](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.SystemEventTypes.Update/), and 
+[delete](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.SystemEventTypes.Delete/).  If you need to represent a different kind of event, just 
+create a class for it.  The TEvent class is used as a key in the dependency injection services collection, and does not need to inherit any class, or have any methods or properties.
 
 ### Example
-The example below is from the core Documents module.  This class adds services to dependency injection using a startup class, including a `ISystemEventHandler` to 
-receive Nucleus system events - in this case, a MigrateEvent which is triggered after a data provider migration script is executed.  Some extensions use the MigrateEvent 
-to perform post-installation or post-upgrade steps which can't be included in a database migration script.  
+The example below is from the core Documents module.  This class adds a  System Event Handler to receive Nucleus system events - in this case, a MigrateEvent which is triggered after a 
+data provider migration script is executed.  Some extensions use the MigrateEvent to perform post-installation or post-upgrade steps which can't be included in a database migration script.  
 
 ```
 using System.Threading.Tasks;
@@ -57,6 +72,7 @@ namespace Nucleus.Modules.Documents
 }
 ```
 
-> **_Note:_**:  The Data migration event (`MigrateEvent`) is sent to **all** subscribers, so you must check the `.SchemaName` property of the event to 
-make sure that it applies to your extension.  Data schema migration doesn't happen immediately when you install an update, it runs the first time the
-extension accesses the database.
+> **_Note:_**:  The Data migration event [MigrateEvent](/api-documentation/Nucleus.Data.Common.xml/Nucleus.Data.Common.MigrateEvent/) 
+is sent to **all** subscribers, so you must check the `.SchemaName` property of the [MigrateEventArgs](/api-documentation/Nucleus.Data.Common.xml/Nucleus.Data.Common.MigrateEventArgs/) 
+object that is passed to the ==Invoke== method to make sure that it applies to your extension.  Data schema migration doesn't happen immediately 
+when you install an update, it runs the first time the extension accesses the database.

@@ -14,10 +14,10 @@ using System.Threading.Tasks;
 namespace Nucleus.Modules.Documents.DataProviders
 {
 	/// <summary>
-	/// Links module data provider.
+	/// Documents module data provider.
 	/// </summary>
 	/// <remarks>
-	/// This class implements the ILinksDataProvider interface, and inherits the base Nucleus entity framework data provider class.
+	/// This class implements the IDocumentsDataProvider interface, and inherits the base Nucleus entity framework data provider class.
 	/// </remarks>
 	public class DocumentsDataProvider : Nucleus.Data.EntityFramework.DataProvider, IDocumentsDataProvider
 	{

@@ -20,6 +20,9 @@ function _Page()
 		var timezoneOffset = new Date().getTimezoneOffset() * -1;
 		document.cookie = 'timezone-offset=' + timezoneOffset.toString() + '; path=/;SameSite=Strict;max-age=3600';
 
+		_restoreScrollPostition();
+		_trackScrollPosition();
+
 		// a elements (links) with a data-target which exist after initial page rendering (not dynamically populated) are tracked by the Google Analytics javascript, which
 		// intermittently causes page navigation (to the url in href) *after* _getPartialContent has executed.  We move the href value to data-href (which is handled by _getPartialContent)
 		// to work around this issue.
@@ -210,6 +213,49 @@ function _Page()
 
 			jQuery(this).parents('form').submit();			
 		}
+	}
+
+	function _buildScrollPositionKey(element)
+	{
+		var scrollTrackId = (element === document) ? "document" : jQuery(element).attr('data-track-scroll');
+		return 'scrolltop:' + document.location.pathname + ':' + scrollTrackId;
+	}
+
+	function _isSessionStorageAvailable()
+	{
+		try
+		{
+			return typeof (window['sessionStorage']) !== 'undefined';
+		}
+		catch (e)
+		{
+			return false;
+		}		
+	}
+
+	function _trackScrollPosition()
+	{
+		if (!_isSessionStorageAvailable() || window.self !== window.top) return;
+		jQuery(window).on('beforeunload', function (event)
+		{
+			jQuery('document, [data-track-scroll]').each(function (index, element)
+			{
+				sessionStorage.setItem(_buildScrollPositionKey(element), jQuery(element).scrollTop().toString());
+			});			
+		});
+	}
+
+	function _restoreScrollPostition()
+	{
+		if (!_isSessionStorageAvailable() || window.self !== window.top) return;
+		jQuery('document, [data-track-scroll]').each(function (index, element)
+		{
+			var key = _buildScrollPositionKey(element);
+			if (sessionStorage[key])
+			{
+				jQuery(element).scrollTop(sessionStorage.getItem(key));
+			}
+		});		
 	}
 
 	function _loadIFrame(event)

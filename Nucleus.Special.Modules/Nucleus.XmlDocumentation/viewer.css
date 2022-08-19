@@ -132,7 +132,7 @@
 	margin-bottom: 1rem;
 }
 
-.XmlDocumentation .api-parameters table tr td, .XmlDocumentation .api-typeparameters table tr td
+.XmlDocumentation .api-parameters table tr td:first-child, .XmlDocumentation .api-typeparameters table tr td:first-child
 {
 	padding: 4px 8px;
 	min-width: 10em;

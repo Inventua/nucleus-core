@@ -25,7 +25,7 @@
 			}
 			else
 			{
-				<div>This @(Model.Content.Type== Nucleus.XmlDocumentation.Models.ApiMember.MemberTypes.Interface ? "Interface" : "Class") is marked as internal use only.  Internal use classes are not intended for use by extensions, and backward and forward compatibility is not guaranteed.</div>
+				<div>This @(Model.Content.Type.ToString().ToLower()) is marked as internal use only.  Internal use classes are not intended for use by extensions, and backward and forward compatibility is not guaranteed.</div>
 			}
 		</div>
 	}

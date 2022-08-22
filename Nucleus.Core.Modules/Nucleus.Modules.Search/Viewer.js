@@ -1,5 +1,7 @@
 ﻿jQuery(document).ready(function ()
 {
+	var suggestionsTimeout = -1;
+
 	/* do search on ENTER */
 	jQuery('.search-term').on('keydown', function (event)
 	{
@@ -13,7 +15,13 @@
 	/* get updated search suggestions */
 	jQuery('.search-term').on('input', function (event)
 	{
-		jQuery(this).parents('form').submit();
+		/* wait 1 second before submitting the request, so that if the user is typing, we don't sent multiple unwanted requests */
+		if (suggestionsTimeout !== -1)
+		{
+			window.clearTimeout(suggestionsTimeout);
+		}
+
+		suggestionsTimeout = window.setTimeout(function () { jQuery(this).parents('form').submit(); }, 1000);
 		return false;
 	});
 

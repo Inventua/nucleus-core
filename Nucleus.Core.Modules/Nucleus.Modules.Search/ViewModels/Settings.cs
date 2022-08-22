@@ -18,10 +18,15 @@ namespace Nucleus.Modules.Search.ViewModels
 			Compact,
 			Minimal
 		}
-		
+
+		public const string PROMPT_DEFAULT = "Search Term";
+
 		public DisplayModes DisplayMode { get; set;}
 		public string SearchCaption { get; set; }
-		public string SearchButtonCaption { get; set; }	
+		public string SearchButtonCaption { get; set; }
+
+		public string Prompt { get; set; } = PROMPT_DEFAULT;
+
 
 		public Boolean ShowUrl { get; set; }
 

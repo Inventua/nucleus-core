@@ -27,6 +27,7 @@ namespace Nucleus.Modules.Search.Controllers
 		private const string MODULESETTING_DISPLAY_MODE = "search:display-mode";
 		private const string MODULESETTING_RESULTS_PAGE = "search:results-page";
 		private const string MODULESETTING_SEARCH_CAPTION = "search:search-caption";
+		private const string MODULESETTING_SEARCH_PROMPT = "search:search-prompt";
 		private const string MODULESETTING_SEARCH_BUTTON_CAPTION = "search:search-button-caption";
 		private const string MODULESETTING_INCLUDE_FILES = "search:include-files";
 
@@ -109,6 +110,8 @@ namespace Nucleus.Modules.Search.Controllers
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_DISPLAY_MODE, viewModel.DisplayMode);
 			
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SEARCH_CAPTION, viewModel.SearchCaption);
+			this.Context.Module.ModuleSettings.Set(MODULESETTING_SEARCH_PROMPT, viewModel.Prompt);
+			
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SEARCH_BUTTON_CAPTION, viewModel.SearchButtonCaption);			
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_INCLUDE_FILES, viewModel.IncludeFiles);
 			
@@ -269,7 +272,8 @@ namespace Nucleus.Modules.Search.Controllers
 		{
 			settings.ResultsPageId = this.Context.Module.ModuleSettings.Get(MODULESETTING_RESULTS_PAGE, Guid.Empty);
 			settings.DisplayMode = this.Context.Module.ModuleSettings.Get(MODULESETTING_DISPLAY_MODE, ViewModels.Settings.DisplayModes.Full);
-			settings.SearchCaption = this.Context.Module.ModuleSettings.Get(MODULESETTING_SEARCH_CAPTION, "Search Term");			
+			settings.SearchCaption = this.Context.Module.ModuleSettings.Get(MODULESETTING_SEARCH_CAPTION, "Search Term");
+			settings.Prompt = this.Context.Module.ModuleSettings.Get(MODULESETTING_SEARCH_PROMPT, Nucleus.Modules.Search.ViewModels.Settings.PROMPT_DEFAULT); 
 			settings.SearchButtonCaption = this.Context.Module.ModuleSettings.Get(MODULESETTING_SEARCH_BUTTON_CAPTION, "Search");
 			settings.IncludeFiles = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_FILES, true);
 

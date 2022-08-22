@@ -18,6 +18,10 @@
 					@Html.TextBoxFor(model => model.SearchCaption, new {  })
 				</SettingsControl>
 
+				<SettingsControl caption="Prompt" helptext="Specifies the text displayed within the search text box before the user has entered anything.">
+					@Html.TextBoxFor(model => model.Prompt, new {  })
+				</SettingsControl>
+
 				<SettingsControl caption="Search Button Caption" helptext="Specifies the text displayed in the search button.   This is only visible when display mode is set to 'Full' or 'Compact'.">
 					@Html.TextBoxFor(model => model.SearchButtonCaption, new {  })
 				</SettingsControl>

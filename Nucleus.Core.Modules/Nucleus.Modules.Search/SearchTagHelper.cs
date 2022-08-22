@@ -44,6 +44,11 @@ namespace Nucleus.Modules.Search
 		public Boolean IncludeFiles { get; set; }
 
 		/// <summary>
+		/// Specifies the text displayed in the search text box before the user has entered anything.
+		/// </summary>
+		public string Prompt { get; set; } = Nucleus.Modules.Search.ViewModels.Settings.PROMPT_DEFAULT;
+
+		/// <summary>
 		/// Use this setting to restrict results to specified scopes, or leave blank for all scopes.  Specify included scopes by entering one 
 		/// or more scopes separated by line feeds.  A scope is the URN of the data type which was used to create a search entry.  This is 
 		/// an advanced setting which may not be supported by all search providers.
@@ -73,7 +78,7 @@ namespace Nucleus.Modules.Search
 			output.SuppressOutput();
 			(this.HtmlHelper as IViewContextAware).Contextualize(this.ViewContext);
 
-			IHtmlContent searchControloutput = await SearchRenderer.Build(this.HtmlHelper, this.ResultsPageUrl, this.DisplayMode, this.MaximumSuggestions, this.IncludeFiles, this.IncludeScopes, null);
+			IHtmlContent searchControloutput = await SearchRenderer.Build(this.HtmlHelper, this.ResultsPageUrl, this.DisplayMode, this.Prompt, this.MaximumSuggestions, this.IncludeFiles, this.IncludeScopes, null);
 			if (searchControloutput != null)
 			{
 				searchControloutput.WriteTo(this.ViewContext.Writer, System.Text.Encodings.Web.HtmlEncoder.Default);

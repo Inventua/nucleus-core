@@ -10,6 +10,7 @@ namespace Nucleus.Modules.Publish.Models
 {
 	public class Article : ModelBase
 	{
+		public const string URN = "urn:nucleus:entities:publish-article";
 		public Guid Id { get; set; }
 		public string Title { get; set; }
 		public string SubTitle { get; set; }

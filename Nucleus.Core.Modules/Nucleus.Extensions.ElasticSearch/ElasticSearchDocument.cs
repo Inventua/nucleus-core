@@ -86,9 +86,28 @@ namespace Nucleus.Extensions.ElasticSearch
 			}
 		}
 
+		/// <summary>
+		/// Encode the url as a base 64 encoded SHA384 hash.  
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// This function is used to generate a key for Elastic search.  Elastic search supports keys up to 512 bytes.  Base 64 string 
+		/// lengths (where n=original length) are 4*(n/3), so an input value of 512 bits = 64 bytes/3*4 = 85.3 (84) bytes + 4 bytes padding, 
+		/// which fits easily.
+		/// </remarks>
 		private string Encode(string value)
 		{
-			return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(value));
+			System.Security.Cryptography.SHA512 sha = System.Security.Cryptography.SHA512.Create();
+
+			string encodedValue = Convert.ToBase64String(sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(value)));
+
+			//string encodedValue = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(value));
+			//if (encodedValue.Length > 512)
+			//{
+			//	encodedValue= encodedValue.Substring(0, 512);
+			//}
+			return encodedValue;
 		}
 
 		/// <summary>

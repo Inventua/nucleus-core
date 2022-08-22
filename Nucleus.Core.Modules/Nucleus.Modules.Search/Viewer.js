@@ -15,13 +15,13 @@
 	/* get updated search suggestions */
 	jQuery('.search-term').on('input', function (event)
 	{
-		/* wait 1 second before submitting the request, so that if the user is typing, we don't sent multiple unwanted requests */
+		/* wait half a second before submitting the request, so that if the user is typing, we don't send multiple unwanted requests */
 		if (suggestionsTimeout !== -1)
 		{
 			window.clearTimeout(suggestionsTimeout);
 		}
 
-		suggestionsTimeout = window.setTimeout(function () { jQuery(this).parents('form').submit(); }, 1000);
+		suggestionsTimeout = window.setTimeout(function (form) { form.submit(); }, 500, jQuery(this).parents('form').first());
 		return false;
 	});
 

@@ -21,6 +21,7 @@ namespace Nucleus.Modules.Links.Controllers
 		public const string MODULESETTING_CATEGORYLIST_ID = "links:categorylistid";
 		public const string MODULESETTING_LAYOUT = "links:layout";
 		public const string MODULESETTING_OPEN_NEW_WINDOW = "links:opennewwindow";
+		public const string MODULESETTING_SHOW_IMAGES = "links:showimages";
 
 		private Context Context { get; }
 		private IPageManager PageManager { get; }
@@ -75,7 +76,15 @@ namespace Nucleus.Modules.Links.Controllers
 		{
 			viewModel.Link.LinkFile.File.ClearSelection();
 
-			return View("Editor", await BuildEditorViewModel(viewModel, Guid.Empty, viewModel.UseLayout=="_PopupEditor"));
+			return View("Editor", await BuildEditorViewModel(viewModel));
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> SelectAnotherImage(ViewModels.Editor viewModel)
+		{
+			viewModel.Link.ImageFile.ClearSelection();
+
+			return View("Editor", await BuildEditorViewModel(viewModel));
 		}
 
 		[HttpPost]
@@ -90,6 +99,25 @@ namespace Nucleus.Modules.Links.Controllers
 		{
 			await this.LinksManager.MoveDown(this.Context.Module, id);
 			return View("_LinksList", await BuildSettingsViewModel(viewModel));
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> UploadImageFile(ViewModels.Editor viewModel, [FromForm] IFormFile mediaFile)
+		{
+			if (mediaFile != null)
+			{
+				viewModel.Link.ImageFile.Parent = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Link.ImageFile.Parent.Id);
+				using (System.IO.Stream fileStream = mediaFile.OpenReadStream())
+				{
+					viewModel.Link.ImageFile = await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.Link.ImageFile.Provider, viewModel.Link.ImageFile.Parent.Path, mediaFile.FileName, fileStream, false);
+				}
+			}
+			else
+			{
+				return BadRequest();
+			}
+
+			return View("Editor", await BuildEditorViewModel(viewModel));
 		}
 
 		[HttpPost]
@@ -108,7 +136,7 @@ namespace Nucleus.Modules.Links.Controllers
 				return BadRequest();
 			}
 
-			return View("Editor", viewModel);
+			return View("Editor", await BuildEditorViewModel(viewModel));
 		}
 
 		[HttpGet]
@@ -166,6 +194,7 @@ namespace Nucleus.Modules.Links.Controllers
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_CATEGORYLIST_ID, viewModel.CategoryList.Id);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_LAYOUT, viewModel.Layout);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_OPEN_NEW_WINDOW, viewModel.NewWindow);
+			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_IMAGES, viewModel.ShowImages);
 
 			await this.PageModuleManager.SaveSettings(this.Context.Module);
 
@@ -181,7 +210,8 @@ namespace Nucleus.Modules.Links.Controllers
 
 			viewModel.CategoryList = await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(MODULESETTING_CATEGORYLIST_ID, Guid.Empty));
 			viewModel.Layout = this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table");
-			viewModel.NewWindow = this.Context.Module.ModuleSettings.Get(MODULESETTING_OPEN_NEW_WINDOW, false); 
+			viewModel.NewWindow = this.Context.Module.ModuleSettings.Get(MODULESETTING_OPEN_NEW_WINDOW, false);
+			viewModel.ShowImages = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_IMAGES, false);
 
 			viewModel.Lists = await this.ListManager.List(this.Context.Site);
 
@@ -197,7 +227,7 @@ namespace Nucleus.Modules.Links.Controllers
 			return viewModel;
 		}
 
-		private async Task<ViewModels.Editor> BuildEditorViewModel(ViewModels.Editor input, Guid id, Boolean standalone)
+		private async Task<ViewModels.Editor> BuildEditorViewModel(ViewModels.Editor input)
 		{
 			ViewModels.Editor viewModel;
 
@@ -209,6 +239,26 @@ namespace Nucleus.Modules.Links.Controllers
 			{
 				viewModel = input;
 			}
+
+			viewModel.CategoryList = await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(MODULESETTING_CATEGORYLIST_ID, Guid.Empty));
+
+			viewModel.LinkTypes = new();
+			viewModel.LinkTypes.Add(Models.LinkTypes.Url, "Url");
+			viewModel.LinkTypes.Add(Models.LinkTypes.Page, "Page");
+			viewModel.LinkTypes.Add(Models.LinkTypes.File, "File");
+
+			if (viewModel.Link?.ImageFile != null)
+			{
+				viewModel.Link.ImageFile = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.Link.ImageFile);
+			}
+
+			return viewModel;
+		}
+
+		private async Task<ViewModels.Editor> BuildEditorViewModel(ViewModels.Editor input, Guid id, Boolean standalone)
+		{
+			ViewModels.Editor viewModel = await BuildEditorViewModel (input);
+
 
 			if (standalone)
 			{
@@ -227,11 +277,8 @@ namespace Nucleus.Modules.Links.Controllers
 				}
 			}
 
-			viewModel.CategoryList = await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(MODULESETTING_CATEGORYLIST_ID, Guid.Empty));
-
 			switch (viewModel.Link.LinkType)
 			{
-				//case Models.LinkTypes.Url:
 				case Models.LinkTypes.File:
 					if (viewModel.Link.LinkFile != null)
 					{
@@ -243,14 +290,9 @@ namespace Nucleus.Modules.Links.Controllers
 					break;
 			}
 
-			viewModel.LinkTypes = new();
-			viewModel.LinkTypes.Add(Models.LinkTypes.Url, "Url");
-			viewModel.LinkTypes.Add(Models.LinkTypes.Page, "Page");
-			viewModel.LinkTypes.Add(Models.LinkTypes.File, "File");
-
-
 			return viewModel;
 		}
+
 
 	}
 }

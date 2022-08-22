@@ -16,6 +16,7 @@ namespace Nucleus.Modules.Links.ViewModels
     public List<Link> Links { get; set; }
     public string Layout { get; set; }
     public Boolean NewWindow { get; set; }
+    public Boolean ShowImages { get; set; }
     public List CategoryList { get; set; }
   }
 }

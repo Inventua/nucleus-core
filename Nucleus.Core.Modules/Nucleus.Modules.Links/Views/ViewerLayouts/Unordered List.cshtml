@@ -23,7 +23,10 @@
 		@if (!String.IsNullOrEmpty(url))
 		{
 			<li>
-				@Html.AddEditingControls(@link.Id)
+				@if (Model.ShowImages && link.ImageFile != null)
+				{
+					<img class="me-1" src="@Url.FileLink(link.ImageFile)" width="@(link.ImageFile.Width.HasValue ? link.ImageFile.Width.Value : "" )" height="@(link.ImageFile.Height.HasValue ? link.ImageFile.Height.Value : "" )" alt="">
+				}
 				<a href="@url" alt="@link.Title" target="@(Model.NewWindow ? "_blank" : "")">@link.Title</a>
 
 				@if (Model.CategoryList != null)
@@ -31,6 +34,7 @@
 					<span class="category">@link.Category?.Name</span>
 				}
 				<span>@link.Description</span>
+				@Html.AddEditingControls(@link.Id)
 			</li>
 		}
 	}

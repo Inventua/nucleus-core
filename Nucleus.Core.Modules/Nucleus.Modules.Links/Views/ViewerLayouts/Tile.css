@@ -17,3 +17,9 @@
 	padding: 0.75rem;
 	border: solid 1px #ddd;
 }
+
+.Links .link-tiles a .document-description, .Links .link-tiles a .document-description:hover
+{
+	display: inline-block;
+	text-decoration: none;
+}

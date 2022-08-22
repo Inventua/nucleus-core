@@ -24,6 +24,22 @@
 			@Html.TextAreaFor(model => model.Link.Description)
 		</SettingsControl>
 
+		<SettingsControl caption="Image (file)" helptext="Select an image file.">
+			<div class="nucleus-flex-fields nucleus-fileselector">
+				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.Link.ImageFile, propertyName = "Link.ImageFile", selectAnotherActionName = "SelectAnotherImage", pattern = "(.gif|.png|.jpg|.jpeg|.bmp)" })
+				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.Link.ImageFile?.Parent, actionName = "UploadImageFile", Filter = "image/*" })		
+				@*@if (Model.Link.ImageFile?.Id != Guid.Empty)
+				{
+					@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.Link.ImageFile?.Parent, actionName = "UploadImageFile", Filter = "image/*" })
+				}*@
+			</div>
+			@*@if (Model.Link.ImageFile?.Id == Guid.Empty)
+			{
+				<div class="nucleus-flex-fields nucleus-fileselector">
+					@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.Link.ImageFile?.Parent, actionName = "UploadImageFile", Filter = "image/*" })
+				</div>
+			}*@
+		</SettingsControl>
 
 		<div class="nucleus-flex-fields">
 			@if (Model.CategoryList != null)
@@ -40,21 +56,21 @@
 		@switch (Model.Link.LinkType)
 		{
 			case Nucleus.Modules.Links.Models.LinkTypes.File:
-				<SettingsControl caption="File" helptext="File">
+				<SettingsControl caption="File" helptext="Link File">
 					<div class="nucleus-flex-fields nucleus-fileselector">
 						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.Link.LinkFile?.File, propertyName = "Link.LinkFile.File" })
-						
-						@if (Model.Link.LinkFile?.File?.Id != Guid.Empty)
+						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.Link.LinkFile?.File?.Parent })
+						@*@if (Model.Link.LinkFile?.File?.Id != Guid.Empty)
 						{
 							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.Link.LinkFile?.File?.Parent })
-						}
+						}*@
 					</div>
-					@if (Model.Link.LinkFile?.File?.Id == Guid.Empty)
+					@*@if (Model.Link.LinkFile?.File?.Id == Guid.Empty)
 					{
 						<div class="nucleus-flex-fields nucleus-fileselector">
 							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.Link.LinkFile?.File?.Parent })
 						</div>
-					}
+					}*@
 				</SettingsControl>
 				break;
 			case Nucleus.Modules.Links.Models.LinkTypes.Page:

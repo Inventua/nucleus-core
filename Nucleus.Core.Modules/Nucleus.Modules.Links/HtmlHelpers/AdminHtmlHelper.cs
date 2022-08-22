@@ -27,7 +27,7 @@ namespace Nucleus.Modules.Links.HtmlHelpers
 				IUrlHelper urlHelper = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(htmlHelper.ViewContext);
 
 				TagBuilder editorBuilder = new("div");
-				editorBuilder.AddCssClass("nucleus-inline-edit-controls justify-content-start");
+				editorBuilder.AddCssClass("nucleus-inline-edit-controls justify-content-end");
 				editorBuilder.InnerHtml.AppendHtml(context.Module.BuildEditButton("&#xe3c9;", "Edit", urlHelper.NucleusAction("Editor", "Admin", "Links", new { Id = Id }), null));
 
 				return editorBuilder;

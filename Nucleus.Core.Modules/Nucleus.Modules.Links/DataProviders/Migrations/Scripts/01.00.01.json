@@ -1,0 +1,14 @@
+{
+	"schemaName": "Nucleus.Modules.Links",
+	"version": "01.00.01",
+	"operations": [
+		{
+			"addColumn": {
+				"table": "Links",
+				"name": "ImageFileId",
+				"clrType": "Guid",
+				"isnullable": true
+			}
+		}		
+	]
+}

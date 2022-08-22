@@ -26,5 +26,6 @@ namespace Nucleus.Modules.Links.Models
 		public LinkPage LinkPage { get; set; }
 		public LinkFile LinkFile { get; set; }
 		public ListItem Category { get; set; }
+		public File ImageFile { get; set; }
 	}
 }

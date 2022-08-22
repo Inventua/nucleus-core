@@ -20,17 +20,18 @@
 					break;
 			}
 			@if (!String.IsNullOrEmpty(url))
-			{
-
-				<div>
-					@Html.AddEditingControls(@link.Id)
-					<div class="document-title">
-						<a href="@url" alt="@link.Title" target="@(Model.NewWindow ? "_blank" : "")">
-							@link.Title
-						</a>
+			{				
+				<a class="d-flex document-title" href="@url" alt="@link.Title" target="@(Model.NewWindow ? "_blank" : "")">
+					@if (Model.ShowImages && link.ImageFile != null)
+					{
+						<img class="me-1" src="@Url.FileLink(link.ImageFile)" width="@(link.ImageFile.Width.HasValue ? link.ImageFile.Width.Value : "" )" height="@(link.ImageFile.Height.HasValue ? link.ImageFile.Height.Value : "" )" alt="">						
+					}
+					<div class="flex-fill">
+						@Html.AddEditingControls(@link.Id)
+						<span class="fw-bold">@link.Title</span>
+						<div class="document-description">@link.Description</div>
 					</div>
-					<div class="document-description">@link.Description</div>
-				</div>
+				</a>				
 			}
 		}
 	</div>

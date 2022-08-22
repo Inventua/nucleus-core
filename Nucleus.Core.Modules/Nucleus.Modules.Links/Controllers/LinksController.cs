@@ -81,7 +81,7 @@ namespace Nucleus.Modules.Links.Controllers
 			viewModel.Layout = layoutPath;
 			viewModel.CategoryList = await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(AdminController.MODULESETTING_CATEGORYLIST_ID, Guid.Empty));
 			viewModel.NewWindow = this.Context.Module.ModuleSettings.Get(AdminController.MODULESETTING_OPEN_NEW_WINDOW, false);
-
+			viewModel.ShowImages = this.Context.Module.ModuleSettings.Get(AdminController.MODULESETTING_SHOW_IMAGES, false);
 
 			return viewModel;
 		}		

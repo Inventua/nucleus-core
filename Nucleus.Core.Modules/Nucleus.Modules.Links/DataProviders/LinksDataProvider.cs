@@ -1,20 +1,13 @@
 ﻿using System;
 using Nucleus.Abstractions.Models;
-using Nucleus.Abstractions.Models.Mail;
-using Nucleus.Abstractions.Models.TaskScheduler;
-using Nucleus.Data.Common;
 using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Data;
-using System.Security.Claims;
 using Nucleus.Abstractions.EventHandlers;
 using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
 using Nucleus.Modules.Links.Models;
 using Microsoft.EntityFrameworkCore;
-using Nucleus.Abstractions.Managers;
 using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Links.DataProviders
@@ -41,6 +34,8 @@ namespace Nucleus.Modules.Links.DataProviders
 			Link result = await this.Context.Links
 				.Where(link => link.Id == id)
 				.Include(link => link.Category)
+				.Include(link => link.ImageFile)
+				.AsSplitQuery()
 				.AsNoTracking()
 				.FirstOrDefaultAsync();
 
@@ -93,7 +88,10 @@ namespace Nucleus.Modules.Links.DataProviders
 		{
 			List<Link> results = await this.Context.Links
 				.Where(link => EF.Property<Guid>(link, "ModuleId") == pageModule.Id)
+				.Include(link => link.Category)
+				.Include(link => link.ImageFile)
 				.OrderBy(link => link.SortOrder)
+				.AsSplitQuery()
 				.AsNoTracking()
 				.ToListAsync();
 

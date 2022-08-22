@@ -35,13 +35,18 @@
 					</SettingsControl>
 				</div>
 				
-				<SettingsControl caption="Open in new window?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to open the link in a new window.">
-					@Html.CheckBoxFor(model => model.NewWindow, new { @class = "ToggleSwitch" })
-				</SettingsControl>
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Open in new window?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to open the link in a new window.">
+						@Html.CheckBoxFor(model => model.NewWindow, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+				
+					<SettingsControl caption="Show Images?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to display link images.">
+						@Html.CheckBoxFor(model => model.ShowImages, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+				</div>
 
 				<div class="nucleus-form-tools">
 					@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "Admin", "Links"), new { })
-
 				</div>
 			</fieldset>
 

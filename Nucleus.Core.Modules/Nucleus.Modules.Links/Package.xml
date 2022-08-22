@@ -42,6 +42,7 @@
 					<file name="Ordered List.cshtml" />
 					<file name="Unordered List.cshtml" />
 					<file name="Tile.cshtml" />
+					<file name="Tile.css" />
 				</folder>
 			</folder>
 			

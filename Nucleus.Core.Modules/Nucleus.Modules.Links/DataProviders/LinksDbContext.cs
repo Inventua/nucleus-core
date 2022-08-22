@@ -44,7 +44,9 @@ namespace Nucleus.Modules.Links.DataProviders
 				.HasOne(link => link.Category)
 				.WithMany()
 				.HasForeignKey("CategoryId");
-			
+
+			builder.Entity<Link>().HasOne<Nucleus.Abstractions.Models.FileSystem.File>(link => link.ImageFile);
+
 			builder.Entity<LinkFile>().Property<Guid>("LinkId");
 			builder.Entity<LinkFile>().HasKey("LinkId");
 			builder.Entity<LinkFile>().HasOne<Nucleus.Abstractions.Models.FileSystem.File>(linkFile => linkFile.File);

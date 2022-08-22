@@ -12,11 +12,13 @@ using System.Threading.Tasks;
 namespace Nucleus.Modules.Links.ViewModels
 {
   public class Settings
-  {
-    //public Guid ModuleId { get; set; }
+  {    
     public IList<Link> Links { get; set; }
-    //public string Message { get; set; }
+    
     public Boolean NewWindow { get; set; }
+
+    public Boolean ShowImages { get; set; }
+
     public IEnumerable<List> Lists { get; set; }
 
     public List CategoryList { get; set; }

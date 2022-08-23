@@ -60,7 +60,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
       if (!String.IsNullOrEmpty(scriptPath))
       {
-        return AddScript(htmlHelper, scriptPath);
+        return AddScript(htmlHelper, scriptPath, false, -100);
       }
       else
       {
@@ -105,6 +105,27 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, string scriptPath, Boolean isAsync)
     {
       return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(htmlHelper.ResolveExtensionUrl(scriptPath)), isAsync, false, 0, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
+    }
+
+    /// <summary>
+    /// Register the specified script to be added to the Layout or module's scripts.
+    /// </summary>
+    /// <param name="htmlHelper"></param>
+    /// <param name="scriptPath"></param>
+    /// <param name="isAsync"></param>
+    /// <param name="order"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// Extensions (modules) can use this Html Helper to add scripts to the HEAD block.  The scriptPath can contain the 
+    /// tilde (~) character to specify an app-relative path.  Your script path should include the extensions folder and your
+    /// extension folder name.
+    /// </remarks>
+    /// <example>
+    /// @Html.AddScript("~/Extensions/MyModule/MyModule.js")
+    /// </example>
+    public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, string scriptPath, Boolean isAsync, int order)
+    {
+      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(htmlHelper.ResolveExtensionUrl(scriptPath)), isAsync, false, order, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
     }
 
     /// <summary>

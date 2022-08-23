@@ -30,8 +30,8 @@
 	</ItemGroup>
 		
   <ItemGroup>
-    <ProjectReference Include="..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
-    <ProjectReference Include="..\Nucleus.Extensions\Nucleus.Extensions.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Extensions\Nucleus.Extensions.csproj" />
   </ItemGroup>
 		
   <ItemGroup>

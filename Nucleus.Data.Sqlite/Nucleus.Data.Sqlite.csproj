@@ -30,9 +30,9 @@
 	</ItemGroup>
 	
   <ItemGroup>
-    <ProjectReference Include="..\Nucleus.Data.Common\Nucleus.Data.Common.csproj" />
-    <ProjectReference Include="..\Nucleus.Data.EntityFramework\Nucleus.Data.EntityFramework.csproj" />
-    <ProjectReference Include="..\Nucleus.Extensions\Nucleus.Extensions.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Data.Common\Nucleus.Data.Common.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Data.EntityFramework\Nucleus.Data.EntityFramework.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Extensions\Nucleus.Extensions.csproj" />
   </ItemGroup>
 
 </Project>

@@ -23,7 +23,7 @@
 	</ItemGroup>
 	
   <ItemGroup>
-    <ProjectReference Include="..\Nucleus.Data.EntityFramework\Nucleus.Data.EntityFramework.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Data.EntityFramework\Nucleus.Data.EntityFramework.csproj" />
   </ItemGroup>
 
 </Project>

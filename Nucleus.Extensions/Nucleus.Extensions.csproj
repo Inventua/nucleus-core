@@ -41,7 +41,7 @@
 	</ItemGroup>
 	
   <ItemGroup>
-    <ProjectReference Include="..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
   </ItemGroup>
 	
   <ItemGroup>

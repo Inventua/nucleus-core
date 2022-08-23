@@ -51,14 +51,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
-    <ProjectReference Include="..\Nucleus.Data.Common\Nucleus.Data.Common.csproj" />
-    <ProjectReference Include="..\Nucleus.Data.EntityFramework\Nucleus.Data.EntityFramework.csproj" />
-    <ProjectReference Include="..\Nucleus.Data.MySql\Nucleus.Data.MySql.csproj" />
-    <ProjectReference Include="..\Nucleus.Data.PostgreSql\Nucleus.Data.PostgreSql.csproj" />
-    <ProjectReference Include="..\Nucleus.Data.Sqlite\Nucleus.Data.Sqlite.csproj" />
-    <ProjectReference Include="..\Nucleus.Data.SqlServer\Nucleus.Data.SqlServer.csproj" />
-    <ProjectReference Include="..\Nucleus.Extensions\Nucleus.Extensions.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Data.Common\Nucleus.Data.Common.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Data.EntityFramework\Nucleus.Data.EntityFramework.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Data.MySql\Nucleus.Data.MySql.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Data.PostgreSql\Nucleus.Data.PostgreSql.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Data.Sqlite\Nucleus.Data.Sqlite.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Data.SqlServer\Nucleus.Data.SqlServer.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Extensions\Nucleus.Extensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

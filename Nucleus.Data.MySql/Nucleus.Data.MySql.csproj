@@ -11,9 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
-    <ProjectReference Include="..\Nucleus.Data.Common\Nucleus.Data.Common.csproj" />
-    <ProjectReference Include="..\Nucleus.Data.EntityFramework\Nucleus.Data.EntityFramework.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Data.Common\Nucleus.Data.Common.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Data.EntityFramework\Nucleus.Data.EntityFramework.csproj" />
   </ItemGroup>
 
 </Project>

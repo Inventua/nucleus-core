@@ -149,11 +149,11 @@ namespace Nucleus.Modules.Search.Controllers
 
 			if (resultsPage != null)
 			{
-				viewModel.ResultsUrl = resultsPage.DefaultPageRoute().Path;
+				viewModel.ResultsUrl = "~" + resultsPage.DefaultPageRoute().Path;
 			}
 			else
 			{
-				viewModel.ResultsUrl = this.Context.Page.DefaultPageRoute().Path;
+				viewModel.ResultsUrl = "~" + this.Context.Page.DefaultPageRoute().Path;
 			}
 
 			if (!String.IsNullOrEmpty(viewModel.SearchTerm))

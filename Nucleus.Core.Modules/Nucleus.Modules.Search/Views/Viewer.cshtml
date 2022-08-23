@@ -6,7 +6,7 @@
 @using Nucleus.Modules.Search.ViewModels
 @Html.AddStyle("~!/../viewer.css")
 @Html.AddScript("~!/../viewer.js")
-@using (Html.BeginNucleusForm("Suggest", "Search", "Search", FormMethod.Post, new { @data_target = ".search-suggestions", @role = "search", @data_resultsurl = Model.ResultsUrl }))
+@using (Html.BeginNucleusForm("Suggest", "Search", "Search", FormMethod.Post, new { @data_target = ".search-suggestions", @role = "search", @data_resultsurl = Url.Content(Model.ResultsUrl) }))
 {
 	@Html.HiddenFor(model=>model.Settings.IncludeFiles)
 	@Html.HiddenFor(model=>model.Settings.IncludeScopes)

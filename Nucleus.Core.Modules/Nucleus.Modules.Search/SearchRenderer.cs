@@ -28,9 +28,9 @@ namespace Nucleus.Modules.Search
 		{
 			ViewModels.Viewer model = new();
 
-			if (!String.IsNullOrEmpty(resultsPageUrl) && !resultsPageUrl.StartsWith('/'))
+			if (!String.IsNullOrEmpty(resultsPageUrl) && !resultsPageUrl.StartsWith("~/"))
 			{
-				resultsPageUrl = '/' + resultsPageUrl;
+				resultsPageUrl = "~/" + resultsPageUrl;
 			}
 
 			model.SearchTerm = htmlHelper.ViewContext.HttpContext.Request.Query["search"];

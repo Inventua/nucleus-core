@@ -12,6 +12,12 @@
 		}
 	});
 
+	/* Close suggestions when mouse is clicked elsewhere */
+	jQuery(document).on('click', '', function ()
+	{
+		jQuery('.suggestions-result').removeClass('show');
+	});
+
 	/* get updated search suggestions */
 	jQuery('.search-term').on('input', function (event)
 	{
@@ -27,7 +33,7 @@
 
 	jQuery(Page).on("ready", function (event, data)
 	{
-		if (data.target.hasClass('search-suggestions'))
+		if (typeof(data.target) !== 'undefined' && data.target.hasClass('search-suggestions'))
 		{
 			/*  If suggestions list overflows the right-hand side of the page, move it back to align to the right of the page */
 			data.target.css('margin-left', '');
@@ -45,12 +51,6 @@
 				var textbox = jQuery(this).parents('form').find('.search-term');
 				textbox.val(jQuery(this).attr('title'));
 				_doSearch(this);
-			});
-
-			/* Close suggestions when mouse is clicked elsewhere */
-			jQuery(document).on('click', '', function ()
-			{
-				jQuery('.suggestions-result').removeClass('show');
 			});
 		}
 	});

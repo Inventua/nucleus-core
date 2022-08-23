@@ -57,6 +57,12 @@
 
 	_doSearch = function (element)
 	{
+		/* if there is a pending call to get search suggestions, cancel it */
+		if (suggestionsTimeout !== -1)
+		{
+			window.clearTimeout(suggestionsTimeout);
+		}
+
 		var form = jQuery(element).parents('form');		
 		window.location = form.attr('data-resultsurl') + '?search=' + form.find('.search-term').val();		
 	}

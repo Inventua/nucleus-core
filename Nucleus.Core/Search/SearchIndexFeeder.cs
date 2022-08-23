@@ -64,28 +64,32 @@ namespace Nucleus.Core.Search
 						this.Logger.LogTrace("Getting search content from {type} for site '{site}'.", contentProvider.GetType().FullName, site.Name);
 						await foreach (ContentMetaData item in contentProvider.ListItems(fullSite))
 						{
-							item.Url = ParseUrl(item.Url);
-							this.Logger.LogTrace("Adding [{scope}] {url} to index.", item.Scope, item.Url);
-
-							foreach (ISearchIndexManager searchIndexManager in this.SearchIndexManagers)
+							// allow IContentMetaDataProducer implementation to return nulls (and silently skip them)
+							if (item != null)
 							{
-								try
-								{
-									searchIndexManager.Index(item);
-									this.Logger.LogInformation("Added [{scope}] {url} to index ({searchIndexManager}).", item.Scope, item.Url, searchIndexManager.GetType());
-								}
-								catch (NotImplementedException)
-								{
-									// ignore
-								}
-								catch (Exception e)
-								{
-									// error in .Index implementation
-									this.Logger.LogError(e, "Error adding [{scope}] {url} to index using {type}.Index()", item.Scope, item.Url, searchIndexManager.GetType().FullName);
-								}
-							}
+								item.Url = ParseUrl(item.Url);
+								this.Logger.LogTrace("Adding [{scope}] {url} to index.", item.Scope, item.Url);
 
-							item.Dispose();
+								foreach (ISearchIndexManager searchIndexManager in this.SearchIndexManagers)
+								{
+									try
+									{
+										searchIndexManager.Index(item);
+										this.Logger.LogInformation("Added [{scope}] {url} to index ({searchIndexManager}).", item.Scope, item.Url, searchIndexManager.GetType());
+									}
+									catch (NotImplementedException)
+									{
+										// ignore
+									}
+									catch (Exception e)
+									{
+										// error in .Index implementation
+										this.Logger.LogError(e, "Error adding [{scope}] {url} to index using {type}.Index()", item.Scope, item.Url, searchIndexManager.GetType().FullName);
+									}
+								}
+
+								item.Dispose();
+							}
 						}
 					}
 					catch (NotImplementedException)
@@ -108,7 +112,7 @@ namespace Nucleus.Core.Search
 		{
 			if (url.StartsWith('~'))
 			{
-				url = url.Substring(1);
+				url = url[1..];
 			}
 			
 			if (!url.EndsWith('/'))

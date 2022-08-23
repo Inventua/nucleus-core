@@ -18,9 +18,6 @@ namespace Nucleus.Modules.Publish
 {
 	public class ArticlesMetaDataProducer : IContentMetaDataProducer
 	{
-		private Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider ExtensionProvider  { get; } = new();
-
-		private IFileSystemManager FileSystemManager { get; }
 		private ArticlesManager ArticlesManager { get; }
 		private IExtensionManager ExtensionManager { get; }
 		private IPageManager PageManager { get; }
@@ -30,10 +27,9 @@ namespace Nucleus.Modules.Publish
 
 		private ILogger<ArticlesMetaDataProducer> Logger { get; }
 
-		public ArticlesMetaDataProducer(HttpClient httpClient, ISiteManager siteManager, ArticlesManager articlesManager, IApiKeyManager apiKeyManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, IExtensionManager extensionManager, ILogger<ArticlesMetaDataProducer> logger)
+		public ArticlesMetaDataProducer(HttpClient httpClient, ArticlesManager articlesManager, IApiKeyManager apiKeyManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IExtensionManager extensionManager, ILogger<ArticlesMetaDataProducer> logger)
 		{
 			this.HttpClient = httpClient;
-			this.FileSystemManager = fileSystemManager;
 			this.ArticlesManager = articlesManager;
 			this.ApiKeyManager = apiKeyManager;
 			this.ExtensionManager = extensionManager;
@@ -54,29 +50,40 @@ namespace Nucleus.Modules.Publish
 
 			// This must match the value in package.xml
 			Guid moduleDefinitionId = Guid.Parse("20af00b8-1d72-4c94-bce7-b175e0b173af");
-			
+
 			if (site.DefaultSiteAlias == null)
 			{
 				this.Logger.LogWarning("Site {0} skipped because it does not have a default alias.", site.Id);
 			}
 			else
 			{
+				this.Logger.LogTrace("Listing modules for site {0}.", site.Id);
 				foreach (PageModule module in await this.ExtensionManager.ListPageModules(new Nucleus.Abstractions.Models.ModuleDefinition() { Id = moduleDefinitionId }))
 				{
+					this.Logger.LogTrace("Getting page {0}.", module.PageId);
 					Page page = await this.PageManager.Get(module.PageId);
 
-					if (!page.IncludeInSearch )
+					if (page == null)
 					{
-						Logger?.LogInformation("Skipping publish module on page {pageid}/{pagename} because the page's 'Include in search' setting is false.", page.Id, page.Name);
+						this.Logger.LogWarning("Skipping module {0} because page {1} was not found.", module.Id, module.PageId);
 					}
-					foreach (Models.Article article in await this.ArticlesManager.List(module))
+					else
 					{
-						yield return await BuildContentMetaData(site, module, apiKey, useSsl, article);
+						if (!page.IncludeInSearch)
+						{
+							Logger?.LogInformation("Skipping publish module on page {pageid}/{pagename} because the page's 'Include in search' setting is false.", page.Id, page.Name);
+						}
+
+						foreach (Models.Article article in await this.ArticlesManager.List(module))
+						{
+							this.Logger.LogTrace("Building content meta-data for article {0}.", article.Id);
+							yield return await BuildContentMetaData(site, module, apiKey, useSsl, article);
+						}
 					}
 				}
 			}
 		}
-				
+
 		/// <summary>
 		/// Return a meta-data entry for the article meta-data
 		/// </summary>
@@ -84,32 +91,39 @@ namespace Nucleus.Modules.Publish
 		/// <param name="article"></param>
 		/// <returns></returns>
 		private async Task<ContentMetaData> BuildContentMetaData(Site site, PageModule module, ApiKey apiKey, Boolean useSsl, Models.Article article)
-		{		
-			// Get article meta-data
-			Page page = await this.PageManager.Get(module.PageId);
-			
-			if (page != null && article.Enabled)
+		{
+			try
 			{
-				string pageUrl = UrlHelperExtensions.RelativePageLink(page);
+				// Get article meta-data
+				Page page = await this.PageManager.Get(module.PageId);
 
-				ContentMetaData articleContentItem = new()
+				if (page != null && article.Enabled)
 				{
-					Site = site,
-					Title = (!String.IsNullOrEmpty(module.Title) ? module.Title : !String.IsNullOrEmpty(page.Title) ? page.Title : page.Name) + (!String.IsNullOrEmpty(article.Title) ? " - " + article.Title : ""),
-					Url =  pageUrl + article.Title.FriendlyEncode(),
-					PublishedDate = article.PublishDate,
-					SourceId = article.Id,
-					Scope = Models.Article.URN,
-					Attachments = article.Attachments.Select(attachment=>attachment.File),
-					Keywords = article.Categories.Select(category=>category.CategoryListItem.Name),
-					Summary = article.Summary,
-					Roles = await GetViewRoles(module),
-					ContentType = "text/html"
-				};
+					string pageUrl = UrlHelperExtensions.RelativePageLink(page);
 
-				await GetContent(site, apiKey, articleContentItem, useSsl);
-								
-				return articleContentItem;
+					ContentMetaData articleContentItem = new()
+					{
+						Site = site,
+						Title = (!String.IsNullOrEmpty(module.Title) ? module.Title : !String.IsNullOrEmpty(page.Title) ? page.Title : page.Name) + (!String.IsNullOrEmpty(article.Title) ? " - " + article.Title : ""),
+						Url = pageUrl + article.Title.FriendlyEncode(),
+						PublishedDate = article.PublishDate,
+						SourceId = article.Id,
+						Scope = Models.Article.URN,
+						Attachments = article.Attachments?.Select(attachment => attachment.File),
+						Keywords = article.Categories?.Select(category => category.CategoryListItem.Name),
+						Summary = article.Summary,
+						Roles = await GetViewRoles(module),
+						ContentType = "text/html"
+					};
+
+					await GetContent(site, apiKey, articleContentItem, useSsl);
+
+					return articleContentItem;
+				}
+			}
+			catch (Exception ex)
+			{
+				this.Logger?.LogError(ex, "Building content meta-data for article {0}.", article.Id);
 			}
 
 			return null;

@@ -38,9 +38,24 @@
 					<td>@Model.OperatingSystem</td>
 				</tr>
 				<tr>
+					<th>Operating System User</th>
+					<td>@Model.OperatingSystemUser</td>
+				</tr>
+				<tr>
 					<th>.NET Version</th>
 					<td>@Model.Framework</td>
 				</tr>
+				<tr>
+					<th>Process Start Time</th>
+					<td>@Model.StartTime.FormatDate(this.Context.Request.GetUserTimeZone()) (@Model.Uptime)</td>
+				</tr>
+				@if (Model.ProcessMemory > 0)
+				{
+					<tr>
+						<th>Process Memory</th>
+						<td>@Model.ProcessMemory.FormatFileSize()</td>
+					</tr>
+				}
 			</table>
 		</TabPanel>
 

@@ -53,6 +53,9 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> Index(ViewModels.Admin.SystemIndex viewModelInput)
 		{
+			System.Diagnostics.Process.GetCurrentProcess().Refresh();
+			TimeSpan uptime = DateTime.UtcNow - System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime();
+
 			ViewModels.Admin.SystemIndex viewModelOutput = new()
 			{
 				Server = Environment.MachineName,
@@ -61,7 +64,11 @@ namespace Nucleus.Web.Controllers.Admin
 				Copyright = this.GetType().Assembly.Copyright(),
 				Version = $"{this.GetType().Assembly.Version()}",
 				Framework = Environment.Version.ToString(),
-				OperatingSystem = Environment.OSVersion.ToString()
+				OperatingSystem = Environment.OSVersion.ToString(),
+				OperatingSystemUser = $"{Environment.UserDomainName}/{Environment.UserName}",
+				StartTime = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime(),
+				Uptime = FormatUptime(uptime),
+				ProcessMemory = System.Diagnostics.Process.GetCurrentProcess().PrivateMemorySize64
 			};
 
 			viewModelOutput.LogSettings.LogFile = viewModelInput.LogSettings.LogFile;
@@ -156,6 +163,30 @@ namespace Nucleus.Web.Controllers.Admin
 			//}
 
 			return View("Index", viewModelOutput);
+		}
+
+		private string FormatUptime(TimeSpan value)
+		{
+			string result = "";
+
+			if (value.Days > 0)
+			{
+				result += $"{value.Days} days, ";
+			}
+
+			if (value.Days > 0 || value.Hours > 0)
+			{
+				result += $"{value.Hours} hours, ";
+			}
+
+			if (value.Days > 0 || value.Hours > 0 || value.Minutes > 0)
+			{
+				result += $"{value.Minutes} minutes, ";
+			}
+
+			result += $"{value.Seconds} seconds.";
+
+			return result;
 		}
 
 		private void ReadLogFile(Nucleus.Abstractions.Models.Paging.PagingSettings settings, ViewModels.Admin.SystemIndex.LogSettingsViewModel viewModel)

@@ -156,6 +156,7 @@
 	text-align: left;
 	padding-right: 2rem;
 	min-width: 12rem;
+	white-space: nowrap;
 }
 
 .nucleus-admin-content table.headers-column td

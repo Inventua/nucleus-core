@@ -17,11 +17,9 @@ namespace Nucleus.Core.Layout
 	/// </remarks>
 	public class DefaultNoCacheMiddleware : Microsoft.AspNetCore.Http.IMiddleware
 	{
-		private IOptions<SecurityHeaderOptions> Options { get; }
-
-		public DefaultNoCacheMiddleware(IOptions<SecurityHeaderOptions> options)
+		public DefaultNoCacheMiddleware()
 		{
-			this.Options = options;
+
 		}
 
 		/// <summary>

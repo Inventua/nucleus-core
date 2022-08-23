@@ -146,9 +146,10 @@ namespace Nucleus.Core.Authentication
 				if (userSession != null)
 				{
 					// user session exists, update sliding expiration in the database, and update the cookie expiry date
-					if (!userSession.RemoteIpAddress.Equals(this.Context.Connection.RemoteIpAddress))
+					//if (!userSession.RemoteIpAddress.Equals(this.Context.Connection.RemoteIpAddress))
+					if (!IsEqual(userSession.RemoteIpAddress, this.Context.Connection.RemoteIpAddress))
 					{
-						Logger.LogCritical("User {UserId} attempted to use a session {SessionId} from {CurrentRemoteIpAddress} when the original session was from {OriginalRemoteIpAddress}!", userSession.UserId, userSession.Id, this.Context.Connection.RemoteIpAddress, userSession.RemoteIpAddress);
+						Logger.LogCritical("User {UserId} attempted to use a session {SessionId} from {CurrentRemoteIpAddress} when the original session was from {OriginalRemoteIpAddress}.", userSession.UserId, userSession.Id, this.Context.Connection.RemoteIpAddress, userSession.RemoteIpAddress);
 						await this.SessionManager.Delete(userSession);
 						_ = this.SessionManager.SignOut(this.Context);
 						return AuthenticateResult.Fail("Access Denied");
@@ -280,6 +281,12 @@ namespace Nucleus.Core.Authentication
 			principal = new ClaimsPrincipal(identity);
 
 			return AuthenticateResult.Success(new AuthenticationTicket(principal, Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME));
+		}
+
+		private Boolean IsEqual(System.Net.IPAddress address1, System.Net.IPAddress address2)
+		{
+			if (System.Net.IPAddress.IsLoopback(address1) && System.Net.IPAddress.IsLoopback(address2)) return true;
+			return address1.MapToIPv6().GetAddressBytes().SequenceEqual(address2.MapToIPv6().GetAddressBytes());			
 		}
 
 		private ClaimsIdentity UnAuthenticatedIdentity()

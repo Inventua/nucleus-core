@@ -21,7 +21,7 @@ namespace Nucleus.Extensions.ElasticSearch
 		{
 			if (metadata.Site == null)
 			{
-				throw new ArgumentException($"The site parameter is required.", nameof(metadata.Site));
+				throw new NullReferenceException("metaData.Site must not be null.");
 			}
 
 			ConfigSettings settings = new(metadata.Site);

@@ -39,6 +39,30 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     }
 
     /// <summary>
+    /// Constant values used to set script ordering in the AddScript overloads that have an order parameter.  Callers to AddScript can 
+    /// also use an integer value, these values are provided for convenience.  Scripts added using 
+    /// <see cref="AddScript(HttpContext, string, bool, bool, int, Version)"/> can have the same value in the order parameter as another script, in theis
+    /// case they are ordered by which order AddScript was called in.
+    /// </summary>
+    public class WellKnownScriptOrders
+		{
+      /// <summary>
+      /// Place the script first/early in the script order. 
+      /// </summary>
+      public const int EARLY = -1000;
+
+      /// <summary>
+      /// Default.
+      /// </summary>
+      public const int DEFAULT = 0;
+
+      /// <summary>
+      /// Place the script late in the script order.
+      /// </summary>
+      public const int LATE = 1000;
+		}
+
+    /// <summary>
     /// Add a well-known script.
     /// </summary>
     /// <param name="htmlHelper"></param>
@@ -60,7 +84,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
       if (!String.IsNullOrEmpty(scriptPath))
       {
-        return AddScript(htmlHelper, scriptPath, false, -100);
+        return AddScript(htmlHelper, scriptPath, false, WellKnownScriptOrders.EARLY);
       }
       else
       {
@@ -104,7 +128,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// </example>
     public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, string scriptPath, Boolean isAsync)
     {
-      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(htmlHelper.ResolveExtensionUrl(scriptPath)), isAsync, false, 0, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
+      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(htmlHelper.ResolveExtensionUrl(scriptPath)), isAsync, false, WellKnownScriptOrders.DEFAULT, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
     }
 
     /// <summary>
@@ -146,7 +170,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// </example>
     public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, string scriptPath, Boolean isAsync, Boolean isDynamic)
     {
-      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(scriptPath), isAsync, isDynamic, 0, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
+      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(scriptPath), isAsync, isDynamic, WellKnownScriptOrders.DEFAULT, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
     }
 
     /// <summary>
@@ -159,7 +183,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// <returns></returns>
     /// <remarks>
     /// This overload is intended for use by extensions which need to add a script from code other than a view.  This overload does not support the 
-    /// tilde (~) character to specify an app-relative path.  Your script path should be absolute.  This overload does not append a version querystring element.
+    /// tilde (~) character to specify an app-relative path.  This overload does not append a version querystring element.
     /// </remarks>
     public static IHtmlContent AddScript(this HttpContext context, string scriptPath, Boolean isAsync, int order)
     {
@@ -261,7 +285,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       public Boolean IsAsync { get; set; }
       public Boolean IsDynamic { get; set; }
       public string Path { get; set; }
-      public int Order { get; set; } = 0;
+      public int Order { get; set; } = WellKnownScriptOrders.DEFAULT;
       public Boolean IsExtensionScript { get; set; } = false;
 
     }

@@ -187,7 +187,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// </remarks>
     public static IHtmlContent AddScript(this HttpContext context, string scriptPath, Boolean isAsync, int order)
     {
-      return AddScript(context, scriptPath, isAsync, false, order, null);
+      return AddScript(context, scriptPath, isAsync, !scriptPath.EndsWith(".js"), order, null);
     }
 
     private static IHtmlContent AddScript(HttpContext context, string scriptPath, Boolean isAsync, Boolean isDynamic, int order, Version version)
@@ -226,18 +226,18 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     }
     private static Boolean LocalFileExists(string contentRootPath, PathString pathBase, string scriptPath, string fileName)
     {
-      string localStyleFilePath;
+      string localScriptFilePath;
 
       if (pathBase.HasValue && scriptPath.StartsWith(pathBase, StringComparison.OrdinalIgnoreCase))
       {
-        localStyleFilePath = System.IO.Path.GetDirectoryName(scriptPath.Substring(pathBase.Value.Length).Replace('/', Path.DirectorySeparatorChar));
+        localScriptFilePath = System.IO.Path.GetDirectoryName(scriptPath.Substring(pathBase.Value.Length).Replace('/', Path.DirectorySeparatorChar));
       }
       else
       {
-        localStyleFilePath = System.IO.Path.GetDirectoryName(scriptPath.Replace('/', Path.DirectorySeparatorChar)); ;
+        localScriptFilePath = System.IO.Path.GetDirectoryName(scriptPath.Replace('/', Path.DirectorySeparatorChar)); ;
       }
 
-      return System.IO.File.Exists(System.IO.Path.Join(contentRootPath, localStyleFilePath, fileName));
+      return System.IO.File.Exists(System.IO.Path.Join(contentRootPath, localScriptFilePath, fileName));
     }
 
     /// <summary>

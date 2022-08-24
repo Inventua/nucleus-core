@@ -3,6 +3,10 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
+<SettingsControl caption="Transition Inverval (ms)" helptext="Specify the interval between slide transitions, in milliseconds.">
+	@Html.TextBoxFor(model => model.LayoutSettings.Interval, new { @type = "number" })
+</SettingsControl>
+	
 <div class="nucleus-flex-fields">
 	<SettingsControl caption="Show Controls?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether navigation (next/back) controls are displayed.">
 		@Html.CheckBoxFor(model => model.LayoutSettings.ShowControls, new { @class = "ToggleSwitch" })

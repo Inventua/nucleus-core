@@ -3,7 +3,7 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @Html.AddStyle("~!/../../viewer.css")
-<div id="carousel-@Model.Module.Id" class="carousel slide carousel-dark multi-content-carousel" data-bs-ride="carousel">
+<div id="carousel-@Model.Module.Id" class="carousel slide carousel-dark multi-content-carousel" data-bs-ride="carousel" data-bs-interval="@Model.LayoutSettings.Interval">
 	@if (Model.LayoutSettings.ShowIndicators)
 	{
 		<div class="carousel-indicators">
@@ -39,3 +39,17 @@
 		</button>
 	}
 </div>
+<script>
+	jQuery(document).ready(function () 
+	{
+		var height = 0;
+		// normalize carousel item heights
+		jQuery('#carousel-@Model.Module.Id .carousel-item').each(function (index, element) 
+		{
+			var elementHeight = jQuery(element).height();
+			if (elementHeight > height) height= elementHeight;
+		});
+		jQuery('#carousel-@Model.Module.Id .carousel-item').height(height);
+	});
+	
+</script>

@@ -36,6 +36,8 @@ namespace Nucleus.Modules.MultiContent.Controllers
 		private const string MODULESETTING_JUSTIFY = "multicontent:justify";
 		private const string MODULESETTING_ICON = "multicontent:icon";
 
+		private const string MODULESETTING_INTERVAL = "multicontent:interval";
+
 		public MultiContentController(IWebHostEnvironment webHostEnvironment, Context context, IPageModuleManager pageModuleManager, IContentManager contentManager)
 		{
 			this.WebHostEnvironment = webHostEnvironment;
@@ -83,6 +85,8 @@ namespace Nucleus.Modules.MultiContent.Controllers
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_JUSTIFY, viewModel.LayoutSettings.Justify);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_ICON, viewModel.LayoutSettings.Icon);
 
+			this.Context.Module.ModuleSettings.Set(MODULESETTING_INTERVAL, viewModel.LayoutSettings.Interval);
+			
 			await this.PageModuleManager.SaveSettings(this.Context.Module);
 
 			return Json(new { Title = "Changes Saved", Message = "Your changes have been saved." });
@@ -169,6 +173,8 @@ namespace Nucleus.Modules.MultiContent.Controllers
 			settings.Justify = this.Context.Module.ModuleSettings.Get(MODULESETTING_JUSTIFY, false);
 			settings.Icon = this.Context.Module.ModuleSettings.Get(MODULESETTING_ICON, ViewModels.LayoutSettings.Icons.Default);
 
+			settings.Interval = this.Context.Module.ModuleSettings.Get(MODULESETTING_INTERVAL, settings.Interval);
+			
 			return settings;
 		}
 

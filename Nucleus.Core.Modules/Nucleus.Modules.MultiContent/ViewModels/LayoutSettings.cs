@@ -38,6 +38,7 @@ namespace Nucleus.Modules.MultiContent.ViewModels
 		public Boolean RenderFlush { get; set; }
 		public Boolean ShowControls { get; set; }
 		public Boolean ShowIndicators { get; set; }
+		public int Interval { get; set; } = 5000;
 
 		// Accordion settings
 		public Boolean OpenFirst { get; set; }  

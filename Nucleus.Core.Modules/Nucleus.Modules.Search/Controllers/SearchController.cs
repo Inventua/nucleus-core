@@ -170,8 +170,8 @@ namespace Nucleus.Modules.Search.Controllers
 					throw new InvalidOperationException("There is no search provider available.");
 				}
 
-				SearchResults results= await searchProvider.Search(await BuildSearchQuery(viewModel.SearchTerm, viewModel.PagingSettings, viewModel.Settings.IncludeFiles,viewModel.Settings.IncludeScopes));
-
+				SearchResults results = await searchProvider.Search(await BuildSearchQuery(viewModel.SearchTerm, viewModel.PagingSettings, viewModel.Settings.IncludeFiles,viewModel.Settings.IncludeScopes));
+				
 				viewModel.PagingSettings.TotalCount = Convert.ToInt32(results.Total);
 				viewModel.SearchResults = results;
 			}

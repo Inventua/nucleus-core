@@ -52,7 +52,7 @@
 				<div class="search-result">
 					@if (Model.Settings.ShowUrl)
 					{
-						<span class="fst-italic small result-url">@Url.Content(result.Url)</span>
+						<span class="fst-italic small result-url">@Url.Content("~" + result.Url)</span>
 					}
 					@if ((Model.Settings.ShowPublishDate || Model.Settings.ShowSize) && (result.PublishedDate.HasValue || result.Size.HasValue))
 					{
@@ -69,7 +69,7 @@
 						</div>
 					}
 
-					<a class="d-block result-link" href="@Url.Content(result.Url)" title="@result.Title">@result.Title</a>
+					<a class="d-block result-link" href="@Url.Content("~" + result.Url)" title="@result.Title">@result.Title</a>
 
 					@if (Model.Settings.ShowSummary && !String.IsNullOrEmpty(@result.Summary))
 					{

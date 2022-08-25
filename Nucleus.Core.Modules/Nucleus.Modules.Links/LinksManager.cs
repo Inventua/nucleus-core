@@ -146,7 +146,7 @@ namespace Nucleus.Modules.Links
 		}
 
 		/// <summary>
-		/// Update the <see cref="PageModule.SortOrder"/> of the page module specifed by id by swapping it with the next-highest <see cref="PageModule.SortOrder"/>.
+		/// Update the <see cref="Models.Link.SortOrder"/> of the link specifed by id by swapping it with the next-highest <see cref="Models.Link.SortOrder"/>.
 		/// </summary>
 		/// <param name="id"></param>
 		public async Task MoveDown(PageModule module, Guid id)
@@ -155,21 +155,21 @@ namespace Nucleus.Modules.Links
 
 			using (ILinksDataProvider provider = this.DataProviderFactory.CreateProvider<ILinksDataProvider>())
 			{
-				IList<Link> links = await provider.List(module);
+				List<Link> links = await provider.List(module);
 				links.Reverse();
 
-				foreach (Link Link in links)
+				foreach (Link link in links)
 				{
-					if (Link.Id == id)
+					if (link.Id == id)
 					{
 						if (previousLink != null)
 						{
-							int temp = Link.SortOrder;
-							Link.SortOrder = previousLink.SortOrder;
+							int temp = link.SortOrder;
+							link.SortOrder = previousLink.SortOrder;
 							previousLink.SortOrder = temp;
 
 							await provider.Save(module, previousLink);
-							await provider.Save(module, Link);
+							await provider.Save(module, link);
 
 							this.CacheManager.LinksCache().Remove(id);
 							this.CacheManager.LinksCache().Remove(previousLink.Id);
@@ -179,14 +179,14 @@ namespace Nucleus.Modules.Links
 					}
 					else
 					{
-						previousLink = Link;
+						previousLink = link;
 					}
 				}
 			}
 		}
 
 		/// <summary>
-		/// Update the <see cref="PageModule.SortOrder"/> of the page module specifed by id by swapping it with the previous <see cref="PageModule.SortOrder"/>.
+		/// Update the <see cref="Models.Link.SortOrder"/> of the link specifed by id by swapping it with the previous <see cref="Models.Link.SortOrder"/>.
 		/// </summary>
 		/// <param name="id"></param>
 		public async Task MoveUp(PageModule module, Guid id)
@@ -195,7 +195,7 @@ namespace Nucleus.Modules.Links
 
 			using (ILinksDataProvider provider = this.DataProviderFactory.CreateProvider<ILinksDataProvider>())
 			{
-				IList<Link> links = await provider.List(module);
+				List<Link> links = await provider.List(module);
 
 				foreach (Link Link in links)
 				{

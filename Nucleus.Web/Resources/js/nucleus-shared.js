@@ -90,6 +90,22 @@ function _Page()
 			}
 		});
 
+		/* modal maximize/minimize */
+		jQuery(document).on('dblclick', '.modal-dialog .modal-header', function (event)
+		{
+			_maximizeDialog(this, !(jQuery(this).parents('.modal-dialog').first().hasClass('modal-full-size')));
+		});
+
+		jQuery(document).on('click', '.modal-dialog .modal-header .btn-maximize', function (event)
+		{
+			_maximizeDialog(this, true);
+		});
+
+		jQuery(document).on('click', '.modal-dialog .modal-header .btn-minimize, .modal-dialog .modal-header .btn-close', function (event)
+		{
+			_maximizeDialog(this, false);
+		});
+
 		/* menu-submenu handling */
 
 		/* 
@@ -821,6 +837,7 @@ function _Page()
 		{
 			if (source.parents('.modal').first().find(target).length === 0)
 			{
+				_maximizeDialog(source.parents('.modal').first(), false);
 				source.parents('.modal').first().modal('hide');
 			}
 		}
@@ -894,6 +911,7 @@ function _Page()
 			}
 			else
 			{
+				_maximizeDialog(modal, false);
 				wrapper.modal('hide');
 			}
 
@@ -941,7 +959,7 @@ function _Page()
 	{
 		jQuery.uniqueSort(jQuery('.modal-backdrop').parent()).each(function (index, parentElement)
 		{
-			jQuery(parentElement).find('.modal-backdrop:not(:first)').remove();
+			jQuery(parentElement).find('.modal-backdrop:not(:last)').remove();
 		});
 	}
 
@@ -1047,6 +1065,33 @@ function _Page()
 		document.execCommand("copy");
 		temp.remove();
 	}
+
+	function _maximizeDialog(element, maximize)
+	{
+		var modal;
+		if (jQuery(element).hasClass('.modal-dialog'))
+		{
+			modal = jQuery(element);
+		}
+		else
+		{
+			modal = jQuery(element).parents('.modal-dialog').first();
+		}
+
+		if (maximize)
+		{
+			modal
+				.removeClass('modal-auto-size')
+				.addClass('modal-full-size');
+		}
+		else
+		{
+			modal
+				.removeClass('modal-full-size')
+				.addClass('modal-auto-size');
+		}
+	}
+
 
 	// Add _Layout.cshtml event handlers, which are used to communicate/execute events from the admin iframe to the main window.
 

@@ -53,11 +53,17 @@
 		<iframe id="AdminFrame" title="Control Panel" accesskey="A" src="@Url.Content("~/Admin/Index/Index")?pageId=@Model.Context.Page.Id" class="Nucleus AdminFrame"></iframe>
 		<div class="AdminFramePlaceholder"></div>
 
-		<div class="modal" tabindex="-1">
+		<modal id="nucleus-popupdialog" title="Module Settings">
+			<iframe src="about:blank" title="Settings" class="nucleus-modulesettings-frame"></iframe>
+		</modal>
+
+		@*<div class="modal" tabindex="-1">
 			<div class="modal-dialog modal-auto-size modal-dialog-scrollable modal-dialog-centered">
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title">Module Settings</h5>
+						<button type="button" class="btn btn-minimize nucleus-material-icon" aria-label="Minimize">&#xe5d1;</button>
+						<button type="button" class="btn btn-maximize nucleus-material-icon" aria-label="Maximize">&#xea10;</button>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
@@ -65,7 +71,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div>*@
 	}
 
 	<div class="Nucleus Content">

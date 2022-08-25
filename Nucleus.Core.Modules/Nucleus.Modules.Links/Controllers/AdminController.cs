@@ -165,9 +165,9 @@ namespace Nucleus.Modules.Links.Controllers
 		{
 			// Category is not mandatory
 			ModelState.Remove("Link.Category.Id"); 
-			ModelState.Remove("Link.Category.Name");
-			
+			ModelState.Remove("Link.Category.Name");			
 			ModelState.Remove("Link.LinkPage.Page.Name");
+			ModelState.Remove("Link.ImageFile.Id");
 
 			if (ModelState.IsValid)
 			{

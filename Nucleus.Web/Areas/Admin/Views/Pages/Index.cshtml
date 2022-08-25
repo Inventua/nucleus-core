@@ -22,7 +22,7 @@
 	<div id="nucleus-page-editor" class="nucleus-editor-panel"></div>
 </div>
 
-@if (Model.PageId != Guid.Empty)
+@if (Model.PageId != Guid.Empty && Model.OpenPage)
 {
 	<script>
 		Page.LoadPartialContent(null, '@Url.Content("~/Admin/Pages/Editor?id=")' + '@Model.PageId', '#nucleus-page-editor');

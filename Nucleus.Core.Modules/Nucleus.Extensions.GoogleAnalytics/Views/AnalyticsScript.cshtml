@@ -5,5 +5,9 @@ jQuery(document).ready(function ()
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', '@Model.GoogleAnalyticsId', { cookie_flags: 'max-age=7200;secure;SameSite=None' } );
+  gtag('config', '@Model.GoogleAnalyticsId', 
+  {
+    'cookie_flags': 'max-age=7200;secure;SameSite=None', 
+    'anonymize_ip': true 
+  } );
 });

@@ -7,6 +7,7 @@
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+		<VersionPrefix>1.0.0.1</VersionPrefix>
   </PropertyGroup>
 
 	<ItemGroup>

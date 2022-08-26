@@ -498,8 +498,11 @@ function _Page()
 	 */
 	function _loadPartialContent(event, url, target)
 	{
-		event.preventDefault();
-		event.stopImmediatePropagation();
+		if (event !== null)
+		{
+			event.preventDefault();
+			event.stopImmediatePropagation();
+		}
 
 		if (typeof (target) === 'string')
 		{

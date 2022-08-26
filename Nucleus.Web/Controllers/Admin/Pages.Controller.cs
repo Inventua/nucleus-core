@@ -194,7 +194,7 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 			else
 			{
-				return View("Index", await BuildIndexViewModel(viewModel.Page.Id));
+				return View("Index", await BuildIndexViewModel(viewModel.Page.Id, false));
 			}
 		}
 
@@ -204,7 +204,7 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			await this.PageManager.MoveDown(this.Context.Site, id);
 
-			return View("Index", await BuildIndexViewModel(id));
+			return View("Index", await BuildIndexViewModel(id, true));
 		}
 
 		[HttpPost]
@@ -213,7 +213,7 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			await this.PageManager.MoveUp(this.Context.Site, id);
 
-			return View("Index", await BuildIndexViewModel(id));
+			return View("Index", await BuildIndexViewModel(id, true));
 		}
 
 		[HttpPost]
@@ -499,7 +499,7 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("PageMenu", viewModel);
 		}
 
-		private async Task<ViewModels.Admin.PageIndex> BuildIndexViewModel(Guid pageId)
+		private async Task<ViewModels.Admin.PageIndex> BuildIndexViewModel(Guid pageId, Boolean openPage)
 		{
 			ViewModels.Admin.PageIndex viewModel = new();
 
@@ -512,6 +512,7 @@ namespace Nucleus.Web.Controllers.Admin
 				);
 
 			viewModel.PageId = pageId;
+			viewModel.OpenPage = openPage;
 			return viewModel;
 		}
 

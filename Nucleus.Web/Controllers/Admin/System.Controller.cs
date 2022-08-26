@@ -67,8 +67,7 @@ namespace Nucleus.Web.Controllers.Admin
 				OperatingSystem = Environment.OSVersion.ToString(),
 				OperatingSystemUser = $"{Environment.UserDomainName}/{Environment.UserName}",
 				StartTime = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime(),
-				Uptime = FormatUptime(uptime),
-				ProcessMemory = System.Diagnostics.Process.GetCurrentProcess().PrivateMemorySize64
+				Uptime = FormatUptime(uptime)
 			};
 
 			viewModelOutput.LogSettings.LogFile = viewModelInput.LogSettings.LogFile;

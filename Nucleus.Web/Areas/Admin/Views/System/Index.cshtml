@@ -49,13 +49,6 @@
 					<th>Process Start Time</th>
 					<td>@Model.StartTime.FormatDate(this.Context.Request.GetUserTimeZone()) (@Model.Uptime)</td>
 				</tr>
-				@if (Model.ProcessMemory > 0)
-				{
-					<tr>
-						<th>Process Memory</th>
-						<td>@Model.ProcessMemory.FormatFileSize()</td>
-					</tr>
-				}
 			</table>
 		</TabPanel>
 

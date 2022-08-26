@@ -26,8 +26,7 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public DateTime StartTime { get; set; }
 		public string Uptime { get; set; }
-		public long ProcessMemory { get; set; }
-
+		
 		public LogSettingsViewModel LogSettings { get; set; } = new();
 
 		public string Configuration { get; set; }

@@ -7,7 +7,6 @@
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<RazorCompileOnBuild>false</RazorCompileOnBuild>
-	  <VersionPrefix>1.0.0.1</VersionPrefix>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -56,7 +55,7 @@
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>Search</ExtensionFolder>
-		<Version>1.0.0</Version>
+		<Version>1.0.0.1</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 	</PropertyGroup>
 

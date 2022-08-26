@@ -36,7 +36,7 @@ namespace Nucleus.Core.Plugins
 						// controller is in an [area], return /Extensions/[extension]/Areas/[area]/[controller]/Views/[view].cshtml
 						return new List<string>()
 						{
-							$"/Extensions/{extensionFolder}/Areas/{actionContext.RouteData.Values["area"]}/Views/{{1}}/{{0}}.cshtml"
+							$"/{Abstractions.RoutingConstants.EXTENSIONS_ROUTE_PATH}/{extensionFolder}/Areas/{actionContext.RouteData.Values["area"]}/Views/{{1}}/{{0}}.cshtml"
 						};
 					}
 					else
@@ -44,8 +44,8 @@ namespace Nucleus.Core.Plugins
 						// controller is not in an [area], return /Extensions/[extension]/Views/[view].cshtml
 						return new List<string>()
 						{
-							$"/Extensions/{extensionFolder}/Views/{{0}}.cshtml",
-							$"/Extensions/{extensionFolder}/Pages/{{0}}.cshtml"
+							$"/{Abstractions.RoutingConstants.EXTENSIONS_ROUTE_PATH}/{extensionFolder}/Views/{{0}}.cshtml",
+							$"/{Abstractions.RoutingConstants.EXTENSIONS_ROUTE_PATH}/{extensionFolder}/Pages/{{0}}.cshtml"
 						};
 					}
 				}

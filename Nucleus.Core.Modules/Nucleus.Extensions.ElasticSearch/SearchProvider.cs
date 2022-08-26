@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Search;
+using System.ComponentModel;
 
 namespace Nucleus.Extensions.ElasticSearch
 {
+	[DisplayName("Elastic Search Provider")]
 	public class SearchProvider : ISearchProvider
 	{
 		private ISiteManager SiteManager { get; }

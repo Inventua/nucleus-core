@@ -38,6 +38,15 @@ namespace Nucleus.Data.EntityFramework
 		}
 
 		/// <summary>
+		/// IDisposable implementation.
+		/// </summary>
+		/// <hidden/>
+		public override void Dispose()
+		{
+			this.Context?.Dispose();
+		}
+
+		/// <summary>
 		/// Attempts a connection to the database.  Throws a database provider specific exception if not successful.
 		/// </summary>
 		public override void CheckConnection()

@@ -34,7 +34,7 @@
     <ProjectReference Include="$(SolutionDir)\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
     <ProjectReference Include="$(SolutionDir)\Nucleus.Core\Nucleus.Core.csproj" />
     <ProjectReference Include="$(SolutionDir)\Nucleus.Extensions\Nucleus.Extensions.csproj" />
-    <ProjectReference Include="$(SolutionDir)\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
+    <ProjectReference Include="..\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
   </ItemGroup>
 
 	<ItemGroup>

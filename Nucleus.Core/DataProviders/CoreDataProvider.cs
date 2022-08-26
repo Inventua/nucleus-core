@@ -2190,6 +2190,10 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task DeleteList(List list)
 		{
+			// Prevent entity framework from trying to delete the list items.  A database cascade-delete referential action removes list items when a list is
+			// deleted.
+			list.Items.Clear();
+
 			this.Context.Remove(list);
 			await this.Context.SaveChangesAsync<List>();
 		}

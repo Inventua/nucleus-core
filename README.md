@@ -5,7 +5,7 @@ Use Nucleus for your site or web application to take advantage of built-in and t
 
 Optional and third-party extensions are installed by end users from within a web browser, with no special skills or software tools required, and do not require that Nucleus be re-compiled.
 
-[Downloads](https://www.nucleus-cms.com/downloads/)
-[Getting Started](https://www.nucleus-cms.com/getting-started/)
-[Configuration](https://www.nucleus-cms.com/configuration-files/)
-[Developer Documentation](https://www.nucleus-cms.com/developers/)
+[Downloads](https://www.nucleus-cms.com/downloads/)  
+[Getting Started](https://www.nucleus-cms.com/getting-started/)  
+[Configuration](https://www.nucleus-cms.com/configuration-files/)  
+[Developer Documentation](https://www.nucleus-cms.com/developers/)  

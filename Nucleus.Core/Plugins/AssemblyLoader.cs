@@ -139,16 +139,34 @@ namespace Nucleus.Core.Plugins
 		/// <returns></returns>
 		internal static string GetExtensionFolderName(string fullPath)
 		{
-			System.IO.DirectoryInfo workingDirectory = new(fullPath);
-			while (workingDirectory.Parent != null)
+			if (fullPath.Contains(Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER))
 			{
-				if (workingDirectory.Parent.Name.Equals(Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER, StringComparison.OrdinalIgnoreCase))
+				string workingDirectory = fullPath;
+				string workingDirectoryParent;
+				
+				while (!String.IsNullOrEmpty(workingDirectory))
 				{
-					return workingDirectory.Name;
+					workingDirectoryParent = System.IO.Path.GetDirectoryName(workingDirectory);
+					if (System.IO.Path.GetFileName(workingDirectoryParent).Equals(Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER, StringComparison.OrdinalIgnoreCase))
+					{
+						return System.IO.Path.GetFileName(workingDirectory);
+					}
+
+					workingDirectory = workingDirectoryParent;
 				}
-				workingDirectory = workingDirectory.Parent;
 			}
+
 			return "";
+
+			////System.IO.DirectoryInfo workingDirectory = new(fullPath);
+			////while (workingDirectory.Parent != null)
+			////{
+			////	if (workingDirectory.Parent.Name.Equals(Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER, StringComparison.OrdinalIgnoreCase))
+			////	{
+			////		return workingDirectory.Name;
+			////	}
+			////	workingDirectory = workingDirectory.Parent;
+			////}
 
 			//string extensionFolder = "";
 

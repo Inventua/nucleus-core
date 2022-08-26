@@ -55,8 +55,6 @@
 	 -->
 	<Target Name="GetOutputAssemblies" AfterTargets="PostBuildEvent">
 		<ItemGroup>
-			<!--<ReferenceAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\ref\*.dll" />-->
-			
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Abstractions.dll"></ExcludedAssemblies>
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.ViewFeatures.dll"></ExcludedAssemblies>
 			<ExcludedAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\Nucleus.Core.dll"></ExcludedAssemblies>
@@ -70,10 +68,16 @@
 			
 			<Message Importance="high" Text="Reference assembles: @(ReferenceAssemblies)" />
 			<Message Importance="high" Text="Excluded assembles: @(ExcludedAssemblies)" />
-			<!--<AllAssemblies Include="bin\$(Configuration)\$(TargetFramework)\**\*.dll" />-->
-			<!--<OutputAssemblies Include="@(AllAssemblies);@(PackageAssemblies)" Exclude="@(ReferenceAssemblies);@(ExcludedAssemblies)" />-->
 			<OutputAssemblies Include="@(PackageAssemblies)" Exclude="@(ExcludedAssemblies)" />
 		</ItemGroup>		
+	</Target>
+
+	<Target Name="ManageVersion" AfterTargets="PostBuildEvent">
+		<XmlPoke
+			XmlInputPath="package.xml"
+			Value="$(PackageVersion)"
+			Query="//p:package/p:version"
+			Namespaces="&lt;Namespace Prefix='p' Uri='urn:nucleus/schemas/package/1.0'/&gt;"/>		
 	</Target>
 	
 	<Target Name="CopyToExtensionsFolder" AfterTargets="PostBuildEvent" Condition="'$(NUCLEUS_PATH)' != '' AND '$(ExtensionFolder)' != '' AND Exists('$(NUCLEUS_PATH)Extensions')">
@@ -84,6 +88,7 @@
 		<RemoveDir Directories="$(NUCLEUS_PATH)\_OLD" />
 
 		<Message Importance="high" Text="Output assembles: @(OutputAssemblies)" />
+		<Message Importance="high" Text="Version: $(PackageVersion)" />
 		
 		<Move SourceFiles="@(RenameExtensionFiles)" DestinationFolder="$(NUCLEUS_PATH)_OLD" />
 		<Copy SourceFiles="@(OutputAssemblies)" DestinationFolder="$(NUCLEUS_PATH)Extensions\$(ExtensionFolder)\bin\%(RecursiveDir)" Retries="2" />

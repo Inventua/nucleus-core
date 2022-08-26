@@ -12,24 +12,28 @@
 		}
 	});
 
-	/* Close suggestions when mouse is clicked elsewhere */
-	jQuery(document).on('click', '', function ()
+	/* the search-suggestions div isn't rendered if the user has disabled search suggestions by setting the max count to zero */
+	if (jQuery('.search-suggestions').length !== 0)
 	{
-		jQuery('.suggestions-result').removeClass('show');
-	});
-
-	/* get updated search suggestions */
-	jQuery('.search-term').on('input', function (event)
-	{
-		/* wait half a second before submitting the request, so that if the user is typing, we don't send multiple unwanted requests */
-		if (suggestionsTimeout !== -1)
+		/* Close suggestions when mouse is clicked elsewhere */
+		jQuery(document).on('click', '', function ()
 		{
-			window.clearTimeout(suggestionsTimeout);
-		}
+			jQuery('.suggestions-result').removeClass('show');
+		});
 
-		suggestionsTimeout = window.setTimeout(function (form) { form.submit(); }, 500, jQuery(this).parents('form').first());
-		return false;
-	});
+		/* get updated search suggestions */
+		jQuery('.search-term').on('input', function (event)
+		{
+			/* wait half a second before submitting the request, so that if the user is typing, we don't send multiple unwanted requests */
+			if (suggestionsTimeout !== -1)
+			{
+				window.clearTimeout(suggestionsTimeout);
+			}
+
+			suggestionsTimeout = window.setTimeout(function (form) { form.submit(); }, 500, jQuery(this).parents('form').first());
+			return false;
+		});
+	}
 
 	jQuery(Page).on("ready", function (event, data)
 	{

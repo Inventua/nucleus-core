@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Nucleus.Abstractions.Search;
 
 [assembly: HostingStartup(typeof(Nucleus.Modules.Search.Startup))]
 
@@ -16,7 +17,8 @@ namespace Nucleus.Modules.Search
         {
             builder.ConfigureServices((context, services) =>
             {
-            });
+							services.AddTransient<ISearchProvider, BasicSearchProvider>();
+						});
         }
     }
 }

@@ -6,7 +6,13 @@
 @using (Html.BeginNucleusForm("Settings", "Search", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
 	<div id="search-settings" class="flex-grow-1">
-		<h2 class="nucleus-modal-caption">Search Settings</h2>		
+		<h2 class="nucleus-modal-caption">Search Settings</h2>
+		
+		<SettingsControl caption="Search Provider" helptext="Select a search provider.">
+			@Html.DropDownListFor(model => model.SearchProvider, new SelectList(Model.SearchProviders, "ClassName", "Name", "(none)"))
+		</SettingsControl>
+
+
 		<fieldset role="group" aria-labelledby="heading">
 			<label>Search Input</label>
 			<div class="nucleus-flex-fields">

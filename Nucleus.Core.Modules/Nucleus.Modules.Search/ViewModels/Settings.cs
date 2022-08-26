@@ -44,5 +44,16 @@ namespace Nucleus.Modules.Search.ViewModels
 		public PageMenu PageMenu { get; set; }
 		public string IncludeScopes { get; set; }
 		public int MaximumSuggestions { get; set; }
+
+		public List<AvailableSearchProvider> SearchProviders { get; set; }
+
+		public string SearchProvider { get; set; }
+
+		public class AvailableSearchProvider
+		{
+			public string Name { get; set; }
+			public string ClassName { get; set; }
+
+		}
 	}
 }

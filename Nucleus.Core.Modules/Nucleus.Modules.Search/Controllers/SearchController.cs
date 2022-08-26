@@ -24,6 +24,7 @@ namespace Nucleus.Modules.Search.Controllers
 		private IUserManager UserManager { get; }
 		private IEnumerable<ISearchProvider> SearchProviders { get; }
 
+		private const string MODULESETTING_SEARCHPROVIDER = "search:search-provider";
 		private const string MODULESETTING_DISPLAY_MODE = "search:display-mode";
 		private const string MODULESETTING_RESULTS_PAGE = "search:results-page";
 		private const string MODULESETTING_SEARCH_CAPTION = "search:search-caption";
@@ -106,6 +107,7 @@ namespace Nucleus.Modules.Search.Controllers
 		{
 			if (viewModel.MaximumSuggestions > 100) viewModel.MaximumSuggestions = 100;
 
+			this.Context.Module.ModuleSettings.Set(MODULESETTING_SEARCHPROVIDER, viewModel.SearchProvider);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_RESULTS_PAGE, viewModel.ResultsPageId);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_DISPLAY_MODE, viewModel.DisplayMode);
 			
@@ -164,10 +166,14 @@ namespace Nucleus.Modules.Search.Controllers
 				{
 					searchProvider = this.SearchProviders.First();
 				}
+				else
+				{
+					searchProvider = this.SearchProviders.Where(provider => provider.GetType().AssemblyQualifiedName.Equals(viewModel.Settings.SearchProvider)).FirstOrDefault();
+				}
 
 				if (searchProvider == null)
 				{
-					throw new InvalidOperationException("There is no search provider available.");
+					throw new InvalidOperationException("There is no search provider selected.");
 				}
 
 				SearchResults results = await searchProvider.Search(await BuildSearchQuery(viewModel.SearchTerm, viewModel.PagingSettings, viewModel.Settings.IncludeFiles,viewModel.Settings.IncludeScopes));
@@ -217,14 +223,23 @@ namespace Nucleus.Modules.Search.Controllers
 			{
 				viewModel = new();
 			}
+			
+			GetSettings(viewModel.Settings);
 
 			if (!String.IsNullOrEmpty(viewModel.SearchTerm))
 			{
-				if (this.SearchProviders.Count() == 1)
+				if (this.SearchProviders.Any())
 				{
-					searchProvider = this.SearchProviders.First();
+					if (this.SearchProviders.Count() == 1)
+					{
+						searchProvider = this.SearchProviders.First();
+					}
+					else
+					{
+						searchProvider = this.SearchProviders.Where(provider => provider.GetType().AssemblyQualifiedName.Equals(viewModel.Settings.SearchProvider)).FirstOrDefault();
+					}
 				}
-				
+
 				if (searchProvider == null)
 				{
 					throw new InvalidOperationException("There is no search provider available.");
@@ -232,25 +247,32 @@ namespace Nucleus.Modules.Search.Controllers
 
 				if (viewModel.Settings.MaximumSuggestions > 100) viewModel.Settings.MaximumSuggestions = 100;
 
-				try
+				if (viewModel.Settings.MaximumSuggestions == 0)
 				{
-					viewModel.SearchResults = await searchProvider.Suggest(await BuildSearchQuery
-						(
-						  viewModel.SearchTerm, 
-							new() 
-							{  
-								CurrentPageIndex = 1, PageSize = viewModel.Settings.MaximumSuggestions 
-							}, 
-							viewModel.Settings.IncludeFiles, 
-							viewModel.Settings.IncludeScopes
-						));
+					viewModel.SearchResults = new() { Total = 0 };
 				}
-				catch (NotImplementedException)
+				else
 				{
-					viewModel.SearchResults = null;
-				}				
+					try
+					{
+						viewModel.SearchResults = await searchProvider.Suggest(await BuildSearchQuery
+							(
+								viewModel.SearchTerm,
+								new()
+								{
+									CurrentPageIndex = 1,
+									PageSize = viewModel.Settings.MaximumSuggestions
+								},
+								viewModel.Settings.IncludeFiles,
+								viewModel.Settings.IncludeScopes
+							));
+					}
+					catch (NotImplementedException)
+					{
+						viewModel.SearchResults = null;
+					}
+				}
 			}
-
 			return viewModel;
 		}
 
@@ -264,12 +286,14 @@ namespace Nucleus.Modules.Search.Controllers
 			GetSettings(viewModel);
 
 			viewModel.PageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, 1);
+			viewModel.SearchProviders = this.SearchProviders.Select(provider => new ViewModels.Settings.AvailableSearchProvider() { Name = GetFriendlyName(provider.GetType()), ClassName = provider.GetType().AssemblyQualifiedName }).OrderBy(provider => provider.Name).ToList();
 
 			return viewModel;
 		}
 
 		private void GetSettings(ViewModels.Settings settings)
 		{
+			settings.SearchProvider = this.Context.Module.ModuleSettings.Get(MODULESETTING_SEARCHPROVIDER, "");
 			settings.ResultsPageId = this.Context.Module.ModuleSettings.Get(MODULESETTING_RESULTS_PAGE, Guid.Empty);
 			settings.DisplayMode = this.Context.Module.ModuleSettings.Get(MODULESETTING_DISPLAY_MODE, ViewModels.Settings.DisplayModes.Full);
 			settings.SearchCaption = this.Context.Module.ModuleSettings.Get(MODULESETTING_SEARCH_CAPTION, "Search Term");
@@ -292,5 +316,24 @@ namespace Nucleus.Modules.Search.Controllers
 				settings.SearchButtonCaption = "Search";
 			}
 		}
+
+		private string GetFriendlyName(System.Type type)
+		{
+			System.ComponentModel.DisplayNameAttribute displayNameAttribute = type.GetCustomAttributes(false)
+				.Where(attr => attr is System.ComponentModel.DisplayNameAttribute)
+				.Select(attr => attr as System.ComponentModel.DisplayNameAttribute)
+				.FirstOrDefault();
+
+			if (displayNameAttribute == null)
+			{
+				return $"{type.FullName}";
+			}
+			else
+			{
+				return displayNameAttribute.DisplayName;
+			}
+
+		}
+
 	}
 }

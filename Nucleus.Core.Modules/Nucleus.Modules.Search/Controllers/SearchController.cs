@@ -223,8 +223,11 @@ namespace Nucleus.Modules.Search.Controllers
 			{
 				viewModel = new();
 			}
-			
-			GetSettings(viewModel.Settings);
+
+			if (this.Context.Module != null)
+			{
+				GetSettings(viewModel.Settings);
+			}
 
 			if (!String.IsNullOrEmpty(viewModel.SearchTerm))
 			{
@@ -242,7 +245,7 @@ namespace Nucleus.Modules.Search.Controllers
 
 				if (searchProvider == null)
 				{
-					throw new InvalidOperationException("There is no search provider available.");
+					throw new InvalidOperationException("There is no search provider selected.");
 				}
 
 				if (viewModel.Settings.MaximumSuggestions > 100) viewModel.Settings.MaximumSuggestions = 100;

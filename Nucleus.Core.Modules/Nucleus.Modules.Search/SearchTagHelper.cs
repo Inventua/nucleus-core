@@ -34,6 +34,11 @@ namespace Nucleus.Modules.Search
 		public Nucleus.Modules.Search.ViewModels.Settings.DisplayModes DisplayMode { get; set; } = ViewModels.Settings.DisplayModes.Full;
 
 		/// <summary>
+		/// The assembly-qualified name of the search provider to use.
+		/// </summary>
+		public string Provider { get; set; }
+
+		/// <summary>
 		/// The relative url of the results page.  This must match one of the routes for a page on your site.
 		/// </summary>
 		public string ResultsPageUrl { get; set; }
@@ -78,7 +83,7 @@ namespace Nucleus.Modules.Search
 			output.SuppressOutput();
 			(this.HtmlHelper as IViewContextAware).Contextualize(this.ViewContext);
 
-			IHtmlContent searchControloutput = await SearchRenderer.Build(this.HtmlHelper, this.ResultsPageUrl, this.DisplayMode, this.Prompt, this.MaximumSuggestions, this.IncludeFiles, this.IncludeScopes, null);
+			IHtmlContent searchControloutput = await SearchRenderer.Build(this.HtmlHelper, this.ResultsPageUrl, this.Provider, this.DisplayMode, this.Prompt, this.MaximumSuggestions, this.IncludeFiles, this.IncludeScopes, null);
 			if (searchControloutput != null)
 			{
 				searchControloutput.WriteTo(this.ViewContext.Writer, System.Text.Encodings.Web.HtmlEncoder.Default);

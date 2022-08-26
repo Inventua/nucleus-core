@@ -24,7 +24,7 @@ namespace Nucleus.Modules.Search
 	/// <hidden />
 	internal static class SearchRenderer
 	{
-		internal static async Task<IHtmlContent> Build(IHtmlHelper htmlHelper, string resultsPageUrl, Nucleus.Modules.Search.ViewModels.Settings.DisplayModes displayMode, string prompt, int maximumSuggestions, Boolean includeFiles, string includeScopes, object htmlAttributes)
+		internal static async Task<IHtmlContent> Build(IHtmlHelper htmlHelper, string resultsPageUrl, string provider, Nucleus.Modules.Search.ViewModels.Settings.DisplayModes displayMode, string prompt, int maximumSuggestions, Boolean includeFiles, string includeScopes, object htmlAttributes)
 		{
 			ViewModels.Viewer model = new();
 
@@ -33,6 +33,7 @@ namespace Nucleus.Modules.Search
 				resultsPageUrl = "~/" + resultsPageUrl;
 			}
 
+			model.Settings.SearchProvider = provider;
 			model.SearchTerm = htmlHelper.ViewContext.HttpContext.Request.Query["search"];
 			model.ResultsUrl = resultsPageUrl;
 			model.Settings.DisplayMode = displayMode;

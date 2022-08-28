@@ -105,7 +105,7 @@
 .nucleus-admin-search
 {
 	position: absolute;
-	max-width: 100%;
+	max-width: 90%;
 	border: solid 2px #222;
 	min-width: 500px;
 	max-height: 90%;
@@ -113,7 +113,7 @@
 	background-color: white;
 	z-index: 5;
 	padding: 8px;
-	margin-top: 8px;
+	margin-top: 4px;
 }
 
 .nucleus-search-results-subtitle::before

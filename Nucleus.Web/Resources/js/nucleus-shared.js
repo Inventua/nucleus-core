@@ -937,18 +937,22 @@ function _Page()
 
 		// attempt to set focus to the first control in the response
 
-		// prefer an INPUT/SELECT/TEXTAREA
-		var focusableElement = target.find('.nucleus-default-control, input:not([type="hidden"]), select, textarea').first();
-		if (focusableElement.length === 0)
+		// if the currently-selected control is an INPUT[type=search], leave focus where it is
+		if (!jQuery(document.activeElement).is('input[type=search]'))
 		{
-			// set focus to another element type if no INPUT/SELECT/TEXTAREA was found
-			focusableElement = target.find('button, a, [tabindex]:not([tabindex="-1"])').first();
-		}
+			// prefer an INPUT/SELECT/TEXTAREA
+			var focusableElement = target.find('.nucleus-default-control, input:not([type="hidden"]), select, textarea').first();
+			if (focusableElement.length === 0)
+			{
+				// set focus to another element type if no INPUT/SELECT/TEXTAREA was found
+				focusableElement = target.find('button, a, [tabindex]:not([tabindex="-1"])').first();
+			}
 
-		// only focus on the "found" element if it is in view to prevent scrolling.
-		if (focusableElement.length > 0 && _isInView(focusableElement.first()))
-		{
-			focusableElement.first().focus();
+			// only focus on the "found" element if it is in view to prevent scrolling.
+			if (focusableElement.length > 0 && _isInView(focusableElement.first()))
+			{
+				focusableElement.first().focus();
+			}
 		}
 
 		// adjust dates from UTC to local

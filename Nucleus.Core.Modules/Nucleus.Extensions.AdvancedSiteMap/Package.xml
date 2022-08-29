@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package id="87fd4141-aeb9-4d31-8ee6-793970990b0c" xmlns="urn:nucleus/schemas/package/1.0">
+  <name>AdvancedSiteMap</name>
+  <version>1.0.0</version>
+  <publisher name="Inventua Pty Ltd" url="https://www.nucleus-cms.com" email="support@inventua.com" />
+  <description>
+		The Advanced SiteMap extension replaces the built-in Nucleus component which generates a `sitemap.xml` file for use by external search
+		engines.  It implements the Nucleus search index manager interface so that the generated site map can include additional entries from
+		extensions which submit meta-data to the search system, like the Documents, Forums and Publish modules.
+	</description>
+  <compatibility minVersion="1.0.0.0" maxVersion="*" />
+  <components>
+    <component folderName="AdvancedSiteMap" optional="false">
+      <file name="readme.txt" />
+      <file name="license.txt" />
+      <folder name="Bin">
+        <file name="Nucleus.Extensions.AdvancedSiteMap.dll" />
+      </folder>
+    </component>
+  </components>
+</package>

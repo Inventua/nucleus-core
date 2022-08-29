@@ -14,29 +14,29 @@
 	
 		@Html.HiddenFor((model) => model.FileId)
 
-		<table>
+		<table class="table table-borderless table-sm headers-column">
 			<tr>
-				<td>Name</td>
+				<th>Name</th>
 				<td>@Model.Package.name</td>
 			</tr>
 			<tr>
-				<td>Version</td>
+				<th>Version</th>
 				<td>@Model.Package.version</td>
 			</tr>
 			<tr>
-				<td>Description</td>
+				<th>Description</th>
 				<td>@Model.Package.description</td>
 			</tr>
 			<tr>
-				<td>Publisher</td>
+				<th>Publisher</th>
 				<td>@Model.Package.publisher.name</td>
 			</tr>
 			<tr>
-				<td>Product Page</td>
+				<th>Product Page</th>
 				<td><a href="@Model.Package.publisher.url" target="_blank">@Model.Package.publisher.url</a></td>
 			</tr>
 			<tr>
-				<td>Support Email</td>
+				<th>Support Email</th>
 				<td><a href="mailto:@Model.Package.publisher.email">@Model.Package.publisher.email</a></td>
 			</tr>
 
@@ -60,8 +60,6 @@
 			}
 
 		</table>
-
-
 	}
 
 </div>

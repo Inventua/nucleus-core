@@ -100,7 +100,7 @@ namespace Nucleus.Modules.Documents
 				};
 
 				// include the linked file as content
-				using (System.IO.Stream responseStream = this.FileSystemManager.GetFileContents(site, document.File))
+				using (System.IO.Stream responseStream = await this.FileSystemManager.GetFileContents(site, document.File))
 				{
 					documentContentItem.Content = new byte[responseStream.Length];
 					responseStream.Read(documentContentItem.Content, 0, documentContentItem.Content.Length);

@@ -6,3 +6,4 @@ extensions which submit meta-data to the search system, like the Documents, Foru
 > The standard sitemap generator only generates entries for pages.  The The Advanced SiteMap extension generates entries for pages, files
 and all extensions which provide meta-data to the search system.
 
+> You must configure a search feeder scheduled task so that the Advanced SiteMap Extension is sent data from search content providers.

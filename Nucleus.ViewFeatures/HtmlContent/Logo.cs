@@ -68,6 +68,10 @@ namespace Nucleus.ViewFeatures.HtmlContent
 						{
 							imageBuilder.Attributes.Add("src", uri.AbsoluteUri);
 						}
+						else
+						{
+							imageBuilder.Attributes.Add("src", urlHelper.FileLink(logoFile));
+						}
 					}
 					else
 					{

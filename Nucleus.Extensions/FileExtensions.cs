@@ -91,11 +91,11 @@ namespace Nucleus.Extensions
 		/// Returns true on success, or false if the file extension does not indicate that the file is an image, or there 
 		/// is an error rendering the image.
 		/// </returns>
-		public static Boolean GetImageDimensions(this File file, Site site, Nucleus.Abstractions.Managers.IFileSystemManager fileSystemManager)
+		public static async Task<Boolean> GetImageDimensions(this File file, Site site, Nucleus.Abstractions.Managers.IFileSystemManager fileSystemManager)
 		{
 			if (GetMIMEType(file, false).StartsWith("image/"))
 			{
-				using System.IO.Stream imageStream = fileSystemManager.GetFileContents(site, file);
+				using System.IO.Stream imageStream = await fileSystemManager.GetFileContents(site, file);
 				// The SkiaSharp is not directly referenced as a Nuget package, but is a dependency of DocumentPartner.ClosedXML,
 				// so it is available to us.
 				SkiaSharp.SKImage image = SkiaSharp.SKImage.FromEncodedData(imageStream);

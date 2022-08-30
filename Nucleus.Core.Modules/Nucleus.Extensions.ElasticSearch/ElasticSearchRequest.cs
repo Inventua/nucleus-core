@@ -36,26 +36,19 @@ namespace Nucleus.Extensions.ElasticSearch
 			this.CertificateThumbprint = certificateThumbprint;
 		}
 
-		public ElasticClient Client
-		{
-			get
+		public async Task<ElasticClient> GetClient()
+		{			
+			if (this._client == null)
 			{
-				if (this._client == null)
+				if (!await Connect())
 				{
-					if (!Connect())
-					{
-						throw new InvalidOperationException(this.DebugInformation);
-					}
+					throw new InvalidOperationException(this.DebugInformation);
 				}
-				return this._client;
 			}
-			set
-			{
-				this._client = value;
-			}
+			return this._client;			
 		}
 
-		private bool Connect()
+		private async Task<bool> Connect()
 		{
 			SingleNodeConnectionPool connectionPool = new SingleNodeConnectionPool(this.Uri);
 			Nest.ConnectionSettings connectionSettings = new Nest.ConnectionSettings(connectionPool);
@@ -82,20 +75,20 @@ namespace Nucleus.Extensions.ElasticSearch
 
 			ElasticClient client = new(connectionSettings);
 
-			pingResponse = client.Ping(BuildPingRequest());
+			pingResponse = await client.PingAsync(BuildPingRequest());
 			if (pingResponse.IsValid)
 			{
 				// Create index
-				if (!client.Indices.Exists(this.IndexName).Exists)
+				if (!(await client.Indices.ExistsAsync(this.IndexName)).Exists)
 				{
-					createIndexResponse = client.Indices.Create(BuildIndexRequest(this.IndexName));
+					createIndexResponse = await client.Indices.CreateAsync(BuildIndexRequest(this.IndexName));
 					if (!createIndexResponse.IsValid)
 					{
 						this.DebugInformation = createIndexResponse.DebugInformation;
 						throw createIndexResponse.OriginalException;
 					}
 
-					mapResponse = client.Map<ElasticSearchDocument>(e => e.AutoMap());
+					mapResponse = await client.MapAsync<ElasticSearchDocument>(e => e.AutoMap());
 					if (!mapResponse.IsValid)
 					{
 						this.DebugInformation = mapResponse.DebugInformation;
@@ -103,14 +96,14 @@ namespace Nucleus.Extensions.ElasticSearch
 					}
 
 					// Configure a pipeline for attachments 
-					attachmentPipelineResponse = ConfigureAttachmentPipeline(client);
+					attachmentPipelineResponse = await ConfigureAttachmentPipeline(client);
 					if (!attachmentPipelineResponse.IsValid)
 					{
 						this.DebugInformation = attachmentPipelineResponse.DebugInformation;
 						throw createIndexResponse.OriginalException;
 					}
 
-					noAttachmentPipelineResponse = ConfigureNoAttachmentPipeline(client);
+					noAttachmentPipelineResponse = await ConfigureNoAttachmentPipeline(client);
 					if (!noAttachmentPipelineResponse.IsValid)
 					{
 						this.DebugInformation = noAttachmentPipelineResponse.DebugInformation;
@@ -124,7 +117,7 @@ namespace Nucleus.Extensions.ElasticSearch
 				throw pingResponse.OriginalException;
 			}
 
-			this.Client = client;
+			this._client = client;
 			return true;
 		}
 
@@ -143,7 +136,7 @@ namespace Nucleus.Extensions.ElasticSearch
 			return new IndexState() { };
 		}
 
-		private PutPipelineResponse ConfigureAttachmentPipeline(ElasticClient client)
+		private async Task<PutPipelineResponse> ConfigureAttachmentPipeline(ElasticClient client)
 		{
 			PutPipelineResponse response;
 			PutPipelineRequest request;
@@ -227,12 +220,12 @@ namespace Nucleus.Extensions.ElasticSearch
 				}
 			};
 
-			response = client.Ingest.PutPipeline(request);
+			response = await client.Ingest.PutPipelineAsync(request);
 
 			return response;
 		}
 
-		private PutPipelineResponse ConfigureNoAttachmentPipeline(ElasticClient client)
+		private async Task<PutPipelineResponse> ConfigureNoAttachmentPipeline(ElasticClient client)
 		{
 			PutPipelineResponse objResponse;
 			PutPipelineRequest objRequest;
@@ -267,30 +260,33 @@ namespace Nucleus.Extensions.ElasticSearch
 				}
 			};
 
-			objResponse = client.Ingest.PutPipeline(objRequest);
+			objResponse = await client.Ingest.PutPipelineAsync(objRequest);
 
 			return objResponse;
 		}
 
-		public long CountIndex()
+		public async Task<long> CountIndex()
 		{
-			return this.Client.Count<ElasticSearchDocument>().Count;
+			ElasticClient client = await GetClient();
+			return (await client.CountAsync<ElasticSearchDocument>()).Count;
 		}
 
 
-		public bool DeleteIndex()
+		public async Task<bool> DeleteIndex()
 		{
 			Nest.DeleteIndexResponse objIndexResponse;
+			ElasticClient client = await GetClient();
 
-			objIndexResponse = this.Client.Indices.Delete(this.IndexName);
+			objIndexResponse = await client.Indices.DeleteAsync(this.IndexName);
 
 			return objIndexResponse.IsValid;
 		}
 
-		public Nest.UpdateIndexSettingsResponse ResetIndexSettings()
+		public async Task<Nest.UpdateIndexSettingsResponse> ResetIndexSettings()
 		{
 			Nest.IUpdateIndexSettingsRequest objIndexRequest;
 			Nest.UpdateIndexSettingsResponse objIndexResponse;
+			ElasticClient client = await GetClient();
 
 			objIndexRequest = new UpdateIndexSettingsRequest(this.IndexName);
 
@@ -298,27 +294,29 @@ namespace Nucleus.Extensions.ElasticSearch
 
 			objIndexRequest.IndexSettings.Add("index.blocks.read_only_allow_delete", false);
 
-			objIndexResponse = this.Client.Indices.UpdateSettings(objIndexRequest);
+			objIndexResponse = await client.Indices.UpdateSettingsAsync(objIndexRequest);
 
 			return objIndexResponse;
 		}
 
-		public GetIndexSettingsResponse GetIndexSettings()
+		public async Task<GetIndexSettingsResponse> GetIndexSettings()
 		{
 			GetIndexSettingsRequest objRequest = new GetIndexSettingsRequest();
+			ElasticClient client = await GetClient();
 
 			objRequest.Human = true;
 			objRequest.IncludeDefaults = true;
 			objRequest.Pretty = true;
 
-			return this.Client.Indices.GetSettings(new GetIndexSettingsRequest());
+			return await client.Indices.GetSettingsAsync(new GetIndexSettingsRequest());
 		}
 
-		public Nest.IndexResponse IndexContent(ElasticSearchDocument content)
+		public async Task<Nest.IndexResponse> IndexContent(ElasticSearchDocument content)
 		{
 			RequestConfiguration requestSettings = new RequestConfiguration();
 			Nest.IndexRequest<ElasticSearchDocument> indexRequest;
 			Nest.IndexResponse indexResponse;
+			ElasticClient client = await GetClient();
 
 			indexRequest = new IndexRequest<ElasticSearchDocument>(content)
 			{
@@ -330,7 +328,7 @@ namespace Nucleus.Extensions.ElasticSearch
 			requestSettings.RequestTimeout = new TimeSpan(0, 15, 0);
 
 			indexRequest.RequestConfiguration = requestSettings;
-			indexResponse = this.Client.Index<ElasticSearchDocument>(indexRequest);
+			indexResponse = await client.IndexAsync<ElasticSearchDocument>(indexRequest);
 
 			if (!indexResponse.IsValid)
 			{
@@ -339,11 +337,12 @@ namespace Nucleus.Extensions.ElasticSearch
 			return indexResponse;
 		}
 
-		public Nest.DeleteResponse RemoveContent(ElasticSearchDocument content)
+		public async Task<Nest.DeleteResponse> RemoveContent(ElasticSearchDocument content)
 		{
 			RequestConfiguration requestSettings = new RequestConfiguration();
 			Nest.DeleteRequest<ElasticSearchDocument> deleteRequest;
 			Nest.DeleteResponse deleteResponse;
+			ElasticClient client = await GetClient();
 
 			deleteRequest = new DeleteRequest<ElasticSearchDocument>(content)
 			{
@@ -354,7 +353,7 @@ namespace Nucleus.Extensions.ElasticSearch
 			requestSettings.RequestTimeout = new TimeSpan(0, 15, 0);
 
 			deleteRequest.RequestConfiguration = requestSettings;
-			deleteResponse = this.Client.Delete<ElasticSearchDocument>(content);
+			deleteResponse = await client.DeleteAsync<ElasticSearchDocument>(content);
 
 			if (!deleteResponse.IsValid)
 			{
@@ -377,7 +376,7 @@ namespace Nucleus.Extensions.ElasticSearch
 			return supportedTypes.Contains(contentType, StringComparer.OrdinalIgnoreCase);
 		}
 
-		public ISearchResponse<ElasticSearchDocument> Suggest(SearchQuery query)
+		public async Task<ISearchResponse<ElasticSearchDocument>> Suggest(SearchQuery query)
 		{
 			SearchRequest searchRequest;
 			ISearchResponse<ElasticSearchDocument> response;
@@ -412,7 +411,7 @@ namespace Nucleus.Extensions.ElasticSearch
 				}
 			};
 
-			response = Search(searchRequest);
+			response = await Search(searchRequest);
 
 			return response;
 		}
@@ -437,7 +436,7 @@ namespace Nucleus.Extensions.ElasticSearch
 		}
 
 
-		public ISearchResponse<ElasticSearchDocument> Search(SearchQuery query)
+		public async Task<ISearchResponse<ElasticSearchDocument>> Search(SearchQuery query)
 		{
 			SearchRequest searchRequest;
 
@@ -467,7 +466,7 @@ namespace Nucleus.Extensions.ElasticSearch
 			// .Pretty = Me.DebugMode,
 			// .Explain = Me.DebugMode,
 			// .Human = Me.DebugMode,
-			ISearchResponse<ElasticSearchDocument> response = Search(searchRequest);
+			ISearchResponse<ElasticSearchDocument> response = await Search(searchRequest);
 
 			if (response.IsValid)
 			{
@@ -479,12 +478,13 @@ namespace Nucleus.Extensions.ElasticSearch
 			}
 		}
 
-		private ISearchResponse<ElasticSearchDocument> Search(Nest.SearchRequest searchRequest)
+		private async Task<ISearchResponse<ElasticSearchDocument>> Search(Nest.SearchRequest searchRequest)
 		{
-			return this.Client.Search<ElasticSearchDocument>(searchRequest);
+			ElasticClient client = await GetClient();
+			return await client.SearchAsync<ElasticSearchDocument>(searchRequest);
 		}
 
-		public ISearchResponse<ElasticSearchDocument> ReplaceHighlights(ISearchResponse<ElasticSearchDocument> response)
+		private ISearchResponse<ElasticSearchDocument> ReplaceHighlights(ISearchResponse<ElasticSearchDocument> response)
 		{
 			// replace document field values with highlighted ones
 			foreach (IHit<ElasticSearchDocument> objHit in response.Hits)

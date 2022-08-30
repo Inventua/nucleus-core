@@ -119,7 +119,7 @@ namespace Nucleus.Core.Search
 					Roles = await GetViewRoles(file.Parent)
 				};
 
-				using (System.IO.Stream responseStream = this.FileSystemManager.GetFileContents(site, file))
+				using (System.IO.Stream responseStream = await this.FileSystemManager.GetFileContents(site, file))
 				{
 					contentItem.Content = new byte[responseStream.Length];
 					await responseStream.ReadAsync(contentItem.Content.AsMemory(0, contentItem.Content.Length));

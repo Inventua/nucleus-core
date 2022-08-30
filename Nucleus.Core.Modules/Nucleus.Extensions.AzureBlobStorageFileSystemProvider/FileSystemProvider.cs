@@ -34,7 +34,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			configSection.Bind(this.Options);
 		}
 
-		public override Folder CreateFolder(string parentPath, string newFolder)
+		public override async Task<Folder> CreateFolder(string parentPath, string newFolder)
 		{
 			string fullPath = GetFullPath(parentPath, newFolder);
 			BlobServiceClient client = new(this.Options.ConnectionString);
@@ -42,29 +42,29 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			if (IsContainerPath(GetFullPath(parentPath, newFolder)))
 			{
 				// folder being created is at the top level, create a container
-				client.CreateBlobContainer(GetContainerName(fullPath));
+				await client.CreateBlobContainerAsync(GetContainerName(fullPath));
 			}
 			else
 			{
 				// folder is "in" a container, create zero-length blob to represent a folder 
 				BlobContainerClient containerClient = client.GetBlobContainerClient(GetContainerName(fullPath));
 				BlobClient blobClient = containerClient.GetBlobClient(GetBlobName(fullPath));
-				blobClient.Upload(new System.IO.MemoryStream());
+				await blobClient.UploadAsync(new System.IO.MemoryStream());
 			}
 
 			return BuildFolder(fullPath);
 		}
 
-		public override void DeleteFile(string path)
+		public override async Task DeleteFile(string path)
 		{
 			BlobServiceClient client = new(this.Options.ConnectionString);
 			BlobContainerClient containerClient = client.GetBlobContainerClient(GetContainerName(path));
-			containerClient.DeleteBlob(GetBlobName(path));
+			await containerClient.DeleteBlobAsync(GetBlobName(path));
 		}
 
-		public override void DeleteFolder(string path, bool recursive)
+		public override async Task DeleteFolder(string path, bool recursive)
 		{
-			Folder existingFolder = ListFolder(path);
+			Folder existingFolder = await ListFolder(path);
 
 			if (IsContainerPath(path))
 			{
@@ -97,12 +97,12 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 					{
 						foreach (File file in existingFolder.Files)
 						{
-							DeleteFile(file.Path);
+							await DeleteFile(file.Path);
 						}
 
 						foreach (Folder folder in existingFolder.Folders)
 						{
-							DeleteFolder(folder.Path, recursive);
+							await DeleteFolder(folder.Path, recursive);
 						}
 					}
 				}
@@ -113,13 +113,13 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			}
 		}
 
-		public override Abstractions.Models.FileSystem.File GetFile(string path)
+		public override async Task<Abstractions.Models.FileSystem.File> GetFile(string path)
 		{
 			try
 			{
 				BlobClient blobClient = new(this.Options.ConnectionString, GetContainerName(path), GetBlobName(path));
-				Azure.Response<BlobProperties> response = blobClient.GetProperties();
-				return BuildFile(path, response.Value);
+				Azure.Response<BlobProperties> response = await blobClient.GetPropertiesAsync();
+				return await BuildFile(path, response.Value);
 			}
 			catch (Azure.RequestFailedException ex)
 			{
@@ -134,7 +134,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			}
 		}
 
-		public override System.Uri GetFileDirectUrl(string path, DateTime expiresOn)
+		public override Task<System.Uri> GetFileDirectUrl(string path, DateTime expiresOn)
 		{
 			// set cache expiry to 30 minutes less than the SAS token expiry so a browser doesn't ever try a direct url that won't work
 			long maxAge = (Int64)((expiresOn - DateTime.UtcNow).TotalHours - 0.5) * 60;
@@ -164,8 +164,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 						ContentType = mimeType
 					};
 
-					return blobClient.GenerateSasUri(options);
-					//return blobClient.GenerateSasUri(Azure.Storage.Sas.BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddDays(30));
+					return Task.FromResult(blobClient.GenerateSasUri(options));
 				}
 				catch (Azure.RequestFailedException ex)
 				{
@@ -183,12 +182,12 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			return null;
 		}
 
-		public override System.IO.Stream GetFileContents(string path)
+		public override async Task<System.IO.Stream> GetFileContents(string path)
 		{
 			try
 			{
 				BlobClient blobClient = new(this.Options.ConnectionString, GetContainerName(path), GetBlobName(path));
-				return blobClient.OpenRead();
+				return await blobClient.OpenReadAsync();
 			}
 			catch (Azure.RequestFailedException ex)
 			{
@@ -203,7 +202,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			}
 		}
 
-		public override Folder GetFolder(string path)
+		public override async Task<Folder> GetFolder(string path)
 		{
 			BlobServiceClient client = new(this.Options.ConnectionString);
 
@@ -217,7 +216,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 				{
 					// Path is a top level container
 					BlobContainerClient containerClient = client.GetBlobContainerClient(GetContainerName(path));
-					Azure.Response<BlobContainerProperties> response = containerClient.GetProperties();
+					Azure.Response<BlobContainerProperties> response = await containerClient.GetPropertiesAsync();
 
 					return BuildFolder(path, response.Value);
 				}
@@ -228,7 +227,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 
 					try
 					{
-						Azure.Response<BlobProperties> response = blobClient.GetProperties();
+						Azure.Response<BlobProperties> response = await blobClient.GetPropertiesAsync();
 						return BuildFolder(path, response.Value);
 					}
 					catch (Azure.RequestFailedException ex)
@@ -247,12 +246,12 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 
 		}
 
-		public override Folder ListFolder(string path)
+		public override async Task<Folder> ListFolder(string path)
 		{
-			return ListFolder(path, "");
+			return await ListFolder(path, "");
 		}
 
-		public override Folder ListFolder(string path, string pattern)
+		public override async Task<Folder> ListFolder(string path, string pattern)
 		{
 			BlobServiceClient client = new(this.Options.ConnectionString);
 			BlobContainerClient containerClient = client.GetBlobContainerClient(GetContainerName(path));
@@ -261,7 +260,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			// In Azure blob storage, containers can only exist at the top level
 			if (String.IsNullOrEmpty(path))
 			{
-				foreach (BlobContainerItem item in client.GetBlobContainers(BlobContainerTraits.None, BlobContainerStates.None, GetBlobName(path)))
+				await foreach (BlobContainerItem item in client.GetBlobContainersAsync(BlobContainerTraits.None, BlobContainerStates.None, GetBlobName(path)))
 				{
 					folder.Folders.Add(BuildFolder(item));
 				}
@@ -280,9 +279,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 
 				try
 				{
-					Azure.Pageable<BlobHierarchyItem> items = containerClient.GetBlobsByHierarchy(Azure.Storage.Blobs.Models.BlobTraits.None, BlobStates.None, new string(System.IO.Path.AltDirectorySeparatorChar, 1), prefix);
-
-					foreach (BlobHierarchyItem item in items)
+					await foreach (BlobHierarchyItem item in containerClient.GetBlobsByHierarchyAsync(Azure.Storage.Blobs.Models.BlobTraits.None, BlobStates.None, new string(System.IO.Path.AltDirectorySeparatorChar, 1), prefix))
 					{
 						//GetFullPath(containerClient.Name, item.Prefix)
 						if (!item.IsBlob)
@@ -318,7 +315,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 								// Add file if it matches the specifed pattern
 								if (String.IsNullOrEmpty(pattern) || System.Text.RegularExpressions.Regex.IsMatch(item?.Blob.Name, pattern))
 								{
-									folder.Files.Add(BuildFile(containerClient.Name, item.Blob));
+									folder.Files.Add(await BuildFile(containerClient.Name, item.Blob));
 								}
 							}
 						}
@@ -340,12 +337,12 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			return folder;
 		}
 
-		public override Abstractions.Models.FileSystem.File RenameFile(string path, string newName)
+		public override Task<Abstractions.Models.FileSystem.File> RenameFile(string path, string newName)
 		{
 			throw new NotImplementedException();
 		}
 
-		public override Folder RenameFolder(string path, string newName)
+		public override Task<Folder> RenameFolder(string path, string newName)
 		{
 			throw new NotImplementedException();
 		}
@@ -357,7 +354,6 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			BlobContainerClient containerClient = client.GetBlobContainerClient(GetContainerName(parentPath));
 			BlobClient blobClient = containerClient.GetBlobClient(GetBlobName(newObjectPath));
 
-			//await blobClient.UploadAsync(content, overwrite: overwrite);
 			Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider extensionProvider = new();
 
 			if (!extensionProvider.TryGetContentType(newFileName, out string mimeType))
@@ -367,7 +363,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 
 			await blobClient.UploadAsync(content, new BlobHttpHeaders { ContentType = mimeType, CacheControl = "max-age=3600" });
 
-			return BuildFile(newObjectPath);
+			return await BuildFile(newObjectPath);
 		}
 
 		/// <summary>
@@ -427,6 +423,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 		{
 			return new FileSystemItemCapabilities()
 			{
+			 	CanHaveFolders = true,
 				CanStoreFiles = false,
 				CanRename = false,
 				CanDelete = false
@@ -465,19 +462,19 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			};
 		}
 
-		private File BuildFile(string fileName)
+		private async Task<File> BuildFile(string fileName)
 		{
 			return new File()
 			{
 				Provider = this.Key,
 				Path = GetRelativePath(fileName),
 				Name = GetDisplayName(fileName),
-				Parent = GetFolder(GetParentPath(fileName)),
+				Parent = await GetFolder(GetParentPath(fileName)),
 				Capabilities = BuildFileCapabilities()
 			};
 		}
 
-		private File BuildFile(string containerName, BlobItem fileItem)
+		private async Task<File> BuildFile(string containerName, BlobItem fileItem)
 		{
 			return new File()
 			{
@@ -485,13 +482,13 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 				Path = GetRelativePath(GetFullPath(containerName, fileItem.Name)),
 				Name = GetDisplayName(fileItem.Name),
 				DateModified = fileItem.Properties.LastModified.Value.UtcDateTime,
-				Parent = GetFolder(GetParentPath(GetFullPath(containerName, fileItem.Name))),
+				Parent = await GetFolder(GetParentPath(GetFullPath(containerName, fileItem.Name))),
 				Size = fileItem.Properties.ContentLength.Value,
 				Capabilities = BuildFileCapabilities()
 			};
 		}
 
-		private File BuildFile(string name, BlobProperties properties)
+		private async Task<File> BuildFile(string name, BlobProperties properties)
 		{
 			return new File()
 			{
@@ -499,7 +496,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 				Path = GetRelativePath(name),
 				Name = GetDisplayName(name),
 				DateModified = properties.LastModified.UtcDateTime,
-				Parent = GetFolder(GetParentPath(name)),
+				Parent = await GetFolder(GetParentPath(name)),
 				Size = properties.ContentLength,
 				Capabilities = BuildFileCapabilities()
 			};
@@ -545,7 +542,8 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 				Path = GetRelativePath(name),
 				Name = GetDisplayName(name),
 				DateModified = properties.LastModified.UtcDateTime,
-				Parent = GetFolder(GetParentPath(name)),
+				//Parent = await GetFolder(GetParentPath(name)),
+				Parent = new Folder() { Provider = this.Key, Path = GetParentPath(name) },
 				Capabilities = IsContainerPath(name) ? BuildContainerCapabilities() : BuildSubFolderCapabilities(),
 				FolderValidationRules = BuildSubFolderValidationRules(),
 				FileValidationRules = BuildFileValidationRules()
@@ -562,7 +560,8 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 				Path = path,
 				Name = GetDisplayName(fileItem.Name),
 				DateModified = fileItem.Properties.LastModified.Value.UtcDateTime,
-				Parent = GetFolder(GetParentPath(GetFullPath(containerName, fileItem.Name))),
+				//Parent = await GetFolder(GetParentPath(GetFullPath(containerName, fileItem.Name))),
+				Parent = new Folder() { Provider = this.Key, Path = GetParentPath(GetFullPath(containerName, fileItem.Name)) },
 				Capabilities = IsContainerPath(path) ? BuildContainerCapabilities() : BuildSubFolderCapabilities(),
 				FolderValidationRules = BuildSubFolderValidationRules(),
 				FileValidationRules = BuildFileValidationRules()
@@ -577,47 +576,47 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 		private FileSystemValidationRule[] BuildTopFolderValidationRules()
 		{
 			return new FileSystemValidationRule[]
-					{
-						new FileSystemValidationRule()
-						{
-							ValidationExpression = "^[0-9a-z]{1}[0-9a-z-]{2,61}[0-9a-z]$" , ErrorMessage = "Azure top level folders (containers) must start and end with a letter or number, contain only letters, numbers and dashes, and must be lower case.",
-						},
-						new FileSystemValidationRule()
-						{
-							ValidationExpression = "^(?!.*--)" , ErrorMessage = "Azure top level folders (containers) must not contain consecutive dashes.",
-						}
-					};
+			{
+				new FileSystemValidationRule()
+				{
+					ValidationExpression = "^[0-9a-z]{1}[0-9a-z-]{2,61}[0-9a-z]$" , ErrorMessage = "Azure top level folders (containers) must start and end with a letter or number, contain only letters, numbers and dashes, and must be lower case.",
+				},
+				new FileSystemValidationRule()
+				{
+					ValidationExpression = "^(?!.*--)" , ErrorMessage = "Azure top level folders (containers) must not contain consecutive dashes.",
+				}
+			};
 		}
 
 		private FileSystemValidationRule[] BuildFileValidationRules()
 		{
 			return new FileSystemValidationRule[]
+			{
+				new FileSystemValidationRule()
 				{
-					new FileSystemValidationRule()
-					{
-						ValidationExpression = "^.{1,1024}$" , ErrorMessage = "Azure file names must be 1-1024 characters long.",
-					},
-					new FileSystemValidationRule()
-					{
-						ValidationExpression = "^[^\\/\\\\]+$" , ErrorMessage = "Azure file names cannot contain the '/' or '\\' character.",
-					}
-				};
+					ValidationExpression = "^.{1,1024}$" , ErrorMessage = "Azure file names must be 1-1024 characters long.",
+				},
+				new FileSystemValidationRule()
+				{
+					ValidationExpression = "^[^\\/\\\\]+$" , ErrorMessage = "Azure file names cannot contain the '/' or '\\' character.",
+				}
+			};
 		}
 
 
 		private FileSystemValidationRule[] BuildSubFolderValidationRules()
 		{
 			return new FileSystemValidationRule[]
+			{
+				new FileSystemValidationRule()
 				{
-					new FileSystemValidationRule()
-					{
-						ValidationExpression = "^.{1,1024}$" , ErrorMessage = "Azure sub-folders must be 1-1024 characters long.",
-					},
-					new FileSystemValidationRule()
-					{
-						ValidationExpression = "^[^\\/\\\\]+$" , ErrorMessage = "Azure sub-folders cannot contain the '/' or '\\' character.",
-					}
-				};
+					ValidationExpression = "^.{1,1024}$" , ErrorMessage = "Azure sub-folders must be 1-1024 characters long.",
+				},
+				new FileSystemValidationRule()
+				{
+					ValidationExpression = "^[^\\/\\\\]+$" , ErrorMessage = "Azure sub-folders cannot contain the '/' or '\\' character.",
+				}
+			};
 		}
 
 		private Folder BuildFolder(string name, BlobContainerProperties properties)

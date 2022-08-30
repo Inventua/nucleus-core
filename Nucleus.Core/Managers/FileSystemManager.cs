@@ -41,7 +41,7 @@ namespace Nucleus.Core.Managers
 		{
 			using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
-				Folder folder = this.FileSystemProviderFactory.Get(site, providerName).GetFolder(path);
+				Folder folder = await this.FileSystemProviderFactory.Get(site, providerName).GetFolder(path);
 
 				if (folder != null)
 				{
@@ -75,7 +75,7 @@ namespace Nucleus.Core.Managers
 
 				if (folderData != null)
 				{
-					Folder folder = this.FileSystemProviderFactory.Get(site, folderData.Provider).GetFolder(folderData.Path);
+					Folder folder = await this.FileSystemProviderFactory.Get(site, folderData.Provider).GetFolder(folderData.Path);
 					folderData.CopyDatabaseValuesTo(folder);
 
 					return folder;
@@ -100,7 +100,7 @@ namespace Nucleus.Core.Managers
 				
 				if (fileData != null)
 				{
-					File file = this.FileSystemProviderFactory.Get(site, fileData.Provider).GetFile(fileData.Path);
+					File file = await this.FileSystemProviderFactory.Get(site, fileData.Provider).GetFile(fileData.Path);
 					fileData.CopyDatabaseValuesTo(file);
 
 					await GetDatabaseProperties(site, file.Parent);
@@ -119,7 +119,7 @@ namespace Nucleus.Core.Managers
 		{
 			using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
-				File file = this.FileSystemProviderFactory.Get(site, providerName).GetFile(path);
+				File file = await this.FileSystemProviderFactory.Get(site, providerName).GetFile(path);
 
 				if (file != null)
 				{
@@ -130,7 +130,7 @@ namespace Nucleus.Core.Managers
 
 						// try to get the image dimensions.  The GetImageDimensions extension checks that the file is
 						// an image and does nothing if it is not, so we don't need to check that here. 
-						file.GetImageDimensions(site, this);
+						await file.GetImageDimensions(site, this);
 						fileData = await provider.SaveFile(site, file);
 					}
 
@@ -310,7 +310,7 @@ namespace Nucleus.Core.Managers
 		{
 			// create the physical folder
 			FileSystemProvider fileSystemProvider = this.FileSystemProviderFactory.Get(site, providerName);
-			Folder parentFolder = fileSystemProvider.GetFolder(parentPath);
+			Folder parentFolder = await fileSystemProvider.GetFolder(parentPath);
 			string message = "";
 
 			if (!IsValidFolderName(parentFolder, newFolder, ref message))
@@ -318,7 +318,7 @@ namespace Nucleus.Core.Managers
 				throw new InvalidOperationException(message);
 			}
 
-			Folder result = fileSystemProvider.CreateFolder(parentPath, newFolder);
+			Folder result = await fileSystemProvider.CreateFolder(parentPath, newFolder);
 
 			// SaveFolderPermissions creates a record in the database for the folder (a new folder doesn't have
 			// any permissions to save, but we do want to save the database record).
@@ -330,7 +330,7 @@ namespace Nucleus.Core.Managers
 		public async Task DeleteFolder(Site site, Folder folder, Boolean recursive)
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, folder.Provider);
-			provider.DeleteFolder(folder.Path, recursive);
+			await provider.DeleteFolder(folder.Path, recursive);
 
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
@@ -343,8 +343,8 @@ namespace Nucleus.Core.Managers
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, folder.Provider);
 
-			folder = provider.RenameFolder(folder.Path, newName);
-			Folder parentFolder = provider.GetFolder(folder.Parent.Path);
+			folder = await provider.RenameFolder(folder.Path, newName);
+			Folder parentFolder = await provider.GetFolder(folder.Parent.Path);
 			string message = "";
 
 			if (!IsValidFolderName(parentFolder, newName, ref message))
@@ -390,7 +390,7 @@ namespace Nucleus.Core.Managers
 			Folder existingFolder = await this.GetFolder(site, id);
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, existingFolder.Provider);
 
-			Folder folder = provider.ListFolder(existingFolder.Path, pattern);
+			Folder folder = await provider.ListFolder(existingFolder.Path, pattern);
 
 			await GetDatabaseProperties(site, folder);
 			await GetDatabaseProperties(site, folder.Parent);
@@ -447,7 +447,7 @@ namespace Nucleus.Core.Managers
 
 			DateTime expiresOn = DateTime.UtcNow.AddDays(30);
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, file.Provider);
-			System.Uri directUrl = provider.GetFileDirectUrl(file.Path, expiresOn);
+			System.Uri directUrl = await provider.GetFileDirectUrl(file.Path, expiresOn);
 
 			if (directUrl != null)
 			{
@@ -463,18 +463,18 @@ namespace Nucleus.Core.Managers
 			return directUrl;
 		}
 
-		public System.IO.Stream GetFileContents(Site site, File file)
+		public async Task<System.IO.Stream> GetFileContents(Site site, File file)
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, file.Provider);
-			return provider.GetFileContents(file.Path);
+			return await provider.GetFileContents(file.Path);
 		}
 
 		public async Task DeleteFile(Site site, File file)
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, file.Provider);
-			Folder parentFolder = provider.GetFolder(file.Parent.Path);
+			Folder parentFolder = await provider.GetFolder(file.Parent.Path);
 
-			provider.DeleteFile(file.Path);
+			await provider.DeleteFile(file.Path);
 
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
@@ -490,7 +490,7 @@ namespace Nucleus.Core.Managers
 		public async Task RenameFile(Site site, File file, string newName)
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, file.Provider);
-			Folder parentFolder = provider.GetFolder(file.Parent.Path);
+			Folder parentFolder = await provider.GetFolder(file.Parent.Path);
 			string message = "";
 
 			if (!IsValidFileName(parentFolder, newName, ref message))
@@ -503,7 +503,7 @@ namespace Nucleus.Core.Managers
 				throw new InvalidOperationException("Changing the file extension is not allowed.");
 			}
 
-			File newfile = provider.RenameFile(file.Path, newName);
+			File newfile = await provider.RenameFile(file.Path, newName);
 
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
@@ -531,7 +531,7 @@ namespace Nucleus.Core.Managers
 
 			if (content != null)
 			{
-				Folder parentFolder = provider.GetFolder(parentPath);
+				Folder parentFolder = await provider.GetFolder(parentPath);
 				string message = "";
 
 				if (!IsValidFileName(parentFolder, newFileName, ref message))
@@ -544,7 +544,7 @@ namespace Nucleus.Core.Managers
 
 				// try to get the image dimensions and save them.  The GetImageDimensions extension checks that the file is
 				// an image and does nothing if it is not, so we don't need to check that here. 
-				file.GetImageDimensions(site, this);
+				await file.GetImageDimensions(site, this);
 				
 				using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 				{

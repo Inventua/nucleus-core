@@ -1,40 +1,33 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="3772d87d-5e44-4b0c-a2d3-3bb3ac83a0d7" xmlns="urn:nucleus/schemas/package/1.0">
-	<name>Accept Terms</name>
-	<version>1.0.0</version>
-	<publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
-	<description>
+  <name>Accept Terms</name>
+  <version>1.0.0</version>
+  <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
+  <description>
 		The 'Accept Terms' module displays your terms text on-screen and requires the user to accept the terms before they can use the page which contains the module.
 	</description>
-	<compatibility minVersion="1.0.0.0" maxVersion="*" />
-	
-	<components>
-		<component folderName="AcceptTerms" optional="false">
-			<moduleDefinition id="45963833-c2b2-4673-a25b-85ac7b2b5b49">
-				<friendlyName>Accept Terms</friendlyName>
-				<extension>AcceptTerms</extension>
-				<viewController>AcceptTerms</viewController>
-				<settingsController>AcceptTermsAdmin</settingsController>
-				<viewAction>Index</viewAction>
-				<editAction>Settings</editAction>
-			</moduleDefinition>
-
-			<file name="readme.txt" />
-			<file name="license.txt" />
-			
-			<file name="viewer.css" />
-			<file name="settings.css" />
-			
-			<folder name="Bin">
-				<file name="Nucleus.Modules.AcceptTerms.dll" />
-			</folder>
-			
-			<folder name="Views">
-				<file name="Viewer.cshtml" />
-				<file name="Settings.cshtml" />
-			</folder>
-			
-		</component>
-	</components>
-	
+  <compatibility minVersion="1.0.0.0" maxVersion="*" />
+  <components>
+    <component folderName="AcceptTerms" optional="false">
+      <moduleDefinition id="45963833-c2b2-4673-a25b-85ac7b2b5b49">
+        <friendlyName>Accept Terms</friendlyName>
+        <extension>AcceptTerms</extension>
+        <viewController>AcceptTerms</viewController>
+        <settingsController>AcceptTermsAdmin</settingsController>
+        <viewAction>Index</viewAction>
+        <editAction>Settings</editAction>
+      </moduleDefinition>
+      <file name="readme.txt" />
+      <file name="license.txt" />
+      <file name="viewer.css" />
+      <file name="settings.css" />
+      <folder name="Bin">
+        <file name="Nucleus.Modules.AcceptTerms.dll" />
+      </folder>
+      <folder name="Views">
+        <file name="Viewer.cshtml" />
+        <file name="Settings.cshtml" />
+      </folder>
+    </component>
+  </components>
 </package>

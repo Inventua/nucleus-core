@@ -37,7 +37,12 @@ namespace Nucleus.Extensions.AdvancedSiteMap
 			}
 		}
 
-		public void Index(ContentMetaData metadata)
+		public Task ClearIndex(Site site)
+		{
+			return Task.CompletedTask;
+		}
+
+		public Task Index(ContentMetaData metadata)
 		{
 			Abstractions.Models.Sitemap.Sitemap siteMap = this.SiteMap();
 			SiteMapEntry item = siteMap.Items.Where(item => item.Url == metadata.Url).FirstOrDefault();
@@ -51,9 +56,11 @@ namespace Nucleus.Extensions.AdvancedSiteMap
 			item.Url = metadata.Url;
 
 			this.Write(siteMap);
+
+			return Task.CompletedTask;
 		}
 
-		public void Remove(ContentMetaData metadata)
+		public Task Remove(ContentMetaData metadata)
 		{
 			Abstractions.Models.Sitemap.Sitemap siteMap = this.SiteMap();
 			SiteMapEntry item = siteMap.Items.Where(item => item.Url == metadata.Url).FirstOrDefault();
@@ -64,6 +71,8 @@ namespace Nucleus.Extensions.AdvancedSiteMap
 			}
 
 			Write(siteMap);
+
+			return Task.CompletedTask;
 		}
 
 		private string GetFilename()

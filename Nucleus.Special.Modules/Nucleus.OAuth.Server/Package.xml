@@ -1,43 +1,35 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="5765ca81-bf24-4ee7-81bd-5c445a044146" xmlns="urn:nucleus/schemas/package/1.0">
-	<name>OAuth Server</name>
-	<version>1.0.0</version>
-	<publisher name="Inventua Pty Ltd" url="http://www.inventua.com" email="support@inventua.com" />
-	<description>
-		
-	</description>
-	<compatibility minVersion="1.0.0.0" maxVersion="*" />
-	
-	<components>
-		<component folderName="OAuth Server" optional="false">
-			<controlPanelExtensionDefinition id="2a55b505-2089-4e7c-9c0b-3111812d21bc">
-				<friendlyName>OAuth Server</friendlyName>
-				<description>Configure OAuth server.</description>
-				<controllerName>OAuthServerAdmin</controllerName>
-				<extensionName>OAuthServer</extensionName>
-				<scope>Site</scope>
-				<editAction>Settings</editAction>
-			</controlPanelExtensionDefinition>
-			
-			<file name="readme.txt" />
-			<file name="license.txt" />
-			
-			<file name="viewer.css" />
-			<file name="settings.css" />
-			
-			<folder name="Bin">
-				<file name="Nucleus.OAuth.Server.dll" />
-			</folder>
-			
-			<folder name="Views">
-				<file name="Viewer.cshtml" />
-				<file name="Settings.cshtml" />
-				<file name="Editor.cshtml" />
-				<file name="_ClientAppsList.cshtml" />
-				<file name="_PageMenu.cshtml" />
-			</folder>
-			
-		</component>
-	</components>
-	
+  <name>OAuth Server</name>
+  <version>1.0.0</version>
+  <publisher name="Inventua Pty Ltd" url="http://www.inventua.com" email="support@inventua.com" />
+  <description>
+  </description>
+  <compatibility minVersion="1.0.0.0" maxVersion="*" />
+  <components>
+    <component folderName="OAuth Server" optional="false">
+      <controlPanelExtensionDefinition id="2a55b505-2089-4e7c-9c0b-3111812d21bc">
+        <friendlyName>OAuth Server</friendlyName>
+        <description>Configure OAuth server.</description>
+        <controllerName>OAuthServerAdmin</controllerName>
+        <extensionName>OAuthServer</extensionName>
+        <scope>Site</scope>
+        <editAction>Settings</editAction>
+      </controlPanelExtensionDefinition>
+      <file name="readme.txt" />
+      <file name="license.txt" />
+      <file name="viewer.css" />
+      <file name="settings.css" />
+      <folder name="Bin">
+        <file name="Nucleus.OAuth.Server.dll" />
+      </folder>
+      <folder name="Views">
+        <file name="Viewer.cshtml" />
+        <file name="Settings.cshtml" />
+        <file name="Editor.cshtml" />
+        <file name="_ClientAppsList.cshtml" />
+        <file name="_PageMenu.cshtml" />
+      </folder>
+    </component>
+  </components>
 </package>

@@ -71,11 +71,19 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 			else
 			{
-				folder = await this.FileSystemManager.GetFolder(this.Context.Site, folderId);
+				try
+				{
+					folder = await this.FileSystemManager.GetFolder(this.Context.Site, folderId);					
+				}
+				catch (System.IO.FileNotFoundException)
+				{
+					// this handles the case where the "most recent" folder has been deleted
+					folder = null;
+				}
 			}
 
 			viewModel = await BuildViewModel(viewModel, folder);
-
+			
 			return View("Index", viewModel);
 		}
 

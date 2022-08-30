@@ -25,7 +25,10 @@
 			{
 				@Html.LinkButton("&#xe5c4;", "Back", @Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = Model.Folder.Parent.Id }), new { @data_target = ".nucleus-adminpage", @class = "btn btn-secondary" })
 			}
-			@Html.AreaActionLink("Create Folder", "ShowCreateFolderDialog", "FileSystem", "Admin", new { folderId = Model.Folder.Id }, new { @class = "btn btn-secondary", @data_target = "#nucleus-popupdialog .modal-body" })
+			@if (Model.Folder.Capabilities.CanHaveFolders)
+			{
+				@Html.AreaActionLink("Create Folder", "ShowCreateFolderDialog", "FileSystem", "Admin", new { folderId = Model.Folder.Id }, new { @class = "btn btn-secondary", @data_target = "#nucleus-popupdialog .modal-body" })
+			}
 			@if (Model.Folder.Capabilities.CanStoreFiles)
 			{
 				<div class="btn btn-secondary">

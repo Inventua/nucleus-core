@@ -1,38 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="e6350984-dd4d-43d6-a12b-25b4c4bb18de" xmlns="urn:nucleus/schemas/package/1.0">
-	<name>Sitemap</name>
-	<version>1.0.0</version>
-	<publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
-	<description>
+  <name>Sitemap</name>
+  <version>1.0.0</version>
+  <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
+  <description>
 		Application install set for the core Sitemap module.			
 	</description>
-	<compatibility minVersion="1.0.0.0" maxVersion="*" />
-	
-	<components>
-		<component folderName="Sitemap" optional="false">
-			<moduleDefinition id="0392bf73-c646-4ccc-bcb5-372a75b9ea84">
-				<friendlyName>Sitemap</friendlyName>
-				<extension>SiteMap</extension>
-				<viewController>Sitemap</viewController>
-				<viewAction>Index</viewAction>
-				<editAction>Edit</editAction>
-			</moduleDefinition>
-
-			<file name="readme.txt" />
-			<file name="license.txt" />
-			
-			<file name="Sitemap.css" />
-			
-			<folder name="Bin">
-				<file name="Nucleus.Modules.Sitemap.dll" />
-			</folder>
-			
-			<folder name="Views">
-				<file name="Viewer.cshtml" />
-				<file name="Settings.cshtml" />				
-			</folder>
-			
-		</component>
-	</components>
-	
+  <compatibility minVersion="1.0.0.0" maxVersion="*" />
+  <components>
+    <component folderName="Sitemap" optional="false">
+      <moduleDefinition id="0392bf73-c646-4ccc-bcb5-372a75b9ea84">
+        <friendlyName>Sitemap</friendlyName>
+        <extension>SiteMap</extension>
+        <viewController>Sitemap</viewController>
+        <viewAction>Index</viewAction>
+        <editAction>Edit</editAction>
+      </moduleDefinition>
+      <file name="readme.txt" />
+      <file name="license.txt" />
+      <file name="Sitemap.css" />
+      <folder name="Bin">
+        <file name="Nucleus.Modules.Sitemap.dll" />
+      </folder>
+      <folder name="Views">
+        <file name="Viewer.cshtml" />
+        <file name="Settings.cshtml" />
+      </folder>
+    </component>
+  </components>
 </package>

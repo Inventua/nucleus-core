@@ -169,7 +169,7 @@ namespace Nucleus.Web.Controllers
 							}
 						}
 
-						return File(this.FileSystemManager.GetFileContents(this.Context.Site, file), mimeType);
+						return File(await this.FileSystemManager.GetFileContents(this.Context.Site, file), mimeType);
 					}
 					else
 					{

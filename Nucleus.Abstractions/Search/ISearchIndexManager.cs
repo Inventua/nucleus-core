@@ -17,10 +17,17 @@ namespace Nucleus.Abstractions.Search
 	public interface ISearchIndexManager
 	{
 		/// <summary>
+		/// Clear all entries from the index.
+		/// </summary>
+		/// <param name="site">Specifies the site whose index is to be cleared.</param>
+		/// <returns></returns>
+		public Task ClearIndex(Site site);
+
+		/// <summary>
 		/// Add the content specified by <paramref name="metadata"/> to the search index.
 		/// </summary>
 		/// <param name="metadata"></param>
-		public void Index(ContentMetaData metadata);
+		public Task Index(ContentMetaData metadata);
 
 		/// <summary>
 		/// Remove the content specified by <paramref name="metadata"/> from the search index, if it is present.
@@ -30,6 +37,6 @@ namespace Nucleus.Abstractions.Search
 		/// If the content is not present or if the search index manager does not support removing content, this function should 
 		/// return without error.  
 		/// </remarks>
-		public void Remove(ContentMetaData metadata);
+		public Task Remove(ContentMetaData metadata);
 	}
 }

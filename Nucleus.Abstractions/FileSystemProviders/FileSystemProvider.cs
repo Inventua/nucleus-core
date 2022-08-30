@@ -31,14 +31,14 @@ namespace Nucleus.Abstractions.FileSystemProviders
 		/// <param name="parentPath"></param>
 		/// <param name="newFolder"></param>
 		/// <returns></returns>
-		public abstract Folder CreateFolder(string parentPath, string newFolder);
+		public abstract Task<Folder> CreateFolder(string parentPath, string newFolder);
 
 		/// <summary>
 		/// Delete an existing folder.
 		/// </summary>
 		/// <param name="path"></param>
 		/// <param name="recursive"></param>
-		public abstract void DeleteFolder(string path, Boolean recursive);
+		public abstract Task DeleteFolder(string path, Boolean recursive);
 
 		/// <summary>
 		/// Rename an existing folder.
@@ -46,14 +46,14 @@ namespace Nucleus.Abstractions.FileSystemProviders
 		/// <param name="path"></param>
 		/// <param name="newName"></param>
 		/// <returns></returns>
-		public abstract Folder RenameFolder(string path, string newName);
+		public abstract Task<Folder> RenameFolder(string path, string newName);
 
 		/// <summary>
 		/// List the contents of a folder.
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		public abstract Folder ListFolder(string path);
+		public abstract Task<Folder> ListFolder(string path);
 
 		/// <summary>
 		/// List the contents of a folder, filtered by the regular expression specified in <paramref name="pattern"/>.
@@ -61,21 +61,21 @@ namespace Nucleus.Abstractions.FileSystemProviders
 		/// <param name="path"></param>
 		/// <param name="pattern"></param>
 		/// <returns></returns>
-		public abstract Folder ListFolder(string path, string pattern);
+		public abstract Task<Folder> ListFolder(string path, string pattern);
 
 		/// <summary>
 		/// Get an existing folder.
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		public abstract Folder GetFolder(string path);
+		public abstract Task<Folder> GetFolder(string path);
 
 		/// <summary>
 		///  Get an existing file.
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		public abstract File GetFile(string path);
+		public abstract Task<File> GetFile(string path);
 
 		/// <summary>
 		///  Get an direct access Url for the file.
@@ -86,20 +86,20 @@ namespace Nucleus.Abstractions.FileSystemProviders
 		/// <remarks>
 		/// This method can return null to indicate that the file system provider cannot provide a direct Url to the file.
 		/// </remarks>
-		public abstract System.Uri GetFileDirectUrl(string path, DateTime expiresOn);
-
+		public abstract Task<System.Uri> GetFileDirectUrl(string path, DateTime expiresOn);
+		
 		/// <summary>
 		/// Retrieve the contents of an existing file and return as a stream.
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		public abstract System.IO.Stream GetFileContents(string path);
-
+		public abstract Task<System.IO.Stream> GetFileContents(string path);
+		
 		/// <summary>
 		/// Delete an existing file.
 		/// </summary>
 		/// <param name="path"></param>
-		public abstract void DeleteFile(string path);
+		public abstract Task DeleteFile(string path);
 
 		/// <summary>
 		/// Rename an existing file.
@@ -107,7 +107,7 @@ namespace Nucleus.Abstractions.FileSystemProviders
 		/// <param name="path"></param>
 		/// <param name="newName"></param>
 		/// <returns></returns>
-		public abstract File RenameFile(string path, string newName);
+		public abstract Task<File> RenameFile(string path, string newName);
 
 		/// <summary>
 		/// Save a file.

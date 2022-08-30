@@ -147,7 +147,7 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="site"></param>
 		/// <param name="file"></param>
 		/// <returns></returns>
-		public System.IO.Stream GetFileContents(Site site, File file);
+		public Task<System.IO.Stream> GetFileContents(Site site, File file);
 
 		/// <summary>
 		/// Delete the specified file.

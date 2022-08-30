@@ -346,7 +346,7 @@ namespace Nucleus.Core.FileSystemProviders
 					Path = "",
 					Name = "/",
 					DateModified = folderItem.LastWriteTimeUtc,
-					Parent = new Folder() { Provider = this.Key, Path = "" },
+					Parent = null, //new Folder() { Provider = this.Key, Path = "" },
 					Capabilities = BuildFolderCapabilities(),
 					FolderValidationRules = BuildFolderValidationRules(),
 					FileValidationRules = BuildFileValidationRules()

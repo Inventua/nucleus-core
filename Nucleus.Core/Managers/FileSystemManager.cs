@@ -427,6 +427,8 @@ namespace Nucleus.Core.Managers
 
 		private async Task<Folder> GetDatabaseProperties(Site site, Folder folder)
 		{
+			if (folder == null) return null;
+
 			Folder folderData = await this.GetFolder(site, folder.Provider, folder.Path);
 			if (folderData != null)
 			{

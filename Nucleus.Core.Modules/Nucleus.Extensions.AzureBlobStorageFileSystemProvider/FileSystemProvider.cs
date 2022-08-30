@@ -630,7 +630,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 					Path = "",
 					Name = "/",
 					DateModified = properties.LastModified.UtcDateTime,
-					Parent = new Folder() { Provider = this.Key, Path = "" },
+					Parent = null, //new Folder() { Provider = this.Key, Path = "" },
 					Capabilities = BuildTopFolderCapabilities(),
 					FolderValidationRules = BuildTopFolderValidationRules()
 				};

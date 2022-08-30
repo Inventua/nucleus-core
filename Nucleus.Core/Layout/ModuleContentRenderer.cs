@@ -85,7 +85,11 @@ namespace Nucleus.Core.Layout
 						{
 							// If the specified container was not found, and the user is an admin, display the error message in place of the module
 							// content.  If the user is not an admin, suppress output of the module.
-							if (e.Message.Contains("The view", StringComparison.OrdinalIgnoreCase) && e.Message.Contains("was not found", StringComparison.OrdinalIgnoreCase))
+							if 
+							(
+								e.Message.Contains("The view", StringComparison.OrdinalIgnoreCase) && e.Message.Contains("was not found", StringComparison.OrdinalIgnoreCase) || 
+								e.Message.Contains("Unable to load an action descriptor for the module", StringComparison.OrdinalIgnoreCase)
+							)
 							{
 								this.Logger?.LogError(e, "Error rendering {pane}.", moduleInfo.Pane);
 								if (htmlHelper.ViewContext.HttpContext.User.IsSiteAdmin(this.Context.Site))

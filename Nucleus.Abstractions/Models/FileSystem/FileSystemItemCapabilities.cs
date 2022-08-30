@@ -12,23 +12,28 @@ namespace Nucleus.Abstractions.Models.FileSystem
 	public class FileSystemItemCapabilities
 	{
 		/// <summary>
+		/// Specifies whether the file system item can contain folders.
+		/// </summary>
+		public Boolean CanHaveFolders { get; set; } = true;
+
+		/// <summary>
 		/// Specifies whether the file system item can store files.
 		/// </summary>
-		public Boolean CanStoreFiles { get; set; }
+		public Boolean CanStoreFiles { get; set; } = true;
 		
 		/// <summary>
 		/// Specifies whether the file system item can be renamed.
 		/// </summary>
-		public Boolean CanRename { get; set; }
+		public Boolean CanRename { get; set; } = true;
 
 		/// <summary>
 		/// Specifies whether the file system item can be deleted.
 		/// </summary>
-		public Boolean CanDelete { get; set; }
+		public Boolean CanDelete { get; set; } = true;
 
 		/// <summary>
 		/// Specifies whether the file system item can be accessed by a direct Url.
 		/// </summary>
-		public Boolean CanDirectLink { get; set; }
+		public Boolean CanDirectLink { get; set; } = false;
 	}
 }

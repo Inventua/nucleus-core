@@ -100,7 +100,7 @@ namespace Nucleus.ViewFeatures.Controls
 			else
 			{
 				// This handles the ".." navigation list item, which doesn't have a real ID
-				viewModel.SelectedFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFile.Provider, viewModel.SelectedFile.Parent?.Path);
+				viewModel.SelectedFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFile.Provider, viewModel.SelectedFile.Parent?.Path ?? "");
 				viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFolder.Id, pattern);
 			}
 

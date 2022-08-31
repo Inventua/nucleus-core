@@ -80,7 +80,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		/// <param name="Path">String representation of the path</param>
 		public PathUri(string path)
 		{
-			Parse(path);
+			Parse(path ?? "");
 		}
 
 		private void Parse(string Path)

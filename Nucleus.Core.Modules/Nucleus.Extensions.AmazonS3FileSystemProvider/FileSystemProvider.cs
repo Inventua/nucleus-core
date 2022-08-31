@@ -13,6 +13,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Microsoft.AspNetCore.Mvc.Formatters.Xml;
 using System.Runtime.CompilerServices;
+using System.IO;
 
 namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 {
@@ -64,14 +65,14 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		{
 			AWSCredentials credentials = new BasicAWSCredentials(this.Options.AccessKey, this.Options.Secret);
 			AmazonS3Config config = new AmazonS3Config()
-			{ 
+			{
 				ServiceURL = this.Options.ServiceUrl
 			};
 
 			AmazonS3Client result = new AmazonS3Client(credentials, config);
 
 			return result;
-		}	
+		}
 
 		public override async Task<Folder> CreateFolder(string parentPath, string newFolder)
 		{
@@ -98,7 +99,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			return BuildFolder(path);
 		}
 
-		public override async Task  DeleteFile(string path)
+		public override async Task DeleteFile(string path)
 		{
 			using (var client = BuildClient())
 			{
@@ -220,8 +221,8 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 					throw new AWSCloudProviderException(System.Net.HttpStatusCode.BadRequest, "Specified path is not a file.");
 				}
 
-				GetPreSignedUrlRequest request = new GetPreSignedUrlRequest() { BucketName = pathUri.BucketName, Key = pathUri.Key, Expires=DateTime.UtcNow.AddMinutes(maxAge) };
-				return Task.FromResult(new System.Uri(client.GetPreSignedURL(request)));	
+				GetPreSignedUrlRequest request = new GetPreSignedUrlRequest() { BucketName = pathUri.BucketName, Key = pathUri.Key, Expires = DateTime.UtcNow.AddMinutes(maxAge) };
+				return Task.FromResult(new System.Uri(client.GetPreSignedURL(request)));
 			}
 		}
 
@@ -257,12 +258,12 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 				{
 					case PathUri.PathUriTypes.Root:
 						// if we are at the top level, count the number of buckets.  If there is only one, automatically navigate to it
-						
+
 						List<FileSystemItem> buckets = await ListItems(new PathUri(""), ListItemsOptions.Folders);
 						if (buckets.Count == 1)
 						{
 							return buckets.First() as Folder;
-						}						
+						}
 						return BuildFolder(new PathUri(""));
 
 					case PathUri.PathUriTypes.Bucket:
@@ -292,11 +293,11 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 								throw new System.IO.FileNotFoundException();
 							}
 							throw;
-						}						
+						}
 
 					default:
 						throw new AWSCloudProviderException(System.Net.HttpStatusCode.BadRequest, "Specified path is not a folder.");
-				}				
+				}
 			}
 		}
 
@@ -310,7 +311,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			PathUri pathUri = new(PathUri.AddDelimiter(path));
 
 			Folder folder = BuildFolder(pathUri);
-			foreach(Abstractions.Models.FileSystem.FileSystemItem item in await ListItems(pathUri, ListItemsOptions.All))
+			foreach (Abstractions.Models.FileSystem.FileSystemItem item in await ListItems(pathUri, ListItemsOptions.All))
 			{
 				if (item is Abstractions.Models.FileSystem.Folder)
 				{
@@ -342,7 +343,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		public override async Task<Abstractions.Models.FileSystem.File> SaveFile(string parentPath, string newFileName, System.IO.Stream content, bool overwrite)
 		{
 			PathUri pathUri = new PathUri(parentPath).Combine(newFileName.ToLower(), false);
-			
+
 			using (var client = BuildClient())
 			{
 				if (pathUri.PathUriType == PathUri.PathUriTypes.Root)
@@ -446,9 +447,20 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			};
 		}
 
-		private async Task<File> BuildFile(PathUri pathUri)
+		private async Task<Abstractions.Models.FileSystem.File> BuildFile(S3Object fileInfo)
 		{
-			return new File()
+			PathUri newItem = new PathUri(fileInfo.BucketName, fileInfo.Key);
+			Abstractions.Models.FileSystem.File file = await BuildFile(newItem);
+			file.Size = fileInfo.Size;
+			file.DateModified = fileInfo.LastModified.ToUniversalTime();
+
+			return file;
+		}
+
+
+		private async Task<Abstractions.Models.FileSystem.File> BuildFile(PathUri pathUri)
+		{
+			return new Abstractions.Models.FileSystem.File()
 			{
 				Provider = this.Key,
 				Path = GetRelativePath(pathUri.FullPath),
@@ -458,9 +470,9 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			};
 		}
 
-		private async Task<File> BuildFile(PathUri pathUri, GetObjectMetadataResponse response)
+		private async Task<Abstractions.Models.FileSystem.File> BuildFile(PathUri pathUri, GetObjectMetadataResponse response)
 		{
-			return new File()
+			return new Abstractions.Models.FileSystem.File()
 			{
 				Provider = this.Key,
 				Path = GetRelativePath(pathUri.FullPath),
@@ -601,7 +613,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 				{
 					// ignore Options (ListItemsOptions) for the top level, as there can only ever be buckets at this level	
 					// We can't use Limit in the API call, because there's no such parameter
-					foreach (var item in (await client.ListBucketsAsync()).Buckets)
+					foreach (S3Bucket item in (await client.ListBucketsAsync()).Buckets)
 					{
 						results.Add(BuildFolder(new PathUri(PathUri.AddDelimiter(item.BucketName))));
 						if (results.Count == limit)
@@ -639,7 +651,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 								string folderName = !String.IsNullOrEmpty(path.Key) ? item.Replace($"{path.Key}", "") : item;
 								results.Add(BuildFolder(new PathUri(path.BucketName).Combine(item, true)));
 								itemsAdded += 1;
-								
+
 								if (results.Count == limit)
 								{
 									break;
@@ -649,29 +661,30 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 						foreach (S3Object item in response.S3Objects)
 						{
-							if (item.Size == 0)
+							PathUri childFolderUri = new PathUri(path.BucketName).Combine(item.Key, true);
+
+							if (childFolderUri.PathUriType != PathUri.PathUriTypes.File && item.Size == 0)
 							{
 								if (options.HasFlag(ListItemsOptions.Folders))
 								{
 									// S3 returns the requested "folder" itself (as well as its children) so we have to make sure that the folder being
 									// added isn't the parent folder.
-									PathUri childFolderUri = new PathUri(path.BucketName).Combine(item.Key, true);
 									if (childFolderUri.FullPath != path.FullPath)
 									{
 										results.Add(BuildFolder(childFolderUri));
 									}
-									itemsAdded += 1;									
+									itemsAdded += 1;
 								}
 							}
 							else
 							{
 								if (options.HasFlag(ListItemsOptions.Files))
 								{
-									PathUri newItem = new PathUri(path.BucketName, item.Key);
-									Abstractions.Models.FileSystem.File file = await BuildFile(newItem);
-									file.Size = item.Size;
+									//PathUri newItem = new PathUri(path.BucketName, item.Key);
+									Abstractions.Models.FileSystem.File file = await BuildFile(item);
+									//file.Size = item.Size;
 									results.Add(file);
-									itemsAdded += 1;									
+									itemsAdded += 1;
 								}
 							}
 

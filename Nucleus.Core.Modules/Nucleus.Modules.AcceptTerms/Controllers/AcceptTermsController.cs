@@ -34,7 +34,7 @@ namespace Nucleus.Modules.AcceptTerms.Controllers
     public async Task<ActionResult> Index()
     {
       Settings settings = new ViewModels.Viewer();
-      settings.ReadSettings(this.Context.Module, this.HttpContext.Request.GetUserTimeZone());
+      settings.GetSettings(this.Context.Module, this.HttpContext.Request.GetUserTimeZone());
       settings.AgreementBody = (await this.ContentManager.List(this.Context.Module)).FirstOrDefault();
 
       if (User.Identity.IsAuthenticated )

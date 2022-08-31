@@ -40,16 +40,17 @@ namespace Nucleus.Modules.AcceptTerms.Controllers
     [HttpPost]
     public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
     {
-      DateTime? effectiveDateUtc = (viewModel.EffectiveDate.HasValue ? System.TimeZoneInfo.ConvertTimeToUtc(viewModel.EffectiveDate.Value, this.HttpContext.Request.GetUserTimeZone()) : (DateTime?)null);
+      //DateTime? effectiveDateUtc = (viewModel.EffectiveDate.HasValue ? System.TimeZoneInfo.ConvertTimeToUtc(viewModel.EffectiveDate.Value, this.HttpContext.Request.GetUserTimeZone()) : (DateTime?)null);
 
-      this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_TITLE, viewModel.Title);
-      this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_ACCEPTTEXT, viewModel.AcceptText);
-      this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_CANCELTEXT, viewModel.CancelText);
-      this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_EFFECTIVEDATE, effectiveDateUtc);
+      //this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_TITLE, viewModel.Title);
+      //this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_ACCEPTTEXT, viewModel.AcceptText);
+      //this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_CANCELTEXT, viewModel.CancelText);
+      //this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_EFFECTIVEDATE, effectiveDateUtc);
+
+      viewModel.SetSettings(this.Context.Module, this.HttpContext.Request.GetUserTimeZone());
+      await this.PageModuleManager.SaveSettings(this.Context.Module);
 
       await this.ContentManager.Save(this.Context.Module, viewModel.AgreementBody);
-
-      await this.PageModuleManager.SaveSettings(this.Context.Module);
 
       return Ok();
     }
@@ -61,7 +62,7 @@ namespace Nucleus.Modules.AcceptTerms.Controllers
         viewModel = new();
       }
 
-      viewModel.ReadSettings(this.Context.Module, this.HttpContext.Request.GetUserTimeZone());
+      viewModel.GetSettings(this.Context.Module, this.HttpContext.Request.GetUserTimeZone());
       viewModel.AgreementBody = (await this.ContentManager.List(this.Context.Module)).FirstOrDefault();
 
       return viewModel;

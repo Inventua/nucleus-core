@@ -11,17 +11,19 @@ namespace Nucleus.Extensions.AdvancedSiteMap.Controllers
 	public class AdvancedSiteMapController : Controller
 	{
 		private Nucleus.Abstractions.Models.Configuration.FolderOptions Options { get; }
+		private Nucleus.Abstractions.Models.Context Context { get; }
 
-		public AdvancedSiteMapController(IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> options)
+		public AdvancedSiteMapController(IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> options, Context context)
 		{
 			this.Options = options.Value;
+			this.Context = context;
 		}
 
 		[HttpGet]
 		[Route("sitemap.xml")]
 		public ActionResult Index()
 		{
-			string filename = System.IO.Path.Join(this.Options.GetTempFolder(), "SiteMap", "Sitemap.xml"); 
+			string filename = SearchIndexManager.GetFilename(this.Options, this.Context.Site); 
 
 			if (System.IO.File.Exists(filename))
 			{

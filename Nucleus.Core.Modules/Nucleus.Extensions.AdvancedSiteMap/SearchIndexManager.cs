@@ -20,9 +20,9 @@ namespace Nucleus.Extensions.AdvancedSiteMap
 			this.Options = options.Value;
 		}
 
-		public Nucleus.Abstractions.Models.Sitemap.Sitemap SiteMap ()
+		public Nucleus.Abstractions.Models.Sitemap.Sitemap SiteMap (Site site)
 		{
-			string filename = GetFilename();
+			string filename = GetFilename(this.Options, site);
 			if (!System.IO.File.Exists(filename))
 			{
 				return new();
@@ -39,12 +39,19 @@ namespace Nucleus.Extensions.AdvancedSiteMap
 
 		public Task ClearIndex(Site site)
 		{
+			string filename = GetFilename(this.Options, site);
+
+			if (System.IO.File.Exists(filename))
+			{
+				System.IO.File.Delete(filename);
+			}
+
 			return Task.CompletedTask;
 		}
 
 		public Task Index(ContentMetaData metadata)
 		{
-			Abstractions.Models.Sitemap.Sitemap siteMap = this.SiteMap();
+			Abstractions.Models.Sitemap.Sitemap siteMap = this.SiteMap(metadata.Site);
 			SiteMapEntry item = siteMap.Items.Where(item => item.Url == metadata.Url).FirstOrDefault();
 
 			if (item == null)
@@ -55,14 +62,14 @@ namespace Nucleus.Extensions.AdvancedSiteMap
 
 			item.Url = metadata.Url;
 
-			this.Write(siteMap);
+			this.Write(metadata.Site, siteMap);
 
 			return Task.CompletedTask;
 		}
 
 		public Task Remove(ContentMetaData metadata)
 		{
-			Abstractions.Models.Sitemap.Sitemap siteMap = this.SiteMap();
+			Abstractions.Models.Sitemap.Sitemap siteMap = this.SiteMap(metadata.Site);
 			SiteMapEntry item = siteMap.Items.Where(item => item.Url == metadata.Url).FirstOrDefault();
 
 			if (item != null)
@@ -70,21 +77,32 @@ namespace Nucleus.Extensions.AdvancedSiteMap
 				siteMap.Items.Remove(item);
 			}
 
-			Write(siteMap);
+			Write(metadata.Site, siteMap);
 
 			return Task.CompletedTask;
 		}
 
-		private string GetFilename()
+		private static string GenerateValidPath (string value)
 		{
-			string path = System.IO.Path.Join(this.Options.GetTempFolder(true), "SiteMap");
-			this.Options.EnsureExists(path);
+			foreach (char character in System.IO.Path.GetInvalidPathChars())
+			{
+				value = value.Replace(character, '_');
+			}
+
+			return value;
+		}
+
+		public static string GetFilename(Abstractions.Models.Configuration.FolderOptions options, Site site)
+		{
+			string path = System.IO.Path.Join(options.GetTempFolder(true), "SiteMap");
+			path = System.IO.Path.Combine(path, GenerateValidPath(site.Name));
+			options.EnsureExists(path);
 			return System.IO.Path.Join(path, "Sitemap.xml");
 		}
 
-		private void Write(Abstractions.Models.Sitemap.Sitemap siteMap)
+		private void Write(Site site, Abstractions.Models.Sitemap.Sitemap siteMap)
 		{
-			string filename = GetFilename();
+			string filename = GetFilename(this.Options, site);
 			
 			using (System.IO.Stream output = System.IO.File.OpenWrite(filename))
 			{

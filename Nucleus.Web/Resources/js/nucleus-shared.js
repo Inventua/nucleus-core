@@ -187,22 +187,34 @@ function _Page()
 			event.stopImmediatePropagation();
 
 			var form = jQuery(this).parents('form');
-			var parent = jQuery(this).parents('.FileSelector');
+			//var parent = jQuery(this).parents('.FileSelector');
+			var uploadprogressWrapper = form.find('.UploadProgress');
+			var uploadprogress = uploadprogressWrapper.find('progress');
+			var uploadprogressLabel = uploadprogressWrapper.find('label');
 
-			parent.find('.UploadProgress').siblings().hide();
-			parent.find('.UploadProgress').show();
+			uploadprogressWrapper.siblings().css('opacity', '.4');
+			uploadprogressWrapper.siblings('.alert').hide();
+			uploadprogressWrapper.show();
 
 			form.on('progress', function (e, percent)
 			{
-				parent.find('.UploadProgress .progress-bar').attr('area-valuenow', percent.toString());
-				parent.find('.UploadProgress .progress-bar').css('width', percent.toString() + '%');
-				parent.find('.UploadProgress .progress-bar').text(percent.toString() + '%');
+				uploadprogress.attr('value', percent.toString());
+				uploadprogress.text(percent.toString() + '%');
+				
+				if (percent < 100)
+				{
+					uploadprogressLabel.text('Uploading file ...');		
+				}
+				else
+				{
+					uploadprogressLabel.text('Upload Complete.  Processing file ...');
+				}
 			});
 
 			form.on('error', function ()
 			{
-				parent.find('.UploadProgress').hide();
-				parent.find('.UploadProgress').siblings().show();
+				uploadprogressWrapper.hide();
+				uploadprogressWrapper.siblings().css('opacity', '1');
 			});
 
 			form.attr('action', jQuery(this).attr('formaction'));

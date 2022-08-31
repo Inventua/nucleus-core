@@ -734,6 +734,27 @@ ul.nucleus-control-panel-items button
 .nucleus-adminpage .FileSystemItems th, .nucleus-adminpage .FileSystemItems td
 {
 	padding: 4px 8px;
+	white-space: nowrap;
+}
+
+.nucleus-adminpage .FileSystemItems .file-type
+{
+	width: 6rem;
+}
+
+.nucleus-adminpage .FileSystemItems .file-modified-date
+{
+	width: 12rem;
+}
+
+.nucleus-adminpage .FileSystemItems .file-size
+{
+	width: 8rem;
+}
+
+.nucleus-adminpage .FileSystemItems .file-dimensions
+{
+	width: 10rem;
 }
 
 #system-logs .log-options, #task-logs .log-options

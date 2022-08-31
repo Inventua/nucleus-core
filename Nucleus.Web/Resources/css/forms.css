@@ -160,3 +160,14 @@ input[type=search], select
 	display: flex;
 	gap: 4px;
 }
+
+
+.nucleus-form-toolbar
+{
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+	display: flex;
+	gap: 4px;
+	border: solid 1px #444;
+	padding: 0.5rem;
+}

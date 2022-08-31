@@ -10,28 +10,31 @@
 
 	@using (Html.BeginAreaForm("Navigate", "FileSystem", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
 	{
-		<div class="nucleus-form-tools d-flex">
+		<div class="nucleus-form-tools">
 			@Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control" })
 			<label class="align-self-center ms-1">
-				Current Folder:
+				@if (@Model.Folder.Name != "/")
+				{
+					<text>/</text>
+				}
 				<span>@Model.Folder.Name</span>
 			</label>			
 		</div>
 		@Html.HiddenFor(model => model.SelectedProviderKey)
 		@Html.HiddenFor(model => model.Folder.Id)
 
-		<div class="nucleus-form-tools">
+		<div class="nucleus-form-toolbar">
 			@if (!String.IsNullOrEmpty(Model.Folder.Path))
 			{
-				@Html.LinkButton("&#xe5c4;", "Back", @Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = Model.Folder.Parent.Id }), new { @data_target = ".nucleus-adminpage", @class = "btn btn-secondary" })
+				@Html.LinkButton("&#xe5c4;", "Back", @Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = Model.Folder.Parent.Id }), new { @data_target = ".nucleus-adminpage", @class = "btn btn-secondary btn-sm" })
 			}
 			@if (Model.Folder.Capabilities.CanHaveFolders)
 			{
-				@Html.AreaActionLink("Create Folder", "ShowCreateFolderDialog", "FileSystem", "Admin", new { folderId = Model.Folder.Id }, new { @class = "btn btn-secondary", @data_target = "#nucleus-popupdialog .modal-body" })
+				@Html.AreaActionLink("Create Folder", "ShowCreateFolderDialog", "FileSystem", "Admin", new { folderId = Model.Folder.Id }, new { @class = "btn btn-secondary btn-sm", @data_target = "#nucleus-popupdialog .modal-body" })
 			}
 			@if (Model.Folder.Capabilities.CanStoreFiles)
 			{
-				<div class="btn btn-secondary">
+				<div class="btn btn-secondary btn-sm">
 					<label>
 						<span class="nucleus-material-icon">&#xe2c6</span> Upload File
 						<input type="file" name="mediaFile" class="collapse" formaction="@Url.AreaAction("UploadFile", "FileSystem", "Admin")">
@@ -40,43 +43,35 @@
 			}
 			else
 			{
-				<button type="button" class="btn btn-secondary" aria-disabled="true" disabled>Upload File</button>
+				<button type="button" class="btn btn-secondary btn-sm" aria-disabled="true" disabled>Upload File</button>
 			}
 			@if (Model.EnableDelete)
 			{
-				@Html.SubmitButton("", "Delete", @Url.AreaAction("ShowDeleteDialog", "FileSystem", "Admin"), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-danger" })
+				@Html.SubmitButton("", "Delete", @Url.AreaAction("ShowDeleteDialog", "FileSystem", "Admin"), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-danger btn-sm" })
 			}
 			@if (Model.EnableRename)
 			{
-				@Html.SubmitButton("", "Rename", @Url.AreaAction("ShowRenameDialog", "FileSystem", "Admin"), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary" })
+				@Html.SubmitButton("", "Rename", @Url.AreaAction("ShowRenameDialog", "FileSystem", "Admin"), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary btn-sm" })
 			}
-			@Html.SubmitButton("&#xe897;", "Folder Settings", @Url.AreaAction("EditFolderSettings", "FileSystem", "Admin", new { folderId = Model.Folder.Id }), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary" })
+			@Html.SubmitButton("&#xe897;", "Folder Settings", @Url.AreaAction("EditFolderSettings", "FileSystem", "Admin", new { folderId = Model.Folder.Id }), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary btn-sm" })
 		</div>
 
 		<div>
-			<div class="UploadProgress">
-				<div>
-					<span class="nucleus-material-icon">&#xe2c6</span> Uploading file ...
-				</div>
-				<div class="progress">
-					<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-				</div>
-			</div>
-
+			<Progress caption="Uploading file ..." class="UploadProgress"></Progress>
 			@if (!Model.Folder?.Folders.Any() == true && !Model.Folder?.Files.Any() == true)
 			{
 				<div class="alert alert-warning">This folder is empty</div>
 			}
 			else
 			{
-				<table class="FileSystemItems">
+				<table class="FileSystemItems table">
 					<tr>
-						<th />
+						<th class="nucleus-small-cell" />
 						<th>Name</th>
-						<th>Type</th>
-						<th>Modified Date</th>
-						<th>Size</th>
-						<th>Dimensions</th>
+						<th class="file-type">Type</th>
+						<th class="file-modified-date">Modified Date</th>
+						<th class="file-size">Size</th>
+						<th class="file-dimensions">Dimensions</th>
 					</tr>
 
 					@for (var folderCount = 0; folderCount < Model.Folder?.Folders.Count; folderCount++)
@@ -112,9 +107,7 @@
 							</td>
 							<td>File</td>
 							<td class="Date@(isRecent ? " fw-bold" : "")">@Model.Folder.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-							<td>
-								@Model.Folder.Files[fileCount].Size.FormatFileSize()
-							</td>
+							<td>@Model.Folder.Files[fileCount].Size.FormatFileSize()</td>
 							<td>
 								@if (Model.Folder.Files[fileCount].Width > 0 && Model.Folder.Files[fileCount].Height > 0)
 								{

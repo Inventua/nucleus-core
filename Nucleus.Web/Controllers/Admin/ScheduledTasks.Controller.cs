@@ -21,13 +21,15 @@ namespace Nucleus.Web.Controllers.Admin
 	{
 		private ILogger<ScheduledTasksController> Logger { get; }
 		private IScheduledTaskManager ScheduledTaskManager { get; }
+		private RunningTaskQueue Queue { get; }
+
 		private string LogFolderPath { get; }
 
-		public ScheduledTasksController(ILogger<ScheduledTasksController> logger, IOptions<Nucleus.Core.Logging.TextFileLoggerOptions> options, IScheduledTaskManager scheduledTaskManager)
+		public ScheduledTasksController(ILogger<ScheduledTasksController> logger, IOptions<Nucleus.Core.Logging.TextFileLoggerOptions> options, IScheduledTaskManager scheduledTaskManager, RunningTaskQueue queue)
 		{
 			this.Logger = logger;
 			this.ScheduledTaskManager = scheduledTaskManager;
-
+			this.Queue = queue;
 			this.LogFolderPath = System.IO.Path.Combine(options.Value.Path, ScheduledTask.SCHEDULED_TASKS_LOG_SUBPATH);
 		}
 
@@ -227,6 +229,18 @@ namespace Nucleus.Web.Controllers.Admin
 
 			viewModel.History = await this.ScheduledTaskManager.ListHistory(scheduledTask);
 			viewModel.LatestHistory = await this.ScheduledTaskManager.GetMostRecentHistory(scheduledTask, !scheduledTask.InstanceType.HasValue || scheduledTask.InstanceType == ScheduledTask.InstanceTypes.PerInstance ? null : Environment.MachineName);
+
+			viewModel.Progress = new() { Status = ScheduledTaskProgress.State.None };
+			if (scheduledTask.Id != Guid.Empty)
+			{
+				RunningTask queueItem = this.Queue.ToList().Where(item => item.ScheduledTask.Id == scheduledTask.Id).FirstOrDefault();
+
+				if (queueItem != null)
+				{
+					viewModel.Progress = queueItem.Progress;
+					viewModel.StartTime = queueItem.StartDate;					
+				}
+			}
 
 			if (scheduledTask.Id != Guid.Empty && !String.IsNullOrEmpty(this.LogFolderPath))
 			{

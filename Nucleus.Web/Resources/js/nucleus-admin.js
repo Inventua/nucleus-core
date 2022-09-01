@@ -156,5 +156,7 @@ function _handleContentLoaded(e, args)
 	if (jQuery().HtmlEditor) { args.target.find('.HtmlEditorControl').HtmlEditor({ isAdminMode: true }); }
 	if (jQuery().ToggleSwitch) { args.target.find('.ToggleSwitch').ToggleSwitch(); }
 	if (jQuery().PageList) { args.target.find('.nucleus-page-list').PageList(); }
+
+	Page.EnableEnhancedToolTips(true);
 	
 }

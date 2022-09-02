@@ -13,6 +13,11 @@ using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Abstractions.Models.Permissions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nucleus.Extensions;
+using System.IO.Compression;
+using Nucleus.Abstractions.Models.Configuration;
+using Microsoft.Extensions.Options;
+using Nucleus.Extensions.Authorization;
+using System.Text;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -26,11 +31,14 @@ namespace Nucleus.Web.Controllers.Admin
 		private Context Context { get; }
 		private IFileSystemManager FileSystemManager { get; }
 		private IRoleManager RoleManager { get; }
+		private FileSystemProviderFactoryOptions FileSystemOptions { get; }
 
-		public FileSystemController(ILogger<FileSystemController> Logger, Context Context, IRoleManager roleManager, IFileSystemManager fileSystemManager)
+
+		public FileSystemController(ILogger<FileSystemController> Logger, Context Context, IOptions<FileSystemProviderFactoryOptions> fileSystemOptions, IRoleManager roleManager, IFileSystemManager fileSystemManager)
 		{
 			this.Logger = Logger;
 			this.Context = Context;
+			this.FileSystemOptions = fileSystemOptions.Value;
 			this.RoleManager = roleManager;
 			this.FileSystemManager = fileSystemManager;
 		}
@@ -63,8 +71,8 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> Navigate(ViewModels.Admin.FileSystem viewModel, Guid folderId)
 		{
-			Folder folder;			
-			
+			Folder folder;
+
 			if (folderId == Guid.Empty)
 			{
 				folder = null;
@@ -73,7 +81,7 @@ namespace Nucleus.Web.Controllers.Admin
 			{
 				try
 				{
-					folder = await this.FileSystemManager.GetFolder(this.Context.Site, folderId);					
+					folder = await this.FileSystemManager.GetFolder(this.Context.Site, folderId);
 				}
 				catch (System.IO.FileNotFoundException)
 				{
@@ -83,7 +91,7 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 
 			viewModel = await BuildViewModel(viewModel, folder);
-			
+
 			return View("Index", viewModel);
 		}
 
@@ -286,6 +294,80 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", viewModel);
 		}
 
+		[HttpPost]
+		public async Task<ActionResult> UploadArchive(ViewModels.Admin.FileSystem viewModel, [FromForm] IFormFile archiveFile)
+		{
+			viewModel.Folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Folder.Id);
+			if (archiveFile != null)
+			{
+				using (System.IO.Stream fileStream = archiveFile.OpenReadStream())
+				{
+					ZipArchive archive = new ZipArchive(fileStream);
+
+					foreach (var entry in archive.Entries.Where(entry => true))
+					{
+						Boolean isValid = false;
+						AllowedFileType fileType = this.FileSystemOptions.AllowedFileTypes.Where(allowedtype => allowedtype.FileExtensions.Contains(System.IO.Path.GetExtension(entry.Name), StringComparer.OrdinalIgnoreCase)).FirstOrDefault();
+						if (fileType != null)
+						{
+							if (fileType.Restricted && !this.User.IsSiteAdmin(this.Context.Site))
+							{
+								Logger.LogWarning("Zip File upload [filename: {filename}] blocked: File type Permission Denied.", entry.Name);
+							}
+
+							using (System.IO.Stream stream = entry.Open())
+							{
+								isValid = fileType.IsValid(stream);
+								if (!isValid)
+								{
+									Logger.LogError("ALERT: File content of file '{filename}' uploaded by {userid} : signature [{sample}] does not match any of the file signatures for file type {filetype}.", entry.Name, this.User.GetUserId(), BitConverter.ToString(Nucleus.Extensions.AllowedFileTypeExtensions.GetSample(stream)).Replace("-", ""), System.IO.Path.GetExtension(entry.Name));
+								}
+								else
+								{
+									string folderName =  System.IO.Path.GetDirectoryName(entry.FullName);																		
+									await EnsureFolderExists(viewModel.SelectedProviderKey, viewModel.Folder.Path, folderName);
+									await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedProviderKey, System.IO.Path.Join(viewModel.Folder.Path, folderName), entry.Name, fileStream, true);
+								}
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				return BadRequest();
+			}
+
+			viewModel = await BuildViewModel(viewModel, viewModel.Folder);
+
+			return View("Index", viewModel);
+		}
+
+		/// <summary>
+		/// Make sure that the item folder exists by iterating through the item folders and checking/creating them.
+		/// </summary>
+		/// <param name="targetFolder"></param>
+		/// <param name="itemFolder"></param>
+		/// <remarks>
+		/// Zip file paths always use "\" as a delimiter, so we shouldn't use System.IO.Path.AltDirectorySeparatorChar / System.IO.Path.DirectorySeparatorChar
+		/// which can be different depending on platform.
+		/// </remarks>
+		private async Task EnsureFolderExists(string provider, string targetFolder, string itemFolder)
+		{			
+			string subFolderName = targetFolder;
+			foreach (string ancestorFolder in itemFolder.Split(new char[] { '\\' }))
+			{
+				try
+				{
+					subFolderName = System.IO.Path.Join(subFolderName, ancestorFolder);
+					Folder folder = await this.FileSystemManager.GetFolder(this.Context.Site, provider, subFolderName);
+				}
+				catch (System.IO.FileNotFoundException)
+				{
+					await this.FileSystemManager.CreateFolder(this.Context.Site, provider, System.IO.Path.GetDirectoryName(subFolderName), System.IO.Path.GetFileName(subFolderName));
+				}
+			}
+		}
 		private async Task<List<Permission>> ConvertPermissions(PermissionsList permissions)
 		{
 			if (permissions == null) return null;

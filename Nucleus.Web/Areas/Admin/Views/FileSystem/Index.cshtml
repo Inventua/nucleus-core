@@ -34,12 +34,32 @@
 			}
 			@if (Model.Folder.Capabilities.CanStoreFiles)
 			{
-				<div class="btn btn-secondary btn-sm">
+				<div class="btn-group" role="group">
+					<button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+						<span class="nucleus-material-icon">&#xe2c6;</span> Upload
+					</button>
+					<ul class="dropdown-menu">
+						<li>							
+							<label class="dropdown-item">
+								Single File ...
+								<input type="file" name="mediaFile" class="collapse" formaction="@Url.AreaAction("UploadFile", "FileSystem", "Admin")">
+							</label>							
+						</li>
+						<li>
+							<label class="dropdown-item" >
+								Upload and un-zip ZIP archive ...
+								<input type="file" name="archiveFile" accept="application/zip" class="collapse" formaction="@Url.AreaAction("UploadArchive", "FileSystem", "Admin")">
+							</label>							
+						</li>
+					</ul>
+				</div>
+
+				@*<div class="btn btn-secondary btn-sm">
 					<label>
 						<span class="nucleus-material-icon">&#xe2c6</span> Upload File
 						<input type="file" name="mediaFile" class="collapse" formaction="@Url.AreaAction("UploadFile", "FileSystem", "Admin")">
 					</label>
-				</div>
+				</div>*@
 			}
 			else
 			{

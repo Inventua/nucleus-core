@@ -399,9 +399,6 @@ function _Page()
 	 */
 	function _postPartialContent(event)
 	{
-		event.preventDefault();
-		event.stopImmediatePropagation();
-
 		var form;
 		var url;
 		var targetSelector;
@@ -451,6 +448,14 @@ function _Page()
 
 		// reset validation error highlighting
 		target.find('.ValidationError').removeClass('ValidationError');
+
+		if (targetSelector === 'window')
+		{
+			return;
+		}
+
+		event.preventDefault();
+		event.stopImmediatePropagation();
 
 		var action = function ()
 		{

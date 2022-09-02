@@ -185,6 +185,68 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
+		public async Task<ActionResult> Download(ViewModels.Admin.FileSystem viewModel)
+		{
+			IEnumerable<Folder> selectedFolders = viewModel.Folder?.Folders.Where(folder => folder.IsSelected);
+			IEnumerable<File>	selectedFiles = viewModel.Folder?.Files.Where(file => file.IsSelected);
+
+			if ( !selectedFolders.Any() && !selectedFiles.Any())
+			{
+				return Json(new { Title = "Download", Message = "Please select one or more files and folders." });
+			}
+
+			if (!selectedFolders.Any() && selectedFiles.Count() == 1)
+			{
+				// one file selected, download as-is
+				File file = await this.FileSystemManager.GetFile(this.Context.Site, selectedFiles.First().Id);
+				return File(await this.FileSystemManager.GetFileContents(this.Context.Site, file), file.GetMIMEType(true));
+			}
+
+			System.IO.MemoryStream output = new();
+			ZipArchive archive = new(output, ZipArchiveMode.Create, true, Encoding.UTF8);
+
+			foreach (var item in selectedFolders)
+			{
+				await AddFolderToZip(archive, item);
+			}
+		
+			foreach (File selectedItem in selectedFiles)
+			{
+				File file = await this.FileSystemManager.GetFile(this.Context.Site, selectedItem.Id);
+				ZipArchiveEntry entry = archive.CreateEntry(file.Name);
+				using (System.IO.Stream stream = entry.Open())
+				{
+					await (await this.FileSystemManager.GetFileContents(this.Context.Site, file)).CopyToAsync(stream);					
+				}
+			}
+
+			archive.Dispose();
+			output.Position = 0;
+			return File(output, "application/zip");
+		}
+
+		private async Task AddFolderToZip(ZipArchive archive, Folder folder)
+		{
+			// the folder object won't be fully populated from model binding, so we have to re-read it 
+			folder = await this.FileSystemManager.ListFolder(this.Context.Site, folder.Id, "");
+
+			foreach (File file in folder.Files)
+			{
+				// Zip file paths always use "\" as a delimiter
+				ZipArchiveEntry entry = archive.CreateEntry(file.Path.Replace('/', '\\'));
+				using (System.IO.Stream stream = entry.Open())
+				{
+					await(await this.FileSystemManager.GetFileContents(this.Context.Site, file)).CopyToAsync(stream);
+				}
+			}
+
+			foreach (Folder subFolder in folder.Folders)
+			{
+				await AddFolderToZip(archive, subFolder);
+			}
+		}
+
+		[HttpPost]
 		public async Task<ActionResult> DeleteSelected(ViewModels.Admin.FileSystemDelete viewModel)
 		{
 			if (viewModel.SelectedFolders != null)

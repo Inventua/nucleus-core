@@ -53,18 +53,14 @@
 						</li>
 					</ul>
 				</div>
-
-				@*<div class="btn btn-secondary btn-sm">
-					<label>
-						<span class="nucleus-material-icon">&#xe2c6</span> Upload File
-						<input type="file" name="mediaFile" class="collapse" formaction="@Url.AreaAction("UploadFile", "FileSystem", "Admin")">
-					</label>
-				</div>*@
 			}
 			else
 			{
 				<button type="button" class="btn btn-secondary btn-sm" aria-disabled="true" disabled>Upload File</button>
 			}
+
+			@Html.SubmitButton("", "Download", @Url.AreaAction("Download", "FileSystem", "Admin"), new { @class = "btn btn-primary btn-sm", @data_target = "window" })
+
 			@if (Model.EnableDelete)
 			{
 				@Html.SubmitButton("", "Delete", @Url.AreaAction("ShowDeleteDialog", "FileSystem", "Admin"), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-danger btn-sm" })

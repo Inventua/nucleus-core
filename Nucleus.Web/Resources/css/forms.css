@@ -152,6 +152,7 @@ input[type=search], select
 	flex-direction: row;
 	margin-bottom: 4px;
 	gap: 8px;	
+	align-items: center;
 }
 
 .nucleus-form-buttonrow
@@ -170,4 +171,5 @@ input[type=search], select
 	gap: 4px;
 	border: solid 1px #444;
 	padding: 0.5rem;
+	position: relative;
 }

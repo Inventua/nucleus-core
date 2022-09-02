@@ -240,7 +240,10 @@ function _Page()
 			event.preventDefault();
 			event.stopImmediatePropagation();
 
-			jQuery(this).parents('form').submit();
+			var newEvent = jQuery.Event('submit', { originalEvent: event });
+			jQuery(this).parents('form').first().trigger(newEvent);
+
+			//jQuery(this).parents('form').submit();
 		}
 	}
 
@@ -451,6 +454,8 @@ function _Page()
 
 		var action = function ()
 		{
+			_indicateProgress.call(this, event);
+
 			jQuery.ajax({
 				url: url,
 				method: 'POST',
@@ -522,6 +527,8 @@ function _Page()
 			target = jQuery(target);
 		}
 
+		_indicateProgress.call(this, event);
+
 		jQuery.ajax({
 			url: url,
 			headers: { 'Accept': 'application/json, */*' },
@@ -585,6 +592,8 @@ function _Page()
 
 		if (typeof (target) !== 'undefined' && typeof (url) !== 'undefined')
 		{
+			_indicateProgress.call(this, event);
+
 			jQuery.ajax({
 				url: url,
 				headers: { 'Accept': 'application/json, */*' },
@@ -594,6 +603,59 @@ function _Page()
 		}
 
 		return false;
+	}
+
+	/**
+	 * @summary	
+	 * Render a progress indicator for the control which triggered the specified event.
+	 * 
+	 * @param {any} event
+	 */
+	function _indicateProgress(event)
+	{
+		// figure out which control initiated the event
+		var triggerControl = jQuery(this);
+		if (event !== null)
+		{
+			if (event.originalEvent !== null && typeof event.originalEvent !== 'undefined')
+			{
+				if (event.originalEvent.submitter !== null && typeof event.originalEvent.submitter !== 'undefined')
+				{
+					triggerControl = jQuery(event.originalEvent.submitter);
+				}
+				else if (event.originalEvent.target !== null && typeof event.originalEvent.target !== 'undefined')
+				{
+					triggerControl = jQuery(event.originalEvent.target);
+				}
+			}			
+		}
+
+		// if the trigger control does not have a nucleus-show-progress class, look for ancestors of the element which do have the nucleus-show-progress class
+		if (triggerControl != null && !triggerControl.hasClass('nucleus-show-progress'))
+		{
+			triggerControl = triggerControl.parents('.nucleus-show-progress').first();
+		}
+
+		if (triggerControl != null && triggerControl.hasClass('nucleus-show-progress'))
+		{
+			window.setTimeout(() =>
+			{
+				var progress = jQuery('<div class="spinner-border spinner-border-sm text-primary nucleus-progress-spinner ms-2" role="status"/>');
+
+				if (triggerControl.hasClass('nucleus-show-progress-inside'))
+				{
+					progress.appendTo(triggerControl);
+				}
+				else if (triggerControl.hasClass('nucleus-show-progress-after'))
+				{
+					progress.insertAfter(triggerControl);
+				}
+				else if (triggerControl.hasClass('nucleus-show-progress-before'))
+				{
+					progress.insertBefore(triggerControl);
+				}
+			}, 500);
+		}
 	}
 
 	function _confirm(message, title, action)

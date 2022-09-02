@@ -11,7 +11,7 @@
 	@using (Html.BeginAreaForm("Navigate", "FileSystem", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
 	{
 		<div class="nucleus-form-tools">
-			@Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control" })
+			@Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control nucleus-show-progress nucleus-show-progress-after" })
 			<label class="align-self-center ms-1">
 				@if (@Model.Folder.Name != "/")
 				{
@@ -26,7 +26,7 @@
 		<div class="nucleus-form-toolbar">
 			@if (!String.IsNullOrEmpty(Model.Folder.Path))
 			{
-				@Html.LinkButton("&#xe5c4;", "Back", @Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = Model.Folder.Parent.Id }), new { @data_target = ".nucleus-adminpage", @class = "btn btn-secondary btn-sm" })
+				@Html.LinkButton("&#xe5c4;", "Back", @Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = Model.Folder.Parent.Id }), new { @data_target = ".nucleus-adminpage", @class = "btn btn-secondary btn-sm nucleus-show-progress nucleus-show-progress-inside" })
 			}
 			@if (Model.Folder.Capabilities.CanHaveFolders)
 			{
@@ -85,7 +85,7 @@
 								@Html.HiddenFor(model => model.Folder.Folders[folderCount].Id)
 							</td>
 							<td>
-								@Html.AreaActionLink(Model.Folder.Folders[folderCount].Name, "Index", "FileSystem", "Admin", new { folderId = @Model.Folder.Folders[folderCount].Id }, new { @class = "NavigateLink", @data_target = ".nucleus-adminpage" })
+								@Html.AreaActionLink(Model.Folder.Folders[folderCount].Name, "Index", "FileSystem", "Admin", new { folderId = @Model.Folder.Folders[folderCount].Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
 							</td>
 							<td>Folder</td>
 							<td>@Model.Folder.Folders[folderCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
@@ -123,9 +123,12 @@
 </div>
 
 <script>
-	jQuery('.providerKey').on('change', function ()
+	jQuery('.providerKey').on('change', function (event)
 	{
-		jQuery(this).parents('form').submit();
+		var newEvent = jQuery.Event('submit', { originalEvent: event });
+		jQuery(this).parents('form').first().trigger(newEvent);
+
+		//jQuery(this).parents('form').submit();
 	});
 
 </script>

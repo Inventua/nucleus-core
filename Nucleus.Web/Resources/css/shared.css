@@ -69,6 +69,22 @@ a *
 	font-family: 'Material Icons'!important; 
 }
 
+.nucleus-show-progress-inside .nucleus-progress-spinner
+{
+  position: absolute;
+  right: 0.5rem;
+}
+
+.nucleus-show-progress-after .nucleus-progress-spinner
+{
+  margin-left: 0.5rem;
+}
+
+.nucleus-show-progress-before .nucleus-progress-spinner
+{
+  margin-right: 0.5rem;
+}
+
 .nucleus-progress-medium
 {
   margin: auto; 

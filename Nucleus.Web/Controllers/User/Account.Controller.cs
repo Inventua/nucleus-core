@@ -134,12 +134,11 @@ namespace Nucleus.Web.Controllers
 							}
 						}
 
-						UserSession session = await this.SessionManager.CreateNew(this.Context.Site, loginUser, viewModel.RememberMe, ControllerContext.HttpContext.Connection.RemoteIpAddress);
+						UserSession session = await this.SessionManager.CreateNew(this.Context.Site, loginUser, false, ControllerContext.HttpContext.Connection.RemoteIpAddress);
 						await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
 
 						string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
-						ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
-						return StatusCode((int)System.Net.HttpStatusCode.Found);
+						return Redirect(location);						
 					}
 				}
 			}

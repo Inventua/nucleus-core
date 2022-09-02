@@ -30,7 +30,33 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       /// <summary>
       /// Bootstrap
       /// </summary>
-      BOOTSTRAP
+      BOOTSTRAP,
+
+      /// <summary>
+      /// Shared CSS used by all of Nucleus
+      /// </summary>
+      NUCLEUS_SHARED,
+
+      /// <summary>
+      /// CSS classes for the admin user interface.
+      /// </summary>
+			NUCLEUS_ADMIN,
+
+      /// <summary>
+      /// CSS classes used by the admin user interface and by modules which display forms.
+      /// </summary>
+			NUCLEUS_FORMS,
+
+      /// <summary>
+      /// CSS classes used by inline editing controls.  This stylesheet is added automatically when the user selects editing mode.
+      /// </summary>
+        NUCLEUS_EDITMODE,
+
+      /// <summary>
+      /// CSS classes for the Nucleus paging control.
+      /// </summary>
+      NUCLEUS_PAGINGCONTROL
+
     }
 
     /// <summary>
@@ -48,7 +74,27 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
         case WellKnownScripts.BOOTSTRAP:
           stylesheetPath = "~/Resources/Libraries/Bootstrap/5.0.2/css/bootstrap.css";
           break;
-      }
+
+				case WellKnownScripts.NUCLEUS_SHARED:
+					stylesheetPath = "~/Resources/css/shared.css";
+					break;
+
+				case WellKnownScripts.NUCLEUS_ADMIN:
+					stylesheetPath = "~/Resources/css/admin.css";
+					break;
+
+				case WellKnownScripts.NUCLEUS_FORMS:
+					stylesheetPath = "~/Resources/css/forms.css";
+					break;
+
+				case WellKnownScripts.NUCLEUS_EDITMODE:
+					stylesheetPath = "~/Resources/css/editmode.css";
+					break;
+
+				case WellKnownScripts.NUCLEUS_PAGINGCONTROL:
+					stylesheetPath = "~/Shared/Controls/Views/PagingControl.css";
+					break;
+			}
 
       if (!String.IsNullOrEmpty(stylesheetPath))
       {

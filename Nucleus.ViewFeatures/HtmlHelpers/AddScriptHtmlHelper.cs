@@ -35,7 +35,27 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       /// <summary>
       /// jQuery
       /// </summary>
-      JQUERY
+      JQUERY,
+
+      /// <summary>
+      /// Nucleus common (shared) client-side script.
+      /// </summary>
+      NUCLEUS_SHARED,
+
+      /// <summary>
+      /// Nucleus pagelist script (used by admin pages).
+      /// </summary>
+      NUCLEUS_PAGELIST,
+
+      /// <summary>
+      /// Nucleus admin pages script.
+      /// </summary>
+      NUCLEUS_ADMIN,
+
+      /// <summary>
+      /// Nucleus toggleswitch control script.
+      /// </summary>
+      NUCLEUS_TOGGLESWITCH
     }
 
     /// <summary>
@@ -80,7 +100,19 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
         case WellKnownScripts.JQUERY:
           scriptPath = "~/Resources/Libraries/jQuery/03.06.00/jquery.js";
           break;
-      }
+        case WellKnownScripts.NUCLEUS_SHARED:
+					scriptPath = "~/Resources/js/nucleus-shared.js";
+					break;
+				case WellKnownScripts.NUCLEUS_PAGELIST:
+					scriptPath = "~/Resources/js/jquery-pagelist.js";
+					break;
+				case WellKnownScripts.NUCLEUS_ADMIN:
+					scriptPath = "~/Resources/js/nucleus-admin.js";
+					break;
+				case WellKnownScripts.NUCLEUS_TOGGLESWITCH:
+					scriptPath = "~/Resources/js/jquery-toggleswitch.js";
+					break;
+			}
 
       if (!String.IsNullOrEmpty(scriptPath))
       {

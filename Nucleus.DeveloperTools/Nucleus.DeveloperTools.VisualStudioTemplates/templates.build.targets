@@ -1,5 +1,16 @@
 ﻿<Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003' ToolsVersion="15.0">
-	<Target Name="ZipOutputPath" AfterTargets="Build">
+	<PropertyGroup Label="Normalize Nucleus Environment Variables">
+		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+		<NUCLEUS_PUBLISH_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PUBLISH_PATH)'))</NUCLEUS_PUBLISH_PATH>
+	</PropertyGroup>
+
+	<Target Name="Messages" BeforeTargets="CoreCompile">		
+		<Message Text="ExtensionFolder: $(ExtensionFolder)" Importance="high" />
+		<Message Text="Nucleus Path: $(NUCLEUS_PATH)" Importance="high" />
+		<Message Text="Nucleus Publish Path: $(NUCLEUS_PUBLISH_PATH)" Importance="high" />
+	</Target>
+	
+	<Target Name="ZipOutputPath" BeforeTargets="CoreCompile">
 		<ZipDirectory SourceDirectory="Template Source Code\Complex Extension Project Template" DestinationFile="Complex Extension.zip" Overwrite="true" />
 		<ZipDirectory SourceDirectory="Template Source Code\Simple Extension Project Template" DestinationFile="Simple Extension.zip" Overwrite="true" />
 		<ZipDirectory SourceDirectory="Template Source Code\Empty Extension Project Template" DestinationFile="Empty Extension.zip" Overwrite="true" />
@@ -8,5 +19,19 @@
 		<Move SourceFiles="Simple Extension.zip" DestinationFiles="ProjectTemplates\Simple Extension.zip" OverwriteReadOnlyFiles="true" />
 		<Move SourceFiles="Empty Extension.zip" DestinationFiles="ProjectTemplates\Empty Extension.zip" OverwriteReadOnlyFiles="true" />
 	</Target>
+
+	<Target Name="CopyModuleTargets" BeforeTargets="CoreCompile" Condition="'$(NUCLEUS_PATH)' != ''">
+		<Copy SourceFiles="$(NUCLEUS_PATH)\module.build.targets" DestinationFiles=".\module.build.targets" OverwriteReadOnlyFiles="true" />
+	</Target>
+	
+	<Target Name="CopyToPublish" AfterTargets="CopyVsixManifestFile" Condition="'$(Configuration)' == 'Release' AND '$(NUCLEUS_PUBLISH_PATH)' != '' ">
+		<Copy SourceFiles="$(TargetVsixContainer)" DestinationFolder="$(NUCLEUS_PUBLISH_PATH)Developer Tools\" Retries="2" />
+		<ZipDirectory SourceDirectory="$(NUCLEUS_PUBLISH_PATH)Developer Tools\" DestinationFile="$(ProjectName).zip" Overwrite="true" />
+		
+		<Delete Files="$(NUCLEUS_PUBLISH_PATH)Developer Tools\$(ProjectName).zip" />
+		<Copy SourceFiles="$(ProjectName).zip" DestinationFolder="$(NUCLEUS_PUBLISH_PATH)Developer Tools" Retries="2" />
+
+	</Target>
+	
 </Project>
 

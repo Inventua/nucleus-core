@@ -6,12 +6,18 @@
 		<Import Project="$(NUCLEUS_PATH)\NucleusPlugin.build.targets" />			
 -->
 <Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003' ToolsVersion="15.0">	
+	<PropertyGroup Label="Normalize Nucleus Environment Variables">
+		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+		<NUCLEUS_PUBLISH_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PUBLISH_PATH)'))</NUCLEUS_PUBLISH_PATH>
+	</PropertyGroup>
+	
 	<Target Name="Messages" AfterTargets="PostBuildEvent">
 		<Message Text="ExtensionFolder: $(ExtensionFolder)" Importance="high" />
 		<Message Text="Nucleus Path: $(NUCLEUS_PATH)" Importance="high" />
+		<Message Text="Nucleus Publish Path: $(NUCLEUS_PUBLISH_PATH)" Importance="high" />
 	</Target>
 			
-	<Target Name="ValidateExtensionFolder" AfterTargets="PostBuildEvent">
+	<Target Name="ValidateExtensionFolder" AfterTargets="PostBuildEvent">		
 		<Warning
 			Condition="'$(Configuration)' == 'Debug' AND '$(ExtensionFolder)' == ''"
 			Text="The ExtensionFolder property path is not set, your plugin will not be copied." />
@@ -20,7 +26,7 @@
 	<Target Name="ValidateNucleusPath" AfterTargets="PostBuildEvent">
 		<Warning 
 			Condition="'$(Configuration)' == 'Debug' AND '$(NUCLEUS_PATH)' == ''"
-			Text="The %NUCLEUS_PATH% environment path is not set, your plugin will not be copied." />
+			Text="The %NUCLEUS_PATH% environment path is not set, your plugin will not be copied." />	
 	</Target>
 
 	<Target Name="GetPackageAssemblies" AfterTargets="PostBuildEvent">
@@ -52,6 +58,7 @@
 		- An environment variable specifying the Nucleus host folder named NUCLEUS_PATH must be defined.
 		
 			The installer creates this environment variable automatically.
+		
 	 -->
 	<Target Name="GetOutputAssemblies" AfterTargets="PostBuildEvent">
 		<ItemGroup>
@@ -108,7 +115,7 @@
 		<RemoveDir Directories="$(NUCLEUS_PATH)\_OLD" />
 	</Target>
 
-	<Target Name="PackageExtension" AfterTargets="PostBuildEvent" Condition = "'$(Configuration)' == 'Release' AND $(ExtensionFolder) != '' AND $(NUCLEUS_PATH) != '' AND Exists('$(NUCLEUS_PATH)Setup')">		
+	<Target Name="PackageExtension" AfterTargets="PostBuildEvent" Condition = "'$(Configuration)' == 'Release' AND '$(ExtensionFolder)' != '' AND '$(NUCLEUS_PATH)' != '' AND Exists('$(NUCLEUS_PATH)Setup')">		
 		<RemoveDir Directories="AppPackage" />
 
 		<Copy SourceFiles="@(OutputAssemblies)" DestinationFolder="AppPackage\bin\%(RecursiveDir)" Retries="2" />
@@ -120,12 +127,17 @@
 		<RemoveDir Directories="AppPackage" />
 	</Target>
 
-	<Target Name="CopyToWebSetup" AfterTargets="PostBuildEvent" Condition="$(CopyToDefaultSetup) != false AND '$(Configuration)' == 'Release' AND $(ExtensionFolder) != '' AND $(NUCLEUS_PATH) != '' AND Exists('$(NUCLEUS_PATH)Setup')">
+	<Target Name="CopyToWebSetup" AfterTargets="PostBuildEvent" Condition="$(CopyToDefaultSetup) != false AND '$(Configuration)' == 'Release' AND '$(ExtensionFolder)' != '' AND $(NUCLEUS_PATH) != '' AND Exists('$(NUCLEUS_PATH)Setup')">
 		<ItemGroup>
 			<FilesToDelete Include="$(NUCLEUS_PATH)\Setup\Extensions\$(ExtensionFolder)_Extension*.zip"/>
 		</ItemGroup>
 		<Message Importance="high" Text="Removing old install packages from $(NUCLEUS_PATH)\Setup\Extensions\: @(FilesToDelete)" />
 		<Delete Files="@(FilesToDelete)" />
-		<Copy SourceFiles="$(ExtensionFolder)_Extension_$(PackageVersion).zip" DestinationFolder="$(NUCLEUS_PATH)\Setup\Extensions\" Retries="2" />
+		<Copy SourceFiles="$(ExtensionFolder)_Extension_$(PackageVersion).zip" DestinationFolder="$(NUCLEUS_PATH)Setup\Extensions\" Retries="2" />
 	</Target>
+
+	<Target Name="CopyToExtensionPublishFolder" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release' AND '$(NUCLEUS_PUBLISH_PATH)' != '' AND Exists('$(NUCLEUS_PUBLISH_PATH)Extensions')">
+		<Copy SourceFiles="$(ExtensionFolder)_Extension_$(PackageVersion).zip" DestinationFolder="$(NUCLEUS_PUBLISH_PATH)Extensions\" Retries="2" />
+	</Target>
+
 </Project>

@@ -1,17 +1,18 @@
 ## Search module
-The search module lists provides a user interface for searching your site.  As your users type a search term, a "quick results" display shows 
-the titles of search terms which match your search term.  The user clicks a result to open the page, file or other resource from your site.  
+The search module lists provides a user interface for searching your site.  As your users type a search term, a search suggestions display shows 
+the titles of search terms which match your search term.  Click a search suggestion or click `Search` to display search results.
 
 ![Search Screenshot](Search.png)
 
-Users can click `Search` to display results in full.
-
 ![Search Screenshot](Search-Results.png)
 
-> The search module doesn't work on its own.  You need to install a search provider for the search module to use to get search results.  
+> The search module doesn't work on its own.  You need a search provider for the search module to use to get search results.  There is 
+a basic page search provider built in, and you can install additional search providers for an enhanced search experience.
 
 > Search providers are installed separately.  The Elastic Search extension includes both a search provider and a search index 
-manager to populate the search index.  Some search providers may include only a search provider, or only a search index manager.
+manager to populate the search index.  Some search providers may include only a search provider, or only a search index manager.  The built-in
+page search provider is intended for sites which don't have a need for enhanced search, and only supports searching for pages.  Other 
+search providers can search module-specific content and file contents. 
 
 You can control the presentation of the full results display in the module settings page.
 

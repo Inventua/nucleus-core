@@ -390,7 +390,7 @@ namespace Nucleus.Modules.Forums.Controllers
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> ManageUnSubscribePost(ViewModels.ManageSubscriptions viewModel, Guid forumPostId)
+		public async Task<ActionResult> ManageUnSubscribeForumPost(ViewModels.ManageSubscriptions viewModel, Guid forumPostId)
 		{
 			Post post = await this.ForumsManager.GetForumPost(forumPostId);
 

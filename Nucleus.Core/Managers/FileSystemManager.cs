@@ -438,7 +438,7 @@ namespace Nucleus.Core.Managers
 		}
 
 		public async Task<System.Uri> GetFileDirectUrl(Site site, File file)
-		{
+		{			
 			if (!String.IsNullOrEmpty(file.DirectUrl) && (!file.DirectUrlExpiry.HasValue || file.DirectUrlExpiry.Value > DateTime.UtcNow))
 			{
 				if (System.Uri.TryCreate(file.DirectUrl, UriKind.Absolute, out Uri uri))
@@ -459,7 +459,7 @@ namespace Nucleus.Core.Managers
 				using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 				{
 					await dataProvider.SaveFile(site, file);
-				}
+				}				
 			}
 
 			return directUrl;
@@ -541,8 +541,16 @@ namespace Nucleus.Core.Managers
 					throw new InvalidOperationException(message);
 				}
 
-				File file = await provider.SaveFile(parentPath, newFileName, content, overwrite);
+				File file = await provider.SaveFile(parentPath, newFileName, content, overwrite);				
+
 				await GetDatabaseProperties(site, file);
+
+				// Expire the direct url after upload.  By generating a new url, we make browsers download image files again rather than using
+				// a browser-cached copy.
+				if (!String.IsNullOrEmpty(file.DirectUrl))
+				{
+					file.DirectUrlExpiry = DateTime.UtcNow;
+				}
 
 				// try to get the image dimensions and save them.  The GetImageDimensions extension checks that the file is
 				// an image and does nothing if it is not, so we don't need to check that here. 

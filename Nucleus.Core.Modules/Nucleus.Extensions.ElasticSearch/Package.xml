@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="282c1a9e-f27d-4c0c-b140-1f38c4bef459" xmlns="urn:nucleus/schemas/package/1.0">
   <name>Elastic Search</name>
-  <version>1.0.0</version>
+  <version>1.0.1.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
 		Elastic search indexing components.

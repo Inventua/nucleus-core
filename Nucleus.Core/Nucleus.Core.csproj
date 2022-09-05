@@ -16,6 +16,7 @@
 		<Authors>Inventua Pty Ltd</Authors>
 		<Description>Nucleus core classes used by the Nucleus runtime.</Description>
 		<PackageOutputPath>$(SolutionDir)\Nuget Packages</PackageOutputPath>
+		<VersionPrefix>1.0.1.0</VersionPrefix>
   </PropertyGroup>
 
 	<ItemGroup>

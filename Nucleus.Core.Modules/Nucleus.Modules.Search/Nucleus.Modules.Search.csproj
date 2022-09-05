@@ -49,13 +49,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.0.2-a3" />
-    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.0.0.1" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.1" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.0.1" />
   </ItemGroup>
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>Search</ExtensionFolder>
-		<Version>1.0.0.1</Version>
+		<VersionPrefix>1.0.1.0</VersionPrefix>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 	</PropertyGroup>
 

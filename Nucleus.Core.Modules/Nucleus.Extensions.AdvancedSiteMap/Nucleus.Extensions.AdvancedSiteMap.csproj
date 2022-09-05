@@ -32,14 +32,15 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.0.2-a3" />
-		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.0.0" />
+		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.1" />
+		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.0.1" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>AdvancedSiteMap</ExtensionFolder>
 		<Version>1.0.0</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+		<CopyToDefaultSetup>false</CopyToDefaultSetup>
 	</PropertyGroup>
 
 	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />

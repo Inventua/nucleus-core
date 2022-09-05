@@ -23,7 +23,6 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Net.Http;
 
 namespace Nucleus.Web
 {
@@ -228,6 +227,7 @@ namespace Nucleus.Web
 			try
 			{
 				app.UseMiddleware<SecurityHeadersMiddleware>();
+				app.UseRequestLocalization();
 
 				app.UseExceptionHandler($"/{RoutingConstants.ERROR_ROUTE_PATH}");
 

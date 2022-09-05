@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="9384abed-a555-46a2-aa89-648d37216225" xmlns="urn:nucleus/schemas/package/1.0">
   <name>Xml Documentation</name>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
 		Xml documentation viewer.
 	</description>
-  <compatibility minVersion="1.0.0.0" maxVersion="*" />
+  <compatibility minVersion="1.0.1.0" maxVersion="*" />
   <components>
     <component folderName="XmlDocumentation" optional="false">
       <moduleDefinition id="0595de3d-1ba7-49df-99f0-2e80fb00d156">

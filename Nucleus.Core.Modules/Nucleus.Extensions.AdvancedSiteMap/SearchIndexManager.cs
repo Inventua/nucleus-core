@@ -84,9 +84,16 @@ namespace Nucleus.Extensions.AdvancedSiteMap
 
 		private static string GenerateValidPath (string value)
 		{
-			foreach (char character in System.IO.Path.GetInvalidPathChars())
+			foreach (char character in System.IO.Path.GetInvalidPathChars().Concat(System.IO.Path.GetInvalidFileNameChars()).Concat(new char[] { '.' }))
 			{
-				value = value.Replace(character, '_');
+				value = value.Replace(character, ' ');
+			}
+
+			value = value.Replace("  ", " ");
+
+			if (value.Length > 64)
+			{
+				value = value.Substring(0, 64);	
 			}
 
 			return value;

@@ -165,9 +165,17 @@ a *
 	z-index: 3;	
 }
 
+/*  Styles for the progress bar rendered with the <Progress> tag helper (in the Files and Extensions page).  */
 .UploadProgress 
 {
 	display: none;
+  border: solid 1px #333;
+  padding: 1rem;
+  position: absolute;
+  left: 0.25rem;
+  right: 0.25rem;
+  background-color: white;
+  z-index: 100;
 }
 
 .UploadProgress label
@@ -183,14 +191,17 @@ a *
   height: 1.5rem;
 }
 
+/*  cross-browser styling for the <progress> element.  */
+/*  The transition style is only known to work in Edge and Chrome */
+
 /*  background component  */
-.UploadProgress progress::-webkit-progress-bar {background-color: #ddd; width: 100%;}
-.UploadProgress progress {background-color: #ddd;}
+.UploadProgress progress::-webkit-progress-bar { background-color: white; width: 100%; }
+.UploadProgress progress { background-color: white; }
 
 /*  value component  */
-.UploadProgress progress::-webkit-progress-value {background-color: #0d6efd!important;}
-.UploadProgress progress::-moz-progress-bar {background-color: #0d6efd!important;}
-.UploadProgress progress {color: #0d6efd;}
+.UploadProgress progress::-webkit-progress-value { background-color: #0d6efd!important; border-radius: 6px; transition: width 1s; }
+.UploadProgress progress::-moz-progress-bar { background-color: #0d6efd!important; border-radius: 6px; transition: width 1s; }
+.UploadProgress progress { color: #0d6efd; border-radius: 6px; transition: width 1s; }
 
 .ValidationError
 {

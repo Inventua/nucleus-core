@@ -39,7 +39,7 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		// This doesn't work & generates a warning: "A request body size limit could not be applied. The IHttpRequestBodySizeFeature for the server is read-only."
+		// This (RequestSizeLimit attribute) doesn't work & generates a warning: "A request body size limit could not be applied. The IHttpRequestBodySizeFeature for the server is read-only."
 		// because the FileIntegrityCheckerMiddleware reads the file in order to check a file signature, which (indirectly) sets 
 		// IHttpMaxRequestBodySizeFeature.IsReadOnly to true.  Code to handle this route as a special case has been added to 
 		// the core FileIntegrityCheckerMiddleware class.

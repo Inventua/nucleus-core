@@ -4,6 +4,7 @@ using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Extensions;
+using System.Threading.Tasks;
 
 namespace Nucleus.Extensions.ElasticSearch.Controllers
 {
@@ -68,11 +69,11 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpPost]
-		public ActionResult GetIndexCount(ViewModels.Settings viewModel)
+		public async Task<ActionResult> GetIndexCount(ViewModels.Settings viewModel)
 		{
 			ElasticSearchRequest request = new(new System.Uri(viewModel.ServerUrl), viewModel.IndexName, viewModel.Username, GetPassword(viewModel), viewModel.CertificateThumbprint);
 
-			long indexCount = request.CountIndex();
+			long indexCount = await request.CountIndex();
 
 			return Json(new { Title = "Index Count", Message = $"There are {indexCount} entries in the index." });			
 		}
@@ -92,11 +93,11 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpPost]
-		public ActionResult ClearIndex(ViewModels.Settings viewModel)
+		public async Task<ActionResult> ClearIndex(ViewModels.Settings viewModel)
 		{
 			ElasticSearchRequest request = new(new System.Uri(viewModel.ServerUrl), viewModel.IndexName, viewModel.Username, GetPassword(viewModel), viewModel.CertificateThumbprint);
 
-			if (request.DeleteIndex())
+			if (await request.DeleteIndex())
 			{
 				return Json(new { Title = "Clear Index", Message = $"Index {viewModel.IndexName} has been removed and will be re-created the next time the search index feeder runs." });
 			}
@@ -108,11 +109,11 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpPost]
-		public ActionResult GetIndexSettings(ViewModels.Settings viewModel)
+		public async Task<ActionResult> GetIndexSettings(ViewModels.Settings viewModel)
 		{
 			ElasticSearchRequest request = new(new System.Uri(viewModel.ServerUrl), viewModel.IndexName, viewModel.Username, GetPassword(viewModel), viewModel.CertificateThumbprint);
 
-			Nest.GetIndexSettingsResponse response = request.GetIndexSettings();
+			Nest.GetIndexSettingsResponse response = await request.GetIndexSettings();
 
 			if (response.IsValid)
 			{

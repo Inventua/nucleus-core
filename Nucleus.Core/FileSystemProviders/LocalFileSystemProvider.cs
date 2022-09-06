@@ -101,7 +101,7 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 		}
 
-		public override Folder CreateFolder(string parentPath, string newFolder)
+		public override Task<Folder> CreateFolder(string parentPath, string newFolder)
 		{
 			if (PathUtils.PathNavigatesAboveRoot(parentPath) || PathUtils.HasInvalidPathChars(parentPath))
 			{
@@ -117,7 +117,7 @@ namespace Nucleus.Core.FileSystemProviders
 			return this.GetFolder(System.IO.Path.Combine(parentPath, newFolder));
 		}
 
-		public override void DeleteFile(string path)
+		public override Task DeleteFile(string path)
 		{
 			if (PathUtils.PathNavigatesAboveRoot(path) || PathUtils.HasInvalidPathChars(path))
 			{
@@ -125,9 +125,11 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 
 			System.IO.File.Delete(BuildPath(path));
+
+			return Task.CompletedTask;
 		}
 
-		public override void DeleteFolder(string path, Boolean recursive)
+		public override Task DeleteFolder(string path, Boolean recursive)
 		{
 			if (PathUtils.PathNavigatesAboveRoot(path) || PathUtils.HasInvalidPathChars(path))
 			{
@@ -135,9 +137,11 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 
 			System.IO.Directory.Delete(BuildPath(path), recursive);
+
+			return Task.CompletedTask;
 		}
 
-		public override Folder GetFolder(string path)
+		public override Task<Folder> GetFolder(string path)
 		{
 			if (PathUtils.PathNavigatesAboveRoot(path) || PathUtils.HasInvalidPathChars(path))
 			{
@@ -149,7 +153,7 @@ namespace Nucleus.Core.FileSystemProviders
 			if (folderInfo.Exists)
 			{
 				// item is a folder
-				return BuildFolder(folderInfo);
+				return Task.FromResult(BuildFolder(folderInfo));
 			}
 			else
 			{
@@ -157,7 +161,7 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 		}
 
-		public override File GetFile(string path)
+		public override async Task<File> GetFile(string path)
 		{
 			if (path == null) return null;
 
@@ -169,7 +173,7 @@ namespace Nucleus.Core.FileSystemProviders
 			System.IO.FileInfo fileInfo = new(BuildPath(path));
 			if (fileInfo.Exists)
 			{
-				return BuildFile(fileInfo);
+				return await BuildFile(fileInfo);
 			}
 			else
 			{
@@ -185,14 +189,14 @@ namespace Nucleus.Core.FileSystemProviders
 		/// <remarks>
 		/// Returns null to indicate that a direct url could not be returned by the provider.
 		/// </remarks>
-		public override System.Uri GetFileDirectUrl(string path, DateTime expiresOn)
+		public override Task<System.Uri> GetFileDirectUrl(string path, DateTime expiresOn)
 		{
-			return null;
+			return Task.FromResult<System.Uri>(null);
 		}
 
-		public override System.IO.Stream GetFileContents(string path)
+		public override async Task<System.IO.Stream> GetFileContents(string path)
 		{
-			File file = GetFile(path);
+			File file = await GetFile(path);
 
 			if (file == null)
 			{
@@ -210,12 +214,12 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 		}
 
-		public override Folder ListFolder(string path)
+		public override Task<Folder> ListFolder(string path)
 		{
 			return ListFolder(path, "");
 		}
 
-		public override Folder ListFolder(string path, string pattern)
+		public override async Task<Folder> ListFolder(string path, string pattern)
 		{
 			if (PathUtils.PathNavigatesAboveRoot(path) || PathUtils.HasInvalidPathChars(path))
 			{
@@ -236,14 +240,14 @@ namespace Nucleus.Core.FileSystemProviders
 				//if (this.Options.AllowedTypes.Contains(item.Extension, StringComparer.OrdinalIgnoreCase))
 				if (this.GlobalOptions.Value.AllowedFileTypes.Where(allowed => allowed.FileExtensions.Contains(item.Extension, StringComparer.OrdinalIgnoreCase)).Any())
 				{
-					result.Files.Add(BuildFile(item));
+					result.Files.Add(await BuildFile(item));
 				}
 			}
 
 			return result;
 		}
 
-		public override File RenameFile(string path, string newName)
+		public override Task<File> RenameFile(string path, string newName)
 		{
 			string newPath;
 
@@ -268,7 +272,7 @@ namespace Nucleus.Core.FileSystemProviders
 			return this.GetFile(newPath);
 		}
 
-		public override Folder RenameFolder(string path, string newName)
+		public override Task<Folder> RenameFolder(string path, string newName)
 		{
 			string newPath;
 
@@ -314,10 +318,10 @@ namespace Nucleus.Core.FileSystemProviders
 				await content.CopyToAsync(outStream);
 			}
 
-			return GetFile(System.IO.Path.Combine(BuildRelativePath(targetPath)));
+			return await GetFile(System.IO.Path.Combine(BuildRelativePath(targetPath)));
 		}
 
-		private File BuildFile(System.IO.FileInfo fileItem)
+		private async Task<File> BuildFile(System.IO.FileInfo fileItem)
 		{
 			return new File()
 			{
@@ -325,7 +329,7 @@ namespace Nucleus.Core.FileSystemProviders
 				Path = BuildRelativePath(fileItem.FullName),
 				Name = fileItem.Name,
 				DateModified = fileItem.LastWriteTimeUtc,
-				Parent = GetFolder(BuildRelativePath(fileItem.DirectoryName)),// new Folder() { Path = BuildRelativePath(fileItem.DirectoryName) },
+				Parent = await GetFolder(BuildRelativePath(fileItem.DirectoryName)),// new Folder() { Path = BuildRelativePath(fileItem.DirectoryName) },
 				Size = fileItem.Length,
 				Capabilities = BuildFileCapabilities()
 			};
@@ -342,7 +346,7 @@ namespace Nucleus.Core.FileSystemProviders
 					Path = "",
 					Name = "/",
 					DateModified = folderItem.LastWriteTimeUtc,
-					Parent = new Folder() { Provider = this.Key, Path = "" },
+					Parent = null, //new Folder() { Provider = this.Key, Path = "" },
 					Capabilities = BuildFolderCapabilities(),
 					FolderValidationRules = BuildFolderValidationRules(),
 					FileValidationRules = BuildFileValidationRules()

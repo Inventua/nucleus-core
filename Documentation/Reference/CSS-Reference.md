@@ -44,3 +44,16 @@ adding a call to `@Html.AddStyle("~/Resources/css/forms.css")` as forms.css is o
 | .settings-control                | This class is used to style elements which are rendered by the [`<SettingsControl>`](https://www.nucleus-cms.com/developers/razor-views/#settingscontrol-tag-helper) tag helper.  It applies styles to present input, select and other controls consistently. | 
 | .nucleus-form-tools              | Class used to wrap buttons in the body of a form.  Buttons are rendered side-by-side with a small gap between them. | 
 | .nucleus-form-buttonrow          | Class used to wrap buttons at the bottom of a form.  Buttons are rendered side-by-side with a small gap between them and a small top margin. | 
+
+## Special
+
+These CSS classes are used to control client-side behavior.
+
+{.table-25-75}
+|                                  |                                                                                      |
+|----------------------------------|--------------------------------------------------------------------------------------|
+| .nucleus-show-progress           | Triggers client-side behavior to display a progress control for the control when partial content is being retrieved, after a 300ms delay.  Use this feature to display feedback to the user for operations which may take a while.  You must also include one of the following classes. | 
+| .nucleus-show-progress-inside    | - Display progress indicator inside the element.  The progress indicator is absolutely positioned, and aligned to the right. | 
+| .nucleus-show-progress-after     | - Display a progress indicator after the element. | 
+| .nucleus-show-progress-before    | - Display a progress indicator before the element. | 
+

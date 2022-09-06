@@ -20,7 +20,11 @@ namespace Nucleus.XmlDocumentation
 
 		public DocumentationParser(IFileSystemManager fileSystemManager, Site site, File file)//(System.IO.Stream input, string sourceFileName)
 		{
-			System.IO.Stream input = fileSystemManager.GetFileContents(site, file);
+			System.IO.Stream input = fileSystemManager.GetFileContents(site, file)
+				.ConfigureAwait(false)
+				.GetAwaiter()
+				.GetResult();
+
 			this.SourceFileName = file.Name;
 			this.Source = DeserializeDocumentationFile(input);
 			this.IsValid = true;

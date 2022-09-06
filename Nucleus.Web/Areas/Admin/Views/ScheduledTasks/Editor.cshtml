@@ -60,11 +60,20 @@
 						})
 						</SettingsControl>
 					</div>
+					
+					@switch (Model.Progress.Status)
+					{
+						case ScheduledTaskProgress.State.Running:
+							<div class="alert alert-primary mt-3" role="alert">This task is running now, started @((DateTime.UtcNow - Model.StartTime).FormatTimeSpan()) ago@(@Model.Progress.Percent > 0 ? $", {Model.Progress.Percent} complete": "").</div>
+							break;
 
-
-					<SettingsControl caption="Next Run">
-						<div>@(Model.LatestHistory == null ? "Immediate" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "Immediate"))</div>
-					</SettingsControl>
+						default:
+							<SettingsControl caption="Next Run">
+								<div>@(Model.LatestHistory == null ? "Immediate" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "Immediate"))</div>
+							</SettingsControl>
+							break;
+					}
+					
 
 					@if (Model.ScheduledTask.Id != Guid.Empty)
 					{

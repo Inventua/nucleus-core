@@ -27,14 +27,16 @@ Navigate to a folder by clicking its link in the display.  Navigate back a level
 ## Upload a file
 Click the `Upload File` button to upload a file.  Some file system providers (like [Azure Blob Storage](https://azure.microsoft.com/en-au/services/storage/blobs/)) 
 do not allow you to upload files to the root folder.  If the upload button is disabled, you will need to create a sub-folder and 
-upload your files there.
+upload your files there.  The `Upload` button displays a menu - you can choose to upload a single file, or you can upload a zip file 
+to be un-zipped into the current folder.
 
-> For security reasons, Nucleus restricts the file types that you can use.  You can't upload files
-with an extension that is not in the "allowed" list.  File contents are validated against a list of known "signatures", 
-so your file content must match its extension.  If you use external file management tools to copy a file with a restricted 
-file extension to your file system, Nucleus will not display the file.  If you need to support file types that aren't in the default
-approved list, your system administrator can modify the Nucleus [configuration files](/configuration-files/) which control which file 
-types are allowed.  
+> For security reasons, Nucleus restricts the file types that you can use.  You can't upload files with an extension that 
+is not in the "allowed" list.  File contents are validated against a list of known "signatures", so your file content must match
+its extension.  This applies to single file uploads, and to the files within a zip, if you have chosen the upload option which un-zips 
+the zip file contents automatically (if any files in the zip are invalid, they are skipped, and the rest of the files are un-zipped).  If 
+you use external file management tools to copy a file with a restricted file extension to your file system, Nucleus will not display the 
+file.  If you need to support file types that aren't in the default approved list, your system administrator can modify the Nucleus 
+[configuration files](/configuration-files/) which control which file types are allowed.  
 
 > The default allowed file extensions are web documents (css, htm, html), 
 images (ico, jpg and jpeg, gif, png, bmp, webp, tif and tiff), Microsoft Office documents (doc, docx, pptx, ppt, xls, xlsx, vsd),

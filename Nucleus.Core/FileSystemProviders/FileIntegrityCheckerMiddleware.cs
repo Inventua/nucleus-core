@@ -11,6 +11,7 @@ using Nucleus.Extensions.Authorization;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Configuration;
+using Nucleus.Extensions;
 
 namespace Nucleus.Core.FileSystemProviders
 {
@@ -31,15 +32,6 @@ namespace Nucleus.Core.FileSystemProviders
 		{
 			if (context.Request.HasFormContentType && (context.Request.Path != $"/{RoutingConstants.ERROR_ROUTE_PATH}"))
 			{
-				//try
-				//{
-				//	context.Request.Form.Files.Count();
-				//}
-				//catch (Microsoft.AspNetCore.Http.BadHttpRequestException e)
-				//{
-
-				//	await next(context);
-				//}
 				foreach (IFormFile file in context.Request.Form.Files)
 				{
 					if (context.User.IsInRole(this.Context.Site.AnonymousUsersRole.Name))
@@ -48,12 +40,6 @@ namespace Nucleus.Core.FileSystemProviders
 						context.Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
 						return;
 					}
-
-					System.IO.Stream stream = file.OpenReadStream();
-					byte[] sample = new byte[63];
-
-					stream.Read(sample, 0, sample.Length);
-					stream.Position = 0;
 
 					AllowedFileType fileType = this.Options.Value.AllowedFileTypes.Where(allowedtype => allowedtype.FileExtensions.Contains(System.IO.Path.GetExtension(file.FileName), StringComparer.OrdinalIgnoreCase)).FirstOrDefault();
 					Boolean isValid = false;
@@ -66,21 +52,17 @@ namespace Nucleus.Core.FileSystemProviders
 							return;
 						}
 
-						foreach (string signature in fileType.Signatures)
+						using (System.IO.Stream stream = file.OpenReadStream())
 						{
-							if (IsValid(signature, sample))
-							{
-								isValid = true;
-								break;
-							}
-						}
+							isValid = fileType.IsValid(stream);
 
-						if (!isValid)
-						{
-							Logger.LogError("ALERT: File content of file '{filename}' uploaded by {userid} : signature [{sample}] does not match any of the file signatures for file type {filetype}.", file.FileName, context.User.GetUserId(), BitConverter.ToString(sample).Replace("-", ""), System.IO.Path.GetExtension(file.FileName));
-							context.Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
-							await context.Response.WriteAsync($"Invalid file content.  The file that you have uploaded is not a valid {System.IO.Path.GetExtension(file.FileName)} file.");
-							return;
+							if (!isValid)
+							{
+								Logger.LogError("ALERT: File content of file '{filename}' uploaded by {userid} : signature [{sample}] does not match any of the file signatures for file type {filetype}.", file.FileName, context.User.GetUserId(), BitConverter.ToString(Nucleus.Extensions.AllowedFileTypeExtensions.GetSample(stream)).Replace("-", ""), System.IO.Path.GetExtension(file.FileName));
+								context.Response.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
+								await context.Response.WriteAsync($"Invalid file content.  The file that you have uploaded is not a valid {System.IO.Path.GetExtension(file.FileName)} file.");
+								return;
+							}
 						}
 					}
 					else
@@ -96,41 +78,6 @@ namespace Nucleus.Core.FileSystemProviders
 			await next(context);
 		}
 
-		private static Boolean IsValid(string signature, byte[] sample)
-		{
-			//byte[] signatureBytes = StringToBytes(signature);
-			List<string> signatureBytes = new();
-
-			for (int count = 0; count < (int)Math.Floor(signature.Length / (double)2); count += 2)
-			{
-				signatureBytes.Add(signature.Substring(count, 2));
-			}
-
-			if (sample.Length < signatureBytes.Count) return false;
-
-			for (int count = 0; count < signatureBytes.Count; count++)
-			{
-				//if (signatureBytes[count] != sample[count]) return false;
-				if (signatureBytes[count] != "??")
-				{
-					if (!signatureBytes[count].Equals(sample[count].ToString("X"), StringComparison.OrdinalIgnoreCase)) return false;
-				}
-			}
-
-			return true;
-		}
-
-		//private static byte[] StringToBytes(string value)
-		//{
-		//	byte[] result = new byte[(int)Math.Ceiling((double)value.Length / 2)];
-		//	for (int count = 0; count < result.Length; count++)
-		//	{
-		//		string part = value.Substring(count * 2, 2);
-		//		result[count] = Byte.Parse(part, System.Globalization.NumberStyles.HexNumber);
-		//	}
-
-		//	return result;
-		//}
 	}
 
 }

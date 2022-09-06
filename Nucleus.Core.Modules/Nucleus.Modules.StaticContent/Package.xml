@@ -1,42 +1,34 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="a0b382dc-2e07-4573-9f58-4f7c3bac989e" xmlns="urn:nucleus/schemas/package/1.0">
-	<name>Static Content</name>
-	<version>1.0.0</version>
-	<publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
-	<description>
-		
-	</description>
-	<compatibility minVersion="1.0.0.0" maxVersion="*" />
-	
-	<components>
-		<component folderName="StaticContent" optional="false">
-			<moduleDefinition id="0930d4fe-0469-47e6-a28b-7c42d85a61fd">
-				<friendlyName>Static Content</friendlyName>
-				<extension>StaticContent</extension>
-				<viewController>StaticContent</viewController>
-				<settingsController>StaticContentAdmin</settingsController>
-				<viewAction>Index</viewAction>
-				<editAction>Settings</editAction>
-				<categories>Content</categories>
-			</moduleDefinition>
-
-			<file name="readme.txt" />
-			<file name="license.txt" />
-			
-			<file name="viewer.css" />
-			<file name="settings.css" />
-			
-			<folder name="Bin">
-				<file name="Nucleus.Modules.StaticContent.dll" />
-				<file name="HtmlAgilityPack.dll" />
-			</folder>
-			
-			<folder name="Views">
-				<file name="Viewer.cshtml" />
-				<file name="Settings.cshtml" />
-			</folder>
-			
-		</component>
-	</components>
-	
+  <name>Static Content</name>
+  <version>1.0.1.0</version>
+  <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
+  <description>
+  </description>
+  <compatibility minVersion="1.0.1.0" maxVersion="*" />
+  <components>
+    <component folderName="StaticContent" optional="false">
+      <moduleDefinition id="0930d4fe-0469-47e6-a28b-7c42d85a61fd">
+        <friendlyName>Static Content</friendlyName>
+        <extension>StaticContent</extension>
+        <viewController>StaticContent</viewController>
+        <settingsController>StaticContentAdmin</settingsController>
+        <viewAction>Index</viewAction>
+        <editAction>Settings</editAction>
+        <categories>Content</categories>
+      </moduleDefinition>
+      <file name="readme.txt" />
+      <file name="license.txt" />
+      <file name="viewer.css" />
+      <file name="settings.css" />
+      <folder name="Bin">
+        <file name="Nucleus.Modules.StaticContent.dll" />
+        <file name="HtmlAgilityPack.dll" />
+      </folder>
+      <folder name="Views">
+        <file name="Viewer.cshtml" />
+        <file name="Settings.cshtml" />
+      </folder>
+    </component>
+  </components>
 </package>

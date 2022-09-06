@@ -21,7 +21,7 @@
 		<PackageId>Inventua.$(AssemblyName)</PackageId>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 		<Authors>Inventua Pty Ltd</Authors>
-		<VersionPrefix>1.0.0.1</VersionPrefix>
+		<VersionPrefix>1.0.1.0</VersionPrefix>
   </PropertyGroup>
 
 	<ItemGroup>

@@ -64,7 +64,11 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				labelBuilder.InnerHtml.AppendHtml(spanBuilder);
 			}
 
-			labelBuilder.InnerHtml.Append(caption);
+			if (!String.IsNullOrEmpty(caption))
+			{
+				spanBuilder.AddCssClass("me-1");
+				labelBuilder.InnerHtml.Append(caption);
+			}
 
 			outputBuilder.InnerHtml.AppendHtml(labelBuilder);
 

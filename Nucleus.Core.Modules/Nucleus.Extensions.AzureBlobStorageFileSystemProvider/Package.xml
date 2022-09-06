@@ -1,29 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="e27c5782-df19-462f-806c-9b6897dd8ae9" xmlns="urn:nucleus/schemas/package/1.0">
-	<name>Azure Blob Storage File System Provider</name>
-	<version>1.0.0</version>
-	<publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
-	<description>
+  <name>Azure Blob Storage File System Provider</name>
+  <version>1.0.1.0</version>
+  <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
+  <description>
 		Nucleus file system provider for Azure Blob storage.
 	</description>
-	<compatibility minVersion="1.0.0.0" maxVersion="*" />
-	
-	<components>
-		<component folderName="AzureBlobStorageFileSystemProvider" optional="false">
-			<file name="readme.txt" />
-			<file name="license.txt" />
-			
-			<folder name="Bin">
-				<file name="Nucleus.Extensions.AzureBlobStorageFileSystemProvider.dll" />
-				<file name="Azure.Core.dll" />
-				<file name="Azure.Storage.Blobs.dll" />
-				<file name="Azure.Storage.Common.dll" />
-				<file name="System.Memory.Data.dll" />
-				<file name="Microsoft.Bcl.AsyncInterfaces.dll" />
-				<file name="System.IO.Hashing.dll" />
-			</folder>
-			
-		</component>
-	</components>
-	
+  <compatibility minVersion="1.0.0.0" maxVersion="*" />
+  <components>
+    <component folderName="AzureBlobStorageFileSystemProvider" optional="false">
+      <file name="readme.txt" />
+      <file name="license.txt" />
+      <folder name="Bin">
+        <file name="Nucleus.Extensions.AzureBlobStorageFileSystemProvider.dll" />
+        <file name="Azure.Core.dll" />
+        <file name="Azure.Storage.Blobs.dll" />
+        <file name="Azure.Storage.Common.dll" />
+        <file name="System.Memory.Data.dll" />
+        <file name="Microsoft.Bcl.AsyncInterfaces.dll" />
+        <file name="System.IO.Hashing.dll" />
+      </folder>
+    </component>
+  </components>
 </package>

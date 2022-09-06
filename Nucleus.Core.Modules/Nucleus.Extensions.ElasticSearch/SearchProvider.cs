@@ -51,7 +51,7 @@ namespace Nucleus.Extensions.ElasticSearch
 				query.Boost = settings.Boost;
 			}
 
-			Nest.ISearchResponse<ElasticSearchDocument> result = request.Search(query);
+			Nest.ISearchResponse<ElasticSearchDocument> result = await request.Search(query);
 
 			return new SearchResults()
 			{
@@ -85,7 +85,7 @@ namespace Nucleus.Extensions.ElasticSearch
 			}
 
 			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(query.Site, settings.EncryptedPassword), settings.CertificateThumbprint);
-			Nest.ISearchResponse<ElasticSearchDocument> result = request.Suggest(query);
+			Nest.ISearchResponse<ElasticSearchDocument> result = await request.Suggest(query);
 
 			return new SearchResults()
 			{

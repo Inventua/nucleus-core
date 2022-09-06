@@ -26,12 +26,12 @@
 	<title>@Model.Context.Page.Title</title>
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.BOOTSTRAP)
-	@Html.AddScript("~/Resources/js/nucleus-shared.js")
+	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_SHARED)
 	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.BOOTSTRAP)
-	@Html.AddStyle("~/Resources/css/shared.css")
+	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_SHARED)
 	@if (Model.IsEditing)
 	{
-		@Html.AddStyle("~/Resources/css/editmode.css")
+		@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_EDITMODE)
 	}
 	@Html.AddHtmlEditor()
 	@RenderSection("styles", false)

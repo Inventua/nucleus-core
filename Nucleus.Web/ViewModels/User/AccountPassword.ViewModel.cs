@@ -14,7 +14,6 @@ namespace Nucleus.Web.ViewModels.User
 		public string Password { get; set; }
 		public string NewPassword { get; set; }
 		public string ConfirmPassword { get; set; }
-		public Boolean RememberMe { get; set; }
 
 		public Boolean ShowVerificationToken { get; set; }
 		public string VerificationToken { get; set; }

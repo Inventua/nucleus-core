@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
@@ -19,13 +20,17 @@ namespace Nucleus.Web.ViewModels.Admin
 		public IEnumerable<ServiceType> AvailableServiceTypes { get; set; }
 
 		public LogSettingsViewModel LogSettings { get; set; } = new();
+
+		public Nucleus.Abstractions.Models.TaskScheduler.ScheduledTaskProgress Progress { get; set; }
+		public DateTime? StartTime { get; set; }
+		
 		//public List<Shared.LogFileInfo> LogFiles { get; set; }
 
-		//public string LogFile { get; set; }
+			//public string LogFile { get; set; }
 
-		//public Nucleus.Abstractions.Models.Paging.PagedResult<ViewModels.Admin.SystemIndex.LogEntry> LogContent { get; set; } = new() { PageSize = 100, PageSizes = new List<int>() { 100, 250, 500 } };
+			//public Nucleus.Abstractions.Models.Paging.PagedResult<ViewModels.Admin.SystemIndex.LogEntry> LogContent { get; set; } = new() { PageSize = 100, PageSizes = new List<int>() { 100, 250, 500 } };
 
-		//public string LogMessage { get; set; }
+			//public string LogMessage { get; set; }
 
 		public class ServiceType
 		{

@@ -12,6 +12,7 @@ using Nucleus.Abstractions.Search;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Nucleus.Core.Logging;
+using Nucleus.Extensions;
 
 namespace Nucleus.Core.Search
 {
@@ -52,6 +53,32 @@ namespace Nucleus.Core.Search
 
 		private async Task CreateAndSubmitFeed(RunningTask task, IProgress<ScheduledTaskProgress> progress, CancellationToken cancellationToken)
 		{
+			foreach (Site site in await this.SiteManager.List())
+			{
+				// .List doesn't fully populate the site object, so we call .Get 
+				Site fullSite = await this.SiteManager.Get(site.Id);
+
+				if (fullSite.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.CLEAR_INDEX, out Boolean clearIndex))
+				{
+					if (clearIndex)
+					{
+						foreach (ISearchIndexManager searchIndexManager in this.SearchIndexManagers)
+						{
+							this.Logger.LogTrace("Clearing index for provider {providername}, site '{site}'.", searchIndexManager.GetType().FullName, fullSite.Name);
+							try
+							{
+								await searchIndexManager.ClearIndex(fullSite);
+							}
+							catch (Exception e)
+							{
+								// don't fail if ClearIndex failed, but log it
+								this.Logger?.LogError(e, "Clearing Index for provider {providername}, site '{site}'.", searchIndexManager.GetType().FullName, fullSite.Name);
+							}
+						}
+					}
+				}
+			}
+
 			foreach (IContentMetaDataProducer contentProvider in this.SearchContentProviders)
 			{
 				foreach (Site site in await this.SiteManager.List())
@@ -74,7 +101,7 @@ namespace Nucleus.Core.Search
 								{
 									try
 									{
-										searchIndexManager.Index(item);
+										await searchIndexManager.Index(item);
 										this.Logger.LogInformation("Added [{scope}] {url} to index ({searchIndexManager}).", item.Scope, item.Url, searchIndexManager.GetType());
 									}
 									catch (NotImplementedException)
@@ -114,7 +141,7 @@ namespace Nucleus.Core.Search
 			{
 				url = url[1..];
 			}
-			
+
 			if (!url.EndsWith('/'))
 			{
 				url += "/";

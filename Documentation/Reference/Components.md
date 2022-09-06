@@ -38,3 +38,8 @@ uses the [MIT](https://github.com/Inventua/nucleus-core/blob/main/Nucleus.Web/li
 |                                  |                                                             | License                         |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | [NEST](https://github.com/elastic/elasticsearch-net) | .NET interface to Elasticsearch.	| [Apache-2.0](https://github.com/elastic/elasticsearch-net/blob/main/LICENSE.txt) |	
+
+## Material Icons
+|                                  |                                                             | License                         |
+|----------------------------------|--------------------------------------------------------------------------------------|
+| [Google Material Icons](https://developers.google.com/fonts/docs/material_icons) | Material Icons font.	| [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0.txt) |	

@@ -7,11 +7,11 @@
 	<meta name="viewport" content="width=device-width" />
 	<title>@ViewData["title"]</title>
 	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.BOOTSTRAP)
-	@Html.AddStyle("~/Resources/css/shared.css")
-	@Html.AddStyle("~/Resources/css/forms.css")
+	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_SHARED)
+	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.BOOTSTRAP)
-	@Html.AddScript("~/Resources/js/nucleus-shared.js")
+	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_SHARED)
 	<merge-stylesheets>
 	@Html.RenderStyles()
 	</merge-stylesheets>

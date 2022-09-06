@@ -63,7 +63,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 				if (!String.IsNullOrEmpty(caption))
 				{ 
-					spanBuilder.AddCssClass("me-2");
+					spanBuilder.AddCssClass("me-1");
 					TagBuilder labelBuilder = new("div");
 
 					labelBuilder.InnerHtml.AppendHtml(spanBuilder);

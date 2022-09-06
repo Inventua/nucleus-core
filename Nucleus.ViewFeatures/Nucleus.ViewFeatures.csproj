@@ -17,7 +17,7 @@
 		<Product>Nucleus</Product>
 		<Description>Html Helpers, Tag Helpers, Url Helpers and shared controls used by Nucleus core and extensions.</Description>
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
-		<VersionPrefix>1.0.0.1</VersionPrefix>
+		<VersionPrefix>1.0.1.0</VersionPrefix>
 		<!--<VersionSuffix>a1</VersionSuffix>-->
 		<PackageTags>Nucleus</PackageTags>
 		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>

@@ -9,15 +9,15 @@
 	<meta name="viewport" content="width=device-width" />
 	<title>Nucleus Editor</title>
 	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.BOOTSTRAP)
-	@Html.AddStyle("~/Resources/css/shared.css")
-	@Html.AddStyle("~/Resources/css/admin.css")
-	@Html.AddStyle("~/Resources/css/forms.css")
+	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_SHARED)
+	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_ADMIN)
+	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.BOOTSTRAP)
-	@Html.AddScript("~/Resources/js/jquery-toggleswitch.js")
-	@Html.AddScript("~/Resources/js/jquery-pagelist.js")
-	@Html.AddScript("~/Resources/js/nucleus-shared.js")
-	@Html.AddScript("~/Resources/js/nucleus-admin.js")
+	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_TOGGLESWITCH)
+	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_PAGELIST)
+	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_SHARED)
+	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_ADMIN)
 	@Html.AddHtmlEditor()
 	<merge-stylesheets>
 	@Html.RenderStyles()

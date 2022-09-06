@@ -47,10 +47,10 @@
 					</td>
 					<td class="compact-cell">@forum.Statistics.PostCount</td>
 					<td class="compact-cell">@forum.Statistics.ReplyCount</td>
-					<td class="compact-cell">
+					<td class="compact-cell" title="@forum.Statistics.LastPost?.Subject">
 						@if (forum.Statistics.LastPost != null)
 						{
-							<div class="forum-subject">@forum.Statistics.LastPost.Subject</div>
+							<div class="forum-subject" title="@forum.Statistics.LastPost.Subject">@forum.Statistics.LastPost.Subject</div>
 							<div>@forum.Statistics.LastPost.PostedBy.UserName, @forum.Statistics.LastPost.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
 						}
 					</td>

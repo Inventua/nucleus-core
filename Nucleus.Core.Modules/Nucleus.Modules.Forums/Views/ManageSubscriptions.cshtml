@@ -14,12 +14,12 @@
 	@if (Model.Subscriptions.Forums.Any())
 	{
 		<h2>Forum Subscriptions</h2>
-		<table class="w-100">
+		<table class="w-100 mb-3">
 			@foreach (var forum in Model.Subscriptions.Forums)
 			{
 				<tr>
 					<td>@forum.Name</td>
-					<td class="w-25 text-end">@Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForum", "Forums", "Forums", new { forumId = forum.Id }), new { @class="btn btn-danger", @data_target = "form.parent()" })
+					<td class="w-25 text-end">@Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForum", "Forums", "Forums", new { forumId = forum.Id }), new { @class="btn btn-danger btn-sm", @data_target = "form.parent()" })
 				</tr>
 			}
 		</table>
@@ -33,7 +33,7 @@
 			{
 				<tr>
 					<td>@post.Subject</td>
-					<td class="w-25 text-end">@Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForumPost", "Forums", "Forums", new { forumPostId = post.Id }), new { @class="btn btn-danger", @data_target = "form.parent()" })</td>
+					<td class="w-25 text-end">@Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForumPost", "Forums", "Forums", new { forumPostId = post.Id }), new { @class="btn btn-danger btn-sm", @data_target = "form.parent()" })</td>
 				</tr>
 			}
 		</table>

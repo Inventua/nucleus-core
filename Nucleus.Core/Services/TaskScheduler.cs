@@ -124,7 +124,8 @@ namespace Nucleus.Core.Services
 			runningTask.History.FinishDate = DateTime.UtcNow;
 			runningTask.History.NextScheduledRun = CalculateInterval(runningTask.StartDate, runningTask.ScheduledTask.IntervalType, runningTask.ScheduledTask.Interval);
 
-			await TaskSucceeded(runningTask.History);
+			runningTask.Progress.Status = ScheduledTaskProgress.State.Succeeded;
+			await LogTaskSucceeded(runningTask.History);
 
 			this.Queue.Remove(runningTask.ScheduledTask);
 		}
@@ -156,19 +157,19 @@ namespace Nucleus.Core.Services
 			}
 		}
 
-		private async Task TaskFailed(ScheduledTaskHistory history)
+		private async Task LogTaskFailed(ScheduledTaskHistory history)
 		{
 			history.Status = ScheduledTaskProgress.State.Error;
 			await this.ScheduledTaskManager.SaveHistory(history);
 		}
 
-		private async Task TaskRunning(ScheduledTaskHistory history)
+		private async Task LogTaskRunning(ScheduledTaskHistory history)
 		{
 			history.Status = ScheduledTaskProgress.State.Running;
 			await this.ScheduledTaskManager.SaveHistory(history);
 		}
 
-		private async Task TaskSucceeded(ScheduledTaskHistory history)
+		private async Task LogTaskSucceeded(ScheduledTaskHistory history)
 		{
 			history.Status = ScheduledTaskProgress.State.Succeeded;
 			await this.ScheduledTaskManager.SaveHistory(history);
@@ -195,7 +196,7 @@ namespace Nucleus.Core.Services
 				if (serviceType == null)
 				{
 					this.Logger.LogError("Unable to find type {typeName}", task.TypeName);
-					await TaskFailed(history);
+					await LogTaskFailed(history);
 					return;
 				}
 
@@ -204,7 +205,7 @@ namespace Nucleus.Core.Services
 				if (service == null)
 				{
 					this.Logger.LogError("Unable to create an instance of {typeName}", task.TypeName);
-					await TaskFailed(history);
+					await LogTaskFailed(history);
 					return;
 				}
 
@@ -213,20 +214,21 @@ namespace Nucleus.Core.Services
 				if (taskService == null)
 				{
 					this.Logger.LogError("Unable to create an instance of {TypeName} because it does not implement IScheduledTask", task.TypeName);
-					await TaskFailed(history);
+					await LogTaskFailed(history);
 					return;
 				}
 
 				RunningTask runningTask = this.Queue.Add(task, history);
 				runningTask.OnProgress += HandleProgress;
 
-				await TaskRunning(history);
+				runningTask.Progress.Status = ScheduledTaskProgress.State.Running;
+				await LogTaskRunning(history);
 
 				runningTask.Task = Task.Run(async () =>
 				{
 					using (this.Logger.BeginScope(runningTask))
 					{
-						await taskService.InvokeAsync(runningTask, runningTask.ProgressCallback, this.CancellationTokenSource.Token);
+						await taskService.InvokeAsync(runningTask, runningTask.ProgressCallback, this.CancellationTokenSource.Token);						
 					}
 				});
 			}

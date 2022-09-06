@@ -12,6 +12,7 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions.Authorization;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models.Configuration;
+using Nucleus.Extensions;
 
 namespace Nucleus.Web.Controllers
 {
@@ -156,20 +157,7 @@ namespace Nucleus.Web.Controllers
 							FileName = file.Name,
 						};
 
-						Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider extensionProvider = new();
-						if (!extensionProvider.TryGetContentType(file.Path, out string mimeType))
-						{
-							mimeType = "application/octet-stream";
-						}
-						else
-						{
-							if (mimeType.StartsWith("text/") && !mimeType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
-							{
-								mimeType += "; charset=utf-8";
-							}
-						}
-
-						return File(this.FileSystemManager.GetFileContents(this.Context.Site, file), mimeType);
+						return File(await this.FileSystemManager.GetFileContents(this.Context.Site, file), file.GetMIMEType(true));
 					}
 					else
 					{

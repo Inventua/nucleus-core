@@ -11,6 +11,7 @@ function _Page()
 	this.AttachCopyButton = _attachCopyButton;
 	this.CopyToClipboard = _copyToClipboard;
 	this.Dialog = _dialog;
+	this.EnableEnhancedToolTips = _enableEnhancedToolTips;
 
 	// Attach Nucleus-standard event handlers when document is ready
 	jQuery(document).ready(function ()
@@ -38,14 +39,14 @@ function _Page()
 
 		// Attach forms and form-submit controls with a data-target attribute to _PostPartialContent
 		jQuery(document).on('submit', 'form[data-target], form:has(input[type="submit"][data-target], input[type="file"][data-target], button[type="submit"][data-target])', _postPartialContent);
-				
+
 		// Attach links which target an IFRAME
 		jQuery(document).on('click', 'a[data-frametarget], button[data-frametarget]', _loadIFrame);
 
 		// Attach hyperlinks with a data-target, but not a data-method to _getPartialContent
 		// Removed: this duplicates the binding above ([data-target]:not(form, input, button):not([data-method="POST"]))
 		//jQuery(document).on('click', 'a[data-target]:not([data-method])', _getPartialContent);
-				
+
 		// Attach hyperlinks with a data-method="POST" attribute to _PostPartialContent
 		jQuery(document).on('click', 'a[data-method="POST"]', _postPartialContent);
 
@@ -109,8 +110,8 @@ function _Page()
 		/* menu-submenu handling */
 
 		/* 
-		  Handle keyboard events (arrow keys) on menu items which are links to a page but which which also have children.  These have
-		  a toggle button immediately following them, which is what we 
+			Handle keyboard events (arrow keys) on menu items which are links to a page but which which also have children.  These have
+			a toggle button immediately following them, which is what we 
 		*/
 		jQuery('.nucleus-menu [data-bs-toggle="dropdown-keyboardonly"]').on('keydown', function (e)
 		{
@@ -152,7 +153,7 @@ function _Page()
 		jQuery('.dropdown-submenu .dropdown-toggle').on('click', function (e)
 		{
 			var subMenu = jQuery(this).next('.dropdown-menu');
-			
+
 			if (!jQuery(this).next().hasClass('show'))
 			{
 				jQuery('.dropdown-menu').not(subMenu.parents()).removeClass('show');
@@ -187,26 +188,38 @@ function _Page()
 			event.stopImmediatePropagation();
 
 			var form = jQuery(this).parents('form');
-			var parent = jQuery(this).parents('.FileSelector');
+			//var parent = jQuery(this).parents('.FileSelector');
+			var uploadprogressWrapper = form.find('.UploadProgress');
+			var uploadprogress = uploadprogressWrapper.find('progress');
+			var uploadprogressLabel = uploadprogressWrapper.find('label');
 
-			parent.find('.UploadProgress').siblings().hide();
-			parent.find('.UploadProgress').show();
+			uploadprogressWrapper.siblings().css('opacity', '.4');
+			uploadprogressWrapper.siblings('.alert').hide();
+			uploadprogressWrapper.show();
 
 			form.on('progress', function (e, percent)
 			{
-				parent.find('.UploadProgress .progress-bar').attr('area-valuenow', percent.toString());
-				parent.find('.UploadProgress .progress-bar').css('width', percent.toString() + '%');
-				parent.find('.UploadProgress .progress-bar').text(percent.toString() + '%');
+				uploadprogress.attr('value', percent.toString());
+				uploadprogress.text(percent.toString() + '%');
+
+				if (percent < 100)
+				{
+					uploadprogressLabel.text('Uploading file ...');
+				}
+				else
+				{
+					uploadprogressLabel.text('Upload Complete.  Processing file ...');
+				}
 			});
 
 			form.on('error', function ()
 			{
-				parent.find('.UploadProgress').hide();
-				parent.find('.UploadProgress').siblings().show();
+				uploadprogressWrapper.hide();
+				uploadprogressWrapper.siblings().css('opacity', '1');
 			});
 
 			form.attr('action', jQuery(this).attr('formaction'));
-			form.submit();			
+			form.submit();
 		});
 
 		// Close popups when a user clicks outside a popup.  Click events will be propagated up to BODY if they are not handled elsewhere and 
@@ -227,7 +240,10 @@ function _Page()
 			event.preventDefault();
 			event.stopImmediatePropagation();
 
-			jQuery(this).parents('form').submit();			
+			var newEvent = jQuery.Event('submit', { originalEvent: event });
+			jQuery(this).parents('form').first().trigger(newEvent);
+
+			//jQuery(this).parents('form').submit();
 		}
 	}
 
@@ -246,7 +262,7 @@ function _Page()
 		catch (e)
 		{
 			return false;
-		}		
+		}
 	}
 
 	function _trackScrollPosition()
@@ -260,8 +276,8 @@ function _Page()
 				{
 					sessionStorage.setItem(_buildScrollPositionKey(element), jQuery(element).scrollTop().toString());
 				}
-				catch (ex){ } // suppress error
-			});			
+				catch (ex) { } // suppress error
+			});
 		});
 	}
 
@@ -279,7 +295,7 @@ function _Page()
 				}
 			}
 			catch (ex) { } // suppress error 
-		});		
+		});
 	}
 
 	function _loadIFrame(event)
@@ -383,9 +399,6 @@ function _Page()
 	 */
 	function _postPartialContent(event)
 	{
-		event.preventDefault();
-		event.stopImmediatePropagation();
-
 		var form;
 		var url;
 		var targetSelector;
@@ -436,8 +449,18 @@ function _Page()
 		// reset validation error highlighting
 		target.find('.ValidationError').removeClass('ValidationError');
 
+		if (targetSelector === 'window')
+		{
+			return;
+		}
+
+		event.preventDefault();
+		event.stopImmediatePropagation();
+
 		var action = function ()
 		{
+			_indicateProgress.call(this, event);
+
 			jQuery.ajax({
 				url: url,
 				method: 'POST',
@@ -509,6 +532,8 @@ function _Page()
 			target = jQuery(target);
 		}
 
+		_indicateProgress.call(this, event);
+
 		jQuery.ajax({
 			url: url,
 			headers: { 'Accept': 'application/json, */*' },
@@ -528,7 +553,7 @@ function _Page()
 	{
 		event.preventDefault();
 		event.stopPropagation();
-		
+
 		var url;
 		var targetSelector;
 		var target;
@@ -572,6 +597,8 @@ function _Page()
 
 		if (typeof (target) !== 'undefined' && typeof (url) !== 'undefined')
 		{
+			_indicateProgress.call(this, event);
+
 			jQuery.ajax({
 				url: url,
 				headers: { 'Accept': 'application/json, */*' },
@@ -581,6 +608,59 @@ function _Page()
 		}
 
 		return false;
+	}
+
+	/**
+	 * @summary	
+	 * Render a progress indicator for the control which triggered the specified event.
+	 * 
+	 * @param {any} event
+	 */
+	function _indicateProgress(event)
+	{
+		// figure out which control initiated the event
+		var triggerControl = jQuery(this);
+		if (event !== null)
+		{
+			if (event.originalEvent !== null && typeof event.originalEvent !== 'undefined')
+			{
+				if (event.originalEvent.submitter !== null && typeof event.originalEvent.submitter !== 'undefined')
+				{
+					triggerControl = jQuery(event.originalEvent.submitter);
+				}
+				else if (event.originalEvent.target !== null && typeof event.originalEvent.target !== 'undefined')
+				{
+					triggerControl = jQuery(event.originalEvent.target);
+				}
+			}			
+		}
+
+		// if the trigger control does not have a nucleus-show-progress class, look for ancestors of the element which do have the nucleus-show-progress class
+		if (triggerControl != null && !triggerControl.hasClass('nucleus-show-progress'))
+		{
+			triggerControl = triggerControl.parents('.nucleus-show-progress').first();
+		}
+
+		if (triggerControl != null && triggerControl.hasClass('nucleus-show-progress'))
+		{
+			window.setTimeout(() =>
+			{
+				var progress = jQuery('<div class="spinner-border spinner-border-sm text-primary nucleus-progress-spinner ms-2" role="status"/>');
+
+				if (triggerControl.hasClass('nucleus-show-progress-inside'))
+				{
+					progress.appendTo(triggerControl);
+				}
+				else if (triggerControl.hasClass('nucleus-show-progress-after'))
+				{
+					progress.insertAfter(triggerControl);
+				}
+				else if (triggerControl.hasClass('nucleus-show-progress-before'))
+				{
+					progress.insertBefore(triggerControl);
+				}
+			}, 500);
+		}
 	}
 
 	function _confirm(message, title, action)
@@ -618,7 +698,7 @@ function _Page()
 			{
 				// bad request.  Parse ModelState errors		
 				var messages = new Array(request.responseJSON.length);
-				var elementSelector ='';
+				var elementSelector = '';
 
 				// get a list of elements with validation errors
 				for (var prop in request.responseJSON)
@@ -653,9 +733,9 @@ function _Page()
 						}
 						messages[index] = '<li>' + message + '</li>';
 					}
-        }
+				}
 
-				var validationMessage = '<ul>' + messages.join('') + '</ul>';		
+				var validationMessage = '<ul>' + messages.join('') + '</ul>';
 
 				errorData = new Object();
 				errorData.title = 'Validation Error';
@@ -668,7 +748,7 @@ function _Page()
 			}
 		}
 		else
-		{			
+		{
 			if (request.status === 403)
 			{
 				errorData = new Object();
@@ -695,7 +775,7 @@ function _Page()
 		for (count = 0; count < items.length; count++)
 		{
 			if (jQuery(items[count]).attr('id') === id) return count;
-    }
+		}
 	}
 
 	function _dialog(title, message, icon, okCaption, cancelCaption, action)
@@ -861,7 +941,7 @@ function _Page()
 				if (source.parents('.modal').first().find(target).length === 0)
 				{
 					// a modal is visible, data is non-blank, target is not the modal or one of its descendants, hide the modal
-					jQuery('.modal:visible').first().modal('hide');							
+					jQuery('.modal:visible').first().modal('hide');
 				}
 			}
 		}
@@ -895,10 +975,10 @@ function _Page()
 
 					if
 						(
-							(typeof (element.attr('data-target')) === 'undefined' || element.attr('data-target') === '')
-							&&
-							(typeof(form) !== 'undefined' && (typeof (form.attr('data-target')) === 'undefined' || form.attr('data-target') === ''))
-						)
+						(typeof (element.attr('data-target')) === 'undefined' || element.attr('data-target') === '')
+						&&
+						(typeof (form) !== 'undefined' && (typeof (form.attr('data-target')) === 'undefined' || form.attr('data-target') === ''))
+					)
 					{
 						element.attr('data-target', '.modal-body');
 					}
@@ -978,7 +1058,7 @@ function _Page()
 		jQuery(element).parents('.nucleus-adminpage').first().siblings('.modal-backdrop').remove();
 	}
 
-	function _isInView (element)
+	function _isInView(element)
 	{
 		var elementTop = element.offset().top;
 		var elementBottom = elementTop + element.outerHeight();
@@ -1041,7 +1121,7 @@ function _Page()
 			{
 				copyButton[0].CopyTarget = jQuery(element);
 			}
-						
+
 			// copy button handler
 			copyButton.on('click', function ()
 			{
@@ -1099,6 +1179,35 @@ function _Page()
 		}
 	}
 
+	function _enableEnhancedToolTips(enable)
+	{		
+		if (!enable)
+		{
+			jQuery('.settings-control[title]').each(function (index, element)
+			{
+				if (enable)
+				{
+					jQuery(element).attr('data-bs-toggle', 'tooltip');
+					return new bootstrap.Tooltip(element,
+						{
+							trigger: 'hover',
+							container: 'body',
+							placement: 'bottom',
+							delay: 300
+						});
+				}
+				else
+				{
+					jQuery(element)
+						.attr('title', jQuery(element).attr('data-bs-original-title'))
+						.removeAttr('data-bs-toggle', 'tooltip');
+
+					bootstrap.Tooltip.getInstance(element).disable();
+				}
+			});
+		}		
+	}
+
 
 	// Add _Layout.cshtml event handlers, which are used to communicate/execute events from the admin iframe to the main window.
 
@@ -1112,8 +1221,8 @@ function _Page()
 		}, false);
 
 		// Refresh event. Set or clear the edit-mode cookie, fade out the display and reload the current Url
-		window.document.addEventListener('Refresh',	function (args)
-		{			
+		window.document.addEventListener('Refresh', function (args)
+		{
 			if (args.detail !== null && typeof (args.detail.setEditMode) !== 'undefined')
 			{
 				var cookieValue = args.detail.setEditMode ? 'true' : '';
@@ -1136,33 +1245,33 @@ function _Page()
 		}, false);
 
 
-	// Initialize a popup iframe (from _PopupEditor.cshtml) by finding it's parent .modal, and creating a Bootstrap modal.
-	window.document.addEventListener('InitFrame',
-		function (args)
-		{
-			if (args.detail !== null && typeof (args.detail.element) !== 'undefined')
+		// Initialize a popup iframe (from _PopupEditor.cshtml) by finding it's parent .modal, and creating a Bootstrap modal.
+		window.document.addEventListener('InitFrame',
+			function (args)
 			{
-				// find the modal which contains the args.detail.element DOM element (the iframe)
-				var element = jQuery(args.detail.element);
-				if (!element.is('iframe')) return;
-				var wrapper = element.parents('.modal');
-
-				// Set modal's title to the iframe title
-				var titleElement = wrapper.find('.modal-title');
-				titleElement.html(args.detail.element.title);
-
-				if (!wrapper.is(':visible'))
+				if (args.detail !== null && typeof (args.detail.element) !== 'undefined')
 				{
-					// Create the modal
-					var newDialog = new bootstrap.Modal(wrapper, { backdrop: 'static' });
-					// when the modal containing the popup dialog is hidden, fade it out for .3 seconds and (at the same time) reload the page
-					wrapper.on('hidden.bs.modal', function () { jQuery('body').fadeTo('opacity', '0.3'); window.location.reload(true); });
-					// show the modal
-					newDialog.show();
+					// find the modal which contains the args.detail.element DOM element (the iframe)
+					var element = jQuery(args.detail.element);
+					if (!element.is('iframe')) return;
+					var wrapper = element.parents('.modal');
+
+					// Set modal's title to the iframe title
+					var titleElement = wrapper.find('.modal-title');
+					titleElement.html(args.detail.element.title);
+
+					if (!wrapper.is(':visible'))
+					{
+						// Create the modal
+						var newDialog = new bootstrap.Modal(wrapper, { backdrop: 'static' });
+						// when the modal containing the popup dialog is hidden, fade it out for .3 seconds and (at the same time) reload the page
+						wrapper.on('hidden.bs.modal', function () { jQuery('body').fadeTo('opacity', '0.3'); window.location.reload(true); });
+						// show the modal
+						newDialog.show();
+					}
+					// make sure the iframe is visible
+					element.show();
 				}
-				// make sure the iframe is visible
-				element.show();
-			}
-		}, false);
+			}, false);
 	}
 }

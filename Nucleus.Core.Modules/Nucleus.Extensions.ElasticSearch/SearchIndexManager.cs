@@ -17,7 +17,30 @@ namespace Nucleus.Extensions.ElasticSearch
 						
 		}
 
-		public void Index(ContentMetaData metadata)
+		public async Task ClearIndex(Site site)
+		{
+			if (site == null)
+			{
+				throw new NullReferenceException("site must not be null.");
+			}
+
+			ConfigSettings settings = new(site);
+
+			if (String.IsNullOrEmpty(settings.ServerUrl))
+			{
+				throw new InvalidOperationException($"The Elastic search server url is not set for site '{site.Name}', index not cleared.");
+			}
+
+			if (String.IsNullOrEmpty(settings.IndexName))
+			{
+				throw new InvalidOperationException($"The Elastic search index name is not set for site '{site.Name}', index not cleared.");
+			}
+
+			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(site, settings.EncryptedPassword), settings.CertificateThumbprint);
+			await request.DeleteIndex();
+		}
+
+		public async Task Index(ContentMetaData metadata)
 		{
 			if (metadata.Site == null)
 			{
@@ -39,19 +62,19 @@ namespace Nucleus.Extensions.ElasticSearch
 			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(metadata.Site, settings.EncryptedPassword), settings.CertificateThumbprint);
 
 			ElasticSearchDocument document = new(metadata);
-			Nest.IndexResponse response = request.IndexContent(document);
+			Nest.IndexResponse response = await request.IndexContent(document);
 
 			// free up memory - file content is part of the feed data, and this can exhaust available memory 
 			document.Dispose();
 		}
 
-		public void Remove(ContentMetaData metadata)
+		public async Task Remove(ContentMetaData metadata)
 		{
 			ConfigSettings settings = new(metadata.Site);
 
 			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(metadata.Site, settings.EncryptedPassword), settings.CertificateThumbprint);
 
-			request.RemoveContent(new ElasticSearchDocument(metadata));
+			await request.RemoveContent(new ElasticSearchDocument(metadata));
 		}
 	}
 }

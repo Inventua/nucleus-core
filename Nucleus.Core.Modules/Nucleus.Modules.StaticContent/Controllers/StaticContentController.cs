@@ -57,9 +57,9 @@ namespace Nucleus.Modules.StaticContent.Controllers
 						if (viewModel.DefaultFile.IsMarkdown() || viewModel.DefaultFile.IsText() || viewModel.DefaultFile.IsContent())
 						{
 							key = this.Context.Site.Id + ":" + viewModel.DefaultFile.Id;
-							renderedContent = this.CacheManager.StaticContentCache().Get(key, key =>
+							renderedContent = await this.CacheManager.StaticContentCache().GetAsync(key, async key =>
 							{
-								using (System.IO.Stream content = this.FileSystemManager.GetFileContents(this.Context.Site, viewModel.DefaultFile))
+								using (System.IO.Stream content = await this.FileSystemManager.GetFileContents(this.Context.Site, viewModel.DefaultFile))
 								{
 									if (viewModel.DefaultFile.IsMarkdown())
 									{

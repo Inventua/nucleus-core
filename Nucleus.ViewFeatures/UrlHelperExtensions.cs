@@ -247,12 +247,12 @@ namespace Nucleus.ViewFeatures
 
 			if (context.Module != null)
 			{
-				routeValueDict.Add("mid", context.Module.Id);
+				routeValueDict.TryAdd("mid", context.Module.Id);
 			}
-			routeValueDict.Add("extension", extensionName);
-			routeValueDict.Add("area", areaName);
-			routeValueDict.Add("controller", controllerName);
-			routeValueDict.Add("action", actionName);
+			routeValueDict.TryAdd("extension", extensionName);
+			routeValueDict.TryAdd("area", areaName);
+			routeValueDict.TryAdd("controller", controllerName);
+			routeValueDict.TryAdd("action", actionName);
 
 			routeContext.Values = routeValueDict;
 

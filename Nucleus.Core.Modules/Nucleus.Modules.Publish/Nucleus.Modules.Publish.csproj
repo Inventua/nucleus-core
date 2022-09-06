@@ -21,11 +21,14 @@
 
   <ItemGroup>
     <None Remove="DataProviders\Migrations\Scripts\01.00.00.json" />
+    <None Remove="DataProviders\Migrations\Scripts\01.00.01.json" />
     <None Remove="license.txt" />
     <None Remove="viewer.css" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="settings.css" />
+    <None Remove="Views\HeadlinesSettings.cshtml" />
+    <None Remove="Views\HeadlinesViewer.cshtml" />
     <None Remove="Views\ViewArticle.cshtml" />
     <None Remove="Views\ViewerLayouts\Table.cshtml" />
     <None Remove="Views\ViewerLayouts\Tile-1-Column.cshtml" />
@@ -41,7 +44,9 @@
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
     <Content Include="settings.css" />
+    <Content Include="Views\HeadlinesSettings.cshtml" />
     <Content Include="Views\ViewArticle.cshtml" />
+    <Content Include="Views\HeadlinesViewer.cshtml" />
     <Content Include="Views\ViewerLayouts\Table.cshtml" />
     <Content Include="Views\ViewerLayouts\Tile-2-Column.cshtml" />
     <Content Include="Views\ViewerLayouts\Tile-1-Column.cshtml" />
@@ -51,6 +56,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.01.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.00.json" />
   </ItemGroup>
 

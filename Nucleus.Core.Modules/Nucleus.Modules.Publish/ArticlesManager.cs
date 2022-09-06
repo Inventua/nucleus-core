@@ -148,7 +148,7 @@ namespace Nucleus.Modules.Publish
 		}
 
 		/// <summary>
-		/// List all <see cref="Article"/>s within the specified site.
+		/// List all <see cref="Article"/>s for the specified module.
 		/// </summary>
 		/// <param name="site"></param>
 		/// <returns></returns>
@@ -175,6 +175,38 @@ namespace Nucleus.Modules.Publish
 					await ReadArticleAttachments (site, article);
 					//ReadArticleCategories(article);
 				}
+				return results;
+			}
+		}
+
+		/// <summary>
+		/// List all <see cref="Article"/>s for the specified module which match the specified filter.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <returns></returns>
+		public async Task<PagedResult<Article>> List(Site site, PageModule module, PagingSettings settings, FilterOptions filterOptions)
+		{
+			using (IArticlesDataProvider provider = this.DataProviderFactory.CreateProvider<IArticlesDataProvider>())
+			{
+				PagedResult<Article> results = await provider.List(module, settings, filterOptions);
+
+				foreach (Article article in results.Items)
+				{
+					try
+					{
+						if (article.ImageFile != null && article.ImageFile.Id != Guid.Empty)
+						{
+							article.ImageFile = await this.FileSystemManager.GetFile(site, article.ImageFile.Id);
+						}
+					}
+					catch (System.IO.FileNotFoundException)
+					{
+
+					}
+
+					await ReadArticleAttachments(site, article);
+				}
+
 				return results;
 			}
 		}

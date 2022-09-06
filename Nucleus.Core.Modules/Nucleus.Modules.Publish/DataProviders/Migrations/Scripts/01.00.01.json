@@ -1,0 +1,57 @@
+{
+	"schemaName": "Nucleus.Modules.Publish",
+	"version": "01.00.01",
+	"operations": [
+		{
+			"createTable": {
+				"name": "PublishHeadlinesFilterCategories",
+				"columns": [
+					{
+						"name": "ModuleId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "CategoryListItemId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_PublishHeadlinesFilterCategories",
+					"isclustered": true,
+					"columns": [ "ModuleId", "CategoryListItemId" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_PublishHeadlinesFilterCategories_ModuleId",
+						"Columns": [ "ModuleId" ],
+						"PrincipalTable": "PageModules",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		}
+	]
+}

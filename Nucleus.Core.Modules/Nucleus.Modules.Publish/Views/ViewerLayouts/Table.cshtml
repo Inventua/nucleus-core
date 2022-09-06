@@ -15,8 +15,8 @@
 		{
 			<tr>
 				<td class="title">
-					@Html.AddEditingControls(@article.Id)
-					<a href="@Url.PageLink(Model.Page, @article.Title.FriendlyEncode())">@article.Title</a>
+					@Html.AddEditingControls(Model.Context, @article.Id)
+					<a href="@Url.PageLink(Model.Context.Page, @article.Title.FriendlyEncode())">@article.Title</a>
 				</td>
 				<td class="summary">
 					@article.Summary
@@ -25,7 +25,7 @@
 					@((article.PublishDate.HasValue ? article.PublishDate.Value.Date : article.DateAdded.Value.Date).FormatDate(this.Context.Request.GetUserTimeZone()))
 				</td>
 				<td class="w-min-fit-content">
-					<a href="@Url.PageLink(Model.Page, @article.Title.FriendlyEncode())" class="btn btn-secondary">Read more</a>
+					<a href="@Url.PageLink(Model.Context.Page, @article.Title.FriendlyEncode())" class="btn btn-secondary">Read more</a>
 				</td>
 			</tr>
 		}

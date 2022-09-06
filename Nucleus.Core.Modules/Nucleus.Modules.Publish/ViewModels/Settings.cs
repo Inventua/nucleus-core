@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Publish.ViewModels
 {
-	public class Settings
+	public class Settings : Models.Settings
 	{
 		public IList<Models.Article> Articles { get; set; }
 		public IEnumerable<List> Lists { get; set; }
 		public List CategoryList { get; set; }
-		public string Layout { get; set; }
+		//public string Layout { get; set; }
 		public List<string> Layouts { get; set; }
 	}
 }

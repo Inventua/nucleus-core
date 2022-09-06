@@ -6,7 +6,7 @@
   <description>
 		Combined news, blogs and announcements module.
 	</description>
-  <compatibility minVersion="1.0.0.0" maxVersion="*" />
+  <compatibility minVersion="1.0.1.0" maxVersion="*" />
   <components>
     <component folderName="Publish" optional="false">
       <moduleDefinition id="20af00b8-1d72-4c94-bce7-b175e0b173af">
@@ -14,6 +14,15 @@
         <extension>Publish</extension>
         <viewController>Publish</viewController>
         <settingsController>Admin</settingsController>
+        <viewAction>Index</viewAction>
+        <editAction>Settings</editAction>
+        <categories>Content</categories>
+      </moduleDefinition>
+      <moduleDefinition id="0E5D1826-045D-4F65-B753-F81563A01DD6">
+        <friendlyName>Publish: Headlines</friendlyName>
+        <extension>Publish</extension>
+        <viewController>Headlines</viewController>
+        <settingsController>HeadlinesAdmin</settingsController>
         <viewAction>Index</viewAction>
         <editAction>Settings</editAction>
         <categories>Content</categories>
@@ -30,6 +39,8 @@
         <file name="Settings.cshtml" />
         <file name="Editor.cshtml" />
         <file name="ViewArticle.cshtml" />
+        <file name="HeadlinesSettings.cshtml" />
+        <file name="HeadlinesViewer.cshtml" />
         <folder name="ViewerLayouts">
           <file name="Table.cshtml" />
           <file name="Tile-1-Column.cshtml" />

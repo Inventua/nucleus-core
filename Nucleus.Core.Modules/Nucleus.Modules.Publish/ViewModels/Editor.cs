@@ -18,7 +18,7 @@ namespace Nucleus.Modules.Publish.ViewModels
 		public Models.Article Article { get; set; }
 		
 		public IEnumerable<List> Lists { get; set; }
-		public List<CategorySelection> Categories { get; set; } = new();	
+		public List<ArticleCategorySelection> Categories { get; set; } = new();	
 		public File SelectedAttachmentFile { get; set; }
 
 	}

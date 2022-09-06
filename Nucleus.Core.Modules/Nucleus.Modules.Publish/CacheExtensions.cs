@@ -15,5 +15,9 @@ namespace Nucleus.Modules.Publish
 		{
 			return cacheManager.Get<Guid, Article>();
 		}
+		public static CacheCollection<Guid, FilterOptions> HeadlinesFilterOptionsCache(this ICacheManager cacheManager)
+		{
+			return cacheManager.Get<Guid, FilterOptions>();
+		}
 	}
 }

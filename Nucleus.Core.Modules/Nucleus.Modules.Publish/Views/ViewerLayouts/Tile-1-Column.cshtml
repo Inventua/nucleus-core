@@ -9,7 +9,7 @@
 	@foreach (var article in Model.Articles.Items)
 	{
 		<div class="Article">
-			@Html.AddEditingControls(@article.Id)
+			@Html.AddEditingControls(Model.Context, @article.Id)
 			<h2 class="title">
 				@article.Title
 			</h2>
@@ -44,7 +44,7 @@
 				</div>
 			}
 			<div class="nucleus-button-row">
-				<a href="@Url.PageLink(Model.Page, @article.Title.FriendlyEncode())" class="btn btn-secondary">Read more</a>
+				<a href="@Url.PageLink(Model.Context.Page, @article.Title.FriendlyEncode())" class="btn btn-secondary">Read more</a>
 			</div>
 		</div>
 	}

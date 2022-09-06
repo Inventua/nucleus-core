@@ -10,11 +10,11 @@ namespace Nucleus.Modules.AcceptTerms.Models
 {
   public class Settings
   {
-    public const string MODULESETTING_TITLE = "acceptterms:title";
-    public const string MODULESETTING_AGREEMENT_BODY = "acceptterms:agreementbody";
-		public const string MODULESETTING_ACCEPTTEXT = "acceptterms:accepttext";
-		public const string MODULESETTING_CANCELTEXT = "acceptterms:canceltext";
-    public const string MODULESETTING_EFFECTIVEDATE = "acceptterms:effectivedate";
+    private const string MODULESETTING_TITLE = "acceptterms:title";
+    private const string MODULESETTING_AGREEMENT_BODY = "acceptterms:agreementbody";
+    private const string MODULESETTING_ACCEPTTEXT = "acceptterms:accepttext";
+    private const string MODULESETTING_CANCELTEXT = "acceptterms:canceltext";
+    private const string MODULESETTING_EFFECTIVEDATE = "acceptterms:effectivedate";
 
     public string Title { get; set; }
 
@@ -26,7 +26,7 @@ namespace Nucleus.Modules.AcceptTerms.Models
 
     public DateTime? EffectiveDate { get; set; }
 
-    public void ReadSettings(PageModule module, TimeZoneInfo userTimeZoneInfo)
+    public void GetSettings(PageModule module, TimeZoneInfo userTimeZoneInfo)
     {
       this.Title = module.ModuleSettings.Get(MODULESETTING_TITLE, "");
       this.AcceptText = module.ModuleSettings.Get(MODULESETTING_ACCEPTTEXT, "Accept");
@@ -42,6 +42,16 @@ namespace Nucleus.Modules.AcceptTerms.Models
       {
         this.EffectiveDate = null;
       }
+    }
+
+    public void SetSettings(PageModule module, TimeZoneInfo userTimeZoneInfo)
+    {
+      DateTime? effectiveDateUtc = (this.EffectiveDate.HasValue ? System.TimeZoneInfo.ConvertTimeToUtc(this.EffectiveDate.Value, userTimeZoneInfo) : (DateTime?)null);
+
+      module.ModuleSettings.Set(Models.Settings.MODULESETTING_TITLE, this.Title);
+      module.ModuleSettings.Set(Models.Settings.MODULESETTING_ACCEPTTEXT, this.AcceptText);
+      module.ModuleSettings.Set(Models.Settings.MODULESETTING_CANCELTEXT, this.CancelText);
+      module.ModuleSettings.Set(Models.Settings.MODULESETTING_EFFECTIVEDATE, effectiveDateUtc);
     }
   }
 }

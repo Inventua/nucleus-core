@@ -87,14 +87,14 @@
 						{
 							<label>
 								@Html.CheckBoxFor(model => model.Categories[categoryCount].IsSelected)
-							@Html.HiddenFor(model => model.Categories[categoryCount].Category.CategoryListItem.Id)
-							@Html.HiddenFor(model => model.Categories[categoryCount].Category.CategoryListItem.Name)
-							<span>@Model.Categories[categoryCount].Category.CategoryListItem.Name</span>
-						</label>
-					}
-				</div>
-			</fieldset>
-		</TabPanel>
+								@Html.HiddenFor(model => model.Categories[categoryCount].Category.CategoryListItem.Id)
+								@Html.HiddenFor(model => model.Categories[categoryCount].Category.CategoryListItem.Name)
+								<span>@Model.Categories[categoryCount].Category.CategoryListItem.Name</span>
+							</label>
+						}
+					</div>
+				</fieldset>
+			</TabPanel>
 		}
 		<TabPanel id="article-attachments">
 			<fieldset role="group" aria-labelledby="heading">

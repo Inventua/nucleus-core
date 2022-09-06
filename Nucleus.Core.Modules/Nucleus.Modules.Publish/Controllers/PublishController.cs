@@ -73,7 +73,7 @@ namespace Nucleus.Modules.Publish.Controllers
 
 			ModelState.Clear();
 
-			viewModel.Page = this.Context.Page;
+			viewModel.Context = this.Context;
 			viewModel.ModuleId = this.Context.Module.Id;
 			viewModel.Layout = $"ViewerLayouts/{this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table")}.cshtml";
 			viewModel.Articles = await this.ArticlesManager.List(this.Context.Site, this.Context.Module, settings);

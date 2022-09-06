@@ -175,7 +175,8 @@ namespace Nucleus.Web
 					// We set KestrelServerOptions options.Limits.MaxRequestBodySize to unlimited because the exception that it generates 
 					// (Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException) causes problems with exception handling.  The other limits
 					// encapsulate this limit anyway, and provide better error messages.
-					services.Configure<KestrelServerOptions>(options => { options.Limits.MaxRequestBodySize = long.MaxValue; });
+					// https://github.com/dotnet/aspnetcore/issues/23949
+					services.Configure<KestrelServerOptions>(options => { options.Limits.MaxRequestBodySize = null; });
 				}
 
 				services.Logger().LogInformation("Adding Security Headers Middleware");

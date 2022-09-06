@@ -20,7 +20,8 @@ namespace Nucleus.ViewFeatures.TagHelpers
 	/// Renders a progress control.
 	/// </summary>	
 	/// <remarks>
-	/// If the site does not have a configured logo, nothing is rendered.
+	/// shared.css has built-in css styles for a progress control with class "UploadProgress".  A progress element with 
+	/// any other class name will require custom styling.
 	/// </remarks>
 	[HtmlTargetElement("Progress")]
 	public class ProgressTagHelper : TagHelper

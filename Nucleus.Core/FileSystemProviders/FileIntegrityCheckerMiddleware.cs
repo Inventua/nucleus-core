@@ -20,6 +20,7 @@ namespace Nucleus.Core.FileSystemProviders
 		private IOptions<FileSystemProviderFactoryOptions> Options { get; }
 		private ILogger<FileIntegrityCheckerMiddleware> Logger { get; }
 		private Context Context { get; }
+		private const long EXTENSIONS_MAX_SIZE = 67108864;
 
 		public FileIntegrityCheckerMiddleware(IOptions<FileSystemProviderFactoryOptions> options, Context context, ILogger<FileIntegrityCheckerMiddleware> logger)
 		{
@@ -32,6 +33,18 @@ namespace Nucleus.Core.FileSystemProviders
 		{
 			if (context.Request.HasFormContentType && (context.Request.Path != $"/{RoutingConstants.ERROR_ROUTE_PATH}"))
 			{
+				// Special case for the extensions installer: Increase maximum request size to 64mb if it is less than that.
+				// This code is required because reading the file bytes indirectly sets IHttpMaxRequestBodySizeFeature.IsReadOnly
+				// to true, which prevents the RequestSizeLimitAttribute from working.
+				if (context.Request.Path.Equals("/admin/extensions/upload", StringComparison.OrdinalIgnoreCase))
+				{
+					Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature max = context.Features.Get<Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature>();
+					if (max != null && max.MaxRequestBodySize.HasValue && max.MaxRequestBodySize.Value < EXTENSIONS_MAX_SIZE)
+					{
+						max.MaxRequestBodySize = EXTENSIONS_MAX_SIZE;
+					}
+				}
+
 				foreach (IFormFile file in context.Request.Form.Files)
 				{
 					if (context.User.IsInRole(this.Context.Site.AnonymousUsersRole.Name))

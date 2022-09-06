@@ -39,7 +39,11 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		[RequestSizeLimit(67108864)] // 64mb		
+		// This doesn't work & generates a warning: "A request body size limit could not be applied. The IHttpRequestBodySizeFeature for the server is read-only."
+		// because the FileIntegrityCheckerMiddleware reads the file in order to check a file signature, which (indirectly) sets 
+		// IHttpMaxRequestBodySizeFeature.IsReadOnly to true.  Code to handle this route as a special case has been added to 
+		// the core FileIntegrityCheckerMiddleware class.
+		// [RequestSizeLimit(67108864)] 
 		public async Task<ActionResult> Upload([FromForm] IFormFile extensionFile)
 		{
 			ViewModels.Admin.Extensions viewModel = new();
@@ -68,30 +72,6 @@ namespace Nucleus.Web.Controllers.Admin
 									SetMessages(viewModel, result.Messages);
 									return View("Complete", viewModel);
 								}
-								//using (ExtensionInstaller installer = this.ExtensionManager.CreateInstaller(package))
-								//{
-
-								//if (await installer.IsValid())
-								//{
-								//	viewModel.FileId = await installer.SaveTempFile();// await ExtensionManager.SaveTempFile(installer.GetArchiveFileStream());
-								//	viewModel.Package = await installer.GetPackage();
-								//	System.IO.Stream readmeStream = await installer.GetFileStream("readme.txt");
-
-								//	if (readmeStream != null)
-								//	{
-								//		readmeStream.Position = 0;
-								//		using (StreamReader reader = new(readmeStream))
-								//		{
-								//			viewModel.Readme = reader.ReadToEnd();
-								//		}
-								//	}
-								//}
-								//else
-								//{
-								//	SetMessages(viewModel, installer.ModelState);
-								//	return View("Complete", viewModel);
-								//}
-								//}
 							}
 						}
 						catch (Exception ex)
@@ -113,7 +93,6 @@ namespace Nucleus.Web.Controllers.Admin
 			else
 			{
 				// When there is a problem receiving the uploaded file, the error is in ModelState
-				//return BadRequest(ControllerContext.ModelState);
 				SetMessages(viewModel, ControllerContext.ModelState);
 				return View("Complete", viewModel);
 			}
@@ -148,11 +127,6 @@ namespace Nucleus.Web.Controllers.Admin
 				{
 					await this.ExtensionManager.InstallExtension(viewModel.FileId);
 					ExtensionManager.DeleteTempFile(viewModel.FileId);
-					//using (ExtensionInstaller installer = this.ExtensionManager.CreateInstaller(viewModel.FileId))
-					//{
-					//	await installer.InstallExtension();
-					//	ExtensionManager.DeleteTempFile(viewModel.FileId);
-					//}
 				}
 				catch (Exception ex)
 				{
@@ -200,10 +174,6 @@ namespace Nucleus.Web.Controllers.Admin
 			try
 			{
 				this.ExtensionManager.UninstallExtension(uninstallPackage);
-				//using (ExtensionInstaller installer = this.ExtensionManager.CreateInstaller(uninstallPackage))
-				//{
-				//	installer.UninstallExtension();
-				//}
 			}
 			catch (Exception ex)
 			{

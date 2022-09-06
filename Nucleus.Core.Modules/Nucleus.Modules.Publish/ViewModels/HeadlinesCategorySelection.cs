@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Publish.ViewModels
 {
-	public class CategorySelection
+	public class HeadlinesCategorySelection
 	{
 		public Boolean IsSelected { get; set; }
-		public Models.Category Category { get; set; }
+		public Nucleus.Abstractions.Models.ListItem Category { get; set; }
 	}
 }

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Extensions;
+using Nucleus.Modules.Publish.Models;
 
 namespace Nucleus.Modules.Publish.Controllers
 {
@@ -26,8 +27,8 @@ namespace Nucleus.Modules.Publish.Controllers
 		private IFileSystemManager FileSystemManager { get; }
 		private IWebHostEnvironment WebHostEnvironment { get; }
 
-		private const string MODULESETTING_CATEGORYLIST_ID = "articles:categorylistid";
-		private const string MODULESETTING_LAYOUT = "articles:layout";
+		//private const string MODULESETTING_CATEGORYLIST_ID = "articles:categorylistid";
+		//private const string MODULESETTING_LAYOUT = "articles:layout";
 
 		public AdminController(IWebHostEnvironment webHostEnvironment, Context Context, IPageModuleManager pageModuleManager, ArticlesManager articlesManager, IListManager listManager, IFileSystemManager fileSystemManager)
 		{
@@ -84,9 +85,7 @@ namespace Nucleus.Modules.Publish.Controllers
 		[HttpPost]
 		public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
 		{
-			this.Context.Module.ModuleSettings.Set(MODULESETTING_CATEGORYLIST_ID, viewModel.CategoryList.Id);
-			this.Context.Module.ModuleSettings.Set(MODULESETTING_LAYOUT, viewModel.Layout);
-
+			viewModel.SetSettings(this.Context.Module);
 			await this.PageModuleManager.SaveSettings(this.Context.Module);
 
 			return Json(new { Title = "Save Settings", Message = "Settings saved." });
@@ -122,7 +121,7 @@ namespace Nucleus.Modules.Publish.Controllers
 		[HttpPost]
 		public async Task<ActionResult> SaveArticle(ViewModels.Editor viewModel)
 		{
-			foreach (ViewModels.CategorySelection selection in viewModel.Categories)
+			foreach (ViewModels.ArticleCategorySelection selection in viewModel.Categories)
 			{
 				if (selection.IsSelected)
 				{
@@ -142,6 +141,16 @@ namespace Nucleus.Modules.Publish.Controllers
 						viewModel.Article.Categories.Remove(existing);
 					}
 				}
+			}
+
+			if (viewModel.Article.PublishDate.HasValue)
+			{
+				viewModel.Article.PublishDate = TimeZoneInfo.ConvertTimeToUtc(viewModel.Article.PublishDate.Value, this.ControllerContext.HttpContext.Request.GetUserTimeZone());
+			}
+
+			if (viewModel.Article.ExpireDate.HasValue)
+			{
+				viewModel.Article.ExpireDate = TimeZoneInfo.ConvertTimeToUtc(viewModel.Article.ExpireDate.Value, this.ControllerContext.HttpContext.Request.GetUserTimeZone());
 			}
 
 			await this.ArticlesManager.Save(this.Context.Module, viewModel.Article);
@@ -247,11 +256,14 @@ namespace Nucleus.Modules.Publish.Controllers
 					viewModel = new();
 				}
 
+				viewModel.GetSettings(this.Context.Module);
+
 				viewModel.Articles = await this.ArticlesManager.List(this.Context.Module);
 				viewModel.Lists = await this.ListManager.List(this.Context.Site);
-				viewModel.CategoryList = await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(MODULESETTING_CATEGORYLIST_ID, Guid.Empty));
-				viewModel.Layout = this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table");
-
+				//viewModel.CategoryList = await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(MODULESETTING_CATEGORYLIST_ID, Guid.Empty));
+				//viewModel.Layout = this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table");
+				viewModel.CategoryList = await this.ListManager.Get(viewModel.CategoryListId);
+				
 				viewModel.Layouts = new();
 				foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{RoutingConstants.EXTENSIONS_ROUTE_PATH}\\Publish\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout=>layout))
 				{
@@ -283,6 +295,15 @@ namespace Nucleus.Modules.Publish.Controllers
 			if (id != Guid.Empty)
 			{
 				viewModel.Article = await this.ArticlesManager.Get(this.Context.Site, id);
+
+				if (viewModel.Article.PublishDate.HasValue)
+				{
+					viewModel.Article.PublishDate = TimeZoneInfo.ConvertTimeFromUtc(viewModel.Article.PublishDate.Value, this.ControllerContext.HttpContext.Request.GetUserTimeZone());				
+				}
+				if (viewModel.Article.ExpireDate.HasValue)
+				{
+					viewModel.Article.ExpireDate = TimeZoneInfo.ConvertTimeFromUtc(viewModel.Article.ExpireDate.Value, this.ControllerContext.HttpContext.Request.GetUserTimeZone());
+				}
 			}
 			else
 			{
@@ -303,10 +324,12 @@ namespace Nucleus.Modules.Publish.Controllers
 
 		private async Task GetCategories(ViewModels.Editor viewModel)
 		{
-			Guid categoryListId = this.Context.Module.ModuleSettings.Get(MODULESETTING_CATEGORYLIST_ID, Guid.Empty);
-			if (categoryListId != Guid.Empty)
+			Settings settings = new ViewModels.Settings();
+			settings.GetSettings(this.Context.Module);
+
+			if (settings.CategoryListId != Guid.Empty)
 			{
-				List categoryList = await this.ListManager.Get(categoryListId);
+				List categoryList = await this.ListManager.Get(settings.CategoryListId);
 
 				if (categoryList != null)
 				{
@@ -314,7 +337,7 @@ namespace Nucleus.Modules.Publish.Controllers
 
 					foreach (var item in categoryList.Items)
 					{
-						ViewModels.CategorySelection selection = new();
+						ViewModels.ArticleCategorySelection selection = new();
 
 						selection.Category = viewModel.Article.Categories.Where(category => category.CategoryListItem.Id == item.Id).FirstOrDefault();
 						if (selection.Category != null)

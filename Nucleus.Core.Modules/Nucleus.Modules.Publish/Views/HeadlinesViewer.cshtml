@@ -1,0 +1,14 @@
+﻿@model Nucleus.Modules.Publish.ViewModels.HeadlinesViewer
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Publish.ViewModels
+@Html.AddStyle("~!/../viewer.css")
+@using (Html.BeginNucleusForm("Index", "Headlines", FormMethod.Post, new { @data_target = "form.parent()" }))
+{
+	@if (Model.Articles != null)
+	{
+		@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.Articles, propertyName = "Articles" })
+		@await Html.PartialAsync(@Model.Layout, Model)
+	}
+}

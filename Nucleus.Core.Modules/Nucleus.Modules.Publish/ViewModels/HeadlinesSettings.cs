@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Modules.Publish.Models;
 using System;
@@ -7,16 +8,15 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Nucleus.Abstractions.Models;
-using Nucleus.Abstractions.Models.Paging;
 
 namespace Nucleus.Modules.Publish.ViewModels
 {
-	public class Viewer
+	public class HeadlinesSettings : Models.HeadlinesSettings
 	{
-		public Context Context { get; set; }
-		public Guid ModuleId { get; set; }
-		public PagedResult<Models.Article> Articles { get; set; }
-		public string Layout { get; set; }
-	}
+		public List<HeadlinesCategorySelection> Categories { get; set; } = new();
+
+		
+		public List<string> Layouts { get; set; }
+
+  }
 }

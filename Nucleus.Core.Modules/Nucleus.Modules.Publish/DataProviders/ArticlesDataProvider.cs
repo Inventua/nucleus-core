@@ -25,6 +25,7 @@ namespace Nucleus.Modules.Publish.DataProviders
 			this.Context = context;
 		}
 
+		#region "    IArticlesDataProvider    "
 		public async Task<Article> Get(Guid id)
 		{
 			return await this.Context.Articles
@@ -70,8 +71,8 @@ namespace Nucleus.Modules.Publish.DataProviders
 				(
 					article => EF.Property<Guid>(article, "ModuleId") == pageModule.Id &&
 					article.Enabled &&
-					(article.PublishDate == null || article.PublishDate.Value >= DateTime.UtcNow) &&
-					(article.ExpireDate == null || article.ExpireDate.Value <= DateTime.UtcNow)
+					(article.PublishDate == null || article.PublishDate.Value <= DateTime.UtcNow) &&
+					(article.ExpireDate == null || article.ExpireDate.Value >= DateTime.UtcNow)
 				);
 
 
@@ -103,9 +104,6 @@ namespace Nucleus.Modules.Publish.DataProviders
 			this.Context.Attach(article);
 			this.Context.Entry(article).Property("ModuleId").CurrentValue = pageModule.Id;
 			this.Context.Entry(article).Property("EncodedTitle").CurrentValue = article.Title.FriendlyEncode();
-
-			this.Context.Entry(article).Property(article => article.PublishDate).CurrentValue = article.PublishDate.HasValue ? article.PublishDate.Value.ToUniversalTime() : null;
-			this.Context.Entry(article).Property(article => article.ExpireDate).CurrentValue = article.ExpireDate.HasValue ? article.ExpireDate.Value.ToUniversalTime() : null;
 
 			if (isNew)
 			{
@@ -264,5 +262,12 @@ namespace Nucleus.Modules.Publish.DataProviders
 
 		}
 
-	}
+    public Task<PagedResult<Article>> List(PageModule module, PagingSettings settings, FilterOptions filters)
+    {
+      throw new NotImplementedException();
+    }
+#endregion
+
+		
+  }
 }

@@ -1,0 +1,68 @@
+﻿@model Nucleus.Modules.Publish.ViewModels.HeadlinesSettings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+@using (Html.BeginNucleusForm("Settings", "HeadlinesAdmin", "Publish", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+	<Tab>
+		<TabItem target="#headlines-settings" caption="Headlines" active="true"></TabItem>
+	</Tab>
+
+	<TabContent>
+		<TabPanel id="headlines-settings" active="true">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Settings</h2>
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Linked Module" helptext="Select the published module instance that this module reads data from.">
+						@Html.DropDownListFor(model => model.LinkedModuleId, new SelectList(Model.ModuleInstances, "ModuleId", "Caption"), "(not selected)")
+					</SettingsControl>
+					<SettingsControl caption="Layout" helptext="Display layout.">
+						@Html.DropDownListFor(model => model.Layout, new SelectList(Model.Layouts))
+					</SettingsControl>
+				</div>
+			</fieldset>
+
+			<fieldset role="group" aria-labelledby="heading">
+				<h2>Filters</h2>
+				<SettingsControl caption="Categories" helptext="Display articles from selected categories. ">
+					<div class="headlines-categories">
+						@for (var categoryCount = 0; categoryCount < Model.Categories.Count; categoryCount++)
+						{
+							<label>
+								@Html.CheckBoxFor(model => model.Categories[categoryCount].IsSelected)
+								@Html.HiddenFor(model => model.Categories[categoryCount].Category.Id)
+								@Html.HiddenFor(model => model.Categories[categoryCount].Category.Name)
+								<span>@Model.Categories[categoryCount].Category.Name</span>
+							</label>
+						}
+					</div>
+				</SettingsControl>
+
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Featured?" helptext="Featured articles are shown at the top of the list." rendermode="LabelLast" class="inner-inline">
+						@Html.CheckBoxFor(model => model.FeaturedOnly, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+
+					<SettingsControl caption="Number of articles shown" helptext="Maximum number of articles shown on list." class="inner-inline">
+						@Html.DropDownListFor(model => model.NumberOfArticles, new SelectList(Model.DisplaySizes))
+					</SettingsControl>
+				</div>
+
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Published Date Range" helptext="Article published date range.">
+						@Html.DropDownListFor(model => model.PublishedDateRange, Html.GetEnumSelectList<Nucleus.Modules.Publish.ViewModels.HeadlinesSettings.PublishedDateRanges>())
+					</SettingsControl>
+					<SettingsControl caption="Sort By" helptext="Sorting order of articles." class="inner-inline">
+						@Html.DropDownListFor(model => model.SortBy, Html.GetEnumSelectList<Nucleus.Modules.Publish.ViewModels.HeadlinesSettings.SortingFields>())
+					</SettingsControl>
+				</div>
+			</fieldset>
+		</TabPanel>
+	</TabContent>
+
+	<div class="nucleus-form-tools">
+		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "HeadlinesAdmin", "Publish"), new { })
+	</div>
+}

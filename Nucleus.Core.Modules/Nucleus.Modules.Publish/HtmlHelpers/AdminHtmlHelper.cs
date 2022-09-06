@@ -17,9 +17,9 @@ namespace Nucleus.Modules.Publish.HtmlHelpers
 {
 	public static class AdminHtmlHelper
 	{
-		public static IHtmlContent AddEditingControls(this IHtmlHelper htmlHelper, Guid Id)
+		public static IHtmlContent AddEditingControls(this IHtmlHelper htmlHelper, Context context, Guid articleId)
 		{
-			Context context = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<Context>();
+			//Context context = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<Context>();
 			Boolean isEditing = htmlHelper.ViewContext.HttpContext.User.IsEditing(htmlHelper.ViewContext?.HttpContext, context.Site, context.Page, context.Module);					
 			
 			if (isEditing)
@@ -28,7 +28,13 @@ namespace Nucleus.Modules.Publish.HtmlHelpers
 
 				TagBuilder editorBuilder = new("div");
 				editorBuilder.AddCssClass("nucleus-inline-edit-controls justify-content-start");
-				editorBuilder.InnerHtml.AppendHtml(context.Module.BuildEditButton("&#xe3c9;", "Edit", urlHelper.NucleusAction("Edit", "Admin", "Publish", new { Id = Id }), null));
+				editorBuilder.InnerHtml.AppendHtml(
+					context.Module.BuildEditButton(
+						"&#xe3c9;", 
+						"Edit", 
+						urlHelper.NucleusAction("Edit", "Admin", "Publish", new { Id = articleId, mid = context.Module.Id }), 
+						null)
+					);
 
 				return editorBuilder;
 			}

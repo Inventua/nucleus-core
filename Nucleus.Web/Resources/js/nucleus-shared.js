@@ -1034,9 +1034,6 @@ function _Page()
 				focusableElement.first().focus();
 			}
 		}
-
-		// adjust dates from UTC to local
-		_setupDateFields(target);
 	}
 
 	// Remove duplicate .modal-backdrop elements with the same parent.  When we do a partial render and replace/re-open a modal, 
@@ -1066,29 +1063,6 @@ function _Page()
 		var viewportBottom = viewportTop + jQuery(window).height();
 		return elementBottom > viewportTop && elementTop < viewportBottom;
 	};
-
-	function _setupDateFields(target)
-	{
-		// .net model binding serializes DateTimeOffset to a format which datetime-local fields don't understand, so we have to set 
-		// a custom attribute to the required value & convert it here.  
-		target.find('input[type=datetime-local]').each(function (index, ui)
-		{
-			var element = jQuery(ui);
-			var value = element.attr('data-value');
-
-			if (typeof (value) !== 'undefined' && value !== '')
-			{
-				// using .toISOString gets us the right format for datetime-local, but outputs the date in UTC time (we want local time), so we
-				// work around by subtracting the local timezone offset first
-				var offset_ms = new Date().getTimezoneOffset() * 60000;
-				var newValue = new Date(new Date(value).getTime() - offset_ms);
-				if (newValue !== 'Invalid Date')
-				{
-					element.val(newValue.toISOString().slice(0, 16));
-				}
-			}
-		});
-	}
 
 	function _initializeControls(target, data, status, request)
 	{

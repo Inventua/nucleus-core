@@ -8,7 +8,7 @@
 <div class="FileSystemManager">
 	<h2 class="nucleus-control-panel-heading">Files</h2>
 
-	@using (Html.BeginAreaForm("Navigate", "FileSystem", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
+	@using (Html.BeginAreaForm("Navigate", "FileSystem", "Admin", FormMethod.Post, new { @class = "d-flex flex-column overflow-auto", @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
 	{
 		<div class="nucleus-form-tools">
 			@Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control nucleus-show-progress nucleus-show-progress-after" })
@@ -18,7 +18,7 @@
 					<text>/</text>
 				}
 				<span>@Model.Folder.Name</span>
-			</label>			
+			</label>
 		</div>
 		@Html.HiddenFor(model => model.SelectedProviderKey)
 		@Html.HiddenFor(model => model.Folder.Id)
@@ -39,17 +39,17 @@
 						<span class="nucleus-material-icon">&#xe2c6;</span> Upload
 					</button>
 					<ul class="dropdown-menu">
-						<li>							
+						<li>
 							<label class="dropdown-item">
 								Single File ...
 								<input type="file" name="mediaFile" class="collapse" formaction="@Url.AreaAction("UploadFile", "FileSystem", "Admin")">
-							</label>							
+							</label>
 						</li>
 						<li>
-							<label class="dropdown-item" >
+							<label class="dropdown-item">
 								Upload and un-zip ZIP archive ...
 								<input type="file" name="archiveFile" accept="application/zip" class="collapse" formaction="@Url.AreaAction("UploadArchive", "FileSystem", "Admin")">
-							</label>							
+							</label>
 						</li>
 					</ul>
 				</div>
@@ -72,15 +72,16 @@
 			@Html.SubmitButton("&#xe897;", "Folder Settings", @Url.AreaAction("EditFolderSettings", "FileSystem", "Admin", new { folderId = Model.Folder.Id }), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary btn-sm" })
 		</div>
 
-		<div>
-			<Progress caption="Uploading file ..." class="UploadProgress"></Progress>
-			@if (!Model.Folder?.Folders.Any() == true && !Model.Folder?.Files.Any() == true)
-			{
-				<div class="alert alert-warning">This folder is empty</div>
-			}
-			else
-			{
-				<table class="FileSystemItems table">
+		<Progress caption="Uploading file ..." class="UploadProgress"></Progress>
+
+		@if (!Model.Folder?.Folders.Any() == true && !Model.Folder?.Files.Any() == true)
+		{
+			<div class="alert alert-warning">This folder is empty</div>
+		}
+		else
+		{
+			<div class="overflow-auto">
+				<table class="FileSystemItems table table-sm">
 					<tr>
 						<th class="nucleus-small-cell" />
 						<th>Name</th>
@@ -127,24 +128,26 @@
 							<td>
 								@if (Model.Folder.Files[fileCount].Width > 0 && Model.Folder.Files[fileCount].Height > 0)
 								{
-									@($"{Model.Folder.Files[fileCount].Width} x {Model.Folder.Files[fileCount].Height}")			
+									@($"{Model.Folder.Files[fileCount].Width} x {Model.Folder.Files[fileCount].Height}")
 								}
 							</td>
 						</tr>
 					}
 				</table>
-			}
-		</div>
+			</div>
+
+		}
+
 	}
 </div>
 
 <script>
 	jQuery('.providerKey').on('change', function (event)
 	{
-		var newEvent = jQuery.Event('submit', { originalEvent: event });
-		jQuery(this).parents('form').first().trigger(newEvent);
+			var newEvent = jQuery.Event('submit', { originalEvent: event });
+			jQuery(this).parents('form').first().trigger(newEvent);
 
-		//jQuery(this).parents('form').submit();
+			//jQuery(this).parents('form').submit();
 	});
 
 </script>

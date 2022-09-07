@@ -187,7 +187,11 @@ namespace Nucleus.Web.Controllers.Admin
 
 			if (!selectedFolders.Any() && !selectedFiles.Any())
 			{
-				return BadRequest("Please select one or more files or folders.");
+				return BadRequest(new ProblemDetails()
+				{
+					Title = "Delete",
+					Detail = "Please select one or more files or folders."
+				});
 			}
 
 			List<string> nonEmptyFolders = new();

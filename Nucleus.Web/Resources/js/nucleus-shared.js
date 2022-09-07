@@ -696,51 +696,59 @@ function _Page()
 		{
 			if (request.status === 400)
 			{
-				// bad request.  Parse ModelState errors		
-				var messages = new Array(request.responseJSON.length);
-				var elementSelector = '';
-
-				// get a list of elements with validation errors
-				for (var prop in request.responseJSON)
+				// bad request.  Can be a ModelState JSON response, or an error message
+				if (typeof request.responseJSON.title !== 'undefined' && typeof request.responseJSON.detail !== 'undefined')
 				{
-					var element = jQuery('[name="' + prop + '"]');
-					if (!element.is('.HtmlEditorControl'))
-					{
-						element.addClass('ValidationError');
-					}
-					else
-					{
-						element.parents('.settings-control').first().addClass('ValidationError');
-					}
-
-					if (elementSelector !== '') elementSelector += ',';
-					elementSelector += '#' + element.attr('id');
+					errorData = request.responseJSON;
 				}
-
-				var elements = jQuery(elementSelector);
-
-				// sort the messages by element ordinal position
-				for (var prop in request.responseJSON)
+				else
 				{
-					var element = jQuery('[name="' + prop + '"]');
-					var index = _getElementIndex(elements, element.attr('id'));
-					if (index !== undefined)
+					// Parse ModelState errors		
+					var messages = new Array(request.responseJSON.length);
+					var elementSelector = '';
+
+					// get a list of elements with validation errors
+					for (var prop in request.responseJSON)
 					{
-						message = request.responseJSON[prop].toString();
-						if (!message.endsWith("."))
+						var element = jQuery('[name="' + prop + '"]');
+						if (!element.is('.HtmlEditorControl'))
 						{
-							message += '.';
+							element.addClass('ValidationError');
 						}
-						messages[index] = '<li>' + message + '</li>';
+						else
+						{
+							element.parents('.settings-control').first().addClass('ValidationError');
+						}
+
+						if (elementSelector !== '') elementSelector += ',';
+						elementSelector += '#' + element.attr('id');
 					}
-				}
 
-				var validationMessage = '<ul>' + messages.join('') + '</ul>';
+					var elements = jQuery(elementSelector);
 
-				errorData = new Object();
-				errorData.title = 'Validation Error';
-				errorData.detail = validationMessage;
-				errorData.statusCode = request.status;
+					// sort the messages by element ordinal position
+					for (var prop in request.responseJSON)
+					{
+						var element = jQuery('[name="' + prop + '"]');
+						var index = _getElementIndex(elements, element.attr('id'));
+						if (index !== undefined)
+						{
+							message = request.responseJSON[prop].toString();
+							if (!message.endsWith("."))
+							{
+								message += '.';
+							}
+							messages[index] = '<li>' + message + '</li>';
+						}
+					}
+
+					var validationMessage = '<ul>' + messages.join('') + '</ul>';
+
+					errorData = new Object();
+					errorData.title = 'Validation Error';
+					errorData.detail = validationMessage;
+					errorData.statusCode = request.status;
+				}				
 			}
 			else
 			{
@@ -767,7 +775,7 @@ function _Page()
 			errorData.statusCode = request.status;
 		}
 
-		_dialog(errorData.title, errorData.detail, 'error')
+		_dialog(errorData.title, errorData.detail, errorData.icon ?? 'error')
 	}
 
 	function _getElementIndex(items, id)

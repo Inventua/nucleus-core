@@ -464,7 +464,7 @@ namespace Nucleus.Data.EntityFramework
 				}
 				catch (Exception ex)
 				{
-					throw new InvalidOperationException($"Migration script error [{script.FullName}]: {migrationCommand.CommandText}", ex);
+					throw new InvalidOperationException($"Migration script error [{script.FullName}]: {migrationCommand.CommandText} {ex.Message}", ex);
 				}
 			}
 

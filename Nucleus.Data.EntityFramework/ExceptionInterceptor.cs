@@ -24,7 +24,7 @@ namespace Nucleus.Data.EntityFramework
       DbUpdateException dbUpdateException = eventData.Exception as DbUpdateException;
       Nucleus.Data.EntityFramework.DbContext dbContext = eventData.Context as Nucleus.Data.EntityFramework.DbContext;
 
-      if (dbContext != null)
+      if (dbUpdateException != null && dbContext != null)
       {
         Nucleus.Data.EntityFramework.DbContextConfigurator contextConfig = (eventData.Context as Nucleus.Data.EntityFramework.DbContext).DbContextConfigurator;
         contextConfig.ParseException(dbUpdateException);

@@ -267,13 +267,15 @@ a *
 .modal-body
 {
   display: flex;  
-}
-
-.modal-auto-size .modal-body
-{
   flex-direction: column;
   justify-content: stretch;
 }
+
+/*.modal-auto-size .modal-body
+{
+  flex-direction: column;
+  justify-content: stretch;
+}*/
 
 .modal-auto-size .modal-content
 {

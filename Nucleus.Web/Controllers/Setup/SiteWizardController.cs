@@ -268,7 +268,6 @@ namespace Nucleus.Web.Controllers.Setup
 
 			foreach (FileInfo extensionPackageFile in InstallableExtensionsFolder().EnumerateFiles("*.zip"))
 			{
-
 				using (Stream extensionStream = extensionPackageFile.OpenRead())
 				{
 					this.Logger?.LogInformation("Validating '{fileName}'.", extensionPackageFile.FullName);
@@ -279,6 +278,22 @@ namespace Nucleus.Web.Controllers.Setup
 						if (extensionResult.IsValid)
 						{
 							ViewModels.Setup.SiteWizard.InstallableExtension installableExtension = new(extensionPackageFile.Name, extensionResult);
+
+							// check for duplicate extensions (different versions in /setup/extensions)
+							ViewModels.Setup.SiteWizard.InstallableExtension existing = installableExtensions.Where(extension => extension.PackageId == installableExtension.PackageId).FirstOrDefault();
+							if (existing != null)
+							{
+								if (existing.PackageVersion > installableExtension.PackageVersion)
+								{
+									// this extension has a later version, replace
+									installableExtensions.Remove(existing);
+								}
+								else 
+								{
+									// this extension does not have a later version, skip
+									break;
+								}
+							}
 
 							installableExtension.ModulesInPackage = extensionResult.Package.components
 								.SelectMany(component => component.Items.OfType<Nucleus.Abstractions.Models.Extensions.moduleDefinition>())

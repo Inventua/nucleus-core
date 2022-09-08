@@ -64,6 +64,8 @@ namespace Nucleus.Web.ViewModels.Setup
 		public class InstallableExtension
 		{
 			//public Nucleus.Abstractions.Models.Extensions.PackageResult PackageInfo { get; set; }
+			public Guid PackageId { get; set; }
+			public System.Version PackageVersion { get; set; }
 			public string Filename { get; set; }
 
 			public string Name { get; set; }
@@ -88,6 +90,9 @@ namespace Nucleus.Web.ViewModels.Setup
 
 			public InstallableExtension(string filename, Nucleus.Abstractions.Models.Extensions.PackageResult packageInfo)
 			{
+				this.PackageId = Guid.Parse(packageInfo.Package.id);
+				this.PackageVersion = System.Version.Parse(packageInfo.Package.version);
+
 				this.Filename = filename;
 
 				this.Name = packageInfo.Package.name;

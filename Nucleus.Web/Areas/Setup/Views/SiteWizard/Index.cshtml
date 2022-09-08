@@ -169,7 +169,7 @@
 											{
 												@Html.CheckBoxFor(model => model.InstallableExtensions[count].IsSelected, Model.InstallableExtensions[count].IsRequired ? disabledAttr : enabledAttr)
 											}
-											<span class="fw-bold">@Model.InstallableExtensions[count].Name</span>
+											<span class="fw-bold">@Model.InstallableExtensions[count].Name</span>@Model.InstallableExtensions[count].PackageVersion
 										</span>
 										<span>@Model.InstallableExtensions[count].Description</span>
 										<span>

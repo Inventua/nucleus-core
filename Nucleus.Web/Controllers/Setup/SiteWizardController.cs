@@ -141,6 +141,16 @@ namespace Nucleus.Web.Controllers.Setup
 			template.Site.Name = viewModel.Site.Name;
 
 			viewModel.Site.DefaultSiteAlias.Id = Guid.NewGuid();
+
+			if (viewModel.Site.DefaultSiteAlias.Alias.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+			{
+				viewModel.Site.DefaultSiteAlias.Alias.Substring("http://".Length);
+			}
+			else if (viewModel.Site.DefaultSiteAlias.Alias.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+			{
+				viewModel.Site.DefaultSiteAlias.Alias.Substring("https://".Length);
+			}
+
 			template.Site.Aliases = new() { viewModel.Site.DefaultSiteAlias };
 			template.Site.DefaultSiteAlias = viewModel.Site.DefaultSiteAlias;
 
@@ -149,8 +159,8 @@ namespace Nucleus.Web.Controllers.Setup
 			template.Site.AnonymousUsersRole = viewModel.Site.AnonymousUsersRole;
 			template.Site.RegisteredUsersRole = viewModel.Site.RegisteredUsersRole;
 
-			template.Site.DefaultContainerDefinition = viewModel.Site.DefaultContainerDefinition;
-			template.Site.DefaultLayoutDefinition = viewModel.Site.DefaultLayoutDefinition;
+			//template.Site.DefaultContainerDefinition = viewModel.Site.DefaultContainerDefinition;
+			//template.Site.DefaultLayoutDefinition = viewModel.Site.DefaultLayoutDefinition;
 			template.Site.HomeDirectory = viewModel.Site.Name;
 
 			viewModel.Site = await this.SiteManager.Import(template);
@@ -341,8 +351,8 @@ namespace Nucleus.Web.Controllers.Setup
 			viewModel.OtherWarnings = otherWarnings.Distinct();
 
 			viewModel.InstallableExtensions = installableExtensions.OrderBy(ext => ext.Name).ToList();
-			viewModel.Layouts = (await this.LayoutManager.List()).InsertDefaultListItem();
-			viewModel.Containers = (await this.ContainerManager.List()).InsertDefaultListItem();
+			//viewModel.Layouts = (await this.LayoutManager.List()).InsertDefaultListItem();
+			//viewModel.Containers = (await this.ContainerManager.List()).InsertDefaultListItem();
 
 			return viewModel;
 		}

@@ -1,11 +1,27 @@
-﻿#site-wizard .modal-body
+﻿#site-wizard .logo
+{
+	position: absolute;
+	right: 1.25rem;
+	width: 81px;
+	height: 90px;
+	animation: rotate-logo 2s ease normal;	
+}
+
+@keyframes rotate-logo { 
+  100% 
+	{ 
+    transform:rotate(360deg); 
+  } 
+}
+
+/*#site-wizard .modal-body
 {
 	background-image: url('../../../../Resources/Images/nucleus.png');
 	background-repeat: no-repeat;
 	background-position: right 1rem top 1rem;
 	
 }
-
+*/
 #site-wizard .tab-content
 {
 	display: flex;
@@ -13,22 +29,47 @@
 	flex-grow: 1;
 	overflow: auto;
 	margin-bottom: 1rem;
+	height: 20rem;
+}
+
+#site-wizard .nav-tabs
+{
+	gap: 0.25rem;
 }
 
 #site-wizard .nav-item
 {
 	max-width: 25%;
+	background-color: #f5f5f5;
+}
+
+#site-wizard .nav-item:hover
+{
+	background-color: #9ac2fd;
+}
+
+#site-wizard .nav-link
+{
+	border-radius: 0;
 }
 
 #site-wizard .installable-package
 {
-	margin-bottom: 0.75rem;
+	margin-bottom: 0.5rem;
+	border: solid 1px #6da7fd;
+	padding: 0.75rem;
+}
+
+#site-wizard .installable-package label
+{
+	display: block;
 }
 
 #site-wizard .installable-package label *
 {
-	display: inline-block;
+	display: flex;
 	vertical-align: middle;
+	gap: 0.5rem;
 }
 
 #site-preflight button

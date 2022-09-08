@@ -30,7 +30,7 @@ namespace Nucleus.Web.ViewModels.Setup
 		[Required(ErrorMessage = "You must enter a System Administrator password")]
 		public string SystemAdminPassword { get; set; }
 
-		[Required(ErrorMessage = "Confirm Password is required")]
+		[Required(ErrorMessage = "You must enter a System Administrator password confirmation")]
 		[Compare(nameof(SystemAdminPassword), ErrorMessage = "The new password and confirm password values must match")]
 		public string SystemAdminConfirmPassword { get; set; }
 
@@ -40,7 +40,7 @@ namespace Nucleus.Web.ViewModels.Setup
 		[Required(ErrorMessage = "You must enter a Site Administrator password")]
 		public string SiteAdminPassword { get; set; }
 
-		[Required(ErrorMessage = "Confirm Password is required")]
+		[Required(ErrorMessage = "You must enter a Site Administrator password confirmation ")]
 		[Compare(nameof(SiteAdminPassword), ErrorMessage = "The new password and confirm password values must match")]
 		public string SiteAdminConfirmPassword { get; set; }
 

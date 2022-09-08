@@ -1189,31 +1189,28 @@ function _Page()
 
 	function _enableEnhancedToolTips(enable)
 	{		
-		if (!enable)
+		jQuery('.settings-control[title]').each(function (index, element)
 		{
-			jQuery('.settings-control[title]').each(function (index, element)
+			if (enable)
 			{
-				if (enable)
-				{
-					jQuery(element).attr('data-bs-toggle', 'tooltip');
-					return new bootstrap.Tooltip(element,
-						{
-							trigger: 'hover',
-							container: 'body',
-							placement: 'bottom',
-							delay: 300
-						});
-				}
-				else
-				{
-					jQuery(element)
-						.attr('title', jQuery(element).attr('data-bs-original-title'))
-						.removeAttr('data-bs-toggle', 'tooltip');
+				jQuery(element).attr('data-bs-toggle', 'tooltip');
+				return new bootstrap.Tooltip(element,
+					{
+						trigger: 'hover',
+						container: 'body',
+						placement: 'bottom',
+						delay: 300
+					});
+			}
+			else
+			{
+				jQuery(element)
+					.attr('title', jQuery(element).attr('data-bs-original-title'))
+					.removeAttr('data-bs-toggle', 'tooltip');
 
-					bootstrap.Tooltip.getInstance(element).disable();
-				}
-			});
-		}		
+				bootstrap.Tooltip.getInstance(element).disable();
+			}
+		});
 	}
 
 

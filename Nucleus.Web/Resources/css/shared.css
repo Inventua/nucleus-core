@@ -19,6 +19,7 @@ body
   font-display: auto;
 }
 
+/* set max width for bootstrap tooltips */
 .tooltip-inner
 {
   max-width: 24rem;

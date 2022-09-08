@@ -748,6 +748,7 @@ function _Page()
 					errorData.title = 'Validation Error';
 					errorData.detail = validationMessage;
 					errorData.statusCode = request.status;
+					errorData.icon = "warning";
 				}				
 			}
 			else
@@ -846,7 +847,7 @@ function _Page()
 			'        <h5 class="modal-title">' + title + '</h5>' +
 			'        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="' + cancelCaption + '"></button>' +
 			'      </div>' +
-			'      <div class="modal-body">' +
+			'      <div class="modal-body flex-row">' +
 			iconElement +
 			'        <div class="dialog-message">' + message.replace(new RegExp('\n', 'g'), '<br/>') + '</div>' +
 			'      </div>' +
@@ -1194,13 +1195,20 @@ function _Page()
 			if (enable)
 			{
 				jQuery(element).attr('data-bs-toggle', 'tooltip');
-				return new bootstrap.Tooltip(element,
+				var instance = new bootstrap.Tooltip(element,
 					{
 						trigger: 'hover',
-						container: 'body',
 						placement: 'bottom',
 						delay: 300
 					});
+
+				jQuery(document).on('click', function ()
+				{
+					jQuery('.settings-control[data-bs-toggle="tooltip"]').each(function (index, element)
+					{
+						bootstrap.Tooltip.getInstance(element).hide();
+					});
+				});
 			}
 			else
 			{

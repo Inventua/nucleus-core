@@ -520,6 +520,18 @@ namespace Nucleus.Web.Controllers.Admin
 					viewModel.Folder = await this.FileSystemManager.ListFolder(this.Context.Site, folder.Id, "");
 					viewModel.Folder.SortFolders(folder => folder.Name, false);
 					viewModel.Folder.SortFiles(file => file.Name, false);
+
+					Folder ancestor = viewModel.Folder;
+					while (ancestor != null && ancestor.Id != Guid.Empty)
+					{
+						viewModel.Ancestors.Add(ancestor);												
+						if (ancestor.Parent == null || ancestor.Parent.Id == Guid.Empty || ancestor.Parent.Id == ancestor.Id)
+						{
+							break;
+						}
+						ancestor = await this.FileSystemManager.GetFolder(this.Context.Site, ancestor.Parent.Id);
+					}
+					viewModel.Ancestors.Reverse();
 				}
 			}
 

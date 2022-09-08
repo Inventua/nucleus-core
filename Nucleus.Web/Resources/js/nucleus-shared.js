@@ -1199,8 +1199,27 @@ function _Page()
 					{
 						trigger: 'hover',
 						placement: 'bottom',
+						container: element,
 						delay: 300
 					});
+
+				element.addEventListener('shown.bs.tooltip', function ()
+				{
+					/*  override bootstrap/popper positioning, in order to bottom-left align the tooltip, but only inside elements with .settings-control */
+					if (jQuery(this).hasClass('settings-control') && jQuery(this).css('position') == 'relative')
+					{
+						jQuery(this).find('.tooltip').css('transform', 'translateY(' + jQuery(this).height() + 'px)');
+
+						/*jQuery(this).find('.tooltip').css('transform', 'matrix(1, 0, 0, 1, 0, ' + jQuery(this).height() + ')');*/
+
+						/* for settings-controls with class inner-inline and a toggleswitch control, adjust the arrow position */
+						if (jQuery(this).hasClass('inner-inline') && jQuery(this).find('.ToggleSwitch').length > 0)
+						{}
+						/*jQuery(this).find('.tooltip-arrow').css('transform', 'matrix(1, 0, 0, 1, 10, 0)');*/
+						jQuery(this).find('.tooltip-arrow').css('transform', 'translateX(10px)');
+						
+					}
+				});
 
 				jQuery(document).on('click', function ()
 				{

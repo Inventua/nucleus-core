@@ -78,12 +78,16 @@ namespace Nucleus.Core.Managers
 					Folder folder = await this.FileSystemProviderFactory.Get(site, folderData.Provider).GetFolder(folderData.Path);
 					folderData.CopyDatabaseValuesTo(folder);
 
+					if (folder.Parent != null)
+					{
+						Folder parent = await provider.GetFolder(site, folder.Provider, folder.Parent.Path);
+						parent.CopyDatabaseValuesTo(folder.Parent);
+					}
 					return folder;
 				}
 			}
 
 			throw new System.IO.FileNotFoundException();
-
 		}
 
 		/// <summary>

@@ -16,6 +16,9 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public IReadOnlyList<FileSystemProviderInfo> Providers { get; set; }
 		public Folder Folder { get; set; } = new();
+
+		public List<Folder> Ancestors { get; set; } = new();
+
 		public FileSystemItem SelectedItem { get; set; }
 		public Guid SelectedFolderRoleId { get; set; }
 

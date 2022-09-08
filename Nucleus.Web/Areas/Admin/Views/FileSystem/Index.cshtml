@@ -11,14 +11,25 @@
 	@using (Html.BeginAreaForm("Navigate", "FileSystem", "Admin", FormMethod.Post, new { @class = "d-flex flex-column overflow-auto", @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
 	{
 		<div class="nucleus-form-tools">
-			@Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control nucleus-show-progress nucleus-show-progress-after" })
-			<label class="align-self-center ms-1">
-				@if (@Model.Folder.Name != "/")
+			<RemoveWhiteSpace>
+			@Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control ms-1 nucleus-show-progress nucleus-show-progress-after" })
+			<span class="align-self-center ms-1 mt-1">
+				@foreach (var ancestor in Model.Ancestors)				
 				{
-					<text>/</text>
+					@if (ancestor.Name != "/")
+					{
+						<text>&nbsp;/&nbsp;</text>
+						@Html.AreaActionLink(ancestor.Name, "Index", "FileSystem", "Admin", new { folderId = ancestor.Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
+					}	
+					else
+					{
+						<button title="Top level" href="@Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = ancestor.Id })" class="btn btn-sm btn-outline-primary me-1 NavigateLink nucleus-show-progress nucleus-show-progress-after nucleus-material-icon" data-target=".nucleus-adminpage">
+								&#xe2c7;
+						</button>						
+					}
 				}
-				<span>@Model.Folder.Name</span>
-			</label>
+			</span>
+			</RemoveWhiteSpace>
 		</div>
 		@Html.HiddenFor(model => model.SelectedProviderKey)
 		@Html.HiddenFor(model => model.Folder.Id)

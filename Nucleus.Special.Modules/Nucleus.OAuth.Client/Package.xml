@@ -2,7 +2,7 @@
 <package id="2f4b7999-9c15-4afa-9ed0-9549602ba7a5" xmlns="urn:nucleus/schemas/package/1.0">
   <name>OAuth Client</name>
   <version>1.0.0</version>
-  <publisher name="Inventua Pty Ltd" url="http://www.inventua.comn" email="support@inventua.com" />
+  <publisher name="Inventua" url="http://www.inventua.comn" email="support@inventua.com" />
   <description>
 		OAuth Services for Nucleus.
 	</description>

@@ -2,7 +2,7 @@
 <package id="28f54611-c14a-4a98-af7c-6a5a3d62b2e0" xmlns="urn:nucleus/schemas/package/1.0">
   <name>Amazon S3 File System Provider</name>
   <version>1.0.0</version>
-  <publisher name="Inventua Pty Ltd" url="https://www.nucleus-cms.com" email="support@inventua.com" />
+  <publisher name="Inventua" url="https://www.nucleus-cms.com" email="support@inventua.com" />
   <description>
 		Nucleus File system provider for Amazon S3 and compatible cloud storage services.
 	</description>

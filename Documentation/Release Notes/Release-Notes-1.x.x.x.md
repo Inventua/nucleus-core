@@ -3,6 +3,9 @@
 ## Version 1.0.1.0
 6 September 2022
 
+Version 1.0.1 includes administration user interface enhancements, a change to the file system provider interfaces to support the 
+(coming soon) Amazon S3 file system provider, along with other enhancements and bug fixes in the core, and in core modules.
+
 ### System Control Panel
 Commit 7742f9f7
 Added bootstrap table classes to system information table.
@@ -98,7 +101,6 @@ are no sites in the sites table, redirect to the setup wizard.  This is to handl
 mostly a scenario that happens in testing, but it could also happen if a user decided to attach to a different (new) database.
 
 ### General Improvements
-
 Admin User Interface:
 Commit 757a71ca: 
 Added "upload and un-zip" function to file manager, moved file validation into new AllowedFileTypeExtensions class so 
@@ -112,7 +114,6 @@ top of the page.
 Commit 3c9d0df1: File Manager: Added list of selected files and folders in delete confirmation dialog.  Added folder-empty validation.  Added 
 client-side code to nucleus-shared.js to parse a BadRequest with a ProblemDetails response.  Added code to set 
 content-disposition of downloaded files to attachment.
-
 
 Commit cc3b52cc: 
 Updated material icons font to latest version.

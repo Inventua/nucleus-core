@@ -38,6 +38,8 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public Dictionary<string, string> WebServerInformation { get; set; } = new();
 
+		public Dictionary<string, string> LoggingSettingsConfiguration { get; set; } = new();
+
 		public SystemIndex()
 		{
 		}

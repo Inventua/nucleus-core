@@ -1,11 +1,15 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.SystemIndex.LogSettingsViewModel
 <div class="d-flex gap-2 mb-2">
 	@Html.DropDownListFor(model => model.LogFile, new SelectList(Model.LogFiles, "Filename", "Title"), "(select)", new { @class = "LogFile mb-1 flex-grow-1" })
+	<button type="button" title="View Logging Settings" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls=".nucleus-system-logging-configuration" data-bs-toggle="modal" data-bs-target=".nucleus-system-logging-configuration">
+		<span class="nucleus-material-icon">&#xe8b8;</span>
+	</button>
+	
 	<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="collapse" data-bs-target=".log-options">
 		Options <span class="nucleus-material-icon">&#xe5c5;</span>
 	</button>
 
-	<button area-expanded="false" class="btn btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" type="button">
+	<button aria-expanded="false" class="btn btn-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" type="button">
 		<span class="nucleus-material-icon">&#xf090;</span>
 		Download 
 	</button>

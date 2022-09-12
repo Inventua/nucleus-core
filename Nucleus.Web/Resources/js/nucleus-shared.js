@@ -102,7 +102,7 @@ function _Page()
 			_maximizeDialog(this, true);
 		});
 
-		jQuery(document).on('click', '.modal-dialog .modal-header .btn-minimize, .modal-dialog .modal-header .btn-close', function (event)
+		jQuery(document).on('click', '.modal-dialog .modal-header .btn-normalsize, .modal-dialog .modal-header .btn-close', function (event)
 		{
 			_maximizeDialog(this, false);
 		});
@@ -1124,7 +1124,14 @@ function _Page()
 
 			if (typeof (childselector) !== 'undefined')
 			{
-				copyButton[0].CopyTarget = jQuery(element).find(childselector);
+				if (jQuery(element).find(childselector).length > 0)
+				{
+					copyButton[0].CopyTarget = jQuery(element).find(childselector);
+				}
+				else
+				{
+					copyButton[0].CopyTarget = jQuery(element).closest(childselector);
+				}
 			}
 			else
 			{
@@ -1156,7 +1163,7 @@ function _Page()
 		}
 		else
 		{
-			temp.val(jQuery(element)[0].innerText).select();
+			temp.val(jQuery(element)[0].innerText.replace(/[^\x20-\x7E\x0A\x0D]/g, '')).select();
 		}
 		document.execCommand("copy");
 		temp.remove();

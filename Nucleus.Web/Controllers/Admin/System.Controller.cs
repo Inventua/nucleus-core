@@ -71,6 +71,12 @@ namespace Nucleus.Web.Controllers.Admin
 				Uptime = FormatUptime(uptime)
 			};
 
+			IConfigurationSection loggingConfig = this.Configuration.GetSection("Logging:LogLevel");
+			foreach (IConfigurationSection configItem in loggingConfig.GetChildren())
+			{
+				viewModelOutput.LoggingSettingsConfiguration.Add(configItem.Key.Replace("Logging:LogLevel:",""), configItem.Value);
+			}
+
 			viewModelOutput.LogSettings.LogFile = viewModelInput.LogSettings.LogFile;
 			viewModelOutput.LogSettings.LogMessage = "";
 

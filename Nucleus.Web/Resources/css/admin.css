@@ -140,11 +140,6 @@
 	border-collapse: collapse;
 }
 
-/*.nucleus-admin-content pre
-{
-	font-family: monospace;	
-}
-*/
 .nucleus-admin-content table input[type=text]
 {
 	width: 100%;
@@ -778,7 +773,14 @@ ul.nucleus-control-panel-items button
 #system-logs .log-levels, #task-logs .log-levels
 {
 	display: grid;
-	 grid-template-columns: repeat(4, 1fr);
+	grid-template-columns: repeat(4, 1fr);
+}
+
+#system-logs .nucleus-copy-button, #task-logs .nucleus-copy-button
+{
+	position: absolute;
+	right: 1rem;
+	top: 0.25rem;
 }
 
 .nucleus-log-level

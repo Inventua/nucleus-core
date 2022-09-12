@@ -2,7 +2,7 @@
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
-<div class="System">
+<div class="System d-flex flex-column h-100">
 	<h1 class="nucleus-control-panel-heading">System</h1>
 
 	<Tab>
@@ -146,10 +146,10 @@
 		</TabPanel>
 
 		<TabPanel id="system-logs">
-			@using (Html.BeginAreaForm("GetLogFile", "System", "Admin", FormMethod.Post, new { @class = "d-flex flex-column", @data_target = ".LogContent", @autocomplete = "off" }))
+			@using (Html.BeginAreaForm("GetLogFile", "System", "Admin", FormMethod.Post, new { @class = "d-flex flex-column overflow-auto", @data_target = ".LogContent", @autocomplete = "off" }))
 			{
 				@await Html.PartialAsync("_LogSettings", Model.LogSettings)
-				<div class="LogContent">
+				<div class="LogContent d-flex flex-column overflow-auto">
 					@if (String.IsNullOrEmpty(Model.LogSettings.LogMessage))
 					{
 						@Model.LogSettings.LogMessage
@@ -158,6 +158,33 @@
 					@await Html.PartialAsync("_Log", Model.LogSettings)
 				</div>
 			}
+
+			<modal class="nucleus-system-logging-configuration" modal-class="modal-lg" title="Logging Configuration">
+				<div class="alert alert-info">
+					Your current logging settings are listed below.  These settings are typically configured in your 
+					<span class="font-monospace">appSettings.[environment.]json</span>	file.
+				</div>
+				<table class="table table-sm">
+					<tr>
+						<th>Category</th>
+						<th>Level</th>
+					</tr>
+					@foreach (KeyValuePair<string, string> configItem in Model.LoggingSettingsConfiguration)
+					{
+						<tr>
+							@if (configItem.Key == "Default")
+							{
+								<td class="fw-bold">@configItem.Key</td>
+							}
+							else
+							{
+								<td>@configItem.Key</td>
+							}
+							<td>@configItem.Value</td>
+						</tr>
+					}
+				</table>
+			</modal>
 		</TabPanel>
 	</TabContent>
 </div>

@@ -22,8 +22,12 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// <hidden />
 	internal static class Modal
 	{
-		internal static TagBuilder Build(ViewContext context, string title, Boolean canClose, TagHelperContent content, object htmlAttributes)
+		private static string[] modalSizes = { "modal-lg", "modal-xl", "modal-sm", "modal-default" };
+
+		internal static TagBuilder Build(ViewContext context, string title, Boolean canClose, TagHelperContent content, string innerClass, object htmlAttributes)
 		{
+			Boolean isAutoSize = false;
+
 			TagBuilder outputBuilder = new("div");
 			TagBuilder dialogBuilder = new("div");
 			TagBuilder contentBuilder = new("div");
@@ -37,7 +41,16 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			outputBuilder.AddCssClass("fade");
 			outputBuilder.MergeAttributes(htmlAttributes);
 
-			dialogBuilder.AddCssClass("modal-dialog modal-auto-size modal-dialog-scrollable modal-dialog-centered");
+			dialogBuilder.AddCssClass(innerClass);
+			dialogBuilder.AddCssClass("modal-dialog modal-dialog-scrollable modal-dialog-centered");
+			
+
+			if (innerClass == null || !innerClass.Split(' ').Any(value => modalSizes.Contains(value)))				
+			{
+				dialogBuilder.AddCssClass("modal-auto-size");
+				isAutoSize = true;
+			}
+
 			contentBuilder.AddCssClass("modal-content");
 
 			modalHeaderBuilder.AddCssClass("modal-header");
@@ -46,22 +59,25 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			modalTitleBuilder.InnerHtml.Append(title);
 			modalHeaderBuilder.InnerHtml.AppendHtml(modalTitleBuilder);
 
-			TagBuilder modalMinimizeButtonBuilder = new("button");
-			modalMinimizeButtonBuilder.AddCssClass("btn btn-minimize nucleus-material-icon");
-			modalMinimizeButtonBuilder.Attributes.Add("type", "button");
-			modalMinimizeButtonBuilder.Attributes.Add("aria-label", "Minimize");
-			modalMinimizeButtonBuilder.InnerHtml.AppendHtml("&#xe5d1;");
+			if (isAutoSize)
+			{
+				TagBuilder modalMinimizeButtonBuilder = new("button");
+				modalMinimizeButtonBuilder.AddCssClass("btn btn-normalsize nucleus-material-icon");
+				modalMinimizeButtonBuilder.Attributes.Add("type", "button");
+				modalMinimizeButtonBuilder.Attributes.Add("aria-label", "Normal size");
+				modalMinimizeButtonBuilder.InnerHtml.AppendHtml("&#xe5d1;");
 
-			modalHeaderBuilder.InnerHtml.AppendHtml(modalMinimizeButtonBuilder);
+				modalHeaderBuilder.InnerHtml.AppendHtml(modalMinimizeButtonBuilder);
 
-			TagBuilder modalMaximizeButtonBuilder = new("button");
-			modalMaximizeButtonBuilder.AddCssClass("btn btn-maximize nucleus-material-icon");
-			modalMaximizeButtonBuilder.Attributes.Add("type", "button");
-			modalMaximizeButtonBuilder.Attributes.Add("aria-label", "Maximize");
-			modalMaximizeButtonBuilder.InnerHtml.AppendHtml("&#xe5d0;");
+				TagBuilder modalMaximizeButtonBuilder = new("button");
+				modalMaximizeButtonBuilder.AddCssClass("btn btn-maximize nucleus-material-icon");
+				modalMaximizeButtonBuilder.Attributes.Add("type", "button");
+				modalMaximizeButtonBuilder.Attributes.Add("aria-label", "Maximize");
+				modalMaximizeButtonBuilder.InnerHtml.AppendHtml("&#xe5d0;");
 
-			modalHeaderBuilder.InnerHtml.AppendHtml(modalMaximizeButtonBuilder);
-			
+				modalHeaderBuilder.InnerHtml.AppendHtml(modalMaximizeButtonBuilder);
+			}
+
 			if (canClose)
 			{
 				TagBuilder modalCloseButtonBuilder = new("button");

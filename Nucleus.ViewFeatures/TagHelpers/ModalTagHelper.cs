@@ -35,6 +35,11 @@ namespace Nucleus.ViewFeatures.TagHelpers
 		public string Title { get; set; }
 
 		/// <summary>
+		/// Css class
+		/// </summary>
+		public string ModalClass { get; set; }
+
+		/// <summary>
 		/// Specifies whether the modal dialog has a close button.
 		/// </summary>
 		public Boolean CanClose { get; set; } = true;
@@ -49,7 +54,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
 		{
 			TagHelperContent content = await output.GetChildContentAsync();
 
-			TagBuilder builder = Nucleus.ViewFeatures.HtmlContent.Modal.Build(this.ViewContext, this.Title, this.CanClose, content, null);
+			TagBuilder builder = Nucleus.ViewFeatures.HtmlContent.Modal.Build(this.ViewContext, this.Title, this.CanClose, content, this.ModalClass, null);
 
 			if (builder == null)
 			{
@@ -59,6 +64,8 @@ namespace Nucleus.ViewFeatures.TagHelpers
 			{
 				output.TagMode = TagMode.StartTagAndEndTag;
 				output.TagName = builder.TagName;
+
+
 				output.MergeAttributes(builder);
 				output.Content.AppendHtml(builder.InnerHtml);
 			}

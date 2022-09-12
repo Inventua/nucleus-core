@@ -89,8 +89,11 @@ namespace Nucleus.Modules.Publish
 			{
 				try
 				{
-					attachment.File = await this.FileSystemManager.GetFile(site, attachment.File.Id);
-				}
+					if (attachment.File != null)
+					{ 
+						attachment.File = await this.FileSystemManager.GetFile(site, attachment.File.Id);
+          }
+        }
 				catch (System.IO.FileNotFoundException)
 				{
 

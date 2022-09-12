@@ -49,9 +49,9 @@ namespace Nucleus.Modules.Publish.Controllers
     {
       Models.FilterOptions filterOptions = new();
      
-      foreach(ViewModels.HeadlinesCategorySelection categorySelection in viewModel.Categories)
+      foreach(ViewModels.HeadlinesCategorySelection categorySelection in viewModel.Categories.Where(selection => selection.IsSelected))
       {
-        filterOptions.CategoryListItems.Add(categorySelection.Category);
+        filterOptions.Categories.Add(categorySelection.Category);
       }
 
       await this.HeadlinesManager.SaveFilterOptions(this.Context.Module, filterOptions);
@@ -93,11 +93,10 @@ namespace Nucleus.Modules.Publish.Controllers
       {
         Abstractions.Models.PageModule linkedModule = await this.PageModuleManager.Get(viewModel.LinkedModuleId);
 
-        Nucleus.Modules.Publish.ViewModels.Settings pageModuleSettings = new ViewModels.Settings();
-        pageModuleSettings.GetSettings(linkedModule);
+        Nucleus.Modules.Publish.ViewModels.Settings linkedModuleSettings = new ViewModels.Settings();
+        linkedModuleSettings.GetSettings(linkedModule);
 
-        await GetCategories(pageModuleSettings, viewModel, await this.HeadlinesManager.GetFilterOptions(linkedModule));
-
+        await GetCategories(linkedModuleSettings, viewModel, await this.HeadlinesManager.GetFilterOptions(this.Context.Module));
       }
       
       viewModel.Layouts = new();
@@ -124,7 +123,7 @@ namespace Nucleus.Modules.Publish.Controllers
             ViewModels.HeadlinesCategorySelection selection = new();
 
             // Selections for the headline category filter
-            selection.Category = filterOptions.CategoryListItems.Where(category => category.Id == item.Id).FirstOrDefault();
+            selection.Category = filterOptions.Categories.Where(category => category.Id == item.Id).FirstOrDefault();
             if (selection.Category != null)
             {
               selection.IsSelected = true;

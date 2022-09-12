@@ -12,8 +12,6 @@ namespace Nucleus.Modules.Publish.Models
   {
     private const string MODULESETTING_CATEGORYLIST_ID = "articles:categorylistid";
     private const string MODULESETTING_LAYOUT = "articles:layout";
-    
-    
 
     public Guid CategoryListId { get; set; }
     public string Layout { get; set; }

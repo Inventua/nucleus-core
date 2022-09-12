@@ -62,12 +62,11 @@
 					</SettingsControl>
 
 					<SettingsControl caption="Publish Date" helptext="Article publication date.  The article will not be visible before this date.">
-						@Html.TextBoxFor(model => model.Article.PublishDate, new { @type = "datetime-local", @step = "60", @data_value = Model.Article.PublishDate.HasValue ? Model.Article.PublishDate.Value.ToString("O") : ""})
-						@*@Html.Hidden("Article.PublishDate.Offset", Model.Article.PublishDate.Offset )*@
+						@Html.TextBoxFor(model => model.Article.PublishDate, Model.Article.PublishDate.HasValue ? Model.Article.PublishDate.Value.ToString("yyyy-MM-ddTHH:mm") : "", new { @type = "datetime-local", @step = "60" })
 					</SettingsControl>
 
 					<SettingsControl caption="Expiry Date" helptext="Article expiry date.  The article will not be visible after this date.">
-						@Html.TextBoxFor(model => model.Article.ExpireDate, new { @type = "datetime-local", @step = "60", @data_value = Model.Article.ExpireDate.HasValue ? Model.Article.ExpireDate.Value.ToString("O") : ""})
+						@Html.TextBoxFor(model => model.Article.ExpireDate, Model.Article.ExpireDate.HasValue ? Model.Article.ExpireDate.Value.ToString("yyyy-MM-ddTHH:mm") : "", new { @type = "datetime-local", @step = "60"})
 					</SettingsControl>
 				</div>
 			</fieldset>
@@ -82,14 +81,14 @@
 			<TabPanel id="article-categories">
 				<fieldset role="group" aria-labelledby="heading">
 					<h2>Categories</h2>
-					<div class="article-categories">
+					<div class="d-grid">
 						@for (var categoryCount = 0; categoryCount < Model.Categories.Count; categoryCount++)
 						{
 							<label>
 								@Html.CheckBoxFor(model => model.Categories[categoryCount].IsSelected)
 								@Html.HiddenFor(model => model.Categories[categoryCount].Category.CategoryListItem.Id)
 								@Html.HiddenFor(model => model.Categories[categoryCount].Category.CategoryListItem.Name)
-								<span>@Model.Categories[categoryCount].Category.CategoryListItem.Name</span>
+								<span class="d-inline-block">@Model.Categories[categoryCount].Category.CategoryListItem.Name</span>
 							</label>
 						}
 					</div>
@@ -98,7 +97,7 @@
 		}
 		<TabPanel id="article-attachments">
 			<fieldset role="group" aria-labelledby="heading">
-				<h2>Attachments</h2>
+				<h2>Add New Attachment</h2>
 
 				<SettingsControl caption="Image" helptext="Article image.">
 					<div class="nucleus-flex-fields nucleus-fileselector">
@@ -117,26 +116,30 @@
 				</SettingsControl>
 				@Html.SubmitButton("", "Add Attachment", @Url.NucleusAction("AddAttachment", "Admin", "Publish"), new { })
 
-				<table>
-					@for (var attachmentCount = 0; attachmentCount < Model.Article.Attachments.Count; attachmentCount++)
-					{
-						<tr>
-							<td>
-								@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].Id)
-								@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Id)
-								@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Provider)
-								@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Path)
-								@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Name)
-								<a href="@Url.FileLink(Model.Article.Attachments[attachmentCount].File)" alt="@Model.Article.Attachments[attachmentCount].File.Name" target="_blank">
-									@Model.Article.Attachments[attachmentCount].File.Name
-								</a>
-							</td>
-							<td class="nucleus-small-cell">
-								<input type="submit" title="Delete Attachment" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" formaction="@Url.NucleusAction("DeleteAttachment", "Admin", "Publish")?id=@Model.Article.Attachments[attachmentCount].Id" data-confirm="Delete this attachment?" />
-							</td>
-						</tr>
-					}
-				</table>
+				@if (Model.Article.Attachments.Any())
+				{
+					<h2 class="mt-4">Attachments</h2>
+					<table class="table table-sm">
+						@for (var attachmentCount = 0; attachmentCount < Model.Article.Attachments.Count; attachmentCount++)
+						{
+							<tr>
+								<td>
+									@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].Id)
+									@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Id)
+									@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Provider)
+									@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Path)
+									@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Name)
+									<a href="@Url.FileLink(Model.Article.Attachments[attachmentCount].File)" alt="@Model.Article.Attachments[attachmentCount].File.Name" target="_blank">
+										@Model.Article.Attachments[attachmentCount].File.Name
+									</a>
+								</td>
+								<td class="nucleus-small-cell">
+									<input type="submit" title="Delete Attachment" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" formaction="@Url.NucleusAction("DeleteAttachment", "Admin", "Publish")?id=@Model.Article.Attachments[attachmentCount].Id" data-confirm="Delete this attachment?" />
+								</td>
+							</tr>
+						}
+					</table>
+				}
 
 			</fieldset>
 		</TabPanel>

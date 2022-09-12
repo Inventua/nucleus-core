@@ -7,8 +7,9 @@ using Nucleus.Abstractions.Models;
 
 namespace Nucleus.Modules.Publish.Models
 {
-  public class FilterOptions
+  public class FilterOptions : FilterOptionsBase
   {
-    public List<ListItem> CategoryListItems { get; set; }
+    public List<ListItem> Categories { get; set; } = new();
+
   }
 }

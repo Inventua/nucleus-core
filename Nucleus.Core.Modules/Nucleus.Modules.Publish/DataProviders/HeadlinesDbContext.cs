@@ -32,7 +32,8 @@ namespace Nucleus.Modules.Publish.DataProviders
 			base.OnModelCreating(builder);
 
 			builder.Entity<PublishHeadlinesFilterCategory>().ToTable ("PublishHeadlinesFilterCategories");
-
+			builder.Entity<PublishHeadlinesFilterCategory>().Property<Guid>("ModuleId");
+			builder.Entity<PublishHeadlinesFilterCategory>().HasKey(new string[] { "ModuleId", "CategoryListItemId" });
 		}
 	}
 }

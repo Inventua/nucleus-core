@@ -17,7 +17,7 @@ namespace Nucleus.Modules.Publish
 				services.AddSingleton<ArticlesManager>();
 				services.AddDataProvider<IArticlesDataProvider, DataProviders.ArticlesDataProvider, DataProviders.ArticlesDbContext>(context.Configuration);
 
-				//services.AddSingleton<HeadlinesManager>();
+				services.AddSingleton<HeadlinesManager>();
 				services.AddDataProvider<IHeadlinesDataProvider, DataProviders.HeadlinesDataProvider, DataProviders.HeadlinesDbContext>(context.Configuration);
 
 				services.AddTransient<IContentMetaDataProducer, ArticlesMetaDataProducer>();

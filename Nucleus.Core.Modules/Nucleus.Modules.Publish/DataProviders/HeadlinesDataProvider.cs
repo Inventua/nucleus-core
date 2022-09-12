@@ -28,7 +28,7 @@ namespace Nucleus.Modules.Publish.DataProviders
 		{
 			FilterOptions result = new()
 			{
-				CategoryListItems =
+				Categories =
 					await this.Context.PublishHeadlinesFilterCategory
 					.Where(article => EF.Property<Guid>(article, "ModuleId") == pageModule.Id)
 					.Include(category => category.CategoryListItem)
@@ -43,18 +43,22 @@ namespace Nucleus.Modules.Publish.DataProviders
 
     public async Task SaveFilterOptions(PageModule pageModule, FilterOptions options)
     {
-			FilterOptions original = await this.GetFilterOptions(pageModule);
+			List<PublishHeadlinesFilterCategory> original = await this.Context.PublishHeadlinesFilterCategory
+					.Where(article => EF.Property<Guid>(article, "ModuleId") == pageModule.Id)
+					.Include(category => category.CategoryListItem)
+					.AsSplitQuery()
+					.ToListAsync();
 
 			// delete removed categories
-			if (original != null && original.CategoryListItems?.Any() == true)
+			if (original.Any())
 			{
-				foreach (ListItem originalCategory in original.CategoryListItems)
+				foreach (PublishHeadlinesFilterCategory originalCategory in original)
 				{
 					Boolean found = false;
 
-					foreach (ListItem newCategory in options.CategoryListItems)
+					foreach (ListItem newCategory in options.Categories)
 					{
-						if (newCategory.Id == originalCategory.Id)
+						if (newCategory.Id == originalCategory.CategoryListItem.Id)
 						{
 							found = true;
 							break;
@@ -63,21 +67,21 @@ namespace Nucleus.Modules.Publish.DataProviders
 
 					if (!found)
 					{
-						this.Context.PublishHeadlinesFilterCategory.Remove(new PublishHeadlinesFilterCategory() { CategoryListItem = originalCategory });
+						this.Context.PublishHeadlinesFilterCategory.Remove(originalCategory);
 					}
 				}
 			}
 
 			// create added categories
-			foreach (ListItem category in options.CategoryListItems)
+			foreach (ListItem category in options.Categories)
 			{
 				Boolean found = false;
 
-				if (original != null && original.CategoryListItems?.Any() == true)
+				if (original.Any())
 				{
-					foreach (ListItem originalCategory in original.CategoryListItems)
+					foreach (PublishHeadlinesFilterCategory originalCategory in original)
 					{
-						if (category.Id == originalCategory.Id)
+						if (category.Id == originalCategory.CategoryListItem.Id)
 						{
 							found = true;
 							break;
@@ -93,7 +97,7 @@ namespace Nucleus.Modules.Publish.DataProviders
 				{
 					PublishHeadlinesFilterCategory newCategory = new PublishHeadlinesFilterCategory() { CategoryListItem = category };
 					this.Context.PublishHeadlinesFilterCategory.Add(newCategory);
-					this.Context.Entry(newCategory).Property("ModuleId").CurrentValue = pageModule.Id;
+					this.Context.Entry(newCategory).Property<Guid>("ModuleId").CurrentValue = pageModule.Id;
 				}
 			}
 

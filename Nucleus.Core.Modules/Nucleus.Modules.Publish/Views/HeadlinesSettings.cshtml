@@ -22,40 +22,43 @@
 						@Html.DropDownListFor(model => model.Layout, new SelectList(Model.Layouts))
 					</SettingsControl>
 				</div>
-			</fieldset>
 
-			<fieldset role="group" aria-labelledby="heading">
-				<h2>Filters</h2>
-				<SettingsControl caption="Categories" helptext="Display articles from selected categories. ">
-					<div class="headlines-categories">
-						@for (var categoryCount = 0; categoryCount < Model.Categories.Count; categoryCount++)
+				<div class="">
+					<h2>Categories</h2>
+					<div class="headlines-categories d-grid border border-1 border-dark p-2">					
+					@for (var categoryCount = 0; categoryCount < Model.Categories.Count; categoryCount++)
 						{
 							<label>
 								@Html.CheckBoxFor(model => model.Categories[categoryCount].IsSelected)
 								@Html.HiddenFor(model => model.Categories[categoryCount].Category.Id)
 								@Html.HiddenFor(model => model.Categories[categoryCount].Category.Name)
-								<span>@Model.Categories[categoryCount].Category.Name</span>
+								<span class="d-inline-block">@Model.Categories[categoryCount].Category.Name</span>
 							</label>
 						}
 					</div>
-				</SettingsControl>
+				</div>
 
-				<div class="nucleus-flex-fields">
-					<SettingsControl caption="Featured?" helptext="Featured articles are shown at the top of the list." rendermode="LabelLast" class="inner-inline">
-						@Html.CheckBoxFor(model => model.FeaturedOnly, new { @class = "ToggleSwitch" })
+				<div class="nucleus-flex-fields mt-2">
+					<SettingsControl caption="Page Size" helptext="Maximum number of articles shown on list on a page.">
+						@Html.TextBoxFor(model => model.PageSize, new SelectList(Model.PageSizes))
 					</SettingsControl>
 
-					<SettingsControl caption="Number of articles shown" helptext="Maximum number of articles shown on list." class="inner-inline">
-						@Html.DropDownListFor(model => model.NumberOfArticles, new SelectList(Model.DisplaySizes))
+					<SettingsControl caption="Published Date Range" helptext="Article published date range.">
+						@Html.DropDownListFor(model => model.PublishedDateRange, Html.GetEnumSelectList<Nucleus.Modules.Publish.Models.PublishedDateRanges>())
+					</SettingsControl>
+
+					<SettingsControl caption="Sort By" helptext="Sorting order of articles." >
+						@Html.DropDownListFor(model => model.SortOrder, Html.GetEnumSelectList<Nucleus.Modules.Publish.Models.SortOrders>())
 					</SettingsControl>
 				</div>
 
-				<div class="nucleus-flex-fields">
-					<SettingsControl caption="Published Date Range" helptext="Article published date range.">
-						@Html.DropDownListFor(model => model.PublishedDateRange, Html.GetEnumSelectList<Nucleus.Modules.Publish.ViewModels.HeadlinesSettings.PublishedDateRanges>())
+				<div class="nucleus-flex-fields mt-2">
+					<SettingsControl caption="Show Featured Only?" helptext="Featured articles are shown at the top of the list." rendermode="LabelLast" class="inner-inline">
+						@Html.CheckBoxFor(model => model.FeaturedOnly, new { @class = "ToggleSwitch" })
 					</SettingsControl>
-					<SettingsControl caption="Sort By" helptext="Sorting order of articles." class="inner-inline">
-						@Html.DropDownListFor(model => model.SortBy, Html.GetEnumSelectList<Nucleus.Modules.Publish.ViewModels.HeadlinesSettings.SortingFields>())
+					
+					<SettingsControl caption="Show Paging Controls?" helptext="Display paging controls for end users." rendermode="LabelLast" class="inner-inline">
+						@Html.CheckBoxFor(model => model.ShowPagingControl, new { @class = "ToggleSwitch" })
 					</SettingsControl>
 				</div>
 			</fieldset>

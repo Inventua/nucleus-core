@@ -35,16 +35,12 @@ namespace Nucleus.Modules.Publish.DataProviders
 
 			builder.Entity<Article>().Property<Guid>("ModuleId");
 			builder.Entity<Article>().Property<String>("EncodedTitle");
-			//builder.Entity<Article>().Ignore(article => article.Categories);
 
 			builder.Entity<Attachment>().ToTable("ArticleAttachments");
 			
 			builder.Entity<Category>().ToTable("ArticleCategories");
 
-			//builder.Entity<Category>()
-			//	.HasOne(category => category.CategoryListItem)
-			//	.WithMany();
 
-		}
+    }
 	}
 }

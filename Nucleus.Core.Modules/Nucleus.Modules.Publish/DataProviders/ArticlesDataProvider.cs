@@ -95,6 +95,94 @@ namespace Nucleus.Modules.Publish.DataProviders
 			return results;
 		}
 
+		private DateTime StartDate(Models.PublishedDateRanges range)
+    {
+			switch(range)
+      {
+				case PublishedDateRanges.LastWeek:
+					return DateTime.UtcNow.AddDays(-7);
+
+				case PublishedDateRanges.LastMonth:
+					return DateTime.UtcNow.AddMonths(-1);
+
+				case PublishedDateRanges.Last3Months:
+					return DateTime.UtcNow.AddMonths(-3);
+
+				case PublishedDateRanges.Last6Months:
+					return DateTime.UtcNow.AddMonths(-6);
+
+				case PublishedDateRanges.LastYear:
+					return DateTime.UtcNow.AddYears(-1);
+
+				case PublishedDateRanges.Last2Years:
+					return DateTime.UtcNow.AddYears(-2);
+
+				default:
+					return DateTime.UtcNow;
+			}
+		}
+
+		public async Task<PagedResult<Article>> List(PageModule pageModule, PagingSettings settings, FilterOptions filters)
+		{
+			PagedResult<Article> results = new(settings);
+
+			IQueryable<Article> query = this.Context.Articles
+				.Where
+				(
+					article => EF.Property<Guid>(article, "ModuleId") == pageModule.Id &&
+					article.Enabled &&
+					(article.PublishDate == null || article.PublishDate.Value <= DateTime.UtcNow) &&
+					(article.ExpireDate == null || article.ExpireDate.Value >= DateTime.UtcNow) &&
+					article.Categories.Where(category => filters.Categories.Select(item => item.Id).Contains(category.CategoryListItem.Id)).Any()
+				);
+
+			if (filters.FeaturedOnly)
+			{
+				query = query.Where(article => (article.Featured == true));
+			}
+
+			if (filters.PublishedDateRange != PublishedDateRanges.Any)
+      {
+				//query = query.Where(article => (article.PublishDate == null || article.PublishDate.Value <= StartDate(filters.PublishedDateRange)));
+				query = query.Where(article => ((article.PublishDate == null ? article.DateAdded : article.PublishDate).Value >= StartDate(filters.PublishedDateRange)));
+			}
+
+			switch (filters.SortOrder)
+      {
+				case SortOrders.FeaturedAndDate:
+					query = query
+						.OrderByDescending(article => article.Featured)
+						.ThenByDescending(article => article.PublishDate == null ? article.DateAdded : article.PublishDate);
+					break;
+				case SortOrders.Date:
+					query = query.OrderByDescending(article => article.PublishDate == null ? article.DateAdded : article.PublishDate);
+					break;
+      }
+
+			if (filters.PageSize != -1)
+      {
+				query = query.Take(filters.PageSize);
+      }
+
+			results.TotalCount = query.Count();
+
+			results.Items = await query
+				//.OrderByDescending(article => article.Featured)
+				//	.ThenByDescending(article => article.DateAdded)
+				.Skip(settings.FirstRowIndex)
+				//.Take(settings.PageSize)
+				.Include(article => article.ImageFile)
+				.Include(article => article.Attachments)
+					.ThenInclude(attachment => attachment.File)
+				.Include(article => article.Categories)
+					.ThenInclude(category => category.CategoryListItem)
+				.AsSplitQuery()
+				.AsNoTracking()
+				.ToListAsync();
+
+				return results;
+		}
+
 		public async Task Save(PageModule pageModule, Article article)
 		{
 			Action raiseEvent;
@@ -262,10 +350,6 @@ namespace Nucleus.Modules.Publish.DataProviders
 
 		}
 
-    public Task<PagedResult<Article>> List(PageModule module, PagingSettings settings, FilterOptions filters)
-    {
-      throw new NotImplementedException();
-    }
 #endregion
 
 		

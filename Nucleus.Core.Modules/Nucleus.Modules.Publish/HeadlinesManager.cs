@@ -29,8 +29,30 @@ namespace Nucleus.Modules.Publish
 			{
 				using (IHeadlinesDataProvider provider = this.DataProviderFactory.CreateProvider<IHeadlinesDataProvider>())
 				{
-					return await provider.GetFilterOptions(pageModule);
+					//return await provider.GetFilterOptions(pageModule);
+					// Get filter options from db
+					FilterOptions result = await provider.GetFilterOptions(pageModule);
+
+					// Get filter options from pagemodule settings
+					HeadlinesSettings settings = new();
+					settings.GetSettings(pageModule);
+
+					result.PublishedDateRange = settings.PublishedDateRange;
+					result.FeaturedOnly = settings.FeaturedOnly;
+
+					if (settings.ShowPagingControl)
+					{
+						result.PageSize = settings.PageSize;
+					}
+					else
+          {
+						result.PageSize = -1;
+          }
+					result.SortOrder = settings.SortOrder;
+
+					return result;
 				}
+
 			});
 		}
 
@@ -39,6 +61,7 @@ namespace Nucleus.Modules.Publish
 			using (IHeadlinesDataProvider provider = this.DataProviderFactory.CreateProvider<IHeadlinesDataProvider>())
 			{
 				await provider.SaveFilterOptions(pageModule, options);
+				this.CacheManager.HeadlinesFilterOptionsCache().Remove(pageModule.Id);
 			}
 		}
 

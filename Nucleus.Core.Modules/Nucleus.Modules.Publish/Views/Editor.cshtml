@@ -28,26 +28,26 @@
 				@Html.HiddenFor(model => model.Article.Id)
 				@Html.HiddenFor(Model => Model.Standalone)
 	
-				<SettingsControl caption="Title" helptext="Article title.">
+				<SettingsControl caption="Title" helptext="Title of the article.">
 					@Html.TextBoxFor(model => model.Article.Title, new { @maxlength = 256} )
 				</SettingsControl>
 
-				<SettingsControl caption="Sub Title" helptext="Article sub-title.">
+				<SettingsControl caption="Sub Title" helptext="Sub-title of the article. This value is use when you want a secondary title for your article.">
 					@Html.TextBoxFor(model => model.Article.SubTitle, new { @maxlength = 256} )
 				</SettingsControl>
 
-				<SettingsControl caption="Summary" helptext="Article summary.">
+				<SettingsControl caption="Summary" helptext="Summary of the article. A short summary about the the contents of the article.">
 					@Html.TextAreaFor(model => model.Article.Summary, new { @maxlength = 256} )
 				</SettingsControl>
 					
-				<SettingsControl caption="Image" helptext="Article image.">
+				<SettingsControl caption="Image" helptext="Image of the article. Displays an image alongside the article content when article is viewed.">
 					<div class="nucleus-flex-fields nucleus-fileselector">
 						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.Article.ImageFile, propertyName = "Article.ImageFile", selectAnotherActionName = "SelectAnotherImage", pattern = "(.gif|.png|.jpg|.jpeg|.bmp)" })
 						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.Article.ImageFile?.Parent, actionName = "UploadImageFile", Filter = "image/*" })
 					</div>
 				</SettingsControl>
 
-				<SettingsControl caption="Description" helptext="Article description.">
+				<SettingsControl caption="Description" helptext="Description of the article. A longer summary on the subject of the article.">
 					@Html.TextAreaFor(model => model.Article.Description, new { @maxlength = 512} )
 				</SettingsControl>
 
@@ -99,7 +99,7 @@
 			<fieldset role="group" aria-labelledby="heading">
 				<h2>Add New Attachment</h2>
 
-				<SettingsControl caption="Image" helptext="Article image.">
+				<SettingsControl caption="Image" helptext="">
 					<div class="nucleus-flex-fields nucleus-fileselector">
 						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.SelectedAttachmentFile, propertyName = "SelectedAttachmentFile", selectAnotherActionName = "SelectAnotherAttachment" })
 						@if (Model.SelectedAttachmentFile?.Id != Guid.Empty)

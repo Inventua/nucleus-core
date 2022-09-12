@@ -240,7 +240,7 @@ a *
   flex: 1;
 }
 
-.modal-dialog .modal-header .btn-minimize, .modal-dialog .modal-header .btn-maximize
+.modal-dialog .modal-header .btn-normalsize, .modal-dialog .modal-header .btn-maximize
 {
   margin: -0.5rem -0.5rem -0.5rem auto;
   padding: 0.5rem;
@@ -249,7 +249,7 @@ a *
   display: none;
 }
 
-.modal-full-size.modal-dialog > .modal-content > .modal-header > .btn-minimize
+.modal-full-size.modal-dialog > .modal-content > .modal-header > .btn-normalsize
 {
   display: block;
 }
@@ -311,6 +311,21 @@ a *
 {
   flex-grow: 5;
   margin: auto;
+}
+
+table.table-sticky-headers
+{
+	width: 100%;
+	border-spacing: 0;
+	border-collapse: separate;
+}
+
+table.table-sticky-headers thead th
+{
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background-color: white;
 }
 
 /*  Extend bootstrap width classes to provide a "width 1", which is generally used for table cells to specify that the cell should be as small as */

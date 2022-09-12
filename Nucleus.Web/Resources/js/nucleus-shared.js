@@ -696,60 +696,51 @@ function _Page()
 		{
 			if (request.status === 400)
 			{
-				// bad request.  Can be a ModelState JSON response, or an error message
-				if (typeof request.responseJSON.title !== 'undefined' && typeof request.responseJSON.detail !== 'undefined')
+				// bad request.  Parse ModelState errors		
+				var messages = new Array(request.responseJSON.length);
+				var elementSelector = '';
+
+				// get a list of elements with validation errors
+				for (var prop in request.responseJSON)
 				{
-					errorData = request.responseJSON;
+					var element = jQuery('[name="' + prop + '"]');
+					if (!element.is('.HtmlEditorControl'))
+					{
+						element.addClass('ValidationError');
+					}
+					else
+					{
+						element.parents('.settings-control').first().addClass('ValidationError');
+					}
+
+					if (elementSelector !== '') elementSelector += ',';
+					elementSelector += '#' + element.attr('id');
 				}
-				else
+
+				var elements = jQuery(elementSelector);
+
+				// sort the messages by element ordinal position
+				for (var prop in request.responseJSON)
 				{
-					// Parse ModelState errors		
-					var messages = new Array(request.responseJSON.length);
-					var elementSelector = '';
-
-					// get a list of elements with validation errors
-					for (var prop in request.responseJSON)
+					var element = jQuery('[name="' + prop + '"]');
+					var index = _getElementIndex(elements, element.attr('id'));
+					if (index !== undefined)
 					{
-						var element = jQuery('[name="' + prop + '"]');
-						if (!element.is('.HtmlEditorControl'))
+						message = request.responseJSON[prop].toString();
+						if (!message.endsWith("."))
 						{
-							element.addClass('ValidationError');
+							message += '.';
 						}
-						else
-						{
-							element.parents('.settings-control').first().addClass('ValidationError');
-						}
-
-						if (elementSelector !== '') elementSelector += ',';
-						elementSelector += '#' + element.attr('id');
+						messages[index] = '<li>' + message + '</li>';
 					}
+				}
 
-					var elements = jQuery(elementSelector);
+				var validationMessage = '<ul>' + messages.join('') + '</ul>';
 
-					// sort the messages by element ordinal position
-					for (var prop in request.responseJSON)
-					{
-						var element = jQuery('[name="' + prop + '"]');
-						var index = _getElementIndex(elements, element.attr('id'));
-						if (index !== undefined)
-						{
-							message = request.responseJSON[prop].toString();
-							if (!message.endsWith("."))
-							{
-								message += '.';
-							}
-							messages[index] = '<li>' + message + '</li>';
-						}
-					}
-
-					var validationMessage = '<ul>' + messages.join('') + '</ul>';
-
-					errorData = new Object();
-					errorData.title = 'Validation Error';
-					errorData.detail = validationMessage;
-					errorData.statusCode = request.status;
-					errorData.icon = "warning";
-				}				
+				errorData = new Object();
+				errorData.title = 'Validation Error';
+				errorData.detail = validationMessage;
+				errorData.statusCode = request.status;
 			}
 			else
 			{
@@ -776,7 +767,7 @@ function _Page()
 			errorData.statusCode = request.status;
 		}
 
-		_dialog(errorData.title, errorData.detail, errorData.icon ?? 'error')
+		_dialog(errorData.title, errorData.detail, 'error')
 	}
 
 	function _getElementIndex(items, id)
@@ -847,7 +838,7 @@ function _Page()
 			'        <h5 class="modal-title">' + title + '</h5>' +
 			'        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="' + cancelCaption + '"></button>' +
 			'      </div>' +
-			'      <div class="modal-body flex-row">' +
+			'      <div class="modal-body">' +
 			iconElement +
 			'        <div class="dialog-message">' + message.replace(new RegExp('\n', 'g'), '<br/>') + '</div>' +
 			'      </div>' +
@@ -1043,9 +1034,6 @@ function _Page()
 				focusableElement.first().focus();
 			}
 		}
-
-		// adjust dates from UTC to local
-		_setupDateFields(target);
 	}
 
 	// Remove duplicate .modal-backdrop elements with the same parent.  When we do a partial render and replace/re-open a modal, 
@@ -1075,29 +1063,6 @@ function _Page()
 		var viewportBottom = viewportTop + jQuery(window).height();
 		return elementBottom > viewportTop && elementTop < viewportBottom;
 	};
-
-	function _setupDateFields(target)
-	{
-		// .net model binding serializes DateTimeOffset to a format which datetime-local fields don't understand, so we have to set 
-		// a custom attribute to the required value & convert it here.  
-		target.find('input[type=datetime-local]').each(function (index, ui)
-		{
-			var element = jQuery(ui);
-			var value = element.attr('data-value');
-
-			if (typeof (value) !== 'undefined' && value !== '')
-			{
-				// using .toISOString gets us the right format for datetime-local, but outputs the date in UTC time (we want local time), so we
-				// work around by subtracting the local timezone offset first
-				var offset_ms = new Date().getTimezoneOffset() * 60000;
-				var newValue = new Date(new Date(value).getTime() - offset_ms);
-				if (newValue !== 'Invalid Date')
-				{
-					element.val(newValue.toISOString().slice(0, 16));
-				}
-			}
-		});
-	}
 
 	function _initializeControls(target, data, status, request)
 	{
@@ -1197,54 +1162,31 @@ function _Page()
 
 	function _enableEnhancedToolTips(enable)
 	{		
-		jQuery('.settings-control[title]').each(function (index, element)
+		if (!enable)
 		{
-			if (enable)
+			jQuery('.settings-control[title]').each(function (index, element)
 			{
-				jQuery(element).attr('data-bs-toggle', 'tooltip');
-				var instance = new bootstrap.Tooltip(element,
-					{
-						trigger: 'hover',
-						placement: 'bottom',
-						container: element,
-						delay: 300
-					});
-
-				element.addEventListener('shown.bs.tooltip', function ()
+				if (enable)
 				{
-					/*  override bootstrap/popper positioning, in order to bottom-left align the tooltip, but only inside elements with .settings-control */
-					if (jQuery(this).hasClass('settings-control') && jQuery(this).css('position') == 'relative')
-					{
-						jQuery(this).find('.tooltip').css('transform', 'translateY(' + jQuery(this).height() + 'px)');
-
-						/*jQuery(this).find('.tooltip').css('transform', 'matrix(1, 0, 0, 1, 0, ' + jQuery(this).height() + ')');*/
-
-						/* for settings-controls with class inner-inline and a toggleswitch control, adjust the arrow position */
-						if (jQuery(this).hasClass('inner-inline') && jQuery(this).find('.ToggleSwitch').length > 0)
-						{}
-						/*jQuery(this).find('.tooltip-arrow').css('transform', 'matrix(1, 0, 0, 1, 10, 0)');*/
-						jQuery(this).find('.tooltip-arrow').css('transform', 'translateX(10px)');
-						
-					}
-				});
-
-				jQuery(document).on('click', function ()
+					jQuery(element).attr('data-bs-toggle', 'tooltip');
+					return new bootstrap.Tooltip(element,
+						{
+							trigger: 'hover',
+							container: 'body',
+							placement: 'bottom',
+							delay: 300
+						});
+				}
+				else
 				{
-					jQuery('.settings-control[data-bs-toggle="tooltip"]').each(function (index, element)
-					{
-						bootstrap.Tooltip.getInstance(element).hide();
-					});
-				});
-			}
-			else
-			{
-				jQuery(element)
-					.attr('title', jQuery(element).attr('data-bs-original-title'))
-					.removeAttr('data-bs-toggle', 'tooltip');
+					jQuery(element)
+						.attr('title', jQuery(element).attr('data-bs-original-title'))
+						.removeAttr('data-bs-toggle', 'tooltip');
 
-				bootstrap.Tooltip.getInstance(element).disable();
-			}
-		});
+					bootstrap.Tooltip.getInstance(element).disable();
+				}
+			});
+		}		
 	}
 
 

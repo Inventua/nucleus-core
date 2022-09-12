@@ -4,44 +4,26 @@
 @using Nucleus.Abstractions
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
-<h2 class="nucleus-modal-caption">Confirm Delete</h2>
-@using (Html.BeginAreaForm("DeleteSelected", "FileSystem", "Admin", FormMethod.Post, new { @class = "overflow-auto", @data_target = ".nucleus-adminpage" }))
+<h2 class="nucleus-modal-caption">Delete</h2>
+@using (Html.BeginAreaForm("DeleteSelected", "FileSystem", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage" }))
 {
-	<p class="alert alert-danger">Delete @(Model.SelectedFiles.Any() ? Model.SelectedFiles.Count.ToString() + " file" + (Model.SelectedFiles.Count > 1 ? "s" : "") : "")@(Model.SelectedFolders.Any() && Model.SelectedFiles.Any() ? " and " : "")@(Model.SelectedFolders.Any() ? @Model.SelectedFolders.Count.ToString() + " folder" + (Model.SelectedFolders.Count > 1 ? "s" : "") : "")?</p>
+	<p>Delete selected files and folders?</p>
 
-	<div class="overflow-auto">
-		<table class="table table-sm">
-			<tr>
-				<th>Name</th>
-				<th>Type</th>
-			</tr>
-		@for (var folderCount = 0; folderCount < Model.SelectedFolders.Count; folderCount++)
-		{
-			<tr>
-				<td>
-					@Html.HiddenFor(model => Model.SelectedFolders[folderCount].IsSelected)
-					@Html.HiddenFor(model => Model.SelectedFolders[folderCount].Id)
-					@Model.SelectedFolders[folderCount].Name
-				</td>
-				<td>Folder</td>
-			</tr>		
-		}
-
-		@for (var fileCount = 0; fileCount < Model.SelectedFiles.Count; fileCount++)
-		{
-			<tr>
-				<td>
-					@Html.HiddenFor(model => Model.SelectedFiles[fileCount].IsSelected)
-					@Html.HiddenFor(model => Model.SelectedFiles[fileCount].Id)
-					@Model.SelectedFiles[fileCount].Name
-				</td>
-				<td>File</td>
-			</tr>		
-		}
-		</table>
-	</div>
 	<div class="nucleus-form-tools">
 		<input type="submit" value="Delete" class="btn btn-danger" formaction="@Url.AreaAction("DeleteSelected", "FileSystem", "Admin")" data-target=".nucleus-adminpage" />
 	</div>
 	@Html.HiddenFor(model => Model.Folder.Id)
+
+	for (var folderCount = 0; folderCount < Model.SelectedFolders.Count; folderCount++)
+	{
+		@Html.HiddenFor(model => Model.SelectedFolders[folderCount].IsSelected)
+		@Html.HiddenFor(model => Model.SelectedFolders[folderCount].Id)
+	}
+
+	for (var fileCount = 0; fileCount < Model.SelectedFiles.Count; fileCount++)
+	{
+		@Html.HiddenFor(model => Model.SelectedFiles[fileCount].IsSelected)
+		@Html.HiddenFor(model => Model.SelectedFiles[fileCount].Id)
+	}
+
 }

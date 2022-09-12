@@ -13,13 +13,12 @@
 	var enabledAttr = new { };
 }
 
-@using (Html.BeginAreaForm("Install", "SiteWizard", "Setup", FormMethod.Post, new { @data_target = "document" }))
+@using (Html.BeginAreaForm("Install", "SiteWizard", "Setup", FormMethod.Post, new { @data_target = "window" }))
 {
 	<Modal id="site-wizard" title="Nucleus Setup Wizard" can-close="false">
-		<img class="logo" src="../../../../Resources/Images/nucleus.png" height="90" width="81"/>
 		<h1>Welcome to Nucleus.</h1>
 		<p>This wizard will help you to set up your site.</p>
-		
+
 		@Html.HiddenFor(model => model.SelectedTemplate)
 		@Html.HiddenFor(model => model.TemplateTempFileName)
 		@if ((Model.Preflight == null || Model.Preflight.IsValid()) && (Model.SelectedTemplate == null || Model.OtherWarnings.Count() > 0 || Model.MissingExtensionWarnings.Count() > 0))
@@ -111,7 +110,7 @@
 							}
 							<button type="button" class="btn btn-secondary ms-auto" onclick="window.location='@Url.AreaAction("Index", "SiteWizard", "Setup")';">Retry</button>
 						</div>
-						<table class="table table-sm align-middle small mt-2">
+						<table class="table table-sm small mt-2">
 							<thead class="table-dark">
 								<tr>
 									<th scope="col"></th>
@@ -150,30 +149,31 @@
 						<fieldset role="group" aria-labelledby="heading">
 							<h2>Install Extensions</h2>
 							<p>
-								Select the extensions that you want to install.  You can install more extensions later.  Extensions shown with a disabled checkbox
-								are required, and can't be un-selected because they are used by the site template.
+								Select the extensions that you want to install.  You can install more extensions later.  Extensions with a disabled checkbox
+								are required because they are used by the site template.
 							</p>
 
 							@for (var count = 0; count < Model.InstallableExtensions.Count(); count++)
 							{
 								<div class="installable-package">
 									<label>
-										<span>
-											@Html.HiddenFor(model => model.InstallableExtensions[count].Filename)
-											@if (Model.InstallableExtensions[count].IsRequired)
-											{
-												@Html.HiddenFor(model => model.InstallableExtensions[count].IsSelected)
-												<span class="nucleus-material-icon placeholder-checkbox">&#xe834;</span>
-											}
-											else
-											{
-												@Html.CheckBoxFor(model => model.InstallableExtensions[count].IsSelected, Model.InstallableExtensions[count].IsRequired ? disabledAttr : enabledAttr)
-											}
-											<span class="fw-bold">@Model.InstallableExtensions[count].Name</span>@Model.InstallableExtensions[count].PackageVersion
-										</span>
-										<span>@Model.InstallableExtensions[count].Description</span>
-										<span>
-											<span class="fst-italic">Publisher</span> <a href="@Model.InstallableExtensions[count].PublisherUrl">@Model.InstallableExtensions[count].Publisher</a>											
+										@Html.HiddenFor(model => model.InstallableExtensions[count].Filename)
+										@if (Model.InstallableExtensions[count].IsRequired)
+										{
+											@Html.HiddenFor(model => model.InstallableExtensions[count].IsSelected)
+											<span class="nucleus-material-icon placeholder-checkbox">&#xe834;</span>
+										}
+										else
+										{
+											@Html.CheckBoxFor(model => model.InstallableExtensions[count].IsSelected, Model.InstallableExtensions[count].IsRequired ? disabledAttr : enabledAttr)
+										}
+										<span>@Model.InstallableExtensions[count].Name</span>
+
+										<span class="d-block">@Model.InstallableExtensions[count].Description</span>
+										<span class="d-block">
+											<span class="fst-italic">Publisher</span> <span>@Model.InstallableExtensions[count].Publisher</span>
+											<a href="@Model.InstallableExtensions[count].PublisherUrl">Web site</a>
+											<a href="mailto:@Model.InstallableExtensions[count].PublisherEmail">Support Email</a>
 										</span>
 									</label>
 								</div>
@@ -185,34 +185,34 @@
 						<fieldset role="group" aria-labelledby="heading">
 							<h2>Site Settings</h2>
 
-							<SettingsControl caption="Site Name" helptext="Enter a name for your site.  This value can be displayed on-screen, depending on the selected layout.">
+							<SettingsControl caption="Site Name" helptext="Site name">
 								@Html.HiddenFor(model => model.Site.Id)
 								@Html.TextBoxFor(model => model.Site.Name)
 							</SettingsControl>
 
-							<SettingsControl caption="Default Alias (url)" helptext="Enter the primary url for your new site.  Example: 'mysite.com' or 'mysite.com/site1'.">
+							<SettingsControl caption="Default Alias (url)" helptext="Enter the primary url for your new site, omitting the http/https scheme (example: mysite.com/site1).">
 								@Html.HiddenFor(model => model.Site.DefaultSiteAlias.Id)
 								@Html.TextBoxFor(model => model.Site.DefaultSiteAlias.Alias)
 							</SettingsControl>
 
-							<SettingsControl caption="Home directory" helptext="Enter the home directory for this site's files, relative to the Nucleus files folder root.">
+							<SettingsControl caption="Home directory" helptext="Enter the home directory for this site's files, relative to the Nucleus files folder root.'">
 								@Html.TextBoxFor(model => model.Site.HomeDirectory)
 							</SettingsControl>
 
-							@*<h3>Appearance</h3>
+							<h3>Appearance</h3>
 							<div class="nucleus-flex-fields">
-								<SettingsControl caption="Default Layout" helptext="Select a default layout for your site.">
+								<SettingsControl caption="Default Layout" helptext="Description">
 									@Html.DropDownListFor(model => model.Site.DefaultLayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
 								</SettingsControl>
 
-								<SettingsControl caption="Default Container" helptext="Select a default container for your site.">
+								<SettingsControl caption="Default Container" helptext="Page default container">
 									@Html.DropDownListFor((model) => model.Site.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
 								</SettingsControl>
-							</div>*@
+							</div>
 
 							<h3>Security Roles</h3>
 							<div class="nucleus-flex-fields">
-								<SettingsControl caption="Administrators Role" helptext="Enter a name for your site's administrators role.  Members of this role can manage all settings for your site.">
+								<SettingsControl caption="Administrators Role" helptext="Administrators Role">
 									@Html.HiddenFor(model => model.Site.AdministratorsRole.Id)
 									@Html.HiddenFor(model => model.Site.AdministratorsRole.Description)
 									@if (Model.Site.AdministratorsRole.RoleGroup != null)
@@ -223,7 +223,7 @@
 									@Html.TextBoxFor(model => model.Site.AdministratorsRole.Name)
 								</SettingsControl>
 
-								<SettingsControl caption="Registered Users Role" helptext="Enter a name for your site's registered users role.  All logged in users are automatically considered to be members of this role.  You can use the registered users role to control access to pages/modules which should apply to logged-on users only.">
+								<SettingsControl caption="Registered Users Role" helptext="Registered users role">
 									@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Id)
 									@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Description)
 									@if (Model.Site.RegisteredUsersRole.RoleGroup != null)
@@ -236,7 +236,7 @@
 							</div>
 
 							<div class="nucleus-flex-fields">
-								<SettingsControl caption="Anonymous Users Role" helptext="Enter a name for your site's anomymous users role.  This role represents users who are not logged in.  You can use the anonymous users role to assign permissions to pages and modules which should apply when a user is not logged in (like view permissions to a module containing a prompt to register and log in.).">
+								<SettingsControl caption="Anonymous Users Role" helptext="Anonymous users role">
 									@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Id)
 									@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Description)
 									@if (Model.Site.AnonymousUsersRole.RoleGroup != null)
@@ -247,7 +247,7 @@
 									@Html.TextBoxFor(model => model.Site.AnonymousUsersRole.Name)
 								</SettingsControl>
 
-								<SettingsControl caption="All Users Role" helptext="Enter a name for your site's all users role.  You can use the all users role to assign permissions to pages and modules which should apply to all users, whether they are logged in or not.">
+								<SettingsControl caption="All Users Role" helptext="All users role">
 									@Html.HiddenFor(model => model.Site.AllUsersRole.Id)
 									@Html.HiddenFor(model => model.Site.AllUsersRole.Description)
 									@if (Model.Site.AllUsersRole.RoleGroup != null)
@@ -267,28 +267,28 @@
 
 							@if (Model.CreateSystemAdministratorUser)
 							{
-								<SettingsControl caption="System Administrator User Name" helptext="Enter a user name for your system administrator user.  This user can manage all sites.">
+								<SettingsControl caption="System Administrator User Name" helptext="Enter a name for your system administrator user.  This user can manage all sites.">
 									@Html.TextBoxFor(model => model.SystemAdminUserName)
 								</SettingsControl>
 
 								<div class="nucleus-flex-fields">
-									<SettingsControl caption="System Administrator User Password" helptext="Enter a password for the system administrator.">
+									<SettingsControl caption="System Administrator User Password" helptext="Enter a password for the user">
 										@Html.PasswordFor(model => model.SystemAdminPassword)
 									</SettingsControl>
-									<SettingsControl caption="Confirm Password" helptext="Confirm the password for the system administrator.">
+									<SettingsControl caption="Confirm Password" helptext="Enter a password for the user">
 										@Html.PasswordFor(model => model.SystemAdminConfirmPassword)
 									</SettingsControl>
 								</div>
 							}
-							<SettingsControl caption="Site Administrator User Name" helptext="Enter a user name for your site's administrator user.  This user will be able to manage the site which is being created by the installation wizard.">
+							<SettingsControl caption="Site Administrator User Name" helptext="Enter a name for your site administrator user.  This user can manage a single site only.">
 								@Html.TextBoxFor(model => model.SiteAdminUserName)
 							</SettingsControl>
 
 							<div class="nucleus-flex-fields">
-								<SettingsControl caption="Site Administrator User Password" helptext="Enter a password for the site administrator user.">
+								<SettingsControl caption="Site Administrator User Password" helptext="Enter a password for the user">
 									@Html.PasswordFor(model => model.SiteAdminPassword)
 								</SettingsControl>
-								<SettingsControl caption="Confirm Password" helptext="Confirm the password for the site administrator user.">
+								<SettingsControl caption="Confirm Password" helptext="Enter a password for the user">
 									@Html.PasswordFor(model => model.SiteAdminConfirmPassword)
 								</SettingsControl>
 							</div>
@@ -339,8 +339,6 @@
 
 		jQuery('#site-wizard').modal('show');
 		jQuery('#wizard-button-back, #wizard-button-next').on('click', navigateTab);
-
-		Page.EnableEnhancedToolTips(true);
 	});
 
 	function navigateTab(e)

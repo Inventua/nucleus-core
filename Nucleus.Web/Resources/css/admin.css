@@ -719,12 +719,6 @@ ul.nucleus-control-panel-items button
 .nucleus-adminpage .FileSystemManager
 {
 	min-width: 750px;
-	max-height: 100%;
-}
-
-.nucleus-adminpage .FileSystemManager form
-{
-	height: 100%;
 }
 
 .nucleus-adminpage .FileSystemItems
@@ -732,11 +726,11 @@ ul.nucleus-control-panel-items button
 	font-size: 14px;
 }
 
-/*.nucleus-adminpage .FileSystemItems th, .nucleus-adminpage .FileSystemItems td
+.nucleus-adminpage .FileSystemItems th, .nucleus-adminpage .FileSystemItems td
 {
 	padding: 4px 8px;
 	white-space: nowrap;
-}*/
+}
 
 .nucleus-adminpage .FileSystemItems .file-type
 {

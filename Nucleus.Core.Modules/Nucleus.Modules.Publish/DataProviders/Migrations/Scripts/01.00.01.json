@@ -14,7 +14,7 @@
 					{
 						"name": "CategoryListItemId",
 						"clrType": "guid",
-						"isnullable": true
+						"isnullable": false
 					},
 					{
 						"name": "DateAdded",

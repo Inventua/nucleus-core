@@ -42,7 +42,6 @@
 .settings-control
 {
 	margin-bottom: 6px;
-	position: relative;
 }
 
 .settings-control label
@@ -55,7 +54,6 @@
 {
 	flex-direction: row;
 	gap: 4px;
-	align-items: center;
 }
 
 .settings-control label span
@@ -110,16 +108,6 @@ table input, table select
 table input[type=radio]
 {
 	width: auto;
-}
-
-.settings-control.textarea-fill
-{
-	display: flex;
-}
-
-.settings-control.textarea-fill, .settings-control.textarea-fill label, .settings-control.textarea-fill label textarea
-{
-	flex: 1;
 }
 
 /* This section is mostly to do with overriding Safari/IOS styling of various elements */

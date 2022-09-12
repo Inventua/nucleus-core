@@ -30,7 +30,7 @@ namespace Nucleus.Web.ViewModels.Setup
 		[Required(ErrorMessage = "You must enter a System Administrator password")]
 		public string SystemAdminPassword { get; set; }
 
-		[Required(ErrorMessage = "You must enter a System Administrator password confirmation")]
+		[Required(ErrorMessage = "Confirm Password is required")]
 		[Compare(nameof(SystemAdminPassword), ErrorMessage = "The new password and confirm password values must match")]
 		public string SystemAdminConfirmPassword { get; set; }
 
@@ -40,7 +40,7 @@ namespace Nucleus.Web.ViewModels.Setup
 		[Required(ErrorMessage = "You must enter a Site Administrator password")]
 		public string SiteAdminPassword { get; set; }
 
-		[Required(ErrorMessage = "You must enter a Site Administrator password confirmation ")]
+		[Required(ErrorMessage = "Confirm Password is required")]
 		[Compare(nameof(SiteAdminPassword), ErrorMessage = "The new password and confirm password values must match")]
 		public string SiteAdminConfirmPassword { get; set; }
 
@@ -64,8 +64,6 @@ namespace Nucleus.Web.ViewModels.Setup
 		public class InstallableExtension
 		{
 			//public Nucleus.Abstractions.Models.Extensions.PackageResult PackageInfo { get; set; }
-			public Guid PackageId { get; set; }
-			public System.Version PackageVersion { get; set; }
 			public string Filename { get; set; }
 
 			public string Name { get; set; }
@@ -90,9 +88,6 @@ namespace Nucleus.Web.ViewModels.Setup
 
 			public InstallableExtension(string filename, Nucleus.Abstractions.Models.Extensions.PackageResult packageInfo)
 			{
-				this.PackageId = Guid.Parse(packageInfo.Package.id);
-				this.PackageVersion = System.Version.Parse(packageInfo.Package.version);
-
 				this.Filename = filename;
 
 				this.Name = packageInfo.Package.name;

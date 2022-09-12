@@ -13,6 +13,8 @@ namespace Nucleus.Modules.Publish.ViewModels
 {
 	public class ViewArticle
 	{
+		public Context Context { get; set; }
+
 		public Models.Article Article { get; set; }
 
 	}

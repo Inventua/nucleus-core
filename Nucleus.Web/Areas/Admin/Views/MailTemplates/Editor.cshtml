@@ -10,15 +10,16 @@
 	<h2>Mail Template</h2>
 	@Html.HiddenFor(model => model.MailTemplate.Id)
 
-	<SettingsControl caption="Name" helptext="Mail Template name.">
+	<SettingsControl caption="Name" helptext="MailTemplate name">
 		@Html.TextBoxFor(model => model.MailTemplate.Name, new { @maxlength = 256 })
 	</SettingsControl>
 
-		<SettingsControl caption="Subject" helptext="Mail Template Subject.  This is the e-mail subject.">
+	<SettingsControl caption="Subject" helptext="Subject">
 		@Html.TextBoxFor(model => model.MailTemplate.Subject, new { @maxlength = 256 })
 	</SettingsControl>
 
-	<SettingsControl caption="Body" helptext="" class="textarea-fill">
+	<SettingsControl caption="Body" helptext="Body">
+		@*@Html.TextAreaFor(model => model.MailTemplate.Body, 12, 60, new { @class = "HtmlEditorControl" })*@
 		@Html.TextAreaFor(model => model.MailTemplate.Body, 12, 60, new { @class = "font-monospace" })
 	</SettingsControl>
 

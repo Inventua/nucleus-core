@@ -1,7 +1,9 @@
 ﻿@model Nucleus.Modules.Publish.ViewModels.ViewArticle
 @using Nucleus.Modules.Publish.ViewModels
+@using Nucleus.Modules.Publish.HtmlHelpers
 @Html.AddStyle("~!/../viewer.css")
 <div class="Article">
+	@Html.AddEditingControls(Model.Context, @Model.Article.Id)
 	<h2 class="title">
 		@Model.Article.Title
 	</h2>

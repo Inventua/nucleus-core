@@ -1189,14 +1189,15 @@ function _Page()
 					/*  override bootstrap/popper positioning, in order to bottom-left align the tooltip, but only inside elements with .settings-control */
 					if (jQuery(this).hasClass('settings-control') && jQuery(this).css('position') == 'relative')
 					{
+						jQuery(this).find('.tooltip').css('position', 'absolute');
 						jQuery(this).find('.tooltip').css('transform', 'translateY(' + jQuery(this).height() + 'px)');
 
-						/*jQuery(this).find('.tooltip').css('transform', 'matrix(1, 0, 0, 1, 0, ' + jQuery(this).height() + ')');*/
+						/* if tooltip is not completely visible (overlaps the bottom of the viewport), position it above the settings control  */
+						if (!_isElementInViewport(jQuery(this).find('.tooltip')))
+						{
+							jQuery(this).find('.tooltip').css('transform', 'translateY(' + -jQuery(this).height() + 'px)');
+						}
 
-						/* for settings-controls with class inner-inline and a toggleswitch control, adjust the arrow position */
-						if (jQuery(this).hasClass('inner-inline') && jQuery(this).find('.ToggleSwitch').length > 0)
-						{}
-						/*jQuery(this).find('.tooltip-arrow').css('transform', 'matrix(1, 0, 0, 1, 10, 0)');*/
 						jQuery(this).find('.tooltip-arrow').css('transform', 'translateX(10px)');
 						
 					}
@@ -1221,6 +1222,24 @@ function _Page()
 		});
 	}
 
+	function _isElementInViewport(el)
+	{
+
+		// Special bonus for those using jQuery
+		if (typeof jQuery === "function" && el instanceof jQuery)
+		{
+			el = el[0];
+		}
+
+		var rect = el.getBoundingClientRect();
+
+		return (
+			rect.top >= 0 &&
+			rect.left >= 0 &&
+			rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /* or $(window).height() */
+			rect.right <= (window.innerWidth || document.documentElement.clientWidth) /* or $(window).width() */
+		);
+	}
 
 	// Add _Layout.cshtml event handlers, which are used to communicate/execute events from the admin iframe to the main window.
 

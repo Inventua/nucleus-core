@@ -85,6 +85,7 @@ namespace Nucleus.Modules.Publish.Controllers
 		{
 			ViewModels.ViewArticle viewModel = new() 
 			{
+				Context = this.Context,
 				Article = article
 			};
 			return Task.FromResult(viewModel);

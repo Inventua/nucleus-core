@@ -1175,14 +1175,32 @@ function _Page()
 		{
 			if (enable)
 			{
-				jQuery(element).attr('data-bs-toggle', 'tooltip');
-				var instance = new bootstrap.Tooltip(element,
+				/* We want tooltips to show when the user hovers over the caption, rather than the input controls */
+				var tooltipTarget = jQuery(element).find('label span');
+
+				/* Save the settings-control tile in data-bs-original-title and remove the title attribute, so the browser doesn't also try to show the title. */
+				/* This is the same as the built-in bootstrap tooltip behavior, but we have to do it ourselves because we are targeting 'tooltipTarget' rather */
+				/* than the settings-control element. */
+				jQuery(element)
+					.attr('data-bs-original-title', jQuery(element).attr('title'))
+					.removeAttr('title', '');
+
+				/* Create the tooltip/event handler/etc.  Note that the "title" argument is a function which gets the parent settings-control title. */
+				tooltipTarget.attr('data-bs-toggle', 'tooltip');
+				var instance = new bootstrap.Tooltip(tooltipTarget,
 					{
 						trigger: 'hover',
 						placement: 'bottom',
 						container: element,
-						delay: 300
+						title: function () { return jQuery(this).parents('.settings-control').first().attr('data-bs-original-title')},
+						delay: 600
 					});
+
+				/* Bootstrap assumes that the tooltip target is what contains the title (regardless of our 'title' function above), and tries to save  */
+				/* the element's title.  This results in two empty attributes */
+				tooltipTarget
+					.removeAttr('data-bs-original-title')
+					.removeAttr('title', '');
 
 				element.addEventListener('shown.bs.tooltip', function ()
 				{
@@ -1207,19 +1225,18 @@ function _Page()
 
 				jQuery(document).on('click', function ()
 				{
-					jQuery('.settings-control[data-bs-toggle="tooltip"]').each(function (index, element)
+					jQuery('.settings-control label span[data-bs-toggle="tooltip"]').each(function (index, element)
 					{
-						bootstrap.Tooltip.getInstance(element).hide();
+						var inst = bootstrap.Tooltip.getInstance(element);
+						if (inst != null) inst.hide();
 					});
 				});
 			}
 			else
 			{
-				jQuery(element)
-					.attr('title', jQuery(element).attr('data-bs-original-title'))
-					.removeAttr('data-bs-toggle', 'tooltip');
-
-				bootstrap.Tooltip.getInstance(element).disable();
+				jQuery(element).attr('title', jQuery(element).attr('data-bs-original-title'));
+				jQuery(element).find('label span').removeAttr('data-bs-toggle', 'tooltip');
+				bootstrap.Tooltip.getInstance(jQuery(element).find('label span[data-bs-toggle="tooltip"]')).disable();
 			}
 		});
 	}

@@ -696,51 +696,60 @@ function _Page()
 		{
 			if (request.status === 400)
 			{
-				// bad request.  Parse ModelState errors		
-				var messages = new Array(request.responseJSON.length);
-				var elementSelector = '';
-
-				// get a list of elements with validation errors
-				for (var prop in request.responseJSON)
+				// bad request.  Can be a ModelState JSON response, or an error message
+				if (typeof request.responseJSON.title !== 'undefined' && typeof request.responseJSON.detail !== 'undefined')
 				{
-					var element = jQuery('[name="' + prop + '"]');
-					if (!element.is('.HtmlEditorControl'))
-					{
-						element.addClass('ValidationError');
-					}
-					else
-					{
-						element.parents('.settings-control').first().addClass('ValidationError');
-					}
-
-					if (elementSelector !== '') elementSelector += ',';
-					elementSelector += '#' + element.attr('id');
+					errorData = request.responseJSON;
 				}
-
-				var elements = jQuery(elementSelector);
-
-				// sort the messages by element ordinal position
-				for (var prop in request.responseJSON)
+				else
 				{
-					var element = jQuery('[name="' + prop + '"]');
-					var index = _getElementIndex(elements, element.attr('id'));
-					if (index !== undefined)
+					// Parse ModelState errors		
+					var messages = new Array(request.responseJSON.length);
+					var elementSelector = '';
+
+					// get a list of elements with validation errors
+					for (var prop in request.responseJSON)
 					{
-						message = request.responseJSON[prop].toString();
-						if (!message.endsWith("."))
+						var element = jQuery('[name="' + prop + '"]');
+						if (!element.is('.HtmlEditorControl'))
 						{
-							message += '.';
+							element.addClass('ValidationError');
 						}
-						messages[index] = '<li>' + message + '</li>';
+						else
+						{
+							element.parents('.settings-control').first().addClass('ValidationError');
+						}
+
+						if (elementSelector !== '') elementSelector += ',';
+						elementSelector += '#' + element.attr('id');
 					}
-				}
 
-				var validationMessage = '<ul>' + messages.join('') + '</ul>';
+					var elements = jQuery(elementSelector);
 
-				errorData = new Object();
-				errorData.title = 'Validation Error';
-				errorData.detail = validationMessage;
-				errorData.statusCode = request.status;
+					// sort the messages by element ordinal position
+					for (var prop in request.responseJSON)
+					{
+						var element = jQuery('[name="' + prop + '"]');
+						var index = _getElementIndex(elements, element.attr('id'));
+						if (index !== undefined)
+						{
+							message = request.responseJSON[prop].toString();
+							if (!message.endsWith("."))
+							{
+								message += '.';
+							}
+							messages[index] = '<li>' + message + '</li>';
+						}
+					}
+
+					var validationMessage = '<ul>' + messages.join('') + '</ul>';
+
+					errorData = new Object();
+					errorData.title = 'Validation Error';
+					errorData.detail = validationMessage;
+					errorData.statusCode = request.status;
+					errorData.icon = "warning";
+				}				
 			}
 			else
 			{
@@ -767,7 +776,7 @@ function _Page()
 			errorData.statusCode = request.status;
 		}
 
-		_dialog(errorData.title, errorData.detail, 'error')
+		_dialog(errorData.title, errorData.detail, errorData.icon ?? 'error')
 	}
 
 	function _getElementIndex(items, id)
@@ -838,7 +847,7 @@ function _Page()
 			'        <h5 class="modal-title">' + title + '</h5>' +
 			'        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="' + cancelCaption + '"></button>' +
 			'      </div>' +
-			'      <div class="modal-body">' +
+			'      <div class="modal-body flex-row">' +
 			iconElement +
 			'        <div class="dialog-message">' + message.replace(new RegExp('\n', 'g'), '<br/>') + '</div>' +
 			'      </div>' +
@@ -1155,31 +1164,54 @@ function _Page()
 
 	function _enableEnhancedToolTips(enable)
 	{		
-		if (!enable)
+		jQuery('.settings-control[title]').each(function (index, element)
 		{
-			jQuery('.settings-control[title]').each(function (index, element)
+			if (enable)
 			{
-				if (enable)
-				{
-					jQuery(element).attr('data-bs-toggle', 'tooltip');
-					return new bootstrap.Tooltip(element,
-						{
-							trigger: 'hover',
-							container: 'body',
-							placement: 'bottom',
-							delay: 300
-						});
-				}
-				else
-				{
-					jQuery(element)
-						.attr('title', jQuery(element).attr('data-bs-original-title'))
-						.removeAttr('data-bs-toggle', 'tooltip');
+				jQuery(element).attr('data-bs-toggle', 'tooltip');
+				var instance = new bootstrap.Tooltip(element,
+					{
+						trigger: 'hover',
+						placement: 'bottom',
+						container: element,
+						delay: 300
+					});
 
-					bootstrap.Tooltip.getInstance(element).disable();
-				}
-			});
-		}		
+				element.addEventListener('shown.bs.tooltip', function ()
+				{
+					/*  override bootstrap/popper positioning, in order to bottom-left align the tooltip, but only inside elements with .settings-control */
+					if (jQuery(this).hasClass('settings-control') && jQuery(this).css('position') == 'relative')
+					{
+						jQuery(this).find('.tooltip').css('transform', 'translateY(' + jQuery(this).height() + 'px)');
+
+						/*jQuery(this).find('.tooltip').css('transform', 'matrix(1, 0, 0, 1, 0, ' + jQuery(this).height() + ')');*/
+
+						/* for settings-controls with class inner-inline and a toggleswitch control, adjust the arrow position */
+						if (jQuery(this).hasClass('inner-inline') && jQuery(this).find('.ToggleSwitch').length > 0)
+						{}
+						/*jQuery(this).find('.tooltip-arrow').css('transform', 'matrix(1, 0, 0, 1, 10, 0)');*/
+						jQuery(this).find('.tooltip-arrow').css('transform', 'translateX(10px)');
+						
+					}
+				});
+
+				jQuery(document).on('click', function ()
+				{
+					jQuery('.settings-control[data-bs-toggle="tooltip"]').each(function (index, element)
+					{
+						bootstrap.Tooltip.getInstance(element).hide();
+					});
+				});
+			}
+			else
+			{
+				jQuery(element)
+					.attr('title', jQuery(element).attr('data-bs-original-title'))
+					.removeAttr('data-bs-toggle', 'tooltip');
+
+				bootstrap.Tooltip.getInstance(element).disable();
+			}
+		});
 	}
 
 

@@ -9,6 +9,7 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Data.Common;
 using Nucleus.Core.DataProviders;
 using Nucleus.Abstractions.Managers;
+using System.IO.Enumeration;
 
 namespace Nucleus.Core.Layout
 {
@@ -179,6 +180,18 @@ namespace Nucleus.Core.Layout
 
 			await next(context);
 
+			// If the request path did not match a site, and the response is a 404 (so it didn't match a controller route
+			// or any other component that can handle the request), and there are no sites in the sites table, redirect to 
+			// the setup wizard.  This is to handle cases where there is a /Setup/install-log.config file present (indicating
+			// that setup has previously completed), but the database is empty.  This is mostly a scenario that happens in
+			// testing, but it could also happen if a user decided to attach to a different (new) database.
+			if (context.Response.StatusCode == (int)System.Net.HttpStatusCode.NotFound && this.Context.Site == null)
+			{
+				if (await this.SiteManager.Count() == 0)
+				{
+					context.Response.Redirect("/Setup/SiteWizard");
+				}
+			}
 		}
 
 		/// <summary>

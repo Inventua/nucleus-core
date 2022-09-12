@@ -2,7 +2,7 @@
 <package id="5765ca81-bf24-4ee7-81bd-5c445a044146" xmlns="urn:nucleus/schemas/package/1.0">
   <name>OAuth Server</name>
   <version>1.0.0</version>
-  <publisher name="Inventua Pty Ltd" url="http://www.inventua.com" email="support@inventua.com" />
+  <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
   </description>
   <compatibility minVersion="1.0.0.0" maxVersion="*" />

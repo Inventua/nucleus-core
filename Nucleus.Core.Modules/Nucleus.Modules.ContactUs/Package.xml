@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="158750dd-7631-4235-b55a-6a0d999dcfef" xmlns="urn:nucleus/schemas/package/1.0">
-  <name>ContactUs</name>
+  <name>Contact Us</name>
   <version>1.0.0</version>
-  <publisher name="Inventua Pty Ltd" url="http://www.inventua.com" email="support@inventua.com" />
+  <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
 		The Contact Us module displays a form which allows site users to contact you by email.
 	</description>

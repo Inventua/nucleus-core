@@ -2,7 +2,7 @@
 <package id="5a74caf7-c328-466c-85aa-db9861c44700" xmlns="urn:nucleus/schemas/package/1.0">
   <name>Google Analytics</name>
   <version>1.0.1.0</version>
-  <publisher name="Inventua Pty Ltd" url="http://www.inventua.com" email="support@inventua.com" />
+  <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
 		Use this extension to add Google Analytics reporting to your site.
 	</description>

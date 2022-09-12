@@ -12,8 +12,8 @@
 
       if (isAdminMode)
       {
-        plugins = 'code link lists'
-        toolbar = 'code | undo redo | blocks | bold italic | link pages unlink | images | alignleft aligncenter alignright alignjustify | bullist numlist | hr | removeformat';
+        plugins = 'code link lists table'
+        toolbar = 'code | undo redo | blocks | table | bold italic strikethrough | link pages unlink | images | alignleft aligncenter alignright alignjustify | bullist numlist | hr | removeformat';
         external_plugins = {
           pages: '../Nucleus/tinymce.pages.min.js',
           images: '../Nucleus/tinymce.images.min.js'
@@ -44,9 +44,9 @@
         paste_block_drop: false,
         paste_data_images: true,
         paste_as_text: true,
-        external_plugins: external_plugins
+        external_plugins: external_plugins,
+        block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Preformatted=pre; Code=code'
       });
-
     });
   }
 })(jQuery);

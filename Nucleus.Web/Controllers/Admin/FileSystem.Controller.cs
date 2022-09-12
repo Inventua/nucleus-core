@@ -18,6 +18,7 @@ using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Options;
 using Nucleus.Extensions.Authorization;
 using System.Text;
+using System.Dynamic;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -179,9 +180,47 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		public ActionResult ShowDeleteDialog(ViewModels.Admin.FileSystem viewModel)
+		public async Task<ActionResult> ShowDeleteDialog(ViewModels.Admin.FileSystem viewModel)
 		{
-			return View("Delete", BuildDeleteViewModel(viewModel));
+			IEnumerable<Folder> selectedFolders = viewModel.Folder?.Folders.Where(folder => folder.IsSelected);
+			IEnumerable<File> selectedFiles = viewModel.Folder?.Files.Where(file => file.IsSelected);
+
+			if (!selectedFolders.Any() && !selectedFiles.Any())
+			{
+				return BadRequest(new ProblemDetails()
+				{
+					Title = "Delete",
+					Detail = "Please select one or more files or folders."
+				});
+			}
+
+			List<string> nonEmptyFolders = new();
+			foreach (Folder selectedFolder in selectedFolders)
+			{
+				Folder folderDetails = await this.FileSystemManager.ListFolder(this.Context.Site, selectedFolder.Id, "");
+				if (folderDetails != null && (folderDetails.Files.Any() || folderDetails.Folders.Any()))
+				{
+					nonEmptyFolders.Add($"'{folderDetails.Name}'");
+				}
+			}
+
+			if (nonEmptyFolders.Any())
+			{
+				if (nonEmptyFolders.Count > 1)
+				{
+					string last = nonEmptyFolders.Last();
+					nonEmptyFolders.Remove(last);
+					nonEmptyFolders.Add($"and {last}");
+				}
+
+				return BadRequest(new ProblemDetails()
+				{
+					Title = "Delete",
+					Detail = $"The folder{(nonEmptyFolders.Count > 1 ? "s" : "")} {String.Join(", ", nonEmptyFolders)} contain{(nonEmptyFolders.Count == 1 ? "s" : "")} one or more files or folders.  You must delete the folders/files within {(nonEmptyFolders.Count > 1 ? "each" : "this")} folder before you can delete it."
+				});
+			}
+
+			return View("Delete", await BuildDeleteViewModel(viewModel));
 		}
 
 		[HttpPost]
@@ -192,13 +231,14 @@ namespace Nucleus.Web.Controllers.Admin
 
 			if ( !selectedFolders.Any() && !selectedFiles.Any())
 			{
-				return Json(new { Title = "Download", Message = "Please select one or more files and folders." });
+				return Json(new { Title = "Download", Message = "Please select one or more files or folders." });
 			}
 
 			if (!selectedFolders.Any() && selectedFiles.Count() == 1)
 			{
 				// one file selected, download as-is
 				File file = await this.FileSystemManager.GetFile(this.Context.Site, selectedFiles.First().Id);
+				Response.Headers.Add("Content-Disposition", "attachment;filename=" + file.Name);
 				return File(await this.FileSystemManager.GetFileContents(this.Context.Site, file), file.GetMIMEType(true));
 			}
 
@@ -222,6 +262,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 			archive.Dispose();
 			output.Position = 0;
+			Response.Headers.Add("Content-Disposition", "attachment");
 			return File(output, "application/zip");
 		}
 
@@ -479,6 +520,18 @@ namespace Nucleus.Web.Controllers.Admin
 					viewModel.Folder = await this.FileSystemManager.ListFolder(this.Context.Site, folder.Id, "");
 					viewModel.Folder.SortFolders(folder => folder.Name, false);
 					viewModel.Folder.SortFiles(file => file.Name, false);
+
+					Folder ancestor = viewModel.Folder;
+					while (ancestor != null && ancestor.Id != Guid.Empty)
+					{
+						viewModel.Ancestors.Add(ancestor);												
+						if (ancestor.Parent == null || ancestor.Parent.Id == Guid.Empty || ancestor.Parent.Id == ancestor.Id)
+						{
+							break;
+						}
+						ancestor = await this.FileSystemManager.GetFolder(this.Context.Site, ancestor.Parent.Id);
+					}
+					viewModel.Ancestors.Reverse();
 				}
 			}
 
@@ -550,14 +603,26 @@ namespace Nucleus.Web.Controllers.Admin
 			.OrderBy(selectListItem => selectListItem.Group?.Name);
 		}
 
-		static ViewModels.Admin.FileSystemDelete BuildDeleteViewModel(ViewModels.Admin.FileSystem viewModel)
+		private async Task<ViewModels.Admin.FileSystemDelete> BuildDeleteViewModel(ViewModels.Admin.FileSystem viewModel)
 		{
-			return new()
+			ViewModels.Admin.FileSystemDelete results = new()
 			{
 				Folder = viewModel.Folder,
 				SelectedFolders = viewModel.Folder?.Folders.Where(folder => folder.IsSelected).ToList(),
 				SelectedFiles = viewModel.Folder?.Files.Where(file => file.IsSelected).ToList()
 			};
+
+			foreach (Folder folder in results.SelectedFolders)
+			{
+				(await this.FileSystemManager.GetFolder(this.Context.Site, folder.Id)).CopyTo(folder);
+			}
+			
+			foreach (File file in results.SelectedFiles)
+			{
+				(await this.FileSystemManager.GetFile(this.Context.Site, file.Id)).CopyTo(file);
+			}
+
+			return results;
 		}
 
 		private async Task<ViewModels.Admin.FileSystemCreateFolder> BuildCreateFolderViewModel(Folder folder)

@@ -101,7 +101,7 @@ namespace Nucleus.Extensions.AdvancedSiteMap
 
 		public static string GetFilename(Abstractions.Models.Configuration.FolderOptions options, Site site)
 		{
-			string path = System.IO.Path.Join(options.GetTempFolder(true), "SiteMap");
+			string path = System.IO.Path.Join(options.GetCacheFolder(true), "SiteMap");
 			path = System.IO.Path.Combine(path, GenerateValidPath(site.Name));
 			options.EnsureExists(path);
 			return System.IO.Path.Join(path, "Sitemap.xml");

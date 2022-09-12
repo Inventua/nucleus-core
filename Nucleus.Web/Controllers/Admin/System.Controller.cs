@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http.Features;
 using Nucleus.Abstractions.Managers;
+using static Nucleus.Web.ViewModels.Admin.SystemIndex;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -71,9 +72,7 @@ namespace Nucleus.Web.Controllers.Admin
 			};
 
 			viewModelOutput.LogSettings.LogFile = viewModelInput.LogSettings.LogFile;
-
 			viewModelOutput.LogSettings.LogMessage = "";
-
 
 			if (!String.IsNullOrEmpty(this.LogFolderPath) && System.IO.Directory.Exists(this.LogFolderPath))
 			{
@@ -159,6 +158,25 @@ namespace Nucleus.Web.Controllers.Admin
 			//	viewModelOutput.WebServerInformation.Add("Server", serverVars["SERVER_NAME"]);
 			//	viewModelOutput.WebServerInformation.Add("Software", serverVars["SERVER_SOFTWARE"]);
 			//	viewModelOutput.WebServerInformation.Add("Path", serverVars["APPL_PHYSICAL_PATH"]);				
+			//}
+
+			//AzureCounterData azureCounters = ViewModels.Admin.SystemIndex.AzureCounterData.Create();
+			//if (azureCounters != null)
+			//{
+			//	viewModelOutput.WebServerInformation.Add("Processes", azureCounters.app.processes.ToString());
+			//	viewModelOutput.WebServerInformation.Add("Process Limit", azureCounters.app.processLimit.ToString());
+
+			//	viewModelOutput.WebServerInformation.Add("Threads", azureCounters.app.threads.ToString());
+			//	viewModelOutput.WebServerInformation.Add("Thread Limit", azureCounters.app.threadLimit.ToString());
+				
+			//	viewModelOutput.WebServerInformation.Add("Connections", azureCounters.app.connections.ToString());
+			//	viewModelOutput.WebServerInformation.Add("Connection Limit", azureCounters.app.connectionLimit.ToString());
+
+			//	viewModelOutput.WebServerInformation.Add("Bytes In All Heaps", azureCounters.clr.bytesInAllHeaps.FormatFileSize());
+
+			//	viewModelOutput.WebServerInformation.Add("aspnet", azureCounters.aspNetTest);
+			//	viewModelOutput.WebServerInformation.Add("app", azureCounters.appTest);
+			//	viewModelOutput.WebServerInformation.Add("clr", azureCounters.clrTest);
 			//}
 
 			return View("Index", viewModelOutput);

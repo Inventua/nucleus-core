@@ -1186,20 +1186,22 @@ function _Page()
 
 				element.addEventListener('shown.bs.tooltip', function ()
 				{
-					/*  override bootstrap/popper positioning, in order to bottom-left align the tooltip, but only inside elements with .settings-control */
+					/*  override bootstrap/popper positioning, in order to bottom-left align the tooltip (instead of bottom-centered), but only inside 
+					 *  elements with .settings-control css class */
 					if (jQuery(this).hasClass('settings-control') && jQuery(this).css('position') == 'relative')
 					{
-						jQuery(this).find('.tooltip').css('position', 'absolute');
-						jQuery(this).find('.tooltip').css('transform', 'translateY(' + jQuery(this).height() + 'px)');
-
-						/* if tooltip is not completely visible (overlaps the bottom of the viewport), position it above the settings control  */
-						if (!_isElementInViewport(jQuery(this).find('.tooltip')))
+						// Popper will set the transform css property to matrix(1,0,0,1, x-position, y-position).  We want to remove the x-position (set it to zero
+						// in order to left-align the tooltip.
+						var matrixTransform = jQuery(this).find('.tooltip').css('transform');
+						if (matrixTransform.includes('matrix'))
 						{
-							jQuery(this).find('.tooltip').css('transform', 'translateY(' + -jQuery(this).height() + 'px)');
+							var values = matrixTransform.split(',');
+							matrixTransform = values[0] + ',' + values[1] + ',' + values[2] + ',' + values[3] + ',' + '0' + ',' + values[5];
+							jQuery(this).find('.tooltip').css('transform', matrixTransform);
 						}
 
-						jQuery(this).find('.tooltip-arrow').css('transform', 'translateX(10px)');
-						
+						/* position the tooltip arrow to the left */
+						jQuery(this).find('.tooltip-arrow').css('transform', 'translateX(10px)');						
 					}
 				});
 
@@ -1220,25 +1222,6 @@ function _Page()
 				bootstrap.Tooltip.getInstance(element).disable();
 			}
 		});
-	}
-
-	function _isElementInViewport(el)
-	{
-
-		// Special bonus for those using jQuery
-		if (typeof jQuery === "function" && el instanceof jQuery)
-		{
-			el = el[0];
-		}
-
-		var rect = el.getBoundingClientRect();
-
-		return (
-			rect.top >= 0 &&
-			rect.left >= 0 &&
-			rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /* or $(window).height() */
-			rect.right <= (window.innerWidth || document.documentElement.clientWidth) /* or $(window).width() */
-		);
 	}
 
 	// Add _Layout.cshtml event handlers, which are used to communicate/execute events from the admin iframe to the main window.

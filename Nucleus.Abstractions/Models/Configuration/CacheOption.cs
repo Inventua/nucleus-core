@@ -25,10 +25,10 @@ namespace Nucleus.Abstractions.Models.Configuration
 		public const string Section = "Nucleus:CacheOptions";
 
 		private const int DEFAULT_CAPACITY = 1000;
-		private const int DEFAULT_EXPIRYTIMEMINUTES = 5;
+		private const int DEFAULT_EXPIRYTIMEMINUTES = 15;
 
 		/// <summary>
-		/// The maximum number of items that can be help in the cache.  When the capacity is reached, every time a new
+		/// The maximum number of items that can be held in the cache.  When the capacity is reached, every time a new
 		/// item is added, the oldest item is removed from the cache.
 		/// </summary>
 		public int Capacity { get; private set; } = DEFAULT_CAPACITY;

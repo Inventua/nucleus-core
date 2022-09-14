@@ -7,16 +7,20 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Data.Common;
 using Nucleus.Core.DataProviders;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Nucleus.Core.Managers
 {
 	public class PermissionsManager : IPermissionsManager
 	{
 		private IDataProviderFactory DataProviderFactory { get; }
+		private ICacheManager CacheManager { get; }
 
-		public PermissionsManager(IDataProviderFactory dataProviderFactory)
+		public PermissionsManager(IDataProviderFactory dataProviderFactory, ICacheManager cacheManager)
 		{
 			this.DataProviderFactory = dataProviderFactory;
+			this.CacheManager = cacheManager;
 		}
 
 		public async Task<List<Permission>> ListPermissions(Guid Id, string permissionNameSpace)
@@ -29,10 +33,13 @@ namespace Nucleus.Core.Managers
 
 		public async Task<List<PermissionType>> ListPermissionTypes(string scopeNamespace)
 		{
-			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+			return await this.CacheManager.PermissionTypesCache().GetAsync(scopeNamespace, async scopeNamespace =>
 			{
-				return await provider.ListPermissionTypes(scopeNamespace);				
-			}
+				using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+				{
+					return await provider.ListPermissionTypes(scopeNamespace);
+				}
+			});
 		}
 
 		public async Task SavePermissions(Guid relatedId, IEnumerable<Permission> permissions, IList<Permission> originalPermissions)
@@ -55,8 +62,9 @@ namespace Nucleus.Core.Managers
 		{
 			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
 			{
-				await provider.AddPermissionType(permissionType);				
+				await provider.AddPermissionType(permissionType);							
 			}
+			this.CacheManager.PermissionTypesCache().Remove(permissionType.Scope);
 		}
 	}
 }

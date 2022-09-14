@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models.Configuration;
+using Microsoft.Extensions.Logging;
+using Nucleus.Abstractions.Managers;
 
 namespace Nucleus.Abstractions.Models.Cache
 {
@@ -36,34 +38,37 @@ namespace Nucleus.Abstractions.Models.Cache
 		
 		// stores the collection options (expiry date and capacity)
 		private CacheOption Options { get; }
+		private ILogger<ICacheManager> Logger { get; }
 
 		/// <summary>
 		/// Initialize a new instance of the CacheCollection class using the options provided.
 		/// </summary>
+		/// <param name="logger"></param>
 		/// <param name="options"></param>
-		public CacheCollection(CacheOption options)
+		public CacheCollection(ILogger<ICacheManager> logger, CacheOption options)
 		{
-			this.Options=options;
+			this.Options = options;
+			this.Logger = logger;
 		}
 
 		/// <summary>
 		/// Get the item from the cache with the specified key, or if it not present in the cache, read it (using itemReader), add it to 
 		/// the cache and return it.
 		/// </summary>
-		/// <param name="id"></param>
+		/// <param name="key"></param>
 		/// <param name="itemReader"></param>
 		/// <returns>The item that matches the specified key.</returns>
-		public TModel Get(TKey id, Func<TKey, TModel> itemReader)
+		public TModel Get(TKey key, Func<TKey, TModel> itemReader)
 		{
-			TModel result = this.Get(id);
+			TModel result = this.Get(key);
 			
 			if (result == null)
 			{
-				result = itemReader.Invoke(id);
+				result = itemReader.Invoke(key);
 
 				if (result != null)
 				{
-					this.Add(id, result);
+					this.Add(key, result);
 				}
 			}
 
@@ -74,20 +79,20 @@ namespace Nucleus.Abstractions.Models.Cache
 		/// Get the item from the cache with the specified key, or if it not present in the cache, read it (using itemReader), add it to 
 		/// the cache and return it.
 		/// </summary>
-		/// <param name="id"></param>
+		/// <param name="key"></param>
 		/// <param name="itemReader"></param>
 		/// <returns>The item that matches the specified key.</returns>
-		public async Task<TModel> GetAsync(TKey id, Func<TKey, Task<TModel>> itemReader)
+		public async Task<TModel> GetAsync(TKey key, Func<TKey, Task<TModel>> itemReader)
 		{
-			TModel result = this.Get(id);
+			TModel result = this.Get(key);
 
 			if (result == null)
 			{
-				result = await itemReader.Invoke(id);
+				result = await itemReader.Invoke(key);
 
 				if (result != null)
 				{
-					this.Add(id, result);
+					this.Add(key, result);
 				}
 			}
 
@@ -97,15 +102,15 @@ namespace Nucleus.Abstractions.Models.Cache
 		/// <summary>
 		/// Get the item from the cache with the specified key.  
 		/// </summary>
-		/// <param name="id"></param>
+		/// <param name="key"></param>
 		/// <returns>The item with the specified key, or null if it not in the cache, or the cache item has expired.</returns>
 		/// <remarks>
 		/// This function is private.  Callers should use Get(TKey id, Func&lt;TKey, TModel&gt; itemReader).  If the cache item expiry date has
 		/// been reached, this function removes it from the cache and returns null.
 		/// </remarks>
-		private TModel Get(TKey id)
+		private TModel Get(TKey key)
 		{
-			this.Cache.TryGetValue(id, out CacheItem<TModel> result);
+			this.Cache.TryGetValue(key, out CacheItem<TModel> result);
 
 			if (result == null)
 			{
@@ -113,13 +118,16 @@ namespace Nucleus.Abstractions.Models.Cache
 			}
 			else
 			{
+				this.Logger?.LogTrace("Checking cache for '{type}' with key {key}.", typeof(TModel).Name, key);
 				if (result.Expires >= DateTime.UtcNow)
 				{
+					this.Logger?.LogTrace("Found valid cache entry for '{type}' with key {key}.", typeof(TModel).Name, key);
 					return result.Item;
 				}
 				else
 				{
-					Remove(id);
+					this.Logger?.LogDebug("Removed expired '{type}' from cache after {timeout}.", typeof(TModel).Name, this.Options.ExpiryTime);
+					Remove(key);
 					return default; 
 				}
 			}			
@@ -128,31 +136,31 @@ namespace Nucleus.Abstractions.Models.Cache
 		/// <summary>
 		/// Add the specified key/item to the cache.
 		/// </summary>
-		/// <param name="id"></param>
+		/// <param name="key"></param>
 		/// <param name="item"></param>
 		/// <remarks>
 		/// This function is private.  Items are added to the cache by the .Get function.  If the cache reaches capacity, the oldest cache item
 		/// is removed.
 		/// </remarks>		
-		private void Add(TKey id, TModel item)
+		private void Add(TKey key, TModel item)
 		{
 			Collect();
 
 			if (item == null)
 			{
-				this.Remove(id);
+				this.Remove(key);
 				return;
 			}
 
-			if (this.Cache.ContainsKey(id))
+			if (this.Cache.ContainsKey(key))
 			{
 				// replace item
-				this.Cache[id] = new CacheItem<TModel>(item, DateTime.UtcNow.Add(this.Options.ExpiryTime));
+				this.Cache[key] = new CacheItem<TModel>(item, DateTime.UtcNow.Add(this.Options.ExpiryTime));
 			}
 			else
 			{
 				// insert item
-				this.Cache.TryAdd(id, new CacheItem<TModel>(item, DateTime.UtcNow.Add(this.Options.ExpiryTime)));
+				this.Cache.TryAdd(key, new CacheItem<TModel>(item, DateTime.UtcNow.Add(this.Options.ExpiryTime)));
 
 				if (this.Cache.Count > this.Options.Capacity)
 				{

@@ -50,7 +50,7 @@ namespace Nucleus.Core.Managers
 
 						this.Logger?.LogDebug("Creating cache:'{configItemName}' with options: capacity={capacity}, expiry time={expiry}.", configItemName, options.Capacity, options.ExpiryTime);
 
-						CacheCollection<TKey, TModel> result = new(this.Logger, options);
+						CacheCollection<TKey, TModel> result = new(configItemName, this.Logger, options);
 						this.Caches.Add(cacheKey, result);
 						return result;
 					}

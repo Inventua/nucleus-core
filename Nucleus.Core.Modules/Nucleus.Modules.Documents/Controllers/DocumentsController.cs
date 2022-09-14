@@ -209,7 +209,12 @@ namespace Nucleus.Modules.Documents.Controllers
 				if (document.File != null)
 				{
 					File file = await this.FileSystemManager.GetFile(this.Context.Site, document.File.Id);
-					file.Parent.Permissions = await this.FileSystemManager.ListPermissions(file.Parent);
+
+					// As of 1.0.1, .GetFile(site, id) always populates file.parent & file.parent.permissions
+					// .GetFolder always reads permissions, and mostly comes from cache, so it will yield better performance
+					// than calling .ListPermissions.
+					//file.Parent = await this.FileSystemManager.GetFolder(this.Context.Site, file.Parent.Id);
+					//file.Parent.Permissions = await this.FileSystemManager.ListPermissions(file.Parent);
 
 					if (User.HasViewPermission(this.Context.Site, file.Parent))
 					{

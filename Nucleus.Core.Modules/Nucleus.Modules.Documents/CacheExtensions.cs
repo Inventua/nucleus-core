@@ -11,9 +11,14 @@ namespace Nucleus.Modules.Documents
 {
 	public static	class CacheExtensions
 	{
-		public static CacheCollection<Guid, Document> DocumentCache (this ICacheManager cacheManager)
+		public static CacheCollection<Guid, Document> DocumentsCache (this ICacheManager cacheManager)
 		{
 			return cacheManager.Get<Guid, Document>();
+		}
+
+		public static CacheCollection<Guid, IList<Document>> ModuleDocumentsCache(this ICacheManager cacheManager)
+		{
+			return cacheManager.Get<Guid, IList<Document>>();
 		}
 	}
 }

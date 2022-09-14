@@ -119,10 +119,12 @@ namespace Nucleus.Web.Controllers
 					}
 
 					Folder folder = await this.FileSystemManager.GetFolder(this.Context.Site, file.Parent.Id);
-					if (folder != null)
-					{
-						folder.Permissions = await this.FileSystemManager.ListPermissions(folder);
-					}
+
+					// As of 1.0.1, .GetFolder(site,id) always populates permissions
+					////if (folder != null)
+					////{
+					////	folder.Permissions = await this.FileSystemManager.ListPermissions(folder);
+					////}
 
 					if (folder != null && HttpContext.User.HasViewPermission(this.Context.Site, folder))
 					{

@@ -198,7 +198,12 @@ namespace Nucleus.Modules.Media.Controllers
 					//Folder folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFile.Parent.Id);
 					if (viewModel.SelectedFile.Parent != null)
 					{
-						viewModel.SelectedFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.SelectedFile.Parent);
+						// As of 1.0.1, .GetFile(site, id) always populates file.parent & file.parent.permissions
+						
+						// .GetFolder always reads permissions, and mostly comes from cache, so it will yield better performance
+						// than calling .ListPermissions.
+						// viewModel.SelectedFile.Parent = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFile.Parent.Id);
+						//viewModel.SelectedFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.SelectedFile.Parent);
 						if (HttpContext.User.HasViewPermission(this.Context.Site, viewModel.SelectedFile.Parent))
 						{
 							viewModel.Caption = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_CAPTION, "");

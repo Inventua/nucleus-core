@@ -93,30 +93,25 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		private async Task<Page> FindPage(Site site, string path)
 		{
-			string pagePathCacheKey = (site.Id.ToString() + "^" + path).ToLower();
-
-			return await this.CacheManager.PageRouteCache().GetAsync(pagePathCacheKey, async pagePathCacheKey =>
+			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
-				using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+				Guid pageId = await provider.FindPage(site, path);
+
+				if (pageId == Guid.Empty && String.IsNullOrEmpty(path))
 				{
-					Guid pageId = await provider.FindPage(site, path);
-
-					if (pageId == Guid.Empty && String.IsNullOrEmpty(path))
-					{
-						// treat empty local path as "/"
-						pageId = await provider.FindPage(site, "/");
-					}
-
-					if (pageId == Guid.Empty)
-					{
-						return null;
-					}
-					else
-					{
-						return await Get(pageId);
-					}
+					// treat empty local path as "/"
+					pageId = await provider.FindPage(site, "/");
 				}
-			});
+
+				if (pageId == Guid.Empty)
+				{
+					return null;
+				}
+				else
+				{
+					return await Get(pageId);
+				}
+			}			
 		}
 
 		/// <summary>

@@ -12,11 +12,11 @@ using Nucleus.Abstractions.Managers;
 
 namespace Nucleus.Core
 {
-	public static class CacheManagerExtensions
+    public static class CacheManagerExtensions
 	{
 		public static CacheCollection<string, PageMenu> PageMenuCache (this ICacheManager cacheManager)  { return cacheManager.Get<string, PageMenu>(); } 
 		public static CacheCollection<Guid, Page> PageCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, Page>(); }
-		public static CacheCollection<string, Page> PageRouteCache(this ICacheManager cacheManager) { return cacheManager.Get<string, Page>(); }
+		public static CacheCollection<string, FoundPage> PageRouteCache(this ICacheManager cacheManager) { return cacheManager.Get<string, FoundPage>(); }
 
 		public static CacheCollection<Guid, PageModule> PageModuleCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, PageModule>(); } 
 		public static CacheCollection<Guid, RoleGroup> RoleGroupCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, RoleGroup>(); } 
@@ -31,12 +31,21 @@ namespace Nucleus.Core
 		public static CacheCollection<Guid, MailTemplate> MailTemplateCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, MailTemplate>(); } 
 
 		public static CacheCollection<Guid, ScheduledTask> ScheduledTaskCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, ScheduledTask>(); } 
-		public static CacheCollection<Guid, Folder> FolderCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, Folder>(); } 
+		public static CacheCollection<Guid, Folder> FolderCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, Folder>(); }
+		public static CacheCollection<Guid, File> FileCache(this ICacheManager cacheManager) { return cacheManager.Get<Guid, File>(); }
+
+		public static CacheCollection<string, Folder> FolderPathCache(this ICacheManager cacheManager) { return cacheManager.Get<string, Folder>(); }
+		public static CacheCollection<string, File> FilePathCache(this ICacheManager cacheManager) { return cacheManager.Get<string, File>(); }
+
+
 		public static CacheCollection<Guid, SiteGroup> SiteGroupCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, SiteGroup>(); } 
 		public static CacheCollection<Guid, List> ListCache (this ICacheManager cacheManager)  { return cacheManager.Get<Guid, List>(); }
 
 		public static CacheCollection<Guid, Content> ContentCache(this ICacheManager cacheManager) { return cacheManager.Get<Guid, Content>(); }
+		public static CacheCollection<Guid, List<Content>> ModuleContentCache(this ICacheManager cacheManager) { return cacheManager.Get<Guid, List<Content>>(); }
 		public static CacheCollection<Guid, ApiKey> ApiKeyCache(this ICacheManager cacheManager) { return cacheManager.Get<Guid, ApiKey>(); }
 
+		public static CacheCollection<string, List<PermissionType>> PermissionTypesCache(this ICacheManager cacheManager) { return cacheManager.Get<string, List<PermissionType>>(); }
+		
 	}
 }

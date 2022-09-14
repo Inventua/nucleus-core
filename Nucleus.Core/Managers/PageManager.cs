@@ -82,16 +82,6 @@ namespace Nucleus.Core.Managers
 				path = String.Concat(!path.StartsWith('/') ? "/" : "", path.EndsWith('/') ? path[0..^1] : path);
 			}
 
-			//if (path.EndsWith('/') && path != "/")
-			//{
-			//	path = path[0..^1];
-			//}
-
-			//if (!path.StartsWith('/'))
-			//{
-			//	path = $"/{path}";
-			//}
-
 			return await FindPage(site, path);
 		}
 

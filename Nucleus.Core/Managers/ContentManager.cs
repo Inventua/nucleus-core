@@ -24,11 +24,14 @@ namespace Nucleus.Core.Managers
 		}
 
 		public async Task<List<Content>> List(PageModule pageModule)
-		{
-			using (IContentDataProvider provider = this.DataProviderFactory.CreateProvider<IContentDataProvider>())
+		{			
+			return await this.CacheManager.ModuleContentCache().GetAsync(pageModule.Id, async id =>
 			{
-				return await provider.ListContent(pageModule);
-			}
+				using (IContentDataProvider provider = this.DataProviderFactory.CreateProvider<IContentDataProvider>())
+				{
+					return await provider.ListContent(pageModule);
+				}
+			});						
 		}
 
 		public async Task<Content> Get(Guid id)
@@ -48,6 +51,7 @@ namespace Nucleus.Core.Managers
 			{				
 				await provider.SaveContent(pageModule, content);
 				this.CacheManager.ContentCache().Remove(content.Id);
+				this.CacheManager.ModuleContentCache().Remove(pageModule.Id);
 			}
 		}
 
@@ -57,6 +61,7 @@ namespace Nucleus.Core.Managers
 			{
 				await provider.DeleteContent(content);
 				this.CacheManager.ContentCache().Remove(content.Id);
+				this.CacheManager.ModuleContentCache().Remove(content.PageModuleId);
 			}
 		}
 
@@ -89,6 +94,8 @@ namespace Nucleus.Core.Managers
 
 							this.CacheManager.ContentCache().Remove(previousContent.Id);
 							this.CacheManager.ContentCache().Remove(content.Id);
+							this.CacheManager.ModuleContentCache().Remove(module.Id);
+
 							break;
 						}
 					}
@@ -128,6 +135,8 @@ namespace Nucleus.Core.Managers
 
 							this.CacheManager.ContentCache().Remove(previousContent.Id);
 							this.CacheManager.ContentCache().Remove(content.Id);
+							this.CacheManager.ModuleContentCache().Remove(module.Id);
+
 							break;
 						}
 					}

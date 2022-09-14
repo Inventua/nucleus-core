@@ -29,13 +29,14 @@ namespace Nucleus.Abstractions.Models.Cache
 	/// <typeparam name="TModel">Item type</typeparam>
 	/// <remarks>
 	/// Items are wrapped in a CacheItem object in order to apply a cache item expiry date.  This class has no Add method, instead the Get
-	/// method has a Func parameters which contains a lambda which is invoked to get an instance of the item, if it is not already present 
+	/// method has a Func parameter which contains an delegate which is invoked to get an instance of the item, if it is not already present 
 	/// in the cache.
 	/// </remarks>
 	public class CacheCollection<TKey, TModel> : ICacheCollection where TModel : class
 	{		
 		private ConcurrentDictionary<TKey, CacheItem<TModel>> Cache { get; } = new();
 		
+		private string Name { get; }
 		// stores the collection options (expiry date and capacity)
 		private CacheOption Options { get; }
 		private ILogger<ICacheManager> Logger { get; }
@@ -43,10 +44,12 @@ namespace Nucleus.Abstractions.Models.Cache
 		/// <summary>
 		/// Initialize a new instance of the CacheCollection class using the options provided.
 		/// </summary>
+		/// <param name="name"></param>
 		/// <param name="logger"></param>
 		/// <param name="options"></param>
-		public CacheCollection(ILogger<ICacheManager> logger, CacheOption options)
+		public CacheCollection(string name, ILogger<ICacheManager> logger, CacheOption options)
 		{
+			this.Name = name;
 			this.Options = options;
 			this.Logger = logger;
 		}
@@ -118,7 +121,7 @@ namespace Nucleus.Abstractions.Models.Cache
 			}
 			else
 			{
-				this.Logger?.LogTrace("Checking cache for '{type}' with key {key}.", typeof(TModel).Name, key);
+				this.Logger?.LogTrace("Checking cache:{name} for '{type}' with key {key}.", this.Name, typeof(TModel).Name, key);
 				if (result.Expires >= DateTime.UtcNow)
 				{
 					this.Logger?.LogTrace("Found valid cache entry for '{type}' with key {key}.", typeof(TModel).Name, key);
@@ -126,7 +129,7 @@ namespace Nucleus.Abstractions.Models.Cache
 				}
 				else
 				{
-					this.Logger?.LogDebug("Removed expired '{type}' from cache after {timeout}.", typeof(TModel).Name, this.Options.ExpiryTime);
+					this.Logger?.LogDebug("Removed expired '{type}' from cache:{name} after {timeout}.", typeof(TModel).Name, this.Name, this.Options.ExpiryTime);
 					Remove(key);
 					return default; 
 				}

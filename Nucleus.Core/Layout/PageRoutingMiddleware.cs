@@ -118,45 +118,14 @@ namespace Nucleus.Core.Layout
 
 				if (this.Context.Site != null)
 				{
-					string localPath = System.Web.HttpUtility.UrlDecode(context.Request.Path);
-
+					string requestedPath = System.Web.HttpUtility.UrlDecode(context.Request.Path);
 					Logger.LogTrace("Using site '{siteid}'.", this.Context.Site.Id);
 
 					if (!SkipPageDetection(context))
 					{
-						Logger.LogTrace("Lookup page by path '{path}'.", localPath);
-						this.Context.Page = await this.PageManager.Get(this.Context.Site, localPath);
+						Logger.LogTrace("Lookup page by path '{path}'.", requestedPath);
 
-						string partPath = localPath;
-						string parameters = "";
-
-						while (this.Context.Page == null && !String.IsNullOrEmpty(partPath))
-						{
-							int lastIndexOfSeparator = partPath.LastIndexOf('/');
-							string nextParameterPart = partPath[(lastIndexOfSeparator + 1)..];
-							if (nextParameterPart.Length > 0)
-							{
-								if (!String.IsNullOrEmpty(parameters))
-								{
-									parameters = nextParameterPart + "/" + parameters;
-								}
-								else
-								{
-									parameters = nextParameterPart;
-								}
-							}
-
-							partPath = partPath.Substring(0, lastIndexOfSeparator);
-
-							if (!String.IsNullOrEmpty(partPath))
-							{
-								this.Context.Page = await this.PageManager.Get(this.Context.Site, partPath);
-								if (this.Context.Page != null)
-								{
-									this.Context.LocalPath = new(parameters);
-								}
-							}
-						}
+						await FindPage(requestedPath);
 					}
 
 					if (this.Context.Page != null)
@@ -173,7 +142,7 @@ namespace Nucleus.Core.Layout
 					}
 					else
 					{
-						Logger.LogTrace("Path '{path}' is not a page.", localPath);
+						Logger.LogTrace("Path '{path}' is not a page.", requestedPath);
 					}
 				}
 			}
@@ -192,6 +161,69 @@ namespace Nucleus.Core.Layout
 					context.Response.Redirect("/Setup/SiteWizard");
 				}
 			}
+		}
+
+		/// <summary>
+		/// Find a page for the requested path, populating and reading from the Page Route cache.
+		/// </summary>
+		/// <param name="requestPath"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// This function includes logic to partly match the requested path, and set Context.LocalPath to the 
+		/// unmatched portion of the path, and also caches partly-matched paths.
+		/// </remarks>
+		private async Task FindPage(string requestPath)
+		{			
+			string pagePathCacheKey = (this.Context.Site.Id.ToString() + "^" + requestPath).ToLower();
+
+			FoundPage found = await this.CacheManager.PageRouteCache().GetAsync(pagePathCacheKey, async pagePathCacheKey =>
+			{
+				Page page = await this.PageManager.Get(this.Context.Site, requestPath);
+
+				if (page != null)
+				{
+					return new() { Page = page, RequestPath = requestPath };					
+				}
+
+				string partPath = requestPath;
+				string parameters = "";
+
+				while (this.Context.Page == null && !String.IsNullOrEmpty(partPath))
+				{
+					int lastIndexOfSeparator = partPath.LastIndexOf('/');
+					string nextParameterPart = partPath[(lastIndexOfSeparator + 1)..];
+					if (nextParameterPart.Length > 0)
+					{
+						if (!String.IsNullOrEmpty(parameters))
+						{
+							parameters = nextParameterPart + "/" + parameters;
+						}
+						else
+						{
+							parameters = nextParameterPart;
+						}
+					}
+
+					partPath = partPath.Substring(0, lastIndexOfSeparator);
+
+					if (!String.IsNullOrEmpty(partPath))
+					{
+						page = await this.PageManager.Get(this.Context.Site, partPath);
+						if (page != null)
+						{
+							return new() { Page = page, LocalPath = new(parameters), RequestPath = requestPath };							
+						}
+					}
+				}
+
+				return null;
+			});
+		
+			if (found != null)
+			{
+				this.Context.Page = found.Page;
+				this.Context.LocalPath = found.LocalPath;
+			}		
 		}
 
 		/// <summary>

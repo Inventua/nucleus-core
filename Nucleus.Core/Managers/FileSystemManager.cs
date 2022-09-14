@@ -13,6 +13,8 @@ using Nucleus.Abstractions.FileSystemProviders;
 using Nucleus.Core.FileSystemProviders;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using Nucleus.Abstractions.Models.Extensions;
 
 namespace Nucleus.Core.Managers
 {
@@ -24,13 +26,19 @@ namespace Nucleus.Core.Managers
 		private ICacheManager CacheManager { get; }
 		private IDataProviderFactory DataProviderFactory { get; }
 		private IFileSystemProviderFactory FileSystemProviderFactory { get; }
-		//private Context Context { get; }
+		private IPermissionsManager PermissionsManager { get; }
 
-		public FileSystemManager(IDataProviderFactory dataProviderFactory, ICacheManager cacheManager, IFileSystemProviderFactory fileSystemProviderFactory)
+		public FileSystemManager(IDataProviderFactory dataProviderFactory, ICacheManager cacheManager, IPermissionsManager permissionsManager, IFileSystemProviderFactory fileSystemProviderFactory)
 		{
 			this.CacheManager = cacheManager;
 			this.DataProviderFactory = dataProviderFactory;
 			this.FileSystemProviderFactory = fileSystemProviderFactory;
+			this.PermissionsManager = permissionsManager;
+		}
+
+		private string FileSystemCachePath(Site site, string providerName, string path)
+		{
+			return $"{site.Id}|{providerName}{path}";
 		}
 
 		/// <summary>
@@ -39,28 +47,36 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		public async Task<Folder> GetFolder(Site site, string providerName, string path)
 		{
-			using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
+			return await this.CacheManager.FolderPathCache().GetAsync(FileSystemCachePath(site, providerName, path), async key =>
 			{
-				Folder folder = await this.FileSystemProviderFactory.Get(site, providerName).GetFolder(path);
-
-				if (folder != null)
+				using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 				{
-					Folder folderData = await provider.GetFolder(site, providerName, path);
-					if (folderData == null)
+
+					// Get folder information fromt the file system
+					Folder folder = await this.FileSystemProviderFactory.Get(site, providerName).GetFolder(path);
+
+					// Retrieve folder information from the database.  We only use Id (see below)
+					Folder databaseEntry = await provider.GetFolder(site, providerName, path);
+
+					if (databaseEntry == null)
 					{
-						// database entry does not exist, create 
-						folderData = await provider.SaveFolder(site, folder);
+						// database entry does not exist for the folder found in the file system, create database record
+						databaseEntry = await provider.SaveFolder(site, folder);
 					}
 
-					if (folderData != null)
+					if (databaseEntry != null)
 					{
-						folderData.CopyDatabaseValuesTo(folder);						
-						return folder;
+						// Get the folder by Id.  This will retrieve the same object that is stored in CacheManager.FolderCache,
+						// so that the object stored in CacheManager.FolderPathCache() is the same object rather than two copies 
+						// of the same data.
+						return await this.GetFolder(site, databaseEntry.Id);
+						////folderData.CopyDatabaseValuesTo(folder);
+						////return folder;
 					}
+
+					return null;
 				}
-
-				return null;
-			}
+			});
 		}
 
 		/// <summary>
@@ -71,7 +87,15 @@ namespace Nucleus.Core.Managers
 		{
 			using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
-				Folder folderData = await provider.GetFolder(id);
+				//Folder folderData = await provider.GetFolder(id);
+				Folder folderData = await this.CacheManager.FolderCache().GetAsync(id, async id =>
+				{
+					Folder newCacheEntry = await provider.GetFolder(id);
+
+					// populate permissions so that future retrievals from the cache will always have the permissions list populated
+					newCacheEntry.Permissions = await this.PermissionsManager.ListPermissions(newCacheEntry.Id, Folder.URN);
+					return newCacheEntry;
+				});
 
 				if (folderData != null)
 				{
@@ -100,19 +124,32 @@ namespace Nucleus.Core.Managers
 
 			using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
-				File fileData = await provider.GetFile(id);
-				
-				if (fileData != null)
+				//File fileData = await provider.GetFile(id);
+				return await this.CacheManager.FileCache().GetAsync(id, async id =>
 				{
-					File file = await this.FileSystemProviderFactory.Get(site, fileData.Provider).GetFile(fileData.Path);
-					fileData.CopyDatabaseValuesTo(file);
+					File databaseEntry = await provider.GetFile(id);
 
-					await GetDatabaseProperties(site, file.Parent);
-					return file;
-				}
+					if (databaseEntry != null)
+					{
+						File file = await this.FileSystemProviderFactory.Get(site, databaseEntry.Provider).GetFile(databaseEntry.Path);
+						databaseEntry.CopyDatabaseValuesTo(file);
+
+						await GetDatabaseProperties(site, file.Parent);
+
+						// Fully populate the parent so that the cached version is ready for use anywhere
+						if (file.Parent != null)
+						{
+							file.Parent = await this.GetFolder(site, file.Parent.Id);
+						}
+
+						return file;
+					}
+					else
+					{
+						throw new System.IO.FileNotFoundException();
+					}
+				});
 			}
-
-			throw new System.IO.FileNotFoundException();
 		}
 
 		/// <summary>
@@ -121,35 +158,44 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		public async Task<File> GetFile(Site site, string providerName, string path)
 		{
-			using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
+			return await this.CacheManager.FilePathCache().GetAsync(FileSystemCachePath(site, providerName, path), async key =>
 			{
-				File file = await this.FileSystemProviderFactory.Get(site, providerName).GetFile(path);
-
-				if (file != null)
+				using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 				{
-					File fileData = await provider.GetFile(site, file.Provider, file.Path);
-					if (fileData == null)
-					{
-						// database entry does not exist, create 
+					// get file information from the file system
+					File file = await this.FileSystemProviderFactory.Get(site, providerName).GetFile(path);
 
-						// try to get the image dimensions.  The GetImageDimensions extension checks that the file is
-						// an image and does nothing if it is not, so we don't need to check that here. 
-						await file.GetImageDimensions(site, this);
-						fileData = await provider.SaveFile(site, file);
-					}
-
-					if (fileData != null)
+					if (file != null)
 					{
-						fileData.CopyDatabaseValuesTo(file);
-						await GetDatabaseProperties(site, file.Parent);
-						return file;
+						// read file data from the database
+						File fileData = await provider.GetFile(site, file.Provider, file.Path);
+
+						if (fileData == null)
+						{
+							// database entry does not exist, create 
+
+							// for newly-detected files, try to get the image dimensions.  The GetImageDimensions extension checks that
+							// the file is an image and does nothing if it is not, so we don't need to check that here. 
+							await file.GetImageDimensions(site, this);
+							fileData = await provider.SaveFile(site, file);
+						}
+
+						if (fileData != null)
+						{
+							// Get the file by Id.  This will retrieve the same object that is stored in CacheManager.FileCache,
+							// so that the object stored in CacheManager.FilePathCache() is the same object rather than two copies 
+							// of the same data.
+							return await this.GetFile(site, fileData.Id);
+							////fileData.CopyDatabaseValuesTo(file);
+							////await GetDatabaseProperties(site, file.Parent);
+							////return file;
+						}
 					}
 				}
-			}
 
-			return null;
+				return null;
+			});
 		}
-
 
 		/// <summary>
 		/// Create/add default permissions to the specified <see cref="Folder"/> for the specified <see cref="Role"/>.
@@ -163,33 +209,33 @@ namespace Nucleus.Core.Managers
 		{
 			Boolean isAnonymousOrAllUsers = role.Equals(site.AnonymousUsersRole) || role.Equals(site.AllUsersRole);
 
-			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+			//using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+			//{
+			List<PermissionType> permissionTypes = await this.PermissionsManager.ListPermissionTypes(Folder.URN);
+			List<Permission> permissions = new();
+
+			foreach (PermissionType permissionType in permissionTypes)
 			{
-				List<PermissionType> permissionTypes = await provider.ListPermissionTypes(Folder.URN);
-				List<Permission> permissions = new();
+				Permission permission = new();
+				permission.Role = role;
 
-				foreach (PermissionType permissionType in permissionTypes)
+				if (isAnonymousOrAllUsers && !permissionType.IsFolderViewPermission())
 				{
-					Permission permission = new();
-					permission.Role = role;
-
-					if (isAnonymousOrAllUsers && !permissionType.IsFolderViewPermission())
-					{
-						permission.AllowAccess = false;
-						permission.PermissionType = new() { Scope = PermissionType.PermissionScopeNamespaces.Disabled };
-					}
-					else
-					{
-						permission.AllowAccess = permissionType.IsFolderViewPermission();
-						permission.PermissionType = permissionType;
-					}
-
-					permissions.Add(permission);
+					permission.AllowAccess = false;
+					permission.PermissionType = new() { Scope = PermissionType.PermissionScopeNamespaces.Disabled };
+				}
+				else
+				{
+					permission.AllowAccess = permissionType.IsFolderViewPermission();
+					permission.PermissionType = permissionType;
 				}
 
-				folder.Permissions.AddRange(permissions);
+				permissions.Add(permission);
 			}
+
+			folder.Permissions.AddRange(permissions);
 		}
+		//}
 
 		/// <summary>
 		/// Save permissions for the specified <see cref="Folder"/>.
@@ -219,13 +265,14 @@ namespace Nucleus.Core.Managers
 				}
 			}
 
-			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
-			{
-				List<Permission> originalPermissions = await provider.ListPermissions(folder.Id, Folder.URN);
+			//using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+			//{
+			List<Permission> originalPermissions = await this.PermissionsManager.ListPermissions(folder.Id, Folder.URN);
+			await this.PermissionsManager.SavePermissions(folder.Id, folder.Permissions, originalPermissions);
+			//}
 
-				await provider.SavePermissions(folder.Id, folder.Permissions, originalPermissions);
-				this.CacheManager.FolderCache().Remove(folder.Id);
-			}
+			this.CacheManager.FolderCache().Remove(folder.Id);
+			this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, folder.Provider, folder.Path));
 		}
 
 		/// <summary>
@@ -237,29 +284,29 @@ namespace Nucleus.Core.Managers
 		{
 			List<Permission> result = new();
 
-			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
-			{
-				List<PermissionType> permissionTypes = await provider.ListPermissionTypes(Folder.URN);
-				List<Permission> permissions = await provider.ListPermissions(folder.Id, Folder.URN);
+			//using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+			//{
+			List<PermissionType> permissionTypes = await this.PermissionsManager.ListPermissionTypes(Folder.URN);
+			List<Permission> permissions = await this.PermissionsManager.ListPermissions(folder.Id, Folder.URN);
 
-				// ensure that for each role with any permissions defined, there is a full set of permission types for the role
-				foreach (Role role in permissions.Select((permission) => permission.Role).ToList())
+			// ensure that for each role with any permissions defined, there is a full set of permission types for the role
+			foreach (Role role in permissions.Select((permission) => permission.Role).ToList())
+			{
+				foreach (PermissionType permissionType in permissionTypes)
 				{
-					foreach (PermissionType permissionType in permissionTypes)
+					if (permissions.Where((permission) => permission?.Role.Id == role.Id && permission?.PermissionType.Id == permissionType.Id).ToList().Count == 0)
 					{
-						if (permissions.Where((permission) => permission?.Role.Id == role.Id && permission?.PermissionType.Id == permissionType.Id).ToList().Count == 0)
-						{
-							Permission permission = new();
-							permission.AllowAccess = false;
-							permission.PermissionType = permissionType;
-							permission.Role = role;
-							permissions.Add(permission);
-						}
+						Permission permission = new();
+						permission.AllowAccess = false;
+						permission.PermissionType = permissionType;
+						permission.Role = role;
+						permissions.Add(permission);
 					}
 				}
-
-				result = permissions.OrderBy((permission) => permission.Role.Name).ThenBy((permission) => permission.PermissionType.SortOrder).ToList();
 			}
+
+			result = permissions.OrderBy((permission) => permission.Role.Name).ThenBy((permission) => permission.PermissionType.SortOrder).ToList();
+			//}
 
 			return result;
 		}
@@ -270,10 +317,10 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		public async Task<List<PermissionType>> ListFolderPermissionTypes()
 		{
-			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
-			{
-				return (await provider.ListPermissionTypes(Folder.URN)).OrderBy(permissionType => permissionType.SortOrder).ToList();
-			}
+			//using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+			//{
+			return (await this.PermissionsManager.ListPermissionTypes(Folder.URN)).OrderBy(permissionType => permissionType.SortOrder).ToList();
+			//}
 		}
 
 		private Boolean IsValidFolderName(Folder parentFolder, string name, ref string message)
@@ -339,8 +386,10 @@ namespace Nucleus.Core.Managers
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
 				await dataProvider.DeleteFolder(folder);
-				this.CacheManager.FolderCache().Remove(folder.Id);
 			}
+
+			this.CacheManager.FolderCache().Remove(folder.Id);
+			this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, folder.Provider, folder.Path));
 		}
 
 		public async Task RenameFolder(Site site, Folder folder, string newName)
@@ -365,10 +414,12 @@ namespace Nucleus.Core.Managers
 					folder.Id = existing.Id;
 					await dataProvider.SaveFolder(site, folder);
 					this.CacheManager.FolderCache().Remove(folder.Id);
+					this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, folder.Provider, folder.Path));
 
 					if (parentFolder != null)
 					{
 						this.CacheManager.FolderCache().Remove(parentFolder.Id);
+						this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, parentFolder.Provider, parentFolder.Path));
 					}
 				}
 			}
@@ -416,7 +467,7 @@ namespace Nucleus.Core.Managers
 			File fileData = await this.GetFile(site, file.Provider, file.Path);
 			if (fileData != null)
 			{
-				fileData.CopyDatabaseValuesTo(file);				
+				fileData.CopyDatabaseValuesTo(file);
 			}
 			return file;
 		}
@@ -442,7 +493,7 @@ namespace Nucleus.Core.Managers
 		}
 
 		public async Task<System.Uri> GetFileDirectUrl(Site site, File file)
-		{			
+		{
 			if (!String.IsNullOrEmpty(file.DirectUrl) && (!file.DirectUrlExpiry.HasValue || file.DirectUrlExpiry.Value > DateTime.UtcNow))
 			{
 				if (System.Uri.TryCreate(file.DirectUrl, UriKind.Absolute, out Uri uri))
@@ -463,7 +514,7 @@ namespace Nucleus.Core.Managers
 				using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 				{
 					await dataProvider.SaveFile(site, file);
-				}				
+				}
 			}
 
 			return directUrl;
@@ -485,11 +536,13 @@ namespace Nucleus.Core.Managers
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
 				await dataProvider.DeleteFile(file);
+			}
 
-				if (parentFolder != null)
-				{
-					this.CacheManager.FolderCache().Remove(parentFolder.Id);
-				}
+			this.CacheManager.FileCache().Remove(file.Id);
+			if (parentFolder != null)
+			{
+				this.CacheManager.FolderCache().Remove(parentFolder.Id);
+				this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, parentFolder.Provider, parentFolder.Path));
 			}
 		}
 
@@ -517,9 +570,11 @@ namespace Nucleus.Core.Managers
 				await dataProvider.SaveFile(site, file);
 			}
 
+			this.CacheManager.FileCache().Remove(file.Id);
 			if (parentFolder != null)
 			{
 				this.CacheManager.FolderCache().Remove(parentFolder.Id);
+				this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, parentFolder.Provider, parentFolder.Path));
 			}
 		}
 
@@ -527,7 +582,11 @@ namespace Nucleus.Core.Managers
 		{
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
-				return await dataProvider.SaveFolder(site, folder);
+				folder = await dataProvider.SaveFolder(site, folder);
+				this.CacheManager.FolderCache().Remove(folder.Id);
+				this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, folder.Provider, folder.Path));
+
+				return folder;
 			}
 		}
 
@@ -545,7 +604,7 @@ namespace Nucleus.Core.Managers
 					throw new InvalidOperationException(message);
 				}
 
-				File file = await provider.SaveFile(parentPath, newFileName, content, overwrite);				
+				File file = await provider.SaveFile(parentPath, newFileName, content, overwrite);
 
 				await GetDatabaseProperties(site, file);
 
@@ -559,11 +618,12 @@ namespace Nucleus.Core.Managers
 				// try to get the image dimensions and save them.  The GetImageDimensions extension checks that the file is
 				// an image and does nothing if it is not, so we don't need to check that here. 
 				await file.GetImageDimensions(site, this);
-				
+
 				using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 				{
 					await dataProvider.SaveFile(site, file);
 				}
+				this.CacheManager.FileCache().Remove(file.Id);
 
 				return file;
 			}

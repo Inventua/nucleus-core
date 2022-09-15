@@ -6,7 +6,7 @@
   <description>
 		Application install set for the core Documents module.			
 	</description>
-  <compatibility minVersion="1.0.0.0" maxVersion="*" />
+  <compatibility minVersion="1.0.1.0" maxVersion="*" />
   <components>
     <component folderName="Documents" optional="false">
       <moduleDefinition id="28df7ff3-6407-459e-8608-c1ef4181807c">

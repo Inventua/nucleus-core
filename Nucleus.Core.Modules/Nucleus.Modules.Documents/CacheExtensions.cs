@@ -16,9 +16,9 @@ namespace Nucleus.Modules.Documents
 			return cacheManager.Get<Guid, Document>();
 		}
 
-		public static CacheCollection<Guid, IList<Document>> ModuleDocumentsCache(this ICacheManager cacheManager)
+		public static CacheCollection<Guid, IEnumerable<Guid>> ModuleDocumentsCache(this ICacheManager cacheManager)
 		{
-			return cacheManager.Get<Guid, IList<Document>>();
+			return cacheManager.Get<Guid, IEnumerable<Guid>>();
 		}
 	}
 }

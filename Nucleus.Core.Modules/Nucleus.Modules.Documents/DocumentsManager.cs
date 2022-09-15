@@ -98,30 +98,32 @@ namespace Nucleus.Modules.Documents
 		/// <returns></returns>
 		public async Task<IList<Document>> List(Site site, PageModule module)
 		{
-			return await this.CacheManager.ModuleDocumentsCache().GetAsync(module.Id, async id =>
+			IEnumerable<Guid> results = await this.CacheManager.ModuleDocumentsCache().GetAsync(module.Id, async id =>
 			{
 				using (IDocumentsDataProvider provider = this.DataProviderFactory.CreateProvider<IDocumentsDataProvider>())
 				{
 					IList<Document> documents = await provider.List(module);
 
-					foreach (Document document in documents)
-					{
-						if (document != null)
-						{
-							try
-							{
-								document.File = await this.FileSystemManager.GetFile(site, document.File.Id);
-							}
-							catch (Exception)
-							{
-								document.File = null;
-							}
-						}
-					}
+					////foreach (Document document in documents)
+					////{
+					////	if (document != null)
+					////	{
+					////		try
+					////		{
+					////			document.File = await this.FileSystemManager.GetFile(site, document.File.Id);
+					////		}
+					////		catch (Exception)
+					////		{
+					////			document.File = null;
+					////		}
+					////	}
+					////}
 
-					return documents;
+					return documents.Select(document => document.Id);
 				}
 			});
+
+			return new List<Document>(await Task.WhenAll(results.Select(async id => await Get(site, id))));
 		}
 
 		/// <summary>

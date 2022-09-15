@@ -768,6 +768,7 @@ ul.nucleus-control-panel-items button
 	box-shadow: 2px 2px 6px #bbb;
 	background: white;
 	right: 1rem;
+	z-index: 1;
 }
 
 #system-logs .log-levels, #task-logs .log-levels

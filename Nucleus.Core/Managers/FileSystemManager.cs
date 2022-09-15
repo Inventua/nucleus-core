@@ -47,12 +47,12 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		public async Task<Folder> GetFolder(Site site, string providerName, string path)
 		{
-			return await this.CacheManager.FolderPathCache().GetAsync(FileSystemCachePath(site, providerName, path), async key =>
+			Guid id = await this.CacheManager.FolderPathCache().GetAsync(FileSystemCachePath(site, providerName, path), async key =>
 			{
 				using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 				{
 
-					// Get folder information fromt the file system
+					// Get folder information from the file system
 					Folder folder = await this.FileSystemProviderFactory.Get(site, providerName).GetFolder(path);
 
 					// Retrieve folder information from the database.  We only use Id (see below)
@@ -66,17 +66,20 @@ namespace Nucleus.Core.Managers
 
 					if (databaseEntry != null)
 					{
+						return databaseEntry.Id;
 						// Get the folder by Id.  This will retrieve the same object that is stored in CacheManager.FolderCache,
 						// so that the object stored in CacheManager.FolderPathCache() is the same object rather than two copies 
 						// of the same data.
-						return await this.GetFolder(site, databaseEntry.Id);
+						//return await this.GetFolder(site, databaseEntry.Id);
 						////folderData.CopyDatabaseValuesTo(folder);
 						////return folder;
 					}
 
-					return null;
+					return default;
 				}
 			});
+
+			return await GetFolder(site, id);
 		}
 
 		/// <summary>
@@ -158,7 +161,7 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		public async Task<File> GetFile(Site site, string providerName, string path)
 		{
-			return await this.CacheManager.FilePathCache().GetAsync(FileSystemCachePath(site, providerName, path), async key =>
+			Guid id = await this.CacheManager.FilePathCache().GetAsync(FileSystemCachePath(site, providerName, path), async key =>
 			{
 				using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 				{
@@ -182,10 +185,11 @@ namespace Nucleus.Core.Managers
 
 						if (fileData != null)
 						{
+							return fileData.Id;
 							// Get the file by Id.  This will retrieve the same object that is stored in CacheManager.FileCache,
 							// so that the object stored in CacheManager.FilePathCache() is the same object rather than two copies 
 							// of the same data.
-							return await this.GetFile(site, fileData.Id);
+							//return await this.GetFile(site, fileData.Id);
 							////fileData.CopyDatabaseValuesTo(file);
 							////await GetDatabaseProperties(site, file.Parent);
 							////return file;
@@ -193,8 +197,10 @@ namespace Nucleus.Core.Managers
 					}
 				}
 
-				return null;
+				return default;
 			});
+
+			return await GetFile(site, id);
 		}
 
 		/// <summary>

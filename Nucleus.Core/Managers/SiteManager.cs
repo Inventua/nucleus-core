@@ -73,18 +73,15 @@ namespace Nucleus.Core.Managers
 		{
 			string siteDetectCacheKey = (requestUri + "^" + pathBase).ToLower();
 						
-			return await this.CacheManager.SiteDetectCache().GetAsync(siteDetectCacheKey, async siteDetectCacheKey =>
+			Guid id = await this.CacheManager.SiteDetectCache().GetAsync(siteDetectCacheKey, async siteDetectCacheKey =>
 			{
 				using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 				{
-					Guid siteId = await provider.DetectSite(requestUri, pathBase);
-					if (siteId == Guid.Empty)
-					{
-						return default(Site);
-					}
-					return await this.Get(siteId);
+					return await provider.DetectSite(requestUri, pathBase);
 				}
 			});
+
+			return await this.Get(id);
 		}
 
 		/// <summary>

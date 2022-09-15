@@ -35,7 +35,7 @@ namespace Nucleus.Core.Managers
 			return $"{caller} {typeof(TKey).FullName} {typeof(TModel).FullName}";
 		}
 
-		private CacheCollection<TKey, TModel> Add<TKey, TModel>(string configItemName) where TModel : class
+		private CacheCollection<TKey, TModel> Add<TKey, TModel>(string configItemName)
 		{
 			string cacheKey = CacheKey<TKey, TModel>(configItemName);
 
@@ -60,7 +60,7 @@ namespace Nucleus.Core.Managers
 			return this.Caches[cacheKey] as CacheCollection<TKey, TModel>;
 		}
 
-		public CacheCollection<TKey, TModel> Get<TKey, TModel>([System.Runtime.CompilerServices.CallerMemberName] string caller = "Default") where TModel : class
+		public CacheCollection<TKey, TModel> Get<TKey, TModel>([System.Runtime.CompilerServices.CallerMemberName] string caller = "Default") 
 		{
 			if (this.Caches.TryGetValue(CacheKey<TKey, TModel>(caller), out ICacheCollection result))
 			{

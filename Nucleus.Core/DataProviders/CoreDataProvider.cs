@@ -147,7 +147,6 @@ namespace Nucleus.Core.DataProviders
 			{
 				site = await this.Context.Sites
 					.AsNoTracking()
-					.OrderBy(site => site.DateAdded)
 					.FirstOrDefaultAsync();
 			}
 			else

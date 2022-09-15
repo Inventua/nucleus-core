@@ -12,7 +12,7 @@ namespace Nucleus.Abstractions.Models.Cache
 	/// <typeparam name="T">The type of the cached item.</typeparam>	
 	/// <internal/>
 	/// <hidden/>
-	public class CacheItem<T> where T : class
+	public class CacheItem<T> 
 	{
 		/// <summary>
 		/// Expiry date/time for the cache item.

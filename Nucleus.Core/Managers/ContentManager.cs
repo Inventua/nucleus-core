@@ -25,13 +25,15 @@ namespace Nucleus.Core.Managers
 
 		public async Task<List<Content>> List(PageModule pageModule)
 		{			
-			return await this.CacheManager.ModuleContentCache().GetAsync(pageModule.Id, async id =>
+			List<Guid> results = await this.CacheManager.ModuleContentCache().GetAsync(pageModule.Id, async id =>
 			{
 				using (IContentDataProvider provider = this.DataProviderFactory.CreateProvider<IContentDataProvider>())
 				{
-					return await provider.ListContent(pageModule);
+					return (await provider.ListContent(pageModule)).Select(content=>content.Id).ToList();
 				}
-			});						
+			});
+
+			return new List<Content>(await Task.WhenAll(results.Select(async id => await Get(id))));			
 		}
 
 		public async Task<Content> Get(Guid id)

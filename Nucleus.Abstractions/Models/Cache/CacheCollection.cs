@@ -32,7 +32,7 @@ namespace Nucleus.Abstractions.Models.Cache
 	/// method has a Func parameter which contains an delegate which is invoked to get an instance of the item, if it is not already present 
 	/// in the cache.
 	/// </remarks>
-	public class CacheCollection<TKey, TModel> : ICacheCollection where TModel : class
+	public class CacheCollection<TKey, TModel> : ICacheCollection 
 	{		
 		private ConcurrentDictionary<TKey, CacheItem<TModel>> Cache { get; } = new();
 		
@@ -64,15 +64,11 @@ namespace Nucleus.Abstractions.Models.Cache
 		public TModel Get(TKey key, Func<TKey, TModel> itemReader)
 		{
 			TModel result = this.Get(key);
-			
-			if (result == null)
+
+			if (IsNullOrEmpty(result))
 			{
 				result = itemReader.Invoke(key);
-
-				if (result != null)
-				{
-					this.Add(key, result);
-				}
+				this.Add(key, result);				
 			}
 
 			return result;
@@ -89,16 +85,12 @@ namespace Nucleus.Abstractions.Models.Cache
 		{
 			TModel result = this.Get(key);
 
-			if (result == null)
+			if (IsNullOrEmpty(result))
 			{
 				result = await itemReader.Invoke(key);
-
-				if (result != null)
-				{
-					this.Add(key, result);
-				}
+				this.Add(key, result);
 			}
-
+						
 			return result;
 		}
 
@@ -135,6 +127,18 @@ namespace Nucleus.Abstractions.Models.Cache
 				}
 			}			
 		}
+
+		private Boolean IsNullOrEmpty(object value)
+		{
+			if (value == null) return true;
+
+			if (value.GetType() == typeof(Guid))
+			{
+				return (Guid)value == Guid.Empty;
+			}
+
+			return false;
+		}
 				
 		/// <summary>
 		/// Add the specified key/item to the cache.
@@ -149,7 +153,7 @@ namespace Nucleus.Abstractions.Models.Cache
 		{
 			Collect();
 
-			if (item == null)
+			if (IsNullOrEmpty(item))
 			{
 				this.Remove(key);
 				return;

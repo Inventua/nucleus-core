@@ -9,7 +9,7 @@
 }
 @using (Html.BeginAreaForm("Save", "Pages", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @autocomplete = "off" }))
 {
-	<div class="position-absolute end-0">
+	<div class="position-absolute m-1 top-0 end-0">
 		@if (Model.Page.Id != Guid.Empty)
 		{
 			<button class="btn btn-success nucleus-open-page" accesskey="O">Open Page</button>

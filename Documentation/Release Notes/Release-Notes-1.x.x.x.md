@@ -6,6 +6,9 @@
 Version 1.0.1 includes administration user interface enhancements, a change to the file system provider interfaces to support the 
 (coming soon) Amazon S3 file system provider, along with other enhancements and bug fixes in the core, and in core modules.
 
+### Caching
+Improved data caching to improve performance and reduce database activity.
+
 ### System Control Panel
 Commit 7742f9f7
 Added bootstrap table classes to system information table.

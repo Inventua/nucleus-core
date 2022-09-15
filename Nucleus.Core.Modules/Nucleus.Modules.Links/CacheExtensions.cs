@@ -13,9 +13,9 @@ namespace Nucleus.Modules.Links
 			return cacheManager.Get<Guid, Link>();
 		}
 
-		public static CacheCollection<Guid, List<Link>> ModuleLinksCache(this ICacheManager cacheManager)
+		public static CacheCollection<Guid, IEnumerable<Guid>> ModuleLinksCache(this ICacheManager cacheManager)
 		{
-			return cacheManager.Get<Guid, List<Link>>();
+			return cacheManager.Get<Guid, IEnumerable<Guid>>();
 		}
 	}
 }

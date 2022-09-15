@@ -11,6 +11,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using System.Collections;
+using Microsoft.AspNetCore.Http;
 
 namespace Nucleus.Modules.Links
 {
@@ -139,20 +141,22 @@ namespace Nucleus.Modules.Links
 		/// <returns></returns>
 		public async Task<IList<Link>> List(Site site, PageModule module)
 		{
-			return await this.CacheManager.ModuleLinksCache().GetAsync(module.Id, async id =>
+			IEnumerable<Guid> results = await this.CacheManager.ModuleLinksCache().GetAsync(module.Id, async id =>
 			{
 				using (ILinksDataProvider provider = this.DataProviderFactory.CreateProvider<ILinksDataProvider>())
 				{
 					List<Link> results = await provider.List(module);
 
-					foreach (Link link in results)
-					{
-						await GetLinkItem(site, link);
-					}
+					////foreach (Link link in results)
+					////{
+					////	await GetLinkItem(site, link);
+					////}
 
-					return results;
+					return results.Select(link=>link.Id);
 				}
 			});
+
+			return new List<Link>(await Task.WhenAll(results.Select(async id => await Get(site, id))));
 		}
 
 		/// <summary>

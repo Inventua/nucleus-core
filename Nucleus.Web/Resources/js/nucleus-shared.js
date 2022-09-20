@@ -189,7 +189,7 @@ function _Page()
 
 			var form = jQuery(this).parents('form');
 			//var parent = jQuery(this).parents('.FileSelector');
-			var uploadprogressWrapper = form.find('.UploadProgress');
+			var uploadprogressWrapper = form.find('.UploadProgress').first();
 			var uploadprogress = uploadprogressWrapper.find('progress');
 			var uploadprogressLabel = uploadprogressWrapper.find('label');
 

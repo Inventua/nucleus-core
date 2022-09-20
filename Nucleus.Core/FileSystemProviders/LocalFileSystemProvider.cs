@@ -39,6 +39,11 @@ namespace Nucleus.Core.FileSystemProviders
 		public override void Configure(IConfigurationSection configSection, string homeDirectory)
 		{
 			configSection.Bind(this.Options);
+			
+			if (String.IsNullOrEmpty(this.Options.RootFolder))
+			{
+				this.Options.RootFolder = this.FolderOptions.Value.GetDataFolder("Content", true);
+			}
 
 			if (System.IO.Path.IsPathRooted(homeDirectory))
 			{

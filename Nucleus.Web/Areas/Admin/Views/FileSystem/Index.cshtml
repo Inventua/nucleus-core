@@ -10,7 +10,7 @@
 
 	@using (Html.BeginAreaForm("Navigate", "FileSystem", "Admin", FormMethod.Post, new { @class = "d-flex flex-column overflow-auto", @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
 	{
-		<div class="nucleus-form-tools">
+		<div class="nucleus-form-buttonrow">
 			<RemoveWhiteSpace>
 			@Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control ms-1 nucleus-show-progress nucleus-show-progress-after" })
 			<span class="align-self-center ms-1 mt-1">
@@ -24,7 +24,7 @@
 					else
 					{
 						<button title="Top level" href="@Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = ancestor.Id })" class="btn btn-sm btn-outline-primary me-1 NavigateLink nucleus-show-progress nucleus-show-progress-after nucleus-material-icon" data-target=".nucleus-adminpage">
-								&#xe2c7;
+							&#xe2c7;
 						</button>						
 					}
 				}
@@ -94,7 +94,6 @@
 			<div class="overflow-auto">
 				<table class="FileSystemItems table table-sm">
 					<tr>
-						<th class="nucleus-small-cell" />
 						<th>Name</th>
 						<th class="file-type">Type</th>
 						<th class="file-modified-date">Modified Date</th>
@@ -106,14 +105,14 @@
 					{
 						<tr>
 							<td>
+								<label>
 								@if (Model.Folder.Folders[folderCount].Capabilities.CanRename || Model.Folder.Folders[folderCount].Capabilities.CanDelete)
 								{
 									@Html.CheckBoxFor(model => model.Folder.Folders[folderCount].IsSelected, new { @class = "nucleus-filesystem-folderselector" })
 								}
 								@Html.HiddenFor(model => model.Folder.Folders[folderCount].Id)
-							</td>
-							<td>
 								@Html.AreaActionLink(Model.Folder.Folders[folderCount].Name, "Index", "FileSystem", "Admin", new { folderId = @Model.Folder.Folders[folderCount].Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
+								</label>
 							</td>
 							<td>Folder</td>
 							<td>@Model.Folder.Folders[folderCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
@@ -126,12 +125,12 @@
 					{
 						var isRecent = Math.Abs(Model.Folder.Files[fileCount].DateModified.Subtract(DateTime.UtcNow).TotalMinutes) < 5;
 						<tr>
-							<td>
-								@Html.CheckBoxFor(model => Model.Folder.Files[fileCount].IsSelected, new { @class = "nucleus-filesystem-fileselector" })
-							</td>
 							<td class="@(isRecent ? "fw-bold" : "")">
+								<label>
+								@Html.CheckBoxFor(model => Model.Folder.Files[fileCount].IsSelected, new { @class = "nucleus-filesystem-fileselector" })							
 								@Model.Folder.Files[fileCount].Name
 								@Html.HiddenFor(model => Model.Folder.Files[fileCount].Id)
+								</label>
 							</td>
 							<td>File</td>
 							<td class="Date@(isRecent ? " fw-bold" : "")">@Model.Folder.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>

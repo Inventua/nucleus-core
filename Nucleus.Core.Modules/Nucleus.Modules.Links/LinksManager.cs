@@ -83,8 +83,15 @@ namespace Nucleus.Modules.Links
 
 					if (result.LinkFile.File != null)
 					{
-						result.LinkFile.File = await this.FileSystemManager.GetFile(site, result.LinkFile.File.Id);
-
+						try
+						{
+							result.LinkFile.File = await this.FileSystemManager.GetFile(site, result.LinkFile.File.Id);
+						}
+						catch (System.IO.FileNotFoundException)
+						{
+							// handle deleted files
+							result.LinkFile.File = new();
+						}
 						// As of 1.0.1, .GetFile(site, id) always populates file.parent & file.parent.permissions
 						// .GetFolder always reads permissions, and mostly comes from cache, so it will yield better performance
 						// than calling .ListPermissions.
@@ -97,6 +104,7 @@ namespace Nucleus.Modules.Links
 					}
 
 					break;
+
 				case LinkTypes.Page:
 					if (result.LinkPage == null)
 					{

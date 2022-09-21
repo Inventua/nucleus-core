@@ -422,7 +422,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			}
 			else if (String.IsNullOrEmpty(this.RootPath))
 			{
-				return "";
+				return path;
 			}
 			else
 			{

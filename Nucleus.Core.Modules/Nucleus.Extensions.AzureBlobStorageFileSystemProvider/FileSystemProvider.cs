@@ -485,7 +485,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			}
 			else if (String.IsNullOrEmpty(this.RootPath))
 			{
-				return "";
+				return path;
 			}
 			else
 			{

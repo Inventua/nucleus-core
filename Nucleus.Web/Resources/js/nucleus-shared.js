@@ -1223,7 +1223,8 @@ function _Page()
 					}
 				});
 
-				jQuery(document).on('click', function ()
+				// Hide tooltip when the user clicks anywhere or presses any key
+				jQuery(document).on('click keydown', function ()
 				{
 					jQuery('.settings-control label span[data-bs-toggle="tooltip"]').each(function (index, element)
 					{

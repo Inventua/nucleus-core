@@ -69,6 +69,12 @@
 	opacity: 0.5;
 }
 
+.settings-control input[type=text].disabled
+{
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
 .settings-control input, .settings-control select, .settings-control textarea
 {
 	display: block;

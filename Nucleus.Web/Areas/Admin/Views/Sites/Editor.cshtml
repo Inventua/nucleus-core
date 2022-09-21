@@ -158,10 +158,22 @@
 					</SettingsControl>
 				}
 
-				<SettingsControl caption="Home Directory" helptext="The site home directory is a sub-directory (for every file provider) which contains the files for this site.">
-					@Html.TextBoxFor(model => model.Site.HomeDirectory, new { @maxlength = 1024 })
-				</SettingsControl>
-
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Home Directory" helptext="The site home directory is a sub-directory (for every file provider) which contains the files for this site.">
+						<div class="d-flex">
+							@if (Model.Site.Id == Guid.Empty)
+							{
+								@Html.TextBoxFor(model => model.Site.HomeDirectory, new { @maxlength = 128, @class = "flex-grow-1" })
+							}
+							else
+							{
+								@Html.TextBoxFor(model => model.Site.HomeDirectory, new { @maxlength = 128, @class = "disabled flex-grow-1", @disabled = true })
+								<button type="button" class="allow-edit-home-directory btn btn-secondary btn-sm ms-2">Edit Home Directory</button>
+							}						
+						</div>
+					</SettingsControl>
+					<div></div>
+				</div>
 			</fieldset>
 		</TabPanel>
 
@@ -321,6 +333,7 @@
 	$(document).ready(function() 
 	{
 		EnableRegistrationControls(jQuery('.allow-registration').is(':checked'));
+		EnableEditHomeDirectoryControls(jQuery('.allow-edit-home-directory').is(':disabled'));
 
 		// Read the child pages of the item containing the "+" button
 		jQuery('#site-sitepages').on('click', '.nucleus-get-childpages', function (e)
@@ -350,6 +363,12 @@
 			EnableRegistrationControls(jQuery(this).is(':checked'));		
 		});
 
+		jQuery('.allow-edit-home-directory').on('click', function (e)
+		{
+			var action = function () { EnableEditHomeDirectoryControls(true); };
+			Page.Dialog('Edit Home Directory', 'You can edit the home directory to fix a mistake made during installation, but you should not change it after you have created any files or folders, or you will lose all links to file system data.  <br/><br/>Are you sure that you want to change the site\'s home directory? ', 'warning', 'Yes', 'No', action);
+		});
+
 	});
 
 	function EnableRegistrationControls(enable)
@@ -365,6 +384,26 @@
 		}
 		else
 		{
+			elements.attr('aria-disabled', true);
+			elements.addClass('disabled');
+		}
+	}
+
+	function EnableEditHomeDirectoryControls(enable)
+	{
+		var elements = jQuery('#Site_HomeDirectory');
+
+		elements.prop('disabled', !enable);
+				
+		if (enable)
+		{
+			jQuery('.allow-edit-home-directory').hide();
+			elements.removeAttr('aria-disabled');
+			elements.removeClass('disabled');
+		}
+		else
+		{
+			jQuery('.allow-edit-home-directory').show();
 			elements.attr('aria-disabled', true);
 			elements.addClass('disabled');
 		}

@@ -40,9 +40,9 @@ namespace Nucleus.Core.FileSystemProviders
 		{
 			configSection.Bind(this.Options);
 			
-			if (String.IsNullOrEmpty(this.Options.RootFolder))
+			if (String.IsNullOrEmpty(this.Options.RootPath))
 			{
-				this.Options.RootFolder = this.FolderOptions.Value.GetDataFolder("Content", true);
+				this.Options.RootPath = this.FolderOptions.Value.GetDataFolder("Content", true);
 			}			
 			
 			// Home directory is not used
@@ -56,12 +56,12 @@ namespace Nucleus.Core.FileSystemProviders
 			//}
 			//else
 			//{
-				this.Options.RootFolder = this.FolderOptions.Value.ParseFolder(this.Options.RootFolder);
+				this.Options.RootPath = this.FolderOptions.Value.ParseFolder(this.Options.RootPath);
 			//}
 
-			if (!System.IO.Directory.Exists(this.Options.RootFolder))
+			if (!System.IO.Directory.Exists(this.Options.RootPath))
 			{
-				System.IO.Directory.CreateDirectory(this.Options.RootFolder);
+				System.IO.Directory.CreateDirectory(this.Options.RootPath);
 			}
 		}
 
@@ -69,11 +69,11 @@ namespace Nucleus.Core.FileSystemProviders
 		{
 			if (String.IsNullOrEmpty(path))
 			{
-				return this.Options.RootFolder;
+				return this.Options.RootPath;
 			}
 			else
 			{
-				return System.IO.Path.Combine(this.Options.RootFolder, path);
+				return System.IO.Path.Combine(this.Options.RootPath, path);
 			}
 		}
 
@@ -85,7 +85,7 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 			else
 			{
-				string relativePath = path.Replace(this.Options.RootFolder, "").Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+				string relativePath = path.Replace(this.Options.RootPath, "").Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
 				if (relativePath.StartsWith(System.IO.Path.AltDirectorySeparatorChar))
 				{
 					if (relativePath.Length > 1)
@@ -342,7 +342,7 @@ namespace Nucleus.Core.FileSystemProviders
 
 		private Folder BuildFolder(System.IO.DirectoryInfo folderItem)
 		{
-			if (folderItem.FullName.Equals(this.Options.RootFolder, StringComparison.OrdinalIgnoreCase))
+			if (folderItem.FullName.Equals(this.Options.RootPath, StringComparison.OrdinalIgnoreCase))
 			{
 				// top level
 				return new Folder()

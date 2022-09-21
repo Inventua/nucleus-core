@@ -11,6 +11,6 @@ namespace Nucleus.Core.FileSystemProviders
 	/// </summary>
 	public class LocalFileSystemProviderOptions
 	{
-		public string RootFolder { get; set; }
+		public string RootPath { get; set; }
 	}
 }

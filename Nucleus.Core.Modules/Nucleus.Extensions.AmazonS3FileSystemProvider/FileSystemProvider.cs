@@ -24,7 +24,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 	public class FileSystemProvider : Abstractions.FileSystemProviders.FileSystemProvider
 	{
 		private FileSystemProviderOptions Options { get; } = new();
-		private string RootFolder { get; set; }
+		private string RootPath { get; set; }
 
 		private static char[] DirectorySeparators = new[] { System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar };
 
@@ -58,11 +58,11 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			configSection.Bind(this.Options);
 			if (!String.IsNullOrEmpty(this.Options.RootPath))
 			{
-				this.RootFolder = this.Options.RootPath;
+				this.RootPath = this.Options.RootPath;
 			}
 			else
 			{
-				this.RootFolder = "";
+				this.RootPath = "";
 			}
 		}
 
@@ -397,7 +397,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		{
 			path = path.Trim(DirectorySeparators);
 
-			if (String.IsNullOrEmpty(this.RootFolder))
+			if (String.IsNullOrEmpty(this.RootPath))
 			{
 				return path;
 			}
@@ -405,11 +405,11 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			{
 				if (!String.IsNullOrEmpty(path))
 				{
-					return $"{this.RootFolder}{System.IO.Path.AltDirectorySeparatorChar}{path}";
+					return $"{this.RootPath}{System.IO.Path.AltDirectorySeparatorChar}{path}";
 				}
 				else
 				{
-					return this.RootFolder;
+					return this.RootPath;
 				}
 			}
 		}
@@ -420,15 +420,15 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			{
 				return path;
 			}
-			else if (String.IsNullOrEmpty(this.RootFolder))
+			else if (String.IsNullOrEmpty(this.RootPath))
 			{
 				return "";
 			}
 			else
 			{
-				if (path.StartsWith(this.RootFolder, StringComparison.OrdinalIgnoreCase))
+				if (path.StartsWith(this.RootPath, StringComparison.OrdinalIgnoreCase))
 				{
-					return path.Substring(this.RootFolder.Length);
+					return path.Substring(this.RootPath.Length);
 				}
 				else
 				{

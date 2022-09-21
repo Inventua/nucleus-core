@@ -290,6 +290,8 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> DeleteSelected(ViewModels.Admin.FileSystemDelete viewModel)
 		{
+			viewModel.Folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Folder.Id);
+
 			if (viewModel.SelectedFolders != null)
 			{
 				foreach (var item in viewModel.SelectedFolders)
@@ -306,7 +308,7 @@ namespace Nucleus.Web.Controllers.Admin
 				}
 			}
 
-			return View("Index", await BuildViewModel(new ViewModels.Admin.FileSystem(), viewModel.Folder));
+			return View("Index", await BuildViewModel(new ViewModels.Admin.FileSystem() { SelectedProviderKey = viewModel.Folder.Provider }, viewModel.Folder));
 		}
 
 		[HttpPost]

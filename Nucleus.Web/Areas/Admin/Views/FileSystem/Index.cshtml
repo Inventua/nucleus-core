@@ -85,6 +85,10 @@
 
 		<Progress caption="Uploading file ..." class="UploadProgress"></Progress>
 
+		@if (Model.Folder?.Permissions?.Any() != true)
+		{
+			<div class="alert alert-warning">This folder does not have any permissions set.  Click Folder Settings to create permissions, unless the files in this folder are for system use only.</div>
+		}
 		@if (!Model.Folder?.Folders.Any() == true && !Model.Folder?.Files.Any() == true)
 		{
 			<div class="alert alert-warning">This folder is empty</div>

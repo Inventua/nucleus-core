@@ -15,5 +15,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		public string Secret { get; set; }
 
 		public string ServiceUrl { get; set; }
+
+		public string RootPath { get; set; }
 	}
 }

@@ -24,6 +24,9 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 	public class FileSystemProvider : Abstractions.FileSystemProviders.FileSystemProvider
 	{
 		private FileSystemProviderOptions Options { get; } = new();
+		private string RootFolder { get; set; }
+
+		private static char[] DirectorySeparators = new[] { System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar };
 
 		/// <summary>
 		/// Enum used to specify items to include in the result of a call to ListItems.
@@ -53,6 +56,14 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		public override void Configure(IConfigurationSection configSection, string HomeDirectory)
 		{
 			configSection.Bind(this.Options);
+			if (!String.IsNullOrEmpty(this.Options.RootPath))
+			{
+				this.RootFolder = this.Options.RootPath;
+			}
+			else
+			{
+				this.RootFolder = "";
+			}
 		}
 
 		/// <summary>
@@ -76,7 +87,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		public override async Task<Folder> CreateFolder(string parentPath, string newFolder)
 		{
-			PathUri path = new PathUri(parentPath).Combine(newFolder.ToLower(), true);
+			PathUri path = new PathUri(UseRootFolder(parentPath)).Combine(newFolder.ToLower(), true);
 
 			using (var client = BuildClient())
 			{
@@ -103,7 +114,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		{
 			using (var client = BuildClient())
 			{
-				PathUri pathUri = new(path);
+				PathUri pathUri = new(UseRootFolder(path));
 				DeleteObjectRequest request = new DeleteObjectRequest() { BucketName = pathUri.BucketName, Key = pathUri.Key };
 				DeleteObjectResponse response = await client.DeleteObjectAsync(request);
 				if (response.HttpStatusCode != System.Net.HttpStatusCode.NoContent)
@@ -117,27 +128,11 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		{
 			using (var client = BuildClient())
 			{
-				PathUri pathUri = new(PathUri.AddDelimiter(path));
+				PathUri pathUri = new(PathUri.AddDelimiter(UseRootFolder(path)));
 
 				if (pathUri.PathUriType == PathUri.PathUriTypes.Bucket)
 				{
 					throw new NotSupportedException();
-					// delete a bucket
-					////if (!recursive)
-					////{
-					////	// check that the bucket doesn't contain any items - deleting a bucket will delete everything in the bucket by default
-					////	if (ListItems(pathUri, ListItemsOptions.All, 1).Count > 0)
-					////	{
-					////		throw new AWSCloudProviderException(System.Net.HttpStatusCode.Conflict, "Folder not deleted because it is not empty.");
-					////	}
-					////}
-
-					////DeleteBucketRequest request = new DeleteBucketRequest() { BucketName = pathUri.BucketName, UseClientRegion = true };
-					////DeleteBucketResponse response = client.DeleteBucketAsync(request).Unwrap();
-					////if (response.HttpStatusCode != System.Net.HttpStatusCode.NoContent)
-					////{
-					////	throw new AWSCloudProviderException(response);
-					////}
 				}
 				else if (pathUri.PathUriType == PathUri.PathUriTypes.Folder)
 				{
@@ -168,7 +163,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 					}
 
 					// delete the "folder"
-					DeleteObjectRequest request = new DeleteObjectRequest() { BucketName = pathUri.BucketName, Key = PathUri.RemoveDelimiter(pathUri.Key) };
+					DeleteObjectRequest request = new DeleteObjectRequest() { BucketName = pathUri.BucketName, Key = pathUri.Key };
 					DeleteObjectResponse response = await client.DeleteObjectAsync(request);
 					if (response.HttpStatusCode != System.Net.HttpStatusCode.NoContent)
 					{
@@ -180,7 +175,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		public override async Task<Abstractions.Models.FileSystem.File> GetFile(string path)
 		{
-			PathUri pathUri = new(path);
+			PathUri pathUri = new(UseRootFolder(path));
 
 			using (var client = BuildClient())
 			{
@@ -212,7 +207,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			// set cache expiry to 30 minutes less than the SAS token expiry so a browser doesn't ever try a direct url that won't work
 			long maxAge = (Int64)((expiresOn - DateTime.UtcNow).TotalHours - 0.5) * 60;
 
-			PathUri pathUri = new(path);
+			PathUri pathUri = new(UseRootFolder(path));
 
 			using (var client = BuildClient())
 			{
@@ -228,7 +223,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		public override async Task<System.IO.Stream> GetFileContents(string path)
 		{
-			PathUri pathUri = new(path);
+			PathUri pathUri = new(UseRootFolder(path));
 
 			using (var client = BuildClient())
 			{
@@ -250,6 +245,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		public override async Task<Folder> GetFolder(string path)
 		{
+			path = UseRootFolder(path);
 			PathUri pathUri = new(String.IsNullOrEmpty(path) ? path : PathUri.AddDelimiter(path));
 
 			using (var client = BuildClient())
@@ -308,7 +304,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		public override async Task<Folder> ListFolder(string path, string pattern)
 		{
-			PathUri pathUri = new(PathUri.AddDelimiter(path));
+			PathUri pathUri = new(PathUri.AddDelimiter(UseRootFolder(path)));
 
 			Folder folder = BuildFolder(pathUri);
 			foreach (Abstractions.Models.FileSystem.FileSystemItem item in await ListItems(pathUri, ListItemsOptions.All))
@@ -342,7 +338,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		public override async Task<Abstractions.Models.FileSystem.File> SaveFile(string parentPath, string newFileName, System.IO.Stream content, bool overwrite)
 		{
-			PathUri pathUri = new PathUri(parentPath).Combine(newFileName.ToLower(), false);
+			PathUri pathUri = new PathUri(UseRootFolder(parentPath)).Combine(newFileName.ToLower(), false);
 
 			using (var client = BuildClient())
 			{
@@ -370,7 +366,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		}
 
 		/// <summary>
-		/// Returns a value indicating whether the path represents a container (and not a sub-folder or file).
+		/// Returns a value indicating whether the path represents a container (bucket) (and not a sub-folder or file).
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
@@ -391,8 +387,57 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			}
 		}
 
+		/// <summary>
+		/// Add the root folder at the start of the specified path, if a root folder has been set, ensuring that the returned path does
+		/// not end with trailing directory separator characters. 
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		private string UseRootFolder(string path)
+		{
+			path = path.Trim(DirectorySeparators);
 
-		private string GetFullPath(string containerName, string blobName)
+			if (String.IsNullOrEmpty(this.RootFolder))
+			{
+				return path;
+			}
+			else
+			{
+				if (!String.IsNullOrEmpty(path))
+				{
+					return $"{this.RootFolder}{System.IO.Path.AltDirectorySeparatorChar}{path}";
+				}
+				else
+				{
+					return this.RootFolder;
+				}
+			}
+		}
+
+		private string RemoveRootFolder(string path)
+		{
+			if (String.IsNullOrEmpty(path))
+			{
+				return path;
+			}
+			else if (String.IsNullOrEmpty(this.RootFolder))
+			{
+				return "";
+			}
+			else
+			{
+				if (path.StartsWith(this.RootFolder, StringComparison.OrdinalIgnoreCase))
+				{
+					return path.Substring(this.RootFolder.Length);
+				}
+				else
+				{
+					return path;
+				}
+			}
+		}
+
+		private string JoinPath(string containerName, string blobName)
 		{
 			if (!String.IsNullOrEmpty(containerName))
 			{
@@ -465,7 +510,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 				Provider = this.Key,
 				Path = GetRelativePath(pathUri.FullPath),
 				Name = GetDisplayName(pathUri.FullPath),
-				Parent = await GetFolder(GetParentPath(pathUri.FullPath)),
+				Parent = await GetFolder(GetRelativePath(GetParentPath(pathUri.FullPath))),
 				Capabilities = BuildFileCapabilities()
 			};
 		}
@@ -478,7 +523,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 				Path = GetRelativePath(pathUri.FullPath),
 				Name = GetDisplayName(pathUri.FileName),
 				DateModified = response.LastModified,
-				Parent = await GetFolder(GetParentPath(pathUri.FullPath)),
+				Parent = await GetFolder(GetRelativePath(GetParentPath(pathUri.FullPath))),
 				Size = response.ContentLength,
 				Capabilities = BuildFileCapabilities()
 			};
@@ -752,6 +797,8 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		private string GetRelativePath(string path)
 		{
+			path = RemoveRootFolder(path);
+
 			if (String.IsNullOrEmpty(path))
 			{
 				return path;

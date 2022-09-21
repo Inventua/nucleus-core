@@ -274,8 +274,8 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		/// </summary>
 		/// <param name="key">key to check</param>
 		/// <returns>
-		/// A string which is the specified key with the path delimiter added, if the specified key did not already end with the path delimiter.  Containers
-		/// and folders are identified by having the delimiter character as their last character.
+		/// A string which is the specified key with the path delimiter added, if the specified key did not already end with the path delimiter.  In S3,
+		/// containers and folders are identified by having the delimiter character as their last character.
 		/// </returns>
 		public static string AddDelimiter(string key)
 		{

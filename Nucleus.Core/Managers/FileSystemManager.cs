@@ -13,7 +13,6 @@ using Nucleus.Abstractions.FileSystemProviders;
 using Nucleus.Core.FileSystemProviders;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using Nucleus.Abstractions.Models.Extensions;
 
 namespace Nucleus.Core.Managers
@@ -27,6 +26,8 @@ namespace Nucleus.Core.Managers
 		private IDataProviderFactory DataProviderFactory { get; }
 		private IFileSystemProviderFactory FileSystemProviderFactory { get; }
 		private IPermissionsManager PermissionsManager { get; }
+
+		private static char[] DirectorySeparators = new[] { System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar };
 
 		public FileSystemManager(IDataProviderFactory dataProviderFactory, ICacheManager cacheManager, IPermissionsManager permissionsManager, IFileSystemProviderFactory fileSystemProviderFactory)
 		{
@@ -51,14 +52,27 @@ namespace Nucleus.Core.Managers
 			{
 				using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 				{
+					FileSystemProvider fileSystemProvider = this.FileSystemProviderFactory.Get(site, providerName);
+					Folder folder = null;
 
 					// Get folder information from the file system
-					Folder folder = await this.FileSystemProviderFactory.Get(site, providerName).GetFolder(path);
+					try
+					{
+						folder = RemoveSiteHomeDirectory(site, await fileSystemProvider.GetFolder(UseSiteHomeDirectory(site, path)));
+					}
+					catch (System.IO.FileNotFoundException)
+					{
+						// if the root folder was not found, try to create it
+						if (string.IsNullOrEmpty(path))
+						{
+							folder = await fileSystemProvider.CreateFolder("", UseSiteHomeDirectory(site, path));
+						}
+					}
 
 					// Retrieve folder information from the database.  We only use Id (see below)
 					Folder databaseEntry = await provider.GetFolder(site, providerName, path);
 
-					if (databaseEntry == null)
+					if (databaseEntry == null && folder != null)
 					{
 						// database entry does not exist for the folder found in the file system, create database record
 						databaseEntry = await provider.SaveFolder(site, folder);
@@ -67,12 +81,6 @@ namespace Nucleus.Core.Managers
 					if (databaseEntry != null)
 					{
 						return databaseEntry.Id;
-						// Get the folder by Id.  This will retrieve the same object that is stored in CacheManager.FolderCache,
-						// so that the object stored in CacheManager.FolderPathCache() is the same object rather than two copies 
-						// of the same data.
-						//return await this.GetFolder(site, databaseEntry.Id);
-						////folderData.CopyDatabaseValuesTo(folder);
-						////return folder;
 					}
 
 					return default;
@@ -88,12 +96,12 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		public async Task<Folder> GetFolder(Site site, Guid id)
 		{
-			using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
+			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
 				//Folder folderData = await provider.GetFolder(id);
 				Folder folderData = await this.CacheManager.FolderCache().GetAsync(id, async id =>
 				{
-					Folder newCacheEntry = await provider.GetFolder(id);
+					Folder newCacheEntry = await dataProvider.GetFolder(id);
 
 					// populate permissions so that future retrievals from the cache will always have the permissions list populated
 					newCacheEntry.Permissions = await this.PermissionsManager.ListPermissions(newCacheEntry.Id, Folder.URN);
@@ -102,13 +110,22 @@ namespace Nucleus.Core.Managers
 
 				if (folderData != null)
 				{
-					Folder folder = await this.FileSystemProviderFactory.Get(site, folderData.Provider).GetFolder(folderData.Path);
+					Folder folder = RemoveSiteHomeDirectory(site, await this.FileSystemProviderFactory.Get(site, folderData.Provider).GetFolder(UseSiteHomeDirectory(site, folderData.Path)));
 					folderData.CopyDatabaseValuesTo(folder);
 
 					if (folder.Parent != null)
 					{
-						Folder parent = await provider.GetFolder(site, folder.Provider, folder.Parent.Path);
-						parent.CopyDatabaseValuesTo(folder.Parent);
+						if (!String.IsNullOrEmpty(site.HomeDirectory) && (String.IsNullOrEmpty(folder.Path) || folder.Path.Equals(site.HomeDirectory, StringComparison.OrdinalIgnoreCase)))
+						{
+							// prevent site's root folder from being part of the folder tree
+							folder.Parent = null;
+						}
+						else
+						{
+							RemoveSiteHomeDirectory(site, folder.Parent);
+							Folder parent = RemoveSiteHomeDirectory(site, await dataProvider.GetFolder(site, folder.Provider, folder.Parent.Path));
+							parent.CopyDatabaseValuesTo(folder.Parent);
+						}
 					}
 					return folder;
 				}
@@ -134,7 +151,7 @@ namespace Nucleus.Core.Managers
 
 					if (databaseEntry != null)
 					{
-						File file = await this.FileSystemProviderFactory.Get(site, databaseEntry.Provider).GetFile(databaseEntry.Path);
+						File file = RemoveSiteHomeDirectory(site, await this.FileSystemProviderFactory.Get(site, databaseEntry.Provider).GetFile(UseSiteHomeDirectory(site, databaseEntry.Path)));
 						databaseEntry.CopyDatabaseValuesTo(file);
 
 						await GetDatabaseProperties(site, file.Parent);
@@ -142,7 +159,15 @@ namespace Nucleus.Core.Managers
 						// Fully populate the parent so that the cached version is ready for use anywhere
 						if (file.Parent != null)
 						{
-							file.Parent = await this.GetFolder(site, file.Parent.Id);
+							if (!String.IsNullOrEmpty(site.HomeDirectory) && file.Parent.Path.Equals(site.HomeDirectory, StringComparison.OrdinalIgnoreCase))
+							{
+								// prevent site's root folder from being part of the folder tree
+								file.Parent = null;
+							}
+							else
+							{
+								file.Parent = await this.GetFolder(site, file.Parent.Id);
+							}
 						}
 
 						return file;
@@ -163,15 +188,15 @@ namespace Nucleus.Core.Managers
 		{
 			Guid id = await this.CacheManager.FilePathCache().GetAsync(FileSystemCachePath(site, providerName, path), async key =>
 			{
-				using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
+				using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 				{
 					// get file information from the file system
-					File file = await this.FileSystemProviderFactory.Get(site, providerName).GetFile(path);
+					File file = RemoveSiteHomeDirectory(site, await this.FileSystemProviderFactory.Get(site, providerName).GetFile(UseSiteHomeDirectory(site, path)));
 
 					if (file != null)
 					{
 						// read file data from the database
-						File fileData = await provider.GetFile(site, file.Provider, file.Path);
+						File fileData = await dataProvider.GetFile(site, file.Provider, file.Path);
 
 						if (fileData == null)
 						{
@@ -180,19 +205,12 @@ namespace Nucleus.Core.Managers
 							// for newly-detected files, try to get the image dimensions.  The GetImageDimensions extension checks that
 							// the file is an image and does nothing if it is not, so we don't need to check that here. 
 							await file.GetImageDimensions(site, this);
-							fileData = await provider.SaveFile(site, file);
+							fileData = await dataProvider.SaveFile(site, file);
 						}
 
 						if (fileData != null)
 						{
 							return fileData.Id;
-							// Get the file by Id.  This will retrieve the same object that is stored in CacheManager.FileCache,
-							// so that the object stored in CacheManager.FilePathCache() is the same object rather than two copies 
-							// of the same data.
-							//return await this.GetFile(site, fileData.Id);
-							////fileData.CopyDatabaseValuesTo(file);
-							////await GetDatabaseProperties(site, file.Parent);
-							////return file;
 						}
 					}
 				}
@@ -266,7 +284,7 @@ namespace Nucleus.Core.Managers
 					else
 					{
 						existing.Permissions = folder.Permissions;
-						folder = existing;
+						folder.Id = existing.Id;
 					}
 				}
 			}
@@ -367,7 +385,7 @@ namespace Nucleus.Core.Managers
 		{
 			// create the physical folder
 			FileSystemProvider fileSystemProvider = this.FileSystemProviderFactory.Get(site, providerName);
-			Folder parentFolder = await fileSystemProvider.GetFolder(parentPath);
+			Folder parentFolder = await fileSystemProvider.GetFolder(UseSiteHomeDirectory(site, parentPath));
 			string message = "";
 
 			if (!IsValidFolderName(parentFolder, newFolder, ref message))
@@ -375,8 +393,8 @@ namespace Nucleus.Core.Managers
 				throw new InvalidOperationException(message);
 			}
 
-			Folder result = await fileSystemProvider.CreateFolder(parentPath, newFolder);
-
+			Folder result = RemoveSiteHomeDirectory(site, await fileSystemProvider.CreateFolder(UseSiteHomeDirectory(site, parentPath), newFolder));
+			
 			// SaveFolderPermissions creates a record in the database for the folder (a new folder doesn't have
 			// any permissions to save, but we do want to save the database record).
 			await SaveFolderPermissions(site, result);
@@ -387,7 +405,7 @@ namespace Nucleus.Core.Managers
 		public async Task DeleteFolder(Site site, Folder folder, Boolean recursive)
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, folder.Provider);
-			await provider.DeleteFolder(folder.Path, recursive);
+			await provider.DeleteFolder(UseSiteHomeDirectory(site, folder.Path), recursive);
 
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
@@ -402,8 +420,9 @@ namespace Nucleus.Core.Managers
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, folder.Provider);
 
-			folder = await provider.RenameFolder(folder.Path, newName);
-			Folder parentFolder = await provider.GetFolder(folder.Parent.Path);
+			folder = RemoveSiteHomeDirectory(site,await provider.RenameFolder(UseSiteHomeDirectory(site, folder.Path), newName));
+			 
+			Folder parentFolder = RemoveSiteHomeDirectory(site,await provider.GetFolder(UseSiteHomeDirectory(site, folder.Parent.Path)));
 			string message = "";
 
 			if (!IsValidFolderName(parentFolder, newName, ref message))
@@ -451,12 +470,13 @@ namespace Nucleus.Core.Managers
 			Folder existingFolder = await this.GetFolder(site, id);
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, existingFolder.Provider);
 
-			Folder folder = await provider.ListFolder(existingFolder.Path, pattern);
-
+			Folder folder = await provider.ListFolder(UseSiteHomeDirectory(site, existingFolder.Path), pattern);
+			
 			await GetDatabaseProperties(site, folder);
 			await GetDatabaseProperties(site, folder.Parent);
 			await GetDatabaseProperties(site, folder.Folders);
 			await GetDatabaseProperties(site, folder.Files);
+
 			return folder;
 		}
 
@@ -464,6 +484,7 @@ namespace Nucleus.Core.Managers
 		{
 			foreach (File file in files)
 			{
+				RemoveSiteHomeDirectory(site, file);
 				await GetDatabaseProperties(site, file);
 			}
 		}
@@ -489,7 +510,8 @@ namespace Nucleus.Core.Managers
 		private async Task<Folder> GetDatabaseProperties(Site site, Folder folder)
 		{
 			if (folder == null) return null;
-
+			
+			RemoveSiteHomeDirectory(site, folder);
 			Folder folderData = await this.GetFolder(site, folder.Provider, folder.Path);
 			if (folderData != null)
 			{
@@ -510,7 +532,7 @@ namespace Nucleus.Core.Managers
 
 			DateTime expiresOn = DateTime.UtcNow.AddDays(30);
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, file.Provider);
-			System.Uri directUrl = await provider.GetFileDirectUrl(file.Path, expiresOn);
+			System.Uri directUrl = await provider.GetFileDirectUrl(UseSiteHomeDirectory(site, file.Path), expiresOn);
 
 			if (directUrl != null)
 			{
@@ -529,15 +551,15 @@ namespace Nucleus.Core.Managers
 		public async Task<System.IO.Stream> GetFileContents(Site site, File file)
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, file.Provider);
-			return await provider.GetFileContents(file.Path);
+			return await provider.GetFileContents(UseSiteHomeDirectory(site, file.Path));
 		}
 
 		public async Task DeleteFile(Site site, File file)
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, file.Provider);
-			Folder parentFolder = await provider.GetFolder(file.Parent.Path);
+			Folder parentFolder = await provider.GetFolder(UseSiteHomeDirectory(site, file.Parent.Path));
 
-			await provider.DeleteFile(file.Path);
+			await provider.DeleteFile(UseSiteHomeDirectory(site, file.Path));
 
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
@@ -555,7 +577,7 @@ namespace Nucleus.Core.Managers
 		public async Task RenameFile(Site site, File file, string newName)
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, file.Provider);
-			Folder parentFolder = await provider.GetFolder(file.Parent.Path);
+			Folder parentFolder = await provider.GetFolder(UseSiteHomeDirectory(site, file.Parent.Path));
 			string message = "";
 
 			if (!IsValidFileName(parentFolder, newName, ref message))
@@ -568,8 +590,8 @@ namespace Nucleus.Core.Managers
 				throw new InvalidOperationException("Changing the file extension is not allowed.");
 			}
 
-			File newfile = await provider.RenameFile(file.Path, newName);
-
+			File newfile = RemoveSiteHomeDirectory(site, await provider.RenameFile(UseSiteHomeDirectory(site, file.Path), newName));
+			
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
 				file.Path = newfile.Path;
@@ -588,7 +610,8 @@ namespace Nucleus.Core.Managers
 		{
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
-				folder = await dataProvider.SaveFolder(site, folder);
+				folder = RemoveSiteHomeDirectory(site, await dataProvider.SaveFolder(site, folder));
+				
 				this.CacheManager.FolderCache().Remove(folder.Id);
 				this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, folder.Provider, folder.Path));
 
@@ -602,7 +625,7 @@ namespace Nucleus.Core.Managers
 
 			if (content != null)
 			{
-				Folder parentFolder = await provider.GetFolder(parentPath);
+				Folder parentFolder = await provider.GetFolder(UseSiteHomeDirectory(site, parentPath));
 				string message = "";
 
 				if (!IsValidFileName(parentFolder, newFileName, ref message))
@@ -610,9 +633,9 @@ namespace Nucleus.Core.Managers
 					throw new InvalidOperationException(message);
 				}
 
-				File file = await provider.SaveFile(parentPath, newFileName, content, overwrite);
-
-				await GetDatabaseProperties(site, file);
+				File file = RemoveSiteHomeDirectory(site, await provider.SaveFile(UseSiteHomeDirectory(site, parentPath), newFileName, content, overwrite));
+				
+				////await GetDatabaseProperties(site, file);
 
 				// Expire the direct url after upload.  By generating a new url, we make browsers download image files again rather than using
 				// a browser-cached copy.
@@ -631,7 +654,7 @@ namespace Nucleus.Core.Managers
 				}
 				this.CacheManager.FileCache().Remove(file.Id);
 
-				return file;
+				return await GetFile(site, file.Id);
 			}
 			else
 			{
@@ -647,17 +670,20 @@ namespace Nucleus.Core.Managers
 				{
 					if (file.Id != Guid.Empty)
 					{
-						file = await this.GetFile(site, file.Id);
+						file = RemoveSiteHomeDirectory(site, await this.GetFile(site, file.Id));
+					}
+
+					// if the file system provider does not set the parent, read it
+					if (file.Parent == null)
+					{
+						file.Parent = await this.GetFolder(site, file.Provider ?? this.ListProviders().FirstOrDefault()?.Key, "");
 					}
 
 					if (file.Parent != null)
 					{
+						RemoveSiteHomeDirectory(site, file.Parent);
 						file.Parent.Permissions = await this.ListPermissions(file.Parent);
-					}
-					else
-					{
-						file.Parent = await this.GetFolder(site, file.Provider ?? this.ListProviders().FirstOrDefault()?.Key, "");
-					}
+					}					
 				}
 			}
 			catch (System.IO.FileNotFoundException)
@@ -666,6 +692,62 @@ namespace Nucleus.Core.Managers
 			}
 
 			return file;
+		}
+
+		/// <summary>
+		/// Add the site's home directory to the start of the specified path, if a home directory has been set, ensuring that the returned path does
+		/// not end with trailing directory separator characters. 
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		private string UseSiteHomeDirectory(Site site, string path)
+		{
+			if (String.IsNullOrEmpty(site.HomeDirectory))
+			{
+				return path;
+			}
+			else
+			{
+				if (String.IsNullOrEmpty(path))
+				{
+					return site.HomeDirectory;
+				}
+				else
+				{
+					return $"{site.HomeDirectory}{System.IO.Path.AltDirectorySeparatorChar}{path}";
+				}
+			}
+		}
+
+		private T RemoveSiteHomeDirectory<T>(Site site, T item) 
+			where T : FileSystemItem
+		{
+			if (item == null) return null;
+			item.Path = RemoveSiteHomeDirectory(site, item.Path);
+			return item;
+		}
+
+		private string RemoveSiteHomeDirectory(Site site, string path)
+		{
+			if (String.IsNullOrEmpty(path))
+			{
+				return path;
+			}
+			else if (String.IsNullOrEmpty(site.HomeDirectory))
+			{
+				return path.Trim(DirectorySeparators);
+			}
+			else
+			{
+				if (path.StartsWith(site.HomeDirectory, StringComparison.OrdinalIgnoreCase))
+				{
+					return path.Substring(site.HomeDirectory.Length).Trim(DirectorySeparators);
+				}
+				else
+				{
+					return path.Trim(DirectorySeparators);
+				}
+			}
 		}
 	}
 }

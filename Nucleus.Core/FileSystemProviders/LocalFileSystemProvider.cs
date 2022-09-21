@@ -36,28 +36,28 @@ namespace Nucleus.Core.FileSystemProviders
 		/// Sets the configuration for this instance.
 		/// </summary>
 		/// <param name="configSection"></param>
-		public override void Configure(IConfigurationSection configSection, string homeDirectory)
+		public override void Configure(IConfigurationSection configSection, string rootDirectory)
 		{
 			configSection.Bind(this.Options);
 			
 			if (String.IsNullOrEmpty(this.Options.RootFolder))
 			{
 				this.Options.RootFolder = this.FolderOptions.Value.GetDataFolder("Content", true);
-			}
-
-			if (System.IO.Path.IsPathRooted(homeDirectory))
-			{
-				throw new ArgumentException($"'{homeDirectory}' is not a valid home directory.  The home directory must not start with a backslash or a drive letter.");
-			}
-
-			if (!String.IsNullOrEmpty(homeDirectory))
-			{
-				this.Options.RootFolder = System.IO.Path.Combine(this.FolderOptions.Value.ParseFolder(this.Options.RootFolder), homeDirectory);
-			}
-			else
-			{
+			}			
+			
+			// Home directory is not used
+			//if (System.IO.Path.IsPathRooted(rootDirectory))
+			//{
+			//	throw new ArgumentException($"'{rootDirectory}' is not a valid root directory.  The home directory must not start with a backslash or a drive letter.");
+			//}
+			//if (!String.IsNullOrEmpty(rootDirectory))
+			//{
+			//	this.Options.RootFolder = System.IO.Path.Combine(this.FolderOptions.Value.ParseFolder(this.Options.RootFolder), rootDirectory);
+			//}
+			//else
+			//{
 				this.Options.RootFolder = this.FolderOptions.Value.ParseFolder(this.Options.RootFolder);
-			}
+			//}
 
 			if (!System.IO.Directory.Exists(this.Options.RootFolder))
 			{
@@ -85,8 +85,8 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 			else
 			{
-				string relativePath = path.Replace(this.Options.RootFolder, "");
-				if (relativePath.StartsWith(System.IO.Path.DirectorySeparatorChar) || relativePath.StartsWith(System.IO.Path.AltDirectorySeparatorChar))
+				string relativePath = path.Replace(this.Options.RootFolder, "").Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+				if (relativePath.StartsWith(System.IO.Path.AltDirectorySeparatorChar))
 				{
 					if (relativePath.Length > 1)
 					{
@@ -351,7 +351,7 @@ namespace Nucleus.Core.FileSystemProviders
 					Path = "",
 					Name = "/",
 					DateModified = folderItem.LastWriteTimeUtc,
-					Parent = null, //new Folder() { Provider = this.Key, Path = "" },
+					Parent = null, 
 					Capabilities = BuildFolderCapabilities(),
 					FolderValidationRules = BuildFolderValidationRules(),
 					FileValidationRules = BuildFileValidationRules()

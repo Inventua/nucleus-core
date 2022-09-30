@@ -121,7 +121,7 @@ namespace Nucleus.Abstractions.Models.Cache
 				}
 				else
 				{
-					this.Logger?.LogDebug("Removed expired '{type}' from cache:{name} after {timeout}.", typeof(TModel).Name, this.Name, this.Options.ExpiryTime);
+					this.Logger?.LogDebug("Removed expired '{type}' [{key}] from cache:{name} after {timeout}.", typeof(TModel).Name, key, this.Name, this.Options.ExpiryTime);
 					Remove(key);
 					return default; 
 				}

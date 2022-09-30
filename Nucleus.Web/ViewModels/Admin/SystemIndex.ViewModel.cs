@@ -27,7 +27,7 @@ namespace Nucleus.Web.ViewModels.Admin
 		public DateTime StartTime { get; set; }
 		public string Uptime { get; set; }
 		
-		public LogSettingsViewModel LogSettings { get; set; } = new();
+		public LogSettingsViewModel LogSettings { get; set; } = new() { HasLoggingConfiguration = true };
 
 		public string Configuration { get; set; }
 
@@ -47,6 +47,9 @@ namespace Nucleus.Web.ViewModels.Admin
 		public class LogSettingsViewModel
 		{
 			public string ControllerName { get; set; }
+			public Boolean HasLoggingConfiguration { get; set; } = false;
+
+
 			public Boolean LogSortDescending { get; set; }
 			public string LogFilterTerm { get; set; }
 			public Boolean LogIncludeInformation { get; set; } = true;

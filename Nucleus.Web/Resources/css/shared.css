@@ -35,6 +35,11 @@ body
   font-size: 0.8rem;
 }
 
+.m-minus1
+{
+  margin: -0.25rem;
+}
+
 .btn label span
 {
   vertical-align: text-top;

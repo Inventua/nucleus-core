@@ -18,10 +18,14 @@
 	@Html.Hidden(@Model.PropertyName + $".{nameof(File.Provider)}", Model.SelectedFile.Provider)
 	@Html.Hidden(@Model.PropertyName + $".{nameof(File.Path)}", Model.SelectedFile.Path)
 	@Html.Hidden(@Model.PropertyName + $".{nameof(File.Parent)}.{nameof(Folder.Id)}", Model.SelectedFolder.Id)
+	@if (Model.ShowImagePreview && Model.SelectedFile.GetMIMEType(false).Contains("image/"))
+{
+		<img src="@Url.FileLink(Model.SelectedFile)" class="nucleus-image-preview" height="60" width="@((int)((float)60 / Model.SelectedFile.Height * Model.SelectedFile.Width))" />
+	}
 }
 else
 {
 	@Html.DropDownList(@Model.PropertyName + $".{nameof(File.Provider)}", new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name), @Model.SelectedFile.Provider), new { @class = "providerKey", @data_autopostbackevent = "change", @onchange = $@"jQuery('#{Model.PropertyName.Replace(".", "_")}_Parent_Id').val(''); jQuery('#{Model.PropertyName.Replace(".", "_")}_Id').val('')" })
 	@Html.DropDownList(@Model.PropertyName + $".{nameof(File.Parent)}.{nameof(Folder.Id)}", new SelectList(Model.SelectedFolder.Folders, nameof(Folder.Id), nameof(Folder.Name), @Model.SelectedFolder.Id), new { @data_autopostbackevent = "change", @onchange = $@"jQuery('#{Model.PropertyName.Replace(".", "_")}_Id').val('');" })
-	@Html.DropDownList(@Model.PropertyName + $".{nameof(File.Id)}", new SelectList(Model.SelectedFolder.Files, nameof(File.Id), nameof(File.Name), @Model.SelectedFile.Id), Model.SelectedFolder.Files.Count > 0 ? "(select)" : "(no files)", new { @data_autopostbackevent = "change" })
+	@Html.DropDownList(@Model.PropertyName + $".{nameof(File.Id)}", new SelectList(Model.SelectedFolder.Files, nameof(File.Id), nameof(File.Name), @Model.SelectedFile.Id), Model.SelectedFolder.Files.Count > 0 ? "(select)" : Model.NoFilesMessage, new { @data_autopostbackevent = "change" })
 }

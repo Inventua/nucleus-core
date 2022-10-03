@@ -11,5 +11,8 @@ namespace Nucleus.Web.ViewModels.User
 		public string Pattern { get; set; }
 		public File File { get; set; }
 		public Boolean ShowSelectAnother { get; set; } = true;
+		public string NoFilesMessage { get; set; } = "(no files)";
+		public Boolean ShowImagePreview { get; set; }
+
 	}
 }

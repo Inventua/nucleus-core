@@ -26,10 +26,11 @@ namespace Nucleus.Web.Controllers
 
 		[HttpGet]
 		[HttpPost]
-		public ActionResult Index(ViewModels.User.FileSelector viewModel, string pattern, Boolean showSelectAnother = true)
+		public ActionResult Index(ViewModels.User.FileSelector viewModel, string pattern, Boolean showSelectAnother = true, string noFilesMessage= "(no files)")
 		{
 			viewModel.Pattern = pattern;
 			viewModel.ShowSelectAnother = showSelectAnother;
+			viewModel.NoFilesMessage = noFilesMessage;
 
 			return View("Index", viewModel);
 		}

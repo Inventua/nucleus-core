@@ -104,6 +104,16 @@ namespace Nucleus.ViewFeatures.Controls
 			// Add the currently selected folder to the folders list (at the top)
 			viewModel.SelectedFolder.Folders.Insert(0, viewModel.SelectedFolder);
 
+			// add a separator after the currently selected folder, only if there are any child folders
+			if (viewModel.SelectedFolder.Folders.Count > 1)
+			{
+				viewModel.SelectedFolder.Folders.Insert(1, new Folder()
+				{
+					Id = Guid.Empty,
+					Name = "-"
+				});
+			}
+
 			// Add a "up one level" folder to the folders list, unless we are already at the top level
 			if (!String.IsNullOrEmpty(viewModel.SelectedFolder.Path))
 			{

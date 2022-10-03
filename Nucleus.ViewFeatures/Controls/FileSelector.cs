@@ -39,8 +39,10 @@ namespace Nucleus.ViewFeatures.Controls
 		/// <param name="showSelectAnother"></param>
 		/// <param name="selectAnotherActionName"></param>
 		/// <param name="applicationAbsoluteUrl"></param>
+		/// <param name="noFilesMessage"></param>
+		/// <param name="showImagePreview"></param>
 		/// <returns></returns>
-		public async Task<IViewComponentResult> InvokeAsync(File file, string pattern, string propertyName, string selectAnotherActionName, Boolean showSelectAnother = true, Boolean applicationAbsoluteUrl = true)
+		public async Task<IViewComponentResult> InvokeAsync(File file, string pattern, string propertyName, string selectAnotherActionName, Boolean showSelectAnother = true, Boolean applicationAbsoluteUrl = true, string noFilesMessage = "(no files)", Boolean showImagePreview = false)
 		{
 			ViewModels.FileSelector viewModel = new() 
 			{
@@ -51,7 +53,9 @@ namespace Nucleus.ViewFeatures.Controls
 				Providers = this.FileSystemManager.ListProviders(),
 				PropertyName = propertyName ?? "SelectedFile",
 				ShowSelectAnother = showSelectAnother,
-				SelectAnotherActionName = selectAnotherActionName ?? "SelectAnother"
+				SelectAnotherActionName = selectAnotherActionName ?? "SelectAnother",
+				NoFilesMessage = noFilesMessage ?? "(no files)",
+				ShowImagePreview = showImagePreview
 			};
 
 			if (viewModel.SelectedFile == null)
@@ -104,11 +108,29 @@ namespace Nucleus.ViewFeatures.Controls
 				viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFolder.Id, pattern);
 			}
 
+			// copy the selected folder so that changes made below don't get reflected in cache
+			viewModel.SelectedFolder = viewModel.SelectedFolder.Copy<Folder>();
+
 			viewModel.SelectedFolder.SortFolders(folder => folder.Name, false);
 			viewModel.SelectedFolder.SortFiles(file => file.Name, false);
 
 			// Add the currently selected folder to the folders list (at the top)
 			viewModel.SelectedFolder.Folders.Insert(0, viewModel.SelectedFolder);
+			//viewModel.SelectedFolder.Folders.Insert(0, new Folder()
+			//{
+			//	Id = viewModel.SelectedFolder.Id,
+			//	Name = $"[{viewModel.SelectedFolder.Name}]"
+			//});
+
+			// add a separator after the currently selected folder, only if there are any child folders
+			if (viewModel.SelectedFolder.Folders.Count > 1)
+			{
+				viewModel.SelectedFolder.Folders.Insert(1, new Folder()
+				{
+					Id = Guid.Empty,
+					Name = "-"
+				});
+			}
 
 			// Add a "up one level" folder to the folders list, unless we are already at the top level
 			if (!String.IsNullOrEmpty(viewModel.SelectedFolder.Path))

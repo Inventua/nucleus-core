@@ -1,12 +1,10 @@
 ﻿html, body
 {
 	height: 100%;
-/*	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-*/}
+}
 
 body 
 {
-	/*margin: 0;*/
 	overflow: auto;
 }
 
@@ -63,6 +61,11 @@ body
 .btn.btn-none:focus-visible
 {
   outline: -webkit-focus-ring-color auto 1px;
+}
+
+select option.option-separator
+{
+  color: #888;
 }
 
 a *
@@ -149,7 +152,6 @@ a *
 
 .Nucleus.Content
 {
-	left: 100px;
 	height: 100%;
 }
 

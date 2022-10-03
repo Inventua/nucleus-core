@@ -1024,6 +1024,15 @@ function _Page()
 			return;
 		}
 
+		// replace <option> elements with a text value of "-" with <optgroup label="----">
+		jQuery('select option').each(function ()
+		{
+			if (jQuery(this).text() == '-')
+			{
+				jQuery(this).replaceWith(jQuery('<option class="option-separator" disabled="disabled">' + "-".repeat(8) + '</option>'));
+			}
+		});
+
 		// attempt to set focus to the first control in the response
 
 		// if the currently-selected control is an INPUT[type=search], leave focus where it is

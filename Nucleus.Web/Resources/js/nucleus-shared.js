@@ -202,13 +202,29 @@ function _Page()
 				uploadprogress.attr('value', percent.toString());
 				uploadprogress.text(percent.toString() + '%');
 
+				var filesCount = 0;
+				var labeltext = 'file';
+
+				jQuery(e.currentTarget).find('input[type=file]').each(function (index, element)
+				{
+					if (element != null && typeof(element.files) !== 'undefined')
+					{
+						filesCount += element.files.length;
+					}
+				});
+
+				if (filesCount > 1)
+				{
+					labeltext = 'files';
+				}
+
 				if (percent < 100)
 				{
-					uploadprogressLabel.text('Uploading file ...');
+					uploadprogressLabel.text('Uploading ' + labeltext + ' ...');
 				}
 				else
 				{
-					uploadprogressLabel.text('Upload Complete.  Processing file ...');
+					uploadprogressLabel.text('Upload Complete.  Processing ' + labeltext + ' ...');
 				}
 			});
 
@@ -1024,12 +1040,22 @@ function _Page()
 			return;
 		}
 
-		// replace <option> elements with a text value of "-" with <optgroup label="----">
+		// set the text and disabled attribute for <option> elements with a text value of "-".
 		jQuery('select option').each(function ()
 		{
 			if (jQuery(this).text() == '-')
 			{
-				jQuery(this).replaceWith(jQuery('<option class="option-separator" disabled="disabled">' + "-".repeat(8) + '</option>'));
+				var element = jQuery(this);
+				var parent = element.parent();
+				// determine how many dashes will fit
+				var measure = jQuery('<span>-</span>');
+				measure.css('font-size', element.parent().css('font-size'));
+				parent.parent().append(measure);
+				var dashCount = Math.floor(parent.width() / measure.width());
+				measure.remove();
+				// set option element to disabled, fill with the calculated number of dashes
+				element.text("-".repeat(dashCount));
+				element.attr('disabled', 'disabled');
 			}
 		});
 

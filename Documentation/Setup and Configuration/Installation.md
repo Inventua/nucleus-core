@@ -27,8 +27,8 @@ You can use the command-line command:
 ## Using a different database provider
 1. Create a database in your database server.
 2. In your installation folder, create a new database configuration file.  If you are setting up a production environment, the file should be named 
-databaseSettings.Production.json.  If you are setting up a development environment, name your file databaseSettings.Development.json.  Refer to the 
-[Configuration Files](https://www.nucleus-cms.com/Configuration/) page for more information.
+`databaseSettings.Production.json`{.file-name}.  If you are setting up a development environment, name your file `databaseSettings.Development.json`{.file-name}. 
+Refer to the [Configuration Files](https://www.nucleus-cms.com/configuration-files/) page for more information.
 3. Edit your new file and add the following, substituting your SQL server name, database name and credentials:
 ```json
 {
@@ -62,6 +62,7 @@ databaseSettings.Production.json.  If you are setting up a development environme
 The process is the same if you want to use MySql, MariaDB or PostgreSQL, but the connection type (shown as "SqlServer" in the example above) 
 will change, as does the format of the [connection string](https://www.connectionstrings.com/).
 
+### Database Types and Connection Strings
 {.table-0-0-75}
 | Database          | Type       | Connection String                                                                                                                          |
 | ---------         | ---------- | ----------------------------                                                                                                               |
@@ -69,7 +70,7 @@ will change, as does the format of the [connection string](https://www.connectio
 | MySql             | MySql      | Server=DATABASE-SERVER;Database=DATABASE-NAME;uid=DATABASE-USERNAME;pwd=DATABASE-PASSWORD                                                  |
 | MariaDB           | MySql      | Server=DATABASE-SERVER;Database=DATABASE-NAME;uid=DATABASE-USERNAME;pwd=DATABASE-PASSWORD                                                  |
 | PostgreSQL        | PostgreSql | Server=DATABASE-SERVER;Database=DATABASE-NAME;User Id=DATABASE-USERNAME;Password=DATABASE-PASSWORD;                                        |
-| Azure Sql Server  | SqlServer  | Use the connection string from Azure Portal.  Select your database, and click "Show database connection strings" in the overview page.     |
+| Azure Sql Server  | SqlServer  | Use the connection string from [Azure Portal](https://portal.azure.com).  Select your database, and click "Show database connection strings" in the overview page.     |
 
 > The database type for MariaDb is 'MySql'.  MariaDb is [based on MySql](https://en.wikipedia.org/wiki/MariaDB) and uses the same database provider.
 
@@ -82,8 +83,9 @@ Local File System provider.  You can add another storage provider after you have
 
 To configure your file system providers:
 1. In your installation folder, edit your environment application configuration file, or create one if it does not exist.  If you are setting up a production environment, 
-the file should be named appSettings.Production.json.  If you are setting up a development environment, name your file appSettings.Development.json.
-2. Edit your new file and add a configuration section for your file system provider (to the Nucleus section).  You may choose to remove or comment out the default file system provider.
+the file should be named `appSettings.Production.json`{.file-name}.  If you are setting up a development environment, name your file `appSettings.Development.json`{.file-name}.
+2. Edit your new file and add a configuration section for your file system provider (to the Nucleus section).  You can remove or comment out the 
+default ('local') file system provider if you don't want to use local file storage.
 
 ```json
 "Nucleus": 
@@ -94,7 +96,16 @@ the file should be named appSettings.Production.json.  If you are setting up a d
     [
       // File providers have a key, name and provider type.  You can specify multiple file providers, 
       // and the user will be presented with a list.  The "Name" property is shown to the user.  Each entry has a 
-      // key which uniquely identifies the provider entry.
+      // key which uniquely identifies the provider entry.  You should not change provider keys after you have 
+      // created folders and files, because it is part of the path identifier that is saved in the database, but you can
+      // change a provider Name property because its value is only used for on-screen display.
+      {
+        "Key": "local",
+        "Name": "Local",
+        "ProviderType": "Nucleus.Core.FileSystemProviders.LocalFileSystemProvider,Nucleus.Core",
+        "RootPath": "{DataFolder}//Content"
+      },
+      // You should only include this section if you are using Azure storage
       {
         "Key": "Azure",
         "Name": "Azure",
@@ -102,24 +113,47 @@ the file should be named appSettings.Production.json.  If you are setting up a d
           "Nucleus.Extensions.AzureBlobStorageFileSystemProvider.FileSystemProvider,Nucleus.Extensions.AzureBlobStorageFileSystemProvider",
         "ConnectionString": "STORAGE_ACCOUNT_CONNECTIONSTRING"
       },
+      // You should only include this section if you are using Amazon S3
       {
-        "Key": "local",
-        "Name": "Local",
-        "ProviderType": "Nucleus.Core.FileSystemProviders.LocalFileSystemProvider,Nucleus.Core",
-        "RootFolder": "{DataFolder}//Content"
+        "Key": "AmazonS3",
+        "Name": "Amazon S3",
+        "ProviderType": "Nucleus.Extensions.AmazonS3FileSystemProvider.FileSystemProvider,Nucleus.Extensions.AmazonS3FileSystemProvider",
+        "AccessKey": "YOUR-ACCESS-KEY",
+        "Secret": "YOUR-SECRET",
+        "ServiceUrl": "AMAZON-S3-REGION-URL",
+        "RootPath": "YOUR-BUCKET-NAME"
       }
     ]
   }
 ]
 ```
 
-Replace the ==STORAGE_ACCOUNT_CONNECTIONSTRING== value for the Azure Blob Storage connection string with the value from Azure Portal.  In Azure Portal, navigate to Settings > Access keys 
-in your storage account's menu blade to see connection strings for both primary and secondary access keys (click the "Show Keys" button).
+If you are using [Azure storage](https://azure.microsoft.com/en-us/products/storage/blobs/), replace the ==STORAGE_ACCOUNT_CONNECTIONSTRING== value for the Azure Blob Storage connection 
+string with the value from Azure Portal.  In Azure Portal, navigate to Settings > Access keys in your storage account's menu blade 
+to see connection strings for both primary and secondary access keys (click the "Show Keys" button).
 
-> You must install the Azure Blob Storage provider extension before adding the configuration section for the Azure Blob Storage provider.
+If you are using [Amazon S3](https://aws.amazon.com/s3/), replace the ==YOUR-ACCESS-KEY==, ==YOUR-SECRET==, ==AMAZON-S3-REGION-URL== and ==YOUR-BUCKET-NAME== 
+with values from the AWS console.  Log in to the console, click `Services`, scroll down and click the `Storage` menu item on 
+the left, and select `S3` from the menu.  Once you have set up an S3 service and created a bucket, you can click `Access Points` 
+in the S3 menu to view your service settings.  You will also need to use the Amazon AWS IAM dashboard to 
+[create your access key](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys) 
+and shared secret.
 
-If you don't want the local file system provider, you can remove or comment out that section, including the comma between sections.  If you are using the local file system provider, 
-the `{DataFolder}` token refers to {.file-name}`%PROGRAMDATA%\Nucleus`.  You can change this value if you need to, but it should not be set to a path within your web root (installation folder) in order to ensure that
-access to files is controlled by Nucleus - otherwise your web server may serve static files without Nucleus being able to check folder permissions.
+> For Azure storage and Amazon S3, you must install the relevant file system provider extension (that is, the 
+Nucleus [Azure storage](https://www.nucleus-cms.com/other-extensions/azure-blob-storage/) file system provider, 
+or the Nucleus [Amazon S3](https://www.nucleus-cms.com/other-extensions/amazon-s3/) provider) before adding settings to your 
+configuration files.
 
-The "Key" value is saved in the database when you add files and folders, so you can't change it later.  The "Name" is shown on-screen, and you can change it at any time.
+The `RootPath` setting can be used to set the base path for Nucleus file storage.  This setting allows you to configure Nucleus 
+to use a sub-folder within the local file system, [Azure storage](https://azure.microsoft.com/en-us/products/storage/blobs/) 
+or [Amazon S3](https://aws.amazon.com/s3/).  Sites also use their individual [home directory](https://www.nucleus-cms.com/manage/site-settings#properties) 
+within the `RootPath` that you have specified.
+- If you are using Amazon S3, you should always specify a bucket name, and can also include a sub-folder path within the specified bucket.  The 
+S3 file system provider can't create S3 buckets, only files and folders within the specified bucket.  An alternative would be to 
+leave the RootPath empty, and specify a bucket name for each site's home directory.
+- If you are using Azure storage, the root folder setting is optional.  The Azure storage file system provider can create and navigate 
+Azure storage containers.
+- The RootFolder setting for the local file system provider is optional, if it is not set, it uses the 
+[DataFolder](https://www.nucleus-cms.com/configuration-reference#nucleusfolderoptions)/Content path as the root for file 
+storage.  In Windows, the default Nucleus data folder is `C:\ProgramData\Nucleus`{.file-name}, so the default file system provider root path 
+is `C:/ProgramData/Nucleus/Content`{.file-name}.

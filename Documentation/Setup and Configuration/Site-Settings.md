@@ -23,7 +23,7 @@ share users between sites, but this functionality has not yet been implemented.
 | Site Icon        | The site icon is a "favicon".  If specified, it is the icon displayed by your browser in the address bar. |
 | Roles            | If required, you can change the administrators, registered users, anonymous users and all users roles.  These settings will generally not need to be changed.   |
 | Site Group       | Assigns a site group to your site.  In Nucleus version 1.0, the site group setting has no effect. |
-| Home Directory   | Specifies a sub-folder at the top level of your file system where site files are stored. |
+| Home Directory   | Specifies a sub-folder at the top level of your file system where site files are stored.  This setting is shared by all file system providers. |
 
 ## Aliases
 An alias is your site's domain name or domain and virtual directory.  Aliases are used to identify the requested site, as they are the first part of a request Url.  Do 

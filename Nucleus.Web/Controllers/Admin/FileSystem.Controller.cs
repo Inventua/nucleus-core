@@ -379,19 +379,23 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> UploadFile(ViewModels.Admin.FileSystem viewModel, [FromForm] IFormFile mediaFile)
+		public async Task<ActionResult> UploadFile(ViewModels.Admin.FileSystem viewModel, [FromForm] List<IFormFile> mediaFiles)
 		{
 			viewModel.Folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Folder.Id);
-			if (mediaFile != null)
+
+			foreach (IFormFile file in mediaFiles)
 			{
-				using (System.IO.Stream fileStream = mediaFile.OpenReadStream())
+				if (file != null)
 				{
-					await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedProviderKey, viewModel.Folder.Path, mediaFile.FileName, fileStream, true);
+					using (System.IO.Stream fileStream = file.OpenReadStream())
+					{
+						await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedProviderKey, viewModel.Folder.Path, file.FileName, fileStream, true);
+					}
 				}
-			}
-			else
-			{
-				return BadRequest();
+				else
+				{
+					return BadRequest();
+				}
 			}
 
 			viewModel = await BuildViewModel(viewModel, viewModel.Folder);

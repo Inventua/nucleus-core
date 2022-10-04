@@ -145,10 +145,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Page Include="Index.cshtml" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <Folder Include="Properties\ServiceDependencies\" />
 	</ItemGroup>
 

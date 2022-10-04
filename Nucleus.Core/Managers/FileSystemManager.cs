@@ -621,11 +621,11 @@ namespace Nucleus.Core.Managers
 
 		public async Task<File> SaveFile(Site site, string providerName, string parentPath, string newFileName, System.IO.Stream content, Boolean overwrite)
 		{
-			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, providerName);
+			FileSystemProvider fileSystemProvider = this.FileSystemProviderFactory.Get(site, providerName);
 
 			if (content != null)
 			{
-				Folder parentFolder = await provider.GetFolder(UseSiteHomeDirectory(site, parentPath));
+				Folder parentFolder = await fileSystemProvider.GetFolder(UseSiteHomeDirectory(site, parentPath));
 				string message = "";
 
 				if (!IsValidFileName(parentFolder, newFileName, ref message))
@@ -633,9 +633,9 @@ namespace Nucleus.Core.Managers
 					throw new InvalidOperationException(message);
 				}
 
-				File file = RemoveSiteHomeDirectory(site, await provider.SaveFile(UseSiteHomeDirectory(site, parentPath), newFileName, content, overwrite));
+				File file = RemoveSiteHomeDirectory(site, await fileSystemProvider.SaveFile(UseSiteHomeDirectory(site, parentPath), newFileName, content, overwrite));
 				
-				////await GetDatabaseProperties(site, file);
+				await GetDatabaseProperties(site, file);
 
 				// Expire the direct url after upload.  By generating a new url, we make browsers download image files again rather than using
 				// a browser-cached copy.

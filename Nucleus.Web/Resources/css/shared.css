@@ -114,16 +114,24 @@ a *
   display: none;
 }
 
+.Nucleus.AdminFrame, .AdminFramePlaceholder
+{
+	width: 100px;
+	height: 100%;
+}
 
 .Nucleus.AdminFrame
 {
 	position: fixed;
 	top: 0;
 	left: 0;
-	width: 100px;
-	height: 100%;
   border: 0;
 	transition: 0.25s;
+}
+
+.AdminFramePlaceholder
+{
+	float: left;
 }
 
 .nucleus-modulesettings-frame
@@ -132,16 +140,6 @@ a *
 	z-index: 99;
 	border: 0;
   flex-grow: 1;
-	/*width: 100%;
-	height: 100%;
-  position: absolute;*/
-}
-
-.AdminFramePlaceholder
-{
-	float: left;
-	width: 100px;
-	height: 100%;
 }
 
 .Nucleus.AdminFrame.Expanded

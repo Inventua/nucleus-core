@@ -4,11 +4,12 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 
-namespace Nucleus.Extensions.AmazonS3FileSystemProvider
+namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 {
 	/// <summary>
-	/// Represents an S3/OpenStack object path and provides parsing and access to parts of the path.
+	/// Represents a Azure Storage object path and provides parsing and access to parts of the path.
 	/// </summary>
 	[DefaultBindingProperty("Path")]
 	public class PathUri
@@ -26,13 +27,13 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		public enum PathUriTypes
 		{
 			/// <summary>
-			/// The path is the root, which contains buckets (containers).
+			/// The path is the root, which contains containers.
 			/// </summary>
 			Root,
 			/// <summary>
-			/// The path is a bucket (container).
+			/// The path is a container.
 			/// </summary>
-			Bucket,
+			Container,
 			/// <summary>
 			/// The path is a folder.
 			/// </summary>
@@ -51,7 +52,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		/// <value>
 		/// Bucket (container) name component of the path.
 		/// </value>
-		public string BucketName { get; private set; }
+		public string ContainerName { get; private set; }
 
 		/// <value>
 		/// Key component of the path.
@@ -63,7 +64,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		/// </summary>
 		public PathUri()
 		{
-			this.BucketName = string.Empty;
+			this.ContainerName = string.Empty;
 			this.Key = string.Empty;
 		}
 
@@ -72,48 +73,27 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		/// </summary>
 		/// <param name="BucketName">Bucket (container) name</param>
 		/// <param name="Key">Item key</param>
-		//public PathUri(string rootPath, string bucketName, string key)
-		//{
-		//	this.RootPath = RemoveDelimiter(rootPath);
-		//	this.BucketName = bucketName;
-		//	this.Key = key;
-		//}
-
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		/// <param name="rootPath"></param>
-		/// <param name="path">String representation of the path</param>
-		public PathUri(string rootPath, string path) : this(rootPath, path, false) {	}
-
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		/// <param name="rootPath"></param>
-		/// <param name="path">String representation of the path</param>
-		/// <param name="isFolder"></param>
-		public PathUri(string rootPath, string path, Boolean isFolder)
+		public PathUri(string rootPath, string bucketName, string key)
 		{
 			this.RootPath = RemoveDelimiter(rootPath);
-			Parse(isFolder && !String.IsNullOrEmpty(path) ? AddDelimiter(path) : path ?? "");
+			this.ContainerName = bucketName;
+			this.Key = key;
 		}
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		/// <param name="rootPath"></param>
-		/// <param name="path">String representation of the path</param>
-		/// <param name="itemname"></param>
-		/// <param name="isFolder"></param>
-		public PathUri(string rootPath, string path, string itemName, Boolean isFolder) : this(rootPath, Combine(path, itemName), isFolder) { }
-		
-		private static string Combine(string path, string item)
+		/// <param name="Path">String representation of the path</param>
+		public PathUri(string rootPath, string path) : this(rootPath, path, false) {	}
+
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="Path">String representation of the path</param>
+		public PathUri(string rootPath, string path, Boolean isFolder)
 		{
-			if (!String.IsNullOrEmpty(path) && !String.IsNullOrEmpty(item))
-			{
-				return AddDelimiter(path) + item;
-			}
-			return path + item;
+			this.RootPath = RemoveDelimiter(rootPath);
+			Parse(isFolder && !String.IsNullOrEmpty(path) ? AddDelimiter(path) : path ?? "");
 		}
 
 		private void Parse(string path)
@@ -134,9 +114,9 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 			if (pathParts.Length > 0)
 			{
-				this.BucketName = pathParts[0];
+				this.ContainerName = pathParts[0];
 
-				keyPosition = fullPath.IndexOf(this.BucketName) + this.BucketName.Length + 1;
+				keyPosition = fullPath.IndexOf(this.ContainerName) + this.ContainerName.Length + 1;
 				if (fullPath.Length > keyPosition)
 				{
 					this.Key = fullPath.Substring(keyPosition);
@@ -148,7 +128,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			}
 			else
 			{
-				this.BucketName = PATH_DELIMITER.ToString();
+				this.ContainerName = PATH_DELIMITER.ToString();
 			}
 		}
 
@@ -159,13 +139,13 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		{
 			get
 			{
-				if (String.IsNullOrEmpty(this.Key) && (String.IsNullOrEmpty(this.BucketName) || this.BucketName == PATH_DELIMITER.ToString()))
+				if (String.IsNullOrEmpty(this.Key) && (String.IsNullOrEmpty(this.ContainerName) || this.ContainerName == PATH_DELIMITER.ToString()))
 				{
 					return PathUriTypes.Root;
 				}
-				else if (!String.IsNullOrEmpty(this.BucketName) && string.IsNullOrEmpty(this.Key))
+				else if (!String.IsNullOrEmpty(this.ContainerName) && string.IsNullOrEmpty(this.Key))
 				{
-					return PathUriTypes.Bucket;
+					return PathUriTypes.Container;
 				}
 				else
 				{
@@ -193,7 +173,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			{
 				if (this.PathUriType == PathUriTypes.File)
 				{
-					return RemoveDelimiter(this.Key);
+					return RemoveDelimiter(this.Parts.Last());
 				}
 				else
 				{
@@ -214,33 +194,33 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 					case PathUriTypes.Root:
 						return AddDelimiter(this.RootPath); // PATH_DELIMITER;
 
-					case PathUriTypes.Bucket:
-						return AddDelimiter(this.BucketName);
+					case PathUriTypes.Container:
+						return AddDelimiter(this.ContainerName);
 
 					case PathUriTypes.Folder:
-						return AddDelimiter($"{this.BucketName}/{this.Key}");
+						return AddDelimiter($"{this.ContainerName}/{this.Key}");
 
 					default:
-						return $"{this.BucketName}/{this.Key}";
+						return $"{this.ContainerName}/{this.Key}";
 				}
 			}
 		}
 
-		public static string RemoveRootPath(string rootPath, string path)
+		private string RemoveRootPath(string path)
 		{
 			if (String.IsNullOrEmpty(path))
 			{
 				return path;
 			}
-			else if (String.IsNullOrEmpty(rootPath))
+			else if (String.IsNullOrEmpty(this.RootPath))
 			{
 				return path;
 			}
 			else
 			{
-				if (path.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase))
+				if (path.StartsWith(this.RootPath, StringComparison.OrdinalIgnoreCase))
 				{
-					return path.Substring(rootPath.Length);
+					return path.Substring(this.RootPath.Length);
 				}
 				else
 				{
@@ -254,7 +234,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		{
 			get
 			{
-				string path = RemoveRootPath(this.RootPath, this.FullPath);
+				string path = RemoveRootPath(this.FullPath);
 
 				if (String.IsNullOrEmpty(path))
 				{
@@ -263,6 +243,23 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 				else
 				{
 					return Normalize(path).Trim(PATH_DELIMITER);
+					////if (relativePath.StartsWith(PATH_DELIMITER))
+					////{
+					////	if (relativePath.Length > 1)
+					////	{
+					////		// remove leading/trailing "/"
+					////		return (relativePath[1..]).Trim(PATH_DELIMITER);
+					////	}
+					////	else
+					////	{
+					////		// if the path "/" was passed in, return an empty string (an empty string is the "root" path)
+					////		return "";
+					////	}
+					////}
+					////else
+					////{
+					////	return System.IO.Path.TrimEndingDirectorySeparator(relativePath);
+					////}
 				}
 			} 
 		}
@@ -310,14 +307,14 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		{
 			get
 			{
-				if (RemoveRootPath(this.RootPath, this.FullPath) == PATH_DELIMITER.ToString())
+				if (RemoveRootPath(this.FullPath) == PATH_DELIMITER.ToString())
 				{
 					// this is the top-level "root", return "self"
 					return this;
 				}
 				else
 				{
-					string path = RemoveRootPath(this.RootPath, this.FullPath).TrimStart(PATH_DELIMITER);
+					string path = RemoveRootPath(this.FullPath).TrimStart(PATH_DELIMITER);
 					int parentPathEnd = path.LastIndexOf(PathUri.PATH_DELIMITER, path.Length - 2);
 					return new PathUri(this.RootPath, PathUri.AddDelimiter(path.Substring(0, parentPathEnd + 1)));
 				}
@@ -347,6 +344,44 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			}
 		}
 
+		///// <summary>
+		///// Return the "parent" path, that is, everything before the last delimiter.
+		///// </summary>
+		///// <param name="path"></param>
+		///// <returns></returns>
+		//public PathUri GetParentPath
+		//{
+		//	get
+		//	{
+		//		int position = Normalize(this.FullPath).LastIndexOf(PATH_DELIMITER);
+
+		//		if (position < 0)
+		//		{
+		//			return new(this.RootPath, "");
+		//		}
+		//		else
+		//		{
+		//			return new(this.RootPath, this.FullPath.Substring(0, position));
+		//		}
+		//	}
+		//}
+
+
+		///// <summary>
+		///// Combine the specified relative path with this path and returns a new PathUri instance.
+		///// </summary>
+		///// <param name="parentPath">Folder path</param>
+		///// <param name="isFolder">Specifies whether to append PATH_DEMIMITER to the end of the path to indicate that the Uri represents a folder.</param>
+		///// <returns></returns>
+		//public PathUri Combine(string parentPath, Boolean isFolder)
+		//{
+		//	if (isFolder)
+		//	{
+		//		parentPath = AddDelimiter(parentPath);
+		//	}
+		//	return new PathUri(this.RootPath, AddDelimiter(this.FullPath) + parentPath);
+		//}
+
 		/// <summary>
 		/// Returns an array containing the path segements that make up this path.
 		/// </summary>
@@ -357,7 +392,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 				return this.FullPath.Split(PathUri.PATH_DELIMITER, StringSplitOptions.RemoveEmptyEntries);
 			}
 		}
-
+				
 		/// <summary>
 		/// Ensure that the specified key ends with the path delimiter.
 		/// </summary>

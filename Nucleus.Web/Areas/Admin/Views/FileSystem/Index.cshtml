@@ -13,7 +13,7 @@
 		<div class="nucleus-form-buttonrow">
 			<RemoveWhiteSpace>
 			@Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control ms-1 nucleus-show-progress nucleus-show-progress-after" })
-			<span class="align-self-center ms-1 mt-1">
+			<span>
 				@foreach (var ancestor in Model.Ancestors)				
 				{
 					@if (ancestor.Name != "/")

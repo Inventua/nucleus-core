@@ -231,7 +231,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 			if ( !selectedFolders.Any() && !selectedFiles.Any())
 			{
-				return Json(new { Title = "Download", Message = "Please select one or more files or folders." });
+				return NoContent();// (new { Title = "Download", Detail = "Please select one or more files or folders." });
 			}
 
 			if (!selectedFolders.Any() && selectedFiles.Count() == 1)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,7 +44,10 @@ namespace Nucleus.Abstractions.Models
 		/// <returns></returns>
 		public T Copy<T>() where T : class
 		{
-			string thisObject = Newtonsoft.Json.JsonConvert.SerializeObject(this);
+			string thisObject = Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.None, new JsonSerializerSettings
+			{
+				PreserveReferencesHandling = PreserveReferencesHandling.Objects
+			});
 			return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(thisObject);
 		}
 

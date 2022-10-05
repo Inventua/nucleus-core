@@ -166,7 +166,7 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 		}
 
-		public override async Task<File> GetFile(string path)
+		public override Task<File> GetFile(string path)
 		{
 			if (path == null) return null;
 
@@ -178,7 +178,7 @@ namespace Nucleus.Core.FileSystemProviders
 			System.IO.FileInfo fileInfo = new(BuildPath(path));
 			if (fileInfo.Exists)
 			{
-				return await BuildFile(fileInfo);
+				return Task.FromResult(BuildFile(fileInfo));
 			}
 			else
 			{
@@ -224,7 +224,7 @@ namespace Nucleus.Core.FileSystemProviders
 			return ListFolder(path, "");
 		}
 
-		public override async Task<Folder> ListFolder(string path, string pattern)
+		public override Task<Folder> ListFolder(string path, string pattern)
 		{
 			if (PathUtils.PathNavigatesAboveRoot(path) || PathUtils.HasInvalidPathChars(path))
 			{
@@ -245,11 +245,11 @@ namespace Nucleus.Core.FileSystemProviders
 				//if (this.Options.AllowedTypes.Contains(item.Extension, StringComparer.OrdinalIgnoreCase))
 				if (this.GlobalOptions.Value.AllowedFileTypes.Where(allowed => allowed.FileExtensions.Contains(item.Extension, StringComparer.OrdinalIgnoreCase)).Any())
 				{
-					result.Files.Add(await BuildFile(item));
+					result.Files.Add(BuildFile(item));
 				}
 			}
 
-			return result;
+			return Task.FromResult(result);
 		}
 
 		public override Task<File> RenameFile(string path, string newName)
@@ -277,7 +277,7 @@ namespace Nucleus.Core.FileSystemProviders
 			return this.GetFile(newPath);
 		}
 
-		public override Task<Folder> RenameFolder(string path, string newName)
+		public override async Task<Folder> RenameFolder(string path, string newName)
 		{
 			string newPath;
 
@@ -290,7 +290,7 @@ namespace Nucleus.Core.FileSystemProviders
 
 			System.IO.Directory.Move(BuildPath(path), BuildPath(newPath));
 
-			return this.GetFolder(newPath);
+			return await this.GetFolder(newPath);
 		}
 
 		public async override Task<File> SaveFile(string parentPath, string newFileName, System.IO.Stream content, Boolean overwrite)
@@ -326,7 +326,7 @@ namespace Nucleus.Core.FileSystemProviders
 			return await GetFile(System.IO.Path.Combine(BuildRelativePath(targetPath)));
 		}
 
-		private async Task<File> BuildFile(System.IO.FileInfo fileItem)
+		private File BuildFile(System.IO.FileInfo fileItem)
 		{
 			return new File()
 			{
@@ -334,9 +334,9 @@ namespace Nucleus.Core.FileSystemProviders
 				Path = BuildRelativePath(fileItem.FullName),
 				Name = fileItem.Name,
 				DateModified = fileItem.LastWriteTimeUtc,
-				Parent = await GetFolder(BuildRelativePath(fileItem.DirectoryName)),// new Folder() { Path = BuildRelativePath(fileItem.DirectoryName) },
+				Parent = new Folder() { Provider = this.Key, Path = BuildRelativePath(fileItem.DirectoryName) },
 				Size = fileItem.Length,
-				Capabilities = BuildFileCapabilities()
+				Capabilities = LocalFileCapabilities
 			};
 		}
 
@@ -352,9 +352,9 @@ namespace Nucleus.Core.FileSystemProviders
 					Name = "/",
 					DateModified = folderItem.LastWriteTimeUtc,
 					Parent = null, 
-					Capabilities = BuildFolderCapabilities(),
-					FolderValidationRules = BuildFolderValidationRules(),
-					FileValidationRules = BuildFileValidationRules()
+					Capabilities = LocalFolderCapabilities,
+					FolderValidationRules = LocalFolderValidationRules,
+					FileValidationRules = LocalFileValidationRules
 				};
 			}
 			else
@@ -366,69 +366,60 @@ namespace Nucleus.Core.FileSystemProviders
 					Name = folderItem.Name,
 					DateModified = folderItem.LastWriteTimeUtc,
 					Parent = new Folder { Provider = this.Key, Path = BuildRelativePath(folderItem.Parent.FullName) },
-					Capabilities = BuildFolderCapabilities(),
-					FolderValidationRules = BuildFolderValidationRules(),
-					FileValidationRules = BuildFileValidationRules()
+					Capabilities = LocalFolderCapabilities,
+					FolderValidationRules = LocalFolderValidationRules,
+					FileValidationRules = LocalFileValidationRules
 				};
 			}
 		}
 
-		private FileSystemValidationRule[] BuildFolderValidationRules()
+		private static FileSystemValidationRule[] LocalFolderValidationRules = new FileSystemValidationRule[]
 		{
-			return new FileSystemValidationRule[]
+			new FileSystemValidationRule()
 			{
-				new FileSystemValidationRule()
-				{
-					ValidationExpression = "^(?!CON|PRN|AUX|NUL|LPT|COM)" , ErrorMessage = "Folder names cannot start with CON, PRN, AUX, NUL, LPT or COM.",
-				},
-				new FileSystemValidationRule()
-				{
-					ValidationExpression = "^[^<>:\"|?*]+$" , ErrorMessage = "Folder names cannot contain any of the <, >, :, \" | ? or * characters.",
-				},
-				new FileSystemValidationRule()
-				{
-					ValidationExpression = "^[^\\/\\\\]+$" , ErrorMessage = "Folder names cannot contain the '/' or '\\' character.",
-				}
-			};
-		}
+				ValidationExpression = "^(?!CON|PRN|AUX|NUL|LPT|COM)" , ErrorMessage = "Folder names cannot start with CON, PRN, AUX, NUL, LPT or COM.",
+			},
+			new FileSystemValidationRule()
+			{
+				ValidationExpression = "^[^<>:\"|?*]+$" , ErrorMessage = "Folder names cannot contain any of the <, >, :, \" | ? or * characters.",
+			},
+			new FileSystemValidationRule()
+			{
+				ValidationExpression = "^[^\\/\\\\]+$" , ErrorMessage = "Folder names cannot contain the '/' or '\\' character.",
+			}
+		};
+		
 
-		private FileSystemValidationRule[] BuildFileValidationRules()
+		private static FileSystemValidationRule[] LocalFileValidationRules = new FileSystemValidationRule[]
 		{
-			return new FileSystemValidationRule[]
+			new FileSystemValidationRule()
 			{
-				new FileSystemValidationRule()
-				{
-					ValidationExpression = "^(?!CON|PRN|AUX|NUL|LPT|COM)" , ErrorMessage = "File names cannot start with CON, PRN, AUX, NUL, LPT or COM.",
-				},
-				new FileSystemValidationRule()
-				{
-					ValidationExpression = "^[^<>:\"|?*]+$" , ErrorMessage = "File names cannot contain any of the <, >, :, \" | ? or * characters.",
-				},
-				new FileSystemValidationRule()
-				{
-					ValidationExpression = "^[^\\/\\\\]+$" , ErrorMessage = "File names cannot contain the '/' or '\\' character.",
-				}
-			};
-		}
+				ValidationExpression = "^(?!CON|PRN|AUX|NUL|LPT|COM)" , ErrorMessage = "File names cannot start with CON, PRN, AUX, NUL, LPT or COM.",
+			},
+			new FileSystemValidationRule()
+			{
+				ValidationExpression = "^[^<>:\"|?*]+$" , ErrorMessage = "File names cannot contain any of the <, >, :, \" | ? or * characters.",
+			},
+			new FileSystemValidationRule()
+			{
+				ValidationExpression = "^[^\\/\\\\]+$" , ErrorMessage = "File names cannot contain the '/' or '\\' character.",
+			}
+		};
+		
 
-		private FileSystemItemCapabilities BuildFolderCapabilities()
+		private static FileSystemItemCapabilities LocalFolderCapabilities = new FileSystemItemCapabilities()
 		{
-			return new FileSystemItemCapabilities()
-			{
-				CanStoreFiles = true,
-				CanRename = true,
-				CanDelete = true
-			};
-		}
+			CanStoreFiles = true,
+			CanRename = true,
+			CanDelete = true
+		};
 
-		private FileSystemItemCapabilities BuildFileCapabilities()
+		private static FileSystemItemCapabilities LocalFileCapabilities = new FileSystemItemCapabilities()
 		{
-			return new FileSystemItemCapabilities()
-			{
-				CanStoreFiles = false,
-				CanRename = true,
-				CanDelete = true
-			};
-		}
+			CanStoreFiles = false,
+			CanRename = true,
+			CanDelete = true
+		};
+		
 	}
 }

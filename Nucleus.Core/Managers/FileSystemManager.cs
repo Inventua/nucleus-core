@@ -98,37 +98,48 @@ namespace Nucleus.Core.Managers
 		{
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
-				//Folder folderData = await provider.GetFolder(id);
 				Folder folderData = await this.CacheManager.FolderCache().GetAsync(id, async id =>
 				{
 					Folder newCacheEntry = await dataProvider.GetFolder(id);
 
 					// populate permissions so that future retrievals from the cache will always have the permissions list populated
-					newCacheEntry.Permissions = await this.PermissionsManager.ListPermissions(newCacheEntry.Id, Folder.URN);
-					return newCacheEntry;
+					if (newCacheEntry != null)
+					{
+						newCacheEntry.Permissions = await this.PermissionsManager.ListPermissions(newCacheEntry.Id, Folder.URN);
+
+						FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, newCacheEntry.Provider);
+						Folder folder = await provider.GetFolder(UseSiteHomeDirectory(site, newCacheEntry.Path));
+						folder = RemoveSiteHomeDirectory(site, folder);
+
+						newCacheEntry.CopyDatabaseValuesTo(folder);
+
+						if (folder.Parent != null)
+						{
+							if (!String.IsNullOrEmpty(site.HomeDirectory) && (String.IsNullOrEmpty(folder.Path) || folder.Path.Equals(site.HomeDirectory, StringComparison.OrdinalIgnoreCase)))
+							{
+								// prevent site's root folder from being part of the folder tree
+								folder.Parent = null;
+							}
+							else
+							{
+								RemoveSiteHomeDirectory(site, folder.Parent);
+								Folder parent = RemoveSiteHomeDirectory(site, await dataProvider.GetFolder(site, folder.Provider, folder.Parent.Path));
+								parent.CopyDatabaseValuesTo(folder.Parent);
+							}
+						}
+
+						return folder;
+					}
+					else
+					{
+						return null;
+					}
 				});
 
 				if (folderData != null)
 				{
-					Folder folder = RemoveSiteHomeDirectory(site, await this.FileSystemProviderFactory.Get(site, folderData.Provider).GetFolder(UseSiteHomeDirectory(site, folderData.Path)));
-					folderData.CopyDatabaseValuesTo(folder);
-
-					if (folder.Parent != null)
-					{
-						if (!String.IsNullOrEmpty(site.HomeDirectory) && (String.IsNullOrEmpty(folder.Path) || folder.Path.Equals(site.HomeDirectory, StringComparison.OrdinalIgnoreCase)))
-						{
-							// prevent site's root folder from being part of the folder tree
-							folder.Parent = null;
-						}
-						else
-						{
-							RemoveSiteHomeDirectory(site, folder.Parent);
-							Folder parent = RemoveSiteHomeDirectory(site, await dataProvider.GetFolder(site, folder.Provider, folder.Parent.Path));
-							parent.CopyDatabaseValuesTo(folder.Parent);
-						}
-					}
-					return folder;
-				}
+					return folderData;
+				}				
 			}
 
 			throw new System.IO.FileNotFoundException();
@@ -420,9 +431,9 @@ namespace Nucleus.Core.Managers
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, folder.Provider);
 
-			folder = RemoveSiteHomeDirectory(site,await provider.RenameFolder(UseSiteHomeDirectory(site, folder.Path), newName));
+			folder = RemoveSiteHomeDirectory(site, await provider.RenameFolder(UseSiteHomeDirectory(site, folder.Path), newName));
 			 
-			Folder parentFolder = RemoveSiteHomeDirectory(site,await provider.GetFolder(UseSiteHomeDirectory(site, folder.Parent.Path)));
+			Folder parentFolder = RemoveSiteHomeDirectory(site, await provider.GetFolder(folder.Parent.Path));
 			string message = "";
 
 			if (!IsValidFolderName(parentFolder, newName, ref message))
@@ -471,8 +482,19 @@ namespace Nucleus.Core.Managers
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, existingFolder.Provider);
 
 			Folder folder = await provider.ListFolder(UseSiteHomeDirectory(site, existingFolder.Path), pattern);
-			
+
 			await GetDatabaseProperties(site, folder);
+
+			foreach (Folder subfolder in folder.Folders)
+			{
+				subfolder.Parent = folder;
+			}
+
+			foreach (File file in folder.Files)
+			{
+				file.Parent = folder;
+			}
+
 			await GetDatabaseProperties(site, folder.Parent);
 			await GetDatabaseProperties(site, folder.Folders);
 			await GetDatabaseProperties(site, folder.Files);

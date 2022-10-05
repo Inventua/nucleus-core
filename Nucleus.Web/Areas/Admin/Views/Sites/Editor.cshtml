@@ -168,6 +168,7 @@
 							else
 							{
 								@Html.TextBoxFor(model => model.Site.HomeDirectory, new { @maxlength = 128, @class = "disabled flex-grow-1", @disabled = true })
+								@Html.HiddenFor(model => model.Site.HomeDirectory, new { @id = "Site_HomeDirectory_Hidden" })
 								<button type="button" class="allow-edit-home-directory btn btn-secondary btn-sm ms-2">Edit Home Directory</button>
 							}						
 						</div>

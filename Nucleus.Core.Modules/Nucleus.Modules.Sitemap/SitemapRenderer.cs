@@ -142,8 +142,16 @@ namespace Nucleus.Modules.Sitemap
 						listItemBuilder.AddCssClass("current-page");
 					}
 
+
+
 					if (maxlevels == 0 || level < maxlevels - 1)
 					{
+						if (menuItem?.Children.Any() == true)
+						{
+							// Add has-child-pages class to help with custom formatting
+							listItemBuilder.AddCssClass("has-child-pages");
+						}
+
 						listItemBuilder.InnerHtml.AppendHtml(AddPageChildren(nucleusContext, urlHelper, menuItem.Children, showDescription, level + 1, maxlevels));
 					}
 

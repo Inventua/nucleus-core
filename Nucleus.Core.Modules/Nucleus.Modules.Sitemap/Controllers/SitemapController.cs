@@ -91,7 +91,7 @@ namespace Nucleus.Modules.Sitemap.Controllers
 				viewModel.ShowDescription = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.SETTINGS_SHOWDESCRIPTION, false);
 			}
 
-			viewModel.Pages = await this.PageManager.GetAdminMenu(this.Context.Site, await this.PageManager.Get(viewModel.RootPageId), HttpContext.User, 1);
+			viewModel.Pages = await this.PageManager.GetAdminMenu(this.Context.Site, null, HttpContext.User, viewModel.RootPageId);
 
 			return viewModel;
 		}

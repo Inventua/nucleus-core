@@ -3,6 +3,8 @@
     <TargetFramework>net6.0</TargetFramework>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+		
+		<!-- This is overridden by core.build.targets -->
 		<VersionPrefix>1.0.1.0</VersionPrefix>
   </PropertyGroup>
 
@@ -13,8 +15,6 @@
 	
 	<PropertyGroup>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<Product>Nucleus</Product>
-		<Copyright>© Inventua Pty Ltd</Copyright>
 		<StartupObject>Nucleus.Web.Program</StartupObject>
 		<DebugType>portable</DebugType>
 	</PropertyGroup>
@@ -27,7 +27,7 @@
     <ProjectReference Include="$(SolutionDir)\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
     <ProjectReference Include="$(SolutionDir)\Nucleus.Core\Nucleus.Core.csproj" />
     <ProjectReference Include="$(SolutionDir)\Nucleus.Extensions\Nucleus.Extensions.csproj" />
-    <ProjectReference Include="..\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
   </ItemGroup>
 
 	<ItemGroup>
@@ -218,4 +218,6 @@
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('iis-dev')">
 		<Delete Files="iis-dev\App_Offline.htm" />
 	</Target>
+
+	<Import Project="..\Nucleus.Core\core.build.targets" />
 </Project>

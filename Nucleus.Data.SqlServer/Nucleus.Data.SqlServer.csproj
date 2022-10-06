@@ -3,6 +3,8 @@
     <TargetFramework>net6.0</TargetFramework>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Nucleus.Data.SqlServer.xml</DocumentationFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+		<!-- This is overridden by core.build.targets -->
 		<VersionPrefix>1.0.1.0</VersionPrefix>
   </PropertyGroup>
 
@@ -19,4 +21,5 @@
     <ProjectReference Include="$(SolutionDir)\Nucleus.Data.EntityFramework\Nucleus.Data.EntityFramework.csproj" />
   </ItemGroup>
 
+	<Import Project="..\Nucleus.Core\core.build.targets" />
 </Project>

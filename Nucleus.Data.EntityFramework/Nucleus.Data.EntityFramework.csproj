@@ -13,15 +13,16 @@
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
 		<Description>Base classes and utility functions for Nucleus data providers which use Entity-Framework.</Description>
-		<Copyright>(c) Inventua Pty Ltd</Copyright>
+		
+		<!-- This is overridden by core.build.targets -->
+		<VersionPrefix>1.0.1.0</VersionPrefix>
+		
 		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>
 		<PackageTags>Nucleus</PackageTags>
 		<PackageLicenseFile>license.txt</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<PackageId>Inventua.$(AssemblyName)</PackageId>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
-		<Authors>Inventua Pty Ltd</Authors>
-		<VersionPrefix>1.0.1.0</VersionPrefix>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -58,4 +59,6 @@
 	<Target Name="GetPackageAssemblies" AfterTargets="PostBuildEvent">
 		<Copy SourceFiles="bin\$(Configuration)\$(TargetFramework)\Nucleus.Data.EntityFramework.xml" DestinationFolder="$(SolutionDir)\..\Publish\XmlDocumentation" Retries="2" />
 	</Target>
+
+	<Import Project="..\Nucleus.Core\core.build.targets" />
 </Project>

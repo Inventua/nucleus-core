@@ -46,6 +46,24 @@ namespace Nucleus.Modules.Sitemap.Controllers
 			return result;
 		}
 
+		[HttpGet]
+		public async Task<ActionResult> GetChildPages(Guid id)
+		{
+			ViewModels.PageIndexPartial viewModel = new();
+
+			viewModel.FromPage = await this.PageManager.Get(id);
+
+			viewModel.Pages = await this.PageManager.GetAdminMenu
+				(
+					this.Context.Site,
+					await this.PageManager.Get(id),
+					ControllerContext.HttpContext.User,
+					1
+				);
+
+			return View("_PageMenu", viewModel);
+		}
+
 		private ViewModels.Sitemap BuildViewModel()
 		{
 			ViewModels.Sitemap viewModel = new ViewModels.Sitemap();
@@ -73,7 +91,7 @@ namespace Nucleus.Modules.Sitemap.Controllers
 				viewModel.ShowDescription = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.SETTINGS_SHOWDESCRIPTION, false);
 			}
 
-			viewModel.Pages = await this.PageManager.GetAdminMenu(this.Context.Site, await this.PageManager.Get(viewModel.RootPageId), HttpContext.User, viewModel.MaxLevels);
+			viewModel.Pages = await this.PageManager.GetAdminMenu(this.Context.Site, await this.PageManager.Get(viewModel.RootPageId), HttpContext.User, 1);
 
 			return viewModel;
 		}

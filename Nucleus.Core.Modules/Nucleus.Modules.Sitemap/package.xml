@@ -25,6 +25,7 @@
       <folder name="Views">
         <file name="Viewer.cshtml" />
         <file name="Settings.cshtml" />
+				<file name="_PageMenu.cshtml" />
       </folder>
     </component>
   </components>

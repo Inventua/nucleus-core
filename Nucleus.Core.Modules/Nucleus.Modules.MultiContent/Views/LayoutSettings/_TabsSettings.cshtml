@@ -13,11 +13,11 @@
 	</SettingsControl>
 
 
-	<SettingsControl caption="Fill?" rendermode="LabelLast" class="inner-inline" helptext="Extend tabs to fill available space.">
+	<SettingsControl caption="Fill?" rendermode="LabelLast" class="inner-inline align-self-end" helptext="Extend tabs to fill available space.">
 		@Html.CheckBoxFor(model => model.LayoutSettings.Fill, new { @class = "ToggleSwitch" })
 	</SettingsControl>
 
-	<SettingsControl caption="Justify?" rendermode="LabelLast" class="inner-inline" helptext="Make every tab the same width.">
+	<SettingsControl caption="Justify?" rendermode="LabelLast" class="inner-inline align-self-end" helptext="Make every tab the same width.">
 		@Html.CheckBoxFor(model => model.LayoutSettings.Justify, new { @class = "ToggleSwitch" })
 	</SettingsControl>
 </div>

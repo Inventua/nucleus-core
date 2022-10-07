@@ -98,7 +98,7 @@
 			<div class="overflow-auto">
 				<table class="FileSystemItems table table-sm">
 					<tr>
-						<th>Name</th>
+						<th class="ps-0"><button type="button" class="nucleus-toggle-selections btn btn-none fs-5 me-1 shadow-none nucleus-material-icon">&#xe146;</button>Name</th>
 						<th class="file-type">Type</th>
 						<th class="file-modified-date">Modified Date</th>
 						<th class="file-size">Size</th>
@@ -164,4 +164,19 @@
 			//jQuery(this).parents('form').submit();
 	});
 
+	jQuery('.nucleus-toggle-selections').on('click', function (event) 
+	{
+		var checkboxElements = jQuery('.nucleus-filesystem-folderselector, .nucleus-filesystem-fileselector');
+
+		if (checkboxElements.filter(':checked').length > 0)
+		{
+			// one or more file system items are selected, un-select all
+			checkboxElements.prop('checked', false);
+		}
+		else
+		{
+			// no file system items are selected, select all
+			checkboxElements.prop('checked', true);
+		}
+	});
 </script>

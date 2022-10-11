@@ -632,7 +632,7 @@ namespace Nucleus.Core.Managers
 		{
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 			{
-				folder = RemoveSiteHomeDirectory(site, await dataProvider.SaveFolder(site, folder));
+				folder = await dataProvider.SaveFolder(site, RemoveSiteHomeDirectory(site, folder));
 				
 				this.CacheManager.FolderCache().Remove(folder.Id);
 				this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, folder.Provider, folder.Path));

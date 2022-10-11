@@ -9,8 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nucleus.Extensions;
-using Nucleus.Modules.Publish.DataProviders;
+using Nucleus.Modules.Publish.Models;
 
 namespace Nucleus.Modules.Publish.Controllers
 {
@@ -24,17 +23,23 @@ namespace Nucleus.Modules.Publish.Controllers
     private IListManager ListManager { get; }
     private IExtensionManager ExtensionManager { get; }
     private HeadlinesManager HeadlinesManager { get; }
-    private IWebHostEnvironment WebHostEnvironment { get; }
+    private string ViewerLayoutFolder { get; }
 
     public HeadlinesAdminController(IWebHostEnvironment webHostEnvironment, Context Context, HeadlinesManager headlinesManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IListManager listManager, IExtensionManager extensionManager)
     {
-      this.WebHostEnvironment = webHostEnvironment;
       this.Context = Context;
       this.HeadlinesManager = headlinesManager;
       this.PageManager = pageManager;
       this.PageModuleManager = pageModuleManager;
       this.ListManager = listManager;
       this.ExtensionManager = extensionManager;
+
+      this.ViewerLayoutFolder = $"{webHostEnvironment.ContentRootPath}\\{Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER}\\Publish\\Views\\ViewerLayouts\\";
+    }
+
+    public async Task<ActionResult> Settings()
+    {
+      return View("HeadlinesSettings", await BuildSettingsViewModel(null));
     }
 
     [HttpGet]
@@ -62,6 +67,7 @@ namespace Nucleus.Modules.Publish.Controllers
       return Ok();
     }
 
+    #region "    Private methods    "
     private async Task<String> BuildInstanceCaption(PageModule pageModule)
     {
       Page page = await this.PageManager.Get(pageModule.PageId);
@@ -73,9 +79,8 @@ namespace Nucleus.Modules.Publish.Controllers
       if (viewModel == null)
       {
         viewModel = new();
+        viewModel.GetSettings(this.Context.Module);
       }
-
-      viewModel.GetSettings(this.Context.Module);
 
       // Populate the module instances list
       IEnumerable<PageModule> modules = await this.ExtensionManager.ListPageModules(new() { Id = Guid.Parse("20af00b8-1d72-4c94-bce7-b175e0b173af") });
@@ -98,12 +103,8 @@ namespace Nucleus.Modules.Publish.Controllers
 
         await GetCategories(linkedModuleSettings, viewModel, await this.HeadlinesManager.GetFilterOptions(this.Context.Module));
       }
-      
-      viewModel.Layouts = new();
-      foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{RoutingConstants.EXTENSIONS_ROUTE_PATH}\\Publish\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
-      {
-        viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
-      }
+
+      ListLayouts(viewModel); 
 
       return viewModel;
     }
@@ -140,5 +141,18 @@ namespace Nucleus.Modules.Publish.Controllers
       }
     }
 
+    private void ListLayouts(ViewModels.HeadlinesSettings viewModel)
+    {
+      viewModel.LayoutOptions.ViewerLayouts = viewModel.LayoutOptions.ListViewerLayouts(this.ViewerLayoutFolder);
+
+      if (String.IsNullOrEmpty(viewModel.LayoutOptions.ViewerLayout))
+      {
+        viewModel.LayoutOptions.ViewerLayout = viewModel.LayoutOptions.ViewerLayouts.FirstOrDefault();
+      }
+
+      viewModel.LayoutOptions.MasterLayouts = viewModel.LayoutOptions.ListMasterLayouts(this.ViewerLayoutFolder);
+      viewModel.LayoutOptions.ArticleLayouts = viewModel.LayoutOptions.ListArticleLayouts(this.ViewerLayoutFolder);
+    }
+    #endregion
   }
 }

@@ -16,7 +16,16 @@ namespace Nucleus.Modules.Publish.ViewModels
 	{
 		public Context Context { get; set; }
 		public Guid ModuleId { get; set; }
-		public PagedResult<Models.Article> Articles { get; set; }
-		public string Layout { get; set; }
-	}
+
+    public Settings Settings { get; set; } = new();
+
+    public PagedResult<Models.Article> Articles { get; set; }
+
+    public IEnumerable<Models.Article> PrimaryArticles { get; set; }
+    public IEnumerable<Models.Article> SecondaryArticles { get; set; }
+
+    public string MasterLayoutPath { get; set; }
+    public string PrimaryArticleLayoutPath { get; set; }
+    public string SecondaryArticleLayoutPath { get; set; }
+  }
 }

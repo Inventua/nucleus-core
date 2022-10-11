@@ -3,9 +3,9 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Publish.ViewModels
-@Html.AddStyle("~!/../viewer.css")
+@Html.AddStyle("~#/viewer.css")
 @using (Html.BeginNucleusForm("Index", "Publish", FormMethod.Post, new { @data_target = "form.parent()" }))
 {
 	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.Articles, propertyName = "Articles" })
-	@await Html.PartialAsync(@Model.Layout, Model)
+	@await Html.PartialAsync(@Model.MasterLayoutPath, Model)
 }

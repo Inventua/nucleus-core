@@ -8,10 +8,12 @@
 {
 	@if (Model.Articles != null)
 	{
-		if (Model.Settings.ShowPagingControl)
+		if (Model.HeadlineSettings.ShowPagingControl)
 		{
 			@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.Articles, propertyName = "Articles" })
 		}
-		@await Html.PartialAsync(@Model.Layout, Model)
+		@await Html.PartialAsync(@Model.MasterLayoutPath, Model)
 	}
+	
+
 }

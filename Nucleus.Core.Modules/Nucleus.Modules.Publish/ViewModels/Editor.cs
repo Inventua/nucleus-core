@@ -16,8 +16,6 @@ namespace Nucleus.Modules.Publish.ViewModels
 		public Boolean Standalone { get; set; }
 		public string UseLayout { get; set; }
 		public Models.Article Article { get; set; }
-		
-		public IEnumerable<List> Lists { get; set; }
 		public List<ArticleCategorySelection> Categories { get; set; } = new();	
 		public File SelectedAttachmentFile { get; set; }
 

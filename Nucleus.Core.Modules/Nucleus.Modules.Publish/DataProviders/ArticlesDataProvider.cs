@@ -159,7 +159,7 @@ namespace Nucleus.Modules.Publish.DataProviders
 					break;
       }
 
-			if (filters.PageSize != -1)
+			if (filters.PageSize > 0)
       {
 				query = query.Take(filters.PageSize);
       }

@@ -1,0 +1,24 @@
+﻿@model Nucleus.Modules.Publish.ViewModels.Viewer
+@using Nucleus.Extensions
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Publish.HtmlHelpers
+@Html.AddStyle("~#/viewer.css")
+@if (Model.Articles.Items.Any() && !Model.PrimaryArticles.Any() && !Model.SecondaryArticles.Any())
+{
+	<div class="alert alert-primary" role="alert">No articles shown. Please check the settings of the primary/secondary article layouts.</div>
+}
+else
+{
+  <div class="Articles FrontPage Primary d-grid gap-3">
+    @foreach (var article in Model.PrimaryArticles)
+    {
+      @await Html.PartialAsync(Model.PrimaryArticleLayoutPath, new Nucleus.Modules.Publish.ViewModels.ViewArticle() { Context = Model.Context, Article = article })
+    }
+  </div>
+  <div class="Articles FrontPage Secondary d-grid gap-2">
+    @foreach (var article in Model.SecondaryArticles)
+    {
+      @await Html.PartialAsync(Model.SecondaryArticleLayoutPath, new Nucleus.Modules.Publish.ViewModels.ViewArticle() { Context = Model.Context, Article = article })
+    }
+  </div>
+}

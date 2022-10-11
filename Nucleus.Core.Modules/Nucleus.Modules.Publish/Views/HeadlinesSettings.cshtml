@@ -2,31 +2,30 @@
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
+@using Nucleus.Modules.Publish.HtmlHelpers
 @using Nucleus.Abstractions.Models
 @Html.AddStyle("~!/../settings.css")
 @using (Html.BeginNucleusForm("Settings", "HeadlinesAdmin", "Publish", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
 	<Tab>
 		<TabItem target="#headlines-settings" caption="Headlines" active="true"></TabItem>
+		<TabItem target="#headlines-layouts" caption="Layouts"></TabItem>
 	</Tab>
 
 	<TabContent>
 		<TabPanel id="headlines-settings" active="true">
-			<fieldset role="group" aria-labelledby="heading">
-				<h2>Settings</h2>
+			<fieldset role="group" aria-label="Settings">
 				<div class="nucleus-flex-fields">
 					<SettingsControl caption="Linked Module" helptext="Select the published module instance that this module reads data from.">
 						@Html.DropDownListFor(model => model.LinkedModuleId, new SelectList(Model.ModuleInstances, "ModuleId", "Caption"), "(not selected)")
 					</SettingsControl>
-					<SettingsControl caption="Layout" helptext="Display layout.">
-						@Html.DropDownListFor(model => model.Layout, new SelectList(Model.Layouts))
-					</SettingsControl>
 				</div>
 
+				<h3>Filters</h3>
 				<div class="">
-					<h2>Categories</h2>
+					<h4>Categories</h4>
 					<div class="headlines-categories d-grid border border-1 border-dark p-2">					
-					@for (var categoryCount = 0; categoryCount < Model.Categories.Count; categoryCount++)
+						@for (var categoryCount = 0; categoryCount < Model.Categories.Count; categoryCount++)
 						{
 							<label>
 								@Html.CheckBoxFor(model => model.Categories[categoryCount].IsSelected)
@@ -40,21 +39,21 @@
 
 				<div class="nucleus-flex-fields mt-2">
 					<SettingsControl caption="Page Size" helptext="Maximum number of articles shown on list on a page.">
-						@Html.TextBoxFor(model => model.PageSize, new SelectList(Model.PageSizes))
+						@Html.TextBoxFor(model => model.FilterOptions.PageSize, new SelectList(Model.FilterOptions.PageSizes))
 					</SettingsControl>
 
 					<SettingsControl caption="Published Date Range" helptext="Article published date range.">
-						@Html.DropDownListFor(model => model.PublishedDateRange, Html.GetEnumSelectList<Nucleus.Modules.Publish.Models.PublishedDateRanges>())
+						@Html.DropDownListFor(model => model.FilterOptions.PublishedDateRange, Html.GetEnumSelectList<Nucleus.Modules.Publish.Models.PublishedDateRanges>())
 					</SettingsControl>
 
 					<SettingsControl caption="Sort By" helptext="Sorting order of articles." >
-						@Html.DropDownListFor(model => model.SortOrder, Html.GetEnumSelectList<Nucleus.Modules.Publish.Models.SortOrders>())
+						@Html.DropDownListFor(model => model.FilterOptions.SortOrder, Html.GetEnumSelectList<Nucleus.Modules.Publish.Models.SortOrders>())
 					</SettingsControl>
 				</div>
 
 				<div class="nucleus-flex-fields mt-2">
 					<SettingsControl caption="Show Featured Only?" helptext="Featured articles are shown at the top of the list." rendermode="LabelLast" class="inner-inline">
-						@Html.CheckBoxFor(model => model.FeaturedOnly, new { @class = "ToggleSwitch" })
+						@Html.CheckBoxFor(model => model.FilterOptions.FeaturedOnly, new { @data_autopostbackevent = "change", @class = "ToggleSwitch" })
 					</SettingsControl>
 					
 					<SettingsControl caption="Show Paging Controls?" helptext="Display paging controls for end users." rendermode="LabelLast" class="inner-inline">
@@ -62,6 +61,54 @@
 					</SettingsControl>
 				</div>
 			</fieldset>
+		</TabPanel>
+	
+		<TabPanel id="headlines-layouts">
+			<div class="alert alert-primary">
+				<p>
+					The master layout typically contains elements which wrap the article layouts.  When a viewer layout has a master, primary article and secondary article layouts, the 
+					primary article layout normally displays article summary information more prominently than the secondary article layout.
+				</p>
+				<p>
+					Some viewer layouts may only have a master layout. Other layouts may have a master layout and a primary layout but no secondary layout.
+				</p>
+			</div>
+			<div>
+				<SettingsControl caption="Viewer Layout" helptext="Viewer layout.">
+					@Html.DropDownListFor(model => model.LayoutOptions.ViewerLayout, new SelectList(Model.LayoutOptions.ViewerLayouts), new { @data_autopostbackevent = "change" })
+				</SettingsControl>
+				<SettingsControl caption="Master Layout" helptext="Master layout.">
+					@Html.DropDownListFor(model => model.LayoutOptions.MasterLayout, new SelectList(Model.LayoutOptions.MasterLayouts))
+				</SettingsControl>
+			</div>
+			<div class="article-layouts d-grid mt-2">
+				<div>
+
+					<h3>Primary</h3>
+					<SettingsControl caption="Article Layout" helptext="Select an article layout.">
+						@*@Html.DropDownListFor(model => model.LayoutOptions.PrimaryArticleLayout, new SelectList(Model.LayoutOptions.ArticleLayouts), "(none)")*@
+						@Html.DropDownListFor(model => model.LayoutOptions.PrimaryArticleLayout, new SelectList(Model.LayoutOptions.ArticleLayouts), "(none)", Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any()))
+					</SettingsControl>
+					<SettingsControl caption="Article Count" helptext="Number of articles to show.">
+						@Html.TextBoxFor(model => model.LayoutOptions.PrimaryArticleCount, Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any(), new { @type = "number", @min = "0" }))
+					</SettingsControl>
+					<SettingsControl caption="Use Primary Items Layout for Featured Articles Only?" helptext="Specifies whether to use the primary items layout for featured articles only. Non-featured articles will be displayed using the secondary items layout." rendermode="LabelLast" class="inner-inline">
+						@Html.CheckBoxFor(model => model.LayoutOptions.PrimaryFeaturedOnly, Html.ControlDisabled((!Model.LayoutOptions.ArticleLayouts.Any() || Model.FilterOptions.FeaturedOnly), new { @class = "ToggleSwitch" }))
+					</SettingsControl>
+				</div>
+				<div>
+					<h3>Secondary</h3>
+					<SettingsControl caption="Article Layout" helptext="Select an article layout.">
+						@Html.DropDownListFor(model => model.LayoutOptions.SecondaryArticleLayout, new SelectList(Model.LayoutOptions.ArticleLayouts), "(none)", Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any()))
+					</SettingsControl>
+					<SettingsControl caption="Article Count" helptext="Number of articles to show.">
+						@Html.TextBoxFor(model => model.LayoutOptions.SecondaryArticleCount, Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any(), new { @type = "number", @min = "0" }))
+					</SettingsControl>
+					@*<SettingsControl caption="Show Featured Only?" helptext="Secondary featured articles." rendermode="LabelLast" class="inner-inline">
+						@Html.CheckBoxFor(model => model.Layouts.SecondaryFeaturedOnly, new { @class = "ToggleSwitch" })
+					</SettingsControl>*@
+				</div>
+			</div>
 		</TabPanel>
 	</TabContent>
 

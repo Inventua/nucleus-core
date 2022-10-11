@@ -36,3 +36,11 @@ not selected a categories list for the module, the categories tab is not display
 
 ## Attachments
 You can add any number of attachments to your article.  Attachments are displayed as a set of links below the article content.
+
+# Publish Headlines Module
+
+The master layout typically contains elements which wrap the article layouts.  When a viewer layout has a master, primary article and secondary article layouts, the 
+primary article layout normally displays article summary information more prominently than the secondary article layout.
+			
+Some viewer layouts may only have a master layout. Other layouts may have a master layout and a primary layout but no secondary layout.
+

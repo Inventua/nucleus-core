@@ -1,0 +1,30 @@
+﻿@model Nucleus.Modules.Publish.ViewModels.Viewer
+@Html.AddStyle("~#/viewer.css")
+<div class="Articles">
+	<table class="table">
+		<tr>
+			<th>Title</th>
+			<th>Summary</th>
+			<th>Published</th>
+			<th></th>
+		</tr>
+		@foreach (var article in Model.Articles.Items)
+		{
+			<tr>
+				<td class="title">
+					@Html.AddEditingControls(Model.Context, @article.Id)
+					<a href="@Url.PageLink(Model.Context.Page, @article.Title.FriendlyEncode())">@article.Title</a>
+				</td>
+				<td class="summary">
+					@article.Summary
+				</td>
+				<td class="w-min-fit-content">
+					@((article.PublishDate.HasValue ? article.PublishDate.Value.Date : article.DateAdded.Value.Date).FormatDate(this.Context.Request.GetUserTimeZone()))
+				</td>
+				<td class="w-min-fit-content">
+					<a href="@Url.PageLink(Model.Context.Page, @article.Title.FriendlyEncode())" class="btn btn-secondary">Read more</a>
+				</td>
+			</tr>
+		}
+	</table>
+</div>

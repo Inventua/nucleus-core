@@ -24,10 +24,5 @@ namespace Nucleus.Modules.Publish.Models
 		public Boolean Featured  { get; set; }
 		public List<Attachment> Attachments { get; set; } = new();
 		public List<Category> Categories { get; set; } = new();
-
-		//public string EncodedTitle()
-		//{
-		//	return this.Title.Replace(' ', '-');
-		//}
 	}
 }

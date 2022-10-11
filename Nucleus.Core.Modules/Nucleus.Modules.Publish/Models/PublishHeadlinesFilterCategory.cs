@@ -9,7 +9,6 @@ namespace Nucleus.Modules.Publish.Models
 {
   public class PublishHeadlinesFilterCategory : ModelBase
   {
-   // public Guid ModuleId { get; set; }
     public ListItem CategoryListItem { get; set; }
   }
 }

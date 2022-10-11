@@ -51,12 +51,12 @@
 	gap: 0.5rem;
 }
 
-.Articles.tile-1-column 
+.Articles.tile-1-column, .Articles.Secondary
 {
 	grid-template-columns: repeat(1, 1fr);
 }
 
-.Articles.tile-2-column 
+.Articles.tile-2-column, .Articles.Primary
 {
 	grid-template-columns: repeat(2, 1fr);
 }
@@ -83,6 +83,6 @@
 .Articles .Article .nucleus-button-row
 {
 	display: flex;
-	align-self: flex-end;
+	justify-content: flex-end;
 	margin-top: auto;
 }

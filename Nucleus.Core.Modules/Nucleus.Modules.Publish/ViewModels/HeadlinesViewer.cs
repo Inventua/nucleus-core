@@ -14,6 +14,6 @@ namespace Nucleus.Modules.Publish.ViewModels
 {
 	public class HeadlinesViewer :  Nucleus.Modules.Publish.ViewModels.Viewer
 	{
-		public HeadlinesSettings Settings { get; set; } = new();
-	}
+		public HeadlinesSettings HeadlineSettings { get; set; } = new();
+  }
 }

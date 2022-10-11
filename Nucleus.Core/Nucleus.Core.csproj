@@ -9,13 +9,14 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Product>Nucleus</Product>
+    
 		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+		
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<Authors>Inventua Pty Ltd</Authors>
 		<Description>Nucleus core classes used by the Nucleus runtime.</Description>
-		<PackageOutputPath>$(SolutionDir)\Nuget Packages</PackageOutputPath>
+		
+		<!-- This is overridden by core.build.targets -->
 		<VersionPrefix>1.0.1.0</VersionPrefix>
   </PropertyGroup>
 
@@ -70,10 +71,11 @@
     </PackageReference>
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="6.0.1" />
   </ItemGroup>
-
 	
 	<ItemGroup>
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
 	</ItemGroup>
+
+	<Import Project="core.build.targets" />
 </Project>

@@ -724,7 +724,7 @@ ul.nucleus-control-panel-items button
 .nucleus-adminpage .FileSystemManager
 {
 	min-width: 750px;
-	max-height: 100%;
+	height: 100%;
 }
 
 .nucleus-adminpage .FileSystemManager form
@@ -773,6 +773,7 @@ ul.nucleus-control-panel-items button
 	box-shadow: 2px 2px 6px #bbb;
 	background: white;
 	right: 1rem;
+	z-index: 2;
 }
 
 #system-logs .log-levels, #task-logs .log-levels

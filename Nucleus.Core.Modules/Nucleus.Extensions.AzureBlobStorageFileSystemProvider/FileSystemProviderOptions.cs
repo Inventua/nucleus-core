@@ -11,6 +11,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 	/// </summary>
 	public class FileSystemProviderOptions 
 	{
+		public string RootPath { get; set; }
 		public string ConnectionString { get; set; }
 	}
 }

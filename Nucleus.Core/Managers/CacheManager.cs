@@ -12,6 +12,7 @@ using Nucleus.Abstractions.Models.Cache;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Managers;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Nucleus.Core.Managers
 {
@@ -19,11 +20,14 @@ namespace Nucleus.Core.Managers
 	{
 		private Dictionary<string, ICacheCollection> Caches { get; } = new();
 		private IConfiguration Configuration { get; }
+		private ILogger<ICacheManager> Logger {get;}
+
 		private static readonly object lockObject = new();
 
-		public CacheManager(IConfiguration configuration)
+		public CacheManager(IConfiguration configuration, ILogger<ICacheManager> logger)
 		{
 			this.Configuration = configuration;
+			this.Logger = logger;
 		}
 
 		private static string CacheKey<TKey, TModel>(string caller)
@@ -31,7 +35,7 @@ namespace Nucleus.Core.Managers
 			return $"{caller} {typeof(TKey).FullName} {typeof(TModel).FullName}";
 		}
 
-		private CacheCollection<TKey, TModel> Add<TKey, TModel>(string configItemName) where TModel : class
+		private CacheCollection<TKey, TModel> Add<TKey, TModel>(string configItemName)
 		{
 			string cacheKey = CacheKey<TKey, TModel>(configItemName);
 
@@ -42,10 +46,11 @@ namespace Nucleus.Core.Managers
 					if (!this.Caches.ContainsKey(cacheKey))
 					{
 						CacheOption options = new();
-						//this.Configuration.GetSection($"{CacheOption.Section}:{typeof(TModel).Name}Cache").Bind(options, binderOptions => binderOptions.BindNonPublicProperties = true);
 						this.Configuration.GetSection($"{CacheOption.Section}:{configItemName}").Bind(options, binderOptions => binderOptions.BindNonPublicProperties = true);
 
-						CacheCollection<TKey, TModel> result = new(options);
+						this.Logger?.LogDebug("Creating cache:'{configItemName}' with options: capacity={capacity}, expiry time={expiry}.", configItemName, options.Capacity, options.ExpiryTime);
+
+						CacheCollection<TKey, TModel> result = new(configItemName, this.Logger, options);
 						this.Caches.Add(cacheKey, result);
 						return result;
 					}
@@ -55,7 +60,7 @@ namespace Nucleus.Core.Managers
 			return this.Caches[cacheKey] as CacheCollection<TKey, TModel>;
 		}
 
-		public CacheCollection<TKey, TModel> Get<TKey, TModel>([System.Runtime.CompilerServices.CallerMemberName] string caller = "Default") where TModel : class
+		public CacheCollection<TKey, TModel> Get<TKey, TModel>([System.Runtime.CompilerServices.CallerMemberName] string caller = "Default") 
 		{
 			if (this.Caches.TryGetValue(CacheKey<TKey, TModel>(caller), out ICacheCollection result))
 			{

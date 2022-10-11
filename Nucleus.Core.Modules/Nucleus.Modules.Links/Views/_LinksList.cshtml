@@ -4,23 +4,42 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 @Html.AddStyle("~!/../settings.css")
-<table class="Links">
+<table class="table table-sm Links">
 	<tr>
 		<th>Title</th>
 		<th>Description</th>
+		<th colspan="4"></th>
 	</tr>
 	@for (int linkCount = 0; linkCount < Model.Links.Count; linkCount++)
 	{
+		var icon="";
+		var title="";
+
+		@switch (Model.Links[linkCount].LinkType)
+		{
+			case Nucleus.Modules.Links.Models.LinkTypes.Url:
+				icon = "&#xe157";
+				title = "Url";
+				break;
+			case Nucleus.Modules.Links.Models.LinkTypes.File:
+				icon = "&#xe873";
+				title = "File";
+				break;
+			case Nucleus.Modules.Links.Models.LinkTypes.Page:
+				icon="&#xe051;";
+				title = "Page";
+				break;
+		}
 		<tr>
 			<td>
 				@Html.HiddenFor(model => model.Links[linkCount].Id)
+				<span class="nucleus-material-icon ms-2" title="@title">@Html.Raw(@icon)</span>
 				@Model.Links[linkCount].Title
 				@if (Model.Links[linkCount].LinkType == Nucleus.Abstractions.Models.FileSystem.File.URN && Model.Links[linkCount].LinkFile?.File?.Id == Guid.Empty)
 				{
 					<span class="nucleus-material-icon text-danger" title="Linked file is missing or has been deleted.">@Html.Raw("&#xe000;")</span>
 				}
 			</td>
-
 			<td>@Model.Links[linkCount].Description</td>
 
 			<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("Editor", "Admin", "Links")?id=@Model.Links[linkCount].Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-primary" title="Edit" data-target="#LinksEditor" /></td>

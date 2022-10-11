@@ -46,7 +46,9 @@ namespace Nucleus.Modules.StaticContent.Controllers
 				if (viewModel.DefaultFile != null && viewModel.DefaultFileId != Guid.Empty)
 				{
 					// Check that the user has permission to view the static file
-					viewModel.DefaultFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.DefaultFile.Parent);
+
+					// As of 1.0.1, .GetFile(site, id) always populates file.parent & file.parent.permissions
+					//viewModel.DefaultFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.DefaultFile.Parent);
 
 					if (!User.HasViewPermission(this.Context.Site, viewModel.DefaultFile.Parent))
 					{

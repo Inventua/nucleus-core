@@ -11,9 +11,6 @@ using Microsoft.Extensions.Options;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Microsoft.AspNetCore.Mvc.Formatters.Xml;
-using System.Runtime.CompilerServices;
-using System.IO;
 
 namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 {
@@ -24,7 +21,9 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 	public class FileSystemProvider : Abstractions.FileSystemProviders.FileSystemProvider
 	{
 		private FileSystemProviderOptions Options { get; } = new();
+		private string RootPath { get; set; }
 
+		
 		/// <summary>
 		/// Enum used to specify items to include in the result of a call to ListItems.
 		/// </summary>
@@ -53,6 +52,14 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		public override void Configure(IConfigurationSection configSection, string HomeDirectory)
 		{
 			configSection.Bind(this.Options);
+			if (!String.IsNullOrEmpty(this.Options.RootPath))
+			{
+				this.RootPath = this.Options.RootPath;
+			}
+			else
+			{
+				this.RootPath = "";
+			}
 		}
 
 		/// <summary>
@@ -76,7 +83,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		public override async Task<Folder> CreateFolder(string parentPath, string newFolder)
 		{
-			PathUri path = new PathUri(parentPath).Combine(newFolder.ToLower(), true);
+			PathUri path = new PathUri(this.RootPath, parentPath, newFolder.ToLower(), true);
 
 			using (var client = BuildClient())
 			{
@@ -103,7 +110,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		{
 			using (var client = BuildClient())
 			{
-				PathUri pathUri = new(path);
+				PathUri pathUri = new(this.RootPath, path);
 				DeleteObjectRequest request = new DeleteObjectRequest() { BucketName = pathUri.BucketName, Key = pathUri.Key };
 				DeleteObjectResponse response = await client.DeleteObjectAsync(request);
 				if (response.HttpStatusCode != System.Net.HttpStatusCode.NoContent)
@@ -117,27 +124,11 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		{
 			using (var client = BuildClient())
 			{
-				PathUri pathUri = new(PathUri.AddDelimiter(path));
+				PathUri pathUri = new(this.RootPath, path, true);
 
 				if (pathUri.PathUriType == PathUri.PathUriTypes.Bucket)
 				{
 					throw new NotSupportedException();
-					// delete a bucket
-					////if (!recursive)
-					////{
-					////	// check that the bucket doesn't contain any items - deleting a bucket will delete everything in the bucket by default
-					////	if (ListItems(pathUri, ListItemsOptions.All, 1).Count > 0)
-					////	{
-					////		throw new AWSCloudProviderException(System.Net.HttpStatusCode.Conflict, "Folder not deleted because it is not empty.");
-					////	}
-					////}
-
-					////DeleteBucketRequest request = new DeleteBucketRequest() { BucketName = pathUri.BucketName, UseClientRegion = true };
-					////DeleteBucketResponse response = client.DeleteBucketAsync(request).Unwrap();
-					////if (response.HttpStatusCode != System.Net.HttpStatusCode.NoContent)
-					////{
-					////	throw new AWSCloudProviderException(response);
-					////}
 				}
 				else if (pathUri.PathUriType == PathUri.PathUriTypes.Folder)
 				{
@@ -168,7 +159,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 					}
 
 					// delete the "folder"
-					DeleteObjectRequest request = new DeleteObjectRequest() { BucketName = pathUri.BucketName, Key = PathUri.RemoveDelimiter(pathUri.Key) };
+					DeleteObjectRequest request = new DeleteObjectRequest() { BucketName = pathUri.BucketName, Key = pathUri.Key };
 					DeleteObjectResponse response = await client.DeleteObjectAsync(request);
 					if (response.HttpStatusCode != System.Net.HttpStatusCode.NoContent)
 					{
@@ -180,7 +171,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		public override async Task<Abstractions.Models.FileSystem.File> GetFile(string path)
 		{
-			PathUri pathUri = new(path);
+			PathUri pathUri = new(this.RootPath, path);
 
 			using (var client = BuildClient())
 			{
@@ -193,7 +184,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 				try
 				{
 					GetObjectMetadataResponse response = await client.GetObjectMetadataAsync(request);
-					return await BuildFile(pathUri, response);
+					return BuildFile(pathUri, response);
 				}
 				catch (Amazon.S3.AmazonS3Exception e)
 				{
@@ -212,7 +203,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			// set cache expiry to 30 minutes less than the SAS token expiry so a browser doesn't ever try a direct url that won't work
 			long maxAge = (Int64)((expiresOn - DateTime.UtcNow).TotalHours - 0.5) * 60;
 
-			PathUri pathUri = new(path);
+			PathUri pathUri = new(this.RootPath, path);
 
 			using (var client = BuildClient())
 			{
@@ -228,7 +219,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		public override async Task<System.IO.Stream> GetFileContents(string path)
 		{
-			PathUri pathUri = new(path);
+			PathUri pathUri = new(this.RootPath, path);
 
 			using (var client = BuildClient())
 			{
@@ -250,7 +241,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		public override async Task<Folder> GetFolder(string path)
 		{
-			PathUri pathUri = new(String.IsNullOrEmpty(path) ? path : PathUri.AddDelimiter(path));
+			PathUri pathUri = new(this.RootPath, path, true);
 
 			using (var client = BuildClient())
 			{
@@ -259,12 +250,12 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 					case PathUri.PathUriTypes.Root:
 						// if we are at the top level, count the number of buckets.  If there is only one, automatically navigate to it
 
-						List<FileSystemItem> buckets = await ListItems(new PathUri(""), ListItemsOptions.Folders);
+						List<FileSystemItem> buckets = await ListItems(new PathUri(this.RootPath, "", true), ListItemsOptions.Folders);
 						if (buckets.Count == 1)
 						{
 							return buckets.First() as Folder;
 						}
-						return BuildFolder(new PathUri(""));
+						return BuildFolder(new PathUri(this.RootPath, "", true));
 
 					case PathUri.PathUriTypes.Bucket:
 						return BuildFolder(pathUri);
@@ -276,7 +267,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 						{
 							BucketName = pathUri.BucketName,
 							Prefix = pathUri.Key,
-							Delimiter = PathUri.PATH_DELIMITER,
+							Delimiter = PathUri.PATH_DELIMITER.ToString(),
 							MaxKeys = 1,
 							FetchOwner = false
 						};
@@ -308,7 +299,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		public override async Task<Folder> ListFolder(string path, string pattern)
 		{
-			PathUri pathUri = new(PathUri.AddDelimiter(path));
+			PathUri pathUri = new(this.RootPath, path, true);
 
 			Folder folder = BuildFolder(pathUri);
 			foreach (Abstractions.Models.FileSystem.FileSystemItem item in await ListItems(pathUri, ListItemsOptions.All))
@@ -342,7 +333,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		public override async Task<Abstractions.Models.FileSystem.File> SaveFile(string parentPath, string newFileName, System.IO.Stream content, bool overwrite)
 		{
-			PathUri pathUri = new PathUri(parentPath).Combine(newFileName.ToLower(), false);
+			PathUri pathUri = new PathUri(this.RootPath, parentPath, newFileName.ToLower(), false);
 
 			using (var client = BuildClient())
 			{
@@ -366,91 +357,13 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 				}
 			}
 
-			return await BuildFile(pathUri);
+			return BuildFile(pathUri);
 		}
 
-		/// <summary>
-		/// Returns a value indicating whether the path represents a container (and not a sub-folder or file).
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		private Boolean IsContainerPath(string path)
+		private Abstractions.Models.FileSystem.File BuildFile(S3Object fileInfo)
 		{
-			return GetContainerName(path) == path;
-		}
-
-		private string GetContainerName(string path)
-		{
-			if (String.IsNullOrEmpty(path))
-			{
-				return string.Empty;
-			}
-			else
-			{
-				return Normalize(path).Split(new char[] { System.IO.Path.AltDirectorySeparatorChar })[0];
-			}
-		}
-
-
-		private string GetFullPath(string containerName, string blobName)
-		{
-			if (!String.IsNullOrEmpty(containerName))
-			{
-				return $"{containerName}{System.IO.Path.AltDirectorySeparatorChar}{blobName}";
-			}
-			else
-			{
-				return blobName;
-			}
-		}
-
-		private FileSystemItemCapabilities BuildTopFolderCapabilities()
-		{
-			return new FileSystemItemCapabilities()
-			{
-				CanHaveFolders = false,
-				CanStoreFiles = false,
-				CanRename = false,
-				CanDelete = false
-			};
-		}
-
-		private FileSystemItemCapabilities BuildBucketCapabilities()
-		{
-			return new FileSystemItemCapabilities()
-			{
-				CanStoreFiles = true,
-				CanRename = false,
-				CanDelete = false
-			};
-		}
-
-		private FileSystemItemCapabilities BuildSubFolderCapabilities()
-		{
-			return new FileSystemItemCapabilities()
-			{
-				CanStoreFiles = true,
-				CanRename = false,
-				CanDelete = true
-			};
-		}
-
-
-		private FileSystemItemCapabilities BuildFileCapabilities()
-		{
-			return new FileSystemItemCapabilities()
-			{
-				CanStoreFiles = false,
-				CanRename = false,
-				CanDelete = true,
-				CanDirectLink = true
-			};
-		}
-
-		private async Task<Abstractions.Models.FileSystem.File> BuildFile(S3Object fileInfo)
-		{
-			PathUri newItem = new PathUri(fileInfo.BucketName, fileInfo.Key);
-			Abstractions.Models.FileSystem.File file = await BuildFile(newItem);
+			PathUri newItem = new PathUri(this.RootPath, PathUri.RemoveRootPath(this.RootPath, fileInfo.BucketName), fileInfo.Key, false);
+			Abstractions.Models.FileSystem.File file = BuildFile(newItem);
 			file.Size = fileInfo.Size;
 			file.DateModified = fileInfo.LastModified.ToUniversalTime();
 
@@ -458,30 +371,36 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		}
 
 
-		private async Task<Abstractions.Models.FileSystem.File> BuildFile(PathUri pathUri)
+		private Abstractions.Models.FileSystem.File BuildFile(PathUri pathUri)
 		{
 			return new Abstractions.Models.FileSystem.File()
 			{
 				Provider = this.Key,
-				Path = GetRelativePath(pathUri.FullPath),
-				Name = GetDisplayName(pathUri.FullPath),
-				Parent = await GetFolder(GetParentPath(pathUri.FullPath)),
-				Capabilities = BuildFileCapabilities()
+				Path = pathUri.RelativePath,
+				Name = pathUri.DisplayName,
+				Parent = new Folder { Provider = this.Key, Path = pathUri.Parent.RelativePath },
+				Capabilities = FileSystemCapabilities.File
 			};
 		}
 
-		private async Task<Abstractions.Models.FileSystem.File> BuildFile(PathUri pathUri, GetObjectMetadataResponse response)
+		private Abstractions.Models.FileSystem.File BuildFile(PathUri pathUri, GetObjectMetadataResponse response)
 		{
-			return new Abstractions.Models.FileSystem.File()
-			{
-				Provider = this.Key,
-				Path = GetRelativePath(pathUri.FullPath),
-				Name = GetDisplayName(pathUri.FileName),
-				DateModified = response.LastModified,
-				Parent = await GetFolder(GetParentPath(pathUri.FullPath)),
-				Size = response.ContentLength,
-				Capabilities = BuildFileCapabilities()
-			};
+			Abstractions.Models.FileSystem.File file = BuildFile(pathUri);
+			file.DateModified = response.LastModified;
+			file.Size = response.ContentLength;
+
+			////return new Abstractions.Models.FileSystem.File()
+			////{
+			////	Provider = this.Key,
+			////	Path = pathUri.RelativePath,
+			////	Name = pathUri.DisplayName,
+			////	DateModified = response.LastModified,
+			////	Parent = new Folder { Provider = this.Key, Path = pathUri.Parent.RelativePath },
+			////	Size = response.ContentLength,
+			////	Capabilities = FileSystemCapabilities.File
+			////};
+
+			return file;
 		}
 
 		private Folder BuildFolder(PathUri path)
@@ -495,8 +414,8 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 					Path = "",
 					Name = "/",
 					Parent = null,
-					Capabilities = BuildTopFolderCapabilities(),
-					FolderValidationRules = BuildTopFolderValidationRules()
+					Capabilities = FileSystemCapabilities.Root,
+					FolderValidationRules = FileSystemValidationRules.Root
 				};
 			}
 			else if (path.PathUriType == PathUri.PathUriTypes.Bucket)
@@ -507,9 +426,9 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 					Provider = this.Key,
 					Path = path.BucketName,
 					Name = path.BucketName,
-					Parent = new Folder() { Provider = this.Key, Path = "" },
-					Capabilities = BuildBucketCapabilities(),
-					FolderValidationRules = BuildBucketValidationRules()
+					Parent = null,
+					Capabilities = FileSystemCapabilities.Bucket,
+					FolderValidationRules = FileSystemValidationRules.Bucket
 				};
 			}
 			else
@@ -517,64 +436,14 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 				return new Folder()
 				{
 					Provider = this.Key,
-					Path = GetRelativePath(path.FullPath),
-					Name = GetDisplayName(path.FullPath),
-					Parent = new Folder { Provider = this.Key, Path = GetRelativePath(GetParentPath(path.FullPath)) },
-					Capabilities = BuildSubFolderCapabilities(),
-					FolderValidationRules = BuildSubFolderValidationRules(),
-					FileValidationRules = BuildFileValidationRules()
+					Path = path.RelativePath,
+					Name = path.DisplayName,
+					Parent = new Folder { Provider = this.Key, Path = path.Parent.RelativePath },
+					Capabilities = FileSystemCapabilities.Folder,
+					FolderValidationRules = FileSystemValidationRules.Folder,
+					FileValidationRules = FileSystemValidationRules.File
 				};
 			}
-		}
-
-		private FileSystemValidationRule[] BuildTopFolderValidationRules()
-		{
-			return new FileSystemValidationRule[]
-			{
-				new FileSystemValidationRule()
-				{
-					ValidationExpression = "^[0-9a-z]{1}[0-9a-z-]{2,61}[0-9a-z]$" , ErrorMessage = "S3 top level folders (containers) must start and end with a letter or number, contain only letters, numbers and dashes, and must be lower case.",
-				},
-				new FileSystemValidationRule()
-				{
-					ValidationExpression = "^(?!.*--)" , ErrorMessage = "S3 top level folders (containers) must not contain consecutive dashes.",
-				}
-			};
-		}
-
-		private FileSystemValidationRule[] BuildFileValidationRules()
-		{
-			return new FileSystemValidationRule[]
-				{
-					new FileSystemValidationRule()
-					{
-						ValidationExpression = "^.{1,1024}$" , ErrorMessage = "S3 file names must be 1-1024 characters long.",
-					},
-					new FileSystemValidationRule()
-					{
-						ValidationExpression = "^[^\\/\\\\]+$" , ErrorMessage = "S3 file names cannot contain the '/' or '\\' character.",
-					}
-				};
-		}
-
-		private FileSystemValidationRule[] BuildBucketValidationRules()
-		{
-			return BuildSubFolderValidationRules();
-		}
-
-		private FileSystemValidationRule[] BuildSubFolderValidationRules()
-		{
-			return new FileSystemValidationRule[]
-				{
-					new FileSystemValidationRule()
-					{
-						ValidationExpression = "^.{1,1024}$" , ErrorMessage = "S3 sub-folders must be 1-1024 characters long.",
-					},
-					new FileSystemValidationRule()
-					{
-						ValidationExpression = "^[^\\/\\\\]+$" , ErrorMessage = "S3 sub-folders cannot contain the '/' or '\\' character.",
-					}
-				};
 		}
 
 		/// <summary>
@@ -615,7 +484,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 					// We can't use Limit in the API call, because there's no such parameter
 					foreach (S3Bucket item in (await client.ListBucketsAsync()).Buckets)
 					{
-						results.Add(BuildFolder(new PathUri(PathUri.AddDelimiter(item.BucketName))));
+						results.Add(BuildFolder(new PathUri(this.RootPath, PathUri.RemoveRootPath(this.RootPath, item.BucketName), "", true)));
 						if (results.Count == limit)
 						{
 							break;
@@ -633,7 +502,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 						{
 							BucketName = path.BucketName,
 							Prefix = path.Key,
-							Delimiter = PathUri.PATH_DELIMITER,
+							Delimiter = PathUri.PATH_DELIMITER.ToString(),
 							StartAfter = startAfter,
 							MaxKeys = (limit == -1 ? 1000 : limit + 1),
 							FetchOwner = false
@@ -647,9 +516,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 							// Folders which contain files are returned in the .CommonPrefixes string array
 							foreach (string item in response.CommonPrefixes)
 							{
-								// Remove the current path from the start of the returned Key, so that we just have the folder name
-								string folderName = !String.IsNullOrEmpty(path.Key) ? item.Replace($"{path.Key}", "") : item;
-								results.Add(BuildFolder(new PathUri(path.BucketName).Combine(item, true)));
+								results.Add(BuildFolder(new PathUri(this.RootPath, PathUri.RemoveRootPath(this.RootPath, path.BucketName), item, true))); 
 								itemsAdded += 1;
 
 								if (results.Count == limit)
@@ -661,7 +528,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 						foreach (S3Object item in response.S3Objects)
 						{
-							PathUri childFolderUri = new PathUri(path.BucketName).Combine(item.Key, true);
+							PathUri childFolderUri = new PathUri(this.RootPath, PathUri.RemoveRootPath(this.RootPath, path.BucketName), item.Key, true);
 
 							if (childFolderUri.PathUriType != PathUri.PathUriTypes.File && item.Size == 0)
 							{
@@ -680,9 +547,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 							{
 								if (options.HasFlag(ListItemsOptions.Files))
 								{
-									//PathUri newItem = new PathUri(path.BucketName, item.Key);
-									Abstractions.Models.FileSystem.File file = await BuildFile(item);
-									//file.Size = item.Size;
+									Abstractions.Models.FileSystem.File file = BuildFile(item);
 									results.Add(file);
 									itemsAdded += 1;
 								}
@@ -709,79 +574,6 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 			}
 
 			return results;
-		}
-
-		/// <summary>
-		/// Return the last part of the path (after the last delimiter), removing any trailing delimiter first.
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		private string GetDisplayName(string path)
-		{
-			string normalizedPath = Normalize(System.IO.Path.TrimEndingDirectorySeparator(path));
-			int position = normalizedPath.LastIndexOf(System.IO.Path.AltDirectorySeparatorChar);
-
-			if (position < 0)
-			{
-				return normalizedPath;
-			}
-			else
-			{
-				return normalizedPath.Substring(position + 1);
-			}
-		}
-
-		/// <summary>
-		/// Return the "parent" path, that is, everything before the last delimiter.
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		private string GetParentPath(string path)
-		{
-			int position = Normalize(path).LastIndexOf(System.IO.Path.AltDirectorySeparatorChar);
-
-			if (position < 0)
-			{
-				return "";
-			}
-			else
-			{
-				return path.Substring(0, position);
-			}
-		}
-
-		private string GetRelativePath(string path)
-		{
-			if (String.IsNullOrEmpty(path))
-			{
-				return path;
-			}
-			else
-			{
-				string relativePath = Normalize(path);
-				if (relativePath.StartsWith(System.IO.Path.AltDirectorySeparatorChar))
-				{
-					if (relativePath.Length > 1)
-					{
-						// remove leading/trailing "/"
-						return System.IO.Path.TrimEndingDirectorySeparator(relativePath[1..]);
-					}
-					else
-					{
-						// if the path "/" was passed in, return an empty string (for the LocalFileSystemProvider, an empty string is the "root" path)
-						return "";
-					}
-				}
-				else
-				{
-					return System.IO.Path.TrimEndingDirectorySeparator(relativePath);
-				}
-			}
-		}
-
-		private string Normalize(string path)
-		{
-			return System.IO.Path.TrimEndingDirectorySeparator(path.Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar));
 		}
 	}
 }

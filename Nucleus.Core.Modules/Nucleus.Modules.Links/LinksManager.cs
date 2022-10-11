@@ -10,6 +10,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using System.Collections;
+using Microsoft.AspNetCore.Http;
 
 namespace Nucleus.Modules.Links
 {
@@ -80,8 +83,20 @@ namespace Nucleus.Modules.Links
 
 					if (result.LinkFile.File != null)
 					{
-						result.LinkFile.File = await this.FileSystemManager.GetFile(site, result.LinkFile.File.Id);
-						result.LinkFile.File.Parent.Permissions = await this.FileSystemManager.ListPermissions(result.LinkFile.File.Parent);
+						try
+						{
+							result.LinkFile.File = await this.FileSystemManager.GetFile(site, result.LinkFile.File.Id);
+						}
+						catch (System.IO.FileNotFoundException)
+						{
+							// handle deleted files
+							result.LinkFile.File = new();
+						}
+						// As of 1.0.1, .GetFile(site, id) always populates file.parent & file.parent.permissions
+						// .GetFolder always reads permissions, and mostly comes from cache, so it will yield better performance
+						// than calling .ListPermissions.
+						//result.LinkFile.File.Parent = await this.FileSystemManager.GetFolder(site, result.LinkFile.File.Parent.Id);
+						//result.LinkFile.File.Parent.Permissions = await this.FileSystemManager.ListPermissions(result.LinkFile.File.Parent);
 					}
 					else
 					{
@@ -89,6 +104,7 @@ namespace Nucleus.Modules.Links
 					}
 
 					break;
+
 				case LinkTypes.Page:
 					if (result.LinkPage == null)
 					{
@@ -122,6 +138,7 @@ namespace Nucleus.Modules.Links
 			{
 				await provider.Delete(link);
 				this.CacheManager.LinksCache().Remove(link.Id);
+				this.CacheManager.ModuleLinksCache().Clear();
 			}
 		}
 
@@ -132,17 +149,22 @@ namespace Nucleus.Modules.Links
 		/// <returns></returns>
 		public async Task<IList<Link>> List(Site site, PageModule module)
 		{
-			using (ILinksDataProvider provider = this.DataProviderFactory.CreateProvider<ILinksDataProvider>())
+			IEnumerable<Guid> results = await this.CacheManager.ModuleLinksCache().GetAsync(module.Id, async id =>
 			{
-				IList<Link> results = await provider.List(module);
-
-				foreach (Link link in results)
+				using (ILinksDataProvider provider = this.DataProviderFactory.CreateProvider<ILinksDataProvider>())
 				{
-					await GetLinkItem(site, link);
-				}
+					List<Link> results = await provider.List(module);
 
-				return results;
-			}
+					////foreach (Link link in results)
+					////{
+					////	await GetLinkItem(site, link);
+					////}
+
+					return results.Select(link=>link.Id);
+				}
+			});
+
+			return new List<Link>(await Task.WhenAll(results.Select(async id => await Get(site, id))));
 		}
 
 		/// <summary>
@@ -173,6 +195,7 @@ namespace Nucleus.Modules.Links
 
 							this.CacheManager.LinksCache().Remove(id);
 							this.CacheManager.LinksCache().Remove(previousLink.Id);
+							this.CacheManager.ModuleLinksCache().Remove(module.Id);
 
 							break;
 						}
@@ -212,6 +235,8 @@ namespace Nucleus.Modules.Links
 
 							this.CacheManager.LinksCache().Remove(id);
 							this.CacheManager.LinksCache().Remove(previousLink.Id);
+							this.CacheManager.ModuleLinksCache().Remove(module.Id);
+
 							break;
 						}
 					}
@@ -234,6 +259,7 @@ namespace Nucleus.Modules.Links
 			{
 				await provider.Save(module, link);
 				this.CacheManager.LinksCache().Remove(link.Id);
+				this.CacheManager.ModuleLinksCache().Remove(module.Id);
 			}
 		}
 

@@ -9,6 +9,7 @@ using Nucleus.Modules.Documents.Models;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.FileSystemProviders;
 using Nucleus.Data.Common;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace Nucleus.Modules.Documents
 {
@@ -52,7 +53,7 @@ namespace Nucleus.Modules.Documents
 		/// <returns></returns>
 		public async Task<Document> Get(Site site, Guid id)
 		{
-			return await this.CacheManager.DocumentCache().GetAsync(id, async id =>
+			return await this.CacheManager.DocumentsCache().GetAsync(id, async id =>
 			{
 				using (IDocumentsDataProvider provider = this.DataProviderFactory.CreateProvider<IDocumentsDataProvider>())
 				{
@@ -79,12 +80,13 @@ namespace Nucleus.Modules.Documents
 		/// Delete the specifed <see cref="Document"/> from the database.
 		/// </summary>
 		/// <param name="Document"></param>
-		public async Task Delete(Document Document)
+		public async Task Delete(Document document)
 		{
 			using (IDocumentsDataProvider provider = this.DataProviderFactory.CreateProvider<IDocumentsDataProvider>())
 			{
-				await provider.Delete(Document);
-				this.CacheManager.DocumentCache().Remove(Document.Id);
+				await provider.Delete(document);
+				this.CacheManager.DocumentsCache().Remove(document.Id);
+				this.CacheManager.ModuleDocumentsCache().Clear();
 			}
 		}
 
@@ -96,27 +98,32 @@ namespace Nucleus.Modules.Documents
 		/// <returns></returns>
 		public async Task<IList<Document>> List(Site site, PageModule module)
 		{
-			using (IDocumentsDataProvider provider = this.DataProviderFactory.CreateProvider<IDocumentsDataProvider>())
+			IEnumerable<Guid> results = await this.CacheManager.ModuleDocumentsCache().GetAsync(module.Id, async id =>
 			{
-				IList<Document> documents = await provider.List(module);
-
-				foreach (Document document in documents)
+				using (IDocumentsDataProvider provider = this.DataProviderFactory.CreateProvider<IDocumentsDataProvider>())
 				{
-					if (document != null)
-					{
-						try
-						{
-							document.File = await this.FileSystemManager.GetFile(site, document.File.Id);
-						}
-						catch (Exception)
-						{
-							document.File = null;
-						}
-					}
-				}
+					IList<Document> documents = await provider.List(module);
 
-				return documents;
-			}
+					////foreach (Document document in documents)
+					////{
+					////	if (document != null)
+					////	{
+					////		try
+					////		{
+					////			document.File = await this.FileSystemManager.GetFile(site, document.File.Id);
+					////		}
+					////		catch (Exception)
+					////		{
+					////			document.File = null;
+					////		}
+					////	}
+					////}
+
+					return documents.Select(document => document.Id);
+				}
+			});
+
+			return new List<Document>(await Task.WhenAll(results.Select(async id => await Get(site, id))));
 		}
 
 		/// <summary>
@@ -144,8 +151,9 @@ namespace Nucleus.Modules.Documents
 							await provider .Save(module, previousDocument);
 							await provider .Save(module, document);
 
-							this.CacheManager.DocumentCache().Remove(id);
-							this.CacheManager.DocumentCache().Remove(previousDocument.Id);
+							this.CacheManager.DocumentsCache().Remove(id);
+							this.CacheManager.DocumentsCache().Remove(previousDocument.Id);
+							this.CacheManager.ModuleDocumentsCache().Remove(module.Id);
 
 							break;
 						}
@@ -183,8 +191,10 @@ namespace Nucleus.Modules.Documents
 							await provider.Save(module, previousDocument);
 							await provider.Save(module, document);
 
-							this.CacheManager.DocumentCache().Remove(id);
-							this.CacheManager.DocumentCache().Remove(previousDocument.Id);
+							this.CacheManager.DocumentsCache().Remove(id);
+							this.CacheManager.DocumentsCache().Remove(previousDocument.Id);
+							this.CacheManager.ModuleDocumentsCache().Remove(module.Id);
+
 							break;
 						}
 					}
@@ -200,13 +210,14 @@ namespace Nucleus.Modules.Documents
 		/// Create or update a <see cref="Document"/>.
 		/// </summary>
 		/// <param name="site"></param>
-		/// <param name="Document"></param>
-		public async Task Save(PageModule module, Document Document)
+		/// <param name="document"></param>
+		public async Task Save(PageModule module, Document document)
 		{
 			using (IDocumentsDataProvider provider = this.DataProviderFactory.CreateProvider<IDocumentsDataProvider>())
 			{
-				await provider.Save(module, Document);
-				this.CacheManager.DocumentCache().Remove(Document.Id);
+				await provider.Save(module, document);
+				this.CacheManager.DocumentsCache().Remove(document.Id);
+				this.CacheManager.ModuleDocumentsCache().Remove(module.Id);
 			}
 		}
 

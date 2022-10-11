@@ -10,10 +10,10 @@
 
 	@using (Html.BeginAreaForm("Navigate", "FileSystem", "Admin", FormMethod.Post, new { @class = "d-flex flex-column overflow-auto", @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
 	{
-		<div class="nucleus-form-tools">
+		<div class="nucleus-form-buttonrow">
 			<RemoveWhiteSpace>
 			@Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control ms-1 nucleus-show-progress nucleus-show-progress-after" })
-			<span class="align-self-center ms-1 mt-1">
+			<span>
 				@foreach (var ancestor in Model.Ancestors)				
 				{
 					@if (ancestor.Name != "/")
@@ -24,7 +24,7 @@
 					else
 					{
 						<button title="Top level" href="@Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = ancestor.Id })" class="btn btn-sm btn-outline-primary me-1 NavigateLink nucleus-show-progress nucleus-show-progress-after nucleus-material-icon" data-target=".nucleus-adminpage">
-								&#xe2c7;
+							&#xe2c7;
 						</button>						
 					}
 				}
@@ -52,8 +52,8 @@
 					<ul class="dropdown-menu">
 						<li>
 							<label class="dropdown-item">
-								Single File ...
-								<input type="file" name="mediaFile" class="collapse" formaction="@Url.AreaAction("UploadFile", "FileSystem", "Admin")">
+								Selected Files ...
+								<input type="file" name="mediaFiles" class="collapse" multiple="multiple" formaction="@Url.AreaAction("UploadFile", "FileSystem", "Admin")">
 							</label>
 						</li>
 						<li>
@@ -83,8 +83,12 @@
 			@Html.SubmitButton("&#xe897;", "Folder Settings", @Url.AreaAction("EditFolderSettings", "FileSystem", "Admin", new { folderId = Model.Folder.Id }), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary btn-sm" })
 		</div>
 
-		<Progress caption="Uploading file ..." class="UploadProgress"></Progress>
+		<Progress caption="Uploading file(s) ..." class="UploadProgress"></Progress>
 
+		@if (Model.Folder?.Permissions?.Any() != true)
+		{
+			<div class="alert alert-warning">This folder does not have any permissions set.  Click Folder Settings to create permissions, unless the files in this folder are for system use only.</div>
+		}
 		@if (!Model.Folder?.Folders.Any() == true && !Model.Folder?.Files.Any() == true)
 		{
 			<div class="alert alert-warning">This folder is empty</div>
@@ -94,8 +98,7 @@
 			<div class="overflow-auto">
 				<table class="FileSystemItems table table-sm">
 					<tr>
-						<th class="nucleus-small-cell" />
-						<th>Name</th>
+						<th class="ps-0"><button type="button" class="nucleus-toggle-selections btn btn-none fs-5 me-1 shadow-none nucleus-material-icon">&#xe146;</button>Name</th>
 						<th class="file-type">Type</th>
 						<th class="file-modified-date">Modified Date</th>
 						<th class="file-size">Size</th>
@@ -106,14 +109,14 @@
 					{
 						<tr>
 							<td>
+								<label>
 								@if (Model.Folder.Folders[folderCount].Capabilities.CanRename || Model.Folder.Folders[folderCount].Capabilities.CanDelete)
 								{
 									@Html.CheckBoxFor(model => model.Folder.Folders[folderCount].IsSelected, new { @class = "nucleus-filesystem-folderselector" })
 								}
 								@Html.HiddenFor(model => model.Folder.Folders[folderCount].Id)
-							</td>
-							<td>
 								@Html.AreaActionLink(Model.Folder.Folders[folderCount].Name, "Index", "FileSystem", "Admin", new { folderId = @Model.Folder.Folders[folderCount].Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
+								</label>
 							</td>
 							<td>Folder</td>
 							<td>@Model.Folder.Folders[folderCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
@@ -126,12 +129,12 @@
 					{
 						var isRecent = Math.Abs(Model.Folder.Files[fileCount].DateModified.Subtract(DateTime.UtcNow).TotalMinutes) < 5;
 						<tr>
-							<td>
-								@Html.CheckBoxFor(model => Model.Folder.Files[fileCount].IsSelected, new { @class = "nucleus-filesystem-fileselector" })
-							</td>
 							<td class="@(isRecent ? "fw-bold" : "")">
+								<label>
+								@Html.CheckBoxFor(model => Model.Folder.Files[fileCount].IsSelected, new { @class = "nucleus-filesystem-fileselector" })							
 								@Model.Folder.Files[fileCount].Name
 								@Html.HiddenFor(model => Model.Folder.Files[fileCount].Id)
+								</label>
 							</td>
 							<td>File</td>
 							<td class="Date@(isRecent ? " fw-bold" : "")">@Model.Folder.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
@@ -161,4 +164,19 @@
 			//jQuery(this).parents('form').submit();
 	});
 
+	jQuery('.nucleus-toggle-selections').on('click', function (event) 
+	{
+		var checkboxElements = jQuery('.nucleus-filesystem-folderselector, .nucleus-filesystem-fileselector');
+
+		if (checkboxElements.filter(':checked').length > 0)
+		{
+			// one or more file system items are selected, un-select all
+			checkboxElements.prop('checked', false);
+		}
+		else
+		{
+			// no file system items are selected, select all
+			checkboxElements.prop('checked', true);
+		}
+	});
 </script>

@@ -26,10 +26,10 @@
 	</div>
 }
 <script>
-	ShowSelectedPage();
-	jQuery('.SiteMapRootPageType').on('change', ShowSelectedPage);
+	ShowSelectedPageControl();
+	jQuery('.SiteMapRootPageType').on('change', ShowSelectedPageControl);
 
-	function ShowSelectedPage(e)
+	function ShowSelectedPageControl(e)
 	{
 		if (jQuery('.SiteMapRootPageType').val() === '@Convert.ToInt32(Nucleus.Modules.Sitemap.RootPageTypes.SelectedPage)')
 		{
@@ -40,4 +40,26 @@
 			jQuery('.SiteMapSelectedPage').hide();
 		}
 	}
+
+	// Read the child pages of the item containing the "+" button
+	jQuery('.SiteMapSelectedPage').on('click', '.nucleus-get-childpages', function (e)
+	{
+			// Add a ul to contain the new pages
+			Page.LoadPartialContent(e, '@Url.NucleusAction("GetChildPages", "SiteMap", "SiteMap")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+
+			// remove the "+" button
+			jQuery(this).remove();
+	});
+
+	// Hide the child pages of the item containing the "-" button
+	jQuery('.SiteMapSelectedPage').on('click', '.nucleus-hide-childpages', function (e)
+	{
+		// hide the "-" button
+		jQuery(this).removeClass('show');
+
+		// show the "+" button
+		jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
+
+		jQuery(this).closest('li').find('ul').remove();
+	});
 </script>

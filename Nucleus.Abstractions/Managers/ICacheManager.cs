@@ -33,7 +33,7 @@ namespace Nucleus.Abstractions.Managers
 		/// <see href="https://www.nucleus-cms.com/developers/caching-data/">Caching Data</see> for details.
 		/// Get an instance of this class from dependency injection by including a parameter in your class constructor.
 		/// </remarks>
-		public CacheCollection<TKey, TModel> Get<TKey, TModel>([System.Runtime.CompilerServices.CallerMemberName] string caller = "Default") where TModel : class;
+		public CacheCollection<TKey, TModel> Get<TKey, TModel>([System.Runtime.CompilerServices.CallerMemberName] string caller = "Default");
 
 		/// <summary>
 		/// Remove expired items from all caches.

@@ -33,6 +33,16 @@ namespace Nucleus.ViewFeatures.ViewModels
 		public Boolean ShowSelectAnother { get; set; }
 
 		/// <summary>
+		/// Specifies the value added to the files list when there are no matching files to select.
+		/// </summary>
+		public string NoFilesMessage { get; set; } = "(no files)";
+
+		/// <summary>
+		/// Specifies whether to display a preview for image files.
+		/// </summary>
+		public Boolean ShowImagePreview { get; set; }
+		
+			/// <summary>
 		/// Name of the action to execute when the user clicks "select another file"
 		/// </summary>
 		public string SelectAnotherActionName { get; set; }

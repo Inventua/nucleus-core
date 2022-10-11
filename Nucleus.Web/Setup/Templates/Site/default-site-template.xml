@@ -36,7 +36,7 @@
 			<Id>{$guid6}</Id>
 			<Alias>localhost:5000</Alias>
 		</DefaultSiteAlias>
-		<HomeDirectory>homeportal</HomeDirectory>
+		<HomeDirectory>default-site</HomeDirectory>
 		<Aliases>
 			<SiteAlias>
 				<Id>{$guid6}</Id>

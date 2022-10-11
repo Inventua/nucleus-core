@@ -69,6 +69,12 @@
 	opacity: 0.5;
 }
 
+.settings-control input[type=text].disabled
+{
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
 .settings-control input, .settings-control select, .settings-control textarea
 {
 	display: block;
@@ -102,7 +108,7 @@ fieldset label span
 	display: block;	
 }
 
-table input, table select
+table input:not([type=checkbox]), table select
 {
 	width: 100%;
 }
@@ -124,32 +130,40 @@ table input[type=radio]
 
 /* This section is mostly to do with overriding Safari/IOS styling of various elements */
 input[type=text], input[type=email], input[type=tel], input[type=search], input[type=url], input[type=password], select, textarea
-{
-	padding: 2px;	
+{	
+	padding: 0 0.25rem;
 	border: solid 1px black;
 	outline: black;
 }
 
-select
+select:not(.no-appearance-override)
 {
-	appearance: none;
-	background: url(data:image/svg+xml;base64,PHN2ZyAKICAgICB2ZXJzaW9uPSIxLjEiIAogICAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgCiAgICAgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIAogICAgIHdpZHRoPSIxMHB4IiBoZWlnaHQ9IjZweCIgCiAgICAgdmlld0JveD0iMCAwIDEwIDYiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPiAKICAgPGc+IAo8aW1hZ2Ugd2lkdGg9IjEwIiBoZWlnaHQ9IjYiIHhsaW5rOmhyZWY9ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCwgCmlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFBb0FBQUFHQ0FZQUFBRDY4QS9HQUFBQUdYUkZXSFJUYjJaMGQyRnlaUUJCWkc5aVpTQkoKYldGblpWSmxZV1I1Y2NsbFBBQUFBRjVKUkVGVWVOcGN6TEVOd0RBSUJFREdTT2xSR0NPanBHUVR4c2dvS1JrakpmRWoyZnBRSUwyZQpBOGxNTWJNcklnNWtIblR1ZmlJWEVwRjNqUEV3UmxiVkd6dmdLb0Jta1FzelFsY2YxelhobkNnWmJkaHhSei9JdUNQTUo4QUFDZVdGCkp4dEtjTWNBQUFBQVNVVk9SSzVDWUlJPQoiLz4gCiAgIDwvZz4gCjwvc3ZnPgkK) no-repeat;	
-	padding-right: 1.4rem;
-	background-position: right 6px center;
-	outline: black;
-	color: black;
+	appearance: none!important;
+	-webkit-appearance: none;
+	background: url(data:image/svg+xml;base64,PHN2ZyAKICAgICB2ZXJzaW9uPSIxLjEiIAogICAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgCiAgICAgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIAogICAgIHdpZHRoPSIxMHB4IiBoZWlnaHQ9IjZweCIgCiAgICAgdmlld0JveD0iMCAwIDEwIDYiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPiAKICAgPGc+IAo8aW1hZ2Ugd2lkdGg9IjEwIiBoZWlnaHQ9IjYiIHhsaW5rOmhyZWY9ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCwgCmlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFBb0FBQUFHQ0FZQUFBRDY4QS9HQUFBQUdYUkZXSFJUYjJaMGQyRnlaUUJCWkc5aVpTQkoKYldGblpWSmxZV1I1Y2NsbFBBQUFBRjVKUkVGVWVOcGN6TEVOd0RBSUJFREdTT2xSR0NPanBHUVR4c2dvS1JrakpmRWoyZnBRSUwyZQpBOGxNTWJNcklnNWtIblR1ZmlJWEVwRjNqUEV3UmxiVkd6dmdLb0Jta1FzelFsY2YxelhobkNnWmJkaHhSei9JdUNQTUo4QUFDZVdGCkp4dEtjTWNBQUFBQVNVVk9SSzVDWUlJPQoiLz4gCiAgIDwvZz4gCjwvc3ZnPgkK) no-repeat!important;
+	padding-right: 1.4rem!important;
+	background-position: right 6px center!important;
+	outline: black!important;
+	color: black!important;
 }
 
-input[type=text], input[type=button], input[type=search], input[type=button], input[type=tel], input[type=email], input[type=password], input[type=date], input[type=datetime]
+/* This is just for webkit/iOS, prevents Apple devices from applying Apple styles to input controls so that display is consistent across platforms */
+input[type=text]:not(.no-appearance-override), 
+input[type=button]:not(.no-appearance-override), 
+input[type=search]:not(.no-appearance-override), 
+input[type=button]:not(.no-appearance-override), 
+input[type=tel], input[type=email]:not(.no-appearance-override), 
+input[type=password]:not(.no-appearance-override), 
+input[type=date]:not(.no-appearance-override), 
+input[type=datetime]:not(.no-appearance-override)
 {
 	-webkit-appearance: none;
 	-webkit-border-radius: 0;
 }
 
-input[type=search], select
+input[type=search]:not(.no-appearance-override)
 {
   appearance: none;
-	-webkit-appearance: none;
 }
 /********************/
 
@@ -172,6 +186,7 @@ input[type=search], select
 	margin-top: 8px;
 	display: flex;
 	gap: 4px;
+	align-items: center;
 }
 
 

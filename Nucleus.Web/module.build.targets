@@ -137,6 +137,11 @@
 	</Target>
 
 	<Target Name="CopyToExtensionPublishFolder" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release' AND '$(NUCLEUS_PUBLISH_PATH)' != '' AND Exists('$(NUCLEUS_PUBLISH_PATH)Extensions')">
+		<ItemGroup>
+			<PublishExtensionsFilesToDelete Include="$(NUCLEUS_PUBLISH_PATH)Extensions\$(ExtensionFolder)_Extension*.zip"/>
+		</ItemGroup>
+		<Message Importance="high" Text="Removing old install packages from $(NUCLEUS_PUBLISH_PATH)Extensions\: @(PublishExtensionsFilesToDelete)" />
+		<Delete Files="@(PublishExtensionsFilesToDelete )" />		
 		<Copy SourceFiles="$(ExtensionFolder)_Extension_$(PackageVersion).zip" DestinationFolder="$(NUCLEUS_PUBLISH_PATH)Extensions\" Retries="2" />
 	</Target>
 

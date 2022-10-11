@@ -90,7 +90,7 @@ The `<components>` element wraps one or more `<component>` elements.
 | folderName       | Yes       | (attribute) Specifies the folder within the /extensions folder that your files will be installed to. |
 | optional         | Yes       | (attribute) Specifies whether the user can choose whether to install the component. This feature is not yet implemented.  |
 
-The `<components>` element can contain any combination of:  moduleDefinition, layoutDefinition, containerDefinition, controlPanelExtensionDefinition, 
+The `<component>` element can contain any combination of:  moduleDefinition, layoutDefinition, containerDefinition, controlPanelExtensionDefinition, 
 file, folder, cleanup.
 
 ## `<moduleDefinition>` 

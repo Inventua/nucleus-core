@@ -40,3 +40,5 @@ The Elastic Search extension settings are accessed in the `Manage` control panel
 must create and enable the scheduled task in the `Settings/Scheduler` control panel as it is not enabled by default.
 
 ![Elastic Search Scheduled Task](elasticsearch-task.png)
+
+See Also: [Setting up Self-Managed Elastic Search on a Azure Virtual Machine running Ubuntu Linux](https://www.nucleus-cms.com/blog/setting-up-self-managed-elastic-search-on-a-azure-virtual-machine-running-ubuntu-linux-) 

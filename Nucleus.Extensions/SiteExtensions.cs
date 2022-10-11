@@ -226,7 +226,7 @@ namespace Nucleus.Extensions
 		private async static Task<string> GetDirectFilePath(this Site site, Guid fileId, IFileSystemManager fileSystemManager)
 		{
 			File file = await fileSystemManager.GetFile(site, fileId);
-			// render a direct link if the file system provider supports it (because it is faster than returning a redirect to Azure Blob Storage).  This "skips"
+			// render a direct link if the file system provider supports it (because it is faster than returning a redirect to remote storage).  This "skips"
 			// the Nucleus permissions check, but the performance difference is > 200ms.
 			if (file.Capabilities.CanDirectLink)
 			{
@@ -399,17 +399,18 @@ namespace Nucleus.Extensions
 		/// <returns></returns>
 		public static System.Uri AbsoluteUri(this Site site, Page page, Boolean useSSL)
 		{
-			return new System.Uri(AbsoluteUri(site, useSSL), RemoveLeadingSlash(page.DefaultPageRoute().Path) + "/");
+			return new System.Uri(AbsoluteUri(site, useSSL), TrimSlash(page.DefaultPageRoute().Path) + "/");
 		}
 
-		private static string RemoveLeadingSlash(string relativeUrl)
+		private static string TrimSlash(string relativeUrl)
     {
 			if (!string.IsNullOrEmpty(relativeUrl))
-			{ 
-				if (relativeUrl.StartsWith('/') && relativeUrl.Length > 1)
-				{
-					return relativeUrl[1..];
-				}
+			{
+				return relativeUrl.Trim('/');
+				//if (relativeUrl.StartsWith('/') && relativeUrl.Length > 1)
+				//{
+				//	return relativeUrl[1..];
+				//}
 			}
 			return relativeUrl;
     }
@@ -423,7 +424,7 @@ namespace Nucleus.Extensions
 		/// <returns></returns>
 		public static System.Uri AbsoluteUri(this Site site, string relativeUrl, Boolean useSSL)
 		{
-			return new System.Uri(AbsoluteUri(site, useSSL), RemoveLeadingSlash(relativeUrl) + "/");
+			return new System.Uri(AbsoluteUri(site, useSSL), TrimSlash(relativeUrl) + "/");
 		}
 
 		/// <summary>
@@ -462,7 +463,7 @@ namespace Nucleus.Extensions
 		/// <returns></returns>
 		public static System.Uri AbsoluteUri(this Site site, Page page, string relativeUrl, Boolean useSSL)
 		{
-			return new System.Uri(AbsoluteUri(site, page, useSSL), RemoveLeadingSlash(relativeUrl) + "/");
+			return new System.Uri(AbsoluteUri(site, page, useSSL), TrimSlash(relativeUrl) + "/");
 		}
 
 	}

@@ -9,5 +9,6 @@ you through the installation process.
 In the list of installed extensions, you can click the publisher name to visit their web site, or the email icon to start a new email.  You can 
 uninstall an extension by clicking the red 'X' button to the right.
 
-> After you install or uninstall an extension, Nucleus will shut down.  If you are hosting using IIS or another reverse proxy, your site will 
-restart automatically.  If you are hosting using an Azure App Service your site may take a minute to restart.
+> After you install or uninstall an extension, Nucleus will shut down.  If you are hosting using IIS, your site will restart automatically.
+If you are hosting using an Azure App Service your site may take a minute to restart.  A restart progress indicator is displayed during 
+restart, and when your site has restarted, an on-screen message will say 'Restart Complete.'

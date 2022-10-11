@@ -1,18 +1,18 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.PageIndex
 @using Nucleus.ViewFeatures.HtmlHelpers
 <h1 class="nucleus-control-panel-heading">Pages</h1>
-<div class="nucleus-form-tools">
-	@using (Html.BeginAreaForm("Search", "Pages", "Admin", FormMethod.Post, new { @data_target = "#Page_Search_Results", @autocomplete = "off" }))
-	{
-		@Html.TextBoxFor(model => model.SearchTerm, new { @data_autopostbackevent = "keyup", @placeholder = "search", @type = "search" })
+@using (Html.BeginAreaForm("Search", "Pages", "Admin", FormMethod.Post, new { @data_target = "#Page_Search_Results", @autocomplete = "off" }))
+{
+	<div class="nucleus-form-tools">
+		@Html.TextBoxFor(model => model.SearchTerm, new { @class = "h-100", @data_autopostbackevent = "keyup", @placeholder = "search", @type = "search" })
 		<input type="submit" value="&#xe8b6;" class="nucleus-material-icon btn btn-outline-secondary" />
-		<div id="Page_Search_Results" class="nucleus-search-results-wrapper">
-			@await Html.PartialAsync("SearchResults.cshtml")
-		</div>
-	}
-
-	<a href="@Url.Content("~/Admin/Pages/Editor")" class="btn btn-secondary" data-target="#nucleus-page-editor" accesskey="N">New Page</a>
+		<a href="@Url.Content("~/Admin/Pages/Editor")" class="btn btn-secondary" data-target="#nucleus-page-editor" accesskey="N">New Page</a>
+	</div>
+<div id="Page_Search_Results" class="nucleus-search-results-wrapper">
+	@await Html.PartialAsync("SearchResults.cshtml")
 </div>
+}
+
 
 <div class="nucleus-index-wrapper">
 	<div class="nucleus-index-items">
@@ -32,40 +32,40 @@
 	// Open a page for editing
 	jQuery('.nucleus-index-wrapper').on('click', 'li[data-target="#nucleus-page-editor"] a', function (e)
 	{
-		Page.LoadPartialContent(e, '@Url.Content("~/Admin/Pages/Editor?id=")' + jQuery(this).attr('data-id'), '#nucleus-page-editor');
+			Page.LoadPartialContent(e, '@Url.Content("~/Admin/Pages/Editor?id=")' + jQuery(this).attr('data-id'), '#nucleus-page-editor');
 	});
 
 	jQuery('.nucleus-index-wrapper').on('keydown', 'a', function (event)
-  {
-    // trigger click event when the user presses ENTER or space 
-    if (event.which === 13 || event.which === 32)
-    {
-			jQuery(this.click());
-      event.preventDefault();
-		}
-  });			
-	
+	{
+			// trigger click event when the user presses ENTER or space
+			if (event.which === 13 || event.which === 32)
+			{
+					jQuery(this.click());
+					event.preventDefault();
+			}
+	});
+
 	// Read the child pages of the item containing the "+" button
 	jQuery('.nucleus-index-wrapper').on('click', '.nucleus-get-childpages', function (e)
 	{
-		// Add a ul to contain the new pages
-		Page.LoadPartialContent(e, '@Url.AreaAction("GetChildPages", "Pages", "Admin")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+			// Add a ul to contain the new pages
+			Page.LoadPartialContent(e, '@Url.AreaAction("GetChildPages", "Pages", "Admin")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
 
-		// hide the "+" button
-		jQuery(this).removeClass('show');
+			// hide the "+" button
+			jQuery(this).removeClass('show');
 
 	});
 
 	// Hide the child pages of the item containing the "-" button
 	jQuery('.nucleus-index-wrapper').on('click', '.nucleus-hide-childpages', function (e)
 	{
-		// hide the "-" button
-		jQuery(this).removeClass('show');
+			// hide the "-" button
+			jQuery(this).removeClass('show');
 
-		// show the "+" button
-		jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
+			// show the "+" button
+			jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
 
-		jQuery(this).closest('li').find('ul').remove();
+			jQuery(this).closest('li').find('ul').remove();
 	});
 
 </script>

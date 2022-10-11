@@ -8,20 +8,24 @@
 	@if (Model.SearchResults?.Items?.Any() == true)
 	{
 		<div class="nucleus-search-results">
-			<table>
+			<table class="table table-sm">
+				<tr>
+					<th>Login name</th>
+					@if (Model.Site.HasProperty(System.Security.Claims.ClaimTypes.GivenName) || Model.Site.HasProperty(System.Security.Claims.ClaimTypes.Surname))
+					{
+						<th>Name</th>
+					}
+					<th>Email</th>
+				</tr>
 				@foreach (var item in Model.SearchResults.Items)
 				{
 					<tr>
 						<td><a href="@Url.Content("~/Admin/Users/Editor")?id=@item.Id" data-target=".UserEditor">@item.UserName</a></td>
-
-						@if (@item.Profile.HasProperty(System.Security.Claims.ClaimTypes.GivenName))
+						@if (Model.Site.HasProperty(System.Security.Claims.ClaimTypes.GivenName) || Model.Site.HasProperty(System.Security.Claims.ClaimTypes.Surname))
 						{
-							<td>@item.Profile.GetProperty(System.Security.Claims.ClaimTypes.GivenName).Value @item.Profile.GetProperty(System.Security.Claims.ClaimTypes.Surname).Value</td>
+							<td>@item.Profile.GetProperty(System.Security.Claims.ClaimTypes.GivenName)?.Value @item.Profile.GetProperty(System.Security.Claims.ClaimTypes.Surname)?.Value</td>
 						}
-						@if (@item.Profile.HasProperty(System.Security.Claims.ClaimTypes.Email))
-						{
-							<td>@item.Profile.GetProperty(System.Security.Claims.ClaimTypes.Email).Value</td>
-						}
+						<td>@item.Profile.GetProperty(System.Security.Claims.ClaimTypes.Email)?.Value</td>
 					</tr>
 				}
 			</table>

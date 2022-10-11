@@ -66,7 +66,7 @@ namespace Nucleus.Web.Controllers.Admin
 		public async Task<ActionResult> Search(ViewModels.Admin.UserIndex viewModel)
 		{
 			viewModel.SearchResults = await this.UserManager.Search(this.Context.Site, viewModel.SearchTerm, viewModel.SearchResults);
-			
+			viewModel.Site = this.Context.Site;
 			return View("SearchResults", viewModel);
 		}
 
@@ -216,6 +216,7 @@ namespace Nucleus.Web.Controllers.Admin
 		private async Task<ViewModels.Admin.UserIndex> BuildViewModel(ViewModels.Admin.UserIndex viewModel)
 		{
 			viewModel.Users = await this.UserManager.List(this.Context.Site, viewModel.Users);
+			viewModel.Site = this.Context.Site;
 			return viewModel;
 		}
 

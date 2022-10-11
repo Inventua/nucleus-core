@@ -1,5 +1,5 @@
 ## Multi-Content module
-The multi-content module displays content in an accordion, tab, pills, carousel or alert layout.  Use the multi-content module when you want multiple pieces of content to occuply the same space on a page.
+The multi-content module displays content in an accordion, tab, pills, carousel or alert layout.  Use the multi-content module when you want multiple pieces of content to occupy the same space on a page.
 
 > The Multi-Content module uses [Bootstrap components](https://getbootstrap.com/docs/5.0/components/accordion/) to render your content.
 

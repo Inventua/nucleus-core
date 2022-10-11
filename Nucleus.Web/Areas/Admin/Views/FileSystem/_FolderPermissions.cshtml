@@ -1,15 +1,15 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.FileSystem
 @using Nucleus.Abstractions.Models
-@*<h2 class="nucleus-modal-caption">Folder Permissions</h2>*@
-
-	@if (Model.AvailableFolderRoles.Any())
-	{
-		<div class="nucleus-form-tools">
-			@Html.DropDownListFor(model => model.SelectedFolderRoleId, Model.AvailableFolderRoles, new { @class = "flex-fill" })
-			<input type="submit" formaction="@Url.AreaAction("AddFolderPermissionRole", "FileSystem", "Admin")" value="Add Role" class="btn btn-primary" data-target="form.parent()" />
-		</div>
-	}
-	@Html.HiddenFor(model => Model.Folder.Id)
+@if (Model.AvailableFolderRoles.Any())
+{
+	<div class="nucleus-form-tools">
+		@Html.DropDownListFor(model => model.SelectedFolderRoleId, Model.AvailableFolderRoles, new { @class = "flex-fill" })
+		<input type="submit" formaction="@Url.AreaAction("AddFolderPermissionRole", "FileSystem", "Admin")" value="Add Role" class="btn btn-primary" data-target="form.parent()" />
+	</div>
+}
+@Html.HiddenFor(model => Model.Folder.Id)
+@if (Model.FolderPermissions.Values.Any())
+{
 	<fieldset role="group" aria-labelledby="heading">
 		<table>
 			<tr>
@@ -18,6 +18,7 @@
 				{
 					<th class="text-center">@permissionType.Name</th>
 				}
+				<th></th>
 			</tr>
 
 			@foreach (var item in Model.FolderPermissions.Values)
@@ -29,13 +30,13 @@
 
 					@for (int permissionsCount = 0; permissionsCount < Model.FolderPermissions[item.Role.Id].Permissions.Count; permissionsCount++)
 					{
-						<td>
+						<td class="text-center">
 							@Html.HiddenFor(model => Model.FolderPermissions[item.Role.Id].Permissions[permissionsCount].Id)
 							@Html.HiddenFor(model => Model.FolderPermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Id)
 							@Html.HiddenFor(model => Model.FolderPermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope)
 							@if (Model.FolderPermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope == PermissionType.PermissionScopeNamespaces.Disabled)
 							{
-								<span class="nucleus-material-icon text-center d-block">&#xe8f5;</span>
+								<span class="nucleus-material-icon">&#xe8f5;</span>
 							}
 							else
 							{
@@ -49,6 +50,6 @@
 			}
 		</table>
 	</fieldset>
-
+}
 
 

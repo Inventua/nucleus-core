@@ -1,0 +1,15 @@
+﻿<!--
+	Shared Build actions for Nucleus core components.  
+	
+	To use this, add a line to the end of the .csproj file:
+	
+		<Import Project="..\Nucleus.Core\core.build.targets" />			
+-->
+<Project>
+	<PropertyGroup>
+		<VersionPrefix>1.1.0.0</VersionPrefix>
+		<Authors>Inventua Pty Ltd</Authors>
+		<Product>Nucleus</Product>
+		<Copyright>(c) Inventua Pty Ptd</Copyright>
+	</PropertyGroup>	
+</Project>

@@ -11,12 +11,12 @@
     <TargetFramework>net6.0</TargetFramework>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Nucleus.Data.Common.xml</DocumentationFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Authors>Inventua Pty Ltd</Authors>
-		<Product>Nucleus</Product>
 		<Description>Common data provider base classes and interfaces.  Nucleus Extension developers would typically reference the Nucleus.Data.EntityFramework package, which includes a reference to this package.</Description>
-		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
+		
+		<!-- This is overridden by core.build.targets -->
 		<VersionPrefix>1.0.1.0</VersionPrefix>
-		<Copyright>(c) Inventua Pty Ltd</Copyright>
+		
+		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
 		<PackageTags>Nucleus</PackageTags>
 		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>
 		<PackageLicenseFile>license.txt</PackageLicenseFile>
@@ -46,4 +46,6 @@
 	<Target Name="GetPackageAssemblies" AfterTargets="PostBuildEvent">
 		<Copy SourceFiles="bin\$(Configuration)\$(TargetFramework)\Nucleus.Data.Common.xml" DestinationFolder="$(SolutionDir)\..\Publish\XmlDocumentation" Retries="2" />
 	</Target>
+
+	<Import Project="..\Nucleus.Core\core.build.targets" />
 </Project>

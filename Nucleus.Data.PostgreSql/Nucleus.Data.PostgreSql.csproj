@@ -4,6 +4,8 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+		<!-- This is overridden by core.build.targets -->
 		<VersionPrefix>1.0.1.0</VersionPrefix>
   </PropertyGroup>
 
@@ -17,4 +19,5 @@
     <ProjectReference Include="$(SolutionDir)\Nucleus.Data.EntityFramework\Nucleus.Data.EntityFramework.csproj" />
   </ItemGroup>
 
+	<Import Project="..\Nucleus.Core\core.build.targets" />
 </Project>

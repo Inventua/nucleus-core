@@ -26,7 +26,6 @@
 {
   display: flex;
   width: auto;
-  white-space: nowrap;
 }
 
 .Forums .forums-list .forum-title > div

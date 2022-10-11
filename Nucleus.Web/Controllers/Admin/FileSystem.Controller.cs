@@ -231,7 +231,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 			if ( !selectedFolders.Any() && !selectedFiles.Any())
 			{
-				return Json(new { Title = "Download", Message = "Please select one or more files or folders." });
+				return NoContent();// (new { Title = "Download", Detail = "Please select one or more files or folders." });
 			}
 
 			if (!selectedFolders.Any() && selectedFiles.Count() == 1)
@@ -290,6 +290,8 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> DeleteSelected(ViewModels.Admin.FileSystemDelete viewModel)
 		{
+			viewModel.Folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Folder.Id);
+
 			if (viewModel.SelectedFolders != null)
 			{
 				foreach (var item in viewModel.SelectedFolders)
@@ -306,7 +308,7 @@ namespace Nucleus.Web.Controllers.Admin
 				}
 			}
 
-			return View("Index", await BuildViewModel(new ViewModels.Admin.FileSystem(), viewModel.Folder));
+			return View("Index", await BuildViewModel(new ViewModels.Admin.FileSystem() { SelectedProviderKey = viewModel.Folder.Provider }, viewModel.Folder));
 		}
 
 		[HttpPost]
@@ -377,19 +379,23 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		[HttpPost]
-		public async Task<ActionResult> UploadFile(ViewModels.Admin.FileSystem viewModel, [FromForm] IFormFile mediaFile)
+		public async Task<ActionResult> UploadFile(ViewModels.Admin.FileSystem viewModel, [FromForm] List<IFormFile> mediaFiles)
 		{
 			viewModel.Folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Folder.Id);
-			if (mediaFile != null)
+
+			foreach (IFormFile file in mediaFiles)
 			{
-				using (System.IO.Stream fileStream = mediaFile.OpenReadStream())
+				if (file != null)
 				{
-					await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedProviderKey, viewModel.Folder.Path, mediaFile.FileName, fileStream, true);
+					using (System.IO.Stream fileStream = file.OpenReadStream())
+					{
+						await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedProviderKey, viewModel.Folder.Path, file.FileName, fileStream, true);
+					}
 				}
-			}
-			else
-			{
-				return BadRequest();
+				else
+				{
+					return BadRequest();
+				}
 			}
 
 			viewModel = await BuildViewModel(viewModel, viewModel.Folder);

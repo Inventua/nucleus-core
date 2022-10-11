@@ -21,6 +21,7 @@
     <None Remove="sitemap.css" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
+    <None Remove="Views\_PageMenu.cshtml" />
     <None Remove="_ViewImports.cshtml" />
   </ItemGroup>
 
@@ -29,6 +30,10 @@
     <Content Include="sitemap.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
+    <Content Include="Views\_PageMenu.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />
     <Content Include="_ViewImports.cshtml" />
@@ -41,7 +46,7 @@
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>Sitemap</ExtensionFolder>
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 	</PropertyGroup>
 

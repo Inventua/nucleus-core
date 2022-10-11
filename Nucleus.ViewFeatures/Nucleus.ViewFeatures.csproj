@@ -13,18 +13,18 @@
 		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>Nucleus.ViewFeatures</PackageId>
-		<Authors>Inventua Pty Ltd</Authors>
-		<Product>Nucleus</Product>
 		<Description>Html Helpers, Tag Helpers, Url Helpers and shared controls used by Nucleus core and extensions.</Description>
-		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
+		
+		<!-- This is overridden by core.build.targets -->
 		<VersionPrefix>1.0.1.0</VersionPrefix>
 		<!--<VersionSuffix>a1</VersionSuffix>-->
+		
+		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
 		<PackageTags>Nucleus</PackageTags>
 		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>
 		<PackageLicenseFile>license.txt</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<PackageId>Inventua.$(AssemblyName)</PackageId>
-		<Copyright>(c) Inventua Pty Ltd</Copyright>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 	
@@ -65,4 +65,6 @@
 	<Target Name="GetPackageAssemblies" AfterTargets="PostBuildEvent">
 		<Copy SourceFiles="bin\$(Configuration)\$(TargetFramework)\Nucleus.ViewFeatures.xml" DestinationFolder="$(SolutionDir)\..\Publish\XmlDocumentation" Retries="2" />		
 	</Target>
+
+	<Import Project="..\Nucleus.Core\core.build.targets" />
 </Project>

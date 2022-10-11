@@ -12,7 +12,6 @@ namespace Nucleus.Web.ViewModels.Admin
 		public string SearchTerm { get; set; }
 
 		public Nucleus.Abstractions.Models.Paging.PagedResult<Nucleus.Abstractions.Models.User> SearchResults { get; set; } = new();
-		
-
+		public Site Site { get; set; }
 	}
 }

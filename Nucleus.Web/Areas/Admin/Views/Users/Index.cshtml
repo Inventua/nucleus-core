@@ -3,22 +3,23 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 <h1 class="nucleus-control-panel-heading">Users</h1>
-<div class="nucleus-form-tools">
-	@using (Html.BeginAreaForm("Search", "Users", "Admin", FormMethod.Post, new { @data_target = "#User_Search_Results", @autocomplete = "off" }))
-	{
-		@Html.TextBoxFor(model => model.SearchTerm, new { @data_autopostbackevent = "keyup", @placeholder = "search", @type = "search" })
-		<input type="submit" value="&#xe8b6;" class="nucleus-material-icon btn btn-outline-secondary" />
-		<div id="User_Search_Results" class="nucleus-search-results-wrapper">
-			@await Html.PartialAsync("SearchResults.cshtml") 
-		</div>
-	}
 
-	<a href="@Url.Content("~/Admin/Users/AddUser")" class="btn btn-secondary" data-target=".UserEditor" accesskey="N">New User</a>
-	<a href="@Url.Content("~/Admin/Users/Export")" class="btn btn-secondary" accesskey="X">Export</a>
-</div>
+@using (Html.BeginAreaForm("Search", "Users", "Admin", FormMethod.Post, new { @data_target = "#User_Search_Results", @autocomplete = "off" }))
+{
+	<div class="nucleus-form-tools">
+		@Html.TextBoxFor(model => model.SearchTerm, new { @class = "h-100", @data_autopostbackevent = "keyup", @placeholder = "search", @type = "search" })
+		<input type="submit" value="&#xe8b6;" class="nucleus-material-icon btn btn-outline-secondary" />
+		<a href="@Url.Content("~/Admin/Users/AddUser")" class="btn btn-secondary" data-target=".UserEditor" accesskey="N">New User</a>
+		<a href="@Url.Content("~/Admin/Users/Export")" class="btn btn-secondary" accesskey="X">Export</a>
+	</div>
+		<div id="User_Search_Results" class="nucleus-search-results-wrapper">
+			@await Html.PartialAsync("SearchResults.cshtml")
+		</div>
+}
+
 
 <div class="nucleus-index-wrapper">
-	<div class="nucleus-index-items">		
+	<div class="nucleus-index-items">
 		@await Html.PartialAsync("_UserList", Model)
 	</div>
 

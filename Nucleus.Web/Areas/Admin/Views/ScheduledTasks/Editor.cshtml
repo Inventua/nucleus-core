@@ -36,7 +36,7 @@
 							@Html.CheckBoxFor(model => model.ScheduledTask.Enabled, new { @class = "ToggleSwitch" })
 						</SettingsControl>
 						<SettingsControl caption="Interval" helptext="Interval between each run.">
-							@Html.TextBoxFor(model => model.ScheduledTask.Interval)
+							@Html.TextBoxFor(model => model.ScheduledTask.Interval, new { @type = "number" })
 						</SettingsControl>
 
 						<SettingsControl caption="Interval Type" helptext="Interval Type.">
@@ -122,10 +122,10 @@
 			<TabPanel id="task-logs">
 				@if (Model.LogSettings.LogFiles != null)
 				{
-					@using (Html.BeginAreaForm("GetLogFile", "ScheduledTasks", "Admin", new { id = Model.ScheduledTask.Id }, FormMethod.Post, new { @class = "d-flex flex-column overflow-auto", @data_target = ".LogContent", @autocomplete = "off" }))
+					@using (Html.BeginAreaForm("GetLogFile", "ScheduledTasks", "Admin", new { id = Model.ScheduledTask.Id }, FormMethod.Post, new { @class = "d-flex flex-column overflow-auto m-minus1", @data_target = ".LogContent", @autocomplete = "off" }))
 					{
 						@await Html.PartialAsync("../System/_LogSettings.cshtml", Model.LogSettings)
-						<div class="LogContent d-flex flex-column overflow-auto">
+						<div class="LogContent d-flex flex-column overflow-auto mx-1">
 							@if (!String.IsNullOrEmpty(Model.LogSettings.LogMessage))
 							{
 								@Model.LogSettings.LogMessage

@@ -1,1 +1,10 @@
-﻿
+﻿table.Links th, table.Links td
+{
+	vertical-align: middle;
+}
+
+table.Links td span
+{
+	vertical-align: bottom;
+	cursor: default;
+}

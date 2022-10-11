@@ -60,7 +60,9 @@ namespace Nucleus.Extensions.AdvancedSiteMap
 				siteMap.Items.Add(item);
 			}
 
-			item.Url = metadata.Url;
+			metadata.Site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PAGES_USE_SSL, out Boolean useSsl);
+
+			item.Url = metadata.Site.AbsoluteUrl(metadata.Url, useSsl);
 
 			this.Write(metadata.Site, siteMap);
 

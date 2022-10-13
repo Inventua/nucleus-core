@@ -14,9 +14,5 @@ namespace Nucleus.Modules.Publish.ViewModels
 	public class HeadlinesSettings : Models.HeadlinesSettings
 	{
 		public List<HeadlinesCategorySelection> Categories { get; set; } = new();
-
-		
-		public List<string> Layouts { get; set; }
-
   }
 }

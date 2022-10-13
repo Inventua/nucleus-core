@@ -37,18 +37,18 @@ namespace Nucleus.Modules.Publish
 					HeadlinesSettings settings = new();
 					settings.GetSettings(pageModule);
 
-					result.PublishedDateRange = settings.PublishedDateRange;
-					result.FeaturedOnly = settings.FeaturedOnly;
+					result.PublishedDateRange = settings.FilterOptions.PublishedDateRange;
+					result.FeaturedOnly = settings.FilterOptions.FeaturedOnly;
 
 					if (settings.ShowPagingControl)
 					{
-						result.PageSize = settings.PageSize;
+						result.PageSize = settings.FilterOptions.PageSize;
 					}
 					else
           {
 						result.PageSize = -1;
           }
-					result.SortOrder = settings.SortOrder;
+					result.SortOrder = settings.FilterOptions.SortOrder;
 
 					return result;
 				}

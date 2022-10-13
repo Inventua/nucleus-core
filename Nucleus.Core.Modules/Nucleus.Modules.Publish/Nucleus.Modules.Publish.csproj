@@ -30,12 +30,21 @@
     <None Remove="Views\HeadlinesSettings.cshtml" />
     <None Remove="Views\HeadlinesViewer.cshtml" />
     <None Remove="Views\ViewArticle.cshtml" />
+    <None Remove="Views\ViewerLayouts\FrontPage\Index.cshtml" />
+    <None Remove="Views\ViewerLayouts\FrontPage\Item-Featured.cshtml" />
+    <None Remove="Views\ViewerLayouts\FrontPage\Item-Normal.cshtml" />
     <None Remove="Views\ViewerLayouts\Table.cshtml" />
+    <None Remove="Views\ViewerLayouts\Table\Table.cshtml" />
     <None Remove="Views\ViewerLayouts\Tile-1-Column.cshtml" />
     <None Remove="Views\ViewerLayouts\Tile-2-Column.cshtml" />
     <None Remove="Views\Editor.cshtml" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
+    <None Remove="Views\ViewerLayouts\Tile-5-Headlines.cshtml" />
+    <None Remove="Views\ViewerLayouts\Tile\ArticleLayouts\Normal.cshtml" />
+    <None Remove="Views\ViewerLayouts\Tile\Tile-1-Column.cshtml" />
+    <None Remove="Views\ViewerLayouts\Tile\Tile-2-Column.cshtml" />
+    <None Remove="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,12 +56,20 @@
     <Content Include="Views\HeadlinesSettings.cshtml" />
     <Content Include="Views\ViewArticle.cshtml" />
     <Content Include="Views\HeadlinesViewer.cshtml" />
+    <Content Include="Views\ViewerLayouts\FrontPage\ArticleLayouts\Item-Featured.cshtml" />
+    <Content Include="Views\ViewerLayouts\FrontPage\ArticleLayouts\Item-Normal.cshtml" />
+    <Content Include="Views\ViewerLayouts\FrontPage\MasterLayouts\Index.cshtml" />
     <Content Include="Views\ViewerLayouts\Table.cshtml" />
+    <Content Include="Views\ViewerLayouts\Table\MasterLayouts\Table.cshtml" />
     <Content Include="Views\ViewerLayouts\Tile-2-Column.cshtml" />
     <Content Include="Views\ViewerLayouts\Tile-1-Column.cshtml" />
     <Content Include="Views\Editor.cshtml" />
     <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />
+    <Content Include="Views\ViewerLayouts\Tile\ArticleLayouts\Normal.cshtml" />
+    <Content Include="Views\ViewerLayouts\Tile\MasterLayouts\Tile-1-Column.cshtml" />
+    <Content Include="Views\ViewerLayouts\Tile\MasterLayouts\Tile-2-Column.cshtml" />
+    <Content Include="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

@@ -11,7 +11,9 @@ using Nucleus.ViewFeatures;
 using Nucleus.Extensions.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
 using Nucleus.Extensions;
+using System.Linq.Expressions;
 
 namespace Nucleus.Modules.Publish.HtmlHelpers
 {
@@ -41,5 +43,26 @@ namespace Nucleus.Modules.Publish.HtmlHelpers
 
 			return null;
 		}
-	}
+
+		public static RouteValueDictionary ControlDisabled(this IHtmlHelper htmlHelper, Boolean disabled, object htmlAttributes = null)
+		{
+			RouteValueDictionary attributes;
+
+      if (htmlAttributes != null)
+			{
+        attributes = new RouteValueDictionary(htmlAttributes);
+			}
+			else
+			{
+				attributes = new RouteValueDictionary(new { });
+      }
+
+      if (disabled)
+			{
+				attributes["disabled"] = "disabled";
+				attributes["class"] = "disabled";
+			}
+			return attributes;
+		}
+  }
 }

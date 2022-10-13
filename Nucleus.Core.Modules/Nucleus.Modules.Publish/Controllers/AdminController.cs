@@ -26,11 +26,9 @@ namespace Nucleus.Modules.Publish.Controllers
 		private IListManager ListManager { get; }
 		private IFileSystemManager FileSystemManager { get; }
 		private IWebHostEnvironment WebHostEnvironment { get; }
-
-		//private const string MODULESETTING_CATEGORYLIST_ID = "articles:categorylistid";
-		//private const string MODULESETTING_LAYOUT = "articles:layout";
-
-		public AdminController(IWebHostEnvironment webHostEnvironment, Context Context, IPageModuleManager pageModuleManager, ArticlesManager articlesManager, IListManager listManager, IFileSystemManager fileSystemManager)
+    private string ViewerLayoutFolder { get; }
+		    
+    public AdminController(IWebHostEnvironment webHostEnvironment, Context Context, IPageModuleManager pageModuleManager, ArticlesManager articlesManager, IListManager listManager, IFileSystemManager fileSystemManager)
 		{
 			this.WebHostEnvironment = webHostEnvironment;
 			this.Context = Context;
@@ -38,9 +36,16 @@ namespace Nucleus.Modules.Publish.Controllers
 			this.ArticlesManager = articlesManager;
 			this.ListManager = listManager;
 			this.FileSystemManager = fileSystemManager;
-		}
+    
+			this.ViewerLayoutFolder = $"{webHostEnvironment.ContentRootPath}\\{Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER}\\Publish\\Views\\ViewerLayouts\\";
+    }
 
-		[HttpGet]
+    public async Task<ActionResult> Settings()
+    {
+      return View("Settings", await BuildSettingsViewModel(null));
+    }
+
+    [HttpGet]
 		[HttpPost]
 		public async Task<ActionResult> Settings(ViewModels.Settings viewModel)
 		{
@@ -177,14 +182,14 @@ namespace Nucleus.Modules.Publish.Controllers
 		[HttpPost]
 		public async Task<ActionResult> AddAttachment(ViewModels.Editor viewModel)
 		{
-			if (viewModel.SelectedAttachmentFile != null)
+			if (viewModel.SelectedAttachmentFile != null && viewModel.SelectedAttachmentFile.Id != Guid.Empty)
 			{
 				viewModel.Article.Attachments.Add(new Models.Attachment() { File = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedAttachmentFile.Id) });
 				viewModel.SelectedAttachmentFile.ClearSelection();
 			}
 			else
 			{
-				return BadRequest();
+				return BadRequest("Please select a file to be attached to the article.");
 			}
 
 			return View("Editor", viewModel);
@@ -254,23 +259,16 @@ namespace Nucleus.Modules.Publish.Controllers
 				if (viewModel == null)
 				{
 					viewModel = new();
-				}
+          viewModel.GetSettings(this.Context.Module);
+        }
 
-				viewModel.GetSettings(this.Context.Module);
-
-				viewModel.Articles = await this.ArticlesManager.List(this.Context.Module);
+        viewModel.Articles = await this.ArticlesManager.List(this.Context.Module);
 				viewModel.Lists = await this.ListManager.List(this.Context.Site);
-				//viewModel.CategoryList = await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(MODULESETTING_CATEGORYLIST_ID, Guid.Empty));
-				//viewModel.Layout = this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table");
 				viewModel.CategoryList = await this.ListManager.Get(viewModel.CategoryListId);
-				
-				viewModel.Layouts = new();
-				foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{RoutingConstants.EXTENSIONS_ROUTE_PATH}\\Publish\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout=>layout))
-				{
-					viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
-				}
 
-				return viewModel;
+        ListLayouts(viewModel);
+
+        return viewModel;
 			}
 		}
 
@@ -358,5 +356,18 @@ namespace Nucleus.Modules.Publish.Controllers
 				}
 			}
 		}
-	}
+    
+		private void ListLayouts(ViewModels.Settings viewModel)
+    {
+      viewModel.LayoutOptions.ViewerLayouts = viewModel.LayoutOptions.ListViewerLayouts(this.ViewerLayoutFolder);
+			
+			if (String.IsNullOrEmpty(viewModel.LayoutOptions.ViewerLayout))
+			{
+        viewModel.LayoutOptions.ViewerLayout = viewModel.LayoutOptions.ViewerLayouts.FirstOrDefault();
+			}
+
+			viewModel.LayoutOptions.MasterLayouts = viewModel.LayoutOptions.ListMasterLayouts(this.ViewerLayoutFolder);
+      viewModel.LayoutOptions.ArticleLayouts = viewModel.LayoutOptions.ListArticleLayouts(this.ViewerLayoutFolder);
+    }
+  }
 }

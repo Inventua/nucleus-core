@@ -47,9 +47,47 @@
 					<SettingsControl caption="Categories List" helptext="Select the list to use for categories for this module instance.  Lists are managed in the Nucleus Lists manager.">
 						@Html.DropDownListFor(model => model.CategoryListId, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")
 					</SettingsControl>
-					<SettingsControl caption="Layout" helptext="Display layout.">
-						@Html.DropDownListFor(model => model.Layout, new SelectList(Model.Layouts))
+				</div>
+
+				<div class="alert alert-primary">
+					<p>
+						The master layout typically contains elements which wrap the article layouts.  When a viewer layout has a master, primary article and secondary article layouts, the
+						primary article layout normally displays article summary information more prominently than the secondary article layout.
+					</p>
+					<p>
+						Some viewer layouts may only have a master layout. Other layouts may have a master layout and a primary layout but no secondary layout.
+					</p>
+				</div>
+				<div>
+					<SettingsControl caption="Viewer Layout" helptext="Viewer layout.">
+						@Html.DropDownListFor(model => model.LayoutOptions.ViewerLayout, new SelectList(Model.LayoutOptions.ViewerLayouts), new { @data_autopostbackevent = "change" })
 					</SettingsControl>
+					<SettingsControl caption="Master Layout" helptext="Master layout.">
+						@Html.DropDownListFor(model => model.LayoutOptions.MasterLayout, new SelectList(Model.LayoutOptions.MasterLayouts))
+					</SettingsControl>
+				</div>
+				<div class="article-layouts d-grid mt-2">
+					<div>
+						<h3>Primary</h3>
+						<SettingsControl caption="Article Layout" helptext="Select an article layout.">
+							@Html.DropDownListFor(model => model.LayoutOptions.PrimaryArticleLayout, new SelectList(Model.LayoutOptions.ArticleLayouts), "(none)", Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any()))
+						</SettingsControl>
+						<SettingsControl caption="Article Count" helptext="Number of articles to show.">
+							@Html.TextBoxFor(model => model.LayoutOptions.PrimaryArticleCount, Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any(), new { @type = "number", @min = "0" }))
+						</SettingsControl>
+						<SettingsControl caption="Use Primary Items Layout for Featured Articles Only?" helptext="Specifies whether to use the primary items layout for featured articles only. Non-featured articles will be displayed using the secondary items layout." rendermode="LabelLast" class="inner-inline">
+							@Html.CheckBoxFor(model => model.LayoutOptions.PrimaryFeaturedOnly, Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any(), new { @class = "ToggleSwitch" }))
+						</SettingsControl>
+					</div>
+					<div>
+						<h3>Secondary</h3>
+						<SettingsControl caption="Article Layout" helptext="Select an article layout.">
+							@Html.DropDownListFor(model => model.LayoutOptions.SecondaryArticleLayout, new SelectList(Model.LayoutOptions.ArticleLayouts), "(none)", Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any()))
+						</SettingsControl>
+						<SettingsControl caption="Article Count" helptext="Number of articles to show.">
+							@Html.TextBoxFor(model => model.LayoutOptions.SecondaryArticleCount, Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any(), new { @type = "number", @min = "0" }))
+						</SettingsControl>
+					</div>
 				</div>
 
 				<div class="nucleus-form-tools">

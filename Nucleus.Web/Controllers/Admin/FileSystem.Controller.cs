@@ -17,8 +17,6 @@ using System.IO.Compression;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Options;
 using Nucleus.Extensions.Authorization;
-using System.Text;
-using System.Dynamic;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -243,7 +241,7 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 
 			System.IO.MemoryStream output = new();
-			ZipArchive archive = new(output, ZipArchiveMode.Create, true, Encoding.UTF8);
+			ZipArchive archive = new(output, ZipArchiveMode.Create, true, System.Text.Encoding.UTF8);
 
 			foreach (var item in selectedFolders)
 			{
@@ -254,9 +252,12 @@ namespace Nucleus.Web.Controllers.Admin
 			{
 				File file = await this.FileSystemManager.GetFile(this.Context.Site, selectedItem.Id);
 				ZipArchiveEntry entry = archive.CreateEntry(file.Name);
-				using (System.IO.Stream stream = entry.Open())
+				using (System.IO.Stream outputStream = entry.Open())
 				{
-					await (await this.FileSystemManager.GetFileContents(this.Context.Site, file)).CopyToAsync(stream);					
+					using (System.IO.Stream inputStream = await this.FileSystemManager.GetFileContents(this.Context.Site, file))
+					{
+						await (inputStream).CopyToAsync(outputStream);
+					}
 				}
 			}
 

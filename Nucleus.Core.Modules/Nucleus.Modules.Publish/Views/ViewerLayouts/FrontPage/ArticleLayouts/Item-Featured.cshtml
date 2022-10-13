@@ -1,0 +1,41 @@
+﻿@model Nucleus.Modules.Publish.ViewModels.ViewArticle
+@Html.AddStyle("~#/viewer.css")
+<div class="Article p-2 border">
+  @Html.AddEditingControls(Model.Context, Model.Article.Id)
+  <h2 class="title">
+    @Model.Article.Title
+  </h2>
+  <div class="metadata">
+    <div class="publish-date">
+      @Model.Article.GetPublishedDate().FormatDate(this.Context.Request.GetUserTimeZone())
+    </div>
+    @if (Model.Article.Categories.Count > 0 || Model.Article.Featured)
+    {
+      <div class="categories">
+        @if (Model.Article.Featured)
+        {
+          <span class="featured category">Featured</span>
+        }
+        @foreach (var category in Model.Article.Categories)
+        {
+          <span class="category">@category.CategoryListItem?.Name</span>
+        }
+      </div>
+    }
+  </div>
+  @if (!String.IsNullOrEmpty(@Model.Article.SubTitle))
+  {
+    <h3 class="sub-title">
+      @Model.Article.SubTitle
+    </h3>
+  }
+  @if (!String.IsNullOrEmpty(@Model.Article.Summary))
+  {
+    <div class="summary">
+      @Model.Article.Summary
+    </div>
+  }
+  <div class="nucleus-button-row m-2">
+    <a href="@Url.PageLink(Model.Context.Page, @Model.Article.Title.FriendlyEncode())" class="btn btn-secondary">Read more</a>
+  </div>
+</div>

@@ -7,6 +7,7 @@
 		Combined news, blogs and announcements module.
 	</description>
   <compatibility minVersion="1.0.1.0" maxVersion="*" />
+  
   <components>
     <component folderName="Publish" optional="false">
       <moduleDefinition id="20af00b8-1d72-4c94-bce7-b175e0b173af">
@@ -18,6 +19,7 @@
         <editAction>Settings</editAction>
         <categories>Content</categories>
       </moduleDefinition>
+      
       <moduleDefinition id="0E5D1826-045D-4F65-B753-F81563A01DD6">
         <friendlyName>Publish: Headlines</friendlyName>
         <extension>Publish</extension>
@@ -27,13 +29,17 @@
         <editAction>Settings</editAction>
         <categories>Content</categories>
       </moduleDefinition>
+      
       <file name="readme.txt" />
       <file name="license.txt" />
       <file name="viewer.css" />
       <file name="settings.css" />
+      <file name="_ViewImports.cshtml" />
+      
       <folder name="Bin">
         <file name="Nucleus.Modules.Publish.dll" />
       </folder>
+      
       <folder name="Views">
         <file name="Viewer.cshtml" />
         <file name="Settings.cshtml" />
@@ -41,12 +47,50 @@
         <file name="ViewArticle.cshtml" />
         <file name="HeadlinesSettings.cshtml" />
         <file name="HeadlinesViewer.cshtml" />
+        
         <folder name="ViewerLayouts">
+          <folder name="FrontPage">
+            <folder name="ArticleLayouts">
+              <file name="Item-Featured.cshtml" />
+              <file name="Item-Normal.cshtml" />
+            </folder>
+            <folder name="MasterLayouts">
+              <file name="Index.cshtml" />
+            </folder>
+          </folder>
+          
+          <folder name="Table">
+            <folder name="MasterLayouts">
+              <file name="Table.cshtml" />
+            </folder>
+          </folder>
+          
+          <folder name="Tile">
+            <folder name="ArticleLayouts">
+              <file name="Normal.cshtml" />
+            </folder>
+            
+            <folder name="MasterLayouts">
+              <file name="Tile-1-Column.cshtml" />
+              <file name="Tile-2-Column.cshtml" />
+            </folder>
+          </folder>
+          
           <file name="Table.cshtml" />
           <file name="Tile-1-Column.cshtml" />
           <file name="Tile-2-Column.cshtml" />
         </folder>
       </folder>
+
+      <cleanup>
+        <folder name="Views">
+          <folder name="ViewerLayouts">
+            <file name="Table.cshtml" />
+            <file name="Tile-1-Column.cshtml" />
+            <file name="Tile-2-Column.cshtml" />
+          </folder>
+        </folder>
+      </cleanup>
     </component>
   </components>
 </package>

@@ -201,7 +201,11 @@ namespace Nucleus.Modules.Publish
 						{
 							article.ImageFile = await this.FileSystemManager.GetFile(site, article.ImageFile.Id);
 						}
-					}
+            //article.PublishDate = System.TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(article.PublishDate.HasValue ? article.PublishDate : article.DateAdded), DateTimeKind.Utc), this.HttpContext.Request.GetUserTimeZone())
+            //this.EffectiveDate = System.TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(effectiveDateUtc.Value, DateTimeKind.Utc), userTimeZoneInfo);
+
+
+          }
 					catch (System.IO.FileNotFoundException)
 					{
 

@@ -8,24 +8,25 @@ using Nucleus.Extensions;
 
 namespace Nucleus.Modules.Publish.Models
 {
-  public class Settings
+  public class Settings 
   {
     private const string MODULESETTING_CATEGORYLIST_ID = "articles:categorylistid";
-    private const string MODULESETTING_LAYOUT = "articles:layout";
 
     public Guid CategoryListId { get; set; }
-    public string Layout { get; set; }
+    public LayoutOptions LayoutOptions { get; set; } = new();
+
 
     public void GetSettings(PageModule module)
     {
       this.CategoryListId = module.ModuleSettings.Get(MODULESETTING_CATEGORYLIST_ID, Guid.Empty);
-      this.Layout = module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table");
+      // layout settings
+      this.LayoutOptions.GetSettings(module);
     }
 
     public void SetSettings(PageModule module)
     {
       module.ModuleSettings.Set(MODULESETTING_CATEGORYLIST_ID, this.CategoryListId);
-      module.ModuleSettings.Set(MODULESETTING_LAYOUT, this.Layout);
+      this.LayoutOptions.SetSettings(module);
     }
   }
 }

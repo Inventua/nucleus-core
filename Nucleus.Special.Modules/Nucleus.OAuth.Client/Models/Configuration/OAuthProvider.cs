@@ -39,7 +39,7 @@ namespace Nucleus.OAuth.Client.Models.Configuration
 		/// </remarks
 		public string AuthenticateEndpoint(Microsoft.AspNetCore.Mvc.IUrlHelper urlHelper, string returnUrl)
 		{
-			string path = $"~/extensions/OAuthClient/Authenticate/{this.Name ?? this.Type}";
+			string path = $"~/extensions/OAuthClient/Authenticate/{System.Uri.EscapeDataString(this.Name) ?? this.Type}";
 
 			return $"{urlHelper.Content(path)}?returnUrl={returnUrl ?? urlHelper.Content("~/")}";
 		}

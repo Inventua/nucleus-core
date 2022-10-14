@@ -875,6 +875,7 @@ namespace Nucleus.Core.DataProviders
 				.Where(user => user.IsSystemAdministrator == false && user.SiteId == site.Id)
 				.Include(user => user.Roles)
 				.Include(user => user.Profile)
+					.ThenInclude(profilevalue => profilevalue.UserProfileProperty)
 				.OrderBy(user => user.UserName)
 				.AsSplitQuery()
 				.AsNoTracking()
@@ -1313,7 +1314,11 @@ namespace Nucleus.Core.DataProviders
 		{
 			return await this.Context.Users
 				.Where(user => user.Roles.Where(role => role.Id == roleId).Any())
+				.Include(user => user.Roles)
+				.Include(user => user.Profile)
+					.ThenInclude(value => value.UserProfileProperty)
 				.OrderBy(user => user.UserName)
+				.AsSplitQuery()
 				.AsNoTracking()
 				.ToListAsync();
 		}

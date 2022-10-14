@@ -81,14 +81,26 @@ namespace Nucleus.Web.Controllers.Admin
 
 			var exporter = new Nucleus.Extensions.ExcelWriter<User>
 			(
-				ExcelWriter.Modes.AutoDetect,
-				nameof(Nucleus.Abstractions.Models.User.SiteId),
-				nameof(Nucleus.Abstractions.Models.User.IsSystemAdministrator),
-				nameof(Nucleus.Abstractions.Models.User.Secrets),
-				nameof(Nucleus.Abstractions.Models.User.Profile),
-				nameof(Nucleus.Abstractions.Models.User.AddedBy),
-				nameof(Nucleus.Abstractions.Models.User.ChangedBy)
+				ExcelWriter.Modes.IncludeSpecifiedPropertiesOnly
 			);
+
+			exporter.AddColumn(user => user.Id);
+			exporter.AddColumn(user => user.UserName);
+			exporter.AddColumn(user => user.Approved);
+			exporter.AddColumn(user => user.Verified);
+			exporter.AddColumn(user => user.Roles);
+
+			foreach (UserProfileProperty profileProperty in this.Context.Site.UserProfileProperties)
+			{
+				exporter.AddColumn(profileProperty.Name, profileProperty.Name, ClosedXML.Excel.XLDataType.Text, 
+					user => user.Profile
+						.Where(profile => profile.UserProfileProperty.Id == profileProperty.Id)
+						.Select(profileValue => profileValue.Value)
+						.FirstOrDefault());
+			}
+
+			exporter.AddColumn(user => user.DateAdded);
+			exporter.AddColumn(user => user.DateChanged);
 
 			exporter.Worksheet.Name = "Users";
 			exporter.Export(users);

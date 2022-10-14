@@ -12,6 +12,7 @@ using Nucleus.Abstractions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Nucleus.Extensions;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -182,6 +183,45 @@ namespace Nucleus.Web.Controllers.Admin
 			exporter.Export(roles);
 
 			return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Roles Export {DateTime.Now}.xlsx");
+		}
+
+		/// <summary>
+		/// Export all roles to excel.
+		/// </summary>
+		/// <returns></returns>
+		[HttpGet]
+		public async Task<ActionResult> ExportRoleUsers(Guid id)
+		{
+			Role role = await this.RoleManager.Get(id);
+			IList<User> users = await this.UserManager.ListUsersInRole(role);
+
+			var exporter = new Nucleus.Extensions.ExcelWriter<User>
+			(
+				ExcelWriter.Modes.IncludeSpecifiedPropertiesOnly
+			);
+
+			exporter.AddColumn(user => user.Id);
+			exporter.AddColumn(user => user.UserName);
+			exporter.AddColumn(user => user.Approved);
+			exporter.AddColumn(user => user.Verified);
+			exporter.AddColumn(user => user.Roles);
+			
+			foreach (UserProfileProperty profileProperty in this.Context.Site.UserProfileProperties)
+			{
+				exporter.AddColumn(profileProperty.Name, profileProperty.Name, ClosedXML.Excel.XLDataType.Text,
+					user => user.Profile
+						.Where(profile => profile.UserProfileProperty.Id == profileProperty.Id)
+						.Select(profileValue => profileValue.Value)
+						.FirstOrDefault());
+			}
+
+			exporter.AddColumn(user => user.DateAdded);
+			exporter.AddColumn(user => user.DateChanged);
+
+			exporter.Worksheet.Name = "Users";
+			exporter.Export(users);
+
+			return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Role {role.Name} Users Export {DateTime.Now}.xlsx");
 		}
 
 		private async Task<ViewModels.Admin.RoleIndex> BuildViewModel()

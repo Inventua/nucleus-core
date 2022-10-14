@@ -92,6 +92,9 @@
 		<TabPanel id="role-users">
 			@if (Model.Users?.Items?.Any() == true)
 			{
+				<div class="nucleus-form-tools">
+					<a href="@Url.AreaAction("ExportRoleUsers", "Roles", "Admin", new { id = Model.Role.Id} )" class="btn btn-secondary ms-auto" accesskey="X">Export Users</a>
+				</div>
 				<div class="nucleus-role-users">
 					@await Html.PartialAsync("_UsersList", Model)
 				</div>

@@ -169,6 +169,8 @@ namespace Nucleus.Web.Controllers.Admin
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> Save(ViewModels.Admin.PageEditor viewModel)
 		{
+			Boolean isNew = (viewModel.Page.Id == Guid.Empty);
+
 			if (!ControllerContext.ModelState.IsValid)
 			{
 				return BadRequest(ControllerContext.ModelState);
@@ -194,7 +196,7 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 			else
 			{
-				return View("Index", await BuildIndexViewModel(viewModel.Page.Id, false));
+				return View("Index", await BuildIndexViewModel(viewModel.Page.Id, isNew));
 			}
 		}
 

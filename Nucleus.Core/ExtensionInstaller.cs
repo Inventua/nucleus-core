@@ -13,6 +13,7 @@ using Nucleus.Abstractions.Managers;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
+using DocumentFormat.OpenXml.Office.CustomUI;
 
 namespace Nucleus.Core
 {

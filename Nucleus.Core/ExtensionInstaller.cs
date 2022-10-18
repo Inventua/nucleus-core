@@ -13,6 +13,7 @@ using Nucleus.Abstractions.Managers;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
+using DocumentFormat.OpenXml.Office.CustomUI;
 
 namespace Nucleus.Core
 {
@@ -663,7 +664,17 @@ namespace Nucleus.Core
 		/// <returns></returns>
 		private Boolean DeleteFolder(string componentFolder, Abstractions.Models.Extensions.folder folder)
 		{
-			foreach (Abstractions.Models.Extensions.file file in folder.Items)
+			// delete specified sub-folders
+			foreach (Abstractions.Models.Extensions.folder subFolder in folder.Items.Where(item => item is Abstractions.Models.Extensions.folder))
+			{
+				if (!DeleteFolder(componentFolder, subFolder))
+				{
+					return false;
+				}
+			}
+
+			// delete specified files
+			foreach (Abstractions.Models.Extensions.file file in folder.Items.Where(item => item is Abstractions.Models.Extensions.file))
 			{
 				if (!DeleteFile(componentFolder, file, folder))
 				{
@@ -671,10 +682,10 @@ namespace Nucleus.Core
 				}
 			}
 
-			// remove directory if it is empty
+			// remove directory (folder) if it is empty after deleting specified sub-folders and files
 			if (System.IO.Directory.Exists(BuildExtensionFilePath(componentFolder, folder.name)))
 			{
-				if (System.IO.Directory.EnumerateFileSystemEntries(BuildExtensionFilePath(componentFolder, folder.name)).Any())
+				if (!System.IO.Directory.EnumerateFileSystemEntries(BuildExtensionFilePath(componentFolder, folder.name)).Any())
 				{
 					System.IO.Directory.Delete(BuildExtensionFilePath(componentFolder, folder.name));
 				}

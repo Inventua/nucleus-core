@@ -81,3 +81,9 @@
 {
 	color: white;
 }
+
+.style-scrollable
+{
+	height: 100%;
+	overflow: auto;
+}

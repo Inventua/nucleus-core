@@ -11,24 +11,6 @@
 	flex-direction: column;	
 }
 
-/*.BannerPane .Breadcrumbs
-{
-	margin-left: 4px;
-	vertical-align: middle;
-}*/
-
-/*.nucleus-account-control.justify-content-end .dropdown-menu
-{
-	left: initial;
-	right: 0;
-	margin: auto;
-}*/
-
-/*.nucleus-account-control > *
-{
-	flex-grow: 0;
-}*/
-
 .LeftPane
 {
 	width: 200px;
@@ -69,4 +51,10 @@
 .BottomPane *
 {
 	color: white;
+}
+
+.style-scrollable
+{
+	height: 100%;
+	overflow: auto;
 }

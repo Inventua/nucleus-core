@@ -1714,6 +1714,7 @@ namespace Nucleus.Core.DataProviders
 		{
 			return await this.Context.ContainerDefinitions
 				.AsNoTracking()
+				.OrderBy(container => container.FriendlyName)
 				.ToListAsync();
 		}
 

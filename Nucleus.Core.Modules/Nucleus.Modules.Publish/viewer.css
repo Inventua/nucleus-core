@@ -47,16 +47,20 @@
 .Articles.tile-1-column, .Articles.tile-2-column
 {
 	display: grid;
-	grid-auto-rows: 1fr;
 	gap: 0.5rem;
 }
 
-.Articles.tile-1-column, .Articles.Secondary
+.Articles.tile-1-column.tile-fill-height, .Articles.tile-2-column.tile-fill-height
+{
+	grid-auto-rows: 1fr;
+}
+
+.Articles.tile-1-column
 {
 	grid-template-columns: repeat(1, 1fr);
 }
 
-.Articles.tile-2-column, .Articles.Primary
+.Articles.tile-2-column
 {
 	grid-template-columns: repeat(2, 1fr);
 }
@@ -80,9 +84,4 @@
 	max-width: 100%;
 }
 
-.Articles .Article .nucleus-button-row
-{
-	display: flex;
-	justify-content: flex-end;
-	margin-top: auto;
-}
+

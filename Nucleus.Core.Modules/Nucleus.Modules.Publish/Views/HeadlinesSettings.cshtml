@@ -17,77 +17,106 @@
 			<fieldset role="group" aria-label="Settings">
 				<div class="nucleus-flex-fields">
 					<SettingsControl caption="Linked Module" helptext="Select the published module instance that this module reads data from.">
-						@Html.DropDownListFor(model => model.LinkedModuleId, new SelectList(Model.ModuleInstances, "ModuleId", "Caption"), "(not selected)")
+						@Html.DropDownListFor(model => model.LinkedModuleId, new SelectList(Model.ModuleInstances, "ModuleId", "Caption"), "(not selected)", new { data_autopostbackevent = "change" })
 					</SettingsControl>
 				</div>
 
 				<h3>Filters</h3>
 				<div class="">
 					<h4>Categories</h4>
-					<div class="headlines-categories d-grid border border-1 border-dark p-2">					
-						@for (var categoryCount = 0; categoryCount < Model.Categories.Count; categoryCount++)
+					@if (!Model.Categories.Any())
+					{
+						<div class="alert alert-info">
+						@if (Model.LinkedModuleId == Guid.Empty)
 						{
-							<label>
-								@Html.CheckBoxFor(model => model.Categories[categoryCount].IsSelected)
-								@Html.HiddenFor(model => model.Categories[categoryCount].Category.Id)
-								@Html.HiddenFor(model => model.Categories[categoryCount].Category.Name)
-								<span class="d-inline-block">@Model.Categories[categoryCount].Category.Name</span>
-							</label>
+							<text>The linked module must be selected before you can choose categories.</text>
 						}
-					</div>
+						else
+						{
+							<text>The linked publish module does not have a categories list selected.</text>
+						}
+						</div>
+					}
+
+					else
+					{
+						<div class="headlines-categories d-grid border border-1 border-dark p-2">
+							@for (var categoryCount = 0; categoryCount < Model.Categories.Count; categoryCount++)
+							{
+								<label>
+									@Html.CheckBoxFor(model => model.Categories[categoryCount].IsSelected)
+									@Html.HiddenFor(model => model.Categories[categoryCount].Category.Id)
+									@Html.HiddenFor(model => model.Categories[categoryCount].Category.Name)
+									<span class="d-inline-block">@Model.Categories[categoryCount].Category.Name</span>
+								</label>
+							}
+						</div>
+					}
 				</div>
 
 				<div class="nucleus-flex-fields mt-2">
-					<SettingsControl caption="Page Size" helptext="Maximum number of articles shown on list on a page.">
-						@Html.TextBoxFor(model => model.FilterOptions.PageSize, new SelectList(Model.FilterOptions.PageSizes))
+					<SettingsControl caption="Page Size" helptext="Specifies the maximum number of articles shown per page. Specify '0' for no limit.">
+						@Html.TextBoxFor(model => model.FilterOptions.PageSize)
 					</SettingsControl>
 
 					<SettingsControl caption="Published Date Range" helptext="Article published date range.">
 						@Html.DropDownListFor(model => model.FilterOptions.PublishedDateRange, Html.GetEnumSelectList<Nucleus.Modules.Publish.Models.PublishedDateRanges>())
 					</SettingsControl>
 
-					<SettingsControl caption="Sort By" helptext="Sorting order of articles." >
+					<SettingsControl caption="Sort By" helptext="Sort order of articles.">
 						@Html.DropDownListFor(model => model.FilterOptions.SortOrder, Html.GetEnumSelectList<Nucleus.Modules.Publish.Models.SortOrders>())
 					</SettingsControl>
 				</div>
 
 				<div class="nucleus-flex-fields mt-2">
-					<SettingsControl caption="Show Featured Only?" helptext="Featured articles are shown at the top of the list." rendermode="LabelLast" class="inner-inline">
+					<SettingsControl caption="Show Featured Only?" helptext="Specifies whether to limit displayed articles to those marked as 'Featured' only." rendermode="LabelLast" class="inner-inline align-self-end">
 						@Html.CheckBoxFor(model => model.FilterOptions.FeaturedOnly, new { @data_autopostbackevent = "change", @class = "ToggleSwitch" })
 					</SettingsControl>
-					
-					<SettingsControl caption="Show Paging Controls?" helptext="Display paging controls for end users." rendermode="LabelLast" class="inner-inline">
+
+					<SettingsControl caption="Show Paging Controls?" helptext="Display paging controls for end users." rendermode="LabelLast" class="inner-inline align-self-end">
 						@Html.CheckBoxFor(model => model.ShowPagingControl, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+
+					<SettingsControl caption="Paging Control Render Mode" helptext="Mode for paging control.  Compact mode is useful for smaller spaces.">
+						@Html.DropDownListFor(model => model.PagingControlRenderMode, Html.GetEnumSelectList<Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes>(), new { @class = "ToggleSwitch" })
 					</SettingsControl>
 				</div>
 			</fieldset>
 		</TabPanel>
-	
+
 		<TabPanel id="headlines-layouts">
 			<div class="alert alert-primary">
 				<p>
-					The master layout typically contains elements which wrap the article layouts.  When a viewer layout has a master, primary article and secondary article layouts, the 
-					primary article layout normally displays article summary information more prominently than the secondary article layout.
+					When a viewer layout has a master, primary article and secondary article layouts, the	primary article layout normally displays article information 
+					more prominently than the secondary article layout.					
 				</p>
 				<p>
-					Some viewer layouts may only have a master layout. Other layouts may have a master layout and a primary layout but no secondary layout.
+					The master layout typically contains elements which wrap the article layouts.  Some viewer layouts may only have a master layout. Other layouts 
+					may have a master layout and a primary layout but no secondary layout.
 				</p>
 			</div>
 			<div>
-				<SettingsControl caption="Viewer Layout" helptext="Viewer layout.">
+				<SettingsControl caption="Viewer Layout" helptext="Selected viewer layout.">
 					@Html.DropDownListFor(model => model.LayoutOptions.ViewerLayout, new SelectList(Model.LayoutOptions.ViewerLayouts), new { @data_autopostbackevent = "change" })
 				</SettingsControl>
-				<SettingsControl caption="Master Layout" helptext="Master layout.">
+				<SettingsControl caption="Master Layout" helptext="Selected master layout.">
 					@Html.DropDownListFor(model => model.LayoutOptions.MasterLayout, new SelectList(Model.LayoutOptions.MasterLayouts))
 				</SettingsControl>
 			</div>
 			<div class="article-layouts d-grid mt-2">
 				<div>
-
 					<h3>Primary</h3>
-					<SettingsControl caption="Article Layout" helptext="Select an article layout.">
-						@*@Html.DropDownListFor(model => model.LayoutOptions.PrimaryArticleLayout, new SelectList(Model.LayoutOptions.ArticleLayouts), "(none)")*@
-						@Html.DropDownListFor(model => model.LayoutOptions.PrimaryArticleLayout, new SelectList(Model.LayoutOptions.ArticleLayouts), "(none)", Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any()))
+					<SettingsControl caption="Article Layout" helptext="Selected article layout.">
+						@if (Model.LayoutOptions.ArticleLayouts.Any())
+						{
+							@Html.DropDownListFor(model => model.LayoutOptions.PrimaryArticleLayout, new SelectList(Model.LayoutOptions.ArticleLayouts), "(none)", Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any()))
+						}
+						else
+						{
+							<div class="alert alert-info">
+								The '@Model.LayoutOptions.ViewerLayout' viewer layout doesn't have any article layouts.
+							</div>
+						}
 					</SettingsControl>
 					<SettingsControl caption="Article Count" helptext="Number of articles to show.">
 						@Html.TextBoxFor(model => model.LayoutOptions.PrimaryArticleCount, Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any(), new { @type = "number", @min = "0" }))
@@ -99,14 +128,20 @@
 				<div>
 					<h3>Secondary</h3>
 					<SettingsControl caption="Article Layout" helptext="Select an article layout.">
-						@Html.DropDownListFor(model => model.LayoutOptions.SecondaryArticleLayout, new SelectList(Model.LayoutOptions.ArticleLayouts), "(none)", Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any()))
+						@if (Model.LayoutOptions.ArticleLayouts.Any())
+						{
+							@Html.DropDownListFor(model => model.LayoutOptions.SecondaryArticleLayout, new SelectList(Model.LayoutOptions.ArticleLayouts), "(none)", Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any()))
+						}
+						else
+						{
+							<div class="alert alert-info">
+								The '@Model.LayoutOptions.ViewerLayout' viewer layout doesn't have any article layouts.
+							</div>
+						}
 					</SettingsControl>
 					<SettingsControl caption="Article Count" helptext="Number of articles to show.">
 						@Html.TextBoxFor(model => model.LayoutOptions.SecondaryArticleCount, Html.ControlDisabled(!Model.LayoutOptions.ArticleLayouts.Any(), new { @type = "number", @min = "0" }))
 					</SettingsControl>
-					@*<SettingsControl caption="Show Featured Only?" helptext="Secondary featured articles." rendermode="LabelLast" class="inner-inline">
-						@Html.CheckBoxFor(model => model.Layouts.SecondaryFeaturedOnly, new { @class = "ToggleSwitch" })
-					</SettingsControl>*@
 				</div>
 			</div>
 		</TabPanel>

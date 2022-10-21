@@ -129,8 +129,8 @@
 									@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Provider)
 									@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Path)
 									@Html.HiddenFor(attachment => Model.Article.Attachments[attachmentCount].File.Name)
-									<a href="@Url.FileLink(Model.Article.Attachments[attachmentCount].File)" alt="@Model.Article.Attachments[attachmentCount].File.Name" target="_blank">
-										@Model.Article.Attachments[attachmentCount].File.Name
+									<a href="@Url.FileLink(Model.Article.Attachments[attachmentCount].File)" alt="@Model.Article.Attachments[attachmentCount].File?.Name" target="_blank">
+										@(Model.Article.Attachments[attachmentCount].File?.Name ?? "Missing or Deleted File")
 									</a>
 								</td>
 								<td class="nucleus-small-cell">

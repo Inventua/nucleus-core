@@ -4,15 +4,15 @@
 {
 	<div class="alert alert-primary" role="alert">No articles shown. Please check the settings of the primary/secondary article layouts.</div>
 }
-else 
+else
 {
-	<div class="Articles Primary tile-1-column">
+	<div class="Articles Primary tile-2-column tile-fill-height">
 		@foreach (var article in Model.PrimaryArticles)
 		{
 			@await Html.PartialAsync(Model.PrimaryArticleLayoutPath, new Nucleus.Modules.Publish.ViewModels.ViewArticle() { Context = Model.Context, Article = article })
 		}
 	</div>
-	<div class="Articles Secondary tile-1-column">
+	<div class="Articles Secondary tile-2-column">
 		@foreach (var article in Model.SecondaryArticles)
 		{
 			@await Html.PartialAsync(Model.SecondaryArticleLayoutPath, new Nucleus.Modules.Publish.ViewModels.ViewArticle() { Context = Model.Context, Article = article })

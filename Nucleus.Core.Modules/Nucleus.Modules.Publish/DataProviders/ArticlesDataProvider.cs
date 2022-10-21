@@ -11,6 +11,7 @@ using Nucleus.Modules.Publish.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using Nucleus.ViewFeatures.Controls;
 
 namespace Nucleus.Modules.Publish.DataProviders
 {
@@ -132,9 +133,13 @@ namespace Nucleus.Modules.Publish.DataProviders
 					article => EF.Property<Guid>(article, "ModuleId") == pageModule.Id &&
 					article.Enabled &&
 					(article.PublishDate == null || article.PublishDate.Value <= DateTime.UtcNow) &&
-					(article.ExpireDate == null || article.ExpireDate.Value >= DateTime.UtcNow) &&
-					article.Categories.Where(category => filters.Categories.Select(item => item.Id).Contains(category.CategoryListItem.Id)).Any()
+					(article.ExpireDate == null || article.ExpireDate.Value >= DateTime.UtcNow) 
 				);
+
+			if (filters.Categories.Any())
+			{
+				query = query.Where(article => article.Categories.Where(category => filters.Categories.Select(item => item.Id).Contains(category.CategoryListItem.Id)).Any());
+			}
 
 			if (filters.FeaturedOnly)
 			{
@@ -164,7 +169,7 @@ namespace Nucleus.Modules.Publish.DataProviders
 				query = query.Take(filters.PageSize);
       }
 
-			results.TotalCount = query.Count();
+			results.TotalCount = await query.CountAsync();
 
 			results.Items = await query
 				//.OrderByDescending(article => article.Featured)

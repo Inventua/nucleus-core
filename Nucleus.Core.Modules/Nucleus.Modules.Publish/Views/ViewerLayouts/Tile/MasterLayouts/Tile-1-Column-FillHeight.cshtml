@@ -6,7 +6,7 @@
 }
 else 
 {
-	<div class="Articles Primary tile-1-column">
+	<div class="Articles Primary tile-1-column tile-fill-height">
 		@foreach (var article in Model.PrimaryArticles)
 		{
 			@await Html.PartialAsync(Model.PrimaryArticleLayoutPath, new Nucleus.Modules.Publish.ViewModels.ViewArticle() { Context = Model.Context, Article = article })

@@ -61,8 +61,19 @@ namespace Nucleus.Modules.Publish.Controllers
         Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings = viewModel.Articles == null ? new() : viewModel.Articles;
 
         PageModule linkedModule = await this.PageModuleManager.Get(viewModel.HeadlineSettings.LinkedModuleId);
-                
-        viewModel.Articles =  await this.ArticlesManager.List(this.Context.Site, linkedModule, pagingSettings, await this.HeadlinesManager.GetFilterOptions(this.Context.Module));
+
+        FilterOptions options = await this.HeadlinesManager.GetFilterOptions(this.Context.Module);
+
+				// check to make sure category list hasn't been un-selected
+				ViewModels.Settings publishSettings = new();
+				publishSettings.GetSettings(linkedModule);
+
+				if (publishSettings.CategoryListId == Guid.Empty)
+        {
+          options.Categories.Clear();
+				}
+
+				viewModel.Articles =  await this.ArticlesManager.List(this.Context.Site, linkedModule, pagingSettings, options);
 
         viewModel.PrimaryArticles = Enumerable.Empty<Article>();
         viewModel.SecondaryArticles = Enumerable.Empty<Article>();

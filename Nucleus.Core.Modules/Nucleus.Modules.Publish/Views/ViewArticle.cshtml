@@ -55,11 +55,14 @@
 		<div class="attachments">
 			@for (var attachmentCount = 0; attachmentCount < Model.Article.Attachments.Count; attachmentCount++)
 			{
-				<span>
-					<a href="@Url.FileLink(Model.Article.Attachments[attachmentCount].File)" alt="@Model.Article.Attachments[attachmentCount].File.Name">
-						@Model.Article.Attachments[attachmentCount].File.Name
-					</a>
-				</span>
+				@if (@Model.Article.Attachments[attachmentCount].File?.Name != null)
+				{
+					<span>
+						<a href="@Url.FileLink(Model.Article.Attachments[attachmentCount].File)" alt="@Model.Article.Attachments[attachmentCount].File?.Name">
+							@Model.Article.Attachments[attachmentCount].File?.Name
+						</a>
+					</span>
+				}
 			}
 		</div>
 	}

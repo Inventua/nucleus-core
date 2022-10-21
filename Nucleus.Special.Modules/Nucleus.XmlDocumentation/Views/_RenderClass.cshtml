@@ -56,17 +56,17 @@
 	@if (Model.Content.Examples?.Any() == true)
 	{
 		<div class="api-examples">
-			<h3>Examples</h3>
+			<h3>@(Model.Content.Examples.Count() == 1 ? "Example" : "Examples")</h3>
 			@foreach (var example in Model.Content.Examples)
 			{
-				<code>@example.FilterXMLWhiteSpace()</code>
+				<pre><code>@example.FilterXMLWhiteSpace()</code></pre>
 			}
 		</div>
 	}
 
 	@if (Model.Content.Constructors?.Any() == true)
 	{
-		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = "Constructors", CssClass = "api-constructors", Members = Model.Content.Constructors })
+			@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = Model.Content.Constructors.Count() == 1 ? "Constructor" : "Constructors", CssClass = "api-constructors", Members = Model.Content.Constructors })
 	}
 
 	@if (Model.Content.Properties.Any() == true)

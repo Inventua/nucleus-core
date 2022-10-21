@@ -115,8 +115,7 @@
 
 .XmlDocumentation .api-content code
 {
-	background-color: #D8D8D8;
-	border: solid 1px #ccc;
+	background-color: #F0F0F0;	
 }
 
 .XmlDocumentation .api-content pre.code
@@ -128,8 +127,7 @@
 {
 	padding: 1.2em;
 	white-space: pre-wrap;
-	display: block;
-	margin-bottom: 1rem;
+	display: block;	
 }
 
 .XmlDocumentation .api-parameters table tr td:first-child, .XmlDocumentation .api-typeparameters table tr td:first-child

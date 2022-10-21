@@ -8,8 +8,12 @@ using Nucleus.Abstractions.EventHandlers;
 namespace Nucleus.Data.Common
 {
 	/// <summary>
-	/// Type representing a migration script operation (event).  This class has no methods or properties, it is used as a key for the <see cref="ISystemEventHandler&lt;TModel, TEvent&gt;"/> class.
+	/// Type representing a migration script operation (event).  This class has no methods or properties, it is used as a key for the <see cref="ISystemEventHandler{TModel, TEvent}"/> class.
 	/// </summary>
+	/// <remarks>
+	/// Nucleus Extensions may subscribe to migration event in order to prime the database with required data, or for any other actions which need to happen after a new installation or upgrade.
+	/// </remarks>
+	/// <seealso href="https://www.nucleus-cms.com/developers/event-handlers/">Event Handlers</seealso>
 	public class MigrateEvent { }
 
 	/// <summary>

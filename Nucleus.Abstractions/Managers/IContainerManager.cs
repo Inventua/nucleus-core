@@ -15,7 +15,7 @@ namespace Nucleus.Abstractions.Managers
 	public interface IContainerManager
 	{
 		/// <summary>
-		/// List all available containers.
+		/// List all available containers, sorted by <see cref="Models.ContainerDefinition.FriendlyName"/>.
 		/// </summary>
 		/// <returns></returns>
 		public Task<List<Nucleus.Abstractions.Models.ContainerDefinition>> List();

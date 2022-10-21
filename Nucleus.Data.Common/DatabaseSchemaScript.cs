@@ -9,6 +9,7 @@ namespace Nucleus.Data.Common
 	/// <summary>
 	/// The DatabaseSchemaScript class represents database upgrade script meta-data and content.
 	/// </summary>
+	/// <internal/>
 	public class DatabaseSchemaScript
 	{
 		/// <summary>

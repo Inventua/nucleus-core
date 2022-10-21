@@ -34,10 +34,14 @@ namespace Nucleus.Data.Common
 		}
 
 		/// <summary>
-		/// Create a new instance of the specified data provider interface
+		/// Create a new instance of the specified data provider interface, after checking whether migration scripts need to be applied.
 		/// </summary>
 		/// <typeparam name="TDataProvider"></typeparam>
 		/// <returns>A data provider instance of the specified type.</returns>
+		/// <remarks>
+		/// If migration scripts exist which have not been applied, scripts are automatically executed before returning the data provider object.  Migration 
+		/// script checks are not run again until after a restart. 
+		/// </remarks>
 		public TDataProvider CreateProvider<TDataProvider>()
 		{
 			TDataProvider provider = (TDataProvider)this.RequestServices.GetService<TDataProvider>();
@@ -94,7 +98,6 @@ namespace Nucleus.Data.Common
 					}
 				}
 			}
-
 
 			return provider;
 		}

@@ -12,7 +12,8 @@ using System.Text.RegularExpressions;
 namespace Nucleus.Data.EntityFramework
 {
 	/// <summary>
-	/// Database-specific EF implementations implement this interface in order to configure their EF DbContext.
+	/// Database providers which use Entity Framework implement this interface in order to configure their Entity Framework DbContext using  
+	/// Nucleus configuration data.
 	/// </summary>
 	/// <typeparam name="TDataProvider"></typeparam>
 	/// <remarks>
@@ -60,8 +61,11 @@ namespace Nucleus.Data.EntityFramework
 		/// Perform (or retry) pre-configuration checks.
 		/// </summary>
 		/// <returns></returns>
+		/// <remarks>
+		/// Implementation of this method is optional, database providers often don't need to execute any checks.  An example of a pre-configuration 
+		/// check is the SQLite database provider, which checks that the folder which will store the database exists, and creates it if it does not.
+		/// </remarks>
 		public virtual Boolean PreConfigure() { return true; }
-
 
 		/// <summary>
 		/// Gets the database connection option for this DbContextConfigurator.
@@ -69,7 +73,7 @@ namespace Nucleus.Data.EntityFramework
 		public Nucleus.Abstractions.Models.Configuration.DatabaseConnectionOption DatabaseConnectionOption { get; protected set; }
 
 		/// <summary>
-		/// Parse a database exception and if recognized, throw an exception with a friendly message.
+		/// Parse a database exception and if recognized, throw an exception with a more friendly message.
 		/// </summary>
 		public abstract void ParseException(DbUpdateException exception);
 
@@ -118,7 +122,7 @@ namespace Nucleus.Data.EntityFramework
 			}
 		}
 
-		private string ConstraintMessage(string name)
+		private static string ConstraintMessage(string name)
 		{
 			switch (name)
 			{
@@ -199,28 +203,12 @@ namespace Nucleus.Data.EntityFramework
 
 					if (group != null)
 					{
-						//if (match.Groups[1].Value == "constraint")
-						//{
-						//	if (ConstraintMessages.ContainsKey(group.Value))
-						//	{
-						//		return ConstraintMessages[group.Value];
-						//	}
-						//	else
-						//	{
-						//		return "missing: " + group.Value;
-						//	}
-						//}
-						//else
-						//{
 						return group.Value;
-						//}
 					}
 				}
 
 				return "";
 			}
-
 		}
-
 	}
 }

@@ -11,21 +11,19 @@ using Nucleus.Abstractions.Models.Configuration;
 namespace Nucleus.Data.Common
 {
 	/// <summary>
-	/// Common data provider registration extensions.
+	/// Common data provider dependency injection registration extension methods.
 	/// </summary>
 	public static class DataProviderExtensions
 	{
 		/// <summary>
-		/// Add data provider objects to the service collection for the data provider specified by TDataProvider if configuration 
-		/// contains an entry specifying that the data provider uses SqlServer.  This overload uses the default schema name for the data provider type.
+		/// Add data provider objects to the service collection for the data provider specified by TDataProvider.  This overload uses the default 
+		/// schema name for the data provider type.
 		/// </summary>
 		/// <typeparam name="TDataProvider"></typeparam>
 		/// <param name="services"></param>
 		/// <param name="configuration"></param>
 		/// <returns></returns>
 		/// <remarks>
-		/// The logic to check whether a specific database provider is the right one to use for the specified <typeparamref name="TDataProvider"/> 
-		/// is implemented within each <see cref="IDatabaseProvider"/> implementation.
 		/// Data providers which are based on Nucleus.Data.EntityFramework do not need to call this directly - it is called by the
 		/// Nucleus.Data.EntityFramework.DataProviderExtensions.AddDataProvider() methods.
 		/// </remarks>
@@ -37,9 +35,8 @@ namespace Nucleus.Data.Common
 		}
 
 		/// <summary>
-		/// Add data provider objects to the service collection for the data provider specified by TDataProvider if configuration 
-		/// contains an entry specifying that the data provider uses SqlServer.  This overload allows callers to specify their schema name instead 
-		/// if using the default.
+		/// Add data provider objects to the service collection for the data provider specified by TDataProvider.  This overload allows callers 
+		/// to specify their schema name instead of using the default.
 		/// </summary>
 		/// <typeparam name="TDataProvider"></typeparam>
 		/// <param name="services"></param>
@@ -47,8 +44,6 @@ namespace Nucleus.Data.Common
 		/// <param name="schemaName"></param>
 		/// <returns></returns>
 		/// <remarks>
-		/// The logic to check whether a specific database provider is the right one to use for the specified <typeparamref name="TDataProvider"/> 
-		/// is implemented within each <see cref="IDatabaseProvider"/> implementation.
 		/// Data providers which are based on Nucleus.Data.EntityFramework do not need to call this directly - it is called by the
 		/// Nucleus.Data.EntityFramework.DataProviderExtensions.AddDataProvider() methods.
 		/// </remarks>
@@ -74,7 +69,7 @@ namespace Nucleus.Data.Common
 				IDatabaseProvider instance = Activator.CreateInstance(implementation) as IDatabaseProvider;
 				if (instance != null)
 				{
-					// Get connection for the specified schema name.  If it is found, add Sqlite data provider objects to the services collection.
+					// Get connection data for the specified schema name.  If it is found, add data provider objects to the services collection.
 					DatabaseConnectionOption connectionOption = options.GetDatabaseConnection(schemaName);
 
 					if (connectionOption != null && connectionOption.Type.Equals(instance.TypeKey(), StringComparison.OrdinalIgnoreCase))
@@ -148,7 +143,7 @@ namespace Nucleus.Data.Common
 			}
 			catch (System.Reflection.ReflectionTypeLoadException)
 			{
-				return new Type[] { };
+				return Array.Empty<Type>();
 			}
 		}
 

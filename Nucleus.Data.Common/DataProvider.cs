@@ -13,16 +13,16 @@ namespace Nucleus.Data.Common
 	/// Base class used by database providers.
 	/// </summary>
 	/// <remarks>
-	/// Nucleus data provider classes inherit this class.  Modules generally inherit Nucleus.Data.EntityFramework.DataProvider instead.
+	/// Nucleus database provider classes inherit this class.  Modules generally inherit Nucleus.Data.EntityFramework.DataProvider instead.
 	/// </remarks>
 	public abstract class DataProvider : IDisposable
 	{
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		public DataProvider()
-		{
-		}
+		///// <summary>
+		///// Initializes a new instance of the DataProvider class.
+		///// </summary>
+		//public DataProvider()
+		//{
+		//}
 
 		/// <summary>
 		/// Check the database connection.  
@@ -59,7 +59,7 @@ namespace Nucleus.Data.Common
 		/// </summary>
 		public virtual void Dispose()
 		{
-
+			GC.SuppressFinalize(this);
 		}
 	}
 

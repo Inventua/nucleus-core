@@ -21,6 +21,9 @@ namespace Nucleus.Abstractions.Managers
 		/// <summary>
 		/// Retrieve an existing <see cref="Folder"/> from the database.
 		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="providerName"></param>
+		/// <param name="path"></param>
 		/// <returns></returns>
 		public Task<Folder> GetFolder(Site site, string providerName, string path);
 
@@ -28,18 +31,25 @@ namespace Nucleus.Abstractions.Managers
 		/// Retrieve an existing <see cref="Folder"/> from the database.
 		/// </summary>
 		/// <returns></returns>
+		/// <param name="site"></param>
+		/// <param name="id"></param>
 		public Task<Folder> GetFolder(Site site, Guid id);
 
 		/// <summary>
 		/// Retrieve an existing <see cref="File"/> from the database.
 		/// </summary>
 		/// <returns></returns>
+		/// <param name="site"></param>
+		/// <param name="id"></param>
 		public Task<File> GetFile(Site site, Guid id);
 
 		/// <summary>
 		/// Retrieve an existing <see cref="File"/> from the database, or create a new record if none exists.
 		/// </summary>
 		/// <returns></returns>
+		/// <param name="site"></param>
+		/// <param name="providerName"></param>
+		/// <param name="path"></param>
 		public Task<File> GetFile(Site site, string providerName, string path);
 
 		/// <summary>
@@ -69,29 +79,29 @@ namespace Nucleus.Abstractions.Managers
 		/// <summary>
 		/// Save <see cref="Folder"/> data to the database.
 		/// </summary>
-		/// <param name="folder"></param>
 		/// <param name="site"></param>
+		/// <param name="folder"></param>
 		public Task<Folder> SaveFolder(Site site, Folder folder);
 
 		/// <summary>
 		/// Save permissions for the specified <see cref="Folder"/>.
 		/// </summary>
-		/// <param name="folder"></param>
 		/// <param name="site"></param>
+		/// <param name="folder"></param>
 		/// <remarks>
 		/// A side-effect of saving folder permissions is that a database record is created for the folder, if one does not already exist.
 		/// </remarks>
 		public Task SaveFolderPermissions(Site site, Folder folder);
 
 		/// <summary>
-		/// List all permissions for the folder specified by folderId.
+		/// List all permissions for the specified folder.
 		/// </summary>
 		/// <param name="folder"></param>
 		/// <returns></returns>
 		public Task<List<Permission>> ListPermissions(Folder folder);
 
 		/// <summary>
-		/// Return a list of available permission types, sorted by SortOrder
+		/// Return a list of available permission types, sorted by <see cref="PermissionType.SortOrder"/>.
 		/// </summary>
 		/// <returns></returns>
 		public Task<List<PermissionType>> ListFolderPermissionTypes();
@@ -137,7 +147,7 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="pattern">Regular expression which is used to filter file names.</param>
 		/// <returns></returns>
 		/// <example>
-		/// ListFolder(this.Context.Site, folderId, "(.xml)");
+		/// ListFolder(this.Context.Site, folderId, "(.doc)|(.docx)");
 		/// </example>
 		public Task<Folder> ListFolder(Site site, Guid id, string pattern);
 
@@ -188,7 +198,7 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="file"></param>
 		/// <returns></returns>
 		/// <remarks>
-		/// Use this method to populate the properties of a file after model binding returns a file object with just the Id property populated.
+		/// Use this method to populate the properties of a file after MVC model binding returns a file object with just the Id property populated.
 		/// </remarks>
 		public Task<File> RefreshProperties(Site site, File file);
 	}

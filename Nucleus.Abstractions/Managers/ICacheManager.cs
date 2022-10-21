@@ -17,8 +17,19 @@ namespace Nucleus.Abstractions.Managers
 	/// Data cache manager.
 	/// </summary>
 	/// <remarks>
-	/// Refer to the <see href="https://www.nucleus-cms.com/developers/caching-data/">Caching Data</see> page for more information.
+	/// Get an instance of this class from dependency injection by including a parameter in your class constructor.
 	/// </remarks>
+	/// <example>
+	/// public class MyClass
+	/// {
+	///		private ICacheManager CacheManager { get; }
+	///		public MyClass(ICacheManager cacheManager, Context context)
+	///		{
+	///			this.CacheManager = cacheManager;
+	///		}
+	///	}
+	/// </example>
+	/// <seealso href="https://www.nucleus-cms.com/developers/caching-data/">Caching Data</seealso>
 	public interface ICacheManager
 	{
 		/// <summary>

@@ -37,7 +37,7 @@ namespace Nucleus.Data.Common
 		}
 
 		/// <summary>
-		/// Constructor which allows the caller to specify the source of schema files
+		/// Constructor which allows the caller to specify the source of schema files.
 		/// </summary>		
 		/// <param name="schemaName">
 		/// Database provider schema name that this class migrates database objects for.
@@ -110,7 +110,7 @@ namespace Nucleus.Data.Common
 		{
 			get
 			{
-				List<DatabaseSchemaScript> scripts = new List<DatabaseSchemaScript>();
+				List<DatabaseSchemaScript> scripts = new();
 
 				foreach (string schemaScriptsNamespace in this.SchemaScriptsNamespaces)
 				{

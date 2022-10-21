@@ -12,7 +12,7 @@ namespace Nucleus.Abstractions.Search
 	public class SearchResults
 	{
 		/// <summary>
-		/// A list of search results.
+		/// A list of <see cref="SearchResult"/>s.
 		/// </summary>
 		/// <remarks>
 		/// The results list contains results for the requested page.
@@ -23,7 +23,7 @@ namespace Nucleus.Abstractions.Search
 		/// Total number of results matching the search query.
 		/// </summary>
 		/// <remarks>
-		/// When a page of results is requested, the result contains the requested page only.  The total property specifies the total
+		/// When a page of results is requested, the result contains results for the requested page only.  The total property specifies the total
 		/// number of available results and is used by paging controls.
 		/// </remarks>
 		public long Total { get; set; }

@@ -8,11 +8,21 @@ using Nucleus.Abstractions.Models;
 namespace Nucleus.Abstractions.Managers
 {
 	/// <summary>
-	/// Provides functions to manage database data for <see cref="Nucleus.Abstractions.Models.ApiKey"/>s.
+	/// Defines the interface for the ApiKey Manager class, which rovides functions to manage database data for <see cref="Nucleus.Abstractions.Models.ApiKey"/>s.
 	/// </summary>
 	/// <remarks>
 	/// Get an instance of this class from dependency injection by including a parameter in your class constructor.
 	/// </remarks>
+	/// <example>
+	/// public class MyClass
+	/// {
+	///		private IApiKeyManager ApiKeyManager { get; }
+	///		public MyClass(IUserManager userManager, IApiKeyManager apiKeyManager, Context context)
+	///		{
+	///			this.ApiKeyManager = apiKeyManager;
+	///		}
+	///	}
+	/// </example>
 	public interface IApiKeyManager
 	{
 		/// <summary>
@@ -32,7 +42,7 @@ namespace Nucleus.Abstractions.Managers
 		public Task<ApiKey> Get(Guid id);
 
 		/// <summary>
-		/// List all <see cref="Nucleus.Abstractions.Models.List"/>s.
+		/// List all <see cref="Nucleus.Abstractions.Models.ApiKey"/>s.
 		/// </summary>
 		/// <returns></returns>
 		public Task<IEnumerable<ApiKey>> List();

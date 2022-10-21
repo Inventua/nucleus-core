@@ -67,6 +67,10 @@ namespace Nucleus.Abstractions.Search
 		/// <summary>
 		/// Specifies boost settings.
 		/// </summary>
+		/// <remarks>
+		/// Boost values can be altered in order to give specific fields a higher priority in search results.  Boost values are expressed as a double, with a 
+		/// base value of 1.0.  In general, values should be between 0.5 and 5.0.
+		/// </remarks>
 		public class BoostSettings
 		{
 			/// <summary>
@@ -77,17 +81,17 @@ namespace Nucleus.Abstractions.Search
 			/// <summary>
 			/// Summary boost.
 			/// </summary>
-			public Double Summary {get;set;} = 1.0;
+			public Double Summary { get; set;} = 1.0;
 
 			/// <summary>
 			/// Categories boost.
 			/// </summary>
-			public Double Categories {get;set;} = 1.0;
+			public Double Categories { get; set; } = 1.0;
 
 			/// <summary>
 			/// Keywords boost.
 			/// </summary>
-			public Double Keywords {get;set;} = 1.0;
+			public Double Keywords { get; set; } = 1.0;
 
 			/// <summary>
 			/// Content boost.
@@ -100,7 +104,7 @@ namespace Nucleus.Abstractions.Search
 			/// <remarks>
 			/// Attachment fields are extracted from the meta-data for a document.
 			/// </remarks>
-			public Double AttachmentAuthor {get;set;} = 1.0;
+			public Double AttachmentAuthor { get; set; } = 1.0;
 
 			/// <summary>
 			/// Attachment keywords boost.
@@ -108,7 +112,7 @@ namespace Nucleus.Abstractions.Search
 			/// <remarks>
 			/// Attachment fields are extracted from the meta-data for a document.
 			/// </remarks>
-			public Double AttachmentKeywords {get;set;} = 1.0;
+			public Double AttachmentKeywords { get; set; } = 1.0;
 
 			/// <summary>
 			/// Attachment name boost.
@@ -116,7 +120,7 @@ namespace Nucleus.Abstractions.Search
 			/// <remarks>
 			/// Attachment fields are extracted from the meta-data for a document.
 			/// </remarks>
-			public Double AttachmentName {get;set;} = 1.0;
+			public Double AttachmentName { get; set; } = 1.0;
 
 			/// <summary>
 			/// Attachment title boost.
@@ -124,7 +128,7 @@ namespace Nucleus.Abstractions.Search
 			/// <remarks>
 			/// Attachment fields are extracted from the meta-data for a document.
 			/// </remarks>
-			public Double AttachmentTitle {get;set;} = 1.0;
+			public Double AttachmentTitle { get; set; } = 1.0;
 			
 		}
 

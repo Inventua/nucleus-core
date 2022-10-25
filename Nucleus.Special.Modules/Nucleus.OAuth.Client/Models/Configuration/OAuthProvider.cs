@@ -39,9 +39,25 @@ namespace Nucleus.OAuth.Client.Models.Configuration
 		/// </remarks
 		public string AuthenticateEndpoint(Microsoft.AspNetCore.Mvc.IUrlHelper urlHelper, string returnUrl)
 		{
-			string path = $"~/extensions/OAuthClient/Authenticate/{System.Uri.EscapeDataString(this.Name) ?? this.Type}";
+			string path = $"~/extensions/OAuthClient/Authenticate/{System.Uri.EscapeDataString(SafeProviderName())}";
 
 			return $"{urlHelper.Content(path)}?returnUrl={returnUrl ?? urlHelper.Content("~/")}";
 		}
+
+		/// <summary>
+		/// Replace characters in the provider name so that it is safe for use in an Url
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		/// <remarks>
+		///  MVC does not url-decode "/" (%2F) in urls - https://github.com/dotnet/aspnetcore/issues/11544.  This issue was first
+		/// reported in .NET 3.1 and has been put on the backlog to be addressed in .NET 6,7 and has now been moved to .NET 8.
+		/// So we replace "/" with in urls.  This means that any comparison to the provider name must use this function.
+		///	</remarks>
+		public string SafeProviderName()
+		{
+			return (this.Name ?? this.Type).Replace("/", "-");
+		}
+
 	}
 }

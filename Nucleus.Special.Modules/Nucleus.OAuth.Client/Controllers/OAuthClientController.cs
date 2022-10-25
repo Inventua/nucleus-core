@@ -99,7 +99,7 @@ namespace Nucleus.OAuth.Client.Controllers
 				// It is possible to have multiple OpenIdConnect configurations which have settings which point to different OAUTH providers, which are identified by Name.  Most of the settings for the
 				// Facebook/Google/Twitter/MicrosoftAccount are built in to the Microsoft.AspNetCore.Authentication.* package, so they can only have one configuration set up, and do require a name.
 				Models.Configuration.OAuthProvider providerOption = this.Options.Value
-					.Where(option => (option.Name != null && option.Name.Equals(providerName, StringComparison.OrdinalIgnoreCase)) || option.Type.Equals(providerName, StringComparison.OrdinalIgnoreCase))
+					.Where(option => (option.SafeProviderName().Equals(providerName, StringComparison.OrdinalIgnoreCase)))
 					.FirstOrDefault();
 
 				if (providerOption != null)

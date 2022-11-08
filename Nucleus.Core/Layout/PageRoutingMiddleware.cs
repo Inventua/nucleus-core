@@ -158,7 +158,8 @@ namespace Nucleus.Core.Layout
 			{
 				if (await this.SiteManager.Count() == 0)
 				{
-					context.Response.Redirect("/Setup/SiteWizard");
+					String relativePath = $"{(String.IsNullOrEmpty(context.Request.PathBase) ? "" : context.Request.PathBase + "/")}Setup/SiteWizard";
+					context.Response.Redirect(relativePath);
 				}
 			}
 		}

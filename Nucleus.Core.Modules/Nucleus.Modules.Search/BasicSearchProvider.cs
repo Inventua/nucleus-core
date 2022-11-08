@@ -65,8 +65,6 @@ namespace Nucleus.Modules.Search
 		{
 			return new SearchResult()
 			{
-				Score = 0,
-
 				Site = await this.SiteManager.Get(page.SiteId),
 				Url = page.DefaultPageRoute().Path,
 				Title = page.Title,

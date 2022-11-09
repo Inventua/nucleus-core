@@ -229,7 +229,7 @@ namespace Nucleus.OAuth.Client
 
 				foreach (Models.Configuration.MapJsonKey key in providerConfig.MapJsonKeys)
 				{
-					oauthOptions.ClaimActions.MapJsonKey(key.ClaimType, key.JsonKey ?? key.ClaimType, key.ValueType);
+					oauthOptions.ClaimActions.MapJsonKey(key.ClaimType, key.JsonKey ?? key.ClaimType);
 				}
 			}
 			options.Events.OnTicketReceived = ((TicketReceivedContext ctx) =>

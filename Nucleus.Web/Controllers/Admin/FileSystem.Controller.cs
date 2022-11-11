@@ -17,6 +17,7 @@ using System.IO.Compression;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Options;
 using Nucleus.Extensions.Authorization;
+using Nucleus.Abstractions.Models.Extensions;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -159,8 +160,9 @@ namespace Nucleus.Web.Controllers.Admin
 			await this.FileSystemManager.SaveFolder(this.Context.Site, folder);
 			await this.FileSystemManager.SaveFolderPermissions(this.Context.Site, folder);
 
-			return Ok();
-		}
+      return await Navigate(new(), viewModel.Folder.Id);
+      //return Ok();
+    }
 
 		/// <summary>
 		/// Create the specified folder

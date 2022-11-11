@@ -89,7 +89,7 @@
 							}
 						</ul>
 					}
-					@if (Model.Settings.ShowScore)
+					@if (Model.Settings.ShowScore && result.Score.HasValue)
 					{
 						<span class="fw-light d-block small result-score">Score: @result.Score</span>
 					}

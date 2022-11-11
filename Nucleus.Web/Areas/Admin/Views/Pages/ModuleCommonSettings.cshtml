@@ -12,14 +12,15 @@
 	@Html.HiddenFor(model => model.Page.Id)
 	@Html.HiddenFor(model => model.PageEditorMode)
 
-	<fieldset role="group" aria-labelledby="heading">
-		<Tab>
-			<TabItem target="#module-properties" active="true" caption="Properties"></TabItem>
-			<TabItem target="#module-permissions" caption="Permissions"></TabItem>
-		</Tab>
+	<Tab>
+		<TabItem target="#module-properties" active="true" caption="Properties"></TabItem>
+		<TabItem target="#module-permissions" caption="Permissions"></TabItem>
+	</Tab>
 
-		<TabContent>
-			<TabPanel id="module-properties" active="true">
+	<TabContent>
+		<TabPanel id="module-properties" active="true">
+
+			<fieldset role="group" aria-label="Properties">
 				@Html.HiddenFor((model) => model.Module.Id)
 				@Html.HiddenFor((model) => model.Module.SortOrder)
 				<SettingsControl caption="Module Type" helptext="Select a Module Type.">
@@ -49,16 +50,18 @@
 						@Html.TextBoxFor((model) => model.Module.Style)
 					</SettingsControl>
 				</div>
-			</TabPanel>
-			<TabPanel id="module-permissions">
+			</fieldset>
+		</TabPanel>
+		<TabPanel id="module-permissions">
+			<fieldset role="group" aria-label="Permissions">
 				<div class="nucleus-form-tools">
 					@Html.DropDownListFor(model => model.SelectedModuleRoleId, Model.AvailableModuleRoles, new { @class = "flex-fill" })
 					<input type="submit" formaction="@Url.AreaAction("AddModulePermissionRole", "Pages", "Admin")?PageEditorMode=@Model.PageEditorMode" value="Add Role" data-target="form.parent()" class="btn btn-secondary" />
 				</div>
 				@await Html.PartialAsync("ModulePermissions")
-			</TabPanel>
-		</TabContent>
-	</fieldset>
+			</fieldset>
+		</TabPanel>
+	</TabContent>
 
 	<div class="nucleus-form-buttonrow">
 		<div class="nucleus-form-tools">

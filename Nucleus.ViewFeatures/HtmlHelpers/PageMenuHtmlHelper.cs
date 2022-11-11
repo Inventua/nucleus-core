@@ -33,9 +33,11 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			IUrlHelper urlHelper = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(htmlHelper.ViewContext);
 			TagBuilder outputBuilder = new("ul");
 
-			AddChildren(urlHelper, outputBuilder, pages, selectedPageId, maxLevels, 0, htmlAttributes);
-
-			return outputBuilder;
+			if (AddChildren(urlHelper, outputBuilder, pages, selectedPageId, maxLevels, 0, htmlAttributes))
+			{
+				return outputBuilder;
+			}
+			return null;
 		}
 
 		/// <summary>
@@ -70,8 +72,10 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			outputBuilder.AppendHtml(RenderCollapseButton(fromPage, true));
 
 			TagBuilder listBuilder = new("ul");
-			AddChildren(urlHelper, listBuilder, pages, Guid.Empty, maxLevels, 0, htmlAttributes);
-			outputBuilder.AppendHtml(listBuilder);
+			if (AddChildren(urlHelper, listBuilder, pages, Guid.Empty, maxLevels, 0, htmlAttributes))
+			{
+				outputBuilder.AppendHtml(listBuilder);
+			}
 
 			return outputBuilder;
 		}
@@ -96,9 +100,9 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			return false;			
 		}
 
-		private static void AddChildren(IUrlHelper urlHelper, TagBuilder control, PageMenu menu, Guid selectedPageId, int maxLevels, int thisLevel, object htmlAttributes)
+		private static Boolean AddChildren(IUrlHelper urlHelper, TagBuilder control, PageMenu menu, Guid selectedPageId, int maxLevels, int thisLevel, object htmlAttributes)
 		{
-			if (thisLevel == maxLevels && !IsInTree(menu, selectedPageId)) return;
+			if (thisLevel == maxLevels && !IsInTree(menu, selectedPageId)) return false;
 
 			if (menu.HasChildren && menu.Children?.Any() == true)
 			{
@@ -136,10 +140,17 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 					if (childItem.Children != null && childItem.Children?.Any()==true)
 					{
 						TagBuilder childList = new("ul");
-						AddChildren(urlHelper, childList, childItem, selectedPageId, maxLevels, thisLevel + 1, htmlAttributes);
-						itemBuilder.InnerHtml.AppendHtml(childList);
+						if (AddChildren(urlHelper, childList, childItem, selectedPageId, maxLevels, thisLevel + 1, htmlAttributes))
+						{
+							itemBuilder.InnerHtml.AppendHtml(childList);
+						}
 					}
 				}
+				return true;
+			}
+			else 
+			{
+				return false;
 			}
 		}
 

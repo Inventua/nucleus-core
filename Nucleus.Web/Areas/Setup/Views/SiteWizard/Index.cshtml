@@ -16,7 +16,7 @@
 @using (Html.BeginAreaForm("Install", "SiteWizard", "Setup", FormMethod.Post, new { @data_target = "document" }))
 {
 	<Modal id="site-wizard" title="Nucleus Setup Wizard" can-close="false">
-		<img class="logo" src="../../../../Resources/Images/nucleus.png" height="90" width="81"/>
+		<img class="logo" src="@Url.Content("~/Resources/Images/nucleus.png")" height="90" width="81" alt="Nucleus Logo" />
 		<h1>Welcome to Nucleus.</h1>
 		<p>This wizard will help you to set up your site.</p>
 		

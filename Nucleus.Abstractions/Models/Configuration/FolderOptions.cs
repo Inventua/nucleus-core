@@ -397,7 +397,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string GetDataFolder(string subFolder, Boolean create)
 		{
-			string folderName = System.IO.Path.Combine(this.DataFolder, subFolder);
+			string folderName = System.IO.Path.Combine(this.DataFolder, subFolder).Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
 
 			if (create)
 			{

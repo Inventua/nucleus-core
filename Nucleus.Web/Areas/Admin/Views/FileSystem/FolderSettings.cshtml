@@ -12,7 +12,6 @@
 		<TabPanel id="folder-settings" active="true">
 			<fieldset role="group" aria-labelledby="heading">
 				<h2>Settings</h2>
-
 				<SettingsControl caption="Include in Search?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the files within this folder are included in the search index, if search is enabled for your site.">
 					@Html.CheckBoxFor(model => model.Folder.IncludeInSearch, new { @class = "ToggleSwitch" })
 				</SettingsControl>
@@ -28,6 +27,6 @@
 	</TabContent>
 
 	<div class="nucleus-button-panel">
-		<input type="submit" class="btn btn-primary" value="Save Changes" />
+		<input type="submit" class="btn btn-primary" value="Save Changes" data-target=".nucleus-adminpage" />
 	</div>
 }

@@ -162,7 +162,7 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 			else
 			{
-				throw new System.IO.FileNotFoundException();
+				throw new System.IO.FileNotFoundException(null, path);
 			}
 		}
 
@@ -183,7 +183,7 @@ namespace Nucleus.Core.FileSystemProviders
 			else
 			{
 				// file not found
-				throw new System.IO.FileNotFoundException();
+				throw new System.IO.FileNotFoundException(null, path);
 			}
 		}
 
@@ -205,7 +205,7 @@ namespace Nucleus.Core.FileSystemProviders
 
 			if (file == null)
 			{
-				throw new System.IO.FileNotFoundException();
+				throw new System.IO.FileNotFoundException(null, path);
 			}
 
 			System.IO.FileInfo fileInfo = new(BuildPath(path));
@@ -215,7 +215,7 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 			else
 			{
-				throw new System.IO.FileNotFoundException();
+				throw new System.IO.FileNotFoundException(null, path);
 			}
 		}
 
@@ -342,7 +342,7 @@ namespace Nucleus.Core.FileSystemProviders
 
 		private Folder BuildFolder(System.IO.DirectoryInfo folderItem)
 		{
-			if (folderItem.FullName.Equals(this.Options.RootPath, StringComparison.OrdinalIgnoreCase))
+			if (folderItem.Parent.FullName.Equals(this.Options.RootPath, StringComparison.OrdinalIgnoreCase))
 			{
 				// top level
 				return new Folder()

@@ -63,10 +63,10 @@ namespace Nucleus.Core.Managers
 					catch (System.IO.FileNotFoundException)
 					{
 						// if the root folder was not found, try to create it
-						if (string.IsNullOrEmpty(path))
-						{
+						//if (string.IsNullOrEmpty(path))
+						//{
 							folder = await fileSystemProvider.CreateFolder("", UseSiteHomeDirectory(site, path));
-						}
+						//}
 					}
 
 					// Retrieve folder information from the database.  We only use Id (see below)
@@ -479,11 +479,20 @@ namespace Nucleus.Core.Managers
 		public async Task<Folder> ListFolder(Site site, Guid id, string pattern)
 		{
 			Folder existingFolder = await this.GetFolder(site, id);
-			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, existingFolder.Provider);
+			Folder folder;
+      FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, existingFolder.Provider);
 
-			Folder folder = await provider.ListFolder(UseSiteHomeDirectory(site, existingFolder.Path), pattern);
+			try
+			{
+				folder = await provider.ListFolder(UseSiteHomeDirectory(site, existingFolder.Path), pattern);
+			}
+			catch (System.IO.FileNotFoundException)
+			{
+				// if the root folder was not found, try to create it				
+				folder = await provider.CreateFolder("", UseSiteHomeDirectory(site, existingFolder.Path));				
+			}
 
-			await GetDatabaseProperties(site, folder);
+      await GetDatabaseProperties(site, folder);
 
 			foreach (Folder subfolder in folder.Folders)
 			{

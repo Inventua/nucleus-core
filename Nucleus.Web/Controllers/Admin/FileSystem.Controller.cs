@@ -335,8 +335,13 @@ namespace Nucleus.Web.Controllers.Admin
 
 			if (viewModel.SelectedItem == null)
 			{
-				return BadRequest("Please select an item to rename.");
-			}
+        //return BadRequest("Please select an item to rename.");
+        return BadRequest(new ProblemDetails()
+        {
+          Title = "Rename",
+          Detail = "Please select an item to rename."
+        });
+      }
 
 			return View("Rename", viewModel);
 		}

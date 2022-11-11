@@ -5,7 +5,10 @@
 @using Nucleus.OAuth.Client.ViewModels
 <div class="d-flex">
 	<div class="d-flex">
-		<label class="d-flex align-self-center me-1">Log in with</label>
+		@if (!String.IsNullOrEmpty(@Model.Caption))
+		{
+			<label class="d-flex align-self-center me-1">@Model.Caption</label>
+		}
 		<select id="oauthclient-viewer-select">
 			@foreach (var option in Model.Options)
 			{

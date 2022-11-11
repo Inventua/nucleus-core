@@ -3,7 +3,10 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.OAuth.Client.ViewModels
-<label>Log in with</label>
+@if (!String.IsNullOrEmpty(@Model.Caption))
+{
+	<label>@Model.Caption</label>
+}
 <ul>
 	@foreach (var option in Model.Options)
 	{

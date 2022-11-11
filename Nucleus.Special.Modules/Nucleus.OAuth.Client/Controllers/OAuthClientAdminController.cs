@@ -88,6 +88,7 @@ namespace Nucleus.OAuth.Client.Controllers
 		[HttpPost]
 		public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
 		{
+			this.Context.Module.ModuleSettings.Set(ViewModels.Settings.MODULESETTING_CAPTION, viewModel.Caption);
 			this.Context.Module.ModuleSettings.Set(ViewModels.Settings.MODULESETTING_AUTOLOGIN, viewModel.AutoLogin);
 			this.Context.Module.ModuleSettings.Set(ViewModels.Settings.MODULESETTING_LAYOUT, viewModel.Layout);
 

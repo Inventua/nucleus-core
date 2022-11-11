@@ -6,7 +6,7 @@
 	<description>
 		SAML Client for Nucleus.
 	</description>
-	<compatibility minVersion="1.0.0.0" maxVersion="*" />
+	<compatibility minVersion="1.1.0.0" maxVersion="*" />
 	
 	<components>
 		<component folderName="SAML Client" optional="false">

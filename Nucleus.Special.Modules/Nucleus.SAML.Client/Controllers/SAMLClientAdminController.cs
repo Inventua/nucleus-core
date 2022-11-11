@@ -1,36 +1,38 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Extensions;
+using Nucleus.SAML.Client.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models.Configuration;
-using Microsoft.AspNetCore.Hosting;
 
-namespace Nucleus.OAuth.Client.Controllers
+namespace Nucleus.SAML.Client.Controllers
 {
-	[Extension("OAuthClient")]
-	public class OAuthClientAdminController : Controller
+	[Extension("SAMLClient")]
+	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+	public class SAMLClientAdminController : Controller
 	{
+
 		private IWebHostEnvironment WebHostEnvironment { get; }
 
 		private Context Context { get; }
-		
+
 		private ISiteManager SiteManager { get; }
 
 		private IPageModuleManager PageModuleManager { get; }
 
-		private IOptions<Models.Configuration.OAuthProviders> Options { get; }
+		private IOptions<Models.Configuration.SAMLProviders> Options { get; }
 
 
-		public OAuthClientAdminController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<Models.Configuration.OAuthProviders> options)
+		public SAMLClientAdminController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<Models.Configuration.SAMLProviders> options)
 		{
 			this.WebHostEnvironment = webHostEnvironment;
 			this.Context = Context;
@@ -39,11 +41,6 @@ namespace Nucleus.OAuth.Client.Controllers
 			this.Options = options;
 		}
 
-		//private string BuildRedirectUrl(string returnUrl)
-		//{
-		//	// Only allow a relative path for redirectUri (that is, the url must start with "/"), to ensure that it points to "this" site.					
-		//	return String.IsNullOrEmpty(returnUrl) || !returnUrl.StartsWith("/") ? "~/" : returnUrl;
-		//}
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpGet]
 		[HttpPost]
@@ -120,13 +117,12 @@ namespace Nucleus.OAuth.Client.Controllers
 			viewModel.ReadSettings(this.Context.Module);
 
 			viewModel.Layouts = new();
-			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\OAuth Client\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
+			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\SAML Client\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
 			{
 				viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
 			}
 
 			return viewModel;
 		}
-
 	}
 }

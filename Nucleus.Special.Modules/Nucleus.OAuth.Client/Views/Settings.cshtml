@@ -10,6 +10,9 @@
 {
 	<fieldset role="group" aria-labelledby="heading">
 		<h2>Settings</h2>
+			<SettingsControl caption="Caption" helptext="On-screen caption.">
+				@Html.TextBoxFor(model => model.Caption)
+			</SettingsControl>
 		<SettingsControl caption="Layout" helptext="Display layout.">
 			@Html.DropDownListFor(model => model.Layout, new SelectList(Model.Layouts))
 		</SettingsControl>

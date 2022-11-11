@@ -1,0 +1,23 @@
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+[assembly: HostingStartup(typeof(Nucleus.SAML.Client.Startup))]
+
+namespace Nucleus.SAML.Client
+{
+	public class Startup : IHostingStartup
+	{
+		public void Configure(IWebHostBuilder builder)
+		{
+			builder.ConfigureServices((context, services) =>
+			{
+				services.AddAuthentication().AddSAML(context.Configuration);
+			});
+		}
+	}
+}

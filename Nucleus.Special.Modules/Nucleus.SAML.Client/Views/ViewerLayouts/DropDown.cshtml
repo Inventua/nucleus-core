@@ -1,29 +1,29 @@
-﻿@model Nucleus.OAuth.Client.ViewModels.Viewer
+﻿@model Nucleus.SAML.Client.ViewModels.Viewer
 @using Nucleus.Abstractions
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
-@using Nucleus.OAuth.Client.ViewModels
+@using Nucleus.SAML.Client.ViewModels
 <div class="d-flex">
 	<div class="d-flex">
 		@if (!String.IsNullOrEmpty(@Model.Caption))
 		{
 			<label class="d-flex align-self-center me-1">@Model.Caption</label>
 		}
-		<select id="oauthclient-viewer-select">
+		<select id="samlclient-viewer-select">
 			@foreach (var option in Model.Options)
 			{
 				<option value="@option.AuthenticateEndpoint(Url, Model.ReturnUrl)">@option.DisplayName()</option>
 			}
 		</select>	
-		<button id="oauth-viewer-login" class="btn btn-primary ms-1" type="button">Log in</button>
+		<button id="saml-viewer-login" class="btn btn-primary ms-1" type="button">Log in</button>
 	</div>
 </div>
 <script>
 	jQuery(document).ready(function ()
 	{
-		jQuery('#oauth-viewer-login').on('click', function() 
+		jQuery('#saml-viewer-login').on('click', function() 
 		{
-			document.location = jQuery('#oauthclient-viewer-select option:selected').prop('value');
+			document.location = jQuery('#samlclient-viewer-select option:selected').prop('value');
 		});
 	});
 </script>

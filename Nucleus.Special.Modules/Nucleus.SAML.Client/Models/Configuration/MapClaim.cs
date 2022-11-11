@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nucleus.OAuth.Client.Models.Configuration
+namespace Nucleus.SAML.Client.Models.Configuration
 {
-	public class MapJsonKey
+	public class MapClaim
 	{
 		public string ClaimType { get; set; }
-		public string JsonKey { get; set; }
+		public string SAMLKey { get; set; }
 
 	}
 }

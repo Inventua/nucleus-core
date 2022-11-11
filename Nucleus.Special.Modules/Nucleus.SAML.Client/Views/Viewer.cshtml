@@ -1,0 +1,10 @@
+﻿@model Nucleus.SAML.Client.ViewModels.Viewer
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.SAML.Client.ViewModels
+@Html.AddStyle("~!/../viewer.css")
+@if (Model.Options.Any())
+{
+	@await Html.PartialAsync(@Model.Layout, Model)
+}

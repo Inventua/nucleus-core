@@ -1,0 +1,15 @@
+﻿@model Nucleus.SAML.Client.ViewModels.Viewer
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.SAML.Client.ViewModels
+@if (!String.IsNullOrEmpty(@Model.Caption))
+{
+	<label>@Model.Caption</label>
+}
+<ul>
+	@foreach (var option in Model.Options)
+	{
+		<li><a href="@option.AuthenticateEndpoint(Url, Model.ReturnUrl)">@option.DisplayName()</a></li>
+	}
+</ul>	

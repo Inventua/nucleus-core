@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package id="3dbb94f0-13ee-4402-bdbd-498f6e3dec62" xmlns="urn:nucleus/schemas/package/1.0">
+	<name>SAML Client</name>
+	<version>1.0.0</version>
+	<publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
+	<description>
+		SAML Client for Nucleus.
+	</description>
+	<compatibility minVersion="1.0.0.0" maxVersion="*" />
+	
+	<components>
+		<component folderName="SAML Client" optional="false">
+			<controlPanelExtensionDefinition id="FC4C96E3-BFE2-4D6F-A56A-358202982E72">
+				<friendlyName>SAML Client</friendlyName>
+				<description>Configure SAML client.</description>
+				<controllerName>SAMLClientAdmin</controllerName>
+				<extensionName>SAMLClient</extensionName>
+				<scope>Site</scope>
+				<editAction>SiteSettings</editAction>
+			</controlPanelExtensionDefinition>
+			
+			<moduleDefinition id="6E77A1F2-C865-4F98-ADB6-F0144DB55A79">
+				<friendlyName>SAML Provider Selector</friendlyName>
+				<extension>SAMLClient</extension>
+				<viewController>SAMLClient</viewController>
+				<settingsController>SAMLClientAdmin</settingsController>
+				<viewAction>Index</viewAction>
+				<editAction>Settings</editAction>
+				<categories>Account Management</categories>
+			</moduleDefinition>
+			
+			<file name="readme.txt" />
+			<file name="license.txt" />
+
+			<file name="_ViewImports.cshtml" />
+			
+			<file name="viewer.css" />
+			<file name="settings.css" />
+			
+			<folder name="Bin">
+				<file name="Nucleus.SAML.Client.dll" />
+				
+				<file name="ITfoxtec.Identity.Saml2.dll" />
+				<file name="ITfoxtec.Identity.Saml2.MvcCore.dll" />
+
+				<!--<file name="System.Security.Cryptography.Xml.dll" />-->
+				
+				<file name="Microsoft.IdentityModel.Tokens.Saml.dll" />
+				<file name="Microsoft.IdentityModel.Logging.dll" />
+				<file name="Microsoft.IdentityModel.Tokens.dll" />
+				<file name="Microsoft.Bcl.AsyncInterfaces.dll" />
+				<file name="Microsoft.IdentityModel.Xml.dll" />
+				
+				<file name="System.ServiceModel.Primitives.dll" />
+				<file name="System.ServiceModel.dll" />
+				<file name="System.ServiceModel.Security.dll" />
+				<file name="System.Private.ServiceModel.dll" />				
+			</folder>
+			
+			<folder name="Views">				
+				<file name="Viewer.cshtml" />
+				<file name="Settings.cshtml" />
+			</folder>
+			
+		</component>
+	</components>
+	
+</package>

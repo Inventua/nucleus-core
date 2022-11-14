@@ -57,7 +57,7 @@ namespace Nucleus.Data.EntityFramework
 			}
 			catch(Exception e)
 			{
-				Nucleus.Data.Common.ConnectionException wrapped = new(this.Context.Database.GetDbConnection(), this.Context.DbContextConfigurator.DatabaseConnectionOption, e);
+				Nucleus.Data.Common.ConnectionException wrapped = new(this.Context.DbContextConfigurator.DatabaseConnectionOption, e);
 				Logger?.LogError(wrapped, "");
 				throw wrapped;
 			}

@@ -14,21 +14,20 @@ namespace Nucleus.Data.Common
 		/// <summary>
 		/// Database connection object which caused the exception.
 		/// </summary>
-		public System.Data.Common.DbConnection Connection { get; }
+		public Nucleus.Abstractions.Models.Configuration.DatabaseConnectionOption ConnectionOptions { get; }
 
 		/// <summary>
 		/// Initialize a new instance of the ConnectionException class.
 		/// </summary>
-		/// <param name="connection"></param>
 		/// <param name="databaseConnectionOption"></param>
 		/// <param name="innerException"></param>
 		/// <remarks>
 		/// The exception's message is derived from the values in the specified database connection option.
 		/// </remarks>
-		public ConnectionException(System.Data.Common.DbConnection connection, Nucleus.Abstractions.Models.Configuration.DatabaseConnectionOption databaseConnectionOption, Exception innerException)
+		public ConnectionException(Nucleus.Abstractions.Models.Configuration.DatabaseConnectionOption databaseConnectionOption, Exception innerException)
 			: base(GetMessage(databaseConnectionOption), innerException)
 		{
-			this.Connection = connection;
+			this.ConnectionOptions = databaseConnectionOption;
 		}
 
 		private static string GetMessage(Nucleus.Abstractions.Models.Configuration.DatabaseConnectionOption databaseConnectionOption)

@@ -60,11 +60,11 @@ namespace Nucleus.Data.MySql
 					switch (dbException.ErrorCode)
 					{
 						case MySqlConnector.MySqlErrorCode.ColumnCannotBeNull:
-							message = ParseException(dbException, Messages.NOT_NULL_PATTERN, Messages.NOT_NULL_MESSAGE);
+							message = ParseException(dbException, MessagePatterns.NOT_NULL_PATTERN, MessagePatterns.NOT_NULL_MESSAGE);
 							break;
 						case MySqlConnector.MySqlErrorCode.DuplicateKeyEntry:
 							// unique constraint
-							message = ParseException(dbException, Messages.UNIQUE_CONSTRAINT_PATTERN, Messages.UNIQUE_CONSTRAINT_MESSAGE);
+							message = ParseException(dbException, MessagePatterns.UNIQUE_CONSTRAINT_PATTERN, MessagePatterns.UNIQUE_CONSTRAINT_MESSAGE);
 							break;
 						case MySqlConnector.MySqlErrorCode.WarningDataOutOfRange:
 							// NumericOverflow:  This would be caused by a bug, so we don't parse this one.
@@ -77,7 +77,7 @@ namespace Nucleus.Data.MySql
 						case MySqlConnector.MySqlErrorCode.NoReferencedRow2:
 						case MySqlConnector.MySqlErrorCode.RowIsReferenced2:
 							// Foreign key constraint
-							message = ParseException(dbException, Messages.FOREIGN_KEY_PATTERN, Messages.FOREIGN_KEY_MESSAGE);
+							message = ParseException(dbException, MessagePatterns.FOREIGN_KEY_PATTERN, MessagePatterns.FOREIGN_KEY_MESSAGE);
 							break;
 					};
 
@@ -89,7 +89,7 @@ namespace Nucleus.Data.MySql
 			}
 		}
 
-		internal class Messages
+		internal class MessagePatterns
 		{
 			internal const string UNIQUE_CONSTRAINT_PATTERN = @"Duplicate entry '.*' for key '(?<table>.*?)\.?(?<constraint_name>[^.]*?)'";
 			// Message is empty so that if the Nucleus.Data.EntityFramework.DbContextConfigurator.ConstraintMessage method

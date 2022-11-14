@@ -98,7 +98,11 @@
 				<SettingName>sitepage:userprofile</SettingName>
 				<SettingValue>{$guid20}</SettingValue>
 			</SiteSetting>
-			<SiteSetting>
+      <SiteSetting>
+        <SettingName>sitepage:error</SettingName>
+        <SettingValue>{$guid222}</SettingValue>
+      </SiteSetting>      
+      <SiteSetting>
 				<SettingName>favicon:provider</SettingName>
 				<SettingValue>local</SettingValue>
 			</SiteSetting>
@@ -816,7 +820,26 @@
 			<ShowInMenu>true</ShowInMenu>
 			<DisableInMenu>false</DisableInMenu>
 			<SortOrder>70</SortOrder>
-			<Modules />
+      <Modules>
+        <PageModule>
+          <Id>{$guid224}</Id>
+          <Pane>ContentPane</Pane>
+          <Title>Error</Title>
+          <ModuleDefinition>
+            <Id>e1d1db07-be39-4796-abca-56cd44b27420</Id>
+            <FriendlyName>Html</FriendlyName>
+            <ClassTypeName>Nucleus.Modules.ErrorReport.Controllers.ErrorReportController,Nucleus.Modules.ErrorReport</ClassTypeName>
+            <ViewAction>Index</ViewAction>
+            <EditAction>Edit</EditAction>
+            <Categories>Utility</Categories>
+          </ModuleDefinition>
+          <ModuleSettings />
+          <Permissions />
+          <Style />
+          <SortOrder>10</SortOrder>
+          <InheritPagePermissions>true</InheritPagePermissions>
+        </PageModule>
+      </Modules>
 			<Permissions>
 				<Permission>
 					<Id>{$guid225}</Id>

@@ -11,6 +11,8 @@ using Nucleus.Data.Common;
 using Nucleus.Abstractions.Models.Configuration;
 using static SQLitePCL.raw;
 using System.Text.RegularExpressions;
+using System.Data.Common;
+using DocumentFormat.OpenXml.InkML;
 
 namespace Nucleus.Data.Sqlite
 {
@@ -22,6 +24,28 @@ namespace Nucleus.Data.Sqlite
 		where TDataProvider : Nucleus.Data.Common.DataProvider
 	{
 		private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
+
+		/// <summary>
+		/// Dictionary of column names/messages for ParseException method.
+		/// </summary>
+		private static Dictionary<string, string> SQLITE_MESSAGES = new(StringComparer.OrdinalIgnoreCase)
+		{
+			{ "SiteGroups.PrimarySiteId", DbContextConfigurator.Messages.IX_SITEGROUPS_PRIMARYSITEID_MESSAGE},
+			{ "SiteGroups.Name", DbContextConfigurator.Messages.IX_SITEGROUPS_NAME_MESSAGE},
+			{ "Sites.Name" , DbContextConfigurator.Messages.IX_SITES_NAME_MESSAGE},
+			{ "SiteAlias.Alias" , DbContextConfigurator.Messages.IX_SITEALIAS_ALIAS_MESSAGE},
+			{ "Pages.SiteId, Pages.ParentId, Pages.Name" , DbContextConfigurator.Messages.IX_PAGES_NAME_MESSAGE},
+			{ "PageRoutes.SiteId, PageRoutes.Path" , DbContextConfigurator.Messages.IX_PAGEROUTES_PATH_MESSAGE},
+			{ "Users.UserName, Users.SiteId" , DbContextConfigurator.Messages.IX_USERS_SITEUSER_MESSAGE},
+			{ "RoleGroups.SiteId, RoleGroups.Name" , DbContextConfigurator.Messages.IX_ROLEGROUPS_NAME_MESSAGE},
+			{ "Roles.SiteId, Roles.Name" , DbContextConfigurator.Messages.IX_ROLES_NAME_MESSAGE},
+			{ "UserProfileProperties.SiteId, UserProfileProperties.TypeUri" , DbContextConfigurator.Messages.IX_USERPROFILEPROPERTIES_SITEID_TYPEURI_MESSAGE},
+			{ "UserProfileProperties.SiteId, UserProfileProperties.Name" , DbContextConfigurator.Messages.IX_USERPROFILEPROPERTIES_NAME_MESSAGE},
+			{ "MailTemplates.SiteId, MailTemplates.Name" , DbContextConfigurator.Messages.IX_MAILTEMPLATES_SITEID_NAME_MESSAGE},
+			{ "Lists.SiteId, Lists.Name" , DbContextConfigurator.Messages.IX_LISTS_NAME_MESSAGE},
+			{ "ListItems.ListId, ListItems.Name" , DbContextConfigurator.Messages.IX_LISTITEMS_NAME_MESSAGE},
+			{ "ApiKeys.Name", DbContextConfigurator.Messages.IX_APIKEYS_NAME_MESSAGE}
+		};
 
 		/// <summary>
 		/// Constructor
@@ -112,10 +136,10 @@ namespace Nucleus.Data.Sqlite
 							// so we don't parse them.
 							break;
 						case SQLITE_CONSTRAINT_NOTNULL:
-							message = ParseException(dbException, Messages.NOT_NULL_PATTERN, Messages.NOT_NULL_MESSAGE);
+							message = ParseException(dbException, MessagePatterns.NOT_NULL_PATTERN, MessagePatterns.NOT_NULL_MESSAGE);
 							break;
 						case SQLITE_CONSTRAINT_UNIQUE:
-							message = ParseException(dbException, Messages.UNIQUE_CONSTRAINT_PATTERN, Messages.UNIQUE_CONSTRAINT_MESSAGE);
+							message = ParseException(dbException, MessagePatterns.UNIQUE_CONSTRAINT_PATTERN, MessagePatterns.UNIQUE_CONSTRAINT_MESSAGE);
 							break;
 						case SQLITE_CONSTRAINT_PRIMARYKEY:
 							// primary key constraint failed errors would typically be caused by a bug rather than user action, so we don't parse them.
@@ -124,7 +148,7 @@ namespace Nucleus.Data.Sqlite
 							// SQLite doesn't provide any useful information in the error message when a foreign key constraint fails, so the parsing for this
 							// isn't very useful - it just generates an exception with message 'FOREIGN KEY constraint failed'.  Foreign key
 							// constraint errors are not normally caused by a user action, so this should not be a serious issue.
-							message = ParseException(dbException, Messages.FOREIGN_KEY_PATTERN, Messages.FOREIGN_KEY_MESSAGE);
+							message = ParseException(dbException, MessagePatterns.FOREIGN_KEY_PATTERN, MessagePatterns.FOREIGN_KEY_MESSAGE);
 							break;
 					};
 
@@ -135,8 +159,40 @@ namespace Nucleus.Data.Sqlite
 				}
 			}
 		}
-		
-		internal class Messages
+				
+		/// <summary>
+		/// Special error message replacement for SQLite.
+		/// </summary>
+		/// <param name="exception"></param>
+		/// <param name="pattern"></param>
+		/// <param name="message"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// SQLite does not return unique constraint names when a unique constraint fails, so instead we use the column names in the error message to match  
+		/// to a custom error.  The list of table.column names / messages is in SQLITE_MESSAGES.
+		/// </remarks>
+		protected string ParseException(Microsoft.Data.Sqlite.SqliteException exception, string pattern, string message)
+		{
+			// get "default" message, parse the message and populate the base.ExceptionMessageTokens dictionary.
+			string customMessage = base.ParseException(exception, pattern, message);
+
+			// replace the error message with 
+			if (base.ExceptionMessageTokens != null  && base.ExceptionMessageTokens.ContainsKey("columns"))
+			{
+				switch (exception.SqliteExtendedErrorCode)
+				{
+					case SQLITE_CONSTRAINT_UNIQUE:
+						if (SQLITE_MESSAGES.ContainsKey(base.ExceptionMessageTokens["columns"]))
+						{
+							return SQLITE_MESSAGES[(base.ExceptionMessageTokens["columns"])];							
+						}
+						break;
+				}
+			}
+			return customMessage;
+		}
+
+		internal class MessagePatterns
 		{
 			internal const string UNIQUE_CONSTRAINT_PATTERN = @"'UNIQUE constraint failed: (?<columns>.*)'.";
 			internal const string UNIQUE_CONSTRAINT_MESSAGE = @"The combination of {columns} must be unique.";

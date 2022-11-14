@@ -66,14 +66,14 @@ namespace Nucleus.Data.SqlServer
 				switch (dbException.Number)
 				{
 					case ReferenceConstraint:
-						message = ParseException(dbException, Messages.FOREIGN_KEY_PATTERN, Messages.FOREIGN_KEY_MESSAGE);
+						message = ParseException(dbException, MessagePatterns.FOREIGN_KEY_PATTERN, MessagePatterns.FOREIGN_KEY_MESSAGE);
 						break;
 					case CannotInsertNull:
-						message = ParseException(dbException, Messages.NOT_NULL_PATTERN, Messages.NOT_NULL_MESSAGE);
+						message = ParseException(dbException, MessagePatterns.NOT_NULL_PATTERN, MessagePatterns.NOT_NULL_MESSAGE);
 						break;
 					case CannotInsertDuplicateKeyUniqueIndex:
 					case CannotInsertDuplicateKeyUniqueConstraint:
-						message = ParseException(dbException, Messages.UNIQUE_CONSTRAINT_PATTERN, Messages.UNIQUE_CONSTRAINT_MESSAGE);
+						message = ParseException(dbException, MessagePatterns.UNIQUE_CONSTRAINT_PATTERN, MessagePatterns.UNIQUE_CONSTRAINT_MESSAGE);
 						break;
 					case ArithmeticOverflow: break;
 					case StringOrBinaryDataWouldBeTruncated: break;
@@ -87,7 +87,7 @@ namespace Nucleus.Data.SqlServer
 		}
 	}
 
-	internal class Messages
+	internal class MessagePatterns
 	{
 		internal const string UNIQUE_CONSTRAINT_PATTERN = @"duplicate key row in object '.*\.(?<table>.*)' with unique index '(?<constraint_name>.*)'";
 		// Message is empty so that if the Nucleus.Data.EntityFramework.DbContextConfigurator.ConstraintMessage method

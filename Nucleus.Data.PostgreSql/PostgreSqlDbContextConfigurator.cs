@@ -59,13 +59,13 @@ namespace Nucleus.Data.PostgreSql
 					switch (dbException.SqlState)
 					{
 						case Npgsql.PostgresErrorCodes.ForeignKeyViolation:
-							message = ParseException(dbException, Messages.FOREIGN_KEY_PATTERN, Messages.FOREIGN_KEY_MESSAGE);
+							message = ParseException(dbException, MessagePatterns.FOREIGN_KEY_PATTERN, MessagePatterns.FOREIGN_KEY_MESSAGE);
 							break;
 						case Npgsql.PostgresErrorCodes.NotNullViolation:
-							message = ParseException(dbException, Messages.NOT_NULL_PATTERN, Messages.NOT_NULL_MESSAGE);
+							message = ParseException(dbException, MessagePatterns.NOT_NULL_PATTERN, MessagePatterns.NOT_NULL_MESSAGE);
 							break;
 						case Npgsql.PostgresErrorCodes.UniqueViolation:
-							message = ParseException(dbException, Messages.UNIQUE_CONSTRAINT_PATTERN, Messages.UNIQUE_CONSTRAINT_MESSAGE);
+							message = ParseException(dbException, MessagePatterns.UNIQUE_CONSTRAINT_PATTERN, MessagePatterns.UNIQUE_CONSTRAINT_MESSAGE);
 							break;
 						case Npgsql.PostgresErrorCodes.NumericValueOutOfRange: break;
 						case Npgsql.PostgresErrorCodes.StringDataRightTruncation: break;
@@ -80,7 +80,7 @@ namespace Nucleus.Data.PostgreSql
 		}
 	}
 
-	internal class Messages
+	internal class MessagePatterns
 	{
 		internal const string UNIQUE_CONSTRAINT_PATTERN = "duplicate key value violates unique constraint \"(?<constraint_name>.*?)\"";
 		// Message is empty so that if the Nucleus.Data.EntityFramework.DbContextConfigurator.ConstraintMessage method

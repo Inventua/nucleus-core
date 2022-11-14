@@ -18,13 +18,11 @@
       </controlPanelExtensionDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />
-      <file name="viewer.css" />
       <file name="settings.css" />
       <folder name="Bin">
         <file name="Nucleus.OAuth.Server.dll" />
       </folder>
       <folder name="Views">
-        <file name="Viewer.cshtml" />
         <file name="Settings.cshtml" />
         <file name="Editor.cshtml" />
         <file name="_ClientAppsList.cshtml" />

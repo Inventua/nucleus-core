@@ -9,7 +9,7 @@
 		{
 			<label class="d-flex align-self-center me-1">@Model.Caption</label>
 		}
-		<select id="oauthclient-viewer-select">
+		<select id="oauthclient-viewer-select" title="OAuth Identity Providers">
 			@foreach (var option in Model.Options)
 			{
 				<option value="@option.AuthenticateEndpoint(Url, Model.ReturnUrl)">@option.DisplayName()</option>

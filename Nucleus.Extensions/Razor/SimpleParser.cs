@@ -43,9 +43,13 @@ namespace Nucleus.Extensions.Razor
 			return result;
 		}
 
-		private TModel GetValue<TModel>(Object model, string propertyName)
+		private TModel GetValue<TModel>(Object model, string key)
 		{
 			object result = null;
+
+			string[] parts = key.Split('.', StringSplitOptions.RemoveEmptyEntries);
+
+			string propertyName = parts.First();
 
 			if (propertyName == this.LoopItemKey)
 			{
@@ -63,17 +67,24 @@ namespace Nucleus.Extensions.Razor
 
 			if (result != null)
 			{
-				if (typeof(TModel) == typeof(string))
+				if (parts.Length > 1)
 				{
-					return (TModel)Convert.ChangeType(result.ToString(), typeof(TModel));
-				}
-				else if (typeof(TModel).IsValueType)
-				{
-					return (TModel)Convert.ChangeType(result, typeof(TModel));
+					return (TModel)Convert.ChangeType(GetValue<Object>(result, String.Join('.', parts.Skip(1))), typeof(TModel));
 				}
 				else
 				{
-					return (TModel)result;
+					if (typeof(TModel) == typeof(string))
+					{
+						return (TModel)Convert.ChangeType(result.ToString(), typeof(TModel));
+					}
+					else if (typeof(TModel).IsValueType)
+					{
+						return (TModel)Convert.ChangeType(result, typeof(TModel));
+					}
+					else
+					{
+						return (TModel)result;
+					}
 				}
 			}
 
@@ -149,23 +160,26 @@ namespace Nucleus.Extensions.Razor
 			{
 				return "";
 			}
-
-			// loop through '.' separated property name - to handle properties of objects (like User.Secrets.PasswordResetToken).  A single 
-			// property (like User.UserName) will only loop through once.
-			foreach (string part in prop.Split('.', StringSplitOptions.RemoveEmptyEntries))
+						
+			if (value is IDictionary<string, object>)
 			{
-				if (value is IDictionary<string, object>)
+				if ((value as IDictionary<string, object>).ContainsKey(prop))
 				{
-					if ((value as IDictionary<string, object>).ContainsKey(part))
+					value = (value as IDictionary<string, object>)[prop];
+				}
+				else if (prop.Contains('.'))
+				{
+					string[] properties = prop.Split('.', StringSplitOptions.RemoveEmptyEntries);
+					if ((value as IDictionary<string, object>).ContainsKey(properties.First()))
 					{
-						value = (value as IDictionary<string, object>)[part];
+						value = GetValue<string>((value as IDictionary<string, object>)[properties.First()], String.Join('.', properties.Skip(1)));
 					}
 				}
-				else
-				{
-					return (GetValue<string>(value, part) ?? "").ToString();
-				}
 			}
+			else
+			{
+				return (GetValue<string>(value, prop) ?? "").ToString();
+			}			
 
 			return value.ToString();
 		}

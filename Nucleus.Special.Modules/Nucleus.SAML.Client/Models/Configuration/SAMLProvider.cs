@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Office2016.Excel;
 using ITfoxtec.Identity.Saml2;
+using Nucleus.ViewFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,6 @@ namespace Nucleus.SAML.Client.Models.Configuration
 	public class SAMLProvider
 	{
 		public string Name { get; set; }
-		public string Type { get; set; }
 		public string FriendlyName { get; set; }
 
 		public List<MapClaim> MapClaims { get; set; } = new();
@@ -81,7 +81,7 @@ namespace Nucleus.SAML.Client.Models.Configuration
 		/// </remarks>
 		public string DisplayName()
 		{
-			return this.FriendlyName ?? this.Name ?? this.Type;
+			return this.FriendlyName ?? this.Name;
 		}
 
 		/// <summary>
@@ -89,14 +89,13 @@ namespace Nucleus.SAML.Client.Models.Configuration
 		/// </summary>
 		/// <returns></returns>
 		/// <remarks>
-		/// The SAML Authenticate action uses a custom (attribute based) route, so we can't use Url.NucleusAction.  Name is 
-		/// optional but takes precedence over Type if specified.
+		/// The SAML Authenticate action uses a custom (attribute based) route, so we can't use Url.NucleusAction.  
 		/// The 'proper' way to start authentication is to call Challenge(), but this would add an extra redirect, and it makes
 		/// no difference to just call the Url directly.
 		/// </remarks
 		public string AuthenticateEndpoint(Microsoft.AspNetCore.Mvc.IUrlHelper urlHelper, string returnUrl)
 		{
-			string path = $"~/extensions/SAMLClient/Authenticate/{System.Uri.EscapeDataString(SafeProviderName())}";
+			string path = $"/saml2/sp/authenticate/{System.Uri.EscapeDataString(SafeProviderName())}";
 
 			return $"{urlHelper.Content(path)}?returnUrl={returnUrl ?? urlHelper.Content("~/")}";
 		}
@@ -113,7 +112,7 @@ namespace Nucleus.SAML.Client.Models.Configuration
 		///	</remarks>
 		public string SafeProviderName()
 		{
-			return (this.Name ?? this.Type).Replace("/", "-");
+			return this.Name.Replace("/", "-");
 		}
 
 	}

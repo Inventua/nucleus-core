@@ -147,7 +147,8 @@ namespace Nucleus.Modules.Account.Controllers
 				User user = await this.UserManager.GetByEmail(this.Context.Site, viewModel.Email);
 				if (user == null)
 				{
-					return BadRequest();
+					Logger.LogWarning("User not found for email {viewModel.Email}.", viewModel.Email);
+					return BadRequest("Invalid Email");
 				}
 				else
 				{
@@ -234,7 +235,7 @@ namespace Nucleus.Modules.Account.Controllers
 
 			await this.UserManager.SaveSecrets(user);
 
-			ControllerContext.HttpContext.Response.Headers.Add("X-Location", GetLoginPageUri().ToString());
+			ControllerContext.HttpContext.Response.Headers.Add("X-Location", (await GetLoginPageUri()).ToString());
 			return StatusCode((int)System.Net.HttpStatusCode.Found);
 		}
 

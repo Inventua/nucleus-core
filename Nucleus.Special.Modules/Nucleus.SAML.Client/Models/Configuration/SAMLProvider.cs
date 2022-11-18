@@ -32,7 +32,8 @@ namespace Nucleus.SAML.Client.Models.Configuration
 		public string SingleLogoutDestination { get; set; }
 		public string ArtifactResolutionServiceUrl { get; set; }
 
-		public string ProtocolBinding { get; set; } = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST";
+		public string ResponseProtocolBinding { get; set; } = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST";
+		public string RequestProtocolBinding { get; set; } = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST";
 
 		public enum ProtocolBindingTypes
 		{
@@ -45,9 +46,18 @@ namespace Nucleus.SAML.Client.Models.Configuration
 			Unhandled
 		}
 
-		public ProtocolBindingTypes GetProtocolBinding()
+		public ProtocolBindingTypes GetRequestProtocolBinding()
 		{
-			switch (this.ProtocolBinding.ToLower())
+			return GetProtocolBinding(this.RequestProtocolBinding);
+		}
+		public ProtocolBindingTypes GetResponseProtocolBinding()
+		{
+			return GetProtocolBinding(this.ResponseProtocolBinding);
+		}
+
+		public ProtocolBindingTypes GetProtocolBinding(string value)
+		{
+			switch (value.ToLower())
 			{
 				case "urn:oasis:names:tc:saml:2.0:bindings:http-redirect":
 					return ProtocolBindingTypes.HttpRedirect;
@@ -95,7 +105,7 @@ namespace Nucleus.SAML.Client.Models.Configuration
 		/// </remarks
 		public string AuthenticateEndpoint(Microsoft.AspNetCore.Mvc.IUrlHelper urlHelper, string returnUrl)
 		{
-			string path = $"/saml2/sp/authenticate/{System.Uri.EscapeDataString(SafeProviderName())}";
+			string path = $"{Routes.AUTHENTICATE}/{System.Uri.EscapeDataString(SafeProviderName())}";
 
 			return $"{urlHelper.Content(path)}?returnUrl={returnUrl ?? urlHelper.Content("~/")}";
 		}

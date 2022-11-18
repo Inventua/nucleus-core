@@ -32,6 +32,8 @@ using Nucleus.ViewFeatures;
 // https://www.itfoxtec.com/License/3clauseBSD.htm
 // https://github.com/ITfoxtec/ITfoxtec.Identity.Saml2/blob/master/test/TestWebAppCore/Controllers/AuthController.cs
 
+// https://medium.com/the-new-control-plane/i-need-a-saml-idp-to-test-now-477761595b60
+
 // SAML Response Validator:
 // https://www.samltool.com/validate_response.php
 
@@ -96,7 +98,7 @@ namespace Nucleus.SAML.Client.Controllers
 		// https://golem.inventua.com:5001/extensions/SAMLClient/Authenticate/start.sharpamericas.com
 		// https://golem.inventua.com:5001/extensions/SAMLClient/Authenticate/start.sharpusa.net
 		[HttpGet]
-		[Route("/saml2/sp/authenticate/{providerName}")]
+		[Route($"{Routes.AUTHENTICATE}/{{providerName}}")]
 		public async Task<IActionResult> Authenticate(string providerName, string returnUrl)
 		{
 			Models.Configuration.SAMLProvider providerOption = GetProvider(providerName);
@@ -105,28 +107,53 @@ namespace Nucleus.SAML.Client.Controllers
 			{
 				Logger?.LogTrace("Starting the remote login process.");
 
-				Saml2RedirectBinding binding = new();
-				binding.SetRelayStateQuery(new Dictionary<string, string> { { relayStateReturnUrl, returnUrl ?? Url.Content("~/") } });
-
-				Saml2Configuration config = await BuildConfiguration(providerOption);
-				IUrlHelper urlHelper = this.UrlHelperFactory.GetUrlHelper(this.ControllerContext);
-
-				switch (providerOption.GetProtocolBinding())
+				switch (providerOption.GetResponseProtocolBinding())
 				{
 					case Models.Configuration.SAMLProvider.ProtocolBindingTypes.HttpRedirect:
 					case Models.Configuration.SAMLProvider.ProtocolBindingTypes.HttpArtifact:
 					case Models.Configuration.SAMLProvider.ProtocolBindingTypes.HttpPost:
-						return binding.Bind(new Saml2AuthnRequest(config)
-						{
-							AssertionConsumerServiceUrl = Nucleus.ViewFeatures.UrlHelperExtensions.GetAbsoluteUri(urlHelper, Url.NucleusAction(nameof(Callback),"SAMLClient", "SAMLClient")),// $"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/SAMLClient/{nameof(Callback)}/{providerName}"),
-							ProtocolBinding = new Uri(String.IsNullOrEmpty(providerOption.ProtocolBinding) ? "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" : providerOption.ProtocolBinding),
-							Subject = new Subject { NameID = new NameID { ID = "" } },
-							NameIdPolicy = new NameIdPolicy { AllowCreate = false, Format = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" }
-						}).ToActionResult();
+						break;
 
 					default:
-						throw new InvalidOperationException($"Unsupported protocol binding: '{providerOption.ProtocolBinding}'");
+						throw new InvalidOperationException($"Unsupported response protocol binding: '{providerOption.ResponseProtocolBinding}'");
 				}
+
+				Saml2Configuration config = await BuildConfiguration(providerOption);
+				IUrlHelper urlHelper = this.UrlHelperFactory.GetUrlHelper(this.ControllerContext);
+				Saml2AuthnRequest request = new(config) 
+				{
+					AssertionConsumerServiceUrl = Nucleus.ViewFeatures.UrlHelperExtensions.GetAbsoluteUri(urlHelper, $"{Routes.ASSERTION_CONSUMER}/{providerName}"),
+					ProtocolBinding = new Uri(String.IsNullOrEmpty(providerOption.ResponseProtocolBinding) ? "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" : providerOption.ResponseProtocolBinding),
+					Subject = new Subject { NameID = new NameID { ID = "" } },
+					NameIdPolicy = new NameIdPolicy { AllowCreate = false, Format = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" }
+				};
+
+				switch (providerOption.GetRequestProtocolBinding())
+				{
+					case Models.Configuration.SAMLProvider.ProtocolBindingTypes.HttpPost:
+					{
+						Saml2PostBinding binding = new();
+						binding.SetRelayStateQuery(new Dictionary<string, string> { { relayStateReturnUrl, returnUrl ?? Url.Content("~/") } });
+						return binding.Bind(request).ToActionResult();
+					}
+
+					case Models.Configuration.SAMLProvider.ProtocolBindingTypes.HttpRedirect:
+					{
+						Saml2RedirectBinding binding = new();
+						binding.SetRelayStateQuery(new Dictionary<string, string> { { relayStateReturnUrl, returnUrl ?? Url.Content("~/") } });
+						return binding.Bind(request).ToActionResult();
+					}
+
+					////case Models.Configuration.SAMLProvider.ProtocolBindingTypes.Soap:
+					////{
+					////	Saml2SoapBinding binding = new();
+					////	binding.SetRelayStateQuery(new Dictionary<string, string> { { relayStateReturnUrl, returnUrl ?? Url.Content("~/") } });
+					////	return binding.Bind(request).ToActionResult();
+					////}
+
+					default:
+						throw new InvalidOperationException($"Unsupported request protocol binding: '{providerOption.RequestProtocolBinding}'");
+				}								
 			}
 			else
 			{
@@ -142,7 +169,7 @@ namespace Nucleus.SAML.Client.Controllers
 			Saml2AuthnResponse saml2AuthnResponse = new(config);
 			Dictionary<string, string> relayStateQuery;
 
-			switch (providerOption.GetProtocolBinding())
+			switch (providerOption.GetResponseProtocolBinding())
 			{
 				case Models.Configuration.SAMLProvider.ProtocolBindingTypes.HttpRedirect:
 				{
@@ -155,10 +182,11 @@ namespace Nucleus.SAML.Client.Controllers
 
 				case Models.Configuration.SAMLProvider.ProtocolBindingTypes.HttpArtifact:
 				{
+					config.Issuer = providerOption.Issuer;
 					Saml2ArtifactBinding binding = new();
-					Saml2ArtifactResolve resolver = new(config);
 					config.ArtifactResolutionService = new() { Index = 0, Location = new(providerOption.ArtifactResolutionServiceUrl) };
-
+					Saml2ArtifactResolve resolver = new(config);
+					
 					binding.Unbind(Request.ToGenericHttpRequest(), resolver);
 
 					Saml2SoapEnvelope soapEnvelope = new();
@@ -178,7 +206,7 @@ namespace Nucleus.SAML.Client.Controllers
 				}
 
 				default:
-					throw new AuthenticationException($"SAML: Unhandled protocol binding {providerOption.ProtocolBinding}");
+					throw new AuthenticationException($"SAML: Unhandled protocol binding {providerOption.ResponseProtocolBinding}");
 			}
 
 			if (saml2AuthnResponse.Status != Saml2StatusCodes.Success)
@@ -194,16 +222,23 @@ namespace Nucleus.SAML.Client.Controllers
 				(
 					claimsPrincipal,
 					providerOption.MapClaims,
-				this.Logger
+					this.Logger
 				)
 			);
+
+			if (principal.IsSystemAdministrator() || principal.IsSiteAdmin(this.Context.Site))
+			{
+				// admins can't use remote authentication
+				Logger?.LogWarning("Access denied for user '{name}' because admins can't use remote authentication.", principal.Identity.Name);
+				return Forbid();
+			}
 
 			return await HandleSignInAsync(this.Context.Site, principal, relayStateQuery);
 
 		}
 
 		[HttpGet]
-		[Route("/saml2/sp/callback/{providerName}")]
+		[Route($"{Routes.ASSERTION_CONSUMER}/{{providerName}}")]
 		public async Task<IActionResult> Callback(string providerName, string SAMLArt)
 		{
 			try
@@ -218,7 +253,7 @@ namespace Nucleus.SAML.Client.Controllers
 		}
 
 		[HttpPost]
-		[Route("/saml2/sp/callback/{providerName}")]
+		[Route($"{Routes.ASSERTION_CONSUMER}/{{providerName}}")]
 		public async Task<IActionResult> Callback(string providerName)
 		{
 			try
@@ -261,7 +296,7 @@ namespace Nucleus.SAML.Client.Controllers
 		}
 
 		[HttpGet]
-		[Route("/saml2/sp/metadata/{providerName}")]
+		[Route($"{Routes.METADATA}/{{providerName}}")]
 		public async Task<IActionResult> Metadata(string providerName)
 		{
 			var defaultSite = new Uri($"{Request.Scheme}://{Request.Host.ToUriComponent()}/");
@@ -290,7 +325,7 @@ namespace Nucleus.SAML.Client.Controllers
 						new SingleLogoutService
 						{
 							Binding = ProtocolBindings.HttpPost,
-							Location = new Uri(defaultSite, $"/saml2/sp/singlelogout/{providerName}"),
+							Location = new Uri(defaultSite, $"{Routes.SINGLE_LOGOUT}/{providerName}"),
 							//ResponseLocation = new Uri(defaultSite,Url.NucleusAction(nameof(SingleLogout),"SAMLClient","SAMLClient"))// $"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension=SAMLClient}}/{{action={nameof(LoggedOut)}}}/{{providerName}}")
 						}
 					},
@@ -302,7 +337,7 @@ namespace Nucleus.SAML.Client.Controllers
 						new AssertionConsumerService
 						{
 							Binding = ProtocolBindings.HttpPost,
-							Location = new Uri(defaultSite, $"/saml2/sp/callback/{providerName}")
+							Location = new Uri(defaultSite, $"{Routes.ASSERTION_CONSUMER}/{providerName}")
 						},
 					},
 
@@ -342,7 +377,7 @@ namespace Nucleus.SAML.Client.Controllers
 		}
 
 		[HttpPost]
-		[Route("/saml2/sp/logout/{providerName}")]
+		[Route($"{Routes.LOGOUT}/{{providerName}}")]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Logout(string providerName)
 		{
@@ -358,7 +393,7 @@ namespace Nucleus.SAML.Client.Controllers
 			return binding.Bind(saml2LogoutRequest).ToActionResult();
 		}
 
-		[Route("/saml2/sp/loggedout/{providerName}")]
+		[Route($"{Routes.LOGGED_OUT}/{{providerName}}")]
 		public async Task<IActionResult> LoggedOut(string providerName)
 		{
 			var binding = new Saml2PostBinding();
@@ -369,7 +404,7 @@ namespace Nucleus.SAML.Client.Controllers
 			return Redirect(Url.Content("~/"));
 		}
 
-		[Route("/saml2/sp/singlelogout/{providerName}")]
+		[Route($"{Routes.SINGLE_LOGOUT}/{{providerName}}")]
 		public async Task<IActionResult> SingleLogout(string providerName)
 		{
 			Saml2StatusCodes status;
@@ -424,7 +459,6 @@ namespace Nucleus.SAML.Client.Controllers
 			saml2Configuration.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.None;
 			saml2Configuration.RevocationMode = X509RevocationMode.NoCheck;
 
-			
 			if (!String.IsNullOrEmpty(providerOption.SigningCertificateFile))
 			{
 				saml2Configuration.SigningCertificate = CertificateUtil.Load(this.WebHostEnvironment.MapToPhysicalFilePath(providerOption.SigningCertificateFile), providerOption.SigningCertificatePassword, X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet);
@@ -435,7 +469,7 @@ namespace Nucleus.SAML.Client.Controllers
 				saml2Configuration.SigningCertificate = CertificateUtil.Load(StoreName.My, StoreLocation.LocalMachine, X509FindType.FindByThumbprint, providerOption.SigningCertificateThumbprint);
 			}
 
-			if (saml2Configuration.SigningCertificate == null)
+			if (saml2Configuration.SignAuthnRequest && saml2Configuration.SigningCertificate == null)
 			{
 				Logger?.LogError("SAML [{name}]: The certificate could not be loaded using the SigningCertificateFile or SigningCertificateThumbprint value.", providerOption.Name);
 				throw new InvalidOperationException($"SAML [{providerOption.Name}]: The SignAuthnRequest property is set to true, but the certificate could not be loaded using the SigningCertificateFile or SigningCertificateThumbprint value.");
@@ -521,7 +555,7 @@ namespace Nucleus.SAML.Client.Controllers
 
 			return saml2Configuration;
 		}
-
+		
 
 		private async Task<IActionResult> HandleSignInAsync(Site site, ClaimsPrincipal user, Dictionary<string, string> properties)
 		{

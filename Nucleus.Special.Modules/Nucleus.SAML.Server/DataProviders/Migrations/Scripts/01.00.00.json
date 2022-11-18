@@ -1,0 +1,223 @@
+{
+	"schemaName": "Nucleus.SAML.Server",
+	"version": "01.00.00",
+	"operations": [
+		{
+			"createTable": {
+				"name": "SAMLServerClientApps",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "SiteId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "AllowedIssuer",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": false
+					},
+					{
+						"name": "Title",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "LoginPageId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "TokenExpiryMinutes",
+						"clrType": "int",
+						"isnullable": false
+					},
+					{
+						"name": "ServiceProviderMetadataUrl",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": false
+					},
+					{
+						"name": "SigningCertificateFile",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": false
+					},
+					{
+						"name": "SigningCertificatePassword",
+						"clrType": "string",
+						"maxLength": 128,
+						"isnullable": false
+					},
+					{
+						"name": "SignatureValidationCertificateFile",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_SAMLServerClientApps",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_SAMLServerClientApps_LoginPageId",
+						"Columns": [ "LoginPageId" ],
+						"PrincipalTable": "Pages",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "SetNull"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_SAMLServerClientApps_LoginPageId",
+				"table": "Pages",
+				"isunique": false,
+				"columns": [ "LoginPageId" ]
+			}
+		},
+		{
+			"createTable": {
+				"name": "SAMLServerClientAppTokens",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ClientAppId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "RequestId",
+						"clrType": "string",
+						"maxLength": 128,
+						"isnullable": false
+					},
+					{
+						"name": "AssertionConsumerServiceUrl",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": false
+					},
+					{
+						"name": "ProtocolBinding",
+						"clrType": "string",
+						"maxLength": 128,
+						"isnullable": false
+					},
+					{
+						"name": "RelayState",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "Scope",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "Code",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "UserId",
+						"clrType": "guid",
+						"isnullable": true
+					},
+					{
+						"name": "ExpiryDate",
+						"clrType": "datetime",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_SAMLServerClientAppTokens",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_SAMLServerClientAppTokens_SAMLServerClientAppId",
+						"Columns": [ "ClientAppId" ],
+						"PrincipalTable": "SAMLServerClientApps",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					},
+					{
+						"name": "FK_SAMLServerClientAppTokens_UserId",
+						"Columns": [ "UserId" ],
+						"PrincipalTable": "Users",
+						"PrincipalColumns": [ "Id" ]
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_SAMLServerClientAppTokens_SAMLServerClientAppId",
+				"table": "SAMLServerClientApps",
+				"isunique": false,
+				"columns": [ "ClientAppId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_SAMLServerClientAppTokens_ExpiryDate",
+				"table": "SAMLServerClientApps",
+				"isunique": false,
+				"columns": [ "ExpiryDate" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_SAMLServerClientAppTokens_Code",
+				"table": "SAMLServerClientAppTokens",
+				"isunique": true,
+				"columns": [ "Code" ]
+			}
+		}
+	]
+}

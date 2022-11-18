@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+		<RootNamespace>Nucleus.SAML.Server</RootNamespace>
+		<EnableDefaultContentItems>false</EnableDefaultContentItems>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+<ItemGroup>
+		<None Remove="**\*.vspscc" />
+		<None Remove="**\*.scc" />
+		<None Remove="*.zip" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <None Remove="DataProviders\Migrations\Scripts\01.00.00.json" />
+    <None Remove="license.txt" />
+    <None Remove="package.xml" />
+    <None Remove="readme.txt" />
+    <None Remove="settings.css" />
+    <None Remove="Views\Editor.cshtml" />
+    <None Remove="Views\_ClientAppsList.cshtml" />
+    <None Remove="Views\_PageMenu.cshtml" />
+		<None Remove="Views\_ViewImports.cshtml" />
+    <None Remove="Views\Settings.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="license.txt" />
+    <Content Include="package.xml" />
+    <Content Include="readme.txt" />
+    <Content Include="settings.css" />
+    <Content Include="Views\Editor.cshtml" />
+    <Content Include="Views\_ClientAppsList.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Views\_PageMenu.cshtml" />
+		<Content Include="Views\_ViewImports.cshtml" />
+    <Content Include="Views\Settings.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.00.json" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.1.0" />
+		<PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="1.1.0" />
+		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.1.0" />
+		<PackageReference Include="ITfoxtec.Identity.Saml2.MvcCore" Version="4.8.3-beta3" />
+	</ItemGroup>
+
+	<PropertyGroup Label="Nucleus">
+		<ExtensionFolder>SAML Server</ExtensionFolder>
+		<Version>1.0.0</Version>
+		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+	</PropertyGroup>
+
+	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+</Project>

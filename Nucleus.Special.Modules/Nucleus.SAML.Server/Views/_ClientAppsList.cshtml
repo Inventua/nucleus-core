@@ -1,0 +1,13 @@
+﻿@model Nucleus.SAML.Server.ViewModels.Settings
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using (Html.BeginNucleusForm("List", "SAMLServerAdmin", "SAMLServer", FormMethod.Post, new { @data_target = ".nucleus-index-items", @autocomplete = "off" }))
+{
+	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.ClientApps, propertyName = "ClientApps", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
+}
+<ul>
+	@foreach (var item in Model.ClientApps.Items)
+	{
+		<li><a href="@Url.NucleusAction("Editor", "SAMLServerAdmin", "SAMLServer")?id=@item.Id" data-target=".ClientAppEditor">@item.Title</a></li>
+	}
+</ul>

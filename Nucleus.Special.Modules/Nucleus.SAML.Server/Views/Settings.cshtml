@@ -1,0 +1,17 @@
+﻿@model Nucleus.SAML.Server.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+<h1 class="nucleus-control-panel-heading">SAML Server: Client Apps</h1>
+<div class="nucleus-form-tools">
+	<a href="@Url.NucleusAction("Editor", "SAMLServerAdmin", "SAMLServer")" class="btn btn-secondary" data-target=".ClientAppEditor" accesskey="N">New Client App</a>
+</div>
+
+<div class="nucleus-index-wrapper">
+	<div class="nucleus-index-items">
+		@await Html.PartialAsync("_ClientAppsList.cshtml", Model)				
+	</div>
+
+	<div class="ClientAppEditor nucleus-editor-panel"></div>
+</div>

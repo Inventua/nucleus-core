@@ -400,7 +400,7 @@ namespace Nucleus.SAML.Server.Controllers
 
 			Saml2AuthnResponse saml2AuthnResponse = new(responseConfig)
 			{
-				Issuer = this.Context.Site.AbsoluteUrl(Request.IsHttps),
+				Issuer = Request.Issuer(),
 				InResponseTo = inResponseTo,
 				Status = status,
 				Destination = relyingParty.AssertionConsumerServiceUri,
@@ -412,7 +412,7 @@ namespace Nucleus.SAML.Server.Controllers
 				saml2AuthnResponse.NameId = new Saml2NameIdentifier(claimsIdentity.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).Single(), NameIdentifierFormats.Persistent);
 				saml2AuthnResponse.ClaimsIdentity = claimsIdentity;
 
-				saml2AuthnResponse.CreateSecurityToken(Request.Issuer(), subjectConfirmationLifetime: 5, issuedTokenLifetime: 60);
+				saml2AuthnResponse.CreateSecurityToken(clientApp.AllowedIssuer, subjectConfirmationLifetime: 5, issuedTokenLifetime: 60);
 			}
 
 			Saml2PostBinding responsebinding = new()
@@ -458,7 +458,7 @@ namespace Nucleus.SAML.Server.Controllers
 				);
 				saml2AuthnResponse.ClaimsIdentity = claimsIdentity;
 
-				saml2AuthnResponse.CreateSecurityToken(Request.Issuer(), subjectConfirmationLifetime: 5, issuedTokenLifetime: 60);
+				saml2AuthnResponse.CreateSecurityToken(token.ClientApp.AllowedIssuer, subjectConfirmationLifetime: 5, issuedTokenLifetime: 60);
 			}
 
 			token.Code = saml2ArtifactResolve.Artifact;

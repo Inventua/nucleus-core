@@ -11,8 +11,10 @@ using Microsoft.AspNetCore.Authentication;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Extensions;
+using Nucleus.Extensions.Authorization;
 using Microsoft.AspNetCore.Routing;
 using Nucleus.Abstractions.Managers;
+using System.Security.Policy;
 
 namespace Nucleus.OAuth.Client
 {
@@ -159,6 +161,12 @@ namespace Nucleus.OAuth.Client
 				{
 					Boolean userProfileUpdated = false;
 					Boolean userRolesUpdated = false;
+					if (loginUser.IsSystemAdministrator || loginUser.Roles.Where(role=>role.Id == CurrentContext.Site.AdministratorsRole.Id).Any())
+					{
+						// admins can't use remote authentication
+						Logger?.LogWarning("Access denied for user '{name}' because admins can't use remote authentication.", loginUser.UserName);
+						await base.ForbidAsync(properties);
+					}
 
 					if (settings.SynchronizeProfile)
 					{

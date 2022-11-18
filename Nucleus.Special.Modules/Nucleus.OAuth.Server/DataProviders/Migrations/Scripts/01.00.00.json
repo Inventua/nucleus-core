@@ -195,7 +195,7 @@
 				"name": "IX_OAuthServerClientAppTokens_OAuthServerClientAppId",
 				"table": "OAuthServerClientApps",
 				"isunique": false,
-				"columns": [ "ApiKeyId" ]
+				"columns": [ "ClientAppId" ]
 			}
 		},
 		{

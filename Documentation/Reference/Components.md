@@ -48,6 +48,14 @@ uses the [MIT](https://github.com/Inventua/nucleus-core/blob/main/Nucleus.Web/li
 
 <br/>
 
+## SAML Client and SAML Server Extension
+|                                  |                                                             | License                         |
+|----------------------------------|--------------------------------------------------------------------------------------|
+| [ITfoxtec.Identity.Saml2](https://github.com/ITfoxtec/ITfoxtec.Identity.Saml2) | ITfoxtec Identity Saml2 package.	| [BSD 3-Clause](https://github.com/ITfoxtec/ITfoxtec.Identity.Saml2/blob/master/LICENSE) |	
+
+<br/>
+
+
 ## Material Icons
 |                                  |                                                             | License                         |
 |----------------------------------|--------------------------------------------------------------------------------------|

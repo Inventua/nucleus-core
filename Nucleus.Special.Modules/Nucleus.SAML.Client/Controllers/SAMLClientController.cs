@@ -301,6 +301,12 @@ namespace Nucleus.SAML.Client.Controllers
 		{
 			var defaultSite = new Uri($"{Request.Scheme}://{Request.Host.ToUriComponent()}/");
 			Models.Configuration.SAMLProvider providerOption = GetProvider(providerName);
+
+			if (providerOption == null)
+			{
+				return NotFound($"Provider '{providerName}' not found.");
+			}
+
 			Saml2Configuration config = await BuildConfiguration(providerOption);
 
 			EntityDescriptor entityDescriptor = new(config)
@@ -461,7 +467,7 @@ namespace Nucleus.SAML.Client.Controllers
 
 			if (!String.IsNullOrEmpty(providerOption.SigningCertificateFile))
 			{
-				saml2Configuration.SigningCertificate = CertificateUtil.Load(this.WebHostEnvironment.MapToPhysicalFilePath(providerOption.SigningCertificateFile), providerOption.SigningCertificatePassword, X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet);
+				saml2Configuration.SigningCertificate = CertificateUtil.Load(this.WebHostEnvironment.MapToPhysicalFilePath(providerOption.SigningCertificateFile), providerOption.SigningCertificatePassword, X509KeyStorageFlags.EphemeralKeySet);
 			}
 			//Alternatively load the certificate by thumbprint from the machines Certificate Store.
 			if (!String.IsNullOrEmpty(providerOption.SigningCertificateThumbprint))

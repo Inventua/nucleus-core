@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
@@ -27,6 +27,7 @@ using Microsoft.AspNetCore.Authentication;
 using Nucleus.Abstractions.Models.Configuration;
 using System.ServiceModel.Channels;
 using Nucleus.ViewFeatures;
+using System.Net;
 
 // https://www.itfoxtec.com/IdentitySaml2
 // https://www.itfoxtec.com/License/3clauseBSD.htm
@@ -120,7 +121,7 @@ namespace Nucleus.SAML.Client.Controllers
 
 				Saml2Configuration config = await BuildConfiguration(providerOption);
 				IUrlHelper urlHelper = this.UrlHelperFactory.GetUrlHelper(this.ControllerContext);
-				Saml2AuthnRequest request = new(config) 
+				Saml2AuthnRequest request = new(config)
 				{
 					AssertionConsumerServiceUrl = Nucleus.ViewFeatures.UrlHelperExtensions.GetAbsoluteUri(urlHelper, $"{Routes.ASSERTION_CONSUMER}/{providerName}"),
 					ProtocolBinding = new Uri(String.IsNullOrEmpty(providerOption.ResponseProtocolBinding) ? "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" : providerOption.ResponseProtocolBinding),
@@ -153,7 +154,7 @@ namespace Nucleus.SAML.Client.Controllers
 
 					default:
 						throw new InvalidOperationException($"Unsupported request protocol binding: '{providerOption.RequestProtocolBinding}'");
-				}								
+				}
 			}
 			else
 			{
@@ -186,7 +187,7 @@ namespace Nucleus.SAML.Client.Controllers
 					Saml2ArtifactBinding binding = new();
 					config.ArtifactResolutionService = new() { Index = 0, Location = new(providerOption.ArtifactResolutionServiceUrl) };
 					Saml2ArtifactResolve resolver = new(config);
-					
+
 					binding.Unbind(Request.ToGenericHttpRequest(), resolver);
 
 					Saml2SoapEnvelope soapEnvelope = new();
@@ -230,7 +231,8 @@ namespace Nucleus.SAML.Client.Controllers
 			{
 				// admins can't use remote authentication
 				Logger?.LogWarning("Access denied for user '{name}' because admins can't use remote authentication.", principal.Identity.Name);
-				return Forbid();
+				return StatusCode((int)HttpStatusCode.Forbidden, "Access denied for user, because admins can't use remote authentication.");
+				//return Forbid();
 			}
 
 			return await HandleSignInAsync(this.Context.Site, principal, relayStateQuery);
@@ -368,7 +370,7 @@ namespace Nucleus.SAML.Client.Controllers
 						TelephoneNumber = "11111111",
 					}
 				}
-			};	
+			};
 
 			return new Saml2Metadata(entityDescriptor).CreateMetadata().ToActionResult();
 		}
@@ -467,12 +469,26 @@ namespace Nucleus.SAML.Client.Controllers
 
 			if (!String.IsNullOrEmpty(providerOption.SigningCertificateFile))
 			{
-				saml2Configuration.SigningCertificate = CertificateUtil.Load(this.WebHostEnvironment.MapToPhysicalFilePath(providerOption.SigningCertificateFile), providerOption.SigningCertificatePassword, X509KeyStorageFlags.EphemeralKeySet);
+				try
+				{
+					saml2Configuration.SigningCertificate = CertificateUtil.Load(this.WebHostEnvironment.MapToPhysicalFilePath(providerOption.SigningCertificateFile), providerOption.SigningCertificatePassword, X509KeyStorageFlags.EphemeralKeySet);
+				}
+				catch (System.Security.Cryptography.CryptographicException e)
+				{
+					throw new InvalidOperationException(e.Message + " (signing certificate/file)", e);
+				}
 			}
 			//Alternatively load the certificate by thumbprint from the machines Certificate Store.
 			if (!String.IsNullOrEmpty(providerOption.SigningCertificateThumbprint))
 			{
-				saml2Configuration.SigningCertificate = CertificateUtil.Load(StoreName.My, StoreLocation.LocalMachine, X509FindType.FindByThumbprint, providerOption.SigningCertificateThumbprint);
+				try
+				{
+					saml2Configuration.SigningCertificate = CertificateUtil.Load(StoreName.My, StoreLocation.LocalMachine, X509FindType.FindByThumbprint, providerOption.SigningCertificateThumbprint);
+				}
+				catch (System.Security.Cryptography.CryptographicException e)
+				{
+					throw new InvalidOperationException(e.Message + " (signing certificate/local machine-cert-store)", e);
+				}
 			}
 
 			if (saml2Configuration.SignAuthnRequest && saml2Configuration.SigningCertificate == null)
@@ -480,17 +496,24 @@ namespace Nucleus.SAML.Client.Controllers
 				Logger?.LogError("SAML [{name}]: The certificate could not be loaded using the SigningCertificateFile or SigningCertificateThumbprint value.", providerOption.Name);
 				throw new InvalidOperationException($"SAML [{providerOption.Name}]: The SignAuthnRequest property is set to true, but the certificate could not be loaded using the SigningCertificateFile or SigningCertificateThumbprint value.");
 			}
-			
+
 
 			if (!String.IsNullOrEmpty(providerOption.SignatureValidationCertificateFile))
 			{
-				if (String.IsNullOrEmpty(providerOption.SignatureValidationCertificatePassword))
+				try
 				{
-					saml2Configuration.SignatureValidationCertificates.Add(CertificateUtil.Load(this.WebHostEnvironment.MapToPhysicalFilePath(providerOption.SignatureValidationCertificateFile)));
+					if (String.IsNullOrEmpty(providerOption.SignatureValidationCertificatePassword))
+					{
+						saml2Configuration.SignatureValidationCertificates.Add(CertificateUtil.Load(this.WebHostEnvironment.MapToPhysicalFilePath(providerOption.SignatureValidationCertificateFile)));
+					}
+					else
+					{
+						saml2Configuration.SignatureValidationCertificates.Add(CertificateUtil.Load(this.WebHostEnvironment.MapToPhysicalFilePath(providerOption.SignatureValidationCertificateFile), providerOption.SignatureValidationCertificatePassword));
+					}
 				}
-				else
+				catch (System.Security.Cryptography.CryptographicException e)
 				{
-					saml2Configuration.SignatureValidationCertificates.Add(CertificateUtil.Load(this.WebHostEnvironment.MapToPhysicalFilePath(providerOption.SignatureValidationCertificateFile), providerOption.SignatureValidationCertificatePassword));
+					throw new InvalidOperationException(e.Message + " (signature validation certificate/file)", e);
 				}
 			}
 
@@ -561,7 +584,7 @@ namespace Nucleus.SAML.Client.Controllers
 
 			return saml2Configuration;
 		}
-		
+
 
 		private async Task<IActionResult> HandleSignInAsync(Site site, ClaimsPrincipal user, Dictionary<string, string> properties)
 		{
@@ -576,8 +599,7 @@ namespace Nucleus.SAML.Client.Controllers
 			if (String.IsNullOrEmpty(user.Identity.Name))
 			{
 				Logger?.LogTrace("The remote user data does not contain a user name.");
-				return Forbid();
-				//await base.ForbidAsync(properties);
+        throw new InvalidOperationException("The SAML response does not contain a user name.");
 			}
 			else
 			{
@@ -614,8 +636,8 @@ namespace Nucleus.SAML.Client.Controllers
 					// user does not exist		
 					if (!settings.CreateUsers)
 					{
-						Logger?.LogTrace("A matching user was not found, and the SAML server CreateUsers setting is set to false.");
-						return Forbid();
+						Logger?.LogTrace("A matching user was not found, and the SAML client 'CreateUsers' setting is set to false.");
+            throw new InvalidOperationException("You cannot use SAML to log in with this login name because because no user matching your login name was found on this site, and the site is not configured to automatically create new users.");
 					}
 					else
 					{

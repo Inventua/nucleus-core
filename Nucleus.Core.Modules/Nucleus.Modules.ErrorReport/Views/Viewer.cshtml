@@ -1,4 +1,4 @@
-﻿@model Nucleus.Modules.ErrorReport.ViewModels.Viewer
+@model Nucleus.Modules.ErrorReport.ViewModels.Viewer
 @using Nucleus.Abstractions
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
@@ -7,5 +7,9 @@
 <h2>An error occurred while processing your request</h2>
 <div>Date/Time: @DateTime.UtcNow.ToString("g") UTC</div>
 <div>Source: @Model?.ExceptionInfo?.Error?.Source</div>
+<div>Type: @Model?.ExceptionInfo?.Error?.GetType().Name</div>
 <div>Message: @Model?.ExceptionInfo?.Error?.Message</div>
-<div>More Information: @Model?.ExceptionInfo?.Error?.InnerException?.Message</div>
+@if (!String.IsNullOrEmpty(@Model?.ExceptionInfo?.Error?.InnerException?.Message))
+{
+	<div>More Information: @Model?.ExceptionInfo?.Error?.InnerException?.Message</div>
+}

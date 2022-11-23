@@ -50,9 +50,15 @@ namespace Nucleus.Modules.Account.Controllers
 		}
 
 		[HttpGet]
-		public ActionResult Index(string returnUrl, string token, string reason)
+		public ActionResult Index(string username, string returnUrl, string token, string reason)
 		{
 			ViewModels.Login viewModel = BuildViewModel(returnUrl);
+
+			// allow username defaulting
+			if (!String.IsNullOrEmpty(username) && String.IsNullOrEmpty(viewModel.Username))
+			{
+				viewModel.Username = username;
+			}
 
 			switch (reason)
 			{

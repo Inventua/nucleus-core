@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Nucleus.SAML.Server.Controllers
 {
@@ -101,7 +102,22 @@ namespace Nucleus.SAML.Server.Controllers
 
 			viewModel.ClientApp = clientApp;
 			viewModel.Pages = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, 1);
-			viewModel.ApiKeys = await this.ApiKeyManager.List();
+			//viewModel.ApiKeys = await this.ApiKeyManager.List();
+			
+			X509Store store = new(StoreName.My, StoreLocation.LocalMachine);
+			store.Open(OpenFlags.ReadOnly);
+
+			viewModel.SigningCertificates = new();
+			viewModel.ValidationCertificates = new();
+			foreach (X509Certificate2 cert in store.Certificates)
+			{
+				if (cert.HasPrivateKey)
+				{
+					viewModel.SigningCertificates.Add(cert.Thumbprint, cert.Subject.Replace("CN=",""));
+				}
+				viewModel.ValidationCertificates.Add(cert.Thumbprint, cert.Subject.Replace("CN=", ""));
+			}
+
 			return viewModel;
 		}
 

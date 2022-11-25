@@ -10,11 +10,14 @@ namespace Nucleus.SAML.Server.Models
 {
 	public class ClientAppToken
 	{
+		public static TimeSpan EXPIRY_DAYS = TimeSpan.FromDays(1);
+
 		public Guid Id { get; set; }
 				
 		public ClientApp ClientApp { get; set; }
 
 		public string ProtocolBinding { get; set; }
+		public string NameIdentifierFormat { get; set; }
 
 		public string RequestId { get; set; }
 
@@ -25,10 +28,9 @@ namespace Nucleus.SAML.Server.Models
 		public string Code { get; set; }
 
 		public Guid? UserId { get; set; }
-
-		public DateTime ExpiryDate { get; set; }
-		
+				
 		public DateTime DateAdded { get; set; }
+		public DateTime ExpiryDate { get; set; }
 
 	}
 }

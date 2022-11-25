@@ -23,7 +23,7 @@ namespace Nucleus.SAML.Server.Models
 				}
 				catch(System.Security.Cryptography.CryptographicException e)
 				{
-					throw new InvalidOperationException(e.Message + " (signing certificate)" ,e);
+					throw new InvalidOperationException(e.Message + " (signing certificate)", e);
 				}				
 			}
 			else

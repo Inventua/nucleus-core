@@ -59,11 +59,11 @@ namespace Nucleus.SAML.Server
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		public async Task<ClientApp> GetByIssuer(string issuer)
+		public async Task<ClientApp> GetByIssuer(Site site, string issuer)
 		{
 			using (IClientAppDataProvider provider = this.DataProviderFactory.CreateProvider<IClientAppDataProvider>())
 			{
-				return await provider.GetClientAppByIssuer(issuer);
+				return await provider.GetClientAppByIssuer(site, issuer);
 			}			
 		}
 

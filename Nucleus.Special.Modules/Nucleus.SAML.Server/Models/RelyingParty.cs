@@ -9,13 +9,13 @@ namespace Nucleus.SAML.Server.Models
 {
 	public class RelyingParty
 	{
-		public string Metadata { get; set; }
+		public string MetadataServiceUrl { get; set; }
 
 		public string Issuer { get; set; }
 
 		public Uri AssertionConsumerServiceUri { get; set; }
 
-		public string ProtocolBinding { get; set; } = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST";
+		public string ProtocolBinding { get; set; } = ITfoxtec.Identity.Saml2.Schemas.ProtocolBindings.HttpPost.ToString(); // "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST";
 
 		public Uri SingleLogoutDestination { get; set; }
 

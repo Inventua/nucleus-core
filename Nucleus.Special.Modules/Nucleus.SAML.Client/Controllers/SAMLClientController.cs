@@ -395,17 +395,6 @@ namespace Nucleus.SAML.Client.Controllers
 
 			switch (providerOption.GetResponseProtocolBinding())
 			{
-				//// There's no such thing as an AuthnResponse sent using HTTP-Redirect binding.
-				//// source: https://docs.oasis-open.org/security/saml/v2.0/saml-conformance-2.0-os.pdf, page 5.
-				////case Models.Configuration.SAMLProvider.ProtocolBindingTypes.HttpRedirect:
-				////{
-				////	Saml2RedirectBinding binding = new();
-				////	binding.ReadSamlResponse(Request.ToGenericHttpRequest(), saml2AuthnResponse);
-				////	binding.Unbind(Request.ToGenericHttpRequest(), saml2AuthnResponse);
-				////	relayStateQuery = binding.GetRelayStateQuery();
-				////	break;
-				////}
-
 				case Models.Configuration.SAMLProvider.ProtocolBindingTypes.HttpArtifact:
 				{
 					// get the SAML artifact from form data, then call the IdP's artifact resolution service to get an AuthnResponse
@@ -450,7 +439,7 @@ namespace Nucleus.SAML.Client.Controllers
 				HttpContext.User = null;
 			}
 
-			// Create a ClaimPrincipal and translate SAML claims to local (Nucleus) claims, using values from config SAMLProviders[@Key=providerKey]:MapClaims
+			// Create a ClaimsPrincipal and translate SAML claims to local (Nucleus) claims, using mapping from config SAMLProviders[@Key=providerKey]:MapClaims
 			ClaimsPrincipal principal = await saml2AuthnResponse.CreateSession
 			(
 				HttpContext,

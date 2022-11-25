@@ -38,6 +38,9 @@ using System.Net;
 // SAML Response Validator:
 // https://www.samltool.com/validate_response.php
 
+
+// todo: cache IdP meta-data?
+
 namespace Nucleus.SAML.Client.Controllers
 {
 	[Extension("SAMLClient")]
@@ -71,11 +74,19 @@ namespace Nucleus.SAML.Client.Controllers
 			this.Logger = logger;
 		}
 
-
+		/// <summary>
+		/// Display a list or drop-down showing the configured SAML identity providers that the user can connect to.  If there is 
+		/// only one provider, and the "AutoLogin" option is set to true, automatically redirect to the provider.
+		/// </summary>
+		/// <param name="returnUrl"></param>
+		/// <returns></returns>
 		[HttpGet]
 		public ActionResult Index(string returnUrl)
 		{
 			ViewModels.Viewer viewModel = BuildViewModel(returnUrl);
+
+			// If there is only one provider, and the user is not logged in, and the "AutoLogin" option is set to true,
+			// automatically redirect to the (one available) provider.
 			if (viewModel.AutoLogin)
 			{
 				if (!User.Identity.IsAuthenticated && this.Options.Value.Count == 1)
@@ -87,7 +98,7 @@ namespace Nucleus.SAML.Client.Controllers
 						string url = BuildRedirectUrl(returnUrl);
 						Logger?.LogTrace("SAML Provider Selector: AutoLogin is enabled, automatically redirecting to '{url}'.", url);
 						// redirect to SAML provider 
-						return Challenge(new AuthenticationProperties() { RedirectUri = url }, providerOption.Name);
+						return Challenge(new AuthenticationProperties() { RedirectUri = url }, providerOption.Key);
 					}
 				}
 			}
@@ -95,14 +106,19 @@ namespace Nucleus.SAML.Client.Controllers
 			return View("Viewer", viewModel);
 		}
 
-		// https://golem.inventua.com:5001/extensions/SAMLClient/Authenticate/localtest
-		// https://golem.inventua.com:5001/extensions/SAMLClient/Authenticate/start.sharpamericas.com
-		// https://golem.inventua.com:5001/extensions/SAMLClient/Authenticate/start.sharpusa.net
+
+		/// <summary>
+		/// Use the specified <paramref name="providerKey"/> to retrieve provider settings and start a SAML login.
+		/// </summary>
+		/// <param name="providerKey">The "Key" value for a SAML IdP which is configured in configuration files [Nucleus:SAMLProviders]</param>
+		/// <param name="returnUrl">Relative url to redirect to after the SAML sign-on is complete.</param>
+		/// <returns></returns>
+		/// <exception cref="InvalidOperationException"></exception>
 		[HttpGet]
-		[Route($"{Routes.AUTHENTICATE}/{{providerName}}")]
-		public async Task<IActionResult> Authenticate(string providerName, string returnUrl)
+		[Route($"{Routes.AUTHENTICATE}/{{providerKey}}")]
+		public async Task<IActionResult> Authenticate(string providerKey, string returnUrl)
 		{
-			Models.Configuration.SAMLProvider providerOption = GetProvider(providerName);
+			Models.Configuration.SAMLProvider providerOption = GetProviderSettings(providerKey);
 
 			if (providerOption != null)
 			{
@@ -123,7 +139,7 @@ namespace Nucleus.SAML.Client.Controllers
 				IUrlHelper urlHelper = this.UrlHelperFactory.GetUrlHelper(this.ControllerContext);
 				Saml2AuthnRequest request = new(config)
 				{
-					AssertionConsumerServiceUrl = Nucleus.ViewFeatures.UrlHelperExtensions.GetAbsoluteUri(urlHelper, $"{Routes.ASSERTION_CONSUMER}/{providerName}"),
+					AssertionConsumerServiceUrl = Nucleus.ViewFeatures.UrlHelperExtensions.GetAbsoluteUri(urlHelper, $"{Routes.ASSERTION_CONSUMER}/{providerKey}"),
 					ProtocolBinding = new Uri(String.IsNullOrEmpty(providerOption.ResponseProtocolBinding) ? "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" : providerOption.ResponseProtocolBinding),
 					Subject = new Subject { NameID = new NameID { ID = "" } },
 					NameIdPolicy = new NameIdPolicy { AllowCreate = false, Format = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" }
@@ -145,44 +161,252 @@ namespace Nucleus.SAML.Client.Controllers
 						return binding.Bind(request).ToActionResult();
 					}
 
-					////case Models.Configuration.SAMLProvider.ProtocolBindingTypes.Soap:
-					////{
-					////	Saml2SoapBinding binding = new();
-					////	binding.SetRelayStateQuery(new Dictionary<string, string> { { relayStateReturnUrl, returnUrl ?? Url.Content("~/") } });
-					////	return binding.Bind(request).ToActionResult();
-					////}
-
 					default:
 						throw new InvalidOperationException($"Unsupported request protocol binding: '{providerOption.RequestProtocolBinding}'");
 				}
 			}
 			else
 			{
-				Logger?.LogTrace("SAML provider {providername} not found.  Check your configuration files Nucleus:SAMLProviders section for a provider with a matching name, or a matching type and no name.", providerName);
+				Logger?.LogTrace("SAML provider {providerKey} not found.  Check your configuration files Nucleus:SAMLProviders section for a provider with a matching name, or a matching type and no name.", providerKey);
 				return BadRequest();
 			}
 		}
 
-		private async Task<IActionResult> ParseAuthnResponse(string providerName)
+		
+		/// <summary>
+		/// Implementation of SAML SP assertion consumer service.  This action receives a SAML artifact as a query string
+		/// value, which it uses to call the Identity Provider artifact resolution service.
+		/// </summary>
+		/// <param name="providerKey"></param>
+		/// <param name="SAMLArt"></param>
+		/// <returns></returns>
+		[HttpGet]
+		[Route($"{Routes.ASSERTION_CONSUMER}/{{providerKey}}")]
+		public async Task<IActionResult> Callback(string providerKey, string SAMLArt)
 		{
-			Models.Configuration.SAMLProvider providerOption = GetProvider(providerName);
+			try
+			{
+				return await ParseAuthnResponse(providerKey);
+			}
+			catch (ITfoxtec.Identity.Saml2.Cryptography.InvalidSignatureException e)
+			{
+				Logger.LogError(e, "Exception thrown while validating SAML2 Authn Response.");
+				throw e;
+			}
+		}
+
+		/// <summary>
+		/// Implementation of SAML SP Assertion consumer service.  This action receives the AuthnResponse as a form  
+		/// value, or in the POST body. 
+		/// </summary>
+		/// <param name="providerKey"></param>
+		/// <returns></returns>
+		[HttpPost]
+		[Route($"{Routes.ASSERTION_CONSUMER}/{{providerKey}}")]
+		public async Task<IActionResult> Callback(string providerKey)
+		{
+			try
+			{
+				return await ParseAuthnResponse(providerKey);
+			}
+			catch (ITfoxtec.Identity.Saml2.Cryptography.InvalidSignatureException e)
+			{
+				Logger.LogError(e, "Exception thrown validating SAML2 Authn Response.");
+				throw e;
+			}
+		}
+
+		/// <summary>
+		/// Prepare and output SAML Service Provider (SP) metadata for the specified <paramref name="providerKey"/>
+		/// </summary>
+		/// <param name="providerKey"></param>
+		/// <returns></returns>
+		[HttpGet]
+		[Route($"{Routes.METADATA}/{{providerKey}}")]
+		public async Task<IActionResult> Metadata(string providerKey)
+		{
+			Uri defaultSite = new ($"{Request.Scheme}://{Request.Host.ToUriComponent()}/{(!String.IsNullOrEmpty(Request.PathBase) ? Request.PathBase + "/" : "")}");
+
+			Models.Configuration.SAMLProvider providerOption = GetProviderSettings(providerKey);
+
+			if (providerOption == null)
+			{
+				return NotFound($"SAML Identity Provider '{providerKey}' not found.");
+			}
+
+			Saml2Configuration config = await BuildConfiguration(providerOption);
+
+			EntityDescriptor entityDescriptor = new(config)
+			{
+				ValidUntil = 30,  // days
+				SPSsoDescriptor = new()
+				{					
+					// we always ask for the assertion to be signed
+					WantAssertionsSigned = true,
+
+					AuthnRequestsSigned = config.SignAuthnRequest,
+					
+					NameIDFormats = new Uri[] { NameIdentifierFormats.Persistent },
+
+					SingleLogoutServices = new SingleLogoutService[]
+					{
+						new() { Binding = ProtocolBindings.HttpPost, Location = new Uri(defaultSite, $"{Routes.SINGLE_LOGOUT}/{providerKey}")	}
+					},
+
+					AssertionConsumerServices = new AssertionConsumerService[]
+					{
+						new() { Binding = ProtocolBindings.HttpPost, Location = new Uri(defaultSite, $"{Routes.ASSERTION_CONSUMER}/{providerKey}") }
+					},
+
+					AttributeConsumingServices = new AttributeConsumingService[]
+					{
+						new() 
+						{							  
+							ServiceName = new ServiceName($"{this.Context.Site.Name} [{providerKey}] SP" , "en"),
+							RequestedAttributes = CreateRequestedAttributes(providerOption)
+						}
+					}
+				}
+				// Contact persons element is optional(SAML spec 2.3.2.2).  
+				//ContactPersons = new ContactPerson[] {
+				//	new ContactPerson(ContactTypes.Administrative)
+				//	{
+				//		Company = "Some Company", GivenName = "Some Given Name", SurName = "Some Surname",	EmailAddress = "some@some-domain.com", TelephoneNumber = "11111111"
+				//	}
+				//}
+			};
+
+			if (config.SigningCertificate != null)
+			{
+				entityDescriptor.IdPSsoDescriptor.SigningCertificates = new X509Certificate2[] { config.SigningCertificate };
+			}
+			//EncryptionCertificates = new X509Certificate2[] { config.DecryptionCertificate },
+
+			return new Saml2Metadata(entityDescriptor).CreateMetadata().ToActionResult();
+		}
+
+		/// /// NOT IMPLEMENTED
+		///// <summary>
+		///// Send a request to the IdP asking to be logged out.
+		///// </summary>
+		///// <param name="providerKey"></param>
+		///// <returns></returns>
+		//[HttpPost]
+		//[Route($"{Routes.LOGOUT}/{{providerKey}}")]
+		//[ValidateAntiForgeryToken]
+		//public async Task<IActionResult> Logout(string providerKey)
+		//{
+		//	if (!User.Identity.IsAuthenticated)
+		//	{
+		//		return Redirect(Url.Content("~/"));
+		//	}
+
+		//	Saml2PostBinding binding = new();
+		//	Models.Configuration.SAMLProvider providerOption = GetProviderSettings(providerKey);
+
+		//	Saml2LogoutRequest saml2LogoutRequest = new(await BuildConfiguration(providerOption), User);
+		//	saml2LogoutRequest.Config.SingleLogoutDestination=???
+		//	saml2LogoutRequest = await saml2LogoutRequest.DeleteSession(HttpContext);
+
+		//	return binding.Bind(saml2LogoutRequest).ToActionResult();
+		//}
+
+		/// /// NOT IMPLEMENTED
+		///// <summary>
+		///// Log out locally.
+		///// </summary>
+		///// <param name="providerKey"></param>
+		///// <returns></returns>
+		//[Route($"{Routes.LOGGED_OUT}/{{providerKey}}")]
+		//public async Task<IActionResult> LoggedOut(string providerKey)
+		//{
+		//	var binding = new Saml2PostBinding();
+		//	Models.Configuration.SAMLProvider providerOption = GetProviderSettings(providerKey);
+
+		//	binding.Unbind(Request.ToGenericHttpRequest(), new Saml2LogoutResponse(await BuildConfiguration(providerOption)));
+
+		//	return Redirect(Url.Content("~/"));
+		//}
+
+		/// /// NOT IMPLEMENTED
+		///// <summary>
+		///// Process IdP-initated local logout
+		///// </summary>
+		///// <param name="providerKey"></param>
+		///// <returns></returns>
+		////[Route($"{Routes.SINGLE_LOGOUT}/{{providerKey}}")]
+		////public async Task<IActionResult> SingleLogout(string providerKey)
+		////{
+		////	Saml2StatusCodes status;
+		////	Saml2PostBinding requestBinding = new();
+		////	Models.Configuration.SAMLProvider providerOption = GetProviderSettings(providerKey);
+
+		////	var logoutRequest = new Saml2LogoutRequest(await BuildConfiguration(providerOption), User);
+		////	try
+		////	{
+		////		requestBinding.Unbind(Request.ToGenericHttpRequest(), logoutRequest);
+		////		status = Saml2StatusCodes.Success;
+		////		await logoutRequest.DeleteSession(HttpContext);
+
+		////		await this.SessionManager.SignOut(HttpContext);
+		////	}
+		////	catch (Exception exc)
+		////	{
+		////		// log exception
+		////		Debug.WriteLine("SingleLogout error: " + exc.ToString());
+		////		status = Saml2StatusCodes.RequestDenied;
+		////	}
+
+		////	var responsebinding = new Saml2PostBinding();
+		////	responsebinding.RelayState = requestBinding.RelayState;
+		////	var saml2LogoutResponse = new Saml2LogoutResponse(await BuildConfiguration(providerOption))
+		////	{
+		////		InResponseToAsString = logoutRequest.IdAsString,
+		////		Status = status,
+		////	};
+		////	return responsebinding.Bind(saml2LogoutResponse).ToActionResult();
+		////}
+
+
+		/// <summary>
+		/// Parse an AuthResponse, or use the value of a SAMLartifact to call the IdP artifact resolution service (which
+		/// returns an AuthnResponse) and then parse it.  If successful, use the information in the AuthnResponse to log in
+		/// locally.
+		/// </summary>
+		/// <param name="providerKey"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// The IdP provider ResponseProtocolBinding setting (specifed by <paramref name="providerKey"/>) controls whether
+		/// we expect the incoming data to be a SAMLartifact in the query string, a AuthnResponse in form data, or an 
+		/// AuthnResponse in the request body.
+		/// 
+		/// The Saml2RedirectBinding, Saml2ArtifactBinding and Saml2PostBinding take care of validating the HTTP method and
+		/// retrieving/parsing the query string, form data or request body, so we don't have to check any of that here.
+		/// </remarks>
+		private async Task<IActionResult> ParseAuthnResponse(string providerKey)
+		{
+			Models.Configuration.SAMLProvider providerOption = GetProviderSettings(providerKey);
 			Saml2Configuration config = await BuildConfiguration(providerOption);
 			Saml2AuthnResponse saml2AuthnResponse = new(config);
 			Dictionary<string, string> relayStateQuery;
 
 			switch (providerOption.GetResponseProtocolBinding())
 			{
-				case Models.Configuration.SAMLProvider.ProtocolBindingTypes.HttpRedirect:
-				{
-					Saml2RedirectBinding binding = new();
-					binding.ReadSamlResponse(Request.ToGenericHttpRequest(), saml2AuthnResponse);
-					binding.Unbind(Request.ToGenericHttpRequest(), saml2AuthnResponse);
-					relayStateQuery = binding.GetRelayStateQuery();
-					break;
-				}
+				//// There's no such thing as an AuthnResponse sent using HTTP-Redirect binding.
+				//// source: https://docs.oasis-open.org/security/saml/v2.0/saml-conformance-2.0-os.pdf, page 5.
+				////case Models.Configuration.SAMLProvider.ProtocolBindingTypes.HttpRedirect:
+				////{
+				////	Saml2RedirectBinding binding = new();
+				////	binding.ReadSamlResponse(Request.ToGenericHttpRequest(), saml2AuthnResponse);
+				////	binding.Unbind(Request.ToGenericHttpRequest(), saml2AuthnResponse);
+				////	relayStateQuery = binding.GetRelayStateQuery();
+				////	break;
+				////}
 
 				case Models.Configuration.SAMLProvider.ProtocolBindingTypes.HttpArtifact:
 				{
+					// get the SAML artifact from form data, then call the IdP's artifact resolution service to get an AuthnResponse
+					// and parse it.
 					config.Issuer = providerOption.Issuer;
 					Saml2ArtifactBinding binding = new();
 					config.ArtifactResolutionService = new() { Index = 0, Location = new(providerOption.ArtifactResolutionServiceUrl) };
@@ -199,6 +423,7 @@ namespace Nucleus.SAML.Client.Controllers
 
 				case Models.Configuration.SAMLProvider.ProtocolBindingTypes.HttpPost:
 				{
+					// The AuthnResponse is in the rrequest body, parse it
 					Saml2PostBinding binding = new();
 					binding.ReadSamlResponse(Request.ToGenericHttpRequest(), saml2AuthnResponse);
 					binding.Unbind(Request.ToGenericHttpRequest(), saml2AuthnResponse);
@@ -207,7 +432,7 @@ namespace Nucleus.SAML.Client.Controllers
 				}
 
 				default:
-					throw new AuthenticationException($"SAML: Unhandled protocol binding {providerOption.ResponseProtocolBinding}");
+					throw new AuthenticationException($"SAML: Unhandled response protocol binding {providerOption.ResponseProtocolBinding}");
 			}
 
 			if (saml2AuthnResponse.Status != Saml2StatusCodes.Success)
@@ -215,7 +440,7 @@ namespace Nucleus.SAML.Client.Controllers
 				throw new AuthenticationException($"SAML Response status: {saml2AuthnResponse.Status}");
 			}
 
-			// Translate SAML claims to local (Nucleus) claims, using values from config SAMLProviders[@Name=providerName]:MapClaims
+			// Translate SAML claims to local (Nucleus) claims, using values from config SAMLProviders[@Key=providerKey]:MapClaims
 			ClaimsPrincipal principal = await saml2AuthnResponse.CreateSession
 			(
 				HttpContext,
@@ -231,292 +456,123 @@ namespace Nucleus.SAML.Client.Controllers
 			{
 				// admins can't use remote authentication
 				Logger?.LogWarning("Access denied for user '{name}' because admins can't use remote authentication.", principal.Identity.Name);
-				return StatusCode((int)HttpStatusCode.Forbidden, "Access denied for user, because admins can't use remote authentication.");
-				//return Forbid();
+				throw new InvalidOperationException("Access denied for user, because admins can't use remote authentication.");
 			}
 
+			// Log in locally
 			return await HandleSignInAsync(this.Context.Site, principal, relayStateQuery);
-
 		}
 
-		[HttpGet]
-		[Route($"{Routes.ASSERTION_CONSUMER}/{{providerName}}")]
-		public async Task<IActionResult> Callback(string providerName, string SAMLArt)
+		/// <summary>
+		/// Request user values (claims) which are commonly used by Nucleus
+		/// </summary>
+		/// <returns></returns>
+		private IEnumerable<RequestedAttribute> CreateRequestedAttributes(Models.Configuration.SAMLProvider provider)
 		{
-			try
-			{
-				return await ParseAuthnResponse(providerName);
-			}
-			catch (ITfoxtec.Identity.Saml2.Cryptography.InvalidSignatureException e)
-			{
-				Logger.LogError(e, "Exception thrown validating SAML2 Authn Response.");
-				throw e;
-			}
+			// return the "SAML-side" names of the claims which we can consume.  The <requestedAttributes> element is a SAML
+			// extension, and IdPs can choose to ignore it.
+			return provider.MapClaims.Select(map => new RequestedAttribute(map.SAMLKey, "urn:oasis:names:tc:SAML:2.0:attrname-format:uri")).ToList();
+
+			//yield return new RequestedAttribute("urn:oid:2.5.4.41");                    // name
+			//yield return new RequestedAttribute("urn:oid:2.5.4.42");                    // givenName
+			//yield return new RequestedAttribute("urn:oid:2.5.4.4");                     // surname
+			//yield return new RequestedAttribute("urn:oid:2.5.4.3");                     // common name
+			//yield return new RequestedAttribute("urn:oid:0.9.2342.19200300.100.1.3");   // email
 		}
 
-		[HttpPost]
-		[Route($"{Routes.ASSERTION_CONSUMER}/{{providerName}}")]
-		public async Task<IActionResult> Callback(string providerName)
+		/// <summary>
+		/// Return provider config settings specified by <paramref name="providerKey"/>, or null if there is no matching provider.
+		/// </summary>
+		/// <param name="providerKey"></param>
+		/// <returns></returns>
+		private Models.Configuration.SAMLProvider GetProviderSettings(string providerKey)
 		{
-			try
+			if (!String.IsNullOrEmpty(providerKey))
 			{
-				return await ParseAuthnResponse(providerName);
-			}
-			catch (ITfoxtec.Identity.Saml2.Cryptography.InvalidSignatureException e)
-			{
-				Logger.LogError(e, "Exception thrown validating SAML2 Authn Response.");
-				throw e;
-			}
+				Logger?.LogTrace("SAML provider {providerKey} requested.", providerKey);
 
-
-			//try
-			//{
-			//	// This line doesn't work property if the assertion is signed (if the response is signed, it works fine).  This may be 
-			//	// a bug in ITfoxtec.Identity.Saml2 or Microsoft.IdentityModel.Xml.dll
-			//	binding.Unbind(Request.ToGenericHttpRequest(), saml2AuthnResponse);
-			//}
-			//catch (ITfoxtec.Identity.Saml2.Cryptography.InvalidSignatureException e)
-			//{
-			//	Logger.LogError(e, "Exception thrown validating SAML2 Authn Response.");
-			//	throw e;
-			//}
-
-			//// Translate SAML claims to local (Nucleus) claims, using values from config SAMLProviders[@Name=providerName]:MapClaims
-			//ClaimsPrincipal principal = await saml2AuthnResponse.CreateSession
-			//(
-			//	HttpContext,
-			//	claimsTransform: claimsPrincipal => ClaimsTransformExtensions.Transform
-			//	(
-			//		claimsPrincipal,
-			//		providerOption.MapClaims,
-			//		this.Logger
-			//	)
-			//);
-
-			//return await HandleSignInAsync(this.Context.Site, principal, binding.GetRelayStateQuery());
-
-		}
-
-		[HttpGet]
-		[Route($"{Routes.METADATA}/{{providerName}}")]
-		public async Task<IActionResult> Metadata(string providerName)
-		{
-			var defaultSite = new Uri($"{Request.Scheme}://{Request.Host.ToUriComponent()}/");
-			Models.Configuration.SAMLProvider providerOption = GetProvider(providerName);
-
-			if (providerOption == null)
-			{
-				return NotFound($"Provider '{providerName}' not found.");
-			}
-
-			Saml2Configuration config = await BuildConfiguration(providerOption);
-
-			EntityDescriptor entityDescriptor = new(config)
-			{
-				ValidUntil = 365,
-				SPSsoDescriptor = new()
-				{
-					WantAssertionsSigned = true,
-
-					AuthnRequestsSigned = providerOption.SignAuthnRequest,
-
-					SigningCertificates = new X509Certificate2[]
-					{
-						config.SigningCertificate
-					},
-					//EncryptionCertificates = new X509Certificate2[]
-					//{
-					//    config.DecryptionCertificate
-					//},
-					SingleLogoutServices = new SingleLogoutService[]
-					{
-						new SingleLogoutService
-						{
-							Binding = ProtocolBindings.HttpPost,
-							Location = new Uri(defaultSite, $"{Routes.SINGLE_LOGOUT}/{providerName}"),
-							//ResponseLocation = new Uri(defaultSite,Url.NucleusAction(nameof(SingleLogout),"SAMLClient","SAMLClient"))// $"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension=SAMLClient}}/{{action={nameof(LoggedOut)}}}/{{providerName}}")
-						}
-					},
-
-					NameIDFormats = new Uri[] { NameIdentifierFormats.X509SubjectName },
-
-					AssertionConsumerServices = new AssertionConsumerService[]
-					{
-						new AssertionConsumerService
-						{
-							Binding = ProtocolBindings.HttpPost,
-							Location = new Uri(defaultSite, $"{Routes.ASSERTION_CONSUMER}/{providerName}")
-						},
-					},
-
-					AttributeConsumingServices = new AttributeConsumingService[]
-					{
-						new AttributeConsumingService
-						{
-							ServiceName = new ServiceName($"{this.Context.Site.Name} [{providerName}] SP" , "en"),
-							RequestedAttributes = CreateRequestedAttributes()
-						}
-					}
-				},
-
-				ContactPersons = new ContactPerson[] {
-					new ContactPerson(ContactTypes.Administrative)
-					{
-						// todo: populate proper values
-						Company = "Some Company",
-						GivenName = "Some Given Name",
-						SurName = "Some Sur Name",
-						EmailAddress = "some@some-domain.com",
-						TelephoneNumber = "11111111",
-					}
-				}
-			};
-
-			return new Saml2Metadata(entityDescriptor).CreateMetadata().ToActionResult();
-		}
-
-		private IEnumerable<RequestedAttribute> CreateRequestedAttributes()
-		{
-			yield return new RequestedAttribute("urn:oid:2.5.4.41");                    // name
-			yield return new RequestedAttribute("urn:oid:2.5.4.42");                    // givenName
-			yield return new RequestedAttribute("urn:oid:2.5.4.4");                     // surname
-			yield return new RequestedAttribute("urn:oid:2.5.4.3");                     // common name
-			yield return new RequestedAttribute("urn:oid:0.9.2342.19200300.100.1.3");   // email
-		}
-
-		[HttpPost]
-		[Route($"{Routes.LOGOUT}/{{providerName}}")]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Logout(string providerName)
-		{
-			if (!User.Identity.IsAuthenticated)
-			{
-				return Redirect(Url.Content("~/"));
-			}
-
-			Saml2PostBinding binding = new();
-			Models.Configuration.SAMLProvider providerOption = GetProvider(providerName);
-
-			var saml2LogoutRequest = await new Saml2LogoutRequest(await BuildConfiguration(providerOption), User).DeleteSession(HttpContext);
-			return binding.Bind(saml2LogoutRequest).ToActionResult();
-		}
-
-		[Route($"{Routes.LOGGED_OUT}/{{providerName}}")]
-		public async Task<IActionResult> LoggedOut(string providerName)
-		{
-			var binding = new Saml2PostBinding();
-			Models.Configuration.SAMLProvider providerOption = GetProvider(providerName);
-
-			binding.Unbind(Request.ToGenericHttpRequest(), new Saml2LogoutResponse(await BuildConfiguration(providerOption)));
-
-			return Redirect(Url.Content("~/"));
-		}
-
-		[Route($"{Routes.SINGLE_LOGOUT}/{{providerName}}")]
-		public async Task<IActionResult> SingleLogout(string providerName)
-		{
-			Saml2StatusCodes status;
-			Saml2PostBinding requestBinding = new();
-			Models.Configuration.SAMLProvider providerOption = GetProvider(providerName);
-
-			var logoutRequest = new Saml2LogoutRequest(await BuildConfiguration(providerOption), User);
-			try
-			{
-				requestBinding.Unbind(Request.ToGenericHttpRequest(), logoutRequest);
-				status = Saml2StatusCodes.Success;
-				await logoutRequest.DeleteSession(HttpContext);
-			}
-			catch (Exception exc)
-			{
-				// log exception
-				Debug.WriteLine("SingleLogout error: " + exc.ToString());
-				status = Saml2StatusCodes.RequestDenied;
-			}
-
-			var responsebinding = new Saml2PostBinding();
-			responsebinding.RelayState = requestBinding.RelayState;
-			var saml2LogoutResponse = new Saml2LogoutResponse(await BuildConfiguration(providerOption))
-			{
-				InResponseToAsString = logoutRequest.IdAsString,
-				Status = status,
-			};
-			return responsebinding.Bind(saml2LogoutResponse).ToActionResult();
-		}
-
-
-		private Models.Configuration.SAMLProvider GetProvider(string providerName)
-		{
-			if (!String.IsNullOrEmpty(providerName))
-			{
-				Logger?.LogTrace("SAML provider {providername} requested.", providerName);
-
-				// Find provider configuration matching the supplied providerName.  
+				// Find provider configuration matching the supplied providerKey.  
 				return this.Options.Value
-					.Where(option => (option.SafeProviderName().Equals(providerName, StringComparison.OrdinalIgnoreCase)))
+					.Where(option => (option.SafeProviderKey().Equals(providerKey, StringComparison.OrdinalIgnoreCase)))
 					.FirstOrDefault();
 			}
 
 			return null;
 		}
 
+		/// <summary>
+		/// Create and populate a Saml2Configuration object from configuration data.
+		/// </summary>
+		/// <param name="providerOption"></param>
+		/// <returns></returns>
+		/// <exception cref="InvalidOperationException">
+		/// Certificate loading/validation errors generate an InvalidOperationException.
+		/// </exception>
 		private async Task<Saml2Configuration> BuildConfiguration(Models.Configuration.SAMLProvider providerOption)
 		{
 			Saml2Configuration saml2Configuration = new();
 
-			saml2Configuration.SignAuthnRequest = providerOption.SignAuthnRequest;
 			saml2Configuration.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.None;
 			saml2Configuration.RevocationMode = X509RevocationMode.NoCheck;
 
-			if (!String.IsNullOrEmpty(providerOption.SigningCertificateFile))
+			if (!String.IsNullOrEmpty(providerOption.Issuer))
 			{
-				try
-				{
-					saml2Configuration.SigningCertificate = CertificateUtil.Load(this.WebHostEnvironment.MapToPhysicalFilePath(providerOption.SigningCertificateFile), providerOption.SigningCertificatePassword, X509KeyStorageFlags.EphemeralKeySet);
-				}
-				catch (System.Security.Cryptography.CryptographicException e)
-				{
-					throw new InvalidOperationException(e.Message + " (signing certificate/file)", e);
-				}
-			}
-			//Alternatively load the certificate by thumbprint from the machines Certificate Store.
-			if (!String.IsNullOrEmpty(providerOption.SigningCertificateThumbprint))
-			{
-				try
-				{
-					saml2Configuration.SigningCertificate = CertificateUtil.Load(StoreName.My, StoreLocation.LocalMachine, X509FindType.FindByThumbprint, providerOption.SigningCertificateThumbprint);
-				}
-				catch (System.Security.Cryptography.CryptographicException e)
-				{
-					throw new InvalidOperationException(e.Message + " (signing certificate/local machine-cert-store)", e);
-				}
+				saml2Configuration.Issuer = providerOption.Issuer;
 			}
 
-			if (saml2Configuration.SignAuthnRequest && saml2Configuration.SigningCertificate == null)
+			// only use these settings from config if IdPMetadataUrl is blank or not specified
+			if (String.IsNullOrEmpty(providerOption.IdPMetadataUrl))
 			{
-				Logger?.LogError("SAML [{name}]: The certificate could not be loaded using the SigningCertificateFile or SigningCertificateThumbprint value.", providerOption.Name);
-				throw new InvalidOperationException($"SAML [{providerOption.Name}]: The SignAuthnRequest property is set to true, but the certificate could not be loaded using the SigningCertificateFile or SigningCertificateThumbprint value.");
-			}
+				saml2Configuration.SignAuthnRequest = providerOption.SignAuthnRequest;
+				saml2Configuration.AllowedIssuer = providerOption.AllowedIssuer;
 
-
-			if (!String.IsNullOrEmpty(providerOption.SignatureValidationCertificateFile))
-			{
-				try
+				if (!String.IsNullOrEmpty(providerOption.SingleSignOnDestination))
 				{
-					if (String.IsNullOrEmpty(providerOption.SignatureValidationCertificatePassword))
+					saml2Configuration.SingleSignOnDestination = new Uri(providerOption.SingleSignOnDestination);
+				}
+
+				if (!String.IsNullOrEmpty(providerOption.SingleLogoutDestination))
+				{
+					saml2Configuration.SingleLogoutDestination = new Uri(providerOption.SingleLogoutDestination);
+				}
+
+				if (!String.IsNullOrEmpty(providerOption.SignatureAlgorithm))
+				{
+					saml2Configuration.SignatureAlgorithm = providerOption.SignatureAlgorithm;
+				}
+				else
+				{
+					saml2Configuration.SignatureAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+				}
+
+				// load signature validation certificate from file
+				if (!String.IsNullOrEmpty(providerOption.SignatureValidationCertificateFile))
+				{
+					try
 					{
 						saml2Configuration.SignatureValidationCertificates.Add(CertificateUtil.Load(this.WebHostEnvironment.MapToPhysicalFilePath(providerOption.SignatureValidationCertificateFile)));
 					}
-					else
+					catch (System.Security.Cryptography.CryptographicException e)
 					{
-						saml2Configuration.SignatureValidationCertificates.Add(CertificateUtil.Load(this.WebHostEnvironment.MapToPhysicalFilePath(providerOption.SignatureValidationCertificateFile), providerOption.SignatureValidationCertificatePassword));
+						throw new InvalidOperationException(e.Message + " (signature validation certificate/file)", e);
 					}
 				}
-				catch (System.Security.Cryptography.CryptographicException e)
-				{
-					throw new InvalidOperationException(e.Message + " (signature validation certificate/file)", e);
-				}
-			}
 
+				// load signature validation certificate from certifiate store
+				if (!String.IsNullOrEmpty(providerOption.SignatureValidationCertificateThumbprint))
+				{
+					try
+					{
+						saml2Configuration.SignatureValidationCertificates.Add(CertificateUtil.Load(StoreName.My, StoreLocation.LocalMachine, X509FindType.FindByThumbprint, providerOption.SignatureValidationCertificateThumbprint.Replace(" ", "")));
+					}
+					catch (System.Security.Cryptography.CryptographicException e)
+					{
+						throw new InvalidOperationException(e.Message + " (signature validation certificate/local machine-cert-store)", e);
+					}
+				}
+			}				
+
+			// read settings from IdP meta-data, if specifed.  Settings from meta-data override any specified setitngs.
 			if (!String.IsNullOrEmpty(providerOption.IdPMetadataUrl))
 			{
 				EntityDescriptor entityDescriptor = new();
@@ -529,63 +585,83 @@ namespace Nucleus.SAML.Client.Controllers
 					saml2Configuration.SingleLogoutDestination = entityDescriptor.IdPSsoDescriptor.SingleLogoutServices.First().Location;
 					foreach (X509Certificate2 signingCertificate in entityDescriptor.IdPSsoDescriptor.SigningCertificates)
 					{
-						if (signingCertificate.IsValidLocalTime())
+						if (!signingCertificate.IsValidLocalTime())
 						{
-							saml2Configuration.SignatureValidationCertificates.Add(signingCertificate);
+							Logger?.LogError("SAML: The signature validation certificate provided by '{url}' has expired.", providerOption.IdPMetadataUrl);
+							throw new InvalidOperationException($"The signature validation certificate provided by '{providerOption.IdPMetadataUrl}' has expired.");
 						}
+						saml2Configuration.SignatureValidationCertificates.Add(signingCertificate);
 					}
-					if (saml2Configuration.SignatureValidationCertificates.Count <= 0)
-					{
-						Logger?.LogError("SAML [{name}]: The IdP signing certificate has expired.", providerOption.Name);
-						throw new InvalidOperationException($"SAML [{providerOption.Name}]: The IdP signing certificate has expired.");
-					}
+					
 					if (entityDescriptor.IdPSsoDescriptor.WantAuthnRequestsSigned.HasValue)
 					{
 						saml2Configuration.SignAuthnRequest = entityDescriptor.IdPSsoDescriptor.WantAuthnRequestsSigned.Value;
 					}
+					else
+					{
+						// if it is not specified by the meta-data, allow users to specify SignAuthnRequest in config file
+						saml2Configuration.SignAuthnRequest = providerOption.SignAuthnRequest;
+					}
 				}
 			}
-			else
+
+			// AuthnRequest signature certificate is always specified by the SP (won't ever come from metadata)
+			if (saml2Configuration.SignAuthnRequest)
 			{
-				saml2Configuration.AllowedIssuer = providerOption.AllowedIssuer;
-
-				if (!String.IsNullOrEmpty(providerOption.Issuer))
+				// Load request signing certificate from a file
+				if (!String.IsNullOrEmpty(providerOption.SigningCertificateFile))
 				{
-					saml2Configuration.Issuer = providerOption.Issuer;
-					saml2Configuration.AllowedAudienceUris.Add(saml2Configuration.Issuer);
+					try
+					{
+						saml2Configuration.SigningCertificate = CertificateUtil.Load(this.WebHostEnvironment.MapToPhysicalFilePath(providerOption.SigningCertificateFile), providerOption.SigningCertificatePassword, X509KeyStorageFlags.EphemeralKeySet);
+					}
+					catch (System.Security.Cryptography.CryptographicException e)
+					{
+						throw new InvalidOperationException(e.Message + " (signing certificate/file)", e);
+					}
 				}
 
-				if (!String.IsNullOrEmpty(providerOption.SingleSignOnDestination))
+				// Load request signing certificate from the certificate store
+				if (!String.IsNullOrEmpty(providerOption.SigningCertificateThumbprint))
 				{
-					saml2Configuration.SingleSignOnDestination = new Uri(providerOption.SingleSignOnDestination);
+					try
+					{
+						saml2Configuration.SigningCertificate = CertificateUtil.Load(StoreName.My, StoreLocation.LocalMachine, X509FindType.FindByThumbprint, providerOption.SigningCertificateThumbprint.Replace(" ", ""));
+					}
+					catch (System.Security.Cryptography.CryptographicException e)
+					{
+						throw new InvalidOperationException(e.Message + " (signing certificate/local machine-cert-store)", e);
+					}
 				}
 
-				if (!String.IsNullOrEmpty(providerOption.SingleLogoutDestination))
+				if (saml2Configuration.SignAuthnRequest && saml2Configuration.SigningCertificate == null)
 				{
-					saml2Configuration.SingleLogoutDestination = new Uri(providerOption.SingleLogoutDestination);
-				}
-
-				saml2Configuration.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.None;
-
-				if (!String.IsNullOrEmpty(providerOption.SignatureAlgorithm))
-				{
-					saml2Configuration.SignatureAlgorithm = providerOption.SignatureAlgorithm;
-				}
-				else
-				{
-					saml2Configuration.SignatureAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256";
+					Logger?.LogError("SAML [{name}]: The certificate could not be loaded using the SigningCertificateFile or SigningCertificateThumbprint value.", providerOption.Key);
+					throw new InvalidOperationException($"SAML [{providerOption.Key}]: The SignAuthnRequest property is set to true, but the certificate could not be loaded using the SigningCertificateFile or SigningCertificateThumbprint value.");
 				}
 			}
-
-			//else
-			//{
-			//	throw new Exception("IdPSsoDescriptor not loaded from metadata.");
-			//}
+			
+			// set other options which are required in config & can't come from IdP metadata
+			if (!String.IsNullOrEmpty(providerOption.Issuer))
+			{
+				saml2Configuration.AllowedAudienceUris.Add(saml2Configuration.Issuer);
+			}
 
 			return saml2Configuration;
 		}
 
-
+		/// <summary>
+		/// Log the user identified in <paramref name="user"/> into Nucleus.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="user"></param>
+		/// <param name="properties"></param>
+		/// <returns></returns>
+		/// <exception cref="InvalidOperationException"></exception>
+		/// <remarks>
+		/// Depending on configuration, this function matches a user by name or email address, and (if enabled) can create a new local user 
+		/// if no matching local user exists.
+		/// </remarks>
 		private async Task<IActionResult> HandleSignInAsync(Site site, ClaimsPrincipal user, Dictionary<string, string> properties)
 		{
 			if (user == null)
@@ -599,7 +675,7 @@ namespace Nucleus.SAML.Client.Controllers
 			if (String.IsNullOrEmpty(user.Identity.Name))
 			{
 				Logger?.LogTrace("The remote user data does not contain a user name.");
-        throw new InvalidOperationException("The SAML response does not contain a user name.");
+				throw new InvalidOperationException("The SAML response does not contain a user name.");
 			}
 			else
 			{
@@ -637,7 +713,7 @@ namespace Nucleus.SAML.Client.Controllers
 					if (!settings.CreateUsers)
 					{
 						Logger?.LogTrace("A matching user was not found, and the SAML client 'CreateUsers' setting is set to false.");
-            throw new InvalidOperationException("You cannot use SAML to log in with this login name because because no user matching your login name was found on this site, and the site is not configured to automatically create new users.");
+						throw new InvalidOperationException("You cannot use SAML to log in with this login name because because no user matching your login name was found on this site, and the site is not configured to automatically create new users.");
 					}
 					else
 					{
@@ -796,6 +872,15 @@ namespace Nucleus.SAML.Client.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Return true if the role identified by <paramref name="name"/> is a "special meaning" role.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// This function is used to determine whether to add/remove a local user from roles provided by the Identity Provider. User membership in 
+		/// "special roles" is not synchronized using data from the Identity Provider.  Only "non-special" roles are synchronized.
+		/// </remarks>
 		private Boolean IsSpecialRole(string name)
 		{
 			if (name == this.Context.Site.AdministratorsRole.Name) return true;
@@ -806,6 +891,11 @@ namespace Nucleus.SAML.Client.Controllers
 			return false;
 		}
 
+		/// <summary>
+		/// Render a list of configured identity providers.
+		/// </summary>
+		/// <param name="redirectUri"></param>
+		/// <returns></returns>
 		private ViewModels.Viewer BuildViewModel(string redirectUri)
 		{
 			ViewModels.Viewer viewModel = new();
@@ -826,76 +916,16 @@ namespace Nucleus.SAML.Client.Controllers
 			return viewModel;
 		}
 
+		/// <summary>
+		/// Generate an absolute Url to redirect to after login.  The specified <paramref name="returnUrl"/> must be 
+		/// </summary>
+		/// <param name="returnUrl"></param>
+		/// <returns></returns>
 		private string BuildRedirectUrl(string returnUrl)
 		{
-			// Only allow a relative path for redirectUri (that is, the url must start with "/"), to ensure that it points to "this" site.					
+			// Only allow a relative path for redirectUri (that is, the url must start with "/"), to ensure that it points to "this"
+			// site.					
 			return Url.Content(String.IsNullOrEmpty(returnUrl) || !returnUrl.StartsWith("/") ? "~/" : returnUrl);
 		}
-
-
-		////private async Task TestValidate(string providerName)
-		////{
-		////	Saml2PostBinding binding = new();
-
-		////	Models.Configuration.SAMLProvider providerOption = GetProvider(providerName);
-		////	Saml2Configuration config = await BuildConfiguration(providerOption);
-
-		////	Saml2AuthnResponse saml2AuthnResponse = new(config);
-
-		////	binding.ReadSamlResponse(Request.ToGenericHttpRequest(), saml2AuthnResponse);
-		////	if (saml2AuthnResponse.Status != Saml2StatusCodes.Success)
-		////	{
-		////		throw new AuthenticationException($"SAML Response status: {saml2AuthnResponse.Status}");
-		////	}
-
-		////	// Test use 
-		////	{
-		////		// Manually Validate assertion signature
-		////		var xmlElements = saml2AuthnResponse.XmlDocument.DocumentElement.SelectNodes($"//*[local-name()='{ITfoxtec.Identity.Saml2.Schemas.Saml2Constants.Message.Assertion}']");
-		////		var xmlElement = xmlElements[0] as System.Xml.XmlElement;
-		////		var xmlSignatures = xmlElement.SelectNodes($"*[local-name()='Signature' and namespace-uri()='{System.Security.Cryptography.Xml.SignedXml.XmlDsigNamespaceUrl}']");
-
-		////		// only validate signature if the assertion is signed
-		////		if (xmlSignatures.Count > 0)
-		////		{
-		////			var signedXml = new ITfoxtec.Identity.Saml2.Cryptography.Saml2SignedXml(
-		////			xmlElement,
-		////			config.SignatureValidationCertificates.First(),
-		////			config.SignatureAlgorithm,
-		////			config.XmlCanonicalizationMethod);
-
-		////			signedXml.LoadXml(xmlSignatures[0] as System.Xml.XmlElement);
-		////			if (signedXml.CheckSignature())
-		////			{
-		////				// Signature is valid.
-
-		////			}
-		////		}
-		////	}
-
-		////	{
-		////		// Manually Validate response signature
-
-		////		var xmlElement = saml2AuthnResponse.XmlDocument.DocumentElement as System.Xml.XmlElement;
-		////		var xmlSignatures = xmlElement.SelectNodes($"*[local-name()='Signature' and namespace-uri()='{System.Security.Cryptography.Xml.SignedXml.XmlDsigNamespaceUrl}']");
-
-		////		// only validate signature if the response is signed
-		////		if (xmlSignatures.Count > 0)
-		////		{
-		////			var signedXml = new ITfoxtec.Identity.Saml2.Cryptography.Saml2SignedXml(
-		////			xmlElement,
-		////			config.SignatureValidationCertificates.First(),
-		////			config.SignatureAlgorithm,
-		////			config.XmlCanonicalizationMethod);
-
-		////			signedXml.LoadXml(xmlSignatures[0] as System.Xml.XmlElement);
-		////			if (signedXml.CheckSignature())
-		////			{
-		////				// Signature is valid.
-
-		////			}
-		////		}
-		////	}
-		////}
 	}
 }

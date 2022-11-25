@@ -11,8 +11,8 @@ namespace Nucleus.SAML.Client.Models.Configuration
 {
 	public class SAMLProvider
 	{
-		public string Name { get; set; }
-		public string FriendlyName { get; set; }
+		public string Key { get; set; }
+		public string FriendlyName { get; set; }		
 
 		public List<MapClaim> MapClaims { get; set; } = new();
 		
@@ -24,14 +24,14 @@ namespace Nucleus.SAML.Client.Models.Configuration
 		public string Issuer { get; set; }
 		public string AllowedIssuer { get; set; }
 		public string SignatureValidationCertificateFile { get; set; }
-		public string SignatureValidationCertificatePassword { get; set; }
+		public string SignatureValidationCertificateThumbprint { get; set; }
 		
 		public string SignatureAlgorithm { get; set; }
 		public Boolean SignAuthnRequest { get; set; }
 		public string SingleSignOnDestination { get; set; }
 		public string SingleLogoutDestination { get; set; }
 		public string ArtifactResolutionServiceUrl { get; set; }
-
+		
 		public string ResponseProtocolBinding { get; set; } = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST";
 		public string RequestProtocolBinding { get; set; } = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST";
 
@@ -91,7 +91,7 @@ namespace Nucleus.SAML.Client.Models.Configuration
 		/// </remarks>
 		public string DisplayName()
 		{
-			return this.FriendlyName ?? this.Name;
+			return this.FriendlyName ?? this.Key;
 		}
 
 		/// <summary>
@@ -105,7 +105,7 @@ namespace Nucleus.SAML.Client.Models.Configuration
 		/// </remarks
 		public string AuthenticateEndpoint(Microsoft.AspNetCore.Mvc.IUrlHelper urlHelper, string returnUrl)
 		{
-			string path = $"{Routes.AUTHENTICATE}/{System.Uri.EscapeDataString(SafeProviderName())}";
+			string path = $"{Routes.AUTHENTICATE}/{System.Uri.EscapeDataString(SafeProviderKey())}";
 
 			return $"{urlHelper.Content(path)}?returnUrl={returnUrl ?? urlHelper.Content("~/")}";
 		}
@@ -120,9 +120,9 @@ namespace Nucleus.SAML.Client.Models.Configuration
 		/// reported in .NET 3.1 and has been put on the backlog to be addressed in .NET 6,7 and has now been moved to .NET 8.
 		/// So we replace "/" with in urls.  This means that any comparison to the provider name must use this function.
 		///	</remarks>
-		public string SafeProviderName()
+		public string SafeProviderKey()
 		{
-			return this.Name.Replace("/", "-");
+			return this.Key.Replace("/", "-");
 		}
 
 	}

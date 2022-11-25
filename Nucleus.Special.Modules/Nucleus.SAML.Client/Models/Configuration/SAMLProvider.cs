@@ -28,6 +28,8 @@ namespace Nucleus.SAML.Client.Models.Configuration
 		
 		public string SignatureAlgorithm { get; set; }
 		public Boolean SignAuthnRequest { get; set; }
+		public Boolean SignMetadata { get; set; }
+
 		public string SingleSignOnDestination { get; set; }
 		public string SingleLogoutDestination { get; set; }
 		public string ArtifactResolutionServiceUrl { get; set; }

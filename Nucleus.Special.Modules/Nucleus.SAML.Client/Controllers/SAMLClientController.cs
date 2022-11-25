@@ -236,16 +236,16 @@ namespace Nucleus.SAML.Client.Controllers
 
 			Saml2Configuration config = await BuildConfiguration(providerOption);
 
-			EntityDescriptor entityDescriptor = new(config)
+			EntityDescriptor entityDescriptor = new(config, signMetadata: providerOption.SignMetadata && config.SigningCertificate != null)
 			{
 				ValidUntil = 30,  // days
 				SPSsoDescriptor = new()
-				{					
+				{
 					// we always ask for the assertion to be signed
 					WantAssertionsSigned = true,
 
 					AuthnRequestsSigned = config.SignAuthnRequest,
-					
+
 					NameIDFormats = new Uri[] { NameIdentifierFormats.Persistent },
 
 					SingleLogoutServices = new SingleLogoutService[]
@@ -262,7 +262,7 @@ namespace Nucleus.SAML.Client.Controllers
 					{
 						new() 
 						{							  
-							ServiceName = new ServiceName($"{this.Context.Site.Name} [{providerKey}] SP" , "en"),
+							ServiceName = new ServiceName($"{this.Context.Site.Name} [{providerKey}] SAML Service Provider" , "en"),
 							RequestedAttributes = CreateRequestedAttributes(providerOption)
 						}
 					}
@@ -278,11 +278,15 @@ namespace Nucleus.SAML.Client.Controllers
 
 			if (config.SigningCertificate != null)
 			{
-				entityDescriptor.IdPSsoDescriptor.SigningCertificates = new X509Certificate2[] { config.SigningCertificate };
+				entityDescriptor.SPSsoDescriptor.SigningCertificates = new X509Certificate2[] { config.SigningCertificate };
 			}
-			//EncryptionCertificates = new X509Certificate2[] { config.DecryptionCertificate },
 
-			return new Saml2Metadata(entityDescriptor).CreateMetadata().ToActionResult();
+			// Encryption not implemented
+			// EncryptionCertificates = new X509Certificate2[] { config.DecryptionCertificate },
+
+			return new Saml2Metadata(entityDescriptor)
+				.CreateMetadata()
+				.ToActionResult();
 		}
 
 		/// /// NOT IMPLEMENTED
@@ -328,44 +332,43 @@ namespace Nucleus.SAML.Client.Controllers
 		//	return Redirect(Url.Content("~/"));
 		//}
 
-		/// /// NOT IMPLEMENTED
-		///// <summary>
-		///// Process IdP-initated local logout
-		///// </summary>
-		///// <param name="providerKey"></param>
-		///// <returns></returns>
-		////[Route($"{Routes.SINGLE_LOGOUT}/{{providerKey}}")]
-		////public async Task<IActionResult> SingleLogout(string providerKey)
-		////{
-		////	Saml2StatusCodes status;
-		////	Saml2PostBinding requestBinding = new();
-		////	Models.Configuration.SAMLProvider providerOption = GetProviderSettings(providerKey);
+		/// <summary>
+		/// Process IdP-initated local logout
+		/// </summary>
+		/// <param name="providerKey"></param>
+		/// <returns></returns>
+		[Route($"{Routes.SINGLE_LOGOUT}/{{providerKey}}")]
+		public async Task<IActionResult> SingleLogout(string providerKey)
+		{
+			Saml2StatusCodes status;
+			Saml2PostBinding requestBinding = new();
+			Models.Configuration.SAMLProvider providerOption = GetProviderSettings(providerKey);
 
-		////	var logoutRequest = new Saml2LogoutRequest(await BuildConfiguration(providerOption), User);
-		////	try
-		////	{
-		////		requestBinding.Unbind(Request.ToGenericHttpRequest(), logoutRequest);
-		////		status = Saml2StatusCodes.Success;
-		////		await logoutRequest.DeleteSession(HttpContext);
+			var logoutRequest = new Saml2LogoutRequest(await BuildConfiguration(providerOption), User);
+			try
+			{
+				requestBinding.Unbind(Request.ToGenericHttpRequest(), logoutRequest);
+				status = Saml2StatusCodes.Success;
+				await logoutRequest.DeleteSession(HttpContext);
 
-		////		await this.SessionManager.SignOut(HttpContext);
-		////	}
-		////	catch (Exception exc)
-		////	{
-		////		// log exception
-		////		Debug.WriteLine("SingleLogout error: " + exc.ToString());
-		////		status = Saml2StatusCodes.RequestDenied;
-		////	}
+				await this.SessionManager.SignOut(HttpContext);
+			}
+			catch (Exception exc)
+			{
+				// log exception
+				Debug.WriteLine("SingleLogout error: " + exc.ToString());
+				status = Saml2StatusCodes.RequestDenied;
+			}
 
-		////	var responsebinding = new Saml2PostBinding();
-		////	responsebinding.RelayState = requestBinding.RelayState;
-		////	var saml2LogoutResponse = new Saml2LogoutResponse(await BuildConfiguration(providerOption))
-		////	{
-		////		InResponseToAsString = logoutRequest.IdAsString,
-		////		Status = status,
-		////	};
-		////	return responsebinding.Bind(saml2LogoutResponse).ToActionResult();
-		////}
+			var responsebinding = new Saml2PostBinding();
+			responsebinding.RelayState = requestBinding.RelayState;
+			var saml2LogoutResponse = new Saml2LogoutResponse(await BuildConfiguration(providerOption))
+			{
+				InResponseToAsString = logoutRequest.IdAsString,
+				Status = status,
+			};
+			return responsebinding.Bind(saml2LogoutResponse).ToActionResult();
+		}
 
 
 		/// <summary>
@@ -440,7 +443,14 @@ namespace Nucleus.SAML.Client.Controllers
 				throw new AuthenticationException($"SAML Response status: {saml2AuthnResponse.Status}");
 			}
 
-			// Translate SAML claims to local (Nucleus) claims, using values from config SAMLProviders[@Key=providerKey]:MapClaims
+			// If a user is already logged in locally, log them out so that we can log on the new user
+			if (HttpContext.User.Identity.IsAuthenticated)
+			{
+				await this.SessionManager.SignOut(HttpContext);
+				HttpContext.User = null;
+			}
+
+			// Create a ClaimPrincipal and translate SAML claims to local (Nucleus) claims, using values from config SAMLProviders[@Key=providerKey]:MapClaims
 			ClaimsPrincipal principal = await saml2AuthnResponse.CreateSession
 			(
 				HttpContext,
@@ -470,8 +480,10 @@ namespace Nucleus.SAML.Client.Controllers
 		private IEnumerable<RequestedAttribute> CreateRequestedAttributes(Models.Configuration.SAMLProvider provider)
 		{
 			// return the "SAML-side" names of the claims which we can consume.  The <requestedAttributes> element is a SAML
-			// extension, and IdPs can choose to ignore it.
-			return provider.MapClaims.Select(map => new RequestedAttribute(map.SAMLKey, "urn:oasis:names:tc:SAML:2.0:attrname-format:uri")).ToList();
+			// extension, and IdPs can choose to ignore it.  
+			return provider.MapClaims
+				.DistinctBy(mapClaim=>mapClaim.SAMLKey)
+				.Select(map => new RequestedAttribute(map.SAMLKey, false, "urn:oasis:names:tc:SAML:2.0:attrname-format:uri")).ToList();
 
 			//yield return new RequestedAttribute("urn:oid:2.5.4.41");                    // name
 			//yield return new RequestedAttribute("urn:oid:2.5.4.42");                    // givenName

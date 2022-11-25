@@ -165,7 +165,7 @@ namespace Nucleus.OAuth.Server.Controllers
 			}
 			else if (token.Type == "grant")
 			{
-				return Redirect($"{token.RedirectUri}#access_token={token.AccessToken}&state={token.State}&token_type={TOKEN_TYPE}&scope={token.Scope}&expires_in={(token.ExpiryDate - DateTime.Now).TotalMinutes}");
+				return Redirect($"{token.RedirectUri}#access_token={token.AccessToken}&state={token.State}&token_type={TOKEN_TYPE}&scope={token.Scope}&expires_in={(token.ExpiryDate - DateTime.UtcNow).TotalMinutes}");
 			}
 			else
 			{
@@ -224,7 +224,7 @@ namespace Nucleus.OAuth.Server.Controllers
 				{
 					access_token = token.AccessToken,
 					token_type = "Bearer",
-					expires_in = (token.ExpiryDate - DateTime.Now).TotalMinutes,
+					expires_in = (token.ExpiryDate - DateTime.UtcNow).TotalMinutes,
 					id_token = await BuildJwtToken(token)
 					// we don't currently support refresh tokens
 					//refresh_token = token.RefreshToken

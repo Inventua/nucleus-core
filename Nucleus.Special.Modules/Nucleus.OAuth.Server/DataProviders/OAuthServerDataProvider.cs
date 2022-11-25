@@ -140,7 +140,12 @@ namespace Nucleus.OAuth.Server.DataProviders
 			Action raiseEvent;
 
 			Boolean isNew = !await this.Context.ClientAppTokens.Where(existing => existing.Id == clientAppToken.Id).AnyAsync();
-
+			
+			if (isNew)
+			{
+				clientAppToken.DateAdded = DateTime.UtcNow;
+			}
+			
 			this.Context.Attach(clientAppToken);
 
 			if (isNew)

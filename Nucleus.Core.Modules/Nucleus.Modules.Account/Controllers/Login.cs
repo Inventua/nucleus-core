@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Nucleus.ViewFeatures;
 using Nucleus.Extensions;
+using DocumentFormat.OpenXml.Office2013.PowerPoint;
 
 namespace Nucleus.Modules.Account.Controllers
 {
@@ -116,12 +117,14 @@ namespace Nucleus.Modules.Account.Controllers
 
 			if (loginUser == null)
 			{
+				await Task.Delay(TimeSpan.FromSeconds(10));
 				return Json(new { Title = "Login", Message = "Invalid username or password." });
 			}
 			else
 			{
 				if (!await this.UserManager.VerifyPassword(loginUser, viewModel.Password))
 				{
+					await Task.Delay(TimeSpan.FromSeconds(10));
 					return Json(new { Title = "Login", Message = "Invalid username or password." });
 				}
 				else
@@ -155,6 +158,7 @@ namespace Nucleus.Modules.Account.Controllers
 							}
 							else
 							{
+								await Task.Delay(TimeSpan.FromSeconds(10));
 								return Json(new { Title = "Login", Message = "Invalid verification token." });
 							}
 						}

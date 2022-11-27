@@ -91,12 +91,14 @@ namespace Nucleus.Web.Controllers
 
 			if (loginUser == null)
 			{
+				await Task.Delay(TimeSpan.FromSeconds(10));
 				return Json(new { Title = "Login", Message = "Invalid username or password." });
 			}
 			else
 			{
 				if (!await this.UserManager.VerifyPassword(loginUser, viewModel.Password))
 				{
+					await Task.Delay(TimeSpan.FromSeconds(10));
 					return Json(new { Title = "Login", Message = "Invalid username or password." });
 				}
 				else
@@ -130,6 +132,7 @@ namespace Nucleus.Web.Controllers
 							}
 							else
 							{
+								await Task.Delay(TimeSpan.FromSeconds(10));
 								return Json(new { Title = "Login", Message = "Invalid verification token." });
 							}
 						}

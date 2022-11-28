@@ -251,7 +251,7 @@ namespace Nucleus.SAML.Client.Controllers
 					SingleLogoutServices = new SingleLogoutService[]
 					{
 						new() { Binding = ProtocolBindings.HttpPost, Location = new Uri(defaultSite, $"{Routes.SINGLE_LOGOUT}/{providerKey}")	}
-					},
+					},									
 
 					AssertionConsumerServices = new AssertionConsumerService[]
 					{
@@ -289,48 +289,51 @@ namespace Nucleus.SAML.Client.Controllers
 				.ToActionResult();
 		}
 
-		/// /// NOT IMPLEMENTED
-		///// <summary>
-		///// Send a request to the IdP asking to be logged out.
-		///// </summary>
-		///// <param name="providerKey"></param>
-		///// <returns></returns>
-		//[HttpPost]
-		//[Route($"{Routes.LOGOUT}/{{providerKey}}")]
-		//[ValidateAntiForgeryToken]
-		//public async Task<IActionResult> Logout(string providerKey)
-		//{
-		//	if (!User.Identity.IsAuthenticated)
-		//	{
-		//		return Redirect(Url.Content("~/"));
-		//	}
+		/// <summary>
+		/// Send a request to the IdP asking to be logged out.
+		/// </summary>
+		/// <param name="providerKey"></param>
+		/// <returns></returns>
+		[HttpPost]
+		[Route($"{Routes.LOGOUT}/{{providerKey}}")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Logout(string providerKey)
+		{
+			if (!User.Identity.IsAuthenticated)
+			{
+				return Redirect(Url.Content("~/"));
+			}
 
-		//	Saml2PostBinding binding = new();
-		//	Models.Configuration.SAMLProvider providerOption = GetProviderSettings(providerKey);
+			Saml2PostBinding binding = new();
+			Models.Configuration.SAMLProvider providerOption = GetProviderSettings(providerKey);
+			Uri defaultSite = new($"{Request.Scheme}://{Request.Host.ToUriComponent()}/{(!String.IsNullOrEmpty(Request.PathBase) ? Request.PathBase + "/" : "")}");
 
-		//	Saml2LogoutRequest saml2LogoutRequest = new(await BuildConfiguration(providerOption), User);
-		//	saml2LogoutRequest.Config.SingleLogoutDestination=???
-		//	saml2LogoutRequest = await saml2LogoutRequest.DeleteSession(HttpContext);
+			Saml2LogoutRequest saml2LogoutRequest = new(await BuildConfiguration(providerOption), User);
+			saml2LogoutRequest.Config.SingleLogoutDestination = new System.Uri(defaultSite, $"{Routes.SINGLE_LOGOUT}/{providerKey}");
+			saml2LogoutRequest = await saml2LogoutRequest.DeleteSession(HttpContext);
+			
+			await this.SessionManager.SignOut(HttpContext);
 
-		//	return binding.Bind(saml2LogoutRequest).ToActionResult();
-		//}
+			return binding.Bind(saml2LogoutRequest).ToActionResult();
+		}
 
-		/// /// NOT IMPLEMENTED
-		///// <summary>
-		///// Log out locally.
-		///// </summary>
-		///// <param name="providerKey"></param>
-		///// <returns></returns>
-		//[Route($"{Routes.LOGGED_OUT}/{{providerKey}}")]
-		//public async Task<IActionResult> LoggedOut(string providerKey)
-		//{
-		//	var binding = new Saml2PostBinding();
-		//	Models.Configuration.SAMLProvider providerOption = GetProviderSettings(providerKey);
+		/// <summary>
+		/// Log out locally.
+		/// </summary>
+		/// <param name="providerKey"></param>
+		/// <returns></returns>
+		[Route($"{Routes.LOGGED_OUT}/{{providerKey}}")]
+		public async Task<IActionResult> LoggedOut(string providerKey)
+		{
+			var binding = new Saml2PostBinding();
+			Models.Configuration.SAMLProvider providerOption = GetProviderSettings(providerKey);
 
-		//	binding.Unbind(Request.ToGenericHttpRequest(), new Saml2LogoutResponse(await BuildConfiguration(providerOption)));
+			binding.Unbind(Request.ToGenericHttpRequest(), new Saml2LogoutResponse(await BuildConfiguration(providerOption)));
 
-		//	return Redirect(Url.Content("~/"));
-		//}
+			await this.SessionManager.SignOut(HttpContext);
+
+			return Redirect(Url.Content("~/"));
+		}
 
 		/// <summary>
 		/// Process IdP-initated local logout
@@ -344,13 +347,14 @@ namespace Nucleus.SAML.Client.Controllers
 			Saml2PostBinding requestBinding = new();
 			Models.Configuration.SAMLProvider providerOption = GetProviderSettings(providerKey);
 
-			var logoutRequest = new Saml2LogoutRequest(await BuildConfiguration(providerOption), User);
+			Saml2LogoutRequest logoutRequest = new (await BuildConfiguration(providerOption), User);
+			
 			try
 			{
 				requestBinding.Unbind(Request.ToGenericHttpRequest(), logoutRequest);
 				status = Saml2StatusCodes.Success;
 				await logoutRequest.DeleteSession(HttpContext);
-
+				
 				await this.SessionManager.SignOut(HttpContext);
 			}
 			catch (Exception exc)
@@ -360,9 +364,9 @@ namespace Nucleus.SAML.Client.Controllers
 				status = Saml2StatusCodes.RequestDenied;
 			}
 
-			var responsebinding = new Saml2PostBinding();
+			Saml2PostBinding responsebinding = new();
 			responsebinding.RelayState = requestBinding.RelayState;
-			var saml2LogoutResponse = new Saml2LogoutResponse(await BuildConfiguration(providerOption))
+			Saml2LogoutResponse saml2LogoutResponse = new (await BuildConfiguration(providerOption))
 			{
 				InResponseToAsString = logoutRequest.IdAsString,
 				Status = status,

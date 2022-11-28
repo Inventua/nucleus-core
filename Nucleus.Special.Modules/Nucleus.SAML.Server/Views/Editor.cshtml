@@ -27,7 +27,7 @@
 				@Html.DropDownListFor(model => model.ClientApp.SigningCertificateThumbprint, new SelectList(Model.SigningCertificates, "Key", "Value"), "(not selected)", new { @class = "saml-idp-cert-store" })
 			</SettingsControl>
 
-			<SettingsControl caption="IdP Signing Certificate Password" helptext="Enter the password for your signing certificate." class="saml-signing-cert-password">
+			<SettingsControl caption="IdP Signing Certificate Password" helptext="Enter the password for your signing certificate." class="saml-idp-cert-password">
 				@Html.TextBoxFor(model => model.ClientApp.SigningCertificatePassword)
 			</SettingsControl>
 
@@ -123,7 +123,6 @@
 				break;
 			case '1': // Store
 				idp_storecontrol.show();
-				idp_pwdcontrol.show();
 				break;
 			case '2': // File
 				idp_filecontrol.show();

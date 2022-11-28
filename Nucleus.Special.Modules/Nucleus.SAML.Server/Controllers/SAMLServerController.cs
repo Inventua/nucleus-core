@@ -285,9 +285,17 @@ namespace Nucleus.SAML.Server.Controllers
 
 				Saml2ArtifactResponse saml2ArtifactResponse = new(config.AsSaml2Configuration(), saml2AuthnResponse)
 				{
-					InResponseTo = saml2ArtifactResolve.Id,
-					NameId = new Saml2NameIdentifier(token.UserId.ToString(), NameIdentifierFormats.Persistent)
+					InResponseTo = saml2ArtifactResolve.Id
 				};
+
+				try
+				{
+					saml2ArtifactResponse.NameId = GetSamlNameID(token, saml2AuthnResponse.ClaimsIdentity);
+				}
+				catch (InvalidOperationException e)
+				{
+					saml2AuthnResponse.Status = Saml2StatusCodes.InvalidNameIdPolicy;
+				}
 
 				// We have to set destination here rather than above, because it gets NULLed by the Saml2ArtifactResponse constructor
 				saml2AuthnResponse.Destination = saml2ArtifactResolve.Destination;

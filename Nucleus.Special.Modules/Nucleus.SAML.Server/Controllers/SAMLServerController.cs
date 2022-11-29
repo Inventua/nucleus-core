@@ -294,6 +294,7 @@ namespace Nucleus.SAML.Server.Controllers
 				}
 				catch (InvalidOperationException e)
 				{
+					Logger?.LogError(e, "Getting SAML NameId.");
 					saml2AuthnResponse.Status = Saml2StatusCodes.InvalidNameIdPolicy;
 				}
 
@@ -474,6 +475,7 @@ namespace Nucleus.SAML.Server.Controllers
         }
         catch(InvalidOperationException e)
         {
+					Logger?.LogError(e, "Getting SAML NameId.");
           saml2AuthnResponse.Status = Saml2StatusCodes.InvalidNameIdPolicy;
         }
 
@@ -526,7 +528,8 @@ namespace Nucleus.SAML.Server.Controllers
         }
         catch (InvalidOperationException e)
         {
-          saml2AuthnResponse.Status = Saml2StatusCodes.InvalidNameIdPolicy;
+					Logger?.LogError(e, "Getting SAML NameId.");
+					saml2AuthnResponse.Status = Saml2StatusCodes.InvalidNameIdPolicy;
         }
 
         // This creates the assertions in the response

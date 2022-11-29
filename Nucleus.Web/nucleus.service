@@ -1,0 +1,16 @@
+﻿[Unit]
+Description=Nucleus Production
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+Environment=ASPNETCORE_ENVIRONMENT=Production
+User=nucleus-service
+WorkingDirectory=/home/nucleus/app
+ExecStart=/home/nucleus/app/Nucleus.Web.exe
+
+[Install]
+WantedBy=multi-user.target

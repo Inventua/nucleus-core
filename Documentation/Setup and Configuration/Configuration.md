@@ -13,7 +13,7 @@ Nucleus automatically loads configuration in this order:
 5. databaseSettings.json
 6. databaseSettings.`{environment}`.json
 
-7. All other .json files in the application folder, in alphabetical order.
+7. All other .json files in the application folder, in alphabetical order, except for reserved file names "*.schema.json" or "bundleconfig.json".
 
 8. Enviromment variables
 9. Command line arguments
@@ -27,11 +27,11 @@ Nucleus automatically loads configuration in this order:
 You can organize your application settings any way you want to, the sections below refer to the default conventions used by Nucleus.
 
 ## hosting.json
-Use the `hosting.json` file to configure the Urls that Nucleus listens on.  The urls setting is a standard .NET core setting.
+Use the `hosting.json` file to configure the Urls that Nucleus listens on.  The [urls setting](https://andrewlock.net/5-ways-to-set-the-urls-for-an-aspnetcore-app/) is a standard .NET core setting.
 
 ```json
 {
-  "urls": "http://0.0.0.0:5000",
+  "urls": "http://*:5000", 
   "iisSettings": 
   {
     "windowsAuthentication": false,

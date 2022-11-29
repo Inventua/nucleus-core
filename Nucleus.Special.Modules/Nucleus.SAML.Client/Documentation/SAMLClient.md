@@ -30,7 +30,7 @@ The SAML client extension settings are accessed in the `Manage` control panel.
 
 ## Configuration
 SAML2 Identity providers are configured in a .json configuration file.  This is typically appSettings.{environment}.json, but you can use a
-different file if you want to.  Identity Provider settings are in the Nucleus:SAMLProviders section.  
+[different file](/configuration-files/) if you want to.  Identity Provider settings are in the Nucleus:SAMLProviders section.  
 
 {.table-25-75}
 |                                          |                                                                                      |

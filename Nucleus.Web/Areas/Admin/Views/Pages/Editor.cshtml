@@ -168,6 +168,8 @@
 }
 
 <script>
+	jQuery('#nucleus-control-panel-heading').html('Pages - ' + jQuery('.PageName').val());
+
 	jQuery('.PageName').on('change', function ()
 	{
 		if (jQuery('.DefaultPagePath').val() === '')
@@ -178,7 +180,9 @@
 		if (jQuery('#Page_Title').val() === '')
 		{
 			jQuery('#Page_Title').val(jQuery(this).val());
-		}			
+		}
+
+		jQuery('#nucleus-control-panel-heading').html('Pages - ' + jQuery(this).val());
 	})
 	
 	// functionality for the "open" button

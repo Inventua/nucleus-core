@@ -56,7 +56,7 @@ namespace Nucleus.Modules.Account.Controllers
 		[HttpPost]
 		public async Task<ActionResult> RecoverUserName(ViewModels.Recover viewModel)
 		{
-			if (!this.Context.Module.ModuleSettings.Get(LoginController.ModuleSettingsKeys.AllowUsernameRecovery, true))
+			if (!this.Context.Module.ModuleSettings.Get(Models.Settings.ModuleSettingsKeys.AllowUsernameRecovery, true))
 			{
 				return BadRequest();
 			}
@@ -132,7 +132,7 @@ namespace Nucleus.Modules.Account.Controllers
 		[HttpPost]
 		public async Task<ActionResult> RecoverPassword(ViewModels.Recover viewModel)
 		{
-			if (!this.Context.Module.ModuleSettings.Get(LoginController.ModuleSettingsKeys.AllowPasswordReset, true))
+			if (!this.Context.Module.ModuleSettings.Get(Models.Settings.ModuleSettingsKeys.AllowPasswordReset, true))
 			{
 				return BadRequest();
 			}
@@ -203,8 +203,8 @@ namespace Nucleus.Modules.Account.Controllers
 			{
 				return BadRequest(ModelState);
 			}
-
-			if (!this.Context.Module.ModuleSettings.Get(LoginController.ModuleSettingsKeys.AllowPasswordReset, true))
+			
+			if (!this.Context.Module.ModuleSettings.Get(Models.Settings.ModuleSettingsKeys.AllowPasswordReset, true))
 			{
 				return BadRequest();
 			}
@@ -264,8 +264,8 @@ namespace Nucleus.Modules.Account.Controllers
 		{
 			return new ViewModels.Recover()
 			{
-				AllowPasswordReset = this.Context.Module.ModuleSettings.Get(LoginController.ModuleSettingsKeys.AllowPasswordReset, true),
-				AllowUsernameRecovery = this.Context.Module.ModuleSettings.Get(LoginController.ModuleSettingsKeys.AllowUsernameRecovery, true),
+				AllowPasswordReset = this.Context.Module.ModuleSettings.Get(Models.Settings.ModuleSettingsKeys.AllowPasswordReset, true),
+				AllowUsernameRecovery = this.Context.Module.ModuleSettings.Get(Models.Settings.ModuleSettingsKeys.AllowUsernameRecovery, true),
 				ReturnUrl = returnUrl
 			};
 		}

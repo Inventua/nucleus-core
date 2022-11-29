@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Account.ViewModels
 {
-	public class Login
+	public class Login : Models.Settings
 	{
 		public string Message { get; set; }
 
@@ -16,13 +16,7 @@ namespace Nucleus.Modules.Account.ViewModels
 
 		public string Password { get; set; }
 		
-		public Boolean RememberMe { get; set; }
-
-		public Boolean AllowRememberMe { get; set; }		
-
-		public Boolean AllowUsernameRecovery { get; set; }
-
-		public Boolean AllowPasswordReset { get; set; }
+		public Boolean RememberMe { get; set; }			
 
 		public Boolean ShowVerificationToken { get; set; }
 		

@@ -4,11 +4,10 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 @Html.AddStyle("~!/../settings.css")
-<h1 class="nucleus-modal-caption">SAML Client Settings</h1>
-<div class="nucleus-editor-panel">
+<h2 class="nucleus-modal-caption">SAML Client Settings</h2>
 @using (Html.BeginNucleusForm("Settings", "SAMLClientAdmin", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
-	<fieldset role="group" aria-labelledby="heading">
+	<fieldset class="flex-grow-1" role="group" aria-labelledby="heading">
 		<h2>Settings</h2>
 		<SettingsControl caption="Caption" helptext="On-screen caption.">
 			@Html.TextBoxFor(model => model.Caption)
@@ -21,10 +20,9 @@
 		<SettingsControl caption="Automatically redirect to remote login" class="inner-inline" rendermode="LabelLast" helptext="If enabled, and if there is only one remote SAML provider configured, and if the user is not logged in, start remote login automatically.">
 			@Html.CheckBoxFor(model => model.AutoLogin, new { @class = "ToggleSwitch" })
 		</SettingsControl>
-
-		<div class="nucleus-form-tools">
-			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "SAMLClientAdmin", "SAMLClient"), new { })
-		</div>
 	</fieldset>
+
+	<div class="nucleus-form-buttonrow">
+		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "SAMLClientAdmin", "SAMLClient"), new { })
+	</div>
 }
-</div>

@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Nucleus.ViewFeatures;
 using Nucleus.Extensions;
-using DocumentFormat.OpenXml.Office2013.PowerPoint;
 
 namespace Nucleus.Modules.Account.Controllers
 {
@@ -32,12 +31,7 @@ namespace Nucleus.Modules.Account.Controllers
 
 		private ClaimTypeOptions ClaimTypeOptions { get; }
 
-		internal class ModuleSettingsKeys
-		{
-			public const string AllowRememberMe = "login:allowrememberme";
-			public const string AllowUsernameRecovery = "login:allowusernamerecovery";
-			public const string AllowPasswordReset = "login:allowpasswordreset";			
-		}
+		
 
 		public LoginController(Context context, ILogger<LoginController> Logger, IUserManager userManager, ISessionManager sessionManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IOptions<ClaimTypeOptions> claimTypeOptions)
 		{
@@ -92,10 +86,8 @@ namespace Nucleus.Modules.Account.Controllers
 		[HttpPost]
 		public ActionResult SaveSettings(ViewModels.Login viewModel)
 		{
-			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.AllowPasswordReset, viewModel.AllowPasswordReset);
-			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.AllowUsernameRecovery, viewModel.AllowUsernameRecovery);
-			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.AllowRememberMe, viewModel.AllowRememberMe);
-
+			viewModel.WriteSettings(this.Context.Module);
+			
 			this.PageModuleManager.SaveSettings(this.Context.Module);
 
 			return Ok();
@@ -106,6 +98,8 @@ namespace Nucleus.Modules.Account.Controllers
 		{
 			User loginUser;
 			List<Claim> claims = new();
+
+			viewModel.ReadSettings(this.Context.Module);
 
 			loginUser = await this.UserManager.Get(this.Context.Site, viewModel.Username);
 
@@ -183,13 +177,11 @@ namespace Nucleus.Modules.Account.Controllers
 
 		private ViewModels.Login BuildViewModel(string returnUrl)
 		{
-			return new ViewModels.Login()
-			{
-				AllowPasswordReset = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.AllowPasswordReset, true),
-				AllowUsernameRecovery = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.AllowUsernameRecovery, true),
-				AllowRememberMe = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.AllowRememberMe, true),
-				ReturnUrl=returnUrl
-			};
+			ViewModels.Login viewModel = new();
+			viewModel.ReadSettings(this.Context.Module);
+
+			viewModel.ReturnUrl = returnUrl;
+			return viewModel;
 		}
 
 	}

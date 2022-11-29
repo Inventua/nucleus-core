@@ -12,6 +12,5 @@ namespace Nucleus.Modules.ErrorReport.ViewModels
 {
 	public class Settings
 	{
-		public string Message { get; set; }
 	}
 }

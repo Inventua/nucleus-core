@@ -3,28 +3,7 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
-@Html.AddStyle("~!/../settings.css")
-<div>
-	@using (Html.BeginNucleusForm("Settings", "ErrorReport", FormMethod.Post, new { @enctype = "multipart/form-data" }))
-	{
-		<fieldset role="group" aria-labelledby="heading">
-			<h2>Settings</h2>
-			<div class="Flex">
-				@*<SettingsControl caption="Categories List" helptext="Select the list to use for categories for this module instance.  Lists are managed in the Nucleus Lists manager.">
-					@Html.DropDownListFor(model => model.CategoryList.Id, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")
-				</SettingsControl>
-				<SettingsControl caption="Layout" helptext="Display layout.">
-					@Html.DropDownListFor(model => model.Layout, new SelectList(Model.Layouts))
-				</SettingsControl>*@
-			</div>
-
-			<div class="Tools">
-				@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "ErrorReport", "ErrorReport"), new { })
-				@if (!String.IsNullOrEmpty(@Model.Message))
-				{
-					<div class="Message">@Model.Message</div>
-				}
-			</div>
-		</fieldset>
-	}
+<h2 class="nucleus-modal-caption">Error Report Settings</h2>
+<div class="alert alert-secondary">
+	This module has no settings.
 </div>

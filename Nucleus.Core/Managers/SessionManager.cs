@@ -46,7 +46,14 @@ namespace Nucleus.Core.Managers
 		/// </remarks>
 		public Task<UserSession> CreateNew(Site site, User user, Boolean rememberMe, System.Net.IPAddress remoteIpAddress)
 		{
-			return Task.FromResult(new UserSession(site, user, rememberMe, remoteIpAddress, DateTime.UtcNow.Add(this.Options.Value.ExpireTimeSpan), !this.Options.Value.ExpireTimeSpan.Equals(TimeSpan.Zero)));			
+			if (rememberMe)
+			{
+				return Task.FromResult(new UserSession(site, user, rememberMe, remoteIpAddress, DateTime.UtcNow.Add(this.Options.Value.LongExpiryTimeSpan), !this.Options.Value.LongExpiryTimeSpan.Equals(TimeSpan.Zero)));
+			}
+			else
+			{
+				return Task.FromResult(new UserSession(site, user, rememberMe, remoteIpAddress, DateTime.UtcNow.Add(this.Options.Value.ExpiryTimeSpan), !this.Options.Value.ExpiryTimeSpan.Equals(TimeSpan.Zero)));
+			}
 		}
 
 		/// <summary>

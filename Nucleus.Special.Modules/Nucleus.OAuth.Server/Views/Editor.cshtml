@@ -10,11 +10,16 @@
 		<h2>Settings</h2>
 		@Html.HiddenFor(model => model.ClientApp.Id)		
 		<SettingsControl caption="API Key" helptext="Select the API key for this Client App, or leave set to 'create' to automatically create a new one.">
-			@Html.DropDownListFor(model => model.ClientApp.ApiKey.Id, new SelectList(Model.ApiKeys, "Id", "Name"), "(create)")
+			@Html.DropDownListFor(model => model.ClientApp.ApiKey.Id, new SelectList(Model.ApiKeys, "Id", "Name"), "(create)", new { @class = "api-key"} )
+		</SettingsControl>
+
+		<SettingsControl caption="API Key Id" helptext="Copy this Id to send to OAuth clients.">
+			<button class="copy-api-key-id nucleus-material-icon btn btn-none align-self-end position-absolute fs-small" type="button" title="Copy to Clipboard">&#xe14d;</button>
+			<span class="api-key-text fs-6">@Model.ClientApp.ApiKey.Id</span>
 		</SettingsControl>
 
 		<SettingsControl caption="Title" helptext="Client App Title.">
-			@Html.TextBoxFor(model => model.ClientApp.Title)
+			@Html.TextBoxFor(model => model.ClientApp.Title)			
 		</SettingsControl>
 			
 		<SettingsControl caption="Token Lifetime (minutes)" helptext="OAuth2 token lifetime in minutes. ">
@@ -38,7 +43,17 @@
 <script>
 	$(document).ready(function() 
 	{
-		
+		jQuery('.api-key').on('change', function() 
+		{
+			jQuery('.api-key-text').html(jQuery('.api-key').val());
+		});
+
+		jQuery('.copy-api-key-id').on('click', function ()
+		{
+			Page.CopyToClipboard(jQuery('.api-key-text'));
+			return false;
+		});
+
 		// Read the child pages of the item containing the "+" button
 		jQuery('.nucleus-page-list').on('click', '.nucleus-get-childpages', function (e)
 		{

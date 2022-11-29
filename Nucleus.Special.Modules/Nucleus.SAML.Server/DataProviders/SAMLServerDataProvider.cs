@@ -39,11 +39,11 @@ namespace Nucleus.SAML.Server.DataProviders
 				.FirstOrDefaultAsync();
 		}
 
-		public async Task<ClientApp> GetClientAppByIssuer(string issuer)
+		public async Task<ClientApp> GetClientAppByIssuer(Site site, string issuer)
 		{
 			return await this.Context.ClientApps
-				.Where(ClientApp => ClientApp.AllowedIssuer == issuer)
-				.Include(ClientApp => ClientApp.LoginPage)
+				.Where(clientApp => EF.Property<Guid>(clientApp, "SiteId") == site.Id && clientApp.AllowedIssuer == issuer)
+				.Include(clientApp => clientApp.LoginPage)
 				.AsNoTracking()
 				.FirstOrDefaultAsync();
 		}
@@ -126,6 +126,12 @@ namespace Nucleus.SAML.Server.DataProviders
 
 			Boolean isNew = !await this.Context.ClientAppTokens.Where(existing => existing.Id == clientAppToken.Id).AnyAsync();
 
+			if (isNew)
+			{
+				clientAppToken.DateAdded = DateTime.UtcNow;
+				clientAppToken.ExpiryDate = DateTime.UtcNow.Add(ClientAppToken.EXPIRY_DAYS);
+			}
+
 			this.Context.Attach(clientAppToken);
 
 			if (isNew)
@@ -150,12 +156,10 @@ namespace Nucleus.SAML.Server.DataProviders
 			await this.Context.SaveChangesAsync<ClientAppToken>();
 		}
 
-		public async Task ExpireTokens(TimeSpan expiryThreshold)
-		{
-			DateTime expiryDate = DateTime.UtcNow.Add(-expiryThreshold);
-			
+		public async Task ExpireTokens()
+		{			
 			List<ClientAppToken> expiredTokens = await this.Context.ClientAppTokens
-				.Where(clientAppToken => clientAppToken.DateAdded < expiryDate)
+				.Where(clientAppToken => clientAppToken.ExpiryDate < DateTime.UtcNow)
 				.ToListAsync();
 
 			this.Context.RemoveRange(expiredTokens);

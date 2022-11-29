@@ -3,11 +3,11 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Modules.StaticContent.ViewModels
+<h2 class="nucleus-modal-caption">Static Content Settings</h2>
 @Html.AddStyle("~!/../settings.css")
-<div>
-	@using (Html.BeginNucleusForm("Settings", "StaticContentAdmin", "StaticContent", FormMethod.Post, new { @enctype = "multipart/form-data" }))
-	{
-	<fieldset role="group" aria-labelledby="heading">
+@using (Html.BeginNucleusForm("Settings", "StaticContentAdmin", "StaticContent", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+	<fieldset class="flex-grow-1" role="group" aria-label="Settings">
 		<h2>Settings</h2>
 		<SettingsControl caption="Select File" helptext="Select the default file to display.">
 			<div class="nucleus-flex-fields nucleus-fileselector">
@@ -18,10 +18,9 @@
 		<SettingsControl caption="Add Copy Buttons?" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to automatically add a 'copy' button to <code> elements.">
 			@Html.CheckBoxFor(model => model.AddCopyButtons, new { @class = "ToggleSwitch" })
 		</SettingsControl>
-
-		<div class="nucleus-form-buttonrow">
-			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "StaticContentAdmin", "StaticContent"), new { @class = "btn btn-primary" })
-		</div>
 	</fieldset>
-	}
-</div>
+
+	<div class="nucleus-form-buttonrow">
+		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "StaticContentAdmin", "StaticContent"), new { @class = "btn btn-primary" })
+	</div>
+}

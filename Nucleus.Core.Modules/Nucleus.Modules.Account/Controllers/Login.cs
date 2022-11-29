@@ -31,12 +31,7 @@ namespace Nucleus.Modules.Account.Controllers
 
 		private ClaimTypeOptions ClaimTypeOptions { get; }
 
-		internal class ModuleSettingsKeys
-		{
-			public const string AllowRememberMe = "login:allowrememberme";
-			public const string AllowUsernameRecovery = "login:allowusernamerecovery";
-			public const string AllowPasswordReset = "login:allowpasswordreset";			
-		}
+		
 
 		public LoginController(Context context, ILogger<LoginController> Logger, IUserManager userManager, ISessionManager sessionManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IOptions<ClaimTypeOptions> claimTypeOptions)
 		{
@@ -50,9 +45,15 @@ namespace Nucleus.Modules.Account.Controllers
 		}
 
 		[HttpGet]
-		public ActionResult Index(string returnUrl, string token, string reason)
+		public ActionResult Index(string username, string returnUrl, string token, string reason)
 		{
 			ViewModels.Login viewModel = BuildViewModel(returnUrl);
+
+			// allow username defaulting
+			if (!String.IsNullOrEmpty(username) && String.IsNullOrEmpty(viewModel.Username))
+			{
+				viewModel.Username = username;
+			}
 
 			switch (reason)
 			{
@@ -85,10 +86,8 @@ namespace Nucleus.Modules.Account.Controllers
 		[HttpPost]
 		public ActionResult SaveSettings(ViewModels.Login viewModel)
 		{
-			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.AllowPasswordReset, viewModel.AllowPasswordReset);
-			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.AllowUsernameRecovery, viewModel.AllowUsernameRecovery);
-			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.AllowRememberMe, viewModel.AllowRememberMe);
-
+			viewModel.WriteSettings(this.Context.Module);
+			
 			this.PageModuleManager.SaveSettings(this.Context.Module);
 
 			return Ok();
@@ -100,6 +99,8 @@ namespace Nucleus.Modules.Account.Controllers
 			User loginUser;
 			List<Claim> claims = new();
 
+			viewModel.ReadSettings(this.Context.Module);
+
 			loginUser = await this.UserManager.Get(this.Context.Site, viewModel.Username);
 
 			if (loginUser == null)
@@ -110,12 +111,14 @@ namespace Nucleus.Modules.Account.Controllers
 
 			if (loginUser == null)
 			{
+				await Task.Delay(TimeSpan.FromSeconds(10));
 				return Json(new { Title = "Login", Message = "Invalid username or password." });
 			}
 			else
 			{
 				if (!await this.UserManager.VerifyPassword(loginUser, viewModel.Password))
 				{
+					await Task.Delay(TimeSpan.FromSeconds(10));
 					return Json(new { Title = "Login", Message = "Invalid username or password." });
 				}
 				else
@@ -149,6 +152,7 @@ namespace Nucleus.Modules.Account.Controllers
 							}
 							else
 							{
+								await Task.Delay(TimeSpan.FromSeconds(10));
 								return Json(new { Title = "Login", Message = "Invalid verification token." });
 							}
 						}
@@ -173,13 +177,11 @@ namespace Nucleus.Modules.Account.Controllers
 
 		private ViewModels.Login BuildViewModel(string returnUrl)
 		{
-			return new ViewModels.Login()
-			{
-				AllowPasswordReset = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.AllowPasswordReset, true),
-				AllowUsernameRecovery = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.AllowUsernameRecovery, true),
-				AllowRememberMe = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.AllowRememberMe, true),
-				ReturnUrl=returnUrl
-			};
+			ViewModels.Login viewModel = new();
+			viewModel.ReadSettings(this.Context.Module);
+
+			viewModel.ReturnUrl = returnUrl;
+			return viewModel;
 		}
 
 	}

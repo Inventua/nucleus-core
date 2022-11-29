@@ -3,7 +3,7 @@
 <h2 class="nucleus-modal-caption">Sitemap Settings</h2>
 @using (Html.BeginNucleusForm("Save", "Sitemap", FormMethod.Post, null))
 {
-<fieldset role="group" aria-labelledby="heading">	
+<fieldset role="group" class="flex-grow-1" aria-labelledby="heading">	
 	<SettingsControl caption="Levels" helptext="Specifies number of levels to show.  Use '0' to show all levels.">
 		@Html.TextBoxFor(model => model.MaxLevels, new { type = "number", min = "0" })
 	</SettingsControl>

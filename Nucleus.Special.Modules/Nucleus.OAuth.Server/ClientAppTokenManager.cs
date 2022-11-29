@@ -114,7 +114,7 @@ namespace Nucleus.OAuth.Server
 		{
 			using (IClientAppTokenDataProvider provider = this.DataProviderFactory.CreateProvider<IClientAppTokenDataProvider>())
 			{
-				await provider.ExpireTokens(TimeSpan.FromDays(1));
+				await provider.ExpireTokens();
 			}
 		}
 	}

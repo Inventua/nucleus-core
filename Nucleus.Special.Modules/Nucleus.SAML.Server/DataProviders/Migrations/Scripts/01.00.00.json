@@ -42,25 +42,47 @@
 						"name": "ServiceProviderMetadataUrl",
 						"clrType": "string",
 						"maxLength": 512,
+						"isnullable": true
+					},
+					{
+						"name": "SigningCertificateSource",
+						"clrType": "int",
 						"isnullable": false
 					},
 					{
 						"name": "SigningCertificateFile",
 						"clrType": "string",
 						"maxLength": 512,
-						"isnullable": false
+						"isnullable": true
+					},
+					{
+						"name": "SigningCertificateThumbprint",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
 					},
 					{
 						"name": "SigningCertificatePassword",
 						"clrType": "string",
 						"maxLength": 128,
+						"isnullable": true
+					},
+					{
+						"name": "SignatureValidationCertificateSource",
+						"clrType": "int",
 						"isnullable": false
 					},
 					{
 						"name": "SignatureValidationCertificateFile",
 						"clrType": "string",
 						"maxLength": 512,
-						"isnullable": false
+						"isnullable": true
+					},
+					{
+						"name": "SignatureValidationCertificateThumbprint",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": true
 					},
 					{
 						"name": "DateAdded",
@@ -102,9 +124,17 @@
 		{
 			"createIndex": {
 				"name": "IX_SAMLServerClientApps_LoginPageId",
-				"table": "Pages",
+				"table": "SAMLServerClientApps",
 				"isunique": false,
 				"columns": [ "LoginPageId" ]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_SAMLServerClientApps_AllowedIssuer",
+				"table": "SAMLServerClientApps",
+				"isunique": false,
+				"columns": [ "SiteId", "AllowedIssuer" ]
 			}
 		},
 		{
@@ -140,13 +170,13 @@
 						"isnullable": false
 					},
 					{
-						"name": "RelayState",
+						"name": "NameIdentifierFormat",
 						"clrType": "string",
-						"maxLength": 512,
-						"isnullable": true
+						"maxLength": 128,
+						"isnullable": false
 					},
 					{
-						"name": "Scope",
+						"name": "RelayState",
 						"clrType": "string",
 						"maxLength": 512,
 						"isnullable": true
@@ -161,11 +191,6 @@
 						"name": "UserId",
 						"clrType": "guid",
 						"isnullable": true
-					},
-					{
-						"name": "ExpiryDate",
-						"clrType": "datetime",
-						"isnullable": false
 					},
 					{
 						"name": "DateAdded",

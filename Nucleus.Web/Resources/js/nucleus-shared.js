@@ -1040,22 +1040,26 @@ function _Page()
 			return;
 		}
 
-		// set the text and disabled attribute for <option> elements with a text value of "-".
+		// set the text and disabled attribute for <option> elements with a text value of "-".  We need to do this in .setTimeout to give the 
+		// content to render first.
 		jQuery('select option').each(function ()
 		{
 			if (jQuery(this).text() == '-')
 			{
-				var element = jQuery(this);
-				var parent = element.parent();
-				// determine how many dashes will fit
-				var measure = jQuery('<span>-</span>');
-				measure.css('font-size', element.parent().css('font-size'));
-				parent.parent().append(measure);
-				var dashCount = Math.floor(parent.width() / measure.width());
-				measure.remove();
-				// set option element to disabled, fill with the calculated number of dashes
-				element.text("-".repeat(dashCount));
-				element.attr('disabled', 'disabled');
+				window.setTimeout(function (element) 
+				{
+					var parent = element.parent();
+					// determine how many dashes will fit
+					var measure = jQuery('<span>-</span>');
+					measure.css('font-size', element.parent().css('font-size'));
+					parent.parent().append(measure);
+					var dashCount = Math.floor(parent.width() / measure.width());
+					measure.remove();
+					// set option element to disabled, fill with the calculated number of dashes
+					if (!Number.isInteger(dashcount)) dashCount = 10;
+					element.text("-".repeat(dashCount));
+					element.attr('disabled', 'disabled');
+				}, 100, jQuery(this));
 			}
 		});
 

@@ -3,11 +3,11 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
+<h2 class="nucleus-modal-caption">Accept Terms Settings</h2>
 @Html.AddStyle("~!/../settings.css")
 @using (Html.BeginNucleusForm("Settings", "AcceptTerms", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
-	<fieldset role="group" aria-labelledby="heading">
-		<h2 class="nucleus-control-panel-heading">Settings</h2>
+	<fieldset class="flex-grow-1" role="group" aria-label="Settings">
 		@Html.HiddenFor(model => model.AgreementBody.Id)
 		<SettingsControl caption="Title" helptext="Enter the title for the user agreement.">
 			@Html.TextBoxFor(model => model.Title, new {  })
@@ -30,9 +30,8 @@
 				@Html.TextBoxFor(model => model.EffectiveDate, "{0:yyyy-MM-ddThh:mm}", new { @class="nucleus-accept-terms-effective-date", @type = "datetime-local" })
 			</SettingsControl>
 		</div>
-
-		<div class="Tools">
-			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "AcceptTermsAdmin", "AcceptTerms"), new { @class = "btn btn-primary" })
-		</div>
 	</fieldset>
+	<div class="nucleus-form-buttonrow">
+		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "AcceptTermsAdmin", "AcceptTerms"), new { @class = "btn btn-primary" })
+	</div>
 }

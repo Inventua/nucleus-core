@@ -30,8 +30,11 @@ namespace Nucleus.Core.Authentication
 			
 			this.CookieName = DEFAULT_COOKIE_NAME;
 			
-			this.ExpireTimeSpan = TimeSpan.FromHours(1);
-			this.SlidingExpirationTimeSpan= TimeSpan.FromHours(1);
+			this.ExpiryTimeSpan = TimeSpan.FromHours(1);
+			this.LongExpiryTimeSpan = TimeSpan.FromDays(30);
+
+			this.SlidingExpirationTimeSpan = TimeSpan.FromHours(1);
+			
 			//this.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
 			//this.SlidingExpiration = true;
 			//this.Events = new CookieAuthenticationEvents();
@@ -45,7 +48,12 @@ namespace Nucleus.Core.Authentication
 		/// <summary>
 		/// Gets the expiry interval for new sessions and their associated cookie.
 		/// </summary>
-		public TimeSpan ExpireTimeSpan { get; private set; }
+		public TimeSpan ExpiryTimeSpan { get; private set; }
+
+		/// <summary>
+		/// Gets the expiry interval for new sessions and their associated cookie.
+		/// </summary>
+		public TimeSpan LongExpiryTimeSpan { get; private set; }
 
 		/// <summary>
 		/// Gets the interval to add to a session expiry each time a new request is received.

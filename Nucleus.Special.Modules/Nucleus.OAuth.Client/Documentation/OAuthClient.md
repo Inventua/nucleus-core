@@ -1,7 +1,7 @@
 ## OAuth client
 The OAuth client allows users to sign on to Nucleus using an external OAuth2 service. 
 
-> An OAuth server extension for Nucleus is available for sale. 
+> An [OAuth server extension](other-extensions/oauth-server) for Nucleus is available for sale. 
 
 > Most OAuth services use SSL (https).  The Microsoft remote authentication system uses a 'correlation cookie' to track remote login requests. 
 Modern browsers block cookies when navigating from an SSL to non-SSL site.  Therefore, if you are using an OAuth service you should use SSL for
@@ -49,12 +49,52 @@ start remote authentication is `https://your-site/extensions/oauthclient/authent
 OAuth provider entry which does not have a name.
 
 ## Configuration
-OAuth providers are configured in the Nucleus:OAuthProviders section in a .json configuration file.  This is typically appSettings.{environment}.json, but you can use a
-different file if you want to.
+OAuth providers are configured in the Nucleus:OAuthProviders section in a .json configuration file.  This is typically appSettings.[environment].json, but you can use a
+[different file](/configuration-files/) if you want to.
+
+> The Google, Facebook, Twitter and Microsoft Account services have pre-configued default settings, so you only need to configure the client id and client secret that you generate using the 
+OAuth service's web site tools.  [Click here](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social#setup-login-providers-required-by-your-application)
+for instructions on how to use their web sites to generate client credentials.  Most OAuth services need for you to enter your Redirect URI, which is 
+`https://your-site/extensions/oauthclient/callback/providerName`, where providerName is the name of an entry in your configuration file, or is the type of an 
+OAuth provider entry which does not have a name.
+
+> The Twitter OAuth2 service does not return the user's email address.  If you need the user's email address, don't allow users to login using Twitter.
+
+> The Nucleus OAuth Server example above uses the generic `OAuth` provider, which can also be used to use other OAuth services.
+
+### Configuration Settings
+
+{.table-25-75}
+|                         |                                                                                      |
+|-------------------------|--------------------------------------------------------------------------------------|
+| Type                    | (required). Specifies the provider type.  Must be Google, Facebook, Twitter, Microsoft, OAuth or OpenIdConnect. |
+| Name                    | (optional). This is the key value used in Urls which reference this provider.  If you are using the Google, Facebook, Twitter or Microsoft service you can omit the `Name` setting and the `Type` will be used instead.|
+| FriendlyName            | (optional). This is the on-screen name used by the `OAuth Provider List` module.  If you do not specify a friendly name, the Name or Type is used instead.|
+| ClientId                | (required). Client Id issued by the OAuth2 service. |
+| ClientSecret            | (required). Client Secret issued by the OAuth2 service.  If you do not have a client secret, set the value to an empty string. |
+
+You do not need to specify Endpoints if you are using Google, Facebook, Twitter or Microsoft OAuth. 
+
+{.table-25-75}
+|                         |                                                                                      |
+|-------------------------|--------------------------------------------------------------------------------------|
+| AuthorizationEndpoint   | This is the endpoint (url) for the OAuth2 `Authorize` request.  |
+| TokenEndpoint           | This is the endpoint (url) for the OAuth2 `Token` request. |
+| UserInformationEndpoint | This is the endpoint (url) used to retrieve user information after a successful OAuth2 authorization.  If your OAuth service returns user information from the `Token` endpoint in a JWT token, the UserInformationEndpoint is not used.  |
+|                         |  |
+| MapJsonKeys             | (optional). The MapJsonKeys is a list of one or more entries which tell the OAuth client how to interpret values which are returned by the UserInformationEndpoint or a JWT token returned by the OAuth service.  You must add an entry for each claim type that you want the OAuth client to consume.  |
+| - claimtype             | (required). A claim type uri.  There is a special claim type for the user name `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name` which you will typically want to include.  |
+| - jsonKey               | (optional). Many OAuth services use their own property names for user values.  Use `jsonKey` to specify the OAuth service property name to map to your claim type. |
+
+> Claim types are matched with your site's user profile properties `Type Uri` to populate user profile values.  The `http://schemas.microsoft.com/ws/2008/06/identity/claims/role` claim type 
+represents roles, and you will need a `MapJsonKeys` entry for it if you want to synchronize roles.
+
+## Example
 
 ```
 "Nucleus":
-"OAuthProviders": [
+"OAuthProviders": 
+[
   {
     "Type": "Google",
     "ClientId": "your-clientid-here",
@@ -83,37 +123,25 @@ different file if you want to.
       { "claimtype": "http://schemas.microsoft.com/ws/2008/06/identity/claims/role" }
     ],
     "Scope": [ "OAuth2" ]
-  }]
+  },
+  {
+    "Type": "OAuth",
+    "Name": "Some other Server",
+    "FriendlyName": "My Nucleus OAuth Server",
+    "AuthorizationEndpoint": "https://site-url/oauth2/authorize",
+    "TokenEndpoint": "https://site-url/oauth2/token",
+    "UserInformationEndpoint": "https://site-url/oauth2/userinfo",
+    "ClientId": "your-clientid-here",
+    "ClientSecret": "your-secret-here",
+    "MapJsonKeys": [
+      { "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", "jsonKey": "user.name" },
+      { "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname", "jsonKey": "user.firstname" },
+      { "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", "jsonKey": "user.lastname" },
+      { "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", "jsonKey": "user.username" },
+      { "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", "jsonKey": "user.email" },
+      { "claimtype": "http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "jsonKey": "user.roles" }
+    ],
+    "Scope": [ "OAuth2" ]
+  }
+]
 ```
-
-> The Google, Facebook, Twitter and Microsoft Account services have pre-configued default settings, so you only need to configure the client id and client secret that you generate using the 
-OAuth service's web site tools.  [Click here](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social#setup-login-providers-required-by-your-application)
-for instructions on how to use their web sites to generate client credentials.  Most OAuth services need for you to enter your Redirect URI, which is 
-`https://your-site/extensions/oauthclient/callback/providerName`, where providerName is the name of an entry in your configuration file, or is the type of an 
-OAuth provider entry which does not have a name.
-
-> The Twitter OAuth2 service does not return the user's email address.  If you need the user's email address, don't allow users to login using Twitter.
-
-> The Nucleus OAuth Server example above uses the generic `OAuth` provider, which can also be used to use other OAuth services.
-
-### Configuration Settings
-
-{.table-25-75}
-|                         |                                                                                      |
-|-------------------------|--------------------------------------------------------------------------------------|
-| Type                    | (required). Specifies the provider type.  Must be Google, Facebook, Twitter, Microsoft, OAuth or OpenIdConnect. |
-| Name                    | (optional). This is the key value used in Urls which reference this provider.  If you are using the Google, Facebook, Twitter or Microsoft service you can omit the `Name` setting and the `Type` will be used instead.|
-| FriendlyName            | (optional). This is the on-screen name used by the `OAuth Provider List` module.  If you do not specify a friendly name, the Name or Type is used instead.|
-| AuthorizationEndpoint   | (required). This is the endpoint (url) for the OAuth2 `Authorize` request. |
-| TokenEndpoint           | (required). This is the endpoint (url) for the OAuth2 `Token` request. |
-| UserInformationEndpoint | (required). This is the endpoint (url) used to retrieve user information after a successful OAuth2 authorization.  If your OAuth service returns user information from the `Token` endpoint in a JWT token, the UserInformationEndpoint is not used.  |
-| ClientId                | (required). Client Id issued by the OAuth2 service. |
-| ClientSecret            | (required). Client Secret issued by the OAuth2 service.  If you do not have a client secret, set the value to an empty string. |
-| MapJsonKeys             | (optional). The MapJsonKeys contains one or more entries which tell the OAuth client how to interpret values which are returned by the UserInformationEndpoint or a JWT token returned by the OAuth service.  You must add an entry for each claim type that you want the OAuth client to consume.  |
-| - claimtype             | (required). A claim type uri.  There is a special claim type for the user name `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name` which you will typically want to include.  |
-| - jsonKey               | (optional). Many OAuth services use their own property names for user values.  Use `jsonKey` to specify the OAuth service property name to map to your claim type. |
-
-> Claim types are matched with your site's user profile properties `Type Uri` to populate user profile values.  The `http://schemas.microsoft.com/ws/2008/06/identity/claims/role` claim type 
-represents roles, and you will need a `MapJsonKeys` entry for it if you want to synchronize roles.
-
-> The Nucleus OAuth Server example above doesn't include jsonKey values, because the Nucleus OAuth Server uses standard claim type Uri values.

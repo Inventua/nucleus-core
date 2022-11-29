@@ -1,4 +1,4 @@
-﻿@model Nucleus.SAML.Server.ViewModels.Settings
+@model Nucleus.SAML.Server.ViewModels.Settings
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
@@ -8,74 +8,139 @@
 {
 	<fieldset role="group" aria-labelledby="heading">
 		<h2>Settings</h2>
-		@Html.HiddenFor(model => model.ClientApp.Id)	
+		@Html.HiddenFor(model => model.ClientApp.Id)
 
 		<SettingsControl caption="Title" helptext="Enter a title for this client app.  This value is displayed in the administration user interface, and is for your reference.">
 			@Html.TextBoxFor(model => model.ClientApp.Title)
 		</SettingsControl>
 
-		<SettingsControl caption="SP Allowed Issuer" helptext="Enter the allowed SAML (service provider) request issuer name.">
-			@Html.TextBoxFor(model => model.ClientApp.AllowedIssuer)
-		</SettingsControl>
+		<fieldset role="group" aria-labelledby="heading">
+			<h2>Identity Provider</h2>
 
-		<SettingsControl caption="SP Metadata Url" helptext="Enter the metadata Url for the service provider (client).  If you leave this value blank, the service provider (relying party) will not be validated.">
-			@Html.TextBoxFor(model => model.ClientApp.ServiceProviderMetadataUrl)
-		</SettingsControl>
+			<div class="alert alert-info">
+				An Identity Provider (IdP) provides authentication information to another site.  This site is the Identity Provider.
+			</div>
 
-		<SettingsControl caption="IdP Signing Certificate" helptext="Enter the path for your signing certificate.">
-			@Html.TextBoxFor(model => model.ClientApp.SigningCertificateFile)
-		</SettingsControl>
+			<SettingsControl caption="IdP Signing Certificate" helptext="Select a certificate to use when signing SAML responses.">
+				@Html.DropDownListFor(model=>model.ClientApp.SigningCertificateSource, Html.GetEnumSelectList<Nucleus.SAML.Server.Models.ClientApp.CertificateSource>(), new { @class = "saml-idp-cert-source w-25 mb-1"})
+				@Html.TextBoxFor(model => model.ClientApp.SigningCertificateFile, new { @class = "saml-idp-cert-file" })
+				@Html.DropDownListFor(model => model.ClientApp.SigningCertificateThumbprint, new SelectList(Model.SigningCertificates, "Key", "Value"), "(not selected)", new { @class = "saml-idp-cert-store" })
+			</SettingsControl>
 
-		<SettingsControl caption="IdP Signing Certificate Password" helptext="Enter the password for your signing certificate.">
-			@Html.TextBoxFor(model => model.ClientApp.SigningCertificatePassword)
-		</SettingsControl>
+			<SettingsControl caption="IdP Signing Certificate Password" helptext="Enter the password for your signing certificate." class="saml-idp-cert-password">
+				@Html.TextBoxFor(model => model.ClientApp.SigningCertificatePassword)
+			</SettingsControl>
 
-		<SettingsControl caption="SP Signature Validation Certificate" helptext="Enter the path for your signature validation certificate.  This is the certificate used to validate messages from the service provider.">
-			@Html.TextBoxFor(model => model.ClientApp.SignatureValidationCertificateFile)
-		</SettingsControl>
+			<SettingsControl caption="Token Lifetime (minutes)" helptext="SAML2 token lifetime in minutes. ">
+				@Html.TextBoxFor(model => model.ClientApp.TokenExpiryMinutes, new { @class="w-25"} )
+			</SettingsControl>
 
-		<SettingsControl caption="Token Lifetime (minutes)" helptext="SAML2 token lifetime in minutes. ">
-			@Html.TextBoxFor(model => model.ClientApp.TokenExpiryMinutes)
-		</SettingsControl>
+			<SettingsControl caption="Login Page" helptext="Login Page for this client App.  Leave this set to 'Site Default' if you want to use the configured login page for this site, or select a custom login page for the Client App.">
+				@Html.PageListFor(model => model.ClientApp.LoginPage, Model.Pages, Guid.Empty, "(site default)", new {})
+			</SettingsControl>
+		</fieldset>
 
-		<SettingsControl caption="Login Page" helptext="Login Page for this client App.  Leave this set to 'Site Default' if you want to use the configured login page for this site, or select a custom login page for the Client App.">
-			@Html.PageListFor(model => model.ClientApp.LoginPage, Model.Pages, Guid.Empty, "(site default)", new {})
-		</SettingsControl>
+		<fieldset role="group" aria-labelledby="heading" class="mt-2">
+			<h3>Service Provider</h3>
+
+			<div class="alert alert-info">
+				The Service Provider (SP) is the web application or site which calls this site to provide authentication information.  Service provider information
+				is used to verify that callers are valid.
+			</div>
+			<SettingsControl caption="SP Allowed Issuer" helptext="Enter the allowed SAML (service provider) request issuer name.">
+				@Html.TextBoxFor(model => model.ClientApp.AllowedIssuer)
+			</SettingsControl>
+
+			<SettingsControl caption="SP Metadata Url" helptext="Enter the metadata Url for the service provider (client).  If you leave this value blank, the service provider (relying party) will not be validated.">
+				@Html.TextBoxFor(model => model.ClientApp.ServiceProviderMetadataUrl)
+			</SettingsControl>
+
+			<SettingsControl caption="SP Signing Certificate" helptext="Select the certificate that the service provider uses to sign SAML requests.  This is used to validate incoming requests.">
+				@Html.DropDownListFor(model=>model.ClientApp.SignatureValidationCertificateSource, Html.GetEnumSelectList<Nucleus.SAML.Server.Models.ClientApp.CertificateSource>(), new { @class = "saml-sp-cert-source w-25 mb-1"})
+				@Html.TextBoxFor(model => model.ClientApp.SignatureValidationCertificateFile, new { @class = "saml-sp-cert-file" })
+				@Html.DropDownListFor(model => model.ClientApp.SignatureValidationCertificateThumbprint, new SelectList(Model.ValidationCertificates, "Key", "Value"), "(not selected)", new { @class = "saml-sp-cert-store" })
+			</SettingsControl>
+
+		</fieldset>
+
+
 	</fieldset>
 
 	<div class="Tools">
-		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "SAMLServerAdmin", "SAMLServer"), new { @data_target = ".nucleus-admin-content" })				
+		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "SAMLServerAdmin", "SAMLServer"), new { @data_target = ".nucleus-admin-content" })
 	</div>
 }
 
 <script>
-	$(document).ready(function() 
+	jQuery(document).ready(function ()
 	{
-		
-		// Read the child pages of the item containing the "+" button
-		jQuery('.nucleus-page-list').on('click', '.nucleus-get-childpages', function (e)
-		{
-			// Add a ul to contain the new pages
-			Page.LoadPartialContent(e, '@Url.NucleusAction("GetChildPages", "SAMLServerAdmin", "SAMLServer")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+			ShowSigningCertControls();
 
-			// hide the "+" button
-			jQuery(this).removeClass('show');
+			jQuery('.saml-idp-cert-source, .saml-sp-cert-source').on('change', ShowSigningCertControls);
 
-		});
-				
-		// Hide the child pages of the item containing the "-" button
-		jQuery('.nucleus-page-list').on('click', '.nucleus-hide-childpages', function (e)
-		{
-			// hide the "-" button
-			jQuery(this).removeClass('show');
+			// Read the child pages of the item containing the "+" button
+			jQuery('.nucleus-page-list').on('click', '.nucleus-get-childpages', function (e)
+			{
+					// Add a ul to contain the new pages
+					Page.LoadPartialContent(e, '@Url.NucleusAction("GetChildPages", "SAMLServerAdmin", "SAMLServer")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
 
-			// show the "+" button
-			jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
+					// hide the "+" button
+					jQuery(this).removeClass('show');
 
-			jQuery(this).closest('li').find('ul').remove();
-		});
+			});
+
+			// Hide the child pages of the item containing the "-" button
+			jQuery('.nucleus-page-list').on('click', '.nucleus-hide-childpages', function (e)
+			{
+					// hide the "-" button
+					jQuery(this).removeClass('show');
+
+					// show the "+" button
+					jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
+
+					jQuery(this).closest('li').find('ul').remove();
+			});
 	});
 
+	function ShowSigningCertControls()
+	{
+		var idp_filecontrol = jQuery('.saml-idp-cert-file');
+		var idp_storecontrol = jQuery('.saml-idp-cert-store');
+		var idp_pwdcontrol = jQuery('.saml-idp-cert-password');
 
+		var sp_filecontrol = jQuery('.saml-sp-cert-file');
+		var sp_storecontrol = jQuery('.saml-sp-cert-store');
+
+		idp_filecontrol.hide();
+		idp_storecontrol.hide();
+		idp_pwdcontrol.hide();
+		sp_filecontrol.hide();
+		sp_storecontrol.hide();
+
+		switch (jQuery('.saml-idp-cert-source').val())
+		{
+			case '0': // None
+				break;
+			case '1': // Store
+				idp_storecontrol.show();
+				break;
+			case '2': // File
+				idp_filecontrol.show();
+				idp_pwdcontrol.show();
+				break;
+		}
+
+		switch (jQuery('.saml-sp-cert-source').val())
+		{
+			case '0': // None
+				break;
+			case '1': // Store
+				sp_storecontrol.show();
+				break;
+			case '2': // File
+				sp_filecontrol.show();
+				break;
+		}
+	}
 
 </script>

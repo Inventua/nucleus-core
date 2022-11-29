@@ -19,6 +19,9 @@ namespace Nucleus.SAML.Server.ViewModels
 
 		public PageMenu Pages { get; set; }
 
-		public IEnumerable<ApiKey> ApiKeys { get; set; }
+		public Dictionary<string,string> SigningCertificates { get; set; }
+
+		public Dictionary<string, string> ValidationCertificates { get; set; }
+
 	}
 }

@@ -26,348 +26,353 @@ using Microsoft.AspNetCore.Http;
 
 namespace Nucleus.Web
 {
-	public class Startup
-	{
-		private const string HOSTING_FILENAME = "hosting.json";
-		private const string CONFIG_FILENAME = "appSettings.json";
-		private const string DATABASE_CONFIG_FILENAME = "databaseSettings.json";
+  public class Startup
+  {
+    private const string HOSTING_FILENAME = "hosting.json";
+    private const string CONFIG_FILENAME = "appSettings.json";
+    private const string DATABASE_CONFIG_FILENAME = "databaseSettings.json";
 
-		private const string SETTING_ENABLERESPONSECOMPRESSION = "Nucleus:EnableResponseCompression";
-		private const string SETTING_ENABLEFORWARDEDHEADERS = "Nucleus:EnableForwardedHeaders";
+    private const string SETTING_ENABLERESPONSECOMPRESSION = "Nucleus:EnableResponseCompression";
+    private const string SETTING_ENABLEFORWARDEDHEADERS = "Nucleus:EnableForwardedHeaders";
 
-		private IConfiguration Configuration { get; }
-		private IWebHostEnvironment Environment { get; }
+    private IConfiguration Configuration { get; }
+    private IWebHostEnvironment Environment { get; }
 
-		public Startup(IConfiguration configuration, IWebHostEnvironment env)
-		{
-			this.Environment = env;
+    public static List<string> ConfigFiles { get; } = new();
 
-			this.Configuration = configuration; // BuildConfiguration(configuration);
-		}
+    public Startup(IConfiguration configuration, IWebHostEnvironment env)
+    {
+      this.Environment = env;
 
-		private static string GetEnvironmentConfigFile(string defaultFileName, string environmentName)
-		{
-			return $"{System.IO.Path.GetFileNameWithoutExtension(defaultFileName)}.{environmentName}{System.IO.Path.GetExtension(defaultFileName)}";
-		}
+      this.Configuration = configuration; // BuildConfiguration(configuration);
+    }
 
-		private static void AddSingleConfigFile(List<string> configFiles, string filefullpath)
-		{
-			if (!configFiles.Contains(filefullpath, StringComparer.OrdinalIgnoreCase))
-			{
-				configFiles.Add(filefullpath);
-			}
-		}
+    private static string GetEnvironmentConfigFile(string defaultFileName, string environmentName)
+    {
+      return $"{System.IO.Path.GetFileNameWithoutExtension(defaultFileName)}.{environmentName}{System.IO.Path.GetExtension(defaultFileName)}";
+    }
 
-		private static void AddConfigFileSet(HostBuilderContext context, List<string> configFiles, string filename)
-		{
-			AddSingleConfigFile(configFiles, System.IO.Path.Combine(ConfigFolder(), filename));
-			AddSingleConfigFile(configFiles, System.IO.Path.Combine(ConfigFolder(), GetEnvironmentConfigFile(filename, context.HostingEnvironment.EnvironmentName)));
-		}
+    private static void AddSingleConfigFile(List<string> configFiles, string filefullpath)
+    {
+      if (!configFiles.Contains(filefullpath, StringComparer.OrdinalIgnoreCase))
+      {
+        if (System.IO.File.Exists(filefullpath))
+        {
+          configFiles.Add(filefullpath);
+        }
+      }
+    }
 
-		public static void ConfigureAppConfiguration(HostBuilderContext context, IConfigurationBuilder configurationBuilder)
-		{
-			List<string> configFiles = new();
+    private static void AddConfigFileSet(HostBuilderContext context, List<string> configFiles, string filename)
+    {
+      AddSingleConfigFile(configFiles, System.IO.Path.Combine(ConfigFolder(), filename));
+      AddSingleConfigFile(configFiles, System.IO.Path.Combine(ConfigFolder(), GetEnvironmentConfigFile(filename, context.HostingEnvironment.EnvironmentName)));
+    }
 
-			AddConfigFileSet(context, configFiles, HOSTING_FILENAME);
-			AddConfigFileSet(context, configFiles, CONFIG_FILENAME);
-			AddConfigFileSet(context, configFiles, DATABASE_CONFIG_FILENAME);
+    public static void ConfigureAppConfiguration(HostBuilderContext context, IConfigurationBuilder configurationBuilder)
+    {
+      AddConfigFileSet(context, ConfigFiles, HOSTING_FILENAME);
+      AddConfigFileSet(context, ConfigFiles, CONFIG_FILENAME);
+      AddConfigFileSet(context, ConfigFiles, DATABASE_CONFIG_FILENAME);
 
-			// Add all of the other .json files so that users can split their configuration however they like.  We sort the filenames alphabetically
-			// so that we can ensure that the files are loaded in a consistent order.  AddSingleConfigFile checks whether the file
-			// already exists in the list, so we don't have to check that the config file isn't one of the ones we already added
-			// above.
-			foreach (string configFile in System.IO.Directory.EnumerateFiles(ConfigFolder(), "*.json").OrderBy(filename => filename, StringComparer.OrdinalIgnoreCase))
-			{
-				string filename = System.IO.Path.GetFileName(configFile);
+      // Add all of the other .json files so that users can split their configuration however they like.  We sort the filenames alphabetically
+      // so that we can ensure that the files are loaded in a consistent order.  AddSingleConfigFile checks whether the file
+      // already exists in the list, so we don't have to check that the config file isn't one of the ones we already added
+      // above.
+      foreach (string configFile in System.IO.Directory.EnumerateFiles(ConfigFolder(), "*.json").OrderBy(filename => filename, StringComparer.OrdinalIgnoreCase))
+      {
+        string filename = System.IO.Path.GetFileName(configFile);
 
-				if (!filename.EndsWith(".schema.json") && filename != "bundleconfig.json")
-				{
-					AddSingleConfigFile(configFiles, configFile);
-				}
-			}
+        if (!filename.EndsWith(".schema.json") && !filename.EndsWith(".deps.json") && !filename.EndsWith(".runtimeconfig.json") && filename != "bundleconfig.json")
+        {
+          AddSingleConfigFile(ConfigFiles, configFile);
+        }
+      }
 
-			foreach (string configFile in configFiles)
-			{
-				configurationBuilder.AddJsonFile(configFile, optional: true, reloadOnChange: true);
-			}
+      foreach (string configFile in ConfigFiles)
+      {
+        configurationBuilder.AddJsonFile(configFile, optional: true, reloadOnChange: true);
+      }
 
-			configurationBuilder.AddEnvironmentVariables();
-			configurationBuilder.AddCommandLine(System.Environment.GetCommandLineArgs());
-		}
+      configurationBuilder.AddEnvironmentVariables();
+      configurationBuilder.AddCommandLine(System.Environment.GetCommandLineArgs());
+    }
 
-		public void ConfigureServices(IServiceCollection services)
-		{
-			try
-			{
-				// This must be called before .AddStartupLogger, because the TextFileLogger uses its values.
-				services.AddFolderOptions(this.Configuration);
+    public void ConfigureServices(IServiceCollection services)
+    {
+      try
+      {
+        // This must be called before .AddStartupLogger, because the TextFileLogger uses its values.
+        services.AddFolderOptions(this.Configuration);
 
-				services.AddStartupLogger(this.Configuration);
+        services.AddStartupLogger(this.Configuration);
 
-				services.Logger().LogInformation(new[]
-				{
-				$"{System.Reflection.Assembly.GetExecutingAssembly().Product()} version {this.GetType().Assembly.GetName().Version}. {this.GetType().Assembly.Copyright()}",
-				$"Application Root folder: [{System.Environment.CurrentDirectory}]",
-				$"Configuration folder:    [{ConfigFolder()}]",
-				$"Content Root:            [{this.Environment.ContentRootPath}]",
-				$"Environment:             [{this.Environment.EnvironmentName}]",
-				$"Urls:                    [{this.Configuration.GetValue<string>(Microsoft.AspNetCore.Hosting.WebHostDefaults.ServerUrlsKey)}]"
-			});
+        services.Logger().LogInformation(new[]
+        {
+          $"{System.Reflection.Assembly.GetExecutingAssembly().Product()} version {this.GetType().Assembly.GetName().Version}. {this.GetType().Assembly.Copyright()}",
+          $"Application Root folder: [{System.Environment.CurrentDirectory}]",
+          $"Configuration folder:    [{ConfigFolder()}]",
+          $"Content Root:            [{this.Environment.ContentRootPath}]",
+          $"Environment:             [{this.Environment.EnvironmentName}]",
+          $"Urls:                    [{this.Configuration.GetValue<string>(Microsoft.AspNetCore.Hosting.WebHostDefaults.ServerUrlsKey)}]"
+        });
 
-				services.AddHttpContextAccessor();  // required by many elements of the system
-				services.AddHttpClient();
+        services.Logger().LogInformation("Used config files: '{file}'", String.Join(',',  ConfigFiles));
 
-				IMvcBuilder builder = services.AddControllersWithViews();
+        services.AddHttpContextAccessor();  // required by many elements of the system
+        services.AddHttpClient();
 
-				builder.AddRazorRuntimeCompilation();
+        IMvcBuilder builder = services.AddControllersWithViews();
 
-				// services.AddLocalization(options => options.ResourcesPath = "LocalizationResources");
+        builder.AddRazorRuntimeCompilation();
 
-				// Enable logging
-				services.AddLogging(logging =>
-				{
-					logging.ClearProviders();
-					logging.AddConsole();
-					logging.AddDebugLogger();
-					logging.AddTextFileLogger(this.Configuration);
-					logging.AddAzureWebAppDiagnostics();
-				});
+        // services.AddLocalization(options => options.ResourcesPath = "LocalizationResources");
 
-				services.Logger().LogInformation($"App Data Folder:         [{Core.Logging.LoggingBuilderExtensions.DataFolder}]");
+        // Enable logging
+        services.AddLogging(logging =>
+        {
+          logging.ClearProviders();
+          logging.AddConsole();
+          logging.AddDebugLogger();
+          logging.AddTextFileLogger(this.Configuration);
+          logging.AddAzureWebAppDiagnostics();
+        });
 
-				// Enable compression
-				if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
-				{
-					services.Logger().LogInformation("Adding Response Compression");
-					services.AddResponseCompression(options =>
-					{
-						options.Providers.Add(typeof(Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider));
-						options.Providers.Add(typeof(Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider));
-						options.EnableForHttps = true;
-					});
-				};
+        services.Logger().LogInformation($"App Data Folder:         [{Core.Logging.LoggingBuilderExtensions.DataFolder}]");
 
-				if (this.Configuration.GetValue<Boolean>(SETTING_ENABLEFORWARDEDHEADERS))
-				{
-					services.Logger().LogInformation("Adding Forwarded Headers");
-					services.Configure<ForwardedHeadersOptions>(options =>
-					{
-						options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.All;
-					});
-				}
+        // Enable compression
+        if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
+        {
+          services.Logger().LogInformation("Adding Response Compression");
+          services.AddResponseCompression(options =>
+          {
+            options.Providers.Add(typeof(Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider));
+            options.Providers.Add(typeof(Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider));
+            options.EnableForHttps = true;
+          });
+        };
 
-				// Read HostOptions settings from config
-				services.Logger().LogInformation("Setting Host Options");
-				services.Configure<HostOptions>(Configuration.GetSection("HostOptions"));
+        if (this.Configuration.GetValue<Boolean>(SETTING_ENABLEFORWARDEDHEADERS))
+        {
+          services.Logger().LogInformation("Adding Forwarded Headers");
+          services.Configure<ForwardedHeadersOptions>(options =>
+          {
+            options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.All;
+          });
+        }
 
-				services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(Configuration.GetSection("FormOptions"));
-				services.Configure<KestrelServerOptions>(Configuration.GetSection("KestrelServerOptions"));
-				services.Configure<IISServerOptions>(Configuration.GetSection("IISServerOptions"));
-				services.Configure<IISOptions>(Configuration.GetSection("IISOptions"));
+        // Read HostOptions settings from config
+        services.Logger().LogInformation("Setting Host Options");
+        services.Configure<HostOptions>(Configuration.GetSection("HostOptions"));
 
-				// Set (override) all of the various "max size" settings from one config value (if it is present)
-				string maxRequestSize = Configuration.GetSection("Nucleus:MaxRequestSize").Value;
-				if (long.TryParse(maxRequestSize, out long maxRequestSizeValue))
-				{
-					services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options => options.MultipartBodyLengthLimit = maxRequestSizeValue);
-					services.Configure<IISServerOptions>(options => { options.MaxRequestBodySize = maxRequestSizeValue; });
+        services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(Configuration.GetSection("FormOptions"));
+        services.Configure<KestrelServerOptions>(Configuration.GetSection("KestrelServerOptions"));
+        services.Configure<IISServerOptions>(Configuration.GetSection("IISServerOptions"));
+        services.Configure<IISOptions>(Configuration.GetSection("IISOptions"));
 
-					// We set KestrelServerOptions options.Limits.MaxRequestBodySize to unlimited because the exception that it generates 
-					// (Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException) causes problems with exception handling.  The other limits
-					// encapsulate this limit anyway, and provide better error messages.
-					// https://github.com/dotnet/aspnetcore/issues/23949
-					services.Configure<KestrelServerOptions>(options => { options.Limits.MaxRequestBodySize = null; });
-				}
+        // Set (override) all of the various "max size" settings from one config value (if it is present)
+        string maxRequestSize = Configuration.GetSection("Nucleus:MaxRequestSize").Value;
+        if (long.TryParse(maxRequestSize, out long maxRequestSizeValue))
+        {
+          services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options => options.MultipartBodyLengthLimit = maxRequestSizeValue);
+          services.Configure<IISServerOptions>(options => { options.MaxRequestBodySize = maxRequestSizeValue; });
 
-				services.Logger().LogInformation("Adding Security Headers Middleware");
-				services.AddSecurityHeadersMiddleware(this.Configuration);
+          // We set KestrelServerOptions options.Limits.MaxRequestBodySize to unlimited because the exception that it generates 
+          // (Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException) causes problems with exception handling.  The other limits
+          // encapsulate this limit anyway, and provide better error messages.
+          // https://github.com/dotnet/aspnetcore/issues/23949
+          services.Configure<KestrelServerOptions>(options => { options.Limits.MaxRequestBodySize = null; });
+        }
 
-				services.Logger().LogInformation("Adding Default Cache Middleware");
-				services.AddDefaultCacheMiddleware(this.Configuration);				
+        services.Logger().LogInformation("Adding Security Headers Middleware");
+        services.AddSecurityHeadersMiddleware(this.Configuration);
 
-				// Add merged file provider.  
-				services.Logger().LogInformation("Adding Merged File Middleware");
-				services.AddMergedFileMiddleware(this.Configuration);
+        services.Logger().LogInformation("Adding Default Cache Middleware");
+        services.AddDefaultCacheMiddleware(this.Configuration);
 
-				services.Logger().LogInformation("Adding Data Provider Services");
-				services.AddDataProviderFactory(this.Configuration);
-				services.AddCoreDataProvider(this.Configuration);
+        // Add merged file provider.  
+        services.Logger().LogInformation("Adding Merged File Middleware");
+        services.AddMergedFileMiddleware(this.Configuration);
 
-				services.Logger().LogInformation("Adding Nucleus core services");
-				services.AddNucleusCoreServices(this.Configuration);
-				services.AddScoped<IContainerController, Nucleus.Web.Controllers.ContainerController>();
+        services.Logger().LogInformation("Adding Data Provider Services");
+        services.AddDataProviderFactory(this.Configuration);
+        services.AddCoreDataProvider(this.Configuration);
 
-				services.Logger().LogInformation("Adding Plugins");
-				builder.AddPlugins(Environment.ContentRootPath);
+        services.Logger().LogInformation("Adding Nucleus core services");
+        services.AddNucleusCoreServices(this.Configuration);
+        services.AddScoped<IContainerController, Nucleus.Web.Controllers.ContainerController>();
 
-				services.AddRazorPages();
+        services.Logger().LogInformation("Adding Plugins");
+        builder.AddPlugins(Environment.ContentRootPath);
 
-				services.AddCoreAuthentication(this.Configuration);
-				services.AddCoreAuthorization();
+        services.AddRazorPages();
 
-				services.AddAntiforgery();
+        services.AddCoreAuthentication(this.Configuration);
+        services.AddCoreAuthorization();
 
-				// default response caching to no caching
-				services.AddResponseCaching(options =>
-				{
-					options.SizeLimit = 0;
-					options.MaximumBodySize = 0;
-				});
-				services.Logger().LogInformation("Startup.ConfigureServices Complete.");
-			}
-			catch (Exception ex)
-			{
-				services.Logger().LogError(ex, "Startup.ConfigureServices Error.");
-				throw;
-			}
-		}
+        services.AddAntiforgery();
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-		{
-			try
-			{
-				app.UseMiddleware<SecurityHeadersMiddleware>();
-				app.UseRequestLocalization();
+        // default response caching to no caching
+        services.AddResponseCaching(options =>
+        {
+          options.SizeLimit = 0;
+          options.MaximumBodySize = 0;
+        });
+        services.Logger().LogInformation("Startup.ConfigureServices Complete.");
+      }
+      catch (Exception ex)
+      {
+        services.Logger().LogError(ex, "Startup.ConfigureServices Error.");
+        throw;
+      }
+    }
 
-				app.UseExceptionHandler($"/{RoutingConstants.ERROR_ROUTE_PATH}");
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+      try
+      {
+        app.UseMiddleware<SecurityHeadersMiddleware>();
+        app.UseRequestLocalization();
 
-				if (this.Configuration.GetValue<Boolean>(SETTING_ENABLEFORWARDEDHEADERS))
-				{
-					app.UseForwardedHeaders();
-				}
-				
-				if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
-				{
-					app.Logger().LogInformation($"Using Response Compression.");
-					app.UseResponseCompression();
-				}
+        app.UseExceptionHandler($"/{RoutingConstants.ERROR_ROUTE_PATH}");
 
-				// Call .UseStaticFiles multiple times to add additional paths.  We expose specific folders only, rather than adding 
-				// env.ContentRootPath so that only defined folders can serve static resources.
-				foreach (string folderName in Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS)
-				{
-					string path = System.IO.Path.Combine(env.ContentRootPath, folderName);
+        if (this.Configuration.GetValue<Boolean>(SETTING_ENABLEFORWARDEDHEADERS))
+        {
+          app.UseForwardedHeaders();
+        }
 
-					if (System.IO.Directory.Exists(path))
-					{
-						app.Logger()?.LogInformation("Adding static file path: [{path}]", path.Replace(Environment.ContentRootPath, ""));
+        if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
+        {
+          app.Logger().LogInformation($"Using Response Compression.");
+          app.UseResponseCompression();
+        }
 
-						app.UseStaticFiles(new StaticFileOptions
-						{
-							FileProvider = new PhysicalFileProvider(path),
-							RequestPath = "/" + folderName,
-							OnPrepareResponse = context =>
-							{
-								// Add charset=utf-8 to content-type for text content if it is not already present
-								if ((context.Context.Response.ContentType.StartsWith("text/") || context.Context.Response.ContentType.StartsWith("application/javascript")) && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
-								{
-									context.Context.Response.ContentType += "; charset=utf-8";
-								}
+        // Call .UseStaticFiles multiple times to add additional paths.  We expose specific folders only, rather than adding 
+        // env.ContentRootPath so that only defined folders can serve static resources.
+        foreach (string folderName in Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS)
+        {
+          string path = System.IO.Path.Combine(env.ContentRootPath, folderName);
 
-								// Cache static content for 30 days
-								context.Context.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
-								{
-									Public = true,
-									MaxAge = TimeSpan.FromDays(30)
-								};
-							}
-						});
-					}
-				}
+          if (System.IO.Directory.Exists(path))
+          {
+            app.Logger()?.LogInformation("Adding static file path: [{path}]", path.Replace(Environment.ContentRootPath, ""));
 
-				// Set default cache-control to NoCache.  This can be overridden by controllers or middleware.
-				app.UseMiddleware<DefaultNoCacheMiddleware>();
-				
-				app.UseAuthorizationRedirect();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+              FileProvider = new PhysicalFileProvider(path),
+              RequestPath = "/" + folderName,
+              OnPrepareResponse = context =>
+              {
+                // Add charset=utf-8 to content-type for text content if it is not already present
+                if ((context.Context.Response.ContentType.StartsWith("text/") || context.Context.Response.ContentType.StartsWith("application/javascript")) && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
+                {
+                  context.Context.Response.ContentType += "; charset=utf-8";
+                }
 
-				app.UseCookiePolicy(new CookiePolicyOptions()
-				{
-					Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest
-				});
+                // Cache static content for 30 days
+                context.Context.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+                {
+                  Public = true,
+                  MaxAge = TimeSpan.FromDays(30)
+                };
+              }
+            });
+          }
+        }
 
-				app.UseRouting();
+        // Set default cache-control to NoCache.  This can be overridden by controllers or middleware.
+        app.UseMiddleware<DefaultNoCacheMiddleware>();
 
-				// the order here is important.  The page routing and module routing middleware sets the Nucleus context, which is used by some of the
-				// authorization handlers, but ModuleRoutingMiddleware does a permission check, which requires that Authentication has run - and
-				// middleware is executed in the order of the code below
-				app.UseMiddleware<MergedFileProviderMiddleware>();
-				app.UseMiddleware<PageRoutingMiddleware>();
-				app.UseAuthentication();
-				app.UseMiddleware<Nucleus.Core.FileSystemProviders.FileIntegrityCheckerMiddleware>();
-				app.UseMiddleware<ModuleRoutingMiddleware>();
-				app.UseAuthorization();
-								
-				app.UseEndpoints(routes =>
-				{
-					// All routes that don't match a controller/action or other defined endpoint go to the index controller and are
-					// treated as CMS pages.  By specifying the pattern argument (first argument) we ensure that requests that "look like"
-					// filenames (that is, contains a dot) are routed to the default page controller, the standard overload uses a pattern 
-					// {*path:nonfile}, which does not route those Urls to the default page controller.
-					// Even though this is the first route defined, .MapFallbackToController always creates a route that is last in the
-					// routing order, so any other mapped route will take precedence over this one.
-					routes.MapFallbackToController("{*path}", "Index", "Default");
+        app.UseAuthorizationRedirect();
 
-					// "Razor Pages" (Razor Pages is different to Razor views with controllers [MVC])
-					routes.MapRazorPages();
+        app.UseCookiePolicy(new CookiePolicyOptions()
+        {
+          Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.SameAsRequest
+        });
 
-					// Map the error page route
-					routes.MapControllerRoute(
-							name: RoutingConstants.ERROR_ROUTE_NAME,
-							pattern: $"/{RoutingConstants.ERROR_ROUTE_PATH}",
-							defaults: new { controller = "Error", action = "Index" });
+        app.UseRouting();
 
-					// map area routes for the admin controllers
-					routes.MapControllerRoute(
-								name: RoutingConstants.AREA_ROUTE_NAME,
-								pattern: "/{area}/{controller}/{action=Index}/{id?}");
+        // the order here is important.  The page routing and module routing middleware sets the Nucleus context, which is used by some of the
+        // authorization handlers, but ModuleRoutingMiddleware does a permission check, which requires that Authentication has run - and
+        // middleware is executed in the order of the code below
+        app.UseMiddleware<MergedFileProviderMiddleware>();
+        app.UseMiddleware<PageRoutingMiddleware>();
+        app.UseAuthentication();
+        app.UseMiddleware<Nucleus.Core.FileSystemProviders.FileIntegrityCheckerMiddleware>();
+        app.UseMiddleware<ModuleRoutingMiddleware>();
+        app.UseAuthorization();
 
-					// map routes for extension controllers
-					routes.MapControllerRoute(
-							name: RoutingConstants.EXTENSIONS_ROUTE_NAME,
-							pattern: $"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
+        app.UseEndpoints(routes =>
+        {
+          // All routes that don't match a controller/action or other defined endpoint go to the index controller and are
+          // treated as CMS pages.  By specifying the pattern argument (first argument) we ensure that requests that "look like"
+          // filenames (that is, contains a dot) are routed to the default page controller, the standard overload uses a pattern 
+          // {*path:nonfile}, which does not route those Urls to the default page controller.
+          // Even though this is the first route defined, .MapFallbackToController always creates a route that is last in the
+          // routing order, so any other mapped route will take precedence over this one.
+          routes.MapFallbackToController("{*path}", "Index", "Default");
 
-					// we're not currently using this route for anything
-					routes.MapControllerRoute(
-							name: RoutingConstants.API_ROUTE_NAME,
-							pattern: $"/{RoutingConstants.API_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
+          // "Razor Pages" (Razor Pages is different to Razor views with controllers [MVC])
+          routes.MapRazorPages();
 
-					// Map the site map controller to /sitemap.xml
-					routes.MapControllerRoute(
-							name: RoutingConstants.SITEMAP_ROUTE_NAME,
-							pattern: $"/{RoutingConstants.SITEMAP_ROUTE_PATH}",
-							defaults: new { controller = "Sitemap", action = "Index" });
+          // Map the error page route
+          routes.MapControllerRoute(
+              name: RoutingConstants.ERROR_ROUTE_NAME,
+              pattern: $"/{RoutingConstants.ERROR_ROUTE_PATH}",
+              defaults: new { controller = "Error", action = "Index" });
 
-					// Map the site map controller to /robots.txt
-					routes.MapControllerRoute(
-							name: RoutingConstants.ROBOTS_ROUTE_NAME,
-							pattern: $"/{RoutingConstants.ROBOTS_ROUTE_PATH}",
-							defaults: new { controller = "Sitemap", action = "Robots" });
-					
+          // map area routes for the admin controllers
+          routes.MapControllerRoute(
+                name: RoutingConstants.AREA_ROUTE_NAME,
+                pattern: "/{area}/{controller}/{action=Index}/{id?}");
 
-					// Configure controller routes using attribute-based routing
-					routes.MapControllers();
-				});
+          // map routes for extension controllers
+          routes.MapControllerRoute(
+              name: RoutingConstants.EXTENSIONS_ROUTE_NAME,
+              pattern: $"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
 
-				app.Logger().LogInformation($"Startup complete.  Nucleus is running.");
-			}
-			catch (Exception ex)
-			{
-				app.Logger().LogError(ex, "Startup.Configure Error.");
-				throw;
-			}
-		}
+          // we're not currently using this route for anything
+          routes.MapControllerRoute(
+              name: RoutingConstants.API_ROUTE_NAME,
+              pattern: $"/{RoutingConstants.API_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
 
-		private static string ConfigFolder()
-		{
-			string path = System.Environment.CurrentDirectory;
+          // Map the site map controller to /sitemap.xml
+          routes.MapControllerRoute(
+              name: RoutingConstants.SITEMAP_ROUTE_NAME,
+              pattern: $"/{RoutingConstants.SITEMAP_ROUTE_PATH}",
+              defaults: new { controller = "Sitemap", action = "Index" });
 
-			if (!System.IO.Directory.Exists(path))
-			{
-				System.IO.Directory.CreateDirectory(path);
-			}
+          // Map the site map controller to /robots.txt
+          routes.MapControllerRoute(
+              name: RoutingConstants.ROBOTS_ROUTE_NAME,
+              pattern: $"/{RoutingConstants.ROBOTS_ROUTE_PATH}",
+              defaults: new { controller = "Sitemap", action = "Robots" });
 
-			return path;
-		}
-	}
+
+          // Configure controller routes using attribute-based routing
+          routes.MapControllers();
+        });
+
+        app.Logger().LogInformation($"Startup complete.  Nucleus is running.");
+      }
+      catch (Exception ex)
+      {
+        app.Logger().LogError(ex, "Startup.Configure Error.");
+        throw;
+      }
+    }
+
+    private static string ConfigFolder()
+    {
+      string path = System.Environment.CurrentDirectory;
+
+      if (!System.IO.Directory.Exists(path))
+      {
+        System.IO.Directory.CreateDirectory(path);
+      }
+
+      return path;
+    }
+  }
 }

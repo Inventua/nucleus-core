@@ -1,21 +1,21 @@
 ﻿@model $nucleus_extension_namespace$.ViewModels.Settings
 @Html.AddStyle("~!/../settings.css")
-<div>
+<div class="nucleus-editor-panel">
 	@using (Html.BeginNucleusForm("Settings", "$nucleus_extension_name$Admin", "$nucleus_extension_name$", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 	{
 		<fieldset role="group" aria-labelledby="heading">
 			<h2 class="nucleus-control-panel-heading">Settings</h2>
 			<div class="nucleus-flex-fields">
 				@*<SettingsControl caption="Categories List" helptext="Select the list to use for categories for this module instance.  Lists are managed in the Nucleus Lists manager.">
-					@Html.DropDownListFor(model => model.CategoryList.Id, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")
-				</SettingsControl>
-				<SettingsControl caption="Layout" helptext="Display layout.">
-					@Html.DropDownListFor(model => model.Layout, new SelectList(Model.Layouts))
-				</SettingsControl>*@
+						@Html.DropDownListFor(model => model.CategoryList.Id, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")
+					</SettingsControl>
+					<SettingsControl caption="Layout" helptext="Display layout.">
+						@Html.DropDownListFor(model => model.Layout, new SelectList(Model.Layouts))
+					</SettingsControl>*@
 			</div>
 
-			<div class="Tools">
-				@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "$nucleus_extension_name$Admin", "$nucleus_extension_name$"), new { })				
+			<div class="nucleus-form-buttonrow">
+				@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "$nucleus_extension_name$Admin", "$nucleus_extension_name$"), new { })
 			</div>
 		</fieldset>
 	}

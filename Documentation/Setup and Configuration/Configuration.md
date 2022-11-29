@@ -45,6 +45,8 @@ and [IISOptions](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcor
 
 > **_NOTE:_**    If you are hosting using Internet Information Services (IIS), Apache, Nginx or another reverse proxy server, the urls setting is ignored.
 
+> If you want to use https, 
+
 ## appSettings.json 
 The `appSettings.json` file contains most of the settings for Nucleus, and can also contain standard ASP.NET Core settings.  The default appSettings.json
 file is configured with settings which should suit most users.

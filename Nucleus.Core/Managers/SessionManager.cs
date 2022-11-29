@@ -48,7 +48,7 @@ namespace Nucleus.Core.Managers
 		{
 			if (rememberMe)
 			{
-				return Task.FromResult(new UserSession(site, user, rememberMe, remoteIpAddress, DateTime.UtcNow.Add(this.Options.Value.LongExpiryTimeSpan), !this.Options.Value.LongExpiryTimeSpan.Equals(TimeSpan.Zero)));
+				return Task.FromResult(new UserSession(site, user, rememberMe, remoteIpAddress, DateTime.UtcNow.Add(this.Options.Value.LongExpiryTimeSpan), false));
 			}
 			else
 			{

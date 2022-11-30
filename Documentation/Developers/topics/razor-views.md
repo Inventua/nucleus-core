@@ -7,7 +7,9 @@ they access your control panel extension from the Manage or Settings control pan
 Your views can make use of [Nucleus view features](/api-documentation/Nucleus.ViewFeatures.xml/#asm-Nucleus-ViewFeatures) (tag helpers, 
 html helpers and url helpers) to make it easier to interact with Nucleus.
 
-All parts of Nucleus (including extensions) can use jQuery and Bootstrap.
+All parts of Nucleus (including extensions) can use jQuery and Bootstrap.  You can use other UI frameworks too, as long as they are 
+compatible with jQuery and Bootstrap.  You will need to include third-party components in your install set and add code to load the 
+relevant Javascript and/or CSS files.
 
 ## Settings Views
 Settings pages are displayed within the Nucleus administrative user interface.  They are Razor views which render partial HTML.
@@ -35,7 +37,7 @@ Settings pages are displayed within the Nucleus administrative user interface.  
       </SettingsControl>
     </div>
 
-    <div class="Tools">
+    <div class="nucleus-form-buttonrow">
       @Html.SubmitButton("", "Save Settings", 
         @Url.NucleusAction("SaveSettings", "AcceptTermsAdmin", "AcceptTerms"), 
         new { @class = "btn btn-primary" })

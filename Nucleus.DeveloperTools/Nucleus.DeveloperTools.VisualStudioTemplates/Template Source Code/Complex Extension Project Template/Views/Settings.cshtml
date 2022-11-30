@@ -13,10 +13,10 @@
 						@Html.DropDownListFor(model => model.Layout, new SelectList(Model.Layouts))
 					</SettingsControl>*@
 			</div>
-
-			<div class="nucleus-form-buttonrow">
-				@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "$nucleus_extension_name$Admin", "$nucleus_extension_name$"), new { })
-			</div>
 		</fieldset>
+
+		<div class="nucleus-form-buttonrow">
+			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "$nucleus_extension_name$Admin", "$nucleus_extension_name$"), new { })
+		</div>
 	}
 </div>

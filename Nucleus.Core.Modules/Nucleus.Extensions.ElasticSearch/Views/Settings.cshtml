@@ -3,12 +3,11 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
-@Html.AddStyle("~!/../settings.css")
-<div class="nucleus-editor-panel">
 <h2 class="nucleus-control-panel-heading">Elastic Search Settings</h2>
+@Html.AddStyle("~!/../settings.css")
 @using (Html.BeginNucleusForm("Settings", "ElasticSearch", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
-	<fieldset role="group" aria-labelledby="heading">
+	<fieldset role="group" aria-label="Settings">
 		<SettingsControl caption="Elastic Search Server Url" helptext="Enter the URL for your Elastic Search server, including the port.">
 			@Html.TextBoxFor(model => model.ServerUrl)
 		</SettingsControl>
@@ -68,11 +67,10 @@
 		</div>
 	</fieldset>
 
-	<div class="Tools">
+		<div class="nucleus-form-buttonrow">
 		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "Settings", "ElasticSearch"), new { })
 		@Html.SubmitButton("", "Get Index Count", @Url.NucleusAction("GetIndexCount", "Settings", "ElasticSearch"), new { })
 		@*@Html.SubmitButton("", "Get Index Settings", @Url.NucleusAction("GetIndexSettings", "Settings", "ElasticSearch"), new { })*@
 		@Html.SubmitButton("", "Clear Index", @Url.NucleusAction("ClearIndex", "Settings", "ElasticSearch"), new { @class = "btn btn-danger", @data_confirm = "This will delete the selected Elastic Search index, and it will be automatically re-created the next time the search feeder runs.  Do you want to continue?" })
 	</div>
 }
-</div>

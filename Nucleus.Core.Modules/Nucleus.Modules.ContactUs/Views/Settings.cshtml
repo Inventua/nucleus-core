@@ -3,12 +3,11 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
+<h2 class="nucleus-control-panel-heading">Settings</h2>
 @Html.AddStyle("~!/../settings.css")
 @using (Html.BeginNucleusForm("Settings", "ContactUs", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
-	<fieldset role="group" aria-labelledby="heading">
-		<h2>Settings</h2>
-
+	<fieldset role="group" aria-label="Settings">
 		<SettingsControl caption="Send To Recipients" helptext="Please enter the email recipients as a comma-separated string.">
 			@Html.TextAreaFor(model => model.SendTo, new { @rows=2 })
 		</SettingsControl>
@@ -72,8 +71,8 @@
 				@Html.CheckBoxFor(model => model.RequireSubject, new { @class = "ToggleSwitch" })
 			</SettingsControl>
 		</div>
-		<div class="Tools">
-			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "ContactUs", "ContactUs"), new { })
-		</div>
 	</fieldset>
+	<div class="nucleus-form-buttonrow">
+		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "ContactUs", "ContactUs"), new { })
+	</div>
 }

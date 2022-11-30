@@ -3,75 +3,72 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
+<h2 class="nucleus-control-panel-heading">SAML Client Settings</h2>
 @Html.AddStyle("~!/../settings.css")
-<div class="nucleus-editor-panel">
-	@using (Html.BeginNucleusForm("SaveSiteSettings", "SAMLClientAdmin", "SAMLClient", FormMethod.Post, new { @enctype = "multipart/form-data" }))
-	{
-		<fieldset role="group" aria-labelledby="heading">
-			<h2 class="nucleus-control-panel-heading">SAML Client Settings</h2>
+@using (Html.BeginNucleusForm("SaveSiteSettings", "SAMLClientAdmin", "SAMLClient", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+	<fieldset role="group" aria-label="Settings">
+		<div class="border m-2 p-2">
+			<h3>User Matching</h3>
 
-			<div class="border m-2 p-2">
-				<h3>User Matching</h3>
-
-				<div class="nucleus-flex-fields">
-					<SettingsControl caption="Match by name" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to match existing users matching the name supplied by the SAML provider.">
-						@Html.CheckBoxFor(model => model.MatchByName, new { @class = "ToggleSwitch" })
-					</SettingsControl>
-
-					<SettingsControl caption="Match by email" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to match existing users matching the email supplied by the SAML provider.">
-						@Html.CheckBoxFor(model => model.MatchByEmail, new { @class = "ToggleSwitch" })
-					</SettingsControl>
-				</div>
-			</div>
-
-			<div class="border m-2 p-2">
-				<h3>New Users</h3>
-				<SettingsControl caption="Create a New User if no Matching User is Found" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to create a new user if no matching user was found.  If this setting is OFF and a user logs in using an SAML provider and does not have a Nucleus user account, the system will redirect them to the login page with a message 'Access was denied.  Your account is not authorized to use this system'.">
-					@Html.CheckBoxFor(model => model.CreateUsers, new { @class = "nucleus-SAML-create-user-control ToggleSwitch" })
+			<div class="nucleus-flex-fields">
+				<SettingsControl caption="Match by name" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to match existing users matching the name supplied by the SAML provider.">
+					@Html.CheckBoxFor(model => model.MatchByName, new { @class = "ToggleSwitch" })
 				</SettingsControl>
 
-				<div class="nucleus-flex-fields nucleus-SAML-create-user-controls">
-					<SettingsControl caption="Automatically Approve New Users" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to override site settings and automatically mark users created with SAML provider data as approved.">
-						@Html.CheckBoxFor(model => model.AutomaticallyApproveNewUsers, new { @class = "ToggleSwitch" })
-					</SettingsControl>
-
-					<SettingsControl caption="Automatically Verify New Users" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to override site settings and automatically mark users created with SAML provider data as verified.">
-						@Html.CheckBoxFor(model => model.AutomaticallyVerifyNewUsers, new { @class = "ToggleSwitch" })
-					</SettingsControl>
-				</div>
-			</div>
-
-			<div class="border m-2 p-2">
-				<h3>Profile</h3>
-
-				<SettingsControl caption="Synchronize Profile" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to update user profile information with data from the SAML provider.  This setting applies to both new users and existing users.">
-					@Html.CheckBoxFor(model => model.SynchronizeProfile, new { @class = "ToggleSwitch" })
+				<SettingsControl caption="Match by email" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to match existing users matching the email supplied by the SAML provider.">
+					@Html.CheckBoxFor(model => model.MatchByEmail, new { @class = "ToggleSwitch" })
 				</SettingsControl>
 			</div>
-
-			<div class="border m-2 p-2">
-				<h3>Roles</h3>
-				<SettingsControl caption="Synchronize Roles" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to update roles based on the response from the SAML2 provider.  This setting applies to both new users and existing users.  If your SAML2 provider does not return roles, roles are not synchronized.  Providers like Google, Twitter and Facebook do not return roles.">
-					@Html.CheckBoxFor(model => model.SynchronizeRoles, new { @class = "nucleus-SAML-sync-roles-control ToggleSwitch" })
-				</SettingsControl>
-
-				<div class="nucleus-flex-fields nucleus-SAML-sync-roles-controls">
-					<SettingsControl caption="Add to Roles" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to add users to the roles returned by the SAML2 provider, if a matching role name is found.">
-						@Html.CheckBoxFor(model => model.AddToRoles, new { @class = "ToggleSwitch" })
-					</SettingsControl>
-
-					<SettingsControl caption="Remove from Roles" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to remove users from all roles which are not returned by the SAML2 provider.">
-						@Html.CheckBoxFor(model => model.RemoveFromRoles, new { @class = "ToggleSwitch" })
-					</SettingsControl>
-				</div>
-			</div>
-		</fieldset>
-
-		<div class="Tools">
-			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSiteSettings", "SAMLClientAdmin", "SAMLClient"), new { })				
 		</div>
-	}
-</div>
+
+		<div class="border m-2 p-2">
+			<h3>New Users</h3>
+			<SettingsControl caption="Create a New User if no Matching User is Found" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to create a new user if no matching user was found.  If this setting is OFF and a user logs in using an SAML provider and does not have a Nucleus user account, the system will redirect them to the login page with a message 'Access was denied.  Your account is not authorized to use this system'.">
+				@Html.CheckBoxFor(model => model.CreateUsers, new { @class = "nucleus-SAML-create-user-control ToggleSwitch" })
+			</SettingsControl>
+
+			<div class="nucleus-flex-fields nucleus-SAML-create-user-controls">
+				<SettingsControl caption="Automatically Approve New Users" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to override site settings and automatically mark users created with SAML provider data as approved.">
+					@Html.CheckBoxFor(model => model.AutomaticallyApproveNewUsers, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+
+				<SettingsControl caption="Automatically Verify New Users" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to override site settings and automatically mark users created with SAML provider data as verified.">
+					@Html.CheckBoxFor(model => model.AutomaticallyVerifyNewUsers, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+			</div>
+		</div>
+
+		<div class="border m-2 p-2">
+			<h3>Profile</h3>
+
+			<SettingsControl caption="Synchronize Profile" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to update user profile information with data from the SAML provider.  This setting applies to both new users and existing users.">
+				@Html.CheckBoxFor(model => model.SynchronizeProfile, new { @class = "ToggleSwitch" })
+			</SettingsControl>
+		</div>
+
+		<div class="border m-2 p-2">
+			<h3>Roles</h3>
+			<SettingsControl caption="Synchronize Roles" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to update roles based on the response from the SAML2 provider.  This setting applies to both new users and existing users.  If your SAML2 provider does not return roles, roles are not synchronized.  Providers like Google, Twitter and Facebook do not return roles.">
+				@Html.CheckBoxFor(model => model.SynchronizeRoles, new { @class = "nucleus-SAML-sync-roles-control ToggleSwitch" })
+			</SettingsControl>
+
+			<div class="nucleus-flex-fields nucleus-SAML-sync-roles-controls">
+				<SettingsControl caption="Add to Roles" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to add users to the roles returned by the SAML2 provider, if a matching role name is found.">
+					@Html.CheckBoxFor(model => model.AddToRoles, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+
+				<SettingsControl caption="Remove from Roles" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether to remove users from all roles which are not returned by the SAML2 provider.">
+					@Html.CheckBoxFor(model => model.RemoveFromRoles, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+			</div>
+		</div>
+	</fieldset>
+
+	<div class="nucleus-control-panel-heading">
+		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSiteSettings", "SAMLClientAdmin", "SAMLClient"), new { })				
+	</div>
+}
 
 <script>
 	$(document).ready(function() 

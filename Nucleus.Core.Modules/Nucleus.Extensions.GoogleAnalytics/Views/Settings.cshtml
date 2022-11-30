@@ -4,21 +4,21 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 @Html.AddStyle("~!/../settings.css")
+<h2 class="nucleus-control-panel-heading">Google Analytics Settings</h2>
 <div class="nucleus-editor-panel">
-	<h2 class="nucleus-control-panel-heading">Google Analytics Settings</h2>
-	@using (Html.BeginNucleusForm("Settings", "GoogleAnalytics", FormMethod.Post, new { @enctype = "multipart/form-data" }))
-	{
-		<fieldset role="group" aria-labelledby="heading">
-			<h2 class="nucleus-control-panel-heading">Settings</h2>
-			<div class="nucleus-flex-fields">
-				<SettingsControl caption="Google Analytics ID" helptext="Enter the Google Analytics ID for your site.  You can disable Google Analytics by setting a blank value.">
-					@Html.TextBoxFor(model => model.GoogleAnalyticsId)
-				</SettingsControl>
-			</div>
+@using (Html.BeginNucleusForm("Settings", "GoogleAnalytics", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+	<fieldset role="group" aria-labelledby="heading">
+		<h2 class="nucleus-control-panel-heading">Settings</h2>
+		<div class="nucleus-flex-fields">
+			<SettingsControl caption="Google Analytics ID" helptext="Enter the Google Analytics ID for your site.  You can disable Google Analytics by setting a blank value.">
+				@Html.TextBoxFor(model => model.GoogleAnalyticsId)
+			</SettingsControl>
+		</div>
+	</fieldset>
 
-			<div class="Tools">
-				@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "GoogleAnalytics", "GoogleAnalytics"), new { })
-			</div>
-		</fieldset>
-	}
+	<div class="nucleus-form-buttonrow">
+		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "GoogleAnalytics", "GoogleAnalytics"), new { })
+	</div>
+}
 </div>

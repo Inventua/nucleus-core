@@ -5,26 +5,22 @@
 @using Nucleus.Abstractions.Models
 @using (Html.BeginAreaForm("Save", "SiteGroups", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @autocomplete = "off" }))
 {
-
-	<div id="sitegroup-properties">
-		<fieldset role="group" aria-labelledby="heading">
-			<h2>Site Group</h2>
-			@Html.HiddenFor(model => model.SiteGroup.Id)
+	<fieldset role="group" aria-labelledby="heading">
+		<h2>Site Group</h2>
+		@Html.HiddenFor(model => model.SiteGroup.Id)
 			
-			<SettingsControl caption="Name" helptext="Site Group name.  This is the display name for the site group.">
-				@Html.TextBoxFor(model => model.SiteGroup.Name, new { @maxlength = 256 })
-			</SettingsControl>
+		<SettingsControl caption="Name" helptext="Site Group name.  This is the display name for the site group.">
+			@Html.TextBoxFor(model => model.SiteGroup.Name, new { @maxlength = 256 })
+		</SettingsControl>
 
-			<SettingsControl caption="Description" helptext="Site group description.  This is used for reference purposes only.">
-				@Html.TextAreaFor(model => model.SiteGroup.Description, new { @maxlength = 512 })
-			</SettingsControl>
+		<SettingsControl caption="Description" helptext="Site group description.  This is used for reference purposes only.">
+			@Html.TextAreaFor(model => model.SiteGroup.Description, new { @maxlength = 512 })
+		</SettingsControl>
 
-			<SettingsControl caption="Primary Site" helptext="The primary site contains the users, roles and other data that is shared by members of this site group.">
-				@Html.DropDownListFor(model => model.SiteGroup.PrimarySite.Id, new SelectList(Model.Sites, "Id", "Name"))
-			</SettingsControl>
-		</fieldset>
-	</div>
-
+		<SettingsControl caption="Primary Site" helptext="The primary site contains the users, roles and other data that is shared by members of this site group.">
+			@Html.DropDownListFor(model => model.SiteGroup.PrimarySite.Id, new SelectList(Model.Sites, "Id", "Name"))
+		</SettingsControl>
+	</fieldset>
 
 	<div class="nucleus-button-panel">
 		<input type="submit" class="btn btn-primary" value="Save Changes" />
@@ -32,5 +28,5 @@
 		{
 			<input type="submit" class="btn btn-danger" value="Delete Site Group" formaction="@Url.AreaAction("DeleteSiteGroup", "SiteGroups", "Admin")" data-confirm="Delete this site group?" />
 		}
-		</div>
+	</div>
 }

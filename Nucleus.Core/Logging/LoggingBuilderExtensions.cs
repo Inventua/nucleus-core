@@ -39,7 +39,7 @@ namespace Nucleus.Core.Logging
 		/// <returns>ILoggingBuilder</returns>
 		public static ILoggingBuilder AddTextFileLogger(this ILoggingBuilder builder, IConfiguration configuration)
 		{
-			builder.Services.Configure<TextFileLoggerOptions>(configuration.GetSection(TextFileLoggerOptions.Section), options => options.BindNonPublicProperties=true);
+			builder.Services.Configure<TextFileLoggerOptions>(configuration.GetSection(TextFileLoggerOptions.Section), options => options.BindNonPublicProperties = true);
 			builder.Services.ConfigureOptions<ConfigureTextFileLogger>();
 
 			builder.Services.AddSingleton<ILoggerProvider, TextFileLoggingProvider>();
@@ -51,7 +51,7 @@ namespace Nucleus.Core.Logging
 			// This is not an elegant solution, but the only alternative would be to require an appSettings setting for Nucleus:TextFileLoggerOptions:Path, and we want
 			// that setting to be optional.
 			Nucleus.Abstractions.Models.Configuration.FolderOptions folderOptions = new();
-			configuration.GetSection(Nucleus.Abstractions.Models.Configuration.FolderOptions.Section).Bind(folderOptions);
+			configuration.GetSection(Nucleus.Abstractions.Models.Configuration.FolderOptions.Section).Bind(folderOptions, options => options.BindNonPublicProperties = true );
 			DataFolder = folderOptions.SetDefaultDataFolder(false);
 			//DataFolder = folderOptions.DataFolder;
 			//if (String.IsNullOrEmpty(DataFolder))

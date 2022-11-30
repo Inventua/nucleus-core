@@ -85,6 +85,7 @@
 	  <None Remove="Shared\Controls\Views\PagingControl.css" />
 	  <None Remove="Shared\Controls\Views\PagingControl.min.css" />
 	  <None Remove="Shared\Layouts\default.css" />
+	  <None Remove="utils\ubuntu\setup.sh" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -142,6 +143,7 @@
 	  <Content Include="Shared\Layouts\default.css">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
+	  <Content Include="utils\ubuntu\setup.sh" />
 	</ItemGroup>
 
 	<ItemGroup>

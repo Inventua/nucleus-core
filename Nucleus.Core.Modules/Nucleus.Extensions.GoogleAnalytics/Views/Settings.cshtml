@@ -14,6 +14,10 @@
 			<SettingsControl caption="Google Analytics ID" helptext="Enter the Google Analytics ID for your site.  You can disable Google Analytics by setting a blank value.">
 				@Html.TextBoxFor(model => model.GoogleAnalyticsId)
 			</SettingsControl>
+
+			<SettingsControl caption="Don't Track Administrator Users" rendermode="LabelLast" class="inner-inline align-self-end" helptext="Specify whether you want to prevent Analytics tracking for system administrators and site administrators.">
+				@Html.CheckBoxFor(model => model.ExcludeAdministrators, new { @class = "ToggleSwitch" })
+			</SettingsControl>
 		</div>
 	</fieldset>
 

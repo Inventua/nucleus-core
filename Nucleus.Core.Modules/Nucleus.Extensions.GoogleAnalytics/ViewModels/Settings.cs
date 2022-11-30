@@ -13,5 +13,6 @@ namespace Nucleus.Extensions.GoogleAnalytics.ViewModels
 	public class Settings
 	{
 		public string GoogleAnalyticsId { get; set; }
+		public Boolean ExcludeAdministrators { get; set; } = true;
 	}
 }

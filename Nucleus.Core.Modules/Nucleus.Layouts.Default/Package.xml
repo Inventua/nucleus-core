@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="c71695ec-111a-4ee6-9ba6-cdce64a6afd5" xmlns="urn:nucleus/schemas/package/1.0">
   <name>Default Layouts</name>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
 		Nucleus Default Layouts and Containers

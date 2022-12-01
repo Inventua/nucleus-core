@@ -363,8 +363,10 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Development configs
-*.development.json
-*.Development.json
+appSettings.*.json
+databaseSettings.*.json
+hosting.*.json
+
 
 # Developent web.config
 Nucleus.Web/iis-dev/**/*.*

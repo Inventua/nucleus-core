@@ -220,12 +220,31 @@ namespace Nucleus.Abstractions.Models.Configuration
 			return this.DataFolder;
 		}
 
-		/// <summary>
-		/// Check whether the specified folder exists, and create it if it does not.
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		public string EnsureExists(string path)
+    /// <summary>
+    /// Sets the data folder to the specified value, after replacing environment variables.
+    /// </summary>
+    /// <param name="value">Data folder path</param>
+    /// <param name="ensureExists">Specifies whether to ensure that the path exists by creating the folder if it does not already exist.</param>
+    /// <remarks>
+    /// This function is intended for use in a workaround to facilitate startup logging, and should not be called by anything 
+    /// except LoggingBuilderExtensions.ConfigureTextFileLogger.
+    /// </remarks>
+    /// <internal>
+    /// This function is intended for use in a workaround to facilitate startup logging, and should not be called by anything 
+    /// except LoggingBuilderExtensions.ConfigureTextFileLogger.
+    /// </internal>
+    public string SetDataFolder(string value, Boolean ensureExists)
+    {
+      this.DataFolder = value;
+      return SetDefaultDataFolder(ensureExists);
+    }
+
+    /// <summary>
+    /// Check whether the specified folder exists, and create it if it does not.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public string EnsureExists(string path)
 		{
 			return EnsureExistsStatic(path);
 		}

@@ -145,21 +145,30 @@ namespace Nucleus.Core
 
 			public void PostConfigure(string name, Nucleus.Abstractions.Models.Configuration.FolderOptions options)
 			{
-				PostConfigure(options);
-			}
+        //PostConfigure(options);
+        try
+        {
+          options.SetDefaultDataFolder(true);
+        }
+        catch (System.UnauthorizedAccessException)
+        {
+          // file permissions error.  Ignore so that the install wizard can report the permissions error when it 
+          // does config checking.
+        }
+      }
 
-			public static void PostConfigure(Nucleus.Abstractions.Models.Configuration.FolderOptions options)
-			{
-				try
-				{
-					options.SetDefaultDataFolder(true);
-				}
-				catch (System.UnauthorizedAccessException)
-				{
-					// file permissions error.  Ignore so that the install wizard can report the permissions error when it 
-					// does config checking.
-				}
-			}
+			//public static void PostConfigure(Nucleus.Abstractions.Models.Configuration.FolderOptions options)
+			//{
+			//	try
+			//	{
+			//		options.SetDefaultDataFolder(true);
+			//	}
+			//	catch (System.UnauthorizedAccessException)
+			//	{
+			//		// file permissions error.  Ignore so that the install wizard can report the permissions error when it 
+			//		// does config checking.
+			//	}
+			//}
 		}
 	}
 }

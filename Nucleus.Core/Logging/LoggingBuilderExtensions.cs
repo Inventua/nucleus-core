@@ -13,12 +13,11 @@ namespace Nucleus.Core.Logging
 	/// Extension methods and supporting functions used in .net core/dependency injection startup.  
 	/// </summary>
 	/// <remarks>
-	/// Logging providers are added by Nucleus Core.Host.  You would not typically need to use these function in an Nucleus Core application.
+	/// Logging providers are added by Nucleus Core.Host.  You would not typically need to use these function in an Nucleus Core 
+  /// application.
 	/// </remarks>
 	public static class LoggingBuilderExtensions
 	{
-		public static string DataFolder { get; private set; }
-
 		/// <summary>
 		///   Adds a Debug logger.
 		/// </summary>
@@ -40,25 +39,18 @@ namespace Nucleus.Core.Logging
 		public static ILoggingBuilder AddTextFileLogger(this ILoggingBuilder builder, IConfiguration configuration)
 		{
 			builder.Services.Configure<TextFileLoggerOptions>(configuration.GetSection(TextFileLoggerOptions.Section), options => options.BindNonPublicProperties = true);
-			builder.Services.ConfigureOptions<ConfigureTextFileLogger>();
 
+      // The TextFileLogger is used by the StartupLogger for logging during dependency injection setup.
+      // The IOptions<FolderOptions> and IConfiguration instance which is added to the dependency injection container won't be
+      // configured/available yet when ConfigureTextFileLogger.PostConfigure is called for the instance which is used by StartupLogger,
+      // so we have to save the configuration object in a static and read the data folder setting "manually" in ConfigureTextFileLogger.
+      // This is not an elegant solution, but the alternative would be to require an appSettings setting for Nucleus:TextFileLoggerOptions:Path,
+      // and we want that setting to be optional.
+      ConfigureTextFileLogger.Configuration = configuration;
+
+      builder.Services.ConfigureOptions<ConfigureTextFileLogger>();
 			builder.Services.AddSingleton<ILoggerProvider, TextFileLoggingProvider>();
 			builder.Services.AddTransient<IExternalScopeProvider, LoggerExternalScopeProvider>();
-
-			// The TextFileLogger is used by the StartupLogger for logging during dependency injection setup.  The IOptions<FolderOptions> instance which is added to the  
-			// Dependency Injection container won't be configured yet when ConfigureTextFileLogger.PostConfigure is called for the instance which is used by StartupLogger,
-			// so we have to read config here, and save the DataFolder in a static for use in ConfigureTextFileLogger.PostConfigure.  
-			// This is not an elegant solution, but the only alternative would be to require an appSettings setting for Nucleus:TextFileLoggerOptions:Path, and we want
-			// that setting to be optional.
-			Nucleus.Abstractions.Models.Configuration.FolderOptions folderOptions = new();
-			configuration.GetSection(Nucleus.Abstractions.Models.Configuration.FolderOptions.Section).Bind(folderOptions, options => options.BindNonPublicProperties = true );
-			DataFolder = folderOptions.SetDefaultDataFolder(false);
-			//DataFolder = folderOptions.DataFolder;
-			//if (String.IsNullOrEmpty(DataFolder))
-			//{
-			//	DataFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Nucleus");
-			//}
-			//DataFolder = folderOptions.Parse(DataFolder);
 
 			return builder;
 		}
@@ -66,33 +58,29 @@ namespace Nucleus.Core.Logging
 		public class ConfigureTextFileLogger : IPostConfigureOptions<TextFileLoggerOptions>
 		{
 			private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
-			
-			public ConfigureTextFileLogger(IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
+
+      // This is populated in AddTextFileLogger because we can't get an IConfiguration instance from dependency injection
+      // when the text file logger is used by the StartupLogger (because Startup has not finished yet)
+      internal static IConfiguration Configuration { private get; set; }
+
+      public ConfigureTextFileLogger(IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
 			{
-				this.FolderOptions = folderOptions;				
+        this.FolderOptions = folderOptions;				
 			}
 
 			public void PostConfigure(string name, TextFileLoggerOptions options)
 			{
-				//  Special case:  When the text file logger is added to the StartupLogger, dependency injection hasn't been set up yet and folderOptions hasn't
-				// been initialized, so we have to use the DataPath that we read ourselves in AddTextFileLogger.
-				CoreServiceExtensions.ConfigureFolderOptions.PostConfigure(this.FolderOptions.Value);
+        // Special case:
+        // When the text file logger is added to the StartupLogger, dependency injection hasn't been set up yet and folderOptions hasn't
+        // been initialized, so we have to read the DataPath ourselves using the Configuration value that we set in AddTextFileLogger.  We
+        // set Configuration to null after use so that this code only runs for the StartupLogger.
+        if (Configuration != null)
+        {
+          this.FolderOptions.Value.SetDataFolder(Configuration.GetValue<String>($"{Nucleus.Abstractions.Models.Configuration.FolderOptions.Section}:DataFolder"), true);
+          Configuration = null;
+        }
 
-				////if (String.IsNullOrEmpty(this.FolderOptions.Value.DataFolder))
-				////{
-				////	//  Special case:  When the text file logger is added to the StartupLogger, dependency injection hasn't been set up yet and folderOptions hasn't
-				////	// been initialized, so we have to use the DataPath that we read ourselves in AddTextFileLogger.				
-				////	this.FolderOptions.Value.DataFolder = DataFolder;
-
-				////	// If the config files don't have an entry, initialize to default.  This also happens in CoreServiceExtensions.ConfigureFolderOptions.PostConfigure,
-				////	// but that doesn't run in time for the StartupLogger
-				////	if (String.IsNullOrEmpty(this.FolderOptions.Value.DataFolder))
-				////	{
-				////		CoreServiceExtensions.ConfigureFolderOptions.PostConfigure(this.FolderOptions.Value);
-				////	}
-				////}
-
-				if (String.IsNullOrEmpty(options.Path))
+        if (String.IsNullOrEmpty(options.Path))
 				{
 					try
 					{
@@ -100,12 +88,10 @@ namespace Nucleus.Core.Logging
 					}
 					catch (System.UnauthorizedAccessException)
 					{
-						// if there's a permissions error on the data/log file path, set the text file logger to disabled
-						options.Enabled = false;
+            // if there is a permissions error on the data/log file path, set the text file logger to disabled
+            options.Enabled = false;
 					}
 				}
-
-				options.Path = this.FolderOptions.Value.Parse(options.Path);
 			}
 		}
 	}

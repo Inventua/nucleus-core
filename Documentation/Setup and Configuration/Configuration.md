@@ -4,7 +4,7 @@ Nucleus configuration files are stored in your Nucleus application folder.  The 
 Configuration settings can be split across multiple .json files, and you can place any setting in any .json file.  If a setting is duplicated in
 multiple files, the last one read takes precedence.
 
-Nucleus automatically loads configuration in this order:
+Nucleus loads configuration in this order:
 
 1. hosting.json
 2. hosting.`{environment}`.json
@@ -13,10 +13,13 @@ Nucleus automatically loads configuration in this order:
 5. databaseSettings.json
 6. databaseSettings.`{environment}`.json
 
-7. All other .json files in the application folder, in alphabetical order, except for reserved file names "*.schema.json" or "bundleconfig.json".
+7. All other .json files in the application folder, in alphabetical order, except for reserved file names "*.schema.json" or "bundleconfig.json", and excluding 
+files which match the pattern `hosting|appSettings|databaseSettings.{*}.json`, to prevent config files which are for other environments from being loaded.
 
 8. Enviromment variables
 9. Command line arguments
+
+The filename and environment parts of the filename are not case-sensitive (even in Linux), but the .json extension must be lower-case.
 
 > **_NOTE:_**    Enviroment-specific settings are commonly used in order to run with different settings in your production, development or testing 
 > environments.  Where possible, a best practise is to always leave the default `appSettings.json` and `databaseSettings.json` files as-is, and make all of your changes

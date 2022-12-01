@@ -1,9 +1,17 @@
 ﻿<!--
-	Post-build steps for Nucleus plugin builds.  
+	Post-build steps for Nucleus extension builds.  
 	
 	To use this, add a line to the end of your .csproj file:
 	
-		<Import Project="$(NUCLEUS_PATH)\NucleusPlugin.build.targets" />			
+	<PropertyGroup Label="Nucleus">
+		<ExtensionFolder>your-extension-folder</ExtensionFolder>
+		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+		<CopyToDefaultSetup>false</CopyToDefaultSetup>
+	</PropertyGroup>
+	
+	<Import Project="$(NUCLEUS_PATH)\module.build.targets" />
+	
+	The Nucleus extension project templates automatically include the lines above.
 -->
 <Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003' ToolsVersion="15.0">	
 	<PropertyGroup Label="Normalize Nucleus Environment Variables">
@@ -20,13 +28,13 @@
 	<Target Name="ValidateExtensionFolder" AfterTargets="PostBuildEvent">		
 		<Warning
 			Condition="'$(Configuration)' == 'Debug' AND '$(ExtensionFolder)' == ''"
-			Text="The ExtensionFolder property path is not set, your plugin will not be copied." />
+			Text="The ExtensionFolder property path is not set, your extension will not be copied." />
 	</Target>
 	
 	<Target Name="ValidateNucleusPath" AfterTargets="PostBuildEvent">
 		<Warning 
 			Condition="'$(Configuration)' == 'Debug' AND '$(NUCLEUS_PATH)' == ''"
-			Text="The %NUCLEUS_PATH% environment path is not set, your plugin will not be copied." />	
+			Text="The %NUCLEUS_PATH% environment path is not set, your extension will not be copied." />	
 	</Target>
 
 	<Target Name="GetPackageAssemblies" AfterTargets="PostBuildEvent">
@@ -43,8 +51,8 @@
 	</Target>
 	<!-- 
 		Copy module assemblies to the dev environment Nucleus host/extensions/YOURMODULE/bin folder.	This step renames (moves) existing 
-		DLLs to _OLD first in order to trigger a restart, this is required because otherwise the DLLs will be "in use"
-	  and the copy operation will fail.  The _OLD folder is removed at the last step.
+		DLLs to _OLD-extensionname first in order to trigger a restart, this is required because otherwise the DLLs will be "in use"
+		and the copy operation will fail.  The _OLD-extensionname folder is removed at the last step.
 		
 		In order for this step to succeed:
 		
@@ -53,12 +61,11 @@
 					<ExtensionFolder>TextHtml</ExtensionFolder>
 				</PropertyGroup>
 			
-			The Nucleus plugin project template creates this property for you.
+			The Nucleus extension project templates automatically create this property for you.
 			
 		- An environment variable specifying the Nucleus host folder named NUCLEUS_PATH must be defined.
 		
-			The installer creates this environment variable automatically.
-		
+			The installer creates this environment variable automatically.		
 	 -->
 	<Target Name="GetOutputAssemblies" AfterTargets="PostBuildEvent">
 		<ItemGroup>
@@ -79,6 +86,7 @@
 		</ItemGroup>		
 	</Target>
 
+	<!-- Check and automatically update the package.xml version element value to the project package version if it does not match. -->
 	<Target Name="ManageVersion_Read" AfterTargets="PostBuildEvent">
 		<XmlPeek XmlInputPath="package.xml" Query="//p:package/p:version/text()" Namespaces="&lt;Namespace Prefix='p' Uri='urn:nucleus/schemas/package/1.0'/&gt;">
 			<Output TaskParameter="Result" ItemName="_OriginalPackageXmlVersion" />
@@ -99,22 +107,25 @@
 		<Message Importance="high" Text="Updated package.xml version to: $(PackageVersion)" />
 	</Target>
 	
+	<!-- Copy files to the dev environment if the project is being built in debug configuration -->
 	<Target Name="CopyToExtensionsFolder" AfterTargets="PostBuildEvent" Condition="'$(NUCLEUS_PATH)' != '' AND '$(ExtensionFolder)' != '' AND Exists('$(NUCLEUS_PATH)Extensions')">
-		<ItemGroup>			
-		  <RenameExtensionFiles Include="$(NUCLEUS_PATH)Extensions\$(ExtensionFolder)\**\$(ProjectName)\*.*" />
+		<ItemGroup>
+			<RenameExtensionFiles Include="$(NUCLEUS_PATH)Extensions\$(ExtensionFolder)\**\*.*" />
   	</ItemGroup>
 
-		<RemoveDir Directories="$(NUCLEUS_PATH)\_OLD" />
+		<RemoveDir Directories="$(NUCLEUS_PATH)_OLD-$(ExtensionFolder)" />
 
 		<Message Importance="high" Text="Output assembles: @(OutputAssemblies)" />		
 		
-		<Move SourceFiles="@(RenameExtensionFiles)" DestinationFolder="$(NUCLEUS_PATH)_OLD" />
+		<Move SourceFiles="@(RenameExtensionFiles)" DestinationFolder="$(NUCLEUS_PATH)_OLD-$(ExtensionFolder)" />
 		<Copy SourceFiles="@(OutputAssemblies)" DestinationFolder="$(NUCLEUS_PATH)Extensions\$(ExtensionFolder)\bin\%(RecursiveDir)" Retries="2" />
 		<Copy SourceFiles="@(Content)" DestinationFolder="$(NUCLEUS_PATH)Extensions\$(ExtensionFolder)\%(RelativeDir)\%(RecursiveDir)" Retries="2" />
 		
-		<RemoveDir Directories="$(NUCLEUS_PATH)\_OLD" />
+		<RemoveDir Directories="$(NUCLEUS_PATH)_OLD-$(ExtensionFolder)" />
+		
 	</Target>
 
+	<!-- Create a install package (zip file) if the project is being built in release configuration -->
 	<Target Name="PackageExtension" AfterTargets="PostBuildEvent" Condition = "'$(Configuration)' == 'Release' AND '$(ExtensionFolder)' != '' AND '$(NUCLEUS_PATH)' != '' AND Exists('$(NUCLEUS_PATH)Setup')">		
 		<RemoveDir Directories="AppPackage" />
 
@@ -127,6 +138,11 @@
 		<RemoveDir Directories="AppPackage" />
 	</Target>
 
+	<!-- 
+		Copy the created install package (if we are building in release configuration) to the dev folder/Setup/Extensions 
+		folder, if the project file does not contain a <CopyToDefaultSetup>false</CopyToDefaultSetup> element.  This makes 
+		the extension available for install in the setup wizard.
+	-->
 	<Target Name="CopyToWebSetup" AfterTargets="PostBuildEvent" Condition="$(CopyToDefaultSetup) != false AND '$(Configuration)' == 'Release' AND '$(ExtensionFolder)' != '' AND $(NUCLEUS_PATH) != '' AND Exists('$(NUCLEUS_PATH)Setup')">
 		<ItemGroup>
 			<FilesToDelete Include="$(NUCLEUS_PATH)\Setup\Extensions\$(ExtensionFolder)_Extension*.zip"/>
@@ -136,6 +152,15 @@
 		<Copy SourceFiles="$(ExtensionFolder)_Extension_$(PackageVersion).zip" DestinationFolder="$(NUCLEUS_PATH)Setup\Extensions\" Retries="2" />
 	</Target>
 
+	<!-- 
+	  This step is to help with release preparation for Nucleus Core/Core Modules.  It will generally not execute on developers machines, 
+		it is for use by the Nucleus core developer team. 
+		
+		Copy the created install package (if we are building in release configuration) to %NUCLEUS_PUBLISH_PATH%\Extensions.  This step 
+		is not executed unless the %NUCLEUS_PUBLISH_PATH% environment variable is set, and most developers will not set this environment
+		variable.  If you want to set %NUCLEUS_PUBLISH_PATH%, the value should be set to a folder (anywhere) that you want to automatically 
+		populate with a copy of all extension install sets.
+	-->
 	<Target Name="CopyToExtensionPublishFolder" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release' AND '$(NUCLEUS_PUBLISH_PATH)' != '' AND Exists('$(NUCLEUS_PUBLISH_PATH)Extensions')">
 		<ItemGroup>
 			<PublishExtensionsFilesToDelete Include="$(NUCLEUS_PUBLISH_PATH)Extensions\$(ExtensionFolder)_Extension*.zip"/>

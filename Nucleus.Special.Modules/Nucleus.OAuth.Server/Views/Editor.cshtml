@@ -3,11 +3,11 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
+<h2 class="nucleus-control-panel-heading">OAuth Client App Settings</h2>
 @Html.AddStyle("~!/../settings.css")
 @using (Html.BeginNucleusForm("Settings", "OAuthServerAdmin", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
-	<fieldset role="group" aria-labelledby="heading">
-		<h2>Settings</h2>
+	<fieldset role="group" aria-label="Settings">
 		@Html.HiddenFor(model => model.ClientApp.Id)		
 		<SettingsControl caption="API Key" helptext="Select the API key for this Client App, or leave set to 'create' to automatically create a new one.">
 			@Html.DropDownListFor(model => model.ClientApp.ApiKey.Id, new SelectList(Model.ApiKeys, "Id", "Name"), "(create)", new { @class = "api-key"} )
@@ -35,7 +35,7 @@
 		</SettingsControl>
 	</fieldset>
 
-	<div class="Tools">
+	<div class="nucleus-control-panel-heading">
 		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "OAuthServerAdmin", "OAuthServer"), new { @data_target = ".nucleus-admin-content" })				
 	</div>
 }

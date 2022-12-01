@@ -42,14 +42,13 @@
 				
 				<file name="ITfoxtec.Identity.Saml2.dll" />
 				<file name="ITfoxtec.Identity.Saml2.MvcCore.dll" />
-
-				<!--<file name="System.Security.Cryptography.Xml.dll" />-->
 				
 				<file name="Microsoft.IdentityModel.Tokens.Saml.dll" />
 				<file name="Microsoft.IdentityModel.Logging.dll" />
 				<file name="Microsoft.IdentityModel.Tokens.dll" />
 				<file name="Microsoft.Bcl.AsyncInterfaces.dll" />
 				<file name="Microsoft.IdentityModel.Xml.dll" />
+				<file name="Microsoft.IdentityModel.Abstractions.dll" />
 				
 				<file name="System.ServiceModel.Primitives.dll" />
 				<file name="System.ServiceModel.dll" />

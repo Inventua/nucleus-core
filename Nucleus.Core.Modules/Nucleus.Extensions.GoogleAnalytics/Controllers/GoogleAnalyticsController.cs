@@ -20,6 +20,7 @@ namespace Nucleus.Extensions.GoogleAnalytics.Controllers
 		private ISiteManager SiteManager { get; }
 
 		internal const string SETTING_ANALYTICS_ID = "googleanalytics:id";
+		internal const string SETTING_EXCLUDE_ADMINISTRATORS = "googleanalytics:exclude-administrators";
 
 		public GoogleAnalyticsController(Context Context, ISiteManager siteManager)
 		{
@@ -40,6 +41,8 @@ namespace Nucleus.Extensions.GoogleAnalytics.Controllers
 		public ActionResult SaveSettings(ViewModels.Settings viewModel)
 		{
 			this.Context.Site.SiteSettings.TrySetValue(SETTING_ANALYTICS_ID, viewModel.GoogleAnalyticsId);
+			this.Context.Site.SiteSettings.TrySetValue(SETTING_EXCLUDE_ADMINISTRATORS, viewModel.ExcludeAdministrators);
+			
 			this.SiteManager.Save(this.Context.Site);
 
 			return Ok();
@@ -72,6 +75,11 @@ namespace Nucleus.Extensions.GoogleAnalytics.Controllers
 				viewModel.GoogleAnalyticsId = googleId;
 			}
 
+			if (this.Context.Site.SiteSettings.TryGetValue(SETTING_EXCLUDE_ADMINISTRATORS, out Boolean excludeAdmins))
+			{
+				viewModel.ExcludeAdministrators = excludeAdmins;
+			}
+			
 			return viewModel;
 		}
 

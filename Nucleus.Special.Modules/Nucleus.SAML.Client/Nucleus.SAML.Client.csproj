@@ -51,7 +51,7 @@
 	<ItemGroup>
 		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.0.1" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.0.0.1" />
-		<PackageReference Include="ITfoxtec.Identity.Saml2.MvcCore" Version="4.8.3-beta3" />
+		<PackageReference Include="ITfoxtec.Identity.Saml2.MvcCore" Version="4.8.3-beta4" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

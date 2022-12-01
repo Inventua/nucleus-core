@@ -118,17 +118,6 @@ namespace Nucleus.Modules.Forums.DataProviders
 			builder.Entity<PostTracking>().HasKey(tracking => new { tracking.ForumPostId, tracking.UserId });
 
 			builder.Entity<MailQueue>().ToTable("ForumMailQueue");
-
-			//builder.Entity<MailQueue>()
-			//	.HasOne<Post>(item => item.Post)
-			//	.WithMany()
-			//	.HasForeignKey(post => post.Id);
-			
-			//builder.Entity<MailQueue>()
-			//	.HasOne<Reply>(item => item.Reply)
-			//	.WithMany()
-			//	.HasForeignKey(reply => reply.Id);
-
 		}
 	}
 }

@@ -85,7 +85,7 @@
 	  <None Remove="Shared\Controls\Views\PagingControl.css" />
 	  <None Remove="Shared\Controls\Views\PagingControl.min.css" />
 	  <None Remove="Shared\Layouts\default.css" />
-	  <None Remove="utils\ubuntu\setup.sh" />
+	  <None Remove="Utils\ubuntu\setup.sh" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -143,7 +143,7 @@
 	  <Content Include="Shared\Layouts\default.css">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
-	  <Content Include="utils\ubuntu\setup.sh" />
+	  <Content Include="Utils\ubuntu\setup.sh" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -160,13 +160,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Update="appSettings.development.json">
+	  <Content Update="appSettings.Development.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="appSettings.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
-	  <Content Update="databaseSettings.development.json">
+	  <Content Update="databaseSettings.Development.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="databaseSettings.json">

@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Nucleus.Web.Controllers.Setup
 {
@@ -84,7 +85,12 @@ namespace Nucleus.Web.Controllers.Setup
 				return BadRequest();
 			}
 
-			if (ModelState.IsValid)
+      if (!String.IsNullOrEmpty(viewModel.SiteAdminUserName) && viewModel.SiteAdminUserName == viewModel.SystemAdminUserName)
+      {
+        ModelState.AddModelError(nameof(ViewModels.Setup.SiteWizard.SiteAdminUserName), "Please enter different user names for the system admin and site admin users.");
+      }
+
+      if (ModelState.IsValid)
 			{
 				if (await this.UserManager.CountSystemAdministrators() == 0)
 				{

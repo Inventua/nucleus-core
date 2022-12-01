@@ -24,7 +24,8 @@ The filename and environment parts of the filename are not case-sensitive (even 
 > **_NOTE:_**    Enviroment-specific settings are commonly used in order to run with different settings in your production, development or testing 
 > environments.  Where possible, a best practise is to always leave the default `appSettings.json` and `databaseSettings.json` files as-is, and make all of your changes
 > in enviroment-specific json files.
-> The `{enviroment}` used in configuration filenames can be configured in a variety of ways.
+> The `{enviroment}` for a production site is normally `Production`.  The enviroment name can be configured in a variety of ways, but 
+is commonly configured using the `ASPNETCORE_ENVIRONMENT` environment variable.
 > Refer to [Use multiple environments in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/environments) for more information.
 
 You can organize your application settings any way you want to, the sections below refer to the default conventions used by Nucleus.
@@ -34,7 +35,7 @@ Use the `hosting.json` file to configure the Urls that Nucleus listens on.  The 
 
 ```json
 {
-  "urls": "http://*:5000", 
+  "urls": "http://*:5000",  // use https://*:5001 for SSL
   "iisSettings": 
   {
     "windowsAuthentication": false,

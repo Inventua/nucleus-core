@@ -83,7 +83,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		public override async Task<Folder> CreateFolder(string parentPath, string newFolder)
 		{
-			PathUri path = new PathUri(this.RootPath, parentPath, newFolder.ToLower(), true);
+			PathUri path = new PathUri(this.RootPath, parentPath, newFolder, true);
 
 			using (var client = BuildClient())
 			{
@@ -333,7 +333,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 
 		public override async Task<Abstractions.Models.FileSystem.File> SaveFile(string parentPath, string newFileName, System.IO.Stream content, bool overwrite)
 		{
-			PathUri pathUri = new PathUri(this.RootPath, parentPath, newFileName.ToLower(), false);
+			PathUri pathUri = new PathUri(this.RootPath, parentPath, newFileName, false);
 
 			using (var client = BuildClient())
 			{
@@ -407,7 +407,7 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 		{
 			if (path.PathUriType == PathUri.PathUriTypes.Root)
 			{
-				// top level
+				// root level
 				return new Folder()
 				{
 					Provider = this.Key,
@@ -426,8 +426,8 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 					Provider = this.Key,
 					Path = path.BucketName,
 					Name = path.BucketName,
-					Parent = null,
-					Capabilities = FileSystemCapabilities.Bucket,
+					Parent = new Folder { Provider = this.Key, Path = path.Parent.RelativePath },
+          Capabilities = FileSystemCapabilities.Bucket,
 					FolderValidationRules = FileSystemValidationRules.Bucket
 				};
 			}

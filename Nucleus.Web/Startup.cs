@@ -23,14 +23,17 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using System.Globalization;
 
 namespace Nucleus.Web
 {
   public class Startup
   {
-    private const string HOSTING_FILENAME = "hosting.json";
-    private const string CONFIG_FILENAME = "appSettings.json";
-    private const string DATABASE_CONFIG_FILENAME = "databaseSettings.json";
+    private const string HOSTING_FILENAME = "hosting";
+    private const string CONFIG_FILENAME = "appSettings";
+    private const string DATABASE_CONFIG_FILENAME = "databaseSettings";
+    
+    private const string CONFIG_FILE_EXTENSION = ".json";
 
     private const string SETTING_ENABLERESPONSECOMPRESSION = "Nucleus:EnableResponseCompression";
     private const string SETTING_ENABLEFORWARDEDHEADERS = "Nucleus:EnableForwardedHeaders";
@@ -52,28 +55,35 @@ namespace Nucleus.Web
       return $"{System.IO.Path.GetFileNameWithoutExtension(defaultFileName)}.{environmentName}{System.IO.Path.GetExtension(defaultFileName)}";
     }
 
-    private static void AddSingleConfigFile(List<string> configFiles, string filefullpath)
+    private static void AddSingleConfigFile(List<string> configFiles, string folder, string filename)
     {
-      if (!configFiles.Contains(filefullpath, StringComparer.OrdinalIgnoreCase))
+      // Add the file, case-insensitive (check for a matching file with the SAME (case-sensitive) extension, but case-insensitive
+      // filename part.  This is for Linux support (windows isn't case-sensitive), but the same code runs in both Windows/Linux.
+      foreach (string foundFileFullPath in System.IO.Directory.EnumerateFiles(folder, "*" + CONFIG_FILE_EXTENSION))
       {
-        if (System.IO.File.Exists(filefullpath))
+        string foundFileNameOnly = System.IO.Path.GetFileName(foundFileFullPath);
+
+        if (foundFileNameOnly.Equals(filename, StringComparison.OrdinalIgnoreCase))
         {
-          configFiles.Add(filefullpath);
+          if (!configFiles.Contains(foundFileFullPath, StringComparer.OrdinalIgnoreCase))
+          {
+            configFiles.Add(foundFileFullPath);
+          }
         }
       }
     }
 
     private static void AddConfigFileSet(HostBuilderContext context, List<string> configFiles, string filename)
     {
-      AddSingleConfigFile(configFiles, System.IO.Path.Combine(ConfigFolder(), filename));
-      AddSingleConfigFile(configFiles, System.IO.Path.Combine(ConfigFolder(), GetEnvironmentConfigFile(filename, context.HostingEnvironment.EnvironmentName)));
+      AddSingleConfigFile(configFiles, ConfigFolder(), filename);
+      AddSingleConfigFile(configFiles, ConfigFolder(), GetEnvironmentConfigFile(filename, context.HostingEnvironment.EnvironmentName));
     }
 
     public static void ConfigureAppConfiguration(HostBuilderContext context, IConfigurationBuilder configurationBuilder)
     {
-      AddConfigFileSet(context, ConfigFiles, HOSTING_FILENAME);
-      AddConfigFileSet(context, ConfigFiles, CONFIG_FILENAME);
-      AddConfigFileSet(context, ConfigFiles, DATABASE_CONFIG_FILENAME);
+      AddConfigFileSet(context, ConfigFiles, HOSTING_FILENAME + CONFIG_FILE_EXTENSION);
+      AddConfigFileSet(context, ConfigFiles, CONFIG_FILENAME + CONFIG_FILE_EXTENSION);
+      AddConfigFileSet(context, ConfigFiles, DATABASE_CONFIG_FILENAME + CONFIG_FILE_EXTENSION);
 
       // Add all of the other .json files so that users can split their configuration however they like.  We sort the filenames alphabetically
       // so that we can ensure that the files are loaded in a consistent order.  AddSingleConfigFile checks whether the file
@@ -83,9 +93,13 @@ namespace Nucleus.Web
       {
         string filename = System.IO.Path.GetFileName(configFile);
 
-        if (!filename.EndsWith(".schema.json") && !filename.EndsWith(".deps.json") && !filename.EndsWith(".runtimeconfig.json") && filename != "bundleconfig.json")
+        // exclude filenames with the pattern *.[environment].json
+        if (!System.Text.RegularExpressions.Regex.IsMatch(filename, $"({HOSTING_FILENAME}|{CONFIG_FILENAME}|{DATABASE_CONFIG_FILENAME})\\.(?<environment>.*)\\.json", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
         {
-          AddSingleConfigFile(ConfigFiles, configFile);
+          if (!filename.EndsWith(".schema.json") && !filename.EndsWith(".deps.json") && !filename.EndsWith(".runtimeconfig.json") && filename != "bundleconfig.json")
+          {
+            AddSingleConfigFile(ConfigFiles, ConfigFolder(), filename);
+          }
         }
       }
 
@@ -117,7 +131,7 @@ namespace Nucleus.Web
           $"Urls:                    [{this.Configuration.GetValue<string>(Microsoft.AspNetCore.Hosting.WebHostDefaults.ServerUrlsKey)}]"
         });
 
-        services.Logger().LogInformation("Used config files: '{file}'", String.Join(',',  ConfigFiles));
+        services.Logger().LogInformation("Used config files: '{file}'", String.Join(',', ConfigFiles));
 
         services.AddHttpContextAccessor();  // required by many elements of the system
         services.AddHttpClient();
@@ -138,7 +152,7 @@ namespace Nucleus.Web
           logging.AddAzureWebAppDiagnostics();
         });
 
-        services.Logger().LogInformation($"App Data Folder:         [{Core.Logging.LoggingBuilderExtensions.DataFolder}]");
+        services.Logger().LogInformation($"App Data Folder:         [{this.Configuration.GetValue<String>($"{Nucleus.Abstractions.Models.Configuration.FolderOptions.Section}:DataFolder")}]");
 
         // Enable compression
         if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))

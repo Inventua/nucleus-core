@@ -68,23 +68,25 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			this.Key = string.Empty;
 		}
 
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		/// <param name="BucketName">Bucket (container) name</param>
-		/// <param name="Key">Item key</param>
-		public PathUri(string rootPath, string bucketName, string key)
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="rootPath"></param>
+    /// <param name="containerName">Bucket (container) name</param>
+    /// <param name="Key">Item key</param>
+    public PathUri(string rootPath, string containerName, string key)
 		{
 			this.RootPath = RemoveDelimiter(rootPath);
-			this.ContainerName = bucketName;
+			this.ContainerName = containerName;
 			this.Key = key;
 		}
 
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		/// <param name="Path">String representation of the path</param>
-		public PathUri(string rootPath, string path) : this(rootPath, path, false) {	}
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="rootPath"></param>
+    /// <param name="Path">String representation of the path</param>
+    public PathUri(string rootPath, string path) : this(rootPath, path, false) {	}
 
 		/// <summary>
 		/// Constructor

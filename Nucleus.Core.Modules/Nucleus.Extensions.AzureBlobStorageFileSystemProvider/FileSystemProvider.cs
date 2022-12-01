@@ -41,7 +41,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 
 		public override async Task<Folder> CreateFolder(string parentPath, string newFolder)
 		{
-			PathUri path = new PathUri(this.RootPath, parentPath, PathUri.AddDelimiter(newFolder.ToLower()));
+			PathUri path = new PathUri(this.RootPath, parentPath, PathUri.AddDelimiter(newFolder));
 			//string fullPath = JoinPath(UseRootFolder(parentPath), newFolder);
 			BlobServiceClient client = new(this.Options.ConnectionString);
 
@@ -384,8 +384,8 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 
 		public override async Task<Abstractions.Models.FileSystem.File> SaveFile(string parentPath, string newFileName, System.IO.Stream content, bool overwrite)
 		{
-			PathUri pathUri = new PathUri(this.RootPath, parentPath, newFileName.ToLower());
-
+			PathUri pathUri = new(this.RootPath, JoinPath(parentPath, newFileName));
+      
 			BlobServiceClient client = new(this.Options.ConnectionString);
 			BlobContainerClient containerClient = client.GetBlobContainerClient(pathUri.ContainerName);
 			BlobClient blobClient = containerClient.GetBlobClient(pathUri.Key);
@@ -452,7 +452,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			//if (folderName.Equals(this.RootPath, StringComparison.OrdinalIgnoreCase) || String.IsNullOrEmpty(GetRelativePath(GetParentPath(folderName))))
 			if (path.PathUriType == PathUri.PathUriTypes.Root)
 			{
-				// top level
+				// root level
 				return new Folder()
 				{
 					Provider = this.Key,
@@ -471,8 +471,8 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 					Provider = this.Key,
 					Path = path.ContainerName,
 					Name = path.ContainerName,
-					Parent = null,
-					Capabilities = FileSystemCapabilities.Container,
+          Parent = new Folder { Provider = this.Key, Path = path.Parent.RelativePath },
+          Capabilities = FileSystemCapabilities.Container,
 					FolderValidationRules = FileSystemValidationRules.Container
 				};
 			}

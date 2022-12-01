@@ -138,7 +138,7 @@ namespace Nucleus.Web
           logging.AddAzureWebAppDiagnostics();
         });
 
-        services.Logger().LogInformation($"App Data Folder:         [{Core.Logging.LoggingBuilderExtensions.DataFolder}]");
+        services.Logger().LogInformation($"App Data Folder:         [{this.Configuration.GetValue<String>($"{Nucleus.Abstractions.Models.Configuration.FolderOptions.Section}:DataFolder")}]");
 
         // Enable compression
         if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))

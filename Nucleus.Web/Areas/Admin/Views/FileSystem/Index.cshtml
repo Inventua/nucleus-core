@@ -35,7 +35,7 @@
 		@Html.HiddenFor(model => model.Folder.Id)
 
 		<div class="nucleus-form-toolbar">
-			@if (!String.IsNullOrEmpty(Model.Folder.Path))
+			@if (!String.IsNullOrEmpty(Model.Folder.Path) && Model.Folder.Parent != null)
 			{
 				@Html.LinkButton("&#xe5c4;", "Back", @Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = Model.Folder.Parent.Id }), new { @data_target = ".nucleus-adminpage", @class = "btn btn-secondary btn-sm nucleus-show-progress nucleus-show-progress-inside" })
 			}

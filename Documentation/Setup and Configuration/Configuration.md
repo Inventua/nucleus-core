@@ -16,7 +16,7 @@ Nucleus loads configuration in this order:
 7. All other .json files in the application folder, in alphabetical order, except for reserved file names "*.schema.json" or "bundleconfig.json", and excluding 
 files which match the pattern `hosting|appSettings|databaseSettings.{*}.json`, to prevent config files which are for other environments from being loaded.
 
-8. Enviromment variables
+8. Environment variables
 9. Command line arguments
 
 The filename and environment parts of the filename are not case-sensitive (even in Linux), but the .json extension must be lower-case.
@@ -24,7 +24,8 @@ The filename and environment parts of the filename are not case-sensitive (even 
 > **_NOTE:_**    Enviroment-specific settings are commonly used in order to run with different settings in your production, development or testing 
 > environments.  Where possible, a best practise is to always leave the default `appSettings.json` and `databaseSettings.json` files as-is, and make all of your changes
 > in enviroment-specific json files.
-> The `{enviroment}` used in configuration filenames can be configured in a variety of ways.
+> The `{enviroment}` for a production site is normally `Production`.  The enviroment name can be configured in a variety of ways, but 
+is commonly configured using the `ASPNETCORE_ENVIRONMENT` environment variable.
 > Refer to [Use multiple environments in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/environments) for more information.
 
 You can organize your application settings any way you want to, the sections below refer to the default conventions used by Nucleus.
@@ -34,7 +35,7 @@ Use the `hosting.json` file to configure the Urls that Nucleus listens on.  The 
 
 ```json
 {
-  "urls": "http://*:5000", 
+  "urls": "http://*:5000",  // use https://*:5001 for SSL
   "iisSettings": 
   {
     "windowsAuthentication": false,

@@ -34,7 +34,7 @@
 				</tr>
 				<tr>
 					<th>Server Time</th>
-					<td>@DateTime.UtcNow.ToShortDateString() @DateTime.UtcNow.ToShortTimeString() [UTC]</td>
+          <td>@DateTime.UtcNow.FormatDate(this.Context.Request.GetUserTimeZone()) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(true)]</td>
 				</tr>
 				<tr>
 					<th>Operating System</th>
@@ -50,7 +50,7 @@
 				</tr>
 				<tr>
 					<th>Process Start Time</th>
-					<td>@Model.StartTime.FormatDate(this.Context.Request.GetUserTimeZone()) (@Model.Uptime)</td>
+          <td>@Model.StartTime.FormatDate(this.Context.Request.GetUserTimeZone()) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(true)] (@Model.Uptime)</td>
 				</tr>
 			</table>
 		</TabPanel>

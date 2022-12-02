@@ -30,8 +30,10 @@ namespace Nucleus.Web.Controllers.Admin
 		private IOptions<DatabaseOptions> DatabaseOptions { get; }
 		private ISessionManager SessionManager { get; }
 		private Context Context { get; }
+    private const string LINUX_OS_INFO_FILE = "/etc/os-release";
 
-		public SystemController(Context context, RunningTaskQueue runningTaskQueue, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<Nucleus.Core.Logging.TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager)
+
+    public SystemController(Context context, RunningTaskQueue runningTaskQueue, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<Nucleus.Core.Logging.TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager)
 		{
 			this.Context = context;
 			this.RunningTaskQueue = runningTaskQueue;
@@ -70,8 +72,36 @@ namespace Nucleus.Web.Controllers.Admin
 				StartTime = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime(),
 				Uptime = FormatUptime(uptime)
 			};
+      
+      // For Linux, see if there is an /etc/os-release file and get more information.  /etc/os-release is fairly standard on Linux and contains
+      // the "proper" OS Name and version
+      if (Environment.OSVersion.Platform == PlatformID.Unix)
+      {
+        try
+        {
+          if (System.IO.File.Exists(LINUX_OS_INFO_FILE))
+          {
+            string osInfo = System.IO.File.ReadAllText(LINUX_OS_INFO_FILE);
+            foreach (string osFileLine in osInfo.Split(new char[] { '\r' , '\n' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+              string[] parts = osFileLine.Split(new char[] { '=' });
+              if (parts.Length == 2)
+              {
+                if (parts.First().Equals("PRETTY_NAME", StringComparison.OrdinalIgnoreCase))
+                {
+                  viewModelOutput.OperatingSystem = parts.Last().Replace("\"", "");
+                }
+              }
+            }
+          }
+        }
+        catch 
+        { 
+          // this is not a critical operation.  Suppress exceptions.
+        }
+      }
 
-			IConfigurationSection loggingConfig = this.Configuration.GetSection("Logging:LogLevel");
+      IConfigurationSection loggingConfig = this.Configuration.GetSection("Logging:LogLevel");
 			foreach (IConfigurationSection configItem in loggingConfig.GetChildren())
 			{
 				viewModelOutput.LoggingSettingsConfiguration.Add(configItem.Key.Replace("Logging:LogLevel:",""), configItem.Value);

@@ -129,7 +129,7 @@ namespace Nucleus.ViewFeatures
             result.Append($":{value.Minutes}");
           }
         }
-        else if (format == TimespanFormats.TimeOffset)
+        else if (format == TimespanFormats.Friendly)
         {
           if (value.Days > 0)
           {

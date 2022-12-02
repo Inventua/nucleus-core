@@ -4,13 +4,14 @@ After=network.target
 StartLimitIntervalSec=0
 
 [Service]
-Type=simple
+Type=notify
 Restart=always
 RestartSec=1
 Environment=ASPNETCORE_ENVIRONMENT=Production
 User=nucleus-service
 WorkingDirectory=/home/nucleus/app
-ExecStart=/home/nucleus/app/Nucleus.Web.exe
+ExecStart=/usr/share/dotnet/dotnet Nucleus.Web.dll
+#KillSignal=SIGINT 
 
 [Install]
 WantedBy=multi-user.target

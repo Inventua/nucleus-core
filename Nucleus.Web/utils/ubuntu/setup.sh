@@ -1,16 +1,22 @@
 ﻿#! /usr/bin/bash
 
-# Default values
-OUTPUT="verbose"
-SERVICE_ACCOUNT="nucleus-service"  # user/group name for running Nucleus
-CREATE_DIRECTORIES=true
-CREATE_USER=true
-
+# Declare the options 
 SHORT_OPTIONS=o:,u:,d:
 LONG_OPTIONS=output:,createuser:,createdirectories:
 
+# Option default values
+CREATE_DIRECTORIES=true
+CREATE_USER=true
+
+# Default values
+OUTPUT="verbose"
+SERVICE_ACCOUNT="nucleus-service"  # user/group name for running Nucleus
+DOTNET_INSTALL_FILE="dotnet-install.sh"
+DIRECTORIES=("app", "data")
+
 OPTS=$(getopt -a -n "Nucleus Setup" --options $SHORT_OPTIONS --longoptions $LONG_OPTIONS -- "$@") 
 
+# If options are not set, then display the usage message
 if [ "$?" != "0" ]; then
   usage
 fi
@@ -42,42 +48,78 @@ if [ "$CREATE_DIRECTORIES" == true ]; then
   mkdir /home/nucleus/data
 fi
 
-# TODO! work out how to do this
-user_exists()
-{ 
-  if [ id "nucleus-service" ] ; then
-    return true
+
+
+# Create the user and setup the directory structure and permissions
+if [ "$CREATE_USER" == true ]; then
+  #if id -u "$SERVICE_ACCOUNT" >/dev/null ; then
+  user_exists
+  if [ "$? == 0" ]; then
+    echo "$SERVICE_ACCOUNT user already exists."
+    exit 1
   else
-    return false
+    echo "Creating $SERVICE_ACCOUNT user"
+    read -s -p "Type in password:" PASSWORD
+    useradd -M "$SERVICE_ACCOUNT" -p "$PASSWORD" -d /home/nucleus -c "Service account for Nucleus"
+    unset PASSWORD
+  fi
+else
+  if ! id -u "$SERVICE_ACCOUNT" > /dev/null ; then
+    echo "User must already exists"
+    exit 1
+  fi
+fi
+
+#uname2="$(stat --format '%U' "$1")"
+#if [ "x${uname2}" = "x${USER}" ]; then
+#    echo owner
+#else
+#    echo no owner
+#fi
+
+if is_directory_owner /home/nucleus/app ; then
+  echo "$?"
+fi
+
+# Make the group account the owner of app and data folders
+chown -R :nucleus-service /home/nucleus/app
+chown -R :nucleus-service /home/nucleus/data
+
+# Set the folder permissions
+chmod -R g+rx-w /home/nucleus/app
+chmod -R g+rw-x /home/nucleus/data
+
+
+
+# 
+function user_exists()
+{ 
+  if [ id -u "$SERVICE_ACCOUNT" > /dev/null ]; then
+    return 0
+  else
+    return 1
   fi
 }
 
-# Create the user and setup the directory structure and permissions
-#if [-p 1] then
-# Create the user and setup the directory structure and permissions
-if [ "$CREATE_USER" == true ]; then
-  if id -u "SERVICE_ACCOUNT" >/dev/null ; then
-    echo "user already exists"
+function is_directory_owner()
+{
+  local directory=$1
+  local group="$(stat --format='%G' $directory)"
+  if [ "$group" = "$SERVICE_ACCOUNT" ]; then
+    return 0
   else
-    echo "Creating $SERVICE_ACCOUNT user."
-    read -s -p "Type in password:" PASSWORD
-    useradd -M "$SERVICE_USER" -p "$PASSWORD" -d /home/nucleus -c "Service account for Nucleus"
-    unset PASSWORD
+    return 1
   fi
+}
 
-  # Make the group account the owner of app and data folders
-  chown -R :nucleus-service /home/nucleus/app
-  chown -R :nucleus-service /home/nucleus/data
 
-  # Set the folder permissions
-  chmod -R g+rx-w /home/nucleus/app
-  chmod -R g+rw-x /home/nucleus/data
-fi
 
+# Check if the dotnet install script exists
 if [ -f "$DOTNET_INSTALL_FILE" ] ; then
   echo "$DOTNET_INSTALL_FILE" exists
 else
   echo "Please download $DOTNET_INSTALL_FILE to install dotnet runtime."
+  exit 1
 fi
 
 
@@ -85,22 +127,27 @@ fi
 if [ -f "$DOTNET_INSTALL_FILE" ] ; then
   echo "$DOTNET_INSTALL_FILE" exists
   # Set the dotnet install script to be executable
-  chmod +x ./"$DOTNET_INSTALL_FILE"
+  chmod +x "$DOTNET_INSTALL_FILE"
   # Installs the aspnetcore runtime (no SDK)
-  #./"$DOTNET_INSTALL_FILE" --runtime aspnetcore --install-dir /usr/share/dotnet
-  #echo PATH=\"$PATH:/usr/share/dotnet\" > /etc/environment
+   "$DOTNET_INSTALL_FILE" --runtime aspnetcore --install-dir /usr/share/dotnet
+  echo PATH=\"$PATH:/usr/share/dotnet\" > /etc/environment
 else
   echo "Please download $DOTNET_INSTALL_FILE to install dotnet runtime."
+  exit 1
 fi
 
 # add dotnet to the path
-#echo PATH=\"$PATH:/usr/share/dotnet\" > /etc/environment
+echo PATH=\"$PATH:/usr/share/dotnet\" > /etc/environment
 
 unzip file??
 
-# copies the script file to system directory and starts the service
+# copies the service unit file to system directory and starts the service
 sudo cp nucleus.service /etc/systemd/system
+sudo systemctl daemon-reload
 sudo systemctl enable --now nucleus
+
+# set firewall
+
 
 #make certificate??
 #openssl x509 -noout -fingerprint -sha1 -inform pem -in /usr/local/share/ca-certificates/aspnet/https.crt

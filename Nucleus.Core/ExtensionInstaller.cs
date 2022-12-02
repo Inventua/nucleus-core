@@ -612,7 +612,7 @@ namespace Nucleus.Core
 							
 							if (existingAssemblyVersion > newAssemblyVersion)
 							{
-								this.ModelState.AddModelError($"validate-file:{zipFullName}", $"A newer version of the assembly {zipFullName} is already installed.");
+								this.ModelState.AddModelError($"validate-file:{zipFullName}", $"A newer version [{existingAssemblyVersion}] of the assembly {zipFullName} [{newAssemblyVersion}] is already installed.");
 								return false;
 							}
 						}

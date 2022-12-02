@@ -299,16 +299,16 @@ namespace Nucleus.Extensions
 			aes.IV = site.Id.ToByteArray();
 
 			// Create the CryptoStream instance.
-			System.Security.Cryptography.CryptoStream cryptStreem = new(msOut, aes.CreateEncryptor(aes.Key, aes.IV), System.Security.Cryptography.CryptoStreamMode.Write);
+			System.Security.Cryptography.CryptoStream cryptStream = new(msOut, aes.CreateEncryptor(aes.Key, aes.IV), System.Security.Cryptography.CryptoStreamMode.Write);
 
 			// Encoding.
-			cryptStreem.Write(bytesIn, 0, bytesIn.Length);
-			cryptStreem.FlushFinalBlock();
+			cryptStream.Write(bytesIn, 0, bytesIn.Length);
+			cryptStream.FlushFinalBlock();
 
 			// Get the encrypted byte array.
 			byte[] bytesOut = msOut.ToArray();
 
-			cryptStreem.Close();
+			cryptStream.Close();
 			msOut.Close();
 
 			// Convert to string and return result value
@@ -340,16 +340,16 @@ namespace Nucleus.Extensions
 			aes.IV = site.Id.ToByteArray();
 
 			// Create the CryptoStream instance.
-			System.Security.Cryptography.CryptoStream cryptStreem = new(msOut, aes.CreateDecryptor(aes.Key, aes.IV), System.Security.Cryptography.CryptoStreamMode.Write);
+			System.Security.Cryptography.CryptoStream cryptStream = new(msOut, aes.CreateDecryptor(aes.Key, aes.IV), System.Security.Cryptography.CryptoStreamMode.Write);
 
 			// Encoding.
-			cryptStreem.Write(bytesIn, 0, bytesIn.Length);
-			cryptStreem.FlushFinalBlock();
+			cryptStream.Write(bytesIn, 0, bytesIn.Length);
+			cryptStream.FlushFinalBlock();
 
 			// Get the encrypted byte array.
 			byte[] bytesOut = msOut.ToArray();
 
-			cryptStreem.Close();
+			cryptStream.Close();
 			msOut.Close();
 
 			// Convert to string and return result value

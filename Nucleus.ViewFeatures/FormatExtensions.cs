@@ -11,13 +11,28 @@ namespace Nucleus.ViewFeatures
 	/// </summary>
 	static public class FormatExtensions
 	{
-		/// <summary>
-		/// Convert a DateTime from UTC to local time and output as a string in short date+short time format.
-		/// </summary>
-		/// <param name="value"></param>
-		/// <param name="timezone"></param>
-		/// <returns></returns>
-		public static string FormatDate(this DateTime? value, TimeZoneInfo timezone)
+    /// <summary>
+    /// Enum used to specofy timespan formats for <see cref="FormatTimeSpan(TimeSpan, TimespanFormats)" />
+    /// </summary>
+    public enum TimespanFormats
+    {
+      /// <summary>
+      /// Human-readable friendly format
+      /// </summary>
+      Friendly = 0,
+      /// <summary>
+      /// Format as time zone offset (+10, -5:30)
+      /// </summary>
+      TimeOffset = 1
+    }
+
+    /// <summary>
+    /// Convert a DateTime from UTC to local time and output as a string in short date+short time format.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="timezone"></param>
+    /// <returns></returns>
+    public static string FormatDate(this DateTime? value, TimeZoneInfo timezone)
 		{
 			if (value.HasValue)
 			{
@@ -85,21 +100,21 @@ namespace Nucleus.ViewFeatures
     /// <returns></returns>
     public static string FormatTimeSpan(this TimeSpan value)
     {
-      return FormatTimeSpan(value, false);
+      return FormatTimeSpan(value, TimespanFormats.Friendly);
     }
 
     /// <summary>
     /// Return a "friendly" string representation of a TimeSpan.
     /// </summary>
     /// <param name="value"></param>
-    /// <param name="asTimeOffset">Specifies whether to format as a date/time offset.</param>
+    /// <param name="format">Specifies output format.</param>
     /// <returns></returns>
-    public static string FormatTimeSpan(this TimeSpan value, Boolean asTimeOffset)
+    public static string FormatTimeSpan(this TimeSpan value, TimespanFormats format)
 		{
 			StringBuilder result = new();
 			try
 			{
-        if (asTimeOffset)
+        if (format == TimespanFormats.TimeOffset)
         {
           if (value.TotalSeconds > 0)
           {
@@ -114,7 +129,7 @@ namespace Nucleus.ViewFeatures
             result.Append($":{value.Minutes}");
           }
         }
-        else
+        else if (format == TimespanFormats.TimeOffset)
         {
           if (value.Days > 0)
           {
@@ -148,20 +163,20 @@ namespace Nucleus.ViewFeatures
     /// <returns></returns>
     public static string FormatTimeSpan(this TimeSpan? value)
     {
-      return FormatTimeSpan(value, false);
+      return FormatTimeSpan(value, TimespanFormats.Friendly);
     }
 
     /// <summary>
     /// Return a "friendly" string representation of a TimeSpan.
     /// </summary>
     /// <param name="value"></param>
-    /// <param name="asTimeOffset">Specifies whether to format as a date/time offset.</param>
+    /// <param name="format">Specifies output format.</param>
     /// <returns></returns>
-    public static string FormatTimeSpan(this TimeSpan? value, Boolean asTimeOffset)
+    public static string FormatTimeSpan(this TimeSpan? value, TimespanFormats format)
 		{
 			if (!value.HasValue) return "";
 
-      return FormatTimeSpan(value.Value, asTimeOffset);      
+      return FormatTimeSpan(value.Value, format);      
 		}
 	}
 }

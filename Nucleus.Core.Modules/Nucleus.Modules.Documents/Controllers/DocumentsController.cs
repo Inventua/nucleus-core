@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
+using Microsoft.Extensions.Options;
 
 namespace Nucleus.Modules.Documents.Controllers
 {
@@ -33,18 +34,18 @@ namespace Nucleus.Modules.Documents.Controllers
 		private IFileSystemManager FileSystemManager { get; }
 		private DocumentsManager DocumentsManager { get; }
 		private IListManager ListManager { get; }
-		private IWebHostEnvironment WebHostEnvironment { get; }
+		private FolderOptions FolderOptions { get; }
 
 		private IPageModuleManager PageModuleManager { get; }
 
-		public DocumentsController(IWebHostEnvironment webHostEnvironment, Context context, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, DocumentsManager documentsManager, IListManager listManager)
+		public DocumentsController(IOptions<FolderOptions> folderOptions, Context context, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, DocumentsManager documentsManager, IListManager listManager)
 		{
 			this.Context = context;
+      this.FolderOptions = folderOptions.Value;
 			this.PageModuleManager = pageModuleManager;
 			this.FileSystemManager = fileSystemManager;
 			this.DocumentsManager = documentsManager;
 			this.ListManager = listManager;
-			this.WebHostEnvironment = webHostEnvironment;
 		}
 
 		[HttpGet]
@@ -187,7 +188,8 @@ namespace Nucleus.Modules.Documents.Controllers
 						
 			string layoutPath = $"ViewerLayouts/{this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table")}.cshtml";
 
-			if (!System.IO.File.Exists($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\Documents\\Views\\{layoutPath}"))
+      if (!System.IO.File.Exists($"{this.FolderOptions.GetExtensionFolder("Documents", false)}/Views/{layoutPath}"))
+      //if (!System.IO.File.Exists($"{this.WebHostEnvironment.ContentRootPath}/{FolderOptions.EXTENSIONS_FOLDER}/Documents/Views/{layoutPath}"))
 			{
 				layoutPath = $"ViewerLayouts/Table.cshtml";
 			}
@@ -277,8 +279,10 @@ namespace Nucleus.Modules.Documents.Controllers
 			}
 
 			viewModel.Layouts = new();
-			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\Documents\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
-			{
+      
+      //foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}/{FolderOptions.EXTENSIONS_FOLDER}/Documents/Views/ViewerLayouts/", "*.cshtml").OrderBy(layout => layout))
+      foreach (string file in System.IO.Directory.EnumerateFiles($"{this.FolderOptions.GetExtensionFolder("Documents", false)}/Views/ViewerLayouts/", "*.cshtml").OrderBy(layout => layout))
+      {
 				viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
 			}
 			return viewModel;

@@ -11,6 +11,7 @@ using System.Linq;
 using Nucleus.Modules.Links.Models;
 using System.Threading.Tasks;
 using Nucleus.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Nucleus.Modules.Links.Controllers
 {
@@ -29,12 +30,12 @@ namespace Nucleus.Modules.Links.Controllers
 		private LinksManager LinksManager { get; }
 		private IFileSystemManager FileSystemManager { get; }
 		private IListManager ListManager { get; }
-		private IWebHostEnvironment WebHostEnvironment { get; }
+		private FolderOptions FolderOptions { get; }
 
-		public AdminController(IWebHostEnvironment webHostEnvironment, Context Context, IPageManager pageManager, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, LinksManager linksManager, IListManager listManager)
+		public AdminController(Context Context, IOptions<FolderOptions> folderOptions, IPageManager pageManager, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, LinksManager linksManager, IListManager listManager)
 		{
-			this.WebHostEnvironment = webHostEnvironment; 
 			this.Context = Context;
+      this.FolderOptions = folderOptions.Value;
 			this.PageManager = pageManager;
 			this.PageModuleManager = pageModuleManager;
 			this.FileSystemManager = fileSystemManager;
@@ -219,7 +220,7 @@ namespace Nucleus.Modules.Links.Controllers
 
 
 			viewModel.Layouts = new();
-			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\Links\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
+			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.FolderOptions.GetExtensionFolder("Links", false)}/Views/ViewerLayouts/", "*.cshtml").OrderBy(layout => layout))
 			{
 				viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
 			}

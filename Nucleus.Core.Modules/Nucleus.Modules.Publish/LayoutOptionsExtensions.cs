@@ -42,9 +42,9 @@ namespace Nucleus.Modules.Publish
 
     public static IEnumerable<string> ListMasterLayouts(this LayoutOptions options, string viewerLayoutFolder)
     {
-      if (options.ViewerLayout != null && System.IO.Directory.Exists($"{viewerLayoutFolder}{options.ViewerLayout}\\MasterLayouts\\"))
+      if (options.ViewerLayout != null && System.IO.Directory.Exists($"{viewerLayoutFolder}{options.ViewerLayout}/MasterLayouts/"))
       {
-        return System.IO.Directory.EnumerateFiles($"{viewerLayoutFolder}{options.ViewerLayout}\\MasterLayouts\\", "*.cshtml")
+        return System.IO.Directory.EnumerateFiles($"{viewerLayoutFolder}{options.ViewerLayout}/MasterLayouts/", "*.cshtml")
           .OrderBy(layout => layout)
           .Select(file => System.IO.Path.GetFileNameWithoutExtension(file));
       }
@@ -56,10 +56,10 @@ namespace Nucleus.Modules.Publish
 
     public static IEnumerable<string> ListArticleLayouts(this LayoutOptions options, string viewerLayoutFolder)
     {
-      if (options.ViewerLayout != null && System.IO.Directory.Exists($"{viewerLayoutFolder}{options.ViewerLayout}\\ArticleLayouts\\"))
+      if (options.ViewerLayout != null && System.IO.Directory.Exists($"{viewerLayoutFolder}{options.ViewerLayout}/ArticleLayouts/"))
       {
         // Get the article layout files in the selected ViewerLayout folder
-        return System.IO.Directory.EnumerateFiles($"{viewerLayoutFolder}{options.ViewerLayout}\\ArticleLayouts\\", "*.cshtml")
+        return System.IO.Directory.EnumerateFiles($"{viewerLayoutFolder}{options.ViewerLayout}/ArticleLayouts/", "*.cshtml")
           .OrderBy(layout => layout)
           .Select(file => System.IO.Path.GetFileNameWithoutExtension(file));
       }

@@ -37,19 +37,33 @@ namespace Nucleus.Core.Managers
 		{
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
-				return await provider.GetLayoutDefinition(id);
-			}
+        return NormalizeRelativePath(await provider.GetLayoutDefinition(id));
+      }
 		}
 
-		/// <summary>
-		/// Returns a list of all installed <see cref="LayoutDefinition"/>s.
-		/// </summary>
-		/// <returns></returns>
-		public async Task<IList<LayoutDefinition>> List()
+    private LayoutDefinition NormalizeRelativePath(LayoutDefinition layoutDefinition)
+    {
+      if (layoutDefinition != null)
+      {
+        layoutDefinition.RelativePath = Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(layoutDefinition.RelativePath);
+      }
+      return layoutDefinition;
+    }
+
+    /// <summary>
+    /// Returns a list of all installed <see cref="LayoutDefinition"/>s.
+    /// </summary>
+    /// <returns></returns>
+    public async Task<IList<LayoutDefinition>> List()
 		{
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
-				return await provider.ListLayoutDefinitions();
+        IList<LayoutDefinition> results =  await provider.ListLayoutDefinitions();
+        foreach (LayoutDefinition result in results)
+        {
+          NormalizeRelativePath(result);
+        }
+        return results;
 			}
 		}
 
@@ -70,7 +84,7 @@ namespace Nucleus.Core.Managers
 
 			if (layout == null)
 			{
-				layoutPath = $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.LAYOUTS_FOLDER}\\{ILayoutManager.DEFAULT_LAYOUT}";
+				layoutPath = $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.LAYOUTS_FOLDER}/{ILayoutManager.DEFAULT_LAYOUT}";
 			}
 			else
 			{

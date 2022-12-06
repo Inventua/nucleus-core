@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Data.Common;
 using Nucleus.Core.DataProviders;
+using Nucleus.Abstractions.Models;
 
 namespace Nucleus.Core.Managers
 {
@@ -20,11 +21,25 @@ namespace Nucleus.Core.Managers
 			this.DataProviderFactory = dataProviderFactory;
 		}
 
-		public async Task<List<Nucleus.Abstractions.Models.ContainerDefinition>> List()
+    private ContainerDefinition NormalizeRelativePath(ContainerDefinition containerDefinition)
+    {
+      if (containerDefinition != null)
+      {
+        containerDefinition.RelativePath = Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(containerDefinition.RelativePath);
+      }
+      return containerDefinition;
+    }
+
+    public async Task<List<ContainerDefinition>> List()
 		{
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
-				return await provider.ListContainerDefinitions();
+        List<ContainerDefinition> results = await provider.ListContainerDefinitions();
+        foreach(ContainerDefinition result in results)
+        {
+          NormalizeRelativePath(result);
+        }
+        return results;
 			}
 		}
 	}

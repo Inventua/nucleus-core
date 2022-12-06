@@ -27,22 +27,21 @@ namespace Nucleus.OAuth.Client.Controllers
 	[Extension("OAuthClient")]
 	public class OAuthClientController : Controller
 	{
-		private IWebHostEnvironment WebHostEnvironment { get; }
-
 		private Context Context { get; }
-		
-		private ISiteManager SiteManager { get; }
+    private FolderOptions FolderOptions { get; }
+
+    private ISiteManager SiteManager { get; }
 
 		private IPageModuleManager PageModuleManager { get; }
 
 		private IOptions<Models.Configuration.OAuthProviders> Options { get; }
 		private ILogger<OAuthClientAdminController> Logger { get; }
 
-		public OAuthClientController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<Models.Configuration.OAuthProviders> options, ILogger<OAuthClientAdminController> logger)
+		public OAuthClientController(Context Context, IOptions<FolderOptions> folderOptions, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<Models.Configuration.OAuthProviders> options, ILogger<OAuthClientAdminController> logger)
 		{
-			this.WebHostEnvironment = webHostEnvironment;
 			this.Context = Context;
-			this.SiteManager = siteManager;
+      this.FolderOptions = folderOptions.Value;
+      this.SiteManager = siteManager;
 			this.PageModuleManager = pageModuleManager;
 			this.Options = options;
 			this.Logger = logger;
@@ -141,11 +140,11 @@ namespace Nucleus.OAuth.Client.Controllers
 
 			viewModel.ReadSettings(this.Context.Module);
 
-			string layoutPath = $"ViewerLayouts\\{viewModel.Layout}.cshtml";
+			string layoutPath = $"ViewerLayouts/{viewModel.Layout}.cshtml";
 
-			if (!System.IO.File.Exists($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\OAuth Client\\Views\\{layoutPath}"))
+			if (!System.IO.File.Exists($"{this.FolderOptions.GetExtensionFolder("OAuth Client", false)}/Views/{layoutPath}"))
 			{
-				layoutPath = $"ViewerLayouts\\List.cshtml";
+				layoutPath = $"ViewerLayouts/List.cshtml";
 			}
 
 			viewModel.Layout = layoutPath;

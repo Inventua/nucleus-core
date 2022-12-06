@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Nucleus.Extensions;
 using Nucleus.Modules.Links.Models;
+using Microsoft.Extensions.Options;
 
 namespace Nucleus.Modules.Links.Controllers
 {
@@ -22,13 +23,13 @@ namespace Nucleus.Modules.Links.Controllers
 		private IPageModuleManager PageModuleManager { get; }
 		private LinksManager LinksManager { get; }
 		private IListManager ListManager { get; }
-		private IWebHostEnvironment WebHostEnvironment { get; }
+    private FolderOptions FolderOptions { get; }
 
-		public LinksController(IWebHostEnvironment webHostEnvironment, Context Context, IPageModuleManager pageModuleManager, LinksManager linksManager, IListManager listManager)
+    public LinksController(Context Context, IOptions<FolderOptions> folderOptions, IPageModuleManager pageModuleManager, LinksManager linksManager, IListManager listManager)
 		{
-			this.WebHostEnvironment = webHostEnvironment;
-			this.Context = Context;
-			this.PageModuleManager = pageModuleManager;
+      this.Context = Context;
+      this.FolderOptions = folderOptions.Value;
+      this.PageModuleManager = pageModuleManager;
 			this.LinksManager = linksManager;
 			this.ListManager = listManager;
 		}
@@ -73,7 +74,7 @@ namespace Nucleus.Modules.Links.Controllers
 
 			string layoutPath = $"ViewerLayouts/{this.Context.Module.ModuleSettings.Get(AdminController.MODULESETTING_LAYOUT, "Table")}.cshtml";
 
-			if (!System.IO.File.Exists($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\Links\\Views\\{layoutPath}"))
+			if (!System.IO.File.Exists($"{this.FolderOptions.GetExtensionFolder("Links", false)}//Views/{layoutPath}"))
 			{
 				layoutPath = $"ViewerLayouts/Table.cshtml";
 			}

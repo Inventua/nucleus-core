@@ -90,7 +90,7 @@ namespace Nucleus.Core.Plugins
 			try
 			{
 				// exclude anything in the bin/runtimes/**/native folder, these are not .net assemblies
-				if (System.IO.Path.GetDirectoryName(path).ToLower().Replace('/', '\\').Contains("\\runtimes\\") && System.IO.Path.GetDirectoryName(path).ToLower().Replace('/', '\\').EndsWith("\\native"))
+				if (System.IO.Path.GetDirectoryName(path).ToLower().Replace('\\', '/').Contains("/runtimes/") && System.IO.Path.GetDirectoryName(path).ToLower().Replace('\\', '/').EndsWith("/native"))
 				{
 					return null;
 				}
@@ -157,31 +157,6 @@ namespace Nucleus.Core.Plugins
 			}
 
 			return "";
-
-			////System.IO.DirectoryInfo workingDirectory = new(fullPath);
-			////while (workingDirectory.Parent != null)
-			////{
-			////	if (workingDirectory.Parent.Name.Equals(Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER, StringComparison.OrdinalIgnoreCase))
-			////	{
-			////		return workingDirectory.Name;
-			////	}
-			////	workingDirectory = workingDirectory.Parent;
-			////}
-
-			//string extensionFolder = "";
-
-			//if (fullPath.StartsWith(System.IO.Path.GetDirectoryName(typeof(AssemblyLoader).Assembly.Location), StringComparison.OrdinalIgnoreCase))
-			//{
-			//	extensionFolder = "";
-			//}
-			//else if (fullPath.StartsWith(Nucleus.Abstractions.Folders.GetExtensionsFolder(), StringComparison.OrdinalIgnoreCase))
-			//{
-			//	// Get the first part of the extension folder.  For example, for the path "/Extensions/TextHtml" the extensionFolder would be "TextHtml"
-			//	string[] pluginFolderParts = fullPath.Replace(Nucleus.Abstractions.Folders.GetExtensionsFolder(), "").Split('\\', StringSplitOptions.RemoveEmptyEntries);
-			//	extensionFolder = pluginFolderParts[0];
-			//}
-
-			//return extensionFolder;
 		}
 
 		/// <summary>

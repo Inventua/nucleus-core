@@ -216,7 +216,9 @@ namespace Nucleus.Core.Managers
 		/// <param name="layoutDefinition"></param>
 		public async Task SaveLayoutDefinition(LayoutDefinition layoutDefinition)
 		{
-			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+      layoutDefinition.RelativePath = Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(layoutDefinition.RelativePath);
+
+      using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
 				await provider.SaveLayoutDefinition(layoutDefinition);
 			}
@@ -240,7 +242,9 @@ namespace Nucleus.Core.Managers
 		/// <param name="containerDefinition"></param>
 		public async Task SaveContainerDefinition(ContainerDefinition containerDefinition)
 		{
-			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+      containerDefinition.RelativePath = Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(containerDefinition.RelativePath);
+
+      using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
 				await provider .SaveContainerDefinition(containerDefinition);
 			}
@@ -254,7 +258,7 @@ namespace Nucleus.Core.Managers
 		{
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
-				await provider .DeleteContainerDefinition(containerDefinition);
+				await provider.DeleteContainerDefinition(containerDefinition);
 			}
 		}
 
@@ -266,7 +270,7 @@ namespace Nucleus.Core.Managers
 		{
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
-				await provider .SaveControlPanelExtensionDefinition(controlPanelExtensionDefinition);
+				await provider.SaveControlPanelExtensionDefinition(controlPanelExtensionDefinition);
 			}
 		}
 

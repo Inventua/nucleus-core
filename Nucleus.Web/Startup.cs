@@ -266,11 +266,11 @@ namespace Nucleus.Web
         // env.ContentRootPath so that only defined folders can serve static resources.
         foreach (string folderName in Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS)
         {
-          string path = System.IO.Path.Combine(env.ContentRootPath, folderName);
+          string path = Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(System.IO.Path.Combine(env.ContentRootPath, folderName));
 
           if (System.IO.Directory.Exists(path))
           {
-            app.Logger()?.LogInformation("Adding static file path: [{path}]", path.Replace(Environment.ContentRootPath, ""));
+            app.Logger()?.LogInformation("Adding static file path: [{path}]", "/" + folderName);
 
             app.UseStaticFiles(new StaticFileOptions
             {

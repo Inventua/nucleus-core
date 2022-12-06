@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Modules.Publish.Models;
+using Microsoft.Extensions.Options;
+using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Modules.Publish.Controllers
 {
@@ -25,7 +27,7 @@ namespace Nucleus.Modules.Publish.Controllers
     private HeadlinesManager HeadlinesManager { get; }
     private string ViewerLayoutFolder { get; }
 
-    public HeadlinesAdminController(IWebHostEnvironment webHostEnvironment, Context Context, HeadlinesManager headlinesManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IListManager listManager, IExtensionManager extensionManager)
+    public HeadlinesAdminController(Context Context, IOptions<FolderOptions> folderOptions, HeadlinesManager headlinesManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IListManager listManager, IExtensionManager extensionManager)
     {
       this.Context = Context;
       this.HeadlinesManager = headlinesManager;
@@ -34,7 +36,7 @@ namespace Nucleus.Modules.Publish.Controllers
       this.ListManager = listManager;
       this.ExtensionManager = extensionManager;
 
-      this.ViewerLayoutFolder = $"{webHostEnvironment.ContentRootPath}\\{Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER}\\Publish\\Views\\ViewerLayouts\\";
+      this.ViewerLayoutFolder = $"{folderOptions.Value.GetExtensionFolder("Publish", false)}/Views/ViewerLayouts/";
     }
 
     public async Task<ActionResult> Settings()

@@ -45,12 +45,12 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <summary>
 		/// Sub folder name (in the web root folder) used for shared containers
 		/// </summary>
-		public const string CONTAINERS_FOLDER = SHARED_FOLDER + "\\Containers";
+		public const string CONTAINERS_FOLDER = SHARED_FOLDER + "/Containers";
 
 		/// <summary>
 		/// Sub folder name (in the web root folder) used for shared layouts
 		/// </summary>
-		public const string LAYOUTS_FOLDER = SHARED_FOLDER + "\\Layouts";
+		public const string LAYOUTS_FOLDER = SHARED_FOLDER + "/Layouts";
 
 		/// <summary>
 		/// Sub folder name (in the web root folder) used for areas
@@ -78,7 +78,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 			Nucleus.Abstractions.Models.Configuration.FolderOptions.AREAS_FOLDER
 		};
 
-		private static string WebRootFolder { get; } = System.Environment.CurrentDirectory;
+		private static string WebRootFolder { get; } = NormalizePath(System.Environment.CurrentDirectory);
 
 		/// <summary>
 		/// Gets the application root folder.
@@ -92,18 +92,18 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <summary>
 		/// Replaces tokens from configuration entries representing a file name, and returns an absolute path.
 		/// </summary>
-		/// <param name="folder"></param>
+		/// <param name="folderName"></param>
 		/// <returns></returns>
-		public string ParseFolder(string folder)
+		public string ParseFolder(string folderName)
 		{
-			System.IO.DirectoryInfo directory = new(Parse(folder));
+			System.IO.DirectoryInfo directory = new(Parse(folderName));
 
 			if (!directory.Exists)
 			{
 				directory.Create();
 			}
 
-			return directory.FullName;
+			return NormalizePath(directory.FullName);
 		}
 
 		/// <summary>
@@ -146,7 +146,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		{
 			string appsFolder;
 
-			appsFolder = System.IO.Path.Combine(WebRootFolder, EXTENSIONS_FOLDER);
+			appsFolder = NormalizePath(System.IO.Path.Combine(WebRootFolder, EXTENSIONS_FOLDER));
 
 			if (create)
 			{
@@ -164,7 +164,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public static string GetExtensionFolderStatic(string name, Boolean create)
 		{
-			string result = System.IO.Path.Combine(GetExtensionsFolderStatic(create), name);
+			string result = NormalizePath(System.IO.Path.Combine(GetExtensionsFolderStatic(create), name));
 
 			if (create)
 			{
@@ -185,7 +185,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string GetExtensionFolder(string name, Boolean create)
 		{
-			string result = System.IO.Path.Combine(GetExtensionsFolder(), name);
+			string result = NormalizePath(System.IO.Path.Combine(GetExtensionsFolder(), name));
 
 			if (create)
 			{
@@ -209,9 +209,8 @@ namespace Nucleus.Abstractions.Models.Configuration
 		{
 			const string DEFAULT_FOLDER = "%ProgramData%/Nucleus";
 
-			this.DataFolder = Parse(String.IsNullOrEmpty(this.DataFolder) ? DEFAULT_FOLDER : this.DataFolder)
-				.Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
-			
+      this.DataFolder = NormalizePath(Parse(String.IsNullOrEmpty(this.DataFolder) ? DEFAULT_FOLDER : this.DataFolder));
+						
 			if (ensureExists)
 			{
 				EnsureExists(this.DataFolder);
@@ -342,13 +341,14 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string GetLogFolder(string subFolder, Boolean create)
 		{
+      string folderName = NormalizePath(System.IO.Path.Combine(this.GetDataFolder(LOG_FOLDER, create), subFolder));
 			if (create)
 			{
-				return EnsureExists(System.IO.Path.Combine(this.GetDataFolder(LOG_FOLDER, create), subFolder));
+				return EnsureExists(folderName);
 			}
 			else
 			{
-				return System.IO.Path.Combine(this.GetDataFolder(LOG_FOLDER, create), subFolder);
+				return folderName;
 			}
 		}
 
@@ -394,16 +394,17 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string GetCacheFolder(string subFolder, Boolean create)
 		{
-			if (create)
+      string folderName = NormalizePath(System.IO.Path.Combine(this.GetDataFolder(CACHE_FOLDER, create), subFolder));
+
+      if (create)
 			{
-				return EnsureExists(System.IO.Path.Combine(this.GetDataFolder(CACHE_FOLDER, create), subFolder));
+				return EnsureExists(folderName);
 			}
 			else
 			{
-				return System.IO.Path.Combine(this.GetDataFolder(CACHE_FOLDER, create), subFolder);
+				return folderName;
 			}
 		}
-
 
 		/// <summary>
 		/// Gets an application data storage folder sub-folder. 
@@ -416,7 +417,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string GetDataFolder(string subFolder, Boolean create)
 		{
-			string folderName = System.IO.Path.Combine(this.DataFolder, subFolder).Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+			string folderName = NormalizePath(System.IO.Path.Combine(this.DataFolder, subFolder).Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar));
 
 			if (create)
 			{
@@ -428,5 +429,16 @@ namespace Nucleus.Abstractions.Models.Configuration
 			}
 		}
 
-	}
+    /// <summary>
+    /// Return the specified path with path separator "\" characters replaced by "/" so that the path will work in 
+    /// both Windows and Linux.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public static string NormalizePath(string path)
+    {
+      if (String.IsNullOrEmpty(path)) return path;
+      return path.Replace("\\", "/");      
+    }
+  }
 }

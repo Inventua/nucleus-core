@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Modules.MultiContent.Controllers
 {
@@ -19,9 +21,9 @@ namespace Nucleus.Modules.MultiContent.Controllers
 		private Context Context { get; }
 		private IPageModuleManager PageModuleManager { get; }
 		private IContentManager ContentManager { get; }
-		private IWebHostEnvironment WebHostEnvironment { get; }
+    private FolderOptions FolderOptions { get; }
 
-		private const string MODULESETTING_LAYOUT = "multicontent:layout";
+    private const string MODULESETTING_LAYOUT = "multicontent:layout";
 
 		private const string MODULESETTING_OPENFIRST = "multicontent:openfirst";
 		private const string MODULESETTING_RENDERFLUSH = "multicontent:renderflush";
@@ -38,11 +40,11 @@ namespace Nucleus.Modules.MultiContent.Controllers
 
 		private const string MODULESETTING_INTERVAL = "multicontent:interval";
 
-		public MultiContentController(IWebHostEnvironment webHostEnvironment, Context context, IPageModuleManager pageModuleManager, IContentManager contentManager)
+		public MultiContentController(IOptions<FolderOptions> folderOptions, Context context, IPageModuleManager pageModuleManager, IContentManager contentManager)
 		{
-			this.WebHostEnvironment = webHostEnvironment;
-			this.Context = context;
-			this.PageModuleManager = pageModuleManager;
+      this.Context = context;
+      this.FolderOptions = folderOptions.Value;
+      this.PageModuleManager = pageModuleManager;
 			this.ContentManager = contentManager;
 		}
 
@@ -193,7 +195,7 @@ namespace Nucleus.Modules.MultiContent.Controllers
 			System.IO.DirectoryInfo thisFolder = new System.IO.DirectoryInfo(this.GetType().Assembly.Location);
 
 			viewModel.Layouts = new();
-			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{RoutingConstants.EXTENSIONS_ROUTE_PATH}\\MultiContent\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
+			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.FolderOptions.GetExtensionFolder("MultiContent", false)}/Views/ViewerLayouts/", "*.cshtml").OrderBy(layout => layout))
 			{
 				viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
 			}

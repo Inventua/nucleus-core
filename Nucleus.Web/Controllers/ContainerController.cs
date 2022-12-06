@@ -24,7 +24,7 @@ namespace Nucleus.Web.Controllers
 				{
 					if (this.ContainerContext.Site.DefaultContainerDefinition == null)
 					{
-						containerPath = $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.CONTAINERS_FOLDER}\\{DEFAULT_CONTAINER}";
+						containerPath = $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.CONTAINERS_FOLDER}/{DEFAULT_CONTAINER}";
 					}
 					else
 					{

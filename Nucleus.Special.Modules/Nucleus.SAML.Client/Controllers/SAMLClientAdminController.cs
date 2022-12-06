@@ -20,23 +20,21 @@ namespace Nucleus.SAML.Client.Controllers
 	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 	public class SAMLClientAdminController : Controller
 	{
-
-		private IWebHostEnvironment WebHostEnvironment { get; }
-
 		private Context Context { get; }
+    private FolderOptions FolderOptions { get; }
 
-		private ISiteManager SiteManager { get; }
+    private ISiteManager SiteManager { get; }
 
 		private IPageModuleManager PageModuleManager { get; }
 
 		private IOptions<Models.Configuration.SAMLProviders> Options { get; }
 
 
-		public SAMLClientAdminController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<Models.Configuration.SAMLProviders> options)
+		public SAMLClientAdminController(Context Context, IOptions<FolderOptions> folderOptions, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<Models.Configuration.SAMLProviders> options)
 		{
-			this.WebHostEnvironment = webHostEnvironment;
 			this.Context = Context;
-			this.SiteManager = siteManager;
+      this.FolderOptions = folderOptions.Value;
+      this.SiteManager = siteManager;
 			this.PageModuleManager = pageModuleManager;
 			this.Options = options;
 		}
@@ -117,7 +115,7 @@ namespace Nucleus.SAML.Client.Controllers
 			viewModel.ReadSettings(this.Context.Module);
 
 			viewModel.Layouts = new();
-			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\SAML Client\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
+			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.FolderOptions.GetExtensionFolder("SAML Client", false)}/Views/ViewerLayouts/", "*.cshtml").OrderBy(layout => layout))
 			{
 				viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
 			}

@@ -42,7 +42,7 @@ namespace Nucleus.Extensions
 			{
 				if (site.DefaultLayoutDefinition == null)
 				{
-					return $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.LAYOUTS_FOLDER}\\{Nucleus.Abstractions.Managers.ILayoutManager.DEFAULT_LAYOUT}";
+					return $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.LAYOUTS_FOLDER}/{Nucleus.Abstractions.Managers.ILayoutManager.DEFAULT_LAYOUT}";
 				}
 				else
 				{

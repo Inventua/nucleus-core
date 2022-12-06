@@ -73,7 +73,7 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 			else
 			{
-				return System.IO.Path.Combine(this.Options.RootPath, path);
+				return Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(System.IO.Path.Combine(this.Options.RootPath, path));
 			}
 		}
 
@@ -85,8 +85,10 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 			else
 			{
-				string relativePath = path.Replace(this.Options.RootPath, "").Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
-				if (relativePath.StartsWith(System.IO.Path.AltDirectorySeparatorChar))
+        //string relativePath = path.Replace(this.Options.RootPath, "").Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar);
+        string relativePath = Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(path).Replace(this.Options.RootPath, "");
+        
+        if (relativePath.StartsWith('/'))
 				{
 					if (relativePath.Length > 1)
 					{

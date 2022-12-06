@@ -19,9 +19,9 @@ namespace Nucleus.OAuth.Client.Controllers
 	[Extension("OAuthClient")]
 	public class OAuthClientAdminController : Controller
 	{
-		private IWebHostEnvironment WebHostEnvironment { get; }
+    private FolderOptions FolderOptions { get; }
 
-		private Context Context { get; }
+    private Context Context { get; }
 		
 		private ISiteManager SiteManager { get; }
 
@@ -30,11 +30,11 @@ namespace Nucleus.OAuth.Client.Controllers
 		private IOptions<Models.Configuration.OAuthProviders> Options { get; }
 
 
-		public OAuthClientAdminController(IWebHostEnvironment webHostEnvironment, Context Context, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<Models.Configuration.OAuthProviders> options)
+		public OAuthClientAdminController(Context Context, IOptions<FolderOptions> folderOptions, ISiteManager siteManager, IPageModuleManager pageModuleManager, IOptions<Models.Configuration.OAuthProviders> options)
 		{
-			this.WebHostEnvironment = webHostEnvironment;
 			this.Context = Context;
-			this.SiteManager = siteManager;
+      this.FolderOptions = folderOptions.Value;
+      this.SiteManager = siteManager;
 			this.PageModuleManager = pageModuleManager;
 			this.Options = options;
 		}
@@ -120,7 +120,7 @@ namespace Nucleus.OAuth.Client.Controllers
 			viewModel.ReadSettings(this.Context.Module);
 
 			viewModel.Layouts = new();
-			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\OAuth Client\\Views\\ViewerLayouts\\", "*.cshtml").OrderBy(layout => layout))
+			foreach (string file in System.IO.Directory.EnumerateFiles($"{this.FolderOptions.GetExtensionFolder("OAuth Client", false)}/Views/ViewerLayouts/", "*.cshtml").OrderBy(layout => layout))
 			{
 				viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));
 			}

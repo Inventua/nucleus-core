@@ -13,6 +13,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Extensions;
 using Nucleus.Modules.Publish.Models;
+using Nucleus.Abstractions.Models.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Nucleus.Modules.Publish.Controllers
 {
@@ -25,19 +27,19 @@ namespace Nucleus.Modules.Publish.Controllers
 		private ArticlesManager ArticlesManager { get; }
 		private IListManager ListManager { get; }
 		private IFileSystemManager FileSystemManager { get; }
-		private IWebHostEnvironment WebHostEnvironment { get; }
+    private FolderOptions FolderOptions { get; }
     private string ViewerLayoutFolder { get; }
 		    
-    public AdminController(IWebHostEnvironment webHostEnvironment, Context Context, IPageModuleManager pageModuleManager, ArticlesManager articlesManager, IListManager listManager, IFileSystemManager fileSystemManager)
-		{
-			this.WebHostEnvironment = webHostEnvironment;
+    public AdminController(Context Context, IOptions<FolderOptions> folderOptions, IPageModuleManager pageModuleManager, ArticlesManager articlesManager, IListManager listManager, IFileSystemManager fileSystemManager)
+		{			
 			this.Context = Context;
-			this.PageModuleManager = pageModuleManager;
+      this.FolderOptions = folderOptions.Value;
+      this.PageModuleManager = pageModuleManager;
 			this.ArticlesManager = articlesManager;
 			this.ListManager = listManager;
 			this.FileSystemManager = fileSystemManager;
     
-			this.ViewerLayoutFolder = $"{webHostEnvironment.ContentRootPath}\\{Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER}\\Publish\\Views\\ViewerLayouts\\";
+			this.ViewerLayoutFolder = $"{this.FolderOptions.GetExtensionFolder("Publish", false)}/Views/ViewerLayouts/";
     }
 
     public async Task<ActionResult> Settings()

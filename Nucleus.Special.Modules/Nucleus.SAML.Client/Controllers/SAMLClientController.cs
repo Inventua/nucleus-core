@@ -46,8 +46,9 @@ namespace Nucleus.SAML.Client.Controllers
 	[Extension("SAMLClient")]
 	public class SAMLClientController : Controller
 	{
-		private IWebHostEnvironment WebHostEnvironment { get; }
-		private IHttpClientFactory HttpClientFactory { get; }
+    private IWebHostEnvironment WebHostEnvironment { get; }
+    private FolderOptions FolderOptions { get; }
+    private IHttpClientFactory HttpClientFactory { get; }
 		private IUrlHelperFactory UrlHelperFactory { get; }
 		private Context Context { get; }
 
@@ -61,11 +62,12 @@ namespace Nucleus.SAML.Client.Controllers
 
 		const string relayStateReturnUrl = "ReturnUrl";
 
-		public SAMLClientController(IWebHostEnvironment webHostEnvironment, IHttpClientFactory httpClientFactory, IUrlHelperFactory urlHelperFactory, Context Context, ISessionManager sessionManager, IUserManager userManager, IRoleManager roleManager, IOptions<Models.Configuration.SAMLProviders> options, ILogger<SAMLClientController> logger)
+		public SAMLClientController(IWebHostEnvironment webHostEnvironment, IHttpClientFactory httpClientFactory, IOptions<FolderOptions> folderOptions, IUrlHelperFactory urlHelperFactory, Context Context, ISessionManager sessionManager, IUserManager userManager, IRoleManager roleManager, IOptions<Models.Configuration.SAMLProviders> options, ILogger<SAMLClientController> logger)
 		{
-			this.WebHostEnvironment = webHostEnvironment;
+      this.WebHostEnvironment = webHostEnvironment;
 			this.HttpClientFactory = httpClientFactory;
-			this.UrlHelperFactory = urlHelperFactory;
+      this.FolderOptions = folderOptions.Value; 
+      this.UrlHelperFactory = urlHelperFactory;
 			this.Context = Context;
 			this.SessionManager = sessionManager;
 			this.UserManager = userManager;
@@ -909,11 +911,11 @@ namespace Nucleus.SAML.Client.Controllers
 
 			viewModel.ReadSettings(this.Context.Module);
 
-			string layoutPath = $"ViewerLayouts\\{viewModel.Layout}.cshtml";
+			string layoutPath = $"ViewerLayouts/{viewModel.Layout}.cshtml";
 
-			if (!System.IO.File.Exists($"{this.WebHostEnvironment.ContentRootPath}\\{FolderOptions.EXTENSIONS_FOLDER}\\SAML Client\\Views\\{layoutPath}"))
+			if (!System.IO.File.Exists($"{this.FolderOptions.GetExtensionFolder("SAML Client", false)}/Views/{layoutPath}"))
 			{
-				layoutPath = $"ViewerLayouts\\List.cshtml";
+				layoutPath = $"ViewerLayouts/List.cshtml";
 			}
 
 			viewModel.Layout = layoutPath;

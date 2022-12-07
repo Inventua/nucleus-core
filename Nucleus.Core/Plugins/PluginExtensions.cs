@@ -33,11 +33,44 @@ namespace Nucleus.Core.Plugins
 
 			builder.Services.Configure<RazorViewEngineOptions>(options =>
 			{
-				options.ViewLocationExpanders.Add(new ExtensionViewLocationExpander());				
+				options.ViewLocationExpanders.Add(new ExtensionViewLocationExpander());		
 			});
 
-			return builder;
+      ConfigureRazorRuntimeCompilation(builder);
+
+      return builder;
 		}
+
+    /// <summary>
+    /// Add all assemblies in sub-folders of /Extensions as "additional reference paths" for Razor runtime complication.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// Razor runtime compilation won't use types from assemblies which aren't the assembly containing the controller class 
+    /// unless it is specifically informed to do so.  This function adds all assemblies in /Extensions/[name]/bin/** as 
+    /// additional reference paths.
+    /// </remarks>
+    private static IMvcBuilder ConfigureRazorRuntimeCompilation(this IMvcBuilder builder)
+    {
+      builder.Services.Configure<Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation.MvcRazorRuntimeCompilationOptions>(options =>
+      { 
+        string extensionsFolder = Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic(false);
+
+        foreach (Assembly assembly in AssemblyLoader.ListAssemblies())
+        {
+          string assemblyPath = Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(assembly.Location);
+          if (assemblyPath.StartsWith(extensionsFolder, StringComparison.OrdinalIgnoreCase) )
+          {
+            builder.Logger().LogInformation("Adding Razor runtime compliation additional reference path '{path}'.", assemblyPath);
+            // Note:  AdditionalReferencePaths expects the file name of an assembly, not a directory name.
+            options.AdditionalReferencePaths.Add(assemblyPath);
+          }
+        }
+      });
+
+      return builder;
+    }
 
 		/// <summary>
 		/// Iterate through assemblies in /bin and /modules/**, add assemblies which contain Controller classes to Part Manager so that DI/MVC 

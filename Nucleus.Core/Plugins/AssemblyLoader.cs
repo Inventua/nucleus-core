@@ -26,7 +26,9 @@ namespace Nucleus.Core.Plugins
 		private static System.Collections.Concurrent.ConcurrentDictionary<string, AssemblyLoadContext> ExtensionLoadContexts { get; } = new(StringComparer.OrdinalIgnoreCase);
 		private static System.Collections.Concurrent.ConcurrentDictionary<string, AssemblyLoadContext> TypeContextCache { get; } = new(StringComparer.OrdinalIgnoreCase);
 
-		private static Boolean isResolvingEventHooked = false;
+    private static List<Assembly> LoadedAssemblies { get; set; }
+
+    private static Boolean isResolvingEventHooked = false;
 
 		/// <summary>
 		/// Load an assembly into the appropriate AssemblyLoadContext. 
@@ -260,6 +262,7 @@ namespace Nucleus.Core.Plugins
 		/// </remarks>
 		public static void UnloadAll()
 		{
+      LoadedAssemblies.Clear();
 			TypeContextCache.Clear();
 
 			string extensionsFolder = Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic(false);
@@ -373,7 +376,7 @@ namespace Nucleus.Core.Plugins
 		/// </remarks>
 		internal static IEnumerable<Assembly> GetAssembliesImplementing<T>(ILogger logger)
 		{
-			foreach (Assembly assembly in LoadAssemblies())
+			foreach (Assembly assembly in ListAssemblies())
 			{
 				Type type;
 
@@ -409,7 +412,7 @@ namespace Nucleus.Core.Plugins
 		/// </remarks>
 		public static IEnumerable<Type> GetTypes<T>()
 		{
-			foreach (Assembly assembly in LoadAssemblies())
+			foreach (Assembly assembly in ListAssemblies())
 			{
 				if (assembly != null)
 				{
@@ -434,6 +437,23 @@ namespace Nucleus.Core.Plugins
 			}
 		}
 
+    /// <summary>
+		/// List assemblies in /bin and in extension folders.
+		/// </summary>
+		/// <returns></returns>
+		/// <remarks>
+		/// A side effect of this function is a call to LoadAssemblies().  This loads assemblies into their AssemblyLoadContexts.  When 
+    /// LoadAssemblies() is called, the result is cached in _loadedAssemblies to improve startup performance.
+		/// </remarks>
+    internal static IEnumerable<Assembly> ListAssemblies()
+    {
+      if (LoadedAssemblies == null)
+      {
+        LoadedAssemblies = LoadAssemblies();
+      }
+      return LoadedAssemblies;
+    }
+
 		/// <summary>
 		/// Load assemblies in /bin and in extension folders into their assembly load contexts.
 		/// </summary>
@@ -442,7 +462,7 @@ namespace Nucleus.Core.Plugins
 		/// For assemblies located in an extension folder, the assembly is loaded into an AssemblyLoadContext for the extension.  For 
 		/// assemblies which are located elsewhere, the Default AssemblyLoadContext is used.
 		/// </remarks>
-		private static IEnumerable<Assembly> LoadAssemblies()
+		private static List<Assembly> LoadAssemblies()
 		{
 			List<Assembly> assemblies = new List<Assembly>();
 

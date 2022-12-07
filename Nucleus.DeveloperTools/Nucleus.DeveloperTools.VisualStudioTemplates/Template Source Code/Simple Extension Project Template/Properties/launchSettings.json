@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Nucleus": {
+      "commandName": "Executable",
+      "executablePath": "%NUCLEUS_PATH%/Nucleus.Web.exe",
+      "workingDirectory": "%NUCLEUS_PATH%",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

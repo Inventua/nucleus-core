@@ -21,7 +21,10 @@
 		<Project TargetFileName="Nucleus.Modules.Project.csproj" File="Nucleus.Modules.Project.csproj" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" TargetFileName="Package.xml">Package.xml</ProjectItem>
 			<ProjectItem ReplaceParameters="true" TargetFileName="readme.txt">readme.txt</ProjectItem>			
-    </Project>	
+      <Folder Name="Properties" TargetFolderName="Properties">
+        <ProjectItem TargetFileName="launchSettings.json">launchSettings.json</ProjectItem>
+      </Folder>
+    </Project>
   </TemplateContent>
 	
 	<WizardExtension>

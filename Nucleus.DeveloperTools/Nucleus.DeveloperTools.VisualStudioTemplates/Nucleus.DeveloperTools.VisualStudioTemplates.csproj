@@ -63,6 +63,8 @@
     <CopyVsixExtensionFiles>False</CopyVsixExtensionFiles>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="Template Source Code\Complex Extension Project Template\Properties\launchSettings.json" />
+    <None Include="Template Source Code\Empty Extension Project Template\Properties\launchSettings.json" />
     <None Include="Template Source Code\Simple Extension Project Template\Models\Settings.cs" />
     <None Include="Template Source Code\Complex Extension Project Template\Models\Settings.cs" />
     <None Include="Template Source Code\Simple Extension Project Template\Controllers\Admin.cs" />
@@ -93,6 +95,7 @@
     <None Include="Template Source Code\Empty Extension Project Template\Nucleus.Modules.Project.csproj" />
     <None Include="Template Source Code\Simple Extension Project Template\package.xml" />
     <None Include="Template Source Code\Simple Extension Project Template\Project.vstemplate" />
+    <None Include="Template Source Code\Simple Extension Project Template\Properties\launchSettings.json" />
     <None Include="Template Source Code\Simple Extension Project Template\readme.txt" />
     <None Include="Template Source Code\Simple Extension Project Template\settings.css" />
     <None Include="Template Source Code\Simple Extension Project Template\viewer.css" />
@@ -172,13 +175,10 @@
       <DependentUpon>ProjectWizardForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-
-	<PropertyGroup Label="Normalize Nucleus Environment Variables">
-		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
-		<NUCLEUS_PUBLISH_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PUBLISH_PATH)'))</NUCLEUS_PUBLISH_PATH>
-	</PropertyGroup>
-
-
+  <PropertyGroup Label="Normalize Nucleus Environment Variables">
+    <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+    <NUCLEUS_PUBLISH_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PUBLISH_PATH)'))</NUCLEUS_PUBLISH_PATH>
+  </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="templates.build.targets" />

@@ -19,6 +19,9 @@
   </TemplateData>
   <TemplateContent>
 		<Project TargetFileName="Nucleus.Modules.Project.csproj" File="Nucleus.Modules.Project.csproj" ReplaceParameters="true">
+      <Folder Name="Properties" TargetFolderName="Properties">
+        <ProjectItem TargetFileName="launchSettings.json">launchSettings.json</ProjectItem>
+      </Folder>
       <Folder Name="Controllers" TargetFolderName="Controllers">
         <ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$Controller.cs">Controller.cs</ProjectItem>
 				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$AdminController.cs">Admin.cs</ProjectItem>

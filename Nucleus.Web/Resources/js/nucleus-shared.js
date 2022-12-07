@@ -362,8 +362,8 @@ function _Page()
 	}
 
 	function _getTarget(eventTarget, targetSelector)
-	{
-		var originalSelector = targetSelector;
+  {
+    var originalSelector = targetSelector;
 
 		if (originalSelector === 'window') return jQuery(window);
 		if (originalSelector === 'document') return jQuery(document);
@@ -460,6 +460,11 @@ function _Page()
 			}
 		}
 
+    if (typeof targetSelector === 'undefined')
+    {
+      return;
+    }
+
 		target = _getTarget(eventTarget, targetSelector);
 
 		// reset validation error highlighting
@@ -468,7 +473,7 @@ function _Page()
 		if (targetSelector === 'window')
 		{
 			return;
-		}
+    }
 
 		event.preventDefault();
 		event.stopImmediatePropagation();

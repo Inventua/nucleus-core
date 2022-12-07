@@ -3,6 +3,7 @@
     "Nucleus": {
       "commandName": "Executable",
       "executablePath": "%NUCLEUS_PATH%/Nucleus.Web.exe",
+      "commandLineArgs": "--launchurl http://localhost:5000",
       "workingDirectory": "%NUCLEUS_PATH%",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

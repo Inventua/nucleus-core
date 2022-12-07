@@ -214,9 +214,12 @@ namespace Nucleus.Core.Layout
 			// non-blank data-target attribute so that the click event is bound to _postPartialContent.  
 			// The value that we are using - "#refresh" - doesn't have any special meaning or code to process it in nucleus-shared.js.
 			formBuilder.Attributes.Add("data-target", "#refresh");
-						
-			// users with module edit permissions can edit module settings and common settings
-			formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe3c9;", "Edit Content/Settings", urlHelper.Content("~/Admin/Pages/EditModule"), null));
+
+      // users with module edit permissions can edit module settings and common settings
+      if (moduleInfo.ModuleDefinition.EditAction != null && moduleInfo.ModuleDefinition.SettingsController != null)
+      {
+        formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe3c9;", "Edit Content/Settings", urlHelper.Content("~/Admin/Pages/EditModule"), null));
+      }
 			formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe8b8;", "Layout and Permissions Settings", urlHelper.Content("~/Admin/Pages/EditModuleCommonSettings"), null));
 
 			// only render the delete control if the user has page-edit permissions
@@ -237,7 +240,7 @@ namespace Nucleus.Core.Layout
 		/// <returns></returns>
 		public async Task<IHtmlContent> RenderModuleEditor(IHtmlHelper htmlHelper, PageModule moduleInfo, Boolean renderContainer)
 		{
-			if (HasEditPermission(moduleInfo, this.Context.Site, htmlHelper.ViewContext.HttpContext.User))
+			if (moduleInfo.ModuleDefinition.EditAction != null && HasEditPermission(moduleInfo, this.Context.Site, htmlHelper.ViewContext.HttpContext.User))
 			{
 				HttpResponse moduleOutput = await BuildModuleOutput(htmlHelper, moduleInfo, String.IsNullOrEmpty(moduleInfo.ModuleDefinition.SettingsController) ? moduleInfo.ModuleDefinition.ViewController : moduleInfo.ModuleDefinition.SettingsController, moduleInfo.ModuleDefinition.EditAction, renderContainer);
 
@@ -389,7 +392,7 @@ namespace Nucleus.Core.Layout
 		private Boolean IsMatch(ControllerActionDescriptor actionDescriptor, string action, string controller, string extension)
 		{
 			return
-				actionDescriptor.ControllerName.Equals(controller) &&
+				(actionDescriptor.ControllerName.Equals(controller) || (actionDescriptor.ControllerName + "Controller").Equals(controller)) &&
 				actionDescriptor.ActionName.Equals(action) &&
 				actionDescriptor.RouteValues.ContainsKey("extension") &&
 				actionDescriptor.RouteValues["extension"] != null &&

@@ -11,6 +11,8 @@ using Microsoft.Extensions.Options;
 using System.IO;
 using Nucleus.Core.Plugins;
 using Nucleus.Core.Logging;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Org.BouncyCastle.Tls;
 
 namespace Nucleus.Web
 {
@@ -77,12 +79,56 @@ namespace Nucleus.Web
 					.ConfigureAppConfiguration(Startup.ConfigureAppConfiguration)
 					.Build();
 
+        LaunchBrowser(args);
+
 				// Disabled file system watcher, because Assembly load contexts are not unloading properly.  This disables the restart loop because doRestart 
 				// won't get set to true (which otherwise happens in FileChanged()).
 				// WatchFileChanges(WebHost.Services.GetService<IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions>>().Value.GetExtensionsFolder());
 				WebHost.Run();				
 			}
 		}
+
+    public static void LaunchBrowser(string[] args)
+    {
+      Boolean doLaunchUrl = false;
+      string launchUrl = null;
+
+      for (int argIndex = 0; argIndex < args.Length; argIndex++)
+      {
+        string arg = args[argIndex];
+        switch (arg)
+        {
+          case "--launchurl":
+            doLaunchUrl = true;
+            if (args.Length >= argIndex + 1)
+            {
+              launchUrl = args[argIndex + 1];
+            }
+            break;
+        }
+      }
+
+      if (doLaunchUrl)
+      {
+        if (!String.IsNullOrEmpty(launchUrl))
+        {
+          try
+          { 
+            System.Diagnostics.Process.Start
+            (
+              new System.Diagnostics.ProcessStartInfo(launchUrl)
+              {
+                UseShellExecute = true
+              }
+            );
+          }
+          catch (Exception ex)
+          {
+            WebHost?.Logger().LogInformation("Failed to launch '{url}': {message}.", launchUrl, ex.Message);
+          } 
+        }
+      }
+    }
 
 		/// <summary>
 		/// Initialize the application.

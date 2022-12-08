@@ -13,7 +13,7 @@
 	{
 		if (item is String)
 		{
-			@Html.Raw(item as String)
+			@item
 		}
 		else if (item is Nucleus.XmlDocumentation.Models.Serialization.See)
 		{

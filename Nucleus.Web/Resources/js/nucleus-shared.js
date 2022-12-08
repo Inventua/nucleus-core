@@ -957,7 +957,20 @@ function _Page()
 	}
 
 	function _postRender(target, source, data, status, request)
-	{
+  {
+    // remove any progress indicators
+    if (typeof source !== 'undefined' && source !== null && source.hasClass('nucleus-show-progress'))
+    {
+      if (source.hasClass('nucleus-show-progress-before') || source.hasClass('nucleus-show-progress-after'))
+      {
+        source.siblings('.nucleus-progress-spinner').remove();
+      }
+      else
+      {
+        source('.nucleus-progress-spinner').remove();
+      }      
+    }
+
 		if (!target.is(':visible') && data !== '')
 		{
 			target.show();

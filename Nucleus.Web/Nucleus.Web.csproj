@@ -37,6 +37,7 @@
 		<Content Remove="Extensions\**" />
 		<Content Remove="logs\**" />
 		<Content Remove="publish\**" />
+		<Content Remove="appSettings.Linux.json" />
 		<Content Remove="bundleconfig.json" />
 		<Content Remove="iis-dev\**\*" />
 		<Content Remove="iis-dev\web.config" />
@@ -85,7 +86,8 @@
 	  <None Remove="Shared\Controls\Views\PagingControl.css" />
 	  <None Remove="Shared\Controls\Views\PagingControl.min.css" />
 	  <None Remove="Shared\Layouts\default.css" />
-	  <None Remove="Utils\ubuntu\setup.sh" />
+	  <None Remove="Utils\Ubuntu\nucleus.service" />
+	  <None Remove="Utils\Ubuntu\setup.sh" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -143,7 +145,10 @@
 	  <Content Include="Shared\Layouts\default.css">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
-	  <Content Include="Utils\ubuntu\setup.sh" />
+	  <Content Include="Utils\Ubuntu\nucleus.service">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Utils\Ubuntu\setup.sh" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -151,6 +156,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Include="appSettings.Linux.json">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </None>
 	  <None Include="bundleconfig.json" />
 	  <None Include="iis-dev\**\*" />
 	  <_ContentIncludedByDefault Remove="appSettings.linux.json" />

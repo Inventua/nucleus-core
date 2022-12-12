@@ -12,6 +12,9 @@ User=nucleus-service
 WorkingDirectory=/home/nucleus/app
 ExecStart=/usr/share/dotnet/dotnet Nucleus.Web.dll
 #KillSignal=SIGINT 
+TimeoutStartSec=180
+TimeoutStopSec=180
+
 
 [Install]
 WantedBy=multi-user.target

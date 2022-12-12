@@ -28,9 +28,6 @@ namespace Nucleus.Core.Layout
 		/// <param name="context"></param>
 		/// <param name="next"></param>
 		/// <returns></returns>
-		/// <remarks>
-		/// We need to set both nocache and nostore, otherwise the 
-		/// </remarks>
 		public async Task InvokeAsync(HttpContext context, RequestDelegate next)
 		{
 			context.Response.GetTypedHeaders().CacheControl =

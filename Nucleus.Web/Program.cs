@@ -103,6 +103,11 @@ namespace Nucleus.Web
             if (args.Length >= argIndex + 1)
             {
               launchUrl = args[argIndex + 1];
+              argIndex++;
+            }
+            else
+            {
+              WebHost?.Logger().LogError("Invalid launch args: --launchurl does not have an url specified.");
             }
             break;
         }

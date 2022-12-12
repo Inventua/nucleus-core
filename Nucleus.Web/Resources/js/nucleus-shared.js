@@ -13,6 +13,8 @@ function _Page()
 	this.Dialog = _dialog;
 	this.EnableEnhancedToolTips = _enableEnhancedToolTips;
 
+  this._progressTimeoutId = -1;
+
 	// Attach Nucleus-standard event handlers when document is ready
 	jQuery(document).ready(function ()
 	{
@@ -663,8 +665,8 @@ function _Page()
 		}
 
 		if (triggerControl != null && triggerControl.hasClass('nucleus-show-progress'))
-		{
-			window.setTimeout(() =>
+    {
+      _progressTimeoutId = window.setTimeout(() =>
 			{
 				var progress = jQuery('<div class="spinner-border spinner-border-sm text-primary nucleus-progress-spinner ms-2" role="status"/>');
 
@@ -959,6 +961,12 @@ function _Page()
 	function _postRender(target, source, data, status, request)
   {
     // remove any progress indicators
+    if (_progressTimeoutId >= 0)
+    {
+      window.clearTimeout(_progressTimeoutId);
+      _progressTimeoutId = -1;
+    }
+
     if (typeof source !== 'undefined' && source !== null && source.hasClass('nucleus-show-progress'))
     {
       if (source.hasClass('nucleus-show-progress-before') || source.hasClass('nucleus-show-progress-after'))

@@ -9,6 +9,7 @@ using System.IO;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Abstractions;
+using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Core.Plugins
 {
@@ -36,7 +37,7 @@ namespace Nucleus.Core.Plugins
 						// controller is in an [area], return /Extensions/[extension]/Areas/[area]/[controller]/Views/[view].cshtml
 						return new List<string>()
 						{
-							$"/{Abstractions.RoutingConstants.EXTENSIONS_ROUTE_PATH}/{extensionFolder}/Areas/{actionContext.RouteData.Values["area"]}/Views/{{1}}/{{0}}.cshtml"
+              $"/{FolderOptions.GetExtensionFolderStatic(extensionFolder, false)}/Areas/{actionContext.RouteData.Values["area"]}/Views/{{1}}/{{0}}.cshtml"
 						};
 					}
 					else
@@ -44,8 +45,8 @@ namespace Nucleus.Core.Plugins
 						// controller is not in an [area], return /Extensions/[extension]/Views/[view].cshtml
 						return new List<string>()
 						{
-							$"/{Abstractions.RoutingConstants.EXTENSIONS_ROUTE_PATH}/{extensionFolder}/Views/{{0}}.cshtml",
-							$"/{Abstractions.RoutingConstants.EXTENSIONS_ROUTE_PATH}/{extensionFolder}/Pages/{{0}}.cshtml"
+							$"/{FolderOptions.GetExtensionFolderStatic(extensionFolder, false)}/Views/{{0}}.cshtml",
+							$"/{FolderOptions.GetExtensionFolderStatic(extensionFolder, false)}/Pages/{{0}}.cshtml"
 						};
 					}
 				}

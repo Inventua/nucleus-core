@@ -77,7 +77,10 @@ namespace Nucleus.Web
 				WebHost = CreateHostBuilder(args)
 					.UseContentRoot(Directory.GetCurrentDirectory())
 					.ConfigureAppConfiguration(Startup.ConfigureAppConfiguration)
-					.Build();
+          // this does nothing in Windows but in Linux it makes systemd aware when the application has started/is stopping, and configures logs
+          // to be sent in a way that journald (the logging system of systemd) understands log priorities.
+          .UseSystemd() 
+          .Build();
 
         LaunchBrowser(args);
 

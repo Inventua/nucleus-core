@@ -21,6 +21,7 @@
       <file name="license.txt" />
       <file name="viewer.css" />
       <file name="settings.css" />
+      <file name="viewer.js" />
       <folder name="Bin">
         <file name="Nucleus.Modules.StaticContent.dll" />
         <file name="HtmlAgilityPack.dll" />

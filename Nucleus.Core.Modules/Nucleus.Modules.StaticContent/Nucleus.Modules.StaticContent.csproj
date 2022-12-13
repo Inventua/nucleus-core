@@ -25,6 +25,7 @@
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="settings.css" />
+    <None Remove="viewer.js" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
   </ItemGroup>
@@ -35,6 +36,7 @@
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
     <Content Include="settings.css" />
+    <Content Include="viewer.js" />
     <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />
   </ItemGroup>

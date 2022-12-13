@@ -1154,14 +1154,27 @@ function _Page()
 		return match ? match[1] : null;
 	}
 
-	function _attachCopyButton(selector, childselector)
-	{
+	function _attachCopyButton(selector, childselector, isBlockElement)
+  {
+    if (typeof isBlockElement === 'undefined' || isBlockElement === null)
+    {
+      isBlockElement = false;
+    }
+
 		// Create copy buttons for selected elements
 		jQuery(selector).each(function (index, element) 
 		{
-			var copyButton = jQuery('<button class="nucleus-copy-button nucleus-material-icon btn btn-none d-block ms-auto mb-1 fs-small" type="button" title="Copy to Clipboard">&#xe14d;</button>');
+      var copyButton;
+      if (isBlockElement)
+      {
+        copyButton = jQuery('<button class="nucleus-copy-button nucleus-material-icon btn btn-none d-block ms-auto mb-1 fs-small" type="button" title="Copy to Clipboard">&#xe14d;</button>');
+      }
+      else
+      {
+        copyButton = jQuery('<button class="nucleus-copy-button nucleus-material-icon btn btn-none ms-1 fs-small" type="button" title="Copy to Clipboard">&#xe14d;</button>');
+      }
 
-			if (typeof (childselector) !== 'undefined')
+      if (typeof childselector !== 'undefined' && childselector !== null)
 			{
 				if (jQuery(element).find(childselector).length > 0)
 				{
@@ -1184,8 +1197,14 @@ function _Page()
 				return false;
 			});
 
-			copyButton.insertBefore(jQuery(element));
-
+      if (isBlockElement)
+      {
+        copyButton.insertBefore(jQuery(element));
+      }
+      else
+      {
+        copyButton.insertAfter(jQuery(element));
+      }
 		});
 
 	}
@@ -1198,12 +1217,12 @@ function _Page()
 		jQuery("body").append(temp);
 		if (jQuery(element).is('input, textarea'))
 		{
-			temp.val(jQuery(element).val()).select();
+			temp.val(jQuery(element).val().trim()).select();
 		}
 		else
 		{
-			temp.val(jQuery(element)[0].innerText.replace(/[^\x20-\x7E\x0A\x0D]/g, '')).select();
-		}
+			temp.val(jQuery(element)[0].innerText.replace(/[^\x20-\x7E\x0A\x0D]/g, '').trim()).select();
+    }
 		document.execCommand("copy");
 		temp.remove();
 	}

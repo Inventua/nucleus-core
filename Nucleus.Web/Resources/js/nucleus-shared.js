@@ -666,7 +666,7 @@ function _Page()
 
 		if (triggerControl != null && triggerControl.hasClass('nucleus-show-progress'))
     {
-      _progressTimeoutId = window.setTimeout(() =>
+      this._progressTimeoutId = window.setTimeout(() =>
 			{
 				var progress = jQuery('<div class="spinner-border spinner-border-sm text-primary nucleus-progress-spinner ms-2" role="status"/>');
 
@@ -961,10 +961,10 @@ function _Page()
 	function _postRender(target, source, data, status, request)
   {
     // remove any progress indicators
-    if (_progressTimeoutId >= 0)
+    if (this._progressTimeoutId >= 0)
     {
-      window.clearTimeout(_progressTimeoutId);
-      _progressTimeoutId = -1;
+      window.clearTimeout(this._progressTimeoutId);
+      this._progressTimeoutId = -1;
     }
 
     if (typeof source !== 'undefined' && source !== null && source.hasClass('nucleus-show-progress'))

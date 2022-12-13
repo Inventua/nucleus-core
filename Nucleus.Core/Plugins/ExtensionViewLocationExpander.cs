@@ -29,28 +29,28 @@ namespace Nucleus.Core.Plugins
 				string assemblyLocation = actionContext.ActionDescriptor.ControllerTypeInfo.Assembly.Location;
 				string extensionFolder = AssemblyLoader.GetExtensionFolderName(assemblyLocation);
 
-				if (!String.IsNullOrEmpty(extensionFolder))
-				{
-					// Assembly was loaded from an extension folder, return view paths for that extension
-					if (actionContext.RouteData.Values.ContainsKey("area") && !String.IsNullOrEmpty((string)actionContext.RouteData.Values["area"]))
-					{
-						// controller is in an [area], return /Extensions/[extension]/Areas/[area]/[controller]/Views/[view].cshtml
-						return new List<string>()
-						{
-              $"/{FolderOptions.GetExtensionFolderStatic(extensionFolder, false)}/Areas/{actionContext.RouteData.Values["area"]}/Views/{{1}}/{{0}}.cshtml"
-						};
-					}
-					else
-					{
-						// controller is not in an [area], return /Extensions/[extension]/Views/[view].cshtml
-						return new List<string>()
-						{
-							$"/{FolderOptions.GetExtensionFolderStatic(extensionFolder, false)}/Views/{{0}}.cshtml",
-							$"/{FolderOptions.GetExtensionFolderStatic(extensionFolder, false)}/Pages/{{0}}.cshtml"
-						};
-					}
-				}
-			}
+        if (!String.IsNullOrEmpty(extensionFolder))
+        {
+          // Assembly was loaded from an extension folder, return view paths for that extension
+          if (actionContext.RouteData.Values.ContainsKey("area") && !String.IsNullOrEmpty((string)actionContext.RouteData.Values["area"]))
+          {            
+            // controller is in an [area], return /Extensions/[extension]/Areas/[area]/[controller]/Views/[view].cshtml
+            return new List<string>()
+            {
+              $"/{FolderOptions.EXTENSIONS_FOLDER}/{extensionFolder}/Areas/{actionContext.RouteData.Values["area"]}/Views/{{1}}/{{0}}.cshtml"
+            };
+          }
+          else
+          {
+            // controller is not in an [area], return /Extensions/[extension]/Views/[view].cshtml
+            return new List<string>()
+            {
+              $"/{FolderOptions.EXTENSIONS_FOLDER}/{extensionFolder}/Views/{{0}}.cshtml",
+              $"/{FolderOptions.EXTENSIONS_FOLDER}/{extensionFolder}/Pages/{{0}}.cshtml"
+            };
+          }
+        }
+      }
 
 			return viewLocations;
 		}

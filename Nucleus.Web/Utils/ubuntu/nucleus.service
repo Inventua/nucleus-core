@@ -5,16 +5,18 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=notify
-Restart=always
-RestartSec=1
-Environment=ASPNETCORE_ENVIRONMENT=Production
+
+# use on-success to restart only when Nucleus terminates cleanly (after installing an extension) and not when there is a startup error
+Restart=always  
+
+RestartSec=3
+
+# use Development for a development environment
+Environment=ASPNETCORE_ENVIRONMENT=Production  
+
 User=nucleus-service
 WorkingDirectory=/home/nucleus/app
 ExecStart=/usr/share/dotnet/dotnet Nucleus.Web.dll
-#KillSignal=SIGINT 
-TimeoutStartSec=180
-TimeoutStopSec=180
-
 
 [Install]
 WantedBy=multi-user.target

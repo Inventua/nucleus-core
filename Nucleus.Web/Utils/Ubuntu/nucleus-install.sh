@@ -188,9 +188,7 @@ if [ "$CREATE_DIRECTORIES" == true ]; then
 fi
 
 # Download and install the dotnet runtime 
-if [ ! -f "$DOTNET_INSTALL_FILE" ] ; then
-  wget -O - https://dot.net/v1/dotnet-install.sh | bash -s -- --runtime aspnetcore --install-dir /usr/share/dotnet
-fi
+wget -q -O - https://dot.net/v1/dotnet-install.sh | bash -s -- --runtime aspnetcore --install-dir /usr/share/dotnet
 
 # add dotnet to the path
 echo PATH=\"$PATH:/usr/share/dotnet\" > /etc/environment
@@ -199,7 +197,7 @@ echo PATH=\"$PATH:/usr/share/dotnet\" > /etc/environment
 if ! dpkg-query -W -f='${Status}' "$UNZIP_PACKAGE"|grep "ok installed" > /dev/null ; then
   read -r -p "$UNZIP_PACKAGE not found, nucleus setup requires $UNZIP_PACKAGE to be installed. Continue (Y/n)? " RESPONSE
   if [[ "$RESPONSE" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    apt install $UNZIP_PACKAGE
+    apt install -qq $UNZIP_PACKAGE
     printf "Installed $UNZIP_PACKAGE."
   else
     printf "Nucleus requires $UNZIP_PACKAGE to continue and configure the system. You can manually install $UNZIP_PACKAGE and rerun the setup script to skip this step. \n"
@@ -210,13 +208,15 @@ fi
 # Unzip the nucleus zip file to app path
 unzip -q "$INSTALL_ZIPFILE" -d $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}
 
-# Copy the Ubuntu appSettings.Template.json and rename to appSettings.Production.json
-cp $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Utils/Ubuntu/appSettings.Template.json $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/appSettings.Production.json
+# Copy the Ubuntu appSettings.template to appSettings.Production.json
+if [ ! -f "$APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/appSettings.Production.json" ]; then
+  cp $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Utils/Ubuntu/appSettings.template $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/appSettings.Production.json
+fi
 
-# Set the group ownership of the folders/files unzipped
+# Set the group ownership of the folders/files that we just unzipped
 chown -R :$SERVICE_ACCOUNT $APP_PATH
 
-# Create /Extensions directory and set group ownership 
+# Create /Extensions directory and set group ownership to the nucleus service group
 directory_exists $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Extensions
 if [ "$?" != 0 ]; then
   mkdir $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Extensions
@@ -227,8 +227,10 @@ fi
 # Nucleus must have read, write and execute permissions to /Setup because we create install-log.config to indicate that the setup wizard has completed
 chmod -R g+rxw $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Extensions $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Setup
 
-# Copies the service unit file to system directory and starts the service
-cp $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Utils/Ubuntu/nucleus.service /etc/systemd/system
+# Copy the service unit file to system directory 
+if [ ! -f "/etc/systemd/system/nucleus.service" ]; then
+  cp $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Utils/Ubuntu/nucleus.service /etc/systemd/system
+fi
 
 # Run the service
 systemctl daemon-reload

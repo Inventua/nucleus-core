@@ -1,4 +1,4 @@
-﻿#! /bin/bash
+#! /bin/bash
 
 # Declare the options 
 SHORT_OPTIONS=o:,z:,p:,u:,d:
@@ -12,7 +12,10 @@ CREATE_USER=true
 OUTPUT="verbose"
 SERVICE_ACCOUNT="nucleus-service"  # user/group name for running Nucleus
 DOTNET_INSTALL_FILE="dotnet-install.sh"
-DIRECTORIES=("app" "data") # array of directories for nucleus app
+DIRECTORIES=("app" "data" "certs") # array of directories for nucleus app
+DIRECTORY_APP=0
+DIRECTORY_DATA=1
+DIRECTORY_CERTS=2
 VERSION="1.0.0.0"
 INSTALL_ZIPFILE=""
 UNZIP_PACKAGE="unzip"
@@ -28,9 +31,9 @@ function usage()
 }
 
 # If options are not set, then display the usage message
-if [ "$?" != "0" ]; then
-  usage
-fi
+#if [ "$?" != "0" ]; then
+#  usage
+#fi
 
 eval set -- "$OPTS"
 
@@ -56,7 +59,7 @@ do
   esac
 done
 
-# version compare function 
+# Version compare function 
 function vercomp () {
     if [[ $1 == $2 ]]
     then
@@ -108,12 +111,11 @@ if [ "$INSTALL_ZIPFILE" == "" ]; then
   fi
 fi
 
-# print settings, ask for confirmation 
+# Print settings, ask for confirmation 
 printf "Nucleus installer shell script. \n"
 printf "Your settings are app path: $APP_PATH, zip file: $INSTALL_ZIPFILE. \n"
 printf "This script will also create a service account '$SERVICE_ACCOUNT' (if it does not already exists) used to run the service. \n"
 printf "The dotnet ASPNetCore runtime and the unzip package will also be installed. \n\n"
-# create directories: $CREATE_DIRECTORIES, create user: $CREATE_USER,
 
 read -r -p "Do you want to continue (Y/n)? " INSTALL_RESPONSE
 if [[ ! "$INSTALL_RESPONSE" =~ ^([yY][eE][sS]|[yY])$ ]]; then
@@ -141,34 +143,16 @@ function directory_exists()
   fi
 }
 
-# Directory permissions *** currently not in use ***
-function is_directory_owner()
-{
-  local directory=$1
-  local group="$(stat --format='%G' $directory)"
-  if [ "$group" = "$SERVICE_ACCOUNT" ]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-# Create the user and setup the directory structure and permissions
+# Create the service account
 if [ "$CREATE_USER" == true ]; then
   # check whether we need to create the service account
   user_exists
   if [ "$?" == 0 ]; then
-    echo "$SERVICE_ACCOUNT user already exist."
+    echo "$SERVICE_ACCOUNT user already exists."
     #exit 1
   else
     echo "Creating $SERVICE_ACCOUNT user"
     useradd -r "$SERVICE_ACCOUNT" -d $APP_PATH -c "Service account for Nucleus" 
-    # Prompt password for service account
-    #read -s -p "Type in password:" PASSWORD
-    #ENCRYPTED_PASSWORD=$(openssl passwd -crypt PASSWORD)
-    #useradd -M "$SERVICE_ACCOUNT" -p "$ENCRYPTED_PASSWORD" -d $APP_PATH -c "Service account for Nucleus"
-    #unset PASSWORD
-    #unset ENCRYPTED_PASSWORD
   fi
 else
   user_exists
@@ -178,7 +162,7 @@ else
   fi
 fi
 
-# Create the directories and set the service account to be the group owner
+# Create the directories, set the service account to be the group owner and the folder permissions
 if [ "$CREATE_DIRECTORIES" == true ]; then
   # home directory set by user
   directory_exists $APP_PATH
@@ -194,55 +178,24 @@ if [ "$CREATE_DIRECTORIES" == true ]; then
     # Assign group ownership of app and data folders to service account 
     chown -R :$SERVICE_ACCOUNT $APP_PATH/$folder
   done
+
+  # Grant read, execute but not write for nucleus group to /app
+  chmod -R g+rx-w $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}
+  # Grant read, write and execute for nucleus group to /data
+  chmod -R g+rwx $APP_PATH/${DIRECTORIES[DIRECTORY_DATA]}
+  # Grant read, execute but write for nucleus group to /certs
+  chmod -R g+rx-w $APP_PATH/${DIRECTORIES[DIRECTORY_CERTS]}
 fi
-
-# Make the group account the owner of app and data folders
-#chown -R :nucleus-service $APP_PATH/app
-#chown -R :nucleus-service $APP_PATH/data
-
-# Set the folder permissions
-
-# Grant read, execute but not write for nucleus group to /app
-chmod -R g+rx-w $APP_PATH/${DIRECTORIES[0]}
-# Grant read, write and execute for nucleus group to /data
-chmod -R g+rwx $APP_PATH/${DIRECTORIES[1]}
-
-##wget https://dot.net/v1/dotnet-install.sh | bash -s --runtime aspnetcore --install-dir /usr/share/dotnet
 
 # Download and install the dotnet runtime 
 if [ ! -f "$DOTNET_INSTALL_FILE" ] ; then
   wget -O - https://dot.net/v1/dotnet-install.sh | bash -s -- --runtime aspnetcore --install-dir /usr/share/dotnet
 fi
 
-## download and install aspnetcore-runtime-6.0
-##if [ ! -f "$DOTNET_INSTALL_FILE" ] ; then
-##  #echo "$DOTNET_INSTALL_FILE" exists
-##else
-##  echo "Downloading dotnet-install script."
-##  wget https://dot.net/v1/dotnet-install.sh
-##  #echo "Please download $DOTNET_INSTALL_FILE to install dotnet runtime."
-##  #echo "You can download the script from https://dot.net/v1/dotnet-install.sh"
-##  #exit 1
-##fi
-
-# Set the user/group owner to current admin user and dotnet install script permissions to be executable
-#chown $USER:$USER "$DOTNET_INSTALL_FILE"
-#chmod +x "$DOTNET_INSTALL_FILE"
-
-# Installs the aspnetcore runtime (no SDK)
-#"$DOTNET_INSTALL_FILE" --runtime aspnetcore --install-dir /usr/share/dotnet
-
-#if ! dpkg-query -W -f='${Status}' "dotnet"|grep "ok installed" > /dev/null ; then
-#  printf "Unable to install dotnet. Exiting setup. \n"
-#  exit 1
-#fi
-
 # add dotnet to the path
 echo PATH=\"$PATH:/usr/share/dotnet\" > /etc/environment
 
-
-#https://stackoverflow.com/questions/3231804/in-bash-how-to-add-are-you-sure-y-n-to-any-command-or-alias
-# install unzip if it hasn't been installed
+# Install unzip if it hasn't been installed
 if ! dpkg-query -W -f='${Status}' "$UNZIP_PACKAGE"|grep "ok installed" > /dev/null ; then
   read -r -p "$UNZIP_PACKAGE not found, nucleus setup requires $UNZIP_PACKAGE to be installed. Continue (Y/n)? " RESPONSE
   if [[ "$RESPONSE" =~ ^([yY][eE][sS]|[yY])$ ]]; then
@@ -255,31 +208,27 @@ if ! dpkg-query -W -f='${Status}' "$UNZIP_PACKAGE"|grep "ok installed" > /dev/nu
 fi
 
 # Unzip the nucleus zip file to app path
-unzip "$INSTALL_ZIPFILE" -d $APP_PATH/${DIRECTORIES[0]}
+unzip -q "$INSTALL_ZIPFILE" -d $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}
 
-cp $APP_PATH/${DIRECTORIES[0]}/Utils/Ubuntu/appSettings.Template.json $APP_PATH/${DIRECTORIES[0]}/appSettings.Production.json
+# Copy the Ubuntu appSettings.Template.json and rename to appSettings.Production.json
+cp $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Utils/Ubuntu/appSettings.Template.json $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/appSettings.Production.json
 
 # Set the group ownership of the folders/files unzipped
 chown -R :$SERVICE_ACCOUNT $APP_PATH
 
-# Set read, write and execute permissions for nucleus group on Extensions folder
-directory_exists $APP_PATH/${DIRECTORIES[0]}/Extensions
+# Create /Extensions directory and set group ownership 
+directory_exists $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Extensions
 if [ "$?" != 0 ]; then
-  mkdir $APP_PATH/${DIRECTORIES[0]}/Extensions
-  chown -R :$SERVICE_ACCOUNT $APP_PATH/${DIRECTORIES[0]}/Extensions
+  mkdir $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Extensions
+  chown -R :$SERVICE_ACCOUNT $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Extensions
 fi
 
-chmod -R g+rxw $APP_PATH/${DIRECTORIES[0]}/Extensions $APP_PATH/${DIRECTORIES[0]}/Setup
+# Nucleus must have read, write and execute permissions to /Extensions in order to install Extensions
+# Nucleus must have read, write and execute permissions to /Setup because we create install-log.config to indicate that the setup wizard has completed
+chmod -R g+rxw $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Extensions $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Setup
 
-#make certificate??
-# prompt for common name of server / or command line
-#openssl x509 -noout -fingerprint -sha1 -inform pem -in /usr/local/share/ca-certificates/aspnet/https.crt
-#~/.dotnet/corefx/cryptography/x509stores/my
-
-
-# copies the service unit file to system directory and starts the service
-chmod +x $APP_PATH/${DIRECTORIES[0]}/Utils/Ubuntu/nucleus.service
-cp $APP_PATH/${DIRECTORIES[0]}/Utils/Ubuntu/nucleus.service /etc/systemd/system
+# Copies the service unit file to system directory and starts the service
+cp $APP_PATH/${DIRECTORIES[DIRECTORY_APP]}/Utils/Ubuntu/nucleus.service /etc/systemd/system
 
 # Run the service
 systemctl daemon-reload

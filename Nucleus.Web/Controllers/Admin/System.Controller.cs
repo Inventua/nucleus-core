@@ -15,7 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http.Features;
 using Nucleus.Abstractions.Managers;
-using static Nucleus.Web.ViewModels.Admin.SystemIndex;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -30,11 +30,14 @@ namespace Nucleus.Web.Controllers.Admin
 		private IOptions<DatabaseOptions> DatabaseOptions { get; }
 		private ISessionManager SessionManager { get; }
 		private Context Context { get; }
+    private IWebHostEnvironment HostingEnvironment { get; }
+
     private const string LINUX_OS_INFO_FILE = "/etc/os-release";
 
 
-    public SystemController(Context context, RunningTaskQueue runningTaskQueue, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<Nucleus.Core.Logging.TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager)
+    public SystemController(IWebHostEnvironment hostingEnvironment, Context context, RunningTaskQueue runningTaskQueue, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<Nucleus.Core.Logging.TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager)
 		{
+      this.HostingEnvironment = hostingEnvironment;
 			this.Context = context;
 			this.RunningTaskQueue = runningTaskQueue;
 			this.Logger = logger;
@@ -67,7 +70,8 @@ namespace Nucleus.Web.Controllers.Admin
 				Copyright = this.GetType().Assembly.Copyright(),
 				Version = $"{this.GetType().Assembly.Version()}",
 				Framework = Environment.Version.ToString(),
-				OperatingSystem = Environment.OSVersion.ToString(),
+        EnvironmentName = this.HostingEnvironment.EnvironmentName,
+        OperatingSystem = Environment.OSVersion.ToString(),
 				OperatingSystemUser = $"{Environment.UserDomainName}/{Environment.UserName}",
 				StartTime = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime(),
 				Uptime = FormatUptime(uptime)

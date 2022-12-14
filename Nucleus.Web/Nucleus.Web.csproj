@@ -87,6 +87,7 @@
 	  <None Remove="Shared\Controls\Views\PagingControl.css" />
 	  <None Remove="Shared\Controls\Views\PagingControl.min.css" />
 	  <None Remove="Shared\Layouts\default.css" />
+	  <None Remove="Utils\Ubuntu\appSettings.template" />
 	  <None Remove="Utils\Ubuntu\nucleus-install.sh" />
 	  <None Remove="Utils\Ubuntu\nucleus.service" />
 	</ItemGroup>
@@ -146,6 +147,7 @@
 	  <Content Include="Shared\Layouts\default.css">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
+	  <Content Include="Utils\Ubuntu\appSettings.template" />
 	  <Content Include="Utils\Ubuntu\nucleus.service">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>

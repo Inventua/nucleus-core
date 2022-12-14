@@ -26,7 +26,8 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public DateTime StartTime { get; set; }
 		public string Uptime { get; set; }
-		
+		public string EnvironmentName { get; set; }
+
 		public LogSettingsViewModel LogSettings { get; set; } = new() { HasLoggingConfiguration = true };
 
 		public string Configuration { get; set; }

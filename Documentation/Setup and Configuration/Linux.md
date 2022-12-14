@@ -66,23 +66,23 @@ For a fresh install you will not generally need to specify any command-line opti
 |                                  |                                                             |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | -u, --createuser                 | Use `--createuser false` to prevent the nucleus-service user from being created.  You should only use this option if the user has already been created.  |
-| -d, --createdirectories          | Use `--create directories false` to prevent creation of the /home/nucleus, /home/nucleus/app and /home/nucleus/data directories.  This also prevents the commands which set the correct owner and permissions to directories.   |
-| -z, --zipfile                    | Overide auto-detection of the Nucleus install zip file name and specify the file to use  |
-| -p,  --apppath                   | Override the default application path (/home/nucleus).  If used, in combination with `--createuser true`, the specified directory will be assigned as the user's home directory.    |
+| -d, --createdirectories          | Use `--createdirectories false` to prevent creation of the /home/nucleus, /home/nucleus/app and /home/nucleus/data directories.  This also prevents the commands which set the correct owner and permissions to directories.   |
+| -z, --zipfile                    | Override auto-detection of the Nucleus install zip file name and specify the file to use.  |
+| -t,  --target-directory          | Override the default application path (/home/nucleus).  If used, in combination with `--createuser true`, the specified directory will be assigned as the user's home directory.    |
 
 Example:  
-<kbd>sudo bash ./nucleus-install.sh -zipfile Nucleus.2.0.0.0.Install.zip -apppath /home/services/nucleus-production</kbd>
+<kbd>sudo bash ./nucleus-install.sh --zipfile Nucleus.2.0.0.0.Install.zip --target-directory /home/services/nucleus-production</kbd>
 
 5.  Test your installation.  
 Use a device with a web browser to test your site.  You will need the IP address of your server, or its host name.  By default, 
-Nucleus is configured to use http on port 5001.
+Nucleus is configured to use http on port 5000.
 
 ```
-https://host-name:5000
+http://host-name:5000
 ```
 
 ```
-https://ip-address:5000
+http://ip-address:5000
 ```
 
 You should see the Nucleus setup wizard, which performs file system access checks, prompts you to set your site properties and 
@@ -134,7 +134,7 @@ connections, so you won't need to configure Nucleus for https.
 
 If you are running Nucleus without a reverse proxy, configure https and certificate settings with:
 
-<kbd>sudo nano /home/nucleus/appSettings.Production.json</kbd>
+<kbd>sudo nano /home/nucleus/app/appSettings.Production.json</kbd>
 
 Add or un-comment the following setting in Kestrel:Endpoints section.  In the default Linux settings template, the section is already 
 present (commented out), so you can just un-comment the section and fill in the password:

@@ -147,7 +147,9 @@
 	  <Content Include="Shared\Layouts\default.css">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
-	  <Content Include="Utils\Ubuntu\appSettings.template" />
+	  <Content Include="Utils\Ubuntu\appSettings.template">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	  <Content Include="Utils\Ubuntu\nucleus.service">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>

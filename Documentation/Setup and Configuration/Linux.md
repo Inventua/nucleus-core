@@ -20,6 +20,8 @@ Choose Ubuntu Server 20.04 LTS or later when you are prompted for an Image.
 Choose Ubuntu Server 20.04 LTS or later when you are prompted for a Blueprint.
 - [Use the Ubuntu docker image](https://hub.docker.com/_/ubuntu) to run Ubuntu in [Docker](https://www.docker.com/). 
 
+
+
 ## Nucleus Installation
 1.  Connect to a terminal session.  
 Once you have installed Linux, log in as an admin user.  If you are using a PC or Raspberry Pi, you will need to connect a 
@@ -44,8 +46,16 @@ If you are installing a later version of Nucleus, download the zip file for that
 most recent version.
 
 4.  Run the shell script:  
+**_TIP:_**   If you are installing to a Linux distribution other than Ubuntu Linux, some parts of the shell script may not work, because
+different Linux distributions use different commands to install packages.  You can work around this issue by installing the ASP.NET runtime and 
+unzip packages before running the script:  
+- [Install the ASP.NET runtime](https://learn.microsoft.com/en-us/dotnet/core/install/linux) 
+- [Install the unzip package](https://www.tecmint.com/install-zip-and-unzip-in-linux/)
+<br />
+<br />
 <kbd>sudo bash ./nucleus-install.sh</kbd>
-
+<br />
+<br />
 The installation shell script installs ASP.net core 6 and Nucleus, copies the application settings template with settings for Linux, 
 sets file system object ownership and permissions and configures systemd to automatically start, monitor and restart the application 
 as needed.  

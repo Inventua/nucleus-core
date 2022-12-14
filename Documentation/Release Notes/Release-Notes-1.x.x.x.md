@@ -1,10 +1,14 @@
 # Release Notes
 
-## Version 1.0.1.0
-6 September 2022
+## Version 1.1.0.0
+14 December 2022
 
-Version 1.0.1 includes administration user interface enhancements, a change to the file system provider interfaces to support the 
-(coming soon) Amazon S3 file system provider, along with other enhancements and bug fixes in the core, and in core modules.
+Version 1.1.0.0 includes administration user interface enhancements, a change to the file system provider interfaces to support the 
+Amazon S3 file system provider, Linux support and other enhancements and bug fixes in the core, and in core modules.
+
+### Linux
+Updated code file system paths to use "/" character intead of "\" (which works in both Linux and Windows), updated case-sensitive 
+file names, created Nucleus installation shell script and documentation for Linux.
 
 ### Caching
 Improved data caching to improve performance and reduce database activity.

@@ -1,33 +1,195 @@
 # Hosting in Linux 
-> **_NOTE:_**   We have done some testing with Nucleus hosted in Linux, but this work is not complete.  This documentation page is also not 
-complete.  If you are an experienced Linux user, and disagree with any of the recommendations below, you can adjust Nucleus settings to suit 
-your environment.
+You will need:
+- A PC, virtual machine or cloud instance running Linux.  We used a [Raspberry Pi 3](https://www.raspberrypi.com/products/raspberry-pi-3-model-b/) 
+to test our installation script.
+- Basic computing skills.  Most of the work is done by our installation script, so if you are a Windows user, you should be able to 
+successfully install Nucleus in Linux.
 
-1. Refer to the [Microsoft documentation](https://docs.microsoft.com/en-us/dotnet/core/install/linux) for instructions on installing .NET core in 
-your Linux environment.
+> **_NOTE:_**   We have created a shell script to automate many of the steps.  This page describes the use of the shell script.  This 
+process has been tested with [*Ubuntu Server 22.04*](https://ubuntu.com/download/server).  The script will configure an instance of Nucleus which uses a Sqlite 
+database.  After you have completed basic installation, you can [configure Nucleus to use a different database type](/getting-started/#using-a-different-database-provider). 
 
-2. Install Nucleus.  Depending on which Linux distribution you are using, the installation folder may vary.  Un-zip the install set and upload to 
-your installation folder.  You may need to set up an Ftp service in order to do this.
+## Linux Installation
+Set up your Linux environment.  There are many options for setting up Linux, including: 
+- [Install Ubuntu](https://ubuntu.com/server/docs/installation) on a standalone computer.  
+- Use the [Raspberry Pi Imager](https://www.raspberrypi.com/software/) to [install Ubuntu for Raspberry Pi](https://ubuntu.com/download/raspberry-pi) to an SD card.  
+**_TIP:_**  In the Raspberry Pi imager, use the Settings icon (gear symbol) to set up your host name, SSH and admin credentials automatically.
+- [Create a Linux virtual machine in Azure](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/quick-create-portal).  
+Choose Ubuntu Server 20.04 LTS or later when you are prompted for an Image.
+- [Create a Linux virtual machine in Amazon Web Services](https://aws.amazon.com/getting-started/hands-on/launch-a-virtual-machine/).  
+Choose Ubuntu Server 20.04 LTS or later when you are prompted for a Blueprint.
+- [Use the Ubuntu docker image](https://hub.docker.com/_/ubuntu) to run Ubuntu in [Docker](https://www.docker.com/). 
 
-3. Install and configure Apache server, or Nginx.  \
-\
-[Host ASP.NET Core on Linux with Nginx](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-6.0) \
-[Host ASP.NET Core on Linux with Apache](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-apache?view=aspnetcore-6.0).
+## Nucleus Installation
+1.  Connect to a terminal session.  
+Once you have installed Linux, log in as an admin user.  If you are using a PC or Raspberry Pi, you will need to connect a 
+keyboard and monitor to your machine in order to see its IP address.  If the IP address is not displayed automatically, you can log in
+and view the IP address by using the <kbd>hostname -I</kbd> command.  
+<br />
+If you have [configured SSH](https://ubuntu.com/server/docs/service-openssh) or are using a virtual machine, you can use SSH to 
+connect from another computer:  
+<kbd>ssh your-admin-username@linux-machine-ip-address</kbd>
 
-4. Configure Nucleus.  In your installation folder create a new application configuration file.  If you are setting up a production environment, the file should be named 
-appSettings.Production.json.  If you are setting up a development environment, name your file appSettings.Development.json.  The file may already exist - if it does, edit the
-existing file.
+2.  Create a temporary directory for installation assets and navigate to it:  
+<kbd>mkdir nucleus-install-files</kbd>
+<br/>
+<kbd>cd nucleus-install-files</kbd>
 
-3. Edit your configuration file and add the following:  If the Nucleus section already exists, add or edit the existing section:
-```json
-    {
-      "$schema": "./nucleus.schema.json",
-      "Nucleus": {
-        "FolderOptions": {
-         "DataFolder": "/home/nucleus/data"
-      },
-    }
+3.  Download the shell script and installation file:  
+<kbd>wget https://github.com/Inventua/nucleus-core/tree/main/Nucleus.Web/Utils/Ubuntu/nucleus-install.sh > nucleus-install.sh</kbd>
+<br/>
+<kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v1.1.0/Nucleus.1.1.0.0.Install.zip > Nucleus.1.1.0.0.Install.zip</kbd>  
+<br />
+If you are installing a later version of Nucleus, download the zip file for that version instead - the script automatically uses the 
+most recent version.
+
+4.  Run the shell script:  
+<kbd>sudo bash ./nucleus-install.sh</kbd>
+
+The installation shell script installs ASP.net core 6 and Nucleus, copies the application settings template with settings for Linux, 
+sets file system object ownership and permissions and configures systemd to automatically start, monitor and restart the application 
+as needed.  
+
+### Shell script command-line options
+For a fresh install you will not generally need to specify any command-line options.  
+
+|                                  |                                                             |
+|----------------------------------|--------------------------------------------------------------------------------------|
+| -u, --createuser                 | Use `--createuser false` to prevent the nucleus-service user from being created.  You should only use this option if the user has already been created.  |
+| -d, --createdirectories          | Use `--create directories false` to prevent creation of the /home/nucleus, /home/nucleus/app and /home/nucleus/data directories.  This also prevents the commands which set the correct owner and permissions to directories.   |
+| -z, --zipfile                    | Overide auto-detection of the Nucleus install zip file name and specify the file to use  |
+| -p,  --apppath                   | Override the default application path (/home/nucleus).  If used, in combination with `--createuser true`, the specified directory will be assigned as the user's home directory.    |
+
+Example:  
+<kbd>sudo bash ./nucleus-install.sh -zipfile Nucleus.2.0.0.0.Install.zip -apppath /home/services/nucleus-production</kbd>
+
+5.  Test your installation.  
+Use a device with a web browser to test your site.  You will need the IP address of your server, or its host name.  By default, 
+Nucleus is configured to use http on port 5001.
+
 ```
-Modify the DataFolder setting as required.  This folder is where logs, temporary files and (if you are using Sqlite) the database resides.  You should 
-not set the data folder to the same folder as the install folder, or to a subdirectory of the install folder.  The folder must allow the application 
-full permissions.
+https://host-name:5000
+```
+
+```
+https://ip-address:5000
+```
+
+You should see the Nucleus setup wizard, which performs file system access checks, prompts you to set your site properties and 
+administrator users and creates your new site.
+
+
+## Extended configuration
+
+### Configure your database provider
+You can leave the default settings as-is to use Sqlite, or [configure Nucleus to use a different database type](/getting-started/#using-a-different-database-provider).
+
+> If your Nucleus instance is for testing or development, or is an embedded IOT web server or small web site, Sqlite is a good choice. 
+For larger production web applications and sites, you should consider using Microsoft SQL Server, MySql or PostgreSql. 
+
+### Set up a reverse proxy (optional)
+Depending on your environment and objectives, you may need to configure a reverse proxy server.  [When to use Kestrel with a reverse proxy](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/when-to-use-a-reverse-proxy).  
+You can set up [Nginx](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx#install-nginx), Kubernetes, 
+[Apache](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-apache#install-apache) or another reverse 
+proxy.  If you don't want to use a reverse proxy, you can use Nucleus with the default ports (http: 5000, https: 5001), or you can configure 
+Nucleus to run Kestrel to using conventional ports (80/443) by editing `/home/nucleus/appSettings.Production.json`.
+
+<kbd>sudo nano /home/nucleus/appSettings.Production.json</kbd>
+
+Locate the Kestrel section, and set the port for the Http endpoint (to 80) and if you have configured it, set the Https endpoint 
+to 443.
+
+### Set up a certificate and configure https
+In most environments, you will have to configure a host entry in your DNS server so that other computers in your network can 
+access your linux machine by host name.
+
+#### Create a self-signed Certificate 
+This command will create a self-signed certficate with no subject defined.  A self-signed certificate is useful in a testing or 
+development environment, but is not useful for a production environment.  When you browse to your site, you will have to ignore 
+or disable security warnings, or "trust" the certificate in your browser, as it is not issued by a recognized certification authority.  
+
+<kbd>openssl req -newkey rsa:2048 -keyout nucleus.key -x509 -days 365 -out nucleus.crt -subj "/"</kbd>
+
+When prompted, enter a password for your certificate private key.
+
+<kbd>sudo chown nucleus-service nucleus.key nucleus.crt</kbd>
+<br />
+<kbd>sudo cp nucleus.crt /home/nucleus/certs</kbd>
+<br />
+<kbd>sudo cp nucleus.key /home/nucleus/certs</kbd>
+
+#### Configure Nucleus to use the certificate
+If you are using a reverse proxy, you will generally want to configure the reverse proxy to use your certificate and manage ("terminate") SSL 
+connections, so you won't need to configure Nucleus for https.
+
+If you are running Nucleus without a reverse proxy, configure https and certificate settings with:
+
+<kbd>sudo nano /home/nucleus/appSettings.Production.json</kbd>
+
+Add or un-comment the following setting in Kestrel:Endpoints section.  In the default Linux settings template, the section is already 
+present (commented out), so you can just un-comment the section and fill in the password:
+
+      "HttpsInlineCertAndKeyFile": {
+        "Url": "https://*:5001",  // or "https://your-hostname-here:5001" if you want to specify a host name
+        "Certificate": {
+          "Path": "/home/nucleus/certs/nucleus.crt",
+          "KeyPath": "/home/nucleus/certs/nucleus.key",
+          "Password": "your-certificate password-here"
+        }
+
+### Configure a firewall
+
+Allow SSH connections:  
+<kbd>sudo ufw allow "OpenSSH"</kbd>
+
+Allow http and https connections.  Depending on your configuration, you may want to exclude some of the ports in the command below:  
+<kbd>sudo ufw allow proto tcp from any to any port 80,443,5000,5001</kbd>
+
+Allow FTP:  
+<kbd>sudo ufw allow 22</kbd>
+
+Enable firewall on next boot:  
+<kbd>sudo ufw enable</kbd>
+
+Review settings:  
+<kbd>sudo ufw status</kbd>
+
+Restart to enable the firewall:  
+<kbd>sudo shutdown -r now</kbd>
+
+
+## Troubleshooting
+If you are not able to access Nucleus using your browser, you can try the following steps.
+
+1.  Check service status.  
+<kbd>systemctl status nucleus</kbd>
+
+2.  Check service logs.  
+<kbd>journalctl -xeu nucleus</kbd>
+
+3.  Check the Nucleus error log.  
+Navigate to the Nucleus log folder <kbd>cd /home/nucleus/data/logs</kbd>, then list the contents <kbd>ls</kbd>.  
+Choose today's log - log filenames use UTC dates, so 
+the file name might not match your local time zone - then open the log file in an editor - <kbd>nano 14-Dec-2022 UTC_MYCOMPUTER.log</kbd>.
+
+4.  Try running Nucleus interactively.  
+First, you will need to configure the nucleus-service user to allow logins.
+<br />
+<kbd>sudo passwd nucleus-service</kbd>
+<br />
+<kbd>sudo usermod --shell /bin/bash nucleus-service</kbd>
+<br />
+<br />
+Then, login as the `nucleus-service` user and try running Nucleus interactively.  Log messages will be displayed on-screen.
+<br />
+<kbd>cd /home/nucleus/app</kbd>
+<br />
+<kbd>sudo systemctl stop nucleus</kbd>
+<br />
+<kbd>/usr/share/dotnet/dotnet Nucleus.Web.dll</kbd>
+<br /><br />
+After you have finished troubleshooting, you can disable login for the Nucleus service user with:  
+<kbd>sudo passwd --delete nucleus-service</kbd>
+<br />
+<kbd>sudo usermod --shell /usr/sbin/nologin nucleus-service</kbd>
+<br />

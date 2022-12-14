@@ -88,7 +88,8 @@ namespace Nucleus.Data.EntityFramework
 				#endif
 				// EF generates this one when we use .FirstOrDefault() or .SingleOrDefault() without an ORDER BY, which we
 				// do all the time when retrieving a single row by id.
-				warnings.Ignore(CoreEventId.RowLimitingOperationWithoutOrderByWarning);				
+        warnings.Ignore(CoreEventId.FirstWithoutOrderByAndFilterWarning);
+				warnings.Ignore(CoreEventId.RowLimitingOperationWithoutOrderByWarning);
 			});
 
 			this.DbContextConfigurator.PreConfigure();

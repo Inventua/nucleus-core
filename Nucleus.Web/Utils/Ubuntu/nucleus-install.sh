@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Declare the options 
-SHORT_OPTIONS=o:,z:,t:,u:,d:
+SHORT_OPTIONS=o:,z:,t:,u:,d:,h
 LONG_OPTIONS=output:,zipfile:,target-directory:,createuser:,createdirectories:,help
 
 # Option default values
@@ -19,6 +19,8 @@ VERSION="1.0.0.0"
 INSTALL_ZIPFILE=""
 UNZIP_PACKAGE="unzip"
 TARGET_DIRECTORY="/home/nucleus"
+SHELL_SCRIPT_VERSION="2022.12"
+#DOTNET_VERSION="6.0.11"
 
 OPTS=$(getopt -a -n "Nucleus Setup" --options $SHORT_OPTIONS --longoptions $LONG_OPTIONS -- "$@") 
 
@@ -26,49 +28,60 @@ function usage()
 {
   # Print out the usage.
   #printf "Usage: %s [-p '<Nucleus Application App path>'] [-z '<Zip file>']\n" "$0"
-  printf "Usage: %s [-OPTION]...\n"
-  printf "Installs the Nucleus web service to the designated directory.\n\n"
-  printf "  -p, --apppath     Home directory of Nucleus web. Defaults to \n"
-  printf "  -h     Print this Help."
-  printf "v     Verbose mode."
-  printf "V     Print software version and exit."
-  printf 
+  printf "Nucleus installer shell script version %s. \n\n" "$SHELL_SCRIPT_VERSION"
+  printf "Usage: %s [-OPTION]...\n" "$0"
+  printf "Installs Nucleus in the specified directory.\n\n"
+  printf "  -t, --target-directory DIRECTORY      Home directory of Nucleus web. Defaults to '%s'.\n" "$TARGET_DIRECTORY"
+  printf "  -z, --zipfile ZIPFILE                 Override auto-detection of the Nucleus install zip file name and specify the file to use.\n"
+  printf "  -u, --createuser [true|false]         Use '--createuser false' to prevent the nucleus-service user from being created.\n"
+  printf "                                        You should only use this option if the user has already been created.\n"
+  printf "  -d, --createdirectories [true|false]  Use '--createdirectories false' to prevent creation of the %s, %s\n" "$TARGET_DIRECTORY" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
+  printf "                                        and %s directories.  This also prevents the commands which set the correct owner\n" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_DATA]}"
+  printf "                                        and permissions to directories.\n" 
+  #printf "  -o, --output [verbose|brief|none]     Verbose mode."
+  printf "  -h, --help                            Print this Help.\n\n"
+  printf "The installation script can be executed without any options. It will install with the following defaults:\n"
+  printf "  Uses the latest Nucleus install zip file located in the same directory as the script.\n"
+  printf "  Creates a system account ('%s') that will run Nucleus.\n" "$SERVICE_ACCOUNT"
+  printf "  Creates the directories for Nucleus ('%s', '%s' and '%s').\n" "$TARGET_DIRECTORY" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_DATA]}"
+  printf "  Install ASP.NET Core Runtime.\n"
+  printf "  Install '%s' package utility.\n" "$UNZIP_PACKAGE"
+  printf "  Unzips the Nucleus files to the '%s' directory.\n" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
+  printf "  Creates and starts the service using systemd.\n"
+  printf "\n"
   exit 0
 }
 
-#[-o verbose|brief|none]
-# If options are not set, then display the usage message
-#if [ "$?" != "0" ]; then
-#  usage
-#fi
+# User function
+function user_exists()
+{ 
+  if id "$SERVICE_ACCOUNT" >/dev/null 2>&1; then
+    return 0
+  else
+    return 1
+  fi
+}
 
-eval set -- "$OPTS"
+function directory_exists()
+{
+  local directory=$1
+  if [ -d "$directory" ] >/dev/null 2>&1; then
+    return 0
+  else
+    return 1
+  fi
+}
 
-while :
-do
-  case "$1" in
-    -u | --createuser)
-      CREATE_USER="$2"        ; shift 2  ;;
-    -d | --createdirectories)
-      CREATE_DIRECTORIES="$2" ; shift 2  ;;
-    -z | --zipfile)
-      INSTALL_ZIPFILE="$2"    ; shift 2  ;;
-    -t | --target-directory)
-      TARGET_DIRECTORY="$2"   ; shift 2  ;;
-    -o | --output)
-      OUTPUT="$2"             ; shift 2  ;;
-    -h | --help)
-      usage                   ; exit 0   ;;
-    # -- means the end of the arguments; drop this, and break out of the while loop
-    --) shift; break ;;
-    # If invalid options were passed, then getopt should have reported an error,
-    # which we checked when getopt was called...
-    *) echo "Unexpected option: $1 - this should not happen."
-      usage ;;
-  esac
-done
+function dotnet_exists()
+{
+  if command -v "dotnet" >/dev/null 2>&1; then
+    return 0
+  else
+    return 1
+  fi
+}
 
-# Version compare function 
+# Version compare function (do not modify)
 function vercomp () {
     if [[ $1 == $2 ]]
     then
@@ -100,6 +113,39 @@ function vercomp () {
     return 0
 }
 
+#[-o verbose|brief|none]
+# If options are not set, then display the usage message
+#if [ "$?" != "0" ]; then
+#  usage
+#fi
+
+eval set -- "$OPTS"
+
+while :
+do
+  case "$1" in
+    -u | --createuser)
+      CREATE_USER="$2"        ; shift 2  ;;
+    -d | --createdirectories)
+      CREATE_DIRECTORIES="$2" ; shift 2  ;;
+    -z | --zipfile)
+      INSTALL_ZIPFILE="$2"    ; shift 2  ;;
+    -t | --target-directory)
+      TARGET_DIRECTORY="$2"   ; shift 2  ;;
+    -o | --output)
+      OUTPUT="$2"             ; shift 2  ;;
+    -h | --help)
+      usage                              ;;
+    # -- means the end of the arguments; drop this, and break out of the while loop
+    --) shift; break ;;
+    # If invalid options were passed, then getopt should have reported an error,
+    # which we checked when getopt was called...
+    *) echo "Unexpected option: $1 - this should not happen."
+      usage ;;
+  esac
+done
+
+
 # If zip file isn't specified then get the latest version
 if [ "$INSTALL_ZIPFILE" == "" ]; then
   if ! compgen -G "Nucleus.[1-9].[0-9].[0-9].[0-9].Install.zip" > /dev/null ; then
@@ -110,9 +156,13 @@ if [ "$INSTALL_ZIPFILE" == "" ]; then
     # loop through nucleus install zip files and get the latest version
     for zipfileversion in Nucleus.*.Install.zip;
     do
+      # default to the first zip file found
+      if [ "$INSTALL_ZIPFILE" == "" ]; then
+        INSTALL_ZIPFILE=$zipfileversion
+      fi
       [[ $zipfileversion =~ ^([A-Za-z_]+)\.([1-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Install\.zip ]]
       vercomp "$VERSION" "${BASH_REMATCH[2]}"
-      if [ $? = 1 ]; then
+      if [ "$?" == 2 ]; then
         # set the latest version of install zip file
         INSTALL_ZIPFILE=$zipfileversion
       fi
@@ -120,37 +170,27 @@ if [ "$INSTALL_ZIPFILE" == "" ]; then
   fi
 fi
 
+# Check we do have an install file otherwise we warn users and exit script.
+if [ "$INSTALL_ZIPFILE" == "" ]; then
+  # still no install zipfiles specified or found
+  printf "Install zip file was not specified and unable to locate in current directory. Please specify the full path of zip file or copy the file to current directory. \n"
+  exit 1
+fi
+
 # Print settings, ask for confirmation 
-printf "Nucleus installer shell script. \n"
-printf "Your settings are app path: %s, zip file: %s.\n" "$TARGET_DIRECTORY" "$INSTALL_ZIPFILE"
-printf "This script will also create a service account '%s' (if it does not already exists) used to run the service.\n" "$SERVICE_ACCOUNT"
-printf "The dotnet ASPNetCore runtime and the unzip package will also be installed.\n\n"
+printf "Nucleus installer shell script version %s. \n\n" "$SHELL_SCRIPT_VERSION"
+printf "Your settings are:\n"
+printf "  - App path: '%s'\n" "$TARGET_DIRECTORY"
+printf "  - Zip file: '%s'.\n\n" "$INSTALL_ZIPFILE"
+printf "This script will:\n"
+printf "  - Create a service account '%s' (if it does not already exist).\n" "$SERVICE_ACCOUNT"
+printf "  - Install ASP.NET Core Runtime\n"
+printf "  - Install %s package.\n\n" "$UNZIP_PACKAGE"
 
 read -r -p "Do you want to continue (Y/n)? " INSTALL_RESPONSE
 if [[ ! "$INSTALL_RESPONSE" =~ ^([yY][eE][sS]|[yY])$ ]]; then
   exit 1
 fi
-
-
-# User function
-function user_exists()
-{ 
-  if id "$SERVICE_ACCOUNT" >/dev/null 2>&1; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-function directory_exists()
-{
-  local directory=$1
-  if [ -d "$directory" ] >/dev/null 2>&1 ; then
-    return 0
-  else
-    return 1
-  fi
-}
 
 # Create the service account
 if [ "$CREATE_USER" == true ]; then
@@ -174,13 +214,13 @@ fi
 if [ "$CREATE_DIRECTORIES" == true ]; then
   # home directory set by user
   
-  if directory_exists "$TARGET_DIRECTORY" != 0 ; then
+  if ! directory_exists "$TARGET_DIRECTORY"; then
     mkdir "$TARGET_DIRECTORY"
   fi
   for folder in "${DIRECTORIES[@]}"
   do
     
-    if directory_exists "$TARGET_DIRECTORY/$folder" != 0 ; then
+    if ! directory_exists "$TARGET_DIRECTORY/$folder"; then
       mkdir "$TARGET_DIRECTORY/$folder"
     fi
     # Assign group ownership of app and data folders to service account 
@@ -196,26 +236,28 @@ if [ "$CREATE_DIRECTORIES" == true ]; then
 fi
 
 # Download and install the dotnet runtime 
-wget -q -O - https://dot.net/v1/dotnet-install.sh | bash -s -- --runtime aspnetcore --install-dir /usr/share/dotnet
+if ! dpkg-query -W -f='${Status}' "dotnet"|grep "ok installed" > /dev/null ; then
+  printf "Installing .NET...\n"
+  #wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+  #dpkg -i packages-microsoft-prod.deb
+  #rm packages-microsoft-prod.deb
+  apt-get -q update && apt-get -q install -y aspnetcore-runtime-6.0
+else
+  printf ".NET is already installed.\n"
+fi 
 
 # add dotnet to the path
 echo PATH=\""$PATH":/usr/share/dotnet\" > /etc/environment
 
 # Install unzip if it hasn't been installed
 if ! dpkg-query -W -f='${Status}' "$UNZIP_PACKAGE"|grep "ok installed" > /dev/null ; then
-  read -r -p "$UNZIP_PACKAGE not found, nucleus setup requires $UNZIP_PACKAGE to be installed. Continue (Y/n)? " RESPONSE
-  if [[ "$RESPONSE" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    apt install -qq $UNZIP_PACKAGE
-    printf "Installed %s.\n" "$UNZIP_PACKAGE"
-  else
-    #printf "Nucleus requires '%1$s' to continue and configure the system. You can manually install '%1$s' and rerun the setup script to skip this step. \n" "$UNZIP_PACKAGE" 
-    printf "Nucleus requires '%s' to continue and configure the system. You can manually install '%s' and rerun the setup script to skip this step. \n" "$UNZIP_PACKAGE" "$UNZIP_PACKAGE"
-    exit 1
-  fi
+  printf "Installing '%s' package...\n" "$UNZIP_PACKAGE"
+  apt-get -q install $UNZIP_PACKAGE
+  printf "Installed %s.\n" "$UNZIP_PACKAGE"
 fi
 
 # Unzip the nucleus zip file to app path
-printf "Unzipping nucleus files to %s.\n" "$TARGET_DIRECTORY"
+printf "Unzipping Nucleus files to %s.\n" "$TARGET_DIRECTORY"
 unzip -q "$INSTALL_ZIPFILE" -d "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
 
 # Copy the Ubuntu appSettings.template to appSettings.Production.json
@@ -226,8 +268,7 @@ fi
 # Set the group ownership of the folders/files that we just unzipped
 chown -R :$SERVICE_ACCOUNT "$TARGET_DIRECTORY"
 
-# Create /Extensions directory and set group ownership to the nucleus service group
-
+# Create /Extensions directory and set group ownership to the Nucleus service account
 if ! directory_exists "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions"; then
   mkdir "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions"
   chown -R :$SERVICE_ACCOUNT "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions"
@@ -238,7 +279,7 @@ fi
 chmod -R g+rxw "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Setup"
 
 # Copy the service unit file to system directory 
-printf "Configuring the nucleus service.\n"
+printf "Configuring the Nucleus service.\n"
 if [ ! -f "/etc/systemd/system/nucleus.service" ]; then
   cp "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Utils/Ubuntu/nucleus.service" "/etc/systemd/system"
 fi

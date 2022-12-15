@@ -19,7 +19,7 @@
       //  "Url": "https://*:5001"
       //},
       //"HttpsInlineCertAndKeyFile": {
-      //  "Url": "https://*:5001" // or "https://your-hostname-here:5001" if you want to specify a host name
+      //  "Url": "https://*:5001", // or "https://your-hostname-here:5001" if you want to specify a host name
       //  "Certificate": {
       //    "Path": "/home/nucleus/certs/nucleus.crt",
       //    "KeyPath": "/home/nucleus/certs/nucleus.key",

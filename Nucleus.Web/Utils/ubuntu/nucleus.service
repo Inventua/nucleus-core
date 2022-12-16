@@ -16,7 +16,7 @@ Environment=ASPNETCORE_ENVIRONMENT=Production
 
 User=nucleus-service
 WorkingDirectory=/home/nucleus/app
-ExecStart=/usr/share/dotnet/dotnet Nucleus.Web.dll
+ExecStart=dotnet Nucleus.Web.dll
 
 [Install]
 WantedBy=multi-user.target

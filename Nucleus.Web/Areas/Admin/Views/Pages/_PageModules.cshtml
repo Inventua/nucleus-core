@@ -32,7 +32,7 @@ else
 					<td>@(String.IsNullOrEmpty(module.Title) ? "-" : module.Title)</td>
 					<td>@module.ModuleDefinition.FriendlyName</td>
             <td class="nucleus-small-cell">
-              @if (module.ModuleDefinition.EditAction != null && module.ModuleDefinition.SettingsController != null)
+							@if (!String.IsNullOrEmpty(module.ModuleDefinition.EditAction))
               {
                 <input type="submit" formaction="@Url.AreaAction("EditModule", "Pages", "Admin")?mid=@module.Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-outline-secondary" title="Edit" data-target="#nucleus-popupdialog .modal-body" />
               }

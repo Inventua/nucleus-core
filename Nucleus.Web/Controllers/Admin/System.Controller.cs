@@ -253,16 +253,17 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.LogContent = new(settings);
 			viewModel.LogContent.TotalCount = results.Count;
 
+			if (viewModel.LogSortDescending)
+			{
+        results.Reverse();
+			}
+
 			viewModel.LogContent.Items = results
 				.Where(logitem => logitem.IsMatch(viewModel))
 				.Skip(viewModel.LogContent.FirstRowIndex)
 				.Take(viewModel.LogContent.PageSize)
 				.ToList();
 			
-			if (viewModel.LogSortDescending)
-			{
-				viewModel.LogContent.Items = viewModel.LogContent.Items.Reverse().ToList();
-			}
 		}
 
 		private List<ViewModels.Admin.SystemIndex.LogEntry> ReadLogFile(string filename)

@@ -850,9 +850,26 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task SaveSystemAdministrator(User user)
 		{
-			Boolean isNew = !this.Context.Users.Where(existing => existing.Id == user.Id).Any();
+			Boolean isNew = !this.Context.Users
+        .Where(existing => existing.Id == user.Id)
+        .Any();
 
-			user.SiteId = null;
+      if (isNew)
+      {
+        // extra check to make sure that we are not creating a system administrator with the same user name as a
+        // site user.
+        User existing = this.Context.Users
+          .Where(existing => existing.UserName == user.UserName)
+          .AsNoTracking()
+          .FirstOrDefault();
+
+        if (existing != null)
+        {
+          throw new InvalidOperationException($"A site user named '{user.UserName}' already exists, so you can't create a system administrator with this user name.");
+        }
+      }
+
+      user.SiteId = null;
 			user.IsSystemAdministrator = true;
 
 			this.Context.Attach(user);
@@ -1008,9 +1025,24 @@ namespace Nucleus.Core.DataProviders
 				.AsSplitQuery()
 				.FirstOrDefaultAsync();
 
-			// We must remove roles from the user object before calling .Attach) so that when we add newly-assigned roles later, we don't get
-			// a change-tracking error telling us that the role is already being tracked
-			List<Role> userRoles = user.Roles;
+      if (existing == null)
+      {
+        // extra check to make sure that we are not creating a user with the same user name as an existing 
+        // system administrator.
+        User existingSystemAdmin = this.Context.Users
+          .Where(existing => existing.UserName == user.UserName && existing.IsSystemAdministrator)
+          .AsNoTracking()
+          .FirstOrDefault();
+
+        if (existingSystemAdmin != null)
+        {
+          throw new InvalidOperationException($"A user named '{user.UserName}' already exists, so you can't create a new user with this user name.");
+        }
+      }
+
+      // We must remove roles from the user object before calling .Attach) so that when we add newly-assigned roles later, we don't get
+      // a change-tracking error telling us that the role is already being tracked
+      List<Role> userRoles = user.Roles;
 			user.Roles = new();
 
 			this.Context.Attach(user);

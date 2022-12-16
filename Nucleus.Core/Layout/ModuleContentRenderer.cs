@@ -216,7 +216,7 @@ namespace Nucleus.Core.Layout
 			formBuilder.Attributes.Add("data-target", "#refresh");
 
       // users with module edit permissions can edit module settings and common settings
-      if (moduleInfo.ModuleDefinition.EditAction != null && moduleInfo.ModuleDefinition.SettingsController != null)
+      if (!String.IsNullOrEmpty(moduleInfo.ModuleDefinition.EditAction))
       {
         formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe3c9;", "Edit Content/Settings", urlHelper.Content("~/Admin/Pages/EditModule"), null));
       }

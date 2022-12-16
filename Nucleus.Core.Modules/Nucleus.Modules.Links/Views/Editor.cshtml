@@ -26,7 +26,7 @@
 
 		<SettingsControl caption="Image (file)" helptext="Select an image file.">
 			<div class="nucleus-flex-fields nucleus-fileselector">
-				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.Link.ImageFile, propertyName = "Link.ImageFile", selectAnotherActionName = "SelectAnotherImage", pattern = "(.gif|.png|.jpg|.jpeg|.bmp)" })
+				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.Link.ImageFile, propertyName = "Link.ImageFile", selectAnotherActionName = "SelectAnotherImage", pattern = "(.gif|.png|.jpg|.jpeg|.bmp|.webp)" })
 				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.Link.ImageFile?.Parent, actionName = "UploadImageFile", Filter = "image/*" })		
 			</div>
 		</SettingsControl>

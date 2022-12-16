@@ -95,7 +95,7 @@
 
 					<SettingsControl caption="Site Logo" helptext="Site banner logo.">
 						<div class="nucleus-flex-fields nucleus-fileselector">
-							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.SelectedLogoFile, PropertyName = "SelectedLogoFile", SelectAnotherActionName = "SelectAnotherLogo", Pattern = "(.gif|.png|.jpg|.jpeg|.bmp)" })
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.SelectedLogoFile, PropertyName = "SelectedLogoFile", SelectAnotherActionName = "SelectAnotherLogo", Pattern = "(.gif|.png|.jpg|.jpeg|.bmp|.webp)" })
 							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.SelectedLogoFile?.Parent, actionName = "UploadLogo", controlName = "logoFile", filter = "image/*" })
 						</div>
 					</SettingsControl>
@@ -110,7 +110,7 @@
 
 					<SettingsControl caption="Site Icon" helptext="Site icon.">
 						<div class="nucleus-flex-fields nucleus-fileselector">
-							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.SelectedIconFile, PropertyName = "SelectedIconFile", SelectAnotherActionName = "SelectAnotherIcon", Pattern = "(.gif|.png|.jpg|.jpeg|.ico)" })
+							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.SelectedIconFile, PropertyName = "SelectedIconFile", SelectAnotherActionName = "SelectAnotherIcon", Pattern = "(.gif|.png|.jpg|.jpeg|.ico|.webp)" })
 							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.SelectedIconFile?.Parent, actionName = "UploadIcon", controlName = "iconFile", filter = "image/*" })
 						</div>
 					</SettingsControl>

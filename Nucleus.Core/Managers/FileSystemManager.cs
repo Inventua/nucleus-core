@@ -39,7 +39,7 @@ namespace Nucleus.Core.Managers
 
 		private string FileSystemCachePath(Site site, string providerName, string path)
 		{
-			return $"{site.Id}|{providerName}{path}";
+			return $"{site.Id}|{providerName}|{path}";
 		}
 
 		/// <summary>
@@ -425,6 +425,14 @@ namespace Nucleus.Core.Managers
 
 			this.CacheManager.FolderCache().Remove(folder.Id);
 			this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, folder.Provider, folder.Path));
+
+			Folder parentFolder = await this.GetFolder(site, folder.Provider, folder.Parent.Path);
+
+			if (parentFolder != null)
+			{
+				this.CacheManager.FolderCache().Remove(parentFolder.Id);
+				this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, parentFolder.Provider, parentFolder.Path));
+			}
 		}
 
 		public async Task RenameFolder(Site site, Folder folder, string newName)
@@ -433,7 +441,8 @@ namespace Nucleus.Core.Managers
 
 			folder = RemoveSiteHomeDirectory(site, await provider.RenameFolder(UseSiteHomeDirectory(site, folder.Path), newName));
 			 
-			Folder parentFolder = RemoveSiteHomeDirectory(site, await provider.GetFolder(folder.Parent.Path));
+			//Folder parentFolder = RemoveSiteHomeDirectory(site, await provider.GetFolder(folder.Parent.Path));
+			Folder parentFolder = await this.GetFolder(site, folder.Provider, folder.Parent.Path);
 			string message = "";
 
 			if (!IsValidFolderName(parentFolder, newName, ref message))
@@ -588,8 +597,8 @@ namespace Nucleus.Core.Managers
 		public async Task DeleteFile(Site site, File file)
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, file.Provider);
-			Folder parentFolder = await provider.GetFolder(UseSiteHomeDirectory(site, file.Parent.Path));
-
+			//Folder parentFolder = await provider.GetFolder(UseSiteHomeDirectory(site, file.Parent.Path));
+			Folder parentFolder = await this.GetFolder(site, file.Provider, file.Parent.Path);
 			await provider.DeleteFile(UseSiteHomeDirectory(site, file.Path));
 
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
@@ -598,6 +607,8 @@ namespace Nucleus.Core.Managers
 			}
 
 			this.CacheManager.FileCache().Remove(file.Id);
+			this.CacheManager.FilePathCache().Remove(FileSystemCachePath(site, file.Provider, file.Path));
+
 			if (parentFolder != null)
 			{
 				this.CacheManager.FolderCache().Remove(parentFolder.Id);
@@ -608,7 +619,8 @@ namespace Nucleus.Core.Managers
 		public async Task RenameFile(Site site, File file, string newName)
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, file.Provider);
-			Folder parentFolder = await provider.GetFolder(UseSiteHomeDirectory(site, file.Parent.Path));
+			//Folder parentFolder = await provider.GetFolder(UseSiteHomeDirectory(site, file.Parent.Path));
+			Folder parentFolder = await this.GetFolder(site, file.Provider, file.Parent.Path);
 			string message = "";
 
 			if (!IsValidFileName(parentFolder, newName, ref message))
@@ -630,6 +642,8 @@ namespace Nucleus.Core.Managers
 			}
 
 			this.CacheManager.FileCache().Remove(file.Id);
+			this.CacheManager.FilePathCache().Remove(FileSystemCachePath(site, file.Provider, file.Path));
+
 			if (parentFolder != null)
 			{
 				this.CacheManager.FolderCache().Remove(parentFolder.Id);
@@ -684,6 +698,7 @@ namespace Nucleus.Core.Managers
 					await dataProvider.SaveFile(site, file);
 				}
 				this.CacheManager.FileCache().Remove(file.Id);
+				this.CacheManager.FilePathCache().Remove(FileSystemCachePath(site, file.Provider, file.Path));
 
 				return await GetFile(site, file.Id);
 			}
@@ -750,11 +765,15 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
-		private T RemoveSiteHomeDirectory<T>(Site site, T item) 
+		private T RemoveSiteHomeDirectory<T>(Site site, T item)
 			where T : FileSystemItem
 		{
 			if (item == null) return null;
 			item.Path = RemoveSiteHomeDirectory(site, item.Path);
+			if (item.Parent != null)
+			{
+				item.Parent.Path = RemoveSiteHomeDirectory(site, item.Parent.Path);
+			}
 			return item;
 		}
 

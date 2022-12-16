@@ -42,7 +42,7 @@
 					
 				<SettingsControl caption="Image" helptext="Image of the article. Displays an image alongside the article content when article is viewed.">
 					<div class="nucleus-flex-fields nucleus-fileselector">
-						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.Article.ImageFile, propertyName = "Article.ImageFile", selectAnotherActionName = "SelectAnotherImage", pattern = "(.gif|.png|.jpg|.jpeg|.bmp)" })
+						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.Article.ImageFile, propertyName = "Article.ImageFile", selectAnotherActionName = "SelectAnotherImage", pattern = "(.gif|.png|.jpg|.jpeg|.bmp|.webp)" })
 						@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.Article.ImageFile?.Parent, actionName = "UploadImageFile", Filter = "image/*" })
 					</div>
 				</SettingsControl>

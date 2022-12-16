@@ -202,6 +202,7 @@ if [ "$CREATE_USER" == true ]; then
   else
     printf "Creating %s user...\n" "$SERVICE_ACCOUNT"
     useradd -r "$SERVICE_ACCOUNT" -d "$TARGET_DIRECTORY" -c "Service account for Nucleus" -s "/usr/sbin/nologin"
+    usermod -a -G "$SERVICE_ACCOUNT" "$USER"
   fi
 else
   if ! user_exists ; then
@@ -228,11 +229,11 @@ if [ "$CREATE_DIRECTORIES" == true ]; then
   done
 
   # Grant read, execute but not write for nucleus group to /app
-  chmod -R g+rx-w "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
+  chmod g+rx-w "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
   # Grant read, write and execute for nucleus group to /data
-  chmod -R g+rwx "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_DATA]}"
+  chmod g+rwx "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_DATA]}"
   # Grant read, execute but write for nucleus group to /certs
-  chmod -R g+rx-w "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_CERTS]}"
+  chmod g+rx-w "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_CERTS]}"
 fi
 
 # Download and install the dotnet runtime 
@@ -274,9 +275,14 @@ if ! directory_exists "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extension
   chown -R :$SERVICE_ACCOUNT "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions"
 fi
 
+# Set read, write and directory execute permissions for user (root)
+chmod -R u+rwX "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
+# Set read and directory execute permissions, remove write access for group (service account)
+chmod -R g+rX-w "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
+
 # Nucleus must have read, write and execute permissions to /Extensions in order to install Extensions
 # Nucleus must have read, write and execute permissions to /Setup because we create install-log.config to indicate that the setup wizard has completed
-chmod -R g+rxw "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Setup"
+chmod g+rwx "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Setup"
 
 # Copy the service unit file to system directory 
 printf "Configuring the Nucleus service.\n"

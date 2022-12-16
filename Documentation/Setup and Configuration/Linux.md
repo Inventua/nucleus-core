@@ -1,8 +1,8 @@
 # Hosting in Linux 
 You will need:
 - A PC, virtual machine or cloud instance running Linux.  We used a [Raspberry Pi 3](https://www.raspberrypi.com/products/raspberry-pi-3-model-b/) 
-to test our installation script.
-- Basic computing skills.  Most of the work is done by our installation script, so if you are a Windows user, you should be able to 
+to test our installer shell script.
+- Basic computing skills.  Most of the work is done by our installer shell script, so if you are a Windows user, you should be able to 
 successfully install Nucleus in Linux.
 
 > **_NOTE:_**   We have created a shell script to automate many of the steps.  This page describes the use of the shell script.  This 
@@ -20,8 +20,6 @@ Choose Ubuntu Server 20.04 LTS or later when you are prompted for an Image.
 Choose Ubuntu Server 20.04 LTS or later when you are prompted for a Blueprint.
 - [Use the Ubuntu docker image](https://hub.docker.com/_/ubuntu) to run Ubuntu in [Docker](https://www.docker.com/). 
 
-
-
 ## Nucleus Installation
 1.  Connect to a terminal session.  
 Once you have installed Linux, log in as an admin user.  If you are using a PC or Raspberry Pi, you will need to connect a 
@@ -37,15 +35,15 @@ connect from another computer:
 <br/>
 <kbd>cd nucleus-install-files</kbd>
 
-3.  Download the shell script and installation file:  
+3.  Download the installer shell script and installation file:  
 <kbd>wget https://github.com/Inventua/nucleus-core/tree/main/Nucleus.Web/Utils/Ubuntu/nucleus-install.sh > nucleus-install.sh</kbd>
 <br/>
 <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v1.1.0/Nucleus.1.1.0.0.Install.zip > Nucleus.1.1.0.0.Install.zip</kbd>  
 <br />
-If you are installing a later version of Nucleus, download the zip file for that version instead - the script automatically uses the 
-most recent version.
+If you are installing a later version of Nucleus, download the zip file for that version instead - the installer shell script automatically uses the 
+zip file with the most recent version which is in the same folder as the shell script.
 
-4.  Run the shell script:  
+4.  Run the installer shell script:  
 **_TIP:_**   If you are installing to a Linux distribution other than Ubuntu Linux, some parts of the shell script may not work, because
 different Linux distributions use different commands to install packages.  You can work around this issue by installing the ASP.NET runtime and 
 unzip packages before running the script:  
@@ -56,19 +54,20 @@ unzip packages before running the script:
 <kbd>sudo bash ./nucleus-install.sh</kbd>
 <br />
 <br />
-The installation shell script installs ASP.net core 6 and Nucleus, copies the application settings template with settings for Linux, 
-sets file system object ownership and permissions and configures systemd to automatically start, monitor and restart the application 
-as needed.  
+The installation shell script creates a user named `nucleus-service`, installs the ASP.NET Core 6 runtime, unzip package and Nucleus, then copies 
+the application settings template with settings for Linux, sets file system object ownership and permissions and configures systemd to 
+automatically start, monitor and restart Nucleus.  The `nucleus-service` user is used to run Nucleus, and does not have a password or a shell 
+configured, so you can't log in as this user.
 
 ### Shell script command-line options
 For a fresh install you will not generally need to specify any command-line options.  
 
 |                                  |                                                             |
 |----------------------------------|--------------------------------------------------------------------------------------|
-| -u, --createuser                 | Use `--createuser false` to prevent the nucleus-service user from being created.  You should only use this option if the user has already been created.  |
-| -d, --createdirectories          | Use `--createdirectories false` to prevent creation of the /home/nucleus, /home/nucleus/app and /home/nucleus/data directories.  This also prevents the commands which set the correct owner and permissions to directories.   |
+| -u, --createuser                 | Use `--createuser false` to prevent the `nucleus-service` user from being created.  You should only use this option if the user has already been created.  |
+| -d, --createdirectories          | Use `--createdirectories false` to prevent creation of the `/home/nucleus`, `/home/nucleus/app` and /home/nucleus/data directories.  This also prevents the commands which set the correct owner and permissions to directories.   |
 | -z, --zipfile                    | Override auto-detection of the Nucleus install zip file name and specify the file to use.  |
-| -t,  --target-directory          | Override the default application path (/home/nucleus).  If used, in combination with `--createuser true`, the specified directory will be assigned as the user's home directory.    |
+| -t,  --target-directory          | Override the default application path (/home/nucleus).  If used in combination with `--createuser true` (the default), the specified directory will be assigned as the user's home directory.    |
 
 Example:  
 <kbd>sudo bash ./nucleus-install.sh --zipfile Nucleus.2.0.0.0.Install.zip --target-directory /home/services/nucleus-production</kbd>
@@ -94,35 +93,38 @@ administrator users and creates your new site.
 ### Configure your database provider
 You can leave the default settings as-is to use Sqlite, or [configure Nucleus to use a different database type](/getting-started/#using-a-different-database-provider).
 
-> If your Nucleus instance is for testing or development, or is an embedded IOT web server or small web site, Sqlite is a good choice. 
+> If your Nucleus instance is for testing or development, or is an embedded IOT web server or small web application or site, Sqlite is a good choice. 
 For larger production web applications and sites, you should consider using Microsoft SQL Server, MySql or PostgreSql. 
 
 ### Set up a reverse proxy (optional)
-Depending on your environment and objectives, you may need to configure a reverse proxy server.  [When to use Kestrel with a reverse proxy](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/when-to-use-a-reverse-proxy).  
+Depending on your environment and objectives, you may need to configure a reverse proxy server.  Refer to ['When to use Kestrel with a reverse proxy'](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/when-to-use-a-reverse-proxy) 
+for more information.  
 You can set up [Nginx](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx#install-nginx), Kubernetes, 
 [Apache](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-apache#install-apache) or another reverse 
-proxy.  If you don't want to use a reverse proxy, you can use Nucleus with the default ports (http: 5000, https: 5001), or you can configure 
-Nucleus to run Kestrel to using conventional ports (80/443) by editing `/home/nucleus/appSettings.Production.json`.
+proxy.  
 
-<kbd>sudo nano /home/nucleus/appSettings.Production.json</kbd>
+If you don't want to use a reverse proxy, you can use Nucleus with the default ports (http: 5000, https: 5001), or you can configure 
+Nucleus to run Kestrel to using different ports (8080/8443) by editing `/home/nucleus/appSettings.Production.json`.
 
-Locate the Kestrel section, and set the port for the Http endpoint (to 80) and if you have configured it, set the Https endpoint 
-to 443.
+<kbd>sudo nano /home/nucleus/app/appSettings.Production.json</kbd>
+
+Locate the Kestrel section, and set the port for the Http endpoint and Https endpoints.
+
+> **_NOTE:_**   Linux will not let you run using Kestrel using port numbers < 1024, because only the root user can use those ports.  Use a reverse 
+proxy if you want to listen on ports 80/443.
 
 ### Set up a certificate and configure https
-In most environments, you will have to configure a host entry in your DNS server so that other computers in your network can 
-access your linux machine by host name.
 
 #### Create a self-signed Certificate 
 This command will create a self-signed certficate with no subject defined.  A self-signed certificate is useful in a testing or 
 development environment, but is not useful for a production environment.  When you browse to your site, you will have to ignore 
 or disable security warnings, or "trust" the certificate in your browser, as it is not issued by a recognized certification authority.  
 
-<kbd>openssl req -newkey rsa:2048 -keyout nucleus.key -x509 -days 365 -out nucleus.crt -subj "/"</kbd>
+<kbd>sudo openssl req -nodes -new -keyout nucleus.key -x509 -days 365 -out nucleus.crt -subj "/"</kbd>
 
-When prompted, enter a password for your certificate private key.
-
-<kbd>sudo chown nucleus-service nucleus.key nucleus.crt</kbd>
+<kbd>sudo chown :nucleus-service nucleus.key nucleus.crt</kbd>
+<br />
+<kbd>sudo chmod g+rw nucleus.key nucleus.crt</kbd>
 <br />
 <kbd>sudo cp nucleus.crt /home/nucleus/certs</kbd>
 <br />
@@ -130,9 +132,9 @@ When prompted, enter a password for your certificate private key.
 
 #### Configure Nucleus to use the certificate
 If you are using a reverse proxy, you will generally want to configure the reverse proxy to use your certificate and manage ("terminate") SSL 
-connections, so you won't need to configure Nucleus for https.
+connections, so you won't need to configure Nucleus for https, and can skip this section.
 
-If you are running Nucleus without a reverse proxy, configure https and certificate settings with:
+If you will be running Nucleus without a reverse proxy, configure https and certificate settings with:
 
 <kbd>sudo nano /home/nucleus/app/appSettings.Production.json</kbd>
 
@@ -147,13 +149,62 @@ present (commented out), so you can just un-comment the section and fill in the 
           "Password": "your-certificate password-here"
         }
 
+        
+#### Nginx Walkthrough
+Follow the steps in this section if you want to install and configure Nginx as a reverse proxy.
+
+Install:  
+<kbd>sudo apt install nginx</kbd>
+
+Create configuration file:  
+<kbd>sudo nano /etc/nginx/sites-enabled/nucleus</kbd>
+
+Insert these settings.  If you have not created a certificate, omit or comment out the two `listen` commands which refer to port 443, and the `ssl_certificate` lines:
+
+```
+server {
+    listen        80;
+    listen        443 ssl default_server;
+    listen        [::]:443 ssl default_server;
+    ssl_certificate     /home/nucleus/certs/nucleus.crt;
+    ssl_certificate_key /home/nucleus/certs/nucleus.key;
+
+    server_name _;
+
+    location / {
+        proxy_pass         http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade $http_upgrade;
+        proxy_set_header   Connection keep-alive;
+        proxy_set_header   Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Remove the default configuration file:  
+<kbd>sudo rm /etc/nginx/sites-enabled/default</kbd>
+
+Restart nginx:  
+<kbd>sudo systemctl restart nginx</kbd>
+
+At this point, Nginx is configured to listen on port 80 (and/or 443 if you have created a certificate), and will communicate with
+Nucleus on the local machine/port 5000.
+
 ### Configure a firewall
 
 Allow SSH connections:  
 <kbd>sudo ufw allow "OpenSSH"</kbd>
 
-Allow http and https connections.  Depending on your configuration, you may want to exclude some of the ports in the command below:  
-<kbd>sudo ufw allow proto tcp from any to any port 80,443,5000,5001</kbd>
+Allow http and https connections:  
+
+- If you are using a reverse proxy (like Nginx) which listens on ports 80/433:  
+<kbd>sudo ufw allow proto tcp from any to any port 80,443</kbd>
+
+- If you are using Kestrel (no reverse proxy), which listens on ports 5000/5001 by default:  
+<kbd>sudo ufw allow proto tcp from any to any port 5000,5001</kbd>
 
 Allow FTP:  
 <kbd>sudo ufw allow 22</kbd>
@@ -178,9 +229,13 @@ If you are not able to access Nucleus using your browser, you can try the follow
 <kbd>journalctl -xeu nucleus</kbd>
 
 3.  Check the Nucleus error log.  
-Navigate to the Nucleus log folder <kbd>cd /home/nucleus/data/logs</kbd>, then list the contents <kbd>ls</kbd>.  
+Navigate to the Nucleus log folder:  
+<kbd>cd /home/nucleus/data/logs</kbd>  
+then list the contents:  
+<kbd>ls</kbd>.  
 Choose today's log - log filenames use UTC dates, so 
-the file name might not match your local time zone - then open the log file in an editor - <kbd>nano 14-Dec-2022 UTC_MYCOMPUTER.log</kbd>.
+the file name might not match your local time zone - then open the log file in an editor:  
+<kbd>nano 14-Dec-2022 UTC_MYCOMPUTER.log</kbd>.
 
 4.  Try running Nucleus interactively.  
 First, you will need to configure the nucleus-service user to allow logins.

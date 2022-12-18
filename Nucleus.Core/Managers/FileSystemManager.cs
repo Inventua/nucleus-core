@@ -435,14 +435,16 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
-		public async Task RenameFolder(Site site, Folder folder, string newName)
+		public async Task RenameFolder(Site site, Folder originalFolder, string newName)
 		{
-			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, folder.Provider);
+			FileSystemProvider fileSystemProvider = this.FileSystemProviderFactory.Get(site, originalFolder.Provider);
+			Folder renamedFolder = RemoveSiteHomeDirectory(site, await fileSystemProvider.RenameFolder(UseSiteHomeDirectory(site, originalFolder.Path), newName));
+      // renamedFolder won't have an ID, because the FileSystemProvider doesn't know anything about database entries
+      originalFolder.CopyDatabaseValuesTo(renamedFolder);
 
-			folder = RemoveSiteHomeDirectory(site, await provider.RenameFolder(UseSiteHomeDirectory(site, folder.Path), newName));
-			 
-			//Folder parentFolder = RemoveSiteHomeDirectory(site, await provider.GetFolder(folder.Parent.Path));
-			Folder parentFolder = await this.GetFolder(site, folder.Provider, folder.Parent.Path);
+      // we can't guarantee that originalFolder has a populated parent property, and .RenameFolder doesn't populate it, so we must
+      // read the parent folder here, so that we can use the Id to remove parent cache entries.
+      Folder parentFolder = await this.GetFolder(site, originalFolder.Provider, originalFolder.Parent.Path);
 			string message = "";
 
 			if (!IsValidFolderName(parentFolder, newName, ref message))
@@ -451,22 +453,16 @@ namespace Nucleus.Core.Managers
 			}
 
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
-			{
-				Folder existing = await dataProvider.GetFolder(folder.Id);
+			{			
+				await dataProvider.SaveFolder(site, renamedFolder);
+				this.CacheManager.FolderCache().Remove(renamedFolder.Id);
+				this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, originalFolder.Provider, originalFolder.Path));
 
-				if (existing != null)
+				if (parentFolder != null)
 				{
-					folder.Id = existing.Id;
-					await dataProvider.SaveFolder(site, folder);
-					this.CacheManager.FolderCache().Remove(folder.Id);
-					this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, folder.Provider, folder.Path));
-
-					if (parentFolder != null)
-					{
-						this.CacheManager.FolderCache().Remove(parentFolder.Id);
-						this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, parentFolder.Provider, parentFolder.Path));
-					}
-				}
+					this.CacheManager.FolderCache().Remove(parentFolder.Id);
+					this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, parentFolder.Provider, parentFolder.Path));
+				}				
 			}
 		}
 
@@ -618,8 +614,7 @@ namespace Nucleus.Core.Managers
 
 		public async Task RenameFile(Site site, File file, string newName)
 		{
-			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, file.Provider);
-			//Folder parentFolder = await provider.GetFolder(UseSiteHomeDirectory(site, file.Parent.Path));
+			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, file.Provider);			
 			Folder parentFolder = await this.GetFolder(site, file.Provider, file.Parent.Path);
 			string message = "";
 

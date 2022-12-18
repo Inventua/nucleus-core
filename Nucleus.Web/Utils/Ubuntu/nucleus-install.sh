@@ -165,6 +165,7 @@ if [ "$INSTALL_ZIPFILE" == "" ]; then
       if [ "$?" == 2 ]; then
         # set the latest version of install zip file
         INSTALL_ZIPFILE=$zipfileversion
+        VERSION="${BASH_REMATCH[2]}"
       fi
     done
   fi
@@ -180,12 +181,15 @@ fi
 # Print settings, ask for confirmation 
 printf "Nucleus installer shell script version %s. \n\n" "$SHELL_SCRIPT_VERSION"
 printf "Your settings are:\n"
-printf "  - App path: '%s'\n" "$TARGET_DIRECTORY"
+printf "  - App path: '%s'.\n" "$TARGET_DIRECTORY"
 printf "  - Zip file: '%s'.\n\n" "$INSTALL_ZIPFILE"
 printf "This script will:\n"
 printf "  - Create a service account '%s' (if it does not already exist).\n" "$SERVICE_ACCOUNT"
-printf "  - Install ASP.NET Core Runtime\n"
-printf "  - Install %s package.\n\n" "$UNZIP_PACKAGE"
+printf "  - Install ASP.NET Core Runtime.\n"
+printf "  - Install %s package.\n" "$UNZIP_PACKAGE"
+printf "  - Install Nucleus version %s.\n" "$VERSION"
+printf "  - Set file and directory owner and permissions.\n"
+printf "  - Configure Nucleus to automatically run as a service.\n\n"
 
 read -r -p "Do you want to continue (Y/n)? " INSTALL_RESPONSE
 if [[ ! "$INSTALL_RESPONSE" =~ ^([yY][eE][sS]|[yY])$ ]]; then
@@ -296,5 +300,4 @@ systemctl enable --now nucleus
 
 # Finish installation message.
 printf "Nucleus is installed. \n"
-printf "You should review your firewall settings (ufw status). \n"
 

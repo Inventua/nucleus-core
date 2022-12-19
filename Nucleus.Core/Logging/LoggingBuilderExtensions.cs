@@ -92,6 +92,10 @@ namespace Nucleus.Core.Logging
             options.Enabled = false;
 					}
 				}
+        else
+        {
+          options.Path = this.FolderOptions.Value.ParseFolder(options.Path);
+        }
 			}
 		}
 	}

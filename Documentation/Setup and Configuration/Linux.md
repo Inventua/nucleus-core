@@ -97,14 +97,16 @@ You can set up [Nginx](https://learn.microsoft.com/en-us/aspnet/core/host-and-de
 [Apache](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-apache#install-apache) or another reverse 
 proxy.  
 
+See also:  [Nginx Walkthrough](/manage/hosting/linux/#nginx-walkthrough)
+
 If you don't want to use a reverse proxy, you can use Nucleus with the default ports (http: 5000, https: 5001), or you can configure 
-Nucleus to run Kestrel to using different ports (8080/8443) by editing `/home/nucleus/appSettings.Production.json`.
+Nucleus to run Kestrel using different ports (8080/8443) by editing `/home/nucleus/appSettings.Production.json`.
 
 <kbd>sudo nano /home/nucleus/app/appSettings.Production.json</kbd>
 
 Locate the Kestrel section, and set the port for the Http endpoint and Https endpoints.
 
-> **_NOTE:_**   Linux will not let you run using Kestrel using port numbers < 1024, because only the root user can use those ports.  Use a reverse 
+> **_NOTE:_**   Linux will not let you use port numbers < 1024, because only the root user can use those ports.  Use a reverse 
 proxy if you want to listen on ports 80/443.
 
 ### Set up a certificate and configure https

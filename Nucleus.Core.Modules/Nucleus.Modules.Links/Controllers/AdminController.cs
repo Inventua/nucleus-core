@@ -12,6 +12,7 @@ using Nucleus.Modules.Links.Models;
 using System.Threading.Tasks;
 using Nucleus.Extensions;
 using Microsoft.Extensions.Options;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace Nucleus.Modules.Links.Controllers
 {
@@ -228,72 +229,89 @@ namespace Nucleus.Modules.Links.Controllers
 			return viewModel;
 		}
 
-		private async Task<ViewModels.Editor> BuildEditorViewModel(ViewModels.Editor input)
-		{
-			ViewModels.Editor viewModel;
+    private async Task<ViewModels.Editor> BuildEditorViewModel(ViewModels.Editor input)
+    {
+      ViewModels.Editor viewModel;
 
-			if (input == null)
-			{
-				viewModel = new ViewModels.Editor();
-			}
-			else
-			{
-				viewModel = input;
-			}
+      if (input == null)
+      {
+        viewModel = new ViewModels.Editor();
+      }
+      else
+      {
+        viewModel = input;
+      }
 
-			viewModel.CategoryList = await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(MODULESETTING_CATEGORYLIST_ID, Guid.Empty));
+      await ReadEditorViewModel(viewModel, input.Link.Id);
 
-			viewModel.LinkTypes = new();
-			viewModel.LinkTypes.Add(Models.LinkTypes.Url, "Url");
-			viewModel.LinkTypes.Add(Models.LinkTypes.Page, "Page");
-			viewModel.LinkTypes.Add(Models.LinkTypes.File, "File");
-
-			if (viewModel.Link?.ImageFile != null)
-			{
-				viewModel.Link.ImageFile = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.Link.ImageFile);
-			}
-
-			return viewModel;
-		}
+      return viewModel;
+    }
 
 		private async Task<ViewModels.Editor> BuildEditorViewModel(ViewModels.Editor input, Guid id, Boolean standalone)
 		{
-			ViewModels.Editor viewModel = await BuildEditorViewModel (input);
+			ViewModels.Editor viewModel;
 
+      if (input == null)
+      {
+        viewModel = new ViewModels.Editor();
+      }
+      else
+      {
+        viewModel = input;
+      }
 
-			if (standalone)
+      if (standalone)
 			{
 				viewModel.UseLayout = "_PopupEditor";
 			}
 
-			if (viewModel.Link == null)
-			{
-				if (id != Guid.Empty)
-				{
-					viewModel.Link = await this.LinksManager.Get(this.Context.Site, id);
-				}
-				else
-				{
-					viewModel.Link = await this.LinksManager.CreateNew();
-				}
-			}
+      await ReadEditorViewModel(viewModel, id);
 
-			switch (viewModel.Link.LinkType)
-			{
-				case Models.LinkTypes.File:
-					if (viewModel.Link.LinkFile != null)
-					{
-						viewModel.Link.LinkFile.File = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.Link.LinkFile?.File);
-					}
-					break;
-				case Models.LinkTypes.Page:
-					viewModel.PageMenu = (await this.PageManager.GetAdminMenu(this.Context.Site, null, ControllerContext.HttpContext.User, 1, true, false, true));
-					break;
-			}
-
-			return viewModel;
+      return viewModel;
 		}
 
 
-	}
+    private async Task<ViewModels.Editor> ReadEditorViewModel(ViewModels.Editor viewModel, Guid id)
+    {
+      viewModel.CategoryList = await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(MODULESETTING_CATEGORYLIST_ID, Guid.Empty));
+
+      viewModel.LinkTypes = new();
+      viewModel.LinkTypes.Add(Models.LinkTypes.Url, "Url");
+      viewModel.LinkTypes.Add(Models.LinkTypes.Page, "Page");
+      viewModel.LinkTypes.Add(Models.LinkTypes.File, "File");
+
+      if (viewModel.Link == null)
+      {
+        if (id != Guid.Empty)
+        {
+          viewModel.Link = await this.LinksManager.Get(this.Context.Site, id);
+        }
+        else
+        {
+          viewModel.Link = await this.LinksManager.CreateNew();
+        }
+      }
+
+      if (viewModel.Link?.ImageFile != null)
+      {
+        viewModel.Link.ImageFile = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.Link.ImageFile);
+      }
+
+      switch (viewModel.Link.LinkType)
+      {
+        case Models.LinkTypes.File:
+          if (viewModel.Link.LinkFile != null)
+          {
+            viewModel.Link.LinkFile.File = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.Link.LinkFile?.File);
+          }
+          break;
+        case Models.LinkTypes.Page:
+          viewModel.PageMenu = (await this.PageManager.GetAdminMenu(this.Context.Site, null, ControllerContext.HttpContext.User, 1, true, false, true));
+          break;
+      }
+
+      return viewModel;
+    }
+
+  }
 }

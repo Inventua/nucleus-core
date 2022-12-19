@@ -1055,7 +1055,6 @@ function _Page()
 				_maximizeDialog(modal, false);
 				wrapper.modal('hide');
 			}
-
 		}
 
 		// if we get an empty response, and are in the main window, and the target is nothing, refresh the current page
@@ -1109,10 +1108,17 @@ function _Page()
 				focusableElement = target.find('button, a, [tabindex]:not([tabindex="-1"])').first();
 			}
 
-			// only focus on the "found" element if it is in view to prevent scrolling.
-			if (focusableElement.length > 0 && _isInView(focusableElement.first()))
-			{
-				focusableElement.first().focus();
+			if (focusableElement.length > 0)
+      {
+        window.setTimeout(function ()
+        {
+          // only focus on the "found" element if it is in view to prevent scrolling.  We do this in a .setTimeout because elements in 
+          // modals aren't immediately visible & elements can't receive focus until they are visible.
+          if (_isInView(focusableElement.first()))
+          {
+            focusableElement.first().focus();
+          }
+        }, 100 );
 			}
 		}
 	}

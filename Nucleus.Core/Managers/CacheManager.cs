@@ -48,7 +48,7 @@ namespace Nucleus.Core.Managers
 						CacheOption options = new();
 						this.Configuration.GetSection($"{CacheOption.Section}:{configItemName}").Bind(options, binderOptions => binderOptions.BindNonPublicProperties = true);
 
-						this.Logger?.LogDebug("Creating cache:'{configItemName}' with options: capacity={capacity}, expiry time={expiry}.", configItemName, options.Capacity, options.ExpiryTime);
+						this.Logger?.LogDebug("Creating cache:'{configItemName}' with capacity={capacity}, expiry time={expiry}.", configItemName, options.Capacity, options.ExpiryTime);
 
 						CacheCollection<TKey, TModel> result = new(configItemName, this.Logger, options);
 						this.Caches.Add(cacheKey, result);
@@ -75,10 +75,13 @@ namespace Nucleus.Core.Managers
 
 		public void Collect()
 		{
-			foreach (ICacheCollection cache in this.Caches.Values)
-			{
-				cache.Collect();
-			}
+      lock (lockObject)
+      {
+        foreach (ICacheCollection cache in this.Caches.Values)
+        {
+          cache.Collect();
+        }
+      }
 		}
 	}
 }

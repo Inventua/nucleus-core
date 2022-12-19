@@ -56,4 +56,6 @@ These CSS classes are used to control client-side behavior.
 | .nucleus-show-progress-inside    | - Display progress indicator inside the element.  The progress indicator is absolutely positioned, and aligned to the right. | 
 | .nucleus-show-progress-after     | - Display a progress indicator after the element. | 
 | .nucleus-show-progress-before    | - Display a progress indicator before the element. | 
+| .nucleus-default-control         | Specifies the element which should receive focus. | 
+| .nucleus-default-button          | Specifies a button which receives a 'click' event when the user presses ENTER in an INPUT element. | 
 

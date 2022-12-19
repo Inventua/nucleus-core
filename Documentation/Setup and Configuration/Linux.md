@@ -1,10 +1,4 @@
 # Hosting in Linux 
-You will need:
-- A PC, virtual machine or cloud instance running Linux.  We used a [Raspberry Pi 3](https://www.raspberrypi.com/products/raspberry-pi-3-model-b/) 
-to test our installer shell script.
-- Basic computing skills.  Most of the work is done by our installer shell script, so if you are a Windows user, you should be able to 
-successfully install Nucleus in Linux.
-
 > **_NOTE:_**   We have created a shell script to automate many of the steps.  This page describes the use of the shell script.  This 
 process has been tested with [*Ubuntu Server 22.04*](https://ubuntu.com/download/server).  The script will configure an instance of Nucleus which uses a Sqlite 
 database.  After you have completed basic installation, you can [configure Nucleus to use a different database type](/getting-started/#using-a-different-database-provider). 
@@ -40,17 +34,10 @@ connect from another computer:
 <br/>
 <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v1.1.0/Nucleus.1.1.0.0.Install.zip > Nucleus.1.1.0.0.Install.zip</kbd>  
 <br />
-If you are installing a later version of Nucleus, download the zip file for that version instead - the installer shell script automatically uses the 
-zip file with the most recent version which is in the same folder as the shell script.
+If you are installing a later version of Nucleus, download the zip file for that version instead - the installer shell script automatically 
+checks the folder which contains the shell script for the zip file with the most recent version of Nucleus.
 
 4.  Run the installer shell script:  
-**_TIP:_**   If you are installing to a Linux distribution other than Ubuntu Linux, some parts of the shell script may not work, because
-different Linux distributions use different commands to install packages.  You can work around this issue by installing the ASP.NET runtime and 
-unzip packages before running the script:  
-- [Install the ASP.NET runtime](https://learn.microsoft.com/en-us/dotnet/core/install/linux) 
-- [Install the unzip package](https://www.tecmint.com/install-zip-and-unzip-in-linux/)
-<br />
-<br />
 <kbd>sudo bash ./nucleus-install.sh</kbd>
 <br />
 <br />
@@ -58,6 +45,13 @@ The installation shell script creates a user named `nucleus-service`, installs t
 the application settings template with settings for Linux, sets file system object ownership and permissions and configures systemd to 
 automatically start, monitor and restart Nucleus.  The `nucleus-service` user is used to run Nucleus, and does not have a password or a shell 
 configured, so you can't log in as this user.
+<br />
+<br />
+**_TIP:_**   If you are installing to a Linux distribution other than Ubuntu Linux, some parts of the shell script may not work, because
+different Linux distributions use different commands to install packages.  You can work around this issue by [installing the ASP.NET runtime]((https://learn.microsoft.com/en-us/dotnet/core/install/linux) and 
+[unzip package](https://www.tecmint.com/install-zip-and-unzip-in-linux/) before running the script:
+<br />
+<br />
 
 ### Shell script command-line options
 For a fresh install you will not generally need to specify any command-line options.  

@@ -2,6 +2,8 @@
 Nucleus supports multiple hosting environments, database providers and file system providers.  The default configuration is set up to run
 in Windows/Internet Information Services using the Sqlite database provider and the local file system provider.
 
+See also:  [Hosting in Linux](/manage/hosting/linux/)
+
 ## Basic Setup 
 1. Download the install set (zip format) from the [downloads](/downloads) page.
 2. Create an installation folder, and un-zip the install set to that folder.

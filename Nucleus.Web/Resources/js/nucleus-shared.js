@@ -1055,7 +1055,6 @@ function _Page()
 				_maximizeDialog(modal, false);
 				wrapper.modal('hide');
 			}
-
 		}
 
 		// if we get an empty response, and are in the main window, and the target is nothing, refresh the current page
@@ -1111,8 +1110,11 @@ function _Page()
 
 			// only focus on the "found" element if it is in view to prevent scrolling.
 			if (focusableElement.length > 0 && _isInView(focusableElement.first()))
-			{
-				focusableElement.first().focus();
+      {
+        window.setTimeout(function ()
+        {
+          focusableElement.first().focus();
+        }, 100 );
 			}
 		}
 	}
@@ -1142,7 +1144,7 @@ function _Page()
 		var elementBottom = elementTop + element.outerHeight();
 		var viewportTop = jQuery(window).scrollTop();
 		var viewportBottom = viewportTop + jQuery(window).height();
-		return elementBottom > viewportTop && elementTop < viewportBottom;
+		return elementBottom >= viewportTop && elementTop <= viewportBottom;
 	};
 
 	function _initializeControls(target, data, status, request)

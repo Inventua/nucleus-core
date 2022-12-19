@@ -11,7 +11,7 @@
 	@Html.HiddenFor(model => model.SelectedItem.Id)
 	<fieldset>
 		<SettingsControl caption="New Name" helptext="New name">
-			@Html.TextBoxFor(model => model.SelectedItem.Name)
+      @Html.TextBoxFor(model => model.SelectedItem.Name, new { @class = "nucleus-default-control"})
 		</SettingsControl>
 	</fieldset>
 	<div class="nucleus-form-tools">

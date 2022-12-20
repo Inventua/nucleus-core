@@ -5,7 +5,9 @@ in Windows/Internet Information Services using the Sqlite database provider and 
 See also:  [Hosting in Linux](/manage/hosting/linux/)
 
 ## Basic Setup 
-1. Download the install set (zip format) from the [downloads](/downloads) page.
+1. Download the install set (zip format) from the [downloads](/downloads) page.  For a new install, you will need to download the 
+Nucleus.[version].Install.zip file.
+
 2. Create an installation folder, and un-zip the install set to that folder.
 3. Install the [.Net Core Hosting Bundle](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/iis/hosting-bundle).  You 
 may need to install the .Net Core Hosting Bundle and do a "Repair" install if IIS returns an error message and your Windows application event log 

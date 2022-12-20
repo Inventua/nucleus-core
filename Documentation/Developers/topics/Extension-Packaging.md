@@ -101,7 +101,8 @@ Modules must specify additional information for use by Nucleus.
 |------------------|-----------|--------------------------------------------------------------------------------------|
 | id               | Yes       | (attribute) A unique id (guid) for your module. |
 | friendlyName     | Yes       | (element)   The display name for your module.  This is displayed in the Nucleus user interface. |
-| classTypeName    | Yes       | (element)   The assembly/class .NET class name for your controller class in the form classname,assembly.  |
+| viewController   | Yes       | (element)   The class name for your view controller.  If the controller name ends in `Controller` you can omit the `Controller` suffix.  |
+| settingsController   | No    | (element)   The class name for your settings controller.  If your settings controller class is the same class as your view controller, you can omit this setting.  |
 | viewAction       | Yes       | (element)   The action in your controller class to call to display the end-user user interface.  |
 | editAction       | No        | (element)   The action in your controller class to call to display the administrative/settings user interface.  |
 | categories       | No        | (element)   A comma-separated list of module categories.  In the Nucleus add module page, modules are listed beneath each category that they are assigned to.  |

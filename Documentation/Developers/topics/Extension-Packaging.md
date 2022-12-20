@@ -101,6 +101,7 @@ Modules must specify additional information for use by Nucleus.
 |------------------|-----------|--------------------------------------------------------------------------------------|
 | id               | Yes       | (attribute) A unique id (guid) for your module. |
 | friendlyName     | Yes       | (element)   The display name for your module.  This is displayed in the Nucleus user interface. |
+| extension        | Yes       | (element)   The extension name for your module.  This should match the value of the `[Extension]` attribute on your controller classes.  |
 | viewController   | Yes       | (element)   The class name for your view controller.  If the controller name ends in `Controller` you can omit the `Controller` suffix.  |
 | settingsController   | No    | (element)   The class name for your settings controller.  If your settings controller class is the same class as your view controller, you can omit this setting.  |
 | viewAction       | Yes       | (element)   The action in your controller class to call to display the end-user user interface.  |
@@ -137,12 +138,12 @@ Control panel extensions must specify additional information for use by Nucleus.
 | Name             | Required? | Description                                                              |
 |------------------|-----------|--------------------------------------------------------------------------|
 | id               | Yes       | (attribute) Unique id (guid) for your control panel extension. |
-| FriendlyName     | Yes       | (element)  Display name for your control panel extension.  This is shown on-screen in the `Manage` or `Settings` control panel. |
-| Description      | Yes       | (element)  Description for your control panel extension.  This is shown on-screen in the `Manage` or `Settings` control panel. |
-| ControllerName   | Yes       | (element)  The type name of your controller class.  You can omit the root namespace and `Controller` suffix. For example, if your class name is `MyExtension.MyControlPanelController`, you can just specify `MyControlPanel`. |
-| ExtensionName    | Yes       | (element)  The name of the extension that the control panel extension belongs to.  This value must match the value of the `Extension()` attribute in your controller class and is used for MVC routing. |
-| Scope            | Yes       | (element)  Specifies whether the control panel extension is added to the `Manage` or `Settings` control panel.  The allowed values are `Site` or `Global`.  If your control panel extension saves settings for the current site, choose `Site`.  If your settings are for the entire Nucleus instance, choose `Global`. |
-| EditAction       | Yes       | (element)  The name of the Controller Action to run when the user selects the control panel extension.  This action should render a View. |
+| friendlyName     | Yes       | (element)  Display name for your control panel extension.  This is shown on-screen in the `Manage` or `Settings` control panel. |
+| description      | Yes       | (element)  Description for your control panel extension.  This is shown on-screen in the `Manage` or `Settings` control panel. |
+| controllerName   | Yes       | (element)  The type name of your controller class.  You can omit the root namespace and `Controller` suffix. For example, if your class name is `MyExtension.MyControlPanelController`, you can just specify `MyControlPanel`. |
+| extensionName    | Yes       | (element)  The name of the extension that the control panel extension belongs to.  This value must match the value of the `Extension()` attribute in your controller class and is used for MVC routing. |
+| scope            | Yes       | (element)  Specifies whether the control panel extension is added to the `Manage` or `Settings` control panel.  The allowed values are `Site` or `Global`.  If your control panel extension saves settings for the current site, choose `Site`.  If your settings are for the entire Nucleus instance, choose `Global`. |
+| editAction       | Yes       | (element)  The name of the Controller Action to run when the user selects the control panel extension.  This action should render a View. |
 
 ## `<file>` 
 Specifies a file to copy during installation.  The file must be present in the package, in a folder location that matches the structure 

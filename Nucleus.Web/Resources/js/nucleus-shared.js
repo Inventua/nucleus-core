@@ -1088,7 +1088,7 @@ function _Page()
 					var dashCount = Math.floor(parent.width() / measure.width());
 					measure.remove();
 					// set option element to disabled, fill with the calculated number of dashes
-					if (!Number.isInteger(dashcount)) dashCount = 10;
+					if (!Number.isInteger(dashCount)) dashCount = 10;
 					element.text("-".repeat(dashCount));
 					element.attr('disabled', 'disabled');
 				}, 100, jQuery(this));

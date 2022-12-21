@@ -83,7 +83,7 @@ namespace Nucleus.Abstractions.Managers
 		public Task<User> Get(Site site, string userName);
 
 		/// <summary>
-		/// Retrieve an existing <see cref="User"/> from the database, matching by the specified userName.
+		/// Retrieve an existing <see cref="User"/> from the database, matching by the specified email address.
 		/// </summary>
 		/// <param name="site"></param>
 		/// <param name="email"></param>

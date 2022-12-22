@@ -310,7 +310,10 @@ namespace Nucleus.Extensions.AmazonS3FileSystemProvider
 				}
 				else if (item is Abstractions.Models.FileSystem.File)
 				{
-					folder.Files.Add(item as Abstractions.Models.FileSystem.File);
+          if (String.IsNullOrEmpty(pattern) || System.Text.RegularExpressions.Regex.IsMatch(item.Name, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+          {
+            folder.Files.Add(item as Abstractions.Models.FileSystem.File);
+          }
 				}
 			}
 

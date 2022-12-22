@@ -348,7 +348,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 								// Item is a file
 
 								// Add file if it matches the specifed pattern
-								if (String.IsNullOrEmpty(pattern) || System.Text.RegularExpressions.Regex.IsMatch(item?.Blob.Name, pattern))
+								if (String.IsNullOrEmpty(pattern) || System.Text.RegularExpressions.Regex.IsMatch(item?.Blob.Name, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
 								{
 									folder.Files.Add(BuildFile(containerClient.Name, item.Blob));
 								}

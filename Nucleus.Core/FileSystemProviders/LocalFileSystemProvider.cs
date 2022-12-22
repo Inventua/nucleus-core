@@ -242,7 +242,7 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 
 			foreach (System.IO.FileInfo item in folderInfo.GetFiles()
-				.Where(item => String.IsNullOrEmpty(pattern) || System.Text.RegularExpressions.Regex.IsMatch(item.Name, pattern)))
+				.Where(item => String.IsNullOrEmpty(pattern) || System.Text.RegularExpressions.Regex.IsMatch(item.Name, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase)))
 			{
 				//if (this.Options.AllowedTypes.Contains(item.Extension, StringComparer.OrdinalIgnoreCase))
 				if (this.GlobalOptions.Value.AllowedFileTypes.Where(allowed => allowed.FileExtensions.Contains(item.Extension, StringComparer.OrdinalIgnoreCase)).Any())

@@ -1130,7 +1130,7 @@ function _Page()
 	{
 		jQuery.uniqueSort(jQuery('.modal-backdrop').parent()).each(function (index, parentElement)
 		{
-			jQuery(parentElement).find('.modal-backdrop:not(:last)').remove();
+			jQuery(parentElement).find('.modal-backdrop:not(:first)').remove();
 		});
 	}
 

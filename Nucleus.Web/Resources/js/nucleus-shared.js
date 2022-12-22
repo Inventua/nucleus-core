@@ -1160,9 +1160,9 @@ function _Page()
     }
 
     // initialize plugins
-    if (jQuery().HtmlEditor) { args.target.find('.HtmlEditorControl').HtmlEditor({ isAdminMode: true }); }
-    if (jQuery().ToggleSwitch) { args.target.find('.ToggleSwitch').ToggleSwitch(); }
-    if (jQuery().PageList) { args.target.find('.nucleus-page-list').PageList(); }
+    if (jQuery().HtmlEditor) { target.find('.HtmlEditorControl').HtmlEditor({ isAdminMode: false }); }
+    if (jQuery().ToggleSwitch) { target.find('.ToggleSwitch').ToggleSwitch(); }
+    if (jQuery().PageList) { target.find('.nucleus-page-list').PageList(); }
 
     Page.EnableEnhancedToolTips(true);
 	}

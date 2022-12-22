@@ -73,8 +73,9 @@ namespace Nucleus.ViewFeatures.Controls
 			// https://stackoverflow.com/questions/16816184/mvc-crazy-property-lose-its-value-does-html-hiddenfor-bug
 			// https://stackoverflow.com/questions/594600/possible-bug-in-asp-net-mvc-with-form-values-being-replaced/30698787#30698787
 			// https://newbedev.com/possible-bug-in-asp-net-mvc-with-form-values-being-replaced
-			ModelState.Remove("SelectedFolder.Provider");
-			ModelState.Remove("SelectedFolder.Path");
+			ModelState.Remove($"{propertyName}.Provider");
+      ModelState.Remove($"{propertyName}.Id");
+      ModelState.Remove($"{propertyName}.Path");
 
 			// if no provider is selected, default the selected provider key to the first available
 			if (String.IsNullOrEmpty(viewModel.SelectedFolder.Provider))

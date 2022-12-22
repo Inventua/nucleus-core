@@ -1157,7 +1157,14 @@ function _Page()
 		{
 			// trigger click to select the tab (and un-select other tabs)
 			target.find('.nav .nav-item:nth-child(' + this._selectedTab + ') button').trigger('click');
-		}
+    }
+
+    // initialize plugins
+    if (jQuery().HtmlEditor) { args.target.find('.HtmlEditorControl').HtmlEditor({ isAdminMode: true }); }
+    if (jQuery().ToggleSwitch) { args.target.find('.ToggleSwitch').ToggleSwitch(); }
+    if (jQuery().PageList) { args.target.find('.nucleus-page-list').PageList(); }
+
+    Page.EnableEnhancedToolTips(true);
 	}
 
 	function _getCookie(name)

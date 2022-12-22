@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Nucleus.Extensions;
 
 namespace Nucleus.ViewFeatures.HtmlHelpers
 {
@@ -98,7 +100,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
       if (!String.IsNullOrEmpty(stylesheetPath))
       {
-        return AddStyle(htmlHelper, stylesheetPath);
+        return AddStyle(htmlHelper, stylesheetPath, true, false, Version.Parse(typeof(AddStyleHtmlHelper).Assembly.Version()));
       }
       else
       {
@@ -161,6 +163,28 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// </example>
     public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, Boolean defer, Boolean isDynamic)
     {
+      return AddStyle(htmlHelper, stylesheetPath, defer, isDynamic, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
+    }
+
+
+    /// <summary>
+    /// Register the specified style to be added to the Layout or module's CSS styles.
+    /// </summary>
+    /// <param name="htmlHelper"></param>
+    /// <param name="stylesheetPath"></param>
+    /// <param name="defer"></param>
+    /// <param name="isDynamic"></param>
+    /// <param name="version"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// Extensions (modules) can use this Html Helper to add CSS stylesheets to the HEAD block.  The scriptPath can contain the 
+    ///  ~! for the currently executing view path, or ~# for the currently executing extension. 
+    /// </remarks>
+    /// <example>
+    /// @Html.AddScript("~/Extensions/MyModule/MyModule.css")
+    /// </example>
+    private static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, Boolean defer, Boolean isDynamic, System.Version version)
+    {
       ResourceFileOptions resourceFileOptions = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IOptions<ResourceFileOptions>>().Value;
       Dictionary<string, StylesheetInfo> stylesheets = (Dictionary<string, StylesheetInfo>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
 
@@ -186,7 +210,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
           Path = finalStylesheetPath,
           Defer = defer,
           IsDynamic = isDynamic,
-          Version = ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version
+          Version = version
         });
 
         htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] = stylesheets;

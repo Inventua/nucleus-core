@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Nucleus.Extensions;
 
 namespace Nucleus.ViewFeatures.HtmlHelpers
 {
@@ -116,7 +117,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
       if (!String.IsNullOrEmpty(scriptPath))
       {
-        return AddScript(htmlHelper, scriptPath, false, WellKnownScriptOrders.EARLY);
+        return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(scriptPath), false, false, WellKnownScriptOrders.EARLY, Version.Parse(typeof(AddScriptHtmlHelper).Assembly.Version()));
       }
       else
       {

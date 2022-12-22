@@ -35,6 +35,7 @@
     <None Remove="DataProviders\Migrations\Scripts\01.00.07.json" />
     <None Remove="DataProviders\Migrations\Scripts\01.00.08.json" />
     <None Remove="DataProviders\Migrations\Scripts\01.00.09.json" />
+    <None Remove="DataProviders\Migrations\Scripts\01.00.10.json" />
     <None Remove="Mail\mail.css" />
   </ItemGroup>
 
@@ -49,6 +50,7 @@
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.03.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.04.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.07.json" />
+    <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.10.json" />
     <EmbeddedResource Include="Mail\mail.css" />
   </ItemGroup>
 

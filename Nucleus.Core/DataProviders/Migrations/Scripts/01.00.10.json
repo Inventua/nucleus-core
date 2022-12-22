@@ -1,0 +1,142 @@
+{
+  "schemaName": "Nucleus.Core",
+  "version": "01.00.10",
+  "operations": [
+    {
+      "createTable": {
+        "name": "Organizations",
+        "columns": [
+          {
+            "name": "Id",
+            "clrType": "guid",
+            "isnullable": false
+          },
+          {
+            "name": "SiteId",
+            "clrType": "guid",
+            "isnullable": false
+          },
+          {
+            "name": "Name",
+            "clrType": "string",
+            "maxLength": 256,
+            "isnullable": false
+          },
+          {
+            "name": "DateAdded",
+            "clrType": "datetime",
+            "isnullable": true
+          },
+          {
+            "name": "AddedBy",
+            "clrType": "guid",
+            "isnullable": true
+          },
+          {
+            "name": "DateChanged",
+            "clrType": "datetime",
+            "isnullable": true
+          },
+          {
+            "name": "ChangedBy",
+            "clrType": "guid",
+            "isnullable": true
+          }
+        ],
+        "primaryKey": {
+          "name": "PK_Organizations",
+          "isclustered": true,
+          "columns": [ "Id" ]
+        },
+        "foreignKeys": [
+          {
+            "name": "FK_Organizations_SiteId",
+            "Columns": [ "SiteId" ],
+            "PrincipalTable": "Sites",
+            "PrincipalColumns": [ "Id" ],
+            "OnDelete": "Cascade"
+          }
+        ]
+      }
+    },
+    {
+      "createIndex": {
+        "name": "IX_Organizations_Name",
+        "table": "Organizations",
+        "isunique": true,
+        "columns": [ "SiteId", "Name" ]
+      }
+    },
+    {
+      "createIndex": {
+        "name": "IX_Organizations_Site",
+        "table": "Organizations",
+        "columns": [ "SiteId" ]
+      }
+    },
+
+    {
+      "createTable": {
+        "name": "OrganizationUsers",
+        "columns": [
+          {
+            "name": "OrganizationId",
+            "clrType": "guid",
+            "isnullable": false
+          },
+          {
+            "name": "UserId",
+            "clrType": "guid",
+            "isnullable": false
+          },
+          {
+            "name": "UserType",
+            "clrType": "int",
+            "isnullable": false
+          },
+          {
+            "name": "DateAdded",
+            "clrType": "datetime",
+            "isnullable": true
+          },
+          {
+            "name": "AddedBy",
+            "clrType": "guid",
+            "isnullable": true
+          },
+          {
+            "name": "DateChanged",
+            "clrType": "datetime",
+            "isnullable": true
+          },
+          {
+            "name": "ChangedBy",
+            "clrType": "guid",
+            "isnullable": true
+          }
+        ],
+        "primaryKey": {
+          "name": "PK_OrganizationUsers",
+          "isclustered": true,
+          "columns": [ "OrganizationId", "UserId" ]
+        }
+      }
+    },
+    {
+      "createIndex": {
+        "name": "IX_OrganizationUsers_Organization",
+        "table": "Organizations",
+        "isunique": false,
+        "columns": [ "OrganizationId" ]
+      }
+    },
+    {
+      "createIndex": {
+        "name": "IX_Organizations_User",
+        "table": "Organizations",
+        "isunique": false,
+        "columns": [ "UserId" ]
+      }
+    }
+  ]
+}

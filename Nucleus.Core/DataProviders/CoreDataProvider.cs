@@ -25,7 +25,7 @@ namespace Nucleus.Core.DataProviders
 	/// <remarks>
 	/// This class implements all of the data provider interfaces for use with entity framework.  
 	/// </remarks>
-	public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayoutDataProvider, IUserDataProvider, IPermissionsDataProvider, ISessionDataProvider, IMailDataProvider, IScheduledTaskDataProvider, IFileSystemDataProvider, IListDataProvider, IContentDataProvider, IApiKeyDataProvider
+	public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayoutDataProvider, IUserDataProvider, IPermissionsDataProvider, ISessionDataProvider, IMailDataProvider, IScheduledTaskDataProvider, IFileSystemDataProvider, IListDataProvider, IContentDataProvider, IApiKeyDataProvider, IOrganizationDataProvider
 	{
 		protected IEventDispatcher EventManager { get; }
 		protected new CoreDataProviderDbContext Context { get; }
@@ -2367,8 +2367,150 @@ namespace Nucleus.Core.DataProviders
 			await this.Context.SaveChangesAsync();
 		}
 
-		#endregion
+    #endregion
 
-	}
+    #region "    Organizations    "
+
+
+    public async Task<IList<Organization>> ListOrganizations(Site site)
+    {
+      return await this.Context.Organizations.Where(organization => EF.Property<Guid>(organization, "SiteId") == site.Id)        
+        .AsNoTracking()
+        .OrderBy(organization => organization.Name)
+        .ToListAsync();
+    }
+
+    public async Task<PagedResult<Organization>> ListOrganizations(Site site, PagingSettings pagingSettings)
+    {
+      List<Organization> results;
+
+      pagingSettings.TotalCount = await this.Context.Organizations
+        .Where(organization => EF.Property<Guid>(organization, "SiteId") == site.Id)
+        .AsNoTracking()
+        .CountAsync();
+
+      results = await this.Context.Organizations
+        .Where(organization => EF.Property<Guid>(organization, "SiteId") == site.Id)
+        .AsNoTracking()
+        .Skip(pagingSettings.FirstRowIndex)
+        .Take(pagingSettings.PageSize)
+        .OrderBy(organization => organization.Name)
+        .ToListAsync();
+
+      return new Nucleus.Abstractions.Models.Paging.PagedResult<Organization>(pagingSettings, results);
+    }
+
+    public async Task<PagedResult<Organization>> SearchOrganizations(Site site, string searchTerm, PagingSettings pagingSettings)
+    {
+      List<Organization> results;
+
+      pagingSettings.TotalCount = await this.Context.Organizations
+        .Where(organization => EF.Property<Guid>(organization, "SiteId") == site.Id && EF.Functions.Like(organization.Name, $"%{searchTerm}%"))
+        .AsNoTracking()
+        .CountAsync();
+
+      results = await this.Context.Organizations
+        .Where(organization => EF.Property<Guid>(organization, "SiteId") == site.Id && EF.Functions.Like(organization.Name, $"%{searchTerm}%"))
+        .AsNoTracking()
+        .Skip(pagingSettings.FirstRowIndex)
+        .Take(pagingSettings.PageSize)
+        .OrderBy(organization => organization.Name)
+        .ToListAsync();
+
+      return new Nucleus.Abstractions.Models.Paging.PagedResult<Organization>(pagingSettings, results);
+    }
+
+    public async Task<Organization> GetOrganization(Guid organizationId)
+    {
+      return await this.Context.Organizations.Where(organization => organization.Id == organizationId)
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
+    }
+
+    public async Task<Organization> GetOrganizationByName(Site site, string name)
+    {
+      return await this.Context.Organizations.Where(organization => EF.Property<Guid>(organization, "SiteId") == site.Id && organization.Name == name)
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
+    }
+
+    public async Task<Boolean> IsOrganizationMember(Organization organization, Guid userId)
+    {
+      return await this.Context.OrganizationUsers.Where(organizationUser => organizationUser.Organization.Id == organization.Id && organizationUser.User.Id == userId)
+       .AsNoTracking()
+       .AnyAsync();
+    }
+
+    public async Task<Boolean> IsOrganizationAdministrator(Organization organization, Guid userId)
+    {
+      return await this.Context.OrganizationUsers.Where(organizationUser => organizationUser.Organization.Id == organization.Id && organizationUser.User.Id == userId && organizationUser.UserType == OrganizationUser.UserTypes.Administrator)
+       .AsNoTracking()
+       .AnyAsync();
+    }
+
+    public async Task SaveOrganization(Site site, Organization organization)
+    {
+      Boolean isNew = !this.Context.Organizations.Where(existing => existing.Id == organization.Id).Any();
+
+      this.Context.Attach(organization);
+      this.Context.Entry(organization).Property("SiteId").CurrentValue = site.Id;
+      this.Context.Entry(organization).State = isNew ? EntityState.Added : EntityState.Modified;
+      await this.Context.SaveChangesAsync();
+
+      if (isNew)
+      {
+        this.EventManager.RaiseEvent<Organization, Create>(organization);
+      }
+      else
+      {
+        this.EventManager.RaiseEvent<Organization, Update>(organization);
+      }
+    }
+
+    public async Task DeleteOrganization(Organization organization)
+    {
+      this.Context.Organizations.Remove(organization);
+      await this.Context.SaveChangesAsync();
+
+      this.EventManager.RaiseEvent<Organization, Delete>(organization);
+    }
+
+    public async Task AddOrganizationUser(OrganizationUser organizationUser)
+    {
+      Boolean isNew = this.Context.OrganizationUsers
+        .Where(existing => existing.Organization.Id == organizationUser.Organization.Id && existing.User.Id == organizationUser.User.Id)
+        .AsNoTracking()
+        .Any();
+
+      if (isNew)
+      {
+        this.Context.OrganizationUsers.Add(organizationUser);
+      }
+      else
+      {
+        this.Context.OrganizationUsers.Update(organizationUser);
+      }
+
+      if (isNew)
+      {
+        this.EventManager.RaiseEvent<OrganizationUser, Create>(organizationUser);
+      }
+      else
+      {
+        this.EventManager.RaiseEvent<OrganizationUser, Update>(organizationUser);
+      }
+
+      await this.Context.SaveChangesAsync();
+    }
+
+    public async Task RemoveOrganizationUser(OrganizationUser organizationUser)
+    {
+      this.Context.OrganizationUsers.Add(organizationUser);
+      await this.Context.SaveChangesAsync();
+      this.EventManager.RaiseEvent<OrganizationUser, Delete>(organizationUser);
+    }
+
+    #endregion
+  }
 }
 

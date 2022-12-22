@@ -105,9 +105,10 @@ namespace Nucleus.Core
 			services.AddSingleton<IPermissionsManager, Managers.PermissionsManager>();
 
 			services.AddSingleton<IApiKeyManager, Managers.ApiKeyManager>();
+      services.AddSingleton<IOrganizationManager, Managers.OrganizationManager>(); 
 
-			// Search
-			services.AddTransient<IContentMetaDataProducer, Search.PageMetaDataProducer>();
+      // Search
+      services.AddTransient<IContentMetaDataProducer, Search.PageMetaDataProducer>();
 			services.AddTransient<IContentMetaDataProducer, Search.FileMetaDataProducer>();
 
 			// Built-in Event handlers

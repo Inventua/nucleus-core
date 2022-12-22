@@ -46,5 +46,6 @@ namespace Nucleus.Core
 
 		public static CacheCollection<string, List<PermissionType>> PermissionTypesCache(this ICacheManager cacheManager) { return cacheManager.Get<string, List<PermissionType>>(); }
 
-	}
+    public static CacheCollection<Guid, Organization> OrganizationCache(this ICacheManager cacheManager) { return cacheManager.Get<Guid, Organization>(); }
+  }
 }

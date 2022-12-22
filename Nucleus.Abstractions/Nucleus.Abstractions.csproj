@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="..\Nucleus.Core\core.build.targets" />
+    
 	<PropertyGroup Label="Globals">
 		<SccProjectName></SccProjectName>
 		<SccProvider></SccProvider>
@@ -22,9 +24,9 @@
 		
 		<Description>Models, interfaces and extensions used by the Nucleus runtime and by Nucleus extensions.</Description>
 		
-		<!-- This is overridden by core.build.targets -->
-		<VersionPrefix>1.0.1.0</VersionPrefix>
-		<!--<VersionSuffix>a4</VersionSuffix>-->
+		<!-- Version is set by core.build.targets, can be overridden here for pre-release builds -->
+		<VersionPrefix>1.1.0.1-pre</VersionPrefix>
+		<VersionSuffix>a2</VersionSuffix>
 		
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
 		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>
@@ -68,5 +70,4 @@
 		<Copy SourceFiles="bin\$(Configuration)\$(TargetFramework)\Nucleus.Abstractions.xml" DestinationFolder="$(SolutionDir)\..\Publish\XmlDocumentation" Retries="2" />
 	</Target>
 
-	<Import Project="..\Nucleus.Core\core.build.targets" />
 </Project>

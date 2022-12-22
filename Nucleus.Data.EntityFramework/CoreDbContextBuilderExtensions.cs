@@ -215,7 +215,16 @@ namespace Nucleus.Data.EntityFramework
 					entity.ToTable("UserRoles");
 				});
 
-			return builder;
+      // SiteId is not a CLR property (it is a shadow property) so we must define its type
+     builder.Entity<Organization>()
+        .ToTable("Organizations")
+        .Property<Guid>("SiteId").IsRequired();
+
+      builder.Entity<OrganizationUser>()
+        .ToTable("OrganizationUsers")
+        .HasKey(new string[] { "OrganizationId", "UserId" });
+
+      return builder;
 		}
 
 		/// <summary>

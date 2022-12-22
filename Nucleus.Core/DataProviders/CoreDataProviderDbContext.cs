@@ -70,8 +70,12 @@ namespace Nucleus.Core.DataProviders
 
 		public DbSet<ApiKey> ApiKeys { get; set; }
 
-		// This isn't referenced anywhere, but it allows EF to correctly understand the database schema
-		public DbSet<UserSecrets> UserSecrets { get; set; }
+    public DbSet<Organization> Organizations { get; set; }
+    public DbSet<OrganizationUser> OrganizationUsers { get; set; }
+
+
+    // This isn't referenced anywhere, but it allows EF to correctly understand the database schema
+    public DbSet<UserSecrets> UserSecrets { get; set; }
 
 		public CoreDataProviderDbContext(DbContextConfigurator<CoreDataProvider> dbContextConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) 
 			: base(dbContextConfigurator, httpContextAccessor, loggerFactory)	{	}

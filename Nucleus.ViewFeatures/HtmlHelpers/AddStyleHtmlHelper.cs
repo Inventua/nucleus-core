@@ -100,7 +100,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
       if (!String.IsNullOrEmpty(stylesheetPath))
       {
-        return AddStyle(htmlHelper, stylesheetPath, true, false, Version.Parse(typeof(AddStyleHtmlHelper).Assembly.Version()));
+        return AddStyle(htmlHelper, stylesheetPath, true, false,typeof(AddStyleHtmlHelper).Assembly.Version());
       }
       else
       {
@@ -163,7 +163,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// </example>
     public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, Boolean defer, Boolean isDynamic)
     {
-      return AddStyle(htmlHelper, stylesheetPath, defer, isDynamic, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
+      return AddStyle(htmlHelper, stylesheetPath, defer, isDynamic, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version.ToString());
     }
 
 
@@ -183,7 +183,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// <example>
     /// @Html.AddScript("~/Extensions/MyModule/MyModule.css")
     /// </example>
-    private static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, Boolean defer, Boolean isDynamic, System.Version version)
+    private static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, Boolean defer, Boolean isDynamic, string version)
     {
       ResourceFileOptions resourceFileOptions = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IOptions<ResourceFileOptions>>().Value;
       Dictionary<string, StylesheetInfo> stylesheets = (Dictionary<string, StylesheetInfo>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
@@ -258,7 +258,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
               builder.Attributes.Add("data-dynamic", "true");
             }
 
-            builder.Attributes.Add("href", style.Value.Path + (style.Value.Version != null ? "?v=" + style.Value.Version.ToString() : ""));
+            builder.Attributes.Add("href", style.Value.Path + (!String.IsNullOrEmpty(style.Value.Version) ? "?v=" + style.Value.Version : ""));
 
             if (style.Value.Defer)
             {
@@ -279,7 +279,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
     private class StylesheetInfo
     {
-      public System.Version Version { get; set; }
+      public string Version { get; set; }
       public Boolean Defer { get; set; }
       public Boolean IsDynamic { get; set; }
       public string Path { get; set; }

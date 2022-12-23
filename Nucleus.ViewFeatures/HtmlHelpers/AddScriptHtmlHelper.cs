@@ -62,7 +62,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// <summary>
     /// Constant values used to set script ordering in the AddScript overloads that have an order parameter.  Callers to AddScript can 
     /// also use an integer value, these values are provided for convenience.  Scripts added using 
-    /// <see cref="AddScript(HttpContext, string, bool, bool, int, Version)"/> can have the same value in the order parameter as another script, in theis
+    /// <see cref="AddScript(HttpContext, string, bool, bool, int, string)"/> can have the same value in the order parameter as another script, in this
     /// case they are ordered by which order AddScript was called in.
     /// </summary>
     public class WellKnownScriptOrders
@@ -117,7 +117,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
       if (!String.IsNullOrEmpty(scriptPath))
       {
-        return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(scriptPath), false, false, WellKnownScriptOrders.EARLY, Version.Parse(typeof(AddScriptHtmlHelper).Assembly.Version()));
+        return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(scriptPath), false, false, WellKnownScriptOrders.EARLY, typeof(AddScriptHtmlHelper).Assembly.Version());
       }
       else
       {
@@ -161,7 +161,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// </example>
     public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, string scriptPath, Boolean isAsync)
     {
-      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(htmlHelper.ResolveExtensionUrl(scriptPath)), isAsync, false, WellKnownScriptOrders.DEFAULT, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
+      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(htmlHelper.ResolveExtensionUrl(scriptPath)), isAsync, false, WellKnownScriptOrders.DEFAULT, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version.ToString());
     }
 
     /// <summary>
@@ -182,7 +182,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// </example>
     public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, string scriptPath, Boolean isAsync, int order)
     {
-      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(htmlHelper.ResolveExtensionUrl(scriptPath)), isAsync, false, order, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
+      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(htmlHelper.ResolveExtensionUrl(scriptPath)), isAsync, false, order, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version.ToString());
     }
 
     /// <summary>
@@ -203,7 +203,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// </example>
     public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, string scriptPath, Boolean isAsync, Boolean isDynamic)
     {
-      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(scriptPath), isAsync, isDynamic, WellKnownScriptOrders.DEFAULT, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version);
+      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(scriptPath), isAsync, isDynamic, WellKnownScriptOrders.DEFAULT, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version.ToString());
     }
 
     /// <summary>
@@ -223,7 +223,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       return AddScript(context, scriptPath, isAsync, !scriptPath.EndsWith(".js"), order, null);
     }
 
-    private static IHtmlContent AddScript(HttpContext context, string scriptPath, Boolean isAsync, Boolean isDynamic, int order, Version version)
+    private static IHtmlContent AddScript(HttpContext context, string scriptPath, Boolean isAsync, Boolean isDynamic, int order, string version)
     {
       ResourceFileOptions resourceFileOptions = context.RequestServices.GetService<IOptions<ResourceFileOptions>>().Value;
       Dictionary<string, ScriptInfo> scripts = (Dictionary<string, ScriptInfo>)context.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
@@ -296,7 +296,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
             {
               builder.Attributes.Add("data-dynamic", "true");
             }
-            builder.Attributes.Add("src", script.Value.Path + (script.Value.Version != null ? "?v=" + script.Value.Version.ToString() : ""));
+            builder.Attributes.Add("src", script.Value.Path + (!String.IsNullOrEmpty(script.Value.Version) ? "?v=" + script.Value.Version : ""));
             if (script.Value.IsAsync)
             {
               builder.Attributes.Add("async", "");
@@ -314,7 +314,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
     private class ScriptInfo
     {
-      public System.Version Version { get; set; }
+      public string Version { get; set; }
       public Boolean IsAsync { get; set; }
       public Boolean IsDynamic { get; set; }
       public string Path { get; set; }

@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models.FileSystem;
-using DocumentFormat.OpenXml.Drawing;
 
 namespace Nucleus.ViewFeatures.Controls
 {

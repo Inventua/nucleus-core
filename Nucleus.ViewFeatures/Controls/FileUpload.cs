@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models.FileSystem;
+using DocumentFormat.OpenXml.Drawing;
 
 namespace Nucleus.ViewFeatures.Controls
 {
@@ -37,13 +38,15 @@ namespace Nucleus.ViewFeatures.Controls
 		/// <param name="filter"></param>
 		/// <param name="actionName"></param>
 		/// <param name="controlName"></param>
+    /// <param name="text"></param>
 		/// <returns></returns>
-		public async Task<IViewComponentResult> InvokeAsync(Folder folder, string filter, string actionName, string controlName)
+		public async Task<IViewComponentResult> InvokeAsync(Folder folder, string filter, string actionName, string controlName, string text)
 		{
 			ViewModels.FileUpload viewModel = new()
 			{
 				ControlName = controlName ?? "mediaFile",
-				ActionName = actionName ?? "UploadFile",
+        Text = text ?? "Upload File",
+        ActionName = actionName ?? "UploadFile",
 				ControllerName = (string)this.ViewContext.RouteData.Values["controller"],
 				AreaName = (string)this.ViewContext.RouteData.Values["area"],
 				ExtensionName = (string)this.ViewContext.RouteData.Values["extension"],

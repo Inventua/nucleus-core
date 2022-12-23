@@ -3,7 +3,7 @@
 {
 	<span class="btn btn-secondary ms-auto">
 		<label>
-			<span class="nucleus-material-icon">&#xe2c6</span> Upload File
+			<span class="nucleus-material-icon">&#xe2c6</span> @Model.Text
 			<input type="file" name="@Model.ControlName" class="collapse" formaction="@Url.NucleusAction(@Model.ActionName, @Model.ControllerName, @Model.AreaName, @Model.ExtensionName)" accept="@Model.Filter" >			
 		</label>
 	</span>
@@ -14,7 +14,7 @@ else
 {
 	<span class="btn btn-secondary ms-auto disabled">
 		<label>
-			<span class="nucleus-material-icon">&#xe2c6</span> Upload File
+			<span class="nucleus-material-icon">&#xe2c6</span> @Model.Text
 		</label>
 	</span>
 }

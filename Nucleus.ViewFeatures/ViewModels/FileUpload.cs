@@ -11,10 +11,15 @@ namespace Nucleus.ViewFeatures.ViewModels
 	/// </summary>
 	public class FileUpload
 	{
-		/// <summary>
-		/// Name of the form field used to submit the uploaded file.
-		/// </summary>
-		public string ControlName { get; set; }
+    /// <summary>
+    /// Display text for the upload control.
+    /// </summary>
+    public string Text { get; set; } = "Upload File";
+
+    /// <summary>
+    /// Name of the form field used to submit the uploaded file.
+    /// </summary>
+    public string ControlName { get; set; }
 
 		/// <summary>
 		/// Action name

@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <Import Project="..\Nucleus.Core\core.build.targets" />
+  
   <PropertyGroup Label="Globals">
     <SccProjectName></SccProjectName>
     <SccProvider></SccProvider>
@@ -15,9 +16,9 @@
 		<PackageId>Nucleus.ViewFeatures</PackageId>
 		<Description>Html Helpers, Tag Helpers, Url Helpers and shared controls used by Nucleus core and extensions.</Description>
 		
-		<!-- This is overridden by core.build.targets -->
-		<VersionPrefix>1.0.1.0</VersionPrefix>
-		<!--<VersionSuffix>a1</VersionSuffix>-->
+		<!-- This overrides the version set by core.build.targets -->
+		<VersionPrefix>1.1.0.1-pre</VersionPrefix>
+		<VersionSuffix>a1</VersionSuffix>
 		
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
 		<PackageTags>Nucleus</PackageTags>
@@ -66,5 +67,4 @@
 		<Copy SourceFiles="bin\$(Configuration)\$(TargetFramework)\Nucleus.ViewFeatures.xml" DestinationFolder="$(SolutionDir)\..\Publish\XmlDocumentation" Retries="2" />		
 	</Target>
 
-	<Import Project="..\Nucleus.Core\core.build.targets" />
 </Project>

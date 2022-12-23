@@ -177,7 +177,7 @@ input[type=search]:not(.no-appearance-override)
 	min-width: 20px;
 }
 
-.nucleus-form-fillpage
+.nucleus-form-fillpage, .nucleus-form-fillpage > fieldset
 {
   display: flex;
   flex-direction: column;

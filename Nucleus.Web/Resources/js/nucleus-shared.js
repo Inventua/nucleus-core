@@ -796,7 +796,7 @@ function _Page()
 		{
 			errorData = new Object();
 			errorData.title = 'Error' + ' [' + request.statusText + ']';
-			errorData.detail = request.responseText;
+			errorData.detail = request.responseText ?? '';
 			errorData.statusCode = request.status;
 		}
 
@@ -925,6 +925,7 @@ function _Page()
 					passwords[index] = new Object({ name: element.prop('name'), value: element.val() });
 				});
 
+        // write new content
 				target.empty().html(data).attr('data-src', url);
 
 				// restore passwords
@@ -954,7 +955,7 @@ function _Page()
 			if (source.parents('.modal').first().find(target).length === 0)
 			{
 				_maximizeDialog(source.parents('.modal').first(), false);
-				source.parents('.modal').first().modal('hide');
+        source.parents('.modal').first().modal('hide');
 			}
 		}
 	}
@@ -1043,7 +1044,7 @@ function _Page()
 				});
 
 				var modal = new bootstrap.Modal(wrapper, { backdrop: 'static' });
-				modal.show();
+        modal.show();
 
 				wrapper.off('shown.bs.modal');
 				wrapper.on('shown.bs.modal', function () { _removeDuplicateOverlays(); });
@@ -1139,7 +1140,8 @@ function _Page()
 	function _removeRelatedOverlays(element)
 	{
 		jQuery(element).siblings('.modal-backdrop').remove();
-		jQuery(element).parents('.nucleus-adminpage').first().siblings('.modal-backdrop').remove();
+    jQuery(element).parents().first().siblings('.modal-backdrop').remove();
+    jQuery('body').children('.modal-backdrop').remove();
 	}
 
 	function _isInView(element)

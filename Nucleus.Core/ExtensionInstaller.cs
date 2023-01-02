@@ -30,6 +30,8 @@ namespace Nucleus.Core
 
 		public Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary ModelState { get; } = new() { MaxAllowedErrors = int.MaxValue};
 
+    public Boolean DisableLocalChecks { get; set; } = false;
+
 		private IExtensionManager ExtensionManager { get; }
 
 		/// <summary>
@@ -486,14 +488,13 @@ namespace Nucleus.Core
 				//var result6 = System.Version.Parse("1.0.0.0").IsLessThan("2.*");
 
 				// check version compatibility
-				if (appVersion.IsLessThan(package.compatibility.minVersion))
+				if (!DisableLocalChecks && appVersion.IsLessThan(package.compatibility.minVersion))
 				{
-					//throw new InvalidDataException($"This extension is not compatible with Nucleus version {appVersion}.");
 					this.ModelState.AddModelError("compatibility-minversion", $"This extension is not compatible with Nucleus version {appVersion} (requires version {package.compatibility.minVersion} or later).");
 					return false;
 				}
 
-				if (!String.IsNullOrEmpty(package.compatibility.maxVersion) && appVersion.IsGreaterThan(package.compatibility.maxVersion))
+				if (!DisableLocalChecks && !String.IsNullOrEmpty(package.compatibility.maxVersion) && appVersion.IsGreaterThan(package.compatibility.maxVersion))
 				{
 					this.ModelState.AddModelError("compatibility-maxversion", $"This extension is not compatible with Nucleus version {appVersion} (not compatible with versions after {package.compatibility.maxVersion}).");
 					return false;
@@ -582,7 +583,7 @@ namespace Nucleus.Core
 			if (entry != null)
 			{
 				// for assemblies, if the target already exists, make sure we aren't overwriting a newer version
-				if (Path.GetExtension(entry.Name).Equals(".dll", StringComparison.OrdinalIgnoreCase))
+				if (!DisableLocalChecks && Path.GetExtension(entry.Name).Equals(".dll", StringComparison.OrdinalIgnoreCase))
 				{
 					if (System.IO.File.Exists(BuildExtensionFilePath(componentFolder, entry.FullName)))
 					{

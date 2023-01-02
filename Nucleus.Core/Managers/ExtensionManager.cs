@@ -51,18 +51,44 @@ namespace Nucleus.Core.Managers
 			return new ExtensionInstaller(input, this, this.Logger, this.FolderOptions);
 		}
 
-		/// <summary>
-		/// Validate a package.
-		/// </summary>
-		/// <param name="tempFileName">
-		/// The file name of a zip file to install.  The file must be stored in the Nucleus "Temp" folder.  tempFileName must not contain a path.
-		/// </param>
-		/// <returns></returns>
-		/// <remarks>
-		/// The readme property in the returned <see cref="PackageResult"/> object is populated as a side-effect of this function, if a file named 
-		/// readme.txt exists in the package.
-		/// </remarks>
-		public async Task<Nucleus.Abstractions.Models.Extensions.PackageResult> ValidatePackage(Stream input)
+    public async Task<Nucleus.Abstractions.Models.Extensions.PackageResult> ValidatePackageContent(Stream input)
+    {
+      Nucleus.Abstractions.Models.Extensions.PackageResult result = new();
+
+      using (ExtensionInstaller installer = CreateInstaller(input))
+      {
+        installer.DisableLocalChecks = true;
+        if (await installer.IsValid())
+        {
+          result.IsValid = true;
+          result.FileId = await installer.SaveTempFile();
+          result.Package = await installer.GetPackage();
+
+          result.Readme = await GetDocumentationFileContents(installer, "readme.txt", "readme.htm", "readme.md", "readme");
+          result.License = await GetDocumentationFileContents(installer, "license.txt", "license.htm", "license.md", "license");
+        }
+        else
+        {
+          result.IsValid = false;
+          result.Messages = installer.ModelState;
+        }
+      }
+
+      return result;
+    }
+
+    /// <summary>
+    /// Validate a package.
+    /// </summary>
+    /// <param name="tempFileName">
+    /// The file name of a zip file to install.  The file must be stored in the Nucleus "Temp" folder.  tempFileName must not contain a path.
+    /// </param>
+    /// <returns></returns>
+    /// <remarks>
+    /// The readme property in the returned <see cref="PackageResult"/> object is populated as a side-effect of this function, if a file named 
+    /// readme.txt exists in the package.
+    /// </remarks>
+    public async Task<Nucleus.Abstractions.Models.Extensions.PackageResult> ValidatePackage(Stream input)
 		{
 			Nucleus.Abstractions.Models.Extensions.PackageResult result = new();
 
@@ -76,20 +102,6 @@ namespace Nucleus.Core.Managers
 
 					result.Readme = await GetDocumentationFileContents(installer, "readme.txt", "readme.htm", "readme.md", "readme");
 					result.License = await GetDocumentationFileContents(installer, "license.txt", "license.htm", "license.md", "license");
-
-					//if (installer.FileExists())
-					//{
-					//	System.IO.Stream readmeStream = await installer.GetFileStream("readme.txt");
-
-					//	if (readmeStream != null)
-					//	{
-					//		readmeStream.Position = 0;
-					//		using (StreamReader reader = new(readmeStream))
-					//		{
-					//			result.Readme = reader.ReadToEnd();
-					//		}
-					//	}
-					//}					
 				}
 				else
 				{

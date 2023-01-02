@@ -33,14 +33,26 @@ namespace Nucleus.Abstractions.Managers
 		/// <returns></returns>
 		public Task<Nucleus.Abstractions.Models.Extensions.PackageResult> ValidatePackage(Stream input);
 
-		/// <summary>
-		/// Install a package, using a temp file as input.
+    /// <summary>
+		/// Validate a package, skipping Nucleus version checking and "already installed" checks.
 		/// </summary>
-		/// <param name="tempFileName">
+		/// <param name="input">
 		/// The file name of a zip file to install.  The file must be stored in the Nucleus "Temp" folder.  tempFileName must not contain a path.
 		/// </param>
 		/// <returns></returns>
-		public Task InstallExtension(string tempFileName);
+    /// <remarks>
+    /// This function is intended for use by the Nucleus store.
+    /// </remarks>
+		public Task<Nucleus.Abstractions.Models.Extensions.PackageResult> ValidatePackageContent(Stream input);
+        
+    /// <summary>
+    /// Install a package, using a temp file as input.
+    /// </summary>
+    /// <param name="tempFileName">
+    /// The file name of a zip file to install.  The file must be stored in the Nucleus "Temp" folder.  tempFileName must not contain a path.
+    /// </param>
+    /// <returns></returns>
+    public Task InstallExtension(string tempFileName);
 
 		/// <summary>
 		/// Uninstall the extension specified by <paramref name="package"/>.

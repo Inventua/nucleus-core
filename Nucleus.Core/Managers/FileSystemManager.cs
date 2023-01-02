@@ -268,7 +268,22 @@ namespace Nucleus.Core.Managers
 				permissions.Add(permission);
 			}
 
-			folder.Permissions.AddRange(permissions);
+      // only add new permissions if they don't already exist for the folder
+      foreach (Permission newPermission in permissions)
+      {
+        Permission existingPermission = folder.Permissions.Where(existingPermission => existingPermission.PermissionType.Scope == newPermission.PermissionType.Scope).FirstOrDefault();
+        if (existingPermission == null)
+        {
+          // only add new permissions if there isn't already a matching permission for the folder      
+          folder.Permissions.Add(newPermission);
+        }
+        else
+        {
+          // otherwise, update the existing one
+          existingPermission.AllowAccess = newPermission.AllowAccess;
+        }
+      }
+      //folder.Permissions.AddRange(permissions);
 		}
 		//}
 

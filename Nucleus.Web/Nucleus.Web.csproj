@@ -55,6 +55,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Areas\Admin\Views\Extensions\extensions.js" />
+	  <None Remove="Areas\Admin\Views\Extensions\nucleus-admin.min.js" />
 	  <None Remove="Areas\Setup\Views\SiteWizard\Complete.js" />
 	  <None Remove="Areas\Setup\Views\SiteWizard\index.css" />
 	  <None Remove="license.txt" />
@@ -98,6 +100,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Include="Resources\js\nucleus-admin-extensions.js" />
+	  <Content Include="Resources\js\nucleus-admin-extensions.min.js" />
 	  <Content Include="Areas\Setup\Views\SiteWizard\Complete.js">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>

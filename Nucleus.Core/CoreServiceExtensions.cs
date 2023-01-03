@@ -127,8 +127,9 @@ namespace Nucleus.Core
 			AddOption<ClaimTypeOptions>(services, configuration, ClaimTypeOptions.Section);			
 			AddOption<SmtpMailOptions>(services, configuration, SmtpMailOptions.Section);
 			AddOption<HtmlEditorOptions>(services, configuration, HtmlEditorOptions.Section);
-			
-			return services;
+      AddOption<StoreOptions>(services, configuration, StoreOptions.Section);
+
+      return services;
 		}
 
 		public static void AddOption<T>(IServiceCollection services, IConfiguration configuration, string key) where T : class, new()
@@ -136,15 +137,26 @@ namespace Nucleus.Core
 			services.Configure<T>(configuration.GetSection(key), binderOptions => binderOptions.BindNonPublicProperties = true); 
 		}
 
+    public class ConfigureStoreOptions : IPostConfigureOptions<StoreOptions>
+    {
+      public void PostConfigure(string name, StoreOptions options)
+      {
+        // Add default value if config contains no values
+        if (!options.Stores.Any())
+        {
+          options.Stores.Add(Store.Default);
+        }
+      }
+    }
 
-		public class ConfigureFolderOptions : IPostConfigureOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions>
+		public class ConfigureFolderOptions : IPostConfigureOptions<FolderOptions>
 		{			
 			public ConfigureFolderOptions()
 			{
 				
 			}
 
-			public void PostConfigure(string name, Nucleus.Abstractions.Models.Configuration.FolderOptions options)
+			public void PostConfigure(string name, FolderOptions options)
 			{
         //PostConfigure(options);
         try

@@ -45,7 +45,7 @@
 
 /* We subtract 45px from the settings popup height (in .nucleus-adminpage above) to account for browsers which display link urls at the bottom left of the screen when   */
 /* hovering over links, but when .nucleus-adminpage is in an iframe the modal doesn't normally use the full screen height, so we don't need to leave space at the bottom. */
-.nucleus-settings-frame.nucleus-adminpage 
+.nucleus-settings-frame.nucleus-adminpage , .nucleus-store-frame
 {
 	height: 100%;	
 }
@@ -654,6 +654,13 @@ ul.nucleus-control-panel-items button
 .nucleus-adminpage .LogContent
 {
 	white-space: nowrap;
+}
+
+.nucleus-adminpage .ExtensionInstaller, .nucleus-adminpage .tab-content, .nucleus-adminpage .tab-pane.active, #extensions-store form
+{
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .nucleus-adminpage .ExtensionInstaller h2

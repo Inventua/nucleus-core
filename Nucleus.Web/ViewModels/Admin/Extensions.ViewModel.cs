@@ -16,5 +16,9 @@ namespace Nucleus.Web.ViewModels.Admin
 		public List<string> Messages { get; } = new();
 		public List<Abstractions.Models.Extensions.package> InstalledExtensions { get; set; }
 
+    public Abstractions.Models.Configuration.StoreOptions StoreOptions { get; set; }
+
+    public string SelectedStoreUrl { get; set; } 
+
 	}
 }

@@ -1,49 +1,75 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.Extensions
+@Html.AddScript("~/Resources/js/nucleus-admin-extensions.js")
 <div class="ExtensionInstaller">
 	<h1 class="nucleus-control-panel-heading">Extensions</h1>
 
-	@using (Html.BeginAreaForm("Upload", "Extensions", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
-	{
-		<div>
-			To begin installation, click 'Select File' and select your extension file package.
-		</div>
+  <Tab>
+		<TabItem active="true" target="#extensions-index" caption="Extensions"></TabItem>
+		<TabItem target="#extensions-store" caption="Store"></TabItem>		
+	</Tab>
 
-		<div class="nucleus-form-tools">
-			<div class="btn btn-primary">
-				<label>
-					<span class="nucleus-material-icon">&#xe2c6</span> Select File
-					<input type="file" name="extensionFile" class="collapse" accept=".zip">
-				</label>
-			</div>
+	<TabContent>
+		<TabPanel id="extensions-index" active="true">
+      @using (Html.BeginAreaForm("Upload", "Extensions", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
+      {
+        <div>
+          To begin installation, click 'Select File' and select your extension file package.
+        </div>
 
-			<div class="Restart">
-				<a href="@Url.AreaAction("Index", "Extensions", "Admin")" class="btn btn-secondary" data-target=".nucleus-adminpage">Install another Extension</a>
-			</div>
-		</div>
+        <div class="nucleus-form-tools">
+          <div class="btn btn-primary">
+            <label>
+              <span class="nucleus-material-icon">&#xe2c6</span> Select File
+              <input type="file" name="extensionFile" class="collapse" accept=".zip">
+            </label>
+          </div>
 
-		<ProgressBar caption="Uploading file ..." class="UploadProgress"></ProgressBar>
-				
-		<h2>Installed Extensions</h2>
-		<table class="InstalledExtensions">
-			<tr>
-				<th>Name</th>
-				<th>Version</th>
-				<th />
-			</tr>
-			@foreach (var extension in Model.InstalledExtensions)
-			{
-				<tr>
-					<td>
-						<div><strong>@extension.name</strong></div>
-						<div><a href="@extension.publisher.url" target="_blank">@extension.publisher.name</a> <a href="mailto:@extension.publisher.email" class="nucleus-material-icon EmailIcon">&#xe0be;</a></div>
-						<div>@extension.description</div>
-					</td>
-					<td>@extension.version</td>
-					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("Uninstall", "Extensions", "Admin", new { Id = extension.id })" value="&#xe14c;" data-confirm="This will uninstall the '@extension.name' package, and remove all module instances, scheduled tasks, layouts and containers which are provided by this extension.<br/><br/>Do you want to continue?" class="nucleus-material-icon btn btn-danger" title="Uninstall" data-target=".nucleus-adminpage" /></td>
-				</tr>
-			}
-		</table>
-	}
+          <div class="Restart">
+            <a href="@Url.AreaAction("Index", "Extensions", "Admin")" class="btn btn-secondary" data-target=".nucleus-adminpage">Install another Extension</a>
+          </div>
+        </div>
+
+        <ProgressBar caption="Uploading file ..." class="UploadProgress"></ProgressBar>
+
+        <h2>Installed Extensions</h2>
+        <table class="InstalledExtensions">
+          <tr>
+            <th>Name</th>
+            <th>Version</th>
+            <th />
+          </tr>
+          @foreach (var extension in Model.InstalledExtensions)
+          {
+            <tr>
+              <td>
+                <div><strong>@extension.name</strong></div>
+                <div><a href="@extension.publisher.url" target="_blank">@extension.publisher.name</a> <a href="mailto:@extension.publisher.email" class="nucleus-material-icon EmailIcon">&#xe0be;</a></div>
+                <div>@extension.description</div>
+              </td>
+              <td>@extension.version</td>
+              <td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("Uninstall", "Extensions", "Admin", new { Id = extension.id })" value="&#xe14c;" data-confirm="This will uninstall the '@extension.name' package, and remove all module instances, scheduled tasks, layouts and containers which are provided by this extension.<br/><br/>Do you want to continue?" class="nucleus-material-icon btn btn-danger" title="Uninstall" data-target=".nucleus-adminpage" /></td>
+            </tr>
+          }
+        </table>
+      }
+    </TabPanel>
+
+    <TabPanel id="extensions-store">
+      @using (Html.BeginAreaForm("Index", "Extensions", "Admin", FormMethod.Post, new { @id = "nucleus-extensions-store-form", @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
+      {
+        @if (Model.StoreOptions.Stores.Count > 1)
+        {
+          @Html.DropDownListFor(model => model.SelectedStoreUrl, new SelectList(Model.StoreOptions.Stores, "Url", "Name"), new { @data_autopostbackevent = "change" })
+        }
+        else
+        {
+          @Html.HiddenFor(model => model.SelectedStoreUrl)
+        }
+        <iframe id="StoreFrame" title="Extensions Store" accesskey="S" src="@Model.SelectedStoreUrl" class="Nucleus nucleus-store-frame"></iframe>
+      }
+    </TabPanel>
+  </TabContent>
+
 </div>
 
 <script>
@@ -68,4 +94,6 @@
 		jQuery('.ExtensionInstaller .ShowUploadProgress').hide();
 	});
 
+  ExtensionsStore.SetUrls('@Url.AreaAction("QueryPackageInstalled", "Extensions", "Admin")', '@Url.AreaAction("InstallPackage", "Extensions", "Admin")');
+  
 </script>

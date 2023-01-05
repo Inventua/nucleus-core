@@ -1,15 +1,15 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.Extensions
 @Html.AddScript("~/Resources/js/nucleus-admin-extensions.js")
 <div class="ExtensionInstaller">
-	<h1 class="nucleus-control-panel-heading">Extensions</h1>
+  <h1 class="nucleus-control-panel-heading">Extensions</h1>
 
   <Tab>
-		<TabItem active="true" target="#extensions-index" caption="Extensions"></TabItem>
-		<TabItem target="#extensions-store" caption="Store"></TabItem>		
-	</Tab>
+    <TabItem active="true" target="#extensions-index" caption="Extensions"></TabItem>
+    <TabItem target="#extensions-store" caption="Store"></TabItem>
+  </Tab>
 
-	<TabContent>
-		<TabPanel id="extensions-index" active="true">
+  <TabContent>
+    <TabPanel id="extensions-index" active="true">
       @using (Html.BeginAreaForm("Upload", "Extensions", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
       {
         <div>
@@ -59,13 +59,59 @@
       {
         @if (Model.StoreOptions.Stores.Count > 1)
         {
-          @Html.DropDownListFor(model => model.SelectedStoreUrl, new SelectList(Model.StoreOptions.Stores, "Url", "Name"), new { @data_autopostbackevent = "change" })
+          @Html.DropDownListFor(model => model.SelectedStoreUrl, new SelectList(Model.StoreOptions.Stores, "BaseUrl", "Name"), new { @class="ms-1", @data_autopostbackevent = "change" })
         }
         else
         {
           @Html.HiddenFor(model => model.SelectedStoreUrl)
         }
-        <iframe id="StoreFrame" title="Extensions Store" accesskey="S" src="@Model.SelectedStoreUrl" class="Nucleus nucleus-store-frame"></iframe>
+
+        @if (Model.StoreSettings == null || Model.StoreSettings.StoreId == Guid.Empty)
+        {
+          <div class="alert alert-info">
+            <h3>Extensions Store Registration</h3>
+            <p>
+              The extensions store will generate a unique Id for your Nucleus instance, which is stored in your database, and in the extensions store database.  This Id is used to assign licenses for extensions
+              to your Nucleus instance.  You can optionally specify an instance name and link a Nucleus web site login with your Nucleus instance.  The instance name is displayed in the Extensions Store License Manager to
+              help you identify which site you are managing, and the web site login and related contact information is used to contact you with license-related information and provide online access to manage your licenses.
+            </p>
+            <p>
+              If choose to register, the store will display an "Install" button when you select an extension, which will automatically download and install the extension for you.
+              You can use the extensions store to download and install free extensions without registering, but you will need to download the extension to your computer, then use the "Extensions" tab to upload and install it.
+            </p>
+            <div>
+              <div class="nucleus-form-buttonrow">
+                @Html.TextBoxFor(model => model.SubscriptionName, new { @class = "flex-grow-1", @placeholder = "subscription name (optional)"})
+                @Html.TextBoxFor(model => model.Username, new { @placeholder = "Nucleus login name (optional)"})
+                @Html.PasswordFor(model => model.Password, new { @placeholder = "password (optional)"})
+                <button type="submit" class="btn btn-primary" formaction="@Url.AreaAction("Register", "Extensions", "Admin")">Register</button>
+                <a class="btn btn-secondary" target="_blank" href="@(Model.SelectedStoreUrl)@Model.SelectedStore.RegisterPath">Create Login</a>
+              </div>
+            </div>
+          </div>
+        }
+        else if (Model.StoreSettings != null && Model.StoreSettings.StoreId != Guid.Empty && !Model.IsOwnerAssigned)
+        {
+          <div class="alert alert-info">
+            <h3>Extensions Store Registration</h3>
+            <p>
+              Your Nucleus instance has an extensions store Id, but it is not assigned to a Nucleus web site login.  If you assign a web site login, we can contact you with license-related 
+              information and you can manage your licenses on the Nucleus web site.
+            </p>
+            <p>
+              You can choose not to create/assign a Nucleus web site login to this subscription if you don't want to.
+            </p>
+            <div class="nucleus-form-buttonrow">
+              @Html.TextBoxFor(model => model.SubscriptionName, new { @class = "flex-grow-1", @placeholder = "subscription name (optional)"})
+              @Html.TextBoxFor(model => model.Username, new { @placeholder = "Nucleus login name"})
+              @Html.PasswordFor(model => model.Password, new { @placeholder = "password"})
+              <button type="submit" class="btn btn-primary" formaction="@Url.AreaAction("Register", "Extensions", "Admin")">Update Registration</button>
+              <a class="btn btn-secondary" target="_blank" href="@(Model.StoreSettings.StoreUri)@Model.SelectedStore.RegisterPath">Create Login</a>
+            </div>
+          </div>
+        }
+
+        <iframe id="StoreFrame" title="Extensions Store" accesskey="S" src="@Model.StoreUrl" class="Nucleus nucleus-store-frame"></iframe>
       }
     </TabPanel>
   </TabContent>
@@ -73,27 +119,27 @@
 </div>
 
 <script>
-	jQuery('.ExtensionInstaller .BrowseExtension input[type=file]').one('change.ExtensionInstaller', function ()
-	{
-		jQuery('.ExtensionInstaller .ShowUploadProgress').show();
-		jQuery('.ExtensionInstaller form').submit();
-		jQuery('.ExtensionInstaller .BrowseExtension').hide();
-	});
+  jQuery('.ExtensionInstaller .BrowseExtension input[type=file]').one('change.ExtensionInstaller', function ()
+  {
+      jQuery('.ExtensionInstaller .ShowUploadProgress').show();
+      jQuery('.ExtensionInstaller form').submit();
+      jQuery('.ExtensionInstaller .BrowseExtension').hide();
+  });
 
-	jQuery('.ExtensionInstaller form').on('progress', function (e, percent)
-	{
-		jQuery('.ExtensionInstaller .UploadProgress .bar').css('width', percent.toString() + '%');
+  jQuery('.ExtensionInstaller form').on('progress', function (e, percent)
+  {
+      jQuery('.ExtensionInstaller .UploadProgress .bar').css('width', percent.toString() + '%');
 
-		jQuery('.ExtensionInstaller .UploadProgress .percent').show();
-		jQuery('.ExtensionInstaller .UploadProgress .percent').html(percent.toString() + '%');
-	});
+      jQuery('.ExtensionInstaller .UploadProgress .percent').show();
+      jQuery('.ExtensionInstaller .UploadProgress .percent').html(percent.toString() + '%');
+  });
 
-	jQuery('.ExtensionInstaller form').on('error', function ()
-	{
-		jQuery('.ExtensionInstaller .nucleus-form-tools').show();
-		jQuery('.ExtensionInstaller .ShowUploadProgress').hide();
-	});
+  jQuery('.ExtensionInstaller form').on('error', function ()
+  {
+      jQuery('.ExtensionInstaller .nucleus-form-tools').show();
+      jQuery('.ExtensionInstaller .ShowUploadProgress').hide();
+  });
 
-  ExtensionsStore.SetUrls('@Url.AreaAction("QueryPackageInstalled", "Extensions", "Admin")', '@Url.AreaAction("InstallPackage", "Extensions", "Admin")');
-  
+  ExtensionsStore.SetUrls('@Url.AreaAction("QueryPackageInstalled", "Extensions", "Admin")', '@Url.AreaAction("InstallPackage", "Extensions", "Admin")', '@Url.AreaAction("QueryStoreSettings", "Extensions", "Admin")',);
+
 </script>

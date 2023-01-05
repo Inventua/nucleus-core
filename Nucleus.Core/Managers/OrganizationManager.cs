@@ -32,6 +32,7 @@ namespace Nucleus.Core.Managers
     public Task<Organization> CreateNew(Site site)
     {
       Organization result = new();
+
       result.Users = new();
 
       return Task.FromResult(result);

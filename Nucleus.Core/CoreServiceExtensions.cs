@@ -77,7 +77,7 @@ namespace Nucleus.Core
 			services.AddSingleton<IEventDispatcher, Services.EventDispatcher>();
 			services.AddTransient<IMailClientFactory, Mail.MailClientFactory>();
 			services.AddTransient<Abstractions.IPreflight, Nucleus.Core.Services.Preflight>();
-
+      services.AddSingleton<Abstractions.IRestApiClient, Services.RestApiClient>();
 			services.AddSingleton<ICacheManager, Managers.CacheManager>();
 
 			// Extension managers
@@ -105,7 +105,8 @@ namespace Nucleus.Core
 			services.AddSingleton<IPermissionsManager, Managers.PermissionsManager>();
 
 			services.AddSingleton<IApiKeyManager, Managers.ApiKeyManager>();
-      services.AddSingleton<IOrganizationManager, Managers.OrganizationManager>(); 
+      services.AddSingleton<IOrganizationManager, Managers.OrganizationManager>();
+      services.AddSingleton<IExtensionsStoreManager, Managers.ExtensionsStoreManager>();
 
       // Search
       services.AddTransient<IContentMetaDataProducer, Search.PageMetaDataProducer>();
@@ -129,6 +130,8 @@ namespace Nucleus.Core
 			AddOption<HtmlEditorOptions>(services, configuration, HtmlEditorOptions.Section);
       AddOption<StoreOptions>(services, configuration, StoreOptions.Section);
 
+      services.ConfigureOptions(typeof(ConfigureStoreOptions));
+
       return services;
 		}
 
@@ -145,6 +148,29 @@ namespace Nucleus.Core
         if (!options.Stores.Any())
         {
           options.Stores.Add(Store.Default);
+        }
+
+        // ensure that baseuri has a trailing slash, remove leading slashes from relative paths, ensure relative paths end with a slash.  This 
+        // is required because the System.Uri constructors 
+        foreach (Store store in options.Stores)
+        {
+          if (!store.BaseUrl.EndsWith('/'))
+          {
+            store.BaseUrl += "/";
+          }
+
+          if (!store.APIPath.EndsWith('/'))
+          {
+            store.APIPath += "/";
+          }
+
+          if (!store.ViewerPath.EndsWith('/'))
+          {
+            store.ViewerPath += "/";
+          }
+          
+          store.APIPath = store.APIPath.TrimStart(new char[] { '/' });
+          store.ViewerPath = store.ViewerPath.TrimStart(new char[] { '/' });
         }
       }
     }

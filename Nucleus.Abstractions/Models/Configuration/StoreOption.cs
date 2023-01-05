@@ -15,16 +15,31 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <summary>
 		/// Store Url.  
 		/// </summary>
-		public string Url { get; private set; }
+		public string BaseUrl { get; set; }
 
-		/// <summary>
-		/// A friendly name for the store.
+    /// <summary>
+		/// Store viewer relative path.  
 		/// </summary>
-		public string Name { get; private set; }
+		public string ViewerPath { get; set; } = "store/";
+
+    /// <summary>
+		/// Store registration page relative path.  
+		/// </summary>
+		public string RegisterPath { get; set; } = "register/";
+
+    /// <summary>
+		/// Store controller API relative path.  
+		/// </summary>
+		public string APIPath { get; set; } = "api/extensions-store/";
+
+    /// <summary>
+    /// A friendly name for the store.
+    /// </summary>
+    public string Name { get; private set; }
 
     /// <summary>
     /// Default Store entry, used by CoreServiceExtensions.ConfigureStoreOptions
     /// </summary>
-    public static Store Default = new() { Name = "Nucleus Extensions Store", Url = "https://www.nucleus-cms.com/store" };
+    public static Store Default = new() { Name = "Nucleus Extensions Store", BaseUrl = "https://www.nucleus-cms.com" };
 	}
 }

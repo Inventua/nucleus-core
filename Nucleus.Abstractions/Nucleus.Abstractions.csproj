@@ -26,7 +26,7 @@
 		
 		<!-- Version is set by core.build.targets, can be overridden here for pre-release builds -->
 		<VersionPrefix>1.1.0.1-pre</VersionPrefix>
-		<VersionSuffix>a3</VersionSuffix>
+		<VersionSuffix>a4</VersionSuffix>
 		
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
 		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>

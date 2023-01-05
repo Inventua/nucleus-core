@@ -5,13 +5,15 @@ function _extensionsStore()
   this.SetUrls = _setUrls;
   _queryUrl = '';
   _installUrl = '';
+  _queryStoreUrl = '';
 
   window.addEventListener('message', _handleStoreEvents, false);
 
-  function _setUrls(queryUrl, installUrl)
+  function _setUrls(queryUrl, installUrl, queryStoreUrl)
   {
     _queryUrl = queryUrl;
     _installUrl = installUrl;
+    _queryStoreUrl = queryStoreUrl;
   }
 
   function _handleStoreEvents(event)
@@ -36,26 +38,26 @@ function _extensionsStore()
           {
             data.type = 'query';
             storeWindow.postMessage(data, '*');
-          },
-          error: function (request, status, message)
-          {
-            // no error handling
           }
         })
 
-      //var result = new Object();
-
-      //result.type = 'query';
-      //result.IsInstalled = true;
-      //result.Version = '1.0.0.0';
-
-      //jQuery('#StoreFrame')[0].contentWindow.postMessage(result, '*');
-
       case 'detect':
-        var result = new Object();
+        var form = jQuery('#nucleus-extensions-store-form');
+        jQuery.ajax({
+          url: _queryStoreUrl,
+          method: 'POST',
+          enctype: form.attr('enctype'),
+          data: (form.attr('enctype') === 'multipart/form-data') ? new FormData(form[0]) : form.serialize(),
+          processData: (form.attr('enctype') === 'multipart/form-data') ? false : true,
+          contentType: (form.attr('enctype') === 'multipart/form-data') ? false : 'application/x-www-form-urlencoded; charset=UTF-8',
+          headers: { 'Accept': 'application/json, */*' },
+          success: function (data, status, request)
+          {
+            data.type = 'detect';
+            storeWindow.postMessage(data, '*');
+          }
+        })
 
-        result.type = 'detect';
-        storeWindow.postMessage(result, '*');
     }
   }
 }

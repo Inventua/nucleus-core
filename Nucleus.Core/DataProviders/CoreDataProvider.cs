@@ -25,8 +25,8 @@ namespace Nucleus.Core.DataProviders
 	/// <remarks>
 	/// This class implements all of the data provider interfaces for use with entity framework.  
 	/// </remarks>
-	public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayoutDataProvider, IUserDataProvider, IPermissionsDataProvider, ISessionDataProvider, IMailDataProvider, IScheduledTaskDataProvider, IFileSystemDataProvider, IListDataProvider, IContentDataProvider, IApiKeyDataProvider, IOrganizationDataProvider
-	{
+	public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayoutDataProvider, IUserDataProvider, IPermissionsDataProvider, ISessionDataProvider, IMailDataProvider, IScheduledTaskDataProvider, IFileSystemDataProvider, IListDataProvider, IContentDataProvider, IApiKeyDataProvider, IOrganizationDataProvider, IExtensionsStoreDataProvider
+  {
 		protected IEventDispatcher EventManager { get; }
 		protected new CoreDataProviderDbContext Context { get; }
 
@@ -2510,6 +2510,46 @@ namespace Nucleus.Core.DataProviders
       this.EventManager.RaiseEvent<OrganizationUser, Delete>(organizationUser);
     }
 
+    #endregion
+
+    #region "    Instance Settings    "
+
+    public async Task SaveExtensionsStoreSettings(ExtensionsStoreSettings setting)
+    {
+      Action raiseEvent;
+
+      ExtensionsStoreSettings existing = await this.Context.ExtensionsStoreSettings
+        .Where(existing => existing.StoreUri == setting.StoreUri)
+        .FirstOrDefaultAsync();
+
+      if (existing == null)
+      {
+        // New role
+        this.Context.ExtensionsStoreSettings.Add(setting);
+        this.Context.Entry(setting).State = EntityState.Added;
+
+        raiseEvent = new(() => { this.EventManager.RaiseEvent<ExtensionsStoreSettings, Create>(setting); });
+      }
+      else
+      {
+        // existing role
+        this.Context.Entry(existing).CurrentValues.SetValues(setting);
+        this.Context.Entry(existing).State = EntityState.Modified;
+        raiseEvent = new(() => { this.EventManager.RaiseEvent<ExtensionsStoreSettings, Update>(existing); });
+      }
+
+      await this.Context.SaveChangesAsync<ExtensionsStoreSettings>();
+      raiseEvent.Invoke();
+    }
+
+    public async Task<ExtensionsStoreSettings> GetExtensionsStoreSettings(string storeUri)
+    {
+      return await this.Context.ExtensionsStoreSettings
+        .Where(existing => existing.StoreUri == storeUri)
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
+
+    }
     #endregion
   }
 }

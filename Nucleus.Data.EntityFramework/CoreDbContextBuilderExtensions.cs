@@ -35,6 +35,9 @@ namespace Nucleus.Data.EntityFramework
 
 			builder.Entity<ApiKey>().ToTable("ApiKeys");
 
+      builder.Entity<ExtensionsStoreSettings>().ToTable("ExtensionsStoreSettings")
+        .HasKey(settings => settings.StoreUri);
+
 			return builder;
 		}
 

@@ -1,0 +1,64 @@
+{
+  "schemaName": "Nucleus.Core",
+  "version": "01.00.11",
+  "operations": [
+    {
+      "createTable": {
+        "name": "ExtensionsStoreSettings",
+        "columns": [
+          {
+            "name": "StoreUri",
+            "clrType": "string",
+            "maxLength": 256,
+            "isnullable": false
+          },
+          {
+            "name": "StoreId",
+            "clrType": "guid",
+            "isnullable": false
+          },
+          {
+            "name": "RegistrationDate",
+            "clrType": "datetime",
+            "isnullable": false
+          },
+          {
+            "name": "RegisteredBy",
+            "clrType": "guid",
+            "isnullable": false
+          },
+          {
+            "name": "Track",
+            "clrType": "int",
+            "isnullable": false
+          },
+          {
+            "name": "DateAdded",
+            "clrType": "datetime",
+            "isnullable": true
+          },
+          {
+            "name": "AddedBy",
+            "clrType": "guid",
+            "isnullable": true
+          },
+          {
+            "name": "DateChanged",
+            "clrType": "datetime",
+            "isnullable": true
+          },
+          {
+            "name": "ChangedBy",
+            "clrType": "guid",
+            "isnullable": true
+          }
+        ],
+        "primaryKey": {
+          "name": "PK_ExtensionsStoreSettings",
+          "isclustered": true,
+          "columns": [ "StoreUri" ]
+        }
+      }
+    }
+  ]
+}

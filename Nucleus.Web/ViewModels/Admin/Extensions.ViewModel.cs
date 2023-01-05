@@ -18,7 +18,17 @@ namespace Nucleus.Web.ViewModels.Admin
 
     public Abstractions.Models.Configuration.StoreOptions StoreOptions { get; set; }
 
-    public string SelectedStoreUrl { get; set; } 
+    public Abstractions.Models.Configuration.Store SelectedStore { get; set; }
 
-	}
+    public string SelectedStoreUrl { get; set; }
+
+    public ExtensionsStoreSettings StoreSettings { get; set; }
+    public Boolean IsOwnerAssigned { get; set; }
+
+    public string SubscriptionName { get; set; }
+    public string Username { get; set; }
+    public string Password { get; set; }
+
+    public string StoreUrl { get; set; }
+  }
 }

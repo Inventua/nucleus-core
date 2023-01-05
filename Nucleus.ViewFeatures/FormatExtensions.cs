@@ -30,7 +30,7 @@ namespace Nucleus.ViewFeatures
     /// Convert a DateTime from UTC to local time and output as a string in short date+short time format.
     /// </summary>
     /// <param name="value"></param>
-    /// <param name="timezone"></param>
+    /// <param name="timezone">Current user time zone.  Use this.Context.Request.GetUserTimeZone() to use the auto-detected time zone.</param>
     /// <returns></returns>
     public static string FormatDate(this DateTime? value, TimeZoneInfo timezone)
 		{
@@ -44,13 +44,13 @@ namespace Nucleus.ViewFeatures
 			}
 		}
 
-		/// <summary>
-		/// Convert a DateTime from UTC to local time and output as a string in short date+short time format.
-		/// </summary>
-		/// <param name="value"></param>
-		/// <param name="timezone"></param>
-		/// <returns></returns>
-		public static string FormatDate(this DateTime value, TimeZoneInfo timezone)
+    /// <summary>
+    /// Convert a DateTime from UTC to local time and output as a string in short date+short time format.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="timezone">Current user time zone.  Use this.Context.Request.GetUserTimeZone() to use the auto-detected time zone.</param>
+    /// <returns></returns>
+    public static string FormatDate(this DateTime value, TimeZoneInfo timezone)
 		{
 			if (value == DateTime.MinValue)
 			{
@@ -74,13 +74,13 @@ namespace Nucleus.ViewFeatures
 			}
 		}
 
-		/// <summary>
-		/// Convert a DateTime from UTC to local time and output as a string in short date format.
-		/// </summary>
-		/// <param name="value"></param>
-		/// <param name="timezone"></param>
-		/// <returns></returns>
-		public static string FormatDate(this DateTimeOffset value, TimeZoneInfo timezone)
+    /// <summary>
+    /// Convert a DateTime from UTC to local time and output as a string in short date format.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="timezone">Current user time zone.  Use this.Context.Request.GetUserTimeZone() to use the auto-detected time zone.</param>
+    /// <returns></returns>
+    public static string FormatDate(this DateTimeOffset value, TimeZoneInfo timezone)
 		{
 			if (value == DateTimeOffset.MinValue)
 			{

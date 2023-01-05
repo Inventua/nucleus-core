@@ -755,15 +755,17 @@ function _Page()
 					{
 						var element = jQuery('[name="' + prop + '"]');
 						var index = _getElementIndex(elements, element.attr('id'));
-						if (index !== undefined)
+						if (typeof(index) === 'undefined')
+            {
+              // id doesn't match any on-screen element, so add it to the end of the list
+              index = messages.length;
+            }
+						message = request.responseJSON[prop].toString();
+						if (!message.endsWith("."))
 						{
-							message = request.responseJSON[prop].toString();
-							if (!message.endsWith("."))
-							{
-								message += '.';
-							}
-							messages[index] = '<li>' + message + '</li>';
+							message += '.';
 						}
+						messages[index] = '<li>' + message + '</li>';						
 					}
 
 					var validationMessage = '<ul>' + messages.join('') + '</ul>';

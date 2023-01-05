@@ -109,7 +109,7 @@ namespace Nucleus.Abstractions.Models
 		/// <remarks>
 		/// Login modules should use <see langword="Nucleus.Core.UserManager.VerifyPassword" /> rather than calling this function directly, 
 		/// because UserManager.VerifyPassword tracks login failures and manages account suspension.
-		/// If the user 'secrets' record has a blank password or blank password hash algirithm, this function always returns false, because
+		/// If the user 'secrets' record has a blank password or blank password hash algorithm, this function always returns false, because
 		/// users without a password cannot login using the login module.  Users can have no password if they are authenticated by a different
 		/// method such as OAuth, or an Authenticator app.
 		/// </remarks>

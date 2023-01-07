@@ -39,7 +39,7 @@ function _Page()
 		jQuery(document).on('click', '[data-target]:not(form, input, button):not([data-method="POST"])', _getPartialContent);
 		jQuery(document).on('click', 'button[type="button"][data-target][data-href]', _getPartialContent);
 
-		// Attach forms and form-submit controls with a data-target attribute to _PostPartialContent
+		// Attach forms with a data-target attribute and forms which contain form-submit controls that have a data-target attribute to _PostPartialContent
 		jQuery(document).on('submit', 'form[data-target], form:has(input[type="submit"][data-target], input[type="file"][data-target], button[type="submit"][data-target])', _postPartialContent);
 
 		// Attach links which target an IFRAME
@@ -928,7 +928,10 @@ function _Page()
 				});
 
         // write new content
-				target.empty().html(data).attr('data-src', url);
+        target
+          .empty()
+          .html(data)
+          .attr('data-src', url);
 
 				// restore passwords
 				jQuery(passwords).each(function (index, value)

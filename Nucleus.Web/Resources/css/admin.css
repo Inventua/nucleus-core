@@ -50,7 +50,7 @@
 	height: 100%;	
 }
 
-.nucleus-adminpage > form, .nucleus-adminpage .modal-body > form, #nucleus-popupdialog .modal-body > form
+.nucleus-adminpage > section, .nucleus-adminpage > section > form, .nucleus-adminpage > form, .nucleus-adminpage .modal-body > form, #nucleus-popupdialog .modal-body > form
 {
 	display: flex;
 	flex-direction: column;

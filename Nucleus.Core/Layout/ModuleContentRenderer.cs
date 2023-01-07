@@ -486,14 +486,17 @@ namespace Nucleus.Core.Layout
 		private static IHtmlContent ToHtmlContent(HttpResponse response)
 		{
 			HtmlContentBuilder content = new();
-
+      TagBuilder section = new("section");
+            
 			response.Body.Position = 0;
 			using (var reader = new StreamReader(response.Body))
 			{
-				content.AppendHtml(reader.ReadToEnd());
+				section.InnerHtml.AppendHtml(reader.ReadToEnd());
 			}
 
-			return content;
+      content.AppendHtml(section);
+
+      return content;
 		}		
 	}
 }

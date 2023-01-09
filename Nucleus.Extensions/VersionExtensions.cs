@@ -21,9 +21,10 @@ namespace Nucleus.Extensions
 		/// compareToVersion should contain a string in the form of a version, but can contain a '*' in place of any of the version fields.
 		/// </remarks>
 		static public Boolean IsLessThan(this System.Version version, string compareToVersion)
-		{			
-			System.Version compareTo = Version.Parse(CheckMinorVersion(compareToVersion).Replace("*", "0"));
-			return version.CompareTo(compareTo) < 0;
+		{
+      if (compareToVersion == "*") compareToVersion = "*.*";
+      System.Version compareTo = Version.Parse(compareToVersion.Replace("*", "0"));
+			return ZeroUndefinedElements(version).CompareTo(ZeroUndefinedElements(compareTo)) < 0;
 		}
 
 		/// <summary>
@@ -37,32 +38,42 @@ namespace Nucleus.Extensions
 		/// </remarks>
 		static public Boolean IsGreaterThan(this System.Version version, string compareToVersion)
 		{
-			if (!compareToVersion.Contains('.'))
-			{
-				compareToVersion += ".*";
-			}
-
-			System.Version compareTo = Version.Parse(CheckMinorVersion(compareToVersion).Replace("*", "65535"));
-			return version.CompareTo(compareTo) > 0;
+      if (compareToVersion == "*") compareToVersion = "*.*";
+      System.Version compareTo = Version.Parse(compareToVersion.Replace("*", "65535"));
+			return ZeroUndefinedElements(version).CompareTo(ZeroUndefinedElements(compareTo)) > 0;
 		}
 
-		/// <summary>
-		/// Return a string representation of the version with '.0' appended, if the specified version contains only a number ('major' version).
-		/// </summary>
-		/// <param name="version"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// This function is used to ensure that a string version has at least a major.minor version number, so that it can be
-		/// parsed by Version.Parse().
-		/// </remarks>
-		static private string CheckMinorVersion(string version)
-		{
-			if (!version.Contains('.'))
-			{
-				version += ".0";
-			}
-			return version;
-		}
+    /// <summary>
+    /// Replace version elements which have been set to -1 with zero, so that comparisons work properly
+    /// </summary>
+    /// <param name="version"></param>
+    /// <returns></returns>
+    static private Version ZeroUndefinedElements(System.Version version)
+    {
+      return new Version(version.Major, version.Minor==-1 ? 0 : version.Minor, version.Build==-1 ? 0 : version.Build, version.Revision==-1 ? 0 : version.Revision);
+    }
+
+		///// <summary>
+		///// Return a string representation of the version with additional ".0"'s appended, if the specified version is missing any of the 
+  //  /// "minor", "revision" or "minorrevision" parts.
+		///// </summary>
+		///// <param name="version"></param>
+		///// <returns></returns>
+		///// <remarks>
+		///// This function is used to ensure that a parsed string version uses zero for the missing version number parts, because Version.Parse() 
+  //  /// sets missing parts to -1 instead of zero, which breaks version comparison between two System.Version instances, when each Version instance
+  //  /// has different parts specified/missing.
+		///// </remarks>
+		////static private string PadMissingVersionElements(string version)
+		////{
+  ////    // pad out version components because Version.Parse does not assume zero for missing parts
+  ////    while (version.Split('c').Length < 3)
+  ////    {
+  ////      version += ".0";
+  ////    }
+      
+		////	return version;
+		////}
 
 	}
 }

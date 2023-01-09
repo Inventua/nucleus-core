@@ -45,15 +45,25 @@ namespace Nucleus.ViewFeatures.TagHelpers
 		/// </summary>
 		public Boolean Active { get; set; }
 
-		/// <summary>
-		/// Generate the output.
+    /// <summary>
+		/// Specifies whether the tab displays an alert symbol.
 		/// </summary>
-		/// <param name="context"></param>
-		/// <param name="output"></param>
-		/// <returns></returns>
-		async public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+		public Boolean Alert { get; set; }
+
+    /// <summary>
+		/// Specifies whether the tab is enabled.
+		/// </summary>
+		public Boolean Enabled { get; set; } = true;
+
+    /// <summary>
+    /// Generate the output.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="output"></param>
+    /// <returns></returns>
+    async public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
 		{
-			TagBuilder builder = Nucleus.ViewFeatures.HtmlContent.TabItem.Build(this.ViewContext, this.Target, this.Caption, this.Active, null);
+			TagBuilder builder = Nucleus.ViewFeatures.HtmlContent.TabItem.Build(this.ViewContext, this.Target, this.Caption, this.Active, this.Enabled, this.Alert, null);
 
 			output.TagName = builder.TagName;
 			output.TagMode = TagMode.StartTagAndEndTag;

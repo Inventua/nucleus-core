@@ -25,7 +25,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// <hidden />
 	internal static class TabItem
 	{
-		internal static TagBuilder Build(ViewContext context, string target, string caption, Boolean active, object htmlAttributes)
+		internal static TagBuilder Build(ViewContext context, string target, string caption, Boolean active, Boolean enabled, Boolean alert, object htmlAttributes)
 		{
 			TagBuilder outputBuilder = new("li");
 			TagBuilder buttonBuilder = new("button");
@@ -35,7 +35,19 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			outputBuilder.MergeAttributes(htmlAttributes);
 
 			buttonBuilder.AddCssClass("nav-link");
+      if (!enabled)
+      {
+        buttonBuilder.AddCssClass("disabled");
+      }
 			buttonBuilder.InnerHtml.Append(caption);
+
+      if (enabled && alert)
+      {
+        TagBuilder alertIcon = new("span");
+        alertIcon.AddCssClass("nucleus-material-icon");
+        alertIcon.InnerHtml.AppendHtml("&#xe000;");
+        buttonBuilder.InnerHtml.AppendHtml(alertIcon);
+      }
 
 			buttonBuilder.Attributes.Add("data-bs-toggle", "tab");
 			buttonBuilder.Attributes.Add("data-bs-target", target);

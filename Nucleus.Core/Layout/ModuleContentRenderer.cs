@@ -78,6 +78,7 @@ namespace Nucleus.Core.Layout
 					{
 						try
 						{
+              // pane name '*' is a special value, used by search feed generators to render content for all panes in a plain format without containers
 							IHtmlContent moduleBody = await RenderModuleView(htmlHelper, moduleInfo, paneName != "*");
 							output.AppendHtml(moduleBody);
 						}
@@ -179,21 +180,21 @@ namespace Nucleus.Core.Layout
 				// create a wrapping div to contain CSS classes defined for the module, and to contain the editing controls (if rendered) and the
 				// module output.  We always render a wrapping div even if no module "styles" are defined/user is not editing, because we want the 
 				// output DOM to be consistent, so that CSS for the layout/container/module can always target the same DOM structure.
-				TagBuilder editorBuilder = new("div");
+				TagBuilder moduleView = new("div");
 
 				if (!String.IsNullOrEmpty(moduleInfo.Style))
 				{
-					editorBuilder.AddCssClass(moduleInfo.Style);
+					moduleView.AddCssClass(moduleInfo.Style);
 				}
 
 				if (isEditing)
 				{
-					AddModuleEditControls(htmlHelper, editorBuilder, moduleInfo, user);
+					AddModuleEditControls(htmlHelper, moduleView, moduleInfo, user);
 				}
 
-				editorBuilder.InnerHtml.AppendHtml(ToHtmlContent(moduleOutput));
-
-				output.AppendHtml(editorBuilder);
+        moduleView.InnerHtml.AppendHtml(ToHtmlContent(moduleOutput));
+                
+				output.AppendHtml(moduleView);
 			}
 
 			return output;
@@ -425,7 +426,12 @@ namespace Nucleus.Core.Layout
 				scopedContainerContext.Site = context.Site;
 				scopedContainerContext.Page = context.Page;
 				scopedContainerContext.Module = moduleinfo;
-				scopedContainerContext.Content = ToHtmlContent(httpContext.Response);
+
+        TagBuilder section = new("section");
+        section.InnerHtml.AppendHtml(ToHtmlContent(httpContext.Response));
+        scopedContainerContext.Content = section;
+        // // scopedContainerContext.Content = ToHtmlContent(httpContext.Response);
+        
 
 				Controller containerController = (Controller)moduleScope.ServiceProvider.GetService<IContainerController>();
 
@@ -486,15 +492,12 @@ namespace Nucleus.Core.Layout
 		private static IHtmlContent ToHtmlContent(HttpResponse response)
 		{
 			HtmlContentBuilder content = new();
-      TagBuilder section = new("section");
             
 			response.Body.Position = 0;
 			using (var reader = new StreamReader(response.Body))
 			{
-				section.InnerHtml.AppendHtml(reader.ReadToEnd());
+				content.AppendHtml(reader.ReadToEnd());
 			}
-
-      content.AppendHtml(section);
 
       return content;
 		}		

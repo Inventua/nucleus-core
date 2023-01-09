@@ -160,4 +160,12 @@
 {
 	margin-top: 1rem;
 	margin-bottom: 1rem;
+  position: relative;
+}
+
+.XmlDocumentation .nucleus-copy-button
+{
+	position: absolute;
+	right: 1rem;
+	top: 0.25rem;
 }

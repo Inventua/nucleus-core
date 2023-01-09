@@ -609,7 +609,7 @@ namespace Nucleus.Core.Managers
 		{
 			FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, file.Provider);
 			//Folder parentFolder = await provider.GetFolder(UseSiteHomeDirectory(site, file.Parent.Path));
-			Folder parentFolder = await this.GetFolder(site, file.Provider, file.Parent.Path);
+			Folder parentFolder = await this.GetFolder(site, file.Provider, file.Parent?.Path);
 			await provider.DeleteFile(UseSiteHomeDirectory(site, file.Path));
 
 			using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())

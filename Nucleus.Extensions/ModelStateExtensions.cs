@@ -16,14 +16,14 @@ namespace Nucleus.Extensions
     /// Add a model state error message for the specified property.
     /// </summary>
     /// <typeparam name="TType"></typeparam>
+    /// <typeparam name="TModel"></typeparam>
     /// <param name="modelState"></param>
     /// <param name="expression"></param>
     /// <param name="message"></param>
     /// <exception cref="ArgumentException"></exception>
     public static void AddModelError<TType, TModel>(this Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState, Expression<Func<TModel, TType>> expression, string message)
     {
-      var memberExpression = expression.Body as MemberExpression;
-      if (memberExpression == null)
+      if (expression.Body is not MemberExpression memberExpression)
       {
         throw new ArgumentException("Expression must be a member expression.");
       }
@@ -33,12 +33,12 @@ namespace Nucleus.Extensions
       modelState.AddModelError(name, message);
     }
 
-		/// <summary>
-		/// Remove all items with the specifed prefix from model state
-		/// </summary>
-		/// <param name="modelState"></param>
-		/// <param name="prefix"></param>
-		public static void RemovePrefix(this Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState, string prefix)
+    /// <summary>
+    /// Remove all items with the specifed prefix from model state
+    /// </summary>
+    /// <param name="modelState"></param>
+    /// <param name="prefix"></param>
+    public static void RemovePrefix(this Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState, string prefix)
 		{
 			foreach (KeyValuePair<string, Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateEntry> item in modelState.FindKeysWithPrefix(prefix))
 			{

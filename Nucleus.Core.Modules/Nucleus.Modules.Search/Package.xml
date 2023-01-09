@@ -4,7 +4,7 @@
   <version>1.0.1.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
-		Search module.  Requires one or more search provider implementations.
+		Search module and basic search provider.
 	</description>
   <compatibility minVersion="1.0.1.0" maxVersion="*" />
   <components>

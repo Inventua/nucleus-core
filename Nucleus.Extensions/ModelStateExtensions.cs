@@ -21,7 +21,7 @@ namespace Nucleus.Extensions
     /// <param name="expression"></param>
     /// <param name="message"></param>
     /// <exception cref="ArgumentException"></exception>
-    public static void AddModelError<TType, TModel>(this Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState, Expression<Func<TModel, TType>> expression, string message)
+    public static void AddModelError<TType, TModel>(this Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState, Expression<Func<TType, TModel>> expression, string message)
     {
       if (expression.Body is not MemberExpression memberExpression)
       {
@@ -43,15 +43,33 @@ namespace Nucleus.Extensions
 			foreach (KeyValuePair<string, Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateEntry> item in modelState.FindKeysWithPrefix(prefix))
 			{
 				modelState.Remove(item.Key);
-			}
+			}            
 		}
 
-		/// <summary>
-		/// Convert a ModelStateDictionary to a comma-separated string, suitable for on-screen display.
-		/// </summary>
-		/// <param name="modelState"></param>
-		/// <returns></returns>
-		public static string ToErrorString(this Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState)
+    /// <summary>
+    /// Remove an item from model state, specified by an expression. 
+    /// </summary>
+    /// <param name="modelState"></param>
+    /// <param name="expression"></param>
+    public static void Remove<TType, TProperty>(this Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState, Expression<Func<TType, TProperty>> expression)
+    {
+      if (expression.Body is not MemberExpression memberExpression)
+      {
+        throw new ArgumentException("Expression must be a member expression.");
+      }
+
+      string name = memberExpression.Member.Name;
+
+      modelState.Remove(name);
+    }
+
+
+    /// <summary>
+    /// Convert a ModelStateDictionary to a comma-separated string, suitable for on-screen display.
+    /// </summary>
+    /// <param name="modelState"></param>
+    /// <returns></returns>
+    public static string ToErrorString(this Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState)
 		{
 			System.Text.StringBuilder result = new();
 

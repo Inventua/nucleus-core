@@ -73,7 +73,7 @@ namespace Nucleus.Core.Services
     public async Task<T> GetResponse<T>(string baseUrl, string relativePath, HttpMethod httpMethod, string apiMethod, HttpContent content)
     {
       // call the store to generate a new id
-      HttpRequestMessage request = CreateRequest(baseUrl, relativePath,httpMethod, apiMethod, content);
+      HttpRequestMessage request = CreateRequest(baseUrl, relativePath, httpMethod, apiMethod, content);
       HttpResponseMessage response = await this.HttpClient.SendAsync(request);
 
       if (!response.IsSuccessStatusCode)

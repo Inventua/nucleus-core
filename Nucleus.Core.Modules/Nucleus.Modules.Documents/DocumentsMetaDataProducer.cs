@@ -17,8 +17,6 @@ namespace Nucleus.Modules.Documents
 {
 	public class DocumentsMetaDataProducer : IContentMetaDataProducer
 	{
-		private Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider ExtensionProvider  { get; } = new();
-
 		private IFileSystemManager FileSystemManager { get; }
 		private DocumentsManager DocumentsManager { get; }
 		private IExtensionManager ExtensionManager { get; }
@@ -42,8 +40,6 @@ namespace Nucleus.Modules.Documents
 			// This must match the value in package.xml
 			Guid moduleDefinitionId = Guid.Parse("28df7ff3-6407-459e-8608-c1ef4181807c");
 			
-			//List<ContentMetaData> results = new();
-
 			if (site.DefaultSiteAlias == null)
 			{
 				this.Logger.LogWarning("Site {0} skipped because it does not have a default alias.", site.Id);
@@ -54,35 +50,29 @@ namespace Nucleus.Modules.Documents
 				{
 					Page page = await this.PageManager.Get(module.PageId);
 
-					if (!page.IncludeInSearch )
-					{
-						Logger?.LogInformation("Skipping documents module on page {pageid}/{pagename} because the page's 'Include in search' setting is false.", page.Id, page.Name);
-					}
-					foreach (Models.Document document in await this.DocumentsManager.List(site, module))
-					{
-						yield return await BuildContentMetaData(site, module, document);
-						//results.Add(await BuildContentMetaData(site, module, document));
-					}
+          if (!page.IncludeInSearch)
+          {
+            Logger?.LogInformation("Skipping documents module on page {pageid}/{pagename} because the page's 'Include in search' setting is false.", page.Id, page.Name);
+          }
+          else
+          {
+            foreach (Models.Document document in await this.DocumentsManager.List(site, module))
+            {
+              yield return await BuildContentMetaData(site, page, module, document);
+            }
+          }
 				}
 			}
-
-			//return results.Where(result=>result != null);
 		}
-
-		
+    		
 		/// <summary>
 		/// Return a meta-data entry for the document meta-data
 		/// </summary>
 		/// <param name="site"></param>
 		/// <param name="document"></param>
 		/// <returns></returns>
-		private async Task<ContentMetaData> BuildContentMetaData(Site site, PageModule module, Models.Document document)
-		{
-
-			// Get document meta-data, using the linked file as "content"
-			//Guid pageId = this.PageModuleManager.GetPageId(module);
-			Page page = await this.PageManager.Get(module.PageId);
-			
+		private async Task<ContentMetaData> BuildContentMetaData(Site site, Page page, PageModule module, Models.Document document)
+		{      			
 			if (page != null && document.File != null)
 			{
 				string pageUrl = UrlHelperExtensions.RelativePageLink(page);
@@ -111,15 +101,6 @@ namespace Nucleus.Modules.Documents
 			}
 
 			return null;
-		}
-
-
-		private async Task<List<Role>> GetViewRoles(Folder folder)
-		{
-			return
-				(await this.FileSystemManager.ListPermissions(folder))
-					.Where(permission => permission.AllowAccess && permission.IsFolderViewPermission())
-					.Select(permission => permission.Role).ToList();
 		}
 
 		private async Task<List<Role>> GetViewRoles(PageModule module)

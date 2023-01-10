@@ -60,37 +60,40 @@ namespace Nucleus.XmlDocumentation
 					apiKey = await this.ApiKeyManager.Get(result);
 				}
 
-				foreach (PageModule module in await this.ExtensionManager.ListPageModules(new Nucleus.Abstractions.Models.ModuleDefinition() { Id = moduleDefinitionId }))
-				{
-					Page page = await this.PageManager.Get(module.PageId);
+        foreach (PageModule module in await this.ExtensionManager.ListPageModules(new Nucleus.Abstractions.Models.ModuleDefinition() { Id = moduleDefinitionId }))
+        {
+          Page page = await this.PageManager.Get(module.PageId);
 
-					if (!page.IncludeInSearch )
-					{
-						Logger?.LogInformation("Skipping XMLDocumentation module on page {pageid}/{pagename} because the page's 'Include in search' setting is false.", page.Id, page.Name);
-					}
-					foreach (Models.ApiDocument document in await GetApiDocuments(site, module))
-					{
-						await foreach (ContentMetaData item in BuildContent(site, apiKey, module, document))
-						{
-							if (item != null)
-							{
-								yield return item;
-							}
-						}
-					}
-				}
+          if (!page.IncludeInSearch)
+          {
+            Logger?.LogInformation("Skipping XMLDocumentation module on page {pageid}/{pagename} because the page's 'Include in search' setting is false.", page.Id, page.Name);
+          }
+          else
+          {
+            foreach (Models.ApiDocument document in await GetApiDocuments(site, module))
+            {
+              await foreach (ContentMetaData item in BuildContent(site, apiKey, page, module, document))
+              {
+                if (item != null)
+                {
+                  yield return item;
+                }
+              }
+            }
+          }
+        }
 			}
 		}
 
-		private async IAsyncEnumerable<ContentMetaData> BuildContent(Site site, ApiKey apiKey, PageModule module, Models.ApiDocument document)
+		private async IAsyncEnumerable<ContentMetaData> BuildContent(Site site, ApiKey apiKey, Page page, PageModule module, Models.ApiDocument document)
 		{
 			site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PAGES_USE_SSL, out Boolean useSsl);
 
-			yield return (await BuildContentMetaData(site, apiKey, module, document, useSsl));
+			yield return (await BuildContentMetaData(site, apiKey, page, module, document, useSsl));
 
 			foreach (Models.ApiClass apiClass in document.Classes)
 			{
-				yield return await BuildContentMetaData(site, apiKey, module, document, apiClass, useSsl);
+				yield return await BuildContentMetaData(site, apiKey, page, module, document, apiClass, useSsl);
 			}
 		}
 
@@ -100,10 +103,8 @@ namespace Nucleus.XmlDocumentation
 		/// <param name="site"></param>
 		/// <param name="document"></param>
 		/// <returns></returns>
-		private async Task<ContentMetaData> BuildContentMetaData(Site site, ApiKey apiKey, PageModule module, Models.ApiDocument document, Boolean useSsl)
+		private async Task<ContentMetaData> BuildContentMetaData(Site site, ApiKey apiKey, Page page, PageModule module, Models.ApiDocument document, Boolean useSsl)
 		{
-			Page page = await this.PageManager.Get(module.PageId);
-
 			if (page != null)
 			{
 				ContentMetaData documentContentItem = new()
@@ -135,10 +136,8 @@ namespace Nucleus.XmlDocumentation
 		/// <param name="site"></param>
 		/// <param name="document"></param>
 		/// <returns></returns>
-		private async Task<ContentMetaData> BuildContentMetaData(Site site, ApiKey apiKey, PageModule module, Models.ApiDocument document, Models.ApiClass apiClass, Boolean useSsl)
+		private async Task<ContentMetaData> BuildContentMetaData(Site site, ApiKey apiKey, Page page, PageModule module, Models.ApiDocument document, Models.ApiClass apiClass, Boolean useSsl)
 		{
-			Page page = await this.PageManager.Get(module.PageId);
-			
 			if (page != null)
 			{
 				ContentMetaData documentContentItem = new()

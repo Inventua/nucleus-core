@@ -69,16 +69,18 @@ namespace Nucleus.Modules.Publish
 					}
 					else
 					{
-						if (!page.IncludeInSearch)
-						{
-							Logger?.LogInformation("Skipping publish module on page {pageid}/{pagename} because the page's 'Include in search' setting is false.", page.Id, page.Name);
-						}
-
-						foreach (Models.Article article in await this.ArticlesManager.List(module))
-						{
-							this.Logger.LogTrace("Building content meta-data for article {0}.", article.Id);
-							yield return await BuildContentMetaData(site, module, apiKey, useSsl, article);
-						}
+            if (!page.IncludeInSearch)
+            {
+              Logger?.LogInformation("Skipping publish module on page {pageid}/{pagename} because the page's 'Include in search' setting is false.", page.Id, page.Name);
+            }
+            else
+            {
+              foreach (Models.Article article in await this.ArticlesManager.List(module))
+              {
+                this.Logger.LogTrace("Building content meta-data for article {0}.", article.Id);
+                yield return await BuildContentMetaData(site, page, module, apiKey, useSsl, article);
+              }
+            }
 					}
 				}
 			}
@@ -90,13 +92,11 @@ namespace Nucleus.Modules.Publish
 		/// <param name="site"></param>
 		/// <param name="article"></param>
 		/// <returns></returns>
-		private async Task<ContentMetaData> BuildContentMetaData(Site site, PageModule module, ApiKey apiKey, Boolean useSsl, Models.Article article)
+		private async Task<ContentMetaData> BuildContentMetaData(Site site, Page page, PageModule module, ApiKey apiKey, Boolean useSsl, Models.Article article)
 		{
 			try
 			{
 				// Get article meta-data
-				Page page = await this.PageManager.Get(module.PageId);
-
 				if (page != null && article.Enabled)
 				{
 					string pageUrl = UrlHelperExtensions.RelativePageLink(page);

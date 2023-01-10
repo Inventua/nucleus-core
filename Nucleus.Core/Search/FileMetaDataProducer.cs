@@ -54,11 +54,8 @@ namespace Nucleus.Core.Search
 			//return results;
 		}
 
-		//private async Task<List<ContentMetaData>> GetFiles(Site site, Folder parentFolder, Boolean indexPublicFilesOnly)
 		public async IAsyncEnumerable<ContentMetaData> GetFiles(Site site, Folder parentFolder, Boolean indexPublicFilesOnly)
 		{
-			//List<ContentMetaData> results = new();
-
 			Folder folder = await this.FileSystemManager.ListFolder(site, parentFolder.Id, "");
 
 			if (!parentFolder.IncludeInSearch)
@@ -77,7 +74,6 @@ namespace Nucleus.Core.Search
 						if (metaData != null)
 						{
 							yield return metaData;
-							//results.Add(metaData);
 						}
 					}
 				}

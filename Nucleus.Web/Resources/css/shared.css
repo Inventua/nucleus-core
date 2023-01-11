@@ -543,7 +543,6 @@ table.table-sticky-headers thead th
   flex-basis: 100%
 }
 
-
 .nucleus-account-control.justify-content-end .dropdown-menu
 {
 	left: initial;
@@ -556,6 +555,15 @@ table.table-sticky-headers thead th
 	left: 0;
 	right: initial;
 	margin: auto;
+}
+
+/* common styles */
+
+.style-scrollable, .style-scrollable > section, .style-scrollable > section > form
+{
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
 }
 
 

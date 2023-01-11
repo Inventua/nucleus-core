@@ -661,6 +661,7 @@ ul.nucleus-control-panel-items button
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  overflow: auto;
 }
 
 .nucleus-adminpage .ExtensionInstaller h2

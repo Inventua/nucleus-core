@@ -38,13 +38,15 @@ namespace Nucleus.ViewFeatures.Controls
 		/// <param name="actionName"></param>
 		/// <param name="controlName"></param>
     /// <param name="text"></param>
+    /// <param name="cssClass"></param>
 		/// <returns></returns>
-		public async Task<IViewComponentResult> InvokeAsync(Folder folder, string filter, string actionName, string controlName, string text)
+		public async Task<IViewComponentResult> InvokeAsync(Folder folder, string filter, string actionName, string controlName, string text, string cssClass)
 		{
 			ViewModels.FileUpload viewModel = new()
-			{
-				ControlName = controlName ?? "mediaFile",
+			{				
+        ControlName = controlName ?? "mediaFile",
         Text = text ?? "Upload File",
+        CssClass = cssClass ?? "btn btn-secondary ms-auto",
         ActionName = actionName ?? "UploadFile",
 				ControllerName = (string)this.ViewContext.RouteData.Values["controller"],
 				AreaName = (string)this.ViewContext.RouteData.Values["area"],
@@ -52,7 +54,7 @@ namespace Nucleus.ViewFeatures.Controls
 				Filter = filter
 			};
 
-			if (folder != null)
+      if (folder != null)
 			{
 				if (folder.Id != Guid.Empty)
 				{

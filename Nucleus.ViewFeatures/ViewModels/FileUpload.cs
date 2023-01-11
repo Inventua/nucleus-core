@@ -14,7 +14,12 @@ namespace Nucleus.ViewFeatures.ViewModels
     /// <summary>
     /// Display text for the upload control.
     /// </summary>
-    public string Text { get; set; } = "Upload File";
+    public string Text { get; set; }
+
+    /// <summary>
+    /// Css class for the upload button.
+    /// </summary>
+    public string CssClass { get; set; }
 
     /// <summary>
     /// Name of the form field used to submit the uploaded file.

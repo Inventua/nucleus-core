@@ -16,6 +16,7 @@ using Nucleus.Abstractions.Models.FileSystem;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models.Paging;
+using Nucleus.Extensions;
 
 namespace Nucleus.Core.DataProviders
 {
@@ -2451,7 +2452,8 @@ namespace Nucleus.Core.DataProviders
     public async Task SaveOrganization(Site site, Organization organization)
     {
       Boolean isNew = !this.Context.Organizations.Where(existing => existing.Id == organization.Id).Any();
-
+      organization.EncodedName= organization.Name.FriendlyEncode();
+      
       this.Context.Attach(organization);
       this.Context.Entry(organization).Property("SiteId").CurrentValue = site.Id;
       this.Context.Entry(organization).State = isNew ? EntityState.Added : EntityState.Modified;

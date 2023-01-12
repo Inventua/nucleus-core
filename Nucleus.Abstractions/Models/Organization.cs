@@ -22,6 +22,11 @@ namespace Nucleus.Abstractions.Models
     public String Name { get; set; }
 
     /// <summary>
+    /// Url-friendly organization name.
+    /// </summary>
+    public String EncodedName { get; set; }
+
+    /// <summary>
     /// List of users who belong to the organization.
     /// </summary>
     public List<OrganizationUser> Users { get; set; }

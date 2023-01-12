@@ -23,6 +23,12 @@
             "isnullable": false
           },
           {
+            "name": "EncodedName",
+            "clrType": "string",
+            "maxLength": 256,
+            "isnullable": false
+          },
+          {
             "name": "DateAdded",
             "clrType": "datetime",
             "isnullable": true

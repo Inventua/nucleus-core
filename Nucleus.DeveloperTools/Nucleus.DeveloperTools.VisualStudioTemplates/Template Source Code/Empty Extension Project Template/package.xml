@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<package id="$guid1$" xmlns="urn:nucleus/schemas/package/1.0">
+<package id="$guid1$" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
 	<name>$nucleus_extension_name$</name>
 	<version>1.0.0</version>
 	<publisher name="$publisher_name$" url="$publisher_url$" email="$publisher_email$" />

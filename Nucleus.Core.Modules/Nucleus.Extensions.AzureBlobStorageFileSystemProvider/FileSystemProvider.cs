@@ -41,26 +41,29 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 
 		public override async Task<Folder> CreateFolder(string parentPath, string newFolder)
 		{
-			PathUri path = new PathUri(this.RootPath, parentPath, PathUri.AddDelimiter(newFolder));
-			//string fullPath = JoinPath(UseRootFolder(parentPath), newFolder);
+      PathUri parent = new PathUri(this.RootPath, parentPath);
+      PathUri path;
+
 			BlobServiceClient client = new(this.Options.ConnectionString);
 
-			if (path.PathUriType == PathUri.PathUriTypes.Root)
-			{
+      if (parent.PathUriType == PathUri.PathUriTypes.Root)
+      {
+        path = new PathUri(this.RootPath, PathUri.AddDelimiter(newFolder));
 				if (!ValidateContainerName(path.ContainerName))
 				{
 					throw new InvalidOperationException($"Cannot create folder '{newFolder}' because it contains spaces or other invalid characters.  Top level folders (containers) in Azure Storage must be lower case, and contain only letters, numbers and dashes.");
 				}
 				// folder being created is at the top level, create a container
 				await client.CreateBlobContainerAsync(path.ContainerName);
-			}
-			else
-			{
+      }
+      else
+      {
+        path = new PathUri(this.RootPath, parentPath, PathUri.AddDelimiter(newFolder));
 				// folder is "in" a container, create zero-length blob to represent a folder 
 				BlobContainerClient containerClient = client.GetBlobContainerClient(path.ContainerName);
 				BlobClient blobClient = containerClient.GetBlobClient(path.Key);
 				await blobClient.UploadAsync(new System.IO.MemoryStream());
-			}
+      }
 
 			return BuildFolder(path);
 		}

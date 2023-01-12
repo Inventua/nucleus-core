@@ -1,11 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<package id="3dbb94f0-13ee-4402-bdbd-498f6e3dec62" xmlns="urn:nucleus/schemas/package/1.0">
+<package id="3dbb94f0-13ee-4402-bdbd-498f6e3dec62"
+         xmlns="urn:nucleus/schemas/package/1.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
 	<name>SAML Client</name>
 	<version>1.0.0</version>
 	<publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
 	<description>
-		SAML Client for Nucleus.
-	</description>
+    The SAML client allows users to sign on to Nucleus using an external SAML2 service (Identity Provider).
+  </description>
 	<compatibility minVersion="1.1.0.0" maxVersion="*" />
 	
 	<components>
@@ -26,7 +29,7 @@
 				<settingsController>SAMLClientAdmin</settingsController>
 				<viewAction>Index</viewAction>
 				<editAction>Settings</editAction>
-				<categories>Account Management</categories>
+				<categories>Authentication,Account Management</categories>
 			</moduleDefinition>
 			
 			<file name="readme.txt" />

@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package id="86246671-4a20-4803-a74a-48b3b2d1cc26" xmlns="urn:nucleus/schemas/package/1.0">
+<package id="86246671-4a20-4803-a74a-48b3b2d1cc26" 
+         xmlns="urn:nucleus/schemas/package/1.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Multi-Content</name>
   <version>1.0.1</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />

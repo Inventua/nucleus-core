@@ -17,9 +17,9 @@ namespace Nucleus.Modules.Sitemap
 		/// <param name="htmlHelper"></param>
 		/// <param name="htmlAttributes"></param>
 		/// <returns></returns>
-		public static IHtmlContent Sitemap(this IHtmlHelper htmlHelper, Nucleus.Modules.Sitemap.RootPageTypes rootPageType, Guid selectedPageId, Boolean showDescription, int levels, object htmlAttributes)
+		public static IHtmlContent Sitemap(this IHtmlHelper htmlHelper, Nucleus.Modules.Sitemap.RootPageTypes rootPageType, Guid selectedPageId, Boolean showDescription, int levels, Directions direction, object htmlAttributes)
 		{
-			return SitemapRenderer.Build(htmlHelper.ViewContext, rootPageType, selectedPageId, showDescription, levels, htmlAttributes).Result;
+			return SitemapRenderer.Build(htmlHelper.ViewContext, rootPageType, selectedPageId, showDescription, levels, direction, htmlAttributes).Result;
 		}
 	}
 }

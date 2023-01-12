@@ -22,7 +22,8 @@ namespace Nucleus.Modules.Sitemap.Controllers
 			public const string SETTINGS_ROOTPAGE_TYPE = "sitemap:root-page-type";
 			public const string SETTINGS_ROOTPAGE = "sitemap:root-page";
 			public const string SETTINGS_SHOWDESCRIPTION = "sitemap:show-description";
-		}
+      public const string SETTINGS_DIRECTION = "sitemap:direction";
+    }
 
 		public SitemapController(Context context, IPageManager pageManager, IPageModuleManager pageModuleManager)
 		{
@@ -74,7 +75,8 @@ namespace Nucleus.Modules.Sitemap.Controllers
 				viewModel.RootPageType = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.SETTINGS_ROOTPAGE_TYPE, Nucleus.Modules.Sitemap.RootPageTypes.SelectedPage);
 				viewModel.RootPageId = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.SETTINGS_ROOTPAGE, Guid.Empty);
 				viewModel.ShowDescription = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.SETTINGS_SHOWDESCRIPTION, false);
-			}
+        viewModel.Direction = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.SETTINGS_DIRECTION, Directions.Vertical);
+      }
 
 			return viewModel;
 		}
@@ -89,7 +91,8 @@ namespace Nucleus.Modules.Sitemap.Controllers
 				viewModel.RootPageType = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.SETTINGS_ROOTPAGE_TYPE, Nucleus.Modules.Sitemap.RootPageTypes.SelectedPage);
 				viewModel.RootPageId = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.SETTINGS_ROOTPAGE, Guid.Empty);
 				viewModel.ShowDescription = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.SETTINGS_SHOWDESCRIPTION, false);
-			}
+        viewModel.Direction = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.SETTINGS_DIRECTION, Directions.Vertical);
+      }
 
 			viewModel.Pages = await this.PageManager.GetAdminMenu(this.Context.Site, null, HttpContext.User, viewModel.RootPageId);
 
@@ -104,8 +107,9 @@ namespace Nucleus.Modules.Sitemap.Controllers
 			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.SETTINGS_ROOTPAGE_TYPE, viewModel.RootPageType);
 			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.SETTINGS_ROOTPAGE, viewModel.RootPageId);
 			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.SETTINGS_SHOWDESCRIPTION, viewModel.ShowDescription);
-
-			await this.PageModuleManager.SaveSettings(this.Context.Module);
+      this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.SETTINGS_DIRECTION, viewModel.Direction);
+      
+      await this.PageModuleManager.SaveSettings(this.Context.Module);
 			
 			return Ok();
 		}

@@ -28,13 +28,19 @@ namespace Nucleus.Modules.Sitemap
 		[Display(Name = "Dual")] Dual = 6
 	}
 
-	/// <summary>
-	/// Renders a site map.
-	/// </summary>
-	internal static class SitemapRenderer
+  public enum Directions
+  {
+    Vertical = 0,
+    Horizontal = 1
+  }
+
+  /// <summary>
+  /// Renders a site map.
+  /// </summary>
+  internal static class SitemapRenderer
 	{
 
-		internal static async Task<TagBuilder> Build(ViewContext context, RootPageTypes rootPageType, Guid selectedPageId, Boolean showDescription, int maxlevels, object htmlAttributes)
+		internal static async Task<TagBuilder> Build(ViewContext context, RootPageTypes rootPageType, Guid selectedPageId, Boolean showDescription, int maxlevels, Directions direction, object htmlAttributes)
 		{
 			Page rootPage = null;
 			TagBuilder outputBuilder;
@@ -81,6 +87,11 @@ namespace Nucleus.Modules.Sitemap
 			if (outputBuilder != null)
 			{
 				outputBuilder.AddCssClass("Sitemap");
+
+        if (direction == Directions.Horizontal)
+        {
+          outputBuilder.AddCssClass("sitemap-horizontal");
+        }
 			}
 
 			return outputBuilder;

@@ -17,3 +17,9 @@ OL.Sitemap LI
 {
 	list-style-type: none;
 }
+
+OL.Sitemap.sitemap-horizontal
+{
+  display: flex;
+  gap: 1rem;
+}

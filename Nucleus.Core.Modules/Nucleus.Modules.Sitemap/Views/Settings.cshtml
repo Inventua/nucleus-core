@@ -4,11 +4,17 @@
 @using (Html.BeginNucleusForm("Save", "Sitemap", FormMethod.Post, null))
 {
 <fieldset role="group" class="flex-grow-1" aria-labelledby="heading">	
-	<SettingsControl caption="Levels" helptext="Specifies number of levels to show.  Use '0' to show all levels.">
-		@Html.TextBoxFor(model => model.MaxLevels, new { type = "number", min = "0" })
-	</SettingsControl>
+  <div class="nucleus-flex-fields">
+	  <SettingsControl caption="Levels" helptext="Specifies number of levels to show.  Use '0' to show all levels.">
+		  @Html.TextBoxFor(model => model.MaxLevels, new { type = "number", min = "0" })
+	  </SettingsControl>
 
-	<SettingsControl caption="Root Page Type" helptext="Select the base page type ">
+    <SettingsControl caption="Direction" helptext="Select whether to render the site map as a vertical or horizontal list.">
+		  @Html.DropDownListFor(model => model.Direction, Html.GetEnumSelectList<Nucleus.Modules.Sitemap.Directions>())
+	  </SettingsControl>
+  </div>
+
+	<SettingsControl caption="Root Page Type" helptext="Select the base page type.">
 		@Html.DropDownListFor(model => model.RootPageType, Html.GetEnumSelectList<Nucleus.Modules.Sitemap.RootPageTypes>(), new { @class = "SiteMapRootPageType" })
 	</SettingsControl>
 

@@ -8,10 +8,12 @@ namespace Nucleus.Modules.Sitemap.ViewModels
 {
 	public class Sitemap
 	{
+    
 		public int MaxLevels { get; set; }
 		public Guid RootPageId { get; set; }
 		public RootPageTypes RootPageType { get; set; }
 		public Boolean ShowDescription { get; set; }
-		
+		public Directions Direction { get; set; }
+
 	}
 }

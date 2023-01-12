@@ -127,6 +127,7 @@ a *
 	left: 0;
   border: 0;
 	transition: 0.25s;
+  z-index: 10000;
 }
 
 .AdminFramePlaceholder
@@ -559,7 +560,7 @@ table.table-sticky-headers thead th
 
 /* common styles */
 
-.style-scrollable, .style-scrollable > section, .style-scrollable > section > form
+.style-scrollable, .style-scrollable > div > section, .style-scrollable > div > section > form
 {
   display: flex;
   flex-direction: column;

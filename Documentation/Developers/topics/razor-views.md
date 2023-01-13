@@ -96,10 +96,16 @@ The `data-target` attribute on a `<form>`, `<input>`, `<a>` or `<button>` is use
 client-side components (javascript).  The Html response is written to the element specified by the `data-target`, which works like a jQuery selector.  You 
 can specify a `data-target` by #id, or using any other jQuery selector syntax.  
 
-> In a ==Settings== view, if you do not specify a `data-target`, your form will use a data-target of `form.parent()`.  This value works for most simple 
-settings views.
+> In a ==Settings== view, if you do not specify a `data-target`, your form will use a data-target of `form.parent()`.  
 
 > data-target can understand `.parent()` at the end of your selector.  This is not standard jQuery selector syntax.
+
+### data-useurl attribute
+The `data-useurl` attribute on a `<form>`, `<input>`, `<a>` or `<button>` is used to specify an url which is pushed to the browser address bar.  It is used 
+in conjunction with the data-target attribute.  The `data-useurl` attribute has a limited use case: Use it when you are populating content within a specific 
+element (using data-target) when your module is also capable of displaying the requested content using the specified url.  In order to do this, your module 
+controller must use [this.Context.LocalPath](https://www.nucleus-cms.com/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.Models.LocalPath/) to 
+parse additional elements from the path (url) to navigate within your module.
 
 ### NucleusAction url helper
 In your submit button(s), you can use `@Url.NucleusAction` to specify a `formaction` for your control.  Similar to `BeginNucleusForm`, the `NucleusAction` 

@@ -55,6 +55,16 @@ function _Page()
 		// Automatically POST the form containing the specified control when the specified event is triggered
 		jQuery(document).on('click change keydown keyup input', 'INPUT[data-autopostbackevent], SELECT[data-autopostbackevent]', _handleAutoPostBack);
 
+    // Handle popstate event.  When the data-useurl attribute is added to an element which causes partial rendering (or to its form element), we 
+    // use the browser history API to push the url specified in data-useurl to the browser address bar.
+    jQuery(window).on("popstate", function (event)
+    {
+      if (history.state && typeof history.state.url !== 'undefined')
+      {
+        window.location = history.state.url;
+      }
+    });
+
 		// Handle ENTER key 
 		jQuery(document).on('keydown', 'input', function (event)
 		{
@@ -406,7 +416,23 @@ function _Page()
 		}
 
 		return target;
-	}
+  }
+
+  function _getUseUrl(event)
+  {
+    var useUrl;
+
+    if (typeof event.originalEvent !== 'undefined' && event.originalEvent !== null && typeof event.originalEvent.submitter !== ' undefined' && event.originalEvent.submitter !== null && jQuery(event.originalEvent.submitter).is('[data-useurl]')) 
+    {
+      useUrl = jQuery(event.originalEvent.submitter).attr('data-useurl');
+    }
+    else if (event.currentTarget !== 'undefined' && event.currentTarget !== null && jQuery(event.currentTarget).is('[data-useurl]'))
+    {
+      useUrl = jQuery(event.currentTarget).attr('data-useurl');      
+    }
+
+    return useUrl;
+  }
 
 	/**
 	 * @summary	
@@ -468,7 +494,7 @@ function _Page()
     }
 
 		target = _getTarget(eventTarget, targetSelector);
-
+    
 		// reset validation error highlighting
 		target.find('.ValidationError').removeClass('ValidationError');
 
@@ -482,41 +508,41 @@ function _Page()
 
 		var action = function ()
 		{
-			_indicateProgress.call(this, event);
+      _indicateProgress.call(this, event);
 
-			jQuery.ajax({
-				url: url,
-				method: 'POST',
-				enctype: form.attr('enctype'),
-				data: (form.attr('enctype') === 'multipart/form-data') ? new FormData(form[0]) : form.serialize(),
-				headers: { 'Accept': 'application/json, */*' },
-				xhr: function ()
-				{
-					var xhr = new window.XMLHttpRequest();
-					//Download progress
-					xhr.upload.addEventListener("progress", function (evt)
-					{
-						if (evt.lengthComputable)
-						{
-							var percentComplete = Math.round((evt.loaded / evt.total) * 100);
-							form.trigger('progress', percentComplete);
-						}
-					}, false);
-					return xhr;
-				},
-				processData: (form.attr('enctype') === 'multipart/form-data') ? false : true,
-				contentType: (form.attr('enctype') === 'multipart/form-data') ? false : 'application/x-www-form-urlencoded; charset=UTF-8',
-				success: function (data, status, request)
-				{
-					_render(target, eventTarget, data, url, event, status, request);
-					form.trigger('success', [target, data, url, event, status, request]);
-				},
-				error: function (request, status, message)
-				{
-					_handleError(target, url, event, status, message, request);
-					form.trigger('error', [target, url, event, status, message, request]);
-				}
-			})
+      jQuery.ajax({
+        url: url,
+        method: 'POST',
+        enctype: form.attr('enctype'),
+        data: (form.attr('enctype') === 'multipart/form-data') ? new FormData(form[0]) : form.serialize(),
+        headers: { 'Accept': 'application/json, */*' },
+        xhr: function ()
+        {
+          var xhr = new window.XMLHttpRequest();
+          //Download progress
+          xhr.upload.addEventListener("progress", function (evt)
+          {
+            if (evt.lengthComputable)
+            {
+              var percentComplete = Math.round((evt.loaded / evt.total) * 100);
+              form.trigger('progress', percentComplete);
+            }
+          }, false);
+          return xhr;
+        },
+        processData: (form.attr('enctype') === 'multipart/form-data') ? false : true,
+        contentType: (form.attr('enctype') === 'multipart/form-data') ? false : 'application/x-www-form-urlencoded; charset=UTF-8',
+        success: function (data, status, request)
+        {
+          _render(target, eventTarget, data, url, event, status, request);
+          form.trigger('success', [target, data, url, event, status, request]);
+        },
+        error: function (request, status, message)
+        {
+          _handleError(target, url, event, status, message, request);
+          form.trigger('error', [target, url, event, status, message, request]);
+        }
+      })
 		};
 
 		if (typeof (event.originalEvent) !== 'undefined' && typeof (event.originalEvent.submitter) !== 'undefined' && typeof (jQuery(event.originalEvent.submitter).attr('data-confirm')) !== 'undefined')
@@ -900,6 +926,16 @@ function _Page()
 	function _render(target, source, data, url, event, status, request)
 	{
 		_preRender(target, source, data, status, request);
+
+    var useUrl = _getUseUrl(event);
+    if (typeof useUrl !== 'undefined' && useUrl !== null)
+    {
+      var state =
+      {
+        url: useUrl
+      };
+      window.history.pushState(state, '', useUrl);
+    }
 
 		if (typeof (request.responseJSON) !== 'undefined' && typeof (request.responseJSON.message) !== 'undefined')
 		{

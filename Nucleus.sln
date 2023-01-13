@@ -162,7 +162,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Release Notes", "Release No
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.SAML.Client", "Nucleus.Special.Modules\Nucleus.SAML.Client\Nucleus.SAML.Client.csproj", "{9D9097B2-1F66-48BA-95AD-310F246EE6C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.SAML.Server", "Nucleus.Special.Modules\Nucleus.SAML.Server\Nucleus.SAML.Server.csproj", "{1DD57018-C708-4334-B79E-BCFA6ACEF138}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.SAML.Server", "Nucleus.Special.Modules\Nucleus.SAML.Server\Nucleus.SAML.Server.csproj", "{1DD57018-C708-4334-B79E-BCFA6ACEF138}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

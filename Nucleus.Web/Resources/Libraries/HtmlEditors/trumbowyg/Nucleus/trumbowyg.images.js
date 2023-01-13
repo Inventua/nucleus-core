@@ -46,6 +46,7 @@
     var url = document.baseURI + 'User/FileSelector/Index?pattern=(.gif)|(.png)|(.jpg)|(.jpeg)|(.bmp)|(.webp)&showSelectAnother=false&applicationAbsoluteUrl=false';
     jQuery.ajax({
       url: url,
+      async: true,
       method: 'GET',
       success: function (data, status, request)
       {

@@ -4,7 +4,8 @@
 	{
 		var url = document.baseURI + 'User/FileSelector/Index?pattern=(.gif)|(.png)|(.jpg)|(.jpeg)|(.bmp)|(.webp)&showSelectAnother=false&applicationAbsoluteUrl=false&noFilesMessage=(no image files)&showImagePreview=true';
 		jQuery.ajax({
-			url: url,
+      url: url,
+      async: true,
 			method: 'GET',
 			success: function (data, status, request)
 			{

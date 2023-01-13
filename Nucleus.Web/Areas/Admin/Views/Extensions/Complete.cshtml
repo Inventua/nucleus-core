@@ -45,6 +45,7 @@
 		
 		jQuery.ajax({
 			url: '@Url.Content("~/")',
+      async: true,
 			method: 'GET',
 			success: function (data, status, request)
 			{

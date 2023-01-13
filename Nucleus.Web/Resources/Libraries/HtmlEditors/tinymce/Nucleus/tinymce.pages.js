@@ -4,7 +4,8 @@
 	{
 		var url = document.baseURI + 'User/PageSelector/Index';
 		jQuery.ajax({
-			url: url,
+      url: url,
+      async: true,
 			method: 'GET',
 			success: function (data, status, request)
 			{

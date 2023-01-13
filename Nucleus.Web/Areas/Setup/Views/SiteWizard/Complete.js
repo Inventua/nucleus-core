@@ -7,7 +7,8 @@
 function TestSiteStarted()
 {
 	jQuery.ajax({
-		url: document.baseURI,
+    url: document.baseURI,
+    async: true,
 		method: 'GET',
 		success: function (data, status, request)
 		{

@@ -31,6 +31,7 @@ function _extensionsStore()
       case 'query':
         jQuery.ajax({
           url: _queryUrl,
+          async: true,
           method: 'GET',
           data: { id: event.data.id },
           headers: { 'Accept': 'application/json, */*' },
@@ -45,6 +46,7 @@ function _extensionsStore()
         var form = jQuery('#nucleus-extensions-store-form');
         jQuery.ajax({
           url: _queryStoreUrl,
+          async: true,
           method: 'POST',
           enctype: form.attr('enctype'),
           data: (form.attr('enctype') === 'multipart/form-data') ? new FormData(form[0]) : form.serialize(),

@@ -512,6 +512,7 @@ function _Page()
 
       jQuery.ajax({
         url: url,
+        async: true,
         method: 'POST',
         enctype: form.attr('enctype'),
         data: (form.attr('enctype') === 'multipart/form-data') ? new FormData(form[0]) : form.serialize(),
@@ -584,7 +585,8 @@ function _Page()
 		_indicateProgress.call(this, event);
 
 		jQuery.ajax({
-			url: url,
+      url: url,
+      async: true,
 			headers: { 'Accept': 'application/json, */*' },
 			success: function (data, status, request) { _render(target, null, data, url, event, status, request); },
 			error: function (request, status, message) { _handleError(target, url, event, status, message, request); }
@@ -649,7 +651,8 @@ function _Page()
 			_indicateProgress.call(this, event);
 
 			jQuery.ajax({
-				url: url,
+        url: url,
+        async: true,
 				headers: { 'Accept': 'application/json, */*' },
 				success: function (data, status, request) { _render(target, jQuery(event.currentTarget), data, url, event, status, request); },
 				error: function (request, status, message) { _handleError(target, url, event, status, message, request); }

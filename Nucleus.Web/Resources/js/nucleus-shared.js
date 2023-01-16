@@ -422,15 +422,17 @@ function _Page()
   {
     var useUrl;
 
-    if (typeof event.originalEvent !== 'undefined' && event.originalEvent !== null && typeof event.originalEvent.submitter !== ' undefined' && event.originalEvent.submitter !== null && jQuery(event.originalEvent.submitter).is('[data-useurl]')) 
+    if (typeof event !== 'undefined' && event !== null && typeof event.originalEvent !== 'undefined')
     {
-      useUrl = jQuery(event.originalEvent.submitter).attr('data-useurl');
+      if (typeof event.originalEvent !== 'undefined' && event.originalEvent !== null && typeof event.originalEvent.submitter !== ' undefined' && event.originalEvent.submitter !== null && jQuery(event.originalEvent.submitter).is('[data-useurl]')) 
+      {
+        useUrl = jQuery(event.originalEvent.submitter).attr('data-useurl');
+      }
+      else if (event.currentTarget !== 'undefined' && event.currentTarget !== null && jQuery(event.currentTarget).is('[data-useurl]'))
+      {
+        useUrl = jQuery(event.currentTarget).attr('data-useurl');
+      }
     }
-    else if (event.currentTarget !== 'undefined' && event.currentTarget !== null && jQuery(event.currentTarget).is('[data-useurl]'))
-    {
-      useUrl = jQuery(event.currentTarget).attr('data-useurl');      
-    }
-
     return useUrl;
   }
 

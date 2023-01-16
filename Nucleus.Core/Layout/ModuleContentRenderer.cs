@@ -323,7 +323,7 @@ namespace Nucleus.Core.Layout
 					
 					if (actionDescriptor == null)
 					{
-						throw new InvalidOperationException($"Unable to load an action descriptor for the module '{moduleinfo.ModuleDefinition.FriendlyName}' [{controller}.{action}].");
+						throw new InvalidOperationException($"Unable to load an action descriptor for the module '{moduleinfo.ModuleDefinition.FriendlyName}' [{controller}.{action}].  Check your package.xml and controller class.  The most common cause of this error is that your package.xml has the wrong controller or action name specified, or your controller class doesn't have a Nucleus 'Extension' attribute.");
 					}
 
 					using (System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope scope = Nucleus.Core.Plugins.AssemblyLoader.EnterExtensionContext(actionDescriptor.ControllerTypeInfo.AssemblyQualifiedName))

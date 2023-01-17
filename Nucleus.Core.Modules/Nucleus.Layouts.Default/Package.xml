@@ -1,8 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package id="c71695ec-111a-4ee6-9ba6-cdce64a6afd5" 
-         xmlns="urn:nucleus/schemas/package/1.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
+<package id="c71695ec-111a-4ee6-9ba6-cdce64a6afd5" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Default Layouts</name>
   <version>1.0.1</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
@@ -59,6 +56,8 @@
         <file name="default-3-column.css" />
         <file name="default-3-column.min.css" />
         <file name="simple.cshtml" />
+        <file name="simple.css" />
+        <file name="simple.min.css" />
       </folder>
       <folder name="Containers">
         <file name="centered.cshtml" />

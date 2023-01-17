@@ -10,5 +10,11 @@
     "inputFiles": [
       "Layouts/default-3-column.css"
     ]
+  },
+  {
+    "outputFileName": "Layouts/simple.min.css",
+    "inputFiles": [
+      "Layouts/simple.css"
+    ]
   }
 ]

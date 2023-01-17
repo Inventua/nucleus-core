@@ -23,6 +23,7 @@
     <None Remove="Containers\centered.cshtml" />
     <None Remove="Containers\no-container.cshtml" />
     <None Remove="Containers\no-title.cshtml" />
+    <None Remove="Layouts\default-2-column - Copy.min.css" />
     <None Remove="Layouts\default-2-column.cshtml" />
     <None Remove="Layouts\default-2-column.css" />
     <None Remove="Layouts\default-2-column.min.css" />
@@ -30,6 +31,7 @@
     <None Remove="Layouts\default-3-column.css" />
     <None Remove="Layouts\default-3-column.min.css" />
     <None Remove="Layouts\simple.cshtml" />
+    <None Remove="Layouts\simple.css" />
     <None Remove="Layouts\_banner.cshtml" />
     <None Remove="license.txt" />
     <None Remove="package.xml" />    
@@ -48,6 +50,8 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+    <Content Include="Layouts\simple.css" />
+    <Content Include="Layouts\simple.min.css" />
     <Content Include="Layouts\simple.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -73,9 +77,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.1.0" />
-    <PackageReference Include="Inventua.Nucleus.Extensions" Version="1.1.0" />
-    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.1.0" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.1.0.1-pre-a5" />
+    <PackageReference Include="Inventua.Nucleus.Extensions" Version="1.1.0.1-pre-a4" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.1.0.1-pre-a1" />
   </ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

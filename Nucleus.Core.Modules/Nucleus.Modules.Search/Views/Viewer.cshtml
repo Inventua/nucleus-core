@@ -98,3 +98,21 @@
 		}
 	}
 }
+<script>
+  @if (!String.IsNullOrEmpty(Model.SearchTerm) && Model.SearchResults != null)
+  { 
+    <text>
+    jQuery(document).ready(function ()
+    {
+      if (typeof gtag !== 'undefined')
+      {
+        gtag('event', 'search', 
+        { 
+          'term': '@Model.SearchTerm', 
+          'total-results': @Model.SearchResults.Total 
+        });
+      }
+    });
+    </text>
+  }
+</script>

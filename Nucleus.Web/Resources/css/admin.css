@@ -664,6 +664,11 @@ ul.nucleus-control-panel-items button
   overflow: auto;
 }
 
+#extensions-store .nucleus-extensions-store-selected-store
+{
+  margin: 0 4px 0 4px;
+}
+
 .nucleus-adminpage .ExtensionInstaller h2
 {
 	font-size: 1.15rem;

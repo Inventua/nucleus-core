@@ -59,7 +59,7 @@
       {
         @if (Model.StoreOptions.Stores.Count > 1)
         {
-          @Html.DropDownListFor(model => model.SelectedStoreUrl, new SelectList(Model.StoreOptions.Stores, "BaseUrl", "Name"), new { @class="ms-1", @data_autopostbackevent = "change" })
+          @Html.DropDownListFor(model => model.SelectedStoreUrl, new SelectList(Model.StoreOptions.Stores, "BaseUrl", "Name"), new { @class="nucleus-extensions-store-selected-store", @data_autopostbackevent = "change" })
         }
         else
         {

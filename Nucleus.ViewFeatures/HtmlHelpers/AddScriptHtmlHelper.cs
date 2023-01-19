@@ -126,15 +126,17 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     }
 
     /// <summary>
-    /// Register the specified script to be added to the Layout or module's scripts.
+    /// Register the specified script to be added to the Layout or module's scripts.  Use ~! for the currently executing view path, or ~# for the 
+    /// currently executing extension.
     /// </summary>
     /// <param name="htmlHelper"></param>
     /// <param name="scriptPath"></param>
     /// <returns></returns>
     /// <remarks>
     /// Extensions (modules) can use this Html Helper to add scripts to the HEAD block.  The scriptPath can contain the 
-    /// tilde (~) character to specify an app-relative path.  Your script path should include the extensions folder and your
-    /// extension folder name.
+    /// tilde (~) character to specify an app-relative path, which should include the extensions folder and your
+    /// extension folder name, or the scriptPath can contain the ~! for the currently executing view path, or ~# for the 
+    /// currently executing extension. 
     /// </remarks>
     /// <example>
     /// @Html.AddScript("~/Extensions/MyModule/MyModule.js")
@@ -145,7 +147,8 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     }
 
     /// <summary>
-    /// Register the specified script to be added to the Layout or module's scripts.
+    /// Register the specified script to be added to the Layout or module's scripts.  Use ~! for the currently executing view path, or ~# for the 
+    /// currently executing extension.
     /// </summary>
     /// <param name="htmlHelper"></param>
     /// <param name="scriptPath"></param>
@@ -153,8 +156,9 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// <returns></returns>
     /// <remarks>
     /// Extensions (modules) can use this Html Helper to add scripts to the HEAD block.  The scriptPath can contain the 
-    /// tilde (~) character to specify an app-relative path.  Your script path should include the extensions folder and your
-    /// extension folder name.
+    /// tilde (~) character to specify an app-relative path, which should include the extensions folder and your
+    /// extension folder name, or the scriptPath can contain the ~! for the currently executing view path, or ~# for the 
+    /// currently executing extension. 
     /// </remarks>
     /// <example>
     /// @Html.AddScript("~/Extensions/MyModule/MyModule.js")
@@ -165,7 +169,8 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     }
 
     /// <summary>
-    /// Register the specified script to be added to the Layout or module's scripts.
+    /// Register the specified script to be added to the Layout or module's scripts.  Use ~! for the currently executing view path, or ~# for the 
+    /// currently executing extension.
     /// </summary>
     /// <param name="htmlHelper"></param>
     /// <param name="scriptPath"></param>
@@ -174,8 +179,9 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// <returns></returns>
     /// <remarks>
     /// Extensions (modules) can use this Html Helper to add scripts to the HEAD block.  The scriptPath can contain the 
-    /// tilde (~) character to specify an app-relative path.  Your script path should include the extensions folder and your
-    /// extension folder name.
+    /// tilde (~) character to specify an app-relative path, which should include the extensions folder and your
+    /// extension folder name, or the scriptPath can contain the ~! for the currently executing view path, or ~# for the 
+    /// currently executing extension. 
     /// </remarks>
     /// <example>
     /// @Html.AddScript("~/Extensions/MyModule/MyModule.js")
@@ -186,7 +192,8 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     }
 
     /// <summary>
-    /// Register the specified script to be added to the Layout or module's scripts.
+    /// Register the specified script to be added to the Layout or module's scripts.  Use ~! for the currently executing view path, or ~# for the 
+    /// currently executing extension.
     /// </summary>
     /// <param name="htmlHelper"></param>
     /// <param name="scriptPath"></param>
@@ -195,8 +202,9 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// <returns></returns>
     /// <remarks>
     /// Extensions (modules) can use this Html Helper to add scripts to the HEAD block.  The scriptPath can contain the 
-    /// tilde (~) character to specify an app-relative path.  Your script path should include the extensions folder and your
-    /// extension folder name.
+    /// tilde (~) character to specify an app-relative path, which should include the extensions folder and your
+    /// extension folder name, or the scriptPath can contain the ~! for the currently executing view path, or ~# for the 
+    /// currently executing extension. 
     /// </remarks>
     /// <example>
     /// @Html.AddScript("~/Extensions/MyModule/MyModule.js")

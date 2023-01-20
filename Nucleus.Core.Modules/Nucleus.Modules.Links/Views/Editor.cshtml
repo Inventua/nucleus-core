@@ -73,6 +73,7 @@
 		{
 			@Html.SubmitButton("", "Delete Link", @Url.NucleusAction("DeleteLink", "Admin", "Links", new { id = @Model.Link.Id }), new { @class = "btn btn-danger", data_target = "#LinksList", @data_confirm = "Delete this link?" })
 		}
+		<button type="button" class="btn btn-secondary ms-auto" onclick="jQuery('#LinksEditor').modal('hide');">Close</button>
 	</div>
 }
 

@@ -1093,9 +1093,9 @@ function _Page()
         modal.show();
 
 				wrapper.off('shown.bs.modal');
-				wrapper.on('shown.bs.modal', function () { _removeDuplicateOverlays(); });
+				wrapper.on('shown.bs.modal', function (event) { _removeDuplicateOverlays(event); });
 				wrapper.off('hide.bs.modal');
-				wrapper.on('hide.bs.modal', function () { _removeRelatedOverlays(this); });
+				wrapper.on('hide.bs.modal', function (event) { _removeRelatedOverlays(event, this); });
 			}
 			else
 			{
@@ -1173,21 +1173,28 @@ function _Page()
 	// Remove duplicate .modal-backdrop elements with the same parent.  When we do a partial render and replace/re-open a modal, 
 	// Bootstrap doesn't know about it, so it renders extra overlays - this code removes all duplicate overlays with the same parent, 
 	// leaving only one behind.
-	function _removeDuplicateOverlays()
+	function _removeDuplicateOverlays(event)
 	{
 		jQuery.uniqueSort(jQuery('.modal-backdrop').parent()).each(function (index, parentElement)
 		{
-			jQuery(parentElement).find('.modal-backdrop:not(:first)').remove();
+      jQuery(parentElement).find('.modal-backdrop:not(:first)').remove();
+      event.stopPropagation();
 		});
 	}
 
 	// Remove .modal-backdrop elements at the same level in the DOM as the specified element.  This is required because when we do a 
 	// partial render and replace content / re-open a modal, Bootstrap loses track of the overlay which is related to a modal.
-	function _removeRelatedOverlays(element)
+	function _removeRelatedOverlays(event, element)
 	{
 		jQuery(element).siblings('.modal-backdrop').remove();
     jQuery(element).parents().first().siblings('.modal-backdrop').remove();
-    jQuery('body').children('.modal-backdrop').remove();
+
+    // If all modals have been closed then remove all backdrops.  This is to ensure that we remove any "orphaned" backdrops.
+    if (jQuery('.modal:visible').length === 0)
+    {
+      jQuery('body').children('.modal-backdrop').remove();
+    }
+    event.stopPropagation();
 	}
 
 	function _isInView(element)

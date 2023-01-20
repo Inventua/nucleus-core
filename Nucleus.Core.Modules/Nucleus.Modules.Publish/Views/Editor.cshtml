@@ -146,7 +146,8 @@
 	</TabContent>
 	<div class="nucleus-form-buttonrow">
 		<div class="nucleus-form-tools">
-			@Html.SubmitButton("", "Save Article", @Url.NucleusAction("SaveArticle", "Admin", "Publish"), new { @data_target="#ArticleEditor.parent()" })			
+			@Html.SubmitButton("", "Save Article", @Url.NucleusAction("SaveArticle", "Admin", "Publish"), new { @data_target="#ArticleEditor.parent()" })
 		</div>
+		<button type="button" class="btn btn-secondary ms-auto" onclick="jQuery('#ArticleEditor').modal('hide');">Close</button>
 	</div>
 }

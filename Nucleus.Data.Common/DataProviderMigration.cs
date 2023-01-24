@@ -117,7 +117,7 @@ namespace Nucleus.Data.Common
 					foreach (string script in this.SchemaScriptsAssembly.GetManifestResourceNames().Where
 					(
 						name =>
-							name.StartsWith(schemaScriptsNamespace, StringComparison.OrdinalIgnoreCase)
+							(name == "*" || name.StartsWith(schemaScriptsNamespace, StringComparison.OrdinalIgnoreCase))
 							&&
 							(name.ToLower().EndsWith(".sql") || name.ToLower().EndsWith(".json"))
 					))
@@ -128,6 +128,7 @@ namespace Nucleus.Data.Common
 						}
 					}
 				}
+
 				return scripts;
 			}
 		}

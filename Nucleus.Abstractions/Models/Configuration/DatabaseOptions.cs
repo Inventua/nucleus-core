@@ -36,7 +36,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		{
 			// Get connection for the specified schema name.  
 			DatabaseSchema schema = this.Schemas
-				.Where(schema => schema.Name == schemaName)
+				.Where(schema => schema.Name.Equals(schemaName, StringComparison.OrdinalIgnoreCase))
 				.FirstOrDefault();
 
 			if (schema == null)

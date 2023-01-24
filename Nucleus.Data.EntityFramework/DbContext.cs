@@ -104,7 +104,9 @@ namespace Nucleus.Data.EntityFramework
 		{
 			base.OnModelCreating(builder);
 
-			if (this.ConfigureNucleusEntities)
+      builder.ConfigureSchemaEntities();
+
+      if (this.ConfigureNucleusEntities)
 			{
 				builder.ConfigureInstanceEntities();
 				builder.ConfigureSiteEntities();
@@ -260,7 +262,13 @@ namespace Nucleus.Data.EntityFramework
 			return rows;
 		}
 
-		private void ManageSpecialColumns()
+    /// <summary>
+    /// Automatically set properties of entity framework entries before adding or updating the database.
+    /// </summary>
+    /// <remarks>
+    /// Extensions can override this class to perform their own automatic actions.
+    /// </remarks>
+		protected virtual void ManageSpecialColumns()
 		{
 			foreach (EntityEntry entry in this.ChangeTracker.Entries()
 									.Where(entityEntry => entityEntry.Entity is ModelBase && (entityEntry.State == EntityState.Added || entityEntry.State == EntityState.Modified)))

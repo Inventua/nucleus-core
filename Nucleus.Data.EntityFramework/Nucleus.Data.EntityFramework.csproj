@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+	<Import Project="..\Nucleus.Core\core.build.targets" />
+    
   <PropertyGroup Label="Globals">
     <SccProjectName></SccProjectName>
     <SccProvider></SccProvider>
@@ -13,9 +14,10 @@
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
 		<Description>Base classes and utility functions for Nucleus data providers which use Entity-Framework.</Description>
-		
-		<!-- This is overridden by core.build.targets -->
-		<VersionPrefix>1.0.1.0</VersionPrefix>
+
+    <!-- Version is set by core.build.targets, can be overridden here for pre-release builds -->
+    <VersionPrefix>1.1.0.1-pre</VersionPrefix>
+    <VersionSuffix>a3</VersionSuffix>
 		
 		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>
 		<PackageTags>Nucleus</PackageTags>
@@ -42,6 +44,14 @@
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="00.00.00.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Scripts\00.00.00.json" />
+	</ItemGroup>
 	
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
@@ -60,5 +70,4 @@
 		<Copy SourceFiles="bin\$(Configuration)\$(TargetFramework)\Nucleus.Data.EntityFramework.xml" DestinationFolder="$(SolutionDir)\..\Publish\XmlDocumentation" Retries="2" />
 	</Target>
 
-	<Import Project="..\Nucleus.Core\core.build.targets" />
 </Project>

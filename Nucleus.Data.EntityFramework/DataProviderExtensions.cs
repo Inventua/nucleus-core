@@ -47,5 +47,42 @@ namespace Nucleus.Data.EntityFramework
 			return services;
 		}
 
-	}
+    /// <summary>
+		/// Add the specified data provider and DbContext to the services collection for the specified schema name.
+		/// </summary>
+		/// <typeparam name="TDataProviderInterface">
+		/// Interface used by modules to access the data provider.  This type is used as a key to the dependency injection service collection.
+		/// </typeparam>
+		/// <typeparam name="TDataProvider">
+		/// Data provider class.  Must implement <typeparamref name="TDataProviderInterface"/> and <see cref="DataProvider"/>.
+		/// </typeparam>
+		/// <typeparam name="TDbContext">
+		/// Entity framework DbContext class.
+		/// </typeparam>
+		/// <param name="services"></param>
+		/// <param name="configuration"></param>
+    /// <param name="schemaName"></param>
+		/// <returns></returns>
+    /// <remarks>
+    /// Use this overload when you want to specify a schema name.
+    /// </remarks>
+		static public IServiceCollection AddDataProvider<TDataProviderInterface, TDataProvider, TDbContext>(this IServiceCollection services, IConfiguration configuration, string schemaName)
+      where TDataProviderInterface : class
+      where TDataProvider : DataProvider, TDataProviderInterface
+      where TDbContext : DbContext
+    {
+      services.AddDataProvider<TDataProvider>(configuration, schemaName);
+
+      services.AddDbContext<TDbContext>(ServiceLifetime.Transient);
+
+      // we add the *same instance* of the data provider with 3 interfaces - one for TDataProviderInterface, to be used by the module, and one
+      // as "itself", so that any configured DataProviderMigration classes can get an instance if required, and one as DataProvider, so that elements
+      // of Nucleus can get a list of Data providers and perform diagnostics.
+      services.AddTransient<TDataProvider>();
+      services.AddTransient<TDataProviderInterface>(serviceProvider => serviceProvider.GetRequiredService<TDataProvider>());
+      services.AddTransient<Nucleus.Data.Common.DataProvider>(serviceProvider => serviceProvider.GetRequiredService<TDataProvider>());
+      return services;
+    }
+
+  }
 }

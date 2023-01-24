@@ -1,0 +1,30 @@
+{
+	"schemaName": "*",
+	"version": "00.00.00",
+	"operations": [
+		{
+			"createTable": {
+				"name": "Schema",
+				"columns": [
+					{
+						"name": "SchemaName",
+						"clrType": "string",
+						"isnullable": false,
+						"maxlength": 256
+					},
+					{
+						"name": "SchemaVersion",
+						"clrType": "string",
+						"isnullable": true,
+						"maxlength": 32
+					}
+				],
+				"primaryKey": {
+					"name": "PK_Schema",
+					"isclustered": true,
+					"columns": [ "SchemaName" ]
+				}
+			}
+		}
+	]
+}

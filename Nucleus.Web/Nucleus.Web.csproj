@@ -1,10 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <Import Project="..\Nucleus.Core\core.build.targets" />
+  
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 		
-		<!-- This is overridden by core.build.targets -->
+		<!-- This overrides the value set by core.build.targets -->
 		<VersionPrefix>1.0.1.0</VersionPrefix>
   </PropertyGroup>
 
@@ -245,5 +247,4 @@
 		<Delete Files="iis-dev\App_Offline.htm" />
 	</Target>
 
-	<Import Project="..\Nucleus.Core\core.build.targets" />
 </Project>

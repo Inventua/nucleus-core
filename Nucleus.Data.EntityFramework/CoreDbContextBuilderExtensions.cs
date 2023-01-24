@@ -14,17 +14,27 @@ namespace Nucleus.Data.EntityFramework
 	/// </summary>
 	public static class CoreDbContextBuilderExtensions
 	{
-		/// <summary>
-		/// Configure fundamental core entities.
+    /// <summary>
+		/// Configure schema entity.
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <returns></returns>
-		public static ModelBuilder ConfigureInstanceEntities(this ModelBuilder builder)
-		{
-			builder.Entity<Nucleus.Abstractions.Models.Internal.Schema>()
-				.ToTable("Schema")
-				.HasKey(schema => schema.SchemaName);
+		public static ModelBuilder ConfigureSchemaEntities(this ModelBuilder builder)
+    {
+      builder.Entity<Nucleus.Abstractions.Models.Internal.Schema>()
+        .ToTable("Schema")
+        .HasKey(schema => schema.SchemaName);
+      
+      return builder;
+    }
 
+    /// <summary>
+    /// Configure fundamental core entities.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <returns></returns>
+    public static ModelBuilder ConfigureInstanceEntities(this ModelBuilder builder)
+		{
 			builder.Entity<ModuleDefinition>().ToTable("ModuleDefinitions");
 			builder.Entity<LayoutDefinition>().ToTable("LayoutDefinitions");
 			builder.Entity<ContainerDefinition>().ToTable("ContainerDefinitions");

@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using DocumentFormat.OpenXml.Math;
 
 namespace Nucleus.Data.EntityFramework
 {
@@ -58,33 +59,42 @@ namespace Nucleus.Data.EntityFramework
 		/// </remarks>
 		public override void CheckDatabaseSchema()
 		{
-			IList<DatabaseSchemaScript> Scripts = this.SchemaScripts;
-			System.Version CurrentDBVersion;
-			System.Version LatestVersion = new(0, 0, 0, 0);
+			List<DatabaseSchemaScript> scripts = this.SchemaScripts.ToList();
+			System.Version currentDBVersion;
+      System.Version latestVersion = new(0, 0, 0, 0);
 
-			foreach (DatabaseSchemaScript script in Scripts)
+      if (scripts.Any())
+      {
+        // if there are any scripts for the database schema, include 00.00.00.json (embedded in this assembly) to create the "schema" table
+        scripts.Insert(0, Nucleus.Data.Common.DatabaseSchemaScript.BuildManifestSchemaScript
+        (
+          typeof(Nucleus.Data.EntityFramework.DataProvider).Assembly, 
+          $"{typeof(Nucleus.Data.EntityFramework.DataProvider).Namespace}.Scripts.", 
+          $"{typeof(Nucleus.Data.EntityFramework.DataProvider).Namespace}.Scripts.00.00.00.json")
+        );
+      }
+
+      foreach (DatabaseSchemaScript script in scripts)
 			{
-				if (script.Version > LatestVersion)
+				if (script.Version > latestVersion)
 				{
-					LatestVersion = script.Version;
+					latestVersion = script.Version;
 				}
 			}
 
 			// Get version from database
-			CurrentDBVersion = GetSchemaVersion(this.SchemaName);
+			currentDBVersion = GetSchemaVersion(this.SchemaName);
 
-			if (LatestVersion > CurrentDBVersion)
+			if (currentDBVersion == null || latestVersion > currentDBVersion)
 			{
 				// run scripts
-				this.RunDatabaseScripts(this.SchemaName, CurrentDBVersion, Scripts);
+				this.RunDatabaseScripts(this.SchemaName, currentDBVersion, scripts);
 			}
 			else
 			{
 				Logger.LogTrace("Schema is up to date, no action taken.");
 			}
-
 		}
-
 
 		/// <summary>
 		/// Check whether the Schema table exists in a database-agnostic way by quering it.
@@ -119,7 +129,7 @@ namespace Nucleus.Data.EntityFramework
 		/// </remarks>
 		public override System.Version GetSchemaVersion(string schemaName)
 		{
-			Version result = new(0, 0, 0, 0);
+      Version result = null; // = new(0, 0, 0, 0);
 
 			if (this.SchemaTableExists())
 			{
@@ -169,7 +179,7 @@ namespace Nucleus.Data.EntityFramework
 		public override void RunDatabaseScripts(string schemaName, System.Version currentSchemaVersion, IList<DatabaseSchemaScript> scripts)
 		{
 			foreach (DatabaseSchemaScript script in scripts
-				.Where(script => currentSchemaVersion < script.Version)
+				.Where(script => currentSchemaVersion < script.Version || currentSchemaVersion == null)
 				.OrderBy(script => script.Version))
 			{
 				// Run the script
@@ -227,14 +237,14 @@ namespace Nucleus.Data.EntityFramework
 			{
 				DataDefinition definition = Newtonsoft.Json.JsonConvert.DeserializeObject<DataDefinition>(script.Content, new Newtonsoft.Json.JsonConverter[] { new MigrationOperationConverter(this.DbContext.Database.ProviderName), new SystemTypeConverter() });
 
-				if (definition.SchemaName != schemaName)
+				if (definition.SchemaName != "*" && definition.SchemaName != schemaName)
 				{
 					throw new InvalidOperationException($"The schema script {script.FullName} schema name {definition.SchemaName} does not match the expected schema name {schemaName}.");
 				}
 
 				if (!definition.Version.Equals(script.Version))
 				{
-					throw new InvalidOperationException($"The schema script {script.FullName} version {definition.Version} does not match the expected schema name {script.Version}.");
+					throw new InvalidOperationException($"The schema script {script.FullName} version {definition.Version} does not match the expected schema version {script.Version}.");
 				}
 
 				foreach (MigrationOperation operation in definition.Operations)

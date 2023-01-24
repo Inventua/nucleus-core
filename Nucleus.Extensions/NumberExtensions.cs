@@ -36,8 +36,10 @@ namespace Nucleus.Extensions
 		public static string FormatFileSize(this long size)
 		{
 			try
-			{				
-				if (size > (1024 * 1024))
+			{
+        if (size > (1024 * 1024 * 1024))
+          return (size / (double)(1024 * 1024 * 1024)).ToString("#,##0.00 GB");
+        else if (size > (1024 * 1024))
 					return (size / (double)(1024 * 1024)).ToString("#,##0.00 MB");
 				else if (size > 1024)
 					return (size / (double)1024).ToString("#,##0.00 KB");

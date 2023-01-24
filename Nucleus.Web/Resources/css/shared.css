@@ -127,7 +127,7 @@ a *
 	left: 0;
   border: 0;
 	transition: 0.25s;
-  z-index: 10000;
+  z-index: 1040;
 }
 
 .AdminFramePlaceholder

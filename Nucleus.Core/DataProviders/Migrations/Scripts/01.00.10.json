@@ -131,15 +131,15 @@
     {
       "createIndex": {
         "name": "IX_OrganizationUsers_Organization",
-        "table": "Organizations",
+        "table": "OrganizationUsers",
         "isunique": false,
         "columns": [ "OrganizationId" ]
       }
     },
     {
       "createIndex": {
-        "name": "IX_Organizations_User",
-        "table": "Organizations",
+        "name": "IX_OrganizationUsers_User",
+        "table": "OrganizationUsers",
         "isunique": false,
         "columns": [ "UserId" ]
       }

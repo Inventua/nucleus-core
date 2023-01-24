@@ -15,7 +15,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 	public static class MenuHtmlHelper
 	{
 		/// <summary>
-		/// Returns a list (<![CDATA[ul]]>) element containing the site's menu structure.
+		/// Displays the site's menu structure.
 		/// </summary>
 		/// <param name="htmlHelper"></param>
 		/// <param name="maxLevels"></param>
@@ -23,11 +23,11 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// <returns></returns>
 		public static IHtmlContent Menu(this IHtmlHelper htmlHelper, int maxLevels, object htmlAttributes)
 		{
-			return Nucleus.ViewFeatures.HtmlContent.Menu.Build(htmlHelper.ViewContext, HtmlContent.Menu.MenuStyles.DropDown, maxLevels, htmlAttributes).Result;
+			return Menu(htmlHelper, HtmlContent.Menu.MenuStyles.DropDown, HtmlContent.Menu.RootPageTypes.SiteRoot, Guid.Empty, maxLevels, htmlAttributes);
 		}
 
 		/// <summary>
-		/// Returns a list (<![CDATA[ul]]>) element containing the site's menu structure.
+		/// Displays the site's menu structure.
 		/// </summary>
 		/// <param name="htmlHelper"></param>
 		/// <param name="menuStyle"></param>
@@ -36,7 +36,37 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// <returns></returns>
 		public static IHtmlContent Menu(this IHtmlHelper htmlHelper, HtmlContent.Menu.MenuStyles menuStyle, int maxLevels, object htmlAttributes)
 		{
-			return Nucleus.ViewFeatures.HtmlContent.Menu.Build(htmlHelper.ViewContext, menuStyle, maxLevels, htmlAttributes).Result;
+			return Menu(htmlHelper, menuStyle, HtmlContent.Menu.RootPageTypes.SiteRoot, Guid.Empty, maxLevels, htmlAttributes);
 		}
-	}
+
+    /// <summary>
+		/// Displays the site's menu structure.
+		/// </summary>
+		/// <param name="htmlHelper"></param>
+		/// <param name="menuStyle"></param>
+    /// <param name="rootPageType"></param>
+		/// <param name="maxLevels"></param>
+		/// <param name="htmlAttributes"></param>
+		/// <returns></returns>
+		public static IHtmlContent Menu(this IHtmlHelper htmlHelper, HtmlContent.Menu.MenuStyles menuStyle, HtmlContent.Menu.RootPageTypes rootPageType, int maxLevels, object htmlAttributes)
+    {
+      return Menu(htmlHelper, menuStyle, rootPageType, Guid.Empty, maxLevels, htmlAttributes);
+    }
+
+    /// <summary>
+		/// Displays the site's menu structure.
+		/// </summary>
+		/// <param name="htmlHelper"></param>
+		/// <param name="menuStyle"></param>
+    /// <param name="rootPageType"></param>
+    /// <param name="rootPageId"></param>
+		/// <param name="maxLevels"></param>
+		/// <param name="htmlAttributes"></param>
+		/// <returns></returns>
+		public static IHtmlContent Menu(this IHtmlHelper htmlHelper, HtmlContent.Menu.MenuStyles menuStyle, HtmlContent.Menu.RootPageTypes rootPageType, Guid rootPageId, int maxLevels, object htmlAttributes)
+    {
+      return Nucleus.ViewFeatures.HtmlContent.Menu.Build(htmlHelper.ViewContext, menuStyle,rootPageType, rootPageId, maxLevels, htmlAttributes).Result;
+    }
+
+  }
 }

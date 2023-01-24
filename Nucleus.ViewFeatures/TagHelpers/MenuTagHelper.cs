@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Mvc.TagHelpers;
 namespace Nucleus.ViewFeatures.TagHelpers
 {
 	/// <summary>
-	/// Returns an list (<![CDATA[ul]]>) element which contains the site's menu structure.
+	/// Displays the site's menu structure.
 	/// </summary>	
 	
 	[HtmlTargetElement("Menu")]
@@ -42,15 +42,29 @@ namespace Nucleus.ViewFeatures.TagHelpers
 		[HtmlAttributeName("menuStyle")]
 		public HtmlContent.Menu.MenuStyles MenuStyle { get; set; } = HtmlContent.Menu.MenuStyles.DropDown;
 
-		/// <summary>
-		/// Generate the output.
+    /// <summary>
+		/// Menu root page type
 		/// </summary>
-		/// <param name="context"></param>
-		/// <param name="output"></param>
-		/// <returns></returns>
-		async public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+		[HtmlAttributeName("rootPageType")]
+    public HtmlContent.Menu.RootPageTypes RootPageType { get; set; } = HtmlContent.Menu.RootPageTypes.SiteRoot;
+
+    /// <summary>
+		/// Specifies which page to use as the menu root, when RootPageType is "SelectedPage".
+		/// </summary>
+		[HtmlAttributeName("rootPageId")]
+    public string RootPageId { get; set; }
+
+    /// <summary>
+    /// Generate the output.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="output"></param>
+    /// <returns></returns>
+    async public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
 		{
-			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Menu.Build(this.ViewContext, this.MenuStyle, this.MaxLevels, null) ;
+      Guid.TryParse(this.RootPageId, out Guid pageId);
+
+			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Menu.Build(this.ViewContext, this.MenuStyle, this.RootPageType, pageId, this.MaxLevels, null);
 
 			if (builder == null)
 			{

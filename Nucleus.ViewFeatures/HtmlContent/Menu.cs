@@ -13,6 +13,7 @@ using Nucleus.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using System.ComponentModel.DataAnnotations;
 
 namespace Nucleus.ViewFeatures.HtmlContent
 {
@@ -40,20 +41,95 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			/// Child items rendered vertically as list blocks
 			/// </summary>
 			RibbonPortrait = 2,
+      /// <summary>
+      /// Horizontal display
+      /// </summary>
+      Horizontal = 3
 		}
 
-		internal static async Task<TagBuilder> Build(ViewContext context, MenuStyles menuStyle, int maxLevels, object htmlAttributes)
+    /// <summary>
+    /// Menu root page types used by the  <see cref="TagHelpers.MenuTagHelper"/> and <see cref="HtmlHelpers.MenuHtmlHelper"/>.
+    /// </summary>
+    public enum RootPageTypes
+    {
+      /// <summary>
+      /// Start from the root of the site (pages with no parent set).
+      /// </summary>
+      [Display(Name = "Site Root")] SiteRoot = 0,
+      /// <summary>
+      /// Display pages starting from the selected page, specified by rootPageId. 
+      /// </summary>
+      [Display(Name = "Selected Page")] SelectedPage = 1,
+      /// <summary>
+      /// Display pages starting from the site's home page.  
+      /// </summary>
+      [Display(Name = "Home Page")] HomePage = 2,
+      /// <summary>
+      /// Display pages starting with the children of the current page.
+      /// </summary>
+      [Display(Name = "Current Page")] CurrentPage = 3,
+      /// <summary>
+      /// Display pages starting with the current page's parent.
+      /// </summary>
+      [Display(Name = "Parent Page")] ParentPage = 4,
+      /// <summary>
+      /// Display pages starting with the top ancestor of the current page (the ancestor with no parent page set). 
+      /// </summary>
+      [Display(Name = "Top Ancestor")] TopAncestor = 5,
+      /// <summary>
+      /// If the current page has a parent, use the same behavior as `Current Page`.  If the current page does not have a parent, use the same behaviour as `Top Ancestor`.
+      /// </summary>
+      [Display(Name = "Dual")] Dual = 6
+    }
+
+
+    internal static async Task<TagBuilder> Build(ViewContext context, MenuStyles menuStyle, RootPageTypes rootPageType, Guid rootPageId, int maxLevels, object htmlAttributes)
 		{
 			IUrlHelper urlHelper = context.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(context);
-			Site site = context.HttpContext.RequestServices.GetService<Context>().Site;
+			Context nucleusContext = context.HttpContext.RequestServices.GetService<Context>();
 			IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
-			PageMenu topMenu = await pageManager.GetMenu
-				(
-					site,
-					null,
-					context.HttpContext.User,
-					false
-				);
+      Page rootPage = null;
+
+      switch (rootPageType)
+      {
+        case RootPageTypes.SiteRoot:
+          rootPage = null;
+          break;
+        case RootPageTypes.SelectedPage:
+          rootPage = await pageManager.Get(rootPageId);
+          break;
+        case RootPageTypes.HomePage:
+          rootPage = await pageManager.Get(nucleusContext.Site, "/");
+          break;
+        case RootPageTypes.CurrentPage:
+          rootPage = nucleusContext.Page;
+          break;
+        case RootPageTypes.ParentPage:
+          rootPage = nucleusContext.Page.ParentId.HasValue ? await pageManager.Get(nucleusContext.Page.ParentId.Value) : null;
+          break;
+        case RootPageTypes.TopAncestor:
+          rootPage = await GetTopAncestor(nucleusContext.Page, pageManager);
+          break;
+        case RootPageTypes.Dual:
+          if (nucleusContext.Page.ParentId.HasValue)
+          {
+            rootPage = nucleusContext.Page;
+          }
+          else
+          {
+            rootPage = await GetTopAncestor(nucleusContext.Page, pageManager);
+          }
+          break;
+      }
+
+      PageMenu topMenu = await pageManager.GetMenu(nucleusContext.Site, rootPage, context.HttpContext.User, false);
+    //  PageMenu topMenu = await pageManager.GetMenu
+				//(
+				//	site,
+				//	null,
+				//	context.HttpContext.User,
+				//	false
+				//);
 
 			TagBuilder outputBuilder = new("nav");
 			outputBuilder.AddCssClass("navbar navbar-expand-lg navbar-light bg-light nucleus-menu");
@@ -114,6 +190,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 					case MenuStyles.RibbonLandscape: 
 					case MenuStyles.RibbonPortrait:
+          case MenuStyles.Horizontal:
 						if (thisLevel == 0)
 						{
 							// top level items are rendered the same as the default style
@@ -137,7 +214,19 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			}
 		}
 
-		private static string GenerateControlId(Page page, string prefix)
+    private static async Task<Page> GetTopAncestor(Page page, IPageManager pageManager)
+    {
+      if (!page.ParentId.HasValue)
+      {
+        return page;
+      }
+      else
+      {
+        return await GetTopAncestor(await pageManager.Get(page.ParentId.Value), pageManager);
+      }
+    }
+
+    private static string GenerateControlId(Page page, string prefix)
 		{
 			PageRoute route = page.DefaultPageRoute();
 			if (route?.Path == null) return "";

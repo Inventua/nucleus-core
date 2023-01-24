@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Nucleus.ViewFeatures
 {
@@ -33,34 +35,71 @@ namespace Nucleus.ViewFeatures
 		/// <returns></returns>
 		public static string ResolveExtensionUrl(this IHtmlHelper helper, string url)
 		{
-			if (url.StartsWith(VIEWPATH_TOKEN))
-			{
-				IUrlHelper urlHelper = new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(helper.ViewContext);
+      return ResolveExtensionUrl(helper.ViewContext, url);
 
-				string executingViewPath = (helper.ViewContext.View).Path;
-				System.Uri viewPath = urlHelper.GetAbsoluteUri(System.IO.Path.GetDirectoryName(executingViewPath).Replace("\\", "/"));
-				return new System.Uri(viewPath, ParseScriptPath(url, VIEWPATH_TOKEN)).AbsolutePath;
-			}
-			else if (url.StartsWith(EXTENSIONPATH_TOKEN))
-			{
-				IUrlHelper urlHelper = new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(helper.ViewContext);
+   ////   if (url.StartsWith(VIEWPATH_TOKEN))
+			////{
+			////	IUrlHelper urlHelper = new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(helper.ViewContext);
 
-				string viewPath = System.IO.Path.GetDirectoryName(((Microsoft.AspNetCore.Mvc.Rendering.ViewContext)urlHelper.ActionContext).ExecutingFilePath).Replace("\\", "/");
-				string[] viewPathParts = viewPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+			////	string executingViewPath = (helper.ViewContext.View).Path;
+			////	System.Uri viewPath = urlHelper.GetAbsoluteUri(System.IO.Path.GetDirectoryName(executingViewPath).Replace("\\", "/"));
+			////	return new System.Uri(viewPath, ParseScriptPath(url, VIEWPATH_TOKEN)).AbsolutePath;
+			////}
+			////else if (url.StartsWith(EXTENSIONPATH_TOKEN))
+			////{
+			////	IUrlHelper urlHelper = new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(helper.ViewContext);
 
-				// viewPathParts[0] will be "extensions", and viewPathParts[1] will be the extension folder name
-				if (viewPathParts.Length > 2)
-				{
-					System.Uri extensionPath = urlHelper.GetAbsoluteUri($"{viewPathParts[0]}/{viewPathParts[1]}");
-					return new System.Uri(extensionPath, ParseScriptPath(url, EXTENSIONPATH_TOKEN)).AbsolutePath;
-				}
-			}
+			////	string viewPath = System.IO.Path.GetDirectoryName(((Microsoft.AspNetCore.Mvc.Rendering.ViewContext)urlHelper.ActionContext).ExecutingFilePath).Replace("\\", "/");
+			////	string[] viewPathParts = viewPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
-			return url;
+			////	// viewPathParts[0] will be "extensions", and viewPathParts[1] will be the extension folder name
+			////	if (viewPathParts.Length > 2)
+			////	{
+			////		System.Uri extensionPath = urlHelper.GetAbsoluteUri($"{viewPathParts[0]}/{viewPathParts[1]}");
+			////		return new System.Uri(extensionPath, ParseScriptPath(url, EXTENSIONPATH_TOKEN)).AbsolutePath;
+			////	}
+			////}
+
+			////return url;
 		}
 
 
-		private static string ParseScriptPath(string url, string token)
+    /// <summary>
+		/// Generates an absolute url from the passed-in relative url after substituting ~! for the currently executing view path, or ~#
+		/// for the currently executing extension.
+		/// </summary>
+		/// <param name="viewContext"></param>
+		/// <param name="url"></param>
+		/// <returns></returns>
+		public static string ResolveExtensionUrl(this ViewContext viewContext, string url)
+    {
+      IUrlHelper urlHelper = viewContext.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(viewContext);
+
+      if (url.StartsWith(VIEWPATH_TOKEN))
+      {
+        string executingViewPath = viewContext.ExecutingFilePath;
+        //string executingViewPath = (helper.ActionContext.ActionDescriptor..View).Path;
+        System.Uri viewPath = urlHelper.GetAbsoluteUri(System.IO.Path.GetDirectoryName(executingViewPath).Replace("\\", "/"));
+        return new System.Uri(viewPath, ParseScriptPath(url, VIEWPATH_TOKEN)).AbsolutePath;
+      }
+      else if (url.StartsWith(EXTENSIONPATH_TOKEN))
+      {        
+        string viewPath = System.IO.Path.GetDirectoryName(viewContext.ExecutingFilePath).Replace("\\", "/");
+        string[] viewPathParts = viewPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+        // viewPathParts[0] will be "extensions", and viewPathParts[1] will be the extension folder name
+        if (viewPathParts.Length > 2)
+        {
+          System.Uri extensionPath = urlHelper.GetAbsoluteUri($"{viewPathParts[0]}/{viewPathParts[1]}");
+          return new System.Uri(extensionPath, ParseScriptPath(url, EXTENSIONPATH_TOKEN)).AbsolutePath;
+        }
+      }
+
+      return url;
+    }
+
+
+    private static string ParseScriptPath(string url, string token)
 		{
 			string scriptPath = url[token.Length..];
 			if (scriptPath.StartsWith('/'))

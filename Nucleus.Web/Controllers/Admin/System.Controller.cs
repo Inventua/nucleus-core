@@ -173,7 +173,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 			foreach (DatabaseSchema schema in this.DatabaseOptions.Value.Schemas)
 			{
-				DatabaseConnectionOption connection = this.DatabaseOptions.Value.GetDatabaseConnection(schema.ConnectionKey);
+				DatabaseConnectionOption connection = this.DatabaseOptions.Value.GetDatabaseConnection(schema.Name);
 
 				if (connection != null)
 				{

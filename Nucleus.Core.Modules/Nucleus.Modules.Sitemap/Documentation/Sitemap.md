@@ -25,7 +25,7 @@ page where it provides a summary of child pages with links.
 | Current Page        | Display pages starting with the children of the current page.  |
 | Parent Page         | Display pages starting with the current page's parent.  |
 | Top Ancestor        | Display pages starting with the top ancestor of the current page (the ancestor with no parent page set) .  |
-| Dual                | If the current page has a parent, use the same behaviour as `Current Page`.  If the current page does not have a parent, use the same behaviour as `Top Ancestor`.  |
+| Dual                | If the current page has a parent, use the same behaviour as `Current Page`.  If the current page does not have a parent, use the same behavior as `Top Ancestor`.  |
 
 > If you are using the site map module to render a full site map, set `Levels` to 0, and Root Page type to `Site Root`.
 

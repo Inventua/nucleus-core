@@ -17,16 +17,40 @@ using Nucleus.Abstractions.Managers;
 
 namespace Nucleus.Modules.Sitemap
 {
-	public enum RootPageTypes
-	{
-		[Display(Name = "Site Root")] SiteRoot = 0,
-		[Display(Name = "Selected Page")] SelectedPage = 1,
-		[Display(Name = "Home Page")] HomePage = 2,
-		[Display(Name = "Current Page")] CurrentPage = 3,
-		[Display(Name = "Parent Page")] ParentPage = 4,
-		[Display(Name = "Top Ancestor")] TopAncestor = 5,
-		[Display(Name = "Dual")] Dual = 6
-	}
+  /// <summary>
+  /// Menu root page types used by the  <see cref="TagHelpers.MenuTagHelper"/> and <see cref="HtmlHelpers.MenuHtmlHelper"/>.
+  /// </summary>
+  public enum RootPageTypes
+  {
+    /// <summary>
+    /// Start from the root of the site (pages with no parent set).
+    /// </summary>
+    [Display(Name = "Site Root")] SiteRoot = 0,
+    /// <summary>
+    /// Display pages starting from the selected page, specified by SelectedPageId. 
+    /// </summary>
+    [Display(Name = "Selected Page")] SelectedPage = 1,
+    /// <summary>
+    /// Display pages starting from the site's home page.  
+    /// </summary>
+    [Display(Name = "Home Page")] HomePage = 2,
+    /// <summary>
+    /// Display pages starting with the children of the current page.
+    /// </summary>
+    [Display(Name = "Current Page")] CurrentPage = 3,
+    /// <summary>
+    /// Display pages starting with the current page's parent.
+    /// </summary>
+    [Display(Name = "Parent Page")] ParentPage = 4,
+    /// <summary>
+    /// Display pages starting with the top ancestor of the current page (the ancestor with no parent page set). 
+    /// </summary>
+    [Display(Name = "Top Ancestor")] TopAncestor = 5,
+    /// <summary>
+    /// If the current page has a parent, use the same behavior as `Current Page`.  If the current page does not have a parent, use the same behaviour as `Top Ancestor`.
+    /// </summary>
+    [Display(Name = "Dual")] Dual = 6
+  }
 
   public enum Directions
   {

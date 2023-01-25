@@ -854,14 +854,14 @@ function _Page()
 		if (typeof (cancelCaption) === 'undefined') cancelCaption = 'Close';
 
 		var okButton = '';
-		if (typeof (action) !== 'undefined')
+		if (typeof action !== 'undefined')
 		{
 			okButton = '<button type="button" class="btn btn-primary" data-bs-dismiss="modal">' + okCaption + '</button>';
 		}
 
 		var iconElement = '';
 		var iconClass = '';
-		if (typeof (icon) !== 'undefined')
+		if (typeof icon !== 'undefined')
 		{
 			switch (icon)
 			{
@@ -872,7 +872,11 @@ function _Page()
 				case 'warning':
 					iconClass = ' icon-warning';
 					iconElement = '<div class="dialog-icon"><span class="nucleus-material-icon">&#xe002;</span></div>';
-					break;
+          break;
+        case 'alert':
+          iconClass = ' icon-alert';
+          iconElement = '<div class="dialog-icon"><span class="nucleus-material-icon">&#xe7f4;</span></div>';
+          break;
 				case 'error':
 					iconClass = ' icon-error';
 					iconElement = '<div class="dialog-icon"><span class="nucleus-material-icon">&#xe000;</span></div>';
@@ -918,7 +922,7 @@ function _Page()
 
 		jQuery('body').append(dialogMarkup);
 
-		if (typeof (action) !== 'undefined')
+		if (typeof action !== 'undefined')
 		{
 			dialogMarkup.find('.btn-primary').on('click', action);
 		}
@@ -944,7 +948,7 @@ function _Page()
 
 		if (typeof (request.responseJSON) !== 'undefined' && typeof (request.responseJSON.message) !== 'undefined')
 		{
-			_dialog(request.responseJSON.title, request.responseJSON.message);
+      _dialog(request.responseJSON.title, request.responseJSON.message, request.responseJSON.icon);
 		}
 		else
 		{
@@ -1008,7 +1012,7 @@ function _Page()
 
   function _cancelProgressIndicators()
   {
-    // remove any progress indicators
+    // cancel setTimeout() handles used to create progress indicators.
     if (_progressTimeoutId >= 0)
     {
       window.clearTimeout(_progressTimeoutId);
@@ -1018,9 +1022,9 @@ function _Page()
 
 	function _postRender(target, source, data, status, request)
   {
-    // remove any progress indicators
     _cancelProgressIndicators();
 
+    // remove any progress indicators from the event source element.
     if (typeof source !== 'undefined' && source !== null && source.hasClass('nucleus-show-progress'))
     {
       if (source.hasClass('nucleus-show-progress-before') || source.hasClass('nucleus-show-progress-after'))

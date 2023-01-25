@@ -463,7 +463,7 @@ namespace Nucleus.Extensions
 		/// </summary>
 		public void AdjustColumnWidths()
 		{
-			this.Worksheet.ColumnsUsed().AdjustToContents();
+			this.Worksheet.Columns().AdjustToContents();
 		}
 
 		/// <summary>

@@ -7,7 +7,7 @@
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 		
 		<!-- This overrides the value set by core.build.targets -->
-		<VersionPrefix>1.0.1.0</VersionPrefix>
+		<!--<VersionPrefix>1.0.1.0</VersionPrefix>-->
   </PropertyGroup>
 
   <ItemGroup>

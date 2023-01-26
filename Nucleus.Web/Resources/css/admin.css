@@ -666,7 +666,7 @@ ul.nucleus-control-panel-items button
 
 #extensions-store .nucleus-extensions-store-selected-store
 {
-  margin: 0 4px 0 4px;
+  margin: 0 0.25rem;
 }
 
 .nucleus-adminpage .ExtensionInstaller h2

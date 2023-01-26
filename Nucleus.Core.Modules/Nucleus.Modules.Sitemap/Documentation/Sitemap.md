@@ -1,6 +1,6 @@
 ## Site map module
-The site map module displays a list of pages within your site.  It can be used as a full site map for users, as a side-menu or on a landing 
-page where it provides a summary of child pages with links. 
+The site map module displays a list of pages within your site.  It can be used as a full site map for users, as a side-menu, or to 
+display a list of pages in on a landing page. 
 
 ![Settings](sitemap-settings.png)
 

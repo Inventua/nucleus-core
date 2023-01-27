@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Options;
 using Nucleus.Data.Common;
+using Microsoft.Data.SqlClient;
 
 namespace Nucleus.Data.SqlServer
 {
@@ -84,8 +85,9 @@ namespace Nucleus.Data.SqlServer
 			results.Add("Transport Protocol", ExecuteScalar(connection, "SELECT CONNECTIONPROPERTY('net_transport')"));
 
 			results.Add("Size", ExecuteReader(connection, "sp_spaceused", "database_size").ToString());
+      results.Add("Schema Version", ExecuteScalar(connection, $"SELECT * FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new SqlParameter("@schemaName", schemaName) }));
 
-			results.Add("Software", ExecuteScalar(connection, "SELECT @@VERSION"));
+      results.Add("Software", ExecuteScalar(connection, "SELECT @@VERSION"));
 
 			connection.Close();
 
@@ -128,5 +130,20 @@ namespace Nucleus.Data.SqlServer
 			}
 		}
 
-	}
+    private string ExecuteScalar(System.Data.Common.DbConnection connection, string sql, System.Data.Common.DbParameter[] parameters)
+    {
+      object result;
+
+      System.Data.Common.DbCommand command = connection.CreateCommand();
+
+      command.CommandText = sql;
+      command.Parameters.AddRange(parameters);
+
+      result = command.ExecuteScalar();
+
+#pragma warning disable CS8603 // Possible null reference return.
+      return result == null ? "" : result.ToString();
+#pragma warning restore CS8603 // Possible null reference return.
+    }
+  }
 }

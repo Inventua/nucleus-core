@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Extensions;
 using Nucleus.Data.Common;
+using Nucleus.Data.EntityFramework;
 
 namespace Nucleus.Data.MySql
 {
@@ -80,8 +81,10 @@ namespace Nucleus.Data.MySql
 			results.Add("Server", ExecuteScalar(connection, "SELECT @@hostname;"));
 			results.Add("Database", connection.Database);
 			results.Add("Version", ExecuteScalar(connection, "SELECT VERSION();"));
-			
-			results.Add("Size", 
+
+      results.Add("Schema Version", ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new MySqlConnector.MySqlParameter("@schemaName", schemaName) }));
+
+      results.Add("Size", 
 				ExecuteScalar(connection, "SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) AS 'database_size' FROM information_schema.tables WHERE table_schema = @dbname;", 
 				new System.Data.Common.DbParameter[] { new MySqlConnector.MySqlParameter("@dbname", connection.Database) }).ToString() + "MB");
 

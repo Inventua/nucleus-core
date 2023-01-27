@@ -83,8 +83,9 @@ namespace Nucleus.Data.Sqlite
 			results.Add("Database", System.IO.Path.GetFileNameWithoutExtension(connection.DataSource));
 			results.Add("Version", ExecuteScalar(connection, "SELECT sqlite_version()"));			
 			results.Add("Size", new System.IO.FileInfo(connection.DataSource).Length.FormatFileSize());
+      results.Add("Schema Version", ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", schemaName) }));
 
-			connection.Close();
+      connection.Close();
 
 			return results;
 		}
@@ -101,6 +102,21 @@ namespace Nucleus.Data.Sqlite
 			return result;
 		}
 
+    private string ExecuteScalar(System.Data.Common.DbConnection connection, string sql, System.Data.Common.DbParameter[] parameters)
+    {
+      object result;
 
-	}
+      System.Data.Common.DbCommand command = connection.CreateCommand();
+
+      command.CommandText = sql;
+      command.Parameters.AddRange(parameters);
+
+      result = command.ExecuteScalar();
+
+#pragma warning disable CS8603 // Possible null reference return.
+      return result == null ? "" : result.ToString();
+#pragma warning restore CS8603 // Possible null reference return.
+    }
+
+  }
 }

@@ -79,8 +79,9 @@ namespace Nucleus.Data.PostgreSql
 			results.Add("Version", ExecuteScalar(connection, "SHOW server_version"));
 			results.Add("Size", Convert.ToInt64(ExecuteScalar(connection, "SELECT pg_database_size(@dbname)", new System.Data.Common.DbParameter[] { new Npgsql.NpgsqlParameter("@dbname", connection.Database) })).FormatFileSize());
 			results.Add("Software", ExecuteScalar(connection, "SELECT version()"));
+      results.Add("Schema Version", ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Npgsql.NpgsqlParameter("@schemaName", schemaName) }));
 
-			connection.Close();
+      connection.Close();
 
 			return results;
 		}

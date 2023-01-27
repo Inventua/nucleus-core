@@ -331,7 +331,7 @@ namespace Nucleus.Extensions
 		/// <exception cref="ArgumentException"></exception>
 		public void WriteRow(params object[] values)
 		{
-			WriteRow(values);
+			WriteRow((IEnumerable<object>)values);
 		}
 
 		/// <summary>

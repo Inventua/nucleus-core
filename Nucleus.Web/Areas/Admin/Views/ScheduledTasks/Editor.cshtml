@@ -43,7 +43,7 @@
 							@Html.DropDownListFor(model => model.ScheduledTask.IntervalType, Html.GetEnumSelectList(typeof(ScheduledTask.Intervals)))
 						</SettingsControl>
 
-						<SettingsControl caption="Instance Type" helptext="Instance Type.">
+						<SettingsControl caption="Instance Type" helptext="Specifies whether the task needs to run on each web server (when you have more than one web server), or needs to run on a single schedule for all web servers.  Most tasks are per-instance because they work with the database, but tasks like 'Cache Cleanup' are per-server because they work with each server's local data.">
 							@Html.DropDownListFor(model => model.ScheduledTask.InstanceType, Html.GetEnumSelectList(typeof(ScheduledTask.InstanceTypes)))
 						</SettingsControl>
 
@@ -98,24 +98,28 @@
 		@if (Model.ScheduledTask.Id != Guid.Empty)
 		{
 			<TabPanel id="task-history">
-				<table>
-					<tr>
-						<th>Start Date</th>
-						<th>Finish Date</th>
-						<th>Next Run Date</th>
-						<th>Server</th>
-						<th>Status</th>
-					</tr>
-					@foreach (var item in Model.History)
-					{
-						<tr>
-							<td>@item.StartDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-							<td>@item.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-							<td>@item.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-							<td>@item.Server</td>
-							<td>@item.Status</td>
-						</tr>
-					}
+				<table class="table table-sm table-striped">
+          <thead>
+					  <tr>
+						  <th scope="col">Start Date</th>
+              <th scope="col">Finish Date</th>
+              <th scope="col">Next Run Date</th>
+              <th scope="col">Server</th>
+              <th scope="col">Status</th>
+					  </tr>
+          </thead>
+          <tbody>
+					  @foreach (var item in Model.History)
+					  {
+						  <tr>
+							  <td>@item.StartDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+							  <td>@item.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+							  <td>@item.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+							  <td>@item.Server</td>
+							  <td>@item.Status</td>
+						  </tr>
+					  }
+          </tbody>
 				</table>
 			</TabPanel>
 

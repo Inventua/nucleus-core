@@ -17,37 +17,48 @@ DIRECTORY_DATA=1
 DIRECTORY_CERTS=2
 VERSION="1.0.0.0"
 INSTALL_ZIPFILE=""
+INSTALL_TYPE=""
 UNZIP_PACKAGE="unzip"
 TARGET_DIRECTORY="/home/nucleus"
 SHELL_SCRIPT_VERSION="2022.12"
-#DOTNET_VERSION="6.0.11"
 
+printf "Nucleus installer shell script version %s. \n\n" "$SHELL_SCRIPT_VERSION"
+  
 OPTS=$(getopt -a -n "Nucleus Setup" --options $SHORT_OPTIONS --longoptions $LONG_OPTIONS -- "$@") 
 
 function usage()
 {
   # Print out the usage.
   #printf "Usage: %s [-p '<Nucleus Application App path>'] [-z '<Zip file>']\n" "$0"
-  printf "Nucleus installer shell script version %s. \n\n" "$SHELL_SCRIPT_VERSION"
   printf "Usage: %s [-OPTION]...\n" "$0"
   printf "Installs Nucleus in the specified directory.\n\n"
   printf "  -t, --target-directory DIRECTORY      Home directory of Nucleus web. Defaults to '%s'.\n" "$TARGET_DIRECTORY"
-  printf "  -z, --zipfile ZIPFILE                 Override auto-detection of the Nucleus install zip file name and specify the file to use.\n"
-  printf "  -u, --createuser [true|false]         Use '--createuser false' to prevent the nucleus-service user from being created.\n"
-  printf "                                        You should only use this option if the user has already been created.\n"
-  printf "  -d, --createdirectories [true|false]  Use '--createdirectories false' to prevent creation of the %s, %s\n" "$TARGET_DIRECTORY" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
-  printf "                                        and %s directories.  This also prevents the commands which set the correct owner\n" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_DATA]}"
+  printf "  -z, --zipfile ZIPFILE                 Override auto-detection of the Nucleus install zip file\n"
+  printf "                                        name and specify the file to use.\n"
+  printf "  -u, --createuser [true|false]         Use '--createuser false' to prevent the nucleus-service\n"
+  printf "                                        user from being created.\n"
+  printf "                                        You should only use this option if the user has already\n"
+  printf "                                        been created.\n"
+  printf "  -d, --createdirectories [true|false]  Use '--createdirectories false' to prevent creation of the\n"
+  printf "                                        '%s', '%s'\n" "$TARGET_DIRECTORY" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
+  printf "                                        and '%s' directories.\n" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_DATA]}"
+  printf "                                        This also prevents the commands which set the correct owner\n"
   printf "                                        and permissions to directories.\n" 
   #printf "  -o, --output [verbose|brief|none]     Verbose mode."
   printf "  -h, --help                            Print this Help.\n\n"
-  printf "The installation script can be executed without any options. It will install with the following defaults:\n"
-  printf "  Uses the latest Nucleus install zip file located in the same directory as the script.\n"
-  printf "  Creates a system account ('%s') that will run Nucleus.\n" "$SERVICE_ACCOUNT"
-  printf "  Creates the directories for Nucleus ('%s', '%s' and '%s').\n" "$TARGET_DIRECTORY" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_DATA]}"
-  printf "  Install ASP.NET Core Runtime.\n"
-  printf "  Install '%s' package utility.\n" "$UNZIP_PACKAGE"
-  printf "  Unzips the Nucleus files to the '%s' directory.\n" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
-  printf "  Creates and starts the service using systemd.\n"
+  printf "The installation script can be executed without any options. It will install with the following\n"
+  printf "defaults:\n"
+  printf "  - Uses the latest Nucleus install zip file located in the same directory as the script.\n"
+  printf "  - Creates a system account ('%s') that will run Nucleus.\n" "$SERVICE_ACCOUNT"
+  printf "  - Creates the directories for Nucleus: ('%s', '%s' and\n" "$TARGET_DIRECTORY" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
+  printf "    '%s').\n" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_DATA]}"
+  printf "  - Install ASP.NET Core Runtime.\n"
+  printf "  - Install '%s' package utility.\n" "$UNZIP_PACKAGE"
+  printf "  - Unzips the Nucleus files to the '%s' directory.\n" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
+  printf "  - Creates and starts the service using systemd.\n"
+  printf "\n"
+  printf "To install an upgrade, use the -z option to specify the name of the upgrade file.  Example:"
+  printf "sudo bash ./nucleus-install.sh -z Nucleus.1.1.0.0.Upgrade.zip\n"
   printf "\n"
   exit 0
 }
@@ -148,46 +159,76 @@ done
 
 # If zip file isn't specified then get the latest version
 if [ "$INSTALL_ZIPFILE" == "" ]; then
-  if ! compgen -G "Nucleus.[1-9].[0-9].[0-9].[0-9].Install.zip" > /dev/null ; then
-    # no install zipfiles found in current directory so exit
-    printf "Install zip file was not specified and unable to locate in current directory. Please specify the full path of zip file or copy the file to current directory. \n"
-    exit 1
-  else
-    # loop through nucleus install zip files and get the latest version
-    for zipfileversion in Nucleus.*.Install.zip;
-    do
+  # loop through nucleus install zip files and get the latest version
+  for zipfileversion in Nucleus.*.zip;
+  do
+    if [[ $zipfileversion =~ ^([A-Za-z_]+)\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Install\.zip ]]; then 
       # default to the first zip file found
       if [ "$INSTALL_ZIPFILE" == "" ]; then
         INSTALL_ZIPFILE=$zipfileversion
       fi
-      [[ $zipfileversion =~ ^([A-Za-z_]+)\.([1-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Install\.zip ]]
+     
       vercomp "$VERSION" "${BASH_REMATCH[2]}"
       if [ "$?" == 2 ]; then
         # set the latest version of install zip file
         INSTALL_ZIPFILE=$zipfileversion
         VERSION="${BASH_REMATCH[2]}"
+        INSTALL_TYPE="Install"
+      fi
+    fi
+  done
+
+  if [ "$INSTALL_ZIPFILE" == "" ]; then
+    # if INSTALL_ZIPFILE is blank, try an upgrade 
+    # loop through nucleus upgrade zip files and get the latest version
+    for zipfileversion in Nucleus.*.zip;
+    do
+      if [[ $zipfileversion =~ ^([A-Za-z_]+)\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Upgrade\.zip ]]; then 
+        # default to the first zip file found
+        if [ "$INSTALL_ZIPFILE" == "" ]; then
+          INSTALL_ZIPFILE=$zipfileversion
+        fi
+       
+        vercomp "$VERSION" "${BASH_REMATCH[2]}"
+        if [ "$?" == 2 ]; then
+          # set the latest version of upgrade zip file
+          INSTALL_ZIPFILE=$zipfileversion
+          VERSION="${BASH_REMATCH[2]}"
+          INSTALL_TYPE="Upgrade"
+        fi
       fi
     done
-  fi
+  fi  
+else
+  [[ $INSTALL_ZIPFILE =~ ^([A-Za-z_]+)\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.(.*)\.zip ]]
+  VERSION="${BASH_REMATCH[2]}"
+  INSTALL_TYPE="${BASH_REMATCH[3]}"
 fi
 
 # Check we do have an install file otherwise we warn users and exit script.
 if [ "$INSTALL_ZIPFILE" == "" ]; then
-  # still no install zipfiles specified or found
-  printf "Install zip file was not specified and unable to locate in current directory. Please specify the full path of zip file or copy the file to current directory. \n"
+  printf "Unable to auto-detect a Nucleus install or upgrade zip file to install.\n"
+  printf "Please specify a Nucleus install or upgrade zip file with the -z option, or copy the file to\n"
+  printf "'%s'.\n" $(pwd)
   exit 1
 fi
 
+INSTALL_MESSAGE="Install"
+if [ "$INSTALL_TYPE" == "Upgrade" ]; then
+  INSTALL_MESSAGE="Upgrade to"
+else
+  INSTALL_MESSAGE="$INSTALL_TYPE"
+fi
+
 # Print settings, ask for confirmation 
-printf "Nucleus installer shell script version %s. \n\n" "$SHELL_SCRIPT_VERSION"
 printf "Your settings are:\n"
 printf "  - App path: '%s'.\n" "$TARGET_DIRECTORY"
 printf "  - Zip file: '%s'.\n\n" "$INSTALL_ZIPFILE"
 printf "This script will:\n"
 printf "  - Create a service account '%s' (if it does not already exist).\n" "$SERVICE_ACCOUNT"
-printf "  - Install ASP.NET Core Runtime.\n"
-printf "  - Install %s package.\n" "$UNZIP_PACKAGE"
-printf "  - Install Nucleus version %s.\n" "$VERSION"
+printf "  - Install the ASP.NET Core Runtime if it is not already installed.\n"
+printf "  - Install the %s package if it is not already installed.\n" "$UNZIP_PACKAGE"
+printf "  - %s Nucleus version %s.\n" "$INSTALL_MESSAGE" "$VERSION"
 printf "  - Set file and directory owner and permissions.\n"
 printf "  - Configure Nucleus to automatically run as a service.\n\n"
 
@@ -241,11 +282,8 @@ if [ "$CREATE_DIRECTORIES" == true ]; then
 fi
 
 # Download and install the dotnet runtime 
-if ! dpkg-query -W -f='${Status}' "dotnet"|grep "ok installed" > /dev/null ; then
+if ! dpkg-query -W -f='${Status}' "aspnetcore-runtime-6.0"|grep "ok installed" > /dev/null ; then
   printf "Installing .NET...\n"
-  #wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-  #dpkg -i packages-microsoft-prod.deb
-  #rm packages-microsoft-prod.deb
   apt-get -q update && apt-get -q install -y aspnetcore-runtime-6.0
 else
   printf ".NET is already installed.\n"
@@ -263,7 +301,7 @@ fi
 
 # Unzip the nucleus zip file to app path
 printf "Unzipping Nucleus files to %s.\n" "$TARGET_DIRECTORY"
-unzip -q "$INSTALL_ZIPFILE" -d "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
+unzip -q -o "$INSTALL_ZIPFILE" -d "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
 
 # Copy the Ubuntu appSettings.template to appSettings.Production.json
 if [ ! -f "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/appSettings.Production.json" ]; then
@@ -299,5 +337,5 @@ systemctl daemon-reload
 systemctl enable --now nucleus
 
 # Finish installation message.
-printf "Nucleus is installed. \n"
+printf "Installation successful. \n"
 

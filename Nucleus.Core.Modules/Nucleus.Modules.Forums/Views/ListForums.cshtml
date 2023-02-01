@@ -12,12 +12,15 @@
 	<table class="forums-list">
 		@foreach (var group in Model.Groups)
 		{
-			<tr class="group-header">
-				<th class="group-title">@group.Name</th>
-				<th>Posts</th>
-				<th>Replies</th>
-				<th>Most Recent</th>
-			</tr>
+			<thead>
+				<tr class="group-header">
+					<th scope="col" class="group-title">@group.Name</th>
+					<th scope="col">Posts</th>
+					<th scope="col">Replies</th>
+					<th scope="col">Most Recent</th>
+				</tr>
+			</thead>
+			<tbody>
 			@foreach (var forum in group.Forums)
 			{
 				<tr class="forum-item @(forum.EffectiveSettings().Enabled ? "enabled" : "disabled")">
@@ -56,6 +59,7 @@
 					</td>
 				</tr>
 			}
+			</tbody>
 		}
 	</table>
 </div>

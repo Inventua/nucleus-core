@@ -247,6 +247,7 @@ if [ "$CREATE_USER" == true ]; then
   else
     printf "Creating %s user...\n" "$SERVICE_ACCOUNT"
     useradd -r "$SERVICE_ACCOUNT" -d "$TARGET_DIRECTORY" -c "Service account for Nucleus" -s "/usr/sbin/nologin"
+    # Add the current user (admin) to the group to allow them to traverse/read nucleus folders. $USER is a linux environment variable.
     usermod -a -G "$SERVICE_ACCOUNT" "$USER"
   fi
 else
@@ -284,7 +285,7 @@ fi
 # Download and install the dotnet runtime 
 if ! dpkg-query -W -f='${Status}' "aspnetcore-runtime-6.0"|grep "ok installed" > /dev/null ; then
   printf "Installing .NET...\n"
-  apt-get -q update && apt-get -q install -y aspnetcore-runtime-6.0
+  apt-get -q update && apt-get -q -y install aspnetcore-runtime-6.0
 else
   printf ".NET is already installed.\n"
 fi 
@@ -317,7 +318,8 @@ if ! directory_exists "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extension
   chown -R :$SERVICE_ACCOUNT "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions"
 fi
 
-# Set read, write and directory execute permissions for user (root)
+# Set read, write and directory execute permissions for user (root). When this script is run with sudo 
+# the user acts as root so directories created by this script are owned by the root user.
 chmod -R u+rwX "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
 # Set read and directory execute permissions, remove write access for group (service account)
 chmod -R g+rX-w "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"

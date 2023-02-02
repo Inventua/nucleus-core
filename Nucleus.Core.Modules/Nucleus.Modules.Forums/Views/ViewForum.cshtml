@@ -34,58 +34,73 @@
 			{
 				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.Posts, propertyName = "Posts", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Standard })
 				@Html.HiddenFor(model => model.Forum.Id)
-			}
-			<table class="forum-posts">
-				<tr>
-					<th colspan="1" class="forum-title">Subject</th>
-					<th class="forum-author">Started By</th>
-					<th>Replies</th>
-					<th>Most Recent</th>
-				</tr>
-				@foreach (var post in Model.Posts.Items)
-				{
-					<tr>
-						<td class="forum-title">
-							<a href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode() + $"/{@post.Id}")" class="@(post.Tracking == null ? "d-block fw-bold" : "d-block")">
-								<span class="nucleus-material-icon">
-									@if (post.IsPinned)
-									{
-										<span title="Pinned">@Html.Raw("&#xe55f;")</span>
-									}
-									else if (post.IsLocked)
-									{
-										<span title="Pinned">@Html.Raw("&#xe897;")</span>
-									}
-									else if (post.IsRejected == true)
-									{
-										<span title="Rejected">@Html.Raw("&#xe8db;")</span>
-									}
-									else if (!post.IsApproved)
-									{
-										<span title="Awaiting Approval">@Html.Raw("&#xef64;")</span>
-									}
 
-								</span>
-								@post.Subject
-							</a>
+				<table class="forum-posts">
+					<thead>
+						<tr>
+							<th colspan="1" class="forum-title" scope="col">
+								Subject
+								@*<button type="submit" class="btn btn-link" formaction="@Url.NucleusAction("ViewForum", "Forums", "Forums", new { @sortkey = "subject", @sortdescending = !Model.SortDescending })">Subject</button>*@
+							</th>
+							<th class="forum-author">Started By</th>
+							<th>
+								Replies
+								@*<button type="submit" class="btn btn-link" formaction="@Url.NucleusAction("ViewForum", "Forums", "Forums", new { @sortkey = "replycount", @sortdescending = !Model.SortDescending })">Replies</button>*@
+							</th>
+							<th>
+								Most Recent
+								@*<button type="submit" class="btn btn-link" formaction="@Url.NucleusAction("ViewForum", "Forums", "Forums", new { @sortkey = "postdate", @sortdescending = !Model.SortDescending })">Most Recent</button>*@
+								</th>
+						</tr>
+					</thead>
+					@foreach (var post in Model.Posts.Items)
+					{
+						<tr>
+							<td class="forum-title">
+								<a href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode() + $"/{@post.Id}")" class="@(post.Tracking == null ? "d-block fw-bold" : "d-block")">
+									<span class="nucleus-material-icon">
+										@if (post.IsPinned)
+										{
+											<span title="Pinned">@Html.Raw("&#xe55f;")</span>
+										}
+										else if (post.IsLocked)
+										{
+											<span title="Pinned">@Html.Raw("&#xe897;")</span>
+										}
+										else if (post.IsRejected == true)
+										{
+											<span title="Rejected">@Html.Raw("&#xe8db;")</span>
+										}
+										else if (!post.IsApproved)
+										{
+											<span title="Awaiting Approval">@Html.Raw("&#xef64;")</span>
+										}
 
-							@if (post.Status != null)
-							{
-								<span class="post-status">@post.Status.Name</span>
-							}
-						</td>
-						<td class="forum-author compact-cell">@post.PostedBy.UserName</td>
-						<td class="compact-cell">@post.Statistics.ReplyCount</td>
-						<td class="compact-cell">
-							@if (post.Statistics.LastReply != null)
-							{
-								<div>@post.Statistics.LastReply.PostedBy.UserName</div>
-								<div>@post.Statistics.LastReply.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
-							}
-					</td>
-				</tr>
+									</span>
+									@post.Subject
+								</a>
+
+								@if (post.Status != null)
+								{
+									<span class="post-status">@post.Status.Name</span>
+								}
+							</td>
+							<td class="forum-author small compact-cell">
+								<div>@post.PostedBy.UserName</div>
+								<div>@post.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
+							</td>
+							<td class="compact-cell">@post.Statistics.ReplyCount</td>
+							<td class="compact-cell small">
+								@if (post.Statistics.LastReply != null)
+								{
+									<div>@post.Statistics.LastReply.PostedBy.UserName</div>
+									<div>@post.Statistics.LastReply.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
+								}
+							</td>
+						</tr>
+					}
+				</table>
 			}
-		</table>
 		}
 	</div>
 }

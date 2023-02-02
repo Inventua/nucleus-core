@@ -19,6 +19,7 @@ namespace Nucleus.Modules.Forums.ViewModels
 		public ForumSubscription Subscription { get; set; }
 		public Boolean CanPost { get; set; }
 		public Boolean CanSubscribe { get; set; }
-
+		public string SortKey { get; set; } = "subject";
+		public Boolean SortDescending { get; set; }
 	}
 }

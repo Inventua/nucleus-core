@@ -70,7 +70,9 @@ namespace Nucleus.Modules.Forums.Controllers
 					}
 					else
 					{
-						return await BuildViewForumView(forum.Id, new());
+						return await BuildViewForumView(new() {
+							Forum = forum
+						});
 					}
 				}
 				else
@@ -103,21 +105,20 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> ViewForum(ViewModels.ViewForum viewModel)
 		{
-			return await BuildViewForumView(viewModel.Forum.Id, viewModel.Posts);
+			return await BuildViewForumView(viewModel);
 		}
 
-		private async Task<ActionResult> BuildViewForumView(Guid forumId, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		private async Task<ActionResult> BuildViewForumView(ViewModels.ViewForum viewModel)
 		{
 			try
 			{
-				return View("ViewForum", await BuildViewForumViewModel(forumId, pagingSettings));
+				return View("ViewForum", await BuildViewForumViewModel(viewModel));
 			}
 			catch (UnauthorizedAccessException)
 			{
 				return Forbid();
 			}
 		}
-
 
 		[HttpGet]
 		public async Task<ActionResult> AddPost(Guid forumId)
@@ -240,8 +241,6 @@ namespace Nucleus.Modules.Forums.Controllers
 			return View("ReplyPost", viewModel);
 		}
 
-
-
 		[HttpGet]
 		public async Task<ActionResult> ViewPost(Guid id)
 		{
@@ -301,7 +300,10 @@ namespace Nucleus.Modules.Forums.Controllers
 			await this.ForumsManager.SavePostTracking(viewModel.Post, HttpContext.User);
 			await this.ForumsManager.Subscribe(viewModel.Post, HttpContext.User);
 
-			return await BuildViewForumView(forum.Id, new());
+			return await BuildViewForumView(new() 
+			{ 
+				Forum = forum				 
+			});
 
 		}
 
@@ -335,7 +337,7 @@ namespace Nucleus.Modules.Forums.Controllers
 				return BadRequest();
 			}
 
-			return await BuildViewForumView(forum.Id, viewModel.Posts);
+			return await BuildViewForumView(viewModel);
 		}
 
 
@@ -347,7 +349,7 @@ namespace Nucleus.Modules.Forums.Controllers
 			// Unsubscribe from the forum 
 			await this.ForumsManager.UnSubscribe(forum, HttpContext.User);
 
-			return await BuildViewForumView(forum.Id, viewModel.Posts);
+			return await BuildViewForumView(viewModel);
 		}
 
 		[HttpPost]
@@ -415,7 +417,10 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.ApproveForumPost(viewModel.Post, true);
 
-			return await BuildViewForumView(forum.Id, new());
+			return await BuildViewForumView(new()
+			{
+				Forum = forum
+			});
 		}
 
 
@@ -434,7 +439,10 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.RejectForumPost(forum, viewModel.Post);
 
-			return await BuildViewForumView(forum.Id, new());
+			return await BuildViewForumView(new()
+			{
+				Forum = forum
+			});
 		}
 
 		[HttpPost]
@@ -452,7 +460,10 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.PinForumPost(viewModel.Post, true);
 
-			return await BuildViewForumView(forum.Id, new());
+			return await BuildViewForumView(new()
+			{
+				Forum = forum
+			});
 		}
 
 		[HttpPost]
@@ -470,7 +481,10 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.PinForumPost(viewModel.Post, false);
 
-			return await BuildViewForumView(forum.Id, new());
+			return await BuildViewForumView(new()
+			{
+				Forum = forum
+			});
 		}
 
 		[HttpPost]
@@ -488,7 +502,10 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.LockForumPost(viewModel.Post, true);
 
-			return await BuildViewForumView(forum.Id, new());
+			return await BuildViewForumView(new()
+			{
+				Forum = forum
+			});
 		}
 
 		[HttpPost]
@@ -506,7 +523,10 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.LockForumPost(viewModel.Post, false);
 
-			return await BuildViewForumView(forum.Id, new());
+			return await BuildViewForumView(new()
+			{
+				Forum = forum
+			});
 		}
 
 		[HttpPost]
@@ -524,7 +544,10 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			await this.ForumsManager.DeleteForumPost(forum, viewModel.Post);
 
-			return await BuildViewForumView(forum.Id, new());
+			return await BuildViewForumView(new()
+			{
+				Forum = forum
+			});
 		}
 
 
@@ -698,19 +721,22 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			return viewModel;
 		}
-
+				
 		/// <summary>
 		/// Create a "view forum" viewmodel and populate it
 		/// </summary>
 		/// <returns></returns>
-		private async Task<ViewModels.ViewForum> BuildViewForumViewModel(Guid forumId, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		private async Task<ViewModels.ViewForum> BuildViewForumViewModel(ViewModels.ViewForum viewModel) //(Guid forumId, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings, string sortKey, Boolean descending)
 		{
-			ViewModels.ViewForum viewModel = new();
+			if (viewModel == null)
+			{
+				viewModel = new();
+			}
 
 			viewModel.Page = this.Context.Page;
 
 			// get a fully-populated forum object
-			Models.Forum forum = await this.ForumsManager.Get(forumId);
+			Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
 
 			if (forum != null)
 			{
@@ -718,14 +744,16 @@ namespace Nucleus.Modules.Forums.Controllers
 				{
 					viewModel.Forum = forum;
 
-					if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE))
-					{
-						viewModel.Posts = await this.ForumsManager.ListPosts(forum, HttpContext.User, pagingSettings, Models.FlagStates.IsAny);
-					}
-					else
-					{
-						viewModel.Posts = await this.ForumsManager.ListPosts(forum, HttpContext.User, pagingSettings, Models.FlagStates.IsTrue);
-					}
+					Boolean canModerate = this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_MODERATE);
+					viewModel.Posts = await this.ForumsManager.ListPosts
+					(
+						forum, 
+						HttpContext.User, 
+						viewModel.Posts, 
+						canModerate ? Models.FlagStates.IsAny : Models.FlagStates.IsTrue, 
+						viewModel.SortKey, 
+						viewModel.SortDescending
+					);
 
 					viewModel.Subscription = await this.ForumsManager.GetSubscription(forum, HttpContext.User);
 					viewModel.CanPost = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_CREATE_POST);

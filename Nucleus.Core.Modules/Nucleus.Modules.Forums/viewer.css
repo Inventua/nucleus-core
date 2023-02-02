@@ -51,10 +51,10 @@
   white-space: nowrap;
 }
 
-.Forums .forums-list td:last-child, .Forums .forum-posts td:last-child
+.Forums table th .btn-link
 {
-  font-size: 0.9rem;
-  line-height: 1.2;
+  padding: 0;
+  margin: 0;
 }
 
 .Forums .post

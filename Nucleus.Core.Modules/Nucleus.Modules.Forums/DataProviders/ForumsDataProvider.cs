@@ -191,7 +191,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 		{
 			return await this.Context.Posts
 				.Where(post => post.ForumId == forumId)
-				.Include(post => post.PostedBy)
+				.Include(post => post.PostedBy)				
 				.OrderByDescending(post => post.DateAdded)
 				.FirstOrDefaultAsync();
 		}
@@ -220,7 +220,6 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			return results;
 		}
-
 
 		public async Task SaveForum(Group group, Forum forum)
 		{
@@ -379,11 +378,11 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.ToListAsync();
 		}
 
-		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListForumPosts(Forum forum, ClaimsPrincipal user, Nucleus.Abstractions.Models.Paging.PagingSettings settings, FlagStates approved)
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListForumPosts(Forum forum, ClaimsPrincipal user, Nucleus.Abstractions.Models.Paging.PagingSettings settings, FlagStates approved, string sortKey, Boolean descending)
 		{
 			Nucleus.Abstractions.Models.Paging.PagedResult<Post> results = new(settings);
 
-			var query = this.Context.Posts
+			IQueryable<Post> query = this.Context.Posts
 				.Where(post => post.ForumId == forum.Id && (post.AddedBy == user.GetUserId() || (approved == FlagStates.IsAny || (post.IsApproved == (approved == FlagStates.IsTrue)))))
 				.Include(post => post.Status)
 				.Include(post => post.Attachments)
@@ -391,13 +390,39 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.Include(post => post.PostedBy);
 
 			results.TotalCount = await query
-				.OrderByDescending(post => post.IsPinned)
-				.ThenByDescending(post => post.DateAdded)
 				.CountAsync();
 
-			IList<Post> posts = await query
-				.OrderByDescending(post => post.IsPinned)
-				.ThenByDescending(post => post.DateAdded)
+			switch (sortKey.ToLower())
+      {
+				// TODO
+				//   case "replycount":
+				//     query = query
+						//	.OrderByDescending(post => post.IsPinned)
+						//	.ThenBy(post => post.Statistics.ReplyCount);
+				//     break;
+				//   case "postdate":
+					//query = query
+					//	.OrderByDescending(post => post.IsPinned)
+					//	.ThenBy(post => post.Statistics.LastReply.DateAdded);
+					//break;
+     //   case "subject":
+					//query = query
+					//	.OrderByDescending(post => post.IsPinned)
+					//	.ThenBy(post => post.Subject);
+     //     break;
+				default: 
+					query = query
+						.OrderByDescending(post => post.IsPinned)
+						.ThenByDescending(post => post.DateAdded);
+					break;
+			}
+
+      //if (descending)
+      //{
+      //  query = query.Reverse();
+      //}
+
+      IList<Post> posts = await query
 				.Skip(settings.FirstRowIndex)
 				.Take(settings.PageSize)
 				.AsSplitQuery()

@@ -316,13 +316,13 @@ namespace Nucleus.Modules.Forums
 			}
 		}
 
-		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListPosts(Forum forum, ClaimsPrincipal user, Nucleus.Abstractions.Models.Paging.PagingSettings settings, Models.FlagStates approved)
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListPosts(Forum forum, ClaimsPrincipal user, Nucleus.Abstractions.Models.Paging.PagingSettings settings, Models.FlagStates approved, string sortOrder, Boolean descending)
 		{
 			Nucleus.Abstractions.Models.Paging.PagedResult<Post> posts;
 
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				posts = await provider.ListForumPosts(forum, user, settings, approved);
+				posts = await provider.ListForumPosts(forum, user, settings, approved, sortOrder, descending);
 			}
 
 			return posts;

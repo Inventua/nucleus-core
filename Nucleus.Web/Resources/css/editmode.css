@@ -11,6 +11,7 @@
   display: flex;
   justify-content: end;
 	gap: 2px;
+  flex-direction: initial;
 }
 
 .nucleus-module-editing .nucleus-inline-edit-controls *

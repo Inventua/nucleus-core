@@ -25,9 +25,10 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public Task<Post> GetForumPost(Guid id);
 
 		public Task<IList<Post>> ListForumPosts(Forum forum, FlagStates approved);
-		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListForumPosts(Forum forum, ClaimsPrincipal user, Nucleus.Abstractions.Models.Paging.PagingSettings settings, FlagStates approved);
+		
+    public Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListForumPosts(Forum forum, ClaimsPrincipal user, Nucleus.Abstractions.Models.Paging.PagingSettings settings, FlagStates approved, string sortKey, Boolean descending);
 
-		public Task SaveForumPost(Forum forum, Post post);
+    public Task SaveForumPost(Forum forum, Post post);
 		public Task DeleteForumPost(Post post);
 		public Task SetForumPostPinned(Post post, Boolean value);
 		public Task SetForumPostLocked(Post post, Boolean value);

@@ -64,7 +64,7 @@
 					@switch (Model.Progress.Status)
 					{
 						case ScheduledTaskProgress.State.Running:
-							<div class="alert alert-primary mt-3" role="alert">This task is running now, started @((DateTime.UtcNow - Model.StartTime).FormatTimeSpan()) ago@(@Model.Progress.Percent > 0 ? $", {Model.Progress.Percent} complete": "").</div>
+							<div class="alert alert-primary mt-3" role="alert">This task is running now, started @((DateTime.UtcNow - Model.StartTime).FormatTimeSpan()) ago@(@Model.Progress.Percent > 0 ? $", {Model.Progress.Percent}% complete": "").</div>
 							break;
 
 						default:

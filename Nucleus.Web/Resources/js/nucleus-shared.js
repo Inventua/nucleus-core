@@ -1320,15 +1320,11 @@ function _Page()
 
 		if (maximize)
 		{
-			modal
-				.removeClass('modal-auto-size')
-				.addClass('modal-full-size');
+			modal.addClass('modal-full-size');
 		}
 		else
 		{
-			modal
-				.removeClass('modal-full-size')
-				.addClass('modal-auto-size');
+			modal.removeClass('modal-full-size');
 		}
 	}
 

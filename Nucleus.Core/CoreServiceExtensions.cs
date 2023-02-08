@@ -13,6 +13,7 @@ using Nucleus.Abstractions.Mail;
 using Nucleus.Abstractions.EventHandlers;
 using Nucleus.Abstractions.Search;
 using Microsoft.Extensions.Options;
+using Nucleus.Abstractions.Models.TaskScheduler;
 
 namespace Nucleus.Core
 {
@@ -120,7 +121,13 @@ namespace Nucleus.Core
 
 			// Scheduler
 			services.AddSingleton<Abstractions.Models.TaskScheduler.RunningTaskQueue>();
-			services.AddHostedService<Services.TaskScheduler>();
+
+      // We add the task scheduler separately as a singleton so that we can use the same instance when also adding it as both a 
+      // IHostedService and ISystemEventHandler.  The Task scheduler implements ISystemEventHandler in order to  immediately 
+      // re-evaluate a scheduled task after it has been updated/changed.
+      services.AddSingleton<Services.TaskScheduler>();
+      services.AddHostedService<Services.TaskScheduler>(serviceProvider => serviceProvider.GetRequiredService<Services.TaskScheduler>());
+      services.AddSingleton<ISystemEventHandler<ScheduledTask, Nucleus.Abstractions.EventHandlers.SystemEventTypes.Update>>(serviceProvider => serviceProvider.GetRequiredService<Services.TaskScheduler>());
 
 			// config options
 			AddOption<ResourceFileOptions>(services, configuration, ResourceFileOptions.Section);

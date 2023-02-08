@@ -147,12 +147,24 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
-		/// <summary>
-		/// Create or update the specified <see cref="ScheduledTaskHistory"/>.
-		/// </summary>
-		/// <param name="site"></param>
-		/// <param name="scheduledTask"></param>
-		public async Task<List<ScheduledTaskHistory>> ListHistory(ScheduledTask task)
+    public async Task RunNow(ScheduledTask scheduledTask)
+    {
+      ScheduledTaskHistory history = await this.GetMostRecentHistory(scheduledTask, null);
+      history.NextScheduledRun = null;
+      await this.SaveHistory(history);
+
+      // This will trigger immediate evaluation of the task for execution (by the Task Scheduler), when the 
+      // event handler <ScheduledTask, Update> event is triggered.
+      ScheduledTask unchangedTask = await this.Get(scheduledTask.Id);
+      await this.Save(unchangedTask);
+    }
+
+    /// <summary>
+    /// Create or update the specified <see cref="ScheduledTaskHistory"/>.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <param name="scheduledTask"></param>
+    public async Task<List<ScheduledTaskHistory>> ListHistory(ScheduledTask task)
 		{
 			using (IScheduledTaskDataProvider provider = this.DataProviderFactory.CreateProvider<IScheduledTaskDataProvider>())
 			{

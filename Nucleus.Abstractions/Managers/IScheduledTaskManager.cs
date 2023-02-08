@@ -70,6 +70,13 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="scheduledTask"></param>
 		public Task TruncateHistory(ScheduledTask scheduledTask);
 
+    /// <summary>
+    /// Run the task immediately.
+    /// </summary>
+    /// <param name="task"></param>
+    /// <returns></returns>
+    public Task RunNow(ScheduledTask task);
+
 		/// <summary>
 		/// Create or update the specified <see cref="ScheduledTaskHistory"/>.
 		/// </summary>

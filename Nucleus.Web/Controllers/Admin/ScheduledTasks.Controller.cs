@@ -93,11 +93,9 @@ namespace Nucleus.Web.Controllers.Admin
 			{
 				return BadRequest(ControllerContext.ModelState);
 			}
-	
-			ScheduledTaskHistory history =	await this.ScheduledTaskManager.GetMostRecentHistory(viewModel.ScheduledTask, Environment.MachineName);
-			history.NextScheduledRun = null;
-			await this.ScheduledTaskManager.SaveHistory(history);
 
+      await this.ScheduledTaskManager.RunNow(viewModel.ScheduledTask);
+			
 			return View("Index", await BuildViewModel());
 		}
 

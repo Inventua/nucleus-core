@@ -10,13 +10,14 @@ using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Models.TaskScheduler;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions;
+using Nucleus.Data.Common;
 
 namespace Nucleus.Core.Services
 {
 	/// <summary>
 	/// Manages scheduling and execution of scheduled tasks.
 	/// </summary>
-	public class TaskScheduler : IHostedService, IDisposable
+	public class TaskScheduler : IHostedService, IDisposable, Nucleus.Abstractions.EventHandlers.ISystemEventHandler<ScheduledTask, Nucleus.Abstractions.EventHandlers.SystemEventTypes.Update>
 	{
 		// https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-5.0&tabs=visual-studio
 
@@ -61,6 +62,7 @@ namespace Nucleus.Core.Services
 
 			return Task.CompletedTask;
 		}
+
 		public void Dispose()
 		{
 			this.Timer?.Dispose();
@@ -84,18 +86,7 @@ namespace Nucleus.Core.Services
 
 				foreach (ScheduledTask task in await this.ScheduledTaskManager.List())
 				{
-					if (task.Enabled)
-					{
-						ScheduledTaskHistory history = await this.ScheduledTaskManager.GetMostRecentHistory(task, Environment.MachineName);
-
-						if (history == null || !history.NextScheduledRun.HasValue || DateTime.UtcNow > history.NextScheduledRun)
-						{
-							if (!this.Queue.Contains(task))
-							{
-								await StartScheduledTask(task);
-							}
-						}
-					}
+          await CheckAndRun(task);
 				}
 			}
 			catch (Exception e)
@@ -104,6 +95,33 @@ namespace Nucleus.Core.Services
 			}			
 		}
 
+    private async Task CheckAndRun(ScheduledTask task)
+    {
+      if (task.Enabled)
+      {
+        ScheduledTaskHistory history = await this.ScheduledTaskManager.GetMostRecentHistory(task, Environment.MachineName);
+
+        if (history == null || !history.NextScheduledRun.HasValue || DateTime.UtcNow > history.NextScheduledRun)
+        {
+          if (!this.Queue.Contains(task))
+          {
+            await StartScheduledTask(task);
+          }
+        }
+      }
+    }
+
+    /// <summary>
+    /// This implementation of ISystemEventHandler[ScheduledTask, Update] causes the updated scheduled task to be evaluated for 
+    /// execution immediately.
+    /// </summary>
+    /// <param name="task"></param>
+    /// <returns></returns>
+    public async Task Invoke(ScheduledTask task)
+    {
+      await CheckAndRun(task);      
+    }
+    
 		/// <summary>
 		/// Check for completed tasks in the queue: reschedule then and remove them from the queue.
 		/// </summary>

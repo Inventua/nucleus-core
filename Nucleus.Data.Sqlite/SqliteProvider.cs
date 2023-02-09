@@ -83,7 +83,13 @@ namespace Nucleus.Data.Sqlite
 			results.Add("Database", System.IO.Path.GetFileNameWithoutExtension(connection.DataSource));
 			results.Add("Version", ExecuteScalar(connection, "SELECT sqlite_version()"));			
 			results.Add("Size", new System.IO.FileInfo(connection.DataSource).Length.FormatFileSize());
-      results.Add("Schema Version", ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", schemaName) }));
+
+      string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", schemaName) });
+      if (String.IsNullOrEmpty(schemaVersion) && schemaName=="*")
+      {
+        schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", "Nucleus.Core") });
+      }
+      results.Add("Schema Version", schemaVersion);
 
       connection.Close();
 

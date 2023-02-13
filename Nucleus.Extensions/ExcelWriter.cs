@@ -175,10 +175,15 @@ namespace Nucleus.Extensions
 	/// </summary>
 	public class ExcelWriter
 	{
-		/// <summary>
-		/// Excel workbook being created.
-		/// </summary>
-		public IXLWorkbook Workbook { get; protected set; }
+    /// <summary>
+    /// MIME type for Excel (xlsx) format.
+    /// </summary>
+    public const string MIMETYPE_EXCEL = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+    /// <summary>
+    /// Excel workbook being created.
+    /// </summary>
+    public IXLWorkbook Workbook { get; protected set; }
 
 		/// <summary>
 		/// Excel worksheet being created.

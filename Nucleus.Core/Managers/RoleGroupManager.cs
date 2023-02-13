@@ -52,12 +52,25 @@ namespace Nucleus.Core.Managers
 			});
 		}
 
-		/// <summary>
-		/// List all <see cref="RoleGroup"/>s for the specified site.
+    /// <summary>
+		/// Retrieve an existing <see cref="RoleGroup"/> from the database.
 		/// </summary>
-		/// <param name="site"></param>
+		/// <param name="id"></param>
 		/// <returns></returns>
-		public async Task<IEnumerable<RoleGroup>> List(Site site)
+		public async Task<RoleGroup> GetByName(Site site, string name)
+    {
+      using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+      {
+        return await provider.GetRoleGroupByName(site, name);
+      }     
+    }
+
+    /// <summary>
+    /// List all <see cref="RoleGroup"/>s for the specified site.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<RoleGroup>> List(Site site)
 		{
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{

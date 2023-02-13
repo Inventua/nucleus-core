@@ -311,7 +311,7 @@ namespace Nucleus.Web.Controllers.Admin
 						var exporter = new Nucleus.Extensions.ExcelWriter<ViewModels.Admin.SystemIndex.LogEntry>(ExcelWriter.Modes.AutoDetect, nameof(ViewModels.Admin.SystemIndex.LogEntry.IsValid));
 						exporter.Worksheet.Name = System.IO.Path.GetFileNameWithoutExtension(logFile);
 						exporter.Export(data);
-						return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{exporter.Worksheet.Name}.xlsx");
+						return File(exporter.GetOutputStream(), ExcelWriter.MIMETYPE_EXCEL, $"{exporter.Worksheet.Name}.xlsx");
 
 					default:
 						byte[] content = System.Text.Encoding.UTF8.GetBytes(String.Join("\r\n", data));

@@ -11,6 +11,7 @@ using Nucleus.Abstractions.Managers;
 using Microsoft.AspNetCore.Authorization;
 using Nucleus.Abstractions;
 using Microsoft.AspNetCore.Hosting;
+using Nucleus.Extensions;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -108,7 +109,7 @@ namespace Nucleus.Web.Controllers.Admin
 			exporter.Worksheet.Name = "Role Groups";
 			exporter.Export(roleGroups);
 
-			return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Role Groups Export {DateTime.Now}.xlsx");
+			return File(exporter.GetOutputStream(), ExcelWriter.MIMETYPE_EXCEL, $"Role Groups Export {DateTime.Now}.xlsx");
 		}
 
 		private async Task<ViewModels.Admin.RoleGroupIndex> BuildViewModel()

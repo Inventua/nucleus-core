@@ -182,7 +182,7 @@ namespace Nucleus.Web.Controllers.Admin
 			exporter.Worksheet.Name = "Roles";
 			exporter.Export(roles);
 
-			return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Roles Export {DateTime.Now}.xlsx");
+			return File(exporter.GetOutputStream(), ExcelWriter.MIMETYPE_EXCEL, $"Roles Export {DateTime.Now}.xlsx");
 		}
 
 		/// <summary>
@@ -221,7 +221,7 @@ namespace Nucleus.Web.Controllers.Admin
 			exporter.Worksheet.Name = "Users";
 			exporter.Export(users);
 
-			return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Role {role.Name} Users Export {DateTime.Now}.xlsx");
+			return File(exporter.GetOutputStream(), ExcelWriter.MIMETYPE_EXCEL, $"Role {role.Name} Users Export {DateTime.Now}.xlsx");
 		}
 
 		private async Task<ViewModels.Admin.RoleIndex> BuildViewModel()

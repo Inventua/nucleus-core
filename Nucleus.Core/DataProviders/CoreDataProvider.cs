@@ -892,7 +892,8 @@ namespace Nucleus.Core.DataProviders
 			return await this.Context.Users
 				.Where(user => user.IsSystemAdministrator == false && user.SiteId == site.Id)
 				.Include(user => user.Roles)
-				.Include(user => user.Profile)
+          .ThenInclude(role => role.RoleGroup)
+        .Include(user => user.Profile)
 					.ThenInclude(profilevalue => profilevalue.UserProfileProperty)
 				.OrderBy(user => user.UserName)
 				.AsSplitQuery()
@@ -910,9 +911,14 @@ namespace Nucleus.Core.DataProviders
 				.CountAsync();
 
 			results = await query
-				.OrderBy(user => user.UserName)
+        .Include(user => user.Roles)
+          .ThenInclude(role => role.RoleGroup)
+        .Include(user => user.Profile)
+          .ThenInclude(profilevalue => profilevalue.UserProfileProperty)
+        .OrderBy(user => user.UserName)
 				.Skip(pagingSettings.FirstRowIndex)
 				.Take(pagingSettings.PageSize)
+        .AsSplitQuery()
 				.AsNoTracking()
 				.ToListAsync();
 
@@ -937,12 +943,15 @@ namespace Nucleus.Core.DataProviders
 						EF.Functions.Like(user.UserName, $"%{searchTerm}%")
 					)
 				)
-				.Include(user => user.Profile)
+        .Include(user => user.Roles)
+          .ThenInclude(role => role.RoleGroup)
+        .Include(user => user.Profile)
 					.ThenInclude(profilevalue => profilevalue.UserProfileProperty)
 				.OrderBy(user => user.UserName)
 				.Skip(pagingSettings.FirstRowIndex)
 				.Take(pagingSettings.PageSize)
-				.AsNoTracking()
+        .AsSplitQuery()
+        .AsNoTracking()
 				.ToListAsync();
 
 			return new Nucleus.Abstractions.Models.Paging.PagedResult<User>(pagingSettings, results);
@@ -955,7 +964,8 @@ namespace Nucleus.Core.DataProviders
 				.Where(user => user.SiteId == site.Id && user.UserName == userName)
 				.Include(user => user.Secrets)
 				.Include(user => user.Roles)
-				.Include(user => user.Profile)
+          .ThenInclude(role => role.RoleGroup)
+        .Include(user => user.Profile)
 					.ThenInclude(profilevalue => profilevalue.UserProfileProperty)
 				.AsNoTracking()
 				.AsSplitQuery()
@@ -969,7 +979,8 @@ namespace Nucleus.Core.DataProviders
 				.Where(user => user.SiteId == site.Id && user.Profile.Where(value => value.UserProfileProperty.TypeUri == ClaimTypes.Email && value.Value == email).Any())
 				.Include(user => user.Secrets)
 				.Include(user => user.Roles)
-				.Include(user => user.Profile)
+          .ThenInclude(role => role.RoleGroup)
+        .Include(user => user.Profile)
 					.ThenInclude(profilevalue => profilevalue.UserProfileProperty)
 				.AsSplitQuery()
 				.AsNoTracking()
@@ -1006,7 +1017,8 @@ namespace Nucleus.Core.DataProviders
 				.Where(user => user.Id == userId)
 				.Include(user => user.Secrets)
 				.Include(user => user.Roles)
-				.Include(user => user.Profile)
+          .ThenInclude(role => role.RoleGroup)
+        .Include(user => user.Profile)
 					.ThenInclude(profilevalue => profilevalue.UserProfileProperty)
 				.AsNoTracking()
 				.AsSplitQuery()
@@ -1191,7 +1203,15 @@ namespace Nucleus.Core.DataProviders
 				.FirstOrDefaultAsync();
 		}
 
-		public async Task SaveRoleGroup(Site site, RoleGroup roleGroup)
+    public async Task<RoleGroup> GetRoleGroupByName(Site site, string name)
+    {
+      return await this.Context.RoleGroups
+        .Where(rolegroup => EF.Property<Guid>(rolegroup, "SiteId") == site.Id && rolegroup.Name == name)
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
+    }
+
+    public async Task SaveRoleGroup(Site site, RoleGroup roleGroup)
 		{
 			Action raiseEvent;
 

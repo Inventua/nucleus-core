@@ -105,7 +105,7 @@ namespace Nucleus.Web.Controllers.Admin
 			exporter.Worksheet.Name = "Users";
 			exporter.Export(users);
 
-			return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Users Export {DateTime.Now}.xlsx");			
+			return File(exporter.GetOutputStream(), ExcelWriter.MIMETYPE_EXCEL, $"Users Export {DateTime.Now}.xlsx");			
 		}		
 
 		/// <summary>

@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nucleus.Core;
 
 namespace Nucleus.Core.Authentication
 {
 	public static class AuthenticationExtensions
 	{
-		
-
 		/// <summary>
 		/// Add Nucleus core Authentication to DI.
 		/// </summary>
@@ -24,13 +23,12 @@ namespace Nucleus.Core.Authentication
 		/// </remarks>
 		public static IServiceCollection AddCoreAuthentication(this IServiceCollection services, IConfiguration configuration)
 		{
-			services.Configure<Authentication.AuthenticationOptions>(configuration.GetSection(Authentication.AuthenticationOptions.Section), binderOptions => binderOptions.BindNonPublicProperties = true);
+      services.AddOption<Authentication.AuthenticationOptions>(configuration, Authentication.AuthenticationOptions.Section);
+      
+      services.AddAuthentication(Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME)
+				.AddScheme<Nucleus.Core.Authentication.AuthenticationOptions, Nucleus.Core.Authentication.AuthenticationHandler>(Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME, options => { });
 
-			services.AddAuthentication(Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME)
-				.AddScheme<Nucleus.Core.Authentication.AuthenticationOptions, Nucleus.Core.Authentication.AuthenticationHandler>(Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME, options =>
-				{	});
-
-			return services;
+      return services;
 		}
 	}
 }

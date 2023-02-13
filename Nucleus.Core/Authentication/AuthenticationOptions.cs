@@ -34,7 +34,7 @@ namespace Nucleus.Core.Authentication
 			this.LongExpiryTimeSpan = TimeSpan.FromDays(30);
 
 			this.SlidingExpirationTimeSpan = TimeSpan.FromHours(1);
-			
+      this.EnforceSameIPAddress = false;
 			//this.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
 			//this.SlidingExpiration = true;
 			//this.Events = new CookieAuthenticationEvents();
@@ -60,5 +60,14 @@ namespace Nucleus.Core.Authentication
 		/// </summary>
 		public TimeSpan SlidingExpirationTimeSpan { get; private set; }
 
-	}
+    /// <summary>
+    /// Gets whether "same IP address" validation is enabled.  When this option is enabled, every request must have the same remote IP address 
+    /// that was used to create the session.
+    /// </summary>
+    /// <remarks>
+    /// This option can cause automatic logouts for users who are using a VPN connection, or whose computers have multiple IP addresses for 
+    /// some other reason.
+    /// </remarks>
+    public Boolean EnforceSameIPAddress { get; private set; }
+  }
 }

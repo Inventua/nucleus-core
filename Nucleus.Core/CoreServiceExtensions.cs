@@ -129,20 +129,20 @@ namespace Nucleus.Core
       services.AddHostedService<Services.TaskScheduler>(serviceProvider => serviceProvider.GetRequiredService<Services.TaskScheduler>());
       services.AddSingleton<ISystemEventHandler<ScheduledTask, Nucleus.Abstractions.EventHandlers.SystemEventTypes.Update>>(serviceProvider => serviceProvider.GetRequiredService<Services.TaskScheduler>());
 
-			// config options
-			AddOption<ResourceFileOptions>(services, configuration, ResourceFileOptions.Section);
-			AddOption<PasswordOptions>(services, configuration, PasswordOptions.Section);
-			AddOption<ClaimTypeOptions>(services, configuration, ClaimTypeOptions.Section);			
-			AddOption<SmtpMailOptions>(services, configuration, SmtpMailOptions.Section);
-			AddOption<HtmlEditorOptions>(services, configuration, HtmlEditorOptions.Section);
-      AddOption<StoreOptions>(services, configuration, StoreOptions.Section);
+      // config options
+      services.AddOption<ResourceFileOptions>(configuration, ResourceFileOptions.Section);
+      services.AddOption<PasswordOptions>(configuration, PasswordOptions.Section);
+      services.AddOption<ClaimTypeOptions>(configuration, ClaimTypeOptions.Section);
+      services.AddOption<SmtpMailOptions>(configuration, SmtpMailOptions.Section);
+      services.AddOption<HtmlEditorOptions>(configuration, HtmlEditorOptions.Section);
+      services.AddOption<StoreOptions>(configuration, StoreOptions.Section);
 
       services.ConfigureOptions(typeof(ConfigureStoreOptions));
 
       return services;
 		}
 
-		public static void AddOption<T>(IServiceCollection services, IConfiguration configuration, string key) where T : class, new()
+		public static void AddOption<T>(this IServiceCollection services, IConfiguration configuration, string key) where T : class, new()
 		{
 			services.Configure<T>(configuration.GetSection(key), binderOptions => binderOptions.BindNonPublicProperties = true); 
 		}

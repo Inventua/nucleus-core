@@ -35,7 +35,7 @@ namespace Nucleus.Web.Controllers.Admin
     private const string LINUX_OS_INFO_FILE = "/etc/os-release";
 
 
-    public SystemController(IWebHostEnvironment hostingEnvironment, Context context, RunningTaskQueue runningTaskQueue, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<Nucleus.Core.Logging.TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager)
+    public SystemController(IWebHostEnvironment hostingEnvironment, Context context, RunningTaskQueue runningTaskQueue, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager)
 		{
       this.HostingEnvironment = hostingEnvironment;
 			this.Context = context;

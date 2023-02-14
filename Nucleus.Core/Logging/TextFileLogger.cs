@@ -8,6 +8,7 @@ using Nucleus.Abstractions;
 using System.Threading;
 using Nucleus.Abstractions.Models.TaskScheduler;
 using System.Collections.Generic;
+using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Core.Logging
 {

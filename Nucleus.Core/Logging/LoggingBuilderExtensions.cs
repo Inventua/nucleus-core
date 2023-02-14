@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Core.Logging
 {
@@ -38,7 +39,7 @@ namespace Nucleus.Core.Logging
 		/// <returns>ILoggingBuilder</returns>
 		public static ILoggingBuilder AddTextFileLogger(this ILoggingBuilder builder, IConfiguration configuration)
 		{
-			builder.Services.Configure<TextFileLoggerOptions>(configuration.GetSection(TextFileLoggerOptions.Section), options => options.BindNonPublicProperties = true);
+			builder.Services.AddOption<TextFileLoggerOptions>(configuration, TextFileLoggerOptions.Section);
 
       // The TextFileLogger is used by the StartupLogger for logging during dependency injection setup.
       // The IOptions<FolderOptions> and IConfiguration instance which is added to the dependency injection container won't be

@@ -664,6 +664,11 @@ ul.nucleus-control-panel-items button
   overflow: auto;
 }
 
+.nucleus-adminpage .ExtensionInstaller
+{
+  padding: 0.6rem;
+}
+
 #extensions-store .nucleus-extensions-store-selected-store
 {
   margin: 0 0.25rem;

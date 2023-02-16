@@ -23,11 +23,17 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// </summary>
 		private const string TEMP_FOLDER = "Temp";
 
-		// Data paths    
-		/// <summary>
-		/// Sub folder name (within the Nucleus data folder) used for log files
-		/// </summary>
-		private const string LOG_FOLDER = "Logs";
+    // Data paths    
+    /// <summary>
+    /// Sub folder name (within the Nucleus temp folder) used for extensions that should be automatically installed
+    /// </summary>
+    public const string EXTENSIONS_AUTO_INSTALL_FOLDER = "Auto-Install";
+
+    // Data paths    
+    /// <summary>
+    /// Sub folder name (within the Nucleus data folder) used for log files
+    /// </summary>
+    private const string LOG_FOLDER = "Logs";
 
 		// Data paths    
 		/// <summary>
@@ -293,6 +299,15 @@ namespace Nucleus.Abstractions.Models.Configuration
 		{
 			return this.GetDataFolder(TEMP_FOLDER, create);
 		}
+
+    /// <summary>
+    /// Gets the folder which contains extension packages which are to be automatically installed.
+    /// </summary>
+    /// <returns></returns>
+    public string GetAutoInstallExtensionsFolder()
+    {
+      return System.IO.Path.Join(this.GetTempFolder(true), EXTENSIONS_AUTO_INSTALL_FOLDER);
+    }
 
 		/// <summary>
 		/// Gets the data storage folder location for log files.

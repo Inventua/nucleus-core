@@ -29,6 +29,12 @@ namespace Nucleus.ViewFeatures.TagHelpers
 		[HtmlAttributeNotBound]
 		public ViewContext ViewContext { get; set; }
 			
+    /// <summary>
+    /// Css classes to apply to the dropdown button.
+    /// </summary>
+    [HtmlAttributeName("button-class")]
+    public string ButtonClass { get; set; }
+
 		/// <summary>
 		/// Generate the output.
 		/// </summary>
@@ -37,7 +43,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
 		/// <returns></returns>
 		async public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
 		{
-			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Account.Build(this.ViewContext, null);
+			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Account.Build(this.ViewContext, this.ButtonClass, null);
 
 			output.TagName = builder.TagName;
 			output.TagMode = TagMode.StartTagAndEndTag;

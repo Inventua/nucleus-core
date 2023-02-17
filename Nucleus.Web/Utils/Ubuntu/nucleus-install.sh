@@ -315,8 +315,8 @@ chown -R :$SERVICE_ACCOUNT "$TARGET_DIRECTORY"
 # Create /Extensions directory and set group ownership to the Nucleus service account
 if ! directory_exists "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions"; then
   mkdir "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions"
-  chown -R :$SERVICE_ACCOUNT "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions"
 fi
+chown -R :$SERVICE_ACCOUNT "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions"
 
 # Set read, write and directory execute permissions for user (root). When this script is run with sudo 
 # the user acts as root so directories created by this script are owned by the root user.
@@ -326,7 +326,7 @@ chmod -R g+rX-w "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
 
 # Nucleus must have read, write and execute permissions to /Extensions in order to install Extensions
 # Nucleus must have read, write and execute permissions to /Setup because we create install-log.config to indicate that the setup wizard has completed
-chmod g+rwx "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Setup"
+chmod -R g+rwx "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Setup"
 
 # Copy the service unit file to system directory 
 printf "Configuring the Nucleus service.\n"

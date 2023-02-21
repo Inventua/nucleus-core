@@ -63,10 +63,12 @@ namespace Nucleus.Core.Managers
 					catch (System.IO.FileNotFoundException)
 					{
 						// if the root folder was not found, try to create it
-						//if (string.IsNullOrEmpty(path))
-						//{
-							folder = await fileSystemProvider.CreateFolder("", UseSiteHomeDirectory(site, path));
-						//}
+						
+            // removed: this code would (almost) never work, as it sends a full path in the newFolder argument, which
+            // would fail because it contains path separator characters.  We can't split the path and folder name, because
+            // the details of how paths are expressed/separated/etc are internal to each file system provider.
+						// folder = await fileSystemProvider.CreateFolder("", UseSiteHomeDirectory(site, path));
+						
 					}
 
 					// Retrieve folder information from the database.  We only use Id (see below)

@@ -690,7 +690,11 @@ namespace Nucleus.Core.Managers
 					throw new InvalidOperationException(message);
 				}
 
-				File file = RemoveSiteHomeDirectory(site, await fileSystemProvider.SaveFile(UseSiteHomeDirectory(site, parentPath), newFileName, content, overwrite));
+        if (content.CanSeek)
+        {
+          content.Position = 0;
+        }
+        File file = RemoveSiteHomeDirectory(site, await fileSystemProvider.SaveFile(UseSiteHomeDirectory(site, parentPath), newFileName, content, overwrite));
 				
 				await GetDatabaseProperties(site, file);
 

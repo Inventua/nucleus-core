@@ -863,7 +863,7 @@ function _Page()
 		var iconClass = '';
 		if (typeof icon !== 'undefined')
 		{
-			switch (icon)
+      switch (icon.toLowerCase())
 			{
 				case 'question':
 					iconClass = ' icon-question';

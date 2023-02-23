@@ -11,11 +11,11 @@ using Nucleus.Abstractions.Managers;
 using Microsoft.AspNetCore.Authorization;
 using Nucleus.Abstractions;
 using Microsoft.AspNetCore.Hosting;
-using Nucleus.Extensions;
+using Nucleus.Extensions.Excel;
 
 namespace Nucleus.Web.Controllers.Admin
 {
-	[Area("Admin")]
+    [Area("Admin")]
 	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
 	public class RoleGroupsController : Controller
 	{
@@ -100,9 +100,9 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			IEnumerable<RoleGroup> roleGroups = await this.RoleGroupManager.List(this.Context.Site);
 
-			var exporter = new Nucleus.Extensions.ExcelWriter<RoleGroup>
-			( 
-				Extensions.ExcelWriter<RoleGroup>.Modes.AutoDetect,
+			var exporter = new ExcelWriter<RoleGroup>
+			(
+        ExcelWorksheet.Modes.AutoDetect,
 				nameof(RoleGroup.AddedBy), 
 				nameof(RoleGroup.ChangedBy)
 			);

@@ -16,10 +16,11 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http.Features;
 using Nucleus.Abstractions.Managers;
 using Microsoft.AspNetCore.Hosting;
+using Nucleus.Extensions.Excel;
 
 namespace Nucleus.Web.Controllers.Admin
 {
-	[Area("Admin")]
+  [Area("Admin")]
 	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
 	public class SystemController : Controller
 	{
@@ -178,7 +179,7 @@ namespace Nucleus.Web.Controllers.Admin
 				if (connection != null)
 				{
 					ViewModels.Admin.SystemIndex.DatabaseConnection databaseConnection = new() { Schema = schema.Name, DatabaseType = connection.Type, ConnectionString = Sanitize(connection.ConnectionString) };
-					databaseConnection.DatabaseInformation = Nucleus.Data.Common.DataProviderExtensions.GetDataProviderInformation(ControllerContext.HttpContext.RequestServices, schema.Name);
+					databaseConnection.DatabaseInformation = Nucleus.Data.Common.DataProviderExtensions.GetDataProviderInformation(this.DatabaseOptions.Value, schema.Name);
 
 					connections.Add(databaseConnection);
 				}
@@ -308,10 +309,10 @@ namespace Nucleus.Web.Controllers.Admin
 				switch (format)
 				{
 					case "excel":
-						var exporter = new Nucleus.Extensions.ExcelWriter<ViewModels.Admin.SystemIndex.LogEntry>(ExcelWriter.Modes.AutoDetect, nameof(ViewModels.Admin.SystemIndex.LogEntry.IsValid));
+						var exporter = new ExcelWriter<ViewModels.Admin.SystemIndex.LogEntry>(ExcelWorksheet.Modes.AutoDetect, nameof(ViewModels.Admin.SystemIndex.LogEntry.IsValid));
 						exporter.Worksheet.Name = System.IO.Path.GetFileNameWithoutExtension(logFile);
 						exporter.Export(data);
-						return File(exporter.GetOutputStream(), ExcelWriter.MIMETYPE_EXCEL, $"{exporter.Worksheet.Name}.xlsx");
+						return File(exporter.GetOutputStream(), ExcelWorksheet.MIMETYPE_EXCEL, $"{exporter.Worksheet.Name}.xlsx");
 
 					default:
 						byte[] content = System.Text.Encoding.UTF8.GetBytes(String.Join("\r\n", data));

@@ -11,12 +11,11 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
-using Nucleus.Extensions;
-using DocumentFormat.OpenXml.Office2010.Excel;
+using Nucleus.Extensions.Excel;
 
 namespace Nucleus.Web.Controllers.Admin
 {
-	[Area("Admin")]
+  [Area("Admin")]
 	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
 	public class RolesController : Controller
 	{
@@ -166,7 +165,7 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			IEnumerable<Role> roles = await this.RoleManager.List(this.Context.Site);
 
-			var exporter = new Nucleus.Extensions.ExcelWriter<Role>();
+			var exporter = new Nucleus.Extensions.Excel.ExcelWriter<Role>();
 
 			exporter.AddColumn(role => role.Id);
 			exporter.AddColumn(role => role.Name);
@@ -182,7 +181,7 @@ namespace Nucleus.Web.Controllers.Admin
 			exporter.Worksheet.Name = "Roles";
 			exporter.Export(roles);
 
-			return File(exporter.GetOutputStream(), ExcelWriter.MIMETYPE_EXCEL, $"Roles Export {DateTime.Now}.xlsx");
+			return File(exporter.GetOutputStream(), ExcelWorksheet.MIMETYPE_EXCEL, $"Roles Export {DateTime.Now}.xlsx");
 		}
 
 		/// <summary>
@@ -195,9 +194,9 @@ namespace Nucleus.Web.Controllers.Admin
 			Role role = await this.RoleManager.Get(id);
 			IList<User> users = await this.UserManager.ListUsersInRole(role);
 
-			var exporter = new Nucleus.Extensions.ExcelWriter<User>
+			var exporter = new ExcelWriter<User>
 			(
-				ExcelWriter.Modes.IncludeSpecifiedPropertiesOnly
+        ExcelWorksheet.Modes.IncludeSpecifiedPropertiesOnly
 			);
 
 			exporter.AddColumn(user => user.Id);

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Nucleus.Extensions;
 using Nucleus.Abstractions.Models.Configuration;
+using Nucleus.Extensions.Excel;
 
 namespace Nucleus.Web.Controllers.Admin;
 
@@ -122,10 +123,10 @@ public class ScheduledTasksController : Controller
       switch (format)
       {
         case "excel":
-          var exporter = new Nucleus.Extensions.ExcelWriter<ViewModels.Admin.SystemIndex.LogEntry>(ExcelWriter.Modes.AutoDetect, nameof(ViewModels.Admin.SystemIndex.LogEntry.IsValid));
+          var exporter = new ExcelWriter<ViewModels.Admin.SystemIndex.LogEntry>(ExcelWorksheet.Modes.AutoDetect, nameof(ViewModels.Admin.SystemIndex.LogEntry.IsValid));
           exporter.Worksheet.Name = System.IO.Path.GetFileNameWithoutExtension(logFile);
           exporter.Export(data);
-          return File(exporter.GetOutputStream(), ExcelWriter.MIMETYPE_EXCEL, $"{exporter.Worksheet.Name}.xlsx");
+          return File(exporter.GetOutputStream(), ExcelWorksheet.MIMETYPE_EXCEL, $"{exporter.Worksheet.Name}.xlsx");
 
         default:
           byte[] content = System.Text.Encoding.UTF8.GetBytes(String.Join("\r\n", data));

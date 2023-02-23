@@ -67,7 +67,7 @@ namespace Nucleus.Data.Sqlite
 			// Special case for Sqlite - ensure that the folder exists
 			FolderOptions folderOptions = this.FolderOptions.Value;
 
-			Microsoft.Data.Sqlite.SqliteConnection connection = new(folderOptions.Parse(this.DatabaseConnectionOption.ConnectionString));
+			Microsoft.Data.Sqlite.SqliteConnection connection = new(Nucleus.Abstractions.Models.Configuration.FolderOptions.Parse(this.DatabaseConnectionOption.ConnectionString));
 
 			try
 			{
@@ -96,7 +96,7 @@ namespace Nucleus.Data.Sqlite
 			{
 				FolderOptions folderOptions = this.FolderOptions.Value;
 
-				Microsoft.Data.Sqlite.SqliteConnection connection = new(folderOptions.Parse(this.DatabaseConnectionOption.ConnectionString));
+				Microsoft.Data.Sqlite.SqliteConnection connection = new(Nucleus.Abstractions.Models.Configuration.FolderOptions.Parse(this.DatabaseConnectionOption.ConnectionString));
 				options.UseSqlite(connection.ConnectionString, options => 
 				{
 					// Sqlite locks the entire database during a write, so concurrent writes can cause SQLITE_BUSY ("Database is locked").  Entity

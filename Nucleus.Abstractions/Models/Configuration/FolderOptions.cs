@@ -90,7 +90,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// Gets the application root folder.
 		/// </summary>
 		/// <returns></returns>
-		public string GetWebRootFolder()
+		public static string GetWebRootFolder()
 		{
 			return WebRootFolder;
 		}
@@ -117,11 +117,11 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
-		public string Parse(string value)
+		public static string Parse(string value)
 		{
 			return Environment.ExpandEnvironmentVariables(value)
-					.Replace("{DataFolder}", this.DataFolder)
-					.Replace("{WebRootFolder}", this.GetWebRootFolder());
+					.Replace("{DataFolder}", DataFolder)
+					.Replace("{WebRootFolder}", GetWebRootFolder());
 		}
 
 		/// <summary>
@@ -205,7 +205,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// Gets the default application data storage folder location, used for logs and database files.
 		/// </summary>
 		/// <returns></returns>
-		private string DataFolder { get; set; }
+		private static string DataFolder { get; set; }
 
 		/// <summary>
 		/// Sets the data folder to a default value if its current value is empty, after replacing environment variables.
@@ -215,14 +215,14 @@ namespace Nucleus.Abstractions.Models.Configuration
 		{
 			const string DEFAULT_FOLDER = "%ProgramData%/Nucleus";
 
-      this.DataFolder = NormalizePath(Parse(String.IsNullOrEmpty(this.DataFolder) ? DEFAULT_FOLDER : this.DataFolder));
+      DataFolder = NormalizePath(Parse(String.IsNullOrEmpty(DataFolder) ? DEFAULT_FOLDER : DataFolder));
 						
 			if (ensureExists)
 			{
-				EnsureExists(this.DataFolder);
+				EnsureExists(DataFolder);
 			}
 
-			return this.DataFolder;
+			return DataFolder;
 		}
 
     /// <summary>
@@ -240,7 +240,7 @@ namespace Nucleus.Abstractions.Models.Configuration
     /// </internal>
     public string SetDataFolder(string value, Boolean ensureExists)
     {
-      this.DataFolder = value;
+      DataFolder = value;
       return SetDefaultDataFolder(ensureExists);
     }
 
@@ -275,7 +275,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string GetDataFolder()
 		{
-			return this.DataFolder;
+			return DataFolder;
 		}
 
 		/// <summary>
@@ -432,7 +432,7 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <returns></returns>
 		public string GetDataFolder(string subFolder, Boolean create)
 		{
-			string folderName = NormalizePath(System.IO.Path.Combine(this.DataFolder, subFolder).Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar));
+			string folderName = NormalizePath(System.IO.Path.Combine(DataFolder, subFolder).Replace(System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar));
 
 			if (create)
 			{

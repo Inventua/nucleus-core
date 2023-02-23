@@ -122,7 +122,7 @@ namespace Nucleus.Core.FileProviders
 
 						if (Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS.Contains(requestedPathRoot))
 						{
-							PhysicalFileProvider fileProvider = new(System.IO.Path.Combine(this.FolderOptions.Value.GetWebRootFolder(), ""));
+							PhysicalFileProvider fileProvider = new(System.IO.Path.Combine(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetWebRootFolder(), ""));
 
 							if (TryProvider(fileProvider, path, mergedcontent))
 							{

@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Data.Common
@@ -66,7 +63,8 @@ namespace Nucleus.Data.Common
 			// config. 
 			foreach (Type implementation in dataProviderConfigImplementations)
 			{
-				IDatabaseProvider instance = Activator.CreateInstance(implementation) as IDatabaseProvider;
+        IDatabaseProvider instance = Activator.CreateInstance(implementation) as IDatabaseProvider;
+        
 				if (instance != null)
 				{
 					// Get connection data for the specified schema name.  If it is found, add data provider objects to the services collection.
@@ -92,17 +90,17 @@ namespace Nucleus.Data.Common
 		/// <summary>
 		/// Get database diagnostics information for the specified schema.
 		/// </summary>
-		/// <param name="services"></param>
+		/// <param name="options"></param>
 		/// <param name="schemaName"></param>
 		/// <returns></returns>
-		static public Dictionary<string, string> GetDataProviderInformation(IServiceProvider services, string schemaName)
+		static public Dictionary<string, string> GetDataProviderInformation(DatabaseOptions options, string schemaName)
 		{
 			Dictionary<string, string> results = new();
 
 			// Get database options
-			DatabaseOptions options = new();
-			IConfiguration configuration = services.GetService<IConfiguration>();
-			configuration.GetSection(DatabaseOptions.Section).Bind(options, options => options.BindNonPublicProperties = true);
+			////DatabaseOptions options = new();
+			////IConfiguration configuration = services.GetService<IConfiguration>();
+			////configuration.GetSection(DatabaseOptions.Section).Bind(options, options => options.BindNonPublicProperties = true);
 
 			// Find IConfigureDataProvider implementations		
 			List<Type> dataProviderConfigImplementations = System.Runtime.Loader.AssemblyLoadContext.All
@@ -122,7 +120,7 @@ namespace Nucleus.Data.Common
 
 					if (connectionOption != null && connectionOption.Type.Equals(instance.TypeKey(), StringComparison.OrdinalIgnoreCase))
 					{
-						foreach (KeyValuePair<string, string> value in instance.GetDatabaseInformation(services, connectionOption, schemaName))
+						foreach (KeyValuePair<string, string> value in instance.GetDatabaseInformation(connectionOption, schemaName))
 						{
 							results.Add(value.Key, value.Value);
 						}

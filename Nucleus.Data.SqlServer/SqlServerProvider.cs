@@ -70,7 +70,7 @@ namespace Nucleus.Data.SqlServer
 		/// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
 		/// the database provider implementing this interface.
 		/// </summary>
-		public Dictionary<string, string> GetDatabaseInformation(IServiceProvider services, DatabaseConnectionOption options, string schemaName)
+		public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName)
 		{
 			Dictionary<string, string> results = new();
 

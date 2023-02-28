@@ -24,6 +24,9 @@ using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using System.Globalization;
+using System.IO;
+using Microsoft.AspNetCore.DataProtection;
+using System.Runtime.InteropServices;
 
 namespace Nucleus.Web
 {
@@ -32,7 +35,7 @@ namespace Nucleus.Web
     private const string HOSTING_FILENAME = "hosting";
     private const string CONFIG_FILENAME = "appSettings";
     private const string DATABASE_CONFIG_FILENAME = "databaseSettings";
-    
+
     private const string CONFIG_FILE_EXTENSION = ".json";
 
     private const string SETTING_ENABLERESPONSECOMPRESSION = "Nucleus:EnableResponseCompression";
@@ -218,6 +221,16 @@ namespace Nucleus.Web
 
         services.Logger().LogInformation("Adding Plugins");
         builder.AddPlugins(Environment.ContentRootPath);
+
+        // For Linux only: None of the "default" behaviors work on Linux, so we have to persist to the file system.
+        // This should be replaced in the future with config file options.
+        // reference: https://github.com/dotnet/aspnetcore/blob/bec278eabea54f63da15e10e654bdfa4168a2479/src/DataProtection/DataProtection/src/DataProtectionBuilderExtensions.cs
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+          services.AddDataProtection()
+            .SetApplicationName("Nucleus")
+            .PersistKeysToFileSystem(new DirectoryInfo(Nucleus.Abstractions.Models.Configuration.FolderOptions.Parse(this.Configuration.GetValue<String>($"{Nucleus.Abstractions.Models.Configuration.FolderOptions.Section}:DataFolder"))));
+        }
 
         services.AddRazorPages();
 

@@ -1,73 +1,73 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<Import Project="..\Nucleus.Core\core.build.targets" />
-    
-	<PropertyGroup Label="Globals">
-		<SccProjectName></SccProjectName>
-		<SccProvider></SccProvider>
-		<SccAuxPath></SccAuxPath>
-		<SccLocalPath></SccLocalPath>
-	</PropertyGroup>
+  <Import Project="..\Nucleus.Core\core.build.targets" />
 
-	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
-	</PropertyGroup>
+  <PropertyGroup Label="Globals">
+    <SccProjectName></SccProjectName>
+    <SccProvider></SccProvider>
+    <SccAuxPath></SccAuxPath>
+    <SccLocalPath></SccLocalPath>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+  </PropertyGroup>
 
-	<PropertyGroup>
-		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Nucleus.Abstractions.xml</DocumentationFile>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		
-		<Description>Models, interfaces and extensions used by the Nucleus runtime and by Nucleus extensions.</Description>
-		
-		<!-- Version is set by core.build.targets, can be overridden here for pre-release builds -->
-		<VersionPrefix>1.1.0.1-pre</VersionPrefix>
-		<VersionSuffix>a5</VersionSuffix>
-		
-		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
-		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>
-		<PackageTags>Nucleus</PackageTags>
-		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<PackageLicenseFile>license.txt</PackageLicenseFile>
-		<PackageId>Inventua.$(AssemblyName)</PackageId>
-		<PackageReadmeFile>readme.md</PackageReadmeFile>
-		
-	</PropertyGroup>
-	
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<WarningsAsErrors>;NU1605</WarningsAsErrors>
-		<WarningLevel>4</WarningLevel>
-	</PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<WarningsAsErrors>;NU1605</WarningsAsErrors>
-		<WarningLevel>4</WarningLevel>
-	</PropertyGroup>
+  <PropertyGroup>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Nucleus.Abstractions.xml</DocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
-	<ItemGroup>
-		<None Remove="**\*.vspscc" />
-		<None Remove="**\*.scc" />
-	</ItemGroup>
+    <Description>Models, interfaces and extensions used by the Nucleus runtime and by Nucleus extensions.</Description>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />	
-	</ItemGroup>
+    <!-- Version is set by core.build.targets, can be overridden here for pre-release builds -->
+    <VersionPrefix>1.1.0.1-pre</VersionPrefix>
+    <VersionSuffix>a6.8</VersionSuffix>
 
-	<ItemGroup>
-	  <None Update="readme.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-		<None Include="license.txt" Pack="true" PackagePath="" />
-	</ItemGroup>
+    <PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
+    <PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>
+    <PackageTags>Nucleus</PackageTags>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>license.txt</PackageLicenseFile>
+    <PackageId>Inventua.$(AssemblyName)</PackageId>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
 
-	<Target Name="GetPackageAssemblies" AfterTargets="PostBuildEvent">
-		<Copy SourceFiles="bin\$(Configuration)\$(TargetFramework)\Nucleus.Abstractions.xml" DestinationFolder="$(SolutionDir)\..\Publish\XmlDocumentation" Retries="2" />
-	</Target>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningsAsErrors>;NU1605</WarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <WarningsAsErrors>;NU1605</WarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="**\*.vspscc" />
+    <None Remove="**\*.scc" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="readme.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="license.txt" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <Target Name="GetPackageAssemblies" AfterTargets="PostBuildEvent">
+    <Copy SourceFiles="bin\$(Configuration)\$(TargetFramework)\Nucleus.Abstractions.xml" DestinationFolder="$(SolutionDir)\..\Publish\XmlDocumentation" Retries="2" />
+  </Target>
 
 </Project>

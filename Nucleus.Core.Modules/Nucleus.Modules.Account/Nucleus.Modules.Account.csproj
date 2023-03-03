@@ -58,13 +58,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.0.1" />
-	  <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.0.0.1" />
+	  <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.1.0.1-pre-a6.8" />
+	  <PackageReference Include="Inventua.Nucleus.Extensions" Version="1.1.0.1-pre-a4" />
+	  <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.1.0.1-pre-a1" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>Account</ExtensionFolder>
-		<Version>1.0.1</Version>
+		<Version>1.2.0</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 	</PropertyGroup>
 

@@ -71,7 +71,9 @@ namespace Nucleus.Modules.Account.Controllers
 				User user = await this.UserManager.GetByEmail(this.Context.Site, viewModel.Email);
 				if (user == null)
 				{
-					return BadRequest();
+					Logger.LogWarning("User not found for email {viewModel.Email}.", viewModel.Email);
+					await Task.Delay(TimeSpan.FromSeconds(10));
+					return BadRequest("Invalid Email");
 				}
 				else
 				{
@@ -148,6 +150,7 @@ namespace Nucleus.Modules.Account.Controllers
 				if (user == null)
 				{
 					Logger.LogWarning("User not found for email {viewModel.Email}.", viewModel.Email);
+					await Task.Delay(TimeSpan.FromSeconds(10));
 					return BadRequest("Invalid Email");
 				}
 				else
@@ -163,8 +166,8 @@ namespace Nucleus.Modules.Account.Controllers
 
 							Models.Mail.RecoveryEmailModel args = new()
 							{
-								Site= this.Context.Site ,
-								User= user.GetCensored(),
+								Site = this.Context.Site ,
+								User = user.GetCensored(),
 								Url = new System.Uri(await GetLoginPageUri(), $"?token={user.Secrets.PasswordResetToken}").ToString()
 							};
 
@@ -193,9 +196,7 @@ namespace Nucleus.Modules.Account.Controllers
 
 			return View("Recover", viewModel);
 		}
-
-		
-
+				
 		[HttpPost]
 		public async Task<ActionResult> ResetPassword(ViewModels.ResetPassword viewModel)
 		{

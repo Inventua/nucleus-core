@@ -4,12 +4,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>User Accounts</name>
-  <version>1.0.1</version>
+  <version>1.2.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
 		Application install set for the core user account modules (signup and login).			
 	</description>
-  <compatibility minVersion="1.0.0.0" maxVersion="*" />
+  <compatibility minVersion="1.2.0.0" maxVersion="*" />
   <components>
     <component folderName="Account" optional="false">
       <moduleDefinition id="f0a9ec71-c29e-436e-96e1-72dcdc44c32b">

@@ -9,11 +9,12 @@ using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Extensions;
 using Nucleus.Data.Common;
 using Microsoft.Extensions.Options;
+using Microsoft.Data.Sqlite;
 
 namespace Nucleus.Data.Sqlite
 {
 	/// <summary>
-	/// 
+	/// Sqlite database provider.
 	/// </summary>
 	public class SqliteProvider : IDatabaseProvider
 	{
@@ -69,13 +70,16 @@ namespace Nucleus.Data.Sqlite
 		/// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
 		/// the database provider implementing this interface.
 		/// </summary>
-		public Dictionary<string, string> GetDatabaseInformation(IServiceProvider services, DatabaseConnectionOption options, string schemaName)
+		public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName)
 		{
 			Dictionary<string, string> results = new();
 
-			IOptions<FolderOptions> folderOptions = services.GetService<IOptions<FolderOptions>>();
-			System.Data.Common.DbConnection connection = new Microsoft.Data.Sqlite.SqliteConnection(folderOptions.Value.Parse(options.ConnectionString));
-			connection.Open();
+      //IOptions<FolderOptions> folderOptions = services.GetService<IOptions<FolderOptions>>();
+      //System.Data.Common.DbConnection connection = new Microsoft.Data.Sqlite.SqliteConnection(this.FolderOptions.Value.Parse(options.ConnectionString));
+      System.Data.Common.DbConnection connection = new Microsoft.Data.Sqlite.SqliteConnection(Nucleus.Abstractions.Models.Configuration.FolderOptions.Parse(options.ConnectionString));
+      
+
+      connection.Open();
 
 			// For Sqlite, we show the filename (with no path or extension) as the database name, because the Sqlite "database" is always called "main".  We
 			// exclude the path in order to not show potentially sensitive information, and we exclude the file extension because it doesn't add anything to
@@ -83,12 +87,33 @@ namespace Nucleus.Data.Sqlite
 			results.Add("Database", System.IO.Path.GetFileNameWithoutExtension(connection.DataSource));
 			results.Add("Version", ExecuteScalar(connection, "SELECT sqlite_version()"));			
 			results.Add("Size", new System.IO.FileInfo(connection.DataSource).Length.FormatFileSize());
-      results.Add("Schema Version", ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", schemaName) }));
+
+      string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", schemaName) });
+      if (String.IsNullOrEmpty(schemaVersion) && schemaName=="*")
+      {
+        schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", "Nucleus.Core") });
+      }
+      results.Add("Schema Version", schemaVersion);
 
       connection.Close();
-
+     
 			return results;
 		}
+
+    // Future use
+    //public void BackupDatabase(DatabaseConnectionOption options, string targetFilename)
+    //{
+    //  Microsoft.Data.Sqlite.SqliteConnection connection = new(Nucleus.Abstractions.Models.Configuration.FolderOptions.Parse(options.ConnectionString));
+
+    //  connection.Open();
+
+    //  using SqliteConnection backup = new ($"Data Source={targetFilename}");
+    //  {
+    //    connection.BackupDatabase(backup);
+    //  }
+
+    //  connection.Close();
+    //}
 
 		private static string ExecuteScalar(System.Data.Common.DbConnection connection, string sql)
 		{

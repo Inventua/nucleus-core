@@ -70,7 +70,7 @@ namespace Nucleus.Data.SqlServer
 		/// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
 		/// the database provider implementing this interface.
 		/// </summary>
-		public Dictionary<string, string> GetDatabaseInformation(IServiceProvider services, DatabaseConnectionOption options, string schemaName)
+		public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName)
 		{
 			Dictionary<string, string> results = new();
 
@@ -85,7 +85,13 @@ namespace Nucleus.Data.SqlServer
 			results.Add("Transport Protocol", ExecuteScalar(connection, "SELECT CONNECTIONPROPERTY('net_transport')"));
 
 			results.Add("Size", ExecuteReader(connection, "sp_spaceused", "database_size").ToString());
-      results.Add("Schema Version", ExecuteScalar(connection, $"SELECT * FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new SqlParameter("@schemaName", schemaName) }));
+
+      string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new SqlParameter("@schemaName", schemaName) });
+      if (String.IsNullOrEmpty(schemaVersion) && schemaName == "*")
+      {
+        schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new SqlParameter("@schemaName", "Nucleus.Core") });
+      }
+      results.Add("Schema Version", schemaVersion);
 
       results.Add("Software", ExecuteScalar(connection, "SELECT @@VERSION"));
 

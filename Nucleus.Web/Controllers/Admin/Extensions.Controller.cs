@@ -12,11 +12,6 @@ using Nucleus.Abstractions.Managers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System.Net.Http;
-using Newtonsoft.Json;
-using Nucleus.Abstractions.Models.Configuration;
-using System.Net.Http.Json;
-using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Office2019.Presentation;
 
 namespace Nucleus.Web.Controllers.Admin
 {

@@ -33,10 +33,15 @@ namespace Nucleus.Core.Authentication
 		private Context CurrentContext { get; set; }
 		private LinkGenerator LinkGenerator { get; }
 
-		public AuthenticationHandler(ISessionManager sessionManager, IUserManager userManager, IApiKeyManager apiKeyManager, LinkGenerator linkGenerator, ISiteManager siteManager,
+    new AuthenticationOptions Options { get; }
+
+
+    public AuthenticationHandler(ISessionManager sessionManager, IUserManager userManager, IApiKeyManager apiKeyManager, LinkGenerator linkGenerator, ISiteManager siteManager,
 																 Context context,
-																 IOptionsMonitor<AuthenticationOptions> options, ILoggerFactory logger, System.Text.Encodings.Web.UrlEncoder encoder,
-																 ISystemClock clock) : base(options, logger, encoder, clock)
+																 IOptionsMonitor<AuthenticationOptions> optionsMonitor, 
+                                 ILoggerFactory logger, 
+                                 System.Text.Encodings.Web.UrlEncoder encoder,
+																 ISystemClock clock) : base(optionsMonitor, logger, encoder, clock)
 		{
 			this.SessionManager = sessionManager;
 			this.UserManager = userManager;
@@ -44,7 +49,13 @@ namespace Nucleus.Core.Authentication
 			this.ApiKeyManager = apiKeyManager;
 			this.LinkGenerator = linkGenerator;
 			this.CurrentContext = context;
-		}
+
+      // This is a workaround to allow authentication options to be set in configuration files.  AuthenticationBuilder.AddScheme uses "named options" to set the
+      // .Options property, which prevents our config settings from being loaded.
+      // https://github.com/dotnet/aspnetcore/issues/17539 
+      // https://github.com/aspnet/AspNetCore/blob/3b7cdc166aa3c9733fa60b56d91fc0fff9b11652/src/Security/Authentication/Core/src/AuthenticationHandler.cs#L85
+      this.Options = this.OptionsMonitor.CurrentValue;
+    }
 
 		/// <summary>
 		/// Handle Authentication
@@ -61,7 +72,7 @@ namespace Nucleus.Core.Authentication
 			ClaimsPrincipal principal;
 			UserSession userSession = null;
 
-			string sessionId = this.Context.Request.Cookies[this.Options.CookieName];
+    string sessionId = this.Context.Request.Cookies[this.Options.CookieName];
 
 			if (String.IsNullOrEmpty(sessionId))
 			{
@@ -147,7 +158,7 @@ namespace Nucleus.Core.Authentication
 				{
 					// user session exists, update sliding expiration in the database, and update the cookie expiry date
 					//if (!userSession.RemoteIpAddress.Equals(this.Context.Connection.RemoteIpAddress))
-					if (!IsEqual(userSession.RemoteIpAddress, this.Context.Connection.RemoteIpAddress))
+					if (this.Options.EnforceSameIPAddress && !IsEqual(userSession.RemoteIpAddress, this.Context.Connection.RemoteIpAddress))
 					{
 						Logger.LogCritical("User {UserId} attempted to use a session {SessionId} from {CurrentRemoteIpAddress} when the original session was from {OriginalRemoteIpAddress}.", userSession.UserId, userSession.Id, this.Context.Connection.RemoteIpAddress, userSession.RemoteIpAddress);
 						await this.SessionManager.Delete(userSession);

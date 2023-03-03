@@ -3,192 +3,210 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 <div class="System d-flex flex-column h-100">
-	<h1 class="nucleus-control-panel-heading">System</h1>
+  <h1 class="nucleus-control-panel-heading">System</h1>
 
-	<Tab>
-		<TabItem target="#system-information" caption="System Information" active="true"></TabItem>
-		<TabItem target="#system-activity" caption="Activity"></TabItem>
-		@if (Model.WebServerInformation != null && Model.WebServerInformation.Values.Any())
-		{
-			<TabItem target="#system-webserver" caption="Web Server"></TabItem>
-		}
-		@*<TabItem target="#system-configuration" caption="Configuration"></TabItem>*@
-		<TabItem target="#system-database" caption="Database"></TabItem>
-		<TabItem target="#system-logs" caption="Logs"></TabItem>
-	</Tab>
+  <Tab>
+    <TabItem target="#system-information" caption="System Information" active="true"></TabItem>
+    <TabItem target="#system-activity" caption="Activity"></TabItem>
+    @if (Model.WebServerInformation != null && Model.WebServerInformation.Values.Any())
+    {
+      <TabItem target="#system-webserver" caption="Web Server"></TabItem>
+    }
+    @*<TabItem target="#system-configuration" caption="Configuration"></TabItem>*@
+    <TabItem target="#system-database" caption="Database"></TabItem>
+    <TabItem target="#system-logs" caption="Logs"></TabItem>
+  </Tab>
 
-	<TabContent>
-		<TabPanel id="system-information" active="true">
-			<table class="table table-borderless table-sm headers-column">
-				<tr>
-					<th>Product</th>
-					<td>@Model.Product @Model.Version</td>
-				</tr>
-				<tr>
-					<th>Copyright</th>
-					<td>@Model.Copyright</td>
-				</tr>
-				<tr>
-					<th>Server</th>
-					<td>@Model.Server</td>
-				</tr>
-				<tr>
-					<th>Server Time</th>
-          <td>@DateTime.UtcNow.FormatDate(this.Context.Request.GetUserTimeZone()) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(FormatExtensions.TimespanFormats.TimeOffset)]</td>
-				</tr>
-				<tr>
-					<th>Operating System</th>
-					<td>@Model.OperatingSystem</td>
-				</tr>
-				<tr>
-					<th>Operating System User</th>
-					<td>@Model.OperatingSystemUser</td>
-				</tr>
-				<tr>
-					<th>.NET Version</th>
-					<td>@Model.Framework</td>
-				</tr>
-				<tr>
-					<th>Process Start Time</th>
-          <td>@Model.StartTime.FormatDate(this.Context.Request.GetUserTimeZone()) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(FormatExtensions.TimespanFormats.TimeOffset)] (@Model.Uptime)</td>
-				</tr>
-			</table>
-		</TabPanel>
+  <TabContent>
+    <TabPanel id="system-information" active="true">
+      <table class="table table-borderless table-sm headers-column">
+        <tbody>
+          <tr>
+            <th scope="row">Product</th>
+            <td>@Model.Product @Model.Version</td>
+          </tr>
+          <tr>
+            <th scope="row">Copyright</th>
+            <td>@Model.Copyright</td>
+          </tr>
+          <tr>
+            <th scope="row">Server</th>
+            <td>@Model.Server</td>
+          </tr>
+          <tr>
+            <th scope="row">Server Time</th>
+            <td>@DateTime.UtcNow.FormatDate(this.Context.Request.GetUserTimeZone()) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(FormatExtensions.TimespanFormats.TimeOffset)]</td>
+          </tr>
+          <tr>
+            <th scope="row">Operating System</th>
+            <td>@Model.OperatingSystem</td>
+          </tr>
+          <tr>
+            <th scope="row">Operating System User</th>
+            <td>@Model.OperatingSystemUser</td>
+          </tr>
+          <tr>
+            <th scope="row">.NET Version</th>
+            <td>@Model.Framework</td>
+          </tr>
+          <tr>
+            <th scope="row">Process Start Time</th>
+            <td>@Model.StartTime.FormatDate(this.Context.Request.GetUserTimeZone()) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(FormatExtensions.TimespanFormats.TimeOffset)] (@Model.Uptime)</td>
+          </tr>
+        </tbody>
+      </table>
+    </TabPanel>
 
-		<TabPanel id="system-activity">
-			<fieldset role="group" aria-labelledby="heading">
-				<h2>General</h2>
-				<table class="headers-column mb-4">
-					<tr>
-						<th>Users Online</th>
-						<td>@Model.UsersOnline</td>
-					</tr>
-				</table>
-			</fieldset>
+    <TabPanel id="system-activity">
+      <fieldset role="group" aria-labelledby="heading">
+        <h2>General</h2>
+        <table class="headers-column mb-4">
+          <tbody>
+            <tr>
+              <th scope="row">Users Online</th>
+              <td>@Model.UsersOnline</td>
+            </tr>
+          </tbody>
+        </table>
+      </fieldset>
 
-			<fieldset role="group" aria-labelledby="heading">
-				<h2>Running Scheduled Tasks</h2>
+      <fieldset role="group" aria-labelledby="heading">
+        <h2>Running Scheduled Tasks</h2>
 
-				@if (Model.RunningTasks.Any())
-				{
-					<table class="table">
-						<tr>
-							<th>Name</th>
-							<th>Status</th>
-							<th>Message</th>
-						</tr>
-						@foreach (var task in Model.RunningTasks)
-						{
-							<tr>
-								<td>@task.ScheduledTask.Name</td>
-								<td>@task.Progress?.Status</td>
-								<td>@task.Progress?.Message</td>
-							</tr>
-						}
-					</table>
-				}
-				else
-				{
-					<span>No tasks are running.</span>
-				}
-			</fieldset>
-		</TabPanel>
+        @if (Model.RunningTasks.Any())
+        {
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Status</th>
+                <th scope="col">Message</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach (var task in Model.RunningTasks)
+              {
+                <tr>
+                  <td>@task.ScheduledTask.Name</td>
+                  <td>@task.Progress?.Status</td>
+                  <td>@task.Progress?.Message</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+        else
+        {
+          <span>No tasks are running.</span>
+        }
+      </fieldset>
+    </TabPanel>
 
-		@if (Model.WebServerInformation != null && Model.WebServerInformation.Values.Any())
-		{
-			<TabPanel id="system-webserver">
-				<table class="table">
-					@foreach (var keyValue in Model.WebServerInformation)
-					{
-						<tr>
-							<td class="text-nowrap fw-bold">@keyValue.Key</td>
-							<td>@keyValue.Value</td>
-						</tr>
-					}
-				</table>
-			</TabPanel>
-		}
-		@*<TabPanel id="system-configuration">
-		<div class="LogContent">
-		<pre>@Model.Configuration</pre>
-		</div>
-		</TabPanel>*@
+    @if (Model.WebServerInformation != null && Model.WebServerInformation.Values.Any())
+    {
+      <TabPanel id="system-webserver">
+        <table class="table">
+          <tbody>
+            @foreach (var keyValue in Model.WebServerInformation)
+            {
+              <tr>
+                <td class="text-nowrap fw-bold">@keyValue.Key</td>
+                <td>@keyValue.Value</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </TabPanel>
+    }
+    @*<TabPanel id="system-configuration">
+    <div class="LogContent">
+    <pre>@Model.Configuration</pre>
+    </div>
+    </TabPanel>*@
 
-		<TabPanel id="system-database">
-			<table class="table">
-				<tr>
-					<th class="text-nowrap">Schema</th>
-					<th class="text-nowrap">Database Type</th>
-					<th class="text-nowrap">Connection String</th>
-				</tr>
-				@foreach (var connection in Model.DatabaseConnections)
-				{
-					<tr>
-						<td class="text-nowrap">@(connection.Schema == "*" ? "Default (*)" : connection.Schema)</td>
-						<td>@connection.DatabaseType</td>
-						<td>@connection.ConnectionString</td>
-					</tr>
-					<tr>
-						<td colspan="3">
-							<table class="border border-1 table">
-								@foreach (var keyValue in connection.DatabaseInformation)
-								{
-									<tr>
-										<td class="text-nowrap fw-bold w-25">@keyValue.Key</td>
-										<td>@keyValue.Value</td>
-									</tr>
-								}
-							</table>
-						</td>
-					</tr>
-				}
-			</table>
-		</TabPanel>
+    <TabPanel id="system-database">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col" class="text-nowrap">Schema</th>
+            <th scope="col" class="text-nowrap">Database Type</th>
+            <th scope="col" class="text-nowrap">Connection String</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach (var connection in Model.DatabaseConnections)
+          {
+            <tr>
+              <td class="text-nowrap">@(connection.Schema == "*" ? "Default (*)" : connection.Schema)</td>
+              <td>@connection.DatabaseType</td>
+              <td>@connection.ConnectionString</td>
+            </tr>
+            <tr>
+              <td colspan="3">
+                <table class="border border-1 table">
+                  @foreach (var keyValue in connection.DatabaseInformation)
+                  {
+                    <tr>
+                      <td class="text-nowrap fw-bold w-25">@keyValue.Key</td>
+                      <td>@keyValue.Value</td>
+                    </tr>
+                  }
+                </table>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </TabPanel>
 
-		<TabPanel id="system-logs">
-			@using (Html.BeginAreaForm("GetLogFile", "System", "Admin", FormMethod.Post, new { @class = "d-flex flex-column overflow-auto m-minus1", @data_target = ".LogContent", @autocomplete = "off" }))
-			{
-				@await Html.PartialAsync("_LogSettings", Model.LogSettings)
-				<div class="LogContent d-flex flex-column overflow-auto mx-1">
-					@if (String.IsNullOrEmpty(Model.LogSettings.LogMessage))
-					{
-						@Model.LogSettings.LogMessage
-					}
+    <TabPanel id="system-logs">
+      @using (Html.BeginAreaForm("GetLogFile", "System", "Admin", FormMethod.Post, new { @class = "d-flex flex-column overflow-auto m-minus1", @data_target = ".LogContent", @autocomplete = "off" }))
+      {
+        @await Html.PartialAsync("_LogSettings", Model.LogSettings)
+        <div class="LogContent d-flex flex-column overflow-auto mx-1">
+          @if (String.IsNullOrEmpty(Model.LogSettings.LogMessage))
+          {
+            @Model.LogSettings.LogMessage
+          }
 
-					@await Html.PartialAsync("_Log", Model.LogSettings)
-				</div>
-			}
+          @await Html.PartialAsync("_Log", Model.LogSettings)
+        </div>
+      }
 
-			<modal class="nucleus-system-logging-configuration" modal-class="modal-lg" title="Logging Configuration">
-				<div class="alert alert-info">
-					Your current logging settings are listed below.  These settings are typically configured in your 
-					<span class="font-monospace">appSettings.@(Model.EnvironmentName).json</span>	file.
-				</div>
-				<table class="table table-sm">
-					<tr>
-						<th>Category</th>
-						<th>Level</th>
-					</tr>
-					@foreach (KeyValuePair<string, string> configItem in Model.LoggingSettingsConfiguration)
-					{
-						<tr>
-							@if (configItem.Key == "Default")
-							{
-								<td class="fw-bold">@configItem.Key</td>
-							}
-							else
-							{
-								<td>@configItem.Key</td>
-							}
-							<td>@configItem.Value</td>
-						</tr>
-					}
-				</table>
-			</modal>
-		</TabPanel>
-	</TabContent>
+      <modal class="nucleus-system-logging-configuration" modal-class="modal-lg" title="Logging Configuration">
+        <div class="alert alert-info">
+          Your current logging settings are listed below.  These settings are typically configured in your
+          <span class="font-monospace">appSettings.@(Model.EnvironmentName).json</span>	file.
+        </div>
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th scope="col">Category</th>
+              <th scope="col">Level</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach (KeyValuePair<string, string> configItem in Model.LoggingSettingsConfiguration)
+            {
+              <tr>
+                @if (configItem.Key == "Default")
+                {
+                  <td class="fw-bold">@configItem.Key</td>
+                }
+                else
+                {
+                  <td>@configItem.Key</td>
+                }
+                <td>@configItem.Value</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </modal>
+    </TabPanel>
+  </TabContent>
 </div>
 
 <script>
-	jQuery('.System .LogFile').on('change', function () { jQuery(this).parents('form').submit(); })
+  jQuery('.System .LogFile').on('change', function () { jQuery(this).parents('form').submit(); })
 </script>

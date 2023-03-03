@@ -29,7 +29,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// <hidden />
 	internal static class Account
 	{
-		internal static async Task<TagBuilder> Build(ViewContext context, object htmlAttributes)
+		internal static async Task<TagBuilder> Build(ViewContext context, string buttonClass, object htmlAttributes)
 		{
 			TagBuilder outputBuilder = new("div");			
 			IUrlHelper urlHelper = context.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(context);
@@ -45,8 +45,9 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				// user is logged in
 				TagBuilder accountMenuButtonBuilder = new("button");
 				accountMenuButtonBuilder.AddCssClass("btn btn-secondary dropdown-toggle");
+        accountMenuButtonBuilder.AddCssClass(buttonClass);
 
-				if (!context.HttpContext.User.IsApproved() || !context.HttpContext.User.IsVerified())
+        if (!context.HttpContext.User.IsApproved() || !context.HttpContext.User.IsVerified())
 				{
 					TagBuilder warningBuilder = new("span");
 					warningBuilder.AddCssClass("nucleus-material-icon pe-2");

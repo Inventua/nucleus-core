@@ -71,7 +71,7 @@ namespace Nucleus.Data.MySql
 		/// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
 		/// the database provider implementing this interface.
 		/// </summary>
-		public Dictionary<string, string> GetDatabaseInformation(IServiceProvider services, DatabaseConnectionOption options, string schemaName)
+		public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName)
 		{
 			Dictionary<string, string> results = new();
 
@@ -82,7 +82,12 @@ namespace Nucleus.Data.MySql
 			results.Add("Database", connection.Database);
 			results.Add("Version", ExecuteScalar(connection, "SELECT VERSION();"));
 
-      results.Add("Schema Version", ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new MySqlConnector.MySqlParameter("@schemaName", schemaName) }));
+      string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new MySqlConnector.MySqlParameter("@schemaName", schemaName) });
+      if (String.IsNullOrEmpty(schemaVersion) && schemaName == "*")
+      {
+        schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new MySqlConnector.MySqlParameter("@schemaName", "Nucleus.Core") });
+      }
+      results.Add("Schema Version", schemaVersion);
 
       results.Add("Size", 
 				ExecuteScalar(connection, "SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) AS 'database_size' FROM information_schema.tables WHERE table_schema = @dbname;", 

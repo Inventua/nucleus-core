@@ -6,6 +6,7 @@ using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.EventHandlers;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Data.Common
 {
@@ -33,19 +34,19 @@ namespace Nucleus.Data.Common
 		/// </remarks>
 		abstract public void CheckConnection();
 
-		/// <summary>
-		/// Get database diagnostics information for the specified schema.
-		/// </summary>
-		/// <param name="services"></param>
-		/// <param name="schemaName"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// The logic to check whether a specific database provider is the right one to use for the specified schema name 
-		/// is implemented within each <see cref="IDatabaseProvider"/> implementation.
-		/// </remarks>
-		public Dictionary<string, string> GetDatabaseInformation(IServiceProvider services, string schemaName)
+    /// <summary>
+    /// Get database diagnostics information for the specified schema.
+    /// </summary>
+    /// <param name="databaseOptions"></param>
+    /// <param name="schemaName"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// The logic to check whether a specific database provider is the right one to use for the specified schema name 
+    /// is implemented within each <see cref="IDatabaseProvider"/> implementation.
+    /// </remarks>
+    public Dictionary<string, string> GetDatabaseInformation(DatabaseOptions databaseOptions, string schemaName)
 		{
-			return DataProviderExtensions.GetDataProviderInformation(services, schemaName);			
+			return DataProviderExtensions.GetDataProviderInformation(databaseOptions, schemaName);			
 		}
 
 		/// <summary>

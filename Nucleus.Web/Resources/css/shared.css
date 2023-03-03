@@ -215,6 +215,14 @@ a *
 	border: solid 2px red!important;
 }
 
+
+
+.modal-auto-size.modal-dialog
+{
+  max-width: 80%;
+  width: auto;
+}
+
 /* override bootstrap modal width constraints & handle full-size modals */
 .modal-full-size.modal-dialog
 {
@@ -228,12 +236,6 @@ a *
 .modal-full-size.modal-dialog .modal-content
 {
   height: 100%;
-}
-
-.modal-auto-size.modal-dialog
-{
-  max-width: 80%;
-  width: auto;
 }
 
 .modal-dialog .modal-header
@@ -260,7 +262,7 @@ a *
   display: block;
 }
 
-.modal-auto-size.modal-dialog > .modal-content > .modal-header > .btn-maximize
+.modal-auto-size.modal-dialog:not(.modal-full-size) > .modal-content > .modal-header > .btn-maximize
 {
   display: block;
 }
@@ -387,10 +389,14 @@ table.table-sticky-headers thead th
 {
   border: 1px solid #dee2e6;
   border-top-width: 0;
-  padding: 0.6rem;
   display: flex;
   flex-grow: 1;
   overflow: auto;
+}
+
+.tab-content .tab-pane
+{
+  padding: 0.6rem;
 }
 
 .tab-content .tab-pane.active

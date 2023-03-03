@@ -53,8 +53,8 @@ namespace Nucleus.Core.Services
 		{
 			IEnumerable<ISystemEventHandler<TModel, TEvent>> handlers;
 
-			// If this.ContextAccessor is not null, use it to get scoped ISystemEventHandlers
-			if (this.ContextAccessor.HttpContext != null)
+			// If this.ContextAccessor/RequestServices is not null, use it to get scoped ISystemEventHandlers
+			if (this.ContextAccessor.HttpContext != null && this.ContextAccessor.HttpContext.RequestServices != null)
 			{
 				handlers = this.ContextAccessor.HttpContext.RequestServices.GetServices<ISystemEventHandler<TModel, TEvent>>();
 			}

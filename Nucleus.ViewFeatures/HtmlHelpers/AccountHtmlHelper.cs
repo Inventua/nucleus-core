@@ -14,15 +14,27 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 	/// </summary>
 	public static class AccountHtmlHelper
 	{
-		/// <summary>
-		/// Renders an account control.
-		/// </summary>
-		/// <param name="htmlHelper"></param>
-		/// <param name="htmlAttributes"></param>
-		/// <returns></returns>
-		public static async Task<IHtmlContent> Account(this IHtmlHelper htmlHelper, object htmlAttributes)
+    /// <summary>
+    /// Renders an account control.
+    /// </summary>
+    /// <param name="htmlHelper"></param>
+    /// <param name="htmlAttributes"></param>
+    /// <returns></returns>
+    public static async Task<IHtmlContent> Account(this IHtmlHelper htmlHelper, object htmlAttributes)
+    {
+      return await Nucleus.ViewFeatures.HtmlContent.Account.Build(htmlHelper.ViewContext, "", htmlAttributes);
+    }
+
+    /// <summary>
+    /// Renders an account control.
+    /// </summary>
+    /// <param name="htmlHelper"></param>
+    /// <param name="buttonClass" />
+    /// <param name="htmlAttributes"></param>
+    /// <returns></returns>
+    public static async Task<IHtmlContent> Account(this IHtmlHelper htmlHelper, string buttonClass, object htmlAttributes)
 		{			
-			return await Nucleus.ViewFeatures.HtmlContent.Account.Build(htmlHelper.ViewContext, htmlAttributes);
+			return await Nucleus.ViewFeatures.HtmlContent.Account.Build(htmlHelper.ViewContext, buttonClass, htmlAttributes);
 		}
 	}
 }

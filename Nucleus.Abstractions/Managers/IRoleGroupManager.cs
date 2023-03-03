@@ -31,12 +31,20 @@ namespace Nucleus.Abstractions.Managers
 		/// <returns></returns>
 		public Task<RoleGroup> Get(Guid id);
 
-		/// <summary>
-		/// List all <see cref="RoleGroup"/>s for the specified site.
+    /// <summary>
+		/// Retrieve an existing <see cref="RoleGroup"/> from the database.
 		/// </summary>
-		/// <param name="site"></param>
+    /// <param name="site"></param>
+    /// <param name="name"></param>
 		/// <returns></returns>
-		public Task<IEnumerable<RoleGroup>> List(Site site);
+		public Task<RoleGroup> GetByName(Site site, string name);
+
+    /// <summary>
+    /// List all <see cref="RoleGroup"/>s for the specified site.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <returns></returns>
+    public Task<IEnumerable<RoleGroup>> List(Site site);
 
 		/// <summary>
 		/// List paged <see cref="RoleGroup"/>s for the specified site.

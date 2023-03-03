@@ -15,10 +15,11 @@ using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Options;
 using Nucleus.Extensions.Authorization;
 using Nucleus.Extensions;
+using Nucleus.Extensions.Excel;
 
 namespace Nucleus.Web.Controllers.Admin
 {
-	[Area("Admin")]
+    [Area("Admin")]
 	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
 	public class UsersController : Controller
 	{
@@ -79,9 +80,9 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			IList<User> users = await this.UserManager.List(this.Context.Site);
 
-			var exporter = new Nucleus.Extensions.ExcelWriter<User>
+			var exporter = new ExcelWriter<User>
 			(
-				ExcelWriter.Modes.IncludeSpecifiedPropertiesOnly
+        ExcelWorksheet.Modes.IncludeSpecifiedPropertiesOnly
 			);
 
 			exporter.AddColumn(user => user.Id);
@@ -105,7 +106,7 @@ namespace Nucleus.Web.Controllers.Admin
 			exporter.Worksheet.Name = "Users";
 			exporter.Export(users);
 
-			return File(exporter.GetOutputStream(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Users Export {DateTime.Now}.xlsx");			
+			return File(exporter.GetOutputStream(), ExcelWriter.MIMETYPE_EXCEL, $"Users Export {DateTime.Now}.xlsx");			
 		}		
 
 		/// <summary>

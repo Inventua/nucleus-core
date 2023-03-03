@@ -91,7 +91,7 @@ namespace Nucleus.Core.Managers
 				layoutPath = layout.RelativePath;
 			}
 
-			fullPath = System.IO.Path.Combine(this.FolderOptions.Value.GetWebRootFolder(), layoutPath);
+			fullPath = System.IO.Path.Combine(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetWebRootFolder(), layoutPath);
 			layoutContent = await System.IO.File.ReadAllTextAsync(fullPath);
 
 			System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "RenderPaneAsync\\(\"(.*)\"\\)");

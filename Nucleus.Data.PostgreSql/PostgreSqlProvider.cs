@@ -68,7 +68,7 @@ namespace Nucleus.Data.PostgreSql
 		/// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
 		/// the database provider implementing this interface.
 		/// </summary>
-		public Dictionary<string, string> GetDatabaseInformation(IServiceProvider services, DatabaseConnectionOption options, string schemaName)
+		public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName)
 		{
 			Dictionary<string, string> results = new();
 
@@ -79,7 +79,13 @@ namespace Nucleus.Data.PostgreSql
 			results.Add("Version", ExecuteScalar(connection, "SHOW server_version"));
 			results.Add("Size", Convert.ToInt64(ExecuteScalar(connection, "SELECT pg_database_size(@dbname)", new System.Data.Common.DbParameter[] { new Npgsql.NpgsqlParameter("@dbname", connection.Database) })).FormatFileSize());
 			results.Add("Software", ExecuteScalar(connection, "SELECT version()"));
-      results.Add("Schema Version", ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Npgsql.NpgsqlParameter("@schemaName", schemaName) }));
+
+      string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Npgsql.NpgsqlParameter("@schemaName", schemaName) });
+      if (String.IsNullOrEmpty(schemaVersion) && schemaName == "*")
+      {
+        schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Npgsql.NpgsqlParameter("@schemaName", "Nucleus.Core") });
+      }
+      results.Add("Schema Version", schemaVersion);
 
       connection.Close();
 

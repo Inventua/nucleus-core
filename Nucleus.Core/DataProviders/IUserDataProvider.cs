@@ -33,7 +33,8 @@ namespace Nucleus.Core.DataProviders
 
 		abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<RoleGroup>> ListRoleGroups(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 		abstract Task<RoleGroup> GetRoleGroup(Guid roleGroupId);
-		abstract Task SaveRoleGroup(Site site, RoleGroup roleGroup);
+    abstract Task<RoleGroup> GetRoleGroupByName(Site site, string name);
+    abstract Task SaveRoleGroup(Site site, RoleGroup roleGroup);
 		abstract Task DeleteRoleGroup(RoleGroup roleGroup);
 
 		abstract Task<List<Role>> ListRoleGroupRoles(Guid RoleGroupId);

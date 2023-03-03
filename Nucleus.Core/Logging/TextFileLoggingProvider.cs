@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Core.Logging
 {

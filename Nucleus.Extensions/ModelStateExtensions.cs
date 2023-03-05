@@ -12,26 +12,29 @@ namespace Nucleus.Extensions
 	/// </summary>
 	public static class ModelStateExtensions
 	{
-    /// <summary>
-    /// Add a model state error message for the specified property.
-    /// </summary>
-    /// <typeparam name="TType"></typeparam>
-    /// <typeparam name="TModel"></typeparam>
-    /// <param name="modelState"></param>
-    /// <param name="expression"></param>
-    /// <param name="message"></param>
-    /// <exception cref="ArgumentException"></exception>
-    public static void AddModelError<TType, TModel>(this Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState, Expression<Func<TType, TModel>> expression, string message)
-    {
-      if (expression.Body is not MemberExpression memberExpression)
-      {
-        throw new ArgumentException("Expression must be a member expression.");
-      }
+    // Removed.   Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionaryExtensions already has an overload which matches
+    // this functionality.
 
-      string name = memberExpression.Member.Name;
+    /////// <summary>
+    /////// Add a model state error message for the specified property.
+    /////// </summary>
+    /////// <typeparam name="TType"></typeparam>
+    /////// <typeparam name="TModel"></typeparam>
+    /////// <param name="modelState"></param>
+    /////// <param name="expression"></param>
+    /////// <param name="message"></param>
+    /////// <exception cref="ArgumentException"></exception>
+    ////public static void AddModelError<TType, TModel>(this Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState, Expression<Func<TType, TModel>> expression, string message)
+    ////{
+    ////  if (expression.Body is not MemberExpression memberExpression)
+    ////  {
+    ////    throw new ArgumentException("Expression must be a member expression.");
+    ////  }
 
-      modelState.AddModelError(name, message);
-    }
+    ////  string name = memberExpression.Member.Name;
+
+    ////  modelState.AddModelError(name, message);
+    ////}
 
     /// <summary>
     /// Remove all items with the specifed prefix from model state

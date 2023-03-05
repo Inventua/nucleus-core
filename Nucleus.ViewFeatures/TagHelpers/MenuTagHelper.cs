@@ -55,6 +55,12 @@ namespace Nucleus.ViewFeatures.TagHelpers
     public string RootPageId { get; set; }
 
     /// <summary>
+		/// Specifies whether to render nothing if there are no pages in the menu.
+		/// </summary>
+		[HtmlAttributeName("hide-empty-menu")]
+    public Boolean HideEmptyMenu { get; set; } = true;
+
+    /// <summary>
     /// Generate the output.
     /// </summary>
     /// <param name="context"></param>
@@ -64,7 +70,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
 		{
       Guid.TryParse(this.RootPageId, out Guid pageId);
 
-			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Menu.Build(this.ViewContext, this.MenuStyle, this.RootPageType, pageId, this.MaxLevels, null);
+			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Menu.Build(this.ViewContext, this.MenuStyle, this.RootPageType, pageId, this.HideEmptyMenu, this.MaxLevels, null);
 
 			if (builder == null)
 			{

@@ -83,11 +83,11 @@ namespace Nucleus.ViewFeatures.HtmlContent
     }
 
 
-    internal static async Task<TagBuilder> Build(ViewContext context, MenuStyles menuStyle, RootPageTypes rootPageType, Guid rootPageId, int maxLevels, object htmlAttributes)
-		{
-			IUrlHelper urlHelper = context.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(context);
-			Context nucleusContext = context.HttpContext.RequestServices.GetService<Context>();
-			IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
+    internal static async Task<TagBuilder> Build(ViewContext context, MenuStyles menuStyle, RootPageTypes rootPageType, Guid rootPageId, Boolean hideEmptyMenu, int maxLevels, object htmlAttributes)
+    {
+      IUrlHelper urlHelper = context.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(context);
+      Context nucleusContext = context.HttpContext.RequestServices.GetService<Context>();
+      IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
       Page rootPage = null;
 
       switch (rootPageType)
@@ -123,25 +123,23 @@ namespace Nucleus.ViewFeatures.HtmlContent
       }
 
       PageMenu topMenu = await pageManager.GetMenu(nucleusContext.Site, rootPage, context.HttpContext.User, false);
-    //  PageMenu topMenu = await pageManager.GetMenu
-				//(
-				//	site,
-				//	null,
-				//	context.HttpContext.User,
-				//	false
-				//);
 
-			TagBuilder outputBuilder = new("nav");
-			outputBuilder.AddCssClass("navbar navbar-expand-lg navbar-light bg-light nucleus-menu");
+      if (hideEmptyMenu && !topMenu.HasChildren)
+      {
+        return null;
+      }
 
-			TagBuilder divBuilder = new("div");
-			divBuilder.AddCssClass("container-fluid");
+      TagBuilder outputBuilder = new("nav");
+      outputBuilder.AddCssClass("navbar navbar-expand-lg navbar-light bg-light nucleus-menu");
 
-			AddMainMenu(divBuilder, urlHelper, topMenu,menuStyle, maxLevels);
-			AddMobileMenu(divBuilder, urlHelper, topMenu);
+      TagBuilder divBuilder = new("div");
+      divBuilder.AddCssClass("container-fluid");
 
-			outputBuilder.InnerHtml.AppendHtml(divBuilder);
-			outputBuilder.MergeAttributes(htmlAttributes);
+      AddMainMenu(divBuilder, urlHelper, topMenu, menuStyle, maxLevels);
+      AddMobileMenu(divBuilder, urlHelper, topMenu);
+
+      outputBuilder.InnerHtml.AppendHtml(divBuilder);
+      outputBuilder.MergeAttributes(htmlAttributes);      
 
 			return outputBuilder;
 		}

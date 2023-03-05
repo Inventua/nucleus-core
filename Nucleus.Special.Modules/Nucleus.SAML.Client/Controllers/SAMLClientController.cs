@@ -749,9 +749,10 @@ namespace Nucleus.SAML.Client.Controllers
 							}
 						}
 
-						this.UserManager.SetNewUserFlags(site, loginUser);
+            // CreateNew already calls SetNewUserFlags.
+            //this.UserManager.SetNewUserFlags(site, loginUser);
 
-						if (settings.AutomaticallyVerifyNewUsers)
+            if (settings.AutomaticallyVerifyNewUsers)
 						{
 							loginUser.Verified = true;
 						}

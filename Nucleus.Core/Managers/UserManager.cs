@@ -214,6 +214,8 @@ namespace Nucleus.Core.Managers
 				result.Profile.Add(new UserProfileValue() { UserProfileProperty = property });
 			}
 
+      this.SetNewUserFlags(site, result);
+
 			return result;
 		}
 

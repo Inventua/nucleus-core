@@ -167,7 +167,8 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="site"></param>
 		/// <param name="user"></param>
 		/// <remarks>
-		/// This function should be called before saving a new user, if the user is self-registering.
+		/// This function is called by <see cref="CreateNew(Site)"/>, so it doesn't need to be called unless the user is being
+    /// created without a call to CreateNew().
 		/// </remarks>
 		public void SetNewUserFlags(Site site, User user);
 

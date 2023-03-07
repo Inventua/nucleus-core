@@ -19,6 +19,7 @@ using Nucleus.ViewFeatures;
 using Nucleus.Extensions;
 using Nucleus.Abstractions.Mail;
 using Nucleus.Abstractions.Models.Mail.Template;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Nucleus.Modules.Account.Controllers;
 
@@ -187,7 +188,8 @@ public class LoginController : Controller
 			{
 				Logger.LogWarning("User not found for username '{viewModel.Username}'.", viewModel.Username);
 				await Task.Delay(TimeSpan.FromSeconds(10));
-				return BadRequest("Invalid Username");
+        ModelState.AddModelError<ViewModels.Login>(model => model.Username, "Invalid username.");
+        return BadRequest(ModelState);
 			}
 			else
 			{
@@ -240,7 +242,7 @@ public class LoginController : Controller
 			return BadRequest();
 		}
 
-		return View("Recover", viewModel);
+		//return View("Recover", viewModel);
 	}
 
 

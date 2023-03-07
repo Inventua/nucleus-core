@@ -83,7 +83,9 @@ public class SignupController : Controller
     try
     {
       User newUser = await this.UserManager.CreateNew(this.Context.Site);
-      this.UserManager.SetNewUserFlags(this.Context.Site, newUser);
+
+      // CreateNew already calls SetNewUserFlags.
+      // this.UserManager.SetNewUserFlags(this.Context.Site, newUser);
 
       newUser.UserName = viewModel.User.UserName;
       newUser.Profile = viewModel.User.Profile;

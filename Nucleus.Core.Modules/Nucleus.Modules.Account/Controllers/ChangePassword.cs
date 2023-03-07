@@ -20,6 +20,7 @@ using Nucleus.ViewFeatures;
 using Nucleus.Abstractions.Models.Mail;
 using Microsoft.AspNetCore.Routing;
 using Nucleus.Extensions;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Nucleus.Modules.Account.Controllers
 {
@@ -75,7 +76,10 @@ namespace Nucleus.Modules.Account.Controllers
 
 			if (viewModel.ConfirmPassword != viewModel.NewPassword)
 			{
-				return BadRequest("Your new password and confirm password values do not match");
+        ModelState.AddModelError<ViewModels.ChangePassword>(model => model.ConfirmPassword, "Your new password and confirm password values do not match.");
+        return BadRequest(ModelState);
+
+        //return BadRequest("Your new password and confirm password values do not match");
 			}
 
 			if (User.IsSystemAdministrator())
@@ -89,21 +93,23 @@ namespace Nucleus.Modules.Account.Controllers
 
 			if (loginUser == null)
 			{
-				return Json(new { Title = "Change Password", Message = "You must login before you can change your password." });				
+				return Json(new { Title = "Change Password", Message = "You must log in before you can change your password.", Icon = "alert" });				
 			}
 			else
 			{
 				if (!loginUser.Approved)
 				{
-					return Json(new { Title = "Change Password", Message = "Your account has not been approved." });
+					return Json(new { Title = "Change Password", Message = "Your account has not been approved.", Icon = "warning" });
 				}
 				else if (!loginUser.Verified)
 				{
-					return Json(new { Title = "Change Password", Message = "Your account has not been verified." });
+					return Json(new { Title = "Change Password", Message = "Your account has not been verified.", Icon = "warning" });
 				}
 				else if (!viewModel.ExistingPasswordBlank && (String.IsNullOrEmpty(viewModel.Password) || !loginUser.Secrets.VerifyPassword(viewModel.Password)))
 				{
-					return Json(new { Title = "Change Password", Message = "Invalid password." });
+          ModelState.AddModelError<ViewModels.ChangePassword>(model => model.Password, "Invalid password.");
+          return BadRequest(ModelState);
+          //return Json(new { Title = "Change Password", Message = "Invalid password.", Icon = "warning" });
 				}
 				else
 				{

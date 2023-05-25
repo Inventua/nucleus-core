@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Declare the options 
+# Declare the options
 SHORT_OPTIONS=o:,z:,t:,u:,d:,h
 LONG_OPTIONS=output:,zipfile:,target-directory:,createuser:,createdirectories:,help
 
@@ -23,8 +23,8 @@ TARGET_DIRECTORY="/home/nucleus"
 SHELL_SCRIPT_VERSION="2022.12"
 
 printf "Nucleus installer shell script version %s. \n\n" "$SHELL_SCRIPT_VERSION"
-  
-OPTS=$(getopt -a -n "Nucleus Setup" --options $SHORT_OPTIONS --longoptions $LONG_OPTIONS -- "$@") 
+
+OPTS=$(getopt -a -n "Nucleus Setup" --options $SHORT_OPTIONS --longoptions $LONG_OPTIONS -- "$@")
 
 function usage()
 {
@@ -43,7 +43,7 @@ function usage()
   printf "                                        '%s', '%s'\n" "$TARGET_DIRECTORY" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
   printf "                                        and '%s' directories.\n" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_DATA]}"
   printf "                                        This also prevents the commands which set the correct owner\n"
-  printf "                                        and permissions to directories.\n" 
+  printf "                                        and permissions to directories.\n"
   #printf "  -o, --output [verbose|brief|none]     Verbose mode."
   printf "  -h, --help                            Print this Help.\n\n"
   printf "The installation script can be executed without any options. It will install with the following\n"
@@ -65,7 +65,7 @@ function usage()
 
 # User function
 function user_exists()
-{ 
+{
   if id "$SERVICE_ACCOUNT" >/dev/null 2>&1; then
     return 0
   else
@@ -162,12 +162,12 @@ if [ "$INSTALL_ZIPFILE" == "" ]; then
   # loop through nucleus install zip files and get the latest version
   for zipfileversion in Nucleus.*.zip;
   do
-    if [[ $zipfileversion =~ ^([A-Za-z_]+)\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Install\.zip ]]; then 
+    if [[ $zipfileversion =~ ^([A-Za-z_]+)\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Install\.zip ]]; then
       # default to the first zip file found
       if [ "$INSTALL_ZIPFILE" == "" ]; then
         INSTALL_ZIPFILE=$zipfileversion
       fi
-     
+
       vercomp "$VERSION" "${BASH_REMATCH[2]}"
       if [ "$?" == 2 ]; then
         # set the latest version of install zip file
@@ -179,16 +179,16 @@ if [ "$INSTALL_ZIPFILE" == "" ]; then
   done
 
   if [ "$INSTALL_ZIPFILE" == "" ]; then
-    # if INSTALL_ZIPFILE is blank, try an upgrade 
+    # if INSTALL_ZIPFILE is blank, try an upgrade
     # loop through nucleus upgrade zip files and get the latest version
     for zipfileversion in Nucleus.*.zip;
     do
-      if [[ $zipfileversion =~ ^([A-Za-z_]+)\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Upgrade\.zip ]]; then 
+      if [[ $zipfileversion =~ ^([A-Za-z_]+)\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Upgrade\.zip ]]; then
         # default to the first zip file found
         if [ "$INSTALL_ZIPFILE" == "" ]; then
           INSTALL_ZIPFILE=$zipfileversion
         fi
-       
+
         vercomp "$VERSION" "${BASH_REMATCH[2]}"
         if [ "$?" == 2 ]; then
           # set the latest version of upgrade zip file
@@ -198,7 +198,7 @@ if [ "$INSTALL_ZIPFILE" == "" ]; then
         fi
       fi
     done
-  fi  
+  fi
 else
   [[ $INSTALL_ZIPFILE =~ ^([A-Za-z_]+)\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.(.*)\.zip ]]
   VERSION="${BASH_REMATCH[2]}"
@@ -220,7 +220,7 @@ else
   INSTALL_MESSAGE="$INSTALL_TYPE"
 fi
 
-# Print settings, ask for confirmation 
+# Print settings, ask for confirmation
 printf "Your settings are:\n"
 printf "  - App path: '%s'.\n" "$TARGET_DIRECTORY"
 printf "  - Zip file: '%s'.\n\n" "$INSTALL_ZIPFILE"
@@ -240,7 +240,7 @@ fi
 # Create the service account
 if [ "$CREATE_USER" == true ]; then
   # check whether we need to create the service account
-  
+
   if user_exists ; then
     printf "%s user already exists.\n" "$SERVICE_ACCOUNT"
     #exit 1
@@ -260,17 +260,17 @@ fi
 # Create the directories, set the service account to be the group owner and the folder permissions
 if [ "$CREATE_DIRECTORIES" == true ]; then
   # home directory set by user
-  
+
   if ! directory_exists "$TARGET_DIRECTORY"; then
     mkdir "$TARGET_DIRECTORY"
   fi
   for folder in "${DIRECTORIES[@]}"
   do
-    
+
     if ! directory_exists "$TARGET_DIRECTORY/$folder"; then
       mkdir "$TARGET_DIRECTORY/$folder"
     fi
-    # Assign group ownership of app and data folders to service account 
+    # Assign group ownership of app and data folders to service account
     chown -R :$SERVICE_ACCOUNT "$TARGET_DIRECTORY/$folder"
   done
 
@@ -282,13 +282,13 @@ if [ "$CREATE_DIRECTORIES" == true ]; then
   chmod g+rx-w "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_CERTS]}"
 fi
 
-# Download and install the dotnet runtime 
+# Download and install the dotnet runtime
 if ! dpkg-query -W -f='${Status}' "aspnetcore-runtime-6.0"|grep "ok installed" > /dev/null ; then
   printf "Installing .NET...\n"
   apt-get -q update && apt-get -q -y install aspnetcore-runtime-6.0
 else
   printf ".NET is already installed.\n"
-fi 
+fi
 
 # add dotnet to the path
 echo PATH=\""$PATH":/usr/share/dotnet\" > /etc/environment
@@ -318,7 +318,7 @@ if ! directory_exists "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extension
 fi
 chown -R :$SERVICE_ACCOUNT "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions"
 
-# Set read, write and directory execute permissions for user (root). When this script is run with sudo 
+# Set read, write and directory execute permissions for user (root). When this script is run with sudo
 # the user acts as root so directories created by this script are owned by the root user.
 chmod -R u+rwX "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
 # Set read and directory execute permissions, remove write access for group (service account)
@@ -328,7 +328,7 @@ chmod -R g+rX-w "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
 # Nucleus must have read, write and execute permissions to /Setup because we create install-log.config to indicate that the setup wizard has completed
 chmod -R g+rwx "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Extensions" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Setup"
 
-# Copy the service unit file to system directory 
+# Copy the service unit file to system directory
 printf "Configuring the Nucleus service.\n"
 if [ ! -f "/etc/systemd/system/nucleus.service" ]; then
   cp "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Utils/Ubuntu/nucleus.service" "/etc/systemd/system"

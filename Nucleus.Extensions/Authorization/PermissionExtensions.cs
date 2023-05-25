@@ -35,7 +35,7 @@ namespace Nucleus.Extensions.Authorization
 				return true;
 			}
 
-			if (permission.AllowAccess)
+			if (permission.AllowAccess && permission.Role != null)
 			{
 				if (user.IsInRole(permission.Role.Name))
 				{

@@ -102,8 +102,9 @@ namespace Nucleus.Core.Managers
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{				
 				await provider.SaveRole(site, role);
-				this.CacheManager.RoleCache().Remove(role.Id);
 			}
+			
+			this.CacheManager.RoleCache().Remove(role.Id);
 		}
 
 		/// <summary>
@@ -115,8 +116,14 @@ namespace Nucleus.Core.Managers
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{
 				await provider.DeleteRole(role);
-				this.CacheManager.RoleCache().Remove(role.Id);
 			}
+
+			this.CacheManager.RoleCache().Remove(role.Id);
+
+			// The role that was just deleted would be cached against pages in the PageCache and PageMenuCache so we have to clear them.
+			this.CacheManager.PageCache().Clear();
+			this.CacheManager.PageMenuCache().Clear();
+
 		}
 
 	}

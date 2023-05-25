@@ -29,7 +29,7 @@
       }
     },
   "Nucleus": {
-    "EnableResponseCompression": true,
+    "EnableResponseCompression": false,
     "EnableForwardedHeaders": true,
     // MaxRequestSize:  Specifies the maximum MultipartBodyLengthLimit and IIS MaxRequestBodySize.  This value must be set high enough 
     // for the largest file upload that you want to allow.

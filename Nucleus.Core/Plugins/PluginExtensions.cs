@@ -61,15 +61,18 @@ namespace Nucleus.Core.Plugins
         foreach (Assembly assembly in AssemblyLoader.ListAssemblies())
         {
           string assemblyPath = Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(assembly.Location);
-          
-          // Note:  AdditionalReferencePaths expects the file name of an assembly, not a directory name.
-          if (!references.ContainsKey(assembly.GetName().Name))
+
+          if (assemblyPath.StartsWith(extensionsFolder, StringComparison.OrdinalIgnoreCase))
           {
-            references.Add(assembly.GetName().Name, assemblyPath);
-          }
-          else
-          {
-            builder.Logger().LogWarning("Skipped adding Razor runtime compliation additional reference path '{path}' because another copy exists at '{existing}'.", assemblyPath, references[assembly.GetName().Name]);
+            // Note:  AdditionalReferencePaths expects the file name of an assembly, not a directory name.
+            if (!references.ContainsKey(assembly.GetName().FullName))
+            {
+              references.Add(assembly.GetName().FullName, assemblyPath);
+            }
+            else
+            {
+              builder.Logger().LogWarning("Skipped adding Razor runtime compliation additional reference path '{path}' because another copy exists at '{existing}'.", assemblyPath, references[assembly.GetName().FullName]);
+            }
           }
         }
 

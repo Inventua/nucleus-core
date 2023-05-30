@@ -53,9 +53,9 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.1.0" />
-		<PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="1.1.0" />
-		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.1.0" />
+		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.2.0" />
+		<PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="1.2.0" />
+		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.2.0" />
 		<PackageReference Include="ITfoxtec.Identity.Saml2.MvcCore" Version="4.8.3-beta4" />
 	</ItemGroup>
 

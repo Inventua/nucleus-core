@@ -9,6 +9,7 @@ fixes and reliability enhancements.
 All core/free modules are now available for automatic installation using the store (from within the application, in the extensions control panel), 
 and are not included as separate "assets" in the 1.2.0.0 release.  This makes it easier to find the main install and upgrade downloads.
 
+You can view a full list of updates in GitHub: https://github.com/Inventua/nucleus-core/commits/main
 
 
 ## Version 1.1.0.0

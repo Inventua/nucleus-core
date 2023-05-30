@@ -76,10 +76,13 @@
 
 		jQuery('.nucleus-login').on('click', function()
 		{
-			var progress = jQuery('<div class="spinner-border spinner-border-sm text-primary nucleus-progress-spinner ms-2" role="status"/>');
-			progress.insertAfter(jQuery('#@(nameof(Nucleus.Modules.Account.ViewModels.Login.Username))'));
-		});
-
+      var usernameControl = jQuery('#@(nameof(Nucleus.Modules.Account.ViewModels.Login.Username))');
 			
+      if (usernameControl.siblings('nucleus-progress-spinner').length === 0)
+      {
+        var progress = jQuery('<div class="spinner-border spinner-border-sm text-primary nucleus-progress-spinner ms-2" role="status"/>');
+        progress.insertAfter(usernameControl);
+      }
+		});			
 	});
 </script>

@@ -137,7 +137,7 @@ function _Page()
 
 					event.stopPropagation();
 					instance.show();
-					instance._selectMenuItem(e);
+					instance._selectMenuItem(event);
 				}
 			}
 		});
@@ -152,11 +152,11 @@ function _Page()
 				if (menuToggleButton.length > 0)
 				{
 					var instance = bootstrap.Dropdown.getOrCreateInstance(menuToggleButton);
-					event.Key = event.which === 37 ? 'ArrowUp' : 'ArrowDown';
+					event.key = event.which === 37 ? 'ArrowUp' : 'ArrowDown';
 
 					event.stopPropagation();
 					instance.show();
-					instance._selectMenuItem(e);
+					instance._selectMenuItem(event);
 				}
 			}
 		});
@@ -200,7 +200,6 @@ function _Page()
 			event.stopImmediatePropagation();
 
 			var form = jQuery(this).parents('form');
-			//var parent = jQuery(this).parents('.FileSelector');
 			var uploadprogressWrapper = form.find('.UploadProgress').first();
 			var uploadprogress = uploadprogressWrapper.find('progress');
 			var uploadprogressLabel = uploadprogressWrapper.find('label');
@@ -209,7 +208,7 @@ function _Page()
 			uploadprogressWrapper.siblings('.alert').hide();
 			uploadprogressWrapper.show();
 
-			form.on('progress', function (e, percent)
+			form.on('progress', function (event, percent)
 			{
 				uploadprogress.attr('value', percent.toString());
 				uploadprogress.text(percent.toString() + '%');
@@ -217,7 +216,7 @@ function _Page()
 				var filesCount = 0;
 				var labeltext = 'file';
 
-				jQuery(e.currentTarget).find('input[type=file]').each(function (index, element)
+				jQuery(event.currentTarget).find('input[type=file]').each(function (index, element)
 				{
 					if (element != null && typeof(element.files) !== 'undefined')
 					{

@@ -1,16 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package id="2db48e5d-57db-485e-978e-635832749d28" 
-         xmlns="urn:nucleus/schemas/package/1.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
+<package id="2db48e5d-57db-485e-978e-635832749d28" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Publish</name>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
 		Combined news, blogs and announcements module.
 	</description>
-  <compatibility minVersion="1.1.0.0" maxVersion="*" />
-  
+  <compatibility minVersion="1.2.0.0" maxVersion="*" />
   <components>
     <component folderName="Publish" optional="false">
       <moduleDefinition id="20af00b8-1d72-4c94-bce7-b175e0b173af">
@@ -22,7 +18,6 @@
         <editAction>Settings</editAction>
         <categories>Content</categories>
       </moduleDefinition>
-      
       <moduleDefinition id="0E5D1826-045D-4F65-B753-F81563A01DD6">
         <friendlyName>Publish: Headlines</friendlyName>
         <extension>Publish</extension>
@@ -32,17 +27,14 @@
         <editAction>Settings</editAction>
         <categories>Content</categories>
       </moduleDefinition>
-      
       <file name="readme.txt" />
       <file name="license.txt" />
       <file name="viewer.css" />
       <file name="settings.css" />
       <file name="_ViewImports.cshtml" />
-      
       <folder name="Bin">
         <file name="Nucleus.Modules.Publish.dll" />
       </folder>
-      
       <folder name="Views">
         <file name="Viewer.cshtml" />
         <file name="Settings.cshtml" />
@@ -50,7 +42,6 @@
         <file name="ViewArticle.cshtml" />
         <file name="HeadlinesSettings.cshtml" />
         <file name="HeadlinesViewer.cshtml" />
-        
         <folder name="ViewerLayouts">
           <folder name="FrontPage">
             <folder name="ArticleLayouts">
@@ -61,28 +52,24 @@
               <file name="Index.cshtml" />
             </folder>
           </folder>
-          
           <folder name="Table">
             <folder name="MasterLayouts">
               <file name="Table.cshtml" />
             </folder>
           </folder>
-          
           <folder name="Tile">
             <folder name="ArticleLayouts">
               <file name="Normal.cshtml" />
             </folder>
-            
             <folder name="MasterLayouts">
               <file name="Tile-1-Column.cshtml" />
               <file name="Tile-2-Column.cshtml" />
-							<file name="Tile-1-Column-FillHeight.cshtml" />
-							<file name="Tile-2-Column-FillHeight.cshtml" />
+              <file name="Tile-1-Column-FillHeight.cshtml" />
+              <file name="Tile-2-Column-FillHeight.cshtml" />
             </folder>
-          </folder>          
+          </folder>
         </folder>
       </folder>
-
       <cleanup>
         <folder name="Views">
           <folder name="ViewerLayouts">

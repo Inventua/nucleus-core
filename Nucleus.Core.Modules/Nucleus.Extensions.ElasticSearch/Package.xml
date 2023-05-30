@@ -4,12 +4,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Elastic Search</name>
-  <version>1.0.1.0</version>
+  <version>1.2.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
 		Elastic search indexing components.
 	</description>
-  <compatibility minVersion="1.0.0.0" maxVersion="*" />
+  <compatibility minVersion="1.2.0.0" maxVersion="*" />
   <components>
     <component folderName="ElasticSearch" optional="false">
       <controlPanelExtensionDefinition id="3cf5e589-01c2-491b-8967-b05c084d1e87">

@@ -69,9 +69,9 @@ namespace Nucleus.Core.Plugins
             {
               references.Add(assembly.GetName().FullName, assemblyPath);
             }
-            else
+            else if (assemblyPath != references[assembly.GetName().FullName])
             {
-              builder.Logger().LogWarning("Skipped adding Razor runtime compliation additional reference path '{path}' because another copy exists at '{existing}'.", assemblyPath, references[assembly.GetName().FullName]);
+              builder.Logger().LogInformation("Skipped adding Razor runtime compliation additional reference path '{path}' because another copy exists at '{existing}'.", assemblyPath, references[assembly.GetName().FullName]);
             }
           }
         }

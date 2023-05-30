@@ -85,14 +85,24 @@ namespace Nucleus.Web
           .UseSystemd()
           .Build();
 
-        await CheckForAutoUpdates(WebHost);
+        if (await CheckForAutoUpdates(WebHost))
+        {
+          // shut down to clean up
+          WebHost?.Logger().LogInformation("Restarting after extensions auto-install.");
+          doRestart = true;
+        }
 
-        LaunchBrowser(args);
+        if (!doRestart)
+        {
+          LaunchBrowser(args);
 
-        // Disabled file system watcher, because Assembly load contexts are not unloading properly.  This disables the restart loop because doRestart 
-        // won't get set to true (which otherwise happens in FileChanged()).
-        // WatchFileChanges(WebHost.Services.GetService<IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions>>().Value.GetExtensionsFolder());
-        WebHost.Run();
+          // Disabled the file system watcher, because Assembly load contexts are not unloading properly.  This disables the restart loop because doRestart 
+          // won't get set to true (which otherwise happens in FileChanged()).
+          // WatchFileChanges(WebHost.Services.GetService<IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions>>().Value.GetExtensionsFolder());
+
+          // Start the application
+          WebHost.Run();
+        }        
       }
     }
 
@@ -160,9 +170,15 @@ namespace Nucleus.Web
         });
     }
 
-
-    public static async Task CheckForAutoUpdates(IHost host)
+    /// <summary>
+    /// Check for extension updates in Temp/Auto-Install and install them.  Return true if at least one extension was 
+    /// installed.
+    /// </summary>
+    /// <param name="host"></param>
+    /// <returns></returns>
+    public static async Task<Boolean> CheckForAutoUpdates(IHost host)
     {
+      Boolean result = false;
       IExtensionManager extensionManager = host.Services.GetService<IExtensionManager>();
       IOptions<FolderOptions> folderOptions = host.Services.GetService<IOptions<FolderOptions>>();
 
@@ -178,16 +194,29 @@ namespace Nucleus.Web
               await extensionManager.InstallExtension(location);
             }
 
-            // remove the file after it has been installed
-            System.IO.File.Delete(extensionFile);
+            result = true;
           }
           catch (Exception ex)
           {
             // if an exception occurs during auto-install, we don't want it to prevent the application from starting
-            host.Logger().LogError(ex,"Auto-installing {extensionFilename}", extensionFile);
+            host.Logger().LogError(ex, "Auto-installing {extensionFilename}", extensionFile);
+          }
+
+          // remove the extension installer file, whether it has been installed or not.  This prevents bad install sets
+          // from staying behind forever.
+          try
+          {
+            System.IO.File.Delete(extensionFile);
+          }
+          catch (Exception ex)
+          {
+            host.Logger().LogError(ex, "Deleting {extensionFilename}", extensionFile);
+            // suppress to stop exceptions which occur while deleting auto-install sets from disrupting app startup
           }
         }
       }
+
+      return result;
     }
 
     /// <summary>

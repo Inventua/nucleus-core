@@ -123,17 +123,17 @@ function _Page()
 
 		/* 
 			Handle keyboard events (arrow keys) on menu items which are links to a page but which which also have children.  These have
-			a toggle button immediately following them, which is what we 
+			a toggle button immediately following them, which is what we use to call _selectMenuItem in response to key presses.
 		*/
-		jQuery('.nucleus-menu [data-bs-toggle="dropdown-keyboardonly"]').on('keydown', function (e)
+		jQuery('.nucleus-menu [data-bs-toggle="dropdown-keyboardonly"]').on('keydown', function (event)
 		{
-			if ([37, 38, 39, 40].includes(e.which))  // arrow keys: 37,38,39,40: left/up/right/down
+			if ([37, 38, 39, 40].includes(event.which))  // arrow keys: 37,38,39,40: left/up/right/down
 			{
 				var menuToggleButton = jQuery(this).siblings('[data-bs-toggle="dropdown"]:not(.disabled):not(:disabled)');
 				if (menuToggleButton.length > 0)
 				{
 					var instance = bootstrap.Dropdown.getOrCreateInstance(menuToggleButton);
-					e.key = [37, 38].includes(e.which) ? 'ArrowUp' : 'ArrowDown';
+					event.key = [37, 38].includes(e.which) ? 'ArrowUp' : 'ArrowDown';
 
 					event.stopPropagation();
 					instance.show();
@@ -143,16 +143,16 @@ function _Page()
 		});
 
 		/* Make left/right keys work the same as up/down */
-		jQuery('.nucleus-menu .dropdown-menu').on('keydown', function (e)
+		jQuery('.nucleus-menu .dropdown-menu').on('keydown', function (event)
 		{
-			if ([37, 39].includes(e.which))  // left arrow, right arrow
+			if ([37, 39].includes(event.which))  // left arrow, right arrow
 			{
 				var menuToggleButton = jQuery(this).siblings('[data-bs-toggle="dropdown"]:not(.disabled):not(:disabled)');
 
 				if (menuToggleButton.length > 0)
 				{
 					var instance = bootstrap.Dropdown.getOrCreateInstance(menuToggleButton);
-					e.Key = e.which === 37 ? 'ArrowUp' : 'ArrowDown';
+					event.Key = event.which === 37 ? 'ArrowUp' : 'ArrowDown';
 
 					event.stopPropagation();
 					instance.show();
@@ -194,7 +194,7 @@ function _Page()
 		});
 
 		// handle file uploads
-		jQuery(document).on('change', 'input[type=file]', function ()
+		jQuery(document).on('change', 'input[type=file]', function (event)
 		{
 			event.preventDefault();
 			event.stopImmediatePropagation();
@@ -1291,19 +1291,38 @@ function _Page()
 	function _copyToClipboard(element)
 	{
 		if (jQuery(element).length === 0) return;
+    var value;
 
-		var temp = jQuery("<textarea>");
-		jQuery("body").append(temp);
-		if (jQuery(element).is('input, textarea'))
+		//var temp = jQuery("<textarea>");
+		//jQuery("body").append(temp);
+		//if (jQuery(element).is('input, textarea'))
+		//{
+		//	temp.val(jQuery(element).val().trim()).select();
+		//}
+		//else
+		//{
+		//	temp.val(jQuery(element)[0].innerText.replace(/[^\x20-\x7E\x0A\x0D]/g, '').trim()).select();
+  //  }
+		//document.execCommand("copy");
+		//temp.remove();
+
+    if (jQuery(element).is('input, textarea'))
 		{
-			temp.val(jQuery(element).val().trim()).select();
+			value = jQuery(element).val().trim();
 		}
 		else
 		{
-			temp.val(jQuery(element)[0].innerText.replace(/[^\x20-\x7E\x0A\x0D]/g, '').trim()).select();
+			value = jQuery(element)[0].innerText.replace(/[^\x20-\x7E\x0A\x0D]/g, '').trim();
     }
-		document.execCommand("copy");
-		temp.remove();
+
+    try
+    {
+      navigator.clipboard.writeText(value)
+    }
+    catch
+    {
+      // ignore 
+    }
 	}
 
 	function _maximizeDialog(element, maximize)

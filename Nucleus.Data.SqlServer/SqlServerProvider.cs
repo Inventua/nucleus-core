@@ -86,10 +86,10 @@ namespace Nucleus.Data.SqlServer
 
 			results.Add("Size", ExecuteReader(connection, "sp_spaceused", "database_size").ToString());
 
-      string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new SqlParameter("@schemaName", schemaName) });
+      string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM [Schema] WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new SqlParameter("@schemaName", schemaName) });
       if (String.IsNullOrEmpty(schemaVersion) && schemaName == "*")
       {
-        schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new SqlParameter("@schemaName", "Nucleus.Core") });
+        schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM [Schema] WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new SqlParameter("@schemaName", "Nucleus.Core") });
       }
       results.Add("Schema Version", schemaVersion);
 

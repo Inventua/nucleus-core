@@ -55,26 +55,26 @@
 			@foreach (var result in Model.SearchResults.Results)
 			{
 				<div class="search-result">
-					@if (Model.Settings.ShowUrl)
+          <a class="d-block result-link" href="@result.Url" title="@result.Title">@result.Title</a>
+
+          @if (Model.Settings.ShowUrl)
 					{
-						<span class="fst-italic small result-url">@Url.Content("~" + result.Url)</span>
+						<span class="fst-italic small result-url">@Url.GetAbsoluteUri(result.Url)</span>
 					}
 					@if ((Model.Settings.ShowPublishDate || Model.Settings.ShowSize) && (result.PublishedDate.HasValue || result.Size.HasValue))
 					{
 						<div class="text-muted small fst-italic result-meta">
 							@if (Model.Settings.ShowPublishDate && result.PublishedDate.HasValue)
 							{
-								<span>Published: @result.PublishedDate.FormatDate(this.Context.Request.GetUserTimeZone())</span>
+								<span>Published: @result.PublishedDate.FormatDate(this.Context.Request.GetUserTimeZone())@Html.Raw(".")</span>
 							}
-							
-							@if (Model.Settings.ShowSize && result.Size.HasValue)
+
+              @if (Model.Settings.ShowSize && result.Size.HasValue && result.Scope == @Nucleus.Abstractions.Models.FileSystem.File.URN)
 							{
 								<span>@result.Size.FormatFileSize()</span>
 							}
 						</div>
 					}
-
-					<a class="d-block result-link" href="@Url.Content("~" + result.Url)" title="@result.Title">@result.Title</a>
 
 					@if (Model.Settings.ShowSummary && !String.IsNullOrEmpty(@result.Summary))
 					{

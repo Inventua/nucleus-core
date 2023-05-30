@@ -69,6 +69,10 @@
 					@Html.CheckBoxFor(model => model.ShowPublishDate, new { @class = "ToggleSwitch" })
 				</SettingsControl>
 
+        <SettingsControl caption="Show Url?" rendermode="LabelLast" class="inner-inline" helptext="Display search result Url.">
+					@Html.CheckBoxFor(model => model.ShowUrl, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+
 				<SettingsControl caption="Show Size?" rendermode="LabelLast" class="inner-inline" helptext="Display search result size, if available.">
 					@Html.CheckBoxFor(model => model.ShowSize, new { @class = "ToggleSwitch" })
 				</SettingsControl>

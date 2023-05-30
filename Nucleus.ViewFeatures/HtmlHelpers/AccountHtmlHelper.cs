@@ -29,7 +29,10 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// Renders an account control.
     /// </summary>
     /// <param name="htmlHelper"></param>
-    /// <param name="buttonClass" />
+    /// <param name="buttonClass">
+    /// If a non-blank value is specified, the value is appended to the css class for buttons within the account control, and the default 
+    /// "btn-secondary" class is not applied.
+    /// </param>
     /// <param name="htmlAttributes"></param>
     /// <returns></returns>
     public static async Task<IHtmlContent> Account(this IHtmlHelper htmlHelper, string buttonClass, object htmlAttributes)

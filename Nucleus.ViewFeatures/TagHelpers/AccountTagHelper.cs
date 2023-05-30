@@ -32,6 +32,10 @@ namespace Nucleus.ViewFeatures.TagHelpers
     /// <summary>
     /// Css classes to apply to the dropdown button.
     /// </summary>
+    /// <remarks>
+    /// If a non-blank value is specified, the value is appended to the css class for buttons within the account control, and the default "btn-secondary" class 
+    /// is not applied.
+    /// </remarks>
     [HtmlAttributeName("button-class")]
     public string ButtonClass { get; set; }
 

@@ -1,4 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\Nucleus.Core\core.build.targets" />
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -6,7 +7,7 @@
     <Nullable>enable</Nullable>
 
 		<!-- This is overridden by core.build.targets -->
-		<VersionPrefix>1.0.1.0</VersionPrefix>
+		<!--<VersionPrefix>1.0.1.0</VersionPrefix>-->
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,5 +20,4 @@
     <ProjectReference Include="$(SolutionDir)\Nucleus.Data.EntityFramework\Nucleus.Data.EntityFramework.csproj" />
   </ItemGroup>
 
-	<Import Project="..\Nucleus.Core\core.build.targets" />
 </Project>

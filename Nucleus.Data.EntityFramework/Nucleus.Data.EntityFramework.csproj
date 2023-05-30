@@ -16,8 +16,8 @@
 		<Description>Base classes and utility functions for Nucleus data providers which use Entity-Framework.</Description>
 
     <!-- Version is set by core.build.targets, can be overridden here for pre-release builds -->
-    <VersionPrefix>1.1.0.1-pre</VersionPrefix>
-    <VersionSuffix>a4</VersionSuffix>
+    <!--<VersionPrefix>1.1.0.1-pre</VersionPrefix>
+    <VersionSuffix>a4</VersionSuffix>-->
 		
 		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>
 		<PackageTags>Nucleus</PackageTags>

@@ -1,11 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\Nucleus.Core\core.build.targets" />
+  
   <PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Nucleus.Data.Sqlite.xml</DocumentationFile>
 		<Description>Sqlite base classes and interfaces.</Description>
 
-		<!-- This is overridden by core.build.targets -->
-		<VersionPrefix>1.0.1.0</VersionPrefix>
+    <!-- Version is set by core.build.targets, can be overridden here for pre-release builds -->
+		<!--<VersionPrefix>1.0.1.0</VersionPrefix>-->
   </PropertyGroup>
 
 	<ItemGroup>
@@ -28,5 +30,4 @@
     <ProjectReference Include="$(SolutionDir)\Nucleus.Extensions\Nucleus.Extensions.csproj" />
   </ItemGroup>
 
-	<Import Project="..\Nucleus.Core\core.build.targets" />
 </Project>

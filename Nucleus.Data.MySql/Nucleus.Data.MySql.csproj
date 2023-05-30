@@ -1,12 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+	<Import Project="..\Nucleus.Core\core.build.targets" />
+
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-		<!-- This is overridden by core.build.targets -->
-		<VersionPrefix>1.0.1.0</VersionPrefix>
+    <!-- Version is set by core.build.targets, can be overridden here for pre-release builds -->
+		<!--<VersionPrefix>1.0.1.0</VersionPrefix>-->
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +20,4 @@
     <ProjectReference Include="$(SolutionDir)\Nucleus.Data.Common\Nucleus.Data.Common.csproj" />
     <ProjectReference Include="$(SolutionDir)\Nucleus.Data.EntityFramework\Nucleus.Data.EntityFramework.csproj" />
   </ItemGroup>
-
-	<Import Project="..\Nucleus.Core\core.build.targets" />
 </Project>

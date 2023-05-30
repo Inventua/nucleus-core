@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="core.build.targets" />
+  
   <PropertyGroup Label="Globals">
     <SccProjectName></SccProjectName>
     <SccProvider></SccProvider>
@@ -15,9 +17,9 @@
 		
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<Description>Nucleus core classes used by the Nucleus runtime.</Description>
-		
-		<!-- This is overridden by core.build.targets -->
-		<VersionPrefix>1.0.1.0</VersionPrefix>
+
+    <!-- Version is set by core.build.targets, can be overridden here for pre-release builds -->
+		<!--<VersionPrefix>1.0.1.0</VersionPrefix>-->
   </PropertyGroup>
 
 	<ItemGroup>
@@ -83,5 +85,4 @@
 		<None Remove="**\*.scc" />
 	</ItemGroup>
 
-	<Import Project="core.build.targets" />
 </Project>

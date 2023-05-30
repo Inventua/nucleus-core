@@ -1,5 +1,16 @@
 # Release Notes
 
+## Version 1.2.0.0
+1 June 2023
+
+Version 1.2.0.0 includes integration with the new Nucleus extensions store, along with improved Linux support some new API methods and minor bug 
+fixes and reliability enhancements.
+
+All core/free modules are now available for automatic installation using the store (from within the application, in the extensions control panel), 
+and are not included as separate "assets" in the 1.2.0.0 release.  This makes it easier to find the main install and upgrade downloads.
+
+
+
 ## Version 1.1.0.0
 14 December 2022
 

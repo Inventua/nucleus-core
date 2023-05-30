@@ -5,8 +5,8 @@
     <TargetFramework>net6.0</TargetFramework>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-		
-		<!-- This overrides the value set by core.build.targets -->
+
+    <!-- Version is set by core.build.targets, can be overridden here for pre-release builds -->
 		<!--<VersionPrefix>1.0.1.0</VersionPrefix>-->
   </PropertyGroup>
 

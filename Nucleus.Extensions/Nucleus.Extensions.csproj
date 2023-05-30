@@ -15,8 +15,8 @@
 		<Description>Provides extension methods for Nucleus and .Net core classes which provide functionality required by Nucleus core and extensions.</Description>
 
     <!-- Version is set by core.build.targets, can be overridden here for pre-release builds -->
-    <VersionPrefix>1.1.0.1-pre</VersionPrefix>
-    <VersionSuffix>a6.8</VersionSuffix>
+    <!--<VersionPrefix>1.1.0.1-pre</VersionPrefix>
+    <VersionSuffix>a6.8</VersionSuffix>-->
 
 		<PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
 		<PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>

@@ -83,7 +83,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
     }
 
 
-    internal static async Task<TagBuilder> Build(ViewContext context, MenuStyles menuStyle, RootPageTypes rootPageType, Guid rootPageId, Boolean hideEmptyMenu, int maxLevels, object htmlAttributes)
+    internal static async Task<TagBuilder> Build(ViewContext context, MenuStyles menuStyle, string menuClass, RootPageTypes rootPageType, Guid rootPageId, Boolean hideEmptyMenu, int maxLevels, object htmlAttributes)
     {
       IUrlHelper urlHelper = context.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(context);
       Context nucleusContext = context.HttpContext.RequestServices.GetService<Context>();
@@ -130,7 +130,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
       }
 
       TagBuilder outputBuilder = new("nav");
-      outputBuilder.AddCssClass("navbar navbar-expand-lg navbar-light bg-light nucleus-menu");
+      outputBuilder.AddCssClass("navbar navbar-expand-lg nucleus-menu");
+      outputBuilder.AddCssClass(String.IsNullOrEmpty(menuClass) ? "navbar-light bg-light" : menuClass);
 
       TagBuilder divBuilder = new("div");
       divBuilder.AddCssClass("container-fluid");

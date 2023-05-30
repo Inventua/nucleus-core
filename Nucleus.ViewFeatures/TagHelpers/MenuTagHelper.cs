@@ -43,6 +43,16 @@ namespace Nucleus.ViewFeatures.TagHelpers
 		public HtmlContent.Menu.MenuStyles MenuStyle { get; set; } = HtmlContent.Menu.MenuStyles.DropDown;
 
     /// <summary>
+    /// Css classes to apply to the menu button.
+    /// </summary>
+    /// <remarks>
+    /// If a non-blank value is specified, the value is added to the css class for the top-level div rendered for the
+    /// menu, and the default "navbar-light bg-light" classes are not applied.
+    /// </remarks>
+    [HtmlAttributeName("menu-class")]
+    public string MenuClass { get; set; }
+
+    /// <summary>
 		/// Menu root page type
 		/// </summary>
 		[HtmlAttributeName("rootPageType")]
@@ -70,7 +80,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
 		{
       Guid.TryParse(this.RootPageId, out Guid pageId);
 
-			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Menu.Build(this.ViewContext, this.MenuStyle, this.RootPageType, pageId, this.HideEmptyMenu, this.MaxLevels, null);
+			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Menu.Build(this.ViewContext, this.MenuStyle, this.MenuClass, this.RootPageType, pageId, this.HideEmptyMenu, this.MaxLevels, null);
 
 			if (builder == null)
 			{

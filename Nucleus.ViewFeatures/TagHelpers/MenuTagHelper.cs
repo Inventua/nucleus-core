@@ -78,7 +78,10 @@ namespace Nucleus.ViewFeatures.TagHelpers
     /// <returns></returns>
     async public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
 		{
-      Guid.TryParse(this.RootPageId, out Guid pageId);
+      if (!Guid.TryParse(this.RootPageId, out Guid pageId))
+      {
+        pageId = Guid.Empty;
+      }
 
 			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Menu.Build(this.ViewContext, this.MenuStyle, this.MenuClass, this.RootPageType, pageId, this.HideEmptyMenu, this.MaxLevels, null);
 

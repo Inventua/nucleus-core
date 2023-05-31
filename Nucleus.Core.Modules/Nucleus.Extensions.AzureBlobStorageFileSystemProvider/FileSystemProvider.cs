@@ -58,7 +58,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
       }
       else
       {
-        path = new PathUri(this.RootPath, parentPath, PathUri.AddDelimiter(newFolder));
+        path = new PathUri(this.RootPath, PathUri.AddDelimiter(parentPath) + PathUri.AddDelimiter(newFolder), true);
 				// folder is "in" a container, create zero-length blob to represent a folder 
 				BlobContainerClient containerClient = client.GetBlobContainerClient(path.ContainerName);
 				BlobClient blobClient = containerClient.GetBlobClient(path.Key);

@@ -124,7 +124,7 @@ namespace Nucleus.Core.FileProviders
 						{
 							PhysicalFileProvider fileProvider = new(System.IO.Path.Combine(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetWebRootFolder(), ""));
 
-							if (TryProvider(fileProvider, path, mergedcontent))
+							if (TryProvider(fileProvider, path, mergedcontent) || TryProvider(fileProvider, System.Web.HttpUtility.UrlDecode(path), mergedcontent))
 							{
 								Logger.LogTrace("Added {path} to result.", path);
 																

@@ -1092,17 +1092,20 @@ function _Page()
 					}
 				});
 
-				var modal = new bootstrap.Modal(wrapper, { backdrop: 'static' });
-        modal.show();
+        if (!wrapper.is(':visible'))
+        {
+          var modal = new bootstrap.Modal(wrapper, { backdrop: 'static' });
+          modal.show();
+        }
 
 				wrapper.off('shown.bs.modal');
 				wrapper.on('shown.bs.modal', function (event) { _removeDuplicateOverlays(event); });
-				wrapper.off('hide.bs.modal');
-				wrapper.on('hide.bs.modal', function (event) { _removeRelatedOverlays(event, this); });
+				wrapper.off('hidden.bs.modal');
+				wrapper.on('hidden.bs.modal', function (event) { _removeRelatedOverlays(event, this); });
 			}
 			else
 			{
-				_maximizeDialog(modal, false);
+				_maximizeDialog(wrapper, false);
 				wrapper.modal('hide');
 			}
 		}

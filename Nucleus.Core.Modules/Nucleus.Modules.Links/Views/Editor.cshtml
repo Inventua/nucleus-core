@@ -73,11 +73,11 @@
 		{
 			@Html.SubmitButton("", "Delete Link", @Url.NucleusAction("DeleteLink", "Admin", "Links", new { id = @Model.Link.Id }), new { @class = "btn btn-danger", data_target = "#LinksList", @data_confirm = "Delete this link?" })
 		}
-		<button type="button" class="btn btn-secondary ms-auto" onclick="jQuery('#LinksEditor').modal('hide');">Close</button>
+    <button type="button" class="btn btn-secondary ms-auto" data-bs-dismiss="modal">Close</button>
 	</div>
 }
 
-<script>
+<script> 
 	// Read the child pages of the item containing the "+" button
 	jQuery('.links-page-list').on('click', '.nucleus-get-childpages', function (e)
 	{

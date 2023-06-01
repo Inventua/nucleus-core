@@ -12,6 +12,7 @@ function _Page()
 	this.CopyToClipboard = _copyToClipboard;
 	this.Dialog = _dialog;
 	this.EnableEnhancedToolTips = _enableEnhancedToolTips;
+  this.ClosePopupDialog = _closePopupDialog;
 
   var _progressTimeoutId = -1;
 
@@ -117,8 +118,13 @@ function _Page()
 		jQuery(document).on('click', '.modal-dialog .modal-header .btn-normalsize, .modal-dialog .modal-header .btn-close', function (event)
 		{
 			_maximizeDialog(this, false);
-		});
-
+    });
+    
+    jQuery(document).on('click', '.nucleus-settings-frame *[data-bs-dismiss="modal"]', function (event)
+    {
+      _closePopupDialog(this);
+    });
+    
 		/* menu-submenu handling */
 
 		/* 
@@ -1349,6 +1355,20 @@ function _Page()
 		}
 	}
 
+  function _closePopupDialog(source)
+  {
+    if (jQuery(source).parents('.modal').length !== 0)
+    {
+      // editor popup from index
+      jQuery(source).parents('.modal').first().modal('hide');
+    }
+    else
+    {
+      // inline editor
+      window.parent.document.dispatchEvent(new CustomEvent('ClosePopupDialog', {}));
+    }
+  }
+
 	function _enableEnhancedToolTips(enable)
 	{		
 		jQuery('.settings-control[title]').each(function (index, element)
@@ -1459,7 +1479,7 @@ function _Page()
 
 
 		// Initialize a popup iframe (from _PopupEditor.cshtml) by finding it's parent .modal, and creating a Bootstrap modal.
-		window.document.addEventListener('InitFrame',
+		window.document.addEventListener('InitializePopupDialog',
 			function (args)
 			{
 				if (args.detail !== null && typeof (args.detail.element) !== 'undefined')
@@ -1485,6 +1505,12 @@ function _Page()
 					// make sure the iframe is visible
 					element.show();
 				}
-			}, false);
+      }, false);
+
+    window.document.addEventListener('ClosePopupDialog',
+      function (args)
+      {
+        jQuery('#nucleus-popupdialog').modal('hide');
+      }, false);
 	}
 }

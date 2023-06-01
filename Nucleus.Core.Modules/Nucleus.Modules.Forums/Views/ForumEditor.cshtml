@@ -142,7 +142,7 @@
 		{
 			<input type="submit" class="btn btn-danger" value="Delete Forum" formaction="@Url.NucleusAction("DeleteForum", "ForumsAdmin", "Forums")?id=@Model.Forum.Id&groupId=@Model.GroupId" data-target="#ForumList" data-confirm="Forums can only be deleted if they contain no posts.  Use the 'Enabled' setting to disable a forum which has existing posts.  Delete this forum?" />
 		}
-		<button type="button" class="btn btn-secondary ms-auto" onclick="jQuery('#ForumEditor').modal('hide');">Close</button>
+    <button type="button" class="btn btn-secondary ms-auto" data-bs-dismiss="modal">Close</button>
 	</div>
 }
 <script>

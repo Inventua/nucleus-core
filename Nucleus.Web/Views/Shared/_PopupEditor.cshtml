@@ -78,7 +78,7 @@
 			// Show the modal which contains the popup editor iframe
 			if (window.frameElement)
 			{
-				window.parent.document.dispatchEvent(new CustomEvent('InitFrame', { detail: { element: window.frameElement } }));
+        window.parent.document.dispatchEvent(new CustomEvent('InitializePopupDialog', { detail: { element: window.frameElement } }));
 			}
 		}
 	</script>

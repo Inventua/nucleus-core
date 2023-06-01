@@ -1,5 +1,5 @@
 ## Elastic Search Extension
-The Elastic Search extension provides a search index manager and a search provider (it both feeds the search index, and retrieves search results).  
+The Elastic Search extension provides a search index manager and a search provider (it both feeds the search index and retrieves search results).  
 
 > The Elastic Search extension provides an interface to Elastic Search, but does not include the Elastic Search application. You need an 
 [Elastic Search](https://www.elastic.co/) server to use the Elastic Search provider.  If you are setting up a new Elastic Search server, make sure to 

@@ -4,8 +4,9 @@
   <version>1.2.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
-		Application install set for the core Documents module.			
-	</description>
+    The documents module lists specified documents in a table or tile layout with optional sorting, categories and control over 
+    meta-data display.
+  </description>
   <compatibility minVersion="1.2.0.0" maxVersion="*" />
   <components>
     <component folderName="Documents" optional="false">

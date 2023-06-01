@@ -7,8 +7,8 @@
   <version>1.2.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
-		Elastic search indexing components.
-	</description>
+    The Elastic Search extension provides a search index manager and a search provider (it both feeds the search index and retrieves search results).
+  </description>
   <compatibility minVersion="1.2.0.0" maxVersion="*" />
   <components>
     <component folderName="ElasticSearch" optional="false">

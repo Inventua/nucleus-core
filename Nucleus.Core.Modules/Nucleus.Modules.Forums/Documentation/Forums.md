@@ -43,15 +43,15 @@ permission.  Forums can be configured to inherit group settings (including permi
 | Moderate                    | Moderator users receive moderator email notifications and can approve/reject new posts and replies.  |
 
 ### Forum and Forum Post Urls
-Each forums has an url which starts with the url of the page containing the module, plus the "friendly-encoded" name of the forum.  The "friendly encoded" name 
+Each forum has an url which starts with the url of the page containing the module, plus the "friendly-encoded" name of the forum.  The "friendly encoded" name 
 is in lower case, and has non-alphanumeric characters replaced with a dash.
 
 ### Status List
 If the forum has a status list defined, users with edit rights to a post can select a status for the post.  When you create a list in 
-`Manage`\`Lists`, you can use list item special values (you can use any text values you like, and these are what are shown on screen):
+`Manage` \ `Lists`, you can use list item special values (you can use any text values you like, and these are what are shown on screen):
 
 {.table-25-75}
-|                             |                                                                                      |
+| Special List Item Value     |                                                                                      |
 |-----------------------------|--------------------------------------------------------------------------------------|
 | default                     | If a list item with the value `default` is present in the list, new posts have their status set to this value automatically.  |
 | rejected                    | If a list item with the value `rejected` is present in the list, rejected posts have their status set to this value automatically..  |
@@ -142,8 +142,8 @@ You can use the forum as a parameter for the AbsoluteUrl() extension to create a
 ```
 
 {.table-25-75}
-| Post                        | An item in each forum's `Posts` list, representing a post with activity.             | 
 |-----------------------------|--------------------------------------------------------------------------------------|
+| Post                        | An item in each forum's `Posts` list, representing a post with activity.             | 
 | Subject                     | The post subject.  |
 
 You can use the post as a parameter for the AbsoluteUrl() extension to create a link to the forum.  
@@ -153,8 +153,8 @@ You can use the post as a parameter for the AbsoluteUrl() extension to create a 
 ```
 
 {.table-25-75}
-| Reply                       | An item in each forum's `Replies` list, representing a new post reply.             | 
 |-----------------------------|--------------------------------------------------------------------------------------|
+| Reply                       | An item in each forum's `Replies` list, representing a new post reply.             | 
 
 The reply object doesn't contain any data that you would want to include in a mail message, but you can use it to generate links to the forum post that it belongs to:
 

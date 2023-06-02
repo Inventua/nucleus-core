@@ -92,18 +92,17 @@
         }
         else if (Model.StoreSettings != null && Model.StoreSettings.StoreId != Guid.Empty && !Model.IsOwnerAssigned)
         {
-          <div class="alert alert-info">
+          <div class="alert alert-info azlert-dismissible fade show position-relative">
+            <a class="btn position-absolute top-0 end-0 nucleus-material-icon" data-bs-dismiss="alert">&#xe5cd;</a>
+            
             <h3>Extensions Store Registration</h3>
-            <p>
-              Your Nucleus instance has an extensions store Id, but it is not assigned to a Nucleus web site login.  If you assign a web site login, we can contact you with license-related 
-              information and you can manage your licenses on the Nucleus web site.
+            <p class="mb-1">
+              Your Nucleus instance has an extensions store subscription Id, but it is not assigned to a Nucleus web site login.  If you assign a web site login, we can contact you with license-related
+              information and you can manage your licenses on the Nucleus web site.  <strong>You can choose not to create or assign a Nucleus web site login to your subscription if you don't want to.</strong>
             </p>
-            <p>
-              You can choose not to create/assign a Nucleus web site login to this subscription if you don't want to.
-            </p>
-            <div class="nucleus-form-buttonrow">
+            <div class="d-flex gap-1">
               @Html.TextBoxFor(model => model.SubscriptionName, new { @class = "flex-grow-1", @placeholder = "subscription name (optional)"})
-              @Html.TextBoxFor(model => model.Username, new { @placeholder = "Nucleus login name"})
+              @Html.TextBoxFor(model => model.Username, new { @placeholder = "www.nucleus-cms.com login name", @size = "30" })
               @Html.PasswordFor(model => model.Password, new { @placeholder = "password"})
               <button type="submit" class="btn btn-primary" formaction="@Url.AreaAction("Register", "Extensions", "Admin")">Update Registration</button>
               <a class="btn btn-secondary" target="_blank" href="@(Model.StoreSettings.StoreUri)@Model.SelectedStore.RegisterPath">Create Login</a>

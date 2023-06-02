@@ -98,10 +98,15 @@ namespace Nucleus.Web.Controllers.Admin
       ExtensionsStoreSettings settings;
 
       viewModel.SelectedStore = this.StoreOptions.Value.Stores.Where(store => store.BaseUrl == viewModel.SelectedStoreUrl).FirstOrDefault();
+      
+      if (viewModel.SelectedStore == null)
+      {
+        viewModel.SelectedStore = this.StoreOptions.Value.Stores.FirstOrDefault();
+      }
 
       if (viewModel.SelectedStore == null)
       {
-        return BadRequest();
+        return BadRequest("No store available.");
       }
 
       settings = await this.StoreManager.Get(viewModel.SelectedStore.BaseUrl);

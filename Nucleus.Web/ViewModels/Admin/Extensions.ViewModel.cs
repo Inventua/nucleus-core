@@ -12,8 +12,9 @@ namespace Nucleus.Web.ViewModels.Admin
 		public string License { get; set; }
 		public Nucleus.Abstractions.Models.Extensions.package Package { get; set; }
 		public string FileId { get; set; }
+    public string Title { get; set; } = "Installation Complete.";
 
-		public List<string> Messages { get; } = new();
+    public List<string> Messages { get; } = new();
 		public List<Abstractions.Models.Extensions.package> InstalledExtensions { get; set; }
 
     public Abstractions.Models.Configuration.StoreOptions StoreOptions { get; set; }

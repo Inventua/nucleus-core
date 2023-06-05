@@ -24,10 +24,10 @@ namespace Nucleus.Core.Managers
 		private ILogger<IExtensionManager> Logger { get; }
 		private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
 
-		public ExtensionManager(IDataProviderFactory dataProviderFactory, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions, ILogger<IExtensionManager> logger)
+		public ExtensionManager(IDataProviderFactory dataProviderFactory, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions, ILogger<IExtensionManager> logger)
 		{
 			this.DataProviderFactory = dataProviderFactory;
-			this.FolderOptions = FolderOptions;
+			this.FolderOptions = folderOptions;
 			this.Logger = logger;
 		}
 
@@ -38,7 +38,7 @@ namespace Nucleus.Core.Managers
 		/// <returns></returns>
 		private ExtensionInstaller CreateInstaller(Abstractions.Models.Extensions.package package)
 		{
-			return new ExtensionInstaller(package, this, this.Logger);			
+			return new ExtensionInstaller(package, this, this.Logger, this.FolderOptions);			
 		}
 
 		/// <summary>
@@ -244,7 +244,7 @@ namespace Nucleus.Core.Managers
 		{
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
-				await provider .DeleteLayoutDefinition(layoutDefinition);
+				await provider.DeleteLayoutDefinition(layoutDefinition);
 			}
 		}
 

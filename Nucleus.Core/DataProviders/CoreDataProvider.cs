@@ -813,8 +813,15 @@ namespace Nucleus.Core.DataProviders
 		/// <param name="moduleDefinition"></param>
 		public async Task DeleteModuleDefinition(ModuleDefinition moduleDefinition)
 		{
-			this.Context.ModuleDefinitions.Remove(moduleDefinition);
-			await this.Context.SaveChangesAsync<ModuleDefinition>();
+      ModuleDefinition existing = await this.Context.ModuleDefinitions
+        .Where(existing => existing.Id == moduleDefinition.Id)
+        .FirstOrDefaultAsync();
+
+      if (existing != null)
+      {
+        this.Context.ModuleDefinitions.Remove(existing);
+        await this.Context.SaveChangesAsync<ModuleDefinition>();
+      }
 		}
 
 		#endregion
@@ -1756,8 +1763,15 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task DeleteLayoutDefinition(LayoutDefinition layoutDefinition)
 		{
-			this.Context.LayoutDefinitions.Remove(layoutDefinition);
-			await this.Context.SaveChangesAsync();
+      LayoutDefinition existing = await this.Context.LayoutDefinitions
+        .Where(existing=>existing.Id == layoutDefinition.Id)
+        .FirstOrDefaultAsync();
+
+      if (existing != null)
+      {
+        this.Context.LayoutDefinitions.Remove(existing);
+        await this.Context.SaveChangesAsync();
+      }
 		}
 
 		#endregion
@@ -1799,8 +1813,15 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task DeleteContainerDefinition(ContainerDefinition containerDefinition)
 		{
-			this.Context.ContainerDefinitions.Remove(containerDefinition);
-			await this.Context.SaveChangesAsync();
+      ContainerDefinition existing = await this.Context.ContainerDefinitions
+        .Where(existing => existing.Id == containerDefinition.Id)
+        .FirstOrDefaultAsync();
+
+      if (existing != null)
+      {
+        this.Context.ContainerDefinitions.Remove(existing);
+        await this.Context.SaveChangesAsync();
+      }
 		}
 
 		#endregion
@@ -1845,8 +1866,16 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task DeleteControlPanelExtensionDefinition(ControlPanelExtensionDefinition controlPanelExtensionDefinition)
 		{
-			this.Context.ControlPanelExtensionDefinitions.Remove(controlPanelExtensionDefinition);
-			await this.Context.SaveChangesAsync();
+      ControlPanelExtensionDefinition existing = await this.Context.ControlPanelExtensionDefinitions
+        .Where(existing => existing.Id == controlPanelExtensionDefinition.Id)
+        .FirstOrDefaultAsync();
+
+      if (existing != null)
+      {
+        this.Context.ControlPanelExtensionDefinitions.Remove(existing);
+        await this.Context.SaveChangesAsync();
+      }
+
 		}
 
 		#endregion

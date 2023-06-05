@@ -64,8 +64,9 @@ namespace Nucleus.Core
 		/// <remarks>
 		/// This constructor is called by the <see cref="ExtensionManager"/> class.  
 		/// </remarks>
-		internal ExtensionInstaller(Abstractions.Models.Extensions.package package, IExtensionManager extensionManager, ILogger<IExtensionManager> logger)
+		internal ExtensionInstaller(Abstractions.Models.Extensions.package package, IExtensionManager extensionManager, ILogger<IExtensionManager> logger, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
 		{
+			this.FolderOptions = folderOptions;
 			this.Package = package;
 			this.ExtensionManager = extensionManager;
 			this.Logger = logger;

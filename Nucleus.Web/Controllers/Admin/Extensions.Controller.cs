@@ -351,7 +351,9 @@ namespace Nucleus.Web.Controllers.Admin
         return BadRequest(ex.Message);
       }
 
-      return View("Complete", await BuildViewModel(viewModel));
+      viewModel = await BuildViewModel(viewModel);
+      viewModel.Title = "Uninstall Complete";
+      return View("Complete", viewModel);
     }
 
     private void GetSelectedStore(ViewModels.Admin.Extensions viewModel)

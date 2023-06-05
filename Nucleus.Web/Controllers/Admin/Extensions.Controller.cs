@@ -70,7 +70,7 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
     public async Task<ActionResult> QueryStoreSettings(ViewModels.Admin.Extensions viewModel)
     {
-      viewModel.SelectedStore = this.StoreOptions.Value.Stores.Where(store => store.BaseUrl == viewModel.SelectedStoreUrl).FirstOrDefault();
+      GetSelectedStore(viewModel);
 
       if (viewModel.SelectedStore == null)
       {
@@ -97,13 +97,7 @@ namespace Nucleus.Web.Controllers.Admin
     {
       ExtensionsStoreSettings settings;
 
-      viewModel.SelectedStore = this.StoreOptions.Value.Stores.Where(store => store.BaseUrl == viewModel.SelectedStoreUrl).FirstOrDefault();
-      
-      if (viewModel.SelectedStore == null)
-      {
-        viewModel.SelectedStore = this.StoreOptions.Value.Stores.FirstOrDefault();
-      }
-
+      GetSelectedStore(viewModel);
       if (viewModel.SelectedStore == null)
       {
         return BadRequest("No store available.");
@@ -179,8 +173,7 @@ namespace Nucleus.Web.Controllers.Admin
     [HttpPost]
     public async Task<ActionResult> InstallPackage(ViewModels.Admin.Extensions viewModel, Guid id)
     {
-      // Make sure selected Url is valid (is present in config)      
-      viewModel.SelectedStore = this.StoreOptions.Value.Stores.Where(store => store.BaseUrl == viewModel.SelectedStoreUrl).FirstOrDefault();
+      GetSelectedStore(viewModel);
 
       if (viewModel.SelectedStore == null)
       {
@@ -361,18 +354,25 @@ namespace Nucleus.Web.Controllers.Admin
       return View("Complete", await BuildViewModel(viewModel));
     }
 
+    private void GetSelectedStore(ViewModels.Admin.Extensions viewModel)
+    {
+      viewModel.SelectedStore = this.StoreOptions.Value.Stores
+        .Where(store => store.BaseUrl == viewModel.SelectedStoreUrl)
+        .FirstOrDefault();
+
+      if (viewModel.SelectedStore == null)
+      {
+        viewModel.SelectedStore = this.StoreOptions.Value.Stores.FirstOrDefault();
+      }
+    }
+
     private async Task<ViewModels.Admin.Extensions> BuildViewModel(ViewModels.Admin.Extensions viewModel)
     {
       viewModel.InstalledExtensions = new();
       viewModel.StoreOptions = this.StoreOptions.Value;
 
-      viewModel.SelectedStore = this.StoreOptions.Value.Stores.Where(store => store.BaseUrl == viewModel.SelectedStoreUrl).FirstOrDefault();
-
-      if (viewModel.SelectedStore == null)
-      {
-        viewModel.SelectedStore = viewModel.StoreOptions.Stores.FirstOrDefault();
-      }
-
+      GetSelectedStore(viewModel);
+      
       viewModel.InstalledExtensions = ListInstalledExtensions();
       viewModel.StoreSettings = await this.StoreManager.Get(viewModel.SelectedStore.BaseUrl);
 

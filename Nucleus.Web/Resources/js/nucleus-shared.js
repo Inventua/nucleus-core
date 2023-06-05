@@ -2,7 +2,7 @@
 var Page = new _Page();
 function _Page()
 {
-	// Public methods
+	// public methods
 	this.PostPartialContent = _postPartialContent;
 	this.GetPartialContent = _getPartialContent;
 	this.LoadPartialContent = _loadPartialContent;
@@ -14,12 +14,16 @@ function _Page()
 	this.EnableEnhancedToolTips = _enableEnhancedToolTips;
   this.ClosePopupDialog = _closePopupDialog;
 
+  // constants
+  var DIALOG_ID = 'nucleus-dialog';
+
+  // private properties
   var _progressTimeoutId = -1;
 
-	// Attach Nucleus-standard event handlers when document is ready
+	// attach Nucleus-standard event handlers when document is ready
 	jQuery(document).ready(function ()
 	{
-		// Capture the user's timezone.  We have to * -1 because the javascript getTimezoneOffset function returns an "opposite" value (The number of minutes returned 
+		// capture the user's timezone.  We have to * -1 because the javascript getTimezoneOffset function returns an "opposite" value (The number of minutes returned 
 		// by getTimezoneOffset()	is positive if the local time zone is behind UTC, and negative if the local time zone is ahead of UTC.For example, for UTC + 10, -600 will be returned.)
 		var timezoneOffset = new Date().getTimezoneOffset() * -1;
 		document.cookie = 'timezone-offset=' + timezoneOffset.toString() + '; path=/;SameSite=Strict;max-age=3600';
@@ -851,10 +855,6 @@ function _Page()
 
 	function _dialog(title, message, icon, okCaption, cancelCaption, action)
 	{
-		var DIALOG_ID = 'nucleus-dialog';
-
-		jQuery('#' + DIALOG_ID).remove();
-
 		if (typeof (okCaption) === 'undefined') okCaption = 'Ok';
 		if (typeof (cancelCaption) === 'undefined') cancelCaption = 'Close';
 
@@ -903,39 +903,67 @@ function _Page()
 				messages[index] = '<li>' + messageItem + '</li>';
 			}
 			message = '<ul>' + messages.join('') + '</ul>';
-		}
+    }
 
-		var dialogMarkup = jQuery(
-			'<div class="modal fade' + iconClass + '" id="' + DIALOG_ID + '" tabindex="-1" aria-label="' + title + '">' +
-			'  <div class="modal-dialog modal-dialog-centered modal-lg">' +
-			'    <div class="modal-content">' +
-			'      <div class="modal-header">' +
-			'        <h5 class="modal-title">' + title + '</h5>' +
-			'        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="' + cancelCaption + '"></button>' +
-			'      </div>' +
-			'      <div class="modal-body flex-row">' +
-			iconElement +
-			'        <div class="dialog-message">' + message.replace(new RegExp('\n', 'g'), '<br/>') + '</div>' +
-			'      </div>' +
-			'      <div class="modal-footer">' +
-			okButton +
-			'        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">' + cancelCaption + '</button>' +
-			'      </div>' +
-			'    </div>' +
-			'  </div >' +
-			'</div>');
+    message = message.replace(new RegExp('\n', 'g'), '<br/>');
 
-		jQuery('body').append(dialogMarkup);
+    // this code handles cases where a dialog has already been displayed, by replacing the title and content of
+    // an existing dialog, if a dialog is already present.  This typicalically happens when a user clicks a "submit"
+    // control to execute an action a second time, while a request is already in progress, like clicking the "Login"
+    // button more than once, so the title and message is usually the same as what is already being displayed.
+    var modalInstance = bootstrap.Modal.getInstance(document.getElementById('nucleus-dialog'));
+    var modalContent =
+      '    <div class="modal-content">' +
+      '      <div class="modal-header">' +
+      '        <h5 class="modal-title">' + title + '</h5>' +
+      '        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="' + cancelCaption + '"></button>' +
+      '      </div>' +
+      '      <div class="modal-body flex-row">' +
+      iconElement +
+      '        <div class="dialog-message">' + message + '</div>' +
+      '      </div>' +
+      '      <div class="modal-footer">' +
+      okButton +
+      '        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">' + cancelCaption + '</button>' +
+      '      </div>' +
+      '    </div>'
 
+    if (modalInstance === null)
+    {
+      // new dialog, create new dialog
+      var dialogMarkup = jQuery(
+        '<div class="modal fade' + iconClass + '" id="' + DIALOG_ID + '" tabindex="-1" aria-label="' + title + '">' +
+        '  <div class="modal-dialog modal-dialog-centered modal-lg">' +
+        modalContent +
+        '  </div >' +
+        '</div>');
+
+      jQuery('body').append(dialogMarkup);
+    }
+    else
+    {
+      // existing dialog, replace content
+      jQuery('#' + DIALOG_ID).find('.modal-dialog').html(modalContent);
+    }
+    
 		if (typeof action !== 'undefined')
 		{
-			dialogMarkup.find('.btn-primary').on('click', action);
+			jQuery('#' + DIALOG_ID).find('.btn-primary').on('click', action);
 		}
 
-		jQuery('#' + DIALOG_ID).on('hidden.bs.modal', function () { jQuery('#' + DIALOG_ID).remove(); });
-		var modal = new bootstrap.Modal('#' + DIALOG_ID);
-		modal.show();
-	}
+    // only create a new instance of bootstrap.Modal for the dialog if one doesn't already exist.  
+    if (modalInstance === null)
+    {
+      // when a dialog is closed, remove it from the DOM
+      jQuery('#' + DIALOG_ID).off('hidden.bs.modal');
+      jQuery('#' + DIALOG_ID).on('hidden.bs.modal', function () { jQuery('#' + DIALOG_ID).remove(); });
+
+      // create a new instance of bootstrap.Modal for the dialog
+      modalInstance = new bootstrap.Modal('#' + DIALOG_ID);      
+    }
+
+    modalInstance.show();
+  }
 
 	function _render(target, source, data, url, event, status, request)
 	{

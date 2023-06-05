@@ -551,7 +551,7 @@ function _Page()
         },
         error: function (request, status, message)
         {
-          _handleError(target, url, event, status, message, request);
+          _handleError(target, eventTarget, url, event, status, message, request);
           form.trigger('error', [target, url, event, status, message, request]);
         }
       })
@@ -581,11 +581,18 @@ function _Page()
 	 * @param {any} event
 	 */
 	function _loadPartialContent(event, url, target)
-	{
+  {
+    var source = null;
+
 		if (event !== null)
-		{
-			event.preventDefault();
-			event.stopImmediatePropagation();
+    {
+      if (event.currentTarget !== null && typeof event.currentTarget !== 'undefined')
+      {
+        source = jQuery(event.currentTarget);
+      }
+
+      event.preventDefault();
+      event.stopImmediatePropagation();      
 		}
 
 		if (typeof (target) === 'string')
@@ -599,8 +606,8 @@ function _Page()
       url: url,
       async: true,
 			headers: { 'Accept': 'application/json, */*' },
-			success: function (data, status, request) { _render(target, null, data, url, event, status, request); },
-			error: function (request, status, message) { _handleError(target, url, event, status, message, request); }
+			success: function (data, status, request) { _render(target, source, data, url, event, status, request); },
+			error: function (request, status, message) { _handleError(target, source, url, event, status, message, request); }
 		});
 	}
 
@@ -666,7 +673,7 @@ function _Page()
         async: true,
 				headers: { 'Accept': 'application/json, */*' },
 				success: function (data, status, request) { _render(target, jQuery(event.currentTarget), data, url, event, status, request); },
-				error: function (request, status, message) { _handleError(target, url, event, status, message, request); }
+				error: function (request, status, message) { _handleError(target, jQuery(event.currentTarget), url, event, status, message, request); }
 			});
 		}
 
@@ -706,7 +713,7 @@ function _Page()
 
 		if (triggerControl != null && triggerControl.hasClass('nucleus-show-progress'))
     {
-      _cancelProgressIndicators();
+      _cancelProgressIndicator();
       _progressTimeoutId = window.setTimeout(() =>
 			{
 				var progress = jQuery('<div class="spinner-border spinner-border-sm text-primary nucleus-progress-spinner ms-2" role="status"/>');
@@ -736,10 +743,11 @@ function _Page()
 		_dialog(title, message, 'question', 'Ok', 'Cancel', action);
 		return true;
 	}
-
-	function _handleError(target, url, event, status, message, request)
+ 
+	function _handleError(target, source, url, event, status, message, request)
 	{
-		// Handle response code "redirect", but with header X-Location rather than location.  Used by modules which need to return a redirect (302) without the browser automatically following it.
+		// Handle response code "redirect", but with header X-Location rather than location.  Used by modules which need to return a redirect (302) 
+    // without the browser automatically following it.
 		if (request.status === 302)
 		{
 			if (request.getResponseHeader('X-Location-Target') === '_top')
@@ -842,6 +850,8 @@ function _Page()
 			errorData.statusCode = request.status;
 		}
 
+    _cancelProgressIndicator();
+    _removeProgressIndicator(source);
 		_dialog(errorData.title, errorData.detail, errorData.icon ?? 'error')
 	}
 
@@ -980,7 +990,9 @@ function _Page()
     }
 
 		if (typeof (request.responseJSON) !== 'undefined' && typeof (request.responseJSON.message) !== 'undefined')
-		{
+    {
+      _cancelProgressIndicator();
+      _removeProgressIndicator(source);
       _dialog(request.responseJSON.title, request.responseJSON.message, request.responseJSON.icon);
 		}
 		else
@@ -1043,7 +1055,7 @@ function _Page()
 		}
 	}
 
-  function _cancelProgressIndicators()
+  function _cancelProgressIndicator()
   {
     // cancel setTimeout() handles used to create progress indicators.
     if (_progressTimeoutId >= 0)
@@ -1055,20 +1067,19 @@ function _Page()
 
 	function _postRender(target, source, data, status, request)
   {
-    _cancelProgressIndicators();
-
-    // remove any progress indicators from the event source element.
-    if (typeof source !== 'undefined' && source !== null && source.hasClass('nucleus-show-progress'))
-    {
-      if (source.hasClass('nucleus-show-progress-before') || source.hasClass('nucleus-show-progress-after'))
-      {
-        source.siblings('.nucleus-progress-spinner').remove();
-      }
-      else
-      {
-        source.find('.nucleus-progress-spinner').remove();
-      }      
-    }
+    _cancelProgressIndicator();    
+    _removeProgressIndicator(source);
+    //if (typeof source !== 'undefined' && source !== null && source.hasClass('nucleus-show-progress'))
+    //{
+    //  if (source.hasClass('nucleus-show-progress-before') || source.hasClass('nucleus-show-progress-after'))
+    //  {
+    //    source.siblings('.nucleus-progress-spinner').remove();
+    //  }
+    //  else
+    //  {
+    //    source.find('.nucleus-progress-spinner').remove();
+    //  }      
+    //}
 
 		if (!target.is(':visible') && data !== '')
 		{
@@ -1209,6 +1220,22 @@ function _Page()
 			}
 		}
 	}
+
+  // remove any progress indicators for the specified event source element.
+  function _removeProgressIndicator(source)
+  {
+    if (typeof source !== 'undefined' && source !== null && source.hasClass('nucleus-show-progress'))
+    {
+      if (source.hasClass('nucleus-show-progress-before') || source.hasClass('nucleus-show-progress-after'))
+      {
+        source.siblings('.nucleus-progress-spinner').remove();
+      }
+      else
+      {
+        source.find('.nucleus-progress-spinner').remove();
+      }
+    }
+  }
 
 	// Remove duplicate .modal-backdrop elements with the same parent.  When we do a partial render and replace/re-open a modal, 
 	// Bootstrap doesn't know about it, so it renders extra overlays - this code removes all duplicate overlays with the same parent, 

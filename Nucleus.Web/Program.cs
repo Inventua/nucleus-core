@@ -32,6 +32,12 @@ namespace Nucleus.Web
     private static bool isRestart = false;
 
     /// <summary>
+    /// Specifies that an event (like an auto-upgrade) occurred, and the application should shutdown so that the
+    /// host can restart it.
+    /// </summary>
+    private static bool doTerminate = false;
+
+    /// <summary>
     /// Application host instance
     /// </summary>
     private static IHost WebHost;
@@ -89,10 +95,10 @@ namespace Nucleus.Web
         {
           // shut down to clean up
           WebHost?.Logger().LogInformation("Restarting after extensions auto-install.");
-          doRestart = true;
+          doTerminate = true;
         }
 
-        if (!doRestart)
+        if (!doTerminate)
         {
           LaunchBrowser(args);
 

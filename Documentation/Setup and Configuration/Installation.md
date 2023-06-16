@@ -1,15 +1,15 @@
-# Installation 
+# Installing Nucleus
 Nucleus supports multiple hosting environments, database providers and file system providers.  The default configuration is set up to run
 in Windows/Internet Information Services using the Sqlite database provider and the local file system provider.
 
 See also:  [Hosting in Linux](/manage/hosting/linux/)
 
 ## Basic Setup 
-1. Download the install set (zip format) from the [downloads](/downloads) page.  For a new install, you will need to download the 
+1. Download the install set (zip format) from the [downloads](/downloads) page.  For a new installation, you will need to download the 
 Nucleus.[version].Install.zip file.
 
 2. Create an installation folder, and un-zip the install set to that folder.
-3. Install the [.Net Core Hosting Bundle](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/iis/hosting-bundle).  You 
+3. Install the [.Net Core Hosting Bundle](https://download.visualstudio.microsoft.com/download/pr/b84943df-6c61-4af8-91fc-a3981cd04eb8/69663d1ee22625a25d9f528b9dde0225/dotnet-hosting-6.0.18-win.exe).  You 
 may need to install the .Net Core Hosting Bundle and do a "Repair" install if IIS returns an error message and your Windows application event log 
 contains an entry with the message '... Ensure that the versions of Microsoft.NetCore.App and Microsoft.AspNetCore.App targeted by the application 
 are installed.'.  
@@ -26,10 +26,10 @@ You can use the command-line command:
 You can use the command-line command:  
 <kbd>ICACLS "[your-installation-folder]" /grant "IIS AppPool\NucleusAppPool:(OI)(CI)RX"</kbd>
 8. If you want to use a different database or file system provider, refer to the sections below.
-9. Browse to your web site address.  The new site wizard will appear, prompting you to set your site properties and administrator users.
+9. Browse to your web site address.  The new site wizard will appear, prompting you to set your site properties and create administrator users.
 
 ## Using a different database provider
-1. Create a database in your database server.
+1. Create a new empty database in your database server.
 2. In your installation folder, create a new database configuration file.  If you are setting up a production environment, the file should be named 
 `databaseSettings.Production.json`{.file-name}.  If you are setting up a development environment, name your file `databaseSettings.Development.json`{.file-name}. 
 Refer to the [Configuration Files](https://www.nucleus-cms.com/configuration-files/) page for more information.
@@ -51,7 +51,8 @@ Refer to the [Configuration Files](https://www.nucleus-cms.com/configuration-fil
       "Schemas": [
         {
           // A name of "*" makes this schema the default.  Using the root namespace of an extension as the name will 
-          // make the schema apply to that extension only.
+          // make the schema apply to that extension only.  The ConnectionKey value must match a Key from the Connections
+          // section.
           "Name": "*",
           "ConnectionKey": "nucleus"
         }
@@ -81,9 +82,9 @@ will change, as does the format of the [connection string](https://www.connectio
 > If your database administrator provides a connection string in a different format, you should use the format that they provide - the connection strings above are just examples.  
 
 ## Using a different File System provider
-If you want to use the Azure Blob Storage file system provider, you can either add it, so that both the Azure Blob Storage and Local File System providers are available, or
-replace the existing setting so that only the Azure Blob Storage file system provider is available.  If you are hosting in an Azure App Service, you should not use the 
-Local File System provider.  You can add another storage provider after you have set up the site.
+In Windows and Linux, if you want to use the Azure Blob Storage or Amazon S3 file system provider, you can either add it, so that both the cloud (Azure/S3) storage and Local File System providers 
+are available, or replace the existing setting so that only the Azure Blob Storage or Amazon S3 file system provider is available.  If you are hosting in an Azure App Service, you should 
+not use the Local File System provider.  You can add additional storage providers after you have set up the site.
 
 To configure your file system providers:
 1. In your installation folder, edit your environment application configuration file, or create one if it does not exist.  If you are setting up a production environment, 

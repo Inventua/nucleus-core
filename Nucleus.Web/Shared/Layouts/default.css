@@ -11,17 +11,6 @@
 	flex-direction: column;	
 }
 
-/*.BannerPane .Breadcrumbs
-{
-	margin-left: 4px;
-	vertical-align: middle;
-}*/
-
-/*.nucleus-account-control > *
-{
-	flex-grow: 0;
-}*/
-
 .ContentWrapper 
 {
 	flex-grow: 1;
@@ -47,7 +36,8 @@
 .BottomPane
 {
 	display: flex;
-	flex-direction: column;	
+	flex-direction: row;	
+  gap: 1rem;
 	background-color: #535353;
 	opacity: 0.9;
 	padding: 0.5rem;

@@ -65,6 +65,10 @@ General top-level settings.
 
 > The DataFolder setting can contain environment variables like `%ProgramData%`, which are resolved at run time.
 
+> Whenever you set a configuration file setting to a file system path, it is a good idea to use `/` instead of `\`, because:
+> 1. `/` is a reserved character in json.  
+> 2. Windows and Linux both understand `/` as a path delimiter, but Linux does not understand `\`.
+
 > File-based database providers (Sqlite) store database files in a `/Data` subfolder of the folder specified by `Nucleus:FolderOptions:DataFolder`.
 
 ### Nucleus:TextFileLoggerOptions

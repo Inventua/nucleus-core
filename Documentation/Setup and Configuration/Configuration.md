@@ -1,4 +1,7 @@
 # Configuration Files 
+> This page describes Nucleus configuration files in general.  The [Configuration Reference](/configuration-reference) 
+> page has information on specific settings.
+
 Nucleus configuration files are stored in your Nucleus application folder.  The default Nucleus configuration files are in .json format.
 
 Configuration settings can be split across multiple .json files, and you can place any setting in any .json file.  If a setting is duplicated in

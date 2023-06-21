@@ -535,23 +535,26 @@ namespace Nucleus.Core
 		{
 			Boolean result = true;
 
-			foreach (Abstractions.Models.Extensions.file file in folder.Items.OfType<Abstractions.Models.Extensions.file>())
-			{
-				if (!ValidateFile(componentFolder, path, file))
-				{
-					result = false;
-				}
-			}
+      if (folder.Items?.Any() == true)
+      {
+        foreach (Abstractions.Models.Extensions.file file in folder.Items.OfType<Abstractions.Models.Extensions.file>())
+        {
+          if (!ValidateFile(componentFolder, path, file))
+          {
+            result = false;
+          }
+        }
 
-			foreach (Nucleus.Abstractions.Models.Extensions.folder subfolder in folder.Items.OfType<Nucleus.Abstractions.Models.Extensions.folder>())
-			{
-				if (System.IO.Path.IsPathRooted(subfolder.name) || PathUtils.PathNavigatesAboveRoot(subfolder.name) || PathUtils.HasInvalidPathChars(subfolder.name))
-				{
-					throw new InvalidOperationException($"Folder name '{subfolder.name}' is invalid.");
-				}
-				
-				ValidateFolder(componentFolder, path + "/" + subfolder.name, subfolder);
-			}
+        foreach (Nucleus.Abstractions.Models.Extensions.folder subfolder in folder.Items.OfType<Nucleus.Abstractions.Models.Extensions.folder>())
+        {
+          if (System.IO.Path.IsPathRooted(subfolder.name) || PathUtils.PathNavigatesAboveRoot(subfolder.name) || PathUtils.HasInvalidPathChars(subfolder.name))
+          {
+            throw new InvalidOperationException($"Folder name '{subfolder.name}' is invalid.");
+          }
+
+          ValidateFolder(componentFolder, path + "/" + subfolder.name, subfolder);
+        }
+      }
 
 			return result;
 		}

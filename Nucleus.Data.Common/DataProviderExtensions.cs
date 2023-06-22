@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Nucleus.Abstractions.Models.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Nucleus.Data.Common
 {
@@ -28,10 +29,10 @@ namespace Nucleus.Data.Common
 			where TDataProvider : Nucleus.Data.Common.DataProvider
 		{
 			string schemaName = typeof(TDataProvider).GetDefaultSchemaName();
-			return AddDataProvider<TDataProvider>(services, configuration, schemaName);
+			return AddDataProvider<TDataProvider>(services, configuration, schemaName, true);
 		}
 
-		/// <summary>
+    /// <summary>
 		/// Add data provider objects to the service collection for the data provider specified by TDataProvider.  This overload allows callers 
 		/// to specify their schema name instead of using the default.
 		/// </summary>
@@ -41,10 +42,28 @@ namespace Nucleus.Data.Common
 		/// <param name="schemaName"></param>
 		/// <returns></returns>
 		/// <remarks>
-		/// Data providers which are based on Nucleus.Data.EntityFramework do not need to call this directly - it is called by the
-		/// Nucleus.Data.EntityFramework.DataProviderExtensions.AddDataProvider() methods.
+		/// This overload is used when developers want to specify their schema name instead of using the default.
 		/// </remarks>
 		static public IServiceCollection AddDataProvider<TDataProvider>(this IServiceCollection services, IConfiguration configuration, string schemaName)
+      where TDataProvider : Nucleus.Data.Common.DataProvider
+    {
+      return AddDataProvider<TDataProvider>(services, configuration, schemaName, false);
+    }
+
+    /// <summary>
+    /// Add data provider objects to the service collection for the data provider specified by TDataProvider.  This overload allows callers 
+    /// to specify their schema name instead of using the default.
+    /// </summary>
+    /// <typeparam name="TDataProvider"></typeparam>
+    /// <param name="services"></param>
+    /// <param name="configuration"></param>
+    /// <param name="schemaName"></param>
+    /// <param name="canUseDefault"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// This overload is used when developers want to specify their schema name, but want Nucleus to "fall back" to using the default.
+    /// </remarks>
+    static private IServiceCollection AddDataProvider<TDataProvider>(this IServiceCollection services, IConfiguration configuration, string schemaName, Boolean canUseDefault)
 			where TDataProvider : Nucleus.Data.Common.DataProvider
 		{
 			Boolean success = false;
@@ -68,7 +87,7 @@ namespace Nucleus.Data.Common
 				if (instance != null)
 				{
 					// Get connection data for the specified schema name.  If it is found, add data provider objects to the services collection.
-					DatabaseConnectionOption connectionOption = options.GetDatabaseConnection(schemaName);
+					DatabaseConnectionOption connectionOption = options.GetDatabaseConnection(schemaName, canUseDefault);
 
 					if (connectionOption != null && connectionOption.Type.Equals(instance.TypeKey(), StringComparison.OrdinalIgnoreCase))
 					{
@@ -81,8 +100,8 @@ namespace Nucleus.Data.Common
 
 			if (!success)
 			{
-				throw new InvalidOperationException($"Nucleus could not find a configured data provider for {typeof(TDataProvider).FullName}.");
-			}
+        throw new InvalidOperationException($"Nucleus could not find a configured data provider for schema '{schemaName}'.");
+      }
 
 			return services;
 		}

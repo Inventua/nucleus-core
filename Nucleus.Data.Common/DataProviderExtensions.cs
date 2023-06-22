@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Nucleus.Abstractions.Models.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace Nucleus.Data.Common
 {

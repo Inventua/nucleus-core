@@ -1,7 +1,7 @@
 # Release Notes
 
 ## Version 1.2.0.0
-1 June 2023
+22 June 2023
 
 Version 1.2.0.0 includes integration with the new Nucleus extensions store, along with improved Linux support some new API methods and minor bug 
 fixes and reliability enhancements.

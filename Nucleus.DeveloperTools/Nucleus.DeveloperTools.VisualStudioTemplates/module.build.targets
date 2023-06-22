@@ -160,8 +160,10 @@
 		is not executed unless the %NUCLEUS_PUBLISH_PATH% environment variable is set, and most developers will not set this environment
 		variable.  If you want to set %NUCLEUS_PUBLISH_PATH%, the value should be set to a folder (anywhere) that you want to automatically 
 		populate with a copy of all extension install sets.
+    
+    This step can be disabled by adding <CopyToPublishFolder>false</CopyToPublishFolder> to a module's project file. 
 	-->
-	<Target Name="CopyToExtensionPublishFolder" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release' AND '$(NUCLEUS_PUBLISH_PATH)' != '' AND Exists('$(NUCLEUS_PUBLISH_PATH)Extensions')">
+	<Target Name="CopyToExtensionPublishFolder" AfterTargets="PostBuildEvent" Condition="$(CopyToPublishFolder) != false AND '$(Configuration)' == 'Release' AND '$(NUCLEUS_PUBLISH_PATH)' != '' AND Exists('$(NUCLEUS_PUBLISH_PATH)Extensions')">
 		<ItemGroup>
 			<PublishExtensionsFilesToDelete Include="$(NUCLEUS_PUBLISH_PATH)Extensions\$(ExtensionFolder)_Extension*.zip"/>
 		</ItemGroup>

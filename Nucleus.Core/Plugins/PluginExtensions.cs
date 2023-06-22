@@ -90,7 +90,7 @@ namespace Nucleus.Core.Plugins
     }
 
 		/// <summary>
-		/// Iterate through assemblies in /bin and /modules/**, add assemblies which contain Controller classes to Part Manager so that DI/MVC 
+		/// Iterate through assemblies in /bin and /extensions/**, add assemblies which contain Controller classes to Part Manager so that DI/MVC 
 		/// can use them.  The call to GetControllerAssemblies checks for classes which implement Microsoft.AspNetCore.Mvc.Controller.	 
 		/// </summary>
 		/// <param name="builder">IMvcBuilder instance used to configure services.</param>
@@ -99,10 +99,10 @@ namespace Nucleus.Core.Plugins
 		{			
 			foreach (Assembly assembly in AssemblyLoader.GetAssembliesImplementing<Controller>(builder.Logger()))
 			{
-				builder.Logger()?.LogInformation("Adding controllers from {assemblyname} [{assemblyLocation}].", assembly.FullName,		assembly.Location.Replace(Environment.CurrentDirectory, ""));
+				builder.Logger()?.LogInformation("Adding controllers from {assemblyname} [{assemblyLocation}].", assembly.FullName, assembly.Location.Replace(Environment.CurrentDirectory, ""));
 
 				Microsoft.AspNetCore.Mvc.ApplicationParts.AssemblyPart part = new(assembly);
-
+        
 				// only add assembly to application parts if it is not already present (adding twice throws a AmbiguousMatchException exception)
 				if (!ApplicationPartContains(builder, part))
 				{

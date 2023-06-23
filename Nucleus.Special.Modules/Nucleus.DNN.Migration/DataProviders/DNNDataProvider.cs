@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office2021.Excel.RichDataWebImage;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.EventHandlers;
@@ -25,9 +26,32 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
   public async Task<Models.DNN.Version> GetVersion()
   {
     return await this.Context.Version
-      .OrderBy(version => version.Major)
-        .ThenBy(version => version.Minor)
-        .ThenBy(version => version.Build)
+      .OrderByDescending(version => version.Major)
+        .ThenByDescending(version => version.Minor)
+        .ThenByDescending(version => version.Build)
       .FirstOrDefaultAsync();
+  }
+
+  public async Task<List<Models.DNN.Portal>> ListPortals()
+  {
+    return await this.Context.Portals
+      .ToListAsync();
+  }
+
+  public async Task<List<Models.DNN.RoleGroup>> ListRoleGroups(int portalId)
+  {
+    return await this.Context.RoleGroups
+      .Where(group => group.PortalId == portalId && group.Roles.Any())
+      .ToListAsync();
+  }
+
+  public async Task<List<Models.DNN.Role>> ListRoles(int portalId)
+  {
+    string[] RESERVED_ROLES = { "Administrators", "Registered Users" };
+
+    return await this.Context.Roles
+      .Where(role => role.PortalId == portalId && role.Users.Any() && !RESERVED_ROLES.Contains(role.RoleName))
+      .Include(role => role.RoleGroup)
+      .ToListAsync();
   }
 }

@@ -1,71 +1,83 @@
-//{
-//	"schemaName": "Nucleus.DNN.Migration",
-//	"version": "01.00.00",
-//	"operations": [
-//		{
-//			"createTable": {
-//				"name": "Models.Migration",
-//				"columns": [
-//					{
-//						"name": "Id",
-//						"clrType": "guid",
-//						"isnullable": false
-//					},
-//					{
-//						"name": "ModuleId",
-//						"clrType": "guid",
-//						"isnullable": false
-//					},
-//					{
-//						"name": "Title",
-//						"clrType": "string",
-//						"maxLength": 256,
-//						"isnullable": false
-//					},
-//					{
-//						"name": "DateAdded",
-//						"clrType": "datetime",
-//						"isnullable": true
-//					},
-//					{
-//						"name": "AddedBy",
-//						"clrType": "guid",
-//						"isnullable": true
-//					},
-//					{
-//						"name": "DateChanged",
-//						"clrType": "datetime",
-//						"isnullable": true
-//					},
-//					{
-//						"name": "ChangedBy",
-//						"clrType": "guid",
-//						"isnullable": true
-//					}
-//				],
-//				"primaryKey": {
-//					"name": "PK_Models.Migration",
-//					"isclustered": true,
-//					"columns": [ "Id" ]
-//				},
-//				"foreignKeys": [
-//					{
-//						"name": "FK_Models.Migration_ModuleId",
-//						"Columns": [ "ModuleId" ],
-//						"PrincipalTable": "PageModules",
-//						"PrincipalColumns": [ "Id" ],
-//						"OnDelete": "Cascade"
-//					}
-//				]
-//			}
-//		},
-//		{
-//			"createIndex": {
-//				"name": "IX_Models.Migration_ModuleId",
-//				"table": "Models.Migration",
-//				"isunique": false,
-//				"columns": [ "ModuleId" ]
-//			}
-//		}
-//	]
-//}
+{
+	"schemaName": "Nucleus.DNN.Migration",
+	"version": "01.00.00",
+	"operations": [
+		{
+			"createTable": {
+				"name": "MigrationHistory",
+        "columns": [
+          {
+            "name": "Id",
+            "clrType": "guid",
+            "isnullable": false
+          },
+          {
+            "name": "SourceEntity",
+            "clrType": "string",
+            "maxLength": 256,
+            "isnullable": false
+          },
+          {
+            "name": "SourceKey",
+            "clrType": "string",
+            "maxLength": 256,
+            "isnullable": false
+          },
+          {
+            "name": "TargetEntity",
+            "clrType": "string",
+            "maxLength": 256,
+            "isnullable": false
+          },
+          {
+            "name": "TargetKey",
+            "clrType": "string",
+            "maxLength": 256,
+            "isnullable": false
+          },
+          {
+            "name": "DateAdded",
+            "clrType": "datetime",
+            "isnullable": true
+          },
+          {
+            "name": "AddedBy",
+            "clrType": "guid",
+            "isnullable": true
+          },
+          {
+            "name": "DateChanged",
+            "clrType": "datetime",
+            "isnullable": true
+          },
+          {
+            "name": "ChangedBy",
+            "clrType": "guid",
+            "isnullable": true
+          }
+        ],
+				"primaryKey": {
+					"name": "PK_MigrationHistory",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				}
+			}
+		},
+    {
+      "createIndex": {
+        "name": "IX_Models.Migration_Source",
+        "table": "MigrationHistory",
+        "isunique": true,
+        "columns": [ "SourceEntity", "SourceKey" ]
+      }
+    },
+    {
+      "createIndex": {
+        "name": "IX_Models.Migration_Target",
+        "table": "MigrationHistory",
+        "isunique": true,
+        "columns": [ "TargetEntity", "TargetKey" ]
+      }
+    }
+	]
+}

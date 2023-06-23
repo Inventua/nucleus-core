@@ -6,7 +6,7 @@
 	<description>
 		Tools for migrating DNN data to Nucleus.
 	</description>
-	<compatibility minVersion="1.1.0.0" maxVersion="*" />
+	<compatibility minVersion="1.2.1.0" maxVersion="*" />
 	
 	<components>
 		<component folderName="DNNMigration" optional="false">
@@ -15,7 +15,7 @@
         <description>Migrate data from DotNetNuke.</description>
         <controllerName>DNNMigration</controllerName>
         <extensionName>DNNMigration</extensionName>
-        <scope>Global</scope>
+        <scope>Site</scope>
         <editAction>Index</editAction>
       </controlPanelExtensionDefinition>
 
@@ -29,6 +29,10 @@
 			<folder name="Views">
 				<file name="_ViewImports.cshtml" />
 				<file name="Index.cshtml" />
+        <file name="_Roles.cshtml" />
+        <file name="_Files.cshtml" />
+        <file name="_Pages.cshtml" />
+        <file name="_Users.cshtml" />
 			</folder>
 			
 		</component>

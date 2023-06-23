@@ -14,7 +14,7 @@ namespace Nucleus.DNN.Migration.DataProviders;
 
 public class DNNMigrationDbContext : Nucleus.Data.EntityFramework.DbContext
 {
-  public DbSet<Models.MigrationLog> MigrationLogs { get; set; }
+  public DbSet<Models.MigrationHistory> MigrationHistory { get; set; }
 
   public DNNMigrationDbContext(DbContextConfigurator<DNNMigrationDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
   {

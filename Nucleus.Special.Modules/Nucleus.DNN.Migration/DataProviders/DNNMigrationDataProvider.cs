@@ -28,27 +28,27 @@ public class DNNMigrationDataProvider : Nucleus.Data.EntityFramework.DataProvide
     this.Context = context;
   }
 
-  public async Task<Models.MigrationLog> Get(Guid id)
+  public async Task<Models.MigrationHistory> Get(Guid id)
   {
-    return await this.Context.MigrationLogs
+    return await this.Context.MigrationHistory
       .Where(log => log.Id == id)
       .AsNoTracking()
       .FirstOrDefaultAsync();
   }
 
-  public async Task<IList<Models.MigrationLog>> List()
+  public async Task<IList<Models.MigrationHistory>> List()
   {
-    return await this.Context.MigrationLogs
+    return await this.Context.MigrationHistory
       .AsNoTracking()
       .AsSingleQuery()
       .ToListAsync();
   }
 
-  public async Task Save(Models.MigrationLog migrationLog)
+  public async Task Save(Models.MigrationHistory migrationLog)
   {
     Action raiseEvent;
 
-    Boolean isNew = !await this.Context.MigrationLogs
+    Boolean isNew = !await this.Context.MigrationHistory
       .Where(existing => existing.Id == migrationLog.Id)
       .AsNoTracking()
       .AnyAsync();
@@ -59,12 +59,12 @@ public class DNNMigrationDataProvider : Nucleus.Data.EntityFramework.DataProvide
     if (isNew)
     {
       this.Context.Entry(migrationLog).State = EntityState.Added;
-      raiseEvent = new(() => { this.EventManager.RaiseEvent<Models.MigrationLog, Create>(migrationLog); });
+      raiseEvent = new(() => { this.EventManager.RaiseEvent<Models.MigrationHistory, Create>(migrationLog); });
     }
     else
     {
       this.Context.Entry(migrationLog).State = EntityState.Modified;
-      raiseEvent = new(() => { this.EventManager.RaiseEvent<Models.MigrationLog, Update>(migrationLog); });
+      raiseEvent = new(() => { this.EventManager.RaiseEvent<Models.MigrationHistory, Update>(migrationLog); });
     }
 
     await this.Context.SaveChangesAsync();
@@ -72,9 +72,9 @@ public class DNNMigrationDataProvider : Nucleus.Data.EntityFramework.DataProvide
     raiseEvent.Invoke();
   }
 
-  public async Task Delete(Models.MigrationLog migrationLog)
+  public async Task Delete(Models.MigrationHistory migrationLog)
   {
     this.Context.Remove(migrationLog);
-    await this.Context.SaveChangesAsync<Models.MigrationLog>();
+    await this.Context.SaveChangesAsync<Models.MigrationHistory>();
   }
 }

@@ -1,0 +1,76 @@
+﻿@model Nucleus.DNN.Migration.ViewModels.Role
+@Html.AddStyle("~!/../index.css")
+<h2 class="nucleus-control-panel-heading">Migrate DNN Roles and Groups</h2>
+<div class="dnn-migration">
+  <div class="alert alert-primary">
+    <ul>
+      <li>Role groups are only migrated if they contain at least one role.</li>
+      <li>Roles are only migrated if they contain at least one user.</li>
+      <li>The "Administrators" and "Registered Users" roles will not be migrated.</li>
+      <li>There @(@Model.RoleGroups.Count == 1 ? "is" : "are") @Model.RoleGroups.Count role group@(@Model.RoleGroups.Count == 1 ? "" : "s") to migrate.</li>
+      <li>There are @Model.Roles.Count roles to migrate.</li>
+    </ul>
+  </div>
+
+  @using (Html.BeginNucleusForm("MigrateRoles", "DNNMigration", "DNNMigration", FormMethod.Post, new { }))
+  {
+    @Html.HiddenFor(model => model.PortalId)
+    <button type="submit" class="btn btn-primary" data-confirm="Migrate selected Roles and Groups from DotNetNuke now?  This action cannot be reversed.">Migrate Roles and Groups</button>
+
+    <div class="my-2">
+      <h2>Role Groups</h2>
+      <table class="table table-striped table-sm">
+        <thead>
+          <tr>
+            <th />
+            <th>Id</th>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        
+        @for (int index = 0; index < Model.RoleGroups.Count; index++)
+        {
+          <tr>
+            <td>
+              @Html.CheckBoxFor(model=> model.RoleGroups[index].IsSelected)
+              @Html.HiddenFor(model=> model.RoleGroups[index].RoleGroupId)
+            </td>
+            <td>@Model.RoleGroups[index].RoleGroupId</td>
+            <td>@Model.RoleGroups[index].RoleGroupName</td>
+            <td>@Model.RoleGroups[index].Description</td>
+          </tr>
+        }
+      </table>
+    </div>
+
+    <div>
+      <h2>Roles</h2>
+      <table class="table table-striped table-sm">
+        <thead>
+          <tr>
+            <th />
+            <th>Id</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Role Group</th>
+          </tr>
+        </thead>
+        @for (int index = 0; index < Model.Roles.Count; index++)
+        {
+          <tr>
+            <td>
+              @Html.HiddenFor(model=> model.Roles[index].RoleId)
+              @Html.CheckBoxFor(model=> model.Roles[index].IsSelected)
+            </td>
+            <td>@Model.Roles[index].RoleId</td>
+            <td>@Model.Roles[index].RoleName</td>
+            <td>@Model.Roles[index].Description</td>
+            <td>@Model.Roles[index].RoleGroup?.RoleGroupName</td>
+          </tr>
+        }
+      </table>
+     
+    </div>
+  }
+</div>

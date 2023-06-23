@@ -13,4 +13,8 @@ public class Version
   public int Minor { get; set; }
   public int Build { get; set; }
 
+  public override string ToString()
+  {
+    return $"{this.Major}.{this.Minor}.{this.Build}";
+  }
 }

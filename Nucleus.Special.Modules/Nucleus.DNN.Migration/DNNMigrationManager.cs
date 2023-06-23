@@ -23,18 +23,7 @@ public class DNNMigrationManager
     this.DataProviderFactory.PreventSchemaCheck(Startup.DNN_SCHEMA_NAME);    
   }
 
-  public async Task<Models.DNN.Version> GetDNNVersion()
-  {
-    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
-    {
-      // we must handle a null provider here, which will happen if there is no configured database schema with name "DNN".  The
-      // main view shows a warning message when version = null
-      if (provider == null) { return null; }
-
-      return await provider.GetVersion();
-    }
-  }
-
+  #region "    Migration History    "
   /// <summary>
   /// Create a new <see cref="Models.Migration"/> with default values.
   /// </summary>
@@ -43,37 +32,11 @@ public class DNNMigrationManager
   /// <remarks>
   /// The new <see cref="Models.Migration"/> is not saved to the database until you call <see cref="Save(PageModule, Models.Migration)"/>.
   /// </remarks>
-  public Models.MigrationLog CreateNew()
+  public Models.MigrationHistory CreateNew()
   {
-    Models.MigrationLog result = new();
+    Models.MigrationHistory result = new();
 
     return result;
-  }
-
-  /// <summary>
-  /// Retrieve an existing <see cref="Models.Migration"/> from the database.
-  /// </summary>
-  /// <param name="id"></param>
-  /// <returns></returns>
-  public async Task<Models.MigrationLog> Get(Guid id)
-  {    
-    using (DNNMigrationDataProvider provider = this.DataProviderFactory.CreateProvider<DNNMigrationDataProvider>())
-    {
-      return await provider.Get(id);
-    }
-   
-  }
-
-  /// <summary>
-  /// Delete the specified <see cref="Models.Migration"/> from the database.
-  /// </summary>
-  /// <param name="Models.Migration"></param>
-  public async Task Delete(Models.MigrationLog migrationLog)
-  {
-    using (DNNMigrationDataProvider provider = this.DataProviderFactory.CreateProvider<DNNMigrationDataProvider>())
-    {
-      await provider.Delete(migrationLog);
-    }
   }
 
   ///// <summary>
@@ -94,12 +57,49 @@ public class DNNMigrationManager
   /// </summary>
   /// <param name="module"></param>
   /// <param name="Models.Migration"></param>
-  public async Task Save(PageModule module, Models.MigrationLog migrationLog)
+  public async Task Save(PageModule module, Models.MigrationHistory migrationHistory)
   {
     using (DNNMigrationDataProvider provider = this.DataProviderFactory.CreateProvider<DNNMigrationDataProvider>())
     {
-      await provider.Save(migrationLog);      
+      await provider.Save(migrationHistory);      
+    }
+  }
+  #endregion
+
+
+  public async Task<Models.DNN.Version> GetDNNVersion()
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      // we must handle a null provider here, which will happen if there is no configured database schema with name "DNN".  The
+      // main view shows a warning message when version = null
+      if (provider == null) { return null; }
+
+      return await provider.GetVersion();
     }
   }
 
+  public async Task<List<Models.DNN.Portal>> ListDNNPortals()
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.ListPortals();
+    }
+  }
+
+  public async Task<List<Models.DNN.RoleGroup>> ListDNNRoleGroups(int portalId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.ListRoleGroups(portalId);
+    }
+  }
+
+  public async Task<List<Models.DNN.Role>> ListDNNRoles(int portalId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.ListRoles(portalId);
+    }
+  }
 }

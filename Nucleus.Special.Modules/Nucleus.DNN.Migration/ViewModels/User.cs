@@ -11,14 +11,9 @@ using System.Threading.Tasks;
 
 namespace Nucleus.DNN.Migration.ViewModels;
 
-public class Index 
+public class User
 {
-  public Models.DNN.Version Version { get; set; }
-
-  public List<Models.DNN.Portal> Portals { get; set; }
   public int PortalId { get; set; }
 
-
-  public string ConnectionString { get; set; }
-
+  public List<Models.DNN.User> Users { get; set; }  
 }

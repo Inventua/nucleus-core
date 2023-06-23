@@ -25,6 +25,10 @@
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="Views\Index.cshtml" />
+    <None Remove="Views\_Files.cshtml" />
+    <None Remove="Views\_Pages.cshtml" />
+    <None Remove="Views\_Roles.cshtml" />
+    <None Remove="Views\_Users.cshtml" />
 		<None Remove="Views\_ViewImports.cshtml" />
   </ItemGroup>
 
@@ -33,6 +37,10 @@
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
     <Content Include="index.css" />
+    <Content Include="Views\_Users.cshtml" />
+    <Content Include="Views\_Pages.cshtml" />
+    <Content Include="Views\_Files.cshtml" />
+    <Content Include="Views\_Roles.cshtml" />
 		<Content Include="Views\_ViewImports.cshtml" />
     <Content Include="Views\Index.cshtml" />
   </ItemGroup>

@@ -6,39 +6,56 @@
   {
     <div class="alert alert-warning">
       <h2>Database Connection not Configured</h2>
-      In order to use the DNN Migration tool, you must edit your databaseSettings.{environment}.json file, and add connection 
+      In order to use the DNN Migration tool, you must edit your databaseSettings.{environment}.json file, and add connection
       information for your DotNetNuke database, with a schema key named "DNN".
     </div>
   }
   else
   {
-    @using (Html.BeginNucleusForm("Settings", "DNNMigration", "DNNMigration", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+    <div class="alert alert-primary">
+      <h2>DotNetNuke</h2>
+      <div>
+        Connected to DotNetNuke: @Model.ConnectionString
+      </div>
+      <div>
+        DotNetNuke Version: @Model.Version
+      </div>
+    </div>
+
+    @using (Html.BeginForm())
     {
+      <div>
+        <h3>Select Source Portal</h3>
+        @Html.DropDownListFor(model => model.PortalId, new SelectList(Model.Portals, "PortalId", "PortalName"), "(select)", new(){} )
+      </div>
+
       <ol>
         <li>
-          <button class="btn btn-primary">Roles</button>
+          <button type="submit" formaction="@Url.NucleusAction("RolesIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary" data-target="#MigrateRoles">Roles</button>
           <span class="action-description">Migrate roles and role groups from DNN</span>
         </li>
 
         <li>
-          <button class="btn btn-primary">Files</button>
+          <button type="submit" formaction="@Url.NucleusAction("FilesIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary" data-target="#MigrateFiles">Files</button>
           <span class="action-description">Migrate files and folders from DNN</span>
         </li>
 
         <li>
-          <button class="btn btn-primary">Pages</button>
+          <button type="submit" formaction="@Url.NucleusAction("PagesIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary" data-target="#MigratePages">Pages</button>
           <span class="action-description">Migrate pages and modules from DNN</span>
         </li>
 
         <li>
-          <button class="btn btn-primary">Users</button>
+          <button type="submit" formaction="@Url.NucleusAction("UsersIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary" data-target="#MigrateUsers">Users</button>
           <span class="action-description">Migrate users and user-role memberships from DNN</span>
         </li>
       </ol>
     }
-
     @*  documents, links, media  *@
     <modal id="MigrateRoles" title="Migrate Roles"></modal>
+    <modal id="MigrateFiles" title="Migrate Files"></modal>
+    <modal id="MigratePages" title="Migrate Pages"></modal>
+    <modal id="MigrateUsers" title="Migrate Users"></modal>
   }
 
 </div>

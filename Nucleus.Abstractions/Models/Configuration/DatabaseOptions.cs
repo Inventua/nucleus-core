@@ -38,6 +38,29 @@ namespace Nucleus.Abstractions.Models.Configuration
     }
 
     /// <summary>
+    /// Find a configuration "schema" section matching the specified schema name.
+    /// </summary>
+    /// <param name="schemaName"></param>
+    /// <param name="canUseDefault"></param>
+    /// <returns></returns>
+    public DatabaseSchema GetConfiguredSchema(string schemaName, Boolean canUseDefault)
+    {
+      // Get connection for the specified schema name.  
+      DatabaseSchema schema = this.Schemas
+        .Where(schema => schema.Name.Equals(schemaName, StringComparison.OrdinalIgnoreCase))
+        .FirstOrDefault();
+
+      if (schema == null && canUseDefault)
+      {
+        schema = this.Schemas
+          .Where(schema => schema.Name == "*")
+          .FirstOrDefault();
+      }
+
+      return schema;
+    }
+
+    /// <summary>
     /// Get the database connection options for the schema specifed by <paramref name="schemaName"/>.  If no matching 
     /// connection is found, return the database connection options for the "*" (default) schema.
     /// </summary>
@@ -46,19 +69,9 @@ namespace Nucleus.Abstractions.Models.Configuration
     /// <returns></returns>
     public DatabaseConnectionOption GetDatabaseConnection(string schemaName, Boolean canUseDefault)
 		{
-			// Get connection for the specified schema name.  
-			DatabaseSchema schema = this.Schemas
-				.Where(schema => schema.Name.Equals(schemaName, StringComparison.OrdinalIgnoreCase))
-				.FirstOrDefault();
+      DatabaseSchema schema = GetConfiguredSchema(schemaName, canUseDefault);
 
-			if (schema == null && canUseDefault)
-			{
-				schema = this.Schemas
-					.Where(schema => schema.Name == "*")
-					.FirstOrDefault();
-			}
-
-			if (schema != null)
+      if (schema != null)
 			{
 				DatabaseConnectionOption connection = this.Connections
 					.Where(connection => connection.Key.Equals(schema.ConnectionKey, StringComparison.OrdinalIgnoreCase))

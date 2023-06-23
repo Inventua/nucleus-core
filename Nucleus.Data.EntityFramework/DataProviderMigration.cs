@@ -16,7 +16,7 @@ using Microsoft.EntityFrameworkCore.Migrations.Operations;
 namespace Nucleus.Data.EntityFramework
 {
 	/// <summary>
-	/// 
+	/// Methods to handle schema migration operations.
 	/// </summary>
 	/// <typeparam name="TDataProvider">
 	/// Type of the data provider implementation that this class handles migration for.
@@ -82,12 +82,12 @@ namespace Nucleus.Data.EntityFramework
 			}
 
 			// Get version from database
-			currentDBVersion = GetSchemaVersion(this.SchemaName);
+			currentDBVersion = GetSchemaVersion(DataProviderSchemas.GetSchemaName(typeof(TDataProvider)).DataProviderSchemaName);
 
 			if (currentDBVersion == null || latestVersion > currentDBVersion)
 			{
 				// run scripts
-				this.RunDatabaseScripts(this.SchemaName, currentDBVersion, scripts);
+				this.RunDatabaseScripts(DataProviderSchemas.GetSchemaName(typeof(TDataProvider)).DataProviderSchemaName, currentDBVersion, scripts);
 			}
 			else
 			{
@@ -236,7 +236,7 @@ namespace Nucleus.Data.EntityFramework
 			{
 				DataDefinition definition = Newtonsoft.Json.JsonConvert.DeserializeObject<DataDefinition>(script.Content, new Newtonsoft.Json.JsonConverter[] { new MigrationOperationConverter(this.DbContext.Database.ProviderName), new SystemTypeConverter() });
 
-				if (definition.SchemaName != "*" && definition.SchemaName != schemaName)
+				if (definition.SchemaName != schemaName)
 				{
 					throw new InvalidOperationException($"The schema script {script.FullName} schema name {definition.SchemaName} does not match the expected schema name {schemaName}.");
 				}

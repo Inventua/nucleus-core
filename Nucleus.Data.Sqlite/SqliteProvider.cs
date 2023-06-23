@@ -88,12 +88,19 @@ namespace Nucleus.Data.Sqlite
 			results.Add("Version", ExecuteScalar(connection, "SELECT sqlite_version()"));			
 			results.Add("Size", new System.IO.FileInfo(connection.DataSource).Length.FormatFileSize());
 
-      string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", schemaName) });
-      if (String.IsNullOrEmpty(schemaVersion) && schemaName=="*")
+      if (Convert.ToInt32(ExecuteScalar(connection, "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='Schema'")) > 0)
       {
-        schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", "Nucleus.Core") });
+        string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", schemaName) });
+        if (String.IsNullOrEmpty(schemaVersion) && schemaName == "*")
+        {
+          schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", "Nucleus.Core") });
+        }
+        results.Add("Schema Version", schemaVersion);
       }
-      results.Add("Schema Version", schemaVersion);
+      else
+      {
+        results.Add("Schema Version", "-");
+      }
 
       connection.Close();
      

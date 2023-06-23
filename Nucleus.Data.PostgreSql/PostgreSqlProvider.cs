@@ -80,17 +80,21 @@ namespace Nucleus.Data.PostgreSql
 			results.Add("Size", Convert.ToInt64(ExecuteScalar(connection, "SELECT pg_database_size(@dbname)", new System.Data.Common.DbParameter[] { new Npgsql.NpgsqlParameter("@dbname", connection.Database) })).FormatFileSize());
 			results.Add("Software", ExecuteScalar(connection, "SELECT version()"));
 
-      string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Npgsql.NpgsqlParameter("@schemaName", schemaName) });
-      if (String.IsNullOrEmpty(schemaVersion) && schemaName == "*")
+      if (Convert.ToInt32(ExecuteScalar(connection, "SELECT COUNT(*) FROM pg_tables WHERE tablename='Schema'"))>0)
       {
-        schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Npgsql.NpgsqlParameter("@schemaName", "Nucleus.Core") });
+        string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Npgsql.NpgsqlParameter("@schemaName", schemaName) });
+        if (String.IsNullOrEmpty(schemaVersion) && schemaName == "*")
+        {
+          schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Npgsql.NpgsqlParameter("@schemaName", "Nucleus.Core") });
+        }
+        results.Add("Schema Version", schemaVersion);
       }
-      results.Add("Schema Version", schemaVersion);
 
       connection.Close();
 
 			return results;
 		}
+
 
 		private string ExecuteScalar(System.Data.Common.DbConnection connection, string sql)
 		{
@@ -114,6 +118,28 @@ namespace Nucleus.Data.PostgreSql
 		}
 
 
+    private int ExecuteScalarInt(System.Data.Common.DbConnection connection, string sql)
+    {
+      return ExecuteScalarInt(connection, sql, new System.Data.Common.DbParameter[] { });
+    }
 
-	}
+    private int ExecuteScalarInt(System.Data.Common.DbConnection connection, string sql, System.Data.Common.DbParameter[] parameters)
+    {
+      object? result;
+
+      System.Data.Common.DbCommand command = connection.CreateCommand();
+
+      command.CommandText = sql;
+      command.Parameters.AddRange(parameters);
+
+      result = command.ExecuteScalar();
+
+#pragma warning disable CS8603 // Possible null reference return.
+      return result == null ? 0 : Convert.ToInt32(result);
+#pragma warning restore CS8603 // Possible null reference return.
+    }
+
+
+
+  }
 }

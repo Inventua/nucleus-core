@@ -16,6 +16,17 @@ namespace Nucleus.Data.Common
 		/// </summary>
 		/// <typeparam name="TDataProvider"></typeparam>
 		/// <returns>A data provider instance of the specified type.</returns>
-		public TDataProvider CreateProvider<TDataProvider>(); 
-	}
+		public TDataProvider CreateProvider<TDataProvider>();
+
+    /// <summary>
+    /// Prevent database schema checking.  
+    /// </summary>
+    /// <param name="schemaName"></param>
+    /// <remarks>
+    /// Extensions can use this method to suppress the default Nucleus behaviour of checking for a Schemas table, comparing versions, and 
+    /// running database schema update scripts.  This is for cases where an extension is using a database from another system, and should
+    /// not attempt to manage the database schema.
+    /// </remarks>
+    public void PreventSchemaCheck(string schemaName);
+  }
 }

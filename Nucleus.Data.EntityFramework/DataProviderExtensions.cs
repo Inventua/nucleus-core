@@ -13,7 +13,7 @@ namespace Nucleus.Data.EntityFramework
   /// Extensions for entity-framework data provider dependency configuration.
   /// </summary>
   static public class DataProviderExtensions
-  {
+  {    
     /// <summary>
     /// Add the specified data provider and DbContext to the services collection.
     /// </summary>
@@ -75,11 +75,8 @@ namespace Nucleus.Data.EntityFramework
     /// <summary>
 		/// Add the specified data provider and DbContext to the services collection for the specified schema name.
 		/// </summary>
-		/// <typeparam name="TDataProviderInterface">
-		/// Interface used by modules to access the data provider.  This type is used as a key to the dependency injection service collection.
-		/// </typeparam>
 		/// <typeparam name="TDataProvider">
-		/// Data provider class.  Must implement <typeparamref name="TDataProviderInterface"/> and <see cref="DataProvider"/>.
+		/// Interface used by modules to access the data provider.  This type is used as a key to the dependency injection service collection.
 		/// </typeparam>
 		/// <typeparam name="TDbContext">
 		/// Entity framework DbContext class.
@@ -123,15 +120,15 @@ namespace Nucleus.Data.EntityFramework
       where TDbContext : DbContext
     {
       services.AddDataProvider<TDataProvider>(configuration, schemaName);
-
+      
       services.AddDbContext<TDbContext>(ServiceLifetime.Transient);
 
       // we add the *same instance* of the data provider with 3 interfaces - one for TDataProviderInterface, to be used by the module, and one
       // as "itself", so that any configured DataProviderMigration classes can get an instance if required, and one as DataProvider, so that elements
       // of Nucleus can get a list of Data providers and perform diagnostics.
       services.AddTransient<TDataProvider>();
-
-      // only add twice if TDataProviderInterface is a different type to TDataProvider
+      
+      // only a second reference keyed by the Interface type if TDataProviderInterface is a different type to TDataProvider
       if (typeof(TDataProviderInterface) != typeof(TDataProvider))
       {
         services.AddTransient<TDataProviderInterface>(serviceProvider => serviceProvider.GetRequiredService<TDataProvider>());

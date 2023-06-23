@@ -245,6 +245,8 @@ namespace Nucleus.Web
           options.SizeLimit = 0;
           options.MaximumBodySize = 0;
         });
+
+        services.CleanupDataProviderExtensions();
         services.Logger().LogInformation("Startup.ConfigureServices Complete.");
       }
       catch (Exception ex)

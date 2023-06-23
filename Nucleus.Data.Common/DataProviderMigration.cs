@@ -26,31 +26,23 @@ namespace Nucleus.Data.Common
 		/// </remarks>
 		public DataProviderMigration(string[] scriptFolderNames)
 		{
-			this.SchemaName = typeof(TDataProvider).GetDefaultSchemaName();
-			//this.SchemaScriptsNamespaces = $"{typeof(TDataProvider).Namespace}.{scriptFolderName}.Scripts.";
-
 			this.SchemaScriptsNamespaces =
 				scriptFolderNames.Select(scriptFolderName => $"{typeof(TDataProvider).Namespace}.{scriptFolderName}.Scripts.");
-
 
 			this.SchemaScriptsAssembly = typeof(TDataProvider).Assembly;
 		}
 
 		/// <summary>
 		/// Constructor which allows the caller to specify the source of schema files.
-		/// </summary>		
-		/// <param name="schemaName">
-		/// Database provider schema name that this class migrates database objects for.
-		/// </param>
+		/// </summary>	
 		/// <param name="absoluteSchemaScriptsNamespaces">
 		/// Fully-qualified namespace for embedded schema files, including the /Scripts folder.
 		/// </param>
 		/// <param name="schemaScriptsAssembly">
 		/// Assembly to retrieve embedded schemas from.
 		/// </param>
-		public DataProviderMigration(string schemaName, string[] absoluteSchemaScriptsNamespaces, System.Reflection.Assembly schemaScriptsAssembly)
+		public DataProviderMigration(string[] absoluteSchemaScriptsNamespaces, System.Reflection.Assembly schemaScriptsAssembly)
 		{
-			this.SchemaName = schemaName;
 			this.SchemaScriptsNamespaces = absoluteSchemaScriptsNamespaces;
 			this.SchemaScriptsAssembly = schemaScriptsAssembly;
 		}
@@ -61,7 +53,6 @@ namespace Nucleus.Data.Common
 	/// </summary>
 	public abstract class DataProviderMigration
 	{
-
 		/// <summary>
 		/// Database object type enum for use by the DatabaseObjectExists method.
 		/// </summary>
@@ -76,14 +67,6 @@ namespace Nucleus.Data.Common
 			/// </summary>
 			Index
 		}
-
-		/// <summary>
-		/// Key used to identify a record in the schemas table.
-		/// </summary>
-		/// <remarks>
-		/// The schemas table records the latest schema version which has been applied to the database for each schema name.
-		/// </remarks>
-		public virtual string SchemaName { get; internal set; }
 
 		/// <summary>
 		/// Namespace of the embedded schema scripts.

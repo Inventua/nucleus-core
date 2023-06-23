@@ -82,12 +82,15 @@ namespace Nucleus.Data.MySql
 			results.Add("Database", connection.Database);
 			results.Add("Version", ExecuteScalar(connection, "SELECT VERSION();"));
 
-      string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new MySqlConnector.MySqlParameter("@schemaName", schemaName) });
-      if (String.IsNullOrEmpty(schemaVersion) && schemaName == "*")
+      if (Convert.ToInt32(ExecuteScalar(connection, "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='Schema'")) > 0)
       {
-        schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new MySqlConnector.MySqlParameter("@schemaName", "Nucleus.Core") });
+        string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new MySqlConnector.MySqlParameter("@schemaName", schemaName) });
+        if (String.IsNullOrEmpty(schemaVersion) && schemaName == "*")
+        {
+          schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new MySqlConnector.MySqlParameter("@schemaName", "Nucleus.Core") });
+        }
+        results.Add("Schema Version", schemaVersion);
       }
-      results.Add("Schema Version", schemaVersion);
 
       results.Add("Size", 
 				ExecuteScalar(connection, "SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) AS 'database_size' FROM information_schema.tables WHERE table_schema = @dbname;", 

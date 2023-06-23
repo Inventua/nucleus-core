@@ -24,15 +24,14 @@ namespace Nucleus.Data.EntityFramework
 	/// </example>
 	public abstract class DbContextConfigurator<TDataProvider> : DbContextConfigurator where TDataProvider : Nucleus.Data.Common.DataProvider
 	{
-
 		/// <summary>
 		/// Create a new instance of this class
 		/// </summary>
 		/// <param name="databaseOptions"></param>
 		public DbContextConfigurator(IOptions<DatabaseOptions> databaseOptions)
 		{
-			this.DatabaseConnectionOption = databaseOptions.Value.GetDatabaseConnection(typeof(TDataProvider).GetDefaultSchemaName());
-		}
+      this.DatabaseConnectionOption = databaseOptions.Value.GetDatabaseConnection(DataProviderSchemas.GetSchemaName(typeof(TDataProvider)).ResolvedSchemaName);
+    }
 	}
 
 	/// <summary>

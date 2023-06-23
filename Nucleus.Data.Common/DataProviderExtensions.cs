@@ -12,6 +12,29 @@ namespace Nucleus.Data.Common
 	/// </summary>
 	public static class DataProviderExtensions
 	{
+    /// <summary>
+    /// Cache for list of types which implement IDatabaseProvider.  These are cached so that we don't iterate assemblies and types multiple times 
+    /// during startup (every time AddDataProvider is called).
+    /// </summary>
+    private static IEnumerable<Type> _cachedDatabaseProviders;
+
+    /// <summary>
+    /// Find IDatabaseProvider implementations.
+    /// </summary>
+    /// <returns></returns>
+    static IEnumerable<Type> GetDatabaseProviders()
+    {
+      if (_cachedDatabaseProviders == null)
+      {
+        _cachedDatabaseProviders = System.Runtime.Loader.AssemblyLoadContext.All
+        .SelectMany(context => context.Assemblies)
+        .SelectMany(assm => GetTypes(assm)
+          .Where(type => typeof(IDatabaseProvider).IsAssignableFrom(type) && !type.Equals(typeof(IDatabaseProvider))));
+      }
+
+      return _cachedDatabaseProviders;
+    }
+
 		/// <summary>
 		/// Add data provider objects to the service collection for the data provider specified by TDataProvider.  This overload uses the default 
 		/// schema name for the data provider type.
@@ -69,33 +92,30 @@ namespace Nucleus.Data.Common
 
 			// Get database options
 			DatabaseOptions options = new();
-			configuration.GetSection(DatabaseOptions.Section).Bind(options, options => options.BindNonPublicProperties = true);
-
-			// Find IConfigureDataProvider implementations		
-			List<Type> dataProviderConfigImplementations = System.Runtime.Loader.AssemblyLoadContext.All
-				.SelectMany(context => context.Assemblies)
-				.SelectMany(assm => GetTypes(assm).Where(type => typeof(IDatabaseProvider).IsAssignableFrom(type) && !type.Equals(typeof(IDatabaseProvider))))
-				.ToList();
+			configuration.GetSection(DatabaseOptions.Section).Bind(options, options => options.BindNonPublicProperties = true);      		
 
 			// Add data provider objects for the data provider specified by <T>.  The database provider required for <T> is specified in
 			// config. 
-			foreach (Type implementation in dataProviderConfigImplementations)
+			foreach (Type implementation in GetDatabaseProviders())
 			{
-        IDatabaseProvider instance = Activator.CreateInstance(implementation) as IDatabaseProvider;
-        
-				if (instance != null)
-				{
-					// Get connection data for the specified schema name.  If it is found, add data provider objects to the services collection.
-					DatabaseConnectionOption connectionOption = options.GetDatabaseConnection(schemaName, canUseDefault);
+        if (Activator.CreateInstance(implementation) is IDatabaseProvider instance)
+        {
+          // Get connection data for the specified schema name.  If it is found, add data provider objects to the services collection.
+          DatabaseConnectionOption connectionOption = options.GetDatabaseConnection(schemaName, canUseDefault);
 
-					if (connectionOption != null && connectionOption.Type.Equals(instance.TypeKey(), StringComparison.OrdinalIgnoreCase))
-					{
-						instance.AddDataProvider<TDataProvider>(services, connectionOption, schemaName);						
-						success = true;
-						break;						
-					}
-				}
-			}
+          if (connectionOption != null && connectionOption.Type.Equals(instance.TypeKey(), StringComparison.OrdinalIgnoreCase))
+          {
+            instance.AddDataProvider<TDataProvider>(services, connectionOption, schemaName);
+
+            // register the schema name
+            string resolvedSchemaName = options.GetConfiguredSchema(schemaName, canUseDefault)?.Name;            
+            Nucleus.Data.Common.DataProviderSchemas.RegisterSchema(typeof(TDataProvider), schemaName, resolvedSchemaName);
+            
+            success = true;
+            break;
+          }
+        }
+      }
 
 			if (!success)
 			{
@@ -115,20 +135,8 @@ namespace Nucleus.Data.Common
 		{
 			Dictionary<string, string> results = new();
 
-			// Get database options
-			////DatabaseOptions options = new();
-			////IConfiguration configuration = services.GetService<IConfiguration>();
-			////configuration.GetSection(DatabaseOptions.Section).Bind(options, options => options.BindNonPublicProperties = true);
-
-			// Find IConfigureDataProvider implementations		
-			List<Type> dataProviderConfigImplementations = System.Runtime.Loader.AssemblyLoadContext.All
-				.SelectMany(context => context.Assemblies)
-				.SelectMany(assm => GetTypes(assm))// assm => assm.GetTypes())
-				.Where(type => typeof(IDatabaseProvider).IsAssignableFrom(type) && !type.Equals(typeof(IDatabaseProvider)))
-				.ToList();
-
 			// Determine which database provider services the specified schema name and retrieve database diagnostic information
-			foreach (Type implementation in dataProviderConfigImplementations)
+			foreach (Type implementation in GetDatabaseProviders())
 			{
 				IDatabaseProvider instance = Activator.CreateInstance(implementation) as IDatabaseProvider;
 				if (instance != null)
@@ -173,9 +181,17 @@ namespace Nucleus.Data.Common
 		{
 			services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.Section), binderOptions => binderOptions.BindNonPublicProperties = true);
 			services.AddSingleton<IDataProviderFactory, DataProviderFactory>();
-
 			return services;
 		}
+
+    /// <summary>
+    /// Clear cache after startup to save memory.
+    /// </summary>
+    /// <param name="services"></param>
+    public static void CleanupDataProviderExtensions(this IServiceCollection services)
+    {
+      _cachedDatabaseProviders = null;
+    }
 
 		/// <summary>
 		/// Return the default namespace for a type.
@@ -188,7 +204,7 @@ namespace Nucleus.Data.Common
 		/// for modules is to us a namespace with ".DataProviders" (plural), but using ".DataProvider" (singular) as the search value handles
 		/// both plural and singular cases.
 		/// </remarks>
-		public static string GetDefaultSchemaName(this System.Type type)
+		private static string GetDefaultSchemaName(this System.Type type)
 		{
 			string typeNamespace = type.Namespace;
 

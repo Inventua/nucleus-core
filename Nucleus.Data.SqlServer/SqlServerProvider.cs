@@ -50,7 +50,7 @@ namespace Nucleus.Data.SqlServer
 		/// <summary>
 		/// Add SqlServer data provider objects to the service collection for the data provider specified by TDataProvider if configuration 
 		/// contains an entry specifying that the data provider uses SqlServer.  This overload allows callers to specify their schema name instead 
-		/// if using the default.
+		/// of using the default.
 		/// </summary>
 		/// <typeparam name="TDataProvider"></typeparam>
 		/// <param name="services"></param>
@@ -62,9 +62,9 @@ namespace Nucleus.Data.SqlServer
 		{
 			services.AddTransient<Nucleus.Data.Common.DataProviderMigration<TDataProvider>, Nucleus.Data.SqlServer.SqlServerDataProviderMigration<TDataProvider>>();
 			services.AddSingleton<Nucleus.Data.EntityFramework.DbContextConfigurator<TDataProvider>, Nucleus.Data.SqlServer.SqlServerDbContextConfigurator<TDataProvider>>();
-			return services;
-		}
 
+      return services;
+		}
 
 		/// <summary>
 		/// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
@@ -86,12 +86,15 @@ namespace Nucleus.Data.SqlServer
 
 			results.Add("Size", ExecuteReader(connection, "sp_spaceused", "database_size").ToString());
 
-      string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM [Schema] WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new SqlParameter("@schemaName", schemaName) });
-      if (String.IsNullOrEmpty(schemaVersion) && schemaName == "*")
-      {
-        schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM [Schema] WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new SqlParameter("@schemaName", "Nucleus.Core") });
+      if (Convert.ToInt32(ExecuteScalar(connection, "SELECT COUNT(*) FROM sys.tables WHERE name='Schema';")) > 0)
+      { 
+        string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM [Schema] WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new SqlParameter("@schemaName", schemaName) });
+        if (String.IsNullOrEmpty(schemaVersion) && schemaName == "*")
+        {
+          schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM [Schema] WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new SqlParameter("@schemaName", "Nucleus.Core") });
+        }
+        results.Add("Schema Version", schemaVersion);
       }
-      results.Add("Schema Version", schemaVersion);
 
       results.Add("Software", ExecuteScalar(connection, "SELECT @@VERSION"));
 
@@ -112,7 +115,7 @@ namespace Nucleus.Data.SqlServer
 			return result;
 		}
 
-		private object ExecuteReader(System.Data.Common.DbConnection connection, string sql, string columnName)
+    private object ExecuteReader(System.Data.Common.DbConnection connection, string sql, string columnName)
 		{
 			System.Data.Common.DbCommand command = connection.CreateCommand();
 

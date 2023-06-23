@@ -18,21 +18,14 @@ namespace Nucleus.Data.Common
 	/// </remarks>
 	public abstract class DataProvider : IDisposable
 	{
-		///// <summary>
-		///// Initializes a new instance of the DataProvider class.
-		///// </summary>
-		//public DataProvider()
-		//{
-		//}
-
-		/// <summary>
-		/// Check the database connection.  
-		/// </summary>
-		/// <returns></returns>
-		/// <remarks>
-		/// This method will throw a database provider-specific exception on error.
-		/// </remarks>
-		abstract public void CheckConnection();
+    /// <summary>
+    /// Check the database connection.  
+    /// </summary>
+    /// <returns></returns>
+    /// <remarks>
+    /// This method will throw a database provider-specific exception on error.
+    /// </remarks>
+    abstract public void CheckConnection();
 
     /// <summary>
     /// Get database diagnostics information for the specified schema.

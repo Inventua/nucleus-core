@@ -36,7 +36,7 @@ public class DataProviderSchemas
     { 
       return Schemas[type];
     }
-    return null;
+    throw new InvalidOperationException($"Schema name not found for type '{type.FullName}'.");
   }
 
   /// <summary>

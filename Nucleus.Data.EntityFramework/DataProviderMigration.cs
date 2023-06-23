@@ -106,16 +106,6 @@ namespace Nucleus.Data.EntityFramework
 		virtual protected Boolean SchemaTableExists()
 		{
 			return DatabaseObjectExists("Schema", DatabaseObjectTypes.Table);
-			//try
-			//{
-			//	this.DbContext.Database.ExecuteSqlRaw("SELECT COUNT(*) FROM Schema");
-			//	//_ = this.DbContext.Schema.Count();
-			//	return true;
-			//}
-			//catch (Exception)
-			//{
-			//	return false;
-			//}
 		}
 
 		/// <summary>
@@ -124,7 +114,7 @@ namespace Nucleus.Data.EntityFramework
 		/// <param name="schemaName"></param>
 		/// <returns></returns>
 		/// <remarks>
-		/// If no schema entry exists for the specified schema name, this function returns version 0.0.0.0.
+		/// If no schema entry exists for the specified schema name, this function returns null.
 		/// </remarks>
 		public override System.Version GetSchemaVersion(string schemaName)
 		{
@@ -275,16 +265,19 @@ namespace Nucleus.Data.EntityFramework
 			// Add/Update the version number that was executed 
 			UpdateSchemaVersion(schemaName, script.Version);
 
-
 			return true;
 		}
 
-
-		private void ApplyCorrections(MigrationOperation operation)
+    /// <summary>
+    /// Set required properties on the <paramref name="migrationOperation"/> to appropriate default values, based on other values set 
+    /// by the migration script and/or the database type.
+    /// </summary>
+    /// <param name="migrationOperation"></param>
+		private void ApplyCorrections(MigrationOperation migrationOperation)
 		{
-			if (operation.GetType() == typeof(CreateTableOperation))
+			if (migrationOperation.GetType() == typeof(CreateTableOperation))
 			{
-				CreateTableOperation createTableOperation = operation as CreateTableOperation;
+				CreateTableOperation createTableOperation = migrationOperation as CreateTableOperation;
 
 				foreach (AddColumnOperation column in createTableOperation.Columns)
 				{
@@ -312,7 +305,8 @@ namespace Nucleus.Data.EntityFramework
 					}
 				}
 
-				// Allow table to be omitted from primary key declaration in createTable
+				// Allow table to be omitted from primary key declaration in createTable (set the primary key table name to the table name of 
+        // the parent object).
 				if (createTableOperation.PrimaryKey != null)
 				{
 					if (createTableOperation.PrimaryKey.Table is null)
@@ -321,7 +315,8 @@ namespace Nucleus.Data.EntityFramework
 					}
 				}
 
-				// Allow table to be omitted from foreign key declaration in createTable
+				// Allow table to be omitted from foreign key declaration in createTable (set the foreign key table name to the table name of 
+        // the parent object).
 				foreach (AddForeignKeyOperation key in createTableOperation.ForeignKeys.ToList())
 				{
 					// Keys wrapped in a DatabaseProviderSpecificOperation can be returned as null if conditions are not met, remove them
@@ -336,14 +331,14 @@ namespace Nucleus.Data.EntityFramework
 				}
 			}
 
-			if (operation.GetType() == typeof(AddColumnOperation))
+			if (migrationOperation.GetType() == typeof(AddColumnOperation))
 			{
-				ApplyCorrections(operation as AddColumnOperation);
+				ApplyCorrections(migrationOperation as AddColumnOperation);
 			}
 
-			if (operation.GetType() == typeof(DatabaseProviderSpecificOperation))
+			if (migrationOperation.GetType() == typeof(DatabaseProviderSpecificOperation))
 			{
-				ApplyCorrections((operation as DatabaseProviderSpecificOperation).Operation);
+				ApplyCorrections((migrationOperation as DatabaseProviderSpecificOperation).Operation);
 			}
 		}
 
@@ -385,7 +380,7 @@ namespace Nucleus.Data.EntityFramework
 				}
 				else
 				{
-					// For everything else, booleans are "1" or "0" rather than "true" or "false"
+					// For all of the other database providers, booleans are "1" or "0" rather than "true" or "false"
 					if (operation.DefaultValueSql == "1" || (Boolean.TryParse(operation.DefaultValueSql, out Boolean value1) && value1 == true))
 					{
 						operation.DefaultValueSql = "1";
@@ -399,6 +394,12 @@ namespace Nucleus.Data.EntityFramework
 			}
 		}
 
+    /// <summary>
+    /// Execute the command specified as string in <paramref name="command"/>.
+    /// </summary>
+    /// <param name="script"></param>
+    /// <param name="command"></param>
+    /// <exception cref="InvalidOperationException"></exception>
 		private void ExecuteCommand(DatabaseSchemaScript script, string command)
 		{
 			try
@@ -409,7 +410,7 @@ namespace Nucleus.Data.EntityFramework
 					command = command[0..^2];
 				}
 
-				// Allow up to 4 minutes for migration commands, and reset back to the default command timeout after executing
+				// Allow up to 4 minutes for each migration command, and reset back to the default command timeout after executing
 				int? timeout = this.DbContext.Database.GetCommandTimeout();
 				this.DbContext.Database.SetCommandTimeout(240);
 				
@@ -423,6 +424,12 @@ namespace Nucleus.Data.EntityFramework
 			}
 		}
 
+    /// <summary>
+    /// Execute the command represented as a MigrationOperation object in <paramref name="operation"/>.
+    /// </summary>
+    /// <param name="script"></param>
+    /// <param name="operation"></param>
+    /// <exception cref="InvalidOperationException"></exception>
 		private void ExecuteCommand(DatabaseSchemaScript script, MigrationOperation operation)
 		{
 			if (operation is CreateTableOperation)
@@ -476,9 +483,6 @@ namespace Nucleus.Data.EntityFramework
 					throw new InvalidOperationException($"Migration script error [{script.FullName}]: {migrationCommand.CommandText} {ex.Message}", ex);
 				}
 			}
-
-
 		}
-
 	}
 }

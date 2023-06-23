@@ -164,6 +164,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.SAML.Client", "Nucl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.SAML.Server", "Nucleus.Special.Modules\Nucleus.SAML.Server\Nucleus.SAML.Server.csproj", "{1DD57018-C708-4334-B79E-BCFA6ACEF138}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.DNN.Migration", "Nucleus.Special.Modules\Nucleus.DNN.Migration\Nucleus.DNN.Migration.csproj", "{2D744268-B32D-4990-A4CB-2E0B5805EAE1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -314,6 +316,10 @@ Global
 		{1DD57018-C708-4334-B79E-BCFA6ACEF138}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DD57018-C708-4334-B79E-BCFA6ACEF138}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DD57018-C708-4334-B79E-BCFA6ACEF138}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D744268-B32D-4990-A4CB-2E0B5805EAE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D744268-B32D-4990-A4CB-2E0B5805EAE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D744268-B32D-4990-A4CB-2E0B5805EAE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D744268-B32D-4990-A4CB-2E0B5805EAE1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -351,6 +357,7 @@ Global
 		{17F1CA11-F065-47CE-A6E8-D72F69DEA608} = {800D8125-BD40-410A-B1E9-C1E62224DC03}
 		{9D9097B2-1F66-48BA-95AD-310F246EE6C7} = {CD49EF69-179E-461A-9C51-041EA3B901CE}
 		{1DD57018-C708-4334-B79E-BCFA6ACEF138} = {CD49EF69-179E-461A-9C51-041EA3B901CE}
+		{2D744268-B32D-4990-A4CB-2E0B5805EAE1} = {CD49EF69-179E-461A-9C51-041EA3B901CE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D84CD364-9C8E-400E-84AA-45562061ED44}

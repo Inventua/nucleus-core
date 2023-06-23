@@ -1,0 +1,44 @@
+﻿@model Nucleus.DNN.Migration.ViewModels.Index
+@Html.AddStyle("~!/../index.css")
+<h2 class="nucleus-control-panel-heading">DNN Migration Tools</h2>
+<div class="dnn-migration">
+  @if (Model.Version == null)
+  {
+    <div class="alert alert-warning">
+      <h2>Database Connection not Configured</h2>
+      In order to use the DNN Migration tool, you must edit your databaseSettings.{environment}.json file, and add connection 
+      information for your DotNetNuke database, with a schema key named "DNN".
+    </div>
+  }
+  else
+  {
+    @using (Html.BeginNucleusForm("Settings", "DNNMigration", "DNNMigration", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+    {
+      <ol>
+        <li>
+          <button class="btn btn-primary">Roles</button>
+          <span class="action-description">Migrate roles and role groups from DNN</span>
+        </li>
+
+        <li>
+          <button class="btn btn-primary">Files</button>
+          <span class="action-description">Migrate files and folders from DNN</span>
+        </li>
+
+        <li>
+          <button class="btn btn-primary">Pages</button>
+          <span class="action-description">Migrate pages and modules from DNN</span>
+        </li>
+
+        <li>
+          <button class="btn btn-primary">Users</button>
+          <span class="action-description">Migrate users and user-role memberships from DNN</span>
+        </li>
+      </ol>
+    }
+
+    @*  documents, links, media  *@
+    <modal id="MigrateRoles" title="Migrate Roles"></modal>
+  }
+
+</div>

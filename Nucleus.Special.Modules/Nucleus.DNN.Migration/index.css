@@ -1,0 +1,13 @@
+﻿.dnn-migration ol
+{
+  list-style-type: none;
+  display: flex; 
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dnn-migration ol li button
+{
+  width: 12rem;
+  margin-right: 1.5rem;
+}

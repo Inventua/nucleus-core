@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package id="3bf0c0c2-010e-4c7b-be10-bdaeeab2bd8d" xmlns="urn:nucleus/schemas/package/1.0">
+	<name>DNNMigration</name>
+	<version>1.0.0</version>
+	<publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
+	<description>
+		Tools for migrating DNN data to Nucleus.
+	</description>
+	<compatibility minVersion="1.1.0.0" maxVersion="*" />
+	
+	<components>
+		<component folderName="DNNMigration" optional="false">
+      <controlPanelExtensionDefinition id="022642F8-67E4-4956-9F41-97473377B692">
+        <friendlyName>DNN Migration</friendlyName>
+        <description>Migrate data from DotNetNuke.</description>
+        <controllerName>DNNMigration</controllerName>
+        <extensionName>DNNMigration</extensionName>
+        <scope>Global</scope>
+        <editAction>Index</editAction>
+      </controlPanelExtensionDefinition>
+
+			<file name="readme.txt" />
+			<file name="index.css" />
+			
+			<folder name="bin">
+				<file name="Nucleus.DNN.Migration.dll" />
+			</folder>
+			
+			<folder name="Views">
+				<file name="_ViewImports.cshtml" />
+				<file name="Index.cshtml" />
+			</folder>
+			
+		</component>
+	</components>
+	
+</package>

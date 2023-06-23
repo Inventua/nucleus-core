@@ -41,7 +41,7 @@ namespace Nucleus.Data.SqlServer
 		{
 			int result;
 
-			System.Data.Common.DbConnection connection = base.DbContext.Database.GetDbConnection();// new Microsoft.Data.SqlClient.SqlConnection(base.DbContext.Database.GetConnectionString());
+			System.Data.Common.DbConnection connection = base.DbContext.Database.GetDbConnection();
 			System.Data.Common.DbCommand command = connection.CreateCommand();
 			System.Data.Common.DbParameter parameter = command.CreateParameter();
 

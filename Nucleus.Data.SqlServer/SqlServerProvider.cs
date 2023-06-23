@@ -13,7 +13,7 @@ using Microsoft.Data.SqlClient;
 namespace Nucleus.Data.SqlServer
 {
 	/// <summary>
-	/// 
+	/// SQL Server database provider for Nucleus.
 	/// </summary>
 	public class SqlServerProvider : IDatabaseProvider
 	{

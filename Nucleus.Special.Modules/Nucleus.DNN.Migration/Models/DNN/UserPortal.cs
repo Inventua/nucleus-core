@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 
 namespace Nucleus.DNN.Migration.Models.DNN;
 
-public class UserRole
+public class UserPortal
 {
-  [Column("UserID")]
+  public int UserPortalId { get; set; }
+
   public int UserId { get; set; }
 
-  [Column("RoleID")]
-  public int RoleId { get; set; }
+  public int PortalId { get; set; }
 
-  public DateTime? ExpiryDate { get; set; }
+  public Boolean Authorised { get; set; }
 
-  public DateTime? EffectiveDate { get; set; }
+  public Boolean IsDeleted { get; set; }
 
-  public Boolean? IsTrialUsed { get; set; }
+  public User User { get; set; }
 
 }

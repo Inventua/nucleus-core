@@ -1,4 +1,17 @@
-﻿.dnn-migration ol
+﻿.dnn-migration, .dnn-migration form, .dnn-migration form > div
+{
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.dnn-migration .nucleus-button-panel
+{
+  overflow: initial;
+  align-items: flex-end;
+}
+
+.dnn-migration ol
 {
   list-style-type: none;
   display: flex; 

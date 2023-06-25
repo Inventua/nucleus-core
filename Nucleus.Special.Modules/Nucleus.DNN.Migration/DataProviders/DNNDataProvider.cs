@@ -42,6 +42,7 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
   {
     return await this.Context.RoleGroups
       .Where(group => group.PortalId == portalId && group.Roles.Any())
+      .OrderBy(group => group.RoleGroupName)
       .ToListAsync();
   }
 
@@ -51,7 +52,27 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
 
     return await this.Context.Roles
       .Where(role => role.PortalId == portalId && role.Users.Any() && !RESERVED_ROLES.Contains(role.RoleName))
+      .OrderBy(role => role.RoleName)
       .Include(role => role.RoleGroup)
+      .ToListAsync();
+  }
+
+  public async Task<List<Models.DNN.User>> ListUsers(int portalId)
+  {   
+    //var test= this.Context.Users
+    //  .Where(user => user.PortalId == portalId && !user.IsSuperUser && user.UserPortal.Authorised)
+    //  .Include(user => user.Roles)
+    //  .Include(user => user.ProfileProperties)
+    //  .Include(user => user.UserPortal)
+    //  .AsSplitQuery();
+
+    return await this.Context.Users
+      .Where(user => user.UserPortal.PortalId == portalId && !user.IsSuperUser && user.UserPortal.Authorised)
+      .Include(user => user.Roles)
+      .Include(user => user.ProfileProperties)
+      .Include(user => user.UserPortal)
+      .OrderBy(user => user.UserName)
+      .AsSplitQuery()
       .ToListAsync();
   }
 }

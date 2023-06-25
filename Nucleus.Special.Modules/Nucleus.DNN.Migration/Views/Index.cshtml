@@ -36,11 +36,6 @@
         </li>
 
         <li>
-          <button type="submit" formaction="@Url.NucleusAction("FilesIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary" data-target="#MigrateFiles">Files</button>
-          <span class="action-description">Migrate files and folders from DNN</span>
-        </li>
-
-        <li>
           <button type="submit" formaction="@Url.NucleusAction("PagesIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary" data-target="#MigratePages">Pages</button>
           <span class="action-description">Migrate pages and modules from DNN</span>
         </li>
@@ -53,7 +48,6 @@
     }
     @*  documents, links, media  *@
     <modal id="MigrateRoles" title="Migrate Roles"></modal>
-    <modal id="MigrateFiles" title="Migrate Files"></modal>
     <modal id="MigratePages" title="Migrate Pages"></modal>
     <modal id="MigrateUsers" title="Migrate Users"></modal>
   }

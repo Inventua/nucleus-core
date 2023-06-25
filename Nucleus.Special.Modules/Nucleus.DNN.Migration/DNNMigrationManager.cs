@@ -102,4 +102,12 @@ public class DNNMigrationManager
       return await provider.ListRoles(portalId);
     }
   }
+
+  public async Task<List<Models.DNN.User>> ListDNNUsers(int portalId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.ListUsers(portalId);
+    }
+  }
 }

@@ -51,12 +51,6 @@ public class DNNMigrationController : Controller
 
 
   [HttpPost]
-  public async Task<ActionResult> FilesIndex(ViewModels.Index viewModel)
-  {
-    return View("_Files", await BuildFilesViewModel(viewModel.PortalId));
-  }
-
-  [HttpPost]
   public async Task<ActionResult> PagesIndex(ViewModels.Index viewModel)
   {
     return View("_Pages", await BuildPagesViewModel(viewModel.PortalId));
@@ -96,14 +90,6 @@ public class DNNMigrationController : Controller
     return viewModel;
   }
 
-  private async Task<ViewModels.File> BuildFilesViewModel(int portalId)
-  {
-    ViewModels.File viewModel = new();
-    viewModel.PortalId = portalId;
-
-    return viewModel;
-  }
-
   private async Task<ViewModels.Page> BuildPagesViewModel(int portalId)
   {
     ViewModels.Page viewModel = new();
@@ -118,6 +104,7 @@ public class DNNMigrationController : Controller
     ViewModels.User viewModel = new();
     viewModel.PortalId = portalId;
 
+    viewModel.Users = await this.DNNMigrationManager.ListDNNUsers(portalId);
 
     return viewModel;
   }

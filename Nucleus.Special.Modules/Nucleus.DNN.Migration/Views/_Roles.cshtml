@@ -7,8 +7,8 @@
       <li>Role groups are only migrated if they contain at least one role.</li>
       <li>Roles are only migrated if they contain at least one user.</li>
       <li>The "Administrators" and "Registered Users" roles will not be migrated.</li>
-      <li>There @(@Model.RoleGroups.Count == 1 ? "is" : "are") @Model.RoleGroups.Count role group@(@Model.RoleGroups.Count == 1 ? "" : "s") to migrate.</li>
-      <li>There are @Model.Roles.Count roles to migrate.</li>
+      <li>There @(@Model.RoleGroups.Where(roleGroup => roleGroup.IsSelected).Count() == 1 ? "is" : "are") @Model.RoleGroups.Count role group@(@Model.RoleGroups.Count == 1 ? "" : "s") to migrate.</li>
+      <li>There are @Model.Roles.Where(role => role.IsSelected).Count() roles to migrate.</li>
     </ul>
   </div>
 
@@ -20,13 +20,14 @@
     </div>
     <div class="my-2">
       <h2>Role Groups</h2>
+      <div class="overflow-auto">
       <table class="table table-striped table-sm">
         <thead>
           <tr>
             <th />
             <th>Id</th>
             <th>Name</th>
-            <th>Description</th>
+            <th>Messages</th>
           </tr>
         </thead>
         
@@ -34,27 +35,42 @@
         {
           <tr>
             <td>
-              @Html.CheckBoxFor(model=> model.RoleGroups[index].IsSelected)
+              @if (Model.RoleGroups[index].CanSelect)
+              {
+                @Html.CheckBoxFor(model=> model.RoleGroups[index].IsSelected)
+              }
+              @Html.HiddenFor(model=> model.RoleGroups[index].CanSelect)
               @Html.HiddenFor(model=> model.RoleGroups[index].RoleGroupId)
             </td>
             <td>@Model.RoleGroups[index].RoleGroupId</td>
             <td>@Model.RoleGroups[index].RoleGroupName</td>
-            <td>@Model.RoleGroups[index].Description</td>
+            <td>
+              <table class="table table-sm table-borderless validation-results">
+                @foreach (var result in Model.RoleGroups[index].Results)
+                {
+                  <tr>
+                    <td class="glyph-@result.Type">@result.Message</td>
+                  </tr>
+                }
+              </table>
+            </td>
           </tr>
         }
       </table>
+      </div>
     </div>
 
     <div>
       <h2>Roles</h2>
+      <div class="overflow-auto">
       <table class="table table-striped table-sm">
         <thead>
           <tr>
             <th />
             <th>Id</th>
             <th>Name</th>
-            <th>Description</th>
             <th>Role Group</th>
+            <th>Messages</th>
           </tr>
         </thead>
         @for (int index = 0; index < Model.Roles.Count; index++)
@@ -62,16 +78,29 @@
           <tr>
             <td>
               @Html.HiddenFor(model=> model.Roles[index].RoleId)
-              @Html.CheckBoxFor(model=> model.Roles[index].IsSelected)
+              @if (Model.Roles[index].CanSelect)
+              {
+                @Html.CheckBoxFor(model=> model.Roles[index].IsSelected)
+              }
+              @Html.HiddenFor(model=> model.Roles[index].CanSelect)              
             </td>
             <td>@Model.Roles[index].RoleId</td>
             <td>@Model.Roles[index].RoleName</td>
-            <td>@Model.Roles[index].Description</td>
             <td>@Model.Roles[index].RoleGroup?.RoleGroupName</td>
+            <td>
+              <table class="table table-sm table-borderless validation-results">
+                @foreach (var result in Model.Roles[index].Results)
+                {
+                  <tr>
+                    <td class="glyph-@result.Type">@result.Message</td>
+                  </tr>
+                }
+              </table>
+            </td>
           </tr>
         }
       </table>
-     
+      </div>
     </div>
   }
 </div>

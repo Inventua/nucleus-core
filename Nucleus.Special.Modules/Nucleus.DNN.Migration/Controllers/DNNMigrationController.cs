@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Options;
+using Nucleus.DNN.Migration.MigrationEngines;
 
 //https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.storage.irelationalcommand.executereaderasync?view=efcore-7.0
 
@@ -87,6 +88,9 @@ public class DNNMigrationController : Controller
     viewModel.RoleGroups = await this.DNNMigrationManager.ListDNNRoleGroups(portalId);
     viewModel.Roles = await this.DNNMigrationManager.ListDNNRoles(portalId);
 
+    await this.HttpContext.RequestServices.CreateEngine<Models.DNN.RoleGroup>().Validate(viewModel.RoleGroups);
+    await this.HttpContext.RequestServices.CreateEngine<Models.DNN.Role>().Validate(viewModel.Roles);
+    
     return viewModel;
   }
 
@@ -95,6 +99,8 @@ public class DNNMigrationController : Controller
     ViewModels.Page viewModel = new();
     viewModel.PortalId = portalId;
 
+    viewModel.Pages = await this.DNNMigrationManager.ListDNNPages(portalId);
+    await this.HttpContext.RequestServices.CreateEngine<Models.DNN.Page>().Validate(viewModel.Pages);
 
     return viewModel;
   }
@@ -105,6 +111,7 @@ public class DNNMigrationController : Controller
     viewModel.PortalId = portalId;
 
     viewModel.Users = await this.DNNMigrationManager.ListDNNUsers(portalId);
+    await this.HttpContext.RequestServices.CreateEngine<Models.DNN.User>().Validate(viewModel.Users);
 
     return viewModel;
   }

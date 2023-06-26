@@ -5,6 +5,11 @@
   overflow: auto;
 }
 
+.dnn-migration form 
+{
+  padding: 0 0.25rem;
+}
+
 .dnn-migration .nucleus-button-panel
 {
   overflow: initial;
@@ -25,4 +30,28 @@
   display: inline-block;
   width: 12rem;
   margin-right: 1.5rem;
+}
+
+.dnn-migration ol li button .nucleus-progress-spinner
+{
+  color: white!important;
+}
+
+.dnn-migration .validation-results
+{
+  margin: 0;
+}
+
+.dnn-migration .glyph-Error::before
+{
+  font-family: 'Material Icons';
+  content: '\e000';
+  margin-right: 0.15rem;
+}
+
+.dnn-migration .glyph-Warning::before
+{
+  font-family: 'Material Icons';
+  content: '\e645';
+  margin-right: 0.15rem;
 }

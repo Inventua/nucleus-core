@@ -22,4 +22,7 @@ public class Role : DNNEntity
 
   public List<Models.DNN.User> Users { get; set; }
 
+  [NotMapped]
+  public int UserCount { get; set; }
+
 }

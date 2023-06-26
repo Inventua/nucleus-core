@@ -1,11 +1,11 @@
-﻿using DocumentFormat.OpenXml.Office2021.Excel.RichDataWebImage;
-using DocumentFormat.OpenXml.Spreadsheet;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.EventHandlers;
 using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
 using Nucleus.Abstractions.Models;
 using Nucleus.DNN.Migration.Models;
+using Nucleus.DNN.Migration.Models.DNN;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -40,38 +40,62 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
 
   public async Task<List<Models.DNN.RoleGroup>> ListRoleGroups(int portalId)
   {
-    return await this.Context.RoleGroups
+    List<Models.DNN.RoleGroup> results = await this.Context.RoleGroups
       .Where(group => group.PortalId == portalId && group.Roles.Any())
       .OrderBy(group => group.RoleGroupName)
       .ToListAsync();
+
+    foreach (var roleGroup in results)
+    {
+      roleGroup.RoleCount = await this.Context.Roles
+        .Where(role => role.RoleGroup.RoleGroupId == roleGroup.RoleGroupId)
+        .CountAsync();
+    }
+
+    return results;
   }
 
   public async Task<List<Models.DNN.Role>> ListRoles(int portalId)
   {
-    string[] RESERVED_ROLES = { "Administrators", "Registered Users" };
-
-    return await this.Context.Roles
-      .Where(role => role.PortalId == portalId && role.Users.Any() && !RESERVED_ROLES.Contains(role.RoleName))
+    List<Models.DNN.Role> results = await this.Context.Roles
+      .Where(role => role.PortalId == portalId)
       .OrderBy(role => role.RoleName)
       .Include(role => role.RoleGroup)
       .ToListAsync();
+
+    foreach (var role in results) 
+    {
+      role.UserCount = await this.Context.UserRoles
+        .Where(userRole => userRole.RoleId == role.RoleId)
+        .CountAsync();
+    }
+
+    return results;
   }
 
   public async Task<List<Models.DNN.User>> ListUsers(int portalId)
   {   
-    //var test= this.Context.Users
-    //  .Where(user => user.PortalId == portalId && !user.IsSuperUser && user.UserPortal.Authorised)
-    //  .Include(user => user.Roles)
-    //  .Include(user => user.ProfileProperties)
-    //  .Include(user => user.UserPortal)
-    //  .AsSplitQuery();
-
     return await this.Context.Users
-      .Where(user => user.UserPortal.PortalId == portalId && !user.IsSuperUser && user.UserPortal.Authorised)
+      .Where(user => user.UserPortal.PortalId == portalId)
       .Include(user => user.Roles)
       .Include(user => user.ProfileProperties)
       .Include(user => user.UserPortal)
       .OrderBy(user => user.UserName)
+      .AsSplitQuery()
+      .ToListAsync();
+  }
+
+  public async Task<List<Models.DNN.Page>> ListPages(int portalId)
+  { 
+    return await this.Context.Pages
+      .Where(page => 
+        page.PortalId == portalId && 
+        page.PageName != "Admin" && !page.TabPath.StartsWith("//Admin") && // exclude "Admin" page, and descendants
+        !page.IsDeleted 
+      )
+      .OrderBy(page => page.Level)
+        .ThenBy(page => page.ParentId)
+        .ThenBy(page => page.PageName)
       .AsSplitQuery()
       .ToListAsync();
   }

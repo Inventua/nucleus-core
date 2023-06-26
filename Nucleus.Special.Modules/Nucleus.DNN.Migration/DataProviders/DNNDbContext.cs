@@ -22,7 +22,11 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
   public DbSet<Models.DNN.Role> Roles { get; set; }
 
   public DbSet<Models.DNN.Page> Pages { get; set; }
+  
   public DbSet<Models.DNN.User> Users { get; set; }
+
+  public DbSet<Models.DNN.UserRole> UserRoles { get; set; }
+
   public DbSet<Models.DNN.UserProfileProperty> UserProfileProperties { get; set; }
 
 
@@ -89,6 +93,8 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
       .ToTable("UserProfile")
       .HasKey(userProfileProperty => userProfileProperty.ProfileId);
 
+    builder.Entity<Models.DNN.Page>()
+     .ToTable("Tabs");
 
     //builder.Entity<DNNMigration>()
     //	.HasOne(DNNMigration => DNNMigration.Category)

@@ -2,6 +2,7 @@
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.DNN.Migration.Models;
+using Nucleus.DNN.Migration.Models.DNN;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Data.EntityFramework;
 using Nucleus.DNN.Migration.DataProviders;
+using Nucleus.DNN.Migration.MigrationEngines;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,6 @@ public class Startup : IHostingStartup
   {
     builder.ConfigureServices((context, services) =>
     {
-      services.AddSingleton<DNNMigrationManager>();
       services.AddDataProvider<DNNMigrationDataProvider, DNNMigrationDataProvider, DNNMigrationDbContext>(context.Configuration);
       try
       {
@@ -31,6 +31,14 @@ public class Startup : IHostingStartup
         // suppress.  This happens when there is no database configuration schema with name="DNN".  The GetDNNVersion function return NULL
         // when there is no DNNDataProvider registered, and the main view shows a warning message.
       }
+      
+      services.AddSingleton<DNNMigrationManager>();
+      
+      services.AddMigrationEngine<Models.DNN.RoleGroup, MigrationEngines.RoleGroupMigration>();
+      services.AddMigrationEngine<Models.DNN.Role, MigrationEngines.RoleMigration>();
+      services.AddMigrationEngine<Models.DNN.Page, MigrationEngines.PageMigration>();
+      services.AddMigrationEngine<Models.DNN.User, MigrationEngines.UserMigration>();
+
     });
   }
 }

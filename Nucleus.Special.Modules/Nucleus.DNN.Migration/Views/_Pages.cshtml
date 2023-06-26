@@ -2,6 +2,63 @@
 @Html.AddStyle("~!/../index.css")
 <h2 class="nucleus-control-panel-heading">Migrate DNN Pages</h2>
 <div class="dnn-migration">
-  
+  <div class="alert alert-primary">
+    <ul>
+      <li>Deleted pages will not be migrated.</li>
+      <li>There are @Model.Pages.Where(page => page.IsSelected).Count() pages to migrate.</li>
+    </ul>
+  </div>
 
+  @using (Html.BeginNucleusForm("MigratePages", "DNNMigration", "DNNMigration", FormMethod.Post, new { }))
+  {
+    @Html.HiddenFor(model => model.PortalId)
+    <div class="nucleus-button-panel">
+      <button type="submit" class="btn btn-primary" data-confirm="Migrate selected pages from DotNetNuke now?  This action cannot be reversed.">Migrate Pages</button>
+    </div>
+
+    <div class="my-2">
+      <h2>Pages</h2>
+      <div class="overflow-auto">
+        <table class="table table-striped table-sm">
+          <thead>
+            <tr>
+              <th />
+              <th>Id</th>
+              <th>Name</th>
+              <th>Title</th>    
+              <th>Messages</th>
+            </tr>
+          </thead>
+
+          @for (int index = 0; index < Model.Pages.Count; index++)
+          {
+            <tr>
+              <td>
+                @if (Model.Pages[index].CanSelect)
+                {
+                  @Html.CheckBoxFor(model=> model.Pages[index].IsSelected)
+                }
+                @Html.HiddenFor(model=> model.Pages[index].PageId)
+                @Html.HiddenFor(model=> model.Pages[index].CanSelect)
+              </td>
+              <td>@Model.Pages[index].PageId</td>
+              <td>@Model.Pages[index].PageName</td>
+              <td>@Model.Pages[index].Title</td>
+              <td>
+                <table class="table table-sm table-borderless validation-results">
+                  @foreach (var result in Model.Pages[index].Results)
+                  {
+                    <tr>
+                      <td class="glyph-@result.Type">@result.Message</td>
+                    </tr>
+                  }
+                </table>
+              </td>
+            </tr>
+          }
+        </table>
+      </div>
+    </div>
+
+  }
 </div>

@@ -19,4 +19,7 @@ public class RoleGroup : DNNEntity
   public string Description { get; set; }
 
   public List<Role> Roles { get; set; }
+
+  [NotMapped]
+  public int RoleCount { get; set; }
 }

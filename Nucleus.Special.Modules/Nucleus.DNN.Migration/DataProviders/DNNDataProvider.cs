@@ -47,9 +47,6 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
 
   public async Task<List<Models.DNN.RoleGroup>> ListRoleGroups(int portalId)
   {
-    var test = this.Context.RoleGroups
-      .Where(group => group.PortalId == portalId && group.Roles.Any());
-
     List<Models.DNN.RoleGroup> results = await this.Context.RoleGroups
       .Where(group => group.PortalId == portalId && group.Roles.Any())
       .OrderBy(group => group.RoleGroupName)
@@ -103,10 +100,6 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
 
   public async Task<List<Models.DNN.User>> ListUsers(int portalId)
   {
-    var test = this.Context.Users
-      .Where(user => user.UserPortal.Portal.PortalId == portalId)
-      .Include(user => user.Roles);
-
     List<Models.DNN.User> results = await this.Context.Users
       .Where(user => user.UserPortal.Portal.PortalId == portalId)
       .Include(user => user.Roles)

@@ -99,10 +99,6 @@ public class DNNMigrationController : Controller
       CurrentOperationEngine = this.DNNMigrationManager.CurrentOperation
     };
 
-    if (viewModel.CurrentOperationEngine.Completed())
-    {
-
-    }
     return Task.FromResult(viewModel);
   }
 

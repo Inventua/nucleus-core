@@ -29,12 +29,14 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .OrderByDescending(version => version.Major)
         .ThenByDescending(version => version.Minor)
         .ThenByDescending(version => version.Build)
+      .AsNoTracking()
       .FirstOrDefaultAsync();
   }
 
   public async Task<List<Models.DNN.Portal>> ListPortals()
   {
     return await this.Context.Portals
+      .AsNoTracking()
       .ToListAsync();
   }
 
@@ -42,6 +44,7 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
   {
     return await this.Context.RoleGroups
       .Where(group => group.RoleGroupId == roleGroupId)
+      .AsNoTracking()
       .FirstOrDefaultAsync();
   }
 
@@ -50,12 +53,14 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
     List<Models.DNN.RoleGroup> results = await this.Context.RoleGroups
       .Where(group => group.PortalId == portalId && group.Roles.Any())
       .OrderBy(group => group.RoleGroupName)
+      .AsNoTracking()
       .ToListAsync();
 
     foreach (var roleGroup in results)
     {
       roleGroup.RoleCount = await this.Context.Roles
         .Where(role => role.RoleGroup.RoleGroupId == roleGroup.RoleGroupId)
+        .AsNoTracking()
         .CountAsync();
     }
 
@@ -67,6 +72,7 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
     return await this.Context.Roles
       .Where(role => role.RoleId == roleId)
       .Include(role => role.RoleGroup)
+      .AsNoTracking()
       .FirstOrDefaultAsync();
   }
 
@@ -76,12 +82,14 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .Where(role => role.PortalId == portalId)
       .OrderBy(role => role.RoleName)
       .Include(role => role.RoleGroup)
+      .AsNoTracking()
       .ToListAsync();
 
     foreach (var role in results) 
     {
       role.UserCount = await this.Context.UserRoles
         .Where(userRole => userRole.RoleId == role.RoleId)
+        .AsNoTracking()
         .CountAsync();
     }
 
@@ -95,6 +103,7 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .Include(user => user.Roles)
       .Include(user => user.ProfileProperties)
       .AsSplitQuery()
+      .AsNoTracking()
       .FirstOrDefaultAsync();
   }
 
@@ -106,12 +115,14 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .Include(user => user.ProfileProperties)
       .OrderBy(user => user.UserName)
       .AsSplitQuery()
+      .AsNoTracking()
       .ToListAsync();
 
     foreach (Models.DNN.User user in results)
     {
       user.UserPortal = await this.Context.UserPortals
         .Where(userPortal => userPortal.UserId == user.UserId && userPortal.Portal.PortalId == portalId)
+        .AsNoTracking()
         .FirstOrDefaultAsync();
     }
     return results;
@@ -121,6 +132,7 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
   {
     return await this.Context.Pages
       .Where(page => page.PageId == pageId)
+      .AsNoTracking()
       .FirstOrDefaultAsync();
   }
 
@@ -136,6 +148,7 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
         .ThenBy(page => page.ParentId)
         .ThenBy(page => page.PageName)
       .AsSplitQuery()
+      .AsNoTracking()
       .ToListAsync();
   }
 }

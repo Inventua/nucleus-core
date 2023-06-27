@@ -14,9 +14,13 @@
 {
   overflow: initial;
   justify-content: end;
+  flex-direction: row;
+}
+
+.dnn-migration .nucleus-button-panel > *
+{
   margin-top: auto;
   margin-bottom: auto;
-  flex-direction: row;
 }
 
 .dnn-migration ol

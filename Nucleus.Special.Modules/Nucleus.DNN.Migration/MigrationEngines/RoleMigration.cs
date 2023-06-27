@@ -47,7 +47,7 @@ public class RoleMigration : MigrationEngineBase<Models.DNN.Role>
       }
       catch (Exception ex)
       {
-        this.AddError(role.RoleId, $"Error importing role '{role.RoleName}': {ex.Message}.");
+        this.AddError(role.RoleId, $"Error importing role '{role.RoleName}': {ex.Message}");
       }
 
       this.Progress();

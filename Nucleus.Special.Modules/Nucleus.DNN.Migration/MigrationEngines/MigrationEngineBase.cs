@@ -70,6 +70,15 @@ public class MigrationEngineBase
 
   public int Current { get; set; }
 
+  public int CurrentPercent
+  {
+    get
+    {
+      if (TotalCount == 0) return 0;
+      return (int)((double)this.Current / (double)TotalCount);
+    }
+  }
+
   public Boolean Completed()
   {
     return this.Current >= this.TotalCount;

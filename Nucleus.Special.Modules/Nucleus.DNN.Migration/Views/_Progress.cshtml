@@ -1,37 +1,36 @@
 ﻿@model Nucleus.DNN.Migration.ViewModels.Progress
 @Html.AddStyle("~!/../index.css")
 <h2 class="nucleus-control-panel-heading">DNN Migration in Progress</h2>
-<div> 
-  <div class="alert alert-warning">
-    <h2>@Model.CurrentOperationEngine.Title</h2>
-    
-    @if (Model.CurrentOperationEngine.Completed())
-    {
-      <span>Operation Complete.</span>
-      <table class="table table-striped table-sm validation-results">        
-        @foreach (var item in Model.CurrentOperationEngine.Items)
-        {
-          @foreach (var result in item.Results)
-          {
-            <tr>
-              <td class="glyph-@result.Type">@result.Message</td>
-            </tr>
-          }
-        }
-      </table>
-    }
-    else
-    {
+<div>
+  @if (!Model.CurrentOperationEngine.Completed())
+  {
+    <div class="alert alert-warning">
+      <h2>@Model.CurrentOperationEngine.Title</h2>
       <div class="progress">
-        <div class="progress-bar" role="progressbar" aria-label="Progress" aria-valuenow="@Model.CurrentOperationEngine.Current" aria-valuemin="0" aria-valuemax="@Model.CurrentOperationEngine.TotalCount"></div>
-      </div>      
-    }
-  </div> 
+        <div class="progress-bar" role="progressbar" aria-label="Progress" style="width: @Model.CurrentOperationEngine.CurrentPercent%" aria-valuenow="@Model.CurrentOperationEngine.Current" aria-valuemin="0" aria-valuemax="@Model.CurrentOperationEngine.TotalCount"></div>
+      </div>
+    </div>
+  }
+  else
+  {
+    <span>@Model.CurrentOperationEngine.Title Complete.</span>
+    <table class="table table-striped table-sm validation-results">
+      @foreach (var item in Model.CurrentOperationEngine.Items)
+      {
+        @foreach (var result in item.Results)
+        {
+          <tr>
+            <td class="glyph-@result.Type">@result.Message</td>
+          </tr>
+        }
+      }
+    </table>
+  }
 </div>
 
 @if (!Model.CurrentOperationEngine.Completed())
 {
   <script>
-    window.setTimeout(Page.LoadPartialContent(null, '@Url.NucleusAction("UpdateProgress", "DNNMigration", "DNNMigration")', '.dnn-migration .modal:visible .modal-body'), 1500);
+    window.setTimeout(Page.LoadPartialContent(null, '@Url.NucleusAction("UpdateProgress", "DNNMigration", "DNNMigration")', '.dnn-migration .modal:visible .modal-body'), 500);
   </script>
 }

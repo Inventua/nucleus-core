@@ -1,7 +1,9 @@
-﻿using Nucleus.Abstractions.Managers;
+﻿using DocumentFormat.OpenXml.Office2010.CustomUI;
+using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Data.Common;
 using Nucleus.DNN.Migration.DataProviders;
+using Nucleus.DNN.Migration.MigrationEngines;
 using Nucleus.DNN.Migration.Models;
 using System;
 using System.Collections.Generic;
@@ -17,11 +19,36 @@ public class DNNMigrationManager
 {
   private IDataProviderFactory DataProviderFactory { get; }
 
+  private static MigrationEngineBase CurrentOperationEngine { get; set; }
+  
   public DNNMigrationManager(IDataProviderFactory dataProviderFactory)
   {
     this.DataProviderFactory = dataProviderFactory;
     this.DataProviderFactory.PreventSchemaCheck(Startup.DNN_SCHEMA_NAME);    
   }
+
+  public Task Migrate<TModel>(IServiceProvider services, List<TModel> items)
+    where TModel : Models.DNN.DNNEntity
+  {
+    if (CurrentOperationEngine?.Completed() == false)
+    {
+      throw new InvalidOperationException("A migration operation is already in progress.");
+    }
+
+    MigrationEngineBase<TModel> engine = services.CreateEngine<TModel>();
+    CurrentOperationEngine = engine;
+
+    return engine.Migrate(items);
+  }
+
+  public MigrationEngineBase CurrentOperation
+  {
+    get
+    { 
+      return CurrentOperationEngine;
+    }
+  }
+
 
   #region "    Migration History    "
   /// <summary>
@@ -87,11 +114,27 @@ public class DNNMigrationManager
     }
   }
 
+  public async Task<Models.DNN.RoleGroup> GetDNNRoleGroup(int id)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.GetRoleGroup(id);
+    }
+  }
+
   public async Task<List<Models.DNN.RoleGroup>> ListDNNRoleGroups(int portalId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
       return await provider.ListRoleGroups(portalId);
+    }
+  }
+
+  public async Task<Models.DNN.Role> GetDNNRole(int id)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.GetRole(id);
     }
   }
 
@@ -103,11 +146,27 @@ public class DNNMigrationManager
     }
   }
 
+  public async Task<Models.DNN.User> GetDNNUser(int id)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.GetUser(id);
+    }
+  }
+
   public async Task<List<Models.DNN.User>> ListDNNUsers(int portalId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
       return await provider.ListUsers(portalId);
+    }
+  }
+
+  public async Task<Models.DNN.Page> GetDNNPage(int id)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.GetPage(id);
     }
   }
 

@@ -26,6 +26,8 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
   public DbSet<Models.DNN.User> Users { get; set; }
 
   public DbSet<Models.DNN.UserRole> UserRoles { get; set; }
+  public DbSet<Models.DNN.UserPortal> UserPortals { get; set; }
+
 
   public DbSet<Models.DNN.UserProfileProperty> UserProfileProperties { get; set; }
 
@@ -61,9 +63,13 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
         entity.Property(ur => ur.RoleId);
         entity.HasKey(ur => new { ur.UserId, ur.RoleId });
         entity.ToTable("UserRoles");
-      }); 
+      });
 
-    builder.Entity<Models.DNN.Portal>().ToView("vw_Portals");
+    builder.Entity<Models.DNN.Portal>()
+      .HasKey(portal => portal.PortalId);
+
+    builder.Entity<Models.DNN.Portal>()
+      .ToView("vw_Portals");
 
     builder.Entity<Models.DNN.User>()
       .HasMany(user => user.Roles)
@@ -78,8 +84,12 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
       .HasMany(user => user.ProfileProperties)
       .WithOne(profileproperty => profileproperty.User);
 
-    builder.Entity<Models.DNN.User>()
-      .HasOne(user => user.UserPortal);
+    //builder.Entity<Models.DNN.User>()
+    //  .HasOne(user => user.UserPortal)
+    //  .WithOne(userPortal => userPortal.User);
+
+    //builder.Entity<Models.DNN.User>()
+    //  .HasOne(user => user.UserPortal);
 
     builder.Entity<Models.DNN.UserProfilePropertyDefinition>()
       .ToTable("ProfilePropertyDefinition")
@@ -88,6 +98,10 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
     builder.Entity<Models.DNN.UserPortal>()
       .ToTable("UserPortals")
       .HasKey(userPortal => userPortal.UserPortalId);
+
+    //builder.Entity<Models.DNN.UserPortal>()
+    //  .HasOne(userPortal => userPortal.User)
+    //  .WithOne(user => user.UserPortal);
 
     builder.Entity<Models.DNN.UserProfileProperty>()
       .ToTable("UserProfile")

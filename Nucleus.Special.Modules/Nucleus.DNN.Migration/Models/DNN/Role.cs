@@ -9,7 +9,12 @@ namespace Nucleus.DNN.Migration.Models.DNN;
 
 public class Role : DNNEntity
 {
-  [Column("RoleID")] 
+  public override int Id()
+  {
+    return this.RoleId; 
+  }
+ 
+  [Column("RoleID")]
   public int RoleId { get; set; }
 
   [Column("PortalID")]
@@ -17,6 +22,8 @@ public class Role : DNNEntity
 
   public string RoleName { get; set; }
   public string Description { get; set; }
+
+  public Boolean AutoAssignment { get; set; }
 
   public RoleGroup RoleGroup { get; set; }
 

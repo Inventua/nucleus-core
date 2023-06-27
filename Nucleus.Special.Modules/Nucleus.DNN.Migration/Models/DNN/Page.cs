@@ -9,6 +9,11 @@ namespace Nucleus.DNN.Migration.Models.DNN;
 
 public class Page : DNNEntity
 {
+  public override int Id()
+  {
+    return this.PageId;
+  }
+
   [Column("TabID")]
   public int PageId { get; set; }
 

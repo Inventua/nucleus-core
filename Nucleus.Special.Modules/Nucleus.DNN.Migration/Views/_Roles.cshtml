@@ -1,7 +1,7 @@
 ﻿@model Nucleus.DNN.Migration.ViewModels.Role
 @Html.AddStyle("~!/../index.css")
 <h2 class="nucleus-control-panel-heading">Migrate DNN Roles and Groups</h2>
-<div class="dnn-migration">
+<div>
   <div class="alert alert-primary">
     <ul>
       <li>Role groups are only migrated if they contain at least one role.</li>
@@ -16,7 +16,7 @@
   {
     @Html.HiddenFor(model => model.PortalId)
     <div class="nucleus-button-panel">
-      <button type="submit" class="btn btn-primary" data-confirm="Migrate selected Roles and Groups from DotNetNuke now?  This action cannot be reversed.">Migrate Roles and Groups</button>
+      <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-before" data-confirm="Migrate selected Roles and Groups from DotNetNuke now?  This action cannot be reversed.">Migrate Roles and Groups</button>
     </div>
     <div class="my-2">
       <h2>Role Groups</h2>

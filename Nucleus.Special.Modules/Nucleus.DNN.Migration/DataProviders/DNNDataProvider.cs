@@ -38,8 +38,18 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .ToListAsync();
   }
 
+  public async Task<Models.DNN.RoleGroup> GetRoleGroup(int roleGroupId)
+  {
+    return await this.Context.RoleGroups
+      .Where(group => group.RoleGroupId == roleGroupId)
+      .FirstOrDefaultAsync();
+  }
+
   public async Task<List<Models.DNN.RoleGroup>> ListRoleGroups(int portalId)
   {
+    var test = this.Context.RoleGroups
+      .Where(group => group.PortalId == portalId && group.Roles.Any());
+
     List<Models.DNN.RoleGroup> results = await this.Context.RoleGroups
       .Where(group => group.PortalId == portalId && group.Roles.Any())
       .OrderBy(group => group.RoleGroupName)
@@ -53,6 +63,14 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
     }
 
     return results;
+  }
+
+  public async Task<Models.DNN.Role> GetRole(int roleId)
+  {
+    return await this.Context.Roles
+      .Where(role => role.RoleId == roleId)
+      .Include(role => role.RoleGroup)
+      .FirstOrDefaultAsync();
   }
 
   public async Task<List<Models.DNN.Role>> ListRoles(int portalId)
@@ -73,16 +91,44 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
     return results;
   }
 
-  public async Task<List<Models.DNN.User>> ListUsers(int portalId)
-  {   
+  public async Task<Models.DNN.User> GetUser(int userId)
+  {
     return await this.Context.Users
-      .Where(user => user.UserPortal.PortalId == portalId)
+      .Where(user => user.UserId == userId)
       .Include(user => user.Roles)
       .Include(user => user.ProfileProperties)
-      .Include(user => user.UserPortal)
+      .AsSplitQuery()
+      .FirstOrDefaultAsync();
+  }
+
+  public async Task<List<Models.DNN.User>> ListUsers(int portalId)
+  {
+    var test = this.Context.Users
+      .Where(user => user.UserPortal.Portal.PortalId == portalId)
+      .Include(user => user.Roles);
+
+    List<Models.DNN.User> results = await this.Context.Users
+      .Where(user => user.UserPortal.Portal.PortalId == portalId)
+      .Include(user => user.Roles)
+      .Include(user => user.ProfileProperties)
       .OrderBy(user => user.UserName)
       .AsSplitQuery()
       .ToListAsync();
+
+    foreach (Models.DNN.User user in results)
+    {
+      user.UserPortal = await this.Context.UserPortals
+        .Where(userPortal => userPortal.UserId == user.UserId && userPortal.Portal.PortalId == portalId)
+        .FirstOrDefaultAsync();
+    }
+    return results;
+  }
+
+  public async Task<Models.DNN.Page> GetPage(int pageId)
+  {
+    return await this.Context.Pages
+      .Where(page => page.PageId == pageId)
+      .FirstOrDefaultAsync();
   }
 
   public async Task<List<Models.DNN.Page>> ListPages(int portalId)

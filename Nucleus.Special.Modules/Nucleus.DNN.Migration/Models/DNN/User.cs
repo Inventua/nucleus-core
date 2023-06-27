@@ -9,6 +9,11 @@ namespace Nucleus.DNN.Migration.Models.DNN;
 
 public class User : DNNEntity
 {
+  public override int Id()
+  {
+    return this.UserId;    
+  }
+
   [Column("UserID")]
   public int UserId { get; set; }
 

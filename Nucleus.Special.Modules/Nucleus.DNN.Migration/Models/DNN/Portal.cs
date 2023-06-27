@@ -11,6 +11,7 @@ public class Portal
 {
   [Column("PortalID")] 
   public int PortalId { get; set; }
+
   public string PortalName { get; set; }
 
 }

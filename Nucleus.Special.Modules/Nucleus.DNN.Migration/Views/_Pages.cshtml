@@ -1,7 +1,7 @@
 ﻿@model Nucleus.DNN.Migration.ViewModels.Page
 @Html.AddStyle("~!/../index.css")
 <h2 class="nucleus-control-panel-heading">Migrate DNN Pages</h2>
-<div class="dnn-migration">
+<div>
   <div class="alert alert-primary">
     <ul>
       <li>Deleted pages will not be migrated.</li>
@@ -13,7 +13,7 @@
   {
     @Html.HiddenFor(model => model.PortalId)
     <div class="nucleus-button-panel">
-      <button type="submit" class="btn btn-primary" data-confirm="Migrate selected pages from DotNetNuke now?  This action cannot be reversed.">Migrate Pages</button>
+      <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-before" data-confirm="Migrate selected pages from DotNetNuke now?  This action cannot be reversed.">Migrate Pages</button>
     </div>
 
     <div class="my-2">

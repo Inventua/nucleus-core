@@ -1,7 +1,7 @@
 ﻿@model Nucleus.DNN.Migration.ViewModels.User
 @Html.AddStyle("~!/../index.css")
 <h2 class="nucleus-control-panel-heading">Migrate DNN Users</h2>
-<div class="dnn-migration">
+<div>
   <div class="alert alert-primary">
     <ul>
       <li>Super users will not be migrated.</li>
@@ -15,7 +15,7 @@
   {
     @Html.HiddenFor(model => model.PortalId)
     <div class="nucleus-button-panel">
-      <button type="submit" class="btn btn-primary" data-confirm="Migrate selected Users from DotNetNuke now?  This action cannot be reversed.">Migrate Users</button>
+      <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-before" data-confirm="Migrate selected Users from DotNetNuke now?  This action cannot be reversed.">Migrate Users</button>
     </div>
 
     <div class="my-2">

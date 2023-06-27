@@ -4,17 +4,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Nucleus.Abstractions.Managers;
 
 namespace Nucleus.DNN.Migration.MigrationEngines;
 
-public class PageMigration : IMigrationEngine<Models.DNN.Page>
+public class PageMigration : MigrationEngineBase<Models.DNN.Page>
 {
-  public Task Migrate(List<Page> items)
+  private Nucleus.Abstractions.Models.Context Context { get; }
+  private DNNMigrationManager MigrationManager { get; }
+  private IPageManager PageManager { get; }
+
+  public PageMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IPageManager pageManager) : base("Migrating Pages")  
+  { 
+    this.Context = context;
+    this.MigrationManager = migrationManager;
+    this.PageManager = pageManager;
+  }
+
+  public override Task Migrate(List<Page> items)
   {
     throw new NotImplementedException();
   }
 
-  public Task Validate(List<Page> items)
+  public override Task Validate(List<Page> items)
   {
     return Task.CompletedTask;
   }

@@ -15,14 +15,15 @@ namespace Nucleus.DNN.Migration.MigrationEngines;
 public static class ServiceExtensions
 {  
   public static void AddMigrationEngine<TModel, TEngine>(this IServiceCollection services) 
-    where TModel : class 
-    where TEngine : class, IMigrationEngine<TModel>
+    where TModel : Models.DNN.DNNEntity 
+    where TEngine : MigrationEngineBase<TModel>
   {
-    services.AddSingleton<IMigrationEngine<TModel>, TEngine>();    
+    services.AddScoped<MigrationEngineBase<TModel>, TEngine>();    
   }
 
-  public static IMigrationEngine<TModel> CreateEngine<TModel>(this IServiceProvider services) where TModel : class
+  public static MigrationEngineBase<TModel> CreateEngine<TModel>(this IServiceProvider services) 
+    where TModel : Models.DNN.DNNEntity
   {
-    return services.GetService<IMigrationEngine<TModel>>();
+    return services.GetService<MigrationEngineBase<TModel>>();
   }
 }

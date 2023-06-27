@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Options;
 using Nucleus.DNN.Migration.MigrationEngines;
+using Nucleus.ViewFeatures.TagHelpers;
 
 //https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.storage.irelationalcommand.executereaderasync?view=efcore-7.0
 
@@ -47,9 +48,20 @@ public class DNNMigrationController : Controller
   [HttpPost]
   public async Task<ActionResult> MigrateRoles(ViewModels.Role viewModel)
   {
-    return View("_Roles", await BuildRolesViewModel(viewModel.PortalId));
+    // we await the role group import, because it is likely to be fast
+    await this.DNNMigrationManager.Migrate<Models.DNN.RoleGroup>(this.HttpContext.RequestServices, viewModel.RoleGroups);
+
+    // run the role import asynchronously
+    Task task = this.DNNMigrationManager.Migrate<Models.DNN.Role>(this.HttpContext.RequestServices, viewModel.Roles);
+
+    return View("_Progress", await BuildProgressViewModel());
   }
 
+  [HttpGet]
+  public async Task<ActionResult> UpdateProgress(ViewModels.Progress viewModel)
+  {  
+    return View("_Progress", await BuildProgressViewModel());
+  }
 
   [HttpPost]
   public async Task<ActionResult> PagesIndex(ViewModels.Index viewModel)
@@ -78,6 +90,20 @@ public class DNNMigrationController : Controller
     }
   
     return viewModel;
+  }
+
+  private Task <ViewModels.Progress> BuildProgressViewModel()
+  {
+    ViewModels.Progress viewModel = new()
+    {
+      CurrentOperationEngine = this.DNNMigrationManager.CurrentOperation
+    };
+
+    if (viewModel.CurrentOperationEngine.Completed())
+    {
+
+    }
+    return Task.FromResult(viewModel);
   }
 
   private async Task<ViewModels.Role> BuildRolesViewModel(int portalId)

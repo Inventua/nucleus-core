@@ -9,6 +9,11 @@ namespace Nucleus.DNN.Migration.Models.DNN;
 
 public class RoleGroup : DNNEntity
 {
+  public override int Id()
+  {
+    return this.RoleGroupId;
+  }
+
   [Column("RoleGroupID")]
   public int RoleGroupId { get; set; }
 

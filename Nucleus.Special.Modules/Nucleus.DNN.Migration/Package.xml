@@ -33,6 +33,7 @@
         <file name="_Files.cshtml" />
         <file name="_Pages.cshtml" />
         <file name="_Users.cshtml" />
+        <file name="_Progress.cshtml" />
 			</folder>
 			
 		</component>

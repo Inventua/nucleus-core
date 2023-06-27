@@ -13,12 +13,12 @@ public class UserPortal
 
   public int UserId { get; set; }
 
-  public int PortalId { get; set; }
+  public Portal Portal { get; set; }
 
   public Boolean Authorised { get; set; }
 
   public Boolean IsDeleted { get; set; }
 
-  public User User { get; set; }
+  //public User User { get; set; }
 
 }

@@ -11,6 +11,8 @@ namespace Nucleus.DNN.Migration.Models.DNN;
 
 public abstract class DNNEntity
 {
+  public abstract int Id();
+
   [NotMapped]
   public Boolean IsSelected { get; set; } = true;
 
@@ -22,7 +24,7 @@ public abstract class DNNEntity
 
   public void AddWarning(string message)
   {
-    this.Results.Add(new(ValidationResult.ValidationResultTypes.Warning, message)); 
+    this.Results.Add(new(ValidationResult.ValidationResultTypes.Warning, message));
   }
 
   public void AddError(string message)
@@ -31,5 +33,4 @@ public abstract class DNNEntity
     this.CanSelect = false;
     this.IsSelected = false;
   }
-
 }

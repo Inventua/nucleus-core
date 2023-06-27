@@ -1,4 +1,5 @@
-﻿using Nucleus.DNN.Migration.Models.DNN;
+﻿using Nucleus.Abstractions.Managers;
+using Nucleus.DNN.Migration.Models.DNN;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,20 +9,52 @@ using System.Threading.Tasks;
 
 namespace Nucleus.DNN.Migration.MigrationEngines;
 
-public class RoleMigration : IMigrationEngine<Models.DNN.Role>
+public class RoleMigration : MigrationEngineBase<Models.DNN.Role>
 {
-  public Task Migrate(List<Role> items)
+  private IRoleManager RoleManager { get; }
+  private IRoleGroupManager RoleGroupManager { get; }
+  private Nucleus.Abstractions.Models.Context Context { get; }
+  private DNNMigrationManager MigrationManager { get; }
+
+  public RoleMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IRoleManager roleManager, IRoleGroupManager roleGroupManager) : base("Migrating Roles")
   {
-    foreach (Role role in items.Where(role => role.CanSelect && role.IsSelected))
-    {
-      Nucleus.Abstractions.Models.Role newRole = new() 
-      { 
-      };
-    }
-    return Task.CompletedTask;
+    this.MigrationManager = migrationManager;
+    this.Context = context;
+    this.RoleManager = roleManager; 
+    this.RoleGroupManager = roleGroupManager;
   }
 
-  public Task Validate(List<Role> items)
+  public override async Task Migrate(List<Role> items)
+  {    
+    this.Start(items.Where(role => role.CanSelect && role.IsSelected).ToList());
+
+    foreach (int roleId in this.Items.Select(role => role.RoleId))
+    {
+      Role role = await this.MigrationManager.GetDNNRole(roleId);
+        
+      try
+      {
+        Nucleus.Abstractions.Models.Role newRole = await this.RoleManager.CreateNew();
+
+        newRole.Name = role.RoleName;
+        newRole.Type = role.AutoAssignment ? Abstractions.Models.Role.RoleType.AutoAssign : Abstractions.Models.Role.RoleType.Normal;
+        newRole.Description = role.Description;
+        if (role.RoleGroup != null)
+        {
+          newRole.RoleGroup = await this.RoleGroupManager.GetByName(this.Context.Site, role.RoleGroup.RoleGroupName);
+        }
+        await this.RoleManager.Save(this.Context.Site, newRole);
+      }
+      catch (Exception ex)
+      {
+        this.AddError(role.RoleId, $"Error importing role '{role.RoleName}': {ex.Message}.");
+      }
+
+      this.Progress();
+    }
+  }
+
+  public override Task Validate(List<Role> items)
   {
     foreach (Role role in items)
     {

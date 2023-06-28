@@ -2,33 +2,36 @@
 @Html.AddStyle("~!/../index.css")
 <h2 class="nucleus-control-panel-heading">DNN Migration in Progress</h2>
 <div>
-  @if (!Model.CurrentOperationEngine.Completed())
+  @foreach (var engine in Model.CurrentOperationEngines)
   {
-    <div class="alert alert-warning">
-      <h2>@Model.CurrentOperationEngine.Title</h2>
-      <div class="progress">
-        <div class="progress-bar" role="progressbar" aria-label="Progress" style="width: @Model.CurrentOperationEngine.CurrentPercent%" aria-valuenow="@Model.CurrentOperationEngine.Current" aria-valuemin="0" aria-valuemax="@Model.CurrentOperationEngine.TotalCount"></div>
+    if (!engine.Completed())
+    {
+      <div class="alert alert-warning">
+        <h2>@engine.Title</h2>
+        <div class="progress">
+          <div class="progress-bar" role="progressbar" aria-label="Progress" style="width: @engine.CurrentPercent%" aria-valuenow="@engine.Current" aria-valuemin="0" aria-valuemax="@engine.TotalCount"></div>
+        </div>
       </div>
-    </div>
-  }
-  else
-  {
-    <span>@Model.CurrentOperationEngine.Title Complete.</span>
-    <table class="table table-striped table-sm validation-results">
-      @foreach (var item in Model.CurrentOperationEngine.Items)
-      {
-        @foreach (var result in item.Results)
+    }
+    else
+    {
+      <span>@engine.Title Complete.</span>
+      <table class="table table-striped table-sm validation-results">
+        @foreach (var item in engine.Items)
         {
-          <tr>
-            <td class="glyph-@result.Type">@result.Message</td>
-          </tr>
+          @foreach (var result in item.Results)
+          {
+            <tr>
+              <td class="glyph-@result.Type">@result.Message</td>
+            </tr>
+          }
         }
-      }
-    </table>
+      </table>
+    }
   }
 </div>
 
-@if (!Model.CurrentOperationEngine.Completed())
+@if (Model.CurrentOperationEngines.All(engine => engine.Completed()))
 {
   <script>
     window.setTimeout(Page.LoadPartialContent(null, '@Url.NucleusAction("UpdateProgress", "DNNMigration", "DNNMigration")', '.dnn-migration .modal:visible .modal-body'), 500);

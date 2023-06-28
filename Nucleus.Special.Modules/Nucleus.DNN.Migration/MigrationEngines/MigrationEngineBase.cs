@@ -74,14 +74,14 @@ public class MigrationEngineBase
   {
     get
     {
-      if (TotalCount == 0) return 0;
-      return (int)((double)this.Current / (double)TotalCount);
+      if (this.TotalCount == 0 || this.Current == 0) return 0;
+      return (int)((double)this.Current / (double)this.TotalCount * 100);
     }
   }
 
   public Boolean Completed()
   {
-    return this.Current >= this.TotalCount;
+    return this.TotalCount != 0 && this.Current >= this.TotalCount;
   }
 
   public void Start(int totalCount)

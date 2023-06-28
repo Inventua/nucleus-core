@@ -16,6 +16,6 @@ public class Progress
 {
   public string Title { get; set; }
 
-  public MigrationEngineBase CurrentOperationEngine { get; set; }
+  public List<MigrationEngineBase> CurrentOperationEngines { get; set; }
 
 }

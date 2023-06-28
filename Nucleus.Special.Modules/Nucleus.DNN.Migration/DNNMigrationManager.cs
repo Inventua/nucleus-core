@@ -19,7 +19,7 @@ public class DNNMigrationManager
 {
   private IDataProviderFactory DataProviderFactory { get; }
 
-  private static MigrationEngineBase CurrentOperationEngine { get; set; }
+  private static List<MigrationEngineBase> CurrentOperationEngines { get; } = new();
   
   public DNNMigrationManager(IDataProviderFactory dataProviderFactory)
   {
@@ -27,25 +27,35 @@ public class DNNMigrationManager
     this.DataProviderFactory.PreventSchemaCheck(Startup.DNN_SCHEMA_NAME);    
   }
 
+  public void ClearMigrateOperations()
+  {
+    if (!CurrentOperationEngines.All(engine => engine.Completed()))
+    {
+      throw new InvalidOperationException("A migration operation is already in progress.");
+    }
+
+    CurrentOperationEngines.Clear();
+  }
+
   public Task Migrate<TModel>(IServiceProvider services, List<TModel> items)
     where TModel : Models.DNN.DNNEntity
   {
-    if (CurrentOperationEngine?.Completed() == false)
+    if (!CurrentOperationEngines.All(engine => engine.Completed()))
     {
       throw new InvalidOperationException("A migration operation is already in progress.");
     }
 
     MigrationEngineBase<TModel> engine = services.CreateEngine<TModel>();
-    CurrentOperationEngine = engine;
+    CurrentOperationEngines.Add(engine);
 
     return engine.Migrate(items);
   }
 
-  public MigrationEngineBase CurrentOperation
+  public List<MigrationEngineBase> CurrentOperations
   {
     get
     { 
-      return CurrentOperationEngine;
+      return CurrentOperationEngines;
     }
   }
 

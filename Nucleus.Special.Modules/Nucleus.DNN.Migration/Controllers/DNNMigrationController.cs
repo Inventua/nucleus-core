@@ -48,12 +48,14 @@ public class DNNMigrationController : Controller
   [HttpPost]
   public async Task<ActionResult> MigrateRoles(ViewModels.Role viewModel)
   {
-    // we await the role group import, because it is likely to be fast
-    await this.DNNMigrationManager.Migrate<Models.DNN.RoleGroup>(this.HttpContext.RequestServices, viewModel.RoleGroups);
+    this.DNNMigrationManager.ClearMigrateOperations();
 
-    // run the role import asynchronously
-    Task task = this.DNNMigrationManager.Migrate<Models.DNN.Role>(this.HttpContext.RequestServices, viewModel.Roles);
-
+    Task task = Task.Run(async () => 
+    {
+      await this.DNNMigrationManager.Migrate<Models.DNN.RoleGroup>(this.HttpContext.RequestServices, viewModel.RoleGroups);
+      await this.DNNMigrationManager.Migrate<Models.DNN.Role>(this.HttpContext.RequestServices, viewModel.Roles);
+    });
+    
     return View("_Progress", await BuildProgressViewModel());
   }
 
@@ -96,7 +98,7 @@ public class DNNMigrationController : Controller
   {
     ViewModels.Progress viewModel = new()
     {
-      CurrentOperationEngine = this.DNNMigrationManager.CurrentOperation
+      CurrentOperationEngines = this.DNNMigrationManager.CurrentOperations
     };
 
     return Task.FromResult(viewModel);

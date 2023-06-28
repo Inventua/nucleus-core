@@ -12,11 +12,11 @@
     </ul>
   </div>
 
-  @using (Html.BeginNucleusForm("MigrateRoles", "DNNMigration", "DNNMigration", FormMethod.Post, new { }))
+  @using (Html.BeginNucleusForm("MigrateRoles", "DNNMigration", "DNNMigration", FormMethod.Post, new { data_target = "#MigrateRoles" }))
   {
     @Html.HiddenFor(model => model.PortalId)
     <div class="nucleus-button-panel">
-      <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-before" data-target="#MigrateRoles" data-confirm="Migrate selected Roles and Groups from DotNetNuke now?  This action cannot be reversed.">Migrate Roles and Groups</button>
+      <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-before" data-confirm="Migrate selected Roles and Groups from DotNetNuke now?  This action cannot be reversed.">Migrate Roles and Groups</button>
     </div>
     <div class="my-2">
       <h2>Role Groups</h2>

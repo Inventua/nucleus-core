@@ -21,14 +21,10 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
     this.UserManager = UserManager;
   }
 
-  public override async Task Migrate(List<User> items)
+  public override async Task Migrate()
   {
-    this.Start(items.Where(User => User.CanSelect && User.IsSelected).ToList());
-
-    foreach (int userId in this.Items.Select(user => user.UserId))
+    foreach (User user in this.Items.Where(user => user.CanSelect && user.IsSelected))
     {
-      User user = await this.MigrationManager.GetDNNUser(userId);
-       
       try
       {
         Nucleus.Abstractions.Models.User newUser = await this.UserManager.CreateNew(this.Context.Site);
@@ -45,16 +41,16 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
       }
       catch (Exception ex)
       {
-        this.AddError(user.UserId, $"Error importing User '{user.UserName}': {ex.Message}.");
+        user.AddError($"Error importing User '{user.UserName}': {ex.Message}");
       }
 
       this.Progress();
     }
   }
 
-  public override Task Validate(List<User> items)
+  public override Task Validate()
   {
-    foreach (User user in items)
+    foreach (User user in this.Items)
     {
       if (user.IsSuperUser)
       {

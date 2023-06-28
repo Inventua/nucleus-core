@@ -24,14 +24,10 @@ public class RoleMigration : MigrationEngineBase<Models.DNN.Role>
     this.RoleGroupManager = roleGroupManager;
   }
 
-  public override async Task Migrate(List<Role> items)
+  public override async Task Migrate()
   {    
-    this.Start(items.Where(role => role.CanSelect && role.IsSelected).ToList());
-
-    foreach (int roleId in this.Items.Select(role => role.RoleId))
+    foreach (Role role in this.Items.Where(role => role.CanSelect && role.IsSelected))
     {
-      Role role = await this.MigrationManager.GetDNNRole(roleId);
-        
       try
       {
         Nucleus.Abstractions.Models.Role newRole = await this.RoleManager.CreateNew();
@@ -47,26 +43,26 @@ public class RoleMigration : MigrationEngineBase<Models.DNN.Role>
       }
       catch (Exception ex)
       {
-        this.AddError(role.RoleId, $"Error importing role '{role.RoleName}': {ex.Message}");
+        role.AddError($"Error importing role '{role.RoleName}': {ex.Message}");
       }
 
       this.Progress();
     }
   }
 
-  public override Task Validate(List<Role> items)
+  public override Task Validate()
   {
-    foreach (Role role in items)
+    foreach (Role role in this.Items)
     {
       string[] RESERVED_ROLES = { "Administrators", "Registered Users" };
       if (RESERVED_ROLES.Contains(role.RoleName, StringComparer.OrdinalIgnoreCase)) 
       {
-        role.AddError("This is a reserved role in DNN which will not be migrated.");
+        role.AddError($"'{role.RoleName}' is a reserved role in DNN and will not be migrated.");
       }
 
       if (role.UserCount == 0)
       {
-        role.AddWarning("There are no users in this role.");
+        role.AddWarning($"There are no users in the '{role.RoleName}' role.");
       }
     }
 

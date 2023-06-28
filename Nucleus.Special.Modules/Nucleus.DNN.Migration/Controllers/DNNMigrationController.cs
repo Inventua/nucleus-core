@@ -14,6 +14,7 @@ using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Options;
 using Nucleus.DNN.Migration.MigrationEngines;
 using Nucleus.ViewFeatures.TagHelpers;
+using DocumentFormat.OpenXml.Math;
 
 //https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.storage.irelationalcommand.executereaderasync?view=efcore-7.0
 
@@ -48,12 +49,16 @@ public class DNNMigrationController : Controller
   [HttpPost]
   public async Task<ActionResult> MigrateRoles(ViewModels.Role viewModel)
   {
-    this.DNNMigrationManager.ClearMigrateOperations();
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.RoleGroup>().UpdateSelections(viewModel.RoleGroups);
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Role>().UpdateSelections(viewModel.Roles);
 
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.RoleGroup>().SignalStart();
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Role>().SignalStart();
+      
     Task task = Task.Run(async () => 
     {
-      await this.DNNMigrationManager.Migrate<Models.DNN.RoleGroup>(this.HttpContext.RequestServices, viewModel.RoleGroups);
-      await this.DNNMigrationManager.Migrate<Models.DNN.Role>(this.HttpContext.RequestServices, viewModel.Roles);
+      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.RoleGroup>().Migrate();
+      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Role>().Migrate();
     });
     
     return View("_Progress", await BuildProgressViewModel());
@@ -96,9 +101,14 @@ public class DNNMigrationController : Controller
 
   private Task <ViewModels.Progress> BuildProgressViewModel()
   {
+    // copy the engine object data to a EngineProgress object so that the progress values do not change during page rendering
+    IEnumerable<EngineProgress> progress = this.DNNMigrationManager.GetMigrationEngines.Select(engine => engine.GetProgress());    
+    Boolean doRefresh = progress.Any(engine => engine.State != Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase.EngineStates.Completed);
+
     ViewModels.Progress viewModel = new()
     {
-      CurrentOperationEngines = this.DNNMigrationManager.CurrentOperations
+      EngineProgress = progress,
+      InProgress = doRefresh
     };
 
     return Task.FromResult(viewModel);
@@ -112,8 +122,14 @@ public class DNNMigrationController : Controller
     viewModel.RoleGroups = await this.DNNMigrationManager.ListDNNRoleGroups(portalId);
     viewModel.Roles = await this.DNNMigrationManager.ListDNNRoles(portalId);
 
-    await this.HttpContext.RequestServices.CreateEngine<Models.DNN.RoleGroup>().Validate(viewModel.RoleGroups);
-    await this.HttpContext.RequestServices.CreateEngine<Models.DNN.Role>().Validate(viewModel.Roles);
+    this.DNNMigrationManager.ClearMigrationEngines();
+    await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.RoleGroup>(this.HttpContext.RequestServices, viewModel.RoleGroups);
+    await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.Role>(this.HttpContext.RequestServices, viewModel.Roles);
+    
+    foreach (MigrationEngineBase engine in this.DNNMigrationManager.GetMigrationEngines)
+    {
+      await engine.Validate();
+    }
     
     return viewModel;
   }
@@ -124,7 +140,15 @@ public class DNNMigrationController : Controller
     viewModel.PortalId = portalId;
 
     viewModel.Pages = await this.DNNMigrationManager.ListDNNPages(portalId);
-    await this.HttpContext.RequestServices.CreateEngine<Models.DNN.Page>().Validate(viewModel.Pages);
+
+    this.DNNMigrationManager.ClearMigrationEngines();
+    await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.Page>(this.HttpContext.RequestServices, viewModel.Pages);    
+
+    foreach (MigrationEngineBase engine in this.DNNMigrationManager.GetMigrationEngines)
+    {
+      await engine.Validate();
+    }
+
 
     return viewModel;
   }
@@ -135,7 +159,14 @@ public class DNNMigrationController : Controller
     viewModel.PortalId = portalId;
 
     viewModel.Users = await this.DNNMigrationManager.ListDNNUsers(portalId);
-    await this.HttpContext.RequestServices.CreateEngine<Models.DNN.User>().Validate(viewModel.Users);
+
+    this.DNNMigrationManager.ClearMigrationEngines();
+    await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.User>(this.HttpContext.RequestServices, viewModel.Users);
+
+    foreach (MigrationEngineBase engine in this.DNNMigrationManager.GetMigrationEngines)
+    {
+      await engine.Validate();
+    }
 
     return viewModel;
   }

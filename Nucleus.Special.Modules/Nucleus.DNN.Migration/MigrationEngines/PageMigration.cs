@@ -21,12 +21,12 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     this.PageManager = pageManager;
   }
 
-  public override Task Migrate(List<Page> items)
+  public override Task Migrate()
   {
     throw new NotImplementedException();
   }
 
-  public override Task Validate(List<Page> items)
+  public override Task Validate()
   {
     return Task.CompletedTask;
   }

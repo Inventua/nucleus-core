@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Nucleus.DNN.Migration.Models;
 using Nucleus.DNN.Migration.Models.DNN;
 
 namespace Nucleus.DNN.Migration.MigrationEngines;
 
 public abstract class MigrationEngineBase<TModel> : MigrationEngineBase 
   where TModel : Nucleus.DNN.Migration.Models.DNN.DNNEntity
-{
+{ 
   public MigrationEngineBase(string title) : base(title) { }
 
   private List<TModel> _items;
@@ -27,37 +28,44 @@ public abstract class MigrationEngineBase<TModel> : MigrationEngineBase
     }
   }
 
-  public void Start(List<TModel> items)
+  public void UpdateSelections(List<TModel> items)
   {
-    this.Items = items;
-    this.TotalCount = items.Count;
-  }
-
-  public abstract Task Validate(List<TModel> items);
- 
-  public abstract Task Migrate(List<TModel> items);
-
-  public void AddWarning(int id, string message)
-  {
-    DNNEntity item = this.Items.Where(item=>item.Id() == id).FirstOrDefault();
-    if (item != null)
+    foreach (TModel item in items)
     {
-      item.Results.Add(new(ValidationResult.ValidationResultTypes.Warning, message));
+      TModel existing = this.Items.Where(existing => existing.Id() == item.Id()).FirstOrDefault();
+      if (existing != null)
+      {
+        existing.IsSelected = item.IsSelected && item.CanSelect;
+      }
     }
   }
 
-  public void AddError(int id, string message)
+  public void Init(List<TModel> items)
   {
-    DNNEntity item = this.Items.Where(item => item.Id() == id).FirstOrDefault();
-    if (item != null)
+    this.Items = items;
+    this.TotalCount = 0;
+  }
+
+  public void SignalStart()
+  {
+    this.IsStarted = true;
+    this.TotalCount = this.Items.Where(item=> item.CanSelect && item.IsSelected).Count();
+    foreach (DNNEntity item in this.Items)
     {
-      item.Results.Add(new(ValidationResult.ValidationResultTypes.Error, message));      
-    }    
+      item.Results.Clear();
+    }
   }
 }
 
-public class MigrationEngineBase
+public abstract class MigrationEngineBase
 {
+  public enum EngineStates
+  {
+    AwaitingInput,
+    InProgress,
+    Completed
+  }
+
   public MigrationEngineBase(string title)
   {
     this.Title = title;
@@ -66,9 +74,27 @@ public class MigrationEngineBase
   public string Title { get; }
   public List<Nucleus.DNN.Migration.Models.DNN.DNNEntity> Items { get; protected set; }
 
+  public EngineProgress GetProgress()
+  {
+    EngineProgress copy = new Models.EngineProgress() 
+    { 
+      Title=this.Title,
+      Current=this.Current,
+      CurrentPercent = this.CurrentPercent,
+      IsStarted = this.IsStarted,  
+      State=this.State(),
+      TotalCount=this.TotalCount,
+      Items = this.Items
+    };
+    
+    return copy;
+  }
+
   public int TotalCount { get; set; }
 
   public int Current { get; set; }
+
+  public Boolean IsStarted { get; protected set; }
 
   public int CurrentPercent
   {
@@ -79,10 +105,23 @@ public class MigrationEngineBase
     }
   }
 
-  public Boolean Completed()
+  public EngineStates State()
   {
-    return this.TotalCount != 0 && this.Current >= this.TotalCount;
+    if (this.IsStarted && this.Current < this.TotalCount)
+    {
+      return EngineStates.InProgress;
+    }
+    else if (this.TotalCount > 0 && this.Current == 0)
+    {
+      return EngineStates.AwaitingInput;
+    }
+    return EngineStates.Completed;
   }
+
+
+  public abstract Task Validate();
+
+  public abstract Task Migrate();
 
   public void Start(int totalCount)
   {

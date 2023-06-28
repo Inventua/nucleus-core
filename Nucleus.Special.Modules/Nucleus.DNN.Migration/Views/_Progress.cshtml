@@ -2,9 +2,9 @@
 @Html.AddStyle("~!/../index.css")
 <h2 class="nucleus-control-panel-heading">DNN Migration in Progress</h2>
 <div>
-  @foreach (var engine in Model.CurrentOperationEngines)
+  @foreach (var engine in Model.EngineProgress)
   {
-    if (!engine.Completed())
+    if (engine.State == Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase.EngineStates.InProgress)
     {
       <div class="alert alert-warning">
         <h2>@engine.Title</h2>
@@ -13,10 +13,10 @@
         </div>
       </div>
     }
-    else
+    else if (engine.State == Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase.EngineStates.Completed)
     {
-      <span>@engine.Title Complete.</span>
-      <table class="table table-striped table-sm validation-results mb-2">
+      <h2>@engine.Title Complete.</h2>
+      <table class="table table-striped table-sm validation-results mb-4">
         @foreach (var item in engine.Items)
         {
           @foreach (var result in item.Results)
@@ -31,9 +31,13 @@
   }
 </div>
 
-@if (Model.CurrentOperationEngines.All(engine => engine.Completed()))
+@if (Model.InProgress)
 {
   <script>
-    window.setTimeout(Page.LoadPartialContent(null, '@Url.NucleusAction("UpdateProgress", "DNNMigration", "DNNMigration")', '.dnn-migration .modal:visible .modal-body'), 500);
+    window.setTimeout(
+      function() 
+      { 
+        Page.LoadPartialContent(null, '@Url.NucleusAction("UpdateProgress", "DNNMigration", "DNNMigration")', '.dnn-migration .modal:visible .modal-body')
+      }, 1000);
   </script>
 }

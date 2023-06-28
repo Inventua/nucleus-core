@@ -19,7 +19,7 @@ public class DNNMigrationManager
 {
   private IDataProviderFactory DataProviderFactory { get; }
 
-  private static List<MigrationEngineBase> CurrentOperationEngines { get; } = new();
+  private static List<MigrationEngineBase> MigrationEngines { get; } = new();
   
   public DNNMigrationManager(IDataProviderFactory dataProviderFactory)
   {
@@ -27,38 +27,48 @@ public class DNNMigrationManager
     this.DataProviderFactory.PreventSchemaCheck(Startup.DNN_SCHEMA_NAME);    
   }
 
-  public void ClearMigrateOperations()
+  public void ClearMigrationEngines()
   {
-    if (!CurrentOperationEngines.All(engine => engine.Completed()))
+    if (MigrationEngines.Any() && MigrationEngines.Any(engine => engine.State() == MigrationEngineBase.EngineStates.InProgress))
     {
       throw new InvalidOperationException("A migration operation is already in progress.");
     }
 
-    CurrentOperationEngines.Clear();
+    MigrationEngines.Clear();
   }
 
-  public Task Migrate<TModel>(IServiceProvider services, List<TModel> items)
+  public MigrationEngineBase<TModel> GetMigrationEngine<TModel>()
+    where TModel : Models.DNN.DNNEntity
+  {    
+    return MigrationEngines.Where(engine => engine as MigrationEngineBase<TModel> != null)
+      .Select(engine => engine as MigrationEngineBase<TModel>)
+      .FirstOrDefault();    
+  }
+
+
+  public List<MigrationEngineBase> GetMigrationEngines
+  {
+    get
+    {
+      return MigrationEngines;
+    }
+  }
+
+
+  public Task<MigrationEngineBase<TModel>> CreateMigrationEngine<TModel>(IServiceProvider services, List<TModel> items)
     where TModel : Models.DNN.DNNEntity
   {
-    if (!CurrentOperationEngines.All(engine => engine.Completed()))
+    if (MigrationEngines.Any() && MigrationEngines.Any(engine => engine.State() == MigrationEngineBase.EngineStates.InProgress))
     {
       throw new InvalidOperationException("A migration operation is already in progress.");
     }
 
     MigrationEngineBase<TModel> engine = services.CreateEngine<TModel>();
-    CurrentOperationEngines.Add(engine);
+    engine.Init(items);
+    MigrationEngines.Add(engine);
 
-    return engine.Migrate(items);
+    return Task.FromResult(engine);
   }
-
-  public List<MigrationEngineBase> CurrentOperations
-  {
-    get
-    { 
-      return CurrentOperationEngines;
-    }
-  }
-
 
   #region "    Migration History    "
   /// <summary>

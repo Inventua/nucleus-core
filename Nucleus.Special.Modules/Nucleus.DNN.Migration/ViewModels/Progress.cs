@@ -12,10 +12,11 @@ using System.Threading.Tasks;
 
 namespace Nucleus.DNN.Migration.ViewModels;
 
-public class Progress 
+public class Progress
 {
   public string Title { get; set; }
 
-  public List<MigrationEngineBase> CurrentOperationEngines { get; set; }
+  public IEnumerable<EngineProgress> EngineProgress { get; set; }
+  public Boolean InProgress { get; set; }
 
 }

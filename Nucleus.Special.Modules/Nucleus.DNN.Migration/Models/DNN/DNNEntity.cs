@@ -29,6 +29,19 @@ public abstract class DNNEntity
 
   public void AddError(string message)
   {
+    // the error messages returned by the data provider system are aimed at users who are entering in a new value.  Parse and replace
+    // key phrases to make them make more sense in the context of import/migration.
+    message = message.Replace("The name that you entered", "This name");
+    int position = message.IndexOf("Please enter a unique");
+    if (position > 0)
+    {
+      message = message[..position];
+    }
+    if (!message.TrimEnd().EndsWith('.'))
+    {
+      message += ".";
+    }
+
     this.Results.Add(new(ValidationResult.ValidationResultTypes.Error, message));
     this.CanSelect = false;
     this.IsSelected = false;

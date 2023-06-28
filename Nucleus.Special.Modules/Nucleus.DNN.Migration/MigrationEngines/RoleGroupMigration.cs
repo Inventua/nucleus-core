@@ -21,14 +21,10 @@ public class RoleGroupMigration : MigrationEngineBase<Models.DNN.RoleGroup>
     this.RoleGroupManager = roleGroupManager;
   }
 
-  public override async Task Migrate(List<RoleGroup> items)
-  {
-    this.Start(items.Where(roleGroup => roleGroup.CanSelect && roleGroup.IsSelected).ToList());
-
-    foreach (int roleGroupId in this.Items.Select(roleGroup => roleGroup.RoleGroupId))
+  public override async Task Migrate()
+  {    
+    foreach (RoleGroup roleGroup in this.Items.Where(roleGroup => roleGroup.CanSelect && roleGroup.IsSelected))
     {
-      RoleGroup roleGroup = await this.MigrationManager.GetDNNRoleGroup(roleGroupId);
-
       try
       {
         Nucleus.Abstractions.Models.RoleGroup newRoleGroup = await this.RoleGroupManager.CreateNew();
@@ -40,16 +36,16 @@ public class RoleGroupMigration : MigrationEngineBase<Models.DNN.RoleGroup>
       }
       catch (Exception ex)
       {
-        this.AddError(roleGroup.RoleGroupId, $"Error importing role group '{roleGroup.RoleGroupName}': {ex.Message}.");
+        roleGroup.AddError($"Error importing role group '{roleGroup.RoleGroupName}': {ex.Message}");
       }
 
       this.Progress();
     }
   }
 
-  public override Task Validate(List<RoleGroup> items)
+  public override Task Validate()
   {
-    foreach (RoleGroup roleGroup in items)
+    foreach (RoleGroup roleGroup in Items)
     {      
       if (roleGroup.RoleCount == 0)
       {

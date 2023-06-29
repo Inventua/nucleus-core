@@ -24,9 +24,16 @@
             <td>@item.DisplayName()</td>
             <td>
               <ul>
-                @foreach (var result in item.Results)
+                @if (item.Results.Any())
                 {
-                  <li class="glyph-@result.Type">@result.Message</li>                
+                  @foreach (var result in item.Results)
+                  {
+                    <li class="glyph-@result.Type">@result.Message</li>
+                  }
+                }
+                else
+                {
+                  <li>Imported OK.</li>
                 }
               </ul>
             </td>

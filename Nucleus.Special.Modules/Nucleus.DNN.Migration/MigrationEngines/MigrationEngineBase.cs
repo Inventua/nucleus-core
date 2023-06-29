@@ -15,7 +15,7 @@ public abstract class MigrationEngineBase<TModel> : MigrationEngineBase
 
   private List<TModel> _items;
 
-  public new List<TModel> Items 
+  public List<TModel> Items 
   {
     get
     {
@@ -24,7 +24,14 @@ public abstract class MigrationEngineBase<TModel> : MigrationEngineBase
     set
     {
       _items = value;
-      base.Items = value.ToList<Models.DNN.DNNEntity>();
+    }
+  }
+
+  public override List<DNNEntity> InnerItems
+  {
+    get
+    {
+      return this.Items.ToList<Models.DNN.DNNEntity>();
     }
   }
 
@@ -72,7 +79,8 @@ public abstract class MigrationEngineBase
   }
 
   public string Title { get; }
-  public List<Nucleus.DNN.Migration.Models.DNN.DNNEntity> Items { get; protected set; }
+  
+  public abstract List<Nucleus.DNN.Migration.Models.DNN.DNNEntity> InnerItems { get; }
 
   public EngineProgress GetProgress()
   {
@@ -84,7 +92,7 @@ public abstract class MigrationEngineBase
       IsStarted = this.IsStarted,  
       State=this.State(),
       TotalCount=this.TotalCount,
-      Items = this.Items
+      Items = this.InnerItems
     };
     
     return copy;

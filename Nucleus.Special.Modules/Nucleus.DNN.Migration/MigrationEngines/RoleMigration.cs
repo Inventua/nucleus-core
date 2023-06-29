@@ -26,27 +26,33 @@ public class RoleMigration : MigrationEngineBase<Models.DNN.Role>
 
   public override async Task Migrate()
   {    
-    foreach (Role role in this.Items.Where(role => role.CanSelect && role.IsSelected))
+    foreach (Role role in this.Items)
     {
-      try
+      if (role.CanSelect && role.IsSelected)
       {
-        Nucleus.Abstractions.Models.Role newRole = await this.RoleManager.CreateNew();
-
-        newRole.Name = role.RoleName;
-        newRole.Type = role.AutoAssignment ? Abstractions.Models.Role.RoleType.AutoAssign : Abstractions.Models.Role.RoleType.Normal;
-        newRole.Description = role.Description;
-        if (role.RoleGroup != null)
+        try
         {
-          newRole.RoleGroup = await this.RoleGroupManager.GetByName(this.Context.Site, role.RoleGroup.RoleGroupName);
-        }
-        await this.RoleManager.Save(this.Context.Site, newRole);
-      }
-      catch (Exception ex)
-      {
-        role.AddError($"Error importing role '{role.RoleName}': {ex.Message}");
-      }
+          Nucleus.Abstractions.Models.Role newRole = await this.RoleManager.CreateNew();
 
-      this.Progress();
+          newRole.Name = role.RoleName;
+          newRole.Type = role.AutoAssignment ? Abstractions.Models.Role.RoleType.AutoAssign : Abstractions.Models.Role.RoleType.Normal;
+          newRole.Description = role.Description;
+          if (role.RoleGroup != null)
+          {
+            newRole.RoleGroup = await this.RoleGroupManager.GetByName(this.Context.Site, role.RoleGroup.RoleGroupName);
+          }
+          await this.RoleManager.Save(this.Context.Site, newRole);
+        }
+        catch (Exception ex)
+        {
+          role.AddError($"Error importing role '{role.RoleName}': {ex.Message}");
+        }
+        this.Progress();
+      }
+      else
+      {
+        role.AddWarning($"Role '{role.RoleName}' was not selected for import.");
+      }
     }
   }
 
@@ -57,7 +63,7 @@ public class RoleMigration : MigrationEngineBase<Models.DNN.Role>
       string[] RESERVED_ROLES = { "Administrators", "Registered Users" };
       if (RESERVED_ROLES.Contains(role.RoleName, StringComparer.OrdinalIgnoreCase)) 
       {
-        role.AddError($"'{role.RoleName}' is a reserved role in DNN and will not be migrated.");
+        role.AddError($"'{role.RoleName}' is a reserved/special role in DNN and will not be migrated.");
       }
 
       if (role.UserCount == 0)

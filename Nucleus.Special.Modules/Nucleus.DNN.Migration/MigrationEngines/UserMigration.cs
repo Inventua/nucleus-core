@@ -27,68 +27,75 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
 
   public override async Task Migrate()
   {
-    foreach (User dnnUser in this.Items.Where(user => user.CanSelect && user.IsSelected))
+    foreach (User dnnUser in this.Items)
     {
-      try
+      if (dnnUser.CanSelect && dnnUser.IsSelected)
       {
-        Nucleus.Abstractions.Models.User newUser = await this.UserManager.CreateNew(this.Context.Site);
-
-        newUser.UserName = dnnUser.UserName;
-        newUser.Verified = false;
-        newUser.IsSystemAdministrator = false;
-
-        foreach (Role dnnUserRole in dnnUser.Roles)
+        try
         {
-          Nucleus.Abstractions.Models.Role newRole = await this.RoleManager.GetByName(this.Context.Site, dnnUserRole.RoleName);
-          if (newRole == null)
+          Nucleus.Abstractions.Models.User newUser = await this.UserManager.CreateNew(this.Context.Site);
+
+          newUser.UserName = dnnUser.UserName;
+          newUser.Verified = false;
+          newUser.IsSystemAdministrator = false;
+
+          foreach (Role dnnUserRole in dnnUser.Roles)
           {
-            dnnUser.AddWarning($"Role '{dnnUserRole.RoleName}' not added, because the role does not exist in Nucleus.");
+            Nucleus.Abstractions.Models.Role newRole = await this.RoleManager.GetByName(this.Context.Site, dnnUserRole.RoleName);
+            if (newRole == null)
+            {
+              dnnUser.AddWarning($"Role '{dnnUserRole.RoleName}' not added, because the role does not exist in Nucleus.");
+            }
+            else
+            {
+              newUser.Roles.Add(newRole);
+            }
+          }
+
+          // all migrated users are unverified & have no password
+          newUser.Verified = false;
+
+          foreach (UserProfileProperty dnnUserProfileItem in dnnUser.ProfileProperties.Where(prop => prop.PropertyDefinition != null))
+          {
+            Nucleus.Abstractions.Models.UserProfileValue nucleusUserProfileValue = newUser.Profile
+              .Where(prop => ReplaceIgnoredCharacters(prop.UserProfileProperty.Name).Equals(ReplaceIgnoredCharacters(dnnUserProfileItem.PropertyDefinition.PropertyName), StringComparison.OrdinalIgnoreCase))
+              .FirstOrDefault();
+            if (nucleusUserProfileValue == null)
+            {
+              dnnUser.AddWarning($"Profile property value for '{dnnUserProfileItem.PropertyDefinition.PropertyName}' not added, because a matching profile property does not exist in Nucleus.");
+            }
+            else
+            {
+              nucleusUserProfileValue.Value = dnnUserProfileItem.Value;
+            }
+          }
+
+          // handle email, which is a profile property in Nucleus, but a user property in DNN
+          Nucleus.Abstractions.Models.UserProfileValue nucleusUserEmailProfileValue = newUser.Profile
+              .Where(prop => ReplaceIgnoredCharacters(prop.UserProfileProperty.Name).Equals("Email", StringComparison.OrdinalIgnoreCase) || ReplaceIgnoredCharacters(prop.UserProfileProperty.Name).Equals("EmailAddress", StringComparison.OrdinalIgnoreCase))
+              .FirstOrDefault();
+          if (nucleusUserEmailProfileValue == null)
+          {
+            dnnUser.AddWarning($"Profile property value for 'Email' not added, because a matching profile property does not exist in Nucleus.");
           }
           else
           {
-            newUser.Roles.Add(newRole);
+            nucleusUserEmailProfileValue.Value = dnnUser.Email;
           }
+
+          await this.UserManager.Save(this.Context.Site, newUser);
         }
-
-        // all migrated users are unverified & have no password
-        newUser.Verified = false;
-
-        foreach (UserProfileProperty dnnUserProfileItem in dnnUser.ProfileProperties.Where(prop => prop.PropertyDefinition != null))
+        catch (Exception ex)
         {
-          Nucleus.Abstractions.Models.UserProfileValue nucleusUserProfileValue = newUser.Profile
-            .Where(prop => ReplaceIgnoredCharacters(prop.UserProfileProperty.Name).Equals(ReplaceIgnoredCharacters(dnnUserProfileItem.PropertyDefinition.PropertyName), StringComparison.OrdinalIgnoreCase))
-            .FirstOrDefault();
-          if (nucleusUserProfileValue == null)
-          {
-            dnnUser.AddWarning($"Profile property value for '{dnnUserProfileItem.PropertyDefinition.PropertyName}' not added, because a matching profile property does not exist in Nucleus.");
-          }
-          else
-          {
-            nucleusUserProfileValue.Value = dnnUserProfileItem.Value;
-          }
+          dnnUser.AddError($"Error importing User '{dnnUser.UserName}': {ex.Message}");
         }
 
-        // handle email, which is a profile property in Nucleus, but a user property in DNN
-        Nucleus.Abstractions.Models.UserProfileValue nucleusUserEmailProfileValue = newUser.Profile
-            .Where(prop => ReplaceIgnoredCharacters(prop.UserProfileProperty.Name).Equals("Email", StringComparison.OrdinalIgnoreCase) || ReplaceIgnoredCharacters(prop.UserProfileProperty.Name).Equals("EmailAddress", StringComparison.OrdinalIgnoreCase))
-            .FirstOrDefault();
-        if (nucleusUserEmailProfileValue == null)
-        {
-          dnnUser.AddWarning($"Profile property value for 'Email' not added, because a matching profile property does not exist in Nucleus.");
-        }
-        else
-        {
-          nucleusUserEmailProfileValue.Value = dnnUser.Email;
-        }
-
-        await this.UserManager.Save(this.Context.Site, newUser);
+        this.Progress();
       }
-      catch (Exception ex)
+      else
       {
-        dnnUser.AddError($"Error importing User '{dnnUser.UserName}': {ex.Message}");
+        dnnUser.AddWarning($"User '{dnnUser.UserName}' was not selected for import.");
       }
-
-      this.Progress();
     }
   }
 
@@ -116,7 +123,7 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
       if (String.IsNullOrEmpty(user.Email))
       {
         user.AddWarning("User has a blank email address.");
-      }  
+      }
     }
 
     return Task.CompletedTask;

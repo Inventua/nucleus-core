@@ -23,23 +23,30 @@ public class RoleGroupMigration : MigrationEngineBase<Models.DNN.RoleGroup>
 
   public override async Task Migrate()
   {    
-    foreach (RoleGroup roleGroup in this.Items.Where(roleGroup => roleGroup.CanSelect && roleGroup.IsSelected))
+    foreach (RoleGroup roleGroup in this.Items)
     {
-      try
+      if (roleGroup.CanSelect && roleGroup.IsSelected)
       {
-        Nucleus.Abstractions.Models.RoleGroup newRoleGroup = await this.RoleGroupManager.CreateNew();
+        try
+        {
+          Nucleus.Abstractions.Models.RoleGroup newRoleGroup = await this.RoleGroupManager.CreateNew();
 
-        newRoleGroup.Name = roleGroup.RoleGroupName;
-        newRoleGroup.Description = roleGroup.Description;
-      
-        await this.RoleGroupManager.Save(this.Context.Site, newRoleGroup);
+          newRoleGroup.Name = roleGroup.RoleGroupName;
+          newRoleGroup.Description = roleGroup.Description;
+
+          await this.RoleGroupManager.Save(this.Context.Site, newRoleGroup);
+        }
+        catch (Exception ex)
+        {
+          roleGroup.AddError($"Error importing role group '{roleGroup.RoleGroupName}': {ex.Message}");
+        }
+
+        this.Progress();
       }
-      catch (Exception ex)
+      else
       {
-        roleGroup.AddError($"Error importing role group '{roleGroup.RoleGroupName}': {ex.Message}");
+        roleGroup.AddWarning($"Role group '{roleGroup.RoleGroupName}' was not selected for import.");
       }
-
-      this.Progress();
     }
   }
 

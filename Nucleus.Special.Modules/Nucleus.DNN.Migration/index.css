@@ -32,11 +32,16 @@
   padding: 1rem 0 0 0;
 }
 
+.dnn-migration ol li > div
+{
+  display: inline-block;
+  width: 14rem;
+}
+
 .dnn-migration ol li a, .dnn-migration ol li button
 {
   display: inline-block;
   width: 12rem;
-  margin-right: 1.5rem;
 }
 
 .dnn-migration ol li button .nucleus-progress-spinner
@@ -47,6 +52,11 @@
 .dnn-migration .validation-results
 {
   margin: 0;
+}
+
+.dnn-migration .validation-results ul
+{
+  list-style-type: none;
 }
 
 .dnn-migration .glyph-Error::before

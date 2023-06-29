@@ -124,6 +124,13 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
         .Where(userPortal => userPortal.UserId == user.UserId && userPortal.Portal.PortalId == portalId)
         .AsNoTracking()
         .FirstOrDefaultAsync();
+
+      foreach (Models.DNN.UserProfileProperty prop in user.ProfileProperties)
+      {
+        prop.PropertyDefinition = this.Context.UserProfilePropertyDefinitions
+          .Where(def => def.PropertyDefinitionId == prop.PropertyDefinitionId)
+          .FirstOrDefault();
+      }
     }
     return results;
   }

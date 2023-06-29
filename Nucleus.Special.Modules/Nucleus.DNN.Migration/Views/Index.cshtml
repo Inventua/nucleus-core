@@ -1,6 +1,6 @@
 ﻿@model Nucleus.DNN.Migration.ViewModels.Index
 @Html.AddStyle("~!/../index.css")
-<h2 class="nucleus-control-panel-heading">DNN Migration Tools</h2>
+<h2 class="nucleus-control-panel-heading">DNN Migration</h2>
 <div class="dnn-migration">
   @if (Model.Version == null)
   {
@@ -31,17 +31,23 @@
 
       <ol>
         <li>
-          <button type="submit" formaction="@Url.NucleusAction("RolesIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-inside" data-target="#MigrateRoles">Roles</button>
+          <div>
+            <button type="submit" formaction="@Url.NucleusAction("RolesIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigrateRoles">Roles</button>
+          </div>
           <span class="action-description">Migrate roles and role groups from DNN</span>
         </li>
 
         <li>
-          <button type="submit" formaction="@Url.NucleusAction("PagesIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-inside" data-target="#MigratePages">Pages</button>
+          <div>
+            <button type="submit" formaction="@Url.NucleusAction("PagesIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigratePages">Pages</button>
+          </div>
           <span class="action-description">Migrate pages and modules from DNN</span>
         </li>
 
         <li>
-          <button type="submit" formaction="@Url.NucleusAction("UsersIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-inside" data-target="#MigrateUsers">Users</button>
+          <div>
+            <button type="submit" formaction="@Url.NucleusAction("UsersIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigrateUsers">Users</button>
+          </div>
           <span class="action-description">Migrate users and user-role memberships from DNN</span>
         </li>
       </ol>

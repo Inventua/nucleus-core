@@ -9,8 +9,9 @@
       <div class="alert alert-warning">
         <h2>@engine.Title</h2>
         <div class="progress">
-          <div class="progress-bar" role="progressbar" aria-label="Progress" style="width: @engine.CurrentPercent%" aria-valuenow="@engine.Current" aria-valuemin="0" aria-valuemax="@engine.TotalCount"></div>
+          <div class="progress-bar" role="progressbar" aria-label="Progress" style="width: @engine.CurrentPercent%" aria-valuenow="@engine.Current" aria-valuemin="0" aria-valuemax="@engine.TotalCount"></div>          
         </div>
+        <div>@engine.Current / @engine.TotalCount</div>
       </div>
     }
     else if (engine.State == Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase.EngineStates.Completed)
@@ -19,12 +20,17 @@
       <table class="table table-striped table-sm validation-results mb-4">
         @foreach (var item in engine.Items)
         {
-          @foreach (var result in item.Results)
-          {
-            <tr>
-              <td class="glyph-@result.Type">@result.Message</td>
-            </tr>
-          }
+          <tr>
+            <td>@item.DisplayName()</td>
+            <td>
+              <ul>
+                @foreach (var result in item.Results)
+                {
+                  <li class="glyph-@result.Type">@result.Message</li>                
+                }
+              </ul>
+            </td>
+          </tr>
         }
       </table>
     }

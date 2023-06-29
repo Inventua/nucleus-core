@@ -15,6 +15,9 @@ public class UserProfileProperty
   [Column("UserID")]
   public int UserId { get; set; }
 
+  [Column("PropertyDefinitionID")]
+  public int PropertyDefinitionId { get; set; }
+
   public UserProfilePropertyDefinition PropertyDefinition { get; set; }
 
   [Column("PropertyValue")]

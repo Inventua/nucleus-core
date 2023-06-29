@@ -14,7 +14,7 @@ public class RoleGroupMigration : MigrationEngineBase<Models.DNN.RoleGroup>
   private Nucleus.Abstractions.Models.Context Context { get; }
   private DNNMigrationManager MigrationManager { get; }
 
-  public RoleGroupMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IRoleGroupManager roleGroupManager) : base("Migrating Role Groups")
+  public RoleGroupMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IRoleGroupManager roleGroupManager) : base("Role Groups")
   {
     this.MigrationManager = migrationManager;
     this.Context = context;

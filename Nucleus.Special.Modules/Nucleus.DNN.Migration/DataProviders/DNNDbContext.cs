@@ -30,7 +30,7 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
 
 
   public DbSet<Models.DNN.UserProfileProperty> UserProfileProperties { get; set; }
-
+  public DbSet<Models.DNN.UserProfilePropertyDefinition> UserProfilePropertyDefinitions { get; set; } 
 
 
   public DNNDbContext(DbContextConfigurator<DNNDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
@@ -94,6 +94,7 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
     builder.Entity<Models.DNN.UserProfilePropertyDefinition>()
       .ToTable("ProfilePropertyDefinition")
       .HasKey(userProfilePropertyDefinition => userProfilePropertyDefinition.PropertyDefinitionId);
+
 
     builder.Entity<Models.DNN.UserPortal>()
       .ToTable("UserPortals")

@@ -12,6 +12,8 @@ namespace Nucleus.DNN.Migration.Models.DNN;
 public abstract class DNNEntity
 {
   public abstract int Id();
+  public abstract string DisplayName();
+
 
   [NotMapped]
   public Boolean IsSelected { get; set; } = true;

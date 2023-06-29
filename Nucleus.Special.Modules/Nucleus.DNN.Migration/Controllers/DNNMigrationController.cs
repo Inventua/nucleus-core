@@ -21,6 +21,8 @@ using DocumentFormat.OpenXml.Math;
 namespace Nucleus.DNN.Migration.Controllers;
 
 [Extension("DNNMigration")]
+[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+[DisableMaxModelBindingCollectionSize]
 public class DNNMigrationController : Controller
 {
   private Context Context { get; }
@@ -46,7 +48,27 @@ public class DNNMigrationController : Controller
     return View("_Roles", await BuildRolesViewModel(portalId));
   }
 
+  [HttpGet]
+  public async Task<ActionResult> UpdateProgress(ViewModels.Progress viewModel)
+  {  
+    return View("_Progress", await BuildProgressViewModel());
+  }
+
   [HttpPost]
+  public async Task<ActionResult> PagesIndex(ViewModels.Index viewModel)
+  {
+    return View("_Pages", await BuildPagesViewModel(viewModel.PortalId));
+  }
+
+  [HttpPost]
+  public async Task<ActionResult> UsersIndex(ViewModels.Index viewModel)
+  {
+    return View("_Users", await BuildUsersViewModel(viewModel.PortalId));
+  }
+
+  [HttpPost]
+  [DisableRequestSizeLimitAttribute]
+  [RequestFormLimits(ValueCountLimit = Int32.MaxValue)]
   public async Task<ActionResult> MigrateRoles(ViewModels.Role viewModel)
   {
     this.DNNMigrationManager.GetMigrationEngine<Models.DNN.RoleGroup>().UpdateSelections(viewModel.RoleGroups);
@@ -64,22 +86,38 @@ public class DNNMigrationController : Controller
     return View("_Progress", await BuildProgressViewModel());
   }
 
-  [HttpGet]
-  public async Task<ActionResult> UpdateProgress(ViewModels.Progress viewModel)
-  {  
+  [HttpPost]
+  [DisableRequestSizeLimitAttribute]
+  [RequestFormLimits(ValueCountLimit = Int32.MaxValue)]
+  public async Task<ActionResult> MigrateUsers(ViewModels.User viewModel)
+  {
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.User>().UpdateSelections(viewModel.Users);
+    
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.User>().SignalStart();
+
+    Task task = Task.Run(async () =>
+    {
+      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.User>().Migrate();
+    });
+
     return View("_Progress", await BuildProgressViewModel());
   }
 
   [HttpPost]
-  public async Task<ActionResult> PagesIndex(ViewModels.Index viewModel)
+  [DisableRequestSizeLimitAttribute]
+  [RequestFormLimits(ValueCountLimit = Int32.MaxValue)]
+  public async Task<ActionResult> MigratePages(ViewModels.Page viewModel)
   {
-    return View("_Pages", await BuildPagesViewModel(viewModel.PortalId));
-  }
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().UpdateSelections(viewModel.Pages);
 
-  [HttpPost]
-  public async Task<ActionResult> UsersIndex(ViewModels.Index viewModel)
-  {
-    return View("_Users", await BuildUsersViewModel(viewModel.PortalId));
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().SignalStart();
+
+    Task task = Task.Run(async () =>
+    {
+      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().Migrate();
+    });
+
+    return View("_Progress", await BuildProgressViewModel());
   }
 
 

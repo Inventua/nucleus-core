@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using RazorEngineCore;
 using Nucleus.Abstractions.Mail;
+using System.Threading;
+using System.Collections.Concurrent;
 
 // https://github.com/adoconnection/RazorEngineCore
 
@@ -15,8 +17,9 @@ namespace Nucleus.Extensions.Razor
 	/// </summary>
 	public class RazorParser
 	{
-		private static readonly Dictionary<string, object> CompiledTemplateCache = new();
+		private static readonly ConcurrentDictionary<string, object> CompiledTemplateCache = new();
 		private readonly static string[] UsingNamespaces = { "System", "System.Collections.Generic", "System.Linq", "System.Text", "Nucleus.Extensions", "Nucleus.Abstractions", "Nucleus.Abstractions.Models" };
+    private static readonly SemaphoreSlim _cacheSemaphore = new(1, 1);
 
 		/// <summary>
 		/// Compile and execute the specified template, using the supplied model as input.
@@ -37,12 +40,35 @@ namespace Nucleus.Extensions.Razor
 			{
 				compiledTemplate = cachedTemplate as IRazorEngineCompiledTemplate<RazorEngineTemplate<TModel>>;
 			}
-			
-			if (compiledTemplate == null)
-			{
-				compiledTemplate = await engine.CompileAsync<RazorEngineTemplate<TModel>>(template, BuildRazorOptions);
-				CompiledTemplateCache.Add(templateKey, compiledTemplate);
-			}
+
+      if (compiledTemplate == null)
+      {
+        // when events are raised in quick succession (like when a data import is in progress), the events hare handled
+        // asynchronously, so this function can be running multiple times at once.  We have to use a semaphore to prevent
+        // attempts to add the compiled template to CompiledTemplateCache more than once.  
+                
+        await _cacheSemaphore.WaitAsync();
+        try
+        {
+          // check the CompiledTemplateCache again in case another thread has added a compiled template in between the
+          // original CompiledTemplateCache.TryGetValue and here.
+          if (CompiledTemplateCache.TryGetValue(templateKey, out object newCachedTemplate))
+          {
+            compiledTemplate = newCachedTemplate as IRazorEngineCompiledTemplate<RazorEngineTemplate<TModel>>;
+          }
+
+          // if another thread has not added the compiled template, compile one and add it to the cache
+          if (compiledTemplate == null)
+          {
+            compiledTemplate = await engine.CompileAsync<RazorEngineTemplate<TModel>>(template, BuildRazorOptions);
+            CompiledTemplateCache.TryAdd(templateKey,compiledTemplate);
+          }
+        }
+        finally 
+        { 
+          _cacheSemaphore.Release(); 
+        }
+      }
 
 			return await compiledTemplate.RunAsync(instance =>
 			{

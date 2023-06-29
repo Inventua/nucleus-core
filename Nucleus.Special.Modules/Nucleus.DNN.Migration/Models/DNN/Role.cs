@@ -13,7 +13,12 @@ public class Role : DNNEntity
   {
     return this.RoleId; 
   }
- 
+
+  public override string DisplayName()
+  {
+    return this.RoleName;
+  }
+
   [Column("RoleID")]
   public int RoleId { get; set; }
 

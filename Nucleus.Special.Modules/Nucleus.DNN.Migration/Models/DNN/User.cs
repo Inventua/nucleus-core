@@ -13,6 +13,10 @@ public class User : DNNEntity
   {
     return this.UserId;    
   }
+  public override string DisplayName()
+  {
+    return this.UserName;
+  }
 
   [Column("UserID")]
   public int UserId { get; set; }

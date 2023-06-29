@@ -14,6 +14,11 @@ public class Page : DNNEntity
     return this.PageId;
   }
 
+  public override string DisplayName()
+  {
+    return this.PageName;
+  }
+
   [Column("TabID")]
   public int PageId { get; set; }
 

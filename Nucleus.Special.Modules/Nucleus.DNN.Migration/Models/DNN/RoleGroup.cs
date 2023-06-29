@@ -14,6 +14,11 @@ public class RoleGroup : DNNEntity
     return this.RoleGroupId;
   }
 
+  public override string DisplayName()
+  {
+    return this.RoleGroupName;
+  }
+
   [Column("RoleGroupID")]
   public int RoleGroupId { get; set; }
 

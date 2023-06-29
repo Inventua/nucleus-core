@@ -14,7 +14,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
   private DNNMigrationManager MigrationManager { get; }
   private IPageManager PageManager { get; }
 
-  public PageMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IPageManager pageManager) : base("Migrating Pages")  
+  public PageMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IPageManager pageManager) : base("Pages")  
   { 
     this.Context = context;
     this.MigrationManager = migrationManager;

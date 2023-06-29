@@ -11,7 +11,7 @@ namespace Nucleus.DNN.Migration.MigrationEngines;
 public abstract class MigrationEngineBase<TModel> : MigrationEngineBase 
   where TModel : Nucleus.DNN.Migration.Models.DNN.DNNEntity
 { 
-  public MigrationEngineBase(string title) : base(title) { }
+  public MigrationEngineBase(string modelFriendlyName) : base(modelFriendlyName) { }
 
   private List<TModel> _items;
 
@@ -66,9 +66,9 @@ public abstract class MigrationEngineBase
     Completed
   }
 
-  public MigrationEngineBase(string title)
+  public MigrationEngineBase(string modelFriendlyName)
   {
-    this.Title = title;
+    this.Title = $"Migrating {modelFriendlyName}";
   }
 
   public string Title { get; }

@@ -25,26 +25,26 @@ namespace Nucleus.Modules.Documents
 				services.AddTransient<IContentMetaDataProducer, DocumentsMetaDataProducer>();
 				services.AddDataProvider<IDocumentsDataProvider, DataProviders.DocumentsDataProvider, DataProviders.DocumentsDbContext>(context.Configuration);
 
-				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>, MigrationEventHandler>();
-			});
+        ////services.AddSingletonSystemEventHandler<MigrateEventArgs, MigrateEvent, MigrationEventHandler>();
+      });
 		}
 	}
 
 
-	public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>
-	{
-		public Task Invoke(MigrateEventArgs item)
-		{
-			if (item.SchemaName == "Nucleus.Modules.Documents")
-			{
-				if (item.ToVersion == new System.Version(1,0,0))
-				{
+	////public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>
+	////{
+	////	public Task Invoke(MigrateEventArgs item)
+	////	{
+	////		if (item.SchemaName == "Nucleus.Modules.Documents")
+	////		{
+	////			if (item.ToVersion == new System.Version(1,0,0))
+	////			{
 
-				}
-				// no implementation.  
-				// This is a test and example of how you would execute code after a db schema migration.
-			}
-			return Task.CompletedTask;
-		}
-	}
+	////			}
+	////			// no implementation.  
+	////			// This is a test and example of how you would execute code after a db schema migration.
+	////		}
+	////		return Task.CompletedTask;
+	////	}
+	////}
 }

@@ -12,6 +12,7 @@ using Nucleus.Abstractions;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Extensions;
+using Microsoft.AspNetCore.Http.Headers;
 
 namespace Nucleus.Core.FileSystemProviders
 {
@@ -44,7 +45,7 @@ namespace Nucleus.Core.FileSystemProviders
 						max.MaxRequestBodySize = EXTENSIONS_MAX_SIZE;
 					}
 				}
-
+       
 				foreach (IFormFile file in context.Request.Form.Files)
 				{
 					if (context.User.IsInRole(this.Context.Site.AnonymousUsersRole.Name))
@@ -98,7 +99,9 @@ namespace Nucleus.Core.FileSystemProviders
     /// <returns></returns>
     private Boolean HasFormDataContentType(HttpContext context)
     {
-      return context.Request.ContentType == "multipart/form-data";
+      if (context.Request.ContentType == null) return false;
+      System.Net.Http.Headers.MediaTypeHeaderValue mediaHeaderValue = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(context.Request.ContentType);
+      return mediaHeaderValue.MediaType == "multipart/form-data";
     }
   }
 

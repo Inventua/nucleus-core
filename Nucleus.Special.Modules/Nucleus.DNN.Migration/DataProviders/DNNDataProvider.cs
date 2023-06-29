@@ -144,13 +144,20 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
   }
 
   public async Task<List<Models.DNN.Page>> ListPages(int portalId)
-  { 
+  {
     return await this.Context.Pages
       .Where(page => 
         page.PortalId == portalId && 
         page.PageName != "Admin" && !page.TabPath.StartsWith("//Admin") && // exclude "Admin" page, and descendants
         !page.IsDeleted 
       )
+      .Include(page => page.Permissions)
+        .ThenInclude(perm => perm.Role)
+      .Include(page => page.PageModules) 
+        .ThenInclude(module => module.DesktopModule)
+      .Include(page => page.PageModules)
+        .ThenInclude(module => module.Permissions)
+          .ThenInclude(perm => perm.Role)
       .OrderBy(page => page.Level)
         .ThenBy(page => page.ParentId)
         .ThenBy(page => page.PageName)

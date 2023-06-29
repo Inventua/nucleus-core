@@ -49,4 +49,8 @@ public class Page : DNNEntity
 
   public string Url { get; set; }
 
+  public List<PageModule> PageModules { get; set; }
+
+  public List<PagePermission> Permissions { get; set; }
+
 }

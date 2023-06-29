@@ -84,25 +84,13 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
       .HasMany(user => user.ProfileProperties)
       .WithOne(profileproperty => profileproperty.User);
 
-    //builder.Entity<Models.DNN.User>()
-    //  .HasOne(user => user.UserPortal)
-    //  .WithOne(userPortal => userPortal.User);
-
-    //builder.Entity<Models.DNN.User>()
-    //  .HasOne(user => user.UserPortal);
-
     builder.Entity<Models.DNN.UserProfilePropertyDefinition>()
       .ToTable("ProfilePropertyDefinition")
       .HasKey(userProfilePropertyDefinition => userProfilePropertyDefinition.PropertyDefinitionId);
 
-
     builder.Entity<Models.DNN.UserPortal>()
       .ToTable("UserPortals")
       .HasKey(userPortal => userPortal.UserPortalId);
-
-    //builder.Entity<Models.DNN.UserPortal>()
-    //  .HasOne(userPortal => userPortal.User)
-    //  .WithOne(user => user.UserPortal);
 
     builder.Entity<Models.DNN.UserProfileProperty>()
       .ToTable("UserProfile")
@@ -111,9 +99,36 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
     builder.Entity<Models.DNN.Page>()
      .ToTable("Tabs");
 
-    //builder.Entity<DNNMigration>()
-    //	.HasOne(DNNMigration => DNNMigration.Category)
-    //	.WithMany()
-    //	.HasForeignKey("CategoryId");
+    builder.Entity<Models.DNN.Page>()
+      .HasMany(page => page.Permissions)
+      .WithOne(permission => permission.Page)
+      .HasForeignKey("TabID");
+
+    builder.Entity<Models.DNN.Page>()
+      .HasMany(page => page.PageModules)
+      .WithOne(module => module.Page)
+      .HasForeignKey("TabID");
+
+    builder.Entity<Models.DNN.PagePermission>()
+      .ToView("vw_TabPermissions")
+      .HasKey(tabPermission => tabPermission.TabPermissionId);
+
+    builder.Entity<Models.DNN.PageModule>()
+      .ToView("vw_Modules")
+      .HasKey(module => module.TabModuleId);
+
+    builder.Entity<Models.DNN.PageModule>()
+      .HasMany(module => module.Permissions)
+      .WithOne(permission => permission.PageModule)
+      .HasForeignKey("ModuleID");
+
+    builder.Entity<Models.DNN.PageModulePermission>()
+      .ToView("vw_ModulePermissions")
+      .HasKey(modulePermission => modulePermission.ModulePermissionId);
+
+    builder.Entity<Models.DNN.DesktopModule>()
+      .ToTable("DesktopModules")
+      .HasKey(desktopModule => desktopModule.DesktopModuleId);
+
   }
 }

@@ -11,7 +11,7 @@ using Nucleus.Extensions;
 
 namespace Nucleus.Modules.Forums.EventHandlers
 {
-	public class ApprovedPostEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Post, Approved>
+	public class ApprovedPostEventHandler : Nucleus.Abstractions.EventHandlers.ISingletonSystemEventHandler<Post, Approved>
 	{		
 		private ForumsManager ForumsManager { get; }
 		private IUserManager UserManager { get; }

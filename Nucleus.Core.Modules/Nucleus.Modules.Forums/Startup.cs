@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
 using Nucleus.Abstractions.Search;
+using Nucleus.Abstractions.EventHandlers;
 
 [assembly: HostingStartup(typeof(Nucleus.Modules.Forums.Startup))]
 
@@ -27,18 +28,20 @@ namespace Nucleus.Modules.Forums
 				// search content producer
 				services.AddTransient<IContentMetaDataProducer, ForumsMetaDataProducer>();
 
-				// Event handlers manage the mail queue
-				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Post, Create>, EventHandlers.CreatePostEventHandler>();
-				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Reply, Create>, EventHandlers.CreateReplyEventHandler>();
+        // Event handlers manage the mail queue
+        services.AddSingletonSystemEventHandler<Models.Post, Create, EventHandlers.CreatePostEventHandler>();
 
-				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Post, Approved>, EventHandlers.ApprovedPostEventHandler>();
-				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Reply, Approved>, EventHandlers.ApprovedReplyEventHandler>();
+        services.AddSingletonSystemEventHandler<Models.Post, Create, EventHandlers.CreatePostEventHandler>();
+        services.AddSingletonSystemEventHandler<Models.Reply, Create, EventHandlers.CreateReplyEventHandler>();
 
-				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Post, Rejected>, EventHandlers.RejectedPostEventHandler>();
-				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Models.Reply, Rejected>, EventHandlers.RejectedReplyEventHandler>();
+        services.AddSingletonSystemEventHandler<Models.Post, Approved, EventHandlers.ApprovedPostEventHandler>();
+        services.AddSingletonSystemEventHandler<Models.Reply, Approved, EventHandlers.ApprovedReplyEventHandler>();
 
-				// Handle migration (install) events
-				services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>, MigrationEventHandler>();
+        services.AddSingletonSystemEventHandler<Models.Post, Rejected, EventHandlers.RejectedPostEventHandler>();
+        services.AddSingletonSystemEventHandler<Models.Reply, Rejected, EventHandlers.RejectedReplyEventHandler>();
+
+        // Handle migration (install) events
+        services.AddSingletonSystemEventHandler<MigrateEventArgs, MigrateEvent, MigrationEventHandler>();
 			});
 		}
 	}
@@ -49,7 +52,7 @@ namespace Nucleus.Modules.Forums
 	/// <remarks>
 	/// When the forums data objects are created, create permission types for forums.
 	/// </remarks>
-	public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>
+	public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISingletonSystemEventHandler<MigrateEventArgs, MigrateEvent>
 	{
 		private IPermissionsManager PermissionsManager { get; }
 

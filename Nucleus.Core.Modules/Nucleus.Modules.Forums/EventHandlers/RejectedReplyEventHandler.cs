@@ -11,7 +11,7 @@ using Nucleus.Extensions;
 
 namespace Nucleus.Modules.Forums.EventHandlers
 {
-	public class RejectedReplyEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Reply, Rejected>
+	public class RejectedReplyEventHandler : Nucleus.Abstractions.EventHandlers.ISingletonSystemEventHandler<Reply, Rejected>
 	{		
 		private ForumsManager ForumsManager { get; }
 		private IUserManager UserManager { get; }

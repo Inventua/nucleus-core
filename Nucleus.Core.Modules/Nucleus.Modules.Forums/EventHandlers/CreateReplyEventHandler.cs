@@ -11,7 +11,7 @@ using Nucleus.Extensions;
 
 namespace Nucleus.Modules.Forums.EventHandlers
 {
-	public class CreateReplyEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<Reply, Create>
+	public class CreateReplyEventHandler : Nucleus.Abstractions.EventHandlers.ISingletonSystemEventHandler<Reply, Create>
 	{		
 		private ForumsManager ForumsManager { get; }
 

@@ -453,7 +453,7 @@ namespace Nucleus.Core.DataProviders
 			}
 
 			// new record
-			if (existingPage == null)
+			if (existingPage == null && page.SortOrder == 0)
 			{
 				page.SortOrder = await GetLastPageSortOrder(site.Id, page.ParentId) + 10;
 			}
@@ -704,7 +704,7 @@ namespace Nucleus.Core.DataProviders
 		{
 			Boolean isNew = !this.Context.PageModules.Where(existing => existing.Id == module.Id).Any();
 
-			if (isNew)
+			if (isNew && module.SortOrder == 0)
 			{
 				module.SortOrder = await GetLastPageModuleSortOrder(pageId) + 10;
 			}

@@ -23,7 +23,7 @@ namespace Nucleus.Core.EventHandlers;
 /// <remarks>
 /// This class sends a Welcome email to the new user.
 /// </remarks>
-public class UserEventHandler : ISystemEventHandler<User, Create>
+public class UserEventHandler : IScopedSystemEventHandler<User, Create>
 {
 	private Context Context { get; }
 	private IMailClientFactory MailClientFactory { get; }

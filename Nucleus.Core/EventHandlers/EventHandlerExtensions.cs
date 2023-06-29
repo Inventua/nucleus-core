@@ -26,9 +26,9 @@ namespace Nucleus.Core.EventHandlers
 		/// </remarks>
 		public static IServiceCollection AddCoreEventHandlers(this IServiceCollection services)
 		{
-			services.AddScoped<ISystemEventHandler<User, Create>, UserEventHandler>();
-			services.AddSingleton<ISystemEventHandler<Page, Create>, PageEventHandler>();
-			services.AddSingleton<ISystemEventHandler<ScheduledTask, Update>, ScheduledTaskEventHandler>();
+			services.AddScopedSystemEventHandler<User, Create, UserEventHandler>();
+			////services.AddSingletonSystemEventHandler<Page, Create, PageEventHandler>();
+			////services.AddSingletonSystemEventHandler<ScheduledTask, Update, ScheduledTaskEventHandler>();
 
 			return services;
 		}

@@ -12,7 +12,11 @@ raise an event.
 
 ### Handling an Event
 To handle an event, create a class which implements the [ISystemEventHandler](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.ISystemEventHandlerT0T1/)
-interface.  
+or ISingletonSystemEventHandler interface.  
+
+> The ISingletonSystemEventHandler interface was added in Nucleus 1.3.  Previously, singleton event handlers could implement ISystemEventHandler, but
+> this causes problems when retrieving event handler implementations from dependency injection when there are both scoped and 
+> singleton handlers for the same model and event.
 
 The functions used to raise and handle events both specify a TModel and TEvent.  The TModel type is the type of the model entity which has changed, and the TEvent 
 type represents the event which occurred.  TEvent can be any type, but Nucleus has classes for [create](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.SystemEventTypes.Create/),  
@@ -21,7 +25,7 @@ type represents the event which occurred.  TEvent can be any type, but Nucleus h
 create a class for it.  The TEvent class is used as a key in the dependency injection services collection, and does not need to inherit any class, or have any methods or properties.
 
 ### Example
-The example below is from the core Documents module.  This class adds a  System Event Handler to receive Nucleus system events - in this case, a MigrateEvent which is triggered after a 
+The example below is from the core Documents module.  This class adds a transient System Event Handler to receive Nucleus system events - in this case, a MigrateEvent which is triggered after a 
 data provider migration script is executed.  Some extensions use the MigrateEvent to perform post-installation or post-upgrade steps which can't be included in a database migration script.  
 
 ```
@@ -32,6 +36,7 @@ using Nucleus.Modules.Documents.DataProviders;
 using Nucleus.Abstractions.Search;
 using Nucleus.Data.EntityFramework;
 using Nucleus.Data.Common;
+using Nucleus.Abstractions.EventHandlers;
 
 [assembly:HostingStartup(typeof(Nucleus.Modules.Documents.Startup))]
 
@@ -48,7 +53,7 @@ namespace Nucleus.Modules.Documents
         services.AddTransient<IContentMetaDataProducer, DocumentsMetaDataProducer>();
         services.AddDataProvider<IDocumentsDataProvider, DataProviders.DocumentsDataProvider, DataProviders.DocumentsDbContext>(context.Configuration);
 
-        services.AddSingleton<Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>, MigrationEventHandler>();
+        services.AddSingletonSystemEventHandler<MigrateEventArgs, MigrateEvent, MigrationEventHandler>();
       });
     }
   }

@@ -28,10 +28,10 @@ namespace Nucleus.Core.FileSystemProviders
 			this.Logger = logger;
 			this.Context = context;
 		}
-
+    
 		public async Task InvokeAsync(HttpContext context, RequestDelegate next)
 		{
-			if (context.Request.HasFormContentType && (context.Request.Path != $"/{RoutingConstants.ERROR_ROUTE_PATH}"))
+			if (HasFormDataContentType(context) && (context.Request.Path != $"/{RoutingConstants.ERROR_ROUTE_PATH}"))
 			{
 				// Special case for the extensions installer: Increase maximum request size to 64mb if it is less than that.
 				// This code is required because reading the file bytes indirectly sets IHttpMaxRequestBodySizeFeature.IsReadOnly
@@ -91,6 +91,15 @@ namespace Nucleus.Core.FileSystemProviders
 			await next(context);
 		}
 
-	}
+    /// <summary>
+    /// Returns whether the request has a content type which can include file uploads.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    private Boolean HasFormDataContentType(HttpContext context)
+    {
+      return context.Request.ContentType == "multipart/form-data";
+    }
+  }
 
 }

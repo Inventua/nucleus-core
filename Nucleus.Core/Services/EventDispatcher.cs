@@ -53,16 +53,26 @@ namespace Nucleus.Core.Services
 		{
 			IEnumerable<ISystemEventHandler<TModel, TEvent>> handlers;
 
-			// If this.ContextAccessor/RequestServices is not null, use it to get scoped ISystemEventHandlers
 			if (this.ContextAccessor.HttpContext != null && this.ContextAccessor.HttpContext.RequestServices != null)
 			{
-				handlers = this.ContextAccessor.HttpContext.RequestServices.GetServices<ISystemEventHandler<TModel, TEvent>>();
-			}
-			else
+        // If ContextAccessor.HttpContext.RequestServices is not null, use it to get scoped ISystemEventHandlers
+
+        // We call GetService<IEnumerable<...>> instead of GetServices because GetServices calls GetRequiredService, which throws
+        // an exception, and we just want a null response, because it is normal for there to be no System Event Handlers
+        // for an event.
+        handlers = this.ContextAccessor.HttpContext.RequestServices.GetService<IEnumerable<IScopedSystemEventHandler<TModel, TEvent>>>();
+        //handlers = this.ContextAccessor.HttpContext.RequestServices.GetServices<ISystemEventHandler<TModel, TEvent>>();
+      }
+      else
 			{
-				// Get singleton ISystemEventHandlers
-				handlers = this.ServiceProvider.GetServices<ISystemEventHandler<TModel, TEvent>>();
-			}
+        // Get singleton ISingletonSystemEventHandlers
+
+        // We call GetService<IEnumerable<...>> instead of GetServices because GetServices calls GetRequiredService, which throws
+        // an exception, and we just want a null response, because it is normal for there to be no System Event Handlers
+        // for an event.
+        handlers = this.ServiceProvider.GetService<IEnumerable<ISingletonSystemEventHandler<TModel, TEvent>>>();
+        //handlers = this.ServiceProvider.GetServices<ISystemEventHandler<TModel, TEvent>>();
+      }
 
 			if (handlers != null)
 			{

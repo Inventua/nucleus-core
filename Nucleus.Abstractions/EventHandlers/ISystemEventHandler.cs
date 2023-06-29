@@ -17,7 +17,8 @@ namespace Nucleus.Abstractions.EventHandlers
 	/// implementation, it is used as a marker.
 	/// </typeparam>
 	/// <remarks>
-	/// Implementations of ISystemEventHandler handle a single model type and event type represented by <typeparamref name="TEvent"/> and <typeparamref name="TModel"/>.
+	/// This is the base interface for <see cref="IScopedSystemEventHandler{TModel, TEvent}"/> and <see cref="ISingletonSystemEventHandler{TModel, TEvent}"/>.  You 
+  /// should implement one of those interfaces rather than this interface.
 	/// </remarks>
 	public interface ISystemEventHandler<TModel, TEvent>
 	{

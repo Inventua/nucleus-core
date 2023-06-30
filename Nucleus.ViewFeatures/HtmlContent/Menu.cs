@@ -83,7 +83,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
     }
 
 
-    internal static async Task<TagBuilder> Build(ViewContext context, MenuStyles menuStyle, string menuClass, RootPageTypes rootPageType, Guid rootPageId, Boolean hideEmptyMenu, int maxLevels, object htmlAttributes)
+    internal static async Task<TagBuilder> Build(ViewContext context, MenuStyles menuStyle, string menuClass, RootPageTypes rootPageType, Guid rootPageId, Boolean hideEmptyMenu, int maxLevels, Boolean useName, object htmlAttributes)
     {
       IUrlHelper urlHelper = context.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(context);
       Context nucleusContext = context.HttpContext.RequestServices.GetService<Context>();
@@ -136,8 +136,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
       TagBuilder divBuilder = new("div");
       divBuilder.AddCssClass("container-fluid");
 
-      AddMainMenu(divBuilder, urlHelper, topMenu, menuStyle, maxLevels);
-      AddMobileMenu(divBuilder, urlHelper, topMenu);
+      AddMainMenu(divBuilder, urlHelper, topMenu, menuStyle, maxLevels, useName);
+      AddMobileMenu(divBuilder, urlHelper, topMenu, useName);
 
       outputBuilder.InnerHtml.AppendHtml(divBuilder);
       outputBuilder.MergeAttributes(htmlAttributes);      
@@ -145,7 +145,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			return outputBuilder;
 		}
 
-		private static void AddMainMenu(TagBuilder outputBuilder, IUrlHelper urlHelper, PageMenu topMenu, MenuStyles menuStyle, int maxLevels)
+		private static void AddMainMenu(TagBuilder outputBuilder, IUrlHelper urlHelper, PageMenu topMenu, MenuStyles menuStyle, int maxLevels, Boolean useName)
 		{
 			TagBuilder divInnerBuilder = new("div");
 			TagBuilder listBuilder = new("ul");
@@ -153,22 +153,22 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			divInnerBuilder.AddCssClass("collapse navbar-collapse");
 
 			listBuilder.AddCssClass("navbar-nav me-auto mb-2 mb-lg-0");
-			AddChildren("nav-", menuStyle, listBuilder, urlHelper, topMenu, maxLevels, 0);
+			AddChildren("nav-", menuStyle, listBuilder, urlHelper, topMenu, maxLevels, 0, useName);
 
 			divInnerBuilder.InnerHtml.AppendHtml(listBuilder);
 			outputBuilder.InnerHtml.AppendHtml(divInnerBuilder);
 		}
 
-		private static void AddMobileMenu(TagBuilder outputBuilder, IUrlHelper urlHelper, PageMenu topMenu)
+		private static void AddMobileMenu(TagBuilder outputBuilder, IUrlHelper urlHelper, PageMenu topMenu, Boolean useName)
 		{
 			TagBuilder listBuilder = new("ul");
 			listBuilder.AddCssClass("navbar-nav nucleus-mobile-menu d-lg-none d-xl-none d-xxl-none");
 
-			AddChildren("nav-mobile-", MenuStyles.DropDown, listBuilder, urlHelper, topMenu, 1, 0);
+			AddChildren("nav-mobile-", MenuStyles.DropDown, listBuilder, urlHelper, topMenu, 1, 0, useName);
 			outputBuilder.InnerHtml.AppendHtml(listBuilder);
 		}
 
-		private static void AddChildren(string prefix, MenuStyles menuStyle, TagBuilder control, IUrlHelper urlHelper, PageMenu menu, int maxLevels, int thisLevel)
+		private static void AddChildren(string prefix, MenuStyles menuStyle, TagBuilder control, IUrlHelper urlHelper, PageMenu menu, int maxLevels, int thisLevel, Boolean useName)
 		{
 			if (maxLevels != 0 && thisLevel == maxLevels) return;
 
@@ -180,10 +180,10 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				switch (menuStyle)
 				{
 					case MenuStyles.DropDown:
-						itemBuilder = RenderDropDownItem(prefix, menuStyle, childItem, urlHelper, thisLevel, maxLevels, renderChildren);
+						itemBuilder = RenderDropDownItem(prefix, menuStyle, childItem, urlHelper, thisLevel, maxLevels, renderChildren, useName);
 						if (renderChildren)
 						{
-							itemBuilder.InnerHtml.AppendHtml(RenderDropDownChildren(prefix, menuStyle, childItem, urlHelper, thisLevel, maxLevels)); 
+							itemBuilder.InnerHtml.AppendHtml(RenderDropDownChildren(prefix, menuStyle, childItem, urlHelper, thisLevel, maxLevels, useName)); 
 						}
 						break;
 
@@ -193,15 +193,15 @@ namespace Nucleus.ViewFeatures.HtmlContent
 						if (thisLevel == 0)
 						{
 							// top level items are rendered the same as the default style
-							itemBuilder = RenderDropDownItem(prefix, menuStyle, childItem, urlHelper, thisLevel, maxLevels, renderChildren);
+							itemBuilder = RenderDropDownItem(prefix, menuStyle, childItem, urlHelper, thisLevel, maxLevels, renderChildren, useName);
 						}
 						else
 						{
-							itemBuilder = RenderRibbonItem(prefix, menuStyle, childItem, urlHelper, thisLevel, maxLevels, renderChildren);
+							itemBuilder = RenderRibbonItem(prefix, menuStyle, childItem, urlHelper, thisLevel, maxLevels, renderChildren, useName);
 						}
 						if (renderChildren)
 						{
-							itemBuilder.InnerHtml.AppendHtml(RenderRibbonChildren(prefix, menuStyle, childItem, urlHelper, thisLevel, maxLevels));
+							itemBuilder.InnerHtml.AppendHtml(RenderRibbonChildren(prefix, menuStyle, childItem, urlHelper, thisLevel, maxLevels, useName));
 						}
 						break;											
 				}
@@ -232,7 +232,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			return prefix + System.Text.RegularExpressions.Regex.Replace(route.Path.Replace(" ", "-"), @"([^0-9A-Za-z\.\-_])", "").ToLower();
 		}
 
-		private static TagBuilder RenderDropDownItem(string prefix, MenuStyles menuStyle, PageMenu childItem, IUrlHelper urlHelper, int thisLevel, int maxLevels, Boolean renderChildren)
+		private static TagBuilder RenderDropDownItem(string prefix, MenuStyles menuStyle, PageMenu childItem, IUrlHelper urlHelper, int thisLevel, int maxLevels, Boolean renderChildren, Boolean useName)
 		{
 			TagBuilder itemBuilder = new("li");
 
@@ -247,7 +247,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				itemBuilder.AddCssClass("nav-item");
 			}
 			
-			string caption = String.IsNullOrWhiteSpace(childItem.Page.Title) ? childItem.Page.Name : childItem.Page.Title;
+			string caption = useName || String.IsNullOrWhiteSpace(childItem.Page.Title) ? childItem.Page.Name : childItem.Page.Title;
 			TagBuilder linkBuilder = BuildLinkElement(childItem, urlHelper);
 			
 			if (thisLevel != 0)			
@@ -280,19 +280,19 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			return itemBuilder;
 		}
 
-		private static TagBuilder RenderDropDownChildren(string prefix, MenuStyles menuStyle, PageMenu childItem, IUrlHelper urlHelper, int thisLevel, int maxLevels)
+		private static TagBuilder RenderDropDownChildren(string prefix, MenuStyles menuStyle, PageMenu childItem, IUrlHelper urlHelper, int thisLevel, int maxLevels, Boolean useName)
 		{			
 			TagBuilder listBuilder = new("ul");
 			listBuilder.AddCssClass("dropdown-menu");
 			listBuilder.Attributes.Add("aria-live", "polite");
-			AddChildren(prefix, menuStyle, listBuilder, urlHelper, childItem, maxLevels, thisLevel + 1);
+			AddChildren(prefix, menuStyle, listBuilder, urlHelper, childItem, maxLevels, thisLevel + 1, useName);
 
 			return listBuilder;
 		}
 
-		private static TagBuilder RenderRibbonItem(string prefix, MenuStyles menuStyle, PageMenu childItem, IUrlHelper urlHelper, int thisLevel, int maxLevels, Boolean renderChildren)
+		private static TagBuilder RenderRibbonItem(string prefix, MenuStyles menuStyle, PageMenu childItem, IUrlHelper urlHelper, int thisLevel, int maxLevels, Boolean renderChildren, Boolean useName)
 		{
-			string caption = String.IsNullOrWhiteSpace(childItem.Page.Title) ? childItem.Page.Name : childItem.Page.Title;
+			string caption = useName || String.IsNullOrWhiteSpace(childItem.Page.Title) ? childItem.Page.Name : childItem.Page.Title;
 			TagBuilder itemBuilder = new("li");
 
 			itemBuilder.Attributes.Add("id", GenerateControlId(childItem.Page, prefix));
@@ -351,7 +351,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			return linkBuilder;
 		}
 
-		private static TagBuilder RenderRibbonChildren(string prefix, MenuStyles menuStyle, PageMenu childItem, IUrlHelper urlHelper, int thisLevel, int maxLevels)
+		private static TagBuilder RenderRibbonChildren(string prefix, MenuStyles menuStyle, PageMenu childItem, IUrlHelper urlHelper, int thisLevel, int maxLevels, Boolean useName)
 		{
 			TagBuilder listBuilder = new("ul");
 			
@@ -362,7 +362,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				listBuilder.AddCssClass("dropdown-menu");
 			}
 
-			AddChildren(prefix, menuStyle, listBuilder, urlHelper, childItem, maxLevels, thisLevel + 1);
+			AddChildren(prefix, menuStyle, listBuilder, urlHelper, childItem, maxLevels, thisLevel + 1, useName);
 
 			return listBuilder;
 		}

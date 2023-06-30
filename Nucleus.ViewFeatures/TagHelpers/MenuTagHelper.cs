@@ -71,6 +71,12 @@ namespace Nucleus.ViewFeatures.TagHelpers
     public Boolean HideEmptyMenu { get; set; } = true;
 
     /// <summary>
+		/// Specifies whether to use the page name instead of the title for in-screen display.
+		/// </summary>
+		[HtmlAttributeName("use-name")]
+    public Boolean UseName { get; set; } = true;
+
+    /// <summary>
     /// Generate the output.
     /// </summary>
     /// <param name="context"></param>
@@ -83,7 +89,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
         pageId = Guid.Empty;
       }
 
-			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Menu.Build(this.ViewContext, this.MenuStyle, this.MenuClass, this.RootPageType, pageId, this.HideEmptyMenu, this.MaxLevels, null);
+			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Menu.Build(this.ViewContext, this.MenuStyle, this.MenuClass, this.RootPageType, pageId, this.HideEmptyMenu, this.MaxLevels, this.UseName, null);
 
 			if (builder == null)
 			{

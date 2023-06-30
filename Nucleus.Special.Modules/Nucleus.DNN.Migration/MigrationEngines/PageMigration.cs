@@ -267,7 +267,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
 
           if (newModule.ModuleDefinition == null)
           {
-            dnnPage.AddWarning($"Page module '{dnnModule.ModuleTitle}' [{dnnModule.DesktopModule.ModuleName}] was not added because the target module is not installed.");
+            dnnPage.AddWarning($"Page module '{dnnModule.ModuleTitle}' [{dnnModule.DesktopModule.ModuleName}] was not added to the page because the target Nucleus extension '{moduleMigrationimplementation.ModuleFriendlyName}' is not installed.");
           }
           else
           {
@@ -275,10 +275,11 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
             try
             {
               await this.PageModuleManager.Save(newPage, newModule);
+              await this.PageModuleManager.SavePermissions(newModule);
             }
             catch (Exception ex)
             {
-              dnnPage.AddError($"Page module '{dnnModule.ModuleTitle}' [{dnnModule.DesktopModule.ModuleName}] was not added: {ex.Message}");
+              dnnPage.AddError($"Page module '{dnnModule.ModuleTitle}' [{dnnModule.DesktopModule.ModuleName}] was not added to the page because there was an error: {ex.Message}");
               return;
             }
 
@@ -286,6 +287,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
             try
             {
               await moduleMigrationimplementation.MigrateContent(dnnPage, dnnModule, newPage, newModule);
+              await this.PageModuleManager.SaveSettings(newModule);
             }
             catch (NotImplementedException)
             {
@@ -293,7 +295,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
             }
             catch (Exception ex)
             {
-              dnnPage.AddError($"Page module '{dnnModule.ModuleTitle}' [{dnnModule.DesktopModule.ModuleName}] was added, but migrating content failed with error: {ex.Message}");
+              dnnPage.AddError($"Page module '{dnnModule.ModuleTitle}' [{dnnModule.DesktopModule.ModuleName}] was added to the page, but migrating content failed with error: {ex.Message}");
             }
           }
         }
@@ -307,7 +309,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     {
       if (dnnPageModule.DesktopModule == null)
       {
-        dnnPage.AddWarning($"Page module '{dnnPageModule.ModuleTitle}' was not added because there was no module type (DesktopModule) data for it.");
+        dnnPage.AddWarning($"Page module '{dnnPageModule.ModuleTitle}' was not added to the page because there was no module type (DesktopModule) data for it.");
       }
       else
       {
@@ -320,7 +322,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
       }
     }
 
-    dnnPage.AddWarning($"Page module '{dnnPageModule.ModuleTitle}' [{dnnPageModule.DesktopModule.ModuleName}] was not added because we don't have a module content migration implementation for this module type.");
+    dnnPage.AddWarning($"Page module '{dnnPageModule.ModuleTitle}' [{dnnPageModule.DesktopModule.ModuleName}] was not added to the page because we don't have a module content migration implementation for this module type.");
 
     //switch (desktopModule.ModuleName.ToLower())
     //{

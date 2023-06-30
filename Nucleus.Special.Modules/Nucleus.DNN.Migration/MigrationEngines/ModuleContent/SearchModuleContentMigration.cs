@@ -10,6 +10,8 @@ namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
 public class SearchModuleContentMigration : ModuleContentMigrationBase
 {
+  public override string ModuleFriendlyName => "Search";
+
   public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
   {
     string[] matches = { "SearchResults", "SearchInput" };

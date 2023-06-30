@@ -10,6 +10,8 @@ namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
 public class PublishModuleContentMigration : ModuleContentMigrationBase
 {
+  public override string ModuleFriendlyName => "Publish";
+
   public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
   {
     string[] matches = { "Blog" };

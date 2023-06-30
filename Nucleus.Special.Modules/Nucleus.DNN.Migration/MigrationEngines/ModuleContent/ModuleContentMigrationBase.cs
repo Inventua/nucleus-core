@@ -11,4 +11,6 @@ public abstract class ModuleContentMigrationBase
   public abstract Guid? GetMatch(IEnumerable<Nucleus.Abstractions.Models.ModuleDefinition> modules, Models.DNN.DesktopModule desktopModule);
 
   public abstract Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Nucleus.Abstractions.Models.Page newPage, Nucleus.Abstractions.Models.PageModule newModule);
+
+  public abstract string ModuleFriendlyName { get; }
 }

@@ -10,6 +10,8 @@ namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
 public class UserProfileModuleContentMigration : ModuleContentMigrationBase
 {
+  public override string ModuleFriendlyName => "";
+
   public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
   {
     if (desktopModule.ModuleName.Equals("ViewProfile", StringComparison.OrdinalIgnoreCase))

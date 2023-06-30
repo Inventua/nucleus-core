@@ -146,7 +146,7 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
 
   public async Task<List<Models.DNN.Page>> ListPages(int portalId)
   {
-    return await this.Context.Pages
+    List<Models.DNN.Page> results = await this.Context.Pages
       .Where(page => 
         page.PortalId == portalId && 
         page.PageName != "Admin" && !page.TabPath.StartsWith("//Admin") && // exclude "Admin" page, and descendants
@@ -154,6 +154,8 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       )
       .Include(page => page.Permissions)
         .ThenInclude(perm => perm.Role)
+      //.Include(page => page.PageModules)
+      //  .ThenInclude(pageModule => pageModule.Settings)
       .Include(page => page.PageModules) 
         .ThenInclude(module => module.DesktopModule)
       .Include(page => page.PageModules)
@@ -165,12 +167,25 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .AsSplitQuery()
       .AsNoTracking()
       .ToListAsync();
+
+    foreach (Models.DNN.Page page in results)
+    {
+      foreach (Models.DNN.PageModule module in page.PageModules)
+      {
+        module.Settings = await this.Context.PageModuleSettings
+          .Where(setting => setting.ModuleId == module.ModuleId)
+          .AsNoTracking()
+          .ToListAsync();
+      }
+    }
+    return results;
   }
 
   public async Task<Models.DNN.Modules.TextHtml> GetHtmlContent(int moduleId)
   {
     return await this.Context.TextHtml
-      .Where(textHtml => textHtml.ModuleId == moduleId)
+      .Where(textHtml => textHtml.ModuleId == moduleId && textHtml.IsPublished)
+      .OrderByDescending(textHtml => textHtml.Version)
       .AsNoTracking()
       .FirstOrDefaultAsync();
   }

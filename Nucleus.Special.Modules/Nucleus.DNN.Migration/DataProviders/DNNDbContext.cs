@@ -22,7 +22,9 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
   public DbSet<Models.DNN.Role> Roles { get; set; }
 
   public DbSet<Models.DNN.Page> Pages { get; set; }
-  
+
+  public DbSet<Models.DNN.PageModuleSetting> PageModuleSettings { get; set; }
+
   public DbSet<Models.DNN.User> Users { get; set; }
 
   public DbSet<Models.DNN.UserRole> UserRoles { get; set; }
@@ -123,6 +125,10 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
       .HasMany(module => module.Permissions)
       .WithOne(permission => permission.PageModule)
       .HasForeignKey("ModuleID");
+
+    builder.Entity<Models.DNN.PageModuleSetting>()
+      .ToTable("ModuleSettings")
+      .HasKey(setting => new { setting.ModuleId, setting.SettingName});
 
     builder.Entity<Models.DNN.PageModulePermission>()
       .ToView("vw_ModulePermissions")

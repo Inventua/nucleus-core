@@ -11,6 +11,8 @@ namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
 public class SiteMapModuleContentMigration : ModuleContentMigrationBase
 {
+  public override string ModuleFriendlyName => "Sitemap";
+
   public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
   {
     string[] matches = { "console", "sitemap", "Inventua - TopMenu", "Inventua - SideMenu" };

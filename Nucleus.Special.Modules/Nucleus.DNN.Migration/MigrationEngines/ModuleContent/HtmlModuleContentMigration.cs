@@ -21,6 +21,8 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
     this.DnnMigrationManager = dnnMigrationManager;
   }
 
+  public override string ModuleFriendlyName => "Text/HTML";
+
   public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
   {
     if (desktopModule.ModuleName.Equals("dnn_html", StringComparison.OrdinalIgnoreCase))
@@ -33,15 +35,27 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
 
   public override async Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule)
   {
-    Nucleus.Abstractions.Models.Content content = new();
-    Models.DNN.Modules.TextHtml contentSource = await this.DnnMigrationManager.GetHtmlContent(dnnModule.TabModuleId);
+    Models.DNN.Modules.TextHtml contentSource = await this.DnnMigrationManager.GetHtmlContent(dnnModule.ModuleId);
+    Nucleus.Abstractions.Models.Content content;
 
+    content = (await this.ContentManager.List(newModule)).FirstOrDefault();
+    
+    if (content == null)
+    {
+      content = new();
+    }
+    
     if (contentSource != null)
     {
       content.SortOrder = 10;
       content.ContentType = "text/html";
       content.Value = System.Web.HttpUtility.HtmlDecode(contentSource.Content);
 
+      // apply "guesses" to the content to help with images/other file links.  This assumes that the contents of /Portals/[index] will be copied in the same directory structure
+      // to Nucleus
+      content.Value = content.Value.Replace($"Portals/{dnnPage.PortalId}/", "");
+
+      // <img alt="Microsoft Certified Partner" style="border-right: white 15px solid; border-top: white 10px solid; border-left: white 15px solid; border-bottom: white 4px solid" src="/Portals/0/Images/MS-CertifiedPartner.jpg">
       await this.ContentManager.Save(newModule, content);
     }
   }

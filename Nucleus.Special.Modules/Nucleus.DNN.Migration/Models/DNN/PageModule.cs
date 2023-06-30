@@ -8,9 +8,12 @@ using System.Threading.Tasks;
 namespace Nucleus.DNN.Migration.Models.DNN;
 
 public class PageModule
-{  
+{
   [Column("TabModuleID")]
   public int TabModuleId { get; set; }
+
+  [Column("ModuleID")]
+  public int ModuleId { get; set; }
 
   public Page Page { get; set; }
 
@@ -27,6 +30,8 @@ public class PageModule
 
   public Boolean InheritViewPermissions { get; set; }
 
-  public List<PageModulePermission> Permissions { get; set; } 
+  public List<PageModulePermission> Permissions { get; set; }
 
+  [NotMapped]
+  public List<PageModuleSetting> Settings { get; set; }
 }

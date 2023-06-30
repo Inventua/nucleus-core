@@ -10,6 +10,8 @@ namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
 public class LinksModuleContentMigration : ModuleContentMigrationBase
 {
+  public override string ModuleFriendlyName => "Links";
+
   public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
   {
     string[] matches = { "links", "dnn_links" };

@@ -10,6 +10,8 @@ namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
 public class MeduaModuleContentMigration : ModuleContentMigrationBase
 {
+  public override string ModuleFriendlyName => "Media";
+
   public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
   {
     string[] matches = { "media", "dnn_media" };

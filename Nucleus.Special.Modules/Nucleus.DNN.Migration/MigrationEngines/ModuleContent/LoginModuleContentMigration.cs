@@ -10,6 +10,8 @@ namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
 public class LoginModuleContentMigration : ModuleContentMigrationBase
 {
+  public override string ModuleFriendlyName => "Login";
+
   public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
   {
     if (desktopModule.ModuleName.Equals("authentication", StringComparison.OrdinalIgnoreCase))

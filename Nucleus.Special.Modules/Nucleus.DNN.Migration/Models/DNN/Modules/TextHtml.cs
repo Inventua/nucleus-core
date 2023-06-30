@@ -17,4 +17,9 @@ public class TextHtml
 
   public string Content { get; set; }
 
+  public int Version { get; set; }
+
+  public Boolean IsPublished { get;set; }
+  
+
 }

@@ -69,18 +69,40 @@
   margin: 0;
 }
 
-.dnn-migration .glyph-Error::before
+.dnn-migration .validation-results li
+{
+  display: flex;
+}
+
+.dnn-migration .validation-results td:first-child
+{
+  width: 30%;
+}
+
+.dnn-migration .glyph-Error, .dnn-migration .glyph-Warning, .dnn-migration .glyph-Success
+{
+  font-size: 0.85rem;
+}
+
+.dnn-migration .glyph-Error::before, .dnn-migration .glyph-Warning::before, .dnn-migration .glyph-Success::before
 {
   font-family: 'Material Icons';
-  content: '\e000';
   margin-right: 0.15rem;
-  float: left;
+  
+}
+
+.dnn-migration .glyph-Error::before
+{
+  content: '\e000';
 }
 
 .dnn-migration .glyph-Warning::before
 {
-  font-family: 'Material Icons';
   content: '\e645';
-  margin-right: 0.15rem;
-  float: left;
+}
+
+
+.dnn-migration .glyph-Success::before
+{
+  content: '\e876';
 }

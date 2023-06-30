@@ -21,5 +21,5 @@ public class Role
   public List<int> SelectedRoleGroups { get; set; }
   public List<int> SelectedRoles { get; set; }
 
-
+  public Boolean UpdateExisting { get; set; } = true;
 }

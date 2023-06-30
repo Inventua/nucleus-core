@@ -32,6 +32,8 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
   public DbSet<Models.DNN.UserProfileProperty> UserProfileProperties { get; set; }
   public DbSet<Models.DNN.UserProfilePropertyDefinition> UserProfilePropertyDefinitions { get; set; } 
 
+  public DbSet<Models.DNN.Modules.TextHtml> TextHtml { get; set; }
+
 
   public DNNDbContext(DbContextConfigurator<DNNDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
   {
@@ -129,6 +131,11 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
     builder.Entity<Models.DNN.DesktopModule>()
       .ToTable("DesktopModules")
       .HasKey(desktopModule => desktopModule.DesktopModuleId);
+
+
+    builder.Entity<Models.DNN.Modules.TextHtml>()
+      .ToTable("HtmlText")
+      .HasKey(htmlText => htmlText.ItemId);
 
   }
 }

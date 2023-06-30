@@ -6,6 +6,7 @@ using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
 using Nucleus.Abstractions.Models;
 using Nucleus.DNN.Migration.Models;
 using Nucleus.DNN.Migration.Models.DNN;
+using Nucleus.DNN.Migration.Models.DNN.Modules;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -164,5 +165,13 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .AsSplitQuery()
       .AsNoTracking()
       .ToListAsync();
+  }
+
+  public async Task<Models.DNN.Modules.TextHtml> GetHtmlContent(int moduleId)
+  {
+    return await this.Context.TextHtml
+      .Where(textHtml => textHtml.ModuleId == moduleId)
+      .AsNoTracking()
+      .FirstOrDefaultAsync();
   }
 }

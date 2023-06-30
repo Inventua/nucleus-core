@@ -14,7 +14,11 @@
   @using (Html.BeginNucleusForm("MigrateUsers", "DNNMigration", "DNNMigration", FormMethod.Post, new { }))
   {
     @Html.HiddenFor(model => model.PortalId)
-    <div class="nucleus-button-panel">
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="Update Existing?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to update users when a matching user name is found.  If this is not set, existing users will generate an error.">
+        @Html.CheckBoxFor(model => model.UpdateExisting, new { @class = "ToggleSwitch" })
+      </SettingsControl>
+
       <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-before" data-target="#MigrateUsers" data-confirm="Migrate selected users from DotNetNuke now?  This action cannot be reversed.">Migrate Users</button>
     </div>
 

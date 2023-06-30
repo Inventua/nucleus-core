@@ -1,4 +1,4 @@
-﻿.dnn-migration, .dnn-migration form, .dnn-migration form > div
+﻿.dnn-migration, .dnn-migration form, .dnn-migration form > div:not(.nucleus-flex-fields)
 {
   display: flex;
   flex-direction: column;
@@ -10,17 +10,20 @@
   padding: 0 0.25rem;
 }
 
-.dnn-migration .nucleus-button-panel
+.dnn-migration .nucleus-flex-fields
 {
-  overflow: initial;
-  justify-content: end;
-  flex-direction: row;
+  padding-top: 0.25rem;
 }
 
-.dnn-migration .nucleus-button-panel > *
+.dnn-migration .nucleus-flex-fields > *
 {
   margin-top: auto;
   margin-bottom: auto;
+}
+
+.dnn-migration .nucleus-flex-fields .nucleus-progress-spinner
+{
+  flex: initial;
 }
 
 .dnn-migration ol
@@ -54,6 +57,11 @@
   margin: 0;
 }
 
+.dnn-migration .validation-results td
+{
+  vertical-align: top;
+}
+
 .dnn-migration .validation-results ul
 {
   list-style-type: none;
@@ -66,6 +74,7 @@
   font-family: 'Material Icons';
   content: '\e000';
   margin-right: 0.15rem;
+  float: left;
 }
 
 .dnn-migration .glyph-Warning::before
@@ -73,4 +82,5 @@
   font-family: 'Material Icons';
   content: '\e645';
   margin-right: 0.15rem;
+  float: left;
 }

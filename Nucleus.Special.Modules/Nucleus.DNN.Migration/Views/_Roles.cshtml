@@ -15,7 +15,11 @@
   @using (Html.BeginNucleusForm("MigrateRoles", "DNNMigration", "DNNMigration", FormMethod.Post, new { data_target = "#MigrateRoles" }))
   {
     @Html.HiddenFor(model => model.PortalId)
-    <div class="nucleus-button-panel">
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="Update Existing?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to update role groups and roles when a matching name is found.  If this is not set, existing role groups and roles will generate an error.">
+			  @Html.CheckBoxFor(model => model.UpdateExisting, new { @class = "ToggleSwitch" })
+		  </SettingsControl>
+
       <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-before" data-confirm="Migrate selected Roles and Groups from DotNetNuke now?  This action cannot be reversed.">Migrate Roles and Groups</button>
     </div>
     <div class="my-2">

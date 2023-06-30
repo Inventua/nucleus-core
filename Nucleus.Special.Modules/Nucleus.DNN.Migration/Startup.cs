@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 [assembly: HostingStartup(typeof(Nucleus.DNN.Migration.Startup))]
 
@@ -39,6 +40,37 @@ public class Startup : IHostingStartup
       services.AddMigrationEngine<Models.DNN.Page, MigrationEngines.PageMigration>();
       services.AddMigrationEngine<Models.DNN.User, MigrationEngines.UserMigration>();
 
+      // Add module content migration classes to DI
+      foreach (Type type in GetModuleContentMigrationImplementations())
+      {
+        services.AddSingleton(typeof(MigrationEngines.ModuleContent.ModuleContentMigrationBase), type);
+      }
     });
   }
+
+  /// <summary>
+  /// Find MigrationEngines.ModuleContent.ModuleContentMigrationBase implementations.
+  /// </summary>
+  /// <returns></returns>
+  static IEnumerable<Type> GetModuleContentMigrationImplementations()
+  {
+    return System.Runtime.Loader.AssemblyLoadContext.All
+      .SelectMany(context => context.Assemblies)
+      .SelectMany(assm => GetTypes(assm)
+        .Where(type => typeof(MigrationEngines.ModuleContent.ModuleContentMigrationBase).IsAssignableFrom(type) && !type.Equals(typeof(MigrationEngines.ModuleContent.ModuleContentMigrationBase))));
+
+  }
+
+  private static Type[] GetTypes(System.Reflection.Assembly assembly)
+  {
+    try
+    {
+      return assembly.GetTypes();
+    }
+    catch (System.Reflection.ReflectionTypeLoadException)
+    {
+      return Array.Empty<Type>();
+    }
+  }
 }
+

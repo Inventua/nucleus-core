@@ -16,5 +16,8 @@ public class Page
 {
   public int PortalId { get; set; }
 
-  public List<Models.DNN.Page> Pages { get; set; }  
+  public List<Models.DNN.Page> Pages { get; set; }
+
+  public Boolean UpdateExisting { get; set; } = true;
+
 }

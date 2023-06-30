@@ -21,31 +21,41 @@ public class RoleGroupMigration : MigrationEngineBase<Models.DNN.RoleGroup>
     this.RoleGroupManager = roleGroupManager;
   }
 
-  public override async Task Migrate()
+  public override async Task Migrate(Boolean updateExisting)
   {    
-    foreach (RoleGroup roleGroup in this.Items)
+    foreach (RoleGroup dnnRoleGroup in this.Items)
     {
-      if (roleGroup.CanSelect && roleGroup.IsSelected)
+      if (dnnRoleGroup.CanSelect && dnnRoleGroup.IsSelected)
       {
         try
         {
-          Nucleus.Abstractions.Models.RoleGroup newRoleGroup = await this.RoleGroupManager.CreateNew();
+          Nucleus.Abstractions.Models.RoleGroup newRoleGroup = null;
 
-          newRoleGroup.Name = roleGroup.RoleGroupName;
-          newRoleGroup.Description = roleGroup.Description;
+          if (updateExisting)
+          {
+            newRoleGroup = await this.RoleGroupManager.GetByName(this.Context.Site, dnnRoleGroup.RoleGroupName);
+          }
+
+          if (newRoleGroup == null) 
+          {
+            newRoleGroup = await this.RoleGroupManager.CreateNew();
+          }          
+
+          newRoleGroup.Name = dnnRoleGroup.RoleGroupName;
+          newRoleGroup.Description = dnnRoleGroup.Description;
 
           await this.RoleGroupManager.Save(this.Context.Site, newRoleGroup);
         }
         catch (Exception ex)
         {
-          roleGroup.AddError($"Error importing role group '{roleGroup.RoleGroupName}': {ex.Message}");
+          dnnRoleGroup.AddError($"Error importing role group '{dnnRoleGroup.RoleGroupName}': {ex.Message}");
         }
 
         this.Progress();
       }
       else
       {
-        roleGroup.AddWarning($"Role group '{roleGroup.RoleGroupName}' was not selected for import.");
+        dnnRoleGroup.AddWarning($"Role group '{dnnRoleGroup.RoleGroupName}' was not selected for import.");
       }
     }
   }

@@ -24,7 +24,7 @@ public class RoleMigration : MigrationEngineBase<Models.DNN.Role>
     this.RoleGroupManager = roleGroupManager;
   }
 
-  public override async Task Migrate()
+  public override async Task Migrate(Boolean updateExisting)
   {    
     foreach (Role role in this.Items)
     {
@@ -32,7 +32,17 @@ public class RoleMigration : MigrationEngineBase<Models.DNN.Role>
       {
         try
         {
-          Nucleus.Abstractions.Models.Role newRole = await this.RoleManager.CreateNew();
+          Nucleus.Abstractions.Models.Role newRole = null;
+          
+          if (updateExisting)
+          {
+            newRole = await this.RoleManager.GetByName(this.Context.Site, role.RoleName);
+          }
+
+          if (newRole == null)
+          {
+            newRole = await this.RoleManager.CreateNew();
+          }
 
           newRole.Name = role.RoleName;
           newRole.Type = role.AutoAssignment ? Abstractions.Models.Role.RoleType.AutoAssign : Abstractions.Models.Role.RoleType.Normal;

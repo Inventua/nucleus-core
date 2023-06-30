@@ -197,4 +197,13 @@ public class DNNMigrationManager
       return await provider.ListPages(portalId);
     }
   }
+
+  public async Task<Models.DNN.Modules.TextHtml> GetHtmlContent(int moduleId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.GetHtmlContent(moduleId);
+    }
+  }
+
 }

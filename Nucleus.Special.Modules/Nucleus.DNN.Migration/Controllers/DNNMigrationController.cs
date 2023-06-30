@@ -79,8 +79,8 @@ public class DNNMigrationController : Controller
       
     Task task = Task.Run(async () => 
     {
-      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.RoleGroup>().Migrate();
-      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Role>().Migrate();
+      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.RoleGroup>().Migrate(viewModel.UpdateExisting);
+      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Role>().Migrate(viewModel.UpdateExisting);
     });
     
     return View("_Progress", await BuildProgressViewModel());
@@ -97,7 +97,7 @@ public class DNNMigrationController : Controller
 
     Task task = Task.Run(async () =>
     {
-      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.User>().Migrate();
+      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.User>().Migrate(viewModel.UpdateExisting);
     });
 
     return View("_Progress", await BuildProgressViewModel());
@@ -114,7 +114,7 @@ public class DNNMigrationController : Controller
 
     Task task = Task.Run(async () =>
     {
-      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().Migrate();
+      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().Migrate(viewModel.UpdateExisting);
     });
 
     return View("_Progress", await BuildProgressViewModel());

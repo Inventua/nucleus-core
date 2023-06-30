@@ -15,5 +15,7 @@ public class User
 {
   public int PortalId { get; set; }
 
-  public List<Models.DNN.User> Users { get; set; }  
+  public List<Models.DNN.User> Users { get; set; }
+  public Boolean UpdateExisting { get; set; } = true;
+
 }

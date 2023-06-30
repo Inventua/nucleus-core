@@ -129,7 +129,7 @@ public abstract class MigrationEngineBase
 
   public abstract Task Validate();
 
-  public abstract Task Migrate();
+  public abstract Task Migrate(Boolean updateExisting);
 
   public void Start(int totalCount)
   {

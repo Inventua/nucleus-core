@@ -12,9 +12,14 @@
   @using (Html.BeginNucleusForm("MigratePages", "DNNMigration", "DNNMigration", FormMethod.Post, new { }))
   {
     @Html.HiddenFor(model => model.PortalId)
-    <div class="nucleus-button-panel">
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="Update Existing?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to update pages when a matching page is found (by page route).  If this is not set, existing pages will generate an error.">
+        @Html.CheckBoxFor(model => model.UpdateExisting, new { @class = "ToggleSwitch" })
+      </SettingsControl>
+
       <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-before" data-target="#MigratePages" data-confirm="Migrate selected pages from DotNetNuke now?  This action cannot be reversed.">Migrate Pages</button>
     </div>
+@*    <div class="nucleus-button-panel"></div>*@
 
     <div class="my-2">
       <h2>Pages</h2>

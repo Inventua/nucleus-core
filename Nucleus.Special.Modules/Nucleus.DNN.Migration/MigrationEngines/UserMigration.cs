@@ -25,7 +25,7 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
     this.RoleManager = roleManager;
   }
 
-  public override async Task Migrate()
+  public override async Task Migrate(Boolean updateExisting)
   {
     foreach (User dnnUser in this.Items)
     {
@@ -33,7 +33,19 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
       {
         try
         {
-          Nucleus.Abstractions.Models.User newUser = await this.UserManager.CreateNew(this.Context.Site);
+          Nucleus.Abstractions.Models.User newUser = null;
+
+          if (updateExisting)
+          {
+            newUser = await this.UserManager.Get(this.Context.Site, dnnUser.UserName);
+          }
+
+          if (newUser == null) 
+          {
+            newUser = await this.UserManager.CreateNew(this.Context.Site);
+            // all newly migrated users are unverified & have no password
+            newUser.Verified = false;
+          }
 
           newUser.UserName = dnnUser.UserName;
           newUser.Verified = false;
@@ -48,12 +60,12 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
             }
             else
             {
-              newUser.Roles.Add(newRole);
+              if (!newUser.Roles.Where(existingRole => existingRole.Id == newRole.Id).Any())
+              {
+                newUser.Roles.Add(newRole);
+              }
             }
           }
-
-          // all migrated users are unverified & have no password
-          newUser.Verified = false;
 
           foreach (UserProfileProperty dnnUserProfileItem in dnnUser.ProfileProperties.Where(prop => prop.PropertyDefinition != null))
           {
@@ -66,7 +78,10 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
             }
             else
             {
-              nucleusUserProfileValue.Value = dnnUserProfileItem.Value;
+              if (!String.IsNullOrEmpty(dnnUserProfileItem.Value))
+              {
+                nucleusUserProfileValue.Value = dnnUserProfileItem.Value;
+              }
             }
           }
 
@@ -76,7 +91,10 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
               .FirstOrDefault();
           if (nucleusUserEmailProfileValue == null)
           {
-            dnnUser.AddWarning($"Profile property value for 'Email' not added, because a matching profile property does not exist in Nucleus.");
+            if (!String.IsNullOrEmpty(dnnUser.Email))
+            {
+              dnnUser.AddWarning($"Profile property value for 'Email' not added, because a matching profile property does not exist in Nucleus.");
+            }
           }
           else
           {

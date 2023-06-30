@@ -1132,15 +1132,20 @@ namespace Nucleus.Core.DataProviders
 				{
 					if (!existingUser.Roles.Where(existingRole => existingRole.Id == role.Id).Any())
 					{
-						// add new role assignment  
-						existingUser.Roles.Add(role);
-						this.Context.Entry(existingUser).Collection(userModel => userModel.Roles).FindEntry(role).State = EntityState.Added;
+            // add new role assignment  
+
+            // we need to copy the role & remove the group to prevent unwanted updates to role groups
+            Role newRole = role.Copy<Role>();
+            newRole.RoleGroup = null;
+
+            existingUser.Roles.Add(newRole);
+						this.Context.Entry(existingUser).Collection(userModel => userModel.Roles).FindEntry(newRole).State = EntityState.Added;
 						// set audit field values on the shadow entity
-						this.Context.Entry(existingUser).Collection(userModel => userModel.Roles).FindEntry(role).Property<Guid?>(nameof(ModelBase.AddedBy)).CurrentValue = this.Context.CurrentUserId();
-						this.Context.Entry(existingUser).Collection(userModel => userModel.Roles).FindEntry(role).Property<DateTime?>(nameof(ModelBase.DateAdded)).CurrentValue = DateTime.UtcNow;           // we don't want to change the actual role data, just the user-role assignment
+						this.Context.Entry(existingUser).Collection(userModel => userModel.Roles).FindEntry(newRole).Property<Guid?>(nameof(ModelBase.AddedBy)).CurrentValue = this.Context.CurrentUserId();
+						this.Context.Entry(existingUser).Collection(userModel => userModel.Roles).FindEntry(newRole).Property<DateTime?>(nameof(ModelBase.DateAdded)).CurrentValue = DateTime.UtcNow;           // we don't want to change the actual role data, just the user-role assignment
 						
 						// we don't want to change the actual role data, just the user-role assignment
-						this.Context.Entry(role).State = EntityState.Unchanged;
+						this.Context.Entry(newRole).State = EntityState.Unchanged;
 					}
 					// existing role assignments do not need to be updated
 				}

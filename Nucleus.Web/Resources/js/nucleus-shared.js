@@ -268,6 +268,7 @@ function _Page()
 
 		jQuery('.nucleus-default-control').focus();
 		jQuery(Page).trigger("ready", [{ page: Page }]);
+    _initializeControls(jQuery(document), null, null, null);
 	});
 
 	function _handleAutoPostBack(event)

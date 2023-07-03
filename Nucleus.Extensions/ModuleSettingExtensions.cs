@@ -89,7 +89,17 @@ namespace Nucleus.Extensions
 		public static int Get(this List<ModuleSetting> settings, string key, int defaultValue)
 		{
 			ModuleSetting value = settings.Where(setting => setting.SettingName == key).FirstOrDefault();
-			return value == null ? defaultValue : int.Parse(value.SettingValue);
+
+      if (value == null) return defaultValue;
+
+      if (int.TryParse(value.SettingValue, out int result))
+      {
+        return result;
+      }
+      else
+      {
+        return defaultValue;
+      }
 		}
 
 		/// <summary>
@@ -102,7 +112,17 @@ namespace Nucleus.Extensions
 		public static Boolean Get(this List<ModuleSetting> settings, string key, Boolean defaultValue)
 		{
 			ModuleSetting value = settings.Where(setting => setting.SettingName == key).FirstOrDefault();
-			return value == null ? defaultValue : Boolean.Parse(value.SettingValue);
+
+      if (value == null) return defaultValue;
+
+      if (Boolean.TryParse(value.SettingValue, out Boolean result))
+      {
+        return result;
+      }
+      else
+      {
+        return defaultValue;
+      }			
 		}
 
 		/// <summary>
@@ -116,7 +136,17 @@ namespace Nucleus.Extensions
 		public static T Get<T>(this List<ModuleSetting> settings, string key, T defaultValue) where T: Enum
 		{
 			ModuleSetting value = settings.Where(setting => setting.SettingName == key).FirstOrDefault();
-			return value == null ? defaultValue : (T)System.Enum.Parse(typeof(T), value.SettingValue);
+
+      if (value == null) return defaultValue;
+
+      if (System.Enum.TryParse(typeof(T), value.SettingValue, out object result))
+      {
+        return (T)result;
+      }
+      else
+      {
+        return defaultValue;
+      }
 		}
 
 		/// <summary>

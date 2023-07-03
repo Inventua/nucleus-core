@@ -2268,9 +2268,16 @@ namespace Nucleus.Core.DataProviders
 					}
 					else
 					{
-						// Add setting
-						existing.Items.Add(item);
-						this.Context.Entry(item).State = EntityState.Added;
+            // Add setting
+            if (existing != null)
+            {
+              existing.Items.Add(item);
+              this.Context.Entry(item).State = EntityState.Added;
+            }
+            else
+            {
+              // list will already contain the item
+            }
 					}
 				}
 			}

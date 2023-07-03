@@ -226,7 +226,7 @@ namespace Nucleus.Data.EntityFramework
 			{
 				DataDefinition definition = Newtonsoft.Json.JsonConvert.DeserializeObject<DataDefinition>(script.Content, new Newtonsoft.Json.JsonConverter[] { new MigrationOperationConverter(this.DbContext.Database.ProviderName), new SystemTypeConverter() });
 
-				if (definition.SchemaName != schemaName)
+				if (definition.SchemaName != "*" && definition.SchemaName != schemaName)
 				{
 					throw new InvalidOperationException($"The schema script {script.FullName} schema name {definition.SchemaName} does not match the expected schema name {schemaName}.");
 				}

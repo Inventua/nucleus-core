@@ -7,7 +7,7 @@
     if (engine.State == Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase.EngineStates.InProgress)
     {
       <div class="alert alert-warning">
-        <h2>@engine.Title</h2>
+        <h2>@(String.IsNullOrEmpty(Model.Message) ? @engine.Title : Model.Message)</h2>
         <div class="progress">
           <div class="progress-bar" role="progressbar" aria-label="Progress" style="width: @engine.CurrentPercent%" aria-valuenow="@engine.Current" aria-valuemin="0" aria-valuemax="@engine.TotalCount"></div>          
         </div>

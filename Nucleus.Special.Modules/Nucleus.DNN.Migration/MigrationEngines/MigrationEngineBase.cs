@@ -13,6 +13,7 @@ public abstract class MigrationEngineBase<TModel> : MigrationEngineBase
 { 
   public MigrationEngineBase(string modelFriendlyName) : base(modelFriendlyName) { }
 
+
   private List<TModel> _items;
 
   public List<TModel> Items 
@@ -79,7 +80,9 @@ public abstract class MigrationEngineBase
   }
 
   public string Title { get; }
-  
+
+  public string Message { get; set; }
+
   public abstract List<Nucleus.DNN.Migration.Models.DNN.DNNEntity> InnerItems { get; }
 
   public EngineProgress GetProgress()

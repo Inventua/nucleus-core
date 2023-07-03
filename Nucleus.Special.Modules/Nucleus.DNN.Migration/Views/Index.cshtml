@@ -39,9 +39,16 @@
 
         <li>
           <div>
+            <button type="submit" formaction="@Url.NucleusAction("ListsIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigrateLists">Lists</button>
+          </div>
+          <span class="action-description">Migrate lists from DNN.</span>
+        </li>
+
+        <li>
+          <div>
             <button type="submit" formaction="@Url.NucleusAction("PagesIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigratePages">Pages</button>
           </div>
-          <span class="action-description">Migrate pages, page modules and content from DNN.</span>
+          <span class="action-description">Migrate pages, page modules and content (html, documents, links) from DNN.</span>
         </li>
 
         <li>
@@ -52,8 +59,8 @@
         </li>
       </ol>
     }
-    @*  documents, links, media  *@
     <modal id="MigrateRoles" title="Migrate Roles"></modal>
+    <modal id="MigrateLists" title="Migrate Lists"></modal>
     <modal id="MigratePages" title="Migrate Pages"></modal>
     <modal id="MigrateUsers" title="Migrate Users"></modal>
   }

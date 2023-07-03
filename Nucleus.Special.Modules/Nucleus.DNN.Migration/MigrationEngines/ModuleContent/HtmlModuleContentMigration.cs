@@ -35,7 +35,7 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
 
   public override async Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule)
   {
-    Models.DNN.Modules.TextHtml contentSource = await this.DnnMigrationManager.GetHtmlContent(dnnModule.ModuleId);
+    Models.DNN.Modules.TextHtml contentSource = await this.DnnMigrationManager.GetDnnHtmlContent(dnnModule.ModuleId);
     Nucleus.Abstractions.Models.Content content;
 
     content = (await this.ContentManager.List(newModule)).FirstOrDefault();
@@ -54,6 +54,10 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
       // apply "guesses" to the content to help with images/other file links.  This assumes that the contents of /Portals/[index] will be copied in the same directory structure
       // to Nucleus
       content.Value = content.Value.Replace($"Portals/{dnnPage.PortalId}/", "");
+
+      // rewrite url links like https://site.com/LinkClick.aspx?link=54&tabid=166
+      // TODO
+
 
       // <img alt="Microsoft Certified Partner" style="border-right: white 15px solid; border-top: white 10px solid; border-left: white 15px solid; border-bottom: white 4px solid" src="/Portals/0/Images/MS-CertifiedPartner.jpg">
       await this.ContentManager.Save(newModule, content);

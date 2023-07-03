@@ -121,6 +121,9 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
 
     // Add standard DNN "friendly" url format as a redirect to help maintain backward compatibility
     AddRoute(newPage, Abstractions.Models.PageRoute.PageRouteTypes.PermanentRedirect, $"{dnnPage.TabPath.Replace("//", "/")}/tabid/{dnnPage.PageId}/Default.aspx");
+
+    // Add old format "tabid=nn" url format as a redirect to help maintain backward compatibility
+    AddRoute(newPage, Abstractions.Models.PageRoute.PageRouteTypes.PermanentRedirect, $"{dnnPage.TabPath.Replace("//", "/")}/Default.aspx?tabid={dnnPage.PageId}");
   }
 
   void AddRoute(Nucleus.Abstractions.Models.Page newPage, Abstractions.Models.PageRoute.PageRouteTypes type, string routePath)

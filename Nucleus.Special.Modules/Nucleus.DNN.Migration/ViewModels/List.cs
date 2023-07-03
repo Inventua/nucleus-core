@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
-using Nucleus.DNN.Migration.MigrationEngines;
 using Nucleus.DNN.Migration.Models;
 using System;
 using System.Collections.Generic;
@@ -12,13 +11,11 @@ using System.Threading.Tasks;
 
 namespace Nucleus.DNN.Migration.ViewModels;
 
-public class Progress
+public class List
 {
-  public string Title { get; set; }
+  public int PortalId { get; set; }
 
-  public string Message { get; set; }
-
-  public IEnumerable<EngineProgress> EngineProgress { get; set; }
-  public Boolean InProgress { get; set; }
+  public List<Models.DNN.List> Lists { get; set; }
+  public Boolean UpdateExisting { get; set; } = true;
 
 }

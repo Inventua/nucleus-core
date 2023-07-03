@@ -15,6 +15,8 @@ using Microsoft.Extensions.Options;
 using Nucleus.DNN.Migration.MigrationEngines;
 using Nucleus.ViewFeatures.TagHelpers;
 using DocumentFormat.OpenXml.Math;
+using Markdig.Extensions.Footnotes;
+using static Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase;
 
 //https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.storage.irelationalcommand.executereaderasync?view=efcore-7.0
 
@@ -27,19 +29,22 @@ public class DNNMigrationController : Controller
 {
   private Context Context { get; }
   private DNNMigrationManager DNNMigrationManager { get; }
+  private IFileSystemManager FileSystemManager { get; }
+
   private IOptions<DatabaseOptions> DatabaseOptions { get; }
 
-  public DNNMigrationController(Context Context, DNNMigrationManager dnnMigrationManager, IOptions<DatabaseOptions> databaseOptions)
+  public DNNMigrationController(Context Context, DNNMigrationManager dnnMigrationManager, IFileSystemManager fileSystemManager, IOptions<DatabaseOptions> databaseOptions)
   {
     this.Context = Context;
     this.DNNMigrationManager = dnnMigrationManager;
+    this.FileSystemManager = fileSystemManager;
     this.DatabaseOptions = databaseOptions;
   }
 
   [HttpGet]
   public async Task <ActionResult> Index()
   {
-    return View("Index", await BuildViewModel());
+    return View("Index", await BuildIndexViewModel());
   }
 
   [HttpPost]
@@ -48,10 +53,10 @@ public class DNNMigrationController : Controller
     return View("_Roles", await BuildRolesViewModel(portalId));
   }
 
-  [HttpGet]
-  public async Task<ActionResult> UpdateProgress(ViewModels.Progress viewModel)
-  {  
-    return View("_Progress", await BuildProgressViewModel());
+  [HttpPost]
+  public async Task<ActionResult> ListsIndex(int portalId)
+  {
+    return View("_Lists", await BuildListsViewModel(portalId));
   }
 
   [HttpPost]
@@ -87,6 +92,21 @@ public class DNNMigrationController : Controller
   }
 
   [HttpPost]
+  public async Task<ActionResult> MigrateLists(ViewModels.List viewModel)
+  {
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.List>().UpdateSelections(viewModel.Lists);
+
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.List>().SignalStart();
+
+    Task task = Task.Run(async () =>
+    {
+      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.List>().Migrate(viewModel.UpdateExisting);
+    });
+
+    return View("_Progress", await BuildProgressViewModel());
+  }
+
+  [HttpPost]
   [DisableRequestSizeLimitAttribute]
   [RequestFormLimits(ValueCountLimit = Int32.MaxValue)]
   public async Task<ActionResult> MigrateUsers(ViewModels.User viewModel)
@@ -109,11 +129,15 @@ public class DNNMigrationController : Controller
   public async Task<ActionResult> MigratePages(ViewModels.Page viewModel)
   {
     this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().UpdateSelections(viewModel.Pages);
-
     this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().SignalStart();
 
     Task task = Task.Run(async () =>
     {
+      this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().Message = "Synchronizing file system ...";
+      await SyncFileSystem();
+
+      this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().Message = "";
+
       await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().Migrate(viewModel.UpdateExisting);
     });
 
@@ -121,7 +145,41 @@ public class DNNMigrationController : Controller
   }
 
 
-  private async Task <ViewModels.Index> BuildViewModel()
+  [HttpGet]
+  public async Task<ActionResult> UpdateProgress(ViewModels.Progress viewModel)
+  {
+    return View("_Progress", await BuildProgressViewModel());
+  }
+
+  /// <summary>
+  /// Traverse file system folders to detect new files.
+  /// </summary>
+  private async Task SyncFileSystem()
+  {
+    Folder topFolder = await this.FileSystemManager.GetFolder(this.Context.Site, this.FileSystemManager.ListProviders().First().Key, "");
+    Folder folderData = await this.FileSystemManager.ListFolder(this.Context.Site, topFolder.Id, "");
+
+    foreach (Folder subFolder in folderData.Folders)
+    {
+      await SyncFolder(subFolder);
+    }
+  }
+
+  /// <summary>
+  /// Traverse file system folders to detect new files.
+  /// </summary>
+  /// <param name="folder"></param>
+  /// <returns></returns>
+  private async Task SyncFolder(Folder folder)
+  {
+    Folder folderData = await this.FileSystemManager.ListFolder(this.Context.Site, folder.Id, "");
+    foreach (Folder subFolder in folderData.Folders)
+    {
+      await SyncFolder(subFolder);
+    }
+  }
+
+  private async Task <ViewModels.Index> BuildIndexViewModel()
   {
     ViewModels.Index viewModel = new();
 
@@ -143,10 +201,15 @@ public class DNNMigrationController : Controller
     IEnumerable<EngineProgress> progress = this.DNNMigrationManager.GetMigrationEngines.Select(engine => engine.GetProgress());    
     Boolean doRefresh = progress.Any(engine => engine.State != Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase.EngineStates.Completed);
 
+    string message = this.DNNMigrationManager.GetMigrationEngines.Where(engine => engine.State() == EngineStates.InProgress)
+      .Select(engine => engine.Message)
+      .FirstOrDefault(); ;
+
     ViewModels.Progress viewModel = new()
     {
       EngineProgress = progress,
-      InProgress = doRefresh
+      InProgress = doRefresh,
+      Message = message
     };
 
     return Task.FromResult(viewModel);
@@ -169,6 +232,24 @@ public class DNNMigrationController : Controller
       await engine.Validate();
     }
     
+    return viewModel;
+  }
+
+  private async Task<ViewModels.List> BuildListsViewModel(int portalId)
+  {
+    ViewModels.List viewModel = new();
+    viewModel.PortalId = portalId;
+
+    viewModel.Lists = await this.DNNMigrationManager.ListDNNLists(portalId);
+    
+    this.DNNMigrationManager.ClearMigrationEngines();
+    await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.List>(this.HttpContext.RequestServices, viewModel.Lists);
+    
+    foreach (MigrationEngineBase engine in this.DNNMigrationManager.GetMigrationEngines)
+    {
+      await engine.Validate();
+    }
+
     return viewModel;
   }
 

@@ -25,6 +25,7 @@
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="Views\Index.cshtml" />
+    <None Remove="Views\_Lists.cshtml" />
     <None Remove="Views\_Pages.cshtml" />
     <None Remove="Views\_Progress.cshtml" />
     <None Remove="Views\_Roles.cshtml" />
@@ -38,6 +39,7 @@
     <Content Include="readme.txt" />
     <Content Include="index.css" />
     <Content Include="Views\_Progress.cshtml" />
+    <Content Include="Views\_Lists.cshtml" />
     <Content Include="Views\_Users.cshtml" />
     <Content Include="Views\_Pages.cshtml" />
     <Content Include="Views\_Roles.cshtml" />

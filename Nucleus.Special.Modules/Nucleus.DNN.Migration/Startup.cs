@@ -37,6 +37,7 @@ public class Startup : IHostingStartup
       
       services.AddMigrationEngine<Models.DNN.RoleGroup, MigrationEngines.RoleGroupMigration>();
       services.AddMigrationEngine<Models.DNN.Role, MigrationEngines.RoleMigration>();
+      services.AddMigrationEngine<Models.DNN.List, MigrationEngines.ListMigration>();
       services.AddMigrationEngine<Models.DNN.Page, MigrationEngines.PageMigration>();
       services.AddMigrationEngine<Models.DNN.User, MigrationEngines.UserMigration>();
 

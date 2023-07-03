@@ -97,6 +97,43 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
     return results;
   }
 
+  public async Task<List<Models.DNN.List>> ListLists(int portalId)
+  {
+    List<Models.DNN.List> results = await this.Context.ListItems
+      .Where(item => item.PortalId ==-1 || item.PortalId == portalId)
+      .GroupBy(listitem => listitem.ListName)
+      .Select(group => new Models.DNN.List() 
+      { 
+        ListName = group.Key, 
+        PortalId = portalId, 
+        SystemList = !group.Any() ? false : group.First().SystemList 
+      })
+      .AsNoTracking()
+      .ToListAsync();
+
+    foreach (Models.DNN.List list in results)
+    {
+      list.ListItems = await this.Context.ListItems
+        .Where(item => item.ListName == list.ListName)
+        .OrderBy(item => item.SortOrder)
+        .AsNoTracking()
+        .ToListAsync();
+    }
+
+    return results;
+  }
+
+
+  public async Task<Models.DNN.File> GetFile(int fileId)
+  {
+    return await this.Context.Files
+      .Where(file => file.FileId == fileId)
+      .Include(file => file.Folder)
+      .AsNoTracking()
+      .FirstOrDefaultAsync();
+  }
+
+
   public async Task<Models.DNN.User> GetUser(int userId)
   {
     return await this.Context.Users
@@ -188,5 +225,22 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .OrderByDescending(textHtml => textHtml.Version)
       .AsNoTracking()
       .FirstOrDefaultAsync();
+  }
+
+  public async Task<Models.DNN.Modules.DocumentsSettings> GetDocumentsSettings(int moduleId)
+  {
+    return await this.Context.DocumentsSettings
+      .Where(settings => settings.ModuleId == moduleId)
+      .AsNoTracking()
+      .FirstOrDefaultAsync();
+  }
+
+
+  public async Task<List<Models.DNN.Modules.Document>> ListDocuments(int moduleId)
+  {
+    return await this.Context.Documents
+      .Where(document => document.ModuleId == moduleId)
+      .AsNoTracking()
+      .ToListAsync();
   }
 }

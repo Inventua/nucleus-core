@@ -1,0 +1,65 @@
+﻿@model Nucleus.DNN.Migration.ViewModels.List
+@Html.AddStyle("~!/../index.css")
+<h2 class="nucleus-control-panel-heading">Migrate DNN Lists</h2>
+<div>
+  <div class="alert alert-primary">
+    <ul>
+      <li>System lists will not be migrated.</li>
+      <li>There are @Model.Lists.Where(list => list.IsSelected).Count() lists to migrate.</li>
+    </ul>
+  </div>
+
+  @using (Html.BeginNucleusForm("MigrateLists", "DNNMigration", "DNNMigration", FormMethod.Post, new { }))
+  {
+    @Html.HiddenFor(model => model.PortalId)
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="Update Existing?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to update lists when a matching list name is found.  If this is not set, existing lists will generate an error.">
+        @Html.CheckBoxFor(model => model.UpdateExisting, new { @class = "ToggleSwitch" })
+      </SettingsControl>
+
+      <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-before" data-target="#MigrateLists" data-confirm="Migrate selected lists from DotNetNuke now?  This action cannot be reversed.">Migrate Lists</button>
+    </div>
+
+    <div class="my-2">
+      <h2>Lists</h2>
+      <div class="overflow-auto">
+        <table class="table table-striped table-sm">
+          <thead>
+            <tr>
+              <th />
+              <th>Name</th>
+              <th>Messages</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (int index = 0; index < Model.Lists.Count; index++)
+            {
+              <tr>
+                <td>
+                  @if (Model.Lists[index].CanSelect)
+                  {
+                    @Html.CheckBoxFor(model=> model.Lists[index].IsSelected)
+                  }
+                  @Html.HiddenFor(model=> model.Lists[index].CanSelect)
+                  @Html.HiddenFor(model=> model.Lists[index].ListName)
+                </td>
+                <td>@Model.Lists[index].ListName</td>
+                <td>
+                  <table class="table table-sm table-borderless validation-results">
+                    @foreach (var result in Model.Lists[index].Results)
+                    {
+                      <tr>
+                        <td class="glyph-@result.Type">@result.Message</td>
+                      </tr>
+                    }
+                  </table>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  }
+</div>

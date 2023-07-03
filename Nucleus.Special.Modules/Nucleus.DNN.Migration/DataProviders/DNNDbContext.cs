@@ -30,12 +30,19 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
   public DbSet<Models.DNN.UserRole> UserRoles { get; set; }
   public DbSet<Models.DNN.UserPortal> UserPortals { get; set; }
 
+  public DbSet<Models.DNN.File> Files { get; set; }
+  public DbSet<Models.DNN.Folder> Folders { get; set; }
+
+  public DbSet<Models.DNN.ListItem> ListItems { get; set; }
+
+
 
   public DbSet<Models.DNN.UserProfileProperty> UserProfileProperties { get; set; }
   public DbSet<Models.DNN.UserProfilePropertyDefinition> UserProfilePropertyDefinitions { get; set; } 
 
   public DbSet<Models.DNN.Modules.TextHtml> TextHtml { get; set; }
-
+  public DbSet<Models.DNN.Modules.Document> Documents { get; set; }
+  public DbSet<Models.DNN.Modules.DocumentsSettings> DocumentsSettings { get; set; }
 
   public DNNDbContext(DbContextConfigurator<DNNDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
   {
@@ -138,10 +145,28 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
       .ToTable("DesktopModules")
       .HasKey(desktopModule => desktopModule.DesktopModuleId);
 
+    builder.Entity<Models.DNN.File>()
+     .ToTable("Files");
+
+    builder.Entity<Models.DNN.Folder>()
+     .ToTable("Folders");
+
+    builder.Entity<Models.DNN.ListItem>()
+      .ToTable("Lists")
+      .HasKey(list => list.EntryId);
 
     builder.Entity<Models.DNN.Modules.TextHtml>()
       .ToTable("HtmlText")
       .HasKey(htmlText => htmlText.ItemId);
+
+    builder.Entity<Models.DNN.Modules.Document>()
+      .ToTable("Documents")
+      .HasKey(document => document.ItemId);
+
+    builder.Entity<Models.DNN.Modules.DocumentsSettings>()
+      .ToTable("DocumentsSettings")
+      .HasKey(settings => settings.ModuleId);
+
 
   }
 }

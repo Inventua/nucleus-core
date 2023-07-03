@@ -24,6 +24,7 @@ public class LoginModuleContentMigration : ModuleContentMigrationBase
 
   public override Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule)
   {
-    throw new NotImplementedException();
+    // The DNN login module doesn't have any settings or data
+    return Task.CompletedTask;
   }
 }

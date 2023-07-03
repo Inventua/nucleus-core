@@ -27,6 +27,16 @@ public class SiteMapModuleContentMigration : ModuleContentMigrationBase
 
   public override Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule)
   {
+    switch (dnnModule.DesktopModule.ModuleName)
+    {
+      case "Inventua - TopMenu":
+        break;
+      case "Inventua - SideMenu":
+        break;
+      default:
+        break;
+
+    }
     throw new NotImplementedException();
   }
 }

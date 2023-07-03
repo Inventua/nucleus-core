@@ -5,7 +5,7 @@ using Nucleus.Data.Common;
 using Nucleus.DNN.Migration.DataProviders;
 using Nucleus.DNN.Migration.MigrationEngines;
 using Nucleus.DNN.Migration.Models;
-using Nucleus.DNN.Migration.Models.Nucleus;
+using Nucleus.DNN.Migration.Models.Modules;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -233,6 +233,14 @@ public class DNNMigrationManager
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
       return await provider.ListDocuments(moduleId);
+    }
+  }
+
+  public async Task<List<Models.DNN.Modules.Link>> ListDnnLinks(int moduleId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.ListLinks(moduleId);
     }
   }
 

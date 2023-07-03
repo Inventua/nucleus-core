@@ -238,7 +238,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
       else
       {
         Nucleus.Abstractions.Models.PageModule newModule = null;
-
+       
         ModuleContentMigrationBase moduleMigrationimplementation = FindContentMigrationImplementation(moduleDefinitions, dnnPage, dnnModule, newPage, newModule);
 
         if (moduleMigrationimplementation != null)
@@ -246,7 +246,14 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
           if (updateExisting)
           {
             newModule = newPage.Modules
-              .Where(existing => existing.ModuleDefinition.Id == moduleMigrationimplementation.GetMatch(moduleDefinitions, dnnModule.DesktopModule) && existing.Title.Equals(dnnModule.ModuleTitle) && existing.SortOrder == dnnModule.ModuleOrder)
+              .Where(existing => 
+                existing.ModuleDefinition.Id == moduleMigrationimplementation.GetMatch(moduleDefinitions, dnnModule.DesktopModule) &&
+                (
+                  (String.IsNullOrEmpty(existing.Title) && String.IsNullOrEmpty(dnnModule.ModuleTitle)) 
+                  ||
+                  existing.Title.Equals(dnnModule.ModuleTitle)
+                ) && 
+                existing.SortOrder == dnnModule.ModuleOrder)
               .FirstOrDefault();
           }
 
@@ -258,6 +265,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
           newModule.Title = dnnModule.ModuleTitle;
           newModule.InheritPagePermissions = dnnModule.InheritViewPermissions;
           newModule.Pane = dnnModule.PaneName;
+          // TODO
           //newModule.ContainerDefinition=?;
           // newModule.ModuleSettings=?;
           newModule.SortOrder = dnnModule.ModuleOrder;

@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Nucleus.Extensions;
 using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Abstractions.FileSystemProviders;
-using System.IO;
 
 namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
@@ -62,7 +61,7 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
     // migrate settings
     Models.DNN.Modules.DocumentsSettings settings = await this.DnnMigrationManager.GetDnnDocumentsSettings(dnnModule.ModuleId);
 
-    if (settings.UseCategoriesList == true)
+    if (settings.UseCategoriesList == true && !String.IsNullOrEmpty(settings.CategoriesListName))
     {
       categoriesList = (await this.ListManager.List(site))
           .Where(list => list.Name.Equals(settings.CategoriesListName))
@@ -128,7 +127,7 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
     List<Models.DNN.Modules.Document> contentSource = await this.DnnMigrationManager.ListDnnDocuments(dnnModule.ModuleId);
     foreach (Nucleus.DNN.Migration.Models.DNN.Modules.Document dnnDocument in contentSource)
     {
-      Nucleus.DNN.Migration.Models.Nucleus.Document newDocument = null;
+      Nucleus.DNN.Migration.Models.Modules.Document newDocument = null;
 
       newDocument = await this.DnnMigrationManager.GetDocument(site, newModule, dnnDocument.Title);
 
@@ -158,7 +157,7 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
           Nucleus.Abstractions.Models.FileSystem.File newFile = await this.FileSystemManager.GetFile(site, fileSystemProvider.Key, dnnDocumentFile.Path());
           newDocument.File = newFile;          
         }
-        catch (FileNotFoundException)
+        catch (System.IO.FileNotFoundException)
         {
           dnnPage.AddWarning($"Document '{dnnDocument.Title}' in documents module '{dnnModule.ModuleTitle}' was not migrated because its file could not be found.");
           break;

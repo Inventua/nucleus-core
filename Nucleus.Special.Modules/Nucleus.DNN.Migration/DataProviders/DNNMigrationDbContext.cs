@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Nucleus.Data.Common;
 using Nucleus.Data.EntityFramework;
 using Nucleus.DNN.Migration.Models;
-using Nucleus.DNN.Migration.Models.Nucleus;
+using Nucleus.DNN.Migration.Models.Modules;
 using System;
 using System.Collections.Generic;
 using System.Linq;

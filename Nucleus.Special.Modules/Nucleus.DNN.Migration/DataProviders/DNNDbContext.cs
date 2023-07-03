@@ -44,6 +44,9 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
   public DbSet<Models.DNN.Modules.Document> Documents { get; set; }
   public DbSet<Models.DNN.Modules.DocumentsSettings> DocumentsSettings { get; set; }
 
+  public DbSet<Models.DNN.Modules.Link> Links { get; set; }
+
+
   public DNNDbContext(DbContextConfigurator<DNNDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
   {
     this.ConfigureNucleusEntities = false;
@@ -167,6 +170,9 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
       .ToTable("DocumentsSettings")
       .HasKey(settings => settings.ModuleId);
 
+    builder.Entity<Models.DNN.Modules.Link>()
+      .ToTable("Links")
+      .HasKey(document => document.ItemId);
 
   }
 }

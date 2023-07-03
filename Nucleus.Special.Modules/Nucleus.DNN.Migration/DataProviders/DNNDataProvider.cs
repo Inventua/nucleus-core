@@ -243,4 +243,13 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .AsNoTracking()
       .ToListAsync();
   }
+
+
+  public async Task<List<Models.DNN.Modules.Link>> ListLinks(int moduleId)
+  {
+    return await this.Context.Links
+      .Where(link => link.ModuleId == moduleId)
+      .AsNoTracking()
+      .ToListAsync();
+  }
 }

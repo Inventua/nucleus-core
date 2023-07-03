@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
           
-namespace Nucleus.DNN.Migration.Models.Nucleus
+namespace Nucleus.DNN.Migration.Models.Modules
 {
 	public class Document
 	{

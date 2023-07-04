@@ -30,8 +30,9 @@ namespace Nucleus.Core.Plugins
 			builder.AddExternalControllers();
 			builder.AddCompiledRazorViews();
 			builder.AddScheduledTasks();
+      builder.AddPortable();
 
-			builder.Services.Configure<RazorViewEngineOptions>(options =>
+      builder.Services.Configure<RazorViewEngineOptions>(options =>
 			{
 				options.ViewLocationExpanders.Add(new ExtensionViewLocationExpander());		
 			});
@@ -134,14 +135,34 @@ namespace Nucleus.Core.Plugins
 			return builder;
 		}
 
-		/// <summary>
-		/// Check whether an application part is already present in the Part Manager, as adding the same Controller assembly twice causes 
-		/// a runtime AmbiguousMatchException.
+    /// <summary>
+		/// Add types in assemblies from /bin and in extension folders which implement <see cref="Nucleus.Abstractions.Portable.IPortable"/> 
+		/// to dependency injection.
 		/// </summary>
-		/// <param name="builder">IMvcBuilder instance used to configure services.</param>
-		/// <param name="part">Part to search for.</param>
+		/// <param name="builder"></param>
 		/// <returns></returns>
-		private static Boolean ApplicationPartContains(this IMvcBuilder builder, Microsoft.AspNetCore.Mvc.ApplicationParts.ApplicationPart part)
+		/// <remarks>
+		/// IPortable implementations are added as Singleton and must not maintain state.  
+		/// </remarks>
+		public static IMvcBuilder AddPortable(this IMvcBuilder builder)
+    {
+      foreach (Type type in AssemblyLoader.GetTypes<Nucleus.Abstractions.Portable.IPortable>())
+      {
+        builder.Logger()?.LogInformation("Adding IPortable {typeName} from {assemblyName} [{assemblyLocation}]", type.FullName, type.Assembly.FullName, type.Assembly.Location.Replace(Environment.CurrentDirectory, ""));
+        builder.Services.AddSingleton(typeof(Nucleus.Abstractions.Portable.IPortable), type);
+      }
+
+      return builder;
+    }
+
+    /// <summary>
+    /// Check whether an application part is already present in the Part Manager, as adding the same Controller assembly twice causes 
+    /// a runtime AmbiguousMatchException.
+    /// </summary>
+    /// <param name="builder">IMvcBuilder instance used to configure services.</param>
+    /// <param name="part">Part to search for.</param>
+    /// <returns></returns>
+    private static Boolean ApplicationPartContains(this IMvcBuilder builder, Microsoft.AspNetCore.Mvc.ApplicationParts.ApplicationPart part)
 		{
 			return builder.PartManager.ApplicationParts.Where(existing => existing is AssemblyPart && existing.Name == part.Name ).Any();
 		}

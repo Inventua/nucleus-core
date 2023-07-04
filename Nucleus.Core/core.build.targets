@@ -8,8 +8,8 @@
 <Project>
 	<PropertyGroup>
 		<!--<VersionPrefix>1.2.0.0</VersionPrefix>-->
-    <VersionPrefix>1.2.1.4-pre</VersionPrefix>
-		<VersionSuffix>a1</VersionSuffix>
+    <VersionPrefix>1.2.1.5-pre</VersionPrefix>
+		<VersionSuffix>a3</VersionSuffix>
 		<Authors>Inventua Pty Ltd</Authors>
 		<Product>Nucleus</Product>
 		<Copyright>(c) Inventua Pty Ptd</Copyright>

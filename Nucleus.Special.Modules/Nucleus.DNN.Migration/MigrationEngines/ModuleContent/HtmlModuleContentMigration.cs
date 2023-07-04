@@ -21,19 +21,16 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
     this.DnnMigrationManager = dnnMigrationManager;
   }
 
+  public override Guid ModuleDefinitionId => new("b516d8dd-c793-4776-be33-902eb704bef6");
+
   public override string ModuleFriendlyName => "Text/HTML";
 
-  public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
+  public override Boolean IsMatch(DesktopModule desktopModule)
   {
-    if (desktopModule.ModuleName.Equals("dnn_html", StringComparison.OrdinalIgnoreCase))
-    {
-      return new("b516d8dd-c793-4776-be33-902eb704bef6");
-    }
-
-    return null;
+    return desktopModule.ModuleName.Equals("dnn_html", StringComparison.OrdinalIgnoreCase);
   }
 
-  public override async Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule)
+  public override async Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule, Dictionary<int, Guid> createdPagesKeys)
   {
     Models.DNN.Modules.TextHtml contentSource = await this.DnnMigrationManager.GetDnnHtmlContent(dnnModule.ModuleId);
     Nucleus.Abstractions.Models.Content content;

@@ -12,17 +12,14 @@ public class LoginModuleContentMigration : ModuleContentMigrationBase
 {
   public override string ModuleFriendlyName => "Login";
 
-  public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
-  {
-    if (desktopModule.ModuleName.Equals("authentication", StringComparison.OrdinalIgnoreCase))
-    {
-      return new("f0a9ec71-c29e-436e-96e1-72dcdc44c32b");
-    }
+  public override Guid ModuleDefinitionId => new("f0a9ec71-c29e-436e-96e1-72dcdc44c32b");
 
-    return null;
+  public override Boolean IsMatch(DesktopModule desktopModule)
+  {
+    return desktopModule.ModuleName.Equals("authentication", StringComparison.OrdinalIgnoreCase);
   }
 
-  public override Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule)
+  public override Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule, Dictionary<int, Guid> createdPagesKeys)
   {
     // The DNN login module doesn't have any settings or data
     return Task.CompletedTask;

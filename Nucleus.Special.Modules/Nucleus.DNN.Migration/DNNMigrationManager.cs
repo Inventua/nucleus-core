@@ -22,12 +22,13 @@ public class DNNMigrationManager
   private IFileSystemManager FileSystemManager { get; }
 
   private static List<MigrationEngineBase> MigrationEngines { get; } = new();
-  
-  public DNNMigrationManager(IDataProviderFactory dataProviderFactory, IFileSystemManager fileSystemManager)
+  private IEnumerable<Nucleus.Abstractions.Portable.IPortable> PortableImplementations { get; }
+
+  public DNNMigrationManager(IDataProviderFactory dataProviderFactory, IFileSystemManager fileSystemManager, IEnumerable<Nucleus.Abstractions.Portable.IPortable> portableImplementations)
   {
     this.DataProviderFactory = dataProviderFactory;
-    this.DataProviderFactory.PreventSchemaCheck(Startup.DNN_SCHEMA_NAME);    
-
+    this.DataProviderFactory.PreventSchemaCheck(Startup.DNN_SCHEMA_NAME);
+    this.PortableImplementations = portableImplementations;
     this.FileSystemManager = fileSystemManager;
   }
 
@@ -56,6 +57,12 @@ public class DNNMigrationManager
     {
       return MigrationEngines;
     }
+  }
+
+  public Nucleus.Abstractions.Portable.IPortable GetPortableImplementation(Guid moduleDefinitionId)   
+  {
+    return this.PortableImplementations.Where(portable => portable.ModuleDefinitionId == moduleDefinitionId)
+      .First();
   }
 
 
@@ -246,34 +253,34 @@ public class DNNMigrationManager
 
   #region "    Documents    "
 
-  /// <summary>
-  /// Retrieve an existing <see cref="Document"/> from the database.
-  /// </summary>
-  /// <param name="module"></param>
-  /// <param name="title"></param>
-  /// <returns></returns>
-  public async Task<Document> GetDocument(Site site, PageModule module, string title)
-  {    
-    using (DNNMigrationDataProvider provider = this.DataProviderFactory.CreateProvider<DNNMigrationDataProvider>())
-    {
-      Document document = await provider.GetDocumentByTitle(module.Id, title);
+  /////// <summary>
+  /////// Retrieve an existing <see cref="Document"/> from the database.
+  /////// </summary>
+  /////// <param name="module"></param>
+  /////// <param name="title"></param>
+  /////// <returns></returns>
+  ////public async Task<Document> GetDocument(Site site, PageModule module, string title)
+  ////{    
+  ////  using (DNNMigrationDataProvider provider = this.DataProviderFactory.CreateProvider<DNNMigrationDataProvider>())
+  ////  {
+  ////    Document document = await provider.GetDocumentByTitle(module.Id, title);
 
-      if (document != null)
-      {
-        try
-        {
-          document.File = await this.FileSystemManager.GetFile(site, document.File.Id);
-        }
-        catch (Exception)
-        {
-          document.File = null;
-        }
-      }
+  ////    if (document != null)
+  ////    {
+  ////      try
+  ////      {
+  ////        document.File = await this.FileSystemManager.GetFile(site, document.File.Id);
+  ////      }
+  ////      catch (Exception)
+  ////      {
+  ////        document.File = null;
+  ////      }
+  ////    }
 
-      return document;
-    }
+  ////    return document;
+  ////  }
     
-  }
+  ////}
 
   /// <summary>
   /// Retrieve document settings for the specified module.
@@ -310,18 +317,18 @@ public class DNNMigrationManager
   //}
 
 
-  /// <summary>
-  /// Create or update a <see cref="Document"/>.
-  /// </summary>
-  /// <param name="site"></param>
-  /// <param name="document"></param>
-  public async Task SaveDocument(PageModule module, Document document)
-  {
-    using (DNNMigrationDataProvider provider = this.DataProviderFactory.CreateProvider<DNNMigrationDataProvider>())
-    {
-      await provider.SaveDocument(module, document);
-    }
-  }
+  /////// <summary>
+  /////// Create or update a <see cref="Document"/>.
+  /////// </summary>
+  /////// <param name="site"></param>
+  /////// <param name="document"></param>
+  ////public async Task SaveDocument(PageModule module, Document document)
+  ////{
+  ////  using (DNNMigrationDataProvider provider = this.DataProviderFactory.CreateProvider<DNNMigrationDataProvider>())
+  ////  {
+  ////    await provider.SaveDocument(module, document);
+  ////  }
+  ////}
 
 
   #endregion

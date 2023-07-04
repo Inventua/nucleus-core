@@ -12,19 +12,16 @@ public class ForumsModuleContentMigration : ModuleContentMigrationBase
 {
   public override string ModuleFriendlyName => "Forums";
 
-  public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
+  public override Guid ModuleDefinitionId => new("ea9b5d66-b791-414c-8c52-a20536cfa9f5");
+
+  public override Boolean IsMatch(DesktopModule desktopModule)
   {
     string[] matches = { "NTForums", "dnn_documents" };
 
-    if (matches.Contains(desktopModule.ModuleName, StringComparer.OrdinalIgnoreCase))
-    {
-      return new("ea9b5d66-b791-414c-8c52-a20536cfa9f5");
-    }
-
-    return null;
+    return matches.Contains(desktopModule.ModuleName, StringComparer.OrdinalIgnoreCase);
   }
 
-  public override Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule)
+  public override Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule, Dictionary<int, Guid> createdPagesKeys)
   {
     throw new NotImplementedException();
   }

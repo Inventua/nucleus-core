@@ -10,19 +10,16 @@ namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
 public class RegisterModuleContentMigration : ModuleContentMigrationBase
 {
-  public override string ModuleFriendlyName => "";
+  public override string ModuleFriendlyName => "Register";
 
-  public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
+  public override Guid ModuleDefinitionId => new("7b25bdaf-14a3-4bad-9c41-972dbbb384a1");
+
+  public override Boolean IsMatch(DesktopModule desktopModule)
   {
-    if (desktopModule.ModuleName.Equals("Security", StringComparison.OrdinalIgnoreCase))
-    {
-      return new("7b25bdaf-14a3-4bad-9c41-972dbbb384a1");
-    }
-
-    return null;
+    return desktopModule.ModuleName.Equals("Security", StringComparison.OrdinalIgnoreCase);
   }
 
-  public override Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule)
+  public override Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule, Dictionary<int, Guid> createdPagesKeys)
   {
     // The DNN user registration module doesn't have any settings or data
     return Task.CompletedTask;

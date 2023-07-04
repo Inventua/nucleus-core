@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Nucleus.Extensions;
 using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Abstractions.FileSystemProviders;
+using Markdig.Helpers;
 
 namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
@@ -18,7 +19,7 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
   private IListManager ListManager { get; }
   private IFileSystemManager FileSystemManager { get; }
   private ISiteManager SiteManager { get; }
-
+  
   private const string MODULESETTING_CATEGORYLIST_ID = "documents:categorylistid";
   private const string MODULESETTING_DEFAULTFOLDER_ID = "documents:defaultfolder:provider-id";
   private const string MODULESETTING_ALLOWSORTING = "documents:allowsorting";
@@ -37,23 +38,21 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
     this.DnnMigrationManager = dnnMigrationManager;
   }
 
+  public override Guid ModuleDefinitionId => new("28df7ff3-6407-459e-8608-c1ef4181807c");
+
   public override string ModuleFriendlyName => "Documents";
 
-  public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
+  public override Boolean IsMatch(DesktopModule desktopModule)
   {
     string[] matches = { "documents", "dnn_documents" };
 
-    if (matches.Contains(desktopModule.ModuleName, StringComparer.OrdinalIgnoreCase))
-    {
-      return new("28df7ff3-6407-459e-8608-c1ef4181807c");
-    }
-
-    return null;
+    return matches.Contains(desktopModule.ModuleName, StringComparer.OrdinalIgnoreCase);
   }
 
-  public override async Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule)
+  public override async Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule, Dictionary<int, Guid> createdPagesKeys)
   {
-    Site site = await this.SiteManager.Get(newPage.SiteId);    
+    Site site = await this.SiteManager.Get(newPage.SiteId);
+    Nucleus.Abstractions.Portable.IPortable portable = this.DnnMigrationManager.GetPortableImplementation(this.ModuleDefinitionId);
 
     Nucleus.Abstractions.Models.List categoriesList = null;
     FileSystemProviderInfo fileSystemProvider = this.FileSystemManager.ListProviders().FirstOrDefault();
@@ -127,25 +126,27 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
     List<Models.DNN.Modules.Document> contentSource = await this.DnnMigrationManager.ListDnnDocuments(dnnModule.ModuleId);
     foreach (Nucleus.DNN.Migration.Models.DNN.Modules.Document dnnDocument in contentSource)
     {
-      Nucleus.DNN.Migration.Models.Modules.Document newDocument = null;
+      Nucleus.Abstractions.Models.FileSystem.File newDocumentFile = null;
 
-      newDocument = await this.DnnMigrationManager.GetDocument(site, newModule, dnnDocument.Title);
+      //Nucleus.DNN.Migration.Models.Modules.Document newDocument = null;
 
-      if (newDocument == null)
-      {
-        newDocument = new();
-        newDocument.SortOrder = dnnDocument.SortOrderIndex;
-      }
+      //newDocument = await this.DnnMigrationManager.GetDocument(site, newModule, dnnDocument.Title);
 
-      newDocument.Title = dnnDocument.Title;
-      newDocument.Description = dnnDocument.Description;
+      //if (newDocument == null)
+      //{
+      //  newDocument = new();
+      //  newDocument.SortOrder = dnnDocument.SortOrderIndex;
+      //}
 
-      if (categoriesList != null)
-      {
-        newDocument.Category = categoriesList.Items
-          .Where(item => item.Name.Equals(dnnDocument.Category, StringComparison.OrdinalIgnoreCase))
-          .FirstOrDefault();
-      }
+      //newDocument.Title = dnnDocument.Title;
+      //newDocument.Description = dnnDocument.Description;
+
+      //if (categoriesList != null)
+      //{
+      //  newDocument.Category = categoriesList.Items
+      //    .Where(item => item.Name.Equals(dnnDocument.Category, StringComparison.OrdinalIgnoreCase))
+      //    .FirstOrDefault();
+      //}
 
       if (dnnDocument.Url.StartsWith("FileID=", StringComparison.OrdinalIgnoreCase))
       {
@@ -154,8 +155,7 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
 
         try
         {
-          Nucleus.Abstractions.Models.FileSystem.File newFile = await this.FileSystemManager.GetFile(site, fileSystemProvider.Key, dnnDocumentFile.Path());
-          newDocument.File = newFile;          
+          newDocumentFile = await this.FileSystemManager.GetFile(site, fileSystemProvider.Key, dnnDocumentFile.Path());          
         }
         catch (System.IO.FileNotFoundException)
         {
@@ -170,7 +170,19 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
         break;
       }
 
-      await this.DnnMigrationManager.SaveDocument(newModule, newDocument);
+      object newDocument = new 
+      {
+        Title = dnnDocument.Title,
+        Description = dnnDocument.Description,
+        Category = categoriesList?.Items
+          .Where(item => item.Name.Equals(dnnDocument.Category, StringComparison.OrdinalIgnoreCase))
+          .FirstOrDefault(),
+        File = newDocumentFile,
+        SortOrder = dnnDocument.SortOrderIndex
+      };
+
+      await portable.Import(newModule, new List<object> { newDocument });
+  //await this.DnnMigrationManager.SaveDocument(newModule, newDocument);
     };
   }
 

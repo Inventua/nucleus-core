@@ -81,55 +81,55 @@ public class DNNMigrationDataProvider : Nucleus.Data.EntityFramework.DataProvide
   ///
 
   #region "    Documents    "
-  public async Task<Document> GetDocumentByTitle(Guid moduleId, string title)
-  {
-    return await this.Context.Documents
-      .Where(document => EF.Property<Guid>(document, "ModuleId") == moduleId && document.Title == title)
-      .Include(document => document.Category)
-      .Include(document => document.File)
-      .AsNoTracking()
-      .FirstOrDefaultAsync();
-  }
+  ////public async Task<Document> GetDocumentByTitle(Guid moduleId, string title)
+  ////{
+  ////  return await this.Context.Documents
+  ////    .Where(document => EF.Property<Guid>(document, "ModuleId") == moduleId && document.Title == title)
+  ////    .Include(document => document.Category)
+  ////    .Include(document => document.File)
+  ////    .AsNoTracking()
+  ////    .FirstOrDefaultAsync();
+  ////}
 
-  public async Task SaveDocument(PageModule pageModule, Document document)
-  {
-    Action raiseEvent;
+  ////public async Task SaveDocument(PageModule pageModule, Document document)
+  ////{
+  ////  Action raiseEvent;
 
-    Boolean isNew = !await this.Context.Documents.Where(existing => existing.Id == document.Id).AnyAsync();
+  ////  Boolean isNew = !await this.Context.Documents.Where(existing => existing.Id == document.Id).AnyAsync();
 
-    this.Context.Attach(document);
-    this.Context.Entry(document).Property("ModuleId").CurrentValue = pageModule.Id;
+  ////  this.Context.Attach(document);
+  ////  this.Context.Entry(document).Property("ModuleId").CurrentValue = pageModule.Id;
 
-    if (isNew)
-    {
-      if (document.SortOrder == 0)
-      {
-        document.SortOrder = await GetTopDocumentSortOrder(pageModule.Id) + 10;
-      }
+  ////  if (isNew)
+  ////  {
+  ////    if (document.SortOrder == 0)
+  ////    {
+  ////      document.SortOrder = await GetTopDocumentSortOrder(pageModule.Id) + 10;
+  ////    }
 
-      this.Context.Entry(document).State = EntityState.Added;
-      raiseEvent = new(() => { this.EventManager.RaiseEvent<Document, Create>(document); });
-    }
-    else
-    {
-      this.Context.Entry(document).State = EntityState.Modified;
-      raiseEvent = new(() => { this.EventManager.RaiseEvent<Document, Update>(document); });
-    }
+  ////    this.Context.Entry(document).State = EntityState.Added;
+  ////    raiseEvent = new(() => { this.EventManager.RaiseEvent<Document, Create>(document); });
+  ////  }
+  ////  else
+  ////  {
+  ////    this.Context.Entry(document).State = EntityState.Modified;
+  ////    raiseEvent = new(() => { this.EventManager.RaiseEvent<Document, Update>(document); });
+  ////  }
 
-    await this.Context.SaveChangesAsync<Document>();
+  ////  await this.Context.SaveChangesAsync<Document>();
 
-    raiseEvent.Invoke();
-  }
+  ////  raiseEvent.Invoke();
+  ////}
 
 
-  private async Task<int> GetTopDocumentSortOrder(Guid moduleId)
-  {
-    Document document = await this.Context.Documents
-      .Where(document => EF.Property<Guid>(document, "ModuleId") == moduleId)
-      .OrderByDescending(document => document.SortOrder)
-      .FirstOrDefaultAsync();
+  ////private async Task<int> GetTopDocumentSortOrder(Guid moduleId)
+  ////{
+  ////  Document document = await this.Context.Documents
+  ////    .Where(document => EF.Property<Guid>(document, "ModuleId") == moduleId)
+  ////    .OrderByDescending(document => document.SortOrder)
+  ////    .FirstOrDefaultAsync();
 
-    return document == null ? 10 : document.SortOrder;
-  }
+  ////  return document == null ? 10 : document.SortOrder;
+  ////}
   #endregion
 }

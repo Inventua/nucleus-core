@@ -16,7 +16,7 @@ namespace Nucleus.DNN.Migration.DataProviders;
 public class DNNMigrationDbContext : Nucleus.Data.EntityFramework.DbContext
 {
   //public DbSet<Models.MigrationHistory> MigrationHistory { get; set; }
-  public DbSet<Document> Documents { get; set; }
+  //public DbSet<Document> Documents { get; set; }
 
   public DNNMigrationDbContext(DbContextConfigurator<DNNMigrationDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
   {
@@ -36,17 +36,17 @@ public class DNNMigrationDbContext : Nucleus.Data.EntityFramework.DbContext
   {
     base.OnModelCreating(builder);
 
-    builder.Entity<Document>().Property<Guid>("ModuleId");
+    ////builder.Entity<Document>().Property<Guid>("ModuleId");
 
-    builder.Entity<Document>()
-      .HasOne(document => document.Category)
-      .WithMany()
-      .HasForeignKey("CategoryId");
+    ////builder.Entity<Document>()
+    ////  .HasOne(document => document.Category)
+    ////  .WithMany()
+    ////  .HasForeignKey("CategoryId");
 
-    builder.Entity<Document>()
-      .HasOne(document => document.File)
-      .WithMany()
-      .HasForeignKey("FileId");
+    ////builder.Entity<Document>()
+    ////  .HasOne(document => document.File)
+    ////  .WithMany()
+    ////  .HasForeignKey("FileId");
 
   }
 }

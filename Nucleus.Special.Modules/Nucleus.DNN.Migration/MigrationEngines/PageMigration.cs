@@ -31,11 +31,14 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
 
   public async override Task Migrate(Boolean updateExisting)
   {
+    // we migrate pages and modules/content in two passes, so total count needs to be doubled
+    this.TotalCount = this.TotalCount * 2;
+
     List<Nucleus.Abstractions.Models.PermissionType> pagePermissionTypes = await this.PageManager.ListPagePermissionTypes();
     List<Nucleus.Abstractions.Models.PermissionType> modulePermissionTypes = await this.PageModuleManager.ListModulePermissionTypes();
     IEnumerable<Nucleus.Abstractions.Models.ModuleDefinition> moduleDefinitions = await this.PageModuleManager.ListModuleDefinitions();
 
-    Dictionary<int, Guid> CreatedPagesKeys = new();
+    Dictionary<int, Guid> createdPagesKeys = new();
 
     foreach (Models.DNN.Page dnnPage in this.Items)
     {
@@ -76,9 +79,9 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
 
           if (dnnPage.ParentId != null)
           {
-            if (CreatedPagesKeys.ContainsKey(dnnPage.ParentId.Value))
+            if (createdPagesKeys.ContainsKey(dnnPage.ParentId.Value))
             {
-              newPage.ParentId = CreatedPagesKeys[dnnPage.ParentId.Value];
+              newPage.ParentId = createdPagesKeys[dnnPage.ParentId.Value];
             }
             else
             {
@@ -90,10 +93,9 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
 
           try
           {
+            // initial save to make sure that the page has an Id
             await this.PageManager.Save(this.Context.Site, newPage);
-            CreatedPagesKeys.Add(dnnPage.PageId, newPage.Id);
-
-            await AddPageModules(updateExisting, dnnPage, newPage, moduleDefinitions, modulePermissionTypes);
+            createdPagesKeys.Add(dnnPage.PageId, newPage.Id);
           }
           catch (Exception ex)
           {
@@ -102,7 +104,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
         }
         catch (Exception ex)
         {
-          dnnPage.AddError($"Error importing role group '{dnnPage.PageName}': {ex.Message}");
+          dnnPage.AddError($"Error importing page '{dnnPage.PageName}': {ex.Message}");
         }
 
         this.Progress();
@@ -110,6 +112,37 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
       else
       {
         dnnPage.AddWarning($"Page '{dnnPage.PageName}' was not selected for import.");
+      }
+    }
+
+    // migrate modules and content.  We do this after creating all of the pages, because some modules have settings
+    // which refer to pages which must already exist
+    foreach (Models.DNN.Page dnnPage in this.Items)
+    {
+      if (dnnPage.CanSelect && dnnPage.IsSelected)
+      {
+        try
+        {
+          Nucleus.Abstractions.Models.Page newPage = await this.PageManager.Get(this.Context.Site, dnnPage.TabPath.Replace("//", "/"));
+          
+          if (newPage == null)
+          {
+            dnnPage.AddError($"Error importing modules and content for '{dnnPage.PageName}' because the migrated page could not be found.");
+          }
+          else
+          {
+            await AddPageModules(updateExisting, dnnPage, newPage, moduleDefinitions, modulePermissionTypes, createdPagesKeys);
+
+           // save again in case any module migrations added/ changed anything
+           await this.PageManager.Save(this.Context.Site, newPage);
+          }
+        }
+        catch (Exception ex)
+        {
+          dnnPage.AddError($"Error importing page '{dnnPage.PageName}': {ex.Message}");
+        }
+
+        this.Progress();
       }
     }
   }
@@ -220,13 +253,11 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
         {
           existing.AllowAccess = newPermission.AllowAccess;
         }
-
-        newPage.Permissions.Add(newPermission);
       }
     }
   }
 
-  async Task AddPageModules(Boolean updateExisting, Models.DNN.Page dnnPage, Nucleus.Abstractions.Models.Page newPage, IEnumerable<Nucleus.Abstractions.Models.ModuleDefinition> moduleDefinitions, List<Nucleus.Abstractions.Models.PermissionType> modulePermissionTypes)
+  async Task AddPageModules(Boolean updateExisting, Models.DNN.Page dnnPage, Nucleus.Abstractions.Models.Page newPage, IEnumerable<Nucleus.Abstractions.Models.ModuleDefinition> moduleDefinitions, List<Nucleus.Abstractions.Models.PermissionType> modulePermissionTypes, Dictionary<int, Guid> createdPagesKeys)
   {
     foreach (Models.DNN.PageModule dnnModule in dnnPage.PageModules)
     {
@@ -238,7 +269,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
       else
       {
         Nucleus.Abstractions.Models.PageModule newModule = null;
-       
+
         ModuleContentMigrationBase moduleMigrationimplementation = FindContentMigrationImplementation(moduleDefinitions, dnnPage, dnnModule, newPage, newModule);
 
         if (moduleMigrationimplementation != null)
@@ -246,13 +277,13 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
           if (updateExisting)
           {
             newModule = newPage.Modules
-              .Where(existing => 
-                existing.ModuleDefinition.Id == moduleMigrationimplementation.GetMatch(moduleDefinitions, dnnModule.DesktopModule) &&
+              .Where(existing =>
+                existing.ModuleDefinition.Id == moduleMigrationimplementation.ModuleDefinitionId &&
                 (
-                  (String.IsNullOrEmpty(existing.Title) && String.IsNullOrEmpty(dnnModule.ModuleTitle)) 
+                  (String.IsNullOrEmpty(existing.Title) && String.IsNullOrEmpty(dnnModule.ModuleTitle))
                   ||
                   existing.Title.Equals(dnnModule.ModuleTitle)
-                ) && 
+                ) &&
                 existing.SortOrder == dnnModule.ModuleOrder)
               .FirstOrDefault();
           }
@@ -273,7 +304,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
           await SetPageModulePermissions(dnnPage, dnnModule, newPage, newModule, modulePermissionTypes);
 
           newModule.ModuleDefinition = moduleDefinitions
-            .Where(module => module.Id == moduleMigrationimplementation.GetMatch(moduleDefinitions, dnnModule.DesktopModule))
+            .Where(moduleDefinition => moduleDefinition.Id == moduleMigrationimplementation.ModuleDefinitionId)
             .FirstOrDefault();
 
           if (newModule.ModuleDefinition == null)
@@ -285,6 +316,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
             // we must save the page module record before adding content
             try
             {
+              // initial save to make sure the module has an Id
               await this.PageModuleManager.Save(newPage, newModule);
               await this.PageModuleManager.SavePermissions(newModule);
             }
@@ -297,8 +329,11 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
             // migrate module content            
             try
             {
-              await moduleMigrationimplementation.MigrateContent(dnnPage, dnnModule, newPage, newModule);
-              await this.PageModuleManager.SaveSettings(newModule);
+              await moduleMigrationimplementation.MigrateContent(dnnPage, dnnModule, newPage, newModule, createdPagesKeys);
+
+              // save again in case content migrations changed anything
+              await this.PageModuleManager.Save(newPage, newModule);
+
             }
             catch (NotImplementedException)
             {
@@ -324,9 +359,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
       }
       else
       {
-        Guid? moduleDefinitionId = implementation.GetMatch(modules, dnnPageModule.DesktopModule);
-
-        if (moduleDefinitionId != null)
+        if (implementation.IsMatch(dnnPageModule.DesktopModule))
         {
           return implementation;
         }
@@ -334,60 +367,6 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     }
 
     dnnPage.AddWarning($"Page module '{dnnPageModule.ModuleTitle}' [{dnnPageModule.DesktopModule.ModuleName}] was not added to the page because we don't have a module content migration implementation for this module type.");
-
-    //switch (desktopModule.ModuleName.ToLower())
-    //{
-    //  case "dnn_html":
-    //    moduleDefinitionId = new("b516d8dd-c793-4776-be33-902eb704bef6");
-    //    break;
-
-    //  case "authentication":
-    //    moduleDefinitionId = new("f0a9ec71-c29e-436e-96e1-72dcdc44c32b");
-    //    break;
-
-    //  // these do no have "core" DNN equivalent modules
-    //  //case "usersignup":
-    //  //  moduleDefinitionId = new("7B25BDAF-14A3-4BAD-9C41-972DBBB384A1");
-    //  //  break;
-
-
-    //  //case "changepass":
-    //  //  moduleDefinitionId = new("530EFACF-B9FF-4BF1-94D9-C357FC8769ED");
-    //  //  break;
-
-    //  case "viewprofile":
-    //    moduleDefinitionId = new("1f347233-99e1-47b8-aa78-90ec16c6dbd2");
-    //    break;
-
-    //  case "console":
-    //  case "sitemap":
-    //    moduleDefinitionId = new("0392bf73-c646-4ccc-bcb5-372a75b9ea84");
-    //    break;
-
-    //  case "links":
-    //  case "dnn_links":
-    //    moduleDefinitionId = new("374e62b5-024d-4d8d-95a2-e56f476fe887");
-    //    break;
-
-    //  case "documents":
-    //  case "dnn_documents":
-    //    moduleDefinitionId = new("28df7ff3-6407-459e-8608-c1ef4181807c");
-    //    break;
-
-    //  case "media":
-    //  case "dnn_media":
-    //    moduleDefinitionId = new("2ffdf8a4-edab-48e5-80c6-7b068e4721bb");
-    //    break;
-
-    //    // , search input, search results, 
-    //}
-
-    //if (moduleDefinitionId != null)
-    //{
-    //  return modules
-    //      .Where(module => module.Id == moduleDefinitionId)
-    //      .FirstOrDefault();
-    //}
 
     // no match
     return null;

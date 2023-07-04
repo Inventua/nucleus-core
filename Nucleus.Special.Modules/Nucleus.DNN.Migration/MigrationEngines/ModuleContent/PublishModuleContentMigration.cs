@@ -12,19 +12,16 @@ public class PublishModuleContentMigration : ModuleContentMigrationBase
 {
   public override string ModuleFriendlyName => "Publish";
 
-  public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
+  public override Guid ModuleDefinitionId => new("20af00b8-1d72-4c94-bce7-b175e0b173af");
+
+  public override Boolean IsMatch(DesktopModule desktopModule)
   {
     string[] matches = { "Blog" };
 
-    if (matches.Contains(desktopModule.ModuleName, StringComparer.OrdinalIgnoreCase))
-    {
-      return new("20af00b8-1d72-4c94-bce7-b175e0b173af");
-    }
-
-    return null;
+    return matches.Contains(desktopModule.ModuleName, StringComparer.OrdinalIgnoreCase);
   }
 
-  public override Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule)
+  public override Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule, Dictionary<int, Guid> createdPagesKeys)
   {
     throw new NotImplementedException();
   }

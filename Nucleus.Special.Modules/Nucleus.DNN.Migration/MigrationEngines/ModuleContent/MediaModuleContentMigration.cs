@@ -8,24 +8,22 @@ using System.Threading.Tasks;
 
 namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
-public class MeduaModuleContentMigration : ModuleContentMigrationBase
+public class MediaModuleContentMigration : ModuleContentMigrationBase
 {
   public override string ModuleFriendlyName => "Media";
 
-  public override Guid? GetMatch(IEnumerable<ModuleDefinition> modules, DesktopModule desktopModule)
+  public override Guid ModuleDefinitionId => new("2ffdf8a4-edab-48e5-80c6-7b068e4721bb");
+
+  public override Boolean IsMatch(DesktopModule desktopModule)
   {
     string[] matches = { "media", "dnn_media" };
 
-    if (matches.Contains(desktopModule.ModuleName, StringComparer.OrdinalIgnoreCase))
-    {
-      return new("2ffdf8a4-edab-48e5-80c6-7b068e4721bb");
-    }
-
-    return null;
+    return matches.Contains(desktopModule.ModuleName, StringComparer.OrdinalIgnoreCase);
   }
 
-  public override Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule)
+  public override Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule, Dictionary<int, Guid> createdPagesKeys)
   {
+    // TODO:
     throw new NotImplementedException();
   }
 }

@@ -127,6 +127,7 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
     foreach (Nucleus.DNN.Migration.Models.DNN.Modules.Document dnnDocument in contentSource)
     {
       Nucleus.Abstractions.Models.FileSystem.File newDocumentFile = null;
+      Boolean doSave = true;
 
       if (dnnDocument.Url.StartsWith("FileID=", StringComparison.OrdinalIgnoreCase))
       {
@@ -140,29 +141,31 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
         catch (System.IO.FileNotFoundException)
         {
           dnnPage.AddWarning($"Document '{dnnDocument.Title}' in documents module '{dnnModule.ModuleTitle}' was not migrated because its file could not be found.");
-          break;
+          doSave = false;
         }
       }
       else
       {
         // unsupported type.  The Nucleus documents module does not support Urls/anything but files
         dnnPage.AddWarning($"Document '{dnnDocument.Title}' in documents module '{dnnModule.ModuleTitle}' was not migrated because it does not reference a file.");
-        break;
+        doSave = false;
       }
 
-      object newDocument = new 
+      if (doSave)
       {
-        Title = dnnDocument.Title,
-        Description = dnnDocument.Description,
-        Category = categoriesList?.Items
+        object newDocument = new
+        {
+          Title = dnnDocument.Title,
+          Description = dnnDocument.Description,
+          Category = categoriesList?.Items
           .Where(item => item.Name.Equals(dnnDocument.Category, StringComparison.OrdinalIgnoreCase))
           .FirstOrDefault(),
-        File = newDocumentFile,
-        SortOrder = dnnDocument.SortOrderIndex
-      };
+          File = newDocumentFile,
+          SortOrder = dnnDocument.SortOrderIndex
+        };
 
-      await portable.Import(newModule, new List<object> { newDocument });
-  //await this.DnnMigrationManager.SaveDocument(newModule, newDocument);
+        await portable.Import(newModule, new List<object> { newDocument });
+      }
     };
   }
 

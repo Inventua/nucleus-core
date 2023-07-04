@@ -23,6 +23,7 @@ namespace Nucleus.Modules.Sitemap.Controllers
 			public const string SETTINGS_ROOTPAGE = "sitemap:root-page";
 			public const string SETTINGS_SHOWDESCRIPTION = "sitemap:show-description";
       public const string SETTINGS_DIRECTION = "sitemap:direction";
+      public const string SETTINGS_USENAME = "sitemap:use-name";
     }
 
 		public SitemapController(Context context, IPageManager pageManager, IPageModuleManager pageModuleManager)

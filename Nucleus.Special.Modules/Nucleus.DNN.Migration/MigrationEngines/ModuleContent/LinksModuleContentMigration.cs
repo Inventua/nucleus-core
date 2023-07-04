@@ -46,7 +46,6 @@ public class LinksModuleContentMigration : ModuleContentMigrationBase
     return matches.Contains(desktopModule.ModuleName, StringComparer.OrdinalIgnoreCase);
   }
 
-  // TODO:
   public override async Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule, Dictionary<int, Guid> createdPagesKeys)
   {
     Site site = await this.SiteManager.Get(newPage.SiteId);
@@ -54,14 +53,14 @@ public class LinksModuleContentMigration : ModuleContentMigrationBase
 
     FileSystemProviderInfo fileSystemProvider = this.FileSystemManager.ListProviders().FirstOrDefault();
 
-    // migrate settings
-    //todo
+    // there are no settings in DNN links that can be migrated to Nucleus
 
     List<Models.DNN.Modules.Link> contentSource = await this.DnnMigrationManager.ListDnnLinks(dnnModule.ModuleId);
     foreach (Nucleus.DNN.Migration.Models.DNN.Modules.Link dnnLink in contentSource)
     {
       Nucleus.Abstractions.Models.FileSystem.File newLinkFile = null;
       Nucleus.Abstractions.Models.Page newLinkPage = null;
+      Boolean doSave = true;
 
       if (dnnLink.Url.StartsWith("FileID=", StringComparison.OrdinalIgnoreCase))
       {
@@ -94,55 +93,58 @@ public class LinksModuleContentMigration : ModuleContentMigrationBase
           dnnPage.AddWarning($"Unable to set the root page setting for site map module '{dnnModule.ModuleTitle}'.  DNN page with id '{linkPageId}' has not been migrated.");
         }
       }
-      
-      //public Guid Id { get; set; }
-      //  public string Title { get; set; }
-      //public string Description { get; set; }
-      //public string LinkType { get; set; }
-      //public int SortOrder { get; set; }
-      //public LinkUrl LinkUrl { get; set; }
-      //public LinkPage LinkPage { get; set; }
-      //public LinkFile LinkFile { get; set; }
-      //public ListItem Category { get; set; }
-      //public File ImageFile { get; set; }
-      object newLink;
-
-      if (newLinkFile != null)
+      else if (dnnLink.Url.StartsWith("http"))
       {
-        newLink = new
-        {
-          Title = dnnLink.Title,
-          Description = dnnLink.Description,
-          LinkType = Nucleus.Abstractions.Models.FileSystem.File.URN,
-          SortOrder = dnnLink.ViewOrder,
-          LinkFile = new { File = newLinkFile }
-        };
-      }
-      else if (newLinkPage != null)
-      {
-        newLink = new
-        {
-          Title = dnnLink.Title,
-          Description = dnnLink.Description,
-          LinkType = Nucleus.Abstractions.Models.Page.URN,
-          SortOrder = dnnLink.ViewOrder,
-          LinkPage = new { Page = newLinkPage }
-        };
+        // link is an Url
       }
       else
       {
-        newLink = new
-        {
-          Title = dnnLink.Title,
-          Description = dnnLink.Description,
-          LinkType = "urn:url",
-          SortOrder = dnnLink.ViewOrder,
-          LinkUrl = new { Url = dnnLink.Url },
-          File = newLinkFile,
-        };
+        // User link, or other unrecognized link
+        dnnPage.AddWarning($"Link '{dnnLink.Title}' in links module '{dnnModule.ModuleTitle}' was not migrated because it is a user or other unsupported link type.");
+        doSave = false;
       }
 
-      await portable.Import(newModule, new List<object> { newLink });
+      if (doSave)
+      {
+        object newLink;
+
+        if (newLinkFile != null)
+        {
+          newLink = new
+          {
+            Title = dnnLink.Title,
+            Description = dnnLink.Description,
+            LinkType = Nucleus.Abstractions.Models.FileSystem.File.URN,
+            SortOrder = dnnLink.ViewOrder,
+            LinkFile = new { File = newLinkFile }
+          };
+        }
+        else if (newLinkPage != null)
+        {
+          newLink = new
+          {
+            Title = dnnLink.Title,
+            Description = dnnLink.Description,
+            LinkType = Nucleus.Abstractions.Models.Page.URN,
+            SortOrder = dnnLink.ViewOrder,
+            LinkPage = new { Page = newLinkPage }
+          };
+        }
+        else
+        {
+          newLink = new
+          {
+            Title = dnnLink.Title,
+            Description = dnnLink.Description,
+            LinkType = "urn:url",
+            SortOrder = dnnLink.ViewOrder,
+            LinkUrl = new { Url = dnnLink.Url },
+            File = newLinkFile,
+          };
+        }
+
+        await portable.Import(newModule, new List<object> { newLink });
+      }
     };
   }
 }

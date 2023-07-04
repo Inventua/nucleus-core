@@ -6,18 +6,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Managers;
-using Nucleus.DNN.Migration.DataProviders;
+using Nucleus.Extensions;
+using Nucleus.Abstractions.FileSystemProviders;
 
 namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
 public class HtmlModuleContentMigration : ModuleContentMigrationBase
 {
-  private IContentManager ContentManager { get; set; }
-  private DNNMigrationManager DnnMigrationManager { get; set; }
+  private IPageManager PageManager { get; }
+  private IFileSystemManager FileSystemManager { get; }
+  private IContentManager ContentManager { get; }
+  private DNNMigrationManager DnnMigrationManager { get; }
 
-  public HtmlModuleContentMigration(IContentManager contentManager, DNNMigrationManager dnnMigrationManager)
+  public HtmlModuleContentMigration(IContentManager contentManager, IPageManager pageManager, IFileSystemManager fileSystemManager, DNNMigrationManager dnnMigrationManager)
   {
+    this.PageManager = pageManager;
     this.ContentManager = contentManager;
+    this.FileSystemManager = fileSystemManager;
     this.DnnMigrationManager = dnnMigrationManager;
   }
 
@@ -34,6 +39,7 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
   {
     Models.DNN.Modules.TextHtml contentSource = await this.DnnMigrationManager.GetDnnHtmlContent(dnnModule.ModuleId);
     Nucleus.Abstractions.Models.Content content;
+    FileSystemProviderInfo fileSystemProvider = this.FileSystemManager.ListProviders().FirstOrDefault();
 
     content = (await this.ContentManager.List(newModule)).FirstOrDefault();
     
@@ -48,15 +54,29 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
       content.ContentType = "text/html";
       content.Value = System.Web.HttpUtility.HtmlDecode(contentSource.Content);
 
-      // apply "guesses" to the content to help with images/other file links.  This assumes that the contents of /Portals/[index] will be copied in the same directory structure
-      // to Nucleus
-      content.Value = content.Value.Replace($"Portals/{dnnPage.PortalId}/", "");
+      // apply "guesses" to the content to help with images/other file links.  This assumes that the contents of
+      // /Portals/[index] will be copied in the same directory structure to Nucleus
+      content.Value = content.Value.Replace($"/Portals/{dnnPage.PortalId}/", $"/files/{fileSystemProvider.Key}/");
 
       // rewrite url links like https://site.com/LinkClick.aspx?link=54&tabid=166
-      // TODO
+      foreach (System.Text.RegularExpressions.Match match in System.Text.RegularExpressions.Regex.Matches(content.Value, "/LinkClick\\.aspx\\?link=(?<linkid>[0-9]*)&tabid=(?<tabid>[0-9]*)"))
+      {
+        if (match.Success)
+        {
+          string linkId = match.Groups["linkid"].Value;
+          string tabId = match.Groups["tabid"].Value;
 
+          if (createdPagesKeys.ContainsKey(int.Parse(tabId)))
+          {
+            Nucleus.Abstractions.Models.Page page = await this.PageManager.Get(createdPagesKeys[int.Parse(tabId)]);
+            string path = page.DefaultPageRoute().Path;
+            path += path.EndsWith("/") ? "" : "/";
 
-      // <img alt="Microsoft Certified Partner" style="border-right: white 15px solid; border-top: white 10px solid; border-left: white 15px solid; border-bottom: white 4px solid" src="/Portals/0/Images/MS-CertifiedPartner.jpg">
+            content.Value = content.Value.Replace($"/LinkClick.aspx?link={linkId}&tabid={tabId}", path, StringComparison.OrdinalIgnoreCase);
+          }
+        }
+      }
+
       await this.ContentManager.Save(newModule, content);
     }
   }

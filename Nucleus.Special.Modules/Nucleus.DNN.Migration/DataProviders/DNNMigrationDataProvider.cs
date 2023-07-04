@@ -4,7 +4,6 @@ using Nucleus.Abstractions.EventHandlers;
 using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
 using Nucleus.Abstractions.Models;
 using Nucleus.DNN.Migration.Models;
-using Nucleus.DNN.Migration.Models.Modules;
 using System;
 using System.Collections.Generic;
 using System.Data;

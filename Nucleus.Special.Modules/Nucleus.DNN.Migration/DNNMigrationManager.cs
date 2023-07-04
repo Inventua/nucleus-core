@@ -5,7 +5,6 @@ using Nucleus.Data.Common;
 using Nucleus.DNN.Migration.DataProviders;
 using Nucleus.DNN.Migration.MigrationEngines;
 using Nucleus.DNN.Migration.Models;
-using Nucleus.DNN.Migration.Models.Modules;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,8 +60,15 @@ public class DNNMigrationManager
 
   public Nucleus.Abstractions.Portable.IPortable GetPortableImplementation(Guid moduleDefinitionId)   
   {
-    return this.PortableImplementations.Where(portable => portable.ModuleDefinitionId == moduleDefinitionId)
-      .First();
+    Nucleus.Abstractions.Portable.IPortable result = this.PortableImplementations.Where(portable => portable.ModuleDefinitionId == moduleDefinitionId)
+      .FirstOrDefault();
+
+    if (result  == null)
+    {
+      throw new InvalidOperationException($"No IPortable implementation for module definition '{moduleDefinitionId}' was found.");
+    }
+
+    return result;
   }
 
 

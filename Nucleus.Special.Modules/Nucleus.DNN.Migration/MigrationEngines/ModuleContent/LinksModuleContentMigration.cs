@@ -16,6 +16,8 @@ public class LinksModuleContentMigration : ModuleContentMigrationBase
 {
   private DNNMigrationManager DnnMigrationManager { get; }
   private IListManager ListManager { get; }
+  private IPageManager PageManager { get; }
+
   private IFileSystemManager FileSystemManager { get; }
   private ISiteManager SiteManager { get; }
 
@@ -24,15 +26,16 @@ public class LinksModuleContentMigration : ModuleContentMigrationBase
   private const string MODULESETTING_OPEN_NEW_WINDOW = "links:opennewwindow";
   private const string MODULESETTING_SHOW_IMAGES = "links:showimages";
 
-  public LinksModuleContentMigration(DNNMigrationManager dnnMigrationManager, ISiteManager siteManager, IListManager listManager, IFileSystemManager fileSystemManager)
+  public LinksModuleContentMigration(DNNMigrationManager dnnMigrationManager, ISiteManager siteManager, IPageManager pageManager, IListManager listManager, IFileSystemManager fileSystemManager)
   {
+    this.PageManager = pageManager;
     this.ListManager = listManager;
     this.SiteManager = siteManager;
     this.FileSystemManager = fileSystemManager;
     this.DnnMigrationManager = dnnMigrationManager;
   }
 
-  public override Guid ModuleDefinitionId => new("b516d8dd-c793-4776-be33-902eb704bef6");
+  public override Guid ModuleDefinitionId => new("374e62b5-024d-4d8d-95a2-e56f476fe887");
 
   public override string ModuleFriendlyName => "Links";
 
@@ -46,62 +49,100 @@ public class LinksModuleContentMigration : ModuleContentMigrationBase
   // TODO:
   public override async Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule, Dictionary<int, Guid> createdPagesKeys)
   {
-    //Site site = await this.SiteManager.Get(newPage.SiteId);
+    Site site = await this.SiteManager.Get(newPage.SiteId);
+    Nucleus.Abstractions.Portable.IPortable portable = this.DnnMigrationManager.GetPortableImplementation(this.ModuleDefinitionId);
 
-    //Nucleus.Abstractions.Models.List categoriesList = null;
-    //FileSystemProviderInfo fileSystemProvider = this.FileSystemManager.ListProviders().FirstOrDefault();
+    FileSystemProviderInfo fileSystemProvider = this.FileSystemManager.ListProviders().FirstOrDefault();
 
     // migrate settings
-   
-    //newModule.ModuleSettings.Set(MODULESETTING_ALLOWSORTING, settings.AllowUserSort);
+    //todo
 
-    //List<Models.DNN.Modules.Link> contentSource = await this.DnnMigrationManager.ListDnnLinks(dnnModule.ModuleId);
-    //foreach (Nucleus.DNN.Migration.Models.DNN.Modules.Link dnnLink in contentSource)
-    //{
-    //  Nucleus.DNN.Migration.Models.Nucleus.Link newLink = null;
+    List<Models.DNN.Modules.Link> contentSource = await this.DnnMigrationManager.ListDnnLinks(dnnModule.ModuleId);
+    foreach (Nucleus.DNN.Migration.Models.DNN.Modules.Link dnnLink in contentSource)
+    {
+      Nucleus.Abstractions.Models.FileSystem.File newLinkFile = null;
+      Nucleus.Abstractions.Models.Page newLinkPage = null;
 
-    //  newLink = await this.DnnMigrationManager.GetLink(site, newModule, dnnLink.Title);
+      if (dnnLink.Url.StartsWith("FileID=", StringComparison.OrdinalIgnoreCase))
+      {
+        // link is a file
+        Models.DNN.File dnnLinkFile = await this.DnnMigrationManager.GetDNNFile(Int32.Parse(dnnLink.Url.Replace("fileid=", "", StringComparison.OrdinalIgnoreCase)));
 
-    //  if (newLink == null)
-    //  {
-    //    newLink = new();
-    //    newLink.SortOrder = dnnLink.ViewOrder;
-    //  }
+        try
+        {
+          newLinkFile = await this.FileSystemManager.GetFile(site, fileSystemProvider.Key, dnnLinkFile.Path());
+        }
+        catch (System.IO.FileNotFoundException)
+        {
+          dnnPage.AddWarning($"Link '{dnnLink.Title}' in links module '{dnnModule.ModuleTitle}' was not migrated because its file '{dnnLinkFile.Path()}' could not be found.");
+          break;
+        }
+      }
+      else if (int.TryParse(dnnLink.Url, out int linkPageId))
+      {
+        // link is a page
+        if (createdPagesKeys.ContainsKey(linkPageId))
+        {
+          newLinkPage = await this.PageManager.Get(createdPagesKeys[linkPageId]);
+          if (newLinkPage == null)
+          {
+            dnnPage.AddWarning($"Unable to set the page property for a migrated link for link '{dnnLink.Title}', module '{dnnModule.ModuleTitle}'.  A page with Id '{createdPagesKeys[linkPageId]}' was not found.");
+          }
+        }
+        else
+        {
+          dnnPage.AddWarning($"Unable to set the root page setting for site map module '{dnnModule.ModuleTitle}'.  DNN page with id '{linkPageId}' has not been migrated.");
+        }
+      }
+      
+      //public Guid Id { get; set; }
+      //  public string Title { get; set; }
+      //public string Description { get; set; }
+      //public string LinkType { get; set; }
+      //public int SortOrder { get; set; }
+      //public LinkUrl LinkUrl { get; set; }
+      //public LinkPage LinkPage { get; set; }
+      //public LinkFile LinkFile { get; set; }
+      //public ListItem Category { get; set; }
+      //public File ImageFile { get; set; }
+      object newLink;
 
-    //  newLink.Title = dnnLink.Title;
-    //  newLink.Description = dnnLink.Description;
+      if (newLinkFile != null)
+      {
+        newLink = new
+        {
+          Title = dnnLink.Title,
+          Description = dnnLink.Description,
+          LinkType = Nucleus.Abstractions.Models.FileSystem.File.URN,
+          SortOrder = dnnLink.ViewOrder,
+          LinkFile = new { File = newLinkFile }
+        };
+      }
+      else if (newLinkPage != null)
+      {
+        newLink = new
+        {
+          Title = dnnLink.Title,
+          Description = dnnLink.Description,
+          LinkType = Nucleus.Abstractions.Models.Page.URN,
+          SortOrder = dnnLink.ViewOrder,
+          LinkPage = new { Page = newLinkPage }
+        };
+      }
+      else
+      {
+        newLink = new
+        {
+          Title = dnnLink.Title,
+          Description = dnnLink.Description,
+          LinkType = "urn:url",
+          SortOrder = dnnLink.ViewOrder,
+          LinkUrl = new { Url = dnnLink.Url },
+          File = newLinkFile,
+        };
+      }
 
-    //  if (categoriesList != null)
-    //  {
-    //    newLink.Category = categoriesList.Items
-    //      .Where(item => item.Name.Equals(dnnLink.Category, StringComparison.OrdinalIgnoreCase))
-    //      .FirstOrDefault();
-    //  }
-
-    //  if (dnnLink.Url.StartsWith("FileID=", StringComparison.OrdinalIgnoreCase))
-    //  {
-    //    // link is a file
-    //    Models.DNN.File dnnLinkFile = await this.DnnMigrationManager.GetDNNFile(Int32.Parse(dnnLink.Url.Replace("fileid=", "", StringComparison.OrdinalIgnoreCase)));
-
-    //    try
-    //    {
-    //      Nucleus.Abstractions.Models.FileSystem.File newFile = await this.FileSystemManager.GetFile(site, fileSystemProvider.Key, dnnLinkFile.Path());
-    //      newLink.File = newFile;
-    //    }
-    //    catch (FileNotFoundException)
-    //    {
-    //      dnnPage.AddWarning($"Link '{dnnLink.Title}' in links module '{dnnModule.ModuleTitle}' was not migrated because its file could not be found.");
-    //      break;
-    //    }
-    //  }
-    //  else
-    //  {
-    //    // unsupported type.  The Nucleus links module does not support Urls/anything but files
-    //    dnnPage.AddWarning($"Link '{dnnLink.Title}' in links module '{dnnModule.ModuleTitle}' was not migrated because it does not reference a file.");
-    //    break;
-    //  }
-
-    //  await this.DnnMigrationManager.SaveLink(newModule, newLink);
-    //};
+      await portable.Import(newModule, new List<object> { newLink });
+    };
   }
 }

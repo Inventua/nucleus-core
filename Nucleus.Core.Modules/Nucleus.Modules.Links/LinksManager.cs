@@ -257,7 +257,20 @@ namespace Nucleus.Modules.Links
 		{
 			using (ILinksDataProvider provider = this.DataProviderFactory.CreateProvider<ILinksDataProvider>())
 			{
-				await provider.Save(module, link);
+        Link copy = link.Copy<Link>();
+
+        // remove extended properties so that EF does not try to attach or save them
+        if (copy.LinkPage?.Page != null)
+        {
+          copy.LinkPage.Page = new Page() { Id = copy.LinkPage.Page.Id };
+        }
+        if (copy.LinkFile?.File != null)
+        {
+          copy.LinkFile.File = new Nucleus.Abstractions.Models.FileSystem.File() { Id = copy.LinkFile.File.Id };
+        }
+
+        await provider.Save(module, copy);
+
 				this.CacheManager.LinksCache().Remove(link.Id);
 				this.CacheManager.ModuleLinksCache().Remove(module.Id);
 			}

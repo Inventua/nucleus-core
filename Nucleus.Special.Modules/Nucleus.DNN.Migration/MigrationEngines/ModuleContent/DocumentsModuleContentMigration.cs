@@ -128,26 +128,6 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
     {
       Nucleus.Abstractions.Models.FileSystem.File newDocumentFile = null;
 
-      //Nucleus.DNN.Migration.Models.Modules.Document newDocument = null;
-
-      //newDocument = await this.DnnMigrationManager.GetDocument(site, newModule, dnnDocument.Title);
-
-      //if (newDocument == null)
-      //{
-      //  newDocument = new();
-      //  newDocument.SortOrder = dnnDocument.SortOrderIndex;
-      //}
-
-      //newDocument.Title = dnnDocument.Title;
-      //newDocument.Description = dnnDocument.Description;
-
-      //if (categoriesList != null)
-      //{
-      //  newDocument.Category = categoriesList.Items
-      //    .Where(item => item.Name.Equals(dnnDocument.Category, StringComparison.OrdinalIgnoreCase))
-      //    .FirstOrDefault();
-      //}
-
       if (dnnDocument.Url.StartsWith("FileID=", StringComparison.OrdinalIgnoreCase))
       {
         // document is a file

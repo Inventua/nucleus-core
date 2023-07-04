@@ -22,10 +22,10 @@ namespace Nucleus.Abstractions.Managers
 		/// Retrieve an existing <see cref="Folder"/> from the database.
 		/// </summary>
 		/// <param name="site"></param>
-		/// <param name="providerName"></param>
+		/// <param name="providerKey"></param>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		public Task<Folder> GetFolder(Site site, string providerName, string path);
+		public Task<Folder> GetFolder(Site site, string providerKey, string path);
 
 		/// <summary>
 		/// Retrieve an existing <see cref="Folder"/> from the database.
@@ -48,9 +48,9 @@ namespace Nucleus.Abstractions.Managers
 		/// </summary>
 		/// <returns></returns>
 		/// <param name="site"></param>
-		/// <param name="providerName"></param>
+		/// <param name="providerKey"></param>
 		/// <param name="path"></param>
-		public Task<File> GetFile(Site site, string providerName, string path);
+		public Task<File> GetFile(Site site, string providerKey, string path);
 
 		/// <summary>
 		/// Get a direct url for the file.
@@ -110,11 +110,11 @@ namespace Nucleus.Abstractions.Managers
 		/// Create a new folder
 		/// </summary>
 		/// <param name="site"></param>
-		/// <param name="providerName"></param>
+		/// <param name="providerKey"></param>
 		/// <param name="parentPath"></param>
 		/// <param name="newFolder"></param>
 		/// <returns></returns>
-		public Task<Folder> CreateFolder(Site site, string providerName, string parentPath, string newFolder);
+		public Task<Folder> CreateFolder(Site site, string providerKey, string parentPath, string newFolder);
 
 		/// <summary>
 		/// Delete an existing folder
@@ -183,13 +183,13 @@ namespace Nucleus.Abstractions.Managers
 		/// Save a file.
 		/// </summary>
 		/// <param name="site"></param>
-		/// <param name="providerName"></param>
+		/// <param name="providerKey"></param>
 		/// <param name="parentPath"></param>
 		/// <param name="newFileName"></param>
 		/// <param name="content"></param>
 		/// <param name="overwrite"></param>
 		/// <returns></returns>
-		public Task<File> SaveFile(Site site, string providerName, string parentPath, string newFileName, System.IO.Stream content, Boolean overwrite);
+		public Task<File> SaveFile(Site site, string providerKey, string parentPath, string newFileName, System.IO.Stream content, Boolean overwrite);
 
 		/// <summary>
 		/// Refresh the properties of a file.

@@ -45,9 +45,9 @@ namespace Nucleus.Abstractions.Managers
 		/// <summary>
 		/// Retrive an existing page from the database.  The returned page is the "owner" of the specified module.
 		/// </summary>
-		/// <param name="page"></param>
+		/// <param name="pageModule"></param>
 		/// <returns></returns>
-		public Task<Page> Get(PageModule page);
+		public Task<Page> Get(PageModule pageModule);
 
 		/// <summary>
 		/// List all <see cref="PageModule"/>s that are part of the page.

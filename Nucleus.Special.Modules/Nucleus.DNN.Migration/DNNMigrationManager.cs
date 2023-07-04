@@ -257,37 +257,6 @@ public class DNNMigrationManager
     }
   }
 
-  #region "    Documents    "
-
-  /////// <summary>
-  /////// Retrieve an existing <see cref="Document"/> from the database.
-  /////// </summary>
-  /////// <param name="module"></param>
-  /////// <param name="title"></param>
-  /////// <returns></returns>
-  ////public async Task<Document> GetDocument(Site site, PageModule module, string title)
-  ////{    
-  ////  using (DNNMigrationDataProvider provider = this.DataProviderFactory.CreateProvider<DNNMigrationDataProvider>())
-  ////  {
-  ////    Document document = await provider.GetDocumentByTitle(module.Id, title);
-
-  ////    if (document != null)
-  ////    {
-  ////      try
-  ////      {
-  ////        document.File = await this.FileSystemManager.GetFile(site, document.File.Id);
-  ////      }
-  ////      catch (Exception)
-  ////      {
-  ////        document.File = null;
-  ////      }
-  ////    }
-
-  ////    return document;
-  ////  }
-    
-  ////}
-
   /// <summary>
   /// Retrieve document settings for the specified module.
   /// </summary>
@@ -301,41 +270,18 @@ public class DNNMigrationManager
     }
   }
 
-  ///// <summary>
-  ///// List all <see cref="Document"/>s for the specified module.
-  ///// </summary>
-  ///// <param name="site"></param>
-  ///// <param name="module"></param>		
-  ///// <returns></returns>
-  //public async Task<IList<Document>> List(Site site, PageModule module)
-  //{
-  //  IEnumerable<Guid> results = await this.CacheManager.ModuleDocumentsCache().GetAsync(module.Id, async id =>
-  //  {
-  //    using (IDocumentsDataProvider provider = this.DataProviderFactory.CreateProvider<IDocumentsDataProvider>())
-  //    {
-  //      IList<Document> documents = await provider.List(module);
-
-  //      return documents.Select(document => document.Id);
-  //    }
-  //  });
-
-  //  return new List<Document>(await Task.WhenAll(results.Select(async id => await Get(site, id))));
-  //}
+  /// <summary>
+  /// Retrieve media module settings for the specified module.
+  /// </summary>
+  /// <param name="moduleId"></param>
+  /// <returns></returns>
+  public async Task<Models.DNN.Modules.MediaSettings> GetDnnMediaSettings(int moduleId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.GetMediaSettings(moduleId);
+    }
+  }
 
 
-  /////// <summary>
-  /////// Create or update a <see cref="Document"/>.
-  /////// </summary>
-  /////// <param name="site"></param>
-  /////// <param name="document"></param>
-  ////public async Task SaveDocument(PageModule module, Document document)
-  ////{
-  ////  using (DNNMigrationDataProvider provider = this.DataProviderFactory.CreateProvider<DNNMigrationDataProvider>())
-  ////  {
-  ////    await provider.SaveDocument(module, document);
-  ////  }
-  ////}
-
-
-  #endregion
 }

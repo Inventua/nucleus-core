@@ -298,7 +298,6 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
           newModule.Pane = dnnModule.PaneName;
           // TODO
           //newModule.ContainerDefinition=?;
-          // newModule.ModuleSettings=?;
           newModule.SortOrder = dnnModule.ModuleOrder;
 
           await SetPageModulePermissions(dnnPage, dnnModule, newPage, newModule, modulePermissionTypes);

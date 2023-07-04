@@ -235,6 +235,14 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .FirstOrDefaultAsync();
   }
 
+  public async Task<Models.DNN.Modules.MediaSettings> GetMediaSettings(int moduleId)
+  {
+    return await this.Context.MediaSettings
+      .Where(settings => settings.ModuleId == moduleId)
+      .AsNoTracking()
+      .FirstOrDefaultAsync();
+  }
+
 
   public async Task<List<Models.DNN.Modules.Document>> ListDocuments(int moduleId)
   {

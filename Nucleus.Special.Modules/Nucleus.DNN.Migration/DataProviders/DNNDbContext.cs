@@ -43,7 +43,7 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
   public DbSet<Models.DNN.Modules.TextHtml> TextHtml { get; set; }
   public DbSet<Models.DNN.Modules.Document> Documents { get; set; }
   public DbSet<Models.DNN.Modules.DocumentsSettings> DocumentsSettings { get; set; }
-
+  public DbSet<Models.DNN.Modules.MediaSettings> MediaSettings { get; set; }
   public DbSet<Models.DNN.Modules.Link> Links { get; set; }
 
 
@@ -168,6 +168,10 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
 
     builder.Entity<Models.DNN.Modules.DocumentsSettings>()
       .ToTable("DocumentsSettings")
+      .HasKey(settings => settings.ModuleId);
+
+    builder.Entity<Models.DNN.Modules.MediaSettings>()
+      .ToTable("Media")
       .HasKey(settings => settings.ModuleId);
 
     builder.Entity<Models.DNN.Modules.Link>()

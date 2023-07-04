@@ -17,14 +17,19 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
   private IPageManager PageManager { get; }
   private IPageModuleManager PageModuleManager { get; }
   private IRoleManager RoleManager { get; }
+  private IContainerManager ContainerManager { get; }
+  private ILayoutManager LayoutManager { get; }
+
   private IEnumerable<Nucleus.DNN.Migration.MigrationEngines.ModuleContent.ModuleContentMigrationBase> ModuleContentMigrations { get; }
 
-  public PageMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IRoleManager roleManager, IEnumerable<Nucleus.DNN.Migration.MigrationEngines.ModuleContent.ModuleContentMigrationBase> moduleContentMigrations) : base("Pages")
+  public PageMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IRoleManager roleManager, ILayoutManager layoutManager, IContainerManager containerManager, IEnumerable<Nucleus.DNN.Migration.MigrationEngines.ModuleContent.ModuleContentMigrationBase> moduleContentMigrations) : base("Pages")
   {
     this.Context = context;
     this.MigrationManager = migrationManager;
     this.PageManager = pageManager;
     this.PageModuleManager = pageModuleManager;
+    this.LayoutManager = layoutManager;
+    this.ContainerManager = containerManager;
     this.RoleManager = roleManager;
     this.ModuleContentMigrations = moduleContentMigrations;
   }
@@ -73,9 +78,13 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
 
           AddRoutes(dnnPage, newPage);
 
-          // TODO
-          //newPage.DefaultContainerDefinition =?;
-          //newPage.LayoutDefinition =?;
+          newPage.DefaultContainerDefinition = (await this.ContainerManager.List())
+            .Where(container => container.FriendlyName.Equals(System.IO.Path.GetFileNameWithoutExtension(dnnPage.ContainerSrc), StringComparison.OrdinalIgnoreCase))
+            .FirstOrDefault();
+
+          newPage.LayoutDefinition = (await this.LayoutManager.List())
+            .Where(layout => layout.FriendlyName.Equals(System.IO.Path.GetFileNameWithoutExtension(dnnPage.ContainerSrc), StringComparison.OrdinalIgnoreCase))
+            .FirstOrDefault();
 
           if (dnnPage.ParentId != null)
           {
@@ -296,8 +305,11 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
           newModule.Title = dnnModule.ModuleTitle;
           newModule.InheritPagePermissions = dnnModule.InheritViewPermissions;
           newModule.Pane = dnnModule.PaneName;
-          // TODO
-          //newModule.ContainerDefinition=?;
+          
+          newModule.ContainerDefinition=(await this.ContainerManager.List())
+            .Where(container => container.FriendlyName.Equals(System.IO.Path.GetFileNameWithoutExtension(dnnModule.ContainerSrc), StringComparison.OrdinalIgnoreCase))
+            .FirstOrDefault();
+
           newModule.SortOrder = dnnModule.ModuleOrder;
 
           await SetPageModulePermissions(dnnPage, dnnModule, newPage, newModule, modulePermissionTypes);

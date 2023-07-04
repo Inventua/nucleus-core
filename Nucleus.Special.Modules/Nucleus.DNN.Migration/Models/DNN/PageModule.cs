@@ -21,6 +21,8 @@ public class PageModule
 
   public int ModuleOrder { get; set; }
   public string PaneName { get; set; }
+  public string ContainerSrc { get; set; }
+
 
   public string ModuleTitle{ get; set; }
 

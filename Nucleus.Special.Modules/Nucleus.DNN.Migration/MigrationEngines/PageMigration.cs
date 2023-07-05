@@ -283,68 +283,14 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
 
         if (moduleMigrationimplementation != null)
         {
-          if (updateExisting)
+          // Guid.Empty is a special value, which is interpreted as meaning that a content migration exists, but we should
+          // not create a module.  It is used for DNN modules like Google Analytics modules, which dont need a module instance
+          // in Nucleus, but do contain the site's analytics ID which we can migrate.
+          if (moduleMigrationimplementation.ModuleDefinitionId == Guid.Empty)
           {
-            newModule = newPage.Modules
-              .Where(existing =>
-                existing.ModuleDefinition.Id == moduleMigrationimplementation.ModuleDefinitionId &&
-                (
-                  (String.IsNullOrEmpty(existing.Title) && String.IsNullOrEmpty(dnnModule.ModuleTitle))
-                  ||
-                  existing.Title.Equals(dnnModule.ModuleTitle)
-                ) &&
-                existing.SortOrder == dnnModule.ModuleOrder)
-              .FirstOrDefault();
-          }
-
-          if (newModule == null)
-          {
-            newModule = await this.PageModuleManager.CreateNew(this.Context.Site);
-          }
-
-          newModule.Title = dnnModule.ModuleTitle;
-          newModule.InheritPagePermissions = dnnModule.InheritViewPermissions;
-          newModule.Pane = dnnModule.PaneName;
-          
-          newModule.ContainerDefinition=(await this.ContainerManager.List())
-            .Where(container => container.FriendlyName.Equals(System.IO.Path.GetFileNameWithoutExtension(dnnModule.ContainerSrc), StringComparison.OrdinalIgnoreCase))
-            .FirstOrDefault();
-
-          newModule.SortOrder = dnnModule.ModuleOrder;
-
-          await SetPageModulePermissions(dnnPage, dnnModule, newPage, newModule, modulePermissionTypes);
-
-          newModule.ModuleDefinition = moduleDefinitions
-            .Where(moduleDefinition => moduleDefinition.Id == moduleMigrationimplementation.ModuleDefinitionId)
-            .FirstOrDefault();
-
-          if (newModule.ModuleDefinition == null)
-          {
-            dnnPage.AddWarning($"Page module '{dnnModule.ModuleTitle}' [{dnnModule.DesktopModule.ModuleName}] was not added to the page because the target Nucleus extension '{moduleMigrationimplementation.ModuleFriendlyName}' is not installed.");
-          }
-          else
-          {
-            // we must save the page module record before adding content
-            try
-            {
-              // initial save to make sure the module has an Id
-              await this.PageModuleManager.Save(newPage, newModule);
-              await this.PageModuleManager.SavePermissions(newModule);
-            }
-            catch (Exception ex)
-            {
-              dnnPage.AddError($"Page module '{dnnModule.ModuleTitle}' [{dnnModule.DesktopModule.ModuleName}] was not added to the page because there was an error: {ex.Message}");
-              return;
-            }
-
-            // migrate module content            
             try
             {
               await moduleMigrationimplementation.MigrateContent(dnnPage, dnnModule, newPage, newModule, createdPagesKeys);
-
-              // save again in case content migrations changed anything
-              await this.PageModuleManager.Save(newPage, newModule);
-
             }
             catch (NotImplementedException)
             {
@@ -352,7 +298,82 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
             }
             catch (Exception ex)
             {
-              dnnPage.AddError($"Page module '{dnnModule.ModuleTitle}' [{dnnModule.DesktopModule.ModuleName}] was added to the page, but migrating content failed with error: {ex.Message}");
+              dnnPage.AddError($"Page module '{dnnModule.ModuleTitle}' [{dnnModule.DesktopModule.ModuleName}] is a module type that migrates settings only, and migrating content failed with error: {ex.Message}");
+            }
+          }
+          else
+          {
+            if (updateExisting)
+            {
+              newModule = newPage.Modules
+                .Where(existing =>
+                  existing.ModuleDefinition.Id == moduleMigrationimplementation.ModuleDefinitionId &&
+                  (
+                    (String.IsNullOrEmpty(existing.Title) && String.IsNullOrEmpty(dnnModule.ModuleTitle))
+                    ||
+                    existing.Title.Equals(dnnModule.ModuleTitle)
+                  ) &&
+                  existing.SortOrder == dnnModule.ModuleOrder)
+                .FirstOrDefault();
+            }
+
+            if (newModule == null)
+            {
+              newModule = await this.PageModuleManager.CreateNew(this.Context.Site);
+            }
+
+            newModule.Title = dnnModule.ModuleTitle;
+            newModule.InheritPagePermissions = dnnModule.InheritViewPermissions;
+            newModule.Pane = dnnModule.PaneName;
+
+            newModule.ContainerDefinition = (await this.ContainerManager.List())
+              .Where(container => container.FriendlyName.Equals(System.IO.Path.GetFileNameWithoutExtension(dnnModule.ContainerSrc), StringComparison.OrdinalIgnoreCase))
+              .FirstOrDefault();
+
+            newModule.SortOrder = dnnModule.ModuleOrder;
+
+            await SetPageModulePermissions(dnnPage, dnnModule, newPage, newModule, modulePermissionTypes);
+
+            newModule.ModuleDefinition = moduleDefinitions
+              .Where(moduleDefinition => moduleDefinition.Id == moduleMigrationimplementation.ModuleDefinitionId)
+              .FirstOrDefault();
+
+            if (newModule.ModuleDefinition == null)
+            {
+              dnnPage.AddWarning($"Page module '{dnnModule.ModuleTitle}' [{dnnModule.DesktopModule.ModuleName}] was not added to the page because the target Nucleus extension '{moduleMigrationimplementation.ModuleFriendlyName}' is not installed.");
+            }
+            else
+            {
+              // we must save the page module record before adding content
+              try
+              {
+                // initial save to make sure the module has an Id
+                await this.PageModuleManager.Save(newPage, newModule);
+                await this.PageModuleManager.SavePermissions(newModule);
+              }
+              catch (Exception ex)
+              {
+                dnnPage.AddError($"Page module '{dnnModule.ModuleTitle}' [{dnnModule.DesktopModule.ModuleName}] was not added to the page because there was an error: {ex.Message}");
+                return;
+              }
+
+              // migrate module content            
+              try
+              {
+                await moduleMigrationimplementation.MigrateContent(dnnPage, dnnModule, newPage, newModule, createdPagesKeys);
+
+                // save again in case content migrations changed anything
+                await this.PageModuleManager.Save(newPage, newModule);
+
+              }
+              catch (NotImplementedException)
+              {
+                // ignore
+              }
+              catch (Exception ex)
+              {
+                dnnPage.AddError($"Page module '{dnnModule.ModuleTitle}' [{dnnModule.DesktopModule.ModuleName}] was added to the page, but migrating content failed with error: {ex.Message}");
+              }
             }
           }
         }

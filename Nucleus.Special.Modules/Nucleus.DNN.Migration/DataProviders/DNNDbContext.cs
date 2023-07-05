@@ -46,6 +46,8 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
   public DbSet<Models.DNN.Modules.MediaSettings> MediaSettings { get; set; }
   public DbSet<Models.DNN.Modules.Link> Links { get; set; }
 
+  public DbSet<Models.DNN.Modules.Blog> Blogs { get; set; }
+
 
   public DNNDbContext(DbContextConfigurator<DNNDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
   {
@@ -178,5 +180,17 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
       .ToTable("Links")
       .HasKey(document => document.ItemId);
 
+    builder.Entity<Models.DNN.Modules.Blog>()
+      .ToTable("Blog_Blogs")
+      .HasKey(blog => blog.BlogId);
+
+    builder.Entity<Models.DNN.Modules.Blog>()
+      .HasMany(blog => blog.BlogEntries)
+      .WithOne(entry => entry.Blog)
+      .HasForeignKey("BlogID");
+
+    builder.Entity<Models.DNN.Modules.BlogEntry>()
+      .ToTable("Blog_Entries")
+      .HasKey(entry => entry.EntryId);
   }
 }

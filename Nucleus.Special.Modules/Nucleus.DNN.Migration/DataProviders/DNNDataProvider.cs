@@ -260,4 +260,13 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .AsNoTracking()
       .ToListAsync();
   }
+
+  public async Task<List<Models.DNN.Modules.Blog>> ListBlogs(int portalId)
+  {
+    return await this.Context.Blogs
+      .Where(blog => blog.PortalId == portalId && blog.Public)
+      .Include(blog => blog.BlogEntries)
+      .AsNoTracking()
+      .ToListAsync();
+  }
 }

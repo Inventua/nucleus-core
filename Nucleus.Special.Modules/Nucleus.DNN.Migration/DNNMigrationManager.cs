@@ -257,6 +257,14 @@ public class DNNMigrationManager
     }
   }
 
+  public async Task<List<Models.DNN.Modules.Blog>> ListDnnBlogs(int portalId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.ListBlogs(portalId);
+    }
+  }
+
   /// <summary>
   /// Retrieve document settings for the specified module.
   /// </summary>

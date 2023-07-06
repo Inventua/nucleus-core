@@ -22,7 +22,14 @@ namespace Nucleus.Extensions
 		{
 			PageRoute result = page.Routes.Where(route => route.Id == page.DefaultPageRouteId).FirstOrDefault();
 
-			if (result == null && page.Routes.Count > 0)
+      // if a default has not been set, use the first active one
+      if (result == null && page.Routes.Count > 0)
+      {
+        result = page.Routes.Where(route => route.Type == PageRoute.PageRouteTypes.Active).FirstOrDefault();
+      }
+
+      // use any route if no active routes were found
+      if (result == null && page.Routes.Count > 0)
 			{
 				result = page.Routes[0];
 			}

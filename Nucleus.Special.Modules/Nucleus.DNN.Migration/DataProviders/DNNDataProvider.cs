@@ -269,4 +269,14 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .AsNoTracking()
       .ToListAsync();
   }
+
+  public async Task<List<Models.DNN.Modules.ForumGroup>> ListForumGroups(int moduleId)
+  {
+    return await this.Context.ForumGroups
+      .Where(group => group.ModuleId == moduleId)
+      .Include(group => group.Forums)
+      .Include(group => group.Settings)
+      .AsNoTracking()
+      .ToListAsync();
+  }
 }

@@ -265,6 +265,14 @@ public class DNNMigrationManager
     }
   }
 
+  public async Task<List<Models.DNN.Modules.ForumGroup>> ListDnnForumGroups(int moduleId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.ListForumGroups(moduleId);
+    }
+  }
+
   /// <summary>
   /// Retrieve document settings for the specified module.
   /// </summary>

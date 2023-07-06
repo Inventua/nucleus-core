@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
+using Nucleus.Extensions;
 
 namespace Nucleus.DNN.Migration.MigrationEngines;
 
@@ -133,7 +134,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
         try
         {
           Nucleus.Abstractions.Models.Page newPage = await this.PageManager.Get(this.Context.Site, dnnPage.TabPath.Replace("//", "/"));
-          
+
           if (newPage == null)
           {
             dnnPage.AddError($"Error importing modules and content for '{dnnPage.PageName}' because the migrated page could not be found.");
@@ -142,8 +143,20 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
           {
             await AddPageModules(updateExisting, dnnPage, newPage, moduleDefinitions, modulePermissionTypes, createdPagesKeys);
 
-           // save again in case any module migrations added/ changed anything
-           await this.PageManager.Save(this.Context.Site, newPage);
+            // if the page has an "Url" setting to indicate that it is a redirect to another page, add a SiteMap module to make it into a "landing"
+            // page.  Nucleus does not support page "link types"
+            if (!String.IsNullOrEmpty(dnnPage.Url))
+            {
+              // links to site pages are an integer (tabid).  Links to files are FileID=nn, and external links  (urls) are just the Url, we don't
+              // support either of those.
+              if (int.TryParse(dnnPage.Url, out int _))
+              {
+                await AddLandingPageModule(newPage, moduleDefinitions, updateExisting);
+              }
+            }
+
+              // save again in case any module migrations added/ changed anything
+            await this.PageManager.Save(this.Context.Site, newPage);
           }
         }
         catch (Exception ex)
@@ -156,6 +169,50 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     }
   }
 
+  // Create a SiteMap module to make the page a "landing page"
+  private async Task AddLandingPageModule(Nucleus.Abstractions.Models.Page newPage, IEnumerable<Nucleus.Abstractions.Models.ModuleDefinition> moduleDefinitions, Boolean updateExisting)
+  {
+    Guid siteMapModuleDefinitionId = new("0392bf73-c646-4ccc-bcb5-372a75b9ea84");
+    string siteMapTitle = newPage.Name;
+    Nucleus.Abstractions.Models.PageModule newModule = null;
+   
+    if (updateExisting)
+    {
+      newModule = newPage.Modules
+        .Where(existing =>
+          existing.ModuleDefinition.Id == siteMapModuleDefinitionId &&
+          (
+            (String.IsNullOrEmpty(existing.Title) && String.IsNullOrEmpty(siteMapTitle))
+            ||
+            existing.Title.Equals(siteMapTitle)
+          ) &&
+          existing.SortOrder == 10)
+        .FirstOrDefault();
+    }
+
+    if (newModule == null)
+    {
+      newModule = await this.PageModuleManager.CreateNew(this.Context.Site);
+    }
+
+    newModule.Title = siteMapTitle;
+    newModule.InheritPagePermissions = true;
+    newModule.Pane = "ContentPane";
+
+    newModule.SortOrder = 10;
+
+    newModule.ModuleDefinition = moduleDefinitions
+      .Where(moduleDefinition => moduleDefinition.Id == siteMapModuleDefinitionId)
+      .FirstOrDefault();
+
+    newModule.ModuleSettings.Set("sitemap:maxlevels", 1);
+    newModule.ModuleSettings.Set("sitemap:root-page-type", "CurrentPage");    
+    newModule.ModuleSettings.Set("sitemap:show-description", true);
+    newModule.ModuleSettings.Set("sitemap:direction", "Vertical");
+
+    await this.PageModuleManager.Save(newPage, newModule);
+  }
+
   void AddRoutes(Models.DNN.Page dnnPage, Nucleus.Abstractions.Models.Page newPage)
   {
     // Add default route based on page hierachy
@@ -165,7 +222,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     AddRoute(newPage, Abstractions.Models.PageRoute.PageRouteTypes.PermanentRedirect, $"{dnnPage.TabPath.Replace("//", "/")}/tabid/{dnnPage.PageId}/Default.aspx");
 
     // Add old format "tabid=nn" url format as a redirect to help maintain backward compatibility
-    AddRoute(newPage, Abstractions.Models.PageRoute.PageRouteTypes.PermanentRedirect, $"{dnnPage.TabPath.Replace("//", "/")}/Default.aspx?tabid={dnnPage.PageId}");
+    AddRoute(newPage, Abstractions.Models.PageRoute.PageRouteTypes.PermanentRedirect, $"/Default.aspx?tabid={dnnPage.PageId}");
   }
 
   void AddRoute(Nucleus.Abstractions.Models.Page newPage, Abstractions.Models.PageRoute.PageRouteTypes type, string routePath)

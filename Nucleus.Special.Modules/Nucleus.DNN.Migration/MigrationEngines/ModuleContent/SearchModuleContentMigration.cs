@@ -23,6 +23,7 @@ public class SearchModuleContentMigration : ModuleContentMigrationBase
 
   public override Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule, Dictionary<int, Guid> createdPagesKeys)
   {
-    throw new NotImplementedException();
+    // The DNN search module doesn't have any settings or data
+    return Task.CompletedTask;
   }
 }

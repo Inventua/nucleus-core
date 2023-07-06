@@ -78,10 +78,25 @@ public class SiteMapModuleContentMigration : ModuleContentMigrationBase
     {
       switch (setting.SettingName)
       {
-        case "Levels":
-          newModule.ModuleSettings.Set(SETTINGS_MAXLEVELS, setting.SettingValue);
+        case string settingName when String.Equals(settingName, "Levels", StringComparison.OrdinalIgnoreCase):
+          if (int.TryParse(setting.SettingValue, out int levelsValue))
+          {
+            if (levelsValue > 1)
+            {
+              switch (dnnModule.DesktopModule.ModuleName)
+              {
+                // The TopMenu and SideMenu "levels" value is one more than it should be
+                case "Inventua - TopMenu":
+                case "Inventua - SideMenu":
+                  levelsValue -= 1;
+                  break;
+              }
+            }
+            newModule.ModuleSettings.Set(SETTINGS_MAXLEVELS, levelsValue);
+          }
           break;
-        case "selectedTab":
+
+        case string settingName when String.Equals(settingName, "selectedTab", StringComparison.OrdinalIgnoreCase):
           if (int.TryParse(setting.SettingValue, out int selectedTabId))
           {
             if (createdPagesKeys.ContainsKey(dnnPage.PageId))
@@ -102,10 +117,37 @@ public class SiteMapModuleContentMigration : ModuleContentMigrationBase
             }
           }
           break;
-        case "CurrentSubTreeOnly":
-          newModule.ModuleSettings.Set(SETTINGS_ROOTPAGE_TYPE, RootPageTypes.CurrentPage);
+
+        case string settingName when String.Equals(settingName, "Source", StringComparison.OrdinalIgnoreCase):
+          if (int.TryParse(setting.SettingValue, out int sourceValue))
+          {
+            switch (sourceValue)
+            {
+              case -1:
+                newModule.ModuleSettings.Set(SETTINGS_ROOTPAGE_TYPE, RootPageTypes.SiteRoot);
+                break;
+              case -2:
+                newModule.ModuleSettings.Set(SETTINGS_ROOTPAGE_TYPE, RootPageTypes.CurrentPage);
+                break;
+              case -3:
+                newModule.ModuleSettings.Set(SETTINGS_ROOTPAGE_TYPE, RootPageTypes.ParentPage);
+                break;
+              case -4:
+                newModule.ModuleSettings.Set(SETTINGS_ROOTPAGE_TYPE, RootPageTypes.TopAncestor);
+                break;
+              case -5:
+                newModule.ModuleSettings.Set(SETTINGS_ROOTPAGE_TYPE, RootPageTypes.Dual);
+                break;
+            }
+           
+          }
           break;
-        case "ShowDescriptions":
+
+        case string settingName when String.Equals(settingName, "CurrentSubTreeOnly", StringComparison.OrdinalIgnoreCase):
+          // this setting is not implemented in the Nucleus SiteMap module
+          break;
+
+        case string settingName when String.Equals(settingName, "ShowDescriptions", StringComparison.OrdinalIgnoreCase):
           switch (setting.SettingValue)
           {
             case "none":
@@ -119,16 +161,13 @@ public class SiteMapModuleContentMigration : ModuleContentMigrationBase
               break;
           }          
           break;
-        case "UseName":
+
+        case string settingName when String.Equals(settingName, "UseName", StringComparison.OrdinalIgnoreCase):
           // the Nucleus sitemap module doesn't currently support "use name", but this is likely to be a 
           // future enhancement
           newModule.ModuleSettings.Set(SETTINGS_USENAME, setting.SettingValue);
           break;
       }
     }
-
-    string settingNames = string.Join(", ", dnnModule.Settings.Select(setting => setting.SettingName));
-
-    throw new NotImplementedException();
   }
 }

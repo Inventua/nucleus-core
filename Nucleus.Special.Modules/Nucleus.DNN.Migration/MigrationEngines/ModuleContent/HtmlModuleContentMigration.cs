@@ -8,18 +8,25 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions;
 using Nucleus.Abstractions.FileSystemProviders;
+using DocumentFormat.OpenXml.EMMA;
+using System.Text.RegularExpressions;
 
 namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
 public class HtmlModuleContentMigration : ModuleContentMigrationBase
 {
+  private ISiteManager SiteManager { get; } 
   private IPageManager PageManager { get; }
   private IFileSystemManager FileSystemManager { get; }
   private IContentManager ContentManager { get; }
   private DNNMigrationManager DnnMigrationManager { get; }
+  
+  private const string HREF_PREFIX_MATCH = "href[\\s]*=[\\s]*\"";
+  private const string HREF_PREFIX = "href=\"";
 
-  public HtmlModuleContentMigration(IContentManager contentManager, IPageManager pageManager, IFileSystemManager fileSystemManager, DNNMigrationManager dnnMigrationManager)
+  public HtmlModuleContentMigration(ISiteManager siteManager, IContentManager contentManager, IPageManager pageManager, IFileSystemManager fileSystemManager, DNNMigrationManager dnnMigrationManager)
   {
+    this.SiteManager = siteManager;
     this.PageManager = pageManager;
     this.ContentManager = contentManager;
     this.FileSystemManager = fileSystemManager;
@@ -37,6 +44,7 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
 
   public override async Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule, Dictionary<int, Guid> createdPagesKeys)
   {
+    Site site = await this.SiteManager.Get(newPage.SiteId);
     Models.DNN.Modules.TextHtml contentSource = await this.DnnMigrationManager.GetDnnHtmlContent(dnnModule.ModuleId);
     Nucleus.Abstractions.Models.Content content;
     FileSystemProviderInfo fileSystemProvider = this.FileSystemManager.ListProviders().FirstOrDefault();
@@ -47,7 +55,7 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
     {
       content = new();
     }
-    
+   
     if (contentSource != null)
     {
       content.SortOrder = 10;
@@ -58,26 +66,118 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
       // /Portals/[index] will be copied in the same directory structure to Nucleus
       content.Value = content.Value.Replace($"/Portals/{dnnPage.PortalId}/", $"/files/{fileSystemProvider.Key}/");
 
-      // rewrite url links like https://site.com/LinkClick.aspx?link=54&tabid=166
-      foreach (System.Text.RegularExpressions.Match match in System.Text.RegularExpressions.Regex.Matches(content.Value, "/LinkClick\\.aspx\\?link=(?<linkid>[0-9]*)&tabid=(?<tabid>[0-9]*)"))
+      if (dnnPage.PageId == 1 || dnnPage.PageId == 44 || dnnPage.PageId == 45)
+      {
+
+      }
+
+      // rewrite url links like /LinkClick.aspx?link=54&tabid=166
+      foreach (System.Text.RegularExpressions.Match match in System.Text.RegularExpressions.Regex.Matches(content.Value, $"{HREF_PREFIX_MATCH}[/]{{0,1}}LinkClick\\.aspx\\?link=(?<tabid>[0-9]*)&[amp;]*tabid=(?<referrer_tabid>[0-9]*)\"", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+      {
+        content.Value = await ReplaceMatch(match, createdPagesKeys, content.Value);        
+      }
+
+      // rewrite url links like /?tabid=166
+      foreach (System.Text.RegularExpressions.Match match in System.Text.RegularExpressions.Regex.Matches(content.Value, $"{HREF_PREFIX_MATCH}[/]{{0,1}}\\?tabid=(?<tabid>[0-9]*)\"", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+      {
+        content.Value = await ReplaceMatch(match, createdPagesKeys, content.Value);
+      }
+
+      // rewrite url links like /Default.aspx?tabid=166
+      foreach (System.Text.RegularExpressions.Match match in System.Text.RegularExpressions.Regex.Matches(content.Value, $"{HREF_PREFIX_MATCH}[/]{{0,1}}Default\\.aspx\\?tabid=(?<tabid>[0-9]*)\"", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+      {
+        content.Value = await ReplaceMatch(match, createdPagesKeys, content.Value);
+      }
+
+      // attempt to rewrite url links for "friendly" urls which base the Url on the page name
+      foreach (System.Text.RegularExpressions.Match match in System.Text.RegularExpressions.Regex.Matches(content.Value, $"{HREF_PREFIX_MATCH}[/]{{0,1}}(?<pagename>[A-Za-z0-9-_% ]*)\\.(?<extension>[a-zA-Z]*)\"", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
       {
         if (match.Success)
-        {
-          string linkId = match.Groups["linkid"].Value;
-          string tabId = match.Groups["tabid"].Value;
-
-          if (createdPagesKeys.ContainsKey(int.Parse(tabId)))
+        {          
+          if (match.Groups.ContainsKey("pagename"))
           {
-            Nucleus.Abstractions.Models.Page page = await this.PageManager.Get(createdPagesKeys[int.Parse(tabId)]);
-            string path = page.DefaultPageRoute().Path;
-            path += path.EndsWith("/") ? "" : "/";
-
-            content.Value = content.Value.Replace($"/LinkClick.aspx?link={linkId}&tabid={tabId}", path, StringComparison.OrdinalIgnoreCase);
+            Nucleus.Abstractions.Models.Page page = (await this.PageManager.List(site))
+              .Where(foundPage => HomogenizeName(foundPage.Name).Equals(HomogenizeName(match.Groups["pagename"].Value), StringComparison.OrdinalIgnoreCase))
+              .FirstOrDefault();
+            
+            if (page != null)
+            {
+              content.Value = ReplaceMatch(match, page, content.Value);
+            }
           }
         }
       }
 
       await this.ContentManager.Save(newModule, content);
     }
+  }
+
+  /// <summary>
+  /// Replace common word separators with "-"
+  /// </summary>
+  /// <param name="pageName"></param>
+  /// <returns></returns>
+  private string HomogenizeName(string pageName)
+  {
+    pageName = pageName.Replace("%20", "-");
+    return System.Text.RegularExpressions.Regex.Replace(System.Web.HttpUtility.HtmlDecode(pageName), "[\\s_]", "-");
+  }
+
+  /// <summary>
+  /// Replace the matched value (which represents the Url of a site page) with the Nucleus page Url for the page which
+  /// was migrated from the tab id in the match.
+  /// </summary>
+  /// <param name="match"></param>
+  /// <param name="createdPagesKeys"></param>
+  /// <param name="value"></param>
+  /// <returns></returns>
+  private async Task<string> ReplaceMatch(System.Text.RegularExpressions.Match match, Dictionary<int, Guid> createdPagesKeys, string value)
+  {
+    if (match.Success)
+    {
+      string tabId = GetPargetDnnTabId(match);      
+
+      if (!String.IsNullOrEmpty(tabId) && int.TryParse(tabId, out int parsedTabId))
+      {
+        if (createdPagesKeys.ContainsKey(parsedTabId))
+        {
+          Nucleus.Abstractions.Models.Page page = await this.PageManager.Get(createdPagesKeys[int.Parse(tabId)]);
+          return ReplaceMatch(match, page, value);
+        }
+      }
+    }
+
+    return value;
+  }
+
+  /// <summary>
+  /// Replace the matched value (which represents the Url of a site page) with the Nucleus page Url
+  /// </summary>
+  /// <param name="match"></param>
+  /// <param name="page"></param>
+  /// <param name="value"></param>
+  /// <returns></returns>
+  private string ReplaceMatch(System.Text.RegularExpressions.Match match, Nucleus.Abstractions.Models.Page page, string value)
+  {
+    string path = HREF_PREFIX + page.DefaultPageRoute().Path;
+    path += path.EndsWith("/") ? "" : "/";
+    path += "\"";
+
+    return value.Replace(match.Value, path, StringComparison.OrdinalIgnoreCase);
+  }
+
+  private string GetPargetDnnTabId(System.Text.RegularExpressions.Match match)
+  {
+    string[] targetParameterNames = { "tabid" };
+
+    foreach (string parameterName in targetParameterNames)
+    {
+      if (match.Groups.ContainsKey(parameterName))
+      {
+        return match.Groups[parameterName].Value;
+      }
+    }
+
+    return null;
   }
 }

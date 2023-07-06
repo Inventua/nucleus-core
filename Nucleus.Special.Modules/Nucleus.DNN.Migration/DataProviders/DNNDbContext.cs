@@ -48,6 +48,8 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
 
   public DbSet<Models.DNN.Modules.Blog> Blogs { get; set; }
 
+  public DbSet<Models.DNN.Modules.ForumGroup> ForumGroups { get; set; }
+
 
   public DNNDbContext(DbContextConfigurator<DNNDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
   {
@@ -192,5 +194,26 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
     builder.Entity<Models.DNN.Modules.BlogEntry>()
       .ToTable("Blog_Entries")
       .HasKey(entry => entry.EntryId);
+
+
+    builder.Entity<Models.DNN.Modules.ForumGroup>()
+      .ToTable("NTForums_ForumGroups")
+      .HasKey(group => group.GroupId);
+
+    builder.Entity<Models.DNN.Modules.ForumGroup>()
+      .HasOne(group => group.Settings);
+
+    builder.Entity<Models.DNN.Modules.ForumGroupSettings>()
+      .ToTable("NTForums_ForumGroupSettings")
+      .HasKey(settings => settings.ForumGroupID);
+
+    builder.Entity<Models.DNN.Modules.ForumGroup>()
+      .HasMany(group => group.Forums)
+      .WithOne(forum => forum.ForumGroup)
+      .HasForeignKey("ForumGroupId");
+
+    builder.Entity<Models.DNN.Modules.Forum>()
+      .ToTable("NTForums_Forums")
+      .HasKey(forum => forum.ForumId);
   }
 }

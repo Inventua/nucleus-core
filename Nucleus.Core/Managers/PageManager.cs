@@ -13,6 +13,7 @@ using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions.Authorization;
 using System.Security.Cryptography;
+using Nucleus.Extensions;
 
 namespace Nucleus.Core.Managers
 {
@@ -294,12 +295,6 @@ namespace Nucleus.Core.Managers
 		/// <param name="page"></param>
 		public async Task Save(Site site, Page page)
 		{
-			// If no default Url was selected and there's more than one Url, set the first Url as the default
-			if (page.DefaultPageRouteId == Guid.Empty && page.Routes.Count > 0)
-			{
-				page.DefaultPageRouteId = page.Routes[0].Id;
-			}
-
 			// check for reserved routes
 			foreach (PageRoute route in page.Routes)
 			{

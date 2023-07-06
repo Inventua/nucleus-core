@@ -469,12 +469,12 @@ namespace Nucleus.Core.DataProviders
 			// if no default route is selected set the first route as default
 			if (!page.DefaultPageRouteId.HasValue || page.DefaultPageRouteId == Guid.Empty)
 			{
-				page.DefaultPageRouteId = page.Routes.FirstOrDefault()?.Id;
+				page.DefaultPageRouteId = page.DefaultPageRoute()?.Id;
 			}
 
-			// We need to create a new <Page> CLR object to work with, because EF alters properties when SaveChanges is called, and we want
-			// to retain the original values so we can call SavePageRoutes and SavePermissions.
-			Page pageClone = this.Context.AttachClone(page);
+      // We need to create a new <Page> CLR object to work with, because EF alters properties when SaveChanges is called, and we want
+      // to retain the original values so we can call SavePageRoutes and SavePermissions.
+      Page pageClone = this.Context.AttachClone(page);
 
 			this.Context.Entry(pageClone).Property("SiteId").CurrentValue = site.Id;
 

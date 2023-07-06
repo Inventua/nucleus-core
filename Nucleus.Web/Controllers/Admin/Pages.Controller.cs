@@ -540,11 +540,15 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.ModulePermissions = modulePermissions;
 
 			viewModel.AvailableModuleRoles = await GetAvailableRoles(viewModel.Module?.Permissions);
-			
-
 			viewModel.ModulePermissionTypes = await this.PageModuleManager.ListModulePermissionTypes();
 
-			if (getPermissions)
+      // Set modules with an invalid pane to "Missing Pane"
+      if (!viewModel.AvailablePanes.Contains(viewModel.Module.Pane))
+      {
+        viewModel.Module.Pane = "None";
+      }
+
+      if (getPermissions)
 			{
 				// read permissions from the database to initialize the viewModel
 				module.Permissions = await this.PageModuleManager.ListPermissions(module);
@@ -567,7 +571,7 @@ namespace Nucleus.Web.Controllers.Admin
 				Module = await this.PageModuleManager.Get(mid)
 			};
 
-			return viewModel;
+      return viewModel;
 		}
 
 		private async Task<ViewModels.Admin.PageEditor> BuildPageEditorViewModel(Page page, PermissionsList pagePermissions, Boolean getPermissions)

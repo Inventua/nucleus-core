@@ -25,7 +25,13 @@ else
 			<tr>
 				<td><h3>@modulePane</h3></td>
 			</tr>
-			count = 0;
+      @if (modulePane == "None")
+      {
+        <tr>
+          <td colspan="5"><div class="alert alert-warning">These modules are not assigned to a pane which is available in the selected Layout, so they will not be displayed.</div></td>
+        </tr>
+      }
+        count = 0;
 			@foreach (var module in Model.Page.Modules.Where(module => module.Pane == modulePane))
 			{
 				<tr>

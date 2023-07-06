@@ -94,7 +94,7 @@ namespace Nucleus.Web.Controllers
 				// Handle "PermanentRedirect" page routes
 				foreach (PageRoute pageRoute in this.Context.Page.Routes.ToArray())
 				{
-					if (pageRoute.Path.Equals(ControllerContext.HttpContext.Request.Path, StringComparison.OrdinalIgnoreCase))
+					if (pageRoute.Path.Equals(ControllerContext.HttpContext.Request.Path, StringComparison.OrdinalIgnoreCase) || pageRoute.Path.Equals(ControllerContext.HttpContext.Request.Path + ControllerContext.HttpContext.Request.QueryString, StringComparison.OrdinalIgnoreCase))
 					{
 						if (pageRoute.Type == PageRoute.PageRouteTypes.PermanentRedirect)
 						{

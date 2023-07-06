@@ -14,6 +14,8 @@ else
 		<th></th>
 		<th></th>
 		<th></th>
+      <th></th>
+      <th></th>
 	</tr>
 
 	@{ int count = 0; }
@@ -28,7 +30,7 @@ else
       @if (modulePane == "None")
       {
         <tr>
-          <td colspan="5"><div class="alert alert-warning">These modules are not assigned to a pane which is available in the selected Layout, so they will not be displayed.</div></td>
+          <td colspan="7"><div class="alert alert-warning">These modules are not assigned to a pane which is available in the selected Layout, so they will not be displayed.</div></td>
         </tr>
       }
         count = 0;

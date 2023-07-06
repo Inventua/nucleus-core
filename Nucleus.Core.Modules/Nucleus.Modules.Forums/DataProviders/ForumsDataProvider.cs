@@ -99,7 +99,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 				raiseEvent = new(() => { this.EventManager.RaiseEvent<Group, Update>(group); });
 			}
 
-			await this.Context.SaveChangesAsync();
+			await this.Context.SaveChangesAsync<Group>();
 			
 			await SaveSettings(group.Id, group.Settings);
 

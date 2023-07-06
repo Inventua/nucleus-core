@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="ea9fa093-ba1a-4a04-bfee-9786ec4beda5" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Forums</name>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
     The forums module is a message board which allows your user community to participate in discussions, post questions and answers.

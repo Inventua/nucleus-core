@@ -7,6 +7,7 @@ using Nucleus.DNN.Migration.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,8 +15,8 @@ namespace Nucleus.DNN.Migration.DataProviders;
 
 public class DNNMigrationDbContext : Nucleus.Data.EntityFramework.DbContext
 {
-  //public DbSet<Models.MigrationHistory> MigrationHistory { get; set; }
-  //public DbSet<Document> Documents { get; set; }
+  public DbSet<Models.RecordCount> RecordCount { get; set; }
+  public DbSet<Models.ForumInfo> ForumInfo { get; set; }
 
   public DNNMigrationDbContext(DbContextConfigurator<DNNMigrationDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
   {
@@ -35,17 +36,17 @@ public class DNNMigrationDbContext : Nucleus.Data.EntityFramework.DbContext
   {
     base.OnModelCreating(builder);
 
-    ////builder.Entity<Document>().Property<Guid>("ModuleId");
+    builder.Entity<RecordCount>().HasNoKey();
 
-    ////builder.Entity<Document>()
-    ////  .HasOne(document => document.Category)
-    ////  .WithMany()
-    ////  .HasForeignKey("CategoryId");
+    builder.Entity<ForumInfo>()
+      .ToTable("Forums")
+      .HasKey(forum => forum.Id);
 
-    ////builder.Entity<Document>()
-    ////  .HasOne(document => document.File)
-    ////  .WithMany()
-    ////  .HasForeignKey("FileId");
+    builder.Entity<ForumInfo>()
+      .HasOne(forum => forum.ForumGroup);
 
+    builder.Entity<ForumGroupInfo>()
+      .ToTable("ForumGroups")
+      .HasKey(group => group.Id);
   }
 }

@@ -35,16 +35,31 @@
   padding: 1rem 0 0 0;
 }
 
-.dnn-migration ol li > div
+.dnn-migration ol li
 {
-  display: inline-block;
+  display: flex;
+  gap: 1rem;
+}
+
+.dnn-migration ol li > div:first-child
+{
   width: 14rem;
+}
+
+.dnn-migration ol li > div:not(:first-child)
+{
+  flex: 1;
 }
 
 .dnn-migration ol li a, .dnn-migration ol li button
 {
   display: inline-block;
   width: 12rem;
+}
+
+.dnn-migration ol li .action-remarks
+{
+  font-size: 0.85rem;
 }
 
 .dnn-migration ol li button .nucleus-progress-spinner

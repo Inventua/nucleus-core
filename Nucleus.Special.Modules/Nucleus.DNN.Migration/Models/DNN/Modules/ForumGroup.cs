@@ -17,10 +17,14 @@ public class ForumGroup
   [Column("ModuleID")]
   public int ModuleId { get; set; }
 
+  [Column("PortalID")]
+  public int PortalId { get; set; }
+
+
   [Column("GroupName")] 
   public string Name { get; set; }
 
-  public int SortOrder { get; set; }
+  public int? SortOrder { get; set; }
 
   public List<Models.DNN.Modules.Forum> Forums { get; set; }  
 }

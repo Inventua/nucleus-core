@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Nucleus.DNN.Migration.DataProviders;
@@ -200,6 +201,7 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
           .ThenInclude(perm => perm.Role)
       .OrderBy(page => page.Level)
         .ThenBy(page => page.ParentId)
+        .ThenBy(page => page.PageId)
         .ThenBy(page => page.PageName)
       .AsSplitQuery()
       .AsNoTracking()
@@ -270,7 +272,7 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .ToListAsync();
   }
 
-  public async Task<List<Models.DNN.Modules.ForumGroup>> ListForumGroups(int moduleId)
+  public async Task<List<Models.DNN.Modules.ForumGroup>> ListForumGroupsByModule(int moduleId)
   {
     return await this.Context.ForumGroups
       .Where(group => group.ModuleId == moduleId)
@@ -279,4 +281,50 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .AsNoTracking()
       .ToListAsync();
   }
+
+  public async Task<List<Models.DNN.Modules.ForumGroup>> ListForumGroupsByPortal(int portalId)
+  {
+    return await this.Context.ForumGroups
+      .Where(group => group.PortalId == portalId)
+      .Include(group => group.Forums)
+      .Include(group => group.Settings)
+      .AsNoTracking()
+      .ToListAsync();
+  }
+
+  public async Task<int> CountForumPosts(int forumId)
+  {
+    return await this.Context.ForumPosts
+      .Where(post => post.ForumId == forumId && post.Deleted == false && post.Archived == false)
+      .OrderBy(post => post.ParentPostId)
+      .AsNoTracking()
+      .CountAsync();
+  }
+
+  public async Task<List<int>> ListForumPostIds(int forumId)
+  {
+    return await this.Context.ForumPosts
+      .Where(post => post.ForumId == forumId && post.ParentPostId == 0 && post.Deleted == false && post.Archived == false)
+      .OrderBy(post => post.ParentPostId)
+      .Select(post => post.PostId)
+      .ToListAsync();
+  }
+
+  public async Task<List<int>> ListForumPostReplyIds(int forumId, int postId)
+  {
+    return await this.Context.ForumPosts
+      .Where(post => post.ForumId == forumId && post.ParentPostId == postId && post.Deleted == false && post.Archived == false)
+      .Select(post => post.PostId)
+      .ToListAsync();
+  }
+
+  public async Task<ForumPost> GetForumPost(int postId)
+  {
+    return await this.Context.ForumPosts
+      .Where(post => post.PostId == postId)
+      .Include(post => post.User)
+      .AsSingleQuery()
+      .FirstOrDefaultAsync();    
+  }
+
 }

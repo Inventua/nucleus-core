@@ -60,6 +60,12 @@ public class DNNMigrationController : Controller
   }
 
   [HttpPost]
+  public async Task<ActionResult> ForumsIndex(int portalId)
+  {
+    return View("_Forums", await BuildForumsViewModel(portalId));
+  }
+
+  [HttpPost]
   public async Task<ActionResult> PagesIndex(ViewModels.Index viewModel)
   {
     return View("_Pages", await BuildPagesViewModel(viewModel.PortalId));
@@ -144,6 +150,35 @@ public class DNNMigrationController : Controller
     return View("_Progress", await BuildProgressViewModel());
   }
 
+  [HttpPost]
+  [DisableRequestSizeLimitAttribute]
+  [RequestFormLimits(ValueCountLimit = Int32.MaxValue)]
+  public async Task<ActionResult> MigrateForums(ViewModels.Forum viewModel)
+  {
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Modules.Forum>().UpdateSelections(viewModel.Forums);
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Modules.Forum>().SignalStart();
+
+    // The forums migration is different than the others, because it is migrating forum posts, not the forums themselves.  We have to
+    // manually set TotalCount
+    viewModel.TotalPosts = 0;
+
+    foreach (Models.DNN.Modules.Forum forum in viewModel.Forums)
+    {
+      if (forum.CanSelect && forum.IsSelected)
+      {
+        viewModel.TotalPosts += await this.DNNMigrationManager.CountForumPosts(forum.ForumId);
+      }
+    }
+
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Modules.Forum>().TotalCount = viewModel.TotalPosts;
+
+    Task task = Task.Run(async () =>
+    {
+      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Modules.Forum>().Migrate(viewModel.UpdateExisting);
+    });
+
+    return View("_Progress", await BuildProgressViewModel());
+  }
 
   [HttpGet]
   public async Task<ActionResult> UpdateProgress(ViewModels.Progress viewModel)
@@ -245,6 +280,31 @@ public class DNNMigrationController : Controller
     this.DNNMigrationManager.ClearMigrationEngines();
     await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.List>(this.HttpContext.RequestServices, viewModel.Lists);
     
+    foreach (MigrationEngineBase engine in this.DNNMigrationManager.GetMigrationEngines)
+    {
+      await engine.Validate();
+    }
+
+    return viewModel;
+  }
+
+  private async Task<ViewModels.Forum> BuildForumsViewModel(int portalId)
+  {
+    ViewModels.Forum viewModel = new();
+    viewModel.PortalId = portalId;
+    viewModel.TotalPosts = 0;
+
+    viewModel.ForumGroups = await this.DNNMigrationManager.ListDnnForumGroupsByPortal(portalId);
+
+    foreach (Models.DNN.Modules.Forum forum in viewModel.ForumGroups.SelectMany(group => group.Forums))
+    {
+      forum.PostCount = await this.DNNMigrationManager.CountForumPosts(forum.ForumId);
+      viewModel.TotalPosts += forum.PostCount;
+    }
+
+    this.DNNMigrationManager.ClearMigrationEngines();
+    await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.Modules.Forum>(this.HttpContext.RequestServices, viewModel.ForumGroups.SelectMany(group => group.Forums).ToList());
+
     foreach (MigrationEngineBase engine in this.DNNMigrationManager.GetMigrationEngines)
     {
       await engine.Validate();

@@ -49,7 +49,9 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
   public DbSet<Models.DNN.Modules.Blog> Blogs { get; set; }
 
   public DbSet<Models.DNN.Modules.ForumGroup> ForumGroups { get; set; }
+  public DbSet<Models.DNN.Modules.Forum> Forums { get; set; }
 
+  public DbSet<Models.DNN.Modules.ForumPost> ForumPosts { get; set; }
 
   public DNNDbContext(DbContextConfigurator<DNNDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
   {
@@ -215,5 +217,10 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
     builder.Entity<Models.DNN.Modules.Forum>()
       .ToTable("NTForums_Forums")
       .HasKey(forum => forum.ForumId);
+
+    builder.Entity<Models.DNN.Modules.ForumPost>()
+      .ToTable("NTForums_Posts")
+      .HasKey(post => post.PostId);
   }
+
 }

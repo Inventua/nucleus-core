@@ -7,8 +7,18 @@ using System.Threading.Tasks;
 
 namespace Nucleus.DNN.Migration.Models.DNN.Modules;
 
-public class Forum
+public class Forum : DNNEntity
 {
+  public override string DisplayName()
+  {
+    return this.Name;
+  }
+
+  public override int Id()
+  {
+    return this.ForumId; ;
+  }
+
   [Column("ForumID")]
   public int ForumId { get; set; }
 
@@ -17,7 +27,7 @@ public class Forum
   public string Name { get; set; }
   public string Description { get; set; }
 
-  public int SortOrder { get; set; }
+  public int? SortOrder { get; set; }
 
 
   public Boolean Active { get; set; }
@@ -65,6 +75,9 @@ public class Forum
 
 
   public int AttachMaxSize { get; set; }
+
+  [NotMapped]
+  public int PostCount { get; set; }
 
 }
 

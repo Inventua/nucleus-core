@@ -28,107 +28,24 @@ public class DNNMigrationDataProvider : Nucleus.Data.EntityFramework.DataProvide
     this.Context = context;
   }
 
-  ////public async Task<Models.MigrationHistory> Get(Guid id)
-  ////{
-  ////  return await this.Context.MigrationHistory
-  ////    .Where(log => log.Id == id)
-  ////    .AsNoTracking()
-  ////    .FirstOrDefaultAsync();
-  ////}
+  public async Task<Boolean> ForumExists(string groupName, string forumName)
+  {
+    Models.RecordCount recordCount = await this.Context.Set<RecordCount>().FromSqlInterpolated($"SELECT COUNT(*) AS Count FROM ForumGroups, Forums WHERE Forums.ForumGroupId = ForumGroups.Id AND ForumGroups.Name={groupName} AND Forums.Name={forumName}")
+      .FirstOrDefaultAsync();
 
-  ////public async Task<IList<Models.MigrationHistory>> List()
-  ////{
-  ////  return await this.Context.MigrationHistory
-  ////    .AsNoTracking()
-  ////    .AsSingleQuery()
-  ////    .ToListAsync();
-  ////}
+    return recordCount.Count > 0;
+  }
 
-  ////public async Task Save(Models.MigrationHistory migrationLog)
-  ////{
-  ////  Action raiseEvent;
+  public async Task<ForumInfo> GetNucleusForumInfo(string groupName, string forumName)
+  {
+    Models.ForumInfo value = await this.Context.ForumInfo
+      .Where(forum => forum.Name == forumName && forum.ForumGroup.Name == groupName)
+      .Include(forum => forum.ForumGroup)
+      .FirstOrDefaultAsync();
 
-  ////  Boolean isNew = !await this.Context.MigrationHistory
-  ////    .Where(existing => existing.Id == migrationLog.Id)
-  ////    .AsNoTracking()
-  ////    .AnyAsync();
+    //Models.ForumInfo value = await this.Context.Set<ForumInfo>().FromSqlInterpolated($"SELECT Id AS ForumId, ModuleId FROM Forums LEFT INNER JOIN ForumGroups ON Forums.ForumGroupId = ForumGroups.Id AND ForumGroups.Name={groupName} WHERE Forums.Name={forumName}")
+    //  .FirstOrDefaultAsync();
 
-  ////  this.Context.Attach(migrationLog);
-  ////  //this.Context.Entry(migrationLog).Property("ModuleId").CurrentValue = pageModule.Id;
-
-  ////  if (isNew)
-  ////  {
-  ////    this.Context.Entry(migrationLog).State = EntityState.Added;
-  ////    raiseEvent = new(() => { this.EventManager.RaiseEvent<Models.MigrationHistory, Create>(migrationLog); });
-  ////  }
-  ////  else
-  ////  {
-  ////    this.Context.Entry(migrationLog).State = EntityState.Modified;
-  ////    raiseEvent = new(() => { this.EventManager.RaiseEvent<Models.MigrationHistory, Update>(migrationLog); });
-  ////  }
-
-  ////  await this.Context.SaveChangesAsync();
-
-  ////  raiseEvent.Invoke();
-  ////}
-
-  ////public async Task Delete(Models.MigrationHistory migrationLog)
-  ////{
-  ////  this.Context.Remove(migrationLog);
-  ////  await this.Context.SaveChangesAsync<Models.MigrationHistory>();
-  ////}
-  ///
-
-  #region "    Documents    "
-  ////public async Task<Document> GetDocumentByTitle(Guid moduleId, string title)
-  ////{
-  ////  return await this.Context.Documents
-  ////    .Where(document => EF.Property<Guid>(document, "ModuleId") == moduleId && document.Title == title)
-  ////    .Include(document => document.Category)
-  ////    .Include(document => document.File)
-  ////    .AsNoTracking()
-  ////    .FirstOrDefaultAsync();
-  ////}
-
-  ////public async Task SaveDocument(PageModule pageModule, Document document)
-  ////{
-  ////  Action raiseEvent;
-
-  ////  Boolean isNew = !await this.Context.Documents.Where(existing => existing.Id == document.Id).AnyAsync();
-
-  ////  this.Context.Attach(document);
-  ////  this.Context.Entry(document).Property("ModuleId").CurrentValue = pageModule.Id;
-
-  ////  if (isNew)
-  ////  {
-  ////    if (document.SortOrder == 0)
-  ////    {
-  ////      document.SortOrder = await GetTopDocumentSortOrder(pageModule.Id) + 10;
-  ////    }
-
-  ////    this.Context.Entry(document).State = EntityState.Added;
-  ////    raiseEvent = new(() => { this.EventManager.RaiseEvent<Document, Create>(document); });
-  ////  }
-  ////  else
-  ////  {
-  ////    this.Context.Entry(document).State = EntityState.Modified;
-  ////    raiseEvent = new(() => { this.EventManager.RaiseEvent<Document, Update>(document); });
-  ////  }
-
-  ////  await this.Context.SaveChangesAsync<Document>();
-
-  ////  raiseEvent.Invoke();
-  ////}
-
-
-  ////private async Task<int> GetTopDocumentSortOrder(Guid moduleId)
-  ////{
-  ////  Document document = await this.Context.Documents
-  ////    .Where(document => EF.Property<Guid>(document, "ModuleId") == moduleId)
-  ////    .OrderByDescending(document => document.SortOrder)
-  ////    .FirstOrDefaultAsync();
-
-  ////  return document == null ? 10 : document.SortOrder;
-  ////}
-  #endregion
+    return value;
+  }
 }

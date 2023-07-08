@@ -44,7 +44,7 @@ public class ForumsModuleContentMigration : ModuleContentMigrationBase
     // Nucleus.Abstractions.Models.List categoriesList = null;
     FileSystemProviderInfo fileSystemProvider = this.FileSystemManager.ListProviders().FirstOrDefault();
 
-    foreach (Models.DNN.Modules.ForumGroup dnnGroup in await this.DnnMigrationManager.ListDnnForumGroups(dnnModule.ModuleId))
+    foreach (Models.DNN.Modules.ForumGroup dnnGroup in await this.DnnMigrationManager.ListDnnForumGroupsByModule(dnnModule.ModuleId))
     {
       List<object> forums = new();
 
@@ -64,11 +64,11 @@ public class ForumsModuleContentMigration : ModuleContentMigrationBase
           _type = "Forum",
           Name = dnnForum.Name,
           Description = dnnForum.Description,
-          SortOrder = dnnForum.SortOrder,
+          SortOrder = dnnForum.SortOrder ?? 0,
           Settings = newForumSettings,
           UseGroupSettings = dnnForum.InheritGroupSettings
         };
-        // Permissions, Statistics 
+        // TODO: Permissions, Statistics 
         forums.Add(newForum);
       }
 
@@ -86,11 +86,11 @@ public class ForumsModuleContentMigration : ModuleContentMigrationBase
         _type = "ForumGroup",
         ModuleId = newModule.Id,
         Name = dnnGroup.Name,
-        SortOrder = dnnGroup.SortOrder,
+        SortOrder = dnnGroup.SortOrder ?? 0,
         Settings = newGroupSettings,
         Forums = forums
       };
-      // Permissions 
+      // TODO: Permissions 
 
       await portable.Import(newModule, new List<object> { newGroup });
     }

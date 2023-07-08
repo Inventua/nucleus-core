@@ -491,7 +491,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     {
       if (!String.IsNullOrEmpty(dnnPage.Url))
       {
-        dnnPage.AddWarning("This page has a 'link type' set to redirect to another page or Url.  Nucleus does not support this feature.  You can migrate this page as an empty page and add a SiteMap module to it later.");
+        dnnPage.AddWarning("This page has a 'link type' set to redirect to another page or Url.  Nucleus does not support this feature.  This page will be migrated with a pre-configured SiteMap module so that it can act as a 'landing' page with a list of child pages.");
       }
     }
 

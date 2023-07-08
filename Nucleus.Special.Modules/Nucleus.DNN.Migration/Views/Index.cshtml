@@ -34,7 +34,7 @@
           <div>
             <button type="submit" formaction="@Url.NucleusAction("RolesIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigrateRoles">Roles</button>
           </div>
-          <span class="action-description">Migrate roles and role groups from DNN.</span>
+          <div class="action-description">Migrate roles and role groups from DNN.</div>
         </li>
 
         <li>
@@ -48,22 +48,24 @@
           <div>
             <button type="submit" formaction="@Url.NucleusAction("PagesIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigratePages">Pages</button>
           </div>
-          <span class="action-description">Migrate pages, page modules and content (html, documents, links, blogs, forums) from DNN.</span>
+          <div class="action-description">Migrate pages, page modules and content (html, documents, links, blogs, forums) from DNN.</div>
         </li>
 
         <li>
           <div>
             <button type="submit" formaction="@Url.NucleusAction("UsersIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigrateUsers">Users</button>
           </div>
-          <span class="action-description">Migrate users and user-role memberships from DNN.</span>
+          <div class="action-description">Migrate users and user-role memberships from DNN.</div>
         </li>
 
         <li class="border-top border-primary border-1 pt-3">
           <div>
-            <button type="submit" formaction="@Url.NucleusAction("ForumContentIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigrateForums">Forums Content</button>
+            <button type="submit" formaction="@Url.NucleusAction("ForumsIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigrateForums">Forums Content</button>
           </div>
-          <span class="action-description">Migrate forum posts and attachments from DNN.</span>
-          <span class="action-remarks">When you migrate pages, we migrates forum groups and (empty) forums along with their settings.  This step is used to copy forum posts and attachments.  This step should be run after migrating users.</span>
+          <div>
+            <div class="action-description">Migrate forum posts and attachments from DNN.</div>
+            <div class="action-remarks">When you migrate pages, we migrate forum groups and empty forums along with their settings.  This step is used to copy forum posts and attachments.  This step should be run after migrating users.</div>
+          </div>
         </li>
       </ol>
     }
@@ -71,6 +73,7 @@
     <modal id="MigrateLists" title="Migrate Lists"></modal>
     <modal id="MigratePages" title="Migrate Pages"></modal>
     <modal id="MigrateUsers" title="Migrate Users"></modal>
+    <modal id="MigrateForums" title="Migrate Forums"></modal>
   }
 
 </div>

@@ -5,6 +5,7 @@ using Nucleus.Data.Common;
 using Nucleus.DNN.Migration.DataProviders;
 using Nucleus.DNN.Migration.MigrationEngines;
 using Nucleus.DNN.Migration.Models;
+using Nucleus.DNN.Migration.Models.DNN.Modules;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -265,13 +266,71 @@ public class DNNMigrationManager
     }
   }
 
-  public async Task<List<Models.DNN.Modules.ForumGroup>> ListDnnForumGroups(int moduleId)
+  public async Task<List<Models.DNN.Modules.ForumGroup>> ListDnnForumGroupsByPortal(int portalId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
-      return await provider.ListForumGroups(moduleId);
+      return await provider.ListForumGroupsByPortal(portalId);
     }
   }
+
+  public async Task<List<Models.DNN.Modules.ForumGroup>> ListDnnForumGroupsByModule(int moduleId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.ListForumGroupsByModule(moduleId);
+    }
+  }
+
+  public async Task<int> CountForumPosts(int forumId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.CountForumPosts(forumId);
+    }
+  }
+
+  public async Task<List<int>> ListForumPostIds(int forumId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.ListForumPostIds(forumId);
+    }
+  }
+
+  public async Task<List<int>> ListForumPostReplyIds(int forumId, int postId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.ListForumPostReplyIds(forumId, postId);
+    }
+  }
+
+  public async Task<ForumPost> GetForumPost(int postId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.GetForumPost(postId);
+    }
+  }
+
+  public async Task<Models.ForumInfo> GetNucleusForumInfo(string groupName, string forumName)
+  {
+    using (DNNMigrationDataProvider provider = this.DataProviderFactory.CreateProvider<DNNMigrationDataProvider>())
+    {
+      return await provider.GetNucleusForumInfo(groupName, forumName);
+    }
+  }
+
+  public async Task<Boolean> ForumExists(string groupName, string forumName)
+  {
+    using (DNNMigrationDataProvider provider = this.DataProviderFactory.CreateProvider<DNNMigrationDataProvider>())
+    {
+      return await provider.ForumExists(groupName, forumName);
+    }
+  }
+
+
 
   /// <summary>
   /// Retrieve document settings for the specified module.

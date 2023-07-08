@@ -277,16 +277,34 @@ namespace Nucleus.Data.EntityFramework
 
 				if (entry.State == EntityState.Added)
 				{
-					model.DateAdded = DateTime.UtcNow;
-					model.AddedBy = this.CurrentUserId();
-					this.Entry(model).Property(model => model.ChangedBy).IsModified = false;
+          if (!model.DateAdded.HasValue)
+          {
+            model.DateAdded = DateTime.UtcNow;
+          }
+
+          if (!model.AddedBy.HasValue)
+          {
+            model.AddedBy = this.CurrentUserId();
+          }
+
+          // new records don't have a changedBy or DateChanged
+          this.Entry(model).Property(model => model.ChangedBy).IsModified = false;
 					this.Entry(model).Property(model => model.DateChanged).IsModified = false;
 				}
 				else
 				{
-					model.DateChanged = DateTime.UtcNow;
-					model.ChangedBy = this.CurrentUserId();
-					this.Entry(model).Property(model => model.AddedBy).IsModified = false;
+          if (!model.DateChanged.HasValue)
+          {
+            model.DateChanged = DateTime.UtcNow;
+          }
+
+          if (!model.ChangedBy.HasValue)
+          {
+            model.ChangedBy = this.CurrentUserId();
+          }
+
+          // prevent original AddedBy values from ever being changed
+          this.Entry(model).Property(model => model.AddedBy).IsModified = false;
 					this.Entry(model).Property(model => model.DateAdded).IsModified = false;
 				}
 

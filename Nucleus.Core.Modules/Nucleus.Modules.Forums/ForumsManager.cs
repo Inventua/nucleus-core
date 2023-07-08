@@ -277,27 +277,38 @@ namespace Nucleus.Modules.Forums
 		}
 
 		/// <summary>
-		/// Retrieve an existing <see cref="Forum"/> from the database.
+		/// Retrieve an existing <see cref="Post"/> from the database.
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
 		public async Task<Post> GetForumPost(Guid forumPostId)
 		{
-			Post post;
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				post = await provider.GetForumPost(forumPostId);
+				return await provider.GetForumPost(forumPostId);
 			}
-
-			return post;
 		}
-
-		/// <summary>
-		/// Retrieve an existing <see cref="Forum"/> from the database.
+    
+    /// <summary>
+		/// Retrieve an existing <see cref="Post"/> from the database by forum id and subject.
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		public async Task<Reply> GetForumPostReply(Guid replyId)
+		public async Task<Post> FindForumPost(Guid forumId, string subject)
+    {
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        return await provider.FindForumPost(forumId, subject);
+      }
+    }
+
+    
+    /// <summary>
+    /// Retrieve an existing <see cref="Reply"/> from the database.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task<Reply> GetForumPostReply(Guid replyId)
 		{
 			Reply reply;
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
@@ -340,7 +351,7 @@ namespace Nucleus.Modules.Forums
 
 			if (post.Id == Guid.Empty)
 			{
-				if (!forum.EffectiveSettings().IsModerated || user.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_MODERATE))
+				if (!forum.EffectiveSettings().IsModerated || user?.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_MODERATE) == true)
 				{
 					post.IsApproved = true;
 				}
@@ -374,13 +385,14 @@ namespace Nucleus.Modules.Forums
 			this.CacheManager.ForumsCache().Remove(forum.Id);
 		}
 
-		/// <summary>
-		/// Approve a <see cref="Post"/>.
-		/// </summary>
-		/// <param name="forum"></param>
-		/// <param name="post"></param>
-		/// <returns></returns>
-		public async Task ApproveForumPost(Post post, Boolean value)
+
+    /// <summary>
+    /// Approve a <see cref="Post"/>.
+    /// </summary>
+    /// <param name="forum"></param>
+    /// <param name="post"></param>
+    /// <returns></returns>
+    public async Task ApproveForumPost(Post post, Boolean value)
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
@@ -486,7 +498,7 @@ namespace Nucleus.Modules.Forums
 				if (reply.Id == Guid.Empty)
 				{
 					Models.Forum forum = await provider.GetForum(post.ForumId);
-					reply.IsApproved = !forum.EffectiveSettings().IsModerated || user.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_MODERATE);
+					reply.IsApproved = !forum.EffectiveSettings().IsModerated || user?.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_MODERATE) == true;
 				}
 
 				// List attachments before save, so we can compare to the post, to delete files for removed attachments

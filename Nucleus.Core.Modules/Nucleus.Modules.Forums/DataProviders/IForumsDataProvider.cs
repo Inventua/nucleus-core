@@ -23,8 +23,10 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public Task DeleteGroup(Group group);
 
 		public Task<Post> GetForumPost(Guid id);
+    public Task<Post> FindForumPost(Guid forumId, string subject);
 
-		public Task<IList<Post>> ListForumPosts(Forum forum, FlagStates approved);
+
+    public Task<IList<Post>> ListForumPosts(Forum forum, FlagStates approved);
 		
     public Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListForumPosts(Forum forum, ClaimsPrincipal user, Nucleus.Abstractions.Models.Paging.PagingSettings settings, FlagStates approved, string sortKey, Boolean descending);
 

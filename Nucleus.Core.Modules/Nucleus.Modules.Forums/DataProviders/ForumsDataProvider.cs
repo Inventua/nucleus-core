@@ -364,7 +364,40 @@ namespace Nucleus.Modules.Forums.DataProviders
 			return result;
 		}
 
-		public async Task<IList<Post>> ListForumPosts(Forum forum, FlagStates approved)
+    public async Task<Post> FindForumPost(Guid forumId, string subject)
+    {
+      Post result = await this.Context.Posts
+        .Where(post => post.ForumId == forumId && post.Subject == subject)
+        .Include(post => post.Status)
+        .Include(post => post.PostedBy)
+        .Include(post => post.Replies)
+          .ThenInclude(reply => reply.Attachments)
+            .ThenInclude(attachment => attachment.File)
+        .Include(post => post.Replies)
+          .ThenInclude(reply => reply.ReplyTo)
+        .Include(post => post.Replies)
+          .ThenInclude(reply => reply.PostedBy)
+        .AsSplitQuery()
+        .FirstOrDefaultAsync();
+
+      if (result != null)
+      {
+        // Entity-framework can't handle the logic for post attachments, which belong directly to the post only
+        // if ForumReplyId is null so we have to read "manually"
+        result.Attachments = this.Context.Attachments
+          .Where(attachment => EF.Property<Guid>(attachment, "ForumPostId") == result.Id && EF.Property<Guid?>(attachment, "ForumReplyId") == null)
+            .Include(attachment => attachment.File)
+            .AsNoTracking()
+            .ToList();
+
+        result.Statistics = await GetPostStatistics(result.Id, FlagStates.IsAny);
+      }
+
+      return result;
+    }
+
+
+    public async Task<IList<Post>> ListForumPosts(Forum forum, FlagStates approved)
 		{			
 			return await this.Context.Posts
 				.Where(post => post.ForumId == forum.Id && (approved == FlagStates.IsAny || (post.IsApproved == (approved == FlagStates.IsTrue))))

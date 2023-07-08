@@ -26,115 +26,126 @@ using Nucleus.Extensions;
 
 namespace Nucleus.Core.Layout
 {
-	/// <summary>
-	/// Renders the modules that make up a "pane" in a page.
-	/// </summary>
-	public class ModuleContentRenderer : IModuleContentRenderer
-	{
-		private Context Context { get; }
-		private IActionInvokerFactory ActionInvokerFactory { get; }
-		private IHttpContextFactory HttpContextFactory { get; }
-		private ILogger<ModuleContentRenderer> Logger { get; }
+  /// <summary>
+  /// Renders the modules that make up a "pane" in a page.
+  /// </summary>
+  public class ModuleContentRenderer : IModuleContentRenderer
+  {
+    private Context Context { get; }
+    private IActionInvokerFactory ActionInvokerFactory { get; }
+    private IHttpContextFactory HttpContextFactory { get; }
+    private ILogger<ModuleContentRenderer> Logger { get; }
 
-		public ModuleContentRenderer(Context context, ILogger<ModuleContentRenderer> logger, IActionInvokerFactory actionInvokerFactory, IHttpContextFactory httpContextFactory)
-		{
-			this.Context = context;
-			this.ActionInvokerFactory = actionInvokerFactory;
-			this.HttpContextFactory = httpContextFactory;
-		}
+    public ModuleContentRenderer(Context context, ILogger<ModuleContentRenderer> logger, IActionInvokerFactory actionInvokerFactory, IHttpContextFactory httpContextFactory)
+    {
+      this.Context = context;
+      this.ActionInvokerFactory = actionInvokerFactory;
+      this.HttpContextFactory = httpContextFactory;
+    }
 
-		/// <summary>
-		/// Render the module instances within the specified pane.
-		/// </summary>
-		/// <param name="htmlHelper"></param>
-		/// <param name="paneName"></param>
-		/// <returns></returns>
-		public async Task<IHtmlContent> RenderPaneAsync(IHtmlHelper htmlHelper, string paneName)
-		{
-			HtmlContentBuilder output = new();
+    /// <summary>
+    /// Render the module instances within the specified pane.
+    /// </summary>
+    /// <param name="htmlHelper"></param>
+    /// <param name="paneName"></param>
+    /// <returns></returns>
+    public async Task<IHtmlContent> RenderPaneAsync(IHtmlHelper htmlHelper, string paneName)
+    {
+      HtmlContentBuilder output = new();
 
-			if (this.Context == null)
-			{
-				throw new InvalidOperationException($"{nameof(Context)} is null.");
-			}
+      if (this.Context == null)
+      {
+        throw new InvalidOperationException($"{nameof(Context)} is null.");
+      }
 
-			if (this.Context.Page == null)
-			{
-				throw new InvalidOperationException($"{nameof(Context.Page)} is null.");
-			}
+      if (this.Context.Page == null)
+      {
+        throw new InvalidOperationException($"{nameof(Context.Page)} is null.");
+      }
 
-			if (this.Context.Page.Modules == null)
-			{
-				throw new InvalidOperationException($"{nameof(Context.Page.Modules)} is null.");
-			}
+      if (this.Context.Page.Modules == null)
+      {
+        throw new InvalidOperationException($"{nameof(Context.Page.Modules)} is null.");
+      }
 
-			// Render the module output if the module pane is the specified pane, and the user has permission to view it
-			foreach (PageModule moduleInfo in this.Context.Page.Modules)
-			{
-				if (paneName == "*" || moduleInfo.Pane.Equals(paneName, StringComparison.OrdinalIgnoreCase))
-				{
-					// "permission denied" for viewing a module is not a failure, it just means we don't render the module
-					if (HasViewPermission(moduleInfo, this.Context.Site, htmlHelper.ViewContext.HttpContext.User))
-					{
-						try
-						{
+      // Render the module output if the module pane is the specified pane, and the user has permission to view it
+      foreach (PageModule moduleInfo in this.Context.Page.Modules)
+      {
+        if (paneName == "*" || moduleInfo.Pane.Equals(paneName, StringComparison.OrdinalIgnoreCase))
+        {
+          // "permission denied" for viewing a module is not a failure, it just means we don't render the module
+          if (HasViewPermission(moduleInfo, this.Context.Site, htmlHelper.ViewContext.HttpContext.User))
+          {
+            try
+            {
               // pane name '*' is a special value, used by search feed generators to render content for all panes in a plain format without containers
-							IHtmlContent moduleBody = await RenderModuleView(htmlHelper, moduleInfo, paneName != "*");
-							output.AppendHtml(moduleBody);
-						}
-						catch (System.InvalidOperationException e)
-						{
-							// If an error occurred while rendering module, and the user is an admin, display the error message in place of the module
-							// content.  If the user is not an admin, suppress output of the module.							
-							this.Logger?.LogError(e, "Error rendering {pane}.", moduleInfo.Pane);
-							if (htmlHelper.ViewContext.HttpContext.User.IsSiteAdmin(this.Context.Site))
-							{
-								output.AppendHtml(e.Message);
-							}
-						}
-					}
-				}
-			}
+              IHtmlContent moduleBody = await RenderModuleView(htmlHelper, moduleInfo, paneName != "*");
+              output.AppendHtml(moduleBody);
+            }
+            catch (System.InvalidOperationException e)
+            {
+              // If an error occurred while rendering module, and the user is an admin, display the error message in place of the module
+              // content.  If the user is not an admin, suppress output of the module.							
+              this.Logger?.LogError(e, "Error rendering {pane}.", moduleInfo.Pane);
+              if (htmlHelper.ViewContext.HttpContext.User.IsSiteAdmin(this.Context.Site))
+              {
+                output.AppendHtml(e.Message);
+              }
+            }
+          }
+        }
+      }
 
-			return output;
-		}
+      return output;
+    }
 
-		private IHtmlContent RenderException(HttpContext context, PageModule moduleInfo, Exception e)
-		{
-			TagBuilder output = new("div");
+    private IHtmlContent RenderException(HttpContext context, PageModule moduleInfo, Exception e)
+    {
+      TagBuilder output = new("div");
 
-			if (context.User.IsSiteAdmin(this.Context.Site))
-			{
-				// admin user, render error information
-				output.InnerHtml.Append($"An error occurred rendering the {moduleInfo.Title} module: {e.Message}");
-			}
-			else
-			{
-				// regular user, render generic error
-				output.InnerHtml.Append($"An error occurred rendering the {moduleInfo.Title} module.");
-			}
+      if (context.User.IsSiteAdmin(this.Context.Site))
+      {
+        // admin user, render error information
+        output.InnerHtml.Append($"An error occurred rendering the {moduleInfo.Title} module: {e.Message}");
+      }
+      else
+      {
+        // regular user, render generic error
+        output.InnerHtml.Append($"An error occurred rendering the {moduleInfo.Title} module.");
+      }
 
-			return output;
-		}
+      return output;
+    }
 
-		/// <summary>
-		/// Returns a true/false value indicating whether the user has view rights for the module.
+    /// <summary>
+    /// Returns a true/false value indicating whether the user has view rights for the module.
+    /// </summary>
+    /// <param name="moduleInfo"></param>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    private Boolean HasViewPermission(PageModule moduleInfo, Site site, System.Security.Claims.ClaimsPrincipal user)
+    {
+      return user.HasViewPermission(site, this.Context.Page, moduleInfo);
+    }
+
+    /// <summary>
+		/// Returns a true/false value indicating whether the module permissions are set to allow only administrators to view the module.
 		/// </summary>
 		/// <param name="moduleInfo"></param>
-		/// <param name="user"></param>
+		/// <param name="site"></param>
 		/// <returns></returns>
-		private Boolean HasViewPermission(PageModule moduleInfo, Site site, System.Security.Claims.ClaimsPrincipal user)
-		{
-			return user.HasViewPermission(site, this.Context.Page, moduleInfo);
-		}
+		private Boolean HasAdminPermissionOnly(PageModule moduleInfo, Site site)
+    {
+      return !(moduleInfo.InheritPagePermissions || moduleInfo.Permissions.Any());
+    }
 
-		/// <summary>
-		/// Returns a true/false value indicating whether the user has edit rights for the module.
-		/// </summary>
-		/// <param name="moduleInfo"></param>
-		/// <param name="user"></param>
-		/// <returns></returns>
-		private Boolean HasEditPermission(PageModule moduleInfo, Site site, System.Security.Claims.ClaimsPrincipal user)
+    /// <summary>
+    /// Returns a true/false value indicating whether the user has edit rights for the module.
+    /// </summary>
+    /// <param name="moduleInfo"></param>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    private Boolean HasEditPermission(PageModule moduleInfo, Site site, System.Security.Claims.ClaimsPrincipal user)
 		{
 			return user.HasEditPermission(site, this.Context.Page, moduleInfo);
 		}
@@ -189,6 +200,11 @@ namespace Nucleus.Core.Layout
 
 				if (isEditing)
 				{
+          if (user.IsSiteAdmin(this.Context.Site) && HasAdminPermissionOnly(moduleInfo, this.Context.Site))
+          {
+            moduleView.AddCssClass("nucleus-adminviewonly");
+          }
+
 					AddModuleEditControls(htmlHelper, moduleView, moduleInfo, user);
 				}
 
@@ -202,7 +218,6 @@ namespace Nucleus.Core.Layout
 
 		private void AddModuleEditControls(IHtmlHelper htmlHelper, TagBuilder editorBuilder, PageModule moduleInfo, System.Security.Claims.ClaimsPrincipal user)
 		{
-			//IUrlHelper urlHelper = new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext);
 			IUrlHelper urlHelper = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(htmlHelper.ViewContext);
 
 			// Render edit controls

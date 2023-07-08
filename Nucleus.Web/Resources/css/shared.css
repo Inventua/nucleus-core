@@ -159,6 +159,22 @@ a *
 	display: none;
 }
 */
+.nucleus-adminviewonly
+{
+  border: dashed 2px red!important;
+}
+
+.nucleus-adminviewonly > *:first-child:before
+{
+  content: 'Visible by Administrators only';
+  margin-left: auto;
+  margin-right: auto;
+  color: red;
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+
 .nucleus-overlay
 {
 	display: none;

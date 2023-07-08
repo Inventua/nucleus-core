@@ -86,14 +86,14 @@
 								}
 							</td>
 							<td class="forum-author small compact-cell">
-								<div>@post.PostedBy.UserName</div>
+								<div>@(post.PostedBy?.UserName ?? "Deleted User")</div>
 								<div>@post.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
 							</td>
 							<td class="compact-cell">@post.Statistics.ReplyCount</td>
 							<td class="compact-cell small">
 								@if (post.Statistics.LastReply != null)
 								{
-									<div>@post.Statistics.LastReply.PostedBy.UserName</div>
+									<div>@(post.Statistics.LastReply.PostedBy?.UserName ?? "Deleted User")</div>
 									<div>@post.Statistics.LastReply.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
 								}
 							</td>

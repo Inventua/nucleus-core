@@ -54,7 +54,7 @@
 						@if (forum.Statistics.LastPost != null)
 						{
 							<div class="forum-subject" title="@forum.Statistics.LastPost.Subject">@forum.Statistics.LastPost.Subject</div>
-							<div>@forum.Statistics.LastPost.PostedBy.UserName, @forum.Statistics.LastPost.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
+							<div>@(forum.Statistics.LastPost.PostedBy?.UserName ?? "Deleted User"), @forum.Statistics.LastPost.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
 						}
 					</td>
 				</tr>

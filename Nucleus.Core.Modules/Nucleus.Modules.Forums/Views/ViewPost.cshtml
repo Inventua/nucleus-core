@@ -31,7 +31,7 @@
 			@Html.HiddenFor(model => model.Post.ForumId)
 			<h3>@Model.Post.Subject</h3>
 			<div class="post-author">
-				<div>Posted on @Model.Post.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone()) by @Model.Post.PostedBy.UserName</div>
+				<div>Posted on @Model.Post.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone()) by @(Model.Post.PostedBy?.UserName ?? "Deleted User")</div>
 			</div>
 			<div class="post-flags">
 				@if (Model.Post.IsLocked)
@@ -122,7 +122,7 @@
 				{
 					<div class="reply">
 						<div class="heading">
-							<span>@reply.PostedBy.UserName replied on</span><span>@reply.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</span>
+							<span>@(reply.PostedBy?.UserName ?? "Deleted User") replied on</span><span>@reply.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</span>
 							<span class="controls">
 								@if (Model.CanApprovePost && !reply.IsApproved)
 								{

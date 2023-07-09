@@ -515,7 +515,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.Where(attachment => EF.Property<Guid>(attachment, "ForumPostId") == post.Id && EF.Property<Guid?>(attachment, "ForumReplyId") == null)
 				.AsNoTracking()
 				.ToList();
-
+      
+      this.Context.ChangeTracker.Clear();
 			await SaveAttachments(post.Id, null, post.Attachments, currentAttachments);
 
 			raiseEvent.Invoke();
@@ -530,7 +531,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 			{
 				foreach (Attachment original in originalAttachments)
 				{
-					if (!attachments.Where(attachment => attachment.Id == original.Id).Any())
+					if (!attachments.Where(attachment => attachment.Id == original.Id || attachment.File.Id == original.File.Id).Any())
 					{
 						// delete the attachment
 						this.Context.Attachments.Remove(original);
@@ -547,7 +548,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 				{
 					foreach (Attachment originalAttachment in originalAttachments)
 					{
-						if (attachment.Id == originalAttachment.Id)
+						if (attachment.Id == originalAttachment.Id || attachment.File.Id == originalAttachment.File.Id)
 						{
 							found = true;
 							break;

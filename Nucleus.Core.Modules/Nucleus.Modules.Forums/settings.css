@@ -11,7 +11,13 @@
 	overflow-y: auto;
 }
 
-.ForumsSettings .group-permissions th, .ForumsSettings .forum-permissions th
+.ForumsSettings #group-permissions th, .ForumsSettings #forum-permissions th
 {
 	text-align: center;
+  font-size: 0.75rem;
+}
+
+.ForumsSettings #group-permissions td:not(:first-child), .ForumsSettings #forum-permissions td:not(:first-child)
+{
+  text-align: center;
 }

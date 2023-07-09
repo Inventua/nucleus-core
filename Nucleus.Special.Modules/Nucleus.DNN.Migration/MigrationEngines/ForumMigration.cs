@@ -144,7 +144,7 @@ public class ForumMigration : MigrationEngineBase<Models.DNN.Modules.Forum>
       {
         try
         {
-          Nucleus.Abstractions.Models.FileSystem.File file = await this.FileSystemManager.GetFile(this.Context.Site, fileSystemProvider.Key, "/NTForums_Attach/ " + dnnAttachment.Filename);
+          Nucleus.Abstractions.Models.FileSystem.File file = await this.FileSystemManager.GetFile(this.Context.Site, fileSystemProvider.Key, $"NTForums_Attach/{dnnAttachment.Filename?.Trim()}");
           if (file != null)
           {
             nucleusAttachments.Add(new { File = file });

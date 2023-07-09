@@ -84,10 +84,10 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			Boolean isNew = !this.Context.Groups.Where(existing => existing.Id == group.Id).Any();
 
-			this.Context.Attach(group);
+      this.Context.Attach(group);
 			this.Context.Entry(group).Property("ModuleId").CurrentValue = module.Id;
 
-			if (isNew)
+      if (isNew)
 			{
 				group.SortOrder = await GetTopForumGroupSortOrder(module.Id) + 10;
 				this.Context.Entry(group).State = EntityState.Added;

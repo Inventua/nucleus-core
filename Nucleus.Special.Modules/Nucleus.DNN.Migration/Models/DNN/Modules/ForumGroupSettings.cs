@@ -62,7 +62,10 @@ public class ForumGroupSettings
 
   [Column("CanSubscribe")]
   public string SubscribePostRoles { get; set; }
-    
+
+  public string ModeratorRoles { get; set; }
+
+
   public int? AttachCount { get; set; }
 
   public Boolean IndexContent { get; set; }

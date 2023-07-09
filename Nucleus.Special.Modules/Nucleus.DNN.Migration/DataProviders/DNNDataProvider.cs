@@ -323,7 +323,8 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
     return await this.Context.ForumPosts
       .Where(post => post.PostId == postId)
       .Include(post => post.User)
-      .AsSingleQuery()
+      .Include(post => post.Attachments)
+      .AsSplitQuery()
       .FirstOrDefaultAsync();    
   }
 

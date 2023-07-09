@@ -73,7 +73,6 @@ public class Forum : DNNEntity
   [Column("CanSubscribe")]
   public string SubscribePostRoles { get; set; }
 
-
   public int AttachMaxSize { get; set; }
 
   [NotMapped]

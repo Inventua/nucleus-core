@@ -60,4 +60,6 @@ public class ForumPost
   public string PostType { get; set; }
   
   public Boolean Archived { get; set; }
+
+  public List<ForumPostAttachment> Attachments { get; set; }
 }

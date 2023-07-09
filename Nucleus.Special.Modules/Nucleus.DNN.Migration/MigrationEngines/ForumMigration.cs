@@ -1,13 +1,13 @@
-﻿using DocumentFormat.OpenXml.EMMA;
-using Nucleus.Abstractions.Managers;
+﻿using Nucleus.Abstractions.Managers;
 using Nucleus.DNN.Migration.Models.DNN;
+using Nucleus.DNN.Migration.Models.DNN.Modules;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using Nucleus.Abstractions.FileSystemProviders;
+using System.IO;
 
 namespace Nucleus.DNN.Migration.MigrationEngines;
 
@@ -19,11 +19,13 @@ public class ForumMigration : MigrationEngineBase<Models.DNN.Modules.Forum>
   private DNNMigrationManager MigrationManager { get; }
   private IPageModuleManager PageModuleManager { get; }
   private IUserManager UserManager { get; }
+  private IFileSystemManager FileSystemManager { get; }
 
-  public ForumMigration(Nucleus.Abstractions.Models.Context context, IPageModuleManager pageModuleManager, IUserManager userManager, DNNMigrationManager migrationManager) : base("Forums")
+  public ForumMigration(Nucleus.Abstractions.Models.Context context, IPageModuleManager pageModuleManager, IUserManager userManager, IFileSystemManager fileSystemManager, DNNMigrationManager migrationManager) : base("Forums")
   {
     this.MigrationManager = migrationManager;
     this.PageModuleManager = pageModuleManager;
+    this.FileSystemManager = fileSystemManager;
     this.UserManager = userManager;
     this.Context = context;
   }
@@ -32,7 +34,7 @@ public class ForumMigration : MigrationEngineBase<Models.DNN.Modules.Forum>
   {
     Nucleus.Abstractions.Portable.IPortable portable = this.MigrationManager.GetPortableImplementation(ForumsModuleDefinitionId);
 
-
+    FileSystemProviderInfo fileSystemProvider = this.FileSystemManager.ListProviders().FirstOrDefault();
 
     //this.Message = "";
     foreach (Models.DNN.Modules.Forum dnnForum in this.Items)
@@ -49,12 +51,12 @@ public class ForumMigration : MigrationEngineBase<Models.DNN.Modules.Forum>
 
           foreach (int postId in postIds)
           {
-            Models.DNN.Modules.ForumPost post = await this.MigrationManager.GetForumPost(postId);
+            Models.DNN.Modules.ForumPost dnnPost = await this.MigrationManager.GetForumPost(postId);
             Nucleus.Abstractions.Models.User postUser = null;
 
-            if (post.User != null)
+            if (dnnPost.User != null)
             {
-              postUser = await this.UserManager.Get(this.Context.Site, post.User.UserName);
+              postUser = await this.UserManager.Get(this.Context.Site, dnnPost.User.UserName);
             }
 
             List<int> replyIds = await this.MigrationManager.ListForumPostReplyIds(dnnForum.ForumId, postId);
@@ -62,26 +64,25 @@ public class ForumMigration : MigrationEngineBase<Models.DNN.Modules.Forum>
 
             foreach (int replyId in replyIds)
             {
-              Models.DNN.Modules.ForumPost reply = await this.MigrationManager.GetForumPost(replyId);
+              Models.DNN.Modules.ForumPost dnnReply = await this.MigrationManager.GetForumPost(replyId);
               Nucleus.Abstractions.Models.User replyUser = null;
 
-              if (reply.User != null) 
+              if (dnnReply.User != null) 
               { 
-                replyUser = await this.UserManager.Get(this.Context.Site, reply.User.UserName);
+                replyUser = await this.UserManager.Get(this.Context.Site, dnnReply.User.UserName);
               }
 
-              //todo
-              List<object> replyAttachments = new();
+              List<object> replyAttachments = await BuildAttachments(newForum, fileSystemProvider, dnnReply.Attachments);
 
               object newReply = new
               {
                 ForumId = newForum.Id,
-                Body = reply.Body,
-                IsLocked = reply.Locked,
-                IsPinned = reply.Pinned,
-                IsApproved = reply.Approved,
-                IsRejected = !reply.Approved,
-                DateAdded = reply.DateAdded,
+                Body = dnnReply.Body,
+                IsLocked = dnnReply.Locked,
+                IsPinned = dnnReply.Pinned,
+                IsApproved = dnnReply.Approved,
+                IsRejected = !dnnReply.Approved,
+                DateAdded = dnnReply.DateAdded,
                 AddedBy = replyUser?.Id ?? Guid.Empty,
                 Attachments = replyAttachments
               };
@@ -91,21 +92,20 @@ public class ForumMigration : MigrationEngineBase<Models.DNN.Modules.Forum>
 
             try
             {
-              //todo
-              List<object> postAttachments = new();
+              List<object> postAttachments = await BuildAttachments(newForum, fileSystemProvider, dnnPost.Attachments);
 
               object newPost = new
               {
                 _type = "ForumPost",
                 ForumId = newForum.Id,
-                Subject = post.Subject,
-                Body = post.Body,
-                DateAdded = post.DateAdded,
+                Subject = dnnPost.Subject,
+                Body = dnnPost.Body,
+                DateAdded = dnnPost.DateAdded,
                 AddedBy = postUser?.Id ?? Guid.Empty,
-                IsLocked = post.Locked,
-                IsPinned = post.Pinned,
-                IsApproved = post.Approved,
-                IsRejected = !post.Approved,
+                IsLocked = dnnPost.Locked,
+                IsPinned = dnnPost.Pinned,
+                IsApproved = dnnPost.Approved,
+                IsRejected = !dnnPost.Approved,
                 Replies = replies,
                 Attachments = postAttachments
               };
@@ -117,7 +117,7 @@ public class ForumMigration : MigrationEngineBase<Models.DNN.Modules.Forum>
             }
             catch (Exception ex)
             {
-              dnnForum.AddError($"Error importing Forum post '{post.Subject}' for forum '{dnnForum.Name}': {ex.Message}");
+              dnnForum.AddError($"Error importing Forum post '{dnnPost.Subject}' for forum '{dnnForum.Name}': {ex.Message}");
             }
           }
         }
@@ -132,6 +132,32 @@ public class ForumMigration : MigrationEngineBase<Models.DNN.Modules.Forum>
         dnnForum.AddWarning($"Forum '{dnnForum.Name}' was not selected for import.");
       }
     }
+  }
+
+  private async Task<List<object>> BuildAttachments(Models.ForumInfo newForum, FileSystemProviderInfo fileSystemProvider, List<ForumPostAttachment> dnnAttachments)
+  {
+    List<object> nucleusAttachments = new();
+
+    if (dnnAttachments != null)
+    {
+      foreach (ForumPostAttachment dnnAttachment in dnnAttachments)
+      {
+        try
+        {
+          Nucleus.Abstractions.Models.FileSystem.File file = await this.FileSystemManager.GetFile(this.Context.Site, fileSystemProvider.Key, "/NTForums_Attach/ " + dnnAttachment.Filename);
+          if (file != null)
+          {
+            nucleusAttachments.Add(new { File = file });
+          }
+        }
+        catch (FileNotFoundException)
+        {
+          // skip missing files
+        }
+      }
+    }
+
+    return nucleusAttachments;
   }
 
   public override async Task Validate()

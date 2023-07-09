@@ -140,10 +140,17 @@ public class DNNMigrationController : Controller
     Task task = Task.Run(async () =>
     {
       this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().Message = "Synchronizing file system ...";
-      await SyncFileSystem();
 
-      this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().Message = "";
-
+      try
+      {
+        await SyncFileSystem();
+        this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().Message = "";
+      }
+      catch (Exception e)
+      {
+        this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().Message = $"Sync File System Error: {e.Message}";
+      }
+      
       await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().Migrate(viewModel.UpdateExisting);
     });
 

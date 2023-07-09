@@ -221,6 +221,15 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
     builder.Entity<Models.DNN.Modules.ForumPost>()
       .ToTable("NTForums_Posts")
       .HasKey(post => post.PostId);
+
+    builder.Entity<Models.DNN.Modules.ForumPost>()
+      .HasMany(post => post.Attachments)
+      .WithOne(attachment => attachment.ForumPost)
+      .HasForeignKey("PostId");    
+
+    builder.Entity<Models.DNN.Modules.ForumPostAttachment>()
+      .ToTable("NTForums_Attach")
+      .HasKey(attachment => attachment.AttachmentId);
   }
 
 }

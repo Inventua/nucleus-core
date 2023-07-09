@@ -432,6 +432,9 @@ namespace Nucleus.Core.DataProviders
 		{
 			List<Permission> currentPermissions = await this.Context.Permissions
 				.Where(permission => permission.RelatedId == page.Id && permission.PermissionType.Scope.StartsWith(Page.URN))
+        .Include(permission => permission.Role)
+        .Include(permission => permission.PermissionType)
+        .AsSplitQuery()
 				.AsNoTracking()
 				.ToListAsync();
 
@@ -1473,7 +1476,7 @@ namespace Nucleus.Core.DataProviders
 			// delete removed permissions
 			foreach (Permission oldPermission in existingPermissions)
 			{
-				if (!newPermissions.Where(permission => permission.Id == oldPermission.Id).Any())
+				if (!newPermissions.Where(existing => existing.Id == oldPermission.Id || (existing.Role.Id == oldPermission.Role.Id && existing.PermissionType.Id == oldPermission.PermissionType.Id)).Any())
 				{
 					this.Context.Remove(oldPermission);
 
@@ -1497,9 +1500,11 @@ namespace Nucleus.Core.DataProviders
 			// add/update permissions
 			foreach (Permission newPermission in newPermissions.Where(permission => permission.PermissionType.Scope != PermissionType.PermissionScopeNamespaces.Disabled))
 			{
-				Permission existing = existingPermissions.Where(existing => existing.Id == newPermission.Id).FirstOrDefault();
-
-				if (existing == null)
+				Permission existing = existingPermissions
+          .Where(existing => existing.Id == newPermission.Id || (existing.Role.Id == newPermission.Role.Id && existing.PermissionType.Id == newPermission.PermissionType.Id))
+          .FirstOrDefault();
+                
+        if (existing == null)
 				{
 					newPermission.RelatedId = relatedId;
 

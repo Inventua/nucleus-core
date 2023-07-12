@@ -182,6 +182,10 @@ public class DNNMigrationController : Controller
     Task task = Task.Run(async () =>
     {
       await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Modules.Forum>().Migrate(viewModel.UpdateExisting);
+      
+      // Forum migration can end up with less posts/replies than predicted because of orphaned records, etc, so we
+      // have to manually signal completion.
+      this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Modules.Forum>().Current = this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Modules.Forum>().TotalCount;
     });
 
     return View("_Progress", await BuildProgressViewModel());

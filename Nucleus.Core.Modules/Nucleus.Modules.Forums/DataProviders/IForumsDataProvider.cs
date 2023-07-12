@@ -49,7 +49,9 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public Task<List<Attachment>> ListPostAttachments(Guid postId);
 		public Task<List<Attachment>> ListReplyAttachments(Guid postId, Guid replyId);
 
-		public Task DeletePostAttachments(Post post);
+    public Task SaveAttachments(Guid postId, Guid? replyId, IEnumerable<Attachment> attachments, IEnumerable<Attachment> originalAttachments);
+
+    public Task DeletePostAttachments(Post post);
 
 		public Task DeleteReplyAttachments(Reply reply);
 

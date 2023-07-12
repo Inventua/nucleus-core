@@ -483,7 +483,10 @@ namespace Nucleus.Modules.Forums.DataProviders
 		{
 			Action raiseEvent;
 			
-			Boolean isNew = !this.Context.Posts.Where(existing => existing.Id == post.Id).Any();
+			Boolean isNew = !this.Context.Posts
+        .Where(existing => existing.Id == post.Id)
+        .AsNoTracking()
+        .Any();
 			
 			this.Context.Attach(post);
 			this.Context.Entry(post).Property("ForumId").CurrentValue = forum.Id;
@@ -511,14 +514,6 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			await this .Context.SaveChangesAsync<Post>();
 
-			List<Attachment> currentAttachments = this.Context.Attachments
-				.Where(attachment => EF.Property<Guid>(attachment, "ForumPostId") == post.Id && EF.Property<Guid?>(attachment, "ForumReplyId") == null)
-				.AsNoTracking()
-				.ToList();
-      
-      this.Context.ChangeTracker.Clear();
-			await SaveAttachments(post.Id, null, post.Attachments, currentAttachments);
-
 			raiseEvent.Invoke();
 		}
 
@@ -531,7 +526,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 			{
 				foreach (Attachment original in originalAttachments)
 				{
-					if (!attachments.Where(attachment => attachment.Id == original.Id || attachment.File.Id == original.File.Id).Any())
+					if (!attachments.Where(attachment => attachment.Id == original.Id || attachment?.File.Id == original.File?.Id).Any())
 					{
 						// delete the attachment
 						this.Context.Attachments.Remove(original);
@@ -548,7 +543,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 				{
 					foreach (Attachment originalAttachment in originalAttachments)
 					{
-						if (attachment.Id == originalAttachment.Id || attachment.File.Id == originalAttachment.File.Id)
+						if (attachment.Id == originalAttachment.Id || attachment.File?.Id == originalAttachment.File?.Id)
 						{
 							found = true;
 							break;
@@ -777,7 +772,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			Boolean isNew = !this.Context.Replies.Where(existing => existing.Id == reply.Id).Any();
 
-			this.Context.Attach(reply);
+			this.Context.Attach<Reply>(reply);
 			this.Context.Entry(reply).Property("ForumPostId").CurrentValue = post.Id;
 
 			if (isNew)
@@ -797,13 +792,6 @@ namespace Nucleus.Modules.Forums.DataProviders
 			}
 
 			await this.Context.SaveChangesAsync<Reply>();
-
-			List<Attachment> currentAttachments = await this.Context.Attachments
-				.Where(attachment => EF.Property<Guid>(attachment, "ForumPostId") == post.Id && EF.Property<Guid>(attachment, "ForumReplyId") == reply.Id)
-				.AsNoTracking()
-				.ToListAsync();
-
-			await SaveAttachments(post.Id, reply.Id, reply.Attachments, currentAttachments);
 
 			raiseEvent.Invoke();
 		}

@@ -130,7 +130,11 @@ namespace Nucleus.Modules.Forums
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				await provider.SaveGroup(module, group);
+        // save a copy of the group with forums set to null so that EF doesn't try to save forums
+        Group saveGroup = group.Copy<Group>();
+        saveGroup.Forums = null;
+        await provider.SaveGroup(module, saveGroup);
+        group.Id = saveGroup.Id;                
 
 				if (group.Permissions != null)
 				{

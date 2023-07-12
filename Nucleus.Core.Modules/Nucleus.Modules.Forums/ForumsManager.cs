@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Claims;
 using Nucleus.Data.Common;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Nucleus.Modules.Forums
 {
@@ -369,20 +370,33 @@ namespace Nucleus.Modules.Forums
 				// List attachments before save, so we can compare to the post, to delete files for removed attachments
 				originalAttachments = await provider.ListPostAttachments(post.Id);
 
-				await provider.SaveForumPost(forum, post);
-
-				foreach (Attachment original in originalAttachments)
-				{
-					if (!post.Attachments.Where(attachment => attachment.Id == original.Id).Any())
-					{
-						// delete the file
-						await this.FileSystemManager.DeleteFile(site, await this.FileSystemManager.GetFile(site, original.File.Id));
-					}
-				}
+        // save a copy of the post with replies and attachments set to null so that EF doesn't try to save replies/attachments
+        Post savePost = post.Copy<Post>();
+        savePost.Replies = null;
+        savePost.Attachments = null;
+        await provider.SaveForumPost(forum, savePost);
+        post.Id = savePost.Id; 
 			}
 
-			// drop forum from cache so that next read updates statistics
-			this.CacheManager.ForumsCache().Remove(forum.Id);
+      // remove files for deleted attachments
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        List<Attachment> currentAttachments = await provider.ListPostAttachments(post.Id);
+
+        await provider.SaveAttachments(post.Id, null, post.Attachments, currentAttachments);
+
+        foreach (Attachment original in originalAttachments)
+        {
+          if (!post.Attachments.Where(attachment => attachment.Id == original.Id).Any())
+          {
+            // delete the file
+            await this.FileSystemManager.DeleteFile(site, await this.FileSystemManager.GetFile(site, original.File.Id));
+          }
+        }
+      }
+
+      // drop forum from cache so that next read updates statistics
+      this.CacheManager.ForumsCache().Remove(forum.Id);
 		}
 
 
@@ -493,7 +507,9 @@ namespace Nucleus.Modules.Forums
 		/// <returns></returns>
 		public async Task SavePostReply(Site site, ClaimsPrincipal user, Post post, Reply reply)
 		{
-			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      List<Attachment> originalAttachments;
+
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
 				if (reply.Id == Guid.Empty)
 				{
@@ -501,12 +517,25 @@ namespace Nucleus.Modules.Forums
 					reply.IsApproved = !forum.EffectiveSettings().IsModerated || user?.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_MODERATE) == true;
 				}
 
-				// List attachments before save, so we can compare to the post, to delete files for removed attachments
-				List<Attachment> originalAttachments = await provider.ListReplyAttachments(post.Id, reply.Id);
+				// List attachments before save, so we can compare to the reply, to delete files for removed attachments
+				originalAttachments = await provider.ListReplyAttachments(post.Id, reply.Id);
 
-				await provider.SaveForumPostReply(post, reply);
+        // save a copy of the reply with attachments set to null so that EF doesn't try to save attachments
+        Reply saveReply = reply.Copy<Reply>();
+        saveReply.Attachments = null;
+        await provider.SaveForumPostReply(post, saveReply);
+        reply.Id = saveReply.Id;
+        
+        await provider.SaveForumPostReply(post, reply);
+			}
 
-				foreach (Attachment original in originalAttachments)
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        List<Attachment> currentAttachments = await provider.ListReplyAttachments(post.Id, reply.Id);
+        await provider.SaveAttachments(post.Id, reply.Id, reply.Attachments, currentAttachments);
+
+        // remove files for deleted attachments
+        foreach (Attachment original in originalAttachments)
 				{
 					if (!reply.Attachments.Where(attachment => attachment.Id == original.Id).Any())
 					{
@@ -514,10 +543,10 @@ namespace Nucleus.Modules.Forums
 						await this.FileSystemManager.DeleteFile(site, await this.FileSystemManager.GetFile(site, original.File.Id));
 					}
 				}
-			}
+      }
 
-			// drop forum from cache so that next read updates statistics
-			this.CacheManager.ForumsCache().Remove(post.ForumId);
+      // drop forum from cache so that next read updates statistics
+      this.CacheManager.ForumsCache().Remove(post.ForumId);
 		}
 
 		/// <summary>

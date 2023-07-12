@@ -88,6 +88,7 @@ public class ForumMigration : MigrationEngineBase<Models.DNN.Modules.Forum>
               };
 
               replies.Add(newReply);
+              this.Progress();
             }
 
             try
@@ -109,27 +110,27 @@ public class ForumMigration : MigrationEngineBase<Models.DNN.Modules.Forum>
                 Replies = replies,
                 Attachments = postAttachments
               };
-              // Permissions 
-
+              
               await portable.Import(newModule, new List<object> { newPost });
-
-              this.Progress();
             }
             catch (Exception ex)
             {
               dnnForum.AddError($"Error importing Forum post '{dnnPost.Subject}' for forum '{dnnForum.Name}': {ex.Message}");
             }
+            
+            this.Progress();
           }
         }
         catch (Exception ex)
         {
           dnnForum.AddError($"Error importing posts for Forum '{dnnForum.Name}': {ex.Message}");
+          this.TotalCount -= dnnForum.PostCount;
         }
-
       }
       else
       {
-        dnnForum.AddWarning($"Forum '{dnnForum.Name}' was not selected for import.");
+        // this doesn't need a warning
+        //dnnForum.AddWarning($"Forum '{dnnForum.Name}' was not selected for import.");
       }
     }
   }

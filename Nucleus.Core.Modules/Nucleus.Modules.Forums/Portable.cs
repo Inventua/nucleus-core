@@ -78,12 +78,8 @@ public class Portable : Nucleus.Abstractions.Portable.IPortable
       group.Id = existingGroup.Id;
     }
 
-    Group saveGroup = group.Copy<Group>();
-    saveGroup.Forums = null;
-
-    await this.GroupsManager.Save(module, saveGroup);
-    group.Id = saveGroup.Id;
-
+    await this.GroupsManager.Save(module, group);
+    
     if (group.Forums != null)
     {
       foreach (Models.Forum forum in group.Forums)

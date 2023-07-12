@@ -46,10 +46,12 @@ namespace Nucleus.Abstractions.Models
 		{
 			string thisObject = Newtonsoft.Json.JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.None, new JsonSerializerSettings
 			{
+        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
 				PreserveReferencesHandling = PreserveReferencesHandling.Objects
 			});
+
 			return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(thisObject);
-		}
+    }
 
 		/// <summary>
 		/// Shallow-copy the object to an existing object

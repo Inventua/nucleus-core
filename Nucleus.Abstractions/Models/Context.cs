@@ -38,5 +38,10 @@ namespace Nucleus.Abstractions.Models
 		/// Represents parameters which are specified at the end of the local (page route) path.
 		/// </summary>
 		public LocalPath LocalPath { get; set; } = new("");
-	}
+
+    /// <summary>
+		/// The page route which was matched to find the page.
+		/// </summary>
+		public PageRoute MatchedRoute { get; set; }
+  }
 }

@@ -94,17 +94,25 @@ namespace Nucleus.Web.Controllers
 				// Handle "PermanentRedirect" page routes
 				foreach (PageRoute pageRoute in this.Context.Page.Routes.ToArray())
 				{
-					if (pageRoute.Path.Equals(ControllerContext.HttpContext.Request.Path, StringComparison.OrdinalIgnoreCase) || pageRoute.Path.Equals(ControllerContext.HttpContext.Request.Path + ControllerContext.HttpContext.Request.QueryString, StringComparison.OrdinalIgnoreCase))
-					{
-						if (pageRoute.Type == PageRoute.PageRouteTypes.PermanentRedirect)
-						{
-							string redirectUrl = this.Url.PageLink(this.Context.Page);
-							Logger.LogTrace("Permanently redirecting request to {redirectUrl}.", redirectUrl);
-							return RedirectPermanent(redirectUrl);
-						}
-					}
-				}				
-			}
+          //if (pageRoute.Path.Equals(ControllerContext.HttpContext.Request.Path, StringComparison.OrdinalIgnoreCase) || pageRoute.Path.Equals(ControllerContext.HttpContext.Request.Path + ControllerContext.HttpContext.Request.QueryString, StringComparison.OrdinalIgnoreCase))
+          // if (pageRoute.Path.Equals(this.Context.MatchedPath, StringComparison.OrdinalIgnoreCase))
+          // {
+					//	if (pageRoute.Type == PageRoute.PageRouteTypes.PermanentRedirect)
+					//	{
+					//		string redirectUrl = this.Url.PageLink(this.Context.Page);
+					//		Logger.LogTrace("Permanently redirecting request to {redirectUrl}.", redirectUrl);
+					//		return RedirectPermanent(redirectUrl);
+					//	}
+          //  break;
+					//}
+          if (this.Context.MatchedRoute?.Type == PageRoute.PageRouteTypes.PermanentRedirect)
+          {
+            string redirectUrl = this.Url.PageLink(this.Context.Page);
+						Logger.LogTrace("Permanently redirecting request to {redirectUrl}.", redirectUrl);
+						return RedirectPermanent(redirectUrl);
+          }
+        }
+      }
 
 			Nucleus.ViewFeatures.ViewModels.Layout viewModel = new(this.Context);
 

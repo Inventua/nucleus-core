@@ -10,6 +10,8 @@ using Nucleus.Data.Common;
 using Nucleus.Core.DataProviders;
 using Nucleus.Abstractions.Managers;
 using System.IO.Enumeration;
+using DocumentFormat.OpenXml.Office.PowerPoint.Y2021.M06.Main;
+using Nucleus.Extensions;
 
 namespace Nucleus.Core.Layout
 {
@@ -126,7 +128,17 @@ namespace Nucleus.Core.Layout
 						Logger.LogTrace("Lookup page by path '{path}'.", requestedPath);
 
 						await FindPage(requestedPath);
-					}
+
+            if (this.Context.Page == null)
+            {
+              // if the page was not found, try searching for path & query
+              string requestedPathAndQuery = System.Web.HttpUtility.UrlDecode(context.Request.Path + context.Request.QueryString);
+
+              Logger.LogTrace("Lookup page by path '{path}'.", requestedPathAndQuery);
+
+              await FindPage(requestedPathAndQuery);
+            }
+          }
 
 					if (this.Context.Page != null)
 					{
@@ -183,7 +195,7 @@ namespace Nucleus.Core.Layout
 
 				if (page != null)
 				{
-					return new() { Page = page, RequestPath = requestPath };					
+					return new() { Page = page, RequestPath = requestPath, MatchedRoute = GetFoundRoute(page, requestPath) };					
 				}
 
 				string partPath = requestPath;
@@ -191,7 +203,7 @@ namespace Nucleus.Core.Layout
 
 				while (this.Context.Page == null && !String.IsNullOrEmpty(partPath))
 				{
-					int lastIndexOfSeparator = partPath.LastIndexOf('/');
+					int lastIndexOfSeparator = partPath.LastIndexOfAny(new char[] { '/', '&', '?' });
 					string nextParameterPart = partPath[(lastIndexOfSeparator + 1)..];
 					if (nextParameterPart.Length > 0)
 					{
@@ -212,7 +224,7 @@ namespace Nucleus.Core.Layout
 						page = await this.PageManager.Get(this.Context.Site, partPath);
 						if (page != null)
 						{
-							return new() { Page = page, LocalPath = new(parameters), RequestPath = requestPath };							
+							return new() { Page = page, LocalPath = new(parameters), RequestPath = requestPath, MatchedRoute = GetFoundRoute(page, partPath)};							
 						}
 					}
 				}
@@ -224,8 +236,21 @@ namespace Nucleus.Core.Layout
 			{
 				this.Context.Page = found.Page;
 				this.Context.LocalPath = found.LocalPath;
+        this.Context.MatchedRoute = found.MatchedRoute;
 			}		
 		}
+
+    private PageRoute GetFoundRoute(Page page, string matchedPath)
+    {
+      foreach (PageRoute pageRoute in page.Routes.ToArray())
+      {
+        if (pageRoute.Path.Equals(matchedPath, StringComparison.OrdinalIgnoreCase))
+        {
+          return pageRoute;
+        }
+      }
+      return page.DefaultPageRoute();
+    }
 
 		/// <summary>
 		/// Gets whether to skip site detection

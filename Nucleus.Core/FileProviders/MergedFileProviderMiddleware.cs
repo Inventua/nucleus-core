@@ -190,23 +190,23 @@ namespace Nucleus.Core.FileProviders
 
 		private static Boolean TryProvider(IFileProvider provider, string path, Stream stream)
 		{
-			StreamReader reader;
-			StreamWriter writer = new(stream, new UTF8Encoding(false));
+      using (StreamWriter writer = new(stream, new UTF8Encoding(false), 1024, true))
+      {
+        IFileInfo file = provider.GetFileInfo(path);
 
-			IFileInfo file = provider.GetFileInfo(path);
+        if (file != null && file.Exists)
+        {
+          string content = $"{Environment.NewLine}/* {path}  */{Environment.NewLine}";
+          writer.Write(content);
 
-			if (file != null && file.Exists)
-			{
-				string content = $"{Environment.NewLine}/* {path}  */{Environment.NewLine}";
-				writer.Write(content);
-
-				reader = new StreamReader(file.CreateReadStream(), new UTF8Encoding(false));
-
-				writer.Write(reader.ReadToEnd());
-				writer.Flush();
-
-				return true;
-			}
+          using (StreamReader reader = new StreamReader(file.CreateReadStream(), new UTF8Encoding(false)))
+          {
+            writer.Write(reader.ReadToEnd());
+            writer.Flush();
+          }
+          return true;
+        }
+      }
 
 			return false;
 		}

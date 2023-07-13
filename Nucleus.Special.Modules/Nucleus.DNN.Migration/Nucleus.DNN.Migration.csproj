@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <None Remove="index.css" />
+    <None Remove="index.js" />
     <None Remove="viewer.css" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
@@ -35,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="index.js" />
     <Content Include="viewer.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />

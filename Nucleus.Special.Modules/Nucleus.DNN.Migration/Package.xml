@@ -21,7 +21,8 @@
 
 			<file name="readme.txt" />
 			<file name="index.css" />
-			
+      <file name="index.js" />
+      
 			<folder name="bin">
 				<file name="Nucleus.DNN.Migration.dll" />
 			</folder>
@@ -30,7 +31,6 @@
 				<file name="_ViewImports.cshtml" />
 				<file name="Index.cshtml" />
         <file name="_Roles.cshtml" />
-        <file name="_Files.cshtml" />
         <file name="_Pages.cshtml" />
         <file name="_Users.cshtml" />
         <file name="_Lists.cshtml" />

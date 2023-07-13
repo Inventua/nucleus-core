@@ -1,5 +1,6 @@
 ﻿@model Nucleus.DNN.Migration.ViewModels.Index
 @Html.AddStyle("~!/../index.css")
+@Html.AddScript("~!../index.js")
 <h2 class="nucleus-control-panel-heading">DNN Migration</h2>
 <div class="dnn-migration">
   @if (Model.Version == null)
@@ -87,8 +88,6 @@
     <modal id="MigratePages" title="Migrate Pages"></modal>
     <modal id="MigrateUsers" title="Migrate Users"></modal>
     <modal id="MigrateForums" title="Migrate Forums"></modal>
-    <modal id="PasswordResetNotification" title="Send Password Reset Notifications"></modal>
-    
+    <modal id="PasswordResetNotification" title="Send Password Reset Notifications"></modal>    
   }
-
 </div>

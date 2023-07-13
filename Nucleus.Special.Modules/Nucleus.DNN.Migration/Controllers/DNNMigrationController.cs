@@ -229,12 +229,12 @@ public class DNNMigrationController : Controller
   {
     ViewModels.Index viewModel = new();
 
-    viewModel.Version = await this.DNNMigrationManager.GetDNNVersion();
-    viewModel.Portals = await this.DNNMigrationManager.ListDNNPortals();
-
-    DatabaseConnectionOption connection = this.DatabaseOptions.Value.GetDatabaseConnection(Startup.DNN_SCHEMA_NAME);
+    DatabaseConnectionOption connection = this.DatabaseOptions.Value.GetDatabaseConnection(Startup.DNN_SCHEMA_NAME, false);
     if (connection != null)
     {
+      viewModel.Version = await this.DNNMigrationManager.GetDNNVersion();
+      viewModel.Portals = await this.DNNMigrationManager.ListDNNPortals();
+
       viewModel.ConnectionString = Sanitize(connection.ConnectionString);
     }
   

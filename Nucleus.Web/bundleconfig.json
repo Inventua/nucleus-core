@@ -112,5 +112,11 @@
     "inputFiles": [
       "Resources/Libraries/HtmlEditors/tinymce/Nucleus/tinymce.pages.js"
     ]
+  },
+  {
+    "outputFileName": "Resources/js/nucleus-admin-extensions.min.js",
+    "inputFiles": [
+      "Resources/js/nucleus-admin-extensions.js"
+    ]
   }
 ]

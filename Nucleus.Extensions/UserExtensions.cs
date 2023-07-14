@@ -53,22 +53,24 @@ namespace Nucleus.Extensions
     }
 
     /// <summary>
-    /// Return a copy of the supplied user with sensitive data removed.
+    /// Return a copy of the supplied user with sensitive data (role memberships, and most secrets) removed.
     /// </summary>
     /// <param name="user"></param>
     /// <returns></returns>
     public static User GetCensored(this User user)
 		{
-			return new User()
-			{
-				Id = user.Id,
-				Profile = user.Profile,
-				UserName = user.UserName,
-				Secrets = new() 
-				{ 
-					PasswordResetToken = user.Secrets?.PasswordResetToken, 
-					VerificationToken = user.Secrets?.VerificationToken 
-				}
+      return new User()
+      {
+        Id = user.Id,
+        Profile = user.Profile,
+        UserName = user.UserName,
+        Secrets = new()
+        {
+          PasswordResetToken = user.Secrets?.PasswordResetToken,
+          PasswordResetTokenExpiryDate = user.Secrets?.PasswordResetTokenExpiryDate,
+          VerificationToken = user.Secrets?.VerificationToken,
+          VerificationTokenExpiryDate = user.Secrets?.VerificationTokenExpiryDate
+        }
 			};
 		}
 	}

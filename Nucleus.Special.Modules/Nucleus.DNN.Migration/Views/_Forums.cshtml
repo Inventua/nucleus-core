@@ -58,9 +58,12 @@
                           <td class="glyph-@result.Type">@result.Message</td>
                         </tr>
                       }
-                      <tr>
-                        <td class="glyph-Information">There are @forum.PostCount posts to migrate.</td>
-                      </tr>
+                      @if (forum.CanSelect)
+                      {
+                        <tr>
+                          <td class="glyph-Information">There are @forum.PostCount posts to migrate.</td>
+                        </tr>
+                      }
                     </table>
                   </td>
                 </tr>

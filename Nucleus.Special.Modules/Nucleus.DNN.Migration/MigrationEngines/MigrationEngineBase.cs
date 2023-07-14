@@ -11,7 +11,7 @@ namespace Nucleus.DNN.Migration.MigrationEngines;
 public abstract class MigrationEngineBase<TModel> : MigrationEngineBase 
   where TModel : Nucleus.DNN.Migration.Models.DNN.DNNEntity
 { 
-  public MigrationEngineBase(string modelFriendlyName) : base(modelFriendlyName) { }
+  public MigrationEngineBase(string title) : base(title) { }
 
 
   private List<TModel> _items;
@@ -36,7 +36,7 @@ public abstract class MigrationEngineBase<TModel> : MigrationEngineBase
     }
   }
 
-  public void UpdateSelections(List<TModel> items)
+  virtual public void UpdateSelections(List<TModel> items)
   {
     foreach (TModel item in items)
     {
@@ -74,9 +74,9 @@ public abstract class MigrationEngineBase
     Completed
   }
 
-  public MigrationEngineBase(string modelFriendlyName)
+  public MigrationEngineBase(string title)
   {
-    this.Title = $"Migrating {modelFriendlyName}";
+    this.Title = $"{title}";
   }
 
   public string Title { get; }
@@ -95,7 +95,7 @@ public abstract class MigrationEngineBase
       IsStarted = this.IsStarted,  
       State=this.State(),
       TotalCount=this.TotalCount,
-      Items = this.InnerItems
+      Items = this.InnerItems.Where(item => item.IsSelected && item.CanSelect).ToList(),
     };
     
     return copy;

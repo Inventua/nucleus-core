@@ -71,10 +71,10 @@
 
         <li class="border-top border-primary border-1 pt-3">
           <div>
-            <button type="submit" formaction="@Url.NucleusAction("PasswordResetNotificationIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#PasswordResetNotification">Send Password Reset</button>
+            <button type="submit" formaction="@Url.NucleusAction("NotifyUsersIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#NotifyUsers">Notify Users</button>
           </div>
           <div>
-            <div class="action-description">Send password reset notification emails.</div>
+            <div class="action-description">Send user notification emails.</div>
             <div class="action-remarks">
               When you migrate users, the user accounts are un-verified, and have no password set, so the user cannot log in.  This step generates a password reset token and sends a
               notification by email so that your migrated users can set a password.
@@ -87,7 +87,7 @@
     <modal id="MigrateLists" title="Migrate Lists"></modal>
     <modal id="MigratePages" title="Migrate Pages"></modal>
     <modal id="MigrateUsers" title="Migrate Users"></modal>
-    <modal id="MigrateForums" title="Migrate Forums"></modal>
-    <modal id="PasswordResetNotification" title="Send Password Reset Notifications"></modal>    
+    <modal id="MigrateForums" title="Migrate Forums Content"></modal>
+    <modal id="NotifyUsers" title="Send User Notifications"></modal>
   }
 </div>

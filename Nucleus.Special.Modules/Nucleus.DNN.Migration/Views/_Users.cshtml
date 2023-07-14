@@ -4,9 +4,9 @@
 <div>
   <div class="alert alert-primary">
     <ul>
-      <li>Super users will not be migrated.</li>
-      <li>Only Authorised Users will be migrated.</li>
-      <li>User roles will only be migrated if a role with the same name already exists in Nucluus.</li>
+      <li>Super users and administrator users will not be migrated.</li>
+      <li>Un-authorised users will not be migrated.</li>
+      <li>User roles will only be migrated if a role with the same name already exists in Nucleus.</li>
       <li>There are @Model.Users.Where(user => user.IsSelected).Count() users to migrate.</li>
     </ul>
   </div>

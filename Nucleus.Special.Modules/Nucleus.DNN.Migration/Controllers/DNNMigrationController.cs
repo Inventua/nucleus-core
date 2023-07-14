@@ -13,10 +13,8 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Options;
 using Nucleus.DNN.Migration.MigrationEngines;
-using Nucleus.ViewFeatures.TagHelpers;
-using DocumentFormat.OpenXml.Math;
-using Markdig.Extensions.Footnotes;
 using static Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 //https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.storage.irelationalcommand.executereaderasync?view=efcore-7.0
 
@@ -30,15 +28,19 @@ public class DNNMigrationController : Controller
   private Context Context { get; }
   private DNNMigrationManager DNNMigrationManager { get; }
   private IFileSystemManager FileSystemManager { get; }
+  private IUserManager UserManager { get; }
+  private IMailTemplateManager MailTemplateManager { get; }
 
   private IOptions<DatabaseOptions> DatabaseOptions { get; }
 
-  public DNNMigrationController(Context Context, DNNMigrationManager dnnMigrationManager, IFileSystemManager fileSystemManager, IOptions<DatabaseOptions> databaseOptions)
+  public DNNMigrationController(Context Context, DNNMigrationManager dnnMigrationManager, IFileSystemManager fileSystemManager, IOptions<DatabaseOptions> databaseOptions, IUserManager userManager, IMailTemplateManager mailTemplateManager)
   {
     this.Context = Context;
     this.DNNMigrationManager = dnnMigrationManager;
     this.FileSystemManager = fileSystemManager;
     this.DatabaseOptions = databaseOptions;
+    this.UserManager = userManager;
+    this.MailTemplateManager = mailTemplateManager;
   }
 
   [HttpGet]
@@ -75,6 +77,12 @@ public class DNNMigrationController : Controller
   public async Task<ActionResult> UsersIndex(ViewModels.Index viewModel)
   {
     return View("_Users", await BuildUsersViewModel(viewModel.PortalId));
+  }
+
+  [HttpPost]
+  public async Task<ActionResult> NotifyUsersIndex(ViewModels.Notify viewModel)
+  {
+    return View("_Notify", await BuildNotifyUsersViewModel());
   }
 
   [HttpPost]
@@ -191,6 +199,32 @@ public class DNNMigrationController : Controller
     return View("_Progress", await BuildProgressViewModel());
   }
 
+  [HttpPost]
+  [DisableRequestSizeLimitAttribute]
+  [RequestFormLimits(ValueCountLimit = Int32.MaxValue)]
+  public async Task<ActionResult> NotifyUsers(ViewModels.Notify viewModel)
+  {
+    if (viewModel.NotifyUserTemplateId == Guid.Empty)
+    {
+      ModelState.Clear();
+      ModelState.AddModelError<ViewModels.Notify>(viewModel => viewModel.NotifyUserTemplateId, "Please select a mail template.");
+      return BadRequest(ModelState);
+    }
+
+    NotifyUsers engine = (NotifyUsers)this.DNNMigrationManager.GetMigrationEngine<Models.NotifyUser>();      
+    engine.SetTemplate(await this.MailTemplateManager.Get(viewModel.NotifyUserTemplateId));
+
+    this.DNNMigrationManager.GetMigrationEngine<Models.NotifyUser>().UpdateSelections(viewModel.Users);
+    this.DNNMigrationManager.GetMigrationEngine<Models.NotifyUser>().SignalStart();
+
+    Task task = Task.Run(async () =>
+    {
+      await this.DNNMigrationManager.GetMigrationEngine<Models.NotifyUser>().Migrate(false);
+    });
+
+    return View("_Progress", await BuildProgressViewModel());
+  }
+
   [HttpGet]
   public async Task<ActionResult> UpdateProgress(ViewModels.Progress viewModel)
   {
@@ -249,7 +283,7 @@ public class DNNMigrationController : Controller
 
     string message = this.DNNMigrationManager.GetMigrationEngines.Where(engine => engine.State() == EngineStates.InProgress)
       .Select(engine => engine.Message)
-      .FirstOrDefault(); ;
+      .FirstOrDefault(); 
 
     ViewModels.Progress viewModel = new()
     {
@@ -359,6 +393,45 @@ public class DNNMigrationController : Controller
     }
 
     return viewModel;
+  }
+
+  private async Task<ViewModels.Notify> BuildNotifyUsersViewModel()
+  {
+    ViewModels.Notify viewModel = new();
+    viewModel.Users = new();
+
+    // we have to call UserManager.Get because .List does not include the secrets property.  We have to loop 
+    // instead of using linq because you can't call an async method from within a linq .Where clause.
+    foreach (User user in await this.UserManager.List(this.Context.Site))
+    {
+      if (await IncludeUser(user))
+        viewModel.Users.Add(new NotifyUser() { User = user, CanSelect = true, IsSelected = true });
+    }
+
+    viewModel.MailTemplates = await this.MailTemplateManager.List(this.Context.Site);
+
+    viewModel.IsMailConfigured = !String.IsNullOrEmpty(this.Context.Site.GetSiteMailSettings().HostName);
+
+    this.DNNMigrationManager.ClearMigrationEngines();
+    await this.DNNMigrationManager.CreateMigrationEngine<NotifyUser>(this.HttpContext.RequestServices, viewModel.Users);
+
+    foreach (MigrationEngineBase engine in this.DNNMigrationManager.GetMigrationEngines)
+    {
+      await engine.Validate();
+    }
+
+    return viewModel;
+  }
+
+  /// <summary>
+  /// Read full user details and return a value to indicate whether the user needs a notification email.
+  /// </summary>
+  /// <param name="user"></param>
+  /// <returns></returns>
+  private async Task<Boolean> IncludeUser(User user)
+  {
+    User fullUser = await this.UserManager.Get(user.Id);
+    return (fullUser.Secrets == null || fullUser.Secrets.PasswordHash == null) && !fullUser.Verified;
   }
 
   /// <summary>

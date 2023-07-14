@@ -16,7 +16,7 @@ public class ListMigration : MigrationEngineBase<Models.DNN.List>
   private Nucleus.Abstractions.Models.Context Context { get; }
   private DNNMigrationManager MigrationManager { get; }
 
-  public ListMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IListManager listManager) : base("Lists")
+  public ListMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IListManager listManager) : base("Migrating Lists")
   {
     this.MigrationManager = migrationManager;
     this.Context = context;

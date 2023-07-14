@@ -8,6 +8,9 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 using Nucleus.Extensions;
+using Microsoft.Extensions.Logging;
+using DocumentFormat.OpenXml.Drawing;
+using System.ComponentModel.DataAnnotations;
 
 namespace Nucleus.DNN.Migration.MigrationEngines;
 
@@ -21,9 +24,11 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
   private IContainerManager ContainerManager { get; }
   private ILayoutManager LayoutManager { get; }
 
+  private ILogger<PageMigration> Logger { get; }
+
   private IEnumerable<Nucleus.DNN.Migration.MigrationEngines.ModuleContent.ModuleContentMigrationBase> ModuleContentMigrations { get; }
 
-  public PageMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IRoleManager roleManager, ILayoutManager layoutManager, IContainerManager containerManager, IEnumerable<Nucleus.DNN.Migration.MigrationEngines.ModuleContent.ModuleContentMigrationBase> moduleContentMigrations) : base("Pages")
+  public PageMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IRoleManager roleManager, ILayoutManager layoutManager, IContainerManager containerManager, IEnumerable<Nucleus.DNN.Migration.MigrationEngines.ModuleContent.ModuleContentMigrationBase> moduleContentMigrations, ILogger<PageMigration> logger) : base("Migrating Pages, Modules, Settings and Content")
   {
     this.Context = context;
     this.MigrationManager = migrationManager;
@@ -33,6 +38,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     this.ContainerManager = containerManager;
     this.RoleManager = roleManager;
     this.ModuleContentMigrations = moduleContentMigrations;
+    this.Logger = logger;
   }
 
   public async override Task Migrate(Boolean updateExisting)
@@ -109,11 +115,13 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
           }
           catch (Exception ex)
           {
+            this.Logger.LogError(ex, "New page creation failed");
             dnnPage.AddError($"New page creation failed: {ex.Message}");
           }
         }
         catch (Exception ex)
         {
+          this.Logger.LogError(ex, "Error importing page '{pageName}", dnnPage.PageName);
           dnnPage.AddError($"Error importing page '{dnnPage.PageName}': {ex.Message}");
         }
 
@@ -155,12 +163,13 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
               }
             }
 
-              // save again in case any module migrations added/ changed anything
+            // save again in case any module migrations added/ changed anything
             await this.PageManager.Save(this.Context.Site, newPage);
           }
         }
         catch (Exception ex)
         {
+          this.Logger.LogError(ex, "Error importing page '{pageName}'", dnnPage.PageName);
           dnnPage.AddError($"Error importing page '{dnnPage.PageName}': {ex.Message}");
         }
 
@@ -175,7 +184,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     Guid siteMapModuleDefinitionId = new("0392bf73-c646-4ccc-bcb5-372a75b9ea84");
     string siteMapTitle = newPage.Name;
     Nucleus.Abstractions.Models.PageModule newModule = null;
-   
+
     if (updateExisting)
     {
       newModule = newPage.Modules
@@ -206,7 +215,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
       .FirstOrDefault();
 
     newModule.ModuleSettings.Set("sitemap:maxlevels", 1);
-    newModule.ModuleSettings.Set("sitemap:root-page-type", "CurrentPage");    
+    newModule.ModuleSettings.Set("sitemap:root-page-type", "CurrentPage");
     newModule.ModuleSettings.Set("sitemap:show-description", true);
     newModule.ModuleSettings.Set("sitemap:direction", "Vertical");
 
@@ -401,6 +410,16 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
             }
             else
             {
+              // Special case: validate that there is only one login module on a page
+              if (newModule.ModuleDefinition.Id == Guid.Parse("f0a9ec71-c29e-436e-96e1-72dcdc44c32b") && 
+                 (newPage.Modules
+                    .Where(module => module.ModuleDefinition.Id == Guid.Parse("f0a9ec71-c29e-436e-96e1-72dcdc44c32b"))
+                    .Count()) > 1)
+              {                
+                dnnPage.AddWarning($"A login module was not added to the '{dnnPage.PageName}' page because it already contains a login module.");
+                return;
+              }
+
               // we must save the page module record before adding content
               try
               {
@@ -429,6 +448,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
               }
               catch (Exception ex)
               {
+                this.Logger.LogError(ex, "Page module '{moduleTitle}' [{moduleName}] was added to the page, but migrating content failed.", dnnModule.ModuleTitle, dnnModule.DesktopModule.ModuleName);
                 dnnPage.AddError($"Page module '{dnnModule.ModuleTitle}' [{dnnModule.DesktopModule.ModuleName}] was added to the page, but migrating content failed with error: {ex.Message}");
               }
             }

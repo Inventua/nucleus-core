@@ -1,0 +1,68 @@
+﻿@model Nucleus.DNN.Migration.ViewModels.Notify
+@using Nucleus.Extensions
+@Html.AddStyle("~!/../index.css")
+<h2 class="nucleus-control-panel-heading">Notify Users</h2>
+<div>
+  @if (!Model.IsMailConfigured)
+  {
+    <div class="alert alert-primary">
+      Mail settings are not configured for this site.
+    </div>
+  }
+  else
+  {
+    @using (Html.BeginNucleusForm("NotifyUsers", "DNNMigration", "DNNMigration", FormMethod.Post, new { data_target = "#NotifyUsers" }))
+    {
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="Email Template" helptext="Specifies the email template to use to notify users.">
+          @Html.DropDownListFor(model => model.NotifyUserTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+        </SettingsControl>
+
+        <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-before mb-0" data-confirm="Notify selected users now?  This action cannot be reversed.">Notify Users</button>
+      </div>
+
+      <div class="my-2">
+        <h2>Users</h2>
+        <div class="overflow-auto">
+          <table class="table table-striped table-sm">
+            <thead>
+              <tr>
+                <th>@Html.CheckBox("toggle-all", true, new { @class = "toggle-all", @id = "" } )</th>
+                <th>User Name</th>
+                <th>Email</th>
+                <th>Messages</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (int index = 0; index < Model.Users.Count; index++)
+              {
+                <tr>
+                  <td>
+                    @if (Model.Users[index].CanSelect)
+                    {
+                      @Html.CheckBoxFor(model=> model.Users[index].IsSelected)
+                    }
+                    @Html.HiddenFor(model=> model.Users[index].CanSelect)
+                    @Html.HiddenFor(model=> model.Users[index].User.Id)
+                  </td>
+                  <td>@Model.Users[index].User.UserName</td>
+                  <td>@Model.Users[index].User?.Profile.GetProperty("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value</td>
+                  <td>
+                    <table class="table table-sm table-borderless validation-results">
+                      @foreach (var result in Model.Users[index].Results)
+                      {
+                        <tr>
+                          <td class="glyph-@result.Type">@result.Message</td>
+                        </tr>
+                      }
+                    </table>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+</div>

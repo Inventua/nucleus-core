@@ -21,7 +21,7 @@ public class ForumMigration : MigrationEngineBase<Models.DNN.Modules.Forum>
   private IUserManager UserManager { get; }
   private IFileSystemManager FileSystemManager { get; }
 
-  public ForumMigration(Nucleus.Abstractions.Models.Context context, IPageModuleManager pageModuleManager, IUserManager userManager, IFileSystemManager fileSystemManager, DNNMigrationManager migrationManager) : base("Forums")
+  public ForumMigration(Nucleus.Abstractions.Models.Context context, IPageModuleManager pageModuleManager, IUserManager userManager, IFileSystemManager fileSystemManager, DNNMigrationManager migrationManager) : base("Migrating Forums Content")
   {
     this.MigrationManager = migrationManager;
     this.PageModuleManager = pageModuleManager;
@@ -36,7 +36,6 @@ public class ForumMigration : MigrationEngineBase<Models.DNN.Modules.Forum>
 
     FileSystemProviderInfo fileSystemProvider = this.FileSystemManager.ListProviders().FirstOrDefault();
 
-    //this.Message = "";
     foreach (Models.DNN.Modules.Forum dnnForum in this.Items)
     {
       Models.ForumInfo newForum = await this.MigrationManager.GetNucleusForumInfo(dnnForum.ForumGroup.Name, dnnForum.Name);

@@ -17,7 +17,7 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
   private Nucleus.Abstractions.Models.Context Context { get; }
   private DNNMigrationManager MigrationManager { get; }
 
-  public UserMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IUserManager userManager, IRoleManager roleManager) : base("Users")
+  public UserMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IUserManager userManager, IRoleManager roleManager) : base("Migrating Users")
   {
     this.MigrationManager = migrationManager;
     this.Context = context;
@@ -48,7 +48,8 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
           }
 
           newUser.UserName = dnnUser.UserName;
-          newUser.Verified = false;
+          newUser.Approved = dnnUser.UserPortal.Authorised;
+
           newUser.IsSystemAdministrator = false;
 
           foreach (Role dnnUserRole in dnnUser.Roles)
@@ -129,6 +130,10 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
       if (user.IsSuperUser)
       {
         user.AddError("Super users can not be migrated.");
+      }
+      if (user.UserName.Equals("admin", StringComparison.OrdinalIgnoreCase) || user.Roles.Where(role => role.RoleName.Equals("Administrators", StringComparison.OrdinalIgnoreCase)).Any())
+      {
+        user.AddError("Administrator users can not be migrated.");
       }
       if (!user.UserPortal.Authorised)
       {

@@ -201,7 +201,7 @@ public class ForumsModuleContentMigration : ModuleContentMigrationBase
             }
             else
             {
-              dnnPage.AddWarning($"Permission '{scope}'/'{nucleusRole.Name}' for {displayName} was not set because a role with name '{dnnRole.RoleName}' was not found.");
+              dnnPage.AddWarning($"Permission '{scope}'/'{dnnRole.RoleName}' for {displayName} was not set because a role with name '{dnnRole.RoleName}' was not found.");
             }
           }
         }

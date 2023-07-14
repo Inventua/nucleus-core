@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Managers;
+using System.Security.Cryptography;
 
 namespace Nucleus.Core.Managers
 {
@@ -149,7 +150,7 @@ namespace Nucleus.Core.Managers
 
 		public async Task SetVerificationToken(User user)
 		{
-			user.Secrets.VerificationToken = new Random().Next(100000, 999999).ToString();
+			user.Secrets.VerificationToken = GenerateToken(20);
 			user.Secrets.VerificationTokenExpiryDate = DateTime.UtcNow.Add(this.PasswordOptions.VerificationTokenExpiry);
 
 			// Save, but only if the user already exists in the database
@@ -167,10 +168,9 @@ namespace Nucleus.Core.Managers
 			if (user.Secrets == null)
 			{
 				user.Secrets = new();
-				user.Secrets.SetPassword(Guid.NewGuid().ToString());
 			}	
 
-			user.Secrets.PasswordResetToken = new Random().Next(100000, 999999).ToString();
+			user.Secrets.PasswordResetToken = GenerateToken(20);
 			user.Secrets.PasswordResetTokenExpiryDate = DateTime.UtcNow.Add(this.PasswordOptions.PasswordResetTokenExpiry);
 			
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
@@ -179,14 +179,14 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
-		/// <summary>
-		/// Create a new <see cref="User"/> with default values.
-		/// </summary>
-		/// <returns></returns>
-		/// <remarks>
-		/// This function does not save the new <see cref="User"/> to the database.  Call <see cref="Save(Site, User)"/> to save the role group.
-		/// </remarks>
-		public async Task<User> CreateNew(Site site)
+    /// <summary>
+    /// Create a new <see cref="User"/> with default values.
+    /// </summary>
+    /// <returns></returns>
+    /// <remarks>
+    /// This function does not save the new <see cref="User"/> to the database.  Call <see cref="Save(Site, User)"/> to save the role group.
+    /// </remarks>
+    public async Task<User> CreateNew(Site site)
 		{
 			User result = new();
 			result.Roles = new();
@@ -527,5 +527,33 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
-	}
+
+    internal static readonly char[] chars =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray();
+
+    /// <summary>
+    /// Generate a random string token.
+    /// </summary>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    public static string GenerateToken(int size)
+    {
+      byte[] data = new byte[4 * size];
+      using (RandomNumberGenerator generator = RandomNumberGenerator.Create())
+      {
+        generator.GetBytes(data);
+      }
+
+      StringBuilder result = new StringBuilder(size);
+      for (int index = 0; index < size; index++)
+      {
+        var rnd = BitConverter.ToUInt32(data, index * 4);
+        var idx = rnd % chars.Length;
+
+        result.Append(chars[idx]);
+      }
+
+      return result.ToString();
+    }
+  }
 }

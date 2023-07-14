@@ -30,13 +30,13 @@
 			<div class="alert alert-primary mt-3">
 				Please enter the verification code from your welcome e-mail and click Login.
 			</div>
-			<div>
+			<div class="nucleus-flex-fields">
 				<label>
 					<span>Verification Token</span>
 					<span>@Html.TextBoxFor(model => model.VerificationToken, new { @class= "nucleus-default-control" })</span>
-				</label>
+        </label>
+        <button type="submit" class="btn btn-secondary btn-sm mt-2" formaction="@Url.NucleusAction("ResendVerificationCode", "Login", "Account")">Send new Verification Code</button>
 			</div>
-			<button type="submit" class="btn btn-secondary mt-2" formaction="@Url.NucleusAction("ResendVerificationCode", "Login", "Account")">Re-send Verification Code</button>
 		}
 
 		@if (Model.AllowRememberMe)

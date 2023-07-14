@@ -235,8 +235,9 @@ namespace Nucleus.Modules.Account.Controllers
 			user.Secrets.PasswordResetTokenExpiryDate = null;
 
 			await this.UserManager.SaveSecrets(user);
+      string uri = (await GetLoginPageUri()).ToString();
 
-			ControllerContext.HttpContext.Response.Headers.Add("X-Location", (await GetLoginPageUri()).ToString());
+			ControllerContext.HttpContext.Response.Headers.Add("X-Location", $"{uri}{(uri.Contains('?') ? "&" : "?")}username={user.UserName}&reason={nameof(System.Net.HttpStatusCode.Found)}");
 			return StatusCode((int)System.Net.HttpStatusCode.Found);
 		}
 

@@ -65,8 +65,12 @@ public class LoginController : Controller
 			case nameof(System.Net.HttpStatusCode.Forbidden):
 				viewModel.Message = "Access was denied.  Your account is not authorized to use this system.";
 				break;
-								
-			default:
+
+      case nameof(System.Net.HttpStatusCode.Found):
+        viewModel.Message = "Your settings have been updated.";
+        break;
+
+      default:
 				viewModel.Message = "";
 				break;
 		}
@@ -74,7 +78,7 @@ public class LoginController : Controller
 
 		if (!String.IsNullOrEmpty(token) && viewModel.AllowPasswordReset)
 		{
-			return View("ResetPassword", new ViewModels.ResetPassword { PasswordResetToken = token });
+			return View("ResetPassword", new ViewModels.ResetPassword { UserName = username, PasswordResetToken = token });
 		}
 		else
 		{

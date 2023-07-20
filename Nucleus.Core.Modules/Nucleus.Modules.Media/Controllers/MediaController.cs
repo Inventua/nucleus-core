@@ -14,6 +14,7 @@ using Nucleus.Extensions.Logging;
 using Nucleus.Extensions.Authorization;
 using Microsoft.AspNetCore.Http;
 using Nucleus.Extensions;
+using Nucleus.ViewFeatures;
 
 namespace Nucleus.Modules.Media.Controllers
 {
@@ -26,19 +27,8 @@ namespace Nucleus.Modules.Media.Controllers
 		private IPageModuleManager PageModuleManager { get; }
 		private ILogger<MediaController> Logger { get; }
 
-		private class ModuleSettingsKeys
-		{
-			public const string MEDIA_FILE_ID = "media:file:id";
 
-			public const string MEDIA_CAPTION = "media:caption";
-			public const string MEDIA_ALTERNATETEXT = "media:alternatetext";
-			public const string MEDIA_SHOWCAPTION = "media:showcaption";
-
-			public const string MEDIA_HEIGHT = "media:height";
-			public const string MEDIA_WIDTH = "media:width";
-			public const string MEDIA_ALWAYSDOWNLOAD = "media:alwaysdownload";
-		}
-
+    
 		public MediaController(Context Context, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, ILogger<MediaController> logger)
 		{
 			this.Context = Context;
@@ -69,46 +59,31 @@ namespace Nucleus.Modules.Media.Controllers
 		[HttpPost]
 		public async Task<ActionResult> Edit(ViewModels.Settings viewModel)
 		{
-			return View("Settings", await BuildEditorViewModel());
+			return View("Settings", await BuildEditorViewModel(viewModel));
 		}
+
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpGet]
 		[HttpPost]
-		public ActionResult Select(ViewModels.Settings viewModel)
+		public async Task<ActionResult> Select(ViewModels.Settings viewModel)
 		{
-			return View("Settings", viewModel);
+			return View("Settings", await BuildEditorViewModel(viewModel));
 		}
 
 		[HttpPost]
-		public ActionResult SelectAnother(ViewModels.Settings viewModel)
+		public async Task<ActionResult> SelectAnother(ViewModels.Settings viewModel)
 		{
 			viewModel.SelectedFile.ClearSelection();
 
-			return View("Settings", viewModel);
+			return View("Settings", await BuildEditorViewModel(viewModel));
 		}
 
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-		[HttpPost]
-		public async Task<ActionResult> Save(ViewModels.Settings viewModel)
-		{
-			if (viewModel.SelectedFile.Path != null)
-			{
-				this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.MEDIA_FILE_ID, viewModel.SelectedFile.Id);
-			}
-			else
-			{
-				this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.MEDIA_FILE_ID, Guid.Empty);
-			}
-
-			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.MEDIA_CAPTION, viewModel.Caption);
-			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.MEDIA_ALTERNATETEXT, viewModel.AlternateText);
-			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.MEDIA_SHOWCAPTION, viewModel.ShowCaption);
-
-			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.MEDIA_HEIGHT, viewModel.Height);
-			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.MEDIA_WIDTH, viewModel.Width);
-			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.MEDIA_ALWAYSDOWNLOAD, viewModel.AlwaysDownload);
-
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    [HttpPost]
+    public async Task<ActionResult> Save(ViewModels.Settings viewModel)
+    {
+      viewModel.SetSettings(this.Context.Module);
 			await this.PageModuleManager.SaveSettings(this.Context.Module);
 
 			return Ok();
@@ -134,13 +109,43 @@ namespace Nucleus.Modules.Media.Controllers
 			return View("Settings", viewModel);
 		}
 
-		private static ViewModels.Viewer.MediaTypes GetMediaType(File file, Boolean alwaysDownload)
+		private static ViewModels.Viewer.MediaTypes GetMediaType(ViewModels.Viewer viewModel, Boolean alwaysDownload)
 		{
-			if (file == null) return ViewModels.Viewer.MediaTypes.None;
+      if (alwaysDownload)
+      {
+        return ViewModels.Viewer.MediaTypes.Generic;
+      }
 
-			if (alwaysDownload) return ViewModels.Viewer.MediaTypes.Generic;
+      if (String.IsNullOrEmpty(viewModel.SourceUrl))
+      {
+        return ViewModels.Viewer.MediaTypes.None;
+      }
 
-			switch (System.IO.Path.GetExtension(file.Name).ToLower())
+      if (viewModel.SourceType == Models.Settings.AvailableSourceTypes.YouTube)
+      {
+        return ViewModels.Viewer.MediaTypes.YouTube;
+      }
+
+      string sourceFileName = "";
+      switch (viewModel.SourceType)
+      {
+        case Models.Settings.AvailableSourceTypes.File:
+          sourceFileName = viewModel.SelectedFile.Name;
+          break;
+        case Models.Settings.AvailableSourceTypes.Url:
+          int position = viewModel.Url.IndexOf('?');
+          if (position > 1)
+          {
+            sourceFileName = viewModel.Url.Substring(0, position);
+          }
+          else
+          {
+            sourceFileName = viewModel.Url;
+          }
+          break;
+      }
+
+			switch (System.IO.Path.GetExtension(sourceFileName).ToLower().Trim())
 			{
 				case ".mpeg":
 				case ".mpg":
@@ -164,7 +169,16 @@ namespace Nucleus.Modules.Media.Controllers
 					return ViewModels.Viewer.MediaTypes.Image;
 
 				default:
-					return ViewModels.Viewer.MediaTypes.Generic;
+          if (viewModel.SourceType == Models.Settings.AvailableSourceTypes.File)
+          {
+            // assume "generic" for files which don't match a known extension
+            return ViewModels.Viewer.MediaTypes.Generic;
+          }
+          else
+          {
+            // assume "video" for Urls which don't match a known extension or have no file extension
+            return ViewModels.Viewer.MediaTypes.Video;
+          }
 			}
 		}
 
@@ -178,70 +192,59 @@ namespace Nucleus.Modules.Media.Controllers
 
 			if (this.Context.Module != null)
 			{
-				Guid selectedFileId = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_FILE_ID, Guid.Empty);
+        viewModel.GetSettings(this.Context.Module);
 
-				if (selectedFileId != Guid.Empty)
-				{
-					try
-					{
-						viewModel.SelectedFile = await this.FileSystemManager.GetFile(this.Context.Site, selectedFileId);
-					}
-					catch (System.IO.FileNotFoundException)
-					{
-						// if the selected file has been deleted, set the selected file to null and allow the user to select another file
-						viewModel.SelectedFile = null;
-					}
-				}
+        if (viewModel.SourceType == Models.Settings.AvailableSourceTypes.File)
+        {
+          if (viewModel.SelectedFileId != Guid.Empty)
+          {
+            try
+            {
+              viewModel.SelectedFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedFileId);
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+              // if the selected file has been deleted, set the selected file to null and allow the user to select another file
+              viewModel.SelectedFile = null;
+            }
+          }
 
-				if (viewModel.SelectedFile != null)
-				{
-					//Folder folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFile.Parent.Id);
-					if (viewModel.SelectedFile.Parent != null)
-					{
-						// As of 1.0.1, .GetFile(site, id) always populates file.parent & file.parent.permissions
-						
-						// .GetFolder always reads permissions, and mostly comes from cache, so it will yield better performance
-						// than calling .ListPermissions.
-						// viewModel.SelectedFile.Parent = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFile.Parent.Id);
-						//viewModel.SelectedFile.Parent.Permissions = await this.FileSystemManager.ListPermissions(viewModel.SelectedFile.Parent);
-						if (HttpContext.User.HasViewPermission(this.Context.Site, viewModel.SelectedFile.Parent))
-						{
-							viewModel.Caption = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_CAPTION, "");
-							viewModel.AlternateText = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_ALTERNATETEXT, "");
-							viewModel.ShowCaption = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_SHOWCAPTION, false);
+          if (viewModel.SelectedFile != null)
+          {
+            if (viewModel.SelectedFile.Parent == null)
+            {
+              // folder is missing from the database (assume no permissions)
+              viewModel.SelectedFile = null;
+              viewModel.PermissionDenied = true;
+            }
+            else
+            // check view permissions on the file folder
+            if (!HttpContext.User.HasViewPermission(this.Context.Site, viewModel.SelectedFile.Parent))
+            {
+              viewModel.SelectedFile = null;
+              viewModel.PermissionDenied = true;
+            }
+          }
+        }
 
-							viewModel.Height = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_HEIGHT, "");
-							viewModel.Width = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_WIDTH, "");
-							viewModel.AlwaysDownload = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_ALWAYSDOWNLOAD, false);
+        switch (viewModel.SourceType)
+        {
+          case Models.Settings.AvailableSourceTypes.File:
+            viewModel.SourceUrl = Url.FileLink(viewModel.SelectedFile, true);
+            break;
+          case Models.Settings.AvailableSourceTypes.Url:
+            viewModel.SourceUrl = viewModel.Url;
+            break;
+          case Models.Settings.AvailableSourceTypes.YouTube:
+            viewModel.SourceUrl = $"https://www.youtube.com/embed/{viewModel.YoutubeId}?mute=1&autoplay={(viewModel.AutoPlay ? "1" : "0")}";
+            break;
+        }
+         
+				viewModel.SelectedItemType = GetMediaType(viewModel, viewModel.AlwaysDownload);
 
-							viewModel.SelectedItemType = GetMediaType(viewModel.SelectedFile, viewModel.AlwaysDownload);
-
-							viewModel.Style =
-								(String.IsNullOrEmpty(viewModel.Height) ? "" : $"height:{viewModel.Height};") +
-								(String.IsNullOrEmpty(viewModel.Width) ? "width: 100%;" : $"width:{viewModel.Width};");
-						}
-						else
-						{
-							// User does not have view permission for the selected file(folder)
-							viewModel.SelectedFile = null;
-							viewModel.PermissionDenied = true;
-						}
-					}
-					else
-					{
-						// folder is missing from the database (assume no permissions)
-						viewModel.SelectedFile = null;
-						viewModel.PermissionDenied = true;
-					}
-				}
-				else
-				{
-					//  no file is selected/file has been deleted
-					viewModel.SelectedFile = null;
-					viewModel.PermissionDenied = false;
-				}
-
-
+				viewModel.Style =
+					(String.IsNullOrEmpty(viewModel.Height) ? "" : $"height:{viewModel.Height};") +
+					(String.IsNullOrEmpty(viewModel.Width) ? "width: 100%;" : $"width:{viewModel.Width};");						
 			}
 
 			return viewModel;
@@ -251,39 +254,36 @@ namespace Nucleus.Modules.Media.Controllers
 		/// Initialize the view model from saved module settings
 		/// </summary>
 		/// <returns></returns>
-		private async Task<ViewModels.Settings> BuildEditorViewModel()
+		private async Task<ViewModels.Settings> BuildEditorViewModel(ViewModels.Settings viewModel)
 		{
-			ViewModels.Settings viewModel = new();
-			if (this.Context.Module != null)
-			{
-				Guid selectedFileId = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_FILE_ID, Guid.Empty);
+      if (String.IsNullOrEmpty(viewModel.SourceType))
+      {
+        viewModel = new();
+        viewModel.GetSettings(this.Context.Module);
+      }
 
-				if (selectedFileId != Guid.Empty)
-				{
-					try
-					{
-						viewModel.SelectedFile = await this.FileSystemManager.GetFile(this.Context.Site, selectedFileId);
-					}
-					catch (System.IO.FileNotFoundException)
-					{
-						// if the selected file has been deleted, set the selected file to null and allow the user to select another file
-						viewModel.SelectedFile = null;
-					}
-				}
+      viewModel.SourceTypes = new();
+      viewModel.SourceTypes.Add(Models.Settings.AvailableSourceTypes.File, "File");
+      viewModel.SourceTypes.Add(Models.Settings.AvailableSourceTypes.Url, "Url");
+      viewModel.SourceTypes.Add(Models.Settings.AvailableSourceTypes.YouTube, "YouTube");
 
-				viewModel.Caption = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_CAPTION, "");
-				viewModel.AlternateText = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_ALTERNATETEXT, "");
-				viewModel.ShowCaption = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_SHOWCAPTION, false);
+      if (viewModel.SourceType == Models.Settings.AvailableSourceTypes.File)
+      {
+        if (viewModel.SelectedFileId != Guid.Empty)
+        {
+          try
+          {
+            viewModel.SelectedFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedFileId);
+          }
+          catch (System.IO.FileNotFoundException)
+          {
+            // if the selected file has been deleted, set the selected file to null and allow the user to select another file
+            viewModel.SelectedFile = null;
+          }
+        }
+      }
 
-				viewModel.Height = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_HEIGHT, "");
-				viewModel.Width = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_WIDTH, "");
-				viewModel.AlwaysDownload = this.Context.Module.ModuleSettings.Get(ModuleSettingsKeys.MEDIA_ALWAYSDOWNLOAD, false);
-			}
-
-			return viewModel;
+      return viewModel;
 		}
-
-
-
 	}
 }

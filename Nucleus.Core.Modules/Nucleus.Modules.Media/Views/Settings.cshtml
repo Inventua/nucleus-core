@@ -4,15 +4,34 @@
 @using Nucleus.Abstractions
 @using Nucleus.Abstractions.Models.FileSystem
 <h1 class="nucleus-modal-caption">Media Settings</h1>
-@using (Html.BeginNucleusForm("Select", "Media", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+@using (Html.BeginNucleusForm("Edit", "Media", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
 	<fieldset class="flex-grow-1" role="group" aria-label="Media Settings">
-		<SettingsControl caption="File" helptext="File">
-			<div class="nucleus-flex-fields nucleus-fileselector">
-				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.SelectedFile })
-				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { })
-			</div>
-		</SettingsControl>
+    <SettingsControl caption="Source Type" helptext="Select your source type.">
+      @Html.DropDownListFor(model => model.SourceType, new SelectList(Model.SourceTypes, "Key", "Value"), new { @data_autopostbackevent = "change" })
+    </SettingsControl>
+
+    @switch (Model.SourceType)
+    {
+      case Nucleus.Modules.Media.Models.Settings.AvailableSourceTypes.File:
+		    <SettingsControl caption="File" helptext="Select your media file.">
+			    <div class="nucleus-flex-fields nucleus-fileselector">
+            @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.SelectedFile, selectAnotherActionName = "SelectAnother" })
+            @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { actionName = "UploadFile" })
+			    </div>
+		    </SettingsControl>
+        break;
+      case Nucleus.Modules.Media.Models.Settings.AvailableSourceTypes.Url:
+        <SettingsControl caption="Url" helptext="Specifies the Url to play.">
+          @Html.TextBoxFor(model => model.Url, new { @type = "url" })
+        </SettingsControl>
+        break;
+      case Nucleus.Modules.Media.Models.Settings.AvailableSourceTypes.YouTube:
+        <SettingsControl caption="YouTube Video ID" helptext="Specifies the ID of the YouTube video to play.">
+          @Html.TextBoxFor(model => model.YoutubeId, new { @maxlength = "32" })
+        </SettingsControl>
+        break;
+    }
 
 		<SettingsControl caption="Caption" helptext="Specifies the media caption.  This can be shown on screen.">
 			@Html.TextBoxFor(model => model.Caption)
@@ -26,6 +45,10 @@
 			<SettingsControl caption="Always download?" helptext="Specifies whether to always render a download link rather than rendering the content on-screen.">
 				@Html.CheckBoxFor(model => model.AlwaysDownload, new { @class = "ToggleSwitch" })
 			</SettingsControl>
+
+      <SettingsControl caption="AutoPlay?" helptext="Specifies whether to automatically play the content, if possible.  If you are playing a YouTube video, this option sets audio to muted.">
+        @Html.CheckBoxFor(model => model.AutoPlay, new { @class = "ToggleSwitch" })
+      </SettingsControl>
 		</div>
 
 		<SettingsControl caption="Alternate Text" helptext="Specifies alternate text to render for the media.  This is typically used by screen readers.">

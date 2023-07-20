@@ -26,7 +26,7 @@
 			break;
 
 		case Nucleus.Modules.Media.ViewModels.Viewer.MediaTypes.Image:
-			<img src="@Url.FileLink(Model.SelectedFile, true)" alt="@Model.AlternateText" style="@Model.Style" />
+      <img src="@Model.SourceUrl" alt="@Model.AlternateText" style="@Model.Style" />
 			@if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
 			{
 				<div class="caption">@Model.Caption</div>
@@ -34,7 +34,7 @@
 			break;
 
 		case Nucleus.Modules.Media.ViewModels.Viewer.MediaTypes.PDF:
-			<embed src="@Url.FileLink(Model.SelectedFile, true)" type="application/pdf" title="@Model.AlternateText" style="@Model.Style" />
+      <embed src="@Model.SourceUrl" type="application/pdf" title="@Model.AlternateText" style="@Model.Style" />
 			@if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
 			{
 				<div class="caption">@Model.Caption</div>
@@ -42,11 +42,19 @@
 			break;
 
 		case Nucleus.Modules.Media.ViewModels.Viewer.MediaTypes.Video:
-			<video controls src="@Url.FileLink(Model.SelectedFile, true)" title="@Model.AlternateText" style="@Model.Style"></video>
+      <video controls src="@Model.SourceUrl" title="@Model.AlternateText" style="@Model.Style" @(Model.AutoPlay ? "autoplay": "")></video>
 			@if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
 			{
 				<div class="caption">@Model.Caption</div>
 			}
 			break;
+
+    case Nucleus.Modules.Media.ViewModels.Viewer.MediaTypes.YouTube:
+      <iframe controls src="@Model.SourceUrl" frameborder="0" title="@Model.AlternateText" style="@Model.Style" allow="autoplay; encrypted-media; picture-in-picture;" allowfullscreen></iframe>
+      @if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
+      {
+        <div class="caption">@Model.Caption</div>
+      }
+      break;
 	}
 </div>

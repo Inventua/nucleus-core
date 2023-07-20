@@ -9,22 +9,11 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Nucleus.Modules.Media.ViewModels
 {
-	public class Settings
-	{
-		
-		//public string SelectedProviderKey { get; set; }
+	public class Settings : Models.Settings
+	{    
+   
+    public Dictionary<string, string> SourceTypes { get; set; }
 
-		//public Dictionary<string, Nucleus.Core.FileSystemProviders.FileSystemProviderInfo> Providers { get; set; }
-		//public Folder Current { get; set; } = new();
-		public File SelectedFile { get; set; }
-
-		public string Height { get; set; }
-		public string Width { get; set; }
-
-		public Boolean AlwaysDownload { get; set; }
-
-		public string Caption { get; set; }
-		public string AlternateText { get; set; }
-		public Boolean ShowCaption { get; set; }
+     
 	}
 }

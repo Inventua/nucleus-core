@@ -118,9 +118,8 @@ public class ForumsModuleContentMigration : ModuleContentMigrationBase
         Permissions = await BuildGroupPermissions(site, dnnPage, dnnGroup)
       };
 
-      await portable.Import(newModule, new List<object> { newGroup });
+      await portable.Import(newModule, new Nucleus.Abstractions.Portable.PortableContent("urn:nucleus:entities:forum-group", newGroup ));
     }
-
   }
 
   private async Task<List<Permission>> BuildGroupPermissions(Site site, Models.DNN.Page dnnPage, Models.DNN.Modules.ForumGroup dnnGroup)

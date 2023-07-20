@@ -27,28 +27,35 @@ public class Portable : Nucleus.Abstractions.Portable.IPortable
 
   public string Name => "Publish";
 
-  public Task<List<object>> Export(PageModule module)
+  public Task<Nucleus.Abstractions.Portable.PortableContent> Export(PageModule module)
   {
     throw new NotImplementedException();
   }
 
-  public async Task Import(PageModule module, List<object> items)
+  public async Task Import(PageModule module, Nucleus.Abstractions.Portable.PortableContent content)
   {
     Abstractions.Models.Page page = await this.PageManager.Get(module);
     Abstractions.Models.Site site = await this.SiteManager.Get(page);
-      
-    foreach (Models.Article article in items.Select(item => item.CopyTo<Models.Article>())) 
+
+    if (content.TypeURN.Equals(Models.Article.URN, StringComparison.OrdinalIgnoreCase))
     {
-      Models.Article existing = (await this.ArticlesManager.List(module))
-        .Where(doc=>doc.Title.Equals(article.Title, StringComparison.OrdinalIgnoreCase))
-        .FirstOrDefault();
-
-      if (existing != null)
+      foreach (Models.Article article in content.Items.Select(item => item.CopyTo<Models.Article>()))
       {
-        article.Id = existing.Id; 
-      }
+        Models.Article existing = (await this.ArticlesManager.List(module))
+          .Where(doc => doc.Title.Equals(article.Title, StringComparison.OrdinalIgnoreCase))
+          .FirstOrDefault();
 
-      await this.ArticlesManager.Save(module, article);
+        if (existing != null)
+        {
+          article.Id = existing.Id;
+        }
+
+        await this.ArticlesManager.Save(module, article);
+      }
+    }
+    else
+    {
+      throw new InvalidOperationException($"Type URN '{content.TypeURN}' is not recognized by the Publish module.");
     }
   }
 }

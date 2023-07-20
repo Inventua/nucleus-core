@@ -17,6 +17,8 @@ namespace Nucleus.Modules.Links.Models
 
 	public class Link : ModelBase
 	{
+    public const string URN = "urn:nucleus:entities:link";
+
 		public Guid Id { get; set; }
 		public string Title { get; set; }
 		public string Description { get; set; }

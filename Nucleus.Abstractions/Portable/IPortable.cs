@@ -29,16 +29,16 @@ public interface IPortable
   /// Import the specified items for the specified module.
   /// </summary>
   /// <param name="module"></param>
-  /// <param name="items"></param>
+  /// <param name="content"></param>
   /// <returns></returns>
-  public Task Import(Nucleus.Abstractions.Models.PageModule module, List<object> items);
+  public Task Import(Nucleus.Abstractions.Models.PageModule module, PortableContent content);
 
   /// <summary>
   /// Export items which belong to the specified module.
   /// </summary>
   /// <param name="module"></param>
   /// <returns></returns>
-  public Task<List<object>> Export(Nucleus.Abstractions.Models.PageModule module);
+  public Task<PortableContent> Export(Nucleus.Abstractions.Models.PageModule module);
 
 
 }

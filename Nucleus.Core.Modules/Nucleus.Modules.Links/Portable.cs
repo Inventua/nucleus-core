@@ -27,28 +27,35 @@ public class Portable : Nucleus.Abstractions.Portable.IPortable
 
   public string Name => "Links";
 
-  public Task<List<object>> Export(PageModule module)
+  public Task<Nucleus.Abstractions.Portable.PortableContent> Export(PageModule module)
   {
     throw new NotImplementedException();
   }
 
-  public async Task Import(PageModule module, List<object> items)
+  public async Task Import(PageModule module, Nucleus.Abstractions.Portable.PortableContent content)
   {
     Abstractions.Models.Page page = await this.PageManager.Get(module);
     Abstractions.Models.Site site = await this.SiteManager.Get(page);
-      
-    foreach (Models.Link link in items.Select(item => item.CopyTo<Models.Link>())) 
+
+    if (content.TypeURN.Equals(Models.Link.URN, StringComparison.OrdinalIgnoreCase))
     {
-      Models.Link existing = (await this.LinksManager.List(site, module))
-        .Where(doc=>doc.Title.Equals(link.Title, StringComparison.OrdinalIgnoreCase))
-        .FirstOrDefault();
-
-      if (existing != null)
+      foreach (Models.Link link in content.Items.Select(item => item.CopyTo<Models.Link>()))
       {
-        link.Id = existing.Id; 
-      }
+        Models.Link existing = (await this.LinksManager.List(site, module))
+          .Where(doc => doc.Title.Equals(link.Title, StringComparison.OrdinalIgnoreCase))
+          .FirstOrDefault();
 
-      await this.LinksManager.Save(module, link);
+        if (existing != null)
+        {
+          link.Id = existing.Id;
+        }
+
+        await this.LinksManager.Save(module, link);
+      }
+    }
+    else
+    {
+      throw new InvalidOperationException($"Type URN '{content.TypeURN}' is not recognized by the Links module.");
     }
   }
 }

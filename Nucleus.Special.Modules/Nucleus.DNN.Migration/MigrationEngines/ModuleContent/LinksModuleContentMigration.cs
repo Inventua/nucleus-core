@@ -143,7 +143,7 @@ public class LinksModuleContentMigration : ModuleContentMigrationBase
           };
         }
 
-        await portable.Import(newModule, new List<object> { newLink });
+        await portable.Import(newModule, new Nucleus.Abstractions.Portable.PortableContent("urn:nucleus:entities:link", newLink ));
       }
     };
   }

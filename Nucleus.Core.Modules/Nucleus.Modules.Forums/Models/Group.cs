@@ -11,10 +11,10 @@ namespace Nucleus.Modules.Forums.Models
 {
 	public class Group : ModelBase
 	{
-		// Groups and forums have the same permissions namespace
-		public const string URN = Forum.URN;
+    // Groups and forums have the same permissions namespace, so use Forum.URN rather than Group.URN for permissions
+    public const string URN = "urn:nucleus:entities:forum-group";
 
-		public Guid Id { get; set; }
+    public Guid Id { get; set; }
 		public Guid ModuleId { get; set; }
 
 

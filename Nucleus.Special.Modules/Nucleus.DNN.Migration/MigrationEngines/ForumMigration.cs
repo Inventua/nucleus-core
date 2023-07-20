@@ -110,7 +110,7 @@ public class ForumMigration : MigrationEngineBase<Models.DNN.Modules.Forum>
                 Attachments = postAttachments
               };
               
-              await portable.Import(newModule, new List<object> { newPost });
+              await portable.Import(newModule, new Nucleus.Abstractions.Portable.PortableContent("urn:nucleus:entities:forum-post", newPost ));
             }
             catch (Exception ex)
             {

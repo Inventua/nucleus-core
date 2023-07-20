@@ -9,6 +9,7 @@ using Nucleus.Abstractions.Portable;
 using Nucleus.Abstractions.Managers;
 using System.Security.Claims;
 using Nucleus.Modules.Forums.Models;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Nucleus.Modules.Forums;
 
@@ -33,32 +34,35 @@ public class Portable : Nucleus.Abstractions.Portable.IPortable
 
   public string Name => "Forums";
 
-  
-
-  public Task<List<object>> Export(PageModule module)
+  public Task<Nucleus.Abstractions.Portable.PortableContent> Export(PageModule module)
   {
     throw new NotImplementedException();
   }
 
-  public async Task Import(PageModule module, List<object> items)
+  public async Task Import(PageModule module, Nucleus.Abstractions.Portable.PortableContent content)
   {
     Abstractions.Models.Page page = await this.PageManager.Get(module);
     Abstractions.Models.Site site = await this.SiteManager.Get(page);
 
-    foreach (object item in items)
+    if (content.TypeURN.Equals(Models.Post.URN, StringComparison.OrdinalIgnoreCase))
     {
-      ImportItem import = item.CopyTo<ImportItem>();
-      switch (import._type)
+      foreach (object item in content.Items)
       {
-        case "ForumPost":
-          await ImportPost(module, item.CopyTo<Models.Post>());
-          break;
-
-        default:
-          await ImportGroup(module, item.CopyTo<Models.Group>());
-          break;
+        await ImportPost(module, item.CopyTo<Models.Post>());
+        break;        
       }
-      
+    }
+    else if (content.TypeURN.Equals(Models.Group.URN, StringComparison.OrdinalIgnoreCase))
+    {
+      foreach (object item in content.Items)
+      {
+        await ImportGroup(module, item.CopyTo<Models.Group>());
+        break;        
+      }
+    }
+    else
+    {
+      throw new InvalidOperationException($"Type URN '{content.TypeURN}' is not recognized by the Forums module.");      
     }
   }
 

@@ -73,7 +73,8 @@ namespace Nucleus.Modules.Forums
 
 		private async Task CheckPermissions(Group group)
 		{
-			List<PermissionType> permissionTypes = await this.PermissionsManager.ListPermissionTypes(Group.URN);
+      // Forums and groups have the same permissions namespace, so we use Forum.URN instead of Group.URN
+			List<PermissionType> permissionTypes = await this.PermissionsManager.ListPermissionTypes(Forum.URN);
 			Dictionary<Role, IList<Permission>> results = new();
 
 			// ensure that for each role with any permissions defined, there is a full set of permission types for the role

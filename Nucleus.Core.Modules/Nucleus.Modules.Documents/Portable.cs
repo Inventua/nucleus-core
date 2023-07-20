@@ -27,28 +27,35 @@ public class Portable : Nucleus.Abstractions.Portable.IPortable
 
   public string Name => "Documents";
 
-  public Task<List<object>> Export(PageModule module)
+  public Task<Nucleus.Abstractions.Portable.PortableContent> Export(PageModule module)
   {
     throw new NotImplementedException();
   }
 
-  public async Task Import(PageModule module, List<object> items)
+  public async Task Import(PageModule module, Nucleus.Abstractions.Portable.PortableContent content)
   {
     Abstractions.Models.Page page = await this.PageManager.Get(module);
     Abstractions.Models.Site site = await this.SiteManager.Get(page);
-      
-    foreach (Models.Document document in items.Select(item => item.CopyTo<Models.Document>())) 
+
+    if (content.TypeURN.Equals(Models.Document.URN))
     {
-      Models.Document existing = (await this.DocumentsManager.List(site, module))
-        .Where(doc=>doc.Title.Equals(document.Title, StringComparison.OrdinalIgnoreCase))
-        .FirstOrDefault();
-
-      if (existing != null)
+      foreach (Models.Document document in content.Items.Select(item => item.CopyTo<Models.Document>()))
       {
-        document.Id = existing.Id; 
-      }
+        Models.Document existing = (await this.DocumentsManager.List(site, module))
+          .Where(doc => doc.Title.Equals(document.Title, StringComparison.OrdinalIgnoreCase))
+          .FirstOrDefault();
 
-      await this.DocumentsManager.Save(module, document);
+        if (existing != null)
+        {
+          document.Id = existing.Id;
+        }
+
+        await this.DocumentsManager.Save(module, document);
+      }
+    }
+    else
+    {
+      throw new InvalidOperationException($"Type URN '{content.TypeURN}' is not recognized by the Documents module.");
     }
   }
 }

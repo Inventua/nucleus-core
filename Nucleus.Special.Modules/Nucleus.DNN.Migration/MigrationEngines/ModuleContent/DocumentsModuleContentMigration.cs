@@ -164,7 +164,7 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
           SortOrder = dnnDocument.SortOrderIndex
         };
 
-        await portable.Import(newModule, new List<object> { newDocument });
+        await portable.Import(newModule, new Nucleus.Abstractions.Portable.PortableContent( "urn:nucleus:entities:document", newDocument ));
       }
     };
   }

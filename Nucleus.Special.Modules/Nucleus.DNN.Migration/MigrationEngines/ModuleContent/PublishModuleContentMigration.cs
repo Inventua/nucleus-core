@@ -49,7 +49,7 @@ public class PublishModuleContentMigration : ModuleContentMigrationBase
           Featured = false
         };
 
-        await portable.Import(newModule, new List<object> { newArticle });
+        await portable.Import(newModule, new Nucleus.Abstractions.Portable.PortableContent("urn:nucleus:entities:publish-article", newArticle ));
       }
     }
   }

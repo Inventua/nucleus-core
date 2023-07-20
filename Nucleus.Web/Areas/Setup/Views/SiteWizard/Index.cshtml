@@ -7,7 +7,7 @@
 	ViewData["title"] = "Nucleus Setup Wizard";
 }
 @Html.AddStyle("~!index.css")
-
+@Html.AddScript("~/Areas/Setup/Views/SiteWizard/index.js", true)
 @{
 	var disabledAttr = new { disabled = "disabled" };
 	var enabledAttr = new { };
@@ -17,7 +17,7 @@
 {
 	<Modal id="site-wizard" title="Nucleus Setup Wizard" can-close="false">
 		<img class="logo" src="@Url.Content("~/Resources/Images/nucleus.png")" height="90" width="81" alt="Nucleus Logo" />
-		<h1>Welcome to Nucleus.</h1>
+		<h2>Welcome to Nucleus.</h2>
 		<p>This wizard will help you to set up your site.</p>
 		
 		@Html.HiddenFor(model => model.SelectedTemplate)
@@ -298,6 +298,16 @@
 				}
 			</TabContent>
 
+      <div class="wizard-progress collapse">
+        <div>
+			    <h2>Setting up Nucleus</h2>
+			    <p>Your web site is being created, please wait.</p>
+			    <div class="progress my-2">
+				    <div class="progress-bar progress-bar-striped progress-bar-animated indeterminate" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+			    </div>
+        </div>
+		  </div>
+
 			<div class="nucleus-button-panel justify-content-end">
 				<button id="wizard-button-back" class="collapse btn btn-secondary" type="button" title="Back">Back</button>
 
@@ -312,54 +322,3 @@
 	</Modal>
 }
 
-<script>
-	jQuery(document).ready(function ()
-	{
-		jQuery('button[data-bs-toggle="tab"][data-bs-target="#user-settings"]').on('shown.bs.tab', function (event)
-		{
-			jQuery('#wizard-button-next').removeClass('show');
-			jQuery('#wizard-button-finish').addClass('show');
-		});
-
-		jQuery('button[data-bs-toggle="tab"]:not([data-bs-target="#user-settings"])').on('shown.bs.tab', function (event)
-		{
-			jQuery('#wizard-button-next').addClass('show');
-			jQuery('#wizard-button-finish').removeClass('show');
-		});
-
-		jQuery('button[data-bs-toggle="tab"][data-bs-target="#site-install"]').on('shown.bs.tab', function (event)
-		{
-			jQuery('#wizard-button-back').removeClass('show');
-		});
-
-		jQuery('button[data-bs-toggle="tab"]:not([data-bs-target="#site-install"])').on('shown.bs.tab', function (event)
-		{
-			jQuery('#wizard-button-back').addClass('show');
-		});
-
-		jQuery('#site-wizard').modal('show');
-		jQuery('#wizard-button-back, #wizard-button-next').on('click', navigateTab);
-
-		Page.EnableEnhancedToolTips(true);
-	});
-
-	function navigateTab(e)
-	{
-		e.preventDefault();
-
-		var clickedButton = jQuery(e.currentTarget);
-		var currentTab = jQuery('.nav-item').has('.active');
-		var newTab;
-
-		if (clickedButton.is('#wizard-button-back'))
-		{
-			newTab = currentTab.prev();
-		}
-		else
-		{
-			newTab = currentTab.next();
-		}
-
-		newTab.find('.nav-link').tab('show');
-	}
-</script>

@@ -32,6 +32,7 @@
 	@if (Model.IsEditing)
 	{
 		@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_EDITMODE)
+    @Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_EDITMODE)
 	}
 	@Html.AddHtmlEditor()
 	@RenderSection("styles", false)

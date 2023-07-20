@@ -1,3 +1,7 @@
 ﻿@model Nucleus.Modules.TextHtml.ViewModels.Viewer
 @using Nucleus.ViewFeatures.HtmlHelpers
-@Model.Content
+@using Nucleus.ViewFeatures
+@using Nucleus.Extensions
+<section inline-edit-route="@Url.NucleusAction("UpdateContent", "TextHtml", "TextHtml", new { @id = Model.Content.Id } )">
+@Html.Raw(Model.Content.ToHtml())
+</section>

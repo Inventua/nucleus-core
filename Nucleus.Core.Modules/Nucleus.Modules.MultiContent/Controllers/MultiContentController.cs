@@ -119,7 +119,29 @@ namespace Nucleus.Modules.MultiContent.Controllers
 			return View("_ContentList", await BuildSettingsViewModel(new ViewModels.Settings()));
 		}
 
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    [HttpPost]
+    public async Task<ActionResult> UpdateTitle(Guid id, string value)
+    {
+      Content content = await this.ContentManager.Get(id);
+      content.Title = value;
+      await this.ContentManager.Save(this.Context.Module, content);
+
+      return Ok();
+    }
+
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    [HttpPost]
+    public async Task<ActionResult> UpdateContent(Guid id, string value)
+    {
+      Content content = await this.ContentManager.Get(id);
+      content.Value = value;
+      await this.ContentManager.Save(this.Context.Module, content);
+
+      return Ok();
+    }
+
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpPost]
 		public async Task<ActionResult> Delete(ViewModels.Settings viewModel, Guid id)
 		{

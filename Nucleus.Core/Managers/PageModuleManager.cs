@@ -165,11 +165,49 @@ namespace Nucleus.Core.Managers
 			InvalidateCache(module);
 		}
 
-		/// <summary>
-		/// Save the settings for the specified <see cref="PageModule"/>.
-		/// </summary>
-		/// <param name="module"></param>
-		public async Task SaveSettings(PageModule module)
+    /// <summary>
+    /// Move the specified <paramref name="module"/> to the specified <paramref name="pane"/>.  If <paramref name="beforeModule"/>
+    /// is not null, set the soft index to before it.
+    /// </summary>
+    /// <param name="module"></param>
+    /// <param name="pane"></param>
+    /// <param name="beforeModule"></param>
+    /// <returns></returns>
+    public async Task MoveTo(Page page, PageModule module, string pane, PageModule beforeModule)
+    {
+      using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+      {
+        module.Pane = pane;
+
+        if (beforeModule != null)
+        {
+          module.SortOrder = beforeModule.SortOrder - 1;
+        }
+        else
+        {
+          module.SortOrder = 1;
+        }
+
+        await provider.SavePageModule(page.Id, module);
+      }
+
+      // re-number the modules in the specified pane
+      using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+      {
+        List<PageModule> modules = (await provider.ListPageModules(page.Id))
+          .Where(module=>module.Pane.Equals(pane, StringComparison.OrdinalIgnoreCase))
+          .ToList();
+        await CheckNumbering(page.Id, modules);
+      }
+
+      InvalidateCache(module);
+    }
+
+    /// <summary>
+    /// Save the settings for the specified <see cref="PageModule"/>.
+    /// </summary>
+    /// <param name="module"></param>
+    public async Task SaveSettings(PageModule module)
 		{
 			using (DataProviders.ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{

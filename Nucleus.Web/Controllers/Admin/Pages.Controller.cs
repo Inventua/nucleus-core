@@ -15,6 +15,7 @@ using Nucleus.Abstractions.Models.Permissions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nucleus.ViewFeatures;
 using Nucleus.Extensions.Authorization;
+using System.Globalization;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -226,7 +227,32 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Editor", await BuildPageEditorViewModel(await this.PageManager.Get(viewModel.Page.Id), null, true));
 		}
 
-		[HttpPost]
+    [HttpPost]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    public async Task<ActionResult> MoveModuleTo(Guid? beforeModuleId, string pane)
+    {
+      PageModule beforeModule = null;
+
+      if (beforeModuleId.HasValue && beforeModuleId.Value != Guid.Empty)
+      {
+        beforeModule = await this.PageModuleManager.Get(beforeModuleId.Value);
+      }
+
+      await this.PageModuleManager.MoveTo(this.Context.Page, this.Context.Module, pane, beforeModule);
+      return Ok();
+    }
+
+
+    [HttpPost]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    public async Task<ActionResult> UpdateModuleTitle(string value)
+    {      
+      this.Context.Module.Title = value;
+      await this.PageModuleManager.Save(this.Context.Page, this.Context.Module);
+      return Ok();
+    }
+
+    [HttpPost]
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		public async Task<ActionResult> RemoveModulePermissionRole(ViewModels.Admin.PageEditor viewModel, Guid id)
 		{

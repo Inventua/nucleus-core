@@ -1,9 +1,6 @@
 ﻿@model Nucleus.Abstractions.Layout.ContainerContext
 @Html.AddStyle("~!/default.css")
 <div class="container-default">
-	@if (!String.IsNullOrEmpty(Model.Module.Title))
-	{
-		<h2>@Model.Module.Title</h2>
-	}
+  @Html.ModuleTitle()
 	@Model.Content
 </div>

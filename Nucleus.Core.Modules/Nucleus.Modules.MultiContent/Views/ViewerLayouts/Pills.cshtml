@@ -7,14 +7,14 @@
 	<div class="nav nav-pills@(Model.LayoutSettings.Alignment == Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.AlignmentStyles.Center ? " justify-content-center" : Model.LayoutSettings.Alignment == Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.AlignmentStyles.Right ? " justify-content-end" : " justify-content-start")@(Model.LayoutSettings.Orientation== Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.OrientationStyles.Vertical ? " flex-column" : "")@(Model.LayoutSettings.Fill ? " nav-fill" : "")@(Model.LayoutSettings.Justify ? " nav-justified" : "")" role="tablist">
 		@foreach (var content in Model.Contents)
 		{
-			<button id="pills-tabpanel-@content.Id" class="nav-link @(content == Model.Contents.First() ? "active" : "")" aria-selected="@(content == Model.Contents.First() ? "true" : "false")" aria-current="page" data-bs-toggle="tab" data-bs-target="#pills-tab-@content.Id" role="tab" type="button" aria-controls="pills-tab-@content.Id">@(!String.IsNullOrEmpty(content.Title) ? content.Title : "No title")</button>
+      <button id="pills-tabpanel-@content.Id" inline-edit-route="@Url.NucleusAction("UpdateTitle", "MultiContent", "MultiContent", new { @id = content.Id } )" class="nav-link @(content == Model.Contents.First() ? "active" : "")" aria-selected="@(content == Model.Contents.First() ? "true" : "false")" aria-current="page" data-bs-toggle="tab" data-bs-target="#pills-tab-@content.Id" role="tab" type="button" aria-controls="pills-tab-@content.Id">@(!String.IsNullOrEmpty(content.Title) ? content.Title : "No title")</button>
 		}
 	</div>
 
 	<div class="tab-content">
 		@foreach (var content in Model.Contents)
 		{
-			<div id="pills-tab-@content.Id" role="tabpanel" aria-labelledby="pills-tabpanel-@content.Id" class="tab-pane fade @(content == Model.Contents.First() ? "show active" : "")">
+      <div id="pills-tab-@content.Id" role="tabpanel" aria-labelledby="pills-tabpanel-@content.Id" inline-edit-route="@Url.NucleusAction("UpdateContent", "MultiContent", "MultiContent", new { @id = content.Id } )" class="tab-pane fade @(content == Model.Contents.First() ? "show active" : "")">
 				@(new Microsoft.AspNetCore.Html.HtmlString(content.ToHtml()))
 			</div>
 		}

@@ -9,7 +9,7 @@ namespace Nucleus.Modules.TextHtml.ViewModels
 {
 	public class Viewer
 	{
-		public HtmlString Content { get; set; } 
+    public Content Content { get; set; } 
 
 	}
 }

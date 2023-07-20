@@ -34,3 +34,46 @@
   padding: 4px 6px;
   font-size: 12px;
 }
+
+h1:focus-visible, h2:focus-visible, h3:focus-visible, h4:focus-visible, h5:focus-visible, h6:focus-visible
+{
+  line-height: normal;
+}
+
+*[contenteditable=true]
+{
+  border: dashed 2px #444;
+  margin: 1px;
+}
+
+.nucleus-move-dragsource.dragging
+{
+  cursor: move;
+}
+
+.nucleus-move-droptarget
+{
+  background-color: #d5e5ff;
+  border: solid 2px #d5e5ff;
+  border-radius: .25rem;
+}
+
+.nucleus-move-droptarget.drag-active
+{
+  border-color: #428aff;
+}
+
+.nucleus-move-droptarget.drag-active:after
+{
+  color: #428aff;
+}
+
+.nucleus-move-droptarget:after
+{
+  font-family: 'Material Icons';
+  content: '\e147'; 
+  padding: 0.25rem;
+  text-align: center;
+  display: block;
+  font-size: 1.4rem;
+}

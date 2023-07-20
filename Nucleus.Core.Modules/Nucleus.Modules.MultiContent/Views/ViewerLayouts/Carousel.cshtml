@@ -19,9 +19,9 @@
 			<div class="carousel-item @(content == Model.Contents.First() ? "active" : "")">
 				@if (!String.IsNullOrEmpty(content.Title))
 				{
-					<h3>@content.Title</h3>
+          <h3 inline-edit-route="@Url.NucleusAction("UpdateTitle", "MultiContent", "MultiContent", new { @id = content.Id } )">@content.Title</h3>
 				}
-				<div>
+        <div inline-edit-route="@Url.NucleusAction("UpdateContent", "MultiContent", "MultiContent", new { @id = content.Id } )">
 					@(new Microsoft.AspNetCore.Html.HtmlString(content.ToHtml()))
 				</div>
 			</div>

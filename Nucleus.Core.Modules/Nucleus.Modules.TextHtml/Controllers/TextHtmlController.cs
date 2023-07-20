@@ -8,6 +8,7 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions;
 using Nucleus.Extensions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Nucleus.Modules.TextHtml.Controllers
 {
@@ -45,13 +46,8 @@ namespace Nucleus.Modules.TextHtml.Controllers
 
 			if (this.Context.Module != null)
 			{
-				List<Content> contents = await this.ContentManager.List(this.Context.Module);
-
-				// Text/Html only ever has one item
-				if (contents.Count > 0)
-				{
-					viewModel.Content = new (contents.First().ToHtml());					
-				}
+        viewModel.Content =(await this.ContentManager.List(this.Context.Module))
+          .FirstOrDefault();
 			}
 
 			return viewModel;
@@ -84,5 +80,17 @@ namespace Nucleus.Modules.TextHtml.Controllers
 			
 			return Ok();
 		}
-	}
+
+
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    [HttpPost]
+    public async Task<ActionResult> UpdateContent(Guid id, string value)
+    {
+      Content content = await this.ContentManager.Get(id);
+      content.Value = value;
+      await this.ContentManager.Save(this.Context.Module, content);
+
+      return Ok();
+    }
+  }
 }

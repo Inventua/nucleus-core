@@ -56,7 +56,12 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       /// <summary>
       /// Nucleus toggleswitch control script.
       /// </summary>
-      NUCLEUS_TOGGLESWITCH
+      NUCLEUS_TOGGLESWITCH,
+
+      /// <summary>
+      /// Nucleus inline editing controls script.
+      /// </summary>
+      NUCLEUS_EDITMODE,
     }
 
     /// <summary>
@@ -113,7 +118,11 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 				case WellKnownScripts.NUCLEUS_TOGGLESWITCH:
 					scriptPath = "~/Resources/js/jquery-toggleswitch.js";
 					break;
-			}
+        case WellKnownScripts.NUCLEUS_EDITMODE:
+          scriptPath = "~/Resources/js/nucleus-editmode.js";
+          break;
+
+      }
 
       if (!String.IsNullOrEmpty(scriptPath))
       {

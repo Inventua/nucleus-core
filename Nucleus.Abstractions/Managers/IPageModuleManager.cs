@@ -69,11 +69,20 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="module"></param>
 		public Task Save(Page page, PageModule module);
 
-		/// <summary>
-		/// Save the settings for the specified <see cref="PageModule"/>.
-		/// </summary>
-		/// <param name="module"></param>
-		public Task SaveSettings(PageModule module);
+    /// <summary>
+    /// Move the specified <see cref="PageModule"/> to the target pane.
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="module"></param>
+    /// <param name="pane"></param>
+    /// <param name="beforeModule"></param>
+    public Task MoveTo(Page page, PageModule module, string pane, PageModule beforeModule);
+
+    /// <summary>
+    /// Save the settings for the specified <see cref="PageModule"/>.
+    /// </summary>
+    /// <param name="module"></param>
+    public Task SaveSettings(PageModule module);
 		
 		/// <summary>
 		/// Return a list of available permission types, sorted by SortOrder

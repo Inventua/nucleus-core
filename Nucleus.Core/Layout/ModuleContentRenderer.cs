@@ -68,6 +68,15 @@ namespace Nucleus.Core.Layout
         throw new InvalidOperationException($"{nameof(Context.Page.Modules)} is null.");
       }
 
+      // if the pane is empty, add a "move module" drag target to the top of the pane
+      if (htmlHelper.ViewContext.HttpContext.User.IsEditing(htmlHelper.ViewContext?.HttpContext, this.Context.Site, this.Context.Page))
+      {
+        if (!this.Context.Page.Modules.Where(module => module.Pane.Equals(paneName, StringComparison.OrdinalIgnoreCase)).Any())
+        {
+          output.AppendHtml(Nucleus.Extensions.PageModuleExtensions.BuildMoveDropTarget(null, paneName, $"Move to {paneName}"));
+        }
+      }
+
       // Render the module output if the module pane is the specified pane, and the user has permission to view it
       foreach (PageModule moduleInfo in this.Context.Page.Modules)
       {
@@ -93,6 +102,15 @@ namespace Nucleus.Core.Layout
               }
             }
           }
+        }
+      }
+
+      // if the pane is not empty, add a "move module" drag target to the bottom of the pane
+      if (htmlHelper.ViewContext.HttpContext.User.IsEditing(htmlHelper.ViewContext?.HttpContext, this.Context.Site, this.Context.Page))
+      {
+        if (this.Context.Page.Modules.Where(module => module.Pane.Equals(paneName, StringComparison.OrdinalIgnoreCase)).Any())
+        {
+          output.AppendHtml(Nucleus.Extensions.PageModuleExtensions.BuildMoveDropTarget(null, paneName, $"Move to bottom of {paneName}"));
         }
       }
 
@@ -205,7 +223,7 @@ namespace Nucleus.Core.Layout
             moduleView.AddCssClass("nucleus-adminviewonly");
           }
 
-					AddModuleEditControls(htmlHelper, moduleView, moduleInfo, user);
+					AddModuleEditControls(htmlHelper, moduleView, moduleInfo, user.HasEditPermission(this.Context.Site, this.Context.Page));
 				}
 
         moduleView.InnerHtml.AppendHtml(ToHtmlContent(moduleOutput));
@@ -216,30 +234,47 @@ namespace Nucleus.Core.Layout
 			return output;
 		}
 
-		private void AddModuleEditControls(IHtmlHelper htmlHelper, TagBuilder editorBuilder, PageModule moduleInfo, System.Security.Claims.ClaimsPrincipal user)
+    /// <summary>
+    /// Add inline editing controls and menus for the specified <paramref name="moduleInfo"/> to the specified 
+    /// <paramref name="editorBuilder"/>.
+    /// </summary>
+    /// <param name="htmlHelper"></param>
+    /// <param name="editorBuilder"></param>
+    /// <param name="moduleInfo"></param>
+    /// <param name="user"></param>
+    /// <remarks>
+    /// This function does not perform permissions checks.  The caller is responsible for determining whether the 
+    /// current user has edit permissions and is currently in edit mode.
+    /// </remarks>
+		private void AddModuleEditControls(IHtmlHelper htmlHelper, TagBuilder editorBuilder, PageModule moduleInfo, Boolean hasPageEditPermission)
 		{
 			IUrlHelper urlHelper = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(htmlHelper.ViewContext);
 
 			// Render edit controls
 			editorBuilder.AddCssClass("nucleus-module-editing");
 
+      editorBuilder.InnerHtml.AppendHtml(moduleInfo.BuildMoveDropTarget(moduleInfo.Pane, "Move here"));
+
 			TagBuilder formBuilder = new("form");
 			formBuilder.Attributes.Add("class", "nucleus-inline-edit-controls");
 
-			// #refresh is a dummy value - we want nucleus-shared.js#_postPartialContent to process the clicks for the inline editing functions, so we need a 
-			// non-blank data-target attribute so that the click event is bound to _postPartialContent.  
+			// #refresh is a dummy value - we want nucleus-shared.js#_postPartialContent to process the clicks for the inline
+      // editing functions, so we need a non-blank data-target attribute so that the click event is bound to _postPartialContent.  
 			// The value that we are using - "#refresh" - doesn't have any special meaning or code to process it in nucleus-shared.js.
 			formBuilder.Attributes.Add("data-target", "#refresh");
 
-      // users with module edit permissions can edit module settings and common settings
+      // add the "move" drag source button
+      formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildMoveButton("&#xe89f;", "Drag to Move", null));
+      
+      // add the "edit module settings" and "common settings" buttons
       if (!String.IsNullOrEmpty(moduleInfo.ModuleDefinition.EditAction))
       {
         formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe3c9;", "Edit Content/Settings", urlHelper.Content("~/Admin/Pages/EditModule"), null));
       }
 			formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe8b8;", "Layout and Permissions Settings", urlHelper.Content("~/Admin/Pages/EditModuleCommonSettings"), null));
 
-			// only render the delete control if the user has page-edit permissions
-			if (user.HasEditPermission(this.Context.Site, this.Context.Page))
+			// add the "delete module" button if the user has page-edit permissions
+			if (hasPageEditPermission)
 			{
 				formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildDeleteButton("&#xe14c;", "Delete Module", urlHelper.Content("~/Admin/Pages/DeletePageModuleInline"), null));
 			}
@@ -444,9 +479,7 @@ namespace Nucleus.Core.Layout
 
         TagBuilder section = new("section");
         section.InnerHtml.AppendHtml(ToHtmlContent(httpContext.Response));
-        scopedContainerContext.Content = section;
-        // // scopedContainerContext.Content = ToHtmlContent(httpContext.Response);
-        
+        scopedContainerContext.Content = section;        
 
 				Controller containerController = (Controller)moduleScope.ServiceProvider.GetService<IContainerController>();
 

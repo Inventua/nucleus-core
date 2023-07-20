@@ -77,6 +77,7 @@
 	  <None Remove="Resources\js\jquery-toggleswitch.min.js" />
 	  <None Remove="Resources\js\nucleus-admin.js" />
 	  <None Remove="Resources\js\nucleus-admin.min.js" />
+	  <None Remove="Resources\js\nucleus-editmode.js" />
 	  <None Remove="Resources\js\nucleus-shared.min.js" />
 	  <None Remove="Resources\Libraries\HtmlEditors\trumbowyg\trumbowyg.js" />
 	  <None Remove="Resources\Libraries\HtmlEditors\trumbowyg\trumbowyg.min.js" />
@@ -129,6 +130,7 @@
 	  <Content Include="Resources\js\jquery-toggleswitch.min.js" />
 	  <Content Include="Resources\js\nucleus-admin.js" />
 	  <Content Include="Resources\js\nucleus-admin.min.js" />
+	  <Content Include="Resources\js\nucleus-editmode.js" />
 	  <Content Include="Resources\js\nucleus-shared.min.js" />
 	  <Content Include="Resources\Libraries\jQuery\03.06.00\jquery.min.js" />
 	  <Content Include="Resources\js\nucleus-shared.js" />

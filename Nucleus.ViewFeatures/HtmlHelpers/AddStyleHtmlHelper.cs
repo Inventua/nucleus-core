@@ -52,7 +52,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       /// <summary>
       /// CSS classes used by inline editing controls.  This stylesheet is added automatically when the user selects editing mode.
       /// </summary>
-        NUCLEUS_EDITMODE,
+      NUCLEUS_EDITMODE,
 
       /// <summary>
       /// CSS classes for the Nucleus paging control.

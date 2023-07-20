@@ -1,5 +1,7 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+// This is a (slightly) modified version of the (internal) PathUtils class from the .net core PhysicalFileProvider - source code from
+// https://github.com/aspnet/FileSystem/blob/master/src/FS.Physical/Internal/PathUtils.cs. 
 
 using System.IO;
 using System.Linq;

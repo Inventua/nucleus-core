@@ -181,11 +181,13 @@ namespace Nucleus.Core.Managers
 
         if (beforeModule != null)
         {
+          // move before the specified module.  this gets renumbered in steps of 10 later
           module.SortOrder = beforeModule.SortOrder - 1;
         }
         else
         {
-          module.SortOrder = 1;
+          // move to end.  this gets renumbered in steps of 10 later
+          module.SortOrder = int.MaxValue;
         }
 
         await provider.SavePageModule(page.Id, module);

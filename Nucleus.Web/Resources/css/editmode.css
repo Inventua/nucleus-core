@@ -46,9 +46,16 @@ h1:focus-visible, h2:focus-visible, h3:focus-visible, h4:focus-visible, h5:focus
   margin: 1px;
 }
 
+.nucleus-move-dragsource
+{
+  margin-left: 0.25rem;
+  cursor: grab;
+}
+
 .nucleus-move-dragsource.dragging
 {
   cursor: move;
+  cursor: grabbing;
 }
 
 .nucleus-move-droptarget

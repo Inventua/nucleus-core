@@ -263,9 +263,6 @@ namespace Nucleus.Core.Layout
 			// The value that we are using - "#refresh" - doesn't have any special meaning or code to process it in nucleus-shared.js.
 			formBuilder.Attributes.Add("data-target", "#refresh");
 
-      // add the "move" drag source button
-      formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildMoveButton("&#xe89f;", "Drag to Move", null));
-      
       // add the "edit module settings" and "common settings" buttons
       if (!String.IsNullOrEmpty(moduleInfo.ModuleDefinition.EditAction))
       {
@@ -273,6 +270,9 @@ namespace Nucleus.Core.Layout
       }
 			formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe8b8;", "Layout and Permissions Settings", urlHelper.Content("~/Admin/Pages/EditModuleCommonSettings"), null));
 
+      // add the "move" drag source button
+      formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildMoveButton("&#xe89f;", "Drag and drop to move this module", null));
+            
 			// add the "delete module" button if the user has page-edit permissions
 			if (hasPageEditPermission)
 			{

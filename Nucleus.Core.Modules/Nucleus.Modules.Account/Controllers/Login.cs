@@ -169,7 +169,7 @@ public class LoginController : Controller
 					UserSession session = await this.SessionManager.CreateNew(this.Context.Site, loginUser, viewModel.AllowRememberMe && viewModel.RememberMe, ControllerContext.HttpContext.Connection.RemoteIpAddress);
 					await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
 
-					string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/").ToString() :viewModel.ReturnUrl;
+          string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/").ToString() :viewModel.ReturnUrl;
 					ControllerContext.HttpContext.Response.Headers.Add("X-Location", Url.Content(location));
 					return StatusCode((int)System.Net.HttpStatusCode.Found);
 				}

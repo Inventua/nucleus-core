@@ -12,8 +12,9 @@ namespace Nucleus.Modules.Account.ViewModels
 		public string ReturnUrl { get; set; }
 
 		public Boolean ExistingPasswordBlank { get; set; } = false;
-		
-		[Required(ErrorMessage = "Password is required")]
+    public Boolean UserPasswordExpired { get; set; } = false;
+
+    [Required(ErrorMessage = "Password is required")]
 		public string Password { get; set; }
 
 		[Required(ErrorMessage = "New Password is required")]

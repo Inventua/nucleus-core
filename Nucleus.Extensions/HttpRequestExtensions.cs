@@ -55,11 +55,17 @@ namespace Nucleus.Extensions
 		/// <exception cref="InvalidOperationException"></exception>
 		private static Boolean IsSigned(Microsoft.AspNetCore.Http.HttpRequest request, out Guid accessKey, out string signature, out string reason)
 		{
-			accessKey = Guid.Empty;
-			signature = "";
-			reason = "";
+      accessKey = Guid.Empty;
+      signature = "";
+      reason = "";
 
-			if (request.Headers.Authorization.Count != 1)
+      if (!request.Headers.Authorization.Any())
+      {
+        reason = $"Request not signed";
+        return false;
+      }
+
+      if (request.Headers.Authorization.Count > 1)
 			{
 				reason = $"Invalid request signature [invalid format]: {request.Headers.Authorization}";
 				return false;

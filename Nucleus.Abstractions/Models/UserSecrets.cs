@@ -28,10 +28,15 @@ namespace Nucleus.Abstractions.Models
 		/// </summary>
 		public string PasswordResetToken { get; set; }
 
-		/// <summary>
-		/// Expiry date/time for <see cref="PasswordResetToken"/>
+    /// <summary>
+		/// Expiry date/time for the password.  When a password is expired, the user must enter a new password the next time they log in.
 		/// </summary>
-		public DateTime? PasswordResetTokenExpiryDate { get; set; }
+		public DateTime? PasswordExpiryDate { get; set; }
+
+    /// <summary>
+    /// Expiry date/time for <see cref="PasswordResetToken"/>
+    /// </summary>
+    public DateTime? PasswordResetTokenExpiryDate { get; set; }
 
 		/// <summary>
 		/// Auto-generated token used for new user verification.
@@ -126,7 +131,10 @@ namespace Nucleus.Abstractions.Models
 		/// Set the password for the user.
 		/// </summary>
 		/// <param name="newPassword"></param>
-
+    /// <remarks>
+    /// Use <seealso cref="Nucleus.Abstractions.Managers.IUserManager.SetPassword"/> rather than this function.  The UserManager method 
+    /// sets other properties like the password expiry date.
+    /// </remarks>
 		public void SetPassword(string newPassword)
 		{
 			if (String.IsNullOrEmpty(newPassword))
@@ -143,6 +151,7 @@ namespace Nucleus.Abstractions.Models
 			this.PasswordHashAlgorithm = "SHA512";
 
 			this.LastPasswordChangedDate = DateTime.UtcNow;
+      this.PasswordExpiryDate = null;
 		}
 
 		private string HashPassword(string password)

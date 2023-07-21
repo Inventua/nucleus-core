@@ -16,6 +16,7 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.ViewFeatures;
 using Nucleus.Extensions.Authorization;
 using Nucleus.Extensions;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Nucleus.Web.Controllers
 {
@@ -155,8 +156,8 @@ namespace Nucleus.Web.Controllers
 		}
 
 		[HttpGet]
-		public ActionResult EditPassword(string returnUrl)		{
-			
+		public ActionResult EditPassword(string returnUrl)		
+    {			
 			return View("ChangePassword", new ViewModels.User.AccountPassword() { ReturnUrl = returnUrl });
 		}
 
@@ -187,32 +188,36 @@ namespace Nucleus.Web.Controllers
 
 			if (loginUser == null)
 			{
-				return Json(new { Title = "Login", Message = "Invalid username or password." });
-			}
+				ModelState.AddModelError<ViewModels.User.AccountPassword>(model => model.Password, "Invalid username or password.");
+        return BadRequest(ModelState);
+      }
 			else
 			{
 				if (String.IsNullOrEmpty(viewModel.Password) || !loginUser.Secrets.VerifyPassword(viewModel.Password))
 				{
-					return Json(new { Title = "Login", Message = "Invalid username or password." });
-				}
+					ModelState.AddModelError<ViewModels.User.AccountPassword>(model => model.Password, "Invalid password.");
+          return BadRequest(ModelState);
+        }
 				else
 				{
 					Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState = await this.UserManager.ValidatePasswordComplexity(nameof(viewModel.NewPassword), viewModel.NewPassword);
-					if (!modelState.IsValid)
-					{
-						return Json(new { Title = "Login", Message = modelState.ToErrorString() });						
-					}
-					// null password is a "last resort" check in case all password complexity rules have been removed
-					else if (!String.IsNullOrEmpty(viewModel.NewPassword)) 
-					{
-						loginUser.Secrets.SetPassword(viewModel.NewPassword);
-						await this.UserManager.SaveSecrets(loginUser);
+          if (!modelState.IsValid)
+          {
+            return BadRequest(modelState);
+          }
+          else if (String.IsNullOrEmpty(viewModel.NewPassword))
+          {
+            // null password check is a "last resort" in case all password complexity rules have been removed from config
+            ModelState.AddModelError<ViewModels.User.AccountPassword>(model => model.Password, "Invalid password.");
+            return BadRequest(ModelState);
+          }
+          else 
+          {
+						await this.UserManager.SetPassword(loginUser, viewModel.NewPassword);
 						return Redirect(Url.Content(String.IsNullOrEmpty(viewModel.ReturnUrl) ? "~/" : viewModel.ReturnUrl));
 					}
 				}
 			}
-
-			return View("ChangePassword", viewModel);
 		}
 
 		[HttpGet]

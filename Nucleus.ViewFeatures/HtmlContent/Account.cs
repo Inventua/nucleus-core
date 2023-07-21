@@ -47,7 +47,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
         accountMenuButtonBuilder.AddCssClass("btn dropdown-toggle");
         accountMenuButtonBuilder.AddCssClass(String.IsNullOrEmpty(buttonClass) ? "btn-secondary" : buttonClass);
         
-        if (!context.HttpContext.User.IsApproved() || !context.HttpContext.User.IsVerified())
+        if (!context.HttpContext.User.IsApproved() || !context.HttpContext.User.IsVerified() || context.HttpContext.User.IsPasswordExpired())
         {
           TagBuilder warningBuilder = new("span");
           warningBuilder.AddCssClass("nucleus-material-icon pe-2");
@@ -89,6 +89,19 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
           notVerifiedItemBuilder.InnerHtml.AppendHtml(notVerifiedSpanBuilder);
           accountMenuBuilder.InnerHtml.AppendHtml(notVerifiedItemBuilder);
+        }
+
+        if (context.HttpContext.User.IsPasswordExpired())
+        {
+          TagBuilder passwordExpiredItemBuilder = new("li");
+          TagBuilder passwordExpiredSpanBuilder = new("span");
+
+          passwordExpiredSpanBuilder.AddCssClass("d-inline-block text-center alert alert-warning px-1 small");
+          passwordExpiredSpanBuilder.InnerHtml.Append("Your password has expired");
+          passwordExpiredSpanBuilder.Attributes.Add("title", "Your password has expired.  You can log in, but you can't access any secured functions until you reset your password.");
+
+          passwordExpiredItemBuilder.InnerHtml.AppendHtml(passwordExpiredSpanBuilder);
+          accountMenuBuilder.InnerHtml.AppendHtml(passwordExpiredItemBuilder);
         }
 
         if (context.HttpContext.User.IsApproved() && context.HttpContext.User.IsVerified())

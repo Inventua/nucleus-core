@@ -14,6 +14,7 @@ using Nucleus.Abstractions.EventHandlers;
 using Nucleus.Abstractions.Search;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models.TaskScheduler;
+using System.Reflection.Metadata;
 
 
 namespace Nucleus.Core
@@ -128,8 +129,8 @@ namespace Nucleus.Core
       // re-evaluate a scheduled task after it has been updated/changed.
       services.AddSingleton<Services.TaskScheduler>();
       services.AddHostedService<Services.TaskScheduler>(serviceProvider => serviceProvider.GetRequiredService<Services.TaskScheduler>());
-      services.AddSingleton<ISystemEventHandler<ScheduledTask, Nucleus.Abstractions.EventHandlers.SystemEventTypes.Update>>(serviceProvider => serviceProvider.GetRequiredService<Services.TaskScheduler>());
-
+      services.AddSingleton<ISingletonSystemEventHandler<ScheduledTask, Nucleus.Abstractions.EventHandlers.SystemEventTypes.Update>>(serviceProvider => serviceProvider.GetRequiredService<Services.TaskScheduler>());
+      
       // config options
       services.AddOption<ResourceFileOptions>(configuration, ResourceFileOptions.Section);
       services.AddOption<PasswordOptions>(configuration, PasswordOptions.Section);

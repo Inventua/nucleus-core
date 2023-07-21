@@ -109,7 +109,6 @@ namespace Nucleus.Modules.Account.Controllers
 				{
           ModelState.AddModelError<ViewModels.ChangePassword>(model => model.Password, "Invalid password.");
           return BadRequest(ModelState);
-          //return Json(new { Title = "Change Password", Message = "Invalid password.", Icon = "warning" });
 				}
 				else
 				{
@@ -118,20 +117,22 @@ namespace Nucleus.Modules.Account.Controllers
 					{
 						return BadRequest(modelState);
 					}
-					// null password check is a "last resort" in case all password complexity rules have been removed from config
-					else if (!String.IsNullOrEmpty(viewModel.NewPassword))
-					{
-						loginUser.Secrets.SetPassword(viewModel.NewPassword);
-						await this.UserManager.SaveSecrets(loginUser);
+					else if (String.IsNullOrEmpty(viewModel.NewPassword))
+          {
+            // null password check is a "last resort" in case all password complexity rules have been removed from config
+            ModelState.AddModelError<ViewModels.ChangePassword>(model => model.Password, "Invalid password.");
+            return BadRequest(modelState);
+          }
+          else
+          {
+            await this.UserManager.SetPassword(loginUser, viewModel.NewPassword);
 						
 						string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
 						ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
 						return StatusCode((int)System.Net.HttpStatusCode.Found);
 					}
 				}
-			}
-
-			return View("ChangePassword", viewModel);
+			}			
 		}
 
 		private async Task<ViewModels.ChangePassword> BuildViewModel(string returnUrl)
@@ -145,10 +146,11 @@ namespace Nucleus.Modules.Account.Controllers
 			{
 				loginUser = await this.UserManager.Get(this.Context.Site, ControllerContext.HttpContext.User.Identity.Name);
 			}
-
-			return new ViewModels.ChangePassword()
+      
+      return new ViewModels.ChangePassword()
 			{
 				ExistingPasswordBlank = loginUser != null && String.IsNullOrEmpty(loginUser.Secrets.PasswordHashAlgorithm),
+        UserPasswordExpired = User.IsPasswordExpired(),
 				ReturnUrl = returnUrl
 			};
 		}

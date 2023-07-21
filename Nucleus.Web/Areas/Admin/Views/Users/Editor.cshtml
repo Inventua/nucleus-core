@@ -40,8 +40,34 @@
 						<SettingsControl caption="Verified" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user is verified.">
 							@Html.CheckBoxFor(model => model.User.Verified, new { @class = "ToggleSwitch" })
 						</SettingsControl>
-					</div>
+
+            
+				    @if (Model.User.Id == Guid.Empty)
+            {
+              @* show "temporary password" control for a new user*@
+              <SettingsControl caption="Temporary Password" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user must re-set their password the first time they log in.">
+                @Html.CheckBoxFor(model => model.ExpirePassword, new { @class = "ToggleSwitch" })
+              </SettingsControl>
+            }
+            else
+            {
+              @* for existing users, show "expire password", which does the same thing, but only if they have a password set, and their password isn't already expired *@
+              @if (!String.IsNullOrEmpty(Model.User.Secrets?.PasswordHashAlgorithm) && !Model.IsPasswordExpired)
+              {
+                <SettingsControl caption="Expire Password" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user must re-set their password the next time that they log in.">
+                  @Html.CheckBoxFor(model => model.ExpirePassword, new { @class = "ToggleSwitch" })
+                </SettingsControl>
+              }
+            }
+
+          </div>
 				}
+        @if (Model.IsPasswordExpired)
+        {
+          <div class="alert alert-info">
+            This user's password has expired.
+          </div>
+        }
 			</fieldset>
 		</TabPanel>
 

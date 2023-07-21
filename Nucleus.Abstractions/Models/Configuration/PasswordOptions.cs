@@ -37,10 +37,15 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// </summary>
 		public TimeSpan PasswordResetTokenExpiry { get; set; } = TimeSpan.FromHours(2);
 
-		/// <summary>
-		/// Specifies the time that a user verification token is valid for.
+    /// <summary>
+		/// Specifies the time that a password is valid for.
 		/// </summary>
-		public TimeSpan VerificationTokenExpiry { get; set; } = TimeSpan.FromDays(7);
+		public TimeSpan? PasswordExpiry { get; set; }
+
+    /// <summary>
+    /// Specifies the time that a user verification token is valid for.
+    /// </summary>
+    public TimeSpan VerificationTokenExpiry { get; set; } = TimeSpan.FromDays(7);
 
 		/// <summary>
 		/// List of password complexity rules

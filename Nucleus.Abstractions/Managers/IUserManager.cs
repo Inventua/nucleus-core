@@ -37,18 +37,30 @@ namespace Nucleus.Abstractions.Managers
 		/// </remarks>
 		public Task<Boolean> VerifyPassword(User user, string password);
 
-		/// <summary>
-		/// Generate and set a random password reset token.
-		/// </summary>
-		/// <param name="user"></param>
-		public Task SetPasswordResetToken(User user);
+    /// <summary>
+    /// Generate and set a random password reset token.
+    /// </summary>
+    /// <param name="user"></param>
+    /// This function saves changes to the database.
+    public Task SetPasswordResetToken(User user);
 
-		/// <summary>
-		/// Generate and set a random verification token.
-		/// </summary>
-		/// <param name="user"></param>
-		/// <returns></returns>
-		public Task SetVerificationToken(User user);
+    /// <summary>
+    /// Set a new password for the specified <paramref name="user"/>.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="newPassword"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// This function saves the new password to the database.
+    /// </remarks>
+		public Task SetPassword(User user, string newPassword);
+
+    /// <summary>
+    /// Generate and set a random verification token.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    public Task SetVerificationToken(User user);
 
 		/// <summary>
 		/// Create a new <see cref="User"/> with default values.

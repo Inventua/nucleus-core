@@ -91,14 +91,25 @@ namespace Nucleus.Extensions.Authorization
 			return !user.Claims.Where(claim => claim.Type == Nucleus.Abstractions.Authentication.Constants.NOT_VERIFIED_CLAIMTYPE).Any();
 		}
 
-		/// <summary>
-		/// Retrieve the specified claim from the user (claims principal)
+    /// <summary>
+		/// Retrieve a true/false value indicating whether the user (claims principal) password has expired.
 		/// </summary>
 		/// <param name="user"></param>
-		/// <param name="nameIdentifier"></param>
-		/// <typeparam name="T">Type to return.</typeparam>
 		/// <returns></returns>
-		public static T GetUserClaim<T>(this System.Security.Claims.ClaimsPrincipal user, string nameIdentifier)
+		public static Boolean IsPasswordExpired(this ClaimsPrincipal user)
+    {
+      return user.Claims.Where(claim => claim.Type == Nucleus.Abstractions.Authentication.Constants.PASSWORD_EXPIRED_CLAIMTYPE).Any();
+    }
+
+
+    /// <summary>
+    /// Retrieve the specified claim from the user (claims principal)
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="nameIdentifier"></param>
+    /// <typeparam name="T">Type to return.</typeparam>
+    /// <returns></returns>
+    public static T GetUserClaim<T>(this System.Security.Claims.ClaimsPrincipal user, string nameIdentifier)
 		{
 			Claim claim = user.Claims.Where(claim => claim.Type == nameIdentifier).FirstOrDefault();
 

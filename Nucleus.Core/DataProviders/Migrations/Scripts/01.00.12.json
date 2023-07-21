@@ -1,0 +1,14 @@
+{
+	"schemaName": "Nucleus.Core",
+	"version": "01.00.12",
+	"operations": [
+		{
+			"addColumn": {
+				"table": "UserSecrets",
+				"name": "PasswordExpiryDate",
+				"clrType": "DateTime",
+				"isnullable": true
+			}
+		}
+	]
+}

@@ -27,16 +27,18 @@ namespace Nucleus.Web.Controllers.Admin
 		private IUserManager UserManager { get; }
 		private IRoleManager RoleManager { get; }
 		private ClaimTypeOptions ClaimTypeOptions { get; }
+    private PasswordOptions PasswordOptions { get; }
 
-		private Context Context { get; }
+    private Context Context { get; }
 
-		public UsersController(Context context, ILogger<UsersController> logger, IUserManager userManager, IRoleManager roleManager, IOptions< ClaimTypeOptions> claimTypeOptions)
+		public UsersController(Context context, ILogger<UsersController> logger, IUserManager userManager, IRoleManager roleManager, IOptions< ClaimTypeOptions> claimTypeOptions, IOptions <PasswordOptions> passwordOptions)
 		{
 			this.Context = context;
 			this.Logger = logger;
 			this.RoleManager = roleManager;
 			this.UserManager = userManager;
 			this.ClaimTypeOptions = claimTypeOptions.Value;
+      this.PasswordOptions = passwordOptions.Value;
 		}
 
 		/// <summary>
@@ -166,7 +168,11 @@ namespace Nucleus.Web.Controllers.Admin
 					}
 								
 					viewModel.User.Secrets.SetPassword(viewModel.EnteredPassword);
-				}
+          if (this.PasswordOptions.PasswordExpiry.HasValue)
+          {
+            viewModel.User.Secrets.PasswordExpiryDate = DateTime.UtcNow.Add(this.PasswordOptions.PasswordExpiry.Value);
+          }
+        }
         else
         {
 					return BadRequest("Please enter a password.");
@@ -174,10 +180,10 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 			else
       {
-				// We must NULL viewModel.User.Secrets for existing users because model binding always creates a new (empty) .Secrets object, which would cause
-				// the data provider to overwrite an existing user's secrets record with blanks.  Setting to null prevents the data provider 
-				// from saving secrets.
-				viewModel.User.Secrets = null;
+				// We must re-read viewModel.User.Secrets for existing users because model binding always creates a new (empty) .Secrets object, which would cause
+				// the data provider to overwrite an existing user's secrets record with blanks.  
+
+				viewModel.User.Secrets = (await this.UserManager.Get(viewModel.User.Id)).Secrets;
 			}
 
 			// If the user has no roles assigned (or they have all been deleted), model binding will set .Roles to null - which is interpreted
@@ -199,6 +205,11 @@ namespace Nucleus.Web.Controllers.Admin
 					viewModel.User.Approved = existing.Approved;
 				}
 			}
+
+      if (viewModel.User.Secrets != null && viewModel.ExpirePassword)
+      {
+        viewModel.User.Secrets.PasswordExpiryDate = DateTime.UtcNow;
+      }
 
 			await this.UserManager.Save(this.Context.Site, viewModel.User);
 
@@ -241,7 +252,9 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.ClaimTypeOptions = this.ClaimTypeOptions;
 			
 			viewModel.IsCurrentUser = (user.Id == ControllerContext.HttpContext.User.GetUserId());
-			if (viewModel.User != null)
+      viewModel.IsPasswordExpired = user.Secrets?.PasswordExpiryDate < DateTime.UtcNow;
+
+      if (viewModel.User != null)
 			{
 				foreach (Role role in await this.RoleManager.List(this.Context.Site))
 				{

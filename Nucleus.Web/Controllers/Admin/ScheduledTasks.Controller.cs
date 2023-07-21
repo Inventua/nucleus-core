@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Nucleus.Extensions;
 using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Extensions.Excel;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace Nucleus.Web.Controllers.Admin;
 
@@ -98,7 +99,21 @@ public class ScheduledTasksController : Controller
 
     await this.ScheduledTaskManager.RunNow(viewModel.ScheduledTask);
 
-    return View("Index", await BuildViewModel());
+    ScheduledTask original = viewModel.ScheduledTask;
+    viewModel = await BuildViewModel(await ScheduledTaskManager.Get(viewModel.ScheduledTask.Id));
+    viewModel.ScheduledTask = original;
+
+    if (viewModel.Progress.Status == ScheduledTaskProgress.State.None)
+    {
+      viewModel.Progress = new()
+      { 
+       Status = ScheduledTaskProgress.State.Running
+      };
+    
+      viewModel.StartTime= DateTime.UtcNow;
+    }
+
+    return View("Editor", viewModel);
   }
 
   [HttpPost]
@@ -233,7 +248,8 @@ public class ScheduledTasksController : Controller
     viewModel.Progress = new() { Status = ScheduledTaskProgress.State.None };
     if (scheduledTask.Id != Guid.Empty)
     {
-      RunningTask queueItem = this.Queue.ToList().Where(item => item.ScheduledTask.Id == scheduledTask.Id).FirstOrDefault();
+      RunningTask queueItem = this.Queue.ToList().Where(item => item.ScheduledTask.Id == scheduledTask.Id)
+        .FirstOrDefault();
 
       if (queueItem != null)
       {

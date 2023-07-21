@@ -177,7 +177,41 @@ namespace Nucleus.Core.Managers
 			{
 				await provider.SaveUserSecrets(user);
 			}
-		}
+
+      this.CacheManager.UserCache().Remove(user.Id);
+    }
+
+    /// <summary>
+    /// Set a new password for the specified <paramref name="user"/>.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="newPassword"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// This function saves the new password to the database.
+    /// </remarks>
+    public async Task SetPassword(User user, string newPassword)
+    {
+      if (user.Secrets == null)
+      {
+        user.Secrets = new();
+      }
+
+      user.Secrets.SetPassword(newPassword);
+
+      if (this.PasswordOptions.PasswordExpiry.HasValue)
+      {
+        user.Secrets.PasswordExpiryDate = DateTime.UtcNow.Add(this.PasswordOptions.PasswordExpiry.Value);
+      }
+
+      using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+      {
+        await provider.SaveUserSecrets(user);
+      }
+
+      this.CacheManager.UserCache().Remove(user.Id);
+    }
+
 
     /// <summary>
     /// Create a new <see cref="User"/> with default values.

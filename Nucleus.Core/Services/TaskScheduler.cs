@@ -17,7 +17,7 @@ namespace Nucleus.Core.Services
 	/// <summary>
 	/// Manages scheduling and execution of scheduled tasks.
 	/// </summary>
-	public class TaskScheduler : IHostedService, IDisposable, Nucleus.Abstractions.EventHandlers.ISystemEventHandler<ScheduledTask, Nucleus.Abstractions.EventHandlers.SystemEventTypes.Update>
+	public class TaskScheduler : IHostedService, IDisposable, Nucleus.Abstractions.EventHandlers.ISingletonSystemEventHandler<ScheduledTask, Nucleus.Abstractions.EventHandlers.SystemEventTypes.Update>
 	{
 		// https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-5.0&tabs=visual-studio
 

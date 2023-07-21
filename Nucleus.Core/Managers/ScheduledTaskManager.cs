@@ -182,7 +182,7 @@ namespace Nucleus.Core.Managers
 		{
 			using (IScheduledTaskDataProvider provider = this.DataProviderFactory.CreateProvider<IScheduledTaskDataProvider>())
 			{				
-				await provider.SaveScheduledTask( scheduledTask);
+				await provider.SaveScheduledTask(scheduledTask);
 				this.CacheManager.ScheduledTaskCache().Remove(scheduledTask.Id);
 			}
 		}

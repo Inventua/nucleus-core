@@ -51,30 +51,22 @@ namespace Nucleus.Core.Services
 			where TModel : class 
 			where TEvent : class
 		{
-			IEnumerable<ISystemEventHandler<TModel, TEvent>> handlers;
+			List<ISystemEventHandler<TModel, TEvent>> handlers = new();
 
-			if (this.ContextAccessor.HttpContext != null && this.ContextAccessor.HttpContext.RequestServices != null)
+      // We call GetService<IEnumerable<...>> instead of GetServices because GetServices calls GetRequiredService, which throws
+      // an exception, and we just want an empty response, because it is normal for there to be no System Event Handlers
+      // for an event.
+
+      // If ContextAccessor.HttpContext.RequestServices is not null, use it to get scoped IScopedSystemEventHandlers
+      if (this.ContextAccessor.HttpContext != null && this.ContextAccessor.HttpContext.RequestServices != null)
 			{
-        // If ContextAccessor.HttpContext.RequestServices is not null, use it to get scoped ISystemEventHandlers
-
-        // We call GetService<IEnumerable<...>> instead of GetServices because GetServices calls GetRequiredService, which throws
-        // an exception, and we just want a null response, because it is normal for there to be no System Event Handlers
-        // for an event.
-        handlers = this.ContextAccessor.HttpContext.RequestServices.GetService<IEnumerable<IScopedSystemEventHandler<TModel, TEvent>>>();
-        //handlers = this.ContextAccessor.HttpContext.RequestServices.GetServices<ISystemEventHandler<TModel, TEvent>>();
+        handlers.AddRange(this.ContextAccessor.HttpContext.RequestServices.GetService<IEnumerable<IScopedSystemEventHandler<TModel, TEvent>>>());  
       }
-      else
-			{
-        // Get singleton ISingletonSystemEventHandlers
-
-        // We call GetService<IEnumerable<...>> instead of GetServices because GetServices calls GetRequiredService, which throws
-        // an exception, and we just want a null response, because it is normal for there to be no System Event Handlers
-        // for an event.
-        handlers = this.ServiceProvider.GetService<IEnumerable<ISingletonSystemEventHandler<TModel, TEvent>>>();
-        //handlers = this.ServiceProvider.GetServices<ISystemEventHandler<TModel, TEvent>>();
-      }
-
-			if (handlers != null)
+      
+      // Get singleton ISingletonSystemEventHandlers
+      handlers.AddRange(this.ServiceProvider.GetService<IEnumerable<ISingletonSystemEventHandler<TModel, TEvent>>>());
+     
+			if (handlers.Any())
 			{
 				foreach (ISystemEventHandler<TModel, TEvent> handler in handlers)
 				{
@@ -82,7 +74,6 @@ namespace Nucleus.Core.Services
 					Task task = Task.Run(() => Invoke<TModel, TEvent>(handler, item));
 				}
 			}
-
 		}
 
 		/// <summary>

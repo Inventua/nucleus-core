@@ -188,7 +188,7 @@
 	// functionality for the "open" button
 	jQuery('.nucleus-open-page').on('click', function()
 	{
-		window.parent.document.dispatchEvent(new CustomEvent('Open', { detail: { target: '/?pageid=@Model.Page.Id' } }));
+		window.parent.document.dispatchEvent(new CustomEvent('Open', { detail: { target: '@Url.PageLink(Model.Page)' } }));
 	});
 
 	// Read the child pages of the item containing the "+" button

@@ -144,7 +144,20 @@ namespace Nucleus.Core.Managers
 		/// <param name="page"></param>
 		public async Task Delete(Page page)
 		{
-			using (IPermissionsDataProvider permissionsProvider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+      using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+      {
+        // page objects from http requests/which have been created by MVC don't always have a valid site id, so we must get 
+        // the site from the database.
+        Page existing = await provider.GetPage(page.Id);
+
+        List<Page> childPages = await provider.ListPages(existing.SiteId, page.Id);
+        if (childPages.Any())
+        {
+          throw new InvalidOperationException($"This page has {childPages.Count} child page{(childPages.Count==1 ? "" : "s")}.  You must delete the child page{(childPages.Count == 1 ? "" : "s")} before you can delete this page.");
+        }
+      }
+
+      using (IPermissionsDataProvider permissionsProvider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
 			{
 				await permissionsProvider.DeletePermissions(page.Permissions);
 			}

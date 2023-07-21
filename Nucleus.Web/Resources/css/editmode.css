@@ -63,6 +63,9 @@ h1:focus-visible, h2:focus-visible, h3:focus-visible, h4:focus-visible, h5:focus
   background-color: #d5e5ff;
   border: solid 2px #d5e5ff;
   border-radius: .25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .nucleus-move-droptarget.drag-active
@@ -70,17 +73,23 @@ h1:focus-visible, h2:focus-visible, h3:focus-visible, h4:focus-visible, h5:focus
   border-color: #428aff;
 }
 
-.nucleus-move-droptarget.drag-active:after
+.nucleus-move-droptarget.drag-active
 {
   color: #428aff;
+}
+
+.nucleus-move-droptarget::before
+{
+  font-family: Calibri, inherit;
+  content: attr(data-pane-name); 
+  font-size: 0.8rem;
+  color: #668;
 }
 
 .nucleus-move-droptarget:after
 {
   font-family: 'Material Icons';
   content: '\e147'; 
-  padding: 0.25rem;
-  text-align: center;
-  display: block;
   font-size: 1.4rem;
+  line-height: 1.4rem;
 }

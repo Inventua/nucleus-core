@@ -1,0 +1,46 @@
+﻿@model Nucleus.Extensions.Shadow.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+@using (Html.BeginNucleusForm("Settings", "ShadowAdmin", "Shadow", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+	<fieldset role="group" aria-labelledby="heading">
+		<h2 class="nucleus-control-panel-heading">Settings</h2>
+    <SettingsControl caption="Page" helptext="Source page" class="shadow-pages-list">
+      @Html.PageListFor(model => model.PageId, Model.PageMenu, Guid.Empty, new { @data_autopostbackevent="change" })
+    </SettingsControl>
+		<SettingsControl caption="Source Module" helptext="Select the module to render.">
+      @Html.DropDownListFor(model => model.ModuleId, new SelectList(Model.Modules, "Id", "Name"), "(select)")
+		</SettingsControl>			
+	</fieldset>
+
+	<div class="nucleus-form-buttonrow">
+		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "ShadowAdmin", "Shadow"), new { })
+	</div>
+}
+
+<script>
+  // Read the child pages of the item containing the "+" button
+  jQuery('.shadow-pages-list').on('click', '.nucleus-get-childpages', function (e)
+  {
+    // Add a ul to contain the new pages
+    Page.LoadPartialContent(e, '@Url.NucleusAction("GetChildPages", "Admin", "Links")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+
+    // hide the "+" button
+    jQuery(this).removeClass('show');
+  });
+
+  // Hide the child pages of the item containing the "-" button
+  jQuery('.shadow-pages-list').on('click', '.nucleus-hide-childpages', function (e)
+  {
+    // hide the "-" button
+    jQuery(this).removeClass('show');
+
+    // show the "+" button
+    jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
+
+    jQuery(this).closest('li').find('ul').remove();
+  });
+</script>

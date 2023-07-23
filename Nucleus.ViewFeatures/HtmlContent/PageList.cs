@@ -32,7 +32,16 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			selectedIdBuilder.Attributes.Add("id",  propertyId);
 			selectedIdBuilder.Attributes.Add("name", propertyName);
 			selectedIdBuilder.Attributes.Add("value", selectedPageId.ToString());
-			selectedIdBuilder.Attributes.Add("type", "hidden");			
+			selectedIdBuilder.Attributes.Add("type", "hidden");
+
+      IDictionary<string, object> attributes = Nucleus.ViewFeatures.TagBuilderExtensions.GetAttributes(htmlAttributes);
+      if (attributes.TryGetValue("data-autopostbackevent", out object autopostbackevent))
+      {
+        selectedIdBuilder.Attributes.Add("data-autopostbackevent", autopostbackevent.ToString());
+        attributes.Remove("data-autopostbackevent");
+        htmlAttributes = attributes;
+      }
+
 			outputBuilder.InnerHtml.AppendHtml(selectedIdBuilder);
 
 			TagBuilder selectedItemBuilder = new("div");

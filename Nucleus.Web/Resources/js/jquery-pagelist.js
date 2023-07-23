@@ -81,9 +81,8 @@
         {
           jQuery(event.currentTarget).parent('li').addClass('selected');
         }
-        //jQuery(this).siblings().removeClass("selected");
-        //jQuery(this).addClass("selected");
         jQuery(this).closest('.nucleus-page-list').find('input[type=hidden]').val(jQuery(this).attr('data-id'));
+        jQuery(this).closest('.nucleus-page-list').find('input[type=hidden]').trigger('change');
         jQuery(this).closest('.nucleus-page-list').find('.nucleus-page-list-selected').html(jQuery(this).html());
 
         jQuery(this).closest('.nucleus-page-list').find('ul:first').removeClass('show');

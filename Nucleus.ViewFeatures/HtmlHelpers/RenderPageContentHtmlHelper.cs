@@ -44,8 +44,9 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		public static async Task<IHtmlContent> RenderPaneAsync(this IHtmlHelper htmlHelper, string paneName)
 		{
 			IModuleContentRenderer renderer = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IModuleContentRenderer>();
+      Context context = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<Context>();
 
-			return await renderer.RenderPaneAsync(htmlHelper, paneName);
+      return await renderer.RenderPaneAsync(htmlHelper, context, paneName);
 		}
 
 		/// <summary>
@@ -72,9 +73,9 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		public static async Task<IHtmlContent> RenderEditorAsync(this IHtmlHelper htmlHelper, PageModule moduleInfo, Boolean renderContainer)
 		{
 			IModuleContentRenderer renderer = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IModuleContentRenderer>();
+      Context context = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<Context>();
 
-			return await renderer.RenderModuleEditor(htmlHelper, moduleInfo, renderContainer);
+      return await renderer.RenderModuleEditor(htmlHelper, context.Site, context.Page, moduleInfo, context.LocalPath, renderContainer);
 		}
-
-	}
+  }
 }

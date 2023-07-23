@@ -23,6 +23,7 @@ using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Layout;
 using Nucleus.Extensions.Authorization;
 using Nucleus.Extensions;
+using Nucleus.Abstractions.Managers;
 
 namespace Nucleus.Core.Layout
 {
@@ -31,16 +32,21 @@ namespace Nucleus.Core.Layout
   /// </summary>
   public class ModuleContentRenderer : IModuleContentRenderer
   {
-    private Context Context { get; }
+    //private Context Context { get; }
     private IActionInvokerFactory ActionInvokerFactory { get; }
     private IHttpContextFactory HttpContextFactory { get; }
+    private IPageModuleManager PageModuleManager { get; }
+    private IPageManager PageManager { get; }
+
     private ILogger<ModuleContentRenderer> Logger { get; }
 
-    public ModuleContentRenderer(Context context, ILogger<ModuleContentRenderer> logger, IActionInvokerFactory actionInvokerFactory, IHttpContextFactory httpContextFactory)
+    public ModuleContentRenderer(IPageManager pageManager, IPageModuleManager pageModuleManager, IActionInvokerFactory actionInvokerFactory, IHttpContextFactory httpContextFactory, ILogger<ModuleContentRenderer> logger)
     {
-      this.Context = context;
+      //this.Context = context;
       this.ActionInvokerFactory = actionInvokerFactory;
       this.HttpContextFactory = httpContextFactory;
+      this.PageManager = pageManager;
+      this.PageModuleManager = pageModuleManager;
     }
 
     /// <summary>
@@ -49,46 +55,46 @@ namespace Nucleus.Core.Layout
     /// <param name="htmlHelper"></param>
     /// <param name="paneName"></param>
     /// <returns></returns>
-    public async Task<IHtmlContent> RenderPaneAsync(IHtmlHelper htmlHelper, string paneName)
+    public async Task<IHtmlContent> RenderPaneAsync(IHtmlHelper htmlHelper, Context context, string paneName)
     {
       HtmlContentBuilder output = new();
 
-      if (this.Context == null)
+      if (context == null)
       {
         throw new InvalidOperationException($"{nameof(Context)} is null.");
       }
 
-      if (this.Context.Page == null)
+      if (context.Page == null)
       {
         throw new InvalidOperationException($"{nameof(Context.Page)} is null.");
       }
 
-      if (this.Context.Page.Modules == null)
+      if (context.Page.Modules == null)
       {
         throw new InvalidOperationException($"{nameof(Context.Page.Modules)} is null.");
       }
 
       // if the pane is empty, add a "move module" drag target to the top of the pane
-      if (htmlHelper.ViewContext.HttpContext.User.IsEditing(htmlHelper.ViewContext?.HttpContext, this.Context.Site, this.Context.Page))
+      if (htmlHelper.ViewContext.HttpContext.User.IsEditing(htmlHelper.ViewContext?.HttpContext, context.Site, context.Page))
       {
-        if (!this.Context.Page.Modules.Where(module => module.Pane.Equals(paneName, StringComparison.OrdinalIgnoreCase)).Any())
+        if (!context.Page.Modules.Where(module => module.Pane.Equals(paneName, StringComparison.OrdinalIgnoreCase)).Any())
         {
           output.AppendHtml(Nucleus.Extensions.PageModuleExtensions.BuildMoveDropTarget(null, paneName, $"Move to {paneName}"));
         }
       }
 
       // Render the module output if the module pane is the specified pane, and the user has permission to view it
-      foreach (PageModule moduleInfo in this.Context.Page.Modules)
+      foreach (PageModule moduleInfo in context.Page.Modules)
       {
         if (paneName == "*" || moduleInfo.Pane.Equals(paneName, StringComparison.OrdinalIgnoreCase))
         {
           // "permission denied" for viewing a module is not a failure, it just means we don't render the module
-          if (HasViewPermission(moduleInfo, this.Context.Site, htmlHelper.ViewContext.HttpContext.User))
+          if (HasViewPermission(context.Site, context.Page, moduleInfo, htmlHelper.ViewContext.HttpContext.User))
           {
             try
             {
               // pane name '*' is a special value, used by search feed generators to render content for all panes in a plain format without containers
-              IHtmlContent moduleBody = await RenderModuleView(htmlHelper, moduleInfo, paneName != "*");
+              IHtmlContent moduleBody = await RenderModuleView(htmlHelper, context.Site, context.Page, moduleInfo, context.LocalPath, paneName != "*");
               output.AppendHtml(moduleBody);
             }
             catch (System.InvalidOperationException e)
@@ -96,7 +102,7 @@ namespace Nucleus.Core.Layout
               // If an error occurred while rendering module, and the user is an admin, display the error message in place of the module
               // content.  If the user is not an admin, suppress output of the module.							
               this.Logger?.LogError(e, "Error rendering {pane}.", moduleInfo.Pane);
-              if (htmlHelper.ViewContext.HttpContext.User.IsSiteAdmin(this.Context.Site))
+              if (htmlHelper.ViewContext.HttpContext.User.IsSiteAdmin(context.Site))
               {
                 output.AppendHtml(e.Message);
               }
@@ -106,9 +112,9 @@ namespace Nucleus.Core.Layout
       }
 
       // if the pane is not empty, add a "move module" drag target to the bottom of the pane
-      if (htmlHelper.ViewContext.HttpContext.User.IsEditing(htmlHelper.ViewContext?.HttpContext, this.Context.Site, this.Context.Page))
+      if (htmlHelper.ViewContext.HttpContext.User.IsEditing(htmlHelper.ViewContext?.HttpContext, context.Site, context.Page))
       {
-        if (this.Context.Page.Modules.Where(module => module.Pane.Equals(paneName, StringComparison.OrdinalIgnoreCase)).Any())
+        if (context.Page.Modules.Where(module => module.Pane.Equals(paneName, StringComparison.OrdinalIgnoreCase)).Any())
         {
           output.AppendHtml(Nucleus.Extensions.PageModuleExtensions.BuildMoveDropTarget(null, paneName, $"Move to bottom of {paneName}"));
         }
@@ -117,11 +123,11 @@ namespace Nucleus.Core.Layout
       return output;
     }
 
-    private IHtmlContent RenderException(HttpContext context, PageModule moduleInfo, Exception e)
+    private IHtmlContent RenderException(HttpContext context, Site site, PageModule moduleInfo, Exception e)
     {
       TagBuilder output = new("div");
 
-      if (context.User.IsSiteAdmin(this.Context.Site))
+      if (context.User.IsSiteAdmin(site))
       {
         // admin user, render error information
         output.InnerHtml.Append($"An error occurred rendering the {moduleInfo.Title} module: {e.Message}");
@@ -141,18 +147,17 @@ namespace Nucleus.Core.Layout
     /// <param name="moduleInfo"></param>
     /// <param name="user"></param>
     /// <returns></returns>
-    private Boolean HasViewPermission(PageModule moduleInfo, Site site, System.Security.Claims.ClaimsPrincipal user)
+    private Boolean HasViewPermission(Site site, Page page, PageModule moduleInfo, System.Security.Claims.ClaimsPrincipal user)
     {
-      return user.HasViewPermission(site, this.Context.Page, moduleInfo);
+      return user.HasViewPermission(site, page, moduleInfo);
     }
 
     /// <summary>
 		/// Returns a true/false value indicating whether the module permissions are set to allow only administrators to view the module.
 		/// </summary>
 		/// <param name="moduleInfo"></param>
-		/// <param name="site"></param>
 		/// <returns></returns>
-		private Boolean HasAdminPermissionOnly(PageModule moduleInfo, Site site)
+		private Boolean HasAdminPermissionOnly(PageModule moduleInfo)
     {
       return !(moduleInfo.InheritPagePermissions || moduleInfo.Permissions.Any());
     }
@@ -163,9 +168,9 @@ namespace Nucleus.Core.Layout
     /// <param name="moduleInfo"></param>
     /// <param name="user"></param>
     /// <returns></returns>
-    private Boolean HasEditPermission(PageModule moduleInfo, Site site, System.Security.Claims.ClaimsPrincipal user)
+    private Boolean HasEditPermission(Site site, Page page, PageModule moduleInfo, System.Security.Claims.ClaimsPrincipal user)
 		{
-			return user.HasEditPermission(site, this.Context.Page, moduleInfo);
+			return user.HasEditPermission(site, page, moduleInfo);
 		}
 
 		/// <summary>
@@ -176,14 +181,52 @@ namespace Nucleus.Core.Layout
 		/// <param name="renderContainer">Specifies whether to wrap the module output in a container.</param>
 		/// <returns></returns>
 
-		public async Task<IHtmlContent> RenderModuleView(IHtmlHelper htmlHelper, PageModule moduleInfo, Boolean renderContainer)
+		public async Task<IHtmlContent> RenderModuleView(IHtmlHelper htmlHelper, Site site, Page page, PageModule moduleInfo, LocalPath localPath, Boolean renderContainer)
 		{
 			HtmlContentBuilder output = new();
 			System.Security.Claims.ClaimsPrincipal user = htmlHelper.ViewContext.HttpContext.User;
 
-			if (HasViewPermission(moduleInfo, this.Context.Site, user))
+			if (HasViewPermission(site, page, moduleInfo, user))
 			{
-				HttpResponse moduleOutput = await BuildModuleOutput(htmlHelper, moduleInfo, moduleInfo.ModuleDefinition.ViewController, moduleInfo.ModuleDefinition.ViewAction, renderContainer);
+				HttpResponse moduleOutput = await BuildModuleOutput(htmlHelper, site, page, moduleInfo, localPath, moduleInfo.ModuleDefinition.ViewController, moduleInfo.ModuleDefinition.ViewAction, renderContainer);
+
+        if (moduleOutput.StatusCode == (int)System.Net.HttpStatusCode.PermanentRedirect)
+        {
+          // the shadow module uses this response to direct Nucleus to render another module            
+          if (moduleOutput.Headers.ContainsKey("X-NucleusAction") && moduleOutput.Headers.Location.First()?.StartsWith("/mid=") == true)
+          {
+            string location = moduleOutput.Headers.Location.First();
+
+            // reset the response status code and remove the headers 
+            htmlHelper.ViewContext.HttpContext.Response.StatusCode = (int)System.Net.HttpStatusCode.OK;
+            htmlHelper.ViewContext.HttpContext.Response.Headers.Remove("Location");
+            htmlHelper.ViewContext.HttpContext.Response.Headers.Remove("X-NucleusAction");
+                            
+            if (Guid.TryParse(location.Split('=')[1], out Guid moduleId))
+            {
+              PageModule redirectModuleInfo = await this.PageModuleManager.Get(moduleId);
+              Page redirectPage = await this.PageManager.Get(redirectModuleInfo.PageId);              
+              if (user.HasViewPermission(site, redirectPage, redirectModuleInfo))
+              {
+                moduleOutput = await BuildModuleOutput(htmlHelper, site, redirectPage, redirectModuleInfo, localPath, redirectModuleInfo.ModuleDefinition.ViewController, redirectModuleInfo.ModuleDefinition.ViewAction, renderContainer);
+              }
+              else
+              {
+                // user does not have view permission to the module that would be rendered, so render nothing
+                return output;
+              }
+            }
+            else
+            {
+              this.Logger?.LogTrace("A PermanentRedirect response with a X-NucleusAction header could not be handled because the location header value '{location}' did not contain valid module information.", moduleOutput.Headers.Location);
+              if (!user.IsEditing(htmlHelper.ViewContext.HttpContext, site, page))
+              {
+                // if the user is not editing, return empty content.  Otherwise continue, so that we render a module with no content (but with edit controls and a container)
+                return output;
+              }
+            }
+          }
+        }
 
 				if (moduleOutput.StatusCode == (int)System.Net.HttpStatusCode.Forbidden)
 				{
@@ -192,12 +235,12 @@ namespace Nucleus.Core.Layout
 					return output;
 				}
 
-				Boolean isEditing = user.IsEditing(htmlHelper.ViewContext?.HttpContext, this.Context.Site, this.Context.Page, moduleInfo);
-
-				if (moduleOutput.StatusCode == (int)System.Net.HttpStatusCode.NoContent)
+				Boolean isEditing = user.IsEditing(htmlHelper.ViewContext?.HttpContext, site, page, moduleInfo);
+        
+        if (moduleOutput.StatusCode == (int)System.Net.HttpStatusCode.NoContent)
 				{
 					// modules can return NoContent to indicate that they have nothing to display, and should not be rendered (including that 
-					// their container is not rendered.  We check to see if the user is editing the page & ignore NoContent so that editors
+					// their container is not rendered).  We check to see if the user is editing the page & ignore NoContent so that editors
 					// can always edit settings.
 					if (!isEditing)
 					{
@@ -218,12 +261,12 @@ namespace Nucleus.Core.Layout
 
 				if (isEditing)
 				{
-          if (user.IsSiteAdmin(this.Context.Site) && HasAdminPermissionOnly(moduleInfo, this.Context.Site))
+          if (user.IsSiteAdmin(site) && HasAdminPermissionOnly(moduleInfo))
           {
             moduleView.AddCssClass("nucleus-adminviewonly");
           }
 
-					AddModuleEditControls(htmlHelper, moduleView, moduleInfo, user.HasEditPermission(this.Context.Site, this.Context.Page));
+					AddModuleEditControls(htmlHelper, moduleView, moduleInfo, user.HasEditPermission(site, page));
 				}
 
         moduleView.InnerHtml.AppendHtml(ToHtmlContent(moduleOutput));
@@ -289,11 +332,11 @@ namespace Nucleus.Core.Layout
 		/// <param name="moduleInfo">Specifies the module being rendered.</param>
 		/// <param name="renderContainer">Specifies whether to wrap the module output in a container.</param>
 		/// <returns></returns>
-		public async Task<IHtmlContent> RenderModuleEditor(IHtmlHelper htmlHelper, PageModule moduleInfo, Boolean renderContainer)
+		public async Task<IHtmlContent> RenderModuleEditor(IHtmlHelper htmlHelper, Site site, Page page, PageModule moduleInfo, LocalPath localPath, Boolean renderContainer)
 		{
-			if (moduleInfo.ModuleDefinition.EditAction != null && HasEditPermission(moduleInfo, this.Context.Site, htmlHelper.ViewContext.HttpContext.User))
+			if (moduleInfo.ModuleDefinition.EditAction != null && HasEditPermission(site, page, moduleInfo, htmlHelper.ViewContext.HttpContext.User))
 			{
-				HttpResponse moduleOutput = await BuildModuleOutput(htmlHelper, moduleInfo, String.IsNullOrEmpty(moduleInfo.ModuleDefinition.SettingsController) ? moduleInfo.ModuleDefinition.ViewController : moduleInfo.ModuleDefinition.SettingsController, moduleInfo.ModuleDefinition.EditAction, renderContainer);
+				HttpResponse moduleOutput = await BuildModuleOutput(htmlHelper, site, page, moduleInfo, localPath, String.IsNullOrEmpty(moduleInfo.ModuleDefinition.SettingsController) ? moduleInfo.ModuleDefinition.ViewController : moduleInfo.ModuleDefinition.SettingsController, moduleInfo.ModuleDefinition.EditAction, renderContainer);
 
 				return ToHtmlContent(moduleOutput);
 			}
@@ -311,7 +354,10 @@ namespace Nucleus.Core.Layout
 		/// <param name="action">Specifies the name of the action being rendered.</param>
 		/// <param name="RenderContainer">Specifies whether to wrap the module output in a container.</param>
 		/// <returns></returns>
-		private async Task<HttpResponse> BuildModuleOutput(IHtmlHelper htmlHelper, PageModule moduleinfo, string controller, string action, Boolean RenderContainer)
+    /// <remarks>
+    /// Permissions checks should be done by the caller.
+    /// </remarks>
+		private async Task<HttpResponse> BuildModuleOutput(IHtmlHelper htmlHelper, Site site, Page page, PageModule moduleinfo, LocalPath localPath, string controller, string action, Boolean RenderContainer)
 		{
 			Context scopedContext;
 			IServiceProvider originalServiceProvider;
@@ -325,9 +371,9 @@ namespace Nucleus.Core.Layout
 
 				// set context.Module to the module being processed
 				scopedContext.Module = moduleinfo;
-				scopedContext.Page = this.Context.Page;
-				scopedContext.Site = this.Context.Site;
-				scopedContext.LocalPath = this.Context.LocalPath;
+				scopedContext.Page = page;
+				scopedContext.Site = site;
+				scopedContext.LocalPath = localPath;
 
 				// If we don't store and restore the original newHttpContext.RequestServices, the htmlHelper.ViewContext?.HttpContext.RequestServices 
 				// object gets disposed in between calls (when there are multiple modules on a page).
@@ -415,10 +461,10 @@ namespace Nucleus.Core.Layout
 
 						// Create the controller and run the controller action
 						await this.ActionInvokerFactory.CreateInvoker(controllerContext).InvokeAsync();
-					}
+          }
 
-					// Restore the original service provider before moduleScope is disposed to prevent it from also being disposed
-					newHttpContext.RequestServices = originalServiceProvider;
+          // Restore the original service provider before moduleScope is disposed to prevent it from also being disposed
+          newHttpContext.RequestServices = originalServiceProvider;
 
 				}
 				catch (Exception)
@@ -429,9 +475,9 @@ namespace Nucleus.Core.Layout
 					throw;
 				}
 
-				if (RenderContainer)
+        if (RenderContainer)
 				{
-					return await BuildContainerOutput(htmlHelper, moduleinfo, newHttpContext);
+					return await BuildContainerOutput(htmlHelper, site, page, moduleinfo, newHttpContext);
 				}
 				else
 				{
@@ -460,7 +506,7 @@ namespace Nucleus.Core.Layout
 		/// <remarks>
 		/// The rendered output of a container includes the module output.
 		/// </remarks>
-		private async Task<HttpResponse> BuildContainerOutput(IHtmlHelper htmlHelper, PageModule moduleinfo, HttpContext httpContext)
+		private async Task<HttpResponse> BuildContainerOutput(IHtmlHelper htmlHelper, Site site, Page page, PageModule moduleinfo, HttpContext httpContext)
 		{
 			ContainerContext scopedContainerContext;
 			IServiceProvider originalServiceProvider;
@@ -468,13 +514,11 @@ namespace Nucleus.Core.Layout
 
 			// https://github.com/aspnet/Mvc/issues/6900
 
-			Context context = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<Context>();
-
 			using (IServiceScope moduleScope = httpContext.RequestServices.CreateScope())
 			{
 				scopedContainerContext = (ContainerContext)moduleScope.ServiceProvider.GetService<ContainerContext>();
-				scopedContainerContext.Site = context.Site;
-				scopedContainerContext.Page = context.Page;
+				scopedContainerContext.Site = site;
+				scopedContainerContext.Page = page;
 				scopedContainerContext.Module = moduleinfo;
 
         TagBuilder section = new("section");

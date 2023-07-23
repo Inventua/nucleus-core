@@ -164,7 +164,7 @@ a *
   border: dashed 2px red!important;
 }
 
-.nucleus-adminviewonly > *:first-child:before
+.nucleus-adminviewonly:before
 {
   content: 'Visible by Administrators only';
   margin-left: auto;
@@ -173,7 +173,6 @@ a *
   font-weight: bold;
   font-size: 0.85rem;
 }
-
 
 .nucleus-overlay
 {

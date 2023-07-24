@@ -20,7 +20,7 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <None Remove="viewer.css" />
+    <None Remove="license.txt" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="settings.css" />
@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="viewer.css" />
+    <Content Include="license.txt" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
     <Content Include="settings.css" />

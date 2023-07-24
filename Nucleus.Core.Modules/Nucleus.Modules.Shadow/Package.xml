@@ -6,7 +6,7 @@
   <description>
 		Renders a module from another page.
 	</description>
-  <compatibility minVersion="1.0.1.0" maxVersion="*" />
+  <compatibility minVersion="1.2.1.0" maxVersion="*" />
   <components>
     <component folderName="Shadow" optional="false">
       <moduleDefinition id="ffaf61a9-6f15-4173-9927-532d3dedcdb5">
@@ -16,9 +16,10 @@
         <settingsController>ShadowAdminController</settingsController>
         <viewAction>Index</viewAction>
         <editAction>Settings</editAction>
+        <categories>Content</categories>
       </moduleDefinition>
       <file name="readme.txt" />
-      <file name="viewer.css" />
+      <file name="license.txt" />      
       <file name="settings.css" />
       <folder name="Bin">
         <file name="Nucleus.Modules.Shadow.dll" />

@@ -10,7 +10,7 @@ function _setupEditMode(e, args)
     .prop('contenteditable', 'true')
     .on('blur', _handleContentUpdate);
 
-  // Handle drag-drop events for moving modules by drag & drop
+  // Attach events for moving modules by drag & drop
   jQuery('.nucleus-move-dragsource')
     .on('dragstart', _handleStartDrag)
     .on('dragend', _handleEndDrag);
@@ -37,7 +37,10 @@ function _setupEditMode(e, args)
     }
   });
 
-
+  /// Handle "move module" drag start.
+  /// Set drag-drop properties in the dataTransfer object, save the ID of the module being moved.
+  /// show all drop targets except the one attached to the module being dragged (because that drop target would just move the module to 
+  /// its current position)
   function _handleStartDrag(event)
   {
     var dragHandleElement = jQuery(event.target);
@@ -67,6 +70,9 @@ function _setupEditMode(e, args)
     _sourceModuleId = jQuery(event.target).attr('data-mid');
   }
 
+  /// Handle the event which is triggered when a drag source icon is initially dragged over a drag target.
+  /// Set drag-active css class on the drag target so that CSS can provide visual indicators that the drag target
+  /// is valid.  
   function _handleDragEnter(event)
   {
     var targetmid = jQuery(event.target).attr('data-mid');
@@ -82,6 +88,8 @@ function _setupEditMode(e, args)
     }
   }
 
+  /// Handle the event which is triggered as a drag source icon is moved over a drag target.
+  /// Call event.preventDefault() to signal to the browser that the drag-drop operation is valid.
   function _handleDragOver(event)
   {
     var targetmid = jQuery(event.target).attr('data-mid');
@@ -92,11 +100,15 @@ function _setupEditMode(e, args)
     }
   }
 
+  /// Handle the event which is triggered when a drag source icon is moved outside of a drag target.
+  /// Remove the drag-active CSS class in order to no longer provide visual indicators that the drag target is valid.
   function _handleDragLeave(event)
   {
     jQuery(event.target).removeClass('drag-active');
   }
 
+  /// Handle the event which is raised when a drag-drop operation is completed.
+  /// Hide drag targets.
   function _handleEndDrag(event)
   {
     jQuery(event.target).removeClass('dragging');
@@ -104,6 +116,8 @@ function _setupEditMode(e, args)
     _sourceModuleId = null;
   }
 
+  /// Handle a "drop" event
+  /// Call Nucleus to execute the "move mnodule" operation.  Reload the page after the module has been moved.
   function _handleDrop(event)
   {
     var targetpane = jQuery(event.target).attr('data-pane-name');
@@ -143,7 +157,8 @@ function _setupEditMode(e, args)
     }    
   }
 
-  // send updated content
+  /// This function is called after a user edits inline-editable content and then the element loses focus. 
+  /// Send updated content to Nucleus.
   function _handleContentUpdate(event)
   {
     var url = jQuery(this).attr("data-inline-edit-route");

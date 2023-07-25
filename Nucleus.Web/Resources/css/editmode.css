@@ -71,12 +71,6 @@
   cursor: grab;
 }
 
-.nucleus-module-editing .nucleus-move-dragsource.dragging
-{
-  cursor: move;
-  cursor: grabbing;
-}
-
 .nucleus-move-droptarget
 {
   background-color: #d5e5ff;

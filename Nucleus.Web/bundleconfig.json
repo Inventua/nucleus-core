@@ -118,5 +118,11 @@
     "inputFiles": [
       "Resources/js/nucleus-admin-extensions.js"
     ]
+  },
+  {
+    "outputFileName": "Resources/js/nucleus-editmode.min.js",
+    "inputFiles": [
+      "Resources/js/nucleus-editmode.js"
+    ]
   }
 ]

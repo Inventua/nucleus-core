@@ -4,6 +4,8 @@
   border: dotted 2px #ddd;
   position: relative;
   margin: 1px;
+  display: flex;
+  flex-direction: column;
 }
 
 .nucleus-module-editing .nucleus-inline-edit-controls
@@ -35,24 +37,41 @@
   font-size: 12px;
 }
 
-h1:focus-visible, h2:focus-visible, h3:focus-visible, h4:focus-visible, h5:focus-visible, h6:focus-visible
+.nucleus-adminviewonly
 {
-  line-height: normal;
+  border-color: red!important;
 }
 
-*[contenteditable=true]
+.nucleus-adminviewonly:before
 {
-  border: dashed 2px #444;
+  content: 'Visible by Administrators only';
+  color: red;
+  font-weight: bold;
+  font-size: 0.85rem;
+  position: absolute;
+  margin: 0.25rem;
+}
+
+.nucleus-module-editing *[contenteditable=true]:focus-visible
+{
+  border: solid 1px black;
+  outline: none;
+}
+
+.nucleus-module-editing *[contenteditable=true]
+{
+  border: solid 1px #ddd;
   margin: 1px;
+  cursor: text;
 }
 
-.nucleus-move-dragsource
+.nucleus-module-editing .nucleus-move-dragsource
 {
   margin-left: 0.25rem;
   cursor: grab;
 }
 
-.nucleus-move-dragsource.dragging
+.nucleus-module-editing .nucleus-move-dragsource.dragging
 {
   cursor: move;
   cursor: grabbing;
@@ -61,29 +80,52 @@ h1:focus-visible, h2:focus-visible, h3:focus-visible, h4:focus-visible, h5:focus
 .nucleus-move-droptarget
 {
   background-color: #d5e5ff;
-  border: solid 2px #d5e5ff;
+  margin: 2px;
+  border: dashed 2px #428aff; /*#d5e5ff;*/
   border-radius: .25rem;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  flex: 0;
+  /*  this is to prevent cases where .nucleus-move-droptarget inherits flex-direction from a pane's CSS */
+  flex-direction: column!important;
 }
 
-.nucleus-move-droptarget.drag-active
+.nucleus-move-droptarget.show
+{          
+  opacity: 0.9;
+}
+
+.nucleus-move-droptarget.sideways
 {
-  border-color: #428aff;
+  flex-direction: row!important;
 }
 
 .nucleus-move-droptarget.drag-active
 {
   color: #428aff;
+  border: solid 2px #428aff;
 }
 
 .nucleus-move-droptarget::before
 {
-  font-family: Calibri, inherit;
   content: attr(data-pane-name); 
   font-size: 0.8rem;
   color: #668;
+}
+
+/* set position absolute for drop targets which are "for" an existing module, but not for drop targets that are the first/last for a pane */
+.nucleus-module-editing .nucleus-move-droptarget.sideways
+{
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+}
+
+.nucleus-move-droptarget.sideways::before
+{
+  text-orientation: sideways;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
 }
 
 .nucleus-move-droptarget:after

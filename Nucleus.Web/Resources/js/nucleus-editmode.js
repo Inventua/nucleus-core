@@ -21,10 +21,48 @@ function _setupEditMode(e, args)
     .on('dragleave', _handleDragLeave)
     .on('drop', _handleDrop);
 
+  // determine which drop targets should be aligned sideways (because their pane renders items side-by-side)
+  jQuery('.nucleus-move-droptarget').each(function (index, item)
+  {
+    var dropTargetElement = jQuery(item);
+    if
+    (
+      (dropTargetElement.parent().prev().length !== 0 && dropTargetElement.parent().prev().position().top === dropTargetElement.parent().position().top) ||
+      (dropTargetElement.parent().next().length !== 0 && dropTargetElement.parent().next().position().top === dropTargetElement.parent().position().top) ||
+      (dropTargetElement.prev().length !== 0 && dropTargetElement.prev().position().top === dropTargetElement.position().top) ||
+      (dropTargetElement.next().length !== 0 && dropTargetElement.next().position().top === dropTargetElement.position().top)
+    )
+    {
+      dropTargetElement.addClass('sideways');
+    }
+  });
+
+
   function _handleStartDrag(event)
   {
-    jQuery(event.target).addClass('dragging');    
-    jQuery('.nucleus-move-droptarget').addClass('show');
+    var dragHandleElement = jQuery(event.target);
+    dragHandleElement.addClass('dragging');    
+
+    // show all drop targets except the one attached to the module being dragged (because that drop target would just move the module to its current position)
+    jQuery('.nucleus-move-droptarget').each(function (index, item)
+    {
+      var dragTargetElement = jQuery(item);
+      var dragHandleContainer = dragHandleElement.parents('.nucleus-module-editing');
+      var dragTargetContainer = dragTargetElement.parents('.nucleus-module-editing');
+
+      if
+      (
+        // don't show drag target if it is the one attached to the module being dragged
+        (!dragTargetContainer.is(jQuery(event.target).parents('.nucleus-module-editing')))
+        &&
+        // don't show drag target if it is the special "pane" end drag target, and the module being dragged is already the last module in the pane
+        (!(dragTargetContainer.length === 0 && dragHandleContainer.is(dragHandleContainer.parent().children('.nucleus-module-editing').last())))
+      )
+      {
+        dragTargetElement.addClass('show');
+      }
+    });
+
     event.originalEvent.dataTransfer.effectAllowed = 'move';
     _sourceModuleId = jQuery(event.target).attr('data-mid');
   }

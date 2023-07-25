@@ -74,7 +74,7 @@ namespace Nucleus.Core.Layout
         throw new InvalidOperationException($"{nameof(Context.Page.Modules)} is null.");
       }
 
-      // if the pane is empty, add a "move module" drag target to the top of the pane
+      // if the pane is empty, add a "move module" drag target to the start of the pane
       if (htmlHelper.ViewContext.HttpContext.User.IsEditing(htmlHelper.ViewContext?.HttpContext, context.Site, context.Page))
       {
         if (!context.Page.Modules.Where(module => module.Pane.Equals(paneName, StringComparison.OrdinalIgnoreCase)).Any())
@@ -111,12 +111,12 @@ namespace Nucleus.Core.Layout
         }
       }
 
-      // if the pane is not empty, add a "move module" drag target to the bottom of the pane
+      // if the pane is not empty, add a "move module" drag target to the end of the pane
       if (htmlHelper.ViewContext.HttpContext.User.IsEditing(htmlHelper.ViewContext?.HttpContext, context.Site, context.Page))
       {
         if (context.Page.Modules.Where(module => module.Pane.Equals(paneName, StringComparison.OrdinalIgnoreCase)).Any())
         {
-          output.AppendHtml(Nucleus.Extensions.PageModuleExtensions.BuildMoveDropTarget(null, paneName, $"Move to bottom of {paneName}"));
+          output.AppendHtml(Nucleus.Extensions.PageModuleExtensions.BuildMoveDropTarget(null, paneName, $"Move to end of {paneName}"));
         }
       }
 
@@ -259,19 +259,21 @@ namespace Nucleus.Core.Layout
 					moduleView.AddCssClass(moduleInfo.Style);
 				}
 
-				if (isEditing)
+        if (isEditing)
 				{
+          moduleView.AddCssClass("nucleus-module-editing");
+
           if (user.IsSiteAdmin(site) && HasAdminPermissionOnly(moduleInfo))
           {
             moduleView.AddCssClass("nucleus-adminviewonly");
           }
 
-					AddModuleEditControls(htmlHelper, moduleView, moduleInfo, user.HasEditPermission(site, page));
+          moduleView.InnerHtml.AppendHtml(moduleInfo.BuildMoveDropTarget(moduleInfo.Pane, "Move here"));
+          moduleView.InnerHtml.AppendHtml(BuildModuleEditControls(htmlHelper, moduleInfo, user.HasEditPermission(site, page)));
 				}
 
         moduleView.InnerHtml.AppendHtml(ToHtmlContent(moduleOutput));
-                
-				output.AppendHtml(moduleView);
+        output.AppendHtml(moduleView);        
 			}
 
 			return output;
@@ -289,15 +291,12 @@ namespace Nucleus.Core.Layout
     /// This function does not perform permissions checks.  The caller is responsible for determining whether the 
     /// current user has edit permissions and is currently in edit mode.
     /// </remarks>
-		private void AddModuleEditControls(IHtmlHelper htmlHelper, TagBuilder editorBuilder, PageModule moduleInfo, Boolean hasPageEditPermission)
+		private TagBuilder BuildModuleEditControls(IHtmlHelper htmlHelper, PageModule moduleInfo, Boolean hasPageEditPermission)
 		{
 			IUrlHelper urlHelper = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(htmlHelper.ViewContext);
 
-			// Render edit controls
-			editorBuilder.AddCssClass("nucleus-module-editing");
-
-      editorBuilder.InnerHtml.AppendHtml(moduleInfo.BuildMoveDropTarget(moduleInfo.Pane, "Move here"));
-
+      // Render edit controls
+      
 			TagBuilder formBuilder = new("form");
 			formBuilder.Attributes.Add("class", "nucleus-inline-edit-controls");
 
@@ -322,7 +321,7 @@ namespace Nucleus.Core.Layout
 				formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildDeleteButton("&#xe14c;", "Delete Module", urlHelper.Content("~/Admin/Pages/DeletePageModuleInline"), null));
 			}
 
-			editorBuilder.InnerHtml.AppendHtml(formBuilder);
+      return formBuilder;
 		}
 		
 		/// <summary>

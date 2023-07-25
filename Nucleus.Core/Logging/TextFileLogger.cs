@@ -3,11 +3,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using System.ComponentModel;
 using Nucleus.Abstractions;
 using System.Threading;
 using Nucleus.Abstractions.Models.TaskScheduler;
-using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Core.Logging
@@ -22,7 +21,6 @@ namespace Nucleus.Core.Logging
 	public class TextFileLogger : ILogger
 	{
 		private string Category { get; }
-		private const int LOG_FILE_RETENTION_DAYS = 7;
 
 		private TextFileLoggingProvider Provider { get; }
 		private TextFileLoggerOptions Options { get; }
@@ -30,11 +28,11 @@ namespace Nucleus.Core.Logging
 		private System.Collections.Concurrent.ConcurrentQueue<string> Queue { get; } = new();
 		private static SemaphoreSlim _fileAccessSemaphore { get; } = new(1);
 
-		public TextFileLogger(TextFileLoggingProvider Provider, TextFileLoggerOptions Options, IExternalScopeProvider scopeProvider, string Category)
+		public TextFileLogger(TextFileLoggingProvider provider, TextFileLoggerOptions options, IExternalScopeProvider scopeProvider, string category)
 		{
-			this.Provider = Provider;
-			this.Options = Options;
-			this.Category = Category;
+			this.Provider = provider;
+			this.Options = options;
+			this.Category = category;
 			this.ScopeProvider = scopeProvider;
 		}
 
@@ -144,43 +142,54 @@ namespace Nucleus.Core.Logging
 			catch(System.UnauthorizedAccessException)
 			{
 				// stop unauthorized access exception (for logs folder) from stopping the application from running.  Logging
-				// providers other than the text file logger will often be enabled/available for troubleshooting, also this is
-				// a potentially common error during first-time install which is reported by the installation wizard so we
-				// want Nucleus to be able to run so it can show the wizard.
+				// providers other than the text file logger will often be enabled/available for troubleshooting, so the log
+        // message can be viewed by other means.  Also this is a potentially common error during first-time install
+        // which is reported by the installation wizard so we want Nucleus to be able to run so it can show the wizard.
 				return;
 			}
 
 			if (this.Provider != null)
 			{
-				if (this.Provider.LastExpiredDocumentsCheckDate.Date < DateTime.UtcNow.Date)
+        // only do this once per day
+				if (this.Provider.LastExpiredLogsCheckDate.Date < DateTime.UtcNow.Date)
 				{
-					this.Provider.LastExpiredDocumentsCheckDate = DateTime.UtcNow.Date;
-
-					foreach (string strOldLogFile in Directory.GetFiles(this.Options.Path, "*.log"))
-					{
-						// try to avoid deleting log files that don't belong to Nucleus by checking that the filename 
-						// is in the expected format.
-						System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(strOldLogFile, LogFileConstants.LOGFILE_REGEX);
-
-						if (match.Success)
-						{
-							try
-							{
-								FileInfo objFileData = new(strOldLogFile);
-
-								if (objFileData.LastWriteTime < DateTime.Now.Date.AddDays(-LOG_FILE_RETENTION_DAYS))
-								{
-									objFileData.Delete();
-								}
-							}
-							catch (Exception)
-							{
-								// suppress exception deleting old logs (non-critical)
-							}
-						}
-					}
+					this.Provider.LastExpiredLogsCheckDate = DateTime.UtcNow.Date;
+          CheckFolder(this.Options.Path);
 				}
 			}
 		}
+
+    private void CheckFolder(string path)
+    {
+      foreach (string logFile in Directory.GetFiles(path, "*.log"))
+      {
+        // try to avoid deleting log files that don't belong to Nucleus by checking that the filename 
+        // is in the expected format.
+        Match match = Regex.Match(logFile, LogFileConstants.LOGFILE_REGEX);
+
+        if (match.Success)
+        {
+          try
+          {
+            FileInfo objFileData = new(logFile);
+
+            if (objFileData.LastWriteTime < DateTime.Now.Date.Add(-this.Options.LogFileExpiry))
+            {
+              objFileData.Delete();
+            }
+          }
+          catch (Exception)
+          {
+            // suppress exception deleting old log file (as this operation is non-critical)
+          }
+        }
+      }
+
+      // check sub-folders.  Scheduled tasks (and theoretically other components) could write logs to sub-folders.
+      foreach (string subFolder in Directory.GetDirectories(path))
+      {
+        CheckFolder(subFolder);
+      }
+    }
 	}
 }

@@ -146,7 +146,7 @@ namespace Nucleus.Core.Services
 			await LogTaskSucceeded(runningTask.History);
 
 			this.Queue.Remove(runningTask.ScheduledTask);
-		}
+    }
 
 		private DateTime CalculateInterval(DateTime thisRunDateTime, ScheduledTask.Intervals intervalType, int interval)
 		{
@@ -191,7 +191,7 @@ namespace Nucleus.Core.Services
 		{
 			history.Status = ScheduledTaskProgress.State.Succeeded;
 			await this.ScheduledTaskManager.SaveHistory(history);
-		}
+    }
 
 		/// <summary>
 		/// Start the <see cref="IScheduledTask"/> represented by the specified <see cref="ScheduledTask"/>.
@@ -244,20 +244,27 @@ namespace Nucleus.Core.Services
 
 				runningTask.Task = Task.Run(async () =>
 				{
-					using (this.Logger.BeginScope(runningTask))
+          this.Logger.LogInformation("The task scheduler has started the '{scheduledTaskName}' task.", runningTask.ScheduledTask.Name);
+          using (this.Logger.BeginScope(runningTask))
 					{
 						await taskService.InvokeAsync(runningTask, runningTask.ProgressCallback, this.CancellationTokenSource.Token);						
 					}
-				});
+        });
 			}
 		}
 
 		async Task HandleProgress(RunningTask sender, ScheduledTaskProgress progress)
 		{
-			if (progress.Status == ScheduledTaskProgress.State.Succeeded)
+			switch (progress.Status)
 			{
-				await SignalCompleted(sender);
-			}
+        case ScheduledTaskProgress.State.Succeeded:
+          await SignalCompleted(sender);
+          this.Logger.LogInformation("The '{scheduledTaskName}' task succeeded.", sender.ScheduledTask.Name);
+          break;
+        case ScheduledTaskProgress.State.Error:
+          this.Logger.LogInformation("The '{scheduledTaskName}' task failed: {message}.", sender.ScheduledTask.Name, progress.Message);
+          break;
+      }
 		}
 	}
 }

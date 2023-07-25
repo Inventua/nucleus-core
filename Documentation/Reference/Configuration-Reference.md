@@ -77,7 +77,7 @@ General top-level settings.
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Path                             | (String) Specifies the name of the folder that the Nucleus text file logger uses to store log files on the file system.  By default, this value is the `Logs` subfolder of the folder specified by `Nucleus:FolderOptions:DataFolder`. | 
-
+| LogFileExpiry                    | (TimeSpan) Specifies how long log files are retained before being automatically deleted.  This value is a TimeSpan, which is represented in days, hours, minutes and seconds in the form "days:hours:minutes:seconds".  For example, 7 days, 11 hours, 20 minutes and 15 seconds would be represented as "07:11:20:15".  The default value is 7 days ("07:00:00:00"). |
 ```
 "Nucleus": 
 {

@@ -21,7 +21,7 @@ namespace Nucleus.Core.Logging
   /// </summary>
   public class TextFileLoggingProvider : ILoggerProvider
   {
-    internal DateTime LastExpiredDocumentsCheckDate { get; set; }
+    internal DateTime LastExpiredLogsCheckDate { get; set; }
     public TextFileLoggerOptions Options { get; }
     private IExternalScopeProvider ScopeProvider { get; set; }
 

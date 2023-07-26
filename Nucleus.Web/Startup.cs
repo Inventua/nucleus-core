@@ -191,7 +191,17 @@ namespace Nucleus.Web
         string maxRequestSize = Configuration.GetSection("Nucleus:MaxRequestSize").Value;
         if (long.TryParse(maxRequestSize, out long maxRequestSizeValue))
         {
-          services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options => options.MultipartBodyLengthLimit = maxRequestSizeValue);
+          services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options => 
+          {
+            options.MultipartBodyLengthLimit = maxRequestSizeValue;
+
+            // Make the value count limit a minimum of 2048 for the admin/files pages.  This value can be
+            // further increased (but not decreased) by config (FormOptions:ValueCountLimit).
+            if (options.ValueCountLimit < 2048)
+            {
+              options.ValueCountLimit = 2048;
+            }
+          });
           services.Configure<IISServerOptions>(options => { options.MaxRequestBodySize = maxRequestSizeValue; });
 
           // We set KestrelServerOptions options.Limits.MaxRequestBodySize to unlimited because the exception that it generates 

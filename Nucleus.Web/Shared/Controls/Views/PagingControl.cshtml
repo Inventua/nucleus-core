@@ -48,8 +48,8 @@ else
 			jQuery(this).parents('.nucleus-paging-control').find('.nucleus-pagingcontrol-pagedropdown').val(jQuery(event.currentTarget).attr('data-page'));
 			event.preventDefault();
 			event.stopImmediatePropagation();
-			jQuery(this).parents('form').submit();	
-		});
+      jQuery(this).parents('form').trigger(jQuery.Event('submit', { srcElement: this, originalEvent: event }));
+    });
 
 		jQuery(document).on('change', '.nucleus-pagingcontrol-pagesizedropdown', function(event) 
 		{
@@ -57,9 +57,9 @@ else
 			jQuery(this).parent('.nucleus-paging-control').find('.nucleus-pagingcontrol-pagedropdown').val('1');
 			event.preventDefault();
 			event.stopImmediatePropagation();
-			jQuery(this).parents('form').submit();	
-			
-		});
+      jQuery(this).parents('form').trigger(jQuery.Event('submit', { srcElement: this, originalEvent: event }));
+
+    });
 	});
 
 </script>

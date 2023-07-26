@@ -7,6 +7,7 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
 using System.Collections.ObjectModel;
 using Nucleus.Abstractions.FileSystemProviders;
+using Nucleus.Abstractions.Models.Paging;
 
 namespace Nucleus.Abstractions.Managers
 {
@@ -151,13 +152,24 @@ namespace Nucleus.Abstractions.Managers
 		/// </example>
 		public Task<Folder> ListFolder(Site site, Guid id, string pattern);
 
-		/// <summary>
-		/// Retrive the contents of the specified file and return as a stream.
+    /// <summary>
+		/// Return a paged list of <seealso cref="Nucleus.Abstractions.Models.FileSystem.FileSystemItem"/> objects for the 
+    /// specified folder.
 		/// </summary>
 		/// <param name="site"></param>
-		/// <param name="file"></param>
+		/// <param name="id"></param>
+		/// <param name="pattern">Regular expression which is used to filter file names.</param>
+    /// <param name="settings">Paging settings.</param>
 		/// <returns></returns>
-		public Task<System.IO.Stream> GetFileContents(Site site, File file);
+    public Task<PagedResult<FileSystemItem>> ListFolder(Site site, Guid id, string pattern, PagingSettings settings);
+
+    /// <summary>
+    /// Retrive the contents of the specified file and return as a stream.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <param name="file"></param>
+    /// <returns></returns>
+    public Task<System.IO.Stream> GetFileContents(Site site, File file);
 
 		/// <summary>
 		/// Delete the specified file.

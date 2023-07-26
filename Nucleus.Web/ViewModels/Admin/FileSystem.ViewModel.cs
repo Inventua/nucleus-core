@@ -5,6 +5,7 @@ using Nucleus.Abstractions.FileSystemProviders;
 using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Permissions;
+using Nucleus.Abstractions.Models.Paging;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Nucleus.Web.ViewModels.Admin
@@ -17,7 +18,12 @@ namespace Nucleus.Web.ViewModels.Admin
 		public IReadOnlyList<FileSystemProviderInfo> Providers { get; set; }
 		public Folder Folder { get; set; } = new();
 
-		public List<Folder> Ancestors { get; set; } = new();
+    public PagingSettings PagingSettings { get; set; }
+
+    public List<Folder> Folders { get; set; } = new();
+    public List<File> Files { get; set; } = new();
+
+    public List<Folder> Ancestors { get; set; } = new();
 
 		public FileSystemItem SelectedItem { get; set; }
 		public Guid SelectedFolderRoleId { get; set; }

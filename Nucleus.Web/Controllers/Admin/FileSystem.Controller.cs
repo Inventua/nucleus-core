@@ -18,12 +18,15 @@ using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Options;
 using Nucleus.Extensions.Authorization;
 using Nucleus.Abstractions.Models.Extensions;
+using Nucleus.Abstractions.Models.Paging;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Nucleus.Extensions.Mvc;
 
 namespace Nucleus.Web.Controllers.Admin
 {
 	[Area("Admin")]
 	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
-	public class FileSystemController : Controller
+  public class FileSystemController : Controller
 	{
 		private const string CURRENT_FOLDER_COOKIE_NAME = "nucleus-current-folder";
 
@@ -73,7 +76,12 @@ namespace Nucleus.Web.Controllers.Admin
 		{
 			Folder folder;
 
-			if (folderId == Guid.Empty)
+      if (folderId == Guid.Empty)
+      {
+        folderId = viewModel.Folder.Id;
+      }
+
+      if (folderId == Guid.Empty)
 			{
 				folder = null;
 			}
@@ -182,10 +190,13 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> ShowDeleteDialog(ViewModels.Admin.FileSystem viewModel)
 		{
-			IEnumerable<Folder> selectedFolders = viewModel.Folder?.Folders.Where(folder => folder.IsSelected);
-			IEnumerable<File> selectedFiles = viewModel.Folder?.Files.Where(file => file.IsSelected);
+      IEnumerable<Folder> selectedFolders = viewModel.Folders
+        .Where(folder => folder.IsSelected);
 
-			if (!selectedFolders.Any() && !selectedFiles.Any())
+			IEnumerable<File> selectedFiles = viewModel.Files
+        .Where(file => file.IsSelected);
+
+      if (!selectedFolders.Any() && !selectedFiles.Any())
 			{
 				return BadRequest(new ProblemDetails()
 				{
@@ -226,10 +237,13 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> Download(ViewModels.Admin.FileSystem viewModel)
 		{
-			IEnumerable<Folder> selectedFolders = viewModel.Folder?.Folders.Where(folder => folder.IsSelected);
-			IEnumerable<File>	selectedFiles = viewModel.Folder?.Files.Where(file => file.IsSelected);
+      IEnumerable<Folder> selectedFolders = viewModel.Folders
+        .Where(folder => folder.IsSelected);
 
-			if ( !selectedFolders.Any() && !selectedFiles.Any())
+      IEnumerable<File> selectedFiles = viewModel.Files
+        .Where(file => file.IsSelected);
+
+      if ( !selectedFolders.Any() && !selectedFiles.Any())
 			{
 				return NoContent();// (new { Title = "Download", Detail = "Please select one or more files or folders." });
 			}
@@ -317,23 +331,23 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> ShowRenameDialog(ViewModels.Admin.FileSystem viewModel)
 		{
-			FileSystemItem existing;
+      FileSystemItem existing;
 
-			existing = viewModel.Folder.Folders.Where(folder => folder.IsSelected).FirstOrDefault();
-			if (existing != null)
-			{
-				viewModel.SelectedItem = await this.FileSystemManager.GetFolder(this.Context.Site, existing.Id);
-			}
-			else
-			{
-				existing = viewModel.Folder.Files.Where(file => file.IsSelected).FirstOrDefault();
-				if (existing != null)
-				{
-					viewModel.SelectedItem = await this.FileSystemManager.GetFile(this.Context.Site, existing.Id);
-				}
-			}
+      existing = viewModel.Folders.Where(folder => folder.IsSelected).FirstOrDefault();
+      if (existing != null)
+      {
+        viewModel.SelectedItem = await this.FileSystemManager.GetFolder(this.Context.Site, existing.Id);
+      }
+      else
+      {
+        existing = viewModel.Files.Where(file => file.IsSelected).FirstOrDefault();
+        if (existing != null)
+        {
+          viewModel.SelectedItem = await this.FileSystemManager.GetFile(this.Context.Site, existing.Id);
+        }
+      }
 
-			if (viewModel.SelectedItem == null)
+      if (viewModel.SelectedItem == null)
 			{
         //return BadRequest("Please select an item to rename.");
         return BadRequest(new ProblemDetails()
@@ -349,25 +363,25 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> Rename(ViewModels.Admin.FileSystem viewModel)
 		{
-			FileSystemItem existing;
+      FileSystemItem existing;
 
-			try
-			{
-				existing = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedItem.Id);
-			}
-			catch (System.IO.FileNotFoundException)
-			{
-				try
-				{
-					existing = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedItem.Id);
-				}
-				catch (System.IO.FileNotFoundException)
-				{
-					existing = null;
-				}
-			}
+      try
+      {
+        existing = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedItem.Id);
+      }
+      catch (System.IO.FileNotFoundException)
+      {
+        try
+        {
+          existing = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.SelectedItem.Id);
+        }
+        catch (System.IO.FileNotFoundException)
+        {
+          existing = null;
+        }
+      }
 
-			if (existing == null)
+      if (existing == null)
 			{
 				return NotFound();
 			}
@@ -460,6 +474,7 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", viewModel);
 		}
 
+    
 		/// <summary>
 		/// Make sure that the item folder exists by iterating through the item folders and checking/creating them.
 		/// </summary>
@@ -528,14 +543,46 @@ namespace Nucleus.Web.Controllers.Admin
 				{
 					folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedProviderKey, "");
 				}
+        else
+        {
+          folder = await this.FileSystemManager.GetFolder(this.Context.Site, folder.Id);
+        }
 
 				if (folder != null)
 				{
-					viewModel.Folder = await this.FileSystemManager.ListFolder(this.Context.Site, folder.Id, "");
-					viewModel.Folder.SortFolders(folder => folder.Name, false);
-					viewModel.Folder.SortFiles(file => file.Name, false);
+          viewModel.Folder = folder;
 
-					Folder ancestor = viewModel.Folder;
+          PagingSettings settings = input.PagingSettings;
+
+          if (settings == null)
+          {
+            settings = new() 
+            { 
+              PageSizes = new() { 250, 500 }, 
+              PageSize = 500 
+            };
+          }
+          else
+          {
+            // we have to keep re-populating the page sizes, because they aren't the default, and available page sizes aren't sent back in the response
+            settings.PageSizes = new() { 250, 500 };              
+          }
+
+          PagedResult<FileSystemItem> fileSystemItems = await this.FileSystemManager.ListFolder(this.Context.Site, folder.Id, "", settings);
+          viewModel.PagingSettings = fileSystemItems;
+
+          viewModel.Folders = fileSystemItems.Items
+            .Where(folder => folder is Folder)
+            .Select(folder => folder as Folder)
+            .ToList();
+
+          viewModel.Files = fileSystemItems.Items
+            .Where(file => file is File)
+            .Select(file => file as File)
+            .ToList();
+
+          // get data for breadcrumb navigation
+          Folder ancestor = viewModel.Folder;
 					while (ancestor != null && ancestor.Id != Guid.Empty)
 					{
 						viewModel.Ancestors.Add(ancestor);												
@@ -546,16 +593,15 @@ namespace Nucleus.Web.Controllers.Admin
 						ancestor = await this.FileSystemManager.GetFolder(this.Context.Site, ancestor.Parent.Id);
 					}
 					viewModel.Ancestors.Reverse();
+
+			    viewModel.EnableDelete =
+				    fileSystemItems.Items.Where(item => item.Capabilities.CanDelete).Any();
+
+			    viewModel.EnableRename =
+				    fileSystemItems.Items.Where(item => item.Capabilities.CanRename).Any();
 				}
 			}
 
-			viewModel.EnableDelete =
-				viewModel.Folder.Folders.Where(folder => folder.Capabilities.CanDelete).Any() ||
-				viewModel.Folder.Files.Where(file => file.Capabilities.CanDelete).Any();
-
-			viewModel.EnableRename =
-				viewModel.Folder.Folders.Where(folder => folder.Capabilities.CanRename).Any() ||
-				viewModel.Folder.Files.Where(file => file.Capabilities.CanRename).Any();
 
 			// https://stackoverflow.com/questions/16816184/mvc-crazy-property-lose-its-value-does-html-hiddenfor-bug
 			// https://stackoverflow.com/questions/594600/possible-bug-in-asp-net-mvc-with-form-values-being-replaced/30698787#30698787
@@ -582,8 +628,8 @@ namespace Nucleus.Web.Controllers.Admin
 			{
 				if (getPermissions)
 				{
-					viewModel.Folder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.Folder.Id, "");
-					viewModel.Folder.Permissions = await this.FileSystemManager.ListPermissions(viewModel.Folder);
+					viewModel.Folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Folder.Id);
+					////viewModel.Folder.Permissions = await this.FileSystemManager.ListPermissions(viewModel.Folder);
 				}
 			}
 
@@ -619,13 +665,18 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private async Task<ViewModels.Admin.FileSystemDelete> BuildDeleteViewModel(ViewModels.Admin.FileSystem viewModel)
 		{
-			ViewModels.Admin.FileSystemDelete results = new()
-			{
-				Folder = viewModel.Folder,
-				SelectedFolders = viewModel.Folder?.Folders.Where(folder => folder.IsSelected).ToList(),
-				SelectedFiles = viewModel.Folder?.Files.Where(file => file.IsSelected).ToList()
-			};
+      ViewModels.Admin.FileSystemDelete results = new()
+      {
+        Folder = viewModel.Folder,
+        SelectedFolders = viewModel.Folders
+          .Where(folder => folder.IsSelected)
+          .ToList(),
 
+        SelectedFiles = viewModel.Files
+          .Where(file => file.IsSelected)
+          .ToList()
+      };
+   
 			foreach (Folder folder in results.SelectedFolders)
 			{
 				(await this.FileSystemManager.GetFolder(this.Context.Site, folder.Id)).CopyTo(folder);

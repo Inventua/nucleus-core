@@ -14,6 +14,8 @@ using Nucleus.Core.FileSystemProviders;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
 using Nucleus.Abstractions.Models.Extensions;
+using Nucleus.Abstractions.Models.Paging;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Nucleus.Core.Managers
 {
@@ -531,17 +533,85 @@ namespace Nucleus.Core.Managers
 			return folder;
 		}
 
-		private async Task GetDatabaseProperties(Site site, List<File> files)
+    /// <summary>
+		/// Return a paged list of <seealso cref="Nucleus.Abstractions.Models.FileSystem.FileSystemItem"/> objects for the 
+    /// specified folder.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="id"></param>
+		/// <param name="pattern">Regular expression which is used to filter file names.</param>
+    /// <param name="settings">Paging settings.</param>
+		/// <returns></returns>
+		public async Task<PagedResult<FileSystemItem>> ListFolder(Site site, Guid id, string pattern, PagingSettings settings)
+    {
+      Folder existingFolder = await this.GetFolder(site, id);
+      Folder folder;
+      FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, existingFolder.Provider);
+      PagedResult<FileSystemItem> results;
+
+      try
+      {
+        folder = await provider.ListFolder(UseSiteHomeDirectory(site, existingFolder.Path), pattern);
+      }
+      catch (System.IO.FileNotFoundException)
+      {
+        // if the root folder was not found, try to create it				
+        folder = await provider.CreateFolder("", UseSiteHomeDirectory(site, existingFolder.Path));
+      }
+
+      await GetDatabaseProperties(site, folder);
+      await GetDatabaseProperties(site, folder.Parent);
+
+      List<FileSystemItem> items = new List<FileSystemItem>();
+      folder.SortFolders(folder => folder.Name, false);
+      folder.SortFiles(file => file.Name, false);
+
+      items.AddRange(folder.Folders);
+      items.AddRange(folder.Files);
+
+      results = new(settings,
+        items
+          .Skip(settings.FirstRowIndex)
+          .Take(settings.PageSize)
+      .ToList());
+
+      results.TotalCount = items.Count;
+
+      foreach (FileSystemItem item in results.Items)
+      {
+        if (item is Folder)
+        {
+          Folder subfolder = item as Folder;
+          subfolder.Parent = folder;
+          await GetDatabaseProperties(site, subfolder);
+        }
+
+        if (item is File)
+        {
+          File file = item as File;
+          file.Parent = folder;
+
+          await GetDatabaseProperties(site, file);
+        }
+      }
+
+      return results;
+    }
+
+    private async Task GetDatabaseProperties(Site site, List<File> files)
 		{
 			foreach (File file in files)
 			{
-				RemoveSiteHomeDirectory(site, file);
 				await GetDatabaseProperties(site, file);
 			}
 		}
 
 		private async Task<File> GetDatabaseProperties(Site site, File file)
 		{
+      if (file == null) return null;
+
+      RemoveSiteHomeDirectory(site, file);
+				
 			File fileData = await this.GetFile(site, file.Provider, file.Path);
 			if (fileData != null)
 			{

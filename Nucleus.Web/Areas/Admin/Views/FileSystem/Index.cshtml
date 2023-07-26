@@ -5,180 +5,219 @@
 @using Nucleus.Abstractions.FileSystemProviders
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
-<div class="FileSystemManager">
-	<h2 class="nucleus-control-panel-heading">Files</h2>
+<div class="nucleus-file-system-manager">
+  <h2 class="nucleus-control-panel-heading">Files</h2>
 
-	@using (Html.BeginAreaForm("Navigate", "FileSystem", "Admin", FormMethod.Post, new { @class = "d-flex flex-column overflow-auto", @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
-	{
-		<div class="nucleus-form-buttonrow">
-			<RemoveWhiteSpace>
-			@Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control ms-1 nucleus-show-progress nucleus-show-progress-after" })
-			<span>
-				@foreach (var ancestor in Model.Ancestors)				
-				{
-					@if (ancestor.Name != "/")
-					{
-						<text>&nbsp;/&nbsp;</text>
-						@Html.AreaActionLink(ancestor.Name, "Index", "FileSystem", "Admin", new { folderId = ancestor.Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
-					}	
-					else
-					{
-						<button title="Top level" href="@Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = ancestor.Id })" class="btn btn-sm btn-outline-primary me-1 NavigateLink nucleus-show-progress nucleus-show-progress-after nucleus-material-icon" data-target=".nucleus-adminpage">
-							&#xe2c7;
-						</button>						
-					}
-				}
-			</span>
-			</RemoveWhiteSpace>
-		</div>
-		@Html.HiddenFor(model => model.SelectedProviderKey)
-		@Html.HiddenFor(model => model.Folder.Id)
+  @using (Html.BeginAreaForm("Navigate", "FileSystem", "Admin", FormMethod.Post, new { @class = "d-flex flex-column overflow-auto", @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
+  {
+    <div class="nucleus-form-buttonrow nucleus-show-progress nucleus-show-progress-inside">
+      <RemoveWhiteSpace>
+        @Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control ms-1" })
+        <span>
+          @foreach (var ancestor in Model.Ancestors)
+          {
+            @if (ancestor.Name != "/")
+            {
+              <text>&nbsp;/&nbsp;</text>
+              @Html.AreaActionLink(ancestor.Name, "Index", "FileSystem", "Admin", new { folderId = ancestor.Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
+            }
+            else
+            {
+              <button title="Top level" href="@Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = ancestor.Id })" class="btn btn-sm btn-outline-primary me-1 NavigateLink nucleus-show-progress nucleus-show-progress-after nucleus-material-icon" data-target=".nucleus-adminpage">
+                &#xe2c7;
+              </button>
+            }
+          }
+        </span>
+      </RemoveWhiteSpace>
+    </div>
+    @Html.HiddenFor(model => model.SelectedProviderKey)
+    @Html.HiddenFor(model => model.Folder.Id)
 
-		<div class="nucleus-form-toolbar">
-			@if (!String.IsNullOrEmpty(Model.Folder.Path) && Model.Folder.Parent != null)
-			{
-				@Html.LinkButton("&#xe5c4;", "Back", @Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = Model.Folder.Parent.Id }), new { @data_target = ".nucleus-adminpage", @class = "btn btn-secondary btn-sm nucleus-show-progress nucleus-show-progress-inside" })
-			}
-			@if (Model.Folder.Capabilities.CanHaveFolders)
-			{
-				@Html.AreaActionLink("Create Folder", "ShowCreateFolderDialog", "FileSystem", "Admin", new { folderId = Model.Folder.Id }, new { @class = "btn btn-secondary btn-sm", @data_target = "#nucleus-popupdialog .modal-body" })
-			}
-			@if (Model.Folder.Capabilities.CanStoreFiles)
-			{
-				<div class="btn-group" role="group">
-					<button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-						<span class="nucleus-material-icon">&#xe2c6;</span> Upload
-					</button>
-					<ul class="dropdown-menu">
-						<li>
-							<label class="dropdown-item">
-								Selected Files ...
-								<input type="file" name="mediaFiles" class="collapse" multiple="multiple" formaction="@Url.AreaAction("UploadFile", "FileSystem", "Admin")">
-							</label>
-						</li>
-						<li>
-							<label class="dropdown-item">
-								Upload and un-zip ZIP archive ...
-								<input type="file" name="archiveFile" accept="application/zip" class="collapse" formaction="@Url.AreaAction("UploadArchive", "FileSystem", "Admin")">
-							</label>
-						</li>
-					</ul>
-				</div>
-			}
-			else
-			{
-				<button type="button" class="btn btn-secondary btn-sm" aria-disabled="true" disabled>Upload File</button>
-			}
+    <div class="nucleus-form-toolbar">
+      @if (!String.IsNullOrEmpty(Model.Folder.Path) && Model.Folder.Parent != null)
+      {
+        @Html.LinkButton("&#xe5c4;", "Back", @Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = Model.Folder.Parent.Id }), new { @data_target = ".nucleus-adminpage", @class = "btn btn-secondary btn-sm nucleus-show-progress nucleus-show-progress-inside" })
+      }
+      @if (Model.Folder.Capabilities.CanHaveFolders)
+      {
+        @Html.AreaActionLink("Create Folder", "ShowCreateFolderDialog", "FileSystem", "Admin", new { folderId = Model.Folder.Id }, new { @class = "btn btn-secondary btn-sm", @data_target = "#nucleus-popupdialog .modal-body" })
+      }
+      @if (Model.Folder.Capabilities.CanStoreFiles)
+      {
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="nucleus-material-icon">&#xe2c6;</span> Upload
+          </button>
+          <ul class="dropdown-menu">
+            <li>
+              <label class="dropdown-item">
+                Selected Files ...
+                <input type="file" name="mediaFiles" class="collapse" multiple="multiple" formaction="@Url.AreaAction("UploadFile", "FileSystem", "Admin")">
+              </label>
+            </li>
+            <li>
+              <label class="dropdown-item">
+                Upload and un-zip ZIP archive ...
+                <input type="file" name="archiveFile" accept="application/zip" class="collapse" formaction="@Url.AreaAction("UploadArchive", "FileSystem", "Admin")">
+              </label>
+            </li>
+          </ul>
+        </div>
+      }
+      else
+      {
+        <button type="button" class="btn btn-secondary btn-sm" aria-disabled="true" disabled>Upload File</button>
+      }
 
-			@if (Model.Folder.Folders.Any() || Model.Folder.Files.Any())
-			{
-				@Html.SubmitButton("", "Download", @Url.AreaAction("Download", "FileSystem", "Admin"), new { @class = "btn btn-primary btn-sm", @data_target = "window" })
-			}
-			@if (Model.EnableDelete)
-			{
-				@Html.SubmitButton("", "Delete", @Url.AreaAction("ShowDeleteDialog", "FileSystem", "Admin"), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-danger btn-sm" })
-			}
-			@if (Model.EnableRename)
-			{
-				@Html.SubmitButton("", "Rename", @Url.AreaAction("ShowRenameDialog", "FileSystem", "Admin"), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary btn-sm" })
-			}
-			@Html.SubmitButton("&#xe897;", "Folder Settings", @Url.AreaAction("EditFolderSettings", "FileSystem", "Admin", new { folderId = Model.Folder.Id }), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary btn-sm" })
-		</div>
+      @if (Model.Folders.Any() || Model.Files.Any())
+      {
+        @Html.SubmitButton("", "Download", @Url.AreaAction("Download", "FileSystem", "Admin"), new { @class = "btn btn-primary btn-sm", @data_target = "window" })
+      }
+      @if (Model.EnableDelete)
+      {
+        @Html.SubmitButton("", "Delete", @Url.AreaAction("ShowDeleteDialog", "FileSystem", "Admin"), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-danger btn-sm" })
+      }
+      @if (Model.EnableRename)
+      {
+        @Html.SubmitButton("", "Rename", @Url.AreaAction("ShowRenameDialog", "FileSystem", "Admin"), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary btn-sm" })
+      }
+      @Html.SubmitButton("&#xe897;", "Folder Settings", @Url.AreaAction("EditFolderSettings", "FileSystem", "Admin", new { folderId = Model.Folder.Id }), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary btn-sm" })
+    </div>
 
-		<ProgressBar caption="Uploading file(s) ..." class="UploadProgress"></ProgressBar>
+    <ProgressBar caption="Uploading file(s) ..." class="UploadProgress"></ProgressBar>
 
-		@if (Model.Folder?.Permissions?.Any() != true)
-		{
-			<div class="alert alert-warning">This folder does not have any permissions set.  Click Folder Settings to create permissions, unless the files in this folder are for system use only.</div>
-		}
-		@if (!Model.Folder?.Folders.Any() == true && !Model.Folder?.Files.Any() == true)
-		{
-			<div class="alert alert-warning">This folder is empty</div>
-		}
-		else
-		{
-			<div class="overflow-auto">
-				<table class="FileSystemItems table table-sm">
-					<tr>
-						<th class="ps-0"><button type="button" class="nucleus-toggle-selections btn btn-none fs-5 me-1 shadow-none nucleus-material-icon">&#xe146;</button>Name</th>
-						<th class="file-type">Type</th>
-						<th class="file-modified-date">Modified Date</th>
-						<th class="file-size">Size</th>
-						<th class="file-dimensions">Dimensions</th>
-					</tr>
+    @if (Model.Folder?.Permissions?.Any() != true)
+    {
+      <div class="alert alert-warning">This folder does not have any permissions set.  Click Folder Settings to create permissions, unless the files in this folder are for system use only.</div>
+    }
+    @if (!Model.Folders.Any() && !Model.Files.Any())
+    {
+      <div class="alert alert-warning">This folder is empty</div>
+    }
+    else
+    {
+      @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.PagingSettings, propertyName = nameof(Model.PagingSettings) })
 
-					@for (var folderCount = 0; folderCount < Model.Folder?.Folders.Count; folderCount++)
-					{
-						<tr>
-							<td>
-								<label>
-								@if (Model.Folder.Folders[folderCount].Capabilities.CanRename || Model.Folder.Folders[folderCount].Capabilities.CanDelete)
-								{
-									@Html.CheckBoxFor(model => model.Folder.Folders[folderCount].IsSelected, new { @class = "nucleus-filesystem-folderselector" })
-								}
-								@Html.HiddenFor(model => model.Folder.Folders[folderCount].Id)
-								@Html.AreaActionLink(Model.Folder.Folders[folderCount].Name, "Index", "FileSystem", "Admin", new { folderId = @Model.Folder.Folders[folderCount].Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
-								</label>
-							</td>
-							<td>Folder</td>
-							<td>@Model.Folder.Folders[folderCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-							<td />
-							<td />
-						</tr>
-					}
+      <div class="overflow-auto">
+        <table class="nucleus-file-system-table table table-sm table-sticky-headers">
+          <thead>
+          <tr>
+            <th class="ps-0"><button type="button" class="nucleus-toggle-selections btn btn-none fs-5 me-1 shadow-none nucleus-material-icon">&#xe146;</button>Name</th>
+            <th class="file-type">Type</th>
+            <th class="file-modified-date">Modified Date</th>
+            <th class="file-size">Size</th>
+            <th class="file-dimensions">Dimensions</th>
+          </tr>
+          </thead>
+          <tbody>
+          @for (var folderCount = 0; folderCount < Model.Folders.Count; folderCount++)
+          {
+            <tr>
+              <td>
+                <label>
+                  @if (Model.Folders[folderCount].Capabilities.CanRename || Model.Folders[folderCount].Capabilities.CanDelete)
+                  {
+                    @Html.CheckBoxFor(model => Model.Folders[folderCount].IsSelected, new { @class = "nucleus-filesystem-folderselector" })
+                  }
+                  @Html.HiddenFor(model => Model.Folders[folderCount].Id)
+                  @Html.AreaActionLink(Model.Folders[folderCount].Name, "Index", "FileSystem", "Admin", new { folderId = @Model.Folders[folderCount].Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
+                </label>
+              </td>
+              <td>Folder</td>
+              <td>@Model.Folders[folderCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+              <td />
+              <td />
+            </tr>
+          }
 
-					@for (var fileCount = 0; fileCount < Model.Folder?.Files.Count; fileCount++)
-					{
-						var isRecent = Math.Abs(Model.Folder.Files[fileCount].DateModified.Subtract(DateTime.UtcNow).TotalMinutes) < 5;
-						<tr>
-							<td class="@(isRecent ? "fw-bold" : "")">
-								<label>
-								@Html.CheckBoxFor(model => Model.Folder.Files[fileCount].IsSelected, new { @class = "nucleus-filesystem-fileselector" })							
-								@Model.Folder.Files[fileCount].Name
-								@Html.HiddenFor(model => Model.Folder.Files[fileCount].Id)
-								</label>
-							</td>
-							<td>File</td>
-							<td class="Date@(isRecent ? " fw-bold" : "")">@Model.Folder.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-							<td>@Model.Folder.Files[fileCount].Size.FormatFileSize()</td>
-							<td>
-								@if (Model.Folder.Files[fileCount].Width > 0 && Model.Folder.Files[fileCount].Height > 0)
-								{
-									@($"{Model.Folder.Files[fileCount].Width} x {Model.Folder.Files[fileCount].Height}")
-								}
-							</td>
-						</tr>
-					}
-				</table>
-			</div>
-
-		}
-
-	}
+          @for (var fileCount = 0; fileCount < Model.Files.Count; fileCount++)
+          {
+            var isRecent = Math.Abs(Model.Files[fileCount].DateModified.Subtract(DateTime.UtcNow).TotalMinutes) < 5;
+            <tr>
+              <td class="@(isRecent ? "fw-bold" : "")">
+                <label>
+                  @Html.CheckBoxFor(model => Model.Files[fileCount].IsSelected, new { @class = "nucleus-filesystem-fileselector" })
+                  @Model.Files[fileCount].Name
+                  @Html.HiddenFor(model => Model.Files[fileCount].Id)
+                </label>
+              </td>
+              <td>File</td>
+              <td class="Date@(isRecent ? " fw-bold" : "")">@Model.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+              <td>@Model.Files[fileCount].Size.FormatFileSize()</td>
+              <td>
+                @if (Model.Files[fileCount].Width > 0 && Model.Files[fileCount].Height > 0)
+                {
+                  @($"{Model.Files[fileCount].Width} x {Model.Files[fileCount].Height}")
+                }
+              </td>
+            </tr>
+          }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
 </div>
 
 <script>
-	jQuery('.providerKey').on('change', function (event)
-	{
-			var newEvent = jQuery.Event('submit', { originalEvent: event });
-			jQuery(this).parents('form').first().trigger(newEvent);
+  jQuery(document).ready(function ()
+  {
+    jQuery('.providerKey').on('change', function (event)
+    {
+      var newEvent = jQuery.Event('submit', { originalEvent: event });
+      jQuery(this).parents('form').first().trigger(newEvent);
+    });
 
-			//jQuery(this).parents('form').submit();
-	});
+    jQuery('.nucleus-toggle-selections').on('click', function (event)
+    {
+      var checkboxElements = jQuery('.nucleus-filesystem-folderselector, .nucleus-filesystem-fileselector');
 
-	jQuery('.nucleus-toggle-selections').on('click', function (event) 
-	{
-		var checkboxElements = jQuery('.nucleus-filesystem-folderselector, .nucleus-filesystem-fileselector');
+      if (checkboxElements.filter(':checked').length > 0)
+      {
+        // one or more file system items are selected, un-select all
+        checkboxElements.prop('checked', false);
+      }
+      else
+      {
+        // no file system items are selected, select all
+        checkboxElements.prop('checked', true);
+      }
+    });
 
-		if (checkboxElements.filter(':checked').length > 0)
-		{
-			// one or more file system items are selected, un-select all
-			checkboxElements.prop('checked', false);
-		}
-		else
-		{
-			// no file system items are selected, select all
-			checkboxElements.prop('checked', true);
-		}
-	});
+    _cancelProgress();
+
+    jQuery(Page).off('progress.file-system-manager');
+    jQuery(Page).on('progress.file-system-manager', function (args)
+    {
+      _cancelProgress();
+      _progressTimeoutId = window.setTimeout(() =>
+      {
+        // manually create a progress spinner for the paging controls buttons
+        if (jQuery('.nucleus-file-system-manager .nucleus-progress-spinner').length === 0)
+        {
+          var progress = jQuery('<div class="spinner-border spinner-border-sm text-primary nucleus-progress-spinner ms-2" role="status"/>');
+          progress.appendTo(jQuery('.nucleus-file-system-manager .nucleus-form-buttonrow'));
+        }
+      }, 600);
+    });
+
+    // remove the  progress spinner when the request completes
+    jQuery('.nucleus-file-system-manager form').off('.file-system-manager');
+    jQuery('.nucleus-file-system-manager form').on('success.file-system-manager error.file-system-manager', function (args)
+    {
+      _cancelProgress();
+      jQuery('.nucleus-file-system-manager .nucleus-progress-spinner').remove();
+    });
+  
+    function _cancelProgress()
+    {
+      if (typeof _progressTimeoutId === 'undefined') return;
+      window.clearTimeout(_progressTimeoutId);
+      _progressTimeoutId=-1;
+    }
+  });
+
+  
+
 </script>

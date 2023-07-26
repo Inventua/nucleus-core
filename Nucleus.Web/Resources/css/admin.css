@@ -740,44 +740,44 @@ ul.nucleus-control-panel-items button
 	display: none;
 }
 
-.nucleus-adminpage .FileSystemManager
+.nucleus-adminpage .nucleus-file-system-manager
 {
 	min-width: 750px;
 	height: 100%;
 }
 
-.nucleus-adminpage .FileSystemManager form
+.nucleus-adminpage .nucleus-file-system-manager form
 {
 	height: 100%;
 }
 
-.nucleus-adminpage .FileSystemItems
+.nucleus-adminpage .nucleus-file-system-manager .nucleus-form-buttonrow .nucleus-progress-spinner
+{
+  position: initial;
+  right: initial;
+}
+
+.nucleus-adminpage .nucleus-file-system-table
 {
 	font-size: 14px;
 }
 
-/*.nucleus-adminpage .FileSystemItems th, .nucleus-adminpage .FileSystemItems td
-{
-	padding: 4px 8px;
-	white-space: nowrap;
-}*/
-
-.nucleus-adminpage .FileSystemItems .file-type
+.nucleus-adminpage .nucleus-file-system-table .file-type
 {
 	width: 6rem;
 }
 
-.nucleus-adminpage .FileSystemItems .file-modified-date
+.nucleus-adminpage .nucleus-file-system-table .file-modified-date
 {
 	width: 12rem;
 }
 
-.nucleus-adminpage .FileSystemItems .file-size
+.nucleus-adminpage .nucleus-file-system-table .file-size
 {
 	width: 8rem;
 }
 
-.nucleus-adminpage .FileSystemItems .file-dimensions
+.nucleus-adminpage .nucleus-file-system-table .file-dimensions
 {
 	width: 10rem;
 }

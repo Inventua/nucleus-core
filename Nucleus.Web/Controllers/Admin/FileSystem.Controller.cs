@@ -20,7 +20,6 @@ using Nucleus.Extensions.Authorization;
 using Nucleus.Abstractions.Models.Extensions;
 using Nucleus.Abstractions.Models.Paging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using Nucleus.Extensions.Mvc;
 
 namespace Nucleus.Web.Controllers.Admin
 {

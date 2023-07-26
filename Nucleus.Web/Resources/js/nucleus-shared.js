@@ -520,7 +520,7 @@ function _Page()
 
 		var action = function ()
 		{
-      _indicateProgress.call(this, event);
+      _indicateProgress.call(this, target, url, event);
 
       jQuery.ajax({
         url: url,
@@ -601,7 +601,7 @@ function _Page()
 			target = jQuery(target);
 		}
 
-		_indicateProgress.call(this, event);
+    _indicateProgress.call(this, target, url, event);
 
 		jQuery.ajax({
       url: url,
@@ -667,7 +667,7 @@ function _Page()
 
 		if (typeof (target) !== 'undefined' && typeof (url) !== 'undefined')
 		{
-			_indicateProgress.call(this, event);
+      _indicateProgress.call(this, target, url, event);
 
 			jQuery.ajax({
         url: url,
@@ -687,10 +687,14 @@ function _Page()
 	 * 
 	 * @param {any} event
 	 */
-	function _indicateProgress(event)
-	{
+  function _indicateProgress(target, url, event)
+  {
+    // send a progress event so that progress indicators can be handled externally
+    jQuery(Page).trigger("progress", [{ page: Page, target: target, url: url, event: event }]);
+
 		// figure out which control initiated the event
-		var triggerControl = jQuery(this);
+    var triggerControl = jQuery(this);
+
 		if (event !== null)
 		{
 			if (event.originalEvent !== null && typeof event.originalEvent !== 'undefined')
@@ -1070,17 +1074,6 @@ function _Page()
   {
     _cancelProgressIndicator();    
     _removeProgressIndicator(source);
-    //if (typeof source !== 'undefined' && source !== null && source.hasClass('nucleus-show-progress'))
-    //{
-    //  if (source.hasClass('nucleus-show-progress-before') || source.hasClass('nucleus-show-progress-after'))
-    //  {
-    //    source.siblings('.nucleus-progress-spinner').remove();
-    //  }
-    //  else
-    //  {
-    //    source.find('.nucleus-progress-spinner').remove();
-    //  }      
-    //}
 
 		if (!target.is(':visible') && data !== '')
 		{

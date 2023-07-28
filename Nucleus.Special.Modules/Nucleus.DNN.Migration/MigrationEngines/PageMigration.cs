@@ -101,7 +101,16 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
             }
             else
             {
-              dnnPage.AddWarning($"The Page parent could not be set because a page with DNN Parent ID '{dnnPage.ParentId}' was not imported.");
+              // try looking by route
+              Nucleus.Abstractions.Models.Page nucleusParentPage = await this.PageManager.Get(this.Context.Site, dnnPage.TabPath.Replace("//", "/"));
+              if (nucleusParentPage != null)
+              {
+                newPage.ParentId = nucleusParentPage.Id;
+              }
+              else
+              {
+                dnnPage.AddWarning($"The Page parent could not be set because a page with DNN Parent ID '{dnnPage.ParentId}' was not imported, and a Nucleus page with route '{dnnPage.TabPath.Replace("//", "/")} was not found.'.");
+              }
             }
           }
 
@@ -475,7 +484,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
       }
     }
 
-    dnnPage.AddWarning($"Page module '{dnnPageModule.ModuleTitle}' [{dnnPageModule.DesktopModule.ModuleName}] was not added to the page because we don't have a module content migration implementation for this module type.");
+    dnnPage.AddWarning($"The module '{dnnPageModule.ModuleTitle}' was not added to the '{newPage.Name}' page because we don't have a module content migration implementation for the '{dnnPageModule.DesktopModule.ModuleName}' module.");
 
     // no match
     return null;

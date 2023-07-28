@@ -173,7 +173,7 @@ public class ForumsModuleContentMigration : ModuleContentMigrationBase
         // ignore negative values (which seem to mean "deny")
         if (dnnRoleId >= 0)
         {
-          Models.DNN.Role dnnRole = await this.DnnMigrationManager.GetDNNRole(dnnRoleId);
+          Models.DNN.Role dnnRole = await this.DnnMigrationManager.GetDnnRole(dnnRoleId);
           if (dnnRole != null && dnnRole.RoleName != "Administrators")
           {
             Nucleus.Abstractions.Models.Role nucleusRole = await this.RoleManager.GetByName(site, dnnRole.RoleName);

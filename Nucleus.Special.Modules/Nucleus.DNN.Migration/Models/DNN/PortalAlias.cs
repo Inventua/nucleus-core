@@ -7,12 +7,16 @@ using System.Threading.Tasks;
 
 namespace Nucleus.DNN.Migration.Models.DNN;
 
-public class Portal
+public class PortalAlias
 {
+  [Column("PortalAliasID")]
+  public int PortalAliasId { get; set; }
+
+
   [Column("PortalID")] 
   public int PortalId { get; set; }
 
-  public string PortalName { get; set; }
+  [Column("HTTPAlias")]
+  public string HttpAlias { get; set; }
 
-  public List<PortalAlias> PortalAliases { get; set; }
 }

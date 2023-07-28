@@ -72,7 +72,7 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
       }
       else
       {
-        dnnPage.AddWarning($"Unable to set the category list setting for documents module '{dnnModule.ModuleTitle}'.  The list '{settings.CategoriesListName}' was not found.");
+        dnnPage.AddWarning($"Unable to set the category list setting for documents module '{dnnModule.ModuleTitle}' because the list '{settings.CategoriesListName}' was not found in Nucleus.");
       }
     }
 
@@ -132,7 +132,7 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
       if (dnnDocument.Url.StartsWith("FileID=", StringComparison.OrdinalIgnoreCase))
       {
         // document is a file
-        Models.DNN.File dnnDocumentFile = await this.DnnMigrationManager.GetDNNFile(Int32.Parse(dnnDocument.Url.Replace("fileid=", "", StringComparison.OrdinalIgnoreCase)));
+        Models.DNN.File dnnDocumentFile = await this.DnnMigrationManager.GetDnnFile(Int32.Parse(dnnDocument.Url.Replace("fileid=", "", StringComparison.OrdinalIgnoreCase)));
 
         try
         {

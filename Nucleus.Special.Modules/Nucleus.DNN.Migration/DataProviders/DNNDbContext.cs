@@ -157,8 +157,15 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
     builder.Entity<Models.DNN.File>()
      .ToTable("Files");
 
+    builder.Entity<Models.DNN.FolderPermission>()
+      .ToView("vw_FolderPermissions")
+      .HasKey(folderPermission => folderPermission.FolderPermissionId);
+
     builder.Entity<Models.DNN.Folder>()
-     .ToTable("Folders");
+     .ToTable("Folders")
+     .HasMany(folder => folder.Permissions)
+      .WithOne(permission => permission.Folder)
+      .HasForeignKey("FolderID"); 
 
     builder.Entity<Models.DNN.ListItem>()
       .ToTable("Lists")

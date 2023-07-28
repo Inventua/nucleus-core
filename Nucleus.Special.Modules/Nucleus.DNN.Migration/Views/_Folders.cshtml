@@ -1,0 +1,81 @@
+﻿@model Nucleus.DNN.Migration.ViewModels.Folder
+@Html.AddStyle("~!/../index.css")
+<h2 class="nucleus-control-panel-heading">Migrate DNN Folders and Files</h2>
+<div>
+  <div class="alert alert-primary">
+    <ul>
+      <li>This migration will copy folders and files and folder permissions from DNN to Nucleus.  You may find it easier to copy the folders and files manually and use this step to just migrate folder permissions.</li>
+      <li>Use the "Update Existing" switch to control whether to copy files that already exist in Nucleus.</li>
+    </ul>
+  </div>
+
+  @using (Html.BeginNucleusForm("MigrateFolders", "DNNMigration", "DNNMigration", FormMethod.Post, new { }))
+  {
+    <h3>DotNetNuke Source Information</h3>
+
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="Portal Alias" helptext="Select the portal alias to use when downloading files from DNN.">
+        @Html.DropDownListFor(model => model.PortalAliasId, new SelectList(Model.AvailablePortalAliases, "PortalAliasId", "HttpAlias"), "(select)", new(){} )
+      </SettingsControl>
+      <SettingsControl caption="Use SSL?" helptext="Specifies whether to use SSL (https) or not (http) for file downloads.">
+        @Html.CheckBoxFor(model => model.UseSSL, new { @class = "ToggleSwitch" })
+      </SettingsControl>
+    </div>
+
+    @Html.HiddenFor(model => model.PortalId)
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="Update Existing?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to update folders when a matching folder is found.  If this is not set, any existing folders will be skipped.">
+        @Html.CheckBoxFor(model => model.UpdateExisting, new { @class = "ToggleSwitch" })
+      </SettingsControl>
+
+      <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-before" data-target="#MigrateFolders" data-confirm="Migrate selected folders and files from DotNetNuke now?  This action cannot be reversed.">Migrate Folders and Files</button>
+    </div>
+
+    <div class="my-2">
+      <div class="overflow-auto">
+        <table class="table table-striped table-sm table-sticky-headers">
+          <thead>
+            <tr>
+              <th>@Html.CheckBox("toggle-all", true, new { @class = "toggle-all", @id = "" } )</th>
+              <th>Name</th>
+              <th>Files</th>
+              <th>Messages</th>
+            </tr>
+          </thead>
+          <tbody>
+            @{
+              var index = 0;
+            }
+            @foreach (var folder in Model.Folders)
+            {
+              <tr>
+                <td>
+                  @if (folder.CanSelect)
+                  {
+                    @Html.CheckBox($"Files[{index}].IsSelected", folder.IsSelected, new { id = $"Files_{index}__IsSelected" })
+                  }
+                  @Html.Hidden($"Folders[{index}].CanSelect", folder.CanSelect, new { id = $"Folders_{index}__CanSelect" })
+                  @Html.Hidden($"Folders[{index}].FolderId", folder.FolderId, new { id = $"Folders_{index}__FolderId" })
+                </td>
+                <td>@(String.IsNullOrEmpty(folder.FolderPath) ? "/" : folder.FolderPath)</td>
+                <td>@folder.Files.Count</td>
+                <td>
+                  <table class="table table-sm table-borderless validation-results">
+                    @foreach (var result in folder.Results)
+                    {
+                      <tr>
+                        <td class="glyph-@result.Type">@result.Message</td>
+                      </tr>
+                    }
+                  </table>
+                </td>
+              </tr>
+              index++;
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  }
+</div>

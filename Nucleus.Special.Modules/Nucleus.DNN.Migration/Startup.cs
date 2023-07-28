@@ -42,6 +42,7 @@ public class Startup : IHostingStartup
       services.AddMigrationEngine<Models.DNN.User, MigrationEngines.UserMigration>();
       services.AddMigrationEngine<Models.DNN.Modules.Forum, MigrationEngines.ForumMigration>();
       services.AddMigrationEngine<Models.NotifyUser, MigrationEngines.NotifyUsers>();
+      services.AddMigrationEngine<Models.DNN.Folder, MigrationEngines.FilesMigration>();
 
       // Add module content migration classes to DI
       foreach (Type type in GetModuleContentMigrationImplementations())

@@ -12,7 +12,6 @@ using Nucleus.Abstractions;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Extensions;
-using Microsoft.AspNetCore.Http.Headers;
 
 namespace Nucleus.Core.FileSystemProviders
 {
@@ -21,7 +20,7 @@ namespace Nucleus.Core.FileSystemProviders
 		private IOptions<FileSystemProviderFactoryOptions> Options { get; }
 		private ILogger<FileIntegrityCheckerMiddleware> Logger { get; }
 		private Context Context { get; }
-		private const long EXTENSIONS_MAX_SIZE = 67108864;
+		private const long MAX_FILE_SIZE_BYTES = 67108864;
 
 		public FileIntegrityCheckerMiddleware(IOptions<FileSystemProviderFactoryOptions> options, Context context, ILogger<FileIntegrityCheckerMiddleware> logger)
 		{
@@ -40,9 +39,9 @@ namespace Nucleus.Core.FileSystemProviders
 				if (context.Request.Path.Equals("/admin/extensions/upload", StringComparison.OrdinalIgnoreCase))
 				{
 					Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature max = context.Features.Get<Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature>();
-					if (max != null && max.MaxRequestBodySize.HasValue && max.MaxRequestBodySize.Value < EXTENSIONS_MAX_SIZE)
+					if (max != null && max.MaxRequestBodySize.HasValue && max.MaxRequestBodySize.Value < MAX_FILE_SIZE_BYTES)
 					{
-						max.MaxRequestBodySize = EXTENSIONS_MAX_SIZE;
+						max.MaxRequestBodySize = MAX_FILE_SIZE_BYTES;
 					}
 				}
        

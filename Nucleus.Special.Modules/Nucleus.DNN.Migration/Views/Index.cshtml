@@ -45,6 +45,16 @@
           <span class="action-description">Migrate lists from DNN.</span>
         </li>
 
+        <li class="border-top border-bottom border-primary border-1 py-3">
+          <div>
+            <button type="submit" formaction="@Url.NucleusAction("FoldersIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigrateFolders">Files and Folders</button>
+          </div>
+          <div>
+            <div class="action-description">Migrate files and folders from DNN.</div>
+            <div class="action-remarks">This step is used to copy files and folders from DNN.</div>
+          </div>
+        </li>
+
         <li>
           <div>
             <button type="submit" formaction="@Url.NucleusAction("PagesIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigratePages">Pages</button>
@@ -85,6 +95,7 @@
     }
     <modal id="MigrateRoles" title="Migrate Roles"></modal>
     <modal id="MigrateLists" title="Migrate Lists"></modal>
+    <modal id="MigrateFolders" title="Migrate Folders and Files"></modal>
     <modal id="MigratePages" title="Migrate Pages"></modal>
     <modal id="MigrateUsers" title="Migrate Users"></modal>
     <modal id="MigrateForums" title="Migrate Forums Content"></modal>

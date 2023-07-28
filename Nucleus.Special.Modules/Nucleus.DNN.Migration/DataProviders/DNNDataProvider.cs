@@ -38,6 +38,7 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
   public async Task<List<Models.DNN.Portal>> ListPortals()
   {
     return await this.Context.Portals
+      .Include(portal => portal.PortalAliases)
       .AsNoTracking()
       .ToListAsync();
   }
@@ -178,7 +179,10 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
   {
     return await this.Context.Pages
       .Where(page => page.PageId == pageId)
+      .Include(page => page.PageModules)
+        .ThenInclude(module => module.DesktopModule)
       .AsNoTracking()
+      .AsSplitQuery()
       .FirstOrDefaultAsync();
   }
 
@@ -268,6 +272,27 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
     return await this.Context.Blogs
       .Where(blog => blog.PortalId == portalId && blog.Public)
       .Include(blog => blog.BlogEntries)
+      .AsNoTracking()
+      .ToListAsync();
+  }
+
+  public async Task<Models.DNN.Folder> GetFolder(int folderId)
+  {
+    return await this.Context.Folders
+      .Where(folder => folder.FolderId == folderId)
+      .Include(folder => folder.Files)
+      .Include(folder => folder.Permissions)
+      .AsSplitQuery()
+      .AsNoTracking()
+      .FirstOrDefaultAsync();
+  }
+
+  public async Task<List<Models.DNN.Folder>> ListFolders(int portalId)
+  {    
+    return await this.Context.Folders
+      .Where(folder => folder.PortalId == portalId)
+      .Include(folder => folder.Files)
+      .OrderBy(folder => folder.FolderPath)
       .AsNoTracking()
       .ToListAsync();
   }

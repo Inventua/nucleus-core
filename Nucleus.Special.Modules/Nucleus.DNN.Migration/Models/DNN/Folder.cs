@@ -27,5 +27,9 @@ public class Folder : DNNEntity
 
   public string FolderPath { get; set; }
 
+  public List<File> Files { get; set; }
+
+  public List<FolderPermission> Permissions { get; set; }
+
 
 }

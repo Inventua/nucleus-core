@@ -65,7 +65,7 @@ public class LinksModuleContentMigration : ModuleContentMigrationBase
       if (dnnLink.Url.StartsWith("FileID=", StringComparison.OrdinalIgnoreCase))
       {
         // link is a file
-        Models.DNN.File dnnLinkFile = await this.DnnMigrationManager.GetDNNFile(Int32.Parse(dnnLink.Url.Replace("fileid=", "", StringComparison.OrdinalIgnoreCase)));
+        Models.DNN.File dnnLinkFile = await this.DnnMigrationManager.GetDnnFile(Int32.Parse(dnnLink.Url.Replace("fileid=", "", StringComparison.OrdinalIgnoreCase)));
 
         try
         {

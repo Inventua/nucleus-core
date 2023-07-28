@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Office2010.CustomUI;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Models.Extensions;
 using Nucleus.Data.Common;
 using Nucleus.DNN.Migration.DataProviders;
 using Nucleus.DNN.Migration.MigrationEngines;
@@ -88,51 +89,8 @@ public class DNNMigrationManager
     return Task.FromResult(engine);
   }
 
-  #region "    Migration History    "
-  ///// <summary>
-  ///// Create a new <see cref="Models.Migration"/> with default values.
-  ///// </summary>
-  ///// <param name="site"></param>
-  ///// <returns></returns>
-  ///// <remarks>
-  ///// The new <see cref="Models.Migration"/> is not saved to the database until you call <see cref="Save(PageModule, Models.Migration)"/>.
-  ///// </remarks>
-  //public Models.MigrationHistory CreateNew()
-  //{
-  //  Models.MigrationHistory result = new();
 
-  //  return result;
-  //}
-
-  /////// <summary>
-  /////// List all <see cref="Models.Migration"/>s within the specified site.
-  /////// </summary>
-  /////// <param name="module"></param>
-  /////// <returns></returns>
-  ////public async Task<IList<Models.Migration>> List(PageModule module)
-  ////{
-  ////  using (IDNNMigrationDataProvider provider = this.DataProviderFactory.CreateProvider<IDNNMigrationDataProvider>())
-  ////  {
-  ////    return await provider.List(module);
-  ////  }
-  ////}
-
-  ///// <summary>
-  ///// Create or update a <see cref="Models.Migration"/>.
-  ///// </summary>
-  ///// <param name="module"></param>
-  ///// <param name="Models.Migration"></param>
-  //public async Task Save(PageModule module, Models.MigrationHistory migrationHistory)
-  //{
-  //  using (DNNMigrationDataProvider provider = this.DataProviderFactory.CreateProvider<DNNMigrationDataProvider>())
-  //  {
-  //    await provider.Save(migrationHistory);      
-  //  }
-  //}
-  #endregion
-
-
-  public async Task<Models.DNN.Version> GetDNNVersion()
+  public async Task<Models.DNN.Version> GetDnnVersion()
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
@@ -145,7 +103,7 @@ public class DNNMigrationManager
   }
 
   #region "    Core Entities    "
-  public async Task<List<Models.DNN.Portal>> ListDNNPortals()
+  public async Task<List<Models.DNN.Portal>> ListDnnPortals()
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
@@ -153,7 +111,7 @@ public class DNNMigrationManager
     }
   }
 
-  public async Task<Models.DNN.RoleGroup> GetDNNRoleGroup(int id)
+  public async Task<Models.DNN.RoleGroup> GetDnnRoleGroup(int id)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
@@ -161,7 +119,7 @@ public class DNNMigrationManager
     }
   }
 
-  public async Task<List<Models.DNN.RoleGroup>> ListDNNRoleGroups(int portalId)
+  public async Task<List<Models.DNN.RoleGroup>> ListDnnRoleGroups(int portalId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
@@ -169,7 +127,7 @@ public class DNNMigrationManager
     }
   }
 
-  public async Task<Models.DNN.Role> GetDNNRole(int id)
+  public async Task<Models.DNN.Role> GetDnnRole(int id)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
@@ -177,7 +135,7 @@ public class DNNMigrationManager
     }
   }
 
-  public async Task<List<Models.DNN.Role>> ListDNNRoles(int portalId)
+  public async Task<List<Models.DNN.Role>> ListDnnRoles(int portalId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
@@ -185,7 +143,7 @@ public class DNNMigrationManager
     }
   }
 
-  public async Task<List<Models.DNN.List>> ListDNNLists(int portalId)
+  public async Task<List<Models.DNN.List>> ListDnnLists(int portalId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
@@ -193,7 +151,7 @@ public class DNNMigrationManager
     }
   }
 
-  public async Task<Models.DNN.File> GetDNNFile(int id)
+  public async Task<Models.DNN.File> GetDnnFile(int id)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
@@ -201,7 +159,7 @@ public class DNNMigrationManager
     }
   }
 
-  public async Task<Models.DNN.User> GetDNNUser(int id)
+  public async Task<Models.DNN.User> GetDnnUser(int id)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
@@ -209,7 +167,7 @@ public class DNNMigrationManager
     }
   }
 
-  public async Task<List<Models.DNN.User>> ListDNNUsers(int portalId)
+  public async Task<List<Models.DNN.User>> ListDnnUsers(int portalId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
@@ -217,7 +175,7 @@ public class DNNMigrationManager
     }
   }
 
-  public async Task<Models.DNN.Page> GetDNNPage(int id)
+  public async Task<Models.DNN.Page> GetDnnPage(int id)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
@@ -225,7 +183,7 @@ public class DNNMigrationManager
     }
   }
 
-  public async Task<List<Models.DNN.Page>> ListDNNPages(int portalId)
+  public async Task<List<Models.DNN.Page>> ListDnnPages(int portalId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
@@ -256,6 +214,39 @@ public class DNNMigrationManager
     {
       return await provider.ListLinks(moduleId);
     }
+  }
+
+  public async Task<Models.DNN.Folder> GetDnnFolder(int folderId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.GetFolder(folderId);
+    }
+  }
+
+  public async Task<List<Models.DNN.Folder>> ListDnnFolders(int portalId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return (await provider.ListFolders(portalId))
+        .Where(folder=> !IsReservedFolderName(folder))
+        .ToList();
+    }
+  }
+
+  private Boolean IsReservedFolderName(Models.DNN.Folder folder)
+  {
+    string[] RESERVED_PATHS = { "Cache/", "Containers/", "Skins/", "SiteMap/", "Templates/", "Users/" };
+
+    foreach (string path in RESERVED_PATHS)
+    {
+      if (folder.FolderPath.StartsWith(path, StringComparison.OrdinalIgnoreCase))
+      {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public async Task<List<Models.DNN.Modules.Blog>> ListDnnBlogs(int portalId)

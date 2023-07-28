@@ -62,6 +62,13 @@ public class DNNMigrationController : Controller
   }
 
   [HttpPost]
+  public async Task<ActionResult> FoldersIndex(int portalId)
+  {
+    return View("_Folders", await BuildFoldersViewModel(portalId));
+  }
+
+
+  [HttpPost]
   public async Task<ActionResult> ForumsIndex(int portalId)
   {
     return View("_Forums", await BuildForumsViewModel(portalId));
@@ -115,6 +122,37 @@ public class DNNMigrationController : Controller
     Task task = Task.Run(async () =>
     {
       await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.List>().Migrate(viewModel.UpdateExisting);
+    });
+
+    return View("_Progress", await BuildProgressViewModel());
+  }
+
+  [HttpPost]
+  public async Task<ActionResult> MigrateFolders(ViewModels.Folder viewModel)
+  {
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
+    }
+    List<Models.DNN.Portal> portals = await this.DNNMigrationManager.ListDnnPortals();
+
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>().UpdateSelections(viewModel.Folders);
+
+    (this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>() as MigrationEngines.FilesMigration)
+      .SetAlias
+      (
+        viewModel.UseSSL, 
+        portals
+          .Where(portal => portal.PortalId == viewModel.PortalId)
+          .SelectMany(portal => portal.PortalAliases)
+          .Where(alias => alias.PortalAliasId == viewModel.PortalAliasId)
+          .FirstOrDefault()
+      );
+    this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>().SignalStart();
+
+    Task task = Task.Run(async () =>
+    {
+      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>().Migrate(viewModel.UpdateExisting);
     });
 
     return View("_Progress", await BuildProgressViewModel());
@@ -266,8 +304,8 @@ public class DNNMigrationController : Controller
     DatabaseConnectionOption connection = this.DatabaseOptions.Value.GetDatabaseConnection(Startup.DNN_SCHEMA_NAME, false);
     if (connection != null)
     {
-      viewModel.Version = await this.DNNMigrationManager.GetDNNVersion();
-      viewModel.Portals = await this.DNNMigrationManager.ListDNNPortals();
+      viewModel.Version = await this.DNNMigrationManager.GetDnnVersion();
+      viewModel.Portals = await this.DNNMigrationManager.ListDnnPortals();
 
       viewModel.ConnectionString = Sanitize(connection.ConnectionString);
     }
@@ -300,8 +338,8 @@ public class DNNMigrationController : Controller
     ViewModels.Role viewModel = new();
     viewModel.PortalId = portalId;
     
-    viewModel.RoleGroups = await this.DNNMigrationManager.ListDNNRoleGroups(portalId);
-    viewModel.Roles = await this.DNNMigrationManager.ListDNNRoles(portalId);
+    viewModel.RoleGroups = await this.DNNMigrationManager.ListDnnRoleGroups(portalId);
+    viewModel.Roles = await this.DNNMigrationManager.ListDnnRoles(portalId);
 
     this.DNNMigrationManager.ClearMigrationEngines();
     await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.RoleGroup>(this.HttpContext.RequestServices, viewModel.RoleGroups);
@@ -320,11 +358,34 @@ public class DNNMigrationController : Controller
     ViewModels.List viewModel = new();
     viewModel.PortalId = portalId;
 
-    viewModel.Lists = await this.DNNMigrationManager.ListDNNLists(portalId);
+    viewModel.Lists = await this.DNNMigrationManager.ListDnnLists(portalId);
     
     this.DNNMigrationManager.ClearMigrationEngines();
     await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.List>(this.HttpContext.RequestServices, viewModel.Lists);
     
+    foreach (MigrationEngineBase engine in this.DNNMigrationManager.GetMigrationEngines)
+    {
+      await engine.Validate();
+    }
+
+    return viewModel;
+  }
+
+  private async Task<ViewModels.Folder> BuildFoldersViewModel(int portalId)
+  {
+    ViewModels.Folder viewModel = new();
+    viewModel.PortalId = portalId;
+
+    viewModel.AvailablePortalAliases = (await this.DNNMigrationManager.ListDnnPortals())
+      .Where(portal => portal.PortalId == portalId)
+      .FirstOrDefault()
+      .PortalAliases;
+
+    viewModel.Folders = await this.DNNMigrationManager.ListDnnFolders(portalId);
+
+    this.DNNMigrationManager.ClearMigrationEngines();
+    await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.Folder>(this.HttpContext.RequestServices, viewModel.Folders);
+
     foreach (MigrationEngineBase engine in this.DNNMigrationManager.GetMigrationEngines)
     {
       await engine.Validate();
@@ -363,7 +424,7 @@ public class DNNMigrationController : Controller
     ViewModels.Page viewModel = new();
     viewModel.PortalId = portalId;
 
-    viewModel.Pages = await this.DNNMigrationManager.ListDNNPages(portalId);
+    viewModel.Pages = await this.DNNMigrationManager.ListDnnPages(portalId);
 
     this.DNNMigrationManager.ClearMigrationEngines();
     await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.Page>(this.HttpContext.RequestServices, viewModel.Pages);    
@@ -382,7 +443,7 @@ public class DNNMigrationController : Controller
     ViewModels.User viewModel = new();
     viewModel.PortalId = portalId;
 
-    viewModel.Users = await this.DNNMigrationManager.ListDNNUsers(portalId);
+    viewModel.Users = await this.DNNMigrationManager.ListDnnUsers(portalId);
 
     this.DNNMigrationManager.ClearMigrationEngines();
     await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.User>(this.HttpContext.RequestServices, viewModel.Users);

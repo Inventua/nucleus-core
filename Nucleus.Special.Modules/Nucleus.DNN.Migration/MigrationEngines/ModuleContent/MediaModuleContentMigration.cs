@@ -56,7 +56,7 @@ public class MediaModuleContentMigration : ModuleContentMigrationBase
     if (settings.Source.StartsWith("FileID=", StringComparison.OrdinalIgnoreCase))
     {
       // file
-      Models.DNN.File dnnMediaFile = await this.DnnMigrationManager.GetDNNFile(Int32.Parse(settings.Source.Replace("fileid=", "", StringComparison.OrdinalIgnoreCase)));
+      Models.DNN.File dnnMediaFile = await this.DnnMigrationManager.GetDnnFile(Int32.Parse(settings.Source.Replace("fileid=", "", StringComparison.OrdinalIgnoreCase)));
 
       try
       {

@@ -58,8 +58,9 @@ function _setupEditMode(e, args)
         // don't show drag target if it is the one attached to the module being dragged
         (!dragTargetContainer.is(jQuery(event.target).parents('.nucleus-module-editing')))
         &&
-        // don't show drag target if it is the special "pane" end drag target, and the module being dragged is already the last module in the pane
-        (!(dragTargetContainer.length === 0 && dragHandleContainer.is(dragHandleContainer.parent().children('.nucleus-module-editing').last())))
+        // don't show drag target if it is the special drag target at the end of the pane (dragTargetContainer.length === 0, because the special drag targets
+        // do not have a .nucleus-module-editing parent), and the module being dragged is already the last module in the(same) pane
+        (!(dragTargetContainer.length === 0 && dragTargetElement.parent().is(dragHandleContainer.parent()) && dragTargetElement.is(':last-child')))
       )
       {
         dragTargetElement.addClass('show');

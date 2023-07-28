@@ -70,7 +70,7 @@ public class RoleMigration : MigrationEngineBase<Models.DNN.Role>
   {
     foreach (Role role in this.Items)
     {
-      string[] RESERVED_ROLES = { "Administrators", "Registered Users" };
+      string[] RESERVED_ROLES = { "Administrators", "Registered Users", "Unverified Users" };
       if (RESERVED_ROLES.Contains(role.RoleName, StringComparer.OrdinalIgnoreCase)) 
       {
         role.AddError($"'{role.RoleName}' is a reserved/special role in DNN and will not be migrated.");

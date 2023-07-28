@@ -159,8 +159,8 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
               }
             }
           }
-          dnnFolder.AddWarning($"{successCount} file{(successCount == 1 ? "" : "s")} migrated, {failCount} file{(failCount == 1 ? "" : "s")} skipped or failed.");
-
+          
+          dnnFolder.AddWarning($"{(successCount == 0 ? "No" : successCount)} file{(successCount == 1 ? "" : "s")} migrated, {(failCount==0 ? "no" : failCount)} file{(failCount == 1 ? "" : "s")} skipped or failed.");
         }
         catch (Exception ex)
         {

@@ -13,7 +13,7 @@ public class UserProfilePropertyDefinition
   public int PropertyDefinitionId { get; set; }
 
   [Column("PortalID")]
-  public int PortalId { get; set; }
+  public int? PortalId { get; set; }
 
   public Boolean Deleted { get; set; }
 

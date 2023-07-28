@@ -88,7 +88,7 @@ public class ListMigration : MigrationEngineBase<Models.DNN.List>
   {
     foreach (List list in this.Items)
     {
-      string[] RESERVED_ROLES = { "Country", "Currency", "DataType", "DisplayPosterLocation", "ForumThreadRate", "Frequency", "Processor", "Region", "Site Log Reports", "TrackingDuration" };
+      string[] RESERVED_ROLES = { "Country", "Currency", "DataType", "DisplayPosterLocation", "ForumThreadRate", "Frequency", "Processor", "Region", "Site Log Reports", "TrackingDuration", "BannedPasswords", "BannedPasswords-0", "ProfanityFilter", "ProfanityFilter-0" };
       if (list.SystemList || RESERVED_ROLES.Contains(list.ListName, StringComparer.OrdinalIgnoreCase)) 
       {
         list.AddError($"'{list.ListName}' is a reserved/special list in DNN and will not be migrated.");

@@ -25,7 +25,7 @@
 
     @using (Html.BeginForm())
     {
-      <div>
+      <div class="overflow-visible">
         <h3>Select Source Portal</h3>
         @Html.DropDownListFor(model => model.PortalId, new SelectList(Model.Portals, "PortalId", "PortalName"), "(select)", new(){} )
       </div>

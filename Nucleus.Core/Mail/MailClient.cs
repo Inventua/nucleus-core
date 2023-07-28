@@ -51,6 +51,11 @@ namespace Nucleus.Core.Mail
 			MimeKit.MimeMessage message = new();
 			MimeKit.BodyBuilder builder = new();
 			
+      if (String.IsNullOrEmpty(this.MailSettings.Sender))
+      {
+        throw new InvalidOperationException("Mail not sent because a sender address is not configured for the site.");
+      }
+
 			message.From.Add(MimeKit.MailboxAddress.Parse(this.MailSettings.Sender));
 
 			foreach (string address in to.Split(new char[] { ',' , ';' }, StringSplitOptions.RemoveEmptyEntries))

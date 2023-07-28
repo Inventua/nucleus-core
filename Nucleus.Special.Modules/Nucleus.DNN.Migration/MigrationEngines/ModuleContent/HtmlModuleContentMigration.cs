@@ -10,6 +10,7 @@ using Nucleus.Extensions;
 using Nucleus.Abstractions.FileSystemProviders;
 using DocumentFormat.OpenXml.EMMA;
 using System.Text.RegularExpressions;
+using System.IO;
 
 namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
@@ -62,19 +63,16 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
       content.ContentType = "text/html";
       content.Value = System.Web.HttpUtility.HtmlDecode(contentSource.Content);
 
-      // apply "guesses" to the content to help with images/other file links.  This assumes that the contents of
-      // /Portals/[index] will be copied in the same directory structure to Nucleus
-      content.Value = content.Value.Replace($"/Portals/{dnnPage.PortalId}/", $"/files/{fileSystemProvider.Key}/");
-
-      if (dnnPage.PageId == 1 || dnnPage.PageId == 44 || dnnPage.PageId == 45)
-      {
-
-      }
-
       // rewrite url links like /LinkClick.aspx?link=54&tabid=166
       foreach (System.Text.RegularExpressions.Match match in System.Text.RegularExpressions.Regex.Matches(content.Value, $"{HREF_PREFIX_MATCH}[/]{{0,1}}LinkClick\\.aspx\\?link=(?<tabid>[0-9]*)&[amp;]*tabid=(?<referrer_tabid>[0-9]*)\"", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
       {
         content.Value = await ReplaceMatch(match, createdPagesKeys, content.Value);        
+      }
+
+      // rewrite image links like src="/portals/0/Images/instant-rebates.jpg?ver=Zo9cRKFqYNVRF84bLp4L0Q%3d%3d"
+      foreach (System.Text.RegularExpressions.Match match in System.Text.RegularExpressions.Regex.Matches(content.Value, "[/]{0,1}\\/portals/[0-9]*/(?<path>[A-Za-z0-9-_ /.]*)", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+      {
+        content.Value = await ReplaceFileMatch(site, fileSystemProvider, match, content.Value);
       }
 
       // rewrite url links like /?tabid=166
@@ -102,11 +100,15 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
             
             if (page != null)
             {
-              content.Value = ReplaceMatch(match, page, content.Value);
+              content.Value = ReplacePageMatch(match, page, content.Value);
             }
           }
         }
       }
+
+      // apply "guesses" to the content to help with images/other file links.  This assumes that the contents of
+      // /Portals/[index] will be copied in the same directory structure to Nucleus
+      content.Value = content.Value.Replace($"/Portals/{dnnPage.PortalId}/", $"/files/{fileSystemProvider.Key}/",StringComparison.OrdinalIgnoreCase);
 
       await this.ContentManager.Save(newModule, content);
     }
@@ -135,15 +137,38 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
   {
     if (match.Success)
     {
-      string tabId = GetPargetDnnTabId(match);      
+      string tabId = GetTargetDnnTabId(match);      
 
       if (!String.IsNullOrEmpty(tabId) && int.TryParse(tabId, out int parsedTabId))
       {
         if (createdPagesKeys.ContainsKey(parsedTabId))
         {
           Nucleus.Abstractions.Models.Page page = await this.PageManager.Get(createdPagesKeys[int.Parse(tabId)]);
-          return ReplaceMatch(match, page, value);
+          return ReplacePageMatch(match, page, value);
         }
+      }
+    }
+
+    return value;
+  }
+
+  /// <summary>
+  /// Replace the matched value (which represents a file Url of a site page) with the Nucleus file Url for the file.
+  /// </summary>
+  /// <param name="site"></param>
+  /// <param name="providerKey"></param>
+  /// <param name="match"></param>  
+  /// <param name="value"></param>
+  /// <returns></returns>
+  private async Task<string> ReplaceFileMatch(Site site, FileSystemProviderInfo fileSystemProvider, System.Text.RegularExpressions.Match match, string value)
+  {
+    if (match.Success)
+    {
+      Nucleus.Abstractions.Models.FileSystem.File linkedFile = await GetTargetFile(site, fileSystemProvider.Key, match);
+
+      if (linkedFile != null)
+      {
+        return value.Replace(match.Value, $"files/{linkedFile.Provider}/{linkedFile.Path}", StringComparison.OrdinalIgnoreCase); 
       }
     }
 
@@ -157,7 +182,7 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
   /// <param name="page"></param>
   /// <param name="value"></param>
   /// <returns></returns>
-  private string ReplaceMatch(System.Text.RegularExpressions.Match match, Nucleus.Abstractions.Models.Page page, string value)
+  private string ReplacePageMatch(System.Text.RegularExpressions.Match match, Nucleus.Abstractions.Models.Page page, string value)
   {
     string path = HREF_PREFIX + page.DefaultPageRoute().Path;
     path += path.EndsWith("/") ? "" : "/";
@@ -166,7 +191,7 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
     return value.Replace(match.Value, path, StringComparison.OrdinalIgnoreCase);
   }
 
-  private string GetPargetDnnTabId(System.Text.RegularExpressions.Match match)
+  private string GetTargetDnnTabId(System.Text.RegularExpressions.Match match)
   {
     string[] targetParameterNames = { "tabid" };
 
@@ -175,6 +200,27 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
       if (match.Groups.ContainsKey(parameterName))
       {
         return match.Groups[parameterName].Value;
+      }
+    }
+
+    return null;
+  }
+
+  private async Task<Nucleus.Abstractions.Models.FileSystem.File> GetTargetFile(Site site, string providerKey, System.Text.RegularExpressions.Match match)
+  {
+    string[] targetParameterNames = { "path" };
+
+    foreach (string parameterName in targetParameterNames)
+    {
+      if (match.Groups.ContainsKey(parameterName))
+      {
+        try
+        {
+          return await this.FileSystemManager.GetFile(site, providerKey, match.Groups[parameterName].Value);
+        }
+        catch (FileNotFoundException)
+        {
+        }
       }
     }
 

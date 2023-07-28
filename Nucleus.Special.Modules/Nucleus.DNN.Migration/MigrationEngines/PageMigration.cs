@@ -423,7 +423,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
                   (
                     (String.IsNullOrEmpty(existing.Title) && String.IsNullOrEmpty(dnnModule.ModuleTitle))
                     ||
-                    existing.Title.Equals(dnnModule.ModuleTitle)
+                    existing.Title?.Equals(dnnModule.ModuleTitle) == true
                   ) &&
                   existing.SortOrder == dnnModule.ModuleOrder)
                 .FirstOrDefault();

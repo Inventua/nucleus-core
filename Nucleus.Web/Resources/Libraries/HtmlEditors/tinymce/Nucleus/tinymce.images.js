@@ -28,9 +28,18 @@
 				type: "panel",
 				items: [
 					{
-						type: "htmlpanel",
+						type: 'htmlpanel',
 						html: '<form class="nucleus-fileselectorform"><div class="nucleus-flex-fields nucleus-fileselector"></div></form>'
-					}]
+          },
+          {
+            type: 'input',
+            name: 'caption', 
+            inputMode: 'text',
+            label: 'Caption', 
+            placeholder: 'enter a caption for your image',
+            maximized: false 
+          }
+        ]
 			},
 			buttons: [
 				{
@@ -43,8 +52,18 @@
 			initialData: {},
 			onSubmit: function (api)
 			{
-				var imgSrc = jQuery('.file-link').html();
-				editor.insertContent('<img src="' + imgSrc + '"/>');
+        var imgSrc = jQuery('.file-link').html();
+        var innerContent = '<img alt="' + api.getData().caption + '" src="' + imgSrc + '"/>';
+        var content = '';
+        if (api.getData().caption !== '')
+        {
+          content = '<figure>' + innerContent + '<figcaption>' + api.getData().caption + '</figcaption></figure>';
+        }
+        else
+        {
+          content = innerContent;
+        }
+				editor.insertContent(content);
 				api.close();
 			}
 		})

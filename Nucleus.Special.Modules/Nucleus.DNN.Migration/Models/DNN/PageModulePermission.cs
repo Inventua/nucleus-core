@@ -16,7 +16,8 @@ public class PageModulePermission
 
   public Boolean AllowAccess{ get; set; }
 
-  public Role Role { get; set; }
+  public int RoleId { get; set; }
+  public string RoleName { get; set; }
 
   public string PermissionCode { get; set; }
 

@@ -194,6 +194,11 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
       // "all users" is represented in DNN by a RoleId of -1
       return site.AllUsersRole;
     }
+    else if (dnnPermission.RoleName == "Unauthenticated Users" && dnnPermission.RoleId == -3)
+    {
+      // "anonymous users" is represented in DNN by a RoleId of -3
+      return site.AnonymousUsersRole;
+    }
     else
     {
       return await this.RoleManager.GetByName(this.Context.Site, dnnPermission.RoleName);

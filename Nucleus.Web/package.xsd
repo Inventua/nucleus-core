@@ -118,8 +118,9 @@
 	</xs:complexType>
 
 	<xs:complexType name="file">
-		<xs:attribute name="name" type="xs:string" use="required" />		
-	</xs:complexType>
+		<xs:attribute name="name" type="xs:string" use="required" />
+    <xs:attribute name="uncompress" type="xs:boolean" use="optional" />
+  </xs:complexType>
 
 	<xs:simpleType name="guid">
 		<xs:restriction base="xs:string">

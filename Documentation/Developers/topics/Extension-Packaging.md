@@ -154,6 +154,7 @@ the file element is a child of the `<components>`, or a sub-folder if the `<file
 | Name             | Required? | Description                                                              |
 |------------------|-----------|--------------------------------------------------------------------------|
 | name             | Yes       | (attribute) File name. |
+| uncompress       | No        | (attribute, boolean).  If set to true, and the file is a .zip file, the file will be un-compressed into the target folder. |
 
 ## `<folder>` 
 Specifies a folder.  `<folder>` elements can contain `<file>` elements or nested `<folder>` elements to represent the target folder structure within the /extensions/[folder-name] folder.

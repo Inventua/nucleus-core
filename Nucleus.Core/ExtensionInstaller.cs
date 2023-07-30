@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using DocumentFormat.OpenXml.Office.CustomUI;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nucleus.Core
 {
@@ -745,26 +746,53 @@ namespace Nucleus.Core
 					
 				}
 
-				this.Logger?.LogInformation("Writing {target} from zip.", target);
-				entry.ExtractToFile(target, true);
+        if (file.uncompress)
+        {
+          // un-zip the file into the target folder
+          if (System.IO.Path.GetExtension(file.name).Equals(".zip", StringComparison.OrdinalIgnoreCase))
+          {
+            UncompressFile(entry, target);
+          }
+          else
+          {
+            this.Logger?.LogError("File {filename} has the 'uncompress' attribute set, but is not a supported compressed file type.", file.name);
+          }
+        }
+        else
+        {
+          this.Logger?.LogInformation("Writing {target} from zip.", target);
+          entry.ExtractToFile(target, true);
+        }
 				return true;
 			}
 			else
 			{
 				this.Logger?.LogWarning("Cannot find {zipFilePath} in zip.  Installation failed.", zipFilePath);
 				return false;
-			}
-			
+			}			
 		}
 
-		/// <summary>
-		/// Delete a file, or rename it to .backup if it is an assembly.
-		/// </summary>
-		/// <param name="componentFolder">Source file</param>
-		/// <param name="file">Target file</param>
-		/// <param name="folder">Target folder.  Can be null for root.</param>
-		/// <returns></returns>
-		private Boolean DeleteFile(string componentFolder, Abstractions.Models.Extensions.file file, Abstractions.Models.Extensions.folder folder)
+    void UncompressFile(ZipArchiveEntry entry, string target) 
+    {
+      string folder = System.IO.Path.GetDirectoryName(target);
+
+      this.Logger?.LogInformation("Un-zipping {source} to {folder}.", entry.Name, folder);
+      
+      using (ZipArchive zipArchive = OpenZipArchive(entry.Open()))
+      {
+        zipArchive.ExtractToDirectory(folder, true);
+      }
+    }    
+
+
+    /// <summary>
+    /// Delete a file, or rename it to .backup if it is an assembly.
+    /// </summary>
+    /// <param name="componentFolder">Source file</param>
+    /// <param name="file">Target file</param>
+    /// <param name="folder">Target folder.  Can be null for root.</param>
+    /// <returns></returns>
+    private Boolean DeleteFile(string componentFolder, Abstractions.Models.Extensions.file file, Abstractions.Models.Extensions.folder folder)
 		{
 			string filePath;
 			
@@ -830,7 +858,7 @@ namespace Nucleus.Core
 			return path;
 		}
 
-		public void Dispose()
+    public void Dispose()
 		{
 			this.ArchiveStream?.Dispose();
 			this.Archive?.Dispose();

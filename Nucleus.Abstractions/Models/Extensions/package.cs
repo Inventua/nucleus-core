@@ -13,7 +13,8 @@
 // 
 namespace Nucleus.Abstractions.Models.Extensions
 {
-	using System.Xml.Serialization;
+  using System;
+  using System.Xml.Serialization;
 
 
 	/// <remarks/>
@@ -130,7 +131,11 @@ namespace Nucleus.Abstractions.Models.Extensions
 		/// <remarks/>
 		[System.Xml.Serialization.XmlAttributeAttribute()]
 		public string name;
-	}
+
+    /// <remarks/>
+		[System.Xml.Serialization.XmlAttributeAttribute()]
+    public Boolean uncompress;
+  }
 
 	/// <hidden>
 	/// Internal use class used for XML serialization.

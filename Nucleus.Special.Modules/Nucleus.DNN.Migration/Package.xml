@@ -4,7 +4,7 @@
 	<version>1.0.0</version>
 	<publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
 	<description>
-		Tools for migrating DNN data to Nucleus.
+		Tools for migrating your DotNetNuke DNN web site to Nucleus.
 	</description>
 	<compatibility minVersion="1.2.1.0" maxVersion="*" />
 	
@@ -12,7 +12,7 @@
 		<component folderName="DNNMigration" optional="false">
       <controlPanelExtensionDefinition id="022642F8-67E4-4956-9F41-97473377B692">
         <friendlyName>DNN Migration</friendlyName>
-        <description>Migrate data from DotNetNuke.</description>
+        <description>Migrate your web site from DotNetNuke to Nucleus.</description>
         <controllerName>DNNMigration</controllerName>
         <extensionName>DNNMigration</extensionName>
         <scope>Site</scope>
@@ -34,12 +34,11 @@
         <file name="_Pages.cshtml" />
         <file name="_Users.cshtml" />
         <file name="_Lists.cshtml" />
-        <file name="_Files.cshtml" />
+        <file name="_Folders.cshtml" />
         <file name="_Forums.cshtml" />
         <file name="_Notify.cshtml" />
         <file name="_Progress.cshtml" />
 			</folder>
-			
 		</component>
 	</components>
 	

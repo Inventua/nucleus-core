@@ -91,20 +91,39 @@ namespace Nucleus.Core.Managers
 				layoutPath = layout.RelativePath;
 			}
 
-			fullPath = System.IO.Path.Combine(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetWebRootFolder(), layoutPath);
-			layoutContent = await System.IO.File.ReadAllTextAsync(fullPath);
+			fullPath = System.IO.Path.Combine(Nucleus.Abstractions.Models.Configuration.FolderOptions.GetWebRootFolder(), layoutPath);			
+      await DetectPanes(fullPath, results);
 
-			System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "RenderPaneAsync\\(\"(.*)\"\\)");
+      return results;
+		}
+
+    private async Task DetectPanes(string filePath, List<string> results)
+    {
+      string layoutContent = await System.IO.File.ReadAllTextAsync(filePath);
+
+      System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "RenderPaneAsync\\(\"(?<panename>.*)\"\\)");
 
 			foreach (System.Text.RegularExpressions.Match match in matches)
 			{
-				if (match.Groups.Count == 2)
+				if (match.Groups.ContainsKey("panename"))
 				{
-					results.Add(match.Groups[1].Value);
+					results.Add(match.Groups["panename"].Value);
 				}
 			}
-			
-			return results;
-		}
+
+      System.Text.RegularExpressions.MatchCollection referenceMatches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "PartialAsync\\(\"(?<reference>.*)\"\\)");
+
+      foreach (System.Text.RegularExpressions.Match match in referenceMatches)
+      {
+        if (match.Groups.ContainsKey("reference"))
+        {
+          string referenceFilePath = System.IO.Path.Join(System.IO.Path.GetDirectoryName(filePath), match.Groups["reference"].Value);
+          if (System.IO.File.Exists(referenceFilePath))
+          {
+            await DetectPanes(referenceFilePath, results);
+          }
+        }
+      }
+    }
 	}
 }

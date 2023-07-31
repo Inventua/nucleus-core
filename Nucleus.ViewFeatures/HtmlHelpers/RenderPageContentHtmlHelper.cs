@@ -46,7 +46,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			IModuleContentRenderer renderer = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IModuleContentRenderer>();
       Context context = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<Context>();
 
-      return await renderer.RenderPaneAsync(htmlHelper, context, paneName);
+      return await renderer.RenderPaneAsync(htmlHelper.ViewContext, context, paneName);
 		}
 
 		/// <summary>
@@ -75,7 +75,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			IModuleContentRenderer renderer = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IModuleContentRenderer>();
       Context context = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<Context>();
 
-      return await renderer.RenderModuleEditor(htmlHelper, context.Site, context.Page, moduleInfo, context.LocalPath, renderContainer);
+      return await renderer.RenderModuleEditor(htmlHelper.ViewContext, context.Site, context.Page, moduleInfo, context.LocalPath, renderContainer);
 		}
   }
 }

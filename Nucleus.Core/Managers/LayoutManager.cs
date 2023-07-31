@@ -79,7 +79,6 @@ namespace Nucleus.Core.Managers
 		{
 			string layoutPath;
 			string fullPath;
-			string layoutContent;
 			List<string> results = new();
 
 			if (layout == null)
@@ -101,9 +100,10 @@ namespace Nucleus.Core.Managers
     {
       string layoutContent = await System.IO.File.ReadAllTextAsync(filePath);
 
-      System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "RenderPaneAsync\\(\"(?<panename>.*)\"\\)");
+      // html helper @Html.RenderPaneAsync("pane-name")
+      System.Text.RegularExpressions.MatchCollection htmlHelperMatches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "RenderPaneAsync\\(\"(?<panename>.*)\"\\)");
 
-			foreach (System.Text.RegularExpressions.Match match in matches)
+			foreach (System.Text.RegularExpressions.Match match in htmlHelperMatches)
 			{
 				if (match.Groups.ContainsKey("panename"))
 				{
@@ -111,9 +111,36 @@ namespace Nucleus.Core.Managers
 				}
 			}
 
-      System.Text.RegularExpressions.MatchCollection referenceMatches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "PartialAsync\\(\"(?<reference>.*)\"\\)");
+      // Tag helper <RenderPane pane-name="name" />
+      System.Text.RegularExpressions.MatchCollection tagHelperMatches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "RenderPane[\\s]*name[\\s]*=[\\s]*\\\"(?<panename>.*)\\\"");
 
-      foreach (System.Text.RegularExpressions.Match match in referenceMatches)
+      foreach (System.Text.RegularExpressions.Match match in tagHelperMatches)
+      {
+        if (match.Groups.ContainsKey("panename"))
+        {
+          results.Add(match.Groups["panename"].Value);
+        }
+      }
+
+      // html helper PartialAsync
+      System.Text.RegularExpressions.MatchCollection htmlHelperReferenceMatches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "PartialAsync\\(\"(?<reference>.*)\"\\)");
+
+      foreach (System.Text.RegularExpressions.Match match in htmlHelperReferenceMatches)
+      {
+        if (match.Groups.ContainsKey("reference"))
+        {
+          string referenceFilePath = System.IO.Path.Join(System.IO.Path.GetDirectoryName(filePath), match.Groups["reference"].Value);
+          if (System.IO.File.Exists(referenceFilePath))
+          {
+            await DetectPanes(referenceFilePath, results);
+          }
+        }
+      }
+
+      // tag helper <partial> matches
+      System.Text.RegularExpressions.MatchCollection tagHelperReferenceMatches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "partial[\\s]*name[\\s]*=[\\s]*\\\"(?<reference>.*)\\\"");
+
+      foreach (System.Text.RegularExpressions.Match match in tagHelperReferenceMatches)
       {
         if (match.Groups.ContainsKey("reference"))
         {

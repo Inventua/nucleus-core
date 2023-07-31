@@ -154,6 +154,12 @@ a *
 	height: 100%;
 }
 
+.Nucleus.Content > *
+{
+  display: flex;
+  flex-direction: column;
+}
+
 /*.PopupMenu
 {
 	display: none;

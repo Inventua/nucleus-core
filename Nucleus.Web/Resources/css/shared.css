@@ -156,18 +156,6 @@ a *
   flex-direction: column;
 }
 
-.Nucleus.Content > *
-{
-  display: flex;
-  flex-direction: column;
-}
-
-/*.PopupMenu
-{
-	display: none;
-}
-*/
-
 .nucleus-overlay
 {
 	display: none;

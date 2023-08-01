@@ -101,7 +101,7 @@ namespace Nucleus.Core.Managers
       string layoutContent = await System.IO.File.ReadAllTextAsync(filePath);
 
       // html helper @Html.RenderPaneAsync("pane-name")
-      System.Text.RegularExpressions.MatchCollection htmlHelperMatches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "RenderPaneAsync\\(\"(?<panename>.*)\"\\)");
+      System.Text.RegularExpressions.MatchCollection htmlHelperMatches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "RenderPaneAsync\\(\"(?<panename>[^\\\"]*)\"\\)");
 
 			foreach (System.Text.RegularExpressions.Match match in htmlHelperMatches)
 			{
@@ -112,7 +112,7 @@ namespace Nucleus.Core.Managers
 			}
 
       // Tag helper <RenderPane pane-name="name" />
-      System.Text.RegularExpressions.MatchCollection tagHelperMatches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "RenderPane[\\s]*name[\\s]*=[\\s]*\\\"(?<panename>.*)\\\"");
+      System.Text.RegularExpressions.MatchCollection tagHelperMatches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "RenderPane[\\s]*name[\\s]*=[\\s]*\\\"(?<panename>[^\\\"]*)\\\"");
 
       foreach (System.Text.RegularExpressions.Match match in tagHelperMatches)
       {
@@ -123,7 +123,7 @@ namespace Nucleus.Core.Managers
       }
 
       // html helper PartialAsync
-      System.Text.RegularExpressions.MatchCollection htmlHelperReferenceMatches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "PartialAsync\\(\"(?<reference>.*)\"\\)");
+      System.Text.RegularExpressions.MatchCollection htmlHelperReferenceMatches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "PartialAsync\\(\"(?<reference>[^\\\"]*)\"\\)");
 
       foreach (System.Text.RegularExpressions.Match match in htmlHelperReferenceMatches)
       {
@@ -138,7 +138,7 @@ namespace Nucleus.Core.Managers
       }
 
       // tag helper <partial> matches
-      System.Text.RegularExpressions.MatchCollection tagHelperReferenceMatches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "partial[\\s]*name[\\s]*=[\\s]*\\\"(?<reference>.*)\\\"");
+      System.Text.RegularExpressions.MatchCollection tagHelperReferenceMatches = System.Text.RegularExpressions.Regex.Matches(layoutContent, "partial[\\s]*name[\\s]*=[\\s]*\\\"(?<reference>[^\\\"]*)\\\"");
 
       foreach (System.Text.RegularExpressions.Match match in tagHelperReferenceMatches)
       {

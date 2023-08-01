@@ -46,11 +46,10 @@ namespace Nucleus.Modules.TextHtml.Controllers
 
 			if (this.Context.Module != null)
 			{
-        viewModel.Content =(await this.ContentManager.List(this.Context.Module))
-          .FirstOrDefault();
+        viewModel.Content =(await this.ContentManager.List(this.Context.Module)).FirstOrDefault() ?? new();
 			}
 
-			return viewModel;
+      return viewModel;
 		}
 
 		private async Task<ViewModels.Settings> BuildSettingsViewModel()

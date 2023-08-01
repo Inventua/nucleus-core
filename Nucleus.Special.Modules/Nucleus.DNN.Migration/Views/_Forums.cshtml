@@ -4,7 +4,8 @@
 <div>
   <div class="alert alert-primary">
     <ul>
-      <li>There are @Model.ForumGroups.SelectMany(group => group.Forums).Where(forum => forum.IsSelected).Count() forums, containing @Model.TotalPosts posts to migrate.</li>
+      <li>There are @Model.ForumGroups.SelectMany(group => group.Forums).Where(forum => forum.CanSelect).Count() forums which can be migrated.</li>
+      <li>Depending on your selections, there are up to @Model.TotalPosts posts which can be migrated.</li>
     </ul>
   </div>
 

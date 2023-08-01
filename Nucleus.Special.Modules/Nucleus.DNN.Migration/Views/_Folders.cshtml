@@ -4,8 +4,15 @@
 <div>
   <div class="alert alert-primary">
     <ul>
-      <li>This migration will copy folders and files and folder permissions from DNN to Nucleus.  You may find it easier to copy the folders and files manually and use this step to just migrate folder permissions.</li>
-      <li>Use the "Update Existing" switch to control whether to copy files that already exist in Nucleus.</li>
+      <li>
+        This migration will copy folders, folder permissions and files from DNN to Nucleus.  You may find it easier and faster to copy the folders and 
+        files manually and use this step to just migrate folder permissions. You can un-select the "Update Existing" switch to prevent the migration 
+        process from copying files that are already present in the Nucleus file store.
+      </li>
+      <li>
+        You must select a portal alias and the "use SSL" flag.  Your settings are used as the base for the Url which is used to download files from 
+        your DNN site.
+      </li>
     </ul>
   </div>
 

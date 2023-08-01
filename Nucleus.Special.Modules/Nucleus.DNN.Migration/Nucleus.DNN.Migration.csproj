@@ -22,12 +22,12 @@
   <ItemGroup>
     <None Remove="index.css" />
     <None Remove="index.js" />
-    <None Remove="viewer.css" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="Views\Index.cshtml" />
     <None Remove="Views\_Folders.cshtml" />
     <None Remove="Views\_Forums.cshtml" />
+    <None Remove="Views\_Layouts.cshtml" />
     <None Remove="Views\_Lists.cshtml" />
     <None Remove="Views\_Notify.cshtml" />
     <None Remove="Views\_Pages.cshtml" />
@@ -39,12 +39,12 @@
 
   <ItemGroup>
     <Content Include="index.js" />
-    <Content Include="viewer.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
     <Content Include="index.css" />
     <Content Include="Views\_Folders.cshtml" />
     <Content Include="Views\_Forums.cshtml" />
+    <Content Include="Views\_Layouts.cshtml" />
     <Content Include="Views\_Progress.cshtml" />
     <Content Include="Views\_Lists.cshtml" />
     <Content Include="Views\_Notify.cshtml" />
@@ -70,7 +70,7 @@
 		<ExtensionFolder>DNNMigration</ExtensionFolder>
 		<Version>1.0.0</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
-    <CopyToDefaultSetup>false</CopyToDefaultSetup>
+    <CopyToDefaultSetup>true</CopyToDefaultSetup>
 	</PropertyGroup>
 
 	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />

@@ -32,6 +32,7 @@
 				<file name="Index.cshtml" />
         <file name="_Roles.cshtml" />
         <file name="_Pages.cshtml" />
+        <file name="_Layouts.cshtml" />
         <file name="_Users.cshtml" />
         <file name="_Lists.cshtml" />
         <file name="_Folders.cshtml" />

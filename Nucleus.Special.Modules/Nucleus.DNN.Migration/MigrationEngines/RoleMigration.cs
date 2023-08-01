@@ -76,9 +76,17 @@ public class RoleMigration : MigrationEngineBase<Models.DNN.Role>
         role.AddError($"'{role.RoleName}' is a reserved/special role in DNN and will not be migrated.");
       }
 
+      // roles which are un-selected by default
+      if (role.RoleName.Equals("Subscribers", StringComparison.OrdinalIgnoreCase) || role.RoleName.StartsWith("Translator", StringComparison.OrdinalIgnoreCase))
+      {
+        role.IsSelected = false;
+        role.AddWarning($"The '{role.RoleName}' role has been un-selected by default, but you can choose to migrate it.");
+      }
+
       if (role.UserCount == 0)
       {
-        role.AddWarning($"There are no users in the '{role.RoleName}' role.");
+        role.IsSelected = false;
+        role.AddWarning($"There are no users in the '{role.RoleName}' role.  The role has been un-selected by default, but you can choose to migrate it.");
       }
     }
 

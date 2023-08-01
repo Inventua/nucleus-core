@@ -5,10 +5,10 @@
   <div class="alert alert-primary">
     <ul>
       <li>Role groups are only migrated if they contain at least one role.</li>
-      <li>Roles are only migrated if they contain at least one user.</li>
-      <li>The "Administrators" and "Registered Users" roles will not be migrated.</li>
-      <li>There @(@Model.RoleGroups.Where(roleGroup => roleGroup.IsSelected).Count() == 1 ? "is" : "are") @Model.RoleGroups.Count role group@(@Model.RoleGroups.Count == 1 ? "" : "s") to migrate.</li>
-      <li>There are @Model.Roles.Where(role => role.IsSelected).Count() roles to migrate.</li>
+      <li>Roles with no users assigned to them are un-selected by default.</li>
+      <li>The "Administrators" and "Registered Users" roles will not be migrated because Nucleus has these roles.</li>
+      <li>There @(@Model.RoleGroups.Where(roleGroup => roleGroup.CanSelect).Count() == 1 ? "is" : "are") @(Model.RoleGroups.Where(roleGroup => roleGroup.CanSelect).Count()) role group@(@Model.RoleGroups.Count == 1 ? "" : "s") which can be migrated.</li>
+      <li>There are @Model.Roles.Where(role => role.CanSelect).Count() roles which can be migrated.</li>
     </ul>
   </div>
 

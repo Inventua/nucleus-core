@@ -1,0 +1,52 @@
+﻿@model Nucleus.DNN.Migration.ViewModels.Page
+<h2>Layout Mappings</h2>
+
+<table class="table table-sm table-striped table-fixed">
+  <thead>
+    <tr>
+      <th>DNN Skin</th>
+      <th>Nucleus Layout</th>
+    </tr>
+  </thead>
+  <tbody>
+  @for (int count = 0; count < Model.DNNSkins.Count; count++)
+  {
+    <tr>
+      <td>
+        @Model.DNNSkins[count].FriendlyName()
+        @Html.HiddenFor(model => model.DNNSkins[count].SkinSrc)
+      </td>
+      <td>
+        @Html.DropDownListFor(model => model.DNNSkins[count].AssignedLayoutId, new SelectList(Model.Layouts, "Id", "FriendlyName"), "(site default)", new(){} )
+      </td>
+    </tr>
+  }
+  </tbody>
+</table>
+
+<h2>Container Mappings</h2>
+
+<table class="table table-sm table-striped table-fixed">
+  <thead>
+    <tr>
+      <th>DNN Container</th>
+      <th>Nucleus Container</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (int count = 0; count < Model.DNNContainers.Count; count++)
+    {
+      <tr>
+        <td>
+          @Model.DNNContainers[count].FriendlyName()
+          @Html.HiddenFor(model => model.DNNContainers[count].ContainerSrc)
+        </td>
+        <td>
+          @Html.DropDownListFor(model => model.DNNContainers[count].AssignedContainerId, new SelectList(Model.Containers, "Id", "FriendlyName"), "(site default)", new(){} )
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>
+
+

@@ -26,6 +26,11 @@
   flex: initial;
 }
 
+.dnn-migration .table-fixed
+{
+  table-layout: fixed;
+}
+
 .dnn-migration ol
 {
   list-style-type: none;

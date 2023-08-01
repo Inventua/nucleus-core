@@ -5,7 +5,14 @@
   <div class="alert alert-primary">
     <ul>
       <li>Deleted pages will not be migrated.</li>
-      <li>There are @Model.Pages.Where(page => page.IsSelected).Count() pages to migrate.</li>
+      <li>There are @Model.Pages.Where(page => page.CanSelect).Count() pages which can be migrated.</li>
+      <li>
+        Use the Layout and Container mappings section to control which Nucleus Layouts and Containers are 
+        used for migrated pages and modules.  The layout that you select should have panes which match the 
+        pane names used in DNN.  If it does not, then modules will be migrated with a pane name which is not 
+        present in the selected layout, and will not be displayed.  After migration, you can use the page editor 
+        to assign modules to panes which do exist in your layout.
+      </li>
     </ul>
   </div>
 
@@ -16,15 +23,19 @@
       <SettingsControl caption="Update Existing?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to update pages when a matching page is found (by page route).  If this is not set, existing pages will generate an error.">
         @Html.CheckBoxFor(model => model.UpdateExisting, new { @class = "ToggleSwitch" })
       </SettingsControl>
-
+      
       <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-before" data-target="#MigratePages" data-confirm="Migrate selected pages from DotNetNuke now?  This action cannot be reversed.">Migrate Pages</button>
     </div>
-@*    <div class="nucleus-button-panel"></div>*@
+    
+    <div class="my-2">
+      <partial name="_Layouts.cshtml" model="Model" />
+    </div>
+
 
     <div class="my-2">
       <h2>Pages</h2>
       <div class="overflow-auto">
-        <table class="table table-striped table-sm table-sticky-headers">
+        <table class="table table-striped table-sm table-sticky-headers table-fixed">
           <thead>
             <tr>
               <th>@Html.CheckBox("toggle-all", true, new { @class = "toggle-all", @id = "" } )</th>

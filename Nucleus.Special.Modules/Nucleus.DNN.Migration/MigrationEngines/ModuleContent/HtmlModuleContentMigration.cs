@@ -72,7 +72,7 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
       // rewrite image links like src="/portals/0/Images/instant-rebates.jpg?ver=Zo9cRKFqYNVRF84bLp4L0Q%3d%3d"
       foreach (System.Text.RegularExpressions.Match match in System.Text.RegularExpressions.Regex.Matches(content.Value, "[/]{0,1}\\/portals/[0-9]*/(?<path>[A-Za-z0-9-_ /.]*)", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
       {
-        content.Value = await ReplaceFileMatch(site, fileSystemProvider, match, content.Value);
+        content.Value = await ReplaceFileMatch(dnnPage, dnnModule, site, fileSystemProvider, match, content.Value);
       }
 
       // rewrite url links like /?tabid=166
@@ -160,11 +160,11 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
   /// <param name="match"></param>  
   /// <param name="value"></param>
   /// <returns></returns>
-  private async Task<string> ReplaceFileMatch(Site site, FileSystemProviderInfo fileSystemProvider, System.Text.RegularExpressions.Match match, string value)
+  private async Task<string> ReplaceFileMatch(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Site site, FileSystemProviderInfo fileSystemProvider, System.Text.RegularExpressions.Match match, string value)
   {
     if (match.Success)
     {
-      Nucleus.Abstractions.Models.FileSystem.File linkedFile = await GetTargetFile(site, fileSystemProvider.Key, match);
+      Nucleus.Abstractions.Models.FileSystem.File linkedFile = await GetTargetFile(dnnPage, dnnModule, site, fileSystemProvider.Key, match);
 
       if (linkedFile != null)
       {
@@ -206,7 +206,7 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
     return null;
   }
 
-  private async Task<Nucleus.Abstractions.Models.FileSystem.File> GetTargetFile(Site site, string providerKey, System.Text.RegularExpressions.Match match)
+  private async Task<Nucleus.Abstractions.Models.FileSystem.File> GetTargetFile(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Site site, string providerKey, System.Text.RegularExpressions.Match match)
   {
     string[] targetParameterNames = { "path" };
 
@@ -220,6 +220,7 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
         }
         catch (FileNotFoundException)
         {
+          dnnPage.AddWarning($"The HTML module with title '{dnnModule.ModuleTitle}' contains a link to a missing file '{match.Groups[parameterName].Value}'. This link was not replaced, and will be a broken link.");
         }
       }
     }

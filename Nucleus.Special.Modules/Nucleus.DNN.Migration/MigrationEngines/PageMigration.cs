@@ -23,8 +23,11 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
   private IRoleManager RoleManager { get; }
   private IContainerManager ContainerManager { get; }
   private ILayoutManager LayoutManager { get; }
-
   private ILogger<PageMigration> Logger { get; }
+
+  public List<Models.DNN.Skin> DNNSkins { get; set; }
+  
+  public List<Models.DNN.Container> DNNContainers { get; set; }
 
   private IEnumerable<Nucleus.DNN.Migration.MigrationEngines.ModuleContent.ModuleContentMigrationBase> ModuleContentMigrations { get; }
 
@@ -39,6 +42,12 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     this.RoleManager = roleManager;
     this.ModuleContentMigrations = moduleContentMigrations;
     this.Logger = logger;
+  }
+
+  public void Setup(List<Models.DNN.Skin> skins, List<Models.DNN.Container> containers)
+  {
+    this.DNNSkins = skins;
+    this.DNNContainers = containers;
   }
 
   public async override Task Migrate(Boolean updateExisting)
@@ -85,13 +94,26 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
 
           AddRoutes(dnnPage, newPage);
 
-          newPage.DefaultContainerDefinition = (await this.ContainerManager.List())
-            .Where(container => container.FriendlyName.Equals(System.IO.Path.GetFileNameWithoutExtension(dnnPage.ContainerSrc), StringComparison.OrdinalIgnoreCase))
+          Guid? assignedContainerId = this.DNNContainers
+            .Where(container => container.ContainerSrc.Equals(dnnPage.ContainerSrc, StringComparison.OrdinalIgnoreCase))
+            .Select(container => container.AssignedContainerId)
+            .FirstOrDefault();
+
+          if (assignedContainerId.HasValue)
+          {
+            newPage.DefaultContainerDefinition = (await this.ContainerManager.List())
+              .Where(container => container.Id == assignedContainerId.Value)
+              .FirstOrDefault();
+          }
+
+          Guid? assignedLayoutId = this.DNNSkins
+            .Where(skin => skin.SkinSrc.Equals(dnnPage.SkinSrc, StringComparison.OrdinalIgnoreCase))
+            .Select(skin => skin.AssignedLayoutId)
             .FirstOrDefault();
 
           newPage.LayoutDefinition = (await this.LayoutManager.List())
-            .Where(layout => layout.FriendlyName.Equals(System.IO.Path.GetFileNameWithoutExtension(dnnPage.ContainerSrc), StringComparison.OrdinalIgnoreCase))
-            .FirstOrDefault();
+            .Where(skin => skin.Id == assignedLayoutId.Value)
+              .FirstOrDefault();
 
           if (dnnPage.ParentId != null)
           {
@@ -158,7 +180,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
           }
           else
           {
-            await AddPageModules(updateExisting, dnnPage, newPage, moduleDefinitions, modulePermissionTypes, createdPagesKeys);
+            await MigratePageModules(updateExisting, dnnPage, newPage, moduleDefinitions, modulePermissionTypes, createdPagesKeys);
 
             // if the page has an "Url" setting to indicate that it is a redirect to another page, add a SiteMap module to make it into a "landing"
             // page.  Nucleus does not support page "link types"
@@ -378,7 +400,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     }
   }
 
-  async Task AddPageModules(Boolean updateExisting, Models.DNN.Page dnnPage, Nucleus.Abstractions.Models.Page newPage, IEnumerable<Nucleus.Abstractions.Models.ModuleDefinition> moduleDefinitions, List<Nucleus.Abstractions.Models.PermissionType> modulePermissionTypes, Dictionary<int, Guid> createdPagesKeys)
+  async Task MigratePageModules(Boolean updateExisting, Models.DNN.Page dnnPage, Nucleus.Abstractions.Models.Page newPage, IEnumerable<Nucleus.Abstractions.Models.ModuleDefinition> moduleDefinitions, List<Nucleus.Abstractions.Models.PermissionType> modulePermissionTypes, Dictionary<int, Guid> createdPagesKeys)
   {
     foreach (Models.DNN.PageModule dnnModule in dnnPage.PageModules)
     {
@@ -438,9 +460,21 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
             newModule.InheritPagePermissions = dnnModule.InheritViewPermissions;
             newModule.Pane = dnnModule.PaneName;
 
-            newModule.ContainerDefinition = (await this.ContainerManager.List())
-              .Where(container => container.FriendlyName.Equals(System.IO.Path.GetFileNameWithoutExtension(dnnModule.ContainerSrc), StringComparison.OrdinalIgnoreCase))
-              .FirstOrDefault();
+            Guid? containerId = this.DNNContainers
+            .Where(container => container.ContainerSrc.Equals(dnnPage.ContainerSrc, StringComparison.OrdinalIgnoreCase))
+            .Select(container => container.AssignedContainerId)
+            .FirstOrDefault();
+
+            if (containerId.HasValue)
+            {
+              newModule.ContainerDefinition = (await this.ContainerManager.List())
+                .Where(container => container.Id == containerId.Value)
+                .FirstOrDefault();
+            }
+
+            ////newModule.ContainerDefinition = (await this.ContainerManager.List())
+            ////  .Where(container => container.FriendlyName.Equals(System.IO.Path.GetFileNameWithoutExtension(dnnModule.ContainerSrc), StringComparison.OrdinalIgnoreCase))
+            ////  .FirstOrDefault();
 
             newModule.SortOrder = dnnModule.ModuleOrder;
 
@@ -555,6 +589,13 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
   {
     foreach (Models.DNN.Page dnnPage in Items)
     {
+      string[] DEFAULT_UNSELECTED_PAGES = { "Friends", "Messages", "My Profile", "Activity Feed", "User Profile" };
+      if (DEFAULT_UNSELECTED_PAGES.Contains(dnnPage.PageName, StringComparer.OrdinalIgnoreCase))
+      {
+        dnnPage.IsSelected = false;
+        dnnPage.AddWarning($"The '{dnnPage.PageName}' pages has a page name which is typically a built-in system page in DNN.  It has been un-selected by default, but you can choose to migrate it.");
+      }
+
       if (!String.IsNullOrEmpty(dnnPage.Url))
       {
         dnnPage.AddWarning("This page has a 'link type' set to redirect to another page or Url.  Nucleus does not support this feature.  This page will be migrated with a pre-configured SiteMap module so that it can act as a 'landing' page with a list of child pages.");

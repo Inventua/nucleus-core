@@ -5,7 +5,7 @@
   <div class="alert alert-primary">
     <ul>
       <li>System lists will not be migrated.</li>
-      <li>There are @Model.Lists.Where(list => list.IsSelected).Count() lists to migrate.</li>
+      <li>There @(Model.Lists.Where(list => list.CanSelect).Count() == 1 ? "is" : "are") @(Model.Lists.Where(list => list.CanSelect).Count() == 0 ? "no" : @Model.Lists.Where(list => list.CanSelect).Count()) list@(Model.Lists.Where(list => list.CanSelect).Count() == 1 ? "" : "s") which can be migrated.</li>
     </ul>
   </div>
 

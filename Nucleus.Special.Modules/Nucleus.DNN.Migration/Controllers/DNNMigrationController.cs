@@ -29,11 +29,13 @@ public class DNNMigrationController : Controller
   private DNNMigrationManager DNNMigrationManager { get; }
   private IFileSystemManager FileSystemManager { get; }
   private IUserManager UserManager { get; }
+  private ILayoutManager LayoutManager { get; }
+  private IContainerManager ContainerManager { get; }
   private IMailTemplateManager MailTemplateManager { get; }
 
   private IOptions<DatabaseOptions> DatabaseOptions { get; }
 
-  public DNNMigrationController(Context Context, DNNMigrationManager dnnMigrationManager, IFileSystemManager fileSystemManager, IOptions<DatabaseOptions> databaseOptions, IUserManager userManager, IMailTemplateManager mailTemplateManager)
+  public DNNMigrationController(Context Context, DNNMigrationManager dnnMigrationManager, IFileSystemManager fileSystemManager, IOptions<DatabaseOptions> databaseOptions, IUserManager userManager, IMailTemplateManager mailTemplateManager, ILayoutManager layoutManager, IContainerManager containerManager)
   {
     this.Context = Context;
     this.DNNMigrationManager = dnnMigrationManager;
@@ -41,6 +43,8 @@ public class DNNMigrationController : Controller
     this.DatabaseOptions = databaseOptions;
     this.UserManager = userManager;
     this.MailTemplateManager = mailTemplateManager;
+    this.LayoutManager = layoutManager;
+    this.ContainerManager = containerManager;
   }
 
   [HttpGet]
@@ -181,6 +185,10 @@ public class DNNMigrationController : Controller
   public async Task<ActionResult> MigratePages(ViewModels.Page viewModel)
   {
     this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().UpdateSelections(viewModel.Pages);
+
+    (this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>() as MigrationEngines.PageMigration)
+      .Setup(viewModel.DNNSkins, viewModel.DNNContainers);
+
     this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().SignalStart();
 
     Task task = Task.Run(async () =>
@@ -425,6 +433,12 @@ public class DNNMigrationController : Controller
     viewModel.PortalId = portalId;
 
     viewModel.Pages = await this.DNNMigrationManager.ListDnnPages(portalId);
+    
+    viewModel.DNNSkins = await this.DNNMigrationManager.ListSkins(viewModel.PortalId);
+    viewModel.Layouts = await this.LayoutManager.List();
+
+    viewModel.DNNContainers = await this.DNNMigrationManager.ListContainers(viewModel.PortalId);
+    viewModel.Containers = await this.ContainerManager.List();
 
     this.DNNMigrationManager.ClearMigrationEngines();
     await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.Page>(this.HttpContext.RequestServices, viewModel.Pages);    

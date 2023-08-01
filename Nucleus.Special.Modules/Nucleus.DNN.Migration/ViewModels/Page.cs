@@ -20,4 +20,9 @@ public class Page
 
   public Boolean UpdateExisting { get; set; } = true;
 
+  public List<Models.DNN.Skin> DNNSkins { get; set; }
+  public IList<Nucleus.Abstractions.Models.LayoutDefinition > Layouts { get; set; }
+
+  public List<Models.DNN.Container> DNNContainers { get; set; }
+  public IList<Nucleus.Abstractions.Models.ContainerDefinition> Containers { get; set; }
 }

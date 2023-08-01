@@ -6,8 +6,8 @@
     <ul>
       <li>Super users and administrator users will not be migrated.</li>
       <li>Un-authorised users will not be migrated.</li>
-      <li>User roles will only be migrated if a role with the same name already exists in Nucleus.</li>
-      <li>There are @Model.Users.Where(user => user.IsSelected).Count() users to migrate.</li>
+      <li>User roles will only be migrated if a role with the same name exists in Nucleus.</li>
+      <li>There are @Model.Users.Where(user => user.CanSelect).Count() users which can be migrated.</li>
     </ul>
   </div>
 

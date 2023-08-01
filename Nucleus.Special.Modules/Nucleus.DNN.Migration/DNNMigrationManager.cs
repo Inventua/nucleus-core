@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office2010.CustomUI;
+using DocumentFormat.OpenXml.Office2016.Presentation.Command;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Extensions;
@@ -45,10 +46,10 @@ public class DNNMigrationManager
 
   public MigrationEngineBase<TModel> GetMigrationEngine<TModel>()
     where TModel : Models.DNN.DNNEntity
-  {    
+  {
     return MigrationEngines.Where(engine => engine as MigrationEngineBase<TModel> != null)
       .Select(engine => engine as MigrationEngineBase<TModel>)
-      .FirstOrDefault();    
+      .FirstOrDefault();
   }
 
 
@@ -60,12 +61,12 @@ public class DNNMigrationManager
     }
   }
 
-  public Nucleus.Abstractions.Portable.IPortable GetPortableImplementation(Guid moduleDefinitionId)   
+  public Nucleus.Abstractions.Portable.IPortable GetPortableImplementation(Guid moduleDefinitionId)
   {
     Nucleus.Abstractions.Portable.IPortable result = this.PortableImplementations.Where(portable => portable.ModuleDefinitionId == moduleDefinitionId)
       .FirstOrDefault();
 
-    if (result  == null)
+    if (result == null)
     {
       throw new InvalidOperationException($"No IPortable implementation for module definition '{moduleDefinitionId}' was found.");
     }
@@ -229,7 +230,7 @@ public class DNNMigrationManager
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
       return (await provider.ListFolders(portalId))
-        .Where(folder=> !IsReservedFolderName(folder))
+        .Where(folder => !IsReservedFolderName(folder))
         .ToList();
     }
   }
@@ -350,4 +351,87 @@ public class DNNMigrationManager
   }
 
 
+  /// <summary>
+  /// Retrieve a list of skins which are in use.
+  /// </summary>
+  /// <param name="portalId"></param>
+  /// <returns></returns>
+  public async Task<List<Models.DNN.Skin>> ListSkins(int portalId)
+  {
+    List<Models.DNN.Skin> results = new();
+
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      foreach (Models.DNN.Page page in await provider.ListPages(portalId))
+      {
+        if (!String.IsNullOrEmpty(page.SkinSrc))
+        {
+          Models.DNN.Skin skin = results
+            .Where(existingSkin => existingSkin.SkinSrc.Equals(page.SkinSrc, StringComparison.OrdinalIgnoreCase))
+            .FirstOrDefault();
+
+          if (skin == null)
+          {
+            skin = new Models.DNN.Skin()
+            {
+              SkinSrc = page.SkinSrc,
+              Panes = new()
+            };
+
+            results.Add(skin);
+          }
+
+          AddPanes(skin, page.PageModules.Select(module => module.PaneName));
+        }
+      }
+
+      return results;
+    }
+  }
+
+  /// <summary>
+  /// Retrieve a list of DNN containers which are in use.
+  /// </summary>
+  /// <param name="portalId"></param>
+  /// <returns></returns>
+  public async Task<List<Models.DNN.Container>> ListContainers(int portalId)
+  {
+    List<Models.DNN.Container> results = new();
+
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      foreach (Models.DNN.Page page in await provider.ListPages(portalId))
+      {
+        if (!String.IsNullOrEmpty(page.ContainerSrc))
+        {
+          Models.DNN.Container Container = results
+            .Where(existingContainer => existingContainer.ContainerSrc.Equals(page.ContainerSrc, StringComparison.OrdinalIgnoreCase))
+            .FirstOrDefault();
+
+          if (Container == null)
+          {
+            Container = new Models.DNN.Container()
+            {
+              ContainerSrc = page.ContainerSrc
+            };
+
+            results.Add(Container);
+          }
+        }
+      }
+
+      return results;
+    }
+  }
+
+  private void AddPanes(Models.DNN.Skin skin, IEnumerable<string> panes)
+  {
+    foreach (string pane in panes)
+    {
+      if (!skin.Panes.Contains(pane, StringComparer.OrdinalIgnoreCase))
+      {
+        skin.Panes.Add(pane);
+      }
+    }
+  }
 }

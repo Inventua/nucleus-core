@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -50,8 +51,13 @@ namespace Nucleus.ViewFeatures.TagHelpers
 			{
 				TagHelperContent content = await output.GetChildContentAsync();
 
-				if (content.IsEmptyOrWhiteSpace)
-				{
+        //if (!content.IsModified && content.IsEmptyOrWhiteSpace)
+        if (context.AllAttributes.First().Value.ToString() == "ContentPane")
+        {
+
+        }
+        if (content.IsEmptyOrWhiteSpace && output.PreContent.IsEmptyOrWhiteSpace && output.Content.IsEmptyOrWhiteSpace && output.PostContent.IsEmptyOrWhiteSpace && output.PreElement.IsEmptyOrWhiteSpace && output.PostElement.IsEmptyOrWhiteSpace)
+        {
 					output.SuppressOutput();
 				}
 			}

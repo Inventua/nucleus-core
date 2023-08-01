@@ -48,7 +48,7 @@ public class DNNMigrationController : Controller
   }
 
   [HttpGet]
-  public async Task <ActionResult> Index()
+  public async Task<ActionResult> Index()
   {
     return View("Index", await BuildIndexViewModel());
   }
@@ -106,13 +106,13 @@ public class DNNMigrationController : Controller
 
     this.DNNMigrationManager.GetMigrationEngine<Models.DNN.RoleGroup>().SignalStart();
     this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Role>().SignalStart();
-      
-    Task task = Task.Run(async () => 
+
+    Task task = Task.Run(async () =>
     {
       await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.RoleGroup>().Migrate(viewModel.UpdateExisting);
       await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Role>().Migrate(viewModel.UpdateExisting);
     });
-    
+
     return View("_Progress", await BuildProgressViewModel());
   }
 
@@ -145,7 +145,7 @@ public class DNNMigrationController : Controller
     (this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>() as MigrationEngines.FilesMigration)
       .SetAlias
       (
-        viewModel.UseSSL, 
+        viewModel.UseSSL,
         portals
           .Where(portal => portal.PortalId == viewModel.PortalId)
           .SelectMany(portal => portal.PortalAliases)
@@ -168,7 +168,7 @@ public class DNNMigrationController : Controller
   public async Task<ActionResult> MigrateUsers(ViewModels.User viewModel)
   {
     this.DNNMigrationManager.GetMigrationEngine<Models.DNN.User>().UpdateSelections(viewModel.Users);
-    
+
     this.DNNMigrationManager.GetMigrationEngine<Models.DNN.User>().SignalStart();
 
     Task task = Task.Run(async () =>
@@ -204,7 +204,7 @@ public class DNNMigrationController : Controller
       {
         this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().Message = $"Sync File System Error: {e.Message}";
       }
-      
+
       await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Page>().Migrate(viewModel.UpdateExisting);
     });
 
@@ -236,7 +236,7 @@ public class DNNMigrationController : Controller
     Task task = Task.Run(async () =>
     {
       await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Modules.Forum>().Migrate(viewModel.UpdateExisting);
-      
+
       // Forum migration can end up with less posts/replies than predicted because of orphaned records, etc, so we
       // have to manually signal completion.
       this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Modules.Forum>().Current = this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Modules.Forum>().TotalCount;
@@ -257,7 +257,7 @@ public class DNNMigrationController : Controller
       return BadRequest(ModelState);
     }
 
-    NotifyUsers engine = (NotifyUsers)this.DNNMigrationManager.GetMigrationEngine<Models.NotifyUser>();      
+    NotifyUsers engine = (NotifyUsers)this.DNNMigrationManager.GetMigrationEngine<Models.NotifyUser>();
     engine.SetTemplate(await this.MailTemplateManager.Get(viewModel.NotifyUserTemplateId));
 
     this.DNNMigrationManager.GetMigrationEngine<Models.NotifyUser>().UpdateSelections(viewModel.Users);
@@ -305,7 +305,7 @@ public class DNNMigrationController : Controller
     }
   }
 
-  private async Task <ViewModels.Index> BuildIndexViewModel()
+  private async Task<ViewModels.Index> BuildIndexViewModel()
   {
     ViewModels.Index viewModel = new();
 
@@ -317,19 +317,19 @@ public class DNNMigrationController : Controller
 
       viewModel.ConnectionString = Sanitize(connection.ConnectionString);
     }
-  
+
     return viewModel;
   }
 
-  private Task <ViewModels.Progress> BuildProgressViewModel()
+  private Task<ViewModels.Progress> BuildProgressViewModel()
   {
     // copy the engine object data to a EngineProgress object so that the progress values do not change during page rendering
-    IEnumerable<EngineProgress> progress = this.DNNMigrationManager.GetMigrationEngines.Select(engine => engine.GetProgress());    
+    IEnumerable<EngineProgress> progress = this.DNNMigrationManager.GetMigrationEngines.Select(engine => engine.GetProgress());
     Boolean doRefresh = progress.Any(engine => engine.State != Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase.EngineStates.Completed);
 
     string message = this.DNNMigrationManager.GetMigrationEngines.Where(engine => engine.State() == EngineStates.InProgress)
       .Select(engine => engine.Message)
-      .FirstOrDefault(); 
+      .FirstOrDefault();
 
     ViewModels.Progress viewModel = new()
     {
@@ -345,19 +345,19 @@ public class DNNMigrationController : Controller
   {
     ViewModels.Role viewModel = new();
     viewModel.PortalId = portalId;
-    
+
     viewModel.RoleGroups = await this.DNNMigrationManager.ListDnnRoleGroups(portalId);
     viewModel.Roles = await this.DNNMigrationManager.ListDnnRoles(portalId);
 
     this.DNNMigrationManager.ClearMigrationEngines();
     await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.RoleGroup>(this.HttpContext.RequestServices, viewModel.RoleGroups);
     await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.Role>(this.HttpContext.RequestServices, viewModel.Roles);
-    
+
     foreach (MigrationEngineBase engine in this.DNNMigrationManager.GetMigrationEngines)
     {
       await engine.Validate();
     }
-    
+
     return viewModel;
   }
 
@@ -367,10 +367,10 @@ public class DNNMigrationController : Controller
     viewModel.PortalId = portalId;
 
     viewModel.Lists = await this.DNNMigrationManager.ListDnnLists(portalId);
-    
+
     this.DNNMigrationManager.ClearMigrationEngines();
     await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.List>(this.HttpContext.RequestServices, viewModel.Lists);
-    
+
     foreach (MigrationEngineBase engine in this.DNNMigrationManager.GetMigrationEngines)
     {
       await engine.Validate();
@@ -408,20 +408,34 @@ public class DNNMigrationController : Controller
     viewModel.PortalId = portalId;
     viewModel.TotalPosts = 0;
 
-    viewModel.ForumGroups = await this.DNNMigrationManager.ListDnnForumGroupsByPortal(portalId);
-
-    foreach (Models.DNN.Modules.Forum forum in viewModel.ForumGroups.SelectMany(group => group.Forums))
+    try
     {
-      forum.PostCount = await this.DNNMigrationManager.CountForumPosts(forum.ForumId);
-      viewModel.TotalPosts += forum.PostCount;
+      viewModel.ForumGroups = await this.DNNMigrationManager.ListDnnForumGroupsByPortal(portalId);
+
+      foreach (Models.DNN.Modules.Forum forum in viewModel.ForumGroups.SelectMany(group => group.Forums))
+      {
+        forum.PostCount = await this.DNNMigrationManager.CountForumPosts(forum.ForumId);
+        viewModel.TotalPosts += forum.PostCount;
+      }
+
+      this.DNNMigrationManager.ClearMigrationEngines();
+      await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.Modules.Forum>(this.HttpContext.RequestServices, viewModel.ForumGroups.SelectMany(group => group.Forums).ToList());
+
+      foreach (MigrationEngineBase engine in this.DNNMigrationManager.GetMigrationEngines)
+      {
+        await engine.Validate();
+      }
     }
-
-    this.DNNMigrationManager.ClearMigrationEngines();
-    await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.Modules.Forum>(this.HttpContext.RequestServices, viewModel.ForumGroups.SelectMany(group => group.Forums).ToList());
-
-    foreach (MigrationEngineBase engine in this.DNNMigrationManager.GetMigrationEngines)
+    catch (Exception ex)
     {
-      await engine.Validate();
+      if (ex.Message.Contains("Invalid object name", StringComparison.OrdinalIgnoreCase))
+      {
+        viewModel.ForumsNotInstalled = true;
+      }
+      else
+      {
+        throw;
+      }
     }
 
     return viewModel;
@@ -433,15 +447,25 @@ public class DNNMigrationController : Controller
     viewModel.PortalId = portalId;
 
     viewModel.Pages = await this.DNNMigrationManager.ListDnnPages(portalId);
-    
+
     viewModel.DNNSkins = await this.DNNMigrationManager.ListSkins(viewModel.PortalId);
     viewModel.Layouts = await this.LayoutManager.List();
+
+    foreach(Models.DNN.Skin skin in viewModel.DNNSkins)
+    {
+      skin.AssignedLayoutId = await FindBestMatch(skin, viewModel.Layouts);
+    }
 
     viewModel.DNNContainers = await this.DNNMigrationManager.ListContainers(viewModel.PortalId);
     viewModel.Containers = await this.ContainerManager.List();
 
+    foreach (Models.DNN.Container container in viewModel.DNNContainers)
+    {
+      container.AssignedContainerId = FindBestMatch(container, viewModel.Containers);
+    }
+
     this.DNNMigrationManager.ClearMigrationEngines();
-    await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.Page>(this.HttpContext.RequestServices, viewModel.Pages);    
+    await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.Page>(this.HttpContext.RequestServices, viewModel.Pages);
 
     foreach (MigrationEngineBase engine in this.DNNMigrationManager.GetMigrationEngines)
     {
@@ -507,6 +531,125 @@ public class DNNMigrationController : Controller
   {
     User fullUser = await this.UserManager.Get(user.Id);
     return (fullUser.Secrets == null || fullUser.Secrets.PasswordHash == null) && !fullUser.Verified;
+  }
+
+
+  private async Task<Guid> FindBestMatch(Models.DNN.Skin skin, IList<Nucleus.Abstractions.Models.LayoutDefinition> layouts)
+  {
+    Guid bestLayoutId = Guid.Empty;
+    double bestLayoutWeight = 0;
+
+    foreach (Nucleus.Abstractions.Models.LayoutDefinition layout in layouts)
+    {
+      // starting weight is based on similarity of "friendly names"
+      double weight = (int)(FindSimilarity(skin.FriendlyName(), layout.FriendlyName) * 10);
+
+      IEnumerable<string> layoutPanes = await this.LayoutManager.ListLayoutPanes(layout);
+
+      // add/subtract from weight based on how many panes they have in common
+      foreach (string sourcePane in skin.Panes)
+      {
+        Boolean found = false;
+        foreach (string layoutPane in layoutPanes)
+        {
+          if (sourcePane.Equals(layoutPane, StringComparison.OrdinalIgnoreCase))
+          {
+            found = true;
+          }
+        }
+
+        // if a matching pane was found in the layout, increase the weight - but if the pane is missing from the layout
+        // reduce the weight.  This is so that layouts with the least missing panes get a higher weight
+        if (found)
+        {
+          weight++;
+        }
+        else
+        {
+          weight--;
+        }
+      }
+
+      if (weight > bestLayoutWeight)
+      {
+        bestLayoutId = layout.Id;
+        bestLayoutWeight = weight;
+      }
+    }
+
+    return bestLayoutId;
+  }
+
+
+  private static int GetEditDistance(string X, string Y)
+  {
+    // https://www.techiedelight.com/calculate-similarity-between-two-strings-in-csharp/#:~:text=We%20can%20use%20the%20Edit,convert%20one%20string%20to%20another.
+    int m = X.Length;
+    int n = Y.Length;
+
+    int[][] T = new int[m + 1][];
+    for (int i = 0; i < m + 1; ++i)
+    {
+      T[i] = new int[n + 1];
+    }
+
+    for (int i = 1; i <= m; i++)
+    {
+      T[i][0] = i;
+    }
+    for (int j = 1; j <= n; j++)
+    {
+      T[0][j] = j;
+    }
+
+    int cost;
+    for (int i = 1; i <= m; i++)
+    {
+      for (int j = 1; j <= n; j++)
+      {
+        cost = X[i - 1] == Y[j - 1] ? 0 : 1;
+        T[i][j] = Math.Min(Math.Min(T[i - 1][j] + 1, T[i][j - 1] + 1),
+                T[i - 1][j - 1] + cost);
+      }
+    }
+
+    return T[m][n];
+  }
+
+  public static double FindSimilarity(string x, string y)
+  {
+    if (x == null || y == null)
+    {
+      throw new ArgumentException("Strings must not be null");
+    }
+
+    double maxLength = Math.Max(x.Length, y.Length);
+    if (maxLength > 0)
+    {
+      // optionally ignore case if needed
+      return (maxLength - GetEditDistance(x, y)) / maxLength;
+    }
+    return 1.0;
+  }
+
+  private Guid FindBestMatch(Models.DNN.Container dnnContainer, IList<Nucleus.Abstractions.Models.ContainerDefinition> containers)
+  {
+    Guid bestContainerId = Guid.Empty;
+    double bestContainerWeight = 0;
+
+    foreach (Nucleus.Abstractions.Models.ContainerDefinition container in containers)
+    {
+      // weight is based on similarity of "friendly names"
+      double weight = (int)(FindSimilarity(dnnContainer.FriendlyName(), container.FriendlyName) * 10);
+
+      if (weight > bestContainerWeight)
+      {
+        bestContainerId = container.Id;
+        bestContainerWeight = weight;
+      }
+    }
+
+    return bestContainerId;
   }
 
   /// <summary>

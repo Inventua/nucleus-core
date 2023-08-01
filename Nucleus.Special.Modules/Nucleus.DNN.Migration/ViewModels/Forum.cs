@@ -23,5 +23,6 @@ public class Forum
   public List<Models.DNN.Modules.Forum> Forums { get; set; }
 
   public Boolean UpdateExisting { get; set; } = true;
+  public Boolean ForumsNotInstalled { get; set; }
 
 }

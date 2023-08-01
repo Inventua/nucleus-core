@@ -1,7 +1,15 @@
 ﻿@model Nucleus.DNN.Migration.ViewModels.Forum
 @Html.AddStyle("~!/../index.css")
 <h2 class="nucleus-control-panel-heading">Migrate DNN Forums</h2>
-<div>
+
+@if (Model.ForumsNotInstalled)
+{
+  <div class="alert alert-info">
+    Your DNN site does not have a forums module installed, or your forums software isn't supported by the migration tool.    
+  </div>
+}
+else
+{
   <div class="alert alert-primary">
     <ul>
       <li>There are @Model.ForumGroups.SelectMany(group => group.Forums).Where(forum => forum.CanSelect).Count() forums which can be migrated.</li>
@@ -79,4 +87,4 @@
     </div>
 
   }
-</div>
+}

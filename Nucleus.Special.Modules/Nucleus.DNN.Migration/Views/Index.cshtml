@@ -21,10 +21,14 @@
       <div>
         DotNetNuke Version: @Model.Version
       </div>
-      <div>
-        WARNING: This is a very old version of DotNetNuke. Migration is likely to fail. You should upgrade your DNN version before migration. 
-      </div>
     </div>
+
+    @if (Model.VersionWarning)
+    {
+      <div class="alert alert-warning">
+        WARNING: This is a very old version of DotNetNuke. Migration is likely to fail. You should upgrade your DNN version before migration.
+      </div>
+    }
 
     @using (Html.BeginForm())
     {

@@ -82,7 +82,7 @@
   vertical-align: top;
 }
 
-.dnn-migration .validation-results ul
+.dnn-migration .validation-results ul, .dnn-migration ul.validation-results
 {
   list-style-type: none;
   padding: 0;
@@ -91,7 +91,8 @@
 
 .dnn-migration .validation-results li
 {
-  display: flex;
+  list-style-type: none;
+  /*display: flex;*/
 }
 
 .dnn-migration .validation-results td:first-child
@@ -125,4 +126,44 @@
 .dnn-migration .glyph-Success::before
 {
   content: '\e876';
+}
+
+.dnn-migration .folder-level-1
+{
+  padding-left: 1rem;
+}
+
+.dnn-migration .folder-level-2
+{
+  padding-left: 2rem;
+}
+
+.dnn-migration .folder-level-3
+{
+  padding-left: 3rem;
+}
+
+.dnn-migration .folder-level-4
+{
+  padding-left: 5rem;
+}
+
+.dnn-migration .folder-level-5
+{
+  padding-left: 5rem;
+}
+
+.dnn-migration .folder-level-6
+{
+  padding-left: 6rem;
+}
+
+.dnn-migration .folder-level-7
+{
+  padding-left: 7rem;
+}
+
+.dnn-migration .folder-level-8
+{
+  padding-left: 8rem;
 }

@@ -60,20 +60,20 @@ else
                   </td>
                   <td>@forum.Name</td>
                   <td>
-                    <table class="table table-sm table-borderless validation-results">
+                    <ul class="validation-results">
                       @foreach (var result in forum.Results)
                       {
-                        <tr>
-                          <td class="glyph-@result.Type">@result.Message</td>
-                        </tr>
+                        <li>
+                          <span class="glyph-@result.Type">@result.Message</span>
+                        </li>
                       }
                       @if (forum.CanSelect)
                       {
-                        <tr>
-                          <td class="glyph-Information">There are @forum.PostCount posts to migrate.</td>
-                        </tr>
+                        <li>
+                          <span class="glyph-Information">There are @forum.PostCount posts to migrate.</span>
+                        </li>
                       }
-                    </table>
+                    </ul>
                   </td>
                 </tr>
                 

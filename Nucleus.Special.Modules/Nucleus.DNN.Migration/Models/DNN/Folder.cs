@@ -31,5 +31,15 @@ public class Folder : DNNEntity
 
   public List<FolderPermission> Permissions { get; set; }
 
+  [NotMapped]
+  public int ParentId { get; set; }
 
+  [NotMapped]
+  public int Level { get; set; }
+  
+  [NotMapped]
+  public int FolderCount { get; set; }
+
+  [NotMapped]
+  public string FolderName { get; set; }
 }

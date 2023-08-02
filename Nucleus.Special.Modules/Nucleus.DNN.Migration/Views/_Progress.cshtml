@@ -1,48 +1,53 @@
 ﻿@model Nucleus.DNN.Migration.ViewModels.Progress
 @Html.AddStyle("~!/../index.css")
 <h2 class="nucleus-control-panel-heading">DNN Migration in Progress</h2>
-<div>
-  @foreach (var engine in Model.EngineProgress)
+@{
+  var index = 0;
+}
+@foreach (var engine in Model.EngineProgress)
+{
+  if (engine.State == Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase.EngineStates.InProgress)
   {
-    if (engine.State == Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase.EngineStates.InProgress)
-    {
-      <div class="alert alert-warning">
-        <h2>@(String.IsNullOrEmpty(Model.Message) ? @engine.Title : Model.Message)</h2>
-        <div class="progress">
-          <div class="progress-bar" role="progressbar" aria-label="Progress" style="width: @engine.CurrentPercent%" aria-valuenow="@engine.Current" aria-valuemin="0" aria-valuemax="@engine.TotalCount"></div>          
-        </div>
-        <div>@engine.Current / @engine.TotalCount</div>
+    <div class="alert alert-warning">
+      <h2>@(String.IsNullOrEmpty(Model.Message) ? @engine.Title : Model.Message)</h2>
+      <div class="progress">
+        <div class="progress-bar" role="progressbar" aria-label="Progress" style="width: @engine.CurrentPercent%" aria-valuenow="@engine.Current" aria-valuemin="0" aria-valuemax="@engine.TotalCount"></div>          
       </div>
-    }
-    else if (engine.State == Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase.EngineStates.Completed)
-    {
-      <h2>@engine.Title Complete.</h2>
-      <table class="table table-striped table-sm validation-results mb-4">
-        @foreach (var item in engine.Items)
-        {
-          <tr>
-            <td>@item.DisplayName()</td>
-            <td>
-              <ul>
-                @if (item.Results.Any())
-                {
-                  @foreach (var result in item.Results)
-                  {
-                    <li class="glyph-@result.Type">@result.Message</li>
-                  }
-                }
-                else
-                {
-                  <li class="glyph-Success">No warnings or errors.</li>
-                }
-              </ul>
-            </td>
-          </tr>
-        }
-      </table>
-    }
+      <div>@engine.Current / @engine.TotalCount</div>
+    </div>
   }
-</div>
+  else if (engine.State == Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase.EngineStates.Completed)
+  {
+    <a href="@Url.NucleusAction("ExportResults", "DNNMigration", "DNNMigration", new { @index = index})" class="btn btn-primary ms-auto me-0">Export Results</a>
+     
+    <h2>@engine.Title Complete.</h2>
+    <table class="table table-striped table-sm validation-results mb-4">
+      @foreach (var item in engine.Items)
+      {
+        <tr>
+          <td>@item.DisplayName()</td>
+          <td>
+            <ul>
+              @if (item.Results.Any())
+              {
+                @foreach (var result in item.Results)
+                {
+                  <li class="glyph-@result.Type">@result.Message</li>
+                }
+              }
+              else
+              {
+                <li class="glyph-Success">Success</li>
+              }
+            </ul>
+          </td>
+        </tr>
+      }
+    </table>
+  
+    index++;
+  }
+}
 
 @if (Model.InProgress)
 {

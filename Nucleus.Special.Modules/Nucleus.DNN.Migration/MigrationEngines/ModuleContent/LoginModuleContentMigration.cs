@@ -16,7 +16,9 @@ public class LoginModuleContentMigration : ModuleContentMigrationBase
 
   public override Boolean IsMatch(DesktopModule desktopModule)
   {
-    return desktopModule.ModuleName.Equals("authentication", StringComparison.OrdinalIgnoreCase);
+    string[] matches = { "authentication", "account login" };
+
+    return matches.Contains(desktopModule.ModuleName, StringComparer.OrdinalIgnoreCase);
   }
 
   public override Task MigrateContent(Models.DNN.Page dnnPage, Models.DNN.PageModule dnnModule, Abstractions.Models.Page newPage, Abstractions.Models.PageModule newModule, Dictionary<int, Guid> createdPagesKeys)

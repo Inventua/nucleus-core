@@ -272,6 +272,12 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
   {
     foreach (Models.DNN.Folder folder in this.Items)
     {
+      if (folder.FolderPath.Equals("Templates/", StringComparison.OrdinalIgnoreCase))
+      {
+        folder.IsSelected = false;
+        folder.AddWarning($"The '{folder.FolderPath}' folder was not selected by default because this is typically a system folder.  You can select it for migration if you want to.");
+      }
+
       foreach (Models.DNN.File file in folder.Files)
       {
         AllowedFileType fileType = this.FileSystemProviderOptions.AllowedFileTypes.Where(allowedtype => allowedtype.FileExtensions.Contains(System.IO.Path.GetExtension(file.FileName), StringComparer.OrdinalIgnoreCase)).FirstOrDefault();

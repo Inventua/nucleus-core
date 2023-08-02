@@ -132,6 +132,8 @@ public class DNNMigrationController : Controller
   }
 
   [HttpPost]
+  [DisableRequestSizeLimitAttribute]
+  [RequestFormLimits(ValueCountLimit = Int32.MaxValue)]
   public async Task<ActionResult> MigrateFolders(ViewModels.Folder viewModel)
   {
     if (!ModelState.IsValid)
@@ -272,6 +274,35 @@ public class DNNMigrationController : Controller
   }
 
   [HttpGet]
+  public ActionResult ExportResults(int index)
+  {
+    var exporter = new Nucleus.Extensions.Excel.ExcelWriter<Models.DNN.DNNEntity>();
+
+    exporter.AddColumn("Name", "Name", ClosedXML.Excel.XLDataType.Text , entity => entity.DisplayName());
+    exporter.AddColumn("ID", "ID", ClosedXML.Excel.XLDataType.Number, entity => entity.Id());
+    exporter.AddColumn("Results", "Results", ClosedXML.Excel.XLDataType.Text, 
+      entity => entity.Results.Any() ? String.Join("\n", entity.Results.Select(result=>result.ToString())) : "Success"
+    );
+
+    if (index >= this.DNNMigrationManager.GetMigrationEngines.Count)
+    {
+      return BadRequest();
+    }
+
+    MigrationEngineBase engine = this.DNNMigrationManager.GetMigrationEngines[index];
+
+    string worksheetName = engine.Title.Replace("Migrating ", "");
+    if (worksheetName.Length > 32)
+    {
+      worksheetName= worksheetName.Substring(0, 32);
+    }
+    exporter.Worksheet.Name = worksheetName;
+    exporter.Export(engine.InnerItems);
+
+    return File(exporter.GetOutputStream(), Nucleus.Extensions.Excel.ExcelWorksheet.MIMETYPE_EXCEL, $"{engine.Title.Replace("Migrating", "Migration Results - ")} {DateTime.Now}.xlsx");
+  }
+
+  [HttpGet]
   public async Task<ActionResult> UpdateProgress(ViewModels.Progress viewModel)
   {
     return View("_Progress", await BuildProgressViewModel());
@@ -315,6 +346,10 @@ public class DNNMigrationController : Controller
       viewModel.Version = await this.DNNMigrationManager.GetDnnVersion();
       viewModel.Portals = await this.DNNMigrationManager.ListDnnPortals();
 
+      if (viewModel.Version.ToVersion() < new System.Version(5,5,1))
+      {
+        viewModel.VersionWarning = true;
+      }
       viewModel.ConnectionString = Sanitize(connection.ConnectionString);
     }
 
@@ -381,6 +416,8 @@ public class DNNMigrationController : Controller
 
   private async Task<ViewModels.Folder> BuildFoldersViewModel(int portalId)
   {
+    Stack<Models.DNN.Folder> folderHierachy = new();
+
     ViewModels.Folder viewModel = new();
     viewModel.PortalId = portalId;
 
@@ -390,6 +427,40 @@ public class DNNMigrationController : Controller
       .PortalAliases;
 
     viewModel.Folders = await this.DNNMigrationManager.ListDnnFolders(portalId);
+
+    foreach (Models.DNN.Folder folder in viewModel.Folders)
+    {
+      if (String.IsNullOrEmpty(folder.FolderPath))
+      {
+        folder.FolderName = "/";
+      }
+      else
+      {
+        folder.FolderName = System.IO.Path.GetDirectoryName(folder.FolderPath);
+      }
+
+      if (!folderHierachy.Any())
+      {
+        folderHierachy.Push(folder);
+      }
+      else
+      {
+        // walk back the stack to ancestor of the current folder
+        while (!folder.FolderPath.StartsWith(folderHierachy.Peek().FolderPath, StringComparison.OrdinalIgnoreCase))
+        {
+          folderHierachy.Pop();
+        }
+
+        folder.ParentId = folderHierachy.Peek().FolderId;
+        folder.Level = folderHierachy.Count;
+        folderHierachy.Peek().FolderCount++;
+
+        // add the current folder to the stack
+        folderHierachy.Push(folder);        
+      }
+
+
+    }
 
     this.DNNMigrationManager.ClearMigrationEngines();
     await this.DNNMigrationManager.CreateMigrationEngine<Models.DNN.Folder>(this.HttpContext.RequestServices, viewModel.Folders);

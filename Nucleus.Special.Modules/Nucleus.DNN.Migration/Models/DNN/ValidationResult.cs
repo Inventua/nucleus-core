@@ -22,4 +22,9 @@ public class ValidationResult
     this.Type = type;
     this.Message = message;
   }
+
+  public override string ToString()
+  {
+    return $"{Type}: {Message}";
+  }
 }

@@ -45,7 +45,6 @@
             <tr>
               <th>@Html.CheckBox("toggle-all", true, new { @class = "toggle-all", @id = "" } )</th>
               <th>Name</th>
-              <th>Files</th>
               <th>Messages</th>
             </tr>
           </thead>
@@ -54,27 +53,29 @@
               var index = 0;
             }
             @foreach (var folder in Model.Folders)
-            {
+            {              
               <tr>
                 <td>
                   @if (folder.CanSelect)
                   {
-                    @Html.CheckBox($"Files[{index}].IsSelected", folder.IsSelected, new { id = $"Files_{index}__IsSelected" })
+                    @Html.CheckBox($"Folders[{index}].IsSelected", folder.IsSelected, new { id = $"Folders{index}__IsSelected", @class = "folder-selection-checkbox", data_folderid = folder.FolderId, data_parentid = folder.ParentId })
                   }
                   @Html.Hidden($"Folders[{index}].CanSelect", folder.CanSelect, new { id = $"Folders_{index}__CanSelect" })
                   @Html.Hidden($"Folders[{index}].FolderId", folder.FolderId, new { id = $"Folders_{index}__FolderId" })
                 </td>
-                <td>@(String.IsNullOrEmpty(folder.FolderPath) ? "/" : folder.FolderPath)</td>
-                <td>@folder.Files.Count</td>
+                <td class="folder-level-@folder.Level">@folder.FolderName</td>
                 <td>
-                  <table class="table table-sm table-borderless validation-results">
+                  <ul class="validation-results">
+                    <li>
+                      @folder.FolderCount folders, @folder.Files.Count files
+                    </li>
                     @foreach (var result in folder.Results)
                     {
-                      <tr>
-                        <td class="glyph-@result.Type">@result.Message</td>
-                      </tr>
+                      <li>
+                        <span class="glyph-@result.Type">@result.Message</span>
+                      </li>
                     }
-                  </table>
+                  </ul>
                 </td>
               </tr>
               index++;

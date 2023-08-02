@@ -16,7 +16,7 @@ public class SearchModuleContentMigration : ModuleContentMigrationBase
 
   public override Boolean IsMatch(DesktopModule desktopModule)
   {
-    string[] matches = { "SearchResults", "SearchInput" };
+    string[] matches = { "SearchResults", "SearchInput", "Search Results" };
 
     return matches.Contains(desktopModule.ModuleName, StringComparer.OrdinalIgnoreCase);
   }

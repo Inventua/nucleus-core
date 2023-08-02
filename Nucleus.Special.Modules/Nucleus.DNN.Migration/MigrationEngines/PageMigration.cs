@@ -31,7 +31,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
 
   private IEnumerable<Nucleus.DNN.Migration.MigrationEngines.ModuleContent.ModuleContentMigrationBase> ModuleContentMigrations { get; }
 
-  public PageMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IRoleManager roleManager, ILayoutManager layoutManager, IContainerManager containerManager, IEnumerable<Nucleus.DNN.Migration.MigrationEngines.ModuleContent.ModuleContentMigrationBase> moduleContentMigrations, ILogger<PageMigration> logger) : base("Migrating Pages, Modules, Settings and Content")
+  public PageMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IRoleManager roleManager, ILayoutManager layoutManager, IContainerManager containerManager, IEnumerable<Nucleus.DNN.Migration.MigrationEngines.ModuleContent.ModuleContentMigrationBase> moduleContentMigrations, ILogger<PageMigration> logger) : base("Migrating Pages and Modules")
   {
     this.Context = context;
     this.MigrationManager = migrationManager;
@@ -94,48 +94,33 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
 
           AddRoutes(dnnPage, newPage);
 
-          Guid? assignedContainerId = this.DNNContainers
+          if (dnnPage.ContainerSrc != null)
+          {
+            Guid? assignedContainerId = this.DNNContainers
             .Where(container => container.ContainerSrc.Equals(dnnPage.ContainerSrc, StringComparison.OrdinalIgnoreCase))
             .Select(container => container.AssignedContainerId)
             .FirstOrDefault();
 
-          if (assignedContainerId.HasValue)
-          {
-            newPage.DefaultContainerDefinition = (await this.ContainerManager.List())
-              .Where(container => container.Id == assignedContainerId.Value)
-              .FirstOrDefault();
+            if (assignedContainerId.HasValue)
+            {
+              newPage.DefaultContainerDefinition = (await this.ContainerManager.List())
+                .Where(container => container.Id == assignedContainerId.Value)
+                .FirstOrDefault();
+            }
           }
 
-          Guid? assignedLayoutId = this.DNNSkins
+          if (dnnPage.SkinSrc != null)
+          {
+            Guid? assignedLayoutId = this.DNNSkins
             .Where(skin => skin.SkinSrc.Equals(dnnPage.SkinSrc, StringComparison.OrdinalIgnoreCase))
             .Select(skin => skin.AssignedLayoutId)
             .FirstOrDefault();
 
-          newPage.LayoutDefinition = (await this.LayoutManager.List())
-            .Where(skin => skin.Id == assignedLayoutId.Value)
-              .FirstOrDefault();
-
-          if (dnnPage.ParentId != null)
-          {
-            if (createdPagesKeys.ContainsKey(dnnPage.ParentId.Value))
-            {
-              newPage.ParentId = createdPagesKeys[dnnPage.ParentId.Value];
-            }
-            else
-            {
-              // try looking by route
-              Nucleus.Abstractions.Models.Page nucleusParentPage = await this.PageManager.Get(this.Context.Site, dnnPage.TabPath.Replace("//", "/"));
-              if (nucleusParentPage != null)
-              {
-                newPage.ParentId = nucleusParentPage.Id;
-              }
-              else
-              {
-                dnnPage.AddWarning($"The Page parent could not be set because a page with DNN Parent ID '{dnnPage.ParentId}' was not imported, and a Nucleus page with route '{dnnPage.TabPath.Replace("//", "/")} was not found.'.");
-              }
-            }
+            newPage.LayoutDefinition = (await this.LayoutManager.List())
+              .Where(skin => skin.Id == assignedLayoutId.Value)
+                .FirstOrDefault();
           }
-
+          
           await SetPagePermissions(dnnPage, newPage, pagePermissionTypes);
 
           try
@@ -193,8 +178,30 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
                 await AddLandingPageModule(newPage, moduleDefinitions, updateExisting);
               }
             }
+            
+            // set parent page
+            if (dnnPage.ParentId != null)
+            {
+              if (createdPagesKeys.ContainsKey(dnnPage.ParentId.Value))
+              {
+                newPage.ParentId = createdPagesKeys[dnnPage.ParentId.Value];
+              }
+              else
+              {
+                // try looking by route
+                Nucleus.Abstractions.Models.Page nucleusParentPage = await this.PageManager.Get(this.Context.Site, dnnPage.TabPath.Replace("//", "/"));
+                if (nucleusParentPage != null)
+                {
+                  newPage.ParentId = nucleusParentPage.Id;
+                }
+                else
+                {
+                  dnnPage.AddWarning($"The Page parent could not be set because a page with DNN Parent ID '{dnnPage.ParentId}' was not imported, and a Nucleus page with route '{dnnPage.TabPath.Replace("//", "/")} was not found.'.");
+                }
+              }
+            }
 
-            // save again in case any module migrations added/ changed anything
+            // save again for parent id + in case any module migrations added/ changed anything
             await this.PageManager.Save(this.Context.Site, newPage);
           }
         }
@@ -207,6 +214,8 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
         this.Progress();
       }
     }
+
+    this.Current = this.TotalCount;
   }
 
   // Create a SiteMap module to make the page a "landing page"

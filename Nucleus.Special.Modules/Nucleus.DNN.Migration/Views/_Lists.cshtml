@@ -45,14 +45,14 @@
                 </td>
                 <td>@Model.Lists[index].ListName</td>
                 <td>
-                  <table class="table table-sm table-borderless validation-results">
+                  <ul class="validation-results">
                     @foreach (var result in Model.Lists[index].Results)
                     {
-                      <tr>
-                        <td class="glyph-@result.Type">@result.Message</td>
-                      </tr>
+                      <li>
+                        <span class="glyph-@result.Type">@result.Message</span>
+                      </li>
                     }
-                  </table>
+                  </ul>
                 </td>
               </tr>
             }

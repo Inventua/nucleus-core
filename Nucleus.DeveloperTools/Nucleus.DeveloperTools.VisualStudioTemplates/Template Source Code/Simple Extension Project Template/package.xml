@@ -13,8 +13,8 @@
 			<moduleDefinition id="$guid2$">
 				<friendlyName>$nucleus_extension_friendlyname$</friendlyName>
 				<extension>$nucleus_extension_name$</extension>
-				<viewController>$nucleus_extension_name$Controller</viewController>
-				<settingsController>$nucleus_extension_name$AdminController</settingsController>
+        <viewController>$nucleus_extension_name$ViewerController</viewController>
+        <settingsController>$nucleus_extension_name$SettingsController</settingsController>
 				<viewAction>Index</viewAction>
 				<editAction>Settings</editAction>
 			</moduleDefinition>
@@ -31,8 +31,7 @@
 				<file name="_ViewImports.cshtml" />
 				<file name="Viewer.cshtml" />
 				<file name="Settings.cshtml" />
-			</folder>
-			
+			</folder>			
 		</component>
 	</components>
 	

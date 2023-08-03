@@ -12,13 +12,21 @@
 	
 	<Target Name="ZipOutputPath" BeforeTargets="CoreCompile">
 		<ZipDirectory SourceDirectory="Template Source Code\Complex Extension Project Template" DestinationFile="Complex Extension.zip" Overwrite="true" />
-		<ZipDirectory SourceDirectory="Template Source Code\Simple Extension Project Template" DestinationFile="Simple Extension.zip" Overwrite="true" />
-		<ZipDirectory SourceDirectory="Template Source Code\Empty Extension Project Template" DestinationFile="Empty Extension.zip" Overwrite="true" />
+    <Move SourceFiles="Complex Extension.zip" DestinationFiles="ProjectTemplates\Complex Extension.zip" OverwriteReadOnlyFiles="true" />
+    
+    <ZipDirectory SourceDirectory="Template Source Code\Simple Extension Project Template" DestinationFile="Simple Extension.zip" Overwrite="true" />
+    <Move SourceFiles="Simple Extension.zip" DestinationFiles="ProjectTemplates\Simple Extension.zip" OverwriteReadOnlyFiles="true" />
+    
+    <ZipDirectory SourceDirectory="Template Source Code\Empty Extension Project Template" DestinationFile="Empty Extension.zip" Overwrite="true" />
+    <Move SourceFiles="Empty Extension.zip" DestinationFiles="ProjectTemplates\Empty Extension.zip" OverwriteReadOnlyFiles="true" />
 
-		<Move SourceFiles="Complex Extension.zip" DestinationFiles="ProjectTemplates\Complex Extension.zip" OverwriteReadOnlyFiles="true" />
-		<Move SourceFiles="Simple Extension.zip" DestinationFiles="ProjectTemplates\Simple Extension.zip" OverwriteReadOnlyFiles="true" />
-		<Move SourceFiles="Empty Extension.zip" DestinationFiles="ProjectTemplates\Empty Extension.zip" OverwriteReadOnlyFiles="true" />
-	</Target>
+    <ZipDirectory SourceDirectory="Template Source Code\View Item Template" DestinationFile="View.zip" Overwrite="true" />
+    <Move SourceFiles="View.zip" DestinationFiles="ItemTemplates\View.zip" OverwriteReadOnlyFiles="true" />
+
+    <ZipDirectory SourceDirectory="Template Source Code\Controller Item Template" DestinationFile="Controller.zip" Overwrite="true" />
+    <Move SourceFiles="Controller.zip" DestinationFiles="ItemTemplates\Controller.zip" OverwriteReadOnlyFiles="true" />
+
+  </Target>
 
 	<Target Name="CopyModuleTargets" BeforeTargets="CoreCompile" Condition="'$(NUCLEUS_PATH)' != ''">
 		<Copy SourceFiles="$(NUCLEUS_PATH)\module.build.targets" DestinationFiles=".\module.build.targets" OverwriteReadOnlyFiles="true" />

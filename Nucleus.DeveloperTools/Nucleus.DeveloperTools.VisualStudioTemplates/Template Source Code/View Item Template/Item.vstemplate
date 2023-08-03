@@ -1,0 +1,20 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Item">
+  <TemplateData>
+    <Name>Nucleus View</Name>
+    <Description>Visual Studio item template for a Nucleus view, including a view model, the Razor view and a CSS file.</Description>
+    <ProjectType>CSharp</ProjectType>
+    <ProjectSubType>CSharp</ProjectSubType>
+    <SortOrder>1001</SortOrder>   
+    <DefaultName>View</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+		<LanguageTag>csharp</LanguageTag>
+  </TemplateData>
+  <TemplateContent>
+		<Folder Name="ViewModels" TargetFolderName="\ViewModels">
+      <ProjectItem ReplaceParameters="true" TargetFileName="$fileinputname$.cs">view.cs</ProjectItem>
+    </Folder>
+    <Folder Name="Views" TargetFolderName="\Views">
+      <ProjectItem ReplaceParameters="true" TargetFileName="$fileinputname$.cshtml">view.cshtml</ProjectItem>
+    </Folder>
+  </TemplateContent>
+</VSTemplate>

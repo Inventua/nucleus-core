@@ -14,8 +14,11 @@
     <CreateInPlace>true</CreateInPlace>
     <Icon>__TemplateIcon.ico</Icon>
 		<LanguageTag>csharp</LanguageTag>
-		<PlatformTag>windows</PlatformTag>
-		<ProjectTypeTag>Nucleus</ProjectTypeTag>
+    <PlatformTag>windows</PlatformTag>
+    <PlatformTag>linux</PlatformTag>
+    <PlatformTag>nucleus</PlatformTag>
+    <ProjectTypeTag>AspNetCore</ProjectTypeTag>
+    <ProjectTypeTag>Nucleus</ProjectTypeTag>
   </TemplateData>
   <TemplateContent>
 		<Project TargetFileName="Nucleus.Modules.Project.csproj" File="Nucleus.Modules.Project.csproj" ReplaceParameters="true">
@@ -23,8 +26,8 @@
         <ProjectItem TargetFileName="launchSettings.json">launchSettings.json</ProjectItem>
       </Folder>
       <Folder Name="Controllers" TargetFolderName="Controllers">
-        <ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$Controller.cs">Controller.cs</ProjectItem>
-				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$AdminController.cs">Admin.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$ViewerController.cs">ViewerController.cs</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$SettingsController.cs">SettingsController.cs</ProjectItem>
       </Folder>
 			<Folder Name="Models" TargetFolderName="Models">
 				<ProjectItem ReplaceParameters="true" TargetFileName="Settings.cs">Settings.cs</ProjectItem>
@@ -47,7 +50,7 @@
   </TemplateContent>
 	
 	<WizardExtension>
-		<Assembly>Nucleus.DeveloperTools.VisualStudioTemplates, Version=1.2.0.0, Culture=Neutral, PublicKeyToken=2cc815f0f52d0477</Assembly>
+		<Assembly>Nucleus.DeveloperTools.VisualStudioTemplates, Version=1.2.1.0, Culture=Neutral, PublicKeyToken=2cc815f0f52d0477</Assembly>
 		<FullClassName>Nucleus.DeveloperTools.VisualStudioTemplates.ProjectWizard</FullClassName>
 	</WizardExtension>
 

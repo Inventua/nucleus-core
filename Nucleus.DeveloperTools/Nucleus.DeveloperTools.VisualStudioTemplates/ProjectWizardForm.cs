@@ -52,11 +52,12 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 		{
 			get
 			{
-				return this.txtModelName.Enabled;
+				return this.txtModelName.Visible;
 			}
 			set 
 			{
-				this.txtModelName.Enabled = value;
+				this.txtModelName.Visible = value;
+        this.lblModelName.Visible = value;
 			}
 		}
 

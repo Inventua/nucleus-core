@@ -1,0 +1,17 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Item">
+  <TemplateData>
+    <Name>Nucleus Controller</Name>
+    <Description>Visual Studio item template for a Nucleus controller.</Description>
+    <ProjectType>CSharp</ProjectType>
+    <ProjectSubType>CSharp</ProjectSubType>
+    <SortOrder>1000</SortOrder>   
+    <DefaultName>Controller</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+		<LanguageTag>csharp</LanguageTag>
+  </TemplateData>
+  <TemplateContent>
+		<Folder Name="Controllers" TargetFolderName="\Controllers">
+      <ProjectItem ReplaceParameters="true" TargetFileName="$fileinputname$.cs">controller.cs</ProjectItem>
+    </Folder>
+  </TemplateContent>
+</VSTemplate>

@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="label5.Text" xml:space="preserve">
-    <value>The extension name is used to set the sub-folder that your extension will be installed to, and the name of the deployment zip file that will be created when you compile in release configuration, and is used as the default name for controllers, data providers and other classes.  The friendly name and description are displayed in the extension installer.
+    <value>The extension name is used to set the sub-folder that your extension will be installed to, and the name of the deployment zip file that will be created when you compile in release configuration, and is used as the default name for controllers, data providers and other classes.  The friendly name and description are displayed in the extension installer.  For complex extensions, the Model Class Name is the name of the automatically-generated data model class.
 </value>
   </data>
 </root>

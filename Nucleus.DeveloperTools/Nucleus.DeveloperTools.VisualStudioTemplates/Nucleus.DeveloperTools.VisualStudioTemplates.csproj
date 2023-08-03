@@ -63,11 +63,20 @@
     <CopyVsixExtensionFiles>False</CopyVsixExtensionFiles>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="ItemTemplates\Controller.zip" />
+    <None Include="Template Source Code\Controller Item Template\Controllers\controller.cs" />
+    <Content Include="ItemTemplates\View.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <None Include="Template Source Code\Controller Item Template\Item.vstemplate" />
+    <None Include="Template Source Code\View Item Template\Item.vstemplate" />
+    <None Include="Template Source Code\View Item Template\ViewModels\View.cs" />
     <None Include="Template Source Code\Complex Extension Project Template\Properties\launchSettings.json" />
     <None Include="Template Source Code\Empty Extension Project Template\Properties\launchSettings.json" />
     <None Include="Template Source Code\Simple Extension Project Template\Models\Settings.cs" />
     <None Include="Template Source Code\Complex Extension Project Template\Models\Settings.cs" />
-    <None Include="Template Source Code\Simple Extension Project Template\Controllers\Admin.cs" />
+    <None Include="Template Source Code\Simple Extension Project Template\Controllers\SettingsController.cs" />
     <Content Include="module.build.targets">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -99,17 +108,13 @@
     <None Include="Template Source Code\Simple Extension Project Template\readme.txt" />
     <None Include="Template Source Code\Simple Extension Project Template\settings.css" />
     <None Include="Template Source Code\Simple Extension Project Template\viewer.css" />
-    <Content Include="ItemTemplates\Module Template.zip">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <None Include="Template Source Code\Simple Extension Project Template\Nucleus.Modules.Project.csproj" />
     <None Include="Template Source Code\Simple Extension Project Template\Views\Settings.cshtml" />
     <None Include="Template Source Code\Simple Extension Project Template\Views\Viewer.cshtml" />
     <None Include="Template Source Code\Simple Extension Project Template\Views\_ViewImports.cshtml" />
     <None Include="Nucleus.DeveloperTools.VisualStudioTemplates.pfx" />
     <None Include="Template Source Code\Complex Extension Project Template\CacheExtensions.cs" />
-    <None Include="Template Source Code\Complex Extension Project Template\Controllers\Controller.cs" />
+    <None Include="Template Source Code\Complex Extension Project Template\Controllers\ViewerController.cs" />
     <None Include="Template Source Code\Complex Extension Project Template\DataProviders\IDataProvider.cs" />
     <None Include="Template Source Code\Complex Extension Project Template\DataProviders\DataProvider.cs" />
     <None Include="Template Source Code\Complex Extension Project Template\Manager.cs" />
@@ -117,8 +122,8 @@
     <None Include="Template Source Code\Complex Extension Project Template\Startup.cs" />
     <None Include="Template Source Code\Complex Extension Project Template\ViewModels\Settings.cs" />
     <None Include="Template Source Code\Complex Extension Project Template\ViewModels\Viewer.cs" />
-    <None Include="Template Source Code\Complex Extension Project Template\Controllers\Admin.cs" />
-    <None Include="Template Source Code\Simple Extension Project Template\Controllers\Controller.cs" />
+    <None Include="Template Source Code\Complex Extension Project Template\Controllers\SettingsController.cs" />
+    <None Include="Template Source Code\Simple Extension Project Template\Controllers\ViewerController.cs" />
     <None Include="Template Source Code\Simple Extension Project Template\Startup.cs" />
     <None Include="Template Source Code\Simple Extension Project Template\ViewModels\Settings.cs" />
     <None Include="Template Source Code\Simple Extension Project Template\ViewModels\Viewer.cs" />
@@ -130,6 +135,7 @@
       <DependentUpon>ProjectWizardForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Template Source Code\View Item Template\Views\View.cshtml" />
     <None Include="templates.build.targets" />
   </ItemGroup>
   <ItemGroup>

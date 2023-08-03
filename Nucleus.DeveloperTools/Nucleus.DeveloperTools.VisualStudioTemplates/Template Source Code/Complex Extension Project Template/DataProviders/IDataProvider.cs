@@ -12,8 +12,8 @@ namespace $nucleus_extension_namespace$.DataProviders
 	{
 		public Task<$nucleus_extension_modelname$> Get(Guid Id);
 		public Task<IList<$nucleus_extension_modelname$>> List(PageModule pageModule);
-		public Task Save(PageModule pageModule, $nucleus_extension_modelname$ $nucleus_extension_modelname_lcase$);
-		public Task Delete($nucleus_extension_modelname$ $nucleus_extension_modelname_lcase$);
+		public Task Save(PageModule pageModule, $nucleus_extension_modelname$ $nucleus_extension_modelname_camelcase$);
+		public Task Delete($nucleus_extension_modelname$ $nucleus_extension_modelname_camelcase$);
 
 	}
 }

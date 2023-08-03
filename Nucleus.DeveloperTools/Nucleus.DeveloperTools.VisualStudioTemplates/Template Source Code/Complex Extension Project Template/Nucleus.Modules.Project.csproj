@@ -20,6 +20,12 @@
 	</ItemGroup>
 
   <ItemGroup>
+    <Content Include="**\*.css" />
+    <Content Include="**\*.js" />
+    <Content Include="**\*.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="viewer.css" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
@@ -28,7 +34,7 @@
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <Content Include="viewer.css" />
     <Content Include="package.xml" />

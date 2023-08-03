@@ -18,7 +18,13 @@
 		<None Remove="**\*.scc" />
 		<None Remove="*.zip" />
 	</ItemGroup>
-
+  
+  <ItemGroup>
+    <Content Include="**\*.css" />
+    <Content Include="**\*.js" />
+    <Content Include="**\*.cshtml" />
+  </ItemGroup>
+  
   <ItemGroup>
     <None Remove="viewer.css" />
     <None Remove="package.xml" />

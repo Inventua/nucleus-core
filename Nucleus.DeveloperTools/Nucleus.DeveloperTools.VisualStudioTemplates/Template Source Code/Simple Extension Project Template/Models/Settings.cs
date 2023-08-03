@@ -6,17 +6,25 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using Nucleus.Extensions;
 
-namespace $nucleus_extension_namespace$.Models
+namespace $nucleus_extension_namespace$.Models;
+
+public class Settings
 {
-	public class Settings
-	{
-		public const string MODULESETTING_TITLE = "$nucleus_extension_name$:title";
+  private class ModuleSettingsKeys
+  {
+    public const string MODULESETTING_TITLE = "$nucleus_extension_name_lowercase$:title";
+  }
 
-		public string Title { get; set; }
+  public string Title { get; set; }
 
-    public void ReadSettings(PageModule module)
-    {
-      this.Title = module.ModuleSettings.Get(MODULESETTING_TITLE, "");      
-    }
+  public void GetSettings(PageModule module)
+  {
+    this.Title = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_TITLE, "");
+  }
+
+  public void SetSettings(PageModule module)
+  {
+    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_TITLE, this.Title);
   }
 }
+

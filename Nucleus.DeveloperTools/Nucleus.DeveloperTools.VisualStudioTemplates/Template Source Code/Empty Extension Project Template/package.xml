@@ -14,8 +14,7 @@
 
 			<folder name="bin">
 				<file name="$nucleus_extension_namespace$.dll" />
-			</folder>
-			
+			</folder>			
 		</component>
 	</components>
 	

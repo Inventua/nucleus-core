@@ -79,28 +79,33 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 									
 					if (projectOptionsForm.ShowDialog() == DialogResult.OK)
 					{
-						// Add custom parameters.
-						replacementsDictionary.Add("$nucleus_extension_name$", projectOptionsForm.ExtensionName);
-						replacementsDictionary.Add("$nucleus_extension_namespace$", projectOptionsForm.ExtensionNamespace);
-						replacementsDictionary.Add("$nucleus_extension_name_lcase$", projectOptionsForm.ExtensionName.Substring(0, 1).ToLower() + projectOptionsForm.ExtensionName.Substring(1));
-						replacementsDictionary.Add("$nucleus_extension_description$", projectOptionsForm.ExtensionDescription);
+            // Add custom parameters.
+            replacementsDictionary.Add("$nucleus_extension_namespace$", projectOptionsForm.ExtensionNamespace);
+            
+            replacementsDictionary.Add("$nucleus_extension_name$", projectOptionsForm.ExtensionName);
+						replacementsDictionary.Add("$nucleus_extension_name_camelcase$", projectOptionsForm.ExtensionName.Substring(0, 1).ToLower() + projectOptionsForm.ExtensionName.Substring(1));
+            replacementsDictionary.Add("$nucleus_extension_name_lowercase$", projectOptionsForm.ExtensionName.ToLower());
+
+            replacementsDictionary.Add("$nucleus_extension_description$", projectOptionsForm.ExtensionDescription);
 						replacementsDictionary.Add("$nucleus_extension_friendlyname$", projectOptionsForm.FriendlyName);
+
 						replacementsDictionary.Add("$nucleus_extension_modelname$", projectOptionsForm.ModelClassName);
+						replacementsDictionary.Add("$nucleus_extension_modelname_camelcase$", projectOptionsForm.ModelClassName.Substring(0, 1).ToLower() + projectOptionsForm.ModelClassName.Substring(1));
+            replacementsDictionary.Add("$nucleus_extension_modelname_lowercase$", projectOptionsForm.ModelClassName.ToLower());
 
-						replacementsDictionary.Add("$nucleus_extension_modelname_lcase$", projectOptionsForm.ModelClassName.Substring(0, 1).ToLower() + projectOptionsForm.ModelClassName.Substring(1));
-
-						string extensionNameSingular = projectOptionsForm.ExtensionName;
+            string extensionNameSingular = projectOptionsForm.ExtensionName;
 						if (extensionNameSingular.EndsWith("s"))
 						{
 							extensionNameSingular = extensionNameSingular.Substring(0, extensionNameSingular.Length - 1);
 						}
 
 						replacementsDictionary.Add("$nucleus_extension_name_singular$", extensionNameSingular);
-						replacementsDictionary.Add("$nucleus_extension_name_singular_lcase$", extensionNameSingular.Substring(0, 1).ToLower() + extensionNameSingular.Substring(1));
+						replacementsDictionary.Add("$nucleus_extension_name_singular_camelcase$", extensionNameSingular.Substring(0, 1).ToLower() + extensionNameSingular.Substring(1));
+            replacementsDictionary.Add("$nucleus_extension_name_singular_lowercase$", extensionNameSingular.ToLower());
 
 
 
-						replacementsDictionary.Add("$publisher_name$", projectOptionsForm.PublisherName);
+            replacementsDictionary.Add("$publisher_name$", projectOptionsForm.PublisherName);
 						replacementsDictionary.Add("$publisher_url$", projectOptionsForm.PublisherUrl);
 						replacementsDictionary.Add("$publisher_email$", projectOptionsForm.PublisherEmail);
 					}

@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models.FileSystem;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using $nucleus_extension_namespace$.Models;
+using $nucleus.extension.namespace$.Models;
 
-namespace $nucleus_extension_namespace$.ViewModels
+namespace $nucleus.extension.namespace$.ViewModels
 {
 	public class Viewer : Models.Settings
 	{

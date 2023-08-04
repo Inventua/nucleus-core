@@ -1,11 +1,11 @@
-﻿@model $nucleus_extension_namespace$.ViewModels.Settings
+﻿@model $nucleus.extension.namespace$.ViewModels.Settings
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 @Html.AddStyle("~!/../settings.css")
 <div class="nucleus-editor-panel">
-	@using (Html.BeginNucleusForm("Settings", "$nucleus_extension_name$", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+	@using (Html.BeginNucleusForm("Settings", "$nucleus.extension.name$", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 	{
 		<fieldset role="group" aria-labelledby="heading">
 			<h2 class="nucleus-control-panel-heading">Settings</h2>
@@ -20,7 +20,7 @@
 		</fieldset>
 
 		<div class="nucleus-form-buttonrow">
-			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "$nucleus_extension_name$", "$nucleus_extension_name$"), new { })
+			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "$nucleus.extension.name$", "$nucleus.extension.name$"), new { })
 		</div>
 	}
 </div>

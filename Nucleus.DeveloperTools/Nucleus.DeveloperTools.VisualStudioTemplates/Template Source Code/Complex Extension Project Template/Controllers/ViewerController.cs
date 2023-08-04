@@ -9,22 +9,22 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions;
-using $nucleus_extension_namespace$.Models;
+using $nucleus.extension.namespace$.Models;
 
-namespace $nucleus_extension_namespace$.Controllers
+namespace $nucleus.extension.namespace$.Controllers
 {
-	[Extension("$nucleus_extension_name$")]
-	public class $nucleus_extension_name$ViewerController : Controller
+	[Extension("$nucleus.extension.name$")]
+	public class $nucleus.extension.name$ViewerController : Controller
 	{
 		private Context Context { get; }
 		private IPageModuleManager PageModuleManager { get; }
-		private $nucleus_extension_name$Manager $nucleus_extension_name$Manager { get; }
+		private $nucleus.extension.name$Manager $nucleus.extension.name$Manager { get; }
 		
-		public $nucleus_extension_name$ViewerController(Context Context, IPageModuleManager pageModuleManager, $nucleus_extension_name$Manager $nucleus_extension_name_camelcase$Manager)
+		public $nucleus.extension.name$ViewerController(Context Context, IPageModuleManager pageModuleManager, $nucleus.extension.name$Manager $nucleus.extension.name.camelcase$Manager)
 		{
 			this.Context = Context;
 			this.PageModuleManager = pageModuleManager;
-			this.$nucleus_extension_name$Manager = $nucleus_extension_name_camelcase$Manager;			
+			this.$nucleus.extension.name$Manager = $nucleus.extension.name.camelcase$Manager;			
 		}
 
 		[HttpGet]

@@ -13,18 +13,18 @@ using $defaultnamespace$.Models;
 
 namespace $defaultnamespace$.Controllers
 {
-	[Extension("$defaultnamespace$")]
+	[Extension("$nucleus.extension.name$")]
 	public class $fileinputname$ViewerController : Controller
 	{
 		private Context Context { get; }
 		private IPageModuleManager PageModuleManager { get; }
-		private $nucleus_extension_name$Manager $nucleus_extension_name$Manager { get; }
+		private $nucleus.extension.name$Manager $nucleus.extension.name$Manager { get; }
 
-    public $fileinputname$ViewerController(Context Context, IPageModuleManager pageModuleManager, $nucleus_extension_name$Manager $nucleus_extension_name_camelcase$Manager)
+    public $fileinputname$ViewerController(Context Context, IPageModuleManager pageModuleManager, $nucleus.extension.name$Manager $nucleus.extension.name.camelcase$Manager)
 		{
 			this.Context = Context;
 			this.PageModuleManager = pageModuleManager;
-			this.$nucleus_extension_name$Manager = $nucleus_extension_name_camelcase$Manager;			
+			this.$nucleus.extension.name$Manager = $nucleus.extension.name.camelcase$Manager;			
 		}
 
 		[HttpGet]

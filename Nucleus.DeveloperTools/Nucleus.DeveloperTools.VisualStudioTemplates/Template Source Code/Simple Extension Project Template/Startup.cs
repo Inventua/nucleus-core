@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-[assembly:HostingStartup(typeof($nucleus_extension_namespace$.Startup))]
+[assembly:HostingStartup(typeof($nucleus.extension.namespace$.Startup))]
 
-namespace $nucleus_extension_namespace$
+namespace $nucleus.extension.namespace$
 {
 
 	public class Startup : IHostingStartup

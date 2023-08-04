@@ -3,7 +3,7 @@
     <TargetFramework>net6.0</TargetFramework>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
-		<RootNamespace>$nucleus_extension_namespace$</RootNamespace>
+		<RootNamespace>$nucleus.extension.namespace$</RootNamespace>
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<RazorCompileOnBuild>false</RazorCompileOnBuild>
@@ -18,7 +18,7 @@
 		<None Remove="**\*.scc" />
 		<None Remove="*.zip" />
 	</ItemGroup>
-
+  
   <ItemGroup>
     <Content Include="**\*.css" />
     <Content Include="**\*.js" />
@@ -26,13 +26,23 @@
   </ItemGroup>
   
   <ItemGroup>
+    <None Remove="viewer.css" />
     <None Remove="package.xml" />
-    <None Remove="readme.txt" />    
+    <None Remove="readme.txt" />
+    <None Remove="settings.css" />
+		<None Remove="Views\_ViewImports.cshtml" />
+    <None Remove="Views\Settings.cshtml" />
+    <None Remove="Views\Viewer.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="viewer.css" />
     <Content Include="package.xml" />
-    <Content Include="readme.txt" />    
+    <Content Include="readme.txt" />
+    <Content Include="settings.css" />
+		<Content Include="Views\_ViewImports.cshtml" />
+    <Content Include="Views\Viewer.cshtml" />
+    <Content Include="Views\Settings.cshtml" />
   </ItemGroup>
 
 	<ItemGroup>
@@ -41,8 +51,8 @@
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">
-		<ExtensionFolder>$nucleus_extension_name$</ExtensionFolder>
-		<Version>1.0.0</Version>
+		<ExtensionFolder>$nucleus.extension.name$</ExtensionFolder>
+		<Version>1.0.0.0</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
     <CopyToDefaultSetup>false</CopyToDefaultSetup>
 	</PropertyGroup>

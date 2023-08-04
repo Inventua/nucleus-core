@@ -38,7 +38,7 @@
       this.label4 = new System.Windows.Forms.Label();
       this.lblHeading = new System.Windows.Forms.Label();
       this.txtExtensionNamespace = new System.Windows.Forms.TextBox();
-      this.label1 = new System.Windows.Forms.Label();
+      this.lblExtensionNamespace = new System.Windows.Forms.Label();
       this.txtPublisherUrl = new System.Windows.Forms.TextBox();
       this.label3 = new System.Windows.Forms.Label();
       this.panel2 = new System.Windows.Forms.Panel();
@@ -55,14 +55,16 @@
       this.label12 = new System.Windows.Forms.Label();
       this.txtModelName = new System.Windows.Forms.TextBox();
       this.lblModelName = new System.Windows.Forms.Label();
+      this.pictureBox1 = new System.Windows.Forms.PictureBox();
       this.panel1.SuspendLayout();
       this.panel2.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
       this.SuspendLayout();
       // 
       // label2
       // 
       this.label2.AutoSize = true;
-      this.label2.Location = new System.Drawing.Point(79, 357);
+      this.label2.Location = new System.Drawing.Point(79, 308);
       this.label2.Name = "label2";
       this.label2.Size = new System.Drawing.Size(93, 15);
       this.label2.TabIndex = 1;
@@ -72,11 +74,12 @@
       // 
       this.txtExtensionName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.txtExtensionName.Location = new System.Drawing.Point(224, 354);
+      this.txtExtensionName.Location = new System.Drawing.Point(224, 305);
       this.txtExtensionName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.txtExtensionName.Name = "txtExtensionName";
       this.txtExtensionName.Size = new System.Drawing.Size(448, 23);
       this.txtExtensionName.TabIndex = 3;
+      this.txtExtensionName.Validating += new System.ComponentModel.CancelEventHandler(this.txtExtensionName_Validating);
       // 
       // cmdNext
       // 
@@ -87,7 +90,7 @@
       this.cmdNext.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.cmdNext.Name = "cmdNext";
       this.cmdNext.Size = new System.Drawing.Size(87, 26);
-      this.cmdNext.TabIndex = 7;
+      this.cmdNext.TabIndex = 8;
       this.cmdNext.Text = "Next";
       this.cmdNext.UseVisualStyleBackColor = true;
       this.cmdNext.Click += new System.EventHandler(this.cmdNext_Click);
@@ -100,7 +103,7 @@
       this.cmdBack.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.cmdBack.Name = "cmdBack";
       this.cmdBack.Size = new System.Drawing.Size(87, 26);
-      this.cmdBack.TabIndex = 8;
+      this.cmdBack.TabIndex = 9;
       this.cmdBack.Text = "Back";
       this.cmdBack.UseVisualStyleBackColor = true;
       // 
@@ -114,7 +117,7 @@
       this.panel1.Location = new System.Drawing.Point(54, 219);
       this.panel1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.panel1.Name = "panel1";
-      this.panel1.Size = new System.Drawing.Size(661, 86);
+      this.panel1.Size = new System.Drawing.Size(687, 69);
       this.panel1.TabIndex = 10;
       // 
       // label5
@@ -124,7 +127,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
       this.label5.Location = new System.Drawing.Point(25, 3);
       this.label5.Name = "label5";
-      this.label5.Size = new System.Drawing.Size(623, 81);
+      this.label5.Size = new System.Drawing.Size(649, 64);
       this.label5.TabIndex = 1;
       this.label5.Text = resources.GetString("label5.Text");
       // 
@@ -153,20 +156,21 @@
       // 
       this.txtExtensionNamespace.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.txtExtensionNamespace.Location = new System.Drawing.Point(224, 323);
+      this.txtExtensionNamespace.Location = new System.Drawing.Point(224, 434);
       this.txtExtensionNamespace.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.txtExtensionNamespace.Name = "txtExtensionNamespace";
       this.txtExtensionNamespace.Size = new System.Drawing.Size(448, 23);
-      this.txtExtensionNamespace.TabIndex = 4;
+      this.txtExtensionNamespace.TabIndex = 6;
+      this.txtExtensionNamespace.Validating += new System.ComponentModel.CancelEventHandler(this.txtExtensionNamespace_Validating);
       // 
-      // label1
+      // lblExtensionNamespace
       // 
-      this.label1.AutoSize = true;
-      this.label1.Location = new System.Drawing.Point(79, 326);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(123, 15);
-      this.label1.TabIndex = 15;
-      this.label1.Text = "Extension Namespace";
+      this.lblExtensionNamespace.AutoSize = true;
+      this.lblExtensionNamespace.Location = new System.Drawing.Point(79, 437);
+      this.lblExtensionNamespace.Name = "lblExtensionNamespace";
+      this.lblExtensionNamespace.Size = new System.Drawing.Size(123, 15);
+      this.lblExtensionNamespace.TabIndex = 15;
+      this.lblExtensionNamespace.Text = "Extension Namespace";
       // 
       // txtPublisherUrl
       // 
@@ -275,7 +279,7 @@
       // 
       this.txtFriendlyName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.txtFriendlyName.Location = new System.Drawing.Point(224, 386);
+      this.txtFriendlyName.Location = new System.Drawing.Point(224, 336);
       this.txtFriendlyName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.txtFriendlyName.Name = "txtFriendlyName";
       this.txtFriendlyName.Size = new System.Drawing.Size(448, 23);
@@ -284,7 +288,7 @@
       // label11
       // 
       this.label11.AutoSize = true;
-      this.label11.Location = new System.Drawing.Point(79, 389);
+      this.label11.Location = new System.Drawing.Point(79, 339);
       this.label11.Name = "label11";
       this.label11.Size = new System.Drawing.Size(84, 15);
       this.label11.TabIndex = 25;
@@ -294,17 +298,17 @@
       // 
       this.txtExtensionDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.txtExtensionDescription.Location = new System.Drawing.Point(224, 448);
+      this.txtExtensionDescription.Location = new System.Drawing.Point(224, 367);
       this.txtExtensionDescription.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.txtExtensionDescription.Multiline = true;
       this.txtExtensionDescription.Name = "txtExtensionDescription";
       this.txtExtensionDescription.Size = new System.Drawing.Size(448, 52);
-      this.txtExtensionDescription.TabIndex = 6;
+      this.txtExtensionDescription.TabIndex = 5;
       // 
       // label12
       // 
       this.label12.AutoSize = true;
-      this.label12.Location = new System.Drawing.Point(79, 451);
+      this.label12.Location = new System.Drawing.Point(79, 370);
       this.label12.Name = "label12";
       this.label12.Size = new System.Drawing.Size(67, 15);
       this.label12.TabIndex = 27;
@@ -314,20 +318,31 @@
       // 
       this.txtModelName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.txtModelName.Location = new System.Drawing.Point(224, 417);
+      this.txtModelName.Location = new System.Drawing.Point(224, 465);
       this.txtModelName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.txtModelName.Name = "txtModelName";
       this.txtModelName.Size = new System.Drawing.Size(448, 23);
-      this.txtModelName.TabIndex = 5;
+      this.txtModelName.TabIndex = 7;
+      this.txtModelName.Validating += new System.ComponentModel.CancelEventHandler(this.txtModelName_Validating);
       // 
       // lblModelName
       // 
       this.lblModelName.AutoSize = true;
-      this.lblModelName.Location = new System.Drawing.Point(79, 420);
+      this.lblModelName.Location = new System.Drawing.Point(79, 468);
       this.lblModelName.Name = "lblModelName";
       this.lblModelName.Size = new System.Drawing.Size(106, 15);
       this.lblModelName.TabIndex = 29;
       this.lblModelName.Text = "Model Class Name";
+      // 
+      // pictureBox1
+      // 
+      this.pictureBox1.Image = global::Nucleus.DeveloperTools.VisualStudioTemplates.Properties.Resources.atom_90;
+      this.pictureBox1.Location = new System.Drawing.Point(681, 11);
+      this.pictureBox1.Name = "pictureBox1";
+      this.pictureBox1.Size = new System.Drawing.Size(60, 60);
+      this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+      this.pictureBox1.TabIndex = 30;
+      this.pictureBox1.TabStop = false;
       // 
       // ProjectWizardForm
       // 
@@ -338,6 +353,7 @@
       this.CancelButton = this.cmdBack;
       this.ClientSize = new System.Drawing.Size(763, 575);
       this.ControlBox = false;
+      this.Controls.Add(this.pictureBox1);
       this.Controls.Add(this.txtModelName);
       this.Controls.Add(this.lblModelName);
       this.Controls.Add(this.txtExtensionDescription);
@@ -353,7 +369,7 @@
       this.Controls.Add(this.txtPublisherName);
       this.Controls.Add(this.label8);
       this.Controls.Add(this.txtExtensionNamespace);
-      this.Controls.Add(this.label1);
+      this.Controls.Add(this.lblExtensionNamespace);
       this.Controls.Add(this.lblHeading);
       this.Controls.Add(this.panel1);
       this.Controls.Add(this.cmdBack);
@@ -371,6 +387,7 @@
       this.panel1.PerformLayout();
       this.panel2.ResumeLayout(false);
       this.panel2.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
       this.ResumeLayout(false);
       this.PerformLayout();
 
@@ -386,7 +403,7 @@
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.Label lblHeading;
 		private System.Windows.Forms.TextBox txtExtensionNamespace;
-		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label lblExtensionNamespace;
 		private System.Windows.Forms.TextBox txtPublisherUrl;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Panel panel2;
@@ -403,5 +420,6 @@
 		private System.Windows.Forms.Label label12;
 		private System.Windows.Forms.TextBox txtModelName;
 		private System.Windows.Forms.Label lblModelName;
-	}
+    private System.Windows.Forms.PictureBox pictureBox1;
+  }
 }

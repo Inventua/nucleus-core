@@ -3,8 +3,7 @@
     <Name>Nucleus Simple Extension Project</Name>
     <Description>Visual Studio project template for a simple Nucleus Extension, including view models and views, but with no data provider or manager class.  Use this template to create a simple extension which does not have its own database objects.  Complex extensions should use the complex Nucleus extension template.</Description>
     <ProjectType>CSharp</ProjectType>
-    <ProjectSubType>
-    </ProjectSubType>
+    <ProjectSubType>Nucleus</ProjectSubType>
     <SortOrder>1001</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>My Extension</DefaultName>
@@ -14,20 +13,19 @@
     <CreateInPlace>true</CreateInPlace>
     <Icon>__TemplateIcon.ico</Icon>
 		<LanguageTag>csharp</LanguageTag>
-    <PlatformTag>windows</PlatformTag>
-    <PlatformTag>linux</PlatformTag>
-    <PlatformTag>nucleus</PlatformTag>
+    <PlatformTag>Windows</PlatformTag>
+    <PlatformTag>Linux</PlatformTag>
+    <PlatformTag>Nucleus</PlatformTag>
     <ProjectTypeTag>AspNetCore</ProjectTypeTag>
-    <ProjectTypeTag>Nucleus</ProjectTypeTag>
   </TemplateData>
   <TemplateContent>
-		<Project TargetFileName="Nucleus.Modules.Project.csproj" File="Nucleus.Modules.Project.csproj" ReplaceParameters="true">
+		<Project TargetFileName="Project.csproj" File="Project.csproj" ReplaceParameters="true">
       <Folder Name="Properties" TargetFolderName="Properties">
         <ProjectItem TargetFileName="launchSettings.json">launchSettings.json</ProjectItem>
       </Folder>
       <Folder Name="Controllers" TargetFolderName="Controllers">
-        <ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$ViewerController.cs">ViewerController.cs</ProjectItem>
-				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$SettingsController.cs">SettingsController.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="$nucleus.extension.name$ViewerController.cs">ViewerController.cs</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus.extension.name$SettingsController.cs">SettingsController.cs</ProjectItem>
       </Folder>
 			<Folder Name="Models" TargetFolderName="Models">
 				<ProjectItem ReplaceParameters="true" TargetFileName="Settings.cs">Settings.cs</ProjectItem>
@@ -50,7 +48,7 @@
   </TemplateContent>
 	
 	<WizardExtension>
-		<Assembly>Nucleus.DeveloperTools.VisualStudioTemplates, Version=1.2.1.0, Culture=Neutral, PublicKeyToken=2cc815f0f52d0477</Assembly>
+		<Assembly>Nucleus.DeveloperTools.VisualStudioTemplates, Version=1.2.2.0, Culture=Neutral, PublicKeyToken=2cc815f0f52d0477</Assembly>
 		<FullClassName>Nucleus.DeveloperTools.VisualStudioTemplates.ProjectWizard</FullClassName>
 	</WizardExtension>
 

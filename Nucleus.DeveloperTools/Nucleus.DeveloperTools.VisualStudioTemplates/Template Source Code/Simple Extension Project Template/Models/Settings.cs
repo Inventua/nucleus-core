@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using Nucleus.Extensions;
 
-namespace $nucleus_extension_namespace$.Models;
+namespace $nucleus.extension.namespace$.Models;
 
 public class Settings
 {
   private class ModuleSettingsKeys
   {
-    public const string MODULESETTING_TITLE = "$nucleus_extension_name_lowercase$:title";
+    public const string MODULESETTING_TITLE = "$nucleus.extension.name.lowercase$:title";
   }
 
   public string Title { get; set; }

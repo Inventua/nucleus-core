@@ -20,11 +20,20 @@
     <ZipDirectory SourceDirectory="Template Source Code\Empty Extension Project Template" DestinationFile="Empty Extension.zip" Overwrite="true" />
     <Move SourceFiles="Empty Extension.zip" DestinationFiles="ProjectTemplates\Empty Extension.zip" OverwriteReadOnlyFiles="true" />
 
+    <ZipDirectory SourceDirectory="Template Source Code\Layout Extension Project Template" DestinationFile="Layout Extension.zip" Overwrite="true" />
+    <Move SourceFiles="Layout Extension.zip" DestinationFiles="ProjectTemplates\Layout Extension.zip" OverwriteReadOnlyFiles="true" />
+
     <ZipDirectory SourceDirectory="Template Source Code\View Item Template" DestinationFile="View.zip" Overwrite="true" />
     <Move SourceFiles="View.zip" DestinationFiles="ItemTemplates\View.zip" OverwriteReadOnlyFiles="true" />
 
     <ZipDirectory SourceDirectory="Template Source Code\Controller Item Template" DestinationFile="Controller.zip" Overwrite="true" />
     <Move SourceFiles="Controller.zip" DestinationFiles="ItemTemplates\Controller.zip" OverwriteReadOnlyFiles="true" />
+
+    <ZipDirectory SourceDirectory="Template Source Code\Layout Item Template" DestinationFile="Layout.zip" Overwrite="true" />
+    <Move SourceFiles="Layout.zip" DestinationFiles="ItemTemplates\Layout.zip" OverwriteReadOnlyFiles="true" />
+
+    <ZipDirectory SourceDirectory="Template Source Code\Container Item Template" DestinationFile="Container.zip" Overwrite="true" />
+    <Move SourceFiles="Container.zip" DestinationFiles="ItemTemplates\Container.zip" OverwriteReadOnlyFiles="true" />
 
   </Target>
 

@@ -8,7 +8,7 @@ using Nucleus.Abstractions.Models.FileSystem;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Nucleus.Abstractions.Models;
 
-namespace $nucleus_extension_namespace$.ViewModels
+namespace $nucleus.extension.namespace$.ViewModels
 {
 	public class Settings : Models.Settings
 	{		

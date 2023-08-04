@@ -3,8 +3,7 @@
     <Name>Nucleus Complex Extension Project</Name>
     <Description>Visual Studio project template for a Nucleus Extension, including default controllers, a data provider, view models and views, cache extension and manager class.</Description>
     <ProjectType>CSharp</ProjectType>
-    <ProjectSubType>
-    </ProjectSubType>
+    <ProjectSubType>Nucleus</ProjectSubType>
     <SortOrder>1000</SortOrder>
     <CreateNewFolder>true</CreateNewFolder>
     <DefaultName>My Extension</DefaultName>
@@ -14,20 +13,19 @@
     <CreateInPlace>true</CreateInPlace>
     <Icon>__TemplateIcon.ico</Icon>
 		<LanguageTag>csharp</LanguageTag>
-    <PlatformTag>windows</PlatformTag>
-    <PlatformTag>linux</PlatformTag>
-    <PlatformTag>nucleus</PlatformTag>
+    <PlatformTag>Windows</PlatformTag>
+    <PlatformTag>Linux</PlatformTag>
+    <PlatformTag>Nucleus</PlatformTag>
 		<ProjectTypeTag>AspNetCore</ProjectTypeTag>
-    <ProjectTypeTag>Nucleus</ProjectTypeTag>
   </TemplateData>
   <TemplateContent>
-		<Project TargetFileName="Nucleus.Modules.Project.csproj" File="Nucleus.Modules.Project.csproj" ReplaceParameters="true">
+		<Project TargetFileName="Project.csproj" File="Project.csproj" ReplaceParameters="true">
       <Folder Name="Properties" TargetFolderName="Properties">
         <ProjectItem TargetFileName="launchSettings.json">launchSettings.json</ProjectItem>
       </Folder>
       <Folder Name="Controllers" TargetFolderName="Controllers">
-        <ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$ViewerController.cs">ViewerController.cs</ProjectItem>
-				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$SettingsController.cs">SettingsController.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="$nucleus.extension.name$ViewerController.cs">ViewerController.cs</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus.extension.name$SettingsController.cs">SettingsController.cs</ProjectItem>
       </Folder>
 			<Folder Name="DataProviders" TargetFolderName="DataProviders">
 				<Folder Name="Migrations" TargetFolderName="Migrations">
@@ -35,12 +33,12 @@
 						<ProjectItem ReplaceParameters="true" TargetFileName="01.00.00.json">01.00.00.json</ProjectItem>
 					</Folder>
 				</Folder>				
-				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$DataProvider.cs">DataProvider.cs</ProjectItem>
-				<ProjectItem ReplaceParameters="true" TargetFileName="I$nucleus_extension_name$DataProvider.cs">IDataProvider.cs</ProjectItem>
-				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$DbContext.cs">DbContext.cs</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus.extension.name$DataProvider.cs">DataProvider.cs</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="I$nucleus.extension.name$DataProvider.cs">IDataProvider.cs</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus.extension.name$DbContext.cs">DbContext.cs</ProjectItem>
 			</Folder>
 			<Folder Name="Models" TargetFolderName="Models">
-				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_modelname$.cs">Model.cs</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus.extension.model_class_name$.cs">Model.cs</ProjectItem>
 				<ProjectItem ReplaceParameters="true" TargetFileName="Settings.cs">Settings.cs</ProjectItem>
 			</Folder>
 			<Folder Name="ViewModels" TargetFolderName="ViewModels">
@@ -53,7 +51,7 @@
 				<ProjectItem ReplaceParameters="true" TargetFileName="_ViewImports.cshtml">_ViewImports.cshtml</ProjectItem>
 			</Folder>
 			<ProjectItem ReplaceParameters="true" TargetFileName="CacheExtensions.cs">CacheExtensions.cs</ProjectItem>
-      <ProjectItem ReplaceParameters="true" TargetFileName="$nucleus_extension_name$Manager.cs">Manager.cs</ProjectItem>																														
+      <ProjectItem ReplaceParameters="true" TargetFileName="$nucleus.extension.name$Manager.cs">Manager.cs</ProjectItem>																														
 			<ProjectItem ReplaceParameters="true" TargetFileName="Package.xml">Package.xml</ProjectItem>
 			<ProjectItem ReplaceParameters="true" TargetFileName="readme.txt">readme.txt</ProjectItem>
 			<ProjectItem ReplaceParameters="true" TargetFileName="settings.css">settings.css</ProjectItem>
@@ -63,7 +61,7 @@
   </TemplateContent>
 	
 	<WizardExtension>
-		<Assembly>Nucleus.DeveloperTools.VisualStudioTemplates, Version=1.2.1.0, Culture=Neutral, PublicKeyToken=2cc815f0f52d0477</Assembly>
+		<Assembly>Nucleus.DeveloperTools.VisualStudioTemplates, Version=1.2.2.0, Culture=Neutral, PublicKeyToken=2cc815f0f52d0477</Assembly>
 		<FullClassName>Nucleus.DeveloperTools.VisualStudioTemplates.ProjectWizard</FullClassName>
 	</WizardExtension>
 

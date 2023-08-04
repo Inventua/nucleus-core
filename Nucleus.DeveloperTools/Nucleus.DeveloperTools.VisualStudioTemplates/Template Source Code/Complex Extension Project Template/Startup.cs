@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Data.EntityFramework;
-using $nucleus_extension_namespace$.DataProviders;
+using $nucleus.extension.namespace$.DataProviders;
 
-[assembly:HostingStartup(typeof($nucleus_extension_namespace$.Startup))]
+[assembly:HostingStartup(typeof($nucleus.extension.namespace$.Startup))]
 
-namespace $nucleus_extension_namespace$
+namespace $nucleus.extension.namespace$
 {
 	public class Startup : IHostingStartup
 	{
@@ -18,8 +18,8 @@ namespace $nucleus_extension_namespace$
 		{
 			builder.ConfigureServices((context, services) => 
 			{
-				services.AddSingleton<$nucleus_extension_name$Manager>();
-				services.AddDataProvider<I$nucleus_extension_name$DataProvider, DataProviders.$nucleus_extension_name$DataProvider, DataProviders.$nucleus_extension_name$DbContext > (context.Configuration);
+				services.AddSingleton<$nucleus.extension.name$Manager>();
+				services.AddDataProvider<I$nucleus.extension.name$DataProvider, DataProviders.$nucleus.extension.name$DataProvider, DataProviders.$nucleus.extension.name$DbContext > (context.Configuration);
 			});
 		}
 	}

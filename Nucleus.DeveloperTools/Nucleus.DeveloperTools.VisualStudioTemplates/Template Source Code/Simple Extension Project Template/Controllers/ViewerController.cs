@@ -9,17 +9,17 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions;
-using $nucleus_extension_namespace$.Models;
+using $nucleus.extension.namespace$.Models;
 
-namespace $nucleus_extension_namespace$.Controllers
+namespace $nucleus.extension.namespace$.Controllers
 {
-	[Extension("$nucleus_extension_name$")]
-	public class $nucleus_extension_name$ViewerController : Controller
+	[Extension("$nucleus.extension.name$")]
+	public class $nucleus.extension.name$ViewerController : Controller
 	{
 		private Context Context { get; }
 		private IPageModuleManager PageModuleManager { get; }
 		
-		public $nucleus_extension_name$ViewerController(Context Context, IPageModuleManager pageModuleManager)
+		public $nucleus.extension.name$ViewerController(Context Context, IPageModuleManager pageModuleManager)
 		{
 			this.Context = Context;
 			this.PageModuleManager = pageModuleManager;		

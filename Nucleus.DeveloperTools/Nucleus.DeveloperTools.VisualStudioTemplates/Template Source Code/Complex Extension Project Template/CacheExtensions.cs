@@ -5,15 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models.Cache;
-using $nucleus_extension_namespace$.Models;
+using $nucleus.extension.namespace$.Models;
 
-namespace $nucleus_extension_namespace$
+namespace $nucleus.extension.namespace$
 {
 	public static	class CacheExtensions
 	{
-		public static CacheCollection<Guid, $nucleus_extension_modelname$> $nucleus_extension_modelname$sCache(this ICacheManager cacheManager)
+		public static CacheCollection<Guid, $nucleus.extension.model_class_name$> $nucleus.extension.model_class_name$sCache(this ICacheManager cacheManager)
 		{
-			return cacheManager.Get<Guid, $nucleus_extension_modelname$> ();
+			return cacheManager.Get<Guid, $nucleus.extension.model_class_name$> ();
 		}
 	}
 }

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TemplateWizard;
 using System.Windows.Forms;
 using EnvDTE;
+using System.Linq;
+using Microsoft.VisualStudio.Package;
+using System.IO;
 
 namespace Nucleus.DeveloperTools.VisualStudioTemplates
 {
@@ -52,11 +55,13 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 			{
 				if (runKind == WizardRunKind.AsNewProject)
 				{
-					Boolean isSimpleExtension = false;
+          //Boolean isSimpleExtension = false;
+          string projectType="";
 
 					if (customParams != null && customParams.Length > 0)
 					{
-						isSimpleExtension = !(customParams[0].ToString().Contains("Complex Extension"));
+            projectType = System.IO.Path.GetDirectoryName(customParams[0].ToString()).Split(new char[] { '/','\\' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
+            //isSimpleExtension = !(customParams[0].ToString().Contains("Complex Extension"));
 					}
 
 					string defaultExtensionName = Get(replacementsDictionary, "$safeprojectname$");
@@ -69,45 +74,34 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 
 					ProjectWizardForm projectOptionsForm = new ProjectWizardForm
 					{
-						ClassNameEnabled = !isSimpleExtension,
+						ClassNameEnabled = true, //!isSimpleExtension,
 						ExtensionNamespace = Get(replacementsDictionary, "$safeprojectname$"),
 						ExtensionName = defaultExtensionName,
 						FriendlyName = defaultExtensionName,
 						PublisherName = Get(replacementsDictionary, "$registeredorganization$"),
 						ModelClassName = defaultModelName,
 					};
-									
-					if (projectOptionsForm.ShowDialog() == DialogResult.OK)
+
+          projectOptionsForm.SetProjectType(projectType);
+
+
+          if (projectOptionsForm.ShowDialog() == DialogResult.OK)
 					{
             // Add custom parameters.
-            replacementsDictionary.Add("$nucleus_extension_namespace$", projectOptionsForm.ExtensionNamespace);
-            
-            replacementsDictionary.Add("$nucleus_extension_name$", projectOptionsForm.ExtensionName);
-						replacementsDictionary.Add("$nucleus_extension_name_camelcase$", projectOptionsForm.ExtensionName.Substring(0, 1).ToLower() + projectOptionsForm.ExtensionName.Substring(1));
-            replacementsDictionary.Add("$nucleus_extension_name_lowercase$", projectOptionsForm.ExtensionName.ToLower());
+            replacementsDictionary.Add("$nucleus.extension.namespace$", projectOptionsForm.ExtensionNamespace);
 
-            replacementsDictionary.Add("$nucleus_extension_description$", projectOptionsForm.ExtensionDescription);
-						replacementsDictionary.Add("$nucleus_extension_friendlyname$", projectOptionsForm.FriendlyName);
+            AddExtensionNameTokens(replacementsDictionary, projectOptionsForm.ExtensionName);
 
-						replacementsDictionary.Add("$nucleus_extension_modelname$", projectOptionsForm.ModelClassName);
-						replacementsDictionary.Add("$nucleus_extension_modelname_camelcase$", projectOptionsForm.ModelClassName.Substring(0, 1).ToLower() + projectOptionsForm.ModelClassName.Substring(1));
-            replacementsDictionary.Add("$nucleus_extension_modelname_lowercase$", projectOptionsForm.ModelClassName.ToLower());
+            replacementsDictionary.Add("$nucleus.extension.description$", projectOptionsForm.ExtensionDescription);
+						replacementsDictionary.Add("$nucleus.extension.friendlyname$", projectOptionsForm.FriendlyName);
 
-            string extensionNameSingular = projectOptionsForm.ExtensionName;
-						if (extensionNameSingular.EndsWith("s"))
-						{
-							extensionNameSingular = extensionNameSingular.Substring(0, extensionNameSingular.Length - 1);
-						}
+						replacementsDictionary.Add("$nucleus.extension.model_class_name$", projectOptionsForm.ModelClassName);
+						replacementsDictionary.Add("$nucleus.extension.model_class_name.camelcase$", projectOptionsForm.ModelClassName.Substring(0, 1).ToLower() + projectOptionsForm.ModelClassName.Substring(1));
+            replacementsDictionary.Add("$nucleus.extension.model_class_name.lowercase$", projectOptionsForm.ModelClassName.ToLower());
 
-						replacementsDictionary.Add("$nucleus_extension_name_singular$", extensionNameSingular);
-						replacementsDictionary.Add("$nucleus_extension_name_singular_camelcase$", extensionNameSingular.Substring(0, 1).ToLower() + extensionNameSingular.Substring(1));
-            replacementsDictionary.Add("$nucleus_extension_name_singular_lowercase$", extensionNameSingular.ToLower());
-
-
-
-            replacementsDictionary.Add("$publisher_name$", projectOptionsForm.PublisherName);
-						replacementsDictionary.Add("$publisher_url$", projectOptionsForm.PublisherUrl);
-						replacementsDictionary.Add("$publisher_email$", projectOptionsForm.PublisherEmail);
+            replacementsDictionary.Add("$publisher.name$", projectOptionsForm.PublisherName);
+						replacementsDictionary.Add("$publisher.url$", projectOptionsForm.PublisherUrl);
+						replacementsDictionary.Add("$publisher.email$", projectOptionsForm.PublisherEmail);
 					}
 					else
 					{
@@ -119,14 +113,20 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 					string defaultArea = "";
 					string areasFolder = "";
 					string projectFile = "";
+          string itemType = "";
 
-					Array activeProjects = (Array)projectProperties.ActiveSolutionProjects;
+          Array activeProjects = (Array)projectProperties.ActiveSolutionProjects;
 
-					if (activeProjects.Length > 0)
+          if (customParams != null && customParams.Length > 0)
+          {
+            itemType = System.IO.Path.GetDirectoryName(customParams[0].ToString()).Split(new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
+          }
+
+          if (activeProjects.Length > 0)
 					{
 						Project activeProj = (Project)activeProjects.GetValue(0);
 						projectFile = activeProj.FileName;
-
+            
 						foreach (ProjectItem pi in activeProj.ProjectItems)
 						{
 							// Get the default area
@@ -140,7 +140,23 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 								}
 							}
 						}
-					}
+
+            switch (itemType)
+            {
+              case "Controller":
+                CheckAndCreateFolder(activeProj, "Controllers");
+                break;
+              case "Layout":
+                CheckAndCreateFolder(activeProj, "Layouts");
+                break;
+              case "Container":
+                CheckAndCreateFolder(activeProj, "Containers");
+                break;
+              case "View":
+                CheckAndCreateFolder(activeProj, "Views");
+                break;
+            }
+          }
 
 					if (!String.IsNullOrEmpty(projectFile))
 					{
@@ -151,9 +167,11 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 						System.Xml.XmlNode pluginFolderXml = projectFileXml.SelectSingleNode("//ExtensionFolder");
 						if (pluginFolderXml != null)
 						{
-							replacementsDictionary.Add("$nucleus_extension_name$", pluginFolderXml.InnerText);
-						}
-					}
+              string extensionName = pluginFolderXml.InnerText;
+
+              AddExtensionNameTokens(replacementsDictionary, extensionName);
+            }
+          }
 				}
 			}
 			catch (WizardBackoutException ex)
@@ -171,5 +189,35 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 			return true;
 		}
 
-	}
+    private void CheckAndCreateFolder(Project activeProj, string folder)
+    {
+      Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+      string projectPath = System.IO.Path.GetDirectoryName(activeProj.FullName);
+
+      string fullPath = System.IO.Path.Combine(projectPath, folder);
+
+      if (!System.IO.Directory.Exists(fullPath))
+      {
+        activeProj.ProjectItems.AddFolder(folder);
+      }
+    }
+
+    private void AddExtensionNameTokens(Dictionary<string, string> replacementsDictionary, string extensionName)
+    {
+      replacementsDictionary.Add("$nucleus.extension.name$", extensionName);
+      replacementsDictionary.Add("$nucleus.extension.name.camelcase$", extensionName.Substring(0, 1).ToLower() + extensionName.Substring(1));
+      replacementsDictionary.Add("$nucleus.extension.name.lowercase$", extensionName.ToLower());
+
+      string extensionNameSingular = extensionName;
+      if (extensionNameSingular.EndsWith("s"))
+      {
+        extensionNameSingular = extensionNameSingular.Substring(0, extensionNameSingular.Length - 1);
+      }
+
+      replacementsDictionary.Add("$nucleus.extension.name-singular$", extensionNameSingular);
+      replacementsDictionary.Add("$nucleus.extension.name-singular.camelcase$", extensionNameSingular.Substring(0, 1).ToLower() + extensionNameSingular.Substring(1));
+      replacementsDictionary.Add("$nucleus.extension.name-singular.lowercase$", extensionNameSingular.ToLower());
+
+    }
+  }
 }

@@ -63,13 +63,44 @@
     <CopyVsixExtensionFiles>False</CopyVsixExtensionFiles>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="ItemTemplates\Controller.zip" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Content Include="ItemTemplates\Container.zip">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ItemTemplates\Layout.zip">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="ProjectTemplates\Layout Extension.zip">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <None Include="Template Source Code\Layout Extension Project Template\Properties\launchSettings.json" />
+    <None Include="Template Source Code\Layout Extension Project Template\readme.txt" />
+    <None Include="Template Source Code\Layout Extension Project Template\Project.vstemplate" />
+    <None Include="Template Source Code\Layout Extension Project Template\Containers\container.cshtml" />
+    <None Include="Template Source Code\Layout Extension Project Template\Layouts\layout.css" />
+    <None Include="Resources\atom-90.png" />
+    <Content Include="Template Source Code\Layout Extension Project Template\Package.xml" />
+    <None Include="Template Source Code\Layout Extension Project Template\Layouts\layout.cshtml" />
+    <None Include="Template Source Code\Layout Extension Project Template\Project.csproj" />
+    <None Include="Template Source Code\Layout Extension Project Template\_ViewImports.cshtml" />
+    <None Include="Template Source Code\Layout Item Template\Layouts\layout.css" />
+    <None Include="Template Source Code\Container Item Template\Containers\container.cshtml" />
+    <None Include="Template Source Code\Layout Item Template\Item.vstemplate" />
+    <None Include="Template Source Code\Container Item Template\Item.vstemplate" />
+    <Content Include="ItemTemplates\Controller.zip">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="Template Source Code\Controller Item Template\Controllers\controller.cs" />
     <Content Include="ItemTemplates\View.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="Template Source Code\Controller Item Template\Item.vstemplate" />
+    <None Include="Template Source Code\Layout Item Template\Layouts\layout.cshtml" />
     <None Include="Template Source Code\View Item Template\Item.vstemplate" />
     <None Include="Template Source Code\View Item Template\ViewModels\View.cs" />
     <None Include="Template Source Code\Complex Extension Project Template\Properties\launchSettings.json" />
@@ -89,6 +120,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Template Source Code\Complex Extension Project Template\DataProviders\Migrations\Scripts\01.00.00.json" />
     <None Include="Template Source Code\Empty Extension Project Template\readme.txt" />
     <None Include="Template Source Code\Empty Extension Project Template\Project.vstemplate" />
@@ -101,14 +136,14 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <None Include="Template Source Code\Empty Extension Project Template\Nucleus.Modules.Project.csproj" />
+    <None Include="Template Source Code\Empty Extension Project Template\Project.csproj" />
     <None Include="Template Source Code\Simple Extension Project Template\package.xml" />
     <None Include="Template Source Code\Simple Extension Project Template\Project.vstemplate" />
     <None Include="Template Source Code\Simple Extension Project Template\Properties\launchSettings.json" />
     <None Include="Template Source Code\Simple Extension Project Template\readme.txt" />
     <None Include="Template Source Code\Simple Extension Project Template\settings.css" />
     <None Include="Template Source Code\Simple Extension Project Template\viewer.css" />
-    <None Include="Template Source Code\Simple Extension Project Template\Nucleus.Modules.Project.csproj" />
+    <None Include="Template Source Code\Simple Extension Project Template\Project.csproj" />
     <None Include="Template Source Code\Simple Extension Project Template\Views\Settings.cshtml" />
     <None Include="Template Source Code\Simple Extension Project Template\Views\Viewer.cshtml" />
     <None Include="Template Source Code\Simple Extension Project Template\Views\_ViewImports.cshtml" />
@@ -139,7 +174,7 @@
     <None Include="templates.build.targets" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Template Source Code\Complex Extension Project Template\Nucleus.Modules.Project.csproj" />
+    <None Include="Template Source Code\Complex Extension Project Template\Project.csproj" />
     <None Include="Template Source Code\Complex Extension Project Template\Views\Settings.cshtml" />
     <None Include="Template Source Code\Complex Extension Project Template\Views\Viewer.cshtml" />
     <None Include="Template Source Code\Complex Extension Project Template\Views\_ViewImports.cshtml" />

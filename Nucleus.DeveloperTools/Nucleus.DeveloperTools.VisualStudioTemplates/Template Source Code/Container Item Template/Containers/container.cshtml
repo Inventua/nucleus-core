@@ -1,0 +1,6 @@
+﻿@model Nucleus.Abstractions.Layout.ContainerContext
+@Html.AddStyle("~/Shared/Containers/default.css")
+<div class="container-default d-flex justify-content-center text-center">
+  @Html.ModuleTitle()
+	@Model.Content
+</div>

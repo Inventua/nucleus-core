@@ -8,15 +8,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Nucleus.Data.Common;
 using Microsoft.EntityFrameworkCore;
-using $nucleus_extension_namespace$.Models;
+using $nucleus.extension.namespace$.Models;
 
-namespace $nucleus_extension_namespace$.DataProviders
+namespace $nucleus.extension.namespace$.DataProviders
 {
-	public class $nucleus_extension_name$DbContext : Nucleus.Data.EntityFramework.DbContext
+	public class $nucleus.extension.name$DbContext : Nucleus.Data.EntityFramework.DbContext
 	{
-		public DbSet<$nucleus_extension_modelname$> $nucleus_extension_modelname$s { get; set; }
+		public DbSet<$nucleus.extension.model_class_name$> $nucleus.extension.model_class_name$s { get; set; }
 
-		public $nucleus_extension_name$DbContext(DbContextConfigurator<$nucleus_extension_name$DataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
+		public $nucleus.extension.name$DbContext(DbContextConfigurator<$nucleus.extension.name$DataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
 		{
 			
 		}
@@ -34,10 +34,10 @@ namespace $nucleus_extension_namespace$.DataProviders
 		{
 			base.OnModelCreating(builder);
 
-			builder.Entity<$nucleus_extension_modelname$>().Property<Guid>("ModuleId");
+			builder.Entity<$nucleus.extension.model_class_name$>().Property<Guid>("ModuleId");
 
-			//builder.Entity<$nucleus_extension_name$>()
-			//	.HasOne($nucleus_extension_name$ => $nucleus_extension_name$.Category)
+			//builder.Entity<$nucleus.extension.name$>()
+			//	.HasOne($nucleus.extension.name$ => $nucleus.extension.name$.Category)
 			//	.WithMany()
 			//	.HasForeignKey("CategoryId");
 	}

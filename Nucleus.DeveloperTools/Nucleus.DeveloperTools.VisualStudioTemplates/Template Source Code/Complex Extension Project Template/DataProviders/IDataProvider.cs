@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using $nucleus_extension_namespace$.Models;
+using $nucleus.extension.namespace$.Models;
 using Nucleus.Abstractions.Models;
 
-namespace $nucleus_extension_namespace$.DataProviders
+namespace $nucleus.extension.namespace$.DataProviders
 {
-	public interface I$nucleus_extension_name$DataProvider : IDisposable
+	public interface I$nucleus.extension.name$DataProvider : IDisposable
 	{
-		public Task<$nucleus_extension_modelname$> Get(Guid Id);
-		public Task<IList<$nucleus_extension_modelname$>> List(PageModule pageModule);
-		public Task Save(PageModule pageModule, $nucleus_extension_modelname$ $nucleus_extension_modelname_camelcase$);
-		public Task Delete($nucleus_extension_modelname$ $nucleus_extension_modelname_camelcase$);
+		public Task<$nucleus.extension.model_class_name$> Get(Guid Id);
+		public Task<IList<$nucleus.extension.model_class_name$>> List(PageModule pageModule);
+		public Task Save(PageModule pageModule, $nucleus.extension.model_class_name$ $nucleus.extension.model_class_name.camelcase$);
+		public Task Delete($nucleus.extension.model_class_name$ $nucleus.extension.model_class_name.camelcase$);
 
 	}
 }

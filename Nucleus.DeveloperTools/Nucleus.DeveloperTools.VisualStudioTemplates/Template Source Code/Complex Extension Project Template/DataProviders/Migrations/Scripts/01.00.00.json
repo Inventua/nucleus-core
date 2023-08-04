@@ -1,10 +1,10 @@
 //{
-//	"schemaName": "$nucleus_extension_namespace$",
+//	"schemaName": "$nucleus.extension.namespace$",
 //	"version": "01.00.00",
 //	"operations": [
 //		{
 //			"createTable": {
-//				"name": "$nucleus_extension_modelname$",
+//				"name": "$nucleus.extension.model_class_name$",
 //				"columns": [
 //					{
 //						"name": "Id",
@@ -44,13 +44,13 @@
 //					}
 //				],
 //				"primaryKey": {
-//					"name": "PK_$nucleus_extension_modelname$",
+//					"name": "PK_$nucleus.extension.model_class_name$",
 //					"isclustered": true,
 //					"columns": [ "Id" ]
 //				},
 //				"foreignKeys": [
 //					{
-//						"name": "FK_$nucleus_extension_modelname$_ModuleId",
+//						"name": "FK_$nucleus.extension.model_class_name$_ModuleId",
 //						"Columns": [ "ModuleId" ],
 //						"PrincipalTable": "PageModules",
 //						"PrincipalColumns": [ "Id" ],
@@ -61,8 +61,8 @@
 //		},
 //		{
 //			"createIndex": {
-//				"name": "IX_$nucleus_extension_modelname$_ModuleId",
-//				"table": "$nucleus_extension_modelname$",
+//				"name": "IX_$nucleus.extension.model_class_name$_ModuleId",
+//				"table": "$nucleus.extension.model_class_name$",
 //				"isunique": false,
 //				"columns": [ "ModuleId" ]
 //			}

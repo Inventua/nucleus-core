@@ -9,9 +9,11 @@ using System.IO;
 
 namespace Nucleus.DeveloperTools.VisualStudioTemplates
 {
+  /// <summary>
+  /// IWizard implementation for Nucleus templates.  Handles Nucleus project and item templates.
+  /// </summary>
 	public class ProjectWizard : IWizard
 	{
-
 		public void BeforeOpeningFile(ProjectItem projectItem)
 		{
 		}
@@ -24,9 +26,11 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 		{
 		}
 
+    /// <summary>
+    /// Set NUCLEUS_PATH if it is not already set.
+    /// </summary>
 		public void RunFinished()
 		{
-			// Set NUCLEUS_PATH if it is not already set
 			if (String.IsNullOrEmpty(System.Environment.GetEnvironmentVariable("NUCLEUS_PATH")))
 			{
 				if (MessageBox.Show("The NUCLEUS_PATH environment variable is not set.  Nucleus build scripts require this path in order to find required resources.  Do you want to automatically set NUCLEUS_PATH?", "Set Path", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
@@ -45,33 +49,47 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 			return "";
 		}
 
+    /// <summary>
+    /// For project templates, display the wizard UI to collect additional Nucleus-related settings.  
+    /// For Item templates, read the project (csproj) file and set Nucleus-related template replacement tokens so that they can be used when Visual Studio replaces
+    /// tokens during item creation, and create required project folders for the relevant item template.
+    /// </summary>
+    /// <param name="automationObject"></param>
+    /// <param name="replacementsDictionary"></param>
+    /// <param name="runKind"></param>
+    /// <param name="customParams"></param>
+    /// <remarks>
+    /// We check/create project folders for item templates because Visual Studio does not create folders when executing an item template.  The .vstemplate "CreateInPlace" 
+    /// element is supposed to work for this, but instead we get a null reference exception message from Visual Studio if the folder does not exist.
+    /// </remarks>
 		public void RunStarted(object automationObject, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams)
 		{
 			Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
 
 			_DTE projectProperties = automationObject as _DTE;
 
-			try
+      try
 			{
 				if (runKind == WizardRunKind.AsNewProject)
 				{
-          //Boolean isSimpleExtension = false;
           string projectType="";
 
+          // parse the project template file name to get the project type
 					if (customParams != null && customParams.Length > 0)
 					{
             projectType = System.IO.Path.GetDirectoryName(customParams[0].ToString()).Split(new char[] { '/','\\' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
-            //isSimpleExtension = !(customParams[0].ToString().Contains("Complex Extension"));
-					}
+          }
 
+          // set default values based on what the user has entered for the project 
 					string defaultExtensionName = Get(replacementsDictionary, "$safeprojectname$");
 					string[] defaultExtensionNameParts = defaultExtensionName.Split('.');
 					if (defaultExtensionNameParts.Length > 1)
 					{
-						defaultExtensionName = defaultExtensionNameParts[defaultExtensionNameParts.Length - 1];
+						defaultExtensionName = defaultExtensionNameParts.Last();
 					}
 					string defaultModelName = defaultExtensionName;
 
+          // show the wizard form
 					ProjectWizardForm projectOptionsForm = new ProjectWizardForm
 					{
 						ClassNameEnabled = true, //!isSimpleExtension,
@@ -84,10 +102,9 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 
           projectOptionsForm.SetProjectType(projectType);
 
-
           if (projectOptionsForm.ShowDialog() == DialogResult.OK)
 					{
-            // Add custom parameters.
+            // Add custom tokens
             replacementsDictionary.Add("$nucleus.extension.namespace$", projectOptionsForm.ExtensionNamespace);
 
             AddExtensionNameTokens(replacementsDictionary, projectOptionsForm.ExtensionName);
@@ -110,37 +127,22 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 				}
 				else if (runKind == WizardRunKind.AsNewItem)
 				{
-					string defaultArea = "";
-					string areasFolder = "";
 					string projectFile = "";
           string itemType = "";
-
-          Array activeProjects = (Array)projectProperties.ActiveSolutionProjects;
-
+                    
           if (customParams != null && customParams.Length > 0)
           {
             itemType = System.IO.Path.GetDirectoryName(customParams[0].ToString()).Split(new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
           }
+
+          // Get the active project, read the project filename and create required project folders
+          Array activeProjects = (Array)projectProperties.ActiveSolutionProjects;
 
           if (activeProjects.Length > 0)
 					{
 						Project activeProj = (Project)activeProjects.GetValue(0);
 						projectFile = activeProj.FileName;
             
-						foreach (ProjectItem pi in activeProj.ProjectItems)
-						{
-							// Get the default area
-							if (pi.Name == "Areas")
-							{
-								foreach (ProjectItem pi2 in pi.ProjectItems)
-								{
-									defaultArea = pi2.Name;
-									areasFolder = pi.FileNames[0];
-									break;
-								}
-							}
-						}
-
             switch (itemType)
             {
               case "Controller":
@@ -158,9 +160,10 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
             }
           }
 
-					if (!String.IsNullOrEmpty(projectFile))
+          // read the project file to find the <ExtensionFolder> element, which contains the extension name, and add nucleus extension tokens to 
+          // the replacements dictionary.
+          if (!String.IsNullOrEmpty(projectFile))
 					{
-						// read the project file to find the <ExtensionFolder> element, which contains the extension name
 						System.Xml.XmlDocument projectFileXml = new System.Xml.XmlDocument();
 						projectFileXml.Load(projectFile);
 
@@ -184,11 +187,21 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
 			}
 		}
 
+    /// <summary>
+    /// Specifies whether we should add the item from an item template to the project.
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <returns></returns>
 		public bool ShouldAddProjectItem(string filePath)
 		{
 			return true;
 		}
 
+    /// <summary>
+    /// Check for a required folder, and create it if it does not exist.
+    /// </summary>
+    /// <param name="activeProj"></param>
+    /// <param name="folder"></param>
     private void CheckAndCreateFolder(Project activeProj, string folder)
     {
       Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
@@ -202,6 +215,11 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
       }
     }
 
+    /// <summary>
+    /// Add nucleus extension name tokens to the replacements dictionary.
+    /// </summary>
+    /// <param name="replacementsDictionary"></param>
+    /// <param name="extensionName"></param>
     private void AddExtensionNameTokens(Dictionary<string, string> replacementsDictionary, string extensionName)
     {
       replacementsDictionary.Add("$nucleus.extension.name$", extensionName);
@@ -217,7 +235,6 @@ namespace Nucleus.DeveloperTools.VisualStudioTemplates
       replacementsDictionary.Add("$nucleus.extension.name-singular$", extensionNameSingular);
       replacementsDictionary.Add("$nucleus.extension.name-singular.camelcase$", extensionNameSingular.Substring(0, 1).ToLower() + extensionNameSingular.Substring(1));
       replacementsDictionary.Add("$nucleus.extension.name-singular.lowercase$", extensionNameSingular.ToLower());
-
     }
   }
 }

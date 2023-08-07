@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package id="$guid1$" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
+	<name>$nucleus.extension.name$</name>
+	<version>1.0.0</version>
+	<publisher name="$publisher.name$" url="$publisher.url$" email="$publisher.email$" />
+	<description>
+		$nucleus.extension.description$
+	</description>
+	<compatibility minVersion="1.0.1.0" maxVersion="*" />
+	
+	<components>
+		<component folderName="$nucleus.extension.name$" optional="false">
+			<moduleDefinition id="$guid2$">
+				<friendlyName>$nucleus.extension.friendlyname$</friendlyName>
+				<extension>$nucleus.extension.name$</extension>
+        <viewController>$nucleus.extension.name$ViewerController</viewController>
+        <settingsController>$nucleus.extension.name$SettingsController</settingsController>
+				<viewAction>Index</viewAction>
+				<editAction>Settings</editAction>
+			</moduleDefinition>
+
+			<file name="readme.txt" />
+			<file name="viewer.css" />
+			<file name="settings.css" />
+			
+			<folder name="bin">
+				<file name="$nucleus.extension.namespace$.dll" />
+			</folder>
+			
+			<folder name="Views">
+				<file name="_ViewImports.cshtml" />
+				<file name="Viewer.cshtml" />
+				<file name="Settings.cshtml" />
+			</folder>
+			
+		</component>
+	</components>
+	
+</package>

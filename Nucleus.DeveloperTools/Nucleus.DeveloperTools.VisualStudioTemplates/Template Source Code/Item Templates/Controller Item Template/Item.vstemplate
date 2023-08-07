@@ -1,0 +1,26 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Item">
+  <TemplateData>
+    <Name>Nucleus Controller</Name>
+    <Description>Visual Studio item template for a Nucleus controller.</Description>
+
+    <ProjectType>CSharp</ProjectType>
+    <NumberOfParentCategoriesToRollUp>2</NumberOfParentCategoriesToRollUp>
+    <TemplateGroupID>AspNetCore</TemplateGroupID>
+    <CreateInPlace>true</CreateInPlace>
+    <SortOrder>1000</SortOrder>   
+    <DefaultName>Controller</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+		<LanguageTag>csharp</LanguageTag>
+    <ProjectTypeTag>AspNetCore</ProjectTypeTag>
+  </TemplateData>
+  <TemplateContent>
+		<Folder Name="Controllers" TargetFolderName="\Controllers">
+      <ProjectItem ReplaceParameters="true" TargetFileName="$fileinputname$.cs">controller.cs</ProjectItem>
+    </Folder>
+  </TemplateContent>
+
+  <WizardExtension>
+    <Assembly>Nucleus.DeveloperTools.VisualStudioTemplates, Version=1.2.2.0, Culture=Neutral, PublicKeyToken=2cc815f0f52d0477</Assembly>
+    <FullClassName>Nucleus.DeveloperTools.VisualStudioTemplates.ProjectWizard</FullClassName>
+  </WizardExtension>
+</VSTemplate>

@@ -8,17 +8,23 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|arm64 = Debug|arm64
 		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|arm64 = Release|arm64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{56C0FBA5-14B7-43D5-8FC2-0F185D45FF68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{56C0FBA5-14B7-43D5-8FC2-0F185D45FF68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56C0FBA5-14B7-43D5-8FC2-0F185D45FF68}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{56C0FBA5-14B7-43D5-8FC2-0F185D45FF68}.Debug|arm64.Build.0 = Debug|Any CPU
 		{56C0FBA5-14B7-43D5-8FC2-0F185D45FF68}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{56C0FBA5-14B7-43D5-8FC2-0F185D45FF68}.Debug|x86.Build.0 = Debug|Any CPU
 		{56C0FBA5-14B7-43D5-8FC2-0F185D45FF68}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56C0FBA5-14B7-43D5-8FC2-0F185D45FF68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56C0FBA5-14B7-43D5-8FC2-0F185D45FF68}.Release|arm64.ActiveCfg = Release|Any CPU
+		{56C0FBA5-14B7-43D5-8FC2-0F185D45FF68}.Release|arm64.Build.0 = Release|Any CPU
 		{56C0FBA5-14B7-43D5-8FC2-0F185D45FF68}.Release|x86.ActiveCfg = Release|Any CPU
 		{56C0FBA5-14B7-43D5-8FC2-0F185D45FF68}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection

@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+		<RootNamespace>$nucleus.extension.namespace$</RootNamespace>
+		<EnableDefaultContentItems>false</EnableDefaultContentItems>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+<ItemGroup>
+		<None Remove="**\*.vspscc" />
+		<None Remove="**\*.scc" />
+		<None Remove="*.zip" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <Content Include="**\*.css" />
+    <Content Include="**\*.js" />
+    <Content Include="**\*.cshtml" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Remove="package.xml" />
+    <None Remove="readme.txt" />    
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="package.xml" />
+    <Content Include="readme.txt" />    
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.0.1.0" />
+		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.0.1.0" />
+	</ItemGroup>
+
+	<PropertyGroup Label="Nucleus">
+		<ExtensionFolder>$nucleus.extension.name$</ExtensionFolder>
+		<Version>1.0.0</Version>
+		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+    <CopyToDefaultSetup>false</CopyToDefaultSetup>
+	</PropertyGroup>
+
+	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+</Project>

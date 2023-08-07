@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package id="$guid1$" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
+  <name>$nucleus.extension.name$</name>
+  <version>1.0.0</version>
+  <publisher name="$publisher.name$" url="$publisher.url$" email="$publisher.email$" />
+  <description>
+    $nucleus.extension.description$
+  </description>
+  <compatibility minVersion="1.0.0.0" maxVersion="*" />
+  <components>
+    <component folderName="$nucleus.extension.name$" optional="false">      
+      <layoutDefinition id="$guid3$">
+        <friendlyName>Layout</friendlyName>
+        <relativePath>Layouts\layout.cshtml</relativePath>
+      </layoutDefinition>
+      <containerDefinition id="$guid4$">
+        <friendlyName>Container</friendlyName>
+        <relativePath>Containers\container.cshtml</relativePath>
+      </containerDefinition>
+      
+      <file name="license.txt" />
+      
+      <folder name="Layouts">
+        <file name="layout.cshtml" />
+        <file name="layout.css" />
+      </folder>
+      <folder name="Containers">
+        <file name="container.cshtml" />
+      </folder>
+    </component>
+  </components>
+</package>

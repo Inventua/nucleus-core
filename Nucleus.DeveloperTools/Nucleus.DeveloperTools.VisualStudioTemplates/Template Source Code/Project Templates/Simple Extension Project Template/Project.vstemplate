@@ -1,0 +1,56 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>Nucleus Simple Extension Project</Name>
+    <Description>Visual Studio project template for a simple Nucleus Extension, including view models and views, but with no data provider or manager class.  Use this template to create a simple extension which does not have its own database objects.  Complex extensions should use the complex Nucleus extension template.</Description>
+    <ProjectType>CSharp</ProjectType>
+    <ProjectSubType>Nucleus</ProjectSubType>
+    <SortOrder>1001</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>My Extension</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <CreateInPlace>true</CreateInPlace>
+    <Icon>__TemplateIcon.ico</Icon>
+		<LanguageTag>csharp</LanguageTag>
+    <PlatformTag>Windows</PlatformTag>
+    <PlatformTag>Linux</PlatformTag>
+    <PlatformTag>Nucleus</PlatformTag>
+    <ProjectTypeTag>AspNetCore</ProjectTypeTag>
+    <ProjectTypeTag>Nucleus</ProjectTypeTag>
+  </TemplateData>
+  <TemplateContent>
+		<Project TargetFileName="Project.csproj" File="Project.csproj" ReplaceParameters="true">
+      <Folder Name="Properties" TargetFolderName="Properties">
+        <ProjectItem TargetFileName="launchSettings.json">launchSettings.json</ProjectItem>
+      </Folder>
+      <Folder Name="Controllers" TargetFolderName="Controllers">
+        <ProjectItem ReplaceParameters="true" TargetFileName="$nucleus.extension.name$ViewerController.cs">ViewerController.cs</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="$nucleus.extension.name$SettingsController.cs">SettingsController.cs</ProjectItem>
+      </Folder>
+			<Folder Name="Models" TargetFolderName="Models">
+				<ProjectItem ReplaceParameters="true" TargetFileName="Settings.cs">Settings.cs</ProjectItem>
+			</Folder>
+			<Folder Name="ViewModels" TargetFolderName="ViewModels">
+				<ProjectItem ReplaceParameters="true" TargetFileName="Settings.cs">Settings.cs</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="Viewer.cs">Viewer.cs</ProjectItem>
+			</Folder>
+			<Folder Name="Views" TargetFolderName="Views">
+				<ProjectItem ReplaceParameters="true" TargetFileName="Settings.cshtml">Settings.cshtml</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="Viewer.cshtml">Viewer.cshtml</ProjectItem>
+				<ProjectItem ReplaceParameters="true" TargetFileName="_ViewImports.cshtml">_ViewImports.cshtml</ProjectItem>
+			</Folder>
+			<ProjectItem ReplaceParameters="true" TargetFileName="Package.xml">package.xml</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="readme.txt">readme.txt</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="settings.css">settings.css</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="viewer.css">viewer.css</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="Startup.cs">Startup.cs</ProjectItem>
+    </Project>	
+  </TemplateContent>
+	
+	<WizardExtension>
+		<Assembly>Nucleus.DeveloperTools.VisualStudioTemplates, Version=1.2.2.0, Culture=Neutral, PublicKeyToken=2cc815f0f52d0477</Assembly>
+		<FullClassName>Nucleus.DeveloperTools.VisualStudioTemplates.ProjectWizard</FullClassName>
+	</WizardExtension>
+
+</VSTemplate>

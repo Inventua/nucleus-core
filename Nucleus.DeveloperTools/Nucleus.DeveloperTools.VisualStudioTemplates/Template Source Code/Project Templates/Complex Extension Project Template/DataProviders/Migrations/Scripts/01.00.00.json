@@ -1,0 +1,71 @@
+//{
+//	"schemaName": "$nucleus.extension.namespace$",
+//	"version": "01.00.00",
+//	"operations": [
+//		{
+//			"createTable": {
+//				"name": "$nucleus.extension.model_class_name$",
+//				"columns": [
+//					{
+//						"name": "Id",
+//						"clrType": "guid",
+//						"isnullable": false
+//					},
+//					{
+//						"name": "ModuleId",
+//						"clrType": "guid",
+//						"isnullable": false
+//					},
+//					{
+//						"name": "Title",
+//						"clrType": "string",
+//						"maxLength": 256,
+//						"isnullable": false
+//					},
+//					{
+//						"name": "DateAdded",
+//						"clrType": "datetime",
+//						"isnullable": true
+//					},
+//					{
+//						"name": "AddedBy",
+//						"clrType": "guid",
+//						"isnullable": true
+//					},
+//					{
+//						"name": "DateChanged",
+//						"clrType": "datetime",
+//						"isnullable": true
+//					},
+//					{
+//						"name": "ChangedBy",
+//						"clrType": "guid",
+//						"isnullable": true
+//					}
+//				],
+//				"primaryKey": {
+//					"name": "PK_$nucleus.extension.model_class_name$",
+//					"isclustered": true,
+//					"columns": [ "Id" ]
+//				},
+//				"foreignKeys": [
+//					{
+//						"name": "FK_$nucleus.extension.model_class_name$_ModuleId",
+//						"Columns": [ "ModuleId" ],
+//						"PrincipalTable": "PageModules",
+//						"PrincipalColumns": [ "Id" ],
+//						"OnDelete": "Cascade"
+//					}
+//				]
+//			}
+//		},
+//		{
+//			"createIndex": {
+//				"name": "IX_$nucleus.extension.model_class_name$_ModuleId",
+//				"table": "$nucleus.extension.model_class_name$",
+//				"isunique": false,
+//				"columns": [ "ModuleId" ]
+//			}
+//		}
+//	]
+//}

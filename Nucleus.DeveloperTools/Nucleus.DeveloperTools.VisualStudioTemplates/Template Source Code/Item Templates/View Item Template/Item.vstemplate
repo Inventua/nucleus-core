@@ -1,0 +1,29 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Item">
+  <TemplateData>
+    <Name>Nucleus View</Name>
+    <Description>Visual Studio item template for a Nucleus view, including a view model, the Razor view and a CSS file.</Description>
+    
+    <ProjectType>CSharp</ProjectType>
+    <NumberOfParentCategoriesToRollUp>2</NumberOfParentCategoriesToRollUp>    
+    <TemplateGroupID>AspNetCore</TemplateGroupID>
+    <CreateInPlace>true</CreateInPlace>
+    <SortOrder>1001</SortOrder>   
+    <DefaultName>View</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+		<LanguageTag>csharp</LanguageTag>
+    <ProjectTypeTag>AspNetCore</ProjectTypeTag>
+  </TemplateData>
+  <TemplateContent>
+		<Folder Name="ViewModels" TargetFolderName="\ViewModels">
+      <ProjectItem ReplaceParameters="true" TargetFileName="$fileinputname$.cs">view.cs</ProjectItem>
+    </Folder>
+    <Folder Name="Views" TargetFolderName="\Views">
+      <ProjectItem ReplaceParameters="true" TargetFileName="$fileinputname$.cshtml">view.cshtml</ProjectItem>
+    </Folder>
+  </TemplateContent>
+
+  <WizardExtension>
+    <Assembly>Nucleus.DeveloperTools.VisualStudioTemplates, Version=1.2.2.0, Culture=Neutral, PublicKeyToken=2cc815f0f52d0477</Assembly>
+    <FullClassName>Nucleus.DeveloperTools.VisualStudioTemplates.ProjectWizard</FullClassName>
+  </WizardExtension>
+</VSTemplate>

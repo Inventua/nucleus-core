@@ -1,0 +1,37 @@
+<VSTemplate Version="3.0.0" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" Type="Project">
+  <TemplateData>
+    <Name>Nucleus Empty Extension Project</Name>
+    <Description>Visual Studio project template for an empty Nucleus Extension, with references and a manifest, but no view models, views, data provider or manager class.  Use this template to create an extension which will only contain layouts, containers or other assets.  Extensions which include modules should use the simple or complex Nucleus extension template.</Description>
+    <ProjectType>CSharp</ProjectType>
+    <ProjectSubType>Nucleus</ProjectSubType>
+    <SortOrder>1002</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>My Extension</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+    <LocationField>Enabled</LocationField>
+    <EnableLocationBrowseButton>true</EnableLocationBrowseButton>
+    <CreateInPlace>true</CreateInPlace>
+    <Icon>__TemplateIcon.ico</Icon>
+		<LanguageTag>csharp</LanguageTag>
+    <PlatformTag>Windows</PlatformTag>
+    <PlatformTag>Linux</PlatformTag>
+    <PlatformTag>Nucleus</PlatformTag>
+    <ProjectTypeTag>AspNetCore</ProjectTypeTag>
+    <ProjectTypeTag>Nucleus</ProjectTypeTag>
+  </TemplateData>
+  <TemplateContent>
+		<Project TargetFileName="Project.csproj" File="Project.csproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" TargetFileName="Package.xml">Package.xml</ProjectItem>
+			<ProjectItem ReplaceParameters="true" TargetFileName="readme.txt">readme.txt</ProjectItem>			
+      <Folder Name="Properties" TargetFolderName="Properties">
+        <ProjectItem TargetFileName="launchSettings.json">launchSettings.json</ProjectItem>
+      </Folder>
+    </Project>
+  </TemplateContent>
+	
+	<WizardExtension>
+		<Assembly>Nucleus.DeveloperTools.VisualStudioTemplates, Version=1.2.2.0, Culture=Neutral, PublicKeyToken=2cc815f0f52d0477</Assembly>
+		<FullClassName>Nucleus.DeveloperTools.VisualStudioTemplates.ProjectWizard</FullClassName>
+	</WizardExtension>
+
+</VSTemplate>

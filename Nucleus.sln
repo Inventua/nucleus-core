@@ -149,6 +149,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reference", "Reference", "{
 		Documentation\Reference\Components.md = Documentation\Reference\Components.md
 		Documentation\Reference\Configuration-Reference.md = Documentation\Reference\Configuration-Reference.md
 		Documentation\Reference\CSS-Reference.md = Documentation\Reference\CSS-Reference.md
+		Documentation\Reference\Developer-Tools-Error-Reference.md = Documentation\Reference\Developer-Tools-Error-Reference.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.AdvancedSiteMap", "Nucleus.Core.Modules\Nucleus.Extensions.AdvancedSiteMap\Nucleus.Extensions.AdvancedSiteMap.csproj", "{13F2F6C0-D84B-4F30-8B06-5485ACA5D0E5}"

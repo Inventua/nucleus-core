@@ -13,15 +13,17 @@
 	
 	The Nucleus extension project templates automatically include the lines above.
 -->
-<Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003' ToolsVersion="15.0">	
-	<PropertyGroup Label="Normalize Nucleus Environment Variables">
+<Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003' ToolsVersion="15.0">
+  <PropertyGroup Label="Normalize Nucleus Environment Variables">
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+    <NUCLEUS_TOOLS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_TOOLS_PATH)'))</NUCLEUS_TOOLS_PATH>
 		<NUCLEUS_PUBLISH_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PUBLISH_PATH)'))</NUCLEUS_PUBLISH_PATH>
 	</PropertyGroup>
 	
 	<Target Name="Messages" AfterTargets="PostBuildEvent">
 		<Message Text="ExtensionFolder: $(ExtensionFolder)" Importance="high" />
 		<Message Text="Nucleus Path: $(NUCLEUS_PATH)" Importance="high" />
+    <Message Text="Nucleus Path: $(NUCLEUS_TOOLS_PATH)" Importance="high" />
 		<Message Text="Nucleus Publish Path: $(NUCLEUS_PUBLISH_PATH)" Importance="high" />
 	</Target>
 			
@@ -42,13 +44,30 @@
 			<Output TaskParameter="Result" ItemName="_XmlPackageAssemblies" />
 		</XmlPeek>
 		<ItemGroup>
-			<PackageAssemblies Include="@(_XmlPackageAssemblies->'bin\$(Configuration)\$(TargetFramework)\%(Identity)')" />
+			<PackageAssemblies Include="@(_XmlPackageAssemblies->'bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).dll')" />
 		</ItemGroup>
 	</Target>
-	
-	<Target Name="test" AfterTargets="PostBuildEvent">
+
+  <Target Name="ValidateNucleusToolsPath" AfterTargets="PostBuildEvent">
+    <Warning
+			Condition="'$(Configuration)' == 'Debug' AND '$(NUCLEUS_TOOLS_PATH)' == ''"
+			Text="The %NUCLEUS_TOOLS_PATH% environment path is not set, your extension zip file will not contain any content." />
+  </Target>
+  
+  <Target Name="GetPackageContent" DependsOnTargets="ResolveReferences" AfterTargets="PostBuildEvent">
+    <GetNucleusPackageContent PackageFile="Package.xml" ProjectFile="$(MSBuildProjectFile)">        
+      <Output TaskParameter="Content" ItemName="PackageContents" />
+    </GetNucleusPackageContent>    
+  </Target>
+  <UsingTask
+    TaskName="GetNucleusPackageContent"
+    AssemblyFile="$(NUCLEUS_TOOLS_PATH)Nucleus.DeveloperTools.MSBuild.dll">
+  </UsingTask>
+  
+	<Target Name="ReportPackageContent" AfterTargets="PostBuildEvent">
 		<Message Importance="high" Text="Package assembles: @(PackageAssemblies)" />
-	</Target>
+    <Message Importance="high" Text="Package content files: @(PackageContents)" />    
+  </Target>
 	<!-- 
 		Copy module assemblies to the dev environment Nucleus host/extensions/YOURMODULE/bin folder.	This step renames (moves) existing 
 		DLLs to _OLD-extensionname first in order to trigger a restart, this is required because otherwise the DLLs will be "in use"
@@ -119,7 +138,7 @@
 		
 		<Move SourceFiles="@(RenameExtensionFiles)" DestinationFolder="$(NUCLEUS_PATH)_OLD-$(ExtensionFolder)" />
 		<Copy SourceFiles="@(OutputAssemblies)" DestinationFolder="$(NUCLEUS_PATH)Extensions\$(ExtensionFolder)\bin\%(RecursiveDir)" Retries="2" />
-		<Copy SourceFiles="@(Content)" DestinationFolder="$(NUCLEUS_PATH)Extensions\$(ExtensionFolder)\%(RelativeDir)\%(RecursiveDir)" Retries="2" />
+		<Copy SourceFiles="@(PackageContents)" DestinationFolder="$(NUCLEUS_PATH)Extensions\$(ExtensionFolder)\%(RelativeDir)\%(RecursiveDir)" Retries="2" />
 		
 		<RemoveDir Directories="$(NUCLEUS_PATH)_OLD-$(ExtensionFolder)" />
 		
@@ -130,7 +149,7 @@
 		<RemoveDir Directories="AppPackage" />
 
 		<Copy SourceFiles="@(OutputAssemblies)" DestinationFolder="AppPackage\bin\%(RecursiveDir)" Retries="2" />
-		<Copy SourceFiles="@(Content)" DestinationFolder="AppPackage\%(RelativeDir)\%(RecursiveDir)" Retries="2" />
+		<Copy SourceFiles="@(PackageContents)" DestinationFolder="AppPackage\%(RelativeDir)\%(RecursiveDir)" Retries="2" />
 		<Delete Files="$(ExtensionFolder)_Extension_$(PackageVersion).zip" />
 		
 		<ZipDirectory SourceDirectory="AppPackage" DestinationFile="$(ExtensionFolder)_Extension_$(PackageVersion).zip" Overwrite="true" />

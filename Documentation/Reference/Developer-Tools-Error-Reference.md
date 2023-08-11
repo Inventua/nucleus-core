@@ -3,6 +3,7 @@
 {.table-0-0-75}
 | Code              | Source              | Description                                                                                     |
 |-------------------|---------------------|-------------------------------------------------------------------------------------------------|
+| NUCL001           | MSBuild             | Your project does not contain a manifest (package.xml) file.                                    |
 | NUCL100           | MSBuild             | Your manifest (package.xml) file has an empty Id attribute.                                     |
 | NUCL101           | MSBuild             | Your manifest (package.xml) file has an empty name element.                                     |
 | NUCL102           | MSBuild             | Your manifest (package.xml) file has an empty version element.                                  |

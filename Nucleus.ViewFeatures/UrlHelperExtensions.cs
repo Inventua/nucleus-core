@@ -27,7 +27,7 @@ namespace Nucleus.ViewFeatures
 		/// <returns></returns>
 		public static string RelativePageLink(Page page)
 		{
-			if (page == null || page.Disabled || page.DefaultPageRoute() == null) return "";
+			if (page == null || page.Disabled || page.DefaultPageRoute()?.Path == null) return "";
 			string path = page.DefaultPageRoute().Path;
 
 			// We append a "/" so that if the path contains dots the net core static file provider doesn't interpret the path as a file
@@ -44,7 +44,7 @@ namespace Nucleus.ViewFeatures
 		{
 			if (page == null) throw new ArgumentNullException(nameof(page));
 
-			if (page.Disabled || page.DefaultPageRoute() == null) return "";
+			if (page.Disabled || page.DefaultPageRoute()?.Path == null) return "";
 			string path = page.DefaultPageRoute().Path;
 
 			// We append a "/" so that if the path contains dots the net core static file provider doesn't interpret the path as a file

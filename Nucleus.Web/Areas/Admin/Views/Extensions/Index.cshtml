@@ -43,10 +43,10 @@
             <tr>
               <td>
                 <div><strong>@extension.name</strong></div>
-                <div><a href="@extension.publisher.url" target="_blank">@extension.publisher.name</a> <a href="mailto:@extension.publisher.email" class="nucleus-material-icon EmailIcon">&#xe0be;</a></div>
-                <div>@extension.description</div>
+                <div><a href="@extension.publisher?.url" target="_blank">@extension.publisher?.name</a> <a href="mailto:@extension.publisher?.email" class="nucleus-material-icon EmailIcon">&#xe0be;</a></div>
+                <div>@extension?.description</div>
               </td>
-              <td>@extension.version</td>
+              <td>@extension?.version</td>
               <td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("Uninstall", "Extensions", "Admin", new { Id = extension.id })" value="&#xe14c;" data-confirm="This will uninstall the '@extension.name' package, and remove all module instances, scheduled tasks, layouts and containers which are provided by this extension.<br/><br/>Do you want to continue?" class="nucleus-material-icon btn btn-danger" title="Uninstall" data-target=".nucleus-adminpage" /></td>
             </tr>
           }

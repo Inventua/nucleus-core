@@ -144,18 +144,21 @@ public class DNNMigrationController : Controller
 
     this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>().UpdateSelections(viewModel.Folders);
 
-    (this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>() as MigrationEngines.FilesMigration)
-      .SetAlias
-      (
-        viewModel.UseSSL,
-        portals
-          .Where(portal => portal.PortalId == viewModel.PortalId)
-          .SelectMany(portal => portal.PortalAliases)
-          .Where(alias => alias.PortalAliasId == viewModel.PortalAliasId)
-          .FirstOrDefault()
-      );
+    MigrationEngines.FilesMigration engine = this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>() as MigrationEngines.FilesMigration;
+    engine.SetAlias
+    (
+      viewModel.UseSSL,
+      portals
+        .Where(portal => portal.PortalId == viewModel.PortalId)
+        .SelectMany(portal => portal.PortalAliases)
+        .Where(alias => alias.PortalAliasId == viewModel.PortalAliasId)
+        .FirstOrDefault()
+    );
+
     this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>().SignalStart();
-        
+
+    engine.CalculateProgressTotal();
+
     Task task = Task.Run(async () =>
     {
       this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>().Message = "Synchronizing file system ...";

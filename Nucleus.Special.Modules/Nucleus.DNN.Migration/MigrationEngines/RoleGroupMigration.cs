@@ -58,6 +58,8 @@ public class RoleGroupMigration : MigrationEngineBase<Models.DNN.RoleGroup>
         dnnRoleGroup.AddWarning($"Role group '{dnnRoleGroup.RoleGroupName}' was not selected for import.");
       }
     }
+
+    this.SignalCompleted();
   }
 
   public override Task Validate()

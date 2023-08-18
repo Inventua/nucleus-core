@@ -38,12 +38,15 @@ public abstract class MigrationEngineBase<TModel> : MigrationEngineBase
 
   virtual public void UpdateSelections(List<TModel> items)
   {
-    foreach (TModel item in items)
+    if (items != null)
     {
-      TModel existing = this.Items.Where(existing => existing.Id() == item.Id()).FirstOrDefault();
-      if (existing != null)
+      foreach (TModel item in items)
       {
-        existing.IsSelected = item.IsSelected && item.CanSelect;
+        TModel existing = this.Items.Where(existing => existing.Id() == item.Id()).FirstOrDefault();
+        if (existing != null)
+        {
+          existing.IsSelected = item.IsSelected && item.CanSelect;
+        }
       }
     }
   }
@@ -62,6 +65,11 @@ public abstract class MigrationEngineBase<TModel> : MigrationEngineBase
     {
       item.Results.Clear();
     }
+  }
+
+  public void SignalCompleted()
+  {
+    this.IsComplete = true;
   }
 }
 
@@ -107,6 +115,9 @@ public abstract class MigrationEngineBase
 
   public Boolean IsStarted { get; protected set; }
 
+  public Boolean IsComplete{ get; protected set; }
+
+
   public int CurrentPercent
   {
     get
@@ -118,7 +129,7 @@ public abstract class MigrationEngineBase
 
   public EngineStates State()
   {
-    if (this.IsStarted && this.Current < this.TotalCount)
+    if (this.IsStarted && !this.IsComplete)
     {
       return EngineStates.InProgress;
     }
@@ -142,6 +153,17 @@ public abstract class MigrationEngineBase
 
   public void Progress()
   {
-    this.Current++;
+    if (this.TotalCount >= this.Current + 1)
+    {
+      this.Current++;
+    }
+  }
+
+  public void Progress(int value)
+  {
+    if (this.TotalCount >= this.Current + value)
+    { 
+      this.Current += value;
+    }
   }
 }

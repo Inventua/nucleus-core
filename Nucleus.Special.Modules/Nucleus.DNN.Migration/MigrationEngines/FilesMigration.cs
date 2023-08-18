@@ -95,9 +95,16 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
             // migrate folder permissions
             await SetFolderPermissions(this.Context.Site, dnnFolder, nucleusFolder, folderPermissionTypes);
             await this.FileSystemManager.SaveFolderPermissions(this.Context.Site, nucleusFolder);
+            this.Progress();
           }
 
-          if (doCopyFiles)
+          if (!doCopyFiles)
+          {
+            // files in folder not copied because the folder already exists & "update existing" is not selected
+            this.Progress(dnnFolder.Files.Count);
+            skippedCount += dnnFolder.Files.Count;
+          }
+          else
           {
             foreach (Models.DNN.File dnnFile in dnnFolder.Files)
             {
@@ -158,18 +165,25 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
                   failCount++;
                 }
 
+                this.Progress();
               }
               else
               {
                 string url = $"{(this.UseSSL ? "https" : "http")}://{this.PortalAlias.HttpAlias}/portals/{this.PortalAlias.PortalId}/{dnnFile.Folder.FolderPath}{dnnFile.FileName}";
                 dnnFolder.AddWarning($"Skipped '{url}' because it does not match any of the allowed file extensions.");
                 failCount++;
-              }
-            
-              this.Progress();
+              }            
             }
           }
-          dnnFolder.AddWarning($"{(successCount == 0 ? "No" : successCount)} file{(successCount == 1 ? "" : "s")} migrated, {(skippedCount == 0 ? "no" : skippedCount)} file{(skippedCount == 1 ? "" : "s")} skipped, {(failCount == 0 ? "no" : failCount)} file{(failCount == 1 ? "" : "s")} failed.");
+
+          if (successCount + skippedCount + failCount == 0)
+          {
+            dnnFolder.AddWarning("No files.");
+          }
+          else
+          { 
+            dnnFolder.AddWarning($"{(successCount == 0 ? "No" : successCount)} file{(successCount == 1 ? "" : "s")} migrated, {(skippedCount == 0 ? "no" : skippedCount)} file{(skippedCount == 1 ? "" : "s")} skipped, {(failCount == 0 ? "no" : failCount)} file{(failCount == 1 ? "" : "s")} failed.");
+          }
         }
         catch (Exception ex)
         {
@@ -181,6 +195,8 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
         dnnFolder.AddWarning($"Folder '{dnnFolder.FolderPath}' was not selected for import.");
       }
     }
+
+    this.SignalCompleted();
   }
 
 
@@ -281,6 +297,21 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
         break;
     }
     return null;
+  }
+
+  public void CalculateProgressTotal()
+  {
+    int total = 0;
+
+    foreach (Models.DNN.Folder folder in this.Items)
+    {
+      if (folder.CanSelect && folder.IsSelected)
+      {
+        total += folder.Files.Count + 1;
+      }
+    }
+
+    this.TotalCount = total;
   }
 
   public override Task Validate()

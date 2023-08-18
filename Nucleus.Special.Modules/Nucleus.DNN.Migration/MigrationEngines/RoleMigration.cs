@@ -64,6 +64,8 @@ public class RoleMigration : MigrationEngineBase<Models.DNN.Role>
         role.AddWarning($"Role '{role.RoleName}' was not selected for import.");
       }
     }
+
+    this.SignalCompleted();
   }
 
   public override Task Validate()

@@ -69,7 +69,7 @@
                 <td>
                   <ul class="validation-results">
                     <li>
-                      @folder.FolderCount folders, @folder.Files.Count files
+                      @(folder.FolderCount == 0 ? "" : $"{folder.FolderCount} folders, ")@(folder.Files.Count == 0 ? (folder.FolderCount == 0 ? "No" : "no") : folder.Files.Count) files
                     </li>
                     @foreach (var result in folder.Results)
                     {

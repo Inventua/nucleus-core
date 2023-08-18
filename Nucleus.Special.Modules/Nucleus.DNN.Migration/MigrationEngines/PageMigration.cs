@@ -215,7 +215,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
       }
     }
 
-    this.Current = this.TotalCount;
+    this.SignalCompleted();
   }
 
   // Create a SiteMap module to make the page a "landing page"

@@ -361,7 +361,21 @@ namespace Nucleus.Core.DataProviders
 			return results;
 		}
 
-		public async Task<List<Page>> ListPages(Guid siteId, Guid? parentId)
+    public async Task<List<Page>> ListSitePages(Guid siteId)
+    {
+      List<Page> results = await this.Context.Pages.Where(page => page.SiteId == siteId)        
+        .AsNoTracking()
+        .ToListAsync();
+
+      foreach (Page result in results)
+      {
+        result.Permissions = await ListPermissions(result.Id, Page.URN);
+      }
+
+      return results;
+    }
+
+    public async Task<List<Page>> ListPages(Guid siteId, Guid? parentId)
 		{
 			List<Page> results = await this.Context.Pages.Where(page => page.SiteId == siteId && page.ParentId == parentId)
 				.Include(page => page.LayoutDefinition)

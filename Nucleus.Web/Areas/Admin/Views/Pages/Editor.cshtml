@@ -55,8 +55,6 @@
 
 				<SettingsControl name="@nameof(Model.Page.ParentId)" caption="Parent Page" helptext="The parent page for this page, used when rendering a menu.">
 					@Html.PageListFor(model => model.Page.ParentId, Model.PageMenu, Model.Page.Id)
-
-					@*@Html.DropDownListFor(model => model.Page.ParentId, new SelectList(Model.Pages, "Id", "Name"), "(none)")*@
 				</SettingsControl>
 
 				<SettingsControl caption="Description" helptext="Description of the page.  Some search engines use the page description to generate result snippets.">

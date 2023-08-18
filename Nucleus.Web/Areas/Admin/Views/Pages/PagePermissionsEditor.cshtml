@@ -3,63 +3,106 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
-<fieldset role="group" aria-labelledby="heading">	
+<fieldset role="group" aria-labelledby="heading" class="flex-grow-1">
 	@if (Model.AvailablePageRoles.Any())
 	{
 		<h2>Roles</h2>
 		<div class="nucleus-form-tools">
-			@*@Html.DropDownListFor((model) => model.SelectedPageRoleId, new SelectList(Model.AvailablePageRoles, "Id", "Name"), new { @class = "flex-fill" })*@
-
 			@Html.DropDownListFor(model => model.SelectedPageRoleId, Model.AvailablePageRoles, new { @class = "flex-fill" })
-
 			<input type="submit" formaction="@Url.AreaAction("AddPagePermissionRole", "Pages", "Admin")" value="Add Role" data-target="form.parent()" class="btn btn-secondary" />
 		</div>
 	}
 	@if (!Model.PagePermissions.Values.Any())
 	{
-		{
-			<div class="alert alert-primary" role="alert">This page does not have any permissions configured, so only administrators can see it. Select a role from the drop-down list and click "Add Role" to create a page permission.</div>
-		}	
+		<div class="alert alert-primary" role="alert">This page does not have any permissions configured, so only administrators can see it. Select a role from the drop-down list and click "Add Role" to create a page permission.</div>
 	}
 	else
 	{
-		<table>
-			<tr>
-				<th></th>
-				@foreach (var permissionType in Model.PagePermissionTypes)
-				{
-					<th class="text-center">@permissionType.Name</th>
-				}
-				<th></th>
-			</tr>
-
-			@foreach (var item in Model.PagePermissions.Values)
-			{
+		<div class="d-flex mb-auto align-items-start permissions-table">
+			<table>
 				<tr>
-					<td>
-						@item.Role.Name
-					</td>
-					@for (int permissionsCount = 0; permissionsCount < Model.PagePermissions[item.Role.Id].Permissions.Count; permissionsCount++)
+					<th></th>
+					@foreach (var permissionType in Model.PagePermissionTypes)
 					{
-						<td class="text-center">
-							@Html.HiddenFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].Id)
-							@Html.HiddenFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Id)
-							@Html.HiddenFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope)
-							@if (Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope == PermissionType.PermissionScopeNamespaces.Disabled)
-							{
-								<span class="nucleus-material-icon">&#xe8f5;</span>
-							}
-							else
-							{
-								@Html.CheckBoxFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].AllowAccess)
-							}
-						</td>
+						<th class="text-center">@permissionType.Name</th>
 					}
-
-					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("RemovePagePermissionRole", "Pages", "Admin", new { id = item.Role.Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Remove" data-target="form.parent()" /></td>
+					<th></th>
 				</tr>
-			}
 
-		</table>
+				@foreach (var item in Model.PagePermissions.Values)
+				{
+					<tr>
+						<td>
+							@item.Role.Name
+						</td>
+						@for (int permissionsCount = 0; permissionsCount < Model.PagePermissions[item.Role.Id].Permissions.Count; permissionsCount++)
+						{
+							<td class="text-center">
+								@Html.HiddenFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].Id)
+								@Html.HiddenFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Id)
+								@Html.HiddenFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope)
+								@if (Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope == PermissionType.PermissionScopeNamespaces.Disabled)
+								{
+									<span class="nucleus-material-icon">&#xe8f5;</span>
+								}
+								else
+								{
+									@Html.CheckBoxFor(model => Model.PagePermissions[item.Role.Id].Permissions[permissionsCount].AllowAccess)
+								}
+							</td>
+						}
+						<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("RemovePagePermissionRole", "Pages", "Admin", new { id = item.Role.Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Remove" data-target="form.parent()" /></td>
+					</tr>
+				}
+			</table>
+		</div>
+
+		@Html.HiddenFor(model => model.DisableCopy)
+		<div class="btn-group align-self-start align-items-center" role="group">
+			<button type="button" class="page-permissions-copy-dropdown btn btn-success btn-sm dropdown-toggle@(Model.DisableCopy ? " disabled" : "")" data-bs-toggle="dropdown" aria-expanded="false">
+				Copy Permissions to Descendants
+			</button>
+			<ul class="dropdown-menu">
+				<li>
+					<label class="dropdown-item">
+						Replace all Permissions ...
+						<button type="submit" class="collapse" formaction="@Url.AreaAction("CopyPermissionsReplaceAll", "Pages", "Admin")" data-confirm="This operation will overwrite all permissions of all descendant pages with permissions from this page. Are you sure that you want to continue?" />
+					</label>
+				</li>
+				<li>
+					<label class="dropdown-item">
+						Merge Permissions ...
+						<button type="submit" class="collapse" formaction="@Url.AreaAction("CopyPermissionsMerge", "Pages", "Admin")" data-confirm="This operation will add permissions from this page to all descendant pages. Are you sure that you want to continue?"  />
+					</label>
+				</li>
+			</ul>
+		</div>
 	}
 </fieldset>
+<script>
+	jQuery(document).ready(function ()
+	{
+		jQuery(Page).on('ready', function (page, target, data, url, event, status, request)
+		{
+			jQuery('.page-permissions-copy-dropdown')
+				.siblings('.nucleus-progress-spinner')
+				.remove();
+		});
+
+		jQuery('.page-permissions-copy-dropdown + .dropdown-menu button').on('confirmed', function ()
+		{
+			var permissionsControl = jQuery('.page-permissions-copy-dropdown');
+
+			if (permissionsControl.siblings('.nucleus-progress-spinner').length === 0)
+			{
+				var progress = jQuery('<div class="spinner-border spinner-border-sm text-primary nucleus-progress-spinner ms-2" role="status"/>');
+				progress.insertAfter(permissionsControl);
+			}
+		});
+
+		jQuery('.permissions-table input[type=checkbox]').on('change', function ()
+		{
+			jQuery('.page-permissions-copy-dropdown').addClass('disabled');
+		});
+	});
+</script>

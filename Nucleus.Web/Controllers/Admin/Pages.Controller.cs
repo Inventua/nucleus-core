@@ -162,6 +162,7 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 
 			viewModel.PagePermissions = viewModel.Page.Permissions.ToPermissionsList(this.Context.Site);
+			viewModel.DisableCopy = true;
 
 			return View("Editor", await BuildPageEditorViewModel(viewModel.Page, viewModel.PagePermissions, false));
 		}
@@ -201,7 +202,36 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 		}
 
-		[HttpPost]
+    [HttpPost]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+    public async Task<ActionResult> CopyPermissionsReplaceAll(ViewModels.Admin.PageEditor viewModel)
+    {
+      if (await this.PageManager.CopyPermissionsToDescendants(this.Context.Site, viewModel.Page, User, IPageManager.CopyPermissionOperation.Replace))
+      {
+				return Json(new { Title = "Copy Permissions to Descendants", Message = "Permissions were copied successfully.", Icon = "alert" });
+			}
+			else
+      {
+        return BadRequest();
+      }
+    }
+
+    [HttpPost]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+    public async Task<ActionResult> CopyPermissionsMerge(ViewModels.Admin.PageEditor viewModel)
+    {
+      if (await this.PageManager.CopyPermissionsToDescendants(this.Context.Site, viewModel.Page, User, IPageManager.CopyPermissionOperation.Merge))
+      {
+				return Json(new { Title = "Copy Permissions to Descendants", Message = "Permissions were copied successfully.", Icon = "alert" });
+			}
+			else
+      {
+        return BadRequest();
+      }
+    }
+
+
+    [HttpPost]
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
 		public async Task<ActionResult> MovePageDown(ViewModels.Admin.PageEditor viewModel, Guid id)
 		{
@@ -505,6 +535,7 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 
 			viewModel.PagePermissions = viewModel.Page.Permissions.ToPermissionsList(this.Context.Site);
+			viewModel.DisableCopy = true;
 
 			return View("Editor", await BuildPageEditorViewModel (viewModel.Page, viewModel.PagePermissions, false));
 		}
@@ -610,12 +641,9 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.Page.Modules = await this .PageManager.ListModules(viewModel.Page);
 
 			viewModel.PageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, page.ParentId);
-			viewModel.Pages = (await this.PageManager.List(this.Context.Site)).Where((page) => page.Id != viewModel.Page.Id);
 
 			viewModel.AvailableModules = await GetAvailableModules();
-
-			viewModel.AvailablePageRoles = await GetAvailableRoles(viewModel.Page?.Permissions);
-			
+			viewModel.AvailablePageRoles = await GetAvailableRoles(viewModel.Page?.Permissions);			
 			viewModel.PagePermissionTypes = await this.PageManager.ListPagePermissionTypes();
 						
 			if (getPermissions)

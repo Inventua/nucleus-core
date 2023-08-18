@@ -155,10 +155,22 @@ public class DNNMigrationController : Controller
           .FirstOrDefault()
       );
     this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>().SignalStart();
-
+        
     Task task = Task.Run(async () =>
     {
-      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>().Migrate(viewModel.UpdateExisting);
+      this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>().Message = "Synchronizing file system ...";
+
+      try
+      {
+        await SyncFileSystem();
+        this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>().Message = "";
+      }
+      catch (Exception e)
+      {
+        this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>().Message = $"Sync File System Error: {e.Message}";
+      }
+            
+      await this.DNNMigrationManager.GetMigrationEngine<Models.DNN.Folder>().Migrate(viewModel.UpdateExisting);      
     });
 
     return View("_Progress", await BuildProgressViewModel());
@@ -436,7 +448,9 @@ public class DNNMigrationController : Controller
       }
       else
       {
-        folder.FolderName = System.IO.Path.GetDirectoryName(folder.FolderPath);
+        folder.FolderName = folder.FolderPath
+          .Split(new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+          .LastOrDefault() ?? "";
       }
 
       if (!folderHierachy.Any())
@@ -445,7 +459,7 @@ public class DNNMigrationController : Controller
       }
       else
       {
-        // walk back the stack to ancestor of the current folder
+        // walk back the stack to the ancestor of the current folder
         while (!folder.FolderPath.StartsWith(folderHierachy.Peek().FolderPath, StringComparison.OrdinalIgnoreCase))
         {
           folderHierachy.Pop();

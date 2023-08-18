@@ -31,6 +31,11 @@
   table-layout: fixed;
 }
 
+.dnn-migration .table-align-top
+{
+  vertical-align: top;
+}
+
 .dnn-migration ol
 {
   list-style-type: none;
@@ -75,6 +80,8 @@
 .dnn-migration .validation-results
 {
   margin: 0;
+  max-height: 8.5rem;
+  overflow: auto;
 }
 
 .dnn-migration .validation-results td

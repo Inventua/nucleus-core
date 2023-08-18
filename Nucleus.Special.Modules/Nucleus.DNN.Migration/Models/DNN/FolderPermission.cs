@@ -16,8 +16,14 @@ public class FolderPermission
 
   public Boolean AllowAccess{ get; set; }
 
-  public int RoleId { get; set; }
+  public int? RoleId { get; set; }
   public string RoleName { get; set; }
+  
+  [Column("UserID")]
+  public int? UserId { get; set; }
+
+  public string UserName { get; set; }
+
 
   public string PermissionCode { get; set; }
 

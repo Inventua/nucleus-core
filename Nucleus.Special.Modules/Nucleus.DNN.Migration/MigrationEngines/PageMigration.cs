@@ -288,19 +288,26 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
 
   async Task<Nucleus.Abstractions.Models.Role> GetRole(Site site, PagePermission dnnPermission)
   {
-    if (dnnPermission.RoleName == "All Users" && dnnPermission.RoleId == -1)
+    if (dnnPermission.RoleId.HasValue)
     {
-      // "all users" is represented in DNN by a RoleId of -1
-      return site.AllUsersRole;
-    }
-    else if (dnnPermission.RoleName == "Unauthenticated Users" && dnnPermission.RoleId == -3)
-    {
-      // "anonymous users" is represented in DNN by a RoleId of -3
-      return site.AnonymousUsersRole;
+      if (dnnPermission.RoleName == "All Users" && dnnPermission.RoleId == -1)
+      {
+        // "all users" is represented in DNN by a RoleId of -1
+        return site.AllUsersRole;
+      }
+      else if (dnnPermission.RoleName == "Unauthenticated Users" && dnnPermission.RoleId == -3)
+      {
+        // "anonymous users" is represented in DNN by a RoleId of -3
+        return site.AnonymousUsersRole;
+      }
+      else
+      {
+        return await this.RoleManager.GetByName(this.Context.Site, dnnPermission.RoleName);
+      }
     }
     else
     {
-      return await this.RoleManager.GetByName(this.Context.Site, dnnPermission.RoleName);
+      return null;
     }
   }
 
@@ -309,39 +316,46 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     foreach (PagePermission dnnPermission in dnnPage.Permissions
             .Where(dnnPermission => dnnPermission.AllowAccess))
     {
-      Nucleus.Abstractions.Models.Permission newPermission = new()
+      if (!dnnPermission.RoleId.HasValue)
       {
-        AllowAccess = true,
-        PermissionType = GetPagePermissionType(pagePermissionTypes, dnnPermission.PermissionKey),
-        Role = await GetRole(this.Context.Site, dnnPermission)
-      };
-
-      if (newPermission.Role == null)
-      {
-        dnnPage.AddWarning($"Page permission '{dnnPermission.PermissionName}' for role '{dnnPermission.RoleName}' was not added because the role does not exist in Nucleus");
-      }
-      else if (newPermission.PermissionType == null)
-      {
-        dnnPage.AddWarning($"Page permission '{dnnPermission.PermissionName}' for role '{dnnPermission.RoleName}' was not added because the DNN permission key '{dnnPermission.PermissionKey}' was not expected");
-      }
-      else if (newPermission.Role.Equals(this.Context.Site.AdministratorsRole))
-      {
-        // this doesn't need a warning
-        //dnnPage.AddWarning($"Page permission '{dnnPermission.PermissionName}' for role '{dnnPermission.RoleName}' was not added because Nucleus does not require role database entries for admin users");
+        dnnPage.AddWarning($"A per-user page permission '{dnnPermission.PermissionName}' for user '{dnnPermission.UserName}' was not added because Nucleus does not support per-user page permissions.");
       }
       else
       {
-        Permission existing = newPage.Permissions
-          .Where(perm => perm.PermissionType.Scope == newPermission.PermissionType.Scope && perm.Role.Id == newPermission.Role.Id)
-          .FirstOrDefault();
-
-        if (existing == null)
+        Nucleus.Abstractions.Models.Permission newPermission = new()
         {
-          newPage.Permissions.Add(newPermission);
+          AllowAccess = true,
+          PermissionType = GetPagePermissionType(pagePermissionTypes, dnnPermission.PermissionKey),
+          Role = await GetRole(this.Context.Site, dnnPermission)
+        };
+
+        if (newPermission.Role == null)
+        {
+          dnnPage.AddWarning($"Page permission '{dnnPermission.PermissionName}' for role '{dnnPermission.RoleName}' was not added because the role does not exist in Nucleus");
+        }
+        else if (newPermission.PermissionType == null)
+        {
+          dnnPage.AddWarning($"Page permission '{dnnPermission.PermissionName}' for role '{dnnPermission.RoleName}' was not added because the DNN permission key '{dnnPermission.PermissionKey}' was not expected");
+        }
+        else if (newPermission.Role.Equals(this.Context.Site.AdministratorsRole))
+        {
+          // this doesn't need a warning
+          //dnnPage.AddWarning($"Page permission '{dnnPermission.PermissionName}' for role '{dnnPermission.RoleName}' was not added because Nucleus does not require role database entries for admin users");
         }
         else
         {
-          existing.AllowAccess = newPermission.AllowAccess;
+          Permission existing = newPage.Permissions
+            .Where(perm => perm.PermissionType.Scope == newPermission.PermissionType.Scope && perm.Role.Id == newPermission.Role.Id)
+            .FirstOrDefault();
+
+          if (existing == null)
+          {
+            newPage.Permissions.Add(newPermission);
+          }
+          else
+          {
+            existing.AllowAccess = newPermission.AllowAccess;
+          }
         }
       }
     }
@@ -371,39 +385,46 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     foreach (PageModulePermission dnnModulePermission in dnnModule.Permissions
       .Where(dnnPermission => dnnPermission.AllowAccess))
     {
-      Nucleus.Abstractions.Models.Permission newPermission = new()
+      if (!dnnModulePermission.RoleId.HasValue)
       {
-        AllowAccess = true,
-        PermissionType = GetPageModulePermissionType(modulePermissionTypes, dnnModulePermission.PermissionKey),
-        Role = await GetRole(this.Context.Site, dnnModulePermission)
-      };
-
-      if (newPermission.Role == null)
-      {
-        dnnPage.AddWarning($"Module permission '{dnnModulePermission.PermissionName}' for role '{dnnModulePermission.RoleName}' was not added because the role does not exist in Nucleus");
-      }
-      else if (newPermission.PermissionType == null)
-      {
-        dnnPage.AddWarning($"Module permission '{dnnModulePermission.PermissionName}' for role '{dnnModulePermission.RoleName}' was not added because the DNN permission key '{dnnModulePermission.PermissionKey}' was not expected");
-      }
-      else if (newPermission.Role.Equals(this.Context.Site.AdministratorsRole))
-      {
-        // this doesn't need a warning
-        //dnnPage.AddWarning($"Module permission '{dnnModulePermission.PermissionName}' for role '{dnnModulePermission.Role.RoleName}' was not added because Nucleus does not require role database entries for admin users");
+        dnnPage.AddWarning($"A per-user module permission '{dnnModulePermission.PermissionName}' for user '{dnnModulePermission.UserName}' was not added because Nucleus does not support per-user module permissions.");
       }
       else
       {
-        Permission existing = newModule.Permissions
-          .Where(perm => perm.PermissionType.Scope == newPermission.PermissionType.Scope && perm.Role.Id == newPermission.Role.Id)
-          .FirstOrDefault();
-
-        if (existing == null)
+        Nucleus.Abstractions.Models.Permission newPermission = new()
         {
-          newModule.Permissions.Add(newPermission);
+          AllowAccess = true,
+          PermissionType = GetPageModulePermissionType(modulePermissionTypes, dnnModulePermission.PermissionKey),
+          Role = await GetRole(this.Context.Site, dnnModulePermission)
+        };
+
+        if (newPermission.Role == null)
+        {
+          dnnPage.AddWarning($"Module permission '{dnnModulePermission.PermissionName}' for role '{dnnModulePermission.RoleName}' was not added because the role does not exist in Nucleus");
+        }
+        else if (newPermission.PermissionType == null)
+        {
+          dnnPage.AddWarning($"Module permission '{dnnModulePermission.PermissionName}' for role '{dnnModulePermission.RoleName}' was not added because the DNN permission key '{dnnModulePermission.PermissionKey}' was not expected");
+        }
+        else if (newPermission.Role.Equals(this.Context.Site.AdministratorsRole))
+        {
+          // this doesn't need a warning
+          //dnnPage.AddWarning($"Module permission '{dnnModulePermission.PermissionName}' for role '{dnnModulePermission.Role.RoleName}' was not added because Nucleus does not require role database entries for admin users");
         }
         else
         {
-          existing.AllowAccess = newPermission.AllowAccess;
+          Permission existing = newModule.Permissions
+            .Where(perm => perm.PermissionType.Scope == newPermission.PermissionType.Scope && perm.Role.Id == newPermission.Role.Id)
+            .FirstOrDefault();
+
+          if (existing == null)
+          {
+            newModule.Permissions.Add(newPermission);
+          }
+          else
+          {
+            existing.AllowAccess = newPermission.AllowAccess;
+          }
         }
       }
     }

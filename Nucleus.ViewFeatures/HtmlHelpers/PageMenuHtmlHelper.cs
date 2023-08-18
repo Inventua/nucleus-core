@@ -59,7 +59,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			HtmlContentBuilder outputBuilder = new();
 
 			TagBuilder linkBuilder = new("a");
-			string caption = !String.IsNullOrWhiteSpace(fromPage.Title) ? fromPage.Title : fromPage.Name;
+			string caption = fromPage.Name;
 
 			linkBuilder.Attributes.Add("data-id", fromPage.Id.ToString());
 			linkBuilder.Attributes.Add("data-linkurl", urlHelper.PageLink(fromPage));
@@ -115,7 +115,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 						itemBuilder.AddCssClass("selected");
 					}
 
-					string caption = !String.IsNullOrWhiteSpace(childItem.Page.Title) ? childItem.Page.Title : childItem.Page.Name;
+					string caption = childItem.Page.Name;
 
 					TagBuilder linkBuilder = new("a");
 					// We append a "/" so that if the path contains dots the net core static file provider doesn't interpret the path as a file

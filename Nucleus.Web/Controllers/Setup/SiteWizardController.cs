@@ -150,11 +150,11 @@ namespace Nucleus.Web.Controllers.Setup
 
 			if (viewModel.Site.DefaultSiteAlias.Alias.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
 			{
-				viewModel.Site.DefaultSiteAlias.Alias.Substring("http://".Length);
+        viewModel.Site.DefaultSiteAlias.Alias = viewModel.Site.DefaultSiteAlias.Alias.Substring("http://".Length);
 			}
 			else if (viewModel.Site.DefaultSiteAlias.Alias.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
 			{
-				viewModel.Site.DefaultSiteAlias.Alias.Substring("https://".Length);
+        viewModel.Site.DefaultSiteAlias.Alias = viewModel.Site.DefaultSiteAlias.Alias.Substring("https://".Length);
 			}
 
 			template.Site.Aliases = new() { viewModel.Site.DefaultSiteAlias };

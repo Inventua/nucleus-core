@@ -7,7 +7,7 @@
     The documents module lists specified documents in a table or tile layout with optional sorting, categories and control over 
     meta-data display.
   </description>
-  <compatibility minVersion="1.2.1.0" maxVersion="*" />
+  <compatibility minVersion="1.2.2.0" maxVersion="*" />
   <components>
     <component folderName="Documents" optional="false">
       <moduleDefinition id="28df7ff3-6407-459e-8608-c1ef4181807c">

@@ -82,6 +82,8 @@ public class ListMigration : MigrationEngineBase<Models.DNN.List>
         list.AddWarning($"List '{list.ListName}' was not selected for import.");
       }
     }
+
+    this.SignalCompleted();
   }
 
   public override Task Validate()
@@ -93,6 +95,13 @@ public class ListMigration : MigrationEngineBase<Models.DNN.List>
       {
         list.AddError($"'{list.ListName}' is a reserved/special list in DNN and will not be migrated.");
       }
+
+      string[] EXCLUDED_ROLES = { "Installer" };
+      if (EXCLUDED_ROLES.Contains(list.ListName, StringComparer.OrdinalIgnoreCase))
+      {
+        list.AddError($"'{list.ListName}' is typically a system list in DNN.  It has been un-selected by default, but you can choose to migrate it.");
+      }
+
 
       if (!list.ListItems.Any())
       {

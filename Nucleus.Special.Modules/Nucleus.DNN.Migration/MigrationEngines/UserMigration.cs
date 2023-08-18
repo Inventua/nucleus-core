@@ -116,6 +116,8 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
         dnnUser.AddWarning($"User '{dnnUser.UserName}' was not selected for import.");
       }
     }
+
+    this.SignalCompleted();
   }
 
   private string ReplaceIgnoredCharacters(string value)

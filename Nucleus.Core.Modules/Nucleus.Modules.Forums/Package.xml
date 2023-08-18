@@ -6,7 +6,7 @@
   <description>
     The forums module is a message board which allows your user community to participate in discussions, post questions and answers.
   </description>
-  <compatibility minVersion="1.2.1.0" maxVersion="*" />
+  <compatibility minVersion="1.2.2.0" maxVersion="*" />
   <components>
     <component folderName="Forums" optional="false">
       <moduleDefinition id="ea9b5d66-b791-414c-8c52-a20536cfa9f5">

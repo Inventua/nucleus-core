@@ -61,6 +61,7 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
         {
           int successCount = 0;
           int failCount = 0;
+          int skippedCount = 0;
 
           await ReadFolderProperties(dnnFolder);
 
@@ -94,9 +95,16 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
             // migrate folder permissions
             await SetFolderPermissions(this.Context.Site, dnnFolder, nucleusFolder, folderPermissionTypes);
             await this.FileSystemManager.SaveFolderPermissions(this.Context.Site, nucleusFolder);
+            this.Progress();
           }
 
-          if (doCopyFiles)
+          if (!doCopyFiles)
+          {
+            // files in folder not copied because the folder already exists & "update existing" is not selected
+            this.Progress(dnnFolder.Files.Count);
+            skippedCount += dnnFolder.Files.Count;
+          }
+          else
           {
             foreach (Models.DNN.File dnnFile in dnnFolder.Files)
             {
@@ -144,6 +152,12 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
                       }
                     }
                   }
+                  else
+                  {
+                    string url = $"{(this.UseSSL ? "https" : "http")}://{this.PortalAlias.HttpAlias}/portals/{this.PortalAlias.PortalId}/{dnnFile.Folder.FolderPath}{dnnFile.FileName}";
+                    this.Message = $"Skipping {url} because the file already exists.";
+                    skippedCount++;
+                  }
                 }
                 catch (HttpRequestException ex)
                 {
@@ -151,28 +165,38 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
                   failCount++;
                 }
 
+                this.Progress();
               }
               else
               {
-                dnnFolder.AddWarning($"Unsupported file type.  File '{dnnFile.FileName}' does not match any of the allowed file extensions.");
+                string url = $"{(this.UseSSL ? "https" : "http")}://{this.PortalAlias.HttpAlias}/portals/{this.PortalAlias.PortalId}/{dnnFile.Folder.FolderPath}{dnnFile.FileName}";
+                dnnFolder.AddWarning($"Skipped '{url}' because it does not match any of the allowed file extensions.");
                 failCount++;
-              }
+              }            
             }
           }
-          
-          dnnFolder.AddWarning($"{(successCount == 0 ? "No" : successCount)} file{(successCount == 1 ? "" : "s")} migrated, {(failCount==0 ? "no" : failCount)} file{(failCount == 1 ? "" : "s")} skipped or failed.");
+
+          if (successCount + skippedCount + failCount == 0)
+          {
+            dnnFolder.AddWarning("No files.");
+          }
+          else
+          { 
+            dnnFolder.AddWarning($"{(successCount == 0 ? "No" : successCount)} file{(successCount == 1 ? "" : "s")} migrated, {(skippedCount == 0 ? "no" : skippedCount)} file{(skippedCount == 1 ? "" : "s")} skipped, {(failCount == 0 ? "no" : failCount)} file{(failCount == 1 ? "" : "s")} failed.");
+          }
         }
         catch (Exception ex)
         {
           dnnFolder.AddError($"Error importing folder '{dnnFolder.FolderPath}': {ex.Message}");
         }
-        this.Progress();
       }
       else
       {
         dnnFolder.AddWarning($"Folder '{dnnFolder.FolderPath}' was not selected for import.");
       }
     }
+
+    this.SignalCompleted();
   }
 
 
@@ -204,52 +228,59 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
       return await this.RoleManager.GetByName(this.Context.Site, dnnPermission.RoleName);
     }
   }
+  
 
   async Task SetFolderPermissions(Site site, Models.DNN.Folder dnnFolder, Nucleus.Abstractions.Models.FileSystem.Folder newFolder, List<Nucleus.Abstractions.Models.PermissionType> folderPermissionTypes)
   {
     foreach (FolderPermission dnnPermission in dnnFolder.Permissions
             .Where(dnnPermission => dnnPermission.AllowAccess))
     {
-
-      Nucleus.Abstractions.Models.Permission newPermission = new()
+      if (!dnnPermission.RoleId.HasValue)
       {
-        AllowAccess = true,
-        PermissionType = GetFolderPermissionType(folderPermissionTypes, dnnPermission.PermissionKey),
-        Role = await GetRole(site, dnnPermission)
-      };
-
-      if (newPermission.Role == null)
-      {
-        dnnFolder.AddWarning($"Folder permission '{dnnPermission.PermissionName}' for role '{dnnPermission.RoleName}' was not added because the role does not exist in Nucleus");
-      }
-      else if (newPermission.PermissionType == null)
-      {
-        if (dnnPermission.PermissionKey != "BROWSE")
-        {
-          dnnFolder.AddWarning($"Folder permission '{dnnPermission.PermissionName}' for role '{dnnPermission.RoleName}' was not added because the DNN permission key '{dnnPermission.PermissionKey}' was not expected");
-        }
-      }
-      else if (newPermission.Role.Equals(this.Context.Site.AdministratorsRole))
-      {
-        // this doesn't need a warning
-        //dnnFolder.AddWarning($"Folder permission '{dnnPermission.PermissionName}' for role '{dnnPermission.Role.RoleName}' was not added because Nucleus does not require role database entries for admin users");
+        dnnFolder.AddWarning($"A per-user folder permission '{dnnPermission.PermissionName}' for user '{dnnPermission.UserName}' was not added because Nucleus does not support per-user folder permissions.");        
       }
       else
       {
-        Permission existing = newFolder.Permissions
-          .Where(perm => perm.PermissionType.Scope == newPermission.PermissionType.Scope && perm.Role.Id == newPermission.Role.Id)
-          .FirstOrDefault();
 
-        if (existing == null)
+        Nucleus.Abstractions.Models.Permission newPermission = new()
         {
-          newFolder.Permissions.Add(newPermission);
+          AllowAccess = true,
+          PermissionType = GetFolderPermissionType(folderPermissionTypes, dnnPermission.PermissionKey),
+          Role = await GetRole(site, dnnPermission)
+        };
+
+        if (newPermission.Role == null)
+        {
+          dnnFolder.AddWarning($"Folder permission '{dnnPermission.PermissionName}' for role '{dnnPermission.RoleName}' was not added because the role does not exist in Nucleus");
+        }
+        else if (newPermission.PermissionType == null)
+        {
+          if (dnnPermission.PermissionKey != "BROWSE")
+          {
+            dnnFolder.AddWarning($"Folder permission '{dnnPermission.PermissionName}' for role '{dnnPermission.RoleName}' was not added because the DNN permission key '{dnnPermission.PermissionKey}' was not expected");
+          }
+        }
+        else if (newPermission.Role.Equals(this.Context.Site.AdministratorsRole))
+        {
+          // this doesn't need a warning
+          //dnnFolder.AddWarning($"Folder permission '{dnnPermission.PermissionName}' for role '{dnnPermission.Role.RoleName}' was not added because Nucleus does not require role database entries for admin users");
         }
         else
         {
-          existing.AllowAccess = newPermission.AllowAccess;
+          Permission existing = newFolder.Permissions
+            .Where(perm => perm.PermissionType.Scope == newPermission.PermissionType.Scope && perm.Role.Id == newPermission.Role.Id)
+            .FirstOrDefault();
+
+          if (existing == null)
+          {
+            newFolder.Permissions.Add(newPermission);
+          }
+          else
+          {
+            existing.AllowAccess = newPermission.AllowAccess;
+          }
         }
       }
-
     }
   }
 
@@ -266,6 +297,21 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
         break;
     }
     return null;
+  }
+
+  public void CalculateProgressTotal()
+  {
+    int total = 0;
+
+    foreach (Models.DNN.Folder folder in this.Items)
+    {
+      if (folder.CanSelect && folder.IsSelected)
+      {
+        total += folder.Files.Count + 1;
+      }
+    }
+
+    this.TotalCount = total;
   }
 
   public override Task Validate()

@@ -132,6 +132,8 @@ public class ForumMigration : MigrationEngineBase<Models.DNN.Modules.Forum>
         //dnnForum.AddWarning($"Forum '{dnnForum.Name}' was not selected for import.");
       }
     }
+
+    this.SignalCompleted();
   }
 
   private async Task<List<object>> BuildAttachments(Models.ForumInfo newForum, FileSystemProviderInfo fileSystemProvider, List<ForumPostAttachment> dnnAttachments)

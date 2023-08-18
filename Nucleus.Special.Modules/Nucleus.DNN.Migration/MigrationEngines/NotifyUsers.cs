@@ -93,6 +93,8 @@ public class NotifyUsers : MigrationEngineBase<Models.NotifyUser>
         user.AddWarning($"User '{user.User.UserName}' was not selected for import.");
       }
     }
+
+    this.SignalCompleted();
   }
 
   public override Task Validate()

@@ -40,7 +40,7 @@
 
     <div class="my-2">
       <div class="overflow-auto">
-        <table class="table table-striped table-sm table-sticky-headers">
+        <table class="table table-striped table-sm table-sticky-headers table-align-top">
           <thead>
             <tr>
               <th>@Html.CheckBox("toggle-all", true, new { @class = "toggle-all", @id = "" } )</th>
@@ -63,11 +63,13 @@
                   @Html.Hidden($"Folders[{index}].CanSelect", folder.CanSelect, new { id = $"Folders_{index}__CanSelect" })
                   @Html.Hidden($"Folders[{index}].FolderId", folder.FolderId, new { id = $"Folders_{index}__FolderId" })
                 </td>
-                <td class="folder-level-@folder.Level">@folder.FolderName</td>
+                <td class="folder-level-@folder.Level" title="@folder.FolderPath">
+                  @folder.FolderName
+                </td>
                 <td>
                   <ul class="validation-results">
                     <li>
-                      @folder.FolderCount folders, @folder.Files.Count files
+                      @(folder.FolderCount == 0 ? "" : $"{folder.FolderCount} folders, ")@(folder.Files.Count == 0 ? (folder.FolderCount == 0 ? "No" : "no") : folder.Files.Count) files
                     </li>
                     @foreach (var result in folder.Results)
                     {

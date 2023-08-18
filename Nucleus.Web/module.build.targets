@@ -44,7 +44,7 @@
 			<Output TaskParameter="Result" ItemName="_XmlPackageAssemblies" />
 		</XmlPeek>
 		<ItemGroup>
-			<PackageAssemblies Include="@(_XmlPackageAssemblies->'bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).dll')" />
+			<PackageAssemblies Include="@(_XmlPackageAssemblies->'bin\$(Configuration)\$(TargetFramework)\%(Identity)')" />
 		</ItemGroup>
 	</Target>
 

@@ -591,7 +591,7 @@ ul.nucleus-control-panel-items button
 {
 	border: solid 1px #767676!important;
 	border-radius: 2px!important;
-	padding: 2px 3px!important;
+	padding: 0 3px!important;
 	flex-grow: 1!important;
 }
 
@@ -641,6 +641,11 @@ ul.nucleus-control-panel-items button
 }
 
 /* page-specific styles */
+.nucleus-adminpage .nucleus-page-editor .page-link-type
+{
+  width: 14rem;
+}
+
 .nucleus-adminpage .ScheduledTasks .interval .settings-control
 {
 	flex-grow: 2;

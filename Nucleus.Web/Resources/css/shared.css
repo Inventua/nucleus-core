@@ -567,6 +567,20 @@ table.table-sticky-headers thead th
 }
 
 /* common styles */
+.flex-1
+{
+  flex: 1;
+}
+
+.flex-2
+{
+  flex: 2;
+}
+
+.flex-3
+{
+  flex: 3;
+}
 
 .style-scrollable, .style-scrollable > div, .style-scrollable > div > section, .style-scrollable > div > section > form
 {

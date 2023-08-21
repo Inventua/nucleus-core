@@ -1,0 +1,35 @@
+{
+	"schemaName": "Nucleus.Core",
+	"version": "01.00.13",
+  "operations": [
+    {
+      "addColumn": {
+        "table": "Pages",
+        "name": "LinkType",
+        "clrType": "int",
+        "isnullable": true
+      }
+    },
+    {
+      "addColumn": {
+        "table": "Pages",
+        "name": "LinkUrl",
+        "clrType": "string",
+        "isnullable": true
+      }
+    },
+    {
+      "addColumn": {
+        "table": "Pages",
+        "name": "LinkPageId",
+        "clrType": "guid",
+        "isnullable": true
+      }
+    },
+    {
+      "sql": {
+        "sql": "UPDATE Pages SET LinkType = 0 WHERE LinkType IS NULL;"
+      }
+    }
+  ]
+}

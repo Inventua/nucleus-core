@@ -16,6 +16,27 @@ namespace Nucleus.Abstractions.Models
 		/// </summary>
 		public const string URN = "urn:nucleus:entities:page";
 		
+    /// <summary>
+    /// Link Types
+    /// </summary>
+    public enum LinkTypes
+    {
+      /// <summary>
+      /// Specifies normal behavior for the page.
+      /// </summary>
+      Normal = 0,
+
+      /// <summary>
+      /// Specifies that the page will navigate to the specified link Url.
+      /// </summary>
+      Url = 1,
+
+      /// <summary>
+      /// Specifies that the page will navigate to the specified page within the site.
+      /// </summary>
+      Page = 2
+    }
+
 		/// <summary>
 		/// Unique record identifier.
 		/// </summary>
@@ -135,10 +156,25 @@ namespace Nucleus.Abstractions.Models
 		/// </summary>
 		public List<Permission> Permissions { get; set; } = new();
 
-		/// <summary>
-		/// Specifies whether the page is the first in the sort order of its parents children
-		/// </summary>
-		[System.Xml.Serialization.XmlIgnore]
+    /// <summary>
+    /// Specifies the page link type.
+    /// </summary>
+    public LinkTypes LinkType { get; set; }
+
+    /// <summary>
+    ///  When Link Type: Url is set, specifies the Url that the page navigates to.
+    /// </summary>
+    public string LinkUrl { get; set; }
+
+    /// <summary>
+    ///  When Link Type: Page is set, specifies the Id of the page within the site that this page navigates to.
+    /// </summary>
+    public Guid? LinkPageId { get; set; }
+
+    /// <summary>
+    /// Specifies whether the page is the first in the sort order of its parents children
+    /// </summary>
+    [System.Xml.Serialization.XmlIgnore]
 		public Boolean IsFirst { get; set; } = false;
 
 		/// <summary>

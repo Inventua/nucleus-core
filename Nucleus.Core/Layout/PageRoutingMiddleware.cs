@@ -10,7 +10,6 @@ using Nucleus.Data.Common;
 using Nucleus.Core.DataProviders;
 using Nucleus.Abstractions.Managers;
 using System.IO.Enumeration;
-using DocumentFormat.OpenXml.Office.PowerPoint.Y2021.M06.Main;
 using Nucleus.Extensions;
 
 namespace Nucleus.Core.Layout
@@ -77,7 +76,13 @@ namespace Nucleus.Core.Layout
 						Logger.LogTrace("Page id '{pageid}' found.", pageId);
 						this.Context.Site = await this.SiteManager.Get(this.Context.Page);
 					}
-				}
+
+          // When HandleLinkType returns false, it means we should not continue because we are redirecting to another site
+          if (!await HandleLinkType(context))
+          {
+            return;
+          }
+        }
 				else
 				{
 					Logger.LogTrace("Page id '{pageid}' not found.", pageId);
@@ -147,11 +152,17 @@ namespace Nucleus.Core.Layout
 							Logger.LogTrace("Page id '{pageid}' is disabled.", pageId);
 							this.Context.Page = null;
 						}
-						else
+            else
 						{
 							Logger.LogTrace("Page found: '{pageid}'.", this.Context.Page.Id);
 						}
-					}
+
+            // When HandleLinkType returns false, it means we should not continue because we are redirecting to another site
+            if (!await HandleLinkType(context))
+            {
+              return;
+            }
+          }
 					else
 					{
 						Logger.LogTrace("Path '{path}' is not a page.", requestedPath);
@@ -175,6 +186,42 @@ namespace Nucleus.Core.Layout
 				}
 			}
 		}
+
+    private async Task<Boolean> HandleLinkType(HttpContext context)
+    {
+      switch (this.Context.Page.LinkType)
+      {
+        case Page.LinkTypes.Normal:
+          return true;
+
+        case Page.LinkTypes.Url:
+          if (!String.IsNullOrEmpty(this.Context.Page.LinkUrl))
+          {
+            Logger.LogTrace("Page: '{pageid}' has link type: url.  Redirecting to '{linkUrl}'", this.Context.Page.Id, this.Context.Page.LinkUrl);
+            context.Response.Redirect(this.Context.Page.LinkUrl);
+            return false;
+          }
+          else
+          {
+            Logger.LogTrace("Page: '{pageid}' has link type: Url, but the does not have a LinkPageUrl set.  Treating as a normal page.", this.Context.Page.Id);
+            break;
+          }
+
+        case Page.LinkTypes.Page:
+          if (this.Context.Page.LinkPageId.HasValue)
+          {
+            this.Context.Page = await this.PageManager.Get(this.Context.Page.LinkPageId.Value);
+            Logger.LogTrace("Page: '{pageid}' has link type: Page.  Using page id '{linkPageId}'", this.Context.Page.Id, this.Context.Page.LinkPageId);
+          }
+          else
+          {
+            Logger.LogTrace("Page: '{pageid}' has link type: Page, but the does not have a LinkPageId set.  Treating as a normal page.", this.Context.Page.Id);
+          }
+          break;
+      }
+
+      return true;
+    }
 
 		/// <summary>
 		/// Find a page for the requested path, populating and reading from the Page Route cache.

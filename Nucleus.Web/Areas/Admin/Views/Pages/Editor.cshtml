@@ -3,6 +3,7 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
+<div class="nucleus-page-editor d-flex flex-column h-100">
 @if (Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default)
 {
 	<h1 class="nucleus-control-panel-heading">Page Settings</h1>
@@ -55,23 +56,36 @@
 
 				<SettingsControl name="@nameof(Model.Page.ParentId)" caption="Parent Page" helptext="The parent page for this page, used when rendering a menu.">
 					@Html.PageListFor(model => model.Page.ParentId, Model.PageMenu, Model.Page.Id)
-
-					@*@Html.DropDownListFor(model => model.Page.ParentId, new SelectList(Model.Pages, "Id", "Name"), "(none)")*@
 				</SettingsControl>
 
 				<SettingsControl caption="Description" helptext="Description of the page.  Some search engines use the page description to generate result snippets.">
 					@Html.TextAreaFor(model => model.Page.Description, new { @maxlength = 512 })
 				</SettingsControl>
 
-				<div class="nucleus-flex-fields">
-					<SettingsControl caption="Page Disabled?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the page is available.  Disabled pages are not displayed in menus, and navigating to a disabled page will generate a '404: Not found' response.">
-						@Html.CheckBoxFor(model => model.Page.Disabled, new { @class = "ToggleSwitch" })
-					</SettingsControl>
+        <div class="nucleus-flex-fields">
+          <SettingsControl caption="Link Type" class="flex-3" helptext="Select a link type.  Link type 'Normal' is standard link behavior, link type 'Url' will navigate to the specified Url, and link type 'Page' will navigate to the specified page in your site.">
+            @Html.DropDownListFor(model => model.Page.LinkType, Html.GetEnumSelectList<Page.LinkTypes>(), new { @class = "page-link-type" })
+          </SettingsControl>
 
-					<SettingsControl caption="Include in Search?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the page is included in the search index, if search is enabled for your site.">
-						@Html.CheckBoxFor(model => model.Page.IncludeInSearch, new { @class = "ToggleSwitch" })
-					</SettingsControl>
-				</div>
+          <div class="d-flex align-items-end flex-1 mt-auto">
+					  <SettingsControl caption="Page Disabled?" rendermode="LabelLast" class="inner-inline mt-auto" helptext="Specifies whether the page is available.  Disabled pages are not displayed in menus, and navigating to a disabled page will generate a '404: Not found' response.">
+						  @Html.CheckBoxFor(model => model.Page.Disabled, new { @class = "ToggleSwitch" })
+					  </SettingsControl>
+
+            <SettingsControl caption="Include in Search?" rendermode="LabelLast" class="inner-inline mt-auto" helptext="Specifies whether the page is included in the search index, if search is enabled for your site.">
+						  @Html.CheckBoxFor(model => model.Page.IncludeInSearch, new { @class = "ToggleSwitch" })
+					  </SettingsControl>
+          </div>
+        </div>
+
+        <SettingsControl caption="Link Url" class="page-link-url collapse@(Model.Page.LinkType == Page.LinkTypes.Url ? " show" : "")" helptext="Enter the Url that you want to navigate to when this page is selected.">
+          @Html.TextBoxFor(model => model.Page.LinkUrl, new { @maxlength = 512 })
+        </SettingsControl>
+
+          <SettingsControl name="@nameof(Model.Page.LinkPageId)" caption="Link Page" class="page-link-page collapse@(Model.Page.LinkType == Page.LinkTypes.Page ? " show" : "")" helptext="Select the page to link to.">
+          @Html.PageListFor(model => model.Page.LinkPageId, Model.PageMenu, Model.Page.Id)
+        </SettingsControl>
+        
 			</fieldset>
 
 			<fieldset role="group" aria-labelledby="heading">
@@ -82,6 +96,7 @@
 				</SettingsControl>
 			</fieldset>
 
+      
 			<fieldset role="group" aria-labelledby="heading">
 				<h2>Layout</h2>
 
@@ -166,6 +181,7 @@
 		}
 	</div>
 }
+</div>
 
 <script>
 	jQuery('#nucleus-control-panel-heading').html('Pages - ' + jQuery('.PageName').val());
@@ -185,6 +201,28 @@
 		jQuery('#nucleus-control-panel-heading').html('Pages - ' + jQuery(this).val());
 	})
 	
+  jQuery('.page-link-type').on('change', function()
+  {
+    var linkUrlControl = jQuery('.page-link-url');
+    var linkPageControl = jQuery('.page-link-page');
+    
+    switch (jQuery('.page-link-type').val())
+    {
+      case '0':
+        linkUrlControl.removeClass('show');
+        linkPageControl.removeClass('show');
+        break;
+      case '1':
+        linkUrlControl.addClass('show');
+        linkPageControl.removeClass('show');
+        break;
+      case '2':
+        linkUrlControl.removeClass('show');
+        linkPageControl.addClass('show');
+        break;
+    }
+  });
+
 	// functionality for the "open" button
 	jQuery('.nucleus-open-page').on('click', function()
 	{

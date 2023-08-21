@@ -30,10 +30,9 @@ namespace Nucleus.ViewFeatures
 		{
       if (page == null) throw new ArgumentNullException(nameof(page));
 
+      if (page.DefaultPageRoute()?.Path == null || page.Disabled) return "";
+
       string path;
-
-      if (page == null || page.Disabled) return "";
-
       switch (page.LinkType)
       {
         case Page.LinkTypes.Url:

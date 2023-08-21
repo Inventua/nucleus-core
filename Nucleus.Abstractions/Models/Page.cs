@@ -34,7 +34,12 @@ namespace Nucleus.Abstractions.Models
       /// <summary>
       /// Specifies that the page will navigate to the specified page within the site.
       /// </summary>
-      Page = 2
+      Page = 2,
+
+      /// <summary>
+      /// Specifies that the page will open the specified file from the site.
+      /// </summary>
+      File = 3
     }
 
 		/// <summary>
@@ -159,7 +164,7 @@ namespace Nucleus.Abstractions.Models
     /// <summary>
     /// Specifies the page link type.
     /// </summary>
-    public LinkTypes LinkType { get; set; }
+    public LinkTypes LinkType { get; set; } = LinkTypes.Normal;
 
     /// <summary>
     ///  When Link Type: Url is set, specifies the Url that the page navigates to.
@@ -170,6 +175,11 @@ namespace Nucleus.Abstractions.Models
     ///  When Link Type: Page is set, specifies the Id of the page within the site that this page navigates to.
     /// </summary>
     public Guid? LinkPageId { get; set; }
+
+    /// <summary>
+    ///  When Link Type: File is set, specifies the Id of the file that this page opens.
+    /// </summary>
+    public Guid? LinkFileId { get; set; }
 
     /// <summary>
     /// Specifies whether the page is the first in the sort order of its parents children

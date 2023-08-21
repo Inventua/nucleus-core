@@ -27,7 +27,10 @@ namespace Nucleus.Core.Layout
 		private Application Application { get; }
 		private IPageManager PageManager { get; }
 		private ISiteManager SiteManager { get; }
-		private ILogger<PageRoutingMiddleware> Logger { get; }
+
+    private IFileSystemManager FileSystemManager { get; }
+
+    private ILogger<PageRoutingMiddleware> Logger { get; }
 
 		private ICacheManager CacheManager { get; }
 
@@ -39,13 +42,14 @@ namespace Nucleus.Core.Layout
 			Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH,
 		};
 
-		public PageRoutingMiddleware(ILogger<PageRoutingMiddleware> logger, Context context, Application application, IPageManager pageManager, ISiteManager siteManager, ICacheManager cacheManager)
+		public PageRoutingMiddleware(ILogger<PageRoutingMiddleware> logger, Context context, Application application, IPageManager pageManager, ISiteManager siteManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager)
 		{
 			this.Logger = logger;
 			this.Context = context;
 			this.Application = application;
 			this.PageManager = pageManager;
 			this.SiteManager = siteManager;
+      this.FileSystemManager = fileSystemManager;
 			this.CacheManager = cacheManager;
 		}
 
@@ -216,6 +220,20 @@ namespace Nucleus.Core.Layout
           else
           {
             Logger.LogTrace("Page: '{pageid}' has link type: Page, but the does not have a LinkPageId set.  Treating as a normal page.", this.Context.Page.Id);
+          }
+          break;
+
+        case Page.LinkTypes.File:
+          if (this.Context.Page.LinkFileId.HasValue)
+          {
+            Nucleus.Abstractions.Models.FileSystem.File file = await this.FileSystemManager.GetFile(this.Context.Site, this.Context.Page.LinkFileId.Value);
+            context.Response.Redirect($"{(String.IsNullOrEmpty(context.Request.PathBase) ? "" : context.Request.PathBase + "/")}/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH}/{file.EncodeFileId()}");
+            Logger.LogTrace("Page: '{pageid}' has link type: File.  Using file id '{linkFileId}'", this.Context.Page.Id, this.Context.Page.LinkFileId);
+            return false;
+          }
+          else
+          {
+            Logger.LogTrace("Page: '{pageid}' has link type: File, but the does not have a LinkFileId set.  Treating as a normal page.", this.Context.Page.Id);
           }
           break;
       }

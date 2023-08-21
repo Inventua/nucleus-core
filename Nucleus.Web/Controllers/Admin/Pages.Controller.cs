@@ -29,12 +29,14 @@ namespace Nucleus.Web.Controllers.Admin
 		private IPageManager PageManager { get; }
 		private IPageModuleManager PageModuleManager { get; }
 		private IRoleManager RoleManager { get; }
+    private IFileSystemManager FileSystemManager { get; set; }
 
 		public PagesController(
 			Context context,
 			ILogger<PagesController> logger,
 			IPageManager pageManager,
 			IPageModuleManager pageModuleManager,
+      IFileSystemManager fileSystemManager,
 			IRoleManager roleManager,
 			ILayoutManager layoutManager,
 			IContainerManager containerManager)
@@ -46,6 +48,7 @@ namespace Nucleus.Web.Controllers.Admin
 			this.RoleManager = roleManager;
 			this.LayoutManager = layoutManager;
 			this.ContainerManager = containerManager;
+      this.FileSystemManager = fileSystemManager;
 		}
 
 		/// <summary>
@@ -101,7 +104,40 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Editor", viewModel);
 		}
 
+    /// <summary>
+		/// Display the page editor
+		/// </summary>
+		/// <returns></returns>
 		[HttpPost]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
+    public async Task<ActionResult> Select(ViewModels.Admin.PageEditor viewModel)
+    {
+      Nucleus.Abstractions.Models.FileSystem.File selectedLinkFile = null;
+      
+      if (viewModel.SelectedLinkFile != null)
+      {
+        selectedLinkFile = await this.FileSystemManager.RefreshProperties(this.Context.Site, viewModel.SelectedLinkFile);
+      }
+
+      viewModel = await BuildPageEditorViewModel(viewModel.Page, viewModel.PagePermissions, true);
+        
+      if (selectedLinkFile != null)
+      {
+        viewModel.SelectedLinkFile = selectedLinkFile;
+      }
+
+      return View("Editor", viewModel);
+    }
+
+    [HttpPost]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
+    public async Task<ActionResult> SelectAnotherLinkFile(ViewModels.Admin.PageEditor viewModel)
+    {
+      viewModel.SelectedLinkFile.ClearSelection();
+      return View("Editor", await BuildPageEditorViewModel(viewModel.Page, viewModel.PagePermissions, true));
+    }
+
+    [HttpPost]
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> DeletePage(ViewModels.Admin.PageEditor viewModel)
 		{
@@ -179,8 +215,9 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 
 			viewModel.Page.Permissions = await RebuildPermissions(viewModel.PagePermissions);
+      viewModel.Page.LinkFileId = viewModel.SelectedLinkFile?.Id;
 
-			await this.PageManager.Save(this.Context.Site, viewModel.Page);
+      await this.PageManager.Save(this.Context.Site, viewModel.Page);
 
 			if (viewModel.PageEditorMode != ViewModels.Admin.PageEditor.PageEditorModes.Default)
 			{
@@ -645,8 +682,13 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.AvailableModules = await GetAvailableModules();
 			viewModel.AvailablePageRoles = await GetAvailableRoles(viewModel.Page?.Permissions);			
 			viewModel.PagePermissionTypes = await this.PageManager.ListPagePermissionTypes();
-						
-			if (getPermissions)
+
+      if (viewModel.Page.LinkFileId.HasValue)
+      {
+        viewModel.SelectedLinkFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.Page.LinkFileId.Value);
+      }
+      
+      if (getPermissions)
 			{
 				// read permissions from the database to initialize the viewModel
 				page.Permissions = await this.PageManager.ListPermissions(page);

@@ -42,10 +42,12 @@
     <None Remove="DataProviders\Migrations\Scripts\01.00.11.json" />
     <None Remove="DataProviders\Migrations\Scripts\01.00.12.json" />
     <None Remove="DataProviders\Migrations\Scripts\01.00.13.json" />
+    <None Remove="DataProviders\Migrations\Scripts\01.00.14.json" />
     <None Remove="Mail\mail.css" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.14.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.13.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.12.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.11.json" />

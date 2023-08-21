@@ -30,7 +30,7 @@ namespace Nucleus.Core.Authorization
 				{
 					if (context.HttpContext.Response.StatusCode == (int)System.Net.HttpStatusCode.Unauthorized || context.HttpContext.Response.StatusCode == (int)System.Net.HttpStatusCode.Forbidden)
 					{
-						if (!context.HttpContext.Request.Path.StartsWithSegments("/files"))
+						if (!context.HttpContext.Request.Path.StartsWithSegments($"/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH}"))
 						{
 							IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
 

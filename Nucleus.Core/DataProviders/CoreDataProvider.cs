@@ -363,7 +363,9 @@ namespace Nucleus.Core.DataProviders
 
     public async Task<List<Page>> ListSitePages(Guid siteId)
     {
-      List<Page> results = await this.Context.Pages.Where(page => page.SiteId == siteId)        
+      List<Page> results = await this.Context.Pages.Where(page => page.SiteId == siteId)
+        .Include(page => page.Routes)
+        .AsSingleQuery()
         .AsNoTracking()
         .ToListAsync();
 

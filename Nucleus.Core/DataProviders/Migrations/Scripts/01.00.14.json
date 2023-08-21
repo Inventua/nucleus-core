@@ -1,0 +1,14 @@
+{
+	"schemaName": "Nucleus.Core",
+	"version": "01.00.14",
+  "operations": [
+    {
+      "addColumn": {
+        "table": "Pages",
+        "name": "LinkFileId",
+        "clrType": "guid",
+        "isnullable": true
+      }
+    }
+  ]
+}

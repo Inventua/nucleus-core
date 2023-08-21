@@ -4,238 +4,252 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 <div class="nucleus-page-editor d-flex flex-column h-100">
-@if (Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default)
-{
-	<h1 class="nucleus-control-panel-heading">Page Settings</h1>
-}
-@using (Html.BeginAreaForm("Save", "Pages", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @autocomplete = "off" }))
-{
-	<div class="position-absolute m-1 top-0 end-0">
-		@if (Model.Page.Id != Guid.Empty)
-		{
-			<button class="btn btn-success nucleus-open-page" accesskey="O">Open Page</button>
-		}
-		@if (Model.PageEditorMode == Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default && Model.Page.Id != Guid.Empty && !Model.Page.IsFirst)
-		{
-			@Html.SubmitButton("&#xe5d8;", "Move Up", Url.AreaAction("MovePageUp", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @accesskey = "U", @data_target = ".nucleus-adminpage" })
-		}
+  @if (Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default)
+  {
+    <h1 class="nucleus-control-panel-heading">Page Settings</h1>
+  }
+  @using (Html.BeginAreaForm("Select", "Pages", "Admin", FormMethod.Post, new { @data_target = Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default ? ".nucleus-adminpage" : "#nucleus-page-editor", @autocomplete = "off" }))
+  {
+    <div class="position-absolute m-1 top-0 end-0">
+      @if (Model.Page.Id != Guid.Empty)
+      {
+        <button class="btn btn-success nucleus-open-page" accesskey="O">Open Page</button>
+      }
+      @if (Model.PageEditorMode == Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default && Model.Page.Id != Guid.Empty && !Model.Page.IsFirst)
+      {
+        @Html.SubmitButton("&#xe5d8;", "Move Up", Url.AreaAction("MovePageUp", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @accesskey = "U", @data_target = ".nucleus-adminpage" })
+      }
 
-		@if (Model.PageEditorMode == Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default && Model.Page.Id != Guid.Empty && !Model.Page.IsLast)
-		{
-			@Html.SubmitButton("&#xe5db;", "Move Down", Url.AreaAction("MovePageDown", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @accesskey = "D", @data_target = ".nucleus-adminpage" })
-		}
-	</div>
+      @if (Model.PageEditorMode == Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default && Model.Page.Id != Guid.Empty && !Model.Page.IsLast)
+      {
+        @Html.SubmitButton("&#xe5db;", "Move Down", Url.AreaAction("MovePageDown", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @accesskey = "D", @data_target = ".nucleus-adminpage" })
+      }
+    </div>
 
-	<Tab>
-		<TabItem active="true" target="#page-properties" caption="Properties"></TabItem>
-		<TabItem target="#page-permissions" caption="Permissions"></TabItem>
-		@if (Model.Page.Id != Guid.Empty)
-		{
-			<TabItem target="#page-modules" caption="Modules"></TabItem>
-		}
-	</Tab>
+    <Tab>
+      <TabItem active="true" target="#page-properties" caption="Properties"></TabItem>
+      <TabItem target="#page-permissions" caption="Permissions"></TabItem>
+      @if (Model.Page.Id != Guid.Empty)
+      {
+        <TabItem target="#page-modules" caption="Modules"></TabItem>
+      }
+    </Tab>
 
-	<TabContent>
-		<TabPanel id="page-properties" active="true">
-			<fieldset role="group" aria-label="Basic Properties">
-								
-				@*<h2>Basic Properties</h2>*@
-				@Html.HiddenFor((model) => model.PageEditorMode)
-				@Html.HiddenFor(model => model.Page.Id)
-				@Html.HiddenFor((model) => model.Page.SortOrder)
+    <TabContent>
+      <TabPanel id="page-properties" active="true">
+        <fieldset role="group" aria-label="Basic Properties">
 
-				<div class="nucleus-flex-fields">
-					<SettingsControl caption="Page Name" helptext="Name of the page.  The page name is displayed in menus.">
-						@Html.TextBoxFor(model => model.Page.Name, new { @class = "PageName", @maxlength = 256 })
-					</SettingsControl>
+          @*<h2>Basic Properties</h2>*@
+          @Html.HiddenFor((model) => model.PageEditorMode)
+          @Html.HiddenFor(model => model.Page.Id)
+          @Html.HiddenFor((model) => model.Page.SortOrder)
 
-					<SettingsControl caption="Page Title" helptext="Title of the page.  The page title is displayed in some browser page/tab captions, is displayed as the heading for search results, and is important for search engine optimisation.">
-						@Html.TextBoxFor(model => model.Page.Title, new { @maxlength = 256 })
-					</SettingsControl>
-				</div>
+          <div class="nucleus-flex-fields">
+            <SettingsControl caption="Page Name" helptext="Name of the page.  The page name is displayed in menus.">
+              @Html.TextBoxFor(model => model.Page.Name, new { @class = "PageName", @maxlength = 256 })
+            </SettingsControl>
 
-				<SettingsControl name="@nameof(Model.Page.ParentId)" caption="Parent Page" helptext="The parent page for this page, used when rendering a menu.">
-					@Html.PageListFor(model => model.Page.ParentId, Model.PageMenu, Model.Page.Id)
-				</SettingsControl>
+            <SettingsControl caption="Page Title" helptext="Title of the page.  The page title is displayed in some browser page/tab captions, is displayed as the heading for search results, and is important for search engine optimisation.">
+              @Html.TextBoxFor(model => model.Page.Title, new { @maxlength = 256 })
+            </SettingsControl>
+          </div>
 
-				<SettingsControl caption="Description" helptext="Description of the page.  Some search engines use the page description to generate result snippets.">
-					@Html.TextAreaFor(model => model.Page.Description, new { @maxlength = 512 })
-				</SettingsControl>
-
-        <div class="nucleus-flex-fields">
-          <SettingsControl caption="Link Type" class="flex-3" helptext="Select a link type.  Link type 'Normal' is standard link behavior, link type 'Url' will navigate to the specified Url, and link type 'Page' will navigate to the specified page in your site.">
-            @Html.DropDownListFor(model => model.Page.LinkType, Html.GetEnumSelectList<Page.LinkTypes>(), new { @class = "page-link-type" })
+          <SettingsControl name="@nameof(Model.Page.ParentId)" caption="Parent Page" helptext="The parent page for this page, used when rendering a menu.">
+            @Html.PageListFor(model => model.Page.ParentId, Model.PageMenu, Model.Page.Id)
           </SettingsControl>
 
-          <div class="d-flex align-items-end flex-1 mt-auto">
-					  <SettingsControl caption="Page Disabled?" rendermode="LabelLast" class="inner-inline mt-auto" helptext="Specifies whether the page is available.  Disabled pages are not displayed in menus, and navigating to a disabled page will generate a '404: Not found' response.">
-						  @Html.CheckBoxFor(model => model.Page.Disabled, new { @class = "ToggleSwitch" })
-					  </SettingsControl>
+          <SettingsControl caption="Description" helptext="Description of the page.  Some search engines use the page description to generate result snippets.">
+            @Html.TextAreaFor(model => model.Page.Description, new { @maxlength = 512 })
+          </SettingsControl>
 
-            <SettingsControl caption="Include in Search?" rendermode="LabelLast" class="inner-inline mt-auto" helptext="Specifies whether the page is included in the search index, if search is enabled for your site.">
-						  @Html.CheckBoxFor(model => model.Page.IncludeInSearch, new { @class = "ToggleSwitch" })
-					  </SettingsControl>
+          <div class="nucleus-flex-fields">
+            <SettingsControl caption="Link Type" class="flex-3" helptext="Select a link type.  Link type 'Normal' is standard link behavior, link type 'Url' will navigate to the specified Url, and link type 'Page' will navigate to the specified page in your site.">
+              @Html.DropDownListFor(model => model.Page.LinkType, Html.GetEnumSelectList<Page.LinkTypes>(), new { @class = "page-link-type" })
+            </SettingsControl>
+
+            <div class="d-flex align-items-end flex-1 mt-auto">
+              <SettingsControl caption="Page Disabled?" rendermode="LabelLast" class="inner-inline mt-auto" helptext="Specifies whether the page is available.  Disabled pages are not displayed in menus, and navigating to a disabled page will generate a '404: Not found' response.">
+                @Html.CheckBoxFor(model => model.Page.Disabled, new { @class = "ToggleSwitch" })
+              </SettingsControl>
+
+              <SettingsControl caption="Include in Search?" rendermode="LabelLast" class="inner-inline mt-auto" helptext="Specifies whether the page is included in the search index, if search is enabled for your site.">
+                @Html.CheckBoxFor(model => model.Page.IncludeInSearch, new { @class = "ToggleSwitch" })
+              </SettingsControl>
+            </div>
           </div>
-        </div>
 
-        <SettingsControl caption="Link Url" class="page-link-url collapse@(Model.Page.LinkType == Page.LinkTypes.Url ? " show" : "")" helptext="Enter the Url that you want to navigate to when this page is selected.">
-          @Html.TextBoxFor(model => model.Page.LinkUrl, new { @maxlength = 512 })
-        </SettingsControl>
+          <SettingsControl caption="Link Url" class="page-link-url collapse@(Model.Page.LinkType == Page.LinkTypes.Url ? " show" : "")" helptext="Enter the Url that you want to navigate to when this page is selected.">
+            @Html.TextBoxFor(model => model.Page.LinkUrl, new { @maxlength = 512 })
+          </SettingsControl>
 
-          <SettingsControl name="@nameof(Model.Page.LinkPageId)" caption="Link Page" class="page-link-page collapse@(Model.Page.LinkType == Page.LinkTypes.Page ? " show" : "")" helptext="Select the page to link to.">
-          @Html.PageListFor(model => model.Page.LinkPageId, Model.PageMenu, Model.Page.Id)
-        </SettingsControl>
-        
-			</fieldset>
+          <SettingsControl caption="Link Page" class="page-link-page collapse@(Model.Page.LinkType == Page.LinkTypes.Page ? " show" : "")" helptext="Select the page to link to.">
+            @Html.PageListFor(model => model.Page.LinkPageId, Model.PageMenu, Model.Page.Id)
+          </SettingsControl>
 
-			<fieldset role="group" aria-labelledby="heading">
-				<h2>Meta Data/SEO</h2>
+          <SettingsControl caption="Link File" class="page-link-file collapse@(Model.Page.LinkType == Page.LinkTypes.File? " show" : "")" helptext="Select the file to display.">
+            <div class="nucleus-flex-fields nucleus-fileselector">
+              @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileSelector), new { file = Model.SelectedLinkFile, PropertyName = "SelectedLinkFile", SelectAnotherActionName = "SelectAnotherLinkFile" })
+            </div>
+          </SettingsControl>
+        </fieldset>
 
-				<SettingsControl caption="Keywords" helptext="Enter page keywords separated by commas.  Keywords may be used by a built-in search indexing service.  They are not used by search engines like Google, and are not rendered within the page meta-data.">
-					@Html.TextBoxFor(model => model.Page.Keywords, new { @maxlength = 512 })
-				</SettingsControl>
-			</fieldset>
+        <fieldset role="group" aria-labelledby="heading">
+          <h2>Meta Data/SEO</h2>
 
-      
-			<fieldset role="group" aria-labelledby="heading">
-				<h2>Layout</h2>
+          <SettingsControl caption="Keywords" helptext="Enter page keywords separated by commas.  Keywords may be used by a built-in search indexing service.  They are not used by search engines like Google, and are not rendered within the page meta-data.">
+            @Html.TextBoxFor(model => model.Page.Keywords, new { @maxlength = 512 })
+          </SettingsControl>
+        </fieldset>
 
-				<div class="nucleus-flex-fields">
-					<SettingsControl caption="Page Layout" helptext="Select a page layout for this page, or select '(default)' to use the default layout for this site.">
-						@Html.DropDownListFor(model => model.Page.LayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
-					</SettingsControl>
 
-					<SettingsControl caption="Default Container" helptext="Select a default container for modules on this page, or select '(default)' to use the default layout for this site.">
-						@Html.DropDownListFor((model) => model.Page.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
-					</SettingsControl>
-				</div>
+        <fieldset role="group" aria-labelledby="heading">
+          <h2>Layout</h2>
 
-				<div class="nucleus-flex-fields">
-					<SettingsControl caption="Show in Menu?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the page is displayed in menus.">
-						@Html.CheckBoxFor(model => model.Page.ShowInMenu, new { @class = "ToggleSwitch" })
-					</SettingsControl>
+          <div class="nucleus-flex-fields">
+            <SettingsControl caption="Page Layout" helptext="Select a page layout for this page, or select '(default)' to use the default layout for this site.">
+              @Html.DropDownListFor(model => model.Page.LayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
+            </SettingsControl>
 
-					<SettingsControl caption="Disable in Menu?" rendermode="LabelLast" class="inner-inline" helptext="If the page is being used as a placeholder (heading) in menus, and has no content, set 'Disable in menu' to prevent it from being clickable in menus.">
-						@Html.CheckBoxFor(model => model.Page.DisableInMenu, new { @class = "ToggleSwitch" })
-					</SettingsControl>
-				</div>
-			</fieldset>
+            <SettingsControl caption="Default Container" helptext="Select a default container for modules on this page, or select '(default)' to use the default layout for this site.">
+              @Html.DropDownListFor((model) => model.Page.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
+            </SettingsControl>
+          </div>
 
-			<fieldset role="group" aria-labelledby="heading" class="border-top pt-2 mt-2">
-				<div class="d-flex">
-					<h2 class="flex-grow-1 align-self-end">Page Routes</h2>
-					<div class="nucleus-form-tools">
-						@Html.SubmitButton("&#xe145;", "Add Path", Url.AreaAction("AddPageRoute", "Pages", "Admin"), new { @data_target = "form.parent()", @class = "btn btn-secondary", @accesskey = "A" })
-					</div>
-				</div>
-				<table>
-					<tr>
-						<th>Path</th>
-						<th class="ps-1">Type</th>
-						<th class="text-center">Default</th>
-						<th></th>
-					</tr>
-					@for (int urlCount = 0; urlCount < Model.Page.Routes.Count; urlCount++)
-					{
-				<tr>					
-					<td>
-						@Html.HiddenFor(model => model.Page.Routes[urlCount].Id)
-						@Html.TextBoxFor(model => model.Page.Routes[urlCount].Path, (@Model.Page.Routes[urlCount].Id == Guid.Empty ? new { @class = "DefaultPagePath", @maxlength = 256 } : null))
-					</td>
+          <div class="nucleus-flex-fields">
+            <SettingsControl caption="Show in Menu?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether the page is displayed in menus.">
+              @Html.CheckBoxFor(model => model.Page.ShowInMenu, new { @class = "ToggleSwitch" })
+            </SettingsControl>
 
-					<td class="ps-1">@Html.DropDownListFor(model => model.Page.Routes[urlCount].Type, Html.GetEnumSelectList<PageRoute.PageRouteTypes>())</td>
-					<td class="text-center">@Html.RadioButtonFor(model => model.Page.DefaultPageRouteId, @Model.Page.Routes[urlCount].Id)</td>
-					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("RemovePageRoute", "Pages", "Admin", new { id = Model.Page.Routes[urlCount].Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Remove" data-target="form.parent()" /></td>
-				</tr>
-					}
-				</table>
-			</fieldset>
+            <SettingsControl caption="Disable in Menu?" rendermode="LabelLast" class="inner-inline" helptext="If the page is being used as a placeholder (heading) in menus, and has no content, set 'Disable in menu' to prevent it from being clickable in menus.">
+              @Html.CheckBoxFor(model => model.Page.DisableInMenu, new { @class = "ToggleSwitch" })
+            </SettingsControl>
+          </div>
+        </fieldset>
 
-		</TabPanel>
+        <fieldset role="group" aria-labelledby="heading" class="border-top pt-2 mt-2">
+          <div class="d-flex">
+            <h2 class="flex-grow-1 align-self-end">Page Routes</h2>
+            <div class="nucleus-form-tools">
+              @Html.SubmitButton("&#xe145;", "Add Path", Url.AreaAction("AddPageRoute", "Pages", "Admin"), new { @data_target = "form.parent()", @class = "btn btn-secondary", @accesskey = "A" })
+            </div>
+          </div>
+          <table>
+            <tr>
+              <th>Path</th>
+              <th class="ps-1">Type</th>
+              <th class="text-center">Default</th>
+              <th></th>
+            </tr>
+            @for (int urlCount = 0; urlCount < Model.Page.Routes.Count; urlCount++)
+            {
+              <tr>
+                <td>
+                  @Html.HiddenFor(model => model.Page.Routes[urlCount].Id)
+                  @Html.TextBoxFor(model => model.Page.Routes[urlCount].Path, (@Model.Page.Routes[urlCount].Id == Guid.Empty ? new { @class = "DefaultPagePath", @maxlength = 256 } : null))
+                </td>
 
-		<TabPanel id="page-permissions">
-			@await Html.PartialAsync("PagePermissionsEditor")
-		</TabPanel>
+                <td class="ps-1">@Html.DropDownListFor(model => model.Page.Routes[urlCount].Type, Html.GetEnumSelectList<PageRoute.PageRouteTypes>())</td>
+                <td class="text-center">@Html.RadioButtonFor(model => model.Page.DefaultPageRouteId, @Model.Page.Routes[urlCount].Id)</td>
+                <td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("RemovePageRoute", "Pages", "Admin", new { id = Model.Page.Routes[urlCount].Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Remove" data-target="form.parent()" /></td>
+              </tr>
+            }
+          </table>
+        </fieldset>
 
-		@if (Model.Page.Id != Guid.Empty)
-		{
-			<TabPanel id="page-modules">
-				<fieldset role="group" aria-labelledby="heading">
-					<h2>Modules on this page</h2>
-					<div class="nucleus-form-tools">
-						<input type="submit" formaction="@Url.AreaAction("AddModule", "Pages", "Admin")" value="Add Module" data-target="#nucleus-popupdialog .modal-body" class="btn btn-secondary" />
-					</div>
-					<div id="pageeditor_pagemodules">
-						@await Html.PartialAsync("_PageModules.cshtml", Model)
-					</div>
-				</fieldset>
-			</TabPanel>
-		}
-	</TabContent>
+      </TabPanel>
 
-	<div class="nucleus-button-panel">
-		<input type="submit" class="btn btn-primary nucleus-dialogresult" value="Save Changes" formaction="@Url.AreaAction("Save", "Pages", "Admin")" />
-		@if (Model.Page.Id != Guid.Empty && Model.CanDeletePage)
-		{
-			<input type="submit" class="btn btn-danger" value="Delete Page" formaction="@Url.AreaAction("DeletePage", "Pages", "Admin")" data-confirm="Delete this page?" />
-		}
-	</div>
-}
+      <TabPanel id="page-permissions">
+        @await Html.PartialAsync("PagePermissionsEditor")
+      </TabPanel>
+
+      @if (Model.Page.Id != Guid.Empty)
+      {
+        <TabPanel id="page-modules">
+          <fieldset role="group" aria-labelledby="heading">
+            <h2>Modules on this page</h2>
+            <div class="nucleus-form-tools">
+              <input type="submit" formaction="@Url.AreaAction("AddModule", "Pages", "Admin")" value="Add Module" data-target="#nucleus-popupdialog .modal-body" class="btn btn-secondary" />
+            </div>
+            <div id="pageeditor_pagemodules">
+              @await Html.PartialAsync("_PageModules.cshtml", Model)
+            </div>
+          </fieldset>
+        </TabPanel>
+      }
+    </TabContent>
+
+    <div class="nucleus-button-panel">
+      <input type="submit" class="btn btn-primary nucleus-dialogresult" value="Save Changes" data-target=".nucleus-adminpage" formaction="@Url.AreaAction("Save", "Pages", "Admin")" />
+      @if (Model.Page.Id != Guid.Empty && Model.CanDeletePage)
+      {
+        <input type="submit" class="btn btn-danger" value="Delete Page" data-target=".nucleus-adminpage" formaction ="@Url.AreaAction("DeletePage", "Pages", "Admin")" data-confirm="Delete this page?" />
+      }
+    </div>
+  }
 </div>
 
 <script>
-	jQuery('#nucleus-control-panel-heading').html('Pages - ' + jQuery('.PageName').val());
+  jQuery('#nucleus-control-panel-heading').html('Pages - ' + jQuery('.PageName').val());
 
-	jQuery('.PageName').on('change', function ()
-	{
-		if (jQuery('.DefaultPagePath').val() === '')
-		{
-			jQuery('.DefaultPagePath').val(jQuery(this).val().replaceAll(" ", "-").toLowerCase());
-		}
+  jQuery('.PageName').on('change', function ()
+  {
+    if (jQuery('.DefaultPagePath').val() === '')
+    {
+      jQuery('.DefaultPagePath').val(jQuery(this).val().replaceAll(" ", "-").toLowerCase());
+    }
 
-		if (jQuery('#Page_Title').val() === '')
-		{
-			jQuery('#Page_Title').val(jQuery(this).val());
-		}
+    if (jQuery('#Page_Title').val() === '')
+    {
+      jQuery('#Page_Title').val(jQuery(this).val());
+    }
 
-		jQuery('#nucleus-control-panel-heading').html('Pages - ' + jQuery(this).val());
-	})
-	
-  jQuery('.page-link-type').on('change', function()
+    jQuery('#nucleus-control-panel-heading').html('Pages - ' + jQuery(this).val());
+  })
+
+  jQuery('.page-link-type').on('change', function ()
   {
     var linkUrlControl = jQuery('.page-link-url');
     var linkPageControl = jQuery('.page-link-page');
-    
+    var linkFileControl = jQuery('.page-link-file');
+
     switch (jQuery('.page-link-type').val())
     {
-      case '0':
+      case '0': // normal
         linkUrlControl.removeClass('show');
         linkPageControl.removeClass('show');
+        linkFileControl.removeClass('show');
         break;
-      case '1':
+      case '1': // url
         linkUrlControl.addClass('show');
         linkPageControl.removeClass('show');
+        linkFileControl.removeClass('show');
         break;
-      case '2':
+      case '2': // page
         linkUrlControl.removeClass('show');
         linkPageControl.addClass('show');
+        linkFileControl.removeClass('show');
+        break;
+      case '3': // file
+        linkUrlControl.removeClass('show');
+        linkPageControl.removeClass('show');
+        linkFileControl.addClass('show');
         break;
     }
   });
 
-	// functionality for the "open" button
-	jQuery('.nucleus-open-page').on('click', function()
-	{
-		window.parent.document.dispatchEvent(new CustomEvent('Open', { detail: { target: '@Url.PageLink(Model.Page)' } }));
-	});
+  // functionality for the "open" button
+  jQuery('.nucleus-open-page').on('click', function ()
+  {
+    window.parent.document.dispatchEvent(new CustomEvent('Open', { detail: { target: '@Url.PageLink(Model.Page)' } }));
+  });
 
-	// Read the child pages of the item containing the "+" button
-	jQuery('#page-properties').on('click', '.nucleus-get-childpages', function (e)
-	{
-		// Add a ul to contain the new pages
-		Page.LoadPartialContent(e, '@Url.AreaAction("GetChildPages", "Pages", "Admin")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+  // Read the child pages of the item containing the "+" button
+  jQuery('#page-properties').on('click', '.nucleus-get-childpages', function (e)
+  {
+    // Add a ul to contain the new pages
+    Page.LoadPartialContent(e, '@Url.AreaAction("GetChildPages", "Pages", "Admin")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
 
-		// remove the "+" button
-		jQuery(this).remove();
-	});
+    // remove the "+" button
+    jQuery(this).remove();
+  });
 </script>

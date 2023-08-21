@@ -54,5 +54,7 @@ namespace Nucleus.Web.ViewModels.Admin
 		public PermissionsList ModulePermissions { get; set; } = new();
 
 		public Boolean DisableCopy { get; set; }
+
+    public Nucleus.Abstractions.Models.FileSystem.File SelectedLinkFile { get; set; }
 	}
 }

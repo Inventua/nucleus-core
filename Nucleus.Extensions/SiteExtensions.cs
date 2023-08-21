@@ -202,7 +202,6 @@ namespace Nucleus.Extensions
 				else
 				{
 					return await GetDirectFilePath(site, fileId, fileSystemManager);
-					//return $"/files/{FileExtensions.EncodeFileId(fileId)}";
 				}
 			}
 			return null;
@@ -242,7 +241,7 @@ namespace Nucleus.Extensions
 			}
 			else
 			{
-				return $"~/files/{FileExtensions.EncodeFileId(file.Id)}";
+				return $"~/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH}/{FileExtensions.EncodeFileId(file.Id)}";
 			}
 
 

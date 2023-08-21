@@ -84,10 +84,10 @@ namespace Nucleus.Data.MySql
 
       if (Convert.ToInt32(ExecuteScalar(connection, "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='Schema'")) > 0)
       {
-        string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new MySqlConnector.MySqlParameter("@schemaName", schemaName) });
+        string schemaVersion = ExecuteScalar(connection, $"SELECT `SchemaVersion` FROM `Schema` WHERE `SchemaName`=@schemaName;", new System.Data.Common.DbParameter[] { new MySqlConnector.MySqlParameter("@schemaName", schemaName) });
         if (String.IsNullOrEmpty(schemaVersion) && schemaName == "*")
         {
-          schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new MySqlConnector.MySqlParameter("@schemaName", "Nucleus.Core") });
+          schemaVersion = ExecuteScalar(connection, $"SELECT `SchemaVersion` FROM `Schema` WHERE `SchemaName`=@schemaName;", new System.Data.Common.DbParameter[] { new MySqlConnector.MySqlParameter("@schemaName", "Nucleus.Core") });
         }
         results.Add("Schema Version", schemaVersion);
       }

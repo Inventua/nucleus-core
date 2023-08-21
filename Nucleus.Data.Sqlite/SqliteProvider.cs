@@ -78,7 +78,6 @@ namespace Nucleus.Data.Sqlite
       //System.Data.Common.DbConnection connection = new Microsoft.Data.Sqlite.SqliteConnection(this.FolderOptions.Value.Parse(options.ConnectionString));
       System.Data.Common.DbConnection connection = new Microsoft.Data.Sqlite.SqliteConnection(Nucleus.Abstractions.Models.Configuration.FolderOptions.Parse(options.ConnectionString));
       
-
       connection.Open();
 
 			// For Sqlite, we show the filename (with no path or extension) as the database name, because the Sqlite "database" is always called "main".  We
@@ -90,10 +89,10 @@ namespace Nucleus.Data.Sqlite
 
       if (Convert.ToInt32(ExecuteScalar(connection, "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='Schema'")) > 0)
       {
-        string schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", schemaName) });
+        string schemaVersion = ExecuteScalar(connection, $"SELECT [SchemaVersion] FROM [Schema] WHERE [SchemaName]=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", schemaName) });
         if (String.IsNullOrEmpty(schemaVersion) && schemaName == "*")
         {
-          schemaVersion = ExecuteScalar(connection, $"SELECT SchemaVersion FROM Schema WHERE SchemaName=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", "Nucleus.Core") });
+          schemaVersion = ExecuteScalar(connection, $"SELECT [SchemaVersion] FROM [Schema] WHERE [SchemaName]=@schemaName;", new System.Data.Common.DbParameter[] { new Microsoft.Data.Sqlite.SqliteParameter("@schemaName", "Nucleus.Core") });
         }
         results.Add("Schema Version", schemaVersion);
       }

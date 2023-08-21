@@ -561,7 +561,12 @@ function _Page()
 		if (typeof (event.originalEvent) !== 'undefined' && typeof (event.originalEvent.submitter) !== 'undefined' && typeof (jQuery(event.originalEvent.submitter).attr('data-confirm')) !== 'undefined')
 		{
 			// submit form after confirmation
-			if (!_confirm(jQuery(event.originalEvent.submitter).attr('data-confirm'), jQuery(event.originalEvent.submitter).attr('data-confirm-title'), function () { action.call(this); }))
+			if (!_confirm(jQuery(event.originalEvent.submitter).attr('data-confirm'), jQuery(event.originalEvent.submitter).attr('data-confirm-title'), function ()
+			{
+				// User clicked ok.
+				jQuery(event.originalEvent.submitter).trigger('confirmed', [target, url, event]);
+				action.call(this);
+			}))
 			{
 				// confirm function returned false to indicate that dialog plugin is not available, submit form with no confirmation
 				action.call(this);

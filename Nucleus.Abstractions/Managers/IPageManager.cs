@@ -17,6 +17,22 @@ namespace Nucleus.Abstractions.Managers
 	/// </remarks>
 	public interface IPageManager
 	{
+
+    /// <summary>
+    /// Copy permission operation types
+    /// </summary>
+    public enum CopyPermissionOperation
+    {
+      /// <summary>
+      /// Replace existing permissions with the new permissions
+      /// </summary>
+      Replace = 1,
+      /// <summary>
+      /// Merge 
+      /// </summary>
+      Merge = 2
+    }
+
 		/// <summary>
 		/// Create a new <see cref="Page"/> with default values.
 		/// </summary>
@@ -69,14 +85,25 @@ namespace Nucleus.Abstractions.Managers
 		/// <returns></returns>
 		public Task<IList<Page>> List(Site site);
 
-		/// <summary>
-		/// Return a list of all <see cref="Page"/>s for the site which match the specified search term.
-		/// </summary>
-		/// <param name="site"></param>
-		/// <param name="searchTerm"></param>
-		/// <param name="pagingSettings"></param>
-		/// <returns></returns>
-		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> Search(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
+    /// <summary>
+    /// List all <see cref="Page"/>s within the specified site.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// This function returns a simple/not fully populated list of pages and is intended for use when populating drop-down
+    /// lists, etc.
+    /// </remarks>
+    public Task<IList<Page>> ListSitePages(Site site);
+
+    /// <summary>
+    /// Return a list of all <see cref="Page"/>s for the site which match the specified search term.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <param name="searchTerm"></param>
+    /// <param name="pagingSettings"></param>
+    /// <returns></returns>
+    public Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> Search(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 
 		/// <summary>
 		/// Add default permissions to the specifed <see cref="Page"/> for the specified <see cref="Role"/>.
@@ -179,5 +206,18 @@ namespace Nucleus.Abstractions.Managers
 		/// <returns></returns>
 		public Task<PageMenu> GetMenu(Site site, Page parentPage, ClaimsPrincipal user, Boolean ignoreSettings);
 
-	}
+		/// <summary>
+		/// Copy permissions from the specified <paramref name="page"/> to its descendants.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="page"></param>
+		/// <param name="operation">
+		/// If <paramref name="operation"/> is <see cref="IPageManager.CopyPermissionOperation.Replace"/> overwrite all permissions of descendant pages.  
+		/// if <paramref name="operation"/> is <see cref="IPageManager.CopyPermissionOperation.Merge"/>, merge the descendant pages permissions with the specified 
+		/// <paramref name="page"/> permissions.		
+		/// </param>
+		/// <returns></returns>
+		public Task<Boolean> CopyPermissionsToDescendants(Site site, Page page, ClaimsPrincipal user, CopyPermissionOperation operation);
+
+  }
 }

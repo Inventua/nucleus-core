@@ -35,7 +35,9 @@ namespace Nucleus.Core.DataProviders
 
 		// page methods
 		abstract Task<List<Page>> ListPages(Guid siteId);
-		abstract Task<List<Page>> ListPages(Guid siteId, Guid? parentId);
+    abstract Task<List<Page>> ListSitePages(Guid siteId);
+
+    abstract Task<List<Page>> ListPages(Guid siteId, Guid? parentId);
 
 		abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> SearchPages(Guid siteId, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 

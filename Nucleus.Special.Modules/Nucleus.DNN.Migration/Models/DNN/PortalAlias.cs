@@ -19,4 +19,5 @@ public class PortalAlias
   [Column("HTTPAlias")]
   public string HttpAlias { get; set; }
 
+  public Boolean IsPrimary { get; set; }
 }

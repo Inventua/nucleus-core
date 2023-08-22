@@ -79,7 +79,7 @@ public class ListMigration : MigrationEngineBase<Models.DNN.List>
       }
       else
       {
-        list.AddWarning($"List '{list.ListName}' was not selected for import.");
+        list.AddInformation($"List '{list.ListName}' was not selected for import.");
       }
     }
 
@@ -105,7 +105,7 @@ public class ListMigration : MigrationEngineBase<Models.DNN.List>
 
       if (!list.ListItems.Any())
       {
-        list.AddWarning($"'{list.ListName}' doesn't have any list items.");
+        list.AddInformation($"'{list.ListName}' doesn't have any list items.");
         list.IsSelected = false;
       }
     }

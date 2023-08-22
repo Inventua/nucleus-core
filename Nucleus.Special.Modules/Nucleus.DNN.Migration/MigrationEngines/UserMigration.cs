@@ -113,7 +113,7 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
       }
       else
       {
-        dnnUser.AddWarning($"User '{dnnUser.UserName}' was not selected for import.");
+        dnnUser.AddInformation($"User '{dnnUser.UserName}' was not selected for import.");
       }
     }
 

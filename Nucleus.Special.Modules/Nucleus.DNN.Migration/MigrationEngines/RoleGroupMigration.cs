@@ -55,7 +55,7 @@ public class RoleGroupMigration : MigrationEngineBase<Models.DNN.RoleGroup>
       }
       else
       {
-        dnnRoleGroup.AddWarning($"Role group '{dnnRoleGroup.RoleGroupName}' was not selected for import.");
+        dnnRoleGroup.AddInformation($"Role group '{dnnRoleGroup.RoleGroupName}' was not selected for import.");
       }
     }
 
@@ -68,7 +68,7 @@ public class RoleGroupMigration : MigrationEngineBase<Models.DNN.RoleGroup>
     {      
       if (roleGroup.RoleCount == 0)
       {
-        roleGroup.AddWarning("There are no roles in this role group.");
+        roleGroup.AddInformation("There are no roles in this role group.");
       }
     }
 

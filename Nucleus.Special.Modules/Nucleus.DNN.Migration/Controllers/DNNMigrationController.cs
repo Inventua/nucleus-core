@@ -441,6 +441,11 @@ public class DNNMigrationController : Controller
       .FirstOrDefault()
       .PortalAliases;
 
+    viewModel.PortalAliasId = viewModel.AvailablePortalAliases
+      .Where(alias => alias.IsPrimary)
+      .Select(alias => alias.PortalAliasId)
+      .FirstOrDefault();
+
     viewModel.Folders = await this.DNNMigrationManager.ListDnnFolders(portalId);
 
     foreach (Models.DNN.Folder folder in viewModel.Folders)

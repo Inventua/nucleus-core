@@ -61,7 +61,7 @@ public class RoleMigration : MigrationEngineBase<Models.DNN.Role>
       }
       else
       {
-        role.AddWarning($"Role '{role.RoleName}' was not selected for import.");
+        role.AddInformation($"Role '{role.RoleName}' was not selected for import.");
       }
     }
 
@@ -82,13 +82,13 @@ public class RoleMigration : MigrationEngineBase<Models.DNN.Role>
       if (role.RoleName.Equals("Subscribers", StringComparison.OrdinalIgnoreCase) || role.RoleName.StartsWith("Translator", StringComparison.OrdinalIgnoreCase))
       {
         role.IsSelected = false;
-        role.AddWarning($"The '{role.RoleName}' role has been un-selected by default, but you can choose to migrate it.");
+        role.AddInformation($"The '{role.RoleName}' role has been un-selected by default, but you can choose to migrate it.");
       }
 
       if (role.UserCount == 0)
       {
         role.IsSelected = false;
-        role.AddWarning($"There are no users in the '{role.RoleName}' role.  The role has been un-selected by default, but you can choose to migrate it.");
+        role.AddInformation($"There are no users in the '{role.RoleName}' role.  The role has been un-selected by default, but you can choose to migrate it.");
       }
     }
 

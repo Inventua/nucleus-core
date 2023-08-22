@@ -24,6 +24,11 @@ public abstract class DNNEntity
   [NotMapped]
   public List<Models.DNN.ValidationResult> Results { get; } = new();
 
+  public void AddInformation(string message)
+  {
+    this.Results.Add(new(ValidationResult.ValidationResultTypes.Information, message));
+  }
+
   public void AddWarning(string message)
   {
     this.Results.Add(new(ValidationResult.ValidationResultTypes.Warning, message));

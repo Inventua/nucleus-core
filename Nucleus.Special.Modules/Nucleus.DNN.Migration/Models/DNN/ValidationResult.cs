@@ -10,6 +10,7 @@ public class ValidationResult
 {
   public enum ValidationResultTypes
   {
+    Information,
     Warning,
     Error
   }

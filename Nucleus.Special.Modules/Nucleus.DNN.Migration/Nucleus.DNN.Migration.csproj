@@ -60,7 +60,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.2.1.8-pre-a3" />
+		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.2.1.12-pre-a3" />
 		<PackageReference Include="Inventua.Nucleus.Data.Common" Version="1.2.1.2-pre-a1" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.2.0" />
 		<PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="1.2.0" />

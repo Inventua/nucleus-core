@@ -11,6 +11,7 @@ using Nucleus.Extensions;
 using Microsoft.Extensions.Logging;
 using DocumentFormat.OpenXml.Drawing;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nucleus.DNN.Migration.MigrationEngines;
 
@@ -23,6 +24,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
   private IRoleManager RoleManager { get; }
   private IContainerManager ContainerManager { get; }
   private ILayoutManager LayoutManager { get; }
+  private IFileSystemManager FileSystemManager { get; }
   private ILogger<PageMigration> Logger { get; }
 
   public List<Models.DNN.Skin> DNNSkins { get; set; }
@@ -31,12 +33,13 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
 
   private IEnumerable<Nucleus.DNN.Migration.MigrationEngines.ModuleContent.ModuleContentMigrationBase> ModuleContentMigrations { get; }
 
-  public PageMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IRoleManager roleManager, ILayoutManager layoutManager, IContainerManager containerManager, IEnumerable<Nucleus.DNN.Migration.MigrationEngines.ModuleContent.ModuleContentMigrationBase> moduleContentMigrations, ILogger<PageMigration> logger) : base("Migrating Pages and Modules")
+  public PageMigration(Nucleus.Abstractions.Models.Context context, DNNMigrationManager migrationManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, IRoleManager roleManager, ILayoutManager layoutManager, IContainerManager containerManager, IEnumerable<Nucleus.DNN.Migration.MigrationEngines.ModuleContent.ModuleContentMigrationBase> moduleContentMigrations, ILogger<PageMigration> logger) : base("Migrating Pages and Modules")
   {
     this.Context = context;
     this.MigrationManager = migrationManager;
     this.PageManager = pageManager;
     this.PageModuleManager = pageModuleManager;
+    this.FileSystemManager = fileSystemManager;
     this.LayoutManager = layoutManager;
     this.ContainerManager = containerManager;
     this.RoleManager = roleManager;
@@ -58,6 +61,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     List<Nucleus.Abstractions.Models.PermissionType> pagePermissionTypes = await this.PageManager.ListPagePermissionTypes();
     List<Nucleus.Abstractions.Models.PermissionType> modulePermissionTypes = await this.PageModuleManager.ListModulePermissionTypes();
     IEnumerable<Nucleus.Abstractions.Models.ModuleDefinition> moduleDefinitions = await this.PageModuleManager.ListModuleDefinitions();
+    Nucleus.Abstractions.FileSystemProviders.FileSystemProviderInfo fileSystemProvider = this.FileSystemManager.ListProviders().FirstOrDefault();
 
     Dictionary<int, Guid> createdPagesKeys = new();
 
@@ -145,7 +149,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
       }
       else
       {
-        dnnPage.AddWarning($"Page '{dnnPage.PageName}' was not selected for import.");
+        dnnPage.AddInformation($"Page '{dnnPage.PageName}' was not selected for import.");
       }
     }
 
@@ -167,15 +171,66 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
           {
             await MigratePageModules(updateExisting, dnnPage, newPage, moduleDefinitions, modulePermissionTypes, createdPagesKeys);
 
-            // if the page has an "Url" setting to indicate that it is a redirect to another page, add a SiteMap module to make it into a "landing"
-            // page.  Nucleus does not support page "link types"
+            // handle DNN page link types
             if (!String.IsNullOrEmpty(dnnPage.Url))
             {
-              // links to site pages are an integer (tabid).  Links to files are FileID=nn, and external links  (urls) are just the Url, we don't
-              // support either of those.
-              if (int.TryParse(dnnPage.Url, out int _))
+              // links to site pages are an integer (tabid).  Links to files are FileID=nn, and external links  (urls) are just the Url
+              if (int.TryParse(dnnPage.Url, out int dnnPageLinkId))
               {
-                await AddLandingPageModule(newPage, moduleDefinitions, updateExisting);
+                // page link
+                Models.DNN.Page dnnLinkPage = await this.MigrationManager.GetDnnPage(dnnPageLinkId);
+                if (dnnLinkPage == null)
+                {
+                  dnnPage.AddWarning($"Unable to set page link for '{dnnPage.PageName}' because the linked DNN page id '{dnnPageLinkId}' was found.");
+                }
+                else
+                {
+                  Nucleus.Abstractions.Models.Page linkedPage = await this.PageManager.Get(this.Context.Site, dnnLinkPage.TabPath.Replace("//", "/"));
+                  if (linkedPage == null)
+                  {
+                    dnnPage.AddWarning($"Unable to set page link for '{dnnPage.PageName}' because no Nucleus page with the path '{dnnLinkPage.TabPath.Replace("//", "/")}' was found.");
+                  }
+                  else
+                  {
+                    newPage.LinkType = Abstractions.Models.Page.LinkTypes.Page;
+                    newPage.LinkPageId = linkedPage.Id;
+                  }
+                }
+              }
+              else if (dnnPage.Url.StartsWith("FileId=", StringComparison.OrdinalIgnoreCase))
+              {
+                if (dnnPage.Url.Length > "FileId=".Length && int.TryParse(dnnPage.Url.Substring("FileId=".Length), out int dnnFileLinkId))
+                {
+                  // file link
+                  Models.DNN.File dnnLinkFile = await this.MigrationManager.GetDnnFile(dnnFileLinkId);
+                  if (dnnLinkFile == null)
+                  {
+                    dnnPage.AddWarning($"Unable to set file link for '{dnnPage.PageName}' because the linked DNN page id '{dnnFileLinkId}' was found.");
+                  }
+                  else
+                  {
+                    Nucleus.Abstractions.Models.FileSystem.File linkedFile = await this.FileSystemManager.GetFile(this.Context.Site, fileSystemProvider.Key, dnnLinkFile.Path());
+                    if (linkedFile == null)
+                    {
+                      dnnPage.AddWarning($"Unable to set file link for '{dnnPage.PageName}' because no Nucleus file with the path '{dnnLinkFile.Path()}' was found.");
+                    }
+                    else
+                    {
+                      newPage.LinkType = Abstractions.Models.Page.LinkTypes.File;
+                      newPage.LinkFileId = linkedFile.Id;
+                    }
+                  }
+                }
+                else
+                {
+                  dnnPage.AddWarning($"Unable to set page link for '{dnnPage.PageName}' because the DNN file link value '{dnnPage.Url}' could not be parsed.");               
+                }
+              }
+              else
+              {
+                // url link
+                newPage.LinkType = Abstractions.Models.Page.LinkTypes.Url;
+                newPage.LinkUrl = dnnPage.Url;
               }
             }
             
@@ -218,56 +273,57 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     this.SignalCompleted();
   }
 
-  // Create a SiteMap module to make the page a "landing page"
-  private async Task AddLandingPageModule(Nucleus.Abstractions.Models.Page newPage, IEnumerable<Nucleus.Abstractions.Models.ModuleDefinition> moduleDefinitions, Boolean updateExisting)
-  {
-    Guid siteMapModuleDefinitionId = new("0392bf73-c646-4ccc-bcb5-372a75b9ea84");
-    string siteMapTitle = newPage.Name;
-    Nucleus.Abstractions.Models.PageModule newModule = null;
+  // No longer required: Nucleus supports link types 
+  ////// Create a SiteMap module to make the page a "landing page"
+  ////private async Task AddLandingPageModule(Nucleus.Abstractions.Models.Page newPage, IEnumerable<Nucleus.Abstractions.Models.ModuleDefinition> moduleDefinitions, Boolean updateExisting)
+  ////{
+  ////  Guid siteMapModuleDefinitionId = new("0392bf73-c646-4ccc-bcb5-372a75b9ea84");
+  ////  string siteMapTitle = newPage.Name;
+  ////  Nucleus.Abstractions.Models.PageModule newModule = null;
 
-    if (updateExisting)
-    {
-      newModule = newPage.Modules
-        .Where(existing =>
-          existing.ModuleDefinition.Id == siteMapModuleDefinitionId &&
-          (
-            (String.IsNullOrEmpty(existing.Title) && String.IsNullOrEmpty(siteMapTitle))
-            ||
-            existing.Title.Equals(siteMapTitle)
-          ) &&
-          existing.SortOrder == 10)
-        .FirstOrDefault();
-    }
+  ////  if (updateExisting)
+  ////  {
+  ////    newModule = newPage.Modules
+  ////      .Where(existing =>
+  ////        existing.ModuleDefinition.Id == siteMapModuleDefinitionId &&
+  ////        (
+  ////          (String.IsNullOrEmpty(existing.Title) && String.IsNullOrEmpty(siteMapTitle))
+  ////          ||
+  ////          existing.Title.Equals(siteMapTitle)
+  ////        ) &&
+  ////        existing.SortOrder == 10)
+  ////      .FirstOrDefault();
+  ////  }
 
-    if (newModule == null)
-    {
-      newModule = await this.PageModuleManager.CreateNew(this.Context.Site);
-    }
+  ////  if (newModule == null)
+  ////  {
+  ////    newModule = await this.PageModuleManager.CreateNew(this.Context.Site);
+  ////  }
 
-    newModule.Title = siteMapTitle;
-    newModule.InheritPagePermissions = true;
-    newModule.Pane = "ContentPane";
+  ////  newModule.Title = siteMapTitle;
+  ////  newModule.InheritPagePermissions = true;
+  ////  newModule.Pane = "ContentPane";
 
-    newModule.SortOrder = 10;
+  ////  newModule.SortOrder = 10;
 
-    newModule.ModuleDefinition = moduleDefinitions
-      .Where(moduleDefinition => moduleDefinition.Id == siteMapModuleDefinitionId)
-      .FirstOrDefault();
+  ////  newModule.ModuleDefinition = moduleDefinitions
+  ////    .Where(moduleDefinition => moduleDefinition.Id == siteMapModuleDefinitionId)
+  ////    .FirstOrDefault();
 
-    newModule.ModuleSettings.Set("sitemap:maxlevels", 1);
-    newModule.ModuleSettings.Set("sitemap:root-page-type", "CurrentPage");
-    newModule.ModuleSettings.Set("sitemap:show-description", true);
-    newModule.ModuleSettings.Set("sitemap:direction", "Vertical");
+  ////  newModule.ModuleSettings.Set("sitemap:maxlevels", 1);
+  ////  newModule.ModuleSettings.Set("sitemap:root-page-type", "CurrentPage");
+  ////  newModule.ModuleSettings.Set("sitemap:show-description", true);
+  ////  newModule.ModuleSettings.Set("sitemap:direction", "Vertical");
 
-    await this.PageModuleManager.Save(newPage, newModule);
-  }
+  ////  await this.PageModuleManager.Save(newPage, newModule);
+  ////}
 
   void AddRoutes(Models.DNN.Page dnnPage, Nucleus.Abstractions.Models.Page newPage)
   {
-    // Add default route based on page hierachy
+    // Add default route based on page hierarchy
     AddRoute(newPage, Abstractions.Models.PageRoute.PageRouteTypes.Active, dnnPage.TabPath.Replace("//", "/"));
 
-    // Add standard DNN "friendly" url format as a redirect to help maintain backward compatibility
+    // Add old-style DNN "search engine friendly" url format as a redirect to help maintain backward compatibility
     AddRoute(newPage, Abstractions.Models.PageRoute.PageRouteTypes.PermanentRedirect, $"{dnnPage.TabPath.Replace("//", "/")}/tabid/{dnnPage.PageId}/Default.aspx");
 
     // Add old format "tabid=nn" url format as a redirect to help maintain backward compatibility
@@ -490,6 +546,11 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
             newModule.InheritPagePermissions = dnnModule.InheritViewPermissions;
             newModule.Pane = dnnModule.PaneName;
 
+            if (!await ValidatePane(newPage.LayoutDefinition ?? this.Context.Site.DefaultLayoutDefinition, newModule.Pane))
+            {
+              dnnPage.AddWarning($"Page module '{dnnModule.ModuleTitle}' is assigned to pane '{newModule.Pane}' but that pane doesn't exist in the layout '{(newPage.LayoutDefinition ?? this.Context.Site.DefaultLayoutDefinition)?.FriendlyName}'.  You must edit the page and assign the module to a different pane, or use a different layout.");
+            }
+
             Guid? containerId = this.DNNContainers
             .Where(container => container.ContainerSrc.Equals(dnnPage.ContainerSrc, StringComparison.OrdinalIgnoreCase))
             .Select(container => container.AssignedContainerId)
@@ -615,6 +676,12 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     return null;
   }
 
+  private async Task <Boolean> ValidatePane(LayoutDefinition layout, string paneName)
+  {
+    IEnumerable<string> panes = await this.LayoutManager.ListLayoutPanes(layout);
+    return panes.Contains (paneName, StringComparer.OrdinalIgnoreCase);
+  }
+
   public override Task Validate()
   {
     foreach (Models.DNN.Page dnnPage in Items)
@@ -623,13 +690,8 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
       if (DEFAULT_UNSELECTED_PAGES.Contains(dnnPage.PageName, StringComparer.OrdinalIgnoreCase))
       {
         dnnPage.IsSelected = false;
-        dnnPage.AddWarning($"The '{dnnPage.PageName}' pages has a page name which is typically a built-in system page in DNN.  It has been un-selected by default, but you can choose to migrate it.");
-      }
-
-      if (!String.IsNullOrEmpty(dnnPage.Url))
-      {
-        dnnPage.AddWarning("This page has a 'link type' set to redirect to another page or Url.  Nucleus does not support this feature.  This page will be migrated with a pre-configured SiteMap module so that it can act as a 'landing' page with a list of child pages.");
-      }
+        dnnPage.AddWarning($"The '{dnnPage.PageName}' page has a page name which is typically a built-in system page in DNN.  It has been un-selected by default, but you can choose to migrate it.");
+      }      
     }
 
 

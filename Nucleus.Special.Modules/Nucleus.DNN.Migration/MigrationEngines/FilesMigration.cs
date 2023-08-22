@@ -178,11 +178,11 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
 
           if (successCount + skippedCount + failCount == 0)
           {
-            dnnFolder.AddWarning("No files.");
+            dnnFolder.AddInformation("No files.");
           }
           else
           { 
-            dnnFolder.AddWarning($"{(successCount == 0 ? "No" : successCount)} file{(successCount == 1 ? "" : "s")} migrated, {(skippedCount == 0 ? "no" : skippedCount)} file{(skippedCount == 1 ? "" : "s")} skipped, {(failCount == 0 ? "no" : failCount)} file{(failCount == 1 ? "" : "s")} failed.");
+            dnnFolder.AddInformation($"{(successCount == 0 ? "No" : successCount)} file{(successCount == 1 ? "" : "s")} migrated, {(skippedCount == 0 ? "no" : skippedCount)} file{(skippedCount == 1 ? "" : "s")} skipped, {(failCount == 0 ? "no" : failCount)} file{(failCount == 1 ? "" : "s")} failed.");
           }
         }
         catch (Exception ex)
@@ -192,7 +192,7 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
       }
       else
       {
-        dnnFolder.AddWarning($"Folder '{dnnFolder.FolderPath}' was not selected for import.");
+        dnnFolder.AddInformation($"Folder '{dnnFolder.FolderPath}' was not selected for import.");
       }
     }
 
@@ -321,7 +321,7 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
       if (folder.FolderPath.Equals("Templates/", StringComparison.OrdinalIgnoreCase))
       {
         folder.IsSelected = false;
-        folder.AddWarning($"The '{folder.FolderPath}' folder was not selected by default because this is typically a system folder.  You can select it for migration if you want to.");
+        folder.AddInformation($"The '{folder.FolderPath}' folder was not selected by default because this is typically a system folder.  You can select it for migration if you want to.");
       }
 
       foreach (Models.DNN.File file in folder.Files)

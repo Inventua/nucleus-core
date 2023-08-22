@@ -90,7 +90,7 @@ public class NotifyUsers : MigrationEngineBase<Models.NotifyUser>
       }
       else
       {
-        user.AddWarning($"User '{user.User.UserName}' was not selected for import.");
+        user.AddInformation($"User '{user.User.UserName}' was not selected for notification.");
       }
     }
 

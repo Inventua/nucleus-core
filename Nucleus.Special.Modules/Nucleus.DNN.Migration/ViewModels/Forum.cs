@@ -2,6 +2,7 @@
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.DNN.Migration.Models;
+using Nucleus.DNN.Migration.Models.DNN.Modules.NTForums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,10 +18,10 @@ public class Forum
 
   public int TotalPosts { get; set; }
 
-  public List<Models.DNN.Modules.ForumGroup> ForumGroups { get; set; }
+  public List<ForumGroup> ForumGroups { get; set; }
 
   // this is populated client-side
-  public List<Models.DNN.Modules.Forum> Forums { get; set; }
+  public List<Models.DNN.Modules.NTForums.Forum> Forums { get; set; }
 
   public Boolean UpdateExisting { get; set; } = true;
   public Boolean ForumsNotInstalled { get; set; }

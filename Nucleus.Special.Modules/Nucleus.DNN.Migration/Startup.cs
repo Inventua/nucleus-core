@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using Nucleus.DNN.Migration.Models.DNN.Modules.NTForums;
 
 [assembly: HostingStartup(typeof(Nucleus.DNN.Migration.Startup))]
 
@@ -40,7 +41,7 @@ public class Startup : IHostingStartup
       services.AddMigrationEngine<Models.DNN.List, MigrationEngines.ListMigration>();
       services.AddMigrationEngine<Models.DNN.Page, MigrationEngines.PageMigration>();
       services.AddMigrationEngine<Models.DNN.User, MigrationEngines.UserMigration>();
-      services.AddMigrationEngine<Models.DNN.Modules.Forum, MigrationEngines.ForumMigration>();
+      services.AddMigrationEngine<Forum, MigrationEngines.NTForumsMigration>();
       services.AddMigrationEngine<Models.NotifyUser, MigrationEngines.NotifyUsers>();
       services.AddMigrationEngine<Models.DNN.Folder, MigrationEngines.FilesMigration>();
 

@@ -99,7 +99,8 @@ public class ListMigration : MigrationEngineBase<Models.DNN.List>
       string[] EXCLUDED_ROLES = { "Installer" };
       if (EXCLUDED_ROLES.Contains(list.ListName, StringComparer.OrdinalIgnoreCase))
       {
-        list.AddError($"'{list.ListName}' is typically a system list in DNN.  It has been un-selected by default, but you can choose to migrate it.");
+        list.AddWarning($"'{list.ListName}' is typically a system list in DNN.  It has been un-selected by default, but you can choose to migrate it.");
+        list.IsSelected = false;
       }
 
 

@@ -6,7 +6,7 @@ using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
 using Nucleus.Abstractions.Models;
 using Nucleus.DNN.Migration.Models;
 using Nucleus.DNN.Migration.Models.DNN;
-using Nucleus.DNN.Migration.Models.DNN.Modules;
+using Nucleus.DNN.Migration.Models.DNN.Modules.NTForums;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Nucleus.DNN.Migration.DataProviders;
 
-public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNNDataProvider
+public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider
 {
   protected new DNNDbContext Context { get; }
 
@@ -222,6 +222,15 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
     return results;
   }
 
+  public async Task<List<Models.DNN.PageUrl>> ListPageUrls(int pageId)
+  {
+    return await this.Context.PageUrls
+      .Where(pageUrl => pageUrl.PageId == pageId)
+      .OrderBy(pageUrl => pageUrl.SeqNum)
+      .AsNoTracking()
+      .ToListAsync();
+  }
+
   public async Task<Models.DNN.Modules.TextHtml> GetHtmlContent(int moduleId)
   {
     return await this.Context.TextHtml
@@ -295,9 +304,9 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .ToListAsync();
   }
 
-  public async Task<List<Models.DNN.Modules.ForumGroup>> ListForumGroupsByModule(int moduleId)
+  public async Task<List<ForumGroup>> ListNTForumGroupsByModule(int moduleId)
   {
-    return await this.Context.ForumGroups
+    return await this.Context.NTForumsGroups
       .Where(group => group.ModuleId == moduleId)
       .Include(group => group.Forums)
       .Include(group => group.Settings)
@@ -305,9 +314,9 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .ToListAsync();
   }
 
-  public async Task<List<Models.DNN.Modules.ForumGroup>> ListForumGroupsByPortal(int portalId)
+  public async Task<List<ForumGroup>> ListNTForumGroupsByPortal(int portalId)
   {
-    return await this.Context.ForumGroups
+    return await this.Context.NTForumsGroups
       .Where(group => group.PortalId == portalId)
       .Include(group => group.Forums)
       .Include(group => group.Settings)
@@ -315,35 +324,35 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .ToListAsync();
   }
 
-  public async Task<int> CountForumPosts(int forumId)
+  public async Task<int> CountNTForumPosts(int forumId)
   {
-    return await this.Context.ForumPosts
+    return await this.Context.NTForumsPosts
       .Where(post => post.ForumId == forumId && post.Deleted == false && post.Archived == false)
       .OrderBy(post => post.ParentPostId)
       .AsNoTracking()
       .CountAsync();
   }
 
-  public async Task<List<int>> ListForumPostIds(int forumId)
+  public async Task<List<int>> ListNTForumPostIds(int forumId)
   {
-    return await this.Context.ForumPosts
+    return await this.Context.NTForumsPosts
       .Where(post => post.ForumId == forumId && post.ParentPostId == 0 && post.Deleted == false && post.Archived == false)
       .OrderBy(post => post.ParentPostId)
       .Select(post => post.PostId)
       .ToListAsync();
   }
 
-  public async Task<List<int>> ListForumPostReplyIds(int forumId, int postId)
+  public async Task<List<int>> ListNTForumPostReplyIds(int forumId, int postId)
   {
-    return await this.Context.ForumPosts
+    return await this.Context.NTForumsPosts
       .Where(post => post.ForumId == forumId && post.ParentPostId == postId && post.Deleted == false && post.Archived == false)
       .Select(post => post.PostId)
       .ToListAsync();
   }
 
-  public async Task<ForumPost> GetForumPost(int postId)
+  public async Task<ForumPost> GetNTForumPost(int postId)
   {
-    return await this.Context.ForumPosts
+    return await this.Context.NTForumsPosts
       .Where(post => post.PostId == postId)
       .Include(post => post.User)
       .Include(post => post.Attachments)
@@ -351,4 +360,75 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider//, IDNN
       .FirstOrDefaultAsync();    
   }
 
+
+  //
+
+  public async Task<List<Models.DNN.Modules.ActiveForums.ForumGroup>> ListActiveForumsGroupsByModule(int moduleId)
+  {
+    return await this.Context.ActiveForumsGroups
+      .Where(group => group.ModuleId == moduleId)
+      .Include(group => group.Forums)      
+      .AsNoTracking()
+      .ToListAsync();
+  }
+
+  public async Task<List<Models.DNN.Modules.ActiveForums.Settings>> ListActiveForumsSettings(int moduleId, string key)
+  {
+    return await this.Context.ActiveForumsSettings
+      .Where(setting => setting.ModuleId == moduleId && setting.GroupKey == key)
+      .AsNoTracking()
+      .ToListAsync();
+  }
+
+  public async Task<List<Models.DNN.Modules.ActiveForums.ForumGroup>> ListActiveForumsGroupsByPortal(int portalId)
+  {
+    return await this.Context.ActiveForumsGroups
+      .Where(group => group.Forums.Where(forum => forum.PortalId == portalId).Any())
+      .Include(group => group.Forums)
+      .Include(group => group.Settings)
+      .AsNoTracking()
+      .ToListAsync();
+  }
+
+  public async Task<int> CountActiveForumsTopics(int forumId)
+  {
+    return await this.Context.ActiveForumsTopics
+      .Where(post => post.ForumId == forumId )
+      .Include(post => post.Content)
+      .Include(post => post.Replies)
+        .ThenInclude(reply => reply.Content)
+      .OrderBy(post => post.ParentPostId)
+      .AsNoTracking()
+      .CountAsync();
+  }
+
+  public async Task<List<int>> ListActiveForumsPostIds(int forumId)
+  {
+    return await this.Context.ActiveForumsTopics
+      .Where(post => post.ForumId == forumId && post.ParentPostId == 0 )
+      .OrderBy(post => post.ParentPostId)
+      .Select(post => post.PostId)
+      .ToListAsync();
+  }
+
+  public async Task<List<int>> ListActiveForumsPostReplyIds(int forumId, int postId)
+  {
+    return await this.Context.ActiveForumsTopics
+      .Where(post => post.ForumId == forumId && post.ParentPostId == postId)
+      .Select(post => post.PostId)
+      .ToListAsync();
+  }
+
+  public async Task<Models.DNN.Modules.ActiveForums.ForumTopic> GetActiveForumsTopic(int topicId)
+  {
+    return await this.Context.ActiveForumsTopics
+      .Where(post => post.PostId == topicId)
+      .Include(post => post.Content)
+        .ThenInclude(content => content.Attachments)
+      .Include(post => post.Replies)
+        .ThenInclude(reply => reply.Content)
+          .ThenInclude(content => content.Attachments)
+      .AsSplitQuery()
+      .FirstOrDefaultAsync();
+  }
 }

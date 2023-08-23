@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using DocumentFormat.OpenXml.Drawing;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.AspNetCore.Routing;
 
 namespace Nucleus.DNN.Migration.MigrationEngines;
 
@@ -96,7 +97,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
           newPage.ShowInMenu = dnnPage.IsVisible;
           newPage.SortOrder = dnnPage.TabOrder;
 
-          AddRoutes(dnnPage, newPage);
+          await AddRoutes(dnnPage, newPage);
 
           if (dnnPage.ContainerSrc != null)
           {
@@ -256,6 +257,12 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
               }
             }
 
+            // ensure that page parent is not "itself".  
+            if (newPage.ParentId == newPage.Id)
+            {
+              newPage.ParentId = null;
+            }
+
             // save again for parent id + in case any module migrations added/ changed anything
             await this.PageManager.Save(this.Context.Site, newPage);
           }
@@ -273,72 +280,77 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     this.SignalCompleted();
   }
 
-  // No longer required: Nucleus supports link types 
-  ////// Create a SiteMap module to make the page a "landing page"
-  ////private async Task AddLandingPageModule(Nucleus.Abstractions.Models.Page newPage, IEnumerable<Nucleus.Abstractions.Models.ModuleDefinition> moduleDefinitions, Boolean updateExisting)
-  ////{
-  ////  Guid siteMapModuleDefinitionId = new("0392bf73-c646-4ccc-bcb5-372a75b9ea84");
-  ////  string siteMapTitle = newPage.Name;
-  ////  Nucleus.Abstractions.Models.PageModule newModule = null;
-
-  ////  if (updateExisting)
-  ////  {
-  ////    newModule = newPage.Modules
-  ////      .Where(existing =>
-  ////        existing.ModuleDefinition.Id == siteMapModuleDefinitionId &&
-  ////        (
-  ////          (String.IsNullOrEmpty(existing.Title) && String.IsNullOrEmpty(siteMapTitle))
-  ////          ||
-  ////          existing.Title.Equals(siteMapTitle)
-  ////        ) &&
-  ////        existing.SortOrder == 10)
-  ////      .FirstOrDefault();
-  ////  }
-
-  ////  if (newModule == null)
-  ////  {
-  ////    newModule = await this.PageModuleManager.CreateNew(this.Context.Site);
-  ////  }
-
-  ////  newModule.Title = siteMapTitle;
-  ////  newModule.InheritPagePermissions = true;
-  ////  newModule.Pane = "ContentPane";
-
-  ////  newModule.SortOrder = 10;
-
-  ////  newModule.ModuleDefinition = moduleDefinitions
-  ////    .Where(moduleDefinition => moduleDefinition.Id == siteMapModuleDefinitionId)
-  ////    .FirstOrDefault();
-
-  ////  newModule.ModuleSettings.Set("sitemap:maxlevels", 1);
-  ////  newModule.ModuleSettings.Set("sitemap:root-page-type", "CurrentPage");
-  ////  newModule.ModuleSettings.Set("sitemap:show-description", true);
-  ////  newModule.ModuleSettings.Set("sitemap:direction", "Vertical");
-
-  ////  await this.PageModuleManager.Save(newPage, newModule);
-  ////}
-
-  void AddRoutes(Models.DNN.Page dnnPage, Nucleus.Abstractions.Models.Page newPage)
+  private async Task AddRoutes(Models.DNN.Page dnnPage, Nucleus.Abstractions.Models.Page newPage)
   {
-    // Add default route based on page hierarchy
-    AddRoute(newPage, Abstractions.Models.PageRoute.PageRouteTypes.Active, dnnPage.TabPath.Replace("//", "/"));
+    List<PageUrl> urls;
 
-    // Add old-style DNN "search engine friendly" url format as a redirect to help maintain backward compatibility
-    AddRoute(newPage, Abstractions.Models.PageRoute.PageRouteTypes.PermanentRedirect, $"{dnnPage.TabPath.Replace("//", "/")}/tabid/{dnnPage.PageId}/Default.aspx");
+    try
+    {
+      urls = await this.MigrationManager.ListDnnPageUrls(dnnPage.PageId);
+    }
+    catch (Exception ex)
+    {
+      urls = new();
+    }
 
-    // Add old format "tabid=nn" url format as a redirect to help maintain backward compatibility
-    AddRoute(newPage, Abstractions.Models.PageRoute.PageRouteTypes.PermanentRedirect, $"/Default.aspx?tabid={dnnPage.PageId}");
+    if (urls.Any())
+    {
+      // if the DNN version supports TabUrls, use them
+      foreach (PageUrl url in urls)
+      {
+        await AddRoute(dnnPage, newPage, url.HttpStatus == "301" ? PageRoute.PageRouteTypes.PermanentRedirect : PageRoute.PageRouteTypes.Active, url.Url + (String.IsNullOrEmpty(url.QueryString) ? "" : $"?{url.QueryString}"));
+      }
+    }
+    else
+    {
+      // if the DNN version doesn't support TabUrls, create some generic routes
+
+      // Add old-style DNN "search engine friendly" url format as a redirect to help maintain backward compatibility
+      await AddRoute(dnnPage, newPage, Abstractions.Models.PageRoute.PageRouteTypes.PermanentRedirect, $"{dnnPage.TabPath.Replace("//", "/")}/tabid/{dnnPage.PageId}/Default.aspx");
+
+      // Add old format "tabid=nn" url format as a redirect to help maintain backward compatibility
+      await AddRoute(dnnPage, newPage, Abstractions.Models.PageRoute.PageRouteTypes.PermanentRedirect, $"/Default.aspx?tabid={dnnPage.PageId}");
+    }
+
+    // Add default route based on page hierarchy.  We always create this route because we use it to match to existing pages during migration.  We 
+    // set this route as active only if there are no active routes.
+    await AddRoute
+    (
+      dnnPage,
+      newPage, 
+      newPage.Routes.Where(route => route.Type == PageRoute.PageRouteTypes.Active).Any() ? PageRoute.PageRouteTypes.PermanentRedirect : PageRoute.PageRouteTypes.Active, 
+      dnnPage.TabPath.Replace("//", "/")
+    );
   }
 
-  void AddRoute(Nucleus.Abstractions.Models.Page newPage, Abstractions.Models.PageRoute.PageRouteTypes type, string routePath)
+  private async Task AddRoute(Models.DNN.Page dnnPage, Nucleus.Abstractions.Models.Page newPage, Abstractions.Models.PageRoute.PageRouteTypes type, string routePath)
   {
-    if (!newPage.Routes.Where(route => route.Path.Equals(routePath, StringComparison.OrdinalIgnoreCase)).Any())
+    Nucleus.Abstractions.Models.Page existing = await this.PageManager.Get(this.Context.Site, routePath);
+
+    if (existing != null && existing.Id != newPage.Id)
     {
-      newPage.Routes.Add(new()
+      dnnPage.AddWarning($"Route '{routePath}' was not added to the page '{newPage.Name}' because that route is already assigned to the '{existing.Name}' page.");
+    }
+    else
+    {
+      string path = routePath.Split('/', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+      if (!String.IsNullOrEmpty(path))
       {
-        Type = type,
-        Path = routePath
-      });
+        if (Nucleus.Abstractions.RoutingConstants.RESERVED_ROUTES.Contains(path, StringComparer.OrdinalIgnoreCase))
+        {
+          dnnPage.AddWarning($"Route '{routePath}' was not added to the page '{newPage.Name}' because page routes starting with '{path}' are reserved.");
+          return;
+        }
+      }
+
+      if (!newPage.Routes.Where(route => route.Path.Equals(routePath, StringComparison.OrdinalIgnoreCase)).Any())
+      {
+        newPage.Routes.Add(new()
+        {
+          Type = type,
+          Path = routePath
+        });
+      }
     }
   }
 

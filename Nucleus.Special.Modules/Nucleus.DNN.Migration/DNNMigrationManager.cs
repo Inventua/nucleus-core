@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Office2010.CustomUI;
 using DocumentFormat.OpenXml.Office2016.Presentation.Command;
+using Microsoft.AspNetCore.Http;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Extensions;
@@ -11,6 +12,7 @@ using Nucleus.DNN.Migration.Models.DNN.Modules;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -191,6 +193,14 @@ public class DNNMigrationManager
       return await provider.ListPages(portalId);
     }
   }
+
+  public async Task<List<Models.DNN.PageUrl>> ListDnnPageUrls(int pageId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.ListPageUrls(pageId);
+    }
+  }
   #endregion 
 
   public async Task<Models.DNN.Modules.TextHtml> GetDnnHtmlContent(int moduleId)
@@ -258,51 +268,125 @@ public class DNNMigrationManager
     }
   }
 
-  public async Task<List<Models.DNN.Modules.ForumGroup>> ListDnnForumGroupsByPortal(int portalId)
+  // NT Forums
+  public async Task<List<Models.DNN.Modules.NTForums.ForumGroup>> ListDnnNTForumGroupsByPortal(int portalId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
-      return await provider.ListForumGroupsByPortal(portalId);
+      return await provider.ListNTForumGroupsByPortal(portalId);
     }
   }
 
-  public async Task<List<Models.DNN.Modules.ForumGroup>> ListDnnForumGroupsByModule(int moduleId)
+  public async Task<List<Models.DNN.Modules.NTForums.ForumGroup>> ListDnnNTForumGroupsByModule(int moduleId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
-      return await provider.ListForumGroupsByModule(moduleId);
+      return await provider.ListNTForumGroupsByModule(moduleId);
     }
   }
 
-  public async Task<int> CountForumPosts(int forumId)
+  public async Task<int> CountNTForumPosts(int forumId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
-      return await provider.CountForumPosts(forumId);
+      return await provider.CountNTForumPosts(forumId);
     }
   }
 
-  public async Task<List<int>> ListForumPostIds(int forumId)
+  public async Task<List<int>> ListNTForumPostIds(int forumId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
-      return await provider.ListForumPostIds(forumId);
+      return await provider.ListNTForumPostIds(forumId);
     }
   }
 
-  public async Task<List<int>> ListForumPostReplyIds(int forumId, int postId)
+  public async Task<List<int>> ListNTForumPostReplyIds(int forumId, int postId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
-      return await provider.ListForumPostReplyIds(forumId, postId);
+      return await provider.ListNTForumPostReplyIds(forumId, postId);
     }
   }
 
-  public async Task<ForumPost> GetForumPost(int postId)
+  public async Task<Models.DNN.Modules.NTForums.ForumPost> GetNTForumPost(int postId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
-      return await provider.GetForumPost(postId);
+      return await provider.GetNTForumPost(postId);
+    }
+  }
+
+  // Active Forums
+  public async Task<List<Models.DNN.Modules.ActiveForums.ForumGroup>> ListDnnActiveForumsGroupsByPortal(int portalId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      List<Models.DNN.Modules.ActiveForums.ForumGroup> results = await provider.ListActiveForumsGroupsByPortal(portalId);
+
+      foreach (Models.DNN.Modules.ActiveForums.ForumGroup group in results)
+      {
+        group.Settings = await provider.ListActiveForumsSettings(group.ModuleId, group.GroupSettingsKey);
+
+        foreach(Models.DNN.Modules.ActiveForums.Forum forum in group.Forums)
+        {
+          forum.Settings = await provider.ListActiveForumsSettings(group.ModuleId, forum.ForumSettingsKey);
+        }
+      }
+
+      return results;
+    }
+  }
+
+  public async Task<List<Models.DNN.Modules.ActiveForums.ForumGroup>> ListDnnActiveForumsGroupsByModule(int moduleId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      List<Models.DNN.Modules.ActiveForums.ForumGroup> results = await provider.ListActiveForumsGroupsByModule(moduleId);
+
+      foreach (Models.DNN.Modules.ActiveForums.ForumGroup group in results)
+      {
+        group.Settings = await provider.ListActiveForumsSettings(moduleId, group.GroupSettingsKey);
+
+        foreach (Models.DNN.Modules.ActiveForums.Forum forum in group.Forums)
+        {
+          forum.Settings = await provider.ListActiveForumsSettings(group.ModuleId, forum.ForumSettingsKey);
+        }
+      }
+
+      return results;
+    }
+  }
+
+  public async Task<int> CountActiveForumsPosts(int forumId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.CountActiveForumsTopics(forumId);
+    }
+  }
+
+  public async Task<List<int>> ListActiveForumsPostIds(int forumId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.ListActiveForumsPostIds(forumId);
+    }
+  }
+
+  public async Task<List<int>> ListActiveForumsPostReplyIds(int forumId, int postId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.ListActiveForumsPostReplyIds(forumId, postId);
+    }
+  }
+
+  public async Task<Models.DNN.Modules.ActiveForums.ForumTopic> GetActiveForumsPost(int postId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.GetActiveForumsTopic(postId);
     }
   }
 

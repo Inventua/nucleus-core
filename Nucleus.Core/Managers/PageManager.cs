@@ -544,7 +544,7 @@ namespace Nucleus.Core.Managers
             breadcrumbs.Add(breadcrumbPage);
           }
 
-          if (breadcrumbPage.ParentId.HasValue)
+          if (breadcrumbPage.ParentId.HasValue && breadcrumbPage.ParentId != breadcrumbPage.Id)
           {
             breadcrumbPage = await this.Get(breadcrumbPage.ParentId.Value);
           }

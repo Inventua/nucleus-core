@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nucleus.ViewFeatures;
 using Nucleus.Extensions.Authorization;
 using System.Globalization;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -208,6 +209,9 @@ namespace Nucleus.Web.Controllers.Admin
 		public async Task<ActionResult> Save(ViewModels.Admin.PageEditor viewModel)
 		{
 			Boolean isNew = (viewModel.Page.Id == Guid.Empty);
+
+      // prevent validation errors when a link file is not selected
+      ControllerContext.ModelState.Remove<ViewModels.Admin.PageEditor>(viewModel => viewModel.SelectedLinkFile.Id);
 
 			if (!ControllerContext.ModelState.IsValid)
 			{

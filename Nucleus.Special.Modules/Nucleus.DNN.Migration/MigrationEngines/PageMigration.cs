@@ -269,7 +269,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
   private async Task SetParentPageId(Models.DNN.Page dnnPage, Nucleus.Abstractions.Models.Page newPage, Dictionary<int, Guid> createdPagesKeys, Boolean logErrorIfMissing)
   {
     // set parent page
-    if (dnnPage.ParentId != null)
+    if (dnnPage.ParentId.HasValue)
     {
       if (createdPagesKeys.ContainsKey(dnnPage.ParentId.Value))
       {
@@ -277,16 +277,21 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
       }
       else
       {
-        // try looking by route
-        Nucleus.Abstractions.Models.Page nucleusParentPage = await this.PageManager.Get(this.Context.Site, dnnPage.TabPath.Replace("//", "/"));
-        if (nucleusParentPage != null)
+        Models.DNN.Page dnnParent = await this.MigrationManager.GetDnnPage(dnnPage.ParentId.Value);
+
+        if (dnnParent != null)
         {
-          newPage.ParentId = nucleusParentPage.Id;
-        }
-        else if (logErrorIfMissing)
-        {
-          dnnPage.AddWarning($"The Page parent could not be set because a page with DNN Parent ID '{dnnPage.ParentId}' was not imported, and a Nucleus page with route '{dnnPage.TabPath.Replace("//", "/")} was not found.'.");
-        }
+          // try looking by route
+          Nucleus.Abstractions.Models.Page nucleusParentPage = await this.PageManager.Get(this.Context.Site, dnnParent.TabPath.Replace("//", "/"));
+          if (nucleusParentPage != null)
+          {
+            newPage.ParentId = nucleusParentPage.Id;
+          }
+          else if (logErrorIfMissing)
+          {
+            dnnPage.AddWarning($"The Page parent could not be set because a page with DNN Parent ID '{dnnPage.ParentId}' was not imported, and a Nucleus page with route '{dnnPage.TabPath.Replace("//", "/")} was not found.'.");
+          }
+        }        
       }
     }
   }

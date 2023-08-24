@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.FileSystemProviders;
 using Nucleus.Abstractions.Managers;
 using Nucleus.DNN.Migration.Models.DNN.Modules.ActiveForums;
+using System.IO;
 
 namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
@@ -94,6 +95,17 @@ public class ActiveForumsModuleContentMigration : ModuleContentMigrationBase
     Nucleus.Abstractions.Portable.IPortable portable = this.DnnMigrationManager.GetPortableImplementation(this.ModuleDefinitionId);
     FileSystemProviderInfo fileSystemProvider = this.FileSystemManager.ListProviders().FirstOrDefault();
 
+    Nucleus.Abstractions.Models.FileSystem.Folder attachmentsFolder;
+
+    try
+    {
+      attachmentsFolder = await this.FileSystemManager.GetFolder(site, fileSystemProvider.Key, "ActiveForums_Attach");
+    }
+    catch (FileNotFoundException)
+    {
+      attachmentsFolder = null;
+    }
+
     foreach (ForumGroup dnnGroup in await this.DnnMigrationManager.ListDnnActiveForumsGroupsByModule(dnnModule.ModuleId))
     {
       List<object> forums = new();
@@ -106,7 +118,8 @@ public class ActiveForumsModuleContentMigration : ModuleContentMigrationBase
           Visible = !dnnForum.Hidden,
           IsModerated = GetSetting(dnnForum.Settings, FORUM_SETTING_ISMODERATED, false),
           AllowAttachments = GetSetting(dnnForum.Settings, FORUM_SETTING_ALLOWATTACH, false),
-          AllowSearchIndexing = GetSetting(dnnForum.Settings, FORUM_SETTING_INDEXCONTENT, false)
+          AllowSearchIndexing = GetSetting(dnnForum.Settings, FORUM_SETTING_INDEXCONTENT, false),
+          AttachmentsFolder = attachmentsFolder
         };
 
         object newForum = new

@@ -10,6 +10,7 @@ using Nucleus.Abstractions.Managers;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using Nucleus.DNN.Migration.Models.DNN.Modules.NTForums;
+using System.IO;
 
 namespace Nucleus.DNN.Migration.MigrationEngines.ModuleContent;
 
@@ -68,6 +69,16 @@ public class NTForumsModuleContentMigration : ModuleContentMigrationBase
     Site site = await this.SiteManager.Get(newPage.SiteId);
     Nucleus.Abstractions.Portable.IPortable portable = this.DnnMigrationManager.GetPortableImplementation(this.ModuleDefinitionId);
     FileSystemProviderInfo fileSystemProvider = this.FileSystemManager.ListProviders().FirstOrDefault();
+    Nucleus.Abstractions.Models.FileSystem.Folder attachmentsFolder;
+    
+    try
+    {
+      attachmentsFolder = await this.FileSystemManager.GetFolder(site, fileSystemProvider.Key, "NTForums_Attach");
+    }
+    catch (FileNotFoundException)
+    {
+      attachmentsFolder = null;
+    }
 
     foreach (ForumGroup dnnGroup in await this.DnnMigrationManager.ListDnnNTForumGroupsByModule(dnnModule.ModuleId))
     {
@@ -82,7 +93,8 @@ public class NTForumsModuleContentMigration : ModuleContentMigrationBase
           Visible = !dnnForum.Hidden,
           IsModerated = dnnForum.IsModerated,
           AllowAttachments = !dnnForum.AttachCount.HasValue ? false : dnnForum.AttachCount.Value > 0,
-          AllowSearchIndexing = dnnForum.IndexContent
+          AllowSearchIndexing = dnnForum.IndexContent,
+          AttachmentsFolder = attachmentsFolder
         };
 
         object newForum = new

@@ -108,7 +108,7 @@ namespace Nucleus.Modules.Forums.Controllers
 
 			viewModel.GroupPermissions = viewModel.Group.Permissions.ToPermissionsList(this.Context.Site);
 
-			return View("GroupEditor", await BuildGroupSettingsViewModel (viewModel, true));
+			return View("_GroupPermissions", await BuildGroupSettingsViewModel (viewModel, true));
 
 		}
 

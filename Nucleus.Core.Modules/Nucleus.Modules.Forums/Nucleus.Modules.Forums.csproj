@@ -39,6 +39,7 @@
     <None Remove="Views\ViewForum.cshtml" />
     <None Remove="Views\ViewPost.cshtml" />
     <None Remove="Views\_ForumList.cshtml" />
+    <None Remove="Views\_GroupPermissions.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,6 +48,7 @@
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
     <Content Include="settings.css" />
+    <Content Include="Views\_GroupPermissions.cshtml" />
     <Content Include="Views\ManageSubscriptions.cshtml" />
     <Content Include="Views\_ForumList.cshtml" />
     <Content Include="Views\ReplyPost.cshtml" />

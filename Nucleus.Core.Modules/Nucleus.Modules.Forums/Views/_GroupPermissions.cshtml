@@ -1,0 +1,53 @@
+﻿@model Nucleus.Modules.Forums.ViewModels.GroupSettings
+@using Nucleus.Abstractions.Models
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.Forums.ViewModels
+@if (Model.AvailableRoles.Count() > 0)
+{
+  <div class="nucleus-form-tools">
+    @Html.DropDownListFor(model => model.SelectedRoleId, Model.AvailableRoles, new { @class = "flex-fill" })
+    <input type="submit" formaction="@Url.NucleusAction("AddGroupPermissionRole", "ForumsAdmin", "Forums")" value="Add Role" data-target="#group-permissions" class="btn btn-secondary" />
+  </div>
+}
+<table class="table table-striped table-sm">
+  <thead>
+    <tr>
+      <th></th>
+      @foreach (var permissionType in Model.ForumPermissionTypes)
+      {
+        <th>@permissionType.Name</th>
+      }
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach (var item in Model.GroupPermissions.Values)
+    {
+      <tr>
+        <td>
+          @item.Role.Name
+        </td>
+
+        @for (int permissionsCount = 0; permissionsCount < Model.GroupPermissions[item.Role.Id].Permissions.Count; permissionsCount++)
+        {
+          <td>
+            @Html.HiddenFor(model => Model.GroupPermissions[item.Role.Id].Permissions[permissionsCount].Id)
+            @Html.HiddenFor(model => Model.GroupPermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Id)
+            @Html.HiddenFor(model => Model.GroupPermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope)
+            @if (Model.GroupPermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope == PermissionType.PermissionScopeNamespaces.Disabled)
+            {
+              <span class="nucleus-material-icon text-center d-block">&#xe8f5;</span>
+            }
+            else
+            {
+              @Html.CheckBoxFor(model => Model.GroupPermissions[item.Role.Id].Permissions[permissionsCount].AllowAccess)
+            }
+          </td>
+        }
+
+        <td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("DeleteGroupPermissionRole", "ForumsAdmin", "Forums", new { id = item.Role.Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target="#GroupEditor" /></td>
+      </tr>
+    }
+  </tbody>
+</table>

@@ -30,6 +30,7 @@
         <file name="ViewForum.cshtml" />
         <file name="Settings.cshtml" />
         <file name="GroupEditor.cshtml" />
+        <file name="_GroupPermissions.cshtml" />
         <file name="_ForumList.cshtml" />
         <file name="ForumEditor.cshtml" />
         <file name="ViewPost.cshtml" />

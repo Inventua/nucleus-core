@@ -679,11 +679,16 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.Page = page;
 			viewModel.PagePermissions = pagePermissions;
 
-			viewModel.Page.Modules = await this .PageManager.ListModules(viewModel.Page);
+      // if the page was populated by MVC, it won't have any modules.  Checking Modules.Any() before calling .ListModules is a small improvement in performance
+      if (!viewModel.Page.Modules.Any())
+      {
+        viewModel.Page.Modules = await this.PageManager.ListModules(viewModel.Page);
+      }
 
-			viewModel.PageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, page.ParentId);
+			viewModel.ParentPageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, page.ParentId);
+      viewModel.LinkPageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, viewModel.Page.LinkPageId);
 
-			viewModel.AvailableModules = await GetAvailableModules();
+      viewModel.AvailableModules = await GetAvailableModules();
 			viewModel.AvailablePageRoles = await GetAvailableRoles(viewModel.Page?.Permissions);			
 			viewModel.PagePermissionTypes = await this.PageManager.ListPagePermissionTypes();
 

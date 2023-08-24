@@ -192,9 +192,7 @@ namespace Nucleus.Core.Managers
         await provider.DeletePage(page);
       }
 
-      this.CacheManager.PageCache().Remove(page.Id);
-      this.CacheManager.PageMenuCache().Clear();
-      this.CacheManager.PageRouteCache().Clear();
+      InvalidateCache(page.Id);
     }
 
     /// <summary>
@@ -358,9 +356,15 @@ namespace Nucleus.Core.Managers
         await provider.SavePage(site, page);
       }
 
-      this.CacheManager.PageCache().Remove(page.Id);
+      InvalidateCache(page.Id);
+    }
+
+    private void InvalidateCache(Guid pageId)
+    {
+      this.CacheManager.PageCache().Remove(pageId);
       this.CacheManager.PageMenuCache().Clear();
       this.CacheManager.PageRouteCache().Clear();
+      this.CacheManager.AdminPageMenuCache().Clear();
     }
 
     /// <summary>
@@ -435,9 +439,8 @@ namespace Nucleus.Core.Managers
               await provider.SavePage(site, page);
             }
 
-            this.CacheManager.PageCache().Remove(previousPage.Id);
-            this.CacheManager.PageCache().Remove(page.Id);
-            this.CacheManager.PageMenuCache().Clear();
+            InvalidateCache(page.Id);
+            InvalidateCache(previousPage.Id);
             break;
           }
         }
@@ -492,9 +495,8 @@ namespace Nucleus.Core.Managers
               await provider.SavePage(site, page);
             }
 
-            this.CacheManager.PageCache().Remove(previousPage.Id);
-            this.CacheManager.PageCache().Remove(page.Id);
-            this.CacheManager.PageMenuCache().Clear();
+            InvalidateCache(page.Id);
+            InvalidateCache(previousPage.Id);
             break;
           }
         }
@@ -507,8 +509,29 @@ namespace Nucleus.Core.Managers
 
     public async Task<PageMenu> GetAdminMenu(Site site, Page parentPage, ClaimsPrincipal user, int levels, Boolean ignorePermissions, Boolean ignoreDisabled, Boolean ignoreShowInMenu)
     {
-      // read from database
-      PageMenuChildrenResult childrenResult =
+      string key;
+      if (user.IsSystemAdministrator())
+      {
+        key = $"system-administrator:{site.Id}:{levels}:{ignorePermissions}:{ignoreDisabled}:{ignoreShowInMenu}:{(parentPage == null ? Guid.Empty : parentPage.Id)}";
+      }
+      else if (user.IsSiteAdmin(site))
+      {
+        key = $"site-administrator:{site.Id}:{levels}:{ignorePermissions}:{ignoreDisabled}:{ignoreShowInMenu}:{(parentPage == null ? Guid.Empty : parentPage.Id)}";
+      }
+      else
+      {
+        string roles = String.Join(":", user.Claims.Where(claim => claim.Type == System.Security.Claims.ClaimTypes.Role).Select(claim => claim.Value));
+        if (String.IsNullOrEmpty(roles))
+        {
+          roles = "Anonymous User";
+        }
+        key = String.Join("|", Encode(roles) + $":{site.Id}:{levels}:{ignorePermissions}:{ignoreDisabled}:{ignoreShowInMenu}:{(parentPage == null ? Guid.Empty : parentPage.Id)}");
+      }
+
+      return await this.CacheManager.AdminPageMenuCache().GetAsync(key, async key =>
+      {
+        // read from database
+        PageMenuChildrenResult childrenResult =
         await GetPageMenuDescendants
         (
           site,
@@ -521,7 +544,8 @@ namespace Nucleus.Core.Managers
           ignoreShowInMenu
         );
 
-      return new PageMenu(null, childrenResult.Children, childrenResult.HasChildren);
+        return new PageMenu(null, childrenResult.Children, childrenResult.HasChildren);
+      });
     }
 
     public async Task<PageMenu> GetAdminMenu(Site site, Page parentPage, ClaimsPrincipal user, int levels)
@@ -531,50 +555,75 @@ namespace Nucleus.Core.Managers
 
     public async Task<PageMenu> GetAdminMenu(Site site, Page parentPage, ClaimsPrincipal user, Guid? selectedPageId)
     {
-      if (selectedPageId.HasValue && selectedPageId != Guid.Empty)
+
+      string key;
+      if (user.IsSystemAdministrator())
       {
-        // use "breadcrumb" logic to fill in the tree up to the selected page
-        List<Page> breadcrumbs = new();
-
-        Page breadcrumbPage = await Get(selectedPageId.Value);
-        do
+        key = $"system-administrator:{site.Id}:{selectedPageId}:{(parentPage == null ? Guid.Empty : parentPage.Id)}";
+      }
+      else if (user.IsSiteAdmin(site))
+      {
+        key = $"site-administrator:{site.Id}:{selectedPageId}:{(parentPage == null ? Guid.Empty : parentPage.Id)}";
+      }
+      else
+      {
+        string roles = String.Join(":", user.Claims.Where(claim => claim.Type == System.Security.Claims.ClaimTypes.Role).Select(claim => claim.Value));
+        if (String.IsNullOrEmpty(roles))
         {
-          if (breadcrumbPage != null)
-          {
-            breadcrumbs.Add(breadcrumbPage);
-          }
-
-          if (breadcrumbPage.ParentId.HasValue && breadcrumbPage.ParentId != breadcrumbPage.Id)
-          {
-            breadcrumbPage = await this.Get(breadcrumbPage.ParentId.Value);
-          }
-          else
-          {
-            breadcrumbPage = null;
-          }
-        } while (breadcrumbPage != null);
-
-        if (breadcrumbs.Any())
-        {
-          breadcrumbs.Reverse();
-
-          // get the top level
-          PageMenu menu = await GetAdminMenu(site, null, user, 1, true, true, true);
-          PageMenu subMenu = menu;
-
-          foreach (Page ancestor in breadcrumbs)
-          {
-            subMenu = subMenu.Children.Where(child => child.Page.Id == ancestor.Id).FirstOrDefault();
-
-            PageMenuChildrenResult newChildren = await GetPageMenuDescendants(site, subMenu.Page, user, 1, 0, PermissionsCheckOption.Ignore, true, true);
-            subMenu.UpdateChildren(newChildren.Children, newChildren.HasChildren);
-          }
-
-          return menu;
+          roles = "Anonymous User";
         }
+        key = String.Join("|", Encode(roles) + $":{site.Id}:{selectedPageId}:{(parentPage == null ? Guid.Empty : parentPage.Id)}");
       }
 
-      return await GetAdminMenu(site, parentPage, user, 1); ;
+      return await this.CacheManager.AdminPageMenuCache().GetAsync(key, async key =>
+      {
+        // read from database
+        if (selectedPageId.HasValue && selectedPageId != Guid.Empty)
+        {
+          // use "breadcrumb" logic to fill in the tree up to the selected page
+          List<Page> breadcrumbs = new();
+
+          Page breadcrumbPage = await Get(selectedPageId.Value);
+          do
+          {
+            if (breadcrumbPage != null)
+            {
+              breadcrumbs.Add(breadcrumbPage);
+            }
+
+            // extra checks here are to prevent an infinite loop 
+            if (breadcrumbPage.ParentId.HasValue && breadcrumbPage.ParentId != breadcrumbPage.Id && !breadcrumbs.Where(crumb => crumb.Id == breadcrumbPage.ParentId).Any())
+            {
+              breadcrumbPage = await this.Get(breadcrumbPage.ParentId.Value);
+            }
+            else
+            {
+              breadcrumbPage = null;
+            }
+          } while (breadcrumbPage != null);
+
+          if (breadcrumbs.Any())
+          {
+            breadcrumbs.Reverse();
+
+            // get the top level
+            PageMenu menu = await GetAdminMenu(site, null, user, 1, true, true, true);
+            PageMenu subMenu = menu;
+
+            foreach (Page ancestor in breadcrumbs)
+            {
+              subMenu = subMenu.Children.Where(child => child.Page.Id == ancestor.Id).FirstOrDefault();
+
+              PageMenuChildrenResult newChildren = await GetPageMenuDescendants(site, subMenu.Page, user, 1, 0, PermissionsCheckOption.Ignore, true, true);
+              subMenu.UpdateChildren(newChildren.Children, newChildren.HasChildren);
+            }
+
+            return menu;
+          }
+        }
+
+        return await GetAdminMenu(site, parentPage, user, 1);
+      });
     }
 
 
@@ -607,18 +656,18 @@ namespace Nucleus.Core.Managers
       });
     }
 
-		/// <summary>
-		/// Copy permissions from the specified <paramref name="page"/> to its descendants.
-		/// </summary>
-		/// <param name="site"></param>
-		/// <param name="page"></param>
-		/// <param name="operation">
-		/// If <paramref name="operation"/> is <see cref="IPageManager.CopyPermissionOperation.Replace"/> overwrite all permissions of descendant pages.  
-		/// if <paramref name="operation"/> is <see cref="IPageManager.CopyPermissionOperation.Merge"/>, merge the descendant pages permissions with the specified 
-		/// <paramref name="page"/> permissions.		
-		/// </param>
-		/// <returns></returns>
-		public async Task<Boolean> CopyPermissionsToDescendants(Site site, Page page, ClaimsPrincipal user, CopyPermissionOperation operation)
+    /// <summary>
+    /// Copy permissions from the specified <paramref name="page"/> to its descendants.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <param name="page"></param>
+    /// <param name="operation">
+    /// If <paramref name="operation"/> is <see cref="IPageManager.CopyPermissionOperation.Replace"/> overwrite all permissions of descendant pages.  
+    /// if <paramref name="operation"/> is <see cref="IPageManager.CopyPermissionOperation.Merge"/>, merge the descendant pages permissions with the specified 
+    /// <paramref name="page"/> permissions.		
+    /// </param>
+    /// <returns></returns>
+    public async Task<Boolean> CopyPermissionsToDescendants(Site site, Page page, ClaimsPrincipal user, CopyPermissionOperation operation)
     {
       PageMenuChildrenResult children = await GetPageMenuDescendants(site, page, user, 0, 0, PermissionsCheckOption.Edit, true, true);
 
@@ -640,7 +689,7 @@ namespace Nucleus.Core.Managers
 
     private async Task CopyPermissionsToDescendants(Site site, PageMenu page, List<Permission> parentPermissions, CopyPermissionOperation operation)
     {
-			List<Permission> newPermissions = new();
+      List<Permission> newPermissions = new();
 
       using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
       {
@@ -648,44 +697,44 @@ namespace Nucleus.Core.Managers
         switch (operation)
         {
           case CopyPermissionOperation.Replace:
-						// this is the default behavior
-						newPermissions = parentPermissions
-							.Select(parentPermission => new Permission() 
-							{ 
-								AllowAccess = parentPermission.AllowAccess,
-							  PermissionType = parentPermission.PermissionType,
-							  RelatedId = parentPermission.RelatedId,
-								Role = parentPermission.Role
- 							}).ToList();
+            // this is the default behavior
+            newPermissions = parentPermissions
+              .Select(parentPermission => new Permission()
+              {
+                AllowAccess = parentPermission.AllowAccess,
+                PermissionType = parentPermission.PermissionType,
+                RelatedId = parentPermission.RelatedId,
+                Role = parentPermission.Role
+              }).ToList();
             break;
 
           case CopyPermissionOperation.Merge:
-						// merge original permissions with new permissions
-						newPermissions = parentPermissions
-							.Select(parentPermission => new Permission()
-							{
-								AllowAccess = parentPermission.AllowAccess,
-								PermissionType = parentPermission.PermissionType,
-								RelatedId = parentPermission.RelatedId,
-								Role = parentPermission.Role
-							}).ToList();
+            // merge original permissions with new permissions
+            newPermissions = parentPermissions
+              .Select(parentPermission => new Permission()
+              {
+                AllowAccess = parentPermission.AllowAccess,
+                PermissionType = parentPermission.PermissionType,
+                RelatedId = parentPermission.RelatedId,
+                Role = parentPermission.Role
+              }).ToList();
 
-						// Include original permissions where the role is not in parentPermissions
-						newPermissions.AddRange(originalPermissions.Where
-						(
-							originalPermission => !newPermissions.Where
-							(
-								newPermission =>
-								(
-									newPermission.RelatedId == originalPermission.RelatedId &&
-									newPermission.Role.Id == originalPermission.Role.Id &&
-									newPermission.PermissionType.Scope.Equals(originalPermission.PermissionType.Scope, StringComparison.OrdinalIgnoreCase) &&
-									newPermission.AllowAccess == originalPermission.AllowAccess
-								)
-							).Any()
-						));
+            // Include original permissions where the role is not in parentPermissions
+            newPermissions.AddRange(originalPermissions.Where
+            (
+              originalPermission => !newPermissions.Where
+              (
+                newPermission =>
+                (
+                  newPermission.RelatedId == originalPermission.RelatedId &&
+                  newPermission.Role.Id == originalPermission.Role.Id &&
+                  newPermission.PermissionType.Scope.Equals(originalPermission.PermissionType.Scope, StringComparison.OrdinalIgnoreCase) &&
+                  newPermission.AllowAccess == originalPermission.AllowAccess
+                )
+              ).Any()
+            ));
 
-						break;
+            break;
         }
 
         await provider.SavePermissions(page.Page.Id, newPermissions, originalPermissions);
@@ -711,8 +760,6 @@ namespace Nucleus.Core.Managers
         return BitConverter.ToString(md5.ComputeHash(valueBytes)).Replace("-", "");
       }
     }
-
-    //private async Task<PageMenuChildrenResult> GetPageMenuChildren(Site site, Page parentPage, ClaimsPrincipal user, int levels, int thisLevel, Boolean ignorePermissions, Boolean ignoreDisabled, Boolean ignoreShowInMenu)
 
     private async Task<PageMenuChildrenResult> GetPageMenuDescendants(Site site, Page parentPage, ClaimsPrincipal user, int levels, int thisLevel, PermissionsCheckOption permissionsCheckOption, Boolean ignoreDisabled, Boolean ignoreShowInMenu)
     {
@@ -744,7 +791,7 @@ namespace Nucleus.Core.Managers
 
     private Boolean HasPermission(Site site, Page page, ClaimsPrincipal user, PermissionsCheckOption permissionsCheckOption)
     {
-      return        
+      return
         (!permissionsCheckOption.HasFlag(PermissionsCheckOption.View) || user.HasViewPermission(site, page)) &&
         (!permissionsCheckOption.HasFlag(PermissionsCheckOption.Edit) || user.HasEditPermission(site, page));
 

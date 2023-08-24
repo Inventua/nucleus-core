@@ -8,7 +8,7 @@
 		<ul>
 			@foreach (var item in Model.Sites)
 			{
-				<li><a href="@Url.Content("~/Admin/Sites/Editor")?id=@item.Id" data-target=".SiteEditor">@item.Name</a></li>
+        <li><a href="@Url.Content("~/Admin/Sites/Editor")?id=@item.Id" data-target=".SiteEditor" class="nucleus-show-progress nucleus-show-progress-inside">@item.Name</a></li>
 			}
 		</ul>
 	</div>

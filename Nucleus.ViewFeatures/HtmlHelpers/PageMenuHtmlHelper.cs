@@ -58,15 +58,15 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 			IUrlHelper urlHelper = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(htmlHelper.ViewContext);
 			HtmlContentBuilder outputBuilder = new();
 
-			TagBuilder linkBuilder = new("a");
-			string caption = fromPage.Name;
+			//TagBuilder linkBuilder = new("a");
+			//string caption = fromPage.Name;
 
-			linkBuilder.Attributes.Add("data-id", fromPage.Id.ToString());
-			linkBuilder.Attributes.Add("data-linkurl", urlHelper.PageLink(fromPage));
-			linkBuilder.Attributes.Add("tabindex", "0");
-			linkBuilder.InnerHtml.SetContent(caption);
+			//linkBuilder.Attributes.Add("data-id", fromPage.Id.ToString());
+			//linkBuilder.Attributes.Add("data-linkurl", urlHelper.PageLink(fromPage));
+			//linkBuilder.Attributes.Add("tabindex", "0");
+			//linkBuilder.InnerHtml.SetContent(caption);
 
-			outputBuilder.AppendHtml(linkBuilder);
+			outputBuilder.AppendHtml(BuildLink(urlHelper, fromPage));
 						
 			outputBuilder.AppendHtml(RenderExpandButton(fromPage, false));
 			outputBuilder.AppendHtml(RenderCollapseButton(fromPage, true));
@@ -79,6 +79,19 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
 			return outputBuilder;
 		}
+
+    private static TagBuilder BuildLink(IUrlHelper urlHelper, Page page)
+    {
+      TagBuilder linkBuilder = new("a");
+
+      linkBuilder.Attributes.Add("data-id", page.Id.ToString());
+      linkBuilder.Attributes.Add("data-linkurl", urlHelper.PageLink(page));
+      linkBuilder.Attributes.Add("tabindex", "0");
+      linkBuilder.InnerHtml.SetContent(page.Name);
+      linkBuilder.AddCssClass("nucleus-show-progress nucleus-show-progress-inside");
+
+      return linkBuilder;
+    }
 
 		private static Boolean IsInTree(PageMenu menu, Guid selectedPageId)
 		{
@@ -117,16 +130,16 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
 					string caption = childItem.Page.Name;
 
-					TagBuilder linkBuilder = new("a");
-					// We append a "/" so that if the path contains dots the net core static file provider doesn't interpret the path as a file
-					//itemUrl = url.Replace("{id}", childItem.Page.Id.ToString());
-					//linkBuilder.Attributes.Add("href", itemUrl);
-					linkBuilder.Attributes.Add("tabindex", "0");
-					linkBuilder.Attributes.Add("data-id", childItem.Page.Id.ToString());
-					linkBuilder.Attributes.Add("data-linkurl", urlHelper.PageLink(childItem.Page));
-					linkBuilder.InnerHtml.SetContent(caption);
+					//TagBuilder linkBuilder = new("a");
+					//// We append a "/" so that if the path contains dots the net core static file provider doesn't interpret the path as a file
+					////itemUrl = url.Replace("{id}", childItem.Page.Id.ToString());
+					////linkBuilder.Attributes.Add("href", itemUrl);
+					//linkBuilder.Attributes.Add("tabindex", "0");
+					//linkBuilder.Attributes.Add("data-id", childItem.Page.Id.ToString());
+					//linkBuilder.Attributes.Add("data-linkurl", urlHelper.PageLink(childItem.Page));
+					//linkBuilder.InnerHtml.SetContent(caption);
 
-					itemBuilder.InnerHtml.AppendHtml(linkBuilder);
+					itemBuilder.InnerHtml.AppendHtml(BuildLink(urlHelper, childItem.Page));
 
 					itemBuilder.MergeAttributes(htmlAttributes);
 

@@ -55,7 +55,7 @@
           </div>
 
           <SettingsControl name="@nameof(Model.Page.ParentId)" caption="Parent Page" helptext="The parent page for this page, used when rendering a menu.">
-            @Html.PageListFor(model => model.Page.ParentId, Model.PageMenu, Model.Page.Id)
+            @Html.PageListFor(model => model.Page.ParentId, Model.ParentPageMenu, Model.Page.Id)
           </SettingsControl>
 
           <SettingsControl caption="Description" helptext="Description of the page.  Some search engines use the page description to generate result snippets.">
@@ -83,7 +83,7 @@
           </SettingsControl>
 
           <SettingsControl caption="Link Page" class="page-link-page collapse@(Model.Page.LinkType == Page.LinkTypes.Page ? " show" : "")" helptext="Select the page to link to.">
-            @Html.PageListFor(model => model.Page.LinkPageId, Model.PageMenu, Model.Page.Id)
+            @Html.PageListFor(model => model.Page.LinkPageId, Model.LinkPageMenu, Model.Page.Id)
           </SettingsControl>
 
           <SettingsControl caption="Link File" class="page-link-file collapse@(Model.Page.LinkType == Page.LinkTypes.File? " show" : "")" helptext="Select the file to display.">

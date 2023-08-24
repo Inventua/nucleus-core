@@ -25,9 +25,11 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public Page Page { get; set; } = new Page();
 
-		public PageMenu PageMenu { get; set; }
+		public PageMenu ParentPageMenu { get; set; }
+    public PageMenu LinkPageMenu { get; set; }
 
-		public PageModule Module { get; set; } = new PageModule();
+
+    public PageModule Module { get; set; } = new PageModule();
 
 		public IEnumerable<SelectListItem> AvailableModules { get; set; } 
 

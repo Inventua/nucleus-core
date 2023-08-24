@@ -106,7 +106,7 @@ namespace Nucleus.Core.Managers
 		{			
 			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
 			{
-				List<Permission> originalPermissions = await provider .ListPermissions(module.Id, PageModule.URN);
+				List<Permission> originalPermissions = await provider.ListPermissions(module.Id, PageModule.URN);
 
 				await provider.SavePermissions(module.Id, module.Permissions, originalPermissions);
 			}

@@ -133,10 +133,15 @@ namespace Nucleus.Data.EntityFramework
 				.ToTable("Pages")
 				.Ignore(prop => prop.IsFirst)
 				.Ignore(prop => prop.IsLast)
-				.Ignore(page => page.Permissions)
+				//.Ignore(page => page.Permissions)
 				.HasOne<Site>();
 
-			builder.Entity<PageRoute>()
+      builder.Entity<Page>()
+        .HasMany(page => page.Permissions)
+        .WithOne()
+        .HasForeignKey(perm => perm.RelatedId);
+
+      builder.Entity<PageRoute>()
 				.ToTable("PageRoutes")
 				.HasOne<Page>()
 				.WithMany(page => page.Routes);
@@ -162,9 +167,14 @@ namespace Nucleus.Data.EntityFramework
 				.HasOne<Page>()
 				.WithMany(page => page.Modules);
 
-			// PageModuleId is not a CLR property (it is a shadow property) so we must define its type.  The relationship
-			// is already inferred because of the Page.ModuleSettings property
-			builder.Entity<ModuleSetting>()
+      builder.Entity<PageModule>()
+        .HasMany(module => module.Permissions)
+        .WithOne()
+        .HasForeignKey(perm => perm.RelatedId);
+
+      // PageModuleId is not a CLR property (it is a shadow property) so we must define its type.  The relationship
+      // is already inferred because of the Page.ModuleSettings property
+      builder.Entity<ModuleSetting>()
 				.ToTable("PageModuleSettings")
 				.Property<Guid>("PageModuleId");
 

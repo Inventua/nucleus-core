@@ -296,8 +296,25 @@ namespace Nucleus.Core.DataProviders
 					.ThenInclude(pageModule => pageModule.ModuleDefinition)
 				.Include(page => page.Modules)
 					.ThenInclude(pageModule => pageModule.ModuleSettings)
-				.Include(page => page.Routes)
-				.AsSplitQuery()
+
+        // module permissions
+        .Include(page => page.Modules)
+          .ThenInclude(module => module.Permissions.Where(permission => permission.PermissionType.Scope == PageModule.URN))
+            .ThenInclude(permission => permission.PermissionType)
+        .Include(page => page.Modules)
+          .ThenInclude(module => module.Permissions)
+            .ThenInclude(permission => permission.Role)
+              .ThenInclude(role => role.RoleGroup)
+
+        .Include(page => page.Routes)
+
+        // page permissions
+        .Include(page => page.Permissions.Where(permission => permission.PermissionType.Scope == Page.URN))
+          .ThenInclude(permission => permission.PermissionType)
+        .Include(page => page.Permissions)
+          .ThenInclude(permission => permission.Role)
+            .ThenInclude(role => role.RoleGroup)
+        .AsSplitQuery()
 				.AsNoTracking()
 				.FirstOrDefaultAsync();
 
@@ -306,17 +323,17 @@ namespace Nucleus.Core.DataProviders
 				// Entity framework doesn't correctly order "child" collections so we have to do it client-side
 				result.Modules = result.Modules.OrderBy(module => module.SortOrder).ToList();
 
-				foreach (PageModule module in result.Modules)
-				{
-					module.Permissions = await ListPermissions(module.Id, PageModule.URN);
-				}
+				////foreach (PageModule module in result.Modules)
+				////{
+				////	module.Permissions = await ListPermissions(module.Id, PageModule.URN);
+				////}
 
 				result.IsFirst = await GetFirstPageSortOrder(result.SiteId, result.ParentId) == result.SortOrder;
 				result.IsLast = await GetLastPageSortOrder(result.SiteId, result.ParentId) == result.SortOrder;
 
-				// we have to deal with the permissions table "manually" because entity framework can't understand that it serves three
-				// different entities (page, module and folder, as well as any other extensions that might use it)
-				result.Permissions = await ListPermissions(result.Id, Page.URN);
+				////// we have to deal with the permissions table "manually" because entity framework can't understand that it serves three
+				////// different entities (page, module and folder, as well as any other extensions that might use it)
+				////result.Permissions = await ListPermissions(result.Id, Page.URN);
 
 			}
 
@@ -345,14 +362,31 @@ namespace Nucleus.Core.DataProviders
 					.ThenInclude(pageModule => pageModule.ModuleDefinition)
 				.Include(page => page.Modules)
 					.ThenInclude(pageModule => pageModule.ModuleSettings)
-				.Include(page => page.Routes)
-				.AsSplitQuery()
+
+        // module permissions
+        .Include(page => page.Modules)
+          .ThenInclude(module => module.Permissions.Where(permission => permission.PermissionType.Scope == PageModule.URN))
+            .ThenInclude(permission => permission.PermissionType)
+        .Include(page => page.Modules)
+          .ThenInclude(module => module.Permissions)
+            .ThenInclude(permission => permission.Role)
+              .ThenInclude(role => role.RoleGroup)
+
+        .Include(page => page.Routes)
+
+        // page permissions
+        .Include(page => page.Permissions.Where(permission => permission.PermissionType.Scope == Page.URN))
+          .ThenInclude(permission => permission.PermissionType)
+        .Include(page => page.Permissions)
+          .ThenInclude(permission => permission.Role)
+            .ThenInclude(role => role.RoleGroup)
+        .AsSplitQuery()
 				.AsNoTracking()
 				.ToListAsync();
 
 			foreach (Page result in results)
 			{
-				result.Permissions = await ListPermissions(result.Id, Page.URN);
+				////result.Permissions = await ListPermissions(result.Id, Page.URN);
 
 				result.IsFirst = await GetFirstPageSortOrder(result.SiteId, result.ParentId) == result.SortOrder;
 				result.IsLast = await GetLastPageSortOrder(result.SiteId, result.ParentId) == result.SortOrder;
@@ -361,18 +395,28 @@ namespace Nucleus.Core.DataProviders
 			return results;
 		}
 
+    /// <summary>
+    /// Return a simplified list of site pages for use with menus, with just routes and permissions populated.
+    /// </summary>
+    /// <param name="siteId"></param>
+    /// <returns></returns>
     public async Task<List<Page>> ListSitePages(Guid siteId)
     {
       List<Page> results = await this.Context.Pages.Where(page => page.SiteId == siteId)
         .Include(page => page.Routes)
-        .AsSingleQuery()
+        .Include(page => page.Permissions.Where(permission => permission.PermissionType.Scope == Page.URN))
+          .ThenInclude(permission => permission.PermissionType)
+        .Include(page => page.Permissions)
+          .ThenInclude(permission => permission.Role)
+            .ThenInclude(role => role.RoleGroup)
+        .AsSplitQuery()
         .AsNoTracking()
         .ToListAsync();
 
-      foreach (Page result in results)
-      {
-        result.Permissions = await ListPermissions(result.Id, Page.URN);
-      }
+      ////foreach (Page result in results)
+      ////{
+      ////  result.Permissions = await ListPermissions(result.Id, Page.URN);
+      ////}
 
       return results;
     }
@@ -390,14 +434,31 @@ namespace Nucleus.Core.DataProviders
 					.ThenInclude(pageModule => pageModule.ModuleDefinition)
 				.Include(page => page.Modules)
 					.ThenInclude(pageModule => pageModule.ModuleSettings)
-				.Include(page => page.Routes)
-				.AsSplitQuery()
+
+        // module permissions
+        .Include(page => page.Modules)
+          .ThenInclude(module => module.Permissions.Where(permission => permission.PermissionType.Scope == PageModule.URN))
+            .ThenInclude(permission => permission.PermissionType)
+        .Include(page => page.Modules)
+          .ThenInclude(module => module.Permissions)
+            .ThenInclude(permission => permission.Role)
+              .ThenInclude(role => role.RoleGroup)
+
+        .Include(page => page.Routes)
+
+        // page permissions
+        .Include(page => page.Permissions.Where(permission => permission.PermissionType.Scope == Page.URN))
+          .ThenInclude(permission => permission.PermissionType)
+        .Include(page => page.Permissions)
+          .ThenInclude(permission => permission.Role)
+            .ThenInclude(role => role.RoleGroup)
+        .AsSplitQuery()
 				.AsNoTracking()
 				.ToListAsync();
 
 			foreach (Page result in results)
 			{
-				result.Permissions = await ListPermissions(result.Id, Page.URN);
+				////result.Permissions = await ListPermissions(result.Id, Page.URN);
 				result.IsFirst = await GetFirstPageSortOrder(result.SiteId, result.ParentId) == result.SortOrder;
 				result.IsLast = await GetLastPageSortOrder(result.SiteId, result.ParentId) == result.SortOrder;
 			}
@@ -654,13 +715,19 @@ namespace Nucleus.Core.DataProviders
 				.Include(module => module.ModuleDefinition)
 				.Include(module => module.ContainerDefinition)
 				.Include(module => module.ModuleSettings)
-				.AsNoTracking()
+        .Include(module => module.Permissions.Where(permission => permission.PermissionType.Scope == PageModule.URN))
+          .ThenInclude(permission => permission.PermissionType)
+        .Include(module => module.Permissions)
+          .ThenInclude(permission => permission.Role)
+            .ThenInclude(role => role.RoleGroup)
+        .AsSplitQuery()
+        .AsNoTracking()
 				.FirstOrDefaultAsync();
 
-			if (result != null)
-			{
-				result.Permissions = await ListPermissions(result.Id, PageModule.URN);
-			}
+			////if (result != null)
+			////{
+			////	result.Permissions = await ListPermissions(result.Id, PageModule.URN);
+			////}
 
 			return result;
 		}
@@ -681,14 +748,20 @@ namespace Nucleus.Core.DataProviders
 				.Include(module => module.ModuleDefinition)
 				.Include(module => module.ContainerDefinition)
 				.Include(module => module.ModuleSettings)
+        .Include(module => module.Permissions.Where(permission => permission.PermissionType.Scope == PageModule.URN))
+          .ThenInclude(permission => permission.PermissionType)
+        .Include(module => module.Permissions)
+          .ThenInclude(permission => permission.Role)
+            .ThenInclude(role => role.RoleGroup)
 				.OrderBy(module => module.SortOrder)
-				.AsNoTracking()
+        .AsSplitQuery()
+        .AsNoTracking()
 				.ToListAsync();
 
-			foreach (PageModule result in results)
-			{
-				result.Permissions = await ListPermissions(result.Id, PageModule.URN);
-			}
+			////foreach (PageModule result in results)
+			////{
+			////	result.Permissions = await ListPermissions(result.Id, PageModule.URN);
+			////}
 
 			return results;
 		}
@@ -700,13 +773,19 @@ namespace Nucleus.Core.DataProviders
 				.Include(module => module.ModuleDefinition)
 				.Include(module => module.ContainerDefinition)
 				.Include(module => module.ModuleSettings)
-				.AsNoTracking()
+        .Include(module => module.Permissions.Where(permission => permission.PermissionType.Scope == PageModule.URN))
+          .ThenInclude(permission => permission.PermissionType)
+        .Include(module => module.Permissions)
+          .ThenInclude(permission => permission.Role)
+            .ThenInclude(role => role.RoleGroup)
+        .AsSplitQuery()
+        .AsNoTracking()
 				.ToListAsync();
 
-			foreach (PageModule result in results)
-			{
-				result.Permissions = await ListPermissions(result.Id, PageModule.URN);
-			}
+			//foreach (PageModule result in results)
+			//{
+			//	result.Permissions = await ListPermissions(result.Id, PageModule.URN);
+			//}
 
 			return results;
 		}

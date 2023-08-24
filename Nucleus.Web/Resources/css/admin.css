@@ -503,7 +503,9 @@ ul.nucleus-control-panel-items button
 	text-decoration: none;
 	margin: 0;
 	color: black;
+  display: flex;
 }
+
 /*
 .nucleus-index-items li a, .nucleus-index-items .nucleus-get-childpages, .nucleus-index-items .nucleus-hide-childpages
 {
@@ -562,6 +564,12 @@ ul.nucleus-control-panel-items button
 	padding: 0 0.25rem!important;
 }
 
+.nucleus-index-items ul li .nucleus-progress-spinner
+{
+  color: white!important;
+  position: static;
+  margin: auto 0 auto auto!important;  
+}
 
 /*
 	The following section (and the !important on all of the .nucleus-page-list styles) is to override the styles imposed by the default 

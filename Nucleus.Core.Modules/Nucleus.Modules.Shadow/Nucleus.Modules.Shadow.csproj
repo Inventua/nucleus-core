@@ -48,7 +48,7 @@
 		<ExtensionFolder>Shadow</ExtensionFolder>
 		<Version>1.0.0.0</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
-    <CopyToDefaultSetup>false</CopyToDefaultSetup>
+    <CopyToDefaultSetup>true</CopyToDefaultSetup>
 	</PropertyGroup>
 
 	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />

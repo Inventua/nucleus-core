@@ -36,7 +36,8 @@
         <file name="_Users.cshtml" />
         <file name="_Lists.cshtml" />
         <file name="_Folders.cshtml" />
-        <file name="_Forums.cshtml" />
+        <file name="_NTForums.cshtml" />
+        <file name="_ActiveForums.cshtml" />
         <file name="_Notify.cshtml" />
         <file name="_Progress.cshtml" />
 			</folder>

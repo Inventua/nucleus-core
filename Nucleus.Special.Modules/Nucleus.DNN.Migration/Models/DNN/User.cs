@@ -37,6 +37,8 @@ public class User : DNNEntity
 
   public List<Models.DNN.UserProfileProperty> ProfileProperties { get; set; }
 
-  public UserPortal UserPortal { get; set; }
+  public List<UserPortal> UserPortals { get; set; }
 
+  [NotMapped]
+  public UserPortal UserPortal { get; set; }
 }

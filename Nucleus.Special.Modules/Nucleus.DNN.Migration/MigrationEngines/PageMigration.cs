@@ -128,8 +128,15 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
           
           await SetPagePermissions(dnnPage, newPage, pagePermissionTypes);
 
+          // this won't always work the first time, because the parent page might not be created yet.  It is called again in the second pass.
+          await SetParentPageId(dnnPage, newPage, createdPagesKeys, false);
+
           try
           {
+            if (!newPage.Routes.Any())
+            {
+
+            }
             // initial save to make sure that the page has an Id
             await this.PageManager.Save(this.Context.Site, newPage);
             createdPagesKeys.Add(dnnPage.PageId, newPage.Id);
@@ -234,37 +241,16 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
                 newPage.LinkUrl = dnnPage.Url;
               }
             }
-            
-            // set parent page
-            if (dnnPage.ParentId != null)
-            {
-              if (createdPagesKeys.ContainsKey(dnnPage.ParentId.Value))
-              {
-                newPage.ParentId = createdPagesKeys[dnnPage.ParentId.Value];
-              }
-              else
-              {
-                // try looking by route
-                Nucleus.Abstractions.Models.Page nucleusParentPage = await this.PageManager.Get(this.Context.Site, dnnPage.TabPath.Replace("//", "/"));
-                if (nucleusParentPage != null)
-                {
-                  newPage.ParentId = nucleusParentPage.Id;
-                }
-                else
-                {
-                  dnnPage.AddWarning($"The Page parent could not be set because a page with DNN Parent ID '{dnnPage.ParentId}' was not imported, and a Nucleus page with route '{dnnPage.TabPath.Replace("//", "/")} was not found.'.");
-                }
-              }
-            }
 
-            // ensure that page parent is not "itself".  
-            if (newPage.ParentId == newPage.Id)
-            {
-              newPage.ParentId = null;
-            }
+            await SetParentPageId(dnnPage, newPage, createdPagesKeys, true);
 
             // save again for parent id + in case any module migrations added/ changed anything
             await this.PageManager.Save(this.Context.Site, newPage);
+
+            if (newPage.ParentId.HasValue && newPage.ParentId.Value == newPage.Id)
+            {
+
+            }
           }
         }
         catch (Exception ex)
@@ -280,6 +266,31 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     this.SignalCompleted();
   }
 
+  private async Task SetParentPageId(Models.DNN.Page dnnPage, Nucleus.Abstractions.Models.Page newPage, Dictionary<int, Guid> createdPagesKeys, Boolean logErrorIfMissing)
+  {
+    // set parent page
+    if (dnnPage.ParentId != null)
+    {
+      if (createdPagesKeys.ContainsKey(dnnPage.ParentId.Value))
+      {
+        newPage.ParentId = createdPagesKeys[dnnPage.ParentId.Value];
+      }
+      else
+      {
+        // try looking by route
+        Nucleus.Abstractions.Models.Page nucleusParentPage = await this.PageManager.Get(this.Context.Site, dnnPage.TabPath.Replace("//", "/"));
+        if (nucleusParentPage != null)
+        {
+          newPage.ParentId = nucleusParentPage.Id;
+        }
+        else if (logErrorIfMissing)
+        {
+          dnnPage.AddWarning($"The Page parent could not be set because a page with DNN Parent ID '{dnnPage.ParentId}' was not imported, and a Nucleus page with route '{dnnPage.TabPath.Replace("//", "/")} was not found.'.");
+        }
+      }
+    }
+  }
+
   private async Task AddRoutes(Models.DNN.Page dnnPage, Nucleus.Abstractions.Models.Page newPage)
   {
     List<PageUrl> urls;
@@ -288,7 +299,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
     {
       urls = await this.MigrationManager.ListDnnPageUrls(dnnPage.PageId);
     }
-    catch (Exception ex)
+    catch (Exception)
     {
       urls = new();
     }
@@ -309,11 +320,11 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
       await AddRoute(dnnPage, newPage, Abstractions.Models.PageRoute.PageRouteTypes.PermanentRedirect, $"{dnnPage.TabPath.Replace("//", "/")}/tabid/{dnnPage.PageId}/Default.aspx");
 
       // Add old format "tabid=nn" url format as a redirect to help maintain backward compatibility
-      await AddRoute(dnnPage, newPage, Abstractions.Models.PageRoute.PageRouteTypes.PermanentRedirect, $"/Default.aspx?tabid={dnnPage.PageId}");
+      await AddRoute(dnnPage, newPage, Abstractions.Models.PageRoute.PageRouteTypes.PermanentRedirect, $"/default.aspx?tabid={dnnPage.PageId}");
     }
 
     // Add default route based on page hierarchy.  We always create this route because we use it to match to existing pages during migration.  We 
-    // set this route as active only if there are no active routes.
+    // set this route as active only if there are no active routes, otherwise it is set as a redirect.
     await AddRoute
     (
       dnnPage,

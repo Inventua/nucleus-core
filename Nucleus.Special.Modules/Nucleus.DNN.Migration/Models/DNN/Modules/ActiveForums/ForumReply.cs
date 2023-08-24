@@ -12,11 +12,11 @@ public class ForumReply
   [Column("ReplyID")]
   public int ReplyId { get; set; }
 
-  [Column("ForumID")]
-  public int ForumId { get; set; }
-
   public ForumTopic Topic { get; set; }
 
+  public Boolean IsApproved { get; set; }
+  public Boolean IsRejected { get; set; }
+  public Boolean IsDeleted { get; set; }
 
   public ForumContent Content { get; set; }
 

@@ -78,7 +78,17 @@
 
         <li class="border-top border-primary border-1 pt-3">
           <div>
-            <button type="submit" formaction="@Url.NucleusAction("ForumsIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigrateForums">Forums Content</button>
+            <button type="submit" formaction="@Url.NucleusAction("NTForumsIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigrateNTForums">Forums Content (NT Forums)</button>
+          </div>
+          <div>
+            <div class="action-description">Migrate forum posts and attachments from DNN.</div>
+            <div class="action-remarks">When you migrate pages, we migrate forum groups and empty forums along with their settings.  This step is used to copy forum posts and attachments.  This step should be run after migrating roles, pages and users.</div>
+          </div>
+        </li>
+
+        <li class="border-top border-primary border-1 pt-3">
+          <div>
+            <button type="submit" formaction="@Url.NucleusAction("ActiveForumsIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigrateActiveForums">Forums Content (Active Forums)</button>
           </div>
           <div>
             <div class="action-description">Migrate forum posts and attachments from DNN.</div>
@@ -105,7 +115,8 @@
     <modal id="MigrateFolders" title="Migrate Folders and Files"></modal>
     <modal id="MigratePages" title="Migrate Pages"></modal>
     <modal id="MigrateUsers" title="Migrate Users"></modal>
-    <modal id="MigrateForums" title="Migrate Forums Content"></modal>
+    <modal id="MigrateNTForums" title="Migrate Forums Content"></modal>
+    <modal id="MigrateActiveForums" title="Migrate Forums Content"></modal>
     <modal id="NotifyUsers" title="Send User Notifications"></modal>
   }
 </div>

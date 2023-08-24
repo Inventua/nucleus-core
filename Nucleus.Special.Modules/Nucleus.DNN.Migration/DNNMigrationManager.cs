@@ -358,7 +358,7 @@ public class DNNMigrationManager
     }
   }
 
-  public async Task<int> CountActiveForumsPosts(int forumId)
+  public async Task<int> CountActiveForumsTopics(int forumId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
@@ -366,27 +366,35 @@ public class DNNMigrationManager
     }
   }
 
-  public async Task<List<int>> ListActiveForumsPostIds(int forumId)
+  public async Task<List<int>> ListActiveForumsTopicIds(int forumId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
-      return await provider.ListActiveForumsPostIds(forumId);
+      return await provider.ListActiveForumsTopicIds(forumId);
     }
   }
 
-  public async Task<List<int>> ListActiveForumsPostReplyIds(int forumId, int postId)
+  public async Task<List<int>> ListActiveForumsReplyIds(int forumId, int topicId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
-      return await provider.ListActiveForumsPostReplyIds(forumId, postId);
+      return await provider.ListActiveForumsReplyIds(forumId, topicId);
     }
   }
 
-  public async Task<Models.DNN.Modules.ActiveForums.ForumTopic> GetActiveForumsPost(int postId)
+  public async Task<Models.DNN.Modules.ActiveForums.ForumTopic> GetActiveForumsTopic(int topicId)
   {
     using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
     {
-      return await provider.GetActiveForumsTopic(postId);
+      return await provider.GetActiveForumsTopic(topicId);
+    }
+  }
+
+  public async Task<Models.DNN.Modules.ActiveForums.ForumReply> GetActiveForumsReply(int replyId)
+  {
+    using (DNNDataProvider provider = this.DataProviderFactory.CreateProvider<DNNDataProvider>())
+    {
+      return await provider.GetActiveForumsReply(replyId);
     }
   }
 

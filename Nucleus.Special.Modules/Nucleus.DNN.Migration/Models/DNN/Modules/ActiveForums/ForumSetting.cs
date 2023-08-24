@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Nucleus.DNN.Migration.Models.DNN.Modules.ActiveForums;
 
-public class Settings
+public class ForumSetting
 {
   public int ModuleId { get; set; }
 

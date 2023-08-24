@@ -9,19 +9,20 @@ namespace Nucleus.DNN.Migration.Models.DNN.Modules.ActiveForums;
 
 public class ForumTopic
 {
-  [Column("PostID")]
-  public int PostId { get; set; }
+  public int TopicId { get; set; }
 
-  [Column("ForumID")]
-  public int ForumId { get; set; }
-
-
-  [Column("ParentPostID")]
-  public int ParentPostId { get; set; }
+  public List<ForumTopicLink> TopicLinks { get; set; }
 
   public ForumContent Content { get; set; }
 
+  public Boolean IsLocked { get; set; }
+  public Boolean IsPinned { get; set; }
+  public Boolean IsApproved { get; set; }
+  public Boolean IsRejected{ get; set; }
+  public Boolean IsDeleted { get; set; }
+  public Boolean IsAnnounce { get; set; }
+  public Boolean IsArchived { get; set; }
 
-  public List<ForumReply> Replies { get; set; }
+  //public List<ForumReply> Replies { get; set; }
 
 }

@@ -31,12 +31,12 @@ public class ForumGroup
 
   public string GroupSecurityKey { get; set; }
 
-  public int PermissionsId { get; set; }
+  public ForumPermissions Permissions { get; set; }
 
 
   public List<Forum> Forums { get; set; }
 
   [NotMapped]
-  public List<Settings> Settings { get; set; }
+  public List<ForumSetting> Settings { get; set; }
 
 }

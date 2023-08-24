@@ -106,14 +106,17 @@ public class NotifyUsers : MigrationEngineBase<Models.NotifyUser>
       if (this.Context.Site.AdministratorsRole != null && user.User.Roles.Where(role => role.Id == this.Context.Site.AdministratorsRole.Id).Any())
       {
         user.AddError("Administrator users are not notified.");
+        user.PreventSelection();
       }
       if (!user.User.Approved)
       {
         user.AddError("Un-approved users are not notified.");
+        user.PreventSelection();
       }      
       if (String.IsNullOrEmpty(user.User.Profile.GetProperty("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value))
       {
         user.AddError("User has a blank email address and cannot be notified.");
+        user.PreventSelection();
       }
     }
 

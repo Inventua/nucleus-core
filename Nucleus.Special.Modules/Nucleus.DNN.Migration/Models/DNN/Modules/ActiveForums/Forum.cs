@@ -41,10 +41,12 @@ public class Forum : DNNEntity
 
   public string ForumSecurityKey { get; set; }
 
-  public int PermissionsId { get; set; }
+  public ForumPermissions Permissions { get; set; }
+
+  public List<ForumTopicLink> TopicLinks { get; set; }
 
   [NotMapped]
-  public List<Settings> Settings { get; set; }
+  public List<ForumSetting> Settings { get; set; }
 
   [NotMapped]
   public int PostCount { get; set; }

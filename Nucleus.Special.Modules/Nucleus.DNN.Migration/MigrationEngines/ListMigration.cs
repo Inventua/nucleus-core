@@ -94,6 +94,7 @@ public class ListMigration : MigrationEngineBase<Models.DNN.List>
       if (list.SystemList || RESERVED_ROLES.Contains(list.ListName, StringComparer.OrdinalIgnoreCase)) 
       {
         list.AddError($"'{list.ListName}' is a reserved/special list in DNN and will not be migrated.");
+        list.PreventSelection();
       }
 
       string[] EXCLUDED_ROLES = { "Installer" };

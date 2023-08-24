@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Nucleus.Abstractions.Models;
 using Nucleus.Data.Common;
 using Nucleus.Data.EntityFramework;
 using Nucleus.DNN.Migration.Models;
@@ -61,7 +62,7 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
 
   public DbSet<Models.DNN.Modules.ActiveForums.ForumTopic> ActiveForumsTopics { get; set; }
   public DbSet<Models.DNN.Modules.ActiveForums.ForumReply> ActiveForumsReplies { get; set; }
-  public DbSet<Models.DNN.Modules.ActiveForums.Settings> ActiveForumsSettings { get; set; }
+  public DbSet<Models.DNN.Modules.ActiveForums.ForumSetting> ActiveForumsSettings { get; set; }
 
 
   public DNNDbContext(DbContextConfigurator<DNNDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)
@@ -123,6 +124,10 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
       .ToTable("UserPortals")
       .HasKey(userPortal => userPortal.UserPortalId);
 
+    builder.Entity<Models.DNN.UserPortal>()
+      .HasOne(userPortal => userPortal.Portal)
+      .WithMany();
+
     builder.Entity<Models.DNN.UserProfileProperty>()
       .ToTable("UserProfile")
       .HasKey(userProfileProperty => userProfileProperty.ProfileId);
@@ -150,12 +155,17 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
 
     builder.Entity<Models.DNN.PageModule>()
       .ToView("vw_Modules")
-      .HasKey(module => module.TabModuleId);
+      .HasKey(module => module.ModuleId);
 
     builder.Entity<Models.DNN.PageModule>()
       .HasMany(module => module.Permissions)
       .WithOne(permission => permission.PageModule)
       .HasForeignKey("ModuleID");
+
+    builder.Entity<Models.DNN.PageModule>()
+      .HasMany(module => module.Settings)
+      .WithOne()
+      .HasForeignKey(setting => setting.ModuleId);
 
     builder.Entity<Models.DNN.PageModuleSetting>()
       .ToTable("ModuleSettings")
@@ -263,42 +273,61 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
       .WithOne(forum => forum.ForumGroup)
       .HasForeignKey("ForumGroupId");
 
+    builder.Entity<Models.DNN.Modules.ActiveForums.ForumGroup>()
+      .HasOne(group => group.Permissions);
+      //.WithOne()
+      //.HasForeignKey("PermissionsId");
+
     builder.Entity<Models.DNN.Modules.ActiveForums.Forum>()
       .ToTable("ActiveForums_Forums")
       .HasKey(forum => forum.ForumId);
 
+    builder.Entity<Models.DNN.Modules.ActiveForums.Forum>()
+      .HasOne(forum => forum.Permissions);
+      //.WithOne()
+      //.HasForeignKey("PermissionsId");
+
+    builder.Entity<Models.DNN.Modules.ActiveForums.ForumPermissions>()
+      .ToTable("Activeforums_Permissions")
+      .HasKey(permission => permission.PermissionsId);
+
+
     builder.Entity<Models.DNN.Modules.ActiveForums.ForumTopic>()
       .ToTable("ActiveForums_Topics")
-      .HasKey(topic => topic.PostId);
+      .HasKey(topic => topic.TopicId);
 
     builder.Entity<Models.DNN.Modules.ActiveForums.ForumTopic>()
       .HasOne(topic => topic.Content);
 
-    //builder.Entity<Models.DNN.Modules.ActiveForums.ForumTopic>()
-    //  .HasMany(post => post.Attachments)
-    //  .WithOne(attachment => attachment.ForumPost)
-    //  .HasForeignKey("PostId");
+    builder.Entity<Models.DNN.Modules.ActiveForums.ForumTopicLink>()
+      .ToTable("Activeforums_ForumTopics")
+      .HasKey(link => new { link.ForumId, link.TopicId });
 
-    builder.Entity<Models.DNN.Modules.ActiveForums.Settings>()
+    builder.Entity<Models.DNN.Modules.ActiveForums.ForumSetting>()
       .ToTable("ActiveForums_Settings")
       .HasKey(settings => new { settings.ModuleId, settings.GroupKey, settings.SettingName });
-
 
     builder.Entity<Models.DNN.Modules.ActiveForums.ForumReply>()
       .ToTable("ActiveForums_Replies")
       .HasKey(reply => reply.ReplyId);
 
-    builder.Entity<Models.DNN.Modules.ActiveForums.ForumReply>()
-      .HasOne(reply => reply.Topic)
-      .WithMany(topic => topic.Replies)
-      .HasForeignKey("PostId");
+    //builder.Entity<Models.DNN.Modules.ActiveForums.ForumReply>()
+    //  .HasOne(reply => reply.Topic)
+    //  .WithMany(topic => topic.Replies)
+    //  .HasForeignKey("PostId");
 
     builder.Entity<Models.DNN.Modules.ActiveForums.ForumReply>()
       .HasOne(reply => reply.Content);
 
     builder.Entity<Models.DNN.Modules.ActiveForums.ForumContent>()
-      .ToTable("ActiveForums_Content")
+      .ToTable("ActiveForums_Content")      
       .HasKey(content => content.ContentId);
+
+    builder.Entity<Models.DNN.Modules.ActiveForums.ForumContent>()
+      .HasOne(content => content.User)
+      .WithMany()
+      .HasForeignKey("AuthorId");
+
 
     //builder.Entity<Models.DNN.Modules.ActiveForums.ForumReply>()
     //  .HasMany(post => post.Attachments)
@@ -306,8 +335,13 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
     //  .HasForeignKey("PostId");
 
     builder.Entity<Models.DNN.Modules.ActiveForums.ForumAttachment>()
-      .ToTable("ActiveForums_Attach")
+      .ToTable("ActiveForums_Attachments")
       .HasKey(attachment => attachment.AttachmentId);
+
+    builder.Entity<Models.DNN.Modules.ActiveForums.ForumAttachment>()
+      .HasOne(attachment => attachment.ForumContent)
+      .WithMany(content => content.Attachments)
+      .HasForeignKey("ContentId");
   }
 
 }

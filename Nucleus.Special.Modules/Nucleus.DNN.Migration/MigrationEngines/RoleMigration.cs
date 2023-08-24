@@ -76,6 +76,7 @@ public class RoleMigration : MigrationEngineBase<Models.DNN.Role>
       if (RESERVED_ROLES.Contains(role.RoleName, StringComparer.OrdinalIgnoreCase)) 
       {
         role.AddError($"'{role.RoleName}' is a reserved/special role in DNN and will not be migrated.");
+        role.PreventSelection();
       }
 
       // roles which are un-selected by default

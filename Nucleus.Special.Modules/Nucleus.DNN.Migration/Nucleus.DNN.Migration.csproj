@@ -25,11 +25,12 @@
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="Views\Index.cshtml" />
+    <None Remove="Views\_ActiveForums.cshtml" />
     <None Remove="Views\_Folders.cshtml" />
-    <None Remove="Views\_Forums.cshtml" />
     <None Remove="Views\_Layouts.cshtml" />
     <None Remove="Views\_Lists.cshtml" />
     <None Remove="Views\_Notify.cshtml" />
+    <None Remove="Views\_NTForums.cshtml" />
     <None Remove="Views\_Pages.cshtml" />
     <None Remove="Views\_Progress.cshtml" />
     <None Remove="Views\_Roles.cshtml" />
@@ -43,7 +44,8 @@
     <Content Include="readme.txt" />
     <Content Include="index.css" />
     <Content Include="Views\_Folders.cshtml" />
-    <Content Include="Views\_Forums.cshtml" />
+    <Content Include="Views\_ActiveForums.cshtml" />
+    <Content Include="Views\_NTForums.cshtml" />
     <Content Include="Views\_Layouts.cshtml" />
     <Content Include="Views\_Progress.cshtml" />
     <Content Include="Views\_Lists.cshtml" />

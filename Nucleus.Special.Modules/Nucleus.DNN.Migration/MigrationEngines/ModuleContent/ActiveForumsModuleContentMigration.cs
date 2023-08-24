@@ -19,6 +19,33 @@ public class ActiveForumsModuleContentMigration : ModuleContentMigrationBase
   private IFileSystemManager FileSystemManager { get; }
   private IPermissionsManager PermissionsManager { get; }
 
+  private const string FORUM_SETTING_ALLOWATTACH  = "ALLOWATTACH";
+  private const string FORUM_SETTING_ALLOWEMOTICONS = "ALLOWEMOTICONS";
+  private const string FORUM_SETTING_ALLOWHTML = "ALLOWHTML";
+  private const string FORUM_SETTING_ALLOWPOSTICON = "ALLOWPOSTICON";
+  private const string FORUM_SETTING_ALLOWRSS = "ALLOWRSS";
+  private const string FORUM_SETTING_ALLOWSCRIPT = "ALLOWSCRIPT";
+  private const string FORUM_SETTING_ALLOWSUBSCRIBE = "ALLOWSUBSCRIBE";
+  private const string FORUM_SETTING_ATTACHCOUNT = "ATTACHCOUNT";
+  private const string FORUM_SETTING_ATTACHMAXHEIGHT = "ATTACHMAXHEIGHT";
+  private const string FORUM_SETTING_ATTACHMAXSIZE = "ATTACHMAXSIZE";
+  private const string FORUM_SETTING_ATTACHMAXWIDTH = "ATTACHMAXWIDTH";
+  private const string FORUM_SETTING_ATTACHSTORE = "ATTACHSTORE";
+  private const string FORUM_SETTING_ATTACHTYPEALLOWED = "ATTACHTYPEALLOWED";
+  private const string FORUM_SETTING_ATTACHUNIQUEFILENAMES = "ATTACHUNIQUEFILENAMES";
+  private const string FORUM_SETTING_EDITORHEIGHT = "EDITORHEIGHT";
+  private const string FORUM_SETTING_EDITORSTYLE = "EDITORSTYLE";
+  private const string FORUM_SETTING_EDITORTOOLBAR = "EDITORTOOLBAR";
+  private const string FORUM_SETTING_EDITORTYPE = "EDITORTYPE";
+  private const string FORUM_SETTING_EDITORWIDTH = "EDITORWIDTH";
+  private const string FORUM_SETTING_EMAILADDRESS = "EMAILADDRESS";
+  private const string FORUM_SETTING_INDEXCONTENT = "INDEXCONTENT";
+  private const string FORUM_SETTING_INSTALLDATE = "INSTALLDATE";
+  private const string FORUM_SETTING_ISMODERATED = "ISMODERATED";
+  private const string FORUM_SETTING_TOPICSTEMPLATEID = "TOPICSTEMPLATEID";
+  private const string FORUM_SETTING_TOPICTEMPLATEID = "TOPICTEMPLATEID";
+  private const string FORUM_SETTING_USEFILTER = "USEFILTER";
+
   private static class PermissionScopeNamespaces
   {
     public const string Forum = "urn:nucleus:entities:forum/permissiontype";
@@ -73,22 +100,13 @@ public class ActiveForumsModuleContentMigration : ModuleContentMigrationBase
 
       foreach (Forum dnnForum in dnnGroup.Forums)
       {
-        //todo
-        //object newForumSettings = new
-        //{
-        //  Enabled = dnnForum.Active,
-        //  Visible = !dnnForum.Hidden,
-        //  IsModerated = dnnForum.IsModerated,
-        //  AllowAttachments = !dnnForum.AttachCount.HasValue ? false : dnnForum.AttachCount.Value > 0,
-        //  AllowSearchIndexing = dnnForum.IndexContent
-        //};
         object newForumSettings = new
         {
           Enabled = dnnForum.Active,
           Visible = !dnnForum.Hidden,
-          IsModerated = false, //dnnForum.IsModerated,
-          AllowAttachments = false, //!dnnForum.AttachCount.HasValue ? false : dnnForum.AttachCount.Value > 0,
-          AllowSearchIndexing = false //dnnForum.IndexContent
+          IsModerated = GetSetting(dnnForum.Settings, FORUM_SETTING_ISMODERATED, false),
+          AllowAttachments = GetSetting(dnnForum.Settings, FORUM_SETTING_ALLOWATTACH, false),
+          AllowSearchIndexing = GetSetting(dnnForum.Settings, FORUM_SETTING_INDEXCONTENT, false)
         };
 
         object newForum = new
@@ -98,29 +116,20 @@ public class ActiveForumsModuleContentMigration : ModuleContentMigrationBase
           Description = dnnForum.Description,
           SortOrder = dnnForum.SortOrder ?? 0,
           Settings = newForumSettings,
-          UseGroupSettings = false, // todo dnnForum.InheritGroupSettings,
+          UseGroupSettings = dnnForum.Permissions == null,
           Permissions = await BuildForumPermissions(site, dnnPage, dnnForum)
         };
 
         forums.Add(newForum);
       }
 
-      // todo
-      //object newGroupSettings = new
-      //{
-      //  Enabled = dnnGroup.Settings.Active,
-      //  Visible = !dnnGroup.Settings.Hidden,
-      //  IsModerated = dnnGroup.Settings.IsModerated,
-      //  AllowAttachments = !dnnGroup.Settings.AttachCount.HasValue ? false : dnnGroup.Settings.AttachCount.Value > 0,
-      //  AllowSearchIndexing = dnnGroup.Settings.IndexContent
-      //};
       object newGroupSettings = new
       {
         Enabled = dnnGroup.Active,
         Visible = !dnnGroup.Hidden,
-        IsModerated = false, // dnnGroup.Settings.IsModerated,
-        AllowAttachments = false, //!dnnGroup.Settings.AttachCount.HasValue ? false : dnnGroup.Settings.AttachCount.Value > 0,
-        AllowSearchIndexing = false//dnnGroup.Settings.IndexContent
+        IsModerated = GetSetting(dnnGroup.Settings, FORUM_SETTING_ISMODERATED, false),
+        AllowAttachments = GetSetting(dnnGroup.Settings, FORUM_SETTING_ALLOWATTACH, false),
+        AllowSearchIndexing = GetSetting(dnnGroup.Settings, FORUM_SETTING_INDEXCONTENT, false)
       };
 
       object newGroup = new
@@ -142,19 +151,21 @@ public class ActiveForumsModuleContentMigration : ModuleContentMigrationBase
   {
     List<Permission> permissions = new();
 
-    // todo
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Settings.AttachToPostRoles, PermissionScopes.FORUM_ATTACH_POST, $"Forum Group '{dnnGroup.Name}'"));
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Settings.ViewRoles, PermissionScopes.FORUM_VIEW, $"Forum Group '{dnnGroup.Name}'"));
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Settings.ReplyPostRoles, PermissionScopes.FORUM_REPLY_POST, $"Forum Group '{dnnGroup.Name}'"));
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Settings.CreatePostRoles, PermissionScopes.FORUM_CREATE_POST, $"Forum Group '{dnnGroup.Name}'"));
+    if (dnnGroup.Permissions != null)
+    {
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Permissions.AttachToPostRoles, PermissionScopes.FORUM_ATTACH_POST, $"Forum Group '{dnnGroup.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Permissions.ViewRoles, PermissionScopes.FORUM_VIEW, $"Forum Group '{dnnGroup.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Permissions.ReplyPostRoles, PermissionScopes.FORUM_REPLY_POST, $"Forum Group '{dnnGroup.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Permissions.CreatePostRoles, PermissionScopes.FORUM_CREATE_POST, $"Forum Group '{dnnGroup.Name}'"));
 
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Settings.DeletePostRoles, PermissionScopes.FORUM_DELETE_POST, $"Forum Group '{dnnGroup.Name}'"));
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Settings.EditPostRoles, PermissionScopes.FORUM_EDIT_POST, $"Forum Group '{dnnGroup.Name}'"));
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Settings.LockPostRoles, PermissionScopes.FORUM_LOCK_POST, $"Forum Group '{dnnGroup.Name}'"));
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Settings.PinPostRoles, PermissionScopes.FORUM_PIN_POST, $"Forum Group '{dnnGroup.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Permissions.DeletePostRoles, PermissionScopes.FORUM_DELETE_POST, $"Forum Group '{dnnGroup.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Permissions.EditPostRoles, PermissionScopes.FORUM_EDIT_POST, $"Forum Group '{dnnGroup.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Permissions.LockPostRoles, PermissionScopes.FORUM_LOCK_POST, $"Forum Group '{dnnGroup.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Permissions.PinPostRoles, PermissionScopes.FORUM_PIN_POST, $"Forum Group '{dnnGroup.Name}'"));
 
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Settings.SubscribePostRoles, PermissionScopes.FORUM_SUBSCRIBE, $"Forum Group '{dnnGroup.Name}'"));
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Settings.ModeratorRoles, PermissionScopes.FORUM_MODERATE, $"Forum Group '{dnnGroup.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Permissions.SubscribePostRoles, PermissionScopes.FORUM_SUBSCRIBE, $"Forum Group '{dnnGroup.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnGroup.Permissions.ModeratorRoles, PermissionScopes.FORUM_MODERATE, $"Forum Group '{dnnGroup.Name}'"));
+    }
 
     return permissions;
   }
@@ -162,62 +173,72 @@ public class ActiveForumsModuleContentMigration : ModuleContentMigrationBase
   private async Task<List<Permission>> BuildForumPermissions(Site site, Models.DNN.Page dnnPage, Forum dnnForum)
   {
     List<Permission> permissions = new();
-    // todo
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.AttachToPostRoles, PermissionScopes.FORUM_ATTACH_POST, $"Forum '{dnnForum.Name}'"));
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.ViewRoles, PermissionScopes.FORUM_VIEW, $"Forum '{dnnForum.Name}'"));
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.ReplyPostRoles, PermissionScopes.FORUM_REPLY_POST, $"Forum '{dnnForum.Name}'"));
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.CreatePostRoles, PermissionScopes.FORUM_CREATE_POST, $"Forum '{dnnForum.Name}'"));
 
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.DeletePostRoles, PermissionScopes.FORUM_DELETE_POST, $"Forum '{dnnForum.Name}'"));
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.EditPostRoles, PermissionScopes.FORUM_EDIT_POST, $"Forum '{dnnForum.Name}'"));
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.LockPostRoles, PermissionScopes.FORUM_LOCK_POST, $"Forum '{dnnForum.Name}'"));
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.PinPostRoles, PermissionScopes.FORUM_PIN_POST, $"Forum '{dnnForum.Name}'"));
+    if (dnnForum.Permissions != null)
+    {
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.Permissions.AttachToPostRoles, PermissionScopes.FORUM_ATTACH_POST, $"Forum '{dnnForum.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.Permissions.ViewRoles, PermissionScopes.FORUM_VIEW, $"Forum '{dnnForum.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.Permissions.ReplyPostRoles, PermissionScopes.FORUM_REPLY_POST, $"Forum '{dnnForum.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.Permissions.CreatePostRoles, PermissionScopes.FORUM_CREATE_POST, $"Forum '{dnnForum.Name}'"));
 
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.SubscribePostRoles, PermissionScopes.FORUM_SUBSCRIBE, $"Forum '{dnnForum.Name}'"));
-    //permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.ModeratorRoles, PermissionScopes.FORUM_MODERATE, $"Forum '{dnnForum.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.Permissions.DeletePostRoles, PermissionScopes.FORUM_DELETE_POST, $"Forum '{dnnForum.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.Permissions.EditPostRoles, PermissionScopes.FORUM_EDIT_POST, $"Forum '{dnnForum.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.Permissions.LockPostRoles, PermissionScopes.FORUM_LOCK_POST, $"Forum '{dnnForum.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.Permissions.PinPostRoles, PermissionScopes.FORUM_PIN_POST, $"Forum '{dnnForum.Name}'"));
+
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.Permissions.SubscribePostRoles, PermissionScopes.FORUM_SUBSCRIBE, $"Forum '{dnnForum.Name}'"));
+      permissions.AddRange(await BuildPermissions(site, dnnPage, dnnForum.Permissions.ModeratorRoles, PermissionScopes.FORUM_MODERATE, $"Forum '{dnnForum.Name}'"));
+    }
 
     return permissions;
   }
 
-  private async Task<List<Permission>> BuildPermissions(Site site, Models.DNN.Page dnnPage, string roles, string scope, string displayName)
+  private async Task<List<Permission>> BuildPermissions(Site site, Models.DNN.Page dnnPage, string permissionRoles, string scope, string displayName)
   {
     List<Permission> permissions = new();
 
-    foreach (string roleId in roles.Split(';', StringSplitOptions.RemoveEmptyEntries))
+    // ActiveForums stores permissions as role-id-list|user-id-list|social-group-id-list.  We are only interested in role-id-list
+    // Reference: https://github.com/ActiveForums/ActiveForums/blob/master/class/Permissions.cs line 240
+    string roles = permissionRoles.Split('|').FirstOrDefault();
+
+    if (roles != null)
     {
-      if (int.TryParse(roleId, out int dnnRoleId))
+      foreach (string roleId in roles.Split(';', StringSplitOptions.RemoveEmptyEntries))
       {
-        // ignore negative values (which seem to mean "deny")
-        if (dnnRoleId >= 0)
+        if (int.TryParse(roleId, out int dnnRoleId))
         {
-          Models.DNN.Role dnnRole = await this.DnnMigrationManager.GetDnnRole(dnnRoleId);
-          if (dnnRole != null && dnnRole.RoleName != "Administrators")
+          // ignore negative values (which seem to mean "deny")
+          if (dnnRoleId >= 0)
           {
-            Nucleus.Abstractions.Models.Role nucleusRole = await this.RoleManager.GetByName(site, dnnRole.RoleName);
-
-            if (nucleusRole != null)
+            Models.DNN.Role dnnRole = await this.DnnMigrationManager.GetDnnRole(dnnRoleId);
+            if (dnnRole != null && dnnRole.RoleName != "Administrators")
             {
-              PermissionType permissionType = (await this.PermissionsManager.ListPermissionTypes(PermissionScopeNamespaces.Forum))
-                  .Where(permissionType => permissionType.Scope == scope)
-                  .FirstOrDefault();
+              Nucleus.Abstractions.Models.Role nucleusRole = await this.RoleManager.GetByName(site, dnnRole.RoleName);
 
-              if (permissionType != null)
+              if (nucleusRole != null)
               {
-                permissions.Add(new()
+                PermissionType permissionType = (await this.PermissionsManager.ListPermissionTypes(PermissionScopeNamespaces.Forum))
+                    .Where(permissionType => permissionType.Scope == scope)
+                    .FirstOrDefault();
+
+                if (permissionType != null)
                 {
-                  PermissionType = permissionType,
-                  Role = nucleusRole,
-                  AllowAccess = true
-                });
+                  permissions.Add(new()
+                  {
+                    PermissionType = permissionType,
+                    Role = nucleusRole,
+                    AllowAccess = true
+                  });
+                }
+                else
+                {
+                  dnnPage.AddWarning($"Permission '{scope}'/'{nucleusRole.Name}' for {displayName} was not set because a permission with scope '{scope}' was not found.");
+                }
               }
               else
               {
-                dnnPage.AddWarning($"Permission '{scope}'/'{nucleusRole.Name}' for {displayName} was not set because a permission with scope '{scope}' was not found.");
+                dnnPage.AddWarning($"Permission '{scope}'/'{dnnRole.RoleName}' for {displayName} was not set because a role with name '{dnnRole.RoleName}' was not found.");
               }
-            }
-            else
-            {
-              dnnPage.AddWarning($"Permission '{scope}'/'{dnnRole.RoleName}' for {displayName} was not set because a role with name '{dnnRole.RoleName}' was not found.");
             }
           }
         }
@@ -227,4 +248,38 @@ public class ActiveForumsModuleContentMigration : ModuleContentMigrationBase
     return permissions;
   }
 
+  private T GetSetting<T>(List<ForumSetting> settings, string key, T defaultValue = default(T))
+  {
+    ForumSetting setting = settings
+      .Where(setting => setting.SettingName.Equals(key, StringComparison.OrdinalIgnoreCase))
+      .FirstOrDefault();
+
+    if (setting == null)
+    {
+      return defaultValue;
+    }  
+    else if (typeof(T) == typeof(Boolean))
+    {
+      if (Boolean.TryParse(setting.SettingValue, out Boolean boolResult))
+      {
+        return (T)Convert.ChangeType(boolResult, typeof(T));
+      }
+      else if (setting.SettingValue == "0")
+      {
+        return (T)Convert.ChangeType(false, typeof(T));
+      }
+      else if (setting.SettingValue == "1")
+      {
+        return (T)Convert.ChangeType(true, typeof(T));
+      }
+      else
+      {
+        return (T)Convert.ChangeType(setting.SettingValue, typeof(T));
+      }
+    }
+    else
+    {
+      return (T)Convert.ChangeType(setting.SettingValue, typeof(T));
+    }
+  }
 }

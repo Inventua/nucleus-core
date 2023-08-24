@@ -50,6 +50,11 @@ public abstract class DNNEntity
     }
 
     this.Results.Add(new(ValidationResult.ValidationResultTypes.Error, message));
+    
+  }
+
+  public void PreventSelection()
+  {
     this.CanSelect = false;
     this.IsSelected = false;
   }

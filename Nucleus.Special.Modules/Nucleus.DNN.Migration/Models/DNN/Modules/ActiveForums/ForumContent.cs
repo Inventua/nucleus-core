@@ -12,9 +12,6 @@ public class ForumContent
   [Column("ContentID")]
   public int ContentId { get; set; }
 
-  [Column("ForumID")]
-  public int ForumId { get; set; }
-
   public string Subject { get; set; }
 
   public string Summary { get; set; }
@@ -37,7 +34,6 @@ public class ForumContent
   [Column("IsDeleted")]
   public bool? Deleted { get; set; }
 
-  public bool? Approved { get; set; }
 
   //public string UserName { get; set; }
 

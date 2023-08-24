@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.EventHandlers;
@@ -13,6 +15,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Nucleus.DNN.Migration.DataProviders;
 
@@ -150,26 +153,38 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider
   public async Task<List<Models.DNN.User>> ListUsers(int portalId)
   {
     List<Models.DNN.User> results = await this.Context.Users
-      .Where(user => user.UserPortal.Portal.PortalId == portalId)
+      .Where(user => user.UserPortals.Where(portal => portal.Portal.PortalId == portalId).Any())
       .Include(user => user.Roles)
       .Include(user => user.ProfileProperties)
+      .Include(user => user.UserPortals)
       .OrderBy(user => user.UserName)
       .AsSplitQuery()
       .AsNoTracking()
       .ToListAsync();
 
+    List<Models.DNN.UserProfilePropertyDefinition> propertyDefinitions = await this.Context.UserProfilePropertyDefinitions
+      .AsNoTracking()
+      .ToListAsync();
+
     foreach (Models.DNN.User user in results)
     {
-      user.UserPortal = await this.Context.UserPortals
-        .Where(userPortal => userPortal.UserId == user.UserId && userPortal.Portal.PortalId == portalId)
-        .AsNoTracking()
-        .FirstOrDefaultAsync();
+      user.UserPortal = user.UserPortals
+        .Where(userPortal => userPortal.UserId == user.UserId && userPortal.PortalId == portalId)
+        .FirstOrDefault();
+
+      //user.UserPortal = await this.Context.UserPortals
+      //  .Where(userPortal => userPortal.UserId == user.UserId && userPortal.Portal.PortalId == portalId)
+      //  .AsNoTracking()
+      //  .FirstOrDefaultAsync();
 
       foreach (Models.DNN.UserProfileProperty prop in user.ProfileProperties)
       {
-        prop.PropertyDefinition = this.Context.UserProfilePropertyDefinitions
+        prop.PropertyDefinition = propertyDefinitions
           .Where(def => def.PropertyDefinitionId == prop.PropertyDefinitionId)
           .FirstOrDefault();
+        //prop.PropertyDefinition = this.Context.UserProfilePropertyDefinitions
+        //  .Where(def => def.PropertyDefinitionId == prop.PropertyDefinitionId)
+        //  .FirstOrDefault();
       }
     }
     return results;
@@ -195,8 +210,8 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider
         !page.IsDeleted 
       )
       .Include(page => page.Permissions)
-      //.Include(page => page.PageModules)
-      //  .ThenInclude(pageModule => pageModule.Settings)
+      .Include(page => page.PageModules)
+        .ThenInclude(pageModule => pageModule.Settings)
       .Include(page => page.PageModules) 
         .ThenInclude(module => module.DesktopModule)
       .Include(page => page.PageModules)
@@ -209,16 +224,16 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider
       .AsNoTracking()
       .ToListAsync();
 
-    foreach (Models.DNN.Page page in results)
-    {
-      foreach (Models.DNN.PageModule module in page.PageModules)
-      {
-        module.Settings = await this.Context.PageModuleSettings
-          .Where(setting => setting.ModuleId == module.ModuleId)
-          .AsNoTracking()
-          .ToListAsync();
-      }
-    }
+    ////foreach (Models.DNN.Page page in results)
+    ////{
+    ////  foreach (Models.DNN.PageModule module in page.PageModules)
+    ////  {
+    ////    module.Settings = await this.Context.PageModuleSettings
+    ////      .Where(setting => setting.ModuleId == module.ModuleId)
+    ////      .AsNoTracking()
+    ////      .ToListAsync();
+    ////  }
+    ////}
     return results;
   }
 
@@ -367,12 +382,15 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider
   {
     return await this.Context.ActiveForumsGroups
       .Where(group => group.ModuleId == moduleId)
-      .Include(group => group.Forums)      
+      .Include(group => group.Permissions)
+      .Include(group => group.Forums)
+        .ThenInclude(forum => forum.Permissions)
       .AsNoTracking()
+      .AsSplitQuery()
       .ToListAsync();
   }
 
-  public async Task<List<Models.DNN.Modules.ActiveForums.Settings>> ListActiveForumsSettings(int moduleId, string key)
+  public async Task<List<Models.DNN.Modules.ActiveForums.ForumSetting>> ListActiveForumsSettings(int moduleId, string key)
   {
     return await this.Context.ActiveForumsSettings
       .Where(setting => setting.ModuleId == moduleId && setting.GroupKey == key)
@@ -384,8 +402,10 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider
   {
     return await this.Context.ActiveForumsGroups
       .Where(group => group.Forums.Where(forum => forum.PortalId == portalId).Any())
+      .Include(group => group.Permissions)
       .Include(group => group.Forums)
-      .Include(group => group.Settings)
+        .ThenInclude(forum => forum.Permissions)
+      .AsSplitQuery()
       .AsNoTracking()
       .ToListAsync();
   }
@@ -393,41 +413,48 @@ public class DNNDataProvider : Nucleus.Data.EntityFramework.DataProvider
   public async Task<int> CountActiveForumsTopics(int forumId)
   {
     return await this.Context.ActiveForumsTopics
-      .Where(post => post.ForumId == forumId )
-      .Include(post => post.Content)
-      .Include(post => post.Replies)
-        .ThenInclude(reply => reply.Content)
-      .OrderBy(post => post.ParentPostId)
+      .Where(topic => topic.IsDeleted == false && topic.IsArchived == false && topic.TopicLinks.Where(link => link.Forum.ForumId == forumId).Any())
       .AsNoTracking()
       .CountAsync();
   }
 
-  public async Task<List<int>> ListActiveForumsPostIds(int forumId)
+  public async Task<List<int>> ListActiveForumsTopicIds(int forumId)
   {
     return await this.Context.ActiveForumsTopics
-      .Where(post => post.ForumId == forumId && post.ParentPostId == 0 )
-      .OrderBy(post => post.ParentPostId)
-      .Select(post => post.PostId)
+      .Where(topic => topic.IsDeleted == false && topic.IsArchived == false && topic.TopicLinks.Where(link => link.Forum.ForumId == forumId).Any())
+      .OrderBy(topic => topic.TopicId)
+      .Select(topic => topic.TopicId)
       .ToListAsync();
   }
 
-  public async Task<List<int>> ListActiveForumsPostReplyIds(int forumId, int postId)
+  public async Task<List<int>> ListActiveForumsReplyIds(int forumId, int topicId)
   {
-    return await this.Context.ActiveForumsTopics
-      .Where(post => post.ForumId == forumId && post.ParentPostId == postId)
-      .Select(post => post.PostId)
+    return await this.Context.ActiveForumsReplies
+      .Where(reply => reply.IsDeleted == false && reply.IsRejected == false && reply.Topic.TopicLinks.Where(link => link.ForumId == forumId).Any() && reply.Topic.TopicId == topicId)
+      .Select(reply => reply.ReplyId)
       .ToListAsync();
   }
 
   public async Task<Models.DNN.Modules.ActiveForums.ForumTopic> GetActiveForumsTopic(int topicId)
   {
     return await this.Context.ActiveForumsTopics
-      .Where(post => post.PostId == topicId)
-      .Include(post => post.Content)
+      .Where(topic => topic.TopicId == topicId)      
+      .Include(topic => topic.Content)
         .ThenInclude(content => content.Attachments)
-      .Include(post => post.Replies)
-        .ThenInclude(reply => reply.Content)
-          .ThenInclude(content => content.Attachments)
+      .Include(topic => topic.Content)
+        .ThenInclude(content => content.User)
+      .AsSplitQuery()
+      .FirstOrDefaultAsync();
+  }
+
+  public async Task<Models.DNN.Modules.ActiveForums.ForumReply> GetActiveForumsReply(int replyId)
+  {
+    return await this.Context.ActiveForumsReplies
+      .Where(reply => reply.ReplyId == replyId)
+      .Include(reply => reply.Content)
+        .ThenInclude(content => content.Attachments)
+      .Include(topic => topic.Content)
+        .ThenInclude(content => content.User)
       .AsSplitQuery()
       .FirstOrDefaultAsync();
   }

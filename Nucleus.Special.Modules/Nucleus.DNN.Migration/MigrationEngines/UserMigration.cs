@@ -132,18 +132,22 @@ public class UserMigration : MigrationEngineBase<Models.DNN.User>
       if (user.IsSuperUser)
       {
         user.AddError("Super users can not be migrated.");
+        user.PreventSelection();
       }
       if (user.UserName.Equals("admin", StringComparison.OrdinalIgnoreCase) || user.Roles.Where(role => role.RoleName.Equals("Administrators", StringComparison.OrdinalIgnoreCase)).Any())
       {
         user.AddError("Administrator users can not be migrated.");
+        user.PreventSelection();
       }
       if (!user.UserPortal.Authorised)
       {
         user.AddError("Unauthorized users are not migrated.");
+        user.PreventSelection();
       }
       if (user.UserPortal.IsDeleted)
       {
         user.AddError("Deleted users are not migrated.");
+        user.PreventSelection();
       }
       if (String.IsNullOrEmpty(user.Email))
       {

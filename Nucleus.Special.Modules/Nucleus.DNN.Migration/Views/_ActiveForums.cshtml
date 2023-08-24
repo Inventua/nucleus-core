@@ -1,11 +1,11 @@
-﻿@model Nucleus.DNN.Migration.ViewModels.Forum
+﻿@model Nucleus.DNN.Migration.ViewModels.ActiveForums
 @Html.AddStyle("~!/../index.css")
-<h2 class="nucleus-control-panel-heading">Migrate DNN Forums</h2>
+<h2 class="nucleus-control-panel-heading">Migrate DNN Forums (Active Forums)</h2>
 
 @if (Model.ForumsNotInstalled)
 {
   <div class="alert alert-info">
-    Your DNN site does not have a forums module installed, or your forums software isn't supported by the migration tool.    
+    Your DNN site does not have the Active Forums module installed, or your Active Forums version isn't supported by the migration tool.
   </div>
 }
 else
@@ -17,7 +17,7 @@ else
     </ul>
   </div>
 
-  @using (Html.BeginNucleusForm("MigrateForums", "DNNMigration", "DNNMigration", FormMethod.Post, new { }))
+  @using (Html.BeginNucleusForm("MigrateActiveForums", "DNNMigration", "DNNMigration", FormMethod.Post, new { }))
   {
     @Html.HiddenFor(model => model.PortalId)
     <div class="nucleus-flex-fields">
@@ -25,7 +25,7 @@ else
         @Html.CheckBoxFor(model => model.UpdateExisting, new { @class = "ToggleSwitch" })
       </SettingsControl>
 
-      <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-before" data-target="#MigrateForums" data-confirm="Migrate forum posts for selected forums from DotNetNuke now?  This action cannot be reversed.">Migrate Forum Posts</button>
+      <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-before" data-target="#MigrateActiveForums" data-confirm="Migrate forum posts for selected forums from DotNetNuke now?  This action cannot be reversed.">Migrate Forum Posts</button>
     </div>
 
     <div class="my-2">

@@ -1,0 +1,15 @@
+﻿@model Nucleus.Modules.IFrame.ViewModels.Viewer
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.IFrame.HtmlHelpers
+@Html.AddStyle("~!/../viewer.css")
+@if (String.IsNullOrEmpty(Model.Url))
+{
+  <div class="alert alert-info">
+    This IFRAME module is not configured.
+  </div>
+}
+else
+{
+  @Html.Frame(Model.Url, Model.FrameAttributes)
+}

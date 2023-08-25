@@ -1,0 +1,49 @@
+﻿@model Nucleus.Modules.IFrame.ViewModels.Settings
+@using Nucleus.Modules.IFrame.Models
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<div class="nucleus-editor-panel">
+	@using (Html.BeginNucleusForm("Settings", "IFrameSettings", "IFrame", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+	{
+		<fieldset role="group" aria-labelledby="heading">
+			<h2 class="nucleus-control-panel-heading">Settings</h2>
+      			
+      <SettingsControl caption="Url" helptext="Enter the Url to link to.">
+				@Html.TextBoxFor(model => model.Url)
+			</SettingsControl>
+
+			<SettingsControl caption="Title" helptext="Enter a title (tooltip) for the IFRAME.">
+        @Html.TextBoxFor(model => model.Title)
+			</SettingsControl>
+
+      <SettingsControl caption="Name" helptext="Enter a name for the IFRAME.  This can be used in the target attribute of some HTML elements.">
+        @Html.TextBoxFor(model => model.Name)
+      </SettingsControl>
+
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="Width" helptext="Enter a width for the IFRAME.  Leave this blank to size the IFRAME automatically.">
+          @Html.TextBoxFor(model => model.Width)
+        </SettingsControl>
+
+        <SettingsControl caption="Height" helptext="Enter a height for the IFRAME.  Leave this blank to size the IFRAME automatically.">
+          @Html.TextBoxFor(model => model.Height)
+        </SettingsControl>
+
+        <SettingsControl caption="Scrolling" helptext="Select whether you want the IFRAME to have a scroll bar.">
+          @Html.DropDownListFor(model => model.Scrolling, Html.GetEnumSelectList<Settings.ScrollingOptions>())
+        </SettingsControl>
+
+        <SettingsControl caption="Border" rendermode="LabelLast" class="inner-inline mt-auto" helptext="Choose whether to display a border around the IFRAME.">
+          @Html.CheckBoxFor(model => model.Border, new { @class = "ToggleSwitch" })
+        </SettingsControl>
+      </div>
+		</fieldset>
+
+		<div class="nucleus-form-buttonrow">
+			@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "IFrameSettings", "IFrame"), new { })
+		</div>
+	}
+</div>

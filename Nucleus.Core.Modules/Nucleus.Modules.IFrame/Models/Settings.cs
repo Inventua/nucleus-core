@@ -23,7 +23,6 @@ public class Settings
     public const string MODULESETTING_TITLE = "iframe:title";
     public const string MODULESETTING_WIDTH = "iframe:width";
     public const string MODULESETTING_HEIGHT = "iframe:height";
-    public const string MODULESETTING_AUTOHEIGHT = "iframe:auto-height";
     public const string MODULESETTING_SCROLLING = "iframe:scrolling";
     public const string MODULESETTING_BORDER = "iframe:border";
   }

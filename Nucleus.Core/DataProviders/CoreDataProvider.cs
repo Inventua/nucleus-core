@@ -299,7 +299,7 @@ namespace Nucleus.Core.DataProviders
 
         // module permissions
         .Include(page => page.Modules)
-          .ThenInclude(module => module.Permissions.Where(permission => permission.PermissionType.Scope == PageModule.URN))
+          .ThenInclude(module => module.Permissions.Where(permission => permission.PermissionType.Scope.StartsWith(PageModule.URN)))
             .ThenInclude(permission => permission.PermissionType)
         .Include(page => page.Modules)
           .ThenInclude(module => module.Permissions)
@@ -309,7 +309,7 @@ namespace Nucleus.Core.DataProviders
         .Include(page => page.Routes)
 
         // page permissions
-        .Include(page => page.Permissions.Where(permission => permission.PermissionType.Scope == Page.URN))
+        .Include(page => page.Permissions.Where(permission => permission.PermissionType.Scope.StartsWith(Page.URN)))
           .ThenInclude(permission => permission.PermissionType)
         .Include(page => page.Permissions)
           .ThenInclude(permission => permission.Role)
@@ -317,7 +317,7 @@ namespace Nucleus.Core.DataProviders
         .AsSplitQuery()
 				.AsNoTracking()
 				.FirstOrDefaultAsync();
-
+      
 			if (result != null)
 			{
 				// Entity framework doesn't correctly order "child" collections so we have to do it client-side
@@ -365,7 +365,7 @@ namespace Nucleus.Core.DataProviders
 
         // module permissions
         .Include(page => page.Modules)
-          .ThenInclude(module => module.Permissions.Where(permission => permission.PermissionType.Scope == PageModule.URN))
+          .ThenInclude(module => module.Permissions.Where(permission => permission.PermissionType.Scope.StartsWith(PageModule.URN)))
             .ThenInclude(permission => permission.PermissionType)
         .Include(page => page.Modules)
           .ThenInclude(module => module.Permissions)
@@ -375,7 +375,7 @@ namespace Nucleus.Core.DataProviders
         .Include(page => page.Routes)
 
         // page permissions
-        .Include(page => page.Permissions.Where(permission => permission.PermissionType.Scope == Page.URN))
+        .Include(page => page.Permissions.Where(permission => permission.PermissionType.Scope.StartsWith(Page.URN)))
           .ThenInclude(permission => permission.PermissionType)
         .Include(page => page.Permissions)
           .ThenInclude(permission => permission.Role)
@@ -404,7 +404,7 @@ namespace Nucleus.Core.DataProviders
     {
       List<Page> results = await this.Context.Pages.Where(page => page.SiteId == siteId)
         .Include(page => page.Routes)
-        .Include(page => page.Permissions.Where(permission => permission.PermissionType.Scope == Page.URN))
+        .Include(page => page.Permissions.Where(permission => permission.PermissionType.Scope.StartsWith(Page.URN)))
           .ThenInclude(permission => permission.PermissionType)
         .Include(page => page.Permissions)
           .ThenInclude(permission => permission.Role)
@@ -437,7 +437,7 @@ namespace Nucleus.Core.DataProviders
 
         // module permissions
         .Include(page => page.Modules)
-          .ThenInclude(module => module.Permissions.Where(permission => permission.PermissionType.Scope == PageModule.URN))
+          .ThenInclude(module => module.Permissions.Where(permission => permission.PermissionType.Scope.StartsWith(PageModule.URN)))
             .ThenInclude(permission => permission.PermissionType)
         .Include(page => page.Modules)
           .ThenInclude(module => module.Permissions)
@@ -447,7 +447,7 @@ namespace Nucleus.Core.DataProviders
         .Include(page => page.Routes)
 
         // page permissions
-        .Include(page => page.Permissions.Where(permission => permission.PermissionType.Scope == Page.URN))
+        .Include(page => page.Permissions.Where(permission => permission.PermissionType.Scope.StartsWith(Page.URN)))
           .ThenInclude(permission => permission.PermissionType)
         .Include(page => page.Permissions)
           .ThenInclude(permission => permission.Role)
@@ -715,7 +715,7 @@ namespace Nucleus.Core.DataProviders
 				.Include(module => module.ModuleDefinition)
 				.Include(module => module.ContainerDefinition)
 				.Include(module => module.ModuleSettings)
-        .Include(module => module.Permissions.Where(permission => permission.PermissionType.Scope == PageModule.URN))
+        .Include(module => module.Permissions.Where(permission => permission.PermissionType.Scope.StartsWith(PageModule.URN)))
           .ThenInclude(permission => permission.PermissionType)
         .Include(module => module.Permissions)
           .ThenInclude(permission => permission.Role)
@@ -748,7 +748,7 @@ namespace Nucleus.Core.DataProviders
 				.Include(module => module.ModuleDefinition)
 				.Include(module => module.ContainerDefinition)
 				.Include(module => module.ModuleSettings)
-        .Include(module => module.Permissions.Where(permission => permission.PermissionType.Scope == PageModule.URN))
+        .Include(module => module.Permissions.Where(permission => permission.PermissionType.Scope.StartsWith(PageModule.URN)))
           .ThenInclude(permission => permission.PermissionType)
         .Include(module => module.Permissions)
           .ThenInclude(permission => permission.Role)
@@ -773,7 +773,7 @@ namespace Nucleus.Core.DataProviders
 				.Include(module => module.ModuleDefinition)
 				.Include(module => module.ContainerDefinition)
 				.Include(module => module.ModuleSettings)
-        .Include(module => module.Permissions.Where(permission => permission.PermissionType.Scope == PageModule.URN))
+        .Include(module => module.Permissions.Where(permission => permission.PermissionType.Scope.StartsWith(PageModule.URN)))
           .ThenInclude(permission => permission.PermissionType)
         .Include(module => module.Permissions)
           .ThenInclude(permission => permission.Role)

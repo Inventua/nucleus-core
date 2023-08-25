@@ -712,7 +712,9 @@ public class DNNMigrationController : Controller
     Guid bestLayoutId = Guid.Empty;
     double bestLayoutWeight = 0;
 
-    foreach (Nucleus.Abstractions.Models.LayoutDefinition layout in layouts)
+    // we don't include the "simple" layout as an auto-detect output, because it is the layout that doesn't render a menu (or anything) and
+    // is confusing for users who didn't deliberately select it.
+    foreach (Nucleus.Abstractions.Models.LayoutDefinition layout in layouts.Where(layout => layout.FriendlyName != "Simple"))
     {
       // starting weight is based on similarity of "friendly names"
       double weight = (int)(FindSimilarity(skin.FriendlyName(), layout.FriendlyName) * 10);

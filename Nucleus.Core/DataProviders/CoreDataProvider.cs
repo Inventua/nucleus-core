@@ -800,22 +800,41 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task SavePageModule(Guid pageId, PageModule module)
 		{
-			Boolean isNew = !this.Context.PageModules.Where(existing => existing.Id == module.Id).Any();
+      //Boolean isNew = !this.Context.PageModules
+      //     .Where(existing => existing.Id == module.Id)
+      //     .AsNoTracking()
+      //     .Any();
 
-			if (isNew && module.SortOrder == 0)
+      PageModule existing = await this.Context.PageModules
+        .Where(existing => existing.Id == module.Id)
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
+
+      if (existing == null && module.SortOrder == 0)
 			{
 				module.SortOrder = await GetLastPageModuleSortOrder(pageId) + 10;
 			}
 
-			this.Context.Attach(module);
-			this.Context.Entry(module).Property("PageId").CurrentValue = pageId;
-			this.Context.Entry(module).State = isNew ? EntityState.Added : EntityState.Modified;
+      if (existing == null)
+      {
+        this.Context.Attach(module);
+        this.Context.Entry(module).Property("PageId").CurrentValue = pageId;
+        this.Context.Entry(module).State = EntityState.Added;
+      }
+      else
+      {
+        this.Context.Entry(existing).CurrentValues.SetValues(module);
+        this.Context.Entry(existing).Property("PageId").CurrentValue = pageId;
+        this.Context.Entry(existing).State = EntityState.Modified;
+      }
+      
+			//this.Context.Entry(module).State = isNew ? EntityState.Added : EntityState.Modified;
 			await this.Context.SaveChangesAsync<PageModule>();
 
 			this.Context.ChangeTracker.Clear();
 			await SavePageModuleSettings(module.Id, module.ModuleSettings);
 
-			if (isNew)
+			if (existing == null)
 			{
 				this.EventManager.RaiseEvent<PageModule, Create>(module);
 			}

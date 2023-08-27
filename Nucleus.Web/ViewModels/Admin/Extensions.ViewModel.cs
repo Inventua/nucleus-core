@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Nucleus.Abstractions.Models;
 
 namespace Nucleus.Web.ViewModels.Admin
@@ -17,6 +18,8 @@ namespace Nucleus.Web.ViewModels.Admin
     public List<string> Messages { get; } = new();
 		public List<Abstractions.Models.Extensions.package> InstalledExtensions { get; set; }
 
+    public Dictionary<Guid, ExtensionComponents> ExtensionsUsage { get; set; } = new();
+
     public Abstractions.Models.Configuration.StoreOptions StoreOptions { get; set; }
 
     public Abstractions.Models.Configuration.Store SelectedStore { get; set; }
@@ -31,5 +34,37 @@ namespace Nucleus.Web.ViewModels.Admin
     public string Password { get; set; }
 
     public string StoreUrl { get; set; }
+
+    public class ExtensionComponents
+    {
+      public List<ExtensionComponentUsage> Layouts { get; set; } = new();
+      
+      public List<ExtensionComponentUsage> Containers { get; set; } = new();
+      
+      public List<ExtensionComponentUsage> Modules { get; set; } = new();
+
+      public List<ExtensionComponentUsage> ControlPanelExtensions { get; set; } = new();
+    }
+
+    public class ExtensionComponentUsage
+    {
+      public Guid Id { get; set; }
+      public string Name { get; set; }
+      public List<Page> Pages { get; set; } = new();
+      public string Message { get; set; }
+
+      public ExtensionComponentUsage(Guid id, string name)
+      {
+        this.Id = id;
+        this.Name = name;
+      }
+
+      public ExtensionComponentUsage(Guid id, string name, List<Page> pages) 
+      {
+        this.Id = id;
+        this.Name = name;
+        this.Pages = pages;
+      }
+    }
   }
 }

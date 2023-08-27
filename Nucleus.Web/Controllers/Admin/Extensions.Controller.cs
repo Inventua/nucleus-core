@@ -12,6 +12,9 @@ using Nucleus.Abstractions.Managers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System.Net.Http;
+using DocumentFormat.OpenXml.Drawing.Diagrams;
+using static Nucleus.Web.ViewModels.Admin.Extensions;
+using Nucleus.Abstractions.Models.Extensions;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -20,18 +23,23 @@ namespace Nucleus.Web.Controllers.Admin
   public class ExtensionsController : Controller
   {
     private IExtensionManager ExtensionManager { get; }
+    private Context Context { get; }
+
     private IHostApplicationLifetime HostApplicationLifetime { get; }
     private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
     private IOptions<Nucleus.Abstractions.Models.Configuration.StoreOptions> StoreOptions { get; }
     private IExtensionsStoreManager StoreManager { get; }
     private IRestApiClient RestApiClient { get; }
+    private IPageManager PageManager { get; }
 
-    public ExtensionsController(IHostApplicationLifetime hostApplicationLifetime, IRestApiClient restApiClient, IExtensionsStoreManager storeManager, IExtensionManager extensionManager, IOptions<Nucleus.Abstractions.Models.Configuration.StoreOptions> storeOptions, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
+    public ExtensionsController(IHostApplicationLifetime hostApplicationLifetime, Context context, IRestApiClient restApiClient, IExtensionsStoreManager storeManager, IExtensionManager extensionManager, IPageManager pageManager, IOptions<Nucleus.Abstractions.Models.Configuration.StoreOptions> storeOptions, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
     {
       this.HostApplicationLifetime = hostApplicationLifetime;
+      this.Context = context;
       this.RestApiClient = restApiClient;
       this.StoreManager = storeManager;
       this.ExtensionManager = extensionManager;
+      this.PageManager = pageManager;
       this.StoreOptions = storeOptions;
       this.FolderOptions = folderOptions;
     }
@@ -43,6 +51,15 @@ namespace Nucleus.Web.Controllers.Admin
     public async Task<ActionResult> Index(ViewModels.Admin.Extensions viewModel)
     {
       return View("Index", await BuildViewModel(viewModel));
+    }
+
+    /// <summary>
+    /// Display the usage information for an extension
+    /// </summary>
+    [HttpGet]
+    public async Task<ActionResult> ListUsage(Guid id, Guid itemId)
+    {
+      return View("_Usage", await BuildUsageViewModel(id, itemId));
     }
 
     /// <summary>
@@ -160,12 +177,6 @@ namespace Nucleus.Web.Controllers.Admin
       }
     }
 
-    private class SubscriberResponse
-    {
-      public Guid Id { get; set; }
-      public string Name { get; set; }
-      public Boolean IsOwnerAssigned { get; set; }
-    }
 
     /// <summary>
     /// 
@@ -271,19 +282,6 @@ namespace Nucleus.Web.Controllers.Admin
       return View("Wizard", viewModel);
     }
 
-    private static void SetMessages(ViewModels.Admin.Extensions viewModel, Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState)
-    {
-      if (!modelState.IsValid)
-      {
-        foreach (Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateEntry entry in modelState.Values)
-        {
-          foreach (Microsoft.AspNetCore.Mvc.ModelBinding.ModelError error in entry.Errors)
-          {
-            viewModel.Messages.Add(error.ErrorMessage);
-          }
-        }
-      }
-    }
 
     [HttpPost]
     public async Task<ActionResult> Install(ViewModels.Admin.Extensions viewModel)
@@ -356,6 +354,20 @@ namespace Nucleus.Web.Controllers.Admin
       return View("Complete", viewModel);
     }
 
+    private static void SetMessages(ViewModels.Admin.Extensions viewModel, Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState)
+    {
+      if (!modelState.IsValid)
+      {
+        foreach (Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateEntry entry in modelState.Values)
+        {
+          foreach (Microsoft.AspNetCore.Mvc.ModelBinding.ModelError error in entry.Errors)
+          {
+            viewModel.Messages.Add(error.ErrorMessage);
+          }
+        }
+      }
+    }
+
     private void GetSelectedStore(ViewModels.Admin.Extensions viewModel)
     {
       viewModel.SelectedStore = this.StoreOptions.Value.Stores
@@ -376,6 +388,32 @@ namespace Nucleus.Web.Controllers.Admin
       GetSelectedStore(viewModel);
       
       viewModel.InstalledExtensions = ListInstalledExtensions();
+
+      foreach (Abstractions.Models.Extensions.package extension in viewModel.InstalledExtensions) 
+      {
+        Guid extensionId = new Guid(extension.id); 
+
+        foreach (Abstractions.Models.Extensions.layoutDefinition layout in extension.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.layoutDefinition>().ToList()))
+        {
+          GetExtensionInfo(viewModel.ExtensionsUsage, extensionId).Layouts.Add(new(new Guid(layout.id), layout.friendlyName));
+        }
+
+        foreach (Abstractions.Models.Extensions.containerDefinition container in extension.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.containerDefinition>().ToList()))
+        {
+          GetExtensionInfo(viewModel.ExtensionsUsage, extensionId).Containers.Add(new(new Guid(container.id), container.friendlyName));
+        }
+
+        foreach (Abstractions.Models.Extensions.moduleDefinition module in extension.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.moduleDefinition>().ToList()))
+        {
+          GetExtensionInfo(viewModel.ExtensionsUsage, extensionId).Modules.Add(new(new Guid(module.id), module.friendlyName));
+        }
+
+        foreach (Abstractions.Models.Extensions.controlPanelExtensionDefinition controlPanelExtension in extension.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.controlPanelExtensionDefinition>().ToList()))
+        {
+          GetExtensionInfo(viewModel.ExtensionsUsage, extensionId).ControlPanelExtensions.Add(new(new Guid(controlPanelExtension.id), controlPanelExtension.friendlyName));
+        }
+      }
+
       viewModel.StoreSettings = await this.StoreManager.Get(viewModel.SelectedStore.BaseUrl);
 
       if (viewModel.StoreSettings != null && viewModel.StoreSettings.StoreId != Guid.Empty)
@@ -408,6 +446,77 @@ namespace Nucleus.Web.Controllers.Admin
       return viewModel;
     }
 
+    private async Task<ViewModels.Admin.ExtensionsUsage> BuildUsageViewModel(Guid extensionId, Guid itemId)
+    {
+      ViewModels.Admin.ExtensionsUsage viewModel = new();
+      
+      viewModel.Id = itemId;
+      viewModel.Package = ListInstalledExtensions().Where(package => new Guid(package.id) == extensionId).FirstOrDefault();
+           
+      IList<Page> pages = await this.PageManager.List(this.Context.Site);
+
+      foreach (Abstractions.Models.Extensions.layoutDefinition layoutDefinition in viewModel.Package.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.layoutDefinition>().ToList()))
+      {        
+        viewModel.ExtensionComponents.Layouts.Add(new
+        (
+          new Guid(layoutDefinition.id),
+          layoutDefinition.friendlyName, 
+          pages.Where(page => page.LayoutDefinition?.Id == new Guid(layoutDefinition.id)).ToList()
+        ));
+
+        if (this.Context.Site.DefaultLayoutDefinition?.Id ==  new Guid(layoutDefinition.id))
+        {
+          viewModel.SiteDefaultLayout = layoutDefinition.friendlyName;
+        }
+      }
+
+      foreach (Abstractions.Models.Extensions.containerDefinition containerDefinition in viewModel.Package.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.containerDefinition>().ToList()))
+      {
+        viewModel.ExtensionComponents.Containers.Add(new
+        (
+          new Guid(containerDefinition.id),
+          containerDefinition.friendlyName,
+          pages.Where(page => page.DefaultContainerDefinition?.Id == new Guid(containerDefinition.id) || page.Modules.Where(module => module.ContainerDefinition?.Id == new Guid(containerDefinition.id)).Any()).ToList()
+        ));
+
+        if (this.Context.Site.DefaultContainerDefinition?.Id == new Guid(containerDefinition.id))
+        {
+          viewModel.SiteDefaultContainer = containerDefinition.friendlyName;
+        }
+      }
+
+      foreach (Abstractions.Models.Extensions.moduleDefinition moduleDefinition in viewModel.Package.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.moduleDefinition>().ToList()))
+      {
+        viewModel.ExtensionComponents.Modules.Add(new
+        (
+          new Guid(moduleDefinition.id),
+          moduleDefinition.friendlyName,
+          pages.Where(page => page.Modules.Where(module => module.ModuleDefinition.Id == new Guid(moduleDefinition.id)).Any()).ToList()
+        ));
+      }
+
+      foreach (Abstractions.Models.Extensions.controlPanelExtensionDefinition controlPanelExtension in viewModel.Package.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.controlPanelExtensionDefinition>().ToList()))
+      {
+        viewModel.ExtensionComponents.ControlPanelExtensions.Add(new(new Guid(controlPanelExtension.id), controlPanelExtension.friendlyName) 
+        { 
+          Message = $"Available in the {(controlPanelExtension.scope == controlPanelExtensionScope.Site ? "manage"  : "settings")} control panel."
+        });
+      }
+
+      return viewModel;
+    }
+
+    private ViewModels.Admin.Extensions.ExtensionComponents GetExtensionInfo(Dictionary<Guid, ExtensionComponents> extensionInfo, Guid extensionId)
+    {
+      if (!extensionInfo.TryGetValue(extensionId, out ViewModels.Admin.Extensions.ExtensionComponents value))
+      {
+        value = new();
+        extensionInfo.Add(extensionId, value);
+      }
+
+      return value;
+    }
+
     private List<Abstractions.Models.Extensions.package> ListInstalledExtensions()
     {
       List<Abstractions.Models.Extensions.package> results = new();
@@ -429,6 +538,13 @@ namespace Nucleus.Web.Controllers.Admin
       }
 
       return results;
+    }
+
+    private class SubscriberResponse
+    {
+      public Guid Id { get; set; }
+      public string Name { get; set; }
+      public Boolean IsOwnerAssigned { get; set; }
     }
   }
 }

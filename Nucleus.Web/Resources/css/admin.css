@@ -59,9 +59,13 @@
 }
 
 /*  default styles for elements within an admin page or popup settings editor */
+#nucleus-control-panel-heading, .modal-content h5.modal-title
+{
+  font-size: 1.25rem;	
+}
+
 #nucleus-control-panel-heading
 {
-	font-size: 20px;
 	margin: 0 0 8px 0;
 	display: inline-block;
 }
@@ -73,18 +77,18 @@
 
 .nucleus-admin-content h1
 {
-	font-size: 24px;
+	font-size: 1.5rem;
 	margin: 0 0 8px 0;
 }
 
 .nucleus-admin-content h2
 {
-	font-size: 16px;
+	font-size: 1rem;
 }
 
 .nucleus-admin-content h3
 {
-	font-size: 14px;	
+	font-size: .85rem;	
 }
 
 .nucleus-admin-content fieldset h3
@@ -94,7 +98,12 @@
 
 .nucleus-admin-content h4
 {
-	font-size: 12px;	
+	font-size: .75rem;	
+}
+
+.nucleus-admin-content h5 
+{
+	font-size: .7rem;	
 }
 
 .nucleus-admin-content select:focus
@@ -702,12 +711,88 @@ ul.nucleus-control-panel-items button
 	font-size: 14px;
 }
 
+.nucleus-adminpage .ExtensionInstaller .InstalledExtensions .nucleus-extension-components
+{
+  background-color: #f0f0f0;
+  padding: 0 0.25rem 0.25rem 0.25rem;
+  border-radius: 0.25rem;
+  border: dashed 1px #555;
+  margin-top: 0.25rem;
+}
+
+.nucleus-adminpage .ExtensionInstaller .modal-body .nucleus-extension-components
+{
+  flex: 1;
+  overflow: auto;
+}
+
+.nucleus-adminpage .ExtensionInstaller .nucleus-extension-components h4
+{
+  margin: 0.5rem 0 0.25rem 0;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.nucleus-adminpage .ExtensionInstaller .nucleus-extension-components h5
+{
+  margin: 0.5rem 0 0.25rem 0;
+  padding: 0.25rem;
+  font-weight: bold;
+  font-size: 0.8rem;
+  display: inline-block;
+  transition: background-color ease-out 2.5s;
+}
+
+.nucleus-adminpage .ExtensionInstaller .nucleus-extension-components .highlight
+{
+  background-color: yellow;
+}
+
+.nucleus-adminpage .ExtensionInstaller .nucleus-extension-components ul
+{
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  /*display: inline-block;*/
+}
+
+.nucleus-adminpage .ExtensionInstaller .nucleus-extension-components div
+{
+  flex: 1;
+}
+
+.nucleus-adminpage .ExtensionInstaller .InstalledExtensions .nucleus-extension-components li
+{
+  display: inline-block;
+}
+
+.nucleus-adminpage .ExtensionInstaller .modal-body .nucleus-extension-components > ul
+{
+  display: flex;
+}
+
+.nucleus-adminpage .ExtensionInstaller .modal-body .nucleus-extension-components > ul > li
+{
+  flex: 1;
+}
+
+.nucleus-adminpage .ExtensionInstaller .InstalledExtensions .nucleus-extension-components ul.component-list li:not(:last-child)::after
+{
+  content: ', ';
+}
+
+.nucleus-adminpage .ExtensionInstaller .nucleus-extension-components .component-pages-list
+{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);  
+}
+
 .nucleus-adminpage .ExtensionInstaller .InstalledExtensions .EmailIcon
 {
 	text-decoration: none;
 	color: #21A3DA!important;
 	font-size: 18px;
-	vertical-align: text-bottom;
+	vertical-align: top;
 }
 
 .nucleus-adminpage .ExtensionInstaller .InstalledExtensions tr

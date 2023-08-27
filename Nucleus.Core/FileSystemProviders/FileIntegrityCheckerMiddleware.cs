@@ -44,8 +44,11 @@ namespace Nucleus.Core.FileSystemProviders
 						max.MaxRequestBodySize = MAX_FILE_SIZE_BYTES;
 					}
 				}
-       
-				foreach (IFormFile file in context.Request.Form.Files)
+
+        // Using .ReadFormAsync is a performance recommendation from https://learn.microsoft.com/en-us/aspnet/core/fundamentals/best-practices?view=aspnetcore-7.0
+        IFormCollection form = await context.Request.ReadFormAsync();
+        
+        foreach (IFormFile file in form.Files)
 				{
 					if (context.User.IsInRole(this.Context.Site.AnonymousUsersRole.Name))
 					{

@@ -137,8 +137,8 @@
           @foreach (var connection in Model.DatabaseConnections)
           {
             <tr>
-              <td class="text-nowrap">@(connection.Schema == "*" ? "Default (*)" : connection.Schema)</td>
-              <td>@connection.DatabaseType</td>
+              <th scope="row" class="text-nowrap w-25"><h2>@(connection.Schema == "*" ? "Default (*)" : connection.Schema)</h2></th>
+              <td class=" w-25">@connection.DatabaseType</td>
               <td>@connection.ConnectionString</td>
             </tr>
             <tr>
@@ -147,7 +147,7 @@
                   @foreach (var keyValue in connection.DatabaseInformation)
                   {
                     <tr>
-                      <td class="text-nowrap fw-bold w-25">@keyValue.Key</td>
+                      <th scope="row" class="text-nowrap w-25"><h3>@keyValue.Key</h3></th>
                       <td>@keyValue.Value</td>
                     </tr>
                   }

@@ -179,8 +179,14 @@ namespace Nucleus.Web.Controllers.Admin
 				if (connection != null)
 				{
 					ViewModels.Admin.SystemIndex.DatabaseConnection databaseConnection = new() { Schema = schema.Name, DatabaseType = connection.Type, ConnectionString = Sanitize(connection.ConnectionString) };
-					databaseConnection.DatabaseInformation = Nucleus.Data.Common.DataProviderExtensions.GetDataProviderInformation(this.DatabaseOptions.Value, schema.Name);
-
+          try
+          {
+            databaseConnection.DatabaseInformation = Nucleus.Data.Common.DataProviderExtensions.GetDataProviderInformation(this.DatabaseOptions.Value, schema.Name);
+          }
+          catch (Exception ex)
+          {
+            databaseConnection.DatabaseInformation = new Dictionary<string, string>() { { "Connection Error", ex.Message } };
+          }
 					connections.Add(databaseConnection);
 				}
 				else

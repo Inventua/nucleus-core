@@ -31,6 +31,8 @@ public class Folder : DNNEntity
 
   public List<FolderPermission> Permissions { get; set; }
 
+  public Boolean IsProtected { get; set; }
+
   [NotMapped]
   public int ParentId { get; set; }
 

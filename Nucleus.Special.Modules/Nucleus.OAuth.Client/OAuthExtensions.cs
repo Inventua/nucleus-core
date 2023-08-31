@@ -71,12 +71,13 @@ namespace Nucleus.OAuth.Client
 				IConfigurationSection configurationSection = configurationSections[count];
 				Models.Configuration.OAuthProvider providerConfig = config[count];
 				string providerName = providerConfig.Name ?? providerConfig.Type; 
-				string providerType = providerConfig.Type; 
+				string providerType = providerConfig.Type;
+        string providerDisplayName = providerConfig.FriendlyName ?? providerName;
 
-				switch (providerType)
+        switch (providerType)
 				{
 					case "OAuth":
-						builder.AddOAuth(providerName, options =>
+						builder.AddOAuth(providerName, providerDisplayName, options =>
 						{
 							SetOptions(options, providerName, configurationSection, providerConfig);
 							options.Events.OnCreatingTicket = ReadUserData;
@@ -84,14 +85,14 @@ namespace Nucleus.OAuth.Client
 						break;
 
 					case "OpenIdConnect":
-						builder.AddOpenIdConnect(providerName, options =>
+						builder.AddOpenIdConnect(providerName, providerDisplayName, options =>
 						{
 							SetOptions(options, providerName, configurationSection, providerConfig);
 						});
 						break;
 
 					case "Google":
-						builder.AddGoogle(providerName, options =>
+						builder.AddGoogle(providerName, providerDisplayName, options =>
 						{
 							SetOptions(options, providerName, configurationSection, providerConfig);
 							options.Events.OnCreatingTicket = ReadUserData;
@@ -99,7 +100,7 @@ namespace Nucleus.OAuth.Client
 						break;
 
 					case "Facebook":
-						builder.AddFacebook(providerName, options =>
+						builder.AddFacebook(providerName, providerDisplayName, options =>
 						{
 							SetOptions(options, providerName, configurationSection, providerConfig);
 							options.Scope.Add("public_profile");
@@ -108,14 +109,14 @@ namespace Nucleus.OAuth.Client
 						break;
 
 					case "Twitter":
-						builder.AddTwitter(providerName, options =>
+						builder.AddTwitter(providerName, providerDisplayName, options =>
 						{
 							SetOptions(options, providerName, configurationSection, providerConfig);
 						});
 						break;
 
 					case "Microsoft":
-						builder.AddMicrosoftAccount(providerName, options =>
+						builder.AddMicrosoftAccount(providerName, providerDisplayName, options =>
 						{
 							SetOptions(options, providerName, configurationSection, providerConfig);
 							options.Events.OnCreatingTicket = ReadUserData;

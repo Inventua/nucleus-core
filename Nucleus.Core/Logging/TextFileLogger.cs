@@ -8,6 +8,7 @@ using System.Threading;
 using Nucleus.Abstractions.Models.TaskScheduler;
 using System.Text.RegularExpressions;
 using Nucleus.Abstractions.Models.Configuration;
+using DocumentFormat.OpenXml.Office2021.DocumentTasks;
 
 namespace Nucleus.Core.Logging
 {
@@ -114,7 +115,7 @@ namespace Nucleus.Core.Logging
 
 		private void LogMessage(RunningTask task, string message)
 		{
-			string logPath = System.IO.Path.Combine(this.Options.Path, ScheduledTask.SCHEDULED_TASKS_LOG_SUBPATH, task.ScheduledTask.Name);
+			string logPath = System.IO.Path.Combine(this.Options.Path, ScheduledTask.SCHEDULED_TASKS_LOG_SUBPATH, task.ScheduledTask.GetLogFolderName());
 			string logFileName = $"{task.StartDate.ToString(LogFileConstants.DATETIME_FILENAME_FORMAT)}_{Environment.MachineName}.log";
 
 			LogMessage(message, logPath, logFileName);
@@ -158,6 +159,8 @@ namespace Nucleus.Core.Logging
 				}
 			}
 		}
+
+   
 
     private void CheckFolder(string path)
     {

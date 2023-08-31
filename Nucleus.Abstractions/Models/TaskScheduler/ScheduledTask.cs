@@ -115,6 +115,13 @@ namespace Nucleus.Abstractions.Models.TaskScheduler
 		/// </summary>
 		public int KeepHistoryCount { get; set; }
 
-
+    /// <summary>
+    /// Generate a valid log folder from the scheduled task name.
+    /// </summary>
+    /// <returns></returns>
+    public string GetLogFolderName()
+    {
+      return System.Text.RegularExpressions.Regex.Replace(this.Name, "[^A-Za-z0-9]", "-");
+    }
 	}
 }

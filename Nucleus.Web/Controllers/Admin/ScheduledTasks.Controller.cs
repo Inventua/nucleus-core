@@ -200,7 +200,7 @@ public class ScheduledTasksController : Controller
 
   private System.IO.DirectoryInfo LogFolder(ScheduledTask scheduledTask)
   {
-    return new(System.IO.Path.Combine(this.LogFolderPath, scheduledTask.Name));
+    return new(System.IO.Path.Combine(this.LogFolderPath, scheduledTask.GetLogFolderName()));
   }
 
   private async Task<ViewModels.Admin.ScheduledTaskIndex> BuildViewModel()
@@ -276,7 +276,7 @@ public class ScheduledTasksController : Controller
             {
               logs.Add(new Nucleus.Web.ViewModels.Admin.Shared.LogFileInfo()
               {
-                Filename = System.IO.Path.Join(scheduledTask.Name, file.Name),
+                Filename = System.IO.Path.Join(scheduledTask.GetLogFolderName(), file.Name),
                 Title = $"{logDate.ToLocalTime():dd MMM yyyy HH:mm} [{match.Groups[2].Value}]",
                 LogDate = logDate
               });

@@ -1,31 +1,23 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Claims;
-using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Net.Http.Headers;
-using Nucleus.Core.DataProviders;
 using Nucleus.Abstractions.Models;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Extensions;
 using Microsoft.AspNetCore.Routing;
 using Nucleus.Abstractions.Managers;
-using System.Security.Principal;
 
 namespace Nucleus.Core.Authentication
 {
-  public class AuthenticationHandler : Microsoft.AspNetCore.Authentication.SignInAuthenticationHandler<AuthenticationOptions>
+  public class AuthenticationHandler : SignInAuthenticationHandler<AuthenticationOptions>
   {
-
     private ISessionManager SessionManager { get; }
     private IUserManager UserManager { get; }
     private ISiteManager SiteManager { get; }
@@ -166,7 +158,7 @@ namespace Nucleus.Core.Authentication
       else
       {
         // user session was not found in the database (or cache)
-        Logger.LogWarning("Invalid session Id {sessionId} sent from {remoteIpAddress}.", sessionId, this.Context.Connection.RemoteIpAddress);        
+        Logger.LogWarning("Invalid session Id {sessionId} sent from {remoteIpAddress}.", sessionId, this.Context.Connection.RemoteIpAddress);
       }
 
       if (userSession == null)
@@ -227,7 +219,7 @@ namespace Nucleus.Core.Authentication
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
             Logger.LogTrace("User Id '{userId}': Adding Claim '{claimType}': '{userName}'.", userSession.UserId, ClaimTypes.Name, user.UserName);
             claims.Add(new Claim(ClaimTypes.Name, user.UserName));
-            
+
             // if the user is a system administrator, add the system administrator claim 
             if (user.IsSystemAdministrator)
             {
@@ -276,8 +268,6 @@ namespace Nucleus.Core.Authentication
 
     private async Task<AuthenticateResult> HandleApiRequest(string sessionId, Guid accessKey)
     {
-     
-
       ApiKey apiKey = await this.ApiKeyManager.Get(accessKey);
       if (apiKey == null)
       {

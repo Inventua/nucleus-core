@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Nucleus.Abstractions.Models.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,6 +22,10 @@ namespace Nucleus.Modules.Account.ViewModels
 		public Boolean ShowVerificationToken { get; set; }
 		
 		public string VerificationToken { get; set; }
+
+    public string NegotiateAuthenticationUrl { get; set; }
+
+    public IEnumerable<AuthenticationProtocol> ExternalAuthenticationProtocols { get; set; } 
 
 	}
 }

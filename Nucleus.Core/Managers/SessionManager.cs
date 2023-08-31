@@ -106,7 +106,7 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
-			public async Task SignIn(UserSession userSession, HttpContext httpContext, string returnUrl)
+		public async Task SignIn(UserSession userSession, HttpContext httpContext, string returnUrl)
 		{	
 			await Save(userSession);
 
@@ -145,14 +145,19 @@ namespace Nucleus.Core.Managers
 				RedirectUri = returnUrl
 			};
 
-			await httpContext.SignInAsync(new ClaimsPrincipal(claimsIdentity), authProperties);
+			await httpContext.SignInAsync
+      (
+        Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME,
+        new ClaimsPrincipal(claimsIdentity), 
+        authProperties
+      );
 
 		}
 
 		public async Task SignOut(HttpContext httpContext)
 		{
 			// The AuthenticationHandler manages deleting the session
-			await httpContext.SignOutAsync();
+			await httpContext.SignOutAsync(Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME);
 		}
 
 		public async Task<long> CountUsersOnline(Site site)

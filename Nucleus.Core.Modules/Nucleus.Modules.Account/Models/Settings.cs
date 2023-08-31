@@ -15,7 +15,9 @@ namespace Nucleus.Modules.Account.Models
 			public const string AllowRememberMe = "login:allowrememberme";
 			public const string AllowUsernameRecovery = "login:allowusernamerecovery";
 			public const string AllowPasswordReset = "login:allowpasswordreset";
-		}
+
+      public const string PreventAutoLogin = "login:preventautologin";
+    }
 
 		public Boolean AllowRememberMe { get; set; }
 
@@ -23,18 +25,23 @@ namespace Nucleus.Modules.Account.Models
 
 		public Boolean AllowPasswordReset { get; set; }
 
-		public void ReadSettings(PageModule module)
+    public Boolean PreventAutoLogin { get; set; }
+
+    public void ReadSettings(PageModule module)
 		{
-			AllowPasswordReset = module.ModuleSettings.Get(ModuleSettingsKeys.AllowPasswordReset, true);
-			AllowUsernameRecovery = module.ModuleSettings.Get(ModuleSettingsKeys.AllowUsernameRecovery, true);
-			AllowRememberMe = module.ModuleSettings.Get(ModuleSettingsKeys.AllowRememberMe, true);
-		}
+      this.AllowPasswordReset = module.ModuleSettings.Get(ModuleSettingsKeys.AllowPasswordReset, true);
+      this.AllowUsernameRecovery = module.ModuleSettings.Get(ModuleSettingsKeys.AllowUsernameRecovery, true);
+      this.AllowRememberMe = module.ModuleSettings.Get(ModuleSettingsKeys.AllowRememberMe, true);
+
+      this.PreventAutoLogin = module.ModuleSettings.Get(ModuleSettingsKeys.AllowRememberMe, true);
+    }
 
 		public void WriteSettings(PageModule module)
 		{
 			module.ModuleSettings.Set(ModuleSettingsKeys.AllowPasswordReset, this.AllowPasswordReset);
 			module.ModuleSettings.Set(ModuleSettingsKeys.AllowUsernameRecovery, this.AllowUsernameRecovery);
 			module.ModuleSettings.Set(ModuleSettingsKeys.AllowRememberMe, this.AllowRememberMe);
-		}
+      module.ModuleSettings.Set(ModuleSettingsKeys.PreventAutoLogin, this.PreventAutoLogin);
+    }
 	}
 }

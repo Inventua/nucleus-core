@@ -14,7 +14,7 @@ namespace Nucleus.Abstractions.Authentication
 		/// <summary>
 		/// Authentication scheme name
 		/// </summary>
-		public const string DEFAULT_AUTH_SCHEME = "urn:nucleus/authentication/default-scheme-name";
+		public const string DEFAULT_AUTH_SCHEME = "urn:nucleus/authentication/nucleus-default-authentication";
 
 		/// <summary>
 		/// Nucleus session ID claim URI.

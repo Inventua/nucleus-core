@@ -20,6 +20,10 @@
 				@Html.CheckBoxFor(model => model.AllowPasswordReset, new { @class = "ToggleSwitch" })
 			</SettingsControl>
 		</div>
+
+    <SettingsControl caption="Prevent Automatic Login?" rendermode="LabelLast" class="inner-inline" helptext="Prevents automatic login using Kerberos or another authentication method that can automatically log the user in.  Use this option to set up a special login page which always prompts the user for a user name and password.">
+      @Html.CheckBoxFor(model => model.PreventAutoLogin, new { @class = "ToggleSwitch" })
+    </SettingsControl>
 	</fieldset>
 
 	<div class="nucleus-form-buttonrow">

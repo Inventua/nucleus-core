@@ -148,7 +148,18 @@ namespace Nucleus.Core.Services
 			this.Queue.Remove(runningTask.ScheduledTask);
     }
 
-		private DateTime CalculateInterval(DateTime thisRunDateTime, ScheduledTask.Intervals intervalType, int interval)
+    private async Task SignalFailed(RunningTask runningTask)
+    {
+      runningTask.History.FinishDate = DateTime.UtcNow;
+      runningTask.History.NextScheduledRun = CalculateInterval(runningTask.StartDate, runningTask.ScheduledTask.IntervalType, runningTask.ScheduledTask.Interval);
+
+      runningTask.Progress.Status = ScheduledTaskProgress.State.Error;
+      await LogTaskFailed(runningTask.History);
+
+      this.Queue.Remove(runningTask.ScheduledTask);
+    }
+
+    private DateTime CalculateInterval(DateTime thisRunDateTime, ScheduledTask.Intervals intervalType, int interval)
 		{
 			switch (intervalType)
 			{
@@ -213,7 +224,7 @@ namespace Nucleus.Core.Services
 
 				if (serviceType == null)
 				{
-					this.Logger.LogError("Unable to find type {typeName}", task.TypeName);
+					this.Logger.LogError("Unable to find type '{typeName}'", task.TypeName);
 					await LogTaskFailed(history);
 					return;
 				}
@@ -222,7 +233,7 @@ namespace Nucleus.Core.Services
 
 				if (service == null)
 				{
-					this.Logger.LogError("Unable to create an instance of {typeName}", task.TypeName);
+					this.Logger.LogError("Unable to create an instance of '{typeName}'", task.TypeName);
 					await LogTaskFailed(history);
 					return;
 				}
@@ -231,7 +242,7 @@ namespace Nucleus.Core.Services
 
 				if (taskService == null)
 				{
-					this.Logger.LogError("Unable to create an instance of {TypeName} because it does not implement IScheduledTask", task.TypeName);
+					this.Logger.LogError("Unable to create an instance of '{TypeName}' because it does not implement IScheduledTask", task.TypeName);
 					await LogTaskFailed(history);
 					return;
 				}
@@ -247,7 +258,15 @@ namespace Nucleus.Core.Services
           this.Logger.LogInformation("The task scheduler has started the '{scheduledTaskName}' task.", runningTask.ScheduledTask.Name);
           using (this.Logger.BeginScope(runningTask))
 					{
-						await taskService.InvokeAsync(runningTask, runningTask.ProgressCallback, this.CancellationTokenSource.Token);						
+            try
+            {
+              await taskService.InvokeAsync(runningTask, runningTask.ProgressCallback, this.CancellationTokenSource.Token);
+            }
+            catch (Exception ex)
+            {
+              this.Logger.LogError(ex, "Error starting scheduled task '{typeName}'", task.TypeName);
+              await SignalFailed(runningTask);
+            }
 					}
         });
 			}

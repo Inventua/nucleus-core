@@ -2109,14 +2109,19 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task SaveScheduledTaskHistory(ScheduledTaskHistory history)
 		{
-			Boolean isNew = !this.Context.ScheduledTaskHistory
+			ScheduledTaskHistory existing = this.Context.ScheduledTaskHistory
 				.Where(existing => existing.Id == history.Id)
-				.AsNoTracking()
-				.Any();
+				.FirstOrDefault();
 
-			this.Context.ScheduledTaskHistory.Attach(history);
-			this.Context.Entry(history).State = isNew ? EntityState.Added : EntityState.Modified;
-
+			if (existing != null)
+			{
+				this.Context.Entry(existing).CurrentValues.SetValues(history);
+			}
+			else
+			{
+				this.Context.ScheduledTaskHistory.Add(history);
+			}
+			
 			await this.Context.SaveChangesAsync<ScheduledTaskHistory>();
 		}
 

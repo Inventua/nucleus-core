@@ -21,7 +21,9 @@ namespace Nucleus.Core.Logging
 	/// </remarks>
 	public class TextFileLogger : ILogger
 	{
-		private string Category { get; }
+    private int MAX_QUEUE_SIZE = 100;
+
+    private string Category { get; }
 
 		private TextFileLoggingProvider Provider { get; }
 		private TextFileLoggerOptions Options { get; }
@@ -62,6 +64,11 @@ namespace Nucleus.Core.Logging
 							WriteMessage(queuedMessage);
 						}
 					}
+          catch (IOException ex)
+          {
+            // file can be in use if another process is reading it
+            Enqueue(message);			
+          }
 					finally
 					{
 						_fileAccessSemaphore.Release();
@@ -69,10 +76,26 @@ namespace Nucleus.Core.Logging
 				}
 				else
 				{
-					this.Queue.Enqueue(message);					
+					Enqueue(message);					
 				}
 			}
 		}
+
+    /// <summary>
+    /// Queue a message to be written to the log later.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <remarks>
+    /// The queue is used when we can't write to the log file immediately because it is already open.  The max queue size check 
+    /// is to prevent excessive memory consumption if the log file is inaccessble for a reason other than that is is locked/in use.
+    /// </remarks>
+    private void Enqueue(string message)
+    {
+      if (this.Queue.Count < MAX_QUEUE_SIZE)
+      {
+        this.Queue.Enqueue(message);
+      }
+    }
 
 		private void WriteMessage(string message)
 		{

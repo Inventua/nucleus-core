@@ -1,12 +1,13 @@
 #! /bin/bash
 
 # Declare the options
-SHORT_OPTIONS=o:,z:,t:,u:,d:,h
-LONG_OPTIONS=output:,zipfile:,target-directory:,createuser:,createdirectories:,help
+SHORT_OPTIONS=a:,o:,z:,t:,u:,d:,h
+LONG_OPTIONS=auto-install:,output:,zipfile:,target-directory:,createuser:,createdirectories:,help
 
 # Option default values
 CREATE_DIRECTORIES=true
 CREATE_USER=true
+AUTO_INSTALL=false
 
 # Default values
 OUTPUT="verbose"
@@ -20,7 +21,7 @@ INSTALL_ZIPFILE=""
 INSTALL_TYPE=""
 UNZIP_PACKAGE="unzip"
 TARGET_DIRECTORY="/home/nucleus"
-SHELL_SCRIPT_VERSION="2022.12"
+SHELL_SCRIPT_VERSION="2023.09"
 
 printf "Nucleus installer shell script version %s. \n\n" "$SHELL_SCRIPT_VERSION"
 
@@ -34,7 +35,8 @@ function usage()
   printf "Installs Nucleus in the specified directory.\n\n"
   printf "  -t, --target-directory DIRECTORY      Home directory of Nucleus web. Defaults to '%s'.\n" "$TARGET_DIRECTORY"
   printf "  -z, --zipfile ZIPFILE                 Override auto-detection of the Nucleus install zip file\n"
-  printf "                                        name and specify the file to use.\n"
+  printf "                                        name and specify the file to use.\n"  
+  printf "  -a, --auto-install                    Install automatically without a prompt.\n"
   printf "  -u, --createuser [true|false]         Use '--createuser false' to prevent the nucleus-service\n"
   printf "                                        user from being created.\n"
   printf "                                        You should only use this option if the user has already\n"
@@ -139,6 +141,8 @@ do
       CREATE_USER="$2"        ; shift 2  ;;
     -d | --createdirectories)
       CREATE_DIRECTORIES="$2" ; shift 2  ;;
+    -a | --auto-install)
+      AUTO_INSTALL="$2" ; shift 2  ;;
     -z | --zipfile)
       INSTALL_ZIPFILE="$2"    ; shift 2  ;;
     -t | --target-directory)
@@ -205,7 +209,7 @@ else
   INSTALL_TYPE="${BASH_REMATCH[3]}"
 fi
 
-# Check we do have an install file otherwise we warn users and exit script.
+# Check that we have an install file otherwise we warn users and exit script.
 if [ "$INSTALL_ZIPFILE" == "" ]; then
   printf "Unable to auto-detect a Nucleus install or upgrade zip file to install.\n"
   printf "Please specify a Nucleus install or upgrade zip file with the -z option, or copy the file to\n"
@@ -220,21 +224,23 @@ else
   INSTALL_MESSAGE="$INSTALL_TYPE"
 fi
 
-# Print settings, ask for confirmation
-printf "Your settings are:\n"
-printf "  - App path: '%s'.\n" "$TARGET_DIRECTORY"
-printf "  - Zip file: '%s'.\n\n" "$INSTALL_ZIPFILE"
-printf "This script will:\n"
-printf "  - Create a service account '%s' (if it does not already exist).\n" "$SERVICE_ACCOUNT"
-printf "  - Install the ASP.NET Core Runtime if it is not already installed.\n"
-printf "  - Install the %s package if it is not already installed.\n" "$UNZIP_PACKAGE"
-printf "  - %s Nucleus version %s.\n" "$INSTALL_MESSAGE" "$VERSION"
-printf "  - Set file and directory owner and permissions.\n"
-printf "  - Configure Nucleus to automatically run as a service.\n\n"
+if [ "$AUTO_INSTALL" == false ]; then
+  # Print settings, ask for confirmation
+  printf "Your settings are:\n"
+  printf "  - App path: '%s'.\n" "$TARGET_DIRECTORY"
+  printf "  - Zip file: '%s'.\n\n" "$INSTALL_ZIPFILE"
+  printf "This script will:\n"
+  printf "  - Create a service account '%s' (if it does not already exist).\n" "$SERVICE_ACCOUNT"
+  printf "  - Install the ASP.NET Core Runtime if it is not already installed.\n"
+  printf "  - Install the %s package if it is not already installed.\n" "$UNZIP_PACKAGE"
+  printf "  - %s Nucleus version %s.\n" "$INSTALL_MESSAGE" "$VERSION"
+  printf "  - Set file and directory owner and permissions.\n"
+  printf "  - Configure Nucleus to automatically run as a service.\n\n"
 
-read -r -p "Do you want to continue (Y/n)? " INSTALL_RESPONSE
-if [[ ! "$INSTALL_RESPONSE" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-  exit 1
+  read -r -p "Do you want to continue (Y/n)? " INSTALL_RESPONSE
+  if [[ ! "$INSTALL_RESPONSE" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    exit 1
+  fi
 fi
 
 # Create the service account

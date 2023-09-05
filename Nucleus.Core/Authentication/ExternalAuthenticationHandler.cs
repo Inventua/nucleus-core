@@ -364,8 +364,7 @@ public class ExternalAuthenticationHandler
 
     if (connection == null)
     {
-      // protocolOptions.Domain can be null (which works OK with the LdapDirectoryIdentifier constructor).  This would only work if the service user
-      // has permission to query LDAP or LDAP can be queried anonymously.
+      // protocolOptions.Domain can be null (which works OK with the LdapDirectoryIdentifier constructor).  
       LdapDirectoryIdentifier endPoint = new(protocolOptions.Domain, false, false);
 
       connection = new(endPoint);

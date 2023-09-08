@@ -9,8 +9,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using System.DirectoryServices.Protocols;
+using Nucleus.Abstractions.Authentication;
+using Microsoft.Extensions.Options;
 
 namespace Nucleus.Core.Authentication;
+
+//
+// Kestrel can only support binding to an IP address/post, not a host name.
+//
 
 public static class AuthenticationExtensions
 {
@@ -25,21 +31,22 @@ public static class AuthenticationExtensions
   /// </remarks>
   public static IServiceCollection AddCoreAuthentication(this IServiceCollection services, IConfiguration configuration)
   {
-    services.AddOption<Authentication.AuthenticationOptions>(configuration, Authentication.AuthenticationOptions.Section);
+    services.AddOption<AuthenticationOptions>(configuration, AuthenticationOptions.Section);
     services.AddOption<AuthenticationProtocols>(configuration, AuthenticationProtocols.Section);
 
-    //services.AddAuthentication(Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME)
-    //  .AddScheme<Nucleus.Core.Authentication.AuthenticationOptions, Nucleus.Core.Authentication.AuthenticationHandler>(Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME, options => { });
-    services.AddAuthentication(options =>
+    AuthenticationBuilder authBuilder = services.AddAuthentication(options =>
     {
-      options.DefaultScheme = Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME;
-      options.DefaultSignInScheme = Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME;
-      options.DefaultSignOutScheme = Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME;
-      options.DefaultForbidScheme = Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME;
-      options.DefaultAuthenticateScheme = Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME;
-      options.DefaultChallengeScheme = Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME;
-    })
-    .AddScheme<Nucleus.Core.Authentication.AuthenticationOptions, Nucleus.Core.Authentication.AuthenticationHandler>(Nucleus.Abstractions.Authentication.Constants.DEFAULT_AUTH_SCHEME, options => { });
+      options.DefaultScheme = Constants.DEFAULT_AUTH_SCHEME;
+
+      options.DefaultSignInScheme = Constants.DEFAULT_AUTH_SCHEME;
+      options.DefaultSignOutScheme = Constants.DEFAULT_AUTH_SCHEME;
+      options.DefaultForbidScheme = Constants.DEFAULT_AUTH_SCHEME;
+
+      options.DefaultAuthenticateScheme = Constants.DEFAULT_AUTH_SCHEME;
+      options.DefaultChallengeScheme = Constants.DEFAULT_AUTH_SCHEME;
+    });
+
+    authBuilder.AddScheme<AuthenticationOptions, AuthenticationHandler>(Constants.DEFAULT_AUTH_SCHEME, Constants.DEFAULT_AUTH_DISPLAY_NAME, options => { });
 
     services.AddScoped<ExternalAuthenticationHandler>();
 
@@ -52,34 +59,26 @@ public static class AuthenticationExtensions
       // initialize LDAP connections
       ExternalAuthenticationHandler.InitializeLDAP(services, authenticationProtocols);
 
-      // add configured external authorization protocols
+      // add configured external authorization protocols.  This code only supports the Negotiate (Windows Authentication/Kerberos) protocol for now.
       foreach (AuthenticationProtocol configuredProtocol in authenticationProtocols.Where(proto => proto.Enabled))
       {
         switch (configuredProtocol.Scheme)
         {
           case NegotiateDefaults.AuthenticationScheme:
-            services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
-              .AddNegotiate(options =>
-              {
-                options.Events = new() { OnAuthenticated = HandleExternalAuthentication };
+            authBuilder.AddNegotiate(NegotiateDefaults.AuthenticationScheme, configuredProtocol.FriendlyName, options =>
+            {              
+              options.Events = new() { OnAuthenticated = HandleExternalAuthentication };
 
-                if (!String.IsNullOrEmpty(configuredProtocol.Domain))
-                {
-                  LdapConnection connection = ExternalAuthenticationHandler.GetConnection(configuredProtocol.Scheme);
-
-                  if (connection != null)
-                  {
-                    options.EnableLdap(settings =>
-                    {
-                      // we create our own connection to LDAP so that we can share the connection between Authentication.Negotiate and
-                      // ExternalAuthenticationHandler.
-                      settings.LdapConnection = connection;
-                      settings.Domain = configuredProtocol.Domain;
-                      //settings.EnableLdapClaimResolution = true;
-                    });
-                  }
-                }
-              });
+              // PersistKerberosCredentials is required in Linux.  If it is not present we get a "Interop+NetSecurityNative+GssApiException: GSSAPI operation
+              // failed with error - Unspecified GSS failure", AFTER we have already authenticated (after HandleExternalAuthentication has
+              // been called).  Looking at https://github.com/dotnet/aspnetcore/blob/main/src/Security/Authentication/Negotiate/src/NegotiateHandler.cs
+              // line 95, it looks like by using PersistKerberosCredentials the NegotiateHandler keeps the negotiation state from a previous 
+              // invocation & thus does not try to re-authenticate, which seems to cause the error.
+              
+              // We enable PersistKerberosCredentials for other operating system as well, because it improves performance and reduces network communication
+              // between the web server running Nucleus and the KDC/Domain controller.
+              options.PersistKerberosCredentials = true;              
+            });
 
             break;
         }

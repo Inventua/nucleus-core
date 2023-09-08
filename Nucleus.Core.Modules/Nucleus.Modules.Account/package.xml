@@ -6,7 +6,7 @@
   <description>
 		Application install set for the core user account modules (signup and login).			
 	</description>
-  <compatibility minVersion="1.2.2.0" maxVersion="*" />
+  <compatibility minVersion="1.2.1.17" maxVersion="*" />
   <components>
     <component folderName="Account" optional="false">
       <moduleDefinition id="f0a9ec71-c29e-436e-96e1-72dcdc44c32b">

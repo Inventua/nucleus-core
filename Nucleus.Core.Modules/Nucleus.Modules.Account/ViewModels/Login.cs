@@ -23,7 +23,10 @@ namespace Nucleus.Modules.Account.ViewModels
 		
 		public string VerificationToken { get; set; }
 
-    public string NegotiateAuthenticationUrl { get; set; }
+    public string ExternalAuthenticationUrl { get; set; }
+    public string ExternalAuthenticationCaption { get; set; }
+
+    public string AutomaticAuthenticationUrl { get; set; }
 
     public IEnumerable<AuthenticationProtocol> ExternalAuthenticationProtocols { get; set; } 
 

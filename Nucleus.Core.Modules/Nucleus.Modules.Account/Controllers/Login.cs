@@ -35,11 +35,10 @@ public class LoginController : Controller
   private IPageManager PageManager { get; }
   private IPageModuleManager PageModuleManager { get; }
   private IMailClientFactory MailClientFactory { get; }
-  private ClaimTypeOptions ClaimTypeOptions { get; }
   private IMailTemplateManager MailTemplateManager { get; }
   private AuthenticationProtocols AuthenticationProtocols { get; }
   
-  public LoginController(Context context, IAuthenticationHandlerProvider authenticationHandlerProvider, IMailClientFactory mailClientFactory, IMailTemplateManager mailTemplateManager, IUserManager userManager, ISessionManager sessionManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IOptions<AuthenticationProtocols> authenticationProtocols, IOptions<ClaimTypeOptions> claimTypeOptions, ILogger<LoginController> logger)
+  public LoginController(Context context, IMailClientFactory mailClientFactory, IMailTemplateManager mailTemplateManager, IUserManager userManager, ISessionManager sessionManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IOptions<AuthenticationProtocols> authenticationProtocols, ILogger<LoginController> logger)
   {
     this.Context = context;
     this.MailClientFactory = mailClientFactory;
@@ -49,7 +48,6 @@ public class LoginController : Controller
     this.PageManager = pageManager;
     this.PageModuleManager = pageModuleManager;
     this.SessionManager = sessionManager;
-    this.ClaimTypeOptions = claimTypeOptions.Value;
     this.AuthenticationProtocols = authenticationProtocols.Value;
   }
 
@@ -90,34 +88,33 @@ public class LoginController : Controller
     }
   }
 
+  /// <summary>
+  /// The Negotiate protocol doesn't work properly (the OnAuthenticated event is not called) when we return a Challenge result, it only
+  /// works with an [Authorize(AuthenticationSchemes = NegotiateDefaults.AuthenticationScheme)] attribute, so we have to redirect here to 
+  /// perform windows authentication.
+  /// </summary>
+  /// <param name="returnUrl"></param>
+  /// <param name="loginRedirectUrl"></param>
+  /// <returns></returns>
   [HttpGet]
+  [HttpPost]
   [Authorize(AuthenticationSchemes = NegotiateDefaults.AuthenticationScheme)]
   public ActionResult Negotiate(string returnUrl, string loginRedirectUrl)
   {
-    if (User.Identity.IsAuthenticated)
-    {
-      string location = String.IsNullOrEmpty(returnUrl) ? Url.Content("~/").ToString() : Url.Content(returnUrl);
+    // User.IsAuthenticated is guaranteed to be true because of the [Authorize] attribute.  We call .External to handle post-login redirect 
+    return External(NegotiateDefaults.AuthenticationScheme, returnUrl);
+  }
 
-      if (IsCalledFromScript())
-      {
-        // if the request came from script, return an X-Location instead of a normal redirect, because browsers eat redirects, and the code in 
-        // shared.js never sees them.
-        ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
-        return StatusCode((int)System.Net.HttpStatusCode.Found);
-      }
-      else
-      {
-        // if the request is a regular GET, redirect normally
-        return Redirect(location);
-      }
-    }
-    else
+  [HttpGet]
+  [HttpPost]
+  public ActionResult External(string scheme, string returnUrl)
+  {
+    if (!User.Identity.IsAuthenticated)
     {
-      // if Kerberos negotiation is unsuccessful, redirect to loginRedirectUrl.  If no loginRedirectUrl is specified do nothing.  The user can
-      // still log in using the login page.
-      if (!String.IsNullOrEmpty(loginRedirectUrl))
-      {
-        string location = Url.Content(loginRedirectUrl);
+      if (scheme.Equals(NegotiateDefaults.AuthenticationScheme, StringComparison.OrdinalIgnoreCase))
+      {       
+        // see comments on Negotiate for why we have to redirect for the Negotiate protocol rather than returning a challenge
+        string location = Url.NucleusAction(nameof(Negotiate), "Login", "Account", new { returnUrl });
 
         if (IsCalledFromScript())
         {
@@ -134,7 +131,24 @@ public class LoginController : Controller
       }
       else
       {
-        return Ok();
+        return Challenge(scheme);
+      }
+    }
+    else
+    {
+      string location = String.IsNullOrEmpty(returnUrl) ? Url.Content("~/").ToString() : Url.Content(returnUrl);
+
+      if (IsCalledFromScript())
+      {
+        // if the request came from script, return an X-Location instead of a normal redirect, because browsers eat redirects, and the code in 
+        // shared.js never sees them.
+        ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
+        return StatusCode((int)System.Net.HttpStatusCode.Found);
+      }
+      else
+      {
+        // if the request is a regular GET, redirect normally
+        return Redirect(location);
       }
     }
   }
@@ -149,7 +163,7 @@ public class LoginController : Controller
   }
 
   [HttpGet]
-  public ActionResult Edit(string returnUrl)
+  public ActionResult Edit()
   {
     return View("Settings", BuildViewModel("", true));
   }
@@ -169,7 +183,7 @@ public class LoginController : Controller
   async public Task<ActionResult> Login(ViewModels.Login viewModel)
   {
     User loginUser;
-    List<Claim> claims = new();
+    
 
     viewModel.ReadSettings(this.Context.Module);
 
@@ -241,23 +255,22 @@ public class LoginController : Controller
 
   }
 
-  [HttpGet]
-  [HttpPost]
-  public ActionResult ExternalLogin(string scheme, string returnUrl)
-  {
-    if (!String.IsNullOrEmpty(scheme))
-    {
-      switch (scheme)
-      {
-        case NegotiateDefaults.AuthenticationScheme:
-          ViewModels.Login viewModel = BuildViewModel(returnUrl, true);
-          viewModel.NegotiateAuthenticationUrl = Url.NucleusAction("Negotiate", "Login", "Account");
-          return View("Login", viewModel);
-      }
-    }
+  ////[HttpGet]
+  ////[HttpPost]
+  ////public ActionResult ExternalLogin(string scheme, string returnUrl)
+  ////{
+  ////  if (!String.IsNullOrEmpty(scheme))
+  ////  {
+  ////    switch (scheme)
+  ////    {
+  ////      case NegotiateDefaults.AuthenticationScheme:
+  ////        ViewModels.Login viewModel = BuildViewModel(returnUrl, true);
+  ////        return View("Login", viewModel);
+  ////    }
+  ////  }
 
-    return BadRequest();
-  }
+  ////  return BadRequest();
+  ////}
 
   [HttpPost]
   public async Task<ActionResult> ResendVerificationCode(ViewModels.Login viewModel)
@@ -344,15 +357,32 @@ public class LoginController : Controller
     ViewModels.Login viewModel = new();
     viewModel.ReadSettings(this.Context.Module);
 
-    viewModel.NegotiateAuthenticationUrl = !preventAutomaticLogin && this.AuthenticationProtocols
-      .Where(protocol => protocol.Enabled && protocol.AutomaticLogon && protocol.Scheme == NegotiateDefaults.AuthenticationScheme)
-      .Count() == 1 ? Url.NucleusAction("Negotiate", "Login", "Account") : null;
+    List<AuthenticationProtocol> enabledProtocols = this.AuthenticationProtocols
+        .Where(protocol => protocol.Enabled)
+        .ToList();
 
-    if (String.IsNullOrEmpty(viewModel.NegotiateAuthenticationUrl))
+    List<AuthenticationProtocol> automaticProtocols = enabledProtocols
+        .Where(protocol => protocol.AutomaticLogon)
+        .ToList();
+
+    if (!preventAutomaticLogin && automaticProtocols.Count == 1)
     {
-      viewModel.ExternalAuthenticationProtocols = this.AuthenticationProtocols
-        .Where(protocol => protocol.Enabled);
+      viewModel.AutomaticAuthenticationUrl = Url.NucleusAction(nameof(this.External), "Login", "Account", new { scheme = automaticProtocols.First().Scheme, returnUrl = returnUrl });
     }
+
+
+    if (enabledProtocols.Count == 1)
+    {
+      viewModel.ExternalAuthenticationUrl = Url.NucleusAction(nameof(this.External), "Login", "Account", new { scheme = enabledProtocols.First().Scheme, returnUrl = returnUrl });
+      viewModel.ExternalAuthenticationCaption = enabledProtocols.First().FriendlyName;
+    }
+    else
+    {
+      viewModel.ExternalAuthenticationUrl = null;
+    }   
+
+    viewModel.ExternalAuthenticationProtocols = enabledProtocols;
+    
 
     viewModel.ReturnUrl = returnUrl;
     return viewModel;

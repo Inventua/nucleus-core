@@ -52,9 +52,9 @@
 			<button type="submit" class="btn btn-primary nucleus-login" data-target="form.parent()">Login</button>
       @if (Model.ExternalAuthenticationProtocols?.Any() == true)
       {
-        @if (Model.ExternalAuthenticationProtocols?.Count() == 1)
+        @if (Model.ExternalAuthenticationUrl != null)
         {
-          <button class="nucleus-login btn btn-primary" data-target="form.parent()" formaction="@Url.NucleusAction("ExternalLogin", "Login", "Account", new { scheme = Model.ExternalAuthenticationProtocols.First().Scheme, returnUrl = Model.ReturnUrl })">@(String.IsNullOrEmpty(Model.ExternalAuthenticationProtocols.First().FriendlyName) ? Model.ExternalAuthenticationProtocols.First().Scheme : Model.ExternalAuthenticationProtocols.First().FriendlyName)</button>
+          <button type="submit" class="nucleus-login btn btn-primary" data-target="form.parent()" formaction="@Model.ExternalAuthenticationUrl">@Model.ExternalAuthenticationCaption</button>
         }
         else
         {
@@ -65,7 +65,7 @@
             <div class="dropdown-menu m-2" aria-label="Log in with">
               @foreach (var protocol in Model.ExternalAuthenticationProtocols)
               {
-                <a class="nucleus-login btn btn-none" data-target="form.parent()" href="@Url.NucleusAction("ExternalLogin", "Login", "Account", new { scheme = protocol.Scheme, returnUrl = Model.ReturnUrl })">@(String.IsNullOrEmpty(protocol.FriendlyName) ? protocol.Scheme : protocol.FriendlyName)</a>
+                <a class="nucleus-login btn btn-none" data-target="form.parent()" href="@Url.NucleusAction("External", "Login", "Account", new { scheme = protocol.Scheme, returnUrl = Model.ReturnUrl })">@(String.IsNullOrEmpty(protocol.FriendlyName) ? protocol.Scheme : protocol.FriendlyName)</a>
               }
             </div>
           </div>
@@ -88,9 +88,9 @@
 <script>
 	jQuery(document).ready(function()
 	{
-    @if (!String.IsNullOrEmpty(Model.NegotiateAuthenticationUrl))
+    @if (!String.IsNullOrEmpty(Model.AutomaticAuthenticationUrl))
     {
-      <text>Page.LoadPartialContent(null, '@Model.NegotiateAuthenticationUrl', "#null"); </text>
+      <text>Page.LoadPartialContent(null, '@Model.AutomaticAuthenticationUrl', "#null"); </text>
     }
 
     jQuery(Page).on('ready', function( page, target, data, url, event, status, request )

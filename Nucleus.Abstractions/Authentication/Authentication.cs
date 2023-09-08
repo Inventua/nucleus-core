@@ -12,17 +12,22 @@ namespace Nucleus.Abstractions.Authentication
 	public class Constants
 	{
 		/// <summary>
-		/// Authentication scheme name
+		/// Default Nucleus Authentication scheme name
 		/// </summary>
 		public const string DEFAULT_AUTH_SCHEME = "urn:nucleus/authentication/nucleus-default-authentication";
 
-		/// <summary>
-		/// Nucleus session ID claim URI.
-		/// </summary>
-		/// <remarks>
-		/// This claim type is used in the cookie which is used to represent a logged-on user.
-		/// </remarks>
-		public const string SESSION_ID_CLAIMTYPE = "urn:nucleus/identity/claims/sessionid";
+    /// <summary>
+    /// Default Nucleus Authentication scheme display name
+    /// </summary>
+    public const string DEFAULT_AUTH_DISPLAY_NAME = "Nucleus";
+
+    /// <summary>
+    /// Nucleus session ID claim URI.
+    /// </summary>
+    /// <remarks>
+    /// This claim type is used in the cookie which is used to represent a logged-on user.
+    /// </remarks>
+    public const string SESSION_ID_CLAIMTYPE = "urn:nucleus/identity/claims/sessionid";
 
 		/// <summary>
 		/// Nucleus System Administrator claim Uri.

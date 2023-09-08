@@ -58,7 +58,7 @@ public class AuthenticationProtocol
   /// Specifies the Authentication Protocol.  
   /// </summary>
   /// <remarks>
-  /// Valida values are: Negotiate (for Kerberos/Windows authentication)
+  /// Valid values are: Negotiate (for Kerberos/Windows authentication)
   /// </remarks>
   public string Scheme{ get; private set; }
 
@@ -80,17 +80,17 @@ public class AuthenticationProtocol
   /// <summary>
   /// Specifies LDAP domain name.  Optional.
   /// </summary>
-  public string Domain { get; private set; }
+  public string LdapDomain { get; private set; }
 
   /// <summary>
   /// Specifies the account name to use for LDAP queries.  Optional.
   /// </summary>
-  public string MachineAccountName { get; private set; }
+  public string LdapMachineAccountName { get; private set; }
 
   /// <summary>
   /// Specifies the password to use for LDAP queries.  Optional.
   /// </summary>
-  public string MachineAccountPassword { get; private set; }
+  public string LdapMachineAccountPassword { get; private set; }
 
   /// <summary>
   /// Specifies whether to create a Nucleus user for authenticated users, if there is no existing account for the user.

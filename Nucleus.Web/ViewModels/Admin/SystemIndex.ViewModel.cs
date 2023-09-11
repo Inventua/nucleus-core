@@ -51,14 +51,16 @@ namespace Nucleus.Web.ViewModels.Admin
 			public Boolean HasLoggingConfiguration { get; set; } = false;
 
 
-			public Boolean LogSortDescending { get; set; }
+      public Boolean LogSortDescending { get; set; } = true;
 			public string LogFilterTerm { get; set; }
 			public Boolean LogIncludeInformation { get; set; } = true;
 			public Boolean LogIncludeWarning { get; set; } = true;
-			public Boolean LogIncludeTrace { get; set; } = true;
-			public Boolean LogIncludeError { get; set; } = true;
+      public Boolean LogIncludeDebug { get; set; } = true;
 
-			public List<KeyValuePair<Boolean, string>> LogSortOrders { get; } = new() { new(true, "Sort Descending"), new(false, "Sort Ascending") };
+      public Boolean LogIncludeTrace { get; set; } = true;
+			public Boolean LogIncludeError { get; set; } = true;
+      
+      public List<KeyValuePair<Boolean, string>> LogSortOrders { get; } = new() { new(true, "Sort Descending"), new(false, "Sort Ascending") };
 
 			public List<Shared.LogFileInfo> LogFiles { get; set; }
 
@@ -126,11 +128,13 @@ namespace Nucleus.Web.ViewModels.Admin
 						return logSettings.LogIncludeTrace;
 					case nameof(LogLevel.Information):
 						return logSettings.LogIncludeInformation;
-					case nameof(LogLevel.Error):
+					case nameof(LogLevel.Debug):
+            return logSettings.LogIncludeDebug;
+          case nameof(LogLevel.Error):
 						return logSettings.LogIncludeError;
 					case nameof(LogLevel.Warning):
 						return logSettings.LogIncludeWarning;
-					default:
+          default:
 						return true;
 				}
 			}

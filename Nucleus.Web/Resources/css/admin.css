@@ -882,7 +882,7 @@ ul.nucleus-control-panel-items button
 
 #system-logs .log-options, #task-logs .log-options
 {
-	width: 36rem;
+	width: 42rem;
 	position: absolute;
 	margin-top: 2.2rem;
 	border: solid 1px #bbb;
@@ -896,7 +896,7 @@ ul.nucleus-control-panel-items button
 #system-logs .log-levels, #task-logs .log-levels
 {
 	display: grid;
-	grid-template-columns: repeat(4, 1fr);
+	grid-template-columns: repeat(5, 1fr);
 }
 
 #system-logs .nucleus-copy-button, #task-logs .nucleus-copy-button

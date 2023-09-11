@@ -47,6 +47,9 @@
 					<SettingsControl caption="Warning" rendermode="LabelLast" class="inner-inline" helptext="Include logs with log level: Warning.">
 						@Html.CheckBoxFor(model=>model.LogIncludeWarning, new { @class = "ToggleSwitch"})
 					</SettingsControl>
+          <SettingsControl caption="Debug" rendermode="LabelLast" class="inner-inline" helptext="Include logs with log level: Debug.">
+            @Html.CheckBoxFor(model=>model.LogIncludeDebug, new { @class = "ToggleSwitch"})
+          </SettingsControl>
 					<SettingsControl caption="Trace" rendermode="LabelLast" class="inner-inline" helptext="Include logs with log level: Trace.">
 						@Html.CheckBoxFor(model=>model.LogIncludeTrace, new { @class = "ToggleSwitch"})
 					</SettingsControl>

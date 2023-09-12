@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Core.Logging;
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using System.Net;
 
 namespace Nucleus.Core.Authentication;
 
@@ -361,15 +362,53 @@ public class ExternalAuthenticationHandler
   {
     LdapConnection connection;
 
-    string domain = protocolOptions.LdapDomain.Equals("auto", StringComparison.OrdinalIgnoreCase) ? System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName : protocolOptions.LdapDomain;
+    string domain = protocolOptions.LdapDomain;
 
-    // protocolOptions.Domain can be null (which works OK with the LdapDirectoryIdentifier constructor).  If null, the underlying
-    // implementation (for example, sssd in linux) has been configured to already know which domain to use.
+    if (domain.Equals("auto", StringComparison.OrdinalIgnoreCase))
+    {      
+      if (OperatingSystem.IsLinux())
+      {
+        if (!System.IO.File.Exists("/etc/krb5.keytab"))
+        {
+          // no keytab file = not joined to a domain, fail
+          logger?.LogInformation("keytab file (/etc/krb5.keytab) is not present or is not accessible, cannot enable LDAP for Kerberos.");
+          return null;
+        }
+
+        // System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName does not work in Linux
+        // look in /etc/krb5.conf for the line: default_realm = [domain]
+        if (System.IO.File.Exists("/etc/krb5.conf"))
+        {
+          string data = System.IO.File.ReadAllText("/etc/krb5.conf");
+          System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(data, ".*default_realm[\\s]*=[\\s]*(?<domain>.*)");
+          if (match.Success && match.Groups.ContainsKey("domain"))
+          {
+            domain = match.Groups["domain"].Value.ToLower();
+          }
+        }
+        else
+        {
+          logger?.LogInformation("Kerberos configuration file (/etc/krb5.conf) is not present or is not accessible, cannot retrieve default LDAP domain to enable LDAP for Kerberos.");
+          return null;
+        }
+      }
+      else
+      {
+        domain = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName;
+      }
+    }
+
+    logger?.LogInformation("Using LDAP domain '{domain}'.", domain);
+        
     LdapDirectoryIdentifier endPoint = new(domain, false, false);
 
     if (endPoint.Servers != null)
     {
       logger?.LogTrace("Creating an LDAP connection to '{domain}/{port}'.", String.Join(',', endPoint.Servers), endPoint.PortNumber);
+    }
+    else
+    {
+      logger?.LogTrace("Creating an LDAP connection to 'null/{port}'.", endPoint.PortNumber);
     }
 
     connection = new(endPoint);
@@ -391,7 +430,7 @@ public class ExternalAuthenticationHandler
     connection.SessionOptions.ReferralChasing = ReferralChasingOptions.None;
 
     // this causes an "A local error occurred" error in Linux
-    // connection.Timeout = TimeSpan.FromSeconds(15);  
+    // connection.Timeout = TimeSpan.FromSeconds(10);  
 
     logger?.LogTrace("Binding LDAP connection.");
     connection.Bind();

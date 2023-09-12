@@ -91,13 +91,13 @@ public static class AuthenticationExtensions
               }
               catch (LdapException ex)
               {
-                connection = null;
                 services.Logger()?.LogError(ex, "Error building LdapConnection for scheme '{scheme}' '{domain}'.  Failed to connect to LDAP [{code}]. ", configuredProtocol.Scheme, configuredProtocol.LdapDomain, ex.ErrorCode);
+                connection = null;
               }
               catch (Exception ex)
               {
-                connection = null;
                 services.Logger()?.LogError(ex, "Error building LdapConnection for scheme '{scheme}' '{domain}'", configuredProtocol.Scheme, configuredProtocol.LdapDomain);
+                connection = null;
               }
 
               if (connection != null)

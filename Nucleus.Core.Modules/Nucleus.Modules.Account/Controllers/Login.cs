@@ -99,7 +99,7 @@ public class LoginController : Controller
   [HttpGet]
   [HttpPost]
   [Authorize(AuthenticationSchemes = NegotiateDefaults.AuthenticationScheme)]
-  public ActionResult Negotiate(string returnUrl, string loginRedirectUrl)
+  public ActionResult Negotiate(string returnUrl)
   {
     // User.IsAuthenticated is guaranteed to be true because of the [Authorize] attribute.  We call .External to handle post-login redirect 
     return External(NegotiateDefaults.AuthenticationScheme, returnUrl);
@@ -361,15 +361,23 @@ public class LoginController : Controller
         .Where(protocol => protocol.Enabled)
         .ToList();
 
+    // special check for linux - ignore the Negotiate protocol if the machine is not joined to a domain
+    if (OperatingSystem.IsLinux() && !System.IO.File.Exists("/etc/krb5.conf"))
+    {
+      foreach (AuthenticationProtocol protocol in enabledProtocols.Where(proto => proto.Scheme.Equals(NegotiateDefaults.AuthenticationScheme, StringComparison.OrdinalIgnoreCase)))
+      {
+        enabledProtocols.Remove(protocol);
+      }
+    }
+
     List<AuthenticationProtocol> automaticProtocols = enabledProtocols
         .Where(protocol => protocol.AutomaticLogon)
         .ToList();
 
     if (!preventAutomaticLogin && automaticProtocols.Count == 1)
-    {
+    {      
       viewModel.AutomaticAuthenticationUrl = Url.NucleusAction(nameof(this.External), "Login", "Account", new { scheme = automaticProtocols.First().Scheme, returnUrl = returnUrl });
     }
-
 
     if (enabledProtocols.Count == 1)
     {

@@ -13,17 +13,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.Negotiate;
 using Nucleus.Core.Logging;
+using Microsoft.AspNetCore.Authentication.Negotiate;
 
 namespace Nucleus.Core.Authentication;
 
 public class ExternalAuthenticationHandler
-{
-  private static System.Collections.Concurrent.ConcurrentDictionary<string, LdapConnection> LdapConnections { get; } = new();
-
-  private static string[] IGNORED_SIDS = { "S-1-0-0", "S-1-1-0", "S-1-2-0", "S-1-3-0", "S-1-3-1", "S-1-5-4", "S-1-5-11" };
-
+{  
   private ISessionManager SessionManager { get; }
   private IUserManager UserManager { get; }
   private IRoleManager RoleManager { get; }
@@ -42,39 +38,6 @@ public class ExternalAuthenticationHandler
   }
 
   /// <summary>
-  /// Configure and bind LDAP protocols.
-  /// </summary>
-  /// <typeparam name=""></typeparam>
-  /// <param name="authenticationProtocols"></param>
-  /// <returns></returns>
-  /// <remarks>
-  /// This function creates and binds LDAP protocols and is intended for during configuration.  LDAP connections take a few seconds to 
-  /// connect - calling this function means that they are ready when they are needed.
-  /// </remarks>
-  internal static void InitializeLDAP(IServiceCollection services, AuthenticationProtocols authenticationProtocols)
-  {
-    if (authenticationProtocols != null)
-    {
-      foreach (AuthenticationProtocol authenticationProtocol in authenticationProtocols)
-      {
-        try
-        {
-          BuildLdapConnection(authenticationProtocol, services.Logger());
-        }
-        catch (Exception ex)
-        {
-          services.Logger()?.LogError(ex, "Error building LdapConnection for scheme '{scheme}' '{domain}'", authenticationProtocol.Scheme, authenticationProtocol.LdapDomain);
-        }
-      }
-    }
-  }
-
-  public static LdapConnection GetConnection(string scheme)
-  {
-    return LdapConnections.ContainsKey(scheme) ? LdapConnections[scheme] : null;
-  }
-
-  /// <summary>
   /// Copy data from the authentication source, create a user if required & configured and create a Nucleus session for the user.
   /// </summary>
   /// <typeparam name="T"></typeparam>
@@ -86,12 +49,10 @@ public class ExternalAuthenticationHandler
   public async Task HandleExternalAuthentication<T>(ResultContext<T> context)
   where T : Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions
   {
-    this.Logger?.LogTrace("HandleExternalAuthentication");
+    this.Logger?.LogTrace("HandleExternalAuthentication: Identity: {identity}.", context.Principal?.Identity?.Name);
 
     if (context.Principal.Identity.IsAuthenticated)
     {
-      this.Logger?.LogTrace("Identity: {identity}.", context.Principal.Identity?.Name);
-
       AuthenticationProtocol protocolOptions = this.AuthenticationProtocols.Value.Where(protocol => protocol.Scheme == context.Scheme.Name).FirstOrDefault();
 
       // remove the domain name from the user name, if protocolOptions.IgnoreDomainName is set to true
@@ -99,7 +60,7 @@ public class ExternalAuthenticationHandler
       if (protocolOptions.UserRemoveDomainName)
       {
         if (userName.Contains('\\'))
-        { 
+        {
           // in Windows, the user principal name is in the form DOMAIN\username
           userName = userName.Substring(userName.IndexOf('\\') + 1);
         }
@@ -208,6 +169,43 @@ public class ExternalAuthenticationHandler
   }
 
   /// <summary>
+  /// Read claims from Ldap and update context.Principal, so that HandleExternalAuthentication has claims data to sync the user.
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
+  /// <param name="context"></param>
+  /// <returns></returns>
+  public async Task HandleLdapClaims(LdapContext context)
+  {
+    this.Logger?.LogTrace("HandleLdapClaims: Identity: {identity}.", context.Principal?.Identity?.Name);
+
+    if (context.Principal.Identity.IsAuthenticated)
+    {
+      AuthenticationProtocol protocolOptions = this.AuthenticationProtocols.Value.Where(protocol => protocol.Scheme == context.Scheme.Name).FirstOrDefault();
+
+      if (protocolOptions.UserSyncOptions.HasFlag(AuthenticationProtocol.SyncOptions.Profile) || (protocolOptions.UserSyncOptions.HasFlag(AuthenticationProtocol.SyncOptions.Roles)))
+      {
+        LdapConnection connection = context.LdapSettings.LdapConnection;
+
+        if (connection != null)
+        {
+          List<Claim> userLdapClaims = GetLdapUserProperties(connection, context.Principal.Claims
+            .Where(claim => claim.Type == ClaimTypes.PrimarySid)
+            .Select(claim => claim.Value)
+            .FirstOrDefault());
+
+          ClaimsIdentity identity = new(userLdapClaims, context.Scheme.Name);
+          context.Principal = new(identity);
+          context.Success();
+
+          // The code in the Negotiate handler doesn't raise the OnAuthenticated when we set a Success status from HandleLdapClaims
+          // so we have to call it ourselves
+          await HandleExternalAuthentication(context);
+        }
+      }
+    }
+  }
+
+  /// <summary>
   /// Copy profile properties and roles, depending on the value of protocolOptions.UserSyncOptions.
   /// </summary>
   /// <param name="protocolOptions"></param>
@@ -219,14 +217,10 @@ public class ExternalAuthenticationHandler
   /// <returns></returns>
   private Task<User> SyncUser(AuthenticationProtocol protocolOptions, ClaimsPrincipal principal, Site site, IEnumerable<Role> roles, User loginUser)
   {
-    LdapConnection connection = null;
-
     if (protocolOptions.UserSyncOptions.HasFlag(AuthenticationProtocol.SyncOptions.Profile))
     {
-      this.Logger?.LogDebug("Updating user profile properties from original claim for user: '{name}'.", loginUser.UserName);
-      // fill in all of the user properties that we can find a value for.  For Authentication.Negotiate, none of the claims returned will match
-      // a user profile property, because Authentication.Negotiate doesn't query user attributes, but other (future) external authentication providers
-      // might have values that we can use.  
+      this.Logger?.LogDebug("Updating user profile properties for user: '{name}'.", loginUser.UserName);
+      // fill in all of the user properties that we can find a value for
       foreach (UserProfileProperty prop in site.UserProfileProperties)
       {
         string userPropertyValue = principal.Claims
@@ -250,85 +244,34 @@ public class ExternalAuthenticationHandler
       }
     }
 
-    if (protocolOptions.UserSyncOptions.HasFlag(AuthenticationProtocol.SyncOptions.Profile) || protocolOptions.UserSyncOptions.HasFlag(AuthenticationProtocol.SyncOptions.Roles))
-    {
-      this.Logger?.LogDebug("Connecting to LDAP.");
-      try
-      {
-        connection = BuildLdapConnection(protocolOptions, this.Logger);
-      }
-      catch (Exception ex)
-      {
-        this.Logger?.LogError(ex, "Failed to connect to LDAP.  User data was not synchronized with LDAP.");
-        return Task.FromResult(loginUser);
-      }
-    }
-
-    if (protocolOptions.UserSyncOptions.HasFlag(AuthenticationProtocol.SyncOptions.Profile))
-    {
-      this.Logger?.LogDebug("Updating user profile properties from LDAP for user: '{name}'.", loginUser.UserName);
-
-      // get user data from ldap
-      foreach (KeyValuePair<string, string> attribute in GetLdapUserProperties(connection, principal.Claims
-        .Where(claim => claim.Type == ClaimTypes.PrimarySid)
-        .Select(claim => claim.Value)
-        .FirstOrDefault()))
-      {
-        string claimType = MapLdapAttributeNameToClaimType(attribute.Key);
-
-        if (claimType != null)
-        {
-          UserProfileProperty property = site.UserProfileProperties
-            .Where(prop => prop.TypeUri.Equals(claimType, StringComparison.OrdinalIgnoreCase))
-            .FirstOrDefault();
-
-          if (property != null)
-          {
-            this.Logger?.LogTrace("Setting profile value '{name}': '{value}'.", property.TypeUri, attribute.Value);
-            UserProfileValue existing = loginUser.Profile.Where(value => value.UserProfileProperty.TypeUri == property.TypeUri).FirstOrDefault();
-            if (existing == null)
-            {
-              loginUser.Profile.Add(new UserProfileValue() { UserProfileProperty = property, Value = attribute.Value });
-            }
-            else
-            {
-              existing.Value = attribute.Value;
-            }
-          }
-        }
-      }
-    }
-
     if (protocolOptions.UserSyncOptions.HasFlag(AuthenticationProtocol.SyncOptions.Roles))
     {
-      this.Logger?.LogDebug("Updating user roles from LDAP for user: '{name}'.", loginUser.UserName);
+      this.Logger?.LogDebug("Updating user roles for user: '{name}'.", loginUser.UserName);
+      List<Claim> roleClaims = principal.Claims
+        .Where(claim => claim.Type == (principal.Identity as ClaimsIdentity)?.RoleClaimType || claim.Type == ClaimTypes.Role)
+        .ToList();
 
-      // handle Active Directory roles (get role names from LDAP).  Kerberos only populates role SIDs.
-      IEnumerable<string> sidList = principal.Claims
-        .Where(claim => claim.Type == ClaimTypes.GroupSid && !IGNORED_SIDS.Contains(claim.Value))
-        .Select(claim => claim.Value);
-
-      IEnumerable<string> ldapRoles = GetLdapRoles(connection, sidList);
-
-      // remove roles that aren't in the LDAP response, except for the registered users and site administrators roles
-      foreach (Role roleToRemove in loginUser.Roles
-        .Where(role => CanRemoveRole(site, role) && !ldapRoles.Contains(role.Name, StringComparer.OrdinalIgnoreCase)).ToList())
+      if (roleClaims.Any())
       {
-        this.Logger?.LogTrace("Removing user '{user}' from role '{roleToRemove}'.", loginUser.UserName, roleToRemove.Name);
-        loginUser.Roles.Remove(roleToRemove);
-      }
-
-      // add roles that are in the LDAP response but are not in the user roles list
-      foreach (string ldapRole in ldapRoles
-        .Where(ldapRole => !loginUser.Roles.Where(role => CanAddRole(site, role) && role.Name.Equals(ldapRole, StringComparison.OrdinalIgnoreCase)).Any()))
-      {
-        Role newRole = roles
-          .Where(role => role.Name.Equals(ldapRole, StringComparison.OrdinalIgnoreCase) && role.Id != site.RegisteredUsersRole.Id)
-          .FirstOrDefault();
-        if (newRole != null)
+        foreach (Role roleToRemove in loginUser.Roles
+          .Where(role => CanRemoveRole(site, role) && !roleClaims.Where(claim => claim.Value.Equals(role.Name, StringComparison.OrdinalIgnoreCase)).Any()))
         {
-          this.Logger?.LogTrace("Adding user '{user}' to role '{roleToRemove}'.", loginUser.UserName, newRole.Name);
-          loginUser.Roles.Add(newRole);
+          this.Logger?.LogTrace("Removing user '{user}' from role '{roleToRemove}'.", loginUser.UserName, roleToRemove.Name);
+          loginUser.Roles.Remove(roleToRemove);
+        }
+
+        // add roles that are in the LDAP response but are not in the user roles list
+        foreach (Claim ldapRole in roleClaims
+          .Where(ldapRole => !loginUser.Roles.Where(role => CanAddRole(site, role) && role.Name.Equals(ldapRole.Value, StringComparison.OrdinalIgnoreCase)).Any()))
+        {
+          Role newRole = roles
+            .Where(role => role.Name.Equals(ldapRole.Value, StringComparison.OrdinalIgnoreCase) && role.Id != site.RegisteredUsersRole.Id)
+            .FirstOrDefault();
+          if (newRole != null)
+          {
+            this.Logger?.LogTrace("Adding user '{user}' to role '{roleToRemove}'.", loginUser.UserName, newRole.Name);
+            loginUser.Roles.Add(newRole);
+          }
         }
       }
     }
@@ -347,6 +290,9 @@ public class ExternalAuthenticationHandler
   {
     switch (ldapAttributeName.ToLower())
     {
+      case "userprincipalname":
+        return ClaimTypes.Name;
+
       case "wwwhomepage":
       case "webpage":
         return ClaimTypes.Webpage;
@@ -381,6 +327,9 @@ public class ExternalAuthenticationHandler
 
       case "postalcode":
         return ClaimTypes.PostalCode;
+
+      case "memberof":
+        return ClaimTypes.Role;
     }
 
     return null;
@@ -401,57 +350,70 @@ public class ExternalAuthenticationHandler
   private static Boolean CanRemoveRole(Site site, Role role)
   {
     return
-      !role.Type.HasFlag(Role.RoleType.AutoAssign) && !role.Type.HasFlag(Role.RoleType.Restricted) && 
+      !role.Type.HasFlag(Role.RoleType.AutoAssign) && !role.Type.HasFlag(Role.RoleType.Restricted) &&
       role.Id != site.AdministratorsRole.Id &&
       role.Id != site.AllUsersRole.Id &&
       role.Id != site.AnonymousUsersRole.Id &&
       role.Id != site.RegisteredUsersRole.Id;
   }
 
-  private static LdapConnection BuildLdapConnection(AuthenticationProtocol protocolOptions, ILogger logger)
+  public static LdapConnection BuildLdapConnection(AuthenticationProtocol protocolOptions, ILogger logger)
   {
-    LdapConnection connection = GetConnection(protocolOptions.Scheme);
+    LdapConnection connection;
 
-    if (connection == null)
-    {      
-      // protocolOptions.Domain can be null (which works OK with the LdapDirectoryIdentifier constructor).  If null, we assume that the underlying
-      // implementation (for example, sssd in linux) has been configured to already know which domain to use.
-      LdapDirectoryIdentifier endPoint = new(protocolOptions.LdapDomain, false, false);
+    string domain = protocolOptions.LdapDomain.Equals("auto", StringComparison.OrdinalIgnoreCase) ? System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName : protocolOptions.LdapDomain;
 
-      logger?.LogTrace("Creating a new LDAP connection to '{domain}'.", String.Join(',', endPoint.Servers));
+    // protocolOptions.Domain can be null (which works OK with the LdapDirectoryIdentifier constructor).  If null, the underlying
+    // implementation (for example, sssd in linux) has been configured to already know which domain to use.
+    LdapDirectoryIdentifier endPoint = new(domain, false, false);
 
-      connection = new(endPoint);
-      if (!String.IsNullOrEmpty(protocolOptions.LdapDomain) && !String.IsNullOrEmpty(protocolOptions.LdapMachineAccountName))
-      {
-        // if specified in config, username should not include the domain
-        connection.Credential = new System.Net.NetworkCredential($"{protocolOptions.LdapMachineAccountName}@{protocolOptions.LdapDomain}", protocolOptions.LdapMachineAccountPassword);
-        logger?.LogTrace("Using credentials from config for user '{user}' for the new LDAP connection to '{domain}'.", protocolOptions.LdapMachineAccountName, String.Join(',', endPoint.Servers));
-      }
-
-      connection.SessionOptions.ProtocolVersion = 3;
-      connection.SessionOptions.ReferralChasing = ReferralChasingOptions.None;
-      connection.Timeout = TimeSpan.FromSeconds(15);
-
-      logger?.LogTrace("Binding LDAP connection.");
-      connection.Bind();
-      logger?.LogTrace("Bind complete.");
-
-      LdapConnections.TryAdd(protocolOptions.Scheme, connection);
+    if (endPoint.Servers != null)
+    {
+      logger?.LogTrace("Creating an LDAP connection to '{domain}/{port}'.", String.Join(',', endPoint.Servers), endPoint.PortNumber);
     }
+
+    connection = new(endPoint);
+    if (!String.IsNullOrEmpty(protocolOptions.LdapMachineAccountName))
+    {
+      // if specified in config, username should include the user and the user's domain.  This is so that we can be flexible about what is in protocolOptions.LdapDomain - it
+      // can be either just a domain name, or it can be a the fully-qualified name of the Ldap server.
+      connection.Credential = new System.Net.NetworkCredential(protocolOptions.LdapMachineAccountName, protocolOptions.LdapMachineAccountPassword);
+      connection.AuthType = AuthType.Basic;
+      logger?.LogTrace("Using credentials from config for user '{user}' for the new LDAP connection to '{domain}'.", protocolOptions.LdapMachineAccountName, String.Join(',', endPoint.Servers));
+    }
+    else
+    {
+      logger?.LogTrace("Using Kerberos (Negotiate) authentication for the LDAP connection to '{domain}'.", String.Join(',', endPoint.Servers));
+      connection.AuthType = AuthType.Negotiate;
+    }
+
+    connection.SessionOptions.ProtocolVersion = 3;
+    connection.SessionOptions.ReferralChasing = ReferralChasingOptions.None;
+
+    // this causes an "A local error occurred" error in Linux
+    // connection.Timeout = TimeSpan.FromSeconds(15);  
+
+    logger?.LogTrace("Binding LDAP connection.");
+    connection.Bind();
+    logger?.LogTrace("Bind complete.");
+
 
     return connection;
   }
 
-  private static Dictionary<string, string> GetLdapUserProperties(LdapConnection connection, string userSid)
+  private static List<Claim> GetLdapUserProperties(LdapConnection connection, string userSid)
   {
-    Dictionary<string, string> results = new(StringComparer.OrdinalIgnoreCase);
-    System.Text.StringBuilder ldapFilter = new();
+    List<Claim> results = new();
+    string ldapFilter = $"(objectSid={userSid})";
 
-    ldapFilter.Append("(objectSid=");
-    ldapFilter.Append(userSid);
-    ldapFilter.Append(")");
+    string dn = String.Join(',',
+      ((LdapDirectoryIdentifier)connection.Directory).Servers
+        .FirstOrDefault()
+        ?.Split('.', StringSplitOptions.RemoveEmptyEntries)
+        .Select(part => $"DC={part}"));
 
-    SearchRequest request = new() { DistinguishedName = "DC=inventua,DC=com", Filter = ldapFilter.ToString(), Scope = SearchScope.Subtree };
+
+    SearchRequest request = new() { DistinguishedName = dn, Filter = ldapFilter, Scope = SearchScope.Subtree };
     SearchResponse response = (SearchResponse)connection.SendRequest(request);
 
     if (response.ResultCode == ResultCode.Success)
@@ -462,8 +424,35 @@ public class ExternalAuthenticationHandler
 
         foreach (string attributeName in entry.Attributes.AttributeNames)
         {
-          string attributeValue = (string)entry.Attributes[attributeName].GetValues(typeof(string)).FirstOrDefault();
-          results.Add(attributeName, attributeValue);
+          string claimType = MapLdapAttributeNameToClaimType(attributeName);
+
+          if (claimType != null)
+          {
+            if (claimType == ClaimTypes.Role)
+            {
+              // special parsing is required for roles
+              foreach (string memberOf in entry.Attributes[attributeName].GetValues(typeof(string)).Cast<string>())
+              {
+                // "memberof" has entries in the form:
+                // CN=role name,<various other stuff like OU, DC, etc>;CN=role name2,<more stuff>
+                IEnumerable<string> roleLdapInfo = memberOf.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                string roleCommonName = roleLdapInfo.Where(value => value.StartsWith("CN=")).FirstOrDefault();
+                if (roleCommonName != null)
+                {
+                  string roleName = roleCommonName.Substring("CN=".Length);
+                  results.Add(new(claimType, roleName));
+                }
+              }
+            }
+            else
+            {
+              foreach (string value in entry.Attributes[attributeName].GetValues(typeof(string)).Cast<string>())
+              {
+                results.Add(new(claimType, value));
+              }
+            }
+          }
         }
       }
     }
@@ -471,39 +460,40 @@ public class ExternalAuthenticationHandler
     return results;
   }
 
-  private static IEnumerable<string> GetLdapRoles(LdapConnection connection, IEnumerable<string> sidList)
-  {
-    List<string> results = new();
-    System.Text.StringBuilder ldapFilter = new();
 
-    //ldapFilter.Append("(&(objectType=group)");
+  //private static IEnumerable<string> GetLdapRoles(LdapConnection connection, IEnumerable<string> sidList)
+  //{
+  //  List<string> results = new();
+  //  System.Text.StringBuilder ldapFilter = new();
 
-    ldapFilter.Append("(|");
-    foreach (string sid in sidList)
-    {
-      ldapFilter.Append("(objectSid=");
-      ldapFilter.Append(sid);
-      ldapFilter.Append(")");
-    }
-    ldapFilter.Append(")");
+  //  //ldapFilter.Append("(&(objectType=group)");
 
-    // ldapFilter.Append(")");
+  //  ldapFilter.Append("(|");
+  //  foreach (string sid in sidList)
+  //  {
+  //    ldapFilter.Append("(objectSid=");
+  //    ldapFilter.Append(sid);
+  //    ldapFilter.Append(")");
+  //  }
+  //  ldapFilter.Append(")");
 
-    SearchRequest request = new() { DistinguishedName = "DC=inventua,DC=com", Filter = ldapFilter.ToString(), Scope = SearchScope.Subtree };
-    SearchResponse response = (SearchResponse)connection.SendRequest(request);
+  //  // ldapFilter.Append(")");
 
-    if (response.ResultCode == ResultCode.Success)
-    {
-      for (int count = 0; count < response.Entries.Count; count++)
-      {
-        string roleName = (string)response.Entries[count].Attributes["name"].GetValues(typeof(string)).FirstOrDefault();
-        if (roleName != null)
-        {
-          results.Add(roleName);
-        }
-      }
-    }
+  //  SearchRequest request = new() { DistinguishedName = "DC=inventua,DC=com", Filter = ldapFilter.ToString(), Scope = SearchScope.Subtree };
+  //  SearchResponse response = (SearchResponse)connection.SendRequest(request);
 
-    return results;
-  }
+  //  if (response.ResultCode == ResultCode.Success)
+  //  {
+  //    for (int count = 0; count < response.Entries.Count; count++)
+  //    {
+  //      string roleName = (string)response.Entries[count].Attributes["name"].GetValues(typeof(string)).FirstOrDefault();
+  //      if (roleName != null)
+  //      {
+  //        results.Add(roleName);
+  //      }
+  //    }
+  //  }
+
+  //  return results;
+  //}
 }

@@ -332,7 +332,6 @@ namespace Nucleus.Core.Authentication
 
     private Task<AuthenticateResult> HandleUnauthenticatedRequest()
     {
-      List<Claim> claims = new();
       ClaimsIdentity identity;
       ClaimsPrincipal principal;
 
@@ -352,7 +351,7 @@ namespace Nucleus.Core.Authentication
       return new ClaimsIdentity(new List<Claim> { { new Claim(ClaimTypes.Anonymous, "") } });
     }
 
-    private Boolean IsEqual(System.Net.IPAddress address1, System.Net.IPAddress address2)
+    private static Boolean IsEqual(System.Net.IPAddress address1, System.Net.IPAddress address2)
     {
       if (System.Net.IPAddress.IsLoopback(address1) && System.Net.IPAddress.IsLoopback(address2)) return true;
       return address1.MapToIPv6().GetAddressBytes().SequenceEqual(address2.MapToIPv6().GetAddressBytes());
@@ -370,7 +369,7 @@ namespace Nucleus.Core.Authentication
         // special handling for admin menu to display a message rather than redirect to login
         await this.Context.Response.WriteAsync("Session expired.");
       }
-      else if (this.Context.Request.IsSigned(out Guid accessKey))
+      else if (this.Context.Request.IsSigned(out Guid _))
       {
         // special handing for API key access (invalid key, or disabled key, or invalid signature), return a 403: Forbidden
         this.Context.Response.StatusCode = (int)System.Net.HttpStatusCode.Forbidden;
@@ -411,7 +410,7 @@ namespace Nucleus.Core.Authentication
       }
     }
 
-    private string GetReturnUrl(HttpContext context)
+    private static string GetReturnUrl(HttpContext context)
     {
       return System.Uri.EscapeDataString(context.Request.PathBase + context.Request.Path);
     }
@@ -421,11 +420,12 @@ namespace Nucleus.Core.Authentication
     /// </summary>
     private void RedirectToDefaultLogin()
     {
-      RouteValueDictionary routeDictionary = new();
-
-      routeDictionary.Add("area", "User");
-      routeDictionary.Add("controller", "Account");
-      routeDictionary.Add("action", "Index");
+      RouteValueDictionary routeDictionary = new()
+      {
+        { "area", "User" },
+        { "controller", "Account" },
+        { "action", "Index" }
+      };
 
       string redirectUrl = this.LinkGenerator.GetPathByRouteValues("Admin", routeDictionary, this.Context.Request.PathBase, FragmentString.Empty, null);
       Logger.LogTrace("Challenge: Redirecting to default login page {redirectUrl}", redirectUrl);

@@ -11,11 +11,14 @@ using Microsoft.AspNetCore.Authentication.Negotiate;
 using System.DirectoryServices.Protocols;
 using Nucleus.Abstractions.Authentication;
 using Microsoft.Extensions.Options;
+using System.Runtime.InteropServices;
+using Nucleus.Core.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Nucleus.Core.Authentication;
 
 //
-// Kestrel can only support binding to an IP address/post, not a host name.
+// Kestrel can only support binding to an IP address/port, not a host name.
 //
 
 public static class AuthenticationExtensions
@@ -56,8 +59,8 @@ public static class AuthenticationExtensions
 
     if (authenticationProtocols != null)
     {
-      // initialize LDAP connections
-      ExternalAuthenticationHandler.InitializeLDAP(services, authenticationProtocols);
+      //// initialize LDAP connections
+      ////ExternalAuthenticationHandler.InitializeLDAP(services, authenticationProtocols);
 
       // add configured external authorization protocols.  This code only supports the Negotiate (Windows Authentication/Kerberos) protocol for now.
       foreach (AuthenticationProtocol configuredProtocol in authenticationProtocols.Where(proto => proto.Enabled))
@@ -66,18 +69,48 @@ public static class AuthenticationExtensions
         {
           case NegotiateDefaults.AuthenticationScheme:
             authBuilder.AddNegotiate(NegotiateDefaults.AuthenticationScheme, configuredProtocol.FriendlyName, options =>
-            {              
-              options.Events = new() { OnAuthenticated = HandleExternalAuthentication };
+            {
+              options.Events = new() { OnAuthenticated = HandleExternalAuthentication, OnRetrieveLdapClaims = HandleLdapClaims };
 
               // PersistKerberosCredentials is required in Linux.  If it is not present we get a "Interop+NetSecurityNative+GssApiException: GSSAPI operation
               // failed with error - Unspecified GSS failure", AFTER we have already authenticated (after HandleExternalAuthentication has
               // been called).  Looking at https://github.com/dotnet/aspnetcore/blob/main/src/Security/Authentication/Negotiate/src/NegotiateHandler.cs
               // line 95, it looks like by using PersistKerberosCredentials the NegotiateHandler keeps the negotiation state from a previous 
               // invocation & thus does not try to re-authenticate, which seems to cause the error.
-              
+
               // We enable PersistKerberosCredentials for other operating system as well, because it improves performance and reduces network communication
               // between the web server running Nucleus and the KDC/Domain controller.
-              options.PersistKerberosCredentials = true;              
+              options.PersistKerberosCredentials = true;
+
+              ////if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+
+              LdapConnection connection;
+              try
+              {
+                connection = ExternalAuthenticationHandler.BuildLdapConnection(configuredProtocol, services.Logger());
+              }
+              catch (LdapException ex)
+              {
+                connection = null;
+                services.Logger()?.LogError(ex, "Error building LdapConnection for scheme '{scheme}' '{domain}'.  Failed to connect to LDAP [{code}]. ", configuredProtocol.Scheme, configuredProtocol.LdapDomain, ex.ErrorCode);
+              }
+              catch (Exception ex)
+              {
+                connection = null;
+                services.Logger()?.LogError(ex, "Error building LdapConnection for scheme '{scheme}' '{domain}'", configuredProtocol.Scheme, configuredProtocol.LdapDomain);
+              }
+
+              if (connection != null)
+              {
+                options.EnableLdap(settings =>
+                {
+                  string domain = (connection.Directory as LdapDirectoryIdentifier).Servers.FirstOrDefault();
+                  settings.Domain = domain;
+                  settings.LdapConnection = connection;
+                  settings.EnableLdapClaimResolution = true;
+                });
+              }
+
             });
 
             break;
@@ -87,6 +120,13 @@ public static class AuthenticationExtensions
 
     return services;
   }
+
+  private static async Task HandleLdapClaims(LdapContext context)
+  {
+    ExternalAuthenticationHandler externalAuthenticationHandler = context.Request.HttpContext.RequestServices.GetService<ExternalAuthenticationHandler>();
+    await externalAuthenticationHandler.HandleLdapClaims(context);
+  }
+
 
   private static async Task HandleExternalAuthentication<T>(ResultContext<T> context)
    where T : Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions

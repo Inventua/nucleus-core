@@ -59,9 +59,6 @@ public static class AuthenticationExtensions
 
     if (authenticationProtocols != null)
     {
-      //// initialize LDAP connections
-      ////ExternalAuthenticationHandler.InitializeLDAP(services, authenticationProtocols);
-
       // add configured external authorization protocols.  This code only supports the Negotiate (Windows Authentication/Kerberos) protocol for now.
       foreach (AuthenticationProtocol configuredProtocol in authenticationProtocols.Where(proto => proto.Enabled))
       {
@@ -71,7 +68,7 @@ public static class AuthenticationExtensions
             authBuilder.AddNegotiate(NegotiateDefaults.AuthenticationScheme, configuredProtocol.FriendlyName, options =>
             {
               options.Events = new() { OnAuthenticated = HandleExternalAuthentication, OnRetrieveLdapClaims = HandleLdapClaims };
-
+              
               // PersistKerberosCredentials is required in Linux.  If it is not present we get a "Interop+NetSecurityNative+GssApiException: GSSAPI operation
               // failed with error - Unspecified GSS failure", AFTER we have already authenticated (after HandleExternalAuthentication has
               // been called).  Looking at https://github.com/dotnet/aspnetcore/blob/main/src/Security/Authentication/Negotiate/src/NegotiateHandler.cs
@@ -81,9 +78,7 @@ public static class AuthenticationExtensions
               // We enable PersistKerberosCredentials for other operating system as well, because it improves performance and reduces network communication
               // between the web server running Nucleus and the KDC/Domain controller.
               options.PersistKerberosCredentials = true;
-
-              ////if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-
+              
               LdapConnection connection;
               try
               {

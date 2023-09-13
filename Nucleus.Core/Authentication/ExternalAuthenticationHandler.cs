@@ -16,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Core.Logging;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using System.Net;
+using System.Threading;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 
 namespace Nucleus.Core.Authentication;
 
@@ -187,12 +189,46 @@ public class ExternalAuthenticationHandler
       {
         LdapConnection connection = context.LdapSettings.LdapConnection;
 
+        if (connection == null)
+        {
+          // if the Ldap connection was not successfully created during startup, try to create one now
+          try
+          {
+            connection = BuildLdapConnection(protocolOptions, this.Logger);
+            context.LdapSettings.LdapConnection = connection;
+          }
+          catch (OperationCanceledException ex)
+          {
+            this.Logger?.LogError(ex, "The LdapConnection bind operation took more than 10 seconds to complete for scheme '{scheme}' '{domain}'.", protocolOptions.Scheme, protocolOptions.LdapDomain);
+            connection = null;
+          }
+          catch (LdapException ex)
+          {
+            this.Logger?.LogError(ex, "Error building LdapConnection for scheme '{scheme}' '{domain}'.  Failed to connect to LDAP [{code}]. ", protocolOptions.Scheme, protocolOptions.LdapDomain, ex.ErrorCode);
+            connection = null;
+          }
+          catch (Exception ex)
+          {
+            this.Logger?.LogError(ex, "Error building LdapConnection for scheme '{scheme}' '{domain}'", protocolOptions.Scheme, protocolOptions.LdapDomain);
+            connection = null;
+          }
+        }
+
         if (connection != null)
         {
-          List<Claim> userLdapClaims = GetLdapUserProperties(connection, context.Principal.Claims
+          // connection can be created by the initial call to BuildLdapConnection (from AuthenticationExtensions.AddCoreAuthentication), but if 
+          // that fails or times out, we initialize the Negotiate protocol with a null connection and the Microsoft implementation can create the
+          // connection.  If that happens, we need to set some connection options because the Microsoft defaults to referral chasing=all, which can
+          // make Ldap searches very slow.  ProtocolVersion = 3 is important for Linux.
+          connection.SessionOptions.ProtocolVersion = 3;
+          connection.SessionOptions.ReferralChasing = ReferralChasingOptions.None;
+
+          string userSid = context.Principal.Claims
             .Where(claim => claim.Type == ClaimTypes.PrimarySid)
             .Select(claim => claim.Value)
-            .FirstOrDefault());
+            .FirstOrDefault();
+
+          List<Claim> userLdapClaims = GetLdapUserProperties(connection, userSid, this.Logger);
 
           ClaimsIdentity identity = new(userLdapClaims, context.Scheme.Name);
           context.Principal = new(identity);
@@ -201,6 +237,11 @@ public class ExternalAuthenticationHandler
           // The code in the Negotiate handler doesn't raise the OnAuthenticated when we set a Success status from HandleLdapClaims
           // so we have to call it ourselves
           await HandleExternalAuthentication(context);
+        }
+        else
+        {
+          this.Logger?.LogWarning("HandleLdapClaims: Identity: {identity}.  LdapConnection is null, no query was sent.", context.Principal?.Identity?.Name);
+          context.Fail("LdapConnection is null.");
         }
       }
     }
@@ -249,13 +290,14 @@ public class ExternalAuthenticationHandler
     {
       this.Logger?.LogDebug("Updating user roles for user: '{name}'.", loginUser.UserName);
       List<Claim> roleClaims = principal.Claims
-        .Where(claim => claim.Type == (principal.Identity as ClaimsIdentity)?.RoleClaimType || claim.Type == ClaimTypes.Role)
+        .Where(claim => claim.Type == ClaimTypes.Role)
         .ToList();
 
+      // only sync roles if the authentication protocol has provided any
       if (roleClaims.Any())
       {
         foreach (Role roleToRemove in loginUser.Roles
-          .Where(role => CanRemoveRole(site, role) && !roleClaims.Where(claim => claim.Value.Equals(role.Name, StringComparison.OrdinalIgnoreCase)).Any()))
+          .Where(role => CanRemoveRole(site, role) && !roleClaims.Where(claim => claim.Value.Equals(role.Name, StringComparison.OrdinalIgnoreCase)).Any()).ToList())
         {
           this.Logger?.LogTrace("Removing user '{user}' from role '{roleToRemove}'.", loginUser.UserName, roleToRemove.Name);
           loginUser.Roles.Remove(roleToRemove);
@@ -263,7 +305,7 @@ public class ExternalAuthenticationHandler
 
         // add roles that are in the LDAP response but are not in the user roles list
         foreach (Claim ldapRole in roleClaims
-          .Where(ldapRole => !loginUser.Roles.Where(role => CanAddRole(site, role) && role.Name.Equals(ldapRole.Value, StringComparison.OrdinalIgnoreCase)).Any()))
+          .Where(ldapRole => !loginUser.Roles.Where(role => CanAddRole(site, role) && role.Name.Equals(ldapRole.Value, StringComparison.OrdinalIgnoreCase)).Any()).ToList())
         {
           Role newRole = roles
             .Where(role => role.Name.Equals(ldapRole.Value, StringComparison.OrdinalIgnoreCase) && role.Id != site.RegisteredUsersRole.Id)
@@ -358,14 +400,12 @@ public class ExternalAuthenticationHandler
       role.Id != site.RegisteredUsersRole.Id;
   }
 
-  public static LdapConnection BuildLdapConnection(AuthenticationProtocol protocolOptions, ILogger logger)
+  public static string ResolveDomain(AuthenticationProtocol protocolOptions, ILogger logger)
   {
-    LdapConnection connection;
-
     string domain = protocolOptions.LdapDomain;
 
     if (domain.Equals("auto", StringComparison.OrdinalIgnoreCase))
-    {      
+    {
       if (OperatingSystem.IsLinux())
       {
         if (!System.IO.File.Exists("/etc/krb5.keytab"))
@@ -397,6 +437,15 @@ public class ExternalAuthenticationHandler
         domain = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName;
       }
     }
+
+    return domain;
+  }
+
+  public static LdapConnection BuildLdapConnection(AuthenticationProtocol protocolOptions, ILogger logger)
+  {
+    LdapConnection connection;
+
+    string domain = ResolveDomain(protocolOptions, logger);
 
     logger?.LogInformation("Using LDAP domain '{domain}'.", domain);
         
@@ -430,17 +479,26 @@ public class ExternalAuthenticationHandler
     connection.SessionOptions.ReferralChasing = ReferralChasingOptions.None;
 
     // this causes an "A local error occurred" error in Linux
-    // connection.Timeout = TimeSpan.FromSeconds(10);  
+    // connection.Timeout = TimeSpan.FromSeconds(15);  
+
+    CancellationTokenSource cancellationTokenSource = new(TimeSpan.FromSeconds(15));
 
     logger?.LogTrace("Binding LDAP connection.");
-    connection.Bind();
-    logger?.LogTrace("Bind complete.");
 
+    // connection.Timeout does not work because of a bug, so we have to implement our own timeout.
+    Task task = Task.Run(() =>
+    {
+      connection.Bind();
+    });
+
+    task.Wait(cancellationTokenSource.Token);
+
+    logger?.LogTrace("Bind complete.");
 
     return connection;
   }
 
-  private static List<Claim> GetLdapUserProperties(LdapConnection connection, string userSid)
+  private static List<Claim> GetLdapUserProperties(LdapConnection connection, string userSid, ILogger logger)
   {
     List<Claim> results = new();
     string ldapFilter = $"(objectSid={userSid})";
@@ -494,6 +552,10 @@ public class ExternalAuthenticationHandler
           }
         }
       }
+    }
+    else
+    {
+      logger?.LogWarning("Ldap search for dn:'{dn}', filter: '{filter}' failed with error ({code}).", dn, ldapFilter, response.ResultCode);
     }
 
     return results;

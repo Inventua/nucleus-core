@@ -84,6 +84,11 @@ public static class AuthenticationExtensions
               {
                 connection = ExternalAuthenticationHandler.BuildLdapConnection(configuredProtocol, services.Logger());
               }
+              catch (OperationCanceledException ex)
+              {
+                services.Logger()?.LogError(ex, "The LdapConnection bind operation took more than 10 seconds to complete for scheme '{scheme}' '{domain}'.", configuredProtocol.Scheme, configuredProtocol.LdapDomain);
+                connection = null;
+              }
               catch (LdapException ex)
               {
                 services.Logger()?.LogError(ex, "Error building LdapConnection for scheme '{scheme}' '{domain}'.  Failed to connect to LDAP [{code}]. ", configuredProtocol.Scheme, configuredProtocol.LdapDomain, ex.ErrorCode);
@@ -94,17 +99,13 @@ public static class AuthenticationExtensions
                 services.Logger()?.LogError(ex, "Error building LdapConnection for scheme '{scheme}' '{domain}'", configuredProtocol.Scheme, configuredProtocol.LdapDomain);
                 connection = null;
               }
-
-              if (connection != null)
+                            
+              options.EnableLdap(settings =>
               {
-                options.EnableLdap(settings =>
-                {
-                  string domain = (connection.Directory as LdapDirectoryIdentifier).Servers.FirstOrDefault();
-                  settings.Domain = domain;
-                  settings.LdapConnection = connection;
-                  settings.EnableLdapClaimResolution = true;
-                });
-              }
+                settings.Domain = ExternalAuthenticationHandler.ResolveDomain(configuredProtocol, services.Logger());
+                settings.LdapConnection = connection;
+                settings.EnableLdapClaimResolution = true;
+              });              
 
             });
 

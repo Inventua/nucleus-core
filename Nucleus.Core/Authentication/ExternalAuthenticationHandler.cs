@@ -15,22 +15,20 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Core.Logging;
 using Microsoft.AspNetCore.Authentication.Negotiate;
-using System.Net;
 using System.Threading;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 
 namespace Nucleus.Core.Authentication;
 
 public class ExternalAuthenticationHandler
-{  
+{
   private ISessionManager SessionManager { get; }
   private IUserManager UserManager { get; }
   private IRoleManager RoleManager { get; }
   private Context NucleusContext { get; }
   private IOptions<AuthenticationProtocols> AuthenticationProtocols { get; }
-  private ILogger<AuthenticationHandler> Logger { get; }
+  private ILogger<ExternalAuthenticationHandler> Logger { get; }
 
-  public ExternalAuthenticationHandler(ISessionManager sessionManager, IUserManager userManager, IRoleManager roleManager, Context nucleusContext, IOptions<AuthenticationProtocols> options, ILogger<AuthenticationHandler> logger)
+  public ExternalAuthenticationHandler(ISessionManager sessionManager, IUserManager userManager, IRoleManager roleManager, Context nucleusContext, IOptions<AuthenticationProtocols> options, ILogger<ExternalAuthenticationHandler> logger)
   {
     this.SessionManager = sessionManager;
     this.UserManager = userManager;
@@ -48,8 +46,9 @@ public class ExternalAuthenticationHandler
   /// <returns></returns>
   /// <remarks>
   /// Use this method to log a user in after receiving a successful response from an external authentication provider.
+  /// Redirecting the response after authentication is successful (if required) is up to the controller action which triggers authentication.
   /// </remarks>
-  public async Task HandleExternalAuthentication<T>(ResultContext<T> context)
+  public async Task HandleExternalAuthentication<T>(ResultContext<T> context, Boolean handleLdapClaims)
   where T : Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions
   {
     this.Logger?.LogTrace("HandleExternalAuthentication: Identity: {identity}.", context.Principal?.Identity?.Name);
@@ -58,116 +57,159 @@ public class ExternalAuthenticationHandler
     {
       AuthenticationProtocol protocolOptions = this.AuthenticationProtocols.Value.Where(protocol => protocol.Scheme == context.Scheme.Name).FirstOrDefault();
 
-      // remove the domain name from the user name, if protocolOptions.IgnoreDomainName is set to true
-      string userName = context.Principal.Identity.Name;
-      if (protocolOptions.UserRemoveDomainName)
+      if (handleLdapClaims)
       {
-        if (userName.Contains('\\'))
+        // handle Windows (Negotiate) authentication.  Call HandleLdapClaims to retrieve/sync data with Ldap 
+        if (context.Options is NegotiateOptions options)
         {
-          // in Windows, the user principal name is in the form DOMAIN\username
-          userName = userName.Substring(userName.IndexOf('\\') + 1);
-        }
-        else if (userName.Contains('@'))
-        {
-          // in Linux, the user principal name is generally in the form username@domain
-          userName = userName.Substring(0, userName.IndexOf('@'));
-        }
-      }
+          LdapContext ldapContext = new(context.HttpContext, context.Scheme, options as NegotiateOptions, new()
+          {
+            Domain = ExternalAuthenticationHandler.ResolveDomain(protocolOptions, this.Logger),
+            LdapConnection = null,             // HandleLdapClaims creates a new LdapConnection
+            EnableLdapClaimResolution = false  // prevent the Microsoft implementation from doing Claims resolution
+          })
+          {
+            Principal = context.Principal
+          };
 
-      this.Logger?.LogTrace("Checking username: {name}.", userName);
+          await HandleLdapClaims(ldapContext);
 
-      // look for an existing user
-      User loginUser = await this.UserManager.Get(this.NucleusContext.Site, userName);
-
-      if (loginUser != null && loginUser.IsSiteAdmin(this.NucleusContext.Site) && !protocolOptions.AllowedUsers.HasFlag(AuthenticationProtocol.UserTypes.SiteAdmins))
-      {
-        this.Logger?.LogError("User {user} was authenticated using '{Scheme}' authentication, but configuration does not allow site admins to log in using '{Scheme}' authentication.", userName, protocolOptions.Scheme, protocolOptions.Scheme);
-        context.Fail("Access Denied.");
-        loginUser = null;
-        return;
-      }
-
-      if (loginUser == null)
-      {
-        // try system admin
-        loginUser = await this.UserManager.GetSystemAdministrator(userName);
-
-        if (loginUser != null && loginUser.IsSystemAdministrator() && !protocolOptions.AllowedUsers.HasFlag(AuthenticationProtocol.UserTypes.SystemAdmins))
-        {
-          this.Logger?.LogError("A system administrator user '{user}' was authenticated using '{Scheme}' authentication, but configuration does not allow system admins to log in using '{Scheme}' authentication.", userName, protocolOptions.Scheme, protocolOptions.Scheme);
-          context.Fail("Access Denied.");
-          loginUser = null;
-          return;
-        }
-      }
-
-      if (loginUser == null)
-      {
-        // create a new user (if configured)
-        if (protocolOptions.CreateUsers)
-        {
-          this.Logger?.LogDebug("User: {name} not found, creating.", userName);
-
-          // create new user 
-          loginUser = await this.UserManager.CreateNew(this.NucleusContext.Site);
-          loginUser.UserName = userName;
-          this.UserManager.SetNewUserFlags(this.NucleusContext.Site, loginUser);
-
-          loginUser.Verified = true;
-          loginUser.Approved = true;
-
-          await SyncUser(protocolOptions, context.Principal, this.NucleusContext.Site, await this.RoleManager.List(this.NucleusContext.Site), loginUser);
-          await this.UserManager.Save(this.NucleusContext.Site, loginUser);
+          // copy the result
+          if (ldapContext.Result != null)
+          {
+            if (ldapContext.Result.Succeeded)
+            {
+              context.Success();
+            }
+            else if (ldapContext.Result.Failure != null)
+            {
+              context.Fail(ldapContext.Result.Failure);
+            }
+          }
+          else
+          {
+            context.NoResult();
+          }
         }
         else
         {
-          this.Logger.LogError("User {user} was authenticated using '{Scheme}' authentication, but the user does not exist in Nucleus and the protocol settings do not allow user creation.", userName, protocolOptions.Scheme);
-          context.Fail("Access Denied.");
-          loginUser = null;
-          return;
+          // if context.Options is not a NegotiateOptions, there's a misconfiguration of some kind.  This should never happen
+          throw new InvalidOperationException("Unable to retrieve Ldap claims (options is not of type NegotiateOptions).");
         }
       }
       else
       {
-        // sync data, depending on config settings, unless the user is a system administrator
-        if (protocolOptions.UserSyncOptions != AuthenticationProtocol.SyncOptions.None && !loginUser.IsSystemAdministrator())
-        {
-          await SyncUser(protocolOptions, context.Principal, this.NucleusContext.Site, await this.RoleManager.List(this.NucleusContext.Site), loginUser);
-          await this.UserManager.Save(this.NucleusContext.Site, loginUser);
-        }
-
-        if (!loginUser.Approved)
-        {
-          this.Logger?.LogError("User {user} was authenticated using '{Scheme}' authentication, but the Nucleus user account is not approved.", userName, protocolOptions.Scheme);
-          context.Fail("Access Denied.");
-          loginUser = null;
-          return;
-        }
-        else if (!loginUser.Verified)
-        {
-          this.Logger?.LogError("User {user} was authenticated using '{Scheme}' authentication, but the Nucleus user account is not verified.", userName, protocolOptions.Scheme);
-          context.Fail("Access Denied.");
-          loginUser = null;
-          return;
-        }
+        // If we add support for other external authentication methods in the future and/or update the SAML and OAUTH extensions to call this function
+        // instead of handling Nucleus signin themselves, then this code path could be used.
+        // When using Windows Authentication, we won't end up here, because:
+        // (a) we are not enabling built-in Ldap handling by the Microsoft Negotiate implementation 
+        // (b) even if we did, the Microsoft Negotiate implementation does not raise the OnAuthenticated event after a return from the 
+        //     OnRetrieveLdapClaims event.
+        await CreateNucleusSession(context, protocolOptions);
       }
+      
+    }
+  }
 
-      // create a Nucleus session
-      if (loginUser != null)
+  /// <summary>
+  /// Check for/create or sync Nucleus user, and create a Nucleus session.
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
+  /// <param name="context"></param>
+  /// <param name="protocolOptions"></param>
+  /// <returns></returns>
+  private async Task CreateNucleusSession<T>(ResultContext<T> context, AuthenticationProtocol protocolOptions)
+    where T : Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions
+  {
+    // remove the domain name from the user name, if protocolOptions.IgnoreDomainName is set to true
+    string userName = context.Principal.Identity.Name;
+
+    if (protocolOptions.UserRemoveDomainName)
+    {
+      if (userName.Contains('\\'))
       {
-        this.Logger?.LogDebug("Creating session for user: {name}.", loginUser.UserName);
+        // in Windows, the user principal name is in the form DOMAIN\username
+        userName = userName[(userName.IndexOf('\\') + 1)..];
+      }
+      else if (userName.Contains('@'))
+      {
+        // in Linux, the user principal name is generally in the form username@domain
+        userName = userName[..userName.IndexOf('@')];
+      }
+    }
 
-        UserSession session = await this.SessionManager.CreateNew(this.NucleusContext.Site, loginUser, false, context.Request.HttpContext.Connection.RemoteIpAddress);
-        await this.SessionManager.SignIn(session, context.Request.HttpContext, "");
+    this.Logger?.LogTrace("Checking username: {name}.", userName);
 
-        // redirecting the response (if required) is up to the controller action which triggers Negotiate/Windows authentication.  
-        // This is normally Nucleus.Modules.Account.Controllers.LoginController.Negotiate(), but other controller actions can trigger
-        // Windows authentication by having a [Authorize(AuthenticationSchemes = NegotiateDefaults.AuthenticationScheme)] attribute.
+    // look for an existing user
+    User loginUser = await this.UserManager.Get(this.NucleusContext.Site, userName);
+
+    if (loginUser != null && loginUser.IsSiteAdmin(this.NucleusContext.Site) && !protocolOptions.AllowedUsers.HasFlag(AuthenticationProtocol.UserTypes.SiteAdmins))
+    {
+      this.Logger?.LogError("User {user} was authenticated using '{Scheme}' authentication, but configuration does not allow site admins to log in using '{Scheme}' authentication.", userName, protocolOptions.Scheme, protocolOptions.Scheme);
+      context.Fail("Access Denied.");
+      return;
+    }
+
+    if (loginUser == null)
+    {
+      // try system admin
+      loginUser = await this.UserManager.GetSystemAdministrator(userName);
+
+      if (loginUser != null && loginUser.IsSystemAdministrator() && !protocolOptions.AllowedUsers.HasFlag(AuthenticationProtocol.UserTypes.SystemAdmins))
+      {
+        this.Logger?.LogError("A system administrator user '{user}' was authenticated using '{Scheme}' authentication, but configuration does not allow system admins to log in using '{Scheme}' authentication.", userName, protocolOptions.Scheme, protocolOptions.Scheme);
+        context.Fail("Access Denied.");
+        return;
+      }
+    }
+
+    if (loginUser == null)
+    {
+      // create a new user (if configured)
+      if (protocolOptions.CreateUsers)
+      {
+        this.Logger?.LogDebug("User: {name} not found, creating.", userName);
+
+        // create new user 
+        loginUser = await this.UserManager.CreateNew(this.NucleusContext.Site);
+        loginUser.UserName = userName;
+        this.UserManager.SetNewUserFlags(this.NucleusContext.Site, loginUser);
+
+        loginUser.Verified = true;
+        loginUser.Approved = true;
+
+        await SyncUser(protocolOptions, context.Principal, this.NucleusContext.Site, await this.RoleManager.List(this.NucleusContext.Site), loginUser);
+        await this.UserManager.Save(this.NucleusContext.Site, loginUser);
       }
       else
       {
-        this.Logger?.LogDebug("No user found for user name: {name}.", userName);
+        this.Logger.LogWarning("User {user} was authenticated using '{Scheme}' authentication, but the user does not exist in Nucleus and the protocol settings do not allow user creation.", userName, protocolOptions.Scheme);
+        context.Fail("Access Denied.");
+        return;
       }
+    }
+    else
+    {
+      // sync data, depending on config settings, unless the user is a system administrator
+      if (protocolOptions.UserSyncOptions != AuthenticationProtocol.SyncOptions.None && !loginUser.IsSystemAdministrator())
+      {
+        await SyncUser(protocolOptions, context.Principal, this.NucleusContext.Site, await this.RoleManager.List(this.NucleusContext.Site), loginUser);
+        await this.UserManager.Save(this.NucleusContext.Site, loginUser);
+      }
+    }
+
+    // create a Nucleus session
+    if (loginUser != null)
+    {
+      this.Logger?.LogDebug("Creating session for user: '{name}'.", loginUser.UserName);
+
+      UserSession session = await this.SessionManager.CreateNew(this.NucleusContext.Site, loginUser, false, context.Request.HttpContext.Connection.RemoteIpAddress);
+      await this.SessionManager.SignIn(session, context.Request.HttpContext, "");      
+    }
+    else
+    {
+      this.Logger?.LogDebug("No user found for user name: '{name}'.", userName);
+      context.Fail($"User name '{userName}' is incorrect.");
     }
   }
 
@@ -194,12 +236,12 @@ public class ExternalAuthenticationHandler
           // if the Ldap connection was not successfully created during startup, try to create one now
           try
           {
-            connection = BuildLdapConnection(protocolOptions, this.Logger);
+            connection = BuildLdapConnection(protocolOptions, false, this.Logger);
             context.LdapSettings.LdapConnection = connection;
           }
           catch (OperationCanceledException ex)
           {
-            this.Logger?.LogError(ex, "The LdapConnection bind operation took more than 10 seconds to complete for scheme '{scheme}' '{domain}'.", protocolOptions.Scheme, protocolOptions.LdapDomain);
+            this.Logger?.LogError(ex, "The LdapConnection bind operation for scheme '{scheme}' '{domain}' timed out.", protocolOptions.Scheme, protocolOptions.LdapDomain);
             connection = null;
           }
           catch (LdapException ex)
@@ -216,7 +258,7 @@ public class ExternalAuthenticationHandler
 
         if (connection != null)
         {
-          // connection can be created by the initial call to BuildLdapConnection (from AuthenticationExtensions.AddCoreAuthentication), but if 
+          // Ensure that connection settings can be created by the initial call to BuildLdapConnection (from AuthenticationExtensions.AddCoreAuthentication), but if 
           // that fails or times out, we initialize the Negotiate protocol with a null connection and the Microsoft implementation can create the
           // connection.  If that happens, we need to set some connection options because the Microsoft defaults to referral chasing=all, which can
           // make Ldap searches very slow.  ProtocolVersion = 3 is important for Linux.
@@ -236,7 +278,8 @@ public class ExternalAuthenticationHandler
 
           // The code in the Negotiate handler doesn't raise the OnAuthenticated when we set a Success status from HandleLdapClaims
           // so we have to call it ourselves
-          await HandleExternalAuthentication(context);
+          await CreateNucleusSession(context, protocolOptions);
+          //await HandleExternalAuthentication(context);
         }
         else
         {
@@ -287,8 +330,7 @@ public class ExternalAuthenticationHandler
     }
 
     if (protocolOptions.UserSyncOptions.HasFlag(AuthenticationProtocol.SyncOptions.Roles))
-    {
-      this.Logger?.LogDebug("Updating user roles for user: '{name}'.", loginUser.UserName);
+    {      
       List<Claim> roleClaims = principal.Claims
         .Where(claim => claim.Type == ClaimTypes.Role)
         .ToList();
@@ -296,6 +338,8 @@ public class ExternalAuthenticationHandler
       // only sync roles if the authentication protocol has provided any
       if (roleClaims.Any())
       {
+        this.Logger?.LogDebug("Updating user roles for user: '{name}'.", loginUser.UserName);
+
         foreach (Role roleToRemove in loginUser.Roles
           .Where(role => CanRemoveRole(site, role) && !roleClaims.Where(claim => claim.Value.Equals(role.Name, StringComparison.OrdinalIgnoreCase)).Any()).ToList())
         {
@@ -316,6 +360,10 @@ public class ExternalAuthenticationHandler
             loginUser.Roles.Add(newRole);
           }
         }
+      }
+      else
+      {
+        this.Logger?.LogDebug("Not updating user roles for user: '{name}' because the '{scheme}' authentication provider did not return any roles.", loginUser.UserName, protocolOptions.Scheme);
       }
     }
 
@@ -441,14 +489,14 @@ public class ExternalAuthenticationHandler
     return domain;
   }
 
-  public static LdapConnection BuildLdapConnection(AuthenticationProtocol protocolOptions, ILogger logger)
+  public static LdapConnection BuildLdapConnection(AuthenticationProtocol protocolOptions, Boolean bindAsync, ILogger logger)
   {
     LdapConnection connection;
 
     string domain = ResolveDomain(protocolOptions, logger);
 
     logger?.LogInformation("Using LDAP domain '{domain}'.", domain);
-        
+
     LdapDirectoryIdentifier endPoint = new(domain, false, false);
 
     if (endPoint.Servers != null)
@@ -481,19 +529,22 @@ public class ExternalAuthenticationHandler
     // this causes an "A local error occurred" error in Linux
     // connection.Timeout = TimeSpan.FromSeconds(15);  
 
-    CancellationTokenSource cancellationTokenSource = new(TimeSpan.FromSeconds(15));
 
     logger?.LogTrace("Binding LDAP connection.");
+
+    CancellationTokenSource cancellationTokenSource = new(TimeSpan.FromSeconds(15));
 
     // connection.Timeout does not work because of a bug, so we have to implement our own timeout.
     Task task = Task.Run(() =>
     {
       connection.Bind();
+      logger?.LogTrace("Ldap Bind complete.");
     });
 
-    task.Wait(cancellationTokenSource.Token);
-
-    logger?.LogTrace("Bind complete.");
+    if (!bindAsync)
+    {
+      task.Wait(cancellationTokenSource.Token);
+    }
 
     return connection;
   }
@@ -501,7 +552,6 @@ public class ExternalAuthenticationHandler
   private static List<Claim> GetLdapUserProperties(LdapConnection connection, string userSid, ILogger logger)
   {
     List<Claim> results = new();
-    string ldapFilter = $"(objectSid={userSid})";
 
     string dn = String.Join(',',
       ((LdapDirectoryIdentifier)connection.Directory).Servers
@@ -509,6 +559,7 @@ public class ExternalAuthenticationHandler
         ?.Split('.', StringSplitOptions.RemoveEmptyEntries)
         .Select(part => $"DC={part}"));
 
+    string ldapFilter = $"(objectSid={userSid})";
 
     SearchRequest request = new() { DistinguishedName = dn, Filter = ldapFilter, Scope = SearchScope.Subtree };
     SearchResponse response = (SearchResponse)connection.SendRequest(request);
@@ -530,14 +581,10 @@ public class ExternalAuthenticationHandler
               // special parsing is required for roles
               foreach (string memberOf in entry.Attributes[attributeName].GetValues(typeof(string)).Cast<string>())
               {
-                // "memberof" has entries in the form:
-                // CN=role name,<various other stuff like OU, DC, etc>;CN=role name2,<more stuff>
-                IEnumerable<string> roleLdapInfo = memberOf.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                string roleName = ParseRoleName(memberOf);
 
-                string roleCommonName = roleLdapInfo.Where(value => value.StartsWith("CN=")).FirstOrDefault();
-                if (roleCommonName != null)
+                if (roleName != null)
                 {
-                  string roleName = roleCommonName.Substring("CN=".Length);
                   results.Add(new(claimType, roleName));
                 }
               }
@@ -561,6 +608,28 @@ public class ExternalAuthenticationHandler
     return results;
   }
 
+  /// <summary>
+  /// Returns a role name from a string returned in the memberOf property of an Ldap response.
+  /// </summary>
+  /// <param name="value"></param>
+  /// <returns></returns>
+  /// <remarks>
+  /// For example, return "Inventua Developers" from CN=Inventua Developers,OU=Inventua Users and Roles,DC=inventua,DC=com
+  /// </remarks>
+  private static string ParseRoleName(string value)
+  {
+    if (value != null)
+    {
+      System.Text.RegularExpressions.Match roleNameMatch = System.Text.RegularExpressions.Regex.Match(value, "^CN=(?<rolename>[^,]*)");
+
+      if (roleNameMatch.Success)
+      {
+        return roleNameMatch.Groups["rolename"].Value;
+      }
+    }
+
+    return null;
+  }
 
   //private static IEnumerable<string> GetLdapRoles(LdapConnection connection, IEnumerable<string> sidList)
   //{

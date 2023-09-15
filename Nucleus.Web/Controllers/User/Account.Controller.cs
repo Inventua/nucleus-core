@@ -139,9 +139,11 @@ namespace Nucleus.Web.Controllers
 						}
 
 						UserSession session = await this.SessionManager.CreateNew(this.Context.Site, loginUser, false, ControllerContext.HttpContext.Connection.RemoteIpAddress);
-						await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
 
-						string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
+            if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
+            await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);            
+            string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
+
 						return Redirect(location);						
 					}
 				}
@@ -151,8 +153,9 @@ namespace Nucleus.Web.Controllers
 		public async Task<ActionResult> Logout(string returnUrl)
 		{
 			await this.SessionManager.SignOut(HttpContext);
-			
-			return Redirect(Url.Content(String.IsNullOrEmpty(returnUrl) ? "~/" : returnUrl));
+
+      if (!Url.IsLocalUrl(returnUrl)) returnUrl = "";
+      return Redirect(Url.Content(String.IsNullOrEmpty(returnUrl) ? "~/" : returnUrl));
 		}
 
 		[HttpGet]

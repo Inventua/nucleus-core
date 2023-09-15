@@ -50,7 +50,7 @@ namespace Nucleus.Modules.Account.Controllers
 		[HttpGet]
 		public ActionResult Edit(string returnUrl)
 		{
-			return View("RecoverSettings", new ViewModels.Signup() { ReturnUrl = returnUrl });
+      return View("RecoverSettings", new ViewModels.Signup() { ReturnUrl = returnUrl });
 		}
 
 		[HttpPost]
@@ -264,11 +264,10 @@ namespace Nucleus.Modules.Account.Controllers
 
 		private ViewModels.Recover BuildViewModel(string returnUrl)
 		{
-			return new ViewModels.Recover()
+      return new ViewModels.Recover()
 			{
 				AllowPasswordReset = this.Context.Module.ModuleSettings.Get(Models.Settings.ModuleSettingsKeys.AllowPasswordReset, true),
-				AllowUsernameRecovery = this.Context.Module.ModuleSettings.Get(Models.Settings.ModuleSettingsKeys.AllowUsernameRecovery, true),
-				ReturnUrl = returnUrl
+				AllowUsernameRecovery = this.Context.Module.ModuleSettings.Get(Models.Settings.ModuleSettingsKeys.AllowUsernameRecovery, true)
 			};
 		}
 

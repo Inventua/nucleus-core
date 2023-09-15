@@ -136,6 +136,7 @@ public class LoginController : Controller
     }
     else
     {
+      if (!Url.IsLocalUrl(returnUrl)) returnUrl = "";
       string location = String.IsNullOrEmpty(returnUrl) ? Url.Content("~/").ToString() : Url.Content(returnUrl);
 
       if (IsCalledFromScript())
@@ -255,23 +256,6 @@ public class LoginController : Controller
 
   }
 
-  ////[HttpGet]
-  ////[HttpPost]
-  ////public ActionResult ExternalLogin(string scheme, string returnUrl)
-  ////{
-  ////  if (!String.IsNullOrEmpty(scheme))
-  ////  {
-  ////    switch (scheme)
-  ////    {
-  ////      case NegotiateDefaults.AuthenticationScheme:
-  ////        ViewModels.Login viewModel = BuildViewModel(returnUrl, true);
-  ////        return View("Login", viewModel);
-  ////    }
-  ////  }
-
-  ////  return BadRequest();
-  ////}
-
   [HttpPost]
   public async Task<ActionResult> ResendVerificationCode(ViewModels.Login viewModel)
   {
@@ -349,6 +333,7 @@ public class LoginController : Controller
   {
     await this.SessionManager.SignOut(HttpContext);
 
+    if (!Url.IsLocalUrl(returnUrl)) returnUrl = "";
     return Redirect(String.IsNullOrEmpty(returnUrl) ? "~/" : returnUrl);
   }
 

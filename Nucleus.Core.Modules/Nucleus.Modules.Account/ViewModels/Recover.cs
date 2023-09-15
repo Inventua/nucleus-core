@@ -9,8 +9,6 @@ namespace Nucleus.Modules.Account.ViewModels
 {
 	public class Recover
 	{
-		public string ReturnUrl { get; set; }
-
 		[Required(ErrorMessage = "Please enter your email address.")]
 
 		public string Email { get; set; }

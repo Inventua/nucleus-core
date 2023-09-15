@@ -6,7 +6,6 @@
 @using (Html.BeginNucleusForm("Index", "Recover", FormMethod.Post, new { data_target = "form.parent()" }))
 {	
 	<fieldset aria-label="Recover Account">
-		@Html.HiddenFor(model => model.ReturnUrl)
 		<p>
 			Please enter the email address associated with your account.
 		</p>

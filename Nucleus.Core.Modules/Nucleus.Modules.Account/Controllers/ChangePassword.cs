@@ -53,9 +53,9 @@ namespace Nucleus.Modules.Account.Controllers
 		}
 
 		[HttpGet]
-		public ActionResult Edit(string returnUrl)
+		public ActionResult Edit()
 		{
-			return View("ChangePasswordSettings", new ViewModels.ChangePassword());
+      return View("ChangePasswordSettings", new ViewModels.ChangePassword());
 		}
 
 		[HttpPost]
@@ -125,6 +125,7 @@ namespace Nucleus.Modules.Account.Controllers
           }
           else
           {
+            this.Logger?.LogInformation("Saving password change for {user}.", loginUser.UserName);
             await this.UserManager.SetPassword(loginUser, viewModel.NewPassword);
 						
 						string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
@@ -137,7 +138,7 @@ namespace Nucleus.Modules.Account.Controllers
 
 		private async Task<ViewModels.ChangePassword> BuildViewModel(string returnUrl)
 		{
-			User loginUser;
+      User loginUser;
 			if (User.IsSystemAdministrator())
 			{
 				loginUser = await this.UserManager.GetSystemAdministrator(ControllerContext.HttpContext.User.Identity.Name);

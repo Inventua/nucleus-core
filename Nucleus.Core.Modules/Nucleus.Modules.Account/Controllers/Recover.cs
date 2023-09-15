@@ -72,9 +72,11 @@ namespace Nucleus.Modules.Account.Controllers
 				if (user == null)
 				{
 					Logger.LogWarning("User not found for email {viewModel.Email}.", viewModel.Email);
-					await Task.Delay(TimeSpan.FromSeconds(10));
-					return BadRequest("Invalid Email");
-				}
+					
+          // we return a message saying that we have sent a reminder (even though we have not), so that this function can't be used to determine whether
+          // an email address belongs to a user in the system
+          return Json(new { Title = "Recover Account", Message = "An account name reminder email has been sent." });
+        }
 				else
 				{
 					if (!user.Approved)
@@ -101,13 +103,12 @@ namespace Nucleus.Modules.Account.Controllers
 									Url = GetLoginPageUri().ToString()
 								};
 
-								Logger.LogTrace("Sending account name reminder email {templateName} to user {userId}.", template.Name, user.Id);
+								Logger.LogTrace("Sending account name reminder email '{templateName}' to user '{userId}', email '{email}'.", template.Name, user.Id, viewModel.Email);
 
 								using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
 								{
 									await mailClient.Send(template, args, viewModel.Email);
-									return Json(new { Title = "Recover Account", Message = "Account Name Reminder email sent." });
-									//viewModel.Message = "Account Name Reminder email sent." ;
+									return Json(new { Title = "Recover Account", Message = "An account name reminder email has been sent." });
 								}
 							}
 						}
@@ -116,7 +117,6 @@ namespace Nucleus.Modules.Account.Controllers
 						{
 							Logger.LogTrace("Not sending account name reminder to user {userId} because no Account Name Reminder Template is configured for site {siteId}.", user.Id, this.Context.Site.Id);
 							return Json(new { Title = "Recover Account", Message = "Your site administrator has not configured an Account Name Reminder email template.  Please contact the site administrator for help." });
-							//viewModel.Message = "Your site administrator has not configured an Account Name Reminder email template.  Please contact the site administrator for help.";				
 						}
 					}
 				}			
@@ -150,9 +150,10 @@ namespace Nucleus.Modules.Account.Controllers
 				if (user == null)
 				{
 					Logger.LogWarning("User not found for email {viewModel.Email}.", viewModel.Email);
-					await Task.Delay(TimeSpan.FromSeconds(10));
-					return BadRequest("Invalid Email");
-				}
+          // we return a message saying that we have sent a password reset email (even though we have not), so that this function can't be used to determine whether
+          // an email address belongs to a user in the system
+          return Json(new { Title = "Password Reset", Message = "Password Reset email sent." });
+        }
 				else
 				{
 					SiteTemplateSelections templateSelections = this.Context.Site.GetSiteTemplateSelections();
@@ -177,14 +178,12 @@ namespace Nucleus.Modules.Account.Controllers
 							{
 								await mailClient.Send(template, args, viewModel.Email);
 								return Json(new { Title = "Password Reset", Message = "Password Reset email sent." });
-								//viewModel.Message = "Password Reset email sent.";
 							}
 						}
 					}
 					else
 					{
 						Logger.LogTrace("Not sending password reset to user {userId} because no password reset template is configured for site {siteId}.", user.Id, this.Context.Site.Id);
-						//viewModel.Message = "Your site administrator has not configured a password reset email template.  Please contact the site administrator for help.";
 						return Json(new { Title = "Password Reset", Message = "Your site administrator has not configured a password reset email template.  Please contact the site administrator for help." });
 					}
 				}
@@ -230,7 +229,7 @@ namespace Nucleus.Modules.Account.Controllers
 			// inputs validated, reset the password and navigate to the login page
 			user.Secrets.SetPassword(viewModel.NewPassword);
 
-			// invalidate the "used up" password reset token
+			// invalidate the "consumed" password reset token
 			user.Secrets.PasswordResetToken = "";
 			user.Secrets.PasswordResetTokenExpiryDate = null;
 

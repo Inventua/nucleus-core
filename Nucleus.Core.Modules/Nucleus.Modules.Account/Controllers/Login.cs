@@ -346,8 +346,8 @@ public class LoginController : Controller
         .Where(protocol => protocol.Enabled)
         .ToList();
 
-    // special check for linux - ignore the Negotiate protocol (don't display the "Windows Login" button) if the machine is not joined to a domain
-    if (OperatingSystem.IsLinux() && !System.IO.File.Exists("/etc/krb5.keytab"))
+    // special check for linux - ignore the Negotiate protocol (don't display the "Windows Login" button) if the machine is not joined to a domain or the request Url does not have a domain
+    if (OperatingSystem.IsLinux() && (!System.IO.File.Exists("/etc/krb5.keytab") || !Request.Host.Host.Contains('.')))
     {
       AuthenticationProtocol negotiateProtocol = enabledProtocols.Where(proto => proto.Scheme.Equals(NegotiateDefaults.AuthenticationScheme, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
       if (negotiateProtocol != null)

@@ -174,8 +174,8 @@ namespace Nucleus.Extensions.ElasticSearch
 					new SetProcessor()
 					{
 						Field = ParseField(nameof(ElasticSearchDocument.FeedProcessingDateTime)),
-						Value = "{{{_ingest.timestamp}}}"
-					},
+            Value = "{{{_ingest.timestamp}}}"
+          },
 					new SetProcessor()
 					{
 						Field = ParseField(nameof(ElasticSearchDocument.Status)),
@@ -243,8 +243,8 @@ namespace Nucleus.Extensions.ElasticSearch
 					new SetProcessor()
 					{
 							Field = ParseField(nameof(ElasticSearchDocument.FeedProcessingDateTime)),
-							Value = DateTime.Now.ToString()
-					},
+              Value = "{{{_ingest.timestamp}}}"
+          },
 					new SetProcessor()
 					{
 							Field = ParseField(nameof(ElasticSearchDocument.SuggesterTitle)),
@@ -252,8 +252,7 @@ namespace Nucleus.Extensions.ElasticSearch
 					},
 					new RemoveProcessor()
 					{
-						// Elastic search failed to consume the value of the .Content property (to populate the index), but we still
-						// want to remove the original value, as it is not useful, and could be large.  Also security - don't store the
+						// remove the original content value, as it is not useful, and could be large.  Also security - don't store the
 						// original outside nucleus.
 						Field =  ParseField(nameof(ElasticSearchDocument.Content))
 					}

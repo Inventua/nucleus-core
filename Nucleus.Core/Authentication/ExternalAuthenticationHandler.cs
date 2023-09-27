@@ -226,6 +226,7 @@ public class ExternalAuthenticationHandler
     if (context.Principal.Identity.IsAuthenticated)
     {
       AuthenticationProtocol protocolOptions = this.AuthenticationProtocols.Value.Where(protocol => protocol.Scheme == context.Scheme.Name).FirstOrDefault();
+      List<Claim> userLdapClaims;
 
       if (protocolOptions.UserSyncOptions.HasFlag(AuthenticationProtocol.SyncOptions.Profile) || (protocolOptions.UserSyncOptions.HasFlag(AuthenticationProtocol.SyncOptions.Roles)))
       {
@@ -243,6 +244,11 @@ public class ExternalAuthenticationHandler
           {
             this.Logger?.LogError(ex, "The LdapConnection bind operation for scheme '{scheme}' '{domain}' timed out.", protocolOptions.Scheme, protocolOptions.LdapDomain);
             connection = null;
+          }
+          catch (AggregateException ex)
+          {
+            this.Logger?.LogError(ex.GetBaseException(), "The LdapConnection bind operation for scheme '{scheme}' '{domain}' failed:", protocolOptions.Scheme, protocolOptions.LdapDomain);
+            connection = null;            
           }
           catch (LdapException ex)
           {
@@ -270,22 +276,22 @@ public class ExternalAuthenticationHandler
             .Select(claim => claim.Value)
             .FirstOrDefault();
 
-          List<Claim> userLdapClaims = GetLdapUserProperties(connection, userSid, this.Logger);
-
-          ClaimsIdentity identity = new(userLdapClaims, context.Scheme.Name);
-          context.Principal = new(identity);
-          context.Success();
-
-          // The code in the Negotiate handler doesn't raise the OnAuthenticated when we set a Success status from HandleLdapClaims
-          // so we have to call it ourselves
-          await CreateNucleusSession(context, protocolOptions);
-          //await HandleExternalAuthentication(context);
+          userLdapClaims = GetLdapUserProperties(connection, userSid, this.Logger);
         }
         else
         {
-          this.Logger?.LogWarning("HandleLdapClaims: Identity: {identity}.  LdapConnection is null, no query was sent.", context.Principal?.Identity?.Name);
-          context.Fail("LdapConnection is null.");
+          userLdapClaims = GetBasicUserProperties(context.Principal?.Identity?.Name, this.Logger);
         }
+
+        ClaimsIdentity identity = new(userLdapClaims, context.Scheme.Name);
+        context.Principal = new(identity);
+        context.Success();
+
+        // The code in the Negotiate handler doesn't raise the OnAuthenticated when we set a Success status from HandleLdapClaims
+        // so we have to call it ourselves
+        await CreateNucleusSession(context, protocolOptions);
+        //await HandleExternalAuthentication(context);
+
       }
     }
   }
@@ -547,6 +553,15 @@ public class ExternalAuthenticationHandler
     }
 
     return connection;
+  }
+
+  private static List<Claim> GetBasicUserProperties(string userName, ILogger logger)
+  {
+    List<Claim> results = new();
+
+    results.Add(new(ClaimTypes.Name, userName));
+
+    return results;
   }
 
   private static List<Claim> GetLdapUserProperties(LdapConnection connection, string userSid, ILogger logger)

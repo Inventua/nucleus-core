@@ -1,5 +1,14 @@
 <?xml version="1.0"?>
-<site-template xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="urn:nucleus:schemas:xml-site-template/v1">
+<site-template 
+  name="Default Site Template"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns="urn:nucleus:schemas:xml-site-template/v1">
+  
+  <description>
+    This is the default site template, which you should use for most new sites.  It contains a set of standard pages, roles, email templates and core scheduled tasks.
+  </description>
+  
 	<Site>
 		<Id>{$guid1}</Id>
 		<Name>Default Site</Name>
@@ -101,15 +110,7 @@
       <SiteSetting>
         <SettingName>sitepage:error</SettingName>
         <SettingValue>{$guid222}</SettingValue>
-      </SiteSetting>      
-      <SiteSetting>
-				<SettingName>favicon:provider</SettingName>
-				<SettingValue>local</SettingValue>
-			</SiteSetting>
-			<SiteSetting>
-				<SettingName>favicon:path</SettingName>
-				<SettingValue>favicon.ico</SettingValue>
-			</SiteSetting>
+      </SiteSetting> 
 			<SiteSetting>
 				<SettingName>mailtemplate:accountnamereminder</SettingName>
 				<SettingValue>{$guid21}</SettingValue>

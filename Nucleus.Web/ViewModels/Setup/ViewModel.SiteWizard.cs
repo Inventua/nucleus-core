@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
-using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace Nucleus.Web.ViewModels.Setup
@@ -49,14 +48,16 @@ namespace Nucleus.Web.ViewModels.Setup
 		public IEnumerable<LayoutDefinition> Layouts { get; set; }
 		public IEnumerable<ContainerDefinition> Containers { get; set; }
 
-		public class SiteTemplate
-		{
-			public string FileName { get; set; }
-			public string Title { get; set; }
+    public class SiteTemplate
+    {
+      public string FileName { get; set; }
+      public string Title { get; set; }
+      public string Description { get; set; }
 
-			public SiteTemplate(string title, string filename)
+			public SiteTemplate(string title, string description, string filename)
 			{
 				this.Title = title;
+        this.Description = description;
 				this.FileName = filename;
 			}
 		}

@@ -21,6 +21,18 @@ namespace Nucleus.Abstractions.Models.Export
 		/// </remarks>
 		public const string NAMESPACE = "urn:nucleus:schemas:xml-site-template/v1";
 
+    /// <summary>
+    /// Template friendly name.
+    /// </summary>
+    [System.Xml.Serialization.XmlAttribute(AttributeName = "name")]
+    public string Name { get; set; }
+
+    /// <summary>
+    /// Template description.
+    /// </summary>
+    [System.Xml.Serialization.XmlElement(ElementName = "description")]
+    public string Description { get; set; }
+
 		/// <summary>
 		/// Site information.
 		/// </summary>

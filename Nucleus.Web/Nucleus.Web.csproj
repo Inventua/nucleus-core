@@ -88,6 +88,7 @@
 	  <None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.min.css" />
 	  <None Remove="Resources\material-icons.woff2" />
 	  <None Remove="Setup\Templates\Site\default-site-template.xml" />
+	  <None Remove="Setup\Templates\Site\empty-site-template.xml" />
 	  <None Remove="Shared\Containers\default.css" />
 	  <None Remove="Shared\Containers\default.min.css" />
 	  <None Remove="Shared\Controls\Views\PagingControl.css" />
@@ -143,6 +144,9 @@
 	  <Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.css" />
 	  <Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.min.css" />
 	  <Content Include="Resources\material-icons.woff2" />
+	  <Content Include="Setup\Templates\Site\empty-site-template.xml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	  <Content Include="Setup\Templates\Site\default-site-template.xml">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>

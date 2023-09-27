@@ -1,6 +1,20 @@
 ﻿var _progressHandle = -1;
 jQuery(document).ready(function ()
 {
+  jQuery('.site-template-list-group-item').on('click', function (event)
+  {
+    jQuery('#site-template-select').val(jQuery(this).attr('data-select'));
+
+    jQuery('.site-template-list-group-item').removeClass('active');
+    jQuery(this).addClass('active');
+  });
+
+  jQuery('#site-template-select').on('change', function (event)
+  {
+    jQuery('.site-template-list-group-item').removeClass('active');
+    jQuery('.site-template-list-group-item[data-select="' + jQuery(this).val() + '"]').addClass('active');
+  });
+
   jQuery('button[data-bs-toggle="tab"][data-bs-target="#user-settings"]').on('shown.bs.tab', function (event)
   {
     jQuery('#wizard-button-next').removeClass('show');

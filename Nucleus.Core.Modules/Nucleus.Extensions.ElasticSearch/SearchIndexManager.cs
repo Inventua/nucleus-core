@@ -17,6 +17,29 @@ namespace Nucleus.Extensions.ElasticSearch
 						
 		}
 
+    public async Task<Boolean> CanConnect(Site site)
+    {
+      if (site == null)
+      {
+        throw new NullReferenceException("site must not be null.");
+      }
+
+      ConfigSettings settings = new(site);
+
+      if (String.IsNullOrEmpty(settings.ServerUrl))
+      {
+        throw new InvalidOperationException($"The Elastic search server url is not set for site '{site.Name}'.");
+      }
+
+      if (String.IsNullOrEmpty(settings.IndexName))
+      {
+        throw new InvalidOperationException($"The Elastic search index name is not set for site '{site.Name}'.");
+      }
+
+      ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(site, settings.EncryptedPassword), settings.CertificateThumbprint);
+      return await request.Connect();
+    }
+
 		public async Task ClearIndex(Site site)
 		{
 			if (site == null)

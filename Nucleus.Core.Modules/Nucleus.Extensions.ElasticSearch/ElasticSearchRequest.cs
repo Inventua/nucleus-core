@@ -48,7 +48,7 @@ namespace Nucleus.Extensions.ElasticSearch
 			return this._client;			
 		}
 
-		private async Task<bool> Connect()
+		public async Task<bool> Connect()
 		{
 			SingleNodeConnectionPool connectionPool = new SingleNodeConnectionPool(this.Uri);
 			Nest.ConnectionSettings connectionSettings = new Nest.ConnectionSettings(connectionPool);

@@ -1047,9 +1047,35 @@ namespace Nucleus.Core.DataProviders
 				.ToListAsync();
 
 			return new Nucleus.Abstractions.Models.Paging.PagedResult<User>(pagingSettings, results);
-		}
+    }
 
-		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> SearchUsers(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+    public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListUsers(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings, Expression<Func<User, bool>> filterExpression)
+    {
+      List<User> results;
+
+      var query = this.Context.Users
+        .Where(user => user.IsSystemAdministrator == false && user.SiteId == site.Id)
+        .Where(filterExpression);
+
+      pagingSettings.TotalCount = await query
+        .CountAsync();
+
+      results = await query
+        .Include(user => user.Roles)
+          .ThenInclude(role => role.RoleGroup)
+        .Include(user => user.Profile)
+          .ThenInclude(profilevalue => profilevalue.UserProfileProperty)
+        .OrderBy(user => user.UserName)
+        .Skip(pagingSettings.FirstRowIndex)
+        .Take(pagingSettings.PageSize)
+        .AsSplitQuery()
+        .AsNoTracking()
+        .ToListAsync();
+
+      return new Nucleus.Abstractions.Models.Paging.PagedResult<User>(pagingSettings, results);
+    }    
+
+    public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> SearchUsers(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
 		{
 			List<User> results;
 
@@ -1079,10 +1105,37 @@ namespace Nucleus.Core.DataProviders
 				.ToListAsync();
 
 			return new Nucleus.Abstractions.Models.Paging.PagedResult<User>(pagingSettings, results);
-		}
+    }
 
+    public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> SearchUsers(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings, Expression<Func<User, bool>> filterExpression)
+    {
+      List<User> results;
+      var query = this.Context.Users
+        .Where(filterExpression)
+        .Where(user => user.SiteId == site.Id &&
+          (
+            EF.Functions.Like(user.UserName, $"%{searchTerm}%")
+          )
+        );
 
-		public async Task<User> GetUserByName(Site site, string userName)
+      pagingSettings.TotalCount = await query.CountAsync();
+
+      results = await query
+        .Include(user => user.Roles)
+          .ThenInclude(role => role.RoleGroup)
+        .Include(user => user.Profile)
+          .ThenInclude(profilevalue => profilevalue.UserProfileProperty)
+        .OrderBy(user => user.UserName)
+        .Skip(pagingSettings.FirstRowIndex)
+        .Take(pagingSettings.PageSize)
+        .AsSplitQuery()
+        .AsNoTracking()
+        .ToListAsync();
+
+      return new Nucleus.Abstractions.Models.Paging.PagedResult<User>(pagingSettings, results);
+    }
+    
+    public async Task<User> GetUserByName(Site site, string userName)
 		{
 			return await this.Context.Users
 				.Where(user => user.SiteId == site.Id && user.UserName == userName)

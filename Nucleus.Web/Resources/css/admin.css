@@ -938,6 +938,20 @@ ul.nucleus-control-panel-items button
 	overflow: auto;
 }
 
+.user-filter-options
+{
+	width: 22rem;
+	position: absolute;
+	top: 2.7rem;
+	border: solid 1px #bbb;
+	padding: 1rem;
+	box-shadow: 2px 2px 6px #bbb;
+	background: white;	
+	z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
 .text-break
 {
 	white-space: break-spaces;

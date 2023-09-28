@@ -16,6 +16,7 @@ using Microsoft.Extensions.Options;
 using Nucleus.Extensions.Authorization;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Excel;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -51,11 +52,11 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", await BuildViewModel());
 		}
 
-		/// <summary>
-		/// Display the user list
-		/// </summary>
-		/// <returns></returns>
-		[HttpPost]
+    /// <summary>
+    /// Display the user list
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
 		public async Task<ActionResult> List(ViewModels.Admin.UserIndex viewModel)
 		{
 			return View("_UserList", await BuildViewModel(viewModel));
@@ -68,8 +69,9 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> Search(ViewModels.Admin.UserIndex viewModel)
 		{
-			viewModel.SearchResults = await this.UserManager.Search(this.Context.Site, viewModel.SearchTerm, viewModel.SearchResults);
+			viewModel.SearchResults = await this.UserManager.Search(this.Context.Site, viewModel.SearchTerm, viewModel.SearchResults, BuildFilter(viewModel.FilterSelections));
 			viewModel.Site = this.Context.Site;
+
 			return View("SearchResults", viewModel);
 		}
 
@@ -81,7 +83,7 @@ namespace Nucleus.Web.Controllers.Admin
 		public async Task<ActionResult> Export()
 		{
 			IList<User> users = await this.UserManager.List(this.Context.Site);
-
+      
 			var exporter = new ExcelWriter<User>
 			(
         ExcelWorksheet.Modes.IncludeSpecifiedPropertiesOnly
@@ -232,6 +234,78 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", await BuildViewModel());
 		}
 
+    private async Task<IEnumerable<SelectListItem>> GetAvailableUserRoles(User user)
+    {
+      IEnumerable<Role> availableRoles = (await this.RoleManager.List(this.Context.Site))
+        .Where
+        (
+          role => !role.Type.HasFlag(Role.RoleType.Restricted) && !user.Roles?.Contains(role) == true
+        )
+        .OrderBy(role => role.Name);
+
+      IEnumerable<string> roleGroups = availableRoles
+        .Where(role => role.RoleGroup != null)
+        .Select(role => role.RoleGroup.Name)
+        .Distinct()
+        .OrderBy(name => name);
+
+      Dictionary<string, SelectListGroup> groups = roleGroups.ToDictionary(name => name, name => new SelectListGroup() { Name = name });
+
+      return availableRoles.Select(role => new SelectListItem(role.Name, role.Id.ToString())
+      {
+        Group = groups.Where(group => role.RoleGroup != null && role.RoleGroup.Name == group.Key).FirstOrDefault().Value
+      })
+      .OrderBy(selectListItem => selectListItem.Group?.Name);
+    }
+
+
+    private async Task<IEnumerable<SelectListItem>> GetFilterRoles()
+    {
+      IEnumerable<Role> availableRoles = (await this.RoleManager.List(this.Context.Site))
+        .Where
+        (
+          role => !role.Type.HasFlag(Role.RoleType.Restricted)
+        )
+        .OrderBy(role => role.Name);
+
+      IEnumerable<string> roleGroups = availableRoles
+        .Where(role => role.RoleGroup != null)
+        .Select(role => role.RoleGroup.Name)
+        .Distinct()
+        .OrderBy(name => name);
+
+      Dictionary<string, SelectListGroup> groups = roleGroups.ToDictionary(name => name, name => new SelectListGroup() { Name = name });
+
+      return availableRoles.Select(role => new SelectListItem(role.Name, role.Id.ToString())
+      {
+        Group = groups.Where(group => role.RoleGroup != null && role.RoleGroup.Name == group.Key).FirstOrDefault().Value
+      })
+      .OrderBy(selectListItem => selectListItem.Group?.Name);
+    }
+        
+    private System.Linq.Expressions.Expression<Func<User, bool>> BuildFilter(ViewModels.Admin.UserFilterOptions filterOptions)
+    {
+      return 
+      (
+        user =>
+        (
+          filterOptions.RoleId == null || (user.Roles.Where(role => role.Id == filterOptions.RoleId).Any())
+        ) 
+        &&
+        (
+          filterOptions.Approved == ViewModels.Admin.UserFilterOptions.ApprovedFilter.All ||
+          (filterOptions.Approved == ViewModels.Admin.UserFilterOptions.ApprovedFilter.ApprovedOnly && user.Approved) ||
+          (filterOptions.Approved == ViewModels.Admin.UserFilterOptions.ApprovedFilter.NotApprovedOnly && !user.Approved)
+        )
+        &&
+        (
+          filterOptions.Verified == ViewModels.Admin.UserFilterOptions.VerifiedFilter.All ||
+          (filterOptions.Verified == ViewModels.Admin.UserFilterOptions.VerifiedFilter.VerifiedOnly && user.Verified) ||
+          (filterOptions.Verified == ViewModels.Admin.UserFilterOptions.VerifiedFilter.NotVerifiedOnly && !user.Verified)
+        )
+      );
+    }
+
 		private async Task<ViewModels.Admin.UserIndex> BuildViewModel()
 		{
 			return await BuildViewModel(new ViewModels.Admin.UserIndex());
@@ -239,12 +313,13 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private async Task<ViewModels.Admin.UserIndex> BuildViewModel(ViewModels.Admin.UserIndex viewModel)
 		{
-			viewModel.Users = await this.UserManager.List(this.Context.Site, viewModel.Users);
+      viewModel.Users = await this.UserManager.List(this.Context.Site, viewModel.Users, BuildFilter(viewModel.FilterSelections));
 			viewModel.Site = this.Context.Site;
-			return viewModel;
+      viewModel.FilterRoles = await GetFilterRoles();
+      return viewModel;
 		}
 
-		private async Task<ViewModels.Admin.UserEditor> BuildViewModel(User user)
+    private async Task<ViewModels.Admin.UserEditor> BuildViewModel(User user)
 		{
 			ViewModels.Admin.UserEditor viewModel = new();
 
@@ -256,13 +331,15 @@ namespace Nucleus.Web.Controllers.Admin
 
       if (viewModel.User != null)
 			{
-				foreach (Role role in await this.RoleManager.List(this.Context.Site))
-				{
-					if (!((role.Type & Role.RoleType.Restricted) == Role.RoleType.Restricted) && !viewModel.User.Roles?.Contains(role) == true)
-					{
-						viewModel.AvailableRoles.Add(role);
-					}
-				}
+        viewModel.AvailableRoles = await GetAvailableUserRoles(viewModel.User);
+
+        //foreach (Role role in await this.RoleManager.List(this.Context.Site))
+				//{
+				//	if (!((role.Type & Role.RoleType.Restricted) == Role.RoleType.Restricted) && !viewModel.User.Roles?.Contains(role) == true)
+				//	{
+				//		viewModel.AvailableRoles.Add(role);
+				//	}
+				//}
 			}
 
 			return viewModel;

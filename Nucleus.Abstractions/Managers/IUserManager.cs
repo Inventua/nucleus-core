@@ -4,6 +4,7 @@ using System.Linq;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Configuration;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace Nucleus.Abstractions.Managers
 {
@@ -145,11 +146,21 @@ namespace Nucleus.Abstractions.Managers
 		/// <returns></returns>
 		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> List(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 
-		/// <summary>
-		/// List all System Administrator <see cref="User"/>s.
+    /// <summary>
+		/// List a page of <see cref="User"/>s who belong to the specified <see cref="Site"/>.
 		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="pagingSettings"></param>
+    /// <param name="filterExpression"></param>
 		/// <returns></returns>
-		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListSystemAdministrators(Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
+		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> List(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings, Expression<Func<User, bool>> filterExpression);
+
+    
+    /// <summary>
+    /// List all System Administrator <see cref="User"/>s.
+    /// </summary>
+    /// <returns></returns>
+    public Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListSystemAdministrators(Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 
 		/// <summary>
 		/// Count the number of System Administrator <see cref="User"/>s.
@@ -166,12 +177,23 @@ namespace Nucleus.Abstractions.Managers
 		/// <returns></returns>
 		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> Search(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 
-		/// <summary>
-		/// Create or update the specified <see cref="User"/>.
+    /// <summary>
+		/// Returns a list of <see cref="User"/>s whi match the specified searchTerm.
 		/// </summary>
 		/// <param name="site"></param>
-		/// <param name="user"></param>
-		public Task Save(Site site, User user);
+		/// <param name="searchTerm"></param>
+		/// <param name="pagingSettings"></param>
+    /// <param name="filterExpression"></param>
+		/// <returns></returns>
+		public Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> Search(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings, Expression<Func<User, bool>> filterExpression);
+
+    
+    /// <summary>
+    /// Create or update the specified <see cref="User"/>.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <param name="user"></param>
+    public Task Save(Site site, User user);
 
 		/// <summary>
 		/// Set <see cref="User"/> approved and verified flags based on site settings.

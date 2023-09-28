@@ -104,15 +104,14 @@
 		<TabPanel id="user-roles">
 			<fieldset role="group" aria-labelledby="heading">
 				<h2>Roles</h2>
-				@if (Model.AvailableRoles.Count > 0)
+				@if (Model.AvailableRoles?.Any() == true)
 				{
 					<div class="nucleus-form-tools">
-						@Html.DropDownListFor((model) => model.SelectedRoleId, new SelectList(Model.AvailableRoles, "Id", "Name"), new { @class = "flex-fill" })
+						@Html.DropDownListFor((model) => model.SelectedRoleId, Model.AvailableRoles, new { @class = "flex-fill" })
 						<button type="submit" formaction="@Url.AreaAction("AddRole", "Users", "Admin")" data-target=".UserEditor" class="btn btn-secondary">Add Role</button>
 					</div>
 				}
 				<table>
-
 					@for (int roleCount = 0; roleCount < Model.User.Roles?.Count; roleCount++)
 					{
 						<tr>

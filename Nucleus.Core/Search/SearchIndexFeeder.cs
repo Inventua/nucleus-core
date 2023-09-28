@@ -75,7 +75,7 @@ namespace Nucleus.Core.Search
             }
             else
             {
-              this.Logger?.LogError("Search index provider {providername} did not connect using the settings for site '{site}', and will not receive data.", searchIndexManager.GetType().FullName, fullSite.Name);
+              this.Logger?.LogInformation("Search index provider {providername} did not connect using the settings for site '{site}', and will not receive data.", searchIndexManager.GetType().FullName, fullSite.Name);
             }
           }
           catch (Exception e)

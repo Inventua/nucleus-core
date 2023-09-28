@@ -13,7 +13,6 @@ using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Nucleus.Core.Logging;
 using Nucleus.Extensions;
-using System.Runtime.CompilerServices;
 
 namespace Nucleus.Core.Search
 {

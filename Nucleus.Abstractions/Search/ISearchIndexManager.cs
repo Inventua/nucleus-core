@@ -16,6 +16,16 @@ namespace Nucleus.Abstractions.Search
 	/// </remarks>	
 	public interface ISearchIndexManager
 	{
+    /// <summary>
+    /// Return whether the underlying search system is available.
+    /// </summary>
+    /// <param name="site">Specifies the site.  Implementations can store per-site settings.</param>
+    /// <returns></returns>
+    /// <remarks>
+    /// Implementation of this method is optional.  
+    /// </remarks>
+    public Task<Boolean> CanConnect(Site site) { return Task.FromResult(true); }
+
 		/// <summary>
 		/// Clear all entries from the index.
 		/// </summary>

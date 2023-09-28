@@ -9,6 +9,7 @@ using Nucleus.Abstractions.Models.TaskScheduler;
 using Nucleus.Data.Common;
 using Nucleus.Core.DataProviders;
 using Nucleus.Abstractions.Managers;
+using System.Threading;
 
 namespace Nucleus.Core.Managers
 {
@@ -19,6 +20,7 @@ namespace Nucleus.Core.Managers
 	{
 		private ICacheManager CacheManager { get; }
 		private IDataProviderFactory DataProviderFactory { get; }
+    private static readonly SemaphoreSlim historySemaphore = new(1, 1);
 
 		public ScheduledTaskManager(IDataProviderFactory dataProviderFactory, ICacheManager cacheManager)
 		{
@@ -126,10 +128,20 @@ namespace Nucleus.Core.Managers
 		/// <param name="scheduledTask"></param>
 		public async Task SaveHistory(ScheduledTaskHistory history)
 		{
-			using (IScheduledTaskDataProvider provider = this.DataProviderFactory.CreateProvider<IScheduledTaskDataProvider>())
-			{
-				await provider.SaveScheduledTaskHistory(history);				
-			}
+      // the task scheduler runs operations in parallel, and thus can call SaveHistory in parallel.  We have to serialize calls to SaveScheduledTaskHistory
+      // so that entiry framework does not throw exceptions as a result of trying to save a new history twice "at once" and having one fail
+      await historySemaphore.WaitAsync();
+      try
+      {
+        using (IScheduledTaskDataProvider provider = this.DataProviderFactory.CreateProvider<IScheduledTaskDataProvider>())
+        {          
+          await provider.SaveScheduledTaskHistory(history);
+        }
+      }
+      finally
+      {
+        historySemaphore.Release();
+      }
 		}
 
 		/// <summary>

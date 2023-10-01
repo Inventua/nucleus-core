@@ -96,13 +96,14 @@ public class SignupController : Controller
 
       await this.UserManager.Save(this.Context.Site, newUser);
 
+      if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
+      
       if (newUser.Approved && newUser.Verified)
       {
         UserSession session = await this.SessionManager.CreateNew(this.Context.Site, newUser, false, ControllerContext.HttpContext.Connection.RemoteIpAddress);
         await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
       }
 
-      if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
       string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
 
       ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);

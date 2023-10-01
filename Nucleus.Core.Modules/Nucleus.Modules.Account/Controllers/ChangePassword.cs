@@ -127,8 +127,9 @@ namespace Nucleus.Modules.Account.Controllers
           {
             this.Logger?.LogInformation("Saving password change for {user}.", loginUser.UserName);
             await this.UserManager.SetPassword(loginUser, viewModel.NewPassword);
-						
-						string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
+
+            if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
+            string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
 						ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
 						return StatusCode((int)System.Net.HttpStatusCode.Found);
 					}

@@ -244,6 +244,8 @@ public class LoginController : Controller
             }
           }
 
+          if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
+
           UserSession session = await this.SessionManager.CreateNew(this.Context.Site, loginUser, viewModel.AllowRememberMe && viewModel.RememberMe, ControllerContext.HttpContext.Connection.RemoteIpAddress);
           await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
 

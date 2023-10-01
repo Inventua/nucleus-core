@@ -93,14 +93,14 @@ namespace Nucleus.Web.Controllers
 			if (loginUser == null)
 			{
 				await Task.Delay(TimeSpan.FromSeconds(10));
-				return Json(new { Title = "Login", Message = "Invalid username or password." });
+				return Json(new { Title = "Login", Message = "Invalid user name or password." });
 			}
 			else
 			{
 				if (!await this.UserManager.VerifyPassword(loginUser, viewModel.Password))
 				{
 					await Task.Delay(TimeSpan.FromSeconds(10));
-					return Json(new { Title = "Login", Message = "Invalid username or password." });
+					return Json(new { Title = "Login", Message = "Invalid user name or password." });
 				}
 				else
 				{
@@ -191,7 +191,7 @@ namespace Nucleus.Web.Controllers
 
 			if (loginUser == null)
 			{
-				ModelState.AddModelError<ViewModels.User.AccountPassword>(model => model.Password, "Invalid username or password.");
+				ModelState.AddModelError<ViewModels.User.AccountPassword>(model => model.Password, "Invalid password.");
         return BadRequest(ModelState);
       }
 			else
@@ -217,7 +217,9 @@ namespace Nucleus.Web.Controllers
           else 
           {
 						await this.UserManager.SetPassword(loginUser, viewModel.NewPassword);
-						return Redirect(Url.Content(String.IsNullOrEmpty(viewModel.ReturnUrl) ? "~/" : viewModel.ReturnUrl));
+
+            if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
+            return Redirect(Url.Content(String.IsNullOrEmpty(viewModel.ReturnUrl) ? "~/" : viewModel.ReturnUrl));
 					}
 				}
 			}
@@ -259,7 +261,8 @@ namespace Nucleus.Web.Controllers
 				await this.UserManager.Save(this.Context.Site, existing);
 			}
 
-			return Redirect(Url.Content(String.IsNullOrEmpty(viewModel.ReturnUrl) ? "~/" : viewModel.ReturnUrl));
+      if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
+      return Redirect(Url.Content(String.IsNullOrEmpty(viewModel.ReturnUrl) ? "~/" : viewModel.ReturnUrl));
 		}
 	}
 }

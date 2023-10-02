@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models.FileSystem;
+using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.ViewFeatures.Controls
 {
@@ -99,13 +100,16 @@ namespace Nucleus.ViewFeatures.Controls
 			// Populate the folders list with "children" of the currently selected folder
 			if (viewModel.SelectedFile?.Parent != null && viewModel.SelectedFile.Parent.Id != Guid.Empty)
 			{
-				viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFile.Parent.Id, pattern);
+				viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFile.Parent.Id, HttpContext.User, pattern);
 			}
 			else
 			{
-				// This handles the ".." navigation list item, which doesn't have a real ID
-				viewModel.SelectedFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFile.Provider, viewModel.SelectedFile.Parent?.Path ?? "");
-				viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFolder.Id, pattern);
+        // This handles the ".." navigation list item, which doesn't have a real ID
+        if (HttpContext.User.HasBrowsePermission(this.Context.Site, viewModel.SelectedFile.Parent))
+        {
+          viewModel.SelectedFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFile.Provider, viewModel.SelectedFile.Parent?.Path ?? "");
+          viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFolder.Id, HttpContext.User, pattern);
+        }
 			}
 
 			// copy the selected folder so that changes made below don't get reflected in cache

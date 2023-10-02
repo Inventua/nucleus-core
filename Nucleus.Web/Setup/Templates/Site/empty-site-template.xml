@@ -118,6 +118,12 @@
       <SortOrder>1</SortOrder>
       <Scope>urn:nucleus:entities:folder/permissiontype/edit</Scope>
     </PermissionType>
+    <PermissionType>
+      <Id>77d424bf-e5eb-4e70-9b08-72ecce931683</Id>
+      <Name>Browse</Name>
+      <SortOrder>2</SortOrder>
+      <Scope>urn:nucleus:entities:folder/permissiontype/browse</Scope>
+    </PermissionType>
   </PermissionTypes>
   <ScheduledTasks>
     <ScheduledTask>

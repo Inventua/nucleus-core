@@ -23,7 +23,7 @@ namespace Nucleus.Extensions
 		{
 			PermissionsList results = new();
 
-			foreach (Role role in permissions
+      foreach (Role role in permissions
 				.Select((permission) => permission.Role)
 				.GroupBy(role => role.Id)
 				.Select(group => group.FirstOrDefault())

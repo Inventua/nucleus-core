@@ -1668,7 +1668,7 @@ namespace Nucleus.Core.DataProviders
 			foreach (Permission newPermission in newPermissions.Where(permission => permission.PermissionType.Scope != PermissionType.PermissionScopeNamespaces.Disabled))
 			{
 				Permission existing = existingPermissions
-          .Where(existing => existing.Id == newPermission.Id || (existing.Role.Id == newPermission.Role.Id && existing.PermissionType.Id == newPermission.PermissionType.Id))
+          .Where(existing => (existing.Id != Guid.Empty && existing.Id == newPermission.Id) || (existing.Role.Id == newPermission.Role.Id && existing.PermissionType.Id == newPermission.PermissionType.Id))
           .FirstOrDefault();
                 
         if (existing == null)

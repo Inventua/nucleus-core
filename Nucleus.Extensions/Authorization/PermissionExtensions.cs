@@ -106,22 +106,43 @@ namespace Nucleus.Extensions.Authorization
 			return IsFolderViewPermission(permission.PermissionType);
 		}
 
-		/// <summary>
-		/// Returns a true/false value indicating whether the specified permission typeis a <see cref="Folder"/> View permission.
+    /// <summary>
+		/// Returns a true/false value indicating whether the specified permission is a <see cref="Folder"/> View permission.
 		/// </summary>
-		/// <param name="permissionType"></param>
+		/// <param name="permission"></param>
 		/// <returns></returns>
-		public static Boolean IsFolderViewPermission(this PermissionType permissionType)
+		public static Boolean IsFolderBrowsePermission(this Permission permission)
+    {
+      return IsFolderBrowsePermission(permission.PermissionType);
+    }
+
+    /// <summary>
+    /// Returns a true/false value indicating whether the specified permission typeis a <see cref="Folder"/> View permission.
+    /// </summary>
+    /// <param name="permissionType"></param>
+    /// <returns></returns>
+    public static Boolean IsFolderViewPermission(this PermissionType permissionType)
 		{
 			return permissionType.Scope == PermissionType.PermissionScopes.FOLDER_VIEW;
 		}
 
-		/// <summary>
-		/// Returns a true/false value indicating whether the specified permission is a <see cref="Folder"/> Edit permission.
-		/// </summary>
-		/// <param name="permission"></param>
-		/// <returns></returns>
-		public static Boolean IsFolderEditPermission(this Permission permission)
+    /// <summary>
+    /// Returns a true/false value indicating whether the specified permission typeis a <see cref="Folder"/> View permission.
+    /// </summary>
+    /// <param name="permissionType"></param>
+    /// <returns></returns>
+    public static Boolean IsFolderBrowsePermission(this PermissionType permissionType)
+    {
+      return permissionType.Scope == PermissionType.PermissionScopes.FOLDER_BROWSE;
+    }
+
+
+    /// <summary>
+    /// Returns a true/false value indicating whether the specified permission is a <see cref="Folder"/> Edit permission.
+    /// </summary>
+    /// <param name="permission"></param>
+    /// <returns></returns>
+    public static Boolean IsFolderEditPermission(this Permission permission)
 		{
 			return IsFolderEditPermission(permission.PermissionType);
 		}
@@ -529,14 +550,45 @@ namespace Nucleus.Extensions.Authorization
 			return false;
 		}
 
-		/// <summary>
-		/// Returns a true/false value indicating whether the user has edit rights for the folder.
+    /// <summary>
+		/// Returns a true/false value indicating whether the user has browse rights for the folder.
 		/// </summary>
 		/// <param name="user"></param>
 		/// <param name="site"></param>
 		/// <param name="folder"></param>
 		/// <returns></returns>
-		public static Boolean HasEditPermission(this System.Security.Claims.ClaimsPrincipal user, Site site, Folder folder)
+		public static Boolean HasBrowsePermission(this System.Security.Claims.ClaimsPrincipal user, Site site, Folder folder)
+    {
+      if (folder == null) return false;
+
+      // system administrators and site administrators always have browse permission
+      if (user.IsSystemAdministrator() || user.IsSiteAdmin(site))
+      {
+        return true;
+      }
+
+      foreach (Permission permission in folder.Permissions)
+      {
+        if (permission.IsFolderBrowsePermission())
+        {
+          if (permission.IsValid(site, user))
+          {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    }
+
+    /// <summary>
+    /// Returns a true/false value indicating whether the user has edit rights for the folder.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="site"></param>
+    /// <param name="folder"></param>
+    /// <returns></returns>
+    public static Boolean HasEditPermission(this System.Security.Claims.ClaimsPrincipal user, Site site, Folder folder)
 		{
 			if (user.IsSystemAdministrator() || user.IsSiteAdmin(site))
 			{

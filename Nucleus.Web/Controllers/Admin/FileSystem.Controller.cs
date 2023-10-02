@@ -212,7 +212,7 @@ namespace Nucleus.Web.Controllers.Admin
 			List<string> nonEmptyFolders = new();
 			foreach (Folder selectedFolder in selectedFolders)
 			{
-				Folder folderDetails = await this.FileSystemManager.ListFolder(this.Context.Site, selectedFolder.Id, "");
+				Folder folderDetails = await this.FileSystemManager.ListFolder(this.Context.Site, selectedFolder.Id, HttpContext.User, "");
 				if (folderDetails != null && (folderDetails.Files.Any() || folderDetails.Folders.Any()))
 				{
 					nonEmptyFolders.Add($"'{folderDetails.Name}'");
@@ -290,7 +290,7 @@ namespace Nucleus.Web.Controllers.Admin
 		private async Task AddFolderToZip(ZipArchive archive, Folder folder)
 		{
 			// the folder object won't be fully populated from model binding, so we have to re-read it 
-			folder = await this.FileSystemManager.ListFolder(this.Context.Site, folder.Id, "");
+			folder = await this.FileSystemManager.ListFolder(this.Context.Site, folder.Id, HttpContext.User, "");
 
 			foreach (File file in folder.Files)
 			{
@@ -572,7 +572,7 @@ namespace Nucleus.Web.Controllers.Admin
             settings.PageSizes = new() { 250, 500 };              
           }
 
-          PagedResult<FileSystemItem> fileSystemItems = await this.FileSystemManager.ListFolder(this.Context.Site, folder.Id, "", settings);
+          PagedResult<FileSystemItem> fileSystemItems = await this.FileSystemManager.ListFolder(this.Context.Site, folder.Id, HttpContext.User, "", settings);
           viewModel.PagingSettings = fileSystemItems;
 
           viewModel.Folders = fileSystemItems.Items
@@ -640,7 +640,7 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.AvailableFolderRoles = await GetAvailableRoles(viewModel.Folder?.Permissions);
 
 			viewModel.FolderPermissionTypes = await this.FileSystemManager.ListFolderPermissionTypes();
-			viewModel.FolderPermissions = viewModel.Folder.Permissions.ToPermissionsList(this.Context.Site);
+      viewModel.FolderPermissions = viewModel.Folder.Permissions.ToPermissionsList(this.Context.Site);
 
 			return viewModel;
 		}

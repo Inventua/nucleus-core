@@ -45,7 +45,7 @@
 					</div>
 					@if (Model.SelectedDocument.File?.Id == Guid.Empty)
 					{
-						<div class="nucleus-flex-fields nucleus-fileselector">
+            <div class="nucleus-flex-fields nucleus-fileselector mt-2">
 							@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { folder = Model.SelectedDocument.File?.Parent })
 						</div>
 					}

@@ -27,9 +27,31 @@ namespace Nucleus.Core.Managers
 		{
 			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
 			{
-				return await provider.ListPermissions(Id, permissionNameSpace);
-			}
-		}
+        List<PermissionType> permissionTypes = await ListPermissionTypes(permissionNameSpace);
+        List<Permission> results =  await provider.ListPermissions(Id, permissionNameSpace);
+        
+        // make sure the permissions list is fully populated (in case more permission types for the entity have been added since
+        // it was created)
+        foreach (PermissionType permissionType in permissionTypes)
+        {
+          foreach (Role role in results.Select(permissions => permissions.Role).ToList())
+          {
+            if (!results.Where(permission => permission.PermissionType.Scope == permissionType.Scope && permission.Role.Id == role.Id).Any())
+            {
+              // a role does not have an available permission, add 
+              results.Add(new Permission()
+              {
+                AllowAccess = false,
+                Role = role,
+                PermissionType = permissionType
+              });
+            }
+          }
+        }
+
+        return results;
+      }
+    }
 
 		public async Task<List<PermissionType>> ListPermissionTypes(string scopeNamespace)
 		{

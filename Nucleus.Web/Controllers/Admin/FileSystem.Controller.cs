@@ -68,8 +68,7 @@ namespace Nucleus.Web.Controllers.Admin
 		/// </summary>
 		/// <remarks>
 		/// This action DOES NOT check for a "current folder cookie".
-		/// </remarks>
-		[HttpGet]
+		/// </remarks>		
 		[HttpPost]
 		public async Task<ActionResult> Navigate(ViewModels.Admin.FileSystem viewModel, Guid folderId)
 		{
@@ -89,7 +88,13 @@ namespace Nucleus.Web.Controllers.Admin
 				try
 				{
 					folder = await this.FileSystemManager.GetFolder(this.Context.Site, folderId);
-				}
+
+          // handle provider change/selection in the UI
+          if (viewModel.SelectedProviderKey != null && folder?.Provider != viewModel.SelectedProviderKey)
+          {
+            folder = null;
+          }
+        }
 				catch (System.IO.FileNotFoundException)
 				{
 					// this handles the case where the "most recent" folder has been deleted

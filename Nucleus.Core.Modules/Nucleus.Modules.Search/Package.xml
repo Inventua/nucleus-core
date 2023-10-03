@@ -6,7 +6,7 @@
   <description>
 		Search module and basic search provider.
 	</description>
-  <compatibility minVersion="1.2.0.0" maxVersion="*" />
+  <compatibility minVersion="1.2.1.17" maxVersion="*" />
   <components>
     <component folderName="Search" optional="false">
       <moduleDefinition id="c225f388-e5c1-48e2-9352-237cd8d0d2b6">

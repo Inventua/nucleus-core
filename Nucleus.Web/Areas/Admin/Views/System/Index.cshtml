@@ -125,7 +125,7 @@
     </TabPanel>*@
 
     <TabPanel id="system-database">
-      <table class="table">
+      <table class="table table-sm table-borderless">
         <thead>
           <tr>
             <th scope="col" class="text-nowrap">Schema</th>
@@ -147,7 +147,7 @@
                   @foreach (var keyValue in connection.DatabaseInformation)
                   {
                     <tr>
-                      <th scope="row" class="text-nowrap w-25"><h3>@keyValue.Key</h3></th>
+                      <th scope="row" class="text-nowrap w-25 px-2"><h3>@keyValue.Key</h3></th>
                       <td>@keyValue.Value</td>
                     </tr>
                   }

@@ -31,6 +31,7 @@ namespace Nucleus.Web.Controllers.Admin
 		private IPageModuleManager PageModuleManager { get; }
 		private IRoleManager RoleManager { get; }
     private IFileSystemManager FileSystemManager { get; set; }
+    private IUserManager UserManager { get; set; }
 
 		public PagesController(
 			Context context,
@@ -39,6 +40,7 @@ namespace Nucleus.Web.Controllers.Admin
 			IPageModuleManager pageModuleManager,
       IFileSystemManager fileSystemManager,
 			IRoleManager roleManager,
+      IUserManager userManager,
 			ILayoutManager layoutManager,
 			IContainerManager containerManager)
 		{
@@ -46,6 +48,7 @@ namespace Nucleus.Web.Controllers.Admin
 			this.Logger = logger;
 			this.PageManager = pageManager;
 			this.PageModuleManager = pageModuleManager;
+      this.UserManager = userManager;
 			this.RoleManager = roleManager;
 			this.LayoutManager = layoutManager;
 			this.ContainerManager = containerManager;
@@ -64,15 +67,31 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Display the pages index
+		/// Search pages and display the results
 		/// </summary>
 		/// <returns></returns>
 		[HttpPost]
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
 		public async Task<ActionResult> Search(ViewModels.Admin.PageIndex viewModel)
 		{
-			
-			viewModel.SearchResults = await this.PageManager.Search(this.Context.Site, viewModel.SearchTerm, viewModel.SearchResults);
+      User user = await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId());
+      
+      List<Role> roles = new() { this.Context.Site.AllUsersRole };
+      
+      if (HttpContext.User.IsSiteAdmin(this.Context.Site))
+      {
+        roles = null;
+      }
+      else if (HttpContext.User.IsAnonymous())
+      {
+        roles.Add(this.Context.Site.AnonymousUsersRole);
+      }
+      else
+      {
+        roles.AddRange((await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId()))?.Roles);
+      }
+
+      viewModel.SearchResults = await this.PageManager.Search(this.Context.Site, viewModel.SearchTerm, roles, viewModel.SearchResults);
 
 			return View("SearchResults", viewModel);
 		}

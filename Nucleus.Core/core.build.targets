@@ -9,7 +9,7 @@
 	<PropertyGroup>
 		<!--<VersionPrefix>1.2.0.0</VersionPrefix>-->
     <VersionPrefix>1.2.1.17-pre</VersionPrefix>
-		<VersionSuffix>a4</VersionSuffix>
+		<VersionSuffix>a7</VersionSuffix>
 		<Authors>Inventua Pty Ltd</Authors>
 		<Product>Nucleus</Product>
 		<Copyright>(c) Inventua Pty Ptd</Copyright>

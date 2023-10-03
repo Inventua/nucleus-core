@@ -55,8 +55,13 @@
 			@foreach (var result in Model.SearchResults.Results)
 			{
 				<div class="search-result">
-          <a class="d-block result-link" href="@result.Url" title="@result.Title">@result.Title</a>
-
+          <div>
+            <a class="result-link" href="@result.Url" title="@result.Title">@result.Title</a>
+            @if (Model.Settings.ShowType && !String.IsNullOrEmpty(result.Type))
+            {
+              <span class="fst-italic small text-muted result-type">@result.Type</span>
+            }
+          </div>          
           @if (Model.Settings.ShowUrl)
 					{
 						<span class="fst-italic small result-url">@Url.GetAbsoluteUri(result.Url)</span>
@@ -99,6 +104,23 @@
 	}
 }
 <script>
+  // position the suggestions drop-down below the search term text box
+  try
+  {
+    jQuery('.search-suggestions').each(function(index) 
+    {
+      var element = jQuery(this).parents('section').find('.search-term');
+      if (element.length !== 0)
+      {
+        jQuery(this).css('left', element.offset().left);
+      }
+    });
+  }
+  catch (error)
+  {
+    console.error(error);
+  }
+
   @if (!String.IsNullOrEmpty(Model.SearchTerm) && Model.SearchResults != null)
   { 
     <text>

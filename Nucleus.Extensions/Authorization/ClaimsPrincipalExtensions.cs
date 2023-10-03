@@ -71,12 +71,22 @@ namespace Nucleus.Extensions.Authorization
 			}
 		}
 
-		/// <summary>
-		/// Retrieve a true/false value indicating whether the user (claims principal) account has been approved.
+    /// <summary>
+		/// Retrieve a true/false value indicating whether the user (claims principal) is anonymous (not logged on).
 		/// </summary>
 		/// <param name="user"></param>
 		/// <returns></returns>
-		public static Boolean IsApproved(this ClaimsPrincipal user)
+		public static Boolean IsAnonymous(this System.Security.Claims.ClaimsPrincipal user)
+    {
+      return user.HasClaim(claim => claim.Type == ClaimTypes.Anonymous);
+    }
+
+    /// <summary>
+    /// Retrieve a true/false value indicating whether the user (claims principal) account has been approved.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    public static Boolean IsApproved(this ClaimsPrincipal user)
 		{
 			return !user.Claims.Where(claim => claim.Type == Nucleus.Abstractions.Authentication.Constants.NOT_APPROVED_CLAIMTYPE).Any();
 		}

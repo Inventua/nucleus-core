@@ -114,6 +114,7 @@ namespace Nucleus.Modules.Forums
 						PublishedDate = post.DateAdded,
 						SourceId = post.Id,
 						Scope = Models.Post.URN,
+            Type = "Forum Post",
 						Roles = GetViewRoles(forum),
 						ContentType = "text/html"
 					};

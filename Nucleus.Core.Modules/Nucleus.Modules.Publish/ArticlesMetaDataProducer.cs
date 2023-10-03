@@ -109,6 +109,7 @@ namespace Nucleus.Modules.Publish
 						PublishedDate = article.PublishDate,
 						SourceId = article.Id,
 						Scope = Models.Article.URN,
+            Type = "Article",
 						Attachments = article.Attachments?.Select(attachment => attachment.File),
 						Keywords = article.Categories?.Select(category => category.CategoryListItem.Name),
 						Summary = article.Summary,

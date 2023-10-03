@@ -112,6 +112,7 @@ namespace Nucleus.Core.Search
 					Size = file.Size,
 					SourceId = file.Id,
 					Scope = File.URN,
+          Type = "File",
 					Roles = await GetViewRoles(file.Parent)
 				};
 

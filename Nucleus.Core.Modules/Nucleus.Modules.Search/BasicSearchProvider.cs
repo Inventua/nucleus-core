@@ -9,6 +9,7 @@ using Nucleus.Abstractions.Search;
 using Nucleus.Extensions;
 using DocumentFormat.OpenXml.Wordprocessing;
 using System.ComponentModel;
+using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Modules.Search
 {
@@ -32,7 +33,7 @@ namespace Nucleus.Modules.Search
 				throw new ArgumentException($"The site property is required.", nameof(query.Site));
 			}
 
-			Abstractions.Models.Paging.PagedResult<Page> pages = await this.PageManager.Search(query.Site,query.SearchTerm,query.PagingSettings);
+			Abstractions.Models.Paging.PagedResult<Page> pages = await this.PageManager.Search(query.Site, query.SearchTerm, query.Roles, query.PagingSettings);
 
 			return new SearchResults()
 			{
@@ -43,6 +44,7 @@ namespace Nucleus.Modules.Search
 
 		public Task<SearchResults> Suggest(SearchQuery query)
 		{
+      // the basic search provider does not support search suggestions
 			return Task.FromResult(new SearchResults()
 			{
 				Total = 0
@@ -74,12 +76,10 @@ namespace Nucleus.Modules.Search
 				SourceId = page.Id,
 				ContentType = "text/html",
 				PublishedDate = page.DateChanged ?? page.DateAdded,
+        Type = "Page",
 
 				Keywords = page.Keywords?.Split(',')
-				//Roles = page.Permissions.Where(permission=>permission.IsValid(HttpContext.) && permission.IsPageViewPermission()).Select(permission => permission.Role)
 			};
 		}
-
-
 	}
 }

@@ -85,6 +85,7 @@ namespace Nucleus.Modules.Documents
 					PublishedDate = document.File.DateChanged.HasValue ? document.File.DateChanged : document.File.DateAdded,
 					SourceId = document.Id,
 					Scope = Models.Document.URN,
+          Type = "Document",
 					Roles = await GetViewRoles(module),
 					ContentType = "text/html"
 				};

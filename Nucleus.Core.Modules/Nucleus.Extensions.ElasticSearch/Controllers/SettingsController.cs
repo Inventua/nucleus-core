@@ -75,7 +75,7 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 
 			long indexCount = await request.CountIndex();
 
-			return Json(new { Title = "Index Count", Message = $"There are {indexCount} entries in the index." });			
+			return Json(new { Title = "Index Count", Message = $"There are {indexCount} entries in the index.", Icon = "alert" });			
 		}
 
 		private string GetPassword(ViewModels.Settings viewModel)
@@ -99,11 +99,11 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 
 			if (await request.DeleteIndex())
 			{
-				return Json(new { Title = "Clear Index", Message = $"Index {viewModel.IndexName} has been removed and will be re-created the next time the search index feeder runs." });
+				return Json(new { Title = "Clear Index", Message = $"Index '{viewModel.IndexName}' has been removed and will be re-created the next time the search index feeder runs.", Icon = "alert" });
 			}
 			else
 			{
-				return Json(new { Title = "Clear Index", Message = $"Index {viewModel.IndexName} was not removed." });
+				return Json(new { Title = "Clear Index", Message = $"Index '{viewModel.IndexName}' was not removed.", Icon = "error" });
 			}
 		}
 

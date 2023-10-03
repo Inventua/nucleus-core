@@ -277,7 +277,9 @@ namespace Nucleus.Extensions.ElasticSearch
 			ElasticClient client = await GetClient();
 
 			objIndexResponse = await client.Indices.DeleteAsync(this.IndexName);
-
+      
+      this.DebugInformation = objIndexResponse.DebugInformation;
+      
 			return objIndexResponse.IsValid;
 		}
 
@@ -295,7 +297,9 @@ namespace Nucleus.Extensions.ElasticSearch
 
 			objIndexResponse = await client.Indices.UpdateSettingsAsync(objIndexRequest);
 
-			return objIndexResponse;
+      this.DebugInformation = objIndexResponse.DebugInformation;
+
+      return objIndexResponse;
 		}
 
 		public async Task<GetIndexSettingsResponse> GetIndexSettings()
@@ -450,7 +454,6 @@ namespace Nucleus.Extensions.ElasticSearch
 						Includes = "*",
 						Excludes = new List<string>()
 						{
-							//ParseField(nameof(ElasticSearchDocument.Content)),
 							ParseField(nameof(ElasticSearchDocument.Attachment)),
 							ParseField(nameof(ElasticSearchDocument.Roles))
 						}.ToArray()

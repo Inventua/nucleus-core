@@ -17,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models.Paging;
 using Nucleus.Extensions;
+using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Core.DataProviders
 {
@@ -466,41 +467,42 @@ namespace Nucleus.Core.DataProviders
 			return results;
 		}
 
-		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> SearchPages(Guid siteId, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
-		{
-			List<Page> results;
+    public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> SearchPages(Site site, string searchTerm, IEnumerable<Role> userRoles, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+    {
+      List<Page> results;
+      IEnumerable<Guid> userRoleIds = userRoles?.Select(role => role.Id);
 
-			pagingSettings.TotalCount = await this.Context.Pages.Where(page =>
-				page.SiteId == siteId &&
-					(
-						EF.Functions.Like(page.Name, $"%{searchTerm}%") ||
-						EF.Functions.Like(page.Title, $"%{searchTerm}%") ||
-						EF.Functions.Like(page.Description, $"%{searchTerm}%") ||
-						EF.Functions.Like(page.Keywords, $"%{searchTerm}%")
-					)
-				)
+      var query = this.Context.Pages.Where(page =>
+        page.SiteId == site.Id &&
+          (
+            EF.Functions.Like(page.Name, $"%{searchTerm}%") ||
+            EF.Functions.Like(page.Title, $"%{searchTerm}%") ||
+            EF.Functions.Like(page.Description, $"%{searchTerm}%") ||
+            EF.Functions.Like(page.Keywords, $"%{searchTerm}%")
+          )
+          &&
+          (
+            userRoleIds == null 
+            ||
+            page.Permissions.Where(permission => permission.AllowAccess && userRoleIds.Contains(permission.Role.Id)).Any()
+          )
+        );
+			
+      pagingSettings.TotalCount = await query
 				.CountAsync();
 
-			results = await this.Context.Pages.Where(page =>
-				page.SiteId == siteId &&
-					(
-						EF.Functions.Like(page.Name, $"%{searchTerm}%") ||
-						EF.Functions.Like(page.Title, $"%{searchTerm}%") ||
-						EF.Functions.Like(page.Description, $"%{searchTerm}%") ||
-						EF.Functions.Like(page.Keywords, $"%{searchTerm}%")
-					)
-				)
-				.Include(page => page.LayoutDefinition)
+			results = await query
+        .Include(page => page.LayoutDefinition)
 				.Include(page => page.DefaultContainerDefinition)
 				.Include(page => page.Modules)
-				.Include(page => page.Routes)
+        .Include(page => page.Routes)
 				.OrderBy(page => page.SortOrder)
 				.Skip(pagingSettings.FirstRowIndex)
 				.Take(pagingSettings.PageSize)
 				.AsSplitQuery()
 				.AsNoTracking()
 				.ToListAsync();
-
+      
 			return new Nucleus.Abstractions.Models.Paging.PagedResult<Page>(pagingSettings, results);
 		}
 

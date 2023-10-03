@@ -118,6 +118,7 @@ namespace Nucleus.Extensions.ElasticSearch
 				Summary = document.Summary,
 
 				Scope = document.Scope,
+        Type = document.Type,
 				SourceId = document.SourceId,
 				ContentType = document.ContentType,
 				PublishedDate = document.PublishedDate,

@@ -235,12 +235,14 @@ namespace Nucleus.Core.Managers
     /// </summary>
     /// <param name="site"></param>
     /// <param name="searchTerm"></param>
+    /// <param name="userRoleNames"></param>
+    /// <param name="pagingSettings"></param>
     /// <returns></returns>
-    public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> Search(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+    public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> Search(Site site, string searchTerm, IEnumerable<Role> userRoles,  Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
     {
       using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
       {
-        return await provider.SearchPages(site.Id, searchTerm, pagingSettings);
+        return await provider.SearchPages(site, searchTerm, userRoles, pagingSettings);
       }
     }
 

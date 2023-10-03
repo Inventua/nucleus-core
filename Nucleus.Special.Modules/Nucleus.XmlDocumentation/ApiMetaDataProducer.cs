@@ -117,6 +117,7 @@ namespace Nucleus.XmlDocumentation
           PublishedDate = document.LastModifiedDate,
           SourceId = null,
           Scope = Models.ApiDocument.URN,
+          Type = "API Documentation",
           Roles = await GetViewRoles(module),
           ContentType = "text/html"
         };
@@ -150,6 +151,7 @@ namespace Nucleus.XmlDocumentation
           PublishedDate = document.LastModifiedDate,
           SourceId = null,
           Scope = Models.ApiClass.URN,
+          Type = "API Documentation",
           Roles = await GetViewRoles(module),
           ContentType = "text/html"
         };

@@ -35,6 +35,7 @@ namespace Nucleus.Extensions.ElasticSearch
 			this.SourceId = content.SourceId;
 
 			this.ContentType = content.ContentType;
+      this.Type = content.Type;
 
 			if (content.Content.Any())
 			{
@@ -71,7 +72,7 @@ namespace Nucleus.Extensions.ElasticSearch
 				this.Roles = content.Roles?.Select(role => role.Id).ToList();
 			}
 
-			this.IsSecure = this.IsPublic(content.Site, content.Roles);
+			this.IsSecure = !this.IsPublic(content.Site, content.Roles);
 		}
 
 		public string GenerateId(ContentMetaData content)
@@ -175,19 +176,25 @@ namespace Nucleus.Extensions.ElasticSearch
 		/// Search entry MIME type.
 		/// </summary>
 		/// <remarks>
-		/// This value should be set to the expected MIME type when a user-agent request the <see cref="Url"/> for this search entry.  This 
+		/// This value should be set to the expected MIME type when a user-agent requests the <see cref="Url"/> for this search entry.  This 
 		/// is not necessarily the MIME type of the Content field.  This value is intended for search result filtering.
 		/// </remarks>
 		[Nest.Keyword]
 		public string ContentType { get; set; }
 
-		/// <summary>
-		/// Source entity published date
+    /// <summary>
+		/// Search entry display type.
 		/// </summary>
-		/// <remarks>
-		/// This value is optional.  If specified, it can be displayed in search results.
-		/// </remarks>
 		[Nest.Keyword]
+    public string Type { get; set; }
+
+    /// <summary>
+    /// Source entity published date
+    /// </summary>
+    /// <remarks>
+    /// This value is optional.  If specified, it can be displayed in search results.
+    /// </remarks>
+    [Nest.Keyword]
 		public DateTime? PublishedDate { get; set; }
 
 		/// <summary>

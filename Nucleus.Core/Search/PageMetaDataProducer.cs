@@ -100,6 +100,7 @@ namespace Nucleus.Core.Search
 					PublishedDate = page.DateChanged.HasValue ? page.DateChanged : page.DateAdded,
 					SourceId = page.Id,
 					Scope = Page.URN,
+          Type = "Page",
 					Keywords = page.Keywords?.Split(',').ToList(),
 					Roles = await GetViewRoles(page)
 				};

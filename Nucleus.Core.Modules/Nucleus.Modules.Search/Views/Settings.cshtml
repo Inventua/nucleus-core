@@ -57,6 +57,10 @@
 		<fieldset class="search-instance-settings collapse show">
 			<label>Results Display</label>
 			<div class="nucleus-flex-fields">
+        <SettingsControl caption="Show Type?" rendermode="LabelLast" class="inner-inline" helptext="Display search result types.">
+					@Html.CheckBoxFor(model => model.ShowType, new { @class = "ToggleSwitch" })
+				</SettingsControl>
+
 				<SettingsControl caption="Show Summary?" rendermode="LabelLast" class="inner-inline" helptext="Display search result item summaries/descriptions.">
 					@Html.CheckBoxFor(model => model.ShowSummary, new { @class = "ToggleSwitch" })
 				</SettingsControl>
@@ -68,7 +72,8 @@
 				<SettingsControl caption="Show Published Date?" rendermode="LabelLast" class="inner-inline" helptext="Display search result publication date, if available.">
 					@Html.CheckBoxFor(model => model.ShowPublishDate, new { @class = "ToggleSwitch" })
 				</SettingsControl>
-
+      </div>
+      <div class="nucleus-flex-fields">
         <SettingsControl caption="Show Url?" rendermode="LabelLast" class="inner-inline" helptext="Display search result Url.">
 					@Html.CheckBoxFor(model => model.ShowUrl, new { @class = "ToggleSwitch" })
 				</SettingsControl>
@@ -80,6 +85,8 @@
 				<SettingsControl caption="Show Score?" rendermode="LabelLast" class="inner-inline" helptext="Display search result score.">
 					@Html.CheckBoxFor(model => model.ShowScore, new { @class = "ToggleSwitch" })
 				</SettingsControl>
+
+        <div />
 			</div>
 		</fieldset>
 	</div>

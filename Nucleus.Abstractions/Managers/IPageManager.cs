@@ -101,9 +101,10 @@ namespace Nucleus.Abstractions.Managers
     /// </summary>
     /// <param name="site"></param>
     /// <param name="searchTerm"></param>
+    /// <param name="userRoles"></param>
     /// <param name="pagingSettings"></param>
     /// <returns></returns>
-    public Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> Search(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
+    public Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> Search(Site site, string searchTerm, IEnumerable<Role> userRoles, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 
 		/// <summary>
 		/// Add default permissions to the specifed <see cref="Page"/> for the specified <see cref="Role"/>.

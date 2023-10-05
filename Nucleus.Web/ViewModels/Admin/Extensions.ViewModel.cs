@@ -44,6 +44,8 @@ namespace Nucleus.Web.ViewModels.Admin
       public List<ExtensionComponentUsage> Modules { get; set; } = new();
 
       public List<ExtensionComponentUsage> ControlPanelExtensions { get; set; } = new();
+
+      public int PageCount { get => this.Layouts.Sum(item=>item.Pages.Count) + this.Containers.Sum(item => item.Pages.Count) + this.Modules.Sum(item => item.Pages.Count) + this.ControlPanelExtensions.Sum(item => item.Pages.Count); }
     }
 
     public class ExtensionComponentUsage

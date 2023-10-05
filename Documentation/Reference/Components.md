@@ -1,11 +1,12 @@
 # Components Reference
 Some users need to check third-party license conditions.  We have included links to the license pages  for third-party components used
-by Nucleus so that you can easily prepare a list.  
+by Nucleus so that you can easily prepare a list.  Some of the components listed are relevant only if you have installed the component 
+(extension) which uses them.
 
 Components from Microsoft are not listed here.  Some components may use other third-party components themselves, these are not listed here.  Nucleus 
 uses the [MIT](https://github.com/Inventua/nucleus-core/blob/main/Nucleus.Web/license.txt) license.
 
-Some of the components listed are relevant only if you have installed the component (extension) which uses them.
+This document was updated to include references which are part of Nucleus version 1.3.0.
 
 ## Core
 |                                  |                                                             | License                         |

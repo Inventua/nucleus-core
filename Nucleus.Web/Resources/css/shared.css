@@ -123,11 +123,19 @@ a *
 .Nucleus.AdminFrame
 {
 	position: fixed;
+  background: #444;
 	top: 0;
 	left: 0;
   border: 0;
-	transition: 0.25s;
   z-index: 1040;
+  transition: none;  /* prevent transition on close */
+}
+
+.Nucleus.AdminFrame.Expanded
+{
+	width: 100%;
+	z-index: 10000;
+  transition: width linear .25s; /* show using transition on open */
 }
 
 .AdminFramePlaceholder
@@ -141,12 +149,6 @@ a *
 	z-index: 99;
 	border: 0;
   flex-grow: 1;
-}
-
-.Nucleus.AdminFrame.Expanded
-{
-	width: 100%;
-	z-index: 10000;
 }
 
 .Nucleus.Content

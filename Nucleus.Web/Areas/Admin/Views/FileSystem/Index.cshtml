@@ -196,7 +196,8 @@
         // manually create a progress spinner for the paging controls buttons
         if (jQuery('.nucleus-file-system-manager .nucleus-progress-spinner').length === 0)
         {
-          var progress = jQuery('<div class="spinner-border spinner-border-sm text-primary nucleus-progress-spinner ms-2" role="status"/>');
+          alert('!');
+          var progress = jQuery('<div class="spinner-border spinner-border-sm text-primary nucleus-progress-spinner ms-2 xx" role="status"/>');
           progress.appendTo(jQuery('.nucleus-file-system-manager .nucleus-form-buttonrow'));
         }
       }, 600);
@@ -205,6 +206,8 @@
     // remove the  progress spinner when the request completes
     jQuery('.nucleus-file-system-manager form').off('.file-system-manager');
     jQuery('.nucleus-file-system-manager form').on('success.file-system-manager error.file-system-manager', function (args)
+
+    jQuery(Page).on("ready.file-system-manager", function (e, args)
     {
       _cancelProgress();
       jQuery('.nucleus-file-system-manager .nucleus-progress-spinner').remove();

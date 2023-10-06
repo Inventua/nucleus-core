@@ -1054,18 +1054,18 @@ function _Page()
     // we add one to index().
     this._selectedTab = target.find('.nav .nav-item .active').parent().index() + 1;
 
-    if (typeof this._currentPageUrl !== 'undefined')
+    if (typeof this._selectedPagePath !== 'undefined')
     {
       try
       {
-        this._selectedTabPath = new URL(document.baseURI + this._currentPageUrl).pathname;
+        this._selectedTabPath = new URL(document.baseURI + this._selectedPagePath).pathname;
       }
       catch (err)
       {
         console.error(err);
       }
     }
-    this._currentPageUrl = url;
+    this._selectedPagePath = url;
 
     // if the original element is in a modal, and the target is not inside the same modal, close the modal 
     if (source !== null && source.parents('.modal').length !== 0)
@@ -1291,8 +1291,9 @@ function _Page()
     {
       try
       {
-        var newPath = new URL(document.baseURI + url).pathname;
-        if (typeof this._selectedTabPath !== 'undefined' && this._selectedTabPath === newPath)
+        var urlPath = url.startsWith('/') ? url.substring(1) : url;        
+        var newPath = new URL(document.baseURI + urlPath).pathname;
+        if (typeof this._selectedPagePath !== 'undefined' && this._selectedPagePath === newPath)
         {
           // trigger click to select the tab (and un-select other tabs)
           target.find('.nav .nav-item:nth-child(' + this._selectedTab + ') button').trigger('click');

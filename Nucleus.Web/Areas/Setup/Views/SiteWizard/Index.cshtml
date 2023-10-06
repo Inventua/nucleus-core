@@ -29,7 +29,7 @@
 			<SettingsControl caption="Site Template" helptext="Select your site template." class="d-flex flex-1 overflow-auto mb-2">
 				@Html.DropDownListFor(model => model.SelectedTemplate, new SelectList(Model.Templates, nameof(Nucleus.Web.ViewModels.Setup.SiteWizard.SiteTemplate.FileName), nameof(Nucleus.Web.ViewModels.Setup.SiteWizard.SiteTemplate.Title)), "(select a template)", new { @id = "site-template-select"})
 
-        <div class="mt-1 d-flex flex-1 overflow-auto border border-dark border-1 bg-secondary bg-gradient">
+        <div class="mt-1 d-flex flex-1 overflow-auto border border-dark border-1">
           <div class="list-group list-group-flush">
             @foreach(var template in Model.Templates)
             {

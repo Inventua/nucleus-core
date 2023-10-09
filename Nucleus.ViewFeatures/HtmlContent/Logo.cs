@@ -44,7 +44,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 					{
 						logoFile = await fileSystemManager.GetFile(site, fileId);
 					}
-					catch (System.IO.FileNotFoundException)
+					catch (Exception)
 					{
 						logoFile = null;
 					}

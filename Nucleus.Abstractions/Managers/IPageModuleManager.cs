@@ -19,11 +19,12 @@ namespace Nucleus.Abstractions.Managers
 		/// Create a new <see cref="PageModule"/> with default settings.
 		/// </summary>
 		/// <param name="site"></param>
+    /// <param name="page"></param>
 		/// <returns></returns>
 		/// <remarks>
 		/// This method does not save the new <see cref="PageModule"/> unless you call <see cref="Save(Page, PageModule)"/>.
 		/// </remarks>
-		public Task<PageModule> CreateNew(Site site);
+		public Task<PageModule> CreateNew(Site site, Page page);
 
 		/// <summary>
 		/// Retrieve an existing <see cref="PageModule"/> from the database.
@@ -45,15 +46,16 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="module"></param>
 		/// <param name="role"></param>
 		/// <remarks>
-		/// The new <see cref="Permission"/>s are not saved unless you call <see cref="SavePermissions(PageModule)"/>.
+		/// The new <see cref="Permission"/>s are not saved unless you call <see cref="SavePermissions(Page, PageModule)"/>.
 		/// </remarks>
 		public Task CreatePermissions(Site site, PageModule module, Role role);
 
 		/// <summary>
 		/// Save permissions for the specified <see cref="PageModule"/>.
 		/// </summary>
+    /// <param name="page"></param>
 		/// <param name="module"></param>
-		public Task SavePermissions(PageModule module);
+		public Task SavePermissions(Page page, PageModule module);
 
 		/// <summary>
 		/// List all permissions for the module specified by moduleId.
@@ -81,8 +83,9 @@ namespace Nucleus.Abstractions.Managers
     /// <summary>
     /// Save the settings for the specified <see cref="PageModule"/>.
     /// </summary>
+    /// <param name="page"></param>
     /// <param name="module"></param>
-    public Task SaveSettings(PageModule module);
+    public Task SaveSettings(Page page, PageModule module);
 		
 		/// <summary>
 		/// Return a list of available permission types, sorted by SortOrder
@@ -93,14 +96,16 @@ namespace Nucleus.Abstractions.Managers
 		/// <summary>
 		/// Update the <see cref="PageModule.SortOrder"/> of the page module specifed by id by swapping it with the next-highest <see cref="PageModule.SortOrder"/>.
 		/// </summary>
-		/// <param name="id"></param>
-		public Task MoveDown(Guid id);
+		/// <param name="page"></param>
+    /// <param name="moduleId"></param>
+		public Task MoveDown(Page page, Guid moduleId);
 
 		/// <summary>
 		/// Update the <see cref="PageModule.SortOrder"/> of the page module specifed by id by swapping it with the previous <see cref="PageModule.SortOrder"/>.
 		/// </summary>
-		/// <param name="id"></param>
-		public Task MoveUp(Guid id);
+    /// <param name="page"></param>
+		/// <param name="moduleId"></param>
+		public Task MoveUp(Page page, Guid moduleId);
 
 		/// <summary>
 		/// Delete the <see cref="PageModule"/> specified by Id.

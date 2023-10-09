@@ -24,7 +24,7 @@ namespace Nucleus.Abstractions.Models
 		/// Read-only Id of the page that this module belongs to.
 		/// </summary>
 		[System.Xml.Serialization.XmlIgnore]
-		public Guid PageId { get; private set; }
+		public Guid PageId { get; init; }
 
 		/// <summary>
 		/// Value indicating which pane of a layout the module is rendered in.

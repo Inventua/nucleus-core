@@ -826,6 +826,19 @@ function _Page()
             messages[index] = '<li>' + message + '</li>';
           }
 
+          // if the first element is in a tab, select the tab
+          if (elements.length !== 0)
+          {
+            var selectedTab = elements.first().parents('.tab-pane');            
+            if (selectedTab.length !== 0)
+            {
+              var selectedTabIndex = selectedTab.index() + 1
+              // trigger click to select the tab (and un-select other tabs)
+              selectedTab.parents('.tab-content').siblings('nav').find('.nav-item:nth-child(' + selectedTabIndex + ') button').trigger('click');              
+            }
+          }
+
+          // display error message
           var validationMessage = '<ul>' + messages.join('') + '</ul>';
 
           errorData = new Object();
@@ -1288,7 +1301,7 @@ function _Page()
 
   function _initializeControls(target, data, url, status, request)
   {
-    if (typeof this._selectedTab !== 'undefined' && this._selectedTab !== -1)
+    if (typeof this._selectedTab !== 'undefined' && this._selectedTab !== -1 && typeof url != 'undefined' && url !== null)
     {
       try
       {

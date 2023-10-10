@@ -15,16 +15,27 @@ namespace Nucleus.Abstractions.Managers
 	/// </remarks>
 	public interface IPageModuleManager
 	{
-		/// <summary>
+    /// <summary>
 		/// Create a new <see cref="PageModule"/> with default settings.
 		/// </summary>
 		/// <param name="site"></param>
-    /// <param name="page"></param>
 		/// <returns></returns>
 		/// <remarks>
 		/// This method does not save the new <see cref="PageModule"/> unless you call <see cref="Save(Page, PageModule)"/>.
 		/// </remarks>
-		public Task<PageModule> CreateNew(Site site, Page page);
+    [Obsolete(message:"Use CreateNew(site, page) instead")]
+		public Task<PageModule> CreateNew(Site site);
+
+    /// <summary>
+    /// Create a new <see cref="PageModule"/> with default settings.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <param name="page"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// This method does not save the new <see cref="PageModule"/> unless you call <see cref="Save(Page, PageModule)"/>.
+    /// </remarks>
+    public Task<PageModule> CreateNew(Site site, Page page);
 
 		/// <summary>
 		/// Retrieve an existing <see cref="PageModule"/> from the database.
@@ -50,12 +61,19 @@ namespace Nucleus.Abstractions.Managers
 		/// </remarks>
 		public Task CreatePermissions(Site site, PageModule module, Role role);
 
-		/// <summary>
+    /// <summary>
 		/// Save permissions for the specified <see cref="PageModule"/>.
 		/// </summary>
+    /// <param name="module"></param>
+		[Obsolete(message:"Use SavePermissions(page, module) instead.")]
+    public Task SavePermissions(PageModule module);
+
+    /// <summary>
+    /// Save permissions for the specified <see cref="PageModule"/>.
+    /// </summary>
     /// <param name="page"></param>
-		/// <param name="module"></param>
-		public Task SavePermissions(Page page, PageModule module);
+    /// <param name="module"></param>
+    public Task SavePermissions(Page page, PageModule module);
 
 		/// <summary>
 		/// List all permissions for the module specified by moduleId.

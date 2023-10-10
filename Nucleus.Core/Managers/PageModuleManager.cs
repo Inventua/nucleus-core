@@ -25,7 +25,7 @@ namespace Nucleus.Core.Managers
 			this.DataProviderFactory = dataProviderFactory;
 		}
 
-		/// <summary>
+    /// <summary>
 		/// Create a new <see cref="PageModule"/> with default settings.
 		/// </summary>
 		/// <param name="site"></param>
@@ -34,9 +34,26 @@ namespace Nucleus.Core.Managers
 		/// <remarks>
 		/// This method does not save the new <see cref="PageModule"/> unless you call <see cref="Save(Page, PageModule)"/>.
 		/// </remarks>
-		public Task<PageModule> CreateNew(Site site, Page page)
+    [Obsolete(message: "Use CreateNew(site, page) instead")]
+    public Task<PageModule> CreateNew(Site site)
+    {
+      PageModule result = new();
+
+      return Task.FromResult(result);
+    }
+
+    /// <summary>
+    /// Create a new <see cref="PageModule"/> with default settings.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <param name="page"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// This method does not save the new <see cref="PageModule"/> unless you call <see cref="Save(Page, PageModule)"/>.
+    /// </remarks>
+    public Task<PageModule> CreateNew(Site site, Page page)
 		{
-			PageModule result = new() { PageId = page.Id };
+			PageModule result = new() { PageId = page?.Id ?? Guid.Empty};
       
 			return Task.FromResult(result);
 		}
@@ -99,11 +116,29 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
-		/// <summary>
-		/// Save permissions for the specified <see cref="PageModule"/>.
-		/// </summary>
-		/// <param name="module"></param>
-		public async Task SavePermissions(Page page, PageModule module)
+    /// <summary>
+    /// Save permissions for the specified <see cref="PageModule"/>.
+    /// </summary>
+    /// <param name="module"></param>
+    [Obsolete(message: "Use SavePermissions(page, module) instead.")]
+    public async Task SavePermissions(PageModule module)
+    {
+      using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+      {
+        List<Permission> originalPermissions = await provider.ListPermissions(module.Id, PageModule.URN);
+
+        await provider.SavePermissions(module.Id, module.Permissions, originalPermissions);
+      }
+
+      InvalidateCache(new() { Id = module.PageId }, module);
+    }
+
+    /// <summary>
+    /// Save permissions for the specified <see cref="PageModule"/>.
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="module"></param>
+    public async Task SavePermissions(Page page, PageModule module)
 		{
       using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
 			{
@@ -156,6 +191,9 @@ namespace Nucleus.Core.Managers
 		/// </summary>
 		/// <param name="page"></param>
 		/// <param name="module"></param>
+    /// <remarks>
+    /// This method does not save module permissions.
+    /// </remarks>
 		public async Task Save(Page page, PageModule module)
 		{
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())

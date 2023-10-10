@@ -817,21 +817,29 @@ namespace Nucleus.Core.DataProviders
 				module.SortOrder = await GetLastPageModuleSortOrder(pageId) + 10;
 			}
 
+      // use AttachClone to create a shallow copy, and use the clone to update the database.  This is because Entity Framework
+      // has trouble with the Permissions collection, because there can be more than one permission with the same Role.
+      PageModule clone = this.Context.AttachClone<PageModule>(module);
+      this.Context.Entry(clone).Property("PageId").CurrentValue = pageId;
+      clone.ModuleDefinition = module.ModuleDefinition;
+      clone.ContainerDefinition = module.ContainerDefinition;
+
       if (existing == null)
       {
-        this.Context.Attach(module);
-        this.Context.Entry(module).Property("PageId").CurrentValue = pageId;
-        this.Context.Entry(module).State = EntityState.Added;
+        ////  this.Context.Attach(module);
+        ////  this.Context.Entry(module).Property("PageId").CurrentValue = pageId;
+        this.Context.Entry(clone).State = EntityState.Added;
       }
       else
       {
-        this.Context.Entry(existing).CurrentValues.SetValues(module);
-        this.Context.Entry(existing).Property("PageId").CurrentValue = pageId;
-        this.Context.Entry(existing).State = EntityState.Modified;
+        ////  this.Context.Entry(existing).CurrentValues.SetValues(module);
+        ////  this.Context.Entry(existing).Property("PageId").CurrentValue = pageId;
+        this.Context.Entry(clone).State = EntityState.Modified;
       }
-      
-			//this.Context.Entry(module).State = isNew ? EntityState.Added : EntityState.Modified;
-			await this.Context.SaveChangesAsync<PageModule>();
+
+      //this.Context.Entry(module).State = isNew ? EntityState.Added : EntityState.Modified;
+      await this.Context.SaveChangesAsync<PageModule>();
+      module.Id = clone.Id;
 
 			this.Context.ChangeTracker.Clear();
 			await SavePageModuleSettings(module.Id, module.ModuleSettings);

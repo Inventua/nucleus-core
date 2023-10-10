@@ -118,7 +118,7 @@ namespace Nucleus.Data.EntityFramework
 		}
 
 		/// <summary>
-		/// Create a copy of the <paramref name="original"/> object and add it to the DbContext change tracker.
+		/// Create a shallow copy of the <paramref name="original"/> object and add it to the DbContext change tracker.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="original"></param>

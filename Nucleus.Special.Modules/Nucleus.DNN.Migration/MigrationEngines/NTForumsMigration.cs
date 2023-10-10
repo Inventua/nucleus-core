@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.FileSystemProviders;
 using System.IO;
 using Nucleus.DNN.Migration.Models.DNN.Modules.NTForums;
+using Microsoft.Extensions.Logging;
 
 namespace Nucleus.DNN.Migration.MigrationEngines;
 
@@ -20,8 +21,9 @@ public class NTForumsMigration : MigrationEngineBase<Forum>
   private IPageModuleManager PageModuleManager { get; }
   private IUserManager UserManager { get; }
   private IFileSystemManager FileSystemManager { get; }
+  private ILogger<NTForumsMigration> Logger { get; }
 
-  public NTForumsMigration(Nucleus.Abstractions.Models.Context context, IPageModuleManager pageModuleManager, IUserManager userManager, IFileSystemManager fileSystemManager, DNNMigrationManager migrationManager) : base("Migrating Forums Content")
+  public NTForumsMigration(Nucleus.Abstractions.Models.Context context, IPageModuleManager pageModuleManager, IUserManager userManager, IFileSystemManager fileSystemManager, DNNMigrationManager migrationManager, ILogger<NTForumsMigration> logger) : base("Migrating Forums Content")
   {
     this.MigrationManager = migrationManager;
     this.PageModuleManager = pageModuleManager;
@@ -114,6 +116,7 @@ public class NTForumsMigration : MigrationEngineBase<Forum>
             }
             catch (Exception ex)
             {
+              this.Logger.LogError(ex, "Error importing Forum post '{dnnPostSubject}' for forum '{dnnForumName}'", dnnPost.Subject, dnnForum.Name);
               dnnForum.AddError($"Error importing Forum post '{dnnPost.Subject}' for forum '{dnnForum.Name}': {ex.Message}");
             }
 
@@ -122,6 +125,7 @@ public class NTForumsMigration : MigrationEngineBase<Forum>
         }
         catch (Exception ex)
         {
+          this.Logger.LogError(ex, "Error importing posts for Forum '{dnnForumName}'", dnnForum.Name);
           dnnForum.AddError($"Error importing posts for Forum '{dnnForum.Name}': {ex.Message}");
           this.Progress(dnnForum.PostCount);
         }

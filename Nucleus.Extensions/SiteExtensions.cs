@@ -7,6 +7,7 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Mail;
 using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Extensions
 {
@@ -465,5 +466,32 @@ namespace Nucleus.Extensions
 			return new System.Uri(AbsoluteUri(site, page, useSSL), TrimSlash(relativeUrl) + "/");
 		}
 
+    /// <summary>
+    /// Validate the site home directory.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// The home directory is validated using using Azure/S3 rules for container names, since that's mostly what the site home directory 
+    /// will be.  This prevents some valid folder names for local storage from being used, but the more strict validation will allow users 
+    /// to migrate to Azure/S3 later if required, and still have a valid home directory setting.
+    /// </remarks>
+    public static Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary ValidateHomeDirectory(this Site site, string key)
+    {
+      Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState = new();
+
+      if (!System.Text.RegularExpressions.Regex.IsMatch(site.HomeDirectory, "^[0-9a-z]{1}[0-9a-z-]{2,61}[0-9a-z]$"))
+      {
+        modelState.AddModelError(key, "The site home directory must start and end with a letter or number, contain only letters, numbers and dashes, and must be lower case.");
+      }
+
+      if (!System.Text.RegularExpressions.Regex.IsMatch(site.HomeDirectory, "^(?!.*--)"))
+      {
+        modelState.AddModelError(key, "The site home directory must must not contain consecutive dashes.");        
+      }
+
+      return modelState;
+    }
 	}
 }

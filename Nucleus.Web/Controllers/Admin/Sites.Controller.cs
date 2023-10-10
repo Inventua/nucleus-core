@@ -321,8 +321,14 @@ namespace Nucleus.Web.Controllers.Admin
 			ControllerContext.ModelState.Remove($"{nameof(ViewModels.Admin.SiteEditor.Site)}.{nameof(ViewModels.Admin.SiteEditor.Site.AnonymousUsersRole)}.{nameof(ViewModels.Admin.SiteEditor.Site.AnonymousUsersRole.Name)}");
 			ControllerContext.ModelState.Remove($"{nameof(ViewModels.Admin.SiteEditor.Site)}.{nameof(ViewModels.Admin.SiteEditor.Site.RegisteredUsersRole)}.{nameof(ViewModels.Admin.SiteEditor.Site.RegisteredUsersRole.Name)}");
 
+      // Validate the site home directory.  
+      Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState = viewModel.Site.ValidateHomeDirectory($"{nameof(viewModel.Site)}.{nameof(viewModel.Site.HomeDirectory)}");
+      if (!modelState.IsValid)
+      {
+        return BadRequest(modelState);
+      }
 
-			if (!ControllerContext.ModelState.IsValid)
+      if (!ControllerContext.ModelState.IsValid)
 			{
 				return BadRequest(ControllerContext.ModelState);
 			}

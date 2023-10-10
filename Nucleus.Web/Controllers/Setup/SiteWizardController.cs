@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Nucleus.Abstractions.Models.FileSystem;
 
 namespace Nucleus.Web.Controllers.Setup
 {
@@ -106,6 +107,15 @@ namespace Nucleus.Web.Controllers.Setup
 
         {
           Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState = await this.UserManager.ValidatePasswordComplexity(nameof(viewModel.SiteAdminPassword), viewModel.SiteAdminPassword);
+          if (!modelState.IsValid)
+          {
+            return BadRequest(modelState);
+          }
+        }
+
+        {
+          // Validate the site home directory.  
+          Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState = viewModel.Site.ValidateHomeDirectory($"{nameof(viewModel.Site)}.{nameof(viewModel.Site.HomeDirectory)}");
           if (!modelState.IsValid)
           {
             return BadRequest(modelState);

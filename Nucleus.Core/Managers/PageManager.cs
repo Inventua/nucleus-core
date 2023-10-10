@@ -590,17 +590,18 @@ namespace Nucleus.Core.Managers
             if (breadcrumbPage != null)
             {
               breadcrumbs.Add(breadcrumbPage);
+
+              // extra checks here are to prevent an infinite loop 
+              if (breadcrumbPage.ParentId.HasValue && breadcrumbPage.ParentId != breadcrumbPage.Id && !breadcrumbs.Where(crumb => crumb.Id == breadcrumbPage.ParentId).Any())
+              {
+                breadcrumbPage = await this.Get(breadcrumbPage.ParentId.Value);
+              }
+              else
+              {
+                breadcrumbPage = null;
+              }
             }
 
-            // extra checks here are to prevent an infinite loop 
-            if (breadcrumbPage.ParentId.HasValue && breadcrumbPage.ParentId != breadcrumbPage.Id && !breadcrumbs.Where(crumb => crumb.Id == breadcrumbPage.ParentId).Any())
-            {
-              breadcrumbPage = await this.Get(breadcrumbPage.ParentId.Value);
-            }
-            else
-            {
-              breadcrumbPage = null;
-            }
           } while (breadcrumbPage != null);
 
           if (breadcrumbs.Any())

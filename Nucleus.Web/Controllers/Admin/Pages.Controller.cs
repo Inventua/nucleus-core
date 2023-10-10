@@ -365,7 +365,7 @@ namespace Nucleus.Web.Controllers.Admin
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> AddModule(ViewModels.Admin.PageEditor viewModel)
 		{
-			PageModule module = await this.PageModuleManager.CreateNew(this.Context.Site, this.Context.Page);
+			PageModule module = await this.PageModuleManager.CreateNew(this.Context.Site, viewModel.Page);
 			viewModel = await BuildPageViewModel(viewModel.Page, module, null, true);
 			
 			return View("ModuleCommonSettings", viewModel);

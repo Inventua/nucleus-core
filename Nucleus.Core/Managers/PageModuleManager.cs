@@ -206,6 +206,16 @@ namespace Nucleus.Core.Managers
       InvalidateCache(page, module);
     }
 
+    public async Task SaveSettings(PageModule module)
+    {
+      using (DataProviders.ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+			{
+				await provider.SavePageModuleSettings(module.Id, module.ModuleSettings);
+      }
+
+			InvalidateCache(new() { Id = module.PageId}, module);    
+    }
+    
     /// <summary>
     /// Save the settings for the specified <see cref="PageModule"/>.
     /// </summary>

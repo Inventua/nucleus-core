@@ -83,6 +83,13 @@ namespace Nucleus.Abstractions.Managers
     /// <summary>
     /// Save the settings for the specified <see cref="PageModule"/>.
     /// </summary>
+    /// <param name="module"></param>
+    [Obsolete(message: "Use SaveSettings(page, module) instead.")]
+    public Task SaveSettings(PageModule module);
+
+    /// <summary>
+    /// Save the settings for the specified <see cref="PageModule"/>.
+    /// </summary>
     /// <param name="page"></param>
     /// <param name="module"></param>
     public Task SaveSettings(Page page, PageModule module);

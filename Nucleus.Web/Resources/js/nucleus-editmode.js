@@ -118,7 +118,7 @@ function _setupEditMode(e, args)
   }
 
   /// Handle a "drop" event
-  /// Call Nucleus to execute the "move mnodule" operation.  Reload the page after the module has been moved.
+  /// Call Nucleus to execute the "move module" operation.  Reload the page after the module has been moved.
   function _handleDrop(event)
   {
     var targetpane = jQuery(event.target).attr('data-pane-name');
@@ -126,7 +126,7 @@ function _setupEditMode(e, args)
    
     if (targetpane !== null && _sourceModuleId !== null)
     {
-      var url = '/admin/pages/movemoduleto?mid=' + _sourceModuleId;
+      var url = document.baseURI + 'admin/pages/movemoduleto?mid=' + _sourceModuleId;
       var content = new FormData();
 
       content.append('pane', targetpane);

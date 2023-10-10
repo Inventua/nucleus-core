@@ -1058,7 +1058,8 @@ function _Page()
     {
       try
       {
-        this._selectedTabPath = new URL(document.baseURI + this._selectedPagePath).pathname;
+        var urlPath = this._selectedPagePath.startsWith('/') ? this._selectedPagePath.substring(1) : this._selectedPagePath;  
+        this._selectedTabPath = new URL(document.baseURI + urlPath).pathname;
       }
       catch (err)
       {
@@ -1293,7 +1294,7 @@ function _Page()
       {
         var urlPath = url.startsWith('/') ? url.substring(1) : url;        
         var newPath = new URL(document.baseURI + urlPath).pathname;
-        if (typeof this._selectedPagePath !== 'undefined' && this._selectedPagePath === newPath)
+        if (typeof this._selectedTabPath !== 'undefined' && this._selectedTabPath === newPath)
         {
           // trigger click to select the tab (and un-select other tabs)
           target.find('.nav .nav-item:nth-child(' + this._selectedTab + ') button').trigger('click');

@@ -140,7 +140,7 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
         }
         catch (System.IO.FileNotFoundException)
         {
-          dnnPage.AddWarning($"Document '{dnnDocument.Title}' in documents module '{dnnModule.ModuleTitle}' was not migrated because its file could not be found.");
+          dnnPage.AddWarning($"Document '{dnnDocument.Title}' in documents module '{dnnModule.ModuleTitle}' was not migrated because its file '{dnnDocumentFile.Path()}' could not be found.");
           doSave = false;
         }
       }

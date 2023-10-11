@@ -172,7 +172,7 @@ namespace Nucleus.Modules.Documents.Controllers
 				return BadRequest();
 			}
 
-			return View("Editor", viewModel);
+			return View("Editor", await BuildEditorViewModel(viewModel));
 		}
 
 

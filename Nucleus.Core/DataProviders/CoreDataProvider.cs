@@ -1684,10 +1684,8 @@ namespace Nucleus.Core.DataProviders
         if (existing == null)
 				{
 					newPermission.RelatedId = relatedId;
-
-					this.Context.Set<Permission>().Attach(newPermission);
-					this.Context.Entry(newPermission).State = EntityState.Added;
-
+          this.Context.Permissions.Add(newPermission);
+					
 					this.Context.Entry(newPermission.Role).State = EntityState.Detached;
 					if (newPermission.Role.RoleGroup != null)
 					{
@@ -1698,9 +1696,8 @@ namespace Nucleus.Core.DataProviders
 				else
 				{
 					existing.AllowAccess = newPermission.AllowAccess;
-					this.Context.Set<Permission>().Attach(existing);
-					this.Context.Entry(existing).State = EntityState.Modified;
-
+					this.Context.Permissions.Update(existing);
+         
 					if (existing.Role != null)
 					{
 						this.Context.Entry(existing.Role).State = EntityState.Detached;
@@ -1714,9 +1711,9 @@ namespace Nucleus.Core.DataProviders
 						this.Context.Entry(existing.PermissionType).State = EntityState.Detached;
 					}
 				}
-
-				await this.Context.SaveChangesAsync<Permission>();
 			}
+			
+      await this.Context.SaveChangesAsync<Permission>();
 		}
 
 		#endregion

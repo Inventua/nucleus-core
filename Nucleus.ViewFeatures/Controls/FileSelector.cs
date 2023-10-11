@@ -98,17 +98,18 @@ namespace Nucleus.ViewFeatures.Controls
 			}
 
 			// Populate the folders list with "children" of the currently selected folder
-			if (viewModel.SelectedFile?.Parent != null && viewModel.SelectedFile.Parent.Id != Guid.Empty)
+			if ( viewModel.SelectedFile?.Parent != null && viewModel.SelectedFile.Parent.Id != Guid.Empty)
 			{
 				viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFile.Parent.Id, HttpContext.User, pattern);
 			}
 			else
 			{
-        // This handles the ".." navigation list item, which doesn't have a real ID
-        if (HttpContext.User.HasBrowsePermission(this.Context.Site, viewModel.SelectedFile.Parent))
+        // handle default (top) folder 
+        Folder selectedFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFile.Provider, viewModel.SelectedFile.Parent?.Path ?? "");
+          
+        if (HttpContext.User.HasBrowsePermission(this.Context.Site, selectedFolder))
         {
-          viewModel.SelectedFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFile.Provider, viewModel.SelectedFile.Parent?.Path ?? "");
-          viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, viewModel.SelectedFolder.Id, HttpContext.User, pattern);
+          viewModel.SelectedFolder = await this.FileSystemManager.ListFolder(this.Context.Site, selectedFolder.Id, HttpContext.User, pattern);
         }
 			}
 
@@ -139,15 +140,20 @@ namespace Nucleus.ViewFeatures.Controls
 			// Add a "up one level" folder to the folders list, unless we are already at the top level
 			if (!String.IsNullOrEmpty(viewModel.SelectedFolder.Path))
 			{
-				viewModel.SelectedFolder.Folders.Insert(0, new Folder()
-				{
-					Id = viewModel.SelectedFolder.Parent.Id,
-					Name = "..",
-					Parent = viewModel.SelectedFolder.Parent.Parent,
-					Path = viewModel.SelectedFolder.Parent.Path,
-					Permissions = viewModel.SelectedFolder.Parent.Permissions,
-					Provider = viewModel.SelectedFolder.Parent.Provider
-				});
+        Folder parentFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedFolder.Parent.Id);
+
+        if (HttpContext.User.HasBrowsePermission(this.Context.Site, parentFolder))
+        {
+          viewModel.SelectedFolder.Folders.Insert(0, new Folder()
+          {
+            Id = parentFolder.Id,
+            Name = "..",
+            Parent = parentFolder.Parent,
+            Path = parentFolder.Path,
+            Permissions = parentFolder.Permissions,
+            Provider = parentFolder.Provider
+          });
+        }
 			}
 
 			if (!String.IsNullOrEmpty(viewModel.SelectedFile.Path))

@@ -25,6 +25,7 @@
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="Viewer.js" />
+    <None Remove="viewer.min.css" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
     <None Remove="Views\_PageMenu.cshtml" />
@@ -38,6 +39,7 @@
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
     <Content Include="Viewer.js" />
+    <Content Include="viewer.min.css" />
     <Content Include="Views\_ViewerInput.cshtml" />
     <Content Include="Views\_PageMenu.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>

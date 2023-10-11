@@ -1307,7 +1307,7 @@ function _Page()
       {
         var urlPath = url.startsWith('/') ? url.substring(1) : url;        
         var newPath = new URL(document.baseURI + urlPath).pathname;
-        if (typeof this._selectedTabPath !== 'undefined' && this._selectedTabPath === newPath)
+        if (newPath.startsWith('/extensions/') || (typeof this._selectedTabPath !== 'undefined' && this._selectedTabPath === newPath))
         {
           // trigger click to select the tab (and un-select other tabs)
           target.find('.nav .nav-item:nth-child(' + this._selectedTab + ') button').trigger('click');

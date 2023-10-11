@@ -8,6 +8,7 @@ using Nucleus.Abstractions.Models.FileSystem;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Nucleus.Modules.Documents.Models;
 using Nucleus.Abstractions.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Nucleus.Modules.Documents.ViewModels
 {
@@ -28,6 +29,9 @@ namespace Nucleus.Modules.Documents.ViewModels
 		public Boolean ShowDescription { get; set; }
 		public Boolean ShowModifiedDate { get; set; }
 
+    public string DefaultSortOrder { get; set; }
+
+    public IEnumerable<SelectListItem> SortOrders { get; set; }
 
 	}
 }

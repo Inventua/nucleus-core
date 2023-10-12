@@ -174,10 +174,8 @@ namespace Nucleus.Modules.Sitemap
 
 					if (menuItem.Page.Id == nucleusContext.Page.Id)
 					{
-						listItemBuilder.AddCssClass("current-page");
+						listItemBuilder.AddCssClass("active");
 					}
-
-
 
 					if (maxlevels == 0 || level < maxlevels - 1)
 					{

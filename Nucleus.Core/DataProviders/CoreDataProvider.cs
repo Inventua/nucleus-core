@@ -1696,7 +1696,8 @@ namespace Nucleus.Core.DataProviders
 				else
 				{
 					existing.AllowAccess = newPermission.AllowAccess;
-					this.Context.Permissions.Update(existing);
+          existing.RelatedId = relatedId;
+          this.Context.Permissions.Update(existing);
          
 					if (existing.Role != null)
 					{

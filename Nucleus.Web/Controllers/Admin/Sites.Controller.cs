@@ -420,7 +420,7 @@ namespace Nucleus.Web.Controllers.Admin
 				}
 			}
 
-			return Json(new { Title = "Test Email Settings", Message = $"A test email was sent successfully to '{viewModel.MailSettings.Sender}'." });
+			return Json(new { Title = "Test Email Settings", Message = $"A test email was sent successfully to '{viewModel.MailSettings.Sender}'.", Icon = "alert" });
 		}
 
 

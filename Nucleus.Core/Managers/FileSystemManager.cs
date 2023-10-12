@@ -892,6 +892,11 @@ namespace Nucleus.Core.Managers
 
 			if (content != null)
 			{
+        if (parentPath.Length > 1 && (parentPath.EndsWith('/') || parentPath.EndsWith('\\')))
+        {
+          parentPath = parentPath[..^1];
+        }
+
 				Folder parentFolder = await fileSystemProvider.GetFolder(UseSiteHomeDirectory(site, parentPath));
 				string message = "";
 

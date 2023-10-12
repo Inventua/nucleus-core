@@ -35,7 +35,7 @@
 				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.Posts, propertyName = "Posts", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Standard })
 				@Html.HiddenFor(model => model.Forum.Id)
 
-				<table class="forum-posts">
+				<table class="forum-posts table table-sm table-striped">
 					<thead>
 						<tr>
 							<th colspan="1" class="forum-title" scope="col">
@@ -94,7 +94,11 @@
 								@if (post.Statistics.LastReply != null)
 								{
 									<div>@(post.Statistics.LastReply.PostedBy?.UserName ?? "Deleted User")</div>
-									<div>@post.Statistics.LastReply.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
+									<div>
+                    <a href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode() + $"/{@post.Id}" + "#_" + @post.Statistics.LastReply.Id)">
+                      @post.Statistics.LastReply.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())
+                    </a>
+                  </div>
 								}
 							</td>
 						</tr>

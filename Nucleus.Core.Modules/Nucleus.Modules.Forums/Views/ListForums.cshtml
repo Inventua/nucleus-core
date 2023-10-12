@@ -6,60 +6,66 @@
 @Html.AddStyle("~!/../viewer.css")
 @Html.AddStyle("~/Resources/css/forms.css")
 <div class="Forums">
-	<div class="nucleus-form-tools">
-		@Html.LinkButton("","Manage Subscriptions", Url.NucleusAction("ManageSubscriptions", "Forums", "Forums"), new { @class = "btn btn-primary", @data_target = ".Forums.parent()" })
-	</div>
-	<table class="forums-list">
-		@foreach (var group in Model.Groups)
-		{
-			<thead>
-				<tr class="group-header">
-					<th scope="col" class="group-title">@group.Name</th>
-					<th scope="col">Posts</th>
-					<th scope="col">Replies</th>
-					<th scope="col">Most Recent</th>
-				</tr>
-			</thead>
-			<tbody>
-			@foreach (var forum in group.Forums)
-			{
-				<tr class="forum-item @(forum.EffectiveSettings().Enabled ? "enabled" : "disabled")">
-					<td class="forum-title">
-						<div class="nucleus-material-icon me-1">
-							@if (forum.EffectiveSettings().Enabled)
-							{
-								@Html.Raw("&#xe0bf;")
-							}
-							else
-							{
-								<span title="Disabled forum">@Html.Raw("&#xf236;")</span>
-							}
-						</div>
-						<div>
-							<div>
-								<a href="@Url.PageLink(Model.Page, forum.Name.FriendlyEncode())">@forum.Name</a>
-							</div>
+  <div class="nucleus-form-tools">
+    @Html.LinkButton("","Manage Subscriptions", Url.NucleusAction("ManageSubscriptions", "Forums", "Forums"), new { @class = "btn btn-primary", @data_target = ".Forums.parent()" })
+  </div>
+  <table class="forums-list table table-sm table-striped">
+    @foreach (var group in Model.Groups)
+    {
+      <thead>
+        <tr class="group-header">
+          <th scope="col" class="group-title">@group.Name</th>
+          <th scope="col">Posts</th>
+          <th scope="col">Replies</th>
+          <th scope="col">Most Recent</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var forum in group.Forums)
+        {
+          <tr class="forum-item @(forum.EffectiveSettings().Enabled ? "enabled" : "disabled")">
+            <td>
+              <div class="forum-title">
+                <div class="nucleus-material-icon me-1">
+                  @if (forum.EffectiveSettings().Enabled)
+                  {
+                    @Html.Raw("&#xe0bf;")
+                  }
+                  else
+                  {
+                    <span title="Disabled forum">@Html.Raw("&#xf236;")</span>
+                  }
+                </div>
+                <div>
+                  <div>
+                    <a href="@Url.PageLink(Model.Page, forum.Name.FriendlyEncode())">@forum.Name</a>
+                  </div>
 
-							@if (!String.IsNullOrEmpty(forum.Description))
-							{
-								<div>
-									@forum.Description
-								</div>
-							}
-						</div>
-					</td>
-					<td class="compact-cell">@forum.Statistics.PostCount</td>
-					<td class="compact-cell">@forum.Statistics.ReplyCount</td>
-					<td class="compact-cell small" title="@forum.Statistics.LastPost?.Subject">
-						@if (forum.Statistics.LastPost != null)
-						{
-							<div class="forum-subject" title="@forum.Statistics.LastPost.Subject">@forum.Statistics.LastPost.Subject</div>
-							<div>@(forum.Statistics.LastPost.PostedBy?.UserName ?? "Deleted User"), @forum.Statistics.LastPost.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
-						}
-					</td>
-				</tr>
-			}
-			</tbody>
-		}
-	</table>
+                  @if (!String.IsNullOrEmpty(forum.Description))
+                  {
+                    <div>
+                      @forum.Description
+                    </div>
+                  }
+                </div>
+              </div>
+            </td>
+            <td class="compact-cell">@forum.Statistics.PostCount</td>
+            <td class="compact-cell">@forum.Statistics.ReplyCount</td>
+            <td class="compact-cell small" title="@forum.Statistics.LastPost?.Subject">
+              @if (forum.Statistics.LastPost != null)
+              {
+                <div class="forum-subject" title="@forum.Statistics.LastPost.Subject">
+                  <a href="@Url.PageLink(Model.Page, @forum.Name.FriendlyEncode() + $"/{@forum.Statistics.LastPost.Id}")">
+                    @forum.Statistics.LastPost.Subject
+                  </a>
+                </div>
+                <div>@(forum.Statistics.LastPost.PostedBy?.UserName ?? "Deleted User"), @forum.Statistics.LastPost.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    }
+  </table>
 </div>

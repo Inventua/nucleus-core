@@ -8,7 +8,7 @@ using Nucleus.Abstractions.Models.FileSystem;
 
 namespace Nucleus.Modules.Documents.Models
 {
-	public class Document
+	public class Document : ModelBase
 	{
 		public const string URN = "urn:nucleus:entities:document";
 

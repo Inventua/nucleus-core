@@ -31,7 +31,7 @@
 
     @Html.HiddenFor(model => model.PortalId)
     <div class="nucleus-flex-fields">
-      <SettingsControl caption="Update Existing?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to update folders when a matching folder is found.  If this is not set, any existing folders will be skipped.">
+      <SettingsControl caption="Update Existing Files?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to re-download files when the file already exists in Nucleus.  Selected folders and folder settings are always migrated.">
         @Html.CheckBoxFor(model => model.UpdateExisting, new { @class = "ToggleSwitch" })
       </SettingsControl>
 

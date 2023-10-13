@@ -158,8 +158,9 @@ public class DocumentsModuleContentMigration : ModuleContentMigrationBase
           Title = dnnDocument.Title,
           Description = dnnDocument.Description,
           Category = categoriesList?.Items
-          .Where(item => item.Name.Equals(dnnDocument.Category, StringComparison.OrdinalIgnoreCase))
-          .FirstOrDefault(),
+            .Where(item => item.Name.Equals(dnnDocument.Category, StringComparison.OrdinalIgnoreCase))
+            .FirstOrDefault(),
+          DateChanged = dnnDocument.ModifiedDate,
           File = newDocumentFile,
           SortOrder = dnnDocument.SortOrderIndex
         };

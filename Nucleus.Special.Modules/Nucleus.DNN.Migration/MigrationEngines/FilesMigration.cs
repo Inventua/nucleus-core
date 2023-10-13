@@ -40,6 +40,8 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
     this.FileSystemManager = fileSystemManager;
     this.FileSystemProviderOptions = fileSystemProviderOptions.Value;
     this.RoleManager = roleManager;
+
+    this.HttpClient.Timeout = TimeSpan.FromMinutes(30);
   }
 
   public void SetAlias(Boolean useSSL, Models.DNN.PortalAlias portalAlias)
@@ -82,7 +84,7 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
             nucleusFolder = null;
           }
 
-          Boolean doCopyFiles = nucleusFolder == null || updateExisting;
+          //Boolean doCopyFiles = nucleusFolder == null || updateExisting;
 
           if (nucleusFolder == null)
           {
@@ -98,83 +100,87 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
             this.Progress();
           }
 
-          if (!doCopyFiles)
+          //if (!doCopyFiles)
+          //{
+          //  // files in folder not copied because the folder already exists & "update existing" is not selected
+          //  this.Progress(dnnFolder.Files.Count);
+          //  skippedCount += dnnFolder.Files.Count;
+          //}
+          //else
+          //{
+          foreach (Models.DNN.File dnnFile in dnnFolder.Files)
           {
-            // files in folder not copied because the folder already exists & "update existing" is not selected
-            this.Progress(dnnFolder.Files.Count);
-            skippedCount += dnnFolder.Files.Count;
-          }
-          else
-          {
-            foreach (Models.DNN.File dnnFile in dnnFolder.Files)
+            // copy files 
+
+            // validate file
+            AllowedFileType fileType = this.FileSystemProviderOptions.AllowedFileTypes
+              .Where(allowedtype => allowedtype.FileExtensions.Contains(System.IO.Path.GetExtension(dnnFile.FileName), StringComparer.OrdinalIgnoreCase))
+              .FirstOrDefault();
+
+            if (fileType != null)
             {
-              // copy files 
-
-              // validate file
-              AllowedFileType fileType = this.FileSystemProviderOptions.AllowedFileTypes
-                .Where(allowedtype => allowedtype.FileExtensions.Contains(System.IO.Path.GetExtension(dnnFile.FileName), StringComparer.OrdinalIgnoreCase))
-                .FirstOrDefault();
-
-              if (fileType != null)
+              try
               {
+                Nucleus.Abstractions.Models.FileSystem.File existingNucleusFile;
+                if (dnnFile.FileName.Contains("Centro 1.1.0"))
+                {
+
+                }
                 try
                 {
-                  Nucleus.Abstractions.Models.FileSystem.File existingNucleusFile;
-                  try
-                  {
-                    existingNucleusFile = await this.FileSystemManager.GetFile(this.Context.Site, fileSystemProvider.Key, $"{dnnFile.Folder.FolderPath}{dnnFile.FileName}");
-                  }
-                  catch (System.IO.FileNotFoundException)
-                  {
-                    existingNucleusFile = null;
-                  }
+                  existingNucleusFile = await this.FileSystemManager.GetFile(this.Context.Site, fileSystemProvider.Key, $"{dnnFile.Folder.FolderPath}{dnnFile.FileName}");
+                }
+                catch (System.IO.FileNotFoundException)
+                {
+                  existingNucleusFile = null;
+                }
 
-                  if (existingNucleusFile == null || updateExisting)
+                if (existingNucleusFile == null || updateExisting)
+                {
+                  using (System.IO.Stream stream = await Download(dnnFile))
                   {
-                    using (System.IO.Stream stream = await Download(dnnFile))
+                    if (stream.Length == 0)
                     {
-                      if (stream.Length == 0)
-                      {
-                        dnnFolder.AddWarning($"File '{dnnFile.FileName}' is zero length and was skipped.");
-                        failCount++;
-                      }
-                      else if (!fileType.IsValid(stream))
-                      {
-                        string sample = BitConverter.ToString(Nucleus.Extensions.AllowedFileTypeExtensions.GetSample(stream)).Replace("-", "");
-                        dnnFolder.AddWarning($"File content of file '{dnnFile.FileName}': signature [{sample}] does not match any of the file signatures for file type {System.IO.Path.GetExtension(dnnFile.FileName)}.");
-                        failCount++;
-                      }
-                      else
-                      {
-                        // save the file
-                        await this.FileSystemManager.SaveFile(this.Context.Site, fileSystemProvider.Key, dnnFile.Folder.FolderPath, dnnFile.FileName, stream, updateExisting);
-                        successCount++;
-                      }
+                      dnnFolder.AddWarning($"File '{dnnFile.FileName}' is zero length and was skipped.");
+                      failCount++;
+                    }
+                    else if (!fileType.IsValid(stream))
+                    {
+                      string sample = BitConverter.ToString(Nucleus.Extensions.AllowedFileTypeExtensions.GetSample(stream)).Replace("-", "");
+                      dnnFolder.AddWarning($"File content of file '{dnnFile.FileName}': signature [{sample}] does not match any of the file signatures for file type {System.IO.Path.GetExtension(dnnFile.FileName)}.");
+                      failCount++;
+                    }
+                    else
+                    {
+                      // save the file
+                      await this.FileSystemManager.SaveFile(this.Context.Site, fileSystemProvider.Key, dnnFile.Folder.FolderPath, dnnFile.FileName, stream, updateExisting);
+                      successCount++;
                     }
                   }
-                  else
-                  {
-                    string url = $"{(this.UseSSL ? "https" : "http")}://{this.PortalAlias.HttpAlias}/portals/{this.PortalAlias.PortalId}/{dnnFile.Folder.FolderPath}{dnnFile.FileName}";
-                    this.Message = $"Skipping {url} because the file already exists.";
-                    skippedCount++;
-                  }
                 }
-                catch (HttpRequestException ex)
+                else
                 {
-                  dnnFolder.AddWarning($"Error downloading file '{dnnFile.FileName}': {ex.Message}");
-                  failCount++;
+                  string url = $"{(this.UseSSL ? "https" : "http")}://{this.PortalAlias.HttpAlias}/portals/{this.PortalAlias.PortalId}/{dnnFile.Folder.FolderPath}{dnnFile.FileName}";
+                  this.Message = $"Skipping {url} because the file already exists.";
+                  skippedCount++;
                 }
-
-                this.Progress();
               }
-              else
+              catch (HttpRequestException ex)
               {
-                string url = $"{(this.UseSSL ? "https" : "http")}://{this.PortalAlias.HttpAlias}/portals/{this.PortalAlias.PortalId}/{dnnFile.Folder.FolderPath}{dnnFile.FileName}";
-                dnnFolder.AddWarning($"Skipped '{url}' because it does not match any of the allowed file extensions.");
+                dnnFolder.AddWarning($"Error downloading file '{dnnFile.FileName}': {ex.Message}");
                 failCount++;
               }
+
+              this.Progress();
+            }
+            else
+            {
+              string url = $"{(this.UseSSL ? "https" : "http")}://{this.PortalAlias.HttpAlias}/portals/{this.PortalAlias.PortalId}/{dnnFile.Folder.FolderPath}{dnnFile.FileName}";
+              dnnFolder.AddWarning($"Skipped '{url}' because it does not match any of the allowed file extensions.");
+              failCount++;
             }
           }
+          //}
 
           if (successCount + skippedCount + failCount == 0)
           {
@@ -367,6 +373,7 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
   private async Task<System.IO.Stream> Download(Models.DNN.File file)
   {
     string url = $"{(this.UseSSL ? "https" : "http")}://{this.PortalAlias.HttpAlias}/portals/{this.PortalAlias.PortalId}/{file.Folder.FolderPath}{file.FileName}";
+
     this.Message = $"Downloading {url} ...";
 
     HttpResponseMessage response = await this.HttpClient.GetAsync(url);

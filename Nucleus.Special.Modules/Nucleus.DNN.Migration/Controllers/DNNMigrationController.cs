@@ -426,10 +426,39 @@ public class DNNMigrationController : Controller
     {
       EngineProgress = progress,
       InProgress = doRefresh,
-      Message = message
+      Message = message,
+      ProgressInverval = CalculateInterval(progress.First()?.StartTime)
     };
 
     return Task.FromResult(viewModel);
+  }
+
+  /// <summary>
+  /// Calculate the progress update interval, based on the total time that the migration has been running.  This is to avoid lots of updates 
+  /// for long-running migrations.
+  /// </summary>
+  /// <param name="startTime"></param>
+  /// <returns></returns>
+  private int CalculateInterval(DateTime? startTime)
+  {
+    if (!startTime.HasValue)
+    {
+      return 1000;  // default
+    }
+    else
+    {
+      // calculate sliding scale for progress updates
+      double seconds = (DateTime.Now - startTime.Value).TotalSeconds;
+      switch (seconds)
+      {
+        case > 120 and < 240:
+          return 5000;
+        case >= 240:
+          return 10000;
+        default:
+          return 1000;
+      }
+    }
   }
 
   private async Task<ViewModels.Role> BuildRolesViewModel(int portalId)

@@ -8,15 +8,15 @@ using Nucleus.DNN.Migration.Models.DNN;
 
 namespace Nucleus.DNN.Migration.MigrationEngines;
 
-public abstract class MigrationEngineBase<TModel> : MigrationEngineBase 
+public abstract class MigrationEngineBase<TModel> : MigrationEngineBase
   where TModel : Nucleus.DNN.Migration.Models.DNN.DNNEntity
-{ 
+{
   public MigrationEngineBase(string title) : base(title) { }
 
 
   private List<TModel> _items;
 
-  public List<TModel> Items 
+  public List<TModel> Items
   {
     get
     {
@@ -59,8 +59,10 @@ public abstract class MigrationEngineBase<TModel> : MigrationEngineBase
 
   public void SignalStart()
   {
+    this.StartTime = DateTime.Now;
+
     this.IsStarted = true;
-    this.TotalCount = this.Items.Where(item=> item.CanSelect && item.IsSelected).Count();
+    this.TotalCount = this.Items.Where(item => item.CanSelect && item.IsSelected).Count();
     foreach (DNNEntity item in this.Items)
     {
       item.Results.Clear();
@@ -70,6 +72,7 @@ public abstract class MigrationEngineBase<TModel> : MigrationEngineBase
   public void SignalCompleted()
   {
     this.IsComplete = true;
+    this.Current = this.TotalCount;
   }
 }
 
@@ -91,21 +94,24 @@ public abstract class MigrationEngineBase
 
   public string Message { get; set; }
 
+  public DateTime? StartTime { get; set; }
+
   public abstract List<Nucleus.DNN.Migration.Models.DNN.DNNEntity> InnerItems { get; }
 
   public EngineProgress GetProgress()
   {
-    EngineProgress copy = new Models.EngineProgress() 
-    { 
-      Title=this.Title,
-      Current=this.Current,
+    EngineProgress copy = new Models.EngineProgress()
+    {
+      Title = this.Title,
+      Current = this.Current,
       CurrentPercent = this.CurrentPercent,
-      IsStarted = this.IsStarted,  
-      State=this.State(),
-      TotalCount=this.TotalCount,
+      IsStarted = this.IsStarted,
+      State = this.State(),
+      TotalCount = this.TotalCount,
+      StartTime = this.StartTime,
       Items = this.InnerItems.Where(item => item.IsSelected && item.CanSelect).ToList(),
     };
-    
+
     return copy;
   }
 
@@ -115,7 +121,7 @@ public abstract class MigrationEngineBase
 
   public Boolean IsStarted { get; protected set; }
 
-  public Boolean IsComplete{ get; protected set; }
+  public Boolean IsComplete { get; protected set; }
 
 
   public int CurrentPercent
@@ -147,7 +153,7 @@ public abstract class MigrationEngineBase
 
   public void Start(int totalCount)
   {
-    this.TotalCount=totalCount;
+    this.TotalCount = totalCount;
     this.Current = 0;
   }
 
@@ -162,7 +168,7 @@ public abstract class MigrationEngineBase
   public void Progress(int value)
   {
     if (this.TotalCount >= this.Current + value)
-    { 
+    {
       this.Current += value;
     }
   }

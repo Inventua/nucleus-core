@@ -25,4 +25,6 @@ public class EngineProgress
   public EngineStates State { get; init; }
 
   public List<Models.DNN.DNNEntity> Items { get; init; }
+
+  public DateTime? StartTime { get; init; }
 }

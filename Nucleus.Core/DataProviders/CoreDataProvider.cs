@@ -794,8 +794,15 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task DeletePageModule(PageModule module)
 		{
-			this.Context.Remove(module);
-			await this.Context.SaveChangesAsync<PageModule>();
+      PageModule existing = await this.Context.PageModules
+       .Where(existing => existing.Id == module.Id)
+       .FirstOrDefaultAsync();
+
+      if (existing != null)
+      {
+        this.Context.Remove(existing);
+        await this.Context.SaveChangesAsync<PageModule>();
+      }
 
 			this.EventManager.RaiseEvent<PageModule, Delete>(module);
 		}

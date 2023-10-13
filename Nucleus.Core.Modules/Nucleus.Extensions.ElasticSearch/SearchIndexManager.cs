@@ -84,7 +84,7 @@ namespace Nucleus.Extensions.ElasticSearch
 
 			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(metadata.Site, settings.EncryptedPassword), settings.CertificateThumbprint);
 
-			ElasticSearchDocument document = new(metadata);
+      ElasticSearchDocument document = new(metadata, settings);
 			Nest.IndexResponse response = await request.IndexContent(document);
 
 			// free up memory - file content is part of the feed data, and this can exhaust available memory 
@@ -97,7 +97,7 @@ namespace Nucleus.Extensions.ElasticSearch
 
 			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(metadata.Site, settings.EncryptedPassword), settings.CertificateThumbprint);
 
-			await request.RemoveContent(new ElasticSearchDocument(metadata));
+			await request.RemoveContent(new ElasticSearchDocument(metadata, settings));
 		}
 	}
 }

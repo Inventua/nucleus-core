@@ -1182,14 +1182,14 @@ function _Page()
     }
 
     // if we get an empty response, and are in the main window, and the target is nothing, refresh the current page
-    if (self === top && data === '' && target.length === 0)
+    if (window.self === window.top && data === '' && target.length === 0)
     {
       window.location.reload(true);
       return;
     }
 
     // if we get an empty response, and the target is in an iframe and the iFrame is not #AdminFrame, hide the iframe and refresh the page
-    if (self !== top && data === '' && (jQuery(frameElement).attr('id') !== 'AdminFrame' || source.hasClass('nucleus-dialogresult')))
+    if (window.self !== window.top && data === '' && (jQuery(frameElement).attr('id') !== 'AdminFrame' || source.hasClass('nucleus-dialogresult')))
     {
       jQuery(frameElement).hide();
       window.parent.document.dispatchEvent(new CustomEvent('Refresh'));
@@ -1307,7 +1307,7 @@ function _Page()
       {
         var urlPath = url.startsWith('/') ? url.substring(1) : url;        
         var newPath = new URL(document.baseURI + urlPath).pathname;
-        if (newPath.startsWith('/extensions/') || (typeof this._selectedTabPath !== 'undefined' && this._selectedTabPath === newPath))
+        if ((window.self !== window.top && jQuery(frameElement).attr('id') !== 'AdminFrame') || _hasCommonBasePath(this._selectedTabPath, newPath))        
         {
           // trigger click to select the tab (and un-select other tabs)
           target.find('.nav .nav-item:nth-child(' + this._selectedTab + ') button').trigger('click');
@@ -1326,6 +1326,26 @@ function _Page()
 
     Page.EnableEnhancedToolTips(true);
   }
+
+  function _hasCommonBasePath(path1, path2)
+  {
+    if (typeof path1 === 'undefined' || typeof path2 === 'undefined' || path1 === null || path2 === null) return false;
+
+    var path1parts = path1.split('/');
+    var path2parts = path2.split('/');
+    var matches = 0;
+
+    for (var count = 0; count < path1parts.length && count < path2parts.length; count++)
+    {
+      if (path1parts[count] !== '' && path1parts[count] === path2parts[count])
+      {
+        matches++;
+      }
+    }
+
+    return (matches >= 2);
+  }
+
 
   function _getCookie(name)
   {

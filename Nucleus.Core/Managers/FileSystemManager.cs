@@ -526,8 +526,8 @@ namespace Nucleus.Core.Managers
 			}
 
 			await GetDatabaseProperties(site, folder.Parent);
-			await GetDatabaseProperties(site, folder.Folders);
-			await GetDatabaseProperties(site, folder.Files);
+			//await GetDatabaseProperties(site, folder.Folders);
+			//await GetDatabaseProperties(site, folder.Files);
 
 			return folder;
 		}
@@ -561,20 +561,12 @@ namespace Nucleus.Core.Managers
 
       await GetDatabaseProperties(site, folder);
 
-      foreach (Folder subfolder in folder.Folders)
-      {
-        subfolder.Parent = folder;
-      }
-
-      foreach (File file in folder.Files)
-      {
-        file.Parent = folder;
-      }
+      
 
       // we must get database properties for folders in order to retrieve permissions before calling CheckFolderPermission
       await GetDatabaseProperties(site, folder.Parent);
-      await GetDatabaseProperties(site, folder.Folders);
-      await GetDatabaseProperties(site, folder.Files);
+      //await GetDatabaseProperties(site, folder.Folders);
+      //await GetDatabaseProperties(site, folder.Files);
 
       CheckFolderPermissions(site, user, folder);
 
@@ -675,7 +667,7 @@ namespace Nucleus.Core.Managers
       
       // we must get database properties for folders in order to retrieve permissions before calling CheckFolderPermission
       await GetDatabaseProperties(site, folder);
-      await GetDatabaseProperties(site, folder.Folders);      
+      //await GetDatabaseProperties(site, folder.Folders);      
       await GetDatabaseProperties(site, folder.Parent);
 
       CheckFolderPermissions(site, user, folder);
@@ -695,22 +687,23 @@ namespace Nucleus.Core.Managers
 
       results.TotalCount = items.Count;
 
-      foreach (FileSystemItem item in results.Items)
-      {
-        if (item is Folder)
-        {
-          Folder subfolder = item as Folder;
-          subfolder.Parent = folder;
-        }
+      // This logic was moved to GetDatabaseProperties(site, folder)
+      ////foreach (FileSystemItem item in results.Items)
+      ////{
+      ////  if (item is Folder)
+      ////  {
+      ////    Folder subfolder = item as Folder;
+      ////    subfolder.Parent = folder;
+      ////  }
 
-        if (item is File)
-        {
-          File file = item as File;
-          file.Parent = folder;
+      ////  if (item is File)
+      ////  {
+      ////    File file = item as File;
+      ////    file.Parent = folder;
 
-          await GetDatabaseProperties(site, file);
-        }
-      }
+      ////    await GetDatabaseProperties(site, file);
+      ////  }
+      ////}
 
       return results;
     }
@@ -740,15 +733,16 @@ namespace Nucleus.Core.Managers
       }
     }
 
-    private async Task GetDatabaseProperties(Site site, List<File> files)
-		{
-			foreach (File file in files)
-			{
-				await GetDatabaseProperties(site, file);
-			}
-		}
+    // Moved to GetDatabaseProperties(Site site, Folder folder)
+    //  private async Task GetDatabaseProperties(Site site, List<File> files)
+    //{
+    //    foreach (File file in files)
+    //	{
+    //		await GetDatabaseProperties(site, file);
+    //	}
+    //}
 
-		private async Task<File> GetDatabaseProperties(Site site, File file)
+    private async Task<File> GetDatabaseProperties(Site site, File file)
 		{
       if (file == null) return null;
 
@@ -762,15 +756,16 @@ namespace Nucleus.Core.Managers
 			return file;
 		}
 
-		private async Task GetDatabaseProperties(Site site, List<Folder> folders)
-		{
-			foreach (Folder folder in folders)
-			{
-				await GetDatabaseProperties(site, folder);
-			}
-		}
+    // Moved to GetDatabaseProperties(Site site, Folder folder)
+    //private async Task GetDatabaseProperties(Site site, List<Folder> folders)
+    //{
+    //	foreach (Folder folder in folders)
+    //	{
+    //		await GetDatabaseProperties(site, folder);
+    //	}
+    //}
 
-		private async Task<Folder> GetDatabaseProperties(Site site, Folder folder)
+    private async Task<Folder> GetDatabaseProperties(Site site, Folder folder)
 		{
 			if (folder == null) return null;
 			
@@ -780,7 +775,39 @@ namespace Nucleus.Core.Managers
 			{
 				folderData.CopyDatabaseValuesTo(folder);
 			}
-			return folder;
+
+      using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
+      {
+        List<Folder> databaseFolders = await dataProvider.ListFolders(site, folder.Provider, folder.Path);
+
+        foreach (Folder subFolder in folder.Folders)
+        {
+          RemoveSiteHomeDirectory(site, subFolder);
+
+          databaseFolders.Where(databaseFile => databaseFile.Path.Equals(subFolder.Path, StringComparison.OrdinalIgnoreCase))
+            .FirstOrDefault()
+            ?.CopyDatabaseValuesTo(subFolder);
+
+          subFolder.Parent = folder;
+        }
+      }
+
+      using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
+      {
+        List<File> databaseFiles = await dataProvider.ListFiles(site, folder.Provider, folder.Path);
+
+        foreach (File file in folder.Files)
+        {
+          RemoveSiteHomeDirectory(site, file);
+
+          databaseFiles.Where(databaseFile => databaseFile.Path.Equals(file.Path, StringComparison.OrdinalIgnoreCase))
+            .FirstOrDefault()
+            ?.CopyDatabaseValuesTo(file);
+          file.Parent = folder;
+        }
+      }
+
+      return folder;
 		}
 
 		public async Task<System.Uri> GetFileDirectUrl(Site site, File file)

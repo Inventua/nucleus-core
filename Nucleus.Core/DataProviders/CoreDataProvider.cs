@@ -1922,6 +1922,7 @@ namespace Nucleus.Core.DataProviders
 		public async Task<List<LayoutDefinition>> ListLayoutDefinitions()
 		{
 			return await this.Context.LayoutDefinitions
+        .OrderBy(layout => layout.FriendlyName)
 				.AsNoTracking()
 				.ToListAsync();
 		}
@@ -1972,8 +1973,8 @@ namespace Nucleus.Core.DataProviders
 		public async Task<List<ContainerDefinition>> ListContainerDefinitions()
 		{
 			return await this.Context.ContainerDefinitions
-				.AsNoTracking()
 				.OrderBy(container => container.FriendlyName)
+				.AsNoTracking()
 				.ToListAsync();
 		}
 
@@ -2224,7 +2225,15 @@ namespace Nucleus.Core.DataProviders
 				.FirstOrDefaultAsync();
 		}
 
-		public async Task<Folder> SaveFolder(Site site, Folder folder)
+    public async Task<List<Folder>> ListFolders(Site site, string provider, string path)
+    {
+      return await this.Context.Folders
+        .Where(folder => EF.Property<Guid>(folder, "SiteId") == site.Id && folder.Provider == provider && folder.Path.StartsWith(path))
+        .AsNoTracking()
+        .ToListAsync();
+    }
+
+    public async Task<Folder> SaveFolder(Site site, Folder folder)
 		{
 			Boolean isNew = !this.Context.Folders.Where(existing => existing.Id == folder.Id).Any();
 
@@ -2258,10 +2267,20 @@ namespace Nucleus.Core.DataProviders
 			return await this.Context.Files
 				.Where(file => file.Id == fileId)
 				.AsNoTracking()
-				.FirstOrDefaultAsync();
-		}
+				.FirstOrDefaultAsync();		
+    }
 
-		public async Task<File> GetFile(Site site, string provider, string path)
+
+    public async Task<List<File>> ListFiles(Site site, string provider, string path)
+    {
+      return await this.Context.Files
+        .Where(file => EF.Property<Guid>(file, "SiteId") == site.Id && file.Provider == provider && file.Path.StartsWith(path))
+        .AsNoTracking()
+        .ToListAsync();
+    }
+
+
+    public async Task<File> GetFile(Site site, string provider, string path)
 		{
 			return await this.Context.Files
 				.Where(file => EF.Property<Guid>(file, "SiteId") == site.Id && file.Provider == provider && file.Path == path)

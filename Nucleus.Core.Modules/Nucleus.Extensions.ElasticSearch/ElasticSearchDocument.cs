@@ -273,21 +273,14 @@ namespace Nucleus.Extensions.ElasticSearch
 
 		private bool IsPublic(Site site, IEnumerable<Role> roles)
 		{
-			if (roles?.Any() == false)
+			foreach (Role role in roles)
 			{
-				return true;
-			}
-			else
-			{
-				foreach (Role role in roles)
+				if (role == site.AnonymousUsersRole || role == site.AllUsersRole)
 				{
-					if (role == site.AnonymousUsersRole || role == site.AllUsersRole)
-					{
-						return true;
-					}
+					return true;
 				}
 			}
-
+		
 			return false;
 		}
 

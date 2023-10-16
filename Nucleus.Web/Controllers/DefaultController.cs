@@ -14,6 +14,7 @@ using Nucleus.Extensions.Authorization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Nucleus.Web.Controllers
 {
@@ -22,6 +23,7 @@ namespace Nucleus.Web.Controllers
   /// </summary>
   public class DefaultController : Controller
   {
+    private IWebHostEnvironment WebHostEnvironment { get; }
     private ILogger<DefaultController> Logger { get; }
     private Context Context { get; }
     private IFileSystemManager FileSystemManager { get; }
@@ -34,8 +36,9 @@ namespace Nucleus.Web.Controllers
     private static readonly HashSet<string> filteredFilenames = new(new string[] { "favicon.ico", "robots.txt" }, StringComparer.OrdinalIgnoreCase);
     private static readonly HashSet<string> filteredFileExtensions = new(new string[] { ".txt", ".css", ".js", ".map" }, StringComparer.OrdinalIgnoreCase);
 
-    public DefaultController(ILogger<DefaultController> logger, Context context, Application application, ISiteManager siteManager, IUserManager userManager, IFileSystemManager fileSystemManager, IPageManager pageManager)
+    public DefaultController(IWebHostEnvironment webHostEnvironment, ILogger<DefaultController> logger, Context context, Application application, ISiteManager siteManager, IUserManager userManager, IFileSystemManager fileSystemManager, IPageManager pageManager)
     {
+      this.WebHostEnvironment = webHostEnvironment;
       this.Application = application;
       this.Logger = logger;
       this.Context = context;
@@ -131,17 +134,6 @@ namespace Nucleus.Web.Controllers
         // Handle "PermanentRedirect" page routes
         foreach (PageRoute pageRoute in this.Context.Page.Routes.ToArray())
         {
-          //if (pageRoute.Path.Equals(ControllerContext.HttpContext.Request.Path, StringComparison.OrdinalIgnoreCase) || pageRoute.Path.Equals(ControllerContext.HttpContext.Request.Path + ControllerContext.HttpContext.Request.QueryString, StringComparison.OrdinalIgnoreCase))
-          // if (pageRoute.Path.Equals(this.Context.MatchedPath, StringComparison.OrdinalIgnoreCase))
-          // {
-          //	if (pageRoute.Type == PageRoute.PageRouteTypes.PermanentRedirect)
-          //	{
-          //		string redirectUrl = this.Url.PageLink(this.Context.Page);
-          //		Logger.LogTrace("Permanently redirecting request to {redirectUrl}.", redirectUrl);
-          //		return RedirectPermanent(redirectUrl);
-          //	}
-          //  break;
-          //}
           if (this.Context.MatchedRoute?.Type == PageRoute.PageRouteTypes.PermanentRedirect)
           {
             string redirectUrl = this.Url.PageLink(this.Context.Page);
@@ -173,7 +165,14 @@ namespace Nucleus.Web.Controllers
         ControllerContext.HttpContext.Response.Cookies.Append(PermissionExtensions.EDIT_COOKIE_NAME, "true", options);
       }
 
-      return View(this.Context.Page.LayoutPath(this.Context.Site), viewModel);
+      string layoutPath = this.Context.Page.LayoutPath(this.Context.Site);
+
+      if (!System.IO.File.Exists(System.IO.Path.Join(this.WebHostEnvironment.ContentRootPath, layoutPath)))
+      {
+        layoutPath = $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.LAYOUTS_FOLDER}/{Nucleus.Abstractions.Managers.ILayoutManager.DEFAULT_LAYOUT}";
+      }
+
+      return View(layoutPath, viewModel);
     }
 
     private Boolean RedirectToSetupWizard()

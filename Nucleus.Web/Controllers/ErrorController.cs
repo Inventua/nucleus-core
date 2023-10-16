@@ -10,18 +10,21 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions;
 using Microsoft.AspNetCore.Http;
 using System.Reflection;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Nucleus.Web.Controllers
 {
 	public class ErrorController : Controller
 	{
-		private Context Context { get; }
+    private IWebHostEnvironment WebHostEnvironment { get; }
+    private Context Context { get; }
 		private IPageManager PageManager { get; }
 		private IFileSystemManager FileSystemManager { get; }
 
 
-		public ErrorController(Context context, IFileSystemManager fileSystemManager, IPageManager pageManager)
+		public ErrorController(IWebHostEnvironment webHostEnvironment, Context context, IFileSystemManager fileSystemManager, IPageManager pageManager)
 		{
+      this.WebHostEnvironment = webHostEnvironment;
 			this.Context = context;
 			this.FileSystemManager = fileSystemManager;
 			this.PageManager = pageManager;
@@ -74,7 +77,14 @@ namespace Nucleus.Web.Controllers
 				viewModel.SiteIconPath = Url.Content(await Context.Site.GetIconPath(this.FileSystemManager));
 				viewModel.SiteCssFilePath = Url.Content(await Context.Site.GetCssFilePath(this.FileSystemManager));
 
-				return View(this.Context.Page.LayoutPath(this.Context.Site), viewModel);
+        string layoutPath = this.Context.Page.LayoutPath(this.Context.Site);
+
+        if (!System.IO.File.Exists(System.IO.Path.Join(this.WebHostEnvironment.ContentRootPath, layoutPath)))
+        {
+          layoutPath = $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.LAYOUTS_FOLDER}/{Nucleus.Abstractions.Managers.ILayoutManager.DEFAULT_LAYOUT}";
+        }
+
+        return View(layoutPath, viewModel);
 			}
 			else
 			{

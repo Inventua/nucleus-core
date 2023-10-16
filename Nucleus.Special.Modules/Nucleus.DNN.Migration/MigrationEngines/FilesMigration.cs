@@ -238,7 +238,7 @@ public class FilesMigration : MigrationEngineBase<Models.DNN.Folder>
 
   async Task SetFolderPermissions(Site site, Models.DNN.Folder dnnFolder, Nucleus.Abstractions.Models.FileSystem.Folder newFolder, List<Nucleus.Abstractions.Models.PermissionType> folderPermissionTypes)
   {
-    if (!dnnFolder.IsProtected)
+    if (!dnnFolder.IsProtected && !newFolder.Name.Equals("NTForums_Attach", StringComparison.OrdinalIgnoreCase))
     {
       // DNN folder is not "protected", so it does not have permissions.  Add "All Users"/Read, since that is the equivalent functionality
       // in Nucleus

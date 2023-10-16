@@ -77,7 +77,7 @@ namespace Nucleus.Data.SqlServer
 			System.Data.Common.DbConnection connection = new Microsoft.Data.SqlClient.SqlConnection(options.ConnectionString);
 			connection.Open();
 
-			results.Add("Server", ExecuteScalar(connection, "SELECT SERVERPROPERTY('MachineName')"));
+			results.Add("Server", ExecuteScalar(connection, "SELECT SERVERPROPERTY('ServerName')"));
 			results.Add("Database", connection.Database);
 			results.Add("Version", $"{ExecuteScalar(connection, "SELECT SERVERPROPERTY('ProductVersion')")} [{ExecuteScalar(connection, "SELECT SERVERPROPERTY('ProductUpdateReference')")}]");
 			results.Add("Edition", ExecuteScalar(connection, "SELECT SERVERPROPERTY('Edition')"));

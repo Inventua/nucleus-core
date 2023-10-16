@@ -86,7 +86,7 @@ namespace Nucleus.Modules.Documents
 					SourceId = document.Id,
 					Scope = Models.Document.URN,
           Type = "Document",
-					Roles = await GetViewRoles(module),
+					Roles = await GetViewRoles(page, module),
 					ContentType = "text/html"
 				};
 
@@ -104,12 +104,22 @@ namespace Nucleus.Modules.Documents
 			return null;
 		}
 
-		private async Task<List<Role>> GetViewRoles(PageModule module)
+		private async Task<List<Role>> GetViewRoles(Page page, PageModule module)
 		{
-			return
-				(await this.PageModuleManager.ListPermissions(module))
-					.Where(permission => permission.AllowAccess && permission.IsModuleViewPermission())
-					.Select(permission => permission.Role).ToList();
+      if (module.InheritPagePermissions)
+      {
+        return
+          (await this.PageManager.ListPermissions(page))
+            .Where(permission => permission.AllowAccess && permission.IsPageViewPermission())
+            .Select(permission => permission.Role).ToList();
+      }
+      else
+      {
+        return
+          (await this.PageModuleManager.ListPermissions(module))
+            .Where(permission => permission.AllowAccess && permission.IsModuleViewPermission())
+            .Select(permission => permission.Role).ToList();
+      }
 		}
 
 	}

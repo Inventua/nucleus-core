@@ -454,8 +454,8 @@ namespace Nucleus.Extensions.ElasticSearch
 						Includes = "*",
 						Excludes = new List<string>()
 						{
-							ParseField(nameof(ElasticSearchDocument.Attachment)),
-							ParseField(nameof(ElasticSearchDocument.Roles))
+							ParseField(nameof(ElasticSearchDocument.Attachment))//,
+							//ParseField(nameof(ElasticSearchDocument.Roles))
 						}.ToArray()
 					},
 					Size = query.PagingSettings.PageSize,

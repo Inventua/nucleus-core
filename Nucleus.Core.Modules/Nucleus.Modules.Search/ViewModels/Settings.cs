@@ -36,6 +36,8 @@ namespace Nucleus.Modules.Search.ViewModels
 		public Boolean ShowPublishDate { get; set; }
 		public Boolean ShowSize { get; set; }
 		public Boolean ShowScore { get; set; }
+    public Boolean ShowScoreAssessment { get; set; }
+
     public Boolean ShowType { get; set; }
 
     public Guid ResultsPageId { get; set; }

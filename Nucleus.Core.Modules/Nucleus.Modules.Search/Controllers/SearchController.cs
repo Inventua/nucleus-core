@@ -40,7 +40,9 @@ namespace Nucleus.Modules.Search.Controllers
     private const string MODULESETTING_SHOW_TYPE = "search:show-type";
     private const string MODULESETTING_SHOW_SIZE = "search:show-size";
 		private const string MODULESETTING_SHOW_SCORE = "search:show-score";
-		private const string MODULESETTING_INCLUDE_SCOPES = "search:include-scopes";
+    private const string MODULESETTING_SHOW_SCORE_ASSESSMENT = "search:show-score-assessment";
+
+    private const string MODULESETTING_INCLUDE_SCOPES = "search:include-scopes";
 		private const string MODULESETTING_MAXIMUM_SUGGESTIONS = "search:maximum-suggestions";
 
 		public SearchController(Context Context, IPageManager pageManager, IPageModuleManager pageModuleManager, IUserManager userManager, IEnumerable<ISearchProvider> searchProviders)
@@ -126,10 +128,12 @@ namespace Nucleus.Modules.Search.Controllers
       this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_TYPE, viewModel.ShowType);
       this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SIZE, viewModel.ShowSize);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SCORE, viewModel.ShowScore);
-			this.Context.Module.ModuleSettings.Set(MODULESETTING_INCLUDE_SCOPES, viewModel.IncludeScopes);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SCORE_ASSESSMENT, viewModel.ShowScoreAssessment);
+
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_INCLUDE_SCOPES, viewModel.IncludeScopes);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_MAXIMUM_SUGGESTIONS, viewModel.MaximumSuggestions);
 			
-			await this.PageModuleManager.SaveSettings(this.Context.Module);
+			await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
 			return Ok();
 		}
@@ -331,7 +335,9 @@ namespace Nucleus.Modules.Search.Controllers
       settings.ShowType = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_TYPE, true);
       settings.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
 			settings.ShowScore = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SCORE, true);
-			settings.IncludeScopes = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_SCOPES, "");
+      settings.ShowScoreAssessment = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SCORE_ASSESSMENT, true);
+
+      settings.IncludeScopes = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_SCOPES, "");
 			settings.MaximumSuggestions = this.Context.Module.ModuleSettings.Get(MODULESETTING_MAXIMUM_SUGGESTIONS, 5);
 
 			if (String.IsNullOrWhiteSpace(settings.SearchButtonCaption))

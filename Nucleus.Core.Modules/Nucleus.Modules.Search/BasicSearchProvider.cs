@@ -38,7 +38,7 @@ namespace Nucleus.Modules.Search
 			return new SearchResults()
 			{
 				Results = await ToSearchResults(pages),
-				Total = pages.TotalPages
+				Total = pages.TotalCount
 			};
 		}
 

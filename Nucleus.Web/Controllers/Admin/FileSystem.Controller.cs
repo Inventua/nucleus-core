@@ -19,7 +19,6 @@ using Microsoft.Extensions.Options;
 using Nucleus.Extensions.Authorization;
 using Nucleus.Abstractions.Models.Extensions;
 using Nucleus.Abstractions.Models.Paging;
-using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -34,9 +33,7 @@ namespace Nucleus.Web.Controllers.Admin
 		private IFileSystemManager FileSystemManager { get; }
 		private IRoleManager RoleManager { get; }
 		private FileSystemProviderFactoryOptions FileSystemOptions { get; }
-
-
-		public FileSystemController(ILogger<FileSystemController> Logger, Context Context, IOptions<FileSystemProviderFactoryOptions> fileSystemOptions, IRoleManager roleManager, IFileSystemManager fileSystemManager)
+    public FileSystemController(ILogger<FileSystemController> Logger, Context Context, IOptions<FileSystemProviderFactoryOptions> fileSystemOptions, IRoleManager roleManager, IFileSystemManager fileSystemManager)
 		{
 			this.Logger = Logger;
 			this.Context = Context;

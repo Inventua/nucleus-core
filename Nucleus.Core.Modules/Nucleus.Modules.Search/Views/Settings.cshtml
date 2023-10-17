@@ -86,7 +86,9 @@
 					@Html.CheckBoxFor(model => model.ShowScore, new { @class = "ToggleSwitch" })
 				</SettingsControl>
 
-        <div />
+        <SettingsControl caption="Show Score Assessment?" rendermode="LabelLast" class="inner-inline" helptext="Display search result score assessment.">
+          @Html.CheckBoxFor(model => model.ShowScoreAssessment, new { @class = "ToggleSwitch" })
+        </SettingsControl>
 			</div>
 		</fieldset>
 	</div>

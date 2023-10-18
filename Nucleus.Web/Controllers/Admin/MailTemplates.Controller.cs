@@ -77,7 +77,7 @@ namespace Nucleus.Web.Controllers.Admin
 				var result = await Nucleus.Extensions.Razor.RazorParser.TestCompile(viewModel.MailTemplate.Subject);
 				if (!result.Success)
 				{
-					return Json(new { Title = "Error Compiling Subject", Message = result.Errors });
+					return Json(new { Title = "Error Compiling Subject", Message = result.Errors, Icon = "error" });
 				}
 			}
 
@@ -85,11 +85,11 @@ namespace Nucleus.Web.Controllers.Admin
 				var result = await Nucleus.Extensions.Razor.RazorParser.TestCompile(viewModel.MailTemplate.Body);
 				if (!result.Success)
 				{
-					return Json(new { Title = "Error Compiling Body", Message = result.Errors });
+					return Json(new { Title = "Error Compiling Body", Message = result.Errors, Icon = "error" });
 				}
 			}
 
-			return Json(new { Title = "Verify", Message = "The subject and message body were test-compiled successfully." });
+			return Json(new { Title = "Verify", Message = "The subject and message body were test-compiled successfully.", Icon = "alert" });
 		}
 
 

@@ -930,19 +930,63 @@
 			<Id>{$guid12}</Id>
 			<Name>Welcome new user</Name>
 			<Subject>Welcome new user</Subject>
-			<Body>Welcome (~User.UserName)</Body>
+			<Body>
+        @Model.User.UserName,
+        &lt;p&gt;
+        You are receiving this email because you have signed up for an account at &lt;a href="@Model.Site.AbsoluteUrl(true)"&gt;@Model.Site.Name&lt;/a&gt; and your email address needs to be verified.
+        &lt;/p&gt;
+
+        &lt;p&gt;
+        &lt;h3&gt;Log in, and enter your verification code&lt;/h3&gt;
+        Visit &lt;a href="@Model.Site.AbsoluteUrl(@Model.LoginPage, true)?username=@Model.User.UserName"&gt;@Model.Site.AbsoluteUrl(@Model.LoginPage, true)?username=@Model.User.UserName&lt;/a&gt; to log in.
+        &lt;/p&gt;
+
+        &lt;p&gt;
+        When you log in for the first time, you will need your verification token, which is &lt;strong&gt;@Model.User.Secrets.VerificationToken&lt;/strong&gt;.  This verification token will expire at @Model.User.Secrets.VerificationTokenExpiryDate UTC.
+        &lt;/p&gt;
+
+        &lt;p&gt;
+        You were sent this email because you are a registered user at &lt;a href="@Model.Site.AbsoluteUrl(true)"&gt;@Model.Site.Name&lt;/a&gt;.
+        &lt;/p&gt;
+      </Body>
 		</MailTemplate>
 		<MailTemplate>
 			<Id>{$guid21}</Id>
 			<Name>User name reminder</Name>
 			<Subject>Your user name reminder</Subject>
-			<Body>A user requested a user name reminder for the site. Your user name is (~User.UserName).</Body>
+			<Body>
+        @Model.User.UserName,
+        &lt;p&gt;
+        You are receiving this email because you requested a user name reminder for your account at &lt;a href="@Model.Site.AbsoluteUrl(true)"&gt;@Model.Site.Name&lt;/a&gt;.
+        &lt;/p&gt;
+
+        Your user name is &lt;strong&gt;@Model.User.UserName&lt;/strong&gt;.  Visit &lt;a href="@Model.Url"&gt;@Model.Url&lt;/a&gt; to log in.
+        &lt;/li&gt;
+
+        &lt;p&gt;
+        You were sent this email because you are a registered user at &lt;a href="@Model.Site.AbsoluteUrl(true)"&gt;@Model.Site.Name&lt;/a&gt; and you requested a user name reminder.
+        &lt;/p&gt;
+      </Body>
 		</MailTemplate>
 		<MailTemplate>
 			<Id>{$guid13}</Id>
 			<Name>Password reset</Name>
 			<Subject>Password reset</Subject>
-			<Body>&lt;p&gt;Attn: (~User.UserName). Your password reset code is (~User.Secrets.PasswordResetToken). Visit &amp;nbsp;&lt;a href="(~Url)"&gt;(~Url)&lt;/a&gt; to reset your password.&lt;/p&gt;</Body>
+			<Body>
+        @Model.User.UserName,
+        &lt;p&gt;
+        You are receiving this email because you requested a password reset for your account at &lt;a href="@Model.Site.AbsoluteUrl(true)"&gt;@Model.Site.Name&lt;/a&gt;.
+        &lt;/p&gt;
+
+        &lt;p&gt;
+        &lt;h3&gt;Reset your account password&lt;/h3&gt;
+        Your user name is &lt;strong&gt;@Model.User.UserName&lt;/strong&gt;.  Your password reset code is &lt;strong&gt;@Model.User.Secrets.PasswordResetToken&lt;/strong&gt;. Visit &lt;a href="@Model.Url"&gt;@Model.Url&lt;/a&gt; to set your password.  This password reset token will expire at @Model.User.Secrets.PasswordResetTokenExpiryDate UTC.
+        &lt;/p&gt;
+
+        &lt;p&gt;
+        You were sent this email because you are a registered user at &lt;a href="@Model.Site.AbsoluteUrl(true)"&gt;@Model.Site.Name&lt;/a&gt; and you requested a password reset.
+        &lt;/p&gt;
+      </Body>
 		</MailTemplate>
 	</MailTemplates>
 </site-template>

@@ -142,9 +142,11 @@ You can use the forum as a parameter for the AbsoluteUrl() extension to create a
 ```
 
 {.table-25-75}
-|-----------------------------|--------------------------------------------------------------------------------------|
 | Post                        | An item in each forum's `Posts` list, representing a post with activity.             | 
+|-----------------------------|--------------------------------------------------------------------------------------|
 | Subject                     | The post subject.  |
+| Body                        | The post body.  |
+| PostedBy                    | A [user](https://www.nucleus-cms.com/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.Models.User/) object representing the user who posted the forum post.  |
 
 You can use the post as a parameter for the AbsoluteUrl() extension to create a link to the forum.  
 
@@ -153,10 +155,10 @@ You can use the post as a parameter for the AbsoluteUrl() extension to create a 
 ```
 
 {.table-25-75}
+| Reply                       | An item in each forum's `Replies` list, representing a new post reply.               |
 |-----------------------------|--------------------------------------------------------------------------------------|
-| Reply                       | An item in each forum's `Replies` list, representing a new post reply.             | 
-
-The reply object doesn't contain any data that you would want to include in a mail message, but you can use it to generate links to the forum post that it belongs to:
+| Body                        | The reply body.  |
+| PostedBy                    | A [user](https://www.nucleus-cms.com/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.Models.User/) object representing the user who posted the forum reply.  |
 
 ```
 <a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a>
@@ -164,50 +166,57 @@ The reply object doesn't contain any data that you would want to include in a ma
 
 ## Mail Template Samples
 
-### Subscription
+### Subscriber Notification
 ```
-@Model.User.UserName,
+@Model.User?.UserName,
 
 <p>New messages have been posted to forums or forum posts that you are tracking at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>: </p>
-
+<br />
 @foreach (var forum in Model.Forums)
 {
-	<a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
+  <a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
 
-	<table>
-		<tr>
-			<th>Subject</th>
-			<th>Author</th>
-			<th>Date</th>
-		</tr>
-		<tr>
-			<td colspan="3"><h2>Posts</h2></td>
-		</tr>
-		@foreach (var post in forum.Posts)
-		{
-		<tr>
-			<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
-			<td>@post.PostedBy.UserName</td>
-			<td>@post.DateAdded (UTC)</td>
-		</tr>
-		}
-		@if (forum.Replies.Any())
+  <table>
+    <tr>
+      <th>Subject</th>
+      <th>Author</th>
+      <th>Date/Time</th>
+    </tr>
+
+    @if (forum.Posts?.Any() == true)
+    {
+      <tr>
+        <th colspan="3"><h2>New Posts</h2></th>
+      </tr>
+      @foreach (var post in forum.Posts)
+      {
+        <tr>
+          <td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
+          <td>@post.PostedBy?.UserName</td>
+          <td>@post?.DateAdded</td>
+        </tr>
+      }
+    }
+		@if (forum.Replies?.Any() == true)
 		{
 			<tr>
-				<td colspan="3"><h2>Replies</h2></td>
+				<th colspan="3"><h2>New Replies</h2></th>
 			</tr>
 			@foreach (var reply in forum.Replies)
 			{
 				<tr>
 					<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
-					<td>@reply.PostedBy.UserName</td>
-					<td>@reply.DateAdded (UTC)</td>
+					<td>@reply.PostedBy?.UserName</td>
+					<td>@reply?.DateAdded</td>
 				</tr>
+				<tr colspan="3">
+					<td>@reply.Body</td>
+				</tr>				
 			}
 		}
 	</table>
 }
-
+<br />
 <div>
 You were sent this email because you are subscribed to a forum or post at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>, or are the
 original poster of this forum message.  <a href="@Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true)">Click here</a> 
@@ -223,40 +232,40 @@ to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.M
 
 @foreach (var forum in Model.Forums)
 {
-	<a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
+  <a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
 
-	<table>
-		<tr>
-			<th>Subject</th>
-			<th>Author</th>
-			<th>Date</th>
-		</tr>
-		<tr>
-			<td colspan="3"><h2>Posts</h2></td>
-		</tr>
-		@foreach (var post in forum.Posts)
-		{
-		<tr>
-			<td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
-			<td>@post.PostedBy.UserName</td>
-			<td>@post.DateAdded (UTC)</td>
-		</tr>
-		}
-		@if (forum.Replies.Any())
-		{
-			<tr>
-				<td colspan="3"><h2>Replies</h2></td>
-			</tr>
-			@foreach (var reply in forum.Replies)
-			{
-				<tr>
-					<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
-					<td>@reply.PostedBy.UserName</td>
-					<td>@reply.DateAdded (UTC)</td>
-				</tr>
-			}
-		}
-	</table>
+  <table>
+    <tr>
+      <th>Subject</th>
+      <th>Author</th>
+      <th>Date</th>
+    </tr>
+    <tr>
+      <td colspan="3"><h2>Posts</h2></td>
+    </tr>
+    @foreach (var post in forum.Posts)
+    {
+      <tr>
+        <td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
+        <td>@post.PostedBy.UserName</td>
+        <td>@post.DateAdded</td>
+      </tr>
+    }
+    @if (((IEnumerable<object>)forum.Replies).Any())
+    {
+      <tr>
+        <td colspan="3"><h2>Replies</h2></td>
+      </tr>
+      @foreach (var reply in forum.Replies)
+      {
+        <tr>
+          <td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
+          <td>@reply.PostedBy.UserName</td>
+          <td>@reply.DateAdded</td>
+        </tr>
+      }
+    }
+  </table>
 }
 ```
 
@@ -268,40 +277,40 @@ to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.M
 
 @foreach (var forum in Model.Forums)
 {
-	<a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
+  <a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
 
-	<table>
-		<tr>
-			<th>Subject</th>
-			<th>Author</th>
-			<th>Date</th>
-		</tr>
-		<tr>
-			<td colspan="3"><h2>Posts</h2></td>
-		</tr>
-		@foreach (var post in forum.Posts)
-		{
-		<tr>
-			<td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
-			<td>@post.PostedBy.UserName</td>
-			<td>@post.DateAdded (UTC)</td>
-		</tr>
-		}
-		@if (forum.Replies.Any())
-		{
-			<tr>
-				<td colspan="3"><h2>Replies</h2></td>
-			</tr>
-			@foreach (var reply in forum.Replies)
-			{
-				<tr>
-					<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
-					<td>@reply.PostedBy.UserName</td>
-					<td>@reply.DateAdded (UTC)</td>
-				</tr>
-			}
-		}
-	</table>
+  <table>
+    <tr>
+      <th>Subject</th>
+      <th>Author</th>
+      <th>Date</th>
+    </tr>
+    <tr>
+      <td colspan="3"><h2>Posts</h2></td>
+    </tr>
+    @foreach (var post in forum.Posts)
+    {
+      <tr>
+        <td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
+        <td>@post.PostedBy.UserName</td>
+        <td>@post.DateAdded</td>
+      </tr>
+    }
+    @if (((IEnumerable<object>)forum.Replies).Any())
+    {
+      <tr>
+        <td colspan="3"><h2>Replies</h2></td>
+      </tr>
+      @foreach (var reply in forum.Replies)
+      {
+        <tr>
+          <td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
+          <td>@reply.PostedBy.UserName</td>
+          <td>@reply.DateAdded</td>
+        </tr>
+      }
+    }
+  </table>
 }
 ```
 
@@ -313,39 +322,39 @@ to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.M
 
 @foreach (var forum in Model.Forums)
 {
-	<a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
+  <a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
 
-	<table>
-		<tr>
-			<th>Subject</th>
-			<th>Author</th>
-			<th>Date</th>
-		</tr>
-		<tr>
-			<td colspan="3"><h2>Posts</h2></td>
-		</tr>
-		@foreach (var post in forum.Posts)
-		{
-		<tr>
-			<td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
-			<td>@post.PostedBy.UserName</td>
-			<td>@post.DateAdded (UTC)</td>
-		</tr>
-		}
-		@if (forum.Replies.Any())
-		{
-			<tr>
-				<td colspan="3"><h2>Replies</h2></td>
-			</tr>
-			@foreach (var reply in forum.Replies)
-			{
-				<tr>
-					<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
-					<td>@reply.PostedBy.UserName</td>
-					<td>@reply.DateAdded (UTC)</td>
-				</tr>
-			}
-		}
-	</table>
+  <table>
+    <tr>
+      <th>Subject</th>
+      <th>Author</th>
+      <th>Date</th>
+    </tr>
+    <tr>
+      <td colspan="3"><h2>Posts</h2></td>
+    </tr>
+    @foreach (var post in forum.Posts)
+    {
+      <tr>
+        <td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
+        <td>@post.PostedBy.UserName</td>
+        <td>@post.DateAdded</td>
+      </tr>
+    }
+    @if (((IEnumerable<object>)forum.Replies).Any())
+    {
+      <tr>
+        <td colspan="3"><h2>Replies</h2></td>
+      </tr>
+      @foreach (var reply in forum.Replies)
+      {
+        <tr>
+          <td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
+          <td>@reply.PostedBy.UserName</td>
+          <td>@reply.DateAdded</td>
+        </tr>
+      }
+    }
+  </table>
 }
 ```

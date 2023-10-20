@@ -70,7 +70,7 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 				Models.MailTemplate.Model model = new Models.MailTemplate.Model();
 
 				User user = await this.UserManager.Get(group.Key.UserId);
-				UserProfileValue email = user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault();
+				UserProfileValue emailAddress = user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault();
 				MailTemplate template = await MailTemplateManager.Get(group.Key.MailTemplateId);
 
 				if (cancellationToken.IsCancellationRequested)
@@ -78,9 +78,9 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 					return;
 				}
 
-				if (template != null && !String.IsNullOrEmpty(email?.Value))
-				{
-					foreach (var moduleGroup in group.GroupedItems.GroupBy(item => item.ModuleId))
+				if (template != null && !String.IsNullOrEmpty(emailAddress?.Value))
+				{ 
+          foreach (var moduleGroup in group.GroupedItems.GroupBy(item => item.ModuleId))
 					{
 						Forum forum = await this.ForumsManager.Get(group.Key.ForumId);
 
@@ -108,14 +108,18 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 					{
 						try
 						{
-							await mailClient.Send<Models.MailTemplate.Model>(template, model, email.Value);
+							await mailClient.Send<Models.MailTemplate.Model>(template, model, emailAddress.Value);
 
-							foreach (MailQueue item in queue.Select(data => data.MailQueueItem))
+              var postIds = model.Forums.SelectMany(forum => forum.Posts.Select(post => post.Id)).ToList();
+              var replyIds = model.Forums.SelectMany(forum => forum.Replies.Select(reply => reply.Id)).ToList();
+
+              // mark handled queue items as sent
+              foreach (MailQueue item in group.GroupedItems)
 							{
 								item.Status = MailQueue.MailQueueStatus.Sent;
 								await this.ForumsManager.SetMailQueueStatus(item);
 							}
-						}
+            }
 						catch (Exception ex)
 						{
 							// don't fail the entire task if an email can't be parsed/sent

@@ -12,17 +12,17 @@
 		<div class="nucleus-form-tools">
 			@if (Model.CanReply && !Model.Post.IsLocked)
 			{
-				@Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @class = "btn btn-primary", @data_target = ".Forums.parent()" })
+        @Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @class = "btn btn-primary btn-sm", @data_target = ".Forums.parent()" })
 			}
 			@if (Model.CanSubscribe && Model.Subscription == null)
 			{
-				@Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribePost", "Forums", "Forums"), new { @class = "btn btn-outline-secondary", @data_target = ".Forums.parent()" })
+        @Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribePost", "Forums", "Forums"), new { @class = "btn btn-outline-secondary btn-sm", @data_target = ".Forums.parent()" })
 			}
 			@if (Model.Subscription != null)
 			{
-				@Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-outline-secondary", @data_target = ".Forums.parent()" })
+        @Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-outline-secondary btn-sm", @data_target = ".Forums.parent()" })
 			}
-			@Html.LinkButton("", "Back", Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode()), new { @class="btn btn-secondary" })
+      @Html.LinkButton("", "Back", Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode()), new { @class="btn btn-secondary btn-sm ms-auto" })
 		</div>
 
     <div class="post">
@@ -74,11 +74,11 @@
 			<div class="nucleus-form-tools">
 				@if (Model.CanEditPost)
 				{
-					@Html.LinkButton("&#xe3c9;", "Edit", Url.NucleusAction("EditPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @class = "btn btn-secondary", @data_target = ".Forums.parent()" })
+          @Html.LinkButton("&#xe3c9;", "Edit", Url.NucleusAction("EditPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @class = "btn btn-secondary btn-sm", @data_target = ".Forums.parent()" })
 				}
 				@if (Model.CanDeletePost)
 				{
-					@Html.SubmitButton("", "Delete", Url.NucleusAction("DeleteForumPost", "Forums", "Forums"), new { @class = "btn btn-danger", @data_target = "form.parent()", @data_confirm = "Delete this post?" })
+          @Html.SubmitButton("", "Delete", Url.NucleusAction("DeleteForumPost", "Forums", "Forums"), new { @class = "btn btn-danger btn-sm", @data_target = "form.parent()", @data_confirm = "Delete this post?" })
 				}
 
 				<div class="AdminTools">
@@ -88,27 +88,27 @@
 					}
 					@if (Model.CanApprovePost && !Model.Post.IsApproved)
 					{
-						@Html.SubmitButton("", "Approve", Url.NucleusAction("ApproveForumPost", "Forums", "Forums"), new { @class = "btn btn-success", @data_target = "form.parent()" })
+            @Html.SubmitButton("", "Approve", Url.NucleusAction("ApproveForumPost", "Forums", "Forums"), new { @class = "btn btn-success btn-sm", @data_target = "form.parent()" })
 					}
 					@if (Model.CanApprovePost && !Model.Post.IsRejected == true)
 					{
-						@Html.SubmitButton("", "Reject", Url.NucleusAction("RejectForumPost", "Forums", "Forums"), new { @class = "btn btn-secondary", @data_target = "form.parent()" })
+						@Html.SubmitButton("", "Reject", Url.NucleusAction("RejectForumPost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = "form.parent()" })
 					}
 					@if (Model.CanLockPost && !Model.Post.IsLocked)
 					{
-						@Html.SubmitButton("", "Lock", Url.NucleusAction("LockForumPost", "Forums", "Forums"), new { @class = "btn btn-secondary", @data_target = "form.parent()" })
+						@Html.SubmitButton("", "Lock", Url.NucleusAction("LockForumPost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = "form.parent()" })
 					}
 					@if (Model.CanLockPost && Model.Post.IsLocked)
 					{
-						@Html.SubmitButton("", "Unlock", Url.NucleusAction("UnlockForumPost", "Forums", "Forums"), new { @class = "btn btn-secondary", @data_target = "form.parent()" })
+						@Html.SubmitButton("", "Unlock", Url.NucleusAction("UnlockForumPost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = "form.parent()" })
 					}
 					@if (Model.CanPinPost && !Model.Post.IsPinned)
 					{
-						@Html.SubmitButton("", "Pin", Url.NucleusAction("PinForumPost", "Forums", "Forums"), new { @class = "btn btn-secondary", @data_target = "form.parent()" })
+						@Html.SubmitButton("", "Pin", Url.NucleusAction("PinForumPost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = "form.parent()" })
 					}
 					@if (Model.CanPinPost && Model.Post.IsPinned)
 					{
-						@Html.SubmitButton("", "Un-pin", Url.NucleusAction("UnPinForumPost", "Forums", "Forums"), new { @class = "btn btn-secondary", @data_target = "form.parent()" })
+						@Html.SubmitButton("", "Un-pin", Url.NucleusAction("UnPinForumPost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = "form.parent()" })
 					}
 				</div>
 			</div>
@@ -126,19 +126,19 @@
 							<span class="controls">
 								@if (Model.CanApprovePost && !reply.IsApproved)
 								{
-									@Html.SubmitButton("", "Approve", Url.NucleusAction("ApproveForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()" })
+									@Html.SubmitButton("", "Approve", Url.NucleusAction("ApproveForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @class="btn btn-success btn-sm" })
 								}
 								@if (Model.CanApprovePost && !reply.IsRejected == true)
 								{
-									@Html.SubmitButton("", "Reject", Url.NucleusAction("RejectForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @class="btn btn-danger" })
+                  @Html.SubmitButton("", "Reject", Url.NucleusAction("RejectForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @class="btn btn-danger btn-sm" })
 								}
 								@if (reply.CanDeleteReply && !Model.Post.IsLocked)
 								{
-									@Html.SubmitButton("&#xe14c;", "", Url.NucleusAction("DeleteForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @class="btn btn-danger", @data_confirm = "Delete this reply?" })
+									@Html.SubmitButton("&#xe14c;", "", Url.NucleusAction("DeleteForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @class="btn btn-danger btn-sm", @data_confirm = "Delete this reply?" })
 								}
 								@if (reply.CanEditReply && !Model.Post.IsLocked)
 								{
-									@Html.LinkButton("&#xe3c9;", "", Url.NucleusAction("EditForumPostReply", "Forums", "Forums", new { postId = Model.Post.Id, replyId = reply.Id }), new { @data_target = "form.parent()" })
+									@Html.LinkButton("&#xe3c9;", "", Url.NucleusAction("EditForumPostReply", "Forums", "Forums", new { postId = Model.Post.Id, replyId = reply.Id }), new { @data_target = "form.parent()", @class="btn btn-primary btn-sm" })
 								}
 							</span>
 						</div>

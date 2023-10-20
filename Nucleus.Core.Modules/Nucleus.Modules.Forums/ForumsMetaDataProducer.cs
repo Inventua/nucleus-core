@@ -64,9 +64,12 @@ namespace Nucleus.Modules.Forums
 						}
 						else
 						{
-							foreach (Models.Forum forum in await this.ForumsManager.List(group))
+							foreach (Models.Forum item in await this.ForumsManager.List(group))
 							{
-								if (!forum.EffectiveSettings().AllowSearchIndexing)
+                // get a fully-populated forum object (will generally be in cache)
+                Models.Forum forum = await this.ForumsManager.Get(item.Id);
+
+                if (!forum.EffectiveSettings().AllowSearchIndexing)
 								{
 									Logger?.LogInformation("Skipping forum {forumName} on page {pageid}/{pagename} because the forum's 'Allow search indexing' setting is false.", forum.Name, page.Id, page.Name);
 								}
@@ -76,7 +79,6 @@ namespace Nucleus.Modules.Forums
 									{
 										yield return metaData;
 									}
-									//results.AddRange(await BuildContentMetaData(site, page, module, forum));
 								}
 							}
 						}

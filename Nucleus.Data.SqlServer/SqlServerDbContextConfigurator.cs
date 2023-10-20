@@ -35,7 +35,11 @@ namespace Nucleus.Data.SqlServer
 		{
 			if (this.DatabaseConnectionOption != null)
 			{
-				options.UseSqlServer(this.DatabaseConnectionOption.ConnectionString);
+				options.UseSqlServer(this.DatabaseConnectionOption.ConnectionString, options =>
+        {
+          options.EnableRetryOnFailure();
+        });
+
 				return true;
 			}
 

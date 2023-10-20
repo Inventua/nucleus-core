@@ -98,7 +98,6 @@ namespace Nucleus.Modules.Forums
 					}
 					return forum;
 				}
-
 			});
 		}
 
@@ -146,13 +145,20 @@ namespace Nucleus.Modules.Forums
 		/// </summary>
 		/// <param name="site"></param>
 		/// <returns></returns>
-		public async Task<IList<Forum>> List(Group group)
+		public async Task<List<Forum>> List(Group group)
 		{
+      List<Forum> results = new();
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				return await provider.ListForums(group);
-			}
-		}
+        foreach (Guid forumId in await provider.ListForums(group))
+        {
+          results.Add(await this.Get(forumId));
+        }
+      }
+
+      return results;
+
+    }
 
 		/// <summary>
 		/// List all moderator users for the specified forum.
@@ -645,7 +651,7 @@ namespace Nucleus.Modules.Forums
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				await provider.SubscribeForum(forum.Id, user.GetUserId());
+				await provider.SubscribeForum(forum.Id, await this.UserManager.Get(user.GetUserId()));
 			}
 		}
 
@@ -669,7 +675,7 @@ namespace Nucleus.Modules.Forums
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				await provider.SubscribeForumPost(post.Id, user.GetUserId());
+        await provider.SubscribeForumPost(post.Id, await this.UserManager.Get(user.GetUserId()));
 			}
 		}
 
@@ -681,8 +687,8 @@ namespace Nucleus.Modules.Forums
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				await provider.UnSubscribeForumPost(post.Id, user.GetUserId());
-			}
+        await provider.UnSubscribeForumPost(post.Id, await this.UserManager.Get(user.GetUserId()));
+      }
 		}
 
 		/// <summary>
@@ -704,7 +710,7 @@ namespace Nucleus.Modules.Forums
 		/// </summary>
 		/// <param name="forum"></param>
 		/// <returns></returns>
-		public async Task<List<User>> ListForumSubscribers(Guid forumId)
+		public async Task<List<ForumSubscription>> ListForumSubscribers(Guid forumId)
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
@@ -718,7 +724,7 @@ namespace Nucleus.Modules.Forums
 		/// <param name="forum"></param>
 		/// <param name="user"></param>
 		/// <returns></returns>
-		public async Task<List<User>> ListPostSubscribers(Guid postId)
+		public async Task<List<PostSubscription>> ListPostSubscribers(Guid postId)
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{

@@ -5,19 +5,19 @@
   margin-bottom: 12px;
 }
 
-.Forums table th, .Forums TABLE td
+.Forums table th, .Forums table td
 {
   padding: 4px 12px;
 	text-align: left;
   vertical-align: middle;
 }
 
-.Forums .group-header:not(:first-child)
+.Forums thead:not(:first-child) .group-header
 {
   border-top: 1px solid #ccc;
 }
 
-.Forums .group-header:not(:first-child) th
+.Forums thead:not(:first-child) .group-header th
 {
   padding-top: 1rem;
 }
@@ -112,6 +112,11 @@
   justify-content: flex-end;
 }
 
+.Forums h3
+{
+  font-size: 1.25rem;
+}
+
 .Forums .post h3
 {
   margin: 0;
@@ -148,7 +153,14 @@
 .Forums .body
 {
   background-color: #eee;
-  padding: 8px;
+  padding: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.Forums .original-post.body
+{
+  max-height: 6rem;
+  overflow: auto;
 }
 
 .Forums .settings-control.stretch

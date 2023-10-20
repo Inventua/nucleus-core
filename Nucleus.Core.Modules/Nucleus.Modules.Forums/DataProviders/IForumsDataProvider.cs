@@ -12,7 +12,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 	public interface IForumsDataProvider : IDisposable
 	{
 		public Task<Forum> GetForum(Guid Id);
-		public Task<IList<Forum>> ListForums(Group group);
+		public Task<List<Guid>> ListForums(Group group);
 		public Task SaveForum(Group group, Forum forum);
 		public Task DeleteForum(Forum forum);
 
@@ -55,13 +55,13 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 		public Task DeleteReplyAttachments(Reply reply);
 
-		public Task SubscribeForum(Guid forumId, Guid userId);
+		public Task SubscribeForum(Guid forumId, User user);
 		public Task UnSubscribeForum(Guid forumId, Guid userId);
-		public Task<List<User>> ListForumSubscribers(Guid forumId);
+		public Task<List<ForumSubscription>> ListForumSubscribers(Guid forumId);
 
-		public Task SubscribeForumPost(Guid postId, Guid userId);
-		public Task UnSubscribeForumPost(Guid postId, Guid userId);
-		public Task<List<User>> ListPostSubscribers(Guid postId);
+		public Task SubscribeForumPost(Guid postId, User user);
+		public Task UnSubscribeForumPost(Guid postId, User user);
+		public Task<List<PostSubscription>> ListPostSubscribers(Guid postId);
 
 		public Task<ForumSubscription> GetForumSubscription(Guid forumId, Guid userId);
 		public Task<PostSubscription> GetPostSubscription(Guid PostId, Guid userId);

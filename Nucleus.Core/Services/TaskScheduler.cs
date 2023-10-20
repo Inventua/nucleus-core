@@ -86,7 +86,7 @@ namespace Nucleus.Core.Services
 
 				foreach (ScheduledTask task in await this.ScheduledTaskManager.List())
 				{
-          await CheckAndRun(task);
+          await CheckAndRun(task, false);
 				}
 			}
 			catch (Exception e)
@@ -95,13 +95,13 @@ namespace Nucleus.Core.Services
 			}			
 		}
 
-    private async Task CheckAndRun(ScheduledTask task)
+    private async Task CheckAndRun(ScheduledTask task, Boolean ignoreSchedule)
     {
-      if (task.Enabled)
+      if (task.Enabled || ignoreSchedule)
       {
         ScheduledTaskHistory history = await this.ScheduledTaskManager.GetMostRecentHistory(task, Environment.MachineName);
 
-        if (history == null || !history.NextScheduledRun.HasValue || DateTime.UtcNow > history.NextScheduledRun)
+        if (ignoreSchedule || history == null || !history.NextScheduledRun.HasValue || DateTime.UtcNow > history.NextScheduledRun)
         {
           if (!this.Queue.Contains(task))
           {
@@ -119,7 +119,7 @@ namespace Nucleus.Core.Services
     /// <returns></returns>
     public async Task Invoke(ScheduledTask task)
     {
-      await CheckAndRun(task);      
+      await CheckAndRun(task, true);      
     }
     
 		/// <summary>

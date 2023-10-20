@@ -33,7 +33,10 @@ namespace Nucleus.Data.MySql
 		{
 			if (this.DatabaseConnectionOption != null)
 			{
-				options.UseMySql(this.DatabaseConnectionOption.ConnectionString, ServerVersion.AutoDetect(this.DatabaseConnectionOption.ConnectionString));
+				options.UseMySql(this.DatabaseConnectionOption.ConnectionString, ServerVersion.AutoDetect(this.DatabaseConnectionOption.ConnectionString),options => 
+        {
+          options.EnableRetryOnFailure();
+        });
 				return true;
 			}
 

@@ -47,6 +47,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.Include(group => group.Permissions)
 					.ThenInclude(permission => permission.PermissionType)
 				.AsSplitQuery()
+        .AsNoTracking()
 				.FirstOrDefaultAsync();
 
 			if (result != null)
@@ -62,7 +63,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 			IList<Group> results = await this.Context.Groups
 				.Where(group => EF.Property<Guid>(group, "ModuleId") == pageModule.Id)
 				.OrderBy(group => group.SortOrder)
-				.ToListAsync();
+        .AsNoTracking()
+        .ToListAsync();
 
 			foreach (Group result in results)
 			{
@@ -82,7 +84,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 			List<Permission> permissions = group.Permissions;
 			group.Permissions = null;
 
-			Boolean isNew = !this.Context.Groups.Where(existing => existing.Id == group.Id).Any();
+			Boolean isNew = !this.Context.Groups.Where(existing => existing.Id == group.Id).AsNoTracking().Any();
 
       this.Context.Attach(group);
 			this.Context.Entry(group).Property("ModuleId").CurrentValue = module.Id;
@@ -131,7 +133,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 			Group group = await this.Context.Groups
 				.Where(group => EF.Property<Guid>(group, "ModuleId") == moduleId)
 				.OrderByDescending(group => group.SortOrder)
-				.FirstOrDefaultAsync();
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
 
 			return group == null ? 10 : group.SortOrder;
 
@@ -156,7 +159,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.Include(forum => forum.Permissions)
 					.ThenInclude(permission => permission.PermissionType)
 				.AsSplitQuery()
-				.FirstOrDefaultAsync();
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
 
 			if (result != null)
 			{
@@ -175,12 +179,14 @@ namespace Nucleus.Modules.Forums.DataProviders
 			
 			result.PostCount = await this.Context.Posts
 				.Where(post => post.ForumId == forumId)
-				.CountAsync();
+        .AsNoTracking()
+        .CountAsync();
 
 			result.ReplyCount = await this.Context.Posts
 				.Where(post => post.ForumId == forumId)
 				.SelectMany(post => post.Replies)
-				.CountAsync();
+        .AsNoTracking()
+        .CountAsync();
 
 			result.LastPost = await GetLastPost(forumId);
 
@@ -193,32 +199,41 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.Where(post => post.ForumId == forumId)
 				.Include(post => post.PostedBy)				
 				.OrderByDescending(post => post.DateAdded)
-				.FirstOrDefaultAsync();
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
 		}
 
-		public async Task<IList<Forum>> ListForums(Group group)
+		public async Task<List<Guid>> ListForums(Group group)
 		{
-			IList<Forum> results = await this.Context.Forums
-				.Where(forum => forum.Group.Id == group.Id)
-				.Include(forum => forum.Group)
-					.ThenInclude(group => group.Permissions)
-						.ThenInclude(permission => permission.Role)
-				.Include(forum => forum.Group)
-					.ThenInclude(group => group.Permissions)
-						.ThenInclude(permission => permission.PermissionType)
-				.Include(forum => forum.Group)
+      return await this.Context.Forums
+        .Where(forum => forum.Group.Id == group.Id)
 				.OrderBy(forum => forum.SortOrder)
-				.ToListAsync();
+        .AsNoTracking()
+        .Select(forum => forum.Id)
+        .ToListAsync();
 
-			foreach (Forum result in results)
-			{
-				result.Settings = await GetSettings(result.Id);
-				result.Statistics = await GetForumStatistics(result.Id);
+      ////   IList<Forum> results = await this.Context.Forums
+      ////	.Where(forum => forum.Group.Id == group.Id)
+      ////	.Include(forum => forum.Group)
+      ////		.ThenInclude(group => group.Permissions)
+      ////			.ThenInclude(permission => permission.Role)
+      ////	.Include(forum => forum.Group)
+      ////		.ThenInclude(group => group.Permissions)
+      ////			.ThenInclude(permission => permission.PermissionType)
+      ////	.Include(forum => forum.Group)
+      ////	.OrderBy(forum => forum.SortOrder)
+      ////     .AsNoTracking()
+      ////     .ToListAsync();
 
-				result.Group.Settings = await GetSettings(result.Group.Id);
-			}
+      ////foreach (Forum result in results)
+      ////{
+      ////	result.Settings = await GetSettings(result.Id);
+      ////	result.Statistics = await GetForumStatistics(result.Id);
 
-			return results;
+      ////	result.Group.Settings = await GetSettings(result.Group.Id);
+      ////}
+
+      ////return results;
 		}
 
 		public async Task SaveForum(Group group, Forum forum)
@@ -230,7 +245,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 			List<Permission> permissions = forum.Permissions;
 			forum.Permissions = null;
 
-			Boolean isNew = !this.Context.Forums.Where(existing => existing.Id == forum.Id).Any();
+			Boolean isNew = !this.Context.Forums.Where(existing => existing.Id == forum.Id).AsNoTracking().Any();
 			
 			this.Context.Attach(forum);
 			this.Context.Entry(forum).Property("ForumGroupId").CurrentValue = group.Id;
@@ -285,7 +300,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 			Forum forum = await this.Context.Forums
 				.Where(forum => forum.Group.Id == groupId)
 				.OrderByDescending(forum => forum.SortOrder)
-				.FirstOrDefaultAsync();
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
 
 			return forum == null ? 10 : forum.SortOrder;
 		}
@@ -301,7 +317,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 					.ThenInclude(statuslist => statuslist.Items)
 				.Include(forum => forum.AttachmentsFolder)
 				.AsSplitQuery()
-				.FirstOrDefaultAsync();
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
 		}
 
 		public async Task SaveSettings(Guid relatedId, Settings settings)
@@ -346,7 +363,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.Include(post => post.Replies)
 					.ThenInclude(reply => reply.PostedBy)
 				.AsSplitQuery()
-				.FirstOrDefaultAsync();
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
 
 			if (result != null)
 			{
@@ -378,6 +396,7 @@ namespace Nucleus.Modules.Forums.DataProviders
         .Include(post => post.Replies)
           .ThenInclude(reply => reply.PostedBy)
         .AsSplitQuery()
+        .AsNoTracking()
         .FirstOrDefaultAsync();
 
       if (result != null)
@@ -408,7 +427,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.OrderByDescending(post => post.IsPinned)
 				.ThenByDescending(post => post.DateAdded)
 				.AsSplitQuery()
-				.ToListAsync();
+        .AsNoTracking()
+        .ToListAsync();
 		}
 
 		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Post>> ListForumPosts(Forum forum, ClaimsPrincipal user, Nucleus.Abstractions.Models.Paging.PagingSettings settings, FlagStates approved, string sortKey, Boolean descending)
@@ -423,7 +443,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.Include(post => post.PostedBy);
 
 			results.TotalCount = await query
-				.CountAsync();
+        .AsNoTracking()
+        .CountAsync();
 
 			switch (sortKey.ToLower())
       {
@@ -459,7 +480,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.Skip(settings.FirstRowIndex)
 				.Take(settings.PageSize)
 				.AsSplitQuery()
-				.ToListAsync();
+        .AsNoTracking()
+        .ToListAsync();
 
 			foreach (Post post in posts)
 			{
@@ -729,7 +751,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.Include(reply => reply.ReplyTo)
 				.Include(reply => reply.PostedBy)
 				.AsSplitQuery()
-				.FirstOrDefaultAsync();
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
 		}
 
 		public async Task<IList<Reply>> ListForumPostReplies(Post post, FlagStates approved)
@@ -741,9 +764,10 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.Include(reply => reply.Post)
 				.Include(reply => reply.ReplyTo)
 				.Include(reply => reply.PostedBy)
-				.AsSplitQuery()
 				.OrderBy(reply => reply.DateAdded)
-				.ToListAsync();
+				.AsSplitQuery()
+        .AsNoTracking()
+        .ToListAsync();
 		}
 
 		public async Task<IList<Reply>> ListForumPostReplies(Post post, ClaimsPrincipal user, FlagStates approved)
@@ -755,9 +779,10 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.Include(reply => reply.Post)
 				.Include(reply => reply.ReplyTo)
 				.Include(reply => reply.PostedBy)
-				.AsSplitQuery()
 				.OrderBy(reply => reply.DateAdded)
-				.ToListAsync();
+				.AsSplitQuery()
+        .AsNoTracking()
+        .ToListAsync();
 		}
 
 		public async Task DeleteForumPostReply(Reply reply)
@@ -844,26 +869,26 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.Include(reply => reply.Post)
 				.Include(reply => reply.ReplyTo)
 				.Include(reply => reply.PostedBy)
-				.AsSplitQuery()
 				.OrderByDescending(reply => reply.DateAdded)
-				.FirstOrDefaultAsync();
-
+        .AsSplitQuery()
+				.AsNoTracking()
+        .FirstOrDefaultAsync();
 		}
-
 
 		#endregion
 
 		#region "    Subscriptions    "
 
-		public async Task SubscribeForum(Guid forumId, Guid userId)
+		public async Task SubscribeForum(Guid forumId, User user)
 		{
 			Boolean alreadyExists = await this.Context.ForumSubscriptions
-				.Where(subscription => subscription.ForumId == forumId && subscription.UserId == userId)
-				.AnyAsync();
+				.Where(subscription => subscription.ForumId == forumId && subscription.User.Id == user.Id)
+        .AsNoTracking()
+        .AnyAsync();
 
 			if (!alreadyExists)
 			{
-				this.Context.Add(new ForumSubscription() { ForumId = forumId, UserId = userId });
+				this.Context.Add(new ForumSubscription() { ForumId = forumId, User = user });
 				await this.Context.SaveChangesAsync<ForumSubscription>();
 			}
 		}
@@ -871,7 +896,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public async Task UnSubscribeForum(Guid forumId, Guid userId)
 		{
 			ForumSubscription subscription = await this.Context.ForumSubscriptions
-				.Where(subscription => subscription.ForumId == forumId && subscription.UserId == userId)
+				.Where(subscription => subscription.ForumId == forumId && subscription.User.Id == userId)
 				.FirstOrDefaultAsync();
 
 			IEnumerable<MailQueue> mailQueue = await this.Context.MailQueue
@@ -887,44 +912,44 @@ namespace Nucleus.Modules.Forums.DataProviders
 			}			
 		}
 				
-		public async Task<List<User>> ListForumSubscribers(Guid forumId)
+		public async Task<List<ForumSubscription>> ListForumSubscribers(Guid forumId)
 		{
-			List<Guid> subscriptionUsers = await this.Context.ForumSubscriptions
+			return await this.Context.ForumSubscriptions
 				.Where(subscription => subscription.ForumId == forumId)
-				.Select(subscription => subscription.UserId)
+        .Include(subscription => subscription.User)
+        .AsNoTracking()
 				.ToListAsync();
-
-			return await this.Context.Users
-				.Where(user => subscriptionUsers.Contains(user.Id))
-				.ToListAsync();
-
 		}
 
 		public async Task<ForumSubscription> GetForumSubscription(Guid forumId, Guid userId)
 		{
 			return await this.Context.ForumSubscriptions
-				.Where(subscription => subscription.ForumId == forumId && subscription.UserId == userId)
+				.Where(subscription => subscription.ForumId == forumId && subscription.User.Id == userId)
+        .Include(subscription => subscription.User)
+        .AsNoTracking()
 				.FirstOrDefaultAsync();
 		}
 
-		public async Task SubscribeForumPost(Guid postId, Guid userId)
+		public async Task SubscribeForumPost(Guid postId, User user)
 		{
 			Boolean alreadyExists = await this.Context.PostSubscriptions
-				.Where(subscription => subscription.ForumPostId == postId && subscription.UserId == userId)
-				.AnyAsync();
+				.Where(subscription => subscription.ForumPostId == postId && subscription.User.Id == user.Id)
+        .AsNoTracking()
+        .AnyAsync();
 
 			if (!alreadyExists)
 			{
-				this.Context.Add(new PostSubscription() { ForumPostId = postId, UserId = userId });
+				this.Context.Add(new PostSubscription() { ForumPostId = postId, User = user });
 				await this.Context.SaveChangesAsync<PostSubscription>();
 			}
 		}
 
-		public async Task UnSubscribeForumPost(Guid postId, Guid userId)
+		public async Task UnSubscribeForumPost(Guid postId, User user)
 		{
 			PostSubscription subscription = await this.Context.PostSubscriptions
-				.Where(subscription => subscription.ForumPostId == postId && subscription.UserId == userId)
-				.FirstOrDefaultAsync();
+				.Where(subscription => subscription.ForumPostId == postId && subscription.User.Id == user.Id)
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
 
 			if (subscription != null)
 			{
@@ -934,25 +959,22 @@ namespace Nucleus.Modules.Forums.DataProviders
 			await this.Context.SaveChangesAsync<PostSubscription>();
 		}
 
-		public async Task<List<User>> ListPostSubscribers(Guid postId)
+    public async Task<List<PostSubscription>> ListPostSubscribers(Guid postId)
 		{
-			List<Guid> subscriptionUsers = await this.Context.PostSubscriptions
+      return await this.Context.PostSubscriptions
 				.Where(subscription => subscription.ForumPostId == postId)
-				.Select(subscription => subscription.UserId)
-				.ToListAsync();
-
-			return await this.Context.Users
-				.Where(user => subscriptionUsers.Contains(user.Id))
-				.ToListAsync();
-
+        .Include(subscription => subscription.User)
+        .AsNoTracking()
+        .ToListAsync();
 		}
-
 
 		public async Task<PostSubscription> GetPostSubscription(Guid postId, Guid userId)
 		{
 			return await this.Context.PostSubscriptions
-				.Where(subscription => subscription.ForumPostId == postId && subscription.UserId == userId)
-				.FirstOrDefaultAsync();
+				.Where(subscription => subscription.ForumPostId == postId && subscription.User.Id == userId)
+        .Include(subscription => subscription.User)
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
 		}
 		#endregion
 
@@ -961,7 +983,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 		{
 			return await this.Context.PostTracking
 				.Where(tracking => tracking.ForumPostId == postId && tracking.UserId == userId)
-				.FirstOrDefaultAsync();
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
 		}
 		
 		public async Task SavePostTracking(Guid postId, Guid userId)
@@ -1003,14 +1026,22 @@ namespace Nucleus.Modules.Forums.DataProviders
 		{
 			return await this.Context.MailQueue
 				.Where(existing => existing.UserId == mailQueue.UserId && existing.MailTemplateId == mailQueue.MailTemplateId && existing.Post.Id == mailQueue.Post.Id && (mailQueue.Reply == null && existing.Reply == null) || (mailQueue.Reply != null && existing.Reply.Id == mailQueue.Reply.Id))
-				.AnyAsync();
+        .AsNoTracking()
+        .AnyAsync();
 		}
 
 		public async Task SaveMailQueue(MailQueue mailQueue)
 		{
 			MailQueue existing = await this.Context.MailQueue
-				.Where(existing => existing.Id == mailQueue.Id)
-				.FirstOrDefaultAsync();
+				.Where(existing => 
+          existing.Id == mailQueue.Id || 
+          (
+            existing.UserId == mailQueue.UserId && 
+            existing.Post.Id == mailQueue.Post.Id &&
+            (mailQueue.Reply == null && existing.Reply == null) || (mailQueue.Reply != null && existing.Reply.Id == mailQueue.Reply.Id)
+          ))
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
 
 			if (existing == null)
 			{
@@ -1070,11 +1101,21 @@ namespace Nucleus.Modules.Forums.DataProviders
 					.ThenInclude(post => post.Status)
 				.Include(item => item.Post)
 					.ThenInclude(post => post.PostedBy)
+
 				.Include(item => item.Reply)
-					.ThenInclude(reply => reply.ReplyTo)
+          .IgnoreAutoIncludes()
+        .Include(item => item.Reply)
+          .ThenInclude(reply => reply.ReplyTo)
 				.Include(item => item.Reply)
 					.ThenInclude(reply => reply.PostedBy)
-				.OrderBy(item => item.UserId)
+        .Include(item => item.Reply)
+          .ThenInclude(reply => reply.Post)          
+            .ThenInclude(post => post.PostedBy)
+         .Include(item => item.Reply)
+          .ThenInclude(reply => reply.Post)
+            .ThenInclude(post => post.Status)
+
+        .OrderBy(item => item.UserId)
 					.ThenBy(item => item.ModuleId)
 					.ThenBy(item => item.Post.ForumId)
 					.ThenBy(item => item.MailTemplateId )
@@ -1082,7 +1123,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 					.ThenBy(item => item.Reply.Id)
 					.ThenBy(item => item.DateAdded)
 				.AsSplitQuery()
-				.ToListAsync();
+        .AsNoTracking()
+        .ToListAsync();
 		}
 
 		public async Task TruncateMailQueue(TimeSpan sentBefore)
@@ -1106,22 +1148,27 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public async Task<UserSubscriptions> ListUserSubscriptions(Guid userId)
 		{
 			UserSubscriptions results = new();
+      List<Forum> forums = new();
+      List<Post> posts = new();
 
-			foreach (ForumSubscription subscription in await this.Context.ForumSubscriptions.Where(item => item.UserId == userId).ToListAsync())
+			foreach (ForumSubscription subscription in await this.Context.ForumSubscriptions.Where(item => item.User.Id == userId).AsNoTracking().ToListAsync())
 			{
 				Forum forum = await GetForum(subscription.ForumId);
 				results.Forums.Add(forum);
 			}
 
-			foreach (PostSubscription subscription in await this.Context.PostSubscriptions.Where(item => item.UserId == userId).ToListAsync())
+      results.Forums = forums.OrderBy(forum => forum.SortOrder).ToList();
+
+      foreach (PostSubscription subscription in await this.Context.PostSubscriptions.Where(item => item.User.Id == userId).AsNoTracking().ToListAsync())
 			{
 				Post post = await GetForumPost(subscription.ForumPostId);
-				results.Posts.Add(post);
+				posts.Add(post);
 			}
 
-			return results;
-		}
+      results.Posts = posts.OrderByDescending(post => post.DateAdded).ToList();
 
+      return results;
+		}
 	}
 }
 

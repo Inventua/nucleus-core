@@ -41,6 +41,11 @@
         menubar: false,
         toolbar: toolbar,
         statusbar: false,
+        setup: function (editor)
+        {
+          editor.on('GetContent', function (e) { jQuery(editor.targetElm).val(e.content); })
+          editor.on('change', function (e) { jQuery(editor.targetElm).val(editor.getBody().innerHTML); })
+        },
         paste_block_drop: false,
         paste_data_images: true,
         paste_as_text: true,

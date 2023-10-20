@@ -33,7 +33,7 @@
 									<ul>
 										@foreach (var apiClass in document.Classes)
 										{
-											<li><a id="@apiClass.MenuId()" class="list-group-item @(apiClass.FullName==Model.SelectedClass?.FullName ? "active" : "")" href="@apiClass.GenerateUrl(Model.Page, document)")">@apiClass.Name</a></li>
+                      <li><a id="@apiClass.MenuId()" class="list-group-item @(apiClass.FullName==Model.SelectedClass?.FullName ? "active" : "")" href="@apiClass.GenerateUrl(Model.Page, document)" )" title="@apiClass.Name">@apiClass.Name</a></li>
 										}
 									</ul>
 								</div>

@@ -24,7 +24,7 @@
       switchElement.addClass(targetControl.is(':checked') ? "checked" : "");
 
       // handle clicks on the toggle control (range control)
-      switchElement.on('click', function ()
+      switchElement.on('change input click', function (event)
       {
         targetControl = jQuery(this).prev();
         if (!(targetControl).is('input[type=checkbox]')) return;
@@ -32,7 +32,7 @@
       });
 
       // handle clicks on an associated label control
-      targetControl.on('click', function ()
+      targetControl.on('click', function (event)
       {
         toggleControl = jQuery(this).prev();
         if (!(toggleControl).is('input[type=range]')) return;

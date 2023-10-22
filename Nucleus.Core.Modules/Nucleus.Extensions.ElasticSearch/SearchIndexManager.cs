@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 
@@ -12,9 +13,11 @@ namespace Nucleus.Extensions.ElasticSearch
 
 	public class SearchIndexManager : ISearchIndexManager
 	{		
-		public SearchIndexManager ()
+    private ILogger<SearchIndexManager> Logger { get; }
+
+    public SearchIndexManager (ILogger<SearchIndexManager> logger)
 		{
-						
+			this.Logger = logger;
 		}
 
     public async Task<Boolean> CanConnect(Site site)
@@ -28,12 +31,16 @@ namespace Nucleus.Extensions.ElasticSearch
 
       if (String.IsNullOrEmpty(settings.ServerUrl))
       {
-        throw new InvalidOperationException($"The Elastic search server url is not set for site '{site.Name}'.");
+        this.Logger?.LogWarning("The Elastic search server url is not set for site '{siteName}'.", site.Name);
+        return false;
+        //throw new InvalidOperationException($"The Elastic search server url is not set for site '{site.Name}'.");
       }
 
       if (String.IsNullOrEmpty(settings.IndexName))
       {
-        throw new InvalidOperationException($"The Elastic search index name is not set for site '{site.Name}'.");
+        this.Logger?.LogWarning("The Elastic search index name is not set for site '{siteName}'.", site.Name);
+        return false;
+        //throw new InvalidOperationException($"The Elastic search index name is not set for site '{site.Name}'.");
       }
 
       ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(site, settings.EncryptedPassword), settings.CertificateThumbprint);

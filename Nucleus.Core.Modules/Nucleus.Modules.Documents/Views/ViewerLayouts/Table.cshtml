@@ -57,7 +57,7 @@
         <tr>
           <td>
             @Html.AddEditingControls(Model.Documents[documentCount].Id)
-            <a href="@Url.FileLink(Model.Documents[documentCount].File)" alt="Model.Documents[documentCount].Title">
+            <a href="@Url.FileLink(Model.Documents[documentCount].File)" alt="@Model.Documents[documentCount].Title" id="_@Model.Documents[documentCount].Id">
               @Model.Documents[documentCount].Title
             </a>
           </td>

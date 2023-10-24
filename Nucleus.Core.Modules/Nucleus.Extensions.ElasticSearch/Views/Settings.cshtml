@@ -8,13 +8,15 @@
 @using (Html.BeginNucleusForm("Settings", "ElasticSearch", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
 	<fieldset role="group" aria-label="Settings">
-		<SettingsControl caption="Elastic Search Server Url" helptext="Enter the URL for your Elastic Search server, including the port.">
-			@Html.TextBoxFor(model => model.ServerUrl)
-		</SettingsControl>
+    <div class="nucleus-flex-fields">
+		  <SettingsControl caption="Elastic Search Server Url" helptext="Enter the URL for your Elastic Search server, including the port.">
+			  @Html.TextBoxFor(model => model.ServerUrl)
+		  </SettingsControl>
 		
-		<SettingsControl caption="Index Name" helptext="Enter the index name to use for this site.">
-			@Html.TextBoxFor(model => model.IndexName)
-		</SettingsControl>
+		  <SettingsControl caption="Index Name" helptext="Enter the index name to use for this site.">
+			  @Html.TextBoxFor(model => model.IndexName)
+		  </SettingsControl>
+    </div>
 
 		<div class="nucleus-flex-fields">
 			<SettingsControl caption="User name" helptext="Enter the Elastic search user name.  If security is not configured on your Elastic search server, leave this value blank.">
@@ -31,8 +33,14 @@
 		</SettingsControl>
 
 		<SettingsControl caption="Attachments Size Limit (mb)" helptext="Enter maximum file size to submit to the Elastic search server for indexing. A value of zero specifies no limit.">
-			@Html.TextBoxFor(model => model.AttachmentMaxSize, new { @type = "number" })
+			@Html.TextBoxFor(model => model.AttachmentMaxSize, new { @type = "number", @class = "attachments-size-limit" })
 		</SettingsControl>
+
+    <div class="w-75">
+      <SettingsControl caption="Indexing Pause (seconds)" helptext="Specifies the pause time (in seconds) between indexing operations.  In some environments (particularly Azure), indexing requests which are sent in rapid succession can exhaust available server resources (In Azure, SNAT ports).  This setting causes the search feed to pause between requests, which gives the server time to release unused resources.  The default value is 1.">
+        @Html.RangeFor(model => model.IndexingPause, 0, 15, 0.5)
+      </SettingsControl>
+    </div>
 
 		<h3>Boost</h3>
 		<div class="w-75">
@@ -67,7 +75,7 @@
 		</div>
 	</fieldset>
 
-		<div class="nucleus-form-buttonrow">
+	<div class="nucleus-form-buttonrow">
 		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "Settings", "ElasticSearch"), new { })
 		@Html.SubmitButton("", "Get Index Count", @Url.NucleusAction("GetIndexCount", "Settings", "ElasticSearch"), new { })
 		@*@Html.SubmitButton("", "Get Index Settings", @Url.NucleusAction("GetIndexSettings", "Settings", "ElasticSearch"), new { })*@

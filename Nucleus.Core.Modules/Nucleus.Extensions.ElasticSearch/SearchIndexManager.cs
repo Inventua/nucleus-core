@@ -14,11 +14,34 @@ namespace Nucleus.Extensions.ElasticSearch
 	public class SearchIndexManager : ISearchIndexManager
 	{		
     private ILogger<SearchIndexManager> Logger { get; }
+    private ElasticSearchRequest _request { get; set; }
 
     public SearchIndexManager (ILogger<SearchIndexManager> logger)
 		{
 			this.Logger = logger;
 		}
+
+    private ElasticSearchRequest Request(Site site)
+    {
+      ConfigSettings settings = new(site);
+
+      if (String.IsNullOrEmpty(settings.ServerUrl))
+      {
+        throw new InvalidOperationException($"The Elastic search server url is not set for site '{site.Name}'.");
+      }
+
+      if (String.IsNullOrEmpty(settings.IndexName))
+      {
+        throw new InvalidOperationException($"The Elastic search index name is not set for site '{site.Name}'.");
+      }
+
+      if (_request == null || !_request.Equals(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(site, settings.EncryptedPassword), settings.CertificateThumbprint))
+      { 
+        _request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(site, settings.EncryptedPassword), settings.CertificateThumbprint, TimeSpan.FromSeconds(settings.IndexingPause));      
+      }
+            
+      return _request;
+    }
 
     public async Task<Boolean> CanConnect(Site site)
     {
@@ -27,24 +50,7 @@ namespace Nucleus.Extensions.ElasticSearch
         throw new NullReferenceException("site must not be null.");
       }
 
-      ConfigSettings settings = new(site);
-
-      if (String.IsNullOrEmpty(settings.ServerUrl))
-      {
-        this.Logger?.LogWarning("The Elastic search server url is not set for site '{siteName}'.", site.Name);
-        return false;
-        //throw new InvalidOperationException($"The Elastic search server url is not set for site '{site.Name}'.");
-      }
-
-      if (String.IsNullOrEmpty(settings.IndexName))
-      {
-        this.Logger?.LogWarning("The Elastic search index name is not set for site '{siteName}'.", site.Name);
-        return false;
-        //throw new InvalidOperationException($"The Elastic search index name is not set for site '{site.Name}'.");
-      }
-
-      ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(site, settings.EncryptedPassword), settings.CertificateThumbprint);
-      return await request.Connect();
+      return await this.Request(site).Connect();
     }
 
 		public async Task ClearIndex(Site site)
@@ -54,21 +60,10 @@ namespace Nucleus.Extensions.ElasticSearch
 				throw new NullReferenceException("site must not be null.");
 			}
 
-			ConfigSettings settings = new(site);
-
-			if (String.IsNullOrEmpty(settings.ServerUrl))
-			{
-				throw new InvalidOperationException($"The Elastic search server url is not set for site '{site.Name}', index not cleared.");
-			}
-
-			if (String.IsNullOrEmpty(settings.IndexName))
-			{
-				throw new InvalidOperationException($"The Elastic search index name is not set for site '{site.Name}', index not cleared.");
-			}
-
-			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(site, settings.EncryptedPassword), settings.CertificateThumbprint);
-			await request.DeleteIndex();
+			await this.Request(site).DeleteIndex();
 		}
+
+    private List<ContentMetaData> queue = new();
 
 		public async Task Index(ContentMetaData metadata)
 		{
@@ -78,33 +73,18 @@ namespace Nucleus.Extensions.ElasticSearch
 			}
 
 			ConfigSettings settings = new(metadata.Site);
-
-			if (String.IsNullOrEmpty(settings.ServerUrl))
-			{
-				throw new InvalidOperationException($"The Elastic search server url is not set for site '{metadata.Site.Name}', content not indexed.");
-			}
-
-			if (String.IsNullOrEmpty(settings.IndexName))
-			{
-				throw new InvalidOperationException($"The Elastic search index name is not set for site '{metadata.Site.Name}', content not indexed.");
-			}
-
-			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(metadata.Site, settings.EncryptedPassword), settings.CertificateThumbprint);
-
+      			
       ElasticSearchDocument document = new(metadata, settings);
-			Nest.IndexResponse response = await request.IndexContent(document);
+			Nest.IndexResponse response = await this.Request(metadata.Site).IndexContent(document);
 
-			// free up memory - file content is part of the feed data, and this can exhaust available memory 
+			// free up memory - file content is part of the feed data, and this could exhaust available memory 
 			document.Dispose();
 		}
 
-		public async Task Remove(ContentMetaData metadata)
+		public async Task Remove(ContentMetaData metaData)
 		{
-			ConfigSettings settings = new(metadata.Site);
-
-			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(metadata.Site, settings.EncryptedPassword), settings.CertificateThumbprint);
-
-			await request.RemoveContent(new ElasticSearchDocument(metadata, settings));
+			ConfigSettings settings = new(metaData.Site);			
+			await this.Request(metaData.Site).RemoveContent(new ElasticSearchDocument(metaData, settings));
 		}
 	}
 }

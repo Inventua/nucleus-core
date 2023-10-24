@@ -50,8 +50,9 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_SERVER_CERTIFICATE_THUMBPRINT, viewModel.CertificateThumbprint);
 
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_ATTACHMENT_MAXSIZE, viewModel.AttachmentMaxSize);
+      this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_INDEXING_PAUSE, viewModel.IndexingPause);
 
-			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_TITLE, viewModel.Boost.Title);
+      this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_TITLE, viewModel.Boost.Title);
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_SUMMARY, viewModel.Boost.Summary);
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_CATEGORIES, viewModel.Boost.Categories);
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_KEYWORDS, viewModel.Boost.Keywords);
@@ -62,7 +63,9 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_ATTACHMENT_NAME, viewModel.Boost.AttachmentName);
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_ATTACHMENT_TITLE, viewModel.Boost.AttachmentTitle);
 
-			this.SiteManager.Save(this.Context.Site);
+      
+
+      this.SiteManager.Save(this.Context.Site);
 			
 			return Ok();
 		}

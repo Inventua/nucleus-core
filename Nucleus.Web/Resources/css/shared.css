@@ -664,6 +664,11 @@ input[type=range].ToggleSwitch.checked:after
 	left: 30px;
 }
 
+.nucleus-range input[type=number]
+{
+  width: 4rem;
+}
+
 /* Set default styles for Html Editors */
 .trumbowyg-editor, .trumbowyg-textarea,
 .tox.tox-tinymce,

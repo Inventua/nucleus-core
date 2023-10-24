@@ -21,23 +21,46 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	{
 		internal static TagBuilder Build(ViewContext context, string propertyId, string propertyName, double min, double max, double step, double value, object htmlAttributes)
 		{
-			TagBuilder outputBuilder = new("input");
+      TagBuilder outputBuilder = new("div");
+      outputBuilder.AddCssClass("d-flex gap-1 nucleus-range");
 
-			outputBuilder.Attributes.Add("id", propertyId);
-			outputBuilder.Attributes.Add("name", propertyName);
+      TagBuilder rangeBuilder = new("input");
+			rangeBuilder.Attributes.Add("id", $"{propertyId}_range");
+			//rangeBuilder.Attributes.Add("name", propertyName);
 
-			outputBuilder.Attributes.Add("type", "range");
-			outputBuilder.Attributes.Add("min", min.ToString());
-			outputBuilder.Attributes.Add("max", max.ToString());
-			outputBuilder.Attributes.Add("step", step.ToString());
+			rangeBuilder.Attributes.Add("type", "range");
+			rangeBuilder.Attributes.Add("min", min.ToString());
+			rangeBuilder.Attributes.Add("max", max.ToString());
+			rangeBuilder.Attributes.Add("step", step.ToString());
 			
-			outputBuilder.Attributes.Add("value", value.ToString());
-			outputBuilder.Attributes.Add("title", value.ToString());
+			rangeBuilder.Attributes.Add("value", value.ToString());
+			rangeBuilder.Attributes.Add("title", value.ToString());
 
-			outputBuilder.Attributes.Add("onchange", "jQuery(this).attr('title', jQuery(this).val());");
+			rangeBuilder.Attributes.Add("onchange", $"jQuery(this).attr('title', jQuery(this).val()); jQuery('#{propertyId}').val(jQuery(this).val());");
+      rangeBuilder.AddCssClass("flex-1");
 
-			return outputBuilder;
-		}
+      TagBuilder textboxBuilder = new("input");
+      textboxBuilder.Attributes.Add("id", propertyId);
+      textboxBuilder.Attributes.Add("name", propertyName);
+
+      textboxBuilder.Attributes.Add("type", "number");
+      textboxBuilder.Attributes.Add("min", min.ToString());
+      textboxBuilder.Attributes.Add("max", max.ToString());
+      textboxBuilder.Attributes.Add("step", step.ToString());
+			
+      textboxBuilder.Attributes.Add("size", max.ToString("0").Length.ToString());
+      textboxBuilder.Attributes.Add("value", value.ToString());
+
+      // setting the text box value to the range control value after setting the range control serves to "round" the value to 
+      // the "step" value of the range, and also enforces the max/min.
+      textboxBuilder.Attributes.Add("onchange", $"jQuery('#{propertyId}_range').val(jQuery(this).val()); jQuery(this).val(jQuery('#{propertyId}_range').val());");
+      
+      outputBuilder.InnerHtml.AppendHtml(rangeBuilder);
+      outputBuilder.InnerHtml.AppendHtml(textboxBuilder);
+
+      return outputBuilder;
+
+    }
 	}
 }
 

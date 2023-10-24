@@ -55,7 +55,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
 			ModelExpressionProvider provider = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<ModelExpressionProvider>();
 			ModelExpression modelExpression = provider.CreateModelExpression(htmlHelper.ViewData, expression);
-			double value = modelExpression.Model == null ? 0 : (Double)modelExpression.Model;
+			double value = modelExpression.Model == null ? 0 : Convert.ToDouble(modelExpression.Model);
 
 			return Nucleus.ViewFeatures.HtmlContent.Range.Build(htmlHelper.ViewContext, htmlHelper.IdFor(expression), htmlHelper.NameFor(expression), min, max, step, value, null);
 		}

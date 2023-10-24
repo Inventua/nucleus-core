@@ -40,11 +40,13 @@ file.  If you need to support file types that aren't in the default approved lis
 
 > The default allowed file extensions are web documents (css, htm, html), 
 images (ico, jpg and jpeg, gif, png, bmp, webp, tif and tiff), Microsoft Office documents (doc, docx, pptx, ppt, xls, xlsx, vsd),
-video and audio (mp4, mpg, mpeg, webm, mkv, mka), common document formats (rtf, xps, pdf), plain-text (txt, md, xml) and zip files.
+video and audio (mp4, mpg, mpeg, webm, mkv, mka), common document formats (rtf, xps, pdf), plain-text (txt, md, xml) and zip files.  System
+administrators can add or remove allowed file types in the Nucleus application [configuration files](/configuration-reference/).
 
 ## Rename a file or folder
-Some file systems do not support rename operations (most cloud file systems).  If your file system provider supports it, use the 
-check boxes on the left to select a single files or folder and click `Rename`.  You will prompted for the new name.
+Some file systems do not support rename operations (most cloud file systems including Amazon S3 and Azure do not support rename operations).  
+If your file system provider supports it, use the check boxes on the left to select a single file or folder and click `Rename`.  You will 
+prompted for the new name.
 
 > You can't change the file extension of a file when renaming it.  This is a security measure to prevent users 
 from circumventing restricted file type checking during upload.

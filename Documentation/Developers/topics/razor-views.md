@@ -59,7 +59,7 @@ can merge style sheets, and will use the minified versions of your style sheets 
 and `~#` represents the root path for the currently executing extension (`/extensions/your-extension`).
 
 ### Headings
-In a ===Settings== view, the contents of any header element with the class `nucleus-modal-caption` are copied to the header of the modal dialog which
+In a ==Settings== view, the contents of any header element with the class `nucleus-modal-caption` are copied to the header of the modal dialog which
 is displayed to contain your settings view, and is then removed from the document.
 ```
 <h1 class="nucleus-modal-caption">Documents Settings</h1>

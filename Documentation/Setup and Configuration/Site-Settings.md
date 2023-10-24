@@ -5,10 +5,6 @@ To manage site settings, after logging in as a system administrator or site admi
 
 If you are logged on as a system administrator, you can also manage or add site from the `Settings` control panel.  Additional sites have their own set of pages and users.
 
-> **_NOTE:_**   Nucleus version 1.0 has user interface elements which allow you to set up `Site Groups`.  In the future, this will allow you to 
-share users between sites, but this functionality has not yet been implemented. 
-
-
 ![Site Settings](Site-Settings-Editor.png)
 
 ## Properties

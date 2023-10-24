@@ -268,4 +268,7 @@ namespace Nucleus.Modules.MultiContent.Controllers
 ```
 
 ### Use you own database tables
-Complex settings which aren't just name/value pairs should be stored in database tables that you create for your extension.
+Complex settings which aren't just name/value pairs should be stored in database tables that you create for your extension.  Create your own 
+[Data Provider](/developers/data-providers/) and (optionally) a Manager class to save and retrieve your complex settings.
+
+**See also:**  [Developing a Nucleus Module](/develop/walkthroughs/developing-a-nucleus-module/)

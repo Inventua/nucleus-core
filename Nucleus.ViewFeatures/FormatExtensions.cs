@@ -12,7 +12,7 @@ namespace Nucleus.ViewFeatures
 	static public class FormatExtensions
 	{
     /// <summary>
-    /// Enum used to specify timespan formats for <see cref="FormatTimeSpan(TimeSpan, TimespanFormats)". />
+    /// Enum used to specify timespan formats for <see cref="FormatTimeSpan(TimeSpan, TimespanFormats)" />.
     /// </summary>
     public enum TimespanFormats
     {

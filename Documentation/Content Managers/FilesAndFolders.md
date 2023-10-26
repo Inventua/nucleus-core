@@ -6,11 +6,12 @@ logging in as a system administrator or site administrator, you can access the f
 
 ![Manage Files and Folders](FilesAndFolders.png)
 
-Nucleus has support for the local file system as well as files hosted in [Azure blob storage](https://azure.microsoft.com/en-au/services/storage/blobs/).  The file provider system is
-extensible, so you may have support for other file systems.  You can configure Nucleus with more than one file system.
+Nucleus has support for the local file system as well as files hosted in [Azure blob storage](/other-extensions/azure-blob-storage/) and 
+[Amazon S3](/amazon-s3/).  The file provider system is extensible, so you may be able to download an extension to add support for other file 
+systems.  You can configure Nucleus to use more than one file system.
 
-The file manager displays a drop-down list to select which file system provider to manage.  A list of files and folders is listed 
-in the main display.
+The file manager displays a drop-down list of file systems which you use to select which file system provider to manage.  A list of files and 
+folders is listed in the main display.
 
 ![Manage Files and Folders](FilesAndFolders-FileManager.png)
 

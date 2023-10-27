@@ -28,12 +28,11 @@ namespace Nucleus.SAML.Client
 		{
 			var claims = new List<Claim>();
 
-			// Look for claim actions (set in config/code with MapJsonType) in the JWT payload (token claims).  If found, add claims
-			// to the identity with the claim types specified.  Normally claim actions are populated (automatically) by a call to
-			// options.UserInformationEndpoint, and .net core doesn't seem to pay any attention to JWT tokens (hence this code is required).
+			// Look for claim actions (set in config/code with MapJsonType) in the incoming claims.  If found, add claims
+			// to the identity with the claim types specified.  
 			foreach (Models.Configuration.MapClaim action in claimActions)
 			{				
-				// The JWT token can contain multiple claims with the same claim type (roles, for example), so we must loop through them.
+				// The incoming claims can contain multiple claims with the same claim type (roles, for example), so we must loop through them.
 				IEnumerable<System.Security.Claims.Claim> samlClaims = incomingPrincipal.Claims
 					.Where(claim => claim.Type.Equals(action.SAMLKey, StringComparison.OrdinalIgnoreCase));
 

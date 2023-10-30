@@ -2196,8 +2196,15 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task DeleteScheduledTaskHistory(ScheduledTaskHistory history)
 		{
-			this.Context.ScheduledTaskHistory.Remove(history);
-			await this.Context.SaveChangesAsync<ScheduledTaskHistory>();
+      ScheduledTaskHistory existing = await this.Context.ScheduledTaskHistory
+        .Where(hist => hist.Id == history.Id)
+        .FirstOrDefaultAsync();
+
+      if (existing != null)
+      {
+        this.Context.ScheduledTaskHistory.Remove(existing);
+        await this.Context.SaveChangesAsync<ScheduledTaskHistory>();
+      }
 		}
 
 		#endregion

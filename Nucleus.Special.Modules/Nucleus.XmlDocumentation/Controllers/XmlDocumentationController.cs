@@ -58,7 +58,7 @@ namespace Nucleus.XmlDocumentation.Controllers
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_DOCUMENTATION_FOLDER_ID, viewModel.DocumentationFolder.Id);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_DOCUMENTATION_DEFAULTOPEN, viewModel.DefaultOpen);
 
-			await this.PageModuleManager.SaveSettings(this.Context.Module);
+			await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
 			await this.ContentManager.Save(this.Context.Module, viewModel.WelcomeMessage);
 

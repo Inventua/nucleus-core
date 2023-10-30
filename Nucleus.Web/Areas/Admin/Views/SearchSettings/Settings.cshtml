@@ -13,7 +13,7 @@
 			@Html.DropDownListFor(model => model.ApiKey.Id, new SelectList(Model.ApiKeys, "Id", "Name"), "(create)")
 		</SettingsControl>
 		
-		<SettingsControl caption="Clear Index?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to clear search indexes at the start of the feed.  This leaves your search index temporarily empty while the search feed runs, but clears out potentially deleted entries.">
+		<SettingsControl caption="Clear Index before feed?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to clear search indexes at the start of the search feed process.  This leaves your search index temporarily empty while the search feed runs, but clears out potentially deleted entries.">
 			@Html.CheckBoxFor(model => model.ClearIndex, new { @class = "ToggleSwitch" })
 		</SettingsControl>
 

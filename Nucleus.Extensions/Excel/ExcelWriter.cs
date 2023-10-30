@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
 using System.Reflection;
+using DocumentFormat.OpenXml.VariantTypes;
 
 namespace Nucleus.Extensions.Excel
 {
@@ -288,7 +289,7 @@ namespace Nucleus.Extensions.Excel
           {
             Worksheet.Cell(RowIndex, cellIndex).SetDataType(XLDataType.Boolean);
           }
-          else if (value is int || value is double || value is float)
+          else if (value is Int16 || value is Int32 || value is Int64 || value is UInt16 || value is UInt32 || value is UInt64 || value is Single || value is double || value is float || value is decimal || value is short || value is long || value is byte || value is sbyte )
           {
             Worksheet.Cell(RowIndex, cellIndex).SetDataType(XLDataType.Number);
           }

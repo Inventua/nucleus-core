@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.TaskScheduler;
+using Nucleus.Abstractions.Search;
 
 namespace Nucleus.Data.EntityFramework
 {
@@ -48,7 +49,10 @@ namespace Nucleus.Data.EntityFramework
       builder.Entity<ExtensionsStoreSettings>().ToTable("ExtensionsStoreSettings")
         .HasKey(settings => settings.StoreUri);
 
-			return builder;
+      builder.Entity<SearchIndexHistory>().ToTable("SearchIndexHistory")
+        .HasKey(history => new { history.SiteId, history.Scope, history.SourceId });
+
+      return builder;
 		}
 
 		/// <summary>

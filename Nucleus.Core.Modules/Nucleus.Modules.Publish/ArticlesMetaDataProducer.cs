@@ -17,8 +17,9 @@ using System.Net.Http;
 namespace Nucleus.Modules.Publish
 {
 	public class ArticlesMetaDataProducer : IContentMetaDataProducer
-	{
-		private ArticlesManager ArticlesManager { get; }
+  {
+    private ISearchIndexHistoryManager SearchIndexHistoryManager { get; }
+    private ArticlesManager ArticlesManager { get; }
 		private IExtensionManager ExtensionManager { get; }
 		private IPageManager PageManager { get; }
 		private IPageModuleManager PageModuleManager { get; }
@@ -27,9 +28,10 @@ namespace Nucleus.Modules.Publish
 
 		private ILogger<ArticlesMetaDataProducer> Logger { get; }
 
-		public ArticlesMetaDataProducer(HttpClient httpClient, ArticlesManager articlesManager, IApiKeyManager apiKeyManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IExtensionManager extensionManager, ILogger<ArticlesMetaDataProducer> logger)
+		public ArticlesMetaDataProducer(HttpClient httpClient, ISearchIndexHistoryManager searchIndexHistoryManager, ArticlesManager articlesManager, IApiKeyManager apiKeyManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IExtensionManager extensionManager, ILogger<ArticlesMetaDataProducer> logger)
 		{
-			this.HttpClient = httpClient;
+      this.SearchIndexHistoryManager = searchIndexHistoryManager;
+      this.HttpClient = httpClient;
 			this.ArticlesManager = articlesManager;
 			this.ApiKeyManager = apiKeyManager;
 			this.ExtensionManager = extensionManager;
@@ -77,8 +79,12 @@ namespace Nucleus.Modules.Publish
             {
               foreach (Models.Article article in await this.ArticlesManager.List(module))
               {
-                this.Logger.LogTrace("Building content meta-data for article {0}.", article.Id);
-                yield return await BuildContentMetaData(site, page, module, apiKey, useSsl, article);
+                SearchIndexHistory historyItem = await this.SearchIndexHistoryManager.Get(site.Id, Models.Article.URN, article.Id);
+                if (historyItem == null || historyItem.LastIndexedDate < (article.DateChanged ?? article.DateAdded ?? DateTime.MaxValue))
+                {
+                  this.Logger.LogTrace("Building content meta-data for article {0}.", article.Id);
+                  yield return await BuildContentMetaData(site, page, module, apiKey, useSsl, article);
+                }
               }
             }
 					}

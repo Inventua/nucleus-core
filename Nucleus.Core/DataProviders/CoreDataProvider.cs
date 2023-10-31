@@ -18,6 +18,8 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Models.Paging;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
+using Nucleus.Abstractions.Search;
+using Org.BouncyCastle.Utilities.Collections;
 
 namespace Nucleus.Core.DataProviders
 {
@@ -27,7 +29,7 @@ namespace Nucleus.Core.DataProviders
 	/// <remarks>
 	/// This class implements all of the data provider interfaces for use with entity framework.  
 	/// </remarks>
-	public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayoutDataProvider, IUserDataProvider, IPermissionsDataProvider, ISessionDataProvider, IMailDataProvider, IScheduledTaskDataProvider, IFileSystemDataProvider, IListDataProvider, IContentDataProvider, IApiKeyDataProvider, IOrganizationDataProvider, IExtensionsStoreDataProvider
+	public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayoutDataProvider, IUserDataProvider, IPermissionsDataProvider, ISessionDataProvider, IMailDataProvider, IScheduledTaskDataProvider, IFileSystemDataProvider, IListDataProvider, IContentDataProvider, IApiKeyDataProvider, IOrganizationDataProvider, IExtensionsStoreDataProvider, ISearchIndexHistoryDataProvider
   {
 		protected IEventDispatcher EventManager { get; }
 		protected new CoreDataProviderDbContext Context { get; }
@@ -2831,7 +2833,54 @@ namespace Nucleus.Core.DataProviders
         .FirstOrDefaultAsync();
 
     }
+
     #endregion
+
+    #region "    Search index history    "
+    public async Task SaveSearchIndexHistory(SearchIndexHistory history)
+    {
+      SearchIndexHistory existing = await this.Context.SearchIndexHistory
+        .Where(existing => existing.SiteId == history.SiteId && existing.Scope == history.Scope && existing.SourceId == history.SourceId )
+        .FirstOrDefaultAsync();
+
+      if (existing != null)
+      {
+        existing.LastIndexedDate = history.LastIndexedDate;
+      }
+      else
+      {
+        this.Context.SearchIndexHistory.Add(history);
+      }
+
+      await this.Context.SaveChangesAsync<SearchIndexHistory>();
+    }
+
+    public async Task<SearchIndexHistory> GetSearchIndexHistory(Guid siteId, string scope, Guid sourceId)
+    {
+      return await this.Context.SearchIndexHistory
+        .Where(existing => existing.SiteId == siteId && existing.Scope == scope && existing.SourceId == sourceId)
+        .FirstOrDefaultAsync();
+    }
+
+    public async Task DeleteSearchIndexHistory(Guid siteId, string scope, Guid sourceId)
+    {
+      SearchIndexHistory existing = await this.Context.SearchIndexHistory
+        .Where(existing => existing.SiteId == siteId && existing.Scope == scope && existing.SourceId == sourceId)
+        .FirstOrDefaultAsync();
+      
+      if (existing != null)
+      {
+        this.Context.SearchIndexHistory.Remove(existing);
+        await this.Context.SaveChangesAsync<SearchIndexHistory>();
+      }
+    }
+
+    public async Task DeleteSearchIndexHistory(Guid siteId)
+    {
+      await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM SearchIndexHistory WHERE SiteId={siteId}");
+    }
+    #endregion
+
   }
 }
 

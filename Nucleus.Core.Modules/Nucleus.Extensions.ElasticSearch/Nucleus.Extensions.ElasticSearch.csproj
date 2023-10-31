@@ -39,7 +39,7 @@
 
   <ItemGroup>
 		<PackageReference Include="NEST" Version="7.17.5" />
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.3.0-rc4" />
+		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.3.0-rc5" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.2.0" />
   </ItemGroup>
 

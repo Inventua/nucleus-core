@@ -11,11 +11,8 @@ using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
-using Nucleus.ViewFeatures;
 using Nucleus.XmlDocumentation.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Net.Http;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Nucleus.XmlDocumentation
 {
@@ -30,11 +27,13 @@ namespace Nucleus.XmlDocumentation
 
     private ILogger<ApiMetaDataProducer> Logger { get; }
     private ICacheManager CacheManager { get; }
+    private ISearchIndexHistoryManager SearchIndexHistoryManager { get; }
 
-    public ApiMetaDataProducer(HttpClient httpClient, IApiKeyManager apiKeyManager, ISiteManager siteManager, IPageManager pageManager, IPageModuleManager pageModuleManager, ICacheManager cacheManager, IFileSystemManager fileSystemManager, IExtensionManager extensionManager, ILogger<ApiMetaDataProducer> logger)
+    public ApiMetaDataProducer(HttpClient httpClient, ISearchIndexHistoryManager searchIndexHistoryManager, IApiKeyManager apiKeyManager, ISiteManager siteManager, IPageManager pageManager, IPageModuleManager pageModuleManager, ICacheManager cacheManager, IFileSystemManager fileSystemManager, IExtensionManager extensionManager, ILogger<ApiMetaDataProducer> logger)
     {
       this.ApiKeyManager = apiKeyManager;
       this.HttpClient = httpClient;
+      this.SearchIndexHistoryManager = searchIndexHistoryManager;
       this.FileSystemManager = fileSystemManager;
       this.ExtensionManager = extensionManager;
       this.PageManager = pageManager;
@@ -48,6 +47,8 @@ namespace Nucleus.XmlDocumentation
       // This must match the value in package.xml
       Guid moduleDefinitionId = Guid.Parse("0595de3d-1ba7-49df-99f0-2e80fb00d156");
       ApiKey apiKey = null;
+
+      this.CacheManager.XmlDocumentationCache().Clear();
 
       if (site.DefaultSiteAlias == null)
       {
@@ -72,11 +73,17 @@ namespace Nucleus.XmlDocumentation
           {
             foreach (Models.ApiDocument document in await GetApiDocuments(site, module))
             {
-              await foreach (ContentMetaData item in BuildContent(site, apiKey, page, module, document))
+              // For the XMLDocumentation module, we check the last modified date for the source file. We only check at the ApiDocument level, 
+              // because ApiClass content comes from the same file.
+              SearchIndexHistory historyItem = await this.SearchIndexHistoryManager.Get(site.Id, ApiDocument.URN, document.SourceFile.Id);
+              if (historyItem == null || historyItem.LastIndexedDate < document.SourceFile.DateModified)
               {
-                if (item != null)
+                await foreach (ContentMetaData item in BuildContent(site, apiKey, page, module, document))
                 {
-                  yield return item;
+                  if (item != null)
+                  {
+                    yield return item;
+                  }
                 }
               }
             }
@@ -115,7 +122,7 @@ namespace Nucleus.XmlDocumentation
           Keywords = document.Namespace.Name.Split('.', StringSplitOptions.RemoveEmptyEntries).Concat(new string[] { document.AssemblyName, document.Namespace.Name }),
           Url = document.GenerateUrl(page),
           PublishedDate = document.LastModifiedDate,
-          SourceId = null,
+          SourceId = document.SourceFile.Id,
           Scope = Models.ApiDocument.URN,
           Type = "API Documentation",
           Roles = await GetViewRoles(module),
@@ -149,7 +156,7 @@ namespace Nucleus.XmlDocumentation
           Keywords = apiClass.FullName.Split('.', StringSplitOptions.RemoveEmptyEntries).Concat(new string[] { apiClass.FullName, apiClass.AssemblyName, apiClass.Namespace }),
           Url = apiClass.GenerateUrl(page, document),
           PublishedDate = document.LastModifiedDate,
-          SourceId = null,
+          SourceId = document.SourceFile.Id,
           Scope = Models.ApiClass.URN,
           Type = "API Documentation",
           Roles = await GetViewRoles(module),

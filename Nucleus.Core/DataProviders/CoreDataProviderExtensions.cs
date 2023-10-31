@@ -36,6 +36,7 @@ namespace Nucleus.Core.DataProviders
 			services.AddTransient<IApiKeyDataProvider>(CoreEntityFrameworkDataProviderFactory);
       services.AddTransient<IOrganizationDataProvider>(CoreEntityFrameworkDataProviderFactory);
       services.AddTransient<IExtensionsStoreDataProvider>(CoreEntityFrameworkDataProviderFactory);
+      services.AddTransient<ISearchIndexHistoryDataProvider>(CoreEntityFrameworkDataProviderFactory);
 
       return services;
 		}

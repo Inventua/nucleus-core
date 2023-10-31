@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
-using Nucleus.Extensions;
 using System.Threading.Tasks;
+using Nucleus.Abstractions.Search;
 
 namespace Nucleus.Extensions.ElasticSearch.Controllers
 {
@@ -15,11 +15,13 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 		private Context Context { get; }
 
 		private ISiteManager SiteManager { get; }
+    private ISearchIndexHistoryManager SearchIndexHistoryManager { get; }
 
-		public SettingsController(Context context, ISiteManager siteManager)
+    public SettingsController(Context context, ISiteManager siteManager, ISearchIndexHistoryManager searchIndexHistoryManager)
 		{
 			this.Context = context;
 			this.SiteManager = siteManager;
+      this.SearchIndexHistoryManager = searchIndexHistoryManager;
 		}			
 
 		[HttpGet]
@@ -100,8 +102,9 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 		{
 			ElasticSearchRequest request = new(new System.Uri(viewModel.ServerUrl), viewModel.IndexName, viewModel.Username, GetPassword(viewModel), viewModel.CertificateThumbprint);
 
-			if (await request.DeleteIndex())
+      if (await request.DeleteIndex())
 			{
+        await this.SearchIndexHistoryManager.Delete(this.Context.Site.Id);
 				return Json(new { Title = "Clear Index", Message = $"Index '{viewModel.IndexName}' has been removed and will be re-created the next time the search index feeder runs.", Icon = "alert" });
 			}
 			else

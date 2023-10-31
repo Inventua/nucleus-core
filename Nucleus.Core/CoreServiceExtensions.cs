@@ -15,11 +15,11 @@ using Nucleus.Abstractions.Search;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models.TaskScheduler;
 using System.Reflection.Metadata;
-
+using Nucleus.Core.Search;
 
 namespace Nucleus.Core
 {
-  public static class CoreServiceExtensions
+    public static class CoreServiceExtensions
   {
 
     /// <summary>
@@ -110,6 +110,8 @@ namespace Nucleus.Core
       services.AddSingleton<IApiKeyManager, Managers.ApiKeyManager>();
       services.AddSingleton<IOrganizationManager, Managers.OrganizationManager>();
       services.AddSingleton<IExtensionsStoreManager, Managers.ExtensionsStoreManager>();
+
+      services.AddSingleton<ISearchIndexHistoryManager, Search.SearchIndexHistoryManager>();
 
       // Search
       services.AddTransient<IContentMetaDataProducer, Search.PageMetaDataProducer>();

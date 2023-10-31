@@ -17,7 +17,8 @@ namespace Nucleus.Modules.Documents
 {
 	public class DocumentsMetaDataProducer : IContentMetaDataProducer
 	{
-		private IFileSystemManager FileSystemManager { get; }
+    private ISearchIndexHistoryManager SearchIndexHistoryManager { get; }
+    private IFileSystemManager FileSystemManager { get; }
 		private DocumentsManager DocumentsManager { get; }
 		private IExtensionManager ExtensionManager { get; }
 		private IPageManager PageManager { get; }
@@ -25,9 +26,10 @@ namespace Nucleus.Modules.Documents
 
 		private ILogger<DocumentsMetaDataProducer> Logger { get; }
 
-		public DocumentsMetaDataProducer(ISiteManager siteManager, DocumentsManager documentsManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, IExtensionManager extensionManager, ILogger<DocumentsMetaDataProducer> logger)
+		public DocumentsMetaDataProducer(ISearchIndexHistoryManager searchIndexHistoryManager, ISiteManager siteManager, DocumentsManager documentsManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, IExtensionManager extensionManager, ILogger<DocumentsMetaDataProducer> logger)
 		{
-			this.FileSystemManager = fileSystemManager;
+      this.SearchIndexHistoryManager = searchIndexHistoryManager;
+      this.FileSystemManager = fileSystemManager;
 			this.DocumentsManager = documentsManager;
 			this.ExtensionManager = extensionManager;
 			this.PageManager = pageManager;
@@ -58,20 +60,36 @@ namespace Nucleus.Modules.Documents
           {
             foreach (Models.Document document in await this.DocumentsManager.List(site, module))
             {
-              yield return await BuildContentMetaData(site, page, module, document);
+              SearchIndexHistory historyItem = await this.SearchIndexHistoryManager.Get(site.Id, Models.Document.URN, document.Id);
+              if (historyItem == null || historyItem.LastIndexedDate < DocumentModifiedDate(document))
+              {
+                yield return await BuildContentMetaData(site, page, module, document);
+              }
             }
           }
 				}
 			}
 		}
     		
-		/// <summary>
-		/// Return a meta-data entry for the document meta-data
-		/// </summary>
-		/// <param name="site"></param>
-		/// <param name="document"></param>
-		/// <returns></returns>
-		private async Task<ContentMetaData> BuildContentMetaData(Site site, Page page, PageModule module, Models.Document document)
+    private DateTime DocumentModifiedDate(Models.Document document)
+    {
+      DateTime? modifiedDate = document.DateChanged ?? document.DateAdded;
+
+      if (document.File != null && (modifiedDate == null || document.File.DateModified > modifiedDate))
+      {
+        modifiedDate = document.File.DateModified;
+      }
+
+      return modifiedDate ?? DateTime.MaxValue;
+    }
+
+    /// <summary>
+    /// Return a meta-data entry for the document meta-data
+    /// </summary>
+    /// <param name="site"></param>
+    /// <param name="document"></param>
+    /// <returns></returns>
+    private async Task<ContentMetaData> BuildContentMetaData(Site site, Page page, PageModule module, Models.Document document)
 		{      			
 			if (page != null && document.File != null)
 			{

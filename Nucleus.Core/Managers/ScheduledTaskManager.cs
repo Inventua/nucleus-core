@@ -129,7 +129,7 @@ namespace Nucleus.Core.Managers
 		public async Task SaveHistory(ScheduledTaskHistory history)
 		{
       // the task scheduler runs operations in parallel, and thus can call SaveHistory in parallel.  We have to serialize calls to SaveScheduledTaskHistory
-      // so that entiry framework does not throw exceptions as a result of trying to save a new history twice "at once" and having one fail
+      // so that entity framework does not throw exceptions as a result of trying to save a new history twice "at once" and having one fail
       await historySemaphore.WaitAsync();
       try
       {

@@ -13,19 +13,26 @@ using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Nucleus.Core.Logging;
 using Nucleus.Extensions;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using Nucleus.Core.DataProviders;
+using Nucleus.Data.Common;
+using DocumentFormat.OpenXml.Drawing.Diagrams;
+using System.Linq.Expressions;
 
 namespace Nucleus.Core.Search
 {
   [System.ComponentModel.DisplayName("Nucleus Core: Search Index Feeder")]
   public class SearchIndexFeeder : IScheduledTask
   {
+    private ISearchIndexHistoryManager SearchIndexHistoryManager { get; }
     private ISiteManager SiteManager { get; }
     private IEnumerable<IContentMetaDataProducer> SearchContentProviders { get; }
     private IEnumerable<ISearchIndexManager> SearchIndexManagers { get; }
     private ILogger<SearchIndexFeeder> Logger { get; }
 
-    public SearchIndexFeeder(IEnumerable<IContentMetaDataProducer> searchContentProviders, IEnumerable<ISearchIndexManager> searchIndexManagers, ISiteManager siteManager, ILogger<SearchIndexFeeder> logger)
+    public SearchIndexFeeder(ISearchIndexHistoryManager searchIndexHistoryManager, IEnumerable<IContentMetaDataProducer> searchContentProviders, IEnumerable<ISearchIndexManager> searchIndexManagers, ISiteManager siteManager, ILogger<SearchIndexFeeder> logger)
     {
+      this.SearchIndexHistoryManager = searchIndexHistoryManager;
       this.SiteManager = siteManager;
       this.SearchContentProviders = searchContentProviders;
       this.SearchIndexManagers = searchIndexManagers;
@@ -110,6 +117,8 @@ namespace Nucleus.Core.Search
                 // allow IContentMetaDataProducer implementation to return nulls (and silently skip them)
                 if (item != null)
                 {
+                  Boolean indexSuccess = false;
+
                   item.Url = ParseUrl(item.Url);
                   this.Logger.LogTrace("Adding [{scope}] {url} to index.", item.Scope, item.Url);
 
@@ -118,6 +127,7 @@ namespace Nucleus.Core.Search
                     try
                     {
                       await searchIndexManager.Index(item);
+                      indexSuccess = true;
                       this.Logger.LogInformation("Added [{scope}] {url} to index ({searchIndexManager}).", item.Scope, item.Url, searchIndexManager.GetType());
                     }
                     catch (NotImplementedException)
@@ -131,6 +141,12 @@ namespace Nucleus.Core.Search
                     }
                   }
 
+                  // store the search index last updated data for the content item
+                  if (indexSuccess && item.SourceId != null && !String.IsNullOrEmpty(item.Scope))
+                  {
+                    // search indexing history is indexed by site, sourceid, scope
+                    await this.SearchIndexHistoryManager.Save(new() { SiteId = item.Site.Id, Scope = item.Scope, SourceId = item.SourceId.Value, Url = item.Url, LastIndexedDate = DateTime.UtcNow });                    
+                  }
                   item.Dispose();
                 }
               }
@@ -171,6 +187,8 @@ namespace Nucleus.Core.Search
               this.Logger?.LogError(e, "Clearing Index for provider {providername}, site '{site}'.", searchIndexManager.GetType().FullName, site.Name);
             }
           }
+
+          await this.SearchIndexHistoryManager.Delete(site.Id);
         }
       }
     }

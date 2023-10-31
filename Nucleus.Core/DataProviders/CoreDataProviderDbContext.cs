@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Nucleus.Data.EntityFramework;
+using Nucleus.Abstractions.Search;
 
 namespace Nucleus.Core.DataProviders
 {
@@ -78,7 +79,10 @@ namespace Nucleus.Core.DataProviders
     // This isn't referenced anywhere, but it allows EF to correctly understand the database schema
     public DbSet<UserSecrets> UserSecrets { get; set; }
 
-		public CoreDataProviderDbContext(DbContextConfigurator<CoreDataProvider> dbContextConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) 
+    public DbSet<SearchIndexHistory> SearchIndexHistory { get; set; }
+
+
+    public CoreDataProviderDbContext(DbContextConfigurator<CoreDataProvider> dbContextConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) 
 			: base(dbContextConfigurator, httpContextAccessor, loggerFactory)	{	}
 
 		/// <summary>

@@ -108,7 +108,7 @@ namespace Nucleus.Modules.Documents.Controllers
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SIZE, viewModel.ShowSize);
       this.Context.Module.ModuleSettings.Set(MODULESETTING_DEFAULTSORTORDER, viewModel.DefaultSortOrder);
 
-      await this.PageModuleManager.SaveSettings(this.Context.Module);
+      await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
 			return Json(new { Title = "Save Settings", Message = "Settings saved.", Icon = "alert" });
 		}

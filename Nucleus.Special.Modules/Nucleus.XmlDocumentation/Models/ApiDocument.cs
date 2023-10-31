@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Nucleus.XmlDocumentation.Models.Serialization;
+using Nucleus.Abstractions.Models.FileSystem;
 
 namespace Nucleus.XmlDocumentation.Models
 {
@@ -13,7 +13,7 @@ namespace Nucleus.XmlDocumentation.Models
 
 		public string AssemblyName { get; set; }
 		public ApiNamespace Namespace { get; set; }
-		public string SourceFileName { get; set; }
+		public File SourceFile { get; set; }
 		public List<ApiClass> Classes { get; set; }
 		public DateTime LastModifiedDate { get; set; }
 

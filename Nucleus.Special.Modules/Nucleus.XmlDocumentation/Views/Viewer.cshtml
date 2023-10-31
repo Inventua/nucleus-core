@@ -53,7 +53,7 @@
 					}
 					foreach (var document in Model.Documents)
 					{
-						<h2><a href="@Url.PageLink(Model.Page, @document.SourceFileName)">@document.Namespace.Name Assembly</a></h2>
+						<h2><a href="@Url.PageLink(Model.Page, @document.SourceFile.Name)">@document.Namespace.Name Assembly</a></h2>
 						if (document.Namespace.Summary != null)
 						{
 							<div class="api-remarks">
@@ -105,7 +105,7 @@
 								@foreach (var apiClass in Model.SelectedDocument.Classes)
 								{
 									<li class="list-group-item">
-										<a class="list-group-item-action" href="@Url.PageLink(Model.Page, $"{Model.SelectedDocument.SourceFileName}/{apiClass.ControlId()}/")">@apiClass.Name @apiClass.Type</a>
+										<a class="list-group-item-action" href="@Url.PageLink(Model.Page, $"{Model.SelectedDocument.SourceFile.Name}/{apiClass.ControlId()}/")">@apiClass.Name @apiClass.Type</a>
 										<div>
 											@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, apiClass.Summary))
 										</div>

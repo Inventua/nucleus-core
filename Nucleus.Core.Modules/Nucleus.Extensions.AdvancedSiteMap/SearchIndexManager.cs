@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models;
@@ -14,8 +15,9 @@ namespace Nucleus.Extensions.AdvancedSiteMap
 	public class SearchIndexManager : ISearchIndexManager
 	{
 		private Nucleus.Abstractions.Models.Configuration.FolderOptions Options { get; }
+    private static SemaphoreSlim _fileAccessSemaphore { get; } = new(1);
 
-		public SearchIndexManager (IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> options)
+    public SearchIndexManager (IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> options)
 		{
 			this.Options = options.Value;
 		}
@@ -29,12 +31,20 @@ namespace Nucleus.Extensions.AdvancedSiteMap
 			}
 			else
 			{
-				using (System.IO.Stream input = System.IO.File.OpenRead(filename))
-				{
-					System.Xml.Serialization.XmlSerializer serializer = new(typeof(Nucleus.Abstractions.Models.Sitemap.Sitemap));
-					return serializer.Deserialize(input) as Nucleus.Abstractions.Models.Sitemap.Sitemap;
-				}		
-			}
+        try
+        {
+          _fileAccessSemaphore.Wait();
+          using (System.IO.Stream input = System.IO.File.OpenRead(filename))
+          {
+            System.Xml.Serialization.XmlSerializer serializer = new(typeof(Nucleus.Abstractions.Models.Sitemap.Sitemap));
+            return serializer.Deserialize(input) as Nucleus.Abstractions.Models.Sitemap.Sitemap;
+          }
+        }
+        finally
+        {
+          _fileAccessSemaphore.Release();
+        }
+      }
 		}
 
 		public Task ClearIndex(Site site)
@@ -43,8 +53,16 @@ namespace Nucleus.Extensions.AdvancedSiteMap
 
 			if (System.IO.File.Exists(filename))
 			{
-				System.IO.File.Delete(filename);
-			}
+        try
+        {
+          _fileAccessSemaphore.Wait();
+          System.IO.File.Delete(filename);
+        }
+        finally
+        {
+          _fileAccessSemaphore.Release();
+        }
+      }
 
 			return Task.CompletedTask;
 		}
@@ -112,12 +130,20 @@ namespace Nucleus.Extensions.AdvancedSiteMap
 		private void Write(Site site, Abstractions.Models.Sitemap.Sitemap siteMap)
 		{
 			string filename = GetFilename(this.Options, site);
-			
-			using (System.IO.Stream output = System.IO.File.OpenWrite(filename))
-			{
-				System.Xml.Serialization.XmlSerializer serializer = new(typeof(Nucleus.Abstractions.Models.Sitemap.Sitemap));
-				serializer.Serialize(output, siteMap);
-			}
-		}
+
+      try
+      {
+        _fileAccessSemaphore.Wait();
+        using (System.IO.Stream output = System.IO.File.OpenWrite(filename))
+        {
+          System.Xml.Serialization.XmlSerializer serializer = new(typeof(Nucleus.Abstractions.Models.Sitemap.Sitemap));
+          serializer.Serialize(output, siteMap);
+        }
+      }
+      finally
+      {
+        _fileAccessSemaphore.Release();
+      }
+    }
 	}
 }

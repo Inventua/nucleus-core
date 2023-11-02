@@ -9,16 +9,28 @@
 		<fieldset>
 			@Html.HiddenFor(model => model.Forum.Id)
 			@Html.HiddenFor(model => model.Post.Id)
-			@Html.HiddenFor(model => model.Reply.Id)
-
-			<SettingsControl caption="Original Post">
-        <a href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode() + $"/{@Model.Post.Id}")" class="@(Model.Post.Tracking == null ? "d-block fw-bold" : "d-block")">
-          @Model.Post.Subject
-        </a>
-        <div class="original-post body">
-          @(new Microsoft.AspNetCore.Html.HtmlString(Model.Post.Body))
-				</div>
-			</SettingsControl>
+      @Html.HiddenFor(model => model.Reply.Id)
+      
+      @if (Model.Reply.ReplyTo != null)
+      {
+        @Html.HiddenFor(model => model.Reply.ReplyTo.Id)
+        <SettingsControl caption="Reply to">
+          <div class="original-post body">
+            @(new Microsoft.AspNetCore.Html.HtmlString(Model.Reply.ReplyTo.Body))
+          </div>
+        </SettingsControl>
+      }
+      else
+      {
+        <SettingsControl caption="Reply to Post">
+          <a href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode() + $"/{@Model.Post.Id}")" class="@(Model.Post.Tracking == null ? "d-block fw-bold" : "d-block")">
+            @Model.Post.Subject
+          </a>
+          <div class="original-post body">
+            @(new Microsoft.AspNetCore.Html.HtmlString(Model.Post.Body))
+				  </div>
+			  </SettingsControl>
+      }
 
 			<SettingsControl caption="Reply" helptext="Enter your reply text.">
 				@Html.TextAreaFor(model => model.Reply.Body, new { @class = "HtmlEditorControl" })

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Modules.Forums.Models;
 using Nucleus.Extensions;
+using Microsoft.Extensions.Hosting;
 
 namespace Nucleus.Modules.Forums.Controllers
 {
@@ -58,7 +59,7 @@ namespace Nucleus.Modules.Forums.Controllers
       {
         if (this.Context.LocalPath.Segments.FirstOrDefault() == MANAGE_SUBSCRIPTIONS_PATH)
         {
-          return View("ManageSubscriptions", await BuildSubscriptionsViewModel());
+          return View("ManageSubscriptions", await BuildManageSubscriptionsViewModel());
         }
 
         Guid? forumId = await this.GroupsManager.FindForum(this.Context.Module, this.Context.LocalPath.Segments[0]);
@@ -77,7 +78,7 @@ namespace Nucleus.Modules.Forums.Controllers
             {
               return await BuildViewForumView(new() { Forum = forum });
             }
-          }          
+          }
         }
 
         return NotFound();
@@ -91,7 +92,7 @@ namespace Nucleus.Modules.Forums.Controllers
       {
         if (User.IsApproved() && User.IsVerified())
         {
-          return View("ManageSubscriptions", await BuildSubscriptionsViewModel());
+          return View("ManageSubscriptions", await BuildManageSubscriptionsViewModel());
         }
         else
         {
@@ -222,7 +223,7 @@ namespace Nucleus.Modules.Forums.Controllers
         return BadRequest();
       }
 
-      return View("ReplyPost", await BuildReplyPostViewModel(viewModel, viewModel.Post.Id, viewModel.Reply.Id));
+      return View("ReplyPost", await BuildReplyPostViewModel(viewModel, viewModel.Post.Id, viewModel.Reply.ReplyTo?.Id, viewModel.Reply.Id));
     }
 
     [HttpPost]
@@ -240,7 +241,7 @@ namespace Nucleus.Modules.Forums.Controllers
         return BadRequest();
       }
 
-      return View("ReplyPost", await BuildReplyPostViewModel(viewModel, viewModel.Post.Id, viewModel.Reply.Id));
+      return View("ReplyPost", await BuildReplyPostViewModel(viewModel, viewModel.Post.Id, viewModel.Reply.ReplyTo?.Id, viewModel.Reply.Id));
     }
 
     [HttpGet]
@@ -300,8 +301,16 @@ namespace Nucleus.Modules.Forums.Controllers
 
       await this.ForumsManager.SavePost(this.Context.Site, User, forum, viewModel.Post);
       await this.ForumsManager.SavePostTracking(viewModel.Post, HttpContext.User);
-      await this.ForumsManager.Subscribe(viewModel.Post, HttpContext.User);
 
+      if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE))
+      {
+        // automatically subscribe the user to the post if the user is not subscribed to the post's forum or forum group
+        if ((await this.ForumsManager.GetSubscription(forum.Group, User)) == null && (await this.ForumsManager.GetSubscription(forum, User)) == null)
+        {
+          await this.ForumsManager.Subscribe(viewModel.Post, HttpContext.User);
+        }
+      }
+      
       return await BuildViewForumView(new()
       {
         Forum = forum
@@ -355,6 +364,35 @@ namespace Nucleus.Modules.Forums.Controllers
     }
 
     [HttpPost]
+    public async Task<ActionResult> ManageSubscribeForumGroup(ViewModels.ManageSubscriptions viewModel, Guid groupId)
+    {
+      Models.Group group = await this.GroupsManager.Get(groupId);
+
+      if (this.GroupsManager.CheckPermission(this.Context.Site, HttpContext.User, group, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE))
+      {
+        // subscribe to the forum 
+        await this.ForumsManager.Subscribe(group, HttpContext.User);
+      }
+      else
+      {
+        return BadRequest();
+      }
+
+      return await ManageSubscriptions();
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> ManageUnSubscribeForumGroup(ViewModels.ManageSubscriptions viewModel, Guid groupId)
+    {
+      Models.Group group = await this.GroupsManager.Get(groupId);
+
+      // Unsubscribe from the forum 
+      await this.ForumsManager.UnSubscribe(group, HttpContext.User);
+
+      return View("ManageSubscriptions", await BuildManageSubscriptionsViewModel());
+    }
+
+    [HttpPost]
     public async Task<ActionResult> ManageUnSubscribeForum(ViewModels.ManageSubscriptions viewModel, Guid forumId)
     {
       Models.Forum forum = await this.ForumsManager.Get(forumId);
@@ -362,9 +400,26 @@ namespace Nucleus.Modules.Forums.Controllers
       // Unsubscribe from the forum 
       await this.ForumsManager.UnSubscribe(forum, HttpContext.User);
 
-      return View("ManageSubscriptions", await BuildSubscriptionsViewModel());
+      return View("ManageSubscriptions", await BuildManageSubscriptionsViewModel());
     }
 
+    [HttpPost]
+    public async Task<ActionResult> ManageSubscribeForum(ViewModels.ManageSubscriptions viewModel, Guid forumId)
+    {
+      Models.Forum forum = await this.ForumsManager.Get(forumId);
+
+      if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE))
+      {
+        // subscribe to the forum 
+        await this.ForumsManager.Subscribe(forum, HttpContext.User);
+      }
+      else
+      {
+        return BadRequest();
+      }
+      
+      return await ManageSubscriptions(); 
+    }
 
     [HttpPost]
     public async Task<ActionResult> SubscribePost(ViewModels.ViewForumPost viewModel)
@@ -401,7 +456,7 @@ namespace Nucleus.Modules.Forums.Controllers
       // Unsubscribe from the forum post
       await this.ForumsManager.UnSubscribe(post, HttpContext.User);
 
-      return View("ManageSubscriptions", await BuildSubscriptionsViewModel());
+      return View("ManageSubscriptions", await BuildManageSubscriptionsViewModel());
     }
 
     [HttpPost]
@@ -554,9 +609,9 @@ namespace Nucleus.Modules.Forums.Controllers
 
 
     [HttpGet]
-    public async Task<ActionResult> ReplyPost(Guid id)
+    public async Task<ActionResult> ReplyPost(Guid id, Guid replyToId)
     {
-      ViewModels.ReplyForumPost viewModel = await BuildReplyPostViewModel(new(), id, Guid.Empty);
+      ViewModels.ReplyForumPost viewModel = await BuildReplyPostViewModel(new(), id, replyToId, Guid.Empty);
 
       if (!this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_REPLY_POST))
       {
@@ -569,7 +624,7 @@ namespace Nucleus.Modules.Forums.Controllers
     [HttpGet]
     public async Task<ActionResult> EditForumPostReply(Guid postId, Guid replyId)
     {
-      ViewModels.ReplyForumPost viewModel = await BuildReplyPostViewModel(new(), postId, replyId);
+      ViewModels.ReplyForumPost viewModel = await BuildReplyPostViewModel(new(), postId, Guid.Empty, replyId);
 
       if (!(this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_REPLY_POST)) && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_EDIT_POST))
       {
@@ -586,6 +641,7 @@ namespace Nucleus.Modules.Forums.Controllers
       ModelState.RemovePrefix("Forum");
       ModelState.RemovePrefix("Post");
       ModelState.RemovePrefix("Reply.Id");
+      ModelState.RemovePrefix("Reply.ReplyTo");
 
       if (!ModelState.IsValid)
       {
@@ -594,15 +650,22 @@ namespace Nucleus.Modules.Forums.Controllers
 
       Models.Forum forum = await this.ForumsManager.Get(viewModel.Forum.Id);
       Models.Post post = await this.ForumsManager.GetForumPost(viewModel.Post.Id);
-
+      
       if (!this.ForumsManager.CheckPermission(this.Context.Site, User, forum, ForumsManager.PermissionScopes.FORUM_REPLY_POST))
       {
         return Forbid();
       }
 
       await this.ForumsManager.SavePostReply(this.Context.Site, User, post, viewModel.Reply);
-      await this.ForumsManager.Subscribe(post, User);
 
+      // automatically subscribe the user to the post if the user is not subscribed to the post's forum or forum group
+      if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE))
+      {
+        if ((await this.ForumsManager.GetSubscription(forum.Group, User)) == null && (await this.ForumsManager.GetSubscription(forum, User)) == null)
+        {
+          await this.ForumsManager.Subscribe(post, User);
+        }
+      }
       return await ViewPost(post.Id);
     }
 
@@ -842,8 +905,61 @@ namespace Nucleus.Modules.Forums.Controllers
           reply.CanEditReply = CanEditReply(viewModel.Forum, reply);
           reply.CanDeleteReply = CanDeleteReply(viewModel.Forum, reply);
         }
+        viewModel.Replies = SortReplies(viewModel.Replies);
       }
       return viewModel;
+    }
+
+    /// <summary>
+    /// Return a list of replies sorted by posted date and reply-to
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    private List<Reply> SortReplies(IList<Reply> source)
+    {
+      List<Reply> results = new List<Reply>();
+
+      // items are removed from source when they are added to results, so this loop is complete when there are no more items in source
+      while (source.Any())
+      {
+        // move the first reply to the result list
+        Reply thisReply = source.First();
+        results.Add(thisReply);
+        source.Remove(thisReply);
+
+        // move all replies which are replies-to-this-reply to the result list (recursively)
+        results.AddRange(GetChildReplies(source, thisReply.Id, 1));
+      }
+
+      return results;
+    }
+
+    /// <summary>
+    /// Move replies which are replies to the reply specified by <paramref name="rootReplyId"/> from the source list to the results list (recursively).
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="rootReplyId"></param>
+    /// <returns></returns>
+    private List<Reply> GetChildReplies(IList<Reply> source, Guid rootReplyId, int level)
+    {
+      List<Reply> results = new List<Reply>();
+
+      // prevent infinite recursion in case database entries have incorrect replyTo data.  If this happens, the replies won't be sorted so
+      // that replies-to-replies appear after their "parent" reply, but will still appear in regular date order
+      if (level <= ViewModels.ReplyForumPost.MAX_LEVELS)
+      {
+        foreach (Reply childReply in source.Where(reply => reply.ReplyTo?.Id == rootReplyId).ToList())
+        {
+          childReply.Level = level;
+          results.Add(childReply);
+          source.Remove(childReply);
+
+          // move all replies which are replies-to-this-reply to the result list
+          results.AddRange(GetChildReplies(source, childReply.Id, level + 1));
+        }
+      }
+
+      return results;
     }
 
 
@@ -989,7 +1105,7 @@ namespace Nucleus.Modules.Forums.Controllers
     /// Create a "reply post" viewmodel and populate it
     /// </summary>
     /// <returns></returns>
-    private async Task<ViewModels.ReplyForumPost> BuildReplyPostViewModel(ViewModels.ReplyForumPost viewModel, Guid forumPostId, Guid replyId)
+    private async Task<ViewModels.ReplyForumPost> BuildReplyPostViewModel(ViewModels.ReplyForumPost viewModel, Guid forumPostId, Guid? replyToId, Guid replyId)
     {
       Models.Post post = await this.ForumsManager.GetForumPost(forumPostId);
       Models.Forum forum = await this.ForumsManager.Get(post.ForumId);
@@ -1006,6 +1122,15 @@ namespace Nucleus.Modules.Forums.Controllers
         foreach (Models.Attachment attachment in reply.Attachments)
         {
           attachment.File = await this.FileSystemManager.GetFile(this.Context.Site, attachment.File.Id);
+        }
+      }
+
+      if (reply == null)
+      {
+        reply = new();
+        if (replyToId != null)
+        { 
+          reply.ReplyTo = await this.ForumsManager.GetForumPostReply(replyToId.Value);
         }
       }
 
@@ -1030,10 +1155,40 @@ namespace Nucleus.Modules.Forums.Controllers
       return new();
     }
 
-    private async Task<ViewModels.ManageSubscriptions> BuildSubscriptionsViewModel()
-    {
+    private async Task<ViewModels.ManageSubscriptions> BuildManageSubscriptionsViewModel()
+    {     
       ViewModels.ManageSubscriptions manageSubscriptions = new();
+      
       manageSubscriptions.Subscriptions = await this.ForumsManager.GetUserSubscriptions(User);
+      IList<Group> groups = await this.GroupsManager.List(this.Context.Module);
+
+      // display groups if the group is enabled and the user has permission to subscribe to it
+      manageSubscriptions.Groups = groups
+        .Where(group => group.Settings.Enabled && this.GroupsManager.CheckPermission(this.Context.Site, HttpContext.User, group, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE))
+        .ToList();
+
+      List<Forum> forums = new();
+
+      foreach (Group group in groups)
+      {
+        List<Forum> groupForums = await this.ForumsManager.List(group);
+        group.Forums = groupForums.Where(forum=>forum.EffectiveSettings().Enabled).ToList();
+
+        // display forums if the forum is enabled, the user has permission to subscribe to the forum AND the user is not subscribed to the forum's group,
+        // or is already subscribed to the forum 
+        forums.AddRange(groupForums
+          .Where(forum => 
+            forum.EffectiveSettings().Enabled && 
+            this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE) && 
+            (
+              !manageSubscriptions.Subscriptions.Groups.Select(subscription => subscription.Id).Contains(group.Id) ||
+              manageSubscriptions.Subscriptions.Forums.Select(subscription => subscription.Id).Contains(forum.Id) 
+            )
+          ));          
+      }      
+
+      manageSubscriptions.Forums = forums;
+
       return manageSubscriptions;
     }
   }

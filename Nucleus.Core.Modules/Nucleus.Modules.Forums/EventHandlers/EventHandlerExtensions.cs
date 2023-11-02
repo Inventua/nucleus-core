@@ -19,9 +19,36 @@ namespace Nucleus.Modules.Forums.EventHandlers
 
 			if (forum.EffectiveSettings().SubscriptionMailTemplateId.HasValue)
 			{
-				List<ForumSubscription> subscriptions = await forumsManager.ListForumSubscribers(post.ForumId);
+        // forum group subscriptions
+        List<ForumGroupSubscription> groupSubscriptions = await forumsManager.ListForumGroupSubscribers(forum.Group.Id);
 
-				foreach (ForumSubscription subscription in subscriptions)
+        foreach (ForumGroupSubscription subscription in groupSubscriptions)
+        {
+          // do not send a notification to the person who posted the message
+          if (subscription.User.Id != post.AddedBy)
+          {
+            // do not send notifications to un-approved or un-verified users, or users who were not created yet when the subscription was created.  This
+            // extra check is to prevent emails for imported forum posts.
+            if (subscription.User.Approved && subscription.User.Verified && post.DateAdded >= subscription.DateAdded)
+            {
+              MailQueue item = new()
+              {
+                ModuleId = forum.Group.ModuleId,
+                UserId = subscription.User.Id,
+                MailTemplateId = forum.EffectiveSettings().SubscriptionMailTemplateId.Value,
+                Post = post,
+                Reply = null
+              };
+
+              await forumsManager.SaveMailQueue(item);
+            }
+          }
+        }
+
+        // forum subscriptions
+        List<ForumSubscription> forumSubscriptions = await forumsManager.ListForumSubscribers(post.ForumId);
+
+				foreach (ForumSubscription subscription in forumSubscriptions)
 				{
 					// do not send a notification to the person who posted the message
 					if (subscription.User.Id != post.AddedBy)
@@ -43,6 +70,8 @@ namespace Nucleus.Modules.Forums.EventHandlers
 						}
 					}
 				}
+
+        // new posts can't have an post subscribers
 			}
 		}
 
@@ -52,10 +81,63 @@ namespace Nucleus.Modules.Forums.EventHandlers
 			if (forum == null) return;
 
 			if (forum.EffectiveSettings().SubscriptionMailTemplateId.HasValue)
-			{
-				List<PostSubscription> subscriptions = await forumsManager.ListPostSubscribers(reply.Post.Id);
+			{        
+        // forum group subscriptions
+        List<ForumGroupSubscription> groupSubscriptions = await forumsManager.ListForumGroupSubscribers(forum.Group.Id);
 
-				foreach (PostSubscription subscription in subscriptions)
+        foreach (ForumGroupSubscription subscription in groupSubscriptions)
+        {
+          // do not send a notification to the person who posted the reply
+          if (subscription.User.Id != reply.AddedBy)
+          {
+            // do not send notifications to un-approved or un-verified users, or users who were not created yet when the subscription was created.  This
+            // extra check is to prevent emails for imported forum replies.
+            if (subscription.User.Approved && subscription.User.Verified && reply.DateAdded >= subscription.DateAdded)
+            {
+              MailQueue item = new()
+              {
+                ModuleId = forum.Group.ModuleId,
+                UserId = subscription.User.Id,
+                MailTemplateId = forum.EffectiveSettings().SubscriptionMailTemplateId.Value,
+                Post = reply.Post,
+                Reply = reply
+              };
+
+              await forumsManager.SaveMailQueue(item);
+            }
+          }
+        }
+
+        // forum subscriptions
+        List<ForumSubscription> forumSubscriptions = await forumsManager.ListForumSubscribers(reply.Post.ForumId);
+
+        foreach (ForumSubscription subscription in forumSubscriptions)
+        {
+          // do not send a notification to the person who posted the reply
+          if (subscription.User.Id != reply.AddedBy)
+          {
+            // do not send notifications to un-approved or un-verified users, or users who were not created yet when the subscription was created.  This
+            // extra check is to prevent emails for imported forum replies.
+            if (subscription.User.Approved && subscription.User.Verified && reply.DateAdded >= subscription.DateAdded)
+            {
+              MailQueue item = new()
+              {
+                ModuleId = forum.Group.ModuleId,
+                UserId = subscription.User.Id,
+                MailTemplateId = forum.EffectiveSettings().SubscriptionMailTemplateId.Value,
+                Post = reply.Post,
+                Reply = reply
+              };
+
+              await forumsManager.SaveMailQueue(item);
+            }
+          }
+        }
+
+        // post subscriptions
+        List<PostSubscription> postSubscriptions = await forumsManager.ListPostSubscribers(reply.Post.Id);
+
+				foreach (PostSubscription subscription in postSubscriptions)
 				{
 					// do not send a notification to the person who posted the reply
 					if (subscription.User.Id != reply.AddedBy)

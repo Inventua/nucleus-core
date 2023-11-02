@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Forums.Models
 {
-	public class UserSubscriptions
+	public class ForumGroupSubscription : ModelBase
 	{
-    public IList<Group> Groups { get; set; } = new List<Group>();
-    public IList<Forum> Forums { get; set; } = new List<Forum>();
-		public IList<Post> Posts { get; set; } = new List<Post>();
+    public Guid UserId { get; set; }
+		public User User { get; set; }
+		public Guid ForumGroupId { get; set; }
 	}
 }

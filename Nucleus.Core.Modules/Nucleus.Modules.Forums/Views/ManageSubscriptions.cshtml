@@ -3,39 +3,110 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Forums.ViewModels
-@if (!Model.Subscriptions.Forums.Any() && !Model.Subscriptions.Posts.Any())
-{
-	<h2>Manage Subscriptions</h2>
-	<div class="alert alert-primary" role="alert">You are not subscribed to any forums or posts.</div>
-}
+@Html.AddStyle("~!/../viewer.css")
+<div class="forums-manage-subscriptions">
+  <h2>Manage Subscriptions</h2>
 
-@using (Html.BeginNucleusForm("UnsubscribeForum", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = "form.parent()" }))
-{
-	@if (Model.Subscriptions.Forums.Any())
-	{
-		<h2>Forum Subscriptions</h2>
-		<table class="w-100 mb-3">
-			@foreach (var forum in Model.Subscriptions.Forums)
-			{
-				<tr>
-					<td>@forum.Name</td>
-					<td class="w-25 text-end">@Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForum", "Forums", "Forums", new { forumId = forum.Id }), new { @class="btn btn-danger btn-sm", @data_target = "form.parent()" })
-				</tr>
-			}
-		</table>
-	}
+  @using (Html.BeginNucleusForm("UnsubscribeForum", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = "form.parent()" }))
+  {
+    @if (Model.Groups.Any())
+    {
+      <div class="subscriptions-group-wrapper">
+        <div class="alert alert-success small">
+          <h3 class="alert-heading">Forum Group Subscriptions</h3>
+          <span>
+            When you subscribe to a forum group, you automatically get notifications for activity in all of the forums within that group.
+          </span>
+        </div>
+        <table class="table table-sm table-striped w-100">
+        <tbody>
+          @foreach (var group in Model.Groups)
+          {
+            <tr>
+              <td>
+                <h4>@group.Name</h4>
+                <div class="group-forums small">
+                  @foreach (var forum in group.Forums)
+                  {
+                    <span>@forum.Name</span>
+                  }
+                </div>
+              </td>
+              <td class="w-25 text-end">
+                @if (Model.Subscriptions.Groups.Where(subscription => subscription.Id == group.Id).Any())
+                {
+                  @Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForumGroup", "Forums", "Forums", new { groupId = group.Id }), new { @class="btn btn-danger btn-sm", @data_target = "form.parent()" })
+                }
+                else
+                {
+                  @Html.SubmitButton("", "Subscribe", Url.NucleusAction("ManageSubscribeForumGroup", "Forums", "Forums", new { groupId = group.Id }), new { @class="btn btn-success btn-sm", @data_target = "form.parent()" })
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      </div>
+    }
 
-	@if (Model.Subscriptions.Posts.Any())
-	{
-		<h2>Forum Post Subscriptions</h2>
-		<table class="w-100">
-			@foreach (var post in Model.Subscriptions.Posts)
-			{
-				<tr>
-					<td>@post.Subject</td>
-					<td class="w-25 text-end">@Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForumPost", "Forums", "Forums", new { forumPostId = post.Id }), new { @class="btn btn-danger btn-sm", @data_target = "form.parent()" })</td>
-				</tr>
-			}
-		</table>
-	}
-}
+    @if (Model.Forums.Any())
+    {
+      <div class="subscriptions-group-wrapper">
+        <div class="alert alert-success small">
+          <h3 class="alert-heading">Forum Subscriptions</h3>
+          @if (Model.Subscriptions.Groups.Any())
+          {
+            <span>
+              You are subscribed to one or more forum groups (above). The forums which belong to the groups that you are subscribed to are not listed here since 
+              you already receive activity notifications for them due to your forum group subscription.
+            </span>
+          }
+        </div>
+      
+        <table class="table table-sm table-striped w-100 mb-3">
+          <tbody>
+            @foreach (var forum in Model.Forums)
+            {
+              <tr>
+                <td><h4>@forum.Name</h4> <span class="small">Forum Group: @forum.Group.Name</span></td>
+                <td class="w-25 text-end">
+                  @if (Model.Subscriptions.Forums.Where(subscription => subscription.Id == forum.Id).Any())
+                  {
+                    @Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForum", "Forums", "Forums", new { forumId = forum.Id }), new { @class="btn btn-danger btn-sm", @data_target = "form.parent()" })
+                  }
+                  else
+                  {
+                    @Html.SubmitButton("", "Subscribe", Url.NucleusAction("ManageSubscribeForum", "Forums", "Forums", new { forumId = forum.Id }), new { @class="btn btn-success btn-sm", @data_target = "form.parent()" })
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (Model.Subscriptions.Posts.Any())
+    {
+      <div class="subscriptions-group-wrapper">
+        <div class="alert alert-success small">
+          <h3 class="alert-heading">Forum Post Subscriptions</h3>
+          <span>
+            You are automatically subscribed to individual forum posts when you create or reply to a post in a forum that you are not subscribed to.
+          </span>
+        </div>
+        <table class="table table-sm table-striped w-100">
+          <tbody>
+            @foreach (var post in Model.Subscriptions.Posts)
+            {
+              <tr>
+                <td>@post.Subject</td>
+                <td class="w-25 text-end">@Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForumPost", "Forums", "Forums", new { forumPostId = post.Id }), new { @class="btn btn-danger btn-sm", @data_target = "form.parent()" })</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>

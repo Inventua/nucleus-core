@@ -55,15 +55,20 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 		public Task DeleteReplyAttachments(Reply reply);
 
-		public Task SubscribeForum(Guid forumId, User user);
-		public Task UnSubscribeForum(Guid forumId, Guid userId);
-		public Task<List<ForumSubscription>> ListForumSubscribers(Guid forumId);
+    public Task SubscribeForumGroup(Guid groupId, User user);
+    public Task UnSubscribeForumGroup(Guid groupId, Guid userId);
+    public Task<List<ForumGroupSubscription>> ListForumGroupSubscribers(Guid groupId);
+
+    public Task SubscribeForum(Guid forumId, User user);
+    public Task UnSubscribeForum(Guid forumId, Guid userId);
+    public Task<List<ForumSubscription>> ListForumSubscribers(Guid forumId);
 
 		public Task SubscribeForumPost(Guid postId, User user);
 		public Task UnSubscribeForumPost(Guid postId, User user);
 		public Task<List<PostSubscription>> ListPostSubscribers(Guid postId);
 
-		public Task<ForumSubscription> GetForumSubscription(Guid forumId, Guid userId);
+    public Task<ForumGroupSubscription> GetForumGroupSubscription(Guid groupId, Guid userId);
+    public Task<ForumSubscription> GetForumSubscription(Guid forumId, Guid userId);
 		public Task<PostSubscription> GetPostSubscription(Guid PostId, Guid userId);
 
 		public Task<PostTracking> GetPostTracking(Guid postId, Guid userId);

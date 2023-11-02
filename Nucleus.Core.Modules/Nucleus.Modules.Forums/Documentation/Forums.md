@@ -104,6 +104,15 @@ You must set up a scheduled task to send forum notifications.  Use the `Settings
 Email templates for forum messages can use the following data objects:
 
 {.table-25-75}
+| Forum Data Model            | Contains properties which describe new forum activity.                               |
+|-----------------------------|--------------------------------------------------------------------------------------|
+| Site                        | Site information.  |
+| Page                        | Information on the page which contains the forums module.  |
+| Forums                      | A list of forums with new activity.  |
+| User                        | Iformation on the user who is receiving the email.  |
+| Summary                     | A comma-delimited list of forum names which have new activity.  |
+
+{.table-25-75}
 | Site                        | Information on the site which has forums with new activity.                          |
 |-----------------------------|--------------------------------------------------------------------------------------|
 | Name                        | Site name.  |
@@ -174,7 +183,7 @@ You can use the post as a parameter for the AbsoluteUrl() extension to create a 
 <br />
 @foreach (var forum in Model.Forums)
 {
-  <a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
+  <h2><a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a></h2>
 
   <table>
     <tr>
@@ -186,7 +195,7 @@ You can use the post as a parameter for the AbsoluteUrl() extension to create a 
     @if (forum.Posts?.Any() == true)
     {
       <tr>
-        <th colspan="3"><h2>New Posts</h2></th>
+        <th colspan="3"><h3>New Posts</h3></th>
       </tr>
       @foreach (var post in forum.Posts)
       {
@@ -197,30 +206,30 @@ You can use the post as a parameter for the AbsoluteUrl() extension to create a 
         </tr>
       }
     }
-		@if (forum.Replies?.Any() == true)
-		{
-			<tr>
-				<th colspan="3"><h2>New Replies</h2></th>
-			</tr>
-			@foreach (var reply in forum.Replies)
-			{
-				<tr>
-					<td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
-					<td>@reply.PostedBy?.UserName</td>
-					<td>@reply?.DateAdded</td>
-				</tr>
-				<tr colspan="3">
-					<td>@reply.Body</td>
-				</tr>				
-			}
-		}
-	</table>
+    @if (forum.Replies?.Any() == true)
+    {
+      <tr>
+        <th colspan="3"><h3>New Replies</h3></th>
+      </tr>
+      @foreach (var reply in forum.Replies)
+      {
+        <tr>
+          <td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
+          <td>@reply.PostedBy?.UserName</td>
+          <td>@reply?.DateAdded</td>
+        </tr>
+        <tr colspan="3">
+          <td>@reply.Body</td>
+        </tr>
+      }
+    }
+  </table>
 }
 <br />
 <div>
-You were sent this email because you are subscribed to a forum or post at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>, or are the
-original poster of this forum message.  <a href="@Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true)">Click here</a> 
-to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true).
+  You were sent this email because you are subscribed to a forum or post at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>, or are the
+  original poster of this forum message.  <a href="@Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true)">Click here</a>
+  to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true).
 </div>
 ```
 

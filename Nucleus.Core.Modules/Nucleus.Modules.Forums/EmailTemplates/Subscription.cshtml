@@ -4,7 +4,7 @@
 <br />
 @foreach (var forum in Model.Forums)
 {
-  <a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
+  <h2><a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a></h2>
 
   <table>
     <tr>
@@ -16,7 +16,7 @@
     @if (forum.Posts?.Any() == true)
     {
       <tr>
-        <th colspan="3"><h2>New Posts</h2></th>
+        <th colspan="3"><h3>New Posts</h3></th>
       </tr>
       @foreach (var post in forum.Posts)
       {
@@ -30,7 +30,7 @@
     @if (forum.Replies?.Any() == true)
     {
       <tr>
-        <th colspan="3"><h2>New Replies</h2></th>
+        <th colspan="3"><h3>New Replies</h3></th>
       </tr>
       @foreach (var reply in forum.Replies)
       {

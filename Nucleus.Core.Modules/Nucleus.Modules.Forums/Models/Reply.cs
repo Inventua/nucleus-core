@@ -15,7 +15,7 @@ namespace Nucleus.Modules.Forums.Models
 
 		public Post Post { get; private set; }
 
-		public Reply ReplyTo { get; private set; }
+		public Reply ReplyTo { get; set; }
 		
 		[Required]
 		public string Body { get; set; }
@@ -31,5 +31,6 @@ namespace Nucleus.Modules.Forums.Models
 		public Boolean CanEditReply{ get; set; }
 		public Boolean CanDeleteReply { get; set; }
 
+    public int Level { get; set; }
 	}
 }

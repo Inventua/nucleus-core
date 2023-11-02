@@ -21,9 +21,11 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public DbSet<Forum> Forums { get; set; }
 		public DbSet<Post> Posts { get; set; }
 		public DbSet<Reply> Replies { get; set; }
-		public DbSet<Attachment> Attachments { get; set; }
-		public DbSet<Settings> Settings { get; set; }
-		public DbSet<ForumSubscription> ForumSubscriptions { get; set; }
+		public DbSet<Attachment> Attachments { get; set; }		
+    public DbSet<Settings> Settings { get; set; }
+    public DbSet<ForumGroupSubscription> ForumGroupSubscriptions { get; set; }
+
+    public DbSet<ForumSubscription> ForumSubscriptions { get; set; }
 		public DbSet<PostSubscription> PostSubscriptions { get; set; }
 		public DbSet<PostTracking> PostTracking { get; set; }
 		public DbSet<MailQueue> MailQueue {get; set; }
@@ -69,6 +71,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.HasForeignKey("ForumPostId");
 
 			builder.Entity<Reply>().ToTable("ForumReplies")
+        .Ignore(reply => reply.Level)
 				.Ignore(reply => reply.CanEditReply)
 				.Ignore(reply => reply.CanDeleteReply);
 
@@ -108,7 +111,11 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.WithMany(forum => forum.Permissions)
 				.HasForeignKey("RelatedId");
 
-			builder.Entity<ForumSubscription>().ToTable("ForumSubscriptions");
+      builder.Entity<ForumGroupSubscription>().ToTable("ForumGroupSubscriptions");
+      builder.Entity<ForumGroupSubscription>().HasKey(subscription => new { subscription.ForumGroupId, subscription.UserId });
+
+
+      builder.Entity<ForumSubscription>().ToTable("ForumSubscriptions");
 			builder.Entity<ForumSubscription>().HasKey( subscription => new { subscription.ForumId, subscription.UserId } );
 
 			builder.Entity<PostSubscription>().ToTable("ForumPostSubscriptions");

@@ -643,11 +643,36 @@ namespace Nucleus.Modules.Forums
 			return results;
 		}
 
-		/// <summary>
-		/// Subscribe the specifed user to the specified <see cref="Forum"/>.
-		/// </summary>
-		/// <param name="Forum"></param>
-		public async Task Subscribe(Forum forum, ClaimsPrincipal user)
+
+    /// <summary>
+    /// Subscribe the specifed user to the specified <see cref="Group"/>.
+    /// </summary>
+    /// <param name="Group"></param>
+    public async Task Subscribe(Group group, ClaimsPrincipal user)
+    {
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        await provider.SubscribeForumGroup(group.Id, await this.UserManager.Get(user.GetUserId()));
+      }
+    }
+
+    /// <summary>
+    /// Un-subscribe the specifed user from the specified <see cref="Group"/>.
+    /// </summary>
+    /// <param name="Group"></param>
+    public async Task UnSubscribe(Group group, ClaimsPrincipal user)
+    {
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        await provider.UnSubscribeForumGroup(group.Id, user.GetUserId());
+      }
+    }
+
+    /// <summary>
+    /// Subscribe the specifed user to the specified <see cref="Forum"/>.
+    /// </summary>
+    /// <param name="Forum"></param>
+    public async Task Subscribe(Forum forum, ClaimsPrincipal user)
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
@@ -705,12 +730,39 @@ namespace Nucleus.Modules.Forums
 			}
 		}
 
-		/// <summary>
-		/// Retrieve a list of users who are subscribed to the specified forum.
+    /// <summary>
+		/// Retrieve an existing <see cref="ForumGroupSubscription"/> from the database, or return null if there is no matching record.
 		/// </summary>
 		/// <param name="forum"></param>
+		/// <param name="user"></param>
 		/// <returns></returns>
-		public async Task<List<ForumSubscription>> ListForumSubscribers(Guid forumId)
+		public async Task<ForumGroupSubscription> GetSubscription(Group group, ClaimsPrincipal user)
+    {
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        return await provider.GetForumGroupSubscription(group.Id, user.GetUserId());
+      }
+    }
+
+    /// <summary>
+		/// Retrieve a list of users who are subscribed to the specified forum group.
+		/// </summary>
+		/// <param name="groupId"></param>
+		/// <returns></returns>
+		public async Task<List<ForumGroupSubscription>> ListForumGroupSubscribers(Guid groupId)
+    {
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        return await provider.ListForumGroupSubscribers(groupId);
+      }
+    }
+
+    /// <summary>
+    /// Retrieve a list of users who are subscribed to the specified forum.
+    /// </summary>
+    /// <param name="forum"></param>
+    /// <returns></returns>
+    public async Task<List<ForumSubscription>> ListForumSubscribers(Guid forumId)
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{

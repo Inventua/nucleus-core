@@ -58,6 +58,7 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 			Site site = null;
 			Page page = null;
 			PageModule module = null;
+      long sentMessageCount = 0;
 
 			this.Logger.LogInformation("Sending forum messages.");
 
@@ -101,6 +102,7 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 					model.Site = site.Copy<Site>();
 					model.Page = Models.MailTemplate.Page.Create(page, page.DefaultPageRoute().Path + $"/{Controllers.ForumsController.MANAGE_SUBSCRIPTIONS_PATH}");
 					model.User = user.GetCensored();
+          model.Summary = String.Join(',', model.Forums.Select(forum => forum.Name));
 
 					Logger.LogTrace("Sending forum email template {name} to user {userid}.", template.Name, user.Id);
 
@@ -109,6 +111,7 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 						try
 						{
 							await mailClient.Send<Models.MailTemplate.Model>(template, model, emailAddress.Value);
+              sentMessageCount++;
 
               var postIds = model.Forums.SelectMany(forum => forum.Posts.Select(post => post.Id)).ToList();
               var replyIds = model.Forums.SelectMany(forum => forum.Replies.Select(reply => reply.Id)).ToList();
@@ -128,7 +131,16 @@ namespace Nucleus.Modules.Forums.ScheduledTasks
 					}
 				}
 			}
-		}
+
+      if (sentMessageCount > 0)
+      {
+        this.Logger?.LogInformation("Sent {count} messages.", sentMessageCount);
+      }
+      else
+      {
+        this.Logger?.LogInformation("There were no messages to send.");
+      }
+    }
 
 		private async Task TruncateMailQueue(IProgress<ScheduledTaskProgress> progress, CancellationToken cancellationToken)
 		{

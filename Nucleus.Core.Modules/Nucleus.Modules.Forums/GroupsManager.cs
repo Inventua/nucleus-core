@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Modules.Forums
 {
@@ -71,7 +72,7 @@ namespace Nucleus.Modules.Forums
             {
               result.Forums.Add(await this.ForumsManager.Get(forumId));
             }
-						await CheckPermissions(result);
+						await CheckPermissionsExist(result);
 					}
 
 					return result;
@@ -79,7 +80,7 @@ namespace Nucleus.Modules.Forums
 			});
 		}
 
-    private async Task CheckPermissions(Group group)
+    public async Task CheckPermissionsExist(Group group)
 		{
       // Forums and groups have the same permissions namespace, so we use Forum.URN instead of Group.URN
 			List<PermissionType> permissionTypes = await this.PermissionsManager.ListPermissionTypes(Forum.URN);
@@ -102,11 +103,42 @@ namespace Nucleus.Modules.Forums
 			}
 		}
 
-		/// <summary>
-		/// Delete the specifed <see cref="Group"/> from the database.
-		/// </summary>
-		/// <param name="Groups"></param>
-		public async Task Delete(Group group)
+    public Boolean CheckPermission(Site site, ClaimsPrincipal user, Group group, string permissionScope)
+    {
+      if (user.IsSystemAdministrator() || user.IsSiteAdmin(site))
+      {
+        return true;
+      }
+      else
+      {
+        if (!user.IsApproved() || !user.IsVerified())
+        {
+          // if the user is not approved/verified, they don't have permission
+          return false;
+        }
+        else
+        {
+          foreach (Permission permission in group.Permissions)
+          {
+            if (permission.PermissionType.Scope == permissionScope)
+            {
+              if (permission.IsValid(site, user))
+              {
+                return true;
+              }
+            }
+          }
+        }
+      }
+
+      return false;
+    }
+
+    /// <summary>
+    /// Delete the specifed <see cref="Group"/> from the database.
+    /// </summary>
+    /// <param name="Groups"></param>
+    public async Task Delete(Group group)
 		{
 			await this.PermissionsManager.DeletePermissions(group.Permissions);
 			

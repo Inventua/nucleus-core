@@ -1,0 +1,63 @@
+{
+	"schemaName": "Nucleus.Modules.Forums",
+	"version": "01.00.04",
+	"operations": [
+    {
+      "createTable": {
+        "name": "ForumGroupSubscriptions",
+        "columns": [
+          {
+            "name": "UserId",
+            "clrType": "guid",
+            "isnullable": false
+          },
+          {
+            "name": "ForumGroupId",
+            "clrType": "guid",
+            "isnullable": false
+          },
+          {
+            "name": "DateAdded",
+            "clrType": "datetime",
+            "isnullable": true
+          },
+          {
+            "name": "AddedBy",
+            "clrType": "guid",
+            "isnullable": true
+          },
+          {
+            "name": "DateChanged",
+            "clrType": "datetime",
+            "isnullable": true
+          },
+          {
+            "name": "ChangedBy",
+            "clrType": "guid",
+            "isnullable": true
+          }
+        ],
+        "primaryKey": {
+          "name": "PK_ForumGroupSubscriptions",
+          "isclustered": true,
+          "columns": [ "UserId", "ForumGroupId" ]
+        },
+        "foreignKeys": [
+          {
+            "name": "FK_ForumGroupSubscriptions_ForumGroupId",
+            "Columns": [ "ForumGroupId" ],
+            "PrincipalTable": "ForumGroups",
+            "PrincipalColumns": [ "Id" ]
+          },
+          {
+            "name": "FK_ForumGroupSubscriptions_UserId",
+            "Columns": [ "UserId" ],
+            "PrincipalTable": "Users",
+            "PrincipalColumns": [ "Id" ],
+            "OnDelete": "Cascade"
+          }
+        ]
+      }
+    }
+	]
+}

@@ -62,7 +62,12 @@ namespace Nucleus.Modules.Forums.DataProviders
 		{
 			IList<Group> results = await this.Context.Groups
 				.Where(group => EF.Property<Guid>(group, "ModuleId") == pageModule.Id)
-				.OrderBy(group => group.SortOrder)
+        .Include(group => group.Permissions)
+          .ThenInclude(permission => permission.Role)
+        .Include(group => group.Permissions)
+          .ThenInclude(permission => permission.PermissionType)
+        .OrderBy(group => group.SortOrder)
+        .AsSplitQuery()
         .AsNoTracking()
         .ToListAsync();
 
@@ -875,11 +880,59 @@ namespace Nucleus.Modules.Forums.DataProviders
         .FirstOrDefaultAsync();
 		}
 
-		#endregion
+    #endregion
 
-		#region "    Subscriptions    "
+    #region "    Subscriptions    "
+    public async Task SubscribeForumGroup(Guid groupId, User user)
+    {
+      Boolean alreadyExists = await this.Context.ForumGroupSubscriptions
+        .Where(subscription => subscription.ForumGroupId == groupId && subscription.User.Id == user.Id)
+        .AsNoTracking()
+        .AnyAsync();
 
-		public async Task SubscribeForum(Guid forumId, User user)
+      if (!alreadyExists)
+      {
+        this.Context.Add(new ForumGroupSubscription() { ForumGroupId = groupId, User = user });
+        await this.Context.SaveChangesAsync<ForumGroupSubscription>();
+      }
+    }
+
+    public async Task UnSubscribeForumGroup(Guid groupId, Guid userId)
+    {
+      Group group = await this.Context.Groups
+        .Where(group => group.Id == groupId)
+        .Include(group => group.Forums)
+        .AsNoTracking()
+        .AsSplitQuery()
+        .FirstOrDefaultAsync();
+      
+      ForumGroupSubscription subscription = await this.Context.ForumGroupSubscriptions
+        .Where(subscription => subscription.ForumGroupId == groupId && subscription.User.Id == userId)
+        .FirstOrDefaultAsync();
+
+      IEnumerable<MailQueue> mailQueue = await this.Context.MailQueue
+        .Where(queue => queue.UserId == userId && group.Forums.Select(forum=>forum.Id).Contains(queue.Post.ForumId))
+        .ToListAsync();
+
+      if (subscription != null)
+      {
+        this.Context.Remove(subscription);
+        this.Context.RemoveRange(mailQueue);
+
+        await this.Context.SaveChangesAsync();
+      }
+    }
+
+    public async Task<List<ForumGroupSubscription>> ListForumGroupSubscribers(Guid groupId)
+    {
+      return await this.Context.ForumGroupSubscriptions
+        .Where(subscription => subscription.ForumGroupId == groupId)
+        .Include(subscription => subscription.User)
+        .AsNoTracking()
+        .ToListAsync();
+    }
+    
+    public async Task SubscribeForum(Guid forumId, User user)
 		{
 			Boolean alreadyExists = await this.Context.ForumSubscriptions
 				.Where(subscription => subscription.ForumId == forumId && subscription.User.Id == user.Id)
@@ -921,7 +974,16 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.ToListAsync();
 		}
 
-		public async Task<ForumSubscription> GetForumSubscription(Guid forumId, Guid userId)
+    public async Task<ForumGroupSubscription> GetForumGroupSubscription(Guid groupId, Guid userId)
+    {
+      return await this.Context.ForumGroupSubscriptions
+        .Where(subscription => subscription.ForumGroupId == groupId && subscription.User.Id == userId)
+        .Include(subscription => subscription.User)
+        .AsNoTracking()
+        .FirstOrDefaultAsync();
+    }
+
+    public async Task<ForumSubscription> GetForumSubscription(Guid forumId, Guid userId)
 		{
 			return await this.Context.ForumSubscriptions
 				.Where(subscription => subscription.ForumId == forumId && subscription.User.Id == userId)
@@ -1148,18 +1210,36 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public async Task<UserSubscriptions> ListUserSubscriptions(Guid userId)
 		{
 			UserSubscriptions results = new();
+      List<Group> groups = new();
       List<Forum> forums = new();
       List<Post> posts = new();
 
-			foreach (ForumSubscription subscription in await this.Context.ForumSubscriptions.Where(item => item.User.Id == userId).AsNoTracking().ToListAsync())
+      foreach (ForumGroupSubscription subscription in await this.Context.ForumGroupSubscriptions
+        .Where(item => item.User.Id == userId)
+        .AsNoTracking()
+        .ToListAsync())
+      {
+        Group group = await GetGroup(subscription.ForumGroupId);
+        groups.Add(group);
+      }
+
+      results.Groups = groups.OrderBy(group => group.SortOrder).ToList();
+
+      foreach (ForumSubscription subscription in await this.Context.ForumSubscriptions
+        .Where(item => item.User.Id == userId)
+        .AsNoTracking()
+        .ToListAsync())
 			{
 				Forum forum = await GetForum(subscription.ForumId);
-				results.Forums.Add(forum);
+				forums.Add(forum);
 			}
 
       results.Forums = forums.OrderBy(forum => forum.SortOrder).ToList();
 
-      foreach (PostSubscription subscription in await this.Context.PostSubscriptions.Where(item => item.User.Id == userId).AsNoTracking().ToListAsync())
+      foreach (PostSubscription subscription in await this.Context.PostSubscriptions
+        .Where(item => item.User.Id == userId)
+        .AsNoTracking()
+        .ToListAsync())
 			{
 				Post post = await GetForumPost(subscription.ForumPostId);
 				posts.Add(post);

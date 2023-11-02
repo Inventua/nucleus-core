@@ -13,18 +13,19 @@
 	@Html.HiddenFor(model=>model.Settings.MaximumSuggestions)
 	@Html.HiddenFor(model=>model.Settings.SearchProvider)
 
-	@if (Model.Settings.DisplayMode == Settings.DisplayModes.Full)
-	{
-		<SettingsControl caption=@Model.Settings.SearchCaption helptext="Enter your search term." class="search-display-full">
-			@await Html.PartialAsync("_ViewerInput.cshtml", Model)
-		</SettingsControl>
-	}
-	else if (Model.Settings.DisplayMode == Settings.DisplayModes.Compact || Model.Settings.DisplayMode == Settings.DisplayModes.Minimal)
-	{
-		<div class="search-display-@Model.Settings.DisplayMode.ToString().ToLower()">
-			@await Html.PartialAsync("_ViewerInput.cshtml", Model)
-		</div>
-	}
+  <div class="search-display-@Model.Settings.DisplayMode.ToString().ToLower()">
+    @if (Model.Settings.DisplayMode == Settings.DisplayModes.Full)
+    {
+      <label>
+        <span>@Model.Settings.Prompt</span>
+        @await Html.PartialAsync("_ViewerInput.cshtml", Model)
+      </label>
+    }    
+    else
+    {
+      @await Html.PartialAsync("_ViewerInput.cshtml", Model)
+    }
+  </div>
 	@if (Model.Settings.MaximumSuggestions > 0)
 	{
 		<div class="search-suggestions collapse@(Model.SearchResults?.Results?.Any() == true ? " show" : "")"></div>

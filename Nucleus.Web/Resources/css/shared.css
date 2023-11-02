@@ -630,6 +630,7 @@ input[type=range].ToggleSwitch::-moz-range-thumb
 	height: 25px;
 	background-color: gray;
 	cursor: pointer;
+  border-radius: 0;
 }
 
 input[type=range].ToggleSwitch::-moz-range-track

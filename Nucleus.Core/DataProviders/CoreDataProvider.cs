@@ -1539,26 +1539,30 @@ namespace Nucleus.Core.DataProviders
 			raiseEvent.Invoke();
 		}
 
-		public async Task DeleteRole(Role role)
-		{
-			using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await this.Context.Database.BeginTransactionAsync();
+    public async Task DeleteRole(Role role)
+    {
+      var strategy = this.Context.Database.CreateExecutionStrategy();
+      await strategy.ExecuteAsync(async () =>
+      {
+        using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await this.Context.Database.BeginTransactionAsync();
 
-			try
-			{
-				await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM UserRoles WHERE RoleId={role.Id}");
-				await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM Permissions WHERE RoleId={role.Id}");
+        try
+        {
+          await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM UserRoles WHERE RoleId={role.Id}");
+          await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM Permissions WHERE RoleId={role.Id}");
 
-				this.Context.Remove(role);
-				await this.Context.SaveChangesAsync();
+          this.Context.Remove(role);
+          await this.Context.SaveChangesAsync();
 
-				transaction.Commit();
-			}
-			catch (Exception)
-			{
-				transaction.Rollback();
-				throw;
-			}
-		}
+          transaction.Commit();
+        }
+        catch (Exception)
+        {
+          transaction.Rollback();
+          throw;
+        }
+      });
+    }
 
 		#endregion
 

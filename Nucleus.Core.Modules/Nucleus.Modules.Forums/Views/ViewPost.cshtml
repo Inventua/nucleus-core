@@ -129,7 +129,7 @@
           @for (var attachmentCount = 0; attachmentCount < Model.Post.Attachments.Count; attachmentCount++)
           {
             <span>
-              <a href="@Url.FileLink(Model.Post.Attachments[attachmentCount].File)" alt="@Model.Post.Attachments[attachmentCount].File.Name">
+              <a href="@Url.FileLink(Model.Post.Attachments[attachmentCount].File)" alt="@Model.Post.Attachments[attachmentCount].File.Name" target="_blank">
                 @Model.Post.Attachments[attachmentCount].File.Name
               </a>
             </span>
@@ -223,7 +223,7 @@
                 @for (var attachmentCount = 0; attachmentCount < reply.Attachments.Count; attachmentCount++)
                 {
                   <span>
-                    <a href="@Url.FileLink(reply.Attachments[attachmentCount].File)" alt="@reply.Attachments[attachmentCount].File.Name">
+                    <a href="@Url.FileLink(reply.Attachments[attachmentCount].File)" alt="@reply.Attachments[attachmentCount].File.Name" target="_blank">
                       @reply.Attachments[attachmentCount].File.Name
                     </a>
                   </span>

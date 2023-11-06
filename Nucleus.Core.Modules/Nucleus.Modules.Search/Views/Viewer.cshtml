@@ -17,7 +17,7 @@
     @if (Model.Settings.DisplayMode == Settings.DisplayModes.Full)
     {
       <label>
-        <span>@Model.Settings.Prompt</span>
+        <span>@Model.Settings.SearchCaption</span>
         @await Html.PartialAsync("_ViewerInput.cshtml", Model)
       </label>
     }    

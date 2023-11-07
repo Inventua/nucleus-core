@@ -713,7 +713,14 @@ namespace Nucleus.Web.Controllers.Admin
 
       if (viewModel.Page.LinkFileId.HasValue)
       {
-        viewModel.SelectedLinkFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.Page.LinkFileId.Value);
+        try
+        {
+          viewModel.SelectedLinkFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.Page.LinkFileId.Value);
+        }
+        catch (FileNotFoundException)
+        {
+          viewModel.SelectedLinkFile = null;
+        }
       }
       
       if (getPermissions)

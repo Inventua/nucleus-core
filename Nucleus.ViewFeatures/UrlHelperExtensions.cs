@@ -40,11 +40,11 @@ namespace Nucleus.ViewFeatures
           break;
 
         default:
-          // LinkType:Normal or LinkType:Page.  Link type=Page is handled in PageRoutingMiddleware
+          // LinkType:Normal/File/Page.  Link type=File/Page is handled in PageRoutingMiddleware
           if (page.DefaultPageRoute()?.Path == null) return "";
           path = page.DefaultPageRoute().Path;
           // We append a "/" so that if the path contains dots the net core static file provider doesn't interpret the path as a file
-          path = $"~" + path + (path.EndsWith("/") ? "" : "/");
+          path = $"~" + (path.StartsWith("/") ? "" : "/") + path + (path.EndsWith("/") ? "" : "/");
           break;
       }
 

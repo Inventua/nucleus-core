@@ -1,7 +1,7 @@
 # Release Notes
 
 ## Version 1.3.0.0
-3 October 2023
+Coming soon
 
 Version 1.3.0.0 
 

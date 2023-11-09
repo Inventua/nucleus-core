@@ -415,14 +415,23 @@ table.table-sticky-headers thead th
 .navbar-nav.nucleus-mobile-menu
 {
 	flex-direction: row;
-	flex-wrap: wrap;
 	gap: 0.5rem;
 }
 
 /* supplement bootstrap menu to allow submenus */
 .nucleus-menu .dropdown-submenu 
 {
-	position: relative;
+	position: relative;  
+}
+
+.navbar-nav
+{
+  flex-wrap: wrap;
+}
+
+.nucleus-menu .navbar-nav > .dropdown-submenu 
+{
+  white-space: nowrap;
 }
 
 .nucleus-menu .dropdown-submenu .dropdown-menu .dropdown-menu.show

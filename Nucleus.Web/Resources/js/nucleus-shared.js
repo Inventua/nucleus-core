@@ -321,19 +321,32 @@ function _Page()
 
   function _restoreScrollPostition()
   {
-    if (!_isSessionStorageAvailable() || window.self !== window.top) return;
-    jQuery('document, [data-track-scroll]').each(function (index, element)
+    if (typeof window.location.hash !== 'undefined' && window.location.hash !== null && window.location.hash !== '')
     {
-      var key = _buildScrollPositionKey(element);
-      try
+      // if the Url contains an anchor id, instead of restoring the scroll position, scroll to the element with
+      // the specified id
+      var element = jQuery(window.location.hash);
+      if (element.length !== 0)
       {
-        if (sessionStorage[key])
-        {
-          jQuery(element).scrollTop(sessionStorage.getItem(key));
-        }
+        element[0].scrollIntoView({ block: "nearest", inline: "nearest" });
       }
-      catch (ex) { } // suppress error 
-    });
+    }
+    else
+    {
+      if (!_isSessionStorageAvailable() || window.self !== window.top) return;
+      jQuery('document, [data-track-scroll]').each(function (index, element)
+      {
+        var key = _buildScrollPositionKey(element);
+        try
+        {
+          if (sessionStorage[key])
+          {
+            jQuery(element).scrollTop(sessionStorage.getItem(key));
+          }
+        }
+        catch (ex) { } // suppress error 
+      });
+    }
   }
 
   function _loadIFrame(event)

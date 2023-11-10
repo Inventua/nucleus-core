@@ -194,6 +194,10 @@ namespace Nucleus.Modules.Forums.DataProviders
         .CountAsync();
 
 			result.LastPost = await GetLastPost(forumId);
+      if (result.LastPost != null)
+      {
+        result.LastReply = await GetLastReply(result.LastPost.Id);
+      }
 
 			return result;
 		}
@@ -897,6 +901,19 @@ namespace Nucleus.Modules.Forums.DataProviders
       }
     }
 
+    public async Task UpdateForumGroupSubscriptionNotificationFrequency(Guid groupId, User user, NotificationFrequency frequency)
+    {
+      ForumGroupSubscription subscription = await this.Context.ForumGroupSubscriptions
+        .Where(subscription => subscription.ForumGroupId == groupId && subscription.User.Id == user.Id)
+        .FirstOrDefaultAsync();
+
+      if (subscription != null)
+      {
+        subscription.NotificationFrequency = frequency;
+        await this.Context.SaveChangesAsync<ForumGroupSubscription>();
+      }
+    }
+
     public async Task UnSubscribeForumGroup(Guid groupId, Guid userId)
     {
       Group group = await this.Context.Groups
@@ -946,7 +963,20 @@ namespace Nucleus.Modules.Forums.DataProviders
 			}
 		}
 
-		public async Task UnSubscribeForum(Guid forumId, Guid userId)
+    public async Task UpdateForumSubscriptionNotificationFrequency(Guid forumId, User user, NotificationFrequency frequency)
+    {
+      ForumSubscription subscription = await this.Context.ForumSubscriptions
+        .Where(subscription => subscription.ForumId == forumId && subscription.User.Id == user.Id)
+        .FirstOrDefaultAsync();
+
+      if (subscription != null)
+      {
+        subscription.NotificationFrequency = frequency;
+        await this.Context.SaveChangesAsync<ForumSubscription>();
+      }
+    }
+
+    public async Task UnSubscribeForum(Guid forumId, Guid userId)
 		{
 			ForumSubscription subscription = await this.Context.ForumSubscriptions
 				.Where(subscription => subscription.ForumId == forumId && subscription.User.Id == userId)
@@ -1087,7 +1117,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public async Task<Boolean> IsQueued(MailQueue mailQueue)
 		{
 			return await this.Context.MailQueue
-				.Where(existing => existing.UserId == mailQueue.UserId && existing.MailTemplateId == mailQueue.MailTemplateId && existing.Post.Id == mailQueue.Post.Id && (mailQueue.Reply == null && existing.Reply == null) || (mailQueue.Reply != null && existing.Reply.Id == mailQueue.Reply.Id))
+				.Where(existing => existing.UserId == mailQueue.UserId && existing.MailTemplateId == mailQueue.MailTemplateId && existing.Post.Id == mailQueue.Post.Id && ((mailQueue.Reply == null && existing.Reply == null) || (mailQueue.Reply != null && existing.Reply.Id == mailQueue.Reply.Id)))
         .AsNoTracking()
         .AnyAsync();
 		}
@@ -1100,7 +1130,8 @@ namespace Nucleus.Modules.Forums.DataProviders
           (
             existing.UserId == mailQueue.UserId && 
             existing.Post.Id == mailQueue.Post.Id &&
-            (mailQueue.Reply == null && existing.Reply == null) || (mailQueue.Reply != null && existing.Reply.Id == mailQueue.Reply.Id)
+            existing.MailTemplateId == mailQueue.MailTemplateId && 
+            ((mailQueue.Reply == null && existing.Reply == null) || (mailQueue.Reply != null && existing.Reply.Id == mailQueue.Reply.Id))
           ))
         .AsNoTracking()
         .FirstOrDefaultAsync();
@@ -1111,7 +1142,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 			}
 			else
 			{
-				this.Context.Entry(mailQueue).State = EntityState.Modified;
+        this.Context.Entry(existing).CurrentValues.SetValues(mailQueue);
 			}
 
 			await this.Context.SaveChangesAsync<MailQueue>();
@@ -1155,10 +1186,10 @@ namespace Nucleus.Modules.Forums.DataProviders
 		/// for a user into a single email.
 		/// </remarks>
 
-		public async Task<IList<MailQueue>> ListMailQueue()
+		public async Task<IList<MailQueue>> ListMailQueue(NotificationFrequency frequency)
 		{
 			return await this.Context.MailQueue
-				.Where(item => item.Status == MailQueue.MailQueueStatus.Queued)
+				.Where(item => item.Status == MailQueue.MailQueueStatus.Queued && item.NotificationFrequency == frequency)
 				.Include(item => item.Post)
 					.ThenInclude(post => post.Status)
 				.Include(item => item.Post)
@@ -1210,9 +1241,9 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public async Task<UserSubscriptions> ListUserSubscriptions(Guid userId)
 		{
 			UserSubscriptions results = new();
-      List<Group> groups = new();
-      List<Forum> forums = new();
-      List<Post> posts = new();
+      List<UserSubscriptions.ForumGroupUserSubscription> groups = new();
+      List<UserSubscriptions.ForumUserSubscription> forums = new();
+      List<UserSubscriptions.PostUserSubscription> posts = new();
 
       foreach (ForumGroupSubscription subscription in await this.Context.ForumGroupSubscriptions
         .Where(item => item.User.Id == userId)
@@ -1220,10 +1251,10 @@ namespace Nucleus.Modules.Forums.DataProviders
         .ToListAsync())
       {
         Group group = await GetGroup(subscription.ForumGroupId);
-        groups.Add(group);
+        groups.Add(new() { Subscription = subscription, Group = group });
       }
 
-      results.Groups = groups.OrderBy(group => group.SortOrder).ToList();
+      results.GroupSubscriptions = groups.OrderBy(groupSubscription => groupSubscription.Group.SortOrder).ToList();
 
       foreach (ForumSubscription subscription in await this.Context.ForumSubscriptions
         .Where(item => item.User.Id == userId)
@@ -1231,10 +1262,10 @@ namespace Nucleus.Modules.Forums.DataProviders
         .ToListAsync())
 			{
 				Forum forum = await GetForum(subscription.ForumId);
-				forums.Add(forum);
-			}
+				forums.Add(new() { Subscription = subscription, Forum = forum });
+      }
 
-      results.Forums = forums.OrderBy(forum => forum.SortOrder).ToList();
+      results.ForumSubscriptions = forums.OrderBy(forumSubscription => forumSubscription.Forum.SortOrder).ToList();
 
       foreach (PostSubscription subscription in await this.Context.PostSubscriptions
         .Where(item => item.User.Id == userId)
@@ -1242,10 +1273,10 @@ namespace Nucleus.Modules.Forums.DataProviders
         .ToListAsync())
 			{
 				Post post = await GetForumPost(subscription.ForumPostId);
-				posts.Add(post);
-			}
+				posts.Add(new() { Subscription = subscription, Post = post });
+      }
 
-      results.Posts = posts.OrderByDescending(post => post.DateAdded).ToList();
+      results.PostSubscriptions = posts.OrderByDescending(postSubscription => postSubscription.Post.DateAdded).ToList();
 
       return results;
 		}

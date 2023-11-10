@@ -3,11 +3,11 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Forums.ViewModels
-@Html.AddStyle("~!/../viewer.css")
 <div class="forums-manage-subscriptions">
+  @Html.AddStyle("~!/../viewer.css")
   <h2>Manage Subscriptions</h2>
 
-  @using (Html.BeginNucleusForm("UnsubscribeForum", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = "form.parent()" }))
+  @using (Html.BeginNucleusForm("UnsubscribeForum", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = ".forums-manage-subscriptions.parent()" }))
   {
     @if (Model.Groups.Any())
     {
@@ -19,64 +19,73 @@
           </span>
         </div>
         <table class="table table-sm table-striped w-100">
-        <tbody>
-          @foreach (var group in Model.Groups)
-          {
+          <thead>
             <tr>
-              <td>
-                <h4>@group.Name</h4>
-                <div class="group-forums small">
-                  @foreach (var forum in group.Forums)
-                  {
-                    <span>@forum.Name</span>
-                  }
-                </div>
-              </td>
-              <td class="w-25 text-end">
-                @if (Model.Subscriptions.Groups.Where(subscription => subscription.Id == group.Id).Any())
+              <th></th>
+              <th class="frequency-col">
+                @if (Model.Subscriptions.GroupSubscriptions.Any())
                 {
-                  @Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForumGroup", "Forums", "Forums", new { groupId = group.Id }), new { @class="btn btn-danger btn-sm", @data_target = "form.parent()" })
+                  <text>Email</text>
                 }
-                else
-                {
-                  @Html.SubmitButton("", "Subscribe", Url.NucleusAction("ManageSubscribeForumGroup", "Forums", "Forums", new { groupId = group.Id }), new { @class="btn btn-success btn-sm", @data_target = "form.parent()" })
-                }
-              </td>
+              </th>
+              <th class="btn-col"></th>
             </tr>
-          }
-        </tbody>
-      </table>
-      </div>
-    }
-
-    @if (Model.Forums.Any())
-    {
-      <div class="subscriptions-group-wrapper">
-        <div class="alert alert-success small">
-          <h3 class="alert-heading">Forum Subscriptions</h3>
-          @if (Model.Subscriptions.Groups.Any())
-          {
-            <span>
-              You are subscribed to one or more forum groups (above). The forums which belong to the groups that you are subscribed to are not listed here since 
-              you already receive activity notifications for them due to your forum group subscription.
-            </span>
-          }
-        </div>
-      
-        <table class="table table-sm table-striped w-100 mb-3">
+          </thead>
           <tbody>
-            @foreach (var forum in Model.Forums)
+            @foreach (var groupEnumerator in @Model.Groups.Select((Group, Index) => new { Index, Group }))
             {
               <tr>
-                <td><h4>@forum.Name</h4> <span class="small">Forum Group: @forum.Group.Name</span></td>
-                <td class="w-25 text-end">
-                  @if (Model.Subscriptions.Forums.Where(subscription => subscription.Id == forum.Id).Any())
+                <td>
+                  <h4>@groupEnumerator.Group.Name</h4>
+                  <div class="group-forums small">
+                    @foreach (var forum in groupEnumerator.Group.Forums)
+                    {
+                      <span>@forum.Name</span>
+                    }
+                  </div>
+                </td>
+                <td class="frequency-col">
+                  @if (Model.Subscriptions.GroupSubscriptions.Where(subscription => subscription.Group.Id == groupEnumerator.Group.Id).Any())
                   {
-                    @Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForum", "Forums", "Forums", new { forumId = forum.Id }), new { @class="btn btn-danger btn-sm", @data_target = "form.parent()" })
+                    <div class="dropdown justify-content-end">
+                      <button area-expanded="false" class="btn dropdown-toggle btn-secondary btn-sm" data-bs-toggle="dropdown" type="button">
+                        @if (Model.Subscriptions.GetGroupSubscriptionNotificationFrequency(groupEnumerator.Group.Id) == Nucleus.Modules.Forums.Models.NotificationFrequency.Single)
+                        {
+                          <text>A message for each post or reply</text>
+                        }
+                        else
+                        {
+                          <text>A periodic activity summary</text>                          
+                        }
+                      </button>
+
+                      <ul class="dropdown-menu" data-boundary="viewport">
+                        <li>
+                          @if (Model.Subscriptions.GetGroupSubscriptionNotificationFrequency(groupEnumerator.Group.Id) == Nucleus.Modules.Forums.Models.NotificationFrequency.Summary)
+                          {
+                            <button type="submit" class="btn btn-secondary btn-sm dropdown-item" formaction="@Url.NucleusAction("ManageSubscribeSetForumGroupFrequency", "Forums", "Forums", new { @id = @groupEnumerator.Group.Id, @notificationFrequency = Nucleus.Modules.Forums.Models.NotificationFrequency.Single })">
+                              A message for each post or reply
+                            </button>
+                          }
+                          else
+                          {
+                            <button type="submit" class="btn btn-secondary btn-sm dropdown-item" formaction="@Url.NucleusAction("ManageSubscribeSetForumGroupFrequency", "Forums", "Forums", new { @id = @groupEnumerator.Group.Id, @notificationFrequency = Nucleus.Modules.Forums.Models.NotificationFrequency.Summary})">
+                              A periodic activity summary
+                            </button>
+                          }
+                        </li>
+                      </ul>
+                    </div>
+                  }
+                </td>
+                <td class="text-end btn-col">
+                  @if (Model.Subscriptions.GroupSubscriptions.Where(subscription => subscription.Group.Id == groupEnumerator.Group.Id).Any())
+                  {
+                    @Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForumGroup", "Forums", "Forums", new { groupId = groupEnumerator.Group.Id }), new { @class="btn btn-danger btn-sm", @data_target = "form.parent()" })
                   }
                   else
                   {
-                    @Html.SubmitButton("", "Subscribe", Url.NucleusAction("ManageSubscribeForum", "Forums", "Forums", new { forumId = forum.Id }), new { @class="btn btn-success btn-sm", @data_target = "form.parent()" })
+                    @Html.SubmitButton("", "Subscribe", Url.NucleusAction("ManageSubscribeForumGroup", "Forums", "Forums", new { groupId = groupEnumerator.Group.Id }), new { @class="btn btn-success btn-sm", @data_target = "form.parent()" })
                   }
                 </td>
               </tr>
@@ -86,7 +95,90 @@
       </div>
     }
 
-    @if (Model.Subscriptions.Posts.Any())
+    @if (Model.Forums.Any())
+    {
+      <div class="subscriptions-group-wrapper">
+        <div class="alert alert-success small">
+          <h3 class="alert-heading">Forum Subscriptions</h3>
+          @if (Model.Subscriptions.GroupSubscriptions.Any())
+          {
+            <span>
+              You are subscribed to one or more forum groups (above). The forums which belong to the groups that you are subscribed to are not listed here since
+              you already receive activity notifications for them due to your forum group subscription.
+            </span>
+          }
+        </div>
+
+        <table class="table table-sm table-striped w-100 mb-3">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="frequency-col">
+                @if (Model.Subscriptions.ForumSubscriptions.Any())
+                {
+                  <text>Email</text>
+                }
+              </th>
+              <th class="btn-col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach (var forumEnumerator in @Model.Forums.Select((Forum, Index) => new { Index, Forum }))
+            {
+              <tr>
+                <td><h4>@forumEnumerator.Forum.Name</h4> <span class="small">Forum Group: @forumEnumerator.Forum.Group.Name</span></td>
+                <td class="frequency-col">
+                  @if (Model.Subscriptions.ForumSubscriptions.Where(subscription => subscription.Forum.Id == forumEnumerator.Forum.Id).Any())
+                  {
+                    <div class="dropdown justify-content-end">
+                      <button area-expanded="false" class="btn dropdown-toggle btn-secondary btn-sm" data-bs-toggle="dropdown" type="button">
+                        @if (Model.Subscriptions.GetForumSubscriptionNotificationFrequency(forumEnumerator.Forum.Id) == Nucleus.Modules.Forums.Models.NotificationFrequency.Single)
+                        {
+                          <text>A message for each post or reply </text>
+                        }
+                        else
+                        {
+                          <text>A periodic activity summary</text>                          
+                        }
+                      </button>
+
+                      <ul class="dropdown-menu" data-boundary="viewport">
+                        <li>
+                          @if (Model.Subscriptions.GetForumSubscriptionNotificationFrequency(forumEnumerator.Forum.Id) == Nucleus.Modules.Forums.Models.NotificationFrequency.Summary)
+                          {
+                            <button type="submit" class="btn btn-secondary btn-sm dropdown-item" formaction="@Url.NucleusAction("ManageSubscribeSetForumFrequency", "Forums", "Forums", new { @id = @forumEnumerator.Forum.Id, @notificationFrequency = Nucleus.Modules.Forums.Models.NotificationFrequency.Single })">
+                              A message for each post or reply
+                            </button>
+                          }
+                          else
+                          {
+                            <button type = "submit" class="btn btn-secondary btn-sm dropdown-item" formaction="@Url.NucleusAction("ManageSubscribeSetForumFrequency", "Forums", "Forums", new { @id = @forumEnumerator.Forum.Id, @notificationFrequency = Nucleus.Modules.Forums.Models.NotificationFrequency.Summary})">
+                              A periodic activity summary
+                            </button>
+                          }
+                        </li>
+                      </ul>
+                    </div>
+                  }
+                </td>
+                <td class="btn-col text-end">
+                  @if (Model.Subscriptions.ForumSubscriptions.Where(subscription => subscription.Forum.Id == forumEnumerator.Forum.Id).Any())
+                  {
+                    @Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForum", "Forums", "Forums", new { forumId = forumEnumerator.Forum.Id }), new { @class="btn btn-danger btn-sm", @data_target = "form.parent()" })
+                  }
+                  else
+                  {
+                    @Html.SubmitButton("", "Subscribe", Url.NucleusAction("ManageSubscribeForum", "Forums", "Forums", new { forumId = forumEnumerator.Forum.Id }), new { @class="btn btn-success btn-sm", @data_target = "form.parent()" })
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    @if (Model.Subscriptions.PostSubscriptions.Any())
     {
       <div class="subscriptions-group-wrapper">
         <div class="alert alert-success small">
@@ -97,11 +189,11 @@
         </div>
         <table class="table table-sm table-striped w-100">
           <tbody>
-            @foreach (var post in Model.Subscriptions.Posts)
+            @foreach (var postSubscription in Model.Subscriptions.PostSubscriptions)
             {
               <tr>
-                <td>@post.Subject</td>
-                <td class="w-25 text-end">@Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForumPost", "Forums", "Forums", new { forumPostId = post.Id }), new { @class="btn btn-danger btn-sm", @data_target = "form.parent()" })</td>
+                <td>@postSubscription.Post.Subject</td>
+                <td class="text-end">@Html.SubmitButton("", "Unsubscribe", Url.NucleusAction("ManageUnsubscribeForumPost", "Forums", "Forums", new { forumPostId = postSubscription.Post.Id }), new { @class="btn btn-danger btn-sm", @data_target = "form.parent()" })</td>
               </tr>
             }
           </tbody>

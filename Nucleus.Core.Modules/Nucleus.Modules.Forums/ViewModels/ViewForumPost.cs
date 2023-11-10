@@ -21,7 +21,9 @@ namespace Nucleus.Modules.Forums.ViewModels
 
 		public PostSubscription Subscription { get; set; }
 
-		public Boolean CanEditPost { get; set; }
+    public Boolean IsSubscribedToForum { get; set; }
+
+    public Boolean CanEditPost { get; set; }
 		public Boolean CanReply { get; set; }
 		public Boolean CanAttach { get; set; }
 		public Boolean CanPinPost { get; set; }

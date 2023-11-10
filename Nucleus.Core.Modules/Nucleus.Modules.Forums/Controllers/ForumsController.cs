@@ -57,7 +57,7 @@ namespace Nucleus.Modules.Forums.Controllers
       }
       else
       {
-        if (this.Context.LocalPath.Segments.FirstOrDefault() == MANAGE_SUBSCRIPTIONS_PATH)
+        if (this.Context.LocalPath.Segments.FirstOrDefault().Equals(MANAGE_SUBSCRIPTIONS_PATH, StringComparison.OrdinalIgnoreCase))
         {
           return View("ManageSubscriptions", await BuildManageSubscriptionsViewModel());
         }
@@ -382,6 +382,22 @@ namespace Nucleus.Modules.Forums.Controllers
     }
 
     [HttpPost]
+    public async Task<ActionResult> ManageSubscribeSetForumGroupFrequency(Guid id, NotificationFrequency notificationFrequency)
+    {
+      Models.Group group = await this.GroupsManager.Get(id);
+      if (this.GroupsManager.CheckPermission(this.Context.Site, HttpContext.User, group, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE))
+      {
+        await this.ForumsManager.UpdateNotificationFrequency(group, HttpContext.User, notificationFrequency);
+      }
+      else
+      {
+        return BadRequest();
+      }
+
+      return await ManageSubscriptions();
+    }
+
+    [HttpPost]
     public async Task<ActionResult> ManageUnSubscribeForumGroup(ViewModels.ManageSubscriptions viewModel, Guid groupId)
     {
       Models.Group group = await this.GroupsManager.Get(groupId);
@@ -420,6 +436,23 @@ namespace Nucleus.Modules.Forums.Controllers
       
       return await ManageSubscriptions(); 
     }
+
+    [HttpPost]
+    public async Task<ActionResult> ManageSubscribeSetForumFrequency(Guid id, NotificationFrequency notificationFrequency)
+    {
+      Models.Forum forum = await this.ForumsManager.Get(id);
+      if (this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE))
+      {
+        await this.ForumsManager.UpdateNotificationFrequency(forum, HttpContext.User, notificationFrequency);
+      }
+      else
+      {
+        return BadRequest();
+      }
+
+      return await ManageSubscriptions();
+    }
+
 
     [HttpPost]
     public async Task<ActionResult> SubscribePost(ViewModels.ViewForumPost viewModel)
@@ -820,6 +853,8 @@ namespace Nucleus.Modules.Forums.Controllers
             viewModel.SortDescending
           );
 
+          viewModel.IsSubscribedToForumGroup = (await this.ForumsManager.GetSubscription(viewModel.Forum.Group, User)) != null;
+
           viewModel.Subscription = await this.ForumsManager.GetSubscription(forum, HttpContext.User);
           viewModel.CanPost = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_CREATE_POST);
           viewModel.CanSubscribe = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE);
@@ -887,6 +922,8 @@ namespace Nucleus.Modules.Forums.Controllers
           attachment.File = await this.FileSystemManager.GetFile(this.Context.Site, attachment.File.Id);
         }
       }
+
+      viewModel.IsSubscribedToForum = await this.ForumsManager.GetSubscription(viewModel.Forum.Group, User) != null || await this.ForumsManager.GetSubscription(viewModel.Forum, User) != null;
 
       viewModel.CanEditPost = CanEditPost(viewModel.Forum, viewModel.Post);
       viewModel.CanReply = CanReplyPost(viewModel.Forum, viewModel.Post);
@@ -1181,8 +1218,8 @@ namespace Nucleus.Modules.Forums.Controllers
             forum.EffectiveSettings().Enabled && 
             this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE) && 
             (
-              !manageSubscriptions.Subscriptions.Groups.Select(subscription => subscription.Id).Contains(group.Id) ||
-              manageSubscriptions.Subscriptions.Forums.Select(subscription => subscription.Id).Contains(forum.Id) 
+              !manageSubscriptions.Subscriptions.GroupSubscriptions.Select(subscription => subscription.Group.Id).Contains(group.Id) ||
+              manageSubscriptions.Subscriptions.ForumSubscriptions.Select(subscription => subscription.Forum.Id).Contains(forum.Id) 
             )
           ));          
       }      

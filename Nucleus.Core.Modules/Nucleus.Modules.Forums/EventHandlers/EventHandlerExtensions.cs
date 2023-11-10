@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Nucleus.Modules.Forums.Models;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
-using Microsoft.Extensions.Hosting;
+using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Modules.Forums.EventHandlers
 {
@@ -35,8 +35,9 @@ namespace Nucleus.Modules.Forums.EventHandlers
               {
                 ModuleId = forum.Group.ModuleId,
                 UserId = subscription.User.Id,
-                MailTemplateId = forum.EffectiveSettings().SubscriptionMailTemplateId.Value,
+                MailTemplateId = subscription.NotificationFrequency == NotificationFrequency.Single ? forum.EffectiveSettings().SubscriptionMailTemplateId.Value : forum.EffectiveSettings().SubscriptionSummaryMailTemplateId.Value,
                 Post = post,
+                NotificationFrequency = subscription.NotificationFrequency ?? NotificationFrequency.Summary,
                 Reply = null
               };
 
@@ -61,8 +62,9 @@ namespace Nucleus.Modules.Forums.EventHandlers
 							{
 								ModuleId = forum.Group.ModuleId,
 								UserId = subscription.User.Id,
-								MailTemplateId = forum.EffectiveSettings().SubscriptionMailTemplateId.Value,
-								Post = post,
+								MailTemplateId = subscription.NotificationFrequency == NotificationFrequency.Single ? forum.EffectiveSettings().SubscriptionMailTemplateId.Value : forum.EffectiveSettings().SubscriptionSummaryMailTemplateId.Value,
+                NotificationFrequency = subscription.NotificationFrequency ?? NotificationFrequency.Summary,
+                Post = post,
 								Reply = null
 							};
 
@@ -98,7 +100,8 @@ namespace Nucleus.Modules.Forums.EventHandlers
               {
                 ModuleId = forum.Group.ModuleId,
                 UserId = subscription.User.Id,
-                MailTemplateId = forum.EffectiveSettings().SubscriptionMailTemplateId.Value,
+                MailTemplateId = subscription.NotificationFrequency == NotificationFrequency.Single ? forum.EffectiveSettings().SubscriptionMailTemplateId.Value : forum.EffectiveSettings().SubscriptionSummaryMailTemplateId.Value,
+                NotificationFrequency = subscription.NotificationFrequency ?? NotificationFrequency.Summary,
                 Post = reply.Post,
                 Reply = reply
               };
@@ -124,7 +127,8 @@ namespace Nucleus.Modules.Forums.EventHandlers
               {
                 ModuleId = forum.Group.ModuleId,
                 UserId = subscription.User.Id,
-                MailTemplateId = forum.EffectiveSettings().SubscriptionMailTemplateId.Value,
+                MailTemplateId = subscription.NotificationFrequency == NotificationFrequency.Single ? forum.EffectiveSettings().SubscriptionMailTemplateId.Value : forum.EffectiveSettings().SubscriptionSummaryMailTemplateId.Value,
+                NotificationFrequency = subscription.NotificationFrequency ?? NotificationFrequency.Summary,
                 Post = reply.Post,
                 Reply = reply
               };
@@ -151,7 +155,8 @@ namespace Nucleus.Modules.Forums.EventHandlers
 								ModuleId = forum.Group.ModuleId,
 								UserId = subscription.User.Id,
 								MailTemplateId = forum.EffectiveSettings().SubscriptionMailTemplateId.Value,
-								Post = reply.Post,
+                NotificationFrequency = NotificationFrequency.Single,
+                Post = reply.Post,
 								Reply = reply
 							};
 
@@ -179,7 +184,8 @@ namespace Nucleus.Modules.Forums.EventHandlers
 						ModuleId = forum.Group.ModuleId,
 						UserId = moderator.Id,
 						MailTemplateId = forum.EffectiveSettings().ModerationRequiredMailTemplateId.Value,
-						Post = post,
+            NotificationFrequency = NotificationFrequency.Single,
+            Post = post,
 						Reply = null
 					};
 
@@ -204,7 +210,8 @@ namespace Nucleus.Modules.Forums.EventHandlers
 						ModuleId = forum.Group.ModuleId,
 						UserId = moderator.Id,
 						MailTemplateId = forum.EffectiveSettings().ModerationRequiredMailTemplateId.Value,
-						Post = reply.Post,
+            NotificationFrequency = NotificationFrequency.Single,
+            Post = reply.Post,
 						Reply = reply
 					};
 
@@ -224,14 +231,18 @@ namespace Nucleus.Modules.Forums.EventHandlers
 
 			if (forum == null || user == null) return;
 
-			if (forum.EffectiveSettings().IsModerated && forum.EffectiveSettings().ModerationApprovedMailTemplateId.HasValue)
+      // don't send "post approved" emails to users who are not moderated
+      if (forumsManager.HasPermission(user, forum, ForumsManager.PermissionScopes.FORUM_UNMODERATED)) return;
+
+      if (forum.EffectiveSettings().IsModerated && forum.EffectiveSettings().ModerationApprovedMailTemplateId.HasValue)
 			{
 				MailQueue item = new()
 				{
 					ModuleId = forum.Group.ModuleId,
 					UserId = user.Id,
 					MailTemplateId = forum.EffectiveSettings().ModerationApprovedMailTemplateId.Value,
-					Post = post,
+          NotificationFrequency = NotificationFrequency.Single,
+          Post = post,
 					Reply = null
 				};
 
@@ -245,17 +256,21 @@ namespace Nucleus.Modules.Forums.EventHandlers
 
 			Forum forum = await forumsManager.Get(reply.Post.ForumId);
 			User user = await userManager.Get(reply.AddedBy.Value);
-
+      
 			if (forum == null || user == null) return;
 
-			if (forum.EffectiveSettings().IsModerated && forum.EffectiveSettings().ModerationApprovedMailTemplateId.HasValue)
+      // don't send "reply approved" emails to users who are not moderated
+      if (forumsManager.HasPermission(user, forum, ForumsManager.PermissionScopes.FORUM_UNMODERATED)) return;
+
+      if (forum.EffectiveSettings().IsModerated && forum.EffectiveSettings().ModerationApprovedMailTemplateId.HasValue)
 			{
 				MailQueue item = new()
 				{
 					ModuleId = forum.Group.ModuleId,
 					UserId = user.Id,
 					MailTemplateId = forum.EffectiveSettings().ModerationApprovedMailTemplateId.Value,
-					Post = reply.Post,
+          NotificationFrequency = NotificationFrequency.Single,
+          Post = reply.Post,
 					Reply = reply
 				};
 
@@ -280,7 +295,8 @@ namespace Nucleus.Modules.Forums.EventHandlers
 					ModuleId = forum.Group.ModuleId,
 					UserId = user.Id,
 					MailTemplateId = forum.EffectiveSettings().ModerationRejectedMailTemplateId.Value,
-					Post = post,
+          NotificationFrequency = NotificationFrequency.Single,
+          Post = post,
 					Reply = null
 				};
 
@@ -306,7 +322,8 @@ namespace Nucleus.Modules.Forums.EventHandlers
 					ModuleId = forum.Group.ModuleId,
 					UserId = user.Id,
 					MailTemplateId = forum.EffectiveSettings().ModerationRejectedMailTemplateId.Value,
-					Post = reply.Post,
+          NotificationFrequency = NotificationFrequency.Single,
+          Post = reply.Post,
 					Reply = reply
 				};
 

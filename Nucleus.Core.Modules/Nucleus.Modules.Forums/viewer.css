@@ -223,6 +223,16 @@
   min-width: 6rem;
 }
 
+.forums-manage-subscriptions table .btn-col
+{
+  width: 14rem;
+}
+
+.forums-manage-subscriptions table .btn-col
+{
+  width: 7rem;
+}
+
 .forums-manage-subscriptions .subscriptions-group-wrapper
 {
   border: solid 1px #aaaaaa;

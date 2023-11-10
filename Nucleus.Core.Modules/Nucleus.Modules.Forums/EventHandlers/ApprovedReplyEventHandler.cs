@@ -7,7 +7,7 @@ using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
 using Nucleus.Modules.Forums.Models;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
-using Nucleus.Extensions;
+using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Modules.Forums.EventHandlers
 {
@@ -16,9 +16,9 @@ namespace Nucleus.Modules.Forums.EventHandlers
 		private ForumsManager ForumsManager { get; }
 		private IUserManager UserManager { get; }
 
-		public ApprovedReplyEventHandler(ForumsManager forumsManager, IUserManager userManager)
+    public ApprovedReplyEventHandler(ForumsManager forumsManager, IUserManager userManager)
 		{
-			this.ForumsManager = forumsManager;
+    	this.ForumsManager = forumsManager;
 			this.UserManager = userManager;
 		}
 
@@ -26,13 +26,13 @@ namespace Nucleus.Modules.Forums.EventHandlers
 		{
 			// Re-get the reply, as it may not be fully populated
 			reply = await this.ForumsManager.GetForumPostReply(reply.Id);
-
-			if (reply.IsApproved)
+      
+      if (reply.IsApproved)
 			{
 				await reply.CreateModerationApprovedEmail(this.ForumsManager, this.UserManager);
 				await reply.CreateSubscriptionEmail(this.ForumsManager);
 			}
 		}
-	}
+  }
 }
 

@@ -1,41 +1,27 @@
 ﻿@Model.User.UserName,
 
-<p>One or more of your forum posts have been rejected <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>: </p>
-
-@foreach (var forum in Model.Forums)
+@if (@Model.Reply == null)
 {
-  <a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
-
-  <table>
-    <tr>
-      <th>Subject</th>
-      <th>Author</th>
-      <th>Date</th>
-    </tr>
-    <tr>
-      <td colspan="3"><h2>Posts</h2></td>
-    </tr>
-    @foreach (var post in forum.Posts)
-    {
-      <tr>
-        <td><a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
-        <td>@post.PostedBy.UserName</td>
-        <td>@post.DateAdded</td>
-      </tr>
-    }
-    @if (((IEnumerable<object>)forum.Replies).Any())
-    {
-      <tr>
-        <td colspan="3"><h2>Replies</h2></td>
-      </tr>
-      @foreach (var reply in forum.Replies)
-      {
-        <tr>
-          <td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
-          <td>@reply.PostedBy.UserName</td>
-          <td>@reply.DateAdded</td>
-        </tr>
-      }
-    }
-  </table>
+  <p>Your forum post at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a> was rejected: </p>
+  <p>@Model.Post.Body</p>
+  <p>
+    To view the complete thread and reply, please visit:
+    <a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Post.Id}", true)">@Model.Post.Subject</a>
+  </p>
 }
+else
+{
+  <p>Your forum reply at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a> was rejected: </p>
+  <p>@Model.Reply.Body</p>
+  <p>
+    To view the complete thread and reply, please visit:
+    <a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Reply.Post.Id}", true)/#_@Model.Reply.Id">@Model.Reply.Post.Subject</a>
+  </p>
+}
+
+<br />
+<div>
+  You were sent this email because you posted to a forum at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>.
+  <a href="@Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true)">Click here</a>
+  to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true).
+</div>

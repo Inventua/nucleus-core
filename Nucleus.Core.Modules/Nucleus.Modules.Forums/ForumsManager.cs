@@ -360,7 +360,7 @@ namespace Nucleus.Modules.Forums
 
 			if (post.Id == Guid.Empty)
 			{
-				if (!forum.EffectiveSettings().IsModerated || user?.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_MODERATE) == true)
+				if (!forum.EffectiveSettings().IsModerated || user?.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_UNMODERATED) == true)
 				{
 					post.IsApproved = true;
 				}
@@ -522,7 +522,7 @@ namespace Nucleus.Modules.Forums
 				if (reply.Id == Guid.Empty)
 				{
 					Models.Forum forum = await provider.GetForum(post.ForumId);
-					reply.IsApproved = !forum.EffectiveSettings().IsModerated || user?.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_MODERATE) == true;
+					reply.IsApproved = !forum.EffectiveSettings().IsModerated || user?.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_UNMODERATED) == true;
 				}
 
 				// List attachments before save, so we can compare to the reply, to delete files for removed attachments
@@ -657,6 +657,18 @@ namespace Nucleus.Modules.Forums
     }
 
     /// <summary>
+    /// Update the notification frequency for the subscription for the specified <see cref="Group"/>.
+    /// </summary>
+    /// <param name="Group"></param>
+    public async Task UpdateNotificationFrequency(Group group, ClaimsPrincipal user, NotificationFrequency frequency)
+    {
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        await provider.UpdateForumGroupSubscriptionNotificationFrequency(group.Id, await this.UserManager.Get(user.GetUserId()), frequency);
+      }
+    }
+
+    /// <summary>
     /// Un-subscribe the specifed user from the specified <see cref="Group"/>.
     /// </summary>
     /// <param name="Group"></param>
@@ -680,11 +692,24 @@ namespace Nucleus.Modules.Forums
 			}
 		}
 
-		/// <summary>
-		/// Un-subscribe the specifed user from the specified <see cref="Forum"/>.
-		/// </summary>
-		/// <param name="Forum"></param>
-		public async Task UnSubscribe(Forum forum, ClaimsPrincipal user)
+    /// <summary>
+    /// Update the notification frequency for the subscription for the specified <see cref="Group"/>.
+    /// </summary>
+    /// <param name="Forum"></param>
+    public async Task UpdateNotificationFrequency(Forum forum, ClaimsPrincipal user, NotificationFrequency frequency)
+    {
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        await provider.UpdateForumSubscriptionNotificationFrequency(forum.Id, await this.UserManager.Get(user.GetUserId()), frequency);
+      }
+    }
+
+
+    /// <summary>
+    /// Un-subscribe the specifed user from the specified <see cref="Forum"/>.
+    /// </summary>
+    /// <param name="Forum"></param>
+    public async Task UnSubscribe(Forum forum, ClaimsPrincipal user)
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
@@ -838,11 +863,11 @@ namespace Nucleus.Modules.Forums
 			}
 		}
 
-		public async Task<IList<MailQueue>> ListMailQueue()
+		public async Task<IList<MailQueue>> ListMailQueue(NotificationFrequency frequency)
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				return await provider.ListMailQueue();
+				return await provider.ListMailQueue(frequency);
 			}
 		}
 
@@ -869,6 +894,20 @@ namespace Nucleus.Modules.Forums
 				return await provider.ListUserSubscriptions(user.GetUserId());
 			}
 		}
+
+
+    public Boolean HasPermission(User user, Forum forum, string scope)
+    {
+      foreach (Permission permission in forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions)
+      {
+        if (permission.PermissionType.Scope == scope && permission.AllowAccess)
+        {
+          return user.Roles.Where(role => role.Id == permission.Role.Id).Any();
+        }
+      }
+
+      return false;
+    }
 
     private void CheckAndCreatePermissions()
     {

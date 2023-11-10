@@ -17,7 +17,7 @@
 				{
 					@Html.LinkButton("", "Add new post", Url.NucleusAction("AddPost", "Forums", "Forums", new { forumId = Model.Forum.Id }), new { @class = "btn btn-primary btn-sm", @data_target = ".Forums.parent()" })
 				}
-				@if (Model.CanSubscribe && Model.Subscription == null)
+        @if (!Model.IsSubscribedToForumGroup && Model.CanSubscribe && Model.Subscription == null)
 				{
 					@Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribeForum", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = ".Forums.parent()" })
 				}
@@ -95,7 +95,7 @@
 								{
 									<div class="small">@(post.Statistics.LastReply.PostedBy?.UserName ?? "Deleted User")</div>
                   <div class="small">
-                    <a href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode() + $"/{@post.Id}" + "#_" + @post.Statistics.LastReply.Id)">
+                    <a href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode() + $"/{@post.Id}")/#_@post.Statistics.LastReply.Id">
                       @post.Statistics.LastReply.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())
                     </a>
                   </div>

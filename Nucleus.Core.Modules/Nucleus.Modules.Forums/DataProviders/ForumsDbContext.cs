@@ -12,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Mail;
 using Nucleus.Modules.Forums.Models;
+using DocumentFormat.OpenXml.Vml.Office;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Nucleus.Modules.Forums.DataProviders
 {
@@ -113,12 +115,17 @@ namespace Nucleus.Modules.Forums.DataProviders
 
       builder.Entity<ForumGroupSubscription>().ToTable("ForumGroupSubscriptions");
       builder.Entity<ForumGroupSubscription>().HasKey(subscription => new { subscription.ForumGroupId, subscription.UserId });
-
+      builder.Entity<ForumGroupSubscription>().Property(subscription => subscription.NotificationFrequency)
+        .HasDefaultValue(NotificationFrequency.Summary)
+        .HasConversion(new EnumToNumberConverter<NotificationFrequency, int>());
 
       builder.Entity<ForumSubscription>().ToTable("ForumSubscriptions");
 			builder.Entity<ForumSubscription>().HasKey( subscription => new { subscription.ForumId, subscription.UserId } );
+      builder.Entity<ForumSubscription>().Property(subscription => subscription.NotificationFrequency)
+        .HasDefaultValue(NotificationFrequency.Summary)
+        .HasConversion(new EnumToNumberConverter<NotificationFrequency, int>());
 
-			builder.Entity<PostSubscription>().ToTable("ForumPostSubscriptions");
+      builder.Entity<PostSubscription>().ToTable("ForumPostSubscriptions");
 			builder.Entity<PostSubscription>().HasKey(subscription => new { subscription.ForumPostId, subscription.UserId });
 
 			builder.Entity<PostTracking>().ToTable("ForumPostTracking");

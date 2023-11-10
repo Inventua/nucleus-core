@@ -56,7 +56,7 @@
               @if (forum.Statistics.LastPost != null)
               {
                 <div class="forum-subject small" title="@forum.Statistics.LastPost.Subject">
-                  <a href="@Url.PageLink(Model.Page, @forum.Name.FriendlyEncode() + $"/{@forum.Statistics.LastPost.Id}")">
+                  <a href="@Url.PageLink(Model.Page, @forum.Name.FriendlyEncode() + $"/{@forum.Statistics.LastPost.Id}")@(forum.Statistics.LastReply == null ? "" : "/#_" + @forum.Statistics.LastReply.Id)">
                     @forum.Statistics.LastPost.Subject
                   </a>
                 </div>

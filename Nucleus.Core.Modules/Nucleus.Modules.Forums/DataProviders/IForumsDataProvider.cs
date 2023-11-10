@@ -56,10 +56,12 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public Task DeleteReplyAttachments(Reply reply);
 
     public Task SubscribeForumGroup(Guid groupId, User user);
+    public Task UpdateForumGroupSubscriptionNotificationFrequency(Guid groupId, User user, NotificationFrequency frequency);
     public Task UnSubscribeForumGroup(Guid groupId, Guid userId);
     public Task<List<ForumGroupSubscription>> ListForumGroupSubscribers(Guid groupId);
 
     public Task SubscribeForum(Guid forumId, User user);
+    public Task UpdateForumSubscriptionNotificationFrequency(Guid forumId, User user, NotificationFrequency frequency);
     public Task UnSubscribeForum(Guid forumId, Guid userId);
     public Task<List<ForumSubscription>> ListForumSubscribers(Guid forumId);
 
@@ -80,7 +82,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 		public Task SetMailQueueStatus(MailQueue mailQueue);
 
 		public Task DeleteMailQueue(MailQueue mailQueue);
-		public Task<IList<MailQueue>> ListMailQueue();
+		public Task<IList<MailQueue>> ListMailQueue(NotificationFrequency frequency);
 		
 		public Task TruncateMailQueue(TimeSpan sentBefore);
 

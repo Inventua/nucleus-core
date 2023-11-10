@@ -64,9 +64,17 @@
             @Html.DropDownListFor(model => model.Group.Settings.SubscriptionMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
           </SettingsControl>
 
+          <SettingsControl caption="Subscription Summary mail template" helptext="Email template used to inform subscribers of new posts or replies when notification frequency is 'summary'.">
+            @Html.DropDownListFor(model => model.Group.Settings.SubscriptionSummaryMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+          </SettingsControl>
+        </div>
+
+        <div class="nucleus-flex-fields">
           <SettingsControl caption="Moderator mail template" helptext="Email template used to inform moderators of new posts or replies.">
             @Html.DropDownListFor(model => model.Group.Settings.ModerationRequiredMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
           </SettingsControl>
+          
+          <div></div>
         </div>
 
         <div class="nucleus-flex-fields">
@@ -88,13 +96,12 @@
     @if (Model.Group?.Forums != null)
     {
       <TabPanel id="group-forums">
-        <fieldset role="group" aria-labelledby="heading">
-          <h3>Forums</h3>
+        <fieldset role="group" aria-label="Forums" class="d-flex overflow-auto">
           <div class="nucleus-form-tools">
             <input type="submit" formaction="@Url.NucleusAction("NewForum", "ForumsAdmin", "Forums")" value="Add Forum" data-target="#ForumEditor" class="btn btn-primary" />
           </div>
 
-          <div id="ForumList">
+          <div id="ForumList" class="overflow-auto">
             @await Html.PartialAsync("_ForumList.cshtml", Model)
           </div>
         </fieldset>
@@ -103,10 +110,10 @@
   </TabContent>
 
   <div class="nucleus-button-panel">
-    <input type="submit" class="btn btn-primary" value="Save Changes" formaction="@Url.NucleusAction("SaveGroup", "ForumsAdmin", "Forums")" data-target=".ForumsSettings" />
+    <input type="submit" class="btn btn-primary" value="Save Changes" formaction="@Url.NucleusAction("SaveGroup", "ForumsAdmin", "Forums")" data-target=".ForumsSettings.parent()" />
     @if (Model.Group?.Id != Guid.Empty)
     {
-      <input type="submit" class="btn btn-danger" value="Delete Group" formaction="@Url.NucleusAction("DeleteGroup", "ForumsAdmin", "Forums")" data-target=".ForumsSettings" data-confirm="Groups can only be deleted if they contain no forums.  Use the 'Enabled' setting to disable a group which contains forums.  Delete this group?" />
+      <input type="submit" class="btn btn-danger" value="Delete Group" formaction="@Url.NucleusAction("DeleteGroup", "ForumsAdmin", "Forums")" data-target=".ForumsSettings.parent()" data-confirm="Groups can only be deleted if they contain no forums.  Use the 'Enabled' setting to disable a group which contains forums.  Delete this group?" />
     }
   </div>
 }

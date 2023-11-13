@@ -66,57 +66,65 @@ public class SendImmediateForumEmailsScheduledTask : IScheduledTask
 
     foreach (var item in queue.OrderBy(item => item.ModuleId))
     {
-      Models.MailTemplate.Models.Immediate model = new();
-
-      User user = await this.UserManager.Get(item.UserId);
-      UserProfileValue emailAddress = user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault();
-      MailTemplate template = await MailTemplateManager.Get(item.MailTemplateId);
-
-      if (cancellationToken.IsCancellationRequested)
+      try
       {
-        return;
+
+        Models.MailTemplate.Models.Immediate model = new();
+
+        User user = await this.UserManager.Get(item.UserId);
+        UserProfileValue emailAddress = user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault();
+        MailTemplate template = await MailTemplateManager.Get(item.MailTemplateId);
+
+        if (cancellationToken.IsCancellationRequested)
+        {
+          return;
+        }
+
+        if (template != null && !String.IsNullOrEmpty(emailAddress?.Value))
+        {
+          Forum forum = await this.ForumsManager.Get(item.Post.ForumId);
+
+          // only re-populate the module, page, site variables if this item's module id is different to the previous one (for performance).
+          if (module == null || module.Id != item.ModuleId)
+          {
+            module = await this.PageModuleManager.Get(item.ModuleId);
+            page = await this.PageManager.Get(module.PageId);
+            site = await this.SiteManager.Get(page.SiteId);
+          }
+
+          model.Forum = new Models.MailTemplate.Forum(forum);
+          model.Post = item.Post;
+          model.Reply = item.Reply;
+        }
+
+        model.Site = site.Copy<Site>();
+        model.Page = Models.MailTemplate.Page.Create(page, page.DefaultPageRoute().Path + $"/{Controllers.ForumsController.MANAGE_SUBSCRIPTIONS_PATH}");
+        model.User = user.GetCensored();
+        model.Summary = model.Forum.Name;
+
+        Logger.LogTrace("Sending forum email template {name} to user {userid}.", template.Name, user.Id);
+
+        using (IMailClient mailClient = this.MailClientFactory.Create(site))
+        {
+          try
+          {
+            await mailClient.Send<Models.MailTemplate.Models.Immediate>(template, model, emailAddress.Value);
+            sentMessageCount++;
+
+            // mark handled queue items as sent            
+            item.Status = MailQueue.MailQueueStatus.Sent;
+            await this.ForumsManager.SetMailQueueStatus(item);
+          }
+          catch (Exception ex)
+          {
+            // don't fail the entire task if an email can't be parsed/sent
+            this.Logger?.LogError(ex, "Error sending template {template}", template.Name);
+          }
+        }
       }
-
-      if (template != null && !String.IsNullOrEmpty(emailAddress?.Value))
+      catch (Exception ex)
       {
-        Forum forum = await this.ForumsManager.Get(item.Post.ForumId);
-
-        // only re-populate the module, page, site variables if this item's module id is different to the previous one (for performance).
-        if (module == null || module.Id != item.ModuleId)
-        {
-          module = await this.PageModuleManager.Get(item.ModuleId);
-          page = await this.PageManager.Get(module.PageId);
-          site = await this.SiteManager.Get(page.SiteId);
-        }
-
-        model.Forum = new Models.MailTemplate.Forum(forum);
-        model.Post = item.Post;
-        model.Reply = item.Reply;
-      }
-
-      model.Site = site.Copy<Site>();
-      model.Page = Models.MailTemplate.Page.Create(page, page.DefaultPageRoute().Path + $"/{Controllers.ForumsController.MANAGE_SUBSCRIPTIONS_PATH}");
-      model.User = user.GetCensored();
-      model.Summary = model.Forum.Name;
-
-      Logger.LogTrace("Sending forum email template {name} to user {userid}.", template.Name, user.Id);
-
-      using (IMailClient mailClient = this.MailClientFactory.Create(site))
-      {
-        try
-        {
-          await mailClient.Send<Models.MailTemplate.Models.Immediate>(template, model, emailAddress.Value);
-          sentMessageCount++;
-
-          // mark handled queue items as sent            
-          item.Status = MailQueue.MailQueueStatus.Sent;
-          await this.ForumsManager.SetMailQueueStatus(item);
-        }
-        catch (Exception ex)
-        {
-          // don't fail the entire task if an email can't be parsed/sent
-          this.Logger?.LogError(ex, "Error sending template {template}", template.Name);
-        }
+        this.Logger.LogError(ex, "Sending forum email (immediate).");
       }
     }
 

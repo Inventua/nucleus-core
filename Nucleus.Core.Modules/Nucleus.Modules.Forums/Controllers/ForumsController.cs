@@ -1195,37 +1195,45 @@ namespace Nucleus.Modules.Forums.Controllers
     private async Task<ViewModels.ManageSubscriptions> BuildManageSubscriptionsViewModel()
     {     
       ViewModels.ManageSubscriptions manageSubscriptions = new();
-      
-      manageSubscriptions.Subscriptions = await this.ForumsManager.GetUserSubscriptions(User);
-      IList<Group> groups = await this.GroupsManager.List(this.Context.Module);
 
-      // display groups if the group is enabled and the user has permission to subscribe to it
-      manageSubscriptions.Groups = groups
-        .Where(group => group.Settings.Enabled && this.GroupsManager.CheckPermission(this.Context.Site, HttpContext.User, group, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE))
-        .ToList();
-
-      List<Forum> forums = new();
-
-      foreach (Group group in groups)
+      string emailAddress = User.GetUserClaim<string>(System.Security.Claims.ClaimTypes.Email);
+      if (String.IsNullOrEmpty(emailAddress))
       {
-        List<Forum> groupForums = await this.ForumsManager.List(group);
-        group.Forums = groupForums.Where(forum=>forum.EffectiveSettings().Enabled).ToList();
+        manageSubscriptions.CanSubscribe = false;
+      }
+      else
+      {
+        manageSubscriptions.Subscriptions = await this.ForumsManager.GetUserSubscriptions(User);
+        IList<Group> groups = await this.GroupsManager.List(this.Context.Module);
 
-        // display forums if the forum is enabled, the user has permission to subscribe to the forum AND the user is not subscribed to the forum's group,
-        // or is already subscribed to the forum 
-        forums.AddRange(groupForums
-          .Where(forum => 
-            forum.EffectiveSettings().Enabled && 
-            this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE) && 
-            (
-              !manageSubscriptions.Subscriptions.GroupSubscriptions.Select(subscription => subscription.Group.Id).Contains(group.Id) ||
-              manageSubscriptions.Subscriptions.ForumSubscriptions.Select(subscription => subscription.Forum.Id).Contains(forum.Id) 
-            )
-          ));          
-      }      
+        // display groups if the group is enabled and the user has permission to subscribe to it
+        manageSubscriptions.Groups = groups
+          .Where(group => group.Settings.Enabled && this.GroupsManager.CheckPermission(this.Context.Site, HttpContext.User, group, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE))
+          .ToList();
 
-      manageSubscriptions.Forums = forums;
+        List<Forum> forums = new();
 
+        foreach (Group group in groups)
+        {
+          List<Forum> groupForums = await this.ForumsManager.List(group);
+          group.Forums = groupForums.Where(forum => forum.EffectiveSettings().Enabled).ToList();
+
+          // display forums if the forum is enabled, the user has permission to subscribe to the forum AND the user is not subscribed to the forum's group,
+          // or is already subscribed to the forum 
+          forums.AddRange(groupForums
+            .Where(forum =>
+              forum.EffectiveSettings().Enabled &&
+              this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE) &&
+              (
+                !manageSubscriptions.Subscriptions.GroupSubscriptions.Select(subscription => subscription.Group.Id).Contains(group.Id) ||
+                manageSubscriptions.Subscriptions.ForumSubscriptions.Select(subscription => subscription.Forum.Id).Contains(forum.Id)
+              )
+            ));
+        }
+
+        manageSubscriptions.Forums = forums;
+      }
+      
       return manageSubscriptions;
     }
   }

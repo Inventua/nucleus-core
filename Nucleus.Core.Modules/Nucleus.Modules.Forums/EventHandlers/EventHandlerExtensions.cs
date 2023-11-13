@@ -29,7 +29,7 @@ namespace Nucleus.Modules.Forums.EventHandlers
           {
             // do not send notifications to un-approved or un-verified users, or users who were not created yet when the subscription was created.  This
             // extra check is to prevent emails for imported forum posts.
-            if (subscription.User.Approved && subscription.User.Verified && post.DateAdded >= subscription.DateAdded)
+            if (subscription.User.Approved && subscription.User.Verified && post.DateAdded >= subscription.DateAdded && subscription.User.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault() != null)
             {
               MailQueue item = new()
               {
@@ -94,7 +94,7 @@ namespace Nucleus.Modules.Forums.EventHandlers
           {
             // do not send notifications to un-approved or un-verified users, or users who were not created yet when the subscription was created.  This
             // extra check is to prevent emails for imported forum replies.
-            if (subscription.User.Approved && subscription.User.Verified && reply.DateAdded >= subscription.DateAdded)
+            if (subscription.User.Approved && subscription.User.Verified && reply.DateAdded >= subscription.DateAdded && subscription.User.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault() != null)
             {
               MailQueue item = new()
               {
@@ -177,7 +177,7 @@ namespace Nucleus.Modules.Forums.EventHandlers
 			{
 				IList<User> moderators = await forumsManager.ListForumModerators(forum);
 
-				foreach (User moderator in moderators)
+				foreach (User moderator in moderators.Where(user => user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault() != null))
 				{
 					MailQueue item = new()
 					{
@@ -203,7 +203,7 @@ namespace Nucleus.Modules.Forums.EventHandlers
 			{
 				IList<User> moderators = await forumsManager.ListForumModerators(forum);
 
-				foreach (User moderator in moderators)
+				foreach (User moderator in moderators.Where(user => user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault() != null))
 				{
 					MailQueue item = new()
 					{
@@ -218,9 +218,7 @@ namespace Nucleus.Modules.Forums.EventHandlers
 					await forumsManager.SaveMailQueue(item);
 				}
 			}
-
 		}
-
 
 		public static async Task CreateModerationApprovedEmail(this Post post, ForumsManager forumsManager, IUserManager userManager)
 		{
@@ -233,6 +231,9 @@ namespace Nucleus.Modules.Forums.EventHandlers
 
       // don't send "post approved" emails to users who are not moderated
       if (forumsManager.HasPermission(user, forum, ForumsManager.PermissionScopes.FORUM_UNMODERATED)) return;
+
+      // don't send anything to users with no email address
+      if (user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault() == null) return;
 
       if (forum.EffectiveSettings().IsModerated && forum.EffectiveSettings().ModerationApprovedMailTemplateId.HasValue)
 			{
@@ -262,6 +263,9 @@ namespace Nucleus.Modules.Forums.EventHandlers
       // don't send "reply approved" emails to users who are not moderated
       if (forumsManager.HasPermission(user, forum, ForumsManager.PermissionScopes.FORUM_UNMODERATED)) return;
 
+      // don't send anything to users with no email address
+      if (user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault() == null) return;
+
       if (forum.EffectiveSettings().IsModerated && forum.EffectiveSettings().ModerationApprovedMailTemplateId.HasValue)
 			{
 				MailQueue item = new()
@@ -288,7 +292,10 @@ namespace Nucleus.Modules.Forums.EventHandlers
 
 			if (forum == null || user == null) return;
 
-			if (forum.EffectiveSettings().IsModerated && forum.EffectiveSettings().ModerationRejectedMailTemplateId.HasValue)
+      // don't send anything to users with no email address
+      if (user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault() == null) return;
+
+      if (forum.EffectiveSettings().IsModerated && forum.EffectiveSettings().ModerationRejectedMailTemplateId.HasValue)
 			{
 				MailQueue item = new()
 				{
@@ -315,7 +322,10 @@ namespace Nucleus.Modules.Forums.EventHandlers
 
 			if (forum == null || user == null) return;
 
-			if (forum.EffectiveSettings().IsModerated && forum.EffectiveSettings().ModerationRejectedMailTemplateId.HasValue)
+      // don't send anything to users with no email address
+      if (user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault() == null) return;
+
+      if (forum.EffectiveSettings().IsModerated && forum.EffectiveSettings().ModerationRejectedMailTemplateId.HasValue)
 			{
 				MailQueue item = new()
 				{

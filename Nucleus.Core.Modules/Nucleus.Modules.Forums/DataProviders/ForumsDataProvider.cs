@@ -896,7 +896,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 
       if (!alreadyExists)
       {
-        this.Context.Add(new ForumGroupSubscription() { ForumGroupId = groupId, User = user });
+        this.Context.Add(new ForumGroupSubscription() { ForumGroupId = groupId, User = new() { Id = user.Id } });
         await this.Context.SaveChangesAsync<ForumGroupSubscription>();
       }
     }
@@ -958,7 +958,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			if (!alreadyExists)
 			{
-				this.Context.Add(new ForumSubscription() { ForumId = forumId, User = user });
+				this.Context.Add(new ForumSubscription() { ForumId = forumId, User = new() { Id = user.Id } });
 				await this.Context.SaveChangesAsync<ForumSubscription>();
 			}
 		}

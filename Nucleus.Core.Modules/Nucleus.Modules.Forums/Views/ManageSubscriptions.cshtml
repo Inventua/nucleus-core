@@ -7,6 +7,14 @@
   @Html.AddStyle("~!/../viewer.css")
   <h2>Manage Subscriptions</h2>
 
+  @if (!Model.CanSubscribe)
+  {
+    <div class="alert alert-warning">
+      Your account does not have an email address specified, so you can't subscribe to forum notifications.
+    </div>
+  }
+  else
+  {
   @using (Html.BeginNucleusForm("UnsubscribeForum", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = ".forums-manage-subscriptions.parent()" }))
   {
     @if (Model.Groups.Any())
@@ -200,5 +208,6 @@
         </table>
       </div>
     }
+  }
   }
 </div>

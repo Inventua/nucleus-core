@@ -96,14 +96,25 @@ namespace Nucleus.Modules.Account.Controllers
 							MailTemplate template = await this.MailTemplateManager.Get(templateSelections.AccountNameReminderTemplateId.Value);
 							if (template != null && viewModel.Email != null)
 							{
-								Models.Mail.RecoveryEmailModel args = new()
-								{
-									Site = this.Context.Site ,
-									User = user.GetCensored() ,
-									Url = GetLoginPageUri().ToString()
-								};
+                SitePages sitePages = this.Context.Site.GetSitePages();
 
-								Logger.LogTrace("Sending account name reminder email '{templateName}' to user '{userId}', email '{email}'.", template.Name, user.Id, viewModel.Email);
+                //Models.Mail.RecoveryEmailModel args = new()
+                //{
+                //	Site = this.Context.Site ,
+                //	User = user.GetCensored() ,
+                //	Url = GetLoginPageUri().ToString()
+                //};
+                Abstractions.Models.Mail.Template.UserMailTemplateData args = new()
+                {
+                  Site = this.Context.Site,
+                  User = user.GetCensored(),
+                  Url = GetLoginPageUri().ToString(),
+                  LoginPage = sitePages.LoginPageId.HasValue ? await this.PageManager.Get(sitePages.LoginPageId.Value) : null,
+                  PrivacyPage = sitePages.PrivacyPageId.HasValue ? await this.PageManager.Get(sitePages.PrivacyPageId.Value) : null,
+                  TermsPage = sitePages.TermsPageId.HasValue ? await this.PageManager.Get(sitePages.TermsPageId.Value) : null
+                };
+
+                Logger.LogTrace("Sending account name reminder email '{templateName}' to user '{userId}', email '{email}'.", template.Name, user.Id, viewModel.Email);
 
 								using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
 								{
@@ -165,14 +176,25 @@ namespace Nucleus.Modules.Account.Controllers
 						{
 							await this.UserManager.SetPasswordResetToken(user);
 
-							Models.Mail.RecoveryEmailModel args = new()
-							{
-								Site = this.Context.Site ,
-								User = user.GetCensored(),
-								Url = new System.Uri(await GetLoginPageUri(), $"?token={user.Secrets.PasswordResetToken}").ToString()
-							};
+              ////Models.Mail.RecoveryEmailModel args = new()
+              ////{
+              ////	Site = this.Context.Site ,
+              ////	User = user.GetCensored(),
+              ////	Url = new System.Uri(await GetLoginPageUri(), $"?token={user.Secrets.PasswordResetToken}").ToString()
+              ////};
+              SitePages sitePages = this.Context.Site.GetSitePages();
 
-							Logger.LogTrace("Sending password reset email {templateName} to user {userId}.", template.Name, user.Id);
+              Abstractions.Models.Mail.Template.UserMailTemplateData args = new()
+              {
+                Site = this.Context.Site,
+                User = user.GetCensored(),    
+                Url = new System.Uri(await GetLoginPageUri(), $"?token={user.Secrets.PasswordResetToken}").ToString(),
+                LoginPage = sitePages.LoginPageId.HasValue ? await this.PageManager.Get(sitePages.LoginPageId.Value) : null,
+                PrivacyPage = sitePages.PrivacyPageId.HasValue ? await this.PageManager.Get(sitePages.PrivacyPageId.Value) : null,
+                TermsPage = sitePages.TermsPageId.HasValue ? await this.PageManager.Get(sitePages.TermsPageId.Value) : null
+              };
+
+              Logger.LogTrace("Sending password reset email {templateName} to user {userId}.", template.Name, user.Id);
 
 							using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
 							{

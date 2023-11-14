@@ -175,7 +175,7 @@ public class LoginController : Controller
   {
     viewModel.WriteSettings(this.Context.Module);
 
-    this.PageModuleManager.SaveSettings(this.Context.Module);
+    this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
     return Ok();
   }

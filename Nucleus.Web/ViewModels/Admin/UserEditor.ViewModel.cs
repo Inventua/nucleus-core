@@ -13,8 +13,10 @@ namespace Nucleus.Web.ViewModels.Admin
 		public Boolean IsCurrentUser { get; set; }
     public Boolean IsPasswordExpired { get; set; }
     public Boolean HasNameProfileProperties { get; set; }
+    public DateTime LockoutResetDate { get; set; }
 
-		public Nucleus.Abstractions.Models.User User { get; set; }
+
+    public Nucleus.Abstractions.Models.User User { get; set; }
 		public string EnteredPassword { get; set; }
     public IEnumerable<SelectListItem> AvailableRoles { get; set; } 
 		public Guid SelectedRoleId { get; set; }

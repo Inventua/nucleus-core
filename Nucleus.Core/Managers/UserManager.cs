@@ -123,10 +123,7 @@ namespace Nucleus.Core.Managers
 					}
 				}
 
-				using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
-				{
-					await provider.SaveUserSecrets(user);
-				}
+        await this.SaveSecrets(user);        
 
 				return false;
 			}
@@ -161,8 +158,23 @@ namespace Nucleus.Core.Managers
 				{
 					await provider.SaveUserSecrets(user);
 				}
-			}
+        this.CacheManager.UserCache().Remove(user.Id);
+      }
 		}
+
+    public async Task UnlockUser(User user)
+    {
+      user.Secrets = (await this.Get(user.Id)).Secrets;
+      user.Secrets.IsLockedOut = false;
+
+      user.Secrets.FailedPasswordWindowStart = null;
+      user.Secrets.FailedPasswordAttemptCount = 0;
+
+      using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+      {
+        await provider.SaveUserSecrets(user);
+      }
+    }
 
 		public async Task SetPasswordResetToken(User user)
 		{

@@ -46,6 +46,13 @@ namespace Nucleus.Abstractions.Managers
     public Task SetPasswordResetToken(User user);
 
     /// <summary>
+    /// Unlock the specified user's account
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    public Task UnlockUser(User user);
+
+    /// <summary>
     /// Set a new password for the specified <paramref name="user"/>.
     /// </summary>
     /// <param name="user"></param>

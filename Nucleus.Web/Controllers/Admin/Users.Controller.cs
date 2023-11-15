@@ -523,6 +523,10 @@ namespace Nucleus.Web.Controllers.Admin
       if (viewModel.User != null)
 			{
         viewModel.AvailableRoles = await GetAvailableUserRoles(viewModel.User);
+        
+        // we must re-read secrets because this function is called with a user object that has been deserialized by MVC and will not 
+        // contain secrets
+        viewModel.User.Secrets = (await this.UserManager.Get(viewModel.User.Id)).Secrets;
         if (viewModel.User.Secrets.IsLockedOut && viewModel.User.Secrets.LastLockoutDate.HasValue)
         {
           viewModel.LockoutResetDate = viewModel.User.Secrets.LastLockoutDate.Value.Add(this.PasswordOptions.FailedPasswordLockoutReset);

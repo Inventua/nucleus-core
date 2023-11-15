@@ -33,7 +33,7 @@ namespace Nucleus.Modules.Forums.ViewModels
 		public Boolean CanSubscribe { get; set; }
 		public Boolean CanDeletePost { get; set; }
 
-		
+		public Folder AttachmentsFolder { get; set; }
 
 	}
 }

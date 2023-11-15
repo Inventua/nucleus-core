@@ -93,16 +93,37 @@
 
 .Forums .post .attachments, .Forums .reply .attachments
 {
-  display: inline-grid;
-  gap: 1em;
-  grid-auto-flow: column;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;  
+  row-gap: 0.5rem;
   font-size: 0.8em;
 }
 
-.Forums .post .attachments::before, .Forums .reply .attachments::before
+/*.Forums .post .attachments > span, .Forums .reply .attachments > span
 {
-  content: 'Attachments: ';
-  font-weight: bold;
+  display: inline-block;
+}*/
+
+.Forums .post .attachments a, .Forums .reply .attachments a
+{
+  border: solid 2px;
+  padding: .5rem .5rem .5rem .35rem;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: black;
+}
+
+.Forums .attachments a:hover, .Forums .attachments a:focus
+{
+  background-color: #ccc;
+}
+
+.Forums .post .attachments a .icon, .Forums .reply .attachments a .icon
+{
+  font-size: 1.2rem;
+  margin-right: 0.25rem;
 }
 
 .Forums .post .nucleus-form-tools
@@ -127,6 +148,12 @@
 .Forums .post h3
 {
   margin: 0;
+}
+
+.Forums .post h4, .Forums .replies h4
+{
+  font-size: 1.1rem;
+  margin: 0.75rem 0;
 }
 
 .Forums .reply
@@ -155,6 +182,26 @@
 .Forums .reply.reply-level-4
 {
   border-left: solid 1.6rem #21A3DA;
+}
+
+.Forums .reply.reply-level-5
+{
+  border-left: solid 1.8rem #21A3DA;
+}
+
+.Forums .reply.reply-level-6
+{
+  border-left: solid 2.0rem #21A3DA;
+}
+
+.Forums .reply.reply-level-7
+{
+  border-left: solid 2.2rem #21A3DA;
+}
+
+.Forums .reply.reply-level-8
+{
+  border-left: solid 2.4rem #21A3DA;
 }
 
 .Forums .post .heading, .Forums .reply .heading

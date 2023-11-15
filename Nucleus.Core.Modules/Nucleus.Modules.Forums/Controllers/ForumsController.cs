@@ -12,7 +12,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Modules.Forums.Models;
 using Nucleus.Extensions;
-using Microsoft.Extensions.Hosting;
 
 namespace Nucleus.Modules.Forums.Controllers
 {
@@ -901,7 +900,8 @@ namespace Nucleus.Modules.Forums.Controllers
             Forum = forum,
             Post = post,
             Subscription = subscription,
-            Page = this.Context.Page
+            Page = this.Context.Page,
+            AttachmentsFolder = forum.EffectiveSettings().AttachmentsFolder
           }, readReplies);
         }
       }
@@ -934,6 +934,7 @@ namespace Nucleus.Modules.Forums.Controllers
       viewModel.CanSubscribe = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE);
       viewModel.CanApprovePost = viewModel.Forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, viewModel.Forum, ForumsManager.PermissionScopes.FORUM_MODERATE);
       viewModel.Replies = readReplies ? await ListReplies(viewModel.Forum, viewModel.Post) : new List<Models.Reply>();
+      viewModel.AttachmentsFolder = viewModel.Forum.EffectiveSettings().AttachmentsFolder;
 
       if (viewModel.Replies != null)
       {
@@ -1183,8 +1184,9 @@ namespace Nucleus.Modules.Forums.Controllers
             Post = post,
             Reply = reply,
             CanAttach = this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_ATTACH_POST),
-            CanSubscribe = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE)
-          };
+            CanSubscribe = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE),
+            AttachmentsFolder = forum.EffectiveSettings().AttachmentsFolder
+        };
         }
       }
 

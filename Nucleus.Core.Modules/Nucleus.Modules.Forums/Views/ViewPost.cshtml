@@ -10,15 +10,20 @@
   @using (Html.BeginNucleusForm("SetForumPostStatus", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = "form.parent()" }))
   {
     <div class="nucleus-form-tools">
+      <a class="btn btn-none" title="Back" href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode())">
+        <span class="nucleus-material-icon">&#xe5e0;</span>
+        <h2 class="d-inline-block">@Model.Forum.Name</h2>
+      </a>
+      
       @if (!Model.IsSubscribedToForum && Model.CanSubscribe && Model.Subscription == null)
       {
-        @Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = ".Forums.parent()" })
+        @Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm ms-auto", @title = "Subscribe to post", @data_target = ".Forums.parent()" })
       }
       @if (Model.Subscription != null)
       {
-        @Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = ".Forums.parent()" })
+        @Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm ms-auto", @data_target = ".Forums.parent()" })
       }
-      @Html.LinkButton("", "Back", Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode()), new { @class="btn btn-secondary btn-sm ms-auto" })
+      @*@Html.LinkButton("", "Back", Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode()), new { @class="btn btn-secondary btn-sm ms-auto" })*@
     </div>
 
     <div class="post">
@@ -128,14 +133,14 @@
 
       @if (Model.Post.Attachments?.Any() == true)
       {
+        <h4>Attachments</h4>
         <div class="attachments">
           @for (var attachmentCount = 0; attachmentCount < Model.Post.Attachments.Count; attachmentCount++)
-          {
-            <span>
-              <a href="@Url.FileLink(Model.Post.Attachments[attachmentCount].File)" alt="@Model.Post.Attachments[attachmentCount].File.Name" target="_blank">
-                @Model.Post.Attachments[attachmentCount].File.Name
-              </a>
-            </span>
+          {            
+            <a href="@Url.FileLink(Model.Post.Attachments[attachmentCount].File)" alt="@Model.Post.Attachments[attachmentCount].File.Name" target="_blank">
+              <span class="icon nucleus-material-icon">&#xe873;</span>
+              <span>@Model.Post.Attachments[attachmentCount].File.Name</span>
+            </a>            
           }
         </div>
       }
@@ -225,14 +230,14 @@
 
             @if (reply.Attachments?.Any() == true)
             {
+              <h4>Attachments</h4>
               <div class="attachments">
                 @for (var attachmentCount = 0; attachmentCount < reply.Attachments.Count; attachmentCount++)
                 {
-                  <span>
-                    <a href="@Url.FileLink(reply.Attachments[attachmentCount].File)" alt="@reply.Attachments[attachmentCount].File.Name" target="_blank">
-                      @reply.Attachments[attachmentCount].File.Name
-                    </a>
-                  </span>
+                  <a href="@Url.FileLink(reply.Attachments[attachmentCount].File)" alt="@reply.Attachments[attachmentCount].File.Name" target="_blank">
+                    <span class="icon nucleus-material-icon">&#xe873;</span>
+                    <span>@reply.Attachments[attachmentCount].File.Name</span>
+                  </a>
                 }
               </div>
             }

@@ -40,7 +40,7 @@
 			{
 				<SettingsControl caption="Attachments" helptext="Add/Manage Attachments.">
 					<div class="nucleus-flex-fields nucleus-fileselector">
-            @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { ActionName = "AddReplyAttachment", CssClass = "btn btn-secondary" })
+            @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { Folder = Model.AttachmentsFolder, ActionName = "AddReplyAttachment", CssClass = "btn btn-secondary" })
 					</div>
 				</SettingsControl>
 			}

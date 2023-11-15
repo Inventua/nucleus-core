@@ -7,15 +7,19 @@
 @Html.AddStyle("~/Resources/css/forms.css")
 @if (Model.Forum != null)
 {
-	<h2>@Model.Forum.Name</h2>
 	<div class="Forums">
 		@using (Html.BeginNucleusForm("SubscribeForum", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off" }))
-		{
-			<div class="nucleus-form-tools">
-				@Html.HiddenFor(model => model.Forum.Id)
+		{			
+			@Html.HiddenFor(model => model.Forum.Id)
+      <a class="btn btn-none" title="Back" href="@Url.PageLink(Model.Page)">
+        <span class="nucleus-material-icon">&#xe5e0;</span>
+        <h2 class="d-inline-block">@Model.Forum.Name</h2>
+      </a>
+
+      <div class="nucleus-form-tools">
 				@if (Model.CanPost)
 				{
-					@Html.LinkButton("", "Add new post", Url.NucleusAction("AddPost", "Forums", "Forums", new { forumId = Model.Forum.Id }), new { @class = "btn btn-primary btn-sm", @data_target = ".Forums.parent()" })
+					@Html.LinkButton("", "New post", Url.NucleusAction("AddPost", "Forums", "Forums", new { forumId = Model.Forum.Id }), new { @class = "btn btn-primary btn-sm", @data_target = ".Forums.parent()" })
 				}
         @if (!Model.IsSubscribedToForumGroup && Model.CanSubscribe && Model.Subscription == null)
 				{
@@ -25,7 +29,7 @@
 				{
 					@Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribeForum", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = ".Forums.parent()" })
 				}
-        @Html.LinkButton("", "Back", Url.PageLink(Model.Page), new { @class="btn btn-secondary btn-sm ms-auto" })
+        @*@Html.LinkButton("", "Back", Url.PageLink(Model.Page), new { @class="btn btn-secondary btn-sm ms-auto" })*@
 			</div>
 		}
 		@if (Model.Posts != null)

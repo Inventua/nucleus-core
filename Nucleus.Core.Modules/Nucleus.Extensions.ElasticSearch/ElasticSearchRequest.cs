@@ -190,32 +190,7 @@ namespace Nucleus.Extensions.ElasticSearch
 					{
 						Field = ParseField(nameof(ElasticSearchDocument.Status)),
 						Value = "Entry with attachment was processed successfully."
-					},
-					//new SetProcessor()
-					//{
-					//	// If the entry did not have a summary, and the attachment has a title, set the summary to the attachment title
-					//	// TODO: this does not work
-					//	Field = ParseField(nameof(ElasticSearchDocument.Summary)),
-					//	Value = $"{{{{{{{ParseField(nameof(ElasticSearchDocument.Attachment))}.{ParseField(nameof(ElasticSearchDocument.Attachment.Title))}}}}}}}",
-					//	If = $"{ParseField(nameof(ElasticSearchDocument.Summary))} == null",
-					//	IgnoreEmptyValue = true,
-					//	OnFailure = new List<IProcessor>()
-					//	{
-					//		new SetProcessor()
-					//		{
-					//			Field = ParseField(nameof(ElasticSearchDocument.Status)),
-					//			Value = "Error: could not process attachment. Ingest processor error: {{_ingest.on_failure_message}}." 
-					//		}
-					//	}
-					//},
-					//new SetProcessor()
-					//{
-					//	// If the entry does not have keywords, and the attachment has keywords, set the entry keywords to the attachment keywords
-					//	Field = ParseField(nameof(ElasticSearchDocument.Keywords)),
-					//	Value = $"{{{{{{{ParseField(nameof(ElasticSearchDocument.Attachment))}.{ParseField(nameof(ElasticSearchDocument.Attachment.Keywords))}}}}}}}",
-					//	If = $"{ParseField(nameof(ElasticSearchDocument.Keywords))} == null",
-					//	IgnoreEmptyValue = true
-					//},
+					}
 					new SetProcessor()
 					{
 						Field = ParseField(nameof(ElasticSearchDocument.SuggesterTitle)),

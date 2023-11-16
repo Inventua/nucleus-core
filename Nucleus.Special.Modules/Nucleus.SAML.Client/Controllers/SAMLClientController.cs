@@ -38,9 +38,6 @@ using System.Net;
 // SAML Response Validator:
 // https://www.samltool.com/validate_response.php
 
-
-// todo: cache IdP meta-data?
-
 namespace Nucleus.SAML.Client.Controllers
 {
 	[Extension("SAMLClient")]

@@ -457,33 +457,12 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			switch (sortKey.ToLower())
       {
-				// TODO
-				//   case "replycount":
-				//     query = query
-						//	.OrderByDescending(post => post.IsPinned)
-						//	.ThenBy(post => post.Statistics.ReplyCount);
-				//     break;
-				//   case "postdate":
-					//query = query
-					//	.OrderByDescending(post => post.IsPinned)
-					//	.ThenBy(post => post.Statistics.LastReply.DateAdded);
-					//break;
-     //   case "subject":
-					//query = query
-					//	.OrderByDescending(post => post.IsPinned)
-					//	.ThenBy(post => post.Subject);
-     //     break;
 				default: 
 					query = query
 						.OrderByDescending(post => post.IsPinned)
 						.ThenByDescending(post => post.DateAdded);
 					break;
 			}
-
-      //if (descending)
-      //{
-      //  query = query.Reverse();
-      //}
 
       IList<Post> posts = await query
 				.Skip(settings.FirstRowIndex)

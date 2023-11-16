@@ -100,11 +100,6 @@
   font-size: 0.8em;
 }
 
-/*.Forums .post .attachments > span, .Forums .reply .attachments > span
-{
-  display: inline-block;
-}*/
-
 .Forums .post .attachments a, .Forums .reply .attachments a
 {
   border: solid 2px;
@@ -124,6 +119,12 @@
 {
   font-size: 1.2rem;
   margin-right: 0.25rem;
+}
+
+.Forums .post .attachments a input, .Forums .reply .attachments a input
+{
+  margin-left: 0.5rem;
+  padding: 0.35rem 0.2rem 0.35rem 0.25rem;
 }
 
 .Forums .post .nucleus-form-tools
@@ -241,7 +242,10 @@
 .Forums .original-post.body
 {
   max-height: 6rem;
+  min-height: 2.5rem;
+  width: 100%;
   overflow: auto;
+  flex: 1;
 }
 
 .Forums .settings-control.stretch

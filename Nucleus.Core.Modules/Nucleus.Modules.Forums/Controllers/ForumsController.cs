@@ -187,6 +187,14 @@ namespace Nucleus.Modules.Forums.Controllers
       if (attachment != null)
       {
         viewModel.Post.Attachments.Remove(attachment);
+        
+        // if the attachment was added and removed (without being saved), delete the file.  if the attachment has an ID, it has been saved before
+        // and the file will be deleted when the user saves their edits.
+        if (attachment.Id == Guid.Empty)
+        {
+          // delete the file
+          await this.FileSystemManager.DeleteFile(this.Context.Site, await this.FileSystemManager.GetFile(this.Context.Site, attachment.File.Id));
+        }
       }
       else
       {
@@ -234,6 +242,14 @@ namespace Nucleus.Modules.Forums.Controllers
       if (attachment != null)
       {
         viewModel.Reply.Attachments.Remove(attachment);
+
+        // if the attachment was added and removed (without being saved), delete the file.  if the attachment has an ID, it has been saved before
+        // and the file will be deleted when the user saves their edits.
+        if (attachment.Id == Guid.Empty)
+        {
+          // delete the file
+          await this.FileSystemManager.DeleteFile(this.Context.Site, await this.FileSystemManager.GetFile(this.Context.Site, attachment.File.Id));
+        }
       }
       else
       {

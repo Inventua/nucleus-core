@@ -4,84 +4,79 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Forums.ViewModels
 <div class="Forums">
-	@using (Html.BeginNucleusForm("SaveForumPostReply", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = ".Forums.parent()", @enctype = "multipart/form-data" }))
-	{
-		<fieldset>
-			@Html.HiddenFor(model => model.Forum.Id)
-			@Html.HiddenFor(model => model.Post.Id)
+  @using (Html.BeginNucleusForm("SaveForumPostReply", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = ".Forums.parent()", @enctype = "multipart/form-data" }))
+  {
+    <fieldset class="reply">
+      @Html.HiddenFor(model => model.Forum.Id)
+      @Html.HiddenFor(model => model.Post.Id)
       @Html.HiddenFor(model => model.Reply.Id)
-      
+
       @if (Model.Reply.ReplyTo != null)
       {
         @Html.HiddenFor(model => model.Reply.ReplyTo.Id)
-        <SettingsControl caption="Reply to">
-          <div class="original-post body">
+      }
+
+      <div class="d-flex flex-column align-items-start justify-items">
+        <a title="Back" href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode() + $"/{@Model.Post.Id}")" class="d-block btn btn-none" )">
+          <span class="nucleus-material-icon">&#xe5e0;</span>
+          <h3 class="d-inline-block">@Model.Post.Subject</h3>
+        </a>
+        <div class="original-post body">
+          @if (Model.Reply.ReplyTo != null)
+          {
             @(new Microsoft.AspNetCore.Html.HtmlString(Model.Reply.ReplyTo.Body))
-          </div>
-        </SettingsControl>
-      }
-      else
-      {
-        <SettingsControl caption="Reply to Post">
-          <a href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode() + $"/{@Model.Post.Id}")" class="@(Model.Post.Tracking == null ? "d-block fw-bold" : "d-block")">
-            @Model.Post.Subject
-          </a>
-          <div class="original-post body">
+          }
+          else
+          {
             @(new Microsoft.AspNetCore.Html.HtmlString(Model.Post.Body))
-				  </div>
-			  </SettingsControl>
+          }
+        </div>
+      </div>
+
+      @if (Model.CanAttach || Model.Reply?.Attachments?.Any() == true)
+      {
+        <div class="attachments mt-1 settings-control align-items-center">
+          @if (Model.CanAttach)
+          {
+            <div class="nucleus-flex-fields nucleus-fileselector">
+              @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { Text = "Add Attachment", Folder = Model.AttachmentsFolder, ActionName = "AddReplyAttachment", CssClass = "btn btn-sm btn-secondary" })
+            </div>
+          }
+          @if (Model.Reply?.Attachments?.Any() == true)
+          {
+            @for (var attachmentCount = 0; attachmentCount < Model.Reply.Attachments.Count; attachmentCount++)
+            {
+              @Html.HiddenFor(attachment => Model.Reply.Attachments[attachmentCount].Id)
+              @Html.HiddenFor(attachment => Model.Reply.Attachments[attachmentCount].File.Id)
+              @Html.HiddenFor(attachment => Model.Reply.Attachments[attachmentCount].File.Provider)
+              @Html.HiddenFor(attachment => Model.Reply.Attachments[attachmentCount].File.Path)
+              @Html.HiddenFor(attachment => Model.Reply.Attachments[attachmentCount].File.Name)
+              <a href="@Url.FileLink(Model.Reply.Attachments[attachmentCount].File)" title="@Model.Reply.Attachments[attachmentCount].File.Name">
+                <span class="icon nucleus-material-icon">&#xe873;</span>
+                @Model.Reply.Attachments[attachmentCount].File.Name
+
+                @if (Model.CanAttach)
+                {
+                  <input type="submit" title="Delete Attachment" value="&#xe14c;" class="nucleus-material-icon btn btn-none btn-sm" formaction="@Url.NucleusAction("DeleteReplyAttachment", "Forums", "Forums")?id=@Model.Reply.Attachments[attachmentCount].Id" data-target=".Forums.parent()" data-confirm="Delete this attachment?" />
+                }
+              </a>
+            }
+          }
+        </div>
       }
+      <SettingsControl caption="Reply" helptext="Enter your reply text.">
+        @Html.TextAreaFor(model => model.Reply.Body, new { @class = "HtmlEditorControl" })
+      </SettingsControl>
 
-			<SettingsControl caption="Reply" helptext="Enter your reply text.">
-				@Html.TextAreaFor(model => model.Reply.Body, new { @class = "HtmlEditorControl" })
-			</SettingsControl>
+    </fieldset>
 
-			@if (Model.CanAttach)
-			{
-				<SettingsControl caption="Attachments" helptext="Add/Manage Attachments.">
-					<div class="nucleus-flex-fields nucleus-fileselector">
-            @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { Folder = Model.AttachmentsFolder, ActionName = "AddReplyAttachment", CssClass = "btn btn-secondary" })
-					</div>
-				</SettingsControl>
-			}
-
-			@if (Model.Reply?.Attachments?.Any() == true)
-			{
-				<table>
-					@for (var attachmentCount = 0; attachmentCount < Model.Reply.Attachments.Count; attachmentCount++)
-					{
-						<tr>
-							<td>
-								@Html.HiddenFor(attachment => Model.Reply.Attachments[attachmentCount].Id)
-								@Html.HiddenFor(attachment => Model.Reply.Attachments[attachmentCount].File.Id)
-								@Html.HiddenFor(attachment => Model.Reply.Attachments[attachmentCount].File.Provider)
-								@Html.HiddenFor(attachment => Model.Reply.Attachments[attachmentCount].File.Path)
-								@Html.HiddenFor(attachment => Model.Reply.Attachments[attachmentCount].File.Name)
-								<a href="@Url.FileLink(Model.Reply.Attachments[attachmentCount].File)" alt="@Model.Reply.Attachments[attachmentCount].File.Name">
-									@Model.Reply.Attachments[attachmentCount].File.Name
-								</a>
-							</td>
-
-							@if (Model.CanAttach)
-							{
-								<td class="nucleus-small-cell">
-                  <input type="submit" title="Delete Attachment" value="&#xe14c;" class="nucleus-material-icon btn btn-danger-secondary btn-sm" formaction="@Url.NucleusAction("DeleteReplyAttachment", "Forums", "Forums")?id=@Model.Reply.Attachments[attachmentCount].Id" data-target=".Forums.parent()" data-confirm="Delete this attachment?" />
-								</td>
-							}
-
-						</tr>
-					}
-				</table>
-			}
-		</fieldset>
-
-		<div class="nucleus-form-tools">
+    <div class="nucleus-form-tools">
       <input type="submit" formaction="@Url.NucleusAction("SaveForumPostReply", "Forums", "Forums")" value="Save" class="btn btn-primary" data-target=".Forums.parent()" />
-      @Html.LinkButton("", "Back", Url.PageLink(Model.Page, @$"{Model.Forum.Name.FriendlyEncode()}/{(Model.Post.Id == Guid.Empty ? "" : Model.Post.Id)}"), new { @class="btn btn-secondary" })
-		</div>
-	}
-	</div>
+      @Html.LinkButton("", "Cancel", Url.PageLink(Model.Page, @$"{Model.Forum.Name.FriendlyEncode()}/{(Model.Post.Id == Guid.Empty ? "" : Model.Post.Id)}"), new { @class="btn btn-secondary" })
+    </div>
+  }
+</div>
 
-	<script>
-		jQuery('.HtmlEditorControl').HtmlEditor({isAdminMode: false});
-	</script>
+<script>
+  jQuery('.HtmlEditorControl').HtmlEditor({ isAdminMode: false });
+</script>

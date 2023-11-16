@@ -22,7 +22,7 @@
       else
       {
         plugins = 'link lists'
-        toolbar = 'code | undo redo | blocks | bold italic | link unlink | alignleft aligncenter alignright alignjustify | bullist numlist | hr | removeformat';
+        toolbar = 'code | undo redo | blocks | bold italic strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist | hr | removeformat';
         external_plugins = {};
       }
 

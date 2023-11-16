@@ -39,9 +39,13 @@
 		<Compile Remove="Extensions\**" />
 		<Compile Remove="logs\**" />
 		<Compile Remove="publish\**" />
+		<Compile Remove="_OLD-AmazonS3FileSystemProvider\**" />
+		<Compile Remove="_OLD-AzureBlobStorageFileSystemProvider\**" />
 		<Content Remove="Extensions\**" />
 		<Content Remove="logs\**" />
 		<Content Remove="publish\**" />
+		<Content Remove="_OLD-AmazonS3FileSystemProvider\**" />
+		<Content Remove="_OLD-AzureBlobStorageFileSystemProvider\**" />
 		<Content Remove="appSettings.Linux.json" />
 		<Content Remove="bundleconfig.json" />
 		<Content Remove="iis-dev\**\*" />
@@ -50,12 +54,16 @@
 		<EmbeddedResource Remove="Extensions\**" />
 		<EmbeddedResource Remove="logs\**" />
 		<EmbeddedResource Remove="publish\**" />
+		<EmbeddedResource Remove="_OLD-AmazonS3FileSystemProvider\**" />
+		<EmbeddedResource Remove="_OLD-AzureBlobStorageFileSystemProvider\**" />
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
 		<None Remove="Extensions\**" />
 		<None Remove="logs\**" />
 		<None Remove="publish\**" />
 		<None Remove="Setup\Extensions\**" />
+		<None Remove="_OLD-AmazonS3FileSystemProvider\**" />
+		<None Remove="_OLD-AzureBlobStorageFileSystemProvider\**" />
 	</ItemGroup>
 
 	<ItemGroup>

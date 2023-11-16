@@ -451,8 +451,6 @@ namespace Nucleus.Core.Layout
 							actionDescriptor.Parameters.Add(paramDesc);
 						}
 
-						// TODO Use routeData from actionDescriptor? ****
-
 						// We must create a NEW routeData object (don't use htmlHelper.ViewContext.RouteData), because we must provide the controller, area and
 						// action names for the module, rather than the route values for the original http request.
 						foreach (var routeValue in actionDescriptor.RouteValues)

@@ -98,7 +98,7 @@
                 <button type="submit" class="btn btn-primary ms-auto text-nowrap" data-target=".UserEditor" formaction="@Url.AreaAction("UnlockUser", "Users", "Admin")">Unlock Account</button>
               </div>
             }
-            <div class="nucleus-flex-fields align-items-start">
+            <div class="nucleus-flex-fields align-items-start alert alert-primary">
               <label class="flex-1">
                 Last Login Date:
                 @if (Model.User.Secrets.LastLoginDate.HasValue)

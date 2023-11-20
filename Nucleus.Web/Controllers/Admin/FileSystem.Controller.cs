@@ -473,7 +473,36 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", viewModel);
 		}
 
-    
+
+		[HttpPost]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		public async Task<ActionResult> CopyPermissionsReplaceAll(ViewModels.Admin.FileSystem viewModel)
+		{
+			if (await this.FileSystemManager.CopyPermissionsToDescendants(this.Context.Site, viewModel.Folder , User, IFileSystemManager.CopyPermissionOperation.Replace))
+			{
+				return Json(new { Title = "Copy Permissions to Descendants", Message = "Permissions were copied successfully.", Icon = "alert" });
+			}
+			else
+			{
+				return BadRequest();
+			}
+		}
+
+		[HttpPost]
+		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+		public async Task<ActionResult> CopyPermissionsMerge(ViewModels.Admin.FileSystem viewModel)
+		{
+			if (await this.FileSystemManager.CopyPermissionsToDescendants(this.Context.Site, viewModel.Folder, User, IFileSystemManager.CopyPermissionOperation.Merge))
+			{
+				return Json(new { Title = "Copy Permissions to Descendants", Message = "Permissions were copied successfully.", Icon = "alert" });
+			}
+			else
+			{
+				return BadRequest();
+			}
+		}
+
+
 		/// <summary>
 		/// Make sure that the item folder exists by iterating through the item folders and checking/creating them.
 		/// </summary>

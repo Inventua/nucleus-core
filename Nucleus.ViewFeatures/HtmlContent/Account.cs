@@ -46,7 +46,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
         TagBuilder accountMenuButtonBuilder = new("button");
         accountMenuButtonBuilder.AddCssClass("btn dropdown-toggle");
         accountMenuButtonBuilder.AddCssClass(String.IsNullOrEmpty(buttonClass) ? "btn-secondary" : buttonClass);
-        
+
         if (!context.HttpContext.User.IsApproved() || !context.HttpContext.User.IsVerified() || context.HttpContext.User.IsPasswordExpired())
         {
           TagBuilder warningBuilder = new("span");
@@ -113,8 +113,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
           accountProfileLinkBuilder.InnerHtml.Append("Account Settings");
 
           PageRoute accountSettingsPageRoute = await GetPageRoute(sitePages.UserProfilePageId, pageManager);
-          accountProfileLinkBuilder.Attributes.Add("href",
-            accountSettingsPageRoute == null ? urlHelper.AreaAction("EditAccountSettings", "Account", "User") : urlHelper.Content("~" + accountSettingsPageRoute.Path) + $"?returnUrl={GetReturnUrl(context.HttpContext, urlHelper)}");
+          string path = accountSettingsPageRoute == null ? urlHelper.AreaAction("EditAccountSettings", "Account", "User") : urlHelper.Content("~" + accountSettingsPageRoute.Path);
+          accountProfileLinkBuilder.Attributes.Add("href", $"{path}?returnUrl={GetReturnUrl(context.HttpContext, urlHelper, path)}");
 
           accountProfileItemBuilder.InnerHtml.AppendHtml(accountProfileLinkBuilder);
           accountMenuBuilder.InnerHtml.AppendHtml(accountProfileItemBuilder);
@@ -128,23 +128,25 @@ namespace Nucleus.ViewFeatures.HtmlContent
           changePasswordLinkBuilder.AddCssClass("dropdown-item");
           changePasswordLinkBuilder.InnerHtml.Append("Change Password");
           PageRoute changePasswordPageRoute = await GetPageRoute(sitePages.UserChangePasswordPageId, pageManager);
-
-          changePasswordLinkBuilder.Attributes.Add("href",
-          changePasswordPageRoute == null ? urlHelper.AreaAction("EditPassword", "Account", "User") : urlHelper.Content("~" + changePasswordPageRoute.Path) + $"?returnUrl={GetReturnUrl(context.HttpContext, urlHelper)}");
+          string path = changePasswordPageRoute == null ? urlHelper.AreaAction("EditPassword", "Account", "User") : urlHelper.Content("~" + changePasswordPageRoute.Path);
+          changePasswordLinkBuilder.Attributes.Add("href",  $"{path}?returnUrl={GetReturnUrl(context.HttpContext, urlHelper, path)}");
 
           changePasswordItemBuilder.InnerHtml.AppendHtml(changePasswordLinkBuilder);
           accountMenuBuilder.InnerHtml.AppendHtml(changePasswordItemBuilder);
         }
 
-        TagBuilder logoutItemBuilder = new("li");
-        TagBuilder logoutLinkBuilder = new("a");
-        logoutLinkBuilder.AddCssClass("dropdown-item");
-        logoutLinkBuilder.InnerHtml.Append("Log Out");
-        logoutLinkBuilder.Attributes.Add("href", $"{urlHelper.AreaAction("Logout", "Account", "User")}?returnUrl={GetReturnUrl(context.HttpContext, urlHelper)}");
+        {
+          TagBuilder logoutItemBuilder = new("li");
+          TagBuilder logoutLinkBuilder = new("a");
+          logoutLinkBuilder.AddCssClass("dropdown-item");
+          logoutLinkBuilder.InnerHtml.Append("Log Out");
 
-        logoutItemBuilder.InnerHtml.AppendHtml(logoutLinkBuilder);
-        accountMenuBuilder.InnerHtml.AppendHtml(logoutItemBuilder);
+          string path = urlHelper.AreaAction("Logout", "Account", "User");
+          logoutLinkBuilder.Attributes.Add("href", $"{path}?returnUrl={GetReturnUrl(context.HttpContext, urlHelper, path)}");
 
+          logoutItemBuilder.InnerHtml.AppendHtml(logoutLinkBuilder);
+          accountMenuBuilder.InnerHtml.AppendHtml(logoutItemBuilder);
+        }
         outputBuilder.InnerHtml.AppendHtml(accountMenuBuilder);
       }
       else
@@ -164,27 +166,27 @@ namespace Nucleus.ViewFeatures.HtmlContent
             registerLinkBuilder.AddCssClass("btn");
             registerLinkBuilder.AddCssClass(String.IsNullOrEmpty(buttonClass) ? "btn-secondary" : buttonClass);
             registerLinkBuilder.InnerHtml.Append("Register");
-            registerLinkBuilder.Attributes.Add("href", urlHelper.Content("~" + registerPageRoute.Path + $"?returnUrl={GetReturnUrl(context.HttpContext, urlHelper)}"));
+            string path = urlHelper.Content("~" + registerPageRoute.Path);
+            registerLinkBuilder.Attributes.Add("href", $"{path}?returnUrl={GetReturnUrl(context.HttpContext, urlHelper, path)}");
 
             buttonRowBuilder.InnerHtml.AppendHtml(registerLinkBuilder);
           }
         }
 
-        PageRoute loginPageRoute = await GetPageRoute(sitePages.LoginPageId, pageManager);
+        {
+          PageRoute loginPageRoute = await GetPageRoute(sitePages.LoginPageId, pageManager);
 
-        TagBuilder loginLinkBuilder = new("a");
-        loginLinkBuilder.AddCssClass("btn");
-        loginLinkBuilder.AddCssClass(String.IsNullOrEmpty(buttonClass) ? "btn-secondary" : buttonClass);
-        
-        loginLinkBuilder.InnerHtml.Append("Log In");
+          TagBuilder loginLinkBuilder = new("a");
+          loginLinkBuilder.AddCssClass("btn");
+          loginLinkBuilder.AddCssClass(String.IsNullOrEmpty(buttonClass) ? "btn-secondary" : buttonClass);
 
-        //outputBuilder.InnerHtml.AppendHtml(Modal.Build(context, "Login", true, null, new { id="LoginDialog" }));
-        //loginLinkBuilder.Attributes.Add("data-target", "#LoginDialog");
+          loginLinkBuilder.InnerHtml.Append("Log In");
 
-        loginLinkBuilder.Attributes.Add("href",
-          loginPageRoute == null ? urlHelper.AreaAction("", "Account", "User") : urlHelper.Content("~" + loginPageRoute.Path) + $"?returnUrl={GetReturnUrl(context.HttpContext, urlHelper)}");
+          string path = loginPageRoute == null ? urlHelper.AreaAction("", "Account", "User") : urlHelper.Content("~" + loginPageRoute.Path);
+          loginLinkBuilder.Attributes.Add("href", $"{path}?returnUrl={GetReturnUrl(context.HttpContext, urlHelper, path)}");
 
-        buttonRowBuilder.InnerHtml.AppendHtml(loginLinkBuilder);
+          buttonRowBuilder.InnerHtml.AppendHtml(loginLinkBuilder);
+        }
 
         outputBuilder.InnerHtml.AppendHtml(buttonRowBuilder);
       }
@@ -194,11 +196,17 @@ namespace Nucleus.ViewFeatures.HtmlContent
       return outputBuilder;
     }
 
-    
 
-    private static string GetReturnUrl(HttpContext context, IUrlHelper urlHelper)
+
+    private static string GetReturnUrl(HttpContext context, IUrlHelper urlHelper, string targetUrl)
     {
-      return System.Uri.EscapeDataString(urlHelper.Content("~" + context.Request.Path));
+      string returnUrl = urlHelper.Content("~" + context.Request.Path);
+      if (returnUrl.Equals(targetUrl, StringComparison.OrdinalIgnoreCase))
+      {
+        returnUrl =  urlHelper.Content("~/");        
+      }
+      
+      return System.Uri.EscapeDataString(returnUrl);
     }
 
     private async static Task<PageRoute> GetPageRoute(Guid? pageId, IPageManager pageManager)

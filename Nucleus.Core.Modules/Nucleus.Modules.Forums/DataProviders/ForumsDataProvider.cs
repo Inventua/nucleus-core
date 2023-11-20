@@ -924,6 +924,9 @@ namespace Nucleus.Modules.Forums.DataProviders
       return await this.Context.ForumGroupSubscriptions
         .Where(subscription => subscription.ForumGroupId == groupId)
         .Include(subscription => subscription.User)
+          .ThenInclude(user => user.Profile)
+            .ThenInclude(profilevalue => profilevalue.UserProfileProperty)
+        .AsSplitQuery()
         .AsNoTracking()
         .ToListAsync();
     }
@@ -979,6 +982,9 @@ namespace Nucleus.Modules.Forums.DataProviders
 			return await this.Context.ForumSubscriptions
 				.Where(subscription => subscription.ForumId == forumId)
         .Include(subscription => subscription.User)
+          .ThenInclude(user => user.Profile)
+            .ThenInclude(profilevalue => profilevalue.UserProfileProperty)
+        .AsSplitQuery()
         .AsNoTracking()
 				.ToListAsync();
 		}
@@ -1035,6 +1041,9 @@ namespace Nucleus.Modules.Forums.DataProviders
       return await this.Context.PostSubscriptions
 				.Where(subscription => subscription.ForumPostId == postId)
         .Include(subscription => subscription.User)
+          .ThenInclude(user => user.Profile)
+            .ThenInclude(profilevalue => profilevalue.UserProfileProperty)
+        .AsSplitQuery()
         .AsNoTracking()
         .ToListAsync();
 		}

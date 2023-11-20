@@ -533,8 +533,6 @@ namespace Nucleus.Modules.Forums
         saveReply.Attachments = null;
         await provider.SaveForumPostReply(post, saveReply);
         reply.Id = saveReply.Id;
-        
-        await provider.SaveForumPostReply(post, reply);
 			}
 
       using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())

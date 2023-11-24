@@ -18,7 +18,17 @@ namespace Nucleus.Extensions.Razor
 	public class RazorParser
 	{
 		private static readonly ConcurrentDictionary<string, object> CompiledTemplateCache = new();
-		private readonly static string[] UsingNamespaces = { "System", "System.Collections.Generic", "System.Linq", "System.Text", "Nucleus.Extensions", "Nucleus.Abstractions", "Nucleus.Abstractions.Models" };
+		private readonly static string[] UsingNamespaces = 
+    { 
+      nameof(System), 
+      nameof(System.Collections.Generic), 
+      nameof(System.Linq), 
+      nameof(System.Text), 
+      nameof(System.Security.Claims), 
+      nameof(Nucleus.Extensions), 
+      nameof(Nucleus.Abstractions), 
+      nameof(Nucleus.Abstractions.Models) 
+    };
     private static readonly SemaphoreSlim _cacheSemaphore = new(1, 1);
 
 		/// <summary>

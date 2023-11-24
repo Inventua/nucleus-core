@@ -124,5 +124,11 @@
     "inputFiles": [
       "Resources/js/nucleus-editmode.js"
     ]
+  },
+  {
+    "outputFileName": "Resources/Libraries/Monaco/Nucleus/monaco-editor.min.js",
+    "inputFiles": [
+      "Resources/Libraries/Monaco/Nucleus/monaco-editor.js"
+    ]
   }
 ]

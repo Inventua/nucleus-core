@@ -123,14 +123,15 @@ table input[type=radio]
 	width: auto;
 }
 
-.settings-control.textarea-fill
+.textarea-fill
 {
 	display: flex;
 }
 
-.settings-control.textarea-fill, .settings-control.textarea-fill label, .settings-control.textarea-fill label textarea
+.textarea-fill, .textarea-fill label, .textarea-fill textarea
 {
 	flex: 1;
+  flex-basis: 100%;
 }
 
 /* This section is mostly to do with overriding Safari/IOS styling of various elements */

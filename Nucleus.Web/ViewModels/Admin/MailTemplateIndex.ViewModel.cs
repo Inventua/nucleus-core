@@ -10,6 +10,6 @@ namespace Nucleus.Web.ViewModels.Admin
 	public class MailTemplateIndex
 	{
 		public Nucleus.Abstractions.Models.Paging.PagedResult<MailTemplate> MailTemplates { get; set; } = new() { PageSize = 20 };
-
+    
 	}
 }

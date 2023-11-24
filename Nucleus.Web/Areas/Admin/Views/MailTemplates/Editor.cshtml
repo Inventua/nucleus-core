@@ -4,35 +4,43 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Extensions
 @using Nucleus.Abstractions.Models
+<style>
+  .monaco-editor { position: absolute !important; }
+</style>
 @using (Html.BeginAreaForm("Save", "MailTemplates", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @autocomplete = "off" }))
 {
-<fieldset role="group" aria-labelledby="heading">
-	<h2>Mail Template</h2>
-	@Html.HiddenFor(model => model.MailTemplate.Id)
+  <fieldset role="group" aria-labelledby="heading">
+    <h2>Mail Template</h2>
+    @Html.HiddenFor(model => model.MailTemplate.Id)
 
-	<SettingsControl caption="Name" helptext="Mail Template name.">
-		@Html.TextBoxFor(model => model.MailTemplate.Name, new { @maxlength = 256 })
-	</SettingsControl>
+    <SettingsControl caption="Name" helptext="Mail Template name.">
+      @Html.TextBoxFor(model => model.MailTemplate.Name, new { @maxlength = 256 })
+    </SettingsControl>
 
-		<SettingsControl caption="Subject" helptext="Mail Template Subject.  This is the e-mail subject.">
-		@Html.TextBoxFor(model => model.MailTemplate.Subject, new { @maxlength = 256 })
-	</SettingsControl>
+    <SettingsControl caption="Subject" helptext="Mail Template Subject.  This is the e-mail subject.">
+      @Html.TextBoxFor(model => model.MailTemplate.Subject, new { @maxlength = 256 })
+    </SettingsControl>
 
-	<SettingsControl caption="Body" helptext="" class="textarea-fill">
-		@Html.TextAreaFor(model => model.MailTemplate.Body, 12, 60, new { @class = "font-monospace" })
-	</SettingsControl>
+    <div class="d-flex flex-1 border-start border-success border-5 textarea-fill">
+      @Html.TextAreaFor(model => model.MailTemplate.Body, 12, 60, new { @class = "font-monospace" })
+      <div id="mailtemplate-monaco-editor" class="flex-1"></div>
+    </div>    
+  </fieldset>
 
-</fieldset>
-	
-	<div class="nucleus-button-panel">
-		<input type="submit" class="btn btn-primary" value="Save Changes" />
-		<input type="submit" class="btn btn-success" value="Verify Template" formaction="@Url.AreaAction("Verify", "MailTemplates", "Admin")" />
+  <div class="nucleus-button-panel">
+    <input type="submit" class="btn btn-primary" value="Save Changes" />
+    <input type="submit" class="btn btn-success" value="Verify Template" formaction="@Url.AreaAction("Verify", "MailTemplates", "Admin")" />
 
-		@if (Model.MailTemplate.Id != Guid.Empty)
-		{
-			<input type="submit" class="btn btn-danger" value="Delete Mail Template" formaction="@Url.AreaAction("DeleteMailTemplate", "MailTemplates", "Admin")" data-confirm="Delete this Mail Template?" />
-		}
-	</div>
-	
+    @if (Model.MailTemplate.Id != Guid.Empty)
+    {
+      <input type="submit" class="btn btn-danger" value="Delete Mail Template" formaction="@Url.AreaAction("DeleteMailTemplate", "MailTemplates", "Admin")" data-confirm="Delete this Mail Template?" />
+    }
+  </div>
+
+  <script>
+    var _model = @Html.Raw(Model.DataModel);
+    jQuery('#mailtemplate-monaco-editor').MonacoEditor({ linkedElement: '#MailTemplate_Body', model: _model });
+  </script>
+
 }
 

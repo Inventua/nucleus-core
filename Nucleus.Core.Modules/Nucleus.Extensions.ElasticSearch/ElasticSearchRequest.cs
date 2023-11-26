@@ -19,22 +19,32 @@ namespace Nucleus.Extensions.ElasticSearch
 		private string Password { get; }
 		private string CertificateThumbprint { get; }
 
+    private TimeSpan IndexingPause { get; } = TimeSpan.FromSeconds(1);
 
-		private ElasticClient _client { get; set; }
+    private ElasticClient _client { get; set; }
 
 		public string DebugInformation { get; internal set; }
 
-		private const string NOATTACHMENT_PIPELINE = "no-attachment-pipeline";
+    private const string NOATTACHMENT_PIPELINE = "no-attachment-pipeline";
 		private const string ATTACHMENT_PIPELINE = "attachment-pipeline";
 
-		public ElasticSearchRequest(Uri uri, string indexName, string username, string password, string certificateThumbprint)
+    public ElasticSearchRequest(Uri uri, string indexName, string username, string password, string certificateThumbprint) 
+      : this(uri, indexName, username, password, certificateThumbprint, TimeSpan.Zero) { }
+
+    public ElasticSearchRequest(Uri uri, string indexName, string username, string password, string certificateThumbprint, TimeSpan indexingPause)
 		{
 			this.Uri = uri;
 			this.IndexName = indexName.ToLower();  // elastic search indexes must be lower case
 			this.Username = username;
 			this.Password = password;
 			this.CertificateThumbprint = certificateThumbprint;
-		}
+      this.IndexingPause = indexingPause;
+    }
+
+    public Boolean Equals(Uri uri, string indexName, string username, string password, string certificateThumbprint)
+    {
+      return this.Uri.AbsoluteUri != uri.AbsoluteUri || this.IndexName != indexName || this.Username != username || this.Password != password || this.CertificateThumbprint != certificateThumbprint;
+    }
 
 		public async Task<ElasticClient> GetClient()
 		{			
@@ -48,22 +58,22 @@ namespace Nucleus.Extensions.ElasticSearch
 			return this._client;			
 		}
 
-		private async Task<bool> Connect()
+		public async Task<bool> Connect()
 		{
-			SingleNodeConnectionPool connectionPool = new SingleNodeConnectionPool(this.Uri);
-			Nest.ConnectionSettings connectionSettings = new Nest.ConnectionSettings(connectionPool);
-			PingResponse pingResponse;
+			SingleNodeConnectionPool connectionPool = new(this.Uri);
+      Nest.ConnectionSettings connectionSettings = new Nest.ConnectionSettings(connectionPool);
+      PingResponse pingResponse;
 			CreateIndexResponse createIndexResponse;
 			PutMappingResponse mapResponse;
 			PutPipelineResponse attachmentPipelineResponse;
 			PutPipelineResponse noAttachmentPipelineResponse;
-
-			connectionSettings.DefaultIndex(this.IndexName.ToLower());    // index name must be lowercase
-			connectionSettings.DisableDirectStreaming(true);          // enables debug info
-			connectionSettings.RequestTimeout(new TimeSpan(0, 0, 30));
+      
+      connectionSettings.DefaultIndex(this.IndexName.ToLower());    // index name must be lowercase
+			connectionSettings.RequestTimeout(TimeSpan.FromSeconds(30));
 			connectionSettings.EnableApiVersioningHeader();
-
-			if (!String.IsNullOrEmpty(this.Username))
+      connectionSettings.ConnectionLimit(20);
+      
+      if (!String.IsNullOrEmpty(this.Username))
 			{
 				connectionSettings.BasicAuthentication(this.Username, this.Password);
 			}
@@ -174,38 +184,13 @@ namespace Nucleus.Extensions.ElasticSearch
 					new SetProcessor()
 					{
 						Field = ParseField(nameof(ElasticSearchDocument.FeedProcessingDateTime)),
-						Value = "{{{_ingest.timestamp}}}"
-					},
+            Value = "{{{_ingest.timestamp}}}"
+          },
 					new SetProcessor()
 					{
 						Field = ParseField(nameof(ElasticSearchDocument.Status)),
 						Value = "Entry with attachment was processed successfully."
-					},
-					//new SetProcessor()
-					//{
-					//	// If the entry did not have a summary, and the attachment has a title, set the summary to the attachment title
-					//	// TODO: this does not work
-					//	Field = ParseField(nameof(ElasticSearchDocument.Summary)),
-					//	Value = $"{{{{{{{ParseField(nameof(ElasticSearchDocument.Attachment))}.{ParseField(nameof(ElasticSearchDocument.Attachment.Title))}}}}}}}",
-					//	If = $"{ParseField(nameof(ElasticSearchDocument.Summary))} == null",
-					//	IgnoreEmptyValue = true,
-					//	OnFailure = new List<IProcessor>()
-					//	{
-					//		new SetProcessor()
-					//		{
-					//			Field = ParseField(nameof(ElasticSearchDocument.Status)),
-					//			Value = "Error: could not process attachment. Ingest processor error: {{_ingest.on_failure_message}}." 
-					//		}
-					//	}
-					//},
-					//new SetProcessor()
-					//{
-					//	// If the entry does not have keywords, and the attachment has keywords, set the entry keywords to the attachment keywords
-					//	Field = ParseField(nameof(ElasticSearchDocument.Keywords)),
-					//	Value = $"{{{{{{{ParseField(nameof(ElasticSearchDocument.Attachment))}.{ParseField(nameof(ElasticSearchDocument.Attachment.Keywords))}}}}}}}",
-					//	If = $"{ParseField(nameof(ElasticSearchDocument.Keywords))} == null",
-					//	IgnoreEmptyValue = true
-					//},
+					}
 					new SetProcessor()
 					{
 						Field = ParseField(nameof(ElasticSearchDocument.SuggesterTitle)),
@@ -243,8 +228,8 @@ namespace Nucleus.Extensions.ElasticSearch
 					new SetProcessor()
 					{
 							Field = ParseField(nameof(ElasticSearchDocument.FeedProcessingDateTime)),
-							Value = DateTime.Now.ToString()
-					},
+              Value = "{{{_ingest.timestamp}}}"
+          },
 					new SetProcessor()
 					{
 							Field = ParseField(nameof(ElasticSearchDocument.SuggesterTitle)),
@@ -252,8 +237,7 @@ namespace Nucleus.Extensions.ElasticSearch
 					},
 					new RemoveProcessor()
 					{
-						// Elastic search failed to consume the value of the .Content property (to populate the index), but we still
-						// want to remove the original value, as it is not useful, and could be large.  Also security - don't store the
+						// remove the original content value, as it is not useful, and could be large.  Also security - don't store the
 						// original outside nucleus.
 						Field =  ParseField(nameof(ElasticSearchDocument.Content))
 					}
@@ -278,7 +262,9 @@ namespace Nucleus.Extensions.ElasticSearch
 			ElasticClient client = await GetClient();
 
 			objIndexResponse = await client.Indices.DeleteAsync(this.IndexName);
-
+      
+      this.DebugInformation = objIndexResponse.DebugInformation;
+      
 			return objIndexResponse.IsValid;
 		}
 
@@ -296,7 +282,9 @@ namespace Nucleus.Extensions.ElasticSearch
 
 			objIndexResponse = await client.Indices.UpdateSettingsAsync(objIndexRequest);
 
-			return objIndexResponse;
+      this.DebugInformation = objIndexResponse.DebugInformation;
+
+      return objIndexResponse;
 		}
 
 		public async Task<GetIndexSettingsResponse> GetIndexSettings()
@@ -313,7 +301,7 @@ namespace Nucleus.Extensions.ElasticSearch
 
 		public async Task<Nest.IndexResponse> IndexContent(ElasticSearchDocument content)
 		{
-			RequestConfiguration requestSettings = new RequestConfiguration();
+			RequestConfiguration requestSettings = new();
 			Nest.IndexRequest<ElasticSearchDocument> indexRequest;
 			Nest.IndexResponse indexResponse;
 			ElasticClient client = await GetClient();
@@ -323,23 +311,29 @@ namespace Nucleus.Extensions.ElasticSearch
 				Pipeline = !(String.IsNullOrEmpty(content.Content)) && IsSupportedType(content.ContentType) ? ATTACHMENT_PIPELINE : NOATTACHMENT_PIPELINE
 			};
 
-			requestSettings.DisableDirectStreaming = false;
-			requestSettings.MaxRetries = 5;
+      requestSettings.DisableDirectStreaming = false;
+			requestSettings.MaxRetries = 3;
 			requestSettings.RequestTimeout = new TimeSpan(0, 15, 0);
-
-			indexRequest.RequestConfiguration = requestSettings;
+      
+      indexRequest.RequestConfiguration = requestSettings;
 			indexResponse = await client.IndexAsync<ElasticSearchDocument>(indexRequest);
-
+      
 			if (!indexResponse.IsValid)
 			{
 				throw indexResponse.OriginalException;
 			}
+
+      if (this.IndexingPause > TimeSpan.Zero)
+      {
+        await Task.Delay(this.IndexingPause);
+      }
+
 			return indexResponse;
 		}
 
-		public async Task<Nest.DeleteResponse> RemoveContent(ElasticSearchDocument content)
+    public async Task<Nest.DeleteResponse> RemoveContent(ElasticSearchDocument content)
 		{
-			RequestConfiguration requestSettings = new RequestConfiguration();
+			RequestConfiguration requestSettings = new ();
 			Nest.DeleteRequest<ElasticSearchDocument> deleteRequest;
 			Nest.DeleteResponse deleteResponse;
 			ElasticClient client = await GetClient();
@@ -451,8 +445,8 @@ namespace Nucleus.Extensions.ElasticSearch
 						Includes = "*",
 						Excludes = new List<string>()
 						{
-							//ParseField(nameof(ElasticSearchDocument.Content)),
-							ParseField(nameof(ElasticSearchDocument.Attachment)),
+              ParseField(nameof(ElasticSearchDocument.Content)),
+              ParseField(nameof(ElasticSearchDocument.Attachment)),
 							ParseField(nameof(ElasticSearchDocument.Roles))
 						}.ToArray()
 					},

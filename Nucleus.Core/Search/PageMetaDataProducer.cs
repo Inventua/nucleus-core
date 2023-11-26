@@ -17,14 +17,16 @@ namespace Nucleus.Core.Search
 {
 	public class PageMetaDataProducer : IContentMetaDataProducer
 	{
-		private IPageManager PageManager { get; }
+    private ISearchIndexHistoryManager SearchIndexHistoryManager { get; }
+    private IPageManager PageManager { get; }
 		private IApiKeyManager ApiKeyManager { get; }
 		private ILogger<PageMetaDataProducer> Logger { get; }
 		private HttpClient HttpClient { get; }
 
-		public PageMetaDataProducer(HttpClient httpClient, IPageManager pageManager, IApiKeyManager apiKeyManager, ILogger<PageMetaDataProducer> logger)
+		public PageMetaDataProducer(HttpClient httpClient, ISearchIndexHistoryManager searchIndexHistoryManager, IPageManager pageManager, IApiKeyManager apiKeyManager, ILogger<PageMetaDataProducer> logger)
 		{
-			this.PageManager = pageManager;
+      this.SearchIndexHistoryManager = searchIndexHistoryManager;
+      this.PageManager = pageManager;
 			this.ApiKeyManager = apiKeyManager;
 			this.HttpClient = httpClient;
 			this.Logger = logger;
@@ -59,30 +61,55 @@ namespace Nucleus.Core.Search
 					{
 						if (!indexPublicPagesOnly || page.Permissions.Where(permission => permission.IsPageViewPermission() && permission.AllowAccess).Any())
 						{
-							Logger.LogTrace("Building meta-data for page {pageId} [{pageName}]", page.Id, page.Name);
-							// we have to .Get the site and page because the .List methods don't return fully-populated page objects
-							ContentMetaData metaData = await BuildContentMetaData(site, apiKey, await this.PageManager.Get(page.Id));
+              SearchIndexHistory historyItem = await this.SearchIndexHistoryManager.Get(site.Id, Page.URN, page.Id);
+              if (historyItem == null || historyItem.LastIndexedDate < PageModifiedDate(page))
+              {
+                Logger.LogTrace("Building meta-data for page {pageId} [{pageName}]", page.Id, page.Name);
+                // we have to .Get the site and page because the .List methods don't return fully-populated page objects
+                ContentMetaData metaData = await BuildContentMetaData(site, apiKey, await this.PageManager.Get(page.Id));
 
-							if (metaData != null)
-							{
-								yield return metaData;
-								//results.Add(metaData);
-							}
-						}
+                if (metaData != null)
+                {
+                  yield return metaData;
+                }
+              }
+              else
+              {
+                Logger.LogTrace("Skipped page {pageId} [{pageName}] because it has not been changed since the last time it was indexed.", page.Id, page.Name);
+              }
+            }
 						else
 						{
-							Logger.LogInformation("Skipping page {pageId} [{pageName}] because it is not visible to all users, and 'Index Public Pages Only' is set.", page.Id, page.Name);
+							Logger.LogInformation("Skipped page {pageId} [{pageName}] because it is not visible to all users, and 'Index Public Pages Only' is set.", page.Id, page.Name);
 						}
 					}
 				}
 			}
-
-			//return results;
 		}
+
+
+    /// <summary>
+    /// Return the page updated date or the latest page module updated date, which 
+    /// </summary>
+    /// <param name="page"></param>
+    /// <returns></returns>
+    private DateTime PageModifiedDate(Page page)
+    {
+      DateTime? modifiedDate = page.DateChanged ?? page.DateAdded;
+
+      PageModule lastChangedModule = page.Modules.OrderBy(module => module.DateChanged ?? module.DateAdded).FirstOrDefault();
+      
+      if (modifiedDate == null || (lastChangedModule != null && modifiedDate < (lastChangedModule.DateChanged ?? lastChangedModule.DateAdded)))
+      {
+        modifiedDate = lastChangedModule.DateChanged ?? lastChangedModule.DateAdded;
+      }
+
+      return modifiedDate ?? DateTime.MaxValue;
+    }
 
 		private async Task<ContentMetaData> BuildContentMetaData(Site site, ApiKey apiKey, Page page)
 		{
-			System.IO.MemoryStream htmlContent = new();
+      System.IO.MemoryStream htmlContent = new();
 			string pageRelativeUrl = PageLink(page);
 
 			site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.INDEX_PAGES_USE_SSL, out Boolean useSsl);
@@ -100,6 +127,7 @@ namespace Nucleus.Core.Search
 					PublishedDate = page.DateChanged.HasValue ? page.DateChanged : page.DateAdded,
 					SourceId = page.Id,
 					Scope = Page.URN,
+          Type = "Page",
 					Keywords = page.Keywords?.Split(',').ToList(),
 					Roles = await GetViewRoles(page)
 				};

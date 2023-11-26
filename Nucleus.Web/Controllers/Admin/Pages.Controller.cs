@@ -31,6 +31,7 @@ namespace Nucleus.Web.Controllers.Admin
 		private IPageModuleManager PageModuleManager { get; }
 		private IRoleManager RoleManager { get; }
     private IFileSystemManager FileSystemManager { get; set; }
+    private IUserManager UserManager { get; set; }
 
 		public PagesController(
 			Context context,
@@ -39,6 +40,7 @@ namespace Nucleus.Web.Controllers.Admin
 			IPageModuleManager pageModuleManager,
       IFileSystemManager fileSystemManager,
 			IRoleManager roleManager,
+      IUserManager userManager,
 			ILayoutManager layoutManager,
 			IContainerManager containerManager)
 		{
@@ -46,6 +48,7 @@ namespace Nucleus.Web.Controllers.Admin
 			this.Logger = logger;
 			this.PageManager = pageManager;
 			this.PageModuleManager = pageModuleManager;
+      this.UserManager = userManager;
 			this.RoleManager = roleManager;
 			this.LayoutManager = layoutManager;
 			this.ContainerManager = containerManager;
@@ -64,15 +67,31 @@ namespace Nucleus.Web.Controllers.Admin
 		}
 
 		/// <summary>
-		/// Display the pages index
+		/// Search pages and display the results
 		/// </summary>
 		/// <returns></returns>
 		[HttpPost]
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
 		public async Task<ActionResult> Search(ViewModels.Admin.PageIndex viewModel)
 		{
-			
-			viewModel.SearchResults = await this.PageManager.Search(this.Context.Site, viewModel.SearchTerm, viewModel.SearchResults);
+      User user = await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId());
+      
+      List<Role> roles = new() { this.Context.Site.AllUsersRole };
+      
+      if (HttpContext.User.IsSiteAdmin(this.Context.Site))
+      {
+        roles = null;
+      }
+      else if (HttpContext.User.IsAnonymous())
+      {
+        roles.Add(this.Context.Site.AnonymousUsersRole);
+      }
+      else
+      {
+        roles.AddRange((await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId()))?.Roles);
+      }
+
+      viewModel.SearchResults = await this.PageManager.Search(this.Context.Site, viewModel.SearchTerm, roles, viewModel.SearchResults);
 
 			return View("SearchResults", viewModel);
 		}
@@ -346,7 +365,7 @@ namespace Nucleus.Web.Controllers.Admin
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> AddModule(ViewModels.Admin.PageEditor viewModel)
 		{
-			PageModule module = await this.PageModuleManager.CreateNew(this.Context.Site);
+			PageModule module = await this.PageModuleManager.CreateNew(this.Context.Site, viewModel.Page);
 			viewModel = await BuildPageViewModel(viewModel.Page, module, null, true);
 			
 			return View("ModuleCommonSettings", viewModel);
@@ -405,7 +424,7 @@ namespace Nucleus.Web.Controllers.Admin
 			await this.PageModuleManager.Save(viewModel.Page, viewModel.Module);
 
 			viewModel.Module.Permissions = await RebuildPermissions(viewModel.ModulePermissions);
-			await this.PageModuleManager.SavePermissions(viewModel.Module);
+			await this.PageModuleManager.SavePermissions(viewModel.Page, viewModel.Module);
 
 			viewModel = await BuildPageEditorViewModel(viewModel.Page, null, true);
 
@@ -428,7 +447,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 			viewModel.Module.Permissions = await RebuildPermissions(viewModel.ModulePermissions);
 
-			await this.PageModuleManager.SavePermissions(viewModel.Module);
+			await this.PageModuleManager.SavePermissions(viewModel.Page, viewModel.Module);
 			await this.PageModuleManager.Save(viewModel.Page, viewModel.Module);
 
 			if (viewModel.PageEditorMode == ViewModels.Admin.PageEditor.PageEditorModes.Standalone)
@@ -502,7 +521,7 @@ namespace Nucleus.Web.Controllers.Admin
 			PageModule module = await this.PageModuleManager.Get(mid);
 			module.Permissions = await RebuildPermissions(viewModel.ModulePermissions);
 
-			await this.PageModuleManager.SavePermissions(module);
+			await this.PageModuleManager.SavePermissions(viewModel.Page, module);
 
 			return Ok();
 		}
@@ -545,7 +564,7 @@ namespace Nucleus.Web.Controllers.Admin
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> MoveModuleDown(ViewModels.Admin.PageEditor viewModel, Guid mid )
 		{
-			await this.PageModuleManager.MoveDown(mid);
+			await this.PageModuleManager.MoveDown(viewModel.Page, mid);
 
 			viewModel = await BuildPageEditorViewModel(viewModel.Page, null, true);
 
@@ -556,7 +575,7 @@ namespace Nucleus.Web.Controllers.Admin
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
 		public async Task<ActionResult> MoveModuleUp(ViewModels.Admin.PageEditor viewModel, Guid mid)
 		{
-			await this.PageModuleManager.MoveUp(mid);
+			await this.PageModuleManager.MoveUp(viewModel.Page, mid);
 
 			viewModel = await BuildPageEditorViewModel(viewModel.Page, null, true);
 
@@ -694,7 +713,14 @@ namespace Nucleus.Web.Controllers.Admin
 
       if (viewModel.Page.LinkFileId.HasValue)
       {
-        viewModel.SelectedLinkFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.Page.LinkFileId.Value);
+        try
+        {
+          viewModel.SelectedLinkFile = await this.FileSystemManager.GetFile(this.Context.Site, viewModel.Page.LinkFileId.Value);
+        }
+        catch (FileNotFoundException)
+        {
+          viewModel.SelectedLinkFile = null;
+        }
       }
       
       if (getPermissions)

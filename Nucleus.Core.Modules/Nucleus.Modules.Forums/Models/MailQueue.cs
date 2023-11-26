@@ -23,5 +23,11 @@ namespace Nucleus.Modules.Forums.Models
 		public Post Post { get; set; }
 		public Reply Reply { get; set; }
 		public MailQueueStatus Status { get; set; } = MailQueueStatus.Queued;
-	}
+    public NotificationFrequency? NotificationFrequency { get; set; }
+
+    public MailQueue()
+    {
+      this.NotificationFrequency = Models.NotificationFrequency.Summary;
+    }
+  }
 }

@@ -64,7 +64,7 @@ namespace Nucleus.Core.Logging
 							WriteMessage(queuedMessage);
 						}
 					}
-          catch (IOException ex)
+          catch (IOException)
           {
             // file can be in use if another process is reading it
             Enqueue(message);			

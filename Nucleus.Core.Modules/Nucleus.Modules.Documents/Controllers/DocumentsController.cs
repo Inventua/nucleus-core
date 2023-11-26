@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Hosting;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Nucleus.Modules.Documents.Controllers
 {
@@ -29,8 +30,9 @@ namespace Nucleus.Modules.Documents.Controllers
 		private const string MODULESETTING_SHOW_SIZE = "documents:show:size";
 		private const string MODULESETTING_SHOW_MODIFIEDDATE = "documents:show:modifieddate";
 		private const string MODULESETTING_SHOW_DESCRIPTION = "documents:show:description";
+    private const string MODULESETTING_DEFAULTSORTORDER = "documents:defaultsortorder";
 
-		private Context Context { get; }
+    private Context Context { get; }
 		private IFileSystemManager FileSystemManager { get; }
 		private DocumentsManager DocumentsManager { get; }
 		private IListManager ListManager { get; }
@@ -49,9 +51,9 @@ namespace Nucleus.Modules.Documents.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult> Index(string sortkey, Boolean descending)
+		public async Task<ActionResult> Index(string sortkey, Boolean? descending)
 		{
-			return View("Viewer", await BuildViewModel(sortkey, descending));
+			return View("Viewer", await BuildViewModel(sortkey, descending != false));
 		}
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
@@ -104,10 +106,11 @@ namespace Nucleus.Modules.Documents.Controllers
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_DESCRIPTION, viewModel.ShowDescription);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_MODIFIEDDATE, viewModel.ShowModifiedDate);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SIZE, viewModel.ShowSize);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_DEFAULTSORTORDER, viewModel.DefaultSortOrder);
 
-			await this.PageModuleManager.SaveSettings(this.Context.Module);
+      await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
-			return Json(new { Title = "Save Settings", Message = "Settings saved." });
+			return Json(new { Title = "Save Settings", Message = "Settings saved.", Icon = "alert" });
 		}
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
@@ -169,7 +172,7 @@ namespace Nucleus.Modules.Documents.Controllers
 				return BadRequest();
 			}
 
-			return View("Editor", viewModel);
+			return View("Editor", await BuildEditorViewModel(viewModel));
 		}
 
 
@@ -185,11 +188,15 @@ namespace Nucleus.Modules.Documents.Controllers
 			viewModel.ShowDescription = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_DESCRIPTION, true);
 			viewModel.ShowModifiedDate= this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_MODIFIEDDATE, true);
 			viewModel.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
-						
+				
+      if (String.IsNullOrEmpty(viewModel.SortKey))
+      {
+        viewModel.SortKey = this.Context.Module.ModuleSettings.Get(MODULESETTING_DEFAULTSORTORDER, "");
+      }
+
 			string layoutPath = $"ViewerLayouts/{this.Context.Module.ModuleSettings.Get(MODULESETTING_LAYOUT, "Table")}.cshtml";
 
       if (!System.IO.File.Exists($"{this.FolderOptions.GetExtensionFolder("Documents", false)}/Views/{layoutPath}"))
-      //if (!System.IO.File.Exists($"{this.WebHostEnvironment.ContentRootPath}/{FolderOptions.EXTENSIONS_FOLDER}/Documents/Views/{layoutPath}"))
 			{
 				layoutPath = $"ViewerLayouts/Table.cshtml";
 			}
@@ -205,7 +212,7 @@ namespace Nucleus.Modules.Documents.Controllers
 					Description=document.Description,
 					Category = document.Category,
 					File = document.File,
-					SortOrder=document.SortOrder					
+					SortOrder = document.SortOrder					
 				};
 
 				if (document.File != null)
@@ -231,9 +238,9 @@ namespace Nucleus.Modules.Documents.Controllers
 				}
 			}
 
-			if (!string.IsNullOrEmpty(sortkey))
+			if (!string.IsNullOrEmpty(viewModel.SortKey))
 			{
-				System.Reflection.PropertyInfo prop = typeof(ViewModels.Viewer.DocumentInfo).GetProperties().Where(prop => prop.Name == sortkey).FirstOrDefault();
+				System.Reflection.PropertyInfo prop = typeof(ViewModels.Viewer.DocumentInfo).GetProperties().Where(prop => prop.Name == viewModel.SortKey).FirstOrDefault();
 				if (prop != null)
 				{					
 					viewModel.Documents = viewModel.Documents.OrderBy(document => prop.GetValue(document)).ThenBy(document => document.Title).ToList();
@@ -255,6 +262,16 @@ namespace Nucleus.Modules.Documents.Controllers
 				viewModel = new();
 			}
 
+      viewModel.SortOrders = new List<SelectListItem>() 
+      {  
+        new("Sort Index", ""),
+        new("Title", "Title"),
+        new("Category", "Category"),
+        new("Modified Date", "ModifiedDate"),
+        new("Size", "Size"),
+        new("Description", "Description")
+      };
+
 			viewModel.Documents = await this.DocumentsManager.List(this.Context.Site, this.Context.Module);
 			viewModel.Lists = await this.ListManager.List(this.Context.Site);
 			viewModel.CategoryList = await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(MODULESETTING_CATEGORYLIST_ID, Guid.Empty));
@@ -265,14 +282,15 @@ namespace Nucleus.Modules.Documents.Controllers
 			viewModel.ShowDescription = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_DESCRIPTION, true);
 			viewModel.ShowModifiedDate = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_MODIFIEDDATE, true);
 			viewModel.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
+      viewModel.DefaultSortOrder = this.Context.Module.ModuleSettings.Get(MODULESETTING_DEFAULTSORTORDER, "");
 
-			if (viewModel.SelectedFolder == null)
+      if (viewModel.SelectedFolder == null)
 			{
 				try
 				{
 					viewModel.SelectedFolder = await this.FileSystemManager.GetFolder(this.Context.Site, this.Context.Module.ModuleSettings.Get(MODULESETTING_DEFAULTFOLDER_ID, Guid.Empty));
 				}
-				catch (System.IO.FileNotFoundException)
+				catch (Exception)
 				{
 					viewModel.SelectedFolder = null;
 				}
@@ -280,7 +298,6 @@ namespace Nucleus.Modules.Documents.Controllers
 
 			viewModel.Layouts = new();
       
-      //foreach (string file in System.IO.Directory.EnumerateFiles($"{this.WebHostEnvironment.ContentRootPath}/{FolderOptions.EXTENSIONS_FOLDER}/Documents/Views/ViewerLayouts/", "*.cshtml").OrderBy(layout => layout))
       foreach (string file in System.IO.Directory.EnumerateFiles($"{this.FolderOptions.GetExtensionFolder("Documents", false)}/Views/ViewerLayouts/", "*.cshtml").OrderBy(layout => layout))
       {
 				viewModel.Layouts.Add(System.IO.Path.GetFileNameWithoutExtension(file));

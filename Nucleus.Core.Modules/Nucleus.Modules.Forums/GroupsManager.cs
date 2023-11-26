@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Modules.Forums
 {
@@ -22,9 +23,11 @@ namespace Nucleus.Modules.Forums
 		private IDataProviderFactory DataProviderFactory { get; }
 		private ICacheManager CacheManager { get; }
 		private IPermissionsManager PermissionsManager { get; }
+    private ForumsManager ForumsManager { get; }
 
-		public GroupsManager(IDataProviderFactory dataProviderFactory, ICacheManager cacheManager, IPermissionsManager permissionsManager)
+		public GroupsManager(IDataProviderFactory dataProviderFactory, ForumsManager forumsManager, ICacheManager cacheManager, IPermissionsManager permissionsManager)
 		{
+      this.ForumsManager = forumsManager;
 			this.CacheManager = cacheManager;
 			this.DataProviderFactory = dataProviderFactory;
 			this.PermissionsManager = permissionsManager;
@@ -63,15 +66,21 @@ namespace Nucleus.Modules.Forums
 						{
 							result.Settings = new();
 						}
-						result.Forums = await provider.ListForums(result);						
-						await CheckPermissions(result);
+
+            result.Forums = new List<Forum>();
+            foreach (Guid forumId in await provider.ListForums(result))
+            {
+              result.Forums.Add(await this.ForumsManager.Get(forumId));
+            }
+						await CheckPermissionsExist(result);
 					}
+
 					return result;
 				}
 			});
 		}
 
-		private async Task CheckPermissions(Group group)
+    public async Task CheckPermissionsExist(Group group)
 		{
       // Forums and groups have the same permissions namespace, so we use Forum.URN instead of Group.URN
 			List<PermissionType> permissionTypes = await this.PermissionsManager.ListPermissionTypes(Forum.URN);
@@ -94,11 +103,42 @@ namespace Nucleus.Modules.Forums
 			}
 		}
 
-		/// <summary>
-		/// Delete the specifed <see cref="Group"/> from the database.
-		/// </summary>
-		/// <param name="Groups"></param>
-		public async Task Delete(Group group)
+    public Boolean CheckPermission(Site site, ClaimsPrincipal user, Group group, string permissionScope)
+    {
+      if (user.IsSystemAdministrator() || user.IsSiteAdmin(site))
+      {
+        return true;
+      }
+      else
+      {
+        if (!user.IsApproved() || !user.IsVerified())
+        {
+          // if the user is not approved/verified, they don't have permission
+          return false;
+        }
+        else
+        {
+          foreach (Permission permission in group.Permissions)
+          {
+            if (permission.PermissionType.Scope == permissionScope)
+            {
+              if (permission.IsValid(site, user))
+              {
+                return true;
+              }
+            }
+          }
+        }
+      }
+
+      return false;
+    }
+
+    /// <summary>
+    /// Delete the specifed <see cref="Group"/> from the database.
+    /// </summary>
+    /// <param name="Groups"></param>
+    public async Task Delete(Group group)
 		{
 			await this.PermissionsManager.DeletePermissions(group.Permissions);
 			
@@ -118,7 +158,7 @@ namespace Nucleus.Modules.Forums
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				return await provider .ListGroups(module);
+				return await provider.ListGroups(module);
 			}
 		}
 
@@ -199,24 +239,24 @@ namespace Nucleus.Modules.Forums
 		//	return await this.PermissionsManager.ListPermissions(group.Id, ForumsManager.PermissionScopeNamespaces.Forum);
 		//}
 
-		public async Task<Forum> FindForum(PageModule module, string encodedName)
+		public async Task<Guid?> FindForum(PageModule module, string encodedName)
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-
 				foreach (Models.Group group in await this.List(module))
 				{
-					foreach (Models.Forum forum in await provider.ListForums(group))
+					foreach (Guid forumId in await provider.ListForums(group))
 					{
+            Forum forum = await this.ForumsManager.Get(forumId);
 						if (forum.Name.FriendlyEncode().Equals(encodedName, StringComparison.OrdinalIgnoreCase))
 						{
-							return forum;
+							return forum.Id;
 						}
 					}
 				}
 			}
 
-			return null;
+			return default;
 		}
 	}
 }

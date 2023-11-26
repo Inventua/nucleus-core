@@ -136,6 +136,7 @@ public class LoginController : Controller
     }
     else
     {
+      if (!Url.IsLocalUrl(returnUrl)) returnUrl = "";
       string location = String.IsNullOrEmpty(returnUrl) ? Url.Content("~/").ToString() : Url.Content(returnUrl);
 
       if (IsCalledFromScript())
@@ -174,7 +175,7 @@ public class LoginController : Controller
   {
     viewModel.WriteSettings(this.Context.Module);
 
-    this.PageModuleManager.SaveSettings(this.Context.Module);
+    this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
     return Ok();
   }
@@ -243,6 +244,8 @@ public class LoginController : Controller
             }
           }
 
+          if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
+
           UserSession session = await this.SessionManager.CreateNew(this.Context.Site, loginUser, viewModel.AllowRememberMe && viewModel.RememberMe, ControllerContext.HttpContext.Connection.RemoteIpAddress);
           await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
 
@@ -254,23 +257,6 @@ public class LoginController : Controller
     }
 
   }
-
-  ////[HttpGet]
-  ////[HttpPost]
-  ////public ActionResult ExternalLogin(string scheme, string returnUrl)
-  ////{
-  ////  if (!String.IsNullOrEmpty(scheme))
-  ////  {
-  ////    switch (scheme)
-  ////    {
-  ////      case NegotiateDefaults.AuthenticationScheme:
-  ////        ViewModels.Login viewModel = BuildViewModel(returnUrl, true);
-  ////        return View("Login", viewModel);
-  ////    }
-  ////  }
-
-  ////  return BadRequest();
-  ////}
 
   [HttpPost]
   public async Task<ActionResult> ResendVerificationCode(ViewModels.Login viewModel)
@@ -326,13 +312,13 @@ public class LoginController : Controller
           else
           {
             Logger.LogTrace("Failed sending Welcome email '{emailTemplateName}' to user '{userid}'. Email address is not set or the site welcome new user template is invalid.", template?.Name, user.Id);
-            return Json(new { Title = "Re-send Verification Code", Message = "Your verification code has not been sent. Please contact the site administrator for help.", Icon = "warning" });
+            return Json(new { Title = "Re-send Verification Code", Message = "Your verification code has not been sent. Please contact the site administrator for help.", Icon = "error" });
           }
         }
         else
         {
           Logger.LogTrace("Not sending Welcome email to user '{userid}' because no welcome email is configured for site '{siteId}'.", user.Id, this.Context.Site.Id);
-          return Json(new { Title = "Re-send Verification Code", Message = "Your site administrator has not configured a welcome email template.  Please contact the site administrator for help.", Icon = "warning" });
+          return Json(new { Title = "Re-send Verification Code", Message = "Your site administrator has not configured a welcome email template.  Please contact the site administrator for help.", Icon = "error" });
         }
       }
     }
@@ -349,6 +335,7 @@ public class LoginController : Controller
   {
     await this.SessionManager.SignOut(HttpContext);
 
+    if (!Url.IsLocalUrl(returnUrl)) returnUrl = "";
     return Redirect(String.IsNullOrEmpty(returnUrl) ? "~/" : returnUrl);
   }
 
@@ -361,8 +348,8 @@ public class LoginController : Controller
         .Where(protocol => protocol.Enabled)
         .ToList();
 
-    // special check for linux - ignore the Negotiate protocol (don't display the "Windows Login" button) if the machine is not joined to a domain
-    if (OperatingSystem.IsLinux() && !System.IO.File.Exists("/etc/krb5.keytab"))
+    // special check for linux - ignore the Negotiate protocol (don't display the "Windows Login" button) if the machine is not joined to a domain or the request Url does not have a domain
+    if (OperatingSystem.IsLinux() && (!System.IO.File.Exists("/etc/krb5.keytab") || !Request.Host.Host.Contains('.')))
     {
       AuthenticationProtocol negotiateProtocol = enabledProtocols.Where(proto => proto.Scheme.Equals(NegotiateDefaults.AuthenticationScheme, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
       if (negotiateProtocol != null)

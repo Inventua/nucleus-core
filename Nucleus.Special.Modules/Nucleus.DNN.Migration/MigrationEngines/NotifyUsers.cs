@@ -62,6 +62,10 @@ public class NotifyUsers : MigrationEngineBase<Models.NotifyUser>
           await this.UserManager.SetPasswordResetToken(user.User);
           await this.UserManager.SetVerificationToken(user.User);
 
+          // artificially increase reset token expiry
+          user.User.Secrets.PasswordResetTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+          await this.UserManager.SaveSecrets(user.User);
+
           Nucleus.Abstractions.Models.SitePages sitePages = this.Context.Site.GetSitePages();
 
           // send mail

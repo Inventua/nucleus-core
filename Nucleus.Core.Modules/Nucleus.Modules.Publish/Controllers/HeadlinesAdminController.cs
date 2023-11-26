@@ -64,7 +64,7 @@ namespace Nucleus.Modules.Publish.Controllers
       await this.HeadlinesManager.SaveFilterOptions(this.Context.Module, filterOptions);
 
       viewModel.SetSettings(this.Context.Module);
-      await this.PageModuleManager.SaveSettings(this.Context.Module);
+      await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
       return Ok();
     }

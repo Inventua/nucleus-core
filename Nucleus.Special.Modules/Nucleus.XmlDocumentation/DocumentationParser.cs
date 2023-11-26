@@ -14,18 +14,18 @@ namespace Nucleus.XmlDocumentation
 	public class DocumentationParser
 	{
 		private Models.Serialization.Documentation Source { get; }
-		public string SourceFileName { get; }
+		public File SourceFile { get; }
 		public Boolean IsValid { get; }
 		public DateTime LastModifiedDate { get; }
 
-		public DocumentationParser(IFileSystemManager fileSystemManager, Site site, File file)//(System.IO.Stream input, string sourceFileName)
+		public DocumentationParser(IFileSystemManager fileSystemManager, Site site, File file)
 		{
 			System.IO.Stream input = fileSystemManager.GetFileContents(site, file)
 				.ConfigureAwait(false)
 				.GetAwaiter()
 				.GetResult();
 
-			this.SourceFileName = file.Name;
+      this.SourceFile = file;
 			this.Source = DeserializeDocumentationFile(input);
 			this.IsValid = true;
 			this.LastModifiedDate = file.DateModified;
@@ -43,7 +43,7 @@ namespace Nucleus.XmlDocumentation
 				{
 					AssemblyName = this.Source.Assembly.Name,
 					Namespace = new ApiNamespace(FindNamespace(this.Source.Members)),
-					SourceFileName = this.SourceFileName,
+					SourceFile = this.SourceFile,
 					LastModifiedDate = this.LastModifiedDate
 				};
 
@@ -584,7 +584,7 @@ namespace Nucleus.XmlDocumentation
 				if (document.Namespace.Name == $"N:{memberIdString}") 
 				{
 					foundReferenceName = document.Namespace.Name;
-					return new System.Uri($"{document.SourceFileName}/{document.Namespace.Name}/", UriKind.Relative);
+					return new System.Uri($"{document.SourceFile.Name}/{document.Namespace.Name}/", UriKind.Relative);
 				}
 
 				foreach (ApiClass apiClass in document.Classes.Where(apiClass => apiClass.IdString == memberIdString || apiClass.AllMembers.Where(member => member.IdString == memberIdString).Any()))   // //document.Classes)
@@ -592,14 +592,14 @@ namespace Nucleus.XmlDocumentation
 					if (apiClass.IdString == memberIdString)
 					{
 						foundReferenceName = apiClass.Name;
-						return new System.Uri($"{document.SourceFileName}/{apiClass.ControlId()}/", UriKind.Relative);
+						return new System.Uri($"{document.SourceFile.Name}/{apiClass.ControlId()}/", UriKind.Relative);
 					}
 
 					ApiMember apiMember = apiClass.AllMembers.Where(member => member.IdString == memberIdString).SingleOrDefault();
 					if (apiMember != null)
 					{
 						foundReferenceName = apiMember.Name;
-						return new System.Uri($"{document.SourceFileName}/{apiMember.ClassName}/#{apiMember.ControlId()}", UriKind.Relative);
+						return new System.Uri($"{document.SourceFile.Name}/{apiMember.ClassName}/#{apiMember.ControlId()}", UriKind.Relative);
 					}
 				}
 			}

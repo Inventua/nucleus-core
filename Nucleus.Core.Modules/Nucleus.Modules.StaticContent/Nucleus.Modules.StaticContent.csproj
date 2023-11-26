@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.54" />
     <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.2.0" />
     <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.2.0" />
   </ItemGroup>

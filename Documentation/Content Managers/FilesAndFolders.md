@@ -6,11 +6,12 @@ logging in as a system administrator or site administrator, you can access the f
 
 ![Manage Files and Folders](FilesAndFolders.png)
 
-Nucleus has support for the local file system as well as files hosted in [Azure blob storage](https://azure.microsoft.com/en-au/services/storage/blobs/).  The file provider system is
-extensible, so you may have support for other file systems.  You can configure Nucleus with more than one file system.
+Nucleus has support for the local file system as well as files hosted in [Azure blob storage](/other-extensions/azure-blob-storage/) and 
+[Amazon S3](/amazon-s3/).  The file provider system is extensible, so you may be able to download an extension to add support for other file 
+systems.  You can configure Nucleus to use more than one file system.
 
-The file manager displays a drop-down list to select which file system provider to manage.  A list of files and folders is listed 
-in the main display.
+The file manager displays a drop-down list of file systems which you use to select which file system provider to manage.  A list of files and 
+folders is listed in the main display.
 
 ![Manage Files and Folders](FilesAndFolders-FileManager.png)
 
@@ -40,11 +41,13 @@ file.  If you need to support file types that aren't in the default approved lis
 
 > The default allowed file extensions are web documents (css, htm, html), 
 images (ico, jpg and jpeg, gif, png, bmp, webp, tif and tiff), Microsoft Office documents (doc, docx, pptx, ppt, xls, xlsx, vsd),
-video and audio (mp4, mpg, mpeg, webm, mkv, mka), common document formats (rtf, xps, pdf), plain-text (txt, md, xml) and zip files.
+video and audio (mp4, mpg, mpeg, webm, mkv, mka), common document formats (rtf, xps, pdf), plain-text (txt, md, xml) and zip files.  System
+administrators can add or remove allowed file types in the Nucleus application [configuration files](/configuration-reference/).
 
 ## Rename a file or folder
-Some file systems do not support rename operations (most cloud file systems).  If your file system provider supports it, use the 
-check boxes on the left to select a single files or folder and click `Rename`.  You will prompted for the new name.
+Some file systems do not support rename operations (most cloud file systems including Amazon S3 and Azure do not support rename operations).  
+If your file system provider supports it, use the check boxes on the left to select a single file or folder and click `Rename`.  You will 
+prompted for the new name.
 
 > You can't change the file extension of a file when renaming it.  This is a security measure to prevent users 
 from circumventing restricted file type checking during upload.

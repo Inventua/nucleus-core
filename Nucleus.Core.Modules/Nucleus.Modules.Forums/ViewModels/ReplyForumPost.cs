@@ -9,18 +9,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nucleus.Modules.Forums.ViewModels
-{
-	public class ReplyForumPost
-	{
-		public Page Page { get; set; }
+namespace Nucleus.Modules.Forums.ViewModels;
 
-		public Forum Forum { get; set; }
-		public Post Post { get; set; }
-		public Reply Reply { get; set; }
-		
-		public Boolean CanAttach { get; set; }		
-		public Boolean CanSubscribe { get; set; }
-		
-	}
+public class ReplyForumPost
+{
+  public const int MAX_LEVELS = 8;
+
+  public Page Page { get; set; }
+
+  public Forum Forum { get; set; }
+  public Post Post { get; set; }
+
+  public Reply Reply { get; set; }
+
+  public Boolean CanAttach { get; set; }
+  public Boolean CanSubscribe { get; set; }
+
+  public Folder AttachmentsFolder { get; set; }
 }

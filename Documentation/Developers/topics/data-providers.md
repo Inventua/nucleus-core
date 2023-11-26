@@ -42,40 +42,39 @@ using Nucleus.Modules.Documents.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
-namespace Nucleus.Modules.Documents.DataProviders
+namespace Nucleus.Modules.Documents.DataProviders;
+
+public class DocumentsDataProvider : Nucleus.Data.EntityFramework.DataProvider, IDocumentsDataProvider
 {
-  public class DocumentsDataProvider : Nucleus.Data.EntityFramework.DataProvider, IDocumentsDataProvider
+  protected IEventDispatcher EventManager { get; }
+  protected new DocumentsDbContext Context { get; }
+
+  public DocumentsDataProvider(DocumentsDbContext context, IEventDispatcher eventManager, ILogger<DocumentsDataProvider> logger) : base(context, logger)
   {
-    protected IEventDispatcher EventManager { get; }
-    protected new DocumentsDbContext Context { get; }
+    this.EventManager = eventManager;
+    this.Context = context;
+  }
 
-    public DocumentsDataProvider(DocumentsDbContext context, IEventDispatcher eventManager, ILogger<DocumentsDataProvider> logger) : base(context, logger)
-    {
-      this.EventManager = eventManager;
-      this.Context = context;
-    }
-
-    public async Task<Document> Get(Guid id)
-    {
-      return await this.Context.Documents
-        .Where(document => document.Id == id)
-        .Include(document => document.Category)
-        .Include(document => document.File)
-        .AsNoTracking()
-        .FirstOrDefaultAsync();
-    }
+  public async Task<Document> Get(Guid id)
+  {
+    return await this.Context.Documents
+      .Where(document => document.Id == id)
+      .Include(document => document.Category)
+      .Include(document => document.File)
+      .AsNoTracking()
+      .FirstOrDefaultAsync();
+  }
     
-    public async Task<IList<Document>> List(PageModule pageModule)
-    {
-      return await this.Context.Documents
-        .Where(document => EF.Property<Guid>(document, "ModuleId") == pageModule.Id)
-        .Include(document => document.Category)
-        .Include(document => document.File)
-        .AsNoTracking()
-        .AsSingleQuery()
-        .OrderBy(document => document.SortOrder)
-        .ToListAsync();
-    }
+  public async Task<IList<Document>> List(PageModule pageModule)
+  {
+    return await this.Context.Documents
+      .Where(document => EF.Property<Guid>(document, "ModuleId") == pageModule.Id)
+      .Include(document => document.Category)
+      .Include(document => document.File)
+      .AsNoTracking()
+      .AsSingleQuery()
+      .OrderBy(document => document.SortOrder)
+      .ToListAsync();
   }
 }
 ```
@@ -91,34 +90,33 @@ using Nucleus.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Nucleus.Modules.Documents.Models;
 
-namespace Nucleus.Modules.Documents.DataProviders
+namespace Nucleus.Modules.Documents.DataProviders;
+
+public class DocumentsDbContext : Nucleus.Data.EntityFramework.DbContext
 {
-  public class DocumentsDbContext : Nucleus.Data.EntityFramework.DbContext
+  public DbSet<Document> Documents { get; set; }
+
+  public DocumentsDbContext(DbContextConfigurator<DocumentsDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)  {  }
+
+  /// <summary>
+  /// Configure entity framework with schema information that it cannot automatically detect.
+  /// </summary>
+  /// <param name="builder"></param>
+  protected override void OnModelCreating(ModelBuilder builder)
   {
-    public DbSet<Document> Documents { get; set; }
+    base.OnModelCreating(builder);
 
-    public DocumentsDbContext(DbContextConfigurator<DocumentsDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)  {  }
+    builder.Entity<Document>().Property<Guid>("ModuleId");
 
-    /// <summary>
-    /// Configure entity framework with schema information that it cannot automatically detect.
-    /// </summary>
-    /// <param name="builder"></param>
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-      base.OnModelCreating(builder);
+    builder.Entity<Document>()
+      .HasOne(document => document.Category)
+      .WithMany()
+      .HasForeignKey("CategoryId");
 
-      builder.Entity<Document>().Property<Guid>("ModuleId");
-
-      builder.Entity<Document>()
-        .HasOne(document => document.Category)
-        .WithMany()
-        .HasForeignKey("CategoryId");
-
-      builder.Entity<Document>()
-        .HasOne(document => document.File)
-        .WithMany()
-        .HasForeignKey("FileId");
-    }
+    builder.Entity<Document>()
+      .HasOne(document => document.File)
+      .WithMany()
+      .HasForeignKey("FileId");
   }
 }
 ```
@@ -134,26 +132,24 @@ The example below is from the core Documents module.  Code which does not demons
 for brevity.
 
 ```
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Modules.Documents.DataProviders;
 using Nucleus.Abstractions.Search;
 using Nucleus.Data.EntityFramework;
-using Nucleus.Data.Common;
 
 [assembly:HostingStartup(typeof(Nucleus.Modules.Documents.Startup))]
-namespace Nucleus.Modules.Documents
+
+namespace Nucleus.Modules.Documents;
+
+public class Startup : IHostingStartup
 {
-  public class Startup : IHostingStartup
+  public void Configure(IWebHostBuilder builder)
   {
-    public void Configure(IWebHostBuilder builder)
+    builder.ConfigureServices((context, services) => 
     {
-      builder.ConfigureServices((context, services) => 
-      {
-        services.AddDataProvider<IDocumentsDataProvider, DataProviders.DocumentsDataProvider, DataProviders.DocumentsDbContext>(context.Configuration);
-      });
-    }
+      services.AddDataProvider<IDocumentsDataProvider, DataProviders.DocumentsDataProvider, DataProviders.DocumentsDbContext>(context.Configuration);
+    });
   }
 }
 ```

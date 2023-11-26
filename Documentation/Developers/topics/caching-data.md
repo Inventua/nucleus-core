@@ -13,14 +13,13 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Modules.Links.Models;
 using System;
 
-namespace Nucleus.Modules.Links
+namespace Nucleus.Modules.Links;
+
+public static class CacheExtensions
 {
-  public static class CacheExtensions
+  public static CacheCollection<Guid, Link> LinksCache(this ICacheManager cacheManager)
   {
-    public static CacheCollection<Guid, Link> LinksCache(this ICacheManager cacheManager)
-    {
-      return cacheManager.Get<Guid, Link>();
-    }
+    return cacheManager.Get<Guid, Link>();
   }
 }
 ```
@@ -35,18 +34,17 @@ dependency injection automatically provides an instance of the Cache Manager.
 ```
 using Nucleus.Abstractions.Managers;
 
-namespace Nucleus.Modules.Links
+namespace Nucleus.Modules.Links;
+
+public class LinksManager
 {
-  public class LinksManager
-  {
-    private IDataProviderFactory DataProviderFactory { get; }
-    private ICacheManager CacheManager { get; }
+  private IDataProviderFactory DataProviderFactory { get; }
+  private ICacheManager CacheManager { get; }
     
-    public LinksManager(IDataProviderFactory dataProviderFactory, ICacheManager cacheManager)
-    {
-      this.CacheManager = cacheManager;
-      this.DataProviderFactory = dataProviderFactory;
-    }
+  public LinksManager(IDataProviderFactory dataProviderFactory, ICacheManager cacheManager)
+  {
+    this.CacheManager = cacheManager;
+    this.DataProviderFactory = dataProviderFactory;
   }
 }
 ```

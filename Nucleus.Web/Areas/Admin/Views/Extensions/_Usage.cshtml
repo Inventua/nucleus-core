@@ -10,9 +10,19 @@
       The <strong>@Model.SiteDefaultContainer</strong> container is the default container for this site.
     </span >
   }
-  <div>
-    Components of the <strong>@Model.Package.name</strong> package are in use on these pages.
-  </div>
+  
+  @if (@Model.ExtensionComponents.PageCount > 0)
+  {
+    <div>
+      There page@(@Model.ExtensionComponents.PageCount == 1 ? "is" : "are") @Model.ExtensionComponents.PageCount pages/modules which use components of the <strong>@Model.Package.name</strong> package.
+    </div>
+  } 
+  else
+  {
+    <div>
+      Components of the <strong>@Model.Package.name</strong> package are not in use on any pages.
+    </div>
+  }
 </div>
 <h1 class="nucleus-control-panel-heading">@Model.Package.name</h1>
 <div class="nucleus-extension-components">

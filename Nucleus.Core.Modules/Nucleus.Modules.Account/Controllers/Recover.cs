@@ -50,7 +50,7 @@ namespace Nucleus.Modules.Account.Controllers
 		[HttpGet]
 		public ActionResult Edit(string returnUrl)
 		{
-			return View("RecoverSettings", new ViewModels.Signup() { ReturnUrl = returnUrl });
+      return View("RecoverSettings", new ViewModels.Signup() { ReturnUrl = returnUrl });
 		}
 
 		[HttpPost]
@@ -72,18 +72,20 @@ namespace Nucleus.Modules.Account.Controllers
 				if (user == null)
 				{
 					Logger.LogWarning("User not found for email {viewModel.Email}.", viewModel.Email);
-					await Task.Delay(TimeSpan.FromSeconds(10));
-					return BadRequest("Invalid Email");
-				}
+					
+          // we return a message saying that we have sent a reminder (even though we have not), so that this function can't be used to determine whether
+          // an email address belongs to a user in the system
+          return Json(new { Title = "Recover Account", Message = "An account name reminder email has been sent.", Icon = "alert" });
+        }
 				else
 				{
 					if (!user.Approved)
 					{
-						return Json(new { Title = "Recover Account", Message = "Your account has not been approved." });
+						return Json(new { Title = "Recover Account", Message = "Your account has not been approved.", Icon = "error" });
 					}
 					else if (!user.Verified)
 					{
-						return Json(new { Title = "Recover Account", Message = "Your account has not been verified." });
+						return Json(new { Title = "Recover Account", Message = "Your account has not been verified.", Icon = "error" });
 					}
 					else
 					{
@@ -94,20 +96,30 @@ namespace Nucleus.Modules.Account.Controllers
 							MailTemplate template = await this.MailTemplateManager.Get(templateSelections.AccountNameReminderTemplateId.Value);
 							if (template != null && viewModel.Email != null)
 							{
-								Models.Mail.RecoveryEmailModel args = new()
-								{
-									Site = this.Context.Site ,
-									User = user.GetCensored() ,
-									Url = GetLoginPageUri().ToString()
-								};
+                SitePages sitePages = this.Context.Site.GetSitePages();
 
-								Logger.LogTrace("Sending account name reminder email {templateName} to user {userId}.", template.Name, user.Id);
+                //Models.Mail.RecoveryEmailModel args = new()
+                //{
+                //	Site = this.Context.Site ,
+                //	User = user.GetCensored() ,
+                //	Url = GetLoginPageUri().ToString()
+                //};
+                Abstractions.Models.Mail.Template.UserMailTemplateData args = new()
+                {
+                  Site = this.Context.Site,
+                  User = user.GetCensored(),
+                  Url = GetLoginPageUri().ToString(),
+                  LoginPage = sitePages.LoginPageId.HasValue ? await this.PageManager.Get(sitePages.LoginPageId.Value) : null,
+                  PrivacyPage = sitePages.PrivacyPageId.HasValue ? await this.PageManager.Get(sitePages.PrivacyPageId.Value) : null,
+                  TermsPage = sitePages.TermsPageId.HasValue ? await this.PageManager.Get(sitePages.TermsPageId.Value) : null
+                };
+
+                Logger.LogTrace("Sending account name reminder email '{templateName}' to user '{userId}', email '{email}'.", template.Name, user.Id, viewModel.Email);
 
 								using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
 								{
 									await mailClient.Send(template, args, viewModel.Email);
-									return Json(new { Title = "Recover Account", Message = "Account Name Reminder email sent." });
-									//viewModel.Message = "Account Name Reminder email sent." ;
+									return Json(new { Title = "Recover Account", Message = "An account name reminder email has been sent.", Icon = "alert" });
 								}
 							}
 						}
@@ -115,8 +127,7 @@ namespace Nucleus.Modules.Account.Controllers
 						else
 						{
 							Logger.LogTrace("Not sending account name reminder to user {userId} because no Account Name Reminder Template is configured for site {siteId}.", user.Id, this.Context.Site.Id);
-							return Json(new { Title = "Recover Account", Message = "Your site administrator has not configured an Account Name Reminder email template.  Please contact the site administrator for help." });
-							//viewModel.Message = "Your site administrator has not configured an Account Name Reminder email template.  Please contact the site administrator for help.";				
+							return Json(new { Title = "Recover Account", Message = "Your site administrator has not configured an Account Name Reminder email template.  Please contact the site administrator for help.", Icon = "error" });
 						}
 					}
 				}			
@@ -150,9 +161,10 @@ namespace Nucleus.Modules.Account.Controllers
 				if (user == null)
 				{
 					Logger.LogWarning("User not found for email {viewModel.Email}.", viewModel.Email);
-					await Task.Delay(TimeSpan.FromSeconds(10));
-					return BadRequest("Invalid Email");
-				}
+          // we return a message saying that we have sent a password reset email (even though we have not), so that this function can't be used to determine whether
+          // an email address belongs to a user in the system
+          return Json(new { Title = "Password Reset", Message = "Password Reset email sent.", Icon = "alert" });
+        }
 				else
 				{
 					SiteTemplateSelections templateSelections = this.Context.Site.GetSiteTemplateSelections();
@@ -164,28 +176,37 @@ namespace Nucleus.Modules.Account.Controllers
 						{
 							await this.UserManager.SetPasswordResetToken(user);
 
-							Models.Mail.RecoveryEmailModel args = new()
-							{
-								Site = this.Context.Site ,
-								User = user.GetCensored(),
-								Url = new System.Uri(await GetLoginPageUri(), $"?token={user.Secrets.PasswordResetToken}").ToString()
-							};
+              ////Models.Mail.RecoveryEmailModel args = new()
+              ////{
+              ////	Site = this.Context.Site ,
+              ////	User = user.GetCensored(),
+              ////	Url = new System.Uri(await GetLoginPageUri(), $"?token={user.Secrets.PasswordResetToken}").ToString()
+              ////};
+              SitePages sitePages = this.Context.Site.GetSitePages();
 
-							Logger.LogTrace("Sending password reset email {templateName} to user {userId}.", template.Name, user.Id);
+              Abstractions.Models.Mail.Template.UserMailTemplateData args = new()
+              {
+                Site = this.Context.Site,
+                User = user.GetCensored(),    
+                Url = new System.Uri(await GetLoginPageUri(), $"?token={user.Secrets.PasswordResetToken}").ToString(),
+                LoginPage = sitePages.LoginPageId.HasValue ? await this.PageManager.Get(sitePages.LoginPageId.Value) : null,
+                PrivacyPage = sitePages.PrivacyPageId.HasValue ? await this.PageManager.Get(sitePages.PrivacyPageId.Value) : null,
+                TermsPage = sitePages.TermsPageId.HasValue ? await this.PageManager.Get(sitePages.TermsPageId.Value) : null
+              };
+
+              Logger.LogTrace("Sending password reset email {templateName} to user {userId}.", template.Name, user.Id);
 
 							using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
 							{
 								await mailClient.Send(template, args, viewModel.Email);
-								return Json(new { Title = "Password Reset", Message = "Password Reset email sent." });
-								//viewModel.Message = "Password Reset email sent.";
+								return Json(new { Title = "Password Reset", Message = "Password Reset email sent.", Icon = "alert" });
 							}
 						}
 					}
 					else
 					{
 						Logger.LogTrace("Not sending password reset to user {userId} because no password reset template is configured for site {siteId}.", user.Id, this.Context.Site.Id);
-						//viewModel.Message = "Your site administrator has not configured a password reset email template.  Please contact the site administrator for help.";
-						return Json(new { Title = "Password Reset", Message = "Your site administrator has not configured a password reset email template.  Please contact the site administrator for help." });
+						return Json(new { Title = "Password Reset", Message = "Your site administrator has not configured a password reset email template.  Please contact the site administrator for help.", Icon = "error" });
 					}
 				}
 			}
@@ -230,8 +251,8 @@ namespace Nucleus.Modules.Account.Controllers
 			// inputs validated, reset the password and navigate to the login page
 			user.Secrets.SetPassword(viewModel.NewPassword);
 
-			// invalidate the "used up" password reset token
-			user.Secrets.PasswordResetToken = "";
+			// invalidate the "consumed" password reset token
+			user.Secrets.PasswordResetToken = null;
 			user.Secrets.PasswordResetTokenExpiryDate = null;
 
 			await this.UserManager.SaveSecrets(user);
@@ -264,11 +285,10 @@ namespace Nucleus.Modules.Account.Controllers
 
 		private ViewModels.Recover BuildViewModel(string returnUrl)
 		{
-			return new ViewModels.Recover()
+      return new ViewModels.Recover()
 			{
 				AllowPasswordReset = this.Context.Module.ModuleSettings.Get(Models.Settings.ModuleSettingsKeys.AllowPasswordReset, true),
-				AllowUsernameRecovery = this.Context.Module.ModuleSettings.Get(Models.Settings.ModuleSettingsKeys.AllowUsernameRecovery, true),
-				ReturnUrl = returnUrl
+				AllowUsernameRecovery = this.Context.Module.ModuleSettings.Get(Models.Settings.ModuleSettingsKeys.AllowUsernameRecovery, true)
 			};
 		}
 

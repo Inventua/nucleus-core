@@ -40,39 +40,34 @@ using Nucleus.Abstractions.EventHandlers;
 
 [assembly:HostingStartup(typeof(Nucleus.Modules.Documents.Startup))]
 
-namespace Nucleus.Modules.Documents
+namespace Nucleus.Modules.Documents;
+
+public class Startup : IHostingStartup
 {
-
-  public class Startup : IHostingStartup
+  public void Configure(IWebHostBuilder builder)
   {
-    public void Configure(IWebHostBuilder builder)
+    builder.ConfigureServices((context, services) => 
     {
-      builder.ConfigureServices((context, services) => 
-      {
-        services.AddSingleton<DocumentsManager>();
-        services.AddTransient<IContentMetaDataProducer, DocumentsMetaDataProducer>();
-        services.AddDataProvider<IDocumentsDataProvider, DataProviders.DocumentsDataProvider, DataProviders.DocumentsDbContext>(context.Configuration);
+      // code which does not demonstrate event handling has been removed from this example
 
-        services.AddSingletonSystemEventHandler<MigrateEventArgs, MigrateEvent, MigrationEventHandler>();
-      });
-    }
+      services.AddSingletonSystemEventHandler<MigrateEventArgs, MigrateEvent, MigrationEventHandler>();
+    });
   }
+}
 
-  public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>
+public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>
+{
+  public Task Invoke(MigrateEventArgs item)
   {
-    public Task Invoke(MigrateEventArgs item)
+    if (item.SchemaName == "Nucleus.Modules.Documents")
     {
-      if (item.SchemaName == "Nucleus.Modules.Documents")
+      if (item.ToVersion == new System.Version(1,0,0))
       {
-        if (item.ToVersion == new System.Version(1,0,0))
-        {
-
-        }
-        // no implementation.  
-        // This is a test and example of how you would execute code after a db schema migration.
+        // This is an example of how you would execute code after a db schema migration.
+        // There is no implementation in this example - you would add your code to implement event handling here. 
       }
-      return Task.CompletedTask;
     }
+    return Task.CompletedTask;
   }
 }
 ```

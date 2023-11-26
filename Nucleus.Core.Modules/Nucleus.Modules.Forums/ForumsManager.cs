@@ -98,7 +98,6 @@ namespace Nucleus.Modules.Forums
 					}
 					return forum;
 				}
-
 			});
 		}
 
@@ -146,13 +145,20 @@ namespace Nucleus.Modules.Forums
 		/// </summary>
 		/// <param name="site"></param>
 		/// <returns></returns>
-		public async Task<IList<Forum>> List(Group group)
+		public async Task<List<Forum>> List(Group group)
 		{
+      List<Forum> results = new();
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				return await provider.ListForums(group);
-			}
-		}
+        foreach (Guid forumId in await provider.ListForums(group))
+        {
+          results.Add(await this.Get(forumId));
+        }
+      }
+
+      return results;
+
+    }
 
 		/// <summary>
 		/// List all moderator users for the specified forum.
@@ -354,7 +360,7 @@ namespace Nucleus.Modules.Forums
 
 			if (post.Id == Guid.Empty)
 			{
-				if (!forum.EffectiveSettings().IsModerated || user?.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_MODERATE) == true)
+				if (!forum.EffectiveSettings().IsModerated || user?.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_UNMODERATED) == true)
 				{
 					post.IsApproved = true;
 				}
@@ -516,7 +522,7 @@ namespace Nucleus.Modules.Forums
 				if (reply.Id == Guid.Empty)
 				{
 					Models.Forum forum = await provider.GetForum(post.ForumId);
-					reply.IsApproved = !forum.EffectiveSettings().IsModerated || user?.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_MODERATE) == true;
+					reply.IsApproved = !forum.EffectiveSettings().IsModerated || user?.HasPermission(site, forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions, ForumsManager.PermissionScopes.FORUM_UNMODERATED) == true;
 				}
 
 				// List attachments before save, so we can compare to the reply, to delete files for removed attachments
@@ -637,23 +643,73 @@ namespace Nucleus.Modules.Forums
 			return results;
 		}
 
-		/// <summary>
-		/// Subscribe the specifed user to the specified <see cref="Forum"/>.
-		/// </summary>
-		/// <param name="Forum"></param>
-		public async Task Subscribe(Forum forum, ClaimsPrincipal user)
+
+    /// <summary>
+    /// Subscribe the specifed user to the specified <see cref="Group"/>.
+    /// </summary>
+    /// <param name="Group"></param>
+    public async Task Subscribe(Group group, ClaimsPrincipal user)
+    {
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        await provider.SubscribeForumGroup(group.Id, await this.UserManager.Get(user.GetUserId()));
+      }
+    }
+
+    /// <summary>
+    /// Update the notification frequency for the subscription for the specified <see cref="Group"/>.
+    /// </summary>
+    /// <param name="Group"></param>
+    public async Task UpdateNotificationFrequency(Group group, ClaimsPrincipal user, NotificationFrequency frequency)
+    {
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        await provider.UpdateForumGroupSubscriptionNotificationFrequency(group.Id, await this.UserManager.Get(user.GetUserId()), frequency);
+      }
+    }
+
+    /// <summary>
+    /// Un-subscribe the specifed user from the specified <see cref="Group"/>.
+    /// </summary>
+    /// <param name="Group"></param>
+    public async Task UnSubscribe(Group group, ClaimsPrincipal user)
+    {
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        await provider.UnSubscribeForumGroup(group.Id, user.GetUserId());
+      }
+    }
+
+    /// <summary>
+    /// Subscribe the specifed user to the specified <see cref="Forum"/>.
+    /// </summary>
+    /// <param name="Forum"></param>
+    public async Task Subscribe(Forum forum, ClaimsPrincipal user)
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				await provider.SubscribeForum(forum.Id, user.GetUserId());
+				await provider.SubscribeForum(forum.Id, await this.UserManager.Get(user.GetUserId()));
 			}
 		}
 
-		/// <summary>
-		/// Un-subscribe the specifed user from the specified <see cref="Forum"/>.
-		/// </summary>
-		/// <param name="Forum"></param>
-		public async Task UnSubscribe(Forum forum, ClaimsPrincipal user)
+    /// <summary>
+    /// Update the notification frequency for the subscription for the specified <see cref="Group"/>.
+    /// </summary>
+    /// <param name="Forum"></param>
+    public async Task UpdateNotificationFrequency(Forum forum, ClaimsPrincipal user, NotificationFrequency frequency)
+    {
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        await provider.UpdateForumSubscriptionNotificationFrequency(forum.Id, await this.UserManager.Get(user.GetUserId()), frequency);
+      }
+    }
+
+
+    /// <summary>
+    /// Un-subscribe the specifed user from the specified <see cref="Forum"/>.
+    /// </summary>
+    /// <param name="Forum"></param>
+    public async Task UnSubscribe(Forum forum, ClaimsPrincipal user)
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
@@ -669,7 +725,7 @@ namespace Nucleus.Modules.Forums
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				await provider.SubscribeForumPost(post.Id, user.GetUserId());
+        await provider.SubscribeForumPost(post.Id, await this.UserManager.Get(user.GetUserId()));
 			}
 		}
 
@@ -681,8 +737,8 @@ namespace Nucleus.Modules.Forums
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				await provider.UnSubscribeForumPost(post.Id, user.GetUserId());
-			}
+        await provider.UnSubscribeForumPost(post.Id, await this.UserManager.Get(user.GetUserId()));
+      }
 		}
 
 		/// <summary>
@@ -699,12 +755,39 @@ namespace Nucleus.Modules.Forums
 			}
 		}
 
-		/// <summary>
-		/// Retrieve a list of users who are subscribed to the specified forum.
+    /// <summary>
+		/// Retrieve an existing <see cref="ForumGroupSubscription"/> from the database, or return null if there is no matching record.
 		/// </summary>
 		/// <param name="forum"></param>
+		/// <param name="user"></param>
 		/// <returns></returns>
-		public async Task<List<User>> ListForumSubscribers(Guid forumId)
+		public async Task<ForumGroupSubscription> GetSubscription(Group group, ClaimsPrincipal user)
+    {
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        return await provider.GetForumGroupSubscription(group.Id, user.GetUserId());
+      }
+    }
+
+    /// <summary>
+		/// Retrieve a list of users who are subscribed to the specified forum group.
+		/// </summary>
+		/// <param name="groupId"></param>
+		/// <returns></returns>
+		public async Task<List<ForumGroupSubscription>> ListForumGroupSubscribers(Guid groupId)
+    {
+      using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
+      {
+        return await provider.ListForumGroupSubscribers(groupId);
+      }
+    }
+
+    /// <summary>
+    /// Retrieve a list of users who are subscribed to the specified forum.
+    /// </summary>
+    /// <param name="forum"></param>
+    /// <returns></returns>
+    public async Task<List<ForumSubscription>> ListForumSubscribers(Guid forumId)
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
@@ -718,7 +801,7 @@ namespace Nucleus.Modules.Forums
 		/// <param name="forum"></param>
 		/// <param name="user"></param>
 		/// <returns></returns>
-		public async Task<List<User>> ListPostSubscribers(Guid postId)
+		public async Task<List<PostSubscription>> ListPostSubscribers(Guid postId)
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
@@ -780,11 +863,11 @@ namespace Nucleus.Modules.Forums
 			}
 		}
 
-		public async Task<IList<MailQueue>> ListMailQueue()
+		public async Task<IList<MailQueue>> ListMailQueue(NotificationFrequency frequency)
 		{
 			using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 			{
-				return await provider.ListMailQueue();
+				return await provider.ListMailQueue(frequency);
 			}
 		}
 
@@ -811,6 +894,20 @@ namespace Nucleus.Modules.Forums
 				return await provider.ListUserSubscriptions(user.GetUserId());
 			}
 		}
+
+
+    public Boolean HasPermission(User user, Forum forum, string scope)
+    {
+      foreach (Permission permission in forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions)
+      {
+        if (permission.PermissionType.Scope == scope && permission.AllowAccess)
+        {
+          return user.Roles.Where(role => role.Id == permission.Role.Id).Any();
+        }
+      }
+
+      return false;
+    }
 
     private void CheckAndCreatePermissions()
     {

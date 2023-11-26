@@ -27,5 +27,13 @@ namespace Nucleus.Abstractions.Search
 		/// number of available results and is used by paging controls.
 		/// </remarks>
 		public long Total { get; set; }
-	}
+
+    /// <summary>
+		/// Highest score for any search result.
+		/// </summary>
+		/// <remarks>
+		/// This value can be compared with the <seealso cref="SearchResult.Score"/> of each search result to determine how well the result matches the search query."/>
+		/// </remarks>
+		public double? MaxScore { get; set; }
+  }
 }

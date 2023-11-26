@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
-using Nucleus.Extensions;
 using System.Threading.Tasks;
+using Nucleus.Abstractions.Search;
 
 namespace Nucleus.Extensions.ElasticSearch.Controllers
 {
@@ -15,11 +15,13 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 		private Context Context { get; }
 
 		private ISiteManager SiteManager { get; }
+    private ISearchIndexHistoryManager SearchIndexHistoryManager { get; }
 
-		public SettingsController(Context context, ISiteManager siteManager)
+    public SettingsController(Context context, ISiteManager siteManager, ISearchIndexHistoryManager searchIndexHistoryManager)
 		{
 			this.Context = context;
 			this.SiteManager = siteManager;
+      this.SearchIndexHistoryManager = searchIndexHistoryManager;
 		}			
 
 		[HttpGet]
@@ -50,8 +52,9 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_SERVER_CERTIFICATE_THUMBPRINT, viewModel.CertificateThumbprint);
 
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_ATTACHMENT_MAXSIZE, viewModel.AttachmentMaxSize);
+      this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_INDEXING_PAUSE, viewModel.IndexingPause);
 
-			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_TITLE, viewModel.Boost.Title);
+      this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_TITLE, viewModel.Boost.Title);
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_SUMMARY, viewModel.Boost.Summary);
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_CATEGORIES, viewModel.Boost.Categories);
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_KEYWORDS, viewModel.Boost.Keywords);
@@ -62,7 +65,9 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_ATTACHMENT_NAME, viewModel.Boost.AttachmentName);
 			this.Context.Site.SiteSettings.TrySetValue(ConfigSettings.SITESETTING_BOOST_ATTACHMENT_TITLE, viewModel.Boost.AttachmentTitle);
 
-			this.SiteManager.Save(this.Context.Site);
+      
+
+      this.SiteManager.Save(this.Context.Site);
 			
 			return Ok();
 		}
@@ -75,7 +80,7 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 
 			long indexCount = await request.CountIndex();
 
-			return Json(new { Title = "Index Count", Message = $"There are {indexCount} entries in the index." });			
+			return Json(new { Title = "Index Count", Message = $"There are {indexCount} entries in the index.", Icon = "alert" });			
 		}
 
 		private string GetPassword(ViewModels.Settings viewModel)
@@ -97,13 +102,14 @@ namespace Nucleus.Extensions.ElasticSearch.Controllers
 		{
 			ElasticSearchRequest request = new(new System.Uri(viewModel.ServerUrl), viewModel.IndexName, viewModel.Username, GetPassword(viewModel), viewModel.CertificateThumbprint);
 
-			if (await request.DeleteIndex())
+      if (await request.DeleteIndex())
 			{
-				return Json(new { Title = "Clear Index", Message = $"Index {viewModel.IndexName} has been removed and will be re-created the next time the search index feeder runs." });
+        await this.SearchIndexHistoryManager.Delete(this.Context.Site.Id);
+				return Json(new { Title = "Clear Index", Message = $"Index '{viewModel.IndexName}' has been removed and will be re-created the next time the search index feeder runs.", Icon = "alert" });
 			}
 			else
 			{
-				return Json(new { Title = "Clear Index", Message = $"Index {viewModel.IndexName} was not removed." });
+				return Json(new { Title = "Clear Index", Message = $"Index '{viewModel.IndexName}' was not removed.", Icon = "error" });
 			}
 		}
 

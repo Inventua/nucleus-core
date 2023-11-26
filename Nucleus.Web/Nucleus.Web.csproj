@@ -12,8 +12,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.6" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="6.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="7.0.13" />
   </ItemGroup>
 	
 	<PropertyGroup>
@@ -37,9 +39,13 @@
 		<Compile Remove="Extensions\**" />
 		<Compile Remove="logs\**" />
 		<Compile Remove="publish\**" />
+		<Compile Remove="_OLD-AmazonS3FileSystemProvider\**" />
+		<Compile Remove="_OLD-AzureBlobStorageFileSystemProvider\**" />
 		<Content Remove="Extensions\**" />
 		<Content Remove="logs\**" />
 		<Content Remove="publish\**" />
+		<Content Remove="_OLD-AmazonS3FileSystemProvider\**" />
+		<Content Remove="_OLD-AzureBlobStorageFileSystemProvider\**" />
 		<Content Remove="appSettings.Linux.json" />
 		<Content Remove="bundleconfig.json" />
 		<Content Remove="iis-dev\**\*" />
@@ -48,12 +54,16 @@
 		<EmbeddedResource Remove="Extensions\**" />
 		<EmbeddedResource Remove="logs\**" />
 		<EmbeddedResource Remove="publish\**" />
+		<EmbeddedResource Remove="_OLD-AmazonS3FileSystemProvider\**" />
+		<EmbeddedResource Remove="_OLD-AzureBlobStorageFileSystemProvider\**" />
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
 		<None Remove="Extensions\**" />
 		<None Remove="logs\**" />
 		<None Remove="publish\**" />
 		<None Remove="Setup\Extensions\**" />
+		<None Remove="_OLD-AmazonS3FileSystemProvider\**" />
+		<None Remove="_OLD-AzureBlobStorageFileSystemProvider\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -88,6 +98,7 @@
 	  <None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.min.css" />
 	  <None Remove="Resources\material-icons.woff2" />
 	  <None Remove="Setup\Templates\Site\default-site-template.xml" />
+	  <None Remove="Setup\Templates\Site\empty-site-template.xml" />
 	  <None Remove="Shared\Containers\default.css" />
 	  <None Remove="Shared\Containers\default.min.css" />
 	  <None Remove="Shared\Controls\Views\PagingControl.css" />
@@ -104,7 +115,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Include="Areas\Setup\Views\SiteWizard\index.js" />
+	  <Content Include="Areas\Setup\Views\SiteWizard\index.js">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	  <Content Include="Resources\js\nucleus-admin-extensions.js" />
 	  <Content Include="Resources\js\nucleus-admin-extensions.min.js" />
 	  <Content Include="Areas\Setup\Views\SiteWizard\Complete.js">
@@ -143,6 +156,9 @@
 	  <Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.css" />
 	  <Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.min.css" />
 	  <Content Include="Resources\material-icons.woff2" />
+	  <Content Include="Setup\Templates\Site\empty-site-template.xml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	  <Content Include="Setup\Templates\Site\default-site-template.xml">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>

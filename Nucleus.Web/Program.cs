@@ -11,8 +11,6 @@ using Microsoft.Extensions.Options;
 using System.IO;
 using Nucleus.Core.Plugins;
 using Nucleus.Core.Logging;
-using DocumentFormat.OpenXml.Wordprocessing;
-using Org.BouncyCastle.Tls;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models.Configuration;
 using System.Threading.Tasks;

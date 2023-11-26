@@ -25,18 +25,36 @@ namespace Nucleus.Core.Managers
 			this.DataProviderFactory = dataProviderFactory;
 		}
 
-		/// <summary>
+    /// <summary>
 		/// Create a new <see cref="PageModule"/> with default settings.
 		/// </summary>
 		/// <param name="site"></param>
+    /// <param name="page"></param>
 		/// <returns></returns>
 		/// <remarks>
 		/// This method does not save the new <see cref="PageModule"/> unless you call <see cref="Save(Page, PageModule)"/>.
 		/// </remarks>
-		public Task<PageModule> CreateNew(Site site)
-		{
-			PageModule result = new();
+    [Obsolete(message: "Use CreateNew(site, page) instead")]
+    public Task<PageModule> CreateNew(Site site)
+    {
+      PageModule result = new();
 
+      return Task.FromResult(result);
+    }
+
+    /// <summary>
+    /// Create a new <see cref="PageModule"/> with default settings.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <param name="page"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// This method does not save the new <see cref="PageModule"/> unless you call <see cref="Save(Page, PageModule)"/>.
+    /// </remarks>
+    public Task<PageModule> CreateNew(Site site, Page page)
+		{
+			PageModule result = new() { PageId = page?.Id ?? Guid.Empty};
+      
 			return Task.FromResult(result);
 		}
 
@@ -98,20 +116,38 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
-		/// <summary>
-		/// Save permissions for the specified <see cref="PageModule"/>.
-		/// </summary>
-		/// <param name="module"></param>
-		public async Task SavePermissions(PageModule module)
-		{			
-			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+    /// <summary>
+    /// Save permissions for the specified <see cref="PageModule"/>.
+    /// </summary>
+    /// <param name="module"></param>
+    [Obsolete(message: "Use SavePermissions(page, module) instead.")]
+    public async Task SavePermissions(PageModule module)
+    {
+      using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+      {
+        List<Permission> originalPermissions = await provider.ListPermissions(module.Id, PageModule.URN);
+
+        await provider.SavePermissions(module.Id, module.Permissions, originalPermissions);
+      }
+
+      InvalidateCache(new() { Id = module.PageId }, module);
+    }
+
+    /// <summary>
+    /// Save permissions for the specified <see cref="PageModule"/>.
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="module"></param>
+    public async Task SavePermissions(Page page, PageModule module)
+		{
+      using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
 			{
 				List<Permission> originalPermissions = await provider.ListPermissions(module.Id, PageModule.URN);
-
+        
 				await provider.SavePermissions(module.Id, module.Permissions, originalPermissions);
 			}
 
-			InvalidateCache(module);
+			InvalidateCache(page, module);
 		}
 
 		/// <summary>
@@ -155,6 +191,9 @@ namespace Nucleus.Core.Managers
 		/// </summary>
 		/// <param name="page"></param>
 		/// <param name="module"></param>
+    /// <remarks>
+    /// This method does not save module permissions.
+    /// </remarks>
 		public async Task Save(Page page, PageModule module)
 		{
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
@@ -162,7 +201,7 @@ namespace Nucleus.Core.Managers
 				await provider.SavePageModule(page.Id, module);
 			}
 
-			InvalidateCache(module);
+      InvalidateCache(page, module);
 		}
 
     /// <summary>
@@ -202,21 +241,32 @@ namespace Nucleus.Core.Managers
         await CheckNumbering(page.Id, modules);
       }
 
-      InvalidateCache(module);
+      InvalidateCache(page, module);
     }
 
+    public async Task SaveSettings(PageModule module)
+    {
+      using (DataProviders.ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+			{
+				await provider.SavePageModuleSettings(module.Id, module.ModuleSettings);
+      }
+
+			InvalidateCache(new() { Id = module.PageId}, module);    
+    }
+    
     /// <summary>
     /// Save the settings for the specified <see cref="PageModule"/>.
     /// </summary>
+    /// <param name="page"></param>
     /// <param name="module"></param>
-    public async Task SaveSettings(PageModule module)
+    public async Task SaveSettings(Page page, PageModule module)
 		{
 			using (DataProviders.ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
 				await provider.SavePageModuleSettings(module.Id, module.ModuleSettings);
-			}
+      }
 
-			InvalidateCache(module);
+			InvalidateCache(page, module);
 		}
 
 		/// <summary>
@@ -263,16 +313,16 @@ namespace Nucleus.Core.Managers
 		/// <summary>
 		/// Update the <see cref="PageModule.SortOrder"/> of the page module specifed by id by swapping it with the next-highest <see cref="PageModule.SortOrder"/>.
 		/// </summary>
-		/// <param name="id"></param>
-		public async Task MoveDown(Guid id)
+    /// <param name="page"></param>
+		/// <param name="moduleId"></param>
+		public async Task MoveDown(Page page, Guid moduleId)
 		{
 			PageModule previousModule = null;
 			PageModule thisModule = null;
-			//Guid pageId;
-
+			
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
-				thisModule = await this.Get(id);
+				thisModule = await this.Get(moduleId);
 				
 				List<PageModule> modules = (await provider.ListPageModules(thisModule.PageId)).Where(module => module.Pane == thisModule.Pane).ToList(); ;
 				await CheckNumbering(thisModule.PageId, modules);
@@ -281,7 +331,7 @@ namespace Nucleus.Core.Managers
 
 				foreach (PageModule module in modules)
 				{
-					if (module.Id == id)
+					if (module.Id == moduleId)
 					{
 						if (previousModule != null)
 						{
@@ -293,7 +343,7 @@ namespace Nucleus.Core.Managers
 							await provider.SavePageModule(thisModule.PageId, module);
 
 							this.CacheManager.PageModuleCache().Remove(previousModule.Id);
-							InvalidateCache(module);
+							InvalidateCache(page, module);
 							break;
 						}
 					}
@@ -308,22 +358,23 @@ namespace Nucleus.Core.Managers
 		/// <summary>
 		/// Update the <see cref="PageModule.SortOrder"/> of the page module specifed by id by swapping it with the previous <see cref="PageModule.SortOrder"/>.
 		/// </summary>
-		/// <param name="id"></param>
-		public async Task MoveUp(Guid id)
+    /// <param name="page"></param>
+		/// <param name="moduleId"></param>
+		public async Task MoveUp(Page page, Guid moduleId)
 		{
 			PageModule previousModule = null;
 			PageModule thisModule = null;
 
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
-				thisModule = await provider.GetPageModule(id);
+				thisModule = await provider.GetPageModule(moduleId);
 
 				List<PageModule> modules = (await provider.ListPageModules(thisModule.PageId)).Where(module => module.Pane == thisModule.Pane).ToList(); ;
 				await CheckNumbering(thisModule.PageId, modules);
 
 				foreach (PageModule module in modules)
 				{
-					if (module.Id == id)
+					if (module.Id == moduleId)
 					{
 						if (previousModule != null)
 						{
@@ -335,7 +386,7 @@ namespace Nucleus.Core.Managers
 							await provider.SavePageModule(thisModule.PageId, module);
 							
 							this.CacheManager.PageModuleCache().Remove(previousModule.Id);
-							InvalidateCache(module);
+							InvalidateCache(page, module);
 							break;
 						}
 					}
@@ -366,16 +417,16 @@ namespace Nucleus.Core.Managers
 
 					await provider.DeletePageModule(module);
 
-					InvalidateCache(module);
+					InvalidateCache(new() { Id = module.PageId  }, module);
 				}			
 			}
 		}
 
-		private void InvalidateCache(PageModule module)
+		private void InvalidateCache(Page page, PageModule module)
     {
 			this.CacheManager.PageModuleCache().Remove(module.Id);
 			// Modules are cached as part of their parent page, so we have invalidate the cache for the page
-			this.CacheManager.PageCache().Remove(module.PageId);
+			this.CacheManager.PageCache().Remove(page.Id);
 			this.CacheManager.PageRouteCache().Clear();
 		}
 	}

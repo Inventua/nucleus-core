@@ -17,6 +17,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models.Paging;
 using Nucleus.Extensions;
+using Nucleus.Extensions.Authorization;
+using Nucleus.Abstractions.Search;
+using Org.BouncyCastle.Utilities.Collections;
 
 namespace Nucleus.Core.DataProviders
 {
@@ -26,7 +29,7 @@ namespace Nucleus.Core.DataProviders
 	/// <remarks>
 	/// This class implements all of the data provider interfaces for use with entity framework.  
 	/// </remarks>
-	public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayoutDataProvider, IUserDataProvider, IPermissionsDataProvider, ISessionDataProvider, IMailDataProvider, IScheduledTaskDataProvider, IFileSystemDataProvider, IListDataProvider, IContentDataProvider, IApiKeyDataProvider, IOrganizationDataProvider, IExtensionsStoreDataProvider
+	public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayoutDataProvider, IUserDataProvider, IPermissionsDataProvider, ISessionDataProvider, IMailDataProvider, IScheduledTaskDataProvider, IFileSystemDataProvider, IListDataProvider, IContentDataProvider, IApiKeyDataProvider, IOrganizationDataProvider, IExtensionsStoreDataProvider, ISearchIndexHistoryDataProvider
   {
 		protected IEventDispatcher EventManager { get; }
 		protected new CoreDataProviderDbContext Context { get; }
@@ -466,41 +469,42 @@ namespace Nucleus.Core.DataProviders
 			return results;
 		}
 
-		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> SearchPages(Guid siteId, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
-		{
-			List<Page> results;
+    public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> SearchPages(Site site, string searchTerm, IEnumerable<Role> userRoles, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+    {
+      List<Page> results;
+      IEnumerable<Guid> userRoleIds = userRoles?.Select(role => role.Id);
 
-			pagingSettings.TotalCount = await this.Context.Pages.Where(page =>
-				page.SiteId == siteId &&
-					(
-						EF.Functions.Like(page.Name, $"%{searchTerm}%") ||
-						EF.Functions.Like(page.Title, $"%{searchTerm}%") ||
-						EF.Functions.Like(page.Description, $"%{searchTerm}%") ||
-						EF.Functions.Like(page.Keywords, $"%{searchTerm}%")
-					)
-				)
+      var query = this.Context.Pages.Where(page =>
+        page.SiteId == site.Id &&
+          (
+            EF.Functions.Like(page.Name, $"%{searchTerm}%") ||
+            EF.Functions.Like(page.Title, $"%{searchTerm}%") ||
+            EF.Functions.Like(page.Description, $"%{searchTerm}%") ||
+            EF.Functions.Like(page.Keywords, $"%{searchTerm}%")
+          )
+          &&
+          (
+            userRoleIds == null 
+            ||
+            page.Permissions.Where(permission => permission.AllowAccess && userRoleIds.Contains(permission.Role.Id)).Any()
+          )
+        );
+			
+      pagingSettings.TotalCount = await query
 				.CountAsync();
 
-			results = await this.Context.Pages.Where(page =>
-				page.SiteId == siteId &&
-					(
-						EF.Functions.Like(page.Name, $"%{searchTerm}%") ||
-						EF.Functions.Like(page.Title, $"%{searchTerm}%") ||
-						EF.Functions.Like(page.Description, $"%{searchTerm}%") ||
-						EF.Functions.Like(page.Keywords, $"%{searchTerm}%")
-					)
-				)
-				.Include(page => page.LayoutDefinition)
+			results = await query
+        .Include(page => page.LayoutDefinition)
 				.Include(page => page.DefaultContainerDefinition)
 				.Include(page => page.Modules)
-				.Include(page => page.Routes)
+        .Include(page => page.Routes)
 				.OrderBy(page => page.SortOrder)
 				.Skip(pagingSettings.FirstRowIndex)
 				.Take(pagingSettings.PageSize)
 				.AsSplitQuery()
 				.AsNoTracking()
 				.ToListAsync();
-
+      
 			return new Nucleus.Abstractions.Models.Paging.PagedResult<Page>(pagingSettings, results);
 		}
 
@@ -792,8 +796,15 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task DeletePageModule(PageModule module)
 		{
-			this.Context.Remove(module);
-			await this.Context.SaveChangesAsync<PageModule>();
+      PageModule existing = await this.Context.PageModules
+       .Where(existing => existing.Id == module.Id)
+       .FirstOrDefaultAsync();
+
+      if (existing != null)
+      {
+        this.Context.Remove(existing);
+        await this.Context.SaveChangesAsync<PageModule>();
+      }
 
 			this.EventManager.RaiseEvent<PageModule, Delete>(module);
 		}
@@ -815,21 +826,29 @@ namespace Nucleus.Core.DataProviders
 				module.SortOrder = await GetLastPageModuleSortOrder(pageId) + 10;
 			}
 
+      // use AttachClone to create a shallow copy, and use the clone to update the database.  This is because Entity Framework
+      // has trouble with the Permissions collection, because there can be more than one permission with the same Role.
+      PageModule clone = this.Context.AttachClone<PageModule>(module);
+      this.Context.Entry(clone).Property("PageId").CurrentValue = pageId;
+      clone.ModuleDefinition = module.ModuleDefinition;
+      clone.ContainerDefinition = module.ContainerDefinition;
+
       if (existing == null)
       {
-        this.Context.Attach(module);
-        this.Context.Entry(module).Property("PageId").CurrentValue = pageId;
-        this.Context.Entry(module).State = EntityState.Added;
+        ////  this.Context.Attach(module);
+        ////  this.Context.Entry(module).Property("PageId").CurrentValue = pageId;
+        this.Context.Entry(clone).State = EntityState.Added;
       }
       else
       {
-        this.Context.Entry(existing).CurrentValues.SetValues(module);
-        this.Context.Entry(existing).Property("PageId").CurrentValue = pageId;
-        this.Context.Entry(existing).State = EntityState.Modified;
+        ////  this.Context.Entry(existing).CurrentValues.SetValues(module);
+        ////  this.Context.Entry(existing).Property("PageId").CurrentValue = pageId;
+        this.Context.Entry(clone).State = EntityState.Modified;
       }
-      
-			//this.Context.Entry(module).State = isNew ? EntityState.Added : EntityState.Modified;
-			await this.Context.SaveChangesAsync<PageModule>();
+
+      //this.Context.Entry(module).State = isNew ? EntityState.Added : EntityState.Modified;
+      await this.Context.SaveChangesAsync<PageModule>();
+      module.Id = clone.Id;
 
 			this.Context.ChangeTracker.Clear();
 			await SavePageModuleSettings(module.Id, module.ModuleSettings);
@@ -1047,9 +1066,35 @@ namespace Nucleus.Core.DataProviders
 				.ToListAsync();
 
 			return new Nucleus.Abstractions.Models.Paging.PagedResult<User>(pagingSettings, results);
-		}
+    }
 
-		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> SearchUsers(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+    public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListUsers(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings, Expression<Func<User, bool>> filterExpression)
+    {
+      List<User> results;
+
+      var query = this.Context.Users
+        .Where(user => user.IsSystemAdministrator == false && user.SiteId == site.Id)
+        .Where(filterExpression);
+
+      pagingSettings.TotalCount = await query
+        .CountAsync();
+
+      results = await query
+        .Include(user => user.Roles)
+          .ThenInclude(role => role.RoleGroup)
+        .Include(user => user.Profile)
+          .ThenInclude(profilevalue => profilevalue.UserProfileProperty)
+        .OrderBy(user => user.UserName)
+        .Skip(pagingSettings.FirstRowIndex)
+        .Take(pagingSettings.PageSize)
+        .AsSplitQuery()
+        .AsNoTracking()
+        .ToListAsync();
+
+      return new Nucleus.Abstractions.Models.Paging.PagedResult<User>(pagingSettings, results);
+    }    
+
+    public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> SearchUsers(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
 		{
 			List<User> results;
 
@@ -1079,10 +1124,37 @@ namespace Nucleus.Core.DataProviders
 				.ToListAsync();
 
 			return new Nucleus.Abstractions.Models.Paging.PagedResult<User>(pagingSettings, results);
-		}
+    }
 
+    public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> SearchUsers(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings, Expression<Func<User, bool>> filterExpression)
+    {
+      List<User> results;
+      var query = this.Context.Users
+        .Where(filterExpression)
+        .Where(user => user.SiteId == site.Id &&
+          (
+            EF.Functions.Like(user.UserName, $"%{searchTerm}%")
+          )
+        );
 
-		public async Task<User> GetUserByName(Site site, string userName)
+      pagingSettings.TotalCount = await query.CountAsync();
+
+      results = await query
+        .Include(user => user.Roles)
+          .ThenInclude(role => role.RoleGroup)
+        .Include(user => user.Profile)
+          .ThenInclude(profilevalue => profilevalue.UserProfileProperty)
+        .OrderBy(user => user.UserName)
+        .Skip(pagingSettings.FirstRowIndex)
+        .Take(pagingSettings.PageSize)
+        .AsSplitQuery()
+        .AsNoTracking()
+        .ToListAsync();
+
+      return new Nucleus.Abstractions.Models.Paging.PagedResult<User>(pagingSettings, results);
+    }
+    
+    public async Task<User> GetUserByName(Site site, string userName)
 		{
 			return await this.Context.Users
 				.Where(user => user.SiteId == site.Id && user.UserName == userName)
@@ -1467,26 +1539,30 @@ namespace Nucleus.Core.DataProviders
 			raiseEvent.Invoke();
 		}
 
-		public async Task DeleteRole(Role role)
-		{
-			using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await this.Context.Database.BeginTransactionAsync();
+    public async Task DeleteRole(Role role)
+    {
+      var strategy = this.Context.Database.CreateExecutionStrategy();
+      await strategy.ExecuteAsync(async () =>
+      {
+        using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await this.Context.Database.BeginTransactionAsync();
 
-			try
-			{
-				await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM UserRoles WHERE RoleId={role.Id}");
-				await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM Permissions WHERE RoleId={role.Id}");
+        try
+        {
+          await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM UserRoles WHERE RoleId={role.Id}");
+          await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM Permissions WHERE RoleId={role.Id}");
 
-				this.Context.Remove(role);
-				await this.Context.SaveChangesAsync();
+          this.Context.Remove(role);
+          await this.Context.SaveChangesAsync();
 
-				transaction.Commit();
-			}
-			catch (Exception)
-			{
-				transaction.Rollback();
-				throw;
-			}
-		}
+          transaction.Commit();
+        }
+        catch (Exception)
+        {
+          transaction.Rollback();
+          throw;
+        }
+      });
+    }
 
 		#endregion
 
@@ -1615,16 +1691,14 @@ namespace Nucleus.Core.DataProviders
 			foreach (Permission newPermission in newPermissions.Where(permission => permission.PermissionType.Scope != PermissionType.PermissionScopeNamespaces.Disabled))
 			{
 				Permission existing = existingPermissions
-          .Where(existing => existing.Id == newPermission.Id || (existing.Role.Id == newPermission.Role.Id && existing.PermissionType.Id == newPermission.PermissionType.Id))
+          .Where(existing => (existing.Id != Guid.Empty && existing.Id == newPermission.Id) || (existing.Role.Id == newPermission.Role.Id && existing.PermissionType.Id == newPermission.PermissionType.Id))
           .FirstOrDefault();
                 
         if (existing == null)
 				{
 					newPermission.RelatedId = relatedId;
-
-					this.Context.Set<Permission>().Attach(newPermission);
-					this.Context.Entry(newPermission).State = EntityState.Added;
-
+          this.Context.Permissions.Add(newPermission);
+					
 					this.Context.Entry(newPermission.Role).State = EntityState.Detached;
 					if (newPermission.Role.RoleGroup != null)
 					{
@@ -1635,9 +1709,9 @@ namespace Nucleus.Core.DataProviders
 				else
 				{
 					existing.AllowAccess = newPermission.AllowAccess;
-					this.Context.Set<Permission>().Attach(existing);
-					this.Context.Entry(existing).State = EntityState.Modified;
-
+          existing.RelatedId = relatedId;
+          this.Context.Permissions.Update(existing);
+         
 					if (existing.Role != null)
 					{
 						this.Context.Entry(existing.Role).State = EntityState.Detached;
@@ -1651,9 +1725,9 @@ namespace Nucleus.Core.DataProviders
 						this.Context.Entry(existing.PermissionType).State = EntityState.Detached;
 					}
 				}
-
-				await this.Context.SaveChangesAsync<Permission>();
 			}
+			
+      await this.Context.SaveChangesAsync<Permission>();
 		}
 
 		#endregion
@@ -1854,6 +1928,7 @@ namespace Nucleus.Core.DataProviders
 		public async Task<List<LayoutDefinition>> ListLayoutDefinitions()
 		{
 			return await this.Context.LayoutDefinitions
+        .OrderBy(layout => layout.FriendlyName)
 				.AsNoTracking()
 				.ToListAsync();
 		}
@@ -1904,8 +1979,8 @@ namespace Nucleus.Core.DataProviders
 		public async Task<List<ContainerDefinition>> ListContainerDefinitions()
 		{
 			return await this.Context.ContainerDefinitions
-				.AsNoTracking()
 				.OrderBy(container => container.FriendlyName)
+				.AsNoTracking()
 				.ToListAsync();
 		}
 
@@ -2127,8 +2202,15 @@ namespace Nucleus.Core.DataProviders
 
 		public async Task DeleteScheduledTaskHistory(ScheduledTaskHistory history)
 		{
-			this.Context.ScheduledTaskHistory.Remove(history);
-			await this.Context.SaveChangesAsync<ScheduledTaskHistory>();
+      ScheduledTaskHistory existing = await this.Context.ScheduledTaskHistory
+        .Where(hist => hist.Id == history.Id)
+        .FirstOrDefaultAsync();
+
+      if (existing != null)
+      {
+        this.Context.ScheduledTaskHistory.Remove(existing);
+        await this.Context.SaveChangesAsync<ScheduledTaskHistory>();
+      }
 		}
 
 		#endregion
@@ -2156,7 +2238,15 @@ namespace Nucleus.Core.DataProviders
 				.FirstOrDefaultAsync();
 		}
 
-		public async Task<Folder> SaveFolder(Site site, Folder folder)
+    public async Task<List<Folder>> ListFolders(Site site, string provider, string path)
+    {
+      return await this.Context.Folders
+        .Where(folder => EF.Property<Guid>(folder, "SiteId") == site.Id && folder.Provider == provider && folder.Path.StartsWith(path))
+        .AsNoTracking()
+        .ToListAsync();
+    }
+
+    public async Task<Folder> SaveFolder(Site site, Folder folder)
 		{
 			Boolean isNew = !this.Context.Folders.Where(existing => existing.Id == folder.Id).Any();
 
@@ -2190,10 +2280,20 @@ namespace Nucleus.Core.DataProviders
 			return await this.Context.Files
 				.Where(file => file.Id == fileId)
 				.AsNoTracking()
-				.FirstOrDefaultAsync();
-		}
+				.FirstOrDefaultAsync();		
+    }
 
-		public async Task<File> GetFile(Site site, string provider, string path)
+
+    public async Task<List<File>> ListFiles(Site site, string provider, string path)
+    {
+      return await this.Context.Files
+        .Where(file => EF.Property<Guid>(file, "SiteId") == site.Id && file.Provider == provider && file.Path.StartsWith(path))
+        .AsNoTracking()
+        .ToListAsync();
+    }
+
+
+    public async Task<File> GetFile(Site site, string provider, string path)
 		{
 			return await this.Context.Files
 				.Where(file => EF.Property<Guid>(file, "SiteId") == site.Id && file.Provider == provider && file.Path == path)
@@ -2737,7 +2837,54 @@ namespace Nucleus.Core.DataProviders
         .FirstOrDefaultAsync();
 
     }
+
     #endregion
+
+    #region "    Search index history    "
+    public async Task SaveSearchIndexHistory(SearchIndexHistory history)
+    {
+      SearchIndexHistory existing = await this.Context.SearchIndexHistory
+        .Where(existing => existing.SiteId == history.SiteId && existing.Scope == history.Scope && existing.SourceId == history.SourceId )
+        .FirstOrDefaultAsync();
+
+      if (existing != null)
+      {
+        existing.LastIndexedDate = history.LastIndexedDate;
+      }
+      else
+      {
+        this.Context.SearchIndexHistory.Add(history);
+      }
+
+      await this.Context.SaveChangesAsync<SearchIndexHistory>();
+    }
+
+    public async Task<SearchIndexHistory> GetSearchIndexHistory(Guid siteId, string scope, Guid sourceId)
+    {
+      return await this.Context.SearchIndexHistory
+        .Where(existing => existing.SiteId == siteId && existing.Scope == scope && existing.SourceId == sourceId)
+        .FirstOrDefaultAsync();
+    }
+
+    public async Task DeleteSearchIndexHistory(Guid siteId, string scope, Guid sourceId)
+    {
+      SearchIndexHistory existing = await this.Context.SearchIndexHistory
+        .Where(existing => existing.SiteId == siteId && existing.Scope == scope && existing.SourceId == sourceId)
+        .FirstOrDefaultAsync();
+      
+      if (existing != null)
+      {
+        this.Context.SearchIndexHistory.Remove(existing);
+        await this.Context.SaveChangesAsync<SearchIndexHistory>();
+      }
+    }
+
+    public async Task DeleteSearchIndexHistory(Guid siteId)
+    {
+      await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM SearchIndexHistory WHERE SiteId={siteId}");
+    }
+    #endregion
+
   }
 }
 

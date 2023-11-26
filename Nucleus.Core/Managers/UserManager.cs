@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Managers;
 using System.Security.Cryptography;
+using System.Linq.Expressions;
 
 namespace Nucleus.Core.Managers
 {
@@ -122,10 +123,7 @@ namespace Nucleus.Core.Managers
 					}
 				}
 
-				using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
-				{
-					await provider.SaveUserSecrets(user);
-				}
+        await this.SaveSecrets(user);        
 
 				return false;
 			}
@@ -160,8 +158,23 @@ namespace Nucleus.Core.Managers
 				{
 					await provider.SaveUserSecrets(user);
 				}
-			}
+        this.CacheManager.UserCache().Remove(user.Id);
+      }
 		}
+
+    public async Task UnlockUser(User user)
+    {
+      user.Secrets = (await this.Get(user.Id)).Secrets;
+      user.Secrets.IsLockedOut = false;
+
+      user.Secrets.FailedPasswordWindowStart = null;
+      user.Secrets.FailedPasswordAttemptCount = 0;
+
+      using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+      {
+        await provider.SaveUserSecrets(user);
+      }
+    }
 
 		public async Task SetPasswordResetToken(User user)
 		{
@@ -437,12 +450,27 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
-		/// <summary>
-		/// List all <see cref="User"/> who belong to any of the specified <see cref="Role"/>s.
+    /// <summary>
+		/// List a page of <see cref="User"/>s who belong to the specified <see cref="Site"/>.
 		/// </summary>
 		/// <param name="site"></param>
+		/// <param name="pagingSettings"></param>
 		/// <returns></returns>
-		public async Task<IList<User>> ListUsersInRole(Role role)
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> List(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings, Expression<Func<User, bool>> filterExpression)
+    {
+      using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+      {
+        return await provider.ListUsers(site, pagingSettings, filterExpression);
+      }
+    }
+
+
+    /// <summary>
+    /// List all <see cref="User"/> who belong to any of the specified <see cref="Role"/>s.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <returns></returns>
+    public async Task<IList<User>> ListUsersInRole(Role role)
 		{
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{
@@ -503,14 +531,30 @@ namespace Nucleus.Core.Managers
 			{
 				return await provider.SearchUsers(site, searchTerm, pagingSettings);
 			}
-		}
+    }
 
-		/// <summary>
-		/// Create or update the specified <see cref="User"/>.
+    /// <summary>
+		/// Returns a list of <see cref="User"/>s whi match the specified searchTerm.
 		/// </summary>
 		/// <param name="site"></param>
-		/// <param name="user"></param>
-		public async Task Save(Site site, User user)
+		/// <param name="searchTerm"></param>
+		/// <param name="pagingSettings"></param>
+		/// <returns></returns>
+		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> Search(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings, Expression<Func<User, bool>> filterExpression)
+    {
+      using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
+      {
+        return await provider.SearchUsers(site, searchTerm, pagingSettings, filterExpression);
+      }
+    }
+
+
+    /// <summary>
+    /// Create or update the specified <see cref="User"/>.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <param name="user"></param>
+    public async Task Save(Site site, User user)
 		{
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{

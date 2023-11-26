@@ -56,13 +56,24 @@ namespace Nucleus.Abstractions.Search
 		/// </remarks>
 		public string Scope { get; set; }
 
-		/// <summary>
-		/// Unique Id for the search entry source.
+    /// <summary>
+		/// Human-readable content type (display name).
 		/// </summary>
 		/// <remarks>
-		/// This value is optional.  If set, it can be used to manage the individual search result for update and delete operations.
+		/// This value is optional.  If set, it can be displayed on screen as part of search results.
 		/// </remarks>
-		public Guid? SourceId { get; set; }
+    /// <example>
+    /// Page, Forum Post, File
+    /// </example>
+		public string Type { get; set; }
+
+    /// <summary>
+    /// Unique Id for the search entry source.
+    /// </summary>
+    /// <remarks>
+    /// This value is optional.  If set, it can be used to manage the individual search result for update and delete operations.
+    /// </remarks>
+    public Guid? SourceId { get; set; }
 
 		/// <summary>
 		/// Search entry content, used for content indexing.

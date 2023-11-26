@@ -13,18 +13,19 @@
 	@Html.HiddenFor(model=>model.Settings.MaximumSuggestions)
 	@Html.HiddenFor(model=>model.Settings.SearchProvider)
 
-	@if (Model.Settings.DisplayMode == Settings.DisplayModes.Full)
-	{
-		<SettingsControl caption=@Model.Settings.SearchCaption helptext="Enter your search term." class="search-display-full">
-			@await Html.PartialAsync("_ViewerInput.cshtml", Model)
-		</SettingsControl>
-	}
-	else if (Model.Settings.DisplayMode == Settings.DisplayModes.Compact || Model.Settings.DisplayMode == Settings.DisplayModes.Minimal)
-	{
-		<div class="search-display-@Model.Settings.DisplayMode.ToString().ToLower()">
-			@await Html.PartialAsync("_ViewerInput.cshtml", Model)
-		</div>
-	}
+  <div class="search-display-@Model.Settings.DisplayMode.ToString().ToLower()">
+    @if (Model.Settings.DisplayMode == Settings.DisplayModes.Full)
+    {
+      <label>
+        <span>@Model.Settings.SearchCaption</span>
+        @await Html.PartialAsync("_ViewerInput.cshtml", Model)
+      </label>
+    }    
+    else
+    {
+      @await Html.PartialAsync("_ViewerInput.cshtml", Model)
+    }
+  </div>
 	@if (Model.Settings.MaximumSuggestions > 0)
 	{
 		<div class="search-suggestions collapse@(Model.SearchResults?.Results?.Any() == true ? " show" : "")"></div>
@@ -34,14 +35,13 @@
 {
 	@if (Model.SearchResults != null)
 	{
-		<div>Search term: @Model.SearchTerm@Html.Raw(".")</div>
 		@if (Model.SearchResults.Total == 0)
 		{
-			<div>No results.</div>
+      <div>No results for '@Model.SearchTerm'@Html.Raw(".").</div>
 		}
 		else
 		{
-			<div>Displaying search results @(((Model.PagingSettings.CurrentPageIndex - 1) * @Model.PagingSettings.PageSize) + 1) to @Model.PagingSettings.LastDisplayedRowIndex of @Model.SearchResults.Total@Html.Raw(".")</div>
+			<div>Displaying search results @(((Model.PagingSettings.CurrentPageIndex - 1) * @Model.PagingSettings.PageSize) + 1) to @Model.PagingSettings.LastDisplayedRowIndex of @Model.SearchResults.Total for '@Model.SearchTerm'@Html.Raw(".")</div>
 		}
 	}
 
@@ -55,8 +55,13 @@
 			@foreach (var result in Model.SearchResults.Results)
 			{
 				<div class="search-result">
-          <a class="d-block result-link" href="@result.Url" title="@result.Title">@result.Title</a>
-
+          <div>
+            <a class="result-link" href="@result.Url" title="@result.Title?.Trim()">@result.Title?.Trim()</a>
+            @if (Model.Settings.ShowType && !String.IsNullOrEmpty(result.Type))
+            {
+              <span class="fst-italic small text-muted result-type">@result.Type</span>
+            }
+          </div>          
           @if (Model.Settings.ShowUrl)
 					{
 						<span class="fst-italic small result-url">@Url.GetAbsoluteUri(result.Url)</span>
@@ -89,16 +94,65 @@
 							}
 						</ul>
 					}
-					@if (Model.Settings.ShowScore && result.Score.HasValue)
-					{
-						<span class="fw-light d-block small result-score">Score: @result.Score</span>
-					}
+
+          @{
+            double? assessmentCalculation = 0;
+            string assessmentText = "";
+
+            if (Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0 && result.Score.HasValue)
+            {
+              assessmentCalculation = result.Score / Model.SearchResults.MaxScore.Value * 100;
+              assessmentText = assessmentCalculation switch
+              {
+                > 99 => "Best Match",
+                > 75 => "Good Match",
+                > 50 => "Medium Match",
+                _ => "Low Match"
+              };
+            }
+          }
+          @if ((Model.Settings.ShowScoreAssessment && Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0) || (Model.Settings.ShowScore && result.Score.HasValue && assessmentCalculation.HasValue))
+          {
+            <span class="fw-light small result-score">
+              @if (Model.Settings.ShowScoreAssessment && Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0 && result.Score.HasValue)
+              {
+                @assessmentText
+              }
+              @if (Model.Settings.ShowScoreAssessment && Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0 && Model.Settings.ShowScore && result.Score.HasValue && assessmentCalculation.HasValue)
+              {
+                <text> - </text>
+              }
+              @if (Model.Settings.ShowScore && assessmentCalculation.HasValue)
+              {
+                <text>Score: </text>
+                @assessmentCalculation.Value.ToString("0.0")
+                <text>%</text>
+              }
+            </span>
+          }          
 				</div>
 			}
 		}
 	}
 }
 <script>
+  // position the suggestions drop-down below the search term text box
+  try
+  {
+    jQuery('.search-suggestions').each(function(index) 
+    {
+      var element = jQuery(this).parents('section').find('.search-term');
+      if (element.length !== 0)
+      {
+        jQuery(this).css('left', element.offset().left);
+      }
+    });
+  }
+  catch (error)
+  {
+    console.error(error);
+  }
+
   @if (!String.IsNullOrEmpty(Model.SearchTerm) && Model.SearchResults != null)
   { 
     <text>

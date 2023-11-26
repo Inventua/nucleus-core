@@ -16,6 +16,11 @@ using Microsoft.Extensions.Options;
 using Nucleus.Extensions.Authorization;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Excel;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Nucleus.Abstractions.Mail;
+using Nucleus.Abstractions.Models.Mail;
+using System.Security.Claims;
+using Nucleus.ViewFeatures;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -28,15 +33,21 @@ namespace Nucleus.Web.Controllers.Admin
 		private IRoleManager RoleManager { get; }
 		private ClaimTypeOptions ClaimTypeOptions { get; }
     private PasswordOptions PasswordOptions { get; }
+    private IMailTemplateManager MailTemplateManager { get; }
+    private IMailClientFactory MailClientFactory { get; }
+    private IPageManager PageManager { get; }
 
     private Context Context { get; }
 
-		public UsersController(Context context, ILogger<UsersController> logger, IUserManager userManager, IRoleManager roleManager, IOptions< ClaimTypeOptions> claimTypeOptions, IOptions <PasswordOptions> passwordOptions)
+		public UsersController(Context context, ILogger<UsersController> logger, IUserManager userManager, IRoleManager roleManager, IPageManager pageManager, IMailTemplateManager mailTemplateManager, IMailClientFactory mailClientFactory, IOptions< ClaimTypeOptions> claimTypeOptions, IOptions<PasswordOptions> passwordOptions)
 		{
 			this.Context = context;
 			this.Logger = logger;
 			this.RoleManager = roleManager;
 			this.UserManager = userManager;
+      this.PageManager = pageManager;
+      this.MailTemplateManager = mailTemplateManager;
+      this.MailClientFactory = mailClientFactory;
 			this.ClaimTypeOptions = claimTypeOptions.Value;
       this.PasswordOptions = passwordOptions.Value;
 		}
@@ -51,11 +62,11 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", await BuildViewModel());
 		}
 
-		/// <summary>
-		/// Display the user list
-		/// </summary>
-		/// <returns></returns>
-		[HttpPost]
+    /// <summary>
+    /// Display the user list
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
 		public async Task<ActionResult> List(ViewModels.Admin.UserIndex viewModel)
 		{
 			return View("_UserList", await BuildViewModel(viewModel));
@@ -68,8 +79,9 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> Search(ViewModels.Admin.UserIndex viewModel)
 		{
-			viewModel.SearchResults = await this.UserManager.Search(this.Context.Site, viewModel.SearchTerm, viewModel.SearchResults);
+			viewModel.SearchResults = await this.UserManager.Search(this.Context.Site, viewModel.SearchTerm, viewModel.SearchResults, BuildFilter(viewModel.FilterSelections));
 			viewModel.Site = this.Context.Site;
+
 			return View("SearchResults", viewModel);
 		}
 
@@ -81,7 +93,7 @@ namespace Nucleus.Web.Controllers.Admin
 		public async Task<ActionResult> Export()
 		{
 			IList<User> users = await this.UserManager.List(this.Context.Site);
-
+      
 			var exporter = new ExcelWriter<User>
 			(
         ExcelWorksheet.Modes.IncludeSpecifiedPropertiesOnly
@@ -216,8 +228,189 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", await BuildViewModel());
 		}
 
+    [HttpPost]
+    public async Task<ActionResult> UnlockUser(ViewModels.Admin.UserEditor viewModel)
+    {
+      if (!ControllerContext.ModelState.IsValid)
+      {
+        return BadRequest(ControllerContext.ModelState);
+      }
 
-		[HttpPost]
+      // only save a password for a new user (and if they entered one)
+      if (viewModel.User.Id == Guid.Empty)
+      {
+        return BadRequest();        
+      }
+      else
+      {
+        User user = await this.UserManager.Get(this.Context.Site, viewModel.User.Id);
+        if (user == null)
+        {
+          return BadRequest();
+        }
+        else
+        {
+          // We must re-read viewModel.User.Secrets for existing users because model binding always creates a new (empty) .Secrets object, which would cause
+          // the data provider to overwrite an existing user's secrets record with blanks.  
+          await this.UserManager.UnlockUser(user);
+        }
+        return View("Editor", await BuildViewModel(user));
+      }
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> SendVerification(ViewModels.Admin.UserEditor viewModel)
+    {
+      if (!ControllerContext.ModelState.IsValid)
+      {
+        return BadRequest(ControllerContext.ModelState);
+      }
+
+      // only save a password for a new user (and if they entered one)
+      if (viewModel.User.Id == Guid.Empty)
+      {
+        return BadRequest();
+      }
+      else
+      {
+        User user = await this.UserManager.Get(this.Context.Site, viewModel.User.Id);
+        if (user == null)
+        {
+          return BadRequest();
+        }
+        else
+        {
+          UserProfileValue email = user.Profile.GetProperty(ClaimTypes.Email);
+
+          if (!String.IsNullOrEmpty(email?.Value))
+          {
+            SiteTemplateSelections templateSelections = this.Context.Site.GetSiteTemplateSelections();
+
+            if (templateSelections.WelcomeNewUserTemplateId.HasValue)
+            {
+              MailTemplate template = await this.MailTemplateManager.Get(templateSelections.WelcomeNewUserTemplateId.Value);
+              if (template != null)
+              {
+                await this.UserManager.SetVerificationToken(user);
+
+                SitePages sitePages = this.Context.Site.GetSitePages();
+
+                Abstractions.Models.Mail.Template.UserMailTemplateData args = new()
+                {
+                  Site = this.Context.Site,
+                  User = user.GetCensored(),
+                  Url = new System.Uri(await GetLoginPageUri(), $"?token={user.Secrets.VerificationToken}").ToString(),
+                  LoginPage = sitePages.LoginPageId.HasValue ? await this.PageManager.Get(sitePages.LoginPageId.Value) : null,
+                  PrivacyPage = sitePages.PrivacyPageId.HasValue ? await this.PageManager.Get(sitePages.PrivacyPageId.Value) : null,
+                  TermsPage = sitePages.TermsPageId.HasValue ? await this.PageManager.Get(sitePages.TermsPageId.Value) : null
+                };
+
+                Logger.LogTrace("Sending password reset email {templateName} to user {userId}.", template.Name, user.Id);
+
+                using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
+                {
+                  await mailClient.Send(template, args, email.Value);
+                  return Json(new { Title = "Password Reset", Message = "Password Reset email sent.", Icon = "alert" });
+                }
+              }
+            }
+            else
+            {
+              Logger.LogTrace("Not sending password reset to user {userId} because no password reset template is configured for site {siteId}.", user.Id, this.Context.Site.Id);
+              return Json(new { Title = "Password Reset", Message = "Your site administrator has not configured a password reset email template.  Please contact the site administrator for help.", Icon = "error" });
+            }
+          }
+
+          else
+          {
+            return BadRequest();
+          }
+        }
+      }
+
+      return Ok();
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> SendPasswordReset(ViewModels.Admin.UserEditor viewModel)
+    {
+      if (!ControllerContext.ModelState.IsValid)
+      {
+        return BadRequest(ControllerContext.ModelState);
+      }
+
+      // only save a password for a new user (and if they entered one)
+      if (viewModel.User.Id == Guid.Empty)
+      {
+        return BadRequest();
+      }
+      else
+      {
+        User user = await this.UserManager.Get(this.Context.Site, viewModel.User.Id);
+        if (user == null)
+        {
+          return BadRequest();
+        }
+        else
+        {
+          UserProfileValue email = user.Profile.GetProperty(ClaimTypes.Email);
+
+          if (!String.IsNullOrEmpty(email?.Value))
+          {
+            SiteTemplateSelections templateSelections = this.Context.Site.GetSiteTemplateSelections();
+
+            if (templateSelections.PasswordResetTemplateId.HasValue)
+            {
+              MailTemplate template = await this.MailTemplateManager.Get(templateSelections.PasswordResetTemplateId.Value);
+              if (template != null)
+              {
+                await this.UserManager.SetPasswordResetToken(user);
+
+                //Nucleus.Abstractions.Models.Mail.RecoveryEmailModel args = new()
+                //{
+                //  Site = this.Context.Site,
+                //  User = viewModel.User.GetCensored(),
+                //  Url = new System.Uri(await GetLoginPageUri(), $"?token={viewModel.User.Secrets.PasswordResetToken}").ToString()
+                //};
+                SitePages sitePages = this.Context.Site.GetSitePages();
+
+                Abstractions.Models.Mail.Template.UserMailTemplateData args = new()
+                {
+                  Site = this.Context.Site,
+                  User = user.GetCensored(),
+                  Url = new System.Uri(await GetLoginPageUri(), $"?token={user.Secrets.PasswordResetToken}").ToString(),
+                  LoginPage = sitePages.LoginPageId.HasValue ? await this.PageManager.Get(sitePages.LoginPageId.Value) : null,
+                  PrivacyPage = sitePages.PrivacyPageId.HasValue ? await this.PageManager.Get(sitePages.PrivacyPageId.Value) : null,
+                  TermsPage = sitePages.TermsPageId.HasValue ? await this.PageManager.Get(sitePages.TermsPageId.Value) : null
+                };
+
+                Logger.LogTrace("Sending password reset email {templateName} to user {userId}.", template.Name, user.Id);
+
+                using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
+                {
+                  await mailClient.Send(template, args, email.Value);
+                  return Json(new { Title = "Password Reset", Message = "Password Reset email sent.", Icon = "alert" });
+                }
+              }
+            }
+            else
+            {
+              Logger.LogTrace("Not sending password reset to user {userId} because no password reset template is configured for site {siteId}.", user.Id, this.Context.Site.Id);
+              return Json(new { Title = "Password Reset", Message = "Your site administrator has not configured a password reset email template.  Please contact the site administrator for help.", Icon = "error" });
+            }
+          }
+
+          else
+          {
+            return BadRequest();
+          }
+        }
+      }
+
+      return Ok();
+    }
+
+    [HttpPost]
 		public async Task<ActionResult> RemoveUserRole(ViewModels.Admin.UserEditor viewModel, Guid roleId)
 		{
 			await this.UserManager.RemoveRole(viewModel.User, roleId);
@@ -232,6 +425,78 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", await BuildViewModel());
 		}
 
+    private async Task<IEnumerable<SelectListItem>> GetAvailableUserRoles(User user)
+    {
+      IEnumerable<Role> availableRoles = (await this.RoleManager.List(this.Context.Site))
+        .Where
+        (
+          role => !role.Type.HasFlag(Role.RoleType.Restricted) && !user.Roles?.Contains(role) == true
+        )
+        .OrderBy(role => role.Name);
+
+      IEnumerable<string> roleGroups = availableRoles
+        .Where(role => role.RoleGroup != null)
+        .Select(role => role.RoleGroup.Name)
+        .Distinct()
+        .OrderBy(name => name);
+
+      Dictionary<string, SelectListGroup> groups = roleGroups.ToDictionary(name => name, name => new SelectListGroup() { Name = name });
+
+      return availableRoles.Select(role => new SelectListItem(role.Name, role.Id.ToString())
+      {
+        Group = groups.Where(group => role.RoleGroup != null && role.RoleGroup.Name == group.Key).FirstOrDefault().Value
+      })
+      .OrderBy(selectListItem => selectListItem.Group?.Name);
+    }
+
+
+    private async Task<IEnumerable<SelectListItem>> GetFilterRoles()
+    {
+      IEnumerable<Role> availableRoles = (await this.RoleManager.List(this.Context.Site))
+        .Where
+        (
+          role => !role.Type.HasFlag(Role.RoleType.Restricted)
+        )
+        .OrderBy(role => role.Name);
+
+      IEnumerable<string> roleGroups = availableRoles
+        .Where(role => role.RoleGroup != null)
+        .Select(role => role.RoleGroup.Name)
+        .Distinct()
+        .OrderBy(name => name);
+
+      Dictionary<string, SelectListGroup> groups = roleGroups.ToDictionary(name => name, name => new SelectListGroup() { Name = name });
+
+      return availableRoles.Select(role => new SelectListItem(role.Name, role.Id.ToString())
+      {
+        Group = groups.Where(group => role.RoleGroup != null && role.RoleGroup.Name == group.Key).FirstOrDefault().Value
+      })
+      .OrderBy(selectListItem => selectListItem.Group?.Name);
+    }
+        
+    private System.Linq.Expressions.Expression<Func<User, bool>> BuildFilter(ViewModels.Admin.UserFilterOptions filterOptions)
+    {
+      return 
+      (
+        user =>
+        (
+          filterOptions.RoleId == null || (user.Roles.Where(role => role.Id == filterOptions.RoleId).Any())
+        ) 
+        &&
+        (
+          filterOptions.Approved == ViewModels.Admin.UserFilterOptions.ApprovedFilter.All ||
+          (filterOptions.Approved == ViewModels.Admin.UserFilterOptions.ApprovedFilter.ApprovedOnly && user.Approved) ||
+          (filterOptions.Approved == ViewModels.Admin.UserFilterOptions.ApprovedFilter.NotApprovedOnly && !user.Approved)
+        )
+        &&
+        (
+          filterOptions.Verified == ViewModels.Admin.UserFilterOptions.VerifiedFilter.All ||
+          (filterOptions.Verified == ViewModels.Admin.UserFilterOptions.VerifiedFilter.VerifiedOnly && user.Verified) ||
+          (filterOptions.Verified == ViewModels.Admin.UserFilterOptions.VerifiedFilter.NotVerifiedOnly && !user.Verified)
+        )
+      );
+    }
+
 		private async Task<ViewModels.Admin.UserIndex> BuildViewModel()
 		{
 			return await BuildViewModel(new ViewModels.Admin.UserIndex());
@@ -239,12 +504,13 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private async Task<ViewModels.Admin.UserIndex> BuildViewModel(ViewModels.Admin.UserIndex viewModel)
 		{
-			viewModel.Users = await this.UserManager.List(this.Context.Site, viewModel.Users);
+      viewModel.Users = await this.UserManager.List(this.Context.Site, viewModel.Users, BuildFilter(viewModel.FilterSelections));
 			viewModel.Site = this.Context.Site;
-			return viewModel;
+      viewModel.FilterRoles = await GetFilterRoles();
+      return viewModel;
 		}
 
-		private async Task<ViewModels.Admin.UserEditor> BuildViewModel(User user)
+    private async Task<ViewModels.Admin.UserEditor> BuildViewModel(User user)
 		{
 			ViewModels.Admin.UserEditor viewModel = new();
 
@@ -256,16 +522,41 @@ namespace Nucleus.Web.Controllers.Admin
 
       if (viewModel.User != null)
 			{
-				foreach (Role role in await this.RoleManager.List(this.Context.Site))
-				{
-					if (!((role.Type & Role.RoleType.Restricted) == Role.RoleType.Restricted) && !viewModel.User.Roles?.Contains(role) == true)
-					{
-						viewModel.AvailableRoles.Add(role);
-					}
-				}
-			}
+        viewModel.AvailableRoles = await GetAvailableUserRoles(viewModel.User);
+        
+        // we must re-read secrets because this function is called with a user object that has been deserialized by MVC and will not 
+        // contain secrets
+        viewModel.User.Secrets = (await this.UserManager.Get(viewModel.User.Id)).Secrets;
+        if (viewModel.User.Secrets.IsLockedOut && viewModel.User.Secrets.LastLockoutDate.HasValue)
+        {
+          viewModel.LockoutResetDate = viewModel.User.Secrets.LastLockoutDate.Value.Add(this.PasswordOptions.FailedPasswordLockoutReset);
+        }
+      }
 
 			return viewModel;
 		}
-	}
+
+    private async Task<System.Uri> GetLoginPageUri()
+    {
+      PageRoute loginPageRoute;
+      Page loginPage = await this.PageManager.Get(this.Context.Site.GetSitePages().LoginPageId.Value);
+      if (loginPage != null)
+      {
+        loginPageRoute = loginPage.DefaultPageRoute();
+        return Url.GetAbsoluteUri(loginPageRoute.Path);
+      }
+      else
+      {
+        //RouteValueDictionary routeDictionary = new();
+
+        //routeDictionary.Add("area", "User");
+        //routeDictionary.Add("controller", "Account");
+        //routeDictionary.Add("action", "Index");
+        //return Url.GetAbsoluteUri(this.LinkGenerator.GetPathByRouteValues("Admin", routeDictionary, this.ControllerContext.HttpContext.Request.PathBase, FragmentString.Empty, null));
+
+        return Url.GetAbsoluteUri(this.Url.AreaAction("Index", "Account", "User"));
+        
+      }
+    }
+  }
 }

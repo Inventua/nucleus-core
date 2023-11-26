@@ -12,12 +12,16 @@ using Nucleus.Extensions.Authorization;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Nucleus.ViewFeatures;
+using Nucleus.Modules.Forums.Models;
+using Microsoft.Extensions.Hosting;
 
 namespace Nucleus.Modules.Forums
 {
 	public class ForumsMetaDataProducer : IContentMetaDataProducer
 	{
-		private Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider ExtensionProvider { get; } = new();
+    private ISearchIndexHistoryManager SearchIndexHistoryManager { get; }
+
+    private Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider ExtensionProvider { get; } = new();
 
 		private IFileSystemManager FileSystemManager { get; }
 		private GroupsManager GroupsManager { get; }
@@ -28,9 +32,10 @@ namespace Nucleus.Modules.Forums
 
 		private ILogger<ForumsMetaDataProducer> Logger { get; }
 
-		public ForumsMetaDataProducer(ISiteManager siteManager, GroupsManager groupsManager, ForumsManager forumsManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, IExtensionManager extensionManager, ILogger<ForumsMetaDataProducer> logger)
+		public ForumsMetaDataProducer(ISearchIndexHistoryManager searchIndexHistoryManager, ISiteManager siteManager, GroupsManager groupsManager, ForumsManager forumsManager, IPageManager pageManager, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, IExtensionManager extensionManager, ILogger<ForumsMetaDataProducer> logger)
 		{
-			this.FileSystemManager = fileSystemManager;
+      this.SearchIndexHistoryManager = searchIndexHistoryManager;
+      this.FileSystemManager = fileSystemManager;
 			this.GroupsManager = groupsManager;
 			this.ForumsManager = forumsManager;
 			this.ExtensionManager = extensionManager;
@@ -64,19 +69,21 @@ namespace Nucleus.Modules.Forums
 						}
 						else
 						{
-							foreach (Models.Forum forum in await this.ForumsManager.List(group))
+							foreach (Models.Forum item in await this.ForumsManager.List(group))
 							{
-								if (!forum.EffectiveSettings().AllowSearchIndexing)
+                // get a fully-populated forum object (will generally be in cache)
+                Models.Forum forum = await this.ForumsManager.Get(item.Id);
+
+                if (!forum.EffectiveSettings().AllowSearchIndexing)
 								{
 									Logger?.LogInformation("Skipping forum {forumName} on page {pageid}/{pagename} because the forum's 'Allow search indexing' setting is false.", forum.Name, page.Id, page.Name);
 								}
 								else
-								{
-									await foreach (ContentMetaData metaData in BuildContentMetaData(site, page, module, forum))
-									{
-										yield return metaData;
-									}
-									//results.AddRange(await BuildContentMetaData(site, page, module, forum));
+								{                  
+                  await foreach (ContentMetaData metaData in BuildContentMetaData(site, page, module, forum))
+                  {
+                    yield return metaData;
+                  }                  
 								}
 							}
 						}
@@ -96,46 +103,61 @@ namespace Nucleus.Modules.Forums
 		/// <returns></returns>
 		private async IAsyncEnumerable<ContentMetaData> BuildContentMetaData(Site site, Page page, PageModule module, Models.Forum forum)
 		{
-			//List<ContentMetaData> results = new();
+      //List<ContentMetaData> results = new();
 
-			if (page != null)
-			{
-				string pageUrl = UrlHelperExtensions.RelativePageLink(page);
+      if (page != null)
+      {
+        string pageUrl = UrlHelperExtensions.RelativePageLink(page);
 
-				foreach (Models.Post post in await this.ForumsManager.ListPosts(forum, Models.FlagStates.IsTrue))
-				{
-					StringBuilder content = new(post.Body);
+        foreach (Models.Post post in await this.ForumsManager.ListPosts(forum, Models.FlagStates.IsTrue))
+        {
+          IList<Reply> replies = await this.ForumsManager.ListPostReplies(site, post, Models.FlagStates.IsTrue);
 
-					ContentMetaData forumPostContentItem = new()
-					{
-						Site = site,
-						Title = post.Subject,
-						Url = pageUrl + forum.Name.FriendlyEncode() + $"/{post.Id}",
-						PublishedDate = post.DateAdded,
-						SourceId = post.Id,
-						Scope = Models.Post.URN,
-						Roles = GetViewRoles(forum),
-						ContentType = "text/html"
-					};
+          SearchIndexHistory historyItem = await this.SearchIndexHistoryManager.Get(site.Id, Models.Post.URN, post.Id);
+          if (historyItem == null || historyItem.LastIndexedDate < PostModifiedDate(post, replies))
+          {
+            StringBuilder content = new(post.Body);
 
-					foreach (Models.Reply reply in await this.ForumsManager.ListPostReplies(site, post, Models.FlagStates.IsTrue))
-					{
-						content.Append(reply.Body);
-					}
+            ContentMetaData forumPostContentItem = new()
+            {
+              Site = site,
+              Title = post.Subject,
+              Url = pageUrl + forum.Name.FriendlyEncode() + $"/{post.Id}",
+              PublishedDate = post.DateAdded,
+              SourceId = post.Id,
+              Scope = Models.Post.URN,
+              Type = "Forum Post",
+              Roles = GetViewRoles(forum),
+              ContentType = "text/html"
+            };
 
-					forumPostContentItem.Content = System.Text.Encoding.UTF8.GetBytes(content.ToString());
+            foreach (Models.Reply reply in replies)
+            {
+              content.Append(reply.Body);
+            }
 
-					yield return forumPostContentItem;
+            forumPostContentItem.Content = System.Text.Encoding.UTF8.GetBytes(content.ToString());
 
-				}
+            yield return forumPostContentItem;
+          }
+        }
+      }
+    }
 
-				//return results;
-			}
+    private DateTime PostModifiedDate(Models.Post post, IList<Models.Reply> replies)
+    {
+      DateTime? modifiedDate = post.DateChanged ?? post.DateAdded;
+      Models.Reply lastReply = replies.OrderBy(reply => reply.DateChanged ??  reply.DateAdded).FirstOrDefault();
 
-			//return null;
-		}
+      if (lastReply != null && ((lastReply.DateChanged ?? lastReply.DateAdded) > modifiedDate))
+      {
+        modifiedDate = lastReply.DateChanged ?? lastReply.DateAdded;
+      }
 
-		private List<Role> GetViewRoles(Models.Forum forum)
+      return modifiedDate ?? DateTime.MaxValue;
+    }
+
+    private List<Role> GetViewRoles(Models.Forum forum)
 		{
 			return
 				(forum.UseGroupSettings ? forum.Group.Permissions : forum.Permissions)

@@ -3,7 +3,7 @@
 	@Html.DropDownListFor(model => model.LogFile, new SelectList(Model.LogFiles, "Filename", "Title"), "(select)", new { @class = "LogFile mb-1 flex-grow-1 h-100" })
 	@if (Model.HasLoggingConfiguration)
 	{
-		<button type="button" title="View Logging Settings" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls=".nucleus-system-logging-configuration" data-bs-toggle="modal" data-bs-target=".nucleus-system-logging-configuration">
+		<button type="button" title="View Logging Settings" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls="nucleus-system-logging-configuration" data-bs-toggle="modal" data-bs-target=".nucleus-system-logging-configuration">
 			<span class="nucleus-material-icon">&#xe8b8;</span>
 		</button>
 	}

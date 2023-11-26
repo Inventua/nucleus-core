@@ -48,7 +48,7 @@
 
                 @if (@Model.ExtensionsUsage.ContainsKey(new Guid(extension.id)))
                 {
-                  <div class="d-flex gap-4 nucleus-extension-components">
+                  <div class="d-flex ms-2 gap-4 nucleus-extension-components">
                     @if (@Model.ExtensionsUsage[new Guid(extension.id)].Modules.Any())
                     {
                       <div>

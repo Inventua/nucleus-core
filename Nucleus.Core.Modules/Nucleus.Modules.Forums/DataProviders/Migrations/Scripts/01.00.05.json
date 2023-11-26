@@ -1,0 +1,38 @@
+{
+	"schemaName": "Nucleus.Modules.Forums",
+	"version": "01.00.05",
+  "operations": [
+    {
+      "addColumn": {
+        "table": "ForumGroupSubscriptions",
+        "name": "NotificationFrequency",
+        "clrType": "int",
+        "isnullable": true
+      }
+    },
+    {
+      "addColumn": {
+        "table": "ForumSubscriptions",
+        "name": "NotificationFrequency",
+        "clrType": "int",
+        "isnullable": true
+      }
+    },
+    {
+      "addColumn": {
+        "table": "ForumMailQueue",
+        "name": "NotificationFrequency",
+        "clrType": "int",
+        "isnullable": true
+      }
+    },
+    {
+      "addColumn": {
+        "table": "ForumSettings",
+        "name": "SubscriptionSummaryMailTemplateId",
+        "clrType": "guid",
+        "isnullable": true
+      }
+    }
+  ]
+}

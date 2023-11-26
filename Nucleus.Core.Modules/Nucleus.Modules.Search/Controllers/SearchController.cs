@@ -37,9 +37,12 @@ namespace Nucleus.Modules.Search.Controllers
 		private const string MODULESETTING_SHOW_CATEGORIES = "search:show-categories";
 		private const string MODULESETTING_SHOW_PUBLISHEDDATE = "search:show-publisheddate";
 
-		private const string MODULESETTING_SHOW_SIZE = "search:show-size";
+    private const string MODULESETTING_SHOW_TYPE = "search:show-type";
+    private const string MODULESETTING_SHOW_SIZE = "search:show-size";
 		private const string MODULESETTING_SHOW_SCORE = "search:show-score";
-		private const string MODULESETTING_INCLUDE_SCOPES = "search:include-scopes";
+    private const string MODULESETTING_SHOW_SCORE_ASSESSMENT = "search:show-score-assessment";
+
+    private const string MODULESETTING_INCLUDE_SCOPES = "search:include-scopes";
 		private const string MODULESETTING_MAXIMUM_SUGGESTIONS = "search:maximum-suggestions";
 
 		public SearchController(Context Context, IPageManager pageManager, IPageModuleManager pageModuleManager, IUserManager userManager, IEnumerable<ISearchProvider> searchProviders)
@@ -122,12 +125,15 @@ namespace Nucleus.Modules.Search.Controllers
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_CATEGORIES, viewModel.ShowCategories);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_PUBLISHEDDATE, viewModel.ShowPublishDate);
 
-			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SIZE, viewModel.ShowSize);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_TYPE, viewModel.ShowType);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SIZE, viewModel.ShowSize);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SCORE, viewModel.ShowScore);
-			this.Context.Module.ModuleSettings.Set(MODULESETTING_INCLUDE_SCOPES, viewModel.IncludeScopes);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SCORE_ASSESSMENT, viewModel.ShowScoreAssessment);
+
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_INCLUDE_SCOPES, viewModel.IncludeScopes);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_MAXIMUM_SUGGESTIONS, viewModel.MaximumSuggestions);
 			
-			await this.PageModuleManager.SaveSettings(this.Context.Module);
+			await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
 			return Ok();
 		}
@@ -176,7 +182,7 @@ namespace Nucleus.Modules.Search.Controllers
 					throw new InvalidOperationException("There is no search provider selected.");
 				}
 
-				SearchResults results = await searchProvider.Search(await BuildSearchQuery(viewModel.SearchTerm, viewModel.PagingSettings, viewModel.Settings.IncludeFiles,viewModel.Settings.IncludeScopes));
+				SearchResults results = await searchProvider.Search(await BuildSearchQuery(viewModel.SearchTerm, viewModel.PagingSettings, viewModel.Settings.IncludeFiles, viewModel.Settings.IncludeScopes));
 				
 				viewModel.PagingSettings.TotalCount = Convert.ToInt32(results.Total);
 				viewModel.SearchResults = results;
@@ -185,7 +191,7 @@ namespace Nucleus.Modules.Search.Controllers
 			return viewModel;
 		}
 
-		private async Task<SearchQuery> BuildSearchQuery(string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings,Boolean includeFiles, string includeScopes)
+		private async Task<SearchQuery> BuildSearchQuery(string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings, Boolean includeFiles, string includeScopes)
 		{			
 			SearchQuery searchQuery = new()
 			{
@@ -194,12 +200,24 @@ namespace Nucleus.Modules.Search.Controllers
 				PagingSettings = pagingSettings
 			};
 
-			if (!(HttpContext.User.IsSystemAdministrator() | HttpContext.User.IsSiteAdmin(this.Context.Site)))
-			{
-				searchQuery.Roles = (await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId()))?.Roles;
-			}
+      List<Role> roles = new () { this.Context.Site.AllUsersRole };
 
-			if (!includeFiles)
+      if (HttpContext.User.IsSiteAdmin(this.Context.Site))
+      {
+        roles = null;  // roles=null means don't filter results by role
+      }
+      else if (HttpContext.User.IsAnonymous())
+      {
+        roles.Add(this.Context.Site.AnonymousUsersRole);
+      }      
+      else
+      {
+        roles.AddRange((await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId()))?.Roles);
+      }
+
+      searchQuery.Roles = roles;
+
+      if (!includeFiles)
 			{
 				searchQuery.ExcludedScopes.Add(Abstractions.Models.FileSystem.File.URN);
 			}
@@ -314,9 +332,12 @@ namespace Nucleus.Modules.Search.Controllers
 			settings.ShowCategories = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_CATEGORIES, true);
 			settings.ShowPublishDate = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_PUBLISHEDDATE, true);
 
-			settings.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
+      settings.ShowType = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_TYPE, true);
+      settings.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
 			settings.ShowScore = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SCORE, true);
-			settings.IncludeScopes = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_SCOPES, "");
+      settings.ShowScoreAssessment = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SCORE_ASSESSMENT, true);
+
+      settings.IncludeScopes = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_SCOPES, "");
 			settings.MaximumSuggestions = this.Context.Module.ModuleSettings.Get(MODULESETTING_MAXIMUM_SUGGESTIONS, 5);
 
 			if (String.IsNullOrWhiteSpace(settings.SearchButtonCaption))

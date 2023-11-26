@@ -29,15 +29,20 @@
         WARNING: This is a very old version of DotNetNuke. Migration is likely to fail. You should upgrade your DNN version before migration.
       </div>
     }
-
-    @using (Html.BeginForm())
+  }
+  @using (Html.BeginForm())
+  {
+    @if (Model.Version != null)
     {
       <div class="overflow-visible">
         <h3>Select Source Portal</h3>
         @Html.DropDownListFor(model => model.PortalId, new SelectList(Model.Portals, "PortalId", "PortalName"), "(select)", new(){} )
       </div>
+    }
 
-      <ol>
+    <ol>
+      @if (Model.Version != null)
+      {
         <li>
           <div>
             <button type="submit" formaction="@Url.NucleusAction("RolesIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#MigrateRoles">Roles</button>
@@ -95,28 +100,28 @@
             <div class="action-remarks">When you migrate pages, we migrate forum groups and empty forums along with their settings.  This step is used to copy forum posts and attachments.  This step should be run after migrating roles, pages and users.</div>
           </div>
         </li>
-
-        <li class="border-top border-primary border-1 pt-3">
-          <div>
-            <button type="submit" formaction="@Url.NucleusAction("NotifyUsersIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#NotifyUsers">Notify Users</button>
+      }
+      <li class="border-top border-primary border-1 pt-3">
+        <div>
+          <button type="submit" formaction="@Url.NucleusAction("NotifyUsersIndex", "DNNMigration", "DNNMigration")" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#NotifyUsers">Notify Users</button>
+        </div>
+        <div>
+          <div class="action-description">Send user notification emails.</div>
+          <div class="action-remarks">
+            When you migrate users, the user accounts are un-verified, and have no password set, so the user cannot log in.  This step generates a password reset token and sends a
+            notification by email so that your migrated users can set a password.
           </div>
-          <div>
-            <div class="action-description">Send user notification emails.</div>
-            <div class="action-remarks">
-              When you migrate users, the user accounts are un-verified, and have no password set, so the user cannot log in.  This step generates a password reset token and sends a
-              notification by email so that your migrated users can set a password.
-            </div>
-          </div>
-        </li>
-      </ol>
-    }
-    <modal id="MigrateRoles" title="Migrate Roles"></modal>
-    <modal id="MigrateLists" title="Migrate Lists"></modal>
-    <modal id="MigrateFolders" title="Migrate Folders and Files"></modal>
-    <modal id="MigratePages" title="Migrate Pages"></modal>
-    <modal id="MigrateUsers" title="Migrate Users"></modal>
-    <modal id="MigrateNTForums" title="Migrate Forums Content"></modal>
-    <modal id="MigrateActiveForums" title="Migrate Forums Content"></modal>
-    <modal id="NotifyUsers" title="Send User Notifications"></modal>
+        </div>
+      </li>
+    </ol>
   }
+  <modal id="MigrateRoles" title="Migrate Roles"></modal>
+  <modal id="MigrateLists" title="Migrate Lists"></modal>
+  <modal id="MigrateFolders" title="Migrate Folders and Files"></modal>
+  <modal id="MigratePages" title="Migrate Pages"></modal>
+  <modal id="MigrateUsers" title="Migrate Users"></modal>
+  <modal id="MigrateNTForums" title="Migrate Forums Content"></modal>
+  <modal id="MigrateActiveForums" title="Migrate Forums Content"></modal>
+  <modal id="NotifyUsers" title="Send User Notifications"></modal>
+
 </div>

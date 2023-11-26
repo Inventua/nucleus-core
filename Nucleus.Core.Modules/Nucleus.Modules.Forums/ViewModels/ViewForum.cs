@@ -17,7 +17,9 @@ namespace Nucleus.Modules.Forums.ViewModels
 		public Forum Forum { get; set; }
 		public Nucleus.Abstractions.Models.Paging.PagedResult<Post> Posts { get; set; } = new();
 		public ForumSubscription Subscription { get; set; }
-		public Boolean CanPost { get; set; }
+    public Boolean IsSubscribedToForumGroup { get; set; }
+
+    public Boolean CanPost { get; set; }
 		public Boolean CanSubscribe { get; set; }
 		public string SortKey { get; set; } = "subject";
 		public Boolean SortDescending { get; set; }

@@ -2,7 +2,7 @@
 @using Nucleus.Abstractions
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
-@Html.TextBoxFor(model => model.SearchTerm, new { @id = "", @class = "search-term align-middle", @autocomplete = "off", @placeholder=@Model.Settings.Prompt, @aria_label = "Enter search term." })
+@Html.TextBoxFor(model => model.SearchTerm, new { @id = "", @class = "search-term align-middle", @type = "search", @autocomplete = "off", @placeholder=@Model.Settings.Prompt, @aria_label = "Enter search term." })
 @if (Model.Settings.DisplayMode != Nucleus.Modules.Search.ViewModels.Settings.DisplayModes.Minimal)
 {
 	@if (!String.IsNullOrEmpty(Model.ResultsUrl))

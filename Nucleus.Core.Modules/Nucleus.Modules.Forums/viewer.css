@@ -5,19 +5,19 @@
   margin-bottom: 12px;
 }
 
-.Forums table th, .Forums TABLE td
+.Forums table th, .Forums table td
 {
   padding: 4px 12px;
 	text-align: left;
   vertical-align: middle;
 }
 
-.Forums .group-header:not(:first-child)
+.Forums thead:not(:first-child) .group-header
 {
   border-top: 1px solid #ccc;
 }
 
-.Forums .group-header:not(:first-child) th
+.Forums thead:not(:first-child) .group-header th
 {
   padding-top: 1rem;
 }
@@ -60,8 +60,8 @@
 .Forums .post
 { 
   border: solid 2px #16698c;
-  padding: 4px;
-  margin-bottom: 8px;
+  padding: 0.25rem;
+  margin-bottom: 0.25rem;
 }
 
 .Forums .post-status
@@ -79,7 +79,7 @@
   gap: 4px;  
   flex-direction: row;
   margin-bottom: 4px;
-  justify-content: flex-end;
+  margin-left: auto;
 }
 
 .Forums .post .post-flags span, .Forums .reply .reply-flags span
@@ -88,14 +88,43 @@
   text-transform: capitalize;
   border: dashed 1px #bbb;
   padding: 1px 2px;
+  margin: 0.25rem 0 auto auto;
 }
 
 .Forums .post .attachments, .Forums .reply .attachments
 {
-  display: inline-grid;
-  gap: 1em;
-  grid-auto-flow: column;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;  
+  row-gap: 0.5rem;
   font-size: 0.8em;
+}
+
+.Forums .post .attachments a, .Forums .reply .attachments a
+{
+  border: solid 2px;
+  padding: .5rem .5rem .5rem .35rem;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: black;
+}
+
+.Forums .attachments a:hover, .Forums .attachments a:focus
+{
+  background-color: #ccc;
+}
+
+.Forums .post .attachments a .icon, .Forums .reply .attachments a .icon
+{
+  font-size: 1.2rem;
+  margin-right: 0.25rem;
+}
+
+.Forums .post .attachments a input, .Forums .reply .attachments a input
+{
+  margin-left: 0.5rem;
+  padding: 0.35rem 0.2rem 0.35rem 0.25rem;
 }
 
 .Forums .post .nucleus-form-tools
@@ -112,46 +141,153 @@
   justify-content: flex-end;
 }
 
+.Forums h3
+{
+  font-size: 1.25rem;
+}
+
 .Forums .post h3
 {
   margin: 0;
 }
 
+.Forums .post h4, .Forums .replies h4
+{
+  font-size: 1.1rem;
+  margin: 0.75rem 0;
+}
+
 .Forums .reply
 {
   border: dotted 2px #21A3DA;
-  margin-bottom: 8px;
+  margin-bottom: 0.25rem;
+  padding: 0.25rem;
 }
 
-.Forums .reply .heading
+/* indenting for reply-to-reply levels */
+.Forums .reply.reply-level-1
 {
-  padding: 4px;
+  border-left: solid 0.4rem #21A3DA;
+}
+
+.Forums .reply.reply-level-2
+{
+  border-left: solid 0.8rem #21A3DA;
+}
+
+.Forums .reply.reply-level-3
+{
+  border-left: solid 1.2rem #21A3DA;
+}
+
+.Forums .reply.reply-level-4
+{
+  border-left: solid 1.6rem #21A3DA;
+}
+
+.Forums .reply.reply-level-5
+{
+  border-left: solid 1.8rem #21A3DA;
+}
+
+.Forums .reply.reply-level-6
+{
+  border-left: solid 2.0rem #21A3DA;
+}
+
+.Forums .reply.reply-level-7
+{
+  border-left: solid 2.2rem #21A3DA;
+}
+
+.Forums .reply.reply-level-8
+{
+  border-left: solid 2.4rem #21A3DA;
+}
+
+.Forums .post .heading, .Forums .reply .heading
+{
   display: flex;
   flex-direction: row;
   gap: 4px;  
 }
 
-.Forums .reply .controls
+.Forums .post .controls, .Forums .reply .controls
 {
   display: inline-flex;
-  flex-direction: row-reverse;
-  flex-grow: 1;
+  flex-direction: row;
+  margin-left: auto;
   gap: 4px;
+  align-items: flex-end;
 }
 
-.Forums .reply .controls *
+/*.Forums .reply .controls *
 {
-  display: inline-flex;
   align-self: flex-end;
-}
+}*/
 
 .Forums .body
 {
   background-color: #eee;
-  padding: 8px;
+  padding: 0.25rem;
+  font-size: 0.9rem;
+  overflow: auto;
+}
+
+.Forums .body p:last-child
+{
+  margin-bottom: 0;
+}
+
+.Forums .original-post.body
+{
+  max-height: 6rem;
+  min-height: 2.5rem;
+  width: 100%;
+  overflow: auto;
+  flex: 1;
 }
 
 .Forums .settings-control.stretch
 {
   min-height: 30vh;
+}
+
+.forums-manage-subscriptions h3
+{
+  font-size: 1.2rem;
+}
+
+.forums-manage-subscriptions h4
+{
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.forums-manage-subscriptions .group-forums span:not(:last-child)::after
+{
+  content: ', ';
+}
+
+.forums-manage-subscriptions table .btn
+{
+  min-width: 6rem;
+}
+
+.forums-manage-subscriptions table .frequency-col
+{
+  width: 16rem;
+}
+
+.forums-manage-subscriptions table .btn-col
+{
+  width: 7rem;
+}
+
+.forums-manage-subscriptions .subscriptions-group-wrapper
+{
+  border: solid 1px #aaaaaa;
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+  margin-bottom: 1rem;
 }

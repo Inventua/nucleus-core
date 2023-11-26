@@ -26,52 +26,61 @@
           @Html.TextAreaFor(model => model.Forum.Description)
         </SettingsControl>
 
-        <SettingsControl caption="Use Group Settings?" class="inner-inline UseGroupSettings" rendermode="LabelLast" helptext="Use settings from the forum group.">
-          @Html.CheckBoxFor(model => model.Forum.UseGroupSettings, new { @class = "ToggleSwitch" })
-        </SettingsControl>
-
-        <div class="ForumSettings">
-          <div class="nucleus-flex-fields">
-            <SettingsControl caption="Moderated?" class="inner-inline" rendermode="LabelLast" helptext="Posts and replies to moderated forums must be approved by a moderator before they can be seen by others.">
-              @Html.CheckBoxFor(model => model.Forum.Settings.IsModerated, new { @class = "ToggleSwitch" })
-            </SettingsControl>
-
-            <SettingsControl caption="Allow search indexing?" class="inner-inline" rendermode="LabelLast" helptext="Specifies whether search indexing engines should include forum posts in their search index.">
-              @Html.CheckBoxFor(model => model.Forum.Settings.AllowSearchIndexing, new { @class = "ToggleSwitch" })
-            </SettingsControl>
-
-            <SettingsControl caption="Enabled?" class="inner-inline" rendermode="LabelLast" helptext="Disabled forums are visible, but users cannot view, create or reply to posts.">
-              @Html.CheckBoxFor(model => model.Forum.Settings.Enabled, new { @class = "ToggleSwitch" })
-            </SettingsControl>
-
-            <SettingsControl caption="Visible?" class="inner-inline" rendermode="LabelLast" helptext="Forums which are not visible are not displayed, but users can view, create or reply to existing posts.">
-              @Html.CheckBoxFor(model => model.Forum.Settings.Visible, new { @class = "ToggleSwitch" })
-            </SettingsControl>
-          </div>
-
-          <SettingsControl caption="Allow attachments?" class="inner-inline AllowAttachments" rendermode="LabelLast" helptext="Specifies whether users can attach documents to posts or replies.">
-            @Html.CheckBoxFor(model => model.Forum.Settings.AllowAttachments, new { @class = "ToggleSwitch" })
+        <div class="nucleus-flex-fields">
+          <SettingsControl caption="Use Group Settings?" class="inner-inline UseGroupSettings" rendermode="LabelLast" helptext="Use settings from the forum group.">
+            @Html.CheckBoxFor(model => model.Forum.UseGroupSettings, new { @class = "ToggleSwitch" })
+          </SettingsControl>
+                    
+          <SettingsControl caption="Moderated?" class="inner-inline ForumSettings" rendermode="LabelLast" helptext="Posts and replies to moderated forums must be approved by a moderator before they can be seen by others.">
+            @Html.CheckBoxFor(model => model.Forum.Settings.IsModerated, new { @class = "ToggleSwitch" })
           </SettingsControl>
 
+          <SettingsControl caption="Allow search indexing?" class="inner-inline ForumSettings" rendermode="LabelLast" helptext="Specifies whether search indexing engines should include forum posts in their search index.">
+            @Html.CheckBoxFor(model => model.Forum.Settings.AllowSearchIndexing, new { @class = "ToggleSwitch" })
+          </SettingsControl>         
+        </div>
+
+        <div class="nucleus-flex-fields">
+          <SettingsControl caption="Enabled?" class="inner-inline ForumSettings" rendermode="LabelLast" helptext="Disabled forums are visible, but users cannot view, create or reply to posts.">
+            @Html.CheckBoxFor(model => model.Forum.Settings.Enabled, new { @class = "ToggleSwitch" })
+          </SettingsControl>
+
+          <SettingsControl caption="Visible?" class="inner-inline ForumSettings" rendermode="LabelLast" helptext="Forums which are not visible are not displayed, but users can view, create or reply to existing posts.">
+            @Html.CheckBoxFor(model => model.Forum.Settings.Visible, new { @class = "ToggleSwitch" })
+          </SettingsControl>
+
+          <SettingsControl caption="Allow attachments?" class="inner-inline ForumSettings AllowAttachments" rendermode="LabelLast" helptext="Specifies whether users can attach documents to posts or replies.">
+            @Html.CheckBoxFor(model => model.Forum.Settings.AllowAttachments, new { @class = "ToggleSwitch" })
+          </SettingsControl>
+        </div>
+
+        <div class="ForumSettings">
           <SettingsControl caption="Attachments Folder" helptext="Attachments folder" class="AttachmentsFolder">
             <div class="nucleus-flex-fields nucleus-fileselector">
               @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FolderSelector), new { model = Model.Forum?.Settings?.AttachmentsFolder, PropertyName = "Forum.Settings.AttachmentsFolder" })
             </div>
           </SettingsControl>
 
-
           <SettingsControl caption="Status List" helptext="Select the list to use for post statuses for this group.  Lists are managed in the Nucleus Lists manager.">
             @Html.DropDownListFor(model => model.Forum.Settings.StatusList.Id, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")
           </SettingsControl>
 
           <div class="nucleus-flex-fields">
-            <SettingsControl caption="Subscription mail template" helptext="Email template used to inform subscribers of new posts or replies.">
+            <SettingsControl caption="Subscription mail template" helptext="Email template used to inform subscribers of new posts or replies when notification frequency is immediate.">
               @Html.DropDownListFor(model => model.Forum.Settings.SubscriptionMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
             </SettingsControl>
 
+            <SettingsControl caption="Subscription Summary mail template" helptext="Email template used to inform subscribers of new posts or replies when notification frequency is 'summary'.">
+              @Html.DropDownListFor(model => model.Forum.Settings.SubscriptionSummaryMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+            </SettingsControl>
+          </div>
+
+          <div class="nucleus-flex-fields">
             <SettingsControl caption="Moderator mail template" helptext="Email template used to inform moderators of new posts or replies.">
               @Html.DropDownListFor(model => model.Forum.Settings.ModerationRequiredMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
             </SettingsControl>
+
+            <div></div>
           </div>
 
           <div class="nucleus-flex-fields">

@@ -23,6 +23,8 @@ public class Document
   public string Category { get; set; }
 
   public string Description { get; set; }
+  
+  public DateTime ModifiedDate { get; set; }
 
   public int SortOrderIndex { get; set; }
 }

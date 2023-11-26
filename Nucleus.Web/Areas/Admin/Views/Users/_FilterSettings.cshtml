@@ -1,0 +1,25 @@
+﻿@model Nucleus.Web.ViewModels.Admin.UserIndex
+<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="collapse" data-bs-target=".user-filter-options">
+  Filter <span class="nucleus-material-icon">&#xe5c5;</span>
+</button>
+<div class="collapse user-filter-options">
+	<fieldset aria-label="Filtering and Sorting">
+    <div class="d-flex">
+      <h3 class="d-inline-block mt-0">Filter Users</h3>
+      <button type="button" class="btn-close ms-auto" data-bs-toggle="collapse" data-bs-target=".user-filter-options" aria-label="Close"></button>
+    </div>
+		<SettingsControl caption="Approved" helptext="User approved flag filter.">
+      @Html.DropDownListFor(model => model.FilterSelections.Approved, Html.GetEnumSelectList<Nucleus.Web.ViewModels.Admin.UserFilterOptions.ApprovedFilter>(), new { @class = "flex-grow-1"} )
+    </SettingsControl>
+
+    <SettingsControl caption="Verified" helptext="User verified flag filter.">
+      @Html.DropDownListFor(model => model.FilterSelections.Verified, Html.GetEnumSelectList<Nucleus.Web.ViewModels.Admin.UserFilterOptions.VerifiedFilter>(), new { @class = "flex-grow-1"} )
+    </SettingsControl>
+
+    <SettingsControl caption="Role" helptext="Specify a role to filter by.">
+      @Html.DropDownListFor(model => model.FilterSelections.RoleId, Model.FilterRoles, "(any)", new { @class = "flex-grow-1"} )
+    </SettingsControl>
+
+    <button type="submit" data-target=".nucleus-index-items" data-bs-toggle="collapse" data-bs-target=".user-filter-options" class="btn btn-primary btn-sm" formaction="@Url.AreaAction("List", "Users", "Admin")">Apply</button>
+	</fieldset>
+</div>

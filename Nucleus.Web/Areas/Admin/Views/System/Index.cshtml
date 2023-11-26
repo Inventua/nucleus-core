@@ -118,45 +118,33 @@
         </table>
       </TabPanel>
     }
-    @*<TabPanel id="system-configuration">
-    <div class="LogContent">
-    <pre>@Model.Configuration</pre>
-    </div>
-    </TabPanel>*@
 
     <TabPanel id="system-database">
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col" class="text-nowrap">Schema</th>
-            <th scope="col" class="text-nowrap">Database Type</th>
-            <th scope="col" class="text-nowrap">Connection String</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach (var connection in Model.DatabaseConnections)
-          {
+      @foreach (var connection in Model.DatabaseConnections)
+      {
+        <table class="border border-1 table">
+          <tbody>
+            <tr class="bg-primary bg-gradient text-light fw-bold">
+              <th scope="row" colspan="2"><h2>@(connection.Schema == "*" ? "Default (*)" : connection.Schema)</h2></th>              
+            </tr>
             <tr>
-              <th scope="row" class="text-nowrap w-25"><h2>@(connection.Schema == "*" ? "Default (*)" : connection.Schema)</h2></th>
-              <td class=" w-25">@connection.DatabaseType</td>
+              <th scope="row" class="text-nowrap w-25 px-2"><h3>Database Type</h3></th>
+              <td>@connection.DatabaseType</td>
+            </tr>
+            <tr>
+              <th scope="row" class="text-nowrap w-25 px-2"><h3>Connection string</h3></th>
               <td>@connection.ConnectionString</td>
             </tr>
-            <tr>
-              <td colspan="3">
-                <table class="border border-1 table">
-                  @foreach (var keyValue in connection.DatabaseInformation)
-                  {
-                    <tr>
-                      <th scope="row" class="text-nowrap w-25"><h3>@keyValue.Key</h3></th>
-                      <td>@keyValue.Value</td>
-                    </tr>
-                  }
-                </table>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+            @foreach (var keyValue in connection.DatabaseInformation)
+            {
+              <tr>
+                <th scope="row" class="text-nowrap w-25 px-2"><h3>@keyValue.Key</h3></th>
+                <td>@keyValue.Value</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
     </TabPanel>
 
     <TabPanel id="system-logs">
@@ -173,7 +161,7 @@
         </div>
       }
 
-      <modal class="nucleus-system-logging-configuration" modal-class="modal-lg" title="Logging Configuration">
+      <modal id="nucleus-system-logging-configuration" class="nucleus-system-logging-configuration" modal-class="modal-lg" title="Logging Configuration">
         <div class="alert alert-info">
           Your current logging settings are listed below.  These settings are typically configured in your
           <span class="font-monospace">appSettings.@(Model.EnvironmentName).json</span>	file.

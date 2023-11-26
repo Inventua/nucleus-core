@@ -20,19 +20,30 @@
 		<h2>Welcome to Nucleus.</h2>
 		<p>This wizard will help you to set up your site.</p>
 		
-		@Html.HiddenFor(model => model.SelectedTemplate)
-		@Html.HiddenFor(model => model.TemplateTempFileName)
 		@if ((Model.Preflight == null || Model.Preflight.IsValid()) && (Model.SelectedTemplate == null || Model.OtherWarnings.Count() > 0 || Model.MissingExtensionWarnings.Count() > 0))
 		{
-			<h2>Site Template</h2>
+			<h3>Site Template</h3>
 			<p>
-				This wizard will automatically set up pages, roles, list entries and other data to get you started.  Please select a site template below.
+				A site template will automatically set up pages, roles, list entries and other data to get you started.  Please select a site template below.
 			</p>
-			<SettingsControl caption="Site Template" helptext="Select your site template.">
-				@Html.DropDownListFor(model => model.SelectedTemplate, new SelectList(Model.Templates, nameof(Nucleus.Web.ViewModels.Setup.SiteWizard.SiteTemplate.FileName), nameof(Nucleus.Web.ViewModels.Setup.SiteWizard.SiteTemplate.Title)))
+			<SettingsControl caption="Site Template" helptext="Select your site template." class="d-flex flex-1 overflow-auto mb-2">
+				@Html.DropDownListFor(model => model.SelectedTemplate, new SelectList(Model.Templates, nameof(Nucleus.Web.ViewModels.Setup.SiteWizard.SiteTemplate.FileName), nameof(Nucleus.Web.ViewModels.Setup.SiteWizard.SiteTemplate.Title)), "(select a template)", new { @id = "site-template-select"})
+
+        <div class="mt-1 d-flex flex-1 overflow-auto border border-dark border-1">
+          <div class="list-group list-group-flush">
+            @foreach(var template in Model.Templates)
+            {
+              <a class="list-group-item list-group-item-action me-auto site-template-list-group-item user-select-none" data-select="@template.FileName">
+                <div class="fw-bold">@template.Title</div>
+                <div class="small lh-sm ">@template.Description</div>
+              </a>
+            }
+          </div>
+          
+        </div>
 			</SettingsControl>
 
-			@if (Model.OtherWarnings.Count() > 0)
+			@if (Model.OtherWarnings?.Count() > 0)
 			{
 				<div class="alert alert-danger">
 					<h3>Warning</h3>
@@ -50,7 +61,7 @@
 				</div>
 			}
 
-			@if (Model.MissingExtensionWarnings.Count() > 0)
+			@if (Model.MissingExtensionWarnings?.Count() > 0)
 			{
 				<div class="alert alert-danger">
 					<h3>Required Extensions Missing</h3>
@@ -73,7 +84,10 @@
 			</div>
 		}
 		else
-		{
+		{      
+		  @Html.HiddenFor(model => model.SelectedTemplate)
+		  @Html.HiddenFor(model => model.TemplateTempFileName)
+
 			<Tab class="nav-pills nav-justified">
 				@if (Model.Preflight != null)
 				{
@@ -109,7 +123,7 @@
 									<span class="medium-icon-text">Configuration checks were successful.</span>
 								}								
 							}
-							<button type="button" class="btn btn-secondary ms-auto" onclick="window.location='@Url.AreaAction("Index", "SiteWizard", "Setup")';">Retry</button>
+							<button type="submit" class="btn btn-secondary ms-auto" formaction="@Url.AreaAction("Index", "SiteWizard", "Setup")">Retry</button>
 						</div>
 						<table class="table table-sm align-middle small mt-2">
 							<thead class="table-dark">
@@ -148,10 +162,10 @@
 				{
 					<TabPanel id="site-install" active="@(Model.Preflight == null ? true : false)">
 						<fieldset role="group" aria-labelledby="heading">
-							<h2>Install Extensions</h2>
+							<h3>Install Extensions</h3>
 							<p>
 								Select the extensions that you want to install.  You can install more extensions later.  Extensions shown with a disabled checkbox
-								are required, and can't be un-selected because they are used by the site template.
+                are required, and can't be un-selected because they are used by the selected site template.
 							</p>
 
 							@for (var count = 0; count < Model.InstallableExtensions.Count(); count++)
@@ -183,7 +197,7 @@
 
 					<TabPanel id="site-settings">
 						<fieldset role="group" aria-labelledby="heading">
-							<h2>Site Settings</h2>
+							<h3>Site Settings</h3>
 
 							<SettingsControl caption="Site Name" helptext="Enter a name for your site.  This value can be displayed on-screen, depending on the selected layout.">
 								@Html.HiddenFor(model => model.Site.Id)
@@ -263,7 +277,7 @@
 
 					<TabPanel id="user-settings">
 						<fieldset role="group" aria-labelledby="heading">
-							<h2>User Settings</h2>
+							<h3>User Settings</h3>
 
 							@if (Model.CreateSystemAdministratorUser)
 							{

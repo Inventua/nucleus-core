@@ -71,7 +71,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
     public Boolean HideEmptyMenu { get; set; } = true;
 
     /// <summary>
-		/// Specifies whether to use the page name instead of the title for in-screen display.
+		/// Specifies whether to use the page name instead of the title for on-screen display.
 		/// </summary>
 		[HtmlAttributeName("use-name")]
     public Boolean UseName { get; set; } = true;

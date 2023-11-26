@@ -14,7 +14,7 @@
 
 	<TabContent>
 		<TabPanel id="user-properties" active="true">
-			<fieldset role="group" aria-labelledby="heading">
+			<fieldset role="group" aria-labelledby="heading" class="flex-1">
 				<h2>Basic Properties</h2>
 				@Html.HiddenFor(model => model.User.Id)
 
@@ -62,13 +62,71 @@
 
           </div>
 				}
-        @if (Model.IsPasswordExpired)
+
+        @if (Model.User.Id != Guid.Empty)
         {
-          <div class="alert alert-info">
-            This user's password has expired.
+          <div class="mt-auto">
+            @if (Model.IsPasswordExpired)
+            {
+              <div class="alert alert-info d-flex align-items-center gap-1">
+                <span>This user's password has expired.</span>
+                <button type="submit" class="btn btn-primary ms-auto text-nowrap" formaction="@Url.AreaAction("SendPasswordReset", "Users", "Admin")">Send Password Reset Message</button>
+              </div>
+            }
+            @if (!Model.User.Verified)
+            {
+              <div class="alert alert-info d-flex align-items-center gap-1">
+                <span>This user's account has not been verified.</span>
+                <button type="submit" class="btn btn-secondary ms-auto text-nowrap" formaction="@Url.AreaAction("SendVerification", "Users", "Admin")">Send Verification Message</button>
+              </div>
+            }
+            @if (Model.User.Secrets.IsLockedOut)
+            {
+              <div class="alert alert-info d-flex align-items-center gap-1">
+                <span>This user was locked out at @Model.User.Secrets.LastLockoutDate.FormatDate(this.Context.Request.GetUserTimeZone()) after 
+                  @Model.User.Secrets.FailedPasswordAttemptCount unsuccessful login attempts.
+
+                  @if (@Model.LockoutResetDate < DateTime.UtcNow)
+                  {
+                    <text>The lockout period has elapsed, and the user account will be unlocked automatically the next time that the user logs in.</text>
+                  }
+                  else
+                  {
+                    <text>The lockout will automatically end at <text>@Model.LockoutResetDate.FormatDate(this.Context.Request.GetUserTimeZone())</text>.</text>
+                  }
+                </span>
+                <button type="submit" class="btn btn-primary ms-auto text-nowrap" data-target=".UserEditor" formaction="@Url.AreaAction("UnlockUser", "Users", "Admin")">Unlock Account</button>
+              </div>
+            }
+            <div class="nucleus-flex-fields align-items-start">
+              <label class="flex-1">
+                Last Login Date:
+                @if (Model.User.Secrets.LastLoginDate.HasValue)
+                {
+                  <span>@Model.User.Secrets.LastLoginDate.Value.FormatDate(this.Context.Request.GetUserTimeZone())</span>
+                }
+                else
+                {
+                  <span>Never</span>
+                }
+
+              </label>
+
+              <label class="flex-1">
+                Last Password Changed Date:
+                @if (Model.User.Secrets.LastPasswordChangedDate.HasValue)
+                {
+                  <span>@Model.User.Secrets.LastPasswordChangedDate.Value.FormatDate(this.Context.Request.GetUserTimeZone())</span>
+                }
+                else
+                {
+                  <span>Never</span>
+                }
+              </label>
+            </div>
           </div>
         }
-			</fieldset>
+      </fieldset>
 		</TabPanel>
 
 		<TabPanel id="user-profile">
@@ -104,15 +162,14 @@
 		<TabPanel id="user-roles">
 			<fieldset role="group" aria-labelledby="heading">
 				<h2>Roles</h2>
-				@if (Model.AvailableRoles.Count > 0)
+				@if (Model.AvailableRoles?.Any() == true)
 				{
 					<div class="nucleus-form-tools">
-						@Html.DropDownListFor((model) => model.SelectedRoleId, new SelectList(Model.AvailableRoles, "Id", "Name"), new { @class = "flex-fill" })
+						@Html.DropDownListFor((model) => model.SelectedRoleId, Model.AvailableRoles, new { @class = "flex-fill" })
 						<button type="submit" formaction="@Url.AreaAction("AddRole", "Users", "Admin")" data-target=".UserEditor" class="btn btn-secondary">Add Role</button>
 					</div>
 				}
 				<table>
-
 					@for (int roleCount = 0; roleCount < Model.User.Roles?.Count; roleCount++)
 					{
 						<tr>
@@ -121,9 +178,7 @@
 								@Html.HiddenFor(model => model.User.Roles[roleCount].Name)
 								@Model.User.Roles[roleCount].Name
 							</td>
-
 							<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("RemoveUserRole", "Users", "Admin")?roleId=@Model.User.Roles[roleCount].Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete User Role" data-target=".UserEditor" /></td>
-
 						</tr>
 					}
 				</table>
@@ -134,9 +189,13 @@
 		<input type="submit" class="btn btn-primary" value="Save Changes" />
 		@if (Model.User.Id != Guid.Empty && !Model.IsCurrentUser)
 		{
-			<button type="submit" class="btn btn-danger" formaction="@Url.AreaAction("DeleteUser", "Users", "Admin")" data-confirm="Delete this user?">Delete User</button>
+      <button type="submit" class="btn btn-danger" formaction="@Url.AreaAction("DeleteUser", "Users", "Admin")" data-confirm="<p>User accounts should typically only be deleted under specific circumstances, such as when the account was never verified or approved, or when it was created in error. Deleting an account with associated data like forum posts may fail. For users with a history, you should use the 'Approved' control above to disable the account instead.</p>Do you want to delete this user account?">Delete User</button>
 		}
-	</div>
+    @if (!Model.IsPasswordExpired)
+    {
+      <button type="submit" class="btn btn-secondary ms-auto text-nowrap" formaction="@Url.AreaAction("SendPasswordReset", "Users", "Admin")">Send Password Reset Message</button>      
+    }
+  </div>
 }
 
 <div class="UserEditor">

@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="87fd4141-aeb9-4d31-8ee6-793970990b0c" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Advanced SiteMap</name>
-  <version>1.2.0</version>
+  <version>1.3.0</version>
   <publisher name="Inventua" url="https://www.nucleus-cms.com" email="support@inventua.com" />
   <description>
 		The Advanced SiteMap extension replaces the built-in Nucleus component which generates a `sitemap.xml` file for use by external search
 		engines.  It implements the Nucleus search index manager interface so that the generated site map can include additional entries from
 		extensions which submit meta-data to the search system, like the Documents, Forums and Publish modules.
 	</description>
-  <compatibility minVersion="1.2.0.0" maxVersion="*" />
+  <compatibility minVersion="1.3.0" maxVersion="*" />
   <components>
     <component folderName="AdvancedSiteMap" optional="false">
       <file name="readme.txt" />

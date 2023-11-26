@@ -8,6 +8,7 @@ using Nucleus.Abstractions.Models.FileSystem;
 using System.Collections.ObjectModel;
 using Nucleus.Abstractions.FileSystemProviders;
 using Nucleus.Abstractions.Models.Paging;
+using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
 namespace Nucleus.Abstractions.Managers
@@ -169,6 +170,19 @@ namespace Nucleus.Abstractions.Managers
 		public Task<Folder> ListFolder(Site site, Guid id, string pattern);
 
     /// <summary>
+		/// Return a folder with the Folders and Files properties populated, checking for user permissions.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="id"></param>
+    /// <param name="user"></param>
+		/// <param name="pattern">Regular expression which is used to filter file names.</param>
+		/// <returns></returns>
+		/// <example>
+		/// ListFolder(this.Context.Site, folderId, "(.doc)|(.docx)");
+		/// </example>
+		public Task<Folder> ListFolder(Site site, Guid id, ClaimsPrincipal user, string pattern);
+
+    /// <summary>
 		/// Return a paged list of <seealso cref="Nucleus.Abstractions.Models.FileSystem.FileSystemItem"/> objects for the 
     /// specified folder.
 		/// </summary>
@@ -178,6 +192,18 @@ namespace Nucleus.Abstractions.Managers
     /// <param name="settings">Paging settings.</param>
 		/// <returns></returns>
     public Task<PagedResult<FileSystemItem>> ListFolder(Site site, Guid id, string pattern, PagingSettings settings);
+
+    /// <summary>
+		/// Return a paged list of <seealso cref="Nucleus.Abstractions.Models.FileSystem.FileSystemItem"/> objects for the 
+    /// specified folder, checking user permissions.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="id"></param>
+    /// <param name="user"></param>
+		/// <param name="pattern">Regular expression which is used to filter file names.</param>
+    /// <param name="settings">Paging settings.</param>
+		/// <returns></returns>
+    public Task<PagedResult<FileSystemItem>> ListFolder(Site site, Guid id, ClaimsPrincipal user, string pattern, PagingSettings settings);
 
     /// <summary>
     /// Retrive the contents of the specified file and return as a stream.

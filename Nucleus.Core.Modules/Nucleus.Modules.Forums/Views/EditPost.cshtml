@@ -6,85 +6,86 @@
 @Html.AddStyle("~!/../viewer.css")
 @Html.AddStyle("~/Resources/css/forms.css")
 @Html.AddScript("~/Resources/js/jquery-toggleswitch.js")
-@using (Html.BeginNucleusForm("SaveForumPost", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = "form.parent()", @enctype = "multipart/form-data", @class = "forums-edit-post" }))
-{
-<fieldset>
-	@Html.HiddenFor(model => model.Forum.Id)
-	@Html.HiddenFor(model => model.Post.Id)
+<div class="Forums">
+  @using (Html.BeginNucleusForm("SaveForumPost", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = ".Forums.parent()", @enctype = "multipart/form-data", @class = "forums-edit-post" }))
+  {
+    <fieldset class="post">
+      @Html.HiddenFor(model => model.Forum.Id)
+      @Html.HiddenFor(model => model.Post.Id)
 
-	<SettingsControl caption="Subject" helptext="Post subject.">
-		@Html.TextBoxFor(model => model.Post.Subject)
-	</SettingsControl>
+      <SettingsControl caption="Subject" helptext="Post subject.">
+        @Html.TextBoxFor(model => model.Post.Subject)
+      </SettingsControl>
 
-	<SettingsControl caption="Body" helptext="Post body.">
-		@Html.TextAreaFor(model => model.Post.Body, new { @class = "HtmlEditorControl" })
-	</SettingsControl>
+      @if (Model.CanAttach || Model.Post?.Attachments?.Any() == true)
+      {
+        <div class="attachments mt-1 settings-control align-items-center">
+          @if (Model.CanAttach)
+          {
+            @*<SettingsControl caption="Attachments" helptext="Add/Manage Attachments.">*@
+            <div class="nucleus-flex-fields nucleus-fileselector">
+              @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { Text = "Add Attachment", Folder = Model.AttachmentsFolder, ActionName = "AddPostAttachment", CssClass = "btn btn-secondary btn-sm" })
+            </div>
+            @*</SettingsControl>*@
+          }
 
-	@if (Model.CanAttach)
-	{
-		<SettingsControl caption="Add Attachment" helptext="Add Attachment">
-			<div class="nucleus-flex-fields nucleus-fileselector">
-				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.FileUpload), new { ActionName = "AddPostAttachment" })
-			</div>
-		</SettingsControl>
-	}
+          @if (Model.Post?.Attachments?.Any() == true)
+          {
+            @for (var attachmentCount = 0; attachmentCount < Model.Post.Attachments.Count; attachmentCount++)
+            {
+              @Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].Id)
+              @Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].File.Id)
+              @Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].File.Provider)
+              @Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].File.Path)
+              @Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].File.Name)
+              <a href="@Url.FileLink(Model.Post.Attachments[attachmentCount].File)" title="@Model.Post.Attachments[attachmentCount].File.Name">
+                <span class="icon nucleus-material-icon">&#xe873;</span>
+                @Model.Post.Attachments[attachmentCount].File.Name
 
-	@if (Model.Post?.Attachments?.Any() == true)
-	{
-		<table>
-			@for (var attachmentCount = 0; attachmentCount < Model.Post.Attachments.Count; attachmentCount++)
-			{
-				<tr>
-					<td>
-						@Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].Id)
-						@Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].File.Id)
-						@Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].File.Provider)
-						@Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].File.Path)
-						@Html.HiddenFor(attachment => Model.Post.Attachments[attachmentCount].File.Name)
-						<a href="@Url.FileLink(Model.Post.Attachments[attachmentCount].File)" alt="@Model.Post.Attachments[attachmentCount].File.Name">
-							@Model.Post.Attachments[attachmentCount].File.Name
-						</a>
-					</td>
-					<td class="nucleus-small-cell">
-						@if (Model.CanAttach)
-						{
-							<input type="submit" title="Delete Attachment" value="&#xe14c;" class="nucleus-material-icon btn btn-danger-secondary" formaction="@Url.NucleusAction("DeletePostAttachment", "Forums", "Forums")?id=@Model.Post.Attachments[attachmentCount].Id" data-confirm="Delete this attachment?" />
-						}
-					</td>
-				</tr>
-			}
-		</table>
-	}
+                @if (Model.CanAttach)
+                {
+                  <input type="submit" title="Delete Attachment" value="&#xe14c;" class="nucleus-material-icon btn btn-none btn-sm" formaction="@Url.NucleusAction("DeletePostAttachment", "Forums", "Forums")?id=@Model.Post.Attachments[attachmentCount].Id" data-confirm="Delete this attachment?" />
+                }
+              </a>
+            }
+          }
+        </div>
+      }
 
-	@if (Model.Post.Id == Guid.Empty)
-	{
-		<div class="nucleus-flex-fields">
-			@if (Model.CanPinPost)
-			{
-				<SettingsControl caption="Pinned?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether this post is pinned (shown at the top of the forum).">
-					@Html.CheckBoxFor(model => model.Post.IsPinned, new { @class = "ToggleSwitch" })
-				</SettingsControl>
-			}
+      <SettingsControl caption="Body" helptext="Post body.">
+        @Html.TextAreaFor(model => model.Post.Body, new { @class = "HtmlEditorControl" })
+      </SettingsControl>
 
-			@if (Model.CanLockPost)
-			{
-				<SettingsControl caption="Locked?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether this post is locked (replies are disabled).">
-					@Html.CheckBoxFor(model => model.Post.IsLocked, new { @class = "ToggleSwitch" })
-				</SettingsControl>
-			}
-		</div>
-	}
+      @if (Model.Post.Id == Guid.Empty)
+      {
+        <div class="nucleus-flex-fields">
+          @if (Model.CanPinPost)
+          {
+            <SettingsControl caption="Pinned?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether this post is pinned (shown at the top of the forum).">
+              @Html.CheckBoxFor(model => model.Post.IsPinned, new { @class = "ToggleSwitch" })
+            </SettingsControl>
+          }
 
-</fieldset>
+          @if (Model.CanLockPost)
+          {
+            <SettingsControl caption="Locked?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether this post is locked (replies are disabled).">
+              @Html.CheckBoxFor(model => model.Post.IsLocked, new { @class = "ToggleSwitch" })
+            </SettingsControl>
+          }
+        </div>
+      }
+    </fieldset>
 
-<div class="nucleus-form-tools">
-	<input type="submit" formaction="@Url.NucleusAction("SaveForumPost", "Forums", "Forums")" value="Save" class="btn btn-primary" data-target="form.parent()" />
-	@Html.LinkButton("", "Back", Url.PageLink(Model.Page, @$"{Model.Forum.Name.FriendlyEncode()}/{(Model.Post.Id == Guid.Empty ? "" : Model.Post.Id)}"), new { @class="btn btn-secondary" })
+    <div class="nucleus-form-tools">
+      <input type="submit" formaction="@Url.NucleusAction("SaveForumPost", "Forums", "Forums")" value="Save" class="btn btn-primary btn-sm" data-target=".Forums.parent()" />
+      @Html.LinkButton("", "Cancel", Url.PageLink(Model.Page, @$"{Model.Forum.Name.FriendlyEncode()}/{(Model.Post.Id == Guid.Empty ? "" : Model.Post.Id)}"), new { @class="btn btn-secondary btn-sm" })
+    </div>
+  }
 </div>
-}
 <script>
-	jQuery(document).ready(function() {
-		jQuery('.forums-edit-post .HtmlEditorControl').HtmlEditor({isAdminMode: false});
-		if (jQuery().ToggleSwitch) { jQuery('.forums-edit-post .ToggleSwitch').ToggleSwitch(); }
-	});
+  jQuery(document).ready(function ()
+  {
+    jQuery('.forums-edit-post .HtmlEditorControl').HtmlEditor({ isAdminMode: false });
+    if (jQuery().ToggleSwitch) { jQuery('.forums-edit-post .ToggleSwitch').ToggleSwitch(); }
+  });
 </script>

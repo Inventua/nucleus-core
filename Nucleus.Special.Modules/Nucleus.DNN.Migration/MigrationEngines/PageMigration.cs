@@ -567,7 +567,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
 
             if (newModule == null)
             {
-              newModule = await this.PageModuleManager.CreateNew(this.Context.Site);
+              newModule = await this.PageModuleManager.CreateNew(this.Context.Site, newPage);
             }
 
             newModule.Title = dnnModule.ModuleTitle;
@@ -624,7 +624,7 @@ public class PageMigration : MigrationEngineBase<Models.DNN.Page>
               {
                 // initial save to make sure the module has an Id
                 await this.PageModuleManager.Save(newPage, newModule);
-                await this.PageModuleManager.SavePermissions(newModule);
+                await this.PageModuleManager.SavePermissions(newPage, newModule);
               }
               catch (Exception ex)
               {

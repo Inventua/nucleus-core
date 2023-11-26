@@ -19,6 +19,7 @@ namespace Nucleus.Extensions.ElasticSearch
 		internal const string SITESETTING_SERVER_CERTIFICATE_THUMBPRINT = "elasticsearch:server-certificate-thumbprint";
 
 		internal const string SITESETTING_ATTACHMENT_MAXSIZE = "elasticsearch:attachment-maxsize";
+    internal const string SITESETTING_INDEXING_PAUSE = "elasticsearch:indexing-pause";
 
 		internal const string SITESETTING_BOOST_TITLE = "elasticsearch:boost-title";
 		internal const string SITESETTING_BOOST_SUMMARY = "elasticsearch:boost-summary";
@@ -30,9 +31,8 @@ namespace Nucleus.Extensions.ElasticSearch
 		internal const string SITESETTING_BOOST_ATTACHMENT_KEYWORDS = "elasticsearch:boost-attachment-keywords";
 		internal const string SITESETTING_BOOST_ATTACHMENT_NAME = "elasticsearch:boost-attachment-name";
 		internal const string SITESETTING_BOOST_ATTACHMENT_TITLE = "elasticsearch:boost-attachment-title";
-		
 
-		public string ServerUrl { get; set; }
+    public string ServerUrl { get; set; }
 		public string IndexName { get; set; }
 		public int AttachmentMaxSize { get; set; }
 
@@ -41,6 +41,7 @@ namespace Nucleus.Extensions.ElasticSearch
 
 		public string CertificateThumbprint { get; set; }
 
+    public double IndexingPause { get; set; } = 1;
 
 		public Nucleus.Abstractions.Search.SearchQuery.BoostSettings Boost { get; set; } = new();
 
@@ -82,7 +83,15 @@ namespace Nucleus.Extensions.ElasticSearch
 				}
 			}
 
-			this.Boost.Title = GetSetting(site, SITESETTING_BOOST_TITLE, this.Boost.Title);
+      if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_INDEXING_PAUSE, out string indexingPause))
+      {
+        if (double.TryParse(indexingPause, out double indexingPauseSeconds))
+        {
+          this.IndexingPause = indexingPauseSeconds;
+        }
+      }
+
+      this.Boost.Title = GetSetting(site, SITESETTING_BOOST_TITLE, this.Boost.Title);
 			this.Boost.Summary = GetSetting(site, SITESETTING_BOOST_SUMMARY, this.Boost.Summary);
 			this.Boost.Categories = GetSetting(site, SITESETTING_BOOST_CATEGORIES, this.Boost.Categories);
 			this.Boost.Keywords = GetSetting(site, SITESETTING_BOOST_KEYWORDS, this.Boost.Keywords);

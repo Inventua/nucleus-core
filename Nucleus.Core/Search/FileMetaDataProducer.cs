@@ -16,15 +16,18 @@ namespace Nucleus.Core.Search
 {
 	public class FileMetaDataProducer : IContentMetaDataProducer
 	{
-		private Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider ExtensionProvider { get; } = new();
+    private ISearchIndexHistoryManager SearchIndexHistoryManager { get; }
+
+    private Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider ExtensionProvider { get; } = new();
 
 		private IFileSystemManager FileSystemManager { get; }
 
 		private ILogger<FileMetaDataProducer> Logger { get; }
 
-		public FileMetaDataProducer(ISiteManager siteManager, IFileSystemManager fileSystemManager, ILogger<FileMetaDataProducer> logger)
+		public FileMetaDataProducer(ISearchIndexHistoryManager searchIndexHistoryManager, ISiteManager siteManager, IFileSystemManager fileSystemManager, ILogger<FileMetaDataProducer> logger)
 		{
-			this.FileSystemManager = fileSystemManager;
+      this.SearchIndexHistoryManager = searchIndexHistoryManager;
+      this.FileSystemManager = fileSystemManager;
 			this.Logger = logger;
 		}
 
@@ -68,13 +71,21 @@ namespace Nucleus.Core.Search
 				{
 					foreach (File file in folder.Files)
 					{
-						Logger.LogTrace("Building meta-data for file {fileid}[{provider}/{path}]", file.Id, file.Provider, file.Path);
-						ContentMetaData metaData = await BuildContentMetaData(site, file);
+            SearchIndexHistory historyItem = await this.SearchIndexHistoryManager.Get(site.Id, File.URN, file.Id);
+            if (historyItem == null || historyItem.LastIndexedDate < file.DateModified)
+            {
+              Logger.LogTrace("Building meta-data for file {fileid}[{provider}/{path}]", file.Id, file.Provider, file.Path);
+              ContentMetaData metaData = await BuildContentMetaData(site, file);
 
-						if (metaData != null)
-						{
-							yield return metaData;
-						}
+              if (metaData != null)
+              {
+                yield return metaData;
+              }
+            }
+            else
+            {
+              Logger.LogTrace("Skipped {fileid}[{provider}/{path}] because the file has not been changed since the last time it was indexed.", file.Id, file.Provider, file.Path);
+            }  
 					}
 				}
 				else
@@ -88,11 +99,8 @@ namespace Nucleus.Core.Search
 					{
 						yield return item;
 					}
-					//results.AddRange(await GetFiles(site, subFolder, indexPublicFilesOnly));
 				}
 			}
-
-			//return results;
 		}
 
 		private async Task<ContentMetaData> BuildContentMetaData(Site site, File file)
@@ -112,6 +120,7 @@ namespace Nucleus.Core.Search
 					Size = file.Size,
 					SourceId = file.Id,
 					Scope = File.URN,
+          Type = "File",
 					Roles = await GetViewRoles(file.Parent)
 				};
 

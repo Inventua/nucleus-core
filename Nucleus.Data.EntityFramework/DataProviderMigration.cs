@@ -181,18 +181,22 @@ namespace Nucleus.Data.EntityFramework
 				}
 				else
 				{
-					using IDbContextTransaction transaction = this.DbContext.Database.BeginTransaction();
-					try
-					{
-						RunScript(schemaName, script);
+          var strategy = this.DbContext.Database.CreateExecutionStrategy();
+          strategy.Execute(() => 
+          { 
+            using IDbContextTransaction transaction = this.DbContext.Database.BeginTransaction();
+					  try
+					  {
+						  RunScript(schemaName, script);
 
-						transaction.Commit();
-					}
-					catch (Exception)
-					{
-						transaction.Rollback();
-						throw;
-					}
+						  transaction.Commit();
+					  }
+					  catch (Exception)
+					  {
+						  transaction.Rollback();
+						  throw;
+					  }          
+          });
 				}
 				this.EventDispatcher?.RaiseEvent<MigrateEventArgs, MigrateEvent>(new MigrateEventArgs(schemaName, script.FullName, currentSchemaVersion, script.Version));
 			}

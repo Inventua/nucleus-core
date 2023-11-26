@@ -72,8 +72,9 @@ namespace Nucleus.OAuth.Client.Controllers
 
 		private string BuildRedirectUrl(string returnUrl)
 		{
-			// Only allow a relative path for redirectUri (that is, the url must start with "/"), to ensure that it points to "this" site.					
-			return Url.Content(String.IsNullOrEmpty(returnUrl) || !returnUrl.StartsWith("/") ? "~/" : returnUrl);
+      if (!Url.IsLocalUrl(returnUrl)) returnUrl = "";
+
+      return Url.Content(String.IsNullOrEmpty(returnUrl) ? "~/" : returnUrl);
 		}
 
 		/// <summary>

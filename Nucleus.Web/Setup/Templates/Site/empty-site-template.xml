@@ -1,0 +1,209 @@
+<?xml version="1.0"?>
+<site-template
+  name="Empty Site Template"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns="urn:nucleus:schemas:xml-site-template/v1">
+
+  <description>
+    This is the empty site template, which you should use when you are planning to migrate content from another system.  It contains the bare minimum set of
+    base data - roles and permission types only, with an empty home page and no email templates.
+  </description>
+
+  <Site>
+    <Id>{$guid1}</Id>
+    <Name>Default Site</Name>
+    <UserRegistrationOptions>NoSignup</UserRegistrationOptions>
+    <AdministratorsRole>
+      <Id>{$guid2}</Id>
+      <Name>Administrators</Name>
+      <RoleGroupId xsi:nil="true" />
+      <Description>This role provides access to all site administration functions.</Description>
+      <Type>System</Type>
+    </AdministratorsRole>
+    <RegisteredUsersRole>
+      <Id>{$guid3}</Id>
+      <Name>Registered Users</Name>
+      <RoleGroupId xsi:nil="true" />
+      <Description>This role represents all logged-on users.</Description>
+      <Type>System</Type>
+    </RegisteredUsersRole>
+    <AllUsersRole>
+      <Id>{$guid4}</Id>
+      <Name>All Users</Name>
+      <RoleGroupId xsi:nil="true" />
+      <Description>This role represents all users, whether logged on or not.</Description>
+      <Type>System Restricted</Type>
+    </AllUsersRole>
+    <AnonymousUsersRole>
+      <Id>{$guid5}</Id>
+      <Name>Anonymous Users</Name>
+      <RoleGroupId xsi:nil="true" />
+      <Description>This role represents users who are not logged on.</Description>
+      <Type>System Restricted</Type>
+    </AnonymousUsersRole>
+    <SiteGroupId xsi:nil="true" />
+    <DefaultSiteAlias>
+      <Id>{$guid6}</Id>
+      <Alias>localhost:5000</Alias>
+    </DefaultSiteAlias>
+    <HomeDirectory>default-site</HomeDirectory>
+    <Aliases>
+      <SiteAlias>
+        <Id>{$guid6}</Id>
+        <Alias>localhost:5000</Alias>
+      </SiteAlias>
+    </Aliases>
+    <UserProfileProperties>
+      <UserProfileProperty>
+        <Id>{$guid8}</Id>
+        <Name>Email</Name>
+        <TypeUri>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress</TypeUri>
+        <SortOrder>0</SortOrder>
+      </UserProfileProperty>
+      <UserProfileProperty>
+        <Id>{$guid9}</Id>
+        <Name>Mobile Phone</Name>
+        <TypeUri>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone</TypeUri>
+        <SortOrder>20</SortOrder>
+      </UserProfileProperty>
+      <UserProfileProperty>
+        <Id>{$guid10}</Id>
+        <Name>First Name</Name>
+        <TypeUri>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname</TypeUri>
+        <SortOrder>30</SortOrder>
+      </UserProfileProperty>
+      <UserProfileProperty>
+        <Id>{$guid11}</Id>
+        <Name>Last Name</Name>
+        <TypeUri>http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname</TypeUri>
+        <SortOrder>40</SortOrder>
+      </UserProfileProperty>
+    </UserProfileProperties>
+  </Site>
+  <PermissionTypes>
+    <PermissionType>
+      <Id>7ec40aaa-9eb0-4005-9895-c0256e749b83</Id>
+      <Name>View</Name>
+      <SortOrder>0</SortOrder>
+      <Scope>urn:nucleus:entities:page/permissiontype/view</Scope>
+    </PermissionType>
+    <PermissionType>
+      <Id>f7ad2ba9-948a-4eb4-bc6e-fce814aee0bf</Id>
+      <Name>Edit</Name>
+      <SortOrder>1</SortOrder>
+      <Scope>urn:nucleus:entities:page/permissiontype/edit</Scope>
+    </PermissionType>
+    <PermissionType>
+      <Id>0a0cd2fb-8612-4932-8b7b-f4d6ee99cc11</Id>
+      <Name>View</Name>
+      <SortOrder>0</SortOrder>
+      <Scope>urn:nucleus:entities:module/permissiontype/view</Scope>
+    </PermissionType>
+    <PermissionType>
+      <Id>86c40f45-a84e-4be4-8186-3bee97896320</Id>
+      <Name>Edit</Name>
+      <SortOrder>1</SortOrder>
+      <Scope>urn:nucleus:entities:module/permissiontype/edit</Scope>
+    </PermissionType>
+    <PermissionType>
+      <Id>dc07183f-6d6c-41d0-8974-2af73d288145</Id>
+      <Name>View</Name>
+      <SortOrder>0</SortOrder>
+      <Scope>urn:nucleus:entities:folder/permissiontype/view</Scope>
+    </PermissionType>
+    <PermissionType>
+      <Id>dee15e89-d511-42f5-afc4-e41c77fa3b03</Id>
+      <Name>Edit</Name>
+      <SortOrder>1</SortOrder>
+      <Scope>urn:nucleus:entities:folder/permissiontype/edit</Scope>
+    </PermissionType>
+    <PermissionType>
+      <Id>77d424bf-e5eb-4e70-9b08-72ecce931683</Id>
+      <Name>Browse</Name>
+      <SortOrder>2</SortOrder>
+      <Scope>urn:nucleus:entities:folder/permissiontype/browse</Scope>
+    </PermissionType>
+  </PermissionTypes>
+  <ScheduledTasks>
+    <ScheduledTask>
+      <Id>{$guid26}</Id>
+      <Name>Collect Cache</Name>
+      <TypeName>Nucleus.Core.ScheduledTasks.CollectCacheScheduledTask,Nucleus.Core</TypeName>
+      <IntervalType>Minutes</IntervalType>
+      <Interval>10</Interval>
+      <Enabled>true</Enabled>
+      <InstanceType>PerServer</InstanceType>
+      <KeepHistoryCount>10</KeepHistoryCount>
+    </ScheduledTask>
+    <ScheduledTask>
+      <Id>{$guid27}</Id>
+      <Name>Truncate Scheduled Task History</Name>
+      <TypeName>Nucleus.Core.ScheduledTasks.TruncateScheduledTaskHistoryScheduledTask,Nucleus.Core</TypeName>
+      <IntervalType>Hours</IntervalType>
+      <Interval>1</Interval>
+      <Enabled>true</Enabled>
+      <InstanceType>PerInstance</InstanceType>
+      <KeepHistoryCount>10</KeepHistoryCount>
+    </ScheduledTask>
+    <ScheduledTask>
+      <Id>{$guid115}</Id>
+      <Name>Remove Expired Sessions</Name>
+      <TypeName>Nucleus.Core.ScheduledTasks.CollectSessionsScheduledTask,Nucleus.Core</TypeName>
+      <IntervalType>Minutes</IntervalType>
+      <Interval>10</Interval>
+      <Enabled>true</Enabled>
+      <InstanceType>PerInstance</InstanceType>
+      <KeepHistoryCount>10</KeepHistoryCount>
+    </ScheduledTask>
+  </ScheduledTasks>
+  <Pages>
+    <Page>
+      <Id>{$guid28}</Id>
+      <ParentId xsi:nil="true" />
+      <Name>Home</Name>
+      <Title>Home</Title>
+      <Description>Home page</Description>
+      <DefaultPageRouteId>{$guid29}</DefaultPageRouteId>
+      <Routes>
+        <PageRoute>
+          <Id>{$guid29}</Id>
+          <Path>/</Path>
+          <Type>Active</Type>
+        </PageRoute>
+      </Routes>
+      <Disabled>false</Disabled>
+      <ShowInMenu>true</ShowInMenu>
+      <DisableInMenu>false</DisableInMenu>
+      <SortOrder>10</SortOrder>
+    </Page>
+  </Pages>
+  <Roles>
+    <Role>
+      <Id>{$guid2}</Id>
+      <Name>Administrators</Name>
+      <RoleGroupId xsi:nil="true" />
+      <Type>System</Type>
+    </Role>
+    <Role>
+      <Id>{$guid4}</Id>
+      <Name>All Users</Name>
+      <RoleGroupId xsi:nil="true" />
+      <Description>This role represents all users, whether logged on or not.</Description>
+      <Type>System Restricted</Type>
+    </Role>
+    <Role>
+      <Id>{$guid5}</Id>
+      <Name>Anonymous Users</Name>
+      <RoleGroupId xsi:nil="true" />
+      <Description>This role represents users who are not logged on.</Description>
+      <Type>System Restricted</Type>
+    </Role>
+    <Role>
+      <Id>{$guid3}</Id>
+      <Name>Registered Users</Name>
+      <RoleGroupId xsi:nil="true" />
+      <Type>System</Type>
+    </Role>
+  </Roles>
+</site-template>

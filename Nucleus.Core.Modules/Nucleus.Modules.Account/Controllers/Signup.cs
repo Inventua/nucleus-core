@@ -55,9 +55,9 @@ public class SignupController : Controller
   }
 
   [HttpGet]
-  public ActionResult Edit(string returnUrl)
+  public ActionResult Edit()
   {
-    return View("SignupSettings", new ViewModels.Signup());
+    return View("SignupSettings", new ViewModels.Signup() { });
   }
 
   [HttpPost]
@@ -84,9 +84,6 @@ public class SignupController : Controller
     {
       User newUser = await this.UserManager.CreateNew(this.Context.Site);
 
-      // CreateNew already calls SetNewUserFlags.
-      // this.UserManager.SetNewUserFlags(this.Context.Site, newUser);
-
       newUser.UserName = viewModel.User.UserName;
       newUser.Profile = viewModel.User.Profile;
       newUser.Secrets = new();
@@ -99,6 +96,8 @@ public class SignupController : Controller
 
       await this.UserManager.Save(this.Context.Site, newUser);
 
+      if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
+      
       if (newUser.Approved && newUser.Verified)
       {
         UserSession session = await this.SessionManager.CreateNew(this.Context.Site, newUser, false, ControllerContext.HttpContext.Connection.RemoteIpAddress);
@@ -106,6 +105,7 @@ public class SignupController : Controller
       }
 
       string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
+
       ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
       return StatusCode((int)System.Net.HttpStatusCode.Found);
     }
@@ -125,6 +125,8 @@ public class SignupController : Controller
 
   private async Task<ViewModels.Signup> BuildViewModel(string returnUrl)
   {
+    if (!Url.IsLocalUrl(returnUrl)) returnUrl = "";
+
     return new ViewModels.Signup()
     {
       ShowForm = true,

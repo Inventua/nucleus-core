@@ -1,13 +1,12 @@
 ﻿.container-default
 {
-	padding: 4px;
 	display: flex;
 	flex-direction: column;
-	overflow: auto;
+  margin: 0.25rem;
 }
 
-h2
+.container-default h2
 {
-	margin: 2px 0 4px 0;
+	margin: 1.25rem 0;
 }
 

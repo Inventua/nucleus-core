@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models.FileSystem;
+using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.ViewFeatures.Controls
 {
@@ -78,7 +79,7 @@ namespace Nucleus.ViewFeatures.Controls
 				folder = await this.FileSystemManager.GetFolder(this.Context.Site, folder.Provider, folder.Path);
 			}
 
-			viewModel.Enabled = folder.Capabilities.CanStoreFiles;
+			viewModel.Enabled = folder.Capabilities.CanStoreFiles && HttpContext.User.HasEditPermission(this.Context.Site, folder);
 
 			return View("~/Shared/Controls/Views/FileUpload.cshtml", viewModel);
 		}		

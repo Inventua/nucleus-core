@@ -151,7 +151,8 @@
 .nucleus-admin-content table
 {
 	width: 100%;
-	border-collapse: collapse;
+	border-spacing: 0;
+	border-collapse: separate;
 	vertical-align: middle;
 }
 
@@ -713,10 +714,9 @@ ul.nucleus-control-panel-items button
 
 .nucleus-adminpage .ExtensionInstaller .InstalledExtensions .nucleus-extension-components
 {
-  background-color: #f0f0f0;
-  padding: 0 0.25rem 0.25rem 0.25rem;
-  border-radius: 0.25rem;
-  border: dashed 1px #555;
+  background-color: white;
+  padding: 0 0.5rem 0.25rem 0.5rem;
+  border-radius: 0.25rem;  
   margin-top: 0.25rem;
 }
 
@@ -729,8 +729,7 @@ ul.nucleus-control-panel-items button
 .nucleus-adminpage .ExtensionInstaller .nucleus-extension-components h4
 {
   margin: 0.5rem 0 0.25rem 0;
-  font-weight: bold;
-  font-size: 1rem;
+  font-size: 0.85rem;
 }
 
 .nucleus-adminpage .ExtensionInstaller .nucleus-extension-components h5
@@ -795,11 +794,16 @@ ul.nucleus-control-panel-items button
 	vertical-align: top;
 }
 
-.nucleus-adminpage .ExtensionInstaller .InstalledExtensions tr
+.nucleus-adminpage .ExtensionInstaller .InstalledExtensions tr:not(:first-child)
 {
-	padding-bottom: 8px;
-	border-bottom: 1px solid #ddd;
-	margin-bottom: 8px;
+  background-color: #f0f0f0;
+	border-bottom: 1rem solid white;
+}
+
+.nucleus-adminpage .ExtensionInstaller .InstalledExtensions tr:not(:first-child) td
+{
+  padding: 0.75rem;
+	
 }
 
 .nucleus-adminpage .ExtensionInstaller .InstalledExtensions tr:last-child
@@ -936,6 +940,20 @@ ul.nucleus-control-panel-items button
 	max-height: 8rem;
 	text-overflow: ellipsis;
 	overflow: auto;
+}
+
+.user-filter-options
+{
+	width: 22rem;
+	position: absolute;
+	top: 2.7rem;
+	border: solid 1px #bbb;
+	padding: 1rem;
+	box-shadow: 2px 2px 6px #bbb;
+	background: white;	
+	z-index: 10;
+  display: flex;
+  flex-direction: column;
 }
 
 .text-break

@@ -35,23 +35,29 @@ namespace Nucleus.Core.Authorization
 							IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
 
 							SitePages sitePages = context.HttpContext.RequestServices.GetService<Context>().Site.GetSitePages();
-							PageRoute loginPageRoute = await GetPageRoute(sitePages.LoginPageId, pageManager);
-
-							if (loginPageRoute != null)
-							{
-								string returnUrl;
+							string returnUrl;
 																
-								if (context.HttpContext.Request.Path.StartsWithSegments("/admin"))
-								{
-									// if we are processing a request to an endpoint in the admin UI, set the return Url to the site root
-									returnUrl = context.HttpContext.Request.PathBase + "/";
-								}
-								else
-								{
-									// otherwise, the return Url is the requested endpoint uri
-									returnUrl = context.HttpContext.Request.PathBase + context.HttpContext.Request.Path;
-								}
+							if (context.HttpContext.Request.Path.StartsWithSegments("/admin"))
+							{
+								// if we are processing a request to an endpoint in the admin UI, set the return Url to the site root
+								returnUrl = context.HttpContext.Request.PathBase + "/";
+							}
+							else
+							{
+								// otherwise, the return Url is the requested endpoint uri
+								returnUrl = context.HttpContext.Request.PathBase + context.HttpContext.Request.Path;
+							}
 
+              PageRoute loginPageRoute = await GetPageRoute(sitePages.LoginPageId, pageManager);
+              
+              if (loginPageRoute == null)
+              {
+                // use built-in "emergency" login page
+                context.HttpContext.Response.Redirect($"{context.HttpContext.Request.PathBase}/user/account?returnUrl={System.Uri.EscapeDataString(returnUrl)}");
+              }
+              else
+							{
+                // use configured login page
 								context.HttpContext.Response.Redirect($"{context.HttpContext.Request.PathBase}{loginPageRoute.Path}?returnUrl={ System.Uri.EscapeDataString(returnUrl)}");
 							}
 						}

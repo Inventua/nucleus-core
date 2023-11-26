@@ -37,4 +37,9 @@ public class UserMailTemplateData
 	/// </summary>
 	public Page TermsPage { get; set; }
 
+  /// <summary>
+  /// String representation which is the Url that is the main topic of the email.
+  /// </summary>
+  public string Url { get; set; }
+
 }

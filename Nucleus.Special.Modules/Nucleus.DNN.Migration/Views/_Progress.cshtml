@@ -13,7 +13,7 @@
       <div class="progress">
         <div class="progress-bar" role="progressbar" aria-label="Progress" style="width: @engine.CurrentPercent%" aria-valuenow="@engine.Current" aria-valuemin="0" aria-valuemax="@engine.TotalCount"></div>          
       </div>
-      <div>@engine.Current / @engine.TotalCount</div>
+      <div>Operation @engine.Current of @engine.TotalCount</div>
     </div>
   }
   else if (engine.State == Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase.EngineStates.Completed)
@@ -56,6 +56,6 @@
       function() 
       { 
         Page.LoadPartialContent(null, '@Url.NucleusAction("UpdateProgress", "DNNMigration", "DNNMigration")', '.dnn-migration .modal:visible .modal-body')
-      }, 1000);
+      }, @Model.ProgressInverval);
   </script>
 }

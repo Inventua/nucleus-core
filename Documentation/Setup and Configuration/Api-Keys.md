@@ -3,9 +3,9 @@ To manage Api Keys, click "Settings", then choose "Api Keys".
 
 ![Api Keys](Api-Keys.png)
 
-Api Keys are used to manage access keys and shared secrets used to authenticate inbound requests when applications (rather than users) access 
-Nucleus endpoints.  The search feeder uses an Api Key to authenticate when retrieving page content for the search index, and other Nucleus extensions 
-can use Api Keys to authenticate applications which use their functionality.
+The Api Keys editor is used to manage access keys and shared secrets.  Api Keys may be used to authenticate inbound requests when applications (rather 
+than users) access Nucleus endpoints.  The search feeder uses an Api Key to identify itself when retrieving page content for the search index, and 
+other Nucleus extensions or external applications can use Api Keys to authenticate themselves when sending a request to Nucleus.
 
 ## Properties
 
@@ -22,6 +22,6 @@ can use Api Keys to authenticate applications which use their functionality.
 ### Making a request using an Api Key
 Applications which make Http requests to Nucleus must specify an Authorization header, with a "scheme" of `Nucleus-HMAC256` and a value which 
 is generated using values from the request and the shared secret.  The [Nucleus.Extensions.HttpRequestExtensions](/api-documentation/Nucleus.Extensions.xml/Nucleus.Extensions.HttpRequestExtensions/) 
-class contains a `.Sign` method which will add the header to a Http Request object.  Applications which do not want to reference the 
+class contains a `.Sign` method which will add the header to a Http Request object.  Application developers who do not want to reference the 
 Nucleus.Extensions assembly can copy the [source code](https://github.com/Inventua/nucleus-core/blob/main/Nucleus.Extensions/HttpRequestExtensions.cs) 
 into their project.

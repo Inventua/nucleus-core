@@ -6,6 +6,6 @@
 <ul>
 	@foreach (var item in Model.Users.Items)
 	{
-		<li><a href="@Url.Content("~/Admin/Users/Editor")?id=@item.Id" data-target=".UserEditor">@item.UserName</a></li>
+		<li><a href="@Url.Content("~/Admin/Users/Editor")?id=@item.Id" data-target=".UserEditor">@(String.IsNullOrEmpty(item.UserName) ? "Blank User Name" : item.UserName)</a></li>
 	}
 </ul>

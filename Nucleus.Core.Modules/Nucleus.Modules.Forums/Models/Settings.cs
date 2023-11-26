@@ -19,7 +19,9 @@ namespace Nucleus.Modules.Forums.Models
 		public Boolean AllowSearchIndexing { get; set; }
 
 		public Guid? SubscriptionMailTemplateId { get; set; }
-		public Guid? ModerationRequiredMailTemplateId { get; set; }
+    public Guid? SubscriptionSummaryMailTemplateId { get; set; }
+
+    public Guid? ModerationRequiredMailTemplateId { get; set; }
 		public Guid? ModerationApprovedMailTemplateId { get; set; }
 		public Guid? ModerationRejectedMailTemplateId { get; set; }
 		public Nucleus.Abstractions.Models.List StatusList { get; set; }

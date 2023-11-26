@@ -1,0 +1,54 @@
+﻿@Model.User?.UserName,
+
+<p>New messages have been posted to forums or forum posts that you are tracking at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>: </p>
+<br />
+@foreach (var forum in Model.Forums)
+{
+  <h2><a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a></h2>
+
+  <table>
+    <tr>
+      <th>Subject</th>
+      <th>Author</th>
+      <th>Date/Time</th>
+    </tr>
+
+    @if (forum.Posts?.Any() == true)
+    {
+      <tr>
+        <th colspan="3"><h3>New Posts</h3></th>
+      </tr>
+      @foreach (var post in forum.Posts)
+      {
+        <tr>
+          <td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
+          <td>@post.PostedBy?.UserName</td>
+          <td>@post?.DateAdded</td>
+        </tr>
+      }
+    }
+    @if (forum.Replies?.Any() == true)
+    {
+      <tr>
+        <th colspan="3"><h3>New Replies</h3></th>
+      </tr>
+      @foreach (var reply in forum.Replies)
+      {
+        <tr>
+          <td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
+          <td>@reply.PostedBy?.UserName</td>
+          <td>@reply?.DateAdded</td>
+        </tr>
+        <tr colspan="3">
+          <td>@reply.Body</td>
+        </tr>
+      }
+    }
+  </table>
+}
+<br />
+<div>
+  You were sent this email because you are subscribed to a forum or post at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>, or are the
+  original poster of this forum message.  <a href="@Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true)">Click here</a>
+  to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true).
+</div>

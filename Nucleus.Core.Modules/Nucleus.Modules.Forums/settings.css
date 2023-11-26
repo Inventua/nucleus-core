@@ -3,6 +3,12 @@
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
+  overflow: auto;
+}
+
+.ForumsSettings .GroupEditor > form
+{
+  overflow: auto;
 }
 
 .ForumsSettings .nucleus-index-items ul

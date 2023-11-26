@@ -8,7 +8,7 @@ function _setupEditMode(e, args)
   // Handle inline content editing
   jQuery('.nucleus-module-editing *[data-inline-edit-route]')
     .prop('contenteditable', 'true')
-    .on('blur', _handleContentUpdate);
+    .on('input blur', _handleContentUpdate);
 
   // Attach events for moving modules by drag & drop
   jQuery('.nucleus-move-dragsource')
@@ -118,7 +118,7 @@ function _setupEditMode(e, args)
   }
 
   /// Handle a "drop" event
-  /// Call Nucleus to execute the "move mnodule" operation.  Reload the page after the module has been moved.
+  /// Call Nucleus to execute the "move module" operation.  Reload the page after the module has been moved.
   function _handleDrop(event)
   {
     var targetpane = jQuery(event.target).attr('data-pane-name');
@@ -126,7 +126,7 @@ function _setupEditMode(e, args)
    
     if (targetpane !== null && _sourceModuleId !== null)
     {
-      var url = '/admin/pages/movemoduleto?mid=' + _sourceModuleId;
+      var url = document.baseURI + 'admin/pages/movemoduleto?mid=' + _sourceModuleId;
       var content = new FormData();
 
       content.append('pane', targetpane);
@@ -158,13 +158,24 @@ function _setupEditMode(e, args)
     }    
   }
 
-  /// This function is called after a user edits inline-editable content and then the element loses focus. 
+  /// This function is called after a user edits inline-editable content.
   /// Send updated content to Nucleus.
+  var _handleContentUpdateTimeout = -1;
   function _handleContentUpdate(event)
   {
-    var url = jQuery(this).attr("data-inline-edit-route");
+    if (_handleContentUpdateTimeout > 0)
+    {
+      window.clearTimeout(_handleContentUpdateTimeout);
+    }
+
+    _handleContentUpdateTimeout = window.setTimeout(_commitContentUpdate, 1000, this);
+  }
+
+  function _commitContentUpdate(element)
+  {
+    var url = jQuery(element).attr("data-inline-edit-route");
     var content = new FormData();
-    content.append('value', jQuery(this).html());
+    content.append('value', jQuery(element).html());
 
     jQuery.ajax({
       url: url,

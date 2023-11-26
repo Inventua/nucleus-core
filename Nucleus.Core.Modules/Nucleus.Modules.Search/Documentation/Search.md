@@ -23,6 +23,7 @@ You can control the presentation of the full results display in the module setti
 {.table-25-75}
 |                     |                                                                                      |
 |---------------------|--------------------------------------------------------------------------------------|
+| Search Provider                | Specifies which search provider to use.  |
 | Display Mode                   | Specifies how the search module is displayed. Available settings are Full, Compact and Minimal.  |
 | Search Caption                 | Specifies the label displayed next to the search term text box.  This is only displayed when display mode is 'Full'. |
 | Search Button Caption          | Specifies the text of the seach button.  The search button is not displayed when display mode is 'Minimal'. |
@@ -30,8 +31,11 @@ You can control the presentation of the full results display in the module setti
 | Results Page                   | Specifies the page to navigate to when the user clicks the search button or presses ENTER.  This page should contain a search module.  Select (none) to display results on the same page as the search module. |
 | Include Scopes                 | Use this setting to restrict results to specified scopes, or leave blank to return results from all sources (this is the default).  Specify included scopes by entering one or more scopes separated by line feeds.  A scope is the URN of the data type which was used to create a search entry (Examples: site pages - urn:nucleus:entities:page, files - urn:nucleus:entities:file, forum posts - urn:nucleus:entities:forum-post).  This setting affects both search suggestions and search results.  This is an advanced setting which may not be supported by all search providers. |
 | Include Files in Results       | Specifies whether to include files in search results. |
+| Show Type                      | Toggles whether to display the result type (for example: Page, File, Document) in the full results display. |
+| Show Summary                   | Toggles whether to display the result summary (if the search result has one) in the full results display. |
 | Show Categories                | Toggles whether to display categories (if the search result has any) in the full results display. |
 | Show Published Date            | Toggles whether to display the published date (if one applies to the result) in the full results display. |
+| Show Url                       | Toggles whether to display the result Url in the full results display. |
 | Show Size                      | Toggles whether to display the result size in the full results display. |
 | Show Score                     | Toggles whether to display the result score in the full results display. |
 

@@ -9,6 +9,11 @@ namespace Nucleus.Modules.Forums.ViewModels
 {
 	public class ManageSubscriptions
 	{
-		public UserSubscriptions Subscriptions { get; set; }
+    public Boolean CanSubscribe { get; set; } = true;
+
+    public IList<Group> Groups { get; set; }
+    public IList<Forum> Forums { get; set; }
+
+    public UserSubscriptions Subscriptions { get; set; }
 	}
 }

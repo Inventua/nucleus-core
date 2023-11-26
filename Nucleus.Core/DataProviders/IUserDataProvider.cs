@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
@@ -13,8 +14,14 @@ namespace Nucleus.Core.DataProviders
 	{
 		abstract Task<IList<User>> ListUsers(Site site);
 		abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListUsers(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
-		abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> SearchUsers(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
-		abstract Task<User> GetUser(Guid userId);
+    abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> ListUsers(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings, Expression<Func<User, bool>> filterExpression);
+    
+
+    abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> SearchUsers(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
+    abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<User>> SearchUsers(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings, Expression<Func<User, bool>> filterExpression);
+    
+
+    abstract Task<User> GetUser(Guid userId);
 		abstract Task<User> GetUserByName(Site site, string userName);
 		abstract Task<User> GetUserByEmail(Site site, string email);
 

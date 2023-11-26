@@ -19,7 +19,10 @@ The Elastic Search extension settings are accessed in the `Manage` control panel
 |---------------------------|--------------------------------------------------------------------------------------|
 | Elastic Search Server Url | Enter the domain name or address of the Elastic Search server, including the scheme (http: or https:) and port.  The default port is 9200.  For example, https://192.168.1.100:9200. |
 | Index Name                | Enter an index name.  The index is created automatically.  Index names must be lower case, may not  include \, /, *, ?, ", &lt;, &gt;, &#124;, (space character) or # and must be less than 255 bytes. |
-| Attachments Size Limit    | You can specify an upper size limit (in mb) for documents which are submitted to the index.  Documents which are lareger than the size limit will have index entries containing meta-data only.  To specify no limit, enter zero (0). |
+| User name, password       | Enter your Elastic Search user name and password.  If your Elastic Search server does not have security configured, you can leave these fields empty. |
+| Certificate Thumbprint    | Enter your Elastic Search certificate thumbprint.  If your Elastic Search server does not have a certificate configured, you can leave this value blank. |
+| Attachments Size Limit    | You can specify an upper size limit (in mb) for documents which are submitted to the index.  Documents which are larger than the size limit will have index entries containing meta-data only.  To specify no limit, enter zero (0). |
+| Indexing Pause            | You can specify an pause in-between each indexing operation (in seconds), or zero for no pause. See additional information below. |
 | Boost Settings            | You can increase or decrease the boost for some search index fields.  This influences the relevance of a document when you are searching, and results are sorted by relevance.  The default boost value for all fields is 1. |
 |  - Title                   | Boost the page title, or the file name for files. |
 |  - Summary                 | Boost the page summary (not relevant for files). |
@@ -28,6 +31,19 @@ The Elastic Search extension settings are accessed in the `Manage` control panel
 |  - Content                 | Boost the page or file content. Elastic search can parse a number of file formats, including office documents and PDFs.  |
 |  - Attachment Fields       | (Title, Name, Author, Keywords) Some document formats contain embedded meta-data.  Use the attachment fields boost to increase the relevance of these values. |
 
+
+### Indexing Pause
+The indexing pause is used to reduce the load on your server during search feed processing.  In some hosting environments, the search feed can exhaust 
+memory, processor or TCP connection limits.
+
+Pausing in-between submitting each index entry gives the server time to free up resources.  This setting makes your search feed 
+take longer to run, but can prevent it from failing.  If you are hosting in an Azure App Service, this setting is important, as Azure automatically stops 
+and restarts applications which have too many TCP ports open.  
+
+If you are hosting in Azure, try an indexing pause of 2.5 seconds.  This will reduce the 
+number of HTTP requests to 24 per minute, which gives the Azure time to release unused 
+[SNAT](https://learn.microsoft.com/en-us/azure/load-balancer/load-balancer-outbound-connections) ports.  For a search index with 5000 entries, this would 
+increase the search feed duration to around 3.5 hours.
 
 ## Tools
 |                           |                                                                                      |

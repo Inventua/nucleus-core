@@ -25,6 +25,7 @@
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="Viewer.js" />
+    <None Remove="viewer.min.css" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
     <None Remove="Views\_PageMenu.cshtml" />
@@ -38,6 +39,7 @@
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
     <Content Include="Viewer.js" />
+    <Content Include="viewer.min.css" />
     <Content Include="Views\_ViewerInput.cshtml" />
     <Content Include="Views\_PageMenu.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -49,13 +51,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.2.0" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.3.0-rc4" />
+    <PackageReference Include="Inventua.Nucleus.Extensions" Version="1.3.0-pre-rc1" />
     <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.2.0" />
   </ItemGroup>
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>Search</ExtensionFolder>
-		<VersionPrefix>1.2.0</VersionPrefix>
+		<VersionPrefix>1.3.0</VersionPrefix>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 	</PropertyGroup>
 

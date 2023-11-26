@@ -11,8 +11,17 @@ using Nucleus.Abstractions.Models.Paging;
 namespace Nucleus.ViewFeatures.Controls
 {
 	/// <summary>
-	/// Paging control
+	/// Paging control.
 	/// </summary>
+	/// <remarks>
+	/// The paging control is a view component. Users of the paging control do not create an instance of this class 
+	/// directly.  Instead, use 
+	/// <seealso href="https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-components#invoke-a-view-component">Component.InvokeAsync</seealso>
+	/// to invoke the control from Razor.
+	/// </remarks>
+	/// <example>
+	/// @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.ApiKeys, propertyName = "ApiKeys", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
+	/// </example>
 	[ViewComponent(Name = "PagingControl")]
 	public class PagingControl : ViewComponent
 	{
@@ -22,15 +31,6 @@ namespace Nucleus.ViewFeatures.Controls
 		/// Constructor used by dependency injection to create an instance of the paging control.
 		/// </summary>
 		/// <param name="Context"></param>
-		/// <remarks>
-		/// The paging control is an ASP.NET core view component. Users of the paging control do not create an instance of this class 
-		/// directly.  Instead, use 
-		/// <seealso href="https://docs.microsoft.com/en-us/aspnet/core/mvc/views/view-components#invoke-a-view-component">Component.InvokeAsync</seealso>
-		/// to invoke the control from Razor.
-		/// </remarks>
-		/// <example>
-		/// @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.ApiKeys, propertyName = "ApiKeys", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
-		/// </example>
 		public PagingControl(Context Context)
 		{
 			this.Context = Context;

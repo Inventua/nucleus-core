@@ -1,0 +1,61 @@
+{
+  "schemaName": "Nucleus.Core",
+  "version": "01.00.16",
+  "operations": [
+    {
+      "createTable": {
+        "name": "SearchIndexHistory",
+        "columns": [
+          {
+            "name": "SiteId",
+            "clrType": "Guid",
+            "isnullable": false
+          },
+          {
+            "name": "Scope",
+            "clrType": "string",
+            "maxLength": 512,
+            "isnullable": false
+          },
+          {
+            "name": "SourceId",
+            "clrType": "guid",
+            "isnullable": false
+          },
+          {
+            "name": "Url",
+            "clrType": "string",
+            "maxLength": 1024,
+            "isnullable": false
+          },
+          {
+            "name": "LastIndexedDate",
+            "clrType": "datetime",
+            "isnullable": false
+          }
+        ],
+        "primaryKey": {
+          "name": "PK_SearchIndexHistory",
+          "isclustered": true,
+          "columns": [ "SiteId", "Scope", "SourceId" ]
+        }
+      }
+    },
+    {
+      "createIndex": {
+        "name": "IX_SearchIndexHistory_SiteId",
+        "table": "SearchIndexHistory",
+        "columns": [ "SiteId" ],
+        "isUnique": false
+      }
+    },
+    {
+      "createIndex": {
+        "name": "IX_SearchIndexHistory_SiteScopeSource",
+        "table": "SearchIndexHistory",
+        "columns": [ "SiteId", "Scope", "SourceId" ],
+        "isUnique": true
+      }
+    }
+  ]
+}

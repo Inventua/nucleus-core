@@ -236,7 +236,7 @@ namespace Nucleus.Core.Layout
 				}
 
 				Boolean isEditing = user.IsEditing(viewContext?.HttpContext, site, page, moduleInfo);
-        
+                
         if (moduleOutput.StatusCode == (int)System.Net.HttpStatusCode.NoContent)
 				{
 					// modules can return NoContent to indicate that they have nothing to display, and should not be rendered (including that 
@@ -254,19 +254,28 @@ namespace Nucleus.Core.Layout
 				// output DOM to be consistent, so that CSS for the layout/container/module can always target the same DOM structure.
 				TagBuilder moduleView = new("div");
 
-				if (!String.IsNullOrEmpty(moduleInfo.Style))
-				{
-					moduleView.AddCssClass(moduleInfo.Style);
-				}
-
-        if (isEditing)
-				{
-          moduleView.AddCssClass("nucleus-module-editing");
-
-          if (user.IsSiteAdmin(site) && HasAdminPermissionOnly(moduleInfo))
+        if (HasAdminPermissionOnly(moduleInfo))
+        {
+          if (isEditing && user.IsSiteAdmin(site))
           {
             moduleView.AddCssClass("nucleus-adminviewonly");
           }
+          else
+          {
+            // suppress display of modules with no permissions when an admin is not in editing mode
+            moduleOutput.StatusCode = (int)System.Net.HttpStatusCode.OK;
+            return output;
+          }
+        }
+
+        if (!String.IsNullOrEmpty(moduleInfo.Style))
+				{
+					moduleView.AddCssClass(moduleInfo.Style);
+				}
+                
+        if (isEditing)
+				{
+          moduleView.AddCssClass("nucleus-module-editing");
 
           moduleView.InnerHtml.AppendHtml(moduleInfo.BuildMoveDropTarget(moduleInfo.Pane, "Move here"));
           moduleView.InnerHtml.AppendHtml(BuildModuleEditControls(viewContext, moduleInfo, user.HasEditPermission(site, page)));
@@ -441,8 +450,6 @@ namespace Nucleus.Core.Layout
 
 							actionDescriptor.Parameters.Add(paramDesc);
 						}
-
-						// TODO Use routeData from actionDescriptor? ****
 
 						// We must create a NEW routeData object (don't use htmlHelper.ViewContext.RouteData), because we must provide the controller, area and
 						// action names for the module, rather than the route values for the original http request.

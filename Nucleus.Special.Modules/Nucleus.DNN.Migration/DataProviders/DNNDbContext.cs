@@ -238,7 +238,7 @@ public class DNNDbContext : Nucleus.Data.EntityFramework.DbContext
       .HasOne(group => group.Settings);
 
     builder.Entity<Models.DNN.Modules.NTForums.ForumGroupSettings>()
-      .ToTable("activeforums_Settings")
+      .ToTable("NTForums_ForumGroupSettings")
       .HasKey(settings => settings.ForumGroupID);
 
     builder.Entity<Models.DNN.Modules.NTForums.ForumGroup>()

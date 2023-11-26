@@ -20,7 +20,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
   /// are available as drop targets for the inline drag/drop "move module" functionality.
   /// </remarks>
   /// <example>
-  /// <div class="GridPane" suppress-empty="true"></div>
+  /// <![CDATA[<div class="GridPane" suppress-empty="true"></div>]]>
   /// </example>
   [HtmlTargetElement(HtmlTargetElementAttribute.ElementCatchAllTarget, Attributes = "[suppress-empty=true]")]
 	public class SuppressEmptyTagHelper : TagHelper

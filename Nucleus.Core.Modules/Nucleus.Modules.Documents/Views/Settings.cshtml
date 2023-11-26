@@ -79,6 +79,10 @@
 						</div>
 					</SettingsControl>
 
+          <SettingsControl caption="Default Sort Order" helptext="Default sort order">
+            @Html.DropDownListFor(model => model.DefaultSortOrder, Model.SortOrders, "(not selected)")
+          </SettingsControl>
+
 					<div class="ShowColumns">
 						<SettingsControl caption="Allow Sorting?" helptext="Specifies whether to allow the user to sort the list." class="inner-inline">
 							@Html.CheckBoxFor(model => model.AllowSorting, new { @class = "ToggleSwitch" })

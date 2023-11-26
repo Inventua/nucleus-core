@@ -21,4 +21,5 @@ public class Progress
   public IEnumerable<EngineProgress> EngineProgress { get; set; }
   public Boolean InProgress { get; set; }
 
+  public int ProgressInverval { get; set; }
 }

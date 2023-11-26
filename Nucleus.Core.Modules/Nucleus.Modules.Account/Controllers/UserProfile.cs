@@ -40,7 +40,7 @@ namespace Nucleus.Modules.Account.Controllers
 		[HttpGet]
 		public async Task<ActionResult> Index(string returnUrl)
 		{
-			return View("UserProfile", new ViewModels.UserProfile()
+      return View("UserProfile", new ViewModels.UserProfile()
 			{
 				User = await this.UserManager.Get(this.Context.Site, this.ControllerContext.HttpContext.User.GetUserId()),
 				ClaimTypeOptions = this.ClaimTypeOptions,
@@ -49,7 +49,7 @@ namespace Nucleus.Modules.Account.Controllers
 		}
 
 		[HttpGet]
-		public ActionResult Edit(string returnUrl)
+		public ActionResult Edit()
 		{
 			return View("UserProfileSettings", new ViewModels.UserProfile());
 		}
@@ -81,7 +81,10 @@ namespace Nucleus.Modules.Account.Controllers
 				await this.UserManager.Save(this.Context.Site, existing); 
 			}
 
-			string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
+
+      if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
+      string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
+
 			ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
 			return StatusCode((int)System.Net.HttpStatusCode.Found);
 		}

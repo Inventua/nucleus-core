@@ -43,7 +43,9 @@ namespace Nucleus.Extensions
 		{
 			byte[] sample = new byte[63];
 
-			stream.Read(sample, 0, sample.Length);
+      stream.Position = 0;
+      stream.Read(sample, 0, sample.Length);
+      stream.Position = 0;
 
 			return sample;
 		}
@@ -52,9 +54,9 @@ namespace Nucleus.Extensions
 		{
 			List<string> signatureBytes = new();
 
-			for (int count = 0; count < (int)Math.Floor(signature.Length / (double)2); count += 2)
+			for (int count = 0; count < (int)Math.Floor(signature.Length / (double)2); count ++)
 			{
-				signatureBytes.Add(signature.Substring(count, 2));
+				signatureBytes.Add(signature.Substring(count*2, 2));
 			}
 
 			if (sample.Length < signatureBytes.Count) return false;
@@ -63,7 +65,7 @@ namespace Nucleus.Extensions
 			{
 				if (signatureBytes[count] != "??")
 				{
-					if (!signatureBytes[count].Equals(sample[count].ToString("X"), StringComparison.OrdinalIgnoreCase)) return false;
+					if (!signatureBytes[count].Equals(sample[count].ToString("X2"), StringComparison.OrdinalIgnoreCase)) return false;
 				}
 			}
 

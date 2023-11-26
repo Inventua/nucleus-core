@@ -33,7 +33,10 @@ namespace Nucleus.Data.PostgreSql
 		{
 			if (this.DatabaseConnectionOption != null)
 			{
-					options.UseNpgsql(this.DatabaseConnectionOption.ConnectionString);
+					options.UseNpgsql(this.DatabaseConnectionOption.ConnectionString, options=>
+          {
+            options.EnableRetryOnFailure();
+          });
 					return true;
 			}
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
@@ -39,7 +40,7 @@ namespace Nucleus.Core.DataProviders
 
     abstract Task<List<Page>> ListPages(Guid siteId, Guid? parentId);
 
-		abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> SearchPages(Guid siteId, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
+    abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> SearchPages(Site site, string searchTerm, IEnumerable<Role> userRoles, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
 
 		abstract Task<Page> GetPage(Guid pageId);
 

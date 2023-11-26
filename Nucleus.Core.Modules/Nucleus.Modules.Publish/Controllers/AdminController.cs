@@ -93,7 +93,7 @@ namespace Nucleus.Modules.Publish.Controllers
 		public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
 		{
 			viewModel.SetSettings(this.Context.Module);
-			await this.PageModuleManager.SaveSettings(this.Context.Module);
+			await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
 			return Json(new { Title = "Save Settings", Message = "Settings saved." });
 		}

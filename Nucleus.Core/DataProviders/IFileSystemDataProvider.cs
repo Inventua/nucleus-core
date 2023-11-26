@@ -19,7 +19,11 @@ namespace Nucleus.Core.DataProviders
 
 		abstract Task<File> GetFile(Guid fileId);
 		abstract Task<File> GetFile(Site site, string provider, string path);
-		abstract Task<File> SaveFile(Site site, File file);
+
+    abstract Task<List<File>> ListFiles(Site site, string provider, string path);
+    abstract Task<List<Folder>> ListFolders(Site site, string provider, string path);
+
+    abstract Task<File> SaveFile(Site site, File file);
 		abstract Task DeleteFile(File file);
 
 

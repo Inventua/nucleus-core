@@ -7,25 +7,29 @@
 @Html.AddStyle("~/Resources/css/forms.css")
 @if (Model.Forum != null)
 {
-	<h2>@Model.Forum.Name</h2>
 	<div class="Forums">
 		@using (Html.BeginNucleusForm("SubscribeForum", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off" }))
-		{
-			<div class="nucleus-form-tools">
-				@Html.HiddenFor(model => model.Forum.Id)
+		{			
+			@Html.HiddenFor(model => model.Forum.Id)
+      <a class="btn btn-none" title="Back" href="@Url.PageLink(Model.Page)">
+        <span class="nucleus-material-icon">&#xe5e0;</span>
+        <h2 class="d-inline-block">@Model.Forum.Name</h2>
+      </a>
+
+      <div class="nucleus-form-tools">
 				@if (Model.CanPost)
 				{
-					@Html.LinkButton("", "Add new post", Url.NucleusAction("AddPost", "Forums", "Forums", new { forumId = Model.Forum.Id }), new { @class = "btn btn-primary", @data_target = ".Forums.parent()" })
+					@Html.LinkButton("", "New post", Url.NucleusAction("AddPost", "Forums", "Forums", new { forumId = Model.Forum.Id }), new { @class = "btn btn-primary btn-sm", @data_target = ".Forums.parent()" })
 				}
-				@if (Model.CanSubscribe && Model.Subscription == null)
+        @if (!Model.IsSubscribedToForumGroup && Model.CanSubscribe && Model.Subscription == null)
 				{
-					@Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribeForum", "Forums", "Forums"), new { @class = "btn btn-secondary", @data_target = ".Forums.parent()" })
+					@Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribeForum", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = ".Forums.parent()" })
 				}
 				@if (Model.Subscription != null)
 				{
-					@Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribeForum", "Forums", "Forums"), new { @class = "btn btn-secondary", @data_target = ".Forums.parent()" })
+					@Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribeForum", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = ".Forums.parent()" })
 				}
-				@Html.LinkButton("", "Back", Url.PageLink(Model.Page), new { @class="btn btn-secondary" })
+        @*@Html.LinkButton("", "Back", Url.PageLink(Model.Page), new { @class="btn btn-secondary btn-sm ms-auto" })*@
 			</div>
 		}
 		@if (Model.Posts != null)
@@ -35,7 +39,7 @@
 				@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.Posts, propertyName = "Posts", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Standard })
 				@Html.HiddenFor(model => model.Forum.Id)
 
-				<table class="forum-posts">
+				<table class="forum-posts table table-sm table-striped">
 					<thead>
 						<tr>
 							<th colspan="1" class="forum-title" scope="col">
@@ -93,8 +97,12 @@
 							<td class="compact-cell small">
 								@if (post.Statistics.LastReply != null)
 								{
-									<div>@(post.Statistics.LastReply.PostedBy?.UserName ?? "Deleted User")</div>
-									<div>@post.Statistics.LastReply.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())</div>
+									<div class="small">@(post.Statistics.LastReply.PostedBy?.UserName ?? "Deleted User")</div>
+                  <div class="small">
+                    <a href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode() + $"/{@post.Id}")/#_@post.Statistics.LastReply.Id">
+                      @post.Statistics.LastReply.DateAdded.FormatDate(this.Context.Request.GetUserTimeZone())
+                    </a>
+                  </div>
 								}
 							</td>
 						</tr>

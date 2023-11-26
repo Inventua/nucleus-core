@@ -35,7 +35,7 @@ namespace Nucleus.Abstractions.Models.FileSystem
 		/// <summary>
 		/// Specifies whether to include the files within the folder in the search index.
 		/// </summary>
-		public Boolean IncludeInSearch { get; set; } = true;
+		public Boolean IncludeInSearch { get; set; } = false;
 
 
 		/// <summary>

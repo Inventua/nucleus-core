@@ -51,7 +51,12 @@ namespace Nucleus.Abstractions.Models
 			/// Standard permission scope suffix for edit permission scopes.
 			/// </summary>
 			public static string EDIT = "edit";
-		}
+
+      /// <summary>
+			/// Standard permission scope suffix for browse permission scopes.
+			/// </summary>
+			public static string BROWSE = "browse";
+    }
 
 		/// <summary>
 		/// Scope namespaces for operations on core entities
@@ -91,7 +96,15 @@ namespace Nucleus.Abstractions.Models
 			/// For folders, the folder edit permission includes upload, rename, delete and all other operations which modify a folder or the files within it.
 			/// </remarks>
 			public static string FOLDER_EDIT = $"{PermissionScopeNamespaces.Folder}/{PermissionScopeTypes.EDIT}";
-		}
+
+      /// <summary>
+			/// URN of scope which represents folder browse permission.
+			/// </summary>
+			/// <remarks>
+			/// For folders, the folder browse permission determines whether a user can view the files and sub-folders in a folder.
+			/// </remarks>
+			public static string FOLDER_BROWSE = $"{PermissionScopeNamespaces.Folder}/{PermissionScopeTypes.BROWSE}";
+    }
 
 		/// <summary>
 		/// Unique record identifier.

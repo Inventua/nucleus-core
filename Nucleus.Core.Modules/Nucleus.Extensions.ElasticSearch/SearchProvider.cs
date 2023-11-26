@@ -56,7 +56,8 @@ namespace Nucleus.Extensions.ElasticSearch
 			return new SearchResults()
 			{
 				Results = await ToSearchResults(result.Documents),
-				Total = result.Total
+        MaxScore = result.MaxScore,
+        Total = result.Total
 			};
 		}
 
@@ -87,9 +88,10 @@ namespace Nucleus.Extensions.ElasticSearch
 			ElasticSearchRequest request = new(new System.Uri(settings.ServerUrl), settings.IndexName, settings.Username, ConfigSettings.DecryptPassword(query.Site, settings.EncryptedPassword), settings.CertificateThumbprint);
 			Nest.ISearchResponse<ElasticSearchDocument> result = await request.Suggest(query);
 
-			return new SearchResults()
-			{
-				Results = await ToSearchResults(result.Documents),
+      return new SearchResults()
+      {
+        Results = await ToSearchResults(result.Documents),
+        MaxScore = result.MaxScore,
 				Total = result.Total
 			};
 		}
@@ -118,6 +120,7 @@ namespace Nucleus.Extensions.ElasticSearch
 				Summary = document.Summary,
 
 				Scope = document.Scope,
+        Type = document.Type,
 				SourceId = document.SourceId,
 				ContentType = document.ContentType,
 				PublishedDate = document.PublishedDate,

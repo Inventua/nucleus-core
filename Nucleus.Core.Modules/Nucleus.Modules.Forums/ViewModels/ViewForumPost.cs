@@ -12,8 +12,8 @@ using Nucleus.Abstractions.Models;
 namespace Nucleus.Modules.Forums.ViewModels
 {
 	public class ViewForumPost
-	{
-		public Page Page { get; set; }
+	{    
+    public Page Page { get; set; }
 		public Forum Forum { get; set; }
 		public Post Post { get; set; }
 
@@ -21,7 +21,9 @@ namespace Nucleus.Modules.Forums.ViewModels
 
 		public PostSubscription Subscription { get; set; }
 
-		public Boolean CanEditPost { get; set; }
+    public Boolean IsSubscribedToForum { get; set; }
+
+    public Boolean CanEditPost { get; set; }
 		public Boolean CanReply { get; set; }
 		public Boolean CanAttach { get; set; }
 		public Boolean CanPinPost { get; set; }
@@ -31,7 +33,7 @@ namespace Nucleus.Modules.Forums.ViewModels
 		public Boolean CanSubscribe { get; set; }
 		public Boolean CanDeletePost { get; set; }
 
-		
+		public Folder AttachmentsFolder { get; set; }
 
 	}
 }

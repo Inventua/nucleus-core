@@ -14,7 +14,6 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions.Authorization;
 using System.Security.Cryptography;
 using Nucleus.Extensions;
-using Org.BouncyCastle.Asn1.Ocsp;
 using static Nucleus.Abstractions.Managers.IPageManager;
 
 namespace Nucleus.Core.Managers
@@ -235,12 +234,14 @@ namespace Nucleus.Core.Managers
     /// </summary>
     /// <param name="site"></param>
     /// <param name="searchTerm"></param>
+    /// <param name="userRoleNames"></param>
+    /// <param name="pagingSettings"></param>
     /// <returns></returns>
-    public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> Search(Site site, string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+    public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> Search(Site site, string searchTerm, IEnumerable<Role> userRoles,  Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
     {
       using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
       {
-        return await provider.SearchPages(site.Id, searchTerm, pagingSettings);
+        return await provider.SearchPages(site, searchTerm, userRoles, pagingSettings);
       }
     }
 
@@ -589,17 +590,18 @@ namespace Nucleus.Core.Managers
             if (breadcrumbPage != null)
             {
               breadcrumbs.Add(breadcrumbPage);
+
+              // extra checks here are to prevent an infinite loop 
+              if (breadcrumbPage.ParentId.HasValue && breadcrumbPage.ParentId != breadcrumbPage.Id && !breadcrumbs.Where(crumb => crumb.Id == breadcrumbPage.ParentId).Any())
+              {
+                breadcrumbPage = await this.Get(breadcrumbPage.ParentId.Value);
+              }
+              else
+              {
+                breadcrumbPage = null;
+              }
             }
 
-            // extra checks here are to prevent an infinite loop 
-            if (breadcrumbPage.ParentId.HasValue && breadcrumbPage.ParentId != breadcrumbPage.Id && !breadcrumbs.Where(crumb => crumb.Id == breadcrumbPage.ParentId).Any())
-            {
-              breadcrumbPage = await this.Get(breadcrumbPage.ParentId.Value);
-            }
-            else
-            {
-              breadcrumbPage = null;
-            }
           } while (breadcrumbPage != null);
 
           if (breadcrumbs.Any())

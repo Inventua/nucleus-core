@@ -57,8 +57,12 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       /// <summary>
       /// CSS classes for the Nucleus paging control.
       /// </summary>
-      NUCLEUS_PAGINGCONTROL
+      NUCLEUS_PAGINGCONTROL,
 
+      /// <summary>
+      /// CSS classes for the Monaco editor
+      /// </summary>
+      NUCLEUS_MONACO_EDITOR
     }
 
     /// <summary>
@@ -96,7 +100,12 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 				case WellKnownScripts.NUCLEUS_PAGINGCONTROL:
 					stylesheetPath = "~/Shared/Controls/Views/PagingControl.css";
 					break;
-			}
+
+        case WellKnownScripts.NUCLEUS_MONACO_EDITOR:
+          stylesheetPath = "~/Resources/Libraries/Monaco/0.44.0/min/vs/editor/editor.main.css";
+          break;
+
+      }
 
       if (!String.IsNullOrEmpty(stylesheetPath))
       {

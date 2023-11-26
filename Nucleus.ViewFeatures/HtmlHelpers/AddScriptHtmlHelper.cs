@@ -62,6 +62,11 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       /// Nucleus inline editing controls script.
       /// </summary>
       NUCLEUS_EDITMODE,
+
+      /// <summary>
+      /// Monaco editor
+      /// </summary>
+      NUCLEUS_MONACO_EDITOR
     }
 
     /// <summary>
@@ -121,7 +126,12 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
         case WellKnownScripts.NUCLEUS_EDITMODE:
           scriptPath = "~/Resources/js/nucleus-editmode.js";
           break;
-
+        case WellKnownScripts.NUCLEUS_MONACO_EDITOR:
+          AddScript(htmlHelper, "~/Resources/Libraries/Monaco/Nucleus/monaco-editor.js");
+          AddScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/loader.js");
+          AddScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/editor/editor.main.nls.js");
+          AddScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/editor/editor.main.js");
+          break;
       }
 
       if (!String.IsNullOrEmpty(scriptPath))

@@ -190,7 +190,7 @@ namespace Nucleus.Extensions.ElasticSearch
 					{
 						Field = ParseField(nameof(ElasticSearchDocument.Status)),
 						Value = "Entry with attachment was processed successfully."
-					}
+					},
 					new SetProcessor()
 					{
 						Field = ParseField(nameof(ElasticSearchDocument.SuggesterTitle)),

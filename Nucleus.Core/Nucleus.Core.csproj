@@ -88,6 +88,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.2" />
     <PackageReference Include="System.DirectoryServices.Protocols" Version="7.0.1" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="7.0.3" />
   </ItemGroup>

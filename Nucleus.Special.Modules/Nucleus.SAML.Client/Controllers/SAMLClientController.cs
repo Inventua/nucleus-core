@@ -190,7 +190,7 @@ namespace Nucleus.SAML.Client.Controllers
 			catch (ITfoxtec.Identity.Saml2.Cryptography.InvalidSignatureException e)
 			{
 				Logger.LogError(e, "Exception thrown while validating SAML2 Authn Response.");
-				throw e;
+				throw;
 			}
 		}
 
@@ -211,7 +211,7 @@ namespace Nucleus.SAML.Client.Controllers
 			catch (ITfoxtec.Identity.Saml2.Cryptography.InvalidSignatureException e)
 			{
 				Logger.LogError(e, "Exception thrown validating SAML2 Authn Response.");
-				throw e;
+				throw;
 			}
 		}
 

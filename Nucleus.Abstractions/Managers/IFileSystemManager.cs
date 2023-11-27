@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
-using System.Collections.ObjectModel;
 using Nucleus.Abstractions.FileSystemProviders;
 using Nucleus.Abstractions.Models.Paging;
-using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
 namespace Nucleus.Abstractions.Managers
@@ -21,21 +18,6 @@ namespace Nucleus.Abstractions.Managers
 	/// </remarks>
 	public interface IFileSystemManager
 	{
-		/// <summary>
-		/// Copy permission operation types
-		/// </summary>
-		public enum CopyPermissionOperation
-		{
-			/// <summary>
-			/// Replace existing permissions with the new permissions
-			/// </summary>
-			Replace = 1,
-			/// <summary>
-			/// Merge 
-			/// </summary>
-			Merge = 2
-		}
-
 		/// <summary>
 		/// Retrieve an existing <see cref="Folder"/> from the database.
 		/// </summary>

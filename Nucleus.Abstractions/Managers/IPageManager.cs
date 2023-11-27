@@ -18,21 +18,6 @@ namespace Nucleus.Abstractions.Managers
 	public interface IPageManager
 	{
 
-    /// <summary>
-    /// Copy permission operation types
-    /// </summary>
-    public enum CopyPermissionOperation
-    {
-      /// <summary>
-      /// Replace existing permissions with the new permissions
-      /// </summary>
-      Replace = 1,
-      /// <summary>
-      /// Merge 
-      /// </summary>
-      Merge = 2
-    }
-
 		/// <summary>
 		/// Create a new <see cref="Page"/> with default values.
 		/// </summary>

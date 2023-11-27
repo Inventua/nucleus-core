@@ -480,7 +480,7 @@ namespace Nucleus.Web.Controllers.Admin
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
 		public async Task<ActionResult> CopyPermissionsReplaceAll(ViewModels.Admin.FileSystem viewModel)
 		{
-			if (await this.FileSystemManager.CopyPermissionsToDescendants(this.Context.Site, viewModel.Folder , User, IFileSystemManager.CopyPermissionOperation.Replace))
+			if (await this.FileSystemManager.CopyPermissionsToDescendants(this.Context.Site, viewModel.Folder , User, CopyPermissionOperation.Replace))
 			{
 				return Json(new { Title = "Copy Permissions to Descendants", Message = "Permissions were copied successfully.", Icon = "alert" });
 			}
@@ -494,7 +494,7 @@ namespace Nucleus.Web.Controllers.Admin
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
 		public async Task<ActionResult> CopyPermissionsMerge(ViewModels.Admin.FileSystem viewModel)
 		{
-			if (await this.FileSystemManager.CopyPermissionsToDescendants(this.Context.Site, viewModel.Folder, User, IFileSystemManager.CopyPermissionOperation.Merge))
+			if (await this.FileSystemManager.CopyPermissionsToDescendants(this.Context.Site, viewModel.Folder, User, CopyPermissionOperation.Merge))
 			{
 				return Json(new { Title = "Copy Permissions to Descendants", Message = "Permissions were copied successfully.", Icon = "alert" });
 			}

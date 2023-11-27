@@ -22,6 +22,21 @@ namespace Nucleus.Abstractions.Managers
 	public interface IFileSystemManager
 	{
 		/// <summary>
+		/// Copy permission operation types
+		/// </summary>
+		public enum CopyPermissionOperation
+		{
+			/// <summary>
+			/// Replace existing permissions with the new permissions
+			/// </summary>
+			Replace = 1,
+			/// <summary>
+			/// Merge 
+			/// </summary>
+			Merge = 2
+		}
+
+		/// <summary>
 		/// Retrieve an existing <see cref="Folder"/> from the database.
 		/// </summary>
 		/// <param name="site"></param>
@@ -240,5 +255,20 @@ namespace Nucleus.Abstractions.Managers
 		/// Use this method to populate the properties of a file after MVC model binding returns a file object with just the Id property populated.
 		/// </remarks>
 		public Task<File> RefreshProperties(Site site, File file);
+
+		/// <summary>
+		/// Copy permissions from the specified <paramref name="folder"/> to its descendants.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="folder"></param>
+		/// <param name="user"></param>
+		/// <param name="operation">
+		/// If <paramref name="operation"/> is <see cref="IFileSystemManager.CopyPermissionOperation.Replace"/> overwrite all permissions of descendant folders.  
+		/// if <paramref name="operation"/> is <see cref="IFileSystemManager.CopyPermissionOperation.Merge"/>, merge the descendant folder permissions with the specified 
+		/// <paramref name="folder"/> permissions.		
+		/// </param>
+		/// <returns></returns>
+		public Task<Boolean> CopyPermissionsToDescendants(Site site, Folder folder, ClaimsPrincipal user, CopyPermissionOperation operation);
+
 	}
 }

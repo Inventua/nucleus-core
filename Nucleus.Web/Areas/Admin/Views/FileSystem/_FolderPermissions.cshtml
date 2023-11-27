@@ -10,8 +10,9 @@
 @Html.HiddenFor(model => Model.Folder.Id)
 @if (Model.FolderPermissions.Values.Any())
 {
-	<fieldset role="group" aria-labelledby="heading">
-		<table>
+	<fieldset role="group" aria-labelledby="heading" class="flex-grow-1">
+		<div class="d-flex mb-auto align-items-start permissions-table">
+			<table>
 			<tr>
 				<th></th>
 				@foreach (var permissionType in Model.FolderPermissionTypes)
@@ -49,6 +50,28 @@
 				</tr>
 			}
 		</table>
+		</div>
+
+		@Html.HiddenFor(model => model.DisableCopy)
+		<div class="btn-group align-self-start align-items-center" role="group">
+			<button type="button" class="folder-permissions-copy-dropdown btn btn-success btn-sm dropdown-toggle@(Model.DisableCopy ? " disabled" : "")" data-bs-toggle="dropdown" aria-expanded="false">
+				Copy Permissions to Descendants
+			</button>
+			<ul class="dropdown-menu">
+				<li>
+					<label class="dropdown-item">
+						Replace all Permissions ...
+						<button type="submit" class="collapse" formaction="@Url.AreaAction("CopyPermissionsReplaceAll", "FileSystem", "Admin")" data-confirm="This operation will overwrite all permissions of all descendant folders with permissions from this folder. Are you sure that you want to continue?" />
+					</label>
+				</li>
+				<li>
+					<label class="dropdown-item">
+						Merge Permissions ...
+						<button type="submit" class="collapse" formaction="@Url.AreaAction("CopyPermissionsMerge", "FileSystem", "Admin")" data-confirm="This operation will add permissions from this folder to all descendant folders. Are you sure that you want to continue?" />
+					</label>
+				</li>
+			</ul>
+		</div>
 	</fieldset>
 }
 

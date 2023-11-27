@@ -19,7 +19,7 @@
 		</TabPanel>
 
 		<TabPanel id="folder-permissions">
-			<fieldset role="group" aria-labelledby="heading">
+			<fieldset role="group" aria-labelledby="heading" class="flex-grow-1">
 				<h2>Permissions</h2>
 				@await Html.PartialAsync("_FolderPermissions", Model)
 			</fieldset>
@@ -30,3 +30,30 @@
 		<input type="submit" class="btn btn-primary" value="Save Changes" data-target=".nucleus-adminpage" />
 	</div>
 }
+<script>
+	jQuery(document).ready(function ()
+	{
+		jQuery(Page).on('ready', function (page, target, data, url, event, status, request)
+		{
+			jQuery('.folder-permissions-copy-dropdown')
+				.siblings('.nucleus-progress-spinner')
+				.remove();
+		});
+
+		jQuery('.folder-permissions-copy-dropdown + .dropdown-menu button').on('confirmed', function ()
+		{
+			var permissionsControl = jQuery('.folder-permissions-copy-dropdown');
+
+			if (permissionsControl.siblings('.nucleus-progress-spinner').length === 0)
+			{
+				var progress = jQuery('<div class="spinner-border spinner-border-sm text-primary nucleus-progress-spinner ms-2" role="status"/>');
+				progress.insertAfter(permissionsControl);
+			}
+		});
+
+		jQuery('.permissions-table input[type=checkbox]').on('change', function ()
+		{
+			jQuery('.folder-permissions-copy-dropdown').addClass('disabled');
+		});
+	});
+</script>

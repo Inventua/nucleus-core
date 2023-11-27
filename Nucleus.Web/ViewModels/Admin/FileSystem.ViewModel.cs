@@ -37,6 +37,7 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public Boolean EnableDelete { get; set; }
 		public Boolean EnableRename { get; set; }
+		public Boolean DisableCopy { get; set; }
 
 	}
 }

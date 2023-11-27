@@ -6,22 +6,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Models;
-using Nucleus.Data.Common;
-using Nucleus.Core.DataProviders;
 using Nucleus.Abstractions.Managers;
-using System.IO.Enumeration;
 using Nucleus.Extensions;
 
 namespace Nucleus.Core.Layout
 {
-	/// <summary>
-	/// Provides support for page routing.  Pages can have any but the reserved list of routes (urls), this class checks the
-	/// request Url and matches it to a page, and sets the context.Page property to the matching page.  
-	/// 
-	/// For API and troubleshooting purposes, a route with a "pageid" querystring value can be specified, in this case the 
-	/// page is selected by Id.  A pageId querystring value takes precendence over the route (request path) for the purposes of page selection.
-	/// </summary>
-	public class PageRoutingMiddleware : Microsoft.AspNetCore.Http.IMiddleware
+  /// <summary>
+  /// Provides support for page routing.  Pages can have multiple routes, with any values except for the reserved list of routes in 
+  /// KNOWN_NON_PAGE_PATHS. This class checks the request Url and matches it to a page, and sets the context.Page property to the matching page.  
+  /// 
+  /// For API and troubleshooting purposes, a route with a "pageid" querystring value can be specified, in this case the 
+  /// page is selected by Id.  A pageId querystring value takes precendence over the route (request path) for the purposes of page selection.
+  /// </summary>
+  public class PageRoutingMiddleware : Microsoft.AspNetCore.Http.IMiddleware
 	{		
 		private Context Context { get; }
 		private Application Application { get; }
@@ -42,15 +39,15 @@ namespace Nucleus.Core.Layout
 			Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH,
 		};
 
-		public PageRoutingMiddleware(ILogger<PageRoutingMiddleware> logger, Context context, Application application, IPageManager pageManager, ISiteManager siteManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager)
+		public PageRoutingMiddleware(Context context, Application application, IPageManager pageManager, ISiteManager siteManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager,ILogger<PageRoutingMiddleware> logger)
 		{
-			this.Logger = logger;
 			this.Context = context;
 			this.Application = application;
 			this.PageManager = pageManager;
 			this.SiteManager = siteManager;
       this.FileSystemManager = fileSystemManager;
 			this.CacheManager = cacheManager;
+			this.Logger = logger;
 		}
 
 		/// <summary>
@@ -62,17 +59,16 @@ namespace Nucleus.Core.Layout
 		/// <returns></returns>
 		public async Task InvokeAsync(HttpContext context, RequestDelegate next)
 		{
-
 			if (Guid.TryParse(context.Request.Query["pageid"], out Guid pageId))
 			{
-				Logger.LogTrace("Request for page id {pageid}.", pageId);
+				Logger.LogTrace("Request for page id '{pageid}'.", pageId);
 				this.Context.Page = await this.PageManager.Get(pageId);
 
 				if (this.Context.Page != null)
 				{
 					if (this.Context.Page.Disabled)
 					{
-						Logger.LogTrace("Page id {pageid} is disabled.", pageId);
+						Logger.LogTrace("Page id '{pageid}' is disabled.", pageId);
 						this.Context.Page = null;
 					}
 					else
@@ -81,7 +77,7 @@ namespace Nucleus.Core.Layout
 						this.Context.Site = await this.SiteManager.Get(this.Context.Page);
 					}
 
-          // When HandleLinkType returns false, it means we should not continue because we are redirecting to another site
+          // When HandleLinkType returns false, it means we should not continue because we are redirecting to another page
           if (!await HandleLinkType(context))
           {
             return;
@@ -140,7 +136,8 @@ namespace Nucleus.Core.Layout
 
             if (this.Context.Page == null)
             {
-              // if the page was not found, try searching for path & query
+              // if the page was not found, try searching for path & query.  This is to support pages routes which include a query string, which
+              // users may have in place to provide for urls from legacy systems like DNN which can have querystring values which identify a page.
               string requestedPathAndQuery = System.Web.HttpUtility.UrlDecode(context.Request.Path + context.Request.QueryString);
 
               Logger.LogTrace("Lookup page by path '{path}'.", requestedPathAndQuery);
@@ -191,6 +188,12 @@ namespace Nucleus.Core.Layout
 			}
 		}
 
+    /// <summary>
+    /// Pages can be set up as a link to an Url, file, or other page.  This function handles page link types and returns true if the page 
+    /// links to something else (and thus we should skip any further processing).
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
     private async Task<Boolean> HandleLinkType(HttpContext context)
     {
       switch (this.Context.Page.LinkType)
@@ -332,8 +335,9 @@ namespace Nucleus.Core.Layout
 		/// </remarks>
 		private Boolean SkipSiteDetection(HttpContext context)
 		{
-			// Browsers often send a request for /favicon.ico even when the page doesn't specify an icon
-			if (context.Request.Path.Value.Equals("/favicon.ico", StringComparison.OrdinalIgnoreCase))
+			// Browsers often send a request for /favicon.ico even when the page doesn't specify an icon.  When a site is set up with an "favicon", the
+      // path is a link to /files/path, not /favicon.ico, so /favicon.ico is never a legitimate request.
+			if (context.Request.Path.Value.Equals("/favicon.ico"))
 			{
 				return true;
 			}
@@ -367,27 +371,14 @@ namespace Nucleus.Core.Layout
 		/// </summary>
 		/// <returns></returns>
 		/// <remarks>
-		/// Skip attempt to identify the current page when the http request is for:					
-		///  - A file
+		/// Skip logic to identify the current page when the http request is for a file, API method, extension resource file or the search engine site map.
 		/// </remarks>
 		private Boolean SkipPageDetection(HttpContext context)
 		{
 			if (context.Request.Path.HasValue && context.Request.Path != "/")
 			{
-				// skip page detection when the request is for a known reserved path.
-				foreach (string knownPath in KNOWN_NON_PAGE_PATHS)
-				{
-					if (context.Request.Path.StartsWithSegments("/" + knownPath))
-					{
-						return true;
-					}
-				}
-				//// skip page detection when the request is for a known reserved path.  The Substring[1..] is to skip the leading "/" which
-				//// is always present.
-				//if (KNOWN_NON_PAGE_PATHS.Contains(context.Request.Path.Value[1..], StringComparer.OrdinalIgnoreCase))
-				//{
-				//	return true;
-				//}
+        // skip page detection when the request is for a known reserved path.
+        return KNOWN_NON_PAGE_PATHS.Where(knownPath => context.Request.Path.StartsWithSegments("/" + knownPath, StringComparison.OrdinalIgnoreCase)).Any();
 			}
 
 			return false;

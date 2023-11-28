@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
-using Microsoft.Extensions.Logging; 
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Nucleus.Web.ViewModels.Admin
 {	
@@ -39,11 +40,19 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public Dictionary<string, string> WebServerInformation { get; set; } = new();
 
-		public Dictionary<string, string> LoggingSettingsConfiguration { get; set; } = new();
+		public List<LogSetting> LoggingSettingsConfiguration { get; set; } = new();
+    public LogSetting NewSetting { get; set; } = new() { Level = LogLevel.None };
 
-		public SystemIndex()
+
+    public SystemIndex()
 		{
 		}
+
+    public class LogSetting
+    {
+      public string Category { get; set; }
+      public Microsoft.Extensions.Logging.LogLevel Level { get; set; }
+    }
 
 		public class LogSettingsViewModel
 		{

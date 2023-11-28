@@ -1,0 +1,42 @@
+﻿@model Nucleus.Web.ViewModels.Admin.SystemIndex
+<div class="overflow-auto log-levels-setup">
+  @using (Html.BeginAreaForm("UpdateLogLevel", "System", "Admin", FormMethod.Post, new { @data_target = ".log-levels-setup", @autocomplete = "off" }))
+  {
+    <table class="table table-sm table-sticky-headers">
+      <thead>
+        <tr>
+          <th scope="col">Category</th>
+          <th scope="col">Level</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            @Html.TextBoxFor(model => model.NewSetting.Category, new { @placeholder = "new logger category" })
+          </td>
+          <td>
+            @Html.DropDownListFor(model => model.NewSetting.Level, Html.GetEnumSelectList<Microsoft.Extensions.Logging.LogLevel>(), new { @data_autopostbackevent = "change" })
+          </td>
+        </tr>
+        @foreach (var item in Model.LoggingSettingsConfiguration.Select((Setting, Index) => new { Index, Setting }))
+        {
+          <tr>
+            <td class="@(item.Setting.Category == "Default" ? "fw-bold" : "")">@item.Setting.Category</td>
+            <td>
+              @Html.HiddenFor(model => model.LoggingSettingsConfiguration[item.Index].Category)
+              @Html.DropDownListFor(model => model.LoggingSettingsConfiguration[item.Index].Level, Html.GetEnumSelectList<Microsoft.Extensions.Logging.LogLevel>(), new { @data_autopostbackevent = "change" })
+            </td>
+            <td>
+            <td class="nucleus-small-cell">
+                @if (Model.LoggingSettingsConfiguration[item.Index].Category != "Default")
+                {
+                <button type="submit" formaction="@Url.AreaAction("RemoveLogLevel", "System", "Admin")?name=@Model.LoggingSettingsConfiguration[item.Index].Category" class="nucleus-material-icon btn btn-danger" title="Delete Log Setting" data-target=".log-levels-setup">&#xe14c;</button>
+                }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

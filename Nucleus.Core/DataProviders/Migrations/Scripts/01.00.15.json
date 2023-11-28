@@ -1,11 +1,37 @@
 {
 	"schemaName": "Nucleus.Core",
 	"version": "01.00.15",
-  "operations": [
-    {
-      "sql": {
-        "sql": "INSERT INTO [PermissionTypes] ([Id], [Scope], [Name], [SortOrder]) SELECT '77D424BF-E5EB-4E70-9B08-72ECCE931683', 'urn:nucleus:entities:folder/permissiontype/browse', 'Browse', 2 WHERE NOT EXISTS(SELECT * FROM [PermissionTypes] WHERE [Id]='77D424BF-E5EB-4E70-9B08-72ECCE931683');"
-      }
-    }
-  ]
+	"operations": [
+		{
+			"DatabaseProviderSpecificOperation": {
+				"include": [ "SqlServer", "Sqlite" ],
+				"operation": {
+					"sql": {
+						"sql": "INSERT INTO [PermissionTypes] ([Id], [Scope], [Name], [SortOrder]) SELECT * FROM (SELECT '77D424BF-E5EB-4E70-9B08-72ECCE931683' AS [Id], 'urn:nucleus:entities:folder/permissiontype/browse' AS [Scope], 'Browse' AS [Name], 2 AS [SortOrder]) AS [NewData] WHERE NOT EXISTS(SELECT * FROM [PermissionTypes] WHERE [Id]='77D424BF-E5EB-4E70-9B08-72ECCE931683');"
+					}
+				}
+			}
+		},
+		{
+			"DatabaseProviderSpecificOperation": {
+				"include": [ "MySql" ],
+				"operation": {
+					"sql": {
+						"sql": "INSERT INTO `PermissionTypes` (`Id`, `Scope`, `Name`, `SortOrder`) SELECT * FROM (SELECT '77D424BF-E5EB-4E70-9B08-72ECCE931683' AS `Id`, 'urn:nucleus:entities:folder/permissiontype/browse' AS `Scope`, 'Browse' AS `Name`, 2 AS `SortOrder`) AS `NewData` WHERE NOT EXISTS(SELECT * FROM `PermissionTypes` WHERE `Id`='77D424BF-E5EB-4E70-9B08-72ECCE931683');"
+					}
+				}
+			}
+		},
+		{
+			"DatabaseProviderSpecificOperation": {
+				"include": [ "PostgreSQL" ],
+				"operation": {
+					"sql": {
+						"sql": "INSERT INTO \"PermissionTypes\" (\"Id\", \"Scope\", \"Name\", \"SortOrder\") SELECT * FROM (SELECT '77D424BF-E5EB-4E70-9B08-72ECCE931683' AS \"Id\", 'urn:nucleus:entities:folder/permissiontype/browse' AS \"Scope\", 'Browse' AS \"Name\", 2 AS \"SortOrder\") AS \"NewData\" WHERE NOT EXISTS(SELECT * FROM \"PermissionTypes\" WHERE \"Id\"='77D424BF-E5EB-4E70-9B08-72ECCE931683');"
+					}
+				}
+
+			}
+		}
+	]
 }

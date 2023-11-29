@@ -10,13 +10,13 @@
 
 .nucleus-module-editing .nucleus-inline-edit-controls
 {
-  display: flex;
+  display: inline-flex;
   justify-content: end;
 	gap: 2px;
   flex-direction: initial;
 }
 
-.nucleus-module-editing .nucleus-inline-edit-controls *
+.nucleus-module-editing .nucleus-inline-edit-controls:not(.nucleus-inline-edit-controls-visible) *
 {
   visibility: hidden;  
 }

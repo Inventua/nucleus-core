@@ -17,7 +17,7 @@ namespace Nucleus.Modules.Documents.HtmlHelpers
 {
 	public static class AdminHtmlHelper
 	{
-		public static IHtmlContent AddEditingControls(this IHtmlHelper htmlHelper, Guid Id)
+    public static IHtmlContent AddEditingControls(this IHtmlHelper htmlHelper, Guid Id)
 		{
 			Context context = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<Context>();
 			Boolean isEditing = htmlHelper.ViewContext.HttpContext.User.IsEditing(htmlHelper.ViewContext?.HttpContext, context.Site, context.Page, context.Module);					
@@ -27,7 +27,7 @@ namespace Nucleus.Modules.Documents.HtmlHelpers
 				IUrlHelper urlHelper = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(htmlHelper.ViewContext);
 
 				TagBuilder editorBuilder = new("div");
-				editorBuilder.AddCssClass("nucleus-inline-edit-controls justify-content-start");
+				editorBuilder.AddCssClass("nucleus-inline-edit-controls nucleus-inline-edit-controls-visible justify-content-start");
 				editorBuilder.InnerHtml.AppendHtml(context.Module.BuildEditButton("&#xe3c9;", "Edit", urlHelper.NucleusAction("Edit", "Documents", "Documents", new { Id = Id }), null));
 
 				return editorBuilder;

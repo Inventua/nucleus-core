@@ -199,8 +199,8 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="page"></param>
     /// <param name="user"></param>
 		/// <param name="operation">
-		/// If <paramref name="operation"/> is <see cref="IPageManager.CopyPermissionOperation.Replace"/> overwrite all permissions of descendant pages.  
-		/// if <paramref name="operation"/> is <see cref="IPageManager.CopyPermissionOperation.Merge"/>, merge the descendant pages permissions with the specified 
+		/// If <paramref name="operation"/> is <see cref="CopyPermissionOperation.Replace"/> overwrite all permissions of descendant pages.  
+		/// if <paramref name="operation"/> is <see cref="CopyPermissionOperation.Merge"/>, merge the descendant pages permissions with the specified 
 		/// <paramref name="page"/> permissions.		
 		/// </param>
 		/// <returns></returns>

@@ -148,6 +148,18 @@
 	width: 100%;
 }
 
+.nucleus-admin-content .tab-content fieldset
+{
+  display: flex;
+  flex-direction: column;
+  flex: 1
+}
+
+.nucleus-admin-content .tab-content .nucleus-button-panel
+{
+  margin-top: auto;
+}
+
 .nucleus-admin-content table
 {
 	width: 100%;

@@ -44,7 +44,7 @@
                   @if (!String.IsNullOrEmpty(forum.Description))
                   {
                     <div>
-                      @forum.Description
+                      @Html.Raw(forum.Description.ToHtml("text/plain"))
                     </div>
                   }
                 </div>

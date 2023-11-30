@@ -15,8 +15,8 @@ namespace Nucleus.Modules.Forums.ViewModels
 {
 	public class Settings
 	{
-		public IList<Group> Groups { get; set; }
+		public IEnumerable<Group> Groups { get; set; }
 	
-
+		public GroupSettings GroupSettings { get; set; }
 	}
 }

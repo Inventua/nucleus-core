@@ -1,10 +1,7 @@
 ﻿using System;
 using Nucleus.Abstractions.Models;
-using Nucleus.Abstractions.Models.Mail;
-using Nucleus.Abstractions.Models.TaskScheduler;
 using Nucleus.Data.Common;
 using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -14,7 +11,6 @@ using Nucleus.Abstractions.EventHandlers;
 using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
 using Nucleus.Modules.Forums.Models;
 using Microsoft.EntityFrameworkCore;
-using Nucleus.Abstractions.Managers;
 using System.Threading.Tasks;
 using Nucleus.Extensions.Authorization;
 
@@ -52,15 +48,15 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			if (result != null)
 			{
-				result.Settings = await GetSettings(result.Id);				
+				result.Settings = await GetSettings(result.Id);
 			}
 
 			return result;
 		}
 
-		public async Task<IList<Group>> ListGroups(PageModule pageModule)
+		public async Task<IEnumerable<Group>> ListGroups(PageModule pageModule)
 		{
-			IList<Group> results = await this.Context.Groups
+			IEnumerable<Group> results = await this.Context.Groups
 				.Where(group => EF.Property<Guid>(group, "ModuleId") == pageModule.Id)
         .Include(group => group.Permissions)
           .ThenInclude(permission => permission.Role)
@@ -89,21 +85,27 @@ namespace Nucleus.Modules.Forums.DataProviders
 			List<Permission> permissions = group.Permissions;
 			group.Permissions = null;
 
-			Boolean isNew = !this.Context.Groups.Where(existing => existing.Id == group.Id).AsNoTracking().Any();
+			//Boolean isNew = !this.Context.Groups.Where(existing => existing.Id == group.Id).AsNoTracking().Any();
+			Group existing = await this.Context.Groups
+				.Where(existing => existing.Id == group.Id)
+				.FirstOrDefaultAsync();
 
-      this.Context.Attach(group);
-			this.Context.Entry(group).Property("ModuleId").CurrentValue = module.Id;
-
-      if (isNew)
+      if (existing == null)
 			{
+				// new group record
+				this.Context.Add(group);
+				this.Context.Entry(group).Property("ModuleId").CurrentValue = module.Id;
 				group.SortOrder = await GetTopForumGroupSortOrder(module.Id) + 10;
 				this.Context.Entry(group).State = EntityState.Added;
 				raiseEvent = new(() => { this.EventManager.RaiseEvent<Group, Create>(group); });
 			}
 			else
 			{
-				this.Context.Entry(group).State = EntityState.Modified;
-				raiseEvent = new(() => { this.EventManager.RaiseEvent<Group, Update>(group); });
+				// existing record
+				this.Context.Entry(existing).CurrentValues.SetValues(group);
+				this.Context.Entry(existing).Property("ModuleId").CurrentValue = module.Id;
+				this.Context.Entry(existing).State = EntityState.Modified;
+				raiseEvent = new(() => { this.EventManager.RaiseEvent<Group, Update>(existing); });
 			}
 
 			await this.Context.SaveChangesAsync<Group>();
@@ -254,21 +256,27 @@ namespace Nucleus.Modules.Forums.DataProviders
 			List<Permission> permissions = forum.Permissions;
 			forum.Permissions = null;
 
-			Boolean isNew = !this.Context.Forums.Where(existing => existing.Id == forum.Id).AsNoTracking().Any();
-			
-			this.Context.Attach(forum);
-			this.Context.Entry(forum).Property("ForumGroupId").CurrentValue = group.Id;
+			//Boolean isNew = !this.Context.Forums.Where(existing => existing.Id == forum.Id).AsNoTracking().Any();
+			Forum existing = await this.Context.Forums
+				.Where(existing => existing.Id == forum.Id)
+				.FirstOrDefaultAsync();
 
-			if (isNew)
+			//this.Context.Attach(forum);
+
+			if (existing == null)
 			{
+				this.Context.Add(forum);
+				this.Context.Entry(forum).Property("ForumGroupId").CurrentValue = group.Id;
 				forum.SortOrder = await GetTopForumSortOrder(group.Id) + 10;
 				this.Context.Entry(forum).State = EntityState.Added;
 				raiseEvent = new(() => { this.EventManager.RaiseEvent<Forum, Create>(forum); });
 			}
 			else
 			{
-				this.Context.Entry(forum).State = EntityState.Modified;
-				raiseEvent = new(() => { this.EventManager.RaiseEvent<Forum, Update>(forum); });
+				this.Context.Entry(existing).CurrentValues.SetValues(forum);
+				this.Context.Entry(existing).Property("ForumGroupId").CurrentValue = group.Id;
+				this.Context.Entry(existing).State = EntityState.Modified;
+				raiseEvent = new(() => { this.EventManager.RaiseEvent<Forum, Update>(existing); });
 			}
 
 			await this.Context.SaveChangesAsync<Forum>();
@@ -300,7 +308,19 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM ForumSubscriptions WHERE ForumId={forum.Id}");
 
-			this.Context.Remove(forum);
+			Forum existing = await this.Context.Forums
+				.Where(existing => existing.Id == forum.Id)
+				.FirstOrDefaultAsync();
+
+			if (existing != null)
+			{
+				this.Context.Remove(existing);
+			}
+			else
+			{
+				this.Context.Remove(forum);
+			}
+
 			await this.Context.SaveChangesAsync();
 		}
 

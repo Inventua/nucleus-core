@@ -26,9 +26,7 @@ namespace Nucleus.Modules.Media.Controllers
 
 		private IPageModuleManager PageModuleManager { get; }
 		private ILogger<MediaController> Logger { get; }
-
-
-    
+        
 		public MediaController(Context Context, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, ILogger<MediaController> logger)
 		{
 			this.Context = Context;
@@ -109,7 +107,22 @@ namespace Nucleus.Modules.Media.Controllers
 			return View("Settings", viewModel);
 		}
 
-		private static ViewModels.Viewer.MediaTypes GetMediaType(ViewModels.Viewer viewModel, Boolean alwaysDownload)
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    [HttpPost]
+    public async Task<ActionResult> UpdateCaption(string value)
+    {
+      ViewModels.Settings settings = new();
+      
+      settings.GetSettings(this.Context.Module);      
+      settings.Caption = value;
+      settings.SetSettings(this.Context.Module);
+
+      await this.PageModuleManager.SaveSettings(this.Context.Module);
+
+      return Ok();
+    }
+
+    private static ViewModels.Viewer.MediaTypes GetMediaType(ViewModels.Viewer viewModel, Boolean alwaysDownload)
 		{
       if (alwaysDownload)
       {

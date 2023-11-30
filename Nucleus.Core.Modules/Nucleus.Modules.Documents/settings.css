@@ -1,4 +1,11 @@
-﻿.DocumentsSettings .ShowColumns
+﻿.DocumentsSettings, .DocumentsSettings fieldset
+{
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.DocumentsSettings .ShowColumns
 {
 	display: flex;
 	gap: 2em;

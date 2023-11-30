@@ -10,7 +10,7 @@
 			<div class="Name">@Model.SelectedFile.Name</div>
 			@if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
 			{
-				<div class="caption">@Model.Caption</div>
+        <div class="caption" inline-edit-route="@Url.NucleusAction("UpdateCaption", "Media", "Media")">@Model.Caption</div>
 			}
 			<div>
 				<span class="ModifiedDate">@Model.SelectedFile.DateModified</span>
@@ -27,34 +27,33 @@
 
 		case Nucleus.Modules.Media.ViewModels.Viewer.MediaTypes.Image:
       <img src="@Model.SourceUrl" alt="@Model.AlternateText" style="@Model.Style" />
-			@if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
-			{
-				<div class="caption">@Model.Caption</div>
-			}
 			break;
 
 		case Nucleus.Modules.Media.ViewModels.Viewer.MediaTypes.PDF:
       <embed src="@Model.SourceUrl" type="application/pdf" title="@Model.AlternateText" style="@Model.Style" />
-			@if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
-			{
-				<div class="caption">@Model.Caption</div>
-			}
 			break;
 
 		case Nucleus.Modules.Media.ViewModels.Viewer.MediaTypes.Video:
       <video controls src="@Model.SourceUrl" title="@Model.AlternateText" style="@Model.Style" @(Model.AutoPlay ? "autoplay": "")></video>
-			@if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
-			{
-				<div class="caption">@Model.Caption</div>
-			}
 			break;
 
     case Nucleus.Modules.Media.ViewModels.Viewer.MediaTypes.YouTube:
       <iframe controls src="@Model.SourceUrl" frameborder="0" title="@Model.AlternateText" style="@Model.Style" allow="autoplay; encrypted-media; picture-in-picture;" allowfullscreen></iframe>
-      @if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
-      {
-        <div class="caption">@Model.Caption</div>
-      }
+      
       break;
 	}
+  @switch (Model.SelectedItemType)
+	{
+		case Nucleus.Modules.Media.ViewModels.Viewer.MediaTypes.Generic:
+      // rendering of generic files handles the caption
+      break;
+    default:
+      @if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
+      {
+        <div class="caption" inline-edit-route="@Url.NucleusAction("UpdateCaption", "Media", "Media")">
+          @Model.Caption
+        </div>
+      }
+      break;
+  }
 </div>

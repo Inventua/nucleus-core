@@ -35,8 +35,10 @@ namespace Nucleus.Extensions
 		/// The contentType can be text/markdown or text/plain.  All other content type values are treated as text/html and
 		/// are not converted.
 		/// </remarks>
-		public static string ToHtml(string content, string contentType)
+		public static string ToHtml(this string content, string contentType)
 		{
+      if (String.IsNullOrEmpty(content)) return "";
+
 			switch (contentType)
 			{
 				case "text/markdown":

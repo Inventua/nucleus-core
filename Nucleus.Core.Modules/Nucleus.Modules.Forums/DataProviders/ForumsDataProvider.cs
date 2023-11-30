@@ -1141,7 +1141,6 @@ namespace Nucleus.Modules.Forums.DataProviders
             existing.MailTemplateId == mailQueue.MailTemplateId && 
             ((mailQueue.Reply == null && existing.Reply == null) || (mailQueue.Reply != null && existing.Reply.Id == mailQueue.Reply.Id))
           ))
-        .AsNoTracking()
         .FirstOrDefaultAsync();
 
 			if (existing == null)

@@ -125,7 +125,7 @@
         <table class="border border-1 table">
           <tbody>
             <tr class="bg-primary bg-gradient text-light fw-bold">
-              <th scope="row" colspan="2"><h2>@(connection.Schema == "*" ? "Default (*)" : connection.Schema)</h2></th>              
+              <th scope="row" colspan="2"><h2>@(connection.Schema == "*" ? "Default (*)" : connection.Schema)</h2></th>
             </tr>
             <tr>
               <th scope="row" class="text-nowrap w-25 px-2"><h3>Database Type</h3></th>
@@ -166,30 +166,8 @@
           Your current logging settings are listed below.  These settings are typically configured in your
           <span class="font-monospace">appSettings.@(Model.EnvironmentName).json</span>	file.
         </div>
-        <table class="table table-sm">
-          <thead>
-            <tr>
-              <th scope="col">Category</th>
-              <th scope="col">Level</th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach (KeyValuePair<string, string> configItem in Model.LoggingSettingsConfiguration)
-            {
-              <tr>
-                @if (configItem.Key == "Default")
-                {
-                  <td class="fw-bold">@configItem.Key</td>
-                }
-                else
-                {
-                  <td>@configItem.Key</td>
-                }
-                <td>@configItem.Value</td>
-              </tr>
-            }
-          </tbody>
-        </table>
+        
+        @await Html.PartialAsync("_LogLevels", Model)
       </modal>
     </TabPanel>
   </TabContent>

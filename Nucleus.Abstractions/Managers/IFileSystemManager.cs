@@ -245,8 +245,8 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="folder"></param>
 		/// <param name="user"></param>
 		/// <param name="operation">
-		/// If <paramref name="operation"/> is <see cref="IFileSystemManager.CopyPermissionOperation.Replace"/> overwrite all permissions of descendant folders.  
-		/// if <paramref name="operation"/> is <see cref="IFileSystemManager.CopyPermissionOperation.Merge"/>, merge the descendant folder permissions with the specified 
+		/// If <paramref name="operation"/> is <see cref="CopyPermissionOperation.Replace"/> overwrite all permissions of descendant folders.  
+		/// if <paramref name="operation"/> is <see cref="CopyPermissionOperation.Merge"/>, merge the descendant folder permissions with the specified 
 		/// <paramref name="folder"/> permissions.		
 		/// </param>
 		/// <returns></returns>

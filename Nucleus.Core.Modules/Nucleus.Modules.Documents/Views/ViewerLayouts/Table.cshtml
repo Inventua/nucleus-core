@@ -57,7 +57,7 @@
         <tr>
           <td>
             @Html.AddEditingControls(Model.Documents[documentCount].Id)
-            <a href="@Url.FileLink(Model.Documents[documentCount].File)" alt="@Model.Documents[documentCount].Title" id="_@Model.Documents[documentCount].Id">
+            <a href="@Url.FileLink(Model.Documents[documentCount].File)" alt="@Model.Documents[documentCount].Title" id="_@Model.Documents[documentCount].Id" inline-edit-route="@Url.NucleusAction("UpdateTitle", "Documents", "Documents", new { id = Model.Documents[documentCount].Id })">
               @Model.Documents[documentCount].Title
             </a>
           </td>
@@ -75,7 +75,7 @@
           }
           @if (Model.ShowDescription)
           {
-            <td>@Model.Documents[documentCount].Description</td>
+            <td><div inline-edit-route="@Url.NucleusAction("UpdateDescription", "Documents", "Documents", new { id = Model.Documents[documentCount].Id })">@Model.Documents[documentCount].Description</div></td>
           }
         </tr>
       }

@@ -36,8 +36,8 @@ namespace Nucleus.Core.Plugins
 		/// <param name="path">The full path and filename of the assembly to load.</param>
 		/// <returns>The loaded assembly.</returns>
 		/// <remarks>
-		/// The LoadFrom method checks the path of the assembly and separates plugin assemblies into their own AssemblyLoadContext.  This
-		/// allows plugins to use their own version of referenced assemblies, if they are present in the plugin's bin folder, or use the versions
+		/// The LoadFrom method checks the path of the assembly and separates extension assemblies into their own AssemblyLoadContext.  This
+		/// allows extensions to use their own version of referenced assemblies, if they are present in the extension's bin folder, or use the versions
 		/// which are shipped with Nucleus Core otherwise.  This method returns NULL if the assembly couldn't be loaded.  This is typically the
 		/// case when a dll is present that is not an assembly.
 		/// </remarks>
@@ -98,11 +98,10 @@ namespace Nucleus.Core.Plugins
 				}
 				else
 				{
-
 					// Microsoft design documentation on assembly load contexts is here:
 					// https://github.com/dotnet/runtime/blob/main/docs/design/features/AssemblyLoadContext.ContextualReflection.md
 
-					// The code in the HandleResolving event handler (below) is important, as it resolves assemblies from plugin assembly load contexts
+					// The code in the HandleResolving event handler (below) is important, as it resolves assemblies from extension assembly load contexts
 					// properly when the Nucleus.Core.Layout.ModuleContentRenderer calls actionInvoker.InvokeAsync().  Without the code in the handler, this
 					// throws a System.IO.FileNotFoundException: Could not load file or assembly ... exception, presumably because .InvokeAsync 
 					// uses one of the Activator classes or one of the Assembly.Load methods which don't work properly with assembly load contexts.  The code in 
@@ -402,15 +401,33 @@ namespace Nucleus.Core.Plugins
 			}
 		}
 
-		/// <summary>
-		/// Return a list of types which implement the class specified by T, but are not T. 
+    /// <summary>
+		/// Return a list of all types. 
 		/// </summary>
-		/// <typeparam name="T">The type to search for.</typeparam>
-		/// <returns>A list of .Net types which implement T.</returns>
-		/// <remarks>
-		/// A side effect of this function is that assemblies are loaded into their assembly load contexts by <see cref="LoadAssemblies"/>.
-		/// </remarks>
-		public static IEnumerable<Type> GetTypes<T>()
+		/// <returns>A list of .Net types.</returns>
+		public static IEnumerable<Type> GetTypes()
+    {
+      foreach (Assembly assembly in ListAssemblies())
+      {
+        if (assembly != null)
+        {
+          foreach (Type type in GetTypes(assembly))
+          {
+            yield return type;
+          }
+        }
+      }
+    }
+
+    /// <summary>
+    /// Return a list of types which implement the class specified by T, but are not T. 
+    /// </summary>
+    /// <typeparam name="T">The type to search for.</typeparam>
+    /// <returns>A list of .Net types which implement T.</returns>
+    /// <remarks>
+    /// A side effect of this function is that assemblies are loaded into their assembly load contexts by <see cref="LoadAssemblies"/>.
+    /// </remarks>
+    public static IEnumerable<Type> GetTypes<T>()
 		{
 			foreach (Assembly assembly in ListAssemblies())
 			{

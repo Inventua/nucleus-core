@@ -15,6 +15,7 @@ using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using DocumentFormat.OpenXml.Drawing;
 
 namespace Nucleus.Modules.Documents.Controllers
 {
@@ -129,7 +130,47 @@ namespace Nucleus.Modules.Documents.Controllers
 			}
 		}
 
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    [HttpPost]
+    public async Task<ActionResult> UpdateTitle(Guid id, string value)
+    {
+      Models.Document document = await this.DocumentsManager.Get(this.Context.Site, id);
+
+      if (document == null)
+      {
+        return BadRequest();
+      }
+      else
+      {
+        document.Title = value;
+      }
+
+      await this.DocumentsManager.Save(this.Context.Module, document);
+
+      return Ok();
+    }
+
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    [HttpPost]
+    public async Task<ActionResult> UpdateDescription(Guid id, string value)
+    {
+      Models.Document document = await this.DocumentsManager.Get(this.Context.Site, id);
+
+      if (document == null)
+      {
+        return BadRequest();
+      }
+      else
+      {
+        document.Description = value;
+      }
+
+      await this.DocumentsManager.Save(this.Context.Module, document);
+
+      return Ok();
+    }
+
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 		[HttpPost]
 		public async Task<ActionResult> Delete(ViewModels.Settings viewModel, Guid id)
 		{

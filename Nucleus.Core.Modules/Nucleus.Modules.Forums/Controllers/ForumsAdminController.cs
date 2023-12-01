@@ -96,6 +96,23 @@ namespace Nucleus.Modules.Forums.Controllers
 		}
 
 		[HttpPost]
+		public async Task<ActionResult> MoveGroupDown(ViewModels.GroupSettings viewModel, Guid id)
+		{
+			await this.GroupsManager.MoveDown(this.Context.Module, id);
+
+			return View("Settings", await BuildSettingsViewModel(await BuildGroupSettingsViewModel(viewModel, true)));
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> MoveGroupUp(ViewModels.GroupSettings viewModel, Guid id)
+		{
+			await this.GroupsManager.MoveUp(this.Context.Module, id);
+
+			return View("Settings", await BuildSettingsViewModel(await BuildGroupSettingsViewModel(viewModel, true)));
+		}
+
+
+		[HttpPost]
 		public async Task<ActionResult> AddGroupPermissionRole(ViewModels.GroupSettings viewModel)
 		{
 			if (viewModel.SelectedRoleId != Guid.Empty)
@@ -213,7 +230,8 @@ namespace Nucleus.Modules.Forums.Controllers
 		[HttpPost]
 		public async Task<ActionResult> DeleteForum(ViewModels.ForumSettings viewModel, Guid id, Guid groupId)
 		{
-			// delete button from the forum editor popup OR group editor forums list (which is why groupId is on the query string instead of in the view model)
+			// delete button from the forum editor popup OR group editor forums list (which is why groupId is on the query
+			// string instead of in the view model)
 			Models.Forum forum = await this.ForumsManager.Get(id);
 
 			await this.ForumsManager.Delete(forum);
@@ -221,6 +239,25 @@ namespace Nucleus.Modules.Forums.Controllers
 			return View("_ForumList", await BuildGroupSettingsViewModel (groupId));
 		}
 
+		[HttpPost]
+		public async Task<ActionResult> MoveForumDown(ViewModels.GroupSettings viewModel, Guid id)
+		{
+			Models.Group group = await this.GroupsManager.Get(viewModel.Group.Id);
+			await this.ForumsManager.MoveDown(group, id);
+
+			viewModel.Group.Forums = await this.ForumsManager.List(viewModel.Group);
+			return View("_ForumList", await BuildGroupSettingsViewModel(viewModel, true));
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> MoveForumUp(ViewModels.GroupSettings viewModel, Guid id)
+		{
+			Models.Group group = await this.GroupsManager.Get(viewModel.Group.Id);
+			await this.ForumsManager.MoveUp(group, id);
+
+			viewModel.Group.Forums = await this.ForumsManager.List(viewModel.Group);
+			return View("_ForumList", await BuildGroupSettingsViewModel(viewModel, true));
+		}
 
 		/// <summary>
 		/// Create a "settings" viewmodel and populate it
@@ -230,6 +267,21 @@ namespace Nucleus.Modules.Forums.Controllers
 		{
 			ViewModels.Settings viewModel = new();
 			viewModel.Groups = await this.GroupsManager.List(this.Context.Module);
+			return viewModel;
+		}
+		
+		/// <summary>
+		/// Create a "settings" viewmodel and populate it
+		/// </summary>
+		/// <returns></returns>
+		/// <remarks>
+		/// This overload is for the MoveUp and MoveDown actions and is used to load both the groups list and editor panel.
+		/// </remarks>
+		private async Task<ViewModels.Settings> BuildSettingsViewModel(ViewModels.GroupSettings groupSettings)
+		{
+			ViewModels.Settings viewModel = await BuildSettingsViewModel();
+			viewModel.GroupSettings = groupSettings;
+
 			return viewModel;
 		}
 
@@ -244,17 +296,17 @@ namespace Nucleus.Modules.Forums.Controllers
 				viewModel = new();
 			}
 
-			viewModel.Groups = await this.GroupsManager.List(this.Context.Module);
-			viewModel.MailTemplates = await this.MailTemplateManager.List(this.Context.Site);
-			viewModel.AvailableRoles = await GetAvailableRoles(viewModel.Group?.Permissions); 
-			viewModel.Lists = await this.ListManager.List(this.Context.Site);
-
 			viewModel.ForumPermissionTypes = await this.GroupsManager.ListForumPermissionTypes();
 
 			if (rebuildPermissions)
 			{
 				viewModel.Group.Permissions = await RebuildPermissions(viewModel.GroupPermissions);
 			}
+
+			viewModel.Groups = await this.GroupsManager.List(this.Context.Module);
+			viewModel.MailTemplates = await this.MailTemplateManager.List(this.Context.Site);
+			viewModel.Lists = await this.ListManager.List(this.Context.Site);
+			viewModel.AvailableRoles = await GetAvailableRoles(viewModel.Group?.Permissions); 
 
 			return viewModel;
 		}

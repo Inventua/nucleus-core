@@ -1222,7 +1222,7 @@ namespace Nucleus.Modules.Forums.Controllers
       else
       {
         manageSubscriptions.Subscriptions = await this.ForumsManager.GetUserSubscriptions(User);
-        IList<Group> groups = await this.GroupsManager.List(this.Context.Module);
+        IEnumerable<Group> groups = await this.GroupsManager.List(this.Context.Module);
 
         // display groups if the group is enabled and the user has permission to subscribe to it
         manageSubscriptions.Groups = groups

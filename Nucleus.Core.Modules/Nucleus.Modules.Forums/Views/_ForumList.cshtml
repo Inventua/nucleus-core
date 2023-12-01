@@ -4,17 +4,31 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Forums.ViewModels
 <table>
-	@for (int forumCount = 0; forumCount < Model.Group?.Forums.Count; forumCount++)
-	{
-		<tr>
-			<td>
-				@Html.HiddenFor(model => Model.Group.Forums[forumCount].Id)
-				@Html.HiddenFor(model => Model.Group.Forums[forumCount].Name)
-				@Model.Group.Forums[forumCount].Name
-			</td>
+	<tbody>
+		@for (int forumCount = 0; forumCount < Model.Group?.Forums.Count; forumCount++)
+		{
+			<tr>
+				<td>
+					@Html.HiddenFor(model => Model.Group.Forums[forumCount].Id)
+					@Html.HiddenFor(model => Model.Group.Forums[forumCount].Name)
+					@Model.Group.Forums[forumCount].Name
+				</td>
 
-			<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("EditForum", "ForumsAdmin", "Forums")?id=@Model.Group.Forums[forumCount].Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-secondary" title="Edit Forum" data-target="#ForumEditor" /></td>
-			<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("DeleteForum", "ForumsAdmin", "Forums")?id=@Model.Group.Forums[forumCount].Id&groupId=@Model.Group.Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete Forum" data-target="#ForumList" data-confirm="Forums can only be deleted if they contain no posts.  Use the 'Enabled' setting to disable a forum which has existing posts.  Delete this forum?" /></td>
-		</tr>
-	}
+				<td class="nucleus-small-cell"><button type="submit" formaction="@Url.NucleusAction("EditForum", "ForumsAdmin", "Forums", new { id = Model.Group.Forums[forumCount].Id })" class="nucleus-material-icon btn btn-secondary" title="Edit Forum" data-target="#ForumEditor">&#xe3c9;</button></td>
+				<td class="nucleus-small-cell"><button type="submit" formaction="@Url.NucleusAction("DeleteForum", "ForumsAdmin", "Forums", new { id = Model.Group.Forums[forumCount].Id, groupId = Model.Group.Id })" class="nucleus-material-icon btn btn-danger" title="Delete Forum" data-target="#ForumList" data-confirm="Forums can only be deleted if they contain no posts.  Use the 'Enabled' setting to disable a forum which has existing posts.  Delete this forum?">&#xe14c;</button></td>
+				<td class="nucleus-small-cell">
+					@if (forumCount != 0)
+					{
+						<button type="submit" formaction="@Url.NucleusAction("MoveForumUp", "ForumsAdmin", "Forums", new { id = Model.Group.Forums[forumCount].Id })" class="nucleus-material-icon btn btn-outline-secondary" title="Move Up" data-target="#ForumList">&#xe5d8;</button>
+					}
+				</td>
+				<td class="nucleus-small-cell">
+					@if (forumCount < Model.Group?.Forums.Count - 1)
+					{
+						<button type="submit" formaction="@Url.NucleusAction("MoveForumDown", "ForumsAdmin", "Forums", new { id = Model.Group.Forums[forumCount].Id })" class="nucleus-material-icon btn btn-outline-secondary" title="Move Down" data-target="#ForumList">&#xe5db;</button>
+					}
+				</td>
+			</tr>
+		}
+	</tbody>
 </table>

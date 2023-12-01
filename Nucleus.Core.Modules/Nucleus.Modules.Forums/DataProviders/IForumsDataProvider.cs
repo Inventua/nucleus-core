@@ -18,7 +18,7 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 
 		public Task<Group> GetGroup(Guid Id);
-		public Task<IList<Group>> ListGroups(PageModule pageModule);
+		public Task<IEnumerable<Group>> ListGroups(PageModule pageModule);
 		public Task SaveGroup(PageModule pageModule, Group group);
 		public Task DeleteGroup(Group group);
 

@@ -5,6 +5,20 @@
 @using Nucleus.Modules.Forums.ViewModels
 @using (Html.BeginNucleusForm("SelectGroupAttachmentsFolder", "ForumsAdmin", "Forums", FormMethod.Post, new { @data_target = "form.parent()", @autocomplete = "off" }))
 {
+	<div class="nucleus-form-tools">
+		<div class="position-absolute m-1 top-0 end-0">
+			@if (Model.Group.Id != Guid.Empty && Model.Group.Id != Model.Groups.First()?.Id)
+			{
+				<button type="submit" formaction="@Url.NucleusAction("MoveGroupUp", "ForumsAdmin", "Forums", new { id = Model.Group.Id })" class="btn btn-secondary" title="Move Up" accesskey="U" data-target=".ForumsSettings.parent()">Move Up <span class="nucleus-material-icon">&#xe5d8;</span></button>
+			}
+
+			@if (Model.Group.Id != Guid.Empty && Model.Group.Id != Model.Groups.Last()?.Id)
+			{
+				<button type="submit" formaction="@Url.NucleusAction("MoveGroupDown", "ForumsAdmin", "Forums", new { id = Model.Group.Id })" class="btn btn-secondary" title="Move Down" accesskey="D" data-target=".ForumsSettings.parent()">Move Down <span class="nucleus-material-icon">&#xe5db;</span></button>
+			}	
+		</div>
+	</div>
+
   <Tab>
     <TabItem target="#group-properties" caption="Properties" active="true"></TabItem>
     <TabItem target="#group-permissions" caption="Permissions"></TabItem>

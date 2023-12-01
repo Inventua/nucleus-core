@@ -75,7 +75,7 @@
 					}
 					
 
-					@if (Model.ScheduledTask.Id != Guid.Empty && Model.LatestHistory != null)
+					@if (Model.ScheduledTask.Id != Guid.Empty)
 					{
 						<div class="text-end">
               <input type="submit" value="Run Now" formaction="@Url.AreaAction("RunNow", "ScheduledTasks", "Admin")" data-target=".ScheduledTaskEditor" class="btn btn-secondary" />

@@ -9,6 +9,14 @@ function _setupEditMode(e, args)
   jQuery('.nucleus-module-editing *[data-inline-edit-route]')
     .prop('contenteditable', 'true')
     .on('input blur', _handleContentUpdate);
+  jQuery('.nucleus-module-editing *[data-inline-edit-route][data-inline-edit-mode = "MultiLineText"]')
+    .on('keydown', _multiLineText_keydown)
+    .on('keyup', _editableContent_keyup)  
+    .on('paste', _multiLineText_paste);
+  jQuery('.nucleus-module-editing *[data-inline-edit-route][data-inline-edit-mode = "SingleLineText"]')
+    .on('keydown', _singleLineText_keydown)
+    .on('keyup', _editableContent_keyup)
+    .on('paste', _singleLineText_paste);
 
   // Attach events for moving modules by drag & drop
   jQuery('.nucleus-move-dragsource')
@@ -26,7 +34,7 @@ function _setupEditMode(e, args)
   {
     var dropTargetElement = jQuery(item);
     if
-    (
+      (
       (dropTargetElement.parent().prev().length !== 0 && dropTargetElement.parent().prev().position().top === dropTargetElement.parent().position().top) ||
       (dropTargetElement.parent().next().length !== 0 && dropTargetElement.parent().next().position().top === dropTargetElement.parent().position().top) ||
       (dropTargetElement.prev().length !== 0 && dropTargetElement.prev().position().top === dropTargetElement.position().top) ||
@@ -44,7 +52,7 @@ function _setupEditMode(e, args)
   function _handleStartDrag(event)
   {
     var dragHandleElement = jQuery(event.target);
-    dragHandleElement.addClass('dragging');    
+    dragHandleElement.addClass('dragging');
 
     // show all drop targets except the one attached to the module being dragged (because that drop target would just move the module to its current position)
     jQuery('.nucleus-move-droptarget').each(function (index, item)
@@ -54,7 +62,7 @@ function _setupEditMode(e, args)
       var dragTargetContainer = dragTargetElement.parents('.nucleus-module-editing');
 
       if
-      (
+        (
         // don't show drag target if it is the one attached to the module being dragged
         (!dragTargetContainer.is(jQuery(event.target).parents('.nucleus-module-editing')))
         &&
@@ -123,7 +131,7 @@ function _setupEditMode(e, args)
   {
     var targetpane = jQuery(event.target).attr('data-pane-name');
     var targetmid = jQuery(event.target).attr('data-mid');
-   
+
     if (targetpane !== null && _sourceModuleId !== null)
     {
       var url = document.baseURI + 'admin/pages/movemoduleto?mid=' + _sourceModuleId;
@@ -155,7 +163,92 @@ function _setupEditMode(e, args)
 
         }
       })
-    }    
+    }
+  }
+
+  /// prevent new lines and some common HTML operations in text-only (single line) editable content.  The _commitContentUpdate function
+  /// is the main point where we remove HTML from plain-text content, this function is simply to improve the user experience by avoiding 
+  /// cases where the newline or HTML styles appear and then disappear a second later when _commitContentUpdate is called.
+  function _singleLineText_keydown(event)
+  {
+    var suppressKeyCodes = [13];
+    var suppressCtrlCodes = [66, 98, 73, 105, 65, 117];  // b,B,i,I,u,U (ctrl-b, ctrl-i, ctrl-u set bold/italic/underline)
+    return (!suppressKeyCodes.includes(event.keyCode) && (!event.ctrlKey || !suppressCtrlCodes.includes(event.keyCode)));
+  }
+
+  function _singleLineText_paste(event)
+  {
+    event.preventDefault(); 
+    content = (event.originalEvent || event).clipboardData?.getData('text/plain');
+
+    if (content)
+    {
+      var range = window.getSelection().getRangeAt(0);
+      if (range)
+      {
+        range.deleteContents();
+        range.insertNode(document.createTextNode(content));
+        window.getSelection().collapseToEnd();
+      }
+    }
+  }
+
+  // prevent contenteditable controls from triggering button clicks, etc when the space character is entered
+  function _editableContent_keyup(event)
+  {
+    if (event.keyCode === 32)
+    {
+      event.stopImmediatePropagation();
+    }
+  }
+
+  /// prevent some common HTML operations in text-only (multi line) editable content but allow newlines.  The _commitContentUpdate function
+  /// is the main point where we remove HTML from plain-text content, this function is simply to improve the user experience by avoiding 
+  /// cases where the newline or HTML styles appear and then disappear a second later when _commitContentUpdate is called.
+  function _multiLineText_keydown(event)
+  {
+    var suppressCtrlCodes = [66, 98, 73, 105, 65, 117];  // b,B,i,I,u,U (ctrl-b, ctrl-i, ctrl-u set bold/italic/underline)
+
+    if (event.keyCode === 13)
+    {
+      /// handle new lines in multi-line content.  This is to standardize browser behavior, as some browsers use DIV elements
+      /// and other browsers use BR elements.
+      var range = window.getSelection().getRangeAt(0);
+      if (range)
+      {
+        range.deleteContents();
+        range.insertNode(document.createElement('br'));
+        window.getSelection().collapseToEnd();
+      }
+      return false;
+    }
+    else
+    {
+      return (!event.ctrlKey || !suppressCtrlCodes.includes(event.keyCode));
+    }
+  }
+
+  /// paste plain text into text-only contenteditable controls
+  function _multiLineText_paste(event)
+  {
+    event.preventDefault();
+    content = (event.originalEvent || event).clipboardData?.getData('text/plain');
+
+    if (content)
+    {
+      var range = window.getSelection().getRangeAt(0);
+      if (range)
+      {
+        range.deleteContents();
+        var template = document.createElement('template');
+        template.innerHTML = content.replaceAll('\n', '<br>');
+        for (var count = template.content.childNodes.length - 1; count >= 0; count--)
+        {
+          range.insertNode(template.content.childNodes[count]);
+        }
+        window.getSelection().collapseToEnd();
+      }
+    }
   }
 
   /// This function is called after a user edits inline-editable content.
@@ -173,16 +266,75 @@ function _setupEditMode(e, args)
 
   function _commitContentUpdate(element)
   {
-    var url = jQuery(element).attr("data-inline-edit-route");
-    var content = new FormData();
-    content.append('value', jQuery(element).html());
+    var control = jQuery(element);
+    var url = control.attr("data-inline-edit-route");
+    var mode = control.attr('data-inline-edit-mode');
+
+    var content;
+
+    if (typeof mode === 'unspecified' || mode === null) return;
+        
+    if (mode === "SingleLineText" || mode === "MultiLineText")
+    {
+      // remove html from the content
+      var textValue = element.innerText;
+      var content = element.innerHTML
+        .replaceAll(/<br([^>]*)>/gi, '\n')
+        .replaceAll(/&nbsp;/gi, '\u00A0');
+        
+      if (content !== textValue)
+      {
+        // get caret position
+        var range = window.getSelection().getRangeAt(0);
+        var selectionStart;
+        var selectionLength;
+
+        if (range && range.commonAncestorContainer.data && element.childNodes.length > 0)
+        {
+          if (range.commonAncestorContainer.data !== textValue)
+          {
+            selectionStart = control.text().indexOf(range.commonAncestorContainer.data);
+            selectionFinish = selectionStart + range?.commonAncestorContainer.data.length;
+          }
+          else
+          {
+            selectionStart = range.startOffset;
+            selectionFinish = range.endOffset;
+          }
+        }
+
+        // remove html
+        var template = document.createElement('div');
+        template.innerHTML = content.replaceAll('<br>', '\n');
+        content = template.innerText;
+        control.html(template.innerText.replaceAll('\n', '<br>'));        
+
+        // restore caret position
+        if (selectionStart && selectionStart >= 0)
+        {
+          var newRange = document.createRange();
+          newRange.setStart(element.childNodes[0], selectionStart);
+          newRange.setEnd(element.childNodes[0], selectionStart);
+
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(newRange);
+        }
+      }
+    }
+    else
+    {
+      content = control.html();
+    }
+    
+    var formContent = new FormData();
+    formContent.append('value', content);
 
     jQuery.ajax({
       url: url,
       async: true,
       method: 'POST',
       enctype: 'multipart/form-data',
-      data: content,
+      data: formContent,
       headers: { 'Accept': 'application/json, */*' },
       contentType: false,
       processData: false,
@@ -192,7 +344,7 @@ function _setupEditMode(e, args)
       },
       error: function (request, status, message)
       {
-
+        console.error(message);
       }
     })
   }

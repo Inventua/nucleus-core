@@ -10,12 +10,10 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models.FileSystem;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using DocumentFormat.OpenXml.Drawing;
 
 namespace Nucleus.Modules.Documents.Controllers
 {

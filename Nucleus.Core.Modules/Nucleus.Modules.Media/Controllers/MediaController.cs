@@ -82,7 +82,7 @@ namespace Nucleus.Modules.Media.Controllers
     public async Task<ActionResult> Save(ViewModels.Settings viewModel)
     {
       viewModel.SetSettings(this.Context.Module);
-			await this.PageModuleManager.SaveSettings(this.Context.Module);
+			await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
 			return Ok();
 		}
@@ -117,7 +117,7 @@ namespace Nucleus.Modules.Media.Controllers
       settings.Caption = value;
       settings.SetSettings(this.Context.Module);
 
-      await this.PageModuleManager.SaveSettings(this.Context.Module);
+      await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
       return Ok();
     }

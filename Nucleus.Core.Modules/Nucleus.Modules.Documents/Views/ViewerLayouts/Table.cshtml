@@ -75,7 +75,7 @@
           }
           @if (Model.ShowDescription)
           {
-            <td><div inline-edit-route="@Url.NucleusAction("UpdateDescription", "Documents", "Documents", new { id = Model.Documents[documentCount].Id })">@Model.Documents[documentCount].Description</div></td>
+            <td><div inline-edit-route="@Url.NucleusAction("UpdateDescription", "Documents", "Documents", new { id = Model.Documents[documentCount].Id })">@Html.Raw(Model.Documents[documentCount].Description.ToHtml("text/plain"))</div></td>
           }
         </tr>
       }

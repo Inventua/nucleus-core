@@ -16,7 +16,7 @@
 		@Html.CheckBoxFor(model => model.LayoutSettings.ShowIndicators, new { @class = "ToggleSwitch" })
 	</SettingsControl>
 
-	<SettingsControl caption="Render Plain?" rendermode="LabelLast" class="inner-inline" helptext="Render the accordion without a background color, rounded corners so that it is rendered edge-to-edge with the parent container.">
+	<SettingsControl caption="Render Plain?" rendermode="LabelLast" class="inner-inline" helptext="Render the accordion without a background color or rounded corners, so that it is rendered edge-to-edge with the parent container.">
 		@Html.CheckBoxFor(model => model.LayoutSettings.RenderFlush, new { @class = "ToggleSwitch" })
 	</SettingsControl>
 </div>

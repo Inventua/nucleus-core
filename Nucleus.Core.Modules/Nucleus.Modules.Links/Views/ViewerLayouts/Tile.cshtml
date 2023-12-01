@@ -1,38 +1,44 @@
 ﻿@model Nucleus.Modules.Links.ViewModels.Viewer
 @using Nucleus.Modules.Links.ViewModels
 @using Nucleus.Modules.Links.HtmlHelpers
+@using Nucleus.Extensions
 @Html.AddStyle("~!/Tile.css")
 <div class="Links">
-	<div class="link-tiles">
-		@foreach (var link in Model.Links)
-		{
-			string url = "";
-			@switch (link.LinkType)
-			{
-				case Nucleus.Modules.Links.Models.LinkTypes.Url:
-					url = link.LinkUrl?.Url;
-					break;
-				case Nucleus.Modules.Links.Models.LinkTypes.File:
-					url = @Url.FileLink(link.LinkFile?.File);
-					break;
-				case Nucleus.Modules.Links.Models.LinkTypes.Page:
-					url = @Url.PageLink(link.LinkPage?.Page);
-					break;
-			}
-			@if (!String.IsNullOrEmpty(url))
-			{				
-				<a class="d-flex document-title" href="@url" alt="@link.Title" target="@(Model.NewWindow ? "_blank" : "")">
-					@if (Model.ShowImages && link.ImageFile != null)
-					{
-						<img class="me-1" src="@Url.FileLink(link.ImageFile)" width="@(link.ImageFile.Width.HasValue ? link.ImageFile.Width.Value : "" )" height="@(link.ImageFile.Height.HasValue ? link.ImageFile.Height.Value : "" )" alt="">						
-					}
-					<div class="flex-fill">
-						@Html.AddEditingControls(@link.Id)
-						<h3>@link.Title</h3>
-						<div class="document-description">@link.Description</div>
-					</div>
-				</a>				
-			}
-		}
-	</div>
+  <div class="link-tiles">
+    @foreach (var link in Model.Links)
+    {
+      string url = "";
+      @switch (link.LinkType)
+      {
+        case Nucleus.Modules.Links.Models.LinkTypes.Url:
+          url = link.LinkUrl?.Url;
+          break;
+        case Nucleus.Modules.Links.Models.LinkTypes.File:
+          url = @Url.FileLink(link.LinkFile?.File);
+          break;
+        case Nucleus.Modules.Links.Models.LinkTypes.Page:
+          url = @Url.PageLink(link.LinkPage?.Page);
+          break;
+      }
+      @if (!String.IsNullOrEmpty(url))
+      {
+        <div class="flex-fill">
+          @Html.AddEditingControls(@link.Id)
+          <h3>
+            <a class="d-flex document-title" href="@url" alt="@link.Title" target="@(Model.NewWindow ? "_blank" : "")" inline-edit-route="@Url.NucleusAction("UpdateTitle", "Admin", "Links", new { id = link.Id })">@link.Title</a>
+          </h3>
+
+          <div class="document-description" inline-edit-route="@Url.NucleusAction("UpdateDescription", "Admin", "Links", new { id = link.Id })">@Html.Raw(link.Description.ToHtml("text/plain"))</div>
+
+          @if (Model.ShowImages && link.ImageFile != null)
+          {
+            <div>
+              <img src="@Url.FileLink(link.ImageFile)" width="@(link.ImageFile.Width.HasValue ? link.ImageFile.Width.Value : "" )" height="@(link.ImageFile.Height.HasValue ? link.ImageFile.Height.Value : "" )" alt="" />
+            </div>
+          }
+        </div>
+
+      }
+    }
+  </div>
 </div>

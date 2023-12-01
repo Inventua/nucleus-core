@@ -10,7 +10,7 @@
 			<div class="Name">@Model.SelectedFile.Name</div>
 			@if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
 			{
-        <div class="caption" inline-edit-route="@Url.NucleusAction("UpdateCaption", "Media", "Media")">@Model.Caption</div>
+        <div class="caption" inline-edit-mode="SingleLineText" inline-edit-route="@Url.NucleusAction("UpdateCaption", "Media", "Media")">@Model.Caption</div>
 			}
 			<div>
 				<span class="ModifiedDate">@Model.SelectedFile.DateModified</span>
@@ -50,7 +50,7 @@
     default:
       @if (Model.ShowCaption && !String.IsNullOrEmpty(Model.Caption))
       {
-        <div class="caption" inline-edit-route="@Url.NucleusAction("UpdateCaption", "Media", "Media")">
+        <div class="caption" inline-edit-mode="SingleLineText" inline-edit-route="@Url.NucleusAction("UpdateCaption", "Media", "Media")">
           @Model.Caption
         </div>
       }

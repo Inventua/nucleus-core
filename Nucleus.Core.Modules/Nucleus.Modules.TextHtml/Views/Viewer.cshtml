@@ -2,6 +2,6 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Extensions
-<div inline-edit-route="@Url.NucleusAction("UpdateContent", "TextHtml", "TextHtml", new { @id = Model.Content.Id } )">
+<div inline-edit-mode="Html" inline-edit-route="@Url.NucleusAction("UpdateContent", "TextHtml", "TextHtml", new { @id = Model.Content.Id } )">
 @Html.Raw(Model.Content.ToHtml())
 </div>

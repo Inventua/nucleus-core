@@ -190,7 +190,47 @@ namespace Nucleus.Modules.Links.Controllers
 			}
 		}
 
-		[HttpPost]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    [HttpPost]
+    public async Task<ActionResult> UpdateTitle(Guid id, string value)
+    {
+      Models.Link link = await this.LinksManager.Get(this.Context.Site, id);
+
+      if (link == null)
+      {
+        return BadRequest();
+      }
+      else
+      {
+        link.Title = value;
+      }
+
+      await this.LinksManager.Save(this.Context.Module, link);
+
+      return Ok();
+    }
+
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    [HttpPost]
+    public async Task<ActionResult> UpdateDescription(Guid id, string value)
+    {
+      Models.Link link = await this.LinksManager.Get(this.Context.Site, id);
+
+      if (link == null)
+      {
+        return BadRequest();
+      }
+      else
+      {
+        link.Description = value;
+      }
+
+      await this.LinksManager.Save(this.Context.Module, link);
+
+      return Ok();
+    }
+
+    [HttpPost]
 		public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
 		{
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_CATEGORYLIST_ID, viewModel.CategoryList.Id);
@@ -198,9 +238,9 @@ namespace Nucleus.Modules.Links.Controllers
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_OPEN_NEW_WINDOW, viewModel.NewWindow);
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_IMAGES, viewModel.ShowImages);
 
-			await this.PageModuleManager.SaveSettings(this.Context.Module);
+			await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
-			return Json(new { Title = "Changes Saved", Message = "Your changes have been saved." });
+			return Json(new { Title = "Changes Saved", Message = "Your changes have been saved.", Icon = "alert" });
 		}
 
 		private async Task<ViewModels.Settings> BuildSettingsViewModel(ViewModels.Settings viewModel)

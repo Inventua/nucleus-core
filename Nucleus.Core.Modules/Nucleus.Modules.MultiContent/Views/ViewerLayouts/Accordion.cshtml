@@ -13,8 +13,8 @@
         </button>
       </h3>
       <div id="accordion-item-@content.Id" class="accordion-collapse collapse@(Model.LayoutSettings.OpenFirst && content == Model.Contents.First() ? " show" : "")" data-bs-parent="#accordion-@Model.Module.Id" aria-labelledby="accordion-head-@content.Id">
-        <div class="accordion-body" inline-edit-route="@Url.NucleusAction("UpdateContent", "MultiContent", "MultiContent", new { @id = content.Id } )">
-          @(new Microsoft.AspNetCore.Html.HtmlString(content.ToHtml()))
+        <div class="accordion-body" inline-edit-mode="Html" inline-edit-route="@Url.NucleusAction("UpdateContent", "MultiContent", "MultiContent", new { @id = content.Id } )">
+          @Html.Raw(content.ToHtml())
         </div>
       </div>
     </div>

@@ -8,14 +8,16 @@
 	{
 		<li class="accordion-item">
 			<h3 class="accordion-header" id="accordion-head-@content.Id">
-        <button inline-edit-route="@Url.NucleusAction("UpdateTitle", "MultiContent", "MultiContent", new { @id = content.Id } )" class="accordion-button @(Model.LayoutSettings.OpenFirst && content == Model.Contents.First() ? "" : "collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-item-@content.Id" aria-expanded="@(content == Model.Contents.First() ? "true" : "false")" aria-controls="accordion-item-@content.Id">
-					@(!String.IsNullOrEmpty(content.Title) ? content.Title : "No title")
+        <button class="accordion-button @(Model.LayoutSettings.OpenFirst && content == Model.Contents.First() ? "" : "collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-item-@content.Id" aria-expanded="@(content == Model.Contents.First() ? "true" : "false")" aria-controls="accordion-item-@content.Id">
+          <span inline-edit-route="@Url.NucleusAction("UpdateTitle", "MultiContent", "MultiContent", new { @id = content.Id } )">
+            @(!String.IsNullOrEmpty(content.Title) ? content.Title : "No title")
+          </span>
 				</button>
 			</h3>
 
 			<div id="accordion-item-@content.Id" class="accordion-collapse collapse@(Model.LayoutSettings.OpenFirst && content == Model.Contents.First() ? " show" : "")" aria-labelledby="accordion-head-@content.Id">
-        <div class="accordion-body" inline-edit-route="@Url.NucleusAction("UpdateContent", "MultiContent", "MultiContent", new { @id = content.Id } )">
-					@(new Microsoft.AspNetCore.Html.HtmlString(content.ToHtml()))
+        <div class="accordion-body" inline-edit-mode="Html" inline-edit-route="@Url.NucleusAction("UpdateContent", "MultiContent", "MultiContent", new { @id = content.Id } )">
+					@Html.Raw(content.ToHtml())
 				</div>
 			</div>
 		</li>

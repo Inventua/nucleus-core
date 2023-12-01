@@ -4,6 +4,11 @@
   margin-bottom: 0.5rem;
 }
 
+.Links li
+{
+  margin-bottom: 0.125rem;
+}
+
 .Links li span
 {
   margin-left: 0.5rem;

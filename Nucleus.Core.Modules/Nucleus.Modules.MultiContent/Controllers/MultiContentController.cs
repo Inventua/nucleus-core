@@ -89,9 +89,9 @@ namespace Nucleus.Modules.MultiContent.Controllers
 
 			this.Context.Module.ModuleSettings.Set(MODULESETTING_INTERVAL, viewModel.LayoutSettings.Interval);
 			
-			await this.PageModuleManager.SaveSettings(this.Context.Module);
+			await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
-			return Json(new { Title = "Changes Saved", Message = "Your changes have been saved." });
+			return Json(new { Title = "Changes Saved", Message = "Your changes have been saved.", Icon = "alert" });
 		}
 
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]

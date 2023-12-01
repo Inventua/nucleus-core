@@ -1,65 +1,68 @@
 ﻿@model Nucleus.Modules.Links.ViewModels.Viewer
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Extensions
 @using Nucleus.Modules.Links.ViewModels
 @using Nucleus.Modules.Links.HtmlHelpers
 @Html.AddStyle("~!/../../viewer.css")
 <div class="Links">
-	<table>
-		<tr>
-			@if (Model.ShowImages)
-			{
-				<th/>
-			}
-			<th>Title</th>
-			@if (Model.CategoryList != null)
-			{
-				<th>Category</th>
-			}
-			<th>Description</th>
-		</tr>
-		@foreach (var link in Model.Links)
-		{
-			string url = "";
-			@switch (link.LinkType)
-			{
-				case Nucleus.Modules.Links.Models.LinkTypes.Url:
-					url = link.LinkUrl?.Url;
-					break;
-				case Nucleus.Modules.Links.Models.LinkTypes.File:
-					url = @Url.FileLink(link.LinkFile?.File);
-					break;
-				case Nucleus.Modules.Links.Models.LinkTypes.Page:
-					url = @Url.PageLink(link.LinkPage?.Page);
-					break;
-			}
-			@if (!String.IsNullOrEmpty(url))
-			{
-				<tr>
-					@if (Model.ShowImages)
-					{
-						<td>
-							@if (link.ImageFile != null)
-							{
-								<img class="me-1" src="@Url.FileLink(link.ImageFile)" width="@(link.ImageFile.Width.HasValue ? link.ImageFile.Width.Value : "" )" height="@(link.ImageFile.Height.HasValue ? link.ImageFile.Height.Value : "" )" alt="">
-							}
-						</td>
-					}
-					<td>
-						<a href="@url" alt="@link.Title" target="@(Model.NewWindow ? "_blank" : "")">
-							@link.Title
-						</a>
-					</td>
-					@if (Model.CategoryList != null)
-					{
-						<td class="category">@link.Category?.Name</td>
-					}
-					<td class="description">
-						@link.Description
-						@Html.AddEditingControls(@link.Id)
-					</td>
-				</tr>
-			}
-		}
-	</table>
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        @if (Model.CategoryList != null)
+        {
+          <th>Category</th>
+        }
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var link in Model.Links)
+      {
+        string url = "";
+        @switch (link.LinkType)
+        {
+          case Nucleus.Modules.Links.Models.LinkTypes.Url:
+            url = link.LinkUrl?.Url;
+            break;
+          case Nucleus.Modules.Links.Models.LinkTypes.File:
+            url = @Url.FileLink(link.LinkFile?.File);
+            break;
+          case Nucleus.Modules.Links.Models.LinkTypes.Page:
+            url = @Url.PageLink(link.LinkPage?.Page);
+            break;
+        }
+        @if (!String.IsNullOrEmpty(url))
+        {
+          <tr>
+            <td>
+              @Html.AddEditingControls(@link.Id)
+              <a href="@url" alt="@link.Title" target="@(Model.NewWindow ? "_blank" : "")" inline-edit-route="@Url.NucleusAction("UpdateTitle", "Admin", "Links", new { id = link.Id })">
+                @link.Title
+              </a>
+            </td>
+            @if (Model.CategoryList != null)
+            {
+              <td class="category">@link.Category?.Name</td>
+            }
+            <td>
+              <div class="description" inline-edit-route="@Url.NucleusAction("UpdateDescription", "Admin", "Links", new { id = link.Id })">
+                @Html.Raw(link.Description.ToHtml("text/plain"))
+              </div>
+              @if (Model.ShowImages)
+              {
+                <div>
+                  @if (link.ImageFile != null)
+                  {
+                    <img class="me-1" src="@Url.FileLink(link.ImageFile)" width="@(link.ImageFile.Width.HasValue ? link.ImageFile.Width.Value : "" )" height="@(link.ImageFile.Height.HasValue ? link.ImageFile.Height.Value : "" )" alt="">
+                  }
+                </div>
+              }
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
 </div>

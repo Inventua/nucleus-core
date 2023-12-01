@@ -1,6 +1,7 @@
 ﻿@model Nucleus.Modules.Links.ViewModels.Viewer
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Extensions
 @using Nucleus.Modules.Links.ViewModels
 @using Nucleus.Modules.Links.HtmlHelpers
 @Html.AddStyle("~!/../../viewer.css")
@@ -22,19 +23,19 @@
 		}
 		@if (!String.IsNullOrEmpty(url))
 		{
-			<li>
+      <li>
+        @Html.AddEditingControls(@link.Id)
 				@if (Model.ShowImages && link.ImageFile != null)
 				{
 					<img class="me-1" src="@Url.FileLink(link.ImageFile)" width="@(link.ImageFile.Width.HasValue ? link.ImageFile.Width.Value : "" )" height="@(link.ImageFile.Height.HasValue ? link.ImageFile.Height.Value : "" )" alt="">
 				}
-				<a href="@url" alt="@link.Title" target="@(Model.NewWindow ? "_blank" : "")">@link.Title</a>
+        <a href="@url" alt="@link.Title" target="@(Model.NewWindow ? "_blank" : "")" inline-edit-route="@Url.NucleusAction("UpdateTitle", "Admin", "Links", new { id = link.Id })">@link.Title</a>
 
 				@if (Model.CategoryList != null)
 				{
 					<span class="category">@link.Category?.Name</span>
 				}
-				<span>@link.Description</span>
-				@Html.AddEditingControls(@link.Id)
+        <span class="d-inline-block" inline-edit-route="@Url.NucleusAction("UpdateDescription", "Admin", "Links", new { id = link.Id })">@Html.Raw(link.Description.ToHtml("text/plain"))</span>
 			</li>
 		}
 	}

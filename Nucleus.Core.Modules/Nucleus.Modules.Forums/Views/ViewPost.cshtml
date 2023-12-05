@@ -13,18 +13,18 @@
       <span class="nucleus-material-icon">&#xe5e0;</span>
       <h2 class="d-inline-block">@Model.Forum.Name</h2>
     </a>
-      
+
     @*<div class="nucleus-form-tools">
-      @if (!Model.IsSubscribedToForum && Model.CanSubscribe && Model.Subscription == null)
-      {
-        @Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @title = "Subscribe to post", @data_target = ".Forums.parent()" })
-      }
-      @if (Model.Subscription != null)
-      {
-        @Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = ".Forums.parent()" })
-      }
-      @Html.LinkButton("", "Back", Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode()), new { @class="btn btn-secondary btn-sm ms-auto" })
-    </div>*@
+  @if (!Model.IsSubscribedToForum && Model.CanSubscribe && Model.Subscription == null)
+  {
+  @Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @title = "Subscribe to post", @data_target = ".Forums.parent()" })
+  }
+  @if (Model.Subscription != null)
+  {
+  @Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = ".Forums.parent()" })
+  }
+  @Html.LinkButton("", "Back", Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode()), new { @class="btn btn-secondary btn-sm ms-auto" })
+  </div>*@
 
     <div class="post">
       @Html.HiddenFor(model => model.Forum.Id)
@@ -38,16 +38,16 @@
             @Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @class = "btn btn-primary btn-sm", @data_target = ".Forums.parent()" })
           }
 
-          @if (!Model.IsSubscribedToForum && Model.CanSubscribe && Model.Subscription == null)
-          {
-            @Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @title = "Subscribe to post", @data_target = ".Forums.parent()" })
-          }
-          @if (Model.Subscription != null)
-          {
-            @Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = ".Forums.parent()" })
-          }
+          @*  @if (!Model.IsSubscribedToForum && Model.CanSubscribe && Model.Subscription == null)
+        {
+        @Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @title = "Subscribe to post", @data_target = ".Forums.parent()" })
+        }
+        @if (Model.Subscription != null)
+        {
+        @Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = ".Forums.parent()" })
+        } *@
 
-          @if (Model.CanEditPost || (Model.CanApprovePost && !Model.Post.IsApproved) || (Model.CanApprovePost && !Model.Post.IsRejected == true) || Model.CanDeletePost || (Model.CanLockPost && !Model.Post.IsLocked) || (Model.CanLockPost && Model.Post.IsLocked) || (Model.CanPinPost && !Model.Post.IsPinned) || (Model.CanPinPost && Model.Post.IsPinned))
+          @if ((!Model.IsSubscribedToForum && Model.CanSubscribe && Model.Subscription == null) || (Model.Subscription != null) || Model.CanEditPost || (Model.CanApprovePost && !Model.Post.IsApproved) || (Model.CanApprovePost && !Model.Post.IsRejected == true) || Model.CanDeletePost || (Model.CanLockPost && !Model.Post.IsLocked) || (Model.CanLockPost && Model.Post.IsLocked) || (Model.CanPinPost && !Model.Post.IsPinned) || (Model.CanPinPost && Model.Post.IsPinned))
           {
             <div class="dropdown justify-content-end">
               <button area-expanded="false" class="btn dropdown-toggle btn-secondary btn-sm" data-bs-toggle="dropdown" type="button">
@@ -103,6 +103,25 @@
                     @Html.SubmitButton("", "Un-pin Post", Url.NucleusAction("UnPinForumPost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm dropdown-item", @data_target = "form.parent()" })
                   </li>
                 }
+
+                @if ((!Model.IsSubscribedToForum && Model.CanSubscribe && Model.Subscription == null) || Model.Subscription != null)
+                {
+                  <li><hr class="dropdown-divider"></li>
+                }
+
+                @if (!Model.IsSubscribedToForum && Model.CanSubscribe && Model.Subscription == null)
+                {
+                  <li>
+                    @Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm dropdown-item", @data_target = "form.parent()" })
+                  </li>
+                }
+                @if (Model.Subscription != null)
+                {
+                  <li>
+                    @Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm dropdown-item", @data_target = "form.parent()" })
+                  </li>
+                }
+
               </ul>
             </div>
           }
@@ -145,11 +164,11 @@
         <h4>Attachments</h4>
         <div class="attachments">
           @for (var attachmentCount = 0; attachmentCount < Model.Post.Attachments.Count; attachmentCount++)
-          {            
+          {
             <a href="@Url.FileLink(Model.Post.Attachments[attachmentCount].File)" alt="@Model.Post.Attachments[attachmentCount].File.Name" target="_blank">
               <span class="icon nucleus-material-icon">&#xe873;</span>
               <span>@Model.Post.Attachments[attachmentCount].File.Name</span>
-            </a>            
+            </a>
           }
         </div>
       }
@@ -158,7 +177,7 @@
         <div class="AdminTools">
           @if (Model.CanEditPost && Model.Forum.EffectiveSettings().StatusList != null && Model.Forum.EffectiveSettings().StatusList.Items?.Any() == true)
           {
-            @Html.DropDownListFor(model => model.Post.Status.Id, new SelectList(Model.Forum.EffectiveSettings().StatusList.Items, "Id", "Name"), new { @data_autopostbackevent = "change", @title= "Forum Post Status" })
+            @Html.DropDownListFor(model => model.Post.Status.Id, new SelectList(Model.Forum.EffectiveSettings().StatusList.Items, "Id", "Name"), new { @data_autopostbackevent = "change", @title = "Forum Post Status" })
           }
         </div>
       </div>
@@ -176,7 +195,7 @@
               <div class="controls">
                 @if (Model.CanReply && !Model.Post.IsLocked)
                 {
-                  @Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id, replytoid = (reply.Level <  Nucleus.Modules.Forums.ViewModels.ReplyForumPost.MAX_LEVELS ? reply.Id : Guid.Empty) }), new { @class = "btn btn-primary btn-sm" + (reply.Level >= Nucleus.Modules.Forums.ViewModels.ReplyForumPost.MAX_LEVELS ? " disabled": ""), @data_target = ".Forums.parent()" })
+                  @Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id, replytoid = (reply.Level < Nucleus.Modules.Forums.ViewModels.ReplyForumPost.MAX_LEVELS ? reply.Id : Guid.Empty) }), new { @class = "btn btn-primary btn-sm" + (reply.Level >= Nucleus.Modules.Forums.ViewModels.ReplyForumPost.MAX_LEVELS ? " disabled" : ""), @data_target = ".Forums.parent()" })
                 }
 
                 @if ((reply.CanEditReply && !Model.Post.IsLocked) || (Model.CanApprovePost && !reply.IsApproved) || (Model.CanApprovePost && !reply.IsRejected == true) || (reply.CanDeleteReply && !Model.Post.IsLocked))
@@ -190,25 +209,25 @@
                       @if (reply.CanEditReply && !Model.Post.IsLocked)
                       {
                         <li>
-                          @Html.LinkButton("", "Edit Reply", Url.NucleusAction("EditForumPostReply", "Forums", "Forums", new { postId = Model.Post.Id, replyId = reply.Id }), new { @data_target = "form.parent()", @class="btn btn-primary btn-sm dropdown-item" })
+                          @Html.LinkButton("", "Edit Reply", Url.NucleusAction("EditForumPostReply", "Forums", "Forums", new { postId = Model.Post.Id, replyId = reply.Id }), new { @data_target = "form.parent()", @class = "btn btn-primary btn-sm dropdown-item" })
                         </li>
                       }
                       @if (Model.CanApprovePost && !reply.IsApproved)
                       {
                         <li>
-                          @Html.SubmitButton("", "Approve Reply", Url.NucleusAction("ApproveForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @class="btn btn-success btn-sm dropdown-item" })
+                          @Html.SubmitButton("", "Approve Reply", Url.NucleusAction("ApproveForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @class = "btn btn-success btn-sm dropdown-item" })
                         </li>
                       }
                       @if (Model.CanApprovePost && reply.IsRejected != true)
                       {
                         <li>
-                          @Html.SubmitButton("", "Reject Reply", Url.NucleusAction("RejectForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @class="btn btn-danger btn-sm dropdown-item" })
+                          @Html.SubmitButton("", "Reject Reply", Url.NucleusAction("RejectForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @class = "btn btn-danger btn-sm dropdown-item" })
                         </li>
                       }
                       @if (reply.CanDeleteReply && !Model.Post.IsLocked)
                       {
                         <li>
-                          @Html.SubmitButton("", "Delete Reply", Url.NucleusAction("DeleteForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @class="btn btn-danger btn-sm dropdown-item", @data_confirm = "Delete this reply?" })
+                          @Html.SubmitButton("", "Delete Reply", Url.NucleusAction("DeleteForumPostReply", "Forums", "Forums", new { replyId = reply.Id }), new { @data_target = "form.parent()", @class = "btn btn-danger btn-sm dropdown-item", @data_confirm = "Delete this reply?" })
                         </li>
                       }
                     </ul>

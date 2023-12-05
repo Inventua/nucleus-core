@@ -79,6 +79,11 @@ a *
 	font-family: 'Material Icons'!important; 
 }
 
+.nucleus-flex-fields .nucleus-progress-spinner
+{
+  flex-grow: initial;
+}
+
 .nucleus-show-progress-inside .nucleus-progress-spinner
 {
 	position: absolute;

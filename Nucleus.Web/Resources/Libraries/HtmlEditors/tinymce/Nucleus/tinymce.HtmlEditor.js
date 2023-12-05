@@ -41,6 +41,7 @@
         menubar: false,
         toolbar: toolbar,
         statusbar: false,
+        contextmenu: false,
         setup: function (editor)
         {
           editor.on('GetContent', function (e) { jQuery(editor.targetElm).val(e.content); })

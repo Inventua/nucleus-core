@@ -47,7 +47,6 @@
 		<ExtensionFolder>ElasticSearch</ExtensionFolder>
 		<VersionPrefix>1.3.0</VersionPrefix>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
-		<CopyToDefaultSetup>false</CopyToDefaultSetup>
 	</PropertyGroup>
 	
 	<Target Name="FilterCopyLocalItems" AfterTargets="ResolveLockFileCopyLocalFiles">

@@ -47,7 +47,6 @@
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>GoogleAnalytics</ExtensionFolder>
 		<VersionPrefix>1.2.0</VersionPrefix>
-		<CopyToDefaultSetup>false</CopyToDefaultSetup>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 	</PropertyGroup>
 

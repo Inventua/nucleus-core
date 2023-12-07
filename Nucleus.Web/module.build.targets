@@ -159,10 +159,10 @@
 
 	<!-- 
 		Copy the created install package (if we are building in release configuration) to the dev folder/Setup/Extensions 
-		folder, if the project file does not contain a <CopyToDefaultSetup>false</CopyToDefaultSetup> element.  This makes 
+		folder, if the project file contains a <CopyToDefaultSetup>true</CopyToDefaultSetup> element.  This makes 
 		the extension available for install in the setup wizard.
 	-->
-	<Target Name="CopyToWebSetup" AfterTargets="PostBuildEvent" Condition="$(CopyToDefaultSetup) != false AND '$(Configuration)' == 'Release' AND '$(ExtensionFolder)' != '' AND $(NUCLEUS_PATH) != '' AND Exists('$(NUCLEUS_PATH)Setup')">
+	<Target Name="CopyToWebSetup" AfterTargets="PostBuildEvent" Condition="$(CopyToDefaultSetup) == true AND '$(Configuration)' == 'Release' AND '$(ExtensionFolder)' != '' AND $(NUCLEUS_PATH) != '' AND Exists('$(NUCLEUS_PATH)Setup')">
 		<ItemGroup>
 			<FilesToDelete Include="$(NUCLEUS_PATH)\Setup\Extensions\$(ExtensionFolder)_Extension*.zip"/>
 		</ItemGroup>

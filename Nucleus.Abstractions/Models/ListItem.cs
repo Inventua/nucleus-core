@@ -21,7 +21,7 @@ namespace Nucleus.Abstractions.Models
 		public Guid Id { get; set; }
 
 		/// <summary>
-		/// Item Name
+		/// List item name.
 		/// </summary>
 		/// <remarks>
 		/// </remarks>		
@@ -29,12 +29,14 @@ namespace Nucleus.Abstractions.Models
 		public string Name { get; set; }
 
 		/// <summary>
-		/// List item value
+		/// List item value.
 		/// </summary>
-		/// <remarks>
-		/// The site to which the list belongs.  A null value represents a instance-wide list.
-		/// </remarks>
 		public string Value { get; set; }
+
+		/// <summary>
+		/// List item display order.
+		/// </summary>
+		public int? SortOrder { get; set; }
 
 		/// <summary>
 		/// Compare one list item to another.
@@ -42,7 +44,7 @@ namespace Nucleus.Abstractions.Models
 		/// <param name="other"></param>
 		/// <returns></returns>
 		/// <remarks>
-		/// This method implements the IComparable interface and is used for sorting.
+		/// This method implements the IComparable interface and is used for sorting by name.
 		/// </remarks>
 		public int CompareTo(object other)
 		{

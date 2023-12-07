@@ -139,6 +139,26 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Index", await BuildViewModel ());
 		}
 
+		[HttpPost]
+		public async Task<ActionResult> MoveDown(ViewModels.Admin.ListEditor viewModel, Guid id)
+		{
+			await this.ListManager.MoveDown(this.Context.Site, viewModel.List, id);
+			viewModel.List = await this.ListManager.Get(viewModel.List.Id);
+
+			ModelState.Clear();
+			return View("Editor", await BuildViewModel(viewModel.List));
+		}
+
+		[HttpPost]
+		public async Task<ActionResult> MoveUp(ViewModels.Admin.ListEditor viewModel, Guid id)
+		{
+			await this.ListManager.MoveUp(this.Context.Site, viewModel.List, id);
+			viewModel.List = await this.ListManager.Get(viewModel.List.Id);
+			ModelState.Clear();
+			return View("Editor", await BuildViewModel(viewModel.List));
+		}
+
+
 		private async Task<ViewModels.Admin.ListIndex> BuildViewModel()
 		{
 			return await BuildViewModel(new ViewModels.Admin.ListIndex());

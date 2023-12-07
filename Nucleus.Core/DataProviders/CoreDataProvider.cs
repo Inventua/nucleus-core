@@ -2433,7 +2433,7 @@ namespace Nucleus.Core.DataProviders
 		{
 			return await this.Context.Lists
 				.Where(list => list.Id == listId)
-				.Include(list => list.Items.OrderBy(item => item.Value))
+				.Include(list => list.Items.OrderBy(item => item.SortOrder))
 				.AsNoTracking()
 				.FirstOrDefaultAsync();
 		}

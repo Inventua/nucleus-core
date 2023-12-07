@@ -46,12 +46,25 @@
 						<tr>
 							<td>
 								@Html.HiddenFor(model => model.List.Items[itemCount].Id)
+								@Html.HiddenFor(model => model.List.Items[itemCount].SortOrder)
 								@Html.TextBoxFor(model => model.List.Items[itemCount].Name, new { @maxlength = 256 })
 							</td>
 							<td>
 								@Html.TextBoxFor(model => model.List.Items[itemCount].Value, new { @maxlength = 512 })
 							</td>
 							<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("DeleteListItem", "Lists", "Admin", new { id = Model.List.Items[itemCount].Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target=".ListEditor" /></td>
+							<td class="nucleus-small-cell">
+								@if (itemCount != 0)
+								{
+									<button type="submit" formaction="@Url.AreaAction("MoveUp", "Lists", "Admin", new { id = Model.List?.Items[itemCount].Id })" class="nucleus-material-icon btn btn-outline-secondary" title="Move Up" data-target=".ListEditor">&#xe5d8;</button>
+								}
+							</td>
+							<td class="nucleus-small-cell">
+								@if (itemCount < Model.List?.Items.Count - 1)
+								{
+									<button type="submit" formaction="@Url.AreaAction("MoveDown", "Lists", "Admin", new { id = Model.List?.Items[itemCount].Id })" class="nucleus-material-icon btn btn-outline-secondary" title="Move Down" data-target=".ListEditor">&#xe5db;</button>
+								}
+							</td>
 						</tr>
 					}
 				</table>

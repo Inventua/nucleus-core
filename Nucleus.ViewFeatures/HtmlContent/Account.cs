@@ -104,7 +104,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
           accountMenuBuilder.InnerHtml.AppendHtml(passwordExpiredItemBuilder);
         }
 
-        if (context.HttpContext.User.IsApproved() && context.HttpContext.User.IsVerified())
+        if (!context.HttpContext.User.IsSystemAdministrator() && context.HttpContext.User.IsApproved() && context.HttpContext.User.IsVerified())
         {
           TagBuilder accountProfileItemBuilder = new("li");
           TagBuilder accountProfileLinkBuilder = new("a");

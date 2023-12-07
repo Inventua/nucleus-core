@@ -8,7 +8,6 @@
 {
 	<Tab>
 		<TabItem target="#user-properties" caption="Properties" active="true"></TabItem>
-		<TabItem target="#user-profile" caption="Profile"></TabItem>
 	</Tab>
 	<TabContent>
 		<TabPanel id="user-properties" active="true">
@@ -40,36 +39,8 @@
 						</SettingsControl>
 				</div>
 				}
-			</fieldset>
-		</TabPanel>
 
-		<TabPanel id="user-profile" class="Section">
-			<fieldset role="group" aria-labelledby="heading">
-				<h3>Profile</h3>
-
-				@for (int profileValueCount = 0; profileValueCount < Model.User.Profile.Count; profileValueCount++)
-				{
-					<div class="settings-control" title="@Model.User.Profile[profileValueCount].UserProfileProperty.HelpText">
-						<label>
-							<span>@Model.User.Profile[profileValueCount].UserProfileProperty.Name</span>
-							@{Dictionary<string, object> parameters = new();
-								parameters.Add("maxlength", 512); 
-								ClaimTypeOption claimTypeOption = Model.User.Profile[profileValueCount].UserProfileProperty.ClaimTypeOption(Model.ClaimTypeOptions);
-								if (!String.IsNullOrEmpty(claimTypeOption.InputType))
-								{
-									parameters.Add("type", claimTypeOption.InputType);
-								}
-								if (!String.IsNullOrEmpty(claimTypeOption.Pattern))
-								{
-									parameters.Add("pattern", claimTypeOption.Pattern);
-								} }
-							@Html.TextBoxFor(model => model.User.Profile[profileValueCount].Value, parameters)
-						</label>
-						@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Id)
-						@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Name)
-						@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.TypeUri)
-					</div>
-				}
+				<div class="alert alert-info">System administrators do not have roles or profile values.</div>
 			</fieldset>
 		</TabPanel>
 	</TabContent>

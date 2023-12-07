@@ -1202,7 +1202,7 @@ namespace Nucleus.Core.DataProviders
 				.Where(user => user.UserName == userName && user.SiteId == null && user.IsSystemAdministrator == true)
 				.Include(user => user.Secrets)
 				// System admins don't have roles
-				.Include(user => user.Profile)
+				// System admins don't have profile properties
 				.AsNoTracking()
 				.FirstOrDefaultAsync();
 		}

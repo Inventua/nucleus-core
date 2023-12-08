@@ -2495,6 +2495,7 @@ namespace Nucleus.Core.DataProviders
             // Add setting
             if (existing != null)
             {
+              item.SortOrder = list.Items?.OrderBy(listitem => listitem.SortOrder).LastOrDefault()?.SortOrder + 10;
               existing.Items.Add(item);
               this.Context.Entry(item).State = EntityState.Added;
             }

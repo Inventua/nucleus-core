@@ -66,5 +66,20 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="list"></param>
 		public Task Delete(List list);
 
+		/// <summary>
+		/// Move list item down 
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="list"></param>
+		/// <param name="itemId"></param>
+		public Task MoveDown(Site site, List list, Guid itemId);
+
+		/// <summary>
+		/// Move list item up 
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="list"></param>
+		/// <param name="itemId"></param>
+		public Task MoveUp(Site site, List list, Guid itemId);
 	}
 }

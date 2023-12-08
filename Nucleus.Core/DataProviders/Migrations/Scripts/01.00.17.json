@@ -1,0 +1,14 @@
+{
+	"schemaName": "Nucleus.Core",
+	"version": "01.00.17",
+  "operations": [
+    {
+      "addColumn": {
+        "table": "ListItems",
+        "name": "SortOrder",
+        "clrType": "int",
+        "isnullable": true
+      }
+    }
+  ]
+}

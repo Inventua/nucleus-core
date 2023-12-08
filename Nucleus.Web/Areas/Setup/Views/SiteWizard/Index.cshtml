@@ -3,336 +3,99 @@
 @using Nucleus.Abstractions
 @addTagHelper "*, Nucleus.ViewFeatures"
 @{
-	Layout = "_Generic";
-	ViewData["title"] = "Nucleus Setup Wizard";
+  Layout = "_Generic";
+  ViewData["title"] = "Nucleus Setup Wizard";
 }
 @Html.AddStyle("~!index.css")
 @Html.AddScript("~/Areas/Setup/Views/SiteWizard/index.js", true)
-@{
-	var disabledAttr = new { disabled = "disabled" };
-	var enabledAttr = new { };
-}
-
-@using (Html.BeginAreaForm("Install", "SiteWizard", "Setup", FormMethod.Post, new { @data_target = "document" }))
+@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
+@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_TOGGLESWITCH)
+@using (Html.BeginAreaForm("GenerateConnectionString", "SiteWizard", "Setup", FormMethod.Post, new { @data_target = "document" }))
 {
-	<Modal id="site-wizard" title="Nucleus Setup Wizard" can-close="false">
-		<img class="logo" src="@Url.Content("~/Resources/Images/nucleus.png")" height="90" width="81" alt="Nucleus Logo" />
-		<h2>Welcome to Nucleus.</h2>
-		<p>This wizard will help you to set up your site.</p>
-		
-		@if ((Model.Preflight == null || Model.Preflight.IsValid()) && (Model.SelectedTemplate == null || Model.OtherWarnings.Count() > 0 || Model.MissingExtensionWarnings.Count() > 0))
-		{
-			<h3>Site Template</h3>
-			<p>
-				A site template will automatically set up pages, roles, list entries and other data to get you started.  Please select a site template below.
-			</p>
-			<SettingsControl caption="Site Template" helptext="Select your site template." class="d-flex flex-1 overflow-auto mb-2">
-				@Html.DropDownListFor(model => model.SelectedTemplate, new SelectList(Model.Templates, nameof(Nucleus.Web.ViewModels.Setup.SiteWizard.SiteTemplate.FileName), nameof(Nucleus.Web.ViewModels.Setup.SiteWizard.SiteTemplate.Title)), "(select a template)", new { @id = "site-template-select"})
+  <Modal id="site-wizard" title="Nucleus Setup Wizard" can-close="false" data-bs-backdrop="static" data-bs-keyboard="false">
+    <img class="logo" src="@Url.Content("~/Resources/Images/nucleus.png")" height="90" width="81" alt="Nucleus Logo" />
+    <h2>Welcome to Nucleus.</h2>
+    <p>This wizard will help you to set up your site.</p>
+        
+    @if (!Model.IsDatabaseConfigured)
+    {
+      <div id="site-databases" class="d-flex flex-column flex-1">
+        @await Html.PartialAsync("_Database", Model)
+      </div>
+    }
+    else
+    {
+      @if ((Model.Preflight == null || Model.Preflight.IsValid()) && (Model.SelectedTemplate == null || Model.OtherWarnings.Count() > 0 || Model.MissingExtensionWarnings.Count() > 0))
+      {
+        @await Html.PartialAsync("_SiteTemplate", Model)
+      }
+      else
+      {
+        @Html.HiddenFor(model => model.SelectedTemplate)
+        @Html.HiddenFor(model => model.TemplateTempFileName)
 
-        <div class="mt-1 d-flex flex-1 overflow-auto border border-dark border-1">
-          <div class="list-group list-group-flush">
-            @foreach(var template in Model.Templates)
-            {
-              <a class="list-group-item list-group-item-action me-auto site-template-list-group-item user-select-none" data-select="@template.FileName">
-                <div class="fw-bold">@template.Title</div>
-                <div class="small lh-sm ">@template.Description</div>
-              </a>
-            }
+        <Tab class="nav-pills nav-justified">
+          @if (Model.Preflight != null)
+          {
+            <TabItem caption="Configuration Checks" active="true" target="#site-preflight"></TabItem>
+          }
+
+          @if (Model.Preflight == null || Model.Preflight.IsValid())
+          {
+            <TabItem caption="File System" active="@(Model.Preflight == null ? true : false)" target="#site-filesystem"></TabItem>
+            <TabItem caption="Extensions" target="#site-install"></TabItem>
+            <TabItem caption="Site" target="#site-settings"></TabItem>
+            <TabItem caption="Users" target="#user-settings"></TabItem>
+          }
+        </Tab>
+        <TabContent>
+          @if (Model.Preflight != null)
+          {
+            <TabPanel id="site-preflight" active="true">
+              @await Html.PartialAsync("_PreFlight", Model)
+            </TabPanel>
+          }
+
+          @if (Model.Preflight == null || Model.Preflight.IsValid())
+          {
+            <TabPanel id="site-filesystem" active="@(Model.Preflight == null ? true : false)">
+              @await Html.PartialAsync("_FileSystem", Model)
+            </TabPanel>
+
+            <TabPanel id="site-install">
+              @await Html.PartialAsync("_Extensions", Model)
+            </TabPanel>
+
+            <TabPanel id="site-settings">
+              @await Html.PartialAsync("_SiteSettings", Model)
+            </TabPanel>
+
+            <TabPanel id="user-settings">
+              @await Html.PartialAsync("_UserSettings", Model)
+            </TabPanel>
+          }
+        </TabContent>
+
+        <div class="wizard-progress collapse">
+          <div>
+            <h2>Setting up Nucleus</h2>
+            <p>Your web site is being created, please wait.</p>
+            <div class="progress my-2">
+              <div class="progress-bar progress-bar-striped progress-bar-animated indeterminate" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+            </div>
           </div>
-          
         </div>
-			</SettingsControl>
 
-			@if (Model.OtherWarnings?.Count() > 0)
-			{
-				<div class="alert alert-danger">
-					<h3>Warning</h3>
-					<div>
-						One or more extensions in the <strong>Setup/Extensions</strong> folder is invalid.
-					</div>
-					<ul>
-						@foreach (string warning in Model.OtherWarnings)
-						{
-							<li>@warning</li>
-						}
-					</ul>
+        <div class="nucleus-button-panel justify-content-end">
+          <button id="wizard-button-back" class="collapse btn btn-secondary" type="button" title="Back">Back</button>
 
-					Installation cannot proceed.  Please correct the issue and click 'Next''.
-				</div>
-			}
-
-			@if (Model.MissingExtensionWarnings?.Count() > 0)
-			{
-				<div class="alert alert-danger">
-					<h3>Required Extensions Missing</h3>
-					<div>
-						One or more modules, layouts or containers are used by the selected template, but are not contained within any of the extensions in the Setup/Extensions folder.
-					</div>
-					<ul>
-						@foreach (string warning in Model.MissingExtensionWarnings)
-						{
-							<li>@warning</li>
-						}
-					</ul>
-					
-					Installation cannot proceed.  Please correct the issue and click 'Next''.
-				</div>
-			}
-
-			<div class="nucleus-button-panel justify-content-end">
-				<button class="btn btn-primary" type="submit" title="Next" formaction="@Url.AreaAction("Index", "SiteWizard", "Setup")">Next</button>
-			</div>
-		}
-		else
-		{      
-		  @Html.HiddenFor(model => model.SelectedTemplate)
-		  @Html.HiddenFor(model => model.TemplateTempFileName)
-
-			<Tab class="nav-pills nav-justified">
-				@if (Model.Preflight != null)
-				{
-					<TabItem caption="Configuration Checks" active="true" target="#site-preflight"></TabItem>
-				}
-
-				@if (Model.Preflight == null || Model.Preflight.IsValid())
-				{
-					<TabItem caption="Install" active="@(Model.Preflight == null ? true : false)" target="#site-install"></TabItem>
-					<TabItem caption="Site" target="#site-settings"></TabItem>
-					<TabItem caption="Users" target="#user-settings"></TabItem>
-				}
-			</Tab>
-			<TabContent>
-				@if (Model.Preflight != null)
-				{
-					<TabPanel id="site-preflight" active="true">
-						<div class="mb-1 d-flex">
-							@if (Model.Preflight != null)
-							{
-								@if (!Model.Preflight.IsValid())
-								{
-									<span class="nucleus-material-icon status-error medium-icon">!</span>
-									<span class="medium-icon-text">
-										Configuration checks have failed (@Model.Preflight.ErrorCount() error@(@Model.Preflight.ErrorCount() == 1 ? "" : "s")).  Please address the errors below and click 'Retry'.  
-										<br/>
-										If you need to modify configuration files you may need to restart Nucleus for changes to take effect.
-									</span>
-								}
-								else
-								{
-									<span class="nucleus-material-icon status-ok medium-icon">&#xe5ca;</span>
-									<span class="medium-icon-text">Configuration checks were successful.</span>
-								}								
-							}
-							<button type="submit" class="btn btn-secondary ms-auto" formaction="@Url.AreaAction("Index", "SiteWizard", "Setup")">Retry</button>
-						</div>
-						<table class="table table-sm align-middle small mt-2">
-							<thead class="table-dark">
-								<tr>
-									<th scope="col"></th>
-									<th scope="col">Message</th>
-									<th scope="col">Code</th>
-								</tr>
-							</thead>
-							@foreach (var result in Model.Preflight)
-							{
-								<tr>
-									<td class="nucleus-material-icon text-center status-col status-col-@(result.Status.ToString().ToLower())" style="width: 3rem">
-										@switch (result.Status)
-										{
-											case IPreflight.Status.OK:
-												@Html.Raw("&#xe5ca;")
-												break;
-											case IPreflight.Status.Warning:
-												@Html.Raw("&#xe002;")
-												break;
-											case IPreflight.Status.Error:
-												@Html.Raw("&#xe000;")
-												break;
-										}
-									</td>
-									<td>@result.Message</td>
-									<td class="code-col">@result.Code</td>
-								</tr>
-							}
-						</table>
-					</TabPanel>
-				}
-
-				@if (Model.Preflight == null || Model.Preflight.IsValid())
-				{
-					<TabPanel id="site-install" active="@(Model.Preflight == null ? true : false)">
-						<fieldset role="group" aria-labelledby="heading">
-							<h3>Install Extensions</h3>
-							<p>
-								Select the extensions that you want to install.  You can install more extensions later.  Extensions shown with a disabled checkbox
-                are required, and can't be un-selected because they are used by the selected site template.
-							</p>
-
-							@for (var count = 0; count < Model.InstallableExtensions.Count(); count++)
-							{
-								<div class="installable-package">
-									<label>
-										<span>
-											@Html.HiddenFor(model => model.InstallableExtensions[count].Filename)
-											@if (Model.InstallableExtensions[count].IsRequired)
-											{
-												@Html.HiddenFor(model => model.InstallableExtensions[count].IsSelected)
-												<span class="nucleus-material-icon placeholder-checkbox">&#xe834;</span>
-											}
-											else
-											{
-												@Html.CheckBoxFor(model => model.InstallableExtensions[count].IsSelected, Model.InstallableExtensions[count].IsRequired ? disabledAttr : enabledAttr)
-											}
-											<span class="fw-bold">@Model.InstallableExtensions[count].Name</span>@Model.InstallableExtensions[count].PackageVersion
-										</span>
-										<span>@Model.InstallableExtensions[count].Description</span>
-										<span>
-											<span class="fst-italic">Publisher</span> <a href="@Model.InstallableExtensions[count].PublisherUrl">@Model.InstallableExtensions[count].Publisher</a>											
-										</span>
-									</label>
-								</div>
-							}
-						</fieldset>
-					</TabPanel>
-
-					<TabPanel id="site-settings">
-						<fieldset role="group" aria-labelledby="heading">
-							<h3>Site Settings</h3>
-
-							<SettingsControl caption="Site Name" helptext="Enter a name for your site.  This value can be displayed on-screen, depending on the selected layout.">
-								@Html.HiddenFor(model => model.Site.Id)
-								@Html.TextBoxFor(model => model.Site.Name)
-							</SettingsControl>
-
-							<SettingsControl caption="Default Alias (url)" helptext="Enter the primary url for your new site.  Example: 'mysite.com' or 'mysite.com/site1'.">
-								@Html.HiddenFor(model => model.Site.DefaultSiteAlias.Id)
-								@Html.TextBoxFor(model => model.Site.DefaultSiteAlias.Alias)
-							</SettingsControl>
-
-							<SettingsControl caption="Home directory" helptext="Enter the home directory for this site's files, relative to the Nucleus files folder root.">
-								@Html.TextBoxFor(model => model.Site.HomeDirectory)
-							</SettingsControl>
-
-							@*<h3>Appearance</h3>
-							<div class="nucleus-flex-fields">
-								<SettingsControl caption="Default Layout" helptext="Select a default layout for your site.">
-									@Html.DropDownListFor(model => model.Site.DefaultLayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
-								</SettingsControl>
-
-								<SettingsControl caption="Default Container" helptext="Select a default container for your site.">
-									@Html.DropDownListFor((model) => model.Site.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
-								</SettingsControl>
-							</div>*@
-
-							<h3>Security Roles</h3>
-							<div class="nucleus-flex-fields">
-								<SettingsControl caption="Administrators Role" helptext="Enter a name for your site's administrators role.  Members of this role can manage all settings for your site.">
-									@Html.HiddenFor(model => model.Site.AdministratorsRole.Id)
-									@Html.HiddenFor(model => model.Site.AdministratorsRole.Description)
-									@if (Model.Site.AdministratorsRole.RoleGroup != null)
-									{
-										@Html.HiddenFor(model => model.Site.AdministratorsRole.RoleGroup.Id)
-									}
-									@Html.HiddenFor(model => model.Site.AdministratorsRole.Type)
-									@Html.TextBoxFor(model => model.Site.AdministratorsRole.Name)
-								</SettingsControl>
-
-								<SettingsControl caption="Registered Users Role" helptext="Enter a name for your site's registered users role.  All logged in users are automatically considered to be members of this role.  You can use the registered users role to control access to pages/modules which should apply to logged-on users only.">
-									@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Id)
-									@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Description)
-									@if (Model.Site.RegisteredUsersRole.RoleGroup != null)
-									{
-										@Html.HiddenFor(model => model.Site.RegisteredUsersRole.RoleGroup.Id)
-									}
-									@Html.HiddenFor(model => model.Site.RegisteredUsersRole.Type)
-									@Html.TextBoxFor(model => model.Site.RegisteredUsersRole.Name)
-								</SettingsControl>
-							</div>
-
-							<div class="nucleus-flex-fields">
-								<SettingsControl caption="Anonymous Users Role" helptext="Enter a name for your site's anomymous users role.  This role represents users who are not logged in.  You can use the anonymous users role to assign permissions to pages and modules which should apply when a user is not logged in (like view permissions to a module containing a prompt to register and log in.).">
-									@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Id)
-									@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Description)
-									@if (Model.Site.AnonymousUsersRole.RoleGroup != null)
-									{
-										@Html.HiddenFor(model => model.Site.AnonymousUsersRole.RoleGroup.Id)
-									}
-									@Html.HiddenFor(model => model.Site.AnonymousUsersRole.Type)
-									@Html.TextBoxFor(model => model.Site.AnonymousUsersRole.Name)
-								</SettingsControl>
-
-								<SettingsControl caption="All Users Role" helptext="Enter a name for your site's all users role.  You can use the all users role to assign permissions to pages and modules which should apply to all users, whether they are logged in or not.">
-									@Html.HiddenFor(model => model.Site.AllUsersRole.Id)
-									@Html.HiddenFor(model => model.Site.AllUsersRole.Description)
-									@if (Model.Site.AllUsersRole.RoleGroup != null)
-									{
-										@Html.HiddenFor(model => model.Site.AllUsersRole.RoleGroup.Id)
-									}
-									@Html.HiddenFor(model => model.Site.AllUsersRole.Type)
-									@Html.TextBoxFor(model => model.Site.AllUsersRole.Name)
-								</SettingsControl>
-							</div>
-						</fieldset>
-					</TabPanel>
-
-					<TabPanel id="user-settings">
-						<fieldset role="group" aria-labelledby="heading">
-							<h3>User Settings</h3>
-
-							@if (Model.CreateSystemAdministratorUser)
-							{
-								<SettingsControl caption="System Administrator User Name" helptext="Enter a user name for your system administrator user.  This user can manage all sites.">
-									@Html.TextBoxFor(model => model.SystemAdminUserName)
-								</SettingsControl>
-
-								<div class="nucleus-flex-fields">
-									<SettingsControl caption="System Administrator User Password" helptext="Enter a password for the system administrator.">
-										@Html.PasswordFor(model => model.SystemAdminPassword)
-									</SettingsControl>
-									<SettingsControl caption="Confirm Password" helptext="Confirm the password for the system administrator.">
-										@Html.PasswordFor(model => model.SystemAdminConfirmPassword)
-									</SettingsControl>
-								</div>
-							}
-							<SettingsControl caption="Site Administrator User Name" helptext="Enter a user name for your site's administrator user.  This user will be able to manage the site which is being created by the installation wizard.">
-								@Html.TextBoxFor(model => model.SiteAdminUserName)
-							</SettingsControl>
-
-							<div class="nucleus-flex-fields">
-								<SettingsControl caption="Site Administrator User Password" helptext="Enter a password for the site administrator user.">
-									@Html.PasswordFor(model => model.SiteAdminPassword)
-								</SettingsControl>
-								<SettingsControl caption="Confirm Password" helptext="Confirm the password for the site administrator user.">
-									@Html.PasswordFor(model => model.SiteAdminConfirmPassword)
-								</SettingsControl>
-							</div>
-
-						</fieldset>
-					</TabPanel>
-				}
-			</TabContent>
-
-      <div class="wizard-progress collapse">
-        <div>
-			    <h2>Setting up Nucleus</h2>
-			    <p>Your web site is being created, please wait.</p>
-			    <div class="progress my-2">
-				    <div class="progress-bar progress-bar-striped progress-bar-animated indeterminate" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
-			    </div>
+          @if (Model.Preflight == null || Model.Preflight.IsValid())
+          {
+            <button id="wizard-button-next" class="collapse show btn btn-primary" type="button" title="Next">Next</button>
+            <button id="wizard-button-finish" class="collapse btn btn-success" type="submit" formaction="@Url.AreaAction("Install", "SiteWizard", "Setup")" title="Finish">Finish</button>
+          }
         </div>
-		  </div>
-
-			<div class="nucleus-button-panel justify-content-end">
-				<button id="wizard-button-back" class="collapse btn btn-secondary" type="button" title="Back">Back</button>
-
-				@if (Model.Preflight == null || Model.Preflight.IsValid())
-				{
-					<button id="wizard-button-next" class="collapse show btn btn-primary" type="button" title="Next">Next</button>
-					<button id="wizard-button-finish" class="collapse btn btn-success" type="submit" title="Finish">Finish</button>
-				}
-			</div>
-		}
-
-	</Modal>
+      }
+    }
+  </Modal>
 }
-

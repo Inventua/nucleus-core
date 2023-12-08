@@ -9,6 +9,7 @@ using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Extensions;
 using Nucleus.Data.Common;
 using Nucleus.Data.EntityFramework;
+using Microsoft.AspNetCore.Http;
 
 namespace Nucleus.Data.MySql
 {
@@ -67,11 +68,66 @@ namespace Nucleus.Data.MySql
 			return services;		
 		}
 
-		/// <summary>
-		/// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
-		/// the database provider implementing this interface.
-		/// </summary>
-		public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName)
+    /// <summary>
+    /// Test the database connection string.
+    /// </summary>
+    /// <param name="connectionString"></param>
+    public void TestConnection(string connectionString)
+    {
+      System.Data.Common.DbConnection connection = new MySqlConnector.MySqlConnection(connectionString);
+      connection.Open();
+
+      System.Data.Common.DbCommand command = connection.CreateCommand();
+      command.CommandText = "SELECT 1;";
+
+      command.ExecuteNonQuery();
+
+      connection.Close();
+    }
+
+    /// <summary>
+    /// Return a list of databases.
+    /// </summary>
+    /// <param name="connectionString"></param>
+    /// <returns></returns>
+    public IEnumerable<string> ListDatabases(string connectionString)
+    {
+      List<string> results = new();
+
+      System.Data.Common.DbConnection connection = new MySqlConnector.MySqlConnection(connectionString);
+      connection.Open();
+
+      System.Data.Common.DbCommand command = connection.CreateCommand();
+      command.CommandText = "SELECT schema_name AS Name FROM INFORMATION_SCHEMA.schemata WHERE schema_name NOT IN ('information_schema', 'mysql', 'performance_schema', 'sys');";
+
+      System.Data.Common.DbDataReader reader = command.ExecuteReader();
+
+      try
+      {
+        while (reader.Read())
+        {
+          string? name = reader.GetValue(reader.GetOrdinal("Name")).ToString();
+          if (name != null)
+          {
+            results.Add(name);
+          }
+        }
+      }
+      finally
+      {
+        reader.Close();
+      }
+
+      connection.Close();
+
+      return results;
+    }
+
+    /// <summary>
+    /// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
+    /// the database provider implementing this interface.
+    /// </summary>
+    public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName)
 		{
 			Dictionary<string, string> results = new();
 

@@ -9,16 +9,11 @@
         //                      connections in the Schemas section.
         //   Type:              Must match the type string specified by the Nucleus database provider.
         //   ConnectionString:  Is a database provider specific connection string.
-        {
-          "Key": "CoreSqlite",
-          "Type": "Sqlite",
-          "ConnectionString": "Data Source={DataFolder}/Data/Nucleus.db"
-        },
-        {
-          "Key": "CoreSqlServer",
-          "Type": "SqlServer",
-          "ConnectionString": "Data Source=<server>;Initial Catalog=<database>;User ID=<username>;Password=<password>"
-        }
+        //{
+        //  "Key": "CoreSqlite",
+        //  "Type": "Sqlite",
+        //  "ConnectionString": "Data Source={DataFolder}/Data/Nucleus.db"
+        //}
       ],
       "Schemas": [
         // In theory, different modules (which define their own schemas) can use different database connections.  In practise,
@@ -26,10 +21,10 @@
         // another database may need to use their own connection.  Use the Schema.Name property to define which connection to use 
         // for each schema.  The special schema name "*" is the default connection used when there isn't a specific connection 
         // defined for a schema.  ConnectionKey must match one of the Database.Connections.Key values above.
-        {
-          "Name": "*",
-          "ConnectionKey": "CoreSqlite"
-        }
+        //{
+        //  "Name": "*",
+        //  "ConnectionKey": "CoreSqlite"
+        //}
       ]
     }
   }

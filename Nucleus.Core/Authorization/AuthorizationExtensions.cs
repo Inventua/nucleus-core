@@ -34,7 +34,7 @@ namespace Nucleus.Core.Authorization
 						{
 							IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
 
-							SitePages sitePages = context.HttpContext.RequestServices.GetService<Context>().Site.GetSitePages();
+							SitePages sitePages = context.HttpContext.RequestServices.GetService<Context>().Site?.GetSitePages() ?? new();
 							string returnUrl;
 																
 							if (context.HttpContext.Request.Path.StartsWithSegments("/admin"))

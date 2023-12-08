@@ -1,0 +1,81 @@
+﻿@model Nucleus.Web.ViewModels.Setup.SiteWizard
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+<fieldset role="group" aria-labelledby="heading">
+  <h3>Site Settings</h3>
+
+  <SettingsControl caption="Site Name" helptext="Enter a name for your site.  This value can be displayed on-screen, depending on the selected layout.">
+    @Html.HiddenFor(model => model.Site.Id)
+    @Html.TextBoxFor(model => model.Site.Name)
+  </SettingsControl>
+
+  <SettingsControl caption="Default Alias (url)" helptext="Enter the primary url for your new site.  Example: 'mysite.com' or 'mysite.com/site1'.">
+    @Html.HiddenFor(model => model.Site.DefaultSiteAlias.Id)
+    @Html.TextBoxFor(model => model.Site.DefaultSiteAlias.Alias)
+  </SettingsControl>
+
+  <SettingsControl caption="Home directory" helptext="Enter the home directory for this site's files, relative to the Nucleus files folder root.">
+    @Html.TextBoxFor(model => model.Site.HomeDirectory)
+  </SettingsControl>
+
+  @*<h3>Appearance</h3>
+  <div class="nucleus-flex-fields">
+  <SettingsControl caption="Default Layout" helptext="Select a default layout for your site.">
+  @Html.DropDownListFor(model => model.Site.DefaultLayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
+  </SettingsControl>
+
+  <SettingsControl caption="Default Container" helptext="Select a default container for your site.">
+  @Html.DropDownListFor((model) => model.Site.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
+  </SettingsControl>
+  </div>*@
+
+  <h3>Security Roles</h3>
+  <div class="nucleus-flex-fields">
+    <SettingsControl caption="Administrators Role" helptext="Enter a name for your site's administrators role.  Members of this role can manage all settings for your site.">
+      @Html.HiddenFor(model => model.Site.AdministratorsRole.Id)
+      @Html.HiddenFor(model => model.Site.AdministratorsRole.Description)
+      @if (Model.Site.AdministratorsRole.RoleGroup != null)
+      {
+        @Html.HiddenFor(model => model.Site.AdministratorsRole.RoleGroup.Id)
+      }
+      @Html.HiddenFor(model => model.Site.AdministratorsRole.Type)
+      @Html.TextBoxFor(model => model.Site.AdministratorsRole.Name)
+    </SettingsControl>
+
+    <SettingsControl caption="Registered Users Role" helptext="Enter a name for your site's registered users role.  All logged in users are automatically considered to be members of this role.  You can use the registered users role to control access to pages/modules which should apply to logged-on users only.">
+      @Html.HiddenFor(model => model.Site.RegisteredUsersRole.Id)
+      @Html.HiddenFor(model => model.Site.RegisteredUsersRole.Description)
+      @if (Model.Site.RegisteredUsersRole.RoleGroup != null)
+      {
+        @Html.HiddenFor(model => model.Site.RegisteredUsersRole.RoleGroup.Id)
+      }
+      @Html.HiddenFor(model => model.Site.RegisteredUsersRole.Type)
+      @Html.TextBoxFor(model => model.Site.RegisteredUsersRole.Name)
+    </SettingsControl>
+  </div>
+
+  <div class="nucleus-flex-fields">
+    <SettingsControl caption="Anonymous Users Role" helptext="Enter a name for your site's anomymous users role.  This role represents users who are not logged in.  You can use the anonymous users role to assign permissions to pages and modules which should apply when a user is not logged in (like view permissions to a module containing a prompt to register and log in.).">
+      @Html.HiddenFor(model => model.Site.AnonymousUsersRole.Id)
+      @Html.HiddenFor(model => model.Site.AnonymousUsersRole.Description)
+      @if (Model.Site.AnonymousUsersRole.RoleGroup != null)
+      {
+        @Html.HiddenFor(model => model.Site.AnonymousUsersRole.RoleGroup.Id)
+      }
+      @Html.HiddenFor(model => model.Site.AnonymousUsersRole.Type)
+      @Html.TextBoxFor(model => model.Site.AnonymousUsersRole.Name)
+    </SettingsControl>
+
+    <SettingsControl caption="All Users Role" helptext="Enter a name for your site's all users role.  You can use the all users role to assign permissions to pages and modules which should apply to all users, whether they are logged in or not.">
+      @Html.HiddenFor(model => model.Site.AllUsersRole.Id)
+      @Html.HiddenFor(model => model.Site.AllUsersRole.Description)
+      @if (Model.Site.AllUsersRole.RoleGroup != null)
+      {
+        @Html.HiddenFor(model => model.Site.AllUsersRole.RoleGroup.Id)
+      }
+      @Html.HiddenFor(model => model.Site.AllUsersRole.Type)
+      @Html.TextBoxFor(model => model.Site.AllUsersRole.Name)
+    </SettingsControl>
+  </div>
+</fieldset>

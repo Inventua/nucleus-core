@@ -1,0 +1,46 @@
+﻿@model Nucleus.Web.ViewModels.Setup.SiteWizard
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+@{
+  var disabledAttr = new { disabled = "disabled" };
+  var enabledAttr = new { };
+}
+<button type="submit" id="refresh-extensions" class="d-none" data-target="#site-install" formaction="@Url.AreaAction("RefreshExtensions", "SiteWizard", "Setup")"></button>
+<h3>Install Extensions</h3>
+<p>
+  Select the extensions that you want to install.  You can install more extensions later.  Extensions shown with a disabled checkbox
+  are required, and can't be un-selected because they are used by the selected site template, or are file system providers that you have selected.
+</p>
+<div class="border border-primary p-2 flex-1 overflow-auto">
+  @for (var count = 0; count < Model.InstallableExtensions.Count(); count++)
+  {
+    <div class="installable-package">
+      <label>
+        <span>
+          @Html.HiddenFor(model => model.InstallableExtensions[count].Filename)
+          @if (Model.InstallableExtensions[count].IsRequired)
+          {
+            @Html.HiddenFor(model => model.InstallableExtensions[count].IsSelected)
+            <span class="nucleus-material-icon placeholder-checkbox">&#xe834;</span>
+          }
+          else
+          {
+            @Html.CheckBoxFor(model => model.InstallableExtensions[count].IsSelected, Model.InstallableExtensions[count].IsRequired ? disabledAttr : enabledAttr)
+          }
+          <span class="fw-bold">@Model.InstallableExtensions[count].Name</span>@Model.InstallableExtensions[count].PackageVersion
+        </span>
+        <span>@Model.InstallableExtensions[count].Description</span>
+        <span>
+          <span class="fst-italic">Publisher</span> <a href="@Model.InstallableExtensions[count].PublisherUrl">@Model.InstallableExtensions[count].Publisher</a>
+        </span>
+      </label>
+    </div>
+  }
+</div>
+<script>
+  // when we refresh the extensions tab after existing the file system tab, the extensions tab ends up with a "display:block" because nucleus-shared.js:_postRender
+  // sets the data-target to visible when it receives data for it.  We need to remove the display style so that it doesn't stay visible after selecting
+  // another tab.  
+  window.setTimeout(function (event) { jQuery('#site-install').css('display', ''); }, 50);
+</script>

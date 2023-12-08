@@ -1,0 +1,59 @@
+﻿@model Nucleus.Web.ViewModels.Setup.SiteWizard
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+<h3>Database Settings</h3>
+<p>
+  Select your database type, server, and authentication settings, and then select your database name.  If your system administrator has supplied a database connection string,
+  you can select your database type, skip the other values, and enter your connection string directly.  If you are using Sqlite, you don't have to specify any database server or authentication settings.
+</p>
+
+<div class="nucleus-flex-fields">
+  <SettingsControl caption="Database Type" helptext="Select your database type.">
+    @Html.DropDownListFor(model => model.DatabaseProvider, new SelectList(Model.DatabaseProviders), new { @data_target = "#site-databases", formaction = Url.AreaAction("Select", "SiteWizard", "Setup"), data_autopostbackevent = "change" })
+  </SettingsControl>
+
+  @if (Model.DatabaseProvider != "Sqlite")
+  {
+    <SettingsControl caption="Database Server Name" helptext="Enter your database server name." class="database-server collapse show">
+      @Html.TextBoxFor(model => model.DatabaseServer)
+    </SettingsControl>
+  }
+</div>
+
+@if (Model.DatabaseProvider != "Sqlite")
+{
+  <SettingsControl caption="Use Integrated Security" rendermode="LabelLast" class="inner-inline database-integratedsecurity collapse show" helptext="If your database server supports it, choose integrated security.">
+    @Html.CheckBoxFor(model => model.DatabaseUseIntegratedSecurity, new { @class = "ToggleSwitch", @data_target = "#site-databases", formaction = Url.AreaAction("ToggleAuthentication", "SiteWizard", "Setup"), data_autopostbackevent = "change" })
+  </SettingsControl>
+
+  <div class="nucleus-flex-fields collapse@(Model.DatabaseUseIntegratedSecurity ? "" : " show")">
+    <SettingsControl caption="Database User Name" helptext="Enter your database user name.">
+      @Html.TextBoxFor(model => model.DatabaseUserName)
+    </SettingsControl>
+
+    <SettingsControl caption="Database Password" helptext="Enter your database password.">
+      @Html.TextBoxFor(model => model.DatabasePassword, new { @type = "password" })
+    </SettingsControl>
+  </div>
+
+  <SettingsControl caption="Database" helptext="Select your database." class="database-name">
+    @Html.DropDownListFor(model => model.DatabaseName, new SelectList(Model.Databases), "(select)", new { @data_target="#site-databases", formaction = Url.AreaAction("GenerateConnectionString", "SiteWizard", "Setup"), data_autopostbackevent = "change" })
+  </SettingsControl>
+
+  <div class="ms-auto mb-2">
+    <button type="submit" class="btn btn-sm btn-success ms-2 nucleus-show-progress nucleus-show-progress-before" data-target="#site-databases" formaction="@Url.AreaAction("RefreshDatabases", "SiteWizard", "Setup")">Refresh</button>
+  </div>
+}
+
+<SettingsControl caption="Connection string" helptext="Enter your database connection string.">
+  @Html.TextAreaFor(model => model.DatabaseConnectionString)
+</SettingsControl>
+
+<p class="alert alert-primary mt-auto">
+  Select your database type, then enter your database settings or a connection string, and click next to continue.  The application will restart in order to apply your settings.
+</p>
+
+<div class="nucleus-button-panel">
+  <button class="btn btn-primary ms-auto" type="submit" title="Next" formaction="@Url.AreaAction("SaveDatabaseSettings", "SiteWizard", "Setup")">Next</button>
+</div>

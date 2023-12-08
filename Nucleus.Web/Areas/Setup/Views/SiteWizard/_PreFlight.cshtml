@@ -1,0 +1,54 @@
+﻿@model Nucleus.Web.ViewModels.Setup.SiteWizard
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+<div class="mb-1 d-flex">
+  @if (Model.Preflight != null)
+  {
+    @if (!Model.Preflight.IsValid())
+    {
+      <span class="nucleus-material-icon status-error medium-icon">!</span>
+      <span class="medium-icon-text">
+        Configuration checks have failed (@Model.Preflight.ErrorCount() error@(@Model.Preflight.ErrorCount() == 1 ? "" : "s")).  Please address the errors below and click 'Retry'.
+        <br />
+        If you need to modify configuration files you may need to restart Nucleus for changes to take effect.
+      </span>
+    }
+    else
+    {
+      <span class="nucleus-material-icon status-ok medium-icon">&#xe5ca;</span>
+      <span class="medium-icon-text">Configuration checks were successful.</span>
+    }
+  }
+  <button type="submit" class="btn btn-secondary ms-auto" formaction="@Url.AreaAction("Index", "SiteWizard", "Setup")">Retry</button>
+</div>
+<table class="table table-sm align-middle small mt-2">
+  <thead class="table-dark">
+    <tr>
+      <th scope="col"></th>
+      <th scope="col">Message</th>
+      <th scope="col">Code</th>
+    </tr>
+  </thead>
+  @foreach (var result in Model.Preflight)
+  {
+    <tr>
+      <td class="nucleus-material-icon text-center status-col status-col-@(result.Status.ToString().ToLower())" style="width: 3rem">
+        @switch (result.Status)
+        {
+          case IPreflight.Status.OK:
+            @Html.Raw("&#xe5ca;")
+            break;
+          case IPreflight.Status.Warning:
+            @Html.Raw("&#xe002;")
+            break;
+          case IPreflight.Status.Error:
+            @Html.Raw("&#xe000;")
+            break;
+        }
+      </td>
+      <td>@result.Message</td>
+      <td class="code-col">@result.Code</td>
+    </tr>
+  }
+</table>

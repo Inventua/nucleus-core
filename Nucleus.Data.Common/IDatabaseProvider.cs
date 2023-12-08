@@ -43,5 +43,18 @@ namespace Nucleus.Data.Common
 		/// <param name="schemaName"></param>
 		/// <returns></returns>
 		public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName);
+
+    /// <summary>
+    /// Return a list of available databases.  This method is used by the setup wizard.
+    /// </summary>
+    /// <param name="connectionString"></param>
+    /// <returns></returns>
+    public IEnumerable<string> ListDatabases(string connectionString);
+
+    /// <summary>
+    /// Test database connection.
+    /// </summary>
+    /// <param name="connectionString"></param>
+    public void TestConnection(string connectionString);
 	}
 }

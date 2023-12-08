@@ -24,9 +24,27 @@
 	height: 20rem;
 }
 
+#site-wizard .tab-pane.active
+{
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	overflow: auto;
+}
+
 #site-wizard h3
 {
   font-size: 1.5rem;
+}
+
+#site-wizard h4
+{
+    font-size: 1.2rem;
+}
+
+#site-wizard h5
+{
+  font-size: 1rem;
 }
 
 #site-wizard .nav-tabs
@@ -48,6 +66,11 @@
 #site-wizard .nav-link
 {
 	border-radius: 0;
+}
+
+#site-wizard .property-value
+{
+  width: 28rem;
 }
 
 #site-wizard .installable-package

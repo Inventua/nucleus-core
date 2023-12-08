@@ -1,0 +1,64 @@
+﻿@model Nucleus.Web.ViewModels.Setup.SiteWizard
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+<h3>Site Template</h3>
+<p>
+	A site template will automatically set up pages, roles, list entries and other data to get you started.  Please select a site template below.
+</p>
+<SettingsControl caption="Site Template" helptext="Select your site template." class="d-flex flex-1 overflow-auto mb-2">
+	@Html.DropDownListFor(model => model.SelectedTemplate, new SelectList(Model.Templates, nameof(Nucleus.Web.ViewModels.Setup.SiteWizard.SiteTemplate.FileName), nameof(Nucleus.Web.ViewModels.Setup.SiteWizard.SiteTemplate.Title)), "(select a template)", new { @id = "site-template-select"})
+
+  <div class="mt-1 d-flex flex-1 overflow-auto border border-dark border-1">
+    <div class="list-group list-group-flush">
+      @foreach(var template in Model.Templates)
+      {
+        <a class="list-group-item list-group-item-action me-auto site-template-list-group-item user-select-none" data-select="@template.FileName">
+          <div class="fw-bold">@template.Title</div>
+          <div class="small lh-sm ">@template.Description</div>
+        </a>
+      }
+    </div>
+          
+  </div>
+</SettingsControl>
+
+@if (Model.OtherWarnings?.Count() > 0)
+{
+	<div class="alert alert-danger">
+		<h3>Warning</h3>
+		<div>
+			One or more extensions in the <strong>Setup/Extensions</strong> folder is invalid.
+		</div>
+		<ul>
+			@foreach (string warning in Model.OtherWarnings)
+			{
+				<li>@warning</li>
+			}
+		</ul>
+
+		Installation cannot proceed.  Please correct the issue and click 'Next''.
+	</div>
+}
+
+@if (Model.MissingExtensionWarnings?.Count() > 0)
+{
+	<div class="alert alert-danger">
+		<h3>Required Extensions Missing</h3>
+		<div>
+			One or more modules, layouts or containers are used by the selected template, but are not contained within any of the extensions in the Setup/Extensions folder.
+		</div>
+		<ul>
+			@foreach (string warning in Model.MissingExtensionWarnings)
+			{
+				<li>@warning</li>
+			}
+		</ul>
+					
+		Installation cannot proceed.  Please correct the issue and click 'Next''.
+	</div>
+}
+
+<div class="nucleus-button-panel align-items-center justify-content-end">
+  <button class="btn btn-primary ms-2 nucleus-show-progress nucleus-show-progress-before" type="submit" title="Next" formaction="@Url.AreaAction("Index", "SiteWizard", "Setup")">Next</button>
+</div>

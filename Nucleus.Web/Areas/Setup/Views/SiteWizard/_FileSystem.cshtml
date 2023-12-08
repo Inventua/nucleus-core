@@ -1,0 +1,79 @@
+﻿@model Nucleus.Web.ViewModels.Setup.SiteWizard
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+<h3>File Systems</h3>
+<p>
+  Select the file system(s) that you want to install and configure.  You can install additional file system providers later, but it can be difficult
+  to remove them once that have been used.
+</p>
+
+<div class="d-flex gap-1 mb-2">
+  @Html.DropDownListFor(model => model.AddFileSystemType.ProviderType, new SelectList(Model.AvailableFileSystemTypes, "ProviderType", "FriendlyName"), new { @class = "flex-grow-0 property-value" })
+  <button type="submit" class="btn btn-sm btn-primary nucleus-show-progress nucleus-show-progress-after" data-target="#site-filesystem" formaction="@Url.AreaAction("AddFileSystem", "SiteWizard", "Setup")">Add</button>
+</div>
+
+<div class="border border-primary p-2 flex-1 overflow-auto">
+  @foreach (var fileSystemEnumerator in Model.SelectedFileSystems.Select((FileSystem, Index) => new { Index, FileSystem }))
+  {
+    @Html.HiddenFor(model => model.SelectedFileSystems[fileSystemEnumerator.Index].FileSystemType.ProviderType)
+
+    @if (fileSystemEnumerator.FileSystem.IsRemoved)
+    {
+      @Html.HiddenFor(model => model.SelectedFileSystems[fileSystemEnumerator.Index].Key)
+      @Html.HiddenFor(model => model.SelectedFileSystems[fileSystemEnumerator.Index].IsRemoved)
+    }
+    else
+    {
+      <div class="mb-4 border border-secondary p-2">
+        <h4>@Model.SelectedFileSystems[fileSystemEnumerator.Index].FileSystemType.FriendlyName</h4>        
+        <div class="nucleus-flex-fields">
+          <SettingsControl caption="Name" class="flex-grow-0" helptext="Enter a name for your file system.  This value is displayed on-screen in Nucleus file system management controls.">
+            @Html.TextBoxFor(model => model.SelectedFileSystems[fileSystemEnumerator.Index].Name, new { @class = "property-value", @id = @Model.SelectedFileSystems[fileSystemEnumerator.Index].Key })
+          </SettingsControl>
+
+          <div class="mt-auto">
+            <button type="submit" class="btn btn-sm btn-danger nucleus-show-progress nucleus-show-progress-after" tabindex="1" data-target="#site-filesystem" formaction="@Url.AreaAction("RemoveFileSystem", "SiteWizard", "Setup", new { @key = Model.SelectedFileSystems[fileSystemEnumerator.Index].Key } )">Remove</button>
+          </div>
+        </div>
+
+        <SettingsControl caption="Key" class="flex-grow-0" helptext="Enter a key for your file system.  This value is stored in the database's file system entries and should not be changed after you have created your site.">
+          @Html.TextBoxFor(model => model.SelectedFileSystems[fileSystemEnumerator.Index].Key, new { @class = "property-value" })
+        </SettingsControl>
+
+        @if (Model.SelectedFileSystems[fileSystemEnumerator.Index].FileSystemType.Properties?.Any() == true)
+        {
+          <fieldset role="group" aria-labelledby="heading" class="mt-2">
+            <h5>Properties</h5>
+            @foreach (var propertyEnumerator in Model.SelectedFileSystems[fileSystemEnumerator.Index].Values.Select((PropertyValue, Index) => new { Index, PropertyValue }))
+            {
+              @Html.HiddenFor(model => model.SelectedFileSystems[fileSystemEnumerator.Index].Values[propertyEnumerator.Index].Key)
+              <SettingsControl caption="@Model.SelectedFileSystems[fileSystemEnumerator.Index].Values[propertyEnumerator.Index].FriendlyName">
+                @if (@Model.SelectedFileSystems[fileSystemEnumerator.Index].Values[propertyEnumerator.Index].Key == "ConnectionString")
+                {
+                  @Html.TextAreaFor(model => model.SelectedFileSystems[fileSystemEnumerator.Index].Values[propertyEnumerator.Index].Value)
+                }
+                else
+                {
+                  @Html.TextBoxFor(model => model.SelectedFileSystems[fileSystemEnumerator.Index].Values[propertyEnumerator.Index].Value, new { @class = "property-value" })
+                }
+              </SettingsControl>
+            }
+          </fieldset>
+        }
+      </div>
+    }
+  }
+</div>
+<script>
+jQuery(function()
+{
+  var scrollTo = jQuery('@Model.ScrollTo');
+  if (scrollTo.length > 0)
+  {
+    scrollTo[0].scrollIntoView({ block: "center", inline: "nearest" } );
+    scrollTo[0].select();
+    window.setTimeout(function () { scrollTo.trigger('focus'); }, 200);
+  }
+});
+</script>

@@ -64,11 +64,66 @@ namespace Nucleus.Data.PostgreSql
 			return services;
 		}
 
-		/// <summary>
-		/// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
-		/// the database provider implementing this interface.
-		/// </summary>
-		public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName)
+    /// <summary>
+    /// Test the database connection string.
+    /// </summary>
+    /// <param name="connectionString"></param>
+    public void TestConnection(string connectionString)
+    {
+      System.Data.Common.DbConnection connection = new Npgsql.NpgsqlConnection(connectionString);
+      connection.Open();
+
+      System.Data.Common.DbCommand command = connection.CreateCommand();
+      command.CommandText = "SELECT 1;";
+
+      command.ExecuteNonQuery();
+
+      connection.Close();
+    }
+
+    /// <summary>
+    /// Return a list of databases.
+    /// </summary>
+    /// <param name="connectionString"></param>
+    /// <returns></returns>
+    public IEnumerable<string> ListDatabases(string connectionString)
+    {
+      List<string> results = new();
+
+      System.Data.Common.DbConnection connection = new Npgsql.NpgsqlConnection(connectionString);
+      connection.Open();
+
+      System.Data.Common.DbCommand command = connection.CreateCommand();
+      command.CommandText = "SELECT datname AS Name FROM pg_database WHERE datName NOT IN ('postgres', 'template0', 'template1')";
+
+      System.Data.Common.DbDataReader reader = command.ExecuteReader();
+
+      try
+      {
+        while (reader.Read())
+        {
+          string? name = reader.GetValue(reader.GetOrdinal("Name")).ToString();
+          if (name != null)
+          {
+            results.Add(name);
+          }
+        }
+      }
+      finally
+      {
+        reader.Close();
+      }
+
+      connection.Close();
+
+      return results;
+    }
+
+    /// <summary>
+    /// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
+    /// the database provider implementing this interface.
+    /// </summary>
+    public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName)
 		{
 			Dictionary<string, string> results = new();
 

@@ -66,16 +66,43 @@ namespace Nucleus.Data.Sqlite
 			return services;			
 		}
 
-		/// <summary>
-		/// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
-		/// the database provider implementing this interface.
-		/// </summary>
-		public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName)
+    /// <summary>
+    /// Test the database connection.
+    /// </summary>
+    /// <param name="connectionString"></param>
+    public void TestConnection(string connectionString)
+    {
+      System.Data.Common.DbConnection connection = new Microsoft.Data.Sqlite.SqliteConnection(Nucleus.Abstractions.Models.Configuration.FolderOptions.Parse(connectionString));
+
+      connection.Open();
+
+      System.Data.Common.DbCommand command = connection.CreateCommand();
+      command.CommandText = "SELECT 1";
+
+      command.ExecuteNonQuery();
+
+      connection.Close();
+    }
+
+    /// <summary>
+    /// Return a list of databases.
+    /// </summary>
+    /// <param name="connectionString"></param>
+    /// <returns></returns>
+    public IEnumerable<string> ListDatabases(string connectionString)
+    {
+      // Sqlite doesn't have the concept of databases
+      return new string[] { };
+    }
+
+    /// <summary>
+    /// Return database diagnostics information if configuration contains an entry specifying that the data provider uses 
+    /// the database provider implementing this interface.
+    /// </summary>
+    public Dictionary<string, string> GetDatabaseInformation(DatabaseConnectionOption options, string schemaName)
 		{
 			Dictionary<string, string> results = new();
 
-      //IOptions<FolderOptions> folderOptions = services.GetService<IOptions<FolderOptions>>();
-      //System.Data.Common.DbConnection connection = new Microsoft.Data.Sqlite.SqliteConnection(this.FolderOptions.Value.Parse(options.ConnectionString));
       System.Data.Common.DbConnection connection = new Microsoft.Data.Sqlite.SqliteConnection(Nucleus.Abstractions.Models.Configuration.FolderOptions.Parse(options.ConnectionString));
       
       connection.Open();

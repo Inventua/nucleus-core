@@ -215,11 +215,6 @@
 			<Disabled>false</Disabled>
 			<ShowInMenu>true</ShowInMenu>
 			<DisableInMenu>false</DisableInMenu>
-			<LayoutDefinition>
-				<Id>07f3c7f2-97e6-46d3-8218-1e02cbbb5cf2</Id>
-				<FriendlyName>Default 2 Column</FriendlyName>
-				<RelativePath>Shared\Layouts\default-2-column.cshtml</RelativePath>
-			</LayoutDefinition>
 			<SortOrder>10</SortOrder>
 			<Modules>
 				<PageModule>
@@ -537,7 +532,7 @@
 				</PageRoute>
 			</Routes>
 			<Disabled>false</Disabled>
-			<ShowInMenu>true</ShowInMenu>
+			<ShowInMenu>false</ShowInMenu>
 			<DisableInMenu>false</DisableInMenu>
 			<SortOrder>40</SortOrder>
 			<Modules />
@@ -560,11 +555,6 @@
 			<Disabled>false</Disabled>
 			<ShowInMenu>true</ShowInMenu>
 			<DisableInMenu>false</DisableInMenu>
-			<LayoutDefinition>
-				<Id>2ff6818a-09fe-4ee2-beff-495a876ab6d6</Id>
-				<FriendlyName>Default</FriendlyName>
-				<RelativePath>Shared\Layouts\default.cshtml</RelativePath>
-			</LayoutDefinition>
 			<SortOrder>10</SortOrder>
 			<Modules>
 				<PageModule>
@@ -824,7 +814,7 @@
 				</PageRoute>
 			</Routes>
 			<Disabled>false</Disabled>
-			<ShowInMenu>true</ShowInMenu>
+			<ShowInMenu>false</ShowInMenu>
 			<DisableInMenu>false</DisableInMenu>
 			<SortOrder>70</SortOrder>
       <Modules>

@@ -5,6 +5,9 @@ in Windows/Internet Information Services using the Sqlite database provider and 
 See also:  [Hosting in Linux](/manage/hosting/linux/)
 
 ## Basic Setup 
+> The instructions below are for Windows.  Use the instructions from the [Hosting in Linux](/manage/hosting/linux/) page if you want to install Nucleus
+in Linux.
+
 1. Download the install set (zip format) from the [downloads](/downloads) page.  For a new installation, you will need to download the 
 Nucleus.[version].Install.zip file.
 
@@ -29,7 +32,9 @@ You can use the command-line command:
 9. Browse to your web site address.  The new site wizard will appear, prompting you to set your site properties and create administrator users.
 
 ## Using a different database provider
-1. Create a new empty database in your database server.
+> Nucleus version 1.3 includes a database configuration step in the setup wizard, so you can configure your selected database options without editing configuration files.  
+
+1. Create a new empty database on your database server.
 2. In your installation folder, create a new database configuration file.  If you are setting up a production environment, the file should be named 
 `databaseSettings.Production.json`{.file-name}.  If you are setting up a development environment, name your file `databaseSettings.Development.json`{.file-name}. 
 Refer to the [Configuration Files](https://www.nucleus-cms.com/configuration-files/) page for more information.
@@ -79,12 +84,14 @@ will change, as does the format of the [connection string](https://www.connectio
 
 > The database type for MariaDb is 'MySql'.  MariaDb is [based on MySql](https://en.wikipedia.org/wiki/MariaDB) and uses the same database provider.
 
-> If your database administrator provides a connection string in a different format, you should use the format that they provide - the connection strings above are just examples.  
+> If your database administrator provides a connection string in a different format, you should use the connection string that they provide - the connection strings above are just examples.  
 
 ## Using a different File System provider
 In Windows and Linux, if you want to use the Azure Blob Storage or Amazon S3 file system provider, you can either add it, so that both the cloud (Azure/S3) storage and Local File System providers 
 are available, or replace the existing setting so that only the Azure Blob Storage or Amazon S3 file system provider is available.  If you are hosting in an Azure App Service, you should 
 not use the Local File System provider.  You can add additional storage providers after you have set up the site.
+
+> Nucleus version 1.3 includes a file system(s) configuration step in the setup wizard, so you can configure your file system selections without editing configuration files. 
 
 To configure your file system providers:
 1. In your installation folder, edit your environment application configuration file, or create one if it does not exist.  If you are setting up a production environment, 

@@ -279,6 +279,7 @@ function _Page()
       event.stopImmediatePropagation();
 
       var newEvent = jQuery.Event('submit', { originalEvent: event });
+      newEvent.originalEvent.submitter = this;
       jQuery(this).parents('form').first().trigger(newEvent);
     }
   }

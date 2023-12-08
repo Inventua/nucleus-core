@@ -21,7 +21,7 @@ function _Page()
   var _progressTimeoutId = -1;
 
   // attach Nucleus-standard event handlers when document is ready
-  jQuery(document).ready(function ()
+  jQuery(function ()
   {
     // capture the user's timezone.  We have to * -1 because the javascript getTimezoneOffset function returns an "opposite" value (The number of minutes returned 
     // by getTimezoneOffset()	is positive if the local time zone is behind UTC, and negative if the local time zone is ahead of UTC.For example, for UTC + 10, -600 will be returned.)
@@ -84,7 +84,7 @@ function _Page()
           var defaultButton = form.find('.nucleus-default-button');
           if (defaultButton.length === 1)
           {
-            defaultButton.click();
+            defaultButton.trigger('click');
             event.preventDefault();
             return;
           }
@@ -92,7 +92,7 @@ function _Page()
           var primaryButton = form.find('.btn-primary');
           if (primaryButton.length === 1)
           {
-            primaryButton.click();
+            primaryButton.trigger('click');
             event.preventDefault();
             return;
           }
@@ -100,7 +100,7 @@ function _Page()
           var inputSubmit = form.find('input[type="submit"]');
           if (inputSubmit.length === 1)
           {
-            inputSubmit.click();
+            inputSubmit.trigger('click');
             event.preventDefault();
             return;
           }
@@ -256,7 +256,7 @@ function _Page()
       });
 
       form.attr('action', jQuery(this).attr('formaction'));
-      form.submit();
+      form.trigger('submit');
     });
 
     // Close popups when a user clicks outside a popup.  Click events will be propagated up to BODY if they are not handled elsewhere and 
@@ -266,7 +266,7 @@ function _Page()
       jQuery('.PopupMenu').fadeOut();
     });
 
-    jQuery('.nucleus-default-control').focus();
+    jQuery('.nucleus-default-control').trigger('focus');
     jQuery(Page).trigger("ready", [{ page: Page }]);
     _initializeControls(jQuery(document), null, null, null, null);
   });
@@ -279,9 +279,8 @@ function _Page()
       event.stopImmediatePropagation();
 
       var newEvent = jQuery.Event('submit', { originalEvent: event });
+      newEvent.originalEvent.submitter = this;
       jQuery(this).parents('form').first().trigger(newEvent);
-
-      //jQuery(this).parents('form').submit();
     }
   }
 

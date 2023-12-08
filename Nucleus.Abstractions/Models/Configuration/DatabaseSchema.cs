@@ -14,12 +14,11 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <summary>
 		/// Schema name.
 		/// </summary>
-		public string Name { get; private set; }
+		public string Name { get; init; }
 
 		/// <summary>
 		/// Key for a <see cref="DatabaseConnectionOption"/>.
 		/// </summary>
-		public string ConnectionKey { get; private set; }
-		
-	}
+		public string ConnectionKey { get; init; }
+  }
 }

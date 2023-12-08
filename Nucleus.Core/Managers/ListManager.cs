@@ -102,10 +102,16 @@ public class ListManager : IListManager
 	/// <param name="site"></param>
 	/// <param name="list"></param>
 	public async Task Save(Site site, List list)
-	{
+	{    
 		using (IListDataProvider provider = this.DataProviderFactory.CreateProvider<IListDataProvider>())
 		{
 			await provider.SaveList(site, list);
+
+      if (list.Items.Where(item => item.SortOrder == null).Any())
+      {
+        await CheckNumbering(site, list, list.Items);
+      }
+
 			this.CacheManager.ListCache().Remove(list.Id);
 		}
 	}

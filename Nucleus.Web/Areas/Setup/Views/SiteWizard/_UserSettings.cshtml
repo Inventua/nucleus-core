@@ -1,0 +1,36 @@
+﻿@model Nucleus.Web.ViewModels.Setup.SiteWizard
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+<fieldset role="group" aria-labelledby="heading">
+  <h3>User Settings</h3>
+
+  @if (Model.CreateSystemAdministratorUser)
+  {
+    <SettingsControl caption="System Administrator User Name" helptext="Enter a user name for your system administrator user.  This user can manage all sites.">
+      @Html.TextBoxFor(model => model.SystemAdminUserName)
+    </SettingsControl>
+
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="System Administrator User Password" helptext="Enter a password for the system administrator.">
+        @Html.PasswordFor(model => model.SystemAdminPassword)
+      </SettingsControl>
+      <SettingsControl caption="Confirm Password" helptext="Confirm the password for the system administrator.">
+        @Html.PasswordFor(model => model.SystemAdminConfirmPassword)
+      </SettingsControl>
+    </div>
+  }
+  <SettingsControl caption="Site Administrator User Name" helptext="Enter a user name for your site's administrator user.  This user will be able to manage the site which is being created by the installation wizard.">
+    @Html.TextBoxFor(model => model.SiteAdminUserName)
+  </SettingsControl>
+
+  <div class="nucleus-flex-fields">
+    <SettingsControl caption="Site Administrator User Password" helptext="Enter a password for the site administrator user.">
+      @Html.PasswordFor(model => model.SiteAdminPassword)
+    </SettingsControl>
+    <SettingsControl caption="Confirm Password" helptext="Confirm the password for the site administrator user.">
+      @Html.PasswordFor(model => model.SiteAdminConfirmPassword)
+    </SettingsControl>
+  </div>
+
+</fieldset>

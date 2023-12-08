@@ -78,7 +78,8 @@ namespace Nucleus.Web.Controllers.Admin
 				viewModel.List.Items = new();
 			}
 
-			viewModel.List.Items.Add(new ListItem());
+      // we assign an Id here so that the delete item function works properly on newly-added list items
+			viewModel.List.Items.Add(new ListItem() { Id = Guid.NewGuid() });
 
 			return View("Editor", await BuildViewModel(viewModel.List));
 		}
@@ -109,6 +110,7 @@ namespace Nucleus.Web.Controllers.Admin
 				}
 			}
 
+      ModelState.Clear();
 			return View("Editor", await BuildViewModel(viewModel.List));
 		}
 

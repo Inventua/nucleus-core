@@ -104,3 +104,13 @@
 {
 	padding: 2px 22px 2px 4px;
 }
+
+/*  Responsive UI  */
+@media screen and (max-width: 1134px),
+       screen and (max-height: 600px)
+{
+  .nucleus-pagingcontrol-left
+  {
+    display: none!important;
+  }
+}

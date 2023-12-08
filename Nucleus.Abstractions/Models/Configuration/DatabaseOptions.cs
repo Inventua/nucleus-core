@@ -19,12 +19,12 @@ namespace Nucleus.Abstractions.Models.Configuration
 		/// <summary>
 		/// List of configured database connections.
 		/// </summary>
-		public List<DatabaseConnectionOption> Connections { get; private set; }
+		public List<DatabaseConnectionOption> Connections { get; private set; } = new();
 
-		/// <summary>
-		/// List of configured schemas.
-		/// </summary>
-		public List<DatabaseSchema> Schemas { get; private set; }
+    /// <summary>
+    /// List of configured schemas.
+    /// </summary>
+    public List<DatabaseSchema> Schemas { get; private set; } = new();
 
     /// <summary>
 		/// Get the database connection options for the schema specifed by <paramref name="schemaName"/>.  If no matching 
@@ -58,6 +58,21 @@ namespace Nucleus.Abstractions.Models.Configuration
       }
 
       return schema;
+    }
+
+    /// <summary>
+    /// Returns whether config has a default database schema configured.
+    /// </summary>
+    /// <remarks>
+    /// When Nucleus is first installed, it can have no default database schema configured, which means that it should display the setup
+    /// wizard.  This function is used to prevent exceptions during startup when the Nucleus database has not been configured,
+    /// </remarks>
+    /// <returns></returns>
+    public Boolean IsDatabaseConfigured()
+    {
+      return this.Schemas
+       .Where(schema => schema.Name.Equals("*", StringComparison.OrdinalIgnoreCase))
+       .Any();
     }
 
     /// <summary>

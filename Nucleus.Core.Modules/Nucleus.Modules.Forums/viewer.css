@@ -291,3 +291,13 @@
   padding: 0.25rem;
   margin-bottom: 1rem;
 }
+
+/*  Responsive UI  */
+@media screen and (max-width: 1134px),
+       screen and (max-height: 600px)
+{
+  .forum-author
+  {
+    display: none!important;
+  }
+}

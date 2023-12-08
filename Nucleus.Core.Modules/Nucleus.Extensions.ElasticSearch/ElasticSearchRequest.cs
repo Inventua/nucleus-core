@@ -527,15 +527,15 @@ namespace Nucleus.Extensions.ElasticSearch
 
 		private Nest.QueryContainer BuildSearchQuery(SearchQuery query)
 		{
-			Nest.QueryContainer searchContainer = new QueryContainer(new SimpleQueryStringQuery()
-			{
-				Fields = SearchFields(query),
-				Query = query.SearchTerm.Trim() + (query.SearchTerm.Trim().Contains(' ') ? "" : "*"),
-				DefaultOperator = query.StrictSearchTerms ? Operator.And : Operator.Or,
-				AnalyzeWildcard = true
-			});
+      Nest.QueryContainer searchContainer = new QueryContainer(new QueryStringQuery()
+      {
+        Fields = SearchFields(query),
+        Query = (query.SearchTerm.Trim().Contains(' ') ? "" : "*") + query.SearchTerm.Trim() + (query.SearchTerm.Trim().Contains(' ') ? "" : "*"),
+        DefaultOperator = query.StrictSearchTerms ? Operator.And : Operator.Or,
+        AnalyzeWildcard = true
+      });
 
-			return new Nest.BoolQuery()
+      return new Nest.BoolQuery()
 			{
 				Must = new QueryContainer[] { searchContainer }
 			};

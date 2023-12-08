@@ -151,7 +151,7 @@ namespace Nucleus.SAML.Server.Controllers
 			}
 		}
 
-		private async Task<RedirectResult> RedirectToLogin(ClientAppToken token, string? username)
+		private async Task<RedirectResult> RedirectToLogin(ClientAppToken token, string username)
 		{
 			string url;
 

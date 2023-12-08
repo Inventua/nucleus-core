@@ -93,6 +93,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Data.PostgreSql", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Content Managers", "Content Managers", "{87D24D71-4026-4693-A812-212F16C9E952}"
 	ProjectSection(SolutionItems) = preProject
+		Documentation\Content Managers\Editing-move.png = Documentation\Content Managers\Editing-move.png
 		Documentation\Content Managers\Editing.md = Documentation\Content Managers\Editing.md
 		Documentation\Content Managers\Editing.png = Documentation\Content Managers\Editing.png
 		Documentation\Content Managers\FilesAndFolders-FileManager.png = Documentation\Content Managers\FilesAndFolders-FileManager.png
@@ -169,7 +170,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.DNN.Migration", "Nu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Modules.Shadow", "Nucleus.Core.Modules\Nucleus.Modules.Shadow\Nucleus.Modules.Shadow.csproj", "{8856AAD6-C187-4F75-8796-99AE9EF05720}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Modules.IFrame", "Nucleus.Core.Modules\Nucleus.Modules.IFrame\Nucleus.Modules.IFrame.csproj", "{E4821BB4-D4BB-410A-AE00-5445720A45B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Modules.IFrame", "Nucleus.Core.Modules\Nucleus.Modules.IFrame\Nucleus.Modules.IFrame.csproj", "{E4821BB4-D4BB-410A-AE00-5445720A45B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

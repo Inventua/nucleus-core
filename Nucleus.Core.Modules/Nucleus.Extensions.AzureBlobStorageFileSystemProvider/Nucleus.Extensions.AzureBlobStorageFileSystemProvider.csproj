@@ -42,7 +42,7 @@
 		<Version>1.2.0</Version>
 		<CopyToDefaultSetup>false</CopyToDefaultSetup>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
-		<CopyToDefaultSetup>false</CopyToDefaultSetup>
+		<CopyToDefaultSetup>true</CopyToDefaultSetup>
 	</PropertyGroup>
 	
 	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />

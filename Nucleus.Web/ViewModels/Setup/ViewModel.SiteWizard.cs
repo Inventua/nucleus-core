@@ -4,49 +4,126 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Primitives;
 
 namespace Nucleus.Web.ViewModels.Setup
 {
-	public class SiteWizard
-	{
-		public Nucleus.Abstractions.IPreflight.ValidationResults Preflight { get; set; }
+  public class SiteWizard
+  {
+    public const string REFRESH_DATABASES = "refresh the database list ...";
+    public string Url { get; set; }
 
-		public string SelectedTemplate { get; set; }
-		public List<SiteTemplate> Templates { get; set; }
+    // database settings
+    public Boolean IsDatabaseConfigured { get; set; }
+    public IEnumerable<string> DatabaseProviders { get; set; } = new string[] { };
+    public string DatabaseProvider { get; set; } = "SqlServer";
+    public string DatabaseServer { get; set; }
 
-		public string TemplateTempFileName { get; set; }
+    public IEnumerable<string> Databases { get; set; } = new string[] { REFRESH_DATABASES };
+    public string DatabaseName { get; set; }
 
-		public IEnumerable<string> OtherWarnings { get; set; }
-		public IEnumerable<string> MissingExtensionWarnings { get; set; }
+    public string DatabaseConnectionString { get; set; }
 
-		public Site Site { get; set; }
-		
-		public Boolean CreateSystemAdministratorUser { get; set; }
+    public Boolean DatabaseUseIntegratedSecurity { get; set; } = true;
+    public string DatabaseUserName { get; set; }
+    public string DatabasePassword { get; set; }
 
-		[Required(ErrorMessage = "You must enter a System Administrator user name")]
-		public string SystemAdminUserName { get; set; }
+    // configuration checks
+    public Nucleus.Abstractions.IPreflight.ValidationResults Preflight { get; set; }
 
-		[Required(ErrorMessage = "You must enter a System Administrator password")]
-		public string SystemAdminPassword { get; set; }
+    // file system
+    public List<FileSystemType> AvailableFileSystemTypes { get; set; } = new();
+    public List<SelectedFileSystem> SelectedFileSystems { get; set; } = new();
 
-		[Required(ErrorMessage = "You must enter a System Administrator password confirmation")]
-		[Compare(nameof(SystemAdminPassword), ErrorMessage = "The new password and confirm password values must match")]
-		public string SystemAdminConfirmPassword { get; set; }
+    public FileSystemType AddFileSystemType { get; set; }
+    public string ScrollTo { get; set; }
 
-		[Required(ErrorMessage = "You must enter a Site Administrator user name")]
-		public string SiteAdminUserName { get; set; }
+    //public Boolean UseLocalFileSystem { get; set; } = true;
 
-		[Required(ErrorMessage = "You must enter a Site Administrator password")]
-		public string SiteAdminPassword { get; set; }
+    //public Boolean UseAzureStorage { get; set; } = true;
 
-		[Required(ErrorMessage = "You must enter a Site Administrator password confirmation ")]
-		[Compare(nameof(SiteAdminPassword), ErrorMessage = "The new password and confirm password values must match")]
-		public string SiteAdminConfirmPassword { get; set; }
+    //public Boolean UseAmazonS3 { get; set; } = true;
 
-		public IList<InstallableExtension> InstallableExtensions { get; set; }
-		
-		public IEnumerable<LayoutDefinition> Layouts { get; set; }
-		public IEnumerable<ContainerDefinition> Containers { get; set; }
+    // site settings
+    public string SelectedTemplate { get; set; }
+    public List<SiteTemplate> Templates { get; set; }
+
+    public string TemplateTempFileName { get; set; }
+
+    public IEnumerable<string> OtherWarnings { get; set; }
+    public IEnumerable<string> MissingExtensionWarnings { get; set; }
+
+    public Site Site { get; set; }
+
+    public Boolean CreateSystemAdministratorUser { get; set; }
+
+    [Required(ErrorMessage = "You must enter a System Administrator user name")]
+    public string SystemAdminUserName { get; set; }
+
+    [Required(ErrorMessage = "You must enter a System Administrator password")]
+    public string SystemAdminPassword { get; set; }
+
+    [Required(ErrorMessage = "You must enter a System Administrator password confirmation")]
+    [Compare(nameof(SystemAdminPassword), ErrorMessage = "The new password and confirm password values must match")]
+    public string SystemAdminConfirmPassword { get; set; }
+
+    [Required(ErrorMessage = "You must enter a Site Administrator user name")]
+    public string SiteAdminUserName { get; set; }
+
+    [Required(ErrorMessage = "You must enter a Site Administrator password")]
+    public string SiteAdminPassword { get; set; }
+
+    [Required(ErrorMessage = "You must enter a Site Administrator password confirmation ")]
+    [Compare(nameof(SiteAdminPassword), ErrorMessage = "The new password and confirm password values must match")]
+    public string SiteAdminConfirmPassword { get; set; }
+
+    public IList<InstallableExtension> InstallableExtensions { get; set; }
+
+    public IEnumerable<LayoutDefinition> Layouts { get; set; }
+    public IEnumerable<ContainerDefinition> Containers { get; set; }
+
+    public class FileSystemType
+    {
+      public Guid PackageId { get; set; }
+
+      public string FriendlyName { get; set; }
+      public string ProviderType { get; set; }
+      public string DefaultKey { get; set; }
+      public string DefaultName { get; set; }
+
+      public List<FileSystemProperty> Properties { get; set; } = new();
+    }
+
+    public class FileSystemProperty
+    {
+      public string FriendlyName { get; set; }
+      public string Key { get; set; }
+      public string Value { get; set; }
+
+
+      public FileSystemProperty()
+      {
+
+      }
+
+      public FileSystemProperty(string friendlyName, string key, string value) 
+      {
+        this.FriendlyName = friendlyName;
+        this.Key = key;
+        this.Value = value;
+      }
+    }
+
+    public class SelectedFileSystem
+    {
+      public string Key { get; set; }
+      public string Name { get; set; }
+      public FileSystemType FileSystemType { get; set; }
+      public Boolean IsRemoved { get; set; }
+      public List<FileSystemProperty> Values { get; set; } = new();
+    }
 
     public class SiteTemplate
     {
@@ -63,8 +140,7 @@ namespace Nucleus.Web.ViewModels.Setup
 		}
 
 		public class InstallableExtension
-		{
-			//public Nucleus.Abstractions.Models.Extensions.PackageResult PackageInfo { get; set; }
+		{			
 			public Guid PackageId { get; set; }
 			public System.Version PackageVersion { get; set; }
 			public string Filename { get; set; }
@@ -75,7 +151,6 @@ namespace Nucleus.Web.ViewModels.Setup
 			public string Publisher { get; set; }
 			public string PublisherUrl { get; set; }
 			public string PublisherEmail { get; set; }
-
 
 			public Boolean IsSelected { get; set; }
 			public Boolean IsRequired { get; set; }

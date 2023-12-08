@@ -1,7 +1,7 @@
-﻿jQuery(document).ready(function ()
+﻿jQuery(function ()
 {
 	jQuery('#site-wizard').modal('show');
-	window.setTimeout(TestSiteStarted, 2000);
+	window.setTimeout(TestSiteStarted, 4000);
 });
 
 function TestSiteStarted()

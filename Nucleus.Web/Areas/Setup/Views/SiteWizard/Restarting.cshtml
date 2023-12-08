@@ -1,0 +1,36 @@
+﻿@model Nucleus.Web.ViewModels.Setup.SiteWizard
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions
+@addTagHelper "*, Nucleus.ViewFeatures"
+@Html.AddScript("~/Areas/Setup/Views/SiteWizard/Complete.js", true)
+@{
+	Layout = "_Generic";
+	ViewData["title"] = "Nucleus Setup Wizard";
+}
+@Html.AddStyle("~!index.css")
+
+<Modal id="site-wizard" title="Nucleus Setup Wizard" can-close="false">
+	<h2>Restarting.</h2>
+
+	<p>
+		Your database settings have been applied, and Nucleus is restarting so that you can continue to set up your site.
+	</p>
+		
+	<div class="wizard-restarting collapse show">
+		<p>Please wait a few seconds for the site to restart.</p>
+
+		<div class="progress mt-2">
+			<div class="progress-bar progress-bar-striped progress-bar-animated indeterminate" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+		</div>
+	</div>
+
+	<div class="wizard-restarted collapse">
+    <div>
+		  Restart complete.
+    </div>
+    <div class="mt-2">
+      <a href="@Model.Url">Click here</a> to continue setting up your site.
+    </div>
+	</div>
+</Modal>
+

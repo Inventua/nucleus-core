@@ -877,11 +877,11 @@ public class ForumsManager
 		}
 	}
 
-	public async Task TruncateMailQueue(TimeSpan sentBefore)
+	public async Task<int> TruncateMailQueue(TimeSpan sentBefore)
 	{
 		using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
 		{
-			await provider.TruncateMailQueue(sentBefore);
+			return await provider.TruncateMailQueue(sentBefore);
 		}
 	}
 

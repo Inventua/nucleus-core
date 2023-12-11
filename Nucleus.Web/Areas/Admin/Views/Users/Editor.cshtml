@@ -29,7 +29,7 @@
 						@Html.PasswordFor(model => model.EnteredPassword)
 					</SettingsControl>
 				}
-				
+
 				@if (!Model.IsCurrentUser)
 				{
 					<div class="nucleus-flex-fields">
@@ -41,92 +41,97 @@
 							@Html.CheckBoxFor(model => model.User.Verified, new { @class = "ToggleSwitch" })
 						</SettingsControl>
 
-            
-				    @if (Model.User.Id == Guid.Empty)
-            {
-              @* show "temporary password" control for a new user*@
-              <SettingsControl caption="Temporary Password" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user must re-set their password the first time they log in.">
-                @Html.CheckBoxFor(model => model.ExpirePassword, new { @class = "ToggleSwitch" })
-              </SettingsControl>
-            }
-            else
-            {
-              @* for existing users, show "expire password", which does the same thing, but only if they have a password set, and their password isn't already expired *@
-              @if (!String.IsNullOrEmpty(Model.User.Secrets?.PasswordHashAlgorithm) && !Model.IsPasswordExpired)
-              {
-                <SettingsControl caption="Expire Password" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user must re-set their password the next time that they log in.">
-                  @Html.CheckBoxFor(model => model.ExpirePassword, new { @class = "ToggleSwitch" })
-                </SettingsControl>
-              }
-            }
 
-          </div>
+						@if (Model.User.Id == Guid.Empty)
+						{
+							@* show "temporary password" control for a new user*@
+							<SettingsControl caption="Temporary Password" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user must re-set their password the first time they log in.">
+								@Html.CheckBoxFor(model => model.ExpirePassword, new { @class = "ToggleSwitch" })
+							</SettingsControl>
+						}
+						else
+						{
+							@* for existing users, show "expire password", which does the same thing, but only if they have a password set, and their password isn't already expired *@
+							@if (!String.IsNullOrEmpty(Model.User.Secrets?.PasswordHashAlgorithm) && !Model.IsPasswordExpired)
+							{
+								<SettingsControl caption="Expire Password" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user must re-set their password the next time that they log in.">
+									@Html.CheckBoxFor(model => model.ExpirePassword, new { @class = "ToggleSwitch" })
+								</SettingsControl>
+							}
+						}
+
+					</div>
 				}
 
-        @if (Model.User.Id != Guid.Empty)
-        {
-          <div class="mt-auto">
-            @if (Model.IsPasswordExpired)
-            {
-              <div class="alert alert-info d-flex align-items-center gap-1">
-                <span>This user's password has expired.</span>
-                <button type="submit" class="btn btn-primary ms-auto text-nowrap" formaction="@Url.AreaAction("SendPasswordReset", "Users", "Admin")">Send Password Reset Message</button>
-              </div>
-            }
-            @if (!Model.User.Verified)
-            {
-              <div class="alert alert-info d-flex align-items-center gap-1">
-                <span>This user's account has not been verified.</span>
-                <button type="submit" class="btn btn-secondary ms-auto text-nowrap" formaction="@Url.AreaAction("SendVerification", "Users", "Admin")">Send Verification Message</button>
-              </div>
-            }
-            @if (Model.User.Secrets.IsLockedOut)
-            {
-              <div class="alert alert-info d-flex align-items-center gap-1">
-                <span>This user was locked out at @Model.User.Secrets.LastLockoutDate.FormatDate(this.Context.Request.GetUserTimeZone()) after 
-                  @Model.User.Secrets.FailedPasswordAttemptCount unsuccessful login attempts.
+				@if (Model.User.Id != Guid.Empty)
+				{
+					<div class="mt-auto">
+						@if (Model.IsPasswordExpired)
+						{
+							<div class="alert alert-info d-flex align-items-center gap-1">
+								<span>This user's password has expired.</span>
+								<button type="submit" class="btn btn-primary ms-auto text-nowrap" formaction="@Url.AreaAction("SendPasswordReset", "Users", "Admin")">Send Password Reset Message</button>
+							</div>
+						}
+						@if (!Model.User.Verified)
+						{
+							<div class="alert alert-info d-flex align-items-center gap-1">
+								<span>This user's account has not been verified.</span>
+								<button type="submit" class="btn btn-secondary ms-auto text-nowrap" formaction="@Url.AreaAction("SendVerification", "Users", "Admin")">Send Verification Message</button>
+							</div>
+						}
 
-                  @if (@Model.LockoutResetDate < DateTime.UtcNow)
-                  {
-                    <text>The lockout period has elapsed, and the user account will be unlocked automatically the next time that the user logs in.</text>
-                  }
-                  else
-                  {
-                    <text>The lockout will automatically end at <text>@Model.LockoutResetDate.FormatDate(this.Context.Request.GetUserTimeZone())</text>.</text>
-                  }
-                </span>
-                <button type="submit" class="btn btn-primary ms-auto text-nowrap" data-target=".UserEditor" formaction="@Url.AreaAction("UnlockUser", "Users", "Admin")">Unlock Account</button>
-              </div>
-            }
-            <div class="nucleus-flex-fields align-items-start alert alert-primary">
-              <label class="flex-1">
-                Last Login Date:
-                @if (Model.User.Secrets.LastLoginDate.HasValue)
-                {
-                  <span>@Model.User.Secrets.LastLoginDate.Value.FormatDate(this.Context.Request.GetUserTimeZone())</span>
-                }
-                else
-                {
-                  <span>Never</span>
-                }
+						@if (Model.User.Secrets != null)
+						{
+							@if (Model.User.Secrets.IsLockedOut)
+							{
+								<div class="alert alert-info d-flex align-items-center gap-1">
+									<span>
+										This user was locked out at @Model.User.Secrets.LastLockoutDate.FormatDate(this.Context.Request.GetUserTimeZone()) after
+										@Model.User.Secrets.FailedPasswordAttemptCount unsuccessful login attempts.
 
-              </label>
+										@if (@Model.LockoutResetDate < DateTime.UtcNow)
+										{
+											<text>The lockout period has elapsed, and the user account will be unlocked automatically the next time that the user logs in.</text>
+										}
+										else
+										{
+											<text>The lockout will automatically end at <text>@Model.LockoutResetDate.FormatDate(this.Context.Request.GetUserTimeZone())</text>.</text>
+										}
+									</span>
+									<button type="submit" class="btn btn-primary ms-auto text-nowrap" data-target=".UserEditor" formaction="@Url.AreaAction("UnlockUser", "Users", "Admin")">Unlock Account</button>
+								</div>
+							}
+							<div class="nucleus-flex-fields align-items-start alert alert-primary">
+								<label class="flex-1">
+									Last Login Date:
+									@if (Model.User.Secrets.LastLoginDate.HasValue)
+									{
+										<span>@Model.User.Secrets.LastLoginDate.Value.FormatDate(this.Context.Request.GetUserTimeZone())</span>
+									}
+									else
+									{
+										<span>Never</span>
+									}
 
-              <label class="flex-1">
-                Last Password Changed Date:
-                @if (Model.User.Secrets.LastPasswordChangedDate.HasValue)
-                {
-                  <span>@Model.User.Secrets.LastPasswordChangedDate.Value.FormatDate(this.Context.Request.GetUserTimeZone())</span>
-                }
-                else
-                {
-                  <span>Never</span>
-                }
-              </label>
-            </div>
-          </div>
-        }
-      </fieldset>
+								</label>
+
+								<label class="flex-1">
+									Last Password Changed Date:
+									@if (Model.User.Secrets.LastPasswordChangedDate.HasValue)
+									{
+										<span>@Model.User.Secrets.LastPasswordChangedDate.Value.FormatDate(this.Context.Request.GetUserTimeZone())</span>
+									}
+									else
+									{
+										<span>Never</span>
+									}
+								</label>
+							</div>
+						}
+					</div>
+				}
+			</fieldset>
 		</TabPanel>
 
 		<TabPanel id="user-profile">
@@ -138,7 +143,8 @@
 					<div class="settings-control" title="@Model.User.Profile[profileValueCount].UserProfileProperty.HelpText">
 						<label>
 							<span>@Model.User.Profile[profileValueCount].UserProfileProperty.Name</span>
-							@{Dictionary<string, object> parameters = new();
+							@{
+								Dictionary<string, object> parameters = new();
 								parameters.Add("maxlength", 512);
 								ClaimTypeOption claimTypeOption = Model.User.Profile[profileValueCount].UserProfileProperty.ClaimTypeOption(Model.ClaimTypeOptions);
 								if (!String.IsNullOrEmpty(claimTypeOption.InputType))
@@ -148,7 +154,8 @@
 								if (!String.IsNullOrEmpty(claimTypeOption.Pattern))
 								{
 									parameters.Add("pattern", claimTypeOption.Pattern);
-								} }
+								}
+							}
 							@Html.TextBoxFor(model => model.User.Profile[profileValueCount].Value, parameters)
 						</label>
 						@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Id)
@@ -189,15 +196,14 @@
 		<input type="submit" class="btn btn-primary" value="Save Changes" />
 		@if (Model.User.Id != Guid.Empty && !Model.IsCurrentUser)
 		{
-      <button type="submit" class="btn btn-danger" formaction="@Url.AreaAction("DeleteUser", "Users", "Admin")" data-confirm="<p>User accounts should typically only be deleted under specific circumstances, such as when the account was never verified or approved, or when it was created in error. Deleting an account with associated data like forum posts may fail. For users with a history, you should use the 'Approved' control above to disable the account instead.</p>Do you want to delete this user account?">Delete User</button>
+			<button type="submit" class="btn btn-danger" formaction="@Url.AreaAction("DeleteUser", "Users", "Admin")" data-confirm="<p>User accounts should typically only be deleted under specific circumstances, such as when the account was never verified or approved, or when it was created in error. Deleting an account with associated data like forum posts may fail. For users with a history, you should use the 'Approved' control above to disable the account instead.</p>Do you want to delete this user account?">Delete User</button>
 		}
-    @if (!Model.IsPasswordExpired)
-    {
-      <button type="submit" class="btn btn-secondary ms-auto text-nowrap" formaction="@Url.AreaAction("SendPasswordReset", "Users", "Admin")">Send Password Reset Message</button>      
-    }
-  </div>
+		@if (!Model.IsPasswordExpired)
+		{
+			<button type="submit" class="btn btn-secondary ms-auto text-nowrap" formaction="@Url.AreaAction("SendPasswordReset", "Users", "Admin")">Send Password Reset Message</button>
+		}
+	</div>
 }
 
 <div class="UserEditor">
-
 </div>

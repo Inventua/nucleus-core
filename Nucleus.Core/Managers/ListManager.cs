@@ -109,7 +109,7 @@ public class ListManager : IListManager
 
       if (list.Items.Where(item => item.SortOrder == null).Any())
       {
-        await CheckNumbering(site, list, list.Items);
+        await CheckNumbering(site, list);
       }
 
 			this.CacheManager.ListCache().Remove(list.Id);
@@ -160,19 +160,13 @@ public class ListManager : IListManager
 	private async Task MoveSortOrder(Site site, List list, Guid itemId, Boolean moveDown)
 	{
 		ListItem previousItem = null;
-		List<ListItem> listItems = new();
-		List<ListItem> siblingListItems;
 
-		siblingListItems = list.Items;
+		// Copy the list (enumerator) because if this is a moveDown we reverse the order and don't want to affect other users.
+		List<ListItem> listItems = moveDown ? list.Items.Reverse<ListItem>().ToList() : list.Items.ToList();
 
-		await CheckNumbering(site, list, siblingListItems);
+		await CheckNumbering(site, list);
 
-		if (moveDown)
-		{
-			siblingListItems.Reverse();
-		}
-
-		foreach (ListItem listItem in siblingListItems)
+		foreach (ListItem listItem in listItems)
 		{
 			if (listItem.Id == itemId)
 			{
@@ -190,14 +184,12 @@ public class ListManager : IListManager
 			}
 			else
 			{
-				previousItem= listItem;
+				previousItem = listItem;
 			}
-
-			listItems.Add(listItem);
 		}
 
 		// Update the new list items in list
-		list.Items = listItems;
+		list.Items = listItems.OrderBy(item => item.SortOrder).ToList(); //listItems;
 
 		// Call Save() to save to the database (which will also remove from cache)
 		await this.Save(site, list);
@@ -210,15 +202,14 @@ public class ListManager : IListManager
 	/// </summary>
 	/// <param name="site"></param>
 	/// <param name="list"></param>
-	/// <param name="listItems"></param>
 	/// <remarks>
 	/// List item sort orders can produce duplicates and gaps when list item parents are changed, or list items are deleted.
 	/// </remarks>
-	private async Task CheckNumbering(Site site, List list, List<ListItem> listItems)
+	private async Task CheckNumbering(Site site, List list)
 	{
 		int sortOrder = 10;
 
-		foreach (ListItem listItem in listItems)
+		foreach (ListItem listItem in list.Items)
 		{
 			if (listItem.SortOrder != sortOrder)
 			{
@@ -228,7 +219,7 @@ public class ListManager : IListManager
 			sortOrder += 10;
 		}
 
-		list.Items = listItems;
+		list.Items = list.Items.OrderBy(item => item.SortOrder).ToList();
 		await this.Save(site, list);
 	}
 }

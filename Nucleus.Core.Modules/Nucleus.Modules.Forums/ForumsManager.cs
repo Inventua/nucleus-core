@@ -946,11 +946,8 @@ public class ForumsManager
 		Forum thisForum;
 		List<Forum> siblingForums;
 
-		using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
-		{
-			thisForum = await this.Get(forumId);
-			siblingForums = await this.List(group);
-		}
+		thisForum = await this.Get(forumId);
+		siblingForums = await this.List(group);
 
 		await CheckNumbering(group, siblingForums);
 
@@ -998,6 +995,7 @@ public class ForumsManager
 	/// <summary>
 	/// Update the <see cref="Forum.SortOrder"/> of the forum module specifed by id by swapping it with the previous <see cref="Forum.SortOrder"/>.
 	/// </summary>
+	/// <param name="group"></param>
 	/// <param name="forumId"></param>
 	public async Task MoveUp(Group group, Guid forumId)
 	{
@@ -1005,11 +1003,8 @@ public class ForumsManager
 		Forum thisForum;
 		IList<Forum> siblingForums;
 
-		using (IForumsDataProvider provider = this.DataProviderFactory.CreateProvider<IForumsDataProvider>())
-		{
-			thisForum = await provider.GetForum(forumId);
-			siblingForums = await this.List(group);
-		}
+		thisForum = await this.Get(forumId);
+		siblingForums = await this.List(group);
 
 		await CheckNumbering(group, siblingForums);
 
@@ -1054,12 +1049,14 @@ public class ForumsManager
 
 
 	/// <summary>
-	/// Ensure that pages have unique sort order.
+	/// Ensure that forums have unique sort order.
 	/// </summary>
-	/// <param name="pages"></param>
+	/// <param name="group"></param>
+	/// <param name="forums"></param>
 	/// <remarks>
-	/// Page sort orders can produce duplicates and gaps when pages parents are changed, or pages are deleted.
+	/// Forum sort orders can produce duplicates and gaps when parent groups are changed, or forums are deleted.
 	/// </remarks>
+
 	private async Task CheckNumbering(Group group, IList<Forum> forums)
 	{
 		int sortOrder = 10;

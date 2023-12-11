@@ -148,14 +148,16 @@
 	width: 100%;
 }
 
-.nucleus-admin-content .tab-content fieldset
+.nucleus-admin-content.modal-body .tab-content fieldset,
+.nucleus-settings-frame .tab-content fieldset
 {
   display: flex;
   flex-direction: column;
   flex: 1
 }
 
-.nucleus-admin-content .tab-content .nucleus-button-panel
+.nucleus-admin-content.modal-body .tab-content .nucleus-button-panel,
+.nucleus-settings-frame .tab-content .nucleus-button-panel
 {
   margin-top: auto;
 }

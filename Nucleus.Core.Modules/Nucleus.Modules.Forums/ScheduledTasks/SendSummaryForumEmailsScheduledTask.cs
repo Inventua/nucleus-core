@@ -147,7 +147,8 @@ public class SendSummaryForumEmailsScheduledTask : IScheduledTask
     try
     {
       this.Logger?.LogInformation("Truncating mail queue.");
-      await this.ForumsManager.TruncateMailQueue(TimeSpan.FromDays(30));
+      int rows = await this.ForumsManager.TruncateMailQueue(TimeSpan.FromDays(30));
+      this.Logger?.LogInformation("{rows} records were removed from the mail queue.");
     }
     catch (Exception ex)
     {

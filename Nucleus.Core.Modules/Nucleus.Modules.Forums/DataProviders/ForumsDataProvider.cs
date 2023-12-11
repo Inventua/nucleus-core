@@ -1227,11 +1227,11 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.ToListAsync();
 		}
 
-		public async Task TruncateMailQueue(TimeSpan sentBefore)
+		public async Task<int> TruncateMailQueue(TimeSpan sentBefore)
 		{
 			DateTime beforeDate = DateTime.Now.Add(-sentBefore);
 
-			await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM ForumMailQueue WHERE Status = {MailQueue.MailQueueStatus.Sent} AND DateChanged < {beforeDate}");
+			return await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM ForumMailQueue WHERE Status = {MailQueue.MailQueueStatus.Sent} AND DateChanged < {beforeDate}");
 
 			////   IEnumerable<MailQueue> items = await this.Context.MailQueue
 			////	.Where(item => item.Status == MailQueue.MailQueueStatus.Sent && item.DateChanged < beforeDate)

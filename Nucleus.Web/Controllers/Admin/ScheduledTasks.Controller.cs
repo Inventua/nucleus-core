@@ -70,6 +70,38 @@ public class ScheduledTasksController : Controller
     return View("Editor", viewModel);
   }
 
+  [HttpGet]
+  public async Task<ActionResult> UpdateStatus(Guid id)
+  {
+    ViewModels.Admin.ScheduledTaskEditor viewModel = new();
+
+    viewModel.ScheduledTask = await ScheduledTaskManager.Get(id);
+    viewModel.LatestHistory = await this.ScheduledTaskManager.GetMostRecentHistory(viewModel.ScheduledTask, !viewModel.ScheduledTask.InstanceType.HasValue || viewModel.ScheduledTask.InstanceType == ScheduledTask.InstanceTypes.PerInstance ? null : Environment.MachineName);
+
+    viewModel.Progress = new() { Status = ScheduledTaskProgress.State.None };
+    if (id != Guid.Empty)
+    {
+      RunningTask queueItem = this.Queue.ToList()
+        .Where(item => item.ScheduledTask.Id == id)
+        .FirstOrDefault();
+
+      if (queueItem != null)
+      {
+        viewModel.Progress = queueItem.Progress;
+        viewModel.StartTime = queueItem.StartDate;
+      }
+      else
+      {
+        if (viewModel.LatestHistory.FinishDate > DateTime.UtcNow.AddMinutes(-1))
+        {
+          viewModel.Progress = new() { Status = viewModel.LatestHistory.Status };
+        }
+      }
+    }
+
+    return View("_TaskStatus", viewModel);
+  }
+
   [HttpPost]
   public async Task<ActionResult> AddScheduledTask()
   {

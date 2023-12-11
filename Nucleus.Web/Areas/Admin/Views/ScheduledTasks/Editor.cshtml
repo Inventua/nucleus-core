@@ -61,26 +61,15 @@
 						</SettingsControl>
 					</div>
 					
-					@switch (Model.Progress.Status)
-					{
-						case ScheduledTaskProgress.State.Running:
-							<div class="alert alert-primary mt-3" role="alert">This task is running now, started @((DateTime.UtcNow - Model.StartTime).FormatTimeSpan()) ago@(@Model.Progress.Percent > 0 ? $", {Model.Progress.Percent}% complete": "").</div>
-							break;
-
-						default:
-							<SettingsControl caption="Next Run">
-								<div>@(Model.LatestHistory == null ? "Immediate" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "Immediate"))</div>
-							</SettingsControl>
-							break;
-					}
-					
-
-					@if (Model.ScheduledTask.Id != Guid.Empty)
-					{
-						<div class="text-end">
-              <input type="submit" value="Run Now" formaction="@Url.AreaAction("RunNow", "ScheduledTasks", "Admin")" data-target=".ScheduledTaskEditor" class="btn btn-secondary" />
-						</div>
-					}
+					<div class="task-status-@Model.ScheduledTask.Id">
+					@await Html.PartialAsync("_TaskStatus", Model)
+					</div>
+          @if (Model.ScheduledTask.Id != Guid.Empty)
+          {
+            <div class="text-end">
+              <input type="submit" value="Run Now" formaction="@Url.AreaAction("RunNow", "ScheduledTasks", "Admin")" data-target=".ScheduledTaskEditor" class="btn btn-secondary scheduled-task-run-now collapse@(Model.Progress.Status == ScheduledTaskProgress.State.Running ? "" : " show")" />
+            </div>
+          }
 				</fieldset>
 
 				<div class="nucleus-button-panel">
@@ -90,7 +79,6 @@
 					{
 						<input type="submit" class="btn btn-danger" value="Delete Scheduled Task" formaction="@Url.AreaAction("DeleteScheduledTask", "ScheduledTasks", "Admin")" data-confirm="Delete this Scheduled Task?" />
 					}
-
 				</div>
 			}
 		</TabPanel>
@@ -99,27 +87,27 @@
 		{
 			<TabPanel id="task-history">
 				<table class="table table-sm table-striped">
-          <thead>
-					  <tr>
-						  <th scope="col">Start Date</th>
-              <th scope="col">Finish Date</th>
-              <th scope="col">Next Run Date</th>
-              <th scope="col">Server</th>
-              <th scope="col">Status</th>
-					  </tr>
-          </thead>
-          <tbody>
-					  @foreach (var item in Model.History)
-					  {
-						  <tr>
-							  <td>@item.StartDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-							  <td>@item.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-							  <td>@item.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-							  <td>@item.Server</td>
-							  <td>@item.Status</td>
-						  </tr>
-					  }
-          </tbody>
+					<thead>
+						<tr>
+							<th scope="col">Start Date</th>
+							<th scope="col">Finish Date</th>
+							<th scope="col">Next Run Date</th>
+							<th scope="col">Server</th>
+							<th scope="col">Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var item in Model.History)
+						{
+							<tr>
+								<td>@item.StartDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+								<td>@item.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+								<td>@item.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+								<td>@item.Server</td>
+								<td>@item.Status</td>
+							</tr>
+						}
+					</tbody>
 				</table>
 			</TabPanel>
 
@@ -153,7 +141,17 @@
 </div>
 
 <script>
-	jQuery('.ScheduledTasks .LogFile').on('change', function () { jQuery(this).parents('form').submit(); })
+  jQuery('.ScheduledTasks .LogFile').on('change', function () { jQuery(this).parents('form').submit(); })
+	@if (Model.ScheduledTask.Id != Guid.Empty)
+  { 
+    <text>
+    Page.ScheduledTasksEditor.Url = '@Url.AreaAction("UpdateStatus", "ScheduledTasks", "Admin", new { id = Model.ScheduledTask.Id })';
+    Page.ScheduledTasksEditor.RefreshTaskStatusSelector = '.task-status-@Model.ScheduledTask.Id';
+    Page.ScheduledTasksEditor.ScheduledTaskId = '@Model.ScheduledTask.Id';
+    Page.ScheduledTasksEditor.Start();
+    </text>
+  }
+  //jQuery(Page).on('progress', function (event) { _cancelRefreshTaskStatus(); });  
 </script>
 
 

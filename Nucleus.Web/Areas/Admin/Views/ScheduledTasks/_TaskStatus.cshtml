@@ -1,0 +1,46 @@
+﻿@model Nucleus.Web.ViewModels.Admin.ScheduledTaskEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@using Nucleus.Abstractions.Models.TaskScheduler
+@using Nucleus.Extensions
+<SettingsControl caption="Last Run">
+  <div>@(Model.LatestHistory == null ? "Never" : (Model.LatestHistory.FinishDate.HasValue ? Model.LatestHistory.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone()) : "Never"))</div>
+</SettingsControl>
+@switch (Model.Progress.Status)
+{
+  case ScheduledTaskProgress.State.Running:
+    <div class="alert alert-primary mt-3" role="alert">
+      <div class="spinner-border spinner-border-sm text-success nucleus-progress-spinner me-2" role="status"></div>
+      This task is running now, started @((DateTime.UtcNow - Model.StartTime).FormatTimeSpan()) ago@(@Model.Progress.Percent > 0 ? $", {Model.Progress.Percent}% complete" : "").
+    </div>
+    break;
+
+  case ScheduledTaskProgress.State.Error:
+    <div class="alert alert-info mt-3" role="alert">
+      This task failed with an error at @(Model.LatestHistory == null ? "Unknown" : (Model.LatestHistory.FinishDate.HasValue ? Model.LatestHistory.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone()) : "Unknown"))
+      and is scheduled to run @(Model.LatestHistory == null ? "immediately" : (Model.LatestHistory.NextScheduledRun.HasValue ? "next at " + Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "immediately")).
+      Check the logs to view error details.
+    </div>
+    break;
+
+  case ScheduledTaskProgress.State.Succeeded:
+    <div class="alert alert-success mt-3" role="alert">
+      This task completed successfully at @(Model.LatestHistory == null ? "Unknown" : (Model.LatestHistory.FinishDate.HasValue ? Model.LatestHistory.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone()) : "Unknown"))
+      and is scheduled to run @(Model.LatestHistory == null ? "immediately" : (Model.LatestHistory.NextScheduledRun.HasValue ? "next at " + Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "immediately")).
+    </div>
+    break;
+
+  default:    
+    <SettingsControl caption="Next Run">
+      <div>@(Model.LatestHistory == null ? "Immediate" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "Immediate"))</div>
+    </SettingsControl>
+    break;
+}
+@if (Model.Progress.Status != ScheduledTaskProgress.State.Running)
+{
+  <script>
+    jQuery('.scheduled-task-run-now').addClass('show');
+  </script>
+}

@@ -30,6 +30,11 @@
 	</ul>
 
 	<div class="collapse log-options">
+    <div class="d-flex flex-column">
+      <button type="button" class="btn btn-none nucleus-material-icon ms-auto" aria-label="Close" data-bs-toggle="collapse" data-bs-target=".log-options">
+        &#xe5cd;
+      </button>
+    </div>
 		<fieldset aria-label="Filtering and Sorting">
 			<SettingsControl caption="Filter" helptext="Log source filter term.">
 				<div class="d-flex gap-2">
@@ -73,4 +78,12 @@
 		var href = jQuery(this).attr('href') + '&LogFile=' + jQuery('#LogFile').val();
 		jQuery(this).attr('href', href);
 	});
+
+  jQuery(document).on('click', function (event) 
+  { 
+    if (jQuery('.log-options').is(':visible') && jQuery(event.target).parents('.log-options').length === 0)
+    {
+      jQuery('.log-options').collapse('hide');      
+    }
+  });
 </script>

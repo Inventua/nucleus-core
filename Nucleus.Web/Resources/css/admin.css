@@ -904,11 +904,16 @@ ul.nucleus-control-panel-items button
 	position: absolute;
 	margin-top: 2.2rem;
 	border: solid 1px #bbb;
-	padding: 1rem;
+  padding: 0 0.25rem;
 	box-shadow: 2px 2px 6px #bbb;
 	background: white;
 	right: 1rem;
 	z-index: 2;
+}
+
+#system-logs .log-options fieldset, #task-logs .log-options fieldset
+{
+	padding: 0 0.5rem 0.5rem 0.5rem;
 }
 
 #system-logs .log-levels, #task-logs .log-levels

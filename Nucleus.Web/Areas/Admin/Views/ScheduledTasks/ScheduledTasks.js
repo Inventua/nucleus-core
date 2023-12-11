@@ -4,12 +4,11 @@ function _scheduledTasksEditor()
   this.ScheduledTaskId = '';
   this.RefreshTaskStatusSelector = '';
   this.Url = '';
-  this.Start = _start;
   this.Started = false;
 
   this.RefreshTaskStatusToken = -1;
-  //jQuery(Page).on('progress', function (event) { _cancelRefreshTaskStatus(); });
-  function _start()
+
+  _scheduledTasksEditor.prototype.Start = function()
   {
     this.ScheduleRefreshTaskStatus();
     this.Started = true;

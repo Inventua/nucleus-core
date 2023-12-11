@@ -69,6 +69,7 @@
 	<ItemGroup>
 	  <None Remove="Areas\Admin\Views\Extensions\extensions.js" />
 	  <None Remove="Areas\Admin\Views\Extensions\nucleus-admin.min.js" />
+	  <None Remove="Areas\Admin\Views\ScheduledTasks\ScheduledTasks.js" />
 	  <None Remove="Areas\Setup\Views\SiteWizard\Complete.js" />
 	  <None Remove="Areas\Setup\Views\SiteWizard\index.css" />
 	  <None Remove="Areas\Setup\Views\SiteWizard\index.js" />
@@ -115,16 +116,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Include="Areas\Admin\Views\ScheduledTasks\ScheduledTasks.js" />
 	  <Content Include="Areas\Setup\Views\SiteWizard\index.js">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Content>
 	  <Content Include="Resources\js\nucleus-admin-extensions.js" />
 	  <Content Include="Resources\js\nucleus-admin-extensions.min.js" />
 	  <Content Include="Areas\Setup\Views\SiteWizard\Complete.js">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Content>
 	  <Content Include="Areas\Setup\Views\SiteWizard\index.css">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Content>
 	  <Content Include="license.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -167,7 +169,7 @@
 	  </Content>
 	  <Content Include="Shared\Containers\default.min.css" />
 	  <Content Include="Shared\Controls\Views\PagingControl.css">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Content>
 	  <Content Include="Shared\Controls\Views\PagingControl.min.css" />
 	  <Content Include="Shared\Layouts\default.css">
@@ -223,16 +225,16 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="Shared\Controls\Views\FileSelector.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="Shared\Controls\Views\FileUpload.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="Shared\Controls\Views\FolderSelector.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="Shared\Controls\Views\PagingControl.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="Views\Shared\_ContentOnly.cshtml">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>

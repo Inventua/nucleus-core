@@ -5,9 +5,6 @@
     <TargetFramework>net6.0</TargetFramework>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-
-    <!-- Version is set by core.build.targets, can be overridden here for pre-release builds -->
-		<!--<VersionPrefix>1.0.1.0</VersionPrefix>-->
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,31 +36,28 @@
 		<Compile Remove="Extensions\**" />
 		<Compile Remove="logs\**" />
 		<Compile Remove="publish\**" />
-		<Compile Remove="_OLD-AmazonS3FileSystemProvider\**" />
-		<Compile Remove="_OLD-AzureBlobStorageFileSystemProvider\**" />
 		<Content Remove="Extensions\**" />
 		<Content Remove="logs\**" />
 		<Content Remove="publish\**" />
-		<Content Remove="_OLD-AmazonS3FileSystemProvider\**" />
-		<Content Remove="_OLD-AzureBlobStorageFileSystemProvider\**" />
+		<Content Remove="appSettings.Development.json" />
 		<Content Remove="appSettings.Linux.json" />
+		<Content Remove="appSettings.Testing.json" />
 		<Content Remove="bundleconfig.json" />
 		<Content Remove="iis-dev\**\*" />
+		<Content Remove="databaseSettings.Development.json" />
+		<Content Remove="databaseSettings.Testing.json" />
+		<Content Remove="hosting.development.json" />
 		<Content Remove="iis-dev\web.config" />
 		<Content Remove="Setup\install-log.config" />
 		<EmbeddedResource Remove="Extensions\**" />
 		<EmbeddedResource Remove="logs\**" />
 		<EmbeddedResource Remove="publish\**" />
-		<EmbeddedResource Remove="_OLD-AmazonS3FileSystemProvider\**" />
-		<EmbeddedResource Remove="_OLD-AzureBlobStorageFileSystemProvider\**" />
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
 		<None Remove="Extensions\**" />
 		<None Remove="logs\**" />
 		<None Remove="publish\**" />
 		<None Remove="Setup\Extensions\**" />
-		<None Remove="_OLD-AmazonS3FileSystemProvider\**" />
-		<None Remove="_OLD-AzureBlobStorageFileSystemProvider\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -116,17 +110,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Include="Areas\Admin\Views\ScheduledTasks\ScheduledTasks.js" />
+	  <Content Include="Areas\Admin\Views\ScheduledTasks\ScheduledTasks.js">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	  <Content Include="Areas\Setup\Views\SiteWizard\index.js">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Include="Resources\js\nucleus-admin-extensions.js" />
 	  <Content Include="Resources\js\nucleus-admin-extensions.min.js" />
 	  <Content Include="Areas\Setup\Views\SiteWizard\Complete.js">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Include="Areas\Setup\Views\SiteWizard\index.css">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Include="license.txt">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -169,19 +165,21 @@
 	  </Content>
 	  <Content Include="Shared\Containers\default.min.css" />
 	  <Content Include="Shared\Controls\Views\PagingControl.css">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Include="Shared\Controls\Views\PagingControl.min.css" />
 	  <Content Include="Shared\Layouts\default.css">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Include="Utils\Ubuntu\appSettings.template">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Include="Utils\Ubuntu\nucleus.service">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
-	  <Content Include="Utils\Ubuntu\nucleus-install.sh" />
+    <Content Include="Utils\Ubuntu\nucleus-install.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -189,31 +187,39 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Include="appSettings.Development.json">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </None>
 	  <None Include="appSettings.Linux.json">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </None>
+	  <None Include="appSettings.Testing.json">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </None>
 	  <None Include="bundleconfig.json" />
 	  <None Include="iis-dev\**\*" />
 	  <_ContentIncludedByDefault Remove="appSettings.linux.json" />
+	  <None Include="databaseSettings.Development.json">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </None>
+	  <None Include="databaseSettings.Testing.json">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </None>
+	  <None Include="hosting.development.json">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </None>
 		<None Include="iis-dev\web.config" />
-		<None Include="Setup\install-log.config">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
+    <None Include="Setup\install-log.config">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 	<ItemGroup>
-	  <Content Update="appSettings.Testing.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="appSettings.Development.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
 	  <Content Update="appSettings.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="Areas\Admin\Views\ScheduledTasks\_TaskStatus.cshtml">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="databaseSettings.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -225,16 +231,16 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="Shared\Controls\Views\FileSelector.cshtml">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="Shared\Controls\Views\FileUpload.cshtml">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="Shared\Controls\Views\FolderSelector.cshtml">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="Shared\Controls\Views\PagingControl.cshtml">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="Views\Shared\_ContentOnly.cshtml">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>

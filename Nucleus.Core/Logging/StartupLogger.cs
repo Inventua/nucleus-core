@@ -35,7 +35,7 @@ namespace Nucleus.Core.Logging
 			// Create loggers for logging during startup
 			using var loggerFactory = LoggerFactory.Create(builder =>
 			{
-				builder.AddConsole();
+				builder.AddSimpleConsole(options => { options.TimestampFormat = "dd-MMM-yyyy HH:mm:ss: "; });
 				builder.AddDebug();
 				builder.AddTextFileLogger(configuration);
 			});

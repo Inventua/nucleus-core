@@ -149,22 +149,22 @@ namespace Nucleus.Web
         services.AddLogging(logging =>
         {
           logging.ClearProviders();
-          logging.AddConsole();
+          logging.AddSimpleConsole(options => { options.TimestampFormat = "dd-MMM-yyyy HH:mm:ss: "; });
           logging.AddDebugLogger();
           logging.AddTextFileLogger(this.Configuration);
           logging.AddAzureWebAppDiagnostics();
         });
 
         services.Logger().LogInformation($"App Data Folder:         [{this.Configuration.GetValue<String>($"{Nucleus.Abstractions.Models.Configuration.FolderOptions.Section}:DataFolder")}]");
-
+        
         // Enable compression
         if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
         {
           services.Logger().LogInformation("Adding Response Compression");
           services.AddResponseCompression(options =>
           {
-            options.Providers.Add(typeof(Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider));
-            options.Providers.Add(typeof(Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider));
+            options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider>();
+            options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider>();
             options.EnableForHttps = true;
           });
         };

@@ -30,8 +30,6 @@ namespace Nucleus.Modules.Forums
 
         // Event handlers manage the mail queue
         services.AddSingletonSystemEventHandler<Models.Post, Create, EventHandlers.CreatePostEventHandler>();
-
-        services.AddSingletonSystemEventHandler<Models.Post, Create, EventHandlers.CreatePostEventHandler>();
         services.AddSingletonSystemEventHandler<Models.Reply, Create, EventHandlers.CreateReplyEventHandler>();
 
         services.AddSingletonSystemEventHandler<Models.Post, Approved, EventHandlers.ApprovedPostEventHandler>();

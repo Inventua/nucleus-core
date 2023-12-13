@@ -253,37 +253,37 @@ public class FileSystemManager : IFileSystemManager
 			Permission permission = new();
 			permission.Role = role;
 
-        //if (isAnonymousOrAllUsers && !permissionType.IsFolderViewPermission())
-        if (isAnonymousOrAllUsers && permissionType.IsFolderEditPermission())
-        {
+			//if (isAnonymousOrAllUsers && !permissionType.IsFolderViewPermission())
+			if (isAnonymousOrAllUsers && permissionType.IsFolderEditPermission())
+			{
 				permission.AllowAccess = false;
 				permission.PermissionType = new() { Scope = PermissionType.PermissionScopeNamespaces.Disabled };
 			}
 			else
 			{
-          permission.AllowAccess = permissionType.IsFolderViewPermission();
-          permission.PermissionType = permissionType;
+				permission.AllowAccess = permissionType.IsFolderViewPermission();
+				permission.PermissionType = permissionType;
 			}
 
 			permissions.Add(permission);
 		}
 
-      // only add new permissions if they don't already exist for the folder
-      foreach (Permission newPermission in permissions)
-      {
-        Permission existingPermission = folder.Permissions.Where(existingPermission => existingPermission.Role.Id == role.Id && existingPermission.PermissionType.Scope == newPermission.PermissionType.Scope).FirstOrDefault();
-        if (existingPermission == null)
-        {
-          // only add new permissions if there isn't already a matching permission for the folder      
-          folder.Permissions.Add(newPermission);
-        }
-        else
-        {
-          // otherwise, update the existing one
-          existingPermission.AllowAccess = newPermission.AllowAccess;
-        }
-      }
-      //folder.Permissions.AddRange(permissions);
+		// only add new permissions if they don't already exist for the folder
+		foreach (Permission newPermission in permissions)
+		{
+			Permission existingPermission = folder.Permissions.Where(existingPermission => existingPermission.Role.Id == role.Id && existingPermission.PermissionType.Scope == newPermission.PermissionType.Scope).FirstOrDefault();
+			if (existingPermission == null)
+			{
+				// only add new permissions if there isn't already a matching permission for the folder      
+				folder.Permissions.Add(newPermission);
+			}
+			else
+			{
+				// otherwise, update the existing one
+				existingPermission.AllowAccess = newPermission.AllowAccess;
+			}
+		}
+		//folder.Permissions.AddRange(permissions);
 	}
 	//}
 
@@ -528,46 +528,46 @@ public class FileSystemManager : IFileSystemManager
 		return folder;
 	}
 
-    /// <summary>
+	/// <summary>
 	/// Return a folder with the Folders and Files properties populated, checking user permissions.
 	/// </summary>
 	/// <param name="site"></param>
 	/// <param name="id"></param>
-    /// <param name="user"></param>
+	/// <param name="user"></param>
 	/// <param name="pattern">Regular expression which is used to filter file names.</param>
 	/// <returns></returns>
 	/// <example>
 	/// ListFolder(this.Context.Site, folderId, "(.xml)");
 	/// </example>
 	public async Task<Folder> ListFolder(Site site, Guid id, ClaimsPrincipal user, string pattern)
-    {
-      Folder existingFolder = await this.GetFolder(site, id);
-      Folder folder;
-      FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, existingFolder.Provider);
-            
-      try
-      {
-        folder = await provider.ListFolder(UseSiteHomeDirectory(site, existingFolder.Path), pattern);
-      }
-      catch (System.IO.FileNotFoundException)
-      {
-        // if the root folder was not found, try to create it				
-        folder = await provider.CreateFolder("", UseSiteHomeDirectory(site, existingFolder.Path));
-      }      
+	{
+		Folder existingFolder = await this.GetFolder(site, id);
+		Folder folder;
+		FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, existingFolder.Provider);
 
-      await GetDatabaseProperties(site, folder);
+		try
+		{
+			folder = await provider.ListFolder(UseSiteHomeDirectory(site, existingFolder.Path), pattern);
+		}
+		catch (System.IO.FileNotFoundException)
+		{
+			// if the root folder was not found, try to create it				
+			folder = await provider.CreateFolder("", UseSiteHomeDirectory(site, existingFolder.Path));
+		}
 
-      
+		await GetDatabaseProperties(site, folder);
 
-      // we must get database properties for folders in order to retrieve permissions before calling CheckFolderPermission
-      await GetDatabaseProperties(site, folder.Parent);
-      //await GetDatabaseProperties(site, folder.Folders);
-      //await GetDatabaseProperties(site, folder.Files);
 
-      CheckFolderPermissions(site, user, folder);
 
-      return folder;
-    }
+		// we must get database properties for folders in order to retrieve permissions before calling CheckFolderPermission
+		await GetDatabaseProperties(site, folder.Parent);
+		//await GetDatabaseProperties(site, folder.Folders);
+		//await GetDatabaseProperties(site, folder.Files);
+
+		CheckFolderPermissions(site, user, folder);
+
+		return folder;
+	}
 
 	/// <summary>
 	/// Return a paged list of <seealso cref="Nucleus.Abstractions.Models.FileSystem.FileSystemItem"/> objects for the 
@@ -627,118 +627,118 @@ public class FileSystemManager : IFileSystemManager
 				File file = item as File;
 				file.Parent = folder;
 
-          await GetDatabaseProperties(site, file);
-        }
-      }
+				await GetDatabaseProperties(site, file);
+			}
+		}
 
-      return results;
-    }
+		return results;
+	}
 
-    /// <summary>
+	/// <summary>
 	/// Return a paged list of <seealso cref="Nucleus.Abstractions.Models.FileSystem.FileSystemItem"/> objects for the 
-    /// specified folder, checking user permissions.
+	/// specified folder, checking user permissions.
 	/// </summary>
 	/// <param name="site"></param>
 	/// <param name="id"></param>
-    /// <param name="user"></param>
+	/// <param name="user"></param>
 	/// <param name="pattern">Regular expression which is used to filter file names.</param>
-    /// <param name="settings">Paging settings.</param>
+	/// <param name="settings">Paging settings.</param>
 	/// <returns></returns>
 	public async Task<PagedResult<FileSystemItem>> ListFolder(Site site, Guid id, ClaimsPrincipal user, string pattern, PagingSettings settings)
-    {
-      Folder existingFolder = await this.GetFolder(site, id);
-      Folder folder;
-      FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, existingFolder.Provider);
-      PagedResult<FileSystemItem> results;
+	{
+		Folder existingFolder = await this.GetFolder(site, id);
+		Folder folder;
+		FileSystemProvider provider = this.FileSystemProviderFactory.Get(site, existingFolder.Provider);
+		PagedResult<FileSystemItem> results;
 
-      try
-      {
-        folder = await provider.ListFolder(UseSiteHomeDirectory(site, existingFolder.Path), pattern);
-      }
-      catch (System.IO.FileNotFoundException)
-      {
-        // if the root folder was not found, try to create it				
-        folder = await provider.CreateFolder("", UseSiteHomeDirectory(site, existingFolder.Path));
-      }
-      
-      // we must get database properties for folders in order to retrieve permissions before calling CheckFolderPermission
-      await GetDatabaseProperties(site, folder);
-      //await GetDatabaseProperties(site, folder.Folders);      
-      await GetDatabaseProperties(site, folder.Parent);
+		try
+		{
+			folder = await provider.ListFolder(UseSiteHomeDirectory(site, existingFolder.Path), pattern);
+		}
+		catch (System.IO.FileNotFoundException)
+		{
+			// if the root folder was not found, try to create it				
+			folder = await provider.CreateFolder("", UseSiteHomeDirectory(site, existingFolder.Path));
+		}
 
-      CheckFolderPermissions(site, user, folder);
+		// we must get database properties for folders in order to retrieve permissions before calling CheckFolderPermission
+		await GetDatabaseProperties(site, folder);
+		//await GetDatabaseProperties(site, folder.Folders);      
+		await GetDatabaseProperties(site, folder.Parent);
 
-      List<FileSystemItem> items = new List<FileSystemItem>();
-      folder.SortFolders(folder => folder.Name, false);
-      folder.SortFiles(file => file.Name, false);
+		CheckFolderPermissions(site, user, folder);
 
-      items.AddRange(folder.Folders);
-      items.AddRange(folder.Files);
+		List<FileSystemItem> items = new List<FileSystemItem>();
+		folder.SortFolders(folder => folder.Name, false);
+		folder.SortFiles(file => file.Name, false);
 
-      results = new(settings,
-        items
-          .Skip(settings.FirstRowIndex)
-          .Take(settings.PageSize)
-      .ToList());
+		items.AddRange(folder.Folders);
+		items.AddRange(folder.Files);
 
-      results.TotalCount = items.Count;
+		results = new(settings,
+			items
+				.Skip(settings.FirstRowIndex)
+				.Take(settings.PageSize)
+		.ToList());
 
-      // This logic was moved to GetDatabaseProperties(site, folder)
-      ////foreach (FileSystemItem item in results.Items)
-      ////{
-      ////  if (item is Folder)
-      ////  {
-      ////    Folder subfolder = item as Folder;
-      ////    subfolder.Parent = folder;
-      ////  }
+		results.TotalCount = items.Count;
 
-      ////  if (item is File)
-      ////  {
-      ////    File file = item as File;
-      ////    file.Parent = folder;
+		// This logic was moved to GetDatabaseProperties(site, folder)
+		////foreach (FileSystemItem item in results.Items)
+		////{
+		////  if (item is Folder)
+		////  {
+		////    Folder subfolder = item as Folder;
+		////    subfolder.Parent = folder;
+		////  }
 
-      ////    await GetDatabaseProperties(site, file);
-      ////  }
-      ////}
+		////  if (item is File)
+		////  {
+		////    File file = item as File;
+		////    file.Parent = folder;
 
-      return results;
-    }
+		////    await GetDatabaseProperties(site, file);
+		////  }
+		////}
 
-    /// <summary>
-    /// Check that the user has permission for subfolders/files, and filter those where the user does not have permission.
-    /// </summary>
-    /// <param name="site"></param>
-    /// <param name="user"></param>
-    /// <param name="folder"></param>
-    private void CheckFolderPermissions(Site site, ClaimsPrincipal user, Folder folder)
-    {
-      // user must have browse permission on the folder to see contents (files and folders)
-      if (!user.HasBrowsePermission(site, folder))
-      {
-        folder.Files.Clear();
-        folder.Folders.Clear();
-      }
+		return results;
+	}
 
-      // user must have browse permission on individual sub-folders to see them
-      foreach (Folder subFolder in folder.Folders.ToList())
-      {
-        if (!user.HasBrowsePermission(site, subFolder))
-        {
-          folder.Folders.Remove(subFolder);
-        }
-      }
-    }
+	/// <summary>
+	/// Check that the user has permission for subfolders/files, and filter those where the user does not have permission.
+	/// </summary>
+	/// <param name="site"></param>
+	/// <param name="user"></param>
+	/// <param name="folder"></param>
+	private void CheckFolderPermissions(Site site, ClaimsPrincipal user, Folder folder)
+	{
+		// user must have browse permission on the folder to see contents (files and folders)
+		if (!user.HasBrowsePermission(site, folder))
+		{
+			folder.Files.Clear();
+			folder.Folders.Clear();
+		}
 
-    // Moved to GetDatabaseProperties(Site site, Folder folder)
-    //  private async Task GetDatabaseProperties(Site site, List<File> files)
-    //{
-    //    foreach (File file in files)
-    //	{
-    //		await GetDatabaseProperties(site, file);
-    //	}
-    //}
+		// user must have browse permission on individual sub-folders to see them
+		foreach (Folder subFolder in folder.Folders.ToList())
+		{
+			if (!user.HasBrowsePermission(site, subFolder))
+			{
+				folder.Folders.Remove(subFolder);
+			}
+		}
+	}
 
-    private async Task<File> GetDatabaseProperties(Site site, File file)
+	// Moved to GetDatabaseProperties(Site site, Folder folder)
+	//  private async Task GetDatabaseProperties(Site site, List<File> files)
+	//{
+	//    foreach (File file in files)
+	//	{
+	//		await GetDatabaseProperties(site, file);
+	//	}
+	//}
+
+	private async Task<File> GetDatabaseProperties(Site site, File file)
 	{
 		if (file == null) return null;
 
@@ -752,16 +752,16 @@ public class FileSystemManager : IFileSystemManager
 		return file;
 	}
 
-    // Moved to GetDatabaseProperties(Site site, Folder folder)
-    //private async Task GetDatabaseProperties(Site site, List<Folder> folders)
-    //{
-    //	foreach (Folder folder in folders)
-    //	{
-    //		await GetDatabaseProperties(site, folder);
-    //	}
-    //}
+	// Moved to GetDatabaseProperties(Site site, Folder folder)
+	//private async Task GetDatabaseProperties(Site site, List<Folder> folders)
+	//{
+	//	foreach (Folder folder in folders)
+	//	{
+	//		await GetDatabaseProperties(site, folder);
+	//	}
+	//}
 
-    private async Task<Folder> GetDatabaseProperties(Site site, Folder folder)
+	private async Task<Folder> GetDatabaseProperties(Site site, Folder folder)
 	{
 		if (folder == null) return null;
 
@@ -772,38 +772,38 @@ public class FileSystemManager : IFileSystemManager
 			folderData.CopyDatabaseValuesTo(folder);
 		}
 
-      using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
-      {
-        List<Folder> databaseFolders = await dataProvider.ListFolders(site, folder.Provider, folder.Path);
+		using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
+		{
+			List<Folder> databaseFolders = await dataProvider.ListFolders(site, folder.Provider, folder.Path);
 
-        foreach (Folder subFolder in folder.Folders)
-        {
-          RemoveSiteHomeDirectory(site, subFolder);
+			foreach (Folder subFolder in folder.Folders)
+			{
+				RemoveSiteHomeDirectory(site, subFolder);
 
-          databaseFolders.Where(databaseFile => databaseFile.Path.Equals(subFolder.Path, StringComparison.OrdinalIgnoreCase))
-            .FirstOrDefault()
-            ?.CopyDatabaseValuesTo(subFolder);
+				databaseFolders.Where(databaseFile => databaseFile.Path.Equals(subFolder.Path, StringComparison.OrdinalIgnoreCase))
+					.FirstOrDefault()
+					?.CopyDatabaseValuesTo(subFolder);
 
-          subFolder.Parent = folder;
-        }
-      }
+				subFolder.Parent = folder;
+			}
+		}
 
-      using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
-      {
-        List<File> databaseFiles = await dataProvider.ListFiles(site, folder.Provider, folder.Path);
+		using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
+		{
+			List<File> databaseFiles = await dataProvider.ListFiles(site, folder.Provider, folder.Path);
 
-        foreach (File file in folder.Files)
-        {
-          RemoveSiteHomeDirectory(site, file);
+			foreach (File file in folder.Files)
+			{
+				RemoveSiteHomeDirectory(site, file);
 
-          databaseFiles.Where(databaseFile => databaseFile.Path.Equals(file.Path, StringComparison.OrdinalIgnoreCase))
-            .FirstOrDefault()
-            ?.CopyDatabaseValuesTo(file);
-          file.Parent = folder;
-        }
-      }
+				databaseFiles.Where(databaseFile => databaseFile.Path.Equals(file.Path, StringComparison.OrdinalIgnoreCase))
+					.FirstOrDefault()
+					?.CopyDatabaseValuesTo(file);
+				file.Parent = folder;
+			}
+		}
 
-      return folder;
+		return folder;
 	}
 
 	public async Task<System.Uri> GetFileDirectUrl(Site site, File file)
@@ -915,10 +915,10 @@ public class FileSystemManager : IFileSystemManager
 
 		if (content != null)
 		{
-        if (parentPath.Length > 1 && (parentPath.EndsWith('/') || parentPath.EndsWith('\\')))
-        {
-          parentPath = parentPath[..^1];
-        }
+			if (parentPath.Length > 1 && (parentPath.EndsWith('/') || parentPath.EndsWith('\\')))
+			{
+				parentPath = parentPath[..^1];
+			}
 
 			Folder parentFolder = await fileSystemProvider.GetFolder(UseSiteHomeDirectory(site, parentPath));
 			string message = "";
@@ -1069,7 +1069,6 @@ public class FileSystemManager : IFileSystemManager
 	/// <returns></returns>
 	public async Task<Boolean> CopyPermissionsToDescendants(Site site, Folder folder, ClaimsPrincipal user, CopyPermissionOperation operation)
 	{
-		//PageMenuChildrenResult children = await GetPageMenuDescendants(site, page, user, 0, 0, PermissionsCheckOption.Edit, true, true);
 		Folder parentFolder = await this.ListFolder(site, folder.Id, "");
 
 		List<Permission> permissions = await this.ListPermissions(folder);
@@ -1092,67 +1091,62 @@ public class FileSystemManager : IFileSystemManager
 	{
 		List<Permission> newPermissions = new();
 
-		using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+		List<Permission> originalPermissions = await this.PermissionsManager.ListPermissions(folder.Id, Folder.URN);
+
+		switch (operation)
 		{
-			List<Permission> originalPermissions = await provider.ListPermissions(folder.Id, Folder.URN);
-			switch (operation)
-			{
-				case CopyPermissionOperation.Replace:
-					// this is the default behavior
-					newPermissions = parentPermissions
-						.Select(parentPermission => new Permission()
-						{
-							AllowAccess = parentPermission.AllowAccess,
-							PermissionType = parentPermission.PermissionType,
-							RelatedId = parentPermission.RelatedId,
-							Role = parentPermission.Role
-						}).ToList();
-					break;
+			case CopyPermissionOperation.Replace:
+				// this is the default behavior
+				newPermissions = parentPermissions
+					.Select(parentPermission => new Permission()
+					{
+						AllowAccess = parentPermission.AllowAccess,
+						PermissionType = parentPermission.PermissionType,
+						RelatedId = parentPermission.RelatedId,
+						Role = parentPermission.Role
+					}).ToList();
+				break;
 
-				case CopyPermissionOperation.Merge:
-					// merge original permissions with new permissions
-					newPermissions = parentPermissions
-						.Select(parentPermission => new Permission()
-						{
-							AllowAccess = parentPermission.AllowAccess,
-							PermissionType = parentPermission.PermissionType,
-							RelatedId = parentPermission.RelatedId,
-							Role = parentPermission.Role
-						}).ToList();
+			case CopyPermissionOperation.Merge:
+				// merge original permissions with new permissions
+				newPermissions = parentPermissions
+					.Select(parentPermission => new Permission()
+					{
+						AllowAccess = parentPermission.AllowAccess,
+						PermissionType = parentPermission.PermissionType,
+						RelatedId = parentPermission.RelatedId,
+						Role = parentPermission.Role
+					}).ToList();
 
-					// Include original permissions where the role is not in parentPermissions
-					newPermissions.AddRange(originalPermissions.Where
+				// Include original permissions where the role is not in parentPermissions
+				newPermissions.AddRange(originalPermissions.Where
+				(
+					originalPermission => !newPermissions.Where
 					(
-						originalPermission => !newPermissions.Where
+						newPermission =>
 						(
-							newPermission =>
-							(
-								newPermission.RelatedId == originalPermission.RelatedId &&
-								newPermission.Role.Id == originalPermission.Role.Id &&
-								newPermission.PermissionType.Scope.Equals(originalPermission.PermissionType.Scope, StringComparison.OrdinalIgnoreCase) &&
-								newPermission.AllowAccess == originalPermission.AllowAccess
-							)
-						).Any()
-					));
+							newPermission.RelatedId == originalPermission.RelatedId &&
+							newPermission.Role.Id == originalPermission.Role.Id &&
+							newPermission.PermissionType.Scope.Equals(originalPermission.PermissionType.Scope, StringComparison.OrdinalIgnoreCase) &&
+							newPermission.AllowAccess == originalPermission.AllowAccess
+						)
+					).Any()
+				));
 
-					break;
-			}
-
-			await provider.SavePermissions(folder.Id, newPermissions, originalPermissions);
+				break;
 		}
+
+		await this.PermissionsManager.SavePermissions(folder.Id, newPermissions, originalPermissions);
+
+		this.CacheManager.FolderCache().Remove(folder.Id);
+		this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, folder.Provider, folder.Path));
 
 		if (folder.Folders.Any())
 		{
-			//foreach (PageMenu child in page.Children)
-			//{
-			//	await CopyPermissionsToDescendants(site, child, parentPermissions, operation);
-			//}
-
 			foreach (Folder childFolder in folder.Folders)
 			{
 				await CopyPermissionsToDescendants(site, childFolder, parentPermissions, operation);
 			}
 		}
-
 	}
 }

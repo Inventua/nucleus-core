@@ -946,6 +946,8 @@ namespace Nucleus.Modules.Forums.DataProviders
 				.Include(subscription => subscription.User)
 					.ThenInclude(user => user.Profile)
 						.ThenInclude(profilevalue => profilevalue.UserProfileProperty)
+				.Include(subscription => subscription.User)
+					.ThenInclude(user => user.Roles)
 				.AsSplitQuery()
 				.AsNoTracking()
 				.ToListAsync();

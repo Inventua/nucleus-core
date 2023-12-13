@@ -17,9 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models.Paging;
 using Nucleus.Extensions;
-using Nucleus.Extensions.Authorization;
 using Nucleus.Abstractions.Search;
-using Org.BouncyCastle.Utilities.Collections;
 
 namespace Nucleus.Core.DataProviders
 {

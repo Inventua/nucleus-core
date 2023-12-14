@@ -124,8 +124,8 @@ namespace Nucleus.Web.ViewModels.Admin
 				{
 					return
 						String.IsNullOrEmpty(logSettings.LogFilterTerm) ||
-						this.Category.Contains(logSettings.LogFilterTerm, StringComparison.OrdinalIgnoreCase) ||
-						this.Message.Contains(logSettings.LogFilterTerm, StringComparison.OrdinalIgnoreCase);
+						this.Category?.Contains(logSettings.LogFilterTerm, StringComparison.OrdinalIgnoreCase) == true ||
+						this.Message?.Contains(logSettings.LogFilterTerm, StringComparison.OrdinalIgnoreCase) == true;
 				}
 			}
 

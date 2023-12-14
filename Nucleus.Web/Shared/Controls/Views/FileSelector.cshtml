@@ -6,9 +6,9 @@
 	<div>@Model.SelectedFile.Name</div>
 	@if (Model.ShowSelectAnother)
 	{
-		<span class="btn btn-secondary">
-			<label>
-			<span class="nucleus-material-icon">&#xe2c6</span> Select Another File
+		<span>
+      <label class="btn btn-sm btn-secondary">
+			  Select Another File
 			<input type="submit" class="collapse btn btn-primary" formaction="@Url.NucleusAction(@Model.SelectAnotherActionName, Model.ControllerName, Model.AreaName, Model.ExtensionName)">
 		</label>
 	</span>

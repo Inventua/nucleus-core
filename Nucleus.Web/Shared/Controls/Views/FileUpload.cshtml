@@ -1,9 +1,9 @@
 ﻿@model Nucleus.ViewFeatures.ViewModels.FileUpload
 @if (Model.Enabled)
 {
-	<span class="@Model.CssClass">
-		<label>
-			<span class="nucleus-material-icon">&#xe2c6</span> @Model.Text
+	<span>
+    <label class="@Model.CssClass">
+			<span class="nucleus-material-icon me-1">&#xe2c6</span> @Model.Text
 			<input type="file" name="@Model.ControlName" class="collapse" formaction="@Url.NucleusAction(@Model.ActionName, @Model.ControllerName, @Model.AreaName, @Model.ExtensionName)" accept="@Model.Filter" >			
 		</label>
 	</span>

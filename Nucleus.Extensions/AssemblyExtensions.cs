@@ -50,9 +50,10 @@ namespace Nucleus.Extensions
 		/// <returns></returns>
 		public static string Version(this Assembly assembly)
 		{
-			AssemblyInformationalVersionAttribute attr = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-			return (attr == null ? String.Empty : attr.InformationalVersion);
-		}
+      AssemblyInformationalVersionAttribute attr = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+      return System.Text.RegularExpressions.Regex.Match(attr?.InformationalVersion ?? "", "(?<version>[^+]*)")?.Value ?? String.Empty;
+      // return (attr == null ? String.Empty : attr.InformationalVersion);
+    }
 
 		/// <summary>
 		/// Gets the assembly copyright.

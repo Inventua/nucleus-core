@@ -126,7 +126,7 @@ namespace Nucleus.Web
 
         services.Logger().LogInformation(new[]
         {
-          $"{System.Reflection.Assembly.GetExecutingAssembly().Product()} version {this.GetType().Assembly.GetName().Version}. {this.GetType().Assembly.Copyright()}",
+          $"{System.Reflection.Assembly.GetExecutingAssembly().Product()} version {this.GetType().Assembly.Version()}. {this.GetType().Assembly.Copyright()}",
           $"Application Root folder: [{System.Environment.CurrentDirectory}]",
           $"Configuration folder:    [{ConfigFolder()}]",
           $"Content Root:            [{this.Environment.ContentRootPath}]",
@@ -134,7 +134,7 @@ namespace Nucleus.Web
           $"Urls:                    [{this.Configuration.GetValue<string>(Microsoft.AspNetCore.Hosting.WebHostDefaults.ServerUrlsKey)}]"
         });
 
-        services.Logger().LogInformation("Used config files: '{file}'", String.Join(',', ConfigFiles));
+        services.Logger().LogInformation("Used config files: '{file}'", String.Join(',', ConfigFiles)); 
 
         services.AddHttpContextAccessor();  // required by many elements of the system
         services.AddHttpClient();
@@ -143,6 +143,7 @@ namespace Nucleus.Web
 
         builder.AddRazorRuntimeCompilation();
 
+        // future reference:
         // services.AddLocalization(options => options.ResourcesPath = "LocalizationResources");
 
         // Enable logging

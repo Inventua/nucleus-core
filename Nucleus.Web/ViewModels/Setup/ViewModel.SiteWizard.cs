@@ -75,7 +75,7 @@ namespace Nucleus.Web.ViewModels.Setup
     [Required(ErrorMessage = "You must enter a Site Administrator password")]
     public string SiteAdminPassword { get; set; }
 
-    [Required(ErrorMessage = "You must enter a Site Administrator password confirmation ")]
+    [Required(ErrorMessage = "You must enter a Site Administrator password confirmation")]
     [Compare(nameof(SiteAdminPassword), ErrorMessage = "The new password and confirm password values must match")]
     public string SiteAdminConfirmPassword { get; set; }
 

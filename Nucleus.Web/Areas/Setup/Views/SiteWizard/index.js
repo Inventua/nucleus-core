@@ -1,36 +1,26 @@
 ﻿var _progressHandle = -1;
 jQuery(function ()
 {  
-  //_setIntegratedSecurityFields = function ()
-  //{
-  //  var fields = jQuery('.user-pwd-identity');
-  //  if (jQuery('#DatabaseUseIntegratedSecurity').is(':checked') || jQuery('#DatabaseProvider').val() === 'Sqlite')
-  //  {
-  //    fields.removeClass('show');
-  //  }
-  //  else
-  //  {
-  //    fields.addClass('show');
-  //  }
-  //  //  .css('visibility', jQuery('#DatabaseUseIntegratedSecurity').is(':checked') ? 'hidden' : 'visible');
-  //}
+	jQuery('form').on('keydown', function (event)
+	{
+		if (event.key === 'Enter')
+		{
+			event.preventDefault();
 
-  //_setSqliteFields();
-  //jQuery('#DatabaseProvider').on('change', function (event)
-  //{
-  //  _setSqliteFields();
-  //});
+			if (jQuery('#wizard-button-finish').is(':visible'))
+			{
+				jQuery('#wizard-button-finish').trigger('click');
+			}
 
-  //_setIntegratedSecurityFields();
-  //jQuery(document).on('change', '#DatabaseUseIntegratedSecurity', function (event)
-  //{
-  //  _setIntegratedSecurityFields();
-  //});
+			return false;
+		}
+	});
 
   jQuery(Page).on("progress", function ()
   {
     jQuery('.wizard-show-progress').addClass('show');
-  });
+	});
+
   jQuery(Page).on("ready", function ()
   {
     jQuery('.wizard-show-progress').removeClass('show');

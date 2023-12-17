@@ -14,6 +14,10 @@
       @foreach(var template in Model.Templates)
       {
         <a class="list-group-item list-group-item-action me-auto site-template-list-group-item user-select-none" data-select="@template.FileName">
+          @if (template.FileName.Equals("default-site-template.xml", StringComparison.Ordinal))
+          {
+            <div class="nucleus-material-icon float-end default-template-icon">&#xe838;</div>
+          }
           <div class="fw-bold">@template.Title</div>
           <div class="small lh-sm ">@template.Description</div>
         </a>

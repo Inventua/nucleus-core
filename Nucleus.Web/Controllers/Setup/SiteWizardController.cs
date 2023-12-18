@@ -134,6 +134,7 @@ public class SiteWizardController : Controller
       viewModel.DatabaseConnectionString = "";
     }
 
+    ModelState.Clear();
     return View("_Database", await BuildViewModel(viewModel, ReadFlags.DatabaseProviders));
   }
 

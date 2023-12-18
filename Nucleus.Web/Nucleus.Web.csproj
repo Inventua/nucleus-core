@@ -39,6 +39,9 @@
 		<Content Remove="Extensions\**" />
 		<Content Remove="logs\**" />
 		<Content Remove="publish\**" />
+		<Content Remove="appSettings - Copy.Development.json" />
+		<Content Remove="appSettings - Copy.Linux.json" />
+		<Content Remove="appSettings - Copy.Testing.json" />
 		<Content Remove="appSettings.Development.json" />
 		<Content Remove="appSettings.Linux.json" />
 		<Content Remove="appSettings.Testing.json" />
@@ -215,6 +218,9 @@
   </ItemGroup>
 
 	<ItemGroup>
+	  <Content Update="appSettings.Production.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	  <Content Update="appSettings.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
@@ -222,6 +228,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="databaseSettings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="databaseSettings.Production.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="hosting.json">

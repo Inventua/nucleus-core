@@ -12,23 +12,27 @@ in Linux.
 Nucleus.[version].Install.zip file.
 
 2. Create an installation folder, and un-zip the install set to that folder.
-3. Install the [.Net Core Hosting Bundle](https://download.visualstudio.microsoft.com/download/pr/b84943df-6c61-4af8-91fc-a3981cd04eb8/69663d1ee22625a25d9f528b9dde0225/dotnet-hosting-6.0.18-win.exe).  You 
-may need to install the .Net Core Hosting Bundle and do a "Repair" install if IIS returns an error message and your Windows application event log 
-contains an entry with the message '... Ensure that the versions of Microsoft.NetCore.App and Microsoft.AspNetCore.App targeted by the application 
-are installed.'.  
+3. Install the [Microsoft .Net Core Hosting Bundle](https://download.visualstudio.microsoft.com/download/pr/1fd87564-6bdb-4123-90dd-26488ec868c9/6c68988c310805bdcbb07b704fbe3e9d/dotnet-hosting-6.0.25-win.exe).  
 4. In Internet Information Services (IIS) manager, add an application pool for your IIS application to use.  .Net core applications
-require a unique (not shared) application pool, set to use NET CLR version v4.0.30319 and integrated pipeline.  
+require a unique (not shared) application pool.  In the `.NET CLR Version` drop-down, select `NET CLR version v4.0.30319` and in the `Managed pipeline mode`
+drop-down, select `Integrated`.  
 5. In Internet Information Services (IIS) manager, add a web site or application with the path set to your installation folder, and assign
-the application pool that you created.  Nucleus ships with a web.config which is pre-configured with settings to run Nucleus in IIS.  
+the application pool that you created in the previous step.  Nucleus ships with a web.config which is pre-configured with settings to run Nucleus in IIS.  
 6. Assign 'Full Control' permissions to your Nucleus data folder for the `IIS AppPool\[AppPool Name]` user.  By default, your data folder 
 is `C:\ProgramData\Nucleus`.  You may need to create the folder in order to assign permissions to it. The Nucleus data folder is used for cached 
 files, logs and the database file, if you are using Sqlite.
 You can use the command-line command:  
-<kbd>ICACLS "C:\ProgramData\Nucleus" /grant "IIS AppPool\NucleusAppPool:(OI)(CI)F"</kbd>
+<kbd>ICACLS "C:\ProgramData\Nucleus" /grant "IIS AppPool\\[AppPool Name]:(OI)(CI)F"</kbd>
 7.  Assign 'Read' permissions to your installation folder for the `IIS AppPool\[AppPool Name]` user. 
 You can use the command-line command:  
-<kbd>ICACLS "[your-installation-folder]" /grant "IIS AppPool\NucleusAppPool:(OI)(CI)RX"</kbd>
-8. Browse to your web site address.  The new site wizard will appear, which will guide you through the process of setting up your site.
+<kbd>ICACLS "[your-installation-folder]" /grant "IIS AppPool\\[AppPool Name]:(OI)(CI)RX"</kbd>
+8.  Set permissions to allow Nucleus to modify configuration files.  This is so that the setup wizard and log settings pages can write configuration settings.
+You can use the command-line command:  
+<kbd>ICACLS "[your-installation-folder]\\*.Production.json" /grant "IIS AppPool\\[AppPool Name]:RM"</kbd>  
+If you are setting up a development environment, replace `Production` with `Development`. 
+9.  The site wizard can automatically configure your database and file system settings. If you want to manually configure settings, refer to the sections 
+below.  If you are using an SQL Server, MySql or PostgreSQL database, create a new empty database.
+10. Browse to your web site address.  The new site wizard will appear, which will guide you through the process of setting up your site.
 
 ## Configure your database provider
 1. Create a new empty database on your database server.
@@ -36,13 +40,14 @@ You can use the command-line command:
 2. Database Provider Configuration:\
 **Automatic Configuration**\
 Nucleus version 1.3 includes a database configuration step in the setup wizard, so you can configure your selected database options without editing 
-configuration files.\
+configuration files, so you can skip this step.\
 **Manual Configuration**\
-In your installation folder, create a new database configuration file.  If you are setting up a production environment, the file should be named 
-`databaseSettings.Production.json`{.file-name}.  If you are setting up a development environment, name your file `databaseSettings.Development.json`{.file-name}. 
+If you are setting up a production environment, a configuration files named `databaseSettings.Production.json`{.file-name} is included in the install set.  
+If you are setting up a development environment, create a new database configuration file named `databaseSettings.Development.json`{.file-name} by copying 
+databaseSettings.json. 
 Refer to the [Configuration Files](https://www.nucleus-cms.com/configuration-files/) page for more information.\
 \
-Edit your new file and add the following, substituting your SQL server name, database name and credentials:
+*SQL Server*: Edit your configuration file and add the following, substituting your SQL server name, database name and credentials:
 ```json
 {
   "Nucleus": {
@@ -81,10 +86,10 @@ will change, as does the format of the [connection string](https://www.connectio
 | Database          | Type       | Connection String                                                                                                                          |
 | ---------         | ---------- | ----------------------------                                                                                                               |
 | Sql Server        | SqlServer  | Data Source=DATABASE-SERVER;Initial Catalog=DATABASE-NAME;User ID=DATABASE-USERNAME;Password=DATABASE-PASSWORD                             |
+| Azure Sql Server  | SqlServer  | Use the connection string from [Azure Portal](https://portal.azure.com).  Select your database, and click "Show database connection strings" in the overview page.     |
 | MySql             | MySql      | Server=DATABASE-SERVER;Database=DATABASE-NAME;uid=DATABASE-USERNAME;pwd=DATABASE-PASSWORD                                                  |
 | MariaDB           | MySql      | Server=DATABASE-SERVER;Database=DATABASE-NAME;uid=DATABASE-USERNAME;pwd=DATABASE-PASSWORD                                                  |
 | PostgreSQL        | PostgreSql | Server=DATABASE-SERVER;Database=DATABASE-NAME;User Id=DATABASE-USERNAME;Password=DATABASE-PASSWORD;                                        |
-| Azure Sql Server  | SqlServer  | Use the connection string from [Azure Portal](https://portal.azure.com).  Select your database, and click "Show database connection strings" in the overview page.     |
 
 > The database type for MariaDb is 'MySql'.  MariaDb is [based on MySql](https://en.wikipedia.org/wiki/MariaDB) and uses the same database provider.
 
@@ -96,7 +101,8 @@ and a Local File System provider, so that you can use both.  If you are hosting 
 after you have set up the site.
 
 1.  **Automatic Configuration:**\
-Nucleus version 1.3 includes a file system(s) configuration step in the setup wizard, so you can configure your file system selections without editing configuration files. 
+Nucleus version 1.3 includes a file system(s) configuration step in the setup wizard, so you can configure your file system selections without editing 
+configuration files and can skip this step. 
 
 2.  **Manual Configuration:**
     * In your installation folder, edit your environment application configuration file, or create one if it does not exist.  If you are setting up a production environment, 

@@ -16,13 +16,11 @@
           To begin installation, click 'Select File' and select your extension file package.
         </div>
 
-        <div class="nucleus-form-tools">
-          <div class="btn btn-primary">
-            <label>
-              <span class="nucleus-material-icon">&#xe2c6</span> Select File
-              <input type="file" name="extensionFile" class="collapse" accept=".zip">
-            </label>
-          </div>
+        <div class="nucleus-form-tools">          
+          <label class="btn btn-primary d-flex">
+            <span class="nucleus-material-icon me-1">&#xe2c6</span> Select File
+            <input type="file" name="extensionFile" class="collapse" accept=".zip">
+          </label>          
 
           <div class="Restart">
             <a href="@Url.AreaAction("Index", "Extensions", "Admin")" class="btn btn-secondary" data-target=".nucleus-adminpage">Install another Extension</a>

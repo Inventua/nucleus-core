@@ -18,6 +18,7 @@ using Nucleus.Data.Common;
 using DocumentFormat.OpenXml.InkML;
 using static Nucleus.Web.ViewModels.Setup.SiteWizard;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Nucleus.Web.ViewModels.Setup;
 
 namespace Nucleus.Web.Controllers.Setup;
 
@@ -133,6 +134,7 @@ public class SiteWizardController : Controller
       viewModel.DatabaseConnectionString = "";
     }
 
+    ModelState.Clear();
     return View("_Database", await BuildViewModel(viewModel, ReadFlags.DatabaseProviders));
   }
 
@@ -533,7 +535,7 @@ public class SiteWizardController : Controller
     if (flags.HasFlag(ReadFlags.Templates))
     {
       viewModel.Templates = new();
-      foreach (FileInfo templateFile in TemplatesFolder().EnumerateFiles("*.xml"))
+      foreach (FileInfo templateFile in TemplatesFolder().EnumerateFiles("*.xml").OrderBy(file => file.Name).ToList())
       {
         using (System.IO.Stream stream = templateFile.OpenRead())
         {
@@ -544,7 +546,17 @@ public class SiteWizardController : Controller
             template.Name = System.IO.Path.GetFileNameWithoutExtension(templateFile.Name).Replace('-', ' ');
           }
 
-          viewModel.Templates.Add(new ViewModels.Setup.SiteWizard.SiteTemplate(template.Name, template.Description, templateFile.Name));
+          SiteWizard.SiteTemplate templateItem = new(template.Name, template.Description, templateFile.Name);
+
+          // templates are sorted by file name, but the default template is always first
+          if (templateFile.Name.Equals("default-site-template.xml", StringComparison.Ordinal))
+          {
+            viewModel.Templates.Insert(0, templateItem);
+          }
+          else
+          { 
+            viewModel.Templates.Add(templateItem);
+          }
         }
       }
 
@@ -577,10 +589,10 @@ public class SiteWizardController : Controller
             .ToList();
 
           layoutsInTemplate = template.Pages
-                .Where(page => page.LayoutDefinition != null)
-                .Select(page => page.LayoutDefinition)
-                .Distinct()
-                .ToList();
+            .Where(page => page.LayoutDefinition != null)
+            .Select(page => page.LayoutDefinition)
+            .Distinct()
+            .ToList();
 
           if (template.Site.DefaultLayoutDefinition != null)
           {

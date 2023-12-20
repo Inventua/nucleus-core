@@ -73,6 +73,16 @@
   width: 28rem;
 }
 
+#site-wizard .default-template-icon
+{
+  color: #ec811b;
+}
+
+#site-wizard .active .default-template-icon
+{
+  color: white;
+}
+
 #site-wizard .installable-package
 {
 	margin-bottom: 0.5rem;

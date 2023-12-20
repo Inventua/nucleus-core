@@ -15,16 +15,16 @@ Choose Ubuntu Server 20.04 LTS or later when you are prompted for a Blueprint.
 - [Use the Ubuntu docker image](https://hub.docker.com/_/ubuntu) to run Ubuntu in [Docker](https://www.docker.com/). 
 
 ## Nucleus Installation
-1.  Connect to a terminal session.  
-Once you have installed Linux, log in as an admin user.  If you are using a PC or Raspberry Pi, you will need to connect a 
+1.  Connect to a SSH or terminal session.  
+Once you have installed Linux, log in as an admin user.  If you are using a PC or Raspberry Pi, you may need to connect a 
 keyboard and monitor to your machine in order to see its IP address.  If the IP address is not displayed automatically, you can log in
 and view the IP address by using the <kbd>hostname -I</kbd> command.  
 <br />
 If you have [configured SSH](https://ubuntu.com/server/docs/service-openssh) or are using a virtual machine, you can use SSH to 
 connect from another computer:  
-<kbd>ssh your-admin-username@linux-machine-ip-address</kbd>
+<kbd>ssh your-admin-username@linux-machine-name-or-ip-address</kbd>
 
-2.  Create a temporary directory for installation assets and navigate to it:  
+2.  Create a temporary directory in the root user's home directory for Nucleus installation assets and navigate to it:  
 <kbd>mkdir nucleus-install-files</kbd>
 <br/>
 <kbd>cd nucleus-install-files</kbd>
@@ -32,10 +32,11 @@ connect from another computer:
 3.  Download the installer shell script and installation file:  
 <kbd>wget https://github.com/Inventua/nucleus-core/tree/main/Nucleus.Web/Utils/Ubuntu/nucleus-install.sh > nucleus-install.sh</kbd>
 <br/>
-<kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v1.1.0/Nucleus.1.1.0.0.Install.zip > Nucleus.1.1.0.0.Install.zip</kbd>  
+<kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v1.1.0/Nucleus.1.3.0.0.Install.zip > Nucleus.1.3.0.0.Install.zip</kbd>  
 <br />
 If you are installing a later version of Nucleus, download the zip file for that version instead - the installer shell script automatically 
-checks the folder which contains the shell script for the zip file with the most recent version of Nucleus.
+checks the folder which contains the shell script for the zip file with the most recent version of Nucleus. 
+[Download the latest Nucleus version](https://github.com/Inventua/nucleus-core/releases/latest)
 
 4.  Run the installer shell script:  
 <kbd>sudo bash ./nucleus-install.sh</kbd>
@@ -48,8 +49,9 @@ configured, so you can't log in as this user.
 <br />
 <br />
 **_TIP:_**   If you are installing to a Linux distribution other than Ubuntu Linux, some parts of the shell script may not work, because
-different Linux distributions use different commands to install packages.  You can work around this issue by [installing the ASP.NET runtime]((https://learn.microsoft.com/en-us/dotnet/core/install/linux) and 
-[unzip package](https://www.tecmint.com/install-zip-and-unzip-in-linux/) before running the script:
+different Linux distributions use different commands to install packages.  In most cases, you can work around this issue by 
+[installing the ASP.NET runtime](https://learn.microsoft.com/en-us/dotnet/core/install/linux) and [unzip package](https://www.tecmint.com/install-zip-and-unzip-in-linux/) 
+before running the script:
 <br />
 <br />
 
@@ -64,7 +66,7 @@ For a fresh install you will not generally need to specify any command-line opti
 | -t,  --target-directory          | Override the default application path (/home/nucleus).  If used in combination with `--createuser true` (the default), the specified directory will be assigned as the user's home directory.    |
 
 Example:  
-<kbd>sudo bash ./nucleus-install.sh --zipfile Nucleus.2.0.0.0.Install.zip --target-directory /home/services/nucleus-production</kbd>
+<kbd>sudo bash ./nucleus-install.sh --zipfile Nucleus.1.3.0.0.Install.zip --target-directory /home/services/nucleus-production</kbd>
 
 5.  Test your installation.  
 Use a device with a web browser to test your site.  You will need the IP address of your server, or its host name.  By default, 
@@ -106,15 +108,16 @@ Nucleus to run Kestrel using different ports (8080/8443) by editing `/home/nucle
 
 Locate the Kestrel section, and set the port for the Http endpoint and Https endpoints.
 
-> **_NOTE:_**   Linux will not let you use port numbers < 1024, because only the root user can use those ports.  Use a reverse 
-proxy if you want to listen on ports 80/443.
+> **_NOTE:_**   Linux will not let you use port numbers less than 1024, because only the root user can use those ports.  Use a reverse 
+proxy if you want to use the conventional web server ports 80 and 443.
 
 ### Set up a certificate and configure https
 
 #### Create a self-signed Certificate 
 This command will create a self-signed certficate with no subject defined.  A self-signed certificate is useful in a testing or 
-development environment, but is not useful for a production environment.  When you browse to your site, you will have to ignore 
-or disable security warnings, or "trust" the certificate in your browser, as it is not issued by a recognized certification authority.  
+development environment, but is not useful for a production environment, because your browser will display a security warning.  When you 
+browse to your site, you will have to ignore or disable security warnings, or "trust" the certificate in your browser, as it is not issued by 
+a recognized certification authority.  
 
 <kbd>sudo openssl req -nodes -new -keyout nucleus.key -x509 -days 365 -out nucleus.crt -subj "/"</kbd>
 
@@ -138,15 +141,15 @@ Add or un-comment the following setting in Kestrel:Endpoints section.  In the de
 present (commented out), so you can just un-comment the section and fill in the password:
 
       "HttpsInlineCertAndKeyFile": {
-        "Url": "https://*:5001",  // or "https://your-hostname-here:5001" if you want to specify a host name
+        "Url": "https://*:5001",  // or "https://your-hostname:5001" if you want to specify a host name
         "Certificate": {
           "Path": "/home/nucleus/certs/nucleus.crt",
           "KeyPath": "/home/nucleus/certs/nucleus.key",
-          "Password": "your-certificate password-here"
+          "Password": "your-certificate password"
         }
 
         
-#### Nginx Walkthrough
+### Nginx Walkthrough
 Follow the steps in this section if you want to install and configure Nginx as a reverse proxy.
 
 Install:  
@@ -155,7 +158,8 @@ Install:
 Create configuration file:  
 <kbd>sudo nano /etc/nginx/sites-enabled/nucleus</kbd>
 
-Insert these settings.  If you have not created a certificate, omit or comment out the two `listen` commands which refer to port 443, and the `ssl_certificate` lines:
+Insert these settings.  If you have not created a certificate, omit or comment out the two `listen` commands which refer to port 443, and the two 
+`ssl_certificate` lines:
 
 ```
 server {
@@ -179,6 +183,7 @@ server {
     }
 }
 ```
+To comment out a line, add # to the start of the line. 
 
 Remove the default configuration file:  
 <kbd>sudo rm /etc/nginx/sites-enabled/default</kbd>

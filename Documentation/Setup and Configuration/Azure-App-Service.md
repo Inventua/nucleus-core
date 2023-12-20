@@ -28,19 +28,49 @@ FTP information.
 
 9.  Un-zip the install package (zip file) locally, then upload the files to your Azure /site/wwwroot folder.
 
-10.  Edit the `databaseSettings.json`{.file-name} file, or copy the existing `databaseSettings.json`{.file-name} file to 
-`databaseSettings.Production.json`{.file-name} or `databaseSettings.Development.json`{.file-name}.  Paste your database 
-connection string in to the CoreSqlServer connection string, and alter the existing Schemas connection key named 
-"*" from "CoreSqlite" to "CoreSqlServer". 
+10.  The Nucleus setup wizard can automatically set up your database configuration, so you can skip this step and paste your database connection string 
+into the wizard when prompted.  
+\
+If you want to manually configure your database settings, edit `databaseSettings.Production.json`{.file-name} 
+or `databaseSettings.Development.json`{.file-name}.  If you are setting up a development environment you will need to create a 
+`databaseSettings.Development.json`{.file-name} file.  Use the template below and copy/paste your Azure database connection string in to 
+the `ConnectionString` setting. 
+```json
+{
+  "Nucleus": {
+    "Database": {
+      "Connections": [
+        // Database connections are available to the core and extensions, but must be configured in the Schemas 
+        // section in order to be used.
+        {
+          "Key": "nucleus-azure",
+          "Type": "SqlServer",
+          "ConnectionString": "[copy your connection string from Azure Portal]"
+        }
+      ],
+      "Schemas": [
+        {
+          // A name of "*" makes this schema the default.  The ConnectionKey value must match a Key from the Connections
+          // section.
+          "Name": "*",
+          "ConnectionKey": "nucleus-azure"
+        }
+      ]
+    }
+  }
+}
+```
 
 11.  Create an Azure storage account.
 
 12.  In Azure Portal, open your storage account, select "Access Keys" from the "Security+Networking" submenu and click the "Show Keys"
 link.  Click the copy button next to the first connection string to copy it to the clipboard.
 
-13.  Edit the `appSettings.json`{.file-name} file, or copy the existing `appSettings.json`{.file-name} file to 
-`appSettings.Production.json`{.file-name} or `appSettings.Development.json`{.file-name}.  Locate the Nucleus/FileSystems/Providers 
-section, remove the default provider and add your Azure storage account.  
+13.  The Nucleus setup wizard can automatically set up your file system configuration, so you can skip this step and paste your Azure Storage 
+connection string into the wizard when prompted.  
+\
+If you want to manually configure your file system provider, edit `appSettings.Production.json`{.file-name} or `appSettings.Development.json`{.file-name}. 
+Locate the Nucleus/FileSystems/Providers section and add a setting for your Azure storage account.  
 ```json
 "FileSystems": {
   "Providers": [
@@ -48,8 +78,8 @@ section, remove the default provider and add your Azure storage account.
     // will be presented with a list.  The "Name" property is shown to the user.  Each entry has a key which uniquely identifies 
     // the provider entry.
     {
-      "Key": "My-Azure-Storage",
-      "Name": "My-Azure-Storage",
+      "Key": "Azure-Storage",
+      "Name": "Azure-Storage",
       "ProviderType": "Nucleus.Extensions.AzureBlobStorageFileSystemProvider.FileSystemProvider,Nucleus.Extensions.AzureBlobStorageFileSystemProvider",
       "ConnectionString": "DefaultEndpointsProtocol=https;AccountName=your-account-name;AccountKey=your-account-key;EndpointSuffix=core.windows.net",
       "RootPath": "my-container/my-nucleus-root-folder"
@@ -59,13 +89,13 @@ section, remove the default provider and add your Azure storage account.
 
 > If you want to use a specific container, or container/sub-folder as your root for Nucleus file storage, set the `RootPath` configuration 
 property to your container name (and optionally, a sub-folder).  If you want Nucleus to be able to access all containers and 
-folders within your Azure storage service, you can set the `RootPath` value to an empty string, or omit the setting. 
+folders within your Azure storage service, you can set the `RootPath` value to an empty string, or remove the setting. 
 
 14.  Nucleus writes logs, cache and other files to sub-folders of `%ProgramData%\Nucleus` by default.  In Windows, this 
 is `C:\ProgramData\Nucleus`{.file-name}, which is an appropriate location for the files.  In an Azure App Service, 
 `%ProgramData%\Nucleus`{.file-name} is mapped to `\local\ProgramData`{.file-name}, which is treated as temporary storage 
 and is reset every time your Azure App Service is restarted.  This is not ideal for logs, so you should configure Nucleus 
-to save log files within the Azure `%HOME%` folder.  
+to save log files within the Azure `%HOME%` folder.  [Understanding the Azure App Service file system](https://github.com/projectkudu/kudu/wiki/Understanding-the-Azure-App-Service-file-system)  
 \
 Edit the `appSettings.json`{.file-name} or `appSettings.Production.json`{.file-name} file.  Locate the FolderOptions section, 
 which is commented out by default.  Remove the comments, and set Nucleus:FolderOptions:DataFolder to 
@@ -83,8 +113,6 @@ which is commented out by default.  Remove the comments, and set Nucleus:FolderO
 other Nucleus data because files stored within `/App_Data`{.file-name} are never directly served by IIS.  The 
 `/site/wwwroot/`{.file-name} folder is the Azure App Service `%HOME%` directory, which Azure App Service treats as persistent 
 storage.  
-
-See Also:  [Understanding the Azure App Service file system](https://github.com/projectkudu/kudu/wiki/Understanding-the-Azure-App-Service-file-system)
 
 15.  Get your site Url from the Azure portal by clicking "App services", then selecting your App Service.  Click the site Url to 
 launch your site.

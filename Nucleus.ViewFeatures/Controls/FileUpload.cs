@@ -47,7 +47,7 @@ namespace Nucleus.ViewFeatures.Controls
 			{				
         ControlName = controlName ?? "mediaFile",
         Text = text ?? "Upload File",
-        CssClass = cssClass ?? "btn btn-secondary ms-auto",
+        CssClass = cssClass ?? "btn btn-secondary btn-sm ms-auto align-items-center",
         ActionName = actionName ?? "UploadFile",
 				ControllerName = (string)this.ViewContext.RouteData.Values["controller"],
 				AreaName = (string)this.ViewContext.RouteData.Values["area"],

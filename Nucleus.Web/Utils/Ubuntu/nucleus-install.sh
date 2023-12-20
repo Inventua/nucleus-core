@@ -21,7 +21,7 @@ INSTALL_ZIPFILE=""
 INSTALL_TYPE=""
 UNZIP_PACKAGE="unzip"
 TARGET_DIRECTORY="/home/nucleus"
-SHELL_SCRIPT_VERSION="2023.09"
+SHELL_SCRIPT_VERSION="2023.12"
 
 printf "Nucleus installer shell script version %s. \n\n" "$SHELL_SCRIPT_VERSION"
 
@@ -329,6 +329,9 @@ chown -R :$SERVICE_ACCOUNT "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Exte
 chmod -R u+rwX "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
 # Set read and directory execute permissions, remove write access for group (service account)
 chmod -R g+rX-w "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
+
+# allow nucleus to modify the production config files (the wizard and log settings screens write config settings)
+chmod -R g+rw "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]/appSettings.Production.json" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]/databaseSettings.Production.json"
 
 # Nucleus must have read, write and execute permissions to /Extensions in order to install Extensions
 # Nucleus must have read, write and execute permissions to /Setup because we create install-log.config to indicate that the setup wizard has completed

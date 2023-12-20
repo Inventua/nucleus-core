@@ -1,5 +1,5 @@
 {
-  "$schema": "./nucleus.schema.json",
+  "$schema": "./config.schema.json",
   "Nucleus": {
     "Database": {
       "Connections": [

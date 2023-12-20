@@ -17,7 +17,7 @@ namespace Nucleus.Core.Managers
 	/// Provides functions to manage database data for <see cref="Site"/>s and <see cref="SiteAlias"/>es.
 	/// </summary>
 	public class SiteManager : ISiteManager
-	{		
+	{
 		private IDataProviderFactory DataProviderFactory { get; }
 		private ICacheManager CacheManager { get; }
 		private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
@@ -72,7 +72,7 @@ namespace Nucleus.Core.Managers
 		public async Task<Site> Get(Microsoft.AspNetCore.Http.HostString requestUri, string pathBase)
 		{
 			string siteDetectCacheKey = (requestUri + "^" + pathBase).ToLower();
-						
+
 			Guid id = await this.CacheManager.SiteDetectCache().GetAsync(siteDetectCacheKey, async siteDetectCacheKey =>
 			{
 				using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
@@ -125,7 +125,7 @@ namespace Nucleus.Core.Managers
 				return await provider.GetSiteAlias(id);
 			}
 		}
-		
+
 		/// <summary>
 		/// Returns an existing <see cref="UserProfileProperty"/>
 		/// </summary>
@@ -148,11 +148,11 @@ namespace Nucleus.Core.Managers
 		{
 			UserProfileProperty previousProp = null;
 			UserProfileProperty thisProp;
-		
+
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
 			{
 				thisProp = await this.GetUserProfileProperty(id);
-			
+
 				List<UserProfileProperty> properties = await provider.ListSiteUserProfileProperties(site.Id);
 
 				properties.Reverse();
@@ -173,7 +173,7 @@ namespace Nucleus.Core.Managers
 
 							// Properties are cached as part of their site, so we have invalidate the cache for the site
 							this.CacheManager.SiteCache().Remove(site.Id);
-							
+
 							// User properties are cached as part of user proerty values, so we have to invalidate the cache
 							// for ALL users when a site's user properties change
 							this.CacheManager.UserCache().Clear();
@@ -364,7 +364,7 @@ namespace Nucleus.Core.Managers
 			System.IO.MemoryStream serializedSite = new();
 
 			Nucleus.Abstractions.Models.Export.SiteTemplate export = new();
-			
+
 			export.Site = site;
 
 			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
@@ -376,7 +376,7 @@ namespace Nucleus.Core.Managers
 
 			using (IScheduledTaskDataProvider provider = this.DataProviderFactory.CreateProvider<IScheduledTaskDataProvider>())
 			{
-				export.ScheduledTasks = await provider.ListScheduledTasks();				
+				export.ScheduledTasks = await provider.ListScheduledTasks();
 			}
 
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
@@ -390,7 +390,7 @@ namespace Nucleus.Core.Managers
 			using (IContentDataProvider provider = this.DataProviderFactory.CreateProvider<IContentDataProvider>())
 			{
 				export.Contents = new();
-				foreach (PageModule pageModule in export.Pages.SelectMany(page=>page.Modules))
+				foreach (PageModule pageModule in export.Pages.SelectMany(page => page.Modules))
 				{
 					export.Contents.AddRange(await provider.ListContent(pageModule));
 				}
@@ -404,7 +404,7 @@ namespace Nucleus.Core.Managers
 			using (IUserDataProvider provider = this.DataProviderFactory.CreateProvider<IUserDataProvider>())
 			{
 				export.RoleGroups = new(await provider.ListRoleGroups(site));
-				
+
 				// don't include special site roles as these are imported from the Sites entity
 				export.Roles = (await provider.ListRoles(site))
 					.Where(role => role != site.RegisteredUsersRole && role != site.AdministratorsRole && role != site.AllUsersRole && role != site.AnonymousUsersRole).ToList();
@@ -412,7 +412,7 @@ namespace Nucleus.Core.Managers
 
 			using (IMailDataProvider provider = this.DataProviderFactory.CreateProvider<IMailDataProvider>())
 			{
-				export.MailTemplates = new (await provider.ListMailTemplates(site));
+				export.MailTemplates = new(await provider.ListMailTemplates(site));
 			}
 
 			// serialize the export data to XML
@@ -443,7 +443,7 @@ namespace Nucleus.Core.Managers
 						case nameof(LayoutDefinition):   // nameof(Page.LayoutDefinition):
 						case nameof(Site.DefaultLayoutDefinition):
 						case nameof(Site.DefaultContainerDefinition):  // nameof(Page.DefaultContainer), case nameof(Site.DefaultContainer),	nameof(PageModule.ContainerDefinition)					
-							// skip these node types, as they are all Guids that must be the same across all sites
+																													 // skip these node types, as they are all Guids that must be the same across all sites
 							break;
 
 						default:
@@ -454,7 +454,7 @@ namespace Nucleus.Core.Managers
 							{
 								xmlData = xmlData.Replace(idValue, $"{{$guid{tokenIndex}}}");
 							}
-							
+
 							tokenIndex++;
 							break;
 					}
@@ -462,7 +462,7 @@ namespace Nucleus.Core.Managers
 			}
 
 			// convert the string back to a stream and return
-			return new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(xmlData));			
+			return new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(xmlData));
 		}
 
 		private async Task<List<Page>> GetPagesSortedByHierachy(Site site, Page parentPage)
@@ -475,7 +475,7 @@ namespace Nucleus.Core.Managers
 				foreach (Page child in await provider.ListPages(site.Id, parentPage?.Id))
 				{
 					pages.Add(child);
-					pages.AddRange(await GetPagesSortedByHierachy(site, child));					
+					pages.AddRange(await GetPagesSortedByHierachy(site, child));
 				}
 			}
 
@@ -511,7 +511,7 @@ namespace Nucleus.Core.Managers
 
 			await this.Save(template.Site);
 			await this.SaveAlias(template.Site, template.Site.DefaultSiteAlias);
-						
+
 			foreach (UserProfileProperty property in template.Site.UserProfileProperties)
 			{
 				await SaveUserProfileProperty(template.Site, property);
@@ -547,8 +547,9 @@ namespace Nucleus.Core.Managers
 			{
 				foreach (Nucleus.Abstractions.Models.Mail.MailTemplate mailTemplate in template.MailTemplates)
 				{
+					mailTemplate.Body = TrimStrings(mailTemplate.Body);
 					await provider.SaveMailTemplate(template.Site, mailTemplate);
-				}				
+				}
 			}
 
 			using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
@@ -582,7 +583,7 @@ namespace Nucleus.Core.Managers
 			// can't set the DefaultSiteAlias on add.  Same for roles, they aren't added until after the site has been created.
 			// So we need to call .Save again in order to do an update, to set the default alias and system roles.
 			await this.Save(template.Site);
-			
+
 			return template.Site;
 		}
 
@@ -600,7 +601,7 @@ namespace Nucleus.Core.Managers
 			// Replace the GUID tokens with newly-generated guids
 			const string idRegEx = "({\\$guid[0-9]+})";
 			System.Text.RegularExpressions.MatchCollection idMatches = System.Text.RegularExpressions.Regex.Matches(xmlData, idRegEx, System.Text.RegularExpressions.RegexOptions.ECMAScript);
-						
+
 			foreach (System.Text.RegularExpressions.Match match in idMatches)
 			{
 				if (match.Success && match.Groups.Count > 1)
@@ -614,7 +615,7 @@ namespace Nucleus.Core.Managers
 			return Task.FromResult(serializer.Deserialize(new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(xmlData))) as Nucleus.Abstractions.Models.Export.SiteTemplate);
 		}
 
-		public Task<string> SaveTemplateTempFile( Nucleus.Abstractions.Models.Export.SiteTemplate template)
+		public Task<string> SaveTemplateTempFile(Nucleus.Abstractions.Models.Export.SiteTemplate template)
 		{
 			string templateTempFileName = Guid.NewGuid().ToString();
 			string templateTempFileFullName = System.IO.Path.Combine(this.FolderOptions.Value.GetTempFolder(), templateTempFileName);
@@ -637,6 +638,40 @@ namespace Nucleus.Core.Managers
 			{
 				return Task.FromResult(serializer.Deserialize(stream) as Nucleus.Abstractions.Models.Export.SiteTemplate);
 			}
+		}
+
+		/// <summary>
+		/// String values parsed from XML can contain additional spaces and CR/LF characters - remove them.
+		/// </summary>
+		/// <param name="content"></param>
+		private static string TrimStrings(string content)
+		{
+			string result = content;
+
+			// Remove new lines from the start
+			result = System.Text.RegularExpressions.Regex.Replace(result, "^[\n]*", "", System.Text.RegularExpressions.RegexOptions.Singleline);
+
+			// Remove new lines from the end
+			result = System.Text.RegularExpressions.Regex.Replace(result, "[\n]*$", "", System.Text.RegularExpressions.RegexOptions.Singleline);
+
+			//// Treat tabs as two spaces
+			//result = result.Replace("\t", "  ");
+
+			// Count the whitespace characters at the start of the first line
+			string firstLine = result.Split(new char[] { '\r', '\n' }).FirstOrDefault();
+			if (firstLine == null) return result;
+
+			// Count the spaces
+			int spaceCount = firstLine.TakeWhile(Char.IsWhiteSpace).Count();
+
+			//// Remove leading spaces 
+			//result = System.Text.RegularExpressions.Regex.Replace(result, $"^[ ]{{{spaceCount}}}", "", System.Text.RegularExpressions.RegexOptions.Multiline);
+
+			// https://stackoverflow.com/questions/25954446/remove-extra-whitespaces-but-keep-new-lines-using-a-regular-expression-in-c-sha
+			// Removes the number of leading spaces depending on the first line but leaves extra spaces/tab/newlines intact
+			result = System.Text.RegularExpressions.Regex.Replace(result, $@"^[^\S\r\n\t]{{0,{spaceCount}}}", "", System.Text.RegularExpressions.RegexOptions.Multiline);
+
+			return result;
 		}
 	}
 }

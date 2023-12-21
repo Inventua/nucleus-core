@@ -119,10 +119,10 @@ namespace Nucleus.Web
     {
       try
       {
+        services.AddStartupLogger(this.Configuration);
+
         // This must be called before .AddStartupLogger, because the TextFileLogger uses its values.
         services.AddFolderOptions(this.Configuration);
-
-        services.AddStartupLogger(this.Configuration);
 
         services.Logger().LogInformation(new[]
         {

@@ -331,7 +331,7 @@ chmod -R u+rwX "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
 chmod -R g+rX-w "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
 
 # allow nucleus to modify the production config files (the wizard and log settings screens write config settings)
-chmod -R g+rw "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]/appSettings.Production.json" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]/databaseSettings.Production.json"
+chmod -R g+rw "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/appSettings.Production.json" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/databaseSettings.Production.json"
 
 # Nucleus must have read, write and execute permissions to /Extensions in order to install Extensions
 # Nucleus must have read, write and execute permissions to /Setup because we create install-log.config to indicate that the setup wizard has completed

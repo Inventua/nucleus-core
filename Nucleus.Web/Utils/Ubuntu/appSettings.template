@@ -59,7 +59,7 @@
           "Key": "local",
           "Name": "Local",
           "ProviderType": "Nucleus.Core.FileSystemProviders.LocalFileSystemProvider,Nucleus.Core",
-          "RootFolder": "{DataFolder}//Content"
+          "RootFolder": "{DataFolder}/Content"
         }
       ]
     }

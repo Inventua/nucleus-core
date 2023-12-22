@@ -20,7 +20,7 @@
       </moduleDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />
-      <file name="Sitemap.css" />
+      <file name="sitemap.css" />
       <folder name="Bin">
         <file name="Nucleus.Modules.Sitemap.dll" />
       </folder>

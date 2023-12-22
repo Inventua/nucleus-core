@@ -537,7 +537,7 @@ namespace Nucleus.Web.Controllers.Admin
         }
       }
 
-      return results;
+      return results.OrderBy(package => package.name).ToList();
     }
 
     private class SubscriberResponse

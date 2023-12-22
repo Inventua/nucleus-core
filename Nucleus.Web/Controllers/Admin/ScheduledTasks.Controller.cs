@@ -92,7 +92,7 @@ public class ScheduledTasksController : Controller
       }
       else
       {
-        if (viewModel.LatestHistory.FinishDate > DateTime.UtcNow.AddMinutes(-1))
+        if (viewModel.LatestHistory?.FinishDate > DateTime.UtcNow.AddMinutes(-1))
         {
           viewModel.Progress = new() { Status = viewModel.LatestHistory.Status };
         }

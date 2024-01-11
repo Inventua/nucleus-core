@@ -225,11 +225,6 @@
 	background-color: #111;		
 }
 
-/*.nucleus-control-panel-sidebar li, .nucleus-control-panel-sidebar li:hover, .nucleus-control-panel-sidebar li:active, .nucleus-control-panel-sidebar li a
-{
-	color: white;
-}*/
-
 .nucleus-control-panel-sidebar li.SystemIcon
 {
 	background-color: #0A0A0A;
@@ -530,24 +525,10 @@ ul.nucleus-control-panel-items button
   display: flex;
 }
 
-/*
-.nucleus-index-items li a, .nucleus-index-items .nucleus-get-childpages, .nucleus-index-items .nucleus-hide-childpages
-{
-	border: solid transparent 2px;	
-}*/
-
 .nucleus-index-items li a:first-child, .nucleus-page-list li a:first-child
 {
 	flex-grow: 1;
 }
-
-/*.nucleus-index-items a:hover, .nucleus-index-items a:focus
-{
-	background-color: #CCC;
-	border-radius: 4px;
-	color: white;
-}*/
-
 
 .nucleus-index-items ul li a, .nucleus-index-items ul li button.btn.btn-none,
 .nucleus-page-list ul li a, .nucleus-page-list ul li button.btn.btn-none
@@ -808,27 +789,35 @@ ul.nucleus-control-panel-items button
 	vertical-align: top;
 }
 
-.nucleus-adminpage .ExtensionInstaller .InstalledExtensions tr:not(:first-child)
+.nucleus-adminpage .ExtensionInstaller .InstalledExtensions > div
 {
+  display: flex;
+  flex-direction: column;
   background-color: #f0f0f0;
-	border-bottom: 1rem solid white;
+  border: solid 1px #999;
+	margin-bottom: 0.5rem;
+  padding: 0.5rem;
 }
 
-.nucleus-adminpage .ExtensionInstaller .InstalledExtensions tr:not(:first-child) td
+.nucleus-adminpage .ExtensionInstaller .InstalledExtensions > div h3
 {
-  padding: 0.75rem;
-	
+  display: inline-block;
 }
 
-.nucleus-adminpage .ExtensionInstaller .InstalledExtensions tr:last-child
+.nucleus-adminpage .ExtensionInstaller .InstalledExtensions .nucleus-small-cell
 {
-	border-bottom: none;
+  margin-left: 2rem;
+  width: auto;
 }
 
-.nucleus-adminpage .ExtensionInstaller .InstalledExtensions td
+.nucleus-adminpage .ExtensionInstaller .InstalledExtensions > div > div:first-child
 {
-	vertical-align: top;
-	padding: 4px;
+  display: flex;  
+}
+
+.nucleus-adminpage .ExtensionInstaller .InstalledExtensions > div > div:first-child > div:first-child
+{
+  flex: 1;
 }
 
 .nucleus-adminpage .ExtensionInstaller .nucleus-package-readme,
@@ -845,11 +834,6 @@ ul.nucleus-control-panel-items button
 	padding: 0.5rem;
 	overflow: auto;
 }
-
-/*.nucleus-adminpage .FileBrowser label
-{
-  cursor: pointer;
-}*/
 
 .nucleus-adminpage .Restart
 {

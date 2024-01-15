@@ -496,7 +496,8 @@ function _Page()
     }
 
     if (typeof (event.originalEvent) !== 'undefined' && typeof (event.originalEvent.submitter) !== 'undefined')
-    {
+		{
+			jQuery(event.originalEvent.submitter).prop('disabled', true);
       var formAction = jQuery(event.originalEvent.submitter).attr('formaction');
       if (typeof (formAction) !== 'undefined' && formAction !== '')
       {
@@ -558,12 +559,14 @@ function _Page()
         processData: (form.attr('enctype') === 'multipart/form-data') ? false : true,
         contentType: (form.attr('enctype') === 'multipart/form-data') ? false : 'application/x-www-form-urlencoded; charset=UTF-8',
         success: function (data, status, request)
-        {
+				{
+					jQuery(event.originalEvent.submitter).prop('disabled', false);
           _render(target, eventTarget, data, url, event, status, request);
           form.trigger('success', [target, data, url, event, status, request]);
         },
         error: function (request, status, message)
-        {
+				{
+					jQuery(event.originalEvent.submitter).prop('disabled', false);
           _handleError(target, eventTarget, url, event, status, message, request);
           form.trigger('error', [target, url, event, status, message, request]);
         }

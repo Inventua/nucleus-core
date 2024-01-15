@@ -477,10 +477,13 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 			switch (sortKey.ToLower())
 			{
-				default: 
-					query = query
-						.OrderByDescending(post => post.IsPinned)
-						.ThenByDescending(post => post.DateAdded);
+				default:
+          query = query
+            .OrderByDescending(post => post.IsPinned)
+            .ThenByDescending
+            (
+              post => post.Replies.Any() ? post.Replies.OrderByDescending(reply => reply.DateAdded).Take(1).FirstOrDefault().DateAdded : post.DateAdded
+            );
 					break;
 			}
 
@@ -795,11 +798,33 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 		public async Task DeleteForumPostReply(Reply reply)
 		{
-			this.Context.Replies.Remove(reply);
-			await this.Context.SaveChangesAsync<Reply>();
-		}
+      await DeleteForumPostReplyChildren(reply.Id);
 
-		public async Task SaveForumPostReply(Post post, Reply reply)
+      this.Context.Replies.Remove(reply);
+      await this.Context.SaveChangesAsync<Reply>();
+    }
+
+    private async Task DeleteForumPostReplyChildren(Guid id)
+    {
+      IList<Reply> replies = await this.Context.Replies
+      .Where(reply => reply.ReplyTo.Id == id)
+      .AsSplitQuery()
+      .AsNoTracking()
+      .ToListAsync();
+
+      if (replies.Any())
+      {
+        // recurse through the children and delete all the replies
+        foreach(Reply reply in replies)
+        {
+          await DeleteForumPostReplyChildren(reply.Id);
+          this.Context.Replies.Remove(reply);
+          await this.Context.SaveChangesAsync<Reply>();
+        }
+      }
+    }
+
+    public async Task SaveForumPostReply(Post post, Reply reply)
 		{
 			Action raiseEvent;
 

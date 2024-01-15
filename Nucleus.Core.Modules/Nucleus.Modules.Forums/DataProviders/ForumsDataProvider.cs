@@ -798,31 +798,46 @@ namespace Nucleus.Modules.Forums.DataProviders
 
 		public async Task DeleteForumPostReply(Reply reply)
 		{
-      await DeleteForumPostReplyChildren(reply.Id);
+      IList<Reply> replies = await this.Context.Replies
+        .Where(childReply => childReply.ReplyTo.Id == reply.Id)
+        .AsSplitQuery()
+        .AsNoTracking()
+        .ToListAsync();
 
+      if (replies.Any())
+      {
+        // recurse through the children until there are no more children
+        foreach (Reply childReply in replies)
+        {
+          await DeleteForumPostReply(childReply);
+        }
+      }
+
+      // Delete all replies from mail queues 
+      await this.DeleteReplyMailQueues(reply);
+      // Remove the reply
       this.Context.Replies.Remove(reply);
       await this.Context.SaveChangesAsync<Reply>();
     }
 
-    private async Task DeleteForumPostReplyChildren(Guid id)
+    private async Task DeleteReplyMailQueues(Reply reply)
     {
-      IList<Reply> replies = await this.Context.Replies
-      .Where(reply => reply.ReplyTo.Id == id)
-      .AsSplitQuery()
-      .AsNoTracking()
-      .ToListAsync();
+      IList<MailQueue> mailQueues = await this.Context.MailQueue
+        .Where(item => item.Reply.Id == reply.Id)
+        .AsSplitQuery()
+        .AsNoTracking()
+        .ToListAsync();
 
-      if (replies.Any())
+      if (mailQueues.Any())
       {
-        // recurse through the children and delete all the replies
-        foreach(Reply reply in replies)
+        foreach (MailQueue mailQueue in mailQueues)
         {
-          await DeleteForumPostReplyChildren(reply.Id);
-          this.Context.Replies.Remove(reply);
-          await this.Context.SaveChangesAsync<Reply>();
+          // Delete the reply mail queues 
+          await this.DeleteMailQueue(mailQueue);
         }
       }
     }
+
 
     public async Task SaveForumPostReply(Post post, Reply reply)
 		{

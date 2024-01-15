@@ -77,7 +77,7 @@
     </fieldset>
 
     <div class="nucleus-form-tools">
-      <input type="submit" formaction="@Url.NucleusAction("SaveForumPost", "Forums", "Forums")" value="Save" class="btn btn-primary btn-sm" data-target=".Forums.parent()" />
+      <input type="submit" formaction="@Url.NucleusAction("SaveForumPost", "Forums", "Forums")" value="Save" class="btn btn-primary btn-sm nucleus-show-progress nucleus-show-progress-after-last-sibling" data-target=".Forums.parent()" />
       @Html.LinkButton("", "Cancel", Url.PageLink(Model.Page, @$"{Model.Forum.Name.FriendlyEncode()}/{(Model.Post.Id == Guid.Empty ? "" : Model.Post.Id)}"), new { @class="btn btn-secondary btn-sm" })
     </div>
   }

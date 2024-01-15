@@ -497,12 +497,12 @@ function _Page()
 
     if (typeof (event.originalEvent) !== 'undefined' && typeof (event.originalEvent.submitter) !== 'undefined')
 		{
-			jQuery(event.originalEvent.submitter).prop('disabled', true);
       var formAction = jQuery(event.originalEvent.submitter).attr('formaction');
       if (typeof (formAction) !== 'undefined' && formAction !== '')
       {
         url = formAction;
         eventTarget = jQuery(event.originalEvent.submitter);
+        jQuery(event.originalEvent.submitter).prop('disabled', true);
       }
 
       var newTarget = jQuery(event.originalEvent.submitter).attr('data-target');
@@ -510,7 +510,7 @@ function _Page()
       {
         targetSelector = newTarget;
         eventTarget = jQuery(event.originalEvent.submitter);
-      }
+		  }
     }
 
     if (typeof targetSelector === 'undefined')
@@ -560,13 +560,13 @@ function _Page()
         contentType: (form.attr('enctype') === 'multipart/form-data') ? false : 'application/x-www-form-urlencoded; charset=UTF-8',
         success: function (data, status, request)
 				{
-					jQuery(event.originalEvent.submitter).prop('disabled', false);
+					eventTarget.prop('disabled', false);
           _render(target, eventTarget, data, url, event, status, request);
           form.trigger('success', [target, data, url, event, status, request]);
         },
         error: function (request, status, message)
 				{
-					jQuery(event.originalEvent.submitter).prop('disabled', false);
+					eventTarget.prop('disabled', false);
           _handleError(target, eventTarget, url, event, status, message, request);
           form.trigger('error', [target, url, event, status, message, request]);
         }
@@ -754,6 +754,18 @@ function _Page()
         else if (triggerControl.hasClass('nucleus-show-progress-before'))
         {
           progress.insertBefore(triggerControl);
+        }
+        else if (triggerControl.hasClass('nucleus-show-progress-after-parent'))
+        {
+          progress.insertAfter(triggerControl.parent());
+        }
+        else if (triggerControl.hasClass('nucleus-show-progress-after-last-sibling'))
+        {
+          progress.insertAfter(triggerControl.parent().children().last());
+        }
+        else if (triggerControl.hasClass('nucleus-show-progress-inside-parent'))
+        {
+          progress.appendTo(triggerControl.parent());
         }
       }, 500);
     }
@@ -1270,6 +1282,18 @@ function _Page()
       if (source.hasClass('nucleus-show-progress-before') || source.hasClass('nucleus-show-progress-after'))
       {
         source.siblings('.nucleus-progress-spinner').remove();
+      }
+      else if (source.hasClass('nucleus-show-progress-after-parent'))
+      {
+        source.parent().siblings('.nucleus-progress-spinner').remove();
+      }
+      else if (source.hasClass('nucleus-show-progress-inside-parent'))
+      {
+        source.parent().find('.nucleus-progress-spinner').remove();
+      }
+      else if (source.hasClass('nucleus-show-progress-after-last-sibling'))
+      {
+        source.parent().children().find('.nucleus-progress-spinner').remove();
       }
       else
       {

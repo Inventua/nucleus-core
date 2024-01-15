@@ -24,7 +24,7 @@ To view the complete thread and reply, please visit:
   }
   else
   {
-    <a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{Model.Forum.Name.FriendlyEncode()}/{@Model.Reply.Post.Id}", true)">@Model.Site.AbsoluteUrl(Model.Page, $"{Model.Forum.Name.FriendlyEncode()}/{Model.Reply.Post.Id}", true)</a>
+    <a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{Model.Forum.Name.FriendlyEncode()}/{@Model.Reply.Post.Id}", true)">@Model.Site.AbsoluteUrl(Model.Page, $"{Model.Forum.Name.FriendlyEncode()}/{Model.Reply.Post.Id}#{Model.Reply.Id}", true)</a>
   }
 </div>
 

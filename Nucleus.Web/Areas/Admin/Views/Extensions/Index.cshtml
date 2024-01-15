@@ -30,80 +30,82 @@
         <ProgressBar caption="Uploading file ..." class="UploadProgress"></ProgressBar>
 
         <h2>Installed Extensions</h2>
-        <table class="InstalledExtensions">
-          <tr>
+        <div class="InstalledExtensions">
+@*           <tr>
             <th>Name</th>
             <th>Version</th>
             <th />
-          </tr>
+          </tr> *@
           @foreach (var extension in Model.InstalledExtensions)
           {
-            <tr>
-              <td>
-                <div><h3>@extension.name</h3></div>
-                <div><a href="@extension.publisher?.url" target="_blank">@extension.publisher?.name</a> <a href="mailto:@extension.publisher?.email" class="nucleus-material-icon EmailIcon">&#xe0be;</a></div>
-                <div>@extension?.description</div>
+            <div>
+              <div>
+                <div>
+                  <span><h3>@extension.name</h3></span>
+                  <span>@extension?.version</span>
+                </div>
+                <div class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("Uninstall", "Extensions", "Admin", new { Id = extension.id })" value="&#xe14c;" data-confirm="This will uninstall the '@extension.name' package, and remove all module instances, scheduled tasks, layouts and containers which are provided by this extension.<br/><br/>Do you want to continue?" class="nucleus-material-icon btn btn-danger" title="Uninstall" data-target=".nucleus-adminpage" /></div>
+              </div>
+              <div><a href="@extension.publisher?.url" target="_blank">@extension.publisher?.name</a> <a href="mailto:@extension.publisher?.email" class="nucleus-material-icon EmailIcon">&#xe0be;</a></div>
+              <div>@extension?.description</div>
 
-                @if (@Model.ExtensionsUsage.ContainsKey(new Guid(extension.id)))
-                {
-                  <div class="d-flex ms-2 gap-4 nucleus-extension-components">
-                    @if (@Model.ExtensionsUsage[new Guid(extension.id)].Modules.Any())
-                    {
-                      <div>
-                        <h4>Modules:</h4>
-                        <ul class="component-list">
-                          @foreach (var moduleUsage in @Model.ExtensionsUsage[new Guid(extension.id)].Modules)
-                          {
-                            <li><a href="@Url.AreaAction("ListUsage", "Extensions", "Admin", new { id = extension.id, itemid = moduleUsage.Id})" data-target="#nucleus-extension-usage">@moduleUsage.Name</a></li>
-                          }
-                        </ul>
-                      </div>
-                    }
-                    @if (@Model.ExtensionsUsage[new Guid(extension.id)].Layouts.Any())
-                    {
-                      <div>
-                        <h4>Layouts:</h4>
-                        <ul class="component-list">
-                          @foreach (var layoutUsage in @Model.ExtensionsUsage[new Guid(extension.id)].Layouts)
-                          {
-                            <li><a href="@Url.AreaAction("ListUsage", "Extensions", "Admin", new { id = extension.id, itemid = layoutUsage.Id})" data-target="#nucleus-extension-usage">@layoutUsage.Name</a></li>
-                          }
-                        </ul>
-                      </div>
-                    }
-                    @if (@Model.ExtensionsUsage[new Guid(extension.id)].Containers.Any())
-                    {
-                      <div>
-                        <h4>Containers:</h4>
-                        <ul class="component-list">
-                          @foreach (var containerUsage in @Model.ExtensionsUsage[new Guid(extension.id)].Containers)
-                          {
-                            <li><a href="@Url.AreaAction("ListUsage", "Extensions", "Admin", new { id = extension.id, itemid = containerUsage.Id})" data-target="#nucleus-extension-usage">@containerUsage.Name</a></li>
-                          }
-                        </ul>
-                      </div>
-                    }
-                    @if (@Model.ExtensionsUsage[new Guid(extension.id)].ControlPanelExtensions.Any())
-                    {
-                      <div>
-                        <h4>Control Panel Extensions:</h4>
-                        <ul class="component-list">
-                          @foreach (var controlPanelExtensionUsage in @Model.ExtensionsUsage[new Guid(extension.id)].ControlPanelExtensions)
-                          {
-                            <li><a href="@Url.AreaAction("ListUsage", "Extensions", "Admin", new { id = extension.id, itemid = controlPanelExtensionUsage.Id})" data-target="#nucleus-extension-usage">@controlPanelExtensionUsage.Name</a></li>
-                          }
-                        </ul>
-                      </div>
-                    }
+              @if (@Model.ExtensionsUsage.ContainsKey(new Guid(extension.id)))
+              {
+                <div class="d-flex ms-2 gap-4 nucleus-extension-components">
+                  @if (@Model.ExtensionsUsage[new Guid(extension.id)].Modules.Any())
+                  {
+                    <div>
+                      <h4>Modules:</h4>
+                      <ul class="component-list">
+                        @foreach (var moduleUsage in @Model.ExtensionsUsage[new Guid(extension.id)].Modules)
+                        {
+                          <li><a href="@Url.AreaAction("ListUsage", "Extensions", "Admin", new { id = extension.id, itemid = moduleUsage.Id})" data-target="#nucleus-extension-usage">@moduleUsage.Name</a></li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                  @if (@Model.ExtensionsUsage[new Guid(extension.id)].Layouts.Any())
+                  {
+                    <div>
+                      <h4>Layouts:</h4>
+                      <ul class="component-list">
+                        @foreach (var layoutUsage in @Model.ExtensionsUsage[new Guid(extension.id)].Layouts)
+                        {
+                          <li><a href="@Url.AreaAction("ListUsage", "Extensions", "Admin", new { id = extension.id, itemid = layoutUsage.Id})" data-target="#nucleus-extension-usage">@layoutUsage.Name</a></li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                  @if (@Model.ExtensionsUsage[new Guid(extension.id)].Containers.Any())
+                  {
+                    <div>
+                      <h4>Containers:</h4>
+                      <ul class="component-list">
+                        @foreach (var containerUsage in @Model.ExtensionsUsage[new Guid(extension.id)].Containers)
+                        {
+                          <li><a href="@Url.AreaAction("ListUsage", "Extensions", "Admin", new { id = extension.id, itemid = containerUsage.Id})" data-target="#nucleus-extension-usage">@containerUsage.Name</a></li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                  @if (@Model.ExtensionsUsage[new Guid(extension.id)].ControlPanelExtensions.Any())
+                  {
+                    <div>
+                      <h4>Control Panel Extensions:</h4>
+                      <ul class="component-list">
+                        @foreach (var controlPanelExtensionUsage in @Model.ExtensionsUsage[new Guid(extension.id)].ControlPanelExtensions)
+                        {
+                          <li><a href="@Url.AreaAction("ListUsage", "Extensions", "Admin", new { id = extension.id, itemid = controlPanelExtensionUsage.Id})" data-target="#nucleus-extension-usage">@controlPanelExtensionUsage.Name</a></li>
+                        }
+                      </ul>
+                    </div>
+                  }
 
-                  </div>
-                }
-              </td>
-              <td>@extension?.version</td>
-              <td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("Uninstall", "Extensions", "Admin", new { Id = extension.id })" value="&#xe14c;" data-confirm="This will uninstall the '@extension.name' package, and remove all module instances, scheduled tasks, layouts and containers which are provided by this extension.<br/><br/>Do you want to continue?" class="nucleus-material-icon btn btn-danger" title="Uninstall" data-target=".nucleus-adminpage" /></td>
-            </tr>
+                </div>
+              }
+            </div>
           }
-        </table>
+        </div>
       }
     </TabPanel>
 

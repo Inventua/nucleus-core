@@ -165,45 +165,30 @@
 }
 
 /* indenting for reply-to-reply levels */
-.Forums .reply.reply-level-1
+.Forums .reply
 {
-  border-left: solid 0.4rem #21A3DA;
+  border-left: solid calc(0.4rem * 08) #21A3DA;
 }
 
-.Forums .reply.reply-level-2
+.Forums .reply.reply-level-0
 {
-  border-left: solid 0.8rem #21A3DA;
+  border-left: dotted 2px #21A3DA;
 }
 
-.Forums .reply.reply-level-3
-{
-  border-left: solid 1.2rem #21A3DA;
-}
-
-.Forums .reply.reply-level-4
-{
-  border-left: solid 1.6rem #21A3DA;
-}
-
-.Forums .reply.reply-level-5
-{
-  border-left: solid 1.8rem #21A3DA;
-}
-
-.Forums .reply.reply-level-6
-{
-  border-left: solid 2.0rem #21A3DA;
-}
-
-.Forums .reply.reply-level-7
-{
-  border-left: solid 2.2rem #21A3DA;
-}
-
-.Forums .reply.reply-level-8
-{
-  border-left: solid 2.4rem #21A3DA;
-}
+.Forums .reply.reply-level-1  { border-left-width: calc(0.4rem * 01)} 
+.Forums .reply.reply-level-2  { border-left-width: calc(0.4rem * 02)} 
+.Forums .reply.reply-level-3  { border-left-width: calc(0.4rem * 03)} 
+.Forums .reply.reply-level-4  { border-left-width: calc(0.4rem * 04)} 
+.Forums .reply.reply-level-5  { border-left-width: calc(0.4rem * 05)} 
+.Forums .reply.reply-level-6  { border-left-width: calc(0.4rem * 06)} 
+.Forums .reply.reply-level-7  { border-left-width: calc(0.4rem * 07)} 
+.Forums .reply.reply-level-8  { border-left-width: calc(0.4rem * 08)} 
+.Forums .reply.reply-level-9  { border-left-width: calc(0.4rem * 09)} 
+.Forums .reply.reply-level-10 { border-left-width: calc(0.4rem * 10)} 
+.Forums .reply.reply-level-11 { border-left-width: calc(0.4rem * 11)} 
+.Forums .reply.reply-level-12 { border-left-width: calc(0.4rem * 12)} 
+.Forums .reply.reply-level-13 { border-left-width: calc(0.4rem * 13)}  
+.Forums .reply.reply-level-14 { border-left-width: calc(0.4rem * 14)} 
 
 .Forums .post .heading, .Forums .reply .heading
 {
@@ -220,11 +205,6 @@
   gap: 4px;
   align-items: flex-end;
 }
-
-/*.Forums .reply .controls *
-{
-  align-self: flex-end;
-}*/
 
 .Forums .body
 {
@@ -299,5 +279,22 @@
   .forum-author
   {
     display: none!important;
+  }
+
+}
+
+/*  Responsive UI  */
+@media screen and (max-width: 760px),
+       screen and (max-height: 600px)
+{
+
+  .Forums .post .heading, .Forums .reply .heading
+  {
+    flex-direction: column;
+  }
+
+  .Forums .post .controls, .Forums .reply .controls
+  {
+    margin-left: 0;
   }
 }

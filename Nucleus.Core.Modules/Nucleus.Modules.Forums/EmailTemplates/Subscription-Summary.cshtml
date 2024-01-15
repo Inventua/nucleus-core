@@ -35,7 +35,7 @@
       @foreach (var reply in forum.Replies)
       {
         <tr>
-          <td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}", true)">@reply.Post.Subject</a></td>
+          <td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}#{Model.Reply.Id}", true)">@reply.Post.Subject</a></td>
           <td>@reply.PostedBy?.UserName</td>
           <td>@reply?.DateAdded</td>
         </tr>

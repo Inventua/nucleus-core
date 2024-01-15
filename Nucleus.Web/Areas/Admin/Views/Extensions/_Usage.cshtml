@@ -14,7 +14,7 @@
   @if (@Model.ExtensionComponents.PageCount > 0)
   {
     <div>
-      There page@(@Model.ExtensionComponents.PageCount == 1 ? "is" : "are") @Model.ExtensionComponents.PageCount pages/modules which use components of the <strong>@Model.Package.name</strong> package.
+      There @(@Model.ExtensionComponents.PageCount == 1 ? "is" : "are") @Model.ExtensionComponents.PageCount page@(Model.ExtensionComponents.PageCount == 1 ? "" : "s")/module@(Model.ExtensionComponents.PageCount == 1 ? "" : "s") which use@(Model.ExtensionComponents.PageCount == 1 ? "s" : "") components of the <strong>@Model.Package.name</strong> package.
     </div>
   } 
   else

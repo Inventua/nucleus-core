@@ -14,18 +14,6 @@
       <h2 class="d-inline-block">@Model.Forum.Name</h2>
     </a>
 
-    @*<div class="nucleus-form-tools">
-  @if (!Model.IsSubscribedToForum && Model.CanSubscribe && Model.Subscription == null)
-  {
-  @Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @title = "Subscribe to post", @data_target = ".Forums.parent()" })
-  }
-  @if (Model.Subscription != null)
-  {
-  @Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = ".Forums.parent()" })
-  }
-  @Html.LinkButton("", "Back", Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode()), new { @class="btn btn-secondary btn-sm ms-auto" })
-  </div>*@
-
     <div class="post">
       @Html.HiddenFor(model => model.Forum.Id)
       @Html.HiddenFor(model => model.Post.Id)
@@ -33,20 +21,14 @@
       <div class="heading">
         <h3>@Model.Post.Subject</h3>
         <div class="controls">
+          @if (Model.CanEditPost && Model.Forum.EffectiveSettings().StatusList != null && Model.Forum.EffectiveSettings().StatusList.Items?.Any() == true)
+          {
+            @Html.DropDownListFor(model => model.Post.Status.Id, new SelectList(Model.Forum.EffectiveSettings().StatusList.Items, "Id", "Name"), "(no status)", new { @class = "form-select form-select-sm", @data_autopostbackevent = "change", @title = "Forum Post Status" })
+          }
           @if (Model.CanReply && !Model.Post.IsLocked)
           {
             @Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @class = "btn btn-primary btn-sm", @data_target = ".Forums.parent()" })
           }
-
-          @*  @if (!Model.IsSubscribedToForum && Model.CanSubscribe && Model.Subscription == null)
-        {
-        @Html.SubmitButton("", "Subscribe", Url.NucleusAction("SubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @title = "Subscribe to post", @data_target = ".Forums.parent()" })
-        }
-        @if (Model.Subscription != null)
-        {
-        @Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm", @data_target = ".Forums.parent()" })
-        } *@
-
           @if ((!Model.IsSubscribedToForum && Model.CanSubscribe && Model.Subscription == null) || (Model.Subscription != null) || Model.CanEditPost || (Model.CanApprovePost && !Model.Post.IsApproved) || (Model.CanApprovePost && !Model.Post.IsRejected == true) || Model.CanDeletePost || (Model.CanLockPost && !Model.Post.IsLocked) || (Model.CanLockPost && Model.Post.IsLocked) || (Model.CanPinPost && !Model.Post.IsPinned) || (Model.CanPinPost && Model.Post.IsPinned))
           {
             <div class="dropdown justify-content-end">
@@ -121,7 +103,6 @@
                     @Html.SubmitButton("", "Un-subscribe", Url.NucleusAction("UnSubscribePost", "Forums", "Forums"), new { @class = "btn btn-secondary btn-sm dropdown-item", @data_target = "form.parent()" })
                   </li>
                 }
-
               </ul>
             </div>
           }
@@ -172,15 +153,6 @@
           }
         </div>
       }
-
-      <div class="nucleus-form-tools">
-        <div class="AdminTools">
-          @if (Model.CanEditPost && Model.Forum.EffectiveSettings().StatusList != null && Model.Forum.EffectiveSettings().StatusList.Items?.Any() == true)
-          {
-            @Html.DropDownListFor(model => model.Post.Status.Id, new SelectList(Model.Forum.EffectiveSettings().StatusList.Items, "Id", "Name"), new { @data_autopostbackevent = "change", @title = "Forum Post Status" })
-          }
-        </div>
-      </div>
     </div>
 
     @if (Model.Replies.Count > 0)
@@ -195,7 +167,7 @@
               <div class="controls">
                 @if (Model.CanReply && !Model.Post.IsLocked)
                 {
-                  @Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id, replytoid = (reply.Level < Nucleus.Modules.Forums.ViewModels.ReplyForumPost.MAX_LEVELS ? reply.Id : Guid.Empty) }), new { @class = "btn btn-primary btn-sm" + (reply.Level >= Nucleus.Modules.Forums.ViewModels.ReplyForumPost.MAX_LEVELS ? " disabled" : ""), @data_target = ".Forums.parent()" })
+                  @Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id, replytoid = reply.Id }), new { @class = "btn btn-primary btn-sm", @data_target = ".Forums.parent()" })
                 }
 
                 @if ((reply.CanEditReply && !Model.Post.IsLocked) || (Model.CanApprovePost && !reply.IsApproved) || (Model.CanApprovePost && !reply.IsRejected == true) || (reply.CanDeleteReply && !Model.Post.IsLocked))

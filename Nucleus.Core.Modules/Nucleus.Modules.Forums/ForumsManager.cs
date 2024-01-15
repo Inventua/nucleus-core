@@ -103,9 +103,9 @@ public class ForumsManager
     // forums are cached, so the status list object can get out of date, since it is not automatically cleared when
     // lists are updated.  Use the ListManager to get an updated list (which is also from cache, but gets managed when 
     // list items are added or edited)
-    if (forum.Settings.StatusList != null)
+    if (forum.EffectiveSettings().StatusList != null)
     {
-      forum.Settings.StatusList = await this.ListManager.Get(forum.Settings.StatusList.Id);
+      forum.EffectiveSettings().StatusList = await this.ListManager.Get(forum.EffectiveSettings().StatusList.Id);
     }
 
     return forum;

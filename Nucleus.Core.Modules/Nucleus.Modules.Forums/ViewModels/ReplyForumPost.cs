@@ -1,19 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using System;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Modules.Forums.Models;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Forums.ViewModels;
 
 public class ReplyForumPost
 {
-  public const int MAX_LEVELS = 8;
+  public const int MAX_LEVELS = 32;
 
   public Page Page { get; set; }
 

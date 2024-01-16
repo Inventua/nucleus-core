@@ -20,6 +20,6 @@
       @Html.DropDownListFor(model => model.FilterSelections.RoleId, Model.FilterRoles, "(any)", new { @class = "flex-grow-1"} )
     </SettingsControl>
 
-    <button type="submit" data-target=".nucleus-index-items" data-bs-toggle="collapse" data-bs-target=".user-filter-options" class="btn btn-primary btn-sm" formaction="@Url.AreaAction("List", "Users", "Admin")">Apply</button>
+    <button type="submit" data-target=".nucleus-index-items" data-bs-toggle="collapse" data-bs-target=".user-filter-options" class="btn btn-primary btn-sm mt-2" formaction="@Url.AreaAction("List", "Users", "Admin")">Apply</button>
 	</fieldset>
 </div>

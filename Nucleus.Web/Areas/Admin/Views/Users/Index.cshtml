@@ -6,16 +6,16 @@
 <div class="nucleus-index-wrapper">
   @using (Html.BeginAreaForm("List", "Users", "Admin", FormMethod.Post, new { @class = "d-flex flex-column", @data_target = ".nucleus-index-items", @autocomplete = "off" }))
   {
-    <div class="nucleus-form-tools">
+    <div class="nucleus-form-tools mt-1">
       @Html.TextBoxFor(model => model.SearchTerm, new { @class = "align-self-stretch", @placeholder = "search", @type = "search" })
-      <button type="submit" title="Search" class="nucleus-material-icon btn btn-outline-secondary">&#xe8b6;</button>
+      <button type="submit" title="Search" class="user-search nucleus-material-icon btn btn-outline-secondary">&#xe8b6;</button>
       @await Html.PartialAsync("_FilterSettings", Model)
     </div>
     <div class="nucleus-index-items">
       @await Html.PartialAsync("_UserList", Model)
     </div>
   }
-  <div class="d-flex flex-column flex-1">
+  <div class="d-flex flex-column flex-1 mt-1">
     <div class="nucleus-form-tools mx-2">
       <a href="@Url.Content("~/Admin/Users/AddUser")" class="btn btn-secondary" data-target=".UserEditor" accesskey="N">New User</a>
       <a href="@Url.Content("~/Admin/Users/Export")" class="btn btn-secondary ms-auto" accesskey="X">Export</a>
@@ -23,3 +23,9 @@
     <div class="UserEditor nucleus-editor-panel"></div>
   </div>
 </div>
+<script>
+  jQuery('.user-search').on('click', function ()
+  { 
+    jQuery('.user-filter-options').collapse('hide');
+  });
+</script>

@@ -502,7 +502,6 @@ function _Page()
       {
         url = formAction;
         eventTarget = jQuery(event.originalEvent.submitter);
-        //jQuery(event.originalEvent.submitter).prop('disabled', true);
       }
 
       var newTarget = jQuery(event.originalEvent.submitter).attr('data-target');
@@ -561,7 +560,7 @@ function _Page()
         beforeSend: function (xhr, settings)
         {
           // Disable the submit control to prevent duplicate postbacks if user tries to click multiple times.
-          jQuery(event.originalEvent.submitter).prop('disabled', true);
+          eventTarget.prop('disabled', true);
         },
         success: function (data, status, request)
 				{

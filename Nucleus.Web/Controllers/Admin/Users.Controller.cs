@@ -305,19 +305,19 @@ namespace Nucleus.Web.Controllers.Admin
                   TermsPage = sitePages.TermsPageId.HasValue ? await this.PageManager.Get(sitePages.TermsPageId.Value) : null
                 };
 
-                Logger.LogTrace("Sending password reset email {templateName} to user {userId}.", template.Name, user.Id);
+                Logger.LogTrace("Sending 'Welcome new user' email {templateName} to user {userId}.", template.Name, user.Id);
 
                 using (IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site))
                 {
                   await mailClient.Send(template, args, email.Value);
-                  return Json(new { Title = "Password Reset", Message = "Password Reset email sent.", Icon = "alert" });
+                  return Json(new { Title = "User Verification", Message = "User verification ('Welcome new user') email sent.", Icon = "alert" });
                 }
               }
             }
             else
             {
-              Logger.LogTrace("Not sending password reset to user {userId} because no password reset template is configured for site {siteId}.", user.Id, this.Context.Site.Id);
-              return Json(new { Title = "Password Reset", Message = "Your site administrator has not configured a password reset email template.  Please contact the site administrator for help.", Icon = "error" });
+              Logger.LogTrace("Not sending verification ('Welcome new user') to user {userId} because no 'Welcome new user' template is configured for site {siteId}.", user.Id, this.Context.Site.Id);
+              return Json(new { Title = "User Verification", Message = "Your site does not have a 'Welcome new user' email template configured, no email was sent.", Icon = "error" });
             }
           }
 
@@ -366,12 +366,6 @@ namespace Nucleus.Web.Controllers.Admin
               {
                 await this.UserManager.SetPasswordResetToken(user);
 
-                //Nucleus.Abstractions.Models.Mail.RecoveryEmailModel args = new()
-                //{
-                //  Site = this.Context.Site,
-                //  User = viewModel.User.GetCensored(),
-                //  Url = new System.Uri(await GetLoginPageUri(), $"?token={viewModel.User.Secrets.PasswordResetToken}").ToString()
-                //};
                 SitePages sitePages = this.Context.Site.GetSitePages();
 
                 Abstractions.Models.Mail.Template.UserMailTemplateData args = new()

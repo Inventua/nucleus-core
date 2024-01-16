@@ -14,7 +14,7 @@ namespace Nucleus.Web.ViewModels.Admin
 		public Nucleus.Abstractions.Models.Paging.PagedResult<Nucleus.Abstractions.Models.User> Users { get; set; } = new() { PageSize = 20 };
 		public string SearchTerm { get; set; }
 
-		public Nucleus.Abstractions.Models.Paging.PagedResult<Nucleus.Abstractions.Models.User> SearchResults { get; set; } = new();
+		//public Nucleus.Abstractions.Models.Paging.PagedResult<Nucleus.Abstractions.Models.User> SearchResults { get; set; } = new();
 		public Site Site { get; set; }
 
     public IEnumerable<SelectListItem> FilterRoles { get; set; }

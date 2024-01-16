@@ -72,18 +72,18 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("_UserList", await BuildViewModel(viewModel));
 		}
 
-		/// <summary>
-		/// Search for users containing the specified search term.
-		/// </summary>
-		/// <returns></returns>
-		[HttpPost]
-		public async Task<ActionResult> Search(ViewModels.Admin.UserIndex viewModel)
-		{
-			viewModel.SearchResults = await this.UserManager.Search(this.Context.Site, viewModel.SearchTerm, viewModel.SearchResults, BuildFilter(viewModel.FilterSelections));
-			viewModel.Site = this.Context.Site;
+		///// <summary>
+		///// Search for users containing the specified search term.
+		///// </summary>
+		///// <returns></returns>
+		//[HttpPost]
+		//public async Task<ActionResult> Search(ViewModels.Admin.UserIndex viewModel)
+		//{
+		//	viewModel.SearchResults = await this.UserManager.Search(this.Context.Site, viewModel.SearchTerm, viewModel.SearchResults, BuildFilter(viewModel.FilterSelections));
+		//	viewModel.Site = this.Context.Site;
 
-			return View("SearchResults", viewModel);
-		}
+		//	return View("SearchResults", viewModel);
+		//}
 
 		/// <summary>
 		/// Export all users to excel.
@@ -478,7 +478,7 @@ namespace Nucleus.Web.Controllers.Admin
     {
       return 
       (
-        user =>
+        user =>        
         (
           filterOptions.RoleId == null || (user.Roles.Where(role => role.Id == filterOptions.RoleId).Any())
         ) 
@@ -504,7 +504,15 @@ namespace Nucleus.Web.Controllers.Admin
 
 		private async Task<ViewModels.Admin.UserIndex> BuildViewModel(ViewModels.Admin.UserIndex viewModel)
 		{
-      viewModel.Users = await this.UserManager.List(this.Context.Site, viewModel.Users, BuildFilter(viewModel.FilterSelections));
+      if (String.IsNullOrEmpty(viewModel.SearchTerm))
+      {
+        viewModel.Users = await this.UserManager.List(this.Context.Site, viewModel.Users, BuildFilter(viewModel.FilterSelections));
+      }
+      else
+      {
+        viewModel.Users = await this.UserManager.Search(this.Context.Site, viewModel.SearchTerm, viewModel.Users, BuildFilter(viewModel.FilterSelections));
+      }
+
 			viewModel.Site = this.Context.Site;
       viewModel.FilterRoles = await GetFilterRoles();
       return viewModel;

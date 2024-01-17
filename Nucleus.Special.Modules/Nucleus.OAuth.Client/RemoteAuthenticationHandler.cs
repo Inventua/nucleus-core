@@ -31,8 +31,7 @@ namespace Nucleus.OAuth.Client
 
 		public RemoteAuthenticationHandler(ISessionManager sessionManager, IUserManager userManager, IRoleManager roleManager, LinkGenerator linkGenerator, ISiteManager siteManager,
 																 Context context,
-																 IOptionsMonitor<RemoteAuthenticationOptions> options, ILoggerFactory logger, System.Text.Encodings.Web.UrlEncoder encoder,
-																 ISystemClock clock) : base(options, logger, encoder, clock)
+																 IOptionsMonitor<RemoteAuthenticationOptions> options, ILoggerFactory logger, System.Text.Encodings.Web.UrlEncoder encoder) : base(options, logger, encoder)
 		{
 			this.SessionManager = sessionManager;
 			this.UserManager = userManager;

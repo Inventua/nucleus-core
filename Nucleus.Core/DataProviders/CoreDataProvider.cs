@@ -61,11 +61,16 @@ namespace Nucleus.Core.DataProviders
 			// shadow property values are stored by the change tracker.
 			if (result != null)
 			{
-				result.DefaultSiteAlias = await this.Context.SiteAlias
-					.Where(alias => alias.Id == this.Context.Entry(result).Property<Guid?>("DefaultSiteAliasId").CurrentValue)
-					.AsNoTracking()
-					.FirstOrDefaultAsync();
+        Guid? aliasId = this.Context.Entry(result).Property<Guid?>("DefaultSiteAliasId").CurrentValue;
+        if (aliasId.HasValue)
+        {
+          result.DefaultSiteAlias = await this.Context.SiteAlias
+          .Where(alias => alias.Id == aliasId)
+          .AsNoTracking()
+          .FirstOrDefaultAsync();
+        }
 			}
+
 			return result;
 		}
 

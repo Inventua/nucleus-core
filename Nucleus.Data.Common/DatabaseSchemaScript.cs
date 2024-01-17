@@ -29,7 +29,7 @@ namespace Nucleus.Data.Common
 		/// Script file names should consist of a three-part version number, with Major.Minor.Build separated by dots.
 		/// </remarks>
 		public System.Version Version { get; }
-				
+    				
 		/// <summary>
 		/// Represents a database schema update script.
 		/// </summary>

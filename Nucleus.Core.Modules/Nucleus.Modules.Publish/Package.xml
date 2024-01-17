@@ -6,7 +6,7 @@
   <description>
 		Combined news, blogs and announcements module.
 	</description>
-  <compatibility minVersion="1.3.0.0" maxVersion="*" />
+  <compatibility minVersion="1.4.0.0" maxVersion="*" />
   <components>
     <component folderName="Publish" optional="false">
       <moduleDefinition id="20af00b8-1d72-4c94-bce7-b175e0b173af">

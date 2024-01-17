@@ -130,10 +130,11 @@ namespace Nucleus.Modules.Account.Controllers
 
             if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
             string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
-						ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
-						return StatusCode((int)System.Net.HttpStatusCode.Found);
-					}
-				}
+            //ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
+            //return StatusCode((int)System.Net.HttpStatusCode.Found);
+            return ControllerContext.HttpContext.NucleusRedirect(location);
+          }
+        }
 			}			
 		}
 

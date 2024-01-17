@@ -53,7 +53,7 @@ namespace Nucleus.Core.Layout
 				{
 					if (context.Request.Headers.Accept.Contains("text/html") || !IsHtmlOnlyHeader(name))
 					{
-						context.Response.Headers.Add(name, value);
+						context.Response.Headers.Append(name, value);
 					}
 				}
 			}

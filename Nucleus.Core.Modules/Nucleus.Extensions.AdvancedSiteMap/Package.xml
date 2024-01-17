@@ -8,7 +8,7 @@
 		engines.  It implements the Nucleus search index manager interface so that the generated site map can include additional entries from
 		extensions which submit meta-data to the search system, like the Documents, Forums and Publish modules.
 	</description>
-  <compatibility minVersion="1.3.0" maxVersion="*" />
+  <compatibility minVersion="1.4.0.0" maxVersion="*" />
   <components>
     <component folderName="AdvancedSiteMap" optional="false">
       <file name="readme.txt" />

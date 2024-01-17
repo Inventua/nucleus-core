@@ -1,33 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <Import Project="..\Nucleus.Core\core.build.targets" />
-
   <PropertyGroup Label="Globals">
-    <SccProjectName></SccProjectName>
-    <SccProvider></SccProvider>
-    <SccAuxPath></SccAuxPath>
-    <SccLocalPath></SccLocalPath>
+    <SccProjectName>
+    </SccProjectName>
+    <SccProvider>
+    </SccProvider>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccLocalPath>
+    </SccLocalPath>
   </PropertyGroup>
-
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
   </PropertyGroup>
-
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
-
   <PropertyGroup>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\Nucleus.Abstractions.xml</DocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-
     <Description>Models, interfaces and extensions used by the Nucleus runtime and by Nucleus extensions.</Description>
-
     <!-- Version is set by core.build.targets, can be overridden here for pre-release builds -->
     <!--<VersionPrefix>1.1.0.1-pre</VersionPrefix>
     <VersionSuffix>a6.9</VersionSuffix>-->
-
     <PackageOutputPath>$(SolutionDir)\..\Publish\Nuget Packages</PackageOutputPath>
     <PackageProjectUrl>https://www.nucleus-cms.com</PackageProjectUrl>
     <PackageTags>Nucleus</PackageTags>
@@ -35,29 +31,23 @@
     <PackageLicenseFile>license.txt</PackageLicenseFile>
     <PackageId>Inventua.$(AssemblyName)</PackageId>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
-
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningsAsErrors>;NU1605</WarningsAsErrors>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <WarningsAsErrors>;NU1605</WarningsAsErrors>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="**\*.vspscc" />
     <None Remove="**\*.scc" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
-
   <ItemGroup>
     <None Update="readme.md">
       <Pack>True</Pack>
@@ -65,7 +55,6 @@
     </None>
     <None Include="license.txt" Pack="true" PackagePath="" />
   </ItemGroup>
-
   <Target Name="GetPackageAssemblies" AfterTargets="PostBuildEvent">
     <Copy SourceFiles="bin\$(Configuration)\$(TargetFramework)\Nucleus.Abstractions.xml" DestinationFolder="$(SolutionDir)\..\Publish\XmlDocumentation" Retries="2" />
   </Target>

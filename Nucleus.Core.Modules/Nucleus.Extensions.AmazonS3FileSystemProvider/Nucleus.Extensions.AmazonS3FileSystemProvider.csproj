@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
@@ -35,7 +35,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AWSSDK.S3" Version="3.7.205.19" />
+		<PackageReference Include="AWSSDK.S3" Version="3.7.305.12" />
 		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.2.0" />
 	</ItemGroup>
 

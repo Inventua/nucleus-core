@@ -125,7 +125,7 @@ namespace Nucleus.Abstractions.Models.Extensions
 	[System.Diagnostics.DebuggerStepThroughAttribute()]
 	[System.ComponentModel.DesignerCategoryAttribute("code")]
 	[System.Xml.Serialization.XmlTypeAttribute(Namespace = "urn:nucleus/schemas/package/1.0")]
-	public partial class file
+	public partial class @file
 	{
 
 		/// <remarks/>

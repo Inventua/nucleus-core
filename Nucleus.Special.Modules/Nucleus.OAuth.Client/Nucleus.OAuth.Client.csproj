@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
 		<RootNamespace>Nucleus.OAuth.Client</RootNamespace>
@@ -47,13 +47,13 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AspNet.Security.OAuth.Twitter" Version="6.0.6" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="6.0.5" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.5" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="6.0.5" />
+		<PackageReference Include="AspNet.Security.OAuth.Twitter" Version="8.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="8.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="2.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.5" />
-		<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.1" />
+		<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.2.0" />
 		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.2.0" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.2.0" />
 	</ItemGroup>

@@ -6,7 +6,7 @@
   <description>
 		Xml documentation viewer.
 	</description>
-  <compatibility minVersion="1.3.0.0" maxVersion="*" />
+  <compatibility minVersion="1.4.0.0" maxVersion="*" />
   <components>
     <component folderName="XmlDocumentation" optional="false">
       <moduleDefinition id="0595de3d-1ba7-49df-99f0-2e80fb00d156">

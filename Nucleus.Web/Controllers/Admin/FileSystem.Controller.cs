@@ -252,9 +252,14 @@ namespace Nucleus.Web.Controllers.Admin
 			if (!selectedFolders.Any() && selectedFiles.Count() == 1)
 			{
 				// one file selected, download as-is
-				File file = await this.FileSystemManager.GetFile(this.Context.Site, selectedFiles.First().Id);
-				Response.Headers.Add("Content-Disposition", "attachment;filename=" + file.Name);
-				return File(await this.FileSystemManager.GetFileContents(this.Context.Site, file), file.GetMIMEType(true));
+				File downloadFile = await this.FileSystemManager.GetFile(this.Context.Site, selectedFiles.First().Id);
+
+        // Response.Headers.Add("Content-Disposition", "attachment;filename=" + file.Name);
+        Response.GetTypedHeaders().ContentDisposition = new("attachment")
+        {
+          FileName = downloadFile.Name
+        };
+				return File(await this.FileSystemManager.GetFileContents(this.Context.Site, downloadFile), downloadFile.GetMIMEType(true));
 			}
 
 			System.IO.MemoryStream output = new();
@@ -280,8 +285,9 @@ namespace Nucleus.Web.Controllers.Admin
 
 			archive.Dispose();
 			output.Position = 0;
-			Response.Headers.Add("Content-Disposition", "attachment");
-			return File(output, "application/zip");
+      //Response.Headers.Add("Content-Disposition", "attachment");
+      Response.GetTypedHeaders().ContentDisposition = new("attachment");
+      return File(output, "application/zip");
 		}
 
 		private async Task AddFolderToZip(ZipArchive archive, Folder folder)

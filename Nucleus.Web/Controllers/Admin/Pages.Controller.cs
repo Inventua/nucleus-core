@@ -15,7 +15,7 @@ using Nucleus.Abstractions.Models.Permissions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nucleus.ViewFeatures;
 using Nucleus.Extensions.Authorization;
-using System.Globalization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Nucleus.Web.Controllers.Admin
@@ -247,10 +247,11 @@ namespace Nucleus.Web.Controllers.Admin
 				if (viewModel.Page.DefaultPageRoute() != null)
 				{
 					string location = Url.GetAbsoluteUri(viewModel.Page.DefaultPageRoute().Path).ToString();
-					ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
-					ControllerContext.HttpContext.Response.Headers.Add("X-Location-Target", "_top");
-					return StatusCode((int)System.Net.HttpStatusCode.Found);
-				}
+					//ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
+					ControllerContext.HttpContext.Response.Headers.Append("X-Location-Target", "_top");
+					//return StatusCode((int)System.Net.HttpStatusCode.Found);
+          return ControllerContext.HttpContext.NucleusRedirect(location);
+        }
 				else
 				{
 					return Ok();

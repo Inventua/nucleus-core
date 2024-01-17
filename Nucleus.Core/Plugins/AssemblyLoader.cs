@@ -37,8 +37,8 @@ namespace Nucleus.Core.Plugins
 		/// <returns>The loaded assembly.</returns>
 		/// <remarks>
 		/// The LoadFrom method checks the path of the assembly and separates extension assemblies into their own AssemblyLoadContext.  This
-		/// allows extensions to use their own version of referenced assemblies, if they are present in the extension's bin folder, or use the versions
-		/// which are shipped with Nucleus Core otherwise.  This method returns NULL if the assembly couldn't be loaded.  This is typically the
+		/// allows extensions to use their own version of a referenced assembly, if it is present in the extension's bin folder, otherwise use the version
+		/// in the Nucleus application folder.  This method returns NULL if the assembly couldn't be loaded.  This is typically the
 		/// case when a dll is present that is not an assembly.
 		/// </remarks>
 		public static Assembly LoadFrom(string path)
@@ -77,9 +77,9 @@ namespace Nucleus.Core.Plugins
 			}
 			else
 			{
-				if (ExtensionLoadContexts.ContainsKey(extensionFolder))
+				if (ExtensionLoadContexts.TryGetValue(extensionFolder, out AssemblyLoadContext value))
 				{
-					assemblyLoadContext = ExtensionLoadContexts[extensionFolder];
+					assemblyLoadContext = value;
 				}
 				else
 				{
@@ -229,9 +229,9 @@ namespace Nucleus.Core.Plugins
 		/// </example>
 		public static System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope EnterExtensionContext(string typeName)
 		{
-			if (TypeContextCache.ContainsKey(typeName))
+			if (TypeContextCache.TryGetValue(typeName, out AssemblyLoadContext value))
 			{
-				return TypeContextCache[typeName].EnterContextualReflection();
+				return value.EnterContextualReflection();
 			}
 			else
 			{
@@ -286,18 +286,14 @@ namespace Nucleus.Core.Plugins
 		/// <param name="pluginName"></param>
 		private static void UnloadPlugin(string pluginName)
 		{
-			if (ExtensionLoadContexts.Keys.Contains(pluginName))
+			if (ExtensionLoadContexts.TryGetValue(pluginName, out AssemblyLoadContext context))
 			{
-				AssemblyLoadContext context = ExtensionLoadContexts[pluginName];
-
-				ExtensionLoadContexts.Remove(pluginName, out AssemblyLoadContext removed);
+				ExtensionLoadContexts.Remove(pluginName, out AssemblyLoadContext _ );
 
 				context.Unload();
-				context = null;
 
 				GC.Collect();
 				GC.WaitForPendingFinalizers();
-
 			}
 		}
 
@@ -383,11 +379,15 @@ namespace Nucleus.Core.Plugins
 				{
 					// We use .FirstOrDefault for performance - we want all of the assemblies implementing <T>, but we only need one match
 					// not all of them.
-					type = assembly.GetTypes().FirstOrDefault
-					(
-						typ => !typ.IsAbstract && typeof(T).IsAssignableFrom(typ) && !typ.Equals(typeof(T))
-					);
-				}
+					//type = assembly.GetTypes().FirstOrDefault
+					//(
+					//	typ => !typ.IsAbstract && typeof(T).IsAssignableFrom(typ) && !typ.Equals(typeof(T))
+					//);
+          type = assembly.GetExportedTypes().FirstOrDefault
+          (
+            typ => !typ.IsAbstract && typeof(T).IsAssignableFrom(typ) && !typ.Equals(typeof(T))
+          );
+        }
 				catch (System.Reflection.ReflectionTypeLoadException e)
 				{
 					logger?.LogError(e, "Unable to load assembly {0}", assembly.FullName);
@@ -446,11 +446,11 @@ namespace Nucleus.Core.Plugins
 		{
 			try
 			{
-				return assembly.GetTypes();
+				return assembly.GetExportedTypes();
 			}
 			catch (System.Reflection.ReflectionTypeLoadException)
 			{
-				return new Type[] { };
+				return [];
 			}
 		}
 
@@ -464,10 +464,7 @@ namespace Nucleus.Core.Plugins
 		/// </remarks>
     internal static IEnumerable<Assembly> ListAssemblies()
     {
-      if (LoadedAssemblies == null)
-      {
-        LoadedAssemblies = LoadAssemblies();
-      }
+      LoadedAssemblies ??= LoadAssemblies();
       return LoadedAssemblies;
     }
 
@@ -481,10 +478,11 @@ namespace Nucleus.Core.Plugins
 		/// </remarks>
 		private static List<Assembly> LoadAssemblies()
 		{
-			List<Assembly> assemblies = new List<Assembly>();
+			List<Assembly> assemblies = [];
 
 			// All assemblies must be loaded into their correct AssemblyLoadContexts in this function (don't use yield return).  This is to ensure that
-			// assemblies which reference other assemblies (in an extension/bin folder) load them from the correct folder and using the correct AssemmblyLoadContext.
+			// assemblies which reference other assemblies (in an extension/bin folder) load them from the correct folder and using the correct
+      // AssemmblyLoadContext.
 			foreach (string assemblyFileName in EnumerateAssemblyNames())
 			{
 				// Load all assemblies EXCEPT Razor views (because they aren't real assemblies and LoadFrom doesn't 

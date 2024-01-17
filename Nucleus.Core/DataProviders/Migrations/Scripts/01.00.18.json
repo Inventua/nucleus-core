@@ -1,0 +1,18 @@
+{
+	"schemaName": "Nucleus.Core",
+  "version": "01.00.18",
+  "useTransaction": false,
+  "operations": [
+    {
+      "DatabaseProviderSpecificOperation": {
+        "include": [ "Sqlite" ],
+        "operation": {
+          "sql": {
+            // https://learn.microsoft.com/en-us/ef/core/what-is-new/ef-core-7.0/breaking-changes?tabs=v7#sqliteretries
+            "sql": "PRAGMA journal_mode = 'wal';"
+          }
+        }
+      }      
+    }
+  ]
+}

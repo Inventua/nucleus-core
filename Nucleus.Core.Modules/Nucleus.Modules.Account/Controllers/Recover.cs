@@ -257,10 +257,11 @@ namespace Nucleus.Modules.Account.Controllers
 
 			await this.UserManager.SaveSecrets(user);
       string uri = (await GetLoginPageUri()).ToString();
-
-			ControllerContext.HttpContext.Response.Headers.Add("X-Location", $"{uri}{(uri.Contains('?') ? "&" : "?")}username={user.UserName}&reason={nameof(System.Net.HttpStatusCode.Found)}");
-			return StatusCode((int)System.Net.HttpStatusCode.Found);
-		}
+      string location = $"{uri}{(uri.Contains('?') ? "&" : "?")}username={user.UserName}&reason={nameof(System.Net.HttpStatusCode.Found)}";
+			//ControllerContext.HttpContext.Response.Headers.Add("X-Location", $"{uri}{(uri.Contains('?') ? "&" : "?")}username={user.UserName}&reason={nameof(System.Net.HttpStatusCode.Found)}");
+			//return StatusCode((int)System.Net.HttpStatusCode.Found);
+      return ControllerContext.HttpContext.NucleusRedirect(location);
+    }
 
 		private async Task<System.Uri> GetLoginPageUri()
 		{

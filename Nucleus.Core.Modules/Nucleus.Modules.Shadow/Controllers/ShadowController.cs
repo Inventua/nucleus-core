@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Nucleus.Extensions.Shadow.Controllers;
 [Extension("Shadow")]
@@ -37,7 +38,7 @@ public class ShadowController : Controller
       // return a HttpStatusCode.PermanentRedirect to signal the ModuleContentRenderer to render a different 
       // module.  The ModuleContentRenderer also requires the X-NucleusAction header, in order to ensure that it is not 
       // intercepting a "real" HttpStatusCode.PermanentRedirect response.
-      HttpContext.Response.Headers.Add("X-NucleusAction", "");
+      HttpContext.Response.Headers.Append("X-NucleusAction", "");
       return new Microsoft.AspNetCore.Mvc.LocalRedirectResult($"~/mid={viewModel.ModuleId}", true, true);
     }
     else

@@ -33,8 +33,7 @@ namespace Nucleus.Core.Authentication
                                  Context context,
                                  IOptionsMonitor<AuthenticationOptions> optionsMonitor,
                                  ILoggerFactory logger,
-                                 System.Text.Encodings.Web.UrlEncoder encoder,
-                                 ISystemClock clock) : base(optionsMonitor, logger, encoder, clock)
+                                 System.Text.Encodings.Web.UrlEncoder encoder) : base(optionsMonitor, logger, encoder)
     {
       this.SessionManager = sessionManager;
       this.UserManager = userManager;

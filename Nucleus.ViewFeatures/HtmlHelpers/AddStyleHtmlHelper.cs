@@ -78,7 +78,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       switch (script)
       {
         case WellKnownScripts.BOOTSTRAP:
-          stylesheetPath = "~/Resources/Libraries/Bootstrap/5.0.2/css/bootstrap.css";
+          stylesheetPath = "~/Resources/Libraries/Bootstrap/5.3.2/css/bootstrap.css";
           break;
 
 				case WellKnownScripts.NUCLEUS_SHARED:

@@ -16,7 +16,7 @@ namespace Nucleus.Core.Plugins
 	{
 		private AssemblyDependencyResolver Resolver { get; set; }
 
-		public PluginLoadContext(string name, string pluginPath) : base(name, true)
+		public PluginLoadContext(string name, string pluginPath) : base(name, false)
 		{
 			this.Resolver = new AssemblyDependencyResolver(pluginPath);
 		}

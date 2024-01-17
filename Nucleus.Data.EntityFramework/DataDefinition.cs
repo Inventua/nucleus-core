@@ -31,10 +31,19 @@ namespace Nucleus.Data.EntityFramework
 		/// </summary>
 		public System.Version Version { get; set; }
 
-		/// <summary>
-		/// A list of operations to execute.
-		/// </summary>
-		public IReadOnlyList<MigrationOperation> Operations { get; set; }
+    /// <summary>
+    /// Specifies whether to use a transaction (default) or not.
+    /// </summary>
+    /// <remarks>
+    /// Some operations cannot run inside a transaction.  This property can be used to prevent use of a transaction for a script.  
+    /// MySql does not support transactions for most data definition language commands, so this value is always false for MySql.
+    /// </remarks>
+    public Boolean UseTransaction { get; set; } = true;
+
+    /// <summary>
+    /// A list of operations to execute.
+    /// </summary>
+    public IReadOnlyList<MigrationOperation> Operations { get; set; }
 
 	}
 }

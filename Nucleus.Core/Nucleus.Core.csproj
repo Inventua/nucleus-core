@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     
 		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
@@ -46,10 +46,12 @@
     <None Remove="DataProviders\Migrations\Scripts\01.00.15.json" />
     <None Remove="DataProviders\Migrations\Scripts\01.00.16.json" />
     <None Remove="DataProviders\Migrations\Scripts\01.00.17.json" />
+    <None Remove="DataProviders\Migrations\Scripts\01.00.18.json" />
     <None Remove="Mail\mail.css" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.18.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.17.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.16.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.15.json" />
@@ -83,16 +85,16 @@
   </ItemGroup>
 
   <ItemGroup>
-		<PackageReference Include="MailKit" Version="4.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="6.0.22" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.24">
+		<PackageReference Include="MailKit" Version="4.3.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="8.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.2" />
-    <PackageReference Include="System.DirectoryServices.Protocols" Version="7.0.1" />
-    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="7.0.3" />
+    <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.0" />
+    <PackageReference Include="System.DirectoryServices.Protocols" Version="8.0.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0" />
   </ItemGroup>
 	
 	<ItemGroup>

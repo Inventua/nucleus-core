@@ -6,7 +6,7 @@
   <description>
 		The 'Accept Terms' module displays your terms text on-screen and requires the user to accept the terms before they can use the page which contains the module.
 	</description>
-  <compatibility minVersion="1.2.0.0" maxVersion="*" />
+  <compatibility minVersion="1.4.0.0" maxVersion="*" />
   <components>
     <component folderName="AcceptTerms" optional="false">
       <moduleDefinition id="45963833-c2b2-4673-a25b-85ac7b2b5b49">

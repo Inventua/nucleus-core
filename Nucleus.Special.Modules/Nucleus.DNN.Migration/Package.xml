@@ -6,7 +6,7 @@
 	<description>
 		Tools for migrating your DotNetNuke DNN web site to Nucleus.
 	</description>
-	<compatibility minVersion="1.3.0.0" maxVersion="*" />
+	<compatibility minVersion="1.4.0.0" maxVersion="*" />
 	
 	<components>
 		<component folderName="DNNMigration" optional="false">

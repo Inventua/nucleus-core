@@ -106,10 +106,10 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       switch (script)
       {
         case WellKnownScripts.BOOTSTRAP:
-          scriptPath = "~/Resources/Libraries/Bootstrap/5.0.2/js/bootstrap.bundle.js";
+          scriptPath = "~/Resources/Libraries/Bootstrap/5.3.2/js/bootstrap.bundle.js";
           break;
         case WellKnownScripts.JQUERY:
-          scriptPath = "~/Resources/Libraries/jQuery/03.06.00/jquery.js";
+          scriptPath = "~/Resources/Libraries/jQuery/3.7.1/jquery.js";
           break;
         case WellKnownScripts.NUCLEUS_SHARED:
 					scriptPath = "~/Resources/js/nucleus-shared.js";

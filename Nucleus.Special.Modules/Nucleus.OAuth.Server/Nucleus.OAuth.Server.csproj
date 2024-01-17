@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
 		<RootNamespace>Nucleus.OAuth.Server</RootNamespace>
@@ -54,7 +54,7 @@
 		<PackageReference Include="Inventua.Nucleus.Extensions" Version="1.2.0" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.2.0" />
 		<PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="1.2.0" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.3" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.2.0" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

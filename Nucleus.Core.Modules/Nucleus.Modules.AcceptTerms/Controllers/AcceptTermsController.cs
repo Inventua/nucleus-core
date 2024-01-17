@@ -73,8 +73,9 @@ namespace Nucleus.Modules.AcceptTerms.Controllers
     public ActionResult CancelTerms()
     {
       string location = Url.Content("~/");
-      ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
-      return StatusCode((int)System.Net.HttpStatusCode.Found);
+      return ControllerContext.HttpContext.NucleusRedirect(location);
+      //ControllerContext.HttpContext.Response.Headers.Add(new("X-Location", location));
+      //return StatusCode((int)System.Net.HttpStatusCode.Found);
     }
   }
 }

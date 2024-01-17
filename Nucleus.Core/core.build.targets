@@ -7,8 +7,8 @@
 -->
 <Project>
 	<PropertyGroup>
-    <VersionPrefix>1.3.0.0</VersionPrefix>
-		<!--<VersionSuffix>rc7</VersionSuffix>-->
+    <VersionPrefix>1.4.0.0</VersionPrefix>
+		<VersionSuffix>pre-alpha2</VersionSuffix>
 		<Authors>Inventua Pty Ltd</Authors>
 		<Product>Nucleus</Product>
 		<Copyright>(c) Inventua Pty Ptd</Copyright>

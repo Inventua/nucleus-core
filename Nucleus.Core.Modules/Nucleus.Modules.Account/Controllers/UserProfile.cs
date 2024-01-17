@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
+using Nucleus.ViewFeatures;
 
 namespace Nucleus.Modules.Account.Controllers
 {
@@ -84,9 +85,9 @@ namespace Nucleus.Modules.Account.Controllers
 
       if (!Url.IsLocalUrl(viewModel.ReturnUrl)) viewModel.ReturnUrl = "";
       string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/") : viewModel.ReturnUrl;
-
-			ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
-			return StatusCode((int)System.Net.HttpStatusCode.Found);
-		}
+      //ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
+      //return StatusCode((int)System.Net.HttpStatusCode.Found);
+      return ControllerContext.HttpContext.NucleusRedirect(location);
+    }
 	}
 }

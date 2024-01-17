@@ -63,14 +63,13 @@ public class Startup : IHostingStartup
       .SelectMany(context => context.Assemblies)
       .SelectMany(assm => GetTypes(assm)
         .Where(type => typeof(MigrationEngines.ModuleContent.ModuleContentMigrationBase).IsAssignableFrom(type) && !type.Equals(typeof(MigrationEngines.ModuleContent.ModuleContentMigrationBase))));
-
   }
 
   private static Type[] GetTypes(System.Reflection.Assembly assembly)
   {
     try
     {
-      return assembly.GetTypes();
+      return assembly.GetExportedTypes();
     }
     catch (System.Reflection.ReflectionTypeLoadException)
     {

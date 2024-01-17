@@ -36,490 +36,438 @@ using Newtonsoft.Json.Linq;
 
 namespace Nucleus.SAML.Server.Controllers
 {
-	[Extension("SAMLServer")]
-	public class SAMLServerController : Controller
-	{
-		private Context Context { get; }
+  [Extension("SAMLServer")]
+  public class SAMLServerController : Controller
+  {
+    private Context Context { get; }
 
-		private IUserManager UserManager { get; }
-		private ISessionManager SessionManager { get; }
+    private IUserManager UserManager { get; }
+    private ISessionManager SessionManager { get; }
 
-		private IPageManager PageManager { get; }
+    private IPageManager PageManager { get; }
 
-		private IHttpClientFactory HttpClientFactory { get; }
+    private IHttpClientFactory HttpClientFactory { get; }
 
-		private ClientAppManager ClientAppManager { get; }
+    private ClientAppManager ClientAppManager { get; }
 
-		private ClientAppTokenManager ClientAppTokenManager { get; }
+    private ClientAppTokenManager ClientAppTokenManager { get; }
 
-		private ILogger<SAMLServerController> Logger { get; }
+    private ILogger<SAMLServerController> Logger { get; }
 
-		private string _issuer;
+    private string _issuer;
 
-		public SAMLServerController(Context context, ISessionManager sessionManager, IUserManager userManager, IPageManager pageManager, ClientAppManager clientAppManager, ClientAppTokenManager clientAppTokenManager, IHttpClientFactory httpClientFactory, ILogger<SAMLServerController> logger)
-		{
-			this.Context = context;
-			this.SessionManager = sessionManager;
-			this.UserManager = userManager;
-			this.PageManager = pageManager;
-			this.ClientAppManager = clientAppManager;
-			this.ClientAppTokenManager = clientAppTokenManager;
-			this.HttpClientFactory = httpClientFactory;
-			this.Logger = logger;
-		}
+    public SAMLServerController(Context context, ISessionManager sessionManager, IUserManager userManager, IPageManager pageManager, ClientAppManager clientAppManager, ClientAppTokenManager clientAppTokenManager, IHttpClientFactory httpClientFactory, ILogger<SAMLServerController> logger)
+    {
+      this.Context = context;
+      this.SessionManager = sessionManager;
+      this.UserManager = userManager;
+      this.PageManager = pageManager;
+      this.ClientAppManager = clientAppManager;
+      this.ClientAppTokenManager = clientAppTokenManager;
+      this.HttpClientFactory = httpClientFactory;
+      this.Logger = logger;
+    }
 
-		/// <summary>
-		/// Return the issuer of an AuthnRequest sent using HTTP-POST or HTTP-Redirect binding.
-		/// </summary>
-		/// <remarks>
-		/// This value can be read 
-		/// </remarks>
-		private string Issuer
-		{
-			get
-			{
-				if (_issuer == null)
-				{
-					Saml2AuthnRequest saml2AuthnRequest = new(new());
-					if (Request.Method == System.Net.WebRequestMethods.Http.Post)
-					{
-						Saml2PostBinding requestBinding = new();
-						requestBinding.ReadSamlRequest(Request.ToGenericHttpRequest(), saml2AuthnRequest);
-						_issuer = saml2AuthnRequest.Issuer;
-					}
-					else
-					{
-						Saml2RedirectBinding requestBinding = new();
-						requestBinding.ReadSamlRequest(Request.ToGenericHttpRequest(), saml2AuthnRequest);
-						_issuer = saml2AuthnRequest.Issuer;
-					}
-				}
-				return _issuer;
-			}
-		}
+    /// <summary>
+    /// Return the issuer of an AuthnRequest sent using HTTP-POST or HTTP-Redirect binding.
+    /// </summary>
+    /// <remarks>
+    /// This value can be read 
+    /// </remarks>
+    private string Issuer
+    {
+      get
+      {
+        if (_issuer == null)
+        {
+          Saml2AuthnRequest saml2AuthnRequest = new(new());
+          if (Request.Method == System.Net.WebRequestMethods.Http.Post)
+          {
+            Saml2PostBinding requestBinding = new();
+            requestBinding.ReadSamlRequest(Request.ToGenericHttpRequest(), saml2AuthnRequest);
+            _issuer = saml2AuthnRequest.Issuer;
+          }
+          else
+          {
+            Saml2RedirectBinding requestBinding = new();
+            requestBinding.ReadSamlRequest(Request.ToGenericHttpRequest(), saml2AuthnRequest);
+            _issuer = saml2AuthnRequest.Issuer;
+          }
+        }
+        return _issuer;
+      }
+    }
 
-		[Route(Routes.LOGIN)]
-		public async Task<IActionResult> Login(string relayState)
-		{
-			ITfoxtec.Identity.Saml2.Http.HttpRequest request = Request.ToGenericHttpRequest();
-			Logger.LogTrace(request.Body);
+    [Route(Routes.LOGIN)]
+    public async Task<IActionResult> Login(string relayState)
+    {
+      ITfoxtec.Identity.Saml2.Http.HttpRequest request = Request.ToGenericHttpRequest();
+      Logger.LogTrace("SAML Login Request: {body}", request.Body);
 
-			RelyingParty relyingParty = await ValidateRelyingParty(this.Issuer);
-			Saml2AuthnRequest saml2AuthnRequest = new(await GetRpSaml2Configuration(relyingParty));
+      RelyingParty relyingParty = await ValidateRelyingParty(this.Issuer);
+      Saml2AuthnRequest saml2AuthnRequest = new(await GetRpSaml2Configuration(relyingParty));
 
-			try
-			{
-				if (Request.Method == System.Net.WebRequestMethods.Http.Post)
-				{
-					Saml2PostBinding requestBinding = new();
-					requestBinding.Unbind(request, saml2AuthnRequest);
-				}
-				else
-				{
-					Saml2RedirectBinding requestBinding = new();
-					requestBinding.Unbind(request, saml2AuthnRequest);
-				}
+      try
+      {
+        if (Request.Method == System.Net.WebRequestMethods.Http.Post)
+        {
+          Saml2PostBinding requestBinding = new();
+          requestBinding.Unbind(request, saml2AuthnRequest);
+        }
+        else
+        {
+          Saml2RedirectBinding requestBinding = new();
+          requestBinding.Unbind(request, saml2AuthnRequest);
+        }
 
-				ClientAppToken token = this.ClientAppTokenManager.CreateNew();
+        ClientAppToken token = this.ClientAppTokenManager.CreateNew();
 
-				token.ClientApp = await this.ClientAppManager.GetByIssuer(this.Context.Site, this.Issuer);
-				token.RequestId = saml2AuthnRequest.IdAsString;
-				token.AssertionConsumerServiceUrl = saml2AuthnRequest.AssertionConsumerServiceUrl.ToString();
-				token.ProtocolBinding = saml2AuthnRequest.ProtocolBinding.ToString();
+        token.ClientApp = await this.ClientAppManager.GetByIssuer(this.Context.Site, this.Issuer);
+        token.RequestId = saml2AuthnRequest.IdAsString;
+        token.AssertionConsumerServiceUrl = saml2AuthnRequest.AssertionConsumerServiceUrl.ToString();
+        token.ProtocolBinding = saml2AuthnRequest.ProtocolBinding.ToString();
         token.NameIdentifierFormat = saml2AuthnRequest.NameId?.Format?.ToString() ?? NameIdentifierFormats.Persistent.ToString();
 
         token.RelayState = relayState;
 
-				await this.ClientAppTokenManager.Save(token);
+        await this.ClientAppTokenManager.Save(token);
 
-				if (User.Identity.IsAuthenticated && !saml2AuthnRequest.ForceAuthn == true)
-				{
-					Logger.LogTrace("A user is already logged in.");
-					// User is already logged in, redirect back immediately
-					return await Respond(token.Id);
-				}
-				else
-				{
-					// Redirect to the login page
-					return await RedirectToLogin(token, saml2AuthnRequest?.Subject?.NameID?.ID);
-				}
-			}
-			catch (Exception exc)
-			{
-				Logger?.LogError(exc, "SAML Login Exception");
-				return await LoginResponse(new() { RequestId = saml2AuthnRequest.IdAsString, RelayState = relayState }, Saml2StatusCodes.Responder, relyingParty);
-			}
-		}
+        if (User.Identity.IsAuthenticated && !saml2AuthnRequest.ForceAuthn == true)
+        {
+          Logger.LogTrace("A user is already logged in.");
+          // User is already logged in, redirect back immediately
+          return await Respond(token.Id);
+        }
+        else
+        {
+          // Redirect to the login page
+          return await RedirectToLogin(token, saml2AuthnRequest?.Subject?.NameID?.ID);
+        }
+      }
+      catch (Exception exc)
+      {
+        Logger?.LogError(exc, "SAML Login Exception");
+        return await LoginResponse(new() { RequestId = saml2AuthnRequest.IdAsString, RelayState = relayState }, Saml2StatusCodes.Responder, relyingParty);
+      }
+    }
 
-		private async Task<RedirectResult> RedirectToLogin(ClientAppToken token, string username)
-		{
-			string url;
+    private async Task<RedirectResult> RedirectToLogin(ClientAppToken token, string username)
+    {
+      string url;
 
-			if (token.ClientApp.LoginPage != null)
-			{
-				url = $"{token.ClientApp.LoginPage.DefaultPageRoute}?returnUrl={Routes.RESPOND}/{token.Id}";
-			}
-			else
-			{
-				if (this.Context.Site != null)
-				{
-					SitePages sitePage = this.Context.Site.GetSitePages();
-					PageRoute loginPageRoute = null;
+      if (token.ClientApp.LoginPage != null)
+      {
+        url = $"{token.ClientApp.LoginPage.DefaultPageRoute}?returnUrl={Routes.RESPOND}/{token.Id}";
+      }
+      else
+      {
+        if (this.Context.Site != null)
+        {
+          SitePages sitePage = this.Context.Site.GetSitePages();
+          PageRoute loginPageRoute = null;
 
-					if (sitePage.LoginPageId.HasValue)
-					{
-						Page loginPage = await this.PageManager.Get(sitePage.LoginPageId.Value);
-						if (loginPage != null)
-						{
-							loginPageRoute = loginPage.DefaultPageRoute();
-						}
-					}
-					if (loginPageRoute == null)
-					{
-						// Use default login page
-						url = this.DefaultLoginUri();
-					}
-					else
-					{
-						url = loginPageRoute.Path;
-					}
-				}
-				else
-				{
-					// use default login page
-					url = this.DefaultLoginUri();
-				}
+          if (sitePage.LoginPageId.HasValue)
+          {
+            Page loginPage = await this.PageManager.Get(sitePage.LoginPageId.Value);
+            if (loginPage != null)
+            {
+              loginPageRoute = loginPage.DefaultPageRoute();
+            }
+          }
+          if (loginPageRoute == null)
+          {
+            // Use default login page
+            url = this.DefaultLoginUri();
+          }
+          else
+          {
+            url = loginPageRoute.Path;
+          }
+        }
+        else
+        {
+          // use default login page
+          url = this.DefaultLoginUri();
+        }
 
-				url = $"{url}?returnUrl={Routes.RESPOND}/{token.Id}";
-			}
+        url = $"{url}?returnUrl={Routes.RESPOND}/{token.Id}";
+      }
 
-			if (!String.IsNullOrEmpty(username))
-			{
-				url += $"&username={username}";
-			}
+      if (!String.IsNullOrEmpty(username))
+      {
+        url += $"&username={username}";
+      }
 
-			Logger?.LogTrace("Redirecting to '{url}'.", url);
-			return Redirect(url);
-		}
+      Logger?.LogTrace("Redirecting to '{url}'.", url);
+      return Redirect(url);
+    }
 
-		/// <summary>
-		/// Receive a redirect from the Nucleus login module, process it and redirect back to the original caller (SAML client).
-		/// </summary>
-		/// <param name="id">The id of an app token created by /Authorize and included in the ReturnUri sent to the login module.</param>
-		/// <returns></returns>
-		[HttpGet]
-		[Route($"{Routes.RESPOND}/{{id}}")]
-		public async Task<ActionResult> Respond(Guid id)
-		{
-			ClientAppToken token = await this.ClientAppTokenManager.Get(id);
+    /// <summary>
+    /// Receive a redirect from the Nucleus login module, process it and redirect back to the original caller (SAML client).
+    /// </summary>
+    /// <param name="id">The id of an app token created by /Authorize and included in the ReturnUri sent to the login module.</param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route($"{Routes.RESPOND}/{{id}}")]
+    public async Task<ActionResult> Respond(Guid id)
+    {
+      ClientAppToken token = await this.ClientAppTokenManager.Get(id);
 
-			if (token == null)
-			{
-				return BadRequest("Your login session has expired.");
-			}
+      if (token == null)
+      {
+        return BadRequest("Your login session has expired.");
+      }
 
-			if (User.IsSystemAdministrator() || User.IsSiteAdmin(this.Context.Site))
-			{
-				return StatusCode((int)HttpStatusCode.Forbidden, "Access denied for user, because admins can't use remote authentication.");
-			}
+      if (User.IsSystemAdministrator() || User.IsSiteAdmin(this.Context.Site))
+      {
+        return StatusCode((int)HttpStatusCode.Forbidden, "Access denied for user, because admins can't use remote authentication.");
+      }
 
-			token.UserId = User.GetUserId();
-			await this.ClientAppTokenManager.Save(token);
+      token.UserId = User.GetUserId();
+      await this.ClientAppTokenManager.Save(token);
 
-			RelyingParty relyingParty = new()
-			{
-				AssertionConsumerServiceUri = new System.Uri(token.AssertionConsumerServiceUrl),
-				Issuer = token.ClientApp.AllowedIssuer,
-				ProtocolBinding = token.ProtocolBinding
-			};
+      RelyingParty relyingParty = new()
+      {
+        AssertionConsumerServiceUri = new System.Uri(token.AssertionConsumerServiceUrl),
+        Issuer = token.ClientApp.AllowedIssuer,
+        ProtocolBinding = token.ProtocolBinding
+      };
 
-			var result = await LoginResponse(token, Saml2StatusCodes.Success, relyingParty);
+      var result = await LoginResponse(token, Saml2StatusCodes.Success, relyingParty);
 
-			// save artifact
-			await this.ClientAppTokenManager.Save(token);
+      // save artifact
+      await this.ClientAppTokenManager.Save(token);
 
-			return (ActionResult)result;
-		}
+      return (ActionResult)result;
+    }
 
-		[Route(Routes.ARTIFACT)]
-		public async Task<IActionResult> Artifact()
-		{
-			try
-			{
-				ITfoxtec.Identity.Saml2.Http.HttpRequest request = await Request.ToGenericHttpRequestAsync(readBodyAsString: true);
-				Saml2SoapEnvelope soapEnvelope = new();
-				
-				Logger.LogTrace(request.Body);
+    [Route(Routes.ARTIFACT)]
+    public async Task<IActionResult> Artifact()
+    {
+      try
+      {
+        ITfoxtec.Identity.Saml2.Http.HttpRequest request = await Request.ToGenericHttpRequestAsync(readBodyAsString: true);
+        Saml2SoapEnvelope soapEnvelope = new();
 
-				// We get the signature validation certificate from this.ClientAppTokenManager.GetByCode (which needs the artifact)
-				// but we can't get the artifact without calling soapEnvelope.Unbind - which needs the signature validation certificate.
+        Logger.LogTrace("SAML Artifact Request: {body}", request.Body);
 
-				// So we have to cheat and get the artifact ourselves
-				System.Xml.XmlDocument xmlDoc = new();
-				xmlDoc.LoadXml(request.Body);
-				string artifact = xmlDoc.DocumentElement.SelectSingleNode("//*[local-name()='Artifact']").InnerText;
+        // We get the signature validation certificate from this.ClientAppTokenManager.GetByCode (which needs the artifact)
+        // but we can't get the artifact without calling soapEnvelope.Unbind - which needs the signature validation certificate.
 
-				ClientAppToken token = await this.ClientAppTokenManager.GetByCode(artifact);
+        // So we have to cheat and get the artifact ourselves
+        System.Xml.XmlDocument xmlDoc = new();
+        xmlDoc.LoadXml(request.Body);
+        string artifact = xmlDoc.DocumentElement.SelectSingleNode("//*[local-name()='Artifact']").InnerText;
 
-				if (token == null)
-				{
-					Logger?.LogError("SAML Artifact: Invalid token '{code}'.", artifact);
-					return BadRequest("SAML Artifact: Invalid Token.");
-				}
+        ClientAppToken token = await this.ClientAppTokenManager.GetByCode(artifact);
 
-				if (token.ExpiryDate < DateTime.UtcNow)
-				{
-					Logger?.LogError("SAML Artifact (id: '{id}', artifact: '{code}') expired: ", token.Id, token.Code);
-					return BadRequest("SAML Artifact expired.");
-				}
+        if (token == null)
+        {
+          Logger?.LogError("SAML Artifact: Invalid token '{code}'.", artifact);
+          return BadRequest("SAML Artifact: Invalid Token.");
+        }
 
-				Config config = new(this.Request, this.Context, token.ClientApp);
+        if (token.ExpiryDate < DateTime.UtcNow)
+        {
+          Logger?.LogError("SAML Artifact (id: '{id}', artifact: '{code}') expired: ", token.Id, token.Code);
+          return BadRequest("SAML Artifact expired.");
+        }
 
-				Saml2ArtifactResolve saml2ArtifactResolve = new(config.AsSaml2Configuration());
-				soapEnvelope.Unbind(request, saml2ArtifactResolve);
-				
-				Saml2AuthnResponse saml2AuthnResponse = new(config.AsSaml2Configuration())
-				{
-					ClaimsIdentity = new ClaimsIdentity(await BuildUserClaims(token.UserId))
-				};
+        Config config = new(this.Request, this.Context, token.ClientApp);
 
-				Saml2ArtifactResponse saml2ArtifactResponse = new(config.AsSaml2Configuration(), saml2AuthnResponse)
-				{
-					InResponseTo = saml2ArtifactResolve.Id
-				};
+        Saml2ArtifactResolve saml2ArtifactResolve = new(config.AsSaml2Configuration());
+        soapEnvelope.Unbind(request, saml2ArtifactResolve);
 
-				try
-				{
-					saml2ArtifactResponse.NameId = GetSamlNameID(token, saml2AuthnResponse.ClaimsIdentity);
-				}
-				catch (InvalidOperationException e)
-				{
-					Logger?.LogError(e, "Getting SAML NameId.");
-					saml2AuthnResponse.Status = Saml2StatusCodes.InvalidNameIdPolicy;
-				}
+        Saml2AuthnResponse saml2AuthnResponse = new(config.AsSaml2Configuration())
+        {
+          ClaimsIdentity = new ClaimsIdentity(await BuildUserClaims(token.UserId))
+        };
 
-				// We have to set destination here rather than above, because it gets NULLed by the Saml2ArtifactResponse constructor
-				saml2AuthnResponse.Destination = saml2ArtifactResolve.Destination;
+        Saml2ArtifactResponse saml2ArtifactResponse = new(config.AsSaml2Configuration(), saml2AuthnResponse)
+        {
+          InResponseTo = saml2ArtifactResolve.Id
+        };
 
-				saml2AuthnResponse.CreateSecurityToken(token.ClientApp.AllowedIssuer, subjectConfirmationLifetime: (int)(token.ExpiryDate - DateTime.UtcNow).TotalMinutes, issuedTokenLifetime: (int)(token.ExpiryDate-DateTime.UtcNow).TotalMinutes);
-				soapEnvelope.Bind(saml2ArtifactResponse);
+        try
+        {
+          saml2ArtifactResponse.NameId = GetSamlNameID(token, saml2AuthnResponse.ClaimsIdentity);
+        }
+        catch (InvalidOperationException e)
+        {
+          Logger?.LogError(e, "Getting SAML NameId.");
+          saml2AuthnResponse.Status = Saml2StatusCodes.InvalidNameIdPolicy;
+        }
 
-				return soapEnvelope.ToActionResult();
-			}
-			catch (Exception exc)
-			{
-				Logger?.LogError(exc, "SAML Artifact Exception");
-				throw;
-			}
-		}
+        // We have to set destination here rather than above, because it gets NULLed by the Saml2ArtifactResponse constructor
+        saml2AuthnResponse.Destination = saml2ArtifactResolve.Destination;
 
-		[HttpPost(Routes.LOGOUT)]
-		public async Task<IActionResult> Logout()
-		{
-			ITfoxtec.Identity.Saml2.Http.HttpRequest request = Request.ToGenericHttpRequest();
-			Logger.LogTrace(request.Body);
+        saml2AuthnResponse.CreateSecurityToken(token.ClientApp.AllowedIssuer, subjectConfirmationLifetime: (int)(token.ExpiryDate - DateTime.UtcNow).TotalMinutes, issuedTokenLifetime: (int)(token.ExpiryDate - DateTime.UtcNow).TotalMinutes);
+        soapEnvelope.Bind(saml2ArtifactResponse);
 
-			// validate request
-			Saml2PostBinding requestBinding = new();
-			RelyingParty relyingParty = await ValidateRelyingParty(await ReadRelyingPartyFromLogoutRequest(requestBinding));
-			Saml2LogoutRequest saml2LogoutRequest = new (await GetRpSaml2Configuration(relyingParty));
+        return soapEnvelope.ToActionResult();
+      }
+      catch (Exception exc)
+      {
+        Logger?.LogError(exc, "SAML Artifact Exception");
+        throw;
+      }
+    }
 
-			try
-			{
-				requestBinding.Unbind(request, saml2LogoutRequest);
+    [HttpPost(Routes.LOGOUT)]
+    public async Task<IActionResult> Logout()
+    {
+      ITfoxtec.Identity.Saml2.Http.HttpRequest request = Request.ToGenericHttpRequest();
+      Logger.LogTrace("SAML Logout Request: {body}", request.Body);
 
-				// log out
-				await	this.SessionManager.SignOut(HttpContext);
+      // validate request
+      Saml2PostBinding requestBinding = new();
+      RelyingParty relyingParty = await ValidateRelyingParty(await ReadRelyingPartyFromLogoutRequest(requestBinding));
+      Saml2LogoutRequest saml2LogoutRequest = new(await GetRpSaml2Configuration(relyingParty));
 
-				return await LogoutResponse(saml2LogoutRequest.Id, Saml2StatusCodes.Success, requestBinding.RelayState, saml2LogoutRequest.SessionIndex, relyingParty);
-			}
-			catch (Exception exc)
-			{
-				Logger?.LogError(exc, "SAML Logout Exception");
-				return await LogoutResponse(saml2LogoutRequest.Id, Saml2StatusCodes.Responder, requestBinding.RelayState, saml2LogoutRequest.SessionIndex, relyingParty);
-			}
-		}
+      try
+      {
+        requestBinding.Unbind(request, saml2LogoutRequest);
+
+        // log out
+        await this.SessionManager.SignOut(HttpContext);
+
+        return await LogoutResponse(saml2LogoutRequest.Id, Saml2StatusCodes.Success, requestBinding.RelayState, saml2LogoutRequest.SessionIndex, relyingParty);
+      }
+      catch (Exception exc)
+      {
+        Logger?.LogError(exc, "SAML Logout Exception");
+        return await LogoutResponse(saml2LogoutRequest.Id, Saml2StatusCodes.Responder, requestBinding.RelayState, saml2LogoutRequest.SessionIndex, relyingParty);
+      }
+    }
 
 
-		[Route($"{Routes.METADATA}/{{issuer}}")]
-		public async Task<IActionResult> Metadata(string issuer)
-		{
-			ClientApp clientApp = await this.ClientAppManager.GetByIssuer(this.Context.Site, issuer);
+    [Route($"{Routes.METADATA}/{{issuer}}")]
+    public async Task<IActionResult> Metadata(string issuer)
+    {
+      ClientApp clientApp = await this.ClientAppManager.GetByIssuer(this.Context.Site, issuer);
 
-			if (clientApp == null)
-			{
-				throw new InvalidOperationException($"Client App for issuer '{issuer}' not found.");
-			}
+      if (clientApp == null)
+      {
+        throw new InvalidOperationException($"Client App for issuer '{issuer}' not found.");
+      }
 
-			Config config = new(this.Request, this.Context, clientApp);
+      Config config = new(this.Request, this.Context, clientApp);
 
-			Uri defaultSite = new(Request.Scheme + Uri.SchemeDelimiter + Request.Host.ToUriComponent() + Request.PathBase);
+      Uri defaultSite = new(Request.Scheme + Uri.SchemeDelimiter + Request.Host.ToUriComponent() + Request.PathBase);
 
-			EntityDescriptor entityDescriptor = new(config.AsSaml2Configuration(), true);
+      EntityDescriptor entityDescriptor = new(config.AsSaml2Configuration(), true)
+      {
+        ValidUntil = 365,
+        IdPSsoDescriptor = new IdPSsoDescriptor
+        {
+          SigningCertificates = new X509Certificate2[]
+        {
+          config.SigningCertificate
+        },
 
-			entityDescriptor.ValidUntil = 365;
-			entityDescriptor.IdPSsoDescriptor = new IdPSsoDescriptor
-			{
-				SigningCertificates = new X509Certificate2[]
-				{
-					config.SigningCertificate
-				},
+        SingleSignOnServices = new SingleSignOnService[]
+        {
+          new()
+          {
+            Binding = ProtocolBindings.HttpRedirect,
+            Location = new Uri(defaultSite, $"{Routes.LOGIN}")
+          }
+        },
 
-				SingleSignOnServices = new SingleSignOnService[]
-				{
-					new SingleSignOnService
-					{
-						Binding = ProtocolBindings.HttpRedirect,
-						Location = new Uri(defaultSite, $"{Routes.LOGIN}")
-					}
-				},
+        SingleLogoutServices = new SingleLogoutService[]
+        {
+          new()
+          {
+            Binding = ProtocolBindings.HttpPost,
+            Location = new Uri(defaultSite, $"{Routes.LOGOUT}")
+          }
+        },
 
-				SingleLogoutServices = new SingleLogoutService[]
-				{
-					new SingleLogoutService
-					{
-						Binding = ProtocolBindings.HttpPost,
-						Location = new Uri(defaultSite, $"{Routes.LOGOUT}")
-					}
-				},
-
-				ArtifactResolutionServices = new ArtifactResolutionService[]
-				{
-					new ArtifactResolutionService
-					{
-						Binding = ProtocolBindings.ArtifactSoap,
-						Index = 0,
-						Location = new Uri(defaultSite, $"{Routes.ARTIFACT}")
-					}
-				},
+        ArtifactResolutionServices = new ArtifactResolutionService[]
+        {
+          new() 
+          {
+            Binding = ProtocolBindings.ArtifactSoap,
+            Index = 0,
+            Location = new Uri(defaultSite, $"{Routes.ARTIFACT}")
+          }
+        },
         // specify available name identifier formats.  Corresponding code in GetSamlNameId must be able to return values for
         // these types.
-				NameIDFormats = new Uri[]
+        NameIDFormats = new Uri[]
         {
           NameIdentifierFormats.X509SubjectName,
           NameIdentifierFormats.Email,
           NameIdentifierFormats.Persistent,
           NameIdentifierFormats.Unspecified
         },
-			};
+        }
+      };
 
-			// Contact persons element is optional (SAML spec 2.3.2.2).  
-			//ContactPersons = new ContactPerson[] {
-			//	new ContactPerson(ContactTypes.Administrative)
-			//	{
-			//		Company = "Some Company", GivenName = "Some Given Name", SurName = "Some Surname",	EmailAddress = "some@some-domain.com", TelephoneNumber = "11111111"
-			//	}
-			//}
+      // Contact persons element is optional (SAML spec 2.3.2.2).  
+      //ContactPersons = new ContactPerson[] {
+      //	new ContactPerson(ContactTypes.Administrative)
+      //	{
+      //		Company = "Some Company", GivenName = "Some Given Name", SurName = "Some Surname",	EmailAddress = "some@some-domain.com", TelephoneNumber = "11111111"
+      //	}
+      //}
 
-			return new Saml2Metadata(entityDescriptor)
-				.CreateMetadata()
-				.ToActionResult();
-		}
+      return new Saml2Metadata(entityDescriptor)
+        .CreateMetadata()
+        .ToActionResult();
+    }
 
-		private async Task<string> ReadRelyingPartyFromLogoutRequest<T>(Saml2Binding<T> binding)
-		{
-			return binding.ReadSamlRequest(Request.ToGenericHttpRequest(), new Saml2LogoutRequest(await GetRpSaml2Configuration()))?.Issuer;
-		}
+    private async Task<string> ReadRelyingPartyFromLogoutRequest(Saml2Binding binding)
+    {
+      return binding.ReadSamlRequest(Request.ToGenericHttpRequest(), new Saml2LogoutRequest(await GetRpSaml2Configuration()))?.Issuer;
+    }
 
-		private async Task<IActionResult> LoginResponse(ClientAppToken token, Saml2StatusCodes status, RelyingParty relyingParty)
-		{
-			if (relyingParty.ProtocolBinding == ITfoxtec.Identity.Saml2.Schemas.ProtocolBindings.HttpPost.ToString()) // "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
-			{
-				return await LoginPostResponse(token, status, relyingParty);
-			}
-			else  // urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact
-			{
-				return await LoginArtifactResponse(token, status, relyingParty);
-			}
-		}
+    private async Task<IActionResult> LoginResponse(ClientAppToken token, Saml2StatusCodes status, RelyingParty relyingParty)
+    {
+      if (relyingParty.ProtocolBinding == ITfoxtec.Identity.Saml2.Schemas.ProtocolBindings.HttpPost.ToString()) // "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+      {
+        return await LoginPostResponse(token, status, relyingParty);
+      }
+      else  // urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact
+      {
+        return await LoginArtifactResponse(token, status, relyingParty);
+      }
+    }
 
-		/// <summary>
-		/// Return a HTTP-POST response with a form containing a base64-encoded 'SAMLResponse' value.
-		/// </summary>
-		/// <param name="token"></param>
-		/// <param name="status"></param>
-		/// <param name="relyingParty"></param>
-		/// <returns></returns>
-		private async Task<IActionResult> LoginPostResponse(ClientAppToken token, Saml2StatusCodes status, RelyingParty relyingParty)
-		{
+    /// <summary>
+    /// Return a HTTP-POST response with a form containing a base64-encoded 'SAMLResponse' value.
+    /// </summary>
+    /// <param name="token"></param>
+    /// <param name="status"></param>
+    /// <param name="relyingParty"></param>
+    /// <returns></returns>
+    private async Task<IActionResult> LoginPostResponse(ClientAppToken token, Saml2StatusCodes status, RelyingParty relyingParty)
+    {
       Saml2PostBinding response = new()
       {
         RelayState = token.RelayState
       };
 
       IEnumerable<Claim> claims = await BuildUserClaims(token.UserId);
-      
-			Config config = new(this.Request, this.Context, token.ClientApp);
 
-			Saml2Configuration responseConfig = new()
-			{
-				ArtifactResolutionService = config.ArtifactResolutionService,
-				SigningCertificate = config.SigningCertificate
-			};
+      Config config = new(this.Request, this.Context, token.ClientApp);
 
-			Saml2AuthnResponse saml2AuthnResponse = new(responseConfig)
-			{
-				Issuer = Request.Issuer(),
-				InResponseTo = new(token.RequestId),
-				Status = status,
-				Destination = relyingParty.AssertionConsumerServiceUri,
-			};
+      Saml2Configuration responseConfig = new()
+      {
+        ArtifactResolutionService = config.ArtifactResolutionService,
+        SigningCertificate = config.SigningCertificate
+      };
 
-			if (status == Saml2StatusCodes.Success && claims != null)
-			{
-        saml2AuthnResponse.ClaimsIdentity = new(claims);
+      Saml2AuthnResponse saml2AuthnResponse = new(responseConfig)
+      {
+        Issuer = Request.Issuer(),
+        InResponseTo = new(token.RequestId),
+        Status = status,
+        Destination = relyingParty.AssertionConsumerServiceUri,
+      };
 
-        try
-        {
-          saml2AuthnResponse.NameId = GetSamlNameID(token, saml2AuthnResponse.ClaimsIdentity);
-        }
-        catch(InvalidOperationException e)
-        {
-					Logger?.LogError(e, "Getting SAML NameId.");
-          saml2AuthnResponse.Status = Saml2StatusCodes.InvalidNameIdPolicy;
-        }
-
-        // This creates the assertions in the response
-				saml2AuthnResponse.CreateSecurityToken(token.ClientApp.AllowedIssuer, subjectConfirmationLifetime: 5, issuedTokenLifetime: 60);
-			}
-
-			return response.Bind(saml2AuthnResponse).ToActionResult();
-		}
-
-		/// <summary>
-		/// Return a HTTP-Artifact response, which is a redirect containing the artifact in the query string
-		/// </summary>
-		/// <param name="token"></param>
-		/// <param name="status"></param>
-		/// <param name="relyingParty"></param>
-		/// <returns></returns>
-		private async Task<IActionResult> LoginArtifactResponse(Models.ClientAppToken token, Saml2StatusCodes status, RelyingParty relyingParty)
-		{
-			Saml2ArtifactBinding response = new() 
-			{
-				RelayState = token.RelayState
-			};
-
-			Saml2ArtifactResolve saml2ArtifactResolve = new(await GetRpSaml2Configuration(relyingParty))
-			{
-				Issuer = Request.Issuer(),
-				Destination = relyingParty.AssertionConsumerServiceUri
-			};
-
-			response.Bind(saml2ArtifactResolve);
-
-			Saml2AuthnResponse saml2AuthnResponse = new(new Config(this.Request, this.Context, token.ClientApp).AsSaml2Configuration())
-			{
-				Issuer = Request.Issuer(),
-				InResponseTo = new Saml2Id(token.RequestId),
-				Status = status,
-				Destination = this.Context.Site.AbsoluteUri(Routes.ARTIFACT, Request.IsHttps)
-			};
-
-			IEnumerable<Claim> claims = await BuildUserClaims(token.UserId);
-
-			if (status == Saml2StatusCodes.Success && claims != null)
-			{
+      if (status == Saml2StatusCodes.Success && claims != null)
+      {
         saml2AuthnResponse.ClaimsIdentity = new(claims);
 
         try
@@ -528,18 +476,71 @@ namespace Nucleus.SAML.Server.Controllers
         }
         catch (InvalidOperationException e)
         {
-					Logger?.LogError(e, "Getting SAML NameId.");
-					saml2AuthnResponse.Status = Saml2StatusCodes.InvalidNameIdPolicy;
+          Logger?.LogError(e, "Getting SAML NameId.");
+          saml2AuthnResponse.Status = Saml2StatusCodes.InvalidNameIdPolicy;
         }
 
         // This creates the assertions in the response
         saml2AuthnResponse.CreateSecurityToken(token.ClientApp.AllowedIssuer, subjectConfirmationLifetime: 5, issuedTokenLifetime: 60);
-			}
+      }
 
-			token.Code = saml2ArtifactResolve.Artifact;
+      return response.Bind(saml2AuthnResponse).ToActionResult();
+    }
 
-			return response.ToActionResult();
-		}
+    /// <summary>
+    /// Return a HTTP-Artifact response, which is a redirect containing the artifact in the query string
+    /// </summary>
+    /// <param name="token"></param>
+    /// <param name="status"></param>
+    /// <param name="relyingParty"></param>
+    /// <returns></returns>
+    private async Task<IActionResult> LoginArtifactResponse(Models.ClientAppToken token, Saml2StatusCodes status, RelyingParty relyingParty)
+    {
+      Saml2ArtifactBinding response = new()
+      {
+        RelayState = token.RelayState
+      };
+
+      Saml2ArtifactResolve saml2ArtifactResolve = new(await GetRpSaml2Configuration(relyingParty))
+      {
+        Issuer = Request.Issuer(),
+        Destination = relyingParty.AssertionConsumerServiceUri
+      };
+
+      response.Bind(saml2ArtifactResolve);
+
+      Saml2AuthnResponse saml2AuthnResponse = new(new Config(this.Request, this.Context, token.ClientApp).AsSaml2Configuration())
+      {
+        Issuer = Request.Issuer(),
+        InResponseTo = new Saml2Id(token.RequestId),
+        Status = status,
+        Destination = this.Context.Site.AbsoluteUri(Routes.ARTIFACT, Request.IsHttps)
+      };
+
+      IEnumerable<Claim> claims = await BuildUserClaims(token.UserId);
+
+      if (status == Saml2StatusCodes.Success && claims != null)
+      {
+        saml2AuthnResponse.ClaimsIdentity = new(claims);
+
+        try
+        {
+          saml2AuthnResponse.NameId = GetSamlNameID(token, saml2AuthnResponse.ClaimsIdentity);
+        }
+        catch (InvalidOperationException e)
+        {
+          Logger?.LogError(e, "Getting SAML NameId.");
+          saml2AuthnResponse.Status = Saml2StatusCodes.InvalidNameIdPolicy;
+        }
+
+        // This creates the assertions in the response
+        saml2AuthnResponse.CreateSecurityToken(token.ClientApp.AllowedIssuer, subjectConfirmationLifetime: 5, issuedTokenLifetime: 60);
+      }
+
+      token.Code = saml2ArtifactResolve.Artifact;
+
+      return response.ToActionResult();
+    }
 
     /// <summary>
     /// Sets the returned NameID using the format specified by the AuthnRequest to determine what value to use.
@@ -560,9 +561,9 @@ namespace Nucleus.SAML.Server.Controllers
       {
         value = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
       }
-      else if (format == NameIdentifierFormats.Persistent || format == NameIdentifierFormats.Unspecified)      
+      else if (format == NameIdentifierFormats.Persistent || format == NameIdentifierFormats.Unspecified)
       {
-        value = token.UserId.ToString();        
+        value = token.UserId.ToString();
       }
 
       if (value == null)
@@ -574,148 +575,150 @@ namespace Nucleus.SAML.Server.Controllers
       return new Saml2NameIdentifier(value, format);
     }
 
-		private async Task<IActionResult> LogoutResponse(Saml2Id inResponseTo, Saml2StatusCodes status, string relayState, string sessionIndex, RelyingParty relyingParty)
-		{
-			var responsebinding = new Saml2PostBinding();
-			responsebinding.RelayState = relayState;
+    private async Task<IActionResult> LogoutResponse(Saml2Id inResponseTo, Saml2StatusCodes status, string relayState, string sessionIndex, RelyingParty relyingParty)
+    {
+      Saml2PostBinding responsebinding = new()
+      {
+        RelayState = relayState
+      };
 
-			Saml2LogoutResponse saml2LogoutResponse = new(await GetRpSaml2Configuration(relyingParty))
-			{
-				InResponseTo = inResponseTo,
-				Status = status,
-				Destination = relyingParty.SingleLogoutDestination,
-				SessionIndex = sessionIndex
-			};
+      Saml2LogoutResponse saml2LogoutResponse = new(await GetRpSaml2Configuration(relyingParty))
+      {
+        InResponseTo = inResponseTo,
+        Status = status,
+        Destination = relyingParty.SingleLogoutDestination,
+        SessionIndex = sessionIndex
+      };
 
-			return responsebinding.Bind(saml2LogoutResponse).ToActionResult();
-		}
+      return responsebinding.Bind(saml2LogoutResponse).ToActionResult();
+    }
 
-		private async Task<Saml2Configuration> GetRpSaml2Configuration(RelyingParty relyingParty = null)
-		{
-			ClientApp clientApp = await this.ClientAppManager.GetByIssuer(this.Context.Site, relyingParty?.Issuer ?? this.Issuer);
-			Config config = new(this.Request, this.Context, clientApp);
+    private async Task<Saml2Configuration> GetRpSaml2Configuration(RelyingParty relyingParty = null)
+    {
+      ClientApp clientApp = await this.ClientAppManager.GetByIssuer(this.Context.Site, relyingParty?.Issuer ?? this.Issuer);
+      Config config = new(this.Request, this.Context, clientApp);
 
-			var rpConfig = new Saml2Configuration()
-			{
-				Issuer = config.Issuer,
-				ArtifactResolutionService = new()
-				{
-					Index = 0,
-					Location = relyingParty.AssertionConsumerServiceUri
-				},
-				SigningCertificate = config.SigningCertificate
-			};
+      var rpConfig = new Saml2Configuration()
+      {
+        Issuer = config.Issuer,
+        ArtifactResolutionService = new()
+        {
+          Index = 0,
+          Location = relyingParty.AssertionConsumerServiceUri
+        },
+        SigningCertificate = config.SigningCertificate
+      };
 
-			if (relyingParty != null)
-			{
-				rpConfig.SignatureValidationCertificates.Add(relyingParty.SignatureValidationCertificate);
-				rpConfig.EncryptionCertificate = relyingParty.EncryptionCertificate;
-			}
+      if (relyingParty != null)
+      {
+        rpConfig.SignatureValidationCertificates.Add(relyingParty.SignatureValidationCertificate);
+        rpConfig.EncryptionCertificate = relyingParty.EncryptionCertificate;
+      }
 
-			return rpConfig;
-		}
+      return rpConfig;
+    }
 
-		private async Task<RelyingParty> ValidateRelyingParty(string issuer)
-		{
-			var clientApp = await this.ClientAppManager.GetByIssuer(this.Context.Site, issuer);
+    private async Task<RelyingParty> ValidateRelyingParty(string issuer)
+    {
+      var clientApp = await this.ClientAppManager.GetByIssuer(this.Context.Site, issuer);
 
-			if (clientApp == null)
-			{
-				throw new InvalidOperationException($"Client app '{issuer}' not found.");
-			}
+      if (clientApp == null)
+      {
+        throw new InvalidOperationException($"Client app '{issuer}' not found.");
+      }
 
-			RelyingParty relyingParty = new()
-			{
-				MetadataServiceUrl = clientApp.ServiceProviderMetadataUrl
-			};
+      RelyingParty relyingParty = new()
+      {
+        MetadataServiceUrl = clientApp.ServiceProviderMetadataUrl
+      };
 
-			if (!String.IsNullOrEmpty(relyingParty.MetadataServiceUrl))
-			{
-				// Use SP metadata endpoint to validate caller
-				using var cancellationTokenSource = new CancellationTokenSource(15 * 1000); // Cancel after 15 seconds.
-				await LoadRelyingPartyAsync(relyingParty, cancellationTokenSource);
-			}
-			else
-			{
-				// No SP metadata endpoint, do not validate
-				relyingParty.Issuer = this.Issuer;
-			}
+      if (!String.IsNullOrEmpty(relyingParty.MetadataServiceUrl))
+      {
+        // Use SP metadata endpoint to validate caller
+        using var cancellationTokenSource = new CancellationTokenSource(15 * 1000); // Cancel after 15 seconds.
+        await LoadRelyingPartyAsync(relyingParty, cancellationTokenSource);
+      }
+      else
+      {
+        // No SP metadata endpoint, do not validate
+        relyingParty.Issuer = this.Issuer;
+      }
 
-			return relyingParty;
-		}
+      return relyingParty;
+    }
 
-		private async Task LoadRelyingPartyAsync(RelyingParty relyingParty, CancellationTokenSource cancellationTokenSource)
-		{
-			try
-			{
-				// Load RP if not already loaded.
-				if (string.IsNullOrEmpty(relyingParty.Issuer))
-				{
-					EntityDescriptor entityDescriptor = new();
-					await entityDescriptor.ReadSPSsoDescriptorFromUrlAsync(this.HttpClientFactory, new Uri(relyingParty.MetadataServiceUrl), cancellationTokenSource.Token);
+    private async Task LoadRelyingPartyAsync(RelyingParty relyingParty, CancellationTokenSource cancellationTokenSource)
+    {
+      try
+      {
+        // Load RP if not already loaded.
+        if (string.IsNullOrEmpty(relyingParty.Issuer))
+        {
+          EntityDescriptor entityDescriptor = new();
+          await entityDescriptor.ReadSPSsoDescriptorFromUrlAsync(this.HttpClientFactory, new Uri(relyingParty.MetadataServiceUrl), cancellationTokenSource.Token);
 
-					if (entityDescriptor.SPSsoDescriptor != null)
-					{
-						relyingParty.Issuer = entityDescriptor.EntityId;
-						relyingParty.AssertionConsumerServiceUri = entityDescriptor.SPSsoDescriptor.AssertionConsumerServices
-							.Where(assertionConsumerService => assertionConsumerService.IsDefault)
-							.OrderBy(assertionConsumerService => assertionConsumerService.Index)
-							.First()
-							.Location;
+          if (entityDescriptor.SPSsoDescriptor != null)
+          {
+            relyingParty.Issuer = entityDescriptor.EntityId;
+            relyingParty.AssertionConsumerServiceUri = entityDescriptor.SPSsoDescriptor.AssertionConsumerServices
+              .Where(assertionConsumerService => assertionConsumerService.IsDefault)
+              .OrderBy(assertionConsumerService => assertionConsumerService.Index)
+              .First()
+              .Location;
 
-						SingleLogoutService singleLogoutService = entityDescriptor.SPSsoDescriptor.SingleLogoutServices.First();
-						relyingParty.SingleLogoutDestination = singleLogoutService.ResponseLocation ?? singleLogoutService.Location;
-						relyingParty.SignatureValidationCertificate = entityDescriptor.SPSsoDescriptor.SigningCertificates.First();
-					}
-					else
-					{
-						throw new Exception($"SPSsoDescriptor not loaded from metadata '{relyingParty.MetadataServiceUrl}'.");
-					}
-				}
-			}
-			catch(System.Threading.Tasks.TaskCanceledException exc)
-			{
-				// if the request to get metadata from the relying party timed out, 
-				Logger?.LogWarning(exc, "Request for SAML metadata from '{url}' timed out.", relyingParty.MetadataServiceUrl);
+            SingleLogoutService singleLogoutService = entityDescriptor.SPSsoDescriptor.SingleLogoutServices.First();
+            relyingParty.SingleLogoutDestination = singleLogoutService.ResponseLocation ?? singleLogoutService.Location;
+            relyingParty.SignatureValidationCertificate = entityDescriptor.SPSsoDescriptor.SigningCertificates.First();
+          }
+          else
+          {
+            throw new Exception($"SPSsoDescriptor not loaded from metadata '{relyingParty.MetadataServiceUrl}'.");
+          }
+        }
+      }
+      catch (System.Threading.Tasks.TaskCanceledException exc)
+      {
+        // if the request to get metadata from the relying party timed out, 
+        Logger?.LogWarning(exc, "Request for SAML metadata from '{url}' timed out.", relyingParty.MetadataServiceUrl);
 
-			}
-			catch (Exception exc)
-			{
-				//log error
-				Logger?.LogError(exc, "SAML SPSsoDescriptor Exception");
-				throw;
-			}
-		}
+      }
+      catch (Exception exc)
+      {
+        //log error
+        Logger?.LogError(exc, "SAML SPSsoDescriptor Exception");
+        throw;
+      }
+    }
 
-		private async Task<IEnumerable<Claim>> BuildUserClaims(Guid? userId)
-		{
-			List<Claim> claims = new();
+    private async Task<IEnumerable<Claim>> BuildUserClaims(Guid? userId)
+    {
+      List<Claim> claims = [];
 
-			if (userId.HasValue)
-			{
-				User user = await this.UserManager.Get(userId.Value);
+      if (userId.HasValue)
+      {
+        User user = await this.UserManager.Get(userId.Value);
 
-				claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-				claims.Add(new Claim(ClaimTypes.Name, user.UserName));
+        claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+        claims.Add(new Claim(ClaimTypes.Name, user.UserName));
 
-				foreach (UserProfileValue value in user.Profile)
-				{
-					claims.Add(new Claim(value.UserProfileProperty.TypeUri, value.Value ?? ""));
-				}
+        foreach (UserProfileValue value in user.Profile)
+        {
+          claims.Add(new Claim(value.UserProfileProperty.TypeUri, value.Value ?? ""));
+        }
 
-				// A user can be in more than one role, so the role claim is set to a comma-separated list
-				if (user.Roles != null && user.Roles.Any())
-				{
-					claims.Add(new Claim(ClaimTypes.Role, String.Join(',', user.Roles.Select(role => role.Name))));
-				}
-			}
+        // A user can be in more than one role, so the role claim is set to a comma-separated list
+        if (user.Roles != null && user.Roles.Any())
+        {
+          claims.Add(new Claim(ClaimTypes.Role, String.Join(',', user.Roles.Select(role => role.Name))));
+        }
+      }
 
-			return claims;
-		}
+      return claims;
+    }
 
-		private string DefaultLoginUri()
-		{
-			return this.Url.AreaAction("Index", "Account", "User");
-		}
-	}
+    private string DefaultLoginUri()
+    {
+      return this.Url.AreaAction("Index", "Account", "User");
+    }
+  }
 }

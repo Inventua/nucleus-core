@@ -6,7 +6,7 @@
   <description>
 		Present content in various forms: alert, tabbed, carousel and accordion.
 	</description>
-  <compatibility minVersion="1.3.0.0" maxVersion="*" />
+  <compatibility minVersion="1.4.0.0" maxVersion="*" />
   <components>
     <component folderName="MultiContent" optional="false">
       <moduleDefinition id="c690ad88-0438-48cf-b977-97fe53b7118f">

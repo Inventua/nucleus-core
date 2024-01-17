@@ -120,8 +120,9 @@ public class LoginController : Controller
         {
           // if the request came from script, return an X-Location instead of a normal redirect, because browsers eat redirects, and the code in 
           // shared.js never sees them.
-          ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
-          return StatusCode((int)System.Net.HttpStatusCode.Found);
+          //ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
+          //return StatusCode((int)System.Net.HttpStatusCode.Found);
+          return ControllerContext.HttpContext.NucleusRedirect(location);
         }
         else
         {
@@ -143,8 +144,9 @@ public class LoginController : Controller
       {
         // if the request came from script, return an X-Location instead of a normal redirect, because browsers eat redirects, and the code in 
         // shared.js never sees them.
-        ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
-        return StatusCode((int)System.Net.HttpStatusCode.Found);
+        //ControllerContext.HttpContext.Response.Headers.Add("X-Location", location);
+        //return StatusCode((int)System.Net.HttpStatusCode.Found);
+        return ControllerContext.HttpContext.NucleusRedirect(location);
       }
       else
       {
@@ -249,9 +251,10 @@ public class LoginController : Controller
           UserSession session = await this.SessionManager.CreateNew(this.Context.Site, loginUser, viewModel.AllowRememberMe && viewModel.RememberMe, ControllerContext.HttpContext.Connection.RemoteIpAddress);
           await this.SessionManager.SignIn(session, HttpContext, viewModel.ReturnUrl);
 
-          string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/").ToString() : viewModel.ReturnUrl;
-          ControllerContext.HttpContext.Response.Headers.Add("X-Location", Url.Content(location));
-          return StatusCode((int)System.Net.HttpStatusCode.Found);
+          string location = String.IsNullOrEmpty(viewModel.ReturnUrl) ? Url.Content("~/").ToString() : Url.Content(viewModel.ReturnUrl);
+          //ControllerContext.HttpContext.Response.Headers.Add("X-Location", Url.Content(location));
+          //return StatusCode((int)System.Net.HttpStatusCode.Found);
+          return ControllerContext.HttpContext.NucleusRedirect(location);
         }
       }
     }

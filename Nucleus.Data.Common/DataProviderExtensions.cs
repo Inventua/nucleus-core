@@ -180,7 +180,7 @@ public static class DataProviderExtensions
   {
     try
     {
-      return assembly.GetTypes();
+      return assembly.GetExportedTypes();
     }
     catch (System.Reflection.ReflectionTypeLoadException)
     {

@@ -10,9 +10,10 @@ else
 		@if (Model.Results.Pages.Count > 1)
 		{
 			<div class="nucleus-pagingcontrol-left">
-				<span class="nucleus-paging-control-summary">Page @Model.Results.CurrentPageIndex of @Model.Results.TotalPages</span>
+				
 				@if (Model.RenderMode == Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Standard)
 				{
+          <span class="nucleus-paging-control-summary">Page @Model.Results.CurrentPageIndex of @Model.Results.TotalPages</span>
 					<button type="button" class="btn nucleus-material-icon nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == 1 ? " disabled" : "")" aria-label = "Select First Page" data-page="1">&#xe5dc;</button>
 					<button type="button" class="btn nucleus-pagingcontrol-pagebutton@(Model.Results.CurrentPageIndex == 1 ? " disabled" : "")" aria-label = "Select Previous Page" data-page="@(Model.Results.CurrentPageIndex - 1)">Previous</button>
 
@@ -33,7 +34,11 @@ else
 			</div>
 
 			@Html.DropDownList(Model.PropertyName + ".CurrentPageIndex", new SelectList(Model.Results.Pages, "Key", "Value", Model.Results.CurrentPageIndex), new { @class = "nucleus-pagingcontrol-pagedropdown no-appearance-override", @aria_label="Select Page", @title = "Select Page", @data_autopostbackevent = "change" })
-		}
+      @if (Model.RenderMode == Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact)
+      {
+        <span class="nucleus-paging-control-summary">of @Model.Results.TotalPages</span>
+      }
+    }
 		<label class="nucleus-pagingcontrol-pagesizelabel">Page Size:</label>
 		@Html.DropDownList(Model.PropertyName + ".PageSize", new SelectList(Model.Results.PageSizes, Model.Results.PageSize), new { @class = "nucleus-pagingcontrol-pagesizedropdown no-appearance-override", @title = "Page Size", @aria_label="Page Size" })
 	</div>

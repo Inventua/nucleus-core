@@ -91,7 +91,8 @@
 
 .nucleus-paging-control.compact .nucleus-pagingcontrol-pagedropdown
 {
-	margin-left: 0.5em;
+  margin-left: 0;
+	margin-right: 0.5em;
 }
 
 .nucleus-paging-control .nucleus-pagingcontrol-pagesizedropdown, .nucleus-paging-control .nucleus-pagingcontrol-pagedropdown

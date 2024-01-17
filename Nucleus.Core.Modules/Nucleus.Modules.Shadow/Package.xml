@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="d70a7ff0-ff47-4daa-aeee-e9a2c29985b3" xmlns="urn:nucleus/schemas/package/1.0">
   <name>Shadow</name>
-  <version>1.0.0.0</version>
+  <version>1.0.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
 		The Shadow Module displays a copy of a module from another page.  
@@ -19,7 +19,7 @@
         <categories>Content</categories>
       </moduleDefinition>
       <file name="readme.txt" />
-      <file name="license.txt" />      
+      <file name="license.txt" />
       <file name="settings.css" />
       <folder name="Bin">
         <file name="Nucleus.Modules.Shadow.dll" />

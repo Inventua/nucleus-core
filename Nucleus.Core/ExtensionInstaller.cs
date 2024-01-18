@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.IO.Compression;
 using System.Xml;
 using Nucleus.Extensions;
-using Nucleus.Abstractions;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
-using DocumentFormat.OpenXml.Office.CustomUI;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 
 namespace Nucleus.Core
 {
@@ -236,8 +233,8 @@ namespace Nucleus.Core
 
 						// apply module definitions
 						foreach (Nucleus.Abstractions.Models.Extensions.moduleDefinition moduleDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.moduleDefinition>())
-						{							
-							ModuleDefinition moduleDefinition = new() 
+						{
+              Nucleus.Abstractions.Models.ModuleDefinition moduleDefinition = new() 
 							{
 								Id = Guid.Parse(moduleDef.id),
 								FriendlyName = moduleDef.friendlyName,
@@ -326,7 +323,7 @@ namespace Nucleus.Core
 
 							foreach (Nucleus.Abstractions.Models.Extensions.moduleDefinition moduleDef in cleanup.Items.OfType<Nucleus.Abstractions.Models.Extensions.moduleDefinition>())
 							{
-								ModuleDefinition moduleDefinition = new()
+								Nucleus.Abstractions.Models.ModuleDefinition moduleDefinition = new()
 								{
 									Id = Guid.Parse(moduleDef.id),
 									FriendlyName = moduleDef.friendlyName,
@@ -420,7 +417,7 @@ namespace Nucleus.Core
 				foreach (Nucleus.Abstractions.Models.Extensions.moduleDefinition moduleDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.moduleDefinition>())
 				{
 
-					ModuleDefinition moduleDefinition = new()
+					Nucleus.Abstractions.Models.ModuleDefinition moduleDefinition = new()
 					{
 						Id = Guid.Parse(moduleDef.id),
 						FriendlyName = moduleDef.friendlyName,
@@ -597,25 +594,18 @@ namespace Nucleus.Core
 							System.Version newAssemblyVersion;
 							System.Version existingAssemblyVersion;
 
-							// Use an assembly load context which we unload after comparing the versions so that the assemblies don't remain loaded 
-							Nucleus.Core.Plugins.PluginLoadContext context;
-
-							// Load the new assembly and retrieve its version.
-							using (Stream stream = entry.Open())
+              // retrieve the version of the new assembly
+              using (Stream stream = entry.Open())
 							{
-								context = new("extension-installer-temp1", BuildExtensionFilePath(componentFolder, ""));
-								System.Reflection.Assembly newAssembly = context.LoadFromStream(stream);
-								newAssemblyVersion = newAssembly.GetName().Version;
-								stream.Close();
-								context.Unload();
+                newAssemblyVersion = GetAssemblyVersion(stream);                
 							}
 
-							// Load the existing assembly and retrieve its version
-							context = new("extension-installer-temp2", BuildExtensionFilePath(componentFolder, ""));
-							System.Reflection.Assembly existingAssembly = context.LoadFromAssemblyPath(BuildExtensionFilePath(componentFolder, entry.FullName));
-							existingAssemblyVersion = existingAssembly.GetName().Version;
-							context.Unload();
-							
+              // retrieve the version of the existing assembly
+              using (Stream stream = System.IO.File.OpenRead(BuildExtensionFilePath(componentFolder, entry.FullName)))
+              {
+                existingAssemblyVersion = GetAssemblyVersion(stream);
+              }             
+						
 							if (existingAssemblyVersion > newAssemblyVersion)
 							{
 								this.ModelState.AddModelError($"validate-file:{zipFullName}", $"A newer version [{existingAssemblyVersion}] of the assembly {zipFullName} [{newAssemblyVersion}] is already installed.");
@@ -637,6 +627,29 @@ namespace Nucleus.Core
 
 			return true;
 		}
+
+    private System.Version GetAssemblyVersion(Stream stream)
+    {
+      System.Version result;
+
+      if (!stream.CanSeek)
+      {
+        using (System.IO.MemoryStream peStream = new())
+        {
+          stream.CopyTo(peStream);
+          peStream.Position = 0;
+          result = GetAssemblyVersion(peStream);
+        }
+      }
+      else
+      {
+        PEReader reader = new(stream);
+        result = reader.GetMetadataReader().GetAssemblyDefinition().Version;
+        reader.Dispose();
+      }
+
+      return result;
+    }
 
 		/// <summary>
 		/// Copy a folder and its files to the specified folder.

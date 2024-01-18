@@ -13,7 +13,7 @@
 		<tr>
 			<td>
 				@Html.HiddenFor(model => model.Contents[contentCount].Id)
-				@Model.Contents[contentCount].Title
+        @(String.IsNullOrEmpty(Model.Contents[contentCount]?.Title?.Trim()) ? "(no title)" : Model.Contents[contentCount]?.Title)
 			</td>
 
 			<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("Edit", "MultiContent", "MultiContent")?id=@Model.Contents[contentCount].Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-primary" title="Edit" data-target="#ContentEditor" /></td>

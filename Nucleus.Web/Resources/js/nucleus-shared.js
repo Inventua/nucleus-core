@@ -1534,7 +1534,7 @@ function _Page()
         /* We want tooltips to show when the user hovers over the caption, rather than the input controls */
         var tooltipTarget = jQuery(element).find('label span');
 
-        /* Save the settings-control tile in data-bs-original-title and remove the title attribute, so the browser doesn't also try to show the title. */
+        /* Save the settings-control title in data-bs-original-title and remove the title attribute, so the browser doesn't also try to show the title. */
         /* This is the same as the built-in bootstrap tooltip behavior, but we have to do it ourselves because we are targeting 'tooltipTarget' rather */
         /* than the settings-control element. */
         jQuery(element)
@@ -1548,7 +1548,7 @@ function _Page()
             trigger: 'hover',
             placement: 'bottom',
             container: element,
-            title: function () { return jQuery(this).parents('.settings-control').first().attr('data-bs-original-title') },
+            title: function (element) { return jQuery(element).parents('.settings-control').first().attr('data-bs-original-title') },
             delay: 600
           });
 

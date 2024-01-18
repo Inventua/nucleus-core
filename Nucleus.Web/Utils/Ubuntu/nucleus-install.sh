@@ -1,4 +1,5 @@
 #! /bin/bash
+SHELL_SCRIPT_VERSION="2024.01"
 
 # Declare the options
 SHORT_OPTIONS=a:,o:,z:,t:,u:,d:,h
@@ -21,7 +22,6 @@ INSTALL_ZIPFILE=""
 INSTALL_TYPE=""
 UNZIP_PACKAGE="unzip"
 TARGET_DIRECTORY="/home/nucleus"
-SHELL_SCRIPT_VERSION="2023.12"
 
 printf "Nucleus installer shell script version %s. \n\n" "$SHELL_SCRIPT_VERSION"
 
@@ -54,7 +54,7 @@ function usage()
   printf "  - Creates a system account ('%s') that will run Nucleus.\n" "$SERVICE_ACCOUNT"
   printf "  - Creates the directories for Nucleus: ('%s', '%s' and\n" "$TARGET_DIRECTORY" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
   printf "    '%s').\n" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_DATA]}"
-  printf "  - Install ASP.NET Core Runtime.\n"
+  printf "  - Install or update ASP.NET Core Runtime.\n"
   printf "  - Install '%s' package utility.\n" "$UNZIP_PACKAGE"
   printf "  - Unzips the Nucleus files to the '%s' directory.\n" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
   printf "  - Creates and starts the service using systemd.\n"
@@ -230,8 +230,9 @@ if [ "$AUTO_INSTALL" == false ]; then
   printf "  - App path: '%s'.\n" "$TARGET_DIRECTORY"
   printf "  - Zip file: '%s'.\n\n" "$INSTALL_ZIPFILE"
   printf "This script will:\n"
-  printf "  - Create a service account '%s' (if it does not already exist).\n" "$SERVICE_ACCOUNT"
-  printf "  - Install the ASP.NET Core Runtime if it is not already installed.\n"
+  printf "  - Create a service account '%s', if it does not already exist.\n" "$SERVICE_ACCOUNT"
+  printf "  - Install the ASP.NET Core 8 Runtime, if it is not already installed.\n"
+  printf "  - Remove the old ASP.NET Core 6 Runtime, if it is installed.\n"
   printf "  - Install the %s package if it is not already installed.\n" "$UNZIP_PACKAGE"
   printf "  - %s Nucleus version %s.\n" "$INSTALL_MESSAGE" "$VERSION"
   printf "  - Set file and directory owner and permissions.\n"
@@ -288,12 +289,22 @@ if [ "$CREATE_DIRECTORIES" == true ]; then
   chmod g+rx-w "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_CERTS]}"
 fi
 
+
 # Download and install the dotnet runtime
-if ! dpkg-query -W -f='${Status}' "aspnetcore-runtime-6.0"|grep "ok installed" > /dev/null ; then
+if ! dpkg-query -W -f='${Status}' "aspnetcore-runtime-8.0"|grep "ok installed" > /dev/null ; then
   printf "Installing .NET...\n"
-  apt-get -q update && apt-get -q -y install aspnetcore-runtime-6.0
+  apt-get -q update && apt-get -q -y install aspnetcore-runtime-8.0
 else
   printf ".NET is already installed.\n"
+fi
+
+# remove .net 6 runtime, if the .net 8 install was successful
+if dpkg-query -W -f='${Status}' "aspnetcore-runtime-6.0"|grep "ok installed" > /dev/null ; then
+  if dpkg-query -W -f='${Status}' "aspnetcore-runtime-8.0"|grep "ok installed" > /dev/null ; then
+    printf "Removing .NET 6 after upgrade to .NET 8 ...\n"
+    apt remove -q aspnetcore-runtime-6.0
+    apt autoremove
+  fi
 fi
 
 # add dotnet to the path

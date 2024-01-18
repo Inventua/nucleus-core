@@ -123,7 +123,7 @@ public class FileSystemManager : IFileSystemManager
 						{
 							RemoveSiteHomeDirectory(site, folder.Parent);
 							Folder parent = RemoveSiteHomeDirectory(site, await dataProvider.GetFolder(site, folder.Provider, folder.Parent.Path));
-							parent.CopyDatabaseValuesTo(folder.Parent);
+							parent?.CopyDatabaseValuesTo(folder.Parent);
 						}
 					}
 

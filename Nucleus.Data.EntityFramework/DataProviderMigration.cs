@@ -228,7 +228,7 @@ namespace Nucleus.Data.EntityFramework
         {
           foreach (MigrationOperation operation in definition.Operations)
           {
-            // Operations wrapped in a DatabaseProviderSpecificOperation can be returned as null if conditions are not met, skip nulls them
+            // Operations wrapped in a DatabaseProviderSpecificOperation can be returned as null if conditions are not met
             if (operation != null)
             {
               ApplyCorrections(operation);

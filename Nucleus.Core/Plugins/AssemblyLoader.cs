@@ -218,8 +218,8 @@ namespace Nucleus.Core.Plugins
 		/// AssemblyLoadContext for the extension.  For assemblies which are located elsewhere, the Default AssemblyLoadContext
 		/// is set.
 		/// This method should be called with a using statement.  When the CurrentContextualReflectionContext is set, calls to Type.GetType
-		/// and other type-resolving functions use the CurrentContextualReflactionContext.  When the ContextualReflectionScope is
-		/// disposed, the CurrentContextualReflectionContext is reset back to the Default AssemblyLoadContext.
+		/// and other type-resolving functions use the CurrentContextualReflectionContext.  When the ContextualReflectionScope is
+		/// disposed, the CurrentContextualReflectionContext is reset back to the default AssemblyLoadContext.
 		/// </remarks>
 		/// <example>
 		/// using (System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope scope = Nucleus.Core.Plugins.AssemblyLoader.EnterExtensionContext(moduleinfo.ModuleDefinition.ClassTypeName))
@@ -261,7 +261,7 @@ namespace Nucleus.Core.Plugins
 		/// </remarks>
 		public static void UnloadAll()
 		{
-      LoadedAssemblies.Clear();
+      LoadedAssemblies?.Clear();
 			TypeContextCache.Clear();
 
 			string extensionsFolder = Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic(false);

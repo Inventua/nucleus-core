@@ -482,6 +482,7 @@ ul.nucleus-control-panel-items button
 	max-width: 20rem;	
 	flex-basis: 100%;
 	align-self: stretch;
+  overflow: auto;  /* this is required so that the list has a scroll bar when there are too many items to fit on the page */
 }
 
 .nucleus-index-items ul
@@ -574,6 +575,24 @@ ul.nucleus-control-panel-items button
   color: white!important;
   position: static;
   margin: auto 0 auto auto!important;  
+}
+
+.nucleus-index-items .user-list li
+{
+  border-bottom: 1px dotted #aaa;
+}
+
+.nucleus-index-items .user-list li > a 
+{
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.nucleus-index-items .user-list li > a *
+{
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 /*

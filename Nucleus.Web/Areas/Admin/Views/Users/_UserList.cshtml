@@ -1,8 +1,17 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.UserIndex
 @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.Users, propertyName = "Users", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
-<ul>
+<ul class="user-list">
 	@foreach (var item in Model.Users.Items)
 	{
-		<li><a href="@Url.Content("~/Admin/Users/Editor")?id=@item.Id" data-target=".UserEditor">@(String.IsNullOrEmpty(item.UserName) ? "Blank User Name" : item.UserName)</a></li>
+		<li>
+      <a href="@Url.Content("~/Admin/Users/Editor")?id=@item.Id" data-target=".UserEditor">
+        <div class="fw-bold">@(String.IsNullOrEmpty(item.UserName) ? "Blank User Name" : item.UserName)</div>
+        @if (Model.Site.HasProperty(System.Security.Claims.ClaimTypes.GivenName) || Model.Site.HasProperty(System.Security.Claims.ClaimTypes.Surname))
+        {
+          <div class="small fst-italic">@item.Profile.GetProperty(System.Security.Claims.ClaimTypes.GivenName)?.Value @item.Profile.GetProperty(System.Security.Claims.ClaimTypes.Surname)?.Value</div>
+        }
+        <div class="small">@item.Profile.GetProperty(System.Security.Claims.ClaimTypes.Email)?.Value</div>
+      </a>
+    </li>
 	}
 </ul>

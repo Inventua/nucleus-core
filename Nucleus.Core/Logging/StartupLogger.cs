@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
-using Nucleus.Extensions;
 using System.Runtime.CompilerServices;
 
 namespace Nucleus.Core.Logging
@@ -44,6 +43,27 @@ namespace Nucleus.Core.Logging
 			_startupLogger = loggerFactory.CreateLogger("Startup");
 		}
 
+    private static ILogger CreateLogger()
+    {
+      // Create loggers for logging during startup
+			using var loggerFactory = LoggerFactory.Create(builder =>
+			{
+				builder.AddSimpleConsole(options => { options.TimestampFormat = "dd-MMM-yyyy HH:mm:ss: "; });
+				builder.AddDebug();
+			});
+
+			_startupLogger = loggerFactory.CreateLogger("Startup");
+
+      return _startupLogger;
+    }
+
+    public static ILogger GetLogger()
+    {
+    
+        return _startupLogger ?? CreateLogger();
+      
+    }
+
 		/// <summary>
 		/// Gets the startup logger
 		/// </summary>
@@ -51,11 +71,7 @@ namespace Nucleus.Core.Logging
 		/// <returns>Startup logger.</returns>
 		public static ILogger Logger(this IMvcBuilder builder, [CallerMemberName] string caller = "")
 		{
-			if (_startupLogger == null)
-			{
-				throw new InvalidOperationException($"Invalid call from {caller}. Call IServiceCollection.AddStartupLogger before using the startup logger.");
-			}
-			return _startupLogger;			
+      return GetLogger(); // _startupLogger;
 		}
 
 		/// <summary>
@@ -65,12 +81,8 @@ namespace Nucleus.Core.Logging
 		/// <returns>Startup logger.</returns>
 		public static ILogger Logger(this IApplicationBuilder builder, [CallerMemberName] string caller = "")
 		{
-			if (_startupLogger == null)
-			{
-				throw new InvalidOperationException($"Invalid call from {caller}. Call IServiceCollection.AddStartupLogger before using the startup logger.");
-			}
-			return _startupLogger;
-		}
+      return GetLogger(); // _startupLogger;
+    }
 
 		/// <summary>
 		/// Gets the startup logger
@@ -79,12 +91,8 @@ namespace Nucleus.Core.Logging
 		/// <returns>Startup logger.</returns>
 		public static ILogger Logger(this IServiceCollection services, [CallerMemberName] string caller = "")
 		{
-			if (_startupLogger == null)
-			{
-				throw new InvalidOperationException($"Invalid call from {caller}. Call IServiceCollection.AddStartupLogger before using the startup logger.");
-			}
-			return _startupLogger;
-		}
+			return GetLogger(); // _startupLogger;
+    }
 
 		/// <summary>
 		/// Gets the startup logger
@@ -93,26 +101,18 @@ namespace Nucleus.Core.Logging
 		/// <returns>Startup logger.</returns>
 		public static ILogger Logger(this IHost host, [CallerMemberName] string caller = "")
 		{
-			if (_startupLogger == null)
-			{
-				throw new InvalidOperationException($"Invalid call from {caller}. Call IServiceCollection.AddStartupLogger before using the startup logger.");
-			}
-			return _startupLogger;
-		}
+      return GetLogger(); // _startupLogger;
+    }
 
-		/// <summary>
-		/// Gets the startup logger
-		/// </summary>
-		/// <param name="builder"><see cref="IHostBuilder"/> instance.</param>
-		/// <returns>Startup logger.</returns>
-		public static ILogger Logger(this IHostBuilder builder, [CallerMemberName] string caller = "")
+    /// <summary>
+    /// Gets the startup logger
+    /// </summary>
+    /// <param name="builder"><see cref="IHostBuilder"/> instance.</param>
+    /// <returns>Startup logger.</returns>
+    public static ILogger Logger(this IHostBuilder builder, [CallerMemberName] string caller = "")
 		{
-			if (_startupLogger == null)
-			{
-				throw new InvalidOperationException($"Invalid call from {caller}. Call IServiceCollection.AddStartupLogger before using the startup logger.");
-			}
-			return _startupLogger;
-		}
+			return GetLogger(); // _startupLogger;
+    }
 		
 		/// <summary>
 		/// Extension for the <see cref="ILogger.LogInformation"/> method to log multiple lines in one log entry.

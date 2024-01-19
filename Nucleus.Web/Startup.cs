@@ -23,7 +23,6 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
-using System.Globalization;
 using System.IO;
 using Microsoft.AspNetCore.DataProtection;
 using System.Runtime.InteropServices;
@@ -119,11 +118,11 @@ namespace Nucleus.Web
     {
       try
       {
-        services.AddStartupLogger(this.Configuration);
-
         // This must be called before .AddStartupLogger, because the TextFileLogger uses its values.
         services.AddFolderOptions(this.Configuration);
-
+        
+        services.AddStartupLogger(this.Configuration);
+        
         services.Logger().LogInformation(new[]
         {
           $"{System.Reflection.Assembly.GetExecutingAssembly().Product()} version {this.GetType().Assembly.Version()}. {this.GetType().Assembly.Copyright()}",
@@ -133,8 +132,8 @@ namespace Nucleus.Web
           $"Environment:             [{this.Environment.EnvironmentName}]",
           $"Urls:                    [{this.Configuration.GetValue<string>(Microsoft.AspNetCore.Hosting.WebHostDefaults.ServerUrlsKey)}]"
         });
-
-        services.Logger().LogInformation("Used config files: '{file}'", String.Join(',', ConfigFiles)); 
+        
+        services.Logger().LogInformation("Used config files: '{file}'", String.Join(',', ConfigFiles));
 
         services.AddHttpContextAccessor();  // required by many elements of the system
         services.AddHttpClient();
@@ -274,6 +273,13 @@ namespace Nucleus.Web
       {
         app.UseMiddleware<SecurityHeadersMiddleware>();
         app.UseRequestLocalization();
+
+        // check & warn if the text file logger configuration is invalid
+        Nucleus.Abstractions.Models.Configuration.TextFileLoggerOptions textFileLoggerOptions = app.ApplicationServices.GetService<Microsoft.Extensions.Options.IOptions<Nucleus.Abstractions.Models.Configuration.TextFileLoggerOptions>>().Value;
+        if (!textFileLoggerOptions.Enabled)
+        { 
+          app.Logger().LogWarning("The text file logger was disabled because of an error accessing '{path}'.", textFileLoggerOptions.Path);
+        }
 
         app.UseExceptionHandler($"/{RoutingConstants.ERROR_ROUTE_PATH}");
 

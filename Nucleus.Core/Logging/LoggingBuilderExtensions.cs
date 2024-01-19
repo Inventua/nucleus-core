@@ -10,36 +10,36 @@ using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Core.Logging
 {
-	/// <summary>
-	/// Extension methods and supporting functions used in .net core/dependency injection startup.  
-	/// </summary>
-	/// <remarks>
-	/// Logging providers are added by Nucleus Core.Host.  You would not typically need to use these function in an Nucleus Core 
+  /// <summary>
+  /// Extension methods and supporting functions used in .net core/dependency injection startup.  
+  /// </summary>
+  /// <remarks>
+  /// Logging providers are added by Nucleus Core.Host.  You would not typically need to use these function in an Nucleus Core 
   /// application.
-	/// </remarks>
-	public static class LoggingBuilderExtensions
-	{
-		/// <summary>
-		///   Adds a Debug logger.
-		/// </summary>
-		/// <param name="builder"></param>
-		/// <returns>ILoggingBuilder</returns>
-		public static ILoggingBuilder AddDebugLogger(this ILoggingBuilder builder)
-		{
-			builder.AddProvider(new DebugLoggingProvider());
+  /// </remarks>
+  public static class LoggingBuilderExtensions
+  {
+    /// <summary>
+    ///   Adds a Debug logger.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <returns>ILoggingBuilder</returns>
+    public static ILoggingBuilder AddDebugLogger(this ILoggingBuilder builder)
+    {
+      builder.AddProvider(new DebugLoggingProvider());
 
-			return builder;
-		}
+      return builder;
+    }
 
-		/// <summary>
-		///   Adds a Text file logger with options defined in configuration.
-		/// </summary>
-		/// <param name="builder"></param>
-		/// <param name="configuration"></param>
-		/// <returns>ILoggingBuilder</returns>
-		public static ILoggingBuilder AddTextFileLogger(this ILoggingBuilder builder, IConfiguration configuration)
-		{
-			builder.Services.AddOption<TextFileLoggerOptions>(configuration, TextFileLoggerOptions.Section);
+    /// <summary>
+    ///   Adds a Text file logger with options defined in configuration.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="configuration"></param>
+    /// <returns>ILoggingBuilder</returns>
+    public static ILoggingBuilder AddTextFileLogger(this ILoggingBuilder builder, IConfiguration configuration)
+    {
+      builder.Services.AddOption<TextFileLoggerOptions>(configuration, TextFileLoggerOptions.Section);
 
       // The TextFileLogger is used by the StartupLogger for logging during dependency injection setup.
       // The IOptions<FolderOptions> and IConfiguration instance which is added to the dependency injection container won't be
@@ -50,27 +50,27 @@ namespace Nucleus.Core.Logging
       ConfigureTextFileLogger.Configuration = configuration;
 
       builder.Services.ConfigureOptions<ConfigureTextFileLogger>();
-			builder.Services.AddSingleton<ILoggerProvider, TextFileLoggingProvider>();
-			builder.Services.AddTransient<IExternalScopeProvider, LoggerExternalScopeProvider>();
+      builder.Services.AddSingleton<ILoggerProvider, TextFileLoggingProvider>();
+      builder.Services.AddTransient<IExternalScopeProvider, LoggerExternalScopeProvider>();
 
-			return builder;
-		}
+      return builder;
+    }
 
-		public class ConfigureTextFileLogger : IPostConfigureOptions<TextFileLoggerOptions>
-		{
-			private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
+    public class ConfigureTextFileLogger : IPostConfigureOptions<TextFileLoggerOptions>
+    {
+      private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
 
       // This is populated in AddTextFileLogger because we can't get an IConfiguration instance from dependency injection
       // when the text file logger is used by the StartupLogger (because Startup has not finished yet)
       internal static IConfiguration Configuration { private get; set; }
-
+      
       public ConfigureTextFileLogger(IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
-			{
-        this.FolderOptions = folderOptions;				
-			}
+      {
+        this.FolderOptions = folderOptions;
+      }
 
-			public void PostConfigure(string name, TextFileLoggerOptions options)
-			{
+      public void PostConfigure(string name, TextFileLoggerOptions options)
+      {
         // Special case:
         // When the text file logger is added to the StartupLogger, dependency injection hasn't been set up yet and folderOptions hasn't
         // been initialized, so we have to read the DataPath ourselves using the Configuration value that we set in AddTextFileLogger.  We
@@ -81,23 +81,16 @@ namespace Nucleus.Core.Logging
           Configuration = null;
         }
 
-        if (String.IsNullOrEmpty(options.Path))
-				{
-					try
-					{
-						options.Path = this.FolderOptions.Value.GetLogFolder();
-					}
-					catch (System.UnauthorizedAccessException)
-					{
-            // if there is a permissions error on the data/log file path, set the text file logger to disabled
-            options.Enabled = false;
-					}
-				}
-        else
+        try
         {
-          options.Path = this.FolderOptions.Value.ParseFolder(options.Path);
+          options.Path = String.IsNullOrEmpty(options.Path) ? this.FolderOptions.Value.GetLogFolder() : this.FolderOptions.Value.ParseFolder(options.Path);
         }
-			}
-		}
-	}
+        catch (Exception ex) when (ex is System.UnauthorizedAccessException || ex is System.IO.DirectoryNotFoundException)
+        {
+          // if there is a permissions error on the data/log file path, set the text file logger to disabled
+          options.Enabled = false;
+        }
+      }
+    }
+  }
 }

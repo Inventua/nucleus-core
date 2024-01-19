@@ -302,8 +302,8 @@ fi
 if dpkg-query -W -f='${Status}' "aspnetcore-runtime-6.0"|grep "ok installed" > /dev/null ; then
   if dpkg-query -W -f='${Status}' "aspnetcore-runtime-8.0"|grep "ok installed" > /dev/null ; then
     printf "Removing .NET 6 after upgrade to .NET 8 ...\n"
-    apt remove -q aspnetcore-runtime-6.0
-    apt autoremove
+    apt remove -q -y aspnetcore-runtime-6.0
+    apt -y autoremove
   fi
 fi
 

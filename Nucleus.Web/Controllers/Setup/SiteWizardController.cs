@@ -930,7 +930,7 @@ public class SiteWizardController : Controller
   {
     try
     {
-      return assembly.GetTypes();
+      return assembly.GetExportedTypes();
     }
     catch (System.Reflection.ReflectionTypeLoadException)
     {

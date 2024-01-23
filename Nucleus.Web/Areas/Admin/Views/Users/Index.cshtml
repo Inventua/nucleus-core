@@ -4,14 +4,14 @@
 @using Nucleus.ViewFeatures
 <h1 class="nucleus-control-panel-heading">Users</h1>
 <div class="nucleus-index-wrapper">
-  @using (Html.BeginAreaForm("List", "Users", "Admin", FormMethod.Post, new { @class = "d-flex flex-column", @data_target = ".nucleus-index-items", @autocomplete = "off" }))
+  @using (Html.BeginAreaForm("List", "Users", "Admin", FormMethod.Post, new { @class = "d-flex flex-column overflow-auto", @data_target = ".nucleus-index-items", @autocomplete = "off" }))
   {
     <div class="nucleus-form-tools mt-1">
       @Html.TextBoxFor(model => model.SearchTerm, new { @class = "align-self-stretch", @placeholder = "search", @type = "search" })
       <button type="submit" title="Search" class="user-search nucleus-material-icon btn btn-outline-secondary">&#xe8b6;</button>
       @await Html.PartialAsync("_FilterSettings", Model)
     </div>
-    <div class="nucleus-index-items">
+    <div class="nucleus-index-items flex-1">
       @await Html.PartialAsync("_UserList", Model)
     </div>
   }

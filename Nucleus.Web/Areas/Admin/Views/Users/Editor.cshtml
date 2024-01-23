@@ -71,13 +71,33 @@
 							<div class="alert alert-info d-flex align-items-center gap-1">
 								<span>This user's password has expired.</span>
 								<button type="submit" class="btn btn-primary ms-auto text-nowrap" formaction="@Url.AreaAction("SendPasswordReset", "Users", "Admin")">Send Password Reset Message</button>
-							</div>
-						}
-						@if (!Model.User.Verified)
+              </div>
+            }
+            else
+            {
+              if (!String.IsNullOrEmpty(Model.User.Secrets?.PasswordHashAlgorithm))
+              {
+                <div class="alert alert-success d-flex align-items-center gap-1">
+                  <span>This user's password is valid.</span>
+                  <button type="submit" class="btn btn-success ms-auto text-nowrap" formaction="@Url.AreaAction("SendPasswordReset", "Users", "Admin")">Send Password Reset Message</button>
+                </div>
+              }
+              else
+              {                
+                <div class="alert alert-info d-flex align-items-center gap-1">
+                  <span>
+                    <p>This user does not have a password.</p>
+                    <small>If the user always logs in using an external authentication provider like SAML or OAuth, it can can be valid to have no password in Nucleus.</small></span>
+                  <button type="submit" class="btn btn-info ms-auto text-nowrap" formaction="@Url.AreaAction("SendPasswordReset", "Users", "Admin")">Send Password Reset Message</button>
+                </div>                
+              }
+            }
+
+            @if (!Model.User.Verified)
 						{
 							<div class="alert alert-info d-flex align-items-center gap-1">
 								<span>This user's account has not been verified.</span>
-								<button type="submit" class="btn btn-secondary ms-auto text-nowrap" formaction="@Url.AreaAction("SendVerification", "Users", "Admin")">Send Verification Message</button>
+								<button type="submit" class="btn btn-info ms-auto text-nowrap" formaction="@Url.AreaAction("SendVerification", "Users", "Admin")">Send Verification Message</button>
 							</div>
 						}
 
@@ -130,6 +150,7 @@
 							</div>
 						}
 					</div>
+
 				}
 			</fieldset>
 		</TabPanel>
@@ -176,7 +197,7 @@
 						<button type="submit" formaction="@Url.AreaAction("AddRole", "Users", "Admin")" data-target=".UserEditor" class="btn btn-secondary">Add Role</button>
 					</div>
 				}
-				<table>
+        <table class="table table-sm table-sticky-headers">
 					@for (int roleCount = 0; roleCount < Model.User.Roles?.Count; roleCount++)
 					{
 						<tr>
@@ -197,10 +218,6 @@
 		@if (Model.User.Id != Guid.Empty && !Model.IsCurrentUser)
 		{
 			<button type="submit" class="btn btn-danger" formaction="@Url.AreaAction("DeleteUser", "Users", "Admin")" data-confirm="<p>User accounts should typically only be deleted under specific circumstances, such as when the account was never verified or approved, or when it was created in error. Deleting an account with associated data like forum posts may fail. For users with a history, you should use the 'Approved' control above to disable the account instead.</p>Do you want to delete this user account?">Delete User</button>
-		}
-		@if (!Model.IsPasswordExpired)
-		{
-			<button type="submit" class="btn btn-secondary ms-auto text-nowrap" formaction="@Url.AreaAction("SendPasswordReset", "Users", "Admin")">Send Password Reset Message</button>
 		}
 	</div>
 }

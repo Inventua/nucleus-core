@@ -90,7 +90,9 @@ public class SystemController : Controller
 
   private void ReadLogFile(Nucleus.Abstractions.Models.Paging.PagingSettings settings, ViewModels.Admin.SystemIndex.LogSettingsViewModel viewModel)
   {
-    List<ViewModels.Admin.SystemIndex.LogEntry> results = ReadLogFile(viewModel.LogFile);
+    List<ViewModels.Admin.SystemIndex.LogEntry> results = ReadLogFile(viewModel.LogFile)
+      .Where(log => log.IsValid && log.IsMatch(viewModel))
+      .ToList();
 
     viewModel.LogContent = new(settings);
     viewModel.LogContent.TotalCount = results.Count;
@@ -101,7 +103,6 @@ public class SystemController : Controller
     }
 
     viewModel.LogContent.Items = results
-      .Where(logitem => logitem.IsMatch(viewModel))
       .Skip(viewModel.LogContent.FirstRowIndex)
       .Take(viewModel.LogContent.PageSize)
       .ToList();

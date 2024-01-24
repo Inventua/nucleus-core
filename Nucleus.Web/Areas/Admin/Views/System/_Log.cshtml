@@ -1,33 +1,34 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.SystemIndex.LogSettingsViewModel
-@if (Model.LogContent?.Items?.Any() == true)
-{
-	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.LogContent, propertyName = "LogContent", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
-	<div class="overflow-auto">
-		<table class="table font-monospace table-sticky-headers">
-			<thead>
-			<tr>
-				<th>Date</th>
-				<th><span class="nucleus-log-level">Level</span></th>
-				<th>Message</th>
-			</tr>
-			</thead>
-			<tbody>
-			@foreach (var entry in Model.LogContent.Items.Where(log => log.IsValid))
-			{
-				<tr>
-					<td>@entry.Date.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-					<td><span class="nucleus-log-level nucleus-log-level-@entry.Level.ToLower()">@entry.Level</span></td>
-					<td class="text-break position-relative"><div class="nucleus-log-category">@entry.Category</div><div class="nucleus-log-message">@(new Microsoft.AspNetCore.Html.HtmlString(System.Web.HttpUtility.HtmlEncode(entry.Message)))</div></td>					
-				</tr>
-			}
-			</tbody>
-		</table>
-	</div>
+@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.LogContent, propertyName = "LogContent", renderMode = Nucleus.ViewFeatures.ViewModels.PagingControl.RenderModes.Compact })
+<div class="overflow-auto">
+  <table class="table font-monospace table-sticky-headers">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th><span class="nucleus-log-level">Level</span></th>
+        <th>Message</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (Model.LogContent?.Items?.Any() == true)
+      {
+        @foreach (var entry in Model.LogContent.Items)
+        {
+          <tr>
+            <td>@entry.Date.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+            <td><span class="nucleus-log-level nucleus-log-level-@entry.Level.ToLower()">@entry.Level</span></td>
+            <td class="text-break position-relative"><div class="nucleus-log-category">@entry.Category</div><div class="nucleus-log-message">@(new Microsoft.AspNetCore.Html.HtmlString(System.Web.HttpUtility.HtmlEncode(entry.Message)))</div></td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>
 
-	<script>
-		jQuery(document).ready(function ()
-		{
-			Page.AttachCopyButton('.nucleus-log-message', 'tr');
-		});
-	</script>
-}
+<script>
+  jQuery(document).ready(function ()
+  {
+    Page.AttachCopyButton('.nucleus-log-message', 'tr');
+  });
+</script>
+      

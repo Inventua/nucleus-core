@@ -75,7 +75,7 @@ var require = { paths: { vs: 'Resources/Libraries/Monaco/0.44.0/min/vs' } };
             endColumn: position.column,
           });
           var lines = textUntilPosition.split('\n');
-          var match = lines[lines.length - 1].match('@Model[\?]{0,1}[\.]{1}(?<expression>[A-Za-z0-9_.]*)[\s(]*(?<parameters>[A-Za-z0-9._]*)');
+          var match = lines[lines.length - 1].match('@Model[\?]{0,1}[\.]{1}(?<expression>[A-Za-z0-9_.]*)[\s(]*(?<parameters>[A-Za-z0-9._]*)$');
           if (!match)
           {
             return { suggestions: [] };

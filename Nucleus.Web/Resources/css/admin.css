@@ -481,7 +481,6 @@ ul.nucleus-control-panel-items button
 	flex-grow: 1;
   flex-shrink: 0;
 	max-width: 20rem;	
-	flex-basis: 100%;
 	align-self: stretch;
   overflow-y: auto;  /* this is required so that the list has a scroll bar when there are too many items to fit on the page */
 }

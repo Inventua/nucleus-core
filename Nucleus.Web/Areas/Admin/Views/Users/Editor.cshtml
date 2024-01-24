@@ -4,73 +4,73 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Extensions;
 @using Nucleus.Abstractions.Models.Configuration
-@using (Html.BeginAreaForm("Save", "Users", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @autocomplete = "off" }))
+@using (Html.BeginAreaForm("Save", "Users", "Admin", FormMethod.Post, new { @class = "d-flex flex-1 overflow-auto", @data_target = ".nucleus-adminpage", @autocomplete = "off" }))
 {
-	<Tab>
-		<TabItem target="#user-properties" caption="Properties" active="true"></TabItem>
-		<TabItem target="#user-profile" caption="Profile"></TabItem>
-		<TabItem target="#user-roles" caption="Roles"></TabItem>
-	</Tab>
+  <Tab>
+    <TabItem target="#user-properties" caption="Properties" active="true"></TabItem>
+    <TabItem target="#user-profile" caption="Profile"></TabItem>
+    <TabItem target="#user-roles" caption="Roles"></TabItem>
+  </Tab>
 
-	<TabContent>
-		<TabPanel id="user-properties" active="true">
-			<fieldset role="group" aria-labelledby="heading" class="flex-1">
-				<h2>Basic Properties</h2>
-				@Html.HiddenFor(model => model.User.Id)
+  <TabContent>
+    <TabPanel id="user-properties" active="true">
+      <fieldset role="group" aria-labelledby="heading" class="flex-1">
+        <h2>Basic Properties</h2>
+        @Html.HiddenFor(model => model.User.Id)
 
-				<SettingsControl caption="User Name" helptext="Unique login name used to log in to the site.">
-					@Html.TextBoxFor(model => model.User.UserName, new { @maxlength = 256 })
-				</SettingsControl>
+        <SettingsControl caption="User Name" helptext="Unique login name used to log in to the site.">
+          @Html.TextBoxFor(model => model.User.UserName, new { @maxlength = 256 })
+        </SettingsControl>
 
-				@*only show password field for a new user*@
-				@if (Model.User.Id == Guid.Empty)
-				{
-					<SettingsControl caption="Password" helptext="Enter a password for the user.">
-						@Html.PasswordFor(model => model.EnteredPassword)
-					</SettingsControl>
-				}
+        @*only show password field for a new user*@
+        @if (Model.User.Id == Guid.Empty)
+        {
+          <SettingsControl caption="Password" helptext="Enter a password for the user.">
+            @Html.PasswordFor(model => model.EnteredPassword)
+          </SettingsControl>
+        }
 
-				@if (!Model.IsCurrentUser)
-				{
-					<div class="nucleus-flex-fields">
-						<SettingsControl caption="Approved" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user is approved.">
-							@Html.CheckBoxFor(model => model.User.Approved, new { @class = "ToggleSwitch" })
-						</SettingsControl>
+        @if (!Model.IsCurrentUser)
+        {
+          <div class="nucleus-flex-fields">
+            <SettingsControl caption="Approved" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user is approved.">
+              @Html.CheckBoxFor(model => model.User.Approved, new { @class = "ToggleSwitch" })
+            </SettingsControl>
 
-						<SettingsControl caption="Verified" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user is verified.">
-							@Html.CheckBoxFor(model => model.User.Verified, new { @class = "ToggleSwitch" })
-						</SettingsControl>
+            <SettingsControl caption="Verified" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user is verified.">
+              @Html.CheckBoxFor(model => model.User.Verified, new { @class = "ToggleSwitch" })
+            </SettingsControl>
 
 
-						@if (Model.User.Id == Guid.Empty)
-						{
-							@* show "temporary password" control for a new user*@
-							<SettingsControl caption="Temporary Password" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user must re-set their password the first time they log in.">
-								@Html.CheckBoxFor(model => model.ExpirePassword, new { @class = "ToggleSwitch" })
-							</SettingsControl>
-						}
-						else
-						{
-							@* for existing users, show "expire password", which does the same thing, but only if they have a password set, and their password isn't already expired *@
-							@if (!String.IsNullOrEmpty(Model.User.Secrets?.PasswordHashAlgorithm) && !Model.IsPasswordExpired)
-							{
-								<SettingsControl caption="Expire Password" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user must re-set their password the next time that they log in.">
-									@Html.CheckBoxFor(model => model.ExpirePassword, new { @class = "ToggleSwitch" })
-								</SettingsControl>
-							}
-						}
+            @if (Model.User.Id == Guid.Empty)
+            {
+              @* show "temporary password" control for a new user*@
+              <SettingsControl caption="Temporary Password" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user must re-set their password the first time they log in.">
+                @Html.CheckBoxFor(model => model.ExpirePassword, new { @class = "ToggleSwitch" })
+              </SettingsControl>
+            }
+            else
+            {
+              @* for existing users, show "expire password", which does the same thing, but only if they have a password set, and their password isn't already expired *@
+              @if (!String.IsNullOrEmpty(Model.User.Secrets?.PasswordHashAlgorithm) && !Model.IsPasswordExpired)
+              {
+                <SettingsControl caption="Expire Password" rendermode="LabelLast" class="inner-inline" helptext="Set whether this user must re-set their password the next time that they log in.">
+                  @Html.CheckBoxFor(model => model.ExpirePassword, new { @class = "ToggleSwitch" })
+                </SettingsControl>
+              }
+            }
 
-					</div>
-				}
+          </div>
+        }
 
-				@if (Model.User.Id != Guid.Empty)
-				{
-					<div class="mt-auto">
-						@if (Model.IsPasswordExpired)
-						{
-							<div class="alert alert-info d-flex align-items-center gap-1">
-								<span>This user's password has expired.</span>
-								<button type="submit" class="btn btn-primary ms-auto text-nowrap" formaction="@Url.AreaAction("SendPasswordReset", "Users", "Admin")">Send Password Reset Message</button>
+        @if (Model.User.Id != Guid.Empty)
+        {
+          <div class="mt-auto">
+            @if (Model.IsPasswordExpired)
+            {
+              <div class="alert alert-info d-flex align-items-center gap-1">
+                <span>This user's password has expired.</span>
+                <button type="submit" class="btn btn-primary ms-auto text-nowrap" formaction="@Url.AreaAction("SendPasswordReset", "Users", "Admin")">Send Password Reset Message</button>
               </div>
             }
             else
@@ -83,143 +83,148 @@
                 </div>
               }
               else
-              {                
+              {
                 <div class="alert alert-info d-flex align-items-center gap-1">
                   <span>
                     <p>This user does not have a password.</p>
-                    <small>If the user always logs in using an external authentication provider like SAML or OAuth, it can can be valid to have no password in Nucleus.</small></span>
+                    <small>If the user always logs in using an external authentication provider like SAML or OAuth, it can can be valid to have no password in Nucleus.</small>
+                  </span>
                   <button type="submit" class="btn btn-info ms-auto text-nowrap" formaction="@Url.AreaAction("SendPasswordReset", "Users", "Admin")">Send Password Reset Message</button>
-                </div>                
+                </div>
               }
             }
 
             @if (!Model.User.Verified)
-						{
-							<div class="alert alert-info d-flex align-items-center gap-1">
-								<span>This user's account has not been verified.</span>
-								<button type="submit" class="btn btn-info ms-auto text-nowrap" formaction="@Url.AreaAction("SendVerification", "Users", "Admin")">Send Verification Message</button>
-							</div>
-						}
+            {
+              <div class="alert alert-info d-flex align-items-center gap-1">
+                <span>This user's account has not been verified.</span>
+                <button type="submit" class="btn btn-info ms-auto text-nowrap" formaction="@Url.AreaAction("SendVerification", "Users", "Admin")">Send Verification Message</button>
+              </div>
+            }
 
-						@if (Model.User.Secrets != null)
-						{
-							@if (Model.User.Secrets.IsLockedOut)
-							{
-								<div class="alert alert-info d-flex align-items-center gap-1">
-									<span>
-										This user was locked out at @Model.User.Secrets.LastLockoutDate.FormatDate(this.Context.Request.GetUserTimeZone()) after
-										@Model.User.Secrets.FailedPasswordAttemptCount unsuccessful login attempts.
+            @if (Model.User.Secrets != null)
+            {
+              @if (Model.User.Secrets.IsLockedOut)
+              {
+                <div class="alert alert-info d-flex align-items-center gap-1">
+                  <span>
+                    This user was locked out at @Model.User.Secrets.LastLockoutDate.FormatDate(this.Context.Request.GetUserTimeZone()) after
+                    @Model.User.Secrets.FailedPasswordAttemptCount unsuccessful login attempts.
 
-										@if (@Model.LockoutResetDate < DateTime.UtcNow)
-										{
-											<text>The lockout period has elapsed, and the user account will be unlocked automatically the next time that the user logs in.</text>
-										}
-										else
-										{
-											<text>The lockout will automatically end at <text>@Model.LockoutResetDate.FormatDate(this.Context.Request.GetUserTimeZone())</text>.</text>
-										}
-									</span>
-									<button type="submit" class="btn btn-primary ms-auto text-nowrap" data-target=".UserEditor" formaction="@Url.AreaAction("UnlockUser", "Users", "Admin")">Unlock Account</button>
-								</div>
-							}
-							<div class="nucleus-flex-fields align-items-start alert alert-primary">
-								<label class="flex-1">
-									Last Login Date:
-									@if (Model.User.Secrets.LastLoginDate.HasValue)
-									{
-										<span>@Model.User.Secrets.LastLoginDate.Value.FormatDate(this.Context.Request.GetUserTimeZone())</span>
-									}
-									else
-									{
-										<span>Never</span>
-									}
+                    @if (@Model.LockoutResetDate < DateTime.UtcNow)
+                    {
+                      <text>The lockout period has elapsed, and the user account will be unlocked automatically the next time that the user logs in.</text>
+                    }
+                    else
+                    {
+                      <text>The lockout will automatically end at <text>@Model.LockoutResetDate.FormatDate(this.Context.Request.GetUserTimeZone())</text>.</text>
+                    }
+                  </span>
+                  <button type="submit" class="btn btn-primary ms-auto text-nowrap" data-target=".UserEditor" formaction="@Url.AreaAction("UnlockUser", "Users", "Admin")">Unlock Account</button>
+                </div>
+              }
+              <div class="nucleus-flex-fields align-items-start alert alert-primary">
+                <label class="flex-1">
+                  Last Login Date:
+                  @if (Model.User.Secrets.LastLoginDate.HasValue)
+                  {
+                    <span>@Model.User.Secrets.LastLoginDate.Value.FormatDate(this.Context.Request.GetUserTimeZone())</span>
+                  }
+                  else
+                  {
+                    <span>Never</span>
+                  }
 
-								</label>
+                </label>
 
-								<label class="flex-1">
-									Last Password Changed Date:
-									@if (Model.User.Secrets.LastPasswordChangedDate.HasValue)
-									{
-										<span>@Model.User.Secrets.LastPasswordChangedDate.Value.FormatDate(this.Context.Request.GetUserTimeZone())</span>
-									}
-									else
-									{
-										<span>Never</span>
-									}
-								</label>
-							</div>
-						}
-					</div>
+                <label class="flex-1">
+                  Last Password Changed Date:
+                  @if (Model.User.Secrets.LastPasswordChangedDate.HasValue)
+                  {
+                    <span>@Model.User.Secrets.LastPasswordChangedDate.Value.FormatDate(this.Context.Request.GetUserTimeZone())</span>
+                  }
+                  else
+                  {
+                    <span>Never</span>
+                  }
+                </label>
+              </div>
+            }
+          </div>
 
-				}
-			</fieldset>
-		</TabPanel>
+        }
+      </fieldset>
+    </TabPanel>
 
-		<TabPanel id="user-profile">
-			<fieldset role="group" aria-labelledby="heading">
-				<h2>Profile</h2>
+    <TabPanel id="user-profile">
+      <fieldset role="group" aria-labelledby="heading">
+        <h2>Profile</h2>
 
-				@for (int profileValueCount = 0; profileValueCount < Model.User.Profile.Count; profileValueCount++)
-				{
-					<div class="settings-control" title="@Model.User.Profile[profileValueCount].UserProfileProperty.HelpText">
-						<label>
-							<span>@Model.User.Profile[profileValueCount].UserProfileProperty.Name</span>
-							@{
-								Dictionary<string, object> parameters = new();
-								parameters.Add("maxlength", 512);
-								ClaimTypeOption claimTypeOption = Model.User.Profile[profileValueCount].UserProfileProperty.ClaimTypeOption(Model.ClaimTypeOptions);
-								if (!String.IsNullOrEmpty(claimTypeOption.InputType))
-								{
-									parameters.Add("type", claimTypeOption.InputType);
-								}
-								if (!String.IsNullOrEmpty(claimTypeOption.Pattern))
-								{
-									parameters.Add("pattern", claimTypeOption.Pattern);
-								}
-							}
-							@Html.TextBoxFor(model => model.User.Profile[profileValueCount].Value, parameters)
-						</label>
-						@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Id)
-						@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Name)
-						@Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.TypeUri)
-					</div>
-				}
-			</fieldset>
-		</TabPanel>
+        @for (int profileValueCount = 0; profileValueCount < Model.User.Profile.Count; profileValueCount++)
+        {
+          <div class="settings-control" title="@Model.User.Profile[profileValueCount].UserProfileProperty.HelpText">
+            <label>
+              <span>@Model.User.Profile[profileValueCount].UserProfileProperty.Name</span>
+              @{
+                Dictionary<string, object> parameters = new();
+                parameters.Add("maxlength", 512);
+                ClaimTypeOption claimTypeOption = Model.User.Profile[profileValueCount].UserProfileProperty.ClaimTypeOption(Model.ClaimTypeOptions);
+                if (!String.IsNullOrEmpty(claimTypeOption.InputType))
+                {
+                  parameters.Add("type", claimTypeOption.InputType);
+                }
+                if (!String.IsNullOrEmpty(claimTypeOption.Pattern))
+                {
+                  parameters.Add("pattern", claimTypeOption.Pattern);
+                }
+              }
+              @Html.TextBoxFor(model => model.User.Profile[profileValueCount].Value, parameters)
+            </label>
+            @Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Id)
+            @Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.Name)
+            @Html.HiddenFor(model => model.User.Profile[profileValueCount].UserProfileProperty.TypeUri)
+          </div>
+        }
+      </fieldset>
+    </TabPanel>
 
-		<TabPanel id="user-roles">
-			<fieldset role="group" aria-labelledby="heading">
-				<h2>Roles</h2>
-				@if (Model.AvailableRoles?.Any() == true)
-				{
-					<div class="nucleus-form-tools">
-						@Html.DropDownListFor((model) => model.SelectedRoleId, Model.AvailableRoles, new { @class = "flex-fill" })
-						<button type="submit" formaction="@Url.AreaAction("AddRole", "Users", "Admin")" data-target=".UserEditor" class="btn btn-secondary">Add Role</button>
-					</div>
-				}
-        <table class="table table-sm table-sticky-headers">
-					@for (int roleCount = 0; roleCount < Model.User.Roles?.Count; roleCount++)
-					{
-						<tr>
-							<td>
-								@Html.HiddenFor(model => model.User.Roles[roleCount].Id)
-								@Html.HiddenFor(model => model.User.Roles[roleCount].Name)
-								@Model.User.Roles[roleCount].Name
-							</td>
-							<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("RemoveUserRole", "Users", "Admin")?roleId=@Model.User.Roles[roleCount].Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete User Role" data-target=".UserEditor" /></td>
-						</tr>
-					}
-				</table>
-			</fieldset>
-		</TabPanel>
-	</TabContent>
-	<div class="nucleus-button-panel">
-		<input type="submit" class="btn btn-primary" value="Save Changes" />
-		@if (Model.User.Id != Guid.Empty && !Model.IsCurrentUser)
-		{
-			<button type="submit" class="btn btn-danger" formaction="@Url.AreaAction("DeleteUser", "Users", "Admin")" data-confirm="<p>User accounts should typically only be deleted under specific circumstances, such as when the account was never verified or approved, or when it was created in error. Deleting an account with associated data like forum posts may fail. For users with a history, you should use the 'Approved' control above to disable the account instead.</p>Do you want to delete this user account?">Delete User</button>
-		}
-	</div>
+    <TabPanel id="user-roles">
+      <fieldset role="group" aria-labelledby="heading">
+        <h2>Roles</h2>
+        @if (Model.AvailableRoles?.Any() == true)
+        {
+          <div class="nucleus-form-tools">
+            @Html.DropDownListFor((model) => model.SelectedRoleId, Model.AvailableRoles, new { @class = "flex-fill" })
+            <button type="submit" formaction="@Url.AreaAction("AddRole", "Users", "Admin")" data-target=".UserEditor" class="btn btn-secondary">Add Role</button>
+          </div>
+        }
+        <div>
+          <table class="table table-sm table-sticky-headers">
+            <tbody>
+              @for (int roleCount = 0; roleCount < Model.User.Roles?.Count; roleCount++)
+              {
+                <tr>
+                  <td>
+                    @Html.HiddenFor(model => model.User.Roles[roleCount].Id)
+                    @Html.HiddenFor(model => model.User.Roles[roleCount].Name)
+                    @Model.User.Roles[roleCount].Name
+                  </td>
+                  <td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("RemoveUserRole", "Users", "Admin")?roleId=@Model.User.Roles[roleCount].Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete User Role" data-target=".UserEditor" /></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </fieldset>
+    </TabPanel>
+  </TabContent>
+  <div class="nucleus-button-panel">
+    <input type="submit" class="btn btn-primary" value="Save Changes" />
+    @if (Model.User.Id != Guid.Empty && !Model.IsCurrentUser)
+    {
+      <button type="submit" class="btn btn-danger" formaction="@Url.AreaAction("DeleteUser", "Users", "Admin")" data-confirm="<p>User accounts should typically only be deleted under specific circumstances, such as when the account was never verified or approved, or when it was created in error. Deleting an account with associated data like forum posts may fail. For users with a history, you should use the 'Approved' control above to disable the account instead.</p>Do you want to delete this user account?">Delete User</button>
+    }
+  </div>
 }
 
 <div class="UserEditor">

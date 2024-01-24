@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Mail;
+using static Nucleus.Web.ViewModels.Admin.ScheduledTaskEditor;
 
 namespace Nucleus.Web.ViewModels.Admin
 {	
@@ -12,7 +13,21 @@ namespace Nucleus.Web.ViewModels.Admin
 	{
 		public MailTemplate MailTemplate { get; set; }
 
+    public IEnumerable<ServiceType> AvailableDataModelTypes { get; set; }
+
     public string DataModel { get; set; }
+
+    public class DataModelType
+    {
+      public string FriendlyName { get; set; }
+      public string TypeName { get; set; }
+
+      public DataModelType(string friendlyName, string typeName)
+      {
+        this.FriendlyName = friendlyName;
+        this.TypeName = typeName;
+      }
+    }
 
     public class DataModelElement
     {
@@ -24,8 +39,7 @@ namespace Nucleus.Web.ViewModels.Admin
         Field = 3,
         Property = 9,
         Enum = 15,
-        Constant=14,
-        
+        Constant=14        
       }
 
       [Newtonsoft.Json.JsonIgnore]

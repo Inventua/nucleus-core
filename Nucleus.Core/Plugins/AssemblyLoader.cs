@@ -442,7 +442,28 @@ namespace Nucleus.Core.Plugins
 			}
 		}
 
-		private static Type[] GetTypes(System.Reflection.Assembly assembly)
+    /// <summary>
+    /// Return a list of types which have the specified attribute assigned. 
+    /// </summary>
+    /// <typeparam name="TAttribute">The System.Attribute type which is assigned to the returned classes.</typeparam>
+    /// <returns>A list of .Net types which have the attribute specified by <typeparamref name="TAttribute"/>.</returns>
+    public static IEnumerable<Type> GetTypesWithAttribute<TAttribute>()
+      where TAttribute : Attribute
+    {
+      foreach (Assembly assembly in ListAssemblies())
+      {
+        if (assembly != null)
+        {
+          foreach (Type type in GetTypes(assembly)
+            .Where(type => !type.IsAbstract && type.GetCustomAttributes<TAttribute>().Any()))
+          {
+            yield return type;
+          }
+        }
+      }
+    }
+
+    private static Type[] GetTypes(System.Reflection.Assembly assembly)
 		{
 			try
 			{

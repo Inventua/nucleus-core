@@ -7,7 +7,7 @@
 <style>
   .monaco-editor { position: absolute !important; }
 </style>
-@using (Html.BeginAreaForm("Save", "MailTemplates", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @autocomplete = "off" }))
+@using (Html.BeginAreaForm("Refresh", "MailTemplates", "Admin", FormMethod.Post, new { @data_target = ".MailTemplateEditor", @autocomplete = "off" }))
 {
   <fieldset role="group" aria-labelledby="heading">
     <h2>Mail Template</h2>
@@ -15,6 +15,10 @@
 
     <SettingsControl caption="Name" helptext="Mail Template name.">
       @Html.TextBoxFor(model => model.MailTemplate.Name, new { @maxlength = 256 })
+    </SettingsControl>
+
+    <SettingsControl caption="Task" helptext="Select the scheduled task to run.">
+      @Html.DropDownListFor(model => model.MailTemplate.DataModelTypeName, new SelectList(Model.AvailableDataModelTypes, "TypeName", "FriendlyName"), "(select)", new { @data_autopostbackevent = "change" })
     </SettingsControl>
 
     <SettingsControl caption="Subject" helptext="Mail Template Subject.  This is the e-mail subject.">
@@ -28,12 +32,12 @@
   </fieldset>
 
   <div class="nucleus-button-panel">
-    <input type="submit" class="btn btn-primary" value="Save Changes" />
-    <input type="submit" class="btn btn-success" value="Verify Template" formaction="@Url.AreaAction("Verify", "MailTemplates", "Admin")" />
+    <button type="submit" class="btn btn-primary" data-target=".nucleus-adminpage" formaction="@Url.AreaAction("Save", "MailTemplates", "Admin")">Save Changes</button>
+    <button type="submit" class="btn btn-success" data-target=".nucleus-adminpage" formaction="@Url.AreaAction("Verify", "MailTemplates", "Admin")">Verify Template</button>
 
     @if (Model.MailTemplate.Id != Guid.Empty)
     {
-      <input type="submit" class="btn btn-danger" value="Delete Mail Template" formaction="@Url.AreaAction("DeleteMailTemplate", "MailTemplates", "Admin")" data-confirm="Delete this Mail Template?" />
+      <button type="submit" class="btn btn-danger" data-target=".nucleus-adminpage" formaction="@Url.AreaAction("DeleteMailTemplate", "MailTemplates", "Admin")" data-confirm="Delete this Mail Template?">Delete Mail Template</button>
     }
   </div>
 

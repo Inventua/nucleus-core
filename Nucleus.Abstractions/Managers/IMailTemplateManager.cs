@@ -58,5 +58,10 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="mailTemplate"></param>
 		public Task Delete(MailTemplate mailTemplate);
 
-	}
+    /// <summary>
+		/// Returns a list of available mail template data model classes.
+		/// </summary>
+    public Task<IEnumerable<System.Type>> ListTemplateDataModelTypes();
+
+  }
 }

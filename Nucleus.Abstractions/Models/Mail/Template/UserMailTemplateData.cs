@@ -10,6 +10,8 @@ namespace Nucleus.Abstractions.Models.Mail.Template;
 /// <summary>
 /// Class used to send user information to the mail client - contains data used by a mail template.
 /// </summary>
+[MailTemplateDataModel()]
+[System.ComponentModel.DisplayName("User Management")]
 public class UserMailTemplateData
 {
 	/// <summary>

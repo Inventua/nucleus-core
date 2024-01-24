@@ -1,0 +1,15 @@
+{
+	"schemaName": "Nucleus.Core",
+  "version": "01.00.19",
+  "operations": [
+    {
+      "addColumn": {
+        "table": "MailTemplates",
+        "name": "DataModelTypeName",
+        "clrType": "string",
+        "maxLength": 256,
+        "isnullable": true
+      }
+    }
+  ]
+}

@@ -4,10 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Models.Mail;
 
 namespace Nucleus.Modules.Forums.Models.MailTemplate.Models
 {
-	public class Immediate
+  [MailTemplateDataModel()]
+  [System.ComponentModel.DisplayName("Forums - Immediate Subscription, Moderation, Approval and Rejection Notifications")]
+  public class Immediate
 	{
 		public Forum Forum { get; set; }
 		public Site Site { get; set; }

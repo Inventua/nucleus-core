@@ -8,6 +8,7 @@ using Nucleus.Abstractions.Models.Mail;
 using Nucleus.Data.Common;
 using Nucleus.Core.DataProviders;
 using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions;
 
 namespace Nucleus.Core.Managers
 {
@@ -107,5 +108,13 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
-	}
+    /// <summary>
+		/// Returns a list of available mail template data model classes.
+		/// </summary>
+		/// <returns></returns>
+		public Task<IEnumerable<System.Type>> ListTemplateDataModelTypes()
+    {
+      return Task.FromResult(Plugins.AssemblyLoader.GetTypesWithAttribute<MailTemplateDataModelAttribute>());
+    }
+  }
 }

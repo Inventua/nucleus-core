@@ -16,11 +16,17 @@ namespace Nucleus.Abstractions.Models.Mail
 		/// Unique record identifier.
 		/// </summary>
 		public Guid Id { get; set; }
-		
-		/// <summary>
-		/// Name of the email template
+
+    /// <summary>
+		/// Assembly-qualified class name for the class which provides data to the template.  The data class will have a MailTemplateDataModelAttribute assigned to 
+    /// signal that it is a mail template data model class.
 		/// </summary>
-		[Required]
+    public string DataModelTypeName { get; set; }
+
+    /// <summary>
+    /// Name of the email template
+    /// </summary>
+    [Required]
 		public string Name { get; set; }
 		
 		/// <summary>

@@ -67,6 +67,18 @@ namespace Nucleus.Web.Controllers.Admin
       return View("Editor", viewModel);
     }
 
+    /// <summary>
+    /// Refresh drop-down lists and template data model
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ActionResult> Refresh(ViewModels.Admin.MailTemplateEditor viewModel)
+    {
+      viewModel = await BuildViewModel(viewModel.MailTemplate);
+
+      return View("Editor", viewModel);
+    }
+
     [HttpPost]
     public async Task<ActionResult> AddMailTemplate()
     {
@@ -92,7 +104,7 @@ namespace Nucleus.Web.Controllers.Admin
         }
       }
 
-      return Json(new { Title = "Verify", Message = "The subject and message body were test-compiled successfully.", Icon = "alert" });
+      return Json(new { Title = "Verify", Message = "The subject and message body were compiled successfully.", Icon = "alert" });
     }
 
 
@@ -127,22 +139,42 @@ namespace Nucleus.Web.Controllers.Admin
       return viewModel;
     }
 
-    private Task<ViewModels.Admin.MailTemplateEditor> BuildViewModel(MailTemplate mailTemplate)
+    private async Task<ViewModels.Admin.MailTemplateEditor> BuildViewModel(MailTemplate mailTemplate)
     {
       ViewModels.Admin.MailTemplateEditor viewModel = new();
 
       viewModel.MailTemplate = mailTemplate;
-      viewModel.DataModel = BuildDataModel();
 
-      return Task.FromResult(viewModel);
+      viewModel.AvailableDataModelTypes =
+       (await this.MailTemplateManager.ListTemplateDataModelTypes())
+       .Select(type => new ViewModels.Admin.ScheduledTaskEditor.ServiceType(GetFriendlyName(type), $"{type.FullName},{type.Assembly.GetName().Name}"));
+
+
+      viewModel.DataModel = BuildDataModel(viewModel.MailTemplate.DataModelTypeName);
+
+      return viewModel;
     }
 
-    private string BuildDataModel()
+    private string BuildDataModel(string dataModelTypeName)
     {
+      System.Type dataModelType;
       Dictionary<string, ViewModels.Admin.MailTemplateEditor.DataModelElement> results = new();
 
-      //results = BuildDataModelProperties(System.Type.GetType("Nucleus.Abstractions.Models.Mail.Template.UserMailTemplateData, Nucleus.Abstractions"), 3);
-      results = BuildDataModelProperties(typeof(Nucleus.Abstractions.Models.Mail.Template.UserMailTemplateData), MODEL_MAX_DEPTH);
+      if (!String.IsNullOrEmpty(dataModelTypeName))
+      {
+        dataModelType = Type.GetType(dataModelTypeName);
+      }
+      else
+      {
+        // default
+        dataModelType = typeof(Nucleus.Abstractions.Models.Mail.Template.UserMailTemplateData);
+      }
+
+      if (dataModelType != null)
+      {
+        results = BuildDataModelProperties(dataModelType, MODEL_MAX_DEPTH);
+      }
+
       results.Add("#ClaimTypes", new() { Properties = BuildDataModelProperties(typeof(System.Security.Claims.ClaimTypes), 1) });
 
       AddExtensionFunctions(results, typeof(Nucleus.Extensions.SiteExtensions));
@@ -179,6 +211,9 @@ namespace Nucleus.Web.Controllers.Admin
 
     private void AddExtensionFunctions(MethodInfo method, List<ViewModels.Admin.MailTemplateEditor.DataModelElement> results, ParameterInfo thisParameter, ParameterInfo[] otherParameters)
     {
+      // suppress the User.GetCensored method.  User data sent to mail is already censored.
+      if (method.Name == "GetCensored") return;
+
       foreach (ViewModels.Admin.MailTemplateEditor.DataModelElement element in results)
       {
         if (element.Type != null && element.Type.Equals(thisParameter.ParameterType))
@@ -195,12 +230,7 @@ namespace Nucleus.Web.Controllers.Admin
             Kind = ViewModels.Admin.MailTemplateEditor.DataModelElement.Kinds.Function,
             Properties = method.ReturnType.IsClass ? BuildDataModelProperties(method.ReturnType, MODEL_MAX_DEPTH) : null
           });
-        }
-
-        if (element.Properties != null)
-        {
-          AddExtensionFunctions(method, element.Properties.Values.ToList(), thisParameter, otherParameters);
-        }
+        }        
       }
     }
 
@@ -276,5 +306,22 @@ namespace Nucleus.Web.Controllers.Admin
       return null;
     }
 
+    private string GetFriendlyName(System.Type type)
+    {
+      System.ComponentModel.DisplayNameAttribute displayNameAttribute = type.GetCustomAttributes(false)
+        .Where(attr => attr is System.ComponentModel.DisplayNameAttribute)
+        .Select(attr => attr as System.ComponentModel.DisplayNameAttribute)
+        .FirstOrDefault();
+
+      if (displayNameAttribute == null)
+      {
+        return $"{type.FullName}";
+      }
+      else
+      {
+        return displayNameAttribute.DisplayName;
+      }
+
+    }
   }
 }

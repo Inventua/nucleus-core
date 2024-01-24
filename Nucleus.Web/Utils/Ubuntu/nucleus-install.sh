@@ -231,8 +231,14 @@ if [ "$AUTO_INSTALL" == false ]; then
   printf "  - Zip file: '%s'.\n\n" "$INSTALL_ZIPFILE"
   printf "This script will:\n"
   printf "  - Create a service account '%s', if it does not already exist.\n" "$SERVICE_ACCOUNT"
-  printf "  - Install the ASP.NET Core 8 Runtime, if it is not already installed.\n"
-  printf "  - Remove the old ASP.NET Core 6 Runtime, if it is installed.\n"
+
+  if [ "$VERSION" == "1.4.0.0" ] || [ "$VERSION" \> "1.4.0.0" ]; then
+    printf "  - Install the ASP.NET Core 8 Runtime, if it is not already installed.\n"
+    printf "  - Remove the old ASP.NET Core 6 Runtime, if it is installed.\n"
+  else
+    printf "  - Install the ASP.NET Core 6 Runtime, if it is not already installed.\n"
+  fi
+
   printf "  - Install the %s package if it is not already installed.\n" "$UNZIP_PACKAGE"
   printf "  - %s Nucleus version %s.\n" "$INSTALL_MESSAGE" "$VERSION"
   printf "  - Set file and directory owner and permissions.\n"
@@ -291,19 +297,29 @@ fi
 
 
 # Download and install the dotnet runtime
-if ! dpkg-query -W -f='${Status}' "aspnetcore-runtime-8.0"|grep "ok installed" > /dev/null ; then
-  printf "Installing .NET...\n"
-  apt-get -q update && apt-get -q -y install aspnetcore-runtime-8.0
-else
-  printf ".NET is already installed.\n"
-fi
+if [ "$VERSION" == "1.4.0.0" ] || [ "$VERSION" \> "1.4.0.0" ]; then
+  if ! dpkg-query -W -f='${Status}' "aspnetcore-runtime-8.0"|grep "ok installed" > /dev/null ; then
+    printf "Installing .NET 8...\n"
+    apt-get -q update && apt-get -q -y install aspnetcore-runtime-8.0
+  else
+    printf ".NET 8 is already installed.\n"
+  fi
 
-# remove .net 6 runtime, if the .net 8 install was successful
-if dpkg-query -W -f='${Status}' "aspnetcore-runtime-6.0"|grep "ok installed" > /dev/null ; then
-  if dpkg-query -W -f='${Status}' "aspnetcore-runtime-8.0"|grep "ok installed" > /dev/null ; then
-    printf "Removing .NET 6 after upgrade to .NET 8 ...\n"
-    apt remove -q -y aspnetcore-runtime-6.0
-    apt -y autoremove
+  # remove .net 6 runtime, if the .net 8 install was successful
+  if dpkg-query -W -f='${Status}' "aspnetcore-runtime-6.0"|grep "ok installed" > /dev/null ; then
+    if dpkg-query -W -f='${Status}' "aspnetcore-runtime-8.0"|grep "ok installed" > /dev/null ; then
+      printf "Removing .NET 6 after upgrade to .NET 8 ...\n"
+      apt remove -q -y aspnetcore-runtime-6.0
+      apt -y autoremove
+    fi
+  fi
+else
+  # install the .NET 6 runtime 
+  if ! dpkg-query -W -f='${Status}' "aspnetcore-runtime-6.0"|grep "ok installed" > /dev/null ; then
+    printf "Installing .NET 6...\n"
+    apt-get -q update && apt-get -q -y install aspnetcore-runtime-6.0
+  else
+    printf ".NET 6 is already installed.\n"
   fi
 fi
 

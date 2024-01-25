@@ -49,7 +49,12 @@ namespace Nucleus.Abstractions.Models.TaskScheduler
 			/// <summary>
 			/// Years
 			/// </summary>
-			Years = 6
+			Years = 6,
+      /// <summary>
+      /// Once after every startup
+      /// </summary>
+      [Display(Name = "After each restart")]
+      Startup
 		}
 
 		/// <summary>

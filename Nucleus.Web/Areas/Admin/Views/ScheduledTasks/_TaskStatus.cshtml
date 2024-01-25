@@ -28,13 +28,13 @@
   case ScheduledTaskProgress.State.Succeeded:
     <div class="alert alert-success mt-3" role="alert">
       This task completed successfully at @(Model.LatestHistory == null ? "Unknown" : (Model.LatestHistory.FinishDate.HasValue ? Model.LatestHistory.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone()) : "Unknown"))
-      and is scheduled to run @(Model.LatestHistory == null ? "immediately" : (Model.LatestHistory.NextScheduledRun.HasValue ? "next at " + Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "immediately")).
+      and is scheduled to run @(Model.LatestHistory == null ? "immediately" : Model.ScheduledTask.IntervalType == ScheduledTask.Intervals.Startup ? "after the next restart" :  (Model.LatestHistory.NextScheduledRun.HasValue ? "next at " + Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "immediately")).
     </div>
     break;
 
   default:    
     <SettingsControl caption="Next Run">
-      <div>@(Model.LatestHistory == null ? "Immediate" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "Immediate"))</div>
+      <div>@(Model.LatestHistory == null ? "Immediate" : Model.ScheduledTask.IntervalType == ScheduledTask.Intervals.Startup ? "After the next restart" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "Immediate"))</div>
     </SettingsControl>
     break;
 }

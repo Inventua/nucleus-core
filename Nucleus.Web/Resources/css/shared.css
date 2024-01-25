@@ -597,6 +597,15 @@ table.table-sticky-headers thead th
 	content: ', ';
 }
 
+input:disabled, select:disabled
+{
+  cursor: not-allowed;
+  opacity: 0.4;
+  color: revert;
+  background-color: revert;
+  border-color: revert;
+}
+
 .style-scrollable, .style-scrollable > div, .style-scrollable > div > section, .style-scrollable > div > section > form
 {
 	display: flex;

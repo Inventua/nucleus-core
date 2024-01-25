@@ -49,15 +49,15 @@
 
 						<SettingsControl caption="Keep History (count)" helptext="The number of history records to retain in the database.">
 							@Html.DropDownListFor(model => model.ScheduledTask.KeepHistoryCount, new List<SelectListItem>
-						{
-						new SelectListItem{ Text="10", Value = "10" },
-						new SelectListItem{ Text="25", Value = "25" },
-						new SelectListItem{ Text="50", Value = "50" },
-						new SelectListItem{ Text="100", Value = "100" },
-						new SelectListItem{ Text="250", Value = "250" },
-						new SelectListItem{ Text="500", Value = "500" },
-						new SelectListItem{ Text="1000", Value = "1000" }
-						})
+						  {
+						  new SelectListItem{ Text="10", Value = "10" },
+						  new SelectListItem{ Text="25", Value = "25" },
+						  new SelectListItem{ Text="50", Value = "50" },
+						  new SelectListItem{ Text="100", Value = "100" },
+						  new SelectListItem{ Text="250", Value = "250" },
+						  new SelectListItem{ Text="500", Value = "500" },
+						  new SelectListItem{ Text="1000", Value = "1000" }
+						  })
 						</SettingsControl>
 					</div>
 					
@@ -141,6 +141,25 @@
 </div>
 
 <script>
+  ScheduledTasks_EnableControls(jQuery('#ScheduledTask_IntervalType').val() == @System.Convert.ToInt32(Nucleus.Abstractions.Models.TaskScheduler.ScheduledTask.Intervals.Startup));
+
+  jQuery('#ScheduledTask_IntervalType').on('change', function (event) 
+  {
+    var isDisabled = (jQuery(this).val() == @System.Convert.ToInt32(Nucleus.Abstractions.Models.TaskScheduler.ScheduledTask.Intervals.Startup));
+  
+    if (isDisabled)
+    {
+      jQuery('#ScheduledTask_InstanceType').val(@System.Convert.ToInt32(Nucleus.Abstractions.Models.TaskScheduler.ScheduledTask.InstanceTypes.PerServer));
+    }
+    ScheduledTasks_EnableControls(isDisabled);    
+  });
+
+  function ScheduledTasks_EnableControls(isDisabled)
+  {
+    jQuery('#ScheduledTask_InstanceType').prop('disabled', isDisabled);
+    jQuery('#ScheduledTask_Interval').prop('disabled', isDisabled);
+  }
+
   jQuery('.ScheduledTasks .LogFile').on('change', function () { jQuery(this).parents('form').submit(); })
 	@if (Model.ScheduledTask.Id != Guid.Empty)
   { 
@@ -150,8 +169,7 @@
     Page.ScheduledTasksEditor.ScheduledTaskId = '@Model.ScheduledTask.Id';
     Page.ScheduledTasksEditor.Start();
     </text>
-  }
-  //jQuery(Page).on('progress', function (event) { _cancelRefreshTaskStatus(); });  
+  }  
 </script>
 
 

@@ -136,13 +136,7 @@ namespace Nucleus.Core.Authentication
               await this.SessionManager.Save(userSession);
             }
 
-            AppendCookie(userSession.Id.ToString(), new AuthenticationProperties()
-            {
-              AllowRefresh = userSession.SlidingExpiry,
-              ExpiresUtc = userSession.ExpiryDate,
-              IsPersistent = userSession.IsPersistent,
-              IssuedUtc = userSession.IssuedDate
-            });
+            AppendCookie(userSession.Id.ToString(), this.SessionManager.BuildAuthenticationProperties(userSession));
           }
         }
         else
@@ -441,17 +435,17 @@ namespace Nucleus.Core.Authentication
       // SameSite = Lax is important in this context.  
       // - For OAUTH2, if a user logs in to a remote authentication site & is redirected back (and is then logged in and redirected to
       //   the home page), browsers treat the entire sequence of requests as "originating" from the remote authentication site, thus
-      //   if SameSite=Strct, the session ID is not sent by the browser when it follows the redirect.  SameSite=Lax allows the cookie to 
+      //   if SameSite=Strict, the session ID is not sent by the browser when it follows the redirect.  SameSite=Lax allows the cookie to 
       //   be sent even though the sequence of requests/responses "originates" at the remote authentication site.
       // - For any other case where a user clicks a link on another site which links to a Nucleus site, and is already logged in to the
       //   Nucleus site, SameSite=Strict would prevent the browser from sending the session cookie (but if SameSite=Lax it will work).
       CookieOptions options = new()
       {
-        Expires = properties.ExpiresUtc,
+        Expires = properties.IsPersistent ? properties.ExpiresUtc : null,
         IsEssential = true,
         HttpOnly = true,
         SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax,
-        Secure = this.Context.Request.IsHttps
+        Secure = this.Context.Request.IsHttps         
       };
 
       this.Context.Response.Cookies.Append(this.Options.CookieName, sessionId, options);

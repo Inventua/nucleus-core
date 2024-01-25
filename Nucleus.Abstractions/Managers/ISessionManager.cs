@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Nucleus.Abstractions.Managers
 {
@@ -75,5 +76,12 @@ namespace Nucleus.Abstractions.Managers
 		/// An active user session is defined as a session which has not expired, and has been updated in the last 5 minutes.
 		/// </remarks>
 		public Task<long> CountUsersOnline(Site site);
-	}
+
+    /// <summary>
+    /// Create a AuthenticationProperties instance using settings from <paramref name="userSession"/>.
+    /// </summary>
+    /// <param name="userSession"></param>
+    /// <returns></returns>
+    public AuthenticationProperties BuildAuthenticationProperties(UserSession userSession);
+  }
 }

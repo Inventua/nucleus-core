@@ -13,6 +13,8 @@ using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Managers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics.Metrics;
+using Nucleus.Core.Services;
 
 namespace Nucleus.Core.Managers
 {
@@ -21,6 +23,7 @@ namespace Nucleus.Core.Managers
 		private Dictionary<string, ICacheCollection> Caches { get; } = new();
 		private IConfiguration Configuration { get; }
 		private ILogger<ICacheManager> Logger {get;}
+    private Meter CacheMeter { get; }
 
 		private static readonly object lockObject = new();
 
@@ -28,9 +31,25 @@ namespace Nucleus.Core.Managers
 		{
 			this.Configuration = configuration;
 			this.Logger = logger;
-		}
+     
+      this.CacheMeter = new("nucleus.cache", typeof(CacheManager).Assembly.GetName().Version.ToString());
+      this.CacheMeter.CreateObservableGauge("nucleus.cache", GetCacheCounts, description: "Nucleus cache counters.");
+    }
 
-		private static string CacheKey<TKey, TModel>(string caller)
+    private IEnumerable<Measurement<int>> GetCacheCounts()
+    {
+      foreach (KeyValuePair<string, ICacheCollection> cache in this.Caches)
+      {
+        yield return new Measurement<int>(cache.Value.Count, new List<KeyValuePair<string, object>>()
+        {
+          new KeyValuePair<string, object>("cache_name", cache.Value.Name.ToLower()),
+          new KeyValuePair<string, object>("capacity", cache.Value.Options.Capacity),
+          new KeyValuePair<string, object>("expiry_time_seconds", cache.Value.Options.ExpiryTime.TotalSeconds)
+        });
+      }
+    }
+
+    private static string CacheKey<TKey, TModel>(string caller)
 		{
 			return $"{caller} {typeof(TKey).FullName} {typeof(TModel).FullName}";
 		}

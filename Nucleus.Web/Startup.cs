@@ -26,10 +26,11 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.AspNetCore.DataProtection;
 using System.Runtime.InteropServices;
+using Nucleus.Core.Services.Instrumentation;
 
 namespace Nucleus.Web
 {
-  public class Startup
+    public class Startup
   {
     private const string HOSTING_FILENAME = "hosting";
     private const string CONFIG_FILENAME = "appSettings";
@@ -156,6 +157,9 @@ namespace Nucleus.Web
         });
 
         services.Logger().LogInformation($"App Data Folder:         [{this.Configuration.GetValue<String>($"{Nucleus.Abstractions.Models.Configuration.FolderOptions.Section}:DataFolder")}]");
+
+        // Enable Open Telemetry metrics and tracing
+        services.AddNucleusOpenTelemetryInstrumentation(this.Configuration);
         
         // Enable compression
         if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
@@ -271,6 +275,8 @@ namespace Nucleus.Web
     {
       try
       {
+        app.UseNucleusOpenTelemetryEndPoint(this.Configuration);
+                
         app.UseMiddleware<SecurityHeadersMiddleware>();
         app.UseRequestLocalization();
 
@@ -353,7 +359,7 @@ namespace Nucleus.Web
         {
           // All routes that don't match a controller/action or other defined endpoint go to the index controller and are
           // treated as CMS pages.  By specifying the pattern argument (first argument) we ensure that requests that "look like"
-          // filenames (that is, contains a dot) are routed to the default page controller, the standard overload uses a pattern 
+          // filenames (that is, contain a dot) are routed to the default page controller, the standard overload uses a pattern 
           // {*path:nonfile}, which does not route those Urls to the default page controller.
           // Even though this is the first route defined, .MapFallbackToController always creates a route that is last in the
           // routing order, so any other mapped route will take precedence over this one.

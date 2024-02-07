@@ -172,6 +172,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Modules.Shadow", "N
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Modules.IFrame", "Nucleus.Core.Modules\Nucleus.Modules.IFrame\Nucleus.Modules.IFrame.csproj", "{E4821BB4-D4BB-410A-AE00-5445720A45B1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Instrumentation", "Instrumentation", "{D0789DE6-4BF3-4964-A34C-1F2AC63171B6}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Instrumentation\grafana-sample-dashboard.json = Documentation\Instrumentation\grafana-sample-dashboard.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -374,6 +379,7 @@ Global
 		{2D744268-B32D-4990-A4CB-2E0B5805EAE1} = {CD49EF69-179E-461A-9C51-041EA3B901CE}
 		{8856AAD6-C187-4F75-8796-99AE9EF05720} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{E4821BB4-D4BB-410A-AE00-5445720A45B1} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
+		{D0789DE6-4BF3-4964-A34C-1F2AC63171B6} = {800D8125-BD40-410A-B1E9-C1E62224DC03}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D84CD364-9C8E-400E-84AA-45562061ED44}

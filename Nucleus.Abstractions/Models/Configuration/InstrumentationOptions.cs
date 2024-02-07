@@ -22,6 +22,11 @@ public class InstrumentationOptions
   public Boolean Enabled { get; private set; }
 
   /// <summary>
+  /// Service name 
+  /// </summary>
+  public string ServiceName { get; private set; } = "Nucleus";
+
+  /// <summary>
   /// Specifies the path used to publish OpenTelemetry meters.
   /// </summary>
   /// <remarks>

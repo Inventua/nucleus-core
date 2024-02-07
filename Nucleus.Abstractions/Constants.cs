@@ -48,11 +48,16 @@ namespace Nucleus.Abstractions
 		/// Key for the error route.
 		/// </summary>
 		public const string ERROR_ROUTE_NAME = "route:error";
-	
-		/// <summary>
-		/// Root path for the admin route.
-		/// </summary>
-		public const string ADMIN_ROUTE_PATH = "admin";
+
+    /// <summary>
+    /// Route pattern used by MapControllerRoute so that we can "catch" requests for CMS pages.
+    /// </summary>
+    public const string DEFAULT_PAGE_PATTERN = "{*path}";
+
+    /// <summary>
+    /// Root path for the admin route.
+    /// </summary>
+    public const string ADMIN_ROUTE_PATH = "admin";
 
 		/// <summary>
 		/// Root path for the Api route.

@@ -10,10 +10,11 @@ using OpenTelemetry.Metrics;
 using Microsoft.Extensions.Configuration;
 using OpenTelemetry.Resources;
 using Microsoft.Extensions.Logging;
-using OpenTelemetry.Logs;
-using static Nucleus.Core.Logging.LoggingBuilderExtensions;
 using Microsoft.AspNetCore.Builder;
-using Google.Protobuf.WellKnownTypes;
+using Nucleus.Abstractions.Models.Configuration;
+using Nucleus.Core.Layout;
+using Nucleus.Extensions;
+using Microsoft.AspNetCore.Hosting;
 
 // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/diagnostic-resource-monitoring#see-also
 
@@ -21,11 +22,19 @@ namespace Nucleus.Core.Services.Instrumentation;
 
 public static class Extensions
 {
+  /// <summary>
+  /// Add Nucleus, AspNetCore, HttpClient, Runtime and Process OpenTelemetry instrumentation, if configured.
+  /// </summary>
+  /// <param name="services"></param>
+  /// <param name="config"></param>
+  /// <returns></returns>
   public static IServiceCollection AddNucleusOpenTelemetryInstrumentation(this IServiceCollection services, IConfiguration config)
   {
-    services.AddOption<Nucleus.Abstractions.Models.Configuration.InstrumentationOptions>(config, Nucleus.Abstractions.Models.Configuration.InstrumentationOptions.Section);
+    services.AddOption<InstrumentationOptions>(config, InstrumentationOptions.Section);
 
-    Nucleus.Abstractions.Models.Configuration.InstrumentationOptions instrumentationOptions = config.GetSection("Nucleus:InstrumentationOptions").Get<Nucleus.Abstractions.Models.Configuration.InstrumentationOptions>(options => options.BindNonPublicProperties = true);
+    InstrumentationOptions instrumentationOptions = new();    
+    config.GetSection(InstrumentationOptions.Section)
+      .Bind(instrumentationOptions, options => options.BindNonPublicProperties = true);
 
     if (instrumentationOptions.Enabled)
     {
@@ -36,7 +45,7 @@ public static class Extensions
         {
           builder.AddService
           (
-            serviceName: "Nucleus",
+            serviceName: instrumentationOptions.ServiceName ?? "Nucleus",
             serviceVersion: typeof(Extensions).Assembly.GetName().Version?.ToString() ?? "unknown",
             serviceInstanceId: Environment.MachineName
           );
@@ -45,6 +54,8 @@ public static class Extensions
         {
           builder.AddAspNetCoreInstrumentation();
           builder.AddHttpClientInstrumentation();
+          builder.AddRuntimeInstrumentation();
+          builder.AddProcessInstrumentation();
           builder.AddMeter("nucleus*", "aspnetcore*", "process*", "dotnet*");
           builder.AddPrometheusExporter(options =>
           {
@@ -52,6 +63,8 @@ public static class Extensions
             options.ScrapeResponseCacheDurationMilliseconds = (int)instrumentationOptions.CacheDuration.TotalMilliseconds;
           });
         });
+
+      // Not currently enabled, for later use
       //.WithTracing(builder =>
       //{
       //  builder.AddHttpClientInstrumentation();
@@ -60,22 +73,32 @@ public static class Extensions
       //});
 
       services.AddResourceMonitoring();
-      services.AddHostedService<ResourceMonitor>();
+      services.AddHostedService<TelemetryMonitor>();
+
+      services.AddScoped<TelemetryMiddleware>();
     }
 
     return services;
   }
 
-  public static IApplicationBuilder UseNucleusOpenTelemetryEndPoint(this IApplicationBuilder builder, IConfiguration config)
+  /// <summary>
+  /// Start OpenTelemetry services.
+  /// </summary>
+  /// <param name="builder"></param>
+  /// <param name="config"></param>
+  /// <param name="environment"></param>
+  /// <returns></returns>
+  public static IApplicationBuilder UseNucleusOpenTelemetryEndPoint(this IApplicationBuilder builder, IConfiguration config, IWebHostEnvironment environment)
   {
     if (config.GetValue<Boolean>("Nucleus:InstrumentationOptions:Enabled"))
     {
       builder.UseOpenTelemetryPrometheusScrapingEndpoint();
+      builder.UseMiddleware<TelemetryMiddleware>();           
     }
     return builder;
   }
 
-  // Not currently enabled
+  // Not currently enabled, for later use
   //public static ILoggingBuilder AddNucleusOpenTelemetryLogging(this ILoggingBuilder builder, IConfiguration config)
   //{
   //  // Enable Open Telemetry logger
@@ -101,6 +124,4 @@ public static class Extensions
 
   //  return builder;
   //}
-
-
 }

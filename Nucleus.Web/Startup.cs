@@ -275,7 +275,7 @@ namespace Nucleus.Web
     {
       try
       {
-        app.UseNucleusOpenTelemetryEndPoint(this.Configuration);
+        app.UseNucleusOpenTelemetryEndPoint(this.Configuration, this.Environment);
                 
         app.UseMiddleware<SecurityHeadersMiddleware>();
         app.UseRequestLocalization();
@@ -363,7 +363,7 @@ namespace Nucleus.Web
           // {*path:nonfile}, which does not route those Urls to the default page controller.
           // Even though this is the first route defined, .MapFallbackToController always creates a route that is last in the
           // routing order, so any other mapped route will take precedence over this one.
-          routes.MapFallbackToController("{*path}", "Index", "Default");
+          routes.MapFallbackToController(RoutingConstants.DEFAULT_PAGE_PATTERN, "Index", "Default");
 
           // "Razor Pages" (Razor Pages is different to Razor views with controllers [MVC])
           routes.MapRazorPages();

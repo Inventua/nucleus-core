@@ -27,12 +27,12 @@ namespace Nucleus.Core.Managers
 
 		private static readonly object lockObject = new();
 
-		public CacheManager(IConfiguration configuration, ILogger<ICacheManager> logger)
+		public CacheManager(IMeterFactory meterFactory, IConfiguration configuration, ILogger<ICacheManager> logger)
 		{
 			this.Configuration = configuration;
 			this.Logger = logger;
      
-      this.CacheMeter = new("nucleus.cache", typeof(CacheManager).Assembly.GetName().Version.ToString());
+      this.CacheMeter = meterFactory.Create("nucleus.cache", typeof(CacheManager).Assembly.GetName().Version.ToString());
       this.CacheMeter.CreateObservableGauge("nucleus.cache", GetCacheCounts, description: "Nucleus cache counters.");
     }
 

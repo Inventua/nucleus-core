@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
+using System.Net;
 
 namespace Nucleus.Web.Controllers
 {
@@ -116,6 +117,7 @@ namespace Nucleus.Web.Controllers
             if (notFoundPage != null)
             {
               this.Context.Page = notFoundPage;
+              this.ControllerContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
               useSiteErrorPage = true;
             }
           }

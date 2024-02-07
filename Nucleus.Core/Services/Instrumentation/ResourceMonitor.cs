@@ -13,6 +13,8 @@ using System.Linq.Expressions;
 
 namespace Nucleus.Core.Services.Instrumentation;
 
+// Supplement the meters published by OpenTelemetry.Instrumentation.Process / .AddProcessInstrumentation
+
 public class ResourceMonitor : IHostedService
 {
   private IResourceMonitor Monitor { get; }
@@ -21,20 +23,15 @@ public class ResourceMonitor : IHostedService
 
   private static readonly TimeSpan Threshold = TimeSpan.FromSeconds(5);
 
-  public ResourceMonitor(IResourceMonitor monitor)
+  public ResourceMonitor(IMeterFactory meterFactory, IResourceMonitor monitor)
   {
     Monitor = monitor;
-    ResourceMeter = new("nucleus.resources", typeof(ResourceMonitor).Assembly.GetName().Version.ToString());
+    ResourceMeter = meterFactory.Create("process.cpu", typeof(ResourceMonitor).Assembly.GetName().Version.ToString());
   }
 
   public Task StartAsync(CancellationToken cancellationToken)
-  {    
-    ResourceMeter.CreateObservableGauge("nucleus.resources.cpu_used_percentage", () => new Measurement<double> (GetUtilization().CpuUsedPercentage), description: "The CPU used by Nucleus in the past 5 seconds as a percentage of the CPU units available in the system.");
-    ResourceMeter.CreateObservableGauge("nucleus.resources.memory_used_percentage", () => new Measurement<double>(GetUtilization().MemoryUsedPercentage), description: "Memory in use as a percentage of the guaranteed memory.");
-    ResourceMeter.CreateObservableGauge("nucleus.resources.memory_used_bytes", () => new Measurement<double>(GetUtilization().MemoryUsedInBytes), description: "Memory in use in bytes.");
-
-    ResourceMeter.CreateObservableGauge("nucleus.resources.guaranteed_memory_bytes", () => new Measurement<double>(GetUtilization().SystemResources.GuaranteedMemoryInBytes), description: "The memory allocated to the system in bytes.");
-    ResourceMeter.CreateObservableGauge("nucleus.resources.maximum_memory_bytes", () => new Measurement<double>(GetUtilization().SystemResources.MaximumMemoryInBytes), description: "The maximum memory allocated to the system in bytes.");
+  {
+    ResourceMeter.CreateObservableGauge("process.cpu.utilization", () => new Measurement<double>(GetUtilization().CpuUsedPercentage), description: "The CPU used by the process as a percentage of the CPU units available in the system.");
 
     return Task.CompletedTask;
   }

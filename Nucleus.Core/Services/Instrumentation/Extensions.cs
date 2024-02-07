@@ -10,10 +10,8 @@ using OpenTelemetry.Metrics;
 using Microsoft.Extensions.Configuration;
 using OpenTelemetry.Resources;
 using Microsoft.Extensions.Logging;
-using OpenTelemetry.Logs;
-using static Nucleus.Core.Logging.LoggingBuilderExtensions;
 using Microsoft.AspNetCore.Builder;
-using Google.Protobuf.WellKnownTypes;
+using Nucleus.Abstractions.Models.Configuration;
 
 // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/diagnostic-resource-monitoring#see-also
 
@@ -23,9 +21,11 @@ public static class Extensions
 {
   public static IServiceCollection AddNucleusOpenTelemetryInstrumentation(this IServiceCollection services, IConfiguration config)
   {
-    services.AddOption<Nucleus.Abstractions.Models.Configuration.InstrumentationOptions>(config, Nucleus.Abstractions.Models.Configuration.InstrumentationOptions.Section);
+    services.AddOption<InstrumentationOptions>(config, InstrumentationOptions.Section);
 
-    Nucleus.Abstractions.Models.Configuration.InstrumentationOptions instrumentationOptions = config.GetSection("Nucleus:InstrumentationOptions").Get<Nucleus.Abstractions.Models.Configuration.InstrumentationOptions>(options => options.BindNonPublicProperties = true);
+    InstrumentationOptions instrumentationOptions = new();    
+    config.GetSection(InstrumentationOptions.Section)
+      .Bind(instrumentationOptions, options => options.BindNonPublicProperties = true);
 
     if (instrumentationOptions.Enabled)
     {
@@ -36,7 +36,7 @@ public static class Extensions
         {
           builder.AddService
           (
-            serviceName: "Nucleus",
+            serviceName: instrumentationOptions.ServiceName ?? "Nucleus",
             serviceVersion: typeof(Extensions).Assembly.GetName().Version?.ToString() ?? "unknown",
             serviceInstanceId: Environment.MachineName
           );
@@ -45,6 +45,8 @@ public static class Extensions
         {
           builder.AddAspNetCoreInstrumentation();
           builder.AddHttpClientInstrumentation();
+          builder.AddRuntimeInstrumentation();
+          builder.AddProcessInstrumentation();
           builder.AddMeter("nucleus*", "aspnetcore*", "process*", "dotnet*");
           builder.AddPrometheusExporter(options =>
           {
@@ -52,6 +54,7 @@ public static class Extensions
             options.ScrapeResponseCacheDurationMilliseconds = (int)instrumentationOptions.CacheDuration.TotalMilliseconds;
           });
         });
+
       //.WithTracing(builder =>
       //{
       //  builder.AddHttpClientInstrumentation();

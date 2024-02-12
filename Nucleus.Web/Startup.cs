@@ -27,10 +27,11 @@ using System.IO;
 using Microsoft.AspNetCore.DataProtection;
 using System.Runtime.InteropServices;
 using Nucleus.Core.Services.Instrumentation;
+using Nucleus.Core.Services.HealthChecks;
 
 namespace Nucleus.Web
 {
-    public class Startup
+  public class Startup
   {
     private const string HOSTING_FILENAME = "hosting";
     private const string CONFIG_FILENAME = "appSettings";
@@ -38,8 +39,8 @@ namespace Nucleus.Web
 
     private const string CONFIG_FILE_EXTENSION = ".json";
 
-    private const string SETTING_ENABLERESPONSECOMPRESSION = "Nucleus:EnableResponseCompression";
-    private const string SETTING_ENABLEFORWARDEDHEADERS = "Nucleus:EnableForwardedHeaders";
+    private const string SETTING_RESPONSECOMPRESSION_ENABLED = "Nucleus:ResponseCompression:Enabled";
+    private const string SETTING_FORWARDEDHEADERS_ENABLED = "Nucleus:ForwardedHeaders:Enabled";
 
     private IConfiguration Configuration { get; }
     private IWebHostEnvironment Environment { get; }
@@ -158,11 +159,14 @@ namespace Nucleus.Web
 
         services.Logger().LogInformation($"App Data Folder:         [{this.Configuration.GetValue<String>($"{Nucleus.Abstractions.Models.Configuration.FolderOptions.Section}:DataFolder")}]");
 
-        // Enable Open Telemetry metrics and tracing
+        // Enable Open Telemetry metrics and tracing, if configured
         services.AddNucleusOpenTelemetryInstrumentation(this.Configuration);
-        
+
+        // Enable health checks, if configured
+        services.AddNucleusHealthChecks(this.Configuration);
+
         // Enable compression
-        if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
+        if (this.Configuration.GetValue<Boolean>(SETTING_RESPONSECOMPRESSION_ENABLED))
         {
           services.Logger().LogInformation("Adding Response Compression");
           services.AddResponseCompression(options =>
@@ -173,7 +177,7 @@ namespace Nucleus.Web
           });
         };
 
-        if (this.Configuration.GetValue<Boolean>(SETTING_ENABLEFORWARDEDHEADERS))
+        if (this.Configuration.GetValue<Boolean>(SETTING_FORWARDEDHEADERS_ENABLED))
         {
           services.Logger().LogInformation("Adding Forwarded Headers");
           services.Configure<ForwardedHeadersOptions>(options =>
@@ -276,7 +280,7 @@ namespace Nucleus.Web
       try
       {
         app.UseNucleusOpenTelemetryEndPoint(this.Configuration, this.Environment);
-                
+
         app.UseMiddleware<SecurityHeadersMiddleware>();
         app.UseRequestLocalization();
 
@@ -289,12 +293,12 @@ namespace Nucleus.Web
 
         app.UseExceptionHandler($"/{RoutingConstants.ERROR_ROUTE_PATH}");
 
-        if (this.Configuration.GetValue<Boolean>(SETTING_ENABLEFORWARDEDHEADERS))
+        if (this.Configuration.GetValue<Boolean>(SETTING_FORWARDEDHEADERS_ENABLED))
         {
           app.UseForwardedHeaders();
         }
 
-        if (this.Configuration.GetValue<Boolean>(SETTING_ENABLERESPONSECOMPRESSION))
+        if (this.Configuration.GetValue<Boolean>(SETTING_RESPONSECOMPRESSION_ENABLED))
         {
           app.Logger().LogInformation($"Using Response Compression.");
           app.UseResponseCompression();
@@ -364,6 +368,9 @@ namespace Nucleus.Web
           // Even though this is the first route defined, .MapFallbackToController always creates a route that is last in the
           // routing order, so any other mapped route will take precedence over this one.
           routes.MapFallbackToController(RoutingConstants.DEFAULT_PAGE_PATTERN, "Index", "Default");
+
+          // map health check endpoint, if configured
+          routes.MapNucleusHealthChecks(this.Configuration);
 
           // "Razor Pages" (Razor Pages is different to Razor views with controllers [MVC])
           routes.MapRazorPages();

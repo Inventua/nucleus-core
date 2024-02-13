@@ -16,5 +16,7 @@ namespace Nucleus.Modules.ContactUs.ViewModels
 		public Models.Message Message { get; set; } = new();
 
 		public Boolean IsAdmin { get; set; }
+
+		public string RecaptchaVerificationToken { get; set; }
 	}
 }

@@ -264,20 +264,20 @@ namespace Nucleus.Core.Authentication
       ApiKey apiKey = await this.ApiKeyManager.Get(accessKey);
       if (apiKey == null)
       {
-        Logger.LogWarning("Invalid Api Key {key} from {remoteIpAddress}.", accessKey, this.Context.Connection.RemoteIpAddress);
-        return AuthenticateResult.Fail($"Invalid Api Key {sessionId} from {this.Context.Connection.RemoteIpAddress}.");
+        Logger.LogWarning("Invalid Api Key '{accessKey}' from '{remoteIpAddress}'.", accessKey, this.Context.Connection.RemoteIpAddress);
+        return AuthenticateResult.Fail($"Invalid Api Key '{accessKey}' from '{this.Context.Connection.RemoteIpAddress}'.");
       }
       else if (!apiKey.Enabled)
       {
-        Logger.LogWarning("Invalid [disabled] Api Key {key} from {remoteIpAddress}.", accessKey, this.Context.Connection.RemoteIpAddress);
-        return AuthenticateResult.Fail($"Invalid [disabled] Api Key {sessionId} from {this.Context.Connection.RemoteIpAddress}.");
+        Logger.LogWarning("Invalid [disabled] Api Key '{accessKey}' from '{remoteIpAddress}'.", accessKey, this.Context.Connection.RemoteIpAddress);
+        return AuthenticateResult.Fail($"Invalid [disabled] Api Key '{accessKey}' from '{this.Context.Connection.RemoteIpAddress}'.");
       }
       else
       {
         if (!this.Context.Request.IsValid(apiKey.Secret, out string reason))
         {
-          Logger.LogWarning("Invalid Api Key {key} from {remoteIpAddress}, {reason}.", accessKey, this.Context.Connection.RemoteIpAddress, reason);
-          return AuthenticateResult.Fail($"Invalid Api Key {sessionId} from {this.Context.Connection.RemoteIpAddress}, {reason}.");
+          Logger.LogWarning("Invalid Api Signature [Access Key: '{accessKey}'] from '{remoteIpAddress}', '{reason}'.", accessKey, this.Context.Connection.RemoteIpAddress, reason);
+          return AuthenticateResult.Fail($"Invalid Api Signature [Access Key: '{accessKey}'] from '{this.Context.Connection.RemoteIpAddress}'.");
         }
         else
         {

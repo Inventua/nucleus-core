@@ -12,6 +12,9 @@ using OpenTelemetry.Resources;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
 using Nucleus.Abstractions.Models.Configuration;
+using Nucleus.Core.Layout;
+using Nucleus.Extensions;
+using Microsoft.AspNetCore.Hosting;
 
 // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/diagnostic-resource-monitoring#see-also
 
@@ -19,6 +22,12 @@ namespace Nucleus.Core.Services.Instrumentation;
 
 public static class Extensions
 {
+  /// <summary>
+  /// Add Nucleus, AspNetCore, HttpClient, Runtime and Process OpenTelemetry instrumentation, if configured.
+  /// </summary>
+  /// <param name="services"></param>
+  /// <param name="config"></param>
+  /// <returns></returns>
   public static IServiceCollection AddNucleusOpenTelemetryInstrumentation(this IServiceCollection services, IConfiguration config)
   {
     services.AddOption<InstrumentationOptions>(config, InstrumentationOptions.Section);
@@ -55,6 +64,7 @@ public static class Extensions
           });
         });
 
+      // Not currently enabled, for later use
       //.WithTracing(builder =>
       //{
       //  builder.AddHttpClientInstrumentation();
@@ -63,22 +73,32 @@ public static class Extensions
       //});
 
       services.AddResourceMonitoring();
-      services.AddHostedService<ResourceMonitor>();
+      services.AddHostedService<TelemetryMonitor>();
+
+      services.AddScoped<TelemetryMiddleware>();
     }
 
     return services;
   }
 
-  public static IApplicationBuilder UseNucleusOpenTelemetryEndPoint(this IApplicationBuilder builder, IConfiguration config)
+  /// <summary>
+  /// Start OpenTelemetry services.
+  /// </summary>
+  /// <param name="builder"></param>
+  /// <param name="config"></param>
+  /// <param name="environment"></param>
+  /// <returns></returns>
+  public static IApplicationBuilder UseNucleusOpenTelemetryEndPoint(this IApplicationBuilder builder, IConfiguration config, IWebHostEnvironment environment)
   {
     if (config.GetValue<Boolean>("Nucleus:InstrumentationOptions:Enabled"))
     {
       builder.UseOpenTelemetryPrometheusScrapingEndpoint();
+      builder.UseMiddleware<TelemetryMiddleware>();           
     }
     return builder;
   }
 
-  // Not currently enabled
+  // Not currently enabled, for later use
   //public static ILoggingBuilder AddNucleusOpenTelemetryLogging(this ILoggingBuilder builder, IConfiguration config)
   //{
   //  // Enable Open Telemetry logger
@@ -104,6 +124,4 @@ public static class Extensions
 
   //  return builder;
   //}
-
-
 }

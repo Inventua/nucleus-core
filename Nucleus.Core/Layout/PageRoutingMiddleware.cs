@@ -8,14 +8,6 @@ using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions;
-using System.Diagnostics.Metrics;
-using Nucleus.Core.Services.Instrumentation;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Routing.Patterns;
-using Nucleus.Abstractions;
-using Microsoft.AspNetCore.Routing;
-using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Core.Layout
 {
@@ -39,9 +31,6 @@ namespace Nucleus.Core.Layout
 
     private ICacheManager CacheManager { get; }
 
-    private Counter<int> PagesVisitedCounter { get; }
-    private Counter<int> NotFound404Counter { get; }
-
     private static readonly string[] KNOWN_NON_PAGE_PATHS =
     {
       Nucleus.Abstractions.RoutingConstants.API_ROUTE_PATH,
@@ -50,7 +39,7 @@ namespace Nucleus.Core.Layout
       Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH,
     };
 
-    public PageRoutingMiddleware(Context context, Application application, IMeterFactory meterFactory, IPageManager pageManager, ISiteManager siteManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager, ILogger<PageRoutingMiddleware> logger)
+    public PageRoutingMiddleware(Context context, Application application, IPageManager pageManager, ISiteManager siteManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager, ILogger<PageRoutingMiddleware> logger)
     {
       this.Context = context;
       this.Application = application;
@@ -59,10 +48,6 @@ namespace Nucleus.Core.Layout
       this.FileSystemManager = fileSystemManager;
       this.CacheManager = cacheManager;
       this.Logger = logger;
-
-      Meter pagesVisitedMeter = meterFactory.Create("nucleus.page_routing", typeof(PageRoutingMiddleware).Assembly.GetName().Version.ToString());
-      this.PagesVisitedCounter = pagesVisitedMeter.CreateCounter<int>("nucleus.page_routing.page_visited", description: "Nucleus pages visited.");
-      this.NotFound404Counter = pagesVisitedMeter.CreateCounter<int>("nucleus.page_routing.not_found", description: "Nucleus page not found.");
     }
 
     /// <summary>
@@ -201,89 +186,6 @@ namespace Nucleus.Core.Layout
           context.Response.Redirect(relativePath);
         }
       }
-
-      // submit counters to metrics
-      if (context.Response.StatusCode == (int)System.Net.HttpStatusCode.NotFound)
-      {
-        this.NotFound404Counter.Add(1,
-            new KeyValuePair<string, object>("site_name", this.Context.Site?.Name),
-            new KeyValuePair<string, object>("site_id", this.Context.Site?.Id),
-            new KeyValuePair<string, object>("http_request_path", context.Request.Path.ToString()));
-      }
-      else if (HttpStatusCodeIsSuccess(context.Response.StatusCode))
-      {
-        if (this.Context.Site != null && this.Context.Page != null)
-        {
-          this.PagesVisitedCounter.Add(1,
-            new KeyValuePair<string, object>("site_name", this.Context.Site?.Name),
-            new KeyValuePair<string, object>("site_id", this.Context.Site?.Id),
-            new KeyValuePair<string, object>("page_name", this.Context.Page?.Name),
-            new KeyValuePair<string, object>("page_id", this.Context.Page?.Id),
-            new KeyValuePair<string, object>("matched_route", this.Context?.MatchedRoute?.Path)
-          );
-        }
-      }
-
-      if (context.Request.Method == "GET")
-      {
-        IHttpMetricsTagsFeature tagsFeature = context.Features.Get<IHttpMetricsTagsFeature>();
-        if (tagsFeature != null)
-        {
-          Microsoft.AspNetCore.Routing.RouteEndpoint endPoint = context.GetEndpoint() as Microsoft.AspNetCore.Routing.RouteEndpoint;
-          if (endPoint != null)
-          {
-            string routeName = endPoint?.Metadata.OfType<RouteNameMetadata>().SingleOrDefault()?.RouteName;
-            string routeType = routeName switch
-            {
-              RoutingConstants.ROBOTS_ROUTE_NAME => "robots",
-              RoutingConstants.SITEMAP_ROUTE_NAME => "sitemap",
-              RoutingConstants.AREA_ROUTE_NAME => "admin-ui",
-              RoutingConstants.API_ROUTE_NAME => "api",
-              RoutingConstants.ERROR_ROUTE_NAME => "error-page",
-              RoutingConstants.EXTENSIONS_ROUTE_NAME => "extension",
-              _ => DetermineType(context.Request)
-            };
-            //if (this.Context?.MatchedRoute?.Path != null)
-            //{
-            tagsFeature.Tags.Add(new KeyValuePair<string, object>("route_type", routeType));
-            //}
-          }
-        }
-      }
-    }
-
-    /// <summary>
-    /// Determine route types for routes which can not be detected by route name.
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
-    private string DetermineType(HttpRequest request)
-    {
-      if (this.Context.Page != null) return "page";
-      if (request.Path.StartsWithSegments($"/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH}")) return "file";
-
-      string[] pathParts = request.Path.ToString().Split(new char[] { System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
-
-      // check to see if the first part of the path is Request.PathBase.  If it is, use the next part of the path as the root 
-      // path to check (this is what happens when an application is run in an IIS virtual directory)
-      string pathStart = pathParts.First().Equals(request.PathBase, StringComparison.OrdinalIgnoreCase) ? pathParts.Skip(1).First() : pathParts.First();
-      if (pathStart != null && FolderOptions.ALLOWED_STATICFILE_PATHS.Contains(pathStart, StringComparer.OrdinalIgnoreCase))
-      {
-        return "resource";
-      }
-
-      return "";
-    }
-
-    /// <summary>
-    /// Return whether the status code is a success code.  For the purposes of this module, status codes in the "300" range 
-    /// are regarded as success codes as well as those in the 200 range.
-    /// </summary>
-    /// <param name="statusCode"></param>
-    /// <returns></returns>
-    private Boolean HttpStatusCodeIsSuccess(int statusCode)
-    {
-      return statusCode >= (int)System.Net.HttpStatusCode.OK && statusCode < (int)System.Net.HttpStatusCode.BadRequest;
     }
 
     /// <summary>

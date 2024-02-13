@@ -176,15 +176,14 @@ function _Page()
     {
       var subMenu = jQuery(this).next('.dropdown-menu');
 
-      if (!jQuery(this).next().hasClass('show'))
-      {
-        jQuery('.dropdown-menu').not(subMenu.parents()).removeClass('show');
-      }
-
+      jQuery('.dropdown-menu').not(subMenu.parents()).removeClass('show');     
+      
+      subMenu.off('shown.bs.collapse');
       subMenu.on('shown.bs.collapse', function ()
       {
         subMenu.css('margin-left', '');
-        var overflowpx = jQuery(window).width() - (subMenu.offset().left + subMenu.outerWidth(true));
+        var padding = 16;
+        var overflowpx = jQuery(window).width() - padding - (subMenu.offset().left + subMenu.outerWidth(true));
 
         if (overflowpx < 0)
         {
@@ -192,7 +191,7 @@ function _Page()
         }
       })
 
-      subMenu.collapse('show');
+      subMenu.collapse('show');     
 
       return false;
     });

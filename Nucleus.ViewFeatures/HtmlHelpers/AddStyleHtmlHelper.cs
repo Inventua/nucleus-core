@@ -267,7 +267,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
               builder.Attributes.Add("data-dynamic", "true");
             }
 
-            builder.Attributes.Add("href", style.Value.Path + (!String.IsNullOrEmpty(style.Value.Version) ? "?v=" + style.Value.Version : ""));
+            builder.Attributes.Add("href", style.Value.Path + (!String.IsNullOrEmpty(style.Value.Version) ? (style.Value.Path.Contains('?') ? "&" : "?") + "v=" + style.Value.Version : ""));
 
             if (style.Value.Defer)
             {

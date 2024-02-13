@@ -46,8 +46,8 @@ public class InstrumentationOptions
   /// Specifies the duration that the "scrape" telemetry content is cached before being re-generated.
   /// </summary>
   /// <remarks>
-  /// The default value is 5 seconds (00:00:05).
+  /// The default value is 60 seconds (00:01:00).
   /// </remarks>
-  public TimeSpan CacheDuration { get; private set; } = TimeSpan.FromSeconds(5);
+  public TimeSpan CacheDuration { get; private set; } = TimeSpan.FromSeconds(60);
 
 }

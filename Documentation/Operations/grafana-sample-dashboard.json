@@ -47,7 +47,7 @@
             {
               "options": {
                 "0": {
-                  "color": "red",
+                  "color": "#ff0000",
                   "index": 0,
                   "text": "Offline"
                 },
@@ -58,6 +58,17 @@
                 }
               },
               "type": "value"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "#ff0000",
+                  "index": 2,
+                  "text": "Offline"
+                }
+              },
+              "type": "special"
             }
           ],
           "thresholds": {
@@ -66,14 +77,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 0
-              },
-              {
-                "color": "green",
-                "value": 1
               }
             ]
           },
@@ -96,7 +99,7 @@
         "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "last"
           ],
           "fields": "",
           "values": false
@@ -141,8 +144,19 @@
             "fixedColor": "blue",
             "mode": "fixed"
           },
-          "decimals": 0,
-          "mappings": [],
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "#bdbdbd",
+                  "index": 0,
+                  "text": "-"
+                }
+              },
+              "type": "special"
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -162,11 +176,11 @@
       },
       "gridPos": {
         "h": 2,
-        "w": 4,
-        "x": 5,
+        "w": 3,
+        "x": 4,
         "y": 1
       },
-      "id": 18,
+      "id": 15,
       "options": {
         "colorMode": "background",
         "graphMode": "area",
@@ -190,7 +204,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "increase(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\", route_type=\"page\"}[$__rate_interval])",
+          "expr": "sum(rate(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\", route_type=\"page\"}[$__range]))",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -199,7 +213,93 @@
           "refId": "A"
         }
       ],
-      "title": "Number of Page Requests",
+      "title": "Page Requests/second",
+      "transformations": [],
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "de71d6cb-34a9-4eff-b6bd-d901c73e00aa"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "#bdbdbd",
+                  "index": 0,
+                  "text": "-"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 2,
+        "x": 7,
+        "y": 1
+      },
+      "id": 22,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "de71d6cb-34a9-4eff-b6bd-d901c73e00aa"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(nucleus_application_users_online{job=\"$job\", instance=\"$instance\"})",
+          "format": "time_series",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Users Online",
       "transformations": [],
       "transparent": true,
       "type": "stat"
@@ -216,14 +316,26 @@
             "mode": "thresholds"
           },
           "decimals": 2,
-          "mappings": [],
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "#bdbdbd",
+                  "index": 0,
+                  "text": "Offline"
+                }
+              },
+              "type": "special"
+            }
+          ],
           "max": 100,
           "min": 0,
           "thresholds": {
             "mode": "percentage",
             "steps": [
               {
-                "color": "green",
+                "color": "blue",
                 "value": null
               },
               {
@@ -239,8 +351,8 @@
       },
       "gridPos": {
         "h": 2,
-        "w": 4,
-        "x": 20,
+        "w": 3,
+        "x": 10,
         "y": 1
       },
       "id": 6,
@@ -289,13 +401,63 @@
         "type": "prometheus",
         "uid": "de71d6cb-34a9-4eff-b6bd-d901c73e00aa"
       },
+      "gridPos": {
+        "h": 4,
+        "w": 10,
+        "x": 14,
+        "y": 1
+      },
+      "id": 21,
+      "links": [
+        {
+          "title": "",
+          "url": "http://localhost:3000/d/c07a60f8-7228-415c-a269-e3057c85edf2/active-alerts?orgId=1"
+        }
+      ],
+      "options": {
+        "alertInstanceLabelFilter": "",
+        "alertName": "",
+        "dashboardAlerts": false,
+        "groupBy": [],
+        "groupMode": "default",
+        "maxItems": 20,
+        "sortOrder": 5,
+        "stateFilter": {
+          "error": true,
+          "firing": true,
+          "noData": false,
+          "normal": false,
+          "pending": false
+        },
+        "viewMode": "list"
+      },
+      "title": "Alerts",
+      "type": "alertlist"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "de71d6cb-34a9-4eff-b6bd-d901c73e00aa"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "blue",
+            "fixedColor": "green",
             "mode": "fixed"
           },
-          "mappings": [],
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "#c4c4c4",
+                  "index": 0,
+                  "text": "-"
+                }
+              },
+              "type": "special"
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -312,19 +474,7 @@
           "unit": "dateTimeAsLocal",
           "unitScale": true
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byValue",
-              "options": {
-                "op": "eq",
-                "reducer": "allValues",
-                "value": 0
-              }
-            },
-            "properties": []
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 2,
@@ -332,20 +482,21 @@
         "x": 0,
         "y": 3
       },
-      "id": 19,
+      "id": 20,
       "options": {
-        "colorMode": "background_solid",
+        "colorMode": "background",
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "firstNotNull"
-          ],
+          "calcs": [],
           "fields": "",
           "values": false
         },
         "showPercentChange": false,
+        "text": {
+          "valueSize": 16
+        },
         "textMode": "auto",
         "wideLayout": true
       },
@@ -356,18 +507,14 @@
             "type": "prometheus",
             "uid": "de71d6cb-34a9-4eff-b6bd-d901c73e00aa"
           },
-          "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "timestamp(up{job=\"$job\", instance=\"$instance\"}) * 1000",
-          "format": "time_series",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": true,
+          "expr": "timestamp(changes(up{job=\"$job\", instance=\"$instance\"}[$__interval]) > 0) * 1000",
+          "instant": false,
+          "interval": "1",
           "legendFormat": "__auto",
-          "range": false,
-          "refId": "A",
-          "useBackend": false
+          "range": true,
+          "refId": "A"
         }
       ],
       "title": "Since",
@@ -385,7 +532,20 @@
             "fixedColor": "blue",
             "mode": "fixed"
           },
-          "mappings": [],
+          "decimals": 0,
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "#bdbdbd",
+                  "index": 0,
+                  "text": "-"
+                }
+              },
+              "type": "special"
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -405,11 +565,11 @@
       },
       "gridPos": {
         "h": 2,
-        "w": 4,
-        "x": 5,
+        "w": 3,
+        "x": 4,
         "y": 3
       },
-      "id": 15,
+      "id": 18,
       "options": {
         "colorMode": "background",
         "graphMode": "area",
@@ -433,7 +593,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rate(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\", route_type=\"page\"}[$__rate_interval])",
+          "expr": "sum(increase(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\", route_type=\"page\"}[$__range]))",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -442,7 +602,7 @@
           "refId": "A"
         }
       ],
-      "title": "Page Requests per second",
+      "title": "Number of Page Requests",
       "transformations": [],
       "transparent": true,
       "type": "stat"
@@ -460,7 +620,19 @@
             "mode": "fixed"
           },
           "decimals": 2,
-          "mappings": [],
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "#bdbdbd",
+                  "index": 0,
+                  "text": "Offline"
+                }
+              },
+              "type": "special"
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -481,8 +653,8 @@
       },
       "gridPos": {
         "h": 2,
-        "w": 4,
-        "x": 20,
+        "w": 3,
+        "x": 10,
         "y": 3
       },
       "id": 7,
@@ -628,7 +800,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "rate(http_server_active_requests{job=\"$job\", instance=\"$instance\"}[$__rate_interval])",
+          "expr": "rate(http_server_active_requests{job=\"$job\", instance=\"$instance\"}[$__range])",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -784,7 +956,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "avg(rate(http_server_request_duration_seconds_bucket{job=\"$job\", instance=\"$instance\",route_type=\"page\"}[$__rate_interval]))",
+          "expr": "avg(rate(http_server_request_duration_seconds_bucket{job=\"$job\", instance=\"$instance\",route_type=\"page\"}[$__range]))",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -901,8 +1073,8 @@
         ]
       },
       "gridPos": {
-        "h": 6,
-        "w": 9,
+        "h": 9,
+        "w": 10,
         "x": 0,
         "y": 14
       },
@@ -973,8 +1145,8 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 3,
-        "x": 9,
+        "w": 2,
+        "x": 10,
         "y": 14
       },
       "id": 3,
@@ -1156,8 +1328,8 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 3,
-        "x": 9,
+        "w": 2,
+        "x": 10,
         "y": 17
       },
       "id": 4,
@@ -1402,17 +1574,45 @@
         "skipUrlSync": false,
         "sort": 1,
         "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "up{instance=\"localhost:5001\",job=\"Nucleus\"} 1 1707882066000",
+          "value": "up{instance=\"localhost:5001\",job=\"Nucleus\"} 1 1707882066000"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "de71d6cb-34a9-4eff-b6bd-d901c73e00aa"
+        },
+        "definition": "query_result(up{job=\"$job\", instance=\"$instance\"})",
+        "hide": 2,
+        "includeAll": false,
+        "label": "Up",
+        "multi": false,
+        "name": "up",
+        "options": [],
+        "query": {
+          "qryType": 3,
+          "query": "query_result(up{job=\"$job\", instance=\"$instance\"})",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-6h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Nucleus",
+  "title": "* Nucleus",
   "uid": "d5323603-423a-4433-869e-845be81ca9d6",
-  "version": 153,
+  "version": 205,
   "weekStart": ""
 }

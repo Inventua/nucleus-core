@@ -323,7 +323,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
             {
               builder.Attributes.Add("data-dynamic", "true");
             }
-            builder.Attributes.Add("src", script.Value.Path + (!String.IsNullOrEmpty(script.Value.Version) ? "?v=" + script.Value.Version : ""));
+            builder.Attributes.Add("src", script.Value.Path + (!String.IsNullOrEmpty(script.Value.Version) ? (script.Value.Path.Contains('?') ? "&" : "?") + "v=" + script.Value.Version : ""));
             if (script.Value.IsAsync)
             {
               builder.Attributes.Add("async", "");

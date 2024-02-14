@@ -10,6 +10,8 @@ namespace Nucleus.Modules.ContactUs.Models
 {
 	public class Settings
 	{
+		public const string DUMMY_PASSWORD = "!@#NOT_CHANGED^&*";
+
 		public const string MODULESETTING_CATEGORYLIST_ID = "contactus:categorylist:id";
 		public const string MODULESETTING_MAILTEMPLATE_ID = "contactus:mailtemplate:id";
 		public const string MODULESETTING_SEND_TO = "contactus:sendto";
@@ -24,6 +26,12 @@ namespace Nucleus.Modules.ContactUs.Models
 		public const string MODULESETTING_REQUIREPHONENUMBER = "contactus:require-phonenumber";
 		public const string MODULESETTING_REQUIRECATEGORY = "contactus:require-category";
 		public const string MODULESETTING_REQUIRESUBJECT = "contactus:require-subject";
+
+		public const string MODULESETTING_RECAPTCHA_SITE_KEY = "contactus:recaptcha-site-key";
+		public const string MODULESETTING_RECAPTCHA_SECRET_KEY = "contactus:recaptcha-secret-key";
+		public const string MODULESETTING_RECAPTCHA_SALT = "contactus:recaptcha-salt";
+
+		public const string MODULESETTING_RECAPTCHA_ACTION = "contactus:recaptcha-action";
 
 		public string SendTo { get; set; }
 
@@ -51,6 +59,27 @@ namespace Nucleus.Modules.ContactUs.Models
 
 		public Boolean RequireSubject { get; set; }
 
+		public string RecaptchaSiteKey { get; set; }
+
+		public string RecaptchaSecretKey { get; set; } = DUMMY_PASSWORD;
+
+		private string RecaptchaEncryptedSecretKey { get; set; }
+
+		public string RecaptchaAction {  get; set; }
+
+		public string GetSecretKey(Site site)
+		{
+			if (String.IsNullOrEmpty(this.RecaptchaEncryptedSecretKey))
+			{
+				return "";
+			}
+			else
+			{
+				return DecryptSecretKey(site, this.RecaptchaEncryptedSecretKey);
+			}
+		}
+		
+
 		public void ReadSettings(PageModule module)
 		{
 			this.MailTemplateId = module.ModuleSettings.Get(Models.Settings.MODULESETTING_MAILTEMPLATE_ID, Guid.Empty);
@@ -68,6 +97,121 @@ namespace Nucleus.Modules.ContactUs.Models
 			this.RequireCategory = module.ModuleSettings.Get(ViewModels.Settings.MODULESETTING_REQUIRECATEGORY, true);
 			this.RequireSubject = module.ModuleSettings.Get(ViewModels.Settings.MODULESETTING_REQUIRESUBJECT, true);
 
+			this.RecaptchaSiteKey = module.ModuleSettings.Get(ViewModels.Settings.MODULESETTING_RECAPTCHA_SITE_KEY, "");
+			this.RecaptchaEncryptedSecretKey = module.ModuleSettings.Get(ViewModels.Settings.MODULESETTING_RECAPTCHA_SECRET_KEY, "");
+
+			this.RecaptchaAction = module.ModuleSettings.Get(ViewModels.Settings.MODULESETTING_RECAPTCHA_ACTION, "");
 		}
+
+		public void SetSettings(Site site, PageModule module)
+		{
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_CATEGORYLIST_ID, this.CategoryList.Id);
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_MAILTEMPLATE_ID, this.MailTemplateId);
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_SEND_TO, this.SendTo);
+
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_SHOWNAME, this.ShowName);
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_SHOWCOMPANY, this.ShowCompany);
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_SHOWPHONENUMBER, this.ShowPhoneNumber);
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_SHOWCATEGORY, this.ShowCategory);
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_SHOWSUBJECT, this.ShowSubject);
+
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_REQUIRENAME, this.RequireName);
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_REQUIRECOMPANY, this.RequireCompany);
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_REQUIREPHONENUMBER, this.RequirePhoneNumber);
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_REQUIRECATEGORY, this.RequireCategory);
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_REQUIRESUBJECT, this.RequireSubject);
+
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_RECAPTCHA_SITE_KEY, this.RecaptchaSiteKey);
+			module.ModuleSettings.Set(Models.Settings.MODULESETTING_RECAPTCHA_ACTION, this.RecaptchaAction);
+
+			if (this.RecaptchaSecretKey != DUMMY_PASSWORD)
+			{
+				module.ModuleSettings.Set(Models.Settings.MODULESETTING_RECAPTCHA_SECRET_KEY, EncryptSecretKey(site, this.RecaptchaSecretKey));
+			}
+
+		}
+
+		/// <summary>
+		/// Encrypt and encode a secret key and return the result.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="secretKey"></param>
+		/// <returns></returns>
+		private static string EncryptSecretKey(Site site, string secretKey)
+		{
+			if (String.IsNullOrEmpty(secretKey))
+			{
+				return null;
+			}
+
+			// Convert string to byte array
+			byte[] bytesIn = System.Text.Encoding.UTF8.GetBytes(secretKey);
+
+			// Preparing the memory stream for encrypted string.
+			System.IO.MemoryStream msOut = new();
+
+			// Create the ICryptoTransform instance.
+			System.Security.Cryptography.Aes aes = System.Security.Cryptography.Aes.Create();
+			aes.Key = site.Id.ToByteArray();
+			aes.IV = site.Id.ToByteArray();
+
+			// Create the CryptoStream instance.
+			System.Security.Cryptography.CryptoStream cryptStream = new(msOut, aes.CreateEncryptor(aes.Key, aes.IV), System.Security.Cryptography.CryptoStreamMode.Write);
+
+			// Encoding.
+			cryptStream.Write(bytesIn, 0, bytesIn.Length);
+			cryptStream.FlushFinalBlock();
+
+			// Get the encrypted byte array.
+			byte[] bytesOut = msOut.ToArray();
+
+			cryptStream.Close();
+			msOut.Close();
+
+			// Convert to string and return result value
+			return System.Convert.ToBase64String(bytesOut);
+		}
+
+		/// <summary>
+		/// Decrypt and decode a secret key and return the result.
+		/// </summary>
+		/// <param name="site"></param>
+		/// <param name="secretKey"></param>
+		/// <returns></returns>
+		private static string DecryptSecretKey(Site site, string secretKey)
+		{
+			if (String.IsNullOrEmpty(secretKey))
+			{
+				return null;
+			}
+
+			// Convert string to byte array
+			byte[] bytesIn = System.Convert.FromBase64String(secretKey);
+
+			// Preparing the memory stream for encrypted string.
+			System.IO.MemoryStream msOut = new();
+
+			// Create the ICryptoTransform instance.
+			System.Security.Cryptography.Aes aes = System.Security.Cryptography.Aes.Create();
+			aes.Key = site.Id.ToByteArray();
+			aes.IV = site.Id.ToByteArray();
+
+			// Create the CryptoStream instance.
+			System.Security.Cryptography.CryptoStream cryptStream = new(msOut, aes.CreateDecryptor(aes.Key, aes.IV), System.Security.Cryptography.CryptoStreamMode.Write);
+
+			// Encoding.
+			cryptStream.Write(bytesIn, 0, bytesIn.Length);
+			cryptStream.FlushFinalBlock();
+
+			// Get the encrypted byte array.
+			byte[] bytesOut = msOut.ToArray();
+
+			cryptStream.Close();
+			msOut.Close();
+
+			// Convert to string and return result value
+			return System.Text.Encoding.UTF8.GetString(bytesOut);
+		}
+
 	}
 }

@@ -121,7 +121,7 @@ This gauge reports Nucleus application information.
 | Attribute                        |                                                                  |
 |----------------------------------|------------------------------------------------------------------|
 | start_date                       | Nucleus start date/time (UTC).                                   |
-| environment_name                 | The configugured [environment](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/environments) name.                               |
+| environment_name                 | The configured [environment](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/environments) name.                               |
 
 > Nucleus enriches the built-in `http_server_request_duration` metrics by adding a route_type attribute.  The route_type attribute idenfifies which type 
 of resouce was served by Nucleus.

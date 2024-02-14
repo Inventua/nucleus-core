@@ -7,13 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Metrics;
-using Microsoft.Extensions.Configuration;
 using OpenTelemetry.Resources;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
 using Nucleus.Abstractions.Models.Configuration;
-using Nucleus.Core.Layout;
-using Nucleus.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Nucleus.Core.Logging;
 
@@ -42,7 +40,7 @@ public static class Extensions
       // Enable Open Telemetry metrics and tracing
       // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/distributed-tracing-instrumentation-walkthroughs
       services.AddOpenTelemetry()
-        .ConfigureResource((builder) =>
+        .ConfigureResource(builder =>
         {
           builder.AddService
           (
@@ -51,6 +49,7 @@ public static class Extensions
             serviceInstanceId: Environment.MachineName
           );
         })
+        
         .WithMetrics(builder =>
         {
           builder.AddAspNetCoreInstrumentation();
@@ -63,7 +62,7 @@ public static class Extensions
             options.ScrapeEndpointPath = instrumentationOptions.ScrapeEndpointPath ?? "/_metrics";
             options.ScrapeResponseCacheDurationMilliseconds = (int)instrumentationOptions.CacheDuration.TotalMilliseconds;
           });
-
+         
           if (!String.IsNullOrEmpty(instrumentationOptions.OtlpEndPoint))
           {
             if (Uri.TryCreate(instrumentationOptions.OtlpEndPoint, UriKind.Absolute, out Uri otlpTargetUri))

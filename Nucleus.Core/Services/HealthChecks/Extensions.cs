@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Core.Logging;
 using Microsoft.AspNetCore.Routing;
-using Nucleus.Core.Services.HealthChecks;
 using Microsoft.AspNetCore.Builder;
 using Nucleus.Extensions.Logging;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -18,8 +16,6 @@ using System.IO;
 using System.Text.Json;
 using Microsoft.IO;
 using System.Net;
-using System.Net.Http.Headers;
-using System.Globalization;
 using Microsoft.Extensions.Primitives;
 
 namespace Nucleus.Core.Services.HealthChecks;

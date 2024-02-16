@@ -3,7 +3,7 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
-<div class="nucleus-page-editor d-flex flex-column h-100">
+<div class="nucleus-page-editor d-flex flex-column h-100@(Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default ? " nucleus-editor-panel" : "")">
   @if (Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default)
   {
     <h1 class="nucleus-control-panel-heading">Page Settings</h1>

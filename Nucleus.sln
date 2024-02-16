@@ -172,9 +172,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Modules.Shadow", "N
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Modules.IFrame", "Nucleus.Core.Modules\Nucleus.Modules.IFrame\Nucleus.Modules.IFrame.csproj", "{E4821BB4-D4BB-410A-AE00-5445720A45B1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Instrumentation", "Instrumentation", "{D0789DE6-4BF3-4964-A34C-1F2AC63171B6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Operations", "Operations", "{D0789DE6-4BF3-4964-A34C-1F2AC63171B6}"
 	ProjectSection(SolutionItems) = preProject
-		Documentation\Instrumentation\grafana-sample-dashboard.json = Documentation\Instrumentation\grafana-sample-dashboard.json
+		Documentation\Operations\grafana-sample-dashboard.json = Documentation\Operations\grafana-sample-dashboard.json
+		Documentation\Operations\health-checks.md = Documentation\Operations\health-checks.md
+		Documentation\Operations\instrumentation.md = Documentation\Operations\instrumentation.md
 	EndProjectSection
 EndProject
 Global

@@ -4,7 +4,6 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 <h2 class="nucleus-control-panel-heading">Settings</h2>
-@Html.AddStyle("~!/../settings.css")
 @using (Html.BeginNucleusForm("Settings", "ContactUs", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
 	<div class="flex-grow-1">
@@ -80,15 +79,15 @@
 			</SettingsControl>
 
 			<SettingsControl caption="reCAPTCHA Secret Key" helptext="Please enter your reCAPTCHA secret key.">
-				@Html.PasswordFor(model => model.RecaptchaSecretKey, new { @value = Nucleus.Modules.ContactUs.Models.Settings.DUMMY_PASSWORD })
+				@Html.PasswordFor(model => model.RecaptchaSecretKey, new { @value = Nucleus.Modules.ContactUs.ViewModels.Settings.DUMMY_PASSWORD })
 			</SettingsControl>
 
-			<SettingsControl caption="reCAPTCHA Action" helptext="Please enter your reCAPTCHA action. This is used in the reCAPTCHA admin console for reporting and for adaptive risk analysis.">
+			<SettingsControl caption="reCAPTCHA Action" helptext="Please enter your reCAPTCHA action using only alphanumeric characters, slashes, and underscore. This is used in the reCAPTCHA admin console for reporting and for adaptive risk analysis.">
 				@Html.TextBoxFor(model => model.RecaptchaAction)
 			</SettingsControl>
 		</fieldset>
 	</div>
 	<div class="nucleus-form-buttonrow">
-		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "ContactUs", "ContactUs"), new { })
+		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "ContactUsAdmin", "ContactUs"), new { })
 	</div>
 }

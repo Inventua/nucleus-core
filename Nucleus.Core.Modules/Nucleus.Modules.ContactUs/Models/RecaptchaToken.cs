@@ -1,31 +1,21 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nucleus.Modules.ContactUs.Models;
 
-public class Recaptcha
-{
-	private const string MINION_SITE_SITE_KEY = "6Le0DVgpAAAAAPpOOQfsViDaxWQafHxDFsc4sRjV";
-	private const string MINION_SITE_SECRET_KEY = "6Le0DVgpAAAAAFVS9N5NMoS3GuDmlkGSszgGK7fj";
-
-	public string SiteKey
-	{ get 
-		{ 
-			return MINION_SITE_SITE_KEY; 
-		} 
-	} 
-
-}
-
 public class RecaptchaToken
 {
-
+	[JsonProperty("challenge_ts")]
 	public DateTime Challenge_ts { get; set; }
+	[JsonProperty("score")]
 	public float Score { get; set; }
+	[JsonProperty("action")]
+	public string Action { get; set; }
+	[JsonProperty("error-codes")]
 	public List<string> ErrorCodes { get; set; }
+	[JsonProperty("success")]
 	public bool Success { get; set; }
+	[JsonProperty("hostname")]
 	public string Hostname { get; set; }
 }

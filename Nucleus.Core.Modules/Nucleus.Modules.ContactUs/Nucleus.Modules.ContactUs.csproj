@@ -21,10 +21,9 @@
 
   <ItemGroup>
     <None Remove="license.txt" />
-    <None Remove="viewer.css" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
-    <None Remove="settings.css" />
+    <None Remove="viewer.js" />
     <None Remove="Views\Email Template Sample.cshtml" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
@@ -32,22 +31,21 @@
 
   <ItemGroup>
     <Content Include="license.txt" />
-    <Content Include="viewer.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
-    <Content Include="settings.css" />
+    <Content Include="viewer.js" />
     <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.2.0" />
+		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.4.0-pre-alpha2.1" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.2.0" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>ContactUs</ExtensionFolder>
-		<Version>1.2.0</Version>
+		<Version>1.4.0</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 	</PropertyGroup>
 

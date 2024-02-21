@@ -1,0 +1,8 @@
+[
+  {
+    "outputFileName": "viewer.min.js",
+    "inputFiles": [
+      "viewer.js"
+    ]
+  }
+]

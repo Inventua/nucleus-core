@@ -7,14 +7,19 @@
 			form: null,
 			verificationTokenElement: null,
 			siteKey: null,
-			action: null
+			action: null,
+			badgeElement: null
 		}, conf);
-		
+
+		var clientId = grecaptcha.render(config.badgeElement[0], {
+			'sitekey': config.siteKey,
+			'badge': 'inline',
+			'size': 'invisible'
+		});
+
 		// For every element passed to the plug-in
 		return this.each(function (index, value)
 		{
-			//config.form.off('submit');
-
 			jQuery(this).on('click', function (event)
 			{
 				if (config.form === null) return;
@@ -26,15 +31,14 @@
 
 				grecaptcha.ready(function ()
 				{
-					grecaptcha.execute(config.siteKey, { action: config.action }).then(function (token)
-					{
-						config.verificationTokenElement.val(token);
-						config.form.on('submit', Page.PostPartialContent);
-						config.form.trigger('submit');
-					});
+					grecaptcha.execute(clientId, { action: config.action })
+						.then(function (token)
+						{
+							config.verificationTokenElement.val(token);
+							config.form.on('submit', Page.PostPartialContent);
+							config.form.trigger('submit');
+						});
 				});
-				
-
 			});
 		});
 	}

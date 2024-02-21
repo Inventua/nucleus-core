@@ -7,16 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nucleus.Modules.ContactUs.ViewModels
+namespace Nucleus.Modules.ContactUs.ViewModels;
+
+public class Viewer : Models.Settings
 {
-	public class Viewer : Models.Settings
-	{
-		public Boolean MessageSent { get; set; }
+	public Boolean MessageSent { get; set; }
 
-		public Models.Message Message { get; set; } = new();
+	public Models.Message Message { get; set; } = new();
 
-		public Boolean IsAdmin { get; set; }
+	public Boolean IsAdmin { get; set; }
 
-		public string RecaptchaVerificationToken { get; set; }
-	}
+	public string RecaptchaVerificationToken { get; set; }
 }

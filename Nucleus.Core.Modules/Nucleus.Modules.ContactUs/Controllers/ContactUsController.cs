@@ -1,23 +1,20 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Mail;
-using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Abstractions.Mail;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
-using Newtonsoft.Json.Linq;
+using Nucleus.Modules.ContactUs.Models;
 
 namespace Nucleus.Modules.ContactUs.Controllers;
 
@@ -102,7 +99,12 @@ public class ContactUsController : Controller
 		if (String.IsNullOrEmpty(settings.RecaptchaSiteKey) || string.IsNullOrEmpty(key))
 		{
 			// Recaptcha is not enabled, return true to allow form submission.
-			return new() { Success = true, Score = 1.0f };
+			return new() 
+			{ 
+				Success = true, 
+				Score = 1.0f, 
+				Action = settings.RecaptchaAction
+			};
 		}
 
 		string response = VerifyRecaptchaToken(key, viewModel.RecaptchaVerificationToken);
@@ -116,26 +118,22 @@ public class ContactUsController : Controller
 		string url = $"{GOOGLE_RECAPTCHA_VERIFY_SITE}?secret={secretKey}&response={recaptchaToken}";
 		using (HttpClient httpClient = this.HttpClientFactory.CreateClient())
 		{
-
-			string responseString = httpClient.GetStringAsync(url).Result;
-			//httpClient.PostAsync()
-
-			return responseString;
-
+			return httpClient.GetStringAsync(url).Result;
 		}
 	}
-
 
 	[HttpPost]
 	public async Task<ActionResult> Send(ViewModels.Viewer viewModel)
 	{
+		Models.RecaptchaToken recaptchaToken;
+
 		Models.Settings settings = new();
 		settings.ReadSettings(this.Context.Module);
 
 		ControllerContext.ModelState.Remove<ViewModels.Viewer>(model => model.Message.Category.Name);
 
 		viewModel.Message.Category = await this.ListManager.GetListItem(viewModel.Message.Category.Id);
-				
+
 		//this.TryValidateModel(viewModel);
 
 		Validate(viewModel, settings);
@@ -144,15 +142,32 @@ public class ContactUsController : Controller
 		{
 			return BadRequest(ControllerContext.ModelState);
 		}
+		//this.Logger.LogWarning($"this is the {DateTime.Now}");
 
 		try
 		{
-			Models.RecaptchaToken recaptchaToken = CaptchaVerify(viewModel);
+			recaptchaToken = CaptchaVerify(viewModel);
+
+			if (!recaptchaToken.Success)
+			{
+				if (recaptchaToken.ErrorCodes.Count > 0 )
+				{
+					this.Logger.LogWarning("Unsuccessful reCAPTCHA verification.  Errors: '{errorCodes}'.", String.Join(',', recaptchaToken.ErrorCodes));
+				}
+				return BadRequest();
+
+			}
+
+			if (recaptchaToken.Action != settings.RecaptchaAction)			
+			{
+				this.Logger.LogWarning("Unexpected reCAPTCHA action in response.  Expected: '{expectedAction}', received: '{receivedAction}'.", settings.RecaptchaAction, recaptchaToken.Action);
+				return BadRequest();
+			}
 
 			if (recaptchaToken.Score < 0.5f)
 			{
 				this.Logger.LogWarning("Suspected robot from {address}. Recaptcha verify score was {score}.", HttpContext.Connection.RemoteIpAddress, recaptchaToken.Score);
-				
+
 				// pretend that the message was sent so that robots can't detect success or failure.
 				viewModel.MessageSent = true;
 				return View("Viewer", viewModel);
@@ -178,7 +193,8 @@ public class ContactUsController : Controller
 						{
 							Site = this.Context.Site,
 							Message = viewModel.Message,
-							Settings = settings
+							Score = recaptchaToken.Score,
+							Settings = GetCensored(settings)
 						};
 
 						Logger.LogTrace("Sending contact email '{emailTemplateName}' to '{sendTo}'.", template.Name, settings.SendTo);
@@ -213,31 +229,37 @@ public class ContactUsController : Controller
 		return View("Viewer", viewModel);
 	}
 
-	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-	[HttpGet]
-	[HttpPost]
-	public async Task<ActionResult> Settings(ViewModels.Settings viewModel)
+	/// <summary>
+	/// Return a copy of the supplied user with sensitive data (role memberships, and most secrets) removed.
+	/// </summary>
+	/// <param name="user"></param>
+	/// <returns></returns>
+	public Models.Settings GetCensored(Models.Settings settings)
 	{
-		return View("Settings", await BuildSettingsViewModel(viewModel));
-	}
-
-	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-	[HttpPost]
-	public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
-	{
-		// Validate that action contains only A-Za-z/_
-		viewModel.SetSettings(this.Context.Site, this.Context.Module);
-
-		await this.PageModuleManager.SaveSettings(this.Context.Module);
-
-		return Ok();
+		return new Models.Settings()
+		{
+			MailTemplateId = settings.MailTemplateId,
+			RecaptchaAction = settings.RecaptchaAction,
+			RequireCategory = settings.RequireCategory,
+			RequireCompany = settings.RequireCompany,
+			RequireName = settings.RequireName,
+			RequirePhoneNumber = settings.RequirePhoneNumber,
+			RequireSubject = settings.RequireSubject,
+			ShowCategory = settings.ShowCategory,
+			ShowCompany = settings.ShowCompany,
+			ShowName = settings.ShowName,
+			ShowPhoneNumber = settings.ShowPhoneNumber,
+			ShowSubject = settings.ShowSubject,
+			SendTo = settings.SendTo
+		};
 	}
 
 	private async Task<ViewModels.Viewer> BuildViewModel()
 	{
-		ViewModels.Viewer viewModel = new();
-
-		viewModel.IsAdmin = User.IsSiteAdmin(this.Context.Site);
+		ViewModels.Viewer viewModel = new()
+		{
+			IsAdmin = User.IsSiteAdmin(this.Context.Site)
+		};
 		viewModel.ReadSettings(this.Context.Module);
 		viewModel.CategoryList = (await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(Models.Settings.MODULESETTING_CATEGORYLIST_ID, Guid.Empty)));
 
@@ -252,22 +274,4 @@ public class ContactUsController : Controller
 
 		return viewModel;
 	}
-
-	private async Task<ViewModels.Settings> BuildSettingsViewModel(ViewModels.Settings viewModel)
-	{
-		if (viewModel == null)
-		{
-			viewModel = new();
-		}
-
-		viewModel.ReadSettings(this.Context.Module);
-
-		viewModel.CategoryList = (await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(Models.Settings.MODULESETTING_CATEGORYLIST_ID, Guid.Empty)));
-
-		viewModel.Lists = await this.ListManager.List(this.Context.Site);
-		viewModel.MailTemplates = await this.MailTemplateManager.List(this.Context.Site);
-
-		return viewModel;
-	}
-
 }

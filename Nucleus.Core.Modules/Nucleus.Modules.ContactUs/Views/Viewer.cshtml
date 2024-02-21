@@ -3,7 +3,6 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.ContactUs.ViewModels
-@Html.AddStyle("~!/../viewer.css")
 @Html.AddStyle("~/Resources/css/forms.css")
 @if (Model.MessageSent)
 {
@@ -13,7 +12,7 @@ else
 {
 	@if (!String.IsNullOrEmpty(Model.RecaptchaSiteKey))
 	{
-		@Html.AddScript("https://www.google.com/recaptcha/api.js?render=" + @Model.RecaptchaSiteKey)
+		@Html.AddScript("https://www.google.com/recaptcha/api.js?render=explicit&onload=onRecaptchaLoadCallback")
 		@Html.AddScript("~!/../viewer.js")
 	}
 	@if (String.IsNullOrEmpty(Model.SendTo))
@@ -30,7 +29,6 @@ else
 			<div class="alert alert-warning">No email template has been configured. This module will not display to end users.</div>
 		}
 	}
-
 	@if (!string.IsNullOrEmpty(Model.SendTo) && Model.MailTemplateId != Guid.Empty)
 	{
 		@using (Html.BeginNucleusForm("Send", "ContactUs", FormMethod.Post, new { @enctype = "multipart/form-data", @data_target = "form.parent()" }))
@@ -59,14 +57,12 @@ else
 						</SettingsControl>
 					}
 				</div>
-
 				@if (Model.ShowCompany)
 				{
 					<SettingsControl caption="Company" helptext="Please enter the name of your company.">
 						@Html.TextBoxFor(model => model.Message.Company, new { @maxlength = 256, @autocomplete = "organization" })
 					</SettingsControl>
 				}
-
 				@if (Model.ShowCategory && Model.CategoryList != null)
 				{
 					<SettingsControl caption="@Model.CategoryList.Name" helptext="Select the most appropriate category related to your enquiry.">
@@ -84,25 +80,33 @@ else
 				</SettingsControl>
 			</fieldset>
 
-			<div class="nucleus-control-panel-heading">
+			<div class="nucleus-control-panel-heading d-flex">
 				@if (!String.IsNullOrEmpty(Model.RecaptchaSiteKey))
 				{
 					@Html.HiddenFor(model => model.RecaptchaVerificationToken, new { @class = "contact-us-recaptcha-verification-token" })
 				}
-				<button type="submit" class="btn btn-primary contact-us-send" formaction="@Url.NucleusAction("Send", "ContactUs", "ContactUs")">Send</button>
+				<button type="submit" class="btn btn-primary align-self-end contact-us-send" formaction="@Url.NucleusAction("Send", "ContactUs", "ContactUs")">Send</button>
+				<div class="recaptcha-badge ms-auto"></div>
 			</div>
+
 		}
 	}
 
 	<script>
-		if ('@Model.RecaptchaSiteKey' !== '')
+		function onRecaptchaLoadCallback()
 		{
-			jQuery('.contact-us-send').Recaptcha({
-				form: jQuery('form'),
-				verificationTokenElement: jQuery('.contact-us-recaptcha-verification-token'),
-				siteKey: '@Model.RecaptchaSiteKey',
-				action: '@Model.RecaptchaAction'
-			});
+			if ('@Model.RecaptchaSiteKey' !== '')
+			{
+				jQuery('.contact-us-send').Recaptcha({
+					form: jQuery('form'),
+					verificationTokenElement: jQuery('.contact-us-recaptcha-verification-token'),
+					siteKey: '@Model.RecaptchaSiteKey',
+					action: '@Model.RecaptchaAction',
+					badgeElement: jQuery('.recaptcha-badge')
+				});
+			}
 		}
+
+
 	</script>
 }

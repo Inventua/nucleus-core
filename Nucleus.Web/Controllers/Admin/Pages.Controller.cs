@@ -422,11 +422,9 @@ namespace Nucleus.Web.Controllers.Admin
 				return BadRequest("You must save your new page before adding a module.");
 			}
 
-			await this.PageModuleManager.Save(viewModel.Page, viewModel.Module);
-
 			viewModel.Module.Permissions = await RebuildPermissions(viewModel.ModulePermissions);
-			await this.PageModuleManager.SavePermissions(viewModel.Page, viewModel.Module);
-
+			await this.PageModuleManager.Save(viewModel.Page, viewModel.Module);
+            
 			viewModel = await BuildPageEditorViewModel(viewModel.Page, null, true);
 
 			return View("_PageModules", viewModel);
@@ -448,7 +446,6 @@ namespace Nucleus.Web.Controllers.Admin
 
 			viewModel.Module.Permissions = await RebuildPermissions(viewModel.ModulePermissions);
 
-			await this.PageModuleManager.SavePermissions(viewModel.Page, viewModel.Module);
 			await this.PageModuleManager.Save(viewModel.Page, viewModel.Module);
 
 			if (viewModel.PageEditorMode == ViewModels.Admin.PageEditor.PageEditorModes.Standalone)

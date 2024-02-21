@@ -83,7 +83,7 @@ namespace Nucleus.Abstractions.Managers
 		public Task<List<Permission>> ListPermissions(PageModule module);
 
 		/// <summary>
-		/// Save the specified <see cref="PageModule"/> and its <see cref="PageModule.ModuleSettings"/>.
+		/// Save the specified <see cref="PageModule"/> including <see cref="PageModule.ModuleSettings"/> and <see cref="PageModule.Permissions"/>.
 		/// </summary>
 		/// <param name="page"></param>
 		/// <param name="module"></param>

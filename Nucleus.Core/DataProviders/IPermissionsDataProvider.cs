@@ -15,9 +15,9 @@ namespace Nucleus.Core.DataProviders
 		abstract Task<Guid> AddPermissionType(PermissionType permissionType);
 
 		abstract Task<List<Permission>> ListPermissions(Guid Id, string permissionNameSpace);
-		abstract Task DeletePermissions(IEnumerable<Permission> permissions);
+		abstract Task DeletePermission(Permission permission);
 
-		abstract Task SavePermissions(Guid relatedId, IEnumerable<Permission> permissions, IList<Permission> originalPermissions);
+		abstract Task SavePermission(Permission permission);
 
 	}
 }

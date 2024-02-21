@@ -9,84 +9,108 @@ using Nucleus.Data.Common;
 using Nucleus.Core.DataProviders;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
-namespace Nucleus.Core.Managers
+namespace Nucleus.Core.Managers;
+
+public class PermissionsManager : IPermissionsManager
 {
-	public class PermissionsManager : IPermissionsManager
-	{
-		private IDataProviderFactory DataProviderFactory { get; }
-		private ICacheManager CacheManager { get; }
+  private IDataProviderFactory DataProviderFactory { get; }
+  private ICacheManager CacheManager { get; }
 
-		public PermissionsManager(IDataProviderFactory dataProviderFactory, ICacheManager cacheManager)
-		{
-			this.DataProviderFactory = dataProviderFactory;
-			this.CacheManager = cacheManager;
-		}
+  public PermissionsManager(IDataProviderFactory dataProviderFactory, ICacheManager cacheManager)
+  {
+    this.DataProviderFactory = dataProviderFactory;
+    this.CacheManager = cacheManager;
+  }
 
-		public async Task<List<Permission>> ListPermissions(Guid Id, string permissionNameSpace)
-		{
-			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
-			{
-        List<PermissionType> permissionTypes = await ListPermissionTypes(permissionNameSpace);
-        List<Permission> results =  await provider.ListPermissions(Id, permissionNameSpace);
-        
-        // make sure the permissions list is fully populated (in case more permission types for the entity have been added since
-        // it was created)
-        foreach (PermissionType permissionType in permissionTypes)
+  public async Task<List<Permission>> ListPermissions(Guid Id, string permissionNameSpace)
+  {
+    using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+    {
+      List<PermissionType> permissionTypes = await ListPermissionTypes(permissionNameSpace);
+      List<Permission> results = await provider.ListPermissions(Id, permissionNameSpace);
+
+      // make sure the permissions list is fully populated (in case more permission types for the entity have been added since
+      // it was created)
+      foreach (PermissionType permissionType in permissionTypes)
+      {
+        foreach (Role role in results.Select(permissions => permissions.Role).ToList())
         {
-          foreach (Role role in results.Select(permissions => permissions.Role).ToList())
+          if (!results.Where(permission => permission.PermissionType.Scope == permissionType.Scope && permission.Role.Id == role.Id).Any())
           {
-            if (!results.Where(permission => permission.PermissionType.Scope == permissionType.Scope && permission.Role.Id == role.Id).Any())
+            // a role does not have an available permission, add 
+            results.Add(new Permission()
             {
-              // a role does not have an available permission, add 
-              results.Add(new Permission()
-              {
-                AllowAccess = false,
-                Role = role,
-                PermissionType = permissionType
-              });
-            }
+              AllowAccess = false,
+              Role = role,
+              PermissionType = permissionType
+            });
           }
         }
+      }
 
-        return results;
+      return results;
+    }
+  }
+
+  public async Task<List<PermissionType>> ListPermissionTypes(string scopeNamespace)
+  {
+    return await this.CacheManager.PermissionTypesCache().GetAsync(scopeNamespace, async scopeNamespace =>
+    {
+      using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+      {
+        return await provider.ListPermissionTypes(scopeNamespace);
+      }
+    });
+  }
+
+  public async Task SavePermissions(Guid relatedId, IEnumerable<Permission> permissions, IList<Permission> originalPermissions)
+  {
+    List<Permission> deletedPermissions = [];
+
+    // delete removed permissions
+    foreach (Permission oldPermission in originalPermissions)
+    {
+      if (!permissions.Where(existing => existing.Id == oldPermission.Id || (existing.Role.Id == oldPermission.Role.Id && existing.PermissionType.Id == oldPermission.PermissionType.Id)).Any())
+      {
+        deletedPermissions.Add(oldPermission);
       }
     }
 
-		public async Task<List<PermissionType>> ListPermissionTypes(string scopeNamespace)
-		{
-			return await this.CacheManager.PermissionTypesCache().GetAsync(scopeNamespace, async scopeNamespace =>
-			{
-				using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
-				{
-					return await provider.ListPermissionTypes(scopeNamespace);
-				}
-			});
-		}
+    if (deletedPermissions.Any())
+    {
+      await DeletePermissions(deletedPermissions);
+    }
 
-		public async Task SavePermissions(Guid relatedId, IEnumerable<Permission> permissions, IList<Permission> originalPermissions)
-		{
-			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
-			{
-				await provider.SavePermissions(relatedId, permissions, originalPermissions);
-			}
-		}
+    // add/update permissions
+    foreach (Permission newPermission in permissions.Where(permission => permission.PermissionType.Scope != PermissionType.PermissionScopeNamespaces.Disabled))
+    {
+      using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+      {
+        newPermission.RelatedId = relatedId;
+        await provider.SavePermission(newPermission);
+      }
+    }
+  }
 
-		public async Task DeletePermissions(IEnumerable<Permission> permissions)
-		{
-			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
-			{
-				await provider.DeletePermissions(permissions);
-			}
-		}
+  public async Task DeletePermissions(IEnumerable<Permission> permissions)
+  {
+    foreach (Permission permission in permissions)
+    {
+      using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+      {
+        await provider.DeletePermission(permission);
+      }
+    }
+  }
 
-		public async Task AddPermissionType(PermissionType permissionType)
-		{
-			using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
-			{
-				await provider.AddPermissionType(permissionType);							
-			}
-			this.CacheManager.PermissionTypesCache().Remove(permissionType.Scope);
-		}
-	}
+  public async Task AddPermissionType(PermissionType permissionType)
+  {
+    using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
+    {
+      await provider.AddPermissionType(permissionType);
+    }
+    this.CacheManager.PermissionTypesCache().Remove(permissionType.Scope);
+  }
 }

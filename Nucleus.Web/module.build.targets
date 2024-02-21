@@ -63,6 +63,14 @@
     TaskName="GetNucleusPackageContent"
     AssemblyFile="$(NUCLEUS_TOOLS_PATH)Nucleus.DeveloperTools.MSBuild.dll">
   </UsingTask>
+
+  <Target Name="CheckPackageContent" DependsOnTargets="ResolveReferences" AfterTargets="PostBuildEvent">
+    <CheckMissingNucleusContent PackageFile="Package.xml" ProjectContent="@(Content)"></CheckMissingNucleusContent>  
+  </Target>
+  <UsingTask
+    TaskName="CheckMissingNucleusContent"
+    AssemblyFile="$(NUCLEUS_TOOLS_PATH)Nucleus.DeveloperTools.MSBuild.dll">
+  </UsingTask>
   
 	<Target Name="ReportPackageContent" AfterTargets="PostBuildEvent">
 		<Message Importance="high" Text="Package assembles: @(PackageAssemblies)" />

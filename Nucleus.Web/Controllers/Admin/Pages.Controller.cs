@@ -741,10 +741,11 @@ namespace Nucleus.Web.Controllers.Admin
 				viewModel.Page.LayoutDefinition = await this.LayoutManager.Get(viewModel.Page.LayoutDefinition.Id);
 			}
 
-			viewModel.Layouts = (await this.LayoutManager.List()).InsertDefaultListItem();
-			viewModel.Containers = (await this.ContainerManager.List()).InsertDefaultListItem();
-			
-			viewModel.AvailablePanes = (await this.LayoutManager.ListLayoutPanes(viewModel.Page.LayoutDefinition ?? this.Context.Site.DefaultLayoutDefinition)).Append("None");
+			viewModel.Layouts = (await this.LayoutManager.List()).InsertDefaultListItem("(site default)");
+			viewModel.PageContainers = (await this.ContainerManager.List()).InsertDefaultListItem("(site default)");
+      viewModel.ModuleContainers = (await this.ContainerManager.List()).InsertDefaultListItem("(page default)");
+
+      viewModel.AvailablePanes = (await this.LayoutManager.ListLayoutPanes(viewModel.Page.LayoutDefinition ?? this.Context.Site.DefaultLayoutDefinition)).Append("None");
 
 			// Set modules with an invalid pane to "Missing Pane"
 			foreach(PageModule moduleMissingPane in viewModel.Page.Modules.Where(module => !viewModel.AvailablePanes.Contains(module.Pane)))

@@ -66,25 +66,32 @@ namespace Nucleus.Extensions
 		/// Insert a "default" layout selection.
 		/// </summary>
 		/// <param name="list"></param>
+    /// <param name="friendlyName"></param>
 		/// <returns></returns>
-		public static IList<LayoutDefinition> InsertDefaultListItem(this IList<LayoutDefinition> list)
+		public static IList<LayoutDefinition> InsertDefaultListItem(this IList<LayoutDefinition> list, string friendlyName = "(default)")
 		{
-			LayoutDefinition item = new();
-			item.FriendlyName = "(default)";
+      LayoutDefinition item = new()
+      {
+        FriendlyName = friendlyName
+      };
 
-			list.Insert(0, item);
+      list.Insert(0, item);
 			return list;
 		}
 
-		/// <summary>
-		/// Insert a "default" layout selection.
-		/// </summary>
-		public static IList<ContainerDefinition> InsertDefaultListItem(this IList<ContainerDefinition> list)
+    /// <summary>
+    /// Insert a "default" layout selection.
+    /// </summary>
+    /// <param name="list"></param>
+    /// <param name="friendlyName"></param>
+    public static IList<ContainerDefinition> InsertDefaultListItem(this IList<ContainerDefinition> list, string friendlyName = "(default)")
 		{
-			ContainerDefinition item = new();
-			item.FriendlyName = "(default)";
+      ContainerDefinition item = new()
+      {
+        FriendlyName = friendlyName
+      };
 
-			list.Insert(0, item);
+      list.Insert(0, item);
 			return list;
 		}
 	}

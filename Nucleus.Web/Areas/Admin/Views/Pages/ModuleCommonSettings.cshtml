@@ -43,8 +43,8 @@
 					<SettingsControl caption="Pane" helptext="Select the pane to display this module in.  Different layouts have different available panes and pane names.">
 						@Html.DropDownListFor((model) => model.Module.Pane, new SelectList(Model.AvailablePanes))
 					</SettingsControl>
-					<SettingsControl caption="Container" helptext="Select the container for the module, or select '(default)' to use the default layout for this page.">
-						@Html.DropDownListFor((model) => model.Module.ContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
+					<SettingsControl caption="Container" helptext="Select the container for the module, or select '(page default)' to use the default layout for this page.">
+						@Html.DropDownListFor((model) => model.Module.ContainerDefinition.Id, new SelectList(Model.ModuleContainers, "Id", "FriendlyName"))
 					</SettingsControl>
 					<SettingsControl caption="Style Classes" helptext="Applies additional CSS classes to the container.  Separate additional CSS classes with spaces.">
 						@Html.TextBoxFor((model) => model.Module.Style)

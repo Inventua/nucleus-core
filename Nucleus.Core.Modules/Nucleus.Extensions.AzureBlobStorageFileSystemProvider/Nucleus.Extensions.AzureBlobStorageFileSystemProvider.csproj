@@ -39,7 +39,7 @@
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>AzureBlobStorageFileSystemProvider</ExtensionFolder>
-		<Version>1.2.0</Version>
+		<Version>1.4.0</Version>
 		<CopyToDefaultSetup>false</CopyToDefaultSetup>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 		<CopyToDefaultSetup>true</CopyToDefaultSetup>

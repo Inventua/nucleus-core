@@ -44,7 +44,7 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Include="Views\_PageMenu.cshtml" />
-		<Content Include="Views\_ViewImports.cshtml" />
+		<Content Include="_ViewImports.cshtml" />
     <Content Include="Views\Settings.cshtml" />
   </ItemGroup>
 

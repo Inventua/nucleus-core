@@ -34,7 +34,7 @@ namespace Nucleus.Extensions
 
 				foreach (Permission permission in rolePermissions)
 				{ 
-					if (isAnonymousOrAllUsers && !(permission.PermissionType.Scope.EndsWith($"/{PermissionType.PermissionScopeTypes.VIEW}")))
+					if (isAnonymousOrAllUsers && !(permission.PermissionType.Scope.EndsWith($"/{PermissionType.PermissionScopeTypes.VIEW}")) && !(permission.PermissionType.Scope.EndsWith($"/{PermissionType.PermissionScopeTypes.BROWSE}")))
 					{
 						permission.PermissionType = new() { Scope = PermissionType.PermissionScopeNamespaces.Disabled };
 						permission.AllowAccess = false;

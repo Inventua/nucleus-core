@@ -52,10 +52,10 @@
     <Warning
 			Condition="'$(Configuration)' == 'Debug' AND '$(NUCLEUS_TOOLS_PATH)' == ''"
 			Text="The %NUCLEUS_TOOLS_PATH% environment path is not set, your extension zip file will not contain any content." />
-  </Target>
+  </Target>  
   
   <Target Name="GetPackageContent" DependsOnTargets="ResolveReferences" AfterTargets="PostBuildEvent">
-    <GetNucleusPackageContent PackageFile="Package.xml" ProjectFile="$(MSBuildProjectFile)">        
+    <GetNucleusPackageContent PackageFile="Package.xml" ProjectFile="$(MSBuildProjectFile)" Condition="'$(NUCLEUS_TOOLS_PATH)' != ''">        
       <Output TaskParameter="Content" ItemName="PackageContents" />
     </GetNucleusPackageContent>    
   </Target>
@@ -64,8 +64,14 @@
     AssemblyFile="$(NUCLEUS_TOOLS_PATH)Nucleus.DeveloperTools.MSBuild.dll">
   </UsingTask>
 
+  <Target Name="GetNucleusMSBuildTasksVersion" DependsOnTargets="ResolveReferences" AfterTargets="PostBuildEvent">
+    <GetAssemblyIdentity AssemblyFiles="$(NUCLEUS_TOOLS_PATH)Nucleus.DeveloperTools.MSBuild.dll">
+      <Output TaskParameter="Assemblies" ItemName="NucleusMSBuildTasksAssembly" />
+    </GetAssemblyIdentity>
+  </Target>
+  
   <Target Name="CheckPackageContent" DependsOnTargets="ResolveReferences" AfterTargets="PostBuildEvent">
-    <CheckMissingNucleusContent PackageFile="Package.xml" ProjectContent="@(Content)"></CheckMissingNucleusContent>  
+    <CheckMissingNucleusContent PackageFile="Package.xml" ProjectContent="@(Content)" Condition="'$(NUCLEUS_TOOLS_PATH)' != '' AND %(NucleusMSBuildTasksAssembly.Version) >= $([System.Version]::Parse('1.4.0.0'))" />  
   </Target>
   <UsingTask
     TaskName="CheckMissingNucleusContent"

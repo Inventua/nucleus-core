@@ -17,7 +17,7 @@
       @Html.TextBoxFor(model => model.MailTemplate.Name, new { @maxlength = 256 })
     </SettingsControl>
 
-    <SettingsControl caption="Task" helptext="Select the scheduled task to run.">
+    <SettingsControl caption="Type" helptext="Select the mail template type.">
       @Html.DropDownListFor(model => model.MailTemplate.DataModelTypeName, new SelectList(Model.AvailableDataModelTypes, "TypeName", "FriendlyName"), "(select)", new { @data_autopostbackevent = "change" })
     </SettingsControl>
 

@@ -763,6 +763,9 @@ public class FileSystemManager : IFileSystemManager
 
 	private async Task<Folder> GetDatabaseProperties(Site site, Folder folder)
 	{
+		List<Folder> databaseFolders;
+		List<File> databaseFiles;
+
 		if (folder == null) return null;
 
 		RemoveSiteHomeDirectory(site, folder);
@@ -774,34 +777,61 @@ public class FileSystemManager : IFileSystemManager
 
 		using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 		{
-			List<Folder> databaseFolders = await dataProvider.ListFolders(site, folder.Provider, folder.Path);
+			databaseFolders = await dataProvider.ListFolders(site, folder.Provider, folder.Path);
+		}
 
-			foreach (Folder subFolder in folder.Folders)
+		foreach (Folder subFolder in folder.Folders)
+		{
+			RemoveSiteHomeDirectory(site, subFolder);
+
+			Folder databaseFolder = databaseFolders.Where(databaseFile => databaseFile.Path.Equals(subFolder.Path, StringComparison.OrdinalIgnoreCase))
+				.FirstOrDefault();
+
+			if (databaseFolder != null)
 			{
-				RemoveSiteHomeDirectory(site, subFolder);
-
-				databaseFolders.Where(databaseFile => databaseFile.Path.Equals(subFolder.Path, StringComparison.OrdinalIgnoreCase))
-					.FirstOrDefault()
-					?.CopyDatabaseValuesTo(subFolder);
-
-				subFolder.Parent = folder;
+				databaseFolder.CopyDatabaseValuesTo(subFolder);
 			}
+			else
+			{
+				// folder is not in the database, create a database entry
+				using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
+				{
+					await dataProvider.SaveFolder(site, subFolder);
+				}
+			}
+
+			subFolder.Parent = folder;
 		}
 
 		using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
 		{
-			List<File> databaseFiles = await dataProvider.ListFiles(site, folder.Provider, folder.Path);
-
-			foreach (File file in folder.Files)
-			{
-				RemoveSiteHomeDirectory(site, file);
-
-				databaseFiles.Where(databaseFile => databaseFile.Path.Equals(file.Path, StringComparison.OrdinalIgnoreCase))
-					.FirstOrDefault()
-					?.CopyDatabaseValuesTo(file);
-				file.Parent = folder;
-			}
+			databaseFiles = await dataProvider.ListFiles(site, folder.Provider, folder.Path);
 		}
+
+		foreach (File file in folder.Files)
+		{
+			RemoveSiteHomeDirectory(site, file);
+
+			File databaseFile = databaseFiles.Where(databaseFile => databaseFile.Path.Equals(file.Path, StringComparison.OrdinalIgnoreCase))
+				.FirstOrDefault();
+
+			if (databaseFile != null)
+			{
+				databaseFile.CopyDatabaseValuesTo(file);
+			}
+			else
+			{
+				// file is not in the database, create a database entry
+				await file.GetImageDimensions(site, this);
+				using (IFileSystemDataProvider dataProvider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
+				{
+					await dataProvider.SaveFile(site, file);
+				}
+			}
+
+			file.Parent = folder;
+		}
+
 
 		return folder;
 	}

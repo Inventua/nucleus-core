@@ -1,0 +1,7 @@
+﻿@model Nucleus.Modules.FilesList.ViewModels.Viewer
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.FilesList.ViewModels
+@Html.AddStyle("~!/../viewer.css")
+@await Html.PartialAsync(@Model.LayoutPath, Model)

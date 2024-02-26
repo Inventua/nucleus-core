@@ -1,0 +1,10 @@
+﻿.FilesListSettings .ShowColumns
+{
+	display: flex;
+	gap: 2em;
+}
+
+.FilesListSettings .ShowColumns label span
+{
+	min-width: 10em;
+}

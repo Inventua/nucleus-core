@@ -1,0 +1,34 @@
+﻿@model Nucleus.Modules.FilesList.ViewModels.Viewer
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Extensions
+@using Nucleus.Modules.FilesList.ViewModels
+@Html.AddStyle("~!/../../viewer.css")
+<ol class="FilesList">
+	@foreach (var file in Model.Files)
+	{
+		@if (file != null)
+		{
+      <li>
+				<a href="@Url.FileLink(file)">@file.Name</a>
+				@if (Model.ShowModifiedDate)
+				{
+					<span class="file-modified-date">- @file.DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</span>
+				}
+				@if (Model.ShowSize)
+				{
+					<span class="file-size">- @file.Size.FormatFileSize()</span>
+				}
+				@if (Model.ShowDimensions)
+				{
+					@if (file.Width > 0 && file.Height > 0)
+					{
+						<span class="file-dimensions">
+							@($"({file.Width} x {file.Height})")
+						</span>
+					}
+				}				
+      </li>
+		}
+	}
+</ol>

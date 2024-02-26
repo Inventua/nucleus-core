@@ -1,0 +1,37 @@
+﻿@model Nucleus.Modules.FilesList.ViewModels.Viewer
+@using Nucleus.Modules.FilesList.ViewModels
+@using Nucleus.Extensions
+@Html.AddStyle("~!/Tile.css")
+<div class="FilesList flex-fill file-tiles">
+	@foreach (var file in Model.Files)
+	{
+		<div>
+			<a class="file-name" href="@Url.FileLink(file)" alt="@file.Name">@file.Name</a>
+			@if (Model.ShowModifiedDate)
+			{
+				<div class="file-modified-date">@file.DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</div>
+			}
+			@if (Model.ShowSize || Model.ShowDimensions)
+			{
+				<div>
+					@if (Model.ShowSize)
+					{
+						<span class="file-size">@file.Size.FormatFileSize()</span>
+					}
+					@if (Model.ShowDimensions)
+					{
+						@if (file.Width > 0 && file.Height > 0)
+						{
+							@if (Model.ShowSize)
+							{
+								@Html.Raw("(")
+								<span class="file-dimensions">@($"{file.Width} x {file.Height}")</span>
+								@Html.Raw(")")
+							}
+						}
+					}
+				</div>
+			}
+		</div>
+	}
+</div>

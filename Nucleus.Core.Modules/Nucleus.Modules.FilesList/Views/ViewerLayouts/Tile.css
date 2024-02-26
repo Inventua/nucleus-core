@@ -1,0 +1,19 @@
+﻿.FilesList.file-tiles
+{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-auto-rows: 1fr;
+	gap: 0.75rem;
+}
+
+.FilesList.file-tiles > div
+{
+	padding: 0.75rem;
+	border: solid 1px #ddd;
+}
+
+.FilesList.file-tiles .file-name
+{
+	font-weight: bold;
+	font-size: 1.25rem;
+}

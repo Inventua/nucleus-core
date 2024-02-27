@@ -1,0 +1,56 @@
+﻿@model Nucleus.CopilotClient.ViewModels.Viewer
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.CopilotClient.ViewModels
+@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
+@Html.AddStyle("~!/viewer.css")
+@Html.AddScript("~!/viewer.js")
+@if (!Model.IsConfigured)
+{
+  <div class="alert alert-warning">
+    The Copilot module is not configured.
+  </div>
+}
+else
+{
+  <div class="copilot-wrapper d-flex flex-column flex-1 overflow-auto">
+    @using (Html.BeginNucleusForm("PostMessage", "CopilotClientViewer", "CopilotClient", FormMethod.Post, new { @class = "d-flex", @enctype = "multipart/form-data" }))
+    {
+      @Html.HiddenFor(model => model.ConversationId)
+      <div class="d-flex flex-1 gap-2">
+        @Html.HiddenFor(Model => Model.Watermark, new { @class = "copilot-watermark" })
+        <SettingsControl caption="Message" helptext="Enter your message." class="flex-1">
+          @Html.TextBoxFor(model => model.Question, new { @class = "copilot-question-input" })
+        </SettingsControl>
+
+        <div class="nucleus-form-buttonrow">
+          <button type="submit" class="btn btn-primary copilot-submit" formaction="@Url.NucleusAction("PostMessage", "CopilotClientViewer", "CopilotClient")" data-target=".copilot-wrapper.parent()">Send</button>
+        </div>
+      </div>
+    }
+    <div class="copilot-responses flex-1 overflow-auto">
+    </div>
+
+    <div class="copilot-citation-popup modal modal-lg" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    jQuery('.copilot-submit').CopilotViewer({
+      url: '@Url.NucleusAction("ReadResponses", "CopilotClientViewer", "CopilotClient")'
+    });
+    jQuery('.copilot-submit').CopilotViewer.Start();
+  </script>
+}

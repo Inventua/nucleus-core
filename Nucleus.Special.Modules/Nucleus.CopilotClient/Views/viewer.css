@@ -21,6 +21,16 @@
   flex-direction: column;
 }
 
+.copilot-content p, .copilot-content ol, .copilot-content ul
+{
+  margin-bottom: 0.5rem;
+}
+
+.copilot-content a
+{
+  margin-right: 0.5rem;
+}
+
 .copilot-question
 {
   color: green;
@@ -31,8 +41,13 @@
 .copilot-question .copilot-icon:before, .copilot-answer .copilot-icon:before
 {
   font-family: 'Material Icons';
-  font-size: 3rem;
+  font-size: 2rem;
   margin-right: 1rem;
+}
+
+.copilot-icon
+{
+  margin-bottom: auto; 
 }
 
 .copilot-question .copilot-icon:before

@@ -30,7 +30,7 @@ public class CopilotClientViewerController : Controller
   private IHttpClientFactory HttpClientFactory { get; }
 
   private static DirectLineToken ActiveDirectLineToken { get; set; }
-  private static DateTime DirectLineTokenExpiry {get;set;}
+  private static DateTime DirectLineTokenExpiry { get; set; }
 
   public CopilotClientViewerController(Context Context, IHttpClientFactory httpClientFactory)
   {
@@ -41,8 +41,8 @@ public class CopilotClientViewerController : Controller
   [HttpGet]
   public async Task<ActionResult> Index()
   {
-    ViewModels.Viewer viewModel = BuildViewModel(null); 
-    
+    ViewModels.Viewer viewModel = BuildViewModel(null);
+
     await StartConversation(viewModel);
 
     return View("Viewer", viewModel);
@@ -52,18 +52,50 @@ public class CopilotClientViewerController : Controller
   public async Task<ActionResult> PostMessage(ViewModels.Viewer viewModel)
   {
     viewModel = BuildViewModel(viewModel);
-  
+
     await SendMessage(viewModel);
 
     return NoContent();
   }
 
+  ////private async Task<TResult> TryCopilotCall<TResult>(string tokenEndpoint, Func<TResult> action)
+  ////{
+  ////  DirectLineToken token = await GetDirectLineToken(tokenEndpoint);
+
+  ////  if (token==null) return null;
+
+  ////  using (var directLineClient = new DirectLineClient(token.Token))
+  ////  {
+
+  ////    try
+  ////    {
+  ////      return action.Invoke();
+  ////    }
+  ////    catch (Microsoft.Rest.TransientFaultHandling.HttpRequestWithStatusException ex)
+  ////    {
+  ////      //: 'Response status code indicates server error: 403 (Forbidden).'
+  ////      if (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+  ////      {
+  ////        ActiveDirectLineToken = null;
+  ////        token = await GetDirectLineToken(tokenEndpoint);
+  ////        return action.Invoke();
+  ////      }
+  ////      else
+  ////      {
+  ////        throw;
+  ////      }
+  ////    }
+  ////  }
+  ////}
+
 
   [HttpPost]
   public async Task<ActionResult> ReadResponses(ViewModels.Viewer viewModel)
   {
+    ActivitySet response;
+
     viewModel = BuildViewModel(viewModel);
-    DirectLineToken token = await GetDirectLineToken(viewModel);
+    DirectLineToken token = await GetDirectLineToken(viewModel.TokenEndpoint);
 
     if (token != null)
     {
@@ -74,27 +106,55 @@ public class CopilotClientViewerController : Controller
         // More information about watermark is available at
         // https://learn.microsoft.com/azure/bot-service/rest-api/bot-framework-rest-direct-line-1-1-receive-messages?view=azure-bot-service-4.0
 
-        // response from bot is of type Microsoft.Bot.Connector.DirectLine.ActivitySet
-        ActivitySet response = await directLineClient.Conversations.GetActivitiesAsync
-        (
-          viewModel.ConversationId, 
-          String.IsNullOrEmpty(viewModel.Watermark)? null : viewModel.Watermark
-        );
-                
-        List<Activity> botResponses = response?.Activities.ToList(); 
+        try
+        {
+          // response from bot is of type Microsoft.Bot.Connector.DirectLine.ActivitySet
+          response = await directLineClient.Conversations.GetActivitiesAsync
+          (
+            viewModel.ConversationId,
+            String.IsNullOrEmpty(viewModel.Watermark) ? null : viewModel.Watermark
+          );
+        }
+        catch (Microsoft.Rest.TransientFaultHandling.HttpRequestWithStatusException ex)
+        {
+          //: 'Response status code indicates server error: 403 (Forbidden).'
+          if (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+          {
+            ActiveDirectLineToken = null;
+            token = await GetDirectLineToken(viewModel.TokenEndpoint);
+            response = await directLineClient.Conversations.GetActivitiesAsync
+            (
+              viewModel.ConversationId,
+              String.IsNullOrEmpty(viewModel.Watermark) ? null : viewModel.Watermark
+            );
+          }
+          else
+          {
+            throw;
+          }
+        }
 
-        // return bot responses
-        return Json(new ViewModels.Viewer.Message() 
-        { 
-          Watermark = response?.Watermark, 
-          Responses = botResponses.Select(response => 
-            new ViewModels.Viewer.Response() 
-            { 
-              Type = (response.ReplyToId == null ? "copilot-question" : "copilot-answer"), 
-              Text = RenderText(response) 
+        List<Activity> botResponses = response?.Activities.ToList();
+
+        if (botResponses == null)
+        {
+          return NoContent();
+        }
+        else
+        {
+
+          // return bot responses
+          return Json(new ViewModels.Viewer.Message()
+          {
+            Watermark = response?.Watermark,
+            Responses = botResponses.Select(response => new ViewModels.Viewer.Response()
+            {
+              Type = (response.ReplyToId == null ? "copilot-question" : "copilot-answer"),
+              Text = RenderText(response)
             }),
-          Citations = RenderCitations(botResponses)
-        });
+            Citations = RenderCitations(botResponses)
+          });
+        }
       }
     }
     else
@@ -109,9 +169,9 @@ public class CopilotClientViewerController : Controller
 
     result = System.Text.RegularExpressions.Regex.Replace
     (
-      result, 
-      "a href=\"(?<href>[^\"]*)\"", 
-      new System.Text.RegularExpressions.MatchEvaluator(match=> ReplaceCitationLinks(match, value))
+      result,
+      "a href=\"(?<href>[^\"]*)\"",
+      new System.Text.RegularExpressions.MatchEvaluator(match => ReplaceCitationLinks(match, value))
     );
 
 
@@ -145,7 +205,7 @@ public class CopilotClientViewerController : Controller
       string entityCitationId = entity.Properties["@id"]?.ToString();
       if (entityCitationId == href)
       {
-        if (href.StartsWith("http"))
+        if (!href.StartsWith("http"))
         {
           string entityCitationName = entity.Properties["name"]?.ToString();
           string entityCitationText = entity.Properties["text"]?.ToString();
@@ -197,19 +257,19 @@ public class CopilotClientViewerController : Controller
     return viewModel;
   }
 
-  private async Task<DirectLineToken> GetDirectLineToken(Models.Settings settings)
-  {    
+  private async Task<DirectLineToken> GetDirectLineToken(string tokenEndpoint)
+  {
     if (ActiveDirectLineToken == null)
     {
-    // get a new token
+      // get a new token
       HttpClient client = this.HttpClientFactory.CreateClient();
 
-      if (String.IsNullOrEmpty(settings.TokenEndpoint))
+      if (String.IsNullOrEmpty(tokenEndpoint))
       {
         return null;
       }
 
-      ActiveDirectLineToken = await client.GetFromJsonAsync<DirectLineToken>(settings.TokenEndpoint);
+      ActiveDirectLineToken = await client.GetFromJsonAsync<DirectLineToken>(tokenEndpoint);
       DirectLineTokenExpiry = DateTime.UtcNow.AddMinutes(ActiveDirectLineToken.Expires_in);
     }
     else if (DateTime.UtcNow > DirectLineTokenExpiry.Subtract(TimeSpan.FromMinutes(5)))
@@ -217,12 +277,12 @@ public class CopilotClientViewerController : Controller
       // renew an expired token
       HttpClient client = this.HttpClientFactory.CreateClient();
 
-      if (String.IsNullOrEmpty(settings.TokenEndpoint))
+      if (String.IsNullOrEmpty(tokenEndpoint))
       {
         return null;
       }
 
-      string refreshTokenUri = new Uri(new Uri(settings.TokenEndpoint + (settings.TokenEndpoint.EndsWith("/") ? "" : "/")), "v3/directline/tokens/refresh").ToString();
+      string refreshTokenUri = new Uri(new Uri(tokenEndpoint + (tokenEndpoint.EndsWith("/") ? "" : "/")), "v3/directline/tokens/refresh").ToString();
 
       HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, refreshTokenUri);
       request.Headers.Authorization = new("Bearer", ActiveDirectLineToken.Token);
@@ -236,7 +296,7 @@ public class CopilotClientViewerController : Controller
 
   private async Task StartConversation(ViewModels.Viewer viewModel)
   {
-    DirectLineToken token = await GetDirectLineToken(viewModel);
+    DirectLineToken token = await GetDirectLineToken(viewModel.TokenEndpoint);
 
     if (token != null)
     {
@@ -251,8 +311,8 @@ public class CopilotClientViewerController : Controller
 
   private async Task SendMessage(ViewModels.Viewer viewModel)
   {
-    DirectLineToken token = await GetDirectLineToken(viewModel);
-    
+    DirectLineToken token = await GetDirectLineToken(viewModel.TokenEndpoint);
+
     if (token != null)
     {
       viewModel.IsConfigured = true;
@@ -269,7 +329,7 @@ public class CopilotClientViewerController : Controller
           Locale = "en-us",
         });
       }
-    }    
+    }
   }
 
 }

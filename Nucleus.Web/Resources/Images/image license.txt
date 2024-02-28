@@ -2,7 +2,3 @@
 Modified for use as the Nucleus logo.  (c) Inventua Pty Ltd.
 Original: https://www.publicdomainpictures.net/en/view-image.php?image=281678&picture=atom
 License:  https://creativecommons.org/publicdomain/zero/1.0/
-
--- progress_medium.gif --
-Original: https://loading.io/spinner/custom/164145
-License: https://loading.io/license/#free-license

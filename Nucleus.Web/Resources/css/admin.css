@@ -116,6 +116,13 @@
 	box-shadow: 0 0 0 0.25rem rgba(80, 80, 80, 0.5);
 }
 
+.nucleus-admin-index-spinner
+{
+  width: 5rem;
+  height: 5rem;
+  border-width: 0.5rem;
+}
+
 .nucleus-admin-search
 {
 	position: absolute;

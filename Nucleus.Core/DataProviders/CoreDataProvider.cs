@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Models.Paging;
 using Nucleus.Extensions;
 using Nucleus.Abstractions.Search;
+using Nucleus.Abstractions;
 
 namespace Nucleus.Core.DataProviders;
 
@@ -2135,6 +2136,14 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
     }
   }
 
+  public async Task TruncateScheduledTaskHistory(Guid scheduledTaskId, int keepHistoryCount)
+  {
+    await this.Context.ScheduledTaskHistory
+      .Where(history => history.ScheduledTaskId == scheduledTaskId)
+      .OrderByDescending(history => history.StartDate)
+      .Skip(keepHistoryCount)
+      .ExecuteDeleteAsync();
+  }
   #endregion
 
   #region "    IFileSystemDataProvider    "

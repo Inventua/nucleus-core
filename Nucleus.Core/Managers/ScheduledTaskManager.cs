@@ -150,12 +150,13 @@ namespace Nucleus.Core.Managers
 		/// <param name="scheduledTask"></param>
 		public async Task TruncateHistory(ScheduledTask scheduledTask)
 		{
-			using (IScheduledTaskDataProvider provider = this.DataProviderFactory.CreateProvider<IScheduledTaskDataProvider>())
+      using (IScheduledTaskDataProvider provider = this.DataProviderFactory.CreateProvider<IScheduledTaskDataProvider>())
 			{
-				foreach (ScheduledTaskHistory history in (await provider.ListScheduledTaskHistory(scheduledTask.Id)).OrderByDescending(history=>history.StartDate).Skip(scheduledTask.KeepHistoryCount))
-				{
-					await provider.DeleteScheduledTaskHistory(history);
-				}
+        await provider.TruncateScheduledTaskHistory(scheduledTask.Id, scheduledTask.KeepHistoryCount);
+        //foreach (ScheduledTaskHistory history in (await provider.ListScheduledTaskHistory(scheduledTask.Id)).OrderByDescending(history=>history.StartDate).Skip(scheduledTask.KeepHistoryCount))
+        //{          
+        //await provider.DeleteScheduledTaskHistory(history);
+        //}
 			}
 		}
 

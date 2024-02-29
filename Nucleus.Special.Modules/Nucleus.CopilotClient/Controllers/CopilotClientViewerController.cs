@@ -117,7 +117,7 @@ public class CopilotClientViewerController : Controller
         }
         catch (Microsoft.Rest.TransientFaultHandling.HttpRequestWithStatusException ex)
         {
-          //: 'Response status code indicates server error: 403 (Forbidden).'
+          // renew token if we get a response status code 403 (Forbidden)
           if (ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
           {
             ActiveDirectLineToken = null;
@@ -134,9 +134,7 @@ public class CopilotClientViewerController : Controller
           }
         }
 
-        List<Activity> botResponses = response?.Activities.ToList();
-
-        if (botResponses == null)
+        if (response == null || response?.Activities == null)
         {
           return NoContent();
         }
@@ -147,12 +145,12 @@ public class CopilotClientViewerController : Controller
           return Json(new ViewModels.Viewer.Message()
           {
             Watermark = response?.Watermark,
-            Responses = botResponses.Select(response => new ViewModels.Viewer.Response()
+            Responses = response.Activities.Select(response => new ViewModels.Viewer.Response()
             {
               Type = (response.ReplyToId == null ? "copilot-question" : "copilot-answer"),
               Text = RenderText(response)
             }),
-            Citations = RenderCitations(botResponses)
+            Citations = RenderCitations(response.Activities)
           });
         }
       }
@@ -173,25 +171,6 @@ public class CopilotClientViewerController : Controller
       "a href=\"(?<href>[^\"]*)\"",
       new System.Text.RegularExpressions.MatchEvaluator(match => ReplaceCitationLinks(match, value))
     );
-
-
-    //System.Text.RegularExpressions.MatchCollection matches =  System.Text.RegularExpressions.Regex.Matches(result, "a href=\"(?<citationid>[A-Za-z0-9:]*)\"");
-    //foreach (System.Text.RegularExpressions.Match match in matches)
-    //{
-    //  string citationId = match.Groups["citationid"].Value;
-
-    //  foreach (Entity entity in value.Entities)
-    //  {
-    //    string entityCitationId = entity.Properties["@id"]?.ToString();
-    //    if (entityCitationId == citationId)
-    //    {
-    //      string entityCitationName = entity.Properties["name"]?.ToString();
-    //      string entityCitationText = entity.Properties["text"]?.ToString();
-
-    //    }
-    //  }
-
-    //}
 
     return result;
   }
@@ -222,7 +201,7 @@ public class CopilotClientViewerController : Controller
     return match.Value;
   }
 
-  private IEnumerable<ViewModels.Viewer.Citation> RenderCitations(List<Activity> values)
+  private IEnumerable<ViewModels.Viewer.Citation> RenderCitations(IList<Activity> values)
   {
     List<ViewModels.Viewer.Citation> results = new();
 

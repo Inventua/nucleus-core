@@ -133,7 +133,7 @@ namespace Nucleus.Abstractions.Managers
 		/// </summary>
 		/// <param name="site"></param>
 		/// <returns></returns>
-		public Task<System.IO.MemoryStream> Export(Site site);
+		public Task<System.IO.Stream> Export(Site site);
 
 		/// <summary>
 		/// Parse a site template file from a stream and return the deserialized result

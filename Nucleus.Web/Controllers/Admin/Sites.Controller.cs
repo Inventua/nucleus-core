@@ -116,8 +116,8 @@ namespace Nucleus.Web.Controllers.Admin
 		public async Task<ActionResult> ExportSite(Guid siteId)
 		{
 			Site site = await this.SiteManager.Get(siteId);
-			System.IO.MemoryStream export = await this.SiteManager.Export(site);
-			return File(export.ToArray(), "text/xml", $"site-{site.Name}.xml");
+			System.IO.Stream export = await this.SiteManager.Export(site);
+			return File(export, "text/xml", $"site-{site.Name}.xml");
 		}
 
 

@@ -26,6 +26,15 @@
         external_plugins = {};
       }
 
+      // Prevent Bootstrap dialog from blocking focusin.  https://www.tiny.cloud/docs/integrations/bootstrap/
+      document.addEventListener('focusin', (e) =>
+      {
+        if (e.target.closest(".tox-tinymce-aux, .moxman-window, .tam-assetmanager-root") !== null)
+        {
+          e.stopImmediatePropagation();
+        }
+      });
+
       if (tinymce.activeEditor !== null && !document.body.contains(tinymce.activeEditor.getElement()))
       {
         tinymce.EditorManager.remove();

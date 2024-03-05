@@ -275,7 +275,7 @@ namespace Nucleus.Web.Controllers.Admin
 				viewModel.SelectedIconFile.Parent = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedCssFile.Parent.Id);
 				using (System.IO.Stream fileStream = cssFile.OpenReadStream())
 				{
-					viewModel.SelectedCssFile = await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedIconFile.Provider, viewModel.SelectedCssFile.Parent.Path, cssFile.FileName, fileStream, false);
+					viewModel.SelectedCssFile = await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedIconFile.Provider, viewModel.SelectedCssFile.Parent.Path ?? "/", cssFile.FileName, fileStream, true);
 				}
 			}
 			else

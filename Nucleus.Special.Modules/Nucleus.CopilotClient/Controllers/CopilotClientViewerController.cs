@@ -283,7 +283,7 @@ public class CopilotClientViewerController : Controller
       using (var directLineClient = new DirectLineClient(token.Token))
       {
         Conversation conversation = await directLineClient.Conversations.StartConversationAsync();
-        viewModel.ConversationId = conversation.ConversationId;
+        viewModel.ConversationId = conversation?.ConversationId;
       }
     }
   }

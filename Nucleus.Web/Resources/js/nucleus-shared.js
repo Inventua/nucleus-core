@@ -903,6 +903,9 @@ function _Page()
       errorData.statusCode = request.status;
     }
 
+    // clear file inputs, otherwise a new file selection won't trigger a change event
+    target.find('input[type=file]').val('');
+
     _cancelProgressIndicator();
     _removeProgressIndicator(source);
     _dialog(errorData.title, errorData.detail, errorData.icon ?? 'error')
@@ -944,6 +947,10 @@ function _Page()
         case 'alert':
           iconClass = ' icon-alert';
           iconElement = '<div class="dialog-icon"><span class="nucleus-material-icon">&#xe7f4;</span></div>';
+          break;
+        case 'info':
+          iconClass = ' icon-info';
+          iconElement = '<div class="dialog-icon"><span class="nucleus-material-icon">&#xe88e;</span></div>';
           break;
         case 'error':
           iconClass = ' icon-error';
@@ -1230,6 +1237,12 @@ function _Page()
       jQuery(frameElement).hide();
       window.parent.document.dispatchEvent(new CustomEvent('Refresh'));
       return;
+    }
+
+    // clear file inputs, otherwise a new file selection won't trigger a change event
+    if (target !== null)
+    {
+      target.find('input[type=file]').val('');
     }
 
     // set the text and disabled attribute for <option> elements with a text value of "-".  We need to do this in .setTimeout to give the 

@@ -1,0 +1,94 @@
+﻿@model Nucleus.Modules.PageLinks.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<h1 class="nucleus-modal-caption">Page Links Settings</h1>
+@using (Html.BeginNucleusForm("Settings", "PageLinksSettings", "PageLinks", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+	<Tab>
+		<TabItem target="#pagelink-list" caption="Links" active="true"></TabItem>
+		<TabItem target="#pagelink-settings" caption="Settings"></TabItem>
+	</Tab>
+
+	<TabContent>
+		<TabPanel id="pagelink-list" active="true">
+			<div class="nucleus-form-tools">
+				@Html.SubmitButton("&#xe147", "Add Link", @Url.NucleusAction("Create", "PageLinksSettings", "PageLinksSettings"), new { @data_target = "#PageLinksEditor" })
+			</div>
+
+			<div id="LinksList">
+				@await Html.PartialAsync("_PageLinksList.cshtml", Model)
+			</div>
+		</TabPanel>
+
+		<TabPanel id="pagelink-settings">
+			<fieldset role="group" aria-labelledby="heading">
+				<h2 class="nucleus-control-panel-heading">Settings</h2>
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Operation Model" helptext="Select the mode of operation to list the page links.">
+						@Html.DropDownListFor(model => model.Mode, Html.GetEnumSelectList<Nucleus.Modules.PageLinks.Models.Settings.Modes>())
+					</SettingsControl>
+				</div>
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Heading Css Class" helptext="Enter the Css class for the Heading element.">
+						@Html.TextBoxFor(model => model.HeadingClass, new { })
+					</SettingsControl>
+
+					<SettingsControl caption="jQuery Selector for Body/Root" helptext="Enter the jQuery selector for body/root that will detect elements. Automatic mode only.">
+						@Html.TextBoxFor(model => model.RootSelector, new { })
+					</SettingsControl>
+
+				</div>
+				<div class="nucleus-flex-fields">
+					<h3 class="d-block">Headers Included</h3>
+					<SettingsControl caption="" helptext="Select the headers for the page links." class="inner-inline">
+						@foreach (Nucleus.Modules.PageLinks.Models.Settings.HtmlHeaderTags htmlHeaderTag in Enum.GetValues(typeof(Nucleus.Modules.PageLinks.Models.Settings.HtmlHeaderTags)))
+						{
+							if (htmlHeaderTag != Nucleus.Modules.PageLinks.Models.Settings.HtmlHeaderTags.All)
+							{
+								@* <label class="">
+									<span class="ms-2 me-5">@htmlHeaderTag</span><input type="checkbox" value="@htmlHeaderTag" class="ToggleSwitch" />
+								</label>*@
+								@Html.DisplayName(htmlHeaderTag.ToString());
+								@Html.CheckBox("HtmlHeaderTag", ( Model.IncludeHeaders.HasFlag(htmlHeaderTag) ), new { @class = "ToggleSwitch" })
+
+							}
+						}
+					</SettingsControl>
+
+				</div>
+
+				<div class="nucleus-flex-fields">
+					<SettingsControl caption="Heading 1 (H1)" helptext="Enables the automatic mode to scan for H1 header tags." class="inner-inline">
+						@Html.CheckBoxFor(model => model.HeaderH1, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+					<SettingsControl caption="Heading 2 (H2)" helptext="Enables the automatic mode to scan for H2 header tags." class="inner-inline">
+						@Html.CheckBoxFor(model => model.HeaderH2, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+					<SettingsControl caption="Heading 3 (H3)" helptext="Enables the automatic mode to scan for H3 header tags." class="inner-inline">
+						@Html.CheckBoxFor(model => model.HeaderH3, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+					<SettingsControl caption="Heading 4 (H4)" helptext="Enables the automatic mode to scan for H4 header tags." class="inner-inline">
+						@Html.CheckBoxFor(model => model.HeaderH4, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+					<SettingsControl caption="Heading 5 (H5)" helptext="Enables the automatic mode to scan for H5 header tags." class="inner-inline">
+						@Html.CheckBoxFor(model => model.HeaderH5, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+					<SettingsControl caption="Heading 6 (H6)" helptext="Enables the automatic mode to scan for H6 header tags." class="inner-inline">
+						@Html.CheckBoxFor(model => model.HeaderH6, new { @class = "ToggleSwitch" })
+					</SettingsControl>
+				</div>
+
+				<div class="nucleus-button-panel">
+					@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "PageLinksSettings", "PageLinks"), new { })
+				</div>
+			</fieldset>
+
+		</TabPanel>
+	</TabContent>
+}
+@* <div class="nucleus-editor-panel">
+</div>
+ *@

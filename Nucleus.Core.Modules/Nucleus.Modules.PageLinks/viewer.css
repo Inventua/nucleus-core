@@ -1,0 +1,27 @@
+﻿.PageLinks ol
+{
+	list-style-type: none;
+}
+
+.PageLinks ol
+{
+	padding-left: 1rem;
+}
+
+.PageLinks > ol
+{
+	padding-left: 0;
+}
+
+
+.nucleus-adminpage .ExtensionInstaller .nucleus-extension-components .highlight
+{
+  background-color: yellow;
+}
+
+
+.nucleus-adminpage .ExtensionInstaller .nucleus-extension-components h5
+{
+  transition: background-color ease-out 2.5s;
+}
+

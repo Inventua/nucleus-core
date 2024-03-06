@@ -185,13 +185,10 @@ public class PageModuleManager : IPageModuleManager
   }
 
   /// <summary>
-  /// Save the specified <see cref="PageModule"/> and its <see cref="PageModule.ModuleSettings"/>.
+  /// Save the specified <see cref="PageModule"/> and its <see cref="PageModule.ModuleSettings"/> and <see cref="PageModule.ModuleSettings"/>.
   /// </summary>
   /// <param name="page"></param>
   /// <param name="module"></param>
-  /// <remarks>
-  /// This method does not save module permissions.
-  /// </remarks>
   public async Task Save(Page page, PageModule module)
   {
     List<Permission> originalPermissions = await this.PermissionsManager.ListPermissions(module.Id, PageModule.URN);

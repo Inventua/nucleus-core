@@ -680,7 +680,7 @@ ul.nucleus-control-panel-items button
 }
 
 /* page-specific styles */
-.nucleus-adminpage .nucleus-page-editor .page-link-type
+.nucleus-adminpage #nucleus-page-editor .page-link-type
 {
   width: 14rem;
 }

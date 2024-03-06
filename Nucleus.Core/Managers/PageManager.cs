@@ -14,14 +14,17 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions.Authorization;
 using System.Security.Cryptography;
 using Nucleus.Extensions;
+using System.Text.RegularExpressions;
 
 namespace Nucleus.Core.Managers;
 
 /// <summary>
 /// Provides functions to manage database data for <see cref="Page"/>s.
 /// </summary>
-public class PageManager : IPageManager
+public partial class PageManager : IPageManager
 {
+  // "partial" class is required by GeneratedRegex
+
   [Flags]
   private enum PermissionsCheckOption
   {
@@ -30,6 +33,13 @@ public class PageManager : IPageManager
     Edit = 2,
     Both = View | Edit
   }
+
+  [GeneratedRegexAttribute(@"({\$guid[0-9]+})", RegexOptions.ECMAScript)]
+  private static partial System.Text.RegularExpressions.Regex GuidTokenRegEx();
+
+
+  [GeneratedRegex(@"<(.+)>\s*<(.+)>([\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12})", RegexOptions.ECMAScript)]
+  private static partial Regex FindGuidRegEx();
 
   private IDataProviderFactory DataProviderFactory { get; }
   private ICacheManager CacheManager { get; }
@@ -358,6 +368,96 @@ public class PageManager : IPageManager
     InvalidateCache(page.Id);
   }
 
+  /// <summary>
+  /// Export the specified <see cref="Page"/> as XML.
+  /// </summary>
+  /// <param name="page"></param>
+  /// <remarks>
+  /// Creates a page template which can be used to create new pages.
+  /// </remarks>
+  public async Task<System.IO.Stream> Export(Page page)
+  {
+    string xmlData;
+
+    Nucleus.Abstractions.Models.Export.PageTemplate export = new()
+    {
+      Page = page.Copy<Page>()
+    };
+
+    // page template can't use the same page name and title
+    export.Page.Name = "";
+    export.Page.Title = "";
+
+    // page templates can't have routes or permissions
+    export.Page.Routes.Clear();
+
+    export.Page.Permissions.Clear();
+    
+    foreach (PageModule module in export.Page.Modules)
+    {
+      module.Permissions.Clear();
+    }
+
+    using (IContentDataProvider provider = this.DataProviderFactory.CreateProvider<IContentDataProvider>())
+    {
+      export.Contents = [];
+      foreach (PageModule pageModule in export.Page.Modules)
+      {
+        export.Contents.AddRange(await provider.ListContent(pageModule));
+      }
+    }
+
+    // serialize the export data to XML
+    using (System.IO.MemoryStream serializedSite = new())
+    {
+      System.Xml.Serialization.XmlSerializer serializer = new(typeof(Nucleus.Abstractions.Models.Export.PageTemplate));
+      serializer.Serialize(serializedSite, export);
+
+      // deserialize the xml to a string for additional processing
+      xmlData = System.Text.Encoding.UTF8.GetString(serializedSite.ToArray());
+    }
+
+    // replace id (guid) values with tokens, except for id's which refer to module definitions, permission types, container definitions and layout definitions
+    MatchCollection idMatches = FindGuidRegEx().Matches(xmlData);
+
+    int tokenIndex = 1;
+    foreach (System.Text.RegularExpressions.Match match in idMatches)
+    {
+      if (match.Groups.Count == 4)
+      {
+        string nodeName = match.Groups[1].Value;
+        string propertyName = match.Groups[2].Value;
+        string idValue = match.Groups[3].Value;
+
+        switch (nodeName)
+        {
+          case nameof(ModuleDefinition):
+          case nameof(PermissionType):
+          case nameof(ContainerDefinition):
+          case nameof(LayoutDefinition): 
+            // skip these node types, as they are all Guids that must be the same across all sites
+            break;
+
+          default:
+            // For other ids, replace with a token.  The replace operation must be for the whole file, as some id's may be present in 
+            // more than one location.  This method isn't particularly fast, but it doesn't need to be since exporting a site happens 
+            // infrequently.
+            if (idValue != Guid.Empty.ToString())
+            {
+              xmlData = xmlData.Replace(idValue, $"{{$guid{tokenIndex}}}");
+            }
+
+            tokenIndex++;
+            break;
+        }
+      }
+    }
+
+    // convert the string back to a stream and return
+    return new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(xmlData));
+  }
+
+
   private void InvalidateCache(Guid pageId)
   {
     this.CacheManager.PageCache().Remove(pageId);
@@ -670,6 +770,33 @@ public class PageManager : IPageManager
     {
       return false;
     }
+  }
+
+  /// <summary>
+  /// Parse a template file and return the deserialized result
+  /// </summary>
+  /// <param name="stream"></param>
+  /// <returns></returns>
+  public Task<Nucleus.Abstractions.Models.Export.PageTemplate> ParseTemplate(System.IO.Stream stream)
+  {
+    // First, get the stream as a string
+    System.IO.StreamReader reader = new(stream);
+    string xmlData = reader.ReadToEnd();
+
+    // Replace the GUID tokens with newly-generated guids
+    MatchCollection idMatches = GuidTokenRegEx().Matches(xmlData);
+
+    foreach (System.Text.RegularExpressions.Match match in idMatches)
+    {
+      if (match.Success && match.Groups.Count > 1)
+      {
+        xmlData = xmlData.Replace(match.Groups[1].Value, Guid.NewGuid().ToString());
+      }
+    }
+
+    // Write the string back into a stream and parse			
+    System.Xml.Serialization.XmlSerializer serializer = new(typeof(Nucleus.Abstractions.Models.Export.PageTemplate));
+    return Task.FromResult(serializer.Deserialize(new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(xmlData))) as Nucleus.Abstractions.Models.Export.PageTemplate);
   }
 
   private async Task CopyPermissionsToDescendants(Site site, PageMenu page, List<Permission> parentPermissions, CopyPermissionOperation operation)

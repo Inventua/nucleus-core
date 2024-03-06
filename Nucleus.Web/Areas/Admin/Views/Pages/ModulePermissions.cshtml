@@ -3,60 +3,63 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
-<fieldset role="group" aria-label="Permissions">	
-	<div class="nucleus-form-buttonrow">
-		<SettingsControl caption="Inherit Page Permissions?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to use page permissions for this module.">
-			@Html.CheckBoxFor(model => Model.Module.InheritPagePermissions, new { @class = "ToggleSwitch" })
-		</SettingsControl>
-	</div>
-	@if (!Model.ModulePermissions.Values.Any())
-	{
-		@if (!Model.Module.InheritPagePermissions)
-		{
-			<div class="alert alert-primary" role="alert">This module does not have any permissions configured, so only administrators can see it. Select a role from the drop-down list and click "Add Role" to create a page permission.</div>
-		}			
-	}
-	else
-	{
-		<table>
-			<tr>
-				<th></th>
-				@foreach (var permissionType in Model.ModulePermissionTypes)
-				{
-					<th class="text-center">@permissionType.Name</th>
-				}
-				<th></th>
-			</tr>
+<div class="nucleus-form-buttonrow">
+  <SettingsControl caption="Inherit Page Permissions?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to use page permissions for this module.">
+    @Html.CheckBoxFor(model => Model.Module.InheritPagePermissions, new { @class = "ToggleSwitch" })
+  </SettingsControl>
+</div>
+@if (!Model.ModulePermissions.Values.Any())
+{
+  @if (!Model.Module.InheritPagePermissions)
+  {
+    <div class="alert alert-primary" role="alert">This module does not have any permissions configured, so it is only visible in edit mode. Select a role from the drop-down list and click "Add Role" to create a page permission, or enable 'Inherit Page Permissions'.</div>
+  }
+}
+else
+{
+  <div class="overflow-auto">
+    <table class="table table-sm table-sticky-headers">
+      <thead>
+        <tr>
+          <th></th>
+          @foreach (var permissionType in Model.ModulePermissionTypes)
+          {
+            <th class="text-center">@permissionType.Name</th>
+          }
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var item in Model.ModulePermissions.Values)
+        {
+          <tr>
+            <td>
+              @item.Role.Name
+            </td>
 
-			@foreach (var item in Model.ModulePermissions.Values)
-			{
-				<tr>
-					<td>
-						@item.Role.Name
-					</td>
+            @for (int permissionsCount = 0; permissionsCount < Model.ModulePermissions[item.Role.Id].Permissions.Count; permissionsCount++)
+            {
+              <td class="text-center">
+                @Html.HiddenFor(model => Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].Id)
+                @Html.HiddenFor(model => Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Id)
+                @Html.HiddenFor(model => Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope)
+                @if (Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope == PermissionType.PermissionScopeNamespaces.Disabled)
+                {
+                  <span class="nucleus-material-icon">&#xe8f5;</span>
+                }
+                else
+                {
+                  @Html.CheckBoxFor(model => Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].AllowAccess)
+                }
+              </td>
+            }
 
-					@for (int permissionsCount = 0; permissionsCount < Model.ModulePermissions[item.Role.Id].Permissions.Count; permissionsCount++)
-					{
-						<td class="text-center">
-							@Html.HiddenFor(model => Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].Id)
-							@Html.HiddenFor(model => Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Id)
-							@Html.HiddenFor(model => Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope)
-							@if (Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope == PermissionType.PermissionScopeNamespaces.Disabled)
-							{
-								<span class="nucleus-material-icon">&#xe8f5;</span>
-							}
-							else
-							{
-								@Html.CheckBoxFor(model => Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].AllowAccess)
-							}
-						</td>
-					}
-
-					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("RemoveModulePermissionRole", "Pages", "Admin", new { id = item.Role.Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Remove" data-target="form.parent()" /></td>
-				</tr>
-			}
-		</table>
-	}
-</fieldset>
+            <td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("RemoveModulePermissionRole", "Pages", "Admin", new { id = item.Role.Id })" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Remove" data-target="form.parent()" /></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
 
 

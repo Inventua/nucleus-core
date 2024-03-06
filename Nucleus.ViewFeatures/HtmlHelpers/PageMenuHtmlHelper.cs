@@ -54,17 +54,8 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 		/// </remarks>
 		public static IHtmlContent PageMenuFor(this IHtmlHelper htmlHelper, PageMenu pages, Page fromPage, int maxLevels, object htmlAttributes)
 		{
-			//string itemUrl;
 			IUrlHelper urlHelper = htmlHelper.ViewContext.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(htmlHelper.ViewContext);
 			HtmlContentBuilder outputBuilder = new();
-
-			//TagBuilder linkBuilder = new("a");
-			//string caption = fromPage.Name;
-
-			//linkBuilder.Attributes.Add("data-id", fromPage.Id.ToString());
-			//linkBuilder.Attributes.Add("data-linkurl", urlHelper.PageLink(fromPage));
-			//linkBuilder.Attributes.Add("tabindex", "0");
-			//linkBuilder.InnerHtml.SetContent(caption);
 
 			outputBuilder.AppendHtml(BuildLink(urlHelper, fromPage));
 						
@@ -87,7 +78,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       linkBuilder.Attributes.Add("data-id", page.Id.ToString());
       linkBuilder.Attributes.Add("data-linkurl", urlHelper.PageLink(page));
       linkBuilder.Attributes.Add("tabindex", "0");
-      linkBuilder.InnerHtml.SetContent(page.Name);
+      linkBuilder.InnerHtml.SetContent(String.IsNullOrEmpty(page.Name) ? "(no name)" : page.Name);
       linkBuilder.AddCssClass("nucleus-show-progress nucleus-show-progress-inside");
 
       return linkBuilder;

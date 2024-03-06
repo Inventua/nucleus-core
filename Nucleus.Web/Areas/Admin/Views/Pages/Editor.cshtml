@@ -3,12 +3,12 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
-<div class="nucleus-page-editor d-flex flex-column h-100@(Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default ? " nucleus-editor-panel" : "")">
+<div class="d-flex overflow-auto flex-column h-100@(Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default ? " nucleus-editor-panel" : "")">
   @if (Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default)
   {
     <h1 class="nucleus-control-panel-heading">Page Settings</h1>
   }
-  @using (Html.BeginAreaForm("Select", "Pages", "Admin", FormMethod.Post, new { @data_target = Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default ? ".nucleus-adminpage" : "#nucleus-page-editor", @autocomplete = "off" }))
+  @using (Html.BeginAreaForm("Select", "Pages", "Admin", FormMethod.Post, new { @class = "d-flex overflow-auto flex-1", @data_target = Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default ? ".nucleus-adminpage" : "#nucleus-page-editor", @autocomplete = "off" }))
   {
     <div class="position-absolute m-1 top-0 end-0">
       @if (Model.Page.Id != Guid.Empty)
@@ -40,9 +40,9 @@
         <fieldset role="group" aria-label="Basic Properties">
 
           @*<h2>Basic Properties</h2>*@
-          @Html.HiddenFor((model) => model.PageEditorMode)
+          @Html.HiddenFor(model => model.PageEditorMode)
           @Html.HiddenFor(model => model.Page.Id)
-          @Html.HiddenFor((model) => model.Page.SortOrder)
+          @Html.HiddenFor(model => model.Page.SortOrder)
 
           <div class="nucleus-flex-fields">
             <SettingsControl caption="Page Name" helptext="Name of the page.  The page name is displayed in menus.">
@@ -94,9 +94,9 @@
         </fieldset>
 
         <fieldset role="group" aria-labelledby="heading">
-          <h2>Meta Data/SEO</h2>
+          <h2>Meta Data</h2>
 
-          <SettingsControl caption="Keywords" helptext="Enter page keywords separated by commas.  Keywords may be used by a built-in search indexing service.  They are not used by search engines like Google, and are not rendered within the page meta-data.">
+          <SettingsControl caption="Keywords" helptext="Enter page keywords separated by commas.  Keywords may be used by a built-in search indexing service.  They are not used by search engines like Google search, and are not rendered within the page meta-data.">
             @Html.TextBoxFor(model => model.Page.Keywords, new { @maxlength = 512 })
           </SettingsControl>
         </fieldset>
@@ -168,7 +168,7 @@
           <fieldset role="group" aria-labelledby="heading">
             <h2>Modules on this page</h2>
             <div class="nucleus-form-tools">
-              <input type="submit" formaction="@Url.AreaAction("AddModule", "Pages", "Admin")" value="Add Module" data-target="#nucleus-popupdialog .modal-body" class="btn btn-secondary" />
+              <button type="submit" formaction="@Url.AreaAction("AddModule", "Pages", "Admin")" data-target="#nucleus-popupdialog .modal-body" class="btn btn-secondary">Add Module</button>
             </div>
             <div id="pageeditor_pagemodules">
               @await Html.PartialAsync("_PageModules.cshtml", Model)
@@ -179,10 +179,29 @@
     </TabContent>
 
     <div class="nucleus-button-panel">
-      <input type="submit" class="btn btn-primary nucleus-dialogresult" value="Save Changes" data-target=".nucleus-adminpage" formaction="@Url.AreaAction("Save", "Pages", "Admin")" />
+      <button type="submit" class="btn btn-primary nucleus-dialogresult" data-target=".nucleus-adminpage" formaction="@Url.AreaAction("Save", "Pages", "Admin")">Save Changes</button>
       @if (Model.Page.Id != Guid.Empty && Model.CanDeletePage)
       {
-        <input type="submit" class="btn btn-danger" value="Delete Page" data-target=".nucleus-adminpage" formaction ="@Url.AreaAction("DeletePage", "Pages", "Admin")" data-confirm="Delete this page?" />
+        <button type="submit" class="btn btn-danger" data-target=".nucleus-adminpage" formaction="@Url.AreaAction("DeletePage", "Pages", "Admin")" data-confirm="Delete this page?">Delete Page</button>
+      }
+      @if (Model.Page.Id != Guid.Empty)
+      {
+        <button type="button" class="btn btn-secondary ms-auto dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          Create Page Template
+        </button>
+        <ul class="dropdown-menu new-page-dropdown-menu">
+          <li>
+            <a href="@Url.AreaAction("CreateTemplateAndSave", "Pages", "Admin", new { pageId = @Model.Page.Id} )" class="dropdown-item d-flex" data-target="#nucleus-page-editor" accesskey="N">
+              Save
+            </a>
+          </li>
+          <li>
+            <a href="@Url.AreaAction("CreateTemplateAndDownload", "Pages", "Admin", new { pageId = @Model.Page.Id} )" class="dropdown-item d-flex" data-target="#nucleus-page-editor" accesskey="N">
+              Download
+            </a>
+          </li>
+        </ul>
+        @* @Html.LinkButton("", "Create Page Template", @Url.AreaAction("CreateTemplate", "Pages", "Admin") + "?pageId=" + @Model.Page.Id, new { @class = "btn btn-secondary ms-auto" })        *@
       }
     </div>
   }

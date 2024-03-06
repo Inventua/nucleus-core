@@ -13,7 +13,7 @@
 
 .LeftPane
 {
-	width: 200px;
+  flex: 1;
 	background-color: #eee;	
 }
 
@@ -29,8 +29,7 @@
 {
 	display: flex;
 	flex-direction: column;
-	flex-grow: 1;
-	/*overflow: auto;*/
+	flex: 5;
 }
 
 .ContentPane > div

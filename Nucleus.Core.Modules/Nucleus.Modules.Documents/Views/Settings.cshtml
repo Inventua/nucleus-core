@@ -8,7 +8,8 @@
 <h1 class="nucleus-modal-caption">Documents Settings</h1>
 
 @using (Html.BeginNucleusForm("Settings", "Documents", FormMethod.Post, new { @enctype = "multipart/form-data" }))
-{<div id="DocumentsSettings" class="DocumentsSettings">
+{
+  <div id="DocumentsSettings" class="DocumentsSettings">
 		<Tab>
 			<TabItem target="#document-list" caption="Documents" active="true"></TabItem>
 			<TabItem target="#document-settings" caption="Settings"></TabItem>
@@ -17,20 +18,17 @@
 		<TabContent>
 			<TabPanel id="document-list" active="true">
 				<div class="nucleus-form-tools">
-					<div class="btn btn-secondary">
-						<label>
-							<span class="nucleus-material-icon">&#xe147</span> Add Document
-							<input type="submit" class="collapse" formaction="@Url.NucleusAction("Create", "Documents", "Documents")" data-target="#DocumentEditor">
-						</label>
-					</div>
+          @Html.SubmitButton("&#xe147", "Add Document", @Url.NucleusAction("Create", "Documents", "Documents"), new { @data_target = "#DocumentEditor" })
 				</div>
 
-				<table class="Documents">
+        <table class="table table-sm table-striped Documents">
+          <thead>
 					<tr>
 						<th>Title</th>
 						<th>Category</th>
-						@*<th>Description</th>*@
 					</tr>
+          </thead>
+          <tbody>
 					@for (int documentCount = 0; documentCount < Model.Documents.Count; documentCount++)
 					{
 						<tr>
@@ -41,7 +39,6 @@
 
 							<td>@Model.Documents[documentCount].Category?.Name</td>
 
-							@*<td>@Model.Documents[documentCount].Description</td>*@
 							<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("Edit", "Documents", "Documents")?id=@Model.Documents[documentCount].Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-primary" title="Edit" data-target="#DocumentEditor" /></td>
 							<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("Delete", "Documents", "Documents")?id=@Model.Documents[documentCount].Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-confirm="Delete this document?" /></td>
 							<td class="nucleus-small-cell">
@@ -58,7 +55,8 @@
 							</td>
 						</tr>
 					}
-				</table>
+          </tbody>
+        </table>
 			</TabPanel>
 
 			<TabPanel id="document-settings">

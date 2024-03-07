@@ -42,7 +42,7 @@
 			}
 			@if (Model.IsSystemAdministrator)
 			{
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Extensions", "Extensions", "~/Admin/Extensions/Index", "E", "&#xe87b;", "ExtensionsIcon"))
+				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Extensions", "Extensions", "~/Admin/Extensions/Index", "X", "&#xe87b;", "ExtensionsIcon"))
 				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Settings", "Settings", "~/Admin/Settings/Index", "S", "&#xe8b8;", "SettingsIcon"))
 			}
 
@@ -52,7 +52,7 @@
 			}
 			@if (Model.CanEditContent)
 			{
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-content-btn", "Toggle Edit Mode", "Edit Content", "~/Admin/Settings/Index", "S", "&#xe3c9;", "nucleus-control-panel-sidebar-bottom nucleus-control-panel-sidebar-bottom" + (Model.IsEditMode ? "-active" : "")))
+				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-content-btn", "Toggle Edit Mode", "Edit Content", "~/Admin/Settings/Index", "T", "&#xe3c9;", "nucleus-control-panel-sidebar-bottom nucleus-control-panel-sidebar-bottom" + (Model.IsEditMode ? "-active" : "")))
 			}
 		</ul>
 

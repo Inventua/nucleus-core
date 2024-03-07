@@ -35,13 +35,16 @@ public static class Extensions
   {
     if (config.GetValue<Boolean>(SETTING_HEALTH_CHECKS_ENABLED))
     {
+      List<string> healthCheckAssemblyNames = new(); 
+
       services.Logger().LogInformation("Adding Health Checks");
       IHealthChecksBuilder builder = services.AddHealthChecks();
 
       // add all IHealthCheck implementations, including those from Nucleus core, and also any which are provided by Nucleus extensions
       foreach (Type type in AssemblyLoader.GetTypes<IHealthCheck>().Where(type => type.IsPublic))
       {
-        services.Logger().LogInformation("Adding IHealthCheck '{type}'.", type.AssemblyQualifiedName);
+        healthCheckAssemblyNames.Add(type.AssemblyQualifiedName);
+        
         builder.Add
         (
           new HealthCheckRegistration
@@ -53,6 +56,8 @@ public static class Extensions
           )
         );
       }
+
+      services.Logger().LogInformation("Added IHealthChecks: '{types}'.", String.Join(", ", healthCheckAssemblyNames));
 
       // register the ApplicationReadyHealthCheck hosted service to track when the application has started
       services.AddHostedService<ApplicationReadyHealthCheck>();

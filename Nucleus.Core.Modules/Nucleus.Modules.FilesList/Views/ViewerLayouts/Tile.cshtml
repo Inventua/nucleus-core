@@ -2,7 +2,7 @@
 @using Nucleus.Modules.FilesList.ViewModels
 @using Nucleus.Extensions
 @Html.AddStyle("~!/Tile.css")
-<div class="FilesList flex-fill file-tiles">
+<div class="d-flex flex-column flex-fill file-tiles">
 	@foreach (var file in Model.Files)
 	{
 		<div>

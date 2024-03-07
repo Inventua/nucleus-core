@@ -3,8 +3,7 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Extensions
 @using Nucleus.Modules.FilesList.ViewModels
-@Html.AddStyle("~!/../../viewer.css")
-<ol class="FilesList">
+<ol class="d-flex flex-column">
 	@foreach (var file in Model.Files)
 	{
 		@if (file != null)

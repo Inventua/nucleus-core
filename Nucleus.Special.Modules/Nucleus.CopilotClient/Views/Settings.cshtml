@@ -5,7 +5,7 @@
 @using Nucleus.Abstractions.Models
 @Html.AddStyle("~!/../settings.css")
 <div class="nucleus-editor-panel">
-  @using (Html.BeginNucleusForm("SaveSettings", "CopilotClientAdmin", "CopilotClientSettings", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+  @using (Html.BeginNucleusForm("SaveSettings", "CopilotClientSettings", "CopilotClient", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 	{
 		<fieldset role="group" aria-labelledby="heading">
 			<h2 class="nucleus-control-panel-heading">Settings</h2>

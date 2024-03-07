@@ -12,9 +12,9 @@ To change settings for the module, click the `Settings` tab.
 {.table-25-75}
 |                   |                                                                                      |
 |-------------------|--------------------------------------------------------------------------------------|
-| Selected Folder   | Select a folder to display the list of files inside that folder.  |
+| Selected Folder   | Choose a folder to display a list of the files that it contains.  |
 | Layout            | Files can be displayed in a table, ordered list, unordered list or as tiles in two columns.  |
-| Show Modified Date| Specifies whether to display the file's last modified date on-screen.  |
-| Show Size         | Specifies whether to display the file's size on-screen.  |
-| Show Dimensions   | Specifies whether to display the file dimensions on-screen. Dimensions are only applicable to valid image files. |
+| Show Modified Date| Specifies whether to display the file's last modified date.  |
+| Show Size         | Specifies whether to display the file's size.  |
+| Show Dimensions   | Specifies whether to display the file dimensions. Dimensions are only available for image files. |
 

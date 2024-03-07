@@ -3,50 +3,47 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Extensions
 @using Nucleus.Modules.FilesList.ViewModels
-<div class="FilesList">
-	<table class="nucleus-file-system-table table table-sm">
-		<thead>
+<table class="nucleus-file-system-table table table-sm table-sticky-headers">
+	<thead>
+		<tr>
+			<th class="file-name ps-0">Name</th>
+			@if (Model.ShowModifiedDate)
+			{
+				<th class="file-modified-date">Modified Date</th>
+			}
+			@if (Model.ShowSize)
+			{
+				<th class="file-size">Size</th>
+			}
+			@if (Model.ShowDimensions)
+			{
+				<th class="file-dimensions">Dimensions</th>
+			}
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var file in Model.Files)
+		{
 			<tr>
-				<th class="file-name ps-0">Name</th>
+				<td class="file-name"><a href="@Url.FileLink(file)">@file.Name</a></td>
 				@if (Model.ShowModifiedDate)
 				{
-					<th class="file-modified-date">Modified Date</th>
+					<td class="file-modified-date">@file.DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
 				}
 				@if (Model.ShowSize)
 				{
-					<th class="file-size">Size</th>
+					<td class="file-size">@file.Size.FormatFileSize()</td>
 				}
 				@if (Model.ShowDimensions)
 				{
-					<th class="file-dimensions">Dimensions</th>
+					<td class="file-dimensions">
+						@if (file.Width > 0 && file.Height > 0)
+						{
+							@($"{file.Width} x {file.Height}")
+						}
+					</td>
 				}
 			</tr>
-		</thead>
-		<tbody>
-			@foreach (var file in Model.Files)
-			{
-				<tr>
-					<td class="file-name"><a href="@Url.FileLink(file)">@file.Name</a></td>
-					@if (Model.ShowModifiedDate)
-					{
-						<td class="file-modified-date">@file.DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-					}
-					@if (Model.ShowSize)
-					{
-						<td class="file-size">@file.Size.FormatFileSize()</td>
-					}
-					@if (Model.ShowDimensions)
-					{
-						<td class="file-dimensions">
-							@if (file.Width > 0 && file.Height > 0)
-							{
-								@($"{file.Width} x {file.Height}")
-							}
-						</td>
-					}
-				</tr>
-			}
-		</tbody>
-	</table>
-
-</div>
+		}
+	</tbody>
+</table>

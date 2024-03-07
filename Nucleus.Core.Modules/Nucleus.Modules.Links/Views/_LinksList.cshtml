@@ -4,12 +4,15 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 @Html.AddStyle("~!/../settings.css")
-<table class="table table-sm Links">
+<table class="table table-sm table-striped Links">
+  <thead>
 	<tr>
 		<th>Title</th>
 		<th>Description</th>
 		<th colspan="4"></th>
 	</tr>
+  </thead>
+  <tbody>
 	@for (int linkCount = 0; linkCount < Model.Links.Count; linkCount++)
 	{
 		var icon="";
@@ -58,4 +61,5 @@
 			</td>
 		</tr>
 	}
+  </tbody>
 </table>

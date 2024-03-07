@@ -310,6 +310,11 @@ a *
 	color: #ec1111;
 }
 
+.modal.icon-info .modal-dialog .dialog-icon 
+{
+	color: #0d6efd;
+}
+
 .modal.icon-alert .modal-dialog .dialog-icon 
 {
 	color: #ff6600;

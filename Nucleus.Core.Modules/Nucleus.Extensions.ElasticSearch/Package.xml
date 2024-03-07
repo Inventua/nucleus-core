@@ -23,7 +23,7 @@
       <file name="readme.txt" />
       <file name="license.txt" />
       <file name="settings.css" />
-      <file name="disable-private-loadcontext.json" />
+      <!--<file name="disable-private-loadcontext.json" />-->
       <folder name="Bin">
         <file name="Nucleus.Extensions.ElasticSearch.dll" />
         <file name="Nest.dll" />

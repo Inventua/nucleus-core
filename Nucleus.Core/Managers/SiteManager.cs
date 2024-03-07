@@ -20,6 +20,7 @@ namespace Nucleus.Core.Managers;
 /// </summary>
 public partial class SiteManager : ISiteManager
 {
+  // "partial" class is required by GeneratedRegex
 
   [GeneratedRegexAttribute(@"({\$guid[0-9]+})", RegexOptions.ECMAScript)]
   private static partial System.Text.RegularExpressions.Regex GuidTokenRegEx();
@@ -376,9 +377,9 @@ public partial class SiteManager : ISiteManager
   /// are not included in the export.  Simple module settings stored in <see cref="PageModule.ModuleSettings"/> are
   /// included in the template, but any data stored in module-specific tables is not included.
   /// </remarks>
-  public async Task<System.IO.MemoryStream> Export(Site site)
+  public async Task<System.IO.Stream> Export(Site site)
   {
-    System.IO.MemoryStream serializedSite = new();
+    string xmlData;
 
     Nucleus.Abstractions.Models.Export.SiteTemplate export = new()
     {
@@ -434,11 +435,14 @@ public partial class SiteManager : ISiteManager
     }
 
     // serialize the export data to XML
-    System.Xml.Serialization.XmlSerializer serializer = new(typeof(Nucleus.Abstractions.Models.Export.SiteTemplate));
-    serializer.Serialize(serializedSite, export);
+    using (System.IO.MemoryStream serializedSite = new())
+    {
+      System.Xml.Serialization.XmlSerializer serializer = new(typeof(Nucleus.Abstractions.Models.Export.SiteTemplate));
+      serializer.Serialize(serializedSite, export);
 
-    // deserialize the xml to a string for additional processing
-    string xmlData = System.Text.Encoding.UTF8.GetString(serializedSite.ToArray());
+      // deserialize the xml to a string for additional processing
+      xmlData = System.Text.Encoding.UTF8.GetString(serializedSite.ToArray());
+    }
 
     // replace id (guid) values with tokens, except for id's which refer to module definitions, permission types, container definitions and layout definitions
     MatchCollection idMatches = FindGuidRegEx().Matches(xmlData);

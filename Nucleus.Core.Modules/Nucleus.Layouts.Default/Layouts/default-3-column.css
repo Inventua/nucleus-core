@@ -36,7 +36,7 @@
 
 .LeftPane
 {
-	width: 200px;
+  flex: 1;
 	background-color: #eee;	
 }
 
@@ -52,7 +52,7 @@
 {
 	display: flex;
 	flex-direction: column;
-	flex-grow: 1;
+	flex: 4;
 	overflow: auto;
 }
 
@@ -64,8 +64,9 @@
 
 .RightPane
 {
-	width: 200px;
-	background-color: #aaa;		
+  flex: 1;
+	min-width: 12rem;
+	background-color: #eee;		
 }
 
 .BottomPane

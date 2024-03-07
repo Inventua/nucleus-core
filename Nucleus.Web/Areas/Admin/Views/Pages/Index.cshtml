@@ -1,71 +1,137 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.PageIndex
 @using Nucleus.ViewFeatures.HtmlHelpers
+@using System.Linq
 <h1 class="nucleus-control-panel-heading">Pages</h1>
 @using (Html.BeginAreaForm("Search", "Pages", "Admin", FormMethod.Post, new { @data_target = "#Page_Search_Results", @autocomplete = "off" }))
 {
-	<div class="nucleus-form-tools">
-		@Html.TextBoxFor(model => model.SearchTerm, new { @class = "h-100", @data_autopostbackevent = "keyup", @placeholder = "search", @type = "search" })
-		<input type="submit" value="&#xe8b6;" class="nucleus-material-icon btn btn-outline-secondary" />
-		<a href="@Url.Content("~/Admin/Pages/Editor")" class="btn btn-secondary" data-target="#nucleus-page-editor" accesskey="N">New Page</a>
-	</div>
-<div id="Page_Search_Results" class="nucleus-search-results-wrapper">
-	@await Html.PartialAsync("SearchResults.cshtml")
-</div>
-}
+  <div class="nucleus-form-tools">
+    @Html.TextBoxFor(model => model.SearchTerm, new { @class = "h-100", @data_autopostbackevent = "keyup", @placeholder = "search", @type = "search" })
+    <input type="submit" value="&#xe8b6;" class="nucleus-material-icon btn btn-outline-secondary" />
 
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-secondary dropdown-toggle new-page-dropdown-btn" data-bs-toggle="dropdown" accesskey="N" aria-expanded="false">
+        New Page
+      </button>
+      <ul class="dropdown-menu new-page-dropdown-menu">
+        <li>
+          <a href="@Url.AreaAction("NewPageBlank", "Pages", "Admin")" class="dropdown-item d-flex" data-target="#nucleus-page-editor" accesskey="N">
+            Blank page
+            <span class="nucleus-material-icon ms-auto">&#xe5e1;</span>
+          </a>
+        </li>
+        <li class="copy-page-disabled collapse">
+          <span class="dropdown-item disabled">Copy this page</span>
+        </li>
+        <li class="collapse copy-page-enabled">
+          <a href="@Url.AreaAction("NewPageFromCopy", "Pages", "Admin")" class="dropdown-item d-flex" data-target="form.parent()" accesskey="C">
+            Copy this page
+            <span class="nucleus-material-icon ms-auto">&#xe5e1;</span>
+          </a>
+        </li>
+        @if (Model.PageTemplates.Any())
+        {
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            @* <a href="@Url.AreaAction("NewPageFromTemplate", "Pages", "Admin")" data-target="#nucleus-page-editor" accesskey="C">New page from template</a> *@
+            <div class="dropdown-item d-flex me-3">
+              <span class="me-2">New page from template</span>
+              <span class="nucleus-material-icon ms-auto">&#xe5e1;</span>
+            </div>
+
+            <div class="dropdown-item mt-1">
+              @Html.DropDownListFor(model => model.SelectedPageTemplateFileId, Model.PageTemplates, "(select)", new { @class = "form-select page-template-select" })
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+  <div id="Page_Search_Results" class="nucleus-search-results-wrapper">
+    @await Html.PartialAsync("SearchResults.cshtml")
+  </div>
+}
 
 <div class="nucleus-index-wrapper">
-	<div class="nucleus-index-items">
-		@Html.PageMenu(Model.Pages, Model.PageId, 1, new { data_target = "#nucleus-page-editor" })
-	</div>
+  <div class="nucleus-index-items">
+    @Html.PageMenu(Model.Pages, Model.PageId, 1, new { data_target = "#nucleus-page-editor" })
+  </div>
 
-	<div id="nucleus-page-editor" class="nucleus-editor-panel"></div>
+  <div id="nucleus-page-editor" class="nucleus-editor-panel"></div>
 </div>
 
-@if (Model.PageId != Guid.Empty && Model.OpenPage)
-{
-	<script>
-		Page.LoadPartialContent(null, '@Url.Content("~/Admin/Pages/Editor?id=")' + '@Model.PageId', '#nucleus-page-editor');
-	</script>
-}
 <script>
-	// Open a page for editing
-	jQuery('.nucleus-index-wrapper').on('click', 'li[data-target="#nucleus-page-editor"] a', function (e)
-	{
-			Page.LoadPartialContent(e, '@Url.Content("~/Admin/Pages/Editor?id=")' + jQuery(this).attr('data-id'), '#nucleus-page-editor');
-	});
+  @if (Model.PageId != Guid.Empty && Model.OpenPage)
+  {
+    <text>
+    if (jQuery('.new-page-dropdown-btn').dropdown())
+    {
+      jQuery('.new-page-dropdown-btn').dropdown('hide');
+    }
+    Page.LoadPartialContent(null, '@Url.Content("~/Admin/Pages/Editor?id=")' + '@Model.PageId', '#nucleus-page-editor');
+    </text>
+  }
+    // Open a page for editing
+    jQuery('.nucleus-index-wrapper').on('click', 'li[data-target="#nucleus-page-editor"] a', function (e)
+    {
+      if (jQuery('.new-page-dropdown-btn').dropdown())
+      {
+        jQuery('.new-page-dropdown-btn').dropdown('hide');
+      }
+      Page.LoadPartialContent(e, '@Url.Content("~/Admin/Pages/Editor?id=")' + jQuery(this).attr('data-id'), '#nucleus-page-editor');
+    });
 
-	jQuery('.nucleus-index-wrapper').on('keydown', 'a', function (event)
-	{
-			// trigger click event when the user presses ENTER or space
-			if (event.which === 13 || event.which === 32)
-			{
-					jQuery(this.click());
-					event.preventDefault();
-			}
-	});
+  jQuery('.nucleus-index-wrapper').on('keydown', 'a', function (event)
+  {
+    // trigger click event when the user presses ENTER or space
+    if (event.which === 13 || event.which === 32)
+    {
+      jQuery(this.click());
+      event.preventDefault();
+    }
+  });
 
-	// Read the child pages of the item containing the "+" button
-	jQuery('.nucleus-index-wrapper').on('click', '.nucleus-get-childpages', function (e)
-	{
-			// Add a ul to contain the new pages
-			Page.LoadPartialContent(e, '@Url.AreaAction("GetChildPages", "Pages", "Admin")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+  // Read the child pages of the item containing the "+" button
+  jQuery('.nucleus-index-wrapper').on('click', '.nucleus-get-childpages', function (e)
+  {
+    // Add a ul to contain the new pages
+    Page.LoadPartialContent(e, '@Url.AreaAction("GetChildPages", "Pages", "Admin")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
 
-			// hide the "+" button
-			jQuery(this).removeClass('show');
+    // hide the "+" button
+    jQuery(this).removeClass('show');
 
-	});
+  });
 
-	// Hide the child pages of the item containing the "-" button
-	jQuery('.nucleus-index-wrapper').on('click', '.nucleus-hide-childpages', function (e)
-	{
-			// hide the "-" button
-			jQuery(this).removeClass('show');
+  // Hide the child pages of the item containing the "-" button
+  jQuery('.nucleus-index-wrapper').on('click', '.nucleus-hide-childpages', function (e)
+  {
+    // hide the "-" button
+    jQuery(this).removeClass('show');
 
-			// show the "+" button
-			jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
+    // show the "+" button
+    jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
 
-			jQuery(this).closest('li').find('ul').remove();
-	});
+    jQuery(this).closest('li').find('ul').remove();
+  });
 
+  jQuery('.new-page-dropdown-btn').on('show.bs.dropdown', function (event)
+  {
+    if (jQuery('#Page_Id').length === 0 || jQuery('#Page_Id').val() === '@Guid.Empty.ToString()')
+    {
+      jQuery('.copy-page-disabled').addClass('show');
+      jQuery('.copy-page-enabled').removeClass('show');
+    }
+    else
+    {
+      jQuery('.copy-page-disabled').removeClass('show');
+      jQuery('.copy-page-enabled').addClass('show');
+      var href = new URL(jQuery('.copy-page-enabled a').attr('href'), window.location.origin);
+      href.search = 'sourcePageId=' + jQuery('#Page_Id').val();
+      jQuery('.copy-page-enabled a').attr('href', href);
+    }
+  });
+
+  jQuery('.page-template-select').on('change', function (event) 
+  { 
+    Page.LoadPartialContent(event, '@Url.AreaAction("NewPageFromTemplate", "Pages", "Admin")' + '?templateId=' + jQuery('.page-template-select').val(), '.nucleus-adminpage');
+  });
 </script>

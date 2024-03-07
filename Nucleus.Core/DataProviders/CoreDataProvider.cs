@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Models.Paging;
 using Nucleus.Extensions;
 using Nucleus.Abstractions.Search;
+using Nucleus.Abstractions;
 
 namespace Nucleus.Core.DataProviders;
 
@@ -1542,7 +1543,7 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
       {
         await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM UserRoles WHERE RoleId={role.Id}");
         await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM Permissions WHERE RoleId={role.Id}");
-
+                
         this.Context.Remove(role);
         await this.Context.SaveChangesAsync();
 
@@ -2135,6 +2136,14 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
     }
   }
 
+  public async Task TruncateScheduledTaskHistory(Guid scheduledTaskId, int keepHistoryCount)
+  {
+    await this.Context.ScheduledTaskHistory
+      .Where(history => history.ScheduledTaskId == scheduledTaskId)
+      .OrderByDescending(history => history.StartDate)
+      .Skip(keepHistoryCount)
+      .ExecuteDeleteAsync();
+  }
   #endregion
 
   #region "    IFileSystemDataProvider    "
@@ -2804,7 +2813,10 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
 
   public async Task DeleteSearchIndexHistory(Guid siteId)
   {
-    await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM SearchIndexHistory WHERE SiteId={siteId}");
+    await this.Context.SearchIndexHistory
+      .Where(history => history.SiteId == siteId)
+      .ExecuteDeleteAsync();
+    //await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM SearchIndexHistory WHERE SiteId={siteId}");
   }
   #endregion
 

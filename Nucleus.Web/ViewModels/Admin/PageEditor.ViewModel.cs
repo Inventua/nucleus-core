@@ -19,7 +19,7 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public string UseLayout { get; set; }
 
-		public PageEditorModes PageEditorMode { get; set; }
+    public PageEditorModes PageEditorMode { get; set; } = PageEditorModes.Default;
 
 		public Boolean CanDeletePage { get; set; }
 
@@ -35,9 +35,10 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public IEnumerable<LayoutDefinition> Layouts { get; set; } 
 
-		public IEnumerable<ContainerDefinition> Containers { get; set; }
+		public IEnumerable<ContainerDefinition> PageContainers { get; set; }
+    public IEnumerable<ContainerDefinition> ModuleContainers { get; set; }
 
-		public Guid SelectedPageRoleId { get; set; }
+    public Guid SelectedPageRoleId { get; set; }
 
 		public Guid SelectedModuleRoleId { get; set; }
 

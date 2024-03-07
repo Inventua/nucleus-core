@@ -9,6 +9,7 @@ To manage mail templates, after logging in as a system administrator or site adm
 |                  |                                                                                      |
 |------------------|--------------------------------------------------------------------------------------|
 | Name             | A name for your template.  This is for your reference only, it is displayed in the control panel and anywhere that an email template can be selected.  |
+| Type             | Specifies the email template type. This selection controls syntax suggestions in the template body editor, and can be used to filter available values in settings pages which select an email template. |
 | Subject          | Specifies the subject for emails generated using the template.  The subject can contain tokens and script (see below).  |
 | Body             | Specifies the body for emails generated using the template.  The body can contain tokens and script (see below).  |
 
@@ -72,5 +73,4 @@ Unlike .Net Core ASP.net Razor:
 - You can't use Html Helpers, because the Razor code is not executed as part of a Http request.
 - You can't use Tag Helpers.
 - You can't use @model, @using or any other directives.  The `System`, `System.Collections.Generic`, `System.Linq`, `System.Text`, 
-`Nucleus.Extensions`, `Nucleus.Abstractions`, and `Nucleus.Abstractions.Models` namespaces are automatically available.
-
+`System.Security.Claims`, `Nucleus.Extensions`, `Nucleus.Abstractions`, and `Nucleus.Abstractions.Models` namespaces are automatically available.

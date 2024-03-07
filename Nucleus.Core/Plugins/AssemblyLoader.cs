@@ -59,11 +59,11 @@ namespace Nucleus.Core.Plugins
 
 			extensionFolder = GetExtensionFolderName(pluginPath);
 
-			// special case:  If a file named disable-private-loadcontext.json exists in the extension root, load the assemblies into the
-			// default context.  This is a special workaround for cases where .net components do not work properly in a private load context.
+			// special case:  If a file named disable-private-loadcontext.json exists in the extension root, load the extension's assemblies into the
+			// default context.  This was a special workaround for cases where .net components do not work properly in a private load context.
 			// https://github.com/dotnet/runtime/issues/1388		 https://github.com/dotnet/runtime/pull/58932
-			// While the original issue in the XmlSerializer was fixed for .NET 6, the extension-level option to opt-out of private load contexts
-			// is still required by the Elastic Search components, as it has the same issue. 
+			// The original issue in the XmlSerializer was fixed for .NET 6, and this option is no longer in use by any modules, but remains present in case
+      // it is needed for some reason in the future. 
 			if (System.IO.File.Exists(System.IO.Path.Combine(Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER, extensionFolder, "disable-private-loadcontext.json")))
 			{
 				extensionFolder = "";
@@ -169,9 +169,9 @@ namespace Nucleus.Core.Plugins
 		/// <param name="assemblyName">Requested assenmbly.</param>
 		/// <remarks>
 		/// This code resolves module assemblies from the PluginLoadContext when the Nucleus.Core.Layout.ModuleContentRenderer 
-		/// calls actionInvoker.InvokeAsync().  Without this handler, .InvokeAsync throws a System.IO.FileNotFoundException: 
-		/// Could not load file or assembly exception because it is using one of the assembly loading methods that are 
-		/// not supported by AssemblyLoadContext - like GetType(string typeName), when typeName includes a assembly-qualified type 
+		/// calls actionInvoker.InvokeAsync().  Without this handler, .InvokeAsync throws "System.IO.FileNotFoundException: Could 
+		/// not load file or assembly" because it is using one of the assembly loading methods that are not supported 
+		/// by AssemblyLoadContext - like GetType(string typeName), when typeName includes a assembly-qualified type 
 		/// reference.  If the requested context isn't .Default or the current context is null or Default,
 		/// this code does nothing (returns null) and allows .net to do the work as normal.
 		/// </remarks>

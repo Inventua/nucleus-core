@@ -116,6 +116,13 @@
 	box-shadow: 0 0 0 0.25rem rgba(80, 80, 80, 0.5);
 }
 
+.nucleus-admin-index-spinner
+{
+  width: 5rem;
+  height: 5rem;
+  border-width: 0.5rem;
+}
+
 .nucleus-admin-search
 {
 	position: absolute;
@@ -673,7 +680,7 @@ ul.nucleus-control-panel-items button
 }
 
 /* page-specific styles */
-.nucleus-adminpage .nucleus-page-editor .page-link-type
+.nucleus-adminpage #nucleus-page-editor .page-link-type
 {
   width: 14rem;
 }

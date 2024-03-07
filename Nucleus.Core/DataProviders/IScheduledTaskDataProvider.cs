@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.TaskScheduler;
 using Nucleus.Data.Common;
+using Org.BouncyCastle.Utilities.Collections;
 
 namespace Nucleus.Core.DataProviders
 {
@@ -27,6 +28,8 @@ namespace Nucleus.Core.DataProviders
 		abstract Task SaveScheduledTaskHistory(ScheduledTaskHistory history);
 		abstract Task<List<ScheduledTaskHistory>> ListScheduledTaskHistory(Guid scheduledTaskId);
 		abstract Task DeleteScheduledTaskHistory(ScheduledTaskHistory history);
-
-	}
+    abstract Task TruncateScheduledTaskHistory(Guid scheduledTaskId, int keepHistoryCount);
+   
+  }
 }
+

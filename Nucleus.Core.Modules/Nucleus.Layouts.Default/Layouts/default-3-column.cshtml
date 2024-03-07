@@ -6,16 +6,16 @@
 		@await Html.RenderPaneAsync("BannerPane")
 	</div>
 
-	<div class="ContentWrapper" data-track-scroll="content-wrapper">
-		<div class="LeftPane">
+	<div class="ContentWrapper">
+    <div class="LeftPane" suppress-empty="true">
 			@await Html.RenderPaneAsync("LeftPane")
 		</div>
 
-		<div class="ContentPane">
+    <div class="ContentPane" data-track-scroll="content-wrapper">
 			@await Html.RenderPaneAsync("ContentPane")
 		</div>
 
-		<div class="RightPane">
+    <div class="RightPane" suppress-empty="true">
 			@await Html.RenderPaneAsync("RightPane")
 		</div>
 	</div>

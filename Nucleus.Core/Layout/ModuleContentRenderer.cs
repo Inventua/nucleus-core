@@ -265,7 +265,7 @@ namespace Nucleus.Core.Layout
         formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe3c9;", "Edit Content/Settings", urlHelper.Content("~/Admin/Pages/EditModule"), null));
       }
 
-      formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe8b8;", "Layout and Permissions Settings", urlHelper.Content("~/Admin/Pages/EditModuleCommonSettings"), null));
+      formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildEditButton("&#xe8b8;", "Layout and Permissions Settings", urlHelper.Content("~/Admin/Pages/EditModuleCommonSettings"), "btn-success", null));
 
       // add the "move" drag source button
       formBuilder.InnerHtml.AppendHtml(moduleInfo.BuildMoveButton("&#xe89f;", "Drag and drop to move this module", null));

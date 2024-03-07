@@ -1,0 +1,68 @@
+﻿.copilot-responses
+{
+  border: solid 2px black;
+  min-height: 10rem;
+}
+
+.copilot-responses > div
+{
+  
+}
+
+.copilot-question, .copilot-answer
+{
+  display: flex;
+  align-items:center
+}
+
+.copilot-content
+{
+  display: flex;
+  flex-direction: column;
+}
+
+.copilot-content p, .copilot-content ol, .copilot-content ul
+{
+  margin-bottom: 0.5rem;
+}
+
+.copilot-content a
+{
+  margin-right: 0.5rem;
+}
+
+.copilot-question
+{
+  color: green;
+  border: dotted 1px green;
+  margin: 0.5rem 0.5rem 0.5rem 5rem ;
+}
+
+.copilot-question .copilot-icon:before, .copilot-answer .copilot-icon:before
+{
+  font-family: 'Material Icons';
+  font-size: 2rem;
+  margin-right: 1rem;
+}
+
+.copilot-icon
+{
+  margin-bottom: auto; 
+}
+
+.copilot-question .copilot-icon:before
+{
+  content: '\e94c';
+}
+
+.copilot-answer
+{
+  color: orange;
+  border: dotted 1px orange;
+  margin: 0.5rem 5rem 0.5rem 0.5rem; 
+}
+
+.copilot-answer .copilot-icon:before
+{
+  content: '\f06c';
+}

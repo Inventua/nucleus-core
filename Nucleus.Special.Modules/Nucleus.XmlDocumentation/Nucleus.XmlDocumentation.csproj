@@ -24,7 +24,6 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <None Remove="disable-private-loadcontext.json" />
     <None Remove="license.txt" />
     <None Remove="viewer.css" />
     <None Remove="package.xml" />
@@ -39,7 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="disable-private-loadcontext.json" />
     <Content Include="license.txt" />
     <Content Include="viewer.css" />
     <Content Include="package.xml" />

@@ -903,6 +903,9 @@ function _Page()
       errorData.statusCode = request.status;
     }
 
+    // clear file inputs, otherwise a new file selection won't trigger a change event
+    target.find('input[type=file]').val('');
+
     _cancelProgressIndicator();
     _removeProgressIndicator(source);
     _dialog(errorData.title, errorData.detail, errorData.icon ?? 'error')
@@ -944,6 +947,10 @@ function _Page()
         case 'alert':
           iconClass = ' icon-alert';
           iconElement = '<div class="dialog-icon"><span class="nucleus-material-icon">&#xe7f4;</span></div>';
+          break;
+        case 'info':
+          iconClass = ' icon-info';
+          iconElement = '<div class="dialog-icon"><span class="nucleus-material-icon">&#xe88e;</span></div>';
           break;
         case 'error':
           iconClass = ' icon-error';
@@ -1032,60 +1039,66 @@ function _Page()
   {
     _preRender(target, source, data, url, status, request);
 
-    var useUrl = _getUseUrl(event);
-    if (typeof useUrl !== 'undefined' && useUrl !== null)
+    if (request.status === 204)  
     {
-      var state =
-      {
-        url: useUrl
-      };
-      window.history.pushState(state, '', useUrl);
-    }
-
-    if (typeof (request.responseJSON) !== 'undefined' && typeof (request.responseJSON.message) !== 'undefined')
-    {
-      _cancelProgressIndicator();
-      _removeProgressIndicator(source);
-      _dialog(request.responseJSON.title, request.responseJSON.message, request.responseJSON.icon);
+      // 204 = No Content.  Nothing to render
     }
     else
     {
-      // response is HTML content
-
-      // If the content is a full HTML page, ignore target.  This is normally when a "302 redirect" is returned.  Browsers automatically
-      // follow the redirect so we don't have a way to know that it was a redirect.
-      if (data.startsWith('<!DOCTYPE'))
+      var useUrl = _getUseUrl(event);
+      if (typeof useUrl !== 'undefined' && useUrl !== null)
       {
-        document.open();
-        document.write(data);
-        document.close();
+        var state =
+        {
+          url: useUrl
+        };
+        window.history.pushState(state, '', useUrl);
+      }
+
+      if (typeof (request.responseJSON) !== 'undefined' && typeof (request.responseJSON.message) !== 'undefined')
+      {
+        _cancelProgressIndicator();
+        _removeProgressIndicator(source);
+        _dialog(request.responseJSON.title, request.responseJSON.message, request.responseJSON.icon);
       }
       else
       {
-        // keep passwords 
-        var passwords = new Array();
-        target.find('input[type=password]').each(function (index, value)
+        // response is HTML content
+
+        // If the content is a full HTML page, ignore target.  This is normally when a "302 redirect" is returned.  Browsers automatically
+        // follow the redirect so we don't have a way to know that it was a redirect.
+        if (data.startsWith('<!DOCTYPE'))
         {
-          var element = jQuery(value);
-          passwords[index] = new Object({ name: element.prop('name'), value: element.val() });
-        });
-
-        // write new content
-        target
-          .empty()
-          .html(data)
-          .attr('data-src', url);
-
-        // restore passwords
-        jQuery(passwords).each(function (index, value)
+          document.open();
+          document.write(data);
+          document.close();
+        }
+        else
         {
-          target.find('input[type=password][name="' + passwords[index].name + '"]').val(passwords[index].value);
-        });
+          // keep passwords 
+          var passwords = new Array();
+          target.find('input[type=password]').each(function (index, value)
+          {
+            var element = jQuery(value);
+            passwords[index] = new Object({ name: element.prop('name'), value: element.val() });
+          });
 
-        passwords = null;
+          // write new content
+          target
+            .empty()
+            .html(data)
+            .attr('data-src', url);
+
+          // restore passwords
+          jQuery(passwords).each(function (index, value)
+          {
+            target.find('input[type=password][name="' + passwords[index].name + '"]').val(passwords[index].value);
+          });
+
+          passwords = null;
+        }
       }
     }
-
     _postRender(target, source, data, status, request);
     jQuery(Page).trigger("ready", [{ page: Page, target: target, data: data, url: url, event: event, status: status, request: request }]);
     _initializeControls(target, data, url, status, request);
@@ -1224,6 +1237,12 @@ function _Page()
       jQuery(frameElement).hide();
       window.parent.document.dispatchEvent(new CustomEvent('Refresh'));
       return;
+    }
+
+    // clear file inputs, otherwise a new file selection won't trigger a change event
+    if (target !== null)
+    {
+      target.find('input[type=file]').val('');
     }
 
     // set the text and disabled attribute for <option> elements with a text value of "-".  We need to do this in .setTimeout to give the 

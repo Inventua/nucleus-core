@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <None Remove="disable-private-loadcontext.json" />
-    <None Remove="LICENSE.txt" />
+    <None Remove="license.txt" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="settings.css" />

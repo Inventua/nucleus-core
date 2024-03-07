@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+	<TargetFramework>net8.0</TargetFramework>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
@@ -21,17 +21,15 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <None Remove="license.txt" />
-    <None Remove="viewer.css" />
-    <None Remove="package.xml" />
-    <None Remove="readme.txt" />
+	<None Remove="license.txt" />
+	<None Remove="package.xml" />
+	<None Remove="readme.txt" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="license.txt" />
-    <Content Include="viewer.css" />
-    <Content Include="package.xml" />
-    <Content Include="readme.txt" />
+	<Content Include="license.txt" />
+	<Content Include="package.xml" />
+	<Content Include="readme.txt" />
   </ItemGroup>
 
 	<ItemGroup>

@@ -1,0 +1,21 @@
+﻿@model Nucleus.CopilotClient.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~!/../settings.css")
+<div class="nucleus-editor-panel">
+  @using (Html.BeginNucleusForm("SaveSettings", "CopilotClientAdmin", "CopilotClientSettings", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+	{
+		<fieldset role="group" aria-labelledby="heading">
+			<h2 class="nucleus-control-panel-heading">Settings</h2>
+      <SettingsControl caption="Token Endpoint" helptext="Enter your Copilot token endpoint (url).  You can get this value from Copilot Studio, in Settings / Channels / Mobile app.">
+				@Html.TextBoxFor(model => model.TokenEndpoint)
+			</SettingsControl>
+		</fieldset>
+
+		<div class="nucleus-form-buttonrow">
+      @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "CopilotClientSettings", "CopilotClient"), new { })
+		</div>
+	}
+</div>

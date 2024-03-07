@@ -15,20 +15,38 @@ namespace Nucleus.Extensions
 	/// </summary>
 	public static class PageModuleExtensions
 	{
-		/// <summary>
+
+    /// <summary>
+    /// Create an edit button for the specified module. 
+    /// </summary>
+    /// <param name="moduleInfo"></param>
+    /// <param name="text"></param>
+    /// <param name="title"></param>
+    /// <param name="formaction"></param>
+    /// <param name="attributes"></param>
+    /// <returns></returns>
+    /// <internal/>
+    public static HtmlString BuildEditButton(this PageModule moduleInfo, string text, string title, string formaction, IDictionary<string, string> attributes)
+    {
+      return BuildEditButton(moduleInfo, text, title, formaction, "btn-primary", attributes);
+    }
+
+    /// <summary>
 		/// Create an edit button for the specified module. 
 		/// </summary>
 		/// <param name="moduleInfo"></param>
 		/// <param name="text"></param>
 		/// <param name="title"></param>
 		/// <param name="formaction"></param>
+    /// <param name="buttonClass"></param>
 		/// <param name="attributes"></param>
 		/// <returns></returns>
-		public static HtmlString BuildEditButton(this PageModule moduleInfo, string text, string title, string formaction, IDictionary<string, string> attributes)
+    /// <internal/>
+		public static HtmlString BuildEditButton(this PageModule moduleInfo, string text, string title, string formaction, string buttonClass, IDictionary<string, string> attributes)
 		{
 			TagBuilder editControlBuilder = new("button");
 			editControlBuilder.InnerHtml.SetContent(text);
-			editControlBuilder.Attributes.Add("class", "nucleus-material-icon btn btn-primary");
+			editControlBuilder.Attributes.Add("class", $"nucleus-material-icon btn {buttonClass}");
 			editControlBuilder.Attributes.Add("title", title);
 			editControlBuilder.Attributes.Add("type", "button");
 			editControlBuilder.Attributes.Add("data-frametarget", ".nucleus-modulesettings-frame");

@@ -122,13 +122,21 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="page"></param>
 		public Task Save(Site site, Page page);
 
+    /// <summary>
+    /// Export the specified <see cref="Page"/> as XML.
+    /// </summary>
+    /// <param name="page"></param>
+    /// <remarks>
+    /// Creates a page template which can be used to create new pages.
+    /// </remarks>
+    public Task<System.IO.Stream> Export(Page page);
 
-		/// <summary>
-		/// Update the <see cref="Page.SortOrder"/> of the page module specifed by id by swapping it with the next-highest <see cref="Page.SortOrder"/>.
-		/// </summary>
-		/// <param name="site"></param>
-		/// <param name="pageId"></param>
-		public Task MoveDown(Site site, Guid pageId);
+    /// <summary>
+    /// Update the <see cref="Page.SortOrder"/> of the page module specifed by id by swapping it with the next-highest <see cref="Page.SortOrder"/>.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <param name="pageId"></param>
+    public Task MoveDown(Site site, Guid pageId);
 
 		/// <summary>
 		/// Update the <see cref="Page.SortOrder"/> of the page module specifed by id by swapping it with the previous <see cref="Page.SortOrder"/>.
@@ -206,5 +214,11 @@ namespace Nucleus.Abstractions.Managers
 		/// <returns></returns>
 		public Task<Boolean> CopyPermissionsToDescendants(Site site, Page page, ClaimsPrincipal user, CopyPermissionOperation operation);
 
+    /// <summary>
+    /// Parse a page template.
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <returns></returns>
+    public Task<Nucleus.Abstractions.Models.Export.PageTemplate> ParseTemplate(System.IO.Stream stream);
   }
 }

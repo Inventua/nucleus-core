@@ -7,7 +7,7 @@
 {
 	Layout = Model.UseLayout;
 }
-@using (Html.BeginAreaForm("SaveModuleCommonSettings", "Pages", "Admin", FormMethod.Post, new { @data_target = "form.parent()", @autocomplete = "off" }))
+@using (Html.BeginAreaForm("SaveModuleCommonSettings", "Pages", "Admin", FormMethod.Post, new { @class = "d-flex overflow-auto flex-1", @data_target = "form.parent()", @autocomplete = "off" }))
 {
 	@Html.HiddenFor(model => model.Page.Id)
 	@Html.HiddenFor(model => model.PageEditorMode)
@@ -43,8 +43,8 @@
 					<SettingsControl caption="Pane" helptext="Select the pane to display this module in.  Different layouts have different available panes and pane names.">
 						@Html.DropDownListFor((model) => model.Module.Pane, new SelectList(Model.AvailablePanes))
 					</SettingsControl>
-					<SettingsControl caption="Container" helptext="Select the container for the module, or select '(default)' to use the default layout for this page.">
-						@Html.DropDownListFor((model) => model.Module.ContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
+					<SettingsControl caption="Container" helptext="Select the container for the module, or select '(page default)' to use the default layout for this page.">
+						@Html.DropDownListFor((model) => model.Module.ContainerDefinition.Id, new SelectList(Model.ModuleContainers, "Id", "FriendlyName"))
 					</SettingsControl>
 					<SettingsControl caption="Style Classes" helptext="Applies additional CSS classes to the container.  Separate additional CSS classes with spaces.">
 						@Html.TextBoxFor((model) => model.Module.Style)
@@ -53,7 +53,7 @@
 			</fieldset>
 		</TabPanel>
 		<TabPanel id="module-permissions">
-			<fieldset role="group" aria-label="Permissions">
+      <fieldset role="group" aria-label="Module Permissions" class="d-flex overflow-auto flex-1">
 				<div class="nucleus-form-tools">
 					@Html.DropDownListFor(model => model.SelectedModuleRoleId, Model.AvailableModuleRoles, new { @class = "flex-fill" })
 					<input type="submit" formaction="@Url.AreaAction("AddModulePermissionRole", "Pages", "Admin")?PageEditorMode=@Model.PageEditorMode" value="Add Role" data-target="form.parent()" class="btn btn-secondary" />

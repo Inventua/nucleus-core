@@ -24,6 +24,7 @@
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="viewer.js" />
+    <None Remove="viewer.min.js" />
     <None Remove="Views\Email Template Sample.cshtml" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
@@ -34,6 +35,7 @@
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
     <Content Include="viewer.js" />
+    <Content Include="viewer.min.js" />
     <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />
   </ItemGroup>

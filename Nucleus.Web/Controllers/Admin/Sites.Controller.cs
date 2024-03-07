@@ -116,8 +116,8 @@ namespace Nucleus.Web.Controllers.Admin
 		public async Task<ActionResult> ExportSite(Guid siteId)
 		{
 			Site site = await this.SiteManager.Get(siteId);
-			System.IO.MemoryStream export = await this.SiteManager.Export(site);
-			return File(export.ToArray(), "text/xml", $"site-{site.Name}.xml");
+			System.IO.Stream export = await this.SiteManager.Export(site);
+			return File(export, "text/xml", $"site-{site.Name}.xml");
 		}
 
 
@@ -275,7 +275,7 @@ namespace Nucleus.Web.Controllers.Admin
 				viewModel.SelectedIconFile.Parent = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.SelectedCssFile.Parent.Id);
 				using (System.IO.Stream fileStream = cssFile.OpenReadStream())
 				{
-					viewModel.SelectedCssFile = await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedIconFile.Provider, viewModel.SelectedCssFile.Parent.Path, cssFile.FileName, fileStream, false);
+					viewModel.SelectedCssFile = await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedIconFile.Provider, viewModel.SelectedCssFile.Parent.Path ?? "/", cssFile.FileName, fileStream, true);
 				}
 			}
 			else

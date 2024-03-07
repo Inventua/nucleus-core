@@ -1,5 +1,5 @@
 ﻿@model Nucleus.Abstractions.Layout.ContainerContext
 @Html.AddStyle("~/Shared/Containers/default.css")
-<div class="container-default">
+<div class="container-default" suppress-empty="true">
 	@Model.Content
 </div>

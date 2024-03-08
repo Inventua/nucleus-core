@@ -9,11 +9,13 @@
       var plugins;
       var toolbar;
       var external_plugins;
+      var styles;
+      var formats;
 
       if (isAdminMode)
       {
         plugins = 'code link lists table'
-        toolbar = 'code | undo redo | blocks | table | bold italic strikethrough | link pages unlink | images | alignleft aligncenter alignright alignjustify | bullist numlist | hr | removeformat';
+        toolbar = 'code | undo redo | styles | table | bold italic strikethrough | link pages unlink | images | alignleft aligncenter alignright alignjustify | bullist numlist | hr | removeformat';
         external_plugins = {
           pages: '../Nucleus/tinymce.pages.min.js',
           images: '../Nucleus/tinymce.images.min.js'
@@ -22,9 +24,29 @@
       else
       {
         plugins = 'link lists'
-        toolbar = 'code | undo redo | blocks | bold italic strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist | hr | removeformat';
+        toolbar = 'code | undo redo | styles | bold italic strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist | hr | removeformat';
         external_plugins = {};
-      }
+      }           
+
+      // make the <mark> element available to styles
+      formats =
+      {
+        mark: { inline: 'mark' }
+      };
+
+      // define which styles can be selected
+      styles = [
+        { title: 'Format', selector: '*' },     // this is a trick to make the toolbar label always say "format".  TinyMCE default bahavior is to display the format of the selection.
+        { title: 'Heading 1', format: 'h1' },
+        { title: 'Heading 2', format: 'h2' },
+        { title: 'Heading 3', format: 'h3' },
+        { title: 'Heading 4', format: 'h4' },
+        { title: 'Heading 5', format: 'h5' },
+        { title: 'Heading 6', format: 'h6' },
+        { title: 'Pre', format: 'pre' },
+        { title: 'Code', format: 'code' },
+        { title: 'Mark', format: 'mark' }        
+      ];
 
       // Prevent Bootstrap dialog from blocking focusin.  https://www.tiny.cloud/docs/integrations/bootstrap/
       document.addEventListener('focusin', (e) =>
@@ -60,7 +82,8 @@
         paste_data_images: true,
         paste_as_text: true,
         external_plugins: external_plugins,
-        block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Preformatted=pre; Code=code'
+        style_formats: styles,
+        formats: formats
       });
     });
   }

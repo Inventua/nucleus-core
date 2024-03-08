@@ -3,7 +3,6 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
-@Html.AddStyle("~!/../settings.css")
 <h1 class="nucleus-modal-caption">Files List Settings</h1>
 @using (Html.BeginNucleusForm("Settings", "FilesListSettings", "FilesList", FormMethod.Post, new { @enctype = "multipart/form-data", @data_target = "form.parent()" }))
 {
@@ -19,16 +18,16 @@
 			@Html.DropDownListFor(model => model.Layout, new SelectList(Model.Layouts))
 		</SettingsControl>
 
-    <div class="files-list-settings-showcolumns d-flex gap-5 mt-4">
-			<SettingsControl caption="Show Modified Date?" helptext="Specifies whether to display the file last modified date." class="inner-inline">
+    <div class="nucleus-flex-fields colimn-gap-5 mt-4">
+      <SettingsControl caption="Show Modified Date?" rendermode="LabelLast" class="inner-inline mt-auto" helptext="Specifies whether to display the file last modified date." class="inner-inline">
 				@Html.CheckBoxFor(model => model.ShowModifiedDate, new { @class = "ToggleSwitch" })
 			</SettingsControl>
 
-			<SettingsControl caption="Show Size?" helptext="Specifies whether to display the file size." class="inner-inline">
+      <SettingsControl caption="Show Size?" rendermode="LabelLast" class="inner-inline mt-auto" helptext="Specifies whether to display the file size." class="inner-inline">
 				@Html.CheckBoxFor(model => model.ShowSize, new { @class = "ToggleSwitch" })
 			</SettingsControl>
 
-			<SettingsControl caption="Show Dimensions?" helptext="Specifies whether to display the dimensions of image files." class="inner-inline">
+      <SettingsControl caption="Show Dimensions?" rendermode="LabelLast" class="inner-inline mt-auto" helptext="Specifies whether to display the dimensions of image files." class="inner-inline">
 				@Html.CheckBoxFor(model => model.ShowDimensions, new { @class = "ToggleSwitch" })
 			</SettingsControl>
 		</div>

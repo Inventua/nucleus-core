@@ -68,5 +68,5 @@ namespace Nucleus.ViewFeatures.ViewModels
 	
 
 
-	}
+  }
 }

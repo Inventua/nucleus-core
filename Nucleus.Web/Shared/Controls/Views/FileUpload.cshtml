@@ -1,12 +1,15 @@
 ﻿@model Nucleus.ViewFeatures.ViewModels.FileUpload
 @if (Model.Enabled)
 {
-	<span>
+  <span>
+    @Html.UploadButton(Model.ControlName, Model.Text, Model.Filter, false, @Url.NucleusAction(@Model.ActionName, @Model.ControllerName, @Model.AreaName, @Model.ExtensionName), "", Model.CssClass)
+  </span>
+	@* <span>
     <label class="@Model.CssClass">
 			<span class="nucleus-material-icon me-1">&#xe2c6</span> @Model.Text
 			<input type="file" name="@Model.ControlName" class="collapse" formaction="@Url.NucleusAction(@Model.ActionName, @Model.ControllerName, @Model.AreaName, @Model.ExtensionName)" accept="@Model.Filter" >			
 		</label>
-	</span>
+	</span> *@
 
 	<ProgressBar caption="Uploading file ..." class="UploadProgress"></ProgressBar>
 }

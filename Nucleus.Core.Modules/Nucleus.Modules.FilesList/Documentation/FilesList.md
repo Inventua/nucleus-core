@@ -1,9 +1,10 @@
 ## Files List module
-The files list module displays a list of downloadable files from a selected folder. Browsing permissions of the source folder is checked before displaying the list of files.
+The files list module displays a list of downloadable files from a selected folder. The end user must have "Browse" permission for the 
+source folder.  If the user does not have permission to browse the files, or there are no files in the folder, nothing is displayed.  The 
+displayed files are restricted to the selected folder - the module does not display sub-folders or their contents and does not provide 
+folder navigation controls.
 
 ![Files List Module Screenshot](files-list.png)
-
-To change settings for the module, click the `Settings` tab.
 
 ![Settings](files-list-settings.png)
 
@@ -12,9 +13,9 @@ To change settings for the module, click the `Settings` tab.
 {.table-25-75}
 |                   |                                                                                      |
 |-------------------|--------------------------------------------------------------------------------------|
-| Selected Folder   | Select a folder to display the list of files inside that folder.  |
+| Selected Folder   | Choose a folder to display a list of the files that it contains.  |
 | Layout            | Files can be displayed in a table, ordered list, unordered list or as tiles in two columns.  |
-| Show Modified Date| Specifies whether to display the file's last modified date on-screen.  |
-| Show Size         | Specifies whether to display the file's size on-screen.  |
-| Show Dimensions   | Specifies whether to display the file dimensions on-screen. Dimensions are only applicable to valid image files. |
+| Show Modified Date| Specifies whether to display each file's last modified date.  |
+| Show Size         | Specifies whether to display each file's size.  |
+| Show Dimensions   | Specifies whether to display image dimensions (width and height). Dimensions are only available for image files. |
 

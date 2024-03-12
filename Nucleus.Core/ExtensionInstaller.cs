@@ -23,7 +23,7 @@ namespace Nucleus.Core
 		private ZipArchive Archive { get; }
 		private Stream ArchiveStream { get; }
 		private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
-		private Abstractions.Models.Extensions.package Package { get; set; }
+		private Abstractions.Models.Extensions.Package Package { get; set; }
 		private ILogger<IExtensionManager> Logger { get; }
 
 		public Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary ModelState { get; } = new() { MaxAllowedErrors = int.MaxValue};
@@ -43,7 +43,6 @@ namespace Nucleus.Core
 		internal ExtensionInstaller(Stream input, IExtensionManager extensionManager, ILogger<IExtensionManager> logger, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
 		{
 			this.FolderOptions = folderOptions;
-
 			this.ArchiveStream = new MemoryStream();
 			input.CopyTo(this.ArchiveStream);
 			this.ArchiveStream.Position = 0;
@@ -62,7 +61,7 @@ namespace Nucleus.Core
 		/// <remarks>
 		/// This constructor is called by the <see cref="ExtensionManager"/> class.  
 		/// </remarks>
-		internal ExtensionInstaller(Abstractions.Models.Extensions.package package, IExtensionManager extensionManager, ILogger<IExtensionManager> logger, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
+		internal ExtensionInstaller(Abstractions.Models.Extensions.Package package, IExtensionManager extensionManager, ILogger<IExtensionManager> logger, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions)
 		{
 			this.FolderOptions = folderOptions;
 			this.Package = package;
@@ -184,15 +183,15 @@ namespace Nucleus.Core
 		/// Parse the manifest and return it as a package object.
 		/// </summary>
 		/// <returns></returns>
-		public async Task<Abstractions.Models.Extensions.package> GetPackage()
+		public async Task<Abstractions.Models.Extensions.Package> GetPackage()
 		{
 			if (this.Package == null)
 			{
 				System.IO.Stream manifestStream = await GetFileStream(IExtensionManager.PACKAGE_MANIFEST_FILENAME);
-				System.Xml.Serialization.XmlSerializer serializer = new(typeof(Abstractions.Models.Extensions.package));
+				System.Xml.Serialization.XmlSerializer serializer = new(typeof(Abstractions.Models.Extensions.Package));
 
 				manifestStream.Position = 0;
-				this.Package = (Abstractions.Models.Extensions.package)serializer.Deserialize(manifestStream);
+				this.Package = (Abstractions.Models.Extensions.Package)serializer.Deserialize(manifestStream);
 			}
 
 			return this.Package;
@@ -207,32 +206,32 @@ namespace Nucleus.Core
 			// manifest is valid, extract data
 			if (await this.IsManifestValid())
 			{
-				Abstractions.Models.Extensions.package package = await GetPackage();
+				Abstractions.Models.Extensions.Package package = await GetPackage();
 
 				if (this.IsPackageValid(package))
-				{					
-					foreach (Nucleus.Abstractions.Models.Extensions.component component in package.components)
+				{
+          foreach (Nucleus.Abstractions.Models.Extensions.Component component in package.components)
 					{
 						// install the files
 						
 						// top level files
-						foreach (Nucleus.Abstractions.Models.Extensions.file file in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.file>())
+						foreach (Nucleus.Abstractions.Models.Extensions.FileDefinition file in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.FileDefinition>())
 						{
 							CopyFile(component.folderName, "", file);
 						}
 
-						foreach (Nucleus.Abstractions.Models.Extensions.folder folder in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.folder>())
+						foreach (Nucleus.Abstractions.Models.Extensions.FolderDefinition folder in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.FolderDefinition>())
 						{
 							CopyFolder(component.folderName, folder.name, folder);
 						}
 
 						// The package file is not included in the manifest, so we have to install it separately
-						Nucleus.Abstractions.Models.Extensions.file packageFile = new();
+						Nucleus.Abstractions.Models.Extensions.FileDefinition packageFile = new();
 						packageFile.name = IExtensionManager.PACKAGE_MANIFEST_FILENAME;
 						CopyFile(component.folderName, "", packageFile);
 
 						// apply module definitions
-						foreach (Nucleus.Abstractions.Models.Extensions.moduleDefinition moduleDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.moduleDefinition>())
+						foreach (Nucleus.Abstractions.Models.Extensions.ModuleDefinition moduleDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.ModuleDefinition>())
 						{
               Nucleus.Abstractions.Models.ModuleDefinition moduleDefinition = new() 
 							{
@@ -250,7 +249,7 @@ namespace Nucleus.Core
 						}
 
 						// apply control panel extensions
-						foreach (Nucleus.Abstractions.Models.Extensions.controlPanelExtensionDefinition controlPanelExtensionDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.controlPanelExtensionDefinition>())
+						foreach (Nucleus.Abstractions.Models.Extensions.ControlPanelExtensionDefinition controlPanelExtensionDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.ControlPanelExtensionDefinition>())
 						{
 							ControlPanelExtensionDefinition extensionDefinition = new()
 							{
@@ -267,7 +266,7 @@ namespace Nucleus.Core
 						}
 
 						// apply layouts
-						foreach (Nucleus.Abstractions.Models.Extensions.layoutDefinition layoutDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.layoutDefinition>())
+						foreach (Nucleus.Abstractions.Models.Extensions.LayoutDefinition layoutDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.LayoutDefinition>())
 						{
 
 							LayoutDefinition layoutDefinition = new()
@@ -281,7 +280,7 @@ namespace Nucleus.Core
 						}
 
 						// apply containers
-						foreach (Nucleus.Abstractions.Models.Extensions.containerDefinition containerDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.containerDefinition>())
+						foreach (Nucleus.Abstractions.Models.Extensions.ContainerDefinition containerDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.ContainerDefinition>())
 						{
 
 							ContainerDefinition containerDefinition = new()
@@ -292,12 +291,12 @@ namespace Nucleus.Core
 							};
 
 							await this.ExtensionManager.SaveContainerDefinition(containerDefinition);
-						}
+						}           
 
-						// apply cleanup steps
-						foreach (Nucleus.Abstractions.Models.Extensions.cleanup cleanup in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.cleanup>())
+            // apply cleanup steps
+            foreach (Nucleus.Abstractions.Models.Extensions.Cleanup cleanup in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.Cleanup>())
 						{
-							foreach (Nucleus.Abstractions.Models.Extensions.containerDefinition containerDef in cleanup.Items.OfType<Nucleus.Abstractions.Models.Extensions.containerDefinition>())
+							foreach (Nucleus.Abstractions.Models.Extensions.ContainerDefinition containerDef in cleanup.Items.OfType<Nucleus.Abstractions.Models.Extensions.ContainerDefinition>())
 							{
 								ContainerDefinition containerDefinition = new()
 								{
@@ -309,7 +308,7 @@ namespace Nucleus.Core
 								await this.ExtensionManager.DeleteContainerDefinition(containerDefinition);
 							}
 
-							foreach (Nucleus.Abstractions.Models.Extensions.layoutDefinition layoutDef in cleanup.Items.OfType<Nucleus.Abstractions.Models.Extensions.layoutDefinition>())
+							foreach (Nucleus.Abstractions.Models.Extensions.LayoutDefinition layoutDef in cleanup.Items.OfType<Nucleus.Abstractions.Models.Extensions.LayoutDefinition>())
 							{
 								LayoutDefinition layoutDefinition = new()
 								{
@@ -321,7 +320,7 @@ namespace Nucleus.Core
 								await this.ExtensionManager.DeleteLayoutDefinition(layoutDefinition);
 							}
 
-							foreach (Nucleus.Abstractions.Models.Extensions.moduleDefinition moduleDef in cleanup.Items.OfType<Nucleus.Abstractions.Models.Extensions.moduleDefinition>())
+							foreach (Nucleus.Abstractions.Models.Extensions.ModuleDefinition moduleDef in cleanup.Items.OfType<Nucleus.Abstractions.Models.Extensions.ModuleDefinition>())
 							{
 								Nucleus.Abstractions.Models.ModuleDefinition moduleDefinition = new()
 								{
@@ -338,7 +337,7 @@ namespace Nucleus.Core
 								await this.ExtensionManager.DeleteModuleDefinition(moduleDefinition);
 							}
 							
-							foreach (Nucleus.Abstractions.Models.Extensions.controlPanelExtensionDefinition controlPanelExtensionDef in cleanup.Items.OfType<Nucleus.Abstractions.Models.Extensions.controlPanelExtensionDefinition>())
+							foreach (Nucleus.Abstractions.Models.Extensions.ControlPanelExtensionDefinition controlPanelExtensionDef in cleanup.Items.OfType<Nucleus.Abstractions.Models.Extensions.ControlPanelExtensionDefinition>())
 							{
 								ControlPanelExtensionDefinition extensionDefinition = new()
 								{
@@ -354,12 +353,12 @@ namespace Nucleus.Core
 								await this.ExtensionManager.DeleteControlPanelExtensionDefinition(extensionDefinition);
 							}
 
-							foreach (Nucleus.Abstractions.Models.Extensions.file file in cleanup.Items.OfType<Nucleus.Abstractions.Models.Extensions.file>())
+							foreach (Nucleus.Abstractions.Models.Extensions.FileDefinition file in cleanup.Items.OfType<Nucleus.Abstractions.Models.Extensions.FileDefinition>())
 							{
 								DeleteFile(component.folderName, file, null);
 							}
 
-							foreach (Nucleus.Abstractions.Models.Extensions.folder folder in cleanup.Items.OfType<Nucleus.Abstractions.Models.Extensions.folder>())
+							foreach (Nucleus.Abstractions.Models.Extensions.FolderDefinition folder in cleanup.Items.OfType<Nucleus.Abstractions.Models.Extensions.FolderDefinition>())
 							{
 								DeleteFolder(component.folderName, folder);
 							}
@@ -393,28 +392,28 @@ namespace Nucleus.Core
 		/// </remarks>
 		public Boolean UninstallExtension()
 		{
-			foreach (Nucleus.Abstractions.Models.Extensions.component component in this.Package.components)
+			foreach (Nucleus.Abstractions.Models.Extensions.Component component in this.Package.components)
 			{
 				// uninstall the files
 
 				// top level files
-				foreach (Nucleus.Abstractions.Models.Extensions.file file in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.file>())
+				foreach (Nucleus.Abstractions.Models.Extensions.FileDefinition file in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.FileDefinition>())
 				{
 					DeleteFile(component.folderName, file, null);
 				}
 
-				foreach (Nucleus.Abstractions.Models.Extensions.folder folder in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.folder>())
+				foreach (Nucleus.Abstractions.Models.Extensions.FolderDefinition folder in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.FolderDefinition>())
 				{
 					DeleteFolder(component.folderName, folder);
 				}
 
 				// The package file is not included in the manifest, so we have to delete it separately
-				Nucleus.Abstractions.Models.Extensions.file packageFile = new();
+				Nucleus.Abstractions.Models.Extensions.FileDefinition packageFile = new();
 				packageFile.name = IExtensionManager.PACKAGE_MANIFEST_FILENAME;
 				DeleteFile(component.folderName, packageFile, null);
 
 				// delete module definitions
-				foreach (Nucleus.Abstractions.Models.Extensions.moduleDefinition moduleDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.moduleDefinition>())
+				foreach (Nucleus.Abstractions.Models.Extensions.ModuleDefinition moduleDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.ModuleDefinition>())
 				{
 
 					Nucleus.Abstractions.Models.ModuleDefinition moduleDefinition = new()
@@ -433,7 +432,7 @@ namespace Nucleus.Core
 				}
 
 				// delete layouts
-				foreach (Nucleus.Abstractions.Models.Extensions.layoutDefinition layoutDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.layoutDefinition>())
+				foreach (Nucleus.Abstractions.Models.Extensions.LayoutDefinition layoutDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.LayoutDefinition>())
 				{
 
 					LayoutDefinition layoutDefinition = new()
@@ -447,7 +446,7 @@ namespace Nucleus.Core
 				}
 
 				// delete containers
-				foreach (Nucleus.Abstractions.Models.Extensions.containerDefinition containerDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.containerDefinition>())
+				foreach (Nucleus.Abstractions.Models.Extensions.ContainerDefinition containerDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.ContainerDefinition>())
 				{
 
 					ContainerDefinition containerDefinition = new()
@@ -470,7 +469,7 @@ namespace Nucleus.Core
 		/// </summary>
 		/// <param name="package"></param>
 		/// <returns></returns>
-		private Boolean IsPackageValid(Nucleus.Abstractions.Models.Extensions.package package)
+		private Boolean IsPackageValid(Nucleus.Abstractions.Models.Extensions.Package package)
 		{
 			if (package.compatibility != null)
 			{
@@ -500,7 +499,7 @@ namespace Nucleus.Core
 				}
 
 				// Validate that referenced files are present in the package
-				foreach (Nucleus.Abstractions.Models.Extensions.component component in package.components)
+				foreach (Nucleus.Abstractions.Models.Extensions.Component component in package.components)
 				{
 					if (System.IO.Path.IsPathRooted(component.folderName) || PathUtils.PathNavigatesAboveRoot(component.folderName) || PathUtils.HasInvalidPathChars(component.folderName))
 					{
@@ -508,12 +507,12 @@ namespace Nucleus.Core
 					}
 
 					// top level files
-					foreach (Nucleus.Abstractions.Models.Extensions.file file in component.Items.OfType<Abstractions.Models.Extensions.file>())
+					foreach (Nucleus.Abstractions.Models.Extensions.FileDefinition file in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.FileDefinition>())
 					{
 						ValidateFile(component.folderName, "", file);
 					}
 
-					foreach (Nucleus.Abstractions.Models.Extensions.folder folder in component.Items.OfType<Abstractions.Models.Extensions.folder>())
+					foreach (Nucleus.Abstractions.Models.Extensions.FolderDefinition folder in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.FolderDefinition>())
 					{
 						ValidateFolder(component.folderName, folder.name, folder);						
 					}
@@ -529,13 +528,13 @@ namespace Nucleus.Core
 		/// <param name="componentFolder"></param>
 		/// <param name="folder"></param>
 		/// <returns></returns>
-		private Boolean ValidateFolder(string componentFolder, string path, Abstractions.Models.Extensions.folder folder)
+		private Boolean ValidateFolder(string componentFolder, string path, Nucleus.Abstractions.Models.Extensions.FolderDefinition folder)
 		{
 			Boolean result = true;
 
       if (folder.Items?.Any() == true)
       {
-        foreach (Abstractions.Models.Extensions.file file in folder.Items.OfType<Abstractions.Models.Extensions.file>())
+        foreach (Nucleus.Abstractions.Models.Extensions.FileDefinition file in folder.Items.OfType<Nucleus.Abstractions.Models.Extensions.FileDefinition>())
         {
           if (!ValidateFile(componentFolder, path, file))
           {
@@ -543,7 +542,7 @@ namespace Nucleus.Core
           }
         }
 
-        foreach (Nucleus.Abstractions.Models.Extensions.folder subfolder in folder.Items.OfType<Nucleus.Abstractions.Models.Extensions.folder>())
+        foreach (Nucleus.Abstractions.Models.Extensions.FolderDefinition subfolder in folder.Items.OfType<Nucleus.Abstractions.Models.Extensions.FolderDefinition>())
         {
           if (System.IO.Path.IsPathRooted(subfolder.name) || PathUtils.PathNavigatesAboveRoot(subfolder.name) || PathUtils.HasInvalidPathChars(subfolder.name))
           {
@@ -564,7 +563,7 @@ namespace Nucleus.Core
 		/// <param name="file"></param>
 		/// <param name="folder"></param>
 		/// <returns></returns>
-		private Boolean ValidateFile(string componentFolder, string path, Abstractions.Models.Extensions.file file)
+		private Boolean ValidateFile(string componentFolder, string path, Nucleus.Abstractions.Models.Extensions.FileDefinition file)
 		{
 			string zipFullName;
 			ZipArchiveEntry entry;
@@ -655,11 +654,12 @@ namespace Nucleus.Core
 		/// Copy a folder and its files to the specified folder.
 		/// </summary>
 		/// <param name="componentFolder">Source folder.</param>
+    /// <param name="path"></param>
 		/// <param name="folder">Target folder.</param>
 		/// <returns></returns>
-		private Boolean CopyFolder(string componentFolder, string path, Abstractions.Models.Extensions.folder folder)
+		private Boolean CopyFolder(string componentFolder, string path, Nucleus.Abstractions.Models.Extensions.FolderDefinition folder)
 		{
-			foreach (Abstractions.Models.Extensions.file file in folder.Items.OfType<Nucleus.Abstractions.Models.Extensions.file>())
+			foreach (Nucleus.Abstractions.Models.Extensions.FileDefinition file in folder.Items.OfType<Nucleus.Abstractions.Models.Extensions.FileDefinition>())
 			{
 				if (!CopyFile(componentFolder, path, file))
 				{
@@ -667,7 +667,7 @@ namespace Nucleus.Core
 				}
 			}
 
-			foreach (Nucleus.Abstractions.Models.Extensions.folder subfolder in folder.Items.OfType<Nucleus.Abstractions.Models.Extensions.folder>())
+			foreach (Nucleus.Abstractions.Models.Extensions.FolderDefinition subfolder in folder.Items.OfType<Nucleus.Abstractions.Models.Extensions.FolderDefinition>())
 			{				
 				CopyFolder(componentFolder, path + "/" + subfolder.name, subfolder);
 			}
@@ -681,10 +681,10 @@ namespace Nucleus.Core
 		/// <param name="componentFolder">Extension root folder.</param>
 		/// <param name="folder">Target folder (relative to extension root).</param>
 		/// <returns></returns>
-		private Boolean DeleteFolder(string componentFolder, Abstractions.Models.Extensions.folder folder)
+		private Boolean DeleteFolder(string componentFolder, Abstractions.Models.Extensions.FolderDefinition folder)
 		{
 			// delete specified sub-folders
-			foreach (Abstractions.Models.Extensions.folder subFolder in folder.Items.Where(item => item is Abstractions.Models.Extensions.folder))
+			foreach (Abstractions.Models.Extensions.FolderDefinition subFolder in folder.Items.Where(item => item is Abstractions.Models.Extensions.FolderDefinition))
 			{
 				if (!DeleteFolder(componentFolder, subFolder))
 				{
@@ -693,7 +693,7 @@ namespace Nucleus.Core
 			}
 
 			// delete specified files
-			foreach (Abstractions.Models.Extensions.file file in folder.Items.Where(item => item is Abstractions.Models.Extensions.file))
+			foreach (Nucleus.Abstractions.Models.Extensions.FileDefinition file in folder.Items.Where(item => item is Nucleus.Abstractions.Models.Extensions.FileDefinition))
 			{
 				if (!DeleteFile(componentFolder, file, folder))
 				{
@@ -713,14 +713,14 @@ namespace Nucleus.Core
 		}
 
 
-		/// <summary>
-		/// Copy a file to the specified folder/file.
-		/// </summary>
-		/// <param name="componentFolder">Source file</param>
-		/// <param name="file">Target file</param>
-		/// <param name="folder">Target folder.  Can be null for root.</param>
-		/// <returns></returns>
-		private Boolean CopyFile(string componentFolder, string path, Abstractions.Models.Extensions.file file)
+    /// <summary>
+    /// Copy a file to the specified folder/file.
+    /// </summary>
+    /// <param name="componentFolder">Source file</param>
+    /// <param name="path">Target folder.  Can be null for root.</param>
+    /// <param name="file">Target file</param>
+    /// <returns></returns>
+    private Boolean CopyFile(string componentFolder, string path, Nucleus.Abstractions.Models.Extensions.FileDefinition file)
 		{
 			string zipFilePath;
 			string localFilePath;
@@ -805,7 +805,7 @@ namespace Nucleus.Core
     /// <param name="file">Target file</param>
     /// <param name="folder">Target folder.  Can be null for root.</param>
     /// <returns></returns>
-    private Boolean DeleteFile(string componentFolder, Abstractions.Models.Extensions.file file, Abstractions.Models.Extensions.folder folder)
+    private Boolean DeleteFile(string componentFolder, Nucleus.Abstractions.Models.Extensions.FileDefinition file, Abstractions.Models.Extensions.FolderDefinition folder)
 		{
 			string filePath;
 			
@@ -837,13 +837,13 @@ namespace Nucleus.Core
 			return true;
 		}
 
-		/// <summary>
-		/// Build a full path within the extensions folder from the specified "relative" folder and file.
-		/// </summary>
-		/// <param name="folderPath"></param>
-		/// <param name="filePath"></param>
-		/// <returns></returns>
-		private string BuildExtensionFilePath(string folderPath, string filePath)
+    /// <summary>
+    /// Build a full path within the extensions folder from the specified "relative" folder and file.
+    /// </summary>
+    /// <param name="folderPath"></param>
+    /// <param name="filePath"></param>
+    /// <returns></returns>
+    private string BuildExtensionFilePath(string folderPath, string filePath)
 		{
 			return BuildExtensionFilePath(folderPath, filePath, false);
 		}
@@ -870,7 +870,7 @@ namespace Nucleus.Core
 			}
 			return path;
 		}
-
+        
     public void Dispose()
 		{
 			this.ArchiveStream?.Dispose();

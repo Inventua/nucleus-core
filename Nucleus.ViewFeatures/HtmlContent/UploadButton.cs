@@ -23,19 +23,15 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// <summary>
 	/// Renders an upload control.
 	/// </summary>
-	/// <remarks>
-	///
-	/// </remarks>
 	/// <internal />
 	/// <hidden />
 	internal static class UploadButton
 	{
-		internal static TagBuilder Build(ViewContext context, string glyph, string caption, string formaction, string dataTarget, Boolean buttonStyle, object htmlAttributes)
+		internal static TagBuilder Build(ViewContext context, string glyph, string name, string caption, string accept, Boolean allowMultiple, string formaction, string dataTarget, string cssClass, object htmlAttributes)
 		{
 			IUrlHelper urlHelper = context.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(context);
 						
 			TagBuilder outputBuilder = new("label");
-			//TagBuilder labelBuilder = new("label");
 			TagBuilder spanBuilder = new("span");
       TagBuilder inputBuilder = new("input");
 
@@ -50,7 +46,13 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				}
 			}
 
-			if (!blnSuppressAutoClass && buttonStyle)
+      if (!String.IsNullOrEmpty(cssClass))
+      {
+        outputBuilder.AddCssClass(cssClass);
+        blnSuppressAutoClass = true;
+      }
+
+			if (!blnSuppressAutoClass)
 			{
         outputBuilder.AddCssClass("btn btn-secondary");
 			}
@@ -64,9 +66,18 @@ namespace Nucleus.ViewFeatures.HtmlContent
         outputBuilder.InnerHtml.AppendHtml(spanBuilder); 	
 			}
 
+      inputBuilder.Attributes.Add("name", name);
+      if (!String.IsNullOrEmpty(accept))
+      {
+        inputBuilder.Attributes.Add("accept", accept);
+      }
       inputBuilder.Attributes.Add("formaction", urlHelper.Content(formaction));
       inputBuilder.Attributes.Add("class", "collapse");
       inputBuilder.Attributes.Add("type", "file");
+      if (allowMultiple)
+      {
+        inputBuilder.Attributes.Add("multiple", "multiple");
+      }
 
       if (!String.IsNullOrEmpty(caption))
 			{
@@ -79,8 +90,6 @@ namespace Nucleus.ViewFeatures.HtmlContent
       }
 
       outputBuilder.InnerHtml.AppendHtml(inputBuilder); 
-
-			//outputBuilder.InnerHtml.AppendHtml(labelBuilder);
 
 			return outputBuilder;			
 		}		

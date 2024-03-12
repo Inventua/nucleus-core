@@ -68,8 +68,8 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpGet]
     public ActionResult QueryPackageInstalled(Guid id)
     {
-      List<Abstractions.Models.Extensions.package> installedPackages = ListInstalledExtensions();
-      Abstractions.Models.Extensions.package installedPackage = installedPackages.Where(package => Guid.Parse(package.id) == id).FirstOrDefault();
+      List<Abstractions.Models.Extensions.Package> installedPackages = ListInstalledExtensions();
+      Abstractions.Models.Extensions.Package installedPackage = installedPackages.Where(package => Guid.Parse(package.id) == id).FirstOrDefault();
 
       if (installedPackage == null)
       {
@@ -311,20 +311,20 @@ namespace Nucleus.Web.Controllers.Admin
     [HttpPost]
     public async Task<ActionResult> Uninstall(ViewModels.Admin.Extensions viewModel, Guid id)
     {
-      Abstractions.Models.Extensions.package uninstallPackage = null;
+      Abstractions.Models.Extensions.Package uninstallPackage = null;
 
       // find the package manifest with the specified id
       foreach (string extensionFolder in System.IO.Directory.GetDirectories(this.FolderOptions.Value.GetExtensionsFolder()))
       {
         string extensionPackageFilename = System.IO.Path.Combine(extensionFolder, IExtensionManager.PACKAGE_MANIFEST_FILENAME);
-        Abstractions.Models.Extensions.package package;
+        Abstractions.Models.Extensions.Package package;
 
         if (System.IO.File.Exists(extensionPackageFilename))
         {
-          System.Xml.Serialization.XmlSerializer serializer = new(typeof(Abstractions.Models.Extensions.package));
+          System.Xml.Serialization.XmlSerializer serializer = new(typeof(Abstractions.Models.Extensions.Package));
           using (System.IO.Stream stream = System.IO.File.OpenRead(extensionPackageFilename))
           {
-            package = (Abstractions.Models.Extensions.package)serializer.Deserialize(stream);
+            package = (Abstractions.Models.Extensions.Package)serializer.Deserialize(stream);
           }
 
           if (Guid.Parse(package.id) == id)
@@ -389,26 +389,26 @@ namespace Nucleus.Web.Controllers.Admin
       
       viewModel.InstalledExtensions = ListInstalledExtensions();
 
-      foreach (Abstractions.Models.Extensions.package extension in viewModel.InstalledExtensions) 
+      foreach (Abstractions.Models.Extensions.Package extension in viewModel.InstalledExtensions) 
       {
         Guid extensionId = new Guid(extension.id); 
 
-        foreach (Abstractions.Models.Extensions.layoutDefinition layout in extension.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.layoutDefinition>().ToList()))
+        foreach (Abstractions.Models.Extensions.LayoutDefinition layout in extension.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.LayoutDefinition>().ToList()))
         {
           GetExtensionInfo(viewModel.ExtensionsUsage, extensionId).Layouts.Add(new(new Guid(layout.id), layout.friendlyName));
         }
 
-        foreach (Abstractions.Models.Extensions.containerDefinition container in extension.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.containerDefinition>().ToList()))
+        foreach (Abstractions.Models.Extensions.ContainerDefinition container in extension.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.ContainerDefinition>().ToList()))
         {
           GetExtensionInfo(viewModel.ExtensionsUsage, extensionId).Containers.Add(new(new Guid(container.id), container.friendlyName));
         }
 
-        foreach (Abstractions.Models.Extensions.moduleDefinition module in extension.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.moduleDefinition>().ToList()))
+        foreach (Abstractions.Models.Extensions.ModuleDefinition module in extension.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.ModuleDefinition>().ToList()))
         {
           GetExtensionInfo(viewModel.ExtensionsUsage, extensionId).Modules.Add(new(new Guid(module.id), module.friendlyName));
         }
 
-        foreach (Abstractions.Models.Extensions.controlPanelExtensionDefinition controlPanelExtension in extension.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.controlPanelExtensionDefinition>().ToList()))
+        foreach (Abstractions.Models.Extensions.ControlPanelExtensionDefinition controlPanelExtension in extension.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.ControlPanelExtensionDefinition>().ToList()))
         {
           GetExtensionInfo(viewModel.ExtensionsUsage, extensionId).ControlPanelExtensions.Add(new(new Guid(controlPanelExtension.id), controlPanelExtension.friendlyName));
         }
@@ -455,7 +455,7 @@ namespace Nucleus.Web.Controllers.Admin
            
       IList<Page> pages = await this.PageManager.List(this.Context.Site);
 
-      foreach (Abstractions.Models.Extensions.layoutDefinition layoutDefinition in viewModel.Package.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.layoutDefinition>().ToList()))
+      foreach (Abstractions.Models.Extensions.LayoutDefinition layoutDefinition in viewModel.Package.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.LayoutDefinition>().ToList()))
       {        
         viewModel.ExtensionComponents.Layouts.Add(new
         (
@@ -470,7 +470,7 @@ namespace Nucleus.Web.Controllers.Admin
         }
       }
 
-      foreach (Abstractions.Models.Extensions.containerDefinition containerDefinition in viewModel.Package.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.containerDefinition>().ToList()))
+      foreach (Abstractions.Models.Extensions.ContainerDefinition containerDefinition in viewModel.Package.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.ContainerDefinition>().ToList()))
       {
         viewModel.ExtensionComponents.Containers.Add(new
         (
@@ -485,7 +485,7 @@ namespace Nucleus.Web.Controllers.Admin
         }
       }
 
-      foreach (Abstractions.Models.Extensions.moduleDefinition moduleDefinition in viewModel.Package.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.moduleDefinition>().ToList()))
+      foreach (Abstractions.Models.Extensions.ModuleDefinition moduleDefinition in viewModel.Package.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.ModuleDefinition>().ToList()))
       {
         viewModel.ExtensionComponents.Modules.Add(new
         (
@@ -495,11 +495,11 @@ namespace Nucleus.Web.Controllers.Admin
         ));
       }
 
-      foreach (Abstractions.Models.Extensions.controlPanelExtensionDefinition controlPanelExtension in viewModel.Package.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.controlPanelExtensionDefinition>().ToList()))
+      foreach (Abstractions.Models.Extensions.ControlPanelExtensionDefinition controlPanelExtension in viewModel.Package.components.SelectMany(component => component.Items.OfType<Abstractions.Models.Extensions.ControlPanelExtensionDefinition>().ToList()))
       {
         viewModel.ExtensionComponents.ControlPanelExtensions.Add(new(new Guid(controlPanelExtension.id), controlPanelExtension.friendlyName) 
         { 
-          Message = $"Available in the {(controlPanelExtension.scope == controlPanelExtensionScope.Site ? "manage"  : "settings")} control panel."
+          Message = $"Available in the {(controlPanelExtension.scope == ControlPanelExtensionScope.Site ? "manage"  : "settings")} control panel."
         });
       }
 
@@ -517,20 +517,20 @@ namespace Nucleus.Web.Controllers.Admin
       return value;
     }
 
-    private List<Abstractions.Models.Extensions.package> ListInstalledExtensions()
+    private List<Abstractions.Models.Extensions.Package> ListInstalledExtensions()
     {
-      List<Abstractions.Models.Extensions.package> results = new();
+      List<Abstractions.Models.Extensions.Package> results = new();
       foreach (string extensionFolder in System.IO.Directory.GetDirectories(this.FolderOptions.Value.GetExtensionsFolder()))
       {
         string extensionPackageFilename = System.IO.Path.Combine(extensionFolder, IExtensionManager.PACKAGE_MANIFEST_FILENAME);
-        Abstractions.Models.Extensions.package package;
+        Abstractions.Models.Extensions.Package package;
 
         if (System.IO.File.Exists(extensionPackageFilename))
         {
-          System.Xml.Serialization.XmlSerializer serializer = new(typeof(Abstractions.Models.Extensions.package));
+          System.Xml.Serialization.XmlSerializer serializer = new(typeof(Abstractions.Models.Extensions.Package));
           using (System.IO.Stream stream = System.IO.File.OpenRead(extensionPackageFilename))
           {
-            package = (Abstractions.Models.Extensions.package)serializer.Deserialize(stream);
+            package = (Abstractions.Models.Extensions.Package)serializer.Deserialize(stream);
           }
 
           results.Add(package);

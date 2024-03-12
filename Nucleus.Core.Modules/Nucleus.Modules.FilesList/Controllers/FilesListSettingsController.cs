@@ -68,7 +68,7 @@ namespace Nucleus.Modules.FilesList.Controllers
 				}
 				catch (Exception)
 				{
-					viewModel.SelectedFolder = null;
+					viewModel.SelectedFolder = await this.FileSystemManager.GetFolder(this.Context.Site, this.FileSystemManager.ListProviders().First()?.Key, "");
 				}
 			}
 

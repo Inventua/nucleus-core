@@ -23,7 +23,7 @@ namespace Nucleus.Abstractions.Models.Extensions
 		/// <summary>
 		/// Parsed package data
 		/// </summary>
-		public package Package { get; set; }
+		public Package Package { get; set; }
 
 		/// <summary>
 		/// Package readme

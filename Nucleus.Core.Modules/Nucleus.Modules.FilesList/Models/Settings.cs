@@ -28,7 +28,7 @@ namespace Nucleus.Modules.FilesList.Models
 			this.Layout = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_LAYOUT, "Table");
 			this.ShowModifiedDate = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOW_MODIFIED_DATE, true);
 			this.ShowSize = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOW_SIZE, true);
-			this.ShowDimensions = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOW_DIMENSIONS, true);
+			this.ShowDimensions = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_SHOW_DIMENSIONS, false);
 		}
 
 		public void SetSettings(PageModule module)

@@ -5,63 +5,63 @@
     xmlns:package="urn:nucleus/schemas/package/1.0"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-	<xs:element name="package" >
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1" />
-				<xs:element name="version" type="xs:string" minOccurs="1" maxOccurs="1" />
-				<xs:element name="publisher" type="package:publisher" minOccurs="1" maxOccurs="1" />
-				<xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="1" />
-				<xs:element name="compatibility" type="package:compatibility" minOccurs="0" maxOccurs="1" />
-				<xs:element name="components" type="package:components" minOccurs="1" maxOccurs="1" />				
-			</xs:sequence>
-			<xs:attribute name="id" type="package:guid" />
-		</xs:complexType>
-	</xs:element>
+	<xs:element name="package" type="package:Package" />
 
-	<xs:complexType name="publisher">
+  <xs:complexType name="Package">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="version" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="publisher" type="package:Publisher" minOccurs="1" maxOccurs="1" />
+      <xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="compatibility" type="package:Compatibility" minOccurs="0" maxOccurs="1" />
+      <xs:element name="components" type="package:Components" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="id" type="package:guid" />
+  </xs:complexType>
+  
+	<xs:complexType name="Publisher">
 		<xs:attribute name="name" type="xs:string" />
 		<xs:attribute name="url" type="xs:string" />
 		<xs:attribute name="email" type="xs:string" />
 	</xs:complexType>
 
-	<xs:complexType name="compatibility">
+	<xs:complexType name="Compatibility">
 		<xs:attribute name="minVersion" type="package:version" use="required" />
 		<xs:attribute name="maxVersion" type="package:version" />
 	</xs:complexType>
 	
-	<xs:complexType name="components">
+	<xs:complexType name="Components">
 		<xs:sequence>
-			<xs:element name="component" type="package:component" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="component" type="package:Component" minOccurs="0" maxOccurs="unbounded" />
 		</xs:sequence>
 	</xs:complexType>
-	
-	<xs:complexType name="component">		
+  
+	<xs:complexType name="Component">		
 		<xs:choice maxOccurs="unbounded">
-			<xs:element name="moduleDefinition" type="package:moduleDefinition" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="layoutDefinition" type="package:layoutDefinition" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="containerDefinition" type="package:containerDefinition" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="controlPanelExtensionDefinition" type="package:controlPanelExtensionDefinition" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="file" type="package:file" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="folder" type="package:folder" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="cleanup" type="package:cleanup" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="moduleDefinition" type="package:ModuleDefinition" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="layoutDefinition" type="package:LayoutDefinition" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="containerDefinition" type="package:ContainerDefinition" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="controlPanelExtensionDefinition" type="package:ControlPanelExtensionDefinition" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="file" type="package:FileDefinition" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="folder" type="package:FolderDefinition" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="cleanup" type="package:Cleanup" minOccurs="0" maxOccurs="unbounded" />
 		</xs:choice>
 
 		<xs:attribute name="folderName" type="xs:string" use="required" />
 		<xs:attribute name="optional" type="xs:boolean" use="required" />
 	</xs:complexType>
-
-	<xs:complexType name="cleanup">
+    
+	<xs:complexType name="Cleanup">
 		<xs:choice maxOccurs="unbounded">
-			<xs:element name="moduleDefinition" type="package:moduleDefinition" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="layoutDefinition" type="package:layoutDefinition" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="containerDefinition" type="package:containerDefinition" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="file" type="package:file" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="folder" type="package:folder" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="moduleDefinition" type="package:ModuleDefinition" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="layoutDefinition" type="package:LayoutDefinition" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="containerDefinition" type="package:ContainerDefinition" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="file" type="package:FileDefinition" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="folder" type="package:FolderDefinition" minOccurs="0" maxOccurs="unbounded" />
 		</xs:choice>
 	</xs:complexType>
 	
-	<xs:complexType name="moduleDefinition">
+	<xs:complexType name="ModuleDefinition">
 		<xs:sequence>
 			<xs:element name="friendlyName" type="xs:string" minOccurs="1" maxOccurs="1" />
 			<xs:element name="extension" type="xs:string" minOccurs="1" maxOccurs="1" />
@@ -74,26 +74,26 @@
 		<xs:attribute name="id" type="package:guid" use="required" />
 	</xs:complexType>
 
-	<xs:complexType name="controlPanelExtensionDefinition">
+	<xs:complexType name="ControlPanelExtensionDefinition">
 		<xs:sequence>
 			<xs:element name="friendlyName" type="xs:string" minOccurs="1" maxOccurs="1" />
 			<xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="1" />
 			<xs:element name="controllerName" type="xs:string" minOccurs="1" maxOccurs="1" />
 			<xs:element name="extensionName" type="xs:string" minOccurs="1" maxOccurs="1" />
-			<xs:element name="scope" type="package:controlPanelExtensionScope" minOccurs="1" maxOccurs="1" />
+			<xs:element name="scope" type="package:ControlPanelExtensionScope" minOccurs="1" maxOccurs="1" />
 			<xs:element name="editAction" type="xs:string" minOccurs="0" maxOccurs="1" />
 		</xs:sequence>
 		<xs:attribute name="id" type="package:guid" use="required" />
 	</xs:complexType>
 
-	<xs:simpleType name="controlPanelExtensionScope">
+	<xs:simpleType name="ControlPanelExtensionScope">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="Global"/>
 			<xs:enumeration value="Site"/>
 		</xs:restriction>
 	</xs:simpleType>
 	
-	<xs:complexType name="layoutDefinition">
+	<xs:complexType name="LayoutDefinition">
 		<xs:sequence>
 			<xs:element name="friendlyName" type="xs:string" minOccurs="1" maxOccurs="1" />
 			<xs:element name="relativePath" type="xs:string" minOccurs="1" maxOccurs="1" />			
@@ -101,7 +101,7 @@
 		<xs:attribute name="id" type="package:guid" use="required" />
 	</xs:complexType>
 
-	<xs:complexType name="containerDefinition">
+	<xs:complexType name="ContainerDefinition">
 		<xs:sequence>
 			<xs:element name="friendlyName" type="xs:string" minOccurs="1" maxOccurs="1" />
 			<xs:element name="relativePath" type="xs:string" minOccurs="1" maxOccurs="1" />
@@ -109,15 +109,15 @@
 		<xs:attribute name="id" type="package:guid" use="required" />
 	</xs:complexType>
 
-	<xs:complexType name="folder">
+	<xs:complexType name="FolderDefinition">
 		<xs:choice maxOccurs="unbounded">
-			<xs:element name="file" type="package:file" minOccurs="0" maxOccurs="unbounded" />
-			<xs:element name="folder" type="package:folder" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="file" type="package:FileDefinition" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="folder" type="package:FolderDefinition" minOccurs="0" maxOccurs="unbounded" />
 		</xs:choice>
 		<xs:attribute name="name" type="xs:string" use="required" />		
 	</xs:complexType>
 
-	<xs:complexType name="file">
+	<xs:complexType name="FileDefinition">
 		<xs:attribute name="name" type="xs:string" use="required" />
     <xs:attribute name="uncompress" type="xs:boolean" use="optional" />
   </xs:complexType>

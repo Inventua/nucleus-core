@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
-using Nucleus.Abstractions.Models.Extensions;
 using Nucleus.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using System.IO;
@@ -15,9 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Nucleus.Data.Common;
-using DocumentFormat.OpenXml.InkML;
 using static Nucleus.Web.ViewModels.Setup.SiteWizard;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Nucleus.Web.ViewModels.Setup;
 
 namespace Nucleus.Web.Controllers.Setup;
@@ -631,7 +628,7 @@ public class SiteWizardController : Controller
 
             try
             {
-              PackageResult extensionResult = await this.ExtensionManager.ValidatePackage(extensionStream);
+              Nucleus.Abstractions.Models.Extensions.PackageResult extensionResult = await this.ExtensionManager.ValidatePackage(extensionStream);
               if (extensionResult.IsValid)
               {
                 ViewModels.Setup.SiteWizard.InstallableExtension installableExtension = new(extensionPackageFile.Name, extensionResult);
@@ -653,17 +650,17 @@ public class SiteWizardController : Controller
                 }
 
                 installableExtension.ModulesInPackage = extensionResult.Package.components
-                  .SelectMany(component => component.Items.OfType<Nucleus.Abstractions.Models.Extensions.moduleDefinition>())
+                  .SelectMany(component => component.Items.OfType<Nucleus.Abstractions.Models.Extensions.ModuleDefinition>())
                   .Select(moduleDefinition => Guid.Parse(moduleDefinition.id))
                   .Distinct();
 
                 installableExtension.LayoutsInPackage = extensionResult.Package.components
-                  .SelectMany(component => component.Items.OfType<Nucleus.Abstractions.Models.Extensions.layoutDefinition>())
+                  .SelectMany(component => component.Items.OfType<Nucleus.Abstractions.Models.Extensions.LayoutDefinition>())
                   .Select(layoutDefinition => Guid.Parse(layoutDefinition.id))
                   .Distinct();
 
                 installableExtension.ContainersInPackage = extensionResult.Package.components
-                  .SelectMany(component => component.Items.OfType<Nucleus.Abstractions.Models.Extensions.containerDefinition>())
+                  .SelectMany(component => component.Items.OfType<Nucleus.Abstractions.Models.Extensions.ContainerDefinition>())
                   .Select(containerDefinition => Guid.Parse(containerDefinition.id))
                   .Distinct();
 

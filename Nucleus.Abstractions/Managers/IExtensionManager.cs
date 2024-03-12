@@ -58,7 +58,7 @@ namespace Nucleus.Abstractions.Managers
 		/// Uninstall the extension specified by <paramref name="package"/>.
 		/// </summary>
 		/// <param name="package"></param>
-		public void UninstallExtension(Abstractions.Models.Extensions.package package);
+		public void UninstallExtension(Abstractions.Models.Extensions.Package package);
 
 		/// <summary>
 		/// Create or update a <see cref="ModuleDefinition"/> database record.

@@ -24,7 +24,7 @@ namespace Nucleus.Core.Managers
 		private ILogger<IExtensionManager> Logger { get; }
 		private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }
 
-		public ExtensionManager(IDataProviderFactory dataProviderFactory, IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions, ILogger<IExtensionManager> logger)
+		public ExtensionManager(IDataProviderFactory dataProviderFactory,  IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> folderOptions, ILogger<IExtensionManager> logger)
 		{
 			this.DataProviderFactory = dataProviderFactory;
 			this.FolderOptions = folderOptions;
@@ -36,7 +36,7 @@ namespace Nucleus.Core.Managers
 		/// </summary>
 		/// <param name="package"></param>
 		/// <returns></returns>
-		private ExtensionInstaller CreateInstaller(Abstractions.Models.Extensions.package package)
+		private ExtensionInstaller CreateInstaller(Abstractions.Models.Extensions.Package package)
 		{
 			return new ExtensionInstaller(package, this, this.Logger, this.FolderOptions);			
 		}
@@ -177,7 +177,7 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
-		public void UninstallExtension(Abstractions.Models.Extensions.package package)
+		public void UninstallExtension(Abstractions.Models.Extensions.Package package)
 		{
 			using (ExtensionInstaller installer = CreateInstaller(package))
 			{

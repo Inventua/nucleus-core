@@ -7,7 +7,7 @@ namespace Nucleus.Web.ViewModels.Admin;
 public class ExtensionsUsage
 {
   public Guid Id { get; set; }
-  public Abstractions.Models.Extensions.package Package { get; set; }
+  public Abstractions.Models.Extensions.Package Package { get; set; }
   public ExtensionComponents ExtensionComponents { get; set; } = new();
 
   public string SiteDefaultLayout { get; set; }

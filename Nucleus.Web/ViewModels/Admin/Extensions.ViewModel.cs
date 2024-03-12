@@ -11,12 +11,12 @@ namespace Nucleus.Web.ViewModels.Admin
 	{
 		public string Readme { get; set; }
 		public string License { get; set; }
-		public Nucleus.Abstractions.Models.Extensions.package Package { get; set; }
+		public Nucleus.Abstractions.Models.Extensions.Package Package { get; set; }
 		public string FileId { get; set; }
     public string Title { get; set; } = "Installation Complete.";
 
     public List<string> Messages { get; } = new();
-		public List<Abstractions.Models.Extensions.package> InstalledExtensions { get; set; }
+		public List<Abstractions.Models.Extensions.Package> InstalledExtensions { get; set; }
 
     public Dictionary<Guid, ExtensionComponents> ExtensionsUsage { get; set; } = new();
 

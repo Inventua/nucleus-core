@@ -56,10 +56,19 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			modalHeaderBuilder.AddCssClass("modal-header");
 
 			modalTitleBuilder.AddCssClass("modal-title");
-			modalTitleBuilder.InnerHtml.Append(title);
+      modalTitleBuilder.Attributes.Add("data-original-text", title);
+      modalTitleBuilder.InnerHtml.Append(title);
 			modalHeaderBuilder.InnerHtml.AppendHtml(modalTitleBuilder);
 
-			if (isAutoSize)
+      TagBuilder modalHelpButtonBuilder = new("a");
+      modalHelpButtonBuilder.AddCssClass("btn btn-help nucleus-material-icon collapse");
+      modalHelpButtonBuilder.Attributes.Add("target", "_blank");
+      modalHelpButtonBuilder.Attributes.Add("aria-label", "Help");
+      modalHelpButtonBuilder.InnerHtml.AppendHtml("&#xe887;");
+
+      modalHeaderBuilder.InnerHtml.AppendHtml(modalHelpButtonBuilder);
+
+      if (isAutoSize)
 			{
 				TagBuilder modalMinimizeButtonBuilder = new("button");
 				modalMinimizeButtonBuilder.AddCssClass("btn btn-normalsize nucleus-material-icon");
@@ -92,7 +101,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			contentBuilder.InnerHtml.AppendHtml(modalHeaderBuilder);
 
 			modalBodyBuilder.AddCssClass("modal-body nucleus-admin-content");
-			if (content != null)
+			if (content != null && !content.IsEmptyOrWhiteSpace)
 			{
 				modalBodyBuilder.InnerHtml.AppendHtml(content);
 			}

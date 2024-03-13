@@ -502,24 +502,24 @@ namespace Nucleus.Core.Layout
     {
       ControllerActionDescriptor actionDescriptor = null;
 
-      if (String.IsNullOrEmpty(controllerName) || String.IsNullOrEmpty(moduleinfo.ModuleDefinition.Extension))
-      {
-        // backward compatibility
-        Type moduleControllerType = Type.GetType(moduleinfo.ModuleDefinition.ClassTypeName);
+      ////if (String.IsNullOrEmpty(controllerName) || String.IsNullOrEmpty(moduleinfo.ModuleDefinition.Extension))
+      ////{
+      ////  // backward compatibility
+      ////  Type moduleControllerType = Type.GetType(moduleinfo.ModuleDefinition.ClassTypeName);
 
-        if (moduleControllerType != null)
-        {
-          TypeInfo moduleControllerTypeInfo = moduleControllerType.GetTypeInfo();
+      ////  if (moduleControllerType != null)
+      ////  {
+      ////    TypeInfo moduleControllerTypeInfo = moduleControllerType.GetTypeInfo();
 
-          moduleinfo.ModuleDefinition.Extension = Nucleus.Core.Plugins.AssemblyLoader.GetExtensionFolderName(moduleControllerTypeInfo.Assembly.Location).Replace(" ", "");
-          controllerName = moduleControllerType.Name;
-          if (controllerName.EndsWith("Controller"))
-          {
-            // remove "Controller" from the end of the controller name
-            controllerName = controllerName[..^"Controller".Length];
-          }
-        }
-      }
+      ////    moduleinfo.ModuleDefinition.Extension = Nucleus.Core.Plugins.AssemblyLoader.GetExtensionFolderName(moduleControllerTypeInfo.Assembly.Location).Replace(" ", "");
+      ////    controllerName = moduleControllerType.Name;
+      ////    if (controllerName.EndsWith("Controller"))
+      ////    {
+      ////      // remove "Controller" from the end of the controller name
+      ////      controllerName = controllerName[..^"Controller".Length];
+      ////    }
+      ////  }
+      ////}
 
       if (!String.IsNullOrEmpty(controllerName))
       {

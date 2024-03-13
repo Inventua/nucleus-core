@@ -1,0 +1,15 @@
+{
+	"schemaName": "Nucleus.Core",
+  "version": "01.00.20",
+  "operations": [
+    {
+      "addColumn": {
+        "table": "ModuleDefinitions",
+        "name": "HelpUrl",
+        "clrType": "string",
+        "maxLength": 256,
+        "isnullable": true
+      }
+    }
+  ]
+}

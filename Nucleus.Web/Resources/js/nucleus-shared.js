@@ -176,8 +176,8 @@ function _Page()
     {
       var subMenu = jQuery(this).next('.dropdown-menu');
 
-      jQuery('.dropdown-menu').not(subMenu.parents()).removeClass('show');     
-      
+      jQuery('.dropdown-menu').not(subMenu.parents()).removeClass('show');
+
       subMenu.off('shown.bs.collapse');
       subMenu.on('shown.bs.collapse', function ()
       {
@@ -191,7 +191,7 @@ function _Page()
         }
       })
 
-      subMenu.collapse('show');     
+      subMenu.collapse('show');
 
       return false;
     });
@@ -495,7 +495,7 @@ function _Page()
     }
 
     if (typeof (event.originalEvent) !== 'undefined' && typeof (event.originalEvent.submitter) !== 'undefined')
-		{
+    {
       var formAction = jQuery(event.originalEvent.submitter).attr('formaction');
       if (typeof (formAction) !== 'undefined' && formAction !== '')
       {
@@ -508,7 +508,7 @@ function _Page()
       {
         targetSelector = newTarget;
         eventTarget = jQuery(event.originalEvent.submitter);
-		  }
+      }
     }
 
     if (typeof targetSelector === 'undefined')
@@ -562,14 +562,14 @@ function _Page()
           eventTarget.prop('disabled', true);
         },
         success: function (data, status, request)
-				{
-					eventTarget.prop('disabled', false);
+        {
+          eventTarget.prop('disabled', false);
           _render(target, eventTarget, data, url, event, status, request);
           form.trigger('success', [target, data, url, event, status, request]);
         },
         error: function (request, status, message)
-				{
-					eventTarget.prop('disabled', false);
+        {
+          eventTarget.prop('disabled', false);
           _handleError(target, eventTarget, url, event, status, message, request);
           form.trigger('error', [target, url, event, status, message, request]);
         }
@@ -859,12 +859,12 @@ function _Page()
           // if the first element is in a tab, select the tab
           if (elements.length !== 0)
           {
-            var selectedTab = elements.first().parents('.tab-pane');            
+            var selectedTab = elements.first().parents('.tab-pane');
             if (selectedTab.length !== 0)
             {
               var selectedTabIndex = selectedTab.index() + 1
               // trigger click to select the tab (and un-select other tabs)
-              selectedTab.parents('.tab-content').siblings('nav').find('.nav-item:nth-child(' + selectedTabIndex + ') button').trigger('click');              
+              selectedTab.parents('.tab-content').siblings('nav').find('.nav-item:nth-child(' + selectedTabIndex + ') button').trigger('click');
             }
           }
 
@@ -1114,7 +1114,7 @@ function _Page()
     {
       try
       {
-        var urlPath = this._selectedPagePath.startsWith('/') ? this._selectedPagePath.substring(1) : this._selectedPagePath;  
+        var urlPath = this._selectedPagePath.startsWith('/') ? this._selectedPagePath.substring(1) : this._selectedPagePath;
         this._selectedTabPath = new URL(document.baseURI + urlPath).pathname;
       }
       catch (err)
@@ -1170,19 +1170,42 @@ function _Page()
 
     if (target.parents('.modal').length !== 0)
     {
-      // target is in a modal.  If content was returned, check/set the modal caption, set any empty data-targets.  If content is 
-      // empty, close the modal.
+      // target is in a modal.  If content was returned, check/set the modal caption, set any empty data-targets. If content is
+      // empty, close the modal.  Similar code is in InitializePopupDialog (this code handles modals which don't contain an IFRAME),
+      // InitializePopupDialog handles modals which contain an IFRAME.
       var wrapper = target.parents('.modal');
-      var settingsDialog;
 
       if (data !== '')
       {
         var heading = jQuery('.nucleus-modal-caption').first();
-        if (heading.length !== 0)
+        var title = wrapper.find('.modal-title');
+        if (title.length !== 0)
         {
-          var title = wrapper.find('.modal-title');
-          title.html(heading.html());
-          heading.remove();
+          if (heading.length !== 0)
+          {
+            title.text(heading.text());
+            heading.remove();
+          }
+          else
+          {
+            title.text(title.attr('data-original-text'));
+          }
+        }
+        var helpLink = jQuery('.nucleus-help-url').first();
+        var modalHelpLink = wrapper.find('.btn-help');
+        if (modalHelpLink.length !== 0)
+        {
+          if (helpLink.length !== 0)
+          {
+            modalHelpLink.attr('href', helpLink.attr('href'));
+            modalHelpLink.removeClass('collapse');
+            helpLink.remove();
+          }
+          else
+          {
+            modalHelpLink.attr('href', '');
+            modalHelpLink.addClass('collapse');
+          }
         }
 
         // Set the target of forms, buttons to the modal's body, if the control doesn't already have a data-target and the control's form doesn't already have a data-target.
@@ -1197,9 +1220,9 @@ function _Page()
 
           if
             (
-            (typeof (element.attr('data-target')) === 'undefined' || element.attr('data-target') === '')
+            (typeof element.attr('data-target') === 'undefined' || element.attr('data-target') === '')
             &&
-            (typeof (form) !== 'undefined' && (typeof (form.attr('data-target')) === 'undefined' || form.attr('data-target') === ''))
+            (typeof form !== 'undefined' && (typeof form.attr('data-target') === 'undefined' || form.attr('data-target') === ''))
           )
           {
             element.attr('data-target', '.modal-body');
@@ -1366,7 +1389,7 @@ function _Page()
     {
       try
       {
-        var urlPath = url.startsWith('/') ? url.substring(1) : url;        
+        var urlPath = url.startsWith('/') ? url.substring(1) : url;
         var newPath = new URL(document.baseURI + urlPath).pathname;
         if ((window.self !== window.top && jQuery(frameElement).attr('id') !== 'AdminFrame') || _hasCommonBasePath(this._selectedTabPath, newPath))        
         {
@@ -1474,20 +1497,7 @@ function _Page()
   {
     if (jQuery(element).length === 0) return;
     var value;
-
-    //var temp = jQuery("<textarea>");
-    //jQuery("body").append(temp);
-    //if (jQuery(element).is('input, textarea'))
-    //{
-    //	temp.val(jQuery(element).val().trim()).select();
-    //}
-    //else
-    //{
-    //	temp.val(jQuery(element)[0].innerText.replace(/[^\x20-\x7E\x0A\x0D]/g, '').trim()).select();
-    //  }
-    //document.execCommand("copy");
-    //temp.remove();
-
+    
     if (jQuery(element).is('input, textarea'))
     {
       value = jQuery(element).val().trim();
@@ -1652,29 +1662,52 @@ function _Page()
     }, false);
 
 
-    // Initialize a popup iframe (from _PopupEditor.cshtml) by finding it's parent .modal, and creating a Bootstrap modal.
+    // Initialize a popup iframe (from _PopupEditor.cshtml) by finding it's parent .modal, and creating a Bootstrap modal.  Set up
+    // the popup title and help link from 
     window.document.addEventListener('InitializePopupDialog',
       function (args)
       {
         if (args.detail !== null && typeof (args.detail.element) !== 'undefined')
         {
+          // handle modal title and help link.  Similar code is in _postRender - _postRender handles modals which don't contain an
+          // IFRAME, this code handles modals which contain an IFRAME.
+
           // find the modal which contains the args.detail.element DOM element (the iframe)
           var element = jQuery(args.detail.element);
           if (!element.is('iframe')) return;
           var wrapper = element.parents('.modal');
 
-          // Set modal's title to the iframe title
+          // Set modal's title to the iframe title.  The title attribute is set in _PopupEditor[.cshtml]_initializePopup
           var titleElement = wrapper.find('.modal-title');
-          titleElement.html(args.detail.element.title);
+          titleElement.text(element.attr('title'));
 
-          if (!wrapper.is(':visible'))
+          // set the help button.  The data-helpurl attribute is set in _PopupEditor[.cshtml]_initializePopup.
+          if (typeof element.attr('data-helpurl') !== 'undefined' && element.attr('data-helpurl') !== '')
+          {
+            var modalHelpLink = wrapper.find('.btn-help');
+            if (modalHelpLink.length !== 0)
+            {
+              modalHelpLink.attr('href', element.attr('data-helpurl'));
+              modalHelpLink.removeClass('collapse');
+            }
+          }
+
+          // For popups, this event is triggered by jQuery.ready and also by the Page.ready.admin event, so it gets called twice.  We
+          // track whether the modal is already initialized by using a 'show-in-progress' css class in order to prevent the backdrop 
+          // from being added twice.  We have to use our own method for this because jQuery(wrapper).is(':visible')) is not effective for 
+          // modals which are in the process of being shown - bootstrap's modal.show() function returns before the modal has been shown.
+          if (!wrapper.hasClass('show-in-progress'))
           {
             // Create the modal
             var newDialog = new bootstrap.Modal(wrapper, { backdrop: 'static' });
             // when the modal containing the popup dialog is hidden, fade it out for .3 seconds and (at the same time) reload the page
             wrapper.on('hidden.bs.modal', function () { jQuery('body').fadeTo('opacity', '0.3'); window.location.reload(true); });
+              
             // show the modal
+            wrapper.addClass('show-in-progress');
+            wrapper.on('shown.bs.modal', function () { wrapper.removeClass('show-in-progress') });
             newDialog.show();
+            
           }
           // make sure the iframe is visible
           element.show();

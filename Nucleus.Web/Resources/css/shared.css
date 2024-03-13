@@ -253,12 +253,16 @@ a *
 	flex: 1;
 }
 
-.modal-dialog .modal-header .btn-normalsize, .modal-dialog .modal-header .btn-maximize
+.modal-dialog .modal-header .btn-help, .modal-dialog .modal-header .btn-normalsize, .modal-dialog .modal-header .btn-maximize
 {
 	margin: -0.5rem -0.5rem -0.5rem auto;
 	padding: 0.5rem;
 	border: 0;
 	font-size: 1.3rem;
+}
+
+.modal-dialog .modal-header .btn-normalsize, .modal-dialog .modal-header .btn-maximize
+{
 	display: none;
 }
 
@@ -595,6 +599,13 @@ table.table-sticky-headers thead th
 .flex-3
 {
 	flex: 3;
+}
+
+.flex-full, .flex-full > *
+{
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .comma-separated li:not(:last-child)::after

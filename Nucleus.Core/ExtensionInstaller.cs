@@ -237,7 +237,8 @@ namespace Nucleus.Core
 							{
 								Id = Guid.Parse(moduleDef.id),
 								FriendlyName = moduleDef.friendlyName,
-								Extension = moduleDef.extension,
+                HelpUrl = moduleDef.helpUrl,
+                Extension = moduleDef.extension,
 								ViewController = moduleDef.viewController,
 								SettingsController = moduleDef.settingsController,
 								ViewAction = moduleDef.viewAction,
@@ -326,7 +327,8 @@ namespace Nucleus.Core
 								{
 									Id = Guid.Parse(moduleDef.id),
 									FriendlyName = moduleDef.friendlyName,
-									Extension = moduleDef.extension,
+                  HelpUrl = moduleDef.helpUrl,
+                  Extension = moduleDef.extension,
 									ViewController = moduleDef.viewController,
 									SettingsController = moduleDef.settingsController,
 									ViewAction = moduleDef.viewAction,
@@ -420,7 +422,8 @@ namespace Nucleus.Core
 					{
 						Id = Guid.Parse(moduleDef.id),
 						FriendlyName = moduleDef.friendlyName,
-						Extension = moduleDef.extension,
+            HelpUrl = moduleDef.helpUrl,
+            Extension = moduleDef.extension,
 						ViewController = moduleDef.viewController,
 						SettingsController = moduleDef.settingsController,
 						ViewAction = moduleDef.viewAction,

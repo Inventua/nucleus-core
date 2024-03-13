@@ -30,17 +30,17 @@
 	<div class="nucleus-adminpage nucleus-admin-content nucleus-settings-frame">
 		@RenderBody()
 	</div>
-	<modal id="nucleus-popupdialog" title="Settings"></modal>
-	
+  @* 
+  this modal is for use by settings pages which launch a secondary modal (it is not the one which contains the content above).  It is
+  equivalent to the modal rendered by \Areas\Admin\Views\Index\Index.cshtml for the same purpose.
+  *@
+	<modal id="nucleus-popupdialog" title="Settings"></modal>	
 	<script>
 		jQuery(Page).on("ready.admin", _handleContentLoaded);
 
-		jQuery(document).ready(function ()
-		{
-			// initialize popup after initial iframe load
-			_initializePopup();
-		});
-
+    // initialize popup after initial iframe load
+    jQuery(_initializePopup);
+		
 		function _handleContentLoaded(e, args)
 		{
 			// initialize popup after partial content update
@@ -52,8 +52,9 @@
 
 		function _initializePopup()
 		{
-			// If the content contains a heading caption, and we are in an iframe, set the iframe title to its content.  
-			// InitFrame will automatically set the modal's caption to the iframe title.
+			// If the content contains a heading caption, and we are in an iframe, set the iframe title to its content.  If the content 
+      // contains a help link, set the iframe data-helpurl atrribute to it's href attribute.  nucleus-shared.InitializePopupDialog() uses
+      // these values to set the modal's caption and help button link.
 			if (window.frameElement)
 			{
 				var heading = jQuery('.nucleus-modal-caption').first();
@@ -62,6 +63,13 @@
 					jQuery(window.frameElement).attr('title', heading.html());
 					heading.remove();
 				}
+        
+        var helpLink = jQuery('.nucleus-help-url').first();
+        if (helpLink.length !== 0)
+        {
+          jQuery(window.frameElement).attr('data-helpurl', helpLink.attr('href'));
+          helpLink.remove();
+        }
 			}
 
 			// Set the target of forms to form.parent() if data-target is not already specifed for the form.
@@ -83,5 +91,4 @@
 		}
 	</script>
 </body>
-
 </html>

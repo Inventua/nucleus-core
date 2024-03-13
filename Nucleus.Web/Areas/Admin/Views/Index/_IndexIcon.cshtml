@@ -1,7 +1,7 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.IndexIcon
 <li id="@Model.Id" class="@Model.ClassName">
-	<button title="@Model.Title" type="button" data-target=".nucleus-adminpage" data-href="@Url.Content(@Model.Url)" accesskey="@Model.AccessKey">
+	<button title="@Model.Tooltip" type="button" data-target=".nucleus-adminpage" data-href="@Url.Content(@Model.Url)" accesskey="@Model.AccessKey">
 		<span class="nucleus-index-icon">@Html.Raw(Model.Glyph)</span>
-		<span class="Label">@Model.Caption</span>
+		<span class="Label">@Model.Title</span>
 	</button>	
 </li>

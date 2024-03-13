@@ -11,6 +11,7 @@
     <component folderName="PageLinks" optional="false">
       <moduleDefinition id="ed660e12-28c4-4baa-9dbe-d530f848a277">
         <friendlyName>Page Links</friendlyName>
+        <!--<helpUrl>https://www.nucleus-cms.com/documentation/modules/page-links/</helpUrl>-->
         <extension>PageLinks</extension>
         <viewController>PageLinksViewerController</viewController>
         <settingsController>PageLinksSettingsController</settingsController>

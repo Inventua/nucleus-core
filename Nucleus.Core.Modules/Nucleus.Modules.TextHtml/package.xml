@@ -12,6 +12,7 @@
     <component folderName="TextHtml" optional="false">
       <moduleDefinition id="b516d8dd-c793-4776-be33-902eb704bef6">
         <friendlyName>Html</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/documentation/modules/texthtml/</helpUrl>
         <extension>TextHtml</extension>
         <viewController>TextHtml</viewController>
         <viewAction>Index</viewAction>

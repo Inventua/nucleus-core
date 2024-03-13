@@ -12,6 +12,7 @@
     <component folderName="Documents" optional="false">
       <moduleDefinition id="28df7ff3-6407-459e-8608-c1ef4181807c">
         <friendlyName>Documents</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/documentation/modules/documents/</helpUrl>
         <extension>Documents</extension>
         <viewController>Documents</viewController>
         <viewAction>Index</viewAction>

@@ -11,6 +11,7 @@
     <component folderName="Media" optional="false">
       <moduleDefinition id="2ffdf8a4-edab-48e5-80c6-7b068e4721bb">
         <friendlyName>Media</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/documentation/modules/media/</helpUrl>
         <extension>Media</extension>
         <viewController>Media</viewController>
         <viewAction>Index</viewAction>

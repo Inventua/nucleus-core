@@ -11,6 +11,7 @@
     <component folderName="Shadow" optional="false">
       <moduleDefinition id="ffaf61a9-6f15-4173-9927-532d3dedcdb5">
         <friendlyName>Shadow</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/documentation/modules/shadow/</helpUrl>
         <extension>Shadow</extension>
         <viewController>ShadowController</viewController>
         <settingsController>ShadowAdminController</settingsController>

@@ -102,9 +102,7 @@ a *
 
 .nucleus-progress-medium
 {
-	margin: auto; 
-	width: 407px; 
-	height: 407px;
+	margin: auto;
 	animation: show-progress 1s 1.5s forwards;
 	opacity: 0;
 }

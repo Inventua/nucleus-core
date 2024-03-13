@@ -16,16 +16,17 @@
         <span>
           @foreach (var ancestor in Model.Ancestors)
           {
-            @if (ancestor.Name != "/")
+            @if (ancestor != Model.Ancestors.First())
             {
               <text>&nbsp;/&nbsp;</text>
               @Html.AreaActionLink(ancestor.Name, "Index", "FileSystem", "Admin", new { folderId = ancestor.Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
             }
             else
             {
-              <button title="Top level" href="@Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = ancestor.Id })" class="btn btn-sm btn-outline-primary me-1 NavigateLink nucleus-show-progress nucleus-show-progress-after nucleus-material-icon" data-target=".nucleus-adminpage">
+              <text>&nbsp;</text>
+              <a title="Top level" href="@Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = ancestor.Id })" class="btn btn-sm btn-outline-primary me-1 NavigateLink nucleus-show-progress nucleus-show-progress-after nucleus-material-icon" data-target=".nucleus-adminpage">
                 &#xe2c7;
-              </button>
+              </a>
             }
           }
         </span>

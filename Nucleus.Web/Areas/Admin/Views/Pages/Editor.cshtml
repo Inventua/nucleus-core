@@ -8,7 +8,7 @@
   {
     <h1 class="nucleus-control-panel-heading">Page Settings</h1>
   }
-  @using (Html.BeginAreaForm("Select", "Pages", "Admin", FormMethod.Post, new { @class = "d-flex overflow-auto flex-1", @data_target = Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default ? ".nucleus-adminpage" : "#nucleus-page-editor", @autocomplete = "off" }))
+  @using (Html.BeginAreaForm("Select", "Pages", "Admin", FormMethod.Post, new { @class = "overflow-auto flex-1", @data_target = Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default ? ".nucleus-adminpage" : "#nucleus-page-editor", @autocomplete = "off" }))
   {
     <div class="position-absolute m-1 top-0 end-0">
       @if (Model.Page.Id != Guid.Empty)
@@ -107,11 +107,17 @@
 
           <div class="nucleus-flex-fields">
             <SettingsControl caption="Page Layout" helptext="Select a page layout for this page, or select '(site default)' to use the default layout for this site.">
-              @Html.DropDownListFor(model => model.Page.LayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
+              <div class="nucleus-flex-fields">
+                @Html.DropDownListFor(model => model.Page.LayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"), new { @class = "flex-1" })
+                <button type="submit" formaction="@Url.AreaAction("LayoutSelector", "Pages", "Admin")" data-target="#page-layout-selector-dialog" class="btn btn-sm btn-outline-dark nucleus-material-icon" title="Layout selector.">&#xe66b;</button>
+              </div>
             </SettingsControl>
 
             <SettingsControl caption="Default Container" helptext="Select a default container for modules on this page, or select '(site default)' to use the default layout for this site.">
-              @Html.DropDownListFor((model) => model.Page.DefaultContainerDefinition.Id, new SelectList(Model.PageContainers, "Id", "FriendlyName"))
+              <div class="nucleus-flex-fields">
+                @Html.DropDownListFor((model) => model.Page.DefaultContainerDefinition.Id, new SelectList(Model.PageContainers, "Id", "FriendlyName"), new { @class = "flex-1"})
+                <button type="submit" formaction="@Url.AreaAction("ContainerSelector", "Pages", "Admin")" data-target="#page-container-selector-dialog" class="btn btn-sm btn-outline-dark nucleus-material-icon" title="Container selector.">&#xe162;</button>
+              </div>
             </SettingsControl>
           </div>
 
@@ -177,6 +183,9 @@
         </TabPanel>
       }
     </TabContent>
+
+    <Modal id="page-layout-selector-dialog" title="Layout Selector"></Modal>
+    <Modal id="page-container-selector-dialog" title="Container Selector"></Modal>
 
     <div class="nucleus-button-panel">
       <button type="submit" class="btn btn-primary nucleus-dialogresult" data-target=".nucleus-adminpage" formaction="@Url.AreaAction("Save", "Pages", "Admin")">Save Changes</button>
@@ -270,5 +279,25 @@
 
     // remove the "+" button
     jQuery(this).remove();
+  });
+
+  // layout selector
+  jQuery(document).on('click', '.select-layout', function (event) 
+  { 
+    var selectedLayoutId = jQuery(this).attr('data-layout-id');
+    if (typeof selectedLayoutId !== 'undefined')
+    {
+      jQuery('#@Html.IdFor(model => model.Page.LayoutDefinition.Id)').val(selectedLayoutId);
+    }
+  });
+
+  // container selector
+  jQuery(document).on('click', '.select-container', function (event)
+  {
+    var selectedContainerId = jQuery(this).attr('data-container-id');
+    if (typeof selectedContainerId  !== 'undefined')
+    {
+      jQuery('#@Html.IdFor(model => model.Page.DefaultContainerDefinition.Id)').val(selectedContainerId);
+    }
   });
 </script>

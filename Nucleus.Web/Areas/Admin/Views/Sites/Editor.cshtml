@@ -50,11 +50,17 @@
 
 				<div class="nucleus-flex-fields">
 					<SettingsControl caption="Default Layout" helptext="Default presentation layout for the site.  Pages which do not specify a layout use the site default.">
-						@Html.DropDownListFor(model => model.Site.DefaultLayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"))
+            <div class="nucleus-flex-fields">
+					    @Html.DropDownListFor(model => model.Site.DefaultLayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"), new  { @class = "flex-1"})
+              <button type="submit" formaction="@Url.AreaAction("LayoutSelector", "Sites", "Admin")" data-target="#site-layout-selector-dialog" class="btn btn-sm btn-outline-dark nucleus-material-icon" title="Layout selector.">&#xe66b;</button>
+            </div>
 					</SettingsControl>
 
 					<SettingsControl caption="Default Container" helptext="Default module container for the site.  Modules which which do not specify a layout use the page default, and if the page default is not set they use the site default container.">
-						@Html.DropDownListFor((model) => model.Site.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"))
+						<div class="nucleus-flex-fields">
+              @Html.DropDownListFor((model) => model.Site.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"), new  { @class = "flex-1"} )
+              <button type="submit" formaction="@Url.AreaAction("ContainerSelector", "Sites", "Admin")" data-target="#site-container-selector-dialog" class="btn btn-sm btn-outline-dark nucleus-material-icon" title="Container selector.">&#xe162;</button>
+            </div>
 					</SettingsControl>
 				</div>
 
@@ -316,6 +322,9 @@
 			</fieldset>
 		</TabPanel>
 	</TabContent>
+  
+  <Modal id="site-layout-selector-dialog" title="Layout Selector"></Modal>
+  <Modal id="site-container-selector-dialog" title="Container Selector"></Modal>
 
 	<div class="nucleus-button-panel">
 		<input type="submit" class="btn btn-primary nucleus-dialogresult" value="Save Changes" formaction="@Url.AreaAction("Save", "Sites", "Admin")" data-target=".nucleus-adminpage" />		
@@ -410,4 +419,25 @@
 			elements.addClass('disabled');
 		}
 	}
+
+
+  // layout selector
+  jQuery(document).on('click', '.select-layout', function (event)
+  {
+    var selectedLayoutId = jQuery(this).attr('data-layout-id');
+    if (typeof selectedLayoutId !== 'undefined')
+    {
+      jQuery('#@Html.IdFor(model => model.Site.DefaultLayoutDefinition.Id)').val(selectedLayoutId);
+    }
+  });
+
+  // container selector
+  jQuery(document).on('click', '.select-container', function (event)
+  {
+    var selectedContainerId = jQuery(this).attr('data-container-id');
+    if (typeof selectedContainerId !== 'undefined')
+    {
+      jQuery('#@Html.IdFor(model => model.Site.DefaultContainerDefinition.Id)').val(selectedContainerId);
+    }
+  });
 </script>

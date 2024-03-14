@@ -1173,7 +1173,7 @@ function _Page()
       // target is in a modal.  If content was returned, check/set the modal caption, set any empty data-targets. If content is
       // empty, close the modal.  Similar code is in InitializePopupDialog (this code handles modals which don't contain an IFRAME),
       // InitializePopupDialog handles modals which contain an IFRAME.
-      var wrapper = target.parents('.modal');
+      var wrapper = target.parents('.modal').first();
 
       if (data !== '')
       {

@@ -41,13 +41,16 @@
 
 				<div class="nucleus-flex-fields">
 					<SettingsControl caption="Pane" helptext="Select the pane to display this module in.  Different layouts have different available panes and pane names.">
-						@Html.DropDownListFor((model) => model.Module.Pane, new SelectList(Model.AvailablePanes))
+						@Html.DropDownListFor(model => model.Module.Pane, new SelectList(Model.AvailablePanes))
 					</SettingsControl>
 					<SettingsControl caption="Container" helptext="Select the container for the module, or select '(page default)' to use the default layout for this page.">
-						@Html.DropDownListFor((model) => model.Module.ContainerDefinition.Id, new SelectList(Model.ModuleContainers, "Id", "FriendlyName"))
+            <div class="nucleus-flex-fields align-items-center">
+              @Html.DropDownListFor(model => model.Module.ContainerDefinition.Id, new SelectList(Model.ModuleContainers, "Id", "FriendlyName"), new { @class = "flex-1" })
+              <button type="submit" formaction="@Url.AreaAction("ModuleContainerSelector", "Pages", "Admin")" data-target="#module-container-selector-dialog" class="btn btn-sm btn-outline-dark nucleus-material-icon" title="Container selector.">&#xe162;</button>
+            </div>
 					</SettingsControl>
 					<SettingsControl caption="Style Classes" helptext="Applies additional CSS classes to the container.  Separate additional CSS classes with spaces.">
-						@Html.TextBoxFor((model) => model.Module.Style)
+						@Html.TextBoxFor(model => model.Module.Style)
 					</SettingsControl>
 				</div>
 			</fieldset>
@@ -61,7 +64,7 @@
 				@await Html.PartialAsync("ModulePermissions")
 			</fieldset>
 		</TabPanel>
-	</TabContent>
+	</TabContent>  
 
 	<div class="nucleus-form-buttonrow">
 		<div class="nucleus-form-tools">
@@ -76,3 +79,16 @@
 		</div>
 	</div>
 }
+<Modal id="module-container-selector-dialog" title="Container Selector"></Modal>
+<script>
+
+  // container selector
+  jQuery(document).on('click', '.select-container', function (event)
+  {
+    var selectedContainerId = jQuery(this).attr('data-container-id');
+    if (typeof selectedContainerId !== 'undefined')
+    {
+      jQuery('#@Html.IdFor(model => model.Module.ContainerDefinition.Id)').val(selectedContainerId);
+    }
+  });
+</script>

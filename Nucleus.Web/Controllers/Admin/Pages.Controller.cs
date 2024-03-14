@@ -130,10 +130,43 @@ namespace Nucleus.Web.Controllers.Admin
     }
 
     /// <summary>
-		/// Display the page editor
-		/// </summary>
-		/// <returns></returns>
-		[HttpGet]
+    /// Display the layout selector
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
+    public async Task<ActionResult> LayoutSelector(ViewModels.Admin.PageEditor viewModel)
+    {
+      return View("_LayoutSelector", await Shared.LayoutSelector.BuildLayoutSelectorViewModel(this.LayoutManager, viewModel.Page.LayoutDefinition?.Id));
+    }
+
+    /// <summary>
+    /// Display the container selector
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
+    public async Task<ActionResult> ContainerSelector(ViewModels.Admin.PageEditor viewModel)
+    {
+      return View("_ContainerSelector", await Shared.LayoutSelector.BuildContainerSelectorViewModel(this.ContainerManager, viewModel.Page.DefaultContainerDefinition?.Id));
+    }
+
+    /// <summary>
+    /// Display the container selector
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
+    public async Task<ActionResult> ModuleContainerSelector(ViewModels.Admin.PageEditor viewModel)
+    {
+      return View("_ContainerSelector", await Shared.LayoutSelector.BuildContainerSelectorViewModel(this.ContainerManager, viewModel.Module.ContainerDefinition?.Id));
+    }
+
+    /// <summary>
+    /// Display the page editor
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
     public async Task<ActionResult> NewPageBlank(ViewModels.Admin.PageEditor.PageEditorModes mode)
     {

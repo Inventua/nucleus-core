@@ -13,6 +13,7 @@ using Nucleus.Extensions;
 using Microsoft.AspNetCore.Http;
 using Nucleus.Data.Common;
 using Nucleus.Abstractions.Mail;
+using DocumentFormat.OpenXml.Office.ActiveX;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -71,11 +72,33 @@ namespace Nucleus.Web.Controllers.Admin
 			return View("Editor", viewModel);
 		}
 
-		/// <summary>
-		/// Display the Site editor
-		/// </summary>
-		/// <returns></returns>
-		[HttpGet]
+    /// <summary>
+    /// Display the layout selector
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
+    public async Task<ActionResult> LayoutSelector(ViewModels.Admin.SiteEditor viewModel)
+    {
+      return View("_LayoutSelector", await Shared.LayoutSelector.BuildLayoutSelectorViewModel(this.LayoutManager, viewModel.Site.DefaultLayoutDefinition?.Id));
+    }
+
+    /// <summary>
+    /// Display the container selector
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
+    public async Task<ActionResult> ContainerSelector(ViewModels.Admin.SiteEditor viewModel)
+    {
+      return View("_ContainerSelector", await Shared.LayoutSelector.BuildContainerSelectorViewModel(this.ContainerManager, viewModel.Site.DefaultContainerDefinition?.Id));
+    }
+
+    /// <summary>
+    /// Display the Site editor
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
 		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SYSTEM_ADMIN_POLICY)]
 		public async Task<ActionResult> Editor(Guid id)
 		{
@@ -522,5 +545,8 @@ namespace Nucleus.Web.Controllers.Admin
 
 			return await BuildViewModel(viewModel);
 		}
-	}
+
+
+   
+  }
 }

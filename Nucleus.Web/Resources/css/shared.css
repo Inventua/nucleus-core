@@ -79,6 +79,13 @@ a *
 	font-family: 'Material Icons'!important; 
 }
 
+.nucleus-material-icon.icon-large
+{
+  font-size: 1.4rem;
+  padding: 0.25rem;
+  line-height: normal;
+}
+
 .nucleus-flex-fields .nucleus-progress-spinner
 {
   flex-grow: initial;

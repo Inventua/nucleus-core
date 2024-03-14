@@ -1,0 +1,37 @@
+﻿@model Nucleus.Web.ViewModels.Admin.LayoutSelector
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions;
+<div class="style-selector layout-selector">
+<ul>
+  @foreach (var layout in Model.Layouts)
+  {
+    <li>
+      <button class="select-layout flex-fill btn btn-outline-primary@(Model.SelectedLayoutId == layout.Id ? " selected" : "")" data-bs-dismiss="modal" data-layout-id="@layout.Id">
+        <h6>
+          @layout.FriendlyName
+          @if (Model.SelectedLayoutId == layout.Id)
+          {
+            <span class="nucleus-material-icon icon-large ms-auto">&#xe86c;</span>
+          }
+        </h6>
+        <div class="flex-row">
+          <div class="flex-1 me-2 description">
+            @if (!String.IsNullOrEmpty(layout.Description))
+            {
+              @Html.Raw(@layout.Description)
+            }
+            else
+            {
+              <text>No description.</text>
+            }
+          </div>
+          @if (!String.IsNullOrEmpty(layout.ThumbnailUrl))
+          {
+            <img class="thumbnail" src="@layout.ThumbnailUrl" />
+          }
+        </div>
+      </button>
+    </li>
+  }
+  </ul>
+</div>

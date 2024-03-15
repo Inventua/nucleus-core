@@ -203,7 +203,7 @@ public class PageModuleManager : IPageModuleManager
 
   /// <summary>
   /// Move the specified <paramref name="module"/> to the specified <paramref name="pane"/>.  If <paramref name="beforeModule"/>
-  /// is not null, set the soft index to before it.
+  /// is not null, set the sort index to before it.
   /// </summary>
   /// <param name="module"></param>
   /// <param name="pane"></param>
@@ -211,6 +211,14 @@ public class PageModuleManager : IPageModuleManager
   /// <returns></returns>
   public async Task MoveTo(Page page, PageModule module, string pane, PageModule beforeModule)
   {
+    // re-get the fully populated module objects
+    module = await this.Get(module.Id);
+
+    if (beforeModule != null)
+    {
+      beforeModule = await this.Get(beforeModule.Id);
+    }
+
     module.Pane = pane;
 
     if (beforeModule != null)

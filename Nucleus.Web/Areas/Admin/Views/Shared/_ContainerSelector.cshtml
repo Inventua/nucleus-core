@@ -2,36 +2,41 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Abstractions;
 <div class="style-selector container-selector">
-<ul>
-  @foreach (var container in Model.Containers)
-  {
-    <li>
-      <button class="select-container flex-fill btn btn-outline-primary@(Model.SelectedContainerId == container.Id ? " selected" : "")" data-bs-dismiss="modal" data-container-id="@container.Id">
-        <h6>
-          @container.FriendlyName
-          @if (Model.SelectedContainerId == container.Id)
-          {
-            <span class="nucleus-material-icon icon-large ms-auto">&#xe86c;</span>
-          }
-        </h6>
-        <div class="flex-row">
-          <div class="flex-1 me-2 description">
-            @if (!String.IsNullOrEmpty(container.Description))
+  <ul>
+    @foreach (var container in Model.Containers)
+    {
+      <li>
+        <button class="select-container flex-fill btn btn-outline-primary@(Model.SelectedContainerId == container.Id ? " selected" : "")" data-bs-dismiss="modal" data-container-id="@container.Id">
+          <h6>
+            <span>@container.FriendlyName</span>
+            @if (!String.IsNullOrEmpty(container.Extension))
             {
-              @Html.Raw(@container.Description)
+              <span class="extension">(@container.Extension)</span>
             }
-            else
+            @if (Model.SelectedContainerId == container.Id)
             {
-              <text>No description.</text>
+              <span class="nucleus-material-icon icon-large ms-auto">&#xe86c;</span>
+            }
+          </h6>
+
+          <div class="flex-row">
+            <div class="flex-1 me-2 description">
+              @if (!String.IsNullOrEmpty(container.Description))
+              {
+                @Html.Raw(@container.Description)
+              }
+              else
+              {
+                <text>No description.</text>
+              }
+            </div>
+            @if (!String.IsNullOrEmpty(container.ThumbnailUrl))
+            {
+              <img class="thumbnail" src="@container.ThumbnailUrl" />
             }
           </div>
-          @if (!String.IsNullOrEmpty(container.ThumbnailUrl))
-          {
-            <img class="thumbnail" src="@container.ThumbnailUrl" />
-          }
-        </div>
-      </button>
-    </li>
-  }
-</ul>
+        </button>
+      </li>
+    }
+  </ul>
 </div>

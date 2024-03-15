@@ -12,6 +12,7 @@ public class ContainerSelector
 
   public class ContainerInformation : ContainerDefinition
   {
+    public string Extension { get; set; }
     public string ThumbnailUrl { get; set; }
     public string Description { get; set; }
   }

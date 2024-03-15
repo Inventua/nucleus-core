@@ -668,7 +668,7 @@ ul.nucleus-control-panel-items button
 
 .nucleus-admin-content .style-selector
 {
-  background-color: #f8f8ff;
+  
 }
 
 .nucleus-admin-content .style-selector > ul
@@ -692,7 +692,7 @@ ul.nucleus-control-panel-items button
   padding: 0;
 }
 
-.nucleus-admin-content .style-selector > ul li > button
+.nucleus-admin-content .style-selector > ul > li > button
 {
   appearance: none;
   padding: 0.5rem;
@@ -702,25 +702,34 @@ ul.nucleus-control-panel-items button
   transition: background-color ease-in 0.2s, color ease-in 0.2s;
 }
 
-.nucleus-admin-content .style-selector > ul li > button:hover
+.nucleus-admin-content .style-selector > ul > li > button:hover
 {
   color: white;
   background-color: #00aeff;
 }
 
-.nucleus-admin-content .style-selector > ul li > button.selected
+.nucleus-admin-content .style-selector > ul > li > button.selected
 {
   outline: solid 4px;
 }
 
-.nucleus-admin-content .style-selector > ul li > h6
+.nucleus-admin-content .style-selector > ul > li button > h6
 {
   display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 1.1rem;
   align-self: stretch;
 }
 
-.nucleus-admin-content .style-selector > ul li > button, .nucleus-admin-content .style-selector > ul li button div
+.nucleus-admin-content .style-selector > ul > li button > h6 .extension
+{
+  font-size: 0.9rem;
+  font-style: italic;
+  font-weight: normal;
+}
+
+.nucleus-admin-content .style-selector > ul > li > button, .nucleus-admin-content .style-selector > ul li button div
 {
   display: flex;
   flex-direction: column;  

@@ -68,6 +68,12 @@
         <file name="centered.cshtml" />
         <file name="no-container.cshtml" />
         <file name="no-title.cshtml" />
+        <file name="centered.md" />
+        <file name="centered.png" />
+        <file name="no-container.md" />
+        <file name="no-container.png" />
+        <file name="no-title.md" />
+        <file name="no-title.png" />
       </folder>
     </component>
   </components>

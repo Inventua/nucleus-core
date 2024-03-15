@@ -21,8 +21,14 @@
 
   <ItemGroup>
     <None Remove="Containers\centered.cshtml" />
+    <None Remove="Containers\centered.md" />
+    <None Remove="Containers\centered.png" />
     <None Remove="Containers\no-container.cshtml" />
+    <None Remove="Containers\no-container.md" />
+    <None Remove="Containers\no-container.png" />
     <None Remove="Containers\no-title.cshtml" />
+    <None Remove="Containers\no-title.md" />
+    <None Remove="Containers\no-title.png" />
     <None Remove="Layouts\default-2-column - Copy.min.css" />
     <None Remove="Layouts\default-2-column.cshtml" />
     <None Remove="Layouts\default-2-column.css" />
@@ -48,6 +54,10 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+    <Content Include="Containers\centered.md" />
+    <Content Include="Containers\centered.png" />
+    <Content Include="Containers\no-title.md" />
+    <Content Include="Containers\no-container.md" />
     <Content Include="Containers\no-container.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -56,6 +66,8 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+    <Content Include="Containers\no-container.png" />
+    <Content Include="Containers\no-title.png" />
     <Content Include="Layouts\default-2-column.md" />
     <Content Include="Layouts\default-2-column.png" />
     <Content Include="Layouts\default-3-column.md" />

@@ -70,13 +70,26 @@ namespace Nucleus.Abstractions.Models
 		/// </summary>
 		public string Style { get; set; }
 
-		/// <summary>
-		/// Module sort order.
+    /// <summary>
+		/// Applies additional CSS classes to the module.  These are "automatic" classes which have been selected from built-in container styles.
 		/// </summary>
-		/// <remarks>
-		/// Modules are rendered in order, within their specified panes.
-		/// </remarks>
-		public int SortOrder { get; set; }
+		public string AutomaticClasses { get; set; }
+
+    /// <summary>
+    /// Applies additional CSS styles to the module.  These are "automatic" styles which have been selected from built-in container styles.
+    /// </summary>
+    /// <remarks>
+    /// Styles are used to set css variables when the user has selected a custom value for a container style.
+    /// </remarks>
+    public string AutomaticStyles { get; set; }
+
+    /// <summary>
+    /// Module sort order.
+    /// </summary>
+    /// <remarks>
+    /// Modules are rendered in order, within their specified panes.
+    /// </remarks>
+    public int SortOrder { get; set; }
 
 		/// <summary>
 		/// Inherit page permissions.

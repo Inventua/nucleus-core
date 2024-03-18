@@ -18,6 +18,8 @@ using Nucleus.Extensions.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Nucleus.Abstractions.Models.FileSystem;
+using System.Xml.Schema;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -35,6 +37,7 @@ namespace Nucleus.Web.Controllers.Admin
     private IUserManager UserManager { get; set; }
     private IContentManager ContentManager { get; set; }
 
+    private const string CUSTOM_CONTAINER_STYLE_VALUE = "__custom";
 
     public PagesController(
       Context context,
@@ -247,7 +250,7 @@ namespace Nucleus.Web.Controllers.Admin
 
       using (System.IO.Stream stream = await this.FileSystemManager.GetFileContents(this.Context.Site, templateFile))
       {
-        template = await this.PageManager.ParseTemplate(stream);        
+        template = await this.PageManager.ParseTemplate(stream);
       }
 
       Page page = template.Page;
@@ -274,7 +277,7 @@ namespace Nucleus.Web.Controllers.Admin
       {
         page.DefaultContainerDefinition = null;
       }
-      
+
       IEnumerable<ModuleDefinition> availableModules = await this.PageModuleManager.ListModuleDefinitions();
       foreach (PageModule module in page.Modules)
       {
@@ -296,9 +299,9 @@ namespace Nucleus.Web.Controllers.Admin
       foreach (PageModule module in page.Modules)
       {
         await this.PageModuleManager.Save(page, module);
-      
+
         // if there are any content elements which relate to the module save them.  
-        foreach (Content content in template.Contents.Where(content=>content.PageModuleId == module.Id))
+        foreach (Content content in template.Contents.Where(content => content.PageModuleId == module.Id))
         {
           await this.ContentManager.Save(module, content);
         }
@@ -306,7 +309,7 @@ namespace Nucleus.Web.Controllers.Admin
 
 
       page = await this.PageManager.Get(page.Id);
-      
+
       viewModel = await BuildIndexViewModel(page.Id, true);
 
       return View("Index", viewModel);
@@ -421,9 +424,9 @@ namespace Nucleus.Web.Controllers.Admin
 
       string filename = $"{page.Name}.xml";
       System.IO.Stream export = await this.PageManager.Export(page);
-            
+
       // download
-      return File(export, "text/xml", filename);     
+      return File(export, "text/xml", filename);
     }
 
 
@@ -442,7 +445,7 @@ namespace Nucleus.Web.Controllers.Admin
       await SaveTemplate(export, filename);
       return this.PopupMessage("Save Template", "Page template saved.", ControllerExtensions.PopupIcons.Info);
       //return Json(new { Title = "Save Template", Message = "Page template saved.", Icon = "info" });
-      
+
     }
 
     [HttpPost]
@@ -630,6 +633,26 @@ namespace Nucleus.Web.Controllers.Admin
       return View("ModuleCommonSettings", viewModel);
     }
 
+    [HttpGet]
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    public async Task<ActionResult> RefreshDisplay(Guid mid, ViewModels.Admin.PageEditor.PageEditorModes mode)
+    {
+      ViewModels.Admin.PageEditor viewModel;
+
+      PageModule module = await this.PageModuleManager.Get(mid);
+      Page page = await this.PageManager.Get(module.PageId);
+
+      viewModel = await BuildPageViewModel(page, module, null, true);
+      viewModel.PageEditorMode = mode;
+
+      if (mode == ViewModels.Admin.PageEditor.PageEditorModes.Standalone)
+      {
+        viewModel.UseLayout = "_PopupEditor";
+      }
+
+      return View("ModuleCommonSettings", viewModel);
+    }
+
     [HttpPost]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
     public async Task<ActionResult> CreateModule(ViewModels.Admin.PageEditor viewModel)
@@ -668,6 +691,11 @@ namespace Nucleus.Web.Controllers.Admin
 
       viewModel.Module.Permissions = await RebuildPermissions(viewModel.ModulePermissions);
 
+      
+
+      viewModel.Module.AutomaticClasses = BuildAutomaticClasses(viewModel.ModuleContainerStyles);
+      viewModel.Module.AutomaticStyles= BuildAutomaticStyles(viewModel.ModuleContainerStyles);
+
       await this.PageModuleManager.Save(viewModel.Page, viewModel.Module);
 
       if (viewModel.PageEditorMode == ViewModels.Admin.PageEditor.PageEditorModes.Standalone)
@@ -679,6 +707,28 @@ namespace Nucleus.Web.Controllers.Admin
         viewModel = await BuildPageEditorViewModel(viewModel.Page, null, false);
         return View("_PageModules", viewModel);
       }
+    }
+
+    private string BuildAutomaticClasses(List<ContainerStyle> values)
+    {
+      string[] cssClasses = values
+        .SelectMany(style => new string[] { !String.IsNullOrEmpty(style.SelectedValue) || !String.IsNullOrEmpty(style.CustomValue) ? style.BaseCssClass : null, style.SelectedValue })
+        .Where(cssClass => !String.IsNullOrEmpty(cssClass) && cssClass != CUSTOM_CONTAINER_STYLE_VALUE)
+        .Distinct()
+        .ToArray();
+
+      return String.Join(' ', cssClasses);
+    }
+
+    private string BuildAutomaticStyles(List<ContainerStyle> values)
+    {
+      string[] cssStyles = values
+        .Where(style => style.SelectedValue == CUSTOM_CONTAINER_STYLE_VALUE)
+        .Select(style => $"--{style.Name}:{style.CustomValue}")
+        .Distinct()
+        .ToArray();
+
+      return String.Join(' ', cssStyles);
     }
 
     [HttpPost]
@@ -870,7 +920,7 @@ namespace Nucleus.Web.Controllers.Admin
           0
         );
       viewModel.PageTemplates = CreateTemplatesSelectList(await ListPageTemplates());
-      
+
       return viewModel;
     }
 
@@ -878,12 +928,12 @@ namespace Nucleus.Web.Controllers.Admin
     {
       return new SelectList
       (
-        files.Select(file => new 
+        files.Select(file => new
         {
           Id = file.Id,
           Name = System.IO.Path.GetFileNameWithoutExtension(file.Name)
-        }), 
-        "Id", 
+        }),
+        "Id",
         "Name"
       );
     }
@@ -894,7 +944,7 @@ namespace Nucleus.Web.Controllers.Admin
     private async Task<List<Nucleus.Abstractions.Models.FileSystem.File>> ListPageTemplates()
     {
       Folder pageTemplatesFolder = await this.GetTemplatesFolder();
-      
+
       return (await this.FileSystemManager.ListFolder(this.Context.Site, pageTemplatesFolder.Id, "(.*).xml"))
         .Files;
     }
@@ -960,6 +1010,69 @@ namespace Nucleus.Web.Controllers.Admin
         await RebuildPermissions(viewModel.ModulePermissions);
       }
 
+      viewModel.ModuleContainerStyles = await this.ContainerManager.ListContainerStyles(this.Context.Site, page, module.ContainerDefinition);
+
+      // add "custom" value for supported syntax types
+      foreach (ContainerStyle currentStyle in viewModel.ModuleContainerStyles)
+      {
+        if (currentStyle.Syntax == "<color>")
+        {
+          currentStyle.Values.Insert(0, new() { Name = CUSTOM_CONTAINER_STYLE_VALUE, CssClass = CUSTOM_CONTAINER_STYLE_VALUE, Title = "Custom" });
+        }
+      }
+
+      // populate each container style's SelectedValue/CustomValue properties
+      if (viewModel.ModuleContainerStyles?.Any() == true)
+      {
+        if (!String.IsNullOrEmpty(viewModel.Module.AutomaticClasses))
+        {
+          string[] cssClasses = viewModel.Module.AutomaticClasses.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+          if (cssClasses.Any())
+          {
+            foreach (ContainerStyle style in viewModel.ModuleContainerStyles)
+            {
+              foreach (ContainerStyleValue value in style.Values)
+              {
+                if (cssClasses.Contains(value.CssClass))
+                {
+                  style.SelectedValue = value.CssClass;
+                  break;
+                }
+              }
+            }
+          }
+        }
+
+        if (!String.IsNullOrEmpty(viewModel.Module.AutomaticStyles))
+        {
+          string[] cssStyles = viewModel.Module.AutomaticStyles.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+          if (cssStyles.Any())
+          {
+            foreach (ContainerStyle style in viewModel.ModuleContainerStyles)
+            {
+              foreach (string cssStyle in cssStyles)
+              {
+                foreach (ContainerStyleValue value in style.Values)
+                {
+                  string token = $"--{style.Name}:";
+                  if (cssStyle.StartsWith(token))
+                  {
+                    style.CustomValue = cssStyle[token.Length..];
+                    style.SelectedValue = CUSTOM_CONTAINER_STYLE_VALUE;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      viewModel.ModuleContainerStyleGroups = viewModel.ModuleContainerStyles
+        .Select(style => style.Group)
+        .Distinct();
 
       return viewModel;
     }

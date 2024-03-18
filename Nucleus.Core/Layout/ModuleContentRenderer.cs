@@ -213,7 +213,7 @@ namespace Nucleus.Core.Layout
             return output;
           }
         }
-
+        
         if (!String.IsNullOrEmpty(moduleInfo.Style))
         {
           moduleView.AddCssClass(moduleInfo.Style);

@@ -92,6 +92,7 @@
 	  <None Remove="Resources\material-icons.woff2" />
 	  <None Remove="Setup\Templates\Site\default-site-template.xml" />
 	  <None Remove="Setup\Templates\Site\empty-site-template.xml" />
+	  <None Remove="Shared\Containers\container-styles.css" />
 	  <None Remove="Shared\Containers\default.css" />
 	  <None Remove="Shared\Containers\default.md" />
 	  <None Remove="Shared\Containers\default.min.css" />
@@ -159,6 +160,9 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Include="Setup\Templates\Site\default-site-template.xml">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Shared\Containers\container-styles.css">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Include="Shared\Containers\default.md" />

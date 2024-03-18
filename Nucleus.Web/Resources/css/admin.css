@@ -115,6 +115,12 @@
 	box-shadow: 0 0 0 0.25rem rgba(80, 80, 80, 0.5);
 }
 
+.nucleus-admin-content .grid-3-column
+{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);  
+}
+
 .nucleus-admin-index-spinner
 {
   width: 5rem;
@@ -785,6 +791,14 @@ ul.nucleus-control-panel-items button
 {
   width: 14rem;
 }
+
+.nucleus-adminpage .container-style-colorselector
+{
+  appearance: none;
+  width: 2rem;
+  border: 0;
+}
+
 
 .nucleus-adminpage .ScheduledTasks .interval .settings-control
 {

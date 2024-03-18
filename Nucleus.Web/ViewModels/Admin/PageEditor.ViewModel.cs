@@ -59,5 +59,10 @@ namespace Nucleus.Web.ViewModels.Admin
 		public Boolean DisableCopy { get; set; }
 
     public Nucleus.Abstractions.Models.FileSystem.File SelectedLinkFile { get; set; }
-	}
+
+
+    public List<ContainerStyle> ModuleContainerStyles { get; set; }
+    public IEnumerable<string> ModuleContainerStyleGroups { get; set; }
+
+  }
 }

@@ -52,6 +52,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
           //outputBuilder.Attributes.Add("data-inline-edit-route", $"/admin/pages/updatemoduletitle?mid={nucleusContext.Module.Id}");
         }
 
+        outputBuilder.AddCssClass("title");
         outputBuilder.InnerHtml.AppendHtml(nucleusContext.Module.Title);
         outputBuilder.MergeAttributes(htmlAttributes);
 

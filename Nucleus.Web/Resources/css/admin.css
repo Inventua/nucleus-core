@@ -792,11 +792,13 @@ ul.nucleus-control-panel-items button
   width: 14rem;
 }
 
-.nucleus-adminpage .container-style-colorselector
+.nucleus-admin-content .container-style-colorselector
 {
   appearance: none;
   width: 2rem;
+  height: 1.5rem;
   border: 0;
+  padding: 0;
 }
 
 

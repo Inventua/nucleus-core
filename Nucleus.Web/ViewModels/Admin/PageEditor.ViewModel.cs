@@ -29,40 +29,40 @@ namespace Nucleus.Web.ViewModels.Admin
     public PageMenu LinkPageMenu { get; set; }
 
 
-    public PageModule Module { get; set; } = new PageModule();
+    //public PageModule Module { get; set; } = new PageModule();
 
-		public IEnumerable<SelectListItem> AvailableModules { get; set; } 
+		//public IEnumerable<SelectListItem> AvailableModules { get; set; } 
 
 		public IEnumerable<LayoutDefinition> Layouts { get; set; } 
 
 		public IEnumerable<ContainerDefinition> PageContainers { get; set; }
-    public IEnumerable<ContainerDefinition> ModuleContainers { get; set; }
+    //public IEnumerable<ContainerDefinition> ModuleContainers { get; set; }
 
     public Guid SelectedPageRoleId { get; set; }
 
-		public Guid SelectedModuleRoleId { get; set; }
+		//public Guid SelectedModuleRoleId { get; set; }
 
 		public IEnumerable<SelectListItem> AvailablePageRoles { get; set; }
 
-		public IEnumerable<SelectListItem> AvailableModuleRoles { get; set; } 
+		//public IEnumerable<SelectListItem> AvailableModuleRoles { get; set; } 
 
-		public IEnumerable<String> AvailablePanes { get; set; }
+		public IEnumerable<String> PagePanes { get; set; }
 
 		public List<PermissionType> PagePermissionTypes { get; set; }
 
-		public List<PermissionType> ModulePermissionTypes { get; set; }
+		//public List<PermissionType> ModulePermissionTypes { get; set; }
 
 		public PermissionsList PagePermissions { get; set; } = new();
 
-		public PermissionsList ModulePermissions { get; set; } = new();
+		//public PermissionsList ModulePermissions { get; set; } = new();
 
 		public Boolean DisableCopy { get; set; }
 
     public Nucleus.Abstractions.Models.FileSystem.File SelectedLinkFile { get; set; }
 
 
-    public List<ContainerStyle> ModuleContainerStyles { get; set; }
-    public IEnumerable<string> ModuleContainerStyleGroups { get; set; }
+    //public List<ContainerStyle> ModuleContainerStyles { get; set; }
+    //public IEnumerable<string> ModuleContainerStyleGroups { get; set; }
 
   }
 }

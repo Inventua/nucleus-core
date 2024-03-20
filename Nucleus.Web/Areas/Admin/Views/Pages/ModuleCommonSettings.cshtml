@@ -1,135 +1,100 @@
-﻿@model Nucleus.Web.ViewModels.Admin.PageEditor
+﻿@model Nucleus.Web.ViewModels.Admin.PageModuleCommonSettingsEditor
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 @if (!String.IsNullOrEmpty(Model.UseLayout))
 {
-	Layout = Model.UseLayout;
+  Layout = Model.UseLayout;
 }
-@using (Html.BeginAreaForm("RefreshDisplay", "Pages", "Admin", FormMethod.Post, new { @class = "d-flex overflow-auto flex-1", @data_target = "form.parent()", @autocomplete = "off" }))
+@using (Html.BeginAreaForm("RefreshContainerStyles", "Pages", "Admin", FormMethod.Post, new { @class = "d-flex overflow-auto flex-1", @data_target = "form.parent()", @autocomplete = "off" }))
 {
-	@Html.HiddenFor(model => model.Page.Id)
-	@Html.HiddenFor(model => model.PageEditorMode)
+  @Html.HiddenFor(model => model.Module.PageId)
+  @Html.HiddenFor(model => model.PageEditorMode)
 
-	<Tab>
-		<TabItem target="#module-properties" active="true" caption="Properties"></TabItem>
-		<TabItem target="#module-permissions" caption="Permissions"></TabItem>
-	</Tab>
+  <Tab>
+    <TabItem target="#module-properties" active="true" caption="Properties"></TabItem>
+    <TabItem target="#module-permissions" caption="Permissions"></TabItem>
+  </Tab>
 
-	<TabContent>
-		<TabPanel id="module-properties" active="true">
+  <TabContent>
+    <TabPanel id="module-properties" active="true">
 
-			<fieldset role="group" aria-label="Properties" class="flex-grow-0">
-				@Html.HiddenFor((model) => model.Module.Id)
-				@Html.HiddenFor((model) => model.Module.SortOrder)
-				<SettingsControl caption="Module Type" helptext="Select a Module Type.">
-					@if (Model.Module.Id == Guid.Empty)
-					{
-						@Html.DropDownListFor(model => model.Module.ModuleDefinition.Id, Model.AvailableModules, "(select module type)")
-					}
-					else
-					{
-						@Html.HiddenFor((model) => model.Module.ModuleDefinition.Id)
-						@Model.Module.ModuleDefinition.FriendlyName
-					}
-				</SettingsControl>
-
-				<SettingsControl caption="Title" helptext="Module Title.  This value may be shown on screen.">
-					@Html.TextBoxFor((model) => model.Module.Title, new { @maxlength = 256 })
-				</SettingsControl>
-
-				<div class="nucleus-flex-fields">
-					<SettingsControl caption="Pane" helptext="Select the pane to display this module in.  Different layouts have different available panes and pane names.">
-						@Html.DropDownListFor(model => model.Module.Pane, new SelectList(Model.AvailablePanes))
-					</SettingsControl>
-					<SettingsControl caption="Container" helptext="Select the container for the module, or select '(page default)' to use the default layout for this page.">
-            <div class="d-flex column-gap-1">
-              @Html.DropDownListFor(model => model.Module.ContainerDefinition.Id, new SelectList(Model.ModuleContainers, "Id", "FriendlyName"), new { @class = "flex-1 my-auto", @data_autopostbackevent = "change" })
-              <button type="submit" formaction="@Url.AreaAction("ModuleContainerSelector", "Pages", "Admin")" data-target="#module-container-selector-dialog" class="btn btn-sm btn-outline-dark my-auto nucleus-material-icon" title="Container selector.">&#xe162;</button>
-            </div>
-					</SettingsControl>
-        </div>
-      </fieldset>
-      
-      <fieldset aria-label="Container Styles">
-        <h3>Container Styles</h3>
-        
-        <div>
-          @foreach (var group in Model.ModuleContainerStyleGroups)
+      <fieldset role="group" aria-label="Properties" class="flex-grow-0">
+        @Html.HiddenFor((model) => model.Module.Id)
+        @Html.HiddenFor((model) => model.Module.SortOrder)
+        <SettingsControl caption="Module Type" helptext="Select a Module Type.">
+          @if (Model.Module.Id == Guid.Empty)
           {
-            @if (!String.IsNullOrEmpty(@group))
-            {
-              <h4 class="mt-2 mb-1">@group</h4>
-            }
-            <div class="d-flex flex-wrap column-gap-2">
-              @foreach (var styleProperty in Model.ModuleContainerStyles.Select((Value, Index) => new { Index, Value }).Where(item => item.Value.Group == group))
+            @Html.DropDownListFor(model => model.Module.ModuleDefinition.Id, Model.AvailableModules, "(select module type)")
+          }
+          else
+          {
+            @Html.HiddenFor((model) => model.Module.ModuleDefinition.Id)
+            <div class="d-flex align-items-center column-gap-2">
+              @Model.Module.ModuleDefinition.FriendlyName
+              @if (!String.IsNullOrEmpty(@Model.Module.ModuleDefinition.HelpUrl))
               {
-                @Html.HiddenFor(model => model.ModuleContainerStyles[styleProperty.Index].Name)
-                @Html.HiddenFor(model => model.ModuleContainerStyles[styleProperty.Index].BaseCssClass)                
-                <SettingsControl caption="@styleProperty.Value.Title" class="flex-1">
-                  <div class="d-flex flex-1">
-                  <select id="@Html.IdFor(model => model.ModuleContainerStyles[styleProperty.Index].SelectedValue)" name="@Html.NameFor(model => model.ModuleContainerStyles[styleProperty.Index].SelectedValue)" data-type="@styleProperty.Value.Syntax" class="container-style-selector flex-1">
-                    <option value="">(no selection)</option>
-                    @foreach (var value in Model.ModuleContainerStyles[styleProperty.Index].Values)
-                    {
-                      @if (value.CssClass == Model.ModuleContainerStyles[styleProperty.Index].SelectedValue)
-                      {
-                        <option selected="selected" value="@value.CssClass" data-name="--@value.Name">@value.Title</option>
-                      }
-                      else
-                      {
-                        <option value="@value.CssClass" data-name="--@value.Name">@value.Title</option>
-                      }
-                    }
-                  </select>
-                  @* @Html.DropDownListFor(model => model.ModuleContainerStyles[styleProperty.Index].SelectedValue, new SelectList(Model.ModuleContainerStyles[styleProperty.Index].Values, "CssClass", "Title"), "(no selection)") *@
-                
-                  @if (styleProperty.Value.Syntax == "<color>")
-                  {
-                    List<string> colorselector_classes = new() { "container-style-colorselector", "collapse" };
-                    if (!String.IsNullOrEmpty(Model.ModuleContainerStyles[styleProperty.Index].CustomValue))
-                    {
-                      colorselector_classes.Add("show");
-                    }
-                    @Html.TextBoxFor(model => model.ModuleContainerStyles[styleProperty.Index].CustomValue, new { @type = "color", @class = String.Join(' ', colorselector_classes) })
-                  }
-                  </div>
-                </SettingsControl>
+                <a class="btn btn-none nucleus-material-icon" href="@Model.Module.ModuleDefinition.HelpUrl" target="_blank">&#xe887;</a>
               }
             </div>
+            
           }
+        </SettingsControl>
+
+        <SettingsControl caption="Title" helptext="Module Title.  This value may be shown on screen.">
+          @Html.TextBoxFor((model) => model.Module.Title, new { @maxlength = 256 })
+        </SettingsControl>
+
+        <div class="nucleus-flex-fields">
+          <SettingsControl caption="Pane" helptext="Select the pane to display this module in.  Different layouts have different available panes and pane names.">
+            @Html.DropDownListFor(model => model.Module.Pane, new SelectList(Model.AvailablePanes))
+          </SettingsControl>
+          <SettingsControl caption="Container" helptext="Select the container for the module, or select '(page default)' to use the default layout for this page.">
+            <div class="d-flex column-gap-1">
+              @Html.DropDownListFor(model => model.Module.ContainerDefinition.Id, new SelectList(Model.ModuleContainers, "Id", "FriendlyName"), new { @class = "flex-1 my-auto", @data_autopostbackevent = "change", @data_target = ".container-styles" })
+              <button type="submit" formaction="@Url.AreaAction("ModuleContainerSelector", "Pages", "Admin")" data-target="#module-container-selector-dialog" class="btn btn-sm btn-outline-dark my-auto nucleus-material-icon" title="Container selector.">&#xe162;</button>
+            </div>
+          </SettingsControl>
+        </div>
+      </fieldset>
+
+      <fieldset aria-label="Container Styles">
+        <h3>Container Styles</h3>
+
+        <div class="container-styles">
+          @await Html.PartialAsync("_ContainerStyles")
         </div>
 
         <SettingsControl caption="Other Css Classes" class="mt-2" helptext="Applies additional CSS classes to the container.  Separate additional CSS classes with spaces.">
           @Html.TextBoxFor(model => model.Module.Style)
         </SettingsControl>
 
-			</fieldset>
-		</TabPanel>
-		<TabPanel id="module-permissions">
+      </fieldset>
+    </TabPanel>
+    <TabPanel id="module-permissions">
       <fieldset role="group" aria-label="Module Permissions" class="d-flex overflow-auto flex-1">
-				<div class="nucleus-form-tools">
-					@Html.DropDownListFor(model => model.SelectedModuleRoleId, Model.AvailableModuleRoles, new { @class = "flex-fill" })
-					<input type="submit" formaction="@Url.AreaAction("AddModulePermissionRole", "Pages", "Admin")?PageEditorMode=@Model.PageEditorMode" value="Add Role" data-target="form.parent()" class="btn btn-secondary" />
-				</div>
-				@await Html.PartialAsync("ModulePermissions")
-			</fieldset>
-		</TabPanel>
-	</TabContent>  
+        <div class="nucleus-form-tools">
+          @Html.DropDownListFor(model => model.SelectedModuleRoleId, Model.AvailableModuleRoles, new { @class = "flex-fill" })
+          <input type="submit" formaction="@Url.AreaAction("AddModulePermissionRole", "Pages", "Admin")?PageEditorMode=@Model.PageEditorMode" value="Add Role" data-target="form.parent()" class="btn btn-secondary" />
+        </div>
+        @await Html.PartialAsync("ModulePermissions")
+      </fieldset>
+    </TabPanel>
+  </TabContent>
 
-	<div class="nucleus-form-buttonrow">
-		<div class="nucleus-form-tools">
-			@if (Model.Module.Id == Guid.Empty)
-			{
-				<input type="submit" value="Add Module" formaction="@Url.AreaAction("CreateModule", "Pages", "Admin")" data-target="#pageeditor_pagemodules" class="btn btn-primary" />
-			}
-			else
-			{
-				<input type="submit" value="Save Changes" formaction="@Url.AreaAction("SaveModuleCommonSettings", "Pages", "Admin")" data-target="#pageeditor_pagemodules" class="btn btn-primary" />
-			}
-		</div>
-	</div>
+  <div class="nucleus-form-buttonrow">
+    <button type="submit" formaction="@Url.AreaAction("SaveModuleCommonSettings", "Pages", "Admin")" data-target="#pageeditor_pagemodules" class="btn btn-primary">
+      @if (Model.Module.Id == Guid.Empty)
+      {
+        <text>Add Module</text>
+      }
+      else
+      {
+        <text>Save Changes</text>
+      }
+    </button>
+  </div>
 }
 <Modal id="module-container-selector-dialog" title="Container Selector"></Modal>
 <script>
@@ -144,12 +109,12 @@
     }
   });
 
-  jQuery('.container-style-selector[data-type="<color>"]').on("change", function (event) 
-  { 
+  jQuery('.container-style-selector[data-type="<color>"]').on("change", function (event)
+  {
     var element = jQuery(this);
     var selectedOption = element.find('option:selected');
     var customIsSelected = selectedOption.attr('data-name') === '--__custom';
-    
+
     switch (element.attr('data-type'))
     {
       case '<color>':

@@ -8,6 +8,7 @@ using Nucleus.Data.Common;
 using Nucleus.Core.DataProviders;
 using Nucleus.Abstractions.Models;
 using System.Text.RegularExpressions;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace Nucleus.Core.Managers;
 
@@ -15,24 +16,25 @@ public class ContainerManager : IContainerManager
 {
   private IDataProviderFactory DataProviderFactory { get; }
 
+  private const string DEFAULT_CONTAINER = "default.cshtml";
+
   public ContainerManager(IDataProviderFactory dataProviderFactory)
   {
     this.DataProviderFactory = dataProviderFactory;
   }
 
   /// <summary>
-  /// Replace "\" with "/" in the the RelativePath property of the specified <paramref name="containerDefinition"/> so that path separators are consistent.
+  /// Retrieve the specified container definition.
   /// </summary>
-  /// <param name="containerDefinition"></param>
   /// <returns></returns>
-  private ContainerDefinition NormalizeRelativePath(ContainerDefinition containerDefinition)
+  public async Task<Nucleus.Abstractions.Models.ContainerDefinition> Get(Guid id)
   {
-    if (containerDefinition != null)
+    using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
     {
-      containerDefinition.RelativePath = Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(containerDefinition.RelativePath);
+      return await provider.GetContainerDefinition(id);
     }
-    return containerDefinition;
   }
+
 
   /// <summary>
   /// Return a list of all installed container definitions.
@@ -52,6 +54,36 @@ public class ContainerManager : IContainerManager
   }
 
   /// <summary>
+  /// Replace "\" with "/" in the the RelativePath property of the specified <paramref name="containerDefinition"/> so that path separators are consistent.
+  /// </summary>
+  /// <param name="containerDefinition"></param>
+  /// <returns></returns>
+  private ContainerDefinition NormalizeRelativePath(ContainerDefinition containerDefinition)
+  {
+    if (containerDefinition != null)
+    {
+      containerDefinition.RelativePath = Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(containerDefinition.RelativePath);
+    }
+    return containerDefinition;
+  }
+
+  /// <summary>
+  /// Return the container to use for the specified site/page/module.
+  /// </summary>
+  /// <param name="site"></param>
+  /// <param name="page"></param>
+  /// <param name="containerDefinition"></param>
+  /// <returns></returns>
+  public string GetEffectiveContainerPath(Site site, Page page, ContainerDefinition containerDefinition)
+  {
+    return
+      containerDefinition?.RelativePath ??
+      page.DefaultContainerDefinition?.RelativePath ??
+      site.DefaultLayoutDefinition?.RelativePath ??
+      $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.CONTAINERS_FOLDER}/{DEFAULT_CONTAINER}";
+  }
+
+  /// <summary>
   /// Return a list of available styles for the specified container.  The container must support container styles (that is, it must have an 
   /// element with a container-styles="true" attribute), if it does not, no results are returned.
   /// </summary>
@@ -66,7 +98,7 @@ public class ContainerManager : IContainerManager
     const string CONTAINER_STYLE_PROPERTY_REGEX = "@property\\s*--(?<propertyName>[A-Za-z0-9-]*)\\s*{(\\s*\\/\\*\\s*title:\\s*(?<propertyTitle>[^\\*]*)\\s*\\*\\/)?(\\s*\\/\\*\\s*group:\\s*(?<propertyGroup>[^\\*]*)\\s*\\*\\/)?(\\s*\\/\\*\\s*baseClass:\\s*(?<propertyBaseCssClass>[^\\*]*)\\s*\\*\\/)?(\\s*\\/\\*\\s*preserveOrder: \\s*(?<propertyPreserveOrder>[^\\*]*)\\s*\\*\\/)?\\s*(syntax:\\s*\"(?<propertySyntax>[^\"]*)\"\\s*;)";
     const string PROPERTY_VALUES_REGEX = "-(?<valueName>[A-Za-z0-9]*)\\s*{(\\s*\\/\\*\\s*title:\\s*(?<valueTitle>[^\\*]*))?";
 
-    // container must support container styles, otherwise don't show any
+    // container must support container styles, otherwise don't allow any selections
     if (SupportsContainerStyles(site, page, containerDefinition))
     {
       List<string> cssFiles = new List<string>() { "/Shared/Containers/container-styles.css" };
@@ -107,7 +139,7 @@ public class ContainerManager : IContainerManager
               currentStyle.Title = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.ToTitleCase(currentStyle.Name);
             }
           }
-                    
+
           foreach (ContainerStyle currentStyle in results)
           {
             // find property values
@@ -115,11 +147,16 @@ public class ContainerManager : IContainerManager
 
             foreach (Match stylePropertyValueMatch in Regex.Matches(containerCss, currentStyle.Name + PROPERTY_VALUES_REGEX, RegexOptions.Multiline).Cast<Match>())
             {
-              ContainerStyleValue currentStyleValue = new()
+              string valueName = stylePropertyValueMatch.Groups["valueName"].Value?.Trim();
+
+              ContainerStyleValue currentStyleValue = currentStyle.Values.Where(value => value.Name == valueName).FirstOrDefault();
+
+              if (currentStyleValue == null)
               {
-                Name = stylePropertyValueMatch.Groups["valueName"].Value?.Trim(),
-                Title = stylePropertyValueMatch.Groups["valueTitle"].Value?.Trim()
-              };
+                currentStyleValue = new() { Name = valueName };
+              }
+
+              currentStyleValue.Title = stylePropertyValueMatch.Groups["valueTitle"].Value?.Trim();   
               currentStyleValue.CssClass = $"{currentStyle.Name}-{currentStyleValue.Name}"?.Trim();
 
               if (String.IsNullOrEmpty(currentStyleValue.Title))
@@ -147,7 +184,7 @@ public class ContainerManager : IContainerManager
   {
     const string SUPPORTS_CONTAINER_STYLES_REGEX = "container-styles\\s*=\\s*\"(?<isSupported>[^\"]*)\"";
 
-    string containerPath = containerDefinition?.RelativePath ?? page.DefaultContainerDefinition?.RelativePath ?? site.DefaultLayoutDefinition?.RelativePath;
+    string containerPath = GetEffectiveContainerPath(site, page, containerDefinition);
 
     if (containerPath != null)
     {
@@ -179,7 +216,7 @@ public class ContainerManager : IContainerManager
     // parse & read container CSS links.
     // Container css files can extend the available values for container styles which are defined by the "core" container styles css file, and can add
     // new container styles.
-    string containerPath = containerDefinition?.RelativePath ?? page.DefaultContainerDefinition?.RelativePath ?? site.DefaultLayoutDefinition?.RelativePath;
+    string containerPath = GetEffectiveContainerPath(site, page, containerDefinition);
 
     if (containerPath != null)
     {
@@ -210,7 +247,7 @@ public class ContainerManager : IContainerManager
         }
       }
     }
-    
+
     return cssFiles;
   }
 

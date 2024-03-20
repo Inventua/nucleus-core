@@ -1696,7 +1696,7 @@ function _Page()
           // track whether the modal is already initialized by using a 'show-in-progress' css class in order to prevent the backdrop 
           // from being added twice.  We have to use our own method for this because jQuery(wrapper).is(':visible')) is not effective for 
           // modals which are in the process of being shown - bootstrap's modal.show() function returns before the modal has been shown.
-          if (!wrapper.hasClass('show-in-progress'))
+          if (!wrapper.hasClass('show-in-progress') && !wrapper.hasClass('show'))
           {
             // Create the modal
             var newDialog = new bootstrap.Modal(wrapper, { backdrop: 'static' });

@@ -10,7 +10,6 @@ using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Managers;
 using Microsoft.AspNetCore.Authorization;
 using Nucleus.Extensions;
-using Microsoft.AspNetCore.Hosting;
 using Nucleus.Abstractions.Models.Permissions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nucleus.ViewFeatures;
@@ -18,8 +17,6 @@ using Nucleus.Extensions.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Nucleus.Abstractions.Models.FileSystem;
-using System.Xml.Schema;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -37,7 +34,7 @@ namespace Nucleus.Web.Controllers.Admin
     private IUserManager UserManager { get; set; }
     private IContentManager ContentManager { get; set; }
 
-    private const string CUSTOM_CONTAINER_STYLE_VALUE = "__custom";
+    public const string CUSTOM_CONTAINER_STYLE_VALUE = "__custom";
 
     public PagesController(
       Context context,
@@ -160,7 +157,7 @@ namespace Nucleus.Web.Controllers.Admin
     /// <returns></returns>
     [HttpPost]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
-    public async Task<ActionResult> ModuleContainerSelector(ViewModels.Admin.PageEditor viewModel)
+    public async Task<ActionResult> ModuleContainerSelector(ViewModels.Admin.PageModuleCommonSettingsEditor viewModel)
     {
       return View("_ContainerSelector", await Shared.LayoutSelector.BuildContainerSelectorViewModel(this.ContainerManager, viewModel.Module.ContainerDefinition?.Id));
     }
@@ -537,14 +534,6 @@ namespace Nucleus.Web.Controllers.Admin
 
     [HttpPost]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-    public async Task<ActionResult> SaveModule(ViewModels.Admin.PageEditor viewModel)
-    {
-      await this.PageModuleManager.Save(viewModel.Page, viewModel.Module);
-      return View("Editor", await BuildPageEditorViewModel(await this.PageManager.Get(viewModel.Page.Id), null, true));
-    }
-
-    [HttpPost]
-    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
     public async Task<ActionResult> MoveModuleTo(Guid? beforeModuleId, string pane)
     {
       PageModule beforeModule = null;
@@ -570,11 +559,12 @@ namespace Nucleus.Web.Controllers.Admin
 
     [HttpPost]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-    public async Task<ActionResult> RemoveModulePermissionRole(ViewModels.Admin.PageEditor viewModel, Guid id)
+    public async Task<ActionResult> RemoveModulePermissionRole(ViewModels.Admin.PageModuleCommonSettingsEditor viewModel, Guid id)
     {
       viewModel.Module.Permissions = await RebuildPermissions(viewModel.ModulePermissions);
 
-      foreach (Permission permission in viewModel.Module.Permissions.ToList())
+      // .ToList is to make a copy so we don't get an error when we .Remove
+      foreach (Permission permission in viewModel.Module.Permissions.ToList())  
       {
         if (permission.Role.Id == id)
         {
@@ -582,67 +572,55 @@ namespace Nucleus.Web.Controllers.Admin
         }
       }
 
+      Page page = await this.PageManager.Get(viewModel.Module.PageId);
       viewModel.ModulePermissions = viewModel.Module.Permissions.ToPermissionsList(this.Context.Site);
 
-      return View("ModuleCommonSettings", await BuildPageViewModel(viewModel.Page, viewModel.Module, viewModel.ModulePermissions, false));
+      return View("ModuleCommonSettings", await BuildPageModuleCommonSettingsViewModel(page, viewModel.Module, viewModel.ModulePermissions, false));
     }
 
     [HttpPost]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
     public async Task<ActionResult> AddModule(ViewModels.Admin.PageEditor viewModel)
     {
-      PageModule module = await this.PageModuleManager.CreateNew(this.Context.Site, viewModel.Page);
-      viewModel = await BuildPageViewModel(viewModel.Page, module, null, true);
+      if (viewModel.Page.Id == Guid.Empty)
+      {
+        return BadRequest("You must save your new page before adding a module.");
+      }
 
-      return View("ModuleCommonSettings", viewModel);
+      Page page = await this.PageManager.Get(viewModel.Page.Id);
+      PageModule module = await this.PageModuleManager.CreateNew(this.Context.Site, page);
+
+      return View("ModuleCommonSettings", await BuildPageModuleCommonSettingsViewModel(page, module, null, true));
     }
 
     [HttpPost]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
     public async Task<ActionResult> EditModuleCommonSettings(ViewModels.Admin.PageEditor viewModel, Guid mid, ViewModels.Admin.PageEditor.PageEditorModes mode)
     {
+      Page page = await this.PageManager.Get(viewModel.Page.Id);
       PageModule module = await this.PageModuleManager.Get(mid);
-      viewModel = await BuildPageViewModel(viewModel.Page, module, null, true);
-      viewModel.PageEditorMode = mode;
+
+      ViewModels.Admin.PageModuleCommonSettingsEditor outputViewModel = await BuildPageModuleCommonSettingsViewModel(page, module, null, true);
+      outputViewModel.PageEditorMode = mode;
 
       if (mode == ViewModels.Admin.PageEditor.PageEditorModes.Standalone)
       {
-        viewModel.UseLayout = "_PopupEditor";
+        outputViewModel.UseLayout = "_PopupEditor";
       }
 
-      return View("ModuleCommonSettings", viewModel);
+      return View("ModuleCommonSettings", outputViewModel);
     }
 
     [HttpGet]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
     public async Task<ActionResult> EditModuleCommonSettings(Guid mid, ViewModels.Admin.PageEditor.PageEditorModes mode)
     {
-      ViewModels.Admin.PageEditor viewModel;
+      ViewModels.Admin.PageModuleCommonSettingsEditor viewModel;
 
       PageModule module = await this.PageModuleManager.Get(mid);
       Page page = await this.PageManager.Get(module.PageId);
 
-      viewModel = await BuildPageViewModel(page, module, null, true);
-      viewModel.PageEditorMode = mode;
-
-      if (mode == ViewModels.Admin.PageEditor.PageEditorModes.Standalone)
-      {
-        viewModel.UseLayout = "_PopupEditor";
-      }
-
-      return View("ModuleCommonSettings", viewModel);
-    }
-
-    [HttpGet]
-    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-    public async Task<ActionResult> RefreshDisplay(Guid mid, ViewModels.Admin.PageEditor.PageEditorModes mode)
-    {
-      ViewModels.Admin.PageEditor viewModel;
-
-      PageModule module = await this.PageModuleManager.Get(mid);
-      Page page = await this.PageManager.Get(module.PageId);
-
-      viewModel = await BuildPageViewModel(page, module, null, true);
+      viewModel = await BuildPageModuleCommonSettingsViewModel(page, module, null, true);
       viewModel.PageEditorMode = mode;
 
       if (mode == ViewModels.Admin.PageEditor.PageEditorModes.Standalone)
@@ -654,49 +632,55 @@ namespace Nucleus.Web.Controllers.Admin
     }
 
     [HttpPost]
-    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
-    public async Task<ActionResult> CreateModule(ViewModels.Admin.PageEditor viewModel)
+    [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+    public async Task<ActionResult> RefreshContainerStyles(ViewModels.Admin.PageModuleCommonSettingsEditor viewModel)
     {
-      if (viewModel.Module.ModuleDefinition == null || viewModel.Module.ModuleDefinition.Id == Guid.Empty)
-      {
-        return BadRequest("No module type selected.");
+      Page page = await this.PageManager.Get(viewModel.Module.PageId);
+      viewModel.Module.ContainerDefinition = await this.ContainerManager.Get(viewModel.Module.ContainerDefinition.Id);
+
+      viewModel.Module.AutomaticClasses = BuildAutomaticClasses(viewModel.ModuleContainerStyles);
+      viewModel.Module.AutomaticStyles = BuildAutomaticStyles(viewModel.ModuleContainerStyles);
+
+      // if the Automatic classes/styles are empty, re-read the values from the original record
+      if (String.IsNullOrEmpty(viewModel.Module.AutomaticClasses) || String.IsNullOrEmpty(viewModel.Module.AutomaticStyles))
+      { 
+        PageModule original = await this.PageModuleManager.Get(viewModel.Module.Id);
+
+        if (original != null)
+        {
+          if (String.IsNullOrEmpty(viewModel.Module.AutomaticClasses))
+          {
+            viewModel.Module.AutomaticClasses = original.AutomaticClasses;
+          }
+          
+          if (String.IsNullOrEmpty(viewModel.Module.AutomaticStyles))
+          {
+            viewModel.Module.AutomaticStyles = original.AutomaticStyles;
+          }
+        }
       }
 
-      if (viewModel.Page.Id == Guid.Empty)
-      {
-        return BadRequest("You must save your new page before adding a module.");
-      }
-
-      viewModel.Module.Permissions = await RebuildPermissions(viewModel.ModulePermissions);
-      await this.PageModuleManager.Save(viewModel.Page, viewModel.Module);
-
-      viewModel = await BuildPageEditorViewModel(viewModel.Page, null, true);
-
-      return View("_PageModules", viewModel);
+      return View("_ContainerStyles", await BuildPageModuleCommonSettingsViewModel(page, viewModel.Module, null, false));
     }
 
     [HttpPost]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-    public async Task<ActionResult> SaveModuleCommonSettings(ViewModels.Admin.PageEditor viewModel)
+    public async Task<ActionResult> SaveModuleCommonSettings(ViewModels.Admin.PageModuleCommonSettingsEditor viewModel)
     {
       if (viewModel.Module.ModuleDefinition == null || viewModel.Module.ModuleDefinition.Id == Guid.Empty)
       {
-        return BadRequest("No module type selected.");
+        ModelState.Clear();
+        ModelState.AddModelError<ViewModels.Admin.PageModuleCommonSettingsEditor>(model => model.Module.ModuleDefinition.Id, "Please select a module type.");
+        return BadRequest(ModelState);
       }
 
-      if (viewModel.Page.Id == Guid.Empty)
-      {
-        return BadRequest("You must save your new page before adding a module.");
-      }
-
+      Page page = await this.PageManager.Get(viewModel.Module.PageId);
       viewModel.Module.Permissions = await RebuildPermissions(viewModel.ModulePermissions);
-
-      
 
       viewModel.Module.AutomaticClasses = BuildAutomaticClasses(viewModel.ModuleContainerStyles);
       viewModel.Module.AutomaticStyles= BuildAutomaticStyles(viewModel.ModuleContainerStyles);
 
-      await this.PageModuleManager.Save(viewModel.Page, viewModel.Module);
+      await this.PageModuleManager.Save(page, viewModel.Module);
 
       if (viewModel.PageEditorMode == ViewModels.Admin.PageEditor.PageEditorModes.Standalone)
       {
@@ -704,13 +688,16 @@ namespace Nucleus.Web.Controllers.Admin
       }
       else
       {
-        viewModel = await BuildPageEditorViewModel(viewModel.Page, null, false);
-        return View("_PageModules", viewModel);
+        // we need to reload the page so that the new module or module changes are present in the modules list
+        page = await this.PageManager.Get(viewModel.Module.PageId);
+        return View("_PageModules", await BuildPageEditorViewModel(page, null, false));
       }
     }
 
     private string BuildAutomaticClasses(List<ContainerStyle> values)
     {
+      if (values == null) return "";
+
       string[] cssClasses = values
         .SelectMany(style => new string[] { !String.IsNullOrEmpty(style.SelectedValue) || !String.IsNullOrEmpty(style.CustomValue) ? style.BaseCssClass : null, style.SelectedValue })
         .Where(cssClass => !String.IsNullOrEmpty(cssClass) && cssClass != CUSTOM_CONTAINER_STYLE_VALUE)
@@ -722,6 +709,8 @@ namespace Nucleus.Web.Controllers.Admin
 
     private string BuildAutomaticStyles(List<ContainerStyle> values)
     {
+      if (values == null) return "";
+
       string[] cssStyles = values
         .Where(style => style.SelectedValue == CUSTOM_CONTAINER_STYLE_VALUE)
         .Select(style => $"--{style.Name}:{style.CustomValue}")
@@ -751,18 +740,18 @@ namespace Nucleus.Web.Controllers.Admin
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
     public async Task<ActionResult> EditModulePermissions(Guid mid)
     {
-      ViewModels.Admin.PageEditor viewModel;
+      ViewModels.Admin.PageModuleCommonSettingsEditor viewModel;
 
       PageModule module = await this.PageModuleManager.Get(mid);
       module.Permissions = await this.PageModuleManager.ListPermissions(module);
-      viewModel = await BuildPageViewModel(await this.PageManager.Get(module), module, null, true);
+      viewModel = await BuildPageModuleCommonSettingsViewModel(await this.PageManager.Get(module), module, null, true);
 
       return View("ModulePermissionsEditor", viewModel);
     }
 
     [HttpPost]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-    public async Task<ActionResult> AddModulePermissionRole(ViewModels.Admin.PageEditor viewModel, [FromQuery] Boolean Standalone)
+    public async Task<ActionResult> AddModulePermissionRole(ViewModels.Admin.PageModuleCommonSettingsEditor viewModel, [FromQuery] Boolean Standalone)
     {
       if (viewModel.SelectedModuleRoleId != Guid.Empty)
       {
@@ -770,9 +759,10 @@ namespace Nucleus.Web.Controllers.Admin
         await this.PageModuleManager.CreatePermissions(this.Context.Site, viewModel.Module, await this.RoleManager.Get(viewModel.SelectedModuleRoleId));
       }
 
+      Page page = await this.PageManager.Get(viewModel.Module.PageId);
       viewModel.ModulePermissions = viewModel.Module.Permissions.ToPermissionsList(this.Context.Site);
 
-      viewModel = await BuildPageViewModel(viewModel.Page, viewModel.Module, viewModel.ModulePermissions, false);
+      viewModel = await BuildPageModuleCommonSettingsViewModel(page, viewModel.Module, viewModel.ModulePermissions, false);
 
       if (Standalone)
       {
@@ -786,12 +776,13 @@ namespace Nucleus.Web.Controllers.Admin
 
     [HttpPost]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-    public async Task<ActionResult> SaveModulePermissions(ViewModels.Admin.PageEditor viewModel, Guid mid)
+    public async Task<ActionResult> SaveModulePermissions(ViewModels.Admin.PageModuleCommonSettingsEditor viewModel, Guid mid)
     {
-      PageModule module = await this.PageModuleManager.Get(mid);
+      Page page = await this.PageManager.Get(viewModel.Module.PageId);
+      PageModule module = await this.PageModuleManager.Get(mid);      
       module.Permissions = await RebuildPermissions(viewModel.ModulePermissions);
 
-      await this.PageModuleManager.SavePermissions(viewModel.Page, module);
+      await this.PageModuleManager.SavePermissions(page, module);
 
       return Ok();
     }
@@ -983,14 +974,20 @@ namespace Nucleus.Web.Controllers.Admin
       return pageTemplatesFolder;
     }
 
-    private async Task<ViewModels.Admin.PageEditor> BuildPageViewModel(Page page, PageModule module, PermissionsList modulePermissions, Boolean getPermissions)
+    private async Task<ViewModels.Admin.PageModuleCommonSettingsEditor> BuildPageModuleCommonSettingsViewModel(Page page, PageModule module, PermissionsList modulePermissions, Boolean getPermissions)
     {
-      ViewModels.Admin.PageEditor viewModel = await BuildPageEditorViewModel(page, null, false);
+      ViewModels.Admin.PageModuleCommonSettingsEditor viewModel = new();// await BuildPageEditorViewModel(page, null, false);
       viewModel.Module = module;
       viewModel.ModulePermissions = modulePermissions;
 
+      viewModel.AvailableModules = await GetAvailableModules();
+
       viewModel.AvailableModuleRoles = await GetAvailableRoles(viewModel.Module?.Permissions);
       viewModel.ModulePermissionTypes = await this.PageModuleManager.ListModulePermissionTypes();
+
+      viewModel.ModuleContainers = (await this.ContainerManager.List()).InsertDefaultListItem("(page default)");
+
+      viewModel.AvailablePanes = (await this.LayoutManager.ListLayoutPanes(page.LayoutDefinition ?? this.Context.Site.DefaultLayoutDefinition)).Append("None");
 
       // Set modules with an invalid pane to "Missing Pane"
       if (!viewModel.AvailablePanes.Contains(viewModel.Module.Pane))
@@ -1012,7 +1009,7 @@ namespace Nucleus.Web.Controllers.Admin
 
       viewModel.ModuleContainerStyles = await this.ContainerManager.ListContainerStyles(this.Context.Site, page, module.ContainerDefinition);
 
-      // add "custom" value for supported syntax types
+      // add "custom" list item for supported syntax types
       foreach (ContainerStyle currentStyle in viewModel.ModuleContainerStyles)
       {
         if (currentStyle.Syntax == "<color>")
@@ -1065,6 +1062,12 @@ namespace Nucleus.Web.Controllers.Admin
                   }
                 }
               }
+
+              // default value
+              if (style.Syntax == "<color>" && String.IsNullOrEmpty(style.CustomValue))
+              {
+                style.CustomValue = "#000000";
+              }              
             }
           }
         }
@@ -1103,7 +1106,7 @@ namespace Nucleus.Web.Controllers.Admin
       viewModel.ParentPageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, page.ParentId);
       viewModel.LinkPageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, viewModel.Page.LinkPageId);
 
-      viewModel.AvailableModules = await GetAvailableModules();
+      //viewModel.AvailableModules = await GetAvailableModules();
       viewModel.AvailablePageRoles = await GetAvailableRoles(viewModel.Page?.Permissions);
       viewModel.PagePermissionTypes = await this.PageManager.ListPagePermissionTypes();
 
@@ -1141,15 +1144,8 @@ namespace Nucleus.Web.Controllers.Admin
 
       viewModel.Layouts = (await this.LayoutManager.List()).InsertDefaultListItem("(site default)");
       viewModel.PageContainers = (await this.ContainerManager.List()).InsertDefaultListItem("(site default)");
-      viewModel.ModuleContainers = (await this.ContainerManager.List()).InsertDefaultListItem("(page default)");
 
-      viewModel.AvailablePanes = (await this.LayoutManager.ListLayoutPanes(viewModel.Page.LayoutDefinition ?? this.Context.Site.DefaultLayoutDefinition)).Append("None");
-
-      // Set modules with an invalid pane to "Missing Pane"
-      foreach (PageModule moduleMissingPane in viewModel.Page.Modules.Where(module => !viewModel.AvailablePanes.Contains(module.Pane)))
-      {
-        moduleMissingPane.Pane = "None";
-      }
+      viewModel.PagePanes = (await this.LayoutManager.ListLayoutPanes(page.LayoutDefinition ?? this.Context.Site.DefaultLayoutDefinition)).Append("None");
 
       if (!page.Routes.Any())
       {

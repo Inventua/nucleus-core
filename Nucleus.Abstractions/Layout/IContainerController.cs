@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Nucleus.Abstractions.Models;
 
 namespace Nucleus.Abstractions.Layout
 {
@@ -22,5 +23,5 @@ namespace Nucleus.Abstractions.Layout
 		/// </summary>
 		/// <returns></returns>
 		public abstract ActionResult RenderContainer();
-	}
+  }
 }

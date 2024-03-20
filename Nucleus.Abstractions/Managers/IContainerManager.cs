@@ -16,6 +16,12 @@ namespace Nucleus.Abstractions.Managers;
 public interface IContainerManager
 {
   /// <summary>
+  /// Retrieve the specified container definition.
+  /// </summary>
+  /// <returns></returns>
+  public Task<Nucleus.Abstractions.Models.ContainerDefinition> Get(Guid id);
+
+  /// <summary>
   /// List all available containers, sorted by <see cref="Models.ContainerDefinition.FriendlyName"/>.
   /// </summary>
   /// <returns></returns>
@@ -29,4 +35,13 @@ public interface IContainerManager
   /// <param name="containerDefinition"></param>
   /// <returns></returns>
   public Task<List<ContainerStyle>> ListContainerStyles(Site site, Page page, ContainerDefinition containerDefinition);
+
+  /// <summary>
+  /// Return the container to use for the specified site/page/module.
+  /// </summary>
+  /// <param name="site"></param>
+  /// <param name="page"></param>
+  /// <param name="containerDefinition"></param>
+  public string GetEffectiveContainerPath(Site site, Page page, ContainerDefinition containerDefinition);
+
 }

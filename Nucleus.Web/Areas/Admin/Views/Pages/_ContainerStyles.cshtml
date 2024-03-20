@@ -1,0 +1,48 @@
+﻿@model Nucleus.Web.ViewModels.Admin.PageModuleCommonSettingsEditor
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@foreach (var group in Model.ModuleContainerStyleGroups)
+{
+  @if (!String.IsNullOrEmpty(@group))
+  {
+    <h4 class="mt-2 mb-1">@group</h4>
+  }
+  <div class="d-flex flex-wrap column-gap-2">
+    @foreach (var styleProperty in Model.ModuleContainerStyles.Select((Value, Index) => new { Index, Value }).Where(item => item.Value.Group == group))
+    {
+      @Html.HiddenFor(model => model.ModuleContainerStyles[styleProperty.Index].Name)
+      @Html.HiddenFor(model => model.ModuleContainerStyles[styleProperty.Index].BaseCssClass)
+      <SettingsControl caption="@styleProperty.Value.Title" class="flex-1">
+        <div class="d-flex flex-1 column-gap-1">
+          <select id="@Html.IdFor(model => model.ModuleContainerStyles[styleProperty.Index].SelectedValue)" name="@Html.NameFor(model => model.ModuleContainerStyles[styleProperty.Index].SelectedValue)" data-type="@styleProperty.Value.Syntax" class="container-style-selector flex-1 my-auto">
+            <option value="">(no selection)</option>
+            @foreach (var value in Model.ModuleContainerStyles[styleProperty.Index].Values)
+            {
+              @if (value.CssClass == Model.ModuleContainerStyles[styleProperty.Index].SelectedValue)
+              {
+                <option selected="selected" value="@value.CssClass" data-name="--@value.Name">@value.Title</option>
+              }
+              else
+              {
+                <option value="@value.CssClass" data-name="--@value.Name">@value.Title</option>
+              }
+            }
+          </select>
+          @* @Html.DropDownListFor(model => model.ModuleContainerStyles[styleProperty.Index].SelectedValue, new SelectList(Model.ModuleContainerStyles[styleProperty.Index].Values, "CssClass", "Title"), "(no selection)") *@
+
+          @if (styleProperty.Value.Syntax == "<color>")
+          {
+            List<string> colorselector_classes = new() { "container-style-colorselector", "collapse" };
+            if (Model.ModuleContainerStyles[styleProperty.Index].SelectedValue == Nucleus.Web.Controllers.Admin.PagesController.CUSTOM_CONTAINER_STYLE_VALUE)
+            {
+              colorselector_classes.Add("show");
+            }
+            @Html.TextBoxFor(model => model.ModuleContainerStyles[styleProperty.Index].CustomValue, new { @type = "color", @class = String.Join(' ', colorselector_classes) })
+          }
+        </div>
+      </SettingsControl>
+    }
+  </div>
+}

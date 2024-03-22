@@ -5,110 +5,110 @@
 @Html.AddStyle("~/Resources/css/forms.css")
 @using (Html.BeginNucleusForm("Login", "Login", "Account", FormMethod.Post, new { data_target = "form.parent()" }))
 {
-	<fieldset aria-label="Login">
-		@if (!String.IsNullOrEmpty(Model.Message))
-		{
-			<div class="alert alert-warning">@Model.Message</div>
-		}
-		@Html.HiddenFor(model => model.ReturnUrl)
-		@Html.HiddenFor(model => model.ShowVerificationToken)
-		<div>
-			<label class="nucleus-show-progress nucleus-show-progress-after">
-				<span>User name</span>
-				<span>@Html.TextBoxFor(model => model.Username, new { @class= Model.ShowVerificationToken ? "" : "nucleus-default-control", @autocorrect = "off", @autocapitalize = "none" })</span>
-			</label>
-		</div>
-		<div>
-			<label>
-				<span>Password</span>
-				<span>@Html.PasswordFor(model => model.Password, new { @value = Model.Password })</span>
-			</label>
-		</div>
+  <fieldset aria-label="Login">
+    @if (!String.IsNullOrEmpty(Model.Message))
+    {
+      <div class="alert alert-warning">@Model.Message</div>
+    }
+    @Html.HiddenFor(model => model.ReturnUrl)
+    @Html.HiddenFor(model => model.ShowVerificationToken)
+    <div>
+      <label class="nucleus-show-progress nucleus-show-progress-after">
+        <span>User name</span>
+        <span>@Html.TextBoxFor(model => model.Username, new { @class = Model.ShowVerificationToken ? "" : "nucleus-default-control", @autocorrect = "off", @autocapitalize = "none" })</span>
+      </label>
+    </div>
+    <div>
+      <label>
+        <span>Password</span>
+        <span>@Html.PasswordFor(model => model.Password, new { @value = Model.Password })</span>
+      </label>
+    </div>
 
-		@if (Model.ShowVerificationToken)
-		{
-			<div class="alert alert-primary mt-3">
-				Please enter the verification code from your welcome e-mail and click Login.
-			</div>
-			<div class="nucleus-flex-fields">
-				<label>
-					<span>Verification Token</span>
-					<span>@Html.TextBoxFor(model => model.VerificationToken, new { @class= "nucleus-default-control" })</span>
+    @if (Model.ShowVerificationToken)
+    {
+      <div class="alert alert-primary mt-3">
+        Please enter the verification code from your welcome e-mail and click Login.
+      </div>
+      <div class="nucleus-flex-fields">
+        <label>
+          <span>Verification Token</span>
+          <span>@Html.TextBoxFor(model => model.VerificationToken, new { @class = "nucleus-default-control" })</span>
         </label>
         <button type="submit" class="btn btn-secondary btn-sm mt-2" formaction="@Url.NucleusAction("ResendVerificationCode", "Login", "Account")">Send new Verification Code</button>
-			</div>
-		}
-
-		@if (Model.AllowRememberMe)
-		{
-			<div>
-				<label>
-					Remember Me?
-					@Html.CheckBoxFor(model => model.RememberMe)
-				</label>
-			</div>
-		}
-		<div class="mt-2">
-			<button type="submit" class="btn btn-primary nucleus-login" data-target="form.parent()">Login</button>
-      @if (Model.ExternalAuthenticationProtocols?.Any() == true)
-      {
-        @if (Model.ExternalAuthenticationUrl != null)
-        {
-          <button type="submit" class="nucleus-login btn btn-primary" data-target="form.parent()" formaction="@Model.ExternalAuthenticationUrl">@Model.ExternalAuthenticationCaption</button>
-        }
-        else
-        {
-          <div class="btn-group d-inline-block">
-            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Log in with
-            </button>
-            <div class="dropdown-menu m-2" aria-label="Log in with">
-              @foreach (var protocol in Model.ExternalAuthenticationProtocols)
-              {
-                <a class="nucleus-login btn btn-none" data-target="form.parent()" href="@Url.NucleusAction("External", "Login", "Account", new { scheme = protocol.Scheme, returnUrl = Model.ReturnUrl })">@(String.IsNullOrEmpty(protocol.FriendlyName) ? protocol.Scheme : protocol.FriendlyName)</a>
-              }
-            </div>
-          </div>
-        }
-      }
-      <button type="button" onclick="window.location.href='@Url.Content("~/")';" class="btn btn-secondary">Cancel</button>
-
-			@if (Model.AllowUsernameRecovery || Model.AllowPasswordReset)
-			{
-				@Html.LinkButton("", "Trouble logging in?", @Url.NucleusAction("Index", "Recover", "Account"), false, new 
-				{ 
-					@class="ms-2", 
-					@returnurl = Model.ReturnUrl, 
-					@data_target = "form.parent()"
-				})
-			}
-		</div>
-	</fieldset>
-}
-<script>
-	jQuery(document).ready(function()
-	{
-    @if (!String.IsNullOrEmpty(Model.AutomaticAuthenticationUrl))
-    {
-      <text>Page.LoadPartialContent(null, '@Model.AutomaticAuthenticationUrl', "#null"); </text>
+      </div>
     }
 
-    jQuery(Page).on('ready', function( page, target, data, url, event, status, request )
-		{
-			jQuery('#@(nameof(Nucleus.Modules.Account.ViewModels.Login.Username))')
-			  .siblings('.nucleus-progress-spinner')
-				.remove();
-		});
+    @if (Model.AllowRememberMe)
+    {
+      <div>
+        <label>
+          Remember Me?
+          @Html.CheckBoxFor(model => model.RememberMe)
+        </label>
+      </div>
+    }
+  </fieldset>
+  <div class="mt-2">
+    <button type="submit" class="btn btn-primary nucleus-login" data-target="form.parent()">Login</button>
+    @if (Model.ExternalAuthenticationProtocols?.Any() == true)
+    {
+      @if (Model.ExternalAuthenticationUrl != null)
+      {
+        <button type="submit" class="nucleus-login btn btn-primary" data-target="form.parent()" formaction="@Model.ExternalAuthenticationUrl">@Model.ExternalAuthenticationCaption</button>
+      }
+      else
+      {
+        <div class="btn-group d-inline-block">
+          <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Log in with
+          </button>
+          <div class="dropdown-menu m-2" aria-label="Log in with">
+            @foreach (var protocol in Model.ExternalAuthenticationProtocols)
+            {
+              <a class="nucleus-login btn btn-none" data-target="form.parent()" href="@Url.NucleusAction("External", "Login", "Account", new { scheme = protocol.Scheme, returnUrl = Model.ReturnUrl })">@(String.IsNullOrEmpty(protocol.FriendlyName) ? protocol.Scheme : protocol.FriendlyName)</a>
+            }
+          </div>
+        </div>
+      }
+    }
+    <button type="button" onclick="window.location.href='@Url.Content("~/")';" class="btn btn-secondary">Cancel</button>
 
-		jQuery('.nucleus-login').on('click', function()
-		{
+    @if (Model.AllowUsernameRecovery || Model.AllowPasswordReset)
+    {
+      @Html.LinkButton("", "Trouble logging in?", @Url.NucleusAction("Index", "Recover", "Account"), false, new
+        {
+          @class = "ms-2",
+          @returnurl = Model.ReturnUrl,
+          @data_target = "form.parent()"
+        })
+    }
+  </div>
+}
+<script>
+  jQuery(document).ready(function ()
+  {
+  @if (!String.IsNullOrEmpty(Model.AutomaticAuthenticationUrl))
+  {
+    <text>Page.LoadPartialContent(null, '@Model.AutomaticAuthenticationUrl', "#null"); </text>
+  }
+
+      jQuery(Page).on('ready', function (page, target, data, url, event, status, request)
+      {
+        jQuery('#@(nameof(Nucleus.Modules.Account.ViewModels.Login.Username))')
+          .siblings('.nucleus-progress-spinner')
+          .remove();
+      });
+
+    jQuery('.nucleus-login').on('click', function ()
+    {
       var usernameControl = jQuery('#@(nameof(Nucleus.Modules.Account.ViewModels.Login.Username))');
-			
+
       if (usernameControl.siblings('.nucleus-progress-spinner').length === 0)
       {
         var progress = jQuery('<div class="spinner-border spinner-border-sm text-primary nucleus-progress-spinner ms-2 mt-1 position-absolute" role="status"/>');
         progress.insertAfter(usernameControl);
       }
-		});			
-	});
+    });
+  });
 </script>

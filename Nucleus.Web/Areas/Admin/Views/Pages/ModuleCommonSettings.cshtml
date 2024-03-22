@@ -109,7 +109,7 @@
     }
   });
 
-  jQuery('.container-style-selector[data-type="<color>"]').on("change", function (event)
+  jQuery(document).on("change", '.container-style-selector[data-type="<color>"]', function (event)
   {
     var element = jQuery(this);
     var selectedOption = element.find('option:selected');

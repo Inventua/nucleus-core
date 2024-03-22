@@ -218,6 +218,12 @@
 }
 
 /* title margin container style values for the @title-margin @property */
+.container-style.title-margin-auto
+{
+  /* title: Auto */
+  --title-margin: auto;
+}
+
 .container-style.title-margin-1
 {
   /* title: Smallest */
@@ -945,6 +951,12 @@
 }
 
 /* content margin container style values for the @content-margin @property */
+.container-style.content-margin-auto
+{
+  /* title: Auto */
+  --content-margin: auto;
+}
+
 .container-style.content-margin-1
 {
   /* title: Smallest */

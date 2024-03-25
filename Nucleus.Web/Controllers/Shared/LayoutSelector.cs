@@ -91,7 +91,7 @@ public class LayoutSelector
         {
           string folder = System.IO.Path.GetFileName(workingDirectory);
           // insert spaces in between words 
-          return Regex.Replace(folder, @"(\B[A-Z]+?(?=[A-Z][^A-Z])|\B[A-Z]+?(?=[^A-Z]))", " $1");
+          return Regex.Replace(folder, @"([A-Z])([A-Z])([a-z])|([a-z])([A-Z])", "$1$4 $2$3$5");
         }
 
         workingDirectory = workingDirectoryParent;

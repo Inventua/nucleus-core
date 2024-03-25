@@ -9,7 +9,7 @@
   {
     <h4 class="mt-2 mb-1">@group</h4>
   }
-  <div class="d-flex flex-wrap column-gap-2">
+  <div class="grid-3-column column-gap-2">
     @foreach (var styleProperty in Model.ModuleContainerStyles.Select((Value, Index) => new { Index, Value }).Where(item => item.Value.Group == group))
     {
       @Html.HiddenFor(model => model.ModuleContainerStyles[styleProperty.Index].Name)

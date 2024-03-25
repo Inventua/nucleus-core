@@ -220,8 +220,14 @@
 /* title margin container style values for the @title-margin @property */
 .container-style.title-margin-auto
 {
-  /* title: Auto */
+  /* title: Automatic (centered) */
   --title-margin: auto;
+}
+
+.container-style.title-margin-none
+{
+  /* title: None */
+  --title-margin: 0;
 }
 
 .container-style.title-margin-1
@@ -953,8 +959,14 @@
 /* content margin container style values for the @content-margin @property */
 .container-style.content-margin-auto
 {
-  /* title: Auto */
+  /* title: Automatic (centered) */
   --content-margin: auto;
+}
+
+.container-style.content-margin-none
+{
+  /* title: None */
+  --content-margin: 0;
 }
 
 .container-style.content-margin-1

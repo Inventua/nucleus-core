@@ -134,7 +134,7 @@ table input[type=radio]
 		flex-basis: 100%;
 	}
 
-/* This section is mostly to do with overriding Safari/IOS styling of various elements */
+/* This section is mostly to override Safari/IOS styling of various elements */
 input[type=text], input[type=email], input[type=tel], input[type=search], input[type=url], input[type=password], select, textarea
 {
 	padding: 0 0.25rem;
@@ -216,6 +216,7 @@ input[type=text], input[type=email], input[type=tel], input[type=search], input[
 /*  Responsive UI  */
 @media screen and (max-width: 980px)
 {
+  /* on small/narrow displays, render controls vertically instead of horizontally */
 	.nucleus-flex-fields
 	{
 		flex-direction: column;

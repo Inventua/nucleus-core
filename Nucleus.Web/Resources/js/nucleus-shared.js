@@ -209,7 +209,7 @@ function _Page()
       event.stopImmediatePropagation();
 
       var form = jQuery(this).parents('form');
-      var uploadprogressWrapper = form.find('.UploadProgress').first();
+      var uploadprogressWrapper = form.find('.upload-progress').first();
       var uploadprogress = uploadprogressWrapper.find('progress');
       var uploadprogressLabel = uploadprogressWrapper.find('label');
 
@@ -519,7 +519,7 @@ function _Page()
     target = _getTarget(eventTarget, targetSelector);
 
     // reset validation error highlighting
-    target.find('.ValidationError').removeClass('ValidationError');
+    target.find('.validation-error').removeClass('validation-error');
 
     if (targetSelector === 'window')
     {
@@ -679,7 +679,7 @@ function _Page()
     }
 
     // reset validation error highlighting
-    target.find('.ValidationError').removeClass('ValidationError');
+    target.find('.validation-error').removeClass('validation-error');
 
     /// In some cases, the item with a data-target will contain an element with a href (for example when a LI 
     /// contains an A element).  Get the Url from the first child with a href attribute in these cases.
@@ -825,11 +825,11 @@ function _Page()
             var element = jQuery('[name="' + prop + '"]');
             if (!element.is('.HtmlEditorControl'))
             {
-              element.addClass('ValidationError');
+              element.addClass('validation-error');
             }
             else
             {
-              element.parents('.settings-control').first().addClass('ValidationError');
+              element.parents('.settings-control').first().addClass('validation-error');
             }
 
             if (elementSelector !== '') elementSelector += ',';
@@ -1633,7 +1633,7 @@ function _Page()
   {
     window.document.addEventListener('ExpandAdminFrame', function (args)
     {
-      var adminFrame = jQuery('#AdminFrame');
+      var adminFrame = jQuery('#nucleus-admin-frame');
       args.detail !== null && args.detail.expand ? adminFrame.addClass('Expanded') : adminFrame.removeClass('Expanded');
     }, false);
 

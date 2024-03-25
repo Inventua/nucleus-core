@@ -85,7 +85,7 @@
       @Html.SubmitButton("&#xe897;", "Folder Settings", @Url.AreaAction("EditFolderSettings", "FileSystem", "Admin", new { folderId = Model.Folder.Id }), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary btn-sm" })
     </div>
 
-    <ProgressBar caption="Uploading file(s) ..." class="UploadProgress"></ProgressBar>
+    <ProgressBar caption="Uploading file(s) ..." class="upload-progress"></ProgressBar>
 
     @if (Model.Folder?.Permissions?.Any() != true)
     {

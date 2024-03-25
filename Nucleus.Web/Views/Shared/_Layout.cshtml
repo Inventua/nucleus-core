@@ -51,8 +51,8 @@
 <body>
 	@if (Model.CanEdit)
 	{
-		<iframe id="AdminFrame" title="Control Panel" accesskey="A" src="@Url.Content("~/Admin/Index/Index")?pageId=@Model.Context.Page.Id" class="Nucleus AdminFrame"></iframe>
-		<div class="AdminFramePlaceholder"></div>
+    <iframe id="nucleus-admin-frame" title="Control Panel" accesskey="A" src="@Url.Content("~/Admin/Index/Index")?pageId=@Model.Context.Page.Id" class="Nucleus nucleus-admin-frame"></iframe>
+		<div class="nucleus-admin-frame-placeholder"></div>
 
 		<modal id="nucleus-popupdialog" title="Module Settings">
 			<iframe src="about:blank" title="Settings" class="nucleus-modulesettings-frame"></iframe>
@@ -66,12 +66,10 @@
 	@if (Model.CanEdit)
 	{
 		<script>
-			jQuery(document).ready(function ()
+			jQuery(function ()
 			{
 				Page.AddEventHandlers('@PermissionExtensions.EDIT_COOKIE_NAME');
 			});
-
-			
 		</script>
 	}
 </body>

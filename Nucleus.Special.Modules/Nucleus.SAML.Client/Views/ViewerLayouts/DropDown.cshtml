@@ -4,19 +4,17 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.SAML.Client.ViewModels
 <div class="d-flex">
-	<div class="d-flex">
-		@if (!String.IsNullOrEmpty(@Model.Caption))
+	@if (!String.IsNullOrEmpty(@Model.Caption))
+	{
+		<label class="d-flex align-self-center me-1">@Model.Caption</label>
+	}
+	<select id="samlclient-viewer-select" title="SAML Identity Providers" class="flex-1">
+		@foreach (var option in Model.Options)
 		{
-			<label class="d-flex align-self-center me-1">@Model.Caption</label>
+			<option value="@option.AuthenticateEndpoint(Url, Model.ReturnUrl)">@option.DisplayName()</option>
 		}
-		<select id="samlclient-viewer-select" title="SAML Identity Providers">
-			@foreach (var option in Model.Options)
-			{
-				<option value="@option.AuthenticateEndpoint(Url, Model.ReturnUrl)">@option.DisplayName()</option>
-			}
-		</select>	
-		<button id="saml-viewer-login" class="btn btn-primary ms-1" type="button">Log in</button>
-	</div>
+	</select>	
+	<button id="saml-viewer-login" class="btn btn-primary ms-1" type="button">Log in</button>
 </div>
 <script>
 	jQuery(document).ready(function ()

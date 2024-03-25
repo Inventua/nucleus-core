@@ -49,39 +49,46 @@
       </div>
     }
   </fieldset>
-  <div class="mt-2">
-    <button type="submit" class="btn btn-primary nucleus-login" data-target="form.parent()">Login</button>
-    @if (Model.ExternalAuthenticationProtocols?.Any() == true)
-    {
-      @if (Model.ExternalAuthenticationUrl != null)
-      {
-        <button type="submit" class="nucleus-login btn btn-primary" data-target="form.parent()" formaction="@Model.ExternalAuthenticationUrl">@Model.ExternalAuthenticationCaption</button>
-      }
-      else
-      {
-        <div class="btn-group d-inline-block">
-          <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Log in with
-          </button>
-          <div class="dropdown-menu m-2" aria-label="Log in with">
-            @foreach (var protocol in Model.ExternalAuthenticationProtocols)
-            {
-              <a class="nucleus-login btn btn-none" data-target="form.parent()" href="@Url.NucleusAction("External", "Login", "Account", new { scheme = protocol.Scheme, returnUrl = Model.ReturnUrl })">@(String.IsNullOrEmpty(protocol.FriendlyName) ? protocol.Scheme : protocol.FriendlyName)</a>
-            }
-          </div>
-        </div>
-      }
-    }
-    <button type="button" onclick="window.location.href='@Url.Content("~/")';" class="btn btn-secondary">Cancel</button>
+  <div class="account-buttons-wrapper">
+    <div class="mt-2 account-main-buttons">
+      <button type="submit" class="btn btn-primary nucleus-login" data-target="form.parent()">Login</button>
+      <a href="@Url.Content("~/")" class="btn btn-secondary">Cancel</a>
+    </div>
 
     @if (Model.AllowUsernameRecovery || Model.AllowPasswordReset)
     {
-      @Html.LinkButton("", "Trouble logging in?", @Url.NucleusAction("Index", "Recover", "Account"), false, new
+      <div class="mt-2 account-recover">
+        @Html.LinkButton("", "Trouble logging in?", @Url.NucleusAction("Index", "Recover", "Account"), false, new
+          {
+            @class = "ms-2",
+            @returnurl = Model.ReturnUrl,
+            @data_target = "form.parent()"
+          })
+      </div>
+    }
+
+    @if (Model.ExternalAuthenticationProtocols?.Any() == true)
+    {
+      <div class="mt-2 account-externalauth">
+        @if (Model.ExternalAuthenticationUrl != null)
         {
-          @class = "ms-2",
-          @returnurl = Model.ReturnUrl,
-          @data_target = "form.parent()"
-        })
+          <button type="submit" class="nucleus-login btn btn-primary" data-target="form.parent()" formaction="@Model.ExternalAuthenticationUrl">@Model.ExternalAuthenticationCaption</button>
+        }
+        else
+        {
+          <div class="btn-group d-inline-block">
+            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Log in with
+            </button>
+            <div class="dropdown-menu m-2" aria-label="Log in with">
+              @foreach (var protocol in Model.ExternalAuthenticationProtocols)
+              {
+                <a class="nucleus-login btn btn-none" data-target="form.parent()" href="@Url.NucleusAction("External", "Login", "Account", new { scheme = protocol.Scheme, returnUrl = Model.ReturnUrl })">@(String.IsNullOrEmpty(protocol.FriendlyName) ? protocol.Scheme : protocol.FriendlyName)</a>
+              }
+            </div>
+          </div>
+        }
+      </div>
     }
   </div>
 }

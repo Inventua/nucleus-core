@@ -4,97 +4,32 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.PageLinks.ViewModels
 @Html.AddStyle("~!/../viewer.css")
-<div class="PageLinks"></div>
+@Html.AddScript("~!/../viewer.js")
+<div class="PageLinks">
+  @if (Model.Mode == Nucleus.Modules.PageLinks.Models.Settings.Modes.Manual)
+  {
+    <ol>
+      @foreach (var pageLink in Model.PageLinks)
+      {
+        <li><a href="@this.Context.Request.Path@(new char[] {'#', '.'}.Contains(pageLink.TargetId.First()) ? "" : "#")@pageLink.TargetId">@pageLink.Title</a></li>
+      }
+    </ol>
+  }
+</div>
 <script>
-
-	jQuery(function ()
-	{
-		var counter = 0;
-		var listElement = jQuery('<ol></ol>');
-		var operationMode = '@Model.Mode';
-		var rootSelector = '@Model.RootSelector';
-
-		if (operationMode === 'Automatic' && rootSelector.length > 0)
-		{
-			var childElements = jQuery(rootSelector).find('h1');
-
-			if (childElements.length !== 0)
-			{
-				addLevel(rootSelector, listElement, childElements, -1, 1, counter);
-				jQuery('.PageLinks').append(listElement);
-			}
-		}
-	});
-
-	function addLevel(parentElement, linkParentElement, elements, previousLevel, level, counter)
-	{
-		elements.each(function (index, element)
-		{
-			var headerElement = jQuery(element);
-
-			if (level === 1 || headerElement.prevAll('h' + previousLevel).first().is(parentElement))
-			{
-				counter++;
-				var elementId = headerElement.attr('id');
-
-				if (typeof elementId === 'undefined')
-				{
-					elementId = 'pageLink' + counter;
-					headerElement.attr('id', elementId);
-				}
-
-				var relativeUrl = new URL(window.location.href);
-				relativeUrl.hash = '#' + elementId;
-
-				var linkText = linkText = headerElement.attr('data-title');
-				if (typeof linkText === 'undefined')
-				{
-					linkText = headerElement.text();
-				}
-
-				if (linkText !== '')
-				{
-					var linkElement = jQuery('<li><a href="' + relativeUrl.toString() + '">' + linkText + '</a></li>');
-
-					if (level < 6)
-					{
-						var nextLevelElement = jQuery('<ol></ol>');
-						var nextLevel = level + 1;
-						var childElements = headerElement.siblings('h' + nextLevel);
-
-						// if (childElements.length !== 0)
-						// {
-							counter = addLevel(headerElement, nextLevelElement, childElements, level, nextLevel, counter);
-						if (nextLevelElement.children().length !== 0)
-						{
-							linkElement.append(nextLevelElement);
-						}
-						// }
-					}
-					linkParentElement.append(linkElement);
-				}
-			}
-		});
-
-		// Handle cases where the content has skipped a header level (for example H2 ... H4)
-		if (elements.length === 0 && level < 6)
-		{
-			var nextLevelElement = jQuery('<ol></ol>');
-			var nextLevel = level + 1;
-			var childElements = parentElement.siblings('h' + nextLevel);
-
-			// if (childElements.length !== 0)
-			// {
-			counter = addLevel(parentElement, linkParentElement, childElements, previousLevel, nextLevel, counter);
-			if (nextLevelElement.children().length !== 0)
-			{
-				linkParentElement.append(nextLevelElement);
-			}
-			// }
-		}
-
-		return counter;
-	}
+  @if (Model.Mode == Nucleus.Modules.PageLinks.Models.Settings.Modes.Automatic)
+  {
+    <text>
+	  jQuery(function ()
+	  {
+		  jQuery('.PageLinks').PageLinkViewer({
+			  operationMode: '@Model.Mode',
+			  rootSelector: '@Model.RootSelector',
+        includeHeaders: '@Model.EnabledHeaders'
+		  });
+	  });
+    </text>
+  }
 
 	function selectElement()
 	{

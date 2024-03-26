@@ -11,6 +11,6 @@ namespace Nucleus.Modules.PageLinks.ViewModels
 {
 	public class Viewer : Models.Settings
 	{
-
-	}
+    public string EnabledHeaders { get; set; }
+  }
 }

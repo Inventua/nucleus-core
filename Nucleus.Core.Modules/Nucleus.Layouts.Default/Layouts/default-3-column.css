@@ -11,33 +11,9 @@
 	flex-direction: column;	
 }
 
-.BannerPane .Breadcrumbs
-{
-	margin-left: 4px;
-	vertical-align: middle;
-}
-
-.BannerPane .AccountControl
-{
-	margin-right: 2px;	
-	gap: 2px;
-}
-
-.BannerPane .AccountControl .dropdown-menu
-{
-	left: auto;
-	margin: auto;
-}
-
-.BannerPane .AccountControl > *
-{
-	flex-grow: 0;
-}
-
 .LeftPane
 {
   flex: 1;
-	background-color: #eee;	
 }
 
 .ContentWrapper 
@@ -65,27 +41,12 @@
 .RightPane
 {
   flex: 1;
-	min-width: 12rem;
-	background-color: #eee;		
 }
 
 .BottomPane
 {
 	display: flex;
-	flex-direction: row;	
+	flex-direction: row;
   gap: 1rem;
-	background-color: #535353;
-	opacity: 0.9;
-	padding: 0.5rem;
-}
-
-.BottomPane *
-{
-	color: white;
-}
-
-.style-scrollable
-{
-	height: 100%;
-	overflow: auto;
+  background-color: #535353;
 }

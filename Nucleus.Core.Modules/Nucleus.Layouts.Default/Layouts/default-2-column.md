@@ -1,6 +1,10 @@
-﻿- The *BannerPane* at the top contains your site logo, and the user account, site menu, and breadcrumb controls.  You can add additional modules.
-- The *LeftPane* has a gray background.  If you don't put anything in the *LeftPane*, it is suppressed.
-- The *ContentPane* is scrollable if the content does not fit.
-- The *BottomPane* at the bottom contains a link to your site terms and privacy policy pages (if configured).  You can add additional modules. 
+﻿Use this layout to display a list of links or other content in the *LeftPane* alongside your main content.  The left pane and content
+widths are a 1:5 ratio.
 
-Use this layout to display a list of links or other content in the *LeftPane* alongside your main content.  
+| Pane             | Position                       | Notes
+|------------------|--------------------------------|-------------------------------
+| BannerPane       | Top, fills width               | Contains site logo, user account, site menu and breadcrumb controls.
+| LeftPane         | Middle-Left, fills height      | Suppressed if no content.
+| ContentPane      | Middle, fills height & width   | Scrollable if content does not fit.
+| BottomPane       | Bottom, fills width            | Contains site terms and privacy policy links (if configured)
+

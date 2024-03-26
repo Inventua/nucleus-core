@@ -33,6 +33,10 @@
         <friendlyName>Simple</friendlyName>
         <relativePath>Layouts\simple.cshtml</relativePath>
       </layoutDefinition>
+      <layoutDefinition id="911E9A85-7401-4768-BC2F-FC6309314351">
+        <friendlyName>Centered Cell</friendlyName>
+        <relativePath>Layouts\centered-cell.cshtml</relativePath>
+      </layoutDefinition>
       <containerDefinition id="006CF94A-8279-4054-8EC2-4E0CAEBE77C7">
         <friendlyName>No Title</friendlyName>
         <relativePath>Containers\no-title.cshtml</relativePath>
@@ -63,6 +67,10 @@
         <file name="default-2-column.md" />
         <file name="default-3-column.md" />
         <file name="simple.md" />
+        <file name="centered-cell.cshtml" />
+        <file name="centered-cell.css" />
+        <file name="centered-cell.png" />
+        <file name="centered-cell.md" />
       </folder>
       <folder name="Containers">
         <file name="centered.cshtml" />

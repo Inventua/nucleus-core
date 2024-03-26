@@ -14,7 +14,6 @@
 .LeftPane
 {
   flex: 1;
-	background-color: #eee;	
 }
 
 .ContentWrapper 
@@ -41,20 +40,7 @@
 .BottomPane
 {
 	display: flex;
-	flex-direction: row;	
+	flex-direction: row;
   gap: 1rem;
-	background-color: #535353;
-	opacity: 0.9;
-	padding: 0.5rem;
-}
-
-.BottomPane *
-{
-	color: white;
-}
-
-.style-scrollable
-{
-	height: 100%;
-	overflow: auto;
+  background-color: #535353;
 }

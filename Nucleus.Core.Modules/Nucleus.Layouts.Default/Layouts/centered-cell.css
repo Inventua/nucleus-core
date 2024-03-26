@@ -5,19 +5,12 @@
 	height: 100%;
 }
 
-.ContentWrapper 
-{
-	flex-grow: 1;
-	display: flex;		
-	overflow: auto;
-	flex-direction: row;
-}
-
 .ContentPane
 {
 	display: flex;
 	flex-direction: column;
-	flex-grow: 1;
+	margin: auto;
+  min-width: 40rem;
 }
 
 .ContentPane > div

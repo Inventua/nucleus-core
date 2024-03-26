@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Grpc.Core;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Extensions;
@@ -42,6 +43,47 @@ public class LayoutSelector
 
     return viewModel;
   }
+
+  //private static string ParseLayoutDescription(string value)
+  //{
+  //  const string CAPABILITIES_REGEX = "{(?<capabilities>.*)}";
+  //  const string CAPABILITY_MATCH = "(?<capability>[^; }]*)";
+    
+  //  List<string> capabilities = new();
+
+  //  Match capabilitiesMatch = System.Text.RegularExpressions.Regex.Match(value, CAPABILITIES_REGEX);
+  //  if (capabilitiesMatch.Success)
+  //  {
+  //    foreach (Match capabilityMatch in System.Text.RegularExpressions.Regex.Matches(value, CAPABILITY_MATCH))
+  //    {
+  //      switch (capabilityMatch.Groups["capability"].Value)
+  //      {
+  //        case "grow-x":
+  //          capabilities.Add("&#xf730;");
+  //          break;
+  //        case "grow-y":
+  //          capabilities.Add("&#xe94f;");
+  //          break;
+  //        case "contains-modules":
+  //          capabilities.Add("&#xe87b;");
+  //          break;
+  //      }
+  //    }
+    
+  //    return System.Text.RegularExpressions.Regex.Replace
+  //    (
+  //      value, 
+  //      CAPABILITIES_REGEX, 
+  //      "<div class='capabilities'>" + 
+  //      String.Join("", capabilities.Select(capability => $"<span class='capability'>{capability}</span>")) + 
+  //      "</div>"
+  //    );
+  //  }
+  //  else
+  //  {
+  //    return value;
+  //  }
+  //}
 
   public static async Task<ContainerSelector> BuildContainerSelectorViewModel(IContainerManager containerManager, Guid? selectedContainerId)
   {

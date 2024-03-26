@@ -652,49 +652,76 @@ ul.nucleus-control-panel-items button
 }
 
 /* container styles selector */
-.nucleus-admin-content .style-selector > ul
+.nucleus-admin-content .style-selector,
+.nucleus-admin-content .style-selector > div.content-area
 {
-  padding-left: 0;
-  gap: 0.5rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-auto-rows: minmax(10rem, 1fr);
-  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: auto;
 }
 
-.nucleus-admin-content .style-selector > ul > li
+.nucleus-admin-content .style-selector > div.content-area > ul
+{
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  padding: 0;
+}
+
+.nucleus-admin-content .style-selector.grid > div.content-area > ul
+{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: minmax(10rem, 1fr); 
+}
+
+.nucleus-admin-content .style-selector.flex > div.content-area > ul
+{
+  display: flex;  
+  flex-direction: column;
+}
+
+
+.nucleus-admin-content .style-selector.flex .select-flex,
+.nucleus-admin-content .style-selector.grid .select-grid
+{
+  background-color: var(--bs-primary);
+}
+
+.nucleus-admin-content .style-selector > div.content-area > ul > li
 {
   display: flex;
   list-style-type: none;
   border-radius: 0.5rem;
-  max-height: 10rem;
+  max-height: 20rem;
   width: 100%;
   margin-right: auto;
   padding: 0;
 }
 
-.nucleus-admin-content .style-selector > ul > li > button
+.nucleus-admin-content .style-selector > div.content-area button
 {
   appearance: none;
   padding: 0.5rem;
   text-align: left;
   color: black;
+  border: solid 2px #eee;
   align-items: stretch;
   transition: background-color ease-in 0.2s, color ease-in 0.2s;
 }
 
-.nucleus-admin-content .style-selector > ul > li > button:hover
+.nucleus-admin-content .style-selector > div.content-area button:hover
 {
   color: white;
   background-color: #00aeff;
 }
 
-.nucleus-admin-content .style-selector > ul > li > button.selected
+.nucleus-admin-content .style-selector > div.content-area button.selected
 {
-  outline: solid 4px;
+  border-color: #00aeff;
 }
 
-.nucleus-admin-content .style-selector > ul > li button > h6
+.nucleus-admin-content .style-selector > div.content-area button > h6
 {
   display: flex;
   align-items: center;
@@ -703,24 +730,34 @@ ul.nucleus-control-panel-items button
   align-self: stretch;
 }
 
-.nucleus-admin-content .style-selector > ul > li button > h6 .extension
+.nucleus-admin-content .style-selector > div.content-area button > h6 .extension
 {
   font-size: 0.9rem;
   font-style: italic;
   font-weight: normal;
 }
 
-.nucleus-admin-content .style-selector > ul > li > button, .nucleus-admin-content .style-selector > ul li button div
+.nucleus-admin-content .style-selector > div.content-area button, .nucleus-admin-content .style-selector > div.content-area button div
 {
   display: flex;
   flex-direction: column;  
   overflow: auto;
 }
 
-.nucleus-admin-content .style-selector > ul > li .description
+.nucleus-admin-content .style-selector > div.content-area .description
 {
   font-size: 0.8rem;
   scrollbar-width: thin;
+}
+
+.nucleus-admin-content .style-selector > div.content-area .description table, 
+.nucleus-admin-content .style-selector > div.content-area .description table th,
+.nucleus-admin-content .style-selector > div.content-area .description table td
+{
+  background-color: transparent;
+  color: inherit;
+  font-size: 0.75rem;
+  padding: 0 0.25rem;
 }
 
 .nucleus-admin-content .style-selector .thumbnail

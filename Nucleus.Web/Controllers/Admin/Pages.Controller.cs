@@ -137,7 +137,12 @@ namespace Nucleus.Web.Controllers.Admin
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
     public async Task<ActionResult> LayoutSelector(ViewModels.Admin.PageEditor viewModel)
     {
-      return View("_LayoutSelector", await Shared.LayoutSelector.BuildLayoutSelectorViewModel(this.LayoutManager, viewModel.Page.LayoutDefinition?.Id));
+      Guid? selectedLayoutId = viewModel.Page.LayoutDefinition?.Id ?? this.Context.Site.DefaultLayoutDefinition?.Id;
+      if (selectedLayoutId == null || selectedLayoutId == Guid.Empty)
+      {
+        selectedLayoutId = Guid.Parse("2FF6818A-09FE-4EE2-BEFF-495A876AB6D6");
+      }
+      return View("_LayoutSelector", await Shared.LayoutSelector.BuildLayoutSelectorViewModel(this.LayoutManager, selectedLayoutId));
     }
 
     /// <summary>
@@ -148,7 +153,12 @@ namespace Nucleus.Web.Controllers.Admin
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
     public async Task<ActionResult> ContainerSelector(ViewModels.Admin.PageEditor viewModel)
     {
-      return View("_ContainerSelector", await Shared.LayoutSelector.BuildContainerSelectorViewModel(this.ContainerManager, viewModel.Page.DefaultContainerDefinition?.Id));
+      Guid? selectedContainerId = viewModel.Page.DefaultContainerDefinition?.Id ?? this.Context.Site.DefaultLayoutDefinition?.Id;
+      if (selectedContainerId == null || selectedContainerId == Guid.Empty)
+      {
+        selectedContainerId = Guid.Parse("80A7F079-F61D-42A4-9A4B-DA7692415952");
+      }
+      return View("_ContainerSelector", await Shared.LayoutSelector.BuildContainerSelectorViewModel(this.ContainerManager, selectedContainerId));
     }
 
     /// <summary>
@@ -159,7 +169,14 @@ namespace Nucleus.Web.Controllers.Admin
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
     public async Task<ActionResult> ModuleContainerSelector(ViewModels.Admin.PageModuleCommonSettingsEditor viewModel)
     {
-      return View("_ContainerSelector", await Shared.LayoutSelector.BuildContainerSelectorViewModel(this.ContainerManager, viewModel.Module.ContainerDefinition?.Id));
+      Page page = await this.PageManager.Get(viewModel.Module.PageId);
+
+      Guid? selectedContainerId = viewModel.Module.ContainerDefinition?.Id ?? page?.DefaultContainerDefinition?.Id ?? this.Context.Site.DefaultLayoutDefinition?.Id;
+      if (selectedContainerId == null || selectedContainerId == Guid.Empty)
+      {
+        selectedContainerId = Guid.Parse("80A7F079-F61D-42A4-9A4B-DA7692415952");
+      }
+      return View("_ContainerSelector", await Shared.LayoutSelector.BuildContainerSelectorViewModel(this.ContainerManager, selectedContainerId));
     }
 
     /// <summary>
@@ -1061,15 +1078,18 @@ namespace Nucleus.Web.Controllers.Admin
                     break;
                   }
                 }
-              }
-
-              // default value
-              if (style.Syntax == "<color>" && String.IsNullOrEmpty(style.CustomValue))
-              {
-                style.CustomValue = "#000000";
-              }              
+              }         
             }
           }
+        }
+
+        foreach (ContainerStyle style in viewModel.ModuleContainerStyles)
+        { 
+          // default value
+          if (style.Syntax == "<color>" && String.IsNullOrEmpty(style.CustomValue))
+          {
+            style.CustomValue = "#000000";
+          }     
         }
       }
 

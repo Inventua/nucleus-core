@@ -1,7 +1,12 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.LayoutSelector
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Abstractions;
-<div class="style-selector layout-selector">
+<div class="style-selector layout-selector flex">
+  <div class="mb-1 bg-secondary-subtle p-2">
+    <button type="button" class="btn btn-secondary nucleus-material-icon icon-large select-flex" onclick="jQuery('.style-selector').removeClass('grid').addClass('flex');" title="List">&#xe8fe;</button>
+    <button type="button" class="btn btn-secondary nucleus-material-icon icon-large select-grid" onclick="jQuery('.style-selector').removeClass('flex').addClass('grid');" title="Grid">&#xe9b0;</button>
+  </div>
+  <div class="content-area">
   <ul>
     @foreach (var layout in Model.Layouts)
     {
@@ -39,4 +44,5 @@
       </li>
     }
   </ul>
+  </div>
 </div>

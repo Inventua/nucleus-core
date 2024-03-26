@@ -7,6 +7,88 @@
   --size-5: 2rem;
 }
 
+@property --container-alignment
+{
+  /* title: Alignment */
+  /* group: Container */
+  /* preserveOrder: true */
+  syntax: "left | center | right";
+  inherits: true;
+  initial-value: unset;
+}
+
+@property --container-text-color
+{
+  /* title: Text Color */
+  /* group: Container */
+  /* preserveOrder: true */
+  syntax: "<color>";
+  inherits: true;
+  initial-value: unset;
+}
+
+@property --container-background-color
+{
+  /* title: Background Color */
+  /* group: Container */
+  /* preserveOrder: true */
+  syntax: "<color>";
+  inherits: true;
+  initial-value: unset;
+}
+
+@property --container-padding
+{
+  /* title: Padding */
+  /* group: Container */
+  /* preserveOrder: true */
+  syntax: "<length>";
+  inherits: true;
+  initial-value: unset;
+}
+
+@property --container-margin
+{
+  /* title: Margin */
+  /* group: Container */
+  /* preserveOrder: true */
+  syntax: "<length>";
+  inherits: true;
+  initial-value: unset;
+}
+
+@property --container-border-size
+{
+  /* title: Border Size */
+  /* group: Container Border */
+  /* baseClass: container-border */
+  /* preserveOrder: true */
+  syntax: "<length>";
+  inherits: true;
+  initial-value: unset;
+}
+
+@property --container-border-color
+{
+  /* title: Border Color */
+  /* group: Container Border */
+  /* baseClass: container-border */
+  syntax: "<color>";
+  inherits: true;
+  initial-value: unset;
+}
+
+@property --container-border-style
+{
+  /* title: Border Style */
+  /* group: Container Border */
+  /* baseClass: container-border */
+  /* preserveOrder: true */
+  syntax: "none | dotted | dashed | solid | double | groove | ridge | inset | outset ";
+  inherits: true;
+  initial-value: unset;
+}
+
 /* properties which define container styles  */
 @property --title-alignment
 {
@@ -114,39 +196,16 @@
   initial-value: unset;
 }
 
-@property --border-size
-{
-  /* title: Border Size */
-  /* group: Border */
-  /* baseClass: container-border */
-  /* preserveOrder: true */
-  syntax: "<length>";
-  inherits: true;
-  initial-value: unset;
-}
-
-@property --border-color
-{
-  /* title: Border Color */
-  /* group: Border */
-  /* baseClass: container-border */
-  syntax: "<color>";
-  inherits: true;
-  initial-value: unset;
-}
-
-@property --border-style
-{
-  /* title: Border Style */
-  /* group: Border */
-  /* baseClass: container-border */
-  /* preserveOrder: true */
-  syntax: "none | dotted | dashed | solid | double | groove | ridge | inset | outset ";
-  inherits: true;
-  initial-value: unset;
-}
-
 /* implementations */
+.container-style
+{
+  text-align: var(--container-alignment);
+  color: var(--container-text-color);
+  background-color: var(--container-background-color);
+  padding: var(--container-padding);
+  margin: var(--container-margin);
+}
+
 .container-style.container-title .title, .container-style.container-title > h1, .container-style.container-title > h2, .container-style > h3.container-title, .container-style.container-title > h4, .container-style.container-title > h5, .container-style.container-title > h6
 {
   text-align: var(--title-alignment);
@@ -158,7 +217,7 @@
 
 .container-style.container-border
 {
-  border: var(--border-style) var(--border-size) var(--border-color);
+  border: var(--container-border-style) var(--container-border-size) var(--container-border-color);
 }
 
 .container-style.container-content > section
@@ -262,194 +321,194 @@
 
 
 /* border style container style values  */
-.container-style.border-style-none
+.container-style.container-border-style-none
 {
-  --border-style: none;
+  --container-border-style: none;
 }
 
-.container-style.border-style-dotted
+.container-style.container-border-style-dotted
 {
-  --border-style: dotted;
+  --container-border-style: dotted;
 }
 
-.container-style.border-style-dashed
+.container-style.container-border-style-dashed
 {
-  --border-style: dashed;
+  --container-border-style: dashed;
 }
 
-.container-style.border-style-solid
+.container-style.container-border-style-solid
 {
-  --border-style: solid;
+  --container-border-style: solid;
 }
 
-.container-style.border-style-double
+.container-style.container-border-style-double
 {
-  --border-style: double;
+  --container-border-style: double;
 }
 
-.container-style.border-style-groove
+.container-style.container-border-style-groove
 {
-  --border-style: groove;
+  --container-border-style: groove;
 }
 
-.container-style.border-style-ridge
+.container-style.container-border-style-ridge
 {
-  --border-style: ridge;
+  --container-border-style: ridge;
 }
 
-.container-style.border-style-inset
+.container-style.container-border-style-inset
 {
-  --border-style: inset;
+  --container-border-style: inset;
 }
 
-.container-style.border-style-outset
+.container-style.container-border-style-outset
 {
-  --border-style: outset;
+  --container-border-style: outset;
 }
 
-/* border size container style values for the @border-size @property */
-.container-style.border-size-1
+/* border size container style values for the @container-border-size @property */
+.container-style.container-border-size-1
 {
   /* title: Smallest */
-  --border-size: var(--size-1);
+  --container-border-size: var(--size-1);
 }
 
-.container-style.border-size-2
+.container-style.container-border-size-2
 {
   /* title: Small */
-  --border-size: var(--size-2);
+  --container-border-size: var(--size-2);
 }
 
-.container-style.border-size-3
+.container-style.container-border-size-3
 {
   /* title: Medium */
-  --border-size: var(--size-3);
+  --container-border-size: var(--size-3);
 }
 
-.container-style.border-size-4
+.container-style.container-border-size-4
 {
   /* title: Large */
-  --border-size: var(--size-4);
+  --container-border-size: var(--size-4);
 }
 
-.container-style.border-size-5
+.container-style.container-border-size-5
 {
   /* title: Thick */
-  --border-size: var(--size-5);
+  --container-border-size: var(--size-5);
 }
 
-/* border color container style values for the border-color @property (uses bootstrap colors) */
-.container-style.border-color-blue
+/* border color container style values for the container-border-color @property (uses bootstrap colors) */
+.container-style.container-border-color-blue
 {
-  --border-color: var(--bs-blue);
+  --container-border-color: var(--bs-blue);
 }
 
-.container-style.border-color-indigo
+.container-style.container-border-color-indigo
 {
-  --border-color: var(--bs-indigo);
+  --container-border-color: var(--bs-indigo);
 }
 
-.container-style.border-color-purple
+.container-style.container-border-color-purple
 {
-  --border-color: var(--bs-purple);
+  --container-border-color: var(--bs-purple);
 }
 
-.container-style.border-color-pink
+.container-style.container-border-color-pink
 {
-  --border-color: var(--bs-pink);
+  --container-border-color: var(--bs-pink);
 }
 
-.container-style.border-color-red
+.container-style.container-border-color-red
 {
-  --border-color: var(--bs-red);
+  --container-border-color: var(--bs-red);
 }
 
-.container-style.border-color-orange
+.container-style.container-border-color-orange
 {
-  --border-color: var(--bs-orange)
+  --container-border-color: var(--bs-orange)
 }
 
-.container-style.border-color-yellow
+.container-style.container-border-color-yellow
 {
-  --border-color: var(--bs-yellow)
+  --container-border-color: var(--bs-yellow)
 }
 
-.container-style.border-color-green
+.container-style.container-border-color-green
 {
-  --border-color: var(--bs-green)
+  --container-border-color: var(--bs-green)
 }
 
-.container-style.border-color-teal
+.container-style.container-border-color-teal
 {
-  --border-color: var(--bs-teal)
+  --container-border-color: var(--bs-teal)
 }
 
-.container-style.border-color-cyan
+.container-style.container-border-color-cyan
 {
-  --border-color: var(--bs-cyan)
+  --container-border-color: var(--bs-cyan)
 }
 
-.container-style.border-color-white
+.container-style.container-border-color-white
 {
-  --border-color: var(--bs-white)
+  --container-border-color: var(--bs-white)
 }
 
-.container-style.border-color-gray
+.container-style.container-border-color-gray
 {
-  --border-color: var(--bs-gray)
+  --container-border-color: var(--bs-gray)
 }
 
-.container-style.border-color-gray-dark
+.container-style.container-border-color-gray-dark
 {
-  --border-color: var(--bs-gray-dark)
+  --container-border-color: var(--bs-gray-dark)
 }
 
-.container-style.border-color-primary
+.container-style.container-border-color-primary
 {
   /* title: ● primary */
-  --border-color: var(--bs-primary)
+  --container-border-color: var(--bs-primary)
 }
 
-.container-style.border-color-secondary
+.container-style.container-border-color-secondary
 {
   /* title: ● secondary */
-  --border-color: var(--bs-secondary)
+  --container-border-color: var(--bs-secondary)
 }
 
-.container-style.border-color-success
+.container-style.container-border-color-success
 {
   /* title: ● success */
-  --border-color: var(--bs-success)
+  --container-border-color: var(--bs-success)
 }
 
-.container-style.border-color-info
+.container-style.container-border-color-info
 {
   /* title: ● info */
-  --border-color: var(--bs-info)
+  --container-border-color: var(--bs-info)
 }
 
-.container-style.border-color-warning
+.container-style.container-border-color-warning
 {
   /* title: ● warning */
-  --border-color: var(--bs-warning)
+  --container-border-color: var(--bs-warning)
 }
 
-.container-style.border-color-danger
+.container-style.container-border-color-danger
 {
   /* title: ● danger */
-  --border-color: var(--bs-danger)
+  --container-border-color: var(--bs-danger)
 }
 
-.container-style.border-color-light
+.container-style.container-border-color-light
 {
   /* title: ● light */
-  --border-color: var(--bs-light)
+  --container-border-color: var(--bs-light)
 }
 
-.container-style.border-color-dark
+.container-style.container-border-color-dark
 {
   /* title: ● dark */
-  --border-color: var(--bs-dark)
+  --container-border-color: var(--bs-dark)
 }
 
 /* container style values for the title-color @property (uses bootstrap colors) */
@@ -997,4 +1056,324 @@
 {
   /* title: Thick */
   --content-margin: var(--size-5);
+}
+
+
+/* container alignments container style values for the container-alignment @property */
+.container-style.container-alignment-left
+{
+  --container-alignment: left;
+}
+
+.container-style.container-alignment-center
+{
+  --container-alignment: center;
+}
+
+.container-style.container-alignment-right
+{
+  --container-alignment: right;
+}
+
+
+/* background color container style values for the container-background-color @property (uses bootstrap colors) */
+.container-style.container-background-color-blue
+{
+  --container-background-color: var(--bs-blue);
+}
+
+.container-style.container-background-color-indigo
+{
+  --container-background-color: var(--bs-indigo);
+}
+
+.container-style.container-background-color-purple
+{
+  --container-background-color: var(--bs-purple);
+}
+
+.container-style.container-background-color-pink
+{
+  --container-background-color: var(--bs-pink);
+}
+
+.container-style.container-background-color-red
+{
+  --container-background-color: var(--bs-red);
+}
+
+.container-style.container-background-color-orange
+{
+  --container-background-color: var(--bs-orange)
+}
+
+.container-style.container-background-color-yellow
+{
+  --container-background-color: var(--bs-yellow)
+}
+
+.container-style.container-background-color-green
+{
+  --container-background-color: var(--bs-green)
+}
+
+.container-style.container-background-color-teal
+{
+  --container-background-color: var(--bs-teal)
+}
+
+.container-style.container-background-color-cyan
+{
+  --container-background-color: var(--bs-cyan)
+}
+
+.container-style.container-background-color-white
+{
+  --container-background-color: var(--bs-white)
+}
+
+.container-style.container-background-color-gray
+{
+  --container-background-color: var(--bs-gray)
+}
+
+.container-style.container-background-color-gray-dark
+{
+  --container-background-color: var(--bs-gray-dark)
+}
+
+.container-style.container-background-color-primary
+{
+  /* title: ● primary */
+  --container-background-color: var(--bs-primary)
+}
+
+.container-style.container-background-color-secondary
+{
+  /* title: ● secondary */
+  --container-background-color: var(--bs-secondary)
+}
+
+.container-style.container-background-color-success
+{
+  /* title: ● success */
+  --container-background-color: var(--bs-success)
+}
+
+.container-style.container-background-color-info
+{
+  /* title: ● info */
+  --container-background-color: var(--bs-info)
+}
+
+.container-style.container-background-color-warning
+{
+  /* title: ● warning */
+  --container-background-color: var(--bs-warning)
+}
+
+.container-style.container-background-color-danger
+{
+  /* title: ● danger */
+  --container-background-color: var(--bs-danger)
+}
+
+.container-style.container-background-color-light
+{
+  /* title: ● light */
+  --container-background-color: var(--bs-light)
+}
+
+.container-style.container-background-color-dark
+{
+  /* title: ● dark */
+  --container-background-color: var(--bs-dark)
+}
+
+/* text color container style values for the container-text-color @property (uses bootstrap colors) */
+.container-style.container-text-color-blue
+{
+  --container-text-color: var(--bs-blue);
+}
+
+.container-style.container-text-color-indigo
+{
+  --container-text-color: var(--bs-indigo);
+}
+
+.container-style.container-text-color-purple
+{
+  --container-text-color: var(--bs-purple);
+}
+
+.container-style.container-text-color-pink
+{
+  --container-text-color: var(--bs-pink);
+}
+
+.container-style.container-text-color-red
+{
+  --container-text-color: var(--bs-red);
+}
+
+.container-style.container-text-color-orange
+{
+  --container-text-color: var(--bs-orange)
+}
+
+.container-style.container-text-color-yellow
+{
+  --container-text-color: var(--bs-yellow)
+}
+
+.container-style.container-text-color-green
+{
+  --container-text-color: var(--bs-green)
+}
+
+.container-style.container-text-color-teal
+{
+  --container-text-color: var(--bs-teal)
+}
+
+.container-style.container-text-color-cyan
+{
+  --container-text-color: var(--bs-cyan)
+}
+
+.container-style.container-text-color-white
+{
+  --container-text-color: var(--bs-white)
+}
+
+.container-style.container-text-color-gray
+{
+  --container-text-color: var(--bs-gray)
+}
+
+.container-style.container-text-color-gray-dark
+{
+  --container-text-color: var(--bs-gray-dark)
+}
+
+.container-style.container-text-color-primary
+{
+  /* title: ● primary */
+  --container-text-color: var(--bs-primary)
+}
+
+.container-style.container-text-color-secondary
+{
+  /* title: ● secondary */
+  --container-text-color: var(--bs-secondary)
+}
+
+.container-style.container-text-color-success
+{
+  /* title: ● success */
+  --container-text-color: var(--bs-success)
+}
+
+.container-style.container-text-color-info
+{
+  /* title: ● info */
+  --container-text-color: var(--bs-info)
+}
+
+.container-style.container-text-color-warning
+{
+  /* title: ● warning */
+  --container-text-color: var(--bs-warning)
+}
+
+.container-style.container-text-color-danger
+{
+  /* title: ● danger */
+  --container-text-color: var(--bs-danger)
+}
+
+.container-style.container-text-color-light
+{
+  /* title: ● light */
+  --container-text-color: var(--bs-light)
+}
+
+.container-style.container-text-color-dark
+{
+  /* title: ● dark */
+  --container-text-color: var(--bs-dark)
+}
+
+/* container padding container style values for the @container-padding @property */
+.container-style.container-padding-1
+{
+  /* title: Smallest */
+  --container-padding: var(--size-1);
+}
+
+.container-style.container-padding-2
+{
+  /* title: Small */
+  --container-padding: var(--size-2);
+}
+
+.container-style.container-padding-3
+{
+  /* title: Medium */
+  --container-padding: var(--size-3);
+}
+
+.container-style.container-padding-4
+{
+  /* title: Large */
+  --container-padding: var(--size-4);
+}
+
+.container-style.container-padding-5
+{
+  /* title: Thick */
+  --container-padding: var(--size-5);
+}
+
+/* container margin container style values for the @container-margin @property */
+.container-style.container-margin-auto
+{
+  /* title: Automatic (centered) */
+  --container-margin: auto;
+}
+
+.container-style.container-margin-none
+{
+  /* title: None */
+  --container-margin: 0;
+}
+
+.container-style.container-margin-1
+{
+  /* title: Smallest */
+  --container-margin: var(--size-1);
+}
+
+.container-style.container-margin-2
+{
+  /* title: Small */
+  --container-margin: var(--size-2);
+}
+
+.container-style.container-margin-3
+{
+  /* title: Medium */
+  --container-margin: var(--size-3);
+}
+
+.container-style.container-margin-4
+{
+  /* title: Large */
+  --container-margin: var(--size-4);
+}
+
+.container-style.container-margin-5
+{
+  /* title: Thick */
+  --container-margin: var(--size-5);
 }

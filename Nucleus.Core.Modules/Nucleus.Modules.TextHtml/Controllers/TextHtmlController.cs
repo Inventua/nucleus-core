@@ -59,6 +59,8 @@ namespace Nucleus.Modules.TextHtml.Controllers
 			if (this.Context.Module != null)
 			{
 				viewModel.ModuleId = this.Context.Module.Id;
+        viewModel.Title = this.Context.Module.Title;
+
 				List<Content> contents = await this.ContentManager.List(this.Context.Module);
 
 				// Text/Html only ever has one item
@@ -70,12 +72,18 @@ namespace Nucleus.Modules.TextHtml.Controllers
 
 
 		[HttpPost]
-		public ActionResult Save(ViewModels.Settings viewModel)
+		public async Task<ActionResult> Save(ViewModels.Settings viewModel)
 		{
 			// Text/Html only ever has one item
 			viewModel.Content.SortOrder = 10;
-			
-			this.ContentManager.Save(this.Context.Module, viewModel.Content);
+
+      // Text/Html is a special case, it has a title control in its editor
+      PageModule module = await this.PageModuleManager.Get(this.Context.Module.Id);
+      module.Title = viewModel.Title;
+      await this.PageModuleManager.Save(this.Context.Page, module);
+
+      // save updated content
+			await this.ContentManager.Save(this.Context.Module, viewModel.Content);
 			
 			return Ok();
 		}

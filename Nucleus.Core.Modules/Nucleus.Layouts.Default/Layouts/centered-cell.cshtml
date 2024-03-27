@@ -6,13 +6,23 @@
     @await Html.RenderPaneAsync("BannerPane")
   </div>
 
-  <div class="ContentPane" data-track-scroll="content-pane">
-    @await Html.RenderPaneAsync("ContentPane")
+  <div class="ContentWrapper" data-track-scroll="content-wrapper">
+    <div>
+      <div class="ContentPane" suppress-empty="true">
+        @await Html.RenderPaneAsync("ContentPane")
+      </div>
+      <div class="SidePane" suppress-empty="true">
+        @await Html.RenderPaneAsync("SidePane")
+      </div>
+    </div>
+    <div class="SecondaryPane" suppress-empty="true">
+      @await Html.RenderPaneAsync("SecondaryPane")
+    </div>
   </div>
- 
-  <div class="BottomPane" suppress-empty="true">
+  
+  <div class="FooterPane" suppress-empty="true">
     <terms caption="Terms" />
     <privacy caption="Privacy Policy" />
-    @await Html.RenderPaneAsync("BottomPane")
+    @await Html.RenderPaneAsync("FooterPane")
   </div>
 </div>

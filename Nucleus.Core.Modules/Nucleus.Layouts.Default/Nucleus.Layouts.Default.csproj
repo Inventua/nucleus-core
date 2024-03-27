@@ -44,6 +44,10 @@
     <None Remove="Layouts\default-3-column.md" />
     <None Remove="Layouts\default-3-column.min.css" />
     <None Remove="Layouts\default-3-column.png" />
+    <None Remove="Layouts\landing.cshtml" />
+    <None Remove="Layouts\landing.css" />
+    <None Remove="Layouts\landing.md" />
+    <None Remove="Layouts\landing.png" />
     <None Remove="Layouts\simple.cshtml" />
     <None Remove="Layouts\simple.css" />
     <None Remove="Layouts\simple.md" />
@@ -72,6 +76,10 @@
     </Content>
     <Content Include="Containers\no-container.png" />
     <Content Include="Containers\no-title.png" />
+    <Content Include="Layouts\landing.png" />
+    <Content Include="Layouts\landing.md" />
+    <Content Include="Layouts\landing.css" />
+    <Content Include="Layouts\landing.cshtml" />
     <Content Include="Layouts\centered-cell.cshtml" />
     <Content Include="Layouts\centered-cell.css" />
     <Content Include="Layouts\centered-cell.md" />

@@ -37,6 +37,10 @@
         <friendlyName>Centered Cell</friendlyName>
         <relativePath>Layouts\centered-cell.cshtml</relativePath>
       </layoutDefinition>
+      <layoutDefinition id="AEF8197A-8C66-4113-BC93-1C8644F8479A">
+        <friendlyName>Landing</friendlyName>
+        <relativePath>Layouts\landing.cshtml</relativePath>
+      </layoutDefinition>
       <containerDefinition id="006CF94A-8279-4054-8EC2-4E0CAEBE77C7">
         <friendlyName>No Title</friendlyName>
         <relativePath>Containers\no-title.cshtml</relativePath>
@@ -71,6 +75,10 @@
         <file name="centered-cell.css" />
         <file name="centered-cell.png" />
         <file name="centered-cell.md" />
+        <file name="landing.cshtml" />
+        <file name="landing.css" />
+        <file name="landing.md" />
+        <file name="landing.png" />
       </folder>
       <folder name="Containers">
         <file name="centered.cshtml" />

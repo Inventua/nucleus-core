@@ -6,5 +6,5 @@ widths are a 1:5 ratio.
 | BannerPane       | Top, fills width               | Contains site logo, user account, site menu and breadcrumb controls.
 | LeftPane         | Middle-Left, fills height      | Suppressed if no content.
 | ContentPane      | Middle, fills height & width   | Scrollable if content does not fit.
-| BottomPane       | Bottom, fills width            | Contains site terms and privacy policy links (if configured)
+| FooterPane       | Bottom, fills width            | Contains site terms and privacy policy links (if configured)
 

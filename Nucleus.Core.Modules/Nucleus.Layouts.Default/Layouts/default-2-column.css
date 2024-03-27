@@ -37,7 +37,7 @@
 	flex-direction: column;
 }
 
-.BottomPane
+.FooterPane
 {
 	display: flex;
 	flex-direction: row;

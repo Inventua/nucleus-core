@@ -33,7 +33,7 @@
 	flex-direction: column;
 }
 
-.BottomPane
+.FooterPane
 {
 	display: flex;
 	flex-direction: row;	
@@ -41,7 +41,7 @@
 	background-color: #535353;
 }
 
-.BottomPane *
+.FooterPane *
 {
 	color: white;
 }

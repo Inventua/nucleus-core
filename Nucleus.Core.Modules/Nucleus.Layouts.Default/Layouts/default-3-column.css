@@ -43,7 +43,7 @@
   flex: 1;
 }
 
-.BottomPane
+.FooterPane
 {
 	display: flex;
 	flex-direction: row;

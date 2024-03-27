@@ -1167,6 +1167,12 @@ namespace Nucleus.Web.Controllers.Admin
 
       viewModel.PagePanes = (await this.LayoutManager.ListLayoutPanes(page.LayoutDefinition ?? this.Context.Site.DefaultLayoutDefinition)).Append("None");
 
+      // Set modules with an invalid pane to "Missing Pane"
+      foreach (PageModule moduleMissingPane in viewModel.Page.Modules.Where(module => !viewModel.PagePanes.Contains(module.Pane)))
+      {
+        moduleMissingPane.Pane = "None";
+      }
+
       if (!page.Routes.Any())
       {
         page.Routes.Add(new PageRoute());

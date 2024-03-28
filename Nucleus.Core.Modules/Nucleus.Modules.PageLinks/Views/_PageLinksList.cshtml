@@ -3,59 +3,37 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
-@Html.AddStyle("~!/../settings.css")
-<table class="table table-sm Links">
+<table class="table table-sm PageLinks">
 	<tr>
+		<th>Target Id</th>
 		<th>Title</th>
-		<th>Description</th>
 		<th colspan="4"></th>
-	</tr>@* 
-	@for (int pageLinkCount = 0; pageLinkCount < Model.Links.Count; pageLinkCount++)
-	{
-		var icon="";
-		var title="";
-
-		@switch (Model.Links[pageLinkCount].LinkType)
-		{
-			case Nucleus.Modules.Links.Models.LinkTypes.Url:
-				icon = "&#xe157";
-				title = "Url";
-				break;
-			case Nucleus.Modules.Links.Models.LinkTypes.File:
-				icon = "&#xe873";
-				title = "File";
-				break;
-			case Nucleus.Modules.Links.Models.LinkTypes.Page:
-				icon="&#xe051;";
-				title = "Page";
-				break;
-		}
+	</tr> 
+  @foreach (var item in Model.PageLinks.Select((PageLink, Index) => new { Index, PageLink }))
+  {
 		<tr>
-			<td>
-				@Html.HiddenFor(model => model.Links[pageLinkCount].Id)
-				<span class="nucleus-material-icon ms-2" title="@title">@Html.Raw(@icon)</span>
-				@Model.Links[pageLinkCount].Title
-				@if (Model.Links[pageLinkCount].LinkType == Nucleus.Abstractions.Models.FileSystem.File.URN && Model.Links[pageLinkCount].LinkFile?.File?.Id == Guid.Empty)
-				{
-					<span class="nucleus-material-icon text-danger" title="Linked file is missing or has been deleted.">@Html.Raw("&#xe000;")</span>
-				}
-			</td>
-			<td>@Model.Links[pageLinkCount].Description</td>
+      <td>
+        @Html.HiddenFor(model => model.PageLinks[item.Index].Id)
+        @Html.HiddenFor(model => model.PageLinks[item.Index].SortOrder)
+        @Html.TextBoxFor(model => model.PageLinks[item.Index].TargetId)
+      </td>
+      <td>
+        @Html.TextBoxFor(model => model.PageLinks[item.Index].Title)
+      </td>
 
-			<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("Editor", "Admin", "Links")?id=@Model.Links[pageLinkCount].Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-primary" title="Edit" data-target="#LinksEditor" /></td>
-			<td class="nucleus-small-cell"><input type="submit" formaction="@Url.NucleusAction("DeleteLink", "Admin", "Links")?id=@Model.Links[pageLinkCount].Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target="#LinksList" data-confirm="Delete this link?" /></td>
+      <td class="nucleus-small-cell"><button type="submit" formaction="@Url.NucleusAction("RemovePageLink", "PageLinksSettings", "PageLinks")?id=@item.PageLink.Id" class="nucleus-material-icon btn btn-danger" title="Delete" data-target="#PageLinksList" data-confirm="Delete this page link?">&#xe14c;</button></td>
 			<td class="nucleus-small-cell">
-				@if (pageLinkCount != 0)
+        @if (item.Index != 0)
 				{
-					<input type="submit" formaction="@Url.NucleusAction("MoveUp", "Admin", "Links")?id=@Model.Links[pageLinkCount].Id" value="&#xe5d8;" class="nucleus-material-icon btn btn-outline-secondary" title="Move Up" data-target="#LinksList" />
+          <button type="submit" formaction="@Url.NucleusAction("MoveUp", "PageLinksSettings", "PageLinks")?id=@item.PageLink.Id" class="nucleus-material-icon btn btn-outline-secondary" title="Move Up" data-target="#PageLinksList">&#xe5d8;</button>
 				}
 			</td>
 			<td class="nucleus-small-cell">
-				@if (pageLinkCount < Model.Links.Count - 1)
+        @if (item.Index < Model.PageLinks.Count - 1)
 				{
-					<input type="submit" formaction="@Url.NucleusAction("MoveDown", "Admin", "Links")?id=@Model.Links[pageLinkCount].Id" value="&#xe5db;" class="nucleus-material-icon btn btn-outline-secondary" title="Move Down" data-target="#LinksList" />
+          <button type="submit" formaction="@Url.NucleusAction("MoveDown", "PageLinksSettings", "PageLinks")?id=@item.PageLink.Id" value="" class="nucleus-material-icon btn btn-outline-secondary" title="Move Down" data-target="#PageLinksList">&#xe5db;</button>
 				}
 			</td>
 		</tr>
-	}  *@
+	}  
 </table>

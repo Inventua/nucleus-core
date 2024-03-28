@@ -10,15 +10,19 @@
     var options = jQuery.extend({
       operationMode: null,
       rootSelector: 'body',
-      includeHeaders: null
+      includeHeaders: ''
     }, conf);
     
     var autoIdCounter = 0;
+    
     
     // private functions   
     function _addLevel(previousHeaderElement, pageLinkParentElement, headerElements, previousLevel, currentHeaderLevel)
     {
       var nextLevel = currentHeaderLevel + 1;
+      // Get headers that have been enabled in the settings.
+      var headerArray = options.includeHeaders.split(',');
+      var includeHeader = headerArray.filter((headers) => headers.toLowerCase().includes('h' + currentHeaderLevel)); 
 
       headerElements.each(function (index, element)
       {
@@ -46,13 +50,24 @@
 
           if (linkText !== '')
           {
-            var linkElement = jQuery('<li><a href="' + relativeUrl.toString() + '">' + linkText + '</a></li>');
+            //var linkElement = jQuery('<li><a href="' + relativeUrl.toString() + '">' + linkText + '</a></li>');
+
+            var linkElement;
+            if (includeHeader.length > 0)
+            {
+              linkElement = jQuery('<li><a href="' + relativeUrl.toString() + '">' + linkText + '</a></li>');
+            }
+            else
+            {
+              linkElement = jQuery('<li></li>');
+            }
 
             if (currentHeaderLevel < 6)
             {
               _addPageLink(headerElement, linkElement, currentHeaderLevel, nextLevel);
             }
             pageLinkParentElement.append(linkElement);
+
           }
         }
       });
@@ -68,18 +83,22 @@
     {
       var pageLinkParentElement = jQuery('<ol></ol>');
       var childElements = headerElement.siblings('h' + nextLevel);
+    //  var headerArray = options.includeHeaders.split(',');
+    //  var includeHeader = headerArray.filter((headers) => headers.toLowerCase().includes('h' + headerLevel)); 
 
       _addLevel(headerElement, pageLinkParentElement, childElements, headerLevel, nextLevel);
+
       if (pageLinkParentElement.children().length !== 0)
       {
         linkElement.append(pageLinkParentElement);
       }
     }
 
+
     return this.each(function ()
     {
       var listElement = jQuery('<ol></ol>');
-
+     
       if (options.operationMode === 'Automatic' && options.rootSelector.length > 0)
       {
         var childElements = jQuery(options.rootSelector).find('h1');

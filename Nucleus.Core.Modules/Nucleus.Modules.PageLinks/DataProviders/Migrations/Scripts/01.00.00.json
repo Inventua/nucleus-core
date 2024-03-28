@@ -1,0 +1,82 @@
+{
+	"schemaName": "Nucleus.Modules.PageLinks",
+	"version": "01.00.00",
+	"operations": [
+		{
+			"createTable": {
+				"name": "PageLinks",
+				"columns": [
+					{
+						"name": "Id",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "ModuleId",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "Title",
+						"clrType": "string",
+						"maxLength": 256,
+						"isnullable": false
+					},
+					{
+						"name": "TargetId",
+						"clrType": "string",
+						"maxLength": 512,
+						"isnullable": false
+					},
+					{
+						"name": "SortOrder",
+						"clrType": "int",
+						"isnullable": false
+					},
+					{
+						"name": "DateAdded",
+						"clrType": "datetime",
+						"isnullable": false
+					},
+					{
+						"name": "AddedBy",
+						"clrType": "guid",
+						"isnullable": false
+					},
+					{
+						"name": "DateChanged",
+						"clrType": "datetime",
+						"isnullable": true
+					},
+					{
+						"name": "ChangedBy",
+						"clrType": "guid",
+						"isnullable": true
+					}
+				],
+				"primaryKey": {
+					"name": "PK_PageLinks",
+					"isclustered": true,
+					"columns": [ "Id" ]
+				},
+				"foreignKeys": [
+					{
+						"name": "FK_PageLinks_ModuleId",
+						"Columns": [ "ModuleId" ],
+						"PrincipalTable": "PageModules",
+						"PrincipalColumns": [ "Id" ],
+						"OnDelete": "Cascade"
+					}
+				]
+			}
+		},
+		{
+			"createIndex": {
+				"name": "IX_PageLinks_ModuleId",
+				"table": "PageLinks",
+				"isunique": false,
+				"columns": [ "ModuleId" ]
+			}
+		}
+	]
+}

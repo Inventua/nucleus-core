@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,73 +15,140 @@ namespace Nucleus.Modules.PageLinks.Controllers;
 [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
 public class PageLinksSettingsController : Controller
 {
-	private Context Context { get; }
-	private IPageModuleManager PageModuleManager { get; }
+  private Context Context { get; }
+  private IPageModuleManager PageModuleManager { get; }
+  private PageLinksManager PageLinksManager { get; }
 
-	public PageLinksSettingsController(Context Context, IPageModuleManager pageModuleManager)
-	{
-		this.Context = Context;
-		this.PageModuleManager = pageModuleManager;
-	}
+  public PageLinksSettingsController(Context Context, IPageModuleManager pageModuleManager, PageLinksManager pageLinksManager)
+  {
+    this.Context = Context;
+    this.PageModuleManager = pageModuleManager;
+    this.PageLinksManager = pageLinksManager;
+  }
 
-	[HttpGet]
-	[HttpPost]
-	public ActionResult Settings(ViewModels.Settings viewModel)
-	{
-		return View("Settings", BuildSettingsViewModel(viewModel));
-	}
+  [HttpGet]
+  public async Task<ActionResult> Settings()
+  {
+    return View("Settings", await BuildSettingsViewModel(null));
+  }
 
-	[HttpPost]
-	public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
-	{
-		viewModel.IncludeHeaders = SetIncludeHeader(viewModel, viewModel.HeaderH1, Models.Settings.HtmlHeaderTags.H1);
-		viewModel.IncludeHeaders = SetIncludeHeader(viewModel, viewModel.HeaderH2, Models.Settings.HtmlHeaderTags.H2);
-		viewModel.IncludeHeaders = SetIncludeHeader(viewModel, viewModel.HeaderH3, Models.Settings.HtmlHeaderTags.H3);
-		viewModel.IncludeHeaders = SetIncludeHeader(viewModel, viewModel.HeaderH4, Models.Settings.HtmlHeaderTags.H4);
-		viewModel.IncludeHeaders = SetIncludeHeader(viewModel, viewModel.HeaderH5, Models.Settings.HtmlHeaderTags.H5);
-		viewModel.IncludeHeaders = SetIncludeHeader(viewModel, viewModel.HeaderH6, Models.Settings.HtmlHeaderTags.H6);
+  [HttpPost]
+  public async Task<ActionResult> AddPageLink(ViewModels.Settings viewModel)
+  {
+    if (viewModel.PageLinks == null)
+    {
+      viewModel.PageLinks = [];
+    }
 
-		viewModel.SetSettings(this.Context.Module);
+    viewModel.PageLinks.Add(new Models.PageLink());
 
-		await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
+    return View("_PageLinksList", await BuildSettingsViewModel(viewModel));
+  }
 
-		return View("Settings", BuildSettingsViewModel(viewModel));
-		//return Ok();
-	}
+  /// <summary>
+  /// Remove the page link specified by id from the currently selected page's links.  
+  /// </summary>
+  /// <param name="viewModel"></param>
+  /// <param name="id"></param>
+  /// <returns></returns>
+  /// <remarks>
+  /// If a link with the specified id is not present in the currently selected page's links, no action is taken and no exception is 
+  /// generated.  The "delete" occurs within the viewModel only - the Save action must be called in order to commit the delete operation
+  /// to the database.
+  /// </remarks>
+  [HttpPost]
+  public async Task<ActionResult> RemovePageLink(ViewModels.Settings viewModel, Guid id)
+  {
+    foreach (Models.PageLink link in viewModel.PageLinks)
+    {
+      if (link.Id == id)
+      {
+        viewModel.PageLinks.Remove(link);
+        break;
+      }
+    }
 
-	private ViewModels.Settings BuildSettingsViewModel(ViewModels.Settings viewModel)
-	{
-		if (viewModel == null)
-		{
-			viewModel = new();
-		}
+    ModelState.Clear();
+    return View("_PageLinksList", await BuildSettingsViewModel(viewModel));
+  }
 
-		viewModel.GetSettings(this.Context.Module);
+  /// <summary>
+  /// Moves the page link <see cref="Models.PageLink.SortOrder"/> by swapping with the immediate previous page link.
+  /// </summary>
+  /// <param name="viewModel"></param>
+  /// <param name="id"></param>
+  /// <returns></returns>
+  [HttpPost]
+  public async Task<ActionResult> MoveUp(ViewModels.Settings viewModel, Guid id)
+  {
+    await this.PageLinksManager.MoveUp(this.Context.Module, id);
 
-		BuildHeaderToggleViewModel(viewModel);
+    ModelState.Clear();
+    return View("_PageLinksList", await BuildSettingsViewModel(viewModel));
+  }
 
-		return viewModel;
-	}
+  /// <summary>
+  /// Moves the page link <see cref="Models.PageLink.SortOrder"/> by swapping with the immediate page link after it.
+  /// </summary>
+  /// <param name="viewModel"></param>
+  /// <param name="id"></param>
+  /// <returns></returns>
+  [HttpPost]
+  public async Task<ActionResult> MoveDown(ViewModels.Settings input, Guid id)
+  {
+    await this.PageLinksManager.MoveDown(this.Context.Module, id);
 
-	private void BuildHeaderToggleViewModel(ViewModels.Settings viewModel)
-	{
-		viewModel.HeaderH1 = viewModel.IncludeHeaders.HasFlag(Models.Settings.HtmlHeaderTags.H1);
-		viewModel.HeaderH2 = viewModel.IncludeHeaders.HasFlag(Models.Settings.HtmlHeaderTags.H2);
-		viewModel.HeaderH3 = viewModel.IncludeHeaders.HasFlag(Models.Settings.HtmlHeaderTags.H3);
-		viewModel.HeaderH4 = viewModel.IncludeHeaders.HasFlag(Models.Settings.HtmlHeaderTags.H4);
-		viewModel.HeaderH5 = viewModel.IncludeHeaders.HasFlag(Models.Settings.HtmlHeaderTags.H5);
-		viewModel.HeaderH6 = viewModel.IncludeHeaders.HasFlag(Models.Settings.HtmlHeaderTags.H6);
-	}
+    ModelState.Clear();
+    return View("_PageLinksList", await BuildSettingsViewModel(input));
+  }
 
-	private Models.Settings.HtmlHeaderTags SetIncludeHeader(ViewModels.Settings viewModel, Boolean headerSetting, Models.Settings.HtmlHeaderTags headerTag)
-	{
-		if (headerSetting)
-		{
-			return viewModel.IncludeHeaders |= headerTag;
-		}
-		else
-		{
-			return viewModel.IncludeHeaders &= ~headerTag;
-		}
-	}
+  /// <summary>
+  /// Save the settings and manual page links.
+  /// </summary>
+  /// <param name="viewModel"></param>
+  /// <returns></returns>
+  /// <remarks>Manual page links are saved regardless of mode of operation.</remarks>
+  [HttpPost]
+  public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
+  {
+    // Page links tab
+    await this.PageLinksManager.Save(this.Context.Module, viewModel.PageLinks);
+
+    // Settings tab
+    viewModel.SetSettings(this.Context.Module);
+
+    await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
+
+    return Ok();
+  }
+
+  private async Task<ViewModels.Settings> BuildSettingsViewModel(ViewModels.Settings viewModel)
+  {
+    if (viewModel == null)
+    {
+      viewModel = new()
+      {
+        PageLinks = await this.PageLinksManager.List(this.Context.Module)
+      };
+    }
+    else
+    {
+      // copy new sort orders to existing viewModel
+      List<Models.PageLink> sortedLinks = await this.PageLinksManager.List(this.Context.Module);
+      foreach (Models.PageLink sortedPageLink in sortedLinks)
+      {
+        Models.PageLink pageLink = viewModel.PageLinks.Where(link => link.Id == sortedPageLink.Id).FirstOrDefault();
+        if (pageLink != null)
+        {
+          pageLink.SortOrder = sortedPageLink.SortOrder;
+        }
+      }
+      viewModel.PageLinks = viewModel.PageLinks.OrderBy(pageLink => pageLink.SortOrder).ToList();
+    }
+
+    viewModel.GetSettings(this.Context.Module);
+
+    return viewModel;
+  }
+
 }

@@ -17,25 +17,36 @@ namespace Nucleus.Modules.PageLinks.Controllers;
 public class PageLinksViewerController : Controller
 {
 	private Context Context { get; }
-	private IPageModuleManager PageModuleManager { get; }
+  private PageLinksManager PageLinksManager { get; }
 
-	public PageLinksViewerController(Context Context, IPageModuleManager pageModuleManager)
+
+  public PageLinksViewerController(Context Context, PageLinksManager pageLinksManager)
+  {
+    this.Context = Context;
+    this.PageLinksManager = pageLinksManager;
+  }
+
+  [HttpGet]
+	public async Task<ActionResult> Index()
 	{
-		this.Context = Context;
-		this.PageModuleManager = pageModuleManager;
+		return View("Viewer", await BuildViewModel());
 	}
 
-	[HttpGet]
-	public ActionResult Index()
-	{
-		return View("Viewer", BuildViewModel());
-	}
-
-	private ViewModels.Viewer BuildViewModel()
+	private async Task <ViewModels.Viewer> BuildViewModel()
 	{
 		ViewModels.Viewer viewModel = new();
 
 		viewModel.GetSettings(this.Context.Module);
-		return viewModel;
+
+    // Set as a comma separated string for enabled headers.
+    viewModel.EnabledHeaders = string.Join(',', viewModel.IncludeHeaders
+      .Where(header => header.Value)
+      .Select(header => header.Key));
+
+    viewModel.PageLinks = (await this.PageLinksManager.List(this.Context.Module))
+      .Where(pageLink => !String.IsNullOrEmpty(pageLink.TargetId))
+      .ToList();
+
+    return viewModel;
 	}
 }

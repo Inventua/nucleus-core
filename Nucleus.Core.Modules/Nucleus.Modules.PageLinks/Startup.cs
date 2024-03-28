@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Nucleus.Modules.PageLinks.DataProviders;
+using Nucleus.Data.EntityFramework;
+using Nucleus.Data.Common;
 
 [assembly: HostingStartup(typeof(Nucleus.Modules.PageLinks.Startup))]
 
@@ -16,7 +14,9 @@ namespace Nucleus.Modules.PageLinks
 		{
 			builder.ConfigureServices((context, services) =>
 			{
-			});
+        services.AddSingleton<PageLinksManager>();
+        services.AddDataProvider<IPageLinksDataProvider, DataProviders.PageLinksDataProvider, DataProviders.PageLinksDbContext>(context.Configuration);
+      });
 		}
 	}
 }

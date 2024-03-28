@@ -64,6 +64,7 @@
 	<xs:complexType name="ModuleDefinition">
 		<xs:sequence>
 			<xs:element name="friendlyName" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="helpUrl" type="xs:string" minOccurs="0" maxOccurs="1" />
 			<xs:element name="extension" type="xs:string" minOccurs="1" maxOccurs="1" />
 			<xs:element name="viewController" type="xs:string" minOccurs="1" maxOccurs="1" />
 			<xs:element name="settingsController" type="xs:string" minOccurs="0" maxOccurs="1" />
@@ -77,6 +78,7 @@
 	<xs:complexType name="ControlPanelExtensionDefinition">
 		<xs:sequence>
 			<xs:element name="friendlyName" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="helpUrl" type="xs:string" minOccurs="0" maxOccurs="1" />
 			<xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="1" />
 			<xs:element name="controllerName" type="xs:string" minOccurs="1" maxOccurs="1" />
 			<xs:element name="extensionName" type="xs:string" minOccurs="1" maxOccurs="1" />

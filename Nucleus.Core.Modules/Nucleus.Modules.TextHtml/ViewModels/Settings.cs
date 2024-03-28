@@ -9,6 +9,7 @@ namespace Nucleus.Modules.TextHtml.ViewModels
 	public class Settings
 	{
 		public Guid ModuleId { get; set; }
+    public string Title { get; set; }
 		public Content Content { get; set; } 
 
 	}

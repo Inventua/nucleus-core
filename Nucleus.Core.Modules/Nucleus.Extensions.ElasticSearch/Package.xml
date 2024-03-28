@@ -32,6 +32,10 @@
       <folder name="Views">
         <file name="Settings.cshtml" />
       </folder>
+
+      <cleanup>
+        <file name="disable-private-loadcontext.json" />
+      </cleanup>
     </component>
   </components>
 </package>

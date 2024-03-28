@@ -1,0 +1,60 @@
+﻿.LayoutWrapper
+{
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.ContentWrapper 
+{
+	flex-grow: 1;
+	display: flex;	
+  gap: 0.5rem;	
+	overflow: auto;
+	flex-direction: column;
+	margin: 1rem;
+}
+
+.Top2Column, .Bottom2Column, .Top3Column, .Bottom3Column
+{
+	display: grid;
+  gap: 0.25rem;	
+	margin: 0;
+}
+
+.Top2Column, .Bottom2Column
+{
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.Top3Column, .Bottom3Column
+{
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.ContentPane
+{
+	display: flex;
+	flex-direction: column;
+}
+
+.ContentPane > div, .Top2Column > div, .Bottom2Column > div, .Top3Column > div, .Bottom3Column > div
+{
+	display: flex;
+	flex-direction: column;
+}
+
+.Top2Column > div > div, .Bottom2Column > div > div, .Top3Column > div > div, .Bottom3Column > div > div
+{
+  height: 100%;
+}
+
+/*  Responsive UI  */
+@media screen and (max-width: 980px)
+{
+  .Top2Column, .Bottom2Column, .Top3Column, .Bottom3Column
+  {
+    display: flex;
+	  flex-direction: column;
+  }
+}

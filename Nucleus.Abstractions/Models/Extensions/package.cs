@@ -175,6 +175,9 @@ namespace Nucleus.Abstractions.Models.Extensions {
         public string friendlyName;
         
         /// <remarks/>
+        public string helpUrl;
+        
+        /// <remarks/>
         public string extension;
         
         /// <remarks/>
@@ -207,6 +210,9 @@ namespace Nucleus.Abstractions.Models.Extensions {
         
         /// <remarks/>
         public string friendlyName;
+        
+        /// <remarks/>
+        public string helpUrl;
         
         /// <remarks/>
         public string description;

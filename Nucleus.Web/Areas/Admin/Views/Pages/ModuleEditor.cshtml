@@ -7,10 +7,10 @@
 {
 	Layout = Model.UseLayout;
 }
-@*@if (Model.RenderHeader)
+@if (!String.IsNullOrEmpty(Model.Module.ModuleDefinition.HelpUrl))
 {
-	<h2>@(String.IsNullOrEmpty(Model.Module.Title) ? "No Title" : @Model.Module.Title)</h2>
-}*@
+  <a class="nucleus-help-url" href="@Model.Module.ModuleDefinition.HelpUrl">&#xe887;</a>
+}
 @await Html.RenderEditorAsync(Model.Module, false)
 
 

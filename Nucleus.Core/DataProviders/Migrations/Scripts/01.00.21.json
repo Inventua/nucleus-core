@@ -1,0 +1,24 @@
+{
+	"schemaName": "Nucleus.Core",
+  "version": "01.00.21",
+  "operations": [
+    {
+      "addColumn": {
+        "table": "PageModules",
+        "name": "AutomaticClasses",
+        "clrType": "string",
+        "maxLength": 1024,
+        "isnullable": true
+      }
+    },
+    {
+      "addColumn": {
+        "table": "PageModules",
+        "name": "AutomaticStyles",
+        "clrType": "string",
+        "maxLength": 1024,
+        "isnullable": true
+      }
+    }
+  ]
+}

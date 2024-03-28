@@ -27,15 +27,10 @@
           </div>
         </div>
 
-        <ProgressBar caption="Uploading file ..." class="UploadProgress"></ProgressBar>
+        <ProgressBar caption="Uploading file ..." class="upload-progress"></ProgressBar>
 
         <h2>Installed Extensions</h2>
         <div class="InstalledExtensions">
-@*           <tr>
-            <th>Name</th>
-            <th>Version</th>
-            <th />
-          </tr> *@
           @foreach (var extension in Model.InstalledExtensions)
           {
             <div>
@@ -182,10 +177,10 @@
 
   jQuery('.ExtensionInstaller form').on('progress', function (e, percent)
   {
-    jQuery('.ExtensionInstaller .UploadProgress .bar').css('width', percent.toString() + '%');
+    jQuery('.ExtensionInstaller .upload-progress .bar').css('width', percent.toString() + '%');
 
-    jQuery('.ExtensionInstaller .UploadProgress .percent').show();
-    jQuery('.ExtensionInstaller .UploadProgress .percent').html(percent.toString() + '%');
+    jQuery('.ExtensionInstaller .upload-progress .percent').show();
+    jQuery('.ExtensionInstaller .upload-progress .percent').html(percent.toString() + '%');
   });
 
   jQuery('.ExtensionInstaller form').on('error', function ()

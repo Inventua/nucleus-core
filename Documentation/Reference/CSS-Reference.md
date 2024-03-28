@@ -25,7 +25,7 @@ by extensions are not included here.
 | .fs-smaller                      | Render text at 0.8rem. | 
 | .btn.btn-none                    | Render a plain button control with no background, padding, border or margin. | 
 | .nucleus-material-icon           | Use the [Google Material Icons](https://developers.google.com/fonts/docs/material_icons) font. | 
-| .ValidationError                 | The ValidationError class is automatically applied when a controller action returns a BadRequest(ControllerContext.ModelState) response.  It highlights controls with invalid content. | 
+| .validation-error                | The validation-error class is automatically applied when a controller action returns a BadRequest(ControllerContext.ModelState) response.  It highlights controls with invalid content. | 
 | .modal-auto-size.modal-dialog    | When applied to a bootstrap modal (.modal-dialog), the .modal-auto-size class overrides Bootstrap's modal width constraints and renders a modal that uses 80% of available screen width.  It also stretches content elements so that button rows are displayed consistently at the bottom of the dialog | 
 | .w-min-fit-content               | The w-min-fit-content class is intended for table cells.  It applies width: 1px; white-space: nowrap; which causes the table cell to use the minimum width possible but still fit content without wrapping. | 
 | .progress .indeterminate         | When applied to a Bootstrap progress bar ().progress) the .indeterminate class renders the progress as an indeterminate progress bar, so you can use a progress indicator when you don't know how long the operation will take. | 

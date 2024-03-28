@@ -148,7 +148,7 @@
     </TabPanel>
 
     <TabPanel id="system-logs">
-      @using (Html.BeginAreaForm("GetLogFile", "System", "Admin", FormMethod.Post, new { @class = "d-flex flex-column overflow-auto m-minus1", @data_target = ".LogContent", @autocomplete = "off" }))
+      @using (Html.BeginAreaForm("GetLogFile", "System", "Admin", FormMethod.Post, new { @class = "d-flex flex-column overflow-auto", @data_target = ".LogContent", @autocomplete = "off" }))
       {
         @await Html.PartialAsync("_LogSettings", Model.LogSettings)
         <div class="LogContent d-flex flex-column overflow-auto mx-1">

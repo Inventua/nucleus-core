@@ -75,7 +75,7 @@
 {
   background-color: #d5e5ff;
   margin: 2px;
-  border: dashed 2px #428aff; /*#d5e5ff;*/
+  border: dashed 2px #428aff;
   border-radius: .25rem;
   display: flex;
   align-items: center;

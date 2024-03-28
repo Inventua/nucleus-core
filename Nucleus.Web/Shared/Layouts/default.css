@@ -33,17 +33,15 @@
 	flex-direction: column;
 }
 
-.BottomPane
+.FooterPane
 {
 	display: flex;
 	flex-direction: row;	
   gap: 1rem;
 	background-color: #535353;
-	opacity: 0.9;
-	padding: 0.5rem;
 }
 
-.BottomPane *
+.FooterPane *
 {
 	color: white;
 }

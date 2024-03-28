@@ -418,7 +418,7 @@ namespace Nucleus.SAML.Client.Controllers
 
 				case Models.Configuration.SAMLProvider.ProtocolBindingTypes.HttpPost:
 				{
-					// The AuthnResponse is in the rrequest body, parse it
+					// The AuthnResponse is in the request body, parse it
 					Saml2PostBinding binding = new();
 					binding.ReadSamlResponse(Request.ToGenericHttpRequest(), saml2AuthnResponse);
 					binding.Unbind(Request.ToGenericHttpRequest(), saml2AuthnResponse);

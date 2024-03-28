@@ -11,6 +11,7 @@
     <component folderName="Links" optional="false">
       <moduleDefinition id="374e62b5-024d-4d8d-95a2-e56f476fe887">
         <friendlyName>Links</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/documentation/modules/links/</helpUrl>
         <extension>Links</extension>
         <viewController>Links</viewController>
         <settingsController>Admin</settingsController>

@@ -25,9 +25,3 @@
 	display: flex;
 	flex-direction: column;
 }
-
-.style-scrollable
-{
-	height: 100%;
-	overflow: auto;
-}

@@ -36,23 +36,23 @@
 		<ul class="nucleus-control-panel-sidebar">
 			@if (Model.IsSiteAdmin)
 			{
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("System", "System", "~/Admin/System/Index", "Y", "&#xe871;", "SystemIcon"))
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Pages", "Pages", "~/Admin/Pages/Index", "P", "&#xef42;", "PagesIcon"))
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Manage", "Manage", "~/Admin/Manage/Index", "M", "&#xf02e;", "ManageIcon"))
+				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("System", "View system information and logs.", "~/Admin/System/Index", "Y", "&#xe871;", "SystemIcon"))
+        @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Pages", "Manage your pages.", "~/Admin/Pages/Index", "P", "&#xef42;", "PagesIcon"))
+				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Manage", "Administer site-specific entities and settings.", "~/Admin/Manage/Index", "M", "&#xf02e;", "ManageIcon"))
 			}
 			@if (Model.IsSystemAdministrator)
 			{
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Extensions", "Extensions", "~/Admin/Extensions/Index", "X", "&#xe87b;", "ExtensionsIcon"))
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Settings", "Settings", "~/Admin/Settings/Index", "S", "&#xe8b8;", "SettingsIcon"))
+				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Extensions", "Add or remove extensions.", "~/Admin/Extensions/Index", "X", "&#xe87b;", "ExtensionsIcon"))
+				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Settings", "Manage system settings.", "~/Admin/Settings/Index", "S", "&#xe8b8;", "SettingsIcon"))
 			}
 
 			@if (Model.CanEditPage)
 			{
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-page-btn", "Edit Page", "Edit Page", "~/Admin/Pages/Editor" + "?id=" + @Model.CurrentPage.Id + "&mode=Single", "E", "&#xef42;", "nucleus-control-panel-sidebar-bottom"))
+				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-page-btn", "Edit Page", "Edit the settings for this page.", "~/Admin/Pages/Editor" + "?id=" + @Model.CurrentPage.Id + "&mode=Single", "E", "&#xef42;", "nucleus-control-panel-sidebar-bottom"))
 			}
 			@if (Model.CanEditContent)
 			{
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-content-btn", "Toggle Edit Mode", "Edit Content", "~/Admin/Settings/Index", "T", "&#xe3c9;", "nucleus-control-panel-sidebar-bottom nucleus-control-panel-sidebar-bottom" + (Model.IsEditMode ? "-active" : "")))
+				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-content-btn", "Edit Content", "Toggle edit mode.", "~/Admin/Settings/Index", "T", "&#xe3c9;", "nucleus-control-panel-sidebar-bottom nucleus-control-panel-sidebar-bottom" + (Model.IsEditMode ? "-active" : "")))
 			}
 		</ul>
 
@@ -63,8 +63,7 @@
 				<a class="nucleus-btn-page-back" data-target=".nucleus-adminpage">&#xe5c4;</a>
 			</div>
 			<div class="nucleus-adminpage nucleus-admin-content">
-        @* <img class="nucleus-progress-medium" src="~/Resources/Images/progress_medium.gif"/> *@
-        <div class="m-auto">
+        <div class="nucleus-admin-index-spinner-wrapper">
           <div class="spinner-border text-primary nucleus-admin-index-spinner" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>

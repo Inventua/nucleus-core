@@ -12,6 +12,7 @@
 		<component folderName="IFrame" optional="false">
 			<moduleDefinition id="505e91b2-df6b-49b9-b66e-770ed68db047">
 				<friendlyName>IFrame</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/documentation/modules/iframe/</helpUrl>
 				<extension>IFrame</extension>
         <viewController>IFrameViewerController</viewController>
         <settingsController>IFrameSettingsController</settingsController>

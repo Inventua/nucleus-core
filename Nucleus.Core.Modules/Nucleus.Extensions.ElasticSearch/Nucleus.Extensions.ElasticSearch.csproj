@@ -20,7 +20,6 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <None Remove="disable-private-loadcontext.json" />
     <None Remove="license.txt" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
@@ -29,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="disable-private-loadcontext.json" />
     <Content Include="license.txt" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />

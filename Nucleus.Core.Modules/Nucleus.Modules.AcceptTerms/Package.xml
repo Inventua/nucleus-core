@@ -11,6 +11,7 @@
     <component folderName="AcceptTerms" optional="false">
       <moduleDefinition id="45963833-c2b2-4673-a25b-85ac7b2b5b49">
         <friendlyName>Accept Terms</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/documentation/modules/accept-terms/</helpUrl>
         <extension>AcceptTerms</extension>
         <viewController>AcceptTerms</viewController>
         <settingsController>AcceptTermsAdmin</settingsController>

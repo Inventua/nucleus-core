@@ -4,6 +4,10 @@
 @using (Html.BeginNucleusForm("Save", "TextHtml", FormMethod.Post, null))
 {
 	@Html.HiddenFor(model => model.Content.Id)
+  <SettingsControl caption="Title" helptext="Module Title.  This value may be shown on screen.">
+    @Html.TextBoxFor(model => model.Title)
+  </SettingsControl>
+
 	@Html.TextAreaFor(model => model.Content.Value, 12, 60, new { @class = "HtmlEditorControl" });
 
 	<div class="nucleus-form-buttonrow">

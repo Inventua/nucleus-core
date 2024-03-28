@@ -9,11 +9,8 @@ namespace Nucleus.Web.ViewModels.Admin
 {	
 	public class PageModuleEditor 
 	{
-		//public Boolean RenderHeader{ get; set; }
 		public string UseLayout { get; set; }
 
-		public PageModule Module { get; set; } = new PageModule();
-
-
-	}
+    public PageModule Module { get; set; } = new PageModule();
+  }
 }

@@ -16,17 +16,17 @@ using Microsoft.AspNetCore.Mvc.TagHelpers;
 
 namespace Nucleus.ViewFeatures.TagHelpers
 {
-	/// <summary>
-	/// Renders a progress control.
-	/// </summary>	
-	/// <remarks>
+  /// <summary>
+  /// Renders a progress control.
+  /// </summary>	
+  /// <remarks>
   /// The tag name for this tag helper was changed from progress to progressbar in Nucleus 1.0.1.0 in order to prevent
   /// confusion between this tag helper and the HTML progress element.
   /// 
-	/// shared.css has built-in css styles for a progress control with class "UploadProgress".  A progress element with 
-	/// any other class name will require custom styling.
+  /// shared.css has built-in css styles for a progress control with class "upload-progress".  A progress element with 
+  /// any other class name will require custom styling.
   /// </remarks>
-	[HtmlTargetElement("ProgressBar")]
+  [HtmlTargetElement("ProgressBar")]
 	public class ProgressTagHelper : TagHelper
 	{
 		/// <summary>

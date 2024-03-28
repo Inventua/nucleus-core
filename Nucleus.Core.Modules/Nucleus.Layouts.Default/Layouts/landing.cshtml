@@ -1,0 +1,34 @@
+﻿@Html.AddStyle("~!/landing.css")	
+
+<div class="LayoutWrapper">
+  <div class="BannerPane">
+    @await Html.PartialAsync("_banner.cshtml")
+    @await Html.RenderPaneAsync("BannerPane")
+  </div>
+
+  <div class="ContentWrapper" data-track-scroll="content-wrapper">
+    <div class="Top2Column" suppress-empty="true">
+      @await Html.RenderPaneAsync("Top2Column")
+    </div>
+    <div class="Top3Column" suppress-empty="true">
+      @await Html.RenderPaneAsync("Top3Column")
+    </div>
+
+    <div class="ContentPane" suppress-empty="true">
+      @await Html.RenderPaneAsync("ContentPane")
+    </div>
+
+    <div class="Bottom3Column" suppress-empty="true">
+      @await Html.RenderPaneAsync("Bottom3Column")
+    </div>
+    <div class="Bottom2Column" suppress-empty="true">
+      @await Html.RenderPaneAsync("Bottom2Column")
+    </div>
+  </div>
+
+  <div class="FooterPane" suppress-empty="true">
+    <terms caption="Terms" />
+    <privacy caption="Privacy Policy" />
+    @await Html.RenderPaneAsync("FooterPane")
+  </div>
+</div>

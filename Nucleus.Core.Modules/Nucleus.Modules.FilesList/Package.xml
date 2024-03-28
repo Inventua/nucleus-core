@@ -11,6 +11,7 @@
     <component folderName="FilesList" optional="false">
       <moduleDefinition id="aebc3074-528f-4e71-84b9-1fbb5de2b8e2">
         <friendlyName>Files List</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/documentation/modules/files-list/</helpUrl>
         <extension>FilesList</extension>
         <viewController>FilesListViewerController</viewController>
         <settingsController>FilesListSettingsController</settingsController>

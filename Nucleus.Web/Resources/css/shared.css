@@ -33,11 +33,6 @@ body
 	font-size: 0.8rem;
 }
 
-.m-minus1
-{
-	margin: -0.25rem;
-}
-
 .btn label span
 {
 	vertical-align: text-top;
@@ -64,11 +59,6 @@ body
 	outline: -webkit-focus-ring-color auto 1px;
 }
 
-select option.nucleus-option-separator
-{
-	color: #888;
-}
-
 a *
 {
 	cursor: pointer;
@@ -77,6 +67,13 @@ a *
 .nucleus-material-icon
 {
 	font-family: 'Material Icons'!important; 
+}
+
+.nucleus-material-icon.icon-large
+{
+  font-size: 1.4rem;
+  padding: 0.25rem;
+  line-height: normal;
 }
 
 .nucleus-flex-fields .nucleus-progress-spinner
@@ -100,33 +97,23 @@ a *
 	margin-right: 0.5rem;
 }
 
-.nucleus-progress-medium
-{
-	margin: auto; 
-	width: 407px; 
-	height: 407px;
-	animation: show-progress 1s 1.5s forwards;
-	opacity: 0;
-}
-
-@keyframes show-progress {
-	to { opacity: 1; }
-}
-
-
-/*  nucleus-modal-caption is used to set popup captions and should not be displayed in content */
 .nucleus-inline-edit-controls
 {
 	display: none;
 }
 
-.Nucleus.AdminFrame, .AdminFramePlaceholder
+.Nucleus.nucleus-admin-frame, .nucleus-admin-frame-placeholder
 {
 	width: 100px;
 	height: 100%;
 }
 
-.Nucleus.AdminFrame
+.nucleus-admin-frame-placeholder
+{
+	float: left;
+}
+
+.Nucleus.nucleus-admin-frame
 {
 	position: fixed;
 	background: #444;
@@ -137,16 +124,11 @@ a *
 	transition: none;  /* prevent transition on close */
 }
 
-.Nucleus.AdminFrame.Expanded
+.Nucleus.nucleus-admin-frame.Expanded
 {
 	width: 100%;
 	z-index: 10000;
 	transition: width linear .25s; /* show using transition on open */
-}
-
-.AdminFramePlaceholder
-{
-	float: left;
 }
 
 .nucleus-modulesettings-frame
@@ -178,7 +160,7 @@ a *
 }
 
 /*  Styles for the progress bar rendered with the <Progress> tag helper (in the Files and Extensions page).  */
-.UploadProgress 
+.upload-progress 
 {
 	display: none;
 	border: solid 1px #333;
@@ -190,12 +172,12 @@ a *
 	z-index: 100;
 }
 
-.UploadProgress label
+.upload-progress label
 {
 	font-size: 0.8rem;
 }
 
-.UploadProgress progress
+.upload-progress progress
 {
 	appearance: none;
 	display: block;
@@ -206,21 +188,19 @@ a *
 /*  cross-browser styling for the <progress> element.  */
 /*  The transition style is only known to work in Edge and Chrome */
 
-/*  background component  */
-.UploadProgress progress::-webkit-progress-bar { background-color: white; width: 100%; }
-.UploadProgress progress { background-color: white; }
+/*  background  */
+.upload-progress progress::-webkit-progress-bar { background-color: white; width: 100%; }
+.upload-progress progress { background-color: white; }
 
 /*  value component  */
-.UploadProgress progress::-webkit-progress-value { background-color: #0d6efd!important; border-radius: 6px; transition: width 1s; }
-.UploadProgress progress::-moz-progress-bar { background-color: #0d6efd!important; border-radius: 6px; transition: width 1s; }
-.UploadProgress progress { color: #0d6efd; border-radius: 6px; transition: width 1s; }
+.upload-progress progress::-webkit-progress-value { background-color: #0d6efd!important; border-radius: 6px; transition: width 1s; }
+.upload-progress progress::-moz-progress-bar { background-color: #0d6efd!important; border-radius: 6px; transition: width 1s; }
+.upload-progress progress { color: #0d6efd; border-radius: 6px; transition: width 1s; }
 
-.ValidationError
+.validation-error
 {
 	border: solid 2px red!important;
 }
-
-
 
 .modal-auto-size.modal-dialog
 {
@@ -253,12 +233,16 @@ a *
 	flex: 1;
 }
 
-.modal-dialog .modal-header .btn-normalsize, .modal-dialog .modal-header .btn-maximize
+.modal-dialog .modal-header .btn-help, .modal-dialog .modal-header .btn-normalsize, .modal-dialog .modal-header .btn-maximize
 {
 	margin: -0.5rem -0.5rem -0.5rem auto;
 	padding: 0.5rem;
 	border: 0;
 	font-size: 1.3rem;
+}
+
+.modal-dialog .modal-header .btn-normalsize, .modal-dialog .modal-header .btn-maximize
+{
 	display: none;
 }
 
@@ -284,12 +268,6 @@ a *
 	flex-direction: column;
 	justify-content: stretch;
 }
-
-/*.modal-auto-size .modal-body
-{
-	flex-direction: column;
-	justify-content: stretch;
-}*/
 
 .modal-auto-size .modal-content
 {
@@ -370,7 +348,8 @@ table.table-sticky-headers thead th
 	}
 }
 
-.progress .indeterminate {
+.progress .indeterminate 
+{
 	animation: indeterminate 2.5s linear infinite alternate;
 	border-radius: 1rem;
 	width: 45% !important;
@@ -388,7 +367,7 @@ table.table-sticky-headers thead th
 	font-size: 15px;
 }
 
-.nucleus-small-cell .btn/*:not(.nav-link)*/
+.nucleus-small-cell .btn
 {
 	padding: 4px 6px;
 	margin-right: 0;
@@ -414,7 +393,6 @@ table.table-sticky-headers thead th
 	display: flex;
 	flex-direction: column;
 	flex-basis: 100%;
-	/*align-self: flex-start;*/  
 }
 
 /* mobile-only elements */
@@ -597,6 +575,13 @@ table.table-sticky-headers thead th
 	flex: 3;
 }
 
+.flex-full, .flex-full > *
+{
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
 .comma-separated li:not(:last-child)::after
 {
 	content: ', ';
@@ -629,7 +614,6 @@ input[type=range].ToggleSwitch
 	outline: gray;
 	opacity: 0.7;
 	transition: opacity .2s;
-	/*padding: 2px;*/
 	vertical-align: middle;
 	font-size: 18px;
 	position: relative;
@@ -699,7 +683,7 @@ input[type=range].ToggleSwitch.checked:after
   width: 4rem;
 }
 
-/* Set default styles for Html Editors */
+/* default styles for Html Editors */
 .trumbowyg-editor, .trumbowyg-textarea,
 .tox.tox-tinymce,
 .nucleus-htmleditordefaults

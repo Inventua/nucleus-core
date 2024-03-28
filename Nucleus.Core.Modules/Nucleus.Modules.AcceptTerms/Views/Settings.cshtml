@@ -7,13 +7,13 @@
 @Html.AddStyle("~!/../settings.css")
 @using (Html.BeginNucleusForm("Settings", "AcceptTerms", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
-	<fieldset class="flex-grow-1" role="group" aria-label="Settings">
+	<div class="d-flex flex-column flex-grow-1" role="group" aria-label="Settings">
 		@Html.HiddenFor(model => model.AgreementBody.Id)
 		<SettingsControl caption="Title" helptext="Enter the title for the user agreement.">
 			@Html.TextBoxFor(model => model.Title, new {  })
 		</SettingsControl>
 
-		<SettingsControl caption="Agreement Text" helptext="Enter the agreement text to display to the user.">
+    <SettingsControl caption="Agreement Text" class="flex-full" helptext="Enter the agreement text to display to the user.">
 			@Html.TextAreaFor(model => model.AgreementBody.Value, new { @class = "HtmlEditorControl" })
 		</SettingsControl>
 
@@ -30,7 +30,7 @@
 				@Html.TextBoxFor(model => model.EffectiveDate, "{0:yyyy-MM-ddThh:mm}", new { @class="nucleus-accept-terms-effective-date", @type = "datetime-local" })
 			</SettingsControl>
 		</div>
-	</fieldset>
+	</div>
 	<div class="nucleus-form-buttonrow">
 		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "AcceptTermsAdmin", "AcceptTerms"), new { @class = "btn btn-primary" })
 	</div>

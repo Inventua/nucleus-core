@@ -114,7 +114,7 @@
 			<TabPanel id="task-logs">
 				@if (Model.LogSettings.LogFiles != null)
 				{
-					@using (Html.BeginAreaForm("GetLogFile", "ScheduledTasks", "Admin", new { id = Model.ScheduledTask.Id }, FormMethod.Post, new { @class = "d-flex flex-column overflow-auto m-minus1", @data_target = ".LogContent", @autocomplete = "off" }))
+					@using (Html.BeginAreaForm("GetLogFile", "ScheduledTasks", "Admin", new { id = Model.ScheduledTask.Id }, FormMethod.Post, new { @class = "d-flex flex-column overflow-auto", @data_target = ".LogContent", @autocomplete = "off" }))
 					{
 						@await Html.PartialAsync("../System/_LogSettings.cshtml", Model.LogSettings)
 						<div class="LogContent d-flex flex-column overflow-auto mx-1">

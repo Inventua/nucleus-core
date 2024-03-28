@@ -92,11 +92,16 @@
 	  <None Remove="Resources\material-icons.woff2" />
 	  <None Remove="Setup\Templates\Site\default-site-template.xml" />
 	  <None Remove="Setup\Templates\Site\empty-site-template.xml" />
+	  <None Remove="Shared\Containers\container-styles.css" />
 	  <None Remove="Shared\Containers\default.css" />
+	  <None Remove="Shared\Containers\default.md" />
 	  <None Remove="Shared\Containers\default.min.css" />
+	  <None Remove="Shared\Containers\default.png" />
 	  <None Remove="Shared\Controls\Views\PagingControl.css" />
 	  <None Remove="Shared\Controls\Views\PagingControl.min.css" />
 	  <None Remove="Shared\Layouts\default.css" />
+	  <None Remove="Shared\Layouts\default.md" />
+	  <None Remove="Shared\Layouts\default.png" />
 	  <None Remove="Utils\Ubuntu\appSettings.template" />
 	  <None Remove="Utils\Ubuntu\nucleus-install.sh" />
 	  <None Remove="Utils\Ubuntu\nucleus.service" />
@@ -157,10 +162,15 @@
 	  <Content Include="Setup\Templates\Site\default-site-template.xml">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
+	  <Content Include="Shared\Containers\container-styles.css">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="Shared\Containers\default.md" />
 	  <Content Include="Shared\Containers\default.css">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Include="Shared\Containers\default.min.css" />
+	  <Content Include="Shared\Containers\default.png" />
 	  <Content Include="Shared\Controls\Views\PagingControl.css">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
@@ -168,6 +178,8 @@
 	  <Content Include="Shared\Layouts\default.css">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
+	  <Content Include="Shared\Layouts\default.md" />
+	  <Content Include="Shared\Layouts\default.png" />
 	  <Content Include="Utils\Ubuntu\appSettings.template">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>

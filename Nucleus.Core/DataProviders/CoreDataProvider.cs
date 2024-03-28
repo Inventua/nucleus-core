@@ -921,7 +921,7 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
   public async Task SaveModuleDefinition(ModuleDefinition moduleDefinition)
   {
     Boolean isNew = !this.Context.ModuleDefinitions.Where(existing => existing.Id == moduleDefinition.Id).AsNoTracking().Any();
-    moduleDefinition.ClassTypeName = "";  // temporary use, this property will be removed
+    
     this.Context.Attach(moduleDefinition);
     this.Context.Entry(moduleDefinition).State = isNew ? EntityState.Added : EntityState.Modified;
     await this.Context.SaveChangesAsync();

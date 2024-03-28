@@ -1,0 +1,73 @@
+﻿.LayoutWrapper
+{
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.ContentWrapper
+{
+  display: flex;		
+	overflow: auto;
+	flex-direction: column;
+  margin: auto;
+}
+
+.ContentWrapper > div
+{
+  display: flex;		
+	flex-direction: row;
+}
+
+.ContentPane
+{
+	display: flex;
+	flex-direction: column;
+	flex: 2;
+  min-width: 40rem;
+}
+
+.SidePane
+{
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+.SidePane > div:last-child 
+{
+  flex-basis: 100%;
+}
+
+.SidePane > div:last-child > div
+{
+  flex-grow: 1;
+}
+
+.ContentPane > div, .SecondaryPane > div, .SidePane > div
+{
+	display: flex;
+	flex-direction: column;
+}
+
+.SecondaryPane > div:last-child
+{
+  flex-grow: 1;
+}
+
+/*  Responsive UI  */
+@media screen and (max-width: 980px)
+{
+  .ContentWrapper
+  {
+    margin: unset;
+  }
+  .ContentWrapper > div
+  {
+    flex-direction: column;
+  }
+  .ContentPane
+  {
+    min-width: unset;
+  }
+}

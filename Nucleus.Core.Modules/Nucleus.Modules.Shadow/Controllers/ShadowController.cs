@@ -38,7 +38,8 @@ public class ShadowController : Controller
       // return a HttpStatusCode.PermanentRedirect to signal the ModuleContentRenderer to render a different 
       // module.  The ModuleContentRenderer also requires the X-NucleusAction header, in order to ensure that it is not 
       // intercepting a "real" HttpStatusCode.PermanentRedirect response.
-      HttpContext.Response.Headers.Append("X-NucleusAction", "");
+      HttpContext.Response.Headers["X-NucleusAction"] = "";
+      
       return new Microsoft.AspNetCore.Mvc.LocalRedirectResult($"~/mid={viewModel.ModuleId}", true, true);
     }
     else

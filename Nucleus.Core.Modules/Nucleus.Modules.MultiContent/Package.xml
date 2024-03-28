@@ -11,6 +11,7 @@
     <component folderName="MultiContent" optional="false">
       <moduleDefinition id="c690ad88-0438-48cf-b977-97fe53b7118f">
         <friendlyName>Multi-Content</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/documentation/modules/multi-content/</helpUrl>
         <extension>MultiContent</extension>
         <viewController>MultiContent</viewController>
         <viewAction>Index</viewAction>

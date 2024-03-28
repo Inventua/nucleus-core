@@ -11,6 +11,7 @@
     <component folderName="StaticContent" optional="false">
       <moduleDefinition id="0930d4fe-0469-47e6-a28b-7c42d85a61fd">
         <friendlyName>Static Content</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/documentation/modules/static-content/</helpUrl>
         <extension>StaticContent</extension>
         <viewController>StaticContent</viewController>
         <settingsController>StaticContentAdmin</settingsController>

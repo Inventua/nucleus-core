@@ -3,66 +3,69 @@
 @using Nucleus.Abstractions;
 @if (Model.Page.Modules.Count == 0)
 {
-	<div class="alert alert-primary" role="alert">This page does not have any modules. Click "Add Module" to add a new module.</div>
+  <div class="alert alert-primary" role="alert">This page does not have any modules. Click "Add Module" to add a new module.</div>
 }
 else
 {
-<table>
-	<tr>
-		<th></th>
-		<th>Type</th>
-		<th></th>
-		<th></th>
-		<th></th>
-      <th></th>
-      <th></th>
-	</tr>
-
-	@{ int count = 0; }
-	@foreach (var modulePane in Model.AvailablePanes)
-	{
-		var modules = Model.Page.Modules.Where(module => module.Pane == modulePane);
-		@if (modules.Any())
-		{
-			<tr>
-				<td><h3>@modulePane</h3></td>
-			</tr>
-      @if (modulePane == "None")
+  <table class="table table-sm table-borderless">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Type</th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var modulePaneItem in Model.PagePanes.Select((Pane, Index) => new { Index, Pane }))
       {
-        <tr>
-          <td colspan="7"><div class="alert alert-warning">These modules are not assigned to a pane which is available in the selected Layout, so they will not be displayed.</div></td>
-        </tr>
+        var modules = Model.Page.Modules.Where(module => module.Pane == modulePaneItem.Pane);
+        @if (modules.Any())
+        {
+          <tr>
+            <th colspan="7"><h3>@modulePaneItem.Pane</h3></th>
+          </tr>
+          @if (modulePaneItem.Pane == "None")
+          {
+            <tr>
+              <th colspan="7"><div class="alert alert-warning mt-3">These modules are not assigned to a pane which is available in the selected Layout, so they will not be displayed.</div></th>
+            </tr>
+          }          
+          
+          @* var paneModules = Model.Page.Modules.Where(module => module.Pane == modulePaneItem.Pane).Select((Module, Index) => new { Module, Index }); *@
+         
+          @foreach (var module in modules)
+          {
+            <tr>
+              <td>@(String.IsNullOrEmpty(module.Title) ? "-" : module.Title)</td>
+              <td>@module.ModuleDefinition.FriendlyName</td>
+              <td class="nucleus-small-cell">
+                @if (!String.IsNullOrEmpty(module.ModuleDefinition.EditAction))
+                {
+                  <input type="submit" formaction="@Url.AreaAction("EditModule", "Pages", "Admin")?mid=@module.Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-outline-secondary" title="Edit" data-target="#nucleus-popupdialog .modal-body" />
+                }
+              </td>
+              <td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("EditModuleCommonSettings", "Pages", "Admin")?mid=@module.Id" value="&#xe8b8;" title="Settings" class="nucleus-material-icon btn btn-outline-secondary" data-target="#nucleus-popupdialog .modal-body" /></td>
+              <td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("DeleteModule", "Pages", "Admin")?mid=@module.Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target="#pageeditor_pagemodules" data-confirm="Delete this module?" /></td>
+              <td class="nucleus-small-cell">
+                @if (!module.Equals(modules.FirstOrDefault()))
+                {
+                  <input type="submit" formaction="@Url.AreaAction("MoveModuleUp", "Pages", "Admin")?mid=@module.Id" value="&#xe5d8;" class="nucleus-material-icon btn btn-outline-secondary" title="Move Up" data-target="#pageeditor_pagemodules" />
+                }
+              </td>
+              <td class="nucleus-small-cell">
+                @if (!module.Equals(modules.LastOrDefault()))
+                {
+                  <input type="submit" formaction="@Url.AreaAction("MoveModuleDown", "Pages", "Admin")?mid=@module.Id" value="&#xe5db;" class="nucleus-material-icon btn btn-outline-secondary" title="Move Down" data-target="#pageeditor_pagemodules" />
+                }
+              </td>
+            </tr>
+          }
+        }
       }
-        count = 0;
-			@foreach (var module in Model.Page.Modules.Where(module => module.Pane == modulePane))
-			{
-				<tr>
-					<td>@(String.IsNullOrEmpty(module.Title) ? "-" : module.Title)</td>
-					<td>@module.ModuleDefinition.FriendlyName</td>
-            <td class="nucleus-small-cell">
-							@if (!String.IsNullOrEmpty(module.ModuleDefinition.EditAction))
-              {
-                <input type="submit" formaction="@Url.AreaAction("EditModule", "Pages", "Admin")?mid=@module.Id" value="&#xe3c9;" class="nucleus-material-icon btn btn-outline-secondary" title="Edit" data-target="#nucleus-popupdialog .modal-body" />
-              }
-            </td>
-            <td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("EditModuleCommonSettings", "Pages", "Admin")?mid=@module.Id" value="&#xe8b8;" title="Settings" class="nucleus-material-icon btn btn-outline-secondary" data-target="#nucleus-popupdialog .modal-body" /></td>
-					<td class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("DeleteModule", "Pages", "Admin")?mid=@module.Id" value="&#xe14c;" class="nucleus-material-icon btn btn-danger" title="Delete" data-target="#pageeditor_pagemodules" data-confirm="Delete this module?" /></td>
-					<td class="nucleus-small-cell">
-						@if (count != 0)
-						{
-							<input type="submit" formaction="@Url.AreaAction("MoveModuleUp", "Pages", "Admin")?mid=@module.Id" value="&#xe5d8;" class="nucleus-material-icon btn btn-outline-secondary" title="Move Up" data-target="#pageeditor_pagemodules" />
-						}
-					</td>
-					<td class="nucleus-small-cell">
-						@if (count < modules.Count() - 1)
-						{
-							<input type="submit" formaction="@Url.AreaAction("MoveModuleDown", "Pages", "Admin")?mid=@module.Id" value="&#xe5db;" class="nucleus-material-icon btn btn-outline-secondary" title="Move Down" data-target="#pageeditor_pagemodules" />
-						}
-					</td>
-				</tr>
-				count++;
-			}
-		}
-	}
-</table>
+    </tbody>
+  </table>
 }

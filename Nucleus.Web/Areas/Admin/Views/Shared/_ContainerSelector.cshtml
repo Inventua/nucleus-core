@@ -1,0 +1,48 @@
+﻿@model Nucleus.Web.ViewModels.Admin.ContainerSelector
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Abstractions;
+<div class="style-selector container-selector flex">
+  <div class="mb-1 bg-secondary-subtle p-2">
+    <button type="button" class="btn btn-secondary nucleus-material-icon icon-large select-flex" onclick="jQuery('.style-selector').removeClass('grid').addClass('flex');" title="List">&#xe8fe;</button>
+    <button type="button" class="btn btn-secondary nucleus-material-icon icon-large select-grid" onclick="jQuery('.style-selector').removeClass('flex').addClass('grid');" title="Grid">&#xe9b0;</button>
+  </div>
+  <div class="content-area">
+  <ul>
+    @foreach (var container in Model.Containers)
+    {
+      <li>
+        <button class="select-container flex-fill btn btn-outline-primary@(Model.SelectedContainerId == container.Id ? " selected" : "")" data-bs-dismiss="modal" data-container-id="@container.Id">
+          <h6>
+            <span>@container.FriendlyName</span>
+            @if (!String.IsNullOrEmpty(container.Extension))
+            {
+              <span class="extension">(@container.Extension)</span>
+            }
+            @if (Model.SelectedContainerId == container.Id)
+            {
+              <span class="nucleus-material-icon icon-large ms-auto">&#xe86c;</span>
+            }
+          </h6>
+
+          <div class="flex-row">
+            <div class="flex-1 me-2 description">
+              @if (!String.IsNullOrEmpty(container.Description))
+              {
+                @Html.Raw(@container.Description)
+              }
+              else
+              {
+                <text>No description.</text>
+              }
+            </div>
+            @if (!String.IsNullOrEmpty(container.ThumbnailUrl))
+            {
+              <img class="thumbnail" src="@container.ThumbnailUrl" />
+            }
+          </div>
+        </button>
+      </li>
+    }
+  </ul>
+  </div>
+</div>

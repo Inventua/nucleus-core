@@ -2,12 +2,7 @@
 using Nucleus.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
 
 namespace Nucleus.Modules.PageLinks.Models;
 
@@ -30,22 +25,22 @@ public class Settings
 
   [Flags]
   public enum HtmlHeaderTags
-  {    
-    [Display(Name = "Heading 1 (H1)"), Description("Scans for H1 header tags in automatic mode.")] H1 = 1,
-    [Display(Name = "Heading 2 (H2)"), Description("Scans for H2 header tags in automatic mode.")] H2 = 2,
-    [Display(Name = "Heading 3 (H3)"), Description("Scans for H3 header tags in automatic mode.")] H3 = 4,
-    [Display(Name = "Heading 4 (H4)"), Description("Scans for H4 header tags in automatic mode.")] H4 = 8,
-    [Display(Name = "Heading 5 (H5)"), Description("Scans for H5 header tags in automatic mode.")] H5 = 16,
-    [Display(Name = "Heading 6 (H6)"), Description("Scans for H6 header tags in automatic mode.")] H6 = 32
+  {
+    [Display(Name = "Heading 1 (H1)", Description = "Include H1 elements in automatically generated page links.")] H1 = 1,
+    [Display(Name = "Heading 2 (H2)", Description = "Include H2 elements in automatically generated page links.")] H2 = 2,
+    [Display(Name = "Heading 3 (H3)", Description = "Include H3 elements in automatically generated page links.")] H3 = 4,
+    [Display(Name = "Heading 4 (H4)", Description = "Include H4 elements in automatically generated page links.")] H4 = 8,
+    [Display(Name = "Heading 5 (H5)", Description = "Include H5 elements in automatically generated page links.")] H5 = 16,
+    [Display(Name = "Heading 6 (H6)", Description = "Include H6 elements in automatically generated page links.")] H6 = 32
   }
 
   public string Title { get; set; }
   public Modes Mode { get; set; }
-  public Dictionary<HtmlHeaderTags, Boolean> IncludeHeaders { get; set; } = new();
+  public Dictionary<HtmlHeaderTags, Boolean> IncludeHeaders { get; set; } = [];
 
   public string HeadingClass { get; set; }
   public string RootSelector { get; set; }
-  public List<PageLink> PageLinks { get; set; } = new();
+  public List<PageLink> PageLinks { get; set; } = [];
 
   public void GetSettings(PageModule module)
   {
@@ -67,7 +62,7 @@ public class Settings
 
   private Dictionary<HtmlHeaderTags, Boolean> GetIncludeHeadersDictionary(HtmlHeaderTags value)
   {
-    Dictionary<HtmlHeaderTags, Boolean> result = new();
+    Dictionary<HtmlHeaderTags, Boolean> result = [];
     foreach (HtmlHeaderTags htmlHeaderTag in Enum.GetValues(typeof(HtmlHeaderTags)))
     {
       result.Add(htmlHeaderTag, value.HasFlag(htmlHeaderTag));

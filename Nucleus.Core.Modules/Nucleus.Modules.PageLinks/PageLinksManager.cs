@@ -15,13 +15,11 @@ public class PageLinksManager
 {
   private IDataProviderFactory DataProviderFactory { get; }
   private ICacheManager CacheManager { get; }
-  private IPageManager PageManager { get; }
 
-  public PageLinksManager(IDataProviderFactory dataProviderFactory, ICacheManager cacheManager, IPageManager pageManager)
+  public PageLinksManager(IDataProviderFactory dataProviderFactory, ICacheManager cacheManager)
   {
     this.CacheManager = cacheManager;
     this.DataProviderFactory = dataProviderFactory;
-    this.PageManager = pageManager;
   }
 
   /// <summary>

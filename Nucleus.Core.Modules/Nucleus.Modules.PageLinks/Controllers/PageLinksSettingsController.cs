@@ -37,7 +37,7 @@ public class PageLinksSettingsController : Controller
   {
     if (viewModel.PageLinks == null)
     {
-      viewModel.PageLinks = new();
+      viewModel.PageLinks = [];
     }
 
     viewModel.PageLinks.Add(new Models.PageLink());
@@ -126,8 +126,10 @@ public class PageLinksSettingsController : Controller
   {
     if (viewModel == null)
     {
-      viewModel = new();
-      viewModel.PageLinks = await this.PageLinksManager.List(this.Context.Module);
+      viewModel = new()
+      {
+        PageLinks = await this.PageLinksManager.List(this.Context.Module)
+      };
     }
     else
     {

@@ -17,14 +17,12 @@ namespace Nucleus.Modules.PageLinks.Controllers;
 public class PageLinksViewerController : Controller
 {
 	private Context Context { get; }
-	private IPageModuleManager PageModuleManager { get; }
   private PageLinksManager PageLinksManager { get; }
 
 
-  public PageLinksViewerController(Context Context, IPageModuleManager pageModuleManager, PageLinksManager pageLinksManager)
+  public PageLinksViewerController(Context Context, PageLinksManager pageLinksManager)
   {
     this.Context = Context;
-    this.PageModuleManager = pageModuleManager;
     this.PageLinksManager = pageLinksManager;
   }
 

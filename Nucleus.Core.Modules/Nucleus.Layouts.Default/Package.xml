@@ -1,9 +1,9 @@
 ﻿<package id="c71695ec-111a-4ee6-9ba6-cdce64a6afd5" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
-  <name>Default Layouts</name>
+  <name>Standard Layouts</name>
   <version>1.4.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
-		Nucleus Default Layouts and Containers
+		Nucleus Standard Layouts and Containers
 	</description>
   <compatibility minVersion="1.4.0.0" maxVersion="*" />
   <components>
@@ -20,14 +20,14 @@
         <friendlyName>Default</friendlyName>
         <relativePath>Shared\Containers\default.cshtml</relativePath>
       </containerDefinition>
-      <!-- Regular layouts and containers  -->
+      <!-- Standard layouts and containers  -->
       <layoutDefinition id="DFAFC982-5CCE-4E09-91F3-A01B9130F1A2">
-        <friendlyName>Default 3 Column</friendlyName>
-        <relativePath>Layouts\default-3-column.cshtml</relativePath>
+        <friendlyName>Fixed 3 Column</friendlyName>
+        <relativePath>Layouts\fixed-3-column.cshtml</relativePath>
       </layoutDefinition>
       <layoutDefinition id="07F3C7F2-97E6-46D3-8218-1E02CBBB5CF2">
-        <friendlyName>Default 2 Column</friendlyName>
-        <relativePath>Layouts\default-2-column.cshtml</relativePath>
+        <friendlyName>Fixed 2 Column</friendlyName>
+        <relativePath>Layouts\fixed-2-column.cshtml</relativePath>
       </layoutDefinition>
       <layoutDefinition id="1561A61B-644D-4406-832C-2ADDE468C637">
         <friendlyName>Simple</friendlyName>
@@ -56,20 +56,20 @@
       <file name="license.txt" />
       <folder name="Layouts">
         <file name="_banner.cshtml" />
-        <file name="default-2-column.cshtml" />
-        <file name="default-2-column.css" />
-        <file name="default-2-column.min.css" />
-        <file name="default-3-column.cshtml" />
-        <file name="default-3-column.css" />
-        <file name="default-3-column.min.css" />
+        <file name="fixed-2-column.cshtml" />
+        <file name="fixed-2-column.css" />
+        <file name="fixed-2-column.min.css" />
+        <file name="fixed-2-column.md" />
+        <file name="fixed-2-column.png" />
+        <file name="fixed-3-column.cshtml" />
+        <file name="fixed-3-column.css" />
+        <file name="fixed-3-column.min.css" />
+        <file name="fixed-3-column.png" />
+        <file name="fixed-3-column.md" />
         <file name="simple.cshtml" />
         <file name="simple.css" />
         <file name="simple.min.css" />
-        <file name="default-2-column.png" />
-        <file name="default-3-column.png" />
         <file name="simple.png" />
-        <file name="default-2-column.md" />
-        <file name="default-3-column.md" />
         <file name="simple.md" />
         <file name="centered-cell.cshtml" />
         <file name="centered-cell.css" />
@@ -91,6 +91,22 @@
         <file name="no-title.md" />
         <file name="no-title.png" />
       </folder>
+
+      <cleanup>
+        <!-- In v1.4 we renamed these from "default..." to to "fixed..." -->
+        <folder name="Layouts">
+          <file name="default-2-column.cshtml" />
+          <file name="default-2-column.css" />
+          <file name="default-2-column.min.css" />
+          <file name="default-2-column.md" />
+          <file name="default-3-column.md" />
+          <file name="default-3-column.cshtml" />
+          <file name="default-3-column.css" />
+          <file name="default-3-column.min.css" />
+          <file name="default-2-column.png" />
+          <file name="default-3-column.png" />
+        </folder>
+      </cleanup>
     </component>
   </components>
 </package>

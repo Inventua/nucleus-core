@@ -694,3 +694,13 @@ input[type=range].ToggleSwitch.checked:after
 	min-height: 30vh;
 	flex-grow: 1;
 }
+
+
+/*  Responsive UI  */
+@media screen and (max-width: 980px)
+{
+  .modal-auto-size.modal-dialog
+  {
+	  max-width: unset;
+  }
+}

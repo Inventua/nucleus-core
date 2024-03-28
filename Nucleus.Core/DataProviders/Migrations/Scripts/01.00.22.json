@@ -5,7 +5,7 @@
     {
       // in v1.4, we renamed layout footer panes to "FooterPane" to better reflect their usage
       "sql": {
-        "sql": "UPDATE PageModules SET Pane = 'FooterPane WHERE Pane = 'BottomPane';"
+        "sql": "UPDATE PageModules SET Pane = 'FooterPane' WHERE Pane = 'BottomPane';"
       }
     }
   ]

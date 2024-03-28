@@ -10,5 +10,5 @@
 | FooterPane       | Bottom, fills width             | Contains site terms and privacy policy links (if configured)
 
 
-*Responsive UI*
+**Responsive UI**: 
 If the browser width is less than 980px, the side pane automatically adjusts to display underneath the content pane.

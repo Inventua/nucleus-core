@@ -1,8 +1,8 @@
 [
   {
-    "outputFileName": "Layouts/default-2-column.min.css",
+    "outputFileName": "Layouts/fixed-2-column.min.css",
     "inputFiles": [
-      "Layouts/default-2-column.css"
+      "Layouts/fixed-2-column.css"
     ]
   },
   {

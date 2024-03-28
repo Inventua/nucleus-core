@@ -10,6 +10,6 @@
 | Bottom2Column    | Middle, fills width            | Two side-by-side columns.  Suppressed if empty.
 | FooterPane       | Bottom, fills width            | Contains site terms and privacy policy links (if configured).
 
-*Responsive UI*
+**Responsive UI**: 
 If the browser width is less than 980px, the column panes automatically adjust to display underneath each other, and fill 
 the full width of the page.

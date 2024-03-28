@@ -1,4 +1,4 @@
-﻿@Html.AddStyle("~!/default-3-column.css")
+﻿@Html.AddStyle("~!/fixed-2-column.css")	
 
 <div class="LayoutWrapper">
 	<div class="BannerPane">
@@ -14,13 +14,9 @@
     <div class="ContentPane" data-track-scroll="content-pane">
 			@await Html.RenderPaneAsync("ContentPane")
 		</div>
-
-    <div class="RightPane" suppress-empty="true">
-			@await Html.RenderPaneAsync("RightPane")
-		</div>
 	</div>
 
-  <div class="FooterPane">
+  <div class="FooterPane" suppress-empty="true">
 		<terms caption="Terms" />
 		<privacy caption="Privacy Policy" />
     @await Html.RenderPaneAsync("FooterPane")

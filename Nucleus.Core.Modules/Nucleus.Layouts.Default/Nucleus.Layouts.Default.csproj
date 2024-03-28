@@ -33,17 +33,17 @@
     <None Remove="Layouts\centered-cell.css" />
     <None Remove="Layouts\centered-cell.md" />
     <None Remove="Layouts\centered-cell.png" />
-    <None Remove="Layouts\default-2-column - Copy.min.css" />
-    <None Remove="Layouts\default-2-column.cshtml" />
-    <None Remove="Layouts\default-2-column.css" />
-    <None Remove="Layouts\default-2-column.md" />
-    <None Remove="Layouts\default-2-column.min.css" />
-    <None Remove="Layouts\default-2-column.png" />
-    <None Remove="Layouts\default-3-column.cshtml" />
-    <None Remove="Layouts\default-3-column.css" />
-    <None Remove="Layouts\default-3-column.md" />
-    <None Remove="Layouts\default-3-column.min.css" />
-    <None Remove="Layouts\default-3-column.png" />
+    <None Remove="Layouts\fixed-2-column - Copy.min.css" />
+    <None Remove="Layouts\fixed-2-column.md" />
+    <None Remove="Layouts\fixed-2-column.min.css" />
+    <None Remove="Layouts\fixed-2-column.png" />
+    <None Remove="Layouts\fixed-3-column.cshtml" />
+    <None Remove="Layouts\fixed-3-column.css" />
+    <None Remove="Layouts\fixed-3-column.md" />
+    <None Remove="Layouts\fixed-3-column.min.css" />
+    <None Remove="Layouts\fixed-3-column.png" />
+    <None Remove="Layouts\fixed-2-column.cshtml" />
+    <None Remove="Layouts\fixed-2-column.css" />
     <None Remove="Layouts\landing.cshtml" />
     <None Remove="Layouts\landing.css" />
     <None Remove="Layouts\landing.md" />
@@ -84,10 +84,10 @@
     <Content Include="Layouts\centered-cell.css" />
     <Content Include="Layouts\centered-cell.md" />
     <Content Include="Layouts\centered-cell.png" />
-    <Content Include="Layouts\default-2-column.md" />
-    <Content Include="Layouts\default-2-column.png" />
-    <Content Include="Layouts\default-3-column.md" />
-    <Content Include="Layouts\default-3-column.png" />
+    <Content Include="Layouts\fixed-2-column.md" />
+    <Content Include="Layouts\fixed-2-column.png" />
+    <Content Include="Layouts\fixed-3-column.md" />
+    <Content Include="Layouts\fixed-3-column.png" />
     <Content Include="Layouts\simple.css" />
     <Content Include="Layouts\simple.md" />
     <Content Include="Layouts\simple.min.css" />
@@ -95,18 +95,18 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="Layouts\default-2-column.cshtml">
+    <Content Include="Layouts\fixed-2-column.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="Layouts\default-2-column.css" />
-    <Content Include="Layouts\default-2-column.min.css" />
-    <Content Include="Layouts\default-3-column.cshtml">
+    <Content Include="Layouts\fixed-2-column.css" />
+    <Content Include="Layouts\fixed-2-column.min.css" />
+    <Content Include="Layouts\fixed-3-column.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="Layouts\default-3-column.css" />
-    <Content Include="Layouts\default-3-column.min.css" />
+    <Content Include="Layouts\fixed-3-column.css" />
+    <Content Include="Layouts\fixed-3-column.min.css" />
     <Content Include="Layouts\simple.png" />
     <Content Include="Layouts\_banner.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>

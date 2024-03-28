@@ -5,6 +5,12 @@
 	height: 100%;
 }
 
+
+.BannerPane .banner-row
+{
+  display: flex;
+}
+
 .ContentWrapper 
 {
 	flex-grow: 1;
@@ -52,9 +58,19 @@
 /*  Responsive UI  */
 @media screen and (max-width: 980px)
 {
+  .BannerPane .banner-row
+  {
+    display: unset;
+  }
+
   .Top2Column, .Bottom2Column, .Top3Column, .Bottom3Column
   {
     display: flex;
 	  flex-direction: column;
+  }
+  
+  .BannerPane .nucleus-account-control > div
+  {
+    margin-left: auto;
   }
 }

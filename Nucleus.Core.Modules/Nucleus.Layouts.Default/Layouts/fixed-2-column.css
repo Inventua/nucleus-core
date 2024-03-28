@@ -5,10 +5,15 @@
 	height: 100%;
 }
 
-.BannerPane
+/*.BannerPane
 {
 	display: flex;
 	flex-direction: column;	
+}*/
+
+.BannerPane .banner-row
+{
+  display: flex;
 }
 
 .LeftPane
@@ -28,8 +33,7 @@
 {
 	display: flex;
 	flex-direction: column;
-	flex: 4;
-	overflow: auto;
+	flex: 5;
 }
 
 .ContentPane > div
@@ -38,15 +42,34 @@
 	flex-direction: column;
 }
 
-.RightPane
-{
-  flex: 1;
-}
-
 .FooterPane
 {
 	display: flex;
 	flex-direction: row;
   gap: 1rem;
   background-color: #535353;
+}
+
+/*  Responsive UI  */
+@media screen and (max-width: 980px)
+{
+  .BannerPane .banner-row
+  {
+    display: unset;
+  }
+  
+  .BannerPane .nucleus-account-control > div
+  {
+    margin-left: auto;
+  }
+
+  .ContentWrapper
+  {
+    flex-direction: column;
+  }
+
+  .ContentPane
+  {
+    overflow: unset;
+  }
 }

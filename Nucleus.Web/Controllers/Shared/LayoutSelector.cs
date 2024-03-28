@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Grpc.Core;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Extensions;
@@ -13,8 +14,6 @@ namespace Nucleus.Web.Controllers.Shared;
 
 public class LayoutSelector
 {
-
-
   public static async Task<ViewModels.Admin.LayoutSelector> BuildLayoutSelectorViewModel(ILayoutManager layoutManager, Guid? selectedLayoutId)
   {
     ViewModels.Admin.LayoutSelector viewModel = new();
@@ -43,47 +42,6 @@ public class LayoutSelector
 
     return viewModel;
   }
-
-  //private static string ParseLayoutDescription(string value)
-  //{
-  //  const string CAPABILITIES_REGEX = "{(?<capabilities>.*)}";
-  //  const string CAPABILITY_MATCH = "(?<capability>[^; }]*)";
-    
-  //  List<string> capabilities = new();
-
-  //  Match capabilitiesMatch = System.Text.RegularExpressions.Regex.Match(value, CAPABILITIES_REGEX);
-  //  if (capabilitiesMatch.Success)
-  //  {
-  //    foreach (Match capabilityMatch in System.Text.RegularExpressions.Regex.Matches(value, CAPABILITY_MATCH))
-  //    {
-  //      switch (capabilityMatch.Groups["capability"].Value)
-  //      {
-  //        case "grow-x":
-  //          capabilities.Add("&#xf730;");
-  //          break;
-  //        case "grow-y":
-  //          capabilities.Add("&#xe94f;");
-  //          break;
-  //        case "contains-modules":
-  //          capabilities.Add("&#xe87b;");
-  //          break;
-  //      }
-  //    }
-    
-  //    return System.Text.RegularExpressions.Regex.Replace
-  //    (
-  //      value, 
-  //      CAPABILITIES_REGEX, 
-  //      "<div class='capabilities'>" + 
-  //      String.Join("", capabilities.Select(capability => $"<span class='capability'>{capability}</span>")) + 
-  //      "</div>"
-  //    );
-  //  }
-  //  else
-  //  {
-  //    return value;
-  //  }
-  //}
 
   public static async Task<ContainerSelector> BuildContainerSelectorViewModel(IContainerManager containerManager, Guid? selectedContainerId)
   {
@@ -121,23 +79,45 @@ public class LayoutSelector
   /// <returns></returns>
   private static string GetExtensionFriendlyName(string fullPath)
   {
-    if (fullPath.Contains(Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER))
+    try
     {
-      string workingDirectory = fullPath;
-      string workingDirectoryParent;
-
-      while (!String.IsNullOrEmpty(workingDirectory))
+      if (fullPath.Contains(Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER))
       {
-        workingDirectoryParent = System.IO.Path.GetDirectoryName(workingDirectory);
-        if (System.IO.Path.GetFileName(workingDirectoryParent).Equals(Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER, StringComparison.OrdinalIgnoreCase))
-        {
-          string folder = System.IO.Path.GetFileName(workingDirectory);
-          // insert spaces in between words 
-          return Regex.Replace(folder, @"([A-Z])([A-Z])([a-z])|([a-z])([A-Z])", "$1$4 $2$3$5");
-        }
+        string workingDirectory = fullPath;
+        string workingDirectoryParent;
 
-        workingDirectory = workingDirectoryParent;
+        while (!String.IsNullOrEmpty(workingDirectory))
+        {
+          workingDirectoryParent = System.IO.Path.GetDirectoryName(workingDirectory);
+          if (System.IO.Path.GetFileName(workingDirectoryParent).Equals(Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER, StringComparison.OrdinalIgnoreCase))
+          {
+            string folder = System.IO.Path.GetFileName(workingDirectory);
+
+            string packagePath = System.IO.Path.Join(Environment.CurrentDirectory, Nucleus.Abstractions.Models.Configuration.FolderOptions.EXTENSIONS_FOLDER, folder, IExtensionManager.PACKAGE_MANIFEST_FILENAME);
+
+            // use package name element if present
+            if (System.IO.File.Exists(packagePath))
+            {
+              System.Xml.Serialization.XmlSerializer serializer = new(typeof(Abstractions.Models.Extensions.Package));
+              using (System.IO.Stream stream = System.IO.File.OpenRead(packagePath))
+              {
+                Abstractions.Models.Extensions.Package package = (Abstractions.Models.Extensions.Package)serializer.Deserialize(stream);
+                return package.name;
+              }
+            }
+
+            // otherwise use folder name: insert spaces in between words, using capital letters to determine word breaks 
+            return Regex.Replace(folder, @"([A-Z])([A-Z])([a-z])|([a-z])([A-Z])", "$1$4 $2$3$5");
+          }
+
+          workingDirectory = workingDirectoryParent;
+        }
       }
+    }
+    catch  (Exception)
+    { 
+      // this is a non-critical function, which accesses the file system and does XML deserializaton (things that can fail).  Suppress 
+      // errors so that any problems don't stop the layout selector from working
     }
 
     return "";

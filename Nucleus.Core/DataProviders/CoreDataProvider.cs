@@ -923,6 +923,10 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
     Boolean isNew = !this.Context.ModuleDefinitions.Where(existing => existing.Id == moduleDefinition.Id).AsNoTracking().Any();
     
     this.Context.Attach(moduleDefinition);
+
+    // the ClassTypeName column is no longer used, but is present in the database and is not nullable, so we have to set a value
+    this.Context.Entry(moduleDefinition).Property<String>("ClassTypeName").CurrentValue="";
+
     this.Context.Entry(moduleDefinition).State = isNew ? EntityState.Added : EntityState.Modified;
     await this.Context.SaveChangesAsync();
 

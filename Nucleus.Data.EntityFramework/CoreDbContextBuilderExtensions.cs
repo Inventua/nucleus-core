@@ -37,7 +37,9 @@ namespace Nucleus.Data.EntityFramework
     public static ModelBuilder ConfigureInstanceEntities(this ModelBuilder builder)
 		{
 			builder.Entity<ModuleDefinition>().ToTable("ModuleDefinitions");
-			builder.Entity<LayoutDefinition>().ToTable("LayoutDefinitions");
+      builder.Entity<ModuleDefinition>().Property<String>("ClassTypeName");
+
+      builder.Entity<LayoutDefinition>().ToTable("LayoutDefinitions");
 			builder.Entity<ContainerDefinition>().ToTable("ContainerDefinitions");
 			builder.Entity<ControlPanelExtensionDefinition>().ToTable("ControlPanelExtensionDefinitions");
 

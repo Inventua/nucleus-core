@@ -79,7 +79,7 @@ public class ContainerManager : IContainerManager
     return
       containerDefinition?.RelativePath ??
       page.DefaultContainerDefinition?.RelativePath ??
-      site.DefaultLayoutDefinition?.RelativePath ??
+      site.DefaultContainerDefinition?.RelativePath ??
       $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.CONTAINERS_FOLDER}/{DEFAULT_CONTAINER}";
   }
 

@@ -354,7 +354,7 @@ namespace Nucleus.Core.Layout
 
           if (RenderContainer)
           {
-            return await BuildContainerOutput(actionInvokerFactory, viewContext, site, page, moduleinfo, newHttpContext);
+            return await BuildContainerOutput(actionInvokerFactory, viewContext, site, page, localPath, moduleinfo, newHttpContext);
           }
           else
           {
@@ -381,7 +381,7 @@ namespace Nucleus.Core.Layout
     /// <remarks>
     /// The rendered output of a container includes the module output.
     /// </remarks>
-    private static async Task<HttpResponse> BuildContainerOutput(IActionInvokerFactory actionInvokerFactory, ViewContext viewContext, Site site, Page page, PageModule moduleinfo, HttpContext httpContext)
+    private static async Task<HttpResponse> BuildContainerOutput(IActionInvokerFactory actionInvokerFactory, ViewContext viewContext, Site site, Page page, LocalPath localPath, PageModule moduleinfo, HttpContext httpContext)
     {
       ContainerContext scopedContainerContext;
       IServiceProvider originalServiceProvider;
@@ -404,6 +404,7 @@ namespace Nucleus.Core.Layout
           scopedContainerContext.Site = site;
           scopedContainerContext.Page = page;
           scopedContainerContext.Module = moduleinfo;
+          scopedContainerContext.LocalPath = localPath;
 
           TagBuilder section = new("section");
           section.InnerHtml.AppendHtml(ToHtmlContent(httpContext.Response));
@@ -450,16 +451,6 @@ namespace Nucleus.Core.Layout
         // 'Collection was of a fixed size' exception.
         actionDescriptor.Parameters = actionDescriptor.MethodInfo.GetParameters().Select(param => new ParameterDescriptor () { Name = param.Name, ParameterType = param.ParameterType }).ToList();
 
-        //actionDescriptor.Parameters = new List<ParameterDescriptor>();
-        //foreach (ParameterInfo param in actionDescriptor.MethodInfo.GetParameters())
-        //{
-        //  actionDescriptor.Parameters.Add(new()
-        //  {
-        //    Name = param.Name,
-        //    ParameterType = param.ParameterType
-        //  });
-        //}
-
         // We must create a new routeData object (don't use htmlHelper.ViewContext.RouteData), because we must provide the controller, area and
         // action names for the module, rather than the route values for the original http request.
         Microsoft.AspNetCore.Routing.RouteData routeData = new();
@@ -473,7 +464,7 @@ namespace Nucleus.Core.Layout
 
         // we catch the module's rendered output in a memory stream so that we can add it to the page output
         httpContext.Response.Body = RecyclableMemoryStreamManager.GetStream();
-
+       
         // Create the controller and run the controller action
         await actionInvokerFactory.CreateInvoker(controllerContext).InvokeAsync();
       }

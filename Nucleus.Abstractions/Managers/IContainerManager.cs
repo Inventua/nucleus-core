@@ -16,6 +16,11 @@ namespace Nucleus.Abstractions.Managers;
 public interface IContainerManager
 {
   /// <summary>
+  /// Default container filename
+  /// </summary>
+  public const string DEFAULT_CONTAINER = "default.cshtml";
+
+  /// <summary>
   /// Retrieve the specified container definition.
   /// </summary>
   /// <returns></returns>

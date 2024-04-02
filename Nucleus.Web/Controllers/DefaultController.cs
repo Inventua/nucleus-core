@@ -103,7 +103,6 @@ namespace Nucleus.Web.Controllers
       // If the page was not found, display the error page if one is defined for the site, or if the requested Uri is one
       // of the file names/extensions that we always return a "raw" 404 error for, return NotFound().
       if (this.Context.Page == null)
-
       {
         Logger.LogTrace("Not found: {path}.", ControllerContext.HttpContext.Request.Path);
 

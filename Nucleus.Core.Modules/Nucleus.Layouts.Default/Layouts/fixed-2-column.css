@@ -1,27 +1,21 @@
-﻿.LayoutWrapper
+﻿.layout-fixed-2-column.LayoutWrapper
 {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
 }
 
-/*.BannerPane
-{
-	display: flex;
-	flex-direction: column;	
-}*/
-
-.BannerPane .banner-row
+.layout-fixed-2-column .BannerPane .banner-row
 {
   display: flex;
 }
 
-.LeftPane
+.layout-fixed-2-column .LeftPane
 {
   flex: 1;
 }
 
-.ContentWrapper 
+.layout-fixed-2-column .ContentWrapper 
 {
 	flex-grow: 1;
 	display: flex;		
@@ -29,20 +23,20 @@
 	flex-direction: row;
 }
 
-.ContentPane
+.layout-fixed-2-column .ContentPane
 {
 	display: flex;
 	flex-direction: column;
 	flex: 5;
 }
 
-.ContentPane > div
+.layout-fixed-2-column .ContentPane > div
 {
 	display: flex;
 	flex-direction: column;
 }
 
-.FooterPane
+.layout-fixed-2-column .FooterPane
 {
 	display: flex;
 	flex-direction: row;
@@ -53,22 +47,22 @@
 /*  Responsive UI  */
 @media screen and (max-width: 980px)
 {
-  .BannerPane .banner-row
+  .layout-fixed-2-column .BannerPane .banner-row
   {
     display: unset;
   }
   
-  .BannerPane .nucleus-account-control > div
+  .layout-fixed-2-column .BannerPane .nucleus-account-control > div
   {
     margin-left: auto;
   }
 
-  .ContentWrapper
+  .layout-fixed-2-column .ContentWrapper
   {
     flex-direction: column;
   }
 
-  .ContentPane
+  .layout-fixed-2-column .ContentPane
   {
     overflow: unset;
   }

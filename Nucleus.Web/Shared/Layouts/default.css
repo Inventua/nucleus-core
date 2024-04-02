@@ -1,21 +1,16 @@
-﻿.LayoutWrapper
+﻿.layout-default.LayoutWrapper
 {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
 }
 
-/*.BannerPane
-{
-	display: flex;
-	flex-direction: column;	
-}*/
-.BannerPane .banner-row
+.layout-default .BannerPane .banner-row
 {
   display: flex;
 }
 
-.ContentWrapper 
+.layout-default .ContentWrapper 
 {
 	flex-grow: 1;
 	display: flex;		
@@ -23,7 +18,7 @@
 	flex-direction: row;
 }
 
-.ContentPane
+.layout-default .ContentPane
 {
 	display: flex;
 	flex-direction: column;
@@ -31,13 +26,13 @@
 	overflow-x: auto;
 }
 
-.ContentPane > div
+.layout-default .ContentPane > div
 {
 	display: flex;
 	flex-direction: column;
 }
 
-.FooterPane
+.layout-default .FooterPane
 {
 	display: flex;
 	flex-direction: row;	
@@ -45,7 +40,7 @@
 	background-color: #535353;
 }
 
-.FooterPane *
+.layout-default .FooterPane *
 {
 	color: white;
 }
@@ -53,12 +48,12 @@
 /*  Responsive UI  */
 @media screen and (max-width: 980px)
 {
-  .BannerPane .banner-row
+  .layout-default .BannerPane .banner-row
   {
     display: unset;
   }
 
-  .BannerPane .nucleus-account-control > div
+  .layout-default .BannerPane .nucleus-account-control > div
   {
     margin-left: auto;
   }

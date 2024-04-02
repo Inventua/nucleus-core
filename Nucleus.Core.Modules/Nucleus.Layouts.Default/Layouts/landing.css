@@ -1,4 +1,4 @@
-﻿.LayoutWrapper
+﻿.layout-landing.LayoutWrapper
 {
 	display: flex;
 	flex-direction: column;
@@ -6,12 +6,12 @@
 }
 
 
-.BannerPane .banner-row
+.layout-landing .BannerPane .banner-row
 {
   display: flex;
 }
 
-.ContentWrapper 
+.layout-landing .ContentWrapper 
 {
 	flex-grow: 1;
 	display: flex;	
@@ -21,36 +21,36 @@
 	margin: 1rem;
 }
 
-.Top2Column, .Bottom2Column, .Top3Column, .Bottom3Column
+.layout-landing .Top2Column, .layout-landing .Bottom2Column, .layout-landing .Top3Column, .layout-landing .Bottom3Column
 {
 	display: grid;
   gap: 0.25rem;	
 	margin: 0;
 }
 
-.Top2Column, .Bottom2Column
+.layout-landing .Top2Column, .layout-landing .Bottom2Column
 {
   grid-template-columns: repeat(2, 1fr);
 }
 
-.Top3Column, .Bottom3Column
+.layout-landing .Top3Column, .layout-landing .Bottom3Column
 {
   grid-template-columns: repeat(3, 1fr);
 }
 
-.ContentPane
+.layout-landing .ContentPane
 {
 	display: flex;
 	flex-direction: column;
 }
 
-.ContentPane > div, .Top2Column > div, .Bottom2Column > div, .Top3Column > div, .Bottom3Column > div
+.layout-landing .ContentPane > div, .layout-landing .Top2Column > div, .layout-landing .Bottom2Column > div, .layout-landing .Top3Column > div, .layout-landing .Bottom3Column > div
 {
 	display: flex;
 	flex-direction: column;
 }
 
-.Top2Column > div > div, .Bottom2Column > div > div, .Top3Column > div > div, .Bottom3Column > div > div
+.layout-landing .Top2Column > div > div, .layout-landing .Bottom2Column > div > div, .layout-landing .Top3Column > div > div, .layout-landing .Bottom3Column > div > div
 {
   height: 100%;
 }
@@ -58,18 +58,18 @@
 /*  Responsive UI  */
 @media screen and (max-width: 980px)
 {
-  .BannerPane .banner-row
+  .layout-landing .BannerPane .banner-row
   {
     display: unset;
   }
 
-  .Top2Column, .Bottom2Column, .Top3Column, .Bottom3Column
+  .layout-landing .Top2Column, .layout-landing .Bottom2Column, .layout-landing .Top3Column, .layout-landing .Bottom3Column
   {
     display: flex;
 	  flex-direction: column;
   }
   
-  .BannerPane .nucleus-account-control > div
+  .layout-landing .BannerPane .nucleus-account-control > div
   {
     margin-left: auto;
   }

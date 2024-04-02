@@ -1,16 +1,16 @@
-﻿.LayoutWrapper
+﻿.layout-simple.LayoutWrapper
 {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
 }
 
-.BannerPane .banner-row
+.layout-simple .BannerPane .banner-row
 {
   display: flex;
 }
 
-.ContentWrapper 
+.layout-simple .ContentWrapper 
 {
 	flex-grow: 1;
 	display: flex;		
@@ -18,14 +18,14 @@
 	flex-direction: row;
 }
 
-.ContentPane
+.layout-simple .ContentPane
 {
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
 }
 
-.ContentPane > div
+.layout-simple .ContentPane > div
 {
 	display: flex;
 	flex-direction: column;
@@ -34,12 +34,12 @@
 /*  Responsive UI  */
 @media screen and (max-width: 980px)
 {
-  .BannerPane .banner-row
+  .layout-simple .BannerPane .banner-row
   {
     display: unset;
   }
   
-  .BannerPane .nucleus-account-control > div
+  .layout-simple .BannerPane .nucleus-account-control > div
   {
     margin-left: auto;
   }

@@ -58,7 +58,7 @@
             @Html.PageListFor(model => model.Page.ParentId, Model.ParentPageMenu, Model.Page.Id)
           </SettingsControl>
 
-          <SettingsControl caption="Description" helptext="Description of the page.  Some search engines use the page description to generate result snippets.">
+          <SettingsControl caption="Description" helptext="Description of the page.  This is used to generate a meta-description for the page, which is good for search engine optimisation (SEO). Some search systems use the page description to generate result snippets. Some modules (like SiteMap) may display page descriptions on-screen.">
             @Html.TextAreaFor(model => model.Page.Description, new { @maxlength = 512 })
           </SettingsControl>
 

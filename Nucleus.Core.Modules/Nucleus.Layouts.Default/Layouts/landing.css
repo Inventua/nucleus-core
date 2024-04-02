@@ -18,7 +18,7 @@
   gap: 0.5rem;	
 	overflow: auto;
 	flex-direction: column;
-	margin: 1rem;
+	padding: 1rem;
 }
 
 .layout-landing .Top2Column, .layout-landing .Bottom2Column, .layout-landing .Top3Column, .layout-landing .Bottom3Column

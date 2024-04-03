@@ -10,8 +10,12 @@
 
 .multi-content-carousel .carousel-inner
 {
-	width: calc(100% - 5rem);
 	margin: auto;
+}
+
+.multi-content-carousel.multi-content-carousel-show-controls .carousel-inner
+{
+	width: calc(100% - 5rem);
 }
 
 .multi-content-faq

@@ -14,7 +14,7 @@
       </button>
       <ul class="dropdown-menu new-page-dropdown-menu">
         <li>
-          <a href="@Url.AreaAction("NewPageBlank", "Pages", "Admin")" class="dropdown-item d-flex" data-target="#nucleus-page-editor" accesskey="N">
+          <a href="@Url.AreaAction("NewPageBlank", "Pages", "Admin")" class="dropdown-item d-flex fw-bold active" data-target="#nucleus-page-editor" accesskey="N">
             Blank page
             <span class="nucleus-material-icon ms-auto">&#xe5e1;</span>
           </a>
@@ -32,14 +32,9 @@
         {
           <li><hr class="dropdown-divider"></li>
           <li>
-            @* <a href="@Url.AreaAction("NewPageFromTemplate", "Pages", "Admin")" data-target="#nucleus-page-editor" accesskey="C">New page from template</a> *@
-            <div class="dropdown-item d-flex me-3">
-              <span class="me-2">New page from template</span>
-              <span class="nucleus-material-icon ms-auto">&#xe5e1;</span>
-            </div>
-
-            <div class="dropdown-item mt-1">
-              @Html.DropDownListFor(model => model.SelectedPageTemplateFileId, Model.PageTemplates, "(select)", new { @class = "form-select page-template-select" })
+            <div class="px-3">
+              <div class="mb-2 text-nowrap">New page from template</div>
+              @Html.DropDownListFor(model => model.SelectedPageTemplateFileId, Model.PageTemplates, "(select)", new { @class = "form-select w-auto page-template-select" })
             </div>
           </li>
         }

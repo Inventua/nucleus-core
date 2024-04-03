@@ -1,25 +1,28 @@
-﻿@Html.AddStyle("~!/fixed-3-column.css")
-<div class="layout-fixed-3-column LayoutWrapper">
+﻿@Html.AddStyle("~/Shared/Layouts/layout-styles.css")
+@Html.AddStyle("~!/fixed-3-column.css")
+<div class="layout-fixed-3-column layout-styles fill-height LayoutWrapper">
 	<div class="BannerPane">
 		@await Html.PartialAsync("_banner.cshtml")
 		@await Html.RenderPaneAsync("BannerPane")
 	</div>
-
-	<div class="ContentWrapper">
-    <div class="LeftPane" suppress-empty="true">
+  <div class="HeroPane" suppress-empty="true">
+    @await Html.RenderPaneAsync("HeroPane")
+  </div>
+  <div class="flex-row scrollable ContentWrapper">
+    <div class="flex-column LeftPane" suppress-empty="true">
 			@await Html.RenderPaneAsync("LeftPane")
 		</div>
 
-    <div class="ContentPane" data-track-scroll="content-pane">
+    <div class="flex-column scrollable ContentPane" data-track-scroll="content-pane">
 			@await Html.RenderPaneAsync("ContentPane")
 		</div>
 
-    <div class="RightPane" suppress-empty="true">
+    <div class="flex-column RightPane" suppress-empty="true">
 			@await Html.RenderPaneAsync("RightPane")
 		</div>
 	</div>
 
-  <div class="FooterPane">
+  <div class="dark-footer FooterPane">
 		<terms caption="Terms" />
 		<privacy caption="Privacy Policy" />
     @await Html.RenderPaneAsync("FooterPane")

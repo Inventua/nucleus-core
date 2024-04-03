@@ -1,76 +1,10 @@
-﻿.layout-landing.LayoutWrapper
+﻿.layout-landing .breadcrumb
 {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-}
-
-
-.layout-landing .BannerPane .banner-row
-{
-  display: flex;
+  padding: 0 1rem;
 }
 
 .layout-landing .ContentWrapper 
 {
-	flex-grow: 1;
-	display: flex;	
   gap: 0.5rem;	
-	overflow: auto;
-	flex-direction: column;
 	padding: 1rem;
-}
-
-.layout-landing .Top2Column, .layout-landing .Bottom2Column, .layout-landing .Top3Column, .layout-landing .Bottom3Column
-{
-	display: grid;
-  gap: 0.25rem;	
-	margin: 0;
-}
-
-.layout-landing .Top2Column, .layout-landing .Bottom2Column
-{
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.layout-landing .Top3Column, .layout-landing .Bottom3Column
-{
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.layout-landing .ContentPane
-{
-	display: flex;
-	flex-direction: column;
-}
-
-.layout-landing .ContentPane > div, .layout-landing .Top2Column > div, .layout-landing .Bottom2Column > div, .layout-landing .Top3Column > div, .layout-landing .Bottom3Column > div
-{
-	display: flex;
-	flex-direction: column;
-}
-
-.layout-landing .Top2Column > div > div, .layout-landing .Bottom2Column > div > div, .layout-landing .Top3Column > div > div, .layout-landing .Bottom3Column > div > div
-{
-  height: 100%;
-}
-
-/*  Responsive UI  */
-@media screen and (max-width: 980px)
-{
-  .layout-landing .BannerPane .banner-row
-  {
-    display: unset;
-  }
-
-  .layout-landing .Top2Column, .layout-landing .Bottom2Column, .layout-landing .Top3Column, .layout-landing .Bottom3Column
-  {
-    display: flex;
-	  flex-direction: column;
-  }
-  
-  .layout-landing .BannerPane .nucleus-account-control > div
-  {
-    margin-left: auto;
-  }
 }

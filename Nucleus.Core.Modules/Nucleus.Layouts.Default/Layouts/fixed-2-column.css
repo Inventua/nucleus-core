@@ -1,26 +1,16 @@
-﻿.layout-fixed-2-column.LayoutWrapper
+﻿.layout-fixed-2-column .breadcrumb
 {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-}
-
-.layout-fixed-2-column .BannerPane .banner-row
-{
-  display: flex;
-}
-
-.layout-fixed-2-column .LeftPane
-{
-  flex: 1;
+  padding: 0 .25rem;
 }
 
 .layout-fixed-2-column .ContentWrapper 
 {
 	flex-grow: 1;
-	display: flex;		
-	overflow: auto;
-	flex-direction: row;
+}
+
+.layout-fixed-2-column .LeftPane
+{
+  flex: 1;
 }
 
 .layout-fixed-2-column .ContentPane
@@ -36,27 +26,9 @@
 	flex-direction: column;
 }
 
-.layout-fixed-2-column .FooterPane
-{
-	display: flex;
-	flex-direction: row;
-  gap: 1rem;
-  background-color: #535353;
-}
-
 /*  Responsive UI  */
 @media screen and (max-width: 980px)
 {
-  .layout-fixed-2-column .BannerPane .banner-row
-  {
-    display: unset;
-  }
-  
-  .layout-fixed-2-column .BannerPane .nucleus-account-control > div
-  {
-    margin-left: auto;
-  }
-
   .layout-fixed-2-column .ContentWrapper
   {
     flex-direction: column;

@@ -1,20 +1,10 @@
-﻿.layout-centered-cell.LayoutWrapper
+﻿.layout-centered-cell .breadcrumb
 {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-}
-
-.layout-centered-cell .BannerPane .banner-row
-{
-  display: flex;
+  padding: 0 .25rem;
 }
 
 .layout-centered-cell .ContentWrapper
 {
-  display: flex;		
-	overflow: auto;
-	flex-direction: column;
   margin: auto;
 }
 
@@ -26,8 +16,6 @@
 
 .layout-centered-cell .ContentPane
 {
-	display: flex;
-	flex-direction: column;
 	flex: 2;
   min-width: 40rem;
 }
@@ -63,16 +51,6 @@
 /*  Responsive UI  */
 @media screen and (max-width: 980px)
 {
-  .layout-centered-cell .BannerPane .banner-row
-  {
-    display: unset;
-  }
-  
-  .layout-centered-cell .BannerPane .nucleus-account-control > div
-  {
-    margin-left: auto;
-  }
-
   .layout-centered-cell .ContentWrapper
   {
     margin: unset;

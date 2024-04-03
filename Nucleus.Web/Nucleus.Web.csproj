@@ -102,6 +102,7 @@
 	  <None Remove="Shared\Layouts\default.css" />
 	  <None Remove="Shared\Layouts\default.md" />
 	  <None Remove="Shared\Layouts\default.png" />
+	  <None Remove="Shared\Layouts\layout-styles.css" />
 	  <None Remove="Utils\Ubuntu\appSettings.template" />
 	  <None Remove="Utils\Ubuntu\nucleus-install.sh" />
 	  <None Remove="Utils\Ubuntu\nucleus.service" />
@@ -180,6 +181,7 @@
 	  </Content>
 	  <Content Include="Shared\Layouts\default.md" />
 	  <Content Include="Shared\Layouts\default.png" />
+	  <Content Include="Shared\Layouts\layout-styles.css" />
 	  <Content Include="Utils\Ubuntu\appSettings.template">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>

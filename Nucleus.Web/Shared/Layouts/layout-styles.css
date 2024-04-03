@@ -1,0 +1,85 @@
+﻿.layout-styles.fill-height, .layout-styles .fill-height
+{
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.layout-styles.containers-fill-height > div > div, .layout-styles .containers-fill-height > div > div
+{
+  height: 100%;
+}
+
+.layout-styles .flex-column
+{
+  display: flex;
+	flex-direction: column;	
+	flex-grow: 1;
+}
+
+.layout-styles .flex-row
+{
+  display: flex;
+	flex-direction: row;	
+	flex-grow: 1;
+}
+
+.layout-styles .scrollable
+{  
+	overflow: auto;
+}
+
+.layout-styles .two-column, .layout-styles .three-column
+{
+	display: grid;
+  gap: 0.25rem;	
+	margin: 0;
+}
+
+.layout-styles .two-column
+{
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.layout-styles .three-column
+{
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.layout-styles .four-column
+{
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.layout-styles .dark-footer
+{ 
+	display: flex;
+	flex-direction: row;
+  gap: 1rem;
+  background-color: #535353;  
+}
+
+.layout-styles .dark-footer, .layout-styles .dark-footer a
+{
+  color: white!important;
+}
+
+/*  Responsive UI  */
+@media screen and (max-width: 980px)
+{
+  .layout-styles .BannerPane .banner-row
+  {
+    display: unset;
+  }
+  
+  .layout-styles .BannerPane .nucleus-account-control > div
+  {
+    margin-left: auto;
+  }
+
+  .layout-styles .two-column, .layout-styles .three-column, .layout-styles .four-column
+  {
+    display: flex;
+	  flex-direction: column;
+  }  
+}

@@ -79,6 +79,8 @@
         <file name="landing.css" />
         <file name="landing.md" />
         <file name="landing.png" />
+        <file name="landing.min.css" />
+        <file name="centered-cell.min.css" />
       </folder>
       <folder name="Containers">
         <file name="centered.cshtml" />
@@ -91,7 +93,6 @@
         <file name="no-title.md" />
         <file name="no-title.png" />
       </folder>
-
       <cleanup>
         <!-- In v1.4 we renamed these from "default..." to to "fixed..." -->
         <folder name="Layouts">

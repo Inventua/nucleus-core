@@ -37,7 +37,11 @@
     <div class="nucleus-form-toolbar">
       @if (!String.IsNullOrEmpty(Model.Folder.Path) && Model.Folder.Parent != null)
       {
-        @Html.LinkButton("&#xe5c4;", "Back", @Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = Model.Folder.Parent.Id }), new { @data_target = ".nucleus-adminpage", @class = "btn btn-secondary btn-sm nucleus-show-progress nucleus-show-progress-inside" })
+        <a href="@Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = Model.Folder.Parent.Id })" data-target=".nucleus-adminpage" class="btn btn-secondary btn-sm nucleus-show-progress nucleus-show-progress-inside">
+          <span class="nucleus-material-icon">&#xe5c4;</span>
+          <span>Back</span>
+        </a>
+        @* @Html.LinkButton("&#xe5c4;", "Back", @Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = Model.Folder.Parent.Id }), new { @data_target = ".nucleus-adminpage", @class = "btn btn-secondary btn-sm nucleus-show-progress nucleus-show-progress-inside" }) *@
       }
       @if (Model.Folder.Capabilities.CanHaveFolders)
       {
@@ -53,7 +57,7 @@
             <li>
               <label class="dropdown-item">
                 Selected Files ...
-                <input type="file" name="mediaFiles" class="collapse" multiple="multiple" formaction="@Url.AreaAction("UploadFile", "FileSystem", "Admin")">
+                <input id="selected-files" type="file" name="mediaFiles" class="collapse" multiple="multiple" formaction="@Url.AreaAction("UploadFile", "FileSystem", "Admin")">
               </label>
             </li>
             <li>
@@ -83,6 +87,13 @@
         @Html.SubmitButton("", "Rename", @Url.AreaAction("ShowRenameDialog", "FileSystem", "Admin"), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary btn-sm" })
       }
       @Html.SubmitButton("&#xe897;", "Folder Settings", @Url.AreaAction("EditFolderSettings", "FileSystem", "Admin", new { folderId = Model.Folder.Id }), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary btn-sm" })
+      @if (Model.Folder.Capabilities.CanStoreFiles)
+      {
+        <div class="files-droptarget ms-auto border rounded border-1 border-dark d-flex align-items-center fs-small px-2">
+          <span class="nucleus-material-icon icon-large me-2">&#xe2c3;</span>
+          <span>Drag here to Upload Files</span>
+        </div>
+      }
     </div>
 
     <ProgressBar caption="Uploading file(s) ..." class="upload-progress"></ProgressBar>
@@ -161,7 +172,7 @@
 </div>
 
 <script>
-  jQuery(document).ready(function ()
+  jQuery(function ()
   {
     jQuery('.providerKey').on('change', function (event)
     {
@@ -184,6 +195,28 @@
         checkboxElements.prop('checked', true);
       }
     });
+
+    jQuery('.files-droptarget')
+      .on('dragover', function (event)
+      {
+        event.preventDefault();
+        event.stopPropagation();
+        jQuery(this).addClass('dragging');
+      })
+      .on('dragleave', function (event)
+      {
+        event.preventDefault();
+        event.stopPropagation();
+        jQuery(this).removeClass('dragging');
+      })
+      .on('drop', function (event)
+      {
+        event.preventDefault();
+        event.stopPropagation();
+        jQuery(this).removeClass('dragging');
+        jQuery('#selected-files')[0].files = event.originalEvent.dataTransfer.files;
+        jQuery('#selected-files').trigger('change');
+      });
 
     _cancelProgress();
 

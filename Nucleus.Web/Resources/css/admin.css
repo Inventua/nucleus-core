@@ -1007,6 +1007,12 @@ ul.nucleus-control-panel-items button
 	height: 100%;
 }
 
+.nucleus-adminpage .nucleus-file-system-manager .files-droptarget.dragging
+{
+  background-color: #0d6efd;
+  color: white;
+}
+
 .nucleus-adminpage .nucleus-file-system-manager form
 {
 	height: 100%;

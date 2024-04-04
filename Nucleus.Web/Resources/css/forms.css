@@ -5,6 +5,7 @@
 	gap: 8px;
 	clear: both;
 	align-items: end;
+  flex-wrap: wrap; /* responsive UI: this allows elements to wrap to the next line if they do not fit */
 }
 
 	.nucleus-flex-fields > div

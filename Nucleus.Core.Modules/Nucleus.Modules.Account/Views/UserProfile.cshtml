@@ -3,7 +3,7 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Extensions
 @using Nucleus.Abstractions.Models.Configuration
-@Html.AddStyle("~/Resources/css/forms.css")
+@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
 @if (Model.User != null)
 {
 	@using (Html.BeginNucleusForm("SaveAccountSettings", "UserProfile", "Account", FormMethod.Post, new { @data_target = "form.parent()" }))

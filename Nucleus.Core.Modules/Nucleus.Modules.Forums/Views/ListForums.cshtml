@@ -4,7 +4,7 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Forums.ViewModels
 @Html.AddStyle("~!/../viewer.css")
-@Html.AddStyle("~/Resources/css/forms.css")
+@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
 <div class="Forums">
   <div class="nucleus-form-tools">
     @Html.LinkButton("","Manage Subscriptions", Url.NucleusAction("ManageSubscriptions", "Forums", "Forums"), new { @class = "btn btn-primary btn-sm", @data_target = ".Forums.parent()" })

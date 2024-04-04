@@ -2,7 +2,7 @@
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
-@Html.AddStyle("~/Resources/css/forms.css")
+@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
 @using (Html.BeginNucleusForm("Login", "Login", "Account", FormMethod.Post, new { data_target = "form.parent()" }))
 {
   <fieldset aria-label="Login">
@@ -15,13 +15,13 @@
     <div>
       <label class="nucleus-show-progress nucleus-show-progress-after">
         <span>User name</span>
-        <span>@Html.TextBoxFor(model => model.Username, new { @class = Model.ShowVerificationToken ? "" : "nucleus-default-control", @autocorrect = "off", @autocapitalize = "none" })</span>
+        <span>@Html.TextBoxFor(model => model.Username, new { @class = Model.ShowVerificationToken ? "" : "nucleus-default-control", @size = "32", @autocomplete = "username", @autocorrect = "off", @autocapitalize = "none" })</span>
       </label>
     </div>
     <div>
       <label>
         <span>Password</span>
-        <span>@Html.PasswordFor(model => model.Password, new { @value = Model.Password })</span>
+        <span>@Html.PasswordFor(model => model.Password, new { @value = Model.Password, @size = "32", @autocomplete = "current-password" })</span>
       </label>
     </div>
 
@@ -33,7 +33,7 @@
       <div class="nucleus-flex-fields">
         <label>
           <span>Verification Token</span>
-          <span>@Html.TextBoxFor(model => model.VerificationToken, new { @class = "nucleus-default-control" })</span>
+          <span>@Html.TextBoxFor(model => model.VerificationToken, new { @class = "nucleus-default-control", @autocomplete = "one-time-code" })</span>
         </label>
         <button type="submit" class="btn btn-secondary btn-sm mt-2" formaction="@Url.NucleusAction("ResendVerificationCode", "Login", "Account")">Send new Verification Code</button>
       </div>

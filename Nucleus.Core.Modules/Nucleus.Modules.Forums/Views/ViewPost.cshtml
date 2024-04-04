@@ -5,7 +5,7 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Forums.ViewModels
 @Html.AddStyle("~!/../viewer.css")
-@Html.AddStyle("~/Resources/css/forms.css")
+@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
 <div class="Forums">
   @using (Html.BeginNucleusForm("SetForumPostStatus", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = "form.parent()" }))
   {

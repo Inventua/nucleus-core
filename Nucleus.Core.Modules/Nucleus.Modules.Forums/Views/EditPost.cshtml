@@ -4,7 +4,7 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Forums.ViewModels
 @Html.AddStyle("~!/../viewer.css")
-@Html.AddStyle("~/Resources/css/forms.css")
+@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
 @Html.AddScript("~/Resources/js/jquery-toggleswitch.js")
 <div class="Forums">
   @using (Html.BeginNucleusForm("SaveForumPost", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = ".Forums.parent()", @enctype = "multipart/form-data", @class = "forums-edit-post" }))

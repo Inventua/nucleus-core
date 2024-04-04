@@ -4,7 +4,7 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Forums.ViewModels
 @Html.AddStyle("~!/../viewer.css")
-@Html.AddStyle("~/Resources/css/forms.css")
+@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
 @if (Model.Forum != null)
 {
 	<div class="Forums">

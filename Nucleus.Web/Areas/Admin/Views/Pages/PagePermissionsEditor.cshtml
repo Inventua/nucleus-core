@@ -9,7 +9,7 @@
     <h2>Roles</h2>
     <div class="nucleus-form-tools">
       @Html.DropDownListFor(model => model.SelectedPageRoleId, Model.AvailablePageRoles, new { @class = "flex-fill" })
-      <input type="submit" formaction="@Url.AreaAction("AddPagePermissionRole", "Pages", "Admin")" value="Add Role" data-target="#nucleus-page-editor" class="btn btn-secondary" />
+      <input type="submit" formaction="@Url.AreaAction("AddPagePermissionRole", "Pages", "Admin")" value="Add Role" data-target=".nucleus-editor-panel" class="btn btn-secondary" />
     </div>
   }
   @if (!Model.PagePermissions.Values.Any())

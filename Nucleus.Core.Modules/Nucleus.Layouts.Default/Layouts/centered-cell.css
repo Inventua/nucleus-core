@@ -8,15 +8,14 @@
   margin: auto;
 }
 
-.layout-centered-cell .ContentWrapper > div
+.layout-centered-cell .ContentWrapper .top-row-wrapper
 {
-  display: flex;		
-	flex-direction: row;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
 }
 
 .layout-centered-cell .ContentPane
 {
-	flex: 2;
   min-width: 40rem;
 }
 
@@ -24,7 +23,6 @@
 {
 	display: flex;
 	flex-direction: column;
-	flex: 1;
 }
 
 .layout-centered-cell .SidePane > div:last-child 
@@ -43,6 +41,12 @@
 	flex-direction: column;
 }
 
+.layout-centered-cell .SecondaryPane
+{
+	display: flex;
+	flex-direction: row;
+}
+
 .layout-centered-cell .SecondaryPane > div:last-child
 {
   flex-grow: 1;
@@ -58,7 +62,7 @@
 
   .layout-centered-cell .ContentWrapper > div
   {
-    flex-direction: column;
+    display: block;
   }
 
   .layout-centered-cell .ContentPane

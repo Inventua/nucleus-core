@@ -1,1 +1,1 @@
-.container-default{display:flex;flex-direction:column;margin:.25rem;min-width:12rem}.container-default h2{margin:0}
+.container-default{--title-margin:0 0 .25rem 0}

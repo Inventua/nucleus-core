@@ -9,6 +9,7 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Extensions;
 using Nucleus.Modules.ContactUs.Models;
+using System.Linq;
 
 namespace Nucleus.Modules.ContactUs.Controllers;
 
@@ -65,7 +66,7 @@ public class ContactUsAdminController : Controller
 		viewModel.CategoryList = (await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(Models.Settings.MODULESETTING_CATEGORYLIST_ID, Guid.Empty)));
 
 		viewModel.Lists = await this.ListManager.List(this.Context.Site);
-		viewModel.MailTemplates = await this.MailTemplateManager.List(this.Context.Site);
+    viewModel.MailTemplates = await this.MailTemplateManager.List(this.Context.Site, typeof(Models.Mail.TemplateModel));
 
 		return viewModel;
 	}

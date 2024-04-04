@@ -67,12 +67,24 @@ namespace Nucleus.Core.Managers
 			}
 		}
 
-		/// <summary>
-		/// List paged <see cref="MailTemplate"/>s for the specified site.
+    /// <summary>
+		/// List <see cref="MailTemplate"/>s for the specified data model type for the specified site.
 		/// </summary>
 		/// <param name="site"></param>
+    /// <param name="type"></param>
 		/// <returns></returns>
-		public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<MailTemplate>> List(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+		public async Task<IEnumerable<MailTemplate>> List(Site site, System.Type type)
+    {
+      IEnumerable<MailTemplate> templates = await this.List(site);
+      return templates.Where(template => String.IsNullOrEmpty(template.DataModelTypeName) || template.DataModelTypeName == $"{type.FullName},{type.Assembly.GetName().Name}");
+    }
+
+    /// <summary>
+    /// List paged <see cref="MailTemplate"/>s for the specified site.
+    /// </summary>
+    /// <param name="site"></param>
+    /// <returns></returns>
+    public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<MailTemplate>> List(Site site, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
 		{
 			using (IMailDataProvider provider = this.DataProviderFactory.CreateProvider<IMailDataProvider>())
 			{

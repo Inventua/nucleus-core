@@ -12,9 +12,9 @@
   /* title: Alignment */
   /* group: Container */
   /* preserveOrder: true */
-  syntax: "left | center | right";
+  syntax: "left | center | right | match-parent";
   inherits: true;
-  initial-value: unset;
+  initial-value: match-parent;
 }
 
 @property --container-text-color
@@ -24,7 +24,7 @@
   /* preserveOrder: true */
   syntax: "<color>";
   inherits: true;
-  initial-value: unset;
+  initial-value: currentColor;
 }
 
 @property --container-background-color
@@ -34,7 +34,7 @@
   /* preserveOrder: true */
   syntax: "<color>";
   inherits: true;
-  initial-value: unset;
+  initial-value: transparent;
 }
 
 @property --container-padding
@@ -42,9 +42,9 @@
   /* title: Padding */
   /* group: Container */
   /* preserveOrder: true */
-  syntax: "<length>";
+  syntax: "*";
   inherits: true;
-  initial-value: unset;
+  initial-value: 0;
 }
 
 @property --container-margin
@@ -52,9 +52,9 @@
   /* title: Margin */
   /* group: Container */
   /* preserveOrder: true */
-  syntax: "<length>";
+  syntax: "*";
   inherits: true;
-  initial-value: unset;
+  initial-value: 0;
 }
 
 @property --container-border-size
@@ -65,7 +65,7 @@
   /* preserveOrder: true */
   syntax: "<length>";
   inherits: true;
-  initial-value: unset;
+  initial-value: 0;
 }
 
 @property --container-border-color
@@ -75,7 +75,7 @@
   /* baseClass: container-border */
   syntax: "<color>";
   inherits: true;
-  initial-value: unset;
+  initial-value: currentColor;
 }
 
 @property --container-border-style
@@ -86,7 +86,7 @@
   /* preserveOrder: true */
   syntax: "none | dotted | dashed | solid | double | groove | ridge | inset | outset ";
   inherits: true;
-  initial-value: unset;
+  initial-value: none;
 }
 
 /* properties which define container styles  */
@@ -96,9 +96,9 @@
   /* group: Title */
   /* baseClass: container-title */
   /* preserveOrder: true */
-  syntax: "left | center | right";
+  syntax: "left | center | right | match-parent";
   inherits: true;
-  initial-value: unset;
+  initial-value: match-parent;
 }
 
 @property --title-color
@@ -108,7 +108,7 @@
   /* baseClass: container-title */
   syntax: "<color>";
   inherits: true;
-  initial-value: unset;
+  initial-value: currentColor;
 }
 
 @property --title-background-color
@@ -118,7 +118,7 @@
   /* baseClass: container-title */
   syntax: "<color>";
   inherits: true;
-  initial-value: unset;
+  initial-value: transparent;
 }
 
 @property --title-padding
@@ -127,9 +127,9 @@
   /* group: Title */
   /* baseClass: container-title */
   /* preserveOrder: true */
-  syntax: "<length>";
+  syntax: "*";
   inherits: true;
-  initial-value: unset;
+  initial-value: 0;
 }
 
 @property --title-margin
@@ -138,9 +138,9 @@
   /* group: Title */
   /* baseClass: container-title */
   /* preserveOrder: true */
-  syntax: "<length>";
+  syntax: "*";
   inherits: true;
-  initial-value: unset;
+  initial-value: 0;
 }
 
 @property --content-alignment
@@ -149,9 +149,9 @@
   /* group: Content */
   /* baseClass: container-content */
   /* preserveOrder: true */
-  syntax: "left | center | right";
+  syntax: "left | center | right | match-parent";
   inherits: true;
-  initial-value: unset;
+  initial-value: match-parent;
 }
 
 @property --content-color
@@ -161,7 +161,7 @@
   /* baseClass: container-content */
   syntax: "<color>";
   inherits: true;
-  initial-value: unset;
+  initial-value: currentColor;
 }
 
 @property --content-background-color
@@ -171,7 +171,7 @@
   /* baseClass: container-content */
   syntax: "<color>";
   inherits: true;
-  initial-value: unset;
+  initial-value: transparent;
 }
 
 @property --content-padding
@@ -180,9 +180,9 @@
   /* group: Content */
   /* baseClass: container-content */
   /* preserveOrder: true */
-  syntax: "<length>";
+  syntax: "*";
   inherits: true;
-  initial-value: unset;
+  initial-value: 0;
 }
 
 @property --content-margin
@@ -191,9 +191,9 @@
   /* group: Content */
   /* baseClass: container-content */
   /* preserveOrder: true */
-  syntax: "<length>";
+  syntax: "*";
   inherits: true;
-  initial-value: unset;
+  initial-value: 0;
 }
 
 /* implementations */

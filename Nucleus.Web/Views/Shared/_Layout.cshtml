@@ -38,7 +38,7 @@
 	@RenderSection("styles", false)
 	@if (!String.IsNullOrEmpty(Model.SiteCssFilePath))
 	{
-		@Html.AddStyle(Model.SiteCssFilePath)
+    @Html.AddStyle(Model.SiteCssFilePath, AddStyleHtmlHelper.WellKnownSortOrders.SITE_STYLES_SORT_INDEX)
 	}
 	@RenderSection("scripts", false)
 	<merge-stylesheets>

@@ -11,6 +11,7 @@ using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Nucleus.Extensions;
+using DocumentFormat.OpenXml.Math;
 
 namespace Nucleus.ViewFeatures.HtmlHelpers
 {
@@ -59,7 +60,77 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       /// <summary>
       /// CSS classes for the Monaco editor
       /// </summary>
-      NUCLEUS_MONACO_EDITOR
+      NUCLEUS_MONACO_EDITOR,
+
+      /// <summary>
+      /// Customizable CSS properties and implementation for containers ("container styles")
+      /// </summary>
+      NUCLEUS_CONTAINER_STYLES
+    }
+
+    private const string WELLKNOWN_BOOTSTRAP = "~/Resources/Libraries/Bootstrap/5.3.2/css/bootstrap.css";
+    private const string WELLKNOWN_NUCLEUS_SHARED = "~/Resources/css/shared.css";
+    private const string WELLKNOWN_NUCLEUS_ADMIN = "~/Resources/css/admin.css";
+    private const string WELLKNOWN_NUCLEUS_FORMS = "~/Resources/css/forms.css";
+    private const string WELLKNOWN_NUCLEUS_EDITMODE = "~/Resources/css/editmode.css";
+    private const string WELLKNOWN_NUCLEUS_PAGINGCONTROL = "~/Shared/Controls/Views/PagingControl.css";
+    private const string WELLKNOWN_NUCLEUS_MONACO_EDITOR = "~/Resources/Libraries/Monaco/0.44.0/min/vs/editor/editor.main.css";
+    private const string WELLKNOWN_NUCLEUS_CONTAINER_STYLES = "~/Shared/Containers/container-styles.css";
+
+    private static readonly string[] WELL_KNOWN_PATHS = 
+    {
+      WELLKNOWN_BOOTSTRAP,
+      WELLKNOWN_NUCLEUS_SHARED,
+      WELLKNOWN_NUCLEUS_ADMIN,
+      WELLKNOWN_NUCLEUS_FORMS,
+      WELLKNOWN_NUCLEUS_EDITMODE,
+      WELLKNOWN_NUCLEUS_PAGINGCONTROL,
+      WELLKNOWN_NUCLEUS_MONACO_EDITOR,
+      WELLKNOWN_NUCLEUS_CONTAINER_STYLES
+    };
+
+    /// <summary>
+    /// Style sort orders
+    /// </summary>
+    public class WellKnownSortOrders
+    {
+      /// <summary>
+      /// Base sort ondex for well-known styles.
+      /// </summary>
+      /// <remarks>
+      /// Well-known styles are added first in Html output, so that their values can be overridden by other css files.
+      /// </remarks>
+      public const int WELL_KNOWN_STYLES_SORT_INDEX = 0;
+
+      /// <summary>
+      /// Base sort ondex for well-known styles.
+      /// </summary>
+      /// <remarks>
+      /// The container styles file is added after other well-known styles.
+      /// </remarks>
+      public const int CONTAINER_STYLES_SORT_INDEX = 5;
+
+      /// <summary>
+      /// Base sort index for unidentified css files.
+      /// </summary>
+      public const int DEFAULT_SORT_INDEX = 10;
+
+      /// <summary>
+      /// Base sort index for Css files which belong to an extension.
+      /// </summary>
+      /// <remarks>
+      /// Extension styles are added after well-known styles but before site-specific Css, so that they can override Nucleus defaults, but can be 
+      /// overridden by site styles.
+      /// </remarks>
+      public const int EXTENSION_STYLES_SORT_INDEX = 1000;
+
+      /// <summary>
+      /// Sort order for the site styles file.  
+      /// </summary>
+      /// <remarks>
+      /// This sort order is for internal use by Nucleus.
+      /// </remarks>
+      public const int SITE_STYLES_SORT_INDEX = 50000;
     }
 
     /// <summary>
@@ -70,43 +141,11 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// <returns></returns>
     public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, WellKnownScripts script)
     {
-      string stylesheetPath = "";
-
-      switch (script)
-      {
-        case WellKnownScripts.BOOTSTRAP:
-          stylesheetPath = "~/Resources/Libraries/Bootstrap/5.3.2/css/bootstrap.css";
-          break;
-
-				case WellKnownScripts.NUCLEUS_SHARED:
-					stylesheetPath = "~/Resources/css/shared.css";
-					break;
-
-				case WellKnownScripts.NUCLEUS_ADMIN:
-					stylesheetPath = "~/Resources/css/admin.css";
-					break;
-
-				case WellKnownScripts.NUCLEUS_FORMS:
-					stylesheetPath = "~/Resources/css/forms.css";
-					break;
-
-				case WellKnownScripts.NUCLEUS_EDITMODE:
-					stylesheetPath = "~/Resources/css/editmode.css";
-					break;
-
-				case WellKnownScripts.NUCLEUS_PAGINGCONTROL:
-					stylesheetPath = "~/Shared/Controls/Views/PagingControl.css";
-					break;
-
-        case WellKnownScripts.NUCLEUS_MONACO_EDITOR:
-          stylesheetPath = "~/Resources/Libraries/Monaco/0.44.0/min/vs/editor/editor.main.css";
-          break;
-
-      }
+      string stylesheetPath = GetWellKnownStylePath(script);      
 
       if (!String.IsNullOrEmpty(stylesheetPath))
       {
-        return AddStyle(htmlHelper, stylesheetPath, true, false,typeof(AddStyleHtmlHelper).Assembly.Version());
+        return AddStyle(htmlHelper, stylesheetPath, true, false, typeof(AddStyleHtmlHelper).Assembly.Version(), GetSortOrder(script));
       }
       else
       {
@@ -114,6 +153,58 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       }
     }
 
+    /// <summary>
+    /// Add a well-known script.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="script"></param>
+    /// <returns></returns>
+    public static IHtmlContent AddStyle(ViewContext context, WellKnownScripts script)
+    {
+      string stylesheetPath = GetWellKnownStylePath(script);
+
+      if (!String.IsNullOrEmpty(stylesheetPath))
+      {
+        return AddStyle(context, stylesheetPath, true, false, typeof(AddStyleHtmlHelper).Assembly.Version(), GetSortOrder(script));
+      }
+      else
+      {
+        return null;
+      }
+    }
+
+    private static string GetWellKnownStylePath(WellKnownScripts script)
+    {
+      switch (script)
+      {
+        case WellKnownScripts.BOOTSTRAP:
+          return WELLKNOWN_BOOTSTRAP;          
+
+        case WellKnownScripts.NUCLEUS_SHARED:
+          return WELLKNOWN_NUCLEUS_SHARED;          
+
+        case WellKnownScripts.NUCLEUS_ADMIN:
+          return WELLKNOWN_NUCLEUS_ADMIN;          
+
+        case WellKnownScripts.NUCLEUS_FORMS:
+          return WELLKNOWN_NUCLEUS_FORMS;          
+
+        case WellKnownScripts.NUCLEUS_EDITMODE:
+          return WELLKNOWN_NUCLEUS_EDITMODE;          
+
+        case WellKnownScripts.NUCLEUS_PAGINGCONTROL:
+          return WELLKNOWN_NUCLEUS_PAGINGCONTROL;
+          
+        case WellKnownScripts.NUCLEUS_MONACO_EDITOR:
+          return WELLKNOWN_NUCLEUS_MONACO_EDITOR;          
+
+        case WellKnownScripts.NUCLEUS_CONTAINER_STYLES:
+          return WELLKNOWN_NUCLEUS_CONTAINER_STYLES;
+
+        default:
+          return string.Empty;
+      }
+    }
 
     /// <summary>
     /// Register the specified style to be added to the Layout or module's CSS styles.
@@ -132,6 +223,23 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     {
       return AddStyle(htmlHelper, stylesheetPath, true);
     }
+
+    /// <summary>
+    /// Register the specified style to be added to the Layout or module's CSS styles.
+    /// </summary>
+    /// <param name="htmlHelper"></param>
+    /// <param name="stylesheetPath"></param>
+    /// <param name="sortIndex"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// Extensions (modules) can use this Html Helper to add CSS stylesheets to the HEAD block.  The scriptPath can contain 
+    ///  ~! for the currently executing view path, or ~# for the currently executing extension. 
+    /// </remarks>
+    public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, int sortIndex)
+    {
+      return AddStyle(htmlHelper, stylesheetPath, true, false, GetVersion(htmlHelper.ViewContext), sortIndex);
+    }
+
 
     /// <summary>
     /// Register the specified style to be added to the Layout or module's CSS styles.
@@ -161,7 +269,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// <param name="isDynamic"></param>
     /// <returns></returns>
     /// <remarks>
-    /// Extensions (modules) can use this Html Helper to add CSS stylesheets to the HEAD block.  The scriptPath can contain the 
+    /// Extensions (modules) can use this Html Helper to add CSS stylesheets to the HEAD block.  The scriptPath can contain  
     ///  ~! for the currently executing view path, or ~# for the currently executing extension. 
     /// </remarks>
     /// <example>
@@ -169,9 +277,8 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// </example>
     public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, Boolean defer, Boolean isDynamic)
     {
-      return AddStyle(htmlHelper, stylesheetPath, defer, isDynamic, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version.ToString());
+      return AddStyle(htmlHelper, stylesheetPath, defer, isDynamic, GetVersion(htmlHelper.ViewContext), GetSortOrder(stylesheetPath));
     }
-
 
     /// <summary>
     /// Register the specified style to be added to the Layout or module's CSS styles.
@@ -181,6 +288,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// <param name="defer"></param>
     /// <param name="isDynamic"></param>
     /// <param name="version"></param>
+    /// <param name="sortIndex"></param>
     /// <returns></returns>
     /// <remarks>
     /// Extensions (modules) can use this Html Helper to add CSS stylesheets to the HEAD block.  The scriptPath can contain the 
@@ -189,9 +297,9 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// <example>
     /// @Html.AddScript("~/Extensions/MyModule/MyModule.css")
     /// </example>
-    private static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, Boolean defer, Boolean isDynamic, string version)
+    private static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, Boolean defer, Boolean isDynamic, string version, int sortIndex)
     {
-      return AddStyle(htmlHelper.ViewContext, stylesheetPath, defer, isDynamic, version);
+      return AddStyle(htmlHelper.ViewContext, stylesheetPath, defer, isDynamic, version, sortIndex);
     }
 
     /// <summary>
@@ -202,6 +310,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// <param name="defer"></param>
     /// <param name="isDynamic"></param>
     /// <param name="version"></param>
+    /// <param name="sortIndex"></param>
     /// <returns></returns>
     /// <remarks>
     /// Extensions (modules) can use this Html Helper to add CSS stylesheets to the HEAD block.  The scriptPath can contain the 
@@ -210,7 +319,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// <example>
     /// @Html.AddScript("~/Extensions/MyModule/MyModule.css")
     /// </example>
-    internal static IHtmlContent AddStyle(ViewContext context, string stylesheetPath, Boolean defer, Boolean isDynamic, string version)
+    internal static IHtmlContent AddStyle(ViewContext context, string stylesheetPath, Boolean defer, Boolean isDynamic, string version, int sortIndex)
     {
       ResourceFileOptions resourceFileOptions = context.HttpContext.RequestServices.GetService<IOptions<ResourceFileOptions>>().Value;
       Dictionary<string, StylesheetInfo> stylesheets = (Dictionary<string, StylesheetInfo>)context.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
@@ -237,13 +346,50 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
           Path = finalStylesheetPath,
           Defer = defer,
           IsDynamic = isDynamic,
-          Version = version
+          Version = version,
+          SortIndex = sortIndex
         });
 
         context.HttpContext.Items[ITEMS_KEY] = stylesheets;
       }
 
       return new HtmlContentBuilder();
+    }
+
+
+    private static int GetSortOrder(WellKnownScripts script)
+    {
+      if (script == WellKnownScripts.NUCLEUS_CONTAINER_STYLES)
+      {
+        return WellKnownSortOrders.CONTAINER_STYLES_SORT_INDEX;
+      }
+      else
+      {
+        return WellKnownSortOrders.WELL_KNOWN_STYLES_SORT_INDEX;
+      }
+    }
+
+    private static int GetSortOrder(string path)
+    {
+      if (WELL_KNOWN_PATHS.Contains(path))
+      {
+        return WellKnownSortOrders.WELL_KNOWN_STYLES_SORT_INDEX;
+      }
+      else
+      {
+        if (path.StartsWith("~!") || path.StartsWith("~#"))
+        {
+          return WellKnownSortOrders.EXTENSION_STYLES_SORT_INDEX;
+        }
+      }
+
+      return WellKnownSortOrders.DEFAULT_SORT_INDEX; 
+    }
+
+
+    private static string GetVersion(ViewContext context)
+    {
+      return ((ControllerActionDescriptor)context.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version.ToString();
     }
 
     private static Boolean LocalFileExists(string contentRootPath, PathString pathBase, string stylesheetPath, string fileName)
@@ -274,7 +420,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
       if (stylesheets != null)
       {
-        foreach (KeyValuePair<string, StylesheetInfo> style in stylesheets)
+        foreach (KeyValuePair<string, StylesheetInfo> style in stylesheets.OrderBy(sheet => sheet.Value.SortIndex))
         {
           if (!String.IsNullOrEmpty(style.Key))
           {
@@ -310,6 +456,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       public Boolean Defer { get; set; }
       public Boolean IsDynamic { get; set; }
       public string Path { get; set; }
+      public int SortIndex { get; set; }
     }
   }
 }

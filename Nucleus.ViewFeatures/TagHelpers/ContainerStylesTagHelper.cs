@@ -95,7 +95,7 @@ public class ContainerStylesTagHelper : TagHelper
           {
             // we need the container-style class and the container styles css file if either automatic classes or automatic styles are being
             // used for a container.
-            AddStyleHtmlHelper.AddStyle(this.ViewContext, "~/Shared/Containers/container-styles.css", true, false, ((ControllerActionDescriptor)this.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version.ToString());
+            AddStyleHtmlHelper.AddStyle(this.ViewContext, AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_CONTAINER_STYLES);
             cssClasses.Add("container-style");
 
             // add .AutomaticClasses to the class attribute.  We don't use output.AddClass here because there will often be several css classes to add,

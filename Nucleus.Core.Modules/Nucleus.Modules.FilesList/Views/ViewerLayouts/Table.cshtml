@@ -3,21 +3,21 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Extensions
 @using Nucleus.Modules.FilesList.ViewModels
-<table class="nucleus-file-system-table table table-sm table-sticky-headers">
+<table class="table table-sm table-sticky-headers files-list">
 	<thead>
 		<tr>
-			<th class="file-name ps-0">Name</th>
+      <th class="file-name-heading ps-0">Name</th>
 			@if (Model.ShowModifiedDate)
 			{
 				<th class="file-modified-date">Modified Date</th>
 			}
 			@if (Model.ShowSize)
 			{
-				<th class="file-size">Size</th>
+        <th class="file-size-heading">Size</th>
 			}
 			@if (Model.ShowDimensions)
 			{
-				<th class="file-dimensions">Dimensions</th>
+				<th class="file-dimensions-heading">Dimensions</th>
 			}
 		</tr>
 	</thead>
@@ -36,12 +36,7 @@
 				}
 				@if (Model.ShowDimensions)
 				{
-					<td class="file-dimensions">
-						@if (file.Width > 0 && file.Height > 0)
-						{
-							@($"{file.Width} x {file.Height}")
-						}
-					</td>
+					<td class="file-dimensions">@(file.Width > 0 && file.Height > 0 ? $"{file.Width} x {file.Height}" : "")</td>
 				}
 			</tr>
 		}

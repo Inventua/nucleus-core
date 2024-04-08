@@ -1,5 +1,39 @@
-﻿.files-list 
+﻿.files-list.file-tiles
 {
-	display: flex;
-	flex-direction: column;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-auto-rows: 1fr;
+	gap: 0.75rem;
+}
+
+.files-list.file-tiles > div
+{
+	padding: 0.75rem;
+	border: solid 1px #ddd;
+}
+
+.files-list.file-tiles .file-name
+{
+	font-weight: bold;
+	font-size: 1.25rem;
+}
+
+.files-list li .file-modified-date::before, .files-list li .file-size::before
+{
+  content: '- ';
+}
+
+.files-list LI .file-dimensions::before, .files-list.file-tiles .file-dimensions::before
+{
+  content: '(';
+}
+
+.files-list LI .file-dimensions::after, .files-list.file-tiles .file-dimensions::after
+{
+  content: 'px)';
+}
+
+.files-list TD.file-dimensions::after
+{
+  content: 'px';
 }

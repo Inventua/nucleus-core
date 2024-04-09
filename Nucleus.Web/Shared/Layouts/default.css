@@ -1,60 +1,16 @@
-﻿.layout-default.LayoutWrapper
+﻿.layout-default .breadcrumb
 {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-}
-
-.layout-default .BannerPane .banner-row
-{
-  display: flex;
+  padding: 0 1rem;
 }
 
 .layout-default .ContentWrapper 
 {
 	flex-grow: 1;
-	display: flex;		
-	overflow: auto;
-	flex-direction: row;
+	display: flex;
+  margin-top: var(--nucleus-default-gap-vertical);
 }
 
 .layout-default .ContentPane
-{
-	display: flex;
-	flex-direction: column;
+{	
 	flex-grow: 1;
-	overflow-x: auto;
-}
-
-.layout-default .ContentPane > div
-{
-	display: flex;
-	flex-direction: column;
-}
-
-.layout-default .FooterPane
-{
-	display: flex;
-	flex-direction: row;	
-  gap: 1rem;
-	background-color: #535353;
-}
-
-.layout-default .FooterPane *
-{
-	color: white;
-}
-
-/*  Responsive UI  */
-@media screen and (max-width: 980px)
-{
-  .layout-default .BannerPane .banner-row
-  {
-    display: unset;
-  }
-
-  .layout-default .BannerPane .nucleus-account-control > div
-  {
-    margin-left: auto;
-  }
 }

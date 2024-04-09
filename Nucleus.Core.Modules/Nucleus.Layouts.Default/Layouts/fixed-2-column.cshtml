@@ -1,26 +1,26 @@
 ﻿@Html.AddStyle("~/Shared/Layouts/layout-styles.css")
 @Html.AddStyle("~!/fixed-2-column.css")
 <div class="layout-fixed-2-column layout-styles fill-height LayoutWrapper">
-	<div class="BannerPane">
-		@await Html.PartialAsync("_banner.cshtml")
-		@await Html.RenderPaneAsync("BannerPane")
-	</div>
-  <div class="HeroPane" suppress-empty="true">
-    @await Html.RenderPaneAsync("HeroPane")
+  <div class="BannerPane">
+    @await Html.PartialAsync("_banner.cshtml")
+    @await Html.RenderPaneAsync("BannerPane")
   </div>
-  <div class="flex-row scrollable ContentWrapper">
+  <div class="flex-row scrollable OuterWrapper">
     <div class="flex-column scrollable LeftPane" suppress-empty="true">
-			@await Html.RenderPaneAsync("LeftPane")
-		</div>
-
-    <div class="flex-column scrollable ContentPane" data-track-scroll="content-pane">
-			@await Html.RenderPaneAsync("ContentPane")
-		</div>
-	</div>
-
-  <div class="dark-footer FooterPane" suppress-empty="true">
-		<terms caption="Terms" />
-		<privacy caption="Privacy Policy" />
+      @await Html.RenderPaneAsync("LeftPane")
+    </div>
+    <div class="flex-column scrollable ContentWrapper" data-track-scroll="content-area">
+      <div class="HeroPane" suppress-empty="true">
+        @await Html.RenderPaneAsync("HeroPane")
+      </div>
+      <div class="flex-column ContentPane" suppress-empty="true">
+        @await Html.RenderPaneAsync("ContentPane")
+      </div>
+    </div>
+  </div>
+  <div class="default-footer FooterPane" suppress-empty="true">
+    <terms caption="Terms" />
+    <privacy caption="Privacy Policy" />
     @await Html.RenderPaneAsync("FooterPane")
-	</div>
+  </div>
 </div>

@@ -1,9 +1,4 @@
-﻿.layout-fixed-2-column .breadcrumb
-{
-  padding: 0 .25rem;
-}
-
-.layout-fixed-2-column .ContentWrapper 
+﻿.layout-fixed-2-column .OuterWrapper 
 {
 	flex-grow: 1;
 }
@@ -13,23 +8,17 @@
   flex: 1;
 }
 
-.layout-fixed-2-column .ContentPane
+.layout-fixed-2-column .ContentWrapper
 {
 	display: flex;
 	flex-direction: column;
 	flex: 5;
 }
 
-.layout-fixed-2-column .ContentPane > div
-{
-	display: flex;
-	flex-direction: column;
-}
-
 /*  Responsive UI  */
 @media screen and (max-width: 980px)
 {
-  .layout-fixed-2-column .ContentWrapper
+  .layout-fixed-2-column .OuterWrapper
   {
     flex-direction: column;
   }

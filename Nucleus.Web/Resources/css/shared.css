@@ -1,4 +1,44 @@
-﻿html, body
+﻿/*! shared.css | Styles for all pages in Nucleus CMS.  (c) Inventua Pty Ptd.  www.nucleus-cms.com */
+:root
+{
+  --admin-frame-width: 100px;
+  --admin-frame-background-color: #444;
+
+  --nucleus-default-gap-horizontal: 1rem;
+  --nucleus-default-gap-vertical: 1rem;
+
+  --font-size-small: 0.9rem;
+  --font-size-smaller: 0.8rem;
+
+  --nucleus-default-border-color: #dee2e6;
+
+  --nucleus-menu-item-padding: 0.5rem;
+
+  --nucleus-menu-background-color: var(--bs-body-bg);
+  --nucleus-menu-text-color: var(--bs-body-color);
+  --nucleus-menu-hover-background-color: var(--bs-tertiary-bg);
+  --nucleus-menu-hover-text-color: var(--bs-body-color);
+  
+  --nucleus-menu-dropdown-padding: 0.25rem 0.5rem;
+
+  --nucleus-menu-dropdown-item-min-width: 10rem;
+  --nucleus-menu-dropdown-item-max-width: 25rem;
+  --nucleus-menu-dropdown-item-padding: 0.25rem;
+
+  --nucleus-menu-ribbon-dropdown-gap: 0.25rem;
+  --nucleus-menu-ribbon-dropdown-border: solid 1px var(--nucleus-default-border-color);
+  --nucleus-menu-ribbon-portrait-dropdown-columns: 4;
+
+  --footer-padding: 1rem;
+  --footer-text-color: white;
+  --footer-background-color: #535353;
+  --footer-gap: var(--nucleus-default-gap-horizontal);
+  --footer-margin: 1rem 0 0 0;
+
+  --tab-content-border: 1px solid var(--nucleus-default-border-color);
+}
+
+html, body
 {
 	height: 100%;
 }
@@ -13,55 +53,8 @@ body
 	font-family: 'Material Icons';
 	font-style: normal;
 	font-weight: 400;
-	src: url(../material-icons.woff2) format('woff2');
+	src: url(/Resources/material-icons.woff2) format('woff2');
 	font-display: auto;
-}
-
-/* set max width for bootstrap tooltips */
-.tooltip-inner
-{
-	max-width: 100vw;
-}
-
-.fs-small
-{
-	font-size: 0.9rem;
-}
-
-.fs-smaller
-{
-	font-size: 0.8rem;
-}
-
-.btn label span
-{
-	vertical-align: text-top;
-}
-
-.btn.btn-none
-{
-	background-color: transparent;
-	border-color: transparent;
-	border: 0;
-	padding: 0;
-	margin: 0;
-	border-radius: 0;
-}
-
-.btn.btn-none:focus
-{
-	border-color: #ccc;
-  box-shadow: none;
-}
-
-.btn.btn-none:focus-visible
-{
-	outline: -webkit-focus-ring-color auto 1px;
-}
-
-a *
-{
-	cursor: pointer;
 }
 
 .nucleus-material-icon
@@ -76,6 +69,67 @@ a *
   line-height: normal;
 }
 
+/* admin sidebar positioning.  These classes are in shared.css rather than admin.css because they control the iframe and placeholder, which belong */
+/* to the main display, admin.css is for elements within the admin iframe.  */
+.nucleus-admin-frame, .nucleus-admin-frame-placeholder
+{
+	width: var(--admin-frame-width);
+	height: 100%;
+}
+
+.nucleus-admin-frame-placeholder
+{
+	float: left;
+}
+
+.nucleus-admin-frame
+{
+	position: fixed;
+	background-color: var(--admin-frame-background-color);
+	top: 0;
+	left: 0;
+	border: 0;
+	z-index: 1040;
+	transition: none;  /* prevent transition on close */
+}
+
+.nucleus-admin-frame.nucleus-admin-frame-expanded
+{
+	width: 100%;
+	z-index: 10000;
+	transition: width linear .25s; /* show using transition on open */
+}
+
+.nucleus-modulesettings-frame
+{
+	display: none;
+	z-index: 99;
+	border: 0;
+	flex-grow: 1;
+}
+
+.nucleus-content
+{
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.nucleus-overlay
+{
+	display: none;
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	background-color: black;
+	opacity: 0.25;
+	z-index: 3;	
+}
+
+
+/* progress bars */
 .nucleus-flex-fields .nucleus-progress-spinner
 {
   flex-grow: initial;
@@ -97,69 +151,25 @@ a *
 	margin-right: 0.5rem;
 }
 
-.nucleus-inline-edit-controls
+/*  Indeterminate progress bar, for use with bootstrap progress class */
+@keyframes indeterminate 
 {
-	display: none;
+	0% {
+		margin-left: 0;
+	}
+	100% {
+		margin-left: 55%;
+	}
 }
 
-.Nucleus.nucleus-admin-frame, .nucleus-admin-frame-placeholder
+.progress .indeterminate 
 {
-	width: 100px;
-	height: 100%;
+	animation: indeterminate 2.5s linear infinite alternate;
+	border-radius: 1rem;
+	width: 45% !important;
 }
 
-.nucleus-admin-frame-placeholder
-{
-	float: left;
-}
-
-.Nucleus.nucleus-admin-frame
-{
-	position: fixed;
-	background: #444;
-	top: 0;
-	left: 0;
-	border: 0;
-	z-index: 1040;
-	transition: none;  /* prevent transition on close */
-}
-
-.Nucleus.nucleus-admin-frame.Expanded
-{
-	width: 100%;
-	z-index: 10000;
-	transition: width linear .25s; /* show using transition on open */
-}
-
-.nucleus-modulesettings-frame
-{
-	display: none;
-	z-index: 99;
-	border: 0;
-	flex-grow: 1;
-}
-
-.Nucleus.Content
-{
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-}
-
-.nucleus-overlay
-{
-	display: none;
-	position: fixed;
-	left: 0;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	background-color: black;
-	opacity: 0.25;
-	z-index: 3;	
-}
-
-/*  Styles for the progress bar rendered with the <Progress> tag helper (in the Files and Extensions page).  */
+/*  Styles for the progress bar rendered with the <Progress> tag helper.  */
 .upload-progress 
 {
 	display: none;
@@ -197,18 +207,19 @@ a *
 .upload-progress progress::-moz-progress-bar { background-color: #0d6efd!important; border-radius: 6px; transition: width 1s; }
 .upload-progress progress { color: #0d6efd; border-radius: 6px; transition: width 1s; }
 
-.validation-error
+/* set pointer for children of <a> elements.  */
+a *
 {
-	border: solid 2px red!important;
+	cursor: pointer;
 }
 
+/* dialog (modal) styles*/
 .modal-auto-size.modal-dialog
 {
 	max-width: 80%;
 	width: auto;
 }
 
-/* override bootstrap modal width constraints & handle full-size modals */
 .modal-full-size.modal-dialog
 {
 	max-height: 100%;
@@ -256,7 +267,8 @@ a *
 	display: block;
 }
 
-/*  prevent selection of dialog header - when handling double-click to set modal to full size, edge selects the text and shows a menu, this prevents that from happening  */
+/*  prevent selection of dialog header - when handling double-click to set modal to full size, edge selects the text and shows a menu, this prevents 
+    that from happening  */
 .modal-header
 {
 	user-select: none; 
@@ -274,7 +286,7 @@ a *
 	min-height: 90%;
 }
 
-/* Nucleus (shared.js:_dialog) css */
+/* styles for dialogs rendered by shared.js:_dialog() */
 .modal-dialog .dialog-icon
 {
 	font-size: 3rem;
@@ -314,6 +326,13 @@ a *
 	margin: auto;
 }
 
+/* shared.css applies the .validation-error class when it receives a BadRequest(ModelState) response. */
+.validation-error
+{
+	border: solid 2px red!important;
+}
+
+/* table "sticky headers" */
 table.table-sticky-headers
 {
 	width: 100%;
@@ -337,25 +356,8 @@ table.table-sticky-headers thead th
 	white-space: nowrap;
 }
 
-/*  Indeterminate progress bar, for use with bootstrap progress class*/
-@keyframes indeterminate 
-{
-	0% {
-		margin-left: 0;
-	}
-	100% {
-		margin-left: 55%;
-	}
-}
-
-.progress .indeterminate 
-{
-	animation: indeterminate 2.5s linear infinite alternate;
-	border-radius: 1rem;
-	width: 45% !important;
-}
-
-.nucleus-small-cell
+/*  styles for small table cells, intended for use with buttons/icons */
+table td.nucleus-small-cell
 {
 	width: 20px;
 	background-color: transparent;
@@ -364,7 +366,7 @@ table.table-sticky-headers thead th
 
 .nucleus-small-cell .nucleus-material-icon
 {
-	font-size: 15px;
+	font-size: 0.92rem;
 }
 
 .nucleus-small-cell .btn
@@ -373,10 +375,10 @@ table.table-sticky-headers thead th
 	margin-right: 0;
 }
 
-/* supplement bootstrap tab style to add a border and padding */
+/* bootstrap tabs. Supplement bootstrap tab style to add a border and padding */
 .tab-content
-{
-	border: 1px solid #dee2e6;
+{  
+	border: var(--tab-content-border);
 	border-top-width: 0;
 	display: flex;
 	flex-grow: 1;
@@ -395,16 +397,24 @@ table.table-sticky-headers thead th
 	flex-basis: 100%;
 }
 
-/* mobile-only elements */
-.nucleus-mobile-only
-{
-	display: none;
-}
-
+/* menu styles for the MenuTagHelper */
 .navbar-nav.nucleus-mobile-menu
 {
+  /* the tag helper renders a mobile-only menu without dropdowns */
 	flex-direction: row;
 	gap: 0.5rem;
+}
+
+.nucleus-menu
+{
+  padding-left: calc(var(--nucleus-default-gap-horizontal) - var(--nucleus-menu-item-padding));
+  padding-right: calc(var(--nucleus-default-gap-horizontal) - var(--nucleus-menu-item-padding));
+}
+
+/* override bootstrap padding so that .nucleus-menu controls padding*/
+.nucleus-menu > .container-fluid
+{
+  padding: 0;  
 }
 
 /* supplement bootstrap menu to allow submenus */
@@ -425,20 +435,35 @@ table.table-sticky-headers thead th
 
 .nucleus-menu .dropdown-submenu .dropdown-menu .dropdown-menu.show
 {
-	display: inline-block;  
-	top: -0.5rem;
+	/*display: inline-block;  */
+	/*top: -0.5rem;*/
 }
 
-.nucleus-menu .nav-link
+.nucleus-menu .navbar-nav > li >.nav-link
 {
 	display: inline-block;
 	vertical-align: middle;
-	padding: 8px;
+	padding: var(--nucleus-menu-item-padding);  
+  white-space: normal;
 }
-
+/*
 .nucleus-menu .nav-link:nth-child(2)
 {
 	margin-left: -4px;
+}
+*/
+.nucleus-menu .dropdown-menu 
+{
+  padding: var(--nucleus-menu-dropdown-padding);
+}
+
+
+.nucleus-menu .dropdown-menu li 
+{
+  display: inline-block;
+  max-width:  var(--nucleus-menu-dropdown-item-max-width);
+  min-width: var(--nucleus-menu-dropdown-item-min-width);
+	padding: var(--nucleus-menu-dropdown-item-padding);
 }
 
 .nucleus-menu .dropdown-menu .dropdown-toggle::after 
@@ -448,16 +473,9 @@ table.table-sticky-headers thead th
 	transform: rotate(-90deg);
 }
 
-.nucleus-menu .dropdown-menu .dropdown-item
-{
-	flex-grow: 1;
-	margin-right: 1rem;
-}
-
 .nucleus-menu .dropdown-menu .dropdown-toggle::after 
 {
-	margin-top: 0.7rem;
-	margin-right: 0.25rem;
+  margin: auto;
 }
 
 .nucleus-menu .dropdown-submenu .dropdown-submenu 
@@ -470,81 +488,153 @@ table.table-sticky-headers thead th
 	left: 100%;
 }
 
-.nucleus-menu .dropdown-submenu .dropdown-submenu .dropdown-toggle::after 
-{
-	position: absolute;
-	right: 0;
-}
 
 .dropdown-menu .alert
 {
 	margin: -0.5rem 0 0.5rem 0;
 }
 
+.nucleus-menu ul li .nav-link
+{
+  color: var(--nucleus-menu-text-color)!important;
+  background-color: var(--nucleus-menu-background-color);
+}
+
+
 /*  ribbon menu styles */
-.nucleus-menu .ribbon-item, .nucleus-menu .ribbon-item li
+
+/* shared ribbon (both landscape and portrait) styles */
+.nucleus-menu .dropdown-submenu > .ribbon-item
 {
-	list-style-type: none;  
+  background-color: var(--nucleus-menu-background-color);
 }
 
-.nucleus-menu .ribbon-item, .nucleus-menu .ribbon-item UL
+.nucleus-menu .ribbon-item .dropdown-item
 {
-	padding-left: 0.5rem;
-	padding-right: 0.5rem;
+  color: var(--nucleus-menu-text-color);
 }
 
-.nucleus-menu .ribbon-item li
+.nucleus-menu .dropdown-menu.ribbon-item li > a:hover, .nucleus-menu .dropdown-menu.ribbon-item li > a:active
 {
-	padding: 0;
-	white-space: nowrap;
-	min-width: 10rem;
-}
-
-.nucleus-menu .dropdown-submenu > .nucleus-menu .ribbon-item.RibbonPortrait
-{
-	flex-direction: column;
-}
-
-.nucleus-menu .dropdown-submenu > .ribbon-item.RibbonPortrait 
-{
-	grid-template-columns: repeat(4, max-content);
-	grid-auto-rows: auto;
-}
-
-.nucleus-menu .dropdown-submenu > .ribbon-item.RibbonLandscape
-{
-	flex-direction: row;
-}
-
-.nucleus-menu .dropdown-menu.ribbon-item.RibbonLandscape.show
-{
-	position: absolute;
-	left: 50%;
-	transform: translateX(-50%);
+  color: var(--nucleus-menu-hover-text-color);
+  background-color: var(--nucleus-menu-hover-background-color);
 }
 
 .nucleus-menu .dropdown-submenu > .ribbon-item.show 
 {
 	display: flex; 
-	gap: 0.25rem;
-}
-
-.nucleus-menu .dropdown-submenu > .ribbon-item.RibbonPortrait.show
-{
-	display: grid;
 }
 
 .nucleus-menu .dropdown-submenu > .ribbon-item > li
 {  
-	border: solid 1px #dee2e6;  
-	padding: 0.25rem;
+	border: var(--nucleus-menu-ribbon-dropdown-border);  
 }
 
-.nucleus-menu .dropdown-submenu > .ribbon-item > li > a
+.nucleus-menu .ribbon-item, .nucleus-menu .ribbon-item li
 {
-	flex-basis: 100%
+	list-style-type: none;  
 }
 
+.nucleus-menu .ribbon-item, .nucleus-menu .ribbon-item UL 
+{
+  padding-left: .5rem;
+  padding-right: .5rem
+}
+
+.nucleus-menu .dropdown-submenu > .ribbon-item
+{
+  width: max-content;
+  max-width: 75vw;
+}
+
+/* menu style "ribbon portrait" styles */
+.nucleus-menu .dropdown-submenu > .ribbon-item.ribbonportrait 
+{
+  grid-template-columns: 1fr repeat(calc(var(--nucleus-menu-ribbon-portrait-dropdown-columns) - 1), auto);
+	grid-auto-rows: auto;
+}
+
+.nucleus-menu .dropdown-submenu > .ribbon-item.ribbonportrait  > li:not(:first-child)
+{
+  margin-left: calc(var(--nucleus-menu-ribbon-dropdown-gap) * 0.5);
+}
+
+.nucleus-menu .dropdown-submenu > .ribbon-item.ribbonportrait  > li:not(:last-child)
+{
+  margin-right: calc(var(--nucleus-menu-ribbon-dropdown-gap) * 0.5);
+}
+
+.nucleus-menu .dropdown-submenu > .ribbon-item.ribbonportrait.show
+{
+	display: grid;  
+}
+
+.nucleus-menu .dropdown-submenu > .ribbon-item.ribbonportrait ul
+{
+  display: flex;
+  flex-direction: column;
+}
+
+/* menu style "ribbon landscape" styles */
+.nucleus-menu .dropdown-submenu > .ribbon-item.ribbonlandscape
+{
+  flex-wrap: wrap;
+  gap: var(--nucleus-menu-ribbon-dropdown-gap);
+}
+
+.nucleus-menu .dropdown-submenu > .ribbon-item.ribbonlandscape ul
+{
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.nucleus-menu .dropdown-submenu > .ribbon-item.ribbonlandscape > li
+{  
+	flex-grow: 1;
+  flex-shrink: 1;
+  max-width: var(--nucleus-menu-dropdown-item-max-width);
+  min-width: var(--nucleus-menu-dropdown-item-min-width);
+}
+
+.nucleus-menu .dropdown-menu.ribbon-item.ribbonlandscape.show
+{
+	position: absolute;
+}
+
+/* menu style "dropdown" styles */
+.nucleus-menu .dropdown-menu.dropdown li:hover > a, .nucleus-menu .dropdown-menu.dropdown li:active > a,
+.nucleus-menu .dropdown-menu.dropdown li:hover > button, .nucleus-menu .dropdown-menu.dropdown li:active > button
+{
+  color: var(--nucleus-menu-hover-text-color);
+  background-color: var(--nucleus-menu-hover-background-color);
+}
+
+.nucleus-menu ul .dropdown-menu.dropdown .dropdown-submenu li:hover > .nav-link, .nucleus-menu ul .dropdown-menu.dropdown .dropdown-submenu li:active > .nav-link,
+.nucleus-menu ul .dropdown-menu.dropdown .dropdown-submenu li:hover > .nav-link, .nucleus-menu ul .dropdown-menu.dropdown .dropdown-submenu li:active > .nav-link
+{
+  color: var(--nucleus-menu-hover-text-color)!important;
+  background-color: var(--nucleus-menu-hover-background-color);
+}
+
+.nucleus-menu  .dropdown-menu.dropdown .dropdown-menu.show
+{
+	top: -0.5rem;
+}
+
+.nucleus-menu .dropdown-menu.dropdown.show
+{
+  display: flex;  
+  flex-direction: column;
+}
+
+/* override max width for bootstrap tooltips to allow full-width.  The bootstrap default is 200px */
+.tooltip-inner
+{
+	max-width: 100vw;
+}
+
+/* styles for the AccountTagHelper */
 .nucleus-account-control.justify-content-end .dropdown-menu
 {
 	left: initial;
@@ -596,12 +686,52 @@ input:disabled, select:disabled
   border-color: revert;
 }
 
+
 .style-scrollable, .style-scrollable > div, .style-scrollable > div > section, .style-scrollable > div > section > form
 {
 	display: flex;
 	flex-direction: column;
 	overflow: auto;
 	flex-grow: 1;
+}
+
+
+/* additional classes to control font size */
+.fs-small
+{
+	font-size: var(--font-size-small);
+}
+
+.fs-smaller
+{
+	font-size: var(--font-size-smaller);
+}
+
+/* buttons */
+.btn label span
+{
+	vertical-align: text-top;
+}
+
+.btn.btn-none
+{
+	background-color: transparent;
+	border-color: transparent;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	border-radius: 0;
+}
+
+.btn.btn-none:focus
+{
+	border-color: #ccc;
+  box-shadow: none;
+}
+
+.btn.btn-none:focus-visible
+{
+	outline: -webkit-focus-ring-color auto 1px;
 }
 
 /*  Toggle switch plugin  */
@@ -678,15 +808,14 @@ input[type=range].ToggleSwitch.checked:after
 	left: 30px;
 }
 
+/* styles for the RangeTagHelper */
 .nucleus-range input[type=number]
 {
   width: 4rem;
 }
 
 /* default styles for Html Editors */
-.trumbowyg-editor, .trumbowyg-textarea,
-.tox.tox-tinymce,
-.nucleus-htmleditordefaults
+.trumbowyg-editor, .trumbowyg-textarea, .tox.tox-tinymce, .nucleus-htmleditordefaults
 {
 	height: auto!important;	
 	background-color: white;
@@ -694,7 +823,6 @@ input[type=range].ToggleSwitch.checked:after
 	min-height: 30vh;
 	flex-grow: 1;
 }
-
 
 /*  Responsive UI  */
 @media screen and (max-width: 980px)

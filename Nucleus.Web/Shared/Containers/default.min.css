@@ -1,1 +1,1 @@
-.container-default{--title-margin:0 0 .25rem 0}
+.container-default{--container-margin:0 var(--nucleus-default-gap-horizontal) var(--nucleus-default-gap-vertical) var(--nucleus-default-gap-horizontal);--title-margin:0 0 .25rem 0;display:flex;flex-direction:column}

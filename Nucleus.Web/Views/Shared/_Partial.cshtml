@@ -1,7 +1,7 @@
 ﻿@*
 	This layout is used when rendering settings pages & any other time a module or extension controller renders a view.  Its purpose is to make the 
-	Html.AddScript and Html.AddStyle helpers work properly when the _Layout layout is not in use.  It causes the style and link elements which are
-	rendered by .RenderStyles and .RenderScripts to be rendered within the output <body> rather than in the <head>, because is handles cases where
+	Html.AddScript and Html.AddStyle helpers work properly when the _Layout.cshtml layout is not in use.  It causes the style and link elements which 
+	are rendered by .RenderStyles and .RenderScripts to be rendered within the output <body> rather than in the <head>, because it handles cases where
 	we are rendering a html fragment.
 
 	Refer to ../_ViewStart.cshtml for more information.

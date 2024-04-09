@@ -92,6 +92,8 @@
         <file name="no-container.png" />
         <file name="no-title.md" />
         <file name="no-title.png" />
+        <file name="no-title.css" />
+        <file name="centered.css" />
       </folder>
       <cleanup>
         <!-- In v1.4 we renamed these from "default..." to to "fixed..." -->

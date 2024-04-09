@@ -3,7 +3,7 @@
 | Pane             | Position                       | Notes
 |------------------|--------------------------------|-------------------------------
 | BannerPane       | Top, fills width               | Contains site logo, user account, site menu and breadcrumb controls.
-| HeroPane         | Top, fills width               | A full-width non-scrollable pane to display an image and/or key message. Suppressed if empty.
+| HeroPane         | Top, fills width               | A full-width pane to display an image and/or key message. Suppressed if empty.
 | Top2Column       | Middle, fills width            | Two side-by-side columns.  Suppressed if empty.
 | Top3Column       | Middle, fills width            | Three side-by-side columns.  Suppressed if empty.
 | ContentPane      | Middle, fills width            | Suppressed if empty.

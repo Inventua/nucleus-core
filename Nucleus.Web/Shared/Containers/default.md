@@ -1,1 +1,1 @@
-﻿The *default* container displays your module title and content, left aligned.
+﻿The *default* container displays your module title and content.  Container styles are supported.

@@ -1,4 +1,12 @@
-﻿.layout-styles.fill-height, .layout-styles .fill-height
+﻿/* Shared classes for use by layouts.  */
+.layout-styles .breadcrumb
+{
+  padding: 0 var(--nucleus-default-gap-horizontal);
+}
+
+
+
+.layout-styles.fill-height, .layout-styles .fill-height
 {
 	display: flex;
 	flex-direction: column;
@@ -29,11 +37,18 @@
 	overflow: auto;
 }
 
-.layout-styles .two-column, .layout-styles .three-column
+.layout-styles .two-column, .layout-styles .three-column, .layout-styles .four-column
 {
 	display: grid;
-  gap: 0.25rem;	
-	margin: 0;
+  grid-column-gap: var(--nucleus-default-gap-horizontal);	
+  grid-row-gap: var(--nucleus-default-gap-vertical);
+  margin-left: var(--nucleus-default-gap-horizontal);
+  margin-right: var(--nucleus-default-gap-horizontal);
+}
+
+.layout-styles .two-column .nucleus-container, .layout-styles .three-column .nucleus-container, .layout-styles .four-column .nucleus-container
+{
+  --container-margin: 0;
 }
 
 .layout-styles .two-column
@@ -51,32 +66,24 @@
   grid-template-columns: repeat(4, 1fr);
 }
 
-.layout-styles .dark-footer
+.layout-styles .default-footer
 { 
 	display: flex;
 	flex-direction: row;
-  gap: 1rem;
-  background-color: #535353;  
+  gap: var(--footer-gap);
+  background-color: var(--footer-background-color);  
+  padding: var(--footer-padding);
+  margin: var(--footer-margin);
 }
 
-.layout-styles .dark-footer, .layout-styles .dark-footer a
+.layout-styles .default-footer, .layout-styles .default-footer a
 {
-  color: white!important;
+  color: var(--footer-text-color)!important;
 }
 
 /*  Responsive UI  */
 @media screen and (max-width: 980px)
 {
-  .layout-styles .BannerPane .banner-row
-  {
-    display: unset;
-  }
-  
-  .layout-styles .BannerPane .nucleus-account-control > div
-  {
-    margin-left: auto;
-  }
-
   .layout-styles .two-column, .layout-styles .three-column, .layout-styles .four-column
   {
     display: flex;

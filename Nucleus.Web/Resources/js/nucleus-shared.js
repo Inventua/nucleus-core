@@ -1634,7 +1634,7 @@ function _Page()
     window.document.addEventListener('ExpandAdminFrame', function (args)
     {
       var adminFrame = jQuery('#nucleus-admin-frame');
-      args.detail !== null && args.detail.expand ? adminFrame.addClass('Expanded') : adminFrame.removeClass('Expanded');
+      args.detail !== null && args.detail.expand ? adminFrame.addClass('nucleus-admin-frame-expanded') : adminFrame.removeClass('nucleus-admin-frame-expanded');
     }, false);
 
     // Refresh event. Set or clear the edit-mode cookie, fade out the display and reload the current Url

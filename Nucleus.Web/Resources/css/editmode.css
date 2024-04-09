@@ -1,4 +1,4 @@
-﻿/* CSS classes for the inline module settings controls */
+﻿/*! editmode.css | Styles for for the inline module settings controls in Nucleus CMS.  (c) Inventua Pty Ptd.  www.nucleus-cms.com */
 .nucleus-module-editing
 {
   border: dotted 2px #ddd;
@@ -18,23 +18,30 @@
 
 .nucleus-module-editing .nucleus-inline-edit-controls:not(.nucleus-inline-edit-controls-visible) *
 {
-  visibility: hidden;  
-}
-
-.nucleus-module-editing .nucleus-inline-edit-controls .btn-danger
-{
-  margin-left: 4px;
+  /*visibility: hidden;  */
+  opacity: 0.25;
 }
 
 .nucleus-module-editing:hover .nucleus-inline-edit-controls *
 {
-  visibility: visible;
+  opacity: 1;
+  /*visibility: visible;*/
+}
+
+.nucleus-module-editing .nucleus-inline-edit-controls .btn-danger, .nucleus-module-editing .nucleus-move-dragsource
+{
+  margin-left: 0.25rem;
+}
+
+.nucleus-module-editing .nucleus-move-dragsource
+{
+  cursor: grab;
 }
 
 .nucleus-module-editing .nucleus-inline-edit-controls .btn
 {
   padding: 4px 6px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .nucleus-adminviewonly
@@ -65,16 +72,11 @@
   cursor: text;
 }
 
-.nucleus-module-editing .nucleus-move-dragsource
-{
-  margin-left: 0.25rem;
-  cursor: grab;
-}
-
 .nucleus-move-droptarget
 {
   background-color: #d5e5ff;
   margin: 2px;
+  padding: 4px;
   border: dashed 2px #428aff;
   border-radius: .25rem;
   display: flex;
@@ -82,11 +84,19 @@
   flex: 0;
   /*  this is to prevent cases where .nucleus-move-droptarget inherits flex-direction from a pane's CSS */
   flex-direction: column!important;
+  transition: opacity linear 0.25s;
+  color: black;
+}
+
+.nucleus-move-droptarget:not(.show)
+{
+  visibility: hidden;
 }
 
 .nucleus-move-droptarget.show
 {          
   opacity: 0.9;
+  visibility: visible;
 }
 
 .nucleus-move-droptarget.sideways
@@ -104,7 +114,6 @@
 {
   content: attr(data-pane-name); 
   font-size: 0.8rem;
-  color: #668;
 }
 
 /* set position absolute for drop targets which are "for" an existing module, but not for drop targets that are the first/last for a pane */

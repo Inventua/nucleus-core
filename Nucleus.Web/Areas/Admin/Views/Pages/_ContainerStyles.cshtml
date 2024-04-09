@@ -7,14 +7,14 @@
 {
   @if (!String.IsNullOrEmpty(@group))
   {
-    <h4 class="mt-2 mb-1">@group</h4>
+    <h3 class="mt-2 mb-1">@group</h3>
   }
-  <div class="grid-3-column column-gap-2">
+  <div class="grid-2-column column-gap-5 ps-2 pb-2">
     @foreach (var styleProperty in Model.ModuleContainerStyles.Select((Value, Index) => new { Index, Value }).Where(item => item.Value.Group == group))
     {
       @Html.HiddenFor(model => model.ModuleContainerStyles[styleProperty.Index].Name)
       @Html.HiddenFor(model => model.ModuleContainerStyles[styleProperty.Index].BaseCssClass)
-      <SettingsControl caption="@styleProperty.Value.Title" class="flex-1">
+      <SettingsControl caption="@styleProperty.Value.Title" class="flex-1 inner-inline container-property">
         <div class="d-flex flex-1 column-gap-1">
           <select id="@Html.IdFor(model => model.ModuleContainerStyles[styleProperty.Index].SelectedValue)" name="@Html.NameFor(model => model.ModuleContainerStyles[styleProperty.Index].SelectedValue)" data-type="@styleProperty.Value.Syntax" class="container-style-selector flex-1 my-auto">
             <option value="">(no selection)</option>
@@ -30,7 +30,6 @@
               }
             }
           </select>
-          @* @Html.DropDownListFor(model => model.ModuleContainerStyles[styleProperty.Index].SelectedValue, new SelectList(Model.ModuleContainerStyles[styleProperty.Index].Values, "CssClass", "Title"), "(no selection)") *@
 
           @if (styleProperty.Value.Syntax == "<color>")
           {

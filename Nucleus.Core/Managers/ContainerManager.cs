@@ -93,7 +93,7 @@ public class ContainerManager : IContainerManager
   {
     List<ContainerStyle> results = new();
 
-    const string CONTAINER_STYLE_PROPERTY_REGEX = "@property\\s*--(?<propertyName>[A-Za-z0-9-]*)\\s*{(\\s*\\/\\*\\s*title:\\s*(?<propertyTitle>[^\\*]*)\\s*\\*\\/)?(\\s*\\/\\*\\s*group:\\s*(?<propertyGroup>[^\\*]*)\\s*\\*\\/)?(\\s*\\/\\*\\s*baseClass:\\s*(?<propertyBaseCssClass>[^\\*]*)\\s*\\*\\/)?(\\s*\\/\\*\\s*preserveOrder: \\s*(?<propertyPreserveOrder>[^\\*]*)\\s*\\*\\/)?\\s*(syntax:\\s*\"(?<propertySyntax>[^\"]*)\"\\s*;)";
+    const string CONTAINER_STYLE_PROPERTY_REGEX = "@property\\s*--(?<propertyName>[A-Za-z0-9-]*)\\s*{(\\s*\\/\\*\\s*title:\\s*(?<propertyTitle>[^\\*]*)\\s*\\*\\/)?(\\s*\\/\\*\\s*group:\\s*(?<propertyGroup>[^\\*]*)\\s*\\*\\/)?(\\s*\\/\\*\\s*baseClass:\\s*(?<propertyBaseCssClass>[^\\*]*)\\s*\\*\\/)?(\\s*\\/\\*\\s*preserveOrder: \\s*(?<propertyPreserveOrder>[^\\*]*)\\s*\\*\\/)?(\\s*\\/\\*\\s*disabled: \\s*(?<propertyDisabled>[^\\*]*)\\s*\\*\\/)?\\s*(syntax:\\s*\"(?<propertySyntax>[^\"]*)\"\\s*;)?";
     const string PROPERTY_VALUES_REGEX = "-(?<valueName>[A-Za-z0-9]*)\\s*{(\\s*\\/\\*\\s*title:\\s*(?<valueTitle>[^\\*]*))?";
 
     // container must support container styles, otherwise don't allow any selections
@@ -126,11 +126,13 @@ public class ContainerManager : IContainerManager
               results.Add(currentStyle);
             }
 
-            currentStyle.Title = stylePropertyMatch.Groups["propertyTitle"].Value?.Trim();
-            currentStyle.Group = stylePropertyMatch.Groups["propertyGroup"].Value?.Trim();
-            currentStyle.BaseCssClass = stylePropertyMatch.Groups["propertyBaseCssClass"].Value?.Trim() ?? "";
-            currentStyle.PreserveOrder = TryParseBoolean(stylePropertyMatch.Groups["propertyPreserveOrder"].Value);
-            currentStyle.Syntax = stylePropertyMatch.Groups["propertySyntax"].Value?.Trim() ?? "";
+            // container-specific css files can override or add values to properties from container-styles.css
+            currentStyle.Title = GetStringValue(stylePropertyMatch.Groups["propertyTitle"], currentStyle.Title);
+            currentStyle.Group = GetStringValue(stylePropertyMatch.Groups["propertyGroup"] ,currentStyle.Group);
+            currentStyle.BaseCssClass = GetStringValue(stylePropertyMatch.Groups["propertyBaseCssClass"], currentStyle.BaseCssClass);
+            currentStyle.PreserveOrder = GetBooleanValue(stylePropertyMatch.Groups["propertyPreserveOrder"], currentStyle.PreserveOrder);
+            currentStyle.Syntax = GetStringValue(stylePropertyMatch.Groups["propertySyntax"], currentStyle.Syntax);
+            currentStyle.Disabled = GetBooleanValue(stylePropertyMatch.Groups["propertyDisabled"], currentStyle.Disabled);
 
             if (String.IsNullOrEmpty(currentStyle.Title))
             {
@@ -175,7 +177,31 @@ public class ContainerManager : IContainerManager
       }
     }
 
-    return Task.FromResult(results);
+    return Task.FromResult(results.Where(result => !result.Disabled).ToList());
+  }
+
+  private string GetStringValue(Group group, string defaultValue)
+  {
+    if (group.Success)
+    {
+      return group.Value?.Trim();
+    }
+    else
+    {
+      return defaultValue;
+    }
+  }
+
+  private Boolean GetBooleanValue(Group group, Boolean defaultValue)
+  {
+    if (group.Success)
+    {
+      return TryParseBoolean(group.Value?.Trim());
+    }
+    else
+    {
+      return defaultValue;
+    }
   }
 
   private Boolean SupportsContainerStyles(Site site, Page page, ContainerDefinition containerDefinition)

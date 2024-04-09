@@ -100,6 +100,12 @@ public class ContainerStyle
   public string Syntax { get; set; }
 
   /// <summary>
+  /// Specifies that the container property is disabled.  This is used by containers which needs to suppress unsupported container properties, like the no-title container, which
+  /// disables the title-related container properties.
+  /// </summary>
+  public Boolean Disabled { get; set; }
+
+  /// <summary>
   /// A list of available values for the container style.
   /// </summary>
   public List<ContainerStyleValue> Values { get; set; } = new();

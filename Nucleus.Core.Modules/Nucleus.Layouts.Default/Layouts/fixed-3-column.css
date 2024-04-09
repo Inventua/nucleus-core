@@ -1,29 +1,18 @@
-﻿.layout-fixed-3-column .breadcrumb
-{
-  padding: 0 .25rem;
-}
-
-.layout-fixed-3-column .LeftPane
+﻿.layout-fixed-3-column .LeftPane
 {
   flex: 1;
 }
 
-.layout-fixed-3-column .ContentWrapper 
+.layout-fixed-3-column .OuterWrapper 
 {
 	flex-grow: 1;
 }
 
-.layout-fixed-3-column .ContentPane
+.layout-fixed-3-column .ContentWrapper 
 {
 	display: flex;
 	flex-direction: column;
 	flex: 4;
-}
-
-.layout-fixed-3-column .ContentPane > div
-{
-	display: flex;
-	flex-direction: column;
 }
 
 .layout-fixed-3-column .RightPane

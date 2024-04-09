@@ -1,9 +1,4 @@
-﻿.layout-centered-cell .breadcrumb
-{
-  padding: 0 .25rem;
-}
-
-.layout-centered-cell .ContentWrapper
+﻿.layout-centered-cell .ContentWrapper
 {
   margin: auto;
 }
@@ -27,18 +22,13 @@
 
 .layout-centered-cell .SidePane > div:last-child 
 {
+	display: flex;
   flex-basis: 100%;
 }
 
 .layout-centered-cell .SidePane > div:last-child > div
 {
   flex-grow: 1;
-}
-
-.layout-centered-cell .ContentPane > div, .layout-centered-cell .SecondaryPane > div, .layout-centered-cell .SidePane > div
-{
-	display: flex;
-	flex-direction: column;
 }
 
 .layout-centered-cell .SecondaryPane
@@ -60,7 +50,7 @@
     margin: unset;
   }
 
-  .layout-centered-cell .ContentWrapper > div
+  .layout-centered-cell .ContentWrapper .top-row-wrapper
   {
     display: block;
   }

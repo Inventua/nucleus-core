@@ -1,12 +1,12 @@
 ﻿/*! shared.css | Styles for all pages in Nucleus CMS.  (c) Inventua Pty Ptd.  www.nucleus-cms.com */
 :root
 {
-  --admin-frame-width: 100px;
+  --admin-frame-size: 100px;
   --admin-frame-background-color: #444;
 
-  --nucleus-default-gap-horizontal: 1rem;
-  --nucleus-default-gap-vertical: 1rem;
-
+  --nucleus-default-gap-horizontal: 0.75rem;
+  --nucleus-default-gap-vertical: 0.75rem;
+  
   --font-size-small: 0.9rem;
   --font-size-smaller: 0.8rem;
 
@@ -78,7 +78,7 @@ body
 /* to the main display, admin.css is for elements within the admin iframe.  */
 .nucleus-admin-frame, .nucleus-admin-frame-placeholder
 {
-	width: var(--admin-frame-width);
+	width: var(--admin-frame-size);
 	height: 100%;
 }
 
@@ -412,8 +412,8 @@ table td.nucleus-small-cell
 
 .nucleus-menu
 {
-  padding-left: calc(var(--nucleus-default-gap-horizontal) - var(--nucleus-menu-item-padding));
-  padding-right: calc(var(--nucleus-default-gap-horizontal) - var(--nucleus-menu-item-padding));
+  padding-left: var(--nucleus-default-gap-horizontal);
+  padding-right: var(--nucleus-default-gap-horizontal);
 }
 
 /* override bootstrap padding so that .nucleus-menu controls padding*/

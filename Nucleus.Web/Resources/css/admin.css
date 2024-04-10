@@ -230,7 +230,7 @@ body
 
 .nucleus-control-panel-sidebar
 {
-  width: 100px;
+  width: var(--admin-frame-size);
   margin: 0;
   color: white;
   display: flex;
@@ -240,7 +240,7 @@ body
 .nucleus-control-panel ul.nucleus-control-panel-sidebar
 {
   padding: 0;
-  margin: 0;
+  margin: 0 auto;
 }
 
 .nucleus-control-panel-sidebar li
@@ -294,14 +294,14 @@ body
     color: #a4ffe2;
   }
 
-  /* apply margin-top: auto to the first .nucleus-control-panel-sidebar-bottom in .nucleus-control-panel-sidebar to align it and any following to the bottom*/
-  .nucleus-control-panel-sidebar li:not(.nucleus-control-panel-sidebar-bottom) + .nucleus-control-panel-sidebar-bottom,
-  .nucleus-control-panel-sidebar li.nucleus-control-panel-sidebar-bottom:first-child
+  /* apply margin-top: auto to the first .nucleus-control-panel-sidebar-end in .nucleus-control-panel-sidebar to align it and any following to the bottom*/
+  .nucleus-control-panel-sidebar li:not(.nucleus-control-panel-sidebar-end) + .nucleus-control-panel-sidebar-end,
+  .nucleus-control-panel-sidebar li.nucleus-control-panel-sidebar-end:first-child
   {
     margin-top: auto;
   }
 
-  .nucleus-control-panel-sidebar li.nucleus-control-panel-sidebar-bottom-active
+  .nucleus-control-panel-sidebar li.nucleus-control-panel-sidebar-end-active
   {
     background-color: #111;
   }

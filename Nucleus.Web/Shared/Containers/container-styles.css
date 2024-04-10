@@ -89,7 +89,7 @@
 
 @property --title-alignment
 {
-  /* title: Title Alignment */
+  /* title: Alignment */
   /* group: Title */
   /* preserveOrder: true */
   syntax: "left | center | right | match-parent";

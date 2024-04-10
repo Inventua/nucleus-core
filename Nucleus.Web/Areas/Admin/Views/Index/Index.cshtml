@@ -48,11 +48,11 @@
 
 			@if (Model.CanEditPage)
 			{
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-page-btn", "Edit Page", "Edit the settings for this page.", "~/Admin/Pages/Editor" + "?id=" + @Model.CurrentPage.Id + "&mode=Single", "E", "&#xef42;", "nucleus-control-panel-sidebar-bottom"))
+				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-page-btn", "Edit Page", "Edit the settings for this page.", "~/Admin/Pages/Editor" + "?id=" + @Model.CurrentPage.Id + "&mode=Single", "E", "&#xef42;", "nucleus-control-panel-sidebar-end"))
 			}
 			@if (Model.CanEditContent)
 			{
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-content-btn", "Edit Content", "Toggle edit mode.", "~/Admin/Settings/Index", "T", "&#xe3c9;", "nucleus-control-panel-sidebar-bottom nucleus-control-panel-sidebar-bottom" + (Model.IsEditMode ? "-active" : "")))
+				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-content-btn", "Edit Content", "Toggle edit mode.", "~/Admin/Settings/Index", "T", "&#xe3c9;", "nucleus-control-panel-sidebar-end nucleus-control-panel-sidebar-end" + (Model.IsEditMode ? "-active" : "")))
 			}
 		</ul>
 

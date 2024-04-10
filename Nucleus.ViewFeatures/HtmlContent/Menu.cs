@@ -264,7 +264,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 				// down arrow icon to expand display (show child pages)
 				TagBuilder toggleLinkBuilder = new("button");
-				toggleLinkBuilder.AddCssClass("dropdown-toggle nav-link d-inline-flex btn btn-none");
+				toggleLinkBuilder.AddCssClass("dropdown-toggle nav-link btn btn-none");
 				toggleLinkBuilder.Attributes.Add("type", "button");
 				toggleLinkBuilder.Attributes.Add("title", "Open");
 				toggleLinkBuilder.Attributes.Add("aria-expanded", "false");

@@ -16,17 +16,22 @@
 
   --nucleus-menu-background-color: var(--bs-body-bg);
   --nucleus-menu-text-color: var(--bs-body-color);
-  --nucleus-menu-hover-background-color: var(--bs-tertiary-bg);
+  --nucleus-menu-hover-background-color: var(--bs-secondary-bg);
   --nucleus-menu-hover-text-color: var(--bs-body-color);
-  
-  --nucleus-menu-dropdown-padding: 0.25rem 0.5rem;
 
-  --nucleus-menu-dropdown-item-min-width: 10rem;
-  --nucleus-menu-dropdown-item-max-width: 25rem;
-  --nucleus-menu-dropdown-item-padding: 0.25rem;
+  --nucleus-submenu-background-color: var(--bs-body-bg);
+  --nucleus-submenu-text-color: var(--bs-body-color);
+  --nucleus-submenu-hover-background-color: var(--bs-secondary-bg);
+  --nucleus-submenu-hover-text-color: var(--bs-body-color);
+
+  --nucleus-submenu-padding: 0.25rem 0.5rem;
+
+  --nucleus-submenu-item-min-width: 10rem;
+  --nucleus-submenu-item-max-width: 25rem;
+  --nucleus-submenu-item-padding: 0.5rem;
 
   --nucleus-menu-ribbon-dropdown-gap: 0.25rem;
-  --nucleus-menu-ribbon-dropdown-border: solid 1px var(--nucleus-default-border-color);
+  --nucleus-submenu-ribbon-dropdown-border: solid 1px var(--nucleus-default-border-color);
   --nucleus-menu-ribbon-portrait-dropdown-columns: 4;
 
   --footer-padding: 1rem;
@@ -426,6 +431,7 @@ table td.nucleus-small-cell
 .navbar-nav
 {
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .nucleus-menu .navbar-nav > .dropdown-submenu 
@@ -454,29 +460,41 @@ table td.nucleus-small-cell
 */
 .nucleus-menu .dropdown-menu 
 {
-  padding: var(--nucleus-menu-dropdown-padding);
+  padding: var(--nucleus-submenu-padding);
 }
 
 
 .nucleus-menu .dropdown-menu li 
 {
   display: inline-block;
-  max-width:  var(--nucleus-menu-dropdown-item-max-width);
-  min-width: var(--nucleus-menu-dropdown-item-min-width);
-	padding: var(--nucleus-menu-dropdown-item-padding);
+  max-width:  var(--nucleus-submenu-item-max-width);
+  min-width: var(--nucleus-submenu-item-min-width);	
 }
 
-.nucleus-menu .dropdown-menu .dropdown-toggle::after 
+.nucleus-menu .dropdown-menu li a
 {
-	margin-top: 0.1rem;
-	margin-left: 1rem;
-	transform: rotate(-90deg);
+  padding: var(--nucleus-submenu-item-padding);
 }
 
-.nucleus-menu .dropdown-menu .dropdown-toggle::after 
+
+.nucleus-menu .dropdown-toggle.btn
+{
+  height: 100%;
+  padding: var(--nucleus-submenu-item-padding);
+}
+
+.nucleus-menu .dropdown-toggle::after 
 {
   margin: auto;
 }
+
+.nucleus-menu .dropdown-menu .dropdown-toggle::after 
+{
+	/*margin-top: 0.1rem;
+	margin-left: 1rem;*/
+	transform: rotate(-90deg);
+}
+
 
 .nucleus-menu .dropdown-submenu .dropdown-submenu 
 {
@@ -494,17 +512,35 @@ table td.nucleus-small-cell
 	margin: -0.5rem 0 0.5rem 0;
 }
 
-.nucleus-menu ul li .nav-link
+.nucleus-menu ul  
 {
-  color: var(--nucleus-menu-text-color)!important;
   background-color: var(--nucleus-menu-background-color);
 }
 
+.nucleus-menu ul.navbar-nav > li:hover 
+{
+  background-color: var(--nucleus-menu-hover-background-color);
+}
+
+.nucleus-menu ul li 
+{
+  color: var(--nucleus-menu-text-color);
+}
+
+.nucleus-menu .dropdown-menu, .nucleus-menu .dropdown-menu UL
+{
+  background-color: var(--nucleus-submenu-background-color);
+}
+
+.nucleus-menu .dropdown-menu .dropdown-item, .nucleus-menu .dropdown-menu .dropdown-toggle
+{
+  color: var(--nucleus-submenu-text-color);  
+}
 
 /*  ribbon menu styles */
 
 /* shared ribbon (both landscape and portrait) styles */
-.nucleus-menu .dropdown-submenu > .ribbon-item
+/*.nucleus-menu .dropdown-submenu > .ribbon-item
 {
   background-color: var(--nucleus-menu-background-color);
 }
@@ -512,12 +548,12 @@ table td.nucleus-small-cell
 .nucleus-menu .ribbon-item .dropdown-item
 {
   color: var(--nucleus-menu-text-color);
-}
+}*/
 
 .nucleus-menu .dropdown-menu.ribbon-item li > a:hover, .nucleus-menu .dropdown-menu.ribbon-item li > a:active
 {
-  color: var(--nucleus-menu-hover-text-color);
-  background-color: var(--nucleus-menu-hover-background-color);
+  color: var(--nucleus-submenu-hover-text-color);
+  background-color: var(--nucleus-submenu-hover-background-color);
 }
 
 .nucleus-menu .dropdown-submenu > .ribbon-item.show 
@@ -527,7 +563,7 @@ table td.nucleus-small-cell
 
 .nucleus-menu .dropdown-submenu > .ribbon-item > li
 {  
-	border: var(--nucleus-menu-ribbon-dropdown-border);  
+	border: var(--nucleus-submenu-ribbon-dropdown-border);  
 }
 
 .nucleus-menu .ribbon-item, .nucleus-menu .ribbon-item li
@@ -535,10 +571,14 @@ table td.nucleus-small-cell
 	list-style-type: none;  
 }
 
-.nucleus-menu .ribbon-item, .nucleus-menu .ribbon-item UL 
+.nucleus-menu .ribbon-item ul
 {
-  padding-left: .5rem;
-  padding-right: .5rem
+  padding: 0;
+}
+
+.nucleus-menu .ribbon-item UL LI
+{
+  padding-left: .5rem;  
 }
 
 .nucleus-menu .dropdown-submenu > .ribbon-item
@@ -552,8 +592,9 @@ table td.nucleus-small-cell
 {
   grid-template-columns: 1fr repeat(calc(var(--nucleus-menu-ribbon-portrait-dropdown-columns) - 1), auto);
 	grid-auto-rows: auto;
+  gap: var(--nucleus-menu-ribbon-dropdown-gap);
 }
-
+/*
 .nucleus-menu .dropdown-submenu > .ribbon-item.ribbonportrait  > li:not(:first-child)
 {
   margin-left: calc(var(--nucleus-menu-ribbon-dropdown-gap) * 0.5);
@@ -563,7 +604,7 @@ table td.nucleus-small-cell
 {
   margin-right: calc(var(--nucleus-menu-ribbon-dropdown-gap) * 0.5);
 }
-
+*/
 .nucleus-menu .dropdown-submenu > .ribbon-item.ribbonportrait.show
 {
 	display: grid;  
@@ -593,8 +634,8 @@ table td.nucleus-small-cell
 {  
 	flex-grow: 1;
   flex-shrink: 1;
-  max-width: var(--nucleus-menu-dropdown-item-max-width);
-  min-width: var(--nucleus-menu-dropdown-item-min-width);
+  max-width: var(--nucleus-submenu-item-max-width);
+  min-width: var(--nucleus-submenu-item-min-width);
 }
 
 .nucleus-menu .dropdown-menu.ribbon-item.ribbonlandscape.show
@@ -606,15 +647,15 @@ table td.nucleus-small-cell
 .nucleus-menu .dropdown-menu.dropdown li:hover > a, .nucleus-menu .dropdown-menu.dropdown li:active > a,
 .nucleus-menu .dropdown-menu.dropdown li:hover > button, .nucleus-menu .dropdown-menu.dropdown li:active > button
 {
-  color: var(--nucleus-menu-hover-text-color);
-  background-color: var(--nucleus-menu-hover-background-color);
+  color: var(--nucleus-submenu-hover-text-color);
+  background-color: var(--nucleus-submenu-hover-background-color);
 }
 
 .nucleus-menu ul .dropdown-menu.dropdown .dropdown-submenu li:hover > .nav-link, .nucleus-menu ul .dropdown-menu.dropdown .dropdown-submenu li:active > .nav-link,
 .nucleus-menu ul .dropdown-menu.dropdown .dropdown-submenu li:hover > .nav-link, .nucleus-menu ul .dropdown-menu.dropdown .dropdown-submenu li:active > .nav-link
 {
-  color: var(--nucleus-menu-hover-text-color)!important;
-  background-color: var(--nucleus-menu-hover-background-color);
+  color: var(--nucleus-submenu-hover-text-color)!important;
+  background-color: var(--nucleus-submenu-hover-background-color);
 }
 
 .nucleus-menu  .dropdown-menu.dropdown .dropdown-menu.show

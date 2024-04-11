@@ -17,6 +17,7 @@ using Nucleus.Extensions.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Nucleus.Abstractions.Models.FileSystem;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -1183,22 +1184,43 @@ namespace Nucleus.Web.Controllers.Admin
 
     private async Task<IEnumerable<SelectListItem>> GetAvailableModules()
     {
+      List<SelectListItem> results = new();
 
       IEnumerable<ModuleDefinition> availableModules = await this.PageModuleManager.ListModuleDefinitions();
+
+      // get a list of distinct category names
       IEnumerable<string> moduleCategories = availableModules
-        .SelectMany(module => String.IsNullOrEmpty(module.Categories) ? new string[] { "" } : module.Categories.Split(',')
-        .Select(category => category))
-        .Where(category => !String.IsNullOrEmpty(category))
+        .SelectMany(module => String.IsNullOrEmpty(module.Categories) ? new string[] { "" } : module.Categories.Split(','))        
         .Distinct()
-        .OrderBy(name => name);
+        .OrderBy(category => category);
 
-      Dictionary<string, SelectListGroup> groups = moduleCategories.ToDictionary(name => name, name => new SelectListGroup() { Name = name });
+      // create a keyed list of SelectListGroup items for each category.  This is so that we can assign each module in the same category to the same 
+      // SelectListGroup object.  Each SelectListGroup is an <optgroup> in html.
+      Dictionary<string, SelectListGroup> selectListGroups = 
+        moduleCategories.ToDictionary(category => category, category => new SelectListGroup() { Name = category });
 
-      return availableModules.Select(module => new SelectListItem(module.FriendlyName, module.Id.ToString())
+      // get a list of modules for each category.  Modules can appear in more than one category.
+      Dictionary<string, IOrderedEnumerable<ModuleDefinition>> categories = moduleCategories
+        .ToDictionary
+        (
+          category => category, 
+          category => 
+            availableModules
+              .Where(module => (module.Categories ?? "").Split(',').Contains(category))
+              .OrderBy(module => module.FriendlyName ?? "")
+        );
+
+      // Create SelectListItem objects for each category/module combination.  SelectListItem objects are rendered as <option> elements in Html.
+      foreach (KeyValuePair<string, IOrderedEnumerable<ModuleDefinition>> item in categories)
       {
-        Group = groups.Where(group => (string.IsNullOrEmpty(module.Categories) ? new string[] { "" } : module.Categories.Split(',')).Contains(group.Key)).FirstOrDefault().Value
-      })
-      .OrderBy(selectListItem => selectListItem.Group?.Name);
+        results.AddRange(item.Value.Select(module => new SelectListItem(module.FriendlyName, module.Id.ToString())
+        {
+          Selected = module.Id == Guid.Parse("b516d8dd-c793-4776-be33-902eb704bef6"), // this makes the html module the default 
+          Group = String.IsNullOrEmpty(item.Key) ? null : selectListGroups[item.Key]
+        }));
+      }
+
+      return results;
     }
 
     private async Task<IEnumerable<SelectListItem>> GetAvailableRoles(List<Permission> existingPermissions)

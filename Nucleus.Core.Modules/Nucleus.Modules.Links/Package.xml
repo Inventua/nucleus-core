@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="407c40be-6025-4a7a-bc41-e07e0ae5f917" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Links</name>
-  <version>1.3.0</version>
+  <version>1.4.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
 		Display a list of links to selected pages, external Urls or files.
@@ -37,7 +37,7 @@
           <file name="Ordered List.cshtml" />
           <file name="Unordered List.cshtml" />
           <file name="Tile.cshtml" />
-          <file name="Tile.css" />
+          <!--<file name="Tile.css" />-->
         </folder>
       </folder>
     </component>

@@ -1,16 +1,18 @@
 ﻿/*! shared.css | Styles for all pages in Nucleus CMS.  (c) Inventua Pty Ptd.  www.nucleus-cms.com */
 :root
 {
-  --admin-frame-size: 100px;
-  --admin-frame-background-color: #444;
+  --control-panel-size: 100px;
+  --control-panel-background-color: #444;
 
   --nucleus-default-gap-horizontal: 0.75rem;
   --nucleus-default-gap-vertical: 0.75rem;
   
+  --font-size-large: 1.25rem;
   --font-size-small: 0.9rem;
-  --font-size-smaller: 0.8rem;
-
+  --font-size-smallest: 0.8rem;
+  
   --nucleus-default-border-color: #dee2e6;
+  --nucleus-default-hover-color: #dddddd;
 
   --nucleus-menu-item-padding: 0.5rem;
 
@@ -78,7 +80,7 @@ body
 /* to the main display, admin.css is for elements within the admin iframe.  */
 .nucleus-admin-frame, .nucleus-admin-frame-placeholder
 {
-	width: var(--admin-frame-size);
+	width: var(--control-panel-size);
 	height: 100%;
 }
 
@@ -90,7 +92,7 @@ body
 .nucleus-admin-frame
 {
 	position: fixed;
-	background-color: var(--admin-frame-background-color);
+	background-color: var(--control-panel-background-color);
 	top: 0;
 	left: 0;
 	border: 0;

@@ -1,0 +1,72 @@
+.documents .document-tiles
+{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-auto-rows: 1fr;
+	row-gap: var(--nucleus-default-gap-vertical);
+  column-gap: var(--nucleus-default-gap-horizontal);
+}
+
+.documents .document-tiles > div
+{
+	padding: var(--nucleus-default-gap-vertical) var(--nucleus-default-gap-horizontal);
+	border: solid 1px var(--nucleus-default-border-color);
+}
+
+.documents .document-sort-list 
+{
+	display: flex;
+	position: relative;
+	width: 16rem;
+}
+
+.documents .document-sort-list .document-sort-list-selected
+{
+	display: flex;
+	border: solid 1px var(--nucleus-default-border-color);
+	padding: var(--nucleus-default-gap-vertical) var(--nucleus-default-gap-horizontal);
+	margin-bottom: var(--nucleus-default-gap-vertical);
+	flex-basis: 100%;
+}
+
+.documents .document-sort-list .document-sort-list-selected > span
+{
+	display: flex;
+	flex-grow: 1;
+	align-self: center;
+}
+
+.documents .document-sort-list > ul
+{
+	position: absolute;
+	left: 0;
+	right: 0;
+	padding: 0;
+	margin: 0;
+	overflow: auto;
+	border: solid 1px var(--nucleus-default-border-color);
+	background-color: var(--bs-body-bg);
+	z-index: 1;
+}
+
+.documents .document-sort-list li
+{
+	cursor: default;		
+	list-style-type: none;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.documents .document-sort-list li a, .document-sort-list li span
+{	
+	padding: var(--nucleus-default-gap-vertical) var(--nucleus-default-gap-horizontal);
+	font-size: inherit!important;
+	flex-grow: 1;
+	text-decoration: none;
+	color: inherit;
+}
+
+.documents .document-sort-list li a:hover
+{
+	background-color: var(--nucleus-default-hover-color);		
+}

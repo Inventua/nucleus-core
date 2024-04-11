@@ -1,14 +1,1 @@
-﻿.Documents TABLE
-{
-	width: 100%;
-}
-
-.Documents TABLE th, .Documents TABLE td
-{
-	text-align: left;
-}
-
-.Documents .document-modifieddate:before
-{
-	content: 'modified '
-}
+﻿

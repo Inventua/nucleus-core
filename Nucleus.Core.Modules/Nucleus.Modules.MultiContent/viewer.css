@@ -31,7 +31,7 @@
 .multi-content-faq .accordion-button, .multi-content-faq .accordion-button:focus, .multi-content-faq .accordion-button:not(.collapsed)
 {
 	box-shadow: none;
-	padding: 0.5rem;
+	padding: var(--nucleus-default-gap-vertical) var(--nucleus-default-gap-horizontal);
 	background: inherit;
 	color: inherit;
 }

@@ -1,1 +1,1 @@
-.layout-landing .ContentWrapper{gap:.5rem}
+.layout-landing .ContentWrapper{column-gap:var(--nucleus-default-gap-horizontal);row-gap:var(--nucleus-default-gap-vertical)}

@@ -52,87 +52,89 @@
 
 		@if (Model.SearchResults?.Results?.Any() == true)
 		{
-			@foreach (var result in Model.SearchResults.Results)
-			{
-				<div class="search-result">
-          <div>
-            <a class="result-link" href="@result.Url" title="@result.Title?.Trim()">@result.Title?.Trim()</a>
-            @if (Model.Settings.ShowType && !String.IsNullOrEmpty(result.Type))
-            {
-              <span class="fst-italic small text-muted result-type">@result.Type</span>
+      <div class="search-results">
+			  @foreach (var result in Model.SearchResults.Results)
+			  {
+				  <div class="search-result">
+            <div>
+              <a class="result-link" href="@result.Url" title="@result.Title?.Trim()">@result.Title?.Trim()</a>
+              @if (Model.Settings.ShowType && !String.IsNullOrEmpty(result.Type))
+              {
+                <span class="fst-italic small text-muted result-type">@result.Type</span>
+              }
+            </div>          
+            @if (Model.Settings.ShowUrl)
+					  {
+						  <span class="fst-italic small result-url">@Url.GetAbsoluteUri(result.Url)</span>
+					  }
+					  @if ((Model.Settings.ShowPublishDate || Model.Settings.ShowSize) && (result.PublishedDate.HasValue || result.Size.HasValue))
+					  {
+						  <div class="text-muted small fst-italic result-meta">
+							  @if (Model.Settings.ShowPublishDate && result.PublishedDate.HasValue)
+							  {
+								  <span>Published: @result.PublishedDate.FormatDate(this.Context.Request.GetUserTimeZone())@Html.Raw(".")</span>
+							  }
+
+                @if (Model.Settings.ShowSize && result.Size.HasValue && result.Scope == @Nucleus.Abstractions.Models.FileSystem.File.URN)
+							  {
+								  <span>@result.Size.FormatFileSize()</span>
+							  }
+						  </div>
+					  }
+
+					  @if (Model.Settings.ShowSummary && !String.IsNullOrEmpty(@result.Summary))
+					  {
+						  <div class="result-summary">@result.Summary</div>
+					  }
+					  @if (Model.Settings.ShowCategories && result.Categories != null && result.Categories.Any())
+					  {
+						  <ul class="list-inline comma-separated result-categories">
+							  @foreach (var category in result.Categories)
+							  {
+								  <li class="list-inline-item">@category.Name</li>
+							  }
+						  </ul>
+					  }
+
+            @{
+              double? assessmentCalculation = 0;
+              string assessmentText = "";
+
+              if (Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0 && result.Score.HasValue)
+              {
+                assessmentCalculation = result.Score / Model.SearchResults.MaxScore.Value * 100;
+                assessmentText = assessmentCalculation switch
+                {
+                  > 99 => "Best Match",
+                  > 75 => "Good Match",
+                  > 50 => "Medium Match",
+                  _ => "Low Match"
+                };
+              }
             }
-          </div>          
-          @if (Model.Settings.ShowUrl)
-					{
-						<span class="fst-italic small result-url">@Url.GetAbsoluteUri(result.Url)</span>
-					}
-					@if ((Model.Settings.ShowPublishDate || Model.Settings.ShowSize) && (result.PublishedDate.HasValue || result.Size.HasValue))
-					{
-						<div class="text-muted small fst-italic result-meta">
-							@if (Model.Settings.ShowPublishDate && result.PublishedDate.HasValue)
-							{
-								<span>Published: @result.PublishedDate.FormatDate(this.Context.Request.GetUserTimeZone())@Html.Raw(".")</span>
-							}
-
-              @if (Model.Settings.ShowSize && result.Size.HasValue && result.Scope == @Nucleus.Abstractions.Models.FileSystem.File.URN)
-							{
-								<span>@result.Size.FormatFileSize()</span>
-							}
-						</div>
-					}
-
-					@if (Model.Settings.ShowSummary && !String.IsNullOrEmpty(@result.Summary))
-					{
-						<div class="result-summary">@result.Summary</div>
-					}
-					@if (Model.Settings.ShowCategories && result.Categories != null && result.Categories.Any())
-					{
-						<ul class="list-inline comma-separated result-categories">
-							@foreach (var category in result.Categories)
-							{
-								<li class="list-inline-item">@category.Name</li>
-							}
-						</ul>
-					}
-
-          @{
-            double? assessmentCalculation = 0;
-            string assessmentText = "";
-
-            if (Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0 && result.Score.HasValue)
+            @if ((Model.Settings.ShowScoreAssessment && Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0) || (Model.Settings.ShowScore && result.Score.HasValue && assessmentCalculation.HasValue))
             {
-              assessmentCalculation = result.Score / Model.SearchResults.MaxScore.Value * 100;
-              assessmentText = assessmentCalculation switch
-              {
-                > 99 => "Best Match",
-                > 75 => "Good Match",
-                > 50 => "Medium Match",
-                _ => "Low Match"
-              };
-            }
-          }
-          @if ((Model.Settings.ShowScoreAssessment && Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0) || (Model.Settings.ShowScore && result.Score.HasValue && assessmentCalculation.HasValue))
-          {
-            <span class="fw-light small result-score">
-              @if (Model.Settings.ShowScoreAssessment && Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0 && result.Score.HasValue)
-              {
-                @assessmentText
-              }
-              @if (Model.Settings.ShowScoreAssessment && Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0 && Model.Settings.ShowScore && result.Score.HasValue && assessmentCalculation.HasValue)
-              {
-                <text> - </text>
-              }
-              @if (Model.Settings.ShowScore && assessmentCalculation.HasValue)
-              {
-                <text>Score: </text>
-                @assessmentCalculation.Value.ToString("0.0")
-                <text>%</text>
-              }
-            </span>
-          }          
-				</div>
-			}
-		}
+              <span class="fw-light small result-score">
+                @if (Model.Settings.ShowScoreAssessment && Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0 && result.Score.HasValue)
+                {
+                  @assessmentText
+                }
+                @if (Model.Settings.ShowScoreAssessment && Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0 && Model.Settings.ShowScore && result.Score.HasValue && assessmentCalculation.HasValue)
+                {
+                  <text> - </text>
+                }
+                @if (Model.Settings.ShowScore && assessmentCalculation.HasValue)
+                {
+                  <text>Score: </text>
+                  @assessmentCalculation.Value.ToString("0.0")
+                  <text>%</text>
+                }
+              </span>
+            }          
+				  </div>
+			  }
+      </div>
+    }
 	}
 }
 <script>

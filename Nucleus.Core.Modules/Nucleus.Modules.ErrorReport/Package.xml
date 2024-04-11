@@ -16,6 +16,7 @@
         <viewController>ErrorReport</viewController>
         <viewAction>Index</viewAction>
         <editAction>Settings</editAction>
+        <categories>Utility</categories>
       </moduleDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />

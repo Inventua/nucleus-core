@@ -24,7 +24,7 @@
 {
 	display: flex;
 	border: solid 1px var(--nucleus-default-border-color);
-	padding: var(--nucleus-default-gap-vertical) var(--nucleus-default-gap-horizontal);
+	padding: calc(var(--nucleus-default-gap-vertical) * 0.5) calc(var(--nucleus-default-gap-horizontal) * 0.5);
 	margin-bottom: var(--nucleus-default-gap-vertical);
 	flex-basis: 100%;
 }

@@ -5,9 +5,9 @@
 @using Nucleus.Modules.Forums.ViewModels
 @Html.AddStyle("~!/../viewer.css")
 @Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
-<div class="Forums">
+<div class="forums">
   <div class="nucleus-form-tools">
-    @Html.LinkButton("","Manage Subscriptions", Url.NucleusAction("ManageSubscriptions", "Forums", "Forums"), new { @class = "btn btn-primary btn-sm", @data_target = ".Forums.parent()" })
+    @Html.LinkButton("","Manage Subscriptions", Url.NucleusAction("ManageSubscriptions", "Forums", "Forums"), new { @class = "btn btn-primary btn-sm", @data_target = ".forums.parent()" })
   </div>
   <table class="forums-list table table-sm table-striped">
     @foreach (var group in Model.Groups)

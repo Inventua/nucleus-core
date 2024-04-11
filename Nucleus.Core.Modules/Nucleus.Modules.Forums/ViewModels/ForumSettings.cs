@@ -12,21 +12,19 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Models.Permissions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Nucleus.Modules.Forums.ViewModels
+namespace Nucleus.Modules.Forums.ViewModels;
+
+public class ForumSettings
 {
-	public class ForumSettings
-	{
-		public string Message { get; set; }
-		public Forum Forum { get; set; }
-		public Guid GroupId { get; set; }
-		public IEnumerable<MailTemplate> MailTemplates { get; set; }
+  public string Message { get; set; }
+  public Forum Forum { get; set; }
+  public Guid GroupId { get; set; }
+  public IEnumerable<MailTemplate> ImmediateMailTemplates { get; set; }
+  public IEnumerable<MailTemplate> SummaryMailTemplates { get; set; }
 
-		public Guid SelectedRoleId { get; set; }
-		public IEnumerable<SelectListItem> AvailableRoles { get; set; } 
-		public IEnumerable<List> Lists { get; set; }
-		public IEnumerable<PermissionType> ForumPermissionTypes { get; set; }
-		public PermissionsList ForumPermissions { get; set; } = new();
-
-
-	}
+  public Guid SelectedRoleId { get; set; }
+  public IEnumerable<SelectListItem> AvailableRoles { get; set; }
+  public IEnumerable<List> Lists { get; set; }
+  public IEnumerable<PermissionType> ForumPermissionTypes { get; set; }
+  public PermissionsList ForumPermissions { get; set; } = new();
 }

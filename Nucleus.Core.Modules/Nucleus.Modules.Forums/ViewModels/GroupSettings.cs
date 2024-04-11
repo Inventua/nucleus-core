@@ -19,9 +19,10 @@ namespace Nucleus.Modules.Forums.ViewModels
 		public string Message { get; set; }
 		public Group Group { get; set; }
 		public IEnumerable<Group> Groups { get; set; }
-		public IEnumerable<MailTemplate> MailTemplates { get; set; }
+    public IEnumerable<MailTemplate> ImmediateMailTemplates { get; set; }
+    public IEnumerable<MailTemplate> SummaryMailTemplates { get; set; }
 
-		public Guid SelectedRoleId { get; set; }
+    public Guid SelectedRoleId { get; set; }
 		public IEnumerable<SelectListItem> AvailableRoles { get; set; } 
 		public IEnumerable<List> Lists { get; set; }
 		public IEnumerable<PermissionType> ForumPermissionTypes { get; set; }

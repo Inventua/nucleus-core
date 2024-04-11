@@ -6,8 +6,8 @@
 @Html.AddStyle("~!/../viewer.css")
 @Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
 @Html.AddScript("~/Resources/js/jquery-toggleswitch.js")
-<div class="Forums">
-  @using (Html.BeginNucleusForm("SaveForumPost", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = ".Forums.parent()", @enctype = "multipart/form-data", @class = "forums-edit-post" }))
+<div class="forums">
+  @using (Html.BeginNucleusForm("SaveForumPost", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = ".forums.parent()", @enctype = "multipart/form-data", @class = "forums-edit-post" }))
   {
     <fieldset class="post">
       @Html.HiddenFor(model => model.Forum.Id)
@@ -77,7 +77,7 @@
     </fieldset>
 
     <div class="nucleus-form-tools">
-      <input type="submit" formaction="@Url.NucleusAction("SaveForumPost", "Forums", "Forums")" value="Save" class="btn btn-primary btn-sm nucleus-show-progress nucleus-show-progress-after-last-sibling" data-target=".Forums.parent()" />
+      <input type="submit" formaction="@Url.NucleusAction("SaveForumPost", "Forums", "Forums")" value="Save" class="btn btn-primary btn-sm nucleus-show-progress nucleus-show-progress-after-last-sibling" data-target=".forums.parent()" />
       @Html.LinkButton("", "Cancel", Url.PageLink(Model.Page, @$"{Model.Forum.Name.FriendlyEncode()}/{(Model.Post.Id == Guid.Empty ? "" : Model.Post.Id)}"), new { @class="btn btn-secondary btn-sm" })
     </div>
   }

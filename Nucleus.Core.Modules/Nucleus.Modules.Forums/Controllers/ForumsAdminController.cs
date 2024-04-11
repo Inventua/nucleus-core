@@ -304,8 +304,9 @@ namespace Nucleus.Modules.Forums.Controllers
 			}
 
 			viewModel.Groups = await this.GroupsManager.List(this.Context.Module);
-			viewModel.MailTemplates = await this.MailTemplateManager.List(this.Context.Site);
-			viewModel.Lists = await this.ListManager.List(this.Context.Site);
+			viewModel.ImmediateMailTemplates = await this.MailTemplateManager.List(this.Context.Site, typeof(Models.MailTemplate.Immediate));
+      viewModel.SummaryMailTemplates = await this.MailTemplateManager.List(this.Context.Site, typeof(Models.MailTemplate.Summary));
+      viewModel.Lists = await this.ListManager.List(this.Context.Site);
 			viewModel.AvailableRoles = await GetAvailableRoles(viewModel.Group?.Permissions); 
 
 			return viewModel;
@@ -337,8 +338,10 @@ namespace Nucleus.Modules.Forums.Controllers
 				viewModel.Forum.Permissions = await RebuildPermissions(viewModel.ForumPermissions);
 			}
 
-			viewModel.MailTemplates = await this.MailTemplateManager.List(this.Context.Site);
-			viewModel.AvailableRoles = await GetAvailableRoles(viewModel.Forum.Permissions);
+			viewModel.ImmediateMailTemplates = await this.MailTemplateManager.List(this.Context.Site, typeof(Models.MailTemplate.Immediate));
+      viewModel.SummaryMailTemplates = await this.MailTemplateManager.List(this.Context.Site, typeof(Models.MailTemplate.Summary));
+
+      viewModel.AvailableRoles = await GetAvailableRoles(viewModel.Forum.Permissions);
 			viewModel.Lists = await this.ListManager.List(this.Context.Site);
 
 			return viewModel;

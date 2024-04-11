@@ -68,7 +68,7 @@ public class SendSummaryForumEmailsScheduledTask : IScheduledTask
 
     foreach (var group in queue)
     {
-      Models.MailTemplate.Models.Summary model = new();
+      Models.MailTemplate.Summary model = new();
 
       User user = await this.UserManager.Get(group.Key.UserId);
       UserProfileValue emailAddress = user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault();
@@ -110,7 +110,7 @@ public class SendSummaryForumEmailsScheduledTask : IScheduledTask
         {
           try
           {
-            await mailClient.Send<Models.MailTemplate.Models.Summary>(template, model, emailAddress.Value);
+            await mailClient.Send<Models.MailTemplate.Summary>(template, model, emailAddress.Value);
             sentMessageCount++;
 
             var postIds = model.Forums.SelectMany(forum => forum.Posts.Select(post => post.Id)).ToList();

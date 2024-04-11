@@ -3,8 +3,8 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Forums.ViewModels
-<div class="Forums">
-  @using (Html.BeginNucleusForm("SaveForumPostReply", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = ".Forums.parent()", @enctype = "multipart/form-data" }))
+<div class="forums">
+  @using (Html.BeginNucleusForm("SaveForumPostReply", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = ".forums.parent()", @enctype = "multipart/form-data" }))
   {
     <fieldset class="reply">
       @Html.HiddenFor(model => model.Forum.Id)
@@ -57,7 +57,7 @@
 
                 @if (Model.CanAttach)
                 {
-                  <input type="submit" title="Delete Attachment" value="&#xe14c;" class="nucleus-material-icon btn btn-none btn-sm" formaction="@Url.NucleusAction("DeleteReplyAttachment", "Forums", "Forums")?id=@Model.Reply.Attachments[attachmentCount].Id" data-target=".Forums.parent()" data-confirm="Delete this attachment?" />
+                  <input type="submit" title="Delete Attachment" value="&#xe14c;" class="nucleus-material-icon btn btn-none btn-sm" formaction="@Url.NucleusAction("DeleteReplyAttachment", "Forums", "Forums")?id=@Model.Reply.Attachments[attachmentCount].Id" data-target=".forums.parent()" data-confirm="Delete this attachment?" />
                 }
               </a>
             }
@@ -71,7 +71,7 @@
     </fieldset>
 
     <div class="nucleus-form-tools">
-      <input type="submit" formaction="@Url.NucleusAction("SaveForumPostReply", "Forums", "Forums")" value="Save" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after-last-sibling" data-target=".Forums.parent()" />
+      <input type="submit" formaction="@Url.NucleusAction("SaveForumPostReply", "Forums", "Forums")" value="Save" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after-last-sibling" data-target=".forums.parent()" />
       @Html.LinkButton("", "Cancel", Url.PageLink(Model.Page, @$"{Model.Forum.Name.FriendlyEncode()}/{(Model.Post.Id == Guid.Empty ? "" : Model.Post.Id)}"), new { @class="btn btn-secondary" })
     </div>
   }

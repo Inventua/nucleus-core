@@ -54,9 +54,20 @@ namespace Nucleus.Web.Controllers.Admin
 			viewModel.CanEditPage = ControllerContext.HttpContext.User.HasEditPermission(this.Context.Site, page);
 			viewModel.CanEditContent = ControllerContext.HttpContext.User.CanEditContent(this.Context.Site, page);
 			viewModel.IsEditMode = (viewModel.CanEditContent && ControllerContext.HttpContext.User.IsEditing(ControllerContext.HttpContext));
+      viewModel.ControlPanelDockingCssClass = viewModel.CanEditContent && IsTopDockSelected(ControllerContext.HttpContext) ? "control-panel-dock-top" : "";
 
-			return View("Index", viewModel);
+      return View("Index", viewModel);
 		}
 
-	}
+
+    private Boolean IsTopDockSelected(Microsoft.AspNetCore.Http.HttpContext context)
+    {
+      if (Boolean.TryParse(context.Request.Cookies[PermissionExtensions.CONTROL_PANEL_DOCKING_COOKIE_NAME], out Boolean isSelected))
+      {
+        return isSelected;
+      }
+
+      return false;
+    }
+  }
 }

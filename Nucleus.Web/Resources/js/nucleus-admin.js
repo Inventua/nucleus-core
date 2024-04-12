@@ -61,7 +61,14 @@ function _handleContentLoaded(e, args)
 	// Edit button handler (toggle edit mode)
 	jQuery('#nucleus-edit-content-btn').off('click.toggleMode');
 	jQuery('#nucleus-edit-content-btn').on('click.toggleMode', ToggleEditMode);
-	
+
+  jQuery('.nucleus-control-panel-sidebar .dock-top-btn, .nucleus-control-panel-sidebar .dock-left-btn').off('click.toggleDocking');
+  jQuery('.nucleus-control-panel-sidebar .dock-top-btn, .nucleus-control-panel-sidebar .dock-left-btn').on('click.toggleDocking', function (event)
+  {
+    jQuery('body').toggleClass('control-panel-dock-top');
+    window.parent.document.dispatchEvent(new CustomEvent('ToggleControlPanelDocking'));
+  });
+
 	function AdminMenuItem_Click(event)
 	{
 		var element = jQuery(event.currentTarget).find('[data-href]');

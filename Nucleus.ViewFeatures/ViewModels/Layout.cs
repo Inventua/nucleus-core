@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Nucleus.ViewFeatures.ViewModels
 {
@@ -30,10 +31,15 @@ namespace Nucleus.ViewFeatures.ViewModels
 		/// </summary>
 		public Boolean CanEdit { get; set; }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public string DefaultPageUri { get; set; }
+    /// <summary>
+    /// Css class used to control control panel docking location.
+    /// </summary>
+    public string ControlPanelDockingCssClass { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public string DefaultPageUri { get; set; }
 
 		/// <summary>
 		/// Gets the current request's site icon.  This value can be empty, which means that no icon has been selected for the site.

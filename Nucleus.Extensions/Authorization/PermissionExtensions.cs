@@ -17,18 +17,23 @@ namespace Nucleus.Extensions.Authorization
 	public static class PermissionExtensions
 	{
 		/// <summary>
-		/// Name of the cookie used to track whether the user is in "edit mode"
+		/// Name of the cookie used to track whether the user is in "edit mode".
 		/// </summary>
 		public static string EDIT_COOKIE_NAME = "nucleus_editmode";
 
-		/// <summary>
-		/// Returns a true/false value indicating whether the user is allowed to access the resource represented by the specified permission.
-		/// </summary>
-		/// <param name="permission"></param>
-		/// <param name="site"></param>
-		/// <param name="user"></param>
-		/// <returns></returns>
-		public static Boolean IsValid(this Permission permission, Site site, ClaimsPrincipal user)
+    /// <summary>
+    /// Name of the cookie used to store the user control panel docking location.
+    /// </summary>
+    public static string CONTROL_PANEL_DOCKING_COOKIE_NAME = "nucleus_control_panel_docking";
+    
+    /// <summary>
+    /// Returns a true/false value indicating whether the user is allowed to access the resource represented by the specified permission.
+    /// </summary>
+    /// <param name="permission"></param>
+    /// <param name="site"></param>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    public static Boolean IsValid(this Permission permission, Site site, ClaimsPrincipal user)
 		{
 			if (user.IsSystemAdministrator() || user.IsSiteAdmin(site))
 			{

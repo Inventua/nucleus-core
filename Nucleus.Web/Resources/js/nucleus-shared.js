@@ -1629,12 +1629,22 @@ function _Page()
   // Add _Layout.cshtml event handlers, which are used to communicate/execute events from the admin iframe to the main window.
 
   // ExpandAdminFrame:  Show or hide the admin iframe
-  function _addEventHandlers(toggleEditCookieName)
+  function _addEventHandlers(toggleEditCookieName, controlPanelDockingCookieName)
   {
     window.document.addEventListener('ExpandAdminFrame', function (args)
     {
-      var adminFrame = jQuery('#nucleus-admin-frame');
-      args.detail !== null && args.detail.expand ? adminFrame.addClass('nucleus-admin-frame-expanded') : adminFrame.removeClass('nucleus-admin-frame-expanded');
+      //var adminFrame = jQuery('#nucleus-admin-frame');
+      //args.detail !== null && args.detail.expand ? adminFrame.addClass('nucleus-admin-frame-expanded') : adminFrame.removeClass('nucleus-admin-frame-expanded');
+      var bodyElement = jQuery('body');
+      args.detail !== null && args.detail.expand ? bodyElement.addClass('nucleus-admin-frame-expanded') : bodyElement.removeClass('nucleus-admin-frame-expanded');
+    }, false);
+
+    window.document.addEventListener('ToggleControlPanelDocking', function (args)
+    {
+      jQuery('body').toggleClass('control-panel-dock-top');
+      var cookieValue = jQuery('body').hasClass('control-panel-dock-top') ? 'true' : '';
+      var cookieAge = '3600';
+      document.cookie = controlPanelDockingCookieName + '=' + cookieValue + '; Path=/; max-age=' + cookieAge;
     }, false);
 
     // Refresh event. Set or clear the edit-mode cookie, fade out the display and reload the current Url

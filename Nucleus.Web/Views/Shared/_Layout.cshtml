@@ -48,10 +48,10 @@
 		@Html.RenderScripts()
 	</merge-scripts>
 </head>
-<body>
+<body class="@Model.ControlPanelDockingCssClass">
 	@if (Model.CanEdit)
 	{
-    <iframe id="nucleus-admin-frame" title="Control Panel" accesskey="A" src="@Url.Content("~/Admin/Index/Index")?pageId=@Model.Context.Page.Id" class="Nucleus nucleus-admin-frame"></iframe>
+    <iframe id="nucleus-admin-frame" title="Control Panel" accesskey="A" src="@Url.Content("~/Admin/Index/Index")?pageId=@Model.Context.Page.Id" class="nucleus-admin-frame"></iframe>
 		<div class="nucleus-admin-frame-placeholder"></div>
 
 		<modal id="nucleus-popupdialog" title="Module Settings">
@@ -68,7 +68,7 @@
 		<script>
 			jQuery(function ()
 			{
-				Page.AddEventHandlers('@PermissionExtensions.EDIT_COOKIE_NAME');
+        Page.AddEventHandlers('@PermissionExtensions.EDIT_COOKIE_NAME', '@PermissionExtensions.CONTROL_PANEL_DOCKING_COOKIE_NAME');
 			});
 		</script>
 	}

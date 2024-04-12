@@ -12,11 +12,16 @@ body
   height: 100%;
 }
 
-  .nucleus-control-panel .dropdown-item
-  {
-    /* the default bootstrap hover background is too light, use a darker value */
-    --bs-dropdown-link-hover-bg: #ebeced;
-  }
+.control-panel-dock-top .nucleus-control-panel
+{
+  flex-direction: column;
+}
+
+.nucleus-control-panel .dropdown-item
+{
+  /* the default bootstrap hover background is too light, use a darker value */
+  --bs-dropdown-link-hover-bg: #ebeced;
+}
 
 .nucleus-button-panel
 {
@@ -32,10 +37,10 @@ body
   flex-basis: 100%;
 }
 
-/* Subtract 45px from the settings popup height to account for browsers which display link urls at the bottom left of the screen */
+
 .nucleus-adminpage
 {
-  height: calc(100% - 45px);
+  /* Subtract 45px from the settings popup height to account for browsers which display link urls at the bottom left of the screen height: calc(100% - 45px);*/
   position: relative;
   display: flex;
   flex-direction: column;
@@ -43,8 +48,6 @@ body
   padding: 4px;
 }
 
-/* We subtract 45px from the settings popup height (in .nucleus-adminpage above) to account for browsers which display link urls at the bottom left of the screen when   */
-/* hovering over links, but when .nucleus-adminpage is in an iframe the modal doesn't normally use the full screen height, so we don't need to leave space at the bottom. */
 .nucleus-settings-frame.nucleus-adminpage, .nucleus-store-frame
 {
   height: 100%;
@@ -123,7 +126,7 @@ body
 }
 
 .nucleus-admin-content .grid-2-column
-{  
+{
   grid-template-columns: repeat(2, 1fr);
 }
 
@@ -237,74 +240,99 @@ body
   flex-direction: column;
 }
 
-.nucleus-control-panel ul.nucleus-control-panel-sidebar
+.control-panel-dock-top .nucleus-control-panel-sidebar
+{
+  height: var(--control-panel-size);
+  width: auto;
+  flex-direction: row;
+}
+
+.nucleus-control-panel .nucleus-control-panel-sidebar ul
 {
   padding: 0;
-  margin: 0 auto;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.control-panel-dock-top .nucleus-control-panel-sidebar ul
+{
+  flex-direction: row;
 }
 
 .nucleus-control-panel-sidebar li
 {
-  padding: 12px;
+  display: flex;
+  padding: 0.75rem;
   opacity: 0.9;
   user-select: none;
   cursor: default;
   list-style-type: none;
 }
 
-  .nucleus-control-panel-sidebar li:hover
-  {
-    opacity: 0.95;
-    background-color: #222;
-  }
+.control-panel-dock-top .nucleus-control-panel-sidebar li
+{
+  height: 100%;
+  flex: 1;
+  max-width: 6rem;
+}
 
-  .nucleus-control-panel-sidebar li:active
-  {
-    opacity: 1;
-    background-color: #111;
-  }
+.nucleus-control-panel-sidebar li:hover
+{
+  opacity: 0.95;
+  background-color: #222;
+}
 
-  .nucleus-control-panel-sidebar li.SystemIcon
-  {
-    background-color: #0A0A0A;
-  }
+.nucleus-control-panel-sidebar li:active
+{
+  opacity: 1;
+  background-color: #111;
+}
 
-    .nucleus-control-panel-sidebar li.SystemIcon button
-    {
-      color: #a4e4ff;
-    }
+.nucleus-control-panel-sidebar li.SystemIcon button
+{
+  color: #a4e4ff;
+}
 
-  .nucleus-control-panel-sidebar li.PagesIcon button
-  {
-    color: #f78f73;
-  }
+.nucleus-control-panel-sidebar li.PagesIcon button
+{
+  color: #f78f73;
+}
 
-  .nucleus-control-panel-sidebar li.ManageIcon button
-  {
-    color: #f1a4ff;
-  }
+.nucleus-control-panel-sidebar li.ManageIcon button
+{
+  color: #f1a4ff;
+}
 
-  .nucleus-control-panel-sidebar li.ExtensionsIcon button
-  {
-    color: #ffdca4;
-  }
+.nucleus-control-panel-sidebar li.ExtensionsIcon button
+{
+  color: #ffdca4;
+}
 
-  .nucleus-control-panel-sidebar li.SettingsIcon button
-  {
-    color: #a4ffe2;
-  }
+.nucleus-control-panel-sidebar li.SettingsIcon button
+{
+  color: #a4ffe2;
+}
 
-  /* apply margin-top: auto to the first .nucleus-control-panel-sidebar-end in .nucleus-control-panel-sidebar to align it and any following to the bottom*/
-  .nucleus-control-panel-sidebar li:not(.nucleus-control-panel-sidebar-end) + .nucleus-control-panel-sidebar-end,
-  .nucleus-control-panel-sidebar li.nucleus-control-panel-sidebar-end:first-child
-  {
-    margin-top: auto;
-  }
+/* apply margin-top: auto to the first .nucleus-control-panel-sidebar-end in .nucleus-control-panel-sidebar to align it and any following to the bottom*/
+.nucleus-control-panel-sidebar li:not(.nucleus-control-panel-sidebar-end) + .nucleus-control-panel-sidebar-end,
+.nucleus-control-panel-sidebar li.nucleus-control-panel-sidebar-end:first-child
+{
+  margin-top: auto;
+}
 
-  .nucleus-control-panel-sidebar li.nucleus-control-panel-sidebar-end-active
-  {
-    background-color: #111;
-  }
+.control-panel-dock-top .nucleus-control-panel-sidebar li:not(.nucleus-control-panel-sidebar-end) + .nucleus-control-panel-sidebar-end,
+.control-panel-dock-top .nucleus-control-panel-sidebar li.nucleus-control-panel-sidebar-end:first-child
+{
+  margin-top: 0;
+  margin-left: auto;
+}
+
+.nucleus-control-panel-sidebar li.nucleus-control-panel-sidebar-end-active
+{
+  background-color: #111;
+}
 
 #nucleus-edit-page-btn button
 {
@@ -326,7 +354,41 @@ body
   font-weight: 500;
 }
 
-.nucleus-control-panel-sidebar button
+.control-panel-dock-top .nucleus-control-panel-sidebar .dock-buttons
+{
+  flex-direction: column;
+}
+
+.nucleus-control-panel-sidebar .dock-buttons button
+{
+  border-radius: 0;
+  padding: 0.25rem;
+  max-height: 2rem;
+  margin-right: auto;
+  margin-bottom: auto;
+}
+
+.nucleus-control-panel .dock-top-btn
+{
+  transform: scaleY(-1);
+}
+
+.dock-left-btn
+{
+  display: none;
+}
+
+.control-panel-dock-top .dock-left-btn 
+{
+  display: block;
+}
+
+.control-panel-dock-top .dock-top-btn
+{
+  display: none;
+}
+
+.nucleus-control-panel-sidebar ul button
 {
   display: block;
   text-decoration: none;
@@ -362,7 +424,7 @@ body
 ul.nucleus-control-panel-items li
 {
   list-style-type: none;
-  flex-basis: 0;
+  flex: 1 0 0;
   font-size: 12px;
   vertical-align: top;
   position: relative;
@@ -436,11 +498,11 @@ ul.nucleus-control-panel-items button
   flex-direction: column;
   position: relative;
   flex-grow: 1;
-  margin: 4px 4px 4px 0;
+  margin: 0.25rem 0.25rem 0.25rem 0;
   box-sizing: border-box;
-  border: 4px solid white;
+  border: 0.25rem solid white;
   background-color: white;
-  max-height: calc(100% - 16px);
+  max-height: calc(100% - 1rem);
   overflow: auto;
 }
 
@@ -464,6 +526,11 @@ ul.nucleus-control-panel-items button
 .nucleus-btn-page-back
 {
   display: none;
+}
+
+.control-panel-dock-top .nucleus-btn-page-back
+{
+  display: none !important;
 }
 
 .nucleus-admin-content .nucleus-index-wrapper

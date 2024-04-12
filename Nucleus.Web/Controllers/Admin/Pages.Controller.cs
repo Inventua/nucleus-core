@@ -94,7 +94,7 @@ namespace Nucleus.Web.Controllers.Admin
       }
       else
       {
-        roles.AddRange((await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId()))?.Roles);
+        roles.AddRange(user?.Roles);
       }
 
       viewModel.SearchResults = await this.PageManager.Search(this.Context.Site, viewModel.SearchTerm, roles, viewModel.SearchResults);
@@ -977,7 +977,7 @@ namespace Nucleus.Web.Controllers.Admin
       }
       catch (FileNotFoundException)
       {
-        systemFolder = await this.FileSystemManager.CreateFolder(this.Context.Site, key, "/", SYSTEM_FOLDER);
+        _ = await this.FileSystemManager.CreateFolder(this.Context.Site, key, "/", SYSTEM_FOLDER);
       }
 
       try

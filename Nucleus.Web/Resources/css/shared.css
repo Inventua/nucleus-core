@@ -55,6 +55,11 @@ body
 	overflow: auto;
 }
 
+body.control-panel-dock-top.nucleus-admin-frame-expanded 
+{
+  overflow:hidden;
+}
+
 @font-face 
 {
 	font-family: 'Material Icons';
@@ -78,7 +83,7 @@ body
 
 /* admin sidebar positioning.  These classes are in shared.css rather than admin.css because they control the iframe and placeholder, which belong */
 /* to the main display, admin.css is for elements within the admin iframe.  */
-.nucleus-admin-frame, .nucleus-admin-frame-placeholder
+.nucleus-admin-frame
 {
 	width: var(--control-panel-size);
 	height: 100%;
@@ -86,7 +91,29 @@ body
 
 .nucleus-admin-frame-placeholder
 {
+  width: calc(var(--control-panel-size) + 4px);
+	height: 100%;
+}
+
+.control-panel-dock-top .nucleus-admin-frame, .control-panel-dock-top .nucleus-admin-frame-placeholder
+{
+  height: var(--control-panel-size);
+  width: 100%;
+}
+
+.control-panel-dock-top .nucleus-admin-frame
+{
+  position: absolute; /*sticky;*/
+}
+
+.nucleus-admin-frame-placeholder
+{
 	float: left;
+}
+
+.control-panel-dock-top .nucleus-admin-frame-placeholder
+{
+  float: none;
 }
 
 .nucleus-admin-frame
@@ -96,15 +123,21 @@ body
 	top: 0;
 	left: 0;
 	border: 0;
-	z-index: 1040;
+	z-index: 1040;  
 	transition: none;  /* prevent transition on close */
 }
 
-.nucleus-admin-frame.nucleus-admin-frame-expanded
+.nucleus-admin-frame-expanded .nucleus-admin-frame
 {
 	width: 100%;
 	z-index: 10000;
 	transition: width linear .25s; /* show using transition on open */
+}
+
+.control-panel-dock-top.nucleus-admin-frame-expanded .nucleus-admin-frame
+{
+  height: 100%;
+	transition-property: height; /* show using transition on open */
 }
 
 .nucleus-modulesettings-frame

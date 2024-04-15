@@ -10,152 +10,158 @@
     var options = jQuery.extend({
       operationMode: null,
       rootSelector: 'body',
-      includeHeaders: ''
+      includeHeaders: '',
+      headingClass: ''
     }, conf);
 
-    var autoIdCounter = 0;
-
+    // private variables
+    let _autoIdCounter = 0;
+    let _headerElements;
 
     // private functions
-    function _addLevel(previousHeaderElement, pageLinkParentElement, headerElements, previousLevel, currentHeaderLevel)
+    function _getAllHeaders(element)
     {
-      var nextLevel = currentHeaderLevel + 1;
-      // Get headers that have been enabled in the settings.
-      //var headerArray = options.includeHeaders.split(',');
-      //var includeHeader = headerArray.filter((headers) => headers.toLowerCase().includes('h' + currentHeaderLevel)).length > 0;
+      this._headerElements = element.children().find(':header');
+      var previousHeaderIndex = 10;
+      var listElement = jQuery('<ol></ol>'); //wrapper used to add to DOM.
+      var parentElement = listElement;
 
-      jQuery.each(headerElements, function (index, element)
+      if (this._headerElements.length > 0)
       {
-        var headerElement = jQuery(element);
-
-        //if (includeHeader && (currentHeaderLevel === 1 || headerElement.prevAll('h' + previousLevel).first().is(previousHeaderElement)))
-        //if (includeHeader) 
-        //{
-        autoIdCounter++;
-        var elementId = headerElement.attr('id');
-
-        if (typeof elementId === 'undefined')
+        jQuery.each(this._headerElements, function (index)
         {
-          elementId = 'pageLink' + autoIdCounter;
-          headerElement.attr('id', elementId);
-        }
+          var headerIndex = parseInt(this.nodeName.substring(1), 10);
 
-        var relativeUrl = new URL(window.location.href);
-        relativeUrl.hash = '#' + elementId;
-
-        var linkText = linkText = headerElement.attr('data-title');
-        if (typeof linkText === 'undefined')
-        {
-          linkText = headerElement.text();
-        }
-
-        if (linkText !== '')
-        {
-          //var linkElement = jQuery('<li><a href="' + relativeUrl.toString() + '">' + linkText + '</a></li>');
-
-          var linkElement;
-          linkElement = jQuery('<li><a href="' + relativeUrl.toString() + '">' + linkText + '</a></li>');
-          //if (includeHeader.length > 0)
-          //{
-          //  linkElement = jQuery('<li><a href="' + relativeUrl.toString() + '">' + linkText + '</a></li>');
-          //}
-          //else
-          //{
-          //  linkElement = jQuery('<li></li>');
-          //}
-
-          if (currentHeaderLevel < 6)
+          if (_isHeaderValid(this))
           {
-            _addPageLink(headerElement, linkElement, currentHeaderLevel, nextLevel);
+            var pageLinkItem = jQuery('<ol></ol>').append(_getPageLink(jQuery(this)));
+
+            var parentListItem = _getParentListItem(parentElement, jQuery(this), headerIndex);
+            if (parentListItem !== null)
+            {
+              listElement.find(parentListItem).append(pageLinkItem);
+            }
+            else
+            {
+              listElement.append(pageLinkItem);
+            }
           }
-          pageLinkParentElement.append(linkElement);
-
-        }
-        //}
-      });
-
-      // Handle cases where the content has skipped a header level (for example H2 ... H4)
-      if (headerElements.length === 0 && currentHeaderLevel < 6)
-      {
-        var linkElement = jQuery('<li></li>');
-        pageLinkParentElement.append(linkElement);
-        _addPageLink(previousHeaderElement, linkElement, previousLevel, nextLevel);
-      }
-    }
-
-    function _getChildren(element, elementLevel, nextLevel)
-    {
-      var selector = 'h' + elementLevel + ',' + 'h' + nextLevel;
-      var childElements = element.parent().find(selector);
-      var results = [];
-      var thisElementFound = false;
-      for (var count = 0; count < childElements.length; count++) 
-      {
-        var item = jQuery(childElements[count]);
-
-        if (item.is(element))
-        {
-          thisElementFound = true;
-        }
-        else if (thisElementFound)
-        {
-          if (item.is('h' + elementLevel)) break;
-          results[results.length] = item;
-        }
+          previousHeaderIndex = headerIndex;
+        });
       }
 
-      return results;
+      // remove the original <ol></ol> wrapper
+      listElement.children('ol').children().unwrap();
+
+      return listElement;
     }
 
-    function _addPageLink(headerElement, linkElement, headerLevel, nextLevel)
+    function _getParentListItem(listElement, element, headerLevel)
     {
-      var selectedHeaderArray = options.includeHeaders.split(',');
-      var doIncludeHeader = selectedHeaderArray.filter((headers) => headers.toLowerCase().includes('h' + nextLevel)).length > 0;
+      var parentListItem = null;
 
-      var pageLinkParentElement = jQuery('<ol></ol>');
-      var childElements;
-
-      if (doIncludeHeader)
+      if (this._headerElements[0] === element)
       {
-        childElements = _getChildren(headerElement, headerLevel, nextLevel);// headerElement.siblings('h' + nextLevel);
+        return null;
       }
       else
       {
-        childElements = [];
+        // copy the preceding elements into another array and reverse
+        var reverseArray = jQuery(this._headerElements.slice(0, this._headerElements.index(jQuery(element)) + 1)).get().reverse();
+
+        // loop through the array until we find the first parent header
+        jQuery(reverseArray).each(function (index)
+        {
+          let headerIndex = parseInt(this.nodeName.substring(1), 10);
+
+          if (_isHeaderValid(this))
+          {
+            if (headerIndex < headerLevel)
+            {
+              // found nearest parent
+              let elementId = jQuery(this).prop('id');
+
+              let relativeUrl = new URL(window.location.href);
+              relativeUrl.hash = '#' + elementId;
+
+              parentListItem = jQuery(listElement).closest('ol').find('a[href*="' + relativeUrl.toString() + '"]').parent();
+              return false;
+            }
+          }
+        });
       }
 
-      _addLevel(headerElement, pageLinkParentElement, childElements, headerLevel, nextLevel);
+      return parentListItem;
+    }
 
-      if (pageLinkParentElement.children().length !== 0)
+    function _setHeaderElementId(element)
+    {
+      var headerElement = jQuery(element);
+      var elementId = headerElement.prop('id');
+
+      if (elementId === '')
       {
-        //if (headerElement.children().length === 0)
-        //{
-        //  var wrapperListItem = jQuery('<li></li>');
-        //  wrapperListItem.append(pageLinkParentElement);
-        //  linkElement.append(wrapperListItem);
-        //}
-        //else
-        //{
-          linkElement.append(pageLinkParentElement);
-        //}
+        var elementId = headerElement
+          .text()
+          .replace(/\s/, '-')
+          .replace(/[^A-Za-z0-9]/g, '')
+          .toLowerCase();
+
+        if (jQuery('#' + elementId).length !== 0)
+        {
+          do
+          {
+            _autoIdCounter++;
+            elementId = 'pageLink' + _autoIdCounter;
+          } while (jQuery('#' + elementId).length !== 0);
+        }
+      } 
+
+      headerElement.prop('id', elementId);
+
+      return elementId;
+    }
+
+    function _getPageLink(element)
+    {
+      var elementId = _setHeaderElementId(element);
+
+      var relativeUrl = new URL(window.location.href);
+      relativeUrl.hash = '#' + elementId;
+
+      var linkText = jQuery(element).prop('data-title');
+      if (typeof linkText === 'undefined')
+      {
+        linkText = jQuery(element).text();
+      }
+
+      return jQuery('<li><a href="' + relativeUrl.toString() + '">' + linkText + '</a></li>');
+    }
+
+    function _isHeaderValid(element)
+    {
+      let headerArray = options.includeHeaders.split(',');
+      let headerIndex = parseInt(element.nodeName.substring(1), 10);
+      let includeHeader = headerArray.filter((headers) => headers.toLowerCase().includes('h' + headerIndex)).length > 0;
+
+      if (includeHeader)
+      {
+        if (options.headingClass.length === 0) return true;
+
+        return jQuery(element).hasClass(options.headingClass);
+      }
+      else
+      {
+        return false;
       }
     }
 
-
-
     return this.each(function ()
     {
-      var listElement = jQuery('<ol></ol>');
-
       if (options.operationMode === 'Automatic' && options.rootSelector.length > 0)
       {
-        var childElements = jQuery(options.rootSelector).find('h1');
-
-        //if (childElements.length !== 0)
-        //{
-        _addLevel(options.rootSelector, listElement, childElements, -1, 1);
+        let listElement = _getAllHeaders(jQuery(options.rootSelector));
         jQuery('.PageLinks').append(listElement);
-        //}
       }
     });
   };

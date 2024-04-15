@@ -222,7 +222,10 @@ namespace Nucleus.Modules.Search.Controllers
 				searchQuery.ExcludedScopes.Add(Abstractions.Models.FileSystem.File.URN);
 			}
 
-			if (!String.IsNullOrEmpty(includeScopes))
+      // folders are never included in a standard search
+      searchQuery.ExcludedScopes.Add(Abstractions.Models.FileSystem.Folder.URN);      
+
+      if (!String.IsNullOrEmpty(includeScopes))
 			{
 				// allow \n delimiter when the included scopes are entered in the settings page and ';' delimiter for when the Html Helper
 				// or tag helper is being used.

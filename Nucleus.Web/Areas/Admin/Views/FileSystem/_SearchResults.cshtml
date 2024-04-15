@@ -1,0 +1,42 @@
+﻿@model Nucleus.Web.ViewModels.Admin.FileSystemSearchResults
+<h2 class="nucleus-modal-caption">Search Results</h2>
+@using (Html.BeginAreaForm("Search", "FileSystem", "Admin", FormMethod.Post, new { @class = "", @data_target = "#filesystem-search-results", @enctype = "multipart/form-data" }))
+{
+  @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.PagingSettings, propertyName = nameof(Model.PagingSettings) })
+
+  <div class="overflow-auto">
+    <table class="nucleus-file-system-table table table-sm table-sticky-headers">
+      <thead>
+        <tr>
+          <th class="file-name">Name</th>
+          <th class="file-type">Type</th>
+          <th class="file-modified-date">Modified Date</th>
+          <th class="file-size">Size</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach (var searchResult in Model.Results.Results)
+        {
+          <tr>
+            <td>
+              <label>
+                @if (searchResult.Scope == Nucleus.Abstractions.Models.FileSystem.Folder.URN)
+                {
+                  @Html.AreaActionLink(searchResult.Title, "Index", "FileSystem", "Admin", new { folderId = @searchResult.SourceId }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
+                }
+                else if (searchResult.Scope == Nucleus.Abstractions.Models.FileSystem.File.URN)
+                {
+                  @Html.AreaActionLink(searchResult.Title, "SelectFile", "FileSystem", "Admin", new { fileId = @searchResult.SourceId }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
+                }
+              </label>
+            </td>
+            <td>@searchResult.Type</td>
+            <td>@searchResult.PublishedDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+            <td>@searchResult.Size.FormatFileSize()</td>
+          </tr>
+        }
+
+      </tbody>
+    </table>
+  </div>
+}  

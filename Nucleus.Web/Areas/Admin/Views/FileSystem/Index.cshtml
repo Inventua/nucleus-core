@@ -10,28 +10,36 @@
 
   @using (Html.BeginAreaForm("Navigate", "FileSystem", "Admin", FormMethod.Post, new { @class = "d-flex flex-column overflow-auto", @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
   {
-    <div class="nucleus-form-buttonrow nucleus-show-progress nucleus-show-progress-inside">
-      <RemoveWhiteSpace>
-        @Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control ms-1" })
-        <span>
-          @foreach (var ancestor in Model.Ancestors)
-          {
-            @if (ancestor != Model.Ancestors.First())
+    <div class="nucleus-form-buttonrow d-flex">
+      <div class="nucleus-show-progress nucleus-show-progress-inside">
+        <RemoveWhiteSpace>
+          @Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control ms-1" })
+          <span>
+            @foreach (var ancestor in Model.Ancestors)
             {
-              <text>&nbsp;/&nbsp;</text>
-              @Html.AreaActionLink(ancestor.Name, "Index", "FileSystem", "Admin", new { folderId = ancestor.Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
+              @if (ancestor != Model.Ancestors.First())
+              {
+                <text>&nbsp;/&nbsp;</text>
+                @Html.AreaActionLink(ancestor.Name, "Index", "FileSystem", "Admin", new { folderId = ancestor.Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
+              }
+              else
+              {
+                <text>&nbsp;</text>
+                <a title="Top level" href="@Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = ancestor.Id })" class="btn btn-sm btn-outline-primary me-1 NavigateLink nucleus-show-progress nucleus-show-progress-after nucleus-material-icon" data-target=".nucleus-adminpage">
+                  &#xe2c7;
+                </a>
+              }
             }
-            else
-            {
-              <text>&nbsp;</text>
-              <a title="Top level" href="@Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = ancestor.Id })" class="btn btn-sm btn-outline-primary me-1 NavigateLink nucleus-show-progress nucleus-show-progress-after nucleus-material-icon" data-target=".nucleus-adminpage">
-                &#xe2c7;
-              </a>
-            }
-          }
-        </span>
-      </RemoveWhiteSpace>
+          </span>
+        </RemoveWhiteSpace>
+      </div>
+
+      <div class="d-flex align-items-center ms-auto">
+        @Html.TextBoxFor(model => model.SearchTerm, new { @class = "" })
+        @Html.SubmitButton("", "Search", @Url.AreaAction("Search", "FileSystem", "Admin"), new { @data_target = "#filesystem-search-results", @class = "btn btn-primary btn-sm ms-2" })
+      </div>
     </div>
+
     @Html.HiddenFor(model => model.Folder.Id)
 
     <div class="nucleus-form-toolbar">
@@ -87,6 +95,7 @@
         @Html.SubmitButton("", "Rename", @Url.AreaAction("ShowRenameDialog", "FileSystem", "Admin"), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary btn-sm" })
       }
       @Html.SubmitButton("&#xe897;", "Folder Settings", @Url.AreaAction("EditFolderSettings", "FileSystem", "Admin", new { folderId = Model.Folder.Id }), new { @data_target = "#nucleus-popupdialog .modal-body", @class = "btn btn-secondary btn-sm" })
+
       @if (Model.Folder.Capabilities.CanStoreFiles)
       {
         <div class="files-droptarget ms-auto border rounded border-1 border-dark d-flex align-items-center fs-small px-2">
@@ -113,67 +122,81 @@
       <div class="overflow-auto">
         <table class="nucleus-file-system-table table table-sm table-sticky-headers">
           <thead>
-          <tr>
-            <th class="ps-0"><button type="button" class="nucleus-toggle-selections btn btn-none fs-5 me-1 shadow-none nucleus-material-icon">&#xe146;</button>Name</th>
-            <th class="file-type">Type</th>
-            <th class="file-modified-date">Modified Date</th>
-            <th class="file-size">Size</th>
-            <th class="file-dimensions">Dimensions</th>
-          </tr>
+            <tr>
+              <th class="ps-0"><button type="button" class="nucleus-toggle-selections btn btn-none fs-5 me-1 shadow-none nucleus-material-icon">&#xe146;</button>Name</th>
+              <th class="file-type">Type</th>
+              <th class="file-modified-date">Modified Date</th>
+              <th class="file-size">Size</th>
+              <th class="file-dimensions">Dimensions</th>
+            </tr>
           </thead>
           <tbody>
-          @for (var folderCount = 0; folderCount < Model.Folders.Count; folderCount++)
-          {
-            <tr>
-              <td>
-                <label>
-                  @if (Model.Folders[folderCount].Capabilities.CanRename || Model.Folders[folderCount].Capabilities.CanDelete)
-                  {
-                    @Html.CheckBoxFor(model => Model.Folders[folderCount].IsSelected, new { @class = "nucleus-filesystem-folderselector" })
-                  }
-                  @Html.HiddenFor(model => Model.Folders[folderCount].Id)
-                  @Html.AreaActionLink(Model.Folders[folderCount].Name, "Index", "FileSystem", "Admin", new { folderId = @Model.Folders[folderCount].Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
-                </label>
-              </td>
-              <td>Folder</td>
-              <td>@Model.Folders[folderCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-              <td />
-              <td />
-            </tr>
-          }
+            @for (var folderCount = 0; folderCount < Model.Folders.Count; folderCount++)
+            {
+              <tr>
+                <td>
+                  <label>
+                    @if (Model.Folders[folderCount].Capabilities.CanRename || Model.Folders[folderCount].Capabilities.CanDelete)
+                    {
+                      @Html.CheckBoxFor(model => Model.Folders[folderCount].IsSelected, new { @class = "nucleus-filesystem-folderselector" })
+                    }
+                    @Html.HiddenFor(model => Model.Folders[folderCount].Id)
+                    @Html.AreaActionLink(Model.Folders[folderCount].Name, "Index", "FileSystem", "Admin", new { folderId = @Model.Folders[folderCount].Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
+                  </label>
+                </td>
+                <td>Folder</td>
+                <td>@Model.Folders[folderCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+                <td />
+                <td />
+              </tr>
+            }
 
-          @for (var fileCount = 0; fileCount < Model.Files.Count; fileCount++)
-          {
-            var isRecent = Math.Abs(Model.Files[fileCount].DateModified.Subtract(DateTime.UtcNow).TotalMinutes) < 5;
-            <tr>
-              <td class="@(isRecent ? "fw-bold" : "")">
-                <label>
-                  @Html.CheckBoxFor(model => Model.Files[fileCount].IsSelected, new { @class = "nucleus-filesystem-fileselector" })
-                  @Model.Files[fileCount].Name
-                  @Html.HiddenFor(model => Model.Files[fileCount].Id)
-                </label>
-              </td>
-              <td>File</td>
-              <td class="Date@(isRecent ? " fw-bold" : "")">@Model.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-              <td>@Model.Files[fileCount].Size.FormatFileSize()</td>
-              <td>
-                @if (Model.Files[fileCount].Width > 0 && Model.Files[fileCount].Height > 0)
-                {
-                  @($"{Model.Files[fileCount].Width} x {Model.Files[fileCount].Height}")
-                }
-              </td>
-            </tr>
-          }
+            @for (var fileCount = 0; fileCount < Model.Files.Count; fileCount++)
+            {
+              var isRecent = Math.Abs(Model.Files[fileCount].DateModified.Subtract(DateTime.UtcNow).TotalMinutes) < 5;              
+              <tr>
+                <td class="@(isRecent ? "fw-bold" : "")@(Model.SelectedFileId == Model.Files[fileCount].Id ? "fw-bold text-primary selected-file" : "")">
+                  <label>
+                    @Html.CheckBoxFor(model => Model.Files[fileCount].IsSelected, new { @class = "nucleus-filesystem-fileselector" })
+                    @Model.Files[fileCount].Name
+                    @Html.HiddenFor(model => Model.Files[fileCount].Id)
+                  </label>
+                </td>
+                <td>File</td>
+                <td class="Date@(isRecent ? " fw-bold" : "")">@Model.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+                <td>@Model.Files[fileCount].Size.FormatFileSize()</td>
+                <td>
+                  @if (Model.Files[fileCount].Width > 0 && Model.Files[fileCount].Height > 0)
+                  {
+                    @($"{Model.Files[fileCount].Width} x {Model.Files[fileCount].Height}")
+                  }
+                </td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
     }
   }
+
+  <Modal id="filesystem-search-results"></Modal>
 </div>
 
 <script>
   jQuery(function ()
   {
+    if ('@Model.SelectedFileId' !== '@Guid.Empty')
+    {
+      var selectedFileElement = jQuery('.selected-file');
+      if (selectedFileElement.length !== 0)
+      {
+        window.setTimeout(function ()
+        {
+          selectedFileElement[0].scrollIntoView({ block: "center", inline: "nearest" });
+        }, 100);
+      }
+    }
+
     jQuery('.providerKey').on('change', function (event)
     {
       var newEvent = jQuery.Event('submit', { originalEvent: event });
@@ -242,15 +265,15 @@
       _cancelProgress();
       jQuery('.nucleus-file-system-manager .nucleus-progress-spinner').remove();
     });
-  
+
     function _cancelProgress()
     {
       if (typeof _progressTimeoutId === 'undefined') return;
       window.clearTimeout(_progressTimeoutId);
-      _progressTimeoutId=-1;
+      _progressTimeoutId = -1;
     }
   });
 
-  
+
 
 </script>

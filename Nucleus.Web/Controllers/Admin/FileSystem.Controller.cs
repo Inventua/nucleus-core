@@ -19,6 +19,7 @@ using Microsoft.Extensions.Options;
 using Nucleus.Extensions.Authorization;
 using Nucleus.Abstractions.Models.Extensions;
 using Nucleus.Abstractions.Models.Paging;
+using Nucleus.Abstractions.Search;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -32,14 +33,19 @@ namespace Nucleus.Web.Controllers.Admin
 		private Context Context { get; }
 		private IFileSystemManager FileSystemManager { get; }
 		private IRoleManager RoleManager { get; }
-		private FileSystemProviderFactoryOptions FileSystemOptions { get; }
-    public FileSystemController(ILogger<FileSystemController> Logger, Context Context, IOptions<FileSystemProviderFactoryOptions> fileSystemOptions, IRoleManager roleManager, IFileSystemManager fileSystemManager)
+    private IUserManager UserManager { get; }
+    private FileSystemProviderFactoryOptions FileSystemOptions { get; }
+    private IEnumerable<ISearchProvider> SearchProviders { get; }
+
+    public FileSystemController(ILogger<FileSystemController> Logger, Context Context, IEnumerable<ISearchProvider> searchProviders, IOptions<FileSystemProviderFactoryOptions> fileSystemOptions, IUserManager userManager, IRoleManager roleManager, IFileSystemManager fileSystemManager)
 		{
 			this.Logger = Logger;
 			this.Context = Context;
 			this.FileSystemOptions = fileSystemOptions.Value;
+      this.UserManager = userManager;
 			this.RoleManager = roleManager;
 			this.FileSystemManager = fileSystemManager;
+      this.SearchProviders = searchProviders;
 		}
 
 		/// <summary>
@@ -57,17 +63,30 @@ namespace Nucleus.Web.Controllers.Admin
 				_ = Guid.TryParse(ControllerContext.HttpContext.Request.Cookies["nucleus-current-folder"], out folderId);
 			}
 
-			return await Navigate(new(), folderId);
+			return await Navigate(new(), folderId, Guid.Empty);
 		}
 
-		/// <summary>
-		/// Handle subsequent folder navigation.
-		/// </summary>
+    /// <summary>
+		/// Display the selected file's folder, with the file highlighted.
+		/// </summary>		
 		/// <remarks>
-		/// This action DOES NOT check for a "current folder cookie".
-		/// </remarks>		
-		[HttpPost]
-		public async Task<ActionResult> Navigate(ViewModels.Admin.FileSystem viewModel, Guid folderId)
+		/// This action checks for a "current folder cookie".
+		/// </remarks>
+		[HttpGet]
+    public async Task<ActionResult> SelectFile(Guid fileId)
+    {
+      File file = await this.FileSystemManager.GetFile(this.Context.Site, fileId);
+      return await Navigate(new(), file.Parent.Id, fileId); 
+    }
+
+    /// <summary>
+    /// Handle subsequent folder navigation.
+    /// </summary>
+    /// <remarks>
+    /// This action DOES NOT check for a "current folder cookie".
+    /// </remarks>		
+    [HttpPost]
+		public async Task<ActionResult> Navigate(ViewModels.Admin.FileSystem viewModel, Guid folderId, Guid fileId)
 		{
 			Folder folder;
 
@@ -99,18 +118,60 @@ namespace Nucleus.Web.Controllers.Admin
 				}
 			}
 
-			viewModel = await BuildViewModel(viewModel, folder);
+			viewModel = await BuildViewModel(viewModel, folder, fileId);
 
 			return View("Index", viewModel);
 		}
 
-		/// <summary>
-		/// Display the Create Folder dialog
-		/// </summary>
-		/// <param name="viewModel"></param>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		[HttpGet]
+    [HttpPost]
+    public async Task<ActionResult> Search(ViewModels.Admin.FileSystemSearchResults viewModel)
+    {
+      if (!String.IsNullOrEmpty(viewModel.SearchTerm))
+      {
+        ISearchProvider searchProvider = null;
+
+        searchProvider = this.SearchProviders.FirstOrDefault();
+        
+        if (searchProvider == null)
+        {
+          throw new InvalidOperationException("There is no search provider selected.");
+        }
+                
+        // we have to keep re-populating the page sizes, because they aren't the default, and available page sizes aren't sent back in the response
+        viewModel.PagingSettings.PageSizes = new() { 250, 500 };
+        
+        viewModel.Results = await searchProvider.Search(await BuildSearchQuery(viewModel.SearchTerm, viewModel.PagingSettings));
+
+        // add the path to file titles
+        foreach (SearchResult searchResult in viewModel.Results.Results)
+        {
+          if (searchResult.Scope == Nucleus.Abstractions.Models.FileSystem.File.URN)
+          {
+            try
+            {
+              File file = await this.FileSystemManager.GetFile(this.Context.Site, searchResult.SourceId.Value);
+              searchResult.Title = $"{searchResult.Title} [{file.Parent.Provider}/{file.Parent.Path}]";
+            }
+            catch (System.IO.FileNotFoundException) 
+            { 
+              // suppress exception
+            }
+          }
+        }
+
+        viewModel.PagingSettings.TotalCount = Convert.ToInt32(viewModel.Results.Total);
+      }
+
+      return View("_SearchResults", viewModel);
+    }
+
+    /// <summary>
+    /// Display the Create Folder dialog
+    /// </summary>
+    /// <param name="viewModel"></param>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    [HttpGet]
 		public async Task<ActionResult> ShowCreateFolderDialog(Guid folderId)
 		{
 			return View("CreateFolder", await BuildCreateFolderViewModel(new Folder() { Id = folderId }));
@@ -169,8 +230,7 @@ namespace Nucleus.Web.Controllers.Admin
 			await this.FileSystemManager.SaveFolder(this.Context.Site, folder);
 			await this.FileSystemManager.SaveFolderPermissions(this.Context.Site, folder);
 
-      return await Navigate(new(), viewModel.Folder.Id);
-      //return Ok();
+      return await Navigate(new(), viewModel.Folder.Id, Guid.Empty);
     }
 
 		/// <summary>
@@ -185,7 +245,7 @@ namespace Nucleus.Web.Controllers.Admin
 			Folder parentFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Folder.Id);
 			Folder newFolder = await this.FileSystemManager.CreateFolder(this.Context.Site, parentFolder.Provider, parentFolder.Path, viewModel.NewFolder);
 
-			return View("Index", await BuildViewModel(new ViewModels.Admin.FileSystem(), newFolder));
+			return View("Index", await BuildViewModel(new ViewModels.Admin.FileSystem(), newFolder, Guid.Empty));
 		}
 
 		[HttpPost]
@@ -332,7 +392,7 @@ namespace Nucleus.Web.Controllers.Admin
 				}
 			}
 
-			return View("Index", await BuildViewModel(new ViewModels.Admin.FileSystem() { SelectedProviderKey = viewModel.Folder.Provider }, viewModel.Folder));
+			return View("Index", await BuildViewModel(new ViewModels.Admin.FileSystem() { SelectedProviderKey = viewModel.Folder.Provider }, viewModel.Folder, Guid.Empty));
 		}
 
 		[HttpPost]
@@ -402,7 +462,7 @@ namespace Nucleus.Web.Controllers.Admin
 				await this.FileSystemManager.RenameFolder(this.Context.Site, existing as Folder, viewModel.SelectedItem.Name);
 			}
 
-			viewModel = await BuildViewModel(viewModel, viewModel.Folder);
+			viewModel = await BuildViewModel(viewModel, viewModel.Folder, viewModel.SelectedItem.Id);
 
 			return View("Index", viewModel);
 		}
@@ -410,6 +470,8 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> UploadFile(ViewModels.Admin.FileSystem viewModel, [FromForm] List<IFormFile> mediaFiles)
 		{
+      File uploadedFile = null;
+
 			viewModel.Folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Folder.Id);
 
 			foreach (IFormFile file in mediaFiles)
@@ -418,7 +480,7 @@ namespace Nucleus.Web.Controllers.Admin
 				{
 					using (System.IO.Stream fileStream = file.OpenReadStream())
 					{
-						await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedProviderKey, viewModel.Folder.Path, file.FileName, fileStream, true);
+						uploadedFile = await this.FileSystemManager.SaveFile(this.Context.Site, viewModel.SelectedProviderKey, viewModel.Folder.Path, file.FileName, fileStream, true);
 					}
 				}
 				else
@@ -427,7 +489,7 @@ namespace Nucleus.Web.Controllers.Admin
 				}
 			}
 
-			viewModel = await BuildViewModel(viewModel, viewModel.Folder);
+			viewModel = await BuildViewModel(viewModel, viewModel.Folder, uploadedFile?.Id ?? Guid.Empty);
 
 			return View("Index", viewModel);
 		}
@@ -476,7 +538,7 @@ namespace Nucleus.Web.Controllers.Admin
 				return BadRequest();
 			}
 
-			viewModel = await BuildViewModel(viewModel, viewModel.Folder);
+			viewModel = await BuildViewModel(viewModel, viewModel.Folder, Guid.Empty);
 
 			return View("Index", viewModel);
 		}
@@ -560,12 +622,13 @@ namespace Nucleus.Web.Controllers.Admin
 			}
 		}
 
-		private async Task<ViewModels.Admin.FileSystem> BuildViewModel(ViewModels.Admin.FileSystem input, Folder folder)
+		private async Task<ViewModels.Admin.FileSystem> BuildViewModel(ViewModels.Admin.FileSystem input, Folder folder, Guid fileId)
 		{
 			ViewModels.Admin.FileSystem viewModel = new()
 			{
 				SelectedProviderKey = input?.SelectedProviderKey ?? folder?.Provider,
-				Providers = this.FileSystemManager.ListProviders()
+				Providers = this.FileSystemManager.ListProviders(),
+        SelectedFileId = fileId
 			};
 
 			if (String.IsNullOrEmpty(viewModel.SelectedProviderKey))
@@ -735,5 +798,37 @@ namespace Nucleus.Web.Controllers.Admin
 
 			return viewModel;
 		}
-	}
+
+    private async Task<SearchQuery> BuildSearchQuery(string searchTerm, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+    {
+      SearchQuery searchQuery = new()
+      {
+        Site = this.Context.Site,
+        SearchTerm = searchTerm,
+        PagingSettings = pagingSettings
+      };
+
+      List<Role> roles = new() { this.Context.Site.AllUsersRole };
+
+      if (HttpContext.User.IsSiteAdmin(this.Context.Site))
+      {
+        roles = null;  // roles=null means don't filter results by role
+      }
+      else if (HttpContext.User.IsAnonymous())
+      {
+        roles.Add(this.Context.Site.AnonymousUsersRole);
+      }
+      else
+      {
+        roles.AddRange((await this.UserManager.Get(this.Context.Site, HttpContext.User.GetUserId()))?.Roles);
+      }
+
+      searchQuery.Roles = roles;
+
+      searchQuery.IncludedScopes = new List<string>() { Abstractions.Models.FileSystem.Folder.URN, Abstractions.Models.FileSystem.File.URN };
+      
+      return searchQuery;
+    }
+
+  }
 }

@@ -46,11 +46,10 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.4.0-pre-alpha2.7" />
-		<PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="1.1.0" />
-		<PackageReference Include="Inventua.Nucleus.Extensions" Version="1.4.0-pre-alpha2.7" />
-		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.0.1.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.24" />
+		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.4.0-pre-alpha2.8" />
+		<PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="1.4.0-pre-alpha2.8" />
+		<PackageReference Include="Inventua.Nucleus.Extensions" Version="1.4.0-pre-alpha2.8" />
+		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.4.0-pre-alpha2.8" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

@@ -56,8 +56,8 @@
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.1" />
 		<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.2.0" />
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.2.0" />
-		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.2.0" />
+		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.4.0-pre-alpha2.8" />
+		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.4.0-pre-alpha2.8" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

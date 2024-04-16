@@ -143,17 +143,25 @@
       let headerArray = options.includeHeaders.split(',');
       let headerIndex = parseInt(element.nodeName.substring(1), 10);
       let includeHeader = headerArray.filter((headers) => headers.toLowerCase().includes('h' + headerIndex)).length > 0;
+      let headingClassArray = options.headingClass.split(',');
 
       if (includeHeader)
       {
         if (options.headingClass.length === 0) return true;
 
-        return jQuery(element).hasClass(options.headingClass);
+        for (let index = 0; index < headingClassArray.length; index++)
+        {
+          if (jQuery(element).hasClass(headingClassArray[index].trim())) return true;
+        }
+
+        //return jQuery(element).hasClass(options.headingClass);
       }
-      else
-      {
-        return false;
-      }
+      //else
+      //{
+      //  return false;
+      //}
+
+      return false;
     }
 
     return this.each(function ()

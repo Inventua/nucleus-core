@@ -11,7 +11,7 @@ are generated based on the settings.
 |                               |                                                                                      |
 |-------------------------------|--------------------------------------------------------------------------------------|
 | Mode                          | Select Automatic or Manual mode.  |
-| Heading Css Class             | Detect headers that have the specified css class. Automatic mode only.  |
+| Heading Css Class             | Include only header elements which have one or more of the specified css classes, separate multiple classes with a comma. Automatic mode only.  |
 | jQuery Selector for Body/Root | jQuery Selector as the root used to detect headers. Automatic mode only.  |
 | Headers Included              | Select the type of headers to be included.  Automatic mode only |
 

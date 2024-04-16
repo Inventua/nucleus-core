@@ -21,17 +21,20 @@
 
   <ItemGroup>
     <None Remove="Containers\centered.cshtml" />
+    <None Remove="Containers\centered.css" />
     <None Remove="Containers\centered.md" />
     <None Remove="Containers\centered.png" />
     <None Remove="Containers\no-container.cshtml" />
     <None Remove="Containers\no-container.md" />
     <None Remove="Containers\no-container.png" />
     <None Remove="Containers\no-title.cshtml" />
+    <None Remove="Containers\no-title.css" />
     <None Remove="Containers\no-title.md" />
     <None Remove="Containers\no-title.png" />
     <None Remove="Layouts\centered-cell.cshtml" />
     <None Remove="Layouts\centered-cell.css" />
     <None Remove="Layouts\centered-cell.md" />
+    <None Remove="Layouts\centered-cell.min.css" />
     <None Remove="Layouts\centered-cell.png" />
     <None Remove="Layouts\fixed-2-column - Copy.min.css" />
     <None Remove="Layouts\fixed-2-column.md" />
@@ -47,6 +50,7 @@
     <None Remove="Layouts\landing.cshtml" />
     <None Remove="Layouts\landing.css" />
     <None Remove="Layouts\landing.md" />
+    <None Remove="Layouts\landing.min.css" />
     <None Remove="Layouts\landing.png" />
     <None Remove="Layouts\simple.cshtml" />
     <None Remove="Layouts\simple.css" />
@@ -64,6 +68,8 @@
     </Content>
     <Content Include="Containers\centered.md" />
     <Content Include="Containers\centered.png" />
+    <Content Include="Containers\centered.css" />
+    <Content Include="Containers\no-title.css" />
     <Content Include="Containers\no-title.md" />
     <Content Include="Containers\no-container.md" />
     <Content Include="Containers\no-container.cshtml">
@@ -76,6 +82,8 @@
     </Content>
     <Content Include="Containers\no-container.png" />
     <Content Include="Containers\no-title.png" />
+    <Content Include="Layouts\centered-cell.min.css" />
+    <Content Include="Layouts\landing.min.css" />
     <Content Include="Layouts\landing.png" />
     <Content Include="Layouts\landing.md" />
     <Content Include="Layouts\landing.css" />

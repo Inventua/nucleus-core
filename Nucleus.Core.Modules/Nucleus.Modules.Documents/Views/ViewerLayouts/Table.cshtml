@@ -4,81 +4,79 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Documents.ViewModels
 @using Nucleus.Modules.Documents.HtmlHelpers
-@Html.AddStyle("~!/Table.css")
-<div class="Documents">
-  <table class="table table-striped table-sm">
-    <thead>
-      <tr>
-        @if (Model.AllowSorting)
+@* @Html.AddStyle("~!/Table.css") *@
+<table class="table table-striped table-sm documents">
+  <thead>
+    <tr>
+      @if (Model.AllowSorting)
+      {
+        <th>@Html.LinkButton("", "Title", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Title)}&descending={!Model.SortDescending || Model.SortKey != nameof(Viewer.DocumentInfo.Title)}", false, new { data_target = ".Documents.parent()" })</th>
+        @if (Model.ShowCategory)
         {
-          <th>@Html.LinkButton("", "Title", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Title)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Title)}", false, new { data_target = ".Documents.parent()" })</th>
-          @if (Model.ShowCategory)
-          {
-            <th>@Html.LinkButton("", "Category", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Category)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Category)}", false, new { data_target = ".Documents.parent()" })</th>
-          }
-          @if (Model.ShowModifiedDate)
-          {
-            <th>@Html.LinkButton("", "Modified Date", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.ModifiedDate)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.ModifiedDate)}", false, new { data_target = ".Documents.parent()" })</th>
-          }
-          @if (Model.ShowSize)
-          {
-            <th>@Html.LinkButton("", "Size", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Size)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Size)}", false, new { data_target = ".Documents.parent()" })</th>
-          }
-          @if (Model.ShowDescription)
-          {
-            <th>@Html.LinkButton("", "Description", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Description)}&descending={!Model.SortDescending || Model.SortKey!=nameof(Viewer.DocumentInfo.Description)}", false, new { data_target = ".Documents.parent()" })</th>
-          }
+          <th>@Html.LinkButton("", "Category", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Category)}&descending={!Model.SortDescending || Model.SortKey != nameof(Viewer.DocumentInfo.Category)}", false, new { data_target = ".Documents.parent()" })</th>
         }
-        else
+        @if (Model.ShowModifiedDate)
         {
-          <th>Title</th>
-          @if (Model.ShowCategory)
-          {
-            <th>Category</th>
-          }
-          @if (Model.ShowModifiedDate)
-          {
-            <th>Modified Date</th>
-          }
-          @if (Model.ShowSize)
-          {
-            <th>Size</th>
-          }
-          @if (Model.ShowDescription)
-          {
-            <th>Description</th>
-          }
+          <th>@Html.LinkButton("", "Modified Date", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.ModifiedDate)}&descending={!Model.SortDescending || Model.SortKey != nameof(Viewer.DocumentInfo.ModifiedDate)}", false, new { data_target = ".Documents.parent()" })</th>
+        }
+        @if (Model.ShowSize)
+        {
+          <th>@Html.LinkButton("", "Size", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Size)}&descending={!Model.SortDescending || Model.SortKey != nameof(Viewer.DocumentInfo.Size)}", false, new { data_target = ".Documents.parent()" })</th>
+        }
+        @if (Model.ShowDescription)
+        {
+          <th>@Html.LinkButton("", "Description", $"{Url.PageLink(Model.Page)}?sortkey={nameof(Viewer.DocumentInfo.Description)}&descending={!Model.SortDescending || Model.SortKey != nameof(Viewer.DocumentInfo.Description)}", false, new { data_target = ".Documents.parent()" })</th>
+        }
+      }
+      else
+      {
+        <th>Title</th>
+        @if (Model.ShowCategory)
+        {
+          <th>Category</th>
+        }
+        @if (Model.ShowModifiedDate)
+        {
+          <th>Modified Date</th>
+        }
+        @if (Model.ShowSize)
+        {
+          <th>Size</th>
+        }
+        @if (Model.ShowDescription)
+        {
+          <th>Description</th>
+        }
+      }
+    </tr>
+  </thead>
+  <tbody>
+    @for (int documentCount = 0; documentCount < Model.Documents.Count; documentCount++)
+    {
+      <tr>
+        <td>
+          @Html.AddEditingControls(Model.Documents[documentCount].Id)
+          <a href="@Url.FileLink(Model.Documents[documentCount].File)" alt="@Model.Documents[documentCount].Title" id="_@Model.Documents[documentCount].Id" inline-edit-route="@Url.NucleusAction("UpdateTitle", "Documents", "Documents", new { id = Model.Documents[documentCount].Id })">
+            @Model.Documents[documentCount].Title
+          </a>
+        </td>
+        @if (Model.ShowCategory)
+        {
+          <td>@Model.Documents[documentCount].Category?.Name</td>
+        }
+        @if (Model.ShowModifiedDate)
+        {
+          <td>@Model.Documents[documentCount].ModifiedDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+        }
+        @if (Model.ShowSize)
+        {
+          <td class="text-nowrap">@Model.Documents[documentCount].Size.FormatFileSize()</td>
+        }
+        @if (Model.ShowDescription)
+        {
+          <td><div inline-edit-route="@Url.NucleusAction("UpdateDescription", "Documents", "Documents", new { id = Model.Documents[documentCount].Id })">@Html.Raw(Model.Documents[documentCount].Description.ToHtml("text/plain"))</div></td>
         }
       </tr>
-    </thead>
-    <tbody>
-      @for (int documentCount = 0; documentCount < Model.Documents.Count; documentCount++)
-      {
-        <tr>
-          <td>
-            @Html.AddEditingControls(Model.Documents[documentCount].Id)
-            <a href="@Url.FileLink(Model.Documents[documentCount].File)" alt="@Model.Documents[documentCount].Title" id="_@Model.Documents[documentCount].Id" inline-edit-route="@Url.NucleusAction("UpdateTitle", "Documents", "Documents", new { id = Model.Documents[documentCount].Id })">
-              @Model.Documents[documentCount].Title
-            </a>
-          </td>
-          @if (Model.ShowCategory)
-          {
-            <td>@Model.Documents[documentCount].Category?.Name</td>
-          }
-          @if (Model.ShowModifiedDate)
-          {
-            <td>@Model.Documents[documentCount].ModifiedDate.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-          }
-          @if (Model.ShowSize)
-          {
-            <td class="text-nowrap">@Model.Documents[documentCount].Size.FormatFileSize()</td>
-          }
-          @if (Model.ShowDescription)
-          {
-            <td><div inline-edit-route="@Url.NucleusAction("UpdateDescription", "Documents", "Documents", new { id = Model.Documents[documentCount].Id })">@Html.Raw(Model.Documents[documentCount].Description.ToHtml("text/plain"))</div></td>
-          }
-        </tr>
-      }
-    </tbody>
-  </table>
-</div>
+    }
+  </tbody>
+</table>

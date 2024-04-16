@@ -3,7 +3,7 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.ContactUs.ViewModels
-@Html.AddStyle("~/Resources/css/forms.css")
+@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
 @if (Model.MessageSent)
 {
 	<div class="alert alert-info">Your message has been sent.</div>

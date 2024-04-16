@@ -1,61 +1,43 @@
-﻿.LayoutWrapper
+﻿.layout-centered-cell .ContentWrapper
 {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-}
-
-.BannerPane .banner-row
-{
-  display: flex;
-}
-
-.ContentWrapper
-{
-  display: flex;		
-	overflow: auto;
-	flex-direction: column;
   margin: auto;
 }
 
-.ContentWrapper > div
+.layout-centered-cell .ContentWrapper .top-row-wrapper
 {
-  display: flex;		
-	flex-direction: row;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
 }
 
-.ContentPane
+.layout-centered-cell .ContentPane
 {
-	display: flex;
-	flex-direction: column;
-	flex: 2;
   min-width: 40rem;
 }
 
-.SidePane
+.layout-centered-cell .SidePane
 {
 	display: flex;
 	flex-direction: column;
-	flex: 1;
 }
 
-.SidePane > div:last-child 
+.layout-centered-cell .SidePane > div:last-child 
 {
+	display: flex;
   flex-basis: 100%;
 }
 
-.SidePane > div:last-child > div
+.layout-centered-cell .SidePane > div:last-child > div
 {
   flex-grow: 1;
 }
 
-.ContentPane > div, .SecondaryPane > div, .SidePane > div
+.layout-centered-cell .SecondaryPane
 {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 }
 
-.SecondaryPane > div:last-child
+.layout-centered-cell .SecondaryPane > div:last-child
 {
   flex-grow: 1;
 }
@@ -63,26 +45,17 @@
 /*  Responsive UI  */
 @media screen and (max-width: 980px)
 {
-  .BannerPane .banner-row
-  {
-    display: unset;
-  }
-  
-  .BannerPane .nucleus-account-control > div
-  {
-    margin-left: auto;
-  }
-
-  .ContentWrapper
+  .layout-centered-cell .ContentWrapper
   {
     margin: unset;
   }
-  .ContentWrapper > div
+
+  .layout-centered-cell .ContentWrapper .top-row-wrapper
   {
-    flex-direction: column;
+    display: block;
   }
 
-  .ContentPane
+  .layout-centered-cell .ContentPane
   {
     min-width: unset;
   }

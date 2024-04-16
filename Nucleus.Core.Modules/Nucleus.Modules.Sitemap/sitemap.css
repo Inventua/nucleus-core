@@ -5,12 +5,12 @@
 
 OL.Sitemap, OL.Sitemap OL
 {
-	margin-bottom: 0.5rem;
+	margin-bottom: var(--nucleus-default-gap-vertical);
 }
 
 OL.Sitemap OL
 {
-	padding-left: 0.5rem;
+	padding-left: var(--nucleus-default-gap-horizontal);
 }
 
 OL.Sitemap LI
@@ -21,5 +21,6 @@ OL.Sitemap LI
 OL.Sitemap.sitemap-horizontal
 {
   display: flex;
-  gap: 1rem;
+  row-gap: var(--nucleus-default-gap-vertical);
+  column-gap: var(--nucleus-default-gap-horizontal);
 }

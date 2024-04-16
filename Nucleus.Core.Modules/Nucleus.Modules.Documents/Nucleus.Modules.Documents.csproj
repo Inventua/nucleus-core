@@ -29,9 +29,7 @@
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
     <None Remove="Views\ViewerLayouts\Table.cshtml" />
-    <None Remove="Views\ViewerLayouts\Table.css" />
     <None Remove="Views\ViewerLayouts\Tile.cshtml" />
-    <None Remove="Views\ViewerLayouts\Tile.css" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,8 +41,6 @@
     <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />
     <Content Include="Views\Editor.cshtml" />
-    <Content Include="Views\ViewerLayouts\Table.css" />
-    <Content Include="Views\ViewerLayouts\Tile.css" />
     <Content Include="Views\ViewerLayouts\Tile.cshtml" />
     <Content Include="Views\ViewerLayouts\Table.cshtml" />
   </ItemGroup>

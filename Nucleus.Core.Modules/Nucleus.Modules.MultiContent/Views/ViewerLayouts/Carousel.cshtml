@@ -3,7 +3,7 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @Html.AddStyle("~!/../../viewer.css")
-<div id="carousel-@Model.Module.Id" class="carousel slide carousel-dark multi-content-carousel" data-bs-ride="carousel" data-bs-interval="@Model.LayoutSettings.Interval">
+<div id="carousel-@Model.Module.Id" class="carousel slide carousel-dark multi-content-carousel@(Model.LayoutSettings.ShowControls ? " multi-content-carousel-show-controls" : "")" data-bs-ride="carousel" data-bs-interval="@Model.LayoutSettings.Interval">
 	@if (Model.LayoutSettings.ShowIndicators)
 	{
 		<div class="carousel-indicators">

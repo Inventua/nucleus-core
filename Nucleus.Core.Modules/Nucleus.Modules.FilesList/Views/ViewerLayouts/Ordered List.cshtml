@@ -3,7 +3,7 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Extensions
 @using Nucleus.Modules.FilesList.ViewModels
-<ol class="d-flex flex-column">
+<ol class="files-list">
 	@foreach (var file in Model.Files)
 	{
 		@if (file != null)
@@ -12,20 +12,15 @@
 				<a href="@Url.FileLink(file)">@file.Name</a>
 				@if (Model.ShowModifiedDate)
 				{
-					<span class="file-modified-date">- @file.DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</span>
+					<span class="file-modified-date">@file.DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</span>
 				}
 				@if (Model.ShowSize)
 				{
-					<span class="file-size">- @file.Size.FormatFileSize()</span>
+					<span class="file-size">@file.Size.FormatFileSize()</span>
 				}
-				@if (Model.ShowDimensions)
+				@if (Model.ShowDimensions && file.Width > 0 && file.Height > 0)
 				{
-					@if (file.Width > 0 && file.Height > 0)
-					{
-						<span class="file-dimensions">
-							@($"({file.Width} x {file.Height})")
-						</span>
-					}
+					<span class="file-dimensions">@($"{file.Width} x {file.Height}")</span>					
 				}				
       </li>
 		}

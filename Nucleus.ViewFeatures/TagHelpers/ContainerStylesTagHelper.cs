@@ -58,61 +58,55 @@ public class ContainerStylesTagHelper : TagHelper
       // null and the attribute will (and should) have no effect.
       if (containerContext != null)
       {
+        List<string> cssClasses = [];
+        List<string> cssStyles = [];
+
         if (!String.IsNullOrEmpty(containerContext.Module.AutomaticClasses) || !String.IsNullOrEmpty(containerContext.Module.AutomaticStyles))
         {
-          List<string> cssClasses = [];
-          List<string> cssStyles = [];
-
           // prepare a list of css classes, including any that were specified in a class attribute for the container element, plus the configured
           // automatic styles.  The .Distinct call ensures that there are no duplicates.
           if (!String.IsNullOrEmpty(containerContext.Module.AutomaticClasses))
           {
-            if (output.Attributes.TryGetAttribute("class", out TagHelperAttribute existingClassAttribute))
-            {
-              cssClasses.AddRange(existingClassAttribute.Value.ToString().Split(SpaceChars, StringSplitOptions.RemoveEmptyEntries));
-            }
-
             cssClasses.AddRange(containerContext.Module.AutomaticClasses.Split(SpaceChars));
-
-            cssClasses = cssClasses.Distinct().ToList();
           }
 
           // prepare a list of styles including any that were specified in a style attribute for the container element, plus the configured
           // automatic styles, which set css variables.  The .Distinct call ensures that there are no duplicates.
           if (!String.IsNullOrEmpty(containerContext.Module.AutomaticStyles))
           {
-            if (output.Attributes.TryGetAttribute("style", out TagHelperAttribute existingStyleAttribute))
-            {
-              cssStyles.AddRange(existingStyleAttribute.Value.ToString().Split(SpaceChars, StringSplitOptions.RemoveEmptyEntries));
-            }
-
             cssStyles.AddRange(containerContext.Module.AutomaticStyles.Split(SpaceChars));
-
-            cssStyles = cssStyles.Distinct().ToList();
           }
+        }
 
-          if (cssClasses.Any() || cssStyles.Any())
+        // add .AutomaticClasses to the class attribute.  We don't use output.AddClass here because there will often be several css classes to add,
+        // and the .AddClass function does a lot of parsing of the existing class attribute value, so it is not efficient to call it multiple 
+        // times - so we do our own .Split() and .Distinct() (in the code above) - so that we parse the existing class attribute value once rather
+        // than multiple times. 
+        
+        // there is always at least one css class to add ("container")
+        if (output.Attributes.TryGetAttribute("class", out TagHelperAttribute existingClassAttribute))
+        {
+          cssClasses.InsertRange(0, existingClassAttribute.Value.ToString().Split(SpaceChars, StringSplitOptions.RemoveEmptyEntries));
+        }
+
+        // we need the container-style class and the container styles css file.  We always add these to containers which support container styles
+        // (that is, have a container-styles=true attribute) so that when containers define default values for container style variables they
+        // are applied by container-styles.css
+        AddStyleHtmlHelper.AddStyle(this.ViewContext, AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_CONTAINER_STYLES);
+        cssClasses.Insert(0, "nucleus-container");
+
+        cssClasses = cssClasses.Distinct().ToList();
+        output.Attributes.SetAttribute("class", String.Join(' ', cssClasses));
+        
+        // add style attribute to set css variables for custom values
+        if (cssStyles.Any())
+        {
+          if (output.Attributes.TryGetAttribute("style", out TagHelperAttribute existingStyleAttribute))
           {
-            // we need the container-style class and the container styles css file if either automatic classes or automatic styles are being
-            // used for a container.
-            AddStyleHtmlHelper.AddStyle(this.ViewContext, "~/Shared/Containers/container-styles.css", true, false, ((ControllerActionDescriptor)this.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version.ToString());
-            cssClasses.Add("container-style");
-
-            // add .AutomaticClasses to the class attribute.  We don't use output.AddClass here because there will often be several css classes to add,
-            // and the .AddClass function does a lot of parsing of the existing class attribute value, so it is not efficient to call it multiple 
-            // times - so we do our own .Split() and .Distinct() (in the code above) - so that we parse the existing class attribute value once rather
-            // than multiple times. 
-            if (cssClasses.Any())
-            {
-              output.Attributes.SetAttribute("class", String.Join(' ', cssClasses));
-            }
-
-            // add style attribute to set css variables for custom values
-            if (cssStyles.Any())
-            {
-              output.Attributes.SetAttribute("style", String.Join("; ", cssStyles));
-            }
+            cssStyles.InsertRange(0, existingStyleAttribute.Value.ToString().Split(SpaceChars, StringSplitOptions.RemoveEmptyEntries));
           }
+          cssStyles = cssStyles.Distinct().ToList();
+          output.Attributes.SetAttribute("style", String.Join("; ", cssStyles));
         }
       }
     }

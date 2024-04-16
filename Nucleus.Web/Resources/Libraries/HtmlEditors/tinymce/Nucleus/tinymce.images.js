@@ -57,11 +57,11 @@
         var content = '';
         if (api.getData().caption !== '')
         {
-          content = '<figure>' + innerContent + '<figcaption>' + api.getData().caption + '</figcaption></figure>';
+          content = '<div><figure>' + innerContent + '<figcaption>' + api.getData().caption + '</figcaption></figure></div>';
         }
         else
         {
-          content = innerContent;
+          content = '<div>' + innerContent + '</div>';
         }
 				editor.insertContent(content);
 				api.close();

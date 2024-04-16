@@ -214,6 +214,12 @@ namespace Nucleus.Modules.Forums.Controllers
       if (mediaFile != null)
       {
         viewModel.Forum = await this.ForumsManager.Get(viewModel.Forum.Id);
+        Abstractions.Models.FileSystem.Folder attachmentsFolder = viewModel.Forum.EffectiveSettings().AttachmentsFolder;
+        if (attachmentsFolder == null)
+        {
+          return BadRequest("The attachments folder is not configured for this forum.");
+        }
+       
         viewModel.Forum.EffectiveSettings().AttachmentsFolder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Forum.EffectiveSettings().AttachmentsFolder.Id);
         using (System.IO.Stream fileStream = mediaFile.OpenReadStream())
         {
@@ -1199,7 +1205,7 @@ namespace Nucleus.Modules.Forums.Controllers
             Forum = forum,
             Post = post,
             Reply = reply,
-            CanAttach = this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_ATTACH_POST),
+            CanAttach = forum.EffectiveSettings().AllowAttachments && forum.EffectiveSettings().AttachmentsFolder != null && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_ATTACH_POST),
             CanSubscribe = forum.EffectiveSettings().Enabled && this.ForumsManager.CheckPermission(this.Context.Site, HttpContext.User, forum, ForumsManager.PermissionScopes.FORUM_SUBSCRIBE),
             AttachmentsFolder = forum.EffectiveSettings().AttachmentsFolder
         };

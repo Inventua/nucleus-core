@@ -1,1 +1,1 @@
-﻿Use this container when you don't want to display your module title.
+﻿Use this container when you don't want to display your module title.  Container styles are supported.

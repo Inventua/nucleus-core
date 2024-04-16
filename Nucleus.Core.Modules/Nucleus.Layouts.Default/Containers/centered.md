@@ -1,1 +1,1 @@
-﻿This container displays your module title and content, horizontally centered.
+﻿This container displays your module title and content, horizontally centered.  Container styles are supported.

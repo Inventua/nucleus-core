@@ -33,8 +33,8 @@
         <folder name="ViewerLayouts">
           <file name="Table.cshtml" />
           <file name="Tile.cshtml" />
-          <file name="Table.css" />
-          <file name="Tile.css" />
+          <!--<file name="Table.css" />
+          <file name="Tile.css" />-->
         </folder>
       </folder>
     </component>

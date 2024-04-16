@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Nucleus.Extensions;
 
 namespace Nucleus.ViewFeatures.HtmlHelpers
 {
@@ -101,47 +97,38 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// <returns></returns>
     public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, WellKnownScripts script)
     {
-      string scriptPath = "";
-
       switch (script)
       {
         case WellKnownScripts.BOOTSTRAP:
-          scriptPath = "~/Resources/Libraries/Bootstrap/5.3.2/js/bootstrap.bundle.js";
+          AddScript(htmlHelper, "~/Resources/Libraries/Bootstrap/5.3.2/js/bootstrap.bundle.js");
           break;
         case WellKnownScripts.JQUERY:
-          scriptPath = "~/Resources/Libraries/jQuery/3.7.1/jquery.js";
+          AddScript(htmlHelper, "~/Resources/Libraries/jQuery/3.7.1/jquery.js");
           break;
         case WellKnownScripts.NUCLEUS_SHARED:
-					scriptPath = "~/Resources/js/nucleus-shared.js";
+          AddScript(htmlHelper, "~/Resources/js/nucleus-shared.js");
 					break;
 				case WellKnownScripts.NUCLEUS_PAGELIST:
-					scriptPath = "~/Resources/js/jquery-pagelist.js";
+          AddScript(htmlHelper, "~/Resources/js/jquery-pagelist.js", true);
 					break;
 				case WellKnownScripts.NUCLEUS_ADMIN:
-					scriptPath = "~/Resources/js/nucleus-admin.js";
+          AddScript(htmlHelper, "~/Resources/js/nucleus-admin.js");
 					break;
 				case WellKnownScripts.NUCLEUS_TOGGLESWITCH:
-					scriptPath = "~/Resources/js/jquery-toggleswitch.js";
+          AddScript(htmlHelper, "~/Resources/js/jquery-toggleswitch.js", true);
 					break;
         case WellKnownScripts.NUCLEUS_EDITMODE:
-          scriptPath = "~/Resources/js/nucleus-editmode.js";
+          AddScript(htmlHelper, "~/Resources/js/nucleus-editmode.js");
           break;
         case WellKnownScripts.NUCLEUS_MONACO_EDITOR:
-          AddScript(htmlHelper, "~/Resources/Libraries/Monaco/Nucleus/monaco-editor.js");
-          AddScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/loader.js");
-          AddScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/editor/editor.main.nls.js");
-          AddScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/editor/editor.main.js");
+          AddScript(htmlHelper, "~/Resources/Libraries/Monaco/Nucleus/monaco-editor.js", false);
+          AddScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/loader.js", false);
+          AddScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/editor/editor.main.nls.js", true);
+          AddScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/editor/editor.main.js", true);
           break;
       }
 
-      if (!String.IsNullOrEmpty(scriptPath))
-      {
-        return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(scriptPath), false, false, WellKnownScriptOrders.EARLY, typeof(AddScriptHtmlHelper).Assembly.Version());
-      }
-      else
-      {
-        return null;
-      }
+      return null;
     }
 
     /// <summary>

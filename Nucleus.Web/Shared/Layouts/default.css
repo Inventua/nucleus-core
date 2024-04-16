@@ -1,65 +1,16 @@
-﻿.LayoutWrapper
+﻿.layout-default .breadcrumb
 {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
+  padding: 0 1rem;
 }
 
-/*.BannerPane
-{
-	display: flex;
-	flex-direction: column;	
-}*/
-.BannerPane .banner-row
-{
-  display: flex;
-}
-
-.ContentWrapper 
+.layout-default .ContentWrapper 
 {
 	flex-grow: 1;
-	display: flex;		
-	overflow: auto;
-	flex-direction: row;
+	display: flex;
+  margin-top: var(--nucleus-default-gap-vertical);
 }
 
-.ContentPane
-{
-	display: flex;
-	flex-direction: column;
+.layout-default .ContentPane
+{	
 	flex-grow: 1;
-	overflow-x: auto;
-}
-
-.ContentPane > div
-{
-	display: flex;
-	flex-direction: column;
-}
-
-.FooterPane
-{
-	display: flex;
-	flex-direction: row;	
-  gap: 1rem;
-	background-color: #535353;
-}
-
-.FooterPane *
-{
-	color: white;
-}
-
-/*  Responsive UI  */
-@media screen and (max-width: 980px)
-{
-  .BannerPane .banner-row
-  {
-    display: unset;
-  }
-
-  .BannerPane .nucleus-account-control > div
-  {
-    margin-left: auto;
-  }
 }

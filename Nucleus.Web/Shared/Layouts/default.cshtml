@@ -1,17 +1,18 @@
-﻿@Html.AddStyle("~!/default.css")	
-<div class="LayoutWrapper">
+﻿@Html.AddStyle("~!/layout-styles.css")
+@Html.AddStyle("~!/default.css")
+<div class="layout-default layout-styles fill-height LayoutWrapper">
 	<div class="BannerPane">
 		@await Html.PartialAsync("_banner.cshtml")
 		@await Html.RenderPaneAsync("BannerPane")
 	</div>
 
-	<div class="ContentWrapper" data-track-scroll="content-wrapper">
-		<div class="ContentPane">
+  <div class="scrollable ContentWrapper" data-track-scroll="content-wrapper">
+    <div class="flex-column ContentPane">
 			@await Html.RenderPaneAsync("ContentPane")
 		</div>
 	</div>
 
-  <div class="FooterPane" suppress-empty="true">
+  <div class="default-footer FooterPane" suppress-empty="true">
 		<terms caption="Terms" />
 		<privacy caption="Privacy Policy" />
     @await Html.RenderPaneAsync("FooterPane")

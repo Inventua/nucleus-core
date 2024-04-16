@@ -1,12 +1,10 @@
 ﻿.container-default
 {
-	display: flex;
-	flex-direction: column;
-  margin: 0.25rem;  
-	min-width: 12rem;
-}
-
-.container-default h2
-{
-	margin: 0;
+  --container-margin: 0 var(--nucleus-default-gap-horizontal) var(--nucleus-default-gap-vertical) var(--nucleus-default-gap-horizontal);
+	--title-margin: 0 0 0.25rem 0;  
+  /* containers from the "default" set use (share) this .css file, and the container-default class.  The          */
+  /* display:flex and flex-direction:column are to propagate "flex" to module content and default the direction   */
+  /* so that each of the containers don't have to specify these themselves.                                       */
+  display: flex;
+  flex-direction: column;
 }

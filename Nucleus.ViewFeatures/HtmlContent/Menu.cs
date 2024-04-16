@@ -40,11 +40,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			/// <summary>
 			/// Child items rendered vertically as list blocks
 			/// </summary>
-			RibbonPortrait = 2,
-      /// <summary>
-      /// Horizontal display
-      /// </summary>
-      Horizontal = 3
+			RibbonPortrait = 2
 		}
 
     /// <summary>
@@ -133,13 +129,16 @@ namespace Nucleus.ViewFeatures.HtmlContent
       outputBuilder.AddCssClass("navbar navbar-expand-lg nucleus-menu");
       outputBuilder.AddCssClass(String.IsNullOrEmpty(menuClass) ? "navbar-light bg-light" : menuClass);
 
-      TagBuilder divBuilder = new("div");
-      divBuilder.AddCssClass("container-fluid");
+      //TagBuilder divBuilder = new("div");
+      //divBuilder.AddCssClass("container-fluid");
 
-      AddMainMenu(divBuilder, urlHelper, topMenu, menuStyle, maxLevels, useName);
-      AddMobileMenu(divBuilder, urlHelper, topMenu, useName);
+      //AddMainMenu(divBuilder, urlHelper, topMenu, menuStyle, maxLevels, useName);
+      //AddMobileMenu(divBuilder, urlHelper, topMenu, useName);
+      
+      AddMainMenu(outputBuilder, urlHelper, topMenu, menuStyle, maxLevels, useName);
+      AddMobileMenu(outputBuilder, urlHelper, topMenu, useName);
 
-      outputBuilder.InnerHtml.AppendHtml(divBuilder);
+      //outputBuilder.InnerHtml.AppendHtml(divBuilder);
       outputBuilder.MergeAttributes(htmlAttributes);      
 
 			return outputBuilder;
@@ -188,8 +187,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 						break;
 
 					case MenuStyles.RibbonLandscape: 
-					case MenuStyles.RibbonPortrait:
-          case MenuStyles.Horizontal:
+					case MenuStyles.RibbonPortrait:          
 						if (thisLevel == 0)
 						{
 							// top level items are rendered the same as the default style
@@ -266,7 +264,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 				// down arrow icon to expand display (show child pages)
 				TagBuilder toggleLinkBuilder = new("button");
-				toggleLinkBuilder.AddCssClass("dropdown-toggle nav-link d-inline-flex btn btn-none");
+				toggleLinkBuilder.AddCssClass("dropdown-toggle nav-link btn btn-none");
 				toggleLinkBuilder.Attributes.Add("type", "button");
 				toggleLinkBuilder.Attributes.Add("title", "Open");
 				toggleLinkBuilder.Attributes.Add("aria-expanded", "false");
@@ -284,7 +282,8 @@ namespace Nucleus.ViewFeatures.HtmlContent
 		{			
 			TagBuilder listBuilder = new("ul");
 			listBuilder.AddCssClass("dropdown-menu");
-			listBuilder.Attributes.Add("aria-live", "polite");
+      listBuilder.AddCssClass(menuStyle.ToString().ToLower());
+      listBuilder.Attributes.Add("aria-live", "polite");
 			AddChildren(prefix, menuStyle, listBuilder, urlHelper, childItem, maxLevels, thisLevel + 1, useName);
 
 			return listBuilder;
@@ -358,7 +357,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 			if (thisLevel < 1)
 			{
 				listBuilder.AddCssClass("ribbon-item");
-				listBuilder.AddCssClass(menuStyle.ToString());
+				listBuilder.AddCssClass(menuStyle.ToString().ToLower());
 				listBuilder.AddCssClass("dropdown-menu");
 			}
 

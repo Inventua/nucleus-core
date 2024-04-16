@@ -75,17 +75,17 @@
 
         <div class="nucleus-flex-fields">
           <SettingsControl caption="Subscription mail template" helptext="Email template used to inform subscribers of new posts or replies.">
-            @Html.DropDownListFor(model => model.Group.Settings.SubscriptionMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+            @Html.DropDownListFor(model => model.Group.Settings.SubscriptionMailTemplateId, new SelectList(Model.ImmediateMailTemplates, "Id", "Name"), "(none selected)")
           </SettingsControl>
 
           <SettingsControl caption="Subscription Summary mail template" helptext="Email template used to inform subscribers of new posts or replies when notification frequency is 'summary'.">
-            @Html.DropDownListFor(model => model.Group.Settings.SubscriptionSummaryMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+            @Html.DropDownListFor(model => model.Group.Settings.SubscriptionSummaryMailTemplateId, new SelectList(Model.SummaryMailTemplates, "Id", "Name"), "(none selected)")
           </SettingsControl>
         </div>
 
         <div class="nucleus-flex-fields">
           <SettingsControl caption="Moderator mail template" helptext="Email template used to inform moderators of new posts or replies.">
-            @Html.DropDownListFor(model => model.Group.Settings.ModerationRequiredMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+            @Html.DropDownListFor(model => model.Group.Settings.ModerationRequiredMailTemplateId, new SelectList(Model.ImmediateMailTemplates, "Id", "Name"), "(none selected)")
           </SettingsControl>
           
           <div></div>
@@ -93,11 +93,11 @@
 
         <div class="nucleus-flex-fields">
           <SettingsControl caption="Post Approved mail template" helptext="Email template used to inform users that their post or reply has been approved by a moderator.">
-            @Html.DropDownListFor(model => model.Group.Settings.ModerationApprovedMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+            @Html.DropDownListFor(model => model.Group.Settings.ModerationApprovedMailTemplateId, new SelectList(Model.ImmediateMailTemplates, "Id", "Name"), "(none selected)")
           </SettingsControl>
 
           <SettingsControl caption="Post Rejected mail template" helptext="Email template used to inform users that their post or reply has been rejected by a moderator.">
-            @Html.DropDownListFor(model => model.Group.Settings.ModerationRejectedMailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(none selected)")
+            @Html.DropDownListFor(model => model.Group.Settings.ModerationRejectedMailTemplateId, new SelectList(Model.ImmediateMailTemplates, "Id", "Name"), "(none selected)")
           </SettingsControl>
         </div>
       </fieldset>

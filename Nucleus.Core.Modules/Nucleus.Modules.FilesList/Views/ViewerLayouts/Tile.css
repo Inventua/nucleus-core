@@ -1,4 +1,7 @@
-﻿.FilesList.file-tiles
+﻿/*
+  This file is not in use.  Contents moved to viewer.css.
+  
+  .FilesList.file-tiles
 {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
@@ -16,4 +19,4 @@
 {
 	font-weight: bold;
 	font-size: 1.25rem;
-}
+}*/

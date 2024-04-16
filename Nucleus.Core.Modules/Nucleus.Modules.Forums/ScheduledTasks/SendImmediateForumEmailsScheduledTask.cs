@@ -69,7 +69,7 @@ public class SendImmediateForumEmailsScheduledTask : IScheduledTask
       try
       {
 
-        Models.MailTemplate.Models.Immediate model = new();
+        Models.MailTemplate.Immediate model = new();
 
         User user = await this.UserManager.Get(item.UserId);
         UserProfileValue emailAddress = user.Profile.Where(item => item.UserProfileProperty.TypeUri == System.Security.Claims.ClaimTypes.Email).FirstOrDefault();
@@ -108,7 +108,7 @@ public class SendImmediateForumEmailsScheduledTask : IScheduledTask
         {
           try
           {
-            await mailClient.Send<Models.MailTemplate.Models.Immediate>(template, model, emailAddress.Value);
+            await mailClient.Send<Models.MailTemplate.Immediate>(template, model, emailAddress.Value);
             sentMessageCount++;
 
             // mark handled queue items as sent            

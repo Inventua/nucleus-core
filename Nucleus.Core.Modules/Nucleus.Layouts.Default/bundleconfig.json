@@ -16,5 +16,17 @@
     "inputFiles": [
       "Layouts/simple.css"
     ]
+  },
+  {
+    "outputFileName": "Layouts/landing.min.css",
+    "inputFiles": [
+      "Layouts/landing.css"
+    ]
+  },
+  {
+    "outputFileName": "Layouts/centered-cell.min.css",
+    "inputFiles": [
+      "Layouts/centered-cell.css"
+    ]
   }
 ]

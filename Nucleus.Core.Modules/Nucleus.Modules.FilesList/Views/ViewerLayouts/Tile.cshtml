@@ -1,8 +1,7 @@
 ﻿@model Nucleus.Modules.FilesList.ViewModels.Viewer
 @using Nucleus.Modules.FilesList.ViewModels
 @using Nucleus.Extensions
-@Html.AddStyle("~!/Tile.css")
-<div class="d-flex flex-column flex-fill file-tiles">
+<div class="files-list file-tiles">
 	@foreach (var file in Model.Files)
 	{
 		<div>
@@ -18,17 +17,9 @@
 					{
 						<span class="file-size">@file.Size.FormatFileSize()</span>
 					}
-					@if (Model.ShowDimensions)
+					@if (Model.ShowDimensions && file.Width > 0 && file.Height > 0)
 					{
-						@if (file.Width > 0 && file.Height > 0)
-						{
-							@if (Model.ShowSize)
-							{
-								@Html.Raw("(")
-								<span class="file-dimensions">@($"{file.Width} x {file.Height}")</span>
-								@Html.Raw(")")
-							}
-						}
+						<span class="file-dimensions">@($"{file.Width} x {file.Height}")</span>						
 					}
 				</div>
 			}

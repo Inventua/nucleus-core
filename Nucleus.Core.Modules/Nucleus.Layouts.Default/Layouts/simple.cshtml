@@ -1,7 +1,8 @@
-﻿@Html.AddStyle("~!/simple.css")	
-<div class="LayoutWrapper">
-	<div class="ContentWrapper" data-track-scroll="content-wrapper">
-		<div class="ContentPane">
+﻿@Html.AddStyle("~/Shared/Layouts/layout-styles.css")
+@* @Html.AddStyle("~!/simple.css") *@
+<div class="layout-simple layout-styles fill-height LayoutWrapper">
+  <div class="flex-row scrollable ContentWrapper" data-track-scroll="content-wrapper">
+    <div class="flex-column scrollable ContentPane">
 			@await Html.RenderPaneAsync("ContentPane")
 		</div>
 	</div>

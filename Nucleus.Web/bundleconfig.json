@@ -130,5 +130,17 @@
     "inputFiles": [
       "Resources/Libraries/Monaco/Nucleus/monaco-editor.js"
     ]
+  },
+  {
+    "outputFileName": "Shared/Layouts/layout-styles.min.css",
+    "inputFiles": [
+      "Shared/Layouts/layout-styles.css"
+    ]
+  },
+  {
+    "outputFileName": "Shared/Containers/container-styles.min.css",
+    "inputFiles": [
+      "Shared/Containers/container-styles.css"
+    ]
   }
 ]

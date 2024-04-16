@@ -5,13 +5,13 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Forums.ViewModels
 @Html.AddStyle("~!/../viewer.css")
-@Html.AddStyle("~/Resources/css/forms.css")
-<div class="Forums">
+@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
+<div class="forums">
   @using (Html.BeginNucleusForm("SetForumPostStatus", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = "form.parent()" }))
   {
     <a class="btn btn-none" title="Back" href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode())">
       <span class="nucleus-material-icon">&#xe5e0;</span>
-      <h2 class="d-inline-block">@Model.Forum.Name</h2>
+      <h3 class="d-inline-block">@Model.Forum.Name</h3>
     </a>
 
     <div class="post">
@@ -19,7 +19,7 @@
       @Html.HiddenFor(model => model.Post.Id)
       @Html.HiddenFor(model => model.Post.ForumId)
       <div class="heading">
-        <h3>@Model.Post.Subject</h3>
+        <h4>@Model.Post.Subject</h4>
         <div class="controls">
           @if (Model.CanEditPost && Model.Forum.EffectiveSettings().StatusList != null && Model.Forum.EffectiveSettings().StatusList.Items?.Any() == true)
           {
@@ -27,7 +27,7 @@
           }
           @if (Model.CanReply && !Model.Post.IsLocked)
           {
-            @Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @class = "btn btn-primary btn-sm", @data_target = ".Forums.parent()" })
+            @Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @class = "btn btn-primary btn-sm", @data_target = ".forums.parent()" })
           }
           @if ((!Model.IsSubscribedToForum && Model.CanSubscribe && Model.Subscription == null) || (Model.Subscription != null) || Model.CanEditPost || (Model.CanApprovePost && !Model.Post.IsApproved) || (Model.CanApprovePost && !Model.Post.IsRejected == true) || Model.CanDeletePost || (Model.CanLockPost && !Model.Post.IsLocked) || (Model.CanLockPost && Model.Post.IsLocked) || (Model.CanPinPost && !Model.Post.IsPinned) || (Model.CanPinPost && Model.Post.IsPinned))
           {
@@ -40,7 +40,7 @@
                 @if (Model.CanEditPost)
                 {
                   <li>
-                    @Html.LinkButton("", "Edit Post", Url.NucleusAction("EditPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @class = "btn btn-secondary btn-sm dropdown-item", @data_target = ".Forums.parent()" })
+                    @Html.LinkButton("", "Edit Post", Url.NucleusAction("EditPost", "Forums", "Forums", new { id = Model.Post.Id }), new { @class = "btn btn-secondary btn-sm dropdown-item", @data_target = ".forums.parent()" })
                   </li>
                 }
                 @if (Model.CanApprovePost && !Model.Post.IsApproved)
@@ -115,25 +115,25 @@
         <div class="post-flags">
           @if (Model.Post.IsLocked)
           {
-            <span>Locked</span>
+            <span class="flag-locked">Locked</span>
           }
           @if (Model.Post.IsPinned)
           {
-            <span>Pinned</span>
+            <span class="flag-pinned">Pinned</span>
           }
           @if (Model.Post.IsApproved)
           {
-            <span>Approved</span>
+            <span class="flag-approved">Approved</span>
           }
           else
           {
             @if (Model.Post.IsRejected == true)
             {
-              <span>Rejected</span>
+              <span class="flag-rejected">Rejected</span>
             }
             else
             {
-              <span>Not Approved</span>
+              <span class="flag-notapproved">Not Approved</span>
             }
           }
         </div>
@@ -142,7 +142,7 @@
 
       @if (Model.Post.Attachments?.Any() == true)
       {
-        <h4>Attachments</h4>
+        <h5>Attachments</h5>
         <div class="attachments">
           @for (var attachmentCount = 0; attachmentCount < Model.Post.Attachments.Count; attachmentCount++)
           {
@@ -167,7 +167,7 @@
               <div class="controls">
                 @if (Model.CanReply && !Model.Post.IsLocked)
                 {
-                  @Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id, replytoid = reply.Id }), new { @class = "btn btn-primary btn-sm", @data_target = ".Forums.parent()" })
+                  @Html.LinkButton("", "Reply", Url.NucleusAction("ReplyPost", "Forums", "Forums", new { id = Model.Post.Id, replytoid = reply.Id }), new { @class = "btn btn-primary btn-sm", @data_target = ".forums.parent()" })
                 }
 
                 @if ((reply.CanEditReply && !Model.Post.IsLocked) || (Model.CanApprovePost && !reply.IsApproved) || (Model.CanApprovePost && !reply.IsRejected == true) || (reply.CanDeleteReply && !Model.Post.IsLocked))
@@ -230,7 +230,7 @@
 
             @if (reply.Attachments?.Any() == true)
             {
-              <h4>Attachments</h4>
+              <h5>Attachments</h5>
               <div class="attachments">
                 @for (var attachmentCount = 0; attachmentCount < reply.Attachments.Count; attachmentCount++)
                 {

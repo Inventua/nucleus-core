@@ -193,7 +193,7 @@ public class ContactUsController : Controller
 						{
 							Site = this.Context.Site,
 							Message = viewModel.Message,
-							Score = recaptchaToken.Score,
+							UserVerificationScore = recaptchaToken.Score,
 							Settings = GetCensored(settings)
 						};
 

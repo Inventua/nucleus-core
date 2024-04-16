@@ -1,78 +1,85 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.Index
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Abstractions
-@{ Layout = ""; }
+@{
+  Layout = "";
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<base href="@Url.Content("~/")" />
-	<meta name="viewport" content="width=device-width" />
-	<meta charset="utf-8">
-	<meta content="text/html" http-equiv="Content-Type" />
-	<title>Nucleus Admin</title>
-	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.BOOTSTRAP)
-	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_SHARED)
-	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_ADMIN)
-	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
-	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_EDITMODE)
-	@Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_PAGINGCONTROL)
-	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
-	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.BOOTSTRAP)
-	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_TOGGLESWITCH)
-	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_PAGELIST)
+  <base href="@Url.Content("~/")" />
+  <meta name="viewport" content="width=device-width" />
+  <meta charset="utf-8">
+  <meta content="text/html" http-equiv="Content-Type" />
+  <title>Nucleus Admin</title>
+  @Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.BOOTSTRAP)
+  @Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_SHARED)
+  @Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_ADMIN)
+  @Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
+  @Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_EDITMODE)
+  @Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_PAGINGCONTROL)
+  @Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
+  @Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.BOOTSTRAP)
+  @Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_TOGGLESWITCH)
+  @Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_PAGELIST)
   @Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_MONACO_EDITOR)
-	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_SHARED)
-	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_ADMIN)
-	@Html.AddHtmlEditor()
-	<merge-stylesheets>
-	@Html.RenderStyles()
-	</merge-stylesheets>
-	<merge-scripts>
-	@Html.RenderScripts()
-	</merge-scripts>
+  @Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_SHARED)
+  @Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_ADMIN)
+  @Html.AddHtmlEditor()
+  <merge-stylesheets>
+    @Html.RenderStyles()
+  </merge-stylesheets>
+  <merge-scripts>
+    @Html.RenderScripts()
+  </merge-scripts>
 </head>
-<body>
-	<div class="nucleus-control-panel">
-		<ul class="nucleus-control-panel-sidebar">
-			@if (Model.IsSiteAdmin)
-			{
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("System", "View system information and logs.", "~/Admin/System/Index", "Y", "&#xe871;", "SystemIcon"))
-        @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Pages", "Manage your pages.", "~/Admin/Pages/Index", "P", "&#xef42;", "PagesIcon"))
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Manage", "Administer site-specific entities and settings.", "~/Admin/Manage/Index", "M", "&#xf02e;", "ManageIcon"))
-			}
-			@if (Model.IsSystemAdministrator)
-			{
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Extensions", "Add or remove extensions.", "~/Admin/Extensions/Index", "X", "&#xe87b;", "ExtensionsIcon"))
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Settings", "Manage system settings.", "~/Admin/Settings/Index", "S", "&#xe8b8;", "SettingsIcon"))
-			}
+<body class="@Model.ControlPanelDockingCssClass">
+  <div class="nucleus-control-panel">
+    <div class="nucleus-control-panel-sidebar">
+      <div class="d-flex dock-buttons">
+        <button class="btn btn-sm btn-dark nucleus-material-icon dock-left-btn" title="Dock Controls Left">&#xe5cb;</button>
+        <button class="btn btn-sm btn-dark nucleus-material-icon dock-top-btn" title="Dock Controls Top">&#xe5cf;</button>
+      </div>
+      <ul>
+        @if (Model.IsSiteAdmin)
+        {
+          @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("System", "View system information and logs.", "~/Admin/System/Index", "Y", "&#xe871;", "SystemIcon"))
+          @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Pages", "Manage your pages.", "~/Admin/Pages/Index", "P", "&#xef42;", "PagesIcon"))
+          @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Manage", "Administer site-specific entities and settings.", "~/Admin/Manage/Index", "M", "&#xf02e;", "ManageIcon"))
+        }
+        @if (Model.IsSystemAdministrator)
+        {
+          @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Extensions", "Add or remove extensions.", "~/Admin/Extensions/Index", "X", "&#xe87b;", "ExtensionsIcon"))
+          @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Settings", "Manage system settings.", "~/Admin/Settings/Index", "S", "&#xe8b8;", "SettingsIcon"))
+        }
 
-			@if (Model.CanEditPage)
-			{
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-page-btn", "Edit Page", "Edit the settings for this page.", "~/Admin/Pages/Editor" + "?id=" + @Model.CurrentPage.Id + "&mode=Single", "E", "&#xef42;", "nucleus-control-panel-sidebar-bottom"))
-			}
-			@if (Model.CanEditContent)
-			{
-				@await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-content-btn", "Edit Content", "Toggle edit mode.", "~/Admin/Settings/Index", "T", "&#xe3c9;", "nucleus-control-panel-sidebar-bottom nucleus-control-panel-sidebar-bottom" + (Model.IsEditMode ? "-active" : "")))
-			}
-		</ul>
-
-		<div class="nucleus-control-panel-content collapse" aria-expanded="false">
-			<div class="nucleus-control-panel-content-header border-bottom mb-1">
-				<h1 id="nucleus-control-panel-heading"></h1>
-				<a class="nucleus-btn-close-frame">&#xe5cd;</a>
-				<a class="nucleus-btn-page-back" data-target=".nucleus-adminpage">&#xe5c4;</a>
-			</div>
-			<div class="nucleus-adminpage nucleus-admin-content">
+        @if (Model.CanEditPage)
+        {
+          @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-page-btn", "Edit Page", "Edit the settings for this page.", "~/Admin/Pages/Editor" + "?id=" + @Model.CurrentPage.Id + "&mode=Single", "E", "&#xef42;", "nucleus-control-panel-sidebar-end"))
+        }
+        @if (Model.CanEditContent)
+        {
+          @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("nucleus-edit-content-btn", "Edit Content", "Toggle edit mode.", "~/Admin/Settings/Index", "T", "&#xe3c9;", "nucleus-control-panel-sidebar-end nucleus-control-panel-sidebar-end" + (Model.IsEditMode ? "-active" : "")))
+        }
+      </ul>
+    </div>
+    <div class="nucleus-control-panel-content collapse" aria-expanded="false">
+      <div class="nucleus-control-panel-content-header border-bottom mb-1">
+        <h1 id="nucleus-control-panel-heading"></h1>
+        <a class="nucleus-btn-close-frame">&#xe5cd;</a>
+        <a class="nucleus-btn-page-back" data-target=".nucleus-adminpage">&#xe5c4;</a>
+      </div>
+      <div class="nucleus-adminpage nucleus-admin-content">
         <div class="nucleus-admin-index-spinner-wrapper">
           <div class="spinner-border text-primary nucleus-admin-index-spinner" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
         </div>
       </div>
-		</div>
-	</div>
+    </div>
+  </div>
 
-	<modal id="nucleus-popupdialog" title="Settings"></modal>
+  <modal id="nucleus-popupdialog" title="Settings"></modal>
 
 </body>
 </html>

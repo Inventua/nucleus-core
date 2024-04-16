@@ -20,14 +20,13 @@
 
   <TabContent>
     <TabPanel id="module-properties" active="true">
-
       <fieldset role="group" aria-label="Properties" class="flex-grow-0">
-        @Html.HiddenFor((model) => model.Module.Id)
-        @Html.HiddenFor((model) => model.Module.SortOrder)
+        @Html.HiddenFor(model => model.Module.Id)
+        @Html.HiddenFor(model => model.Module.SortOrder)
         <SettingsControl caption="Module Type" helptext="Select a Module Type.">
           @if (Model.Module.Id == Guid.Empty)
           {
-            @Html.DropDownListFor(model => model.Module.ModuleDefinition.Id, Model.AvailableModules, "(select module type)")
+            @Html.DropDownListFor(model => model.Module.ModuleDefinition.Id, Model.AvailableModules)
           }
           else
           {
@@ -62,8 +61,6 @@
     </TabPanel>
     <TabPanel id="module-styles">
       <fieldset aria-label="Container Styles">
-        <h3>Container Styles</h3>
-
         <div class="container-styles">
           @await Html.PartialAsync("_ContainerStyles")
         </div>

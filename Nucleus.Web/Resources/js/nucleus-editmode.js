@@ -11,7 +11,7 @@ function _setupEditMode(e, args)
     .on('input blur', _handleContentUpdate);
   jQuery('.nucleus-module-editing *[data-inline-edit-route][data-inline-edit-mode = "MultiLineText"]')
     .on('keydown', _multiLineText_keydown)
-    .on('keyup', _editableContent_keyup)  
+    .on('keyup', _editableContent_keyup)
     .on('paste', _multiLineText_paste);
   jQuery('.nucleus-module-editing *[data-inline-edit-route][data-inline-edit-mode = "SingleLineText"]')
     .on('keydown', _singleLineText_keydown)
@@ -33,17 +33,31 @@ function _setupEditMode(e, args)
   jQuery('.nucleus-move-droptarget').each(function (index, item)
   {
     var dropTargetElement = jQuery(item);
+    var parentElement = dropTargetElement.parent();
     if
-      (
-      (dropTargetElement.parent().prev().length !== 0 && dropTargetElement.parent().prev().position().top === dropTargetElement.parent().position().top) ||
-      (dropTargetElement.parent().next().length !== 0 && dropTargetElement.parent().next().position().top === dropTargetElement.parent().position().top) ||
+    (
+      (parentElement.prev().length !== 0 && parentElement.prev().position().top === parentElement.position().top) ||
+      (parentElement.next().length !== 0 && parentElement.next().position().top === parentElement.position().top) ||
       (dropTargetElement.prev().length !== 0 && dropTargetElement.prev().position().top === dropTargetElement.position().top) ||
       (dropTargetElement.next().length !== 0 && dropTargetElement.next().position().top === dropTargetElement.position().top)
     )
     {
-      dropTargetElement.addClass('sideways');
+      if (_isRenderedHorizontal(parentElement))
+      {
+        dropTargetElement.addClass('sideways');
+      }
     }
   });
+
+  function _isRenderedHorizontal(element)
+  {
+    if (element.css('display') === 'flex' && element.css('flex-direction') === 'row') return true;
+    if (element.css('display') === 'inline-flex' && element.css('flex-direction') === 'row') return true;
+    if (element.is('td')) return true;
+    if (element.css('float') === 'left') return true;
+
+    return false;
+  }
 
   /// Handle "move module" drag start.
   /// Set drag-drop properties in the dataTransfer object, save the ID of the module being moved.
@@ -178,7 +192,7 @@ function _setupEditMode(e, args)
 
   function _singleLineText_paste(event)
   {
-    event.preventDefault(); 
+    event.preventDefault();
     content = (event.originalEvent || event).clipboardData?.getData('text/plain');
 
     if (content)
@@ -273,7 +287,7 @@ function _setupEditMode(e, args)
     var content;
 
     if (typeof mode === 'unspecified' || mode === null) return;
-        
+
     if (mode === "SingleLineText" || mode === "MultiLineText")
     {
       // remove html from the content
@@ -281,7 +295,7 @@ function _setupEditMode(e, args)
       var content = element.innerHTML
         .replaceAll(/<br([^>]*)>/gi, '\n')
         .replaceAll(/&nbsp;/gi, '\u00A0');
-        
+
       if (content !== textValue)
       {
         // get caret position
@@ -307,7 +321,7 @@ function _setupEditMode(e, args)
         var template = document.createElement('div');
         template.innerHTML = content.replaceAll('<br>', '\n');
         content = template.innerText;
-        control.html(template.innerText.replaceAll('\n', '<br>'));        
+        control.html(template.innerText.replaceAll('\n', '<br>'));
 
         // restore caret position
         if (selectionStart && selectionStart >= 0)
@@ -325,7 +339,7 @@ function _setupEditMode(e, args)
     {
       content = control.html();
     }
-    
+
     var formContent = new FormData();
     formContent.append('value', content);
 

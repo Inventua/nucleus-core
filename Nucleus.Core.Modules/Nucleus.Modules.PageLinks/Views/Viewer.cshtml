@@ -3,8 +3,8 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.PageLinks.ViewModels
-@Html.AddStyle("~!/../viewer.css")
-@Html.AddScript("~!/../viewer.js")
+@Html.AddStyle("~#/viewer.css")
+@Html.AddScript("~#/viewer.js")
 <div class="PageLinks">
   @if (Model.Mode == Nucleus.Modules.PageLinks.Models.Settings.Modes.Manual)
   {
@@ -25,8 +25,9 @@
 		  jQuery('.PageLinks').PageLinkViewer({
 			  operationMode: '@Model.Mode',
 			  rootSelector: '@Model.RootSelector',
-        includeHeaders: '@Model.EnabledHeaders'
-		  });
+        includeHeaders: '@Model.EnabledHeaders',
+        headingClass: '@Model.HeadingClass'
+      });
 	  });
     </text>
   }

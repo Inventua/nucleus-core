@@ -4,7 +4,7 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 @using Nucleus.Extensions
-@Html.AddStyle("~!/../settings.css")
+@Html.AddStyle("~#/settings.css")
 <h1 class="nucleus-modal-caption">Page Links Settings</h1>
 @using (Html.BeginNucleusForm("SaveSettings", "PageLinksSettings", "PageLinks", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
@@ -23,7 +23,7 @@
           </SettingsControl>
         </div>
         <div class="nucleus-flex-fields">
-          <SettingsControl caption="Heading Css Class" helptext="CSS class used to detect child header elements. Automatic mode only.">
+          <SettingsControl caption="Heading Css Class" helptext="Include only header elements which have one or more of the specified css classes, separate multiple classes with a comma. Automatic mode only.">
             @Html.TextBoxFor(model => model.HeadingClass, new { })
           </SettingsControl>
 

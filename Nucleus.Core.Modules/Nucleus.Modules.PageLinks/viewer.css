@@ -8,20 +8,8 @@
 	padding-left: 1rem;
 }
 
+/* Remove padding from the first ol */
 .PageLinks > ol
 {
 	padding-left: 0;
 }
-
-
-.nucleus-adminpage .ExtensionInstaller .nucleus-extension-components .highlight
-{
-  background-color: yellow;
-}
-
-
-.nucleus-adminpage .ExtensionInstaller .nucleus-extension-components h5
-{
-  transition: background-color ease-out 2.5s;
-}
-

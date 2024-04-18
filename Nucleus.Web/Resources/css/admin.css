@@ -414,8 +414,8 @@ body
 .nucleus-control-panel-items
 {
   white-space: initial;
-  display: flex;
-  flex-flow: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
   gap: 1rem;
   padding-left: 0;
   margin-top: 1rem;
@@ -423,9 +423,8 @@ body
 
 ul.nucleus-control-panel-items li
 {
-  list-style-type: none;
-  flex: 1 0 0;
-  font-size: 12px;
+  font-size: 0.75rem;
+  list-style-type: none;  
   vertical-align: top;
   position: relative;
 }

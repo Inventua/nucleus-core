@@ -920,6 +920,7 @@
 			<Id>{$guid12}</Id>
 			<Name>Welcome new user</Name>
 			<Subject>Welcome new user</Subject>
+      <DataModelTypeName>Nucleus.Abstractions.Models.Mail.Template.UserMailTemplateData,Nucleus.Abstractions</DataModelTypeName>
 			<Body>
         @Model.User.UserName,
         &lt;p&gt;
@@ -944,6 +945,7 @@
 			<Id>{$guid21}</Id>
 			<Name>User name reminder</Name>
 			<Subject>Your user name reminder</Subject>
+      <DataModelTypeName>Nucleus.Abstractions.Models.Mail.Template.UserMailTemplateData,Nucleus.Abstractions</DataModelTypeName>
 			<Body>
         @Model.User.UserName,
         &lt;p&gt;
@@ -962,6 +964,7 @@
 			<Id>{$guid13}</Id>
 			<Name>Password reset</Name>
 			<Subject>Password reset</Subject>
+      <DataModelTypeName>Nucleus.Abstractions.Models.Mail.Template.UserMailTemplateData,Nucleus.Abstractions</DataModelTypeName>
 			<Body>
         @Model.User.UserName,
         &lt;p&gt;

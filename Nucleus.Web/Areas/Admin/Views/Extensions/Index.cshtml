@@ -12,7 +12,7 @@
     <TabPanel id="extensions-index" active="true">
       @using (Html.BeginAreaForm("Upload", "Extensions", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
       {
-        <div>
+        <div class="mb-2">
           To begin installation, click 'Select File' and select your extension file package.
         </div>
 
@@ -46,7 +46,7 @@
 
               @if (@Model.ExtensionsUsage.ContainsKey(new Guid(extension.id)))
               {
-                <div class="d-flex ms-2 gap-4 nucleus-extension-components">
+                <div class="d-flex gap-4 nucleus-extension-components">
                   @if (@Model.ExtensionsUsage[new Guid(extension.id)].Modules.Any())
                   {
                     <div>

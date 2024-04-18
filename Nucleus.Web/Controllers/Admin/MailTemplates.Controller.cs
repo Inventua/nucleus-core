@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -87,9 +88,18 @@ namespace Nucleus.Web.Controllers.Admin
 
     [HttpPost]
     public async Task<ActionResult> Verify(ViewModels.Admin.MailTemplateEditor viewModel)
-    {
+    {      
+      if (String.IsNullOrEmpty(viewModel.MailTemplate.DataModelTypeName))
       {
-        var result = await Nucleus.Extensions.Razor.RazorParser.TestCompile(viewModel.MailTemplate.Subject);
+        ModelState.Clear();
+        ModelState.AddModelError<ViewModels.Admin.MailTemplateEditor>(viewModel => viewModel.MailTemplate.DataModelTypeName, "Please select a mail template type.");
+        return BadRequest(ModelState);
+      }
+
+      Type modelType = Type.GetType(viewModel.MailTemplate.DataModelTypeName);
+
+      {
+        var result = await Nucleus.Extensions.Razor.RazorParser.TestCompile(modelType, viewModel.MailTemplate.Subject);
         if (!result.Success)
         {
           return Json(new { Title = "Error Compiling Subject", Message = result.Errors, Icon = "error" });
@@ -97,7 +107,7 @@ namespace Nucleus.Web.Controllers.Admin
       }
 
       {
-        var result = await Nucleus.Extensions.Razor.RazorParser.TestCompile(viewModel.MailTemplate.Body);
+        var result = await Nucleus.Extensions.Razor.RazorParser.TestCompile(modelType, viewModel.MailTemplate.Body);
         if (!result.Success)
         {
           return Json(new { Title = "Error Compiling Body", Message = result.Errors, Icon = "error" });

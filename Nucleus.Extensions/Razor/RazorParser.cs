@@ -16,7 +16,7 @@ namespace Nucleus.Extensions.Razor
 	{
 		private static readonly ConcurrentDictionary<string, object> CompiledTemplateCache = new();
 		private readonly static string[] UsingNamespaces = 
-    { 
+    [ 
       "System", 
       "System.Collections.Generic", 
       "System.Linq", 
@@ -25,7 +25,7 @@ namespace Nucleus.Extensions.Razor
       "Nucleus.Extensions", 
       "Nucleus.Abstractions", 
       "Nucleus.Abstractions.Models" 
-    };
+    ];
     private static readonly SemaphoreSlim _cacheSemaphore = new(1, 1);
 
 		/// <summary>
@@ -38,7 +38,7 @@ namespace Nucleus.Extensions.Razor
 		public static async Task<string> Parse<TModel>(string template, TModel model)
 			where TModel : class
 		{
-			IRazorEngine engine = new RazorEngine();
+			RazorEngine engine = new();
 			IRazorEngineCompiledTemplate<RazorEngineTemplate<TModel>> compiledTemplate = null;
 			
 			string templateKey = typeof(TModel).FullName + Hash(template);
@@ -91,7 +91,7 @@ namespace Nucleus.Extensions.Razor
 		/// <returns></returns>
 		public static async Task<RazorValidatorResult> TestCompile(System.Type modelType, string template)
 		{
-			RazorValidator engine = new RazorValidator();
+			RazorValidator engine = new();
       Type templateType = typeof(RazorEngineTemplate<>).MakeGenericType(modelType);
 
       return await engine.TestCompileAsync(modelType, template, BuildRazorOptions);
@@ -100,7 +100,7 @@ namespace Nucleus.Extensions.Razor
 		private static void BuildRazorOptions(IRazorEngineCompilationOptionsBuilder builder)
 		{
 			builder.Options.TemplateFilename = " ";
-			builder.Options.DefaultUsings = new();
+			builder.Options.DefaultUsings = [];
 
 			builder.AddAssemblyReference(typeof(System.Uri).Assembly);
 			builder.AddAssemblyReference(typeof(System.Collections.Generic.CollectionExtensions).Assembly);
@@ -114,13 +114,9 @@ namespace Nucleus.Extensions.Razor
 		}
 
 		private static string Hash(string value)
-		{
-			var objData = Encoding.UTF8.GetBytes(value);
-
-			using (System.Security.Cryptography.HashAlgorithm provider = System.Security.Cryptography.SHA256.Create())
-			{
-				return Convert.ToBase64String(provider.ComputeHash(objData, 0, objData.Length));
-			}
-		}
-	}
+    {
+      byte[] objData = Encoding.UTF8.GetBytes(value);
+      return Convert.ToBase64String(System.Security.Cryptography.SHA256.HashData(objData.AsSpan(0, objData.Length)));
+    }
+  }
 }

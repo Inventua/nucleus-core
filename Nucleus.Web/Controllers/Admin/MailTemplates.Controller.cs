@@ -151,13 +151,14 @@ namespace Nucleus.Web.Controllers.Admin
 
     private async Task<ViewModels.Admin.MailTemplateEditor> BuildViewModel(MailTemplate mailTemplate)
     {
-      ViewModels.Admin.MailTemplateEditor viewModel = new();
+      ViewModels.Admin.MailTemplateEditor viewModel = new()
+      {
+        MailTemplate = mailTemplate,
 
-      viewModel.MailTemplate = mailTemplate;
-
-      viewModel.AvailableDataModelTypes =
-       (await this.MailTemplateManager.ListTemplateDataModelTypes())
-       .Select(type => new ViewModels.Admin.ScheduledTaskEditor.ServiceType(GetFriendlyName(type), $"{type.FullName},{type.Assembly.GetName().Name}"));
+        AvailableDataModelTypes =
+         (await this.MailTemplateManager.ListTemplateDataModelTypes())
+         .Select(type => new ViewModels.Admin.ScheduledTaskEditor.ServiceType(GetFriendlyName(type), $"{type.FullName},{type.Assembly.GetName().Name}"))
+      };
 
 
       viewModel.DataModel = BuildDataModel(viewModel.MailTemplate.DataModelTypeName);
@@ -168,7 +169,7 @@ namespace Nucleus.Web.Controllers.Admin
     private string BuildDataModel(string dataModelTypeName)
     {
       System.Type dataModelType;
-      Dictionary<string, ViewModels.Admin.MailTemplateEditor.DataModelElement> results = new();
+      Dictionary<string, ViewModels.Admin.MailTemplateEditor.DataModelElement> results = [];
 
       if (!String.IsNullOrEmpty(dataModelTypeName))
       {
@@ -213,24 +214,24 @@ namespace Nucleus.Web.Controllers.Admin
           {
             ParameterInfo[] otherParameters = parameters.Skip(1).ToArray();
 
-            AddExtensionFunctions(method, results.Values.ToList(), thisParameter, otherParameters);
+            AddExtensionFunctions(method, results, thisParameter, otherParameters);
           }
         }
       }
     }
 
-    private void AddExtensionFunctions(MethodInfo method, List<ViewModels.Admin.MailTemplateEditor.DataModelElement> results, ParameterInfo thisParameter, ParameterInfo[] otherParameters)
+    private void AddExtensionFunctions(MethodInfo method, Dictionary<string, ViewModels.Admin.MailTemplateEditor.DataModelElement> results, ParameterInfo thisParameter, ParameterInfo[] otherParameters)
     {
       // suppress the User.GetCensored method.  User data sent to mail is already censored.
       if (method.Name == "GetCensored") return;
 
-      foreach (ViewModels.Admin.MailTemplateEditor.DataModelElement element in results)
+      foreach (ViewModels.Admin.MailTemplateEditor.DataModelElement element in results.Values)
       {
         if (element.Type != null && element.Type.Equals(thisParameter.ParameterType))
         {
           if (element.Functions == null)
           {
-            element.Functions = new();
+            element.Functions = [];
           }
 
           element.Functions.Add(method.Name + "_" + String.Join('_', otherParameters.Select(parm => $"{parm.Name}-{parm.ParameterType.Name}")), new()
@@ -246,11 +247,12 @@ namespace Nucleus.Web.Controllers.Admin
 
     private ViewModels.Admin.MailTemplateEditor.DataModelElement BuildDataModelItem(PropertyInfo prop, int levels)
     {
-      ViewModels.Admin.MailTemplateEditor.DataModelElement result = new();
-
-      result.Type = prop.PropertyType;
-      result.Label = prop.Name;
-      result.Kind = ViewModels.Admin.MailTemplateEditor.DataModelElement.Kinds.Property;
+      ViewModels.Admin.MailTemplateEditor.DataModelElement result = new()
+      {
+        Type = prop.PropertyType,
+        Label = prop.Name,
+        Kind = ViewModels.Admin.MailTemplateEditor.DataModelElement.Kinds.Property
+      };
 
       if (levels > 0)
       {
@@ -264,7 +266,7 @@ namespace Nucleus.Web.Controllers.Admin
     {
       if (type == null) return null;
 
-      Dictionary<string, ViewModels.Admin.MailTemplateEditor.DataModelElement> properties = new();
+      Dictionary<string, ViewModels.Admin.MailTemplateEditor.DataModelElement> properties = [];
 
       foreach (PropertyInfo childProp in type.GetProperties())
       {
@@ -301,7 +303,7 @@ namespace Nucleus.Web.Controllers.Admin
     {
       if (type == null) return null;
 
-      Dictionary<string, ViewModels.Admin.MailTemplateEditor.DataModelElement> values = new();
+      Dictionary<string, ViewModels.Admin.MailTemplateEditor.DataModelElement> values = [];
 
       foreach (string enumName in type.GetEnumNames())
       {        
@@ -316,7 +318,7 @@ namespace Nucleus.Web.Controllers.Admin
       return null;
     }
 
-    private string GetFriendlyName(System.Type type)
+    private static string GetFriendlyName(System.Type type)
     {
       System.ComponentModel.DisplayNameAttribute displayNameAttribute = type.GetCustomAttributes(false)
         .Where(attr => attr is System.ComponentModel.DisplayNameAttribute)

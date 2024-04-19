@@ -19,7 +19,7 @@ internal class RazorValidator : RazorEngineCore.RazorEngine
   {
     Type desiredType = typeof(RazorEngineTemplate<>).MakeGenericType(modelType);
 
-    IRazorEngineCompilationOptionsBuilder compilationOptionsBuilder = new RazorEngineCompilationOptionsBuilder();
+    RazorEngineCompilationOptionsBuilder compilationOptionsBuilder = new();
     compilationOptionsBuilder.AddAssemblyReference(desiredType.Assembly);
     compilationOptionsBuilder.Inherits(desiredType);
 

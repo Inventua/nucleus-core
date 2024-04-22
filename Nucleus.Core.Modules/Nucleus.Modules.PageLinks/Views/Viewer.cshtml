@@ -5,42 +5,22 @@
 @using Nucleus.Modules.PageLinks.ViewModels
 @Html.AddStyle("~#/viewer.css")
 @Html.AddScript("~#/viewer.js")
-<div class="PageLinks">
-  @if (Model.Mode == Nucleus.Modules.PageLinks.Models.Settings.Modes.Manual)
-  {
-    <ol>
-      @foreach (var pageLink in Model.PageLinks)
-      {
-        <li><a href="@this.Context.Request.Path@(new char[] {'#', '.'}.Contains(pageLink.TargetId.First()) ? "" : "#")@pageLink.TargetId">@pageLink.Title</a></li>
-      }
-    </ol>
-  }
-</div>
-<script>
-  @if (Model.Mode == Nucleus.Modules.PageLinks.Models.Settings.Modes.Automatic)
-  {
-    <text>
-	  jQuery(function ()
-	  {
-		  jQuery('.PageLinks').PageLinkViewer({
-			  operationMode: '@Model.Mode',
-			  rootSelector: '@Model.RootSelector',
-        includeHeaders: '@Model.EnabledHeaders',
-        headingClass: '@Model.HeadingClass'
-      });
-	  });
-    </text>
-  }
-
-	function selectElement()
-	{
-		jQuery('.nucleus-extension-components .highlight').removeClass('highlight');
-		selectedItem.addClass('highlight');
-
-		window.setTimeout(function ()
-		{
-			selectedItem[0].scrollIntoView({ block: "start", inline: "nearest" });
-			selectedItem.removeClass('highlight');
-		}, 100);
-	}
-</script>
+@if (Model.Mode == Nucleus.Modules.PageLinks.Models.Settings.Modes.Manual)
+{
+  <ol class="page-links">
+    @foreach (var pageLink in Model.PageLinks)
+    {
+      <li><a href="@this.Context.Request.Path@(new char[] {'#', '.'}.Contains(pageLink.TargetId.First()) ? "" : "#")@pageLink.TargetId">@pageLink.Title</a></li>
+    }
+  </ol>
+}
+else if (Model.Mode == Nucleus.Modules.PageLinks.Models.Settings.Modes.Automatic)
+{
+  <ol class="page-links" data-page-links-rootselector="@Model.RootSelector" data-page-links-includeheaders="@Model.EnabledHeaders" data-page-links-heading-class="@Model.HeadingClass"></ol>
+  <script>
+    jQuery(function () 
+    { 
+      jQuery('.page-links').PageLinkViewer();
+    });        
+  </script>
+}

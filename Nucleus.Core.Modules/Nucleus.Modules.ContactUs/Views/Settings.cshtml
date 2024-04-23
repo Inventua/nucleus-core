@@ -3,91 +3,97 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
+@Html.AddStyle("~#/settings.css")
 <h2 class="nucleus-control-panel-heading">Settings</h2>
-@using (Html.BeginNucleusForm("Settings", "ContactUs", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+@using (Html.BeginNucleusForm("SaveSettings", "ContactUsAdmin", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
-	<div class="flex-grow-1">
-		<fieldset role="group" aria-label="General Settings">
-			<SettingsControl caption="Send To Recipients" helptext="Please enter the email recipients as a comma-separated string.">
-				@Html.TextAreaFor(model => model.SendTo, new { @rows = 2 })
-			</SettingsControl>
+  <div class="flex-grow-1">
+    <fieldset role="group" aria-label="General Settings">
+      <SettingsControl caption="Send To Recipients" helptext="Specifies one or more recipients (email addresses) for messages. Multiple email address are comma-separated.">
+        @Html.TextAreaFor(model => model.SendTo, new { @rows = 2 })
+      </SettingsControl>
 
-			<div class="nucleus-flex-fields">
-				<SettingsControl caption="Categories List" helptext="Select the list to use for categories for this module instance.  Lists are managed in the Nucleus Lists manager.">
-					@Html.DropDownListFor(model => model.CategoryList.Id, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")
-				</SettingsControl>
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="Categories List" helptext="Select the list to use for categories for this module instance.  Lists are managed in the Nucleus Lists manager.">
+          @Html.DropDownListFor(model => model.CategoryListId, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")
+        </SettingsControl>
 
-				<SettingsControl caption="Mail Templates" helptext="Email template used to generate an email message when the user clicks send.">
-					@Html.DropDownListFor(model => model.MailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(not selected)")
-				</SettingsControl>
-			</div>
+        <SettingsControl caption="Mail Templates" helptext="Email template used to generate email messages.">
+          @Html.DropDownListFor(model => model.MailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(not selected)")
+        </SettingsControl>
+      </div>
 
-			<div class="nucleus-flex-fields">
-				<h2 class="flex-grow-1">Visibility</h2>
-				<h2 class="flex-grow-1">Required</h2>
-			</div>
-			<div class="nucleus-flex-fields">
-				<SettingsControl caption="Show Name?" class="inner-inline" rendermode="LabelLast" helptext="Show the first name and last name fields.">
-					@Html.CheckBoxFor(model => model.ShowName, new { @class = "ToggleSwitch" })
-				</SettingsControl>
+      <div class="nucleus-flex-fields">
+        <div>
+          <h2 class="flex-grow-1">Visibility</h2>
+          <SettingsControl caption="Show Name?" class="inner-inline" rendermode="LabelLast" helptext="Show the first name and last name fields.">
+            @Html.CheckBoxFor(model => model.ShowName, new { @class = "ToggleSwitch" })
+          </SettingsControl>
 
-				<SettingsControl caption="Require Name?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the first name and last name fields are mandatory.">
-					@Html.CheckBoxFor(model => model.RequireName, new { @class = "ToggleSwitch" })
-				</SettingsControl>
-			</div>
-			<div class="nucleus-flex-fields">
-				<SettingsControl caption="Show Phone Number?" class="inner-inline" rendermode="LabelLast" helptext="Show the phone number field.">
-					@Html.CheckBoxFor(model => model.ShowPhoneNumber, new { @class = "ToggleSwitch" })
-				</SettingsControl>
+          <SettingsControl caption="Show Phone Number?" class="inner-inline" rendermode="LabelLast" helptext="Show the phone number field.">
+            @Html.CheckBoxFor(model => model.ShowPhoneNumber, new { @class = "ToggleSwitch" })
+          </SettingsControl>
 
-				<SettingsControl caption="Require Phone Number?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the phone number field is mandatory.">
-					@Html.CheckBoxFor(model => model.RequirePhoneNumber, new { @class = "ToggleSwitch" })
-				</SettingsControl>
-			</div>
-			<div class="nucleus-flex-fields">
-				<SettingsControl caption="Show Company?" class="inner-inline" rendermode="LabelLast" helptext="Show the company name field.">
-					@Html.CheckBoxFor(model => model.ShowCompany, new { @class = "ToggleSwitch" })
-				</SettingsControl>
+          <SettingsControl caption="Show Company?" class="inner-inline" rendermode="LabelLast" helptext="Show the company name field.">
+            @Html.CheckBoxFor(model => model.ShowCompany, new { @class = "ToggleSwitch" })
+          </SettingsControl>
 
-				<SettingsControl caption="Require Company?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the company name field is mandatory.">
-					@Html.CheckBoxFor(model => model.RequireCompany, new { @class = "ToggleSwitch" })
-				</SettingsControl>
-			</div>
-			<div class="nucleus-flex-fields">
-				<SettingsControl caption="Show Category?" class="inner-inline" rendermode="LabelLast" helptext="Show the category field.">
-					@Html.CheckBoxFor(model => model.ShowCategory, new { @class = "ToggleSwitch" })
-				</SettingsControl>
+          <SettingsControl caption="Show Category?" class="inner-inline" rendermode="LabelLast" helptext="Show the category field.">
+            @Html.CheckBoxFor(model => model.ShowCategory, new { @class = "ToggleSwitch" })
+          </SettingsControl>
 
-				<SettingsControl caption="Require Category?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the phone number field is mandatory.">
-					@Html.CheckBoxFor(model => model.RequireCategory, new { @class = "ToggleSwitch" })
-				</SettingsControl>
-			</div>
-			<div class="nucleus-flex-fields">
-				<SettingsControl caption="Show Subject?" class="inner-inline" rendermode="LabelLast" helptext="Show the subject field.">
-					@Html.CheckBoxFor(model => model.ShowSubject, new { @class = "ToggleSwitch" })
-				</SettingsControl>
+          <SettingsControl caption="Show Subject?" class="inner-inline" rendermode="LabelLast" helptext="Show the subject field.">
+            @Html.CheckBoxFor(model => model.ShowSubject, new { @class = "ToggleSwitch" })
+          </SettingsControl>
+        </div>
 
-				<SettingsControl caption="Require Subject?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the subject field is mandatory.">
-					@Html.CheckBoxFor(model => model.RequireSubject, new { @class = "ToggleSwitch" })
-				</SettingsControl>
-			</div>
-		</fieldset>
+        <div>
+          <h2 class="flex-grow-1">Required</h2>
+          <SettingsControl caption="Require Name?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the first name and last name fields are mandatory.">
+            @Html.CheckBoxFor(model => model.RequireName, new { @class = "ToggleSwitch" })
+          </SettingsControl>
 
-		<fieldset role="group" aria-label="reCAPTCHA Settings">
-			<SettingsControl caption="reCAPTCHA Site Key" helptext="Please enter your reCAPTCHA site key. Visit https://www.google.com/recaptcha/admin/create to create a site key.">
-				@Html.TextBoxFor(model => model.RecaptchaSiteKey)
-			</SettingsControl>
+          <SettingsControl caption="Require Phone Number?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the phone number field is mandatory.">
+            @Html.CheckBoxFor(model => model.RequirePhoneNumber, new { @class = "ToggleSwitch" })
+          </SettingsControl>
 
-			<SettingsControl caption="reCAPTCHA Secret Key" helptext="Please enter your reCAPTCHA secret key.">
-				@Html.PasswordFor(model => model.RecaptchaSecretKey, new { @value = Nucleus.Modules.ContactUs.ViewModels.Settings.DUMMY_PASSWORD })
-			</SettingsControl>
+          <SettingsControl caption="Require Company?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the company name field is mandatory.">
+            @Html.CheckBoxFor(model => model.RequireCompany, new { @class = "ToggleSwitch" })
+          </SettingsControl>
 
-			<SettingsControl caption="reCAPTCHA Action" helptext="Please enter your reCAPTCHA action using only alphanumeric characters, slashes, and underscore. This is used in the reCAPTCHA admin console for reporting and for adaptive risk analysis.">
-				@Html.TextBoxFor(model => model.RecaptchaAction)
-			</SettingsControl>
-		</fieldset>
-	</div>
-	<div class="nucleus-form-buttonrow">
-		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "ContactUsAdmin", "ContactUs"), new { })
-	</div>
+          <SettingsControl caption="Require Category?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the phone number field is mandatory.">
+            @Html.CheckBoxFor(model => model.RequireCategory, new { @class = "ToggleSwitch" })
+          </SettingsControl>
+
+          <SettingsControl caption="Require Subject?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the subject field is mandatory.">
+            @Html.CheckBoxFor(model => model.RequireSubject, new { @class = "ToggleSwitch" })
+          </SettingsControl>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset role="group" aria-label="reCAPTCHA Settings">
+      <SettingsControl caption="reCAPTCHA Site Key" helptext="Specifies your reCAPTCHA site key. Visit https://www.google.com/recaptcha/admin/create to create a site key.">
+        @Html.TextBoxFor(model => model.RecaptchaSiteKey)
+      </SettingsControl>
+
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="reCAPTCHA Secret Key" helptext="Specifies your reCAPTCHA secret key." class="flex-grow-2">
+          @Html.PasswordFor(model => model.RecaptchaSecretKey, new { value = (Model.IsSecretKeySet ? Nucleus.Modules.ContactUs.ViewModels.Settings.DUMMY_PASSWORD : "") })
+        </SettingsControl>
+
+        <SettingsControl caption="reCAPTCHA Action" helptext="Specifies your reCAPTCHA action using only alphanumeric characters, slashes, and underscore. This is used in the reCAPTCHA admin console for reporting and for adaptive risk analysis." class="flex-grow-2">
+          @Html.TextBoxFor(model => model.RecaptchaAction)
+        </SettingsControl>
+
+        <SettingsControl caption="reCAPTCHA Score Threshold" helptext="Specifies the minimum required reCAPTCHA interaction score. A value of 0 permits all messages, while a value of 1 blocks all messages. The default setting is 0.5.">
+          @Html.TextBoxFor(model => model.RecaptchaScoreThreshold, new { @type = "number", @inputmode = "decimal", @min = "0.0", @max = "1.0", @step = "0.1" })
+        </SettingsControl>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="nucleus-form-buttonrow">
+    @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "ContactUsAdmin", "ContactUs"), new { })
+  </div>
 }

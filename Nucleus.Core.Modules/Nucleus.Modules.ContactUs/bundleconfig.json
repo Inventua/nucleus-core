@@ -4,5 +4,11 @@
     "inputFiles": [
       "viewer.js"
     ]
+  },
+  {
+    "outputFileName": "settings.min.css",
+    "inputFiles": [
+      "settings.css"
+    ]
   }
 ]

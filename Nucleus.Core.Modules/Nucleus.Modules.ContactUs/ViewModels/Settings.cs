@@ -12,6 +12,6 @@ public class Settings : Models.Settings
 	
 	public IEnumerable<MailTemplate> MailTemplates { get; set; }
 
-	public string RecaptchaSecretKey { get; set; } = DUMMY_PASSWORD;
+	public string RecaptchaSecretKey { get; set; }
 
 }

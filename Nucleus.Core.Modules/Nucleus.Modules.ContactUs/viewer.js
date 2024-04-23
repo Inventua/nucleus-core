@@ -1,45 +1,40 @@
 ﻿(function ($)
 {
-	jQuery.fn.Recaptcha = function (conf)
-	{
-		// Config for plugin
-		var config = jQuery.extend({
-			form: null,
-			verificationTokenElement: null,
-			siteKey: null,
-			action: null,
-			badgeElement: null
-		}, conf);
+  jQuery.fn.Recaptcha = function (conf)
+  {
+    // For every element passed to the plug-in
+    return this.each(function (index, value)
+    {
+      let siteKey = jQuery(value).attr('data-verification-site-key');
+      var badgeElement = jQuery(jQuery(value).attr('data-verification-badge-element-selector'));
 
-		var clientId = grecaptcha.render(config.badgeElement[0], {
-			'sitekey': config.siteKey,
-			'badge': 'inline',
-			'size': 'invisible'
-		});
+      let clientId = grecaptcha.render(badgeElement[0],
+        {
+          'sitekey': siteKey,
+          'badge': 'inline',
+          'size': 'invisible'
+        });
 
-		// For every element passed to the plug-in
-		return this.each(function (index, value)
-		{
-			jQuery(this).on('click', function (event)
-			{
-				if (config.form === null) return;
-				if (config.verificationTokenElement === null) return;
-				if (config.siteKey === null) return;
-				if (config.action === null) return;
+      jQuery(this).off('click.contactus');
+      jQuery(this).on('click.contactus', function (event)
+      {
+        let verificationAction = jQuery(this).attr('data-verification-action');
+        let form = jQuery(this).parents('form').first();
+        let verificationTokenElement = jQuery(jQuery(this).attr('data-verification-token-element-selector'));
 
-				event.preventDefault();
+        event.preventDefault();
 
-				grecaptcha.ready(function ()
-				{
-					grecaptcha.execute(clientId, { action: config.action })
-						.then(function (token)
-						{
-							config.verificationTokenElement.val(token);
-							config.form.on('submit', Page.PostPartialContent);
-							config.form.trigger('submit');
-						});
-				});
-			});
-		});
-	}
+        grecaptcha.ready(function ()
+        {
+          grecaptcha.execute(clientId, { action: verificationAction })
+            .then(function (token)
+            {
+              verificationTokenElement.val(token);
+              form.on('submit', Page.PostPartialContent);
+              form.trigger('submit');
+            });
+        });
+      });
+    });
+  }
 })(jQuery);

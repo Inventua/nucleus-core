@@ -23,6 +23,7 @@
     <None Remove="license.txt" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
+    <None Remove="settings.css" />
     <None Remove="viewer.js" />
     <None Remove="viewer.min.js" />
     <None Remove="Views\Email Template Sample.cshtml" />
@@ -34,6 +35,7 @@
     <Content Include="license.txt" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
+    <Content Include="settings.css" />
     <Content Include="viewer.js" />
     <Content Include="viewer.min.js" />
     <Content Include="Views\Viewer.cshtml" />
@@ -41,7 +43,8 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.4.0-pre-alpha2.8" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.4.0-pre-alpha2.9" />
+    <PackageReference Include="Inventua.Nucleus.Extensions" Version="1.4.0-pre-alpha2.9" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.2.0" />
 	</ItemGroup>
 

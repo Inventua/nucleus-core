@@ -102,14 +102,37 @@ namespace Nucleus.Extensions
       }
 		}
 
-		/// <summary>
-		/// Gets the specified value or returns an empty string if the key is not present.
+    /// <summary>
+		/// Gets the specified value or returns <paramref name="defaultValue"/> if the key is not present.
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="key"></param>
 		/// <param name="defaultValue"></param>
 		/// <returns></returns>
-		public static Boolean Get(this List<ModuleSetting> settings, string key, Boolean defaultValue)
+		public static double Get(this List<ModuleSetting> settings, string key, double defaultValue)
+    {
+      ModuleSetting value = settings.Where(setting => setting.SettingName == key).FirstOrDefault();
+
+      if (value == null) return defaultValue;
+
+      if (double.TryParse(value.SettingValue, out double result))
+      {
+        return result;
+      }
+      else
+      {
+        return defaultValue;
+      }
+    }
+
+    /// <summary>
+    /// Gets the specified value or returns an empty string if the key is not present.
+    /// </summary>
+    /// <param name="settings"></param>
+    /// <param name="key"></param>
+    /// <param name="defaultValue"></param>
+    /// <returns></returns>
+    public static Boolean Get(this List<ModuleSetting> settings, string key, Boolean defaultValue)
 		{
 			ModuleSetting value = settings.Where(setting => setting.SettingName == key).FirstOrDefault();
 

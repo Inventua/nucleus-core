@@ -13,7 +13,7 @@ else
 	@if (!String.IsNullOrEmpty(Model.RecaptchaSiteKey))
 	{
 		@Html.AddScript("https://www.google.com/recaptcha/api.js?render=explicit&onload=onRecaptchaLoadCallback")
-		@Html.AddScript("~!/../viewer.js")
+		@Html.AddScript("~#/viewer.js")
 	}
 	@if (String.IsNullOrEmpty(Model.SendTo))
 	{
@@ -31,7 +31,7 @@ else
 	}
 	@if (!string.IsNullOrEmpty(Model.SendTo) && Model.MailTemplateId != Guid.Empty)
 	{
-		@using (Html.BeginNucleusForm("Send", "ContactUs", FormMethod.Post, new { @enctype = "multipart/form-data", @data_target = "form.parent()" }))
+		@using (Html.BeginNucleusForm("Send", "ContactUs", FormMethod.Post, new { @class="contact-us-form", @enctype = "multipart/form-data", @data_target = "form.parent()" }))
 		{
 			<fieldset aria-label="Contact Us">
 				@if (Model.ShowName)
@@ -85,10 +85,9 @@ else
 				{
 					@Html.HiddenFor(model => model.RecaptchaVerificationToken, new { @class = "contact-us-recaptcha-verification-token" })
 				}
-				<button type="submit" class="btn btn-primary align-self-end contact-us-send" formaction="@Url.NucleusAction("Send", "ContactUs", "ContactUs")">Send</button>
+        <button type="submit" class="btn btn-primary align-self-end contact-us-send" data-verification-site-key="@Model.RecaptchaSiteKey" data-verification-badge-element-selector=".recaptcha-badge" data-verification-token-element-selector=".contact-us-recaptcha-verification-token" data-verification-action="@Model.RecaptchaAction" formaction="@Url.NucleusAction("Send", "ContactUs", "ContactUs")">Send</button>
 				<div class="recaptcha-badge ms-auto"></div>
 			</div>
-
 		}
 	}
 
@@ -97,16 +96,19 @@ else
 		{
 			if ('@Model.RecaptchaSiteKey' !== '')
 			{
-				jQuery('.contact-us-send').Recaptcha({
-					form: jQuery('form'),
+        jQuery('.contact-us-send').Recaptcha({
+          siteKey: '@Model.RecaptchaSiteKey',
+          badgeElement: jQuery('.recaptcha-badge')
+        });
+
+				@* jQuery('.contact-us-send').Recaptcha({
+          form: jQuery('.contact-us-form'),
 					verificationTokenElement: jQuery('.contact-us-recaptcha-verification-token'),
 					siteKey: '@Model.RecaptchaSiteKey',
 					action: '@Model.RecaptchaAction',
 					badgeElement: jQuery('.recaptcha-badge')
-				});
+				}); *@
 			}
 		}
-
-
 	</script>
 }

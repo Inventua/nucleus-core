@@ -8,13 +8,11 @@ using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using Nucleus.Extensions.Logging;
-using Nucleus.Modules.ContactUs.Models;
+using System.Collections.Generic;
 
 namespace Nucleus.Modules.ContactUs.Controllers;
 
@@ -32,6 +30,7 @@ public class ContactUsController : Controller
 	private IMailTemplateManager MailTemplateManager { get; }
 
 	private IMailClientFactory MailClientFactory { get; }
+
 	private IHttpClientFactory HttpClientFactory { get; }
 
 	private const string GOOGLE_RECAPTCHA_VERIFY_SITE = "https://www.google.com/recaptcha/api/siteverify";
@@ -55,7 +54,7 @@ public class ContactUsController : Controller
 
 	private void Validate(Boolean isRequired, string value, string propertyName, string message)
 	{
-		if (isRequired && string.IsNullOrEmpty(value))
+		if (isRequired && String.IsNullOrEmpty(value))
 		{
 			ModelState.AddModelError(propertyName, message);
 		}
@@ -90,13 +89,13 @@ public class ContactUsController : Controller
 		ModelState.AddModelError(propertyName, message);
 	}
 
-	private Models.RecaptchaToken CaptchaVerify(ViewModels.Viewer viewModel)
+	private async Task<Models.RecaptchaToken> CaptchaVerify(ViewModels.Viewer viewModel)
 	{
 		Models.Settings settings = new();
 		settings.ReadSettings(this.Context.Module);
 		string key = settings.GetSecretKey(this.Context.Site);
 
-		if (String.IsNullOrEmpty(settings.RecaptchaSiteKey) || string.IsNullOrEmpty(key))
+		if (String.IsNullOrEmpty(settings.RecaptchaSiteKey) || String.IsNullOrEmpty(key))
 		{
 			// Recaptcha is not enabled, return true to allow form submission.
 			return new() 
@@ -107,19 +106,37 @@ public class ContactUsController : Controller
 			};
 		}
 
-		string response = VerifyRecaptchaToken(key, viewModel.RecaptchaVerificationToken);
+		string response = await VerifyRecaptchaToken(key, viewModel.RecaptchaVerificationToken);
 		Models.RecaptchaToken responseToken = Newtonsoft.Json.JsonConvert.DeserializeObject<Models.RecaptchaToken>(response);
 
 		return responseToken;
 	}
 
-	private string VerifyRecaptchaToken(string secretKey, string recaptchaToken)
+
+  /// <summary>
+  /// Verify the user response token.
+  /// </summary>
+  /// <param name="secretKey"></param>
+  /// <param name="recaptchaToken"></param>
+  /// <returns></returns>
+	private async Task<string> VerifyRecaptchaToken(string secretKey, string recaptchaToken)
 	{
-		string url = $"{GOOGLE_RECAPTCHA_VERIFY_SITE}?secret={secretKey}&response={recaptchaToken}";
-		using (HttpClient httpClient = this.HttpClientFactory.CreateClient())
+    HttpResponseMessage responseMessage;
+
+    using (HttpClient httpClient = this.HttpClientFactory.CreateClient())
 		{
-			return httpClient.GetStringAsync(url).Result;
+      responseMessage = await httpClient.PostAsync($"{GOOGLE_RECAPTCHA_VERIFY_SITE}",
+        new FormUrlEncodedContent(new[]
+        {
+          new KeyValuePair<string, string>("secret", secretKey),
+          new KeyValuePair<string, string>("response", recaptchaToken),
+          new KeyValuePair<string, string>("remoteip", this.HttpContext.Connection.RemoteIpAddress.ToString())
+        })
+      );
 		}
+
+    responseMessage.EnsureSuccessStatusCode();
+    return await responseMessage.Content.ReadAsStringAsync();
 	}
 
 	[HttpPost]
@@ -134,19 +151,16 @@ public class ContactUsController : Controller
 
 		viewModel.Message.Category = await this.ListManager.GetListItem(viewModel.Message.Category.Id);
 
-		//this.TryValidateModel(viewModel);
-
 		Validate(viewModel, settings);
 
 		if (!ControllerContext.ModelState.IsValid)
 		{
 			return BadRequest(ControllerContext.ModelState);
-		}
-		//this.Logger.LogWarning($"this is the {DateTime.Now}");
+		}		
 
 		try
 		{
-			recaptchaToken = CaptchaVerify(viewModel);
+			recaptchaToken = await CaptchaVerify(viewModel);
 
 			if (!recaptchaToken.Success)
 			{
@@ -154,19 +168,18 @@ public class ContactUsController : Controller
 				{
 					this.Logger.LogWarning("Unsuccessful reCAPTCHA verification.  Errors: '{errorCodes}'.", String.Join(',', recaptchaToken.ErrorCodes));
 				}
-				return BadRequest();
-
+				return BadRequest("Unable to send message. Please contact the system administrator.");
 			}
 
 			if (recaptchaToken.Action != settings.RecaptchaAction)			
 			{
 				this.Logger.LogWarning("Unexpected reCAPTCHA action in response.  Expected: '{expectedAction}', received: '{receivedAction}'.", settings.RecaptchaAction, recaptchaToken.Action);
-				return BadRequest();
+				return BadRequest("Unable to send message. Please contact the system administrator.");
 			}
 
-			if (recaptchaToken.Score < 0.5f)
-			{
-				this.Logger.LogWarning("Suspected robot from {address}. Recaptcha verify score was {score}.", HttpContext.Connection.RemoteIpAddress, recaptchaToken.Score);
+      if (recaptchaToken.Score < Convert.ToSingle(settings.RecaptchaScoreThreshold))
+      {
+        this.Logger.LogWarning("Suspected robot from {address}. Recaptcha verify score was {score}. Action: {action}.", HttpContext.Connection.RemoteIpAddress, recaptchaToken.Score, recaptchaToken.Action);
 
 				// pretend that the message was sent so that robots can't detect success or failure.
 				viewModel.MessageSent = true;
@@ -260,8 +273,9 @@ public class ContactUsController : Controller
 		{
 			IsAdmin = User.IsSiteAdmin(this.Context.Site)
 		};
+
 		viewModel.ReadSettings(this.Context.Module);
-		viewModel.CategoryList = (await this.ListManager.Get(this.Context.Module.ModuleSettings.Get(Models.Settings.MODULESETTING_CATEGORYLIST_ID, Guid.Empty)));
+		viewModel.CategoryList = (await this.ListManager.Get(viewModel.CategoryListId));
 
 		// default values if user is logged on
 		if (User.Identity.IsAuthenticated)

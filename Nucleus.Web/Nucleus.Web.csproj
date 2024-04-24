@@ -196,6 +196,7 @@
 	<ItemGroup>
 	  <Folder Include="Properties\ServiceDependencies\" />
 	  <Folder Include="Resources\Libraries\jQuery\3.7.1\" />
+	  <Folder Include="Utils\Windows\" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -181,9 +181,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Operations", "Operations", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Modules.FilesList", "Nucleus.Core.Modules\Nucleus.Modules.FilesList\Nucleus.Modules.FilesList.csproj", "{C476B816-B7AE-43CE-BB62-5D8B9BB13629}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Modules.PageLinks", "Nucleus.Core.Modules\Nucleus.Modules.PageLinks\Nucleus.Modules.PageLinks.csproj", "{6D4A7F71-4564-47C0-9503-10B01BB5B3FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Modules.PageLinks", "Nucleus.Core.Modules\Nucleus.Modules.PageLinks\Nucleus.Modules.PageLinks.csproj", "{6D4A7F71-4564-47C0-9503-10B01BB5B3FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.CopilotClient", "Nucleus.Special.Modules\Nucleus.CopilotClient\Nucleus.CopilotClient.csproj", "{3112275E-9ABE-494C-A5A9-83EF913CEC0C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.CopilotClient", "Nucleus.Special.Modules\Nucleus.CopilotClient\Nucleus.CopilotClient.csproj", "{3112275E-9ABE-494C-A5A9-83EF913CEC0C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Extensions.SendGrid", "Nucleus.Core.Modules\Nucleus.Extensions.SendGrid\Nucleus.Extensions.SendGrid.csproj", "{319B4F09-DF9F-4421-BA89-11116E068B60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Extensions.Smtp", "Nucleus.Core.Modules\Nucleus.Extensions.Smtp\Nucleus.Extensions.Smtp.csproj", "{675D5641-BDF7-4B51-80BB-326A75EBBAF9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -359,6 +363,14 @@ Global
 		{3112275E-9ABE-494C-A5A9-83EF913CEC0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3112275E-9ABE-494C-A5A9-83EF913CEC0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3112275E-9ABE-494C-A5A9-83EF913CEC0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{319B4F09-DF9F-4421-BA89-11116E068B60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{319B4F09-DF9F-4421-BA89-11116E068B60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{319B4F09-DF9F-4421-BA89-11116E068B60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{319B4F09-DF9F-4421-BA89-11116E068B60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{675D5641-BDF7-4B51-80BB-326A75EBBAF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{675D5641-BDF7-4B51-80BB-326A75EBBAF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{675D5641-BDF7-4B51-80BB-326A75EBBAF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{675D5641-BDF7-4B51-80BB-326A75EBBAF9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -403,6 +415,8 @@ Global
 		{C476B816-B7AE-43CE-BB62-5D8B9BB13629} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{6D4A7F71-4564-47C0-9503-10B01BB5B3FF} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{3112275E-9ABE-494C-A5A9-83EF913CEC0C} = {CD49EF69-179E-461A-9C51-041EA3B901CE}
+		{319B4F09-DF9F-4421-BA89-11116E068B60} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
+		{675D5641-BDF7-4B51-80BB-326A75EBBAF9} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D84CD364-9C8E-400E-84AA-45562061ED44}

@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.TaskScheduler;
-using Nucleus.Data.Common;
-using Org.BouncyCastle.Utilities.Collections;
 
 namespace Nucleus.Core.DataProviders
 {
-	/// <summary>
-	/// Provides create, read, update and delete functionality for the <see cref="ScheduledTask"/> class.
-	/// </summary>
-	internal interface IScheduledTaskDataProvider : IDisposable//, IDataProvider<IScheduledTaskDataProvider>
+  /// <summary>
+  /// Provides create, read, update and delete functionality for the <see cref="ScheduledTask"/> class.
+  /// </summary>
+  internal interface IScheduledTaskDataProvider : IDisposable//, IDataProvider<IScheduledTaskDataProvider>
 	{
 		abstract Task<ScheduledTask> GetScheduledTaskByTypeName(string typeName);
 		abstract Task SaveScheduledTask(ScheduledTask scheduledTask);

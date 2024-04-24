@@ -51,7 +51,6 @@
     <None Remove="DataProviders\Migrations\Scripts\01.00.20.json" />
     <None Remove="DataProviders\Migrations\Scripts\01.00.21.json" />
     <None Remove="DataProviders\Migrations\Scripts\01.00.22.json" />
-    <None Remove="Mail\mail.css" />
   </ItemGroup>
 
   <ItemGroup>
@@ -78,7 +77,6 @@
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.04.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.07.json" />
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.10.json" />
-    <EmbeddedResource Include="Mail\mail.css" />
   </ItemGroup>
 
   <ItemGroup>
@@ -93,7 +91,6 @@
   </ItemGroup>
 
   <ItemGroup>
-		<PackageReference Include="MailKit" Version="4.5.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="8.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.1">

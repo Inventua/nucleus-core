@@ -1,0 +1,28 @@
+﻿@model Nucleus.Extensions.Smtp.SmtpMailOptions
+<div class="nucleus-flex-fields">
+  <SettingsControl caption="SMTP Host" helptext="SMTP host name">
+    @Html.TextBoxFor(model => model.HostName)
+  </SettingsControl>
+
+  <SettingsControl caption="SMTP Port" helptext="SMTP Port">
+    @Html.TextBoxFor(model => model.Port)
+  </SettingsControl>
+</div>
+
+<SettingsControl caption="Use SSL?" helptext="Use SSL?" rendermode="LabelLast" class="inner-inline">
+  @Html.CheckBoxFor(model => model.UseSsl, new { @class = "ToggleSwitch" })
+</SettingsControl>
+
+<SettingsControl caption="Sender Email" helptext="Sender Email">
+  @Html.TextBoxFor(model => model.Sender)
+</SettingsControl>
+
+<div class="nucleus-flex-fields">
+  <SettingsControl caption="User Name" helptext="Username">
+    @Html.TextBoxFor(model => model.UserName)
+  </SettingsControl>
+
+  <SettingsControl caption="Password" helptext="Password">
+    @Html.PasswordFor(model => model.Password, new { @value = Nucleus.Extensions.Smtp.SmtpMailOptions.UNCHANGED_PASSWORD })    
+  </SettingsControl>
+</div>

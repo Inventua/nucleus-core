@@ -1,0 +1,23 @@
+﻿<package id="09aeadfd-536e-44d4-acdf-cf1cf6d86629" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
+  <name>SendGrid Mail</name>
+  <version>1.0.0</version>
+  <publisher name="Inventua" url="https://www.inventua.com" email="support@inventua.com" />
+  <description>
+		Adds support for sending emails using the Twilio SendGrid API.
+	</description>
+  <compatibility minVersion="1.4.0.0" maxVersion="*" />
+  <components>
+    <component folderName="SendGrid Mail" optional="false">
+      <file name="readme.txt" />
+      <file name="license.txt" />
+      <folder name="bin">
+        <file name="Nucleus.Extensions.SendGrid.dll" />
+        <file name="StarkbankEcdsa.dll" />
+        <file name="SendGrid.dll" />
+      </folder>
+      <folder name="Views">
+        <file name="_SendGridSettings.cshtml" />
+      </folder>
+    </component>
+  </components>
+</package>

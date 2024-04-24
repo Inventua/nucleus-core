@@ -1,0 +1,26 @@
+﻿@model Nucleus.Web.ViewModels.Admin.MailSettings
+<h1 class="nucleus-control-panel-heading">Mail Settings</h1>
+@using (Html.BeginAreaForm("SelectMailClient", "MailSettings", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @autocomplete = "off", @enctype = "multipart/form-data" }))
+{
+  <fieldset class="flex-grow-1">
+    <SettingsControl caption="Default Mail Client" helptext="Select the type of mail client that your site uses.">
+      @Html.DropDownListFor(model => model.DefaultMailClientTypeName, new SelectList(Model.AvailableMailClientTypes, "TypeName", "FriendlyName"), "(select)", new { @data_autopostbackevent = "change" })
+    </SettingsControl>
+    @if (!String.IsNullOrEmpty(Model.SettingsPath))
+    {
+      @await Html.PartialAsync(Model.SettingsPath, Model.Settings, Model.SettingsViewData)
+    }
+  </fieldset>
+  <div class="alert alert-success">
+    <h3>Send Test Message</h3>
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="Email Address" helptext="Enter an email address.">
+        @Html.TextBoxFor(model => model.SendTestMailTo)
+      </SettingsControl>
+      <button type="submit" class="btn btn-success ms-auto nucleus-show-progress nucleus-show-progress-before" formaction="@Url.AreaAction("TestMailSettings", "MailSettings", "Admin")" data-target=".nucleus-adminpage">Send Test</button>
+    </div>
+  </div>
+  <div>
+    <button type="submit" class="btn btn-primary nucleus-show-progress nucleus-show-progress-after" formaction="@Url.AreaAction("Save", "MailSettings", "Admin")" data-target=".nucleus-adminpage">Save Changes</button>
+  </div>
+}

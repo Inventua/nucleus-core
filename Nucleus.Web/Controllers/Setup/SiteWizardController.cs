@@ -38,6 +38,10 @@ public class SiteWizardController : Controller
   private Abstractions.Models.Application Application { get; }
   private ILogger<SiteWizardController> Logger { get; }
 
+  private static Guid HTML_MODULE_PACKAGE_ID = Guid.Parse("4036fdb6-6114-4740-b3c4-d3dbc8f37540");
+  private static Guid SMTP_CLIENT_PACKAGE_ID = Guid.Parse("2cefdc41-bb7c-48c7-9dd0-9f1975bcd502");
+
+  private static Guid[] REQUIRED_EXTENSIONS = { HTML_MODULE_PACKAGE_ID, SMTP_CLIENT_PACKAGE_ID };
 
   private static FileSystemType LOCAL_FILES = new()
   {
@@ -666,12 +670,14 @@ public class SiteWizardController : Controller
 
                 if
                   (
+                    REQUIRED_EXTENSIONS.Contains(installableExtension.PackageId) ||
                     (modulesInTemplate != null && modulesInTemplate.Where(moduleDef => installableExtension.ModulesInPackage.Contains(moduleDef.Id)).Any()) ||
                     (layoutsInTemplate != null && layoutsInTemplate.Where(layoutDef => installableExtension.LayoutsInPackage.Contains(layoutDef.Id)).Any()) ||
                     (containersInTemplate != null && containersInTemplate.Where(containerDef => installableExtension.ContainersInPackage.Contains(containerDef.Id)).Any())
                   )
                 {
-                  // template contains one or more modules/layouts/containers that are in this extension (so the extension is required)
+                  // extension is a required component, or the selected template contains one or more modules/layouts/containers that are in this
+                  // extension (so the extension is required by the template)
                   installableExtension.IsSelected = true;
                   installableExtension.IsRequired = true;
                 }
@@ -751,8 +757,6 @@ public class SiteWizardController : Controller
       viewModel.OtherWarnings = otherWarnings.Distinct();
 
       viewModel.InstallableExtensions = installableExtensions.OrderBy(ext => ext.Name).ToList();
-      //viewModel.Layouts = (await this.LayoutManager.List()).InsertDefaultListItem();
-      //viewModel.Containers = (await this.ContainerManager.List()).InsertDefaultListItem();
     }
 
     return viewModel;

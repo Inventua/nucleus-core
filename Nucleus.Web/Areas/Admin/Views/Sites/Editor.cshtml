@@ -18,7 +18,7 @@
 			<TabItem target="#site-userprofile" caption="User Profile Properties"></TabItem>
 			<TabItem target="#site-sitepages" caption="Site Pages"></TabItem>
 		}
-		<TabItem target="#site-mailsettings" caption="Email Settings"></TabItem>
+		@* <TabItem target="#site-mailsettings" caption="Email Settings"></TabItem> *@
 		@if (Model.Site.Id != Guid.Empty)
 		{
 			<TabItem target="#site-mailtemplates" caption="Email Templates"></TabItem>
@@ -257,9 +257,13 @@
 				</fieldset>
 			</TabPanel>
 		}
-		<TabPanel id="site-mailsettings">
+		@* <TabPanel id="site-mailsettings">
 			<fieldset role="group" aria-labelledby="heading">
 				<h2>Email Settings</h2>
+
+        <SettingsControl caption="SMTP Host" helptext="SMTP host name">
+					@Html.TextBoxFor(model => model.MailSettings.HostName)
+				</SettingsControl>
 
 				<div class="nucleus-flex-fields">
 					<SettingsControl caption="SMTP Host" helptext="SMTP host name">
@@ -300,7 +304,7 @@
           <button type="submit" class="btn btn-success nucleus-show-progress nucleus-show-progress-after" formaction="@Url.AreaAction("TestMailSettings", "Sites", "Admin")" data-target=".nucleus-adminpage">Test Mail Settings</button>
         </div>
 			</fieldset>
-		</TabPanel>
+		</TabPanel> *@
 
 		<TabPanel id="site-mailtemplates">
 			<fieldset role="group" aria-labelledby="heading">

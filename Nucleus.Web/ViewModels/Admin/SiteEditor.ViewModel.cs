@@ -32,7 +32,6 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public List<SiteGroup> SiteGroups { get; set; }
 
-		public MailSettings MailSettings { get; set; }
 		public SiteTemplateSelections SiteTemplateSelections { get; set; }
 		public SitePages SitePages { get; set; }
 		public PageMenu PageMenu { get; set; }

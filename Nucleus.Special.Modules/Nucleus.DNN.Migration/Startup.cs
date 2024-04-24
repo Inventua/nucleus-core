@@ -71,7 +71,7 @@ public class Startup : IHostingStartup
     {
       return assembly.GetExportedTypes();
     }
-    catch (System.Reflection.ReflectionTypeLoadException)
+    catch (Exception)
     {
       return Array.Empty<Type>();
     }

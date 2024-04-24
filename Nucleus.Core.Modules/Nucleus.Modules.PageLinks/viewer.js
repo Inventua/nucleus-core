@@ -7,170 +7,222 @@
 {
   jQuery.fn.PageLinkViewer = function (conf)
   {
-    var options = jQuery.extend({
-      operationMode: null,
-      rootSelector: 'body',
-      includeHeaders: '',
-      headingClass: ''
-    }, conf);
+    let options = jQuery.extend({}, conf);
 
     // private variables
-    let _autoIdCounter = 0;
-    let _headerElements;
 
     // private functions
-    function _getAllHeaders(element)
+
+    // create and return the page links list 
+    function _buildPageLinksList(rootElement, includedHeaders, headingClass)
     {
-      this._headerElements = element.children().find(':header');
-      var previousHeaderIndex = 10;
-      var listElement = jQuery('<ol></ol>'); //wrapper used to add to DOM.
-      var parentElement = listElement;
+      let headerElements = rootElement.children().find(':header:visible');
+      let pageLinkslistElement = jQuery('<div></div>');
 
-      if (this._headerElements.length > 0)
+      if (headerElements.length > 0)
       {
-        jQuery.each(this._headerElements, function (index)
+        let currentHeaderIndex = -1;
+        let queuedPageLinks = [];
+          
+        for (let headersIndex = 0; headersIndex < headerElements.length; headersIndex++)
         {
-          var headerIndex = parseInt(this.nodeName.substring(1), 10);
+          let headerElement = headerElements[headersIndex];
+          let headerIndex = parseInt(headerElement.nodeName.substring(1), 10);
 
-          if (_isHeaderValid(this))
+          // render a child list on change of level
+          if (headerIndex !== currentHeaderIndex)
           {
-            var pageLinkItem = jQuery('<ol></ol>').append(_getPageLink(jQuery(this)));
-
-            var parentListItem = _getParentListItem(parentElement, jQuery(this), headerIndex);
-            if (parentListItem !== null)
+            if (queuedPageLinks.length !== 0)
             {
-              listElement.find(parentListItem).append(pageLinkItem);
+              let parentListItem = _getParentListItem(headerElements, pageLinkslistElement, jQuery(headerElements[headersIndex-1]), includedHeaders, headingClass);
+              parentListItem.append(parentListItem.is('li') ? jQuery('<ol></ol>').append(queuedPageLinks): queuedPageLinks);
+              queuedPageLinks = [];
             }
-            else
-            {
-              listElement.append(pageLinkItem);
-            }
+            currentHeaderIndex = headerIndex;
           }
-          previousHeaderIndex = headerIndex;
-        });
-      }
 
-      // remove the original <ol></ol> wrapper
-      listElement.children('ol').children().unwrap();
-
-      return listElement;
-    }
-
-    function _getParentListItem(listElement, element, headerLevel)
-    {
-      var parentListItem = null;
-
-      if (this._headerElements[0] === element)
-      {
-        return null;
-      }
-      else
-      {
-        // copy the preceding elements into another array and reverse
-        var reverseArray = jQuery(this._headerElements.slice(0, this._headerElements.index(jQuery(element)) + 1)).get().reverse();
-
-        // loop through the array until we find the first parent header
-        jQuery(reverseArray).each(function (index)
-        {
-          let headerIndex = parseInt(this.nodeName.substring(1), 10);
-
-          if (_isHeaderValid(this))
+          if (_shouldIncludeHeader(headerElement, includedHeaders, headingClass))
           {
-            if (headerIndex < headerLevel)
-            {
-              // found nearest parent
-              let elementId = jQuery(this).prop('id');
-
-              let relativeUrl = new URL(window.location.href);
-              relativeUrl.hash = '#' + elementId;
-
-              parentListItem = jQuery(listElement).closest('ol').find('a[href*="' + relativeUrl.toString() + '"]').parent();
-              return false;
-            }
+            let pageLinkItem = _buildPageLink(jQuery(headerElement));
+            queuedPageLinks.push(pageLinkItem);            
           }
-        });
-      }
-
-      return parentListItem;
-    }
-
-    function _setHeaderElementId(element)
-    {
-      var headerElement = jQuery(element);
-      var elementId = headerElement.prop('id');
-
-      if (elementId === '')
-      {
-        var elementId = headerElement
-          .text()
-          .replace(/\s/, '-')
-          .replace(/[^A-Za-z0-9]/g, '')
-          .toLowerCase();
-
-        if (jQuery('#' + elementId).length !== 0)
-        {
-          do
+          
+          // render a child list after processing the last heading in the list
+          if (headersIndex === headerElements.length - 1)
           {
-            _autoIdCounter++;
-            elementId = 'pageLink' + _autoIdCounter;
-          } while (jQuery('#' + elementId).length !== 0);
+            let parentListItem = _getParentListItem(headerElements, pageLinkslistElement, jQuery(headerElement), includedHeaders, headingClass);
+            parentListItem.append(parentListItem.is('li') ? jQuery('<ol></ol>').append(queuedPageLinks) : queuedPageLinks);
+          }
         }
-      } 
+      }
 
-      headerElement.prop('id', elementId);
-
-      return elementId;
+      return pageLinkslistElement.children();
     }
 
-    function _getPageLink(element)
+    // create and return a list item containing an anchor <a> element which links to the specified element 
+    function _buildPageLink(element)
     {
-      var elementId = _setHeaderElementId(element);
+      let elementId = element.prop('id');
 
-      var relativeUrl = new URL(window.location.href);
+      let relativeUrl = new URL(window.location.href);
       relativeUrl.hash = '#' + elementId;
 
-      var linkText = jQuery(element).prop('data-title');
+      let linkText = jQuery(element).prop('data-title');
       if (typeof linkText === 'undefined')
       {
         linkText = jQuery(element).text();
       }
 
-      return jQuery('<li><a href="' + relativeUrl.toString() + '">' + linkText + '</a></li>');
+      let listElement = jQuery('<li></li>');
+      let linkElement = jQuery('<a href="#">' + linkText + '</a>');
+      if (elementId === '')
+      {
+        // if the header element does not have an id, set the PageLinksTarget property and attach an event handler to 
+        // manage scrollTo.
+        linkElement[0].PageLinksTarget = element;
+        linkElement.on('click', _scrollTo);
+      }
+      else
+      {
+        // if the header element has an id, use it
+        linkElement.attr('href', relativeUrl.toString());
+        // still call _scrollTo to manage the header animation
+        linkElement.on('click', _scrollTo);
+      }
+
+      listElement.append(linkElement);
+
+      return listElement;
     }
 
-    function _isHeaderValid(element)
+    // return the parent of the list item which is linked to the specified element
+    function _getParentListItem(headerElements, listElement, element, includedHeaders, headingClass)
     {
-      let headerArray = options.includeHeaders.split(',');
-      let headerIndex = parseInt(element.nodeName.substring(1), 10);
-      let includeHeader = headerArray.filter((headers) => headers.toLowerCase().includes('h' + headerIndex)).length > 0;
-      let headingClassArray = options.headingClass.split(',');
-
-      if (includeHeader)
+      // first item is always added to the top-level list
+      if (headerElements[0] === element[0])
       {
-        if (options.headingClass.length === 0) return true;
+        return listElement;
+      }
+      else      
+      {
+        let thisHeaderLevel = parseInt(element[0].nodeName.substring(1), 10);
+        // loop through preceeding headers in reverse to find a header level less than the specified element
+        for (let headersCount = headerElements.index(element); headersCount >= 0; headersCount--)
+        {
+          let headerElement = headerElements[headersCount];
+          let headerLevel = parseInt(headerElement.nodeName.substring(1), 10);
 
+          if (_shouldIncludeHeader(headerElement, includedHeaders, headingClass) && headerLevel < thisHeaderLevel)
+          {
+            // find the list item which is linked to the "parent" header element
+            let parentListItem = null;
+      
+            // handle headers which are linked by id
+            let relativeUrl = new URL(window.location.href);
+            relativeUrl.hash = '#' + jQuery(headerElement).prop('id');
+            parentListItem = jQuery(listElement).find('a[href*="' + relativeUrl.toString() + '"]').parent();
+
+            if (parentListItem.length !== 0) return parentListItem;
+
+            if (parentListItem === null || parentListItem.length === 0)
+            {
+              // handle headers which are linked by the PageLinksTarget property
+              let links = jQuery(listElement).find('a');
+              for (let childCount = links.length-1; childCount >= 0; childCount--)
+              {
+                if (typeof links[childCount].PageLinksTarget !== 'undefined' && links[childCount].PageLinksTarget.length > 0 && links[childCount].PageLinksTarget[0] === headerElement)
+                {
+                  return jQuery(links[childCount]).parent();
+                }
+              }
+            }
+          }
+        }
+      }
+
+      return listElement;
+    }
+    
+    // return whether the header element should be included in the page links list, based on module settings
+    function _shouldIncludeHeader(element, includedHeaders, headingClass)
+    {
+      let doIncludeHeader = includedHeaders.toUpperCase().split(',').includes(element.nodeName);
+
+      if (doIncludeHeader)
+      {
+        if (headingClass === '') return true;
+
+        let headingClassArray = headingClass.split(',');
         for (let index = 0; index < headingClassArray.length; index++)
         {
-          if (jQuery(element).hasClass(headingClassArray[index].trim())) return true;
+          if (jQuery(element).hasClass(headingClassArray[index].trim().replace(/^\./gm, ''))) return true;
         }
-
-        //return jQuery(element).hasClass(options.headingClass);
       }
-      //else
-      //{
-      //  return false;
-      //}
-
       return false;
     }
 
+    // for the clicked page link, scroll the linked header into view 
+    function _scrollTo(event)
+    {
+      let scrollTargetElement = this.PageLinksTarget;
+
+      if (typeof scrollTargetElement === 'undefined' || scrollTargetElement === null)
+      {
+        // if PageLinksTarget is not set, the header element has an id, use it to find the target element so
+        // we can highlight it
+        let relativeUrl = new URL(jQuery(this).attr('href'))
+        scrollTargetElement = jQuery(relativeUrl.hash);
+      }
+      else
+      {
+        // if we are using the PageLinksTarget property, then we need to suppress default behavior
+        event.preventDefault();
+      }
+
+      let durationValue = getComputedStyle(scrollTargetElement[0]).getPropertyValue('--page-links-highlight-duration');
+      let duration = Number.isNaN(parseInt(durationValue)) ? 0 : parseInt(durationValue);
+
+      if (duration > 0)
+      {
+        scrollTargetElement
+          .removeClass('pagelink-highlight')
+          .addClass('pagelink-highlight');
+      }
+
+      scrollTargetElement[0].scrollIntoView({ block: "center", inline: "nearest" });
+
+      if (duration !== '')
+      {
+        window.setTimeout(function ()
+        {
+          scrollTargetElement.removeClass('pagelink-highlight');
+        }, duration);
+      }
+    }
+
+    // build the page links list
     return this.each(function ()
     {
-      if (options.operationMode === 'Automatic' && options.rootSelector.length > 0)
+      let pageLinksWrapper = jQuery(this);
+      if (pageLinksWrapper[0].hasAttribute('data-page-links-rootselector'))
       {
-        let listElement = _getAllHeaders(jQuery(options.rootSelector));
-        jQuery('.PageLinks').append(listElement);
+        let rootSelector = pageLinksWrapper.attr('data-page-links-rootselector');
+        let includedHeaders = pageLinksWrapper.attr('data-page-links-includeheaders');
+        let headingClass = pageLinksWrapper.attr('data-page-links-heading-class');
+
+        // remove the attributes because they are only needed until this code has executed. Also removing them prevents the plugin from
+        // running twice on the same wrapper.
+        pageLinksWrapper.removeAttr('data-page-links-rootselector');
+        pageLinksWrapper.removeAttr('data-page-links-includeheaders');
+        pageLinksWrapper.removeAttr('data-page-links-heading-class');
+
+        if (!rootSelector || rootSelector.length === 0)
+        {
+          rootSelector = 'body';
+        }
+
+        pageLinksWrapper.append(_buildPageLinksList(jQuery(rootSelector), includedHeaders, headingClass));
       }
-    });
+    })
   };
 }(jQuery));

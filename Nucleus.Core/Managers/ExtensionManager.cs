@@ -113,7 +113,7 @@ namespace Nucleus.Core.Managers
 			return result;
 		}
 
-		private async Task<string> GetDocumentationFileContents(ExtensionInstaller installer, params string[] filenames)
+		private static async Task<string> GetDocumentationFileContents(ExtensionInstaller installer, params string[] filenames)
 		{
 			foreach (string filename in filenames)
 			{

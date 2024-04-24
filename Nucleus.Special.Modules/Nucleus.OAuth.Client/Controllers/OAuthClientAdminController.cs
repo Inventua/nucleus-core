@@ -92,7 +92,7 @@ namespace Nucleus.OAuth.Client.Controllers
 			this.Context.Module.ModuleSettings.Set(ViewModels.Settings.MODULESETTING_AUTOLOGIN, viewModel.AutoLogin);
 			this.Context.Module.ModuleSettings.Set(ViewModels.Settings.MODULESETTING_LAYOUT, viewModel.Layout);
 
-			await this.PageModuleManager.SaveSettings(this.Context.Module);
+			await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
 			return Ok();
 		}

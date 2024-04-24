@@ -115,7 +115,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
           AddScript(htmlHelper, "~/Resources/js/nucleus-admin.js");
 					break;
 				case WellKnownScripts.NUCLEUS_TOGGLESWITCH:
-          AddScript(htmlHelper, "~/Resources/js/jquery-toggleswitch.js", true);
+          AddScript(htmlHelper, "~/Resources/js/jquery-toggleswitch.js");
 					break;
         case WellKnownScripts.NUCLEUS_EDITMODE:
           AddScript(htmlHelper, "~/Resources/js/nucleus-editmode.js");

@@ -1,15 +1,34 @@
-﻿.PageLinks ol
+﻿:root
 {
-	list-style-type: none;
+  --page-links-highlight-text-color: inherit;
+  --page-links-highlight-background-color: yellow;
+
+  /* this variable is used by viewer.js.  set to 0 to disable target highlighting */
+  --page-links-highlight-duration: 750; 
+  --page-links-highlight-transition-duration: 0.5s;
 }
 
-.PageLinks ol
+/* Remove padding from the first "outer" ol */
+.page-links 
 {
-	padding-left: 1rem;
+  padding-left: 0;
+  list-style-type: none;
 }
 
-/* Remove padding from the first ol */
-.PageLinks > ol
+.page-links ol
 {
-	padding-left: 0;
+  list-style-type: none;
+  padding-left: 1rem;
+}
+
+h1, h2, h3, h4, h5, h6
+{
+  transition: background-color ease-in var(--page-links-highlight-transition-duration);
+}
+
+.pagelink-highlight
+{
+  color: var(--page-links-highlight-text-color)!important;
+  background-color: var(--page-links-highlight-background-color)!important;
+  transition: background-color ease-out var(--page-links-highlight-transition-duration);
 }

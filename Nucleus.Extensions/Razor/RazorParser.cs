@@ -1,25 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Concurrent;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using RazorEngineCore;
-using Nucleus.Abstractions.Mail;
-using System.Threading;
-using System.Collections.Concurrent;
 
 // https://github.com/adoconnection/RazorEngineCore
 
 namespace Nucleus.Extensions.Razor
 {
-	/// <summary>
-	/// Razor Parser methods.
-	/// </summary>
-	public class RazorParser
+  /// <summary>
+  /// Razor Parser methods.
+  /// </summary>
+  public class RazorParser
 	{
 		private static readonly ConcurrentDictionary<string, object> CompiledTemplateCache = new();
 		private readonly static string[] UsingNamespaces = 
-    { 
+    [ 
       "System", 
       "System.Collections.Generic", 
       "System.Linq", 
@@ -28,7 +25,7 @@ namespace Nucleus.Extensions.Razor
       "Nucleus.Extensions", 
       "Nucleus.Abstractions", 
       "Nucleus.Abstractions.Models" 
-    };
+    ];
     private static readonly SemaphoreSlim _cacheSemaphore = new(1, 1);
 
 		/// <summary>
@@ -41,7 +38,7 @@ namespace Nucleus.Extensions.Razor
 		public static async Task<string> Parse<TModel>(string template, TModel model)
 			where TModel : class
 		{
-			IRazorEngine engine = new RazorEngine();
+			RazorEngine engine = new();
 			IRazorEngineCompiledTemplate<RazorEngineTemplate<TModel>> compiledTemplate = null;
 			
 			string templateKey = typeof(TModel).FullName + Hash(template);
@@ -89,67 +86,21 @@ namespace Nucleus.Extensions.Razor
 		/// <summary>
 		/// Test-compile the template, throwing an exception on error.
 		/// </summary>
+    /// <param name="modelType"></param>
 		/// <param name="template">Razor-language template.</param>
 		/// <returns></returns>
-		public static async Task<TestCompileResult> TestCompile(string template)
+		public static async Task<RazorValidatorResult> TestCompile(System.Type modelType, string template)
 		{
-			IRazorEngine engine = new RazorEngine();
-			IRazorEngineCompiledTemplate compiledTemplate = null;
+			RazorValidator engine = new();
+      Type templateType = typeof(RazorEngineTemplate<>).MakeGenericType(modelType);
 
-			try
-			{
-				compiledTemplate = await engine.CompileAsync(template, BuildRazorOptions);
-			}
-			catch (RazorEngineCompilationException ex)
-			{
-				return new TestCompileResult(false, ex.Errors.Select(err => $"{err.GetMessage()}, position {err.Location.GetLineSpan().StartLinePosition.Character} in source: <code>{GetSource(ex.GeneratedCode, err)}</code>"));				
-			}
-
-			return new TestCompileResult(true);
+      return await engine.TestCompileAsync(modelType, template, BuildRazorOptions);
 		}
-
-		private static string GetSource(string code, Microsoft.CodeAnalysis.Diagnostic error)
-		{
-			string[] codeLines = code.Split(Environment.NewLine);
-
-			Microsoft.CodeAnalysis.FileLinePositionSpan location = error.Location.GetLineSpan();
-
-			return String.Join(" ", codeLines
-				.Skip(location.StartLinePosition.Line)
-				.Take(location.EndLinePosition.Line - location.StartLinePosition.Line+1));
-		}
-
-		/// <summary>
-		/// Return value for the TestCompile function.
-		/// </summary>
-		public class TestCompileResult
-		{
-			/// <summary>
-			/// Indicates that the template was compiled successfully (true) or had errors (false)
-			/// </summary>
-			public Boolean Success { get; }
-
-			/// <summary>
-			/// List of error messages when Success=false.
-			/// </summary>
-			public IEnumerable<string> Errors { get; }
-
-			internal TestCompileResult(Boolean success)
-			{
-				this.Success = success;
-			}
-
-			internal TestCompileResult(Boolean success, IEnumerable<string> errors)
-			{
-				this.Success = success;
-				this.Errors = errors;
-			}
-		}
-
+     
 		private static void BuildRazorOptions(IRazorEngineCompilationOptionsBuilder builder)
 		{
 			builder.Options.TemplateFilename = " ";
-			builder.Options.DefaultUsings = new();
+			builder.Options.DefaultUsings = [];
 
 			builder.AddAssemblyReference(typeof(System.Uri).Assembly);
 			builder.AddAssemblyReference(typeof(System.Collections.Generic.CollectionExtensions).Assembly);
@@ -163,13 +114,9 @@ namespace Nucleus.Extensions.Razor
 		}
 
 		private static string Hash(string value)
-		{
-			var objData = Encoding.UTF8.GetBytes(value);
-
-			using (System.Security.Cryptography.HashAlgorithm provider = System.Security.Cryptography.SHA256.Create())
-			{
-				return Convert.ToBase64String(provider.ComputeHash(objData, 0, objData.Length));
-			}
-		}
-	}
+    {
+      byte[] objData = Encoding.UTF8.GetBytes(value);
+      return Convert.ToBase64String(System.Security.Cryptography.SHA256.HashData(objData.AsSpan(0, objData.Length)));
+    }
+  }
 }

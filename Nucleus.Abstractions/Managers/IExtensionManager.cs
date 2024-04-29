@@ -66,11 +66,18 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="moduleDefinition"></param>
 		public Task SaveModuleDefinition(ModuleDefinition moduleDefinition);
 
-		/// <summary>
-		/// Delete a <see cref="ModuleDefinition"/> database record.
-		/// </summary>
-		/// <param name="moduleDefinition"></param>
-		public Task DeleteModuleDefinition(ModuleDefinition moduleDefinition);
+    /// <summary>
+    /// Check for and delete scheduled tasks implemented by the specified assembly.
+    /// </summary>
+    /// <param name="assemblyFilePath"></param>
+    /// <returns></returns>
+    public Task DeleteScheduledTasks(string assemblyFilePath);
+
+    /// <summary>
+    /// Delete a <see cref="ModuleDefinition"/> database record.
+    /// </summary>
+    /// <param name="moduleDefinition"></param>
+    public Task DeleteModuleDefinition(ModuleDefinition moduleDefinition);
 
 		/// <summary>
 		/// List the modules which use the specified module definition.

@@ -632,7 +632,7 @@ namespace Nucleus.Core
 
     private System.Version GetAssemblyVersion(Stream stream)
     {
-      System.Version result;
+      System.Version result;    
 
       if (!stream.CanSeek)
       {
@@ -651,16 +651,16 @@ namespace Nucleus.Core
       }
 
       return result;
-    }
+    }    
 
-		/// <summary>
-		/// Copy a folder and its files to the specified folder.
-		/// </summary>
-		/// <param name="componentFolder">Source folder.</param>
+    /// <summary>
+    /// Copy a folder and its files to the specified folder.
+    /// </summary>
+    /// <param name="componentFolder">Source folder.</param>
     /// <param name="path"></param>
-		/// <param name="folder">Target folder.</param>
-		/// <returns></returns>
-		private Boolean CopyFolder(string componentFolder, string path, Nucleus.Abstractions.Models.Extensions.FolderDefinition folder)
+    /// <param name="folder">Target folder.</param>
+    /// <returns></returns>
+    private Boolean CopyFolder(string componentFolder, string path, Nucleus.Abstractions.Models.Extensions.FolderDefinition folder)
 		{
 			foreach (Nucleus.Abstractions.Models.Extensions.FileDefinition file in folder.Items.OfType<Nucleus.Abstractions.Models.Extensions.FileDefinition>())
 			{
@@ -826,9 +826,12 @@ namespace Nucleus.Core
 			{
 				if (System.IO.Path.GetExtension(file.name).Equals(".dll", StringComparison.OrdinalIgnoreCase))
 				{
-					// rename DLLs to .backup to prevent a file in use error.  ExtensionManager.Cleanup is called during startup to remove the 
-					// backups.   
-					System.IO.File.Move(filePath, filePath + IExtensionManager.BACKUP_FILE_EXTENSION);
+          // check for scheduled tasks
+          this.ExtensionManager.DeleteScheduledTasks(filePath);
+
+          // rename DLLs to .backup to prevent a file in use error.  ExtensionManager.Cleanup is called during startup to remove the 
+          // backups.   
+          System.IO.File.Move(filePath, filePath + IExtensionManager.BACKUP_FILE_EXTENSION);
 				}
 				else
 				{

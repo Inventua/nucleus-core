@@ -307,6 +307,12 @@ a *
 	display: block;
 }
 
+.modal-dialog-content-border.modal-dialog .modal-body
+{
+  margin: var(--nucleus-default-gap-vertical) var(--nucleus-default-gap-horizontal);
+  border: solid 1px var(--nucleus-default-border-color);
+}
+
 /*  prevent selection of dialog header - when handling double-click to set modal to full size, edge selects the text and shows a menu, this prevents 
     that from happening  */
 .modal-header

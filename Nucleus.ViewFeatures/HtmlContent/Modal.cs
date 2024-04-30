@@ -24,7 +24,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	{
 		private static string[] modalSizes = { "modal-lg", "modal-xl", "modal-sm", "modal-default" };
 
-		internal static TagBuilder Build(ViewContext context, string title, Boolean canClose, TagHelperContent content, string innerClass, object htmlAttributes)
+		internal static TagBuilder Build(ViewContext context, string title, Boolean canClose, TagHelperContent content, string innerClass, Boolean renderFooter, Boolean useAdminStyles, object htmlAttributes)
 		{
 			Boolean isAutoSize = false;
 
@@ -37,7 +37,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 			TagBuilder modalBodyBuilder = new("div");
 
-			outputBuilder.AddCssClass("modal");
+      outputBuilder.AddCssClass("modal");
 			outputBuilder.AddCssClass("fade");
 			outputBuilder.MergeAttributes(htmlAttributes);
 
@@ -98,16 +98,29 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				modalHeaderBuilder.InnerHtml.AppendHtml(modalCloseButtonBuilder);
 			}
 
-			contentBuilder.InnerHtml.AppendHtml(modalHeaderBuilder);
+      contentBuilder.InnerHtml.AppendHtml(modalHeaderBuilder);
 
-			modalBodyBuilder.AddCssClass("modal-body nucleus-admin-content");
-			if (content != null && !content.IsEmptyOrWhiteSpace)
+			modalBodyBuilder.AddCssClass("modal-body");
+
+      if (useAdminStyles)
+      {
+        modalBodyBuilder.AddCssClass("nucleus-admin-content");
+      }
+
+      if (content != null && !content.IsEmptyOrWhiteSpace)
 			{
 				modalBodyBuilder.InnerHtml.AppendHtml(content);
 			}
 			contentBuilder.InnerHtml.AppendHtml(modalBodyBuilder);
 
-			dialogBuilder.InnerHtml.AppendHtml(contentBuilder);
+      if (renderFooter)
+      {
+        TagBuilder modalFooterBuilder = new("div");
+        modalFooterBuilder.AddCssClass("modal-footer");
+        contentBuilder.InnerHtml.AppendHtml(modalFooterBuilder);
+      }
+
+      dialogBuilder.InnerHtml.AppendHtml(contentBuilder);
 
 			outputBuilder.InnerHtml.AppendHtml(dialogBuilder);
 

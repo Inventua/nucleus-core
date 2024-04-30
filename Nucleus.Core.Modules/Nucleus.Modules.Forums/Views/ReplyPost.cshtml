@@ -3,6 +3,7 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.Forums.ViewModels
+@addTagHelper "*, Nucleus.ViewFeatures"
 <div class="forums">
   @using (Html.BeginNucleusForm("SaveForumPostReply", "Forums", "Forums", FormMethod.Post, new { @autocomplete = "off", @data_target = ".forums.parent()", @enctype = "multipart/form-data" }))
   {
@@ -16,12 +17,15 @@
         @Html.HiddenFor(model => model.Reply.ReplyTo.Id)
       }
 
-      <div class="d-flex flex-column align-items-start justify-items">
-        <a title="Back" href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode() + $"/{@Model.Post.Id}")" class="d-block btn btn-none" )">
+      <div class="d-flex flex-row">
+        <a title="Back" href="@Url.PageLink(Model.Page, @Model.Forum.Name.FriendlyEncode() + $"/{@Model.Post.Id}")" class="d-block btn btn-none flex-1 text-start" )">
           <span class="nucleus-material-icon">&#xe5e0;</span>
-          <h3 class="d-inline-block">@Model.Post.Subject</h3>
+          <h3 class="d-inline-block post-title">@Model.Post.Subject</h3>
         </a>
-        <div class="original-post body">
+        <button type="button" class="btn btn-none nucleus-material-icon ms-auto view-post-dialog">&#xf1ce;</button>
+      </div>
+      <div class="original-post">
+        <div class="post-body">
           @if (Model.Reply.ReplyTo != null)
           {
             @(new Microsoft.AspNetCore.Html.HtmlString(Model.Reply.ReplyTo.Body))
@@ -76,7 +80,20 @@
     </div>
   }
 </div>
-
+<modal id="original-post-dialog" modal-class="modal-auto-size modal-dialog-scrollable modal-dialog-content-border" use-admin-styles="false" render-footer="true"></modal>
 <script>
   jQuery('.HtmlEditorControl').HtmlEditor({ isAdminMode: false });
+
+  jQuery('.view-post-dialog').on('click', function () 
+  { 
+    jQuery('#original-post-dialog .modal-title').text(jQuery('.post-title').text());
+    jQuery('#original-post-dialog .modal-body').html(jQuery('.post-body').html());
+    if (jQuery('#original-post-dialog .modal-footer .modal-close-button').length === 0)
+    {
+      var closeButton = '<button type="button" class="btn btn-primary modal-close-button" data-bs-dismiss="modal">Close</button>';
+      jQuery('#original-post-dialog .modal-footer').append(closeButton);
+    }
+    jQuery('#original-post-dialog').modal('show');
+    //Page.Dialog(jQuery('.post-title').text(), jQuery('.post-body').html(), '', 'Close', null, null, true);
+  });  
 </script>

@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Mvc;
 using Nucleus.Core.Logging;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Core.Plugins;
 
 /// <summary>
-/// Provides methods used to load Nucleus Core plugins into dependency injection.
+/// Provides methods used to set up Nucleus Core plugins.
 /// </summary>
 public static class PluginExtensions
 {
@@ -23,6 +23,9 @@ public static class PluginExtensions
   /// <param name="builder"></param>
   /// <param name="contentRootPath"></param>
   /// <returns></returns>
+  /// <internal>
+  /// This method is intended for use by Nucleus.Web.Startup.
+  /// </internal>
   public static IMvcBuilder AddPlugins(this IMvcBuilder builder, string contentRootPath)
   {
     builder.AddExternalControllers();
@@ -41,14 +44,14 @@ public static class PluginExtensions
   }
 
   /// <summary>
-  /// Add all assemblies in sub-folders of /Extensions as "additional reference paths" for Razor runtime complication.
+  /// Add all assemblies in sub-folders of /Extensions/*/bin as additional reference paths for Razor runtime complication.
   /// </summary>
   /// <param name="builder"></param>
   /// <returns></returns>
   /// <remarks>
   /// Razor runtime compilation won't use types from assemblies which aren't the assembly containing the controller class 
-  /// unless it is specifically told to do so.  This function adds all assemblies in /Extensions/[name]/bin/** as 
-  /// additional reference paths, if they don't exist in /bin.
+  /// unless it is specifically told to do so.  This function adds all assemblies in /Extensions/*/bin/** as 
+  /// additional reference paths.
   /// </remarks>
   private static IMvcBuilder ConfigureRazorRuntimeCompilation(this IMvcBuilder builder)
   {
@@ -79,7 +82,6 @@ public static class PluginExtensions
       {
         if (assemblyPath.StartsWith(extensionsFolder, StringComparison.OrdinalIgnoreCase))
         {
-          //builder.Logger().LogInformation("Adding Razor runtime compliation additional reference path '{path}'.", assemblyPath);
           options.AdditionalReferencePaths.Add(assemblyPath);
         }
       }
@@ -93,31 +95,32 @@ public static class PluginExtensions
 
   /// <summary>
   /// Iterate through assemblies in /bin and /extensions/**, add assemblies which contain Controller classes to Part Manager so that DI/MVC 
-  /// can use them.  The call to GetControllerAssemblies checks for classes which implement Microsoft.AspNetCore.Mvc.Controller.	 
+  /// can use them. 
   /// </summary>
   /// <param name="builder">IMvcBuilder instance used to configure services.</param>
+  /// <remarks>
+  /// The call to GetAssembliesImplementing checks for classes which implement Microsoft.AspNetCore.Mvc.Controller.	 
+  /// </remarks>
   /// <returns>IMvcBuilder instance.</returns>
-  public static IMvcBuilder AddExternalControllers(this IMvcBuilder builder)
+  private static IMvcBuilder AddExternalControllers(this IMvcBuilder builder)
   {
-    List<Assembly> externalControllerAssemblies = new();
+    List<string> logEntries = [];
 
     foreach (Assembly assembly in AssemblyLoader.GetAssembliesImplementing<Controller>(builder.Logger()))
     {
-      externalControllerAssemblies.Add(assembly);
-
-      //builder.Logger()?.LogInformation("Adding controllers from {assemblyname} [{assemblyLocation}].", assembly.FullName, assembly.Location.Replace(Environment.CurrentDirectory, ""));
+      logEntries.Add($"{assembly.FullName} [{System.IO.Path.GetRelativePath(Environment.CurrentDirectory, assembly.Location)}]");
 
       AssemblyPart part = new(assembly);
 
-      // only add assembly to application parts if it is not already present (adding twice throws a AmbiguousMatchException exception)
+      // only add assembly to application parts if it is not already present (adding twice throws a AmbiguousMatchException)
       if (!ApplicationPartContains(builder, part))
       {
         builder.PartManager.ApplicationParts.Add(part);
       }
     }
 
-    builder.Logger()?.LogInformation("Added ({count}) controllers from: {assemblies}].", externalControllerAssemblies.Count,
-      String.Join(", ", externalControllerAssemblies.Select(assembly => $"{assembly.FullName} [{System.IO.Path.GetRelativePath(Environment.CurrentDirectory, assembly.Location)}]")));
+    builder.Logger()?.LogInformation("Added ({count}) controllers from: {assemblies}.", logEntries.Count,
+      String.Join(", ", logEntries));
 
     return builder;
   }
@@ -132,20 +135,18 @@ public static class PluginExtensions
   /// Scheduled tasks are added as Transient so that a new instance is created each time the task is run.  This means
   /// that developers of scheduled tasks don't need to worry about making their implementations stateless.
   /// </remarks>
-  public static IMvcBuilder AddScheduledTasks(this IMvcBuilder builder)
+  private static IMvcBuilder AddScheduledTasks(this IMvcBuilder builder)
   {
-    List<Type> scheduledTaskTypes = new();
+    List<string> LogEntries = new();
 
     foreach (Type type in AssemblyLoader.GetTypes<Nucleus.Abstractions.IScheduledTask>())
     {
-      //builder.Logger()?.LogInformation("Adding scheduled task type {typeName} from {assemblyName} [{assemblyLocation}]", type.FullName, type.Assembly.FullName, type.Assembly.Location.Replace(Environment.CurrentDirectory, ""));
-      scheduledTaskTypes.Add(type);
-
+      LogEntries.Add($"{type.FullName} from {type.Assembly.FullName} [{System.IO.Path.GetRelativePath(Environment.CurrentDirectory, type.Assembly.Location)}]");
       builder.Services.AddTransient(type);
     }
 
-    builder.Logger()?.LogInformation("Added ({count}) scheduled task types: {assemblies}].", scheduledTaskTypes.Count,
-      String.Join(", ", scheduledTaskTypes.Select(type => $"{type.FullName} from {type.Assembly.FullName} [{System.IO.Path.GetRelativePath(Environment.CurrentDirectory, type.Assembly.Location)}]")));
+    builder.Logger()?.LogInformation("Added ({count}) scheduled task types: {assemblies}.", LogEntries.Count,
+      String.Join(", ", LogEntries));
 
     return builder;
   }
@@ -159,20 +160,18 @@ public static class PluginExtensions
   /// <remarks>
   /// IPortable implementations are added as Singleton and must not maintain state.  
   /// </remarks>
-  public static IMvcBuilder AddPortable(this IMvcBuilder builder)
+  private static IMvcBuilder AddPortable(this IMvcBuilder builder)
   {
-    List<Type> portableImplementationTypes = new();
+    List<string> logEntries = new();
 
     foreach (Type type in AssemblyLoader.GetTypes<Nucleus.Abstractions.Portable.IPortable>())
     {
-      //builder.Logger()?.LogInformation("Adding IPortable {typeName} from {assemblyName} [{assemblyLocation}]", type.FullName, type.Assembly.FullName, type.Assembly.Location.Replace(Environment.CurrentDirectory, ""));
-      portableImplementationTypes.Add(type);
+      logEntries.Add($"{type.FullName} from {type.Assembly.FullName} [{System.IO.Path.GetRelativePath(Environment.CurrentDirectory, type.Assembly.Location)}]");
       builder.Services.AddSingleton(typeof(Nucleus.Abstractions.Portable.IPortable), type);
     }
 
-    builder.Logger()?.LogInformation("Added ({count}) IPortable implementations: {assemblies}].", portableImplementationTypes.Count,
-      String.Join(", ", portableImplementationTypes.Select(type => $"{type.FullName} from {type.Assembly.FullName} [{System.IO.Path.GetRelativePath(Environment.CurrentDirectory, type.Assembly.Location)}]")));
-
+    builder.Logger()?.LogInformation("Added ({count}) IPortable implementations: {assemblies}.", logEntries.Count,
+      String.Join(", ", logEntries));
 
     return builder;
   }
@@ -184,7 +183,7 @@ public static class PluginExtensions
   /// <param name="builder">IMvcBuilder instance used to configure services.</param>
   /// <param name="part">Part to search for.</param>
   /// <returns></returns>
-  private static Boolean ApplicationPartContains(this IMvcBuilder builder, Microsoft.AspNetCore.Mvc.ApplicationParts.ApplicationPart part)
+  private static Boolean ApplicationPartContains(this IMvcBuilder builder, ApplicationPart part)
   {
     return builder.PartManager.ApplicationParts.Where(existing => existing is AssemblyPart && existing.Name == part.Name).Any();
   }
@@ -194,20 +193,23 @@ public static class PluginExtensions
   /// </summary>
   /// <param name="builder">IMvcBuilder instance used to configure services.</param>
   /// <returns></returns>
-  public static IMvcBuilder AddCompiledRazorViews(this IMvcBuilder builder)
+  private static IMvcBuilder AddCompiledRazorViews(this IMvcBuilder builder)
   {
-    foreach (string assemblyFileName in AssemblyLoader.GetAssemblyNamesWithAttribute<Microsoft.AspNetCore.Razor.Hosting.RazorCompiledItemAttribute>())
-    {
-      Assembly assembly = AssemblyLoader.LoadFrom(assemblyFileName);
+    List<string> logEntries = new();
 
-      foreach (Microsoft.AspNetCore.Mvc.ApplicationParts.ApplicationPart part in Microsoft.AspNetCore.Mvc.ApplicationParts.CompiledRazorAssemblyApplicationPartFactory.GetDefaultApplicationParts(assembly))
+    foreach (Assembly assembly in AssemblyLoader.GetAssembliesWithAttribute<Microsoft.AspNetCore.Razor.Hosting.RazorCompiledItemAttribute>())
+    {
+      foreach (ApplicationPart part in CompiledRazorAssemblyApplicationPartFactory.GetDefaultApplicationParts(assembly))
       {
         if (!ApplicationPartContains(builder, part))
         {
-          builder.Logger().LogInformation($"Adding Compiled Razor views from {part.Name}.");
+          logEntries.Add(part.Name);
           builder.PartManager.ApplicationParts.Add(part);
         }
       }
+
+      builder.Logger()?.LogInformation("Added ({count}) compiled Razor Views from: {assemblies}].", logEntries.Count,
+        String.Join(", ", logEntries));
     }
 
     return builder;

@@ -10,9 +10,19 @@ display a list of pages in on a landing page.
 |                     |                                                                                      |
 |---------------------|--------------------------------------------------------------------------------------|
 | Levels              | Specifies how many levels of descendant pages to display.  Set to 0 to show all levels.  |
+| Direction           | Specifies how the site map is rendered - Vertical, Horizontal or Grid.  Refer to the [Directions](#directions) section below for a description of each direction.   |
 | Root Page Type      | Specifies how to determine the top level page (see below). |
 | Selected Page       | If the root page type is set to `Selected Page`, specifies the selected page. |
 | Show Description    | Specifies whether to display the page description. |
+
+### Direction
+{.table-25-75}
+|                     |                                                                                      |
+|---------------------|--------------------------------------------------------------------------------------|
+| Vertical            | Renders the site map in a list with each list item in a new line.  Each level is rendered in a child list. |
+| Horizontal          | Renders the site map in a list.  Each item in the top level is drawn side-by-side.  Subsequent levels are rendered below their top-level parent.  |
+| Grid                | Renders the site map in a grid, which adapts to the browser window size.  Each item in the top level is drawn side-by-side, but the display can wrap when the number of items exceeds the display width of the browser.  Subsequent levels are rendered below their top-level parent. |
+
 
 ### Root Page Types
 

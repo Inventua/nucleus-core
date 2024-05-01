@@ -24,3 +24,11 @@ OL.Sitemap.sitemap-horizontal
   row-gap: var(--nucleus-default-gap-vertical);
   column-gap: var(--nucleus-default-gap-horizontal);
 }
+
+OL.Sitemap.sitemap-grid
+{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  row-gap: var(--nucleus-default-gap-vertical);
+  column-gap: var(--nucleus-default-gap-horizontal);
+}

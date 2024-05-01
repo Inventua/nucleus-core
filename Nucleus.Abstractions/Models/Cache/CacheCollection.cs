@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Nucleus.Abstractions.Models.Configuration;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models.Configuration;
 
 namespace Nucleus.Abstractions.Models.Cache;
 
@@ -62,7 +61,7 @@ public class CacheCollection<TKey, TModel> : ICacheCollection
   public CacheOption Options { get; }
 
   private ILogger<ICacheManager> Logger { get; }
-    
+
   /// <summary>
   /// Initialize a new instance of the CacheCollection class using the options provided.
   /// </summary>
@@ -81,7 +80,6 @@ public class CacheCollection<TKey, TModel> : ICacheCollection
   /// </summary>
   public int Count => this.Cache.Count;
 
-
   /// <summary>
   /// Get the item from the cache with the specified key, or if it not present in the cache, read it (using itemReader), add it to 
   /// the cache and return it.
@@ -92,14 +90,15 @@ public class CacheCollection<TKey, TModel> : ICacheCollection
   public TModel Get(TKey key, Func<TKey, TModel> itemReader)
   {
     TModel result = this.Get(key);
+    return IsNullOrEmpty(result) ? this.Add(key, itemReader.Invoke(key)) : result;
 
-    if (IsNullOrEmpty(result))
-    {
-      result = itemReader.Invoke(key);
-      this.Add(key, result);
-    }
+    //if (IsNullOrEmpty(result))
+    //{
+    //  result = itemReader.Invoke(key);
+    //  this.Add(key, result);
+    //}
 
-    return result;
+    //return result;
   }
 
   /// <summary>
@@ -112,14 +111,14 @@ public class CacheCollection<TKey, TModel> : ICacheCollection
   public async Task<TModel> GetAsync(TKey key, Func<TKey, Task<TModel>> itemReader)
   {
     TModel result = this.Get(key);
+    return IsNullOrEmpty(result) ? this.Add(key, await itemReader.Invoke(key)) : result;
+    //if (IsNullOrEmpty(result))
+    //{
+    //  result = await itemReader.Invoke(key);
+    //  this.Add(key, result);
+    //}
 
-    if (IsNullOrEmpty(result))
-    {
-      result = await itemReader.Invoke(key);
-      this.Add(key, result);
-    }
-
-    return result;
+    //return result;
   }
 
   /// <summary>
@@ -133,36 +132,39 @@ public class CacheCollection<TKey, TModel> : ICacheCollection
   /// </remarks>
   private TModel Get(TKey key)
   {
-    this.Cache.TryGetValue(key, out CacheItem<TModel> result);
+    if (this.Cache.TryGetValue(key, out CacheItem<TModel> result))
+    {
+      if (result != null)
+      {
+        this.Logger?.LogTrace("Checking cache '{name}' for '{type}' with key {key}.", this.Name, typeof(TModel).Name, key);
+        if (result.Expires >= DateTime.UtcNow)
+        {
+          this.Logger?.LogTrace("Found valid cache entry for '{type}' with key {key}.", typeof(TModel).Name, key);
+          return result.Item;
+        }
+        else
+        {          
+          this.Logger?.LogDebug("Removed expired '{type}' with key '{key}' from cache '{name}'.", typeof(TModel).Name, key, this.Name);
+          Remove(key);
+        }
+      }
+    }
 
-    if (result == null)
-    {
-      return default;
-    }
-    else
-    {
-      this.Logger?.LogTrace("Checking cache:{name} for '{type}' with key {key}.", this.Name, typeof(TModel).Name, key);
-      if (result.Expires >= DateTime.UtcNow)
-      {
-        this.Logger?.LogTrace("Found valid cache entry for '{type}' with key {key}.", typeof(TModel).Name, key);
-        return result.Item;
-      }
-      else
-      {
-        this.Logger?.LogDebug("Removed expired '{type}' [{key}] from cache:{name} after {timeout}.", typeof(TModel).Name, key, this.Name, this.Options.ExpiryTime);
-        Remove(key);
-        return default;
-      }
-    }
+    return default;
   }
 
-  private Boolean IsNullOrEmpty(object value)
+  private Boolean IsNullOrEmpty(TModel value)
   {
     if (value == null) return true;
 
     if (value.GetType() == typeof(Guid))
     {
-      return (Guid)value == Guid.Empty;
+      return value.Equals(Guid.Empty);
+    }
+
+    if (value.GetType() == typeof(String))
+    {
+      return String.IsNullOrEmpty(value as string);
     }
 
     return false;
@@ -177,37 +179,54 @@ public class CacheCollection<TKey, TModel> : ICacheCollection
   /// This function is private.  Items are added to the cache by the .Get function.  If the cache reaches capacity, the oldest cache item
   /// is removed.
   /// </remarks>		
-  private void Add(TKey key, TModel item)
+  private TModel Add(TKey key, TModel item)
   {
     Collect();
 
     if (IsNullOrEmpty(item))
     {
+      // this mostly happens when .Get/.GetAsync invokes itemReader and it returns a null result because the database record does not exist.
       this.Remove(key);
-      return;
-    }
-
-    if (this.Cache.ContainsKey(key))
-    {
-      // replace item
-      this.Cache[key] = new CacheItem<TModel>(item, DateTime.UtcNow.Add(this.Options.ExpiryTime));
     }
     else
     {
-      // insert item
-      this.Cache.TryAdd(key, new CacheItem<TModel>(item, DateTime.UtcNow.Add(this.Options.ExpiryTime)));
-
-      if (this.Cache.Count > this.Options.Capacity)
+      if (this.Cache.TryGetValue(key, out CacheItem<TModel> value))
       {
-        // Remove oldest
-        KeyValuePair<TKey, CacheItem<TModel>> oldestItem = this.Cache.OrderBy(KeyValue => KeyValue.Value.Expires).FirstOrDefault();
-        this.Cache.TryRemove(oldestItem);
+        // replace item
+        value.Replace(item, DateTime.UtcNow.Add(this.Options.ExpiryTime));
       }
+      else
+      {
+        // insert item
+        this.Cache.TryAdd(key, new CacheItem<TModel>(item, DateTime.UtcNow.Add(this.Options.ExpiryTime)));
+
+        if (this.Cache.Count > this.Options.Capacity)
+        {
+          // Remove oldest
+          KeyValuePair<TKey, CacheItem<TModel>> oldestItem = this.Cache.OrderBy(item => item.Value.Expires).FirstOrDefault();
+          this.Cache.TryRemove(oldestItem);
+        }
+      }
+    }
+
+    return item;
+  }
+
+  /// <summary>
+  /// Override the expiry time for an item from the cache, specifed by key.
+  /// </summary>
+  /// <param name="key"></param>
+  /// <param name="time"></param>
+  public void Expire(TKey key, TimeSpan time)
+  {
+    if (this.Cache.TryGetValue(key, out CacheItem<TModel> item))
+    {
+      item.Expire(time);
     }
   }
 
   /// <summary>
-  /// Remove an item from the cache, specifed by key.
+  /// Remove an item from the cache, specified by key.
   /// </summary>
   /// <param name="key"></param>
   public void Remove(TKey key)

@@ -16,8 +16,7 @@ namespace Nucleus.Core.Plugins
 	public class ExtensionViewLocationExpander : IViewLocationExpander
 	{
 		/// <summary>
-		/// If the request is for an assembly located in the extensions folder, return view location patterns which point to the relevant
-		/// extensions's views folder or Areas/[area]/[controller]/Views folder.
+		/// If the request is for an assembly located in the extensions folder, return view location patterns for extensions.
 		/// </summary>
 		/// <param name="context"></param>
 		/// <param name="viewLocations"></param>
@@ -26,34 +25,46 @@ namespace Nucleus.Core.Plugins
 		{
 			if (context.ActionContext is ControllerContext actionContext)
 			{
-				string assemblyLocation = actionContext.ActionDescriptor.ControllerTypeInfo.Assembly.Location;
+        // we need to use the extension folder in the returned view paths (a sub-folder in /Extensions), not the extension
+        // name, which may be different.
+        string assemblyLocation = actionContext.ActionDescriptor.ControllerTypeInfo.Assembly.Location;
 				string extensionFolder = AssemblyLoader.GetExtensionFolderName(assemblyLocation);
 
         if (!String.IsNullOrEmpty(extensionFolder))
         {
-          // Assembly was loaded from an extension folder, return view paths for that extension
-          if (actionContext.RouteData.Values.ContainsKey("area") && !String.IsNullOrEmpty((string)actionContext.RouteData.Values["area"]))
-          {            
-            // controller is in an [area], return /Extensions/[extension]/Areas/[area]/[controller]/Views/[view].cshtml
-            return new List<string>()
-            {
-              $"/{FolderOptions.EXTENSIONS_FOLDER}/{extensionFolder}/Areas/{actionContext.RouteData.Values["area"]}/Views/{{1}}/{{0}}.cshtml"
-            };
-          }
-          else
-          {
-            // controller is not in an [area], return /Extensions/[extension]/Views/[view].cshtml
-            return new List<string>()
-            {
-              $"/{FolderOptions.EXTENSIONS_FOLDER}/{extensionFolder}/Views/{{0}}.cshtml",
-              $"/{FolderOptions.EXTENSIONS_FOLDER}/{extensionFolder}/Pages/{{0}}.cshtml"
-            };
-          }
+          actionContext.RouteData.Values.TryGetValue("area", out object area);
+          return GetViewPaths(extensionFolder, area);
         }
       }
-
+      
 			return viewLocations;
 		}
+
+    /// <summary>
+    /// Return view paths for the specified extension.
+    /// </summary>
+    /// <param name="extensionFolder"></param>
+    /// <param name="area"></param>
+    /// <returns></returns>
+    private IEnumerable<string> GetViewPaths(string extensionFolder, object area)
+    {
+      //  The view engine path string tokens are:
+      //  {0} view name
+      //  {1} controller name
+      //  {2} area name (if present)
+
+      // the most likely view path(s) should be returned first.
+      yield return $"/{FolderOptions.EXTENSIONS_FOLDER}/{extensionFolder}/Views/{{0}}.cshtml";
+      yield return $"/{FolderOptions.EXTENSIONS_FOLDER}/{extensionFolder}/Views/Shared/{{0}}.cshtml";
+      yield return $"/{FolderOptions.EXTENSIONS_FOLDER}/{extensionFolder}/Views/{{1}}/{{0}}.cshtml";
+      yield return $"/{FolderOptions.EXTENSIONS_FOLDER}/{extensionFolder}/Pages/{{0}}.cshtml";
+
+      if (area != null)
+      {
+        yield return $"/{FolderOptions.EXTENSIONS_FOLDER}/{extensionFolder}/Areas/{{2}}/Views/{{1}}/{{0}}.cshtml";
+        yield return $"/{FolderOptions.EXTENSIONS_FOLDER}/{extensionFolder}/Areas/{{2}}/Views/Shared/{{0}}.cshtml";
+      }
+    }
 
 		/// <summary>
 		/// Populate the context.Values dictionary with values that can change the result of ExpandViewLocations()
@@ -71,9 +82,9 @@ namespace Nucleus.Core.Plugins
 
 				if (!String.IsNullOrEmpty(extensionFolder))
 				{
-					if (actionContext.RouteData.Values.ContainsKey("area"))
+          if (actionContext.RouteData.Values.TryGetValue("area", out object area))
 					{
-						context.Values["area"] = (string)actionContext.RouteData.Values["area"];
+						context.Values["area"] = (string)area;
 					}
 
 					context.Values["extension"] = extensionFolder;

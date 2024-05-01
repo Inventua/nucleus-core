@@ -10,7 +10,7 @@ display a list of pages in on a landing page.
 |                     |                                                                                      |
 |---------------------|--------------------------------------------------------------------------------------|
 | Levels              | Specifies how many levels of descendant pages to display.  Set to 0 to show all levels.  |
-| Direction           | Specifies how the site map is rendered - Vertical, Horizontal or Grid.  Refer to the [Directions](#directions) section below for a description of each direction.   |
+| Direction           | Specifies how the site map is rendered - Vertical, Horizontal or Grid.  Refer to the `Direction` section below for a description of each direction.   |
 | Root Page Type      | Specifies how to determine the top level page (see below). |
 | Selected Page       | If the root page type is set to `Selected Page`, specifies the selected page. |
 | Show Description    | Specifies whether to display the page description. |

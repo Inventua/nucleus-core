@@ -199,7 +199,7 @@
   align-items: flex-end;
 }
 
-.forums .body
+.forums .body, .forums .post-body
 {
   background-color: #eee;
   padding: 0.25rem;
@@ -207,7 +207,7 @@
   overflow: auto;
 }
 
-.forums .body p:last-child
+.forums .body p:last-child, .forums .post-body p:last-child
 {
   margin-bottom: 0;
 }

@@ -48,12 +48,12 @@ else
 
 				<div class="nucleus-flex-fields">
 					<SettingsControl caption="Email" helptext="Please enter your email address.">
-						@Html.TextBoxFor(model => model.Message.Email, new { @maxlength = 256, @autocomplete = "email" })
+						@Html.TextBoxFor(model => model.Message.Email, new { @maxlength = 256, @type = "email", @autocomplete = "email" })
 					</SettingsControl>
 					@if (Model.ShowPhoneNumber)
 					{
 						<SettingsControl caption="Phone Number" helptext="Please enter your phone number.">
-							@Html.TextBoxFor(model => model.Message.PhoneNumber, new { @maxlength = 64, @autocomplete = "tel" })
+							@Html.TextBoxFor(model => model.Message.PhoneNumber, new { @maxlength = 64, @type = "tel", @autocomplete = "tel" })
 						</SettingsControl>
 					}
 				</div>

@@ -39,9 +39,9 @@ namespace Nucleus.Web.ViewModels.Admin
 		public IEnumerable<Page> Pages { get; set; }
 
 		// favicon
-		public File SelectedIconFile { get; set; }
-		public File SelectedLogoFile { get; set; }
-		public File SelectedCssFile { get; set; }
+		public Nucleus.Abstractions.Models.FileSystem.File SelectedIconFile { get; set; }
+		public Nucleus.Abstractions.Models.FileSystem.File SelectedLogoFile { get; set; }
+		public Nucleus.Abstractions.Models.FileSystem.File SelectedCssFile { get; set; }
 
 	}
 }

@@ -13,7 +13,7 @@ namespace Nucleus.Web.ViewModels.Admin
 	{
 		public Folder Folder { get; set; } = new();
 		public List<Folder> SelectedFolders { get; set; }
-		public List<File> SelectedFiles { get; set; }
+		public List<Nucleus.Abstractions.Models.FileSystem.File> SelectedFiles { get; set; }
 
 	}
 }

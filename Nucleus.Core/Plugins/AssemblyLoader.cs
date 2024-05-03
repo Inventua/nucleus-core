@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using Microsoft.Extensions.Logging;
+using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Core.Plugins;
@@ -307,10 +308,17 @@ public class AssemblyLoader
 
   internal static string[] EXCLUDED_ASSSEMBLY_PATHS = { "BlazorDebugProxy", "refs" };
 
+  internal static Boolean IsExcludedAssembly(string assemblyPath)
+  {
+    string assemblySubFolder = System.IO.Path.GetDirectoryName(assemblyPath).Split(['/', '\\']).LastOrDefault();
+    return EXCLUDED_ASSSEMBLY_PATHS.Contains(assemblySubFolder);
+  }
+
   internal static Boolean IsExcludedAssembly(Assembly assembly)
   {
-    string assemblySubFolder = System.IO.Path.GetDirectoryName(assembly.Location).Split(['/', '\\']).LastOrDefault();
-    return EXCLUDED_ASSSEMBLY_PATHS.Contains(assemblySubFolder);
+    return IsExcludedAssembly(assembly.Location);
+    //string assemblySubFolder = System.IO.Path.GetDirectoryName(assembly.Location).Split(['/', '\\']).LastOrDefault();
+    //return EXCLUDED_ASSSEMBLY_PATHS.Contains(assemblySubFolder);
   }
 
   /// <summary>
@@ -326,7 +334,10 @@ public class AssemblyLoader
     // get all assemblies (dlls) in /bin 			
     foreach (string filename in System.IO.Directory.EnumerateFiles(System.IO.Path.GetDirectoryName(typeof(AssemblyLoader).Assembly.Location), "*.dll", System.IO.SearchOption.AllDirectories))
     {
-      yield return filename;
+      if (!IsExcludedAssembly(filename))
+      {
+        yield return FolderOptions.NormalizePath(filename);
+      }
     }
 
     string extensionsFolder = Nucleus.Abstractions.Models.Configuration.FolderOptions.GetExtensionsFolderStatic(false);
@@ -336,7 +347,7 @@ public class AssemblyLoader
       // get all extension assemblies (dlls) in /extensions/*
       foreach (string foldername in System.IO.Directory.EnumerateFiles(extensionsFolder, "*.dll", System.IO.SearchOption.AllDirectories))
       {
-        yield return foldername;
+        yield return FolderOptions.NormalizePath(foldername);
       }
     }
   }
@@ -499,7 +510,7 @@ public class AssemblyLoader
 		/// </remarks>
   internal static IEnumerable<Assembly> ListAssemblies()
   {
-    LoadedAssemblies ??= LoadAssemblies().Where(assembly => !IsExcludedAssembly(assembly)).ToList();
+    LoadedAssemblies ??= LoadAssemblies();//.Where(assembly => !IsExcludedAssembly(assembly)).ToList();
     return LoadedAssemblies;
   }
 

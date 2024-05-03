@@ -185,9 +185,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Modules.PageLinks",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.CopilotClient", "Nucleus.Special.Modules\Nucleus.CopilotClient\Nucleus.CopilotClient.csproj", "{3112275E-9ABE-494C-A5A9-83EF913CEC0C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Extensions.SendGrid", "Nucleus.Core.Modules\Nucleus.Extensions.SendGrid\Nucleus.Extensions.SendGrid.csproj", "{319B4F09-DF9F-4421-BA89-11116E068B60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.SendGrid", "Nucleus.Core.Modules\Nucleus.Extensions.SendGrid\Nucleus.Extensions.SendGrid.csproj", "{319B4F09-DF9F-4421-BA89-11116E068B60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Extensions.Smtp", "Nucleus.Core.Modules\Nucleus.Extensions.Smtp\Nucleus.Extensions.Smtp.csproj", "{675D5641-BDF7-4B51-80BB-326A75EBBAF9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.Smtp", "Nucleus.Core.Modules\Nucleus.Extensions.Smtp\Nucleus.Extensions.Smtp.csproj", "{675D5641-BDF7-4B51-80BB-326A75EBBAF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Web.Admin", "Nucleus.Web.Admin\Nucleus.Web.Admin.csproj", "{5038799C-D90D-4B04-934F-AA5381A91929}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -371,6 +373,10 @@ Global
 		{675D5641-BDF7-4B51-80BB-326A75EBBAF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{675D5641-BDF7-4B51-80BB-326A75EBBAF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{675D5641-BDF7-4B51-80BB-326A75EBBAF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5038799C-D90D-4B04-934F-AA5381A91929}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5038799C-D90D-4B04-934F-AA5381A91929}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5038799C-D90D-4B04-934F-AA5381A91929}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5038799C-D90D-4B04-934F-AA5381A91929}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

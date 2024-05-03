@@ -11,6 +11,7 @@ using Nucleus.Extensions;
 using Microsoft.AspNetCore.Http;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
+using Nucleus.ViewFeatures;
 
 namespace Nucleus.Web.Controllers
 {
@@ -20,12 +21,13 @@ namespace Nucleus.Web.Controllers
     private Context Context { get; }
 		private IPageManager PageManager { get; }
 		private IFileSystemManager FileSystemManager { get; }
+    private Application Application { get; }
 
-
-		public ErrorController(IWebHostEnvironment webHostEnvironment, Context context, IFileSystemManager fileSystemManager, IPageManager pageManager)
+    public ErrorController(IWebHostEnvironment webHostEnvironment, Context context, Application application, IFileSystemManager fileSystemManager, IPageManager pageManager)
 		{
       this.WebHostEnvironment = webHostEnvironment;
 			this.Context = context;
+      this.Application = application;
 			this.FileSystemManager = fileSystemManager;
 			this.PageManager = pageManager;
 		}
@@ -70,23 +72,27 @@ namespace Nucleus.Web.Controllers
 			{
 				this.Context.Page = errorPage;
 
-				Nucleus.ViewFeatures.ViewModels.Layout viewModel = new(this.Context);
+        ////Nucleus.ViewFeatures.ViewModels.Layout viewModel = new(this.Context);
 
-				viewModel.IsEditing = User.IsEditing(HttpContext, this.Context.Site, this.Context.Page);
-				viewModel.CanEdit = User.CanEditContent(this.Context.Site, this.Context.Page);
-				viewModel.SiteIconPath = Url.Content(await Context.Site.GetIconPath(this.FileSystemManager));
-				viewModel.SiteCssFilePath = Url.Content(await Context.Site.GetCssFilePath(this.FileSystemManager));
+        ////    viewModel.ControlPanelUri = this.Application.ControlPanelUri;
+        ////    viewModel.IsEditing = User.IsEditing(HttpContext, this.Context.Site, this.Context.Page);
+        ////viewModel.CanEdit = User.CanEditContent(this.Context.Site, this.Context.Page) && viewModel.ControlPanelUri != "";
+        ////    viewModel.DefaultPageUri = base.Url.GetAbsoluteUri(this.Context.Page.DefaultPageRoute().Path).AbsoluteUri;
+        ////    viewModel.SiteIconPath = Url.Content(await Context.Site.GetIconPath(this.FileSystemManager));
+        ////viewModel.SiteCssFilePath = Url.Content(await Context.Site.GetCssFilePath(this.FileSystemManager));
 
-        string layoutPath = this.Context.Page.LayoutPath(this.Context.Site);
+        ////    string layoutPath = this.Context.Page.LayoutPath(this.Context.Site);
 
-        if (!System.IO.File.Exists(System.IO.Path.Join(this.WebHostEnvironment.ContentRootPath, layoutPath)))
-        {
-          layoutPath = $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.LAYOUTS_FOLDER}/{Nucleus.Abstractions.Managers.ILayoutManager.DEFAULT_LAYOUT}";
-        }
+        ////    if (!System.IO.File.Exists(System.IO.Path.Join(this.WebHostEnvironment.ContentRootPath, layoutPath)))
+        ////    {
+        ////      layoutPath = $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.LAYOUTS_FOLDER}/{Nucleus.Abstractions.Managers.ILayoutManager.DEFAULT_LAYOUT}";
+        ////    }
 
-        return View(layoutPath, viewModel);
-			}
-			else
+        ////    return View(layoutPath, viewModel);
+        return View(DefaultController.GetLayoutPath(this.WebHostEnvironment, this.Context), await DefaultController.BuildViewModel(this.Url, this.Context, this.HttpContext, this.Application, this.FileSystemManager));
+
+      }
+      else
 			{
 				// no error page, or Context.Site is null
 				if (data != null)

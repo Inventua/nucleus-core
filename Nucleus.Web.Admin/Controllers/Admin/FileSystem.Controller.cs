@@ -1,29 +1,24 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Nucleus.Abstractions.Models;
-using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
+﻿using System.IO.Compression;
 using Microsoft.AspNetCore.Authorization;
-using Nucleus.Abstractions.Managers;
-using Nucleus.Abstractions.Models.FileSystem;
-using Nucleus.Abstractions.Models.Permissions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Nucleus.Extensions;
-using System.IO.Compression;
-using Nucleus.Abstractions.Models.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Nucleus.Extensions.Authorization;
-using Nucleus.Abstractions.Models.Extensions;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Models.Configuration;
+using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Abstractions.Models.Paging;
+using Nucleus.Abstractions.Models.Permissions;
 using Nucleus.Abstractions.Search;
+using Nucleus.Extensions;
+using Nucleus.Extensions.Authorization;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Web.Controllers.Admin
 {
-	[Area("Admin")]
+  [Area("Admin")]
 	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
   public class FileSystemController : Controller
 	{
@@ -75,7 +70,7 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpGet]
     public async Task<ActionResult> SelectFile(Guid fileId)
     {
-      File file = await this.FileSystemManager.GetFile(this.Context.Site, fileId);
+      Nucleus.Abstractions.Models.FileSystem.File file = await this.FileSystemManager.GetFile(this.Context.Site, fileId);
       return await Navigate(new(), file.Parent.Id, fileId); 
     }
 
@@ -149,7 +144,7 @@ namespace Nucleus.Web.Controllers.Admin
           {
             try
             {
-              File file = await this.FileSystemManager.GetFile(this.Context.Site, searchResult.SourceId.Value);
+              Nucleus.Abstractions.Models.FileSystem.File file = await this.FileSystemManager.GetFile(this.Context.Site, searchResult.SourceId.Value);
               searchResult.Title = $"{searchResult.Title} [{file.Parent.Provider}/{file.Parent.Path}]";
             }
             catch (System.IO.FileNotFoundException) 
@@ -254,7 +249,7 @@ namespace Nucleus.Web.Controllers.Admin
       IEnumerable<Folder> selectedFolders = viewModel.Folders
         .Where(folder => folder.IsSelected);
 
-			IEnumerable<File> selectedFiles = viewModel.Files
+			IEnumerable<Nucleus.Abstractions.Models.FileSystem.File> selectedFiles = viewModel.Files
         .Where(file => file.IsSelected);
 
       if (!selectedFolders.Any() && !selectedFiles.Any())
@@ -301,7 +296,7 @@ namespace Nucleus.Web.Controllers.Admin
       IEnumerable<Folder> selectedFolders = viewModel.Folders
         .Where(folder => folder.IsSelected);
 
-      IEnumerable<File> selectedFiles = viewModel.Files
+      IEnumerable<Nucleus.Abstractions.Models.FileSystem.File> selectedFiles = viewModel.Files
         .Where(file => file.IsSelected);
 
       if ( !selectedFolders.Any() && !selectedFiles.Any())
@@ -311,8 +306,8 @@ namespace Nucleus.Web.Controllers.Admin
 
 			if (!selectedFolders.Any() && selectedFiles.Count() == 1)
 			{
-				// one file selected, download as-is
-				File downloadFile = await this.FileSystemManager.GetFile(this.Context.Site, selectedFiles.First().Id);
+        // one file selected, download as-is
+        Nucleus.Abstractions.Models.FileSystem.File downloadFile = await this.FileSystemManager.GetFile(this.Context.Site, selectedFiles.First().Id);
 
         // Response.Headers.Add("Content-Disposition", "attachment;filename=" + file.Name);
         Response.GetTypedHeaders().ContentDisposition = new("attachment")
@@ -330,9 +325,9 @@ namespace Nucleus.Web.Controllers.Admin
 				await AddFolderToZip(archive, item);
 			}
 		
-			foreach (File selectedItem in selectedFiles)
+			foreach (Nucleus.Abstractions.Models.FileSystem.File selectedItem in selectedFiles)
 			{
-				File file = await this.FileSystemManager.GetFile(this.Context.Site, selectedItem.Id);
+				Nucleus.Abstractions.Models.FileSystem.File file = await this.FileSystemManager.GetFile(this.Context.Site, selectedItem.Id);
 				ZipArchiveEntry entry = archive.CreateEntry(file.Name);
 				using (System.IO.Stream outputStream = entry.Open())
 				{
@@ -355,7 +350,7 @@ namespace Nucleus.Web.Controllers.Admin
 			// the folder object won't be fully populated from model binding, so we have to re-read it 
 			folder = await this.FileSystemManager.ListFolder(this.Context.Site, folder.Id, HttpContext.User, "");
 
-			foreach (File file in folder.Files)
+			foreach (Nucleus.Abstractions.Models.FileSystem.File file in folder.Files)
 			{
 				// Zip file paths always use "\" as a delimiter
 				ZipArchiveEntry entry = archive.CreateEntry(file.Path.Replace('/', '\\'));
@@ -453,9 +448,9 @@ namespace Nucleus.Web.Controllers.Admin
 				return NotFound();
 			}
 
-			if (existing is File)
+			if (existing is Nucleus.Abstractions.Models.FileSystem.File)
 			{
-				await this.FileSystemManager.RenameFile(this.Context.Site, existing as File, viewModel.SelectedItem.Name);
+				await this.FileSystemManager.RenameFile(this.Context.Site, existing as Nucleus.Abstractions.Models.FileSystem.File, viewModel.SelectedItem.Name);
 			}
 			else if (existing is Folder)
 			{
@@ -470,7 +465,7 @@ namespace Nucleus.Web.Controllers.Admin
 		[HttpPost]
 		public async Task<ActionResult> UploadFile(ViewModels.Admin.FileSystem viewModel, [FromForm] List<IFormFile> mediaFiles)
 		{
-      File uploadedFile = null;
+      Nucleus.Abstractions.Models.FileSystem.File uploadedFile = null;
 
 			viewModel.Folder = await this.FileSystemManager.GetFolder(this.Context.Site, viewModel.Folder.Id);
 
@@ -676,8 +671,8 @@ namespace Nucleus.Web.Controllers.Admin
             .ToList();
 
           viewModel.Files = fileSystemItems.Items
-            .Where(file => file is File)
-            .Select(file => file as File)
+            .Where(file => file is Nucleus.Abstractions.Models.FileSystem.File)
+            .Select(file => file as Nucleus.Abstractions.Models.FileSystem.File)
             .ToList();
 
           // get data for breadcrumb navigation
@@ -781,7 +776,7 @@ namespace Nucleus.Web.Controllers.Admin
 				(await this.FileSystemManager.GetFolder(this.Context.Site, folder.Id)).CopyTo(folder);
 			}
 			
-			foreach (File file in results.SelectedFiles)
+			foreach (Nucleus.Abstractions.Models.FileSystem.File file in results.SelectedFiles)
 			{
 				(await this.FileSystemManager.GetFile(this.Context.Site, file.Id)).CopyTo(file);
 			}

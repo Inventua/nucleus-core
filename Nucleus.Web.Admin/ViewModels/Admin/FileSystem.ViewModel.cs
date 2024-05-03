@@ -20,7 +20,7 @@ namespace Nucleus.Web.ViewModels.Admin
     public PagingSettings PagingSettings { get; set; }
 
     public List<Folder> Folders { get; set; } = new();
-    public List<File> Files { get; set; } = new();
+    public List<Nucleus.Abstractions.Models.FileSystem.File> Files { get; set; } = new();
     public Guid SelectedFileId { get; set; }
 
     public List<Folder> Ancestors { get; set; } = new();

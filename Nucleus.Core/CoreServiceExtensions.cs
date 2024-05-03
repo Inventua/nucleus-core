@@ -15,6 +15,12 @@ using Nucleus.Abstractions.Search;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models.TaskScheduler;
 using Nucleus.Core.Mail;
+using Nucleus.Abstractions.Models;
+using Nucleus.Core.Plugins;
+using Nucleus.Abstractions;
+using System.Reflection;
+using System.Configuration;
+using Microsoft.AspNetCore.Builder;
 
 namespace Nucleus.Core;
 
@@ -76,6 +82,7 @@ public static class CoreServiceExtensions
 
     // General-use services 
     services.AddSingleton<Nucleus.Abstractions.Models.Application>();
+    
     services.AddSingleton<IEventDispatcher, Services.EventDispatcher>();
     services.AddTransient<IMailClientFactory, Mail.MailClientFactory>();
     services.AddTransient<Abstractions.IPreflight, Nucleus.Core.Services.Preflight>();
@@ -148,7 +155,48 @@ public static class CoreServiceExtensions
   {
     services.Configure<T>(configuration.GetSection(key), binderOptions => binderOptions.BindNonPublicProperties = true);
   }
+  
+  /// <summary>
+  /// Use the specified Nucleus control panel.
+  /// </summary>
+  /// <remarks>
+  /// If the name is an empty string, the admin UI is not rendered. If the specified control panel name is not found, the default control panel is used.
+  /// </remarks>
+  /// <param name="app"></param>
+  /// <param name="name"></param>
+  public static void UseControlPanel(this IApplicationBuilder app, string name)
+  {
+    Application appData = app.ApplicationServices.GetService<Application>();
 
+    if (name == "")
+    {
+      appData.SetControlPanelUri("");
+    }
+    else
+    {
+      IEnumerable<ControlPanelAttribute> panels = AssemblyLoader.GetAssembliesWithAttribute<ControlPanelAttribute>()
+        .Select(assembly => assembly.GetCustomAttribute<ControlPanelAttribute>());
+
+      if (panels.Count() == 0)
+      {
+        // there are no control panel implementations
+        appData.SetControlPanelUri("");
+      }
+      else if (panels.Count() == 1)
+      {
+        // use the one available control panel
+        appData.SetControlPanelUri(panels.First().Uri);
+      }
+      else
+      {
+        // more than one control panel is available. Use the selected control panel if found, or use the default if not found.    
+        appData.SetControlPanelUri(panels
+          .Where(panel => !String.IsNullOrEmpty(name) && panel.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+          .FirstOrDefault()
+          ?.Uri);
+      }
+    }
+  }
 
   public class ConfigureStoreOptions : IPostConfigureOptions<StoreOptions>
   {

@@ -1,23 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Nucleus.Abstractions.Models;
-using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
-using Nucleus.Abstractions.Managers;
-using Microsoft.AspNetCore.Authorization;
-using Nucleus.Extensions;
-using Nucleus.Abstractions.Models.Permissions;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Nucleus.ViewFeatures;
-using Nucleus.Extensions.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Nucleus.Abstractions.Models.Permissions;
+using Nucleus.Extensions;
+using Nucleus.Extensions.Authorization;
+using Nucleus.ViewFeatures;
 
 namespace Nucleus.Web.Controllers.Admin
 {

@@ -28,6 +28,7 @@ using Microsoft.AspNetCore.DataProtection;
 using System.Runtime.InteropServices;
 using Nucleus.Core.Services.Instrumentation;
 using Nucleus.Core.Services.HealthChecks;
+using System.Configuration;
 
 namespace Nucleus.Web
 {
@@ -358,6 +359,7 @@ namespace Nucleus.Web
         app.UseMiddleware<Nucleus.Core.FileSystemProviders.FileIntegrityCheckerMiddleware>();
         app.UseMiddleware<ModuleRoutingMiddleware>();
         app.UseAuthorization();
+        app.UseControlPanel(this.Configuration.GetSection("Nucleus:ControlPanel:Name").Value);
 
         app.UseEndpoints(routes =>
         {

@@ -32,6 +32,11 @@ namespace Nucleus.ViewFeatures.ViewModels
 		public Boolean CanEdit { get; set; }
 
     /// <summary>
+    /// Url used to access the admin control panel.
+    /// </summary>
+    public string ControlPanelUri { get; set; } 
+
+    /// <summary>
     /// Css class used to control control panel docking location.
     /// </summary>
     public string ControlPanelDockingCssClass { get; set; }

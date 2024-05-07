@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Modules.ErrorReport.Controllers
 {
@@ -40,21 +42,25 @@ namespace Nucleus.Modules.ErrorReport.Controllers
 			return View("Settings", BuildSettingsViewModel(viewModel));
 		}
 
-		[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
-		[HttpPost]
-		public ActionResult SaveSettings(ViewModels.Settings viewModel)
-		{
-			//this.Context.Module.ModuleSettings.Set(MODULESETTING_CATEGORYLIST_ID, viewModel.CategoryList.Id);
+		//[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
+		//[HttpPost]
+		//public ActionResult SaveSettings(ViewModels.Settings viewModel)
+		//{
+		//	//this.Context.Module.ModuleSettings.Set(MODULESETTING_CATEGORYLIST_ID, viewModel.CategoryList.Id);
 
-			this.PageModuleManager.SaveSettings(this.Context.Module);
+		//	this.PageModuleManager.SaveSettings(this.Context.Module);
 
-			return Ok();
-		}
+		//	return Ok();
+		//}
 
 		private ViewModels.Viewer BuildViewModel(IExceptionHandlerFeature exceptionInfo)
 		{
 			ViewModels.Viewer viewModel = new();
 			viewModel.ExceptionInfo = exceptionInfo;
+
+      // only show sensitive data to admin users
+      viewModel.ShowSensitiveData = User.IsSiteAdmin(this.Context.Site);
+
 			return viewModel;
 		}
 

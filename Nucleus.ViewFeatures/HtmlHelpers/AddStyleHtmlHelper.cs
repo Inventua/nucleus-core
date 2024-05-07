@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.IO;
+using System.Linq;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Nucleus.Abstractions.Models.Configuration;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Extensions;
-using DocumentFormat.OpenXml.Math;
 
 namespace Nucleus.ViewFeatures.HtmlHelpers
 {

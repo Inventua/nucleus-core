@@ -41,12 +41,8 @@
     @Html.AddStyle(Model.SiteCssFilePath, AddStyleHtmlHelper.WellKnownSortOrders.SITE_STYLES_SORT_INDEX)
 	}
 	@RenderSection("scripts", false)
-	<merge-stylesheets>
-		@Html.RenderStyles()
-	</merge-stylesheets>
-	<merge-scripts>
-		@Html.RenderScripts()
-	</merge-scripts>
+	@Html.RenderStyles()
+	@Html.RenderScripts()
 </head>
 <body class="@Model.ControlPanelDockingCssClass">
   @if (Model.CanEdit)

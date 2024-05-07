@@ -1,29 +1,33 @@
 ﻿@model Nucleus.Web.ViewModels.User.AccountPassword
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
-@{Layout = "_Generic";}
-<h1>Login</h1>
-
-@using (Html.BeginAreaForm("Login", "Account", "User", FormMethod.Post))
-{
-	<fieldset>
-		@Html.HiddenFor(model => model.ReturnUrl)
-		<div>
-			<label>
-				<span>User name</span>
-				<span>@Html.TextBoxFor(model => model.Username, new { @autocorrect = "off", @autocapitalize = "none" })</span>
-			</label>
-		</div>
-
-		<div>
-			<label>
-				<span>Password</span>
-				<span>@Html.PasswordFor(model => model.Password)</span>
-			</label>
-		</div>
-		<div class="nucleus-form-buttonrow">
-			<input type="submit" value="Login" class="btn btn-primary" />
-			<a href="@Url.Content("~/")" class="btn btn-secondary">Cancel</a>
-		</div>
-	</fieldset>
+@{
+  Layout = "_Generic";
 }
+<div class="p-2">
+  <h1>Login</h1>
+
+  @using (Html.BeginAreaForm("Login", "Account", "User", FormMethod.Post))
+  {
+    <fieldset>
+      @Html.HiddenFor(model => model.ReturnUrl)
+      <div>
+        <label>
+          <span>User name</span>
+          <span>@Html.TextBoxFor(model => model.Username, new { @autocorrect = "off", @autocapitalize = "none" })</span>
+        </label>
+      </div>
+
+      <div>
+        <label>
+          <span>Password</span>
+          <span>@Html.PasswordFor(model => model.Password)</span>
+        </label>
+      </div>
+      <div class="nucleus-form-buttonrow">
+        <input type="submit" value="Login" class="btn btn-primary" />
+        <a href="@Url.Content("~/")" class="btn btn-secondary">Cancel</a>
+      </div>
+    </fieldset>
+  }
+</div>

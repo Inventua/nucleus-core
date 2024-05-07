@@ -403,7 +403,7 @@ table.table-sticky-headers thead th
 }
 
 /*  styles for small table cells, intended for use with buttons/icons */
-table td.nucleus-small-cell
+.nucleus-small-cell
 {
 	width: 20px;
 	background-color: transparent;

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="93788e4e-4c0f-4381-bfd8-3b3e6fe07fc0" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Error Report</name>
-  <version>1.4.0</version>
+  <version>1.2.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
     This module is used on the site error page to display error details.

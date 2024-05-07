@@ -40,8 +40,10 @@ public class SiteWizardController : Controller
 
   private static Guid HTML_MODULE_PACKAGE_ID = Guid.Parse("4036fdb6-6114-4740-b3c4-d3dbc8f37540");
   private static Guid SMTP_CLIENT_PACKAGE_ID = Guid.Parse("2cefdc41-bb7c-48c7-9dd0-9f1975bcd502");
+  private static Guid STANDARD_LAYOUTS_CONTAINERS_PACKAGE_ID = Guid.Parse("c71695ec-111a-4ee6-9ba6-cdce64a6afd5");
 
   private static Guid[] REQUIRED_EXTENSIONS = { HTML_MODULE_PACKAGE_ID, SMTP_CLIENT_PACKAGE_ID };
+  private static Guid[] RECOMMENDED_EXTENSIONS = { STANDARD_LAYOUTS_CONTAINERS_PACKAGE_ID };
 
   private static FileSystemType LOCAL_FILES = new()
   {
@@ -168,7 +170,7 @@ public class SiteWizardController : Controller
       viewModel.Databases = ListDatabases(viewModel);
     }
 
-    if (viewModel.DatabaseProvider=="Sqlite" || (!String.IsNullOrEmpty(viewModel.DatabaseName) && viewModel.DatabaseName != ViewModels.Setup.SiteWizard.REFRESH_DATABASES))
+    if (viewModel.DatabaseProvider == "Sqlite" || (!String.IsNullOrEmpty(viewModel.DatabaseName) && viewModel.DatabaseName != ViewModels.Setup.SiteWizard.REFRESH_DATABASES))
     {
       viewModel.DatabaseConnectionString = CreateConnectionString(viewModel, false);
     }
@@ -511,7 +513,7 @@ public class SiteWizardController : Controller
 
     // we always need the list of available file systems, regardless of the flags setting
     AddAvailableFileSystems(viewModel);
-      
+
     if (flags.HasFlag(ReadFlags.FileSystems))
     {
       // file systems
@@ -555,7 +557,7 @@ public class SiteWizardController : Controller
             viewModel.Templates.Insert(0, templateItem);
           }
           else
-          { 
+          {
             viewModel.Templates.Add(templateItem);
           }
         }
@@ -618,7 +620,7 @@ public class SiteWizardController : Controller
                 .Select(module => module.ContainerDefinition)
                 .Distinct()
             )
-            .ToList(); 
+            .ToList();
 
           // save parsed template (with Guids generated) so that the Guids stay the same when we build the site
           viewModel.TemplateTempFileName = await this.SiteManager.SaveTemplateTempFile(template);
@@ -682,6 +684,15 @@ public class SiteWizardController : Controller
                   installableExtension.IsRequired = true;
                 }
 
+                // only apply default extension selections once (that is, not from the RefreshExtensions action)
+                if (flags.HasFlag(ReadFlags.All))
+                {
+                  if (RECOMMENDED_EXTENSIONS.Contains(installableExtension.PackageId))
+                  {
+                    installableExtension.IsSelected = true;
+                  }
+                }
+
                 installableExtensions.Add(installableExtension);
               }
             }
@@ -694,7 +705,7 @@ public class SiteWizardController : Controller
       }
 
       if (flags.HasFlag(ReadFlags.Extensions))
-      {  
+      {
         // mark file system providers as selected and required if they match selected file systems
         foreach (SelectedFileSystem fileSystem in viewModel.SelectedFileSystems)
         {

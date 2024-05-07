@@ -487,6 +487,25 @@ public class AssemblyLoader
     }
   }
 
+  /// <summary>
+  /// Return a list of types in the specified <paramref name="assembly"/> which have the specified attribute assigned. 
+  /// </summary>
+  /// <typeparam name="TAttribute"></typeparam>
+  /// <param name="assembly"></param>
+  /// <returns></returns>
+  public static IEnumerable<Type> GetTypesWithAttribute<TAttribute>(Assembly assembly)
+    where TAttribute : Attribute
+  {    
+    if (assembly != null)
+    {
+      foreach (Type type in GetTypes(assembly)
+        .Where(type => !type.IsAbstract && type.GetCustomAttributes<TAttribute>().Any()))
+      {
+        yield return type;
+      }
+    }    
+  }
+
   private static Type[] GetTypes(System.Reflection.Assembly assembly)
   {
     try
@@ -531,17 +550,12 @@ public class AssemblyLoader
     // AssemmblyLoadContext.
     foreach (string assemblyFileName in EnumerateAssemblyNames())
     {
-      // Load all assemblies EXCEPT Razor views (because they aren't real assemblies and LoadFrom doesn't 
-      // work on them)
-      if (!System.IO.Path.GetFileName(assemblyFileName).EndsWith("Views.dll"))
-      {
-        Assembly assembly = AssemblyLoader.LoadFrom(assemblyFileName);
+      Assembly assembly = AssemblyLoader.LoadFrom(assemblyFileName);
 
-        if (assembly != null)
-        {
-          assemblies.Add(assembly);
-        }
-      }
+      if (assembly != null)
+      {
+        assemblies.Add(assembly);
+      }      
     }
 
     return assemblies;

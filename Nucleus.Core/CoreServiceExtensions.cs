@@ -1,26 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Nucleus.Core.Layout;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Nucleus.Abstractions;
+using Nucleus.Abstractions.EventHandlers;
+using Nucleus.Abstractions.Mail;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Models.Configuration;
+using Nucleus.Abstractions.Models.TaskScheduler;
+using Nucleus.Abstractions.Search;
 using Nucleus.Core.EventHandlers;
 using Nucleus.Core.FileSystemProviders;
-using Nucleus.Abstractions.Models.Configuration;
-using Nucleus.Abstractions.Managers;
-using Nucleus.Abstractions.Mail;
-using Nucleus.Abstractions.EventHandlers;
-using Nucleus.Abstractions.Search;
-using Microsoft.Extensions.Options;
-using Nucleus.Abstractions.Models.TaskScheduler;
-using Nucleus.Core.Mail;
-using Nucleus.Abstractions.Models;
+using Nucleus.Core.Layout;
+using Nucleus.Core.Logging;
 using Nucleus.Core.Plugins;
-using Nucleus.Abstractions;
-using System.Reflection;
-using System.Configuration;
-using Microsoft.AspNetCore.Builder;
 
 namespace Nucleus.Core;
 
@@ -155,7 +157,61 @@ public static class CoreServiceExtensions
   {
     services.Configure<T>(configuration.GetSection(key), binderOptions => binderOptions.BindNonPublicProperties = true);
   }
+
+  public static IApplicationBuilder UseStaticPhysicalPath(this IApplicationBuilder app, IWebHostEnvironment env)
+  {
+    List<IFileProvider> providers = new();
+
+    foreach (string folderName in Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS)
+    {
+      string path = Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(System.IO.Path.Combine(env.ContentRootPath, folderName));
+
+      if (System.IO.Directory.Exists(path))
+      {
+        app.Logger()?.LogInformation("Adding static file path: [{path}]", "/" + folderName);
+        IFileProvider fileProvider = new PhysicalFileProvider(path);
+
+        app.UseStaticFiles(new StaticFileOptions
+        {
+          FileProvider = fileProvider,
+          RequestPath = "/" + folderName,
+          OnPrepareResponse = context =>
+          {
+            // Add charset=utf-8 to content-type for text content if it is not already present
+            if ((context.Context.Response.ContentType.StartsWith("text/") || context.Context.Response.ContentType.StartsWith("application/javascript")) && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
+            {
+              context.Context.Response.ContentType += "; charset=utf-8";
+            }
+
+            // Cache static content for 30 days
+            context.Context.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+            {
+              Public = true,
+              MaxAge = TimeSpan.FromDays(30)
+            };
+          }
+        });
+        
+        providers.Add(fileProvider);
+      }
+    }
+
+    if (env.ContentRootFileProvider is CompositeFileProvider compositeFileProvider) 
+    {
+      providers.InsertRange(0, compositeFileProvider.FileProviders);
+    }
+    else
+    {
+      providers.Insert(0, env.ContentRootFileProvider);
+    }
+    
+    env.ContentRootFileProvider = new CompositeFileProvider(providers);
+
+    return app;
+  }
   
+
+
   /// <summary>
   /// Use the specified Nucleus control panel.
   /// </summary>
@@ -164,7 +220,7 @@ public static class CoreServiceExtensions
   /// </remarks>
   /// <param name="app"></param>
   /// <param name="name"></param>
-  public static void UseControlPanel(this IApplicationBuilder app, string name)
+  public static IApplicationBuilder UseControlPanel(this IApplicationBuilder app, string name)
   {
     Application appData = app.ApplicationServices.GetService<Application>();
 
@@ -196,6 +252,8 @@ public static class CoreServiceExtensions
           ?.Uri);
       }
     }
+
+    return app;
   }
 
   public class ConfigureStoreOptions : IPostConfigureOptions<StoreOptions>

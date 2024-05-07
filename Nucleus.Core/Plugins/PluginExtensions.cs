@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Core.Logging;
 using Nucleus.Extensions.Logging;
 
@@ -35,7 +40,7 @@ public static class PluginExtensions
 
     builder.Services.Configure<RazorViewEngineOptions>(options =>
     {
-      options.ViewLocationExpanders.Add(new ExtensionViewLocationExpander());
+      options.ViewLocationExpanders.Add(new ExtensionViewLocationExpander());      
     });
 
     ConfigureRazorRuntimeCompilation(builder);
@@ -177,7 +182,7 @@ public static class PluginExtensions
   }
 
   /// <summary>
-  /// Check whether an application part is already present in the Part Manager, as adding the same Controller assembly twice causes 
+  /// Check whether an application part is already present in the Part Manager, as adding the same part twice causes 
   /// a runtime AmbiguousMatchException.
   /// </summary>
   /// <param name="builder">IMvcBuilder instance used to configure services.</param>
@@ -185,7 +190,81 @@ public static class PluginExtensions
   /// <returns></returns>
   private static Boolean ApplicationPartContains(this IMvcBuilder builder, ApplicationPart part)
   {
-    return builder.PartManager.ApplicationParts.Where(existing => existing is AssemblyPart && existing.Name == part.Name).Any();
+    return builder.PartManager.ApplicationParts.Contains(part);
+    //return builder.PartManager.ApplicationParts.Where(existing => existing is AssemblyPart && existing.Name == part.Name).Any();
+  }
+
+
+  public static IApplicationBuilder UseCompiledRazorResources(this IApplicationBuilder app, IWebHostEnvironment env)
+  {
+    List<IFileProvider> providers = new() { env.ContentRootFileProvider };
+
+    foreach (Assembly assembly in AssemblyLoader.ListAssemblies())
+    {
+      if (assembly.GetManifestResourceStream("Microsoft.Extensions.FileProviders.Embedded.Manifest.xml") != null)
+      {
+        // test use
+        //System.IO.Stream manifest = assembly.GetManifestResourceStream("Microsoft.Extensions.FileProviders.Embedded.Manifest.xml");
+        //System.IO.StreamReader reader = new(manifest);
+        //string contents = reader.ReadToEnd();
+
+        string requestPath = null;
+
+        // For control panel implementations, the root path for resources is specified in the ControlPanelAttribute.ResourcesRootPath. 
+        Nucleus.Abstractions.ControlPanelAttribute controlPanelAttr = assembly.GetCustomAttribute<Nucleus.Abstractions.ControlPanelAttribute>();
+        if (controlPanelAttr != null)
+        {
+          // use null for "/", because StaticFileOptions throws an exception if we try to set RequestPath to "/" (even though "/" is the 
+          // default value)
+          if (controlPanelAttr.ResourcesRootPath != "/")
+          {
+            requestPath = controlPanelAttr.ResourcesRootPath;
+          }
+        }
+        else
+        {
+          // For extensions, we derive the root path for resources using the extension name.  The derived root path is 
+          // "/Extensions/[extension-name]".  
+          foreach (System.Type extensionType in AssemblyLoader.GetTypesWithAttribute<Nucleus.Abstractions.ExtensionAttribute>(assembly))
+          {
+            Nucleus.Abstractions.ExtensionAttribute extensionAttr = extensionType.GetCustomAttribute<Nucleus.Abstractions.ExtensionAttribute>();
+            if (extensionAttr != null)
+            {
+              requestPath = $"/{FolderOptions.EXTENSIONS_FOLDER}/{extensionAttr.RouteValue}";
+            }
+          }
+        }
+
+        IFileProvider provider = new ManifestEmbeddedFileProvider(assembly, "/");
+        
+        app.UseStaticFiles(new StaticFileOptions
+        {
+          FileProvider = provider,
+          RequestPath = requestPath,
+          OnPrepareResponse = context =>
+          {
+            // Add charset=utf-8 to content-type for text content if it is not already present
+            if ((context.Context.Response.ContentType.StartsWith("text/") || context.Context.Response.ContentType.StartsWith("application/javascript")) && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
+            {
+              context.Context.Response.ContentType += "; charset=utf-8";
+            }
+
+            // Cache static content for 30 days
+            context.Context.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+            {
+              Public = true,
+              MaxAge = TimeSpan.FromDays(30)
+            };
+          }
+        });
+
+        providers.Add(provider);
+      }
+    }
+
+    env.ContentRootFileProvider = new CompositeFileProvider(providers);
+
+    return app;
   }
 
   /// <summary>
@@ -193,6 +272,11 @@ public static class PluginExtensions
   /// </summary>
   /// <param name="builder">IMvcBuilder instance used to configure services.</param>
   /// <returns></returns>
+  /// <remarks>
+  /// Application parts are also configured in AddExternalControllers(), so in many (most) cases, the PartManager will already
+  /// contain the ApplicationPart for the assembly which contains compiled Razor views, so we check to ensure that we do not 
+  /// add a part twice by checking for it in the call to ApplicationPartContains().
+  /// </remarks>
   private static IMvcBuilder AddCompiledRazorViews(this IMvcBuilder builder)
   {
     List<string> logEntries = new();

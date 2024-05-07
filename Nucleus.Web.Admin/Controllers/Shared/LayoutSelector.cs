@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Grpc.Core;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Extensions.FileProviders;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Extensions;
@@ -14,7 +12,7 @@ namespace Nucleus.Web.Controllers.Shared;
 
 public class LayoutSelector
 {
-  public static async Task<ViewModels.Admin.LayoutSelector> BuildLayoutSelectorViewModel(ILayoutManager layoutManager, Guid? selectedLayoutId)
+  public static async Task<ViewModels.Admin.LayoutSelector> BuildLayoutSelectorViewModel(IWebHostEnvironment env, ILayoutManager layoutManager, Guid? selectedLayoutId)
   {
     ViewModels.Admin.LayoutSelector viewModel = new();
 
@@ -28,14 +26,17 @@ public class LayoutSelector
     foreach (ViewModels.Admin.LayoutSelector.LayoutInformation layout in viewModel.Layouts)
     {
       string basePath = System.IO.Path.Join(System.IO.Path.GetDirectoryName(layout.RelativePath), System.IO.Path.GetFileNameWithoutExtension(layout.RelativePath));
-      string descriptionFileRelativePath = FindLayoutDescriptionFile(basePath);
+      string descriptionFileRelativePath = FindLayoutDescriptionFile(env, basePath);
 
       layout.Extension = GetExtensionFriendlyName(basePath);
-      layout.ThumbnailUrl = FindLayoutThumbnail(basePath);
+      layout.ThumbnailUrl = FindLayoutThumbnail(env, basePath);
 
       if (descriptionFileRelativePath != null)
       {
-        string descriptionContent = System.IO.File.ReadAllText(System.IO.Path.Join(Environment.CurrentDirectory, descriptionFileRelativePath));
+        IFileInfo fileInfo = env.ContentRootFileProvider.GetFileInfo(descriptionFileRelativePath);
+        //string descriptionContent = System.IO.File.ReadAllText(System.IO.Path.Join(Environment.CurrentDirectory, descriptionFileRelativePath));
+        string descriptionContent = await fileInfo.ReadAllText();
+
         layout.Description = descriptionContent.ToHtml(GetContentType(System.IO.Path.GetExtension(descriptionFileRelativePath)));
       }
     }
@@ -43,7 +44,7 @@ public class LayoutSelector
     return viewModel;
   }
 
-  public static async Task<ContainerSelector> BuildContainerSelectorViewModel(IContainerManager containerManager, Guid? selectedContainerId)
+  public static async Task<ContainerSelector> BuildContainerSelectorViewModel(IWebHostEnvironment env, IContainerManager containerManager, Guid? selectedContainerId)
   {
     ContainerSelector viewModel = new();
 
@@ -57,14 +58,15 @@ public class LayoutSelector
     foreach (ContainerSelector.ContainerInformation container in viewModel.Containers)
     {
       string basePath = System.IO.Path.Join(System.IO.Path.GetDirectoryName(container.RelativePath), System.IO.Path.GetFileNameWithoutExtension(container.RelativePath));
-      string descriptionFileRelativePath = FindContainerDescriptionFile(basePath);
+      string descriptionFileRelativePath = FindContainerDescriptionFile(env, basePath);
 
       container.Extension = GetExtensionFriendlyName(basePath);
-      container.ThumbnailUrl = FindContainerThumbnail(basePath);
+      container.ThumbnailUrl = FindContainerThumbnail(env, basePath);
 
       if (descriptionFileRelativePath != null)
       {
-        string descriptionContent = System.IO.File.ReadAllText(System.IO.Path.Join(Environment.CurrentDirectory, descriptionFileRelativePath));
+        IFileInfo fileInfo = env.ContentRootFileProvider.GetFileInfo(descriptionFileRelativePath);
+        string descriptionContent = await fileInfo.ReadAllText();// System.IO.File.ReadAllText(System.IO.Path.Join(Environment.CurrentDirectory, descriptionFileRelativePath));
         container.Description = descriptionContent.ToHtml(GetContentType(System.IO.Path.GetExtension(descriptionFileRelativePath)));
       }
     }
@@ -130,12 +132,14 @@ public class LayoutSelector
     return "text/html";
   }
 
-  public static string FindLayoutThumbnail(string basePath)
+  public static string FindLayoutThumbnail(IWebHostEnvironment env, string basePath)
   {
     foreach (string fileExtension in new string[] { ".png", ".svg", ".jpg", ".webp" })
     {
       string path = basePath + fileExtension;
-      if (System.IO.File.Exists(System.IO.Path.Join(Environment.CurrentDirectory, path)))
+
+      IFileInfo fileInfo = env.ContentRootFileProvider.GetFileInfo(path);
+      if (fileInfo.Exists)
       {
         return path;
       }
@@ -144,12 +148,14 @@ public class LayoutSelector
     return null;
   }
 
-  public static string FindLayoutDescriptionFile(string basePath)
+  public static string FindLayoutDescriptionFile(IWebHostEnvironment env, string basePath)
   {
     foreach (string fileExtension in new string[] { ".md", ".htm", ".html", ".txt" })
     {
       string path = basePath + fileExtension;
-      if (System.IO.File.Exists(System.IO.Path.Join(Environment.CurrentDirectory, path)))
+      
+      IFileInfo fileInfo = env.ContentRootFileProvider.GetFileInfo(path);
+      if (fileInfo.Exists)
       {
         return path;
       }
@@ -158,8 +164,8 @@ public class LayoutSelector
     return null;
   }
 
-  public static string FindContainerThumbnail(string basePath) => FindLayoutThumbnail(basePath);
+  public static string FindContainerThumbnail(IWebHostEnvironment env, string basePath) => FindLayoutThumbnail(env, basePath);
 
-  public static string FindContainerDescriptionFile(string basePath) => FindLayoutDescriptionFile(basePath);
+  public static string FindContainerDescriptionFile(IWebHostEnvironment env, string basePath) => FindLayoutDescriptionFile(env, basePath);
 
 }

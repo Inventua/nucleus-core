@@ -13,6 +13,7 @@ using Nucleus.Extensions;
 using Microsoft.AspNetCore.Http;
 using Nucleus.Data.Common;
 using Nucleus.Abstractions.Mail;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Nucleus.Web.Controllers.Admin
 {
@@ -20,26 +21,29 @@ namespace Nucleus.Web.Controllers.Admin
 	[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]	
 	public class SitesController : Controller
 	{
-		private ILogger<SitesController> Logger { get; }
+    private IWebHostEnvironment WebHostEnvironment { get; }
+
+    private ILogger<SitesController> Logger { get; }
 		private ISiteManager SiteManager{ get; }
 		private IRoleManager RoleManager { get; }
 		private IPageManager PageManager { get; }
 		private IMailTemplateManager MailTemplateManager { get; }
-		//private IMailClientFactory MailClientFactory { get; }
 
 		private IFileSystemManager FileSystemManager { get; }		
 		private Context Context { get; }
 		private ILayoutManager LayoutManager { get; }
 		private IContainerManager ContainerManager { get; }
 
-		public SitesController(Context context, ILogger<SitesController> logger, ISiteManager siteManager, IPageManager pageManager, IMailTemplateManager mailTemplateManager, IRoleManager roleManager, ILayoutManager layoutManager, IContainerManager containerManager, IFileSystemManager fileSystemManager)
+		public SitesController(IWebHostEnvironment webHostEnvironment, Context context, ILogger<SitesController> logger, ISiteManager siteManager, IPageManager pageManager, IMailTemplateManager mailTemplateManager, IRoleManager roleManager, ILayoutManager layoutManager, IContainerManager containerManager, IFileSystemManager fileSystemManager)
 		{
+      this.WebHostEnvironment = webHostEnvironment;
 			this.Context = context;
+
 			this.Logger = logger;
 			this.SiteManager = siteManager;
-			this.PageManager = pageManager;
-			this.MailTemplateManager = mailTemplateManager;
-			//this.MailClientFactory = mailClientFactory;
+			this.PageManager = pageManager;			
+      this.MailTemplateManager = mailTemplateManager;			
+
 			this.RoleManager = roleManager;
 			this.LayoutManager = layoutManager;
 			this.ContainerManager = containerManager;
@@ -79,7 +83,7 @@ namespace Nucleus.Web.Controllers.Admin
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
     public async Task<ActionResult> LayoutSelector(ViewModels.Admin.SiteEditor viewModel)
     {
-      return View("_LayoutSelector", await Shared.LayoutSelector.BuildLayoutSelectorViewModel(this.LayoutManager, viewModel.Site.DefaultLayoutDefinition?.Id));
+      return View("_LayoutSelector", await Shared.LayoutSelector.BuildLayoutSelectorViewModel(this.WebHostEnvironment, this.LayoutManager, viewModel.Site.DefaultLayoutDefinition?.Id));
     }
 
     /// <summary>
@@ -90,7 +94,7 @@ namespace Nucleus.Web.Controllers.Admin
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
     public async Task<ActionResult> ContainerSelector(ViewModels.Admin.SiteEditor viewModel)
     {
-      return View("_ContainerSelector", await Shared.LayoutSelector.BuildContainerSelectorViewModel(this.ContainerManager, viewModel.Site.DefaultContainerDefinition?.Id));
+      return View("_ContainerSelector", await Shared.LayoutSelector.BuildContainerSelectorViewModel(this.WebHostEnvironment, this.ContainerManager, viewModel.Site.DefaultContainerDefinition?.Id));
     }
 
     /// <summary>

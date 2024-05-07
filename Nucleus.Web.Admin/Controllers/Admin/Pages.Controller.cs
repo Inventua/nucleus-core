@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -17,6 +18,7 @@ namespace Nucleus.Web.Controllers.Admin
   [Area("Admin")]
   public class PagesController : Controller
   {
+    private IWebHostEnvironment WebHostEnvironment { get; }
     private ILogger<PagesController> Logger { get; }
     private Context Context { get; }
     private ILayoutManager LayoutManager { get; }
@@ -31,6 +33,7 @@ namespace Nucleus.Web.Controllers.Admin
     public const string CUSTOM_CONTAINER_STYLE_VALUE = "__custom";
 
     public PagesController(
+      IWebHostEnvironment webHostEnvironment,
       Context context,
       ILogger<PagesController> logger,
       IPageManager pageManager,
@@ -42,6 +45,7 @@ namespace Nucleus.Web.Controllers.Admin
       IContentManager contentManager,
       IContainerManager containerManager)
     {
+      this.WebHostEnvironment = webHostEnvironment;
       this.Context = context;
       this.Logger = logger;
       this.PageManager = pageManager;
@@ -136,7 +140,7 @@ namespace Nucleus.Web.Controllers.Admin
       {
         selectedLayoutId = Guid.Parse("2FF6818A-09FE-4EE2-BEFF-495A876AB6D6");
       }
-      return View("_LayoutSelector", await Shared.LayoutSelector.BuildLayoutSelectorViewModel(this.LayoutManager, selectedLayoutId));
+      return View("_LayoutSelector", await Shared.LayoutSelector.BuildLayoutSelectorViewModel(this.WebHostEnvironment, this.LayoutManager, selectedLayoutId));
     }
 
     /// <summary>
@@ -152,7 +156,7 @@ namespace Nucleus.Web.Controllers.Admin
       {
         selectedContainerId = Guid.Parse("80A7F079-F61D-42A4-9A4B-DA7692415952");
       }
-      return View("_ContainerSelector", await Shared.LayoutSelector.BuildContainerSelectorViewModel(this.ContainerManager, selectedContainerId));
+      return View("_ContainerSelector", await Shared.LayoutSelector.BuildContainerSelectorViewModel(this.WebHostEnvironment, this.ContainerManager, selectedContainerId));
     }
 
     /// <summary>
@@ -170,7 +174,7 @@ namespace Nucleus.Web.Controllers.Admin
       {
         selectedContainerId = Guid.Parse("80A7F079-F61D-42A4-9A4B-DA7692415952");
       }
-      return View("_ContainerSelector", await Shared.LayoutSelector.BuildContainerSelectorViewModel(this.ContainerManager, selectedContainerId));
+      return View("_ContainerSelector", await Shared.LayoutSelector.BuildContainerSelectorViewModel(this.WebHostEnvironment, this.ContainerManager, selectedContainerId));
     }
 
     /// <summary>

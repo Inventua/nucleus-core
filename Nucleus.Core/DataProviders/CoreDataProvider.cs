@@ -146,9 +146,9 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
     }
   }
 
-  public async Task<Guid> DetectSite(Microsoft.AspNetCore.Http.HostString requestUri, string pathBase)
+  public async Task<Guid> DetectSite(string requestUri, string pathBase)
   {
-    string siteAlias = requestUri.Value + pathBase;
+    string siteAlias = requestUri + pathBase;
     Site site;
 
     if (String.IsNullOrEmpty(siteAlias) && await CountSites() == 1)

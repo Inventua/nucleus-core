@@ -87,7 +87,7 @@ public partial class SiteManager : ISiteManager
   /// <param name="requestUri"></param>
   /// <param name="pathBase"></param>
   /// <returns></returns>
-  public async Task<Site> Get(Microsoft.AspNetCore.Http.HostString requestUri, string pathBase)
+  public async Task<Site> Get(string requestUri, string pathBase)
   {
     string siteDetectCacheKey = (requestUri + "^" + pathBase).ToLower();
 

@@ -6,7 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
-    <!--<RazorCompileOnBuild>true</RazorCompileOnBuild>-->
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,27 +18,7 @@
     <ProjectReference Include="$(SolutionDir)\Nucleus.Extensions\Nucleus.Extensions.csproj" />
     <ProjectReference Include="$(SolutionDir)\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
   </ItemGroup>
-  
-  <!--<ItemGroup>
-    --><!--<Content Update="Areas\**\*.cshtml">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Content>--><!--
-    --><!--<Content Include="Areas\**\*.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Areas\**\*.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>--><!--    
-  </ItemGroup>-->
-  
-  <!--<ItemGroup>
-    <Content Remove="Areas\Admin\Views\ScheduledTasks\ScheduledTasks.js" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Remove="Areas\Admin\Views\ScheduledTasks\ScheduledTasks.js" />
-  </ItemGroup>-->
-  
+    
   <ItemGroup>
     <EmbeddedResource Include="Areas\Admin\Views\ScheduledTasks\ScheduledTasks.js" />
   </ItemGroup>

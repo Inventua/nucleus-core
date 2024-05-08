@@ -28,42 +28,42 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       /// <summary>
       /// Bootstrap
       /// </summary>
-      BOOTSTRAP,
+      BOOTSTRAP=10,
 
       /// <summary>
       /// Shared CSS used by all of Nucleus
       /// </summary>
-      NUCLEUS_SHARED,
+      NUCLEUS_SHARED=20,
 
       /// <summary>
       /// CSS classes for the admin user interface.
       /// </summary>
-			NUCLEUS_ADMIN,
+			NUCLEUS_ADMIN=30,
 
       /// <summary>
       /// CSS classes used by the admin user interface and by modules which display forms.
       /// </summary>
-			NUCLEUS_FORMS,
+			NUCLEUS_FORMS=40,
 
       /// <summary>
       /// CSS classes used by inline editing controls.  This stylesheet is added automatically when the user selects editing mode.
       /// </summary>
-      NUCLEUS_EDITMODE,
+      NUCLEUS_EDITMODE=50,
 
       /// <summary>
       /// CSS classes for the Nucleus paging control.
       /// </summary>
-      NUCLEUS_PAGINGCONTROL,
+      NUCLEUS_PAGINGCONTROL=60,
 
       /// <summary>
       /// CSS classes for the Monaco editor
       /// </summary>
-      NUCLEUS_MONACO_EDITOR,
+      NUCLEUS_MONACO_EDITOR=70,
 
       /// <summary>
       /// Customizable CSS properties and implementation for containers ("container styles")
       /// </summary>
-      NUCLEUS_CONTAINER_STYLES
+      NUCLEUS_CONTAINER_STYLES=80
     }
 
     private const string WELLKNOWN_BOOTSTRAP = "~/Resources/Libraries/Bootstrap/5.3.2/css/bootstrap.css";

@@ -142,6 +142,7 @@ namespace Nucleus.Web
         IMvcBuilder builder = services.AddControllersWithViews();
 
         builder.AddRazorRuntimeCompilation();
+        services.AddServerSideBlazor();
 
         // future reference:
         // services.AddLocalization(options => options.ResourcesPath = "LocalizationResources");
@@ -306,43 +307,10 @@ namespace Nucleus.Web
         // Add file providers for embedded static resources in Nucleus.Web and in control panel implementations/extensions
         app.UseCompiledRazorResources(this.Environment);
 
-        // Call .UseStaticFiles multiple times to add additional paths.  We expose specific folders only, rather than adding 
+        // Add static file providers for the paths in FolderOptions.ALLOWED_STATICFILE_PATHS.  We expose specific folders only, rather than adding 
         // env.ContentRootPath so that only defined folders can serve static resources.
-        app.UseStaticPhysicalPath(this.Environment);
-
-        ////// Call .UseStaticFiles multiple times to add additional paths.  We expose specific folders only, rather than adding 
-        ////// env.ContentRootPath so that only defined folders can serve static resources.
-        ////foreach (string folderName in Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS)
-        ////{
-        ////  string path = Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(System.IO.Path.Combine(env.ContentRootPath, folderName));
-
-        ////  if (System.IO.Directory.Exists(path))
-        ////  {
-        ////    app.Logger()?.LogInformation("Adding static file path: [{path}]", "/" + folderName);
-
-        ////    app.UseStaticFiles(new StaticFileOptions
-        ////    {
-        ////      FileProvider = new PhysicalFileProvider(path),
-        ////      RequestPath = "/" + folderName,
-        ////      OnPrepareResponse = context =>
-        ////      {
-        ////        // Add charset=utf-8 to content-type for text content if it is not already present
-        ////        if ((context.Context.Response.ContentType.StartsWith("text/") || context.Context.Response.ContentType.StartsWith("application/javascript")) && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
-        ////        {
-        ////          context.Context.Response.ContentType += "; charset=utf-8";
-        ////        }
-
-        ////        // Cache static content for 30 days
-        ////        context.Context.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
-        ////        {
-        ////          Public = true,
-        ////          MaxAge = TimeSpan.FromDays(30)
-        ////        };
-        ////      }
-        ////    });
-        ////  }
-        ////}
-
+        app.UseStaticFilePaths(this.Environment);
+        
         // Set default cache-control to NoCache.  This can be overridden by controllers or middleware.
         app.UseMiddleware<DefaultNoCacheMiddleware>();
 
@@ -381,6 +349,9 @@ namespace Nucleus.Web
 
           // "Razor Pages" (Razor Pages is different to Razor views with controllers [MVC])
           routes.MapRazorPages();
+
+          // Blazor SignalR hub
+          routes.MapBlazorHub();
 
           // Map the error page route
           routes.MapControllerRoute(

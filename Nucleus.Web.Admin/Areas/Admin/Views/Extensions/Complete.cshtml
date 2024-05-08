@@ -1,0 +1,61 @@
+﻿@model Nucleus.Web.ViewModels.Admin.Extensions
+<div class="ExtensionInstaller">
+	<h1>Extension Installer</h1>
+
+	@if (@Model.Messages.Count > 0)
+	{
+		<ul>
+			@foreach (string message in Model.Messages)
+			{
+				<li>@message</li>
+			}
+		</ul>
+	}
+	else
+	{
+		<div class="extensions-restarting collapse show">
+			<h2>@Model.Title</h2>
+			<p>Your web site is restarting, please wait.</p>
+			<div class="progress mt-2">
+				<div class="progress-bar progress-bar-striped progress-bar-animated indeterminate" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+			</div>
+		</div>
+
+		<div class="extensions-restarted collapse">
+			<h2>Restart Complete.</h2>
+			<p></p>
+		</div>
+	}
+	<div class="nucleus-form-buttonrow">
+		<a href="@Url.AreaAction("Index", "Extensions", "Admin")" class="btn btn-secondary" data-target=".nucleus-adminpage">Back</a>
+	</div>
+</div>
+
+<script>
+	jQuery(document).ready(function ()
+	{
+		@if (@Model.Messages.Count == 0)
+		{
+			@Html.Raw("window.setTimeout(TestSiteStarted, 2000);");
+		}
+	});
+
+	function TestSiteStarted()
+	{
+		
+		jQuery.ajax({
+			url: '@Url.Content("~/")',
+      async: true,
+			method: 'GET',
+			success: function (data, status, request)
+			{
+				jQuery('.extensions-restarting').removeClass('show');
+				jQuery('.extensions-restarted').addClass('show');
+			},
+			error: function (request, status, message)
+			{
+				window.setTimeout(TestSiteStarted, 2000);
+			}
+		})
+	}
+</script>

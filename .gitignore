@@ -372,11 +372,11 @@ hosting.*.json
 Nucleus.Web/iis-dev/**/*.*
 
 # Nucleus.Web extensions folder
-Extensions/
-Extensions/**/
-Setup/Extensions/
-Setup/Extensions/*.*
+Nucleus.Web/Extensions/
+Nucleus.Web/Extensions/**/
+Nucleus.Web/Setup/Extensions/
+Nucleus.Web/Setup/Extensions/*.*
 Nucleus.Core.Modules/**/*.zip
 Nucleus.Special.Modules/**/*.zip
 Nucleus.Core.Modules/**/AppPackage
-/Nucleus.Web/Setup/install-log.config
+Nucleus.Web/Setup/install-log.config

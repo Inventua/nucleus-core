@@ -1,0 +1,127 @@
+﻿@model Nucleus.Web.ViewModels.Admin.ExtensionsUsage
+<div class="alert alert-info">
+  @if (!String.IsNullOrEmpty(Model.SiteDefaultLayout))
+  {
+    <span>The <strong>@Model.SiteDefaultLayout</strong> layout is the default layout for this site.</span>
+  }
+  @if (!String.IsNullOrEmpty(Model.SiteDefaultContainer))
+  {
+    <span>
+      The <strong>@Model.SiteDefaultContainer</strong> container is the default container for this site.
+    </span >
+  }
+  
+  @if (@Model.ExtensionComponents.PageCount > 0)
+  {
+    <div>
+      There @(@Model.ExtensionComponents.PageCount == 1 ? "is" : "are") @Model.ExtensionComponents.PageCount page@(Model.ExtensionComponents.PageCount == 1 ? "" : "s")/module@(Model.ExtensionComponents.PageCount == 1 ? "" : "s") which use@(Model.ExtensionComponents.PageCount == 1 ? "s" : "") components of the <strong>@Model.Package.name</strong> package.
+    </div>
+  } 
+  else
+  {
+    <div>
+      Components of the <strong>@Model.Package.name</strong> package are not in use on any pages.
+    </div>
+  }
+</div>
+<h1 class="nucleus-control-panel-heading">@Model.Package.name</h1>
+<div class="nucleus-extension-components">
+  @if (@Model.ExtensionComponents.Modules.Any())
+  {
+    <div class="border p-2 mb-2 nucleus-extension-components-modules">
+      <h2>Modules:</h2>
+      <ul class="ms-2">
+        @foreach (var moduleUsage in @Model.ExtensionComponents.Modules)
+        {
+          <li>
+            <h5 data-id="@moduleUsage.Id">@moduleUsage.Name</h5>
+            @await Html.PartialAsync("_UsagePages", moduleUsage.Pages)
+            @if (!String.IsNullOrEmpty(moduleUsage.Message))
+            {
+              <div class="ms-2">@moduleUsage.Message</div>
+            }
+          </li>         
+        }
+      </ul>
+    </div>
+  }
+  @if (@Model.ExtensionComponents.Layouts.Any())
+  {
+    <div class="border p-2 mb-2 nucleus-extension-components-layouts">
+      <h4>Layouts:</h4>
+      <ul class="ms-2">
+        @foreach (var layoutUsage in @Model.ExtensionComponents.Layouts)
+        {
+          <li>
+            <h5 data-id="@layoutUsage.Id">@layoutUsage.Name</h5>
+            @await Html.PartialAsync("_UsagePages", layoutUsage.Pages)
+            @if (!String.IsNullOrEmpty(layoutUsage.Message))
+            {
+              <div class="ms-2">@layoutUsage.Message</div>
+            }
+          </li>
+        }
+      </ul>
+    </div>
+  }
+  @if (@Model.ExtensionComponents.Containers.Any())
+  {
+    <div class="border p-2 mb-2 nucleus-extension-components-containers">
+      <h4>Containers:</h4>
+      <ul class="ms-2">
+        @foreach (var containerUsage in @Model.ExtensionComponents.Containers)
+        {
+          <li>
+            <h5 data-id="@containerUsage.Id">@containerUsage.Name</h5>
+
+            @await Html.PartialAsync("_UsagePages", containerUsage.Pages)
+            @if (!String.IsNullOrEmpty(containerUsage.Message))
+            {
+              <div class="ms-2">@containerUsage.Message</div>
+            }
+          </li>          
+        }
+      </ul>
+    </div>
+  }
+  @if (@Model.ExtensionComponents.ControlPanelExtensions.Any())
+  {
+    <div class="border p-2 mb-2 nucleus-extension-components-controlpanelextensions">
+      <h4>Control Panel Extensions:</h4>
+      <ul class="ms-2">
+        @foreach (var controlPanelExtensionUsage in @Model.ExtensionComponents.ControlPanelExtensions)
+        {
+          <li>
+            <h5 data-id="@controlPanelExtensionUsage.Id">@controlPanelExtensionUsage.Name</h5>
+            @if (!String.IsNullOrEmpty(controlPanelExtensionUsage.Message))
+            {
+              <div class="ms-2">@controlPanelExtensionUsage.Message</div>
+            }
+          </li>
+        }
+      </ul>
+    </div>
+  }
+</div>
+<script>
+  jQuery(Page).on("ready.extensionusage", function()
+  {
+    var selectedItem = jQuery('h5[data-id="@Model.Id"]');
+    
+    if (selectedItem.length > 0)
+    {
+      jQuery('.nucleus-extension-components .highlight').removeClass('highlight');
+      selectedItem.addClass('highlight');
+
+      window.setTimeout(function()
+      {
+        selectedItem[0].scrollIntoView({ block: "start", inline: "nearest" });
+        selectedItem.removeClass('highlight');
+      }, 100);
+      
+    }
+  });
+
+
+</script>
+

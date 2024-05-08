@@ -1,0 +1,194 @@
+﻿@model Nucleus.Web.ViewModels.Admin.Extensions
+@Html.AddScript("~/Resources/js/nucleus-admin-extensions.js")
+<div class="ExtensionInstaller">
+  <h1 class="nucleus-control-panel-heading">Extensions</h1>
+
+  <Tab>
+    <TabItem active="true" target="#extensions-index" caption="Extensions"></TabItem>
+    <TabItem target="#extensions-store" caption="Store"></TabItem>
+  </Tab>
+
+  <TabContent>
+    <TabPanel id="extensions-index" active="true">
+      @using (Html.BeginAreaForm("Upload", "Extensions", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
+      {
+        <div class="mb-2">
+          To begin installation, click 'Select File' and select your extension file package.
+        </div>
+
+        <div class="nucleus-form-tools">          
+          <label class="btn btn-primary d-flex">
+            <span class="nucleus-material-icon me-1">&#xe2c6</span> Select File
+            <input type="file" name="extensionFile" class="collapse" accept=".zip">
+          </label>          
+
+          <div class="Restart">
+            <a href="@Url.AreaAction("Index", "Extensions", "Admin")" class="btn btn-secondary" data-target=".nucleus-adminpage">Install another Extension</a>
+          </div>
+        </div>
+
+        <ProgressBar caption="Uploading file ..." class="upload-progress"></ProgressBar>
+
+        <h2>Installed Extensions</h2>
+        <div class="InstalledExtensions">
+          @foreach (var extension in Model.InstalledExtensions)
+          {
+            <div>
+              <div>
+                <div>
+                  <span><h3>@extension.name</h3></span>
+                  <span>@extension?.version</span>
+                </div>
+                <div class="nucleus-small-cell"><input type="submit" formaction="@Url.AreaAction("Uninstall", "Extensions", "Admin", new { Id = extension.id })" value="&#xe14c;" data-confirm="This will uninstall the '@extension.name' package, and remove all module instances, scheduled tasks, layouts and containers which are provided by this extension.<br/><br/>Do you want to continue?" class="nucleus-material-icon btn btn-danger" title="Uninstall" data-target=".nucleus-adminpage" /></div>
+              </div>
+              <div><a href="@extension.publisher?.url" target="_blank">@extension.publisher?.name</a> <a href="mailto:@extension.publisher?.email" class="nucleus-material-icon EmailIcon">&#xe0be;</a></div>
+              <div>@extension?.description</div>
+
+              @if (@Model.ExtensionsUsage.ContainsKey(new Guid(extension.id)))
+              {
+                <div class="d-flex gap-4 nucleus-extension-components">
+                  @if (@Model.ExtensionsUsage[new Guid(extension.id)].Modules.Any())
+                  {
+                    <div>
+                      <h4>Modules:</h4>
+                      <ul class="component-list">
+                        @foreach (var moduleUsage in @Model.ExtensionsUsage[new Guid(extension.id)].Modules)
+                        {
+                          <li><a href="@Url.AreaAction("ListUsage", "Extensions", "Admin", new { id = extension.id, itemid = moduleUsage.Id})" data-target="#nucleus-extension-usage">@moduleUsage.Name</a></li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                  @if (@Model.ExtensionsUsage[new Guid(extension.id)].Layouts.Any())
+                  {
+                    <div>
+                      <h4>Layouts:</h4>
+                      <ul class="component-list">
+                        @foreach (var layoutUsage in @Model.ExtensionsUsage[new Guid(extension.id)].Layouts)
+                        {
+                          <li><a href="@Url.AreaAction("ListUsage", "Extensions", "Admin", new { id = extension.id, itemid = layoutUsage.Id})" data-target="#nucleus-extension-usage">@layoutUsage.Name</a></li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                  @if (@Model.ExtensionsUsage[new Guid(extension.id)].Containers.Any())
+                  {
+                    <div>
+                      <h4>Containers:</h4>
+                      <ul class="component-list">
+                        @foreach (var containerUsage in @Model.ExtensionsUsage[new Guid(extension.id)].Containers)
+                        {
+                          <li><a href="@Url.AreaAction("ListUsage", "Extensions", "Admin", new { id = extension.id, itemid = containerUsage.Id})" data-target="#nucleus-extension-usage">@containerUsage.Name</a></li>
+                        }
+                      </ul>
+                    </div>
+                  }
+                  @if (@Model.ExtensionsUsage[new Guid(extension.id)].ControlPanelExtensions.Any())
+                  {
+                    <div>
+                      <h4>Control Panel Extensions:</h4>
+                      <ul class="component-list">
+                        @foreach (var controlPanelExtensionUsage in @Model.ExtensionsUsage[new Guid(extension.id)].ControlPanelExtensions)
+                        {
+                          <li><a href="@Url.AreaAction("ListUsage", "Extensions", "Admin", new { id = extension.id, itemid = controlPanelExtensionUsage.Id})" data-target="#nucleus-extension-usage">@controlPanelExtensionUsage.Name</a></li>
+                        }
+                      </ul>
+                    </div>
+                  }
+
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </TabPanel>
+
+    <TabPanel id="extensions-store">
+      @using (Html.BeginAreaForm("Index", "Extensions", "Admin", FormMethod.Post, new { @id = "nucleus-extensions-store-form", @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
+      {
+        @if (Model.StoreOptions.Stores.Count > 1)
+        {
+          @Html.DropDownListFor(model => model.SelectedStoreUrl, new SelectList(Model.StoreOptions.Stores, "BaseUrl", "Name"), new { @class="nucleus-extensions-store-selected-store", @data_autopostbackevent = "change" })
+        }
+        else
+        {
+          @Html.HiddenFor(model => model.SelectedStoreUrl)
+        }
+
+        @if (Model.StoreSettings == null || Model.StoreSettings.StoreId == Guid.Empty)
+        {
+          <div class="alert alert-info">
+            <h3>Extensions Store Registration</h3>
+            <p>
+              The extensions store will generate a unique Id for your Nucleus instance, which is stored in your database, and in the extensions store database.  This Id is used to assign licenses for extensions
+              to your Nucleus instance.  You can optionally specify an instance name and link a Nucleus web site login with your Nucleus instance.  The instance name is displayed in the Extensions Store License Manager to
+              help you identify which site you are managing, and the web site login and related contact information is used to contact you with license-related information and provide online access to manage your licenses.
+            </p>
+            <p>
+              If choose to register, the store will display an "Install" button when you select an extension, which will automatically download and install the extension for you.
+              You can use the extensions store to download and install free extensions without registering, but you will need to download the extension to your computer, then use the "Extensions" tab to upload and install it.
+            </p>
+            <div>
+              <div class="nucleus-form-buttonrow">
+                @Html.TextBoxFor(model => model.SubscriptionName, new { @class = "flex-grow-1", @placeholder = "subscription name (optional)"})
+                @Html.TextBoxFor(model => model.Username, new { @placeholder = "Nucleus login name (optional)"})
+                @Html.PasswordFor(model => model.Password, new { @placeholder = "password (optional)"})
+                <button type="submit" class="btn btn-primary" formaction="@Url.AreaAction("Register", "Extensions", "Admin")">Register</button>
+                <a class="btn btn-secondary" target="_blank" href="@(Model.SelectedStoreUrl)@Model.SelectedStore.RegisterPath">Create Login</a>
+              </div>
+            </div>
+          </div>
+        }
+        else if (Model.StoreSettings != null && Model.StoreSettings.StoreId != Guid.Empty && !Model.IsOwnerAssigned)
+        {
+          <div class="alert alert-info alert-dismissible fade show position-relative">
+            <a class="btn position-absolute top-0 end-0 nucleus-material-icon" data-bs-dismiss="alert">&#xe5cd;</a>
+
+            <h3>Extensions Store Registration</h3>
+            <p class="mb-1">
+              Your Nucleus instance has an extensions store subscription Id, but it is not assigned to a Nucleus web site login.  If you assign a web site login, we can contact you with license-related
+              information and you can manage your licenses on the Nucleus web site.  <strong>You can choose not to create or assign a Nucleus web site login to your subscription if you don't want to.</strong>
+            </p>
+            <div class="d-flex gap-1">
+              @Html.TextBoxFor(model => model.SubscriptionName, new { @class = "flex-grow-1", @placeholder = "subscription name (optional)"})
+              @Html.TextBoxFor(model => model.Username, new { @placeholder = "www.nucleus-cms.com login name", @size = "30" })
+              @Html.PasswordFor(model => model.Password, new { @placeholder = "password"})
+              <button type="submit" class="btn btn-primary" formaction="@Url.AreaAction("Register", "Extensions", "Admin")">Update Registration</button>
+              <a class="btn btn-secondary" target="_blank" href="@(Model.StoreSettings.StoreUri)@Model.SelectedStore.RegisterPath">Create Login</a>
+            </div>
+          </div>
+        }
+
+        <iframe id="StoreFrame" title="Extensions Store" accesskey="S" src="@Model.StoreUrl" class="Nucleus nucleus-store-frame"></iframe>
+      }
+    </TabPanel>
+  </TabContent>
+  <Modal id="nucleus-extension-usage" title="Extension Usage"></Modal>
+</div>
+
+<script>
+  jQuery('.ExtensionInstaller .BrowseExtension input[type=file]').one('change.ExtensionInstaller', function ()
+  {
+    jQuery('.ExtensionInstaller .ShowUploadProgress').show();
+    jQuery('.ExtensionInstaller form').submit();
+    jQuery('.ExtensionInstaller .BrowseExtension').hide();
+  });
+
+  jQuery('.ExtensionInstaller form').on('progress', function (e, percent)
+  {
+    jQuery('.ExtensionInstaller .upload-progress .bar').css('width', percent.toString() + '%');
+
+    jQuery('.ExtensionInstaller .upload-progress .percent').show();
+    jQuery('.ExtensionInstaller .upload-progress .percent').html(percent.toString() + '%');
+  });
+
+  jQuery('.ExtensionInstaller form').on('error', function ()
+  {
+    jQuery('.ExtensionInstaller .nucleus-form-tools').show();
+    jQuery('.ExtensionInstaller .ShowUploadProgress').hide();
+  });
+
+  ExtensionsStore.SetUrls('@Url.AreaAction("QueryPackageInstalled", "Extensions", "Admin")', '@Url.AreaAction("InstallPackage", "Extensions", "Admin")', '@Url.AreaAction("QueryStoreSettings", "Extensions", "Admin")',);
+
+</script>

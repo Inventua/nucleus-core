@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Nucleus.Extensions
 {
@@ -53,12 +54,12 @@ namespace Nucleus.Extensions
 		/// <param name="signature"></param>
 		/// <param name="reason"></param>
 		/// <exception cref="InvalidOperationException"></exception>
-		private static Boolean IsSigned(Microsoft.AspNetCore.Http.HttpRequest request, out Guid accessKey, out string signature, out string reason)
+		private static Boolean IsSigned(HttpRequest request, out Guid accessKey, out string signature, out string reason)
 		{
       accessKey = Guid.Empty;
       signature = "";
       reason = "";
-
+      
       if (!request.Headers.Authorization.Any())
       {
         reason = $"Request not signed";

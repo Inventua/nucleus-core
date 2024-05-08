@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Nucleus.Abstractions.Models.FileSystem;
 using Microsoft.Extensions.Configuration;
+using Nucleus.Abstractions.Models.FileSystem;
 
 namespace Nucleus.Abstractions.FileSystemProviders
 {
-	/// <summary>
-	/// Abstract class implemented by all file system providers.
-	/// </summary>
-	abstract public class FileSystemProvider 
+  /// <summary>
+  /// Abstract class implemented by all file system providers.
+  /// </summary>
+  abstract public class FileSystemProvider 
 	{
 		/// <summary>
 		/// File system provider key (from configuration)

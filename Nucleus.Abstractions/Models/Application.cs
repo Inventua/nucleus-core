@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reflection;
-using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace Nucleus.Abstractions.Models
 {
-	/// <summary>
-	/// Nucleus application information.
-	/// </summary>
-	public class Application
+  /// <summary>
+  /// Nucleus application information.
+  /// </summary>
+  public class Application
 	{
 		/// <summary>
 		/// Initialize a new instance of the class.

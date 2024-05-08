@@ -1,12 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
-using Nucleus.Abstractions.Models.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace Nucleus.Abstractions.EventHandlers;
 

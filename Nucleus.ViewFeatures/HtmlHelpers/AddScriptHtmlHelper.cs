@@ -67,7 +67,12 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       /// <summary>
       /// Blazor server (blazor.server.js)
       /// </summary>
-      BLAZOR_SERVER=90
+      BLAZOR_SERVER=90,
+
+      /// <summary>
+      /// Blazor server (blazor.web.js)
+      /// </summary>
+      BLAZOR_WEB = 100
     }
 
     /// <summary>
@@ -133,6 +138,9 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
           break;
         case WellKnownScripts.BLAZOR_SERVER:
           AddScript(htmlHelper, "~/_framework/blazor.server.js");
+          break;
+        case WellKnownScripts.BLAZOR_WEB:
+          AddScript(htmlHelper, "~/_framework/blazor.web.js");
           break;
       }
 

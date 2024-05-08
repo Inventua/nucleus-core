@@ -158,9 +158,9 @@ public static class CoreServiceExtensions
     services.Configure<T>(configuration.GetSection(key), binderOptions => binderOptions.BindNonPublicProperties = true);
   }
 
-  public static IApplicationBuilder UseStaticPhysicalPath(this IApplicationBuilder app, IWebHostEnvironment env)
+  public static IApplicationBuilder UseStaticFilePaths(this IApplicationBuilder app, IWebHostEnvironment env)
   {
-    List<IFileProvider> providers = new();
+    List<IFileProvider> providers = [];
 
     foreach (string folderName in Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS)
     {

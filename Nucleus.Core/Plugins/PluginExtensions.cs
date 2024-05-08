@@ -197,7 +197,7 @@ public static class PluginExtensions
 
   public static IApplicationBuilder UseCompiledRazorResources(this IApplicationBuilder app, IWebHostEnvironment env)
   {
-    List<IFileProvider> providers = new() { env.ContentRootFileProvider };
+    List<IFileProvider> providers = [];
 
     foreach (Assembly assembly in AssemblyLoader.ListAssemblies())
     {
@@ -209,6 +209,7 @@ public static class PluginExtensions
         //string contents = reader.ReadToEnd();
 
         string requestPath = null;
+        IFileProvider provider = null;
 
         // For control panel implementations, the root path for resources is specified in the ControlPanelAttribute.ResourcesRootPath. 
         Nucleus.Abstractions.ControlPanelAttribute controlPanelAttr = assembly.GetCustomAttribute<Nucleus.Abstractions.ControlPanelAttribute>();
@@ -220,6 +221,7 @@ public static class PluginExtensions
           {
             requestPath = controlPanelAttr.ResourcesRootPath;
           }
+          provider = new ManifestEmbeddedFileProvider(assembly, "/");
         }
         else
         {
@@ -227,16 +229,21 @@ public static class PluginExtensions
           // "/Extensions/[extension-name]".  
           foreach (System.Type extensionType in AssemblyLoader.GetTypesWithAttribute<Nucleus.Abstractions.ExtensionAttribute>(assembly))
           {
+            // requestPath for extensions is null because the Extensions/extension-name prefix is handled by the ExtensionManifestEmbeddedFileProvider.
             Nucleus.Abstractions.ExtensionAttribute extensionAttr = extensionType.GetCustomAttribute<Nucleus.Abstractions.ExtensionAttribute>();
             if (extensionAttr != null)
             {
-              requestPath = $"/{FolderOptions.EXTENSIONS_FOLDER}/{extensionAttr.RouteValue}";
+              provider = new Nucleus.Core.FileProviders.NucleusExtensionManifestEmbeddedFileProvider(assembly, extensionAttr.RouteValue);
+              break;
             }
           }
         }
+        if (provider == null)
+        {
+          // the assembly is not a control panel implementation or an extension (but contains embedded files)
+          provider = new ManifestEmbeddedFileProvider(assembly, "/");
+        }
 
-        IFileProvider provider = new ManifestEmbeddedFileProvider(assembly, "/");
-        
         app.UseStaticFiles(new StaticFileOptions
         {
           FileProvider = provider,
@@ -259,7 +266,17 @@ public static class PluginExtensions
         });
 
         providers.Add(provider);
+        
       }
+    }
+
+    if (env.ContentRootFileProvider is CompositeFileProvider compositeFileProvider)
+    {
+      providers.InsertRange(0, compositeFileProvider.FileProviders);
+    }
+    else
+    {
+      providers.Insert(0, env.ContentRootFileProvider);
     }
 
     env.ContentRootFileProvider = new CompositeFileProvider(providers);

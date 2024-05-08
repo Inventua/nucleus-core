@@ -27,6 +27,7 @@ using Microsoft.AspNetCore.DataProtection;
 using System.Runtime.InteropServices;
 using Nucleus.Core.Services.Instrumentation;
 using Nucleus.Core.Services.HealthChecks;
+using Google.Protobuf.WellKnownTypes;
 
 namespace Nucleus.Web
 {
@@ -44,7 +45,7 @@ namespace Nucleus.Web
     private IConfiguration Configuration { get; }
     private IWebHostEnvironment Environment { get; }
 
-    public static List<string> ConfigFiles { get; } = new();
+    public static List<string> ConfigFiles { get; } = [];
 
     public Startup(IConfiguration configuration, IWebHostEnvironment env)
     {
@@ -142,6 +143,11 @@ namespace Nucleus.Web
         IMvcBuilder builder = services.AddControllersWithViews();
 
         builder.AddRazorRuntimeCompilation();
+
+        services.AddRazorComponents()
+          .AddInteractiveServerComponents()
+          .AddInteractiveWebAssemblyComponents();
+       
         services.AddServerSideBlazor();
 
         // future reference:
@@ -305,7 +311,7 @@ namespace Nucleus.Web
         }
 
         // Add file providers for embedded static resources in Nucleus.Web and in control panel implementations/extensions
-        app.UseCompiledRazorResources(this.Environment);
+        app.UseEmbeddedStaticFiles(this.Environment);
 
         // Add static file providers for the paths in FolderOptions.ALLOWED_STATICFILE_PATHS.  We expose specific folders only, rather than adding 
         // env.ContentRootPath so that only defined folders can serve static resources.
@@ -322,7 +328,7 @@ namespace Nucleus.Web
         });
 
         app.UseRouting();
-
+        
         // the order here is important.  The page routing and module routing middleware sets the Nucleus context, which is used by some of the
         // authorization handlers, but ModuleRoutingMiddleware does a permission check, which requires that Authentication has run - and
         // middleware is executed in the order of the code below
@@ -352,6 +358,13 @@ namespace Nucleus.Web
 
           // Blazor SignalR hub
           routes.MapBlazorHub();
+
+          // https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0
+          // https://chrissainty.com/using-blazor-components-in-an-existing-mvc-application/
+          RazorComponentsEndpointConventionBuilder razorEP = routes.MapRazorComponents<object>()
+            .AddInteractiveWebAssemblyRenderMode();
+          // .AddInteractiveServerRenderMode(); // this adds _framework/blazor.server.js a second time;
+          // .AddAdditionalAssemblies
 
           // Map the error page route
           routes.MapControllerRoute(

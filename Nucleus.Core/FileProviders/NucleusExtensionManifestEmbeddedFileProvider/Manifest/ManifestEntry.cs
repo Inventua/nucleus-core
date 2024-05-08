@@ -1,8 +1,9 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-// This is a copy from https://github.com/dotnet/aspnetcore/blob/main/src/FileProviders/Embedded/src/ with no changes.  It is
-// copied because the .net class is marked internal.
+// This is a copy from https://github.com/dotnet/aspnetcore/blob/main/src/FileProviders/Embedded/src/.  See NucleusExtensionManifestEmbeddedFileProvider.cs
+// for more information.
+
 using System;
 using Microsoft.Extensions.Primitives;
 
@@ -10,11 +11,19 @@ using Microsoft.Extensions.Primitives;
 
 namespace Nucleus.Core.FileProviders.Manifest;
 
+/// <summary>
+/// Base class for ManifestDirectory and ManifestFile.
+/// </summary>
 internal abstract class ManifestEntry
 {
-  public ManifestEntry(string name)
+  public System.Reflection.Assembly Assembly { get; }
+  public DateTimeOffset LastModified { get; }
+
+  public ManifestEntry(string name, System.Reflection.Assembly assembly, DateTimeOffset lastModified )
   {
-    Name = name;
+    this.Name = name;
+    this.Assembly = assembly;
+    this.LastModified = lastModified;
   }
 
   public ManifestEntry? Parent { get; private set; }

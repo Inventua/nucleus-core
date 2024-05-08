@@ -1,8 +1,9 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-// This is a copy from https://github.com/dotnet/aspnetcore/blob/main/src/FileProviders/Embedded/src/ with no changes.  It is
-// copied because the .net class is marked internal.
+// This is a copy from https://github.com/dotnet/aspnetcore/blob/main/src/FileProviders/Embedded/src/.  See NucleusExtensionManifestEmbeddedFileProvider.cs
+// for more information.
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,17 +20,13 @@ internal sealed class ManifestDirectoryInfo : IFileInfo, IDirectoryContents
 {
   private IFileInfo[]? _entries;
 
-  public ManifestDirectoryInfo(Assembly assembly, ManifestDirectory directory, DateTimeOffset lastModified)
+  public ManifestDirectoryInfo(ManifestDirectory directory)
   {
-    ArgumentNullThrowHelper.ThrowIfNull(assembly);
     ArgumentNullThrowHelper.ThrowIfNull(directory);
 
-    Assembly = assembly;
-    Directory = directory;
-    LastModified = lastModified;
+    this.Directory = directory;
+    this.LastModified = directory.LastModified;
   }
-
-  public Assembly Assembly { get; }
 
   public bool Exists => true;
 
@@ -43,10 +40,9 @@ internal sealed class ManifestDirectoryInfo : IFileInfo, IDirectoryContents
 
   public bool IsDirectory => true;
 
-  public ManifestDirectory Directory { get; }
+  private ManifestDirectory Directory { get; }
 
-  public Stream CreateReadStream() =>
-      throw new InvalidOperationException("Cannot create a stream for a directory.");
+  public Stream CreateReadStream() => throw new InvalidOperationException("Cannot create a stream for a directory.");
 
   public IEnumerator<IFileInfo> GetEnumerator()
   {
@@ -58,7 +54,7 @@ internal sealed class ManifestDirectoryInfo : IFileInfo, IDirectoryContents
     {
       if (Directory == ManifestEntry.UnknownPath)
       {
-        return Array.Empty<IFileInfo>();
+        return [];
       }
 
       var entries = new List<IFileInfo>();
@@ -67,8 +63,8 @@ internal sealed class ManifestDirectoryInfo : IFileInfo, IDirectoryContents
       {
         IFileInfo fileInfo = entry switch
         {
-          ManifestFile file => new ManifestFileInfo(Assembly, file, LastModified),
-          ManifestDirectory directory => new ManifestDirectoryInfo(Assembly, directory, LastModified),
+          ManifestFile file => new ManifestFileInfo(file),
+          ManifestDirectory directory => new ManifestDirectoryInfo( directory),
           _ => throw new InvalidOperationException("Unknown entry type")
         };
 

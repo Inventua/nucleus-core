@@ -1,22 +1,24 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-// This is a copy from https://github.com/dotnet/aspnetcore/blob/main/src/FileProviders/Embedded/src/ with a change to the
-// Traverse() method (line 28) to handle a named root directory.
+// This is a copy from https://github.com/dotnet/aspnetcore/blob/main/src/FileProviders/Embedded/src/.  See NucleusExtensionManifestEmbeddedFileProvider.cs
+// for more information.
+
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using global::Microsoft.Extensions.Primitives;
 
 namespace Nucleus.Core.FileProviders.Manifest;
 
 internal class ManifestDirectory : ManifestEntry
 {
-  protected ManifestDirectory(string name, ManifestEntry[] children)
-      : base(name)
+  protected ManifestDirectory(string name, Assembly assembly, ManifestEntry[] children, DateTimeOffset lastModified)
+      : base(name, assembly, lastModified)
   {
     ArgumentNullThrowHelper.ThrowIfNull(children);
 
-    Children = children;
+    this.Children = children;
   }
 
   public IReadOnlyList<ManifestEntry> Children { get; protected set; }
@@ -44,14 +46,13 @@ internal class ManifestDirectory : ManifestEntry
     return UnknownPath;
   }
 
-  public virtual ManifestDirectory ToRootDirectory() => CreateRootDirectory("", CopyChildren());
-
-  public static ManifestDirectory CreateDirectory(string name, ManifestEntry[] children)
+  public static ManifestDirectory CreateDirectory(string name, Assembly assembly, ManifestEntry[] children, DateTimeOffset lastModified)
   {
     ArgumentThrowHelper.ThrowIfNullOrWhiteSpace(name);
+    ArgumentNullThrowHelper.ThrowIfNull(assembly);
     ArgumentNullThrowHelper.ThrowIfNull(children);
 
-    var result = new ManifestDirectory(name, children);
+    var result = new ManifestDirectory(name, assembly, children, lastModified);
     ValidateChildrenAndSetParent(children, result);
 
     return result;
@@ -61,7 +62,7 @@ internal class ManifestDirectory : ManifestEntry
   {
     ArgumentNullThrowHelper.ThrowIfNull(children);
 
-    var result = new ManifestRootDirectory(rootDirectoryName, children);
+    var result = new ManifestRootDirectory(rootDirectoryName, null, children, DateTimeOffset.MaxValue);
     ValidateChildrenAndSetParent(children, result);
 
     return result;
@@ -98,11 +99,11 @@ internal class ManifestDirectory : ManifestEntry
           throw new InvalidOperationException("Unexpected manifest node.");
         case ManifestDirectory d:
           var grandChildren = d.CopyChildren();
-          var newDirectory = CreateDirectory(d.Name, grandChildren);
+          var newDirectory = CreateDirectory(d.Name, this.Assembly, grandChildren, this.LastModified);
           list.Add(newDirectory);
           break;
         case ManifestFile f:
-          var file = new ManifestFile(f.Name, f.ResourcePath);
+          var file = new ManifestFile(f.Name, f.Assembly,f.LastModified, f.ResourcePath);
           list.Add(file);
           break;
         default:

@@ -3,6 +3,7 @@
 
 // This is a copy from https://github.com/dotnet/aspnetcore/tree/da3aa27233a2cec2f6780884f71934b2f5e686ce/src/Shared/ThrowHelpers with
 // no changes.  It is copied because the .net class is marked internal.
+
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System;
@@ -19,7 +20,7 @@ internal static partial class ArgumentNullThrowHelper
 #if INTERNAL_NULLABLE_ATTRIBUTES || NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
       [NotNull]
 #endif
-        object? argument, [CallerArgumentExpression("argument")] string? paramName = null)
+        object? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
   {
 #if !NET7_0_OR_GREATER || NETSTANDARD || NETFRAMEWORK
         if (argument is null)

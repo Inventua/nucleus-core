@@ -28,6 +28,14 @@ namespace Nucleus.Core;
 
 public static class CoreServiceExtensions
 {
+  /// <summary>
+  /// Cache settings for static files.
+  /// </summary>
+  internal static Microsoft.Net.Http.Headers.CacheControlHeaderValue STATIC_FILES_CACHE_CONTROL = new()
+  {
+    Public = true,
+    MaxAge = TimeSpan.FromDays(30)
+  };
 
   /// <summary>
   /// Add and configure security headers middleware.
@@ -184,11 +192,7 @@ public static class CoreServiceExtensions
             }
 
             // Cache static content for 30 days
-            context.Context.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
-            {
-              Public = true,
-              MaxAge = TimeSpan.FromDays(30)
-            };
+            context.Context.Response.GetTypedHeaders().CacheControl = STATIC_FILES_CACHE_CONTROL;
           }
         });
         
@@ -233,7 +237,7 @@ public static class CoreServiceExtensions
       IEnumerable<ControlPanelAttribute> panels = AssemblyLoader.GetAssembliesWithAttribute<ControlPanelAttribute>()
         .Select(assembly => assembly.GetCustomAttribute<ControlPanelAttribute>());
 
-      if (panels.Count() == 0)
+      if (!panels.Any())
       {
         // there are no control panel implementations
         appData.SetControlPanelUri("");
@@ -261,7 +265,7 @@ public static class CoreServiceExtensions
     public void PostConfigure(string name, StoreOptions options)
     {
       // Add default value if config contains no values
-      if (!options.Stores.Any())
+      if (options.Stores.Count == 0)
       {
         options.Stores.Add(Store.Default);
       }
@@ -285,8 +289,8 @@ public static class CoreServiceExtensions
           store.ViewerPath += "/";
         }
 
-        store.APIPath = store.APIPath.TrimStart(new char[] { '/' });
-        store.ViewerPath = store.ViewerPath.TrimStart(new char[] { '/' });
+        store.APIPath = store.APIPath.TrimStart(['/']);
+        store.ViewerPath = store.ViewerPath.TrimStart(['/']);
       }
     }
   }

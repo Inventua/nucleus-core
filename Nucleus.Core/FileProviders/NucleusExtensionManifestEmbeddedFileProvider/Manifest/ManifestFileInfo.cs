@@ -1,8 +1,9 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-// This is a copy from https://github.com/dotnet/aspnetcore/blob/main/src/FileProviders/Embedded/src/ with no changes.  It is
-// copied because the .net class is marked internal.
+// This is a copy from https://github.com/dotnet/aspnetcore/blob/main/src/FileProviders/Embedded/src/.  See NucleusExtensionManifestEmbeddedFileProvider.cs
+// for more information.
+
 using System;
 using System.IO;
 using System.Reflection;
@@ -16,14 +17,13 @@ internal sealed class ManifestFileInfo : IFileInfo
 {
   private long? _length;
 
-  public ManifestFileInfo(Assembly assembly, ManifestFile file, DateTimeOffset lastModified)
+  public ManifestFileInfo(ManifestFile file)
   {
-    ArgumentNullThrowHelper.ThrowIfNull(assembly);
     ArgumentNullThrowHelper.ThrowIfNull(file);
 
-    Assembly = assembly;
-    ManifestFile = file;
-    LastModified = lastModified;
+    this.Assembly = file.Assembly;
+    this.ManifestFile = file;
+    this.LastModified = file.LastModified;
   }
 
   public Assembly Assembly { get; }

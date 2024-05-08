@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
-using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Core.Logging;
 using Nucleus.Extensions.Logging;
 
@@ -72,13 +71,13 @@ public static class PluginExtensions
         if (assemblyPath.StartsWith(extensionsFolder, StringComparison.OrdinalIgnoreCase))
         {
           // Note:  AdditionalReferencePaths expects the file name of an assembly, not a directory name.
-          if (!references.ContainsKey(assembly.GetName().FullName))
+          if (!references.TryGetValue(assembly.GetName().FullName, out string value))
           {
             references.Add(assembly.GetName().FullName, assemblyPath);
           }
-          else if (assemblyPath != references[assembly.GetName().FullName])
+          else if (assemblyPath != value)
           {
-            builder.Logger().LogInformation("Skipped adding Razor runtime compliation additional reference path '{path}' because another copy exists at '{existing}'.", assemblyPath, references[assembly.GetName().FullName]);
+            builder.Logger().LogInformation("Skipped adding Razor runtime compliation additional reference path '{path}' because another copy exists at '{existing}'.", assemblyPath, value);
           }
         }
       }
@@ -142,7 +141,7 @@ public static class PluginExtensions
   /// </remarks>
   private static IMvcBuilder AddScheduledTasks(this IMvcBuilder builder)
   {
-    List<string> LogEntries = new();
+    List<string> LogEntries = [];
 
     foreach (Type type in AssemblyLoader.GetTypes<Nucleus.Abstractions.IScheduledTask>())
     {
@@ -167,7 +166,7 @@ public static class PluginExtensions
   /// </remarks>
   private static IMvcBuilder AddPortable(this IMvcBuilder builder)
   {
-    List<string> logEntries = new();
+    List<string> logEntries = [];
 
     foreach (Type type in AssemblyLoader.GetTypes<Nucleus.Abstractions.Portable.IPortable>())
     {
@@ -195,13 +194,14 @@ public static class PluginExtensions
   }
 
 
-  public static IApplicationBuilder UseCompiledRazorResources(this IApplicationBuilder app, IWebHostEnvironment env)
+  public static IApplicationBuilder UseEmbeddedStaticFiles(this IApplicationBuilder app, IWebHostEnvironment env)
   {
     List<IFileProvider> providers = [];
+    List<Assembly> extensions = [];
 
     foreach (Assembly assembly in AssemblyLoader.ListAssemblies())
     {
-      if (assembly.GetManifestResourceStream("Microsoft.Extensions.FileProviders.Embedded.Manifest.xml") != null)
+      if (assembly.GetManifestResourceInfo(Nucleus.Core.FileProviders.Manifest.ManifestParser.DefaultManifestName) != null)
       {
         // test use
         //System.IO.Stream manifest = assembly.GetManifestResourceStream("Microsoft.Extensions.FileProviders.Embedded.Manifest.xml");
@@ -209,7 +209,6 @@ public static class PluginExtensions
         //string contents = reader.ReadToEnd();
 
         string requestPath = null;
-        IFileProvider provider = null;
 
         // For control panel implementations, the root path for resources is specified in the ControlPanelAttribute.ResourcesRootPath. 
         Nucleus.Abstractions.ControlPanelAttribute controlPanelAttr = assembly.GetCustomAttribute<Nucleus.Abstractions.ControlPanelAttribute>();
@@ -221,54 +220,28 @@ public static class PluginExtensions
           {
             requestPath = controlPanelAttr.ResourcesRootPath;
           }
-          provider = new ManifestEmbeddedFileProvider(assembly, "/");
+          
+          providers.Add(AddFileProvider(app, new ManifestEmbeddedFileProvider(assembly, "/"), requestPath));
+        }
+        else if (IsNucleusExtension(assembly))
+        {
+          extensions.Add(assembly);           
         }
         else
         {
-          // For extensions, we derive the root path for resources using the extension name.  The derived root path is 
-          // "/Extensions/[extension-name]".  
-          foreach (System.Type extensionType in AssemblyLoader.GetTypesWithAttribute<Nucleus.Abstractions.ExtensionAttribute>(assembly))
-          {
-            // requestPath for extensions is null because the Extensions/extension-name prefix is handled by the ExtensionManifestEmbeddedFileProvider.
-            Nucleus.Abstractions.ExtensionAttribute extensionAttr = extensionType.GetCustomAttribute<Nucleus.Abstractions.ExtensionAttribute>();
-            if (extensionAttr != null)
-            {
-              provider = new Nucleus.Core.FileProviders.NucleusExtensionManifestEmbeddedFileProvider(assembly, extensionAttr.RouteValue);
-              break;
-            }
-          }
+          // the assembly is not a control panel implementation or an extension (but contains embedded files), add embedded files at
+          // the root.  Nucleus.Web is an example of this.
+          providers.Add(AddFileProvider(app, new ManifestEmbeddedFileProvider(assembly, "/"), null));
         }
-        if (provider == null)
-        {
-          // the assembly is not a control panel implementation or an extension (but contains embedded files)
-          provider = new ManifestEmbeddedFileProvider(assembly, "/");
-        }
-
-        app.UseStaticFiles(new StaticFileOptions
-        {
-          FileProvider = provider,
-          RequestPath = requestPath,
-          OnPrepareResponse = context =>
-          {
-            // Add charset=utf-8 to content-type for text content if it is not already present
-            if ((context.Context.Response.ContentType.StartsWith("text/") || context.Context.Response.ContentType.StartsWith("application/javascript")) && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
-            {
-              context.Context.Response.ContentType += "; charset=utf-8";
-            }
-
-            // Cache static content for 30 days
-            context.Context.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
-            {
-              Public = true,
-              MaxAge = TimeSpan.FromDays(30)
-            };
-          }
-        });
-
-        providers.Add(provider);
-        
       }
     }
+
+    // create a NucleusExtensionManifestEmbeddedFileProvider to handle files embedded in Nucleus extensions.  A single instance 
+    // is used to handle all extensions with embedded files.
+    if (extensions.Count != 0)
+    {
+      providers.Add(AddFileProvider(app, new Nucleus.Core.FileProviders.NucleusExtensionManifestEmbeddedFileProvider(extensions), null)); 
+    }     
 
     if (env.ContentRootFileProvider is CompositeFileProvider compositeFileProvider)
     {
@@ -282,6 +255,34 @@ public static class PluginExtensions
     env.ContentRootFileProvider = new CompositeFileProvider(providers);
 
     return app;
+  
+  }
+
+  private static Boolean IsNucleusExtension(Assembly assembly)
+  {
+    return AssemblyLoader.GetTypesWithAttribute<Nucleus.Abstractions.ExtensionAttribute>(assembly).Any();    
+  }
+
+  private static IFileProvider AddFileProvider(IApplicationBuilder app, IFileProvider provider, string requestPath)
+  {
+    app.UseStaticFiles(new StaticFileOptions
+    {
+      FileProvider = provider,
+      RequestPath = requestPath,
+      OnPrepareResponse = context =>
+      {
+        // Add charset=utf-8 to content-type for text content if it is not already present
+        if ((context.Context.Response.ContentType.StartsWith("text/") || context.Context.Response.ContentType.StartsWith("application/javascript")) && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
+        {
+          context.Context.Response.ContentType += "; charset=utf-8";
+        }
+
+        // Cache static content for 30 days
+        context.Context.Response.GetTypedHeaders().CacheControl = CoreServiceExtensions.STATIC_FILES_CACHE_CONTROL;
+      }
+    });
+
+    return provider;
   }
 
   /// <summary>
@@ -296,7 +297,7 @@ public static class PluginExtensions
   /// </remarks>
   private static IMvcBuilder AddCompiledRazorViews(this IMvcBuilder builder)
   {
-    List<string> logEntries = new();
+    List<string> logEntries = [];
 
     foreach (Assembly assembly in AssemblyLoader.GetAssembliesWithAttribute<Microsoft.AspNetCore.Razor.Hosting.RazorCompiledItemAttribute>())
     {

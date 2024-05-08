@@ -1,8 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-// This is a copy from https://github.com/dotnet/aspnetcore/blob/main/src/FileProviders/Embedded/src/ with a change to the
-// ResolveEntry() method (line 47) to handle a named root directory.
+// This is a copy from https://github.com/dotnet/aspnetcore/blob/main/src/FileProviders/Embedded/src/.  See NucleusExtensionManifestEmbeddedFileProvider.cs
+// for more information.
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -18,7 +18,7 @@ internal sealed class EmbeddedFilesManifest
   private static readonly char[] _invalidFileNameChars = Path.GetInvalidFileNameChars()
       .Where(c => c != Path.DirectorySeparatorChar && c != Path.AltDirectorySeparatorChar).ToArray();
 
-  private static readonly char[] _separators = new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar };
+  private static readonly char[] _separators = [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar];
 
   private readonly ManifestDirectory _rootDirectory;
 
@@ -75,16 +75,6 @@ internal sealed class EmbeddedFilesManifest
     var end = Array.IndexOf(_separators, path[path.Length - 1]) == -1 ? path.Length : path.Length - 1;
     var trimmed = new StringSegment(path, start, end - start);
     return trimmed;
-  }
-
-  internal EmbeddedFilesManifest Scope(string path)
-  {
-    if (ResolveEntry(path) is ManifestDirectory directory && directory != ManifestEntry.UnknownPath)
-    {
-      return new EmbeddedFilesManifest(directory.ToRootDirectory());
-    }
-
-    throw new InvalidOperationException($"Invalid path: '{path}'");
   }
 
   private static bool HasInvalidPathChars(string path) => path.IndexOfAny(_invalidFileNameChars) != -1;

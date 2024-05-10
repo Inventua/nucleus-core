@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -23,6 +24,7 @@ using Nucleus.Core.FileSystemProviders;
 using Nucleus.Core.Layout;
 using Nucleus.Core.Logging;
 using Nucleus.Core.Plugins;
+using Nucleus.Extensions;
 
 namespace Nucleus.Core;
 
@@ -77,6 +79,26 @@ public static class CoreServiceExtensions
     // Register action & post-configuration for folder options (as normal)
     AddOption<FolderOptions>(services, configuration, FolderOptions.Section);
     services.ConfigureOptions<ConfigureFolderOptions>();
+
+    return services;
+  }
+
+  /// <summary>
+  /// Add Blazor and Razor components support (server and webassembly)
+  /// </summary>
+  /// <param name="services"></param>
+  /// <returns></returns>
+  public static IServiceCollection AddBlazor(this IServiceCollection services)
+  {
+    services.AddRazorComponents()
+      .AddInteractiveServerComponents()
+      .AddInteractiveWebAssemblyComponents();
+
+    services.AddServerSideBlazor();
+
+    // Experimental.  Accompanying code is Nucleus.Extensions\BlazorExtensions.cs
+    // add IActionResultExecutor for Nucleus.Extensions.BlazorExtensions.ComponentView
+    // services.AddScoped<IActionResultExecutor<ComponentViewResult>, ComponentViewResultExecutor>();
 
     return services;
   }

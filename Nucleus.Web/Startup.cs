@@ -1,33 +1,30 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions;
+using Nucleus.Abstractions.Layout;
 using Nucleus.Core;
-using Nucleus.Core.Layout;
-using Nucleus.Core.Plugins;
-using Nucleus.Core.Logging;
-using Nucleus.Core.DataProviders;
-using Nucleus.Extensions;
 using Nucleus.Core.Authentication;
 using Nucleus.Core.Authorization;
-using Nucleus.Abstractions.Layout;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Nucleus.Data.Common;
-using System.Linq;
-using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using Microsoft.AspNetCore.DataProtection;
-using System.Runtime.InteropServices;
-using Nucleus.Core.Services.Instrumentation;
+using Nucleus.Core.DataProviders;
+using Nucleus.Core.Layout;
+using Nucleus.Core.Logging;
+using Nucleus.Core.Plugins;
 using Nucleus.Core.Services.HealthChecks;
-using Google.Protobuf.WellKnownTypes;
+using Nucleus.Core.Services.Instrumentation;
+using Nucleus.Data.Common;
+using Nucleus.Extensions;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Web
 {
@@ -144,11 +141,7 @@ namespace Nucleus.Web
 
         builder.AddRazorRuntimeCompilation();
 
-        services.AddRazorComponents()
-          .AddInteractiveServerComponents()
-          .AddInteractiveWebAssemblyComponents();
-       
-        services.AddServerSideBlazor();
+        services.AddBlazor();
 
         // future reference:
         // services.AddLocalization(options => options.ResourcesPath = "LocalizationResources");

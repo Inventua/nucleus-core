@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Components.Endpoints;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Mvc.Controllers;
 
 namespace Nucleus.Extensions;
 
@@ -41,7 +48,7 @@ public static class ControllerExtensions
   }
 
   /// <summary>
-  /// Return Json which triggers a popup dialog in Nucleus client-side code.
+  /// Creates a JsonResult which renders Json which triggers a popup dialog in Nucleus client-side code.
   /// </summary>
   /// <param name="controller"></param>
   /// <param name="title"></param>
@@ -52,4 +59,6 @@ public static class ControllerExtensions
   {
     return new JsonResult(new { Title = title, Message = message, Icon = icon.ToString().ToLower() });
   }
+
+
 }

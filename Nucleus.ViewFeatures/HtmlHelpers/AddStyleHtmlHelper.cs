@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models.Configuration;
+using Nucleus.Abstractions.Models.StaticResources;
 using Nucleus.Extensions;
 
 namespace Nucleus.ViewFeatures.HtmlHelpers
@@ -18,8 +21,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
   /// </summary>
   public static class AddStyleHtmlHelper
   {
-    private const string ITEMS_KEY = "STYLESHEETS_SECTION";
-
+    
     /// <summary>
     /// Constant (enum) values used for the (this IHtmlHelper htmlHelper, WellKnownScripts script) overload.
     /// </summary>
@@ -320,11 +322,11 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     internal static IHtmlContent AddStyle(ViewContext context, string stylesheetPath, Boolean defer, Boolean isDynamic, string version, int sortIndex)
     {
       ResourceFileOptions resourceFileOptions = context.HttpContext.RequestServices.GetService<IOptions<ResourceFileOptions>>().Value;
-      Dictionary<string, StylesheetInfo> stylesheets = (Dictionary<string, StylesheetInfo>)context.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
-
+      //Dictionary<string, Nucleus.Abstractions.Models.StaticResources.StyleSheet> stylesheets = (Dictionary<string, Nucleus.Abstractions.Models.StaticResources.StyleSheet>)context.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
+      ClientResources pageResources = (ClientResources)context.HttpContext.Items[Nucleus.Abstractions.Models.StaticResources.ClientResources.ITEMS_KEY] ?? new();
       stylesheetPath = new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(context).Content(context.ResolveExtensionUrl(stylesheetPath));
 
-      if (!stylesheets.ContainsKey(stylesheetPath))
+      if (!pageResources.StyleSheets.ContainsKey(stylesheetPath))
       {
         string finalStylesheetPath = stylesheetPath;
 
@@ -333,13 +335,13 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
           Microsoft.AspNetCore.Hosting.IWebHostEnvironment webHostingEnvironment = context.HttpContext.RequestServices.GetService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
           string minifiedFileName = System.IO.Path.GetFileNameWithoutExtension(stylesheetPath) + ".min" + System.IO.Path.GetExtension(stylesheetPath);
 
-          if (LocalFileExists(webHostingEnvironment.ContentRootPath, context.HttpContext.Request.PathBase, stylesheetPath, minifiedFileName))
+          if (LocalFileExists(webHostingEnvironment, context.HttpContext.Request.PathBase, stylesheetPath, minifiedFileName))
           {
             finalStylesheetPath = stylesheetPath.Substring(0, stylesheetPath.Length - System.IO.Path.GetFileName(stylesheetPath).Length) + minifiedFileName;
           }
         }
 
-        stylesheets.Add(stylesheetPath, new StylesheetInfo()
+        pageResources.StyleSheets.Add(stylesheetPath, new Nucleus.Abstractions.Models.StaticResources.StyleSheet()
         {
           Path = finalStylesheetPath,
           Defer = defer,
@@ -348,7 +350,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
           SortIndex = sortIndex
         });
 
-        context.HttpContext.Items[ITEMS_KEY] = stylesheets;
+        context.HttpContext.Items[Nucleus.Abstractions.Models.StaticResources.ClientResources.ITEMS_KEY] = pageResources;
       }
 
       return new HtmlContentBuilder();
@@ -390,20 +392,23 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       return ((ControllerActionDescriptor)context.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version.ToString();
     }
 
-    private static Boolean LocalFileExists(string contentRootPath, PathString pathBase, string stylesheetPath, string fileName)
+    internal static Boolean LocalFileExists(IWebHostEnvironment webHostingEnvironment, PathString pathBase, string stylesheetPath, string fileName)
     {
-      string localStyleFilePath;
+      string localFilePath;
 
       if (pathBase.HasValue && stylesheetPath.StartsWith(pathBase, StringComparison.OrdinalIgnoreCase))
       {
-        localStyleFilePath = System.IO.Path.GetDirectoryName(stylesheetPath.Substring(pathBase.Value.Length).Replace('/', Path.DirectorySeparatorChar));
+        localFilePath = System.IO.Path.GetDirectoryName(stylesheetPath.Substring(pathBase.Value.Length).Replace('/', Path.DirectorySeparatorChar));
       }
       else
       {
-        localStyleFilePath = System.IO.Path.GetDirectoryName(stylesheetPath.Replace('/', Path.DirectorySeparatorChar)); ;
+        localFilePath = System.IO.Path.GetDirectoryName(stylesheetPath.Replace('/', Path.DirectorySeparatorChar)); ;
       }
 
-      return System.IO.File.Exists(System.IO.Path.Join(contentRootPath, localStyleFilePath, fileName));
+      IFileInfo file = webHostingEnvironment.ContentRootFileProvider.GetFileInfo(localFilePath);
+      return file.Exists;
+
+      //return System.IO.File.Exists(System.IO.Path.Join(contentRootPath, localStyleFilePath, fileName));
     }
 
     /// <summary>
@@ -414,11 +419,12 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     public static IHtmlContent RenderStyles(this IHtmlHelper htmlHelper)
     {
       HtmlContentBuilder scriptOutput = new();
-      Dictionary<string, StylesheetInfo> stylesheets = (Dictionary<string, StylesheetInfo>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
-
-      if (stylesheets != null)
+      //Dictionary<string, Nucleus.Abstractions.Models.StaticResources.StyleSheet> stylesheets = (Dictionary<string, Nucleus.Abstractions.Models.StaticResources.StyleSheet>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
+      ClientResources pageResources = (ClientResources)htmlHelper.ViewContext.HttpContext.Items[Nucleus.Abstractions.Models.StaticResources.ClientResources.ITEMS_KEY] ?? new();
+     
+      if (pageResources.StyleSheets.Any())
       {
-        foreach (KeyValuePair<string, StylesheetInfo> style in stylesheets.OrderBy(sheet => sheet.Value.SortIndex))
+        foreach (KeyValuePair<string, Nucleus.Abstractions.Models.StaticResources.StyleSheet> style in pageResources.StyleSheets.OrderBy(sheet => sheet.Value.SortIndex))
         {
           if (!String.IsNullOrEmpty(style.Key))
           {
@@ -441,20 +447,11 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
         }
 
         // Once consumed, clear the stylesheets item to prevent double-rendering in case RenderStyles is called twice.
-        htmlHelper.ViewContext.HttpContext.Items.Remove(ITEMS_KEY);
+        pageResources.StyleSheets.Clear();
+        htmlHelper.ViewContext.HttpContext.Items[Nucleus.Abstractions.Models.StaticResources.ClientResources.ITEMS_KEY] = pageResources;
       }
 
       return scriptOutput;
-    }
-
-
-    private class StylesheetInfo
-    {
-      public string Version { get; set; }
-      public Boolean Defer { get; set; }
-      public Boolean IsDynamic { get; set; }
-      public string Path { get; set; }
-      public int SortIndex { get; set; }
     }
   }
 }

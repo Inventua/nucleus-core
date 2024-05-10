@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Nucleus.Abstractions.Models.Configuration;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Nucleus.Abstractions.Models.Configuration;
+using Nucleus.Abstractions.Models.StaticResources;
 
 namespace Nucleus.ViewFeatures.HtmlHelpers
 {
@@ -16,9 +16,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
   /// Html helper used to add scripts.
   /// </summary>
   public static class AddScriptHtmlHelper
-  {
-    private const string ITEMS_KEY = "SCRIPT_SECTION";
-
+  {   
     /// <summary>
     /// Constant (enum) values used for the (this IHtmlHelper htmlHelper, WellKnownScripts script) overload.
     /// </summary>
@@ -233,7 +231,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     /// </example>
     public static IHtmlContent AddScript(this IHtmlHelper htmlHelper, string scriptPath, Boolean isAsync, Boolean isDynamic)
     {
-      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(scriptPath), isAsync, isDynamic, WellKnownScriptOrders.DEFAULT, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version.ToString());
+      return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(htmlHelper.ResolveExtensionUrl(scriptPath)), isAsync, isDynamic, WellKnownScriptOrders.DEFAULT, ((ControllerActionDescriptor)htmlHelper.ViewContext.ActionDescriptor).ControllerTypeInfo.Assembly.GetName().Version.ToString());
     }
 
     /// <summary>
@@ -253,12 +251,23 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       return AddScript(context, scriptPath, isAsync, !scriptPath.EndsWith(".js"), order, null);
     }
 
-    private static IHtmlContent AddScript(HttpContext context, string scriptPath, Boolean isAsync, Boolean isDynamic, int order, string version)
+
+    /// <summary>
+    /// Register the specified script to be added to the Layout or module's scripts.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="scriptPath"></param>
+    /// <param name="isAsync"></param>
+    /// <param name="isDynamic"></param>
+    /// <param name="order"></param>
+    /// <param name="version"></param>
+    internal static IHtmlContent AddScript(HttpContext context, string scriptPath, Boolean isAsync, Boolean isDynamic, int order, string version)
     {
       ResourceFileOptions resourceFileOptions = context.RequestServices.GetService<IOptions<ResourceFileOptions>>().Value;
-      Dictionary<string, ScriptInfo> scripts = (Dictionary<string, ScriptInfo>)context.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
-      
-      if (!scripts.ContainsKey(scriptPath))
+      //Dictionary<string, Nucleus.Abstractions.Models.StaticResources.Script> scripts = (Dictionary<string, Nucleus.Abstractions.Models.StaticResources.Script>)context.Items[SCRIPTS_ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
+      ClientResources pageResources = (ClientResources)context.Items[Nucleus.Abstractions.Models.StaticResources.ClientResources.ITEMS_KEY] ?? new();
+
+      if (!pageResources.Scripts.ContainsKey(scriptPath))
       {
         string finalScriptPath = scriptPath;
 
@@ -267,13 +276,13 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
           Microsoft.AspNetCore.Hosting.IWebHostEnvironment webHostingEnvironment = context.RequestServices.GetService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
           string minifiedFileName = System.IO.Path.GetFileNameWithoutExtension(finalScriptPath) + ".min" + System.IO.Path.GetExtension(finalScriptPath);
 
-          if (LocalFileExists(webHostingEnvironment.ContentRootPath, context.Request.PathBase, scriptPath, minifiedFileName))
+          if (AddStyleHtmlHelper.LocalFileExists(webHostingEnvironment, context.Request.PathBase, scriptPath, minifiedFileName))
           {
             finalScriptPath = scriptPath.Substring(0, scriptPath.Length - System.IO.Path.GetFileName(scriptPath).Length) + minifiedFileName;
           }
         }
 
-        scripts.Add(scriptPath, new ScriptInfo()
+        pageResources.Scripts.Add(scriptPath, new Nucleus.Abstractions.Models.StaticResources.Script()
         {
           Path = finalScriptPath,
           IsAsync = isAsync,
@@ -282,26 +291,13 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
           Version = version,
           IsExtensionScript = scriptPath.StartsWith("/" + Nucleus.Abstractions.RoutingConstants.EXTENSIONS_ROUTE_PATH, StringComparison.OrdinalIgnoreCase)
         });
-        context.Items[ITEMS_KEY] = scripts;
+
+        context.Items[Nucleus.Abstractions.Models.StaticResources.ClientResources.ITEMS_KEY] = pageResources;
       }
 
       return new HtmlContentBuilder();
     }
-    private static Boolean LocalFileExists(string contentRootPath, PathString pathBase, string scriptPath, string fileName)
-    {
-      string localScriptFilePath;
 
-      if (pathBase.HasValue && scriptPath.StartsWith(pathBase, StringComparison.OrdinalIgnoreCase))
-      {
-        localScriptFilePath = System.IO.Path.GetDirectoryName(scriptPath.Substring(pathBase.Value.Length).Replace('/', Path.DirectorySeparatorChar));
-      }
-      else
-      {
-        localScriptFilePath = System.IO.Path.GetDirectoryName(scriptPath.Replace('/', Path.DirectorySeparatorChar)); ;
-      }
-
-      return System.IO.File.Exists(System.IO.Path.Join(contentRootPath, localScriptFilePath, fileName));
-    }
 
     /// <summary>
     /// Adds the scripts submitted by AddScript to the layout.  This method is intended for use by the Nucleus Core layout.
@@ -312,12 +308,14 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     {
       HtmlContentBuilder scriptOutput = new();
 
-      Dictionary<string, ScriptInfo> scripts = (Dictionary<string, ScriptInfo>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
-      if (scripts != null)
+      //Dictionary<string, Nucleus.Abstractions.Models.StaticResources.Script> scripts = (Dictionary<string, Nucleus.Abstractions.Models.StaticResources.Script>)htmlHelper.ViewContext.HttpContext.Items[Nucleus.Extensions.StaticResources.SCRIPTS_ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
+      ClientResources pageResources = (ClientResources)htmlHelper.ViewContext.HttpContext.Items[Nucleus.Abstractions.Models.StaticResources.ClientResources.ITEMS_KEY] ?? new();
+
+      if (pageResources.Scripts.Any())
       {
         // Sort to ensure that a specific order is most important, followed by whether the script belongs to an extension.  The sort by IsExtensionScript is
         // so that extension scripts are rendered after core scripts.
-        foreach (KeyValuePair<string, ScriptInfo> script in scripts.OrderBy(script => script.Value.Order).ThenBy(script => script.Value.IsExtensionScript))
+        foreach (KeyValuePair<string, Nucleus.Abstractions.Models.StaticResources.Script> script in pageResources.Scripts.OrderBy(script => script.Value.Order).ThenBy(script => script.Value.IsExtensionScript))
         {
           if (!String.IsNullOrEmpty(script.Key))
           {
@@ -336,21 +334,12 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
         }
 
         // Once consumed, clear the scripts item to prevent double-rendering in case RenderScripts is called twice.
-        htmlHelper.ViewContext.HttpContext.Items.Remove(ITEMS_KEY);
+        pageResources.Scripts.Clear();
+        htmlHelper.ViewContext.HttpContext.Items[Nucleus.Abstractions.Models.StaticResources.ClientResources.ITEMS_KEY] = pageResources;
       }
 
       return scriptOutput;
     }
 
-    private class ScriptInfo
-    {
-      public string Version { get; set; }
-      public Boolean IsAsync { get; set; }
-      public Boolean IsDynamic { get; set; }
-      public string Path { get; set; }
-      public int Order { get; set; } = WellKnownScriptOrders.DEFAULT;
-      public Boolean IsExtensionScript { get; set; } = false;
-
-    }
   }
 }

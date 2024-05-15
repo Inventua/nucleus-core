@@ -309,10 +309,10 @@ public static class PluginExtensions
           builder.PartManager.ApplicationParts.Add(part);
         }
       }
-
-      builder.Logger()?.LogInformation("Added ({count}) compiled Razor Views from: {assemblies}].", logEntries.Count,
-        String.Join(", ", logEntries));
     }
+
+    builder.Logger()?.LogInformation("Added compiled Razor Views from ({count}) assemblies: {assemblies}].", logEntries.Count,
+      String.Join(", ", logEntries));
 
     return builder;
   }

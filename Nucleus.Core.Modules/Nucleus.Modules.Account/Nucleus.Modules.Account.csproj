@@ -29,6 +29,8 @@
 	  <None Remove="license.txt" />
 	  <None Remove="package.xml" />
 	  <None Remove="readme.txt" />
+	  <None Remove="signup.js" />
+	  <None Remove="viewer.min.js" />
 	  <None Remove="Views\ChangePassword.cshtml" />
 	  <None Remove="Views\ChangePasswordSettings.cshtml" />
 	  <None Remove="Views\Login.cshtml" />
@@ -45,6 +47,8 @@
 	  <Content Include="license.txt" />
 	  <Content Include="package.xml" />
 	  <Content Include="readme.txt" />
+	  <Content Include="signup.js" />
+	  <Content Include="signup.min.js" />
 	  <Content Include="Views\ChangePassword.cshtml" />
 	  <Content Include="Views\ResetPassword.cshtml" />
 	  <Content Include="Views\Recover.cshtml" />
@@ -58,8 +62,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.4.0-pre-alpha2" />
-	  <PackageReference Include="Inventua.Nucleus.Extensions" Version="1.4.0-pre-alpha2" />
+	  <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.4.0-pre-alpha2.9" />
+	  <PackageReference Include="Inventua.Nucleus.Extensions" Version="1.4.0-pre-alpha2.9" />
 	  <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.4.0-pre-alpha2" />
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="8.0.1" />
 	</ItemGroup>

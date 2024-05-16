@@ -1,17 +1,23 @@
 ﻿@model Nucleus.Modules.Account.ViewModels.Signup
 @addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Extensions
 @using Nucleus.Abstractions.Models.Configuration
 @Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
-@using (Html.BeginNucleusForm("Signup", "Signup", FormMethod.Post, new { @data_target = "form.parent()" }))
+@if (!String.IsNullOrEmpty(Model.RecaptchaSiteKey))
 {
-  if (Model.ShowForm)
+  @Html.AddScript("https://www.google.com/recaptcha/api.js?render=explicit&onload=onRecaptchaLoadCallback", true)
+  @Html.AddScript("~#/signup.js")
+}
+@using (Html.BeginNucleusForm("Signup", "Signup", FormMethod.Post, new { @enctype = "multipart/form-data", @data_target = "form.parent()" }))
+{
+  @if (Model.ShowForm)
   {
     <fieldset aria-label="Sign Up">
-      @Html.HiddenFor((model) => model.ReturnUrl)
+      @Html.HiddenFor(model => model.ReturnUrl)
       <SettingsControl caption="User Name" helptext="Enter your new user name">
-        @Html.TextBoxFor((model) => model.User.UserName)
+        @Html.TextBoxFor(model => model.User.UserName)
       </SettingsControl>
 
       @*only show password field for a new user*@
@@ -49,10 +55,27 @@
           @Html.TextBoxFor(model => model.User.Profile[profileValueCount].Value, parameters)
         </SettingsControl>
       }
-      <div>
-        <input type="submit" value="Save Changes" class="btn btn-primary" />
-        <a href="@Url.Content("~/")" class="btn btn-secondary">Cancel</a>
-      </div>
     </fieldset>
+    <div class="nucleus-control-panel-heading d-flex mt-1">
+      @if (!String.IsNullOrEmpty(Model.RecaptchaSiteKey))
+      {
+        @Html.HiddenFor(model => model.RecaptchaVerificationToken, new { @class = "signup-recaptcha-verification-token" })
+      }
+      <button type="submit" class="btn btn-primary align-self-end me-2 signup-save" data-verification-site-key="@Model.RecaptchaSiteKey" data-verification-badge-element-selector=".recaptcha-badge" data-verification-token-element-selector=".signup-recaptcha-verification-token" data-verification-action="@Model.RecaptchaAction">Save Changes</button>
+      <a href="@Url.Content(Model.ReturnUrl)" class="btn btn-secondary align-self-end">Cancel</a>
+      <div class="recaptcha-badge ms-auto"></div>
+    </div>
   }
 }
+<script>
+  function onRecaptchaLoadCallback()
+  {
+    if ('@Model.RecaptchaSiteKey' !== '')
+    {
+      jQuery('.signup-save').Recaptcha({
+        siteKey: '@Model.RecaptchaSiteKey',
+        badgeElement: jQuery('.recaptcha-badge')
+      });
+    }
+  }
+</script>

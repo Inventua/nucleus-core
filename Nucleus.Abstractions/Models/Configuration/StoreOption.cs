@@ -1,16 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Nucleus.Abstractions.Models.Configuration
+﻿namespace Nucleus.Abstractions.Models.Configuration
 {
-	/// <summary>
-	/// Class used to read configuration data for the extension store(s).
-	/// </summary>
-	public class Store
+  /// <summary>
+  /// Class used to read configuration data for the extension store(s).
+  /// </summary>
+  public class Store
 	{
 		/// <summary>
 		/// Store Url.  

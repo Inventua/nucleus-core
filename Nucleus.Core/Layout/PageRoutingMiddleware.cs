@@ -101,12 +101,12 @@ namespace Nucleus.Core.Layout
 
         Logger.LogTrace("Matching site by host '{host}' and pathbase '{pathbase}'.", context.Request.Host, context.Request.PathBase);
 
-        this.Context.Site = await this.SiteManager.Get(context.Request.Host, context.Request.PathBase);
+        this.Context.Site = await this.SiteManager.Get(context.Request.Host.Value, context.Request.PathBase);
 
         if (this.Context.Site == null)
         {
           Logger.LogTrace("Using default site.");
-          this.Context.Site = await this.SiteManager.Get(new HostString(""), "");
+          this.Context.Site = await this.SiteManager.Get("", "");
 
           if (this.Context.Site != null)
           {

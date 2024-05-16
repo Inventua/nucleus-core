@@ -1,21 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using Nucleus.Abstractions.Models;
-using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
-using Microsoft.AspNetCore.Authorization;
-using Nucleus.Abstractions.Managers;
-using Nucleus.Abstractions;
-using Nucleus.Extensions;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Nucleus.ViewFeatures;
-using Microsoft.Extensions.Options;
-using Nucleus.Extensions.Authorization;
-using System.Threading.Tasks;
+﻿using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting;
 using System.Net;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models;
+using Nucleus.Extensions;
+using Nucleus.Extensions.Authorization;
+using Nucleus.Extensions.Logging;
+using Nucleus.ViewFeatures;
 
 namespace Nucleus.Web.Controllers;
 
@@ -29,15 +26,14 @@ public class DefaultController : Controller
   private Context Context { get; }
   private IFileSystemManager FileSystemManager { get; }
   private IPageManager PageManager { get; }
-  private ISiteManager SiteManager { get; }
-  private IUserManager UserManager { get; }
+  
   private Application Application { get; }
 
   // Files and extensions in these lists do not show the site error page, they always return a 404 if they are not found.
-  private static readonly HashSet<string> filteredFilenames = new(new string[] { "favicon.ico", "robots.txt" }, StringComparer.OrdinalIgnoreCase);
-  private static readonly HashSet<string> filteredFileExtensions = new(new string[] { ".txt", ".css", ".js", ".map" }, StringComparer.OrdinalIgnoreCase);
+  private static readonly HashSet<string> FILTERED_FILE_NAMES = new(["favicon.ico", "robots.txt"], StringComparer.OrdinalIgnoreCase);
+  private static readonly HashSet<string> FILTERED_FILE_EXTENSIONS = new([".txt", ".css", ".js", ".map"], StringComparer.OrdinalIgnoreCase);
 
-  public DefaultController(IWebHostEnvironment webHostEnvironment, ILogger<DefaultController> logger, Context context, Application application, ISiteManager siteManager, IUserManager userManager, IFileSystemManager fileSystemManager, IPageManager pageManager)
+  public DefaultController(IWebHostEnvironment webHostEnvironment, ILogger<DefaultController> logger, Context context, Application application, IFileSystemManager fileSystemManager, IPageManager pageManager)
   {
     this.WebHostEnvironment = webHostEnvironment;
     this.Application = application;
@@ -45,8 +41,6 @@ public class DefaultController : Controller
     this.Context = context;
     this.FileSystemManager = fileSystemManager;
     this.PageManager = pageManager;
-    this.SiteManager = siteManager;
-    this.UserManager = userManager;
   }
 
   [HttpGet]
@@ -58,7 +52,7 @@ public class DefaultController : Controller
     // If the site hasn't been set up yet (empty database), redirect to the site wizard.
     if (this.Context.Site == null && this.Context.Page == null)
     {
-      if (this.RedirectToSetupWizard())
+      if (this.ShouldRedirectToSetupWizard())
       {
         return RedirectToAction("Index", "SiteWizard", new { area = "Setup" });
       }
@@ -144,17 +138,34 @@ public class DefaultController : Controller
       }
     }
 
-    Nucleus.ViewFeatures.ViewModels.Layout viewModel = new(this.Context);
+    return View(GetLayoutPath(this.WebHostEnvironment, this.Context, this.Logger), await BuildViewModel(this.Url, this.Context, this.HttpContext, this.Application, this.FileSystemManager ));
+  }
 
-    viewModel.IsEditing = User.IsEditing(HttpContext, this.Context.Site, this.Context.Page);
-    viewModel.CanEdit = User.CanEditContent(this.Context.Site, this.Context.Page);
-    viewModel.DefaultPageUri = base.Url.GetAbsoluteUri(this.Context.Page.DefaultPageRoute().Path).AbsoluteUri;
-    viewModel.SiteIconPath = Url.Content(await Context.Site.GetIconPath(this.FileSystemManager));
-    viewModel.SiteCssFilePath = Url.Content(await Context.Site.GetCssFilePath(this.FileSystemManager));
-    viewModel.ControlPanelDockingCssClass = viewModel.CanEdit && IsTopDockSelected(ControllerContext.HttpContext) ? "control-panel-dock-top" : "";
+  internal static string GetLayoutPath(IWebHostEnvironment env, Context context, ILogger logger)
+  {
+    string layoutPath = context.Page.LayoutPath(context.Site);
+    if (!env.ContentRootFileProvider.GetFileInfo(layoutPath).Exists)
+    {
+      logger.LogWarning("A page with title '{title}' and route '{route}' is configured to use a missing layout '{layout}'.  The default layout was used instead.", context.Page.Title, context.MatchedRoute.Path, layoutPath);
+      layoutPath = $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.LAYOUTS_FOLDER}/{Nucleus.Abstractions.Managers.ILayoutManager.DEFAULT_LAYOUT}";
+    }
+
+    return layoutPath;
+  }
+
+  internal static async Task<Nucleus.ViewFeatures.ViewModels.Layout> BuildViewModel(IUrlHelper url, Context context, HttpContext httpContext, Application app, IFileSystemManager fileSystemManager)
+  {    
+    Nucleus.ViewFeatures.ViewModels.Layout viewModel = new(context);
+
+    viewModel.ControlPanelUri = app.ControlPanelUri;
+    viewModel.IsEditing = httpContext.User.IsEditing(httpContext, context.Site, context.Page);
+    viewModel.CanEdit = httpContext.User.CanEditContent(context.Site, context.Page) && viewModel.ControlPanelUri != "";
+    viewModel.DefaultPageUri = url.GetAbsoluteUri(context.Page.DefaultPageRoute().Path).AbsoluteUri;
+    viewModel.SiteIconPath = url.Content(await context.Site.GetIconPath(fileSystemManager));
+    viewModel.SiteCssFilePath = url.Content(await context.Site.GetCssFilePath(fileSystemManager));
+    viewModel.ControlPanelDockingCssClass = viewModel.CanEdit && IsTopDockSelected(httpContext) ? "control-panel-dock-top" : "";
 
     if (viewModel.IsEditing)
-
     {
       // refresh editing cookie expiry
       Microsoft.AspNetCore.Http.CookieOptions options = new()
@@ -164,40 +175,15 @@ public class DefaultController : Controller
         SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Strict
       };
 
-      ControllerContext.HttpContext.Response.Cookies.Append(PermissionExtensions.EDIT_COOKIE_NAME, "true", options);
+      httpContext.Response.Cookies.Append(PermissionExtensions.EDIT_COOKIE_NAME, "true", options);
     }
 
-    string layoutPath = this.Context.Page.LayoutPath(this.Context.Site);
-
-    if (!System.IO.File.Exists(System.IO.Path.Join(this.WebHostEnvironment.ContentRootPath, layoutPath)))
-    {
-      layoutPath = $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.LAYOUTS_FOLDER}/{Nucleus.Abstractions.Managers.ILayoutManager.DEFAULT_LAYOUT}";
-    }
-
-    return View(layoutPath, viewModel);
+    return viewModel;
   }
 
-  private Boolean RedirectToSetupWizard()
+  private Boolean ShouldRedirectToSetupWizard()
   {
     return (!this.Application.IsInstalled);
-  }
-
-  private async Task<Boolean> RedirectToInstallWizard()
-  {
-    // if the wizard hasn't run AND there are no sites AND no system administrators, run the wizard
-    if (!this.Application.IsInstalled && await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0)
-    {
-      return true;
-    }
-
-    // if nucleus thinks that the wizard HAS run but there are no sites AND no system administrators, run the wizard.  The logic here
-    // is repeated from the previous case because this.Application.IsInstalled returns quickly and this function is called frequently.
-    if (await this.SiteManager.Count() == 0 && await this.UserManager.CountSystemAdministrators() == 0)
-    {
-      return true;
-    }
-
-    return false;
   }
 
   /// <summary>
@@ -207,12 +193,12 @@ public class DefaultController : Controller
   /// <returns></returns>
   private Boolean No404Redirect()
   {
-    if (filteredFilenames.Contains(System.IO.Path.GetFileName(ControllerContext.HttpContext.Request.Path)))
+    if (FILTERED_FILE_NAMES.Contains(System.IO.Path.GetFileName(ControllerContext.HttpContext.Request.Path)))
     {
       return true;
     }
 
-    if (filteredFileExtensions.Contains(System.IO.Path.GetExtension(ControllerContext.HttpContext.Request.Path)))
+    if (FILTERED_FILE_EXTENSIONS.Contains(System.IO.Path.GetExtension(ControllerContext.HttpContext.Request.Path)))
     {
       return true;
     }
@@ -220,7 +206,7 @@ public class DefaultController : Controller
     return false;
   }
 
-  private Boolean IsTopDockSelected(Microsoft.AspNetCore.Http.HttpContext context)
+  private static Boolean IsTopDockSelected(Microsoft.AspNetCore.Http.HttpContext context)
   {
     if (Boolean.TryParse(context.Request.Cookies[PermissionExtensions.CONTROL_PANEL_DOCKING_COOKIE_NAME], out Boolean isSelected))
     {

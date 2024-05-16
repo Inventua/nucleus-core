@@ -41,17 +41,13 @@
     @Html.AddStyle(Model.SiteCssFilePath, AddStyleHtmlHelper.WellKnownSortOrders.SITE_STYLES_SORT_INDEX)
 	}
 	@RenderSection("scripts", false)
-	<merge-stylesheets>
-		@Html.RenderStyles()
-	</merge-stylesheets>
-	<merge-scripts>
-		@Html.RenderScripts()
-	</merge-scripts>
+	@Html.RenderStyles()
+	@Html.RenderScripts()
 </head>
 <body class="@Model.ControlPanelDockingCssClass">
-	@if (Model.CanEdit)
+  @if (Model.CanEdit)
 	{
-    <iframe id="nucleus-admin-frame" title="Control Panel" accesskey="A" src="@Url.Content("~/Admin/Index/Index")?pageId=@Model.Context.Page.Id" class="nucleus-admin-frame"></iframe>
+    <iframe id="nucleus-admin-frame" title="Control Panel" accesskey="A" src="@Url.Content(Model.ControlPanelUri)?pageId=@Model.Context.Page.Id" class="nucleus-admin-frame"></iframe>
 		<div class="nucleus-admin-frame-placeholder"></div>
 
 		<modal id="nucleus-popupdialog" title="Module Settings">

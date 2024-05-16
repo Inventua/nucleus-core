@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nucleus.Abstractions.Models.Cache
 {
@@ -12,17 +8,17 @@ namespace Nucleus.Abstractions.Models.Cache
 	/// <typeparam name="T">The type of the cached item.</typeparam>	
 	/// <internal/>
 	/// <hidden/>
-	public class CacheItem<T> 
+	internal class CacheItem<T> 
 	{
 		/// <summary>
 		/// Expiry date/time for the cache item.
 		/// </summary>
-		public DateTime Expires { get; }
+		internal DateTime Expires { get; private set; }
 
 		/// <summary>
 		/// The cached item.
 		/// </summary>
-		public T Item { get; }
+		internal T Item { get; private set; }
 
 		/// <summary>
 		/// Initialize a new instance of the CacheItem class.  CacheItem instances should be created by the CacheCollection object only. 
@@ -34,5 +30,25 @@ namespace Nucleus.Abstractions.Models.Cache
 			this.Item = item;
 			this.Expires = expires;
 		}
+
+    /// <summary>
+    /// Replace the cached item.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="expires"></param>
+    internal void Replace(T item, DateTime expires)
+    {
+      this.Item = item;
+			this.Expires = expires;
+    }
+
+    /// <summary>
+    /// Override the expiry time for this cache item.
+    /// </summary>
+    /// <param name="time"></param>
+    internal void Expire(TimeSpan time)
+    {
+      this.Expires = DateTime.UtcNow.Add(time);
+    }
 	}
 }

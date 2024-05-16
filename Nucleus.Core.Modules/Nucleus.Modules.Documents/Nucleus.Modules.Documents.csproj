@@ -5,7 +5,7 @@
 		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+		<RazorCompileOnBuild>true</RazorCompileOnBuild>
   </PropertyGroup>
 
 	<ItemGroup>

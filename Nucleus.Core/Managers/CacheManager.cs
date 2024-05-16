@@ -20,9 +20,10 @@ namespace Nucleus.Core.Managers
 {
 	public class CacheManager : ICacheManager
 	{
-		private Dictionary<string, ICacheCollection> Caches { get; } = new();
+		private Dictionary<string, ICacheCollection> Caches { get; } = [];
 		private IConfiguration Configuration { get; }
 		private ILogger<ICacheManager> Logger {get;}
+
     private Meter CacheMeter { get; }
 
 		private static readonly object lockObject = new();
@@ -57,35 +58,39 @@ namespace Nucleus.Core.Managers
 		private CacheCollection<TKey, TModel> Add<TKey, TModel>(string configItemName)
 		{
 			string cacheKey = CacheKey<TKey, TModel>(configItemName);
+      ICacheCollection cache;
 
-			if (!this.Caches.ContainsKey(cacheKey))
+      if (!this.Caches.TryGetValue(cacheKey, out cache))
 			{
 				lock(lockObject)
 				{
-					if (!this.Caches.ContainsKey(cacheKey))
+					if (!this.Caches.TryGetValue(cacheKey, out cache))
 					{
 						CacheOption options = new();
 						this.Configuration.GetSection($"{CacheOption.Section}:{configItemName}").Bind(options, binderOptions => binderOptions.BindNonPublicProperties = true);
 
 						this.Logger?.LogDebug("Creating cache:'{configItemName}' with capacity={capacity}, expiry time={expiry}.", configItemName, options.Capacity, options.ExpiryTime);
 
-						CacheCollection<TKey, TModel> result = new(configItemName, this.Logger, options);
-						this.Caches.Add(cacheKey, result);
-						return result;
+						CacheCollection<TKey, TModel> newCache = new(configItemName, this.Logger, options);
+						this.Caches.Add(cacheKey, newCache);
+
+						return newCache;
 					}
 				}				
 			}
 
-			return this.Caches[cacheKey] as CacheCollection<TKey, TModel>;
+			return cache as CacheCollection<TKey, TModel>;
 		}
 
 		public CacheCollection<TKey, TModel> Get<TKey, TModel>([System.Runtime.CompilerServices.CallerMemberName] string caller = "Default") 
 		{
-			if (this.Caches.TryGetValue(CacheKey<TKey, TModel>(caller), out ICacheCollection result))
+			if (this.Caches.TryGetValue(CacheKey<TKey, TModel>(caller), out ICacheCollection cache))
 			{
-				if (result is CacheCollection<TKey, TModel>)
+        CacheCollection<TKey, TModel> result = cache as CacheCollection<TKey, TModel>;
+
+        if (result != null)
 				{
-					return result as CacheCollection<TKey, TModel>;
+					return result;
 				}
 			}
 

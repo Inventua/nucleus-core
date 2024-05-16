@@ -39,7 +39,7 @@ namespace Nucleus.Abstractions.Managers
 		/// <param name="requestUri"></param>
 		/// <param name="pathBase"></param>
 		/// <returns></returns>
-		public Task<Site> Get(Microsoft.AspNetCore.Http.HostString requestUri, string pathBase);
+		public Task<Site> Get(string requestUri, string pathBase);
 
 		/// <summary>
 		/// Retrieve the existing <see cref="Site"/> from the database which contains the specified page.

@@ -38,8 +38,8 @@
 
 	<ItemGroup>
 	  <PackageReference Include="DocumentPartner.ClosedXML" Version="0.95.289" />
-	  <PackageReference Include="Markdig" Version="0.34.0" />
-	  <PackageReference Include="RazorEngineCore" Version="2023.11.2" />
+	  <PackageReference Include="Markdig" Version="0.37.0" />
+	  <PackageReference Include="RazorEngineCore" Version="2024.4.1" />
 	</ItemGroup>
 	
   <ItemGroup>

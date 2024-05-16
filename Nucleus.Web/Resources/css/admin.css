@@ -363,9 +363,8 @@ body
 {
   border-radius: 0;
   padding: 0.25rem;
-  max-height: 2rem;
-  margin-right: auto;
-  margin-bottom: auto;
+  margin: auto;
+  flex-basis: 100%;
 }
 
 .nucleus-control-panel .dock-top-btn
@@ -436,16 +435,17 @@ ul.nucleus-control-panel-items button
   border-radius: 4px;
   display: flex;
   background-color: transparent;
-  padding: 8px;
+  padding: 0.5rem;
   border: 0;
   text-align: left;
 }
 
 .nucleus-control-panel-items .nucleus-index-icon
 {
-  margin: 0 8px 0 0;
+  margin: 0 0.75rem 0 0;
   font-family: 'Material Icons';
-  font-size: 42px;
+  font-size: 2.75rem;
+  line-height: 100%;
 }
 
 .nucleus-control-panel-items li:hover, .nucleus-control-panel-items li:active, .nucleus-control-panel-items li:hover *, .nucleus-control-panel-items li:active *
@@ -474,6 +474,11 @@ ul.nucleus-control-panel-items button
 .nucleus-control-panel-items li.SiteIcon .nucleus-index-icon, .nucleus-control-panel-items li.SitesIcon .nucleus-index-icon
 {
   color: #444444;
+}
+
+.nucleus-control-panel-items li.MailSettingsIcon .nucleus-index-icon, .nucleus-control-panel-items li.MailSettingsIcon .nucleus-index-icon
+{
+  color: #329bfd;
 }
 
 .nucleus-control-panel-items li.MailIcon .nucleus-index-icon

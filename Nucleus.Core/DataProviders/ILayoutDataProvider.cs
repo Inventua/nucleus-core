@@ -17,7 +17,7 @@ internal interface ILayoutDataProvider : IDisposable//, IDataProvider<ILayoutDat
 {
   // site methods
   abstract Task<Site> GetSite(Guid id);
-  abstract Task<Guid> DetectSite(Microsoft.AspNetCore.Http.HostString requestUri, string pathBase);
+  abstract Task<Guid> DetectSite(string requestUri, string pathBase);
   abstract Task SaveSite(Site site);
   abstract Task<List<Site>> ListSites();
   abstract Task<long> CountSites();

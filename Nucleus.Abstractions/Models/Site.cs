@@ -44,30 +44,10 @@ namespace Nucleus.Abstractions.Models
 		/// </summary>
 		public static class SiteMailSettingKeys
 		{
-			/// <summary>
-			/// SMTP server host name
-			/// </summary>
-			public const string MAIL_HOSTNAME = "mail:hostname";
-			/// <summary>
-			/// SMTP server port name
-			/// </summary>
-			public const string MAIL_PORT = "mail:port";
-			/// <summary>
-			/// Use SSL to connect 
-			/// </summary>
-			public const string MAIL_USESSL = "mail:usessl";
-			/// <summary>
-			/// Default mail sender name
-			/// </summary>
-			public const string MAIL_SENDER = "mail:sender";
-			/// <summary>
-			/// SMTP server user name
-			/// </summary>
-			public const string MAIL_USERNAME = "mail:username";
-			/// <summary>
-			/// SMTP server password
-			/// </summary>
-			public const string MAIL_PASSWORD = "mail:password";
+      /// <summary>
+      /// Selected mail client typename
+      /// </summary>
+      public const string MAIL_CLIENT_TYPENAME = "mail:default-mail-client-type";      
 		}
 
 		/// <summary>

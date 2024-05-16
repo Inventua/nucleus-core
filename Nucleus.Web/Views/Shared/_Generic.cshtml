@@ -12,14 +12,10 @@
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.BOOTSTRAP)
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_SHARED)
-	<merge-stylesheets>
 	@Html.RenderStyles()
-	</merge-stylesheets>
-	<merge-scripts>
 	@Html.RenderScripts()
-	</merge-scripts>
 </head>
-<body class="p-2">
+<body>
 	@RenderBody()
 </body>
 </html>

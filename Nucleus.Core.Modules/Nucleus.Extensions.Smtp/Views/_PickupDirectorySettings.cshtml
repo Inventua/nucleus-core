@@ -1,0 +1,8 @@
+﻿@model Nucleus.Extensions.Smtp.PickupDirectoryMailOptions
+<SettingsControl caption="Folder" helptext="Mail folder.">
+  @Html.TextBoxFor(model => model.PickupDirectoryLocation)
+</SettingsControl>
+
+<SettingsControl caption="Sender Email" helptext="Sender Email">
+  @Html.TextBoxFor(model => model.Sender)
+</SettingsControl>

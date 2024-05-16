@@ -1,20 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-  <Import Project="..\Nucleus.Core\core.build.targets" />
-  
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+	<Import Project="..\Nucleus.Core\core.build.targets" />
+	
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>    
   </PropertyGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.4" />
-    <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.7.0-rc.1" />
-  </ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.4" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.4" />
+		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.7.0-rc.1" />
+    <!--<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.4" />-->
+	</ItemGroup>
 	
 	<PropertyGroup>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
@@ -23,16 +25,18 @@
 	</PropertyGroup>
 	
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <Optimize>False</Optimize>
+		<Optimize>False</Optimize>
 	</PropertyGroup>
 	
-  <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
-    <ProjectReference Include="$(SolutionDir)\Nucleus.Core\Nucleus.Core.csproj" />
-    <ProjectReference Include="$(SolutionDir)\Nucleus.Extensions\Nucleus.Extensions.csproj" />
-    <ProjectReference Include="$(SolutionDir)\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
-  </ItemGroup>
-
+	<ItemGroup>
+		<ProjectReference Include="$(SolutionDir)\Nucleus.Abstractions\Nucleus.Abstractions.csproj" />
+		<ProjectReference Include="$(SolutionDir)\Nucleus.Core\Nucleus.Core.csproj" />
+		<ProjectReference Include="$(SolutionDir)\Nucleus.Extensions\Nucleus.Extensions.csproj" />
+		<ProjectReference Include="$(SolutionDir)\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
+		<ProjectReference Include="$(SolutionDir)\Nucleus.Web.Admin\Nucleus.Web.Admin.csproj">
+		</ProjectReference>		
+	</ItemGroup>
+	
 	<ItemGroup>
 		<Compile Remove="Extensions\**" />
 		<Compile Remove="logs\**" />
@@ -46,6 +50,7 @@
 		<Content Remove="databaseSettings.*.json" />
 		<Content Remove="hosting.*.json" />
 		<Content Remove="iis-dev\web.config" />
+		<Content Remove="Resources\Libraries\Monaco\0.44.0\package.json" />
 		<Content Remove="Setup\install-log.config" />
 		<EmbeddedResource Remove="Extensions\**" />
 		<EmbeddedResource Remove="logs\**" />
@@ -58,227 +63,219 @@
 		<None Remove="Setup\Extensions\**" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <None Remove="Areas\Admin\Views\Extensions\extensions.js" />
-	  <None Remove="Areas\Admin\Views\Extensions\nucleus-admin.min.js" />
-	  <None Remove="Areas\Admin\Views\ScheduledTasks\ScheduledTasks.js" />
-	  <None Remove="Areas\Setup\Views\SiteWizard\Complete.js" />
-	  <None Remove="Areas\Setup\Views\SiteWizard\index.css" />
-	  <None Remove="Areas\Setup\Views\SiteWizard\index.js" />
-	  <None Remove="license.txt" />
-	  <None Remove="module.build.targets" />
-	  <None Remove="package.xsd" />
-	  <None Remove="Resources\css\admin.css" />
-	  <None Remove="Resources\css\admin.min.css" />
-	  <None Remove="Resources\css\editmode.css" />
-	  <None Remove="Resources\css\editmode.min.css" />
-	  <None Remove="Resources\css\forms.css" />
-	  <None Remove="Resources\css\forms.min.css" />
-	  <None Remove="Resources\css\shared.css" />
-	  <None Remove="Resources\css\shared.min.css" />
-	  <None Remove="Resources\js\jquery-3.6.0.min.js" />
-	  <None Remove="Resources\js\jquery-pagelist.min.js" />
-	  <None Remove="Resources\js\jquery-toggleswitch.min.js" />
-	  <None Remove="Resources\js\nucleus-admin.js" />
-	  <None Remove="Resources\js\nucleus-admin.min.js" />
-	  <None Remove="Resources\js\nucleus-editmode.js" />
-	  <None Remove="Resources\js\nucleus-shared.min.js" />
-	  <None Remove="Resources\Libraries\HtmlEditors\trumbowyg\trumbowyg.js" />
-	  <None Remove="Resources\Libraries\HtmlEditors\trumbowyg\trumbowyg.min.js" />
-	  <None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\icons.svg" />
-	  <None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\sass\trumbowyg.scss" />
-	  <None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.css" />
-	  <None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.min.css" />
-	  <None Remove="Resources\material-icons.woff2" />
-	  <None Remove="Setup\Templates\Site\default-site-template.xml" />
-	  <None Remove="Setup\Templates\Site\empty-site-template.xml" />
-	  <None Remove="Shared\Containers\container-styles.css" />
-	  <None Remove="Shared\Containers\default.css" />
-	  <None Remove="Shared\Containers\default.md" />
-	  <None Remove="Shared\Containers\default.min.css" />
-	  <None Remove="Shared\Containers\default.png" />
-	  <None Remove="Shared\Controls\Views\PagingControl.css" />
-	  <None Remove="Shared\Controls\Views\PagingControl.min.css" />
-	  <None Remove="Shared\Layouts\default.css" />
-	  <None Remove="Shared\Layouts\default.md" />
-	  <None Remove="Shared\Layouts\default.png" />
-	  <None Remove="Shared\Layouts\layout-styles.css" />
-	  <None Remove="Utils\Ubuntu\appSettings.template" />
-	  <None Remove="Utils\Ubuntu\nucleus-install.sh" />
-	  <None Remove="Utils\Ubuntu\nucleus.service" />
+	<ItemGroup>	  
+		<None Remove="Areas\Setup\Views\SiteWizard\Complete.js" />
+		<None Remove="Areas\Setup\Views\SiteWizard\index.css" />
+		<None Remove="Areas\Setup\Views\SiteWizard\index.js" />
+		<None Remove="license.txt" />
+		<None Remove="module.build.targets" />
+		<None Remove="package.xsd" />
+		<None Remove="Resources\css\admin.css" />
+		<None Remove="Resources\css\admin.min.css" />
+		<None Remove="Resources\css\editmode.css" />
+		<None Remove="Resources\css\editmode.min.css" />
+		<None Remove="Resources\css\forms.css" />
+		<None Remove="Resources\css\forms.min.css" />
+		<None Remove="Resources\css\shared.css" />
+		<None Remove="Resources\css\shared.min.css" />
+		<None Remove="Resources\js\jquery-3.6.0.min.js" />
+		<None Remove="Resources\js\jquery-pagelist.min.js" />
+		<None Remove="Resources\js\jquery-toggleswitch.min.js" />
+		<None Remove="Resources\js\nucleus-admin.js" />
+		<None Remove="Resources\js\nucleus-admin.min.js" />
+		<None Remove="Resources\js\nucleus-editmode.js" />
+		<None Remove="Resources\js\nucleus-shared.min.js" />
+		<None Remove="Resources\Libraries\HtmlEditors\trumbowyg\trumbowyg.js" />
+		<None Remove="Resources\Libraries\HtmlEditors\trumbowyg\trumbowyg.min.js" />
+		<None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\icons.svg" />
+		<None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\sass\trumbowyg.scss" />
+		<None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.css" />
+		<None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.min.css" />
+		<None Remove="Resources\material-icons.woff2" />
+		<None Remove="Setup\Templates\Site\default-site-template.xml" />
+		<None Remove="Setup\Templates\Site\empty-site-template.xml" />
+		<None Remove="Shared\Containers\container-styles.css" />
+		<None Remove="Shared\Containers\default.css" />
+		<None Remove="Shared\Containers\default.md" />
+		<None Remove="Shared\Containers\default.min.css" />
+		<None Remove="Shared\Containers\default.png" />
+		<None Remove="Shared\Controls\Views\PagingControl.css" />
+		<None Remove="Shared\Controls\Views\PagingControl.min.css" />
+		<None Remove="Shared\Layouts\default.css" />
+		<None Remove="Shared\Layouts\default.md" />
+		<None Remove="Shared\Layouts\default.png" />
+		<None Remove="Shared\Layouts\layout-styles.css" />
+		<None Remove="Utils\Ubuntu\appSettings.template" />
+		<None Remove="Utils\Ubuntu\nucleus-install.sh" />
+		<None Remove="Utils\Ubuntu\nucleus.service" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishInstall.pubxml" />
-	  <_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishUpgrade.pubxml" />
+		<_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishInstall.pubxml" />
+		<_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishUpgrade.pubxml" />
+	</ItemGroup>
+
+	<ItemGroup>	  
+		<EmbeddedResource Include="Areas\Setup\Views\SiteWizard\index.js">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<Content Include="Resources\js\nucleus-admin-extensions.js" />
+		<Content Include="Resources\js\nucleus-admin-extensions.min.js" />
+		<EmbeddedResource Include="Areas\Setup\Views\SiteWizard\Complete.js">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Areas\Setup\Views\SiteWizard\index.css">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<Content Include="license.txt">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="module.build.targets" />
+		<Content Include="package.xsd">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\css\admin.css" />
+		<Content Include="Resources\css\admin.min.css" />
+		<Content Include="Resources\css\editmode.min.css" />
+		<Content Include="Resources\css\forms.css" />
+		<Content Include="Resources\css\forms.min.css" />
+		<Content Include="Resources\css\editmode.css" />
+		<Content Include="Resources\css\shared.css" />
+		<Content Include="Resources\css\shared.min.css" />
+		<Content Include="Resources\js\jquery-pagelist.min.js" />
+		<Content Include="Resources\js\jquery-toggleswitch.min.js" />
+		<Content Include="Resources\js\nucleus-admin.js" />
+		<Content Include="Resources\js\nucleus-admin.min.js" />
+		<Content Include="Resources\js\nucleus-editmode.js" />
+		<Content Include="Resources\js\nucleus-shared.min.js" />
+		<Content Include="Resources\js\nucleus-shared.js" />
+		<Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\trumbowyg.js" />
+		<Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\trumbowyg.min.js" />
+		<Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\icons.svg" />
+		<Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\sass\trumbowyg.scss" />
+		<Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.css" />
+		<Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.min.css" />
+		<Content Include="Resources\material-icons.woff2" />
+		<Content Include="Setup\Templates\Site\empty-site-template.xml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Setup\Templates\Site\default-site-template.xml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Shared\Containers\container-styles.css">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Shared\Containers\default.md" />
+		<Content Include="Shared\Containers\default.css">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Shared\Containers\default.min.css" />
+		<Content Include="Shared\Containers\default.png" />
+		<Content Include="Shared\Controls\Views\PagingControl.css">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Shared\Controls\Views\PagingControl.min.css" />
+		<Content Include="Shared\Layouts\default.css">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Shared\Layouts\default.md" />
+		<Content Include="Shared\Layouts\default.png" />
+		<Content Include="Shared\Layouts\layout-styles.css" />
+		<Content Include="Utils\Ubuntu\appSettings.template">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Utils\Ubuntu\nucleus.service">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Utils\Ubuntu\nucleus-install.sh">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Include="Areas\Admin\Views\ScheduledTasks\ScheduledTasks.js">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="Areas\Setup\Views\SiteWizard\index.js">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="Resources\js\nucleus-admin-extensions.js" />
-	  <Content Include="Resources\js\nucleus-admin-extensions.min.js" />
-	  <Content Include="Areas\Setup\Views\SiteWizard\Complete.js">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="Areas\Setup\Views\SiteWizard\index.css">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="license.txt">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="module.build.targets" />
-	  <Content Include="package.xsd">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="Resources\css\admin.css" />
-	  <Content Include="Resources\css\admin.min.css" />
-	  <Content Include="Resources\css\editmode.min.css" />
-	  <Content Include="Resources\css\forms.css" />
-	  <Content Include="Resources\css\forms.min.css" />
-	  <Content Include="Resources\css\editmode.css" />
-	  <Content Include="Resources\css\shared.css" />
-	  <Content Include="Resources\css\shared.min.css" />
-	  <Content Include="Resources\js\jquery-pagelist.min.js" />
-	  <Content Include="Resources\js\jquery-toggleswitch.min.js" />
-	  <Content Include="Resources\js\nucleus-admin.js" />
-	  <Content Include="Resources\js\nucleus-admin.min.js" />
-	  <Content Include="Resources\js\nucleus-editmode.js" />
-	  <Content Include="Resources\js\nucleus-shared.min.js" />
-	  <Content Include="Resources\js\nucleus-shared.js" />
-	  <Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\trumbowyg.js" />
-	  <Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\trumbowyg.min.js" />
-	  <Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\icons.svg" />
-	  <Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\sass\trumbowyg.scss" />
-	  <Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.css" />
-	  <Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.min.css" />
-	  <Content Include="Resources\material-icons.woff2" />
-	  <Content Include="Setup\Templates\Site\empty-site-template.xml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="Setup\Templates\Site\default-site-template.xml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="Shared\Containers\container-styles.css">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="Shared\Containers\default.md" />
-	  <Content Include="Shared\Containers\default.css">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="Shared\Containers\default.min.css" />
-	  <Content Include="Shared\Containers\default.png" />
-	  <Content Include="Shared\Controls\Views\PagingControl.css">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="Shared\Controls\Views\PagingControl.min.css" />
-	  <Content Include="Shared\Layouts\default.css">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="Shared\Layouts\default.md" />
-	  <Content Include="Shared\Layouts\default.png" />
-	  <Content Include="Shared\Layouts\layout-styles.css" />
-	  <Content Include="Utils\Ubuntu\appSettings.template">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="Utils\Ubuntu\nucleus.service">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-    <Content Include="Utils\Ubuntu\nucleus-install.sh">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+		<Folder Include="Properties\ServiceDependencies\" />
+		<Folder Include="Resources\Libraries\jQuery\3.7.1\" />
+		<Folder Include="Utils\Windows\" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Properties\ServiceDependencies\" />
-	  <Folder Include="Resources\Libraries\jQuery\3.7.1\" />
-	  <Folder Include="Utils\Windows\" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Include="appSettings.*.json">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </None>
-	  <None Include="bundleconfig.json" />
-	  <None Include="iis-dev\**\*" />
-	  <_ContentIncludedByDefault Remove="appSettings.linux.json" />
-	  <None Include="databaseSettings.*.json">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </None>
-	  <None Include="hosting.*.json">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </None>
+		<None Include="appSettings.*.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Include="bundleconfig.json" />
+		<None Include="iis-dev\**\*" />
+		<_ContentIncludedByDefault Remove="appSettings.linux.json" />
+		<None Include="databaseSettings.*.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Include="hosting.*.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
 		<None Include="iis-dev\web.config" />
-    <None Include="Setup\install-log.config">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+		<None Include="Resources\Libraries\Monaco\0.44.0\package.json" />
+		<None Include="Setup\install-log.config">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Update="appSettings.Production.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="appSettings.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Areas\Admin\Views\ScheduledTasks\_TaskStatus.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="databaseSettings.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="databaseSettings.Production.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="hosting.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Shared\Containers\default.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Shared\Controls\Views\FileSelector.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Shared\Controls\Views\FileUpload.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Shared\Controls\Views\FolderSelector.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Shared\Controls\Views\PagingControl.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Views\Shared\_ContentOnly.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Shared\Layouts\default.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Shared\Layouts\_banner.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Views\Shared\_Generic.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Views\Shared\_Layout.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Views\Shared\_Partial.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Views\Shared\_PopupEditor.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="_ViewImports.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="_ViewStart.cshtml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
+		<Content Update="appSettings.Production.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="appSettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>	 
+		<Content Update="databaseSettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="databaseSettings.Production.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="hosting.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Shared\Containers\default.cshtml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Shared\Controls\Views\FileSelector.cshtml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Shared\Controls\Views\FileUpload.cshtml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Shared\Controls\Views\FolderSelector.cshtml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Shared\Controls\Views\PagingControl.cshtml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Views\Shared\_ContentOnly.cshtml">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Shared\Layouts\default.cshtml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Shared\Layouts\_banner.cshtml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Views\Shared\_Generic.cshtml">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Views\Shared\_Layout.cshtml">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Views\Shared\_Partial.cshtml">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Views\Shared\_PopupEditor.cshtml">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Content>
+		<Content Update="_ViewImports.cshtml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		<Content Update="_ViewStart.cshtml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="Exists('iis-dev')">
@@ -288,5 +285,4 @@
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="Exists('iis-dev')">
 		<Delete Files="iis-dev\App_Offline.htm" />
 	</Target>
-
 </Project>

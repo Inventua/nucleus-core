@@ -11,7 +11,6 @@ using Nucleus.Core;
 using Nucleus.Core.Layout;
 using Nucleus.Core.Plugins;
 using Nucleus.Core.Logging;
-using Nucleus.Core.FileProviders;
 using Nucleus.Core.DataProviders;
 using Nucleus.Extensions;
 using Nucleus.Core.Authentication;
@@ -143,6 +142,7 @@ namespace Nucleus.Web
         IMvcBuilder builder = services.AddControllersWithViews();
 
         builder.AddRazorRuntimeCompilation();
+        services.AddServerSideBlazor();
 
         // future reference:
         // services.AddLocalization(options => options.ResourcesPath = "LocalizationResources");
@@ -225,9 +225,9 @@ namespace Nucleus.Web
         services.Logger().LogInformation("Adding Default Cache Middleware");
         services.AddDefaultCacheMiddleware(this.Configuration);
 
-        // Add merged file provider.  
-        services.Logger().LogInformation("Adding Merged File Middleware");
-        services.AddMergedFileMiddleware(this.Configuration);
+        //// Add merged file provider.  
+        //services.Logger().LogInformation("Adding Merged File Middleware");
+        //services.AddMergedFileMiddleware(this.Configuration);
 
         services.Logger().LogInformation("Adding Data Provider Services");
         services.AddDataProviderFactory(this.Configuration);
@@ -304,39 +304,13 @@ namespace Nucleus.Web
           app.UseResponseCompression();
         }
 
-        // Call .UseStaticFiles multiple times to add additional paths.  We expose specific folders only, rather than adding 
+        // Add file providers for embedded static resources in Nucleus.Web and in control panel implementations/extensions
+        app.UseCompiledRazorResources(this.Environment);
+
+        // Add static file providers for the paths in FolderOptions.ALLOWED_STATICFILE_PATHS.  We expose specific folders only, rather than adding 
         // env.ContentRootPath so that only defined folders can serve static resources.
-        foreach (string folderName in Nucleus.Abstractions.Models.Configuration.FolderOptions.ALLOWED_STATICFILE_PATHS)
-        {
-          string path = Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(System.IO.Path.Combine(env.ContentRootPath, folderName));
-
-          if (System.IO.Directory.Exists(path))
-          {
-            app.Logger()?.LogInformation("Adding static file path: [{path}]", "/" + folderName);
-
-            app.UseStaticFiles(new StaticFileOptions
-            {
-              FileProvider = new PhysicalFileProvider(path),
-              RequestPath = "/" + folderName,
-              OnPrepareResponse = context =>
-              {
-                // Add charset=utf-8 to content-type for text content if it is not already present
-                if ((context.Context.Response.ContentType.StartsWith("text/") || context.Context.Response.ContentType.StartsWith("application/javascript")) && !context.Context.Response.ContentType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
-                {
-                  context.Context.Response.ContentType += "; charset=utf-8";
-                }
-
-                // Cache static content for 30 days
-                context.Context.Response.GetTypedHeaders().CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
-                {
-                  Public = true,
-                  MaxAge = TimeSpan.FromDays(30)
-                };
-              }
-            });
-          }
-        }
-
+        app.UseStaticFilePaths(this.Environment);
+        
         // Set default cache-control to NoCache.  This can be overridden by controllers or middleware.
         app.UseMiddleware<DefaultNoCacheMiddleware>();
 
@@ -352,12 +326,13 @@ namespace Nucleus.Web
         // the order here is important.  The page routing and module routing middleware sets the Nucleus context, which is used by some of the
         // authorization handlers, but ModuleRoutingMiddleware does a permission check, which requires that Authentication has run - and
         // middleware is executed in the order of the code below
-        app.UseMiddleware<MergedFileProviderMiddleware>();
+        //app.UseMiddleware<MergedFileProviderMiddleware>();
         app.UseMiddleware<PageRoutingMiddleware>();
         app.UseAuthentication();
         app.UseMiddleware<Nucleus.Core.FileSystemProviders.FileIntegrityCheckerMiddleware>();
         app.UseMiddleware<ModuleRoutingMiddleware>();
         app.UseAuthorization();
+        app.UseControlPanel(this.Configuration.GetSection("Nucleus:ControlPanel:Name").Value);
 
         app.UseEndpoints(routes =>
         {
@@ -374,6 +349,9 @@ namespace Nucleus.Web
 
           // "Razor Pages" (Razor Pages is different to Razor views with controllers [MVC])
           routes.MapRazorPages();
+
+          // Blazor SignalR hub
+          routes.MapBlazorHub();
 
           // Map the error page route
           routes.MapControllerRoute(

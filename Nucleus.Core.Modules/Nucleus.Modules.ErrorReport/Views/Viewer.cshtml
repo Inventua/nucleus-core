@@ -5,11 +5,45 @@
 @using Nucleus.Modules.ErrorReport.ViewModels
 @* @Html.AddStyle("~#/viewer.css") *@
 <h2>An error occurred while processing your request</h2>
-<div>Date/Time: @DateTime.UtcNow.ToString("g") UTC</div>
-<div>Source: @Model?.ExceptionInfo?.Error?.Source</div>
-<div>Type: @Model?.ExceptionInfo?.Error?.GetType().Name</div>
-<div>Message: @Model?.ExceptionInfo?.Error?.Message</div>
-@if (!String.IsNullOrEmpty(@Model?.ExceptionInfo?.Error?.InnerException?.Message))
-{
-	<div>More Information: @Model?.ExceptionInfo?.Error?.InnerException?.Message</div>
-}
+<table class="table">
+  <tbody>
+    <tr>
+      <th class="nucleus-small-cell pe-5" scope="row">Date/Time</th>
+      <td>@DateTime.UtcNow.ToString("g") UTC</td>
+    </tr>
+    <tr>
+      <th class="nucleus-small-cell pe-5" scope="row">Path</th>
+      <td>@Model?.ExceptionInfo?.Path</td>
+    </tr>
+
+    @if (Model.ShowSensitiveData)
+    {
+      @if (Model?.ExceptionInfo?.RouteValues != null)
+      {
+        <tr>
+          <th class="nucleus-small-cell pe-5" scope="row">Route</th>
+          <td>@String.Join(", ", Model?.ExceptionInfo?.RouteValues?.Select(route => $"{route.Key}: '{route.Value}'"))</td>
+        </tr>
+        <tr>
+          <th class="nucleus-small-cell pe-5" scope="row">Source</th>
+          <td>@Model?.ExceptionInfo?.Error?.Source / @Model?.ExceptionInfo?.Endpoint?.DisplayName</td>
+        </tr>
+      }
+    }
+    <tr>
+      <th class="nucleus-small-cell pe-5" scope="row">Type</th>
+      <td>@Model?.ExceptionInfo?.Error?.GetType().Name</td>
+    </tr>
+    <tr>
+      <th class="nucleus-small-cell pe-5" scope="row">Message</th>
+      <td>@Model?.ExceptionInfo?.Error?.Message</td>
+    </tr>
+    @if (!String.IsNullOrEmpty(@Model?.ExceptionInfo?.Error?.InnerException?.Message))
+    {
+      <tr>
+        <th class="nucleus-small-cell pe-5" scope="row">More Information</th>
+        <td>@Model?.ExceptionInfo?.Error?.InnerException?.Message</td>
+      </tr>
+    }
+  </tbody>
+</table>

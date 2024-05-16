@@ -27,42 +27,47 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
       /// <summary>
       /// Bootstrap
       /// </summary>
-      BOOTSTRAP,
+      BOOTSTRAP=10,
 
       /// <summary>
       /// jQuery
       /// </summary>
-      JQUERY,
+      JQUERY=20,
 
       /// <summary>
       /// Nucleus common (shared) client-side script.
       /// </summary>
-      NUCLEUS_SHARED,
+      NUCLEUS_SHARED=30,
 
       /// <summary>
       /// Nucleus pagelist script (used by admin pages).
       /// </summary>
-      NUCLEUS_PAGELIST,
+      NUCLEUS_PAGELIST=40,
 
       /// <summary>
       /// Nucleus admin pages script.
       /// </summary>
-      NUCLEUS_ADMIN,
+      NUCLEUS_ADMIN=50,
 
       /// <summary>
       /// Nucleus toggleswitch control script.
       /// </summary>
-      NUCLEUS_TOGGLESWITCH,
+      NUCLEUS_TOGGLESWITCH=60,
 
       /// <summary>
       /// Nucleus inline editing controls script.
       /// </summary>
-      NUCLEUS_EDITMODE,
+      NUCLEUS_EDITMODE=70,
 
       /// <summary>
       /// Monaco editor
       /// </summary>
-      NUCLEUS_MONACO_EDITOR
+      NUCLEUS_MONACO_EDITOR=80,
+
+      /// <summary>
+      /// Blazor server (blazor.server.js)
+      /// </summary>
+      BLAZOR_SERVER=90
     }
 
     /// <summary>
@@ -125,6 +130,9 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
           AddScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/loader.js", false);
           AddScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/editor/editor.main.nls.js", true);
           AddScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/editor/editor.main.js", true);
+          break;
+        case WellKnownScripts.BLAZOR_SERVER:
+          AddScript(htmlHelper, "~/_framework/blazor.server.js");
           break;
       }
 

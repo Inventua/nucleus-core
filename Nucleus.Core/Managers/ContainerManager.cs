@@ -1,23 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Nucleus.Abstractions.Managers;
-using Nucleus.Data.Common;
-using Nucleus.Core.DataProviders;
-using Nucleus.Abstractions.Models;
 using System.Text.RegularExpressions;
-using DocumentFormat.OpenXml.Wordprocessing;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models;
+using Nucleus.Core.DataProviders;
+using Nucleus.Data.Common;
+using Nucleus.Extensions;
 
 namespace Nucleus.Core.Managers;
 
 public class ContainerManager : IContainerManager
 {
+  private IWebHostEnvironment WebHostEnvironment { get; }
   private IDataProviderFactory DataProviderFactory { get; }
     
-  public ContainerManager(IDataProviderFactory dataProviderFactory)
+  public ContainerManager(IWebHostEnvironment webHostEnvironment, IDataProviderFactory dataProviderFactory)
   {
+    this.WebHostEnvironment = webHostEnvironment;
     this.DataProviderFactory = dataProviderFactory;
   }
 
@@ -89,7 +91,7 @@ public class ContainerManager : IContainerManager
   /// <param name="page"></param>
   /// <param name="containerDefinition"></param>
   /// <returns></returns>
-  public Task<List<ContainerStyle>> ListContainerStyles(Site site, Page page, ContainerDefinition containerDefinition)
+  public async Task<List<ContainerStyle>> ListContainerStyles(Site site, Page page, ContainerDefinition containerDefinition)
   {
     List<ContainerStyle> results = new();
 
@@ -97,20 +99,22 @@ public class ContainerManager : IContainerManager
     const string PROPERTY_VALUES_REGEX = "-(?<valueName>[A-Za-z0-9]*)\\s*{(\\s*\\/\\*\\s*title:\\s*(?<valueTitle>[^\\*]*))?";
 
     // container must support container styles, otherwise don't allow any selections
-    if (SupportsContainerStyles(site, page, containerDefinition))
+    if (await SupportsContainerStyles(site, page, containerDefinition))
     {
       List<string> cssFiles = new List<string>() { "/Shared/Containers/container-styles.css" };
-      cssFiles.AddRange(GetContainerCssReferences(site, page, containerDefinition));
+      cssFiles.AddRange(await GetContainerCssReferences(site, page, containerDefinition));
 
-      // parse each css file and idenfify @property elements, which are used to define container styles
+      // parse each css file and identify @property elements, which are used to define container styles
       foreach (string relativePath in cssFiles)
       {
-        string containerCssStylesPath = System.IO.Path.Join(Environment.CurrentDirectory, relativePath);
-
-        if (System.IO.File.Exists(containerCssStylesPath))
+        //string containerCssStylesPath = System.IO.Path.Join(Environment.CurrentDirectory, relativePath);
+        Microsoft.Extensions.FileProviders.IFileInfo fileInfo = this.WebHostEnvironment.ContentRootFileProvider.GetFileInfo(relativePath);
+        if (fileInfo.Exists)
+        //if (System.IO.File.Exists(containerCssStylesPath))
         {
-          string containerCss = System.IO.File.ReadAllText(containerCssStylesPath);
-
+          string containerCss = await fileInfo.ReadAllText();
+          //containerCss = System.IO.File.ReadAllText(containerCssStylesPath);
+          
           // find properties
           foreach (Match stylePropertyMatch in Regex.Matches(containerCss, CONTAINER_STYLE_PROPERTY_REGEX, RegexOptions.Multiline).Cast<Match>())
           {
@@ -177,7 +181,7 @@ public class ContainerManager : IContainerManager
       }
     }
 
-    return Task.FromResult(results.Where(result => !result.Disabled).ToList());
+    return results.Where(result => !result.Disabled).ToList();
   }
 
   private string GetStringValue(Group group, string defaultValue)
@@ -204,15 +208,17 @@ public class ContainerManager : IContainerManager
     }
   }
 
-  private Boolean SupportsContainerStyles(Site site, Page page, ContainerDefinition containerDefinition)
+  private async Task<Boolean> SupportsContainerStyles(Site site, Page page, ContainerDefinition containerDefinition)
   {
     const string SUPPORTS_CONTAINER_STYLES_REGEX = "container-styles\\s*=\\s*\"(?<isSupported>[^\"]*)\"";
 
     string containerPath = GetEffectiveContainerPath(site, page, containerDefinition);
-    string containerFullPath = System.IO.Path.Join(Environment.CurrentDirectory, containerPath);
-    if (containerPath != null && System.IO.File.Exists(containerFullPath))
+    //string containerFullPath = System.IO.Path.Join(Environment.CurrentDirectory, containerPath);
+    Microsoft.Extensions.FileProviders.IFileInfo fileInfo = this.WebHostEnvironment.ContentRootFileProvider.GetFileInfo(containerPath);
+    // if (containerPath != null && System.IO.File.Exists(containerFullPath))
+    if (containerPath != null && fileInfo.Exists)
     {
-      string containerContent = System.IO.File.ReadAllText(containerFullPath);
+      string containerContent = await fileInfo.ReadAllText();// System.IO.File.ReadAllText(containerFullPath);
 
       foreach (Match containerStylesMatch in Regex.Matches(containerContent, SUPPORTS_CONTAINER_STYLES_REGEX, RegexOptions.Multiline).Cast<Match>())
       {
@@ -230,7 +236,7 @@ public class ContainerManager : IContainerManager
     return false;
   }
 
-  private List<string> GetContainerCssReferences(Site site, Page page, ContainerDefinition containerDefinition)
+  private async Task<List<string>> GetContainerCssReferences(Site site, Page page, ContainerDefinition containerDefinition)
   {
     List<string> cssFiles = new();
 
@@ -243,9 +249,11 @@ public class ContainerManager : IContainerManager
     string containerPath = GetEffectiveContainerPath(site, page, containerDefinition);
     string containerFullPath = System.IO.Path.Join(Environment.CurrentDirectory, containerPath);
 
-    if (containerPath != null && System.IO.File.Exists(containerFullPath))
+    Microsoft.Extensions.FileProviders.IFileInfo fileInfo = this.WebHostEnvironment.ContentRootFileProvider.GetFileInfo(containerPath);
+    if (containerPath != null && fileInfo.Exists)
+    //  if (containerPath != null && System.IO.File.Exists(containerFullPath))
     {
-      string containerContent = System.IO.File.ReadAllText(containerFullPath);
+      string containerContent = await fileInfo.ReadAllText();// System.IO.File.ReadAllText(containerFullPath);
       // look for container stylesheets
       foreach (string regex in new string[] { cssStylesheetsRegEx, cssStylesheetsRegEx2 })
       {

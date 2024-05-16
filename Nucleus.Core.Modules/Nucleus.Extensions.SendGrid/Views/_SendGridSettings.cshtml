@@ -1,0 +1,12 @@
+﻿@model Nucleus.Extensions.SendGrid.SendGridMailOptions
+<SettingsControl caption="Api Host" helptext="SendGrid Api host Url.  Global users use https://api.sendgrid.com/, EU users use https://api.eu.sendgrid.com/.">
+  @Html.TextBoxFor(model => model.Host)
+</SettingsControl>
+
+<SettingsControl caption="Api Key" helptext="Enter your SendGrid API key.">
+  @Html.PasswordFor(model => model.ApiKey, new { @value = Nucleus.Extensions.SendGrid.SendGridMailOptions.UNCHANGED_APIKEY })
+</SettingsControl>
+
+<SettingsControl caption="Sender Email" helptext="Sender Email">
+  @Html.TextBoxFor(model => model.Sender)
+</SettingsControl>

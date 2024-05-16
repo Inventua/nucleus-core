@@ -6,7 +6,7 @@
   <description>
     This module is used on the site error page to display error details.
   </description>
-  <compatibility minVersion="1.2.0.0" maxVersion="*" />
+  <compatibility minVersion="1.4.0.0" maxVersion="*" />
   <components>
     <component folderName="ErrorReport" optional="false">
       <moduleDefinition id="e1d1db07-be39-4796-abca-56cd44b27420">
@@ -15,7 +15,7 @@
         <extension>ErrorReport</extension>
         <viewController>ErrorReport</viewController>
         <viewAction>Index</viewAction>
-        <editAction>Settings</editAction>
+        <!--<editAction>Settings</editAction>-->
         <categories>Utility</categories>
       </moduleDefinition>
       <file name="readme.txt" />

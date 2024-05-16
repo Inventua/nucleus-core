@@ -55,7 +55,8 @@ namespace Nucleus.Modules.Sitemap
   public enum Directions
   {
     Vertical = 0,
-    Horizontal = 1
+    Horizontal = 1,
+    Grid
   }
 
   /// <summary>
@@ -116,7 +117,11 @@ namespace Nucleus.Modules.Sitemap
         {
           outputBuilder.AddCssClass("sitemap-horizontal");
         }
-			}
+        else if (direction == Directions.Grid)
+        {
+          outputBuilder.AddCssClass("sitemap-grid");
+        }
+      }
 
 			return outputBuilder;
 		}

@@ -1,0 +1,23 @@
+﻿@model Nucleus.Web.ViewModels.Admin.Manage
+@using Nucleus.Web.ViewModels.Admin
+@using Nucleus.ViewFeatures
+@using Nucleus.Extensions;
+@addTagHelper "*, Nucleus.ViewFeatures"
+<h1 class="nucleus-control-panel-heading">Manage</h1>
+<ul class="nucleus-control-panel-items">
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Users", "Users", "Create and Manage user accounts, profile settings and user role assignments.", "~/Admin/Users/Index", "U", "&#xf02e;", "UsersIcon"))
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Role Groups", "Role Groups", "Create and Manage Role Groups.", "~/Admin/RoleGroups/Index", "G", "&#xf233;", "RoleGroupsIcon"))
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Roles", "Roles", "Create and Manage Security Roles.", "~/Admin/Roles/Index", "R", "&#xe7ef;", "UsersIcon"))
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Site", "Site", "Manage settings for the current site.", "~/Admin/Sites/EditCurrentSite", "S", "&#xe051;", "SiteIcon"))
+  @await Html.PartialAsync("_ManageIcon", new ManageIcon("Mail Settings", "Mail Settings", "Manage mail settings.", "~/Admin/MailSettings/Index", "M", "&#xe158;", "MailSettingsIcon"))
+
+  @await Html.PartialAsync("_ManageIcon", new ManageIcon("Mail Templates", "Mail Templates", "Manage e-mail templates for the current site.", "~/Admin/MailTemplates/Index", "M", "&#xe0be;", "MailIcon"))
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Files", "Files", "Manage file system providers, folders and files.", "~/Admin/FileSystem/Index", "F", "&#xe2c7;", "FilesIcon"))
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Lists", "Lists", "Create and Manage Lists, which can be used by modules or other parts of the system.", "~/Admin/Lists/Index", "L", "&#xe7ef;", "ListsIcon"))
+	@await Html.PartialAsync("_ManageIcon", new ManageIcon("Search Settings", "Search Settings", "Manage search settings.", "~/Admin/SearchSettings/Settings", "R", "&#xe8b6;", "SearchSettingsIcon"))
+	
+	@foreach (var extension in Model.Extensions)
+	{
+		@await Html.PartialAsync("_ManageIcon", new ManageIcon(@extension.FriendlyName, @extension.FriendlyName, @extension.Description, @Url.NucleusAction(extension.EditAction, extension.ControllerName, extension.ExtensionName), @extension.FriendlyName.Substring(0,1), "&#xe87b;", "ExtensionIcon"))
+	}
+</ul>

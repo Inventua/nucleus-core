@@ -1,15 +1,12 @@
 ﻿.forums .forums-list, .forums .forum-posts
 {
   border: 1px solid var(--nucleus-default-border-color);
-  /*width: 100%;
-  margin-bottom: var(--nucleus-default-gap-vertical);*/
 }
 
 .forums table th, .forums table td
 {
   padding: 4px 12px;
-	/*text-align: left;*/
-  vertical-align: middle;
+	vertical-align: middle;
 }
 
 .forums thead:not(:first-child) .group-header
@@ -126,7 +123,6 @@
   margin-left: 0.5rem;
   padding: 0.35rem 0.2rem 0.35rem 0.25rem;
 }
-
 .forums .post .nucleus-form-tools
 {
   margin-top: 0.25rem;
@@ -203,7 +199,7 @@
   align-items: flex-end;
 }
 
-.forums .body
+.forums .body, .forums .post-body
 {
   background-color: #eee;
   padding: 0.25rem;
@@ -211,12 +207,12 @@
   overflow: auto;
 }
 
-.forums .body p:last-child
+.forums .body p:last-child, .forums .post-body p:last-child
 {
   margin-bottom: 0;
 }
 
-.forums .original-post.body
+.forums .original-post .post-body
 {
   max-height: 6rem;
   min-height: 2.5rem;

@@ -7,9 +7,9 @@
   ViewData["title"] = "Nucleus Setup Wizard";
 }
 @Html.AddStyle("~!index.css")
-@Html.AddScript("~/Areas/Setup/Views/SiteWizard/index.js", true)
 @Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
 @Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_TOGGLESWITCH)
+@Html.AddScript("~/Areas/Setup/Views/SiteWizard/index.js", true)
 @using (Html.BeginAreaForm("GenerateConnectionString", "SiteWizard", "Setup", FormMethod.Post, new { @data_target = "document" }))
 {
   <Modal id="site-wizard" title="Nucleus Setup Wizard" can-close="false" data-bs-backdrop="static" data-bs-keyboard="false">

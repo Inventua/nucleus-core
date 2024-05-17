@@ -35,7 +35,7 @@ namespace Nucleus.Web.Controllers
 		}
 
 		[HttpGet]
-		[Route("/" + Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH + "/{providerKey}/{**path}")]
+		[Route("/" + Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX + "/{providerKey}/{**path}")]
 		public async Task<ActionResult> Index(string providerKey, string path, Boolean inline)
 		{
 			this.Logger.LogInformation("File {providerKey}/{path} requested.", providerKey, path);
@@ -62,7 +62,7 @@ namespace Nucleus.Web.Controllers
 		}
 
 		[HttpGet]
-		[Route("/" + Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH + "/{encodedpath}")]
+		[Route("/" + Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX + "/{encodedpath}")]
 		public async Task<ActionResult> Index(string encodedPath, Boolean inline)
 		{
 			//string idString;

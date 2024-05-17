@@ -192,7 +192,7 @@ namespace Nucleus.Core.Search
     private static string RelativeFileLink(File file)
     {
       string encodedPath = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{file.Id}"));
-      return $"~/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH}/{encodedPath}";
+      return $"~/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX}/{encodedPath}";
     }
   }
 }

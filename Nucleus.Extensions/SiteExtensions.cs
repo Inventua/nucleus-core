@@ -191,7 +191,7 @@ public static class SiteExtensions
     }
     else
     {
-      return $"~/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH}/{FileExtensions.EncodeFileId(file.Id)}";
+      return $"~/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX}/{FileExtensions.EncodeFileId(file.Id)}";
     }
   }
 

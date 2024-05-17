@@ -129,7 +129,7 @@ public class TelemetryMiddleware : IMiddleware
   private TelemetryRouteTypes DetermineType(HttpRequest request)
   {
     if (this.Context.Page != null) return TelemetryRouteTypes.Page;
-    if (request.Path.StartsWithSegments("/" + RoutingConstants.FILES_ROUTE_PATH)) return TelemetryRouteTypes.File;
+    if (request.Path.StartsWithSegments("/" + RoutingConstants.FILES_ROUTE_PATH_PREFIX)) return TelemetryRouteTypes.File;
 
     // check for static resources
     string[] pathParts = request.Path.ToString().Split(new char[] { System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
@@ -151,7 +151,7 @@ public class TelemetryMiddleware : IMiddleware
   /// </summary>
   /// <param name="statusCode"></param>
   /// <returns></returns>
-  private Boolean HttpStatusCodeIsSuccess(int statusCode)
+  private static Boolean HttpStatusCodeIsSuccess(int statusCode)
   {
     return statusCode >= (int)System.Net.HttpStatusCode.OK && statusCode < (int)System.Net.HttpStatusCode.BadRequest;
   }

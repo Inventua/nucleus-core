@@ -60,7 +60,7 @@ namespace Nucleus.Web.Controllers
 
 		public ActionResult Robots()
 		{
-			string[] BLOCKED_ROUTES = { RoutingConstants.ADMIN_ROUTE_PATH, RoutingConstants.EXTENSIONS_ROUTE_PATH, RoutingConstants.API_ROUTE_PATH, "merged.css", "merged.js", "oauth2", RoutingConstants.ERROR_ROUTE_PATH };
+			string[] BLOCKED_ROUTES = { RoutingConstants.ADMIN_ROUTE_PATH_PREFIX, RoutingConstants.EXTENSIONS_ROUTE_PATH_PREFIX, RoutingConstants.API_ROUTE_PATH_PREFIX, "merged.css", "merged.js", "oauth2", RoutingConstants.ERROR_ROUTE_PATH };
 
 			string reservedPaths = "";			
 			foreach (string path in BLOCKED_ROUTES)

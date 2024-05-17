@@ -30,7 +30,7 @@ namespace Nucleus.Core.Authorization
 				{
 					if (context.HttpContext.Response.StatusCode == (int)System.Net.HttpStatusCode.Unauthorized || context.HttpContext.Response.StatusCode == (int)System.Net.HttpStatusCode.Forbidden)
 					{
-						if (!context.HttpContext.Response.Headers.WWWAuthenticate.Any() && !context.HttpContext.Request.Path.StartsWithSegments($"/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH}"))
+						if (!context.HttpContext.Response.Headers.WWWAuthenticate.Any() && !StartsWithRoutePrefix(context, [Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX, Nucleus.Abstractions.RoutingConstants.API_ROUTE_PATH_PREFIX]))
 						{
 							IPageManager pageManager = context.HttpContext.RequestServices.GetService<IPageManager>();
 
@@ -67,6 +67,19 @@ namespace Nucleus.Core.Authorization
 
 			return app;
 		}
+
+    private static Boolean StartsWithRoutePrefix(Microsoft.AspNetCore.Diagnostics.StatusCodeContext context, string[] routes)
+    {
+      foreach (string route in routes)
+      { 
+        if (context.HttpContext.Request.Path.StartsWithSegments($"/" + route, StringComparison.OrdinalIgnoreCase))
+        {
+          return true;
+        }
+      }
+
+      return false;
+    }
 
 		private async static Task<PageRoute> GetPageRoute(Guid? pageId, IPageManager pageManager)
 		{

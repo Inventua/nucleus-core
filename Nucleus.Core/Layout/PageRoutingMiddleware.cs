@@ -33,10 +33,10 @@ namespace Nucleus.Core.Layout
 
     private static readonly string[] KNOWN_NON_PAGE_PATHS =
     {
-      Nucleus.Abstractions.RoutingConstants.API_ROUTE_PATH,
-      Nucleus.Abstractions.RoutingConstants.EXTENSIONS_ROUTE_PATH,
+      Nucleus.Abstractions.RoutingConstants.API_ROUTE_PATH_PREFIX,
+      Nucleus.Abstractions.RoutingConstants.EXTENSIONS_ROUTE_PATH_PREFIX,
       Nucleus.Abstractions.RoutingConstants.SITEMAP_ROUTE_PATH,
-      Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH,
+      Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX,
     };
 
     public PageRoutingMiddleware(Context context, Application application, IPageManager pageManager, ISiteManager siteManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager, ILogger<PageRoutingMiddleware> logger)
@@ -230,7 +230,7 @@ namespace Nucleus.Core.Layout
           if (this.Context.Page.LinkFileId.HasValue)
           {
             Nucleus.Abstractions.Models.FileSystem.File file = await this.FileSystemManager.GetFile(this.Context.Site, this.Context.Page.LinkFileId.Value);
-            context.Response.Redirect($"{(String.IsNullOrEmpty(context.Request.PathBase) ? "" : context.Request.PathBase + "/")}/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH}/{file.EncodeFileId()}");
+            context.Response.Redirect($"{(String.IsNullOrEmpty(context.Request.PathBase) ? "" : context.Request.PathBase + "/")}/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX}/{file.EncodeFileId()}");
             Logger.LogTrace("Page: '{pageid}' has link type: File.  Using file id '{linkFileId}'", this.Context.Page.Id, this.Context.Page.LinkFileId);
             return false;
           }

@@ -52,7 +52,7 @@ namespace Nucleus.Core.Authorization
       // match user roles to this.CurrentContext.Page.Permissions.  This class checks VIEW permissions only.
       if (this.CurrentContext.Page != null)
       {
-        Logger.LogTrace("Checking permissions for page {0}.", this.CurrentContext.Page.Id);
+        Logger.LogTrace("Checking permissions for page {pageid}.", this.CurrentContext.Page.Id);
 
         foreach (Permission permission in this.CurrentContext.Page.Permissions)
         {
@@ -61,7 +61,7 @@ namespace Nucleus.Core.Authorization
             if (permission.IsValid(this.CurrentContext.Site, context.User))
             {
               // If any of the user's roles have permission, the user has permission
-              Logger.LogTrace("User {0}: Access granted to page {1} using role {2}[{3}].", context.User.Identity.Name, this.CurrentContext.Page.Id, permission.Role.Id, permission.Role.Name);
+              Logger.LogTrace("User {user}: Access granted to page {pageid} using role {roleid}[{rolename}].", context.User.Identity.Name, this.CurrentContext.Page.Id, permission.Role.Id, permission.Role.Name);
               context.Succeed(requirement);
               break;
             }
@@ -70,7 +70,7 @@ namespace Nucleus.Core.Authorization
 
         if (!context.HasSucceeded)
         {
-          Logger.LogTrace("User {0}: Access denied to page {1}.", context.User.Identity.Name, this.CurrentContext.Page.Id);
+          Logger.LogTrace("User {user}: Access denied to page {pageid}.", context.User.Identity.Name, this.CurrentContext.Page.Id);
           context.Fail();
         }
       }
@@ -81,14 +81,11 @@ namespace Nucleus.Core.Authorization
       //	context.Succeed(requirement);
       //}
 
-      if (this.CurrentContext.Page == null && this.CurrentContext.Module == null && !context.HasSucceeded)
+      if (this.CurrentContext.Page == null && !context.HasSucceeded)
       {
-        // if the PageRoutingMiddleware didn't find a page, and the ModuleRoutingMiddleware didn't find a
-        // module, and we haven't otherwise "succeeded", return success, since the user isn't trying to access
-        // a page or a module.  This allows:
-        // (a) Extensions which manage their own routes to work and
-        // (b) If no route matches, NET core can return a 404
-        context.Succeed(requirement);
+        // the user can't have Page view permission if no page was specified
+        Logger.LogTrace("User {0}: Access denied, no page specified.", context.User);
+        context.Fail();
       }
       return Task.CompletedTask;
     }

@@ -9,8 +9,8 @@
   </PropertyGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.4" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.4" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
@@ -35,8 +35,8 @@
 		<ProjectReference Include="$(SolutionDir)\Nucleus.Core\Nucleus.Core.csproj" />
 		<ProjectReference Include="$(SolutionDir)\Nucleus.Extensions\Nucleus.Extensions.csproj" />
 		<ProjectReference Include="$(SolutionDir)\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
-		<ProjectReference Include="$(SolutionDir)\Nucleus.Web.Admin\Nucleus.Web.Admin.csproj">
-		</ProjectReference>		
+		<ProjectReference Include="$(SolutionDir)\Nucleus.Web.Admin\Nucleus.Web.Admin.csproj" />
+		<ProjectReference Include="..\Nucleus.WebAssembly\Nucleus.WebAssembly.csproj" />		
 	</ItemGroup>
 	
 	<ItemGroup>

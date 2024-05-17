@@ -5,10 +5,11 @@ using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions;
@@ -24,7 +25,6 @@ using Nucleus.Core.FileSystemProviders;
 using Nucleus.Core.Layout;
 using Nucleus.Core.Logging;
 using Nucleus.Core.Plugins;
-using Nucleus.Extensions;
 
 namespace Nucleus.Core;
 
@@ -84,26 +84,6 @@ public static class CoreServiceExtensions
   }
 
   /// <summary>
-  /// Add Blazor and Razor components support (server and webassembly)
-  /// </summary>
-  /// <param name="services"></param>
-  /// <returns></returns>
-  public static IServiceCollection AddBlazor(this IServiceCollection services)
-  {
-    services.AddRazorComponents()
-      .AddInteractiveServerComponents()
-      .AddInteractiveWebAssemblyComponents();
-
-    services.AddServerSideBlazor();
-
-    // Experimental.  Accompanying code is Nucleus.Extensions\BlazorExtensions.cs
-    // add IActionResultExecutor for Nucleus.Extensions.BlazorExtensions.ComponentView
-    // services.AddScoped<IActionResultExecutor<ComponentViewResult>, ComponentViewResultExecutor>();
-
-    return services;
-  }
-
-  /// <summary>
   /// Add core service "manager" classes to the dependency injection services collection
   /// </summary>
   /// <param name="services"></param>
@@ -114,7 +94,7 @@ public static class CoreServiceExtensions
 
     // General-use services 
     services.AddSingleton<Nucleus.Abstractions.Models.Application>();
-    
+
     services.AddSingleton<IEventDispatcher, Services.EventDispatcher>();
     services.AddTransient<IMailClientFactory, Mail.MailClientFactory>();
     services.AddTransient<Abstractions.IPreflight, Nucleus.Core.Services.Preflight>();
@@ -188,6 +168,64 @@ public static class CoreServiceExtensions
     services.Configure<T>(configuration.GetSection(key), binderOptions => binderOptions.BindNonPublicProperties = true);
   }
 
+
+  /// <summary>
+  /// Add Blazor and Razor components support (server and webassembly)
+  /// </summary>
+  /// <param name="services"></param>
+  /// <returns></returns>
+  public static IServiceCollection AddBlazor(this IServiceCollection services)
+  {
+
+    services.AddRazorComponents()
+      .AddInteractiveServerComponents()
+      .AddInteractiveWebAssemblyComponents();
+    //AddHubOptions()
+
+    // Experimental.  Accompanying code (commented out) is Nucleus.Extensions\BlazorExtensions.cs
+    // add IActionResultExecutor for Nucleus.Extensions.BlazorExtensions.ComponentView
+    // services.AddScoped<IActionResultExecutor<ComponentViewResult>, ComponentViewResultExecutor>();
+
+    return services;
+  }
+
+  public static IEndpointRouteBuilder UseBlazor<T>(this IApplicationBuilder app, IWebHostEnvironment env, IEndpointRouteBuilder routes)
+  {
+    if (env.IsDevelopment())
+    {
+      app.UseWebAssemblyDebugging();
+
+      // Disable WebAssembly "hot reload", because it doesn't work with dynamically loaded Web Assemblies which are part of a Nucleus extension.  Any value that is
+      // not "debug" will disable wasm "hot reload".  This only affects Nucleus when debugging.
+
+      // Code reference: https://github.com/dotnet/aspnetcore/blob/main/src/Components/WebAssembly/Server/src/ComponentsWebAssemblyApplicationBuilderExtensions.cs
+      System.Environment.SetEnvironmentVariable("DOTNET_MODIFIABLE_ASSEMBLIES", "Release");
+    }
+
+    // map razor/blazor components, add server render modes and webassembly render modes, add assemblies in the extensions folder/subfolders which
+    // contain razor/blazor components
+    routes.MapRazorComponents<T>()
+      .AddInteractiveServerRenderMode()
+      .AddInteractiveWebAssemblyRenderMode()
+
+      // scan extensions which contain razor/blazor components for pages and map their endpoints.  Razor pages (which define their own routes)
+      // are not expected to be a common use case, but there's no reason not to support them.
+      .AddAdditionalAssemblies
+      (
+        AssemblyLoader.GetAssembliesImplementing<Microsoft.AspNetCore.Components.ComponentBase>(app.Logger())
+          .Where(assembly => assembly.Location.StartsWith(FolderOptions.GetExtensionsFolderStatic(false)))
+          .ToArray()
+      );
+
+    return routes;
+  }
+
+  /// <summary>
+  /// Add static file paths for the extensions, resources, shared and areas folders.
+  /// </summary>
+  /// <param name="app"></param>
+  /// <param name="env"></param>
+  /// <returns></returns>
   public static IApplicationBuilder UseStaticFilePaths(this IApplicationBuilder app, IWebHostEnvironment env)
   {
     List<IFileProvider> providers = [];
@@ -217,12 +255,12 @@ public static class CoreServiceExtensions
             context.Context.Response.GetTypedHeaders().CacheControl = STATIC_FILES_CACHE_CONTROL;
           }
         });
-        
+
         providers.Add(fileProvider);
       }
     }
 
-    if (env.ContentRootFileProvider is CompositeFileProvider compositeFileProvider) 
+    if (env.ContentRootFileProvider is CompositeFileProvider compositeFileProvider)
     {
       providers.InsertRange(0, compositeFileProvider.FileProviders);
     }
@@ -230,13 +268,11 @@ public static class CoreServiceExtensions
     {
       providers.Insert(0, env.ContentRootFileProvider);
     }
-    
+
     env.ContentRootFileProvider = new CompositeFileProvider(providers);
 
     return app;
   }
-  
-
 
   /// <summary>
   /// Use the specified Nucleus control panel.

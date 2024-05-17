@@ -30,4 +30,10 @@
     <Folder Include="Resources\css\" />
     <Folder Include="Resources\js\" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="license.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

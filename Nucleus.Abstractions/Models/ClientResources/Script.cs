@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Nucleus.Abstractions.Models.StaticResources;
-
+namespace Nucleus.Abstractions.Models.ClientResources;
 
 /// <summary>
 /// Represents a script which will be included in the page output.

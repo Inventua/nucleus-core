@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Nucleus.Abstractions.Models.StaticResources;
+namespace Nucleus.Abstractions.Models.ClientResources;
 
 /// <summary>
 /// Represents a stylesheet which is added as a link element in the page output.

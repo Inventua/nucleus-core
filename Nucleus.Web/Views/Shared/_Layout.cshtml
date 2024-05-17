@@ -43,6 +43,7 @@
 	@RenderSection("scripts", false)
 	@Html.RenderStyles()
 	@Html.RenderScripts()
+  @Html.RenderWebAssemblies()
 </head>
 <body class="@Model.ControlPanelDockingCssClass">
   @if (Model.CanEdit)

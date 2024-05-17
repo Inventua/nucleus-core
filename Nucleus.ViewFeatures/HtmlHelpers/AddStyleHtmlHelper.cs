@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models.Configuration;
-using Nucleus.Abstractions.Models.StaticResources;
+using Nucleus.Abstractions.Models.ClientResources;
 using Nucleus.Extensions;
 
 namespace Nucleus.ViewFeatures.HtmlHelpers
@@ -323,7 +323,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     {
       ResourceFileOptions resourceFileOptions = context.HttpContext.RequestServices.GetService<IOptions<ResourceFileOptions>>().Value;
       //Dictionary<string, Nucleus.Abstractions.Models.StaticResources.StyleSheet> stylesheets = (Dictionary<string, Nucleus.Abstractions.Models.StaticResources.StyleSheet>)context.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
-      ClientResources pageResources = (ClientResources)context.HttpContext.Items[Nucleus.Abstractions.Models.StaticResources.ClientResources.ITEMS_KEY] ?? new();
+      ClientResources pageResources = (ClientResources)context.HttpContext.Items[Nucleus.Abstractions.Models.ClientResources.ClientResources.ITEMS_KEY] ?? new();
       stylesheetPath = new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(context).Content(context.ResolveExtensionUrl(stylesheetPath));
 
       if (!pageResources.StyleSheets.ContainsKey(stylesheetPath))
@@ -341,7 +341,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
           }
         }
 
-        pageResources.StyleSheets.Add(stylesheetPath, new Nucleus.Abstractions.Models.StaticResources.StyleSheet()
+        pageResources.StyleSheets.Add(stylesheetPath, new Nucleus.Abstractions.Models.ClientResources.StyleSheet()
         {
           Path = finalStylesheetPath,
           Defer = defer,
@@ -350,7 +350,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
           SortIndex = sortIndex
         });
 
-        context.HttpContext.Items[Nucleus.Abstractions.Models.StaticResources.ClientResources.ITEMS_KEY] = pageResources;
+        context.HttpContext.Items[Nucleus.Abstractions.Models.ClientResources.ClientResources.ITEMS_KEY] = pageResources;
       }
 
       return new HtmlContentBuilder();
@@ -420,11 +420,11 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     {
       HtmlContentBuilder scriptOutput = new();
       //Dictionary<string, Nucleus.Abstractions.Models.StaticResources.StyleSheet> stylesheets = (Dictionary<string, Nucleus.Abstractions.Models.StaticResources.StyleSheet>)htmlHelper.ViewContext.HttpContext.Items[ITEMS_KEY] ?? new(StringComparer.OrdinalIgnoreCase);
-      ClientResources pageResources = (ClientResources)htmlHelper.ViewContext.HttpContext.Items[Nucleus.Abstractions.Models.StaticResources.ClientResources.ITEMS_KEY] ?? new();
+      ClientResources pageResources = (ClientResources)htmlHelper.ViewContext.HttpContext.Items[Nucleus.Abstractions.Models.ClientResources.ClientResources.ITEMS_KEY] ?? new();
      
       if (pageResources.StyleSheets.Any())
       {
-        foreach (KeyValuePair<string, Nucleus.Abstractions.Models.StaticResources.StyleSheet> style in pageResources.StyleSheets.OrderBy(sheet => sheet.Value.SortIndex))
+        foreach (KeyValuePair<string, Nucleus.Abstractions.Models.ClientResources.StyleSheet> style in pageResources.StyleSheets.OrderBy(sheet => sheet.Value.SortIndex))
         {
           if (!String.IsNullOrEmpty(style.Key))
           {
@@ -448,7 +448,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
         // Once consumed, clear the stylesheets item to prevent double-rendering in case RenderStyles is called twice.
         pageResources.StyleSheets.Clear();
-        htmlHelper.ViewContext.HttpContext.Items[Nucleus.Abstractions.Models.StaticResources.ClientResources.ITEMS_KEY] = pageResources;
+        htmlHelper.ViewContext.HttpContext.Items[Nucleus.Abstractions.Models.ClientResources.ClientResources.ITEMS_KEY] = pageResources;
       }
 
       return scriptOutput;

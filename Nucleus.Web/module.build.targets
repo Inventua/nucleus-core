@@ -139,6 +139,19 @@
 			Namespaces="&lt;Namespace Prefix='p' Uri='urn:nucleus/schemas/package/1.0'/&gt;"/>
 		<Message Importance="high" Text="Updated package.xml version to: $(PackageVersion)" />
 	</Target>
+  
+  <!-- Find Blazor WebAssembly build outputs from project references -->
+  <Target Name="IdentifyReferencedProjectWasmFiles" AfterTargets="PostBuildEvent">
+    <ItemGroup>
+      <ExtensionWasmFiles Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)bin\$(Configuration)\$(TargetFramework)\wwwroot\_framework\%(ProjectReference.FileName).wasm.*" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Copy Blazor WebAssembly build outputs from project references into the module /bin folder -->
+  <Target Name="CopyReferencedProjectWasmFiles" AfterTargets="PostBuildEvent">
+    <Message Text="Copying WASM Files: @(ExtensionWasmFiles)" Importance="high" />
+    <Copy SourceFiles="@(ExtensionWasmFiles)" DestinationFolder="bin\$(Configuration)\$(TargetFramework)\%(RecursiveDir)" Retries="2" />
+  </Target>
 	
 	<!-- Copy files to the dev environment if the project is being built in debug configuration -->
 	<Target Name="CopyToExtensionsFolder" AfterTargets="PostBuildEvent" Condition="'$(NUCLEUS_PATH)' != '' AND '$(ExtensionFolder)' != '' AND Exists('$(NUCLEUS_PATH)Extensions')">

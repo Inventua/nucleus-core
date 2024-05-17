@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions;
@@ -164,6 +165,15 @@ namespace Nucleus.Web
         // Enable health checks, if configured
         services.AddNucleusHealthChecks(this.Configuration);
 
+        // this makes output caching available to controllers, it does not do anything automatically
+        // https://learn.microsoft.com/en-au/aspnet/core/performance/caching/output?view=aspnetcore-8.0
+        services.AddOutputCache(options=> 
+        {
+          options.AddBasePolicy(builder => builder.Expire(TimeSpan.FromSeconds(10)));
+          options.AddPolicy("Expire20", builder => builder.Expire(TimeSpan.FromSeconds(20)));
+          options.AddPolicy("Expire30", builder => builder.Expire(TimeSpan.FromSeconds(30)));
+        });
+
         // Enable compression
         if (this.Configuration.GetValue<Boolean>(SETTING_RESPONSECOMPRESSION_ENABLED))
         {
@@ -278,6 +288,9 @@ namespace Nucleus.Web
     {
       try
       {
+        // this makes output caching available to controllers, it does not do anything automatically
+        app.UseOutputCache();
+
         app.UseNucleusOpenTelemetryEndPoint(this.Configuration, this.Environment);
 
         app.UseMiddleware<SecurityHeadersMiddleware>();
@@ -302,7 +315,7 @@ namespace Nucleus.Web
           app.Logger().LogInformation($"Using Response Compression.");
           app.UseResponseCompression();
         }
-
+                
         // Add file providers for embedded static resources in Nucleus.Web and in control panel implementations/extensions
         app.UseEmbeddedStaticFiles(this.Environment);
 
@@ -326,6 +339,7 @@ namespace Nucleus.Web
         // authorization handlers, but ModuleRoutingMiddleware does a permission check, which requires that Authentication has run - and
         // middleware is executed in the order of the code below
         //app.UseMiddleware<MergedFileProviderMiddleware>();
+
         app.UseMiddleware<PageRoutingMiddleware>();
         app.UseAuthentication();
         app.UseMiddleware<Nucleus.Core.FileSystemProviders.FileIntegrityCheckerMiddleware>();
@@ -346,18 +360,11 @@ namespace Nucleus.Web
           // map health check endpoint, if configured
           routes.MapNucleusHealthChecks(this.Configuration);
 
-          // "Razor Pages" (Razor Pages is different to Razor views with controllers [MVC])
+          // "Razor Pages" (Razor Pages is different to Razor views with controllers [MVC]).  We don't
+          // expect that using Razor pages will be a common use case, but there's no reason to not allow them.
           routes.MapRazorPages();
 
-          // Blazor SignalR hub
-          routes.MapBlazorHub();
-
-          // https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0
-          // https://chrissainty.com/using-blazor-components-in-an-existing-mvc-application/
-          RazorComponentsEndpointConventionBuilder razorEP = routes.MapRazorComponents<object>()
-            .AddInteractiveWebAssemblyRenderMode();
-          // .AddInteractiveServerRenderMode(); // this adds _framework/blazor.server.js a second time;
-          // .AddAdditionalAssemblies
+          app.UseBlazor<Nucleus.WebAssembly.Components.App>(this.Environment, routes);
 
           // Map the error page route
           routes.MapControllerRoute(
@@ -368,17 +375,17 @@ namespace Nucleus.Web
           // map area routes for the admin controllers
           routes.MapControllerRoute(
                 name: RoutingConstants.AREA_ROUTE_NAME,
-                pattern: "/{area}/{controller}/{action=Index}/{id?}");
+                pattern: RoutingConstants.AREA_ROUTE_PATH);
 
           // map routes for extension controllers
           routes.MapControllerRoute(
               name: RoutingConstants.EXTENSIONS_ROUTE_NAME,
-              pattern: $"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
+              pattern: RoutingConstants.EXTENSIONS_ROUTE_PATH);
 
-          // we're not currently using this route for anything
-          routes.MapControllerRoute(
-              name: RoutingConstants.API_ROUTE_NAME,
-              pattern: $"/{RoutingConstants.API_ROUTE_PATH}/{{extension:exists}}/{{controller}}/{{action=Index}}/{{mid?}}/{{id?}}");
+        // we're not currently using this route for anything
+        routes.MapControllerRoute(
+            name: RoutingConstants.API_ROUTE_NAME,
+            pattern: RoutingConstants.API_ROUTE_PATH);
 
           // Map the site map controller to /sitemap.xml
           routes.MapControllerRoute(
@@ -392,8 +399,7 @@ namespace Nucleus.Web
               pattern: $"/{RoutingConstants.ROBOTS_ROUTE_PATH}",
               defaults: new { controller = "Sitemap", action = "Robots" });
 
-
-          // Configure controller routes using attribute-based routing
+          // Configure controller routes for controllers which are using attribute-based routing
           routes.MapControllers();
         });
 

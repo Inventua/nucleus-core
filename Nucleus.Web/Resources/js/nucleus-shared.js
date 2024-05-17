@@ -13,12 +13,17 @@ function _Page()
   this.Dialog = _dialog;
   this.EnableEnhancedToolTips = _enableEnhancedToolTips;
   this.ClosePopupDialog = _closePopupDialog;
+  this.AddWasmRuntimeAssemblies = _addWasmRuntimeAssemblies;
+
+  // public properties
+  this.WasmRuntimeAssemblies = function() { return _WasmRuntimeAssemblies; };
 
   // constants
   var DIALOG_ID = 'nucleus-dialog';
 
   // private properties
   var _progressTimeoutId = -1;
+  var _WasmRuntimeAssemblies = [];
 
   // attach Nucleus-standard event handlers when document is ready
   jQuery(function ()
@@ -1255,7 +1260,7 @@ function _Page()
     }
 
     // if we get an empty response, and the target is in an iframe and the iFrame is not #AdminFrame, hide the iframe and refresh the page
-    if (window.self !== window.top && data === '' && (jQuery(frameElement).attr('id') !== 'AdminFrame' || source.hasClass('nucleus-dialogresult')))
+    if (window.self !== window.top && data === '' && (jQuery(frameElement).attr('id') !== 'nucleus-admin-frame' || source.hasClass('nucleus-dialogresult')))
     {
       jQuery(frameElement).hide();
       window.parent.document.dispatchEvent(new CustomEvent('Refresh'));
@@ -1537,6 +1542,31 @@ function _Page()
     {
       modal.removeClass('modal-full-size');
     }
+  }
+
+  function _addWasmRuntimeAssemblies(assemblies)
+  {
+    if (typeof assemblies === 'string')
+    {
+      _addWasmRuntimeAssembly(assemblies);
+    }
+    else
+    {
+      for (var index = 0; index < assemblies.length; index++)
+      {
+        _addWasmRuntimeAssembly(assemblies[index]);
+      }
+    }
+  }
+
+  function _addWasmRuntimeAssembly(assembly)
+  {
+    // check for duplicate
+    for (var index = 0; index < _WasmRuntimeAssemblies.length; index++)
+    {
+      if (_WasmRuntimeAssemblies[index] === assembly) return;
+    }
+    _WasmRuntimeAssemblies.push(assembly);
   }
 
   function _closePopupDialog(source)

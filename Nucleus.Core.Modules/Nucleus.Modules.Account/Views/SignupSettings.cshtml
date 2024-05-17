@@ -1,10 +1,32 @@
-﻿@model Nucleus.Modules.Account.ViewModels.Signup
+﻿@model Nucleus.Modules.Account.ViewModels.SignupSettings
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
 @using Nucleus.Abstractions
-@using Nucleus.Abstractions.Models.Configuration
 <h2 class="nucleus-modal-caption">Signup Module Settings</h2>
-<div class="alert alert-secondary">
-	This module has no settings.
-</div>
+@using (Html.BeginNucleusForm("SaveSettings", "SignupAdmin", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+  <fieldset role="group" aria-label="reCAPTCHA Settings" class="flex-grow-1">
+    <SettingsControl caption="reCAPTCHA Site Key" helptext="Specifies your reCAPTCHA site key. Visit https://www.google.com/recaptcha/admin/create to create a site key.">
+      @Html.TextBoxFor(model => model.RecaptchaSiteKey)
+    </SettingsControl>
+
+    <div class="nucleus-flex-fields">
+      <SettingsControl caption="reCAPTCHA Secret Key" helptext="Specifies your reCAPTCHA secret key." class="flex-grow-2">
+        @Html.PasswordFor(model => model.RecaptchaSecretKey, new { value = (Model.IsSecretKeySet ? Nucleus.Modules.Account.ViewModels.SignupSettings.DUMMY_PASSWORD : "") })
+      </SettingsControl>
+
+      <SettingsControl caption="reCAPTCHA Action" helptext="Specifies your reCAPTCHA action using only alphanumeric characters, slashes, and underscore. This is used in the reCAPTCHA admin console for reporting and for adaptive risk analysis." class="flex-grow-2">
+        @Html.TextBoxFor(model => model.RecaptchaAction)
+      </SettingsControl>
+
+      <SettingsControl caption="reCAPTCHA Score Threshold" helptext="Specifies the minimum required reCAPTCHA interaction score. A value of 0 permits all messages, while a value of 1 blocks all messages. The default setting is 0.5.">
+        @Html.TextBoxFor(model => model.RecaptchaScoreThreshold, new { @type = "number", @inputmode = "decimal", @min = "0.0", @max = "1.0", @step = "0.1" })
+      </SettingsControl>
+    </div>
+  </fieldset>
+  <div class="nucleus-form-buttonrow">
+    @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "SignupAdmin", "Account"), new { })
+  </div>
+}
 

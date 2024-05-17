@@ -139,6 +139,23 @@ namespace Nucleus.Web
       {
         if (!String.IsNullOrEmpty(launchUrl))
         {
+          IConfiguration configuration = WebHost.Services.GetService<IConfiguration>();
+          string httpUrl = configuration.GetSection("Kestrel:EndPoints:Http:Url").Value;
+          string httpsUrl = configuration.GetSection("Kestrel:EndPoints:Https:Url").Value;
+
+          switch (launchUrl)
+          {
+            case "{auto}":
+              launchUrl = !String.IsNullOrEmpty(httpsUrl) ? httpsUrl : httpUrl;
+              break;
+            case "{auto.https}":
+              launchUrl = httpsUrl;
+              break;
+            case "{auto.http}":
+              launchUrl = httpUrl;
+              break;
+          }
+
           try
           {
             System.Diagnostics.Process.Start

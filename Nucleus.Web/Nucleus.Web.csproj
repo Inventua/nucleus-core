@@ -5,9 +5,12 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>    
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
   </PropertyGroup>
-	
+  
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+  </PropertyGroup>
+  
 	<ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.4" />
@@ -110,6 +113,7 @@
 		<None Remove="Utils\Ubuntu\appSettings.template" />
 		<None Remove="Utils\Ubuntu\nucleus-install.sh" />
 		<None Remove="Utils\Ubuntu\nucleus.service" />
+		<None Remove="Utils\Windows\nucleus_install.ps1" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -123,6 +127,7 @@
 		</EmbeddedResource>
 		<Content Include="Resources\js\nucleus-admin-extensions.js" />
 		<Content Include="Resources\js\nucleus-admin-extensions.min.js" />
+		<Content Include="Utils\Windows\nucleus_install.ps1" />
 		<EmbeddedResource Include="Areas\Setup\Views\SiteWizard\Complete.js">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>
@@ -158,12 +163,12 @@
 		<Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.css" />
 		<Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.min.css" />
 		<Content Include="Resources\material-icons.woff2" />
-		<Content Include="Setup\Templates\Site\empty-site-template.xml">
+		<Content Include="Setup\Templates\Site\*.xml">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
-		<Content Include="Setup\Templates\Site\default-site-template.xml">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
+    <Content Include="Setup\Extensions\*.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
 		<Content Include="Shared\Containers\container-styles.css">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
@@ -197,7 +202,6 @@
 	<ItemGroup>
 		<Folder Include="Properties\ServiceDependencies\" />
 		<Folder Include="Resources\Libraries\jQuery\3.7.1\" />
-		<Folder Include="Utils\Windows\" />
 	</ItemGroup>
 
 	<ItemGroup>

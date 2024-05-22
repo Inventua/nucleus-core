@@ -267,6 +267,21 @@ class Application
     return $this.GetApplicationPool($this.ApplicationPool)
   } 
 
+  [boolean] IsPortInUse ()
+  {
+    $val = $false;
+    $manager = Get-IISServerManager
+    $manager.Sites | ForEach-Object { 
+      $_.Bindings | ForEach-Object { 
+        if ($_.bindingInformation -match ".*:$($this.Port):") 
+        {
+          $val = $true 
+        }
+      } 
+    }
+    return $val
+  } 
+
   [void]WriteLine([string]$caption, [string]$value)
   {
     $this.WriteLine($caption, $value, $false);
@@ -323,6 +338,10 @@ class Application
     if ($this.GetWebSite() -eq $null)
     {
 	    Write-Host "- Create an IIS site named '$($this.Site)'." -ForeGroundColor yellow
+      if ($this.IsPortInUse())
+      {
+        Write-Host "  WARNING: Port $($this.Port) is already in use.  You must change the port to another value." -ForeGroundColor red
+      }
     }
     else
     {
@@ -377,7 +396,7 @@ class Application
     }
     else
     {
-      Write-Host "- Not create or change permissions on '$appSettingsFile' because it already exists."
+      Write-Host "- Not create '$appSettingsFile' or change permissions because the file already exists."
     }
 
     if (-not (Test-Path -Path $databaseSettingsFile))
@@ -386,7 +405,7 @@ class Application
     }
     else
     {
-      Write-Host "- Not create or change permissions on '$databaseSettingsFile' because it already exists."
+      Write-Host "- Not create '$databaseSettingsFile' or change permissions because the file already exists."
     }
 
     Write-Host "- Set permissions on '$($this.Path)' for the Application Pool user." -ForeGroundColor yellow
@@ -432,8 +451,8 @@ class Application
 		{
       Write-Host "Creating IIS web site '$($this.Site)' ..." -NoNewLine
       $binding = ("{0}{1}{2}" -f "*:", $this.Port, ":")
-			$newSite = New-IISSite -Name $this.Site -PhysicalPath $this.Path -BindingInformation $binding
-      $newSite.ApplicationPoolName = $this.ApplicationPool
+			$newSite = New-IISSite -Name $this.Site -PhysicalPath $this.Path -BindingInformation $binding -PassThru
+      $newSite.Applications["/"].ApplicationPoolName = $this.ApplicationPool
       $manager.CommitChanges();
 			Write-Host " OK."
 		}    
@@ -717,6 +736,20 @@ if ($cancel -ne $true)
     $application.Name = ""
   }
 
+  # validate
+  if ($application.GetWebSite() -eq $null)
+  {
+	  if ($application.IsPortInUse())
+    {
+      $cancel = $true
+      Write-Host "Port $($application.Port) is already in use.  You must use a different value." -ForeGroundColor red
+      Write-Host ""
+    }
+  }
+}
+
+if ($cancel -ne $true)
+{
   $application.Create()
     
   Write-Host ""

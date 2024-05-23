@@ -113,7 +113,7 @@
 		<None Remove="Utils\Ubuntu\appSettings.template" />
 		<None Remove="Utils\Ubuntu\nucleus-install.sh" />
 		<None Remove="Utils\Ubuntu\nucleus.service" />
-		<None Remove="Utils\Windows\nucleus_install.ps1" />
+		<None Remove="Utils\Windows\nucleus-install.ps1" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -127,7 +127,7 @@
 		</EmbeddedResource>
 		<Content Include="Resources\js\nucleus-admin-extensions.js" />
 		<Content Include="Resources\js\nucleus-admin-extensions.min.js" />
-		<Content Include="Utils\Windows\nucleus_install.ps1" />
+		<Content Include="Utils\Windows\nucleus-install.ps1" />
 		<EmbeddedResource Include="Areas\Setup\Views\SiteWizard\Complete.js">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>

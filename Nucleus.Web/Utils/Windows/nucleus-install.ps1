@@ -7,7 +7,19 @@
   .SYNOPSIS
     Set up Nucleus in a Windows/IIS environment
   .EXAMPLE
-    nucleus-install.ps1 -Site "Nucleus"
+    .\nucleus-install.ps1 -Name "Nucleus"
+    Install Nucleus with default settings and create an IIS Application in the default site named "Nucleus"
+  .EXAMPLE
+    .\nucleus_install.ps1  -Name "NucleusTest" -Environment "Testing" 
+    Install Nucleus with default settings and create an IIS Application in the default site named "NucleusTest", set 
+    web.config to use an ASP.NET environment "Testing", and create config files named appSettings.Testing.json and 
+    databaseSettings.Testing.json
+  .EXAMPLE
+    .\nucleus-install.ps1 -NetCoreVersion ""
+    Install Nucleus with default settings and prevent installation of ASP.NET core.
+  .EXAMPLE
+    .\nucleus-install.ps1 -AutoInstall -OverwriteExisting
+    Install Nucleus with default settings, overwriting exsiting data and with no further user input required.
   .DESCRIPTION
     This script performs tasks to set up Nucleus in a Windows/IIS environment:
     - Install ASP.NET core if it is not already installed.
@@ -15,9 +27,11 @@
     - If the specified IIS site does not already exist, create it.
     - If the specified IIS application does not already exist, create it.
     - If the specified Application Pool does not exist, create it.
-    - Create an empty appSettings.Testing.json file if it does not already exist and set permissions for the Application Pool user.
-    - Create an empty databaseSettings.Testing.json file if it does not already exist and set permissions for the Application Pool user.
-    - Set permissions on the Nucleus install folder for the Application Pool user.
+    - Create an empty appSettings.[environment].json file if it does not already exist and set Read/Write 
+      permissions for the Application Pool user.
+    - Create an empty databaseSettings.[environment]].json file if it does not already exist and set Read/Write 
+      permissions for the Application Pool user.
+    - Set Read/Execute permissions on the Nucleus install folder for the Application Pool user.
     - Set the ASPNETCORE_ENVIRONMENT environment variable in web.config to the specified Environment.
   .PARAMETER Site
     Default: Default Web Site
@@ -29,11 +43,11 @@
     Default: Nucleus
     Specifies the name of the IIS application to create or update.
   .PARAMETER ApplicationPool
-    Default: Application name plus "AppPool"
+    Default: Application name (-Name) plus "AppPool"
     Specifies the name of the IIS Application Pool to create or update.
   .PARAMETER Path
-    Default: If this script is run from within an installed Nucleus folder (in Utils\Windows), the existing Nucleus install folder.  Otherwise
-    the folder which contains this script.
+    Default: If this script is run from within an installed Nucleus folder (in Utils\Windows), the existing 
+    Nucleus install folder.  Otherwise, the folder which contains this script.
     Specifies the folder where Nucleus is installed.
   .PARAMETER DataPath
     Default: C:\ProgramData\Nucleus
@@ -45,28 +59,30 @@
     Default: Production
     Specifies the environment name to configure for your installation.
   .PARAMETER ZipFile
-    Default: Auto-detected
-    Specifies a install or upgrade package to unzip.  If there is no zip file present in the script folder and this parameter is not specified, 
-    the script assumes that a package has been manually un-zipped, so no package file needs to be unzipped.
+    Default: detect
+    Specifies an install or upgrade package to unzip.  If there is no zip file present in the installation folder 
+    and this parameter is not specified, the script assumes that a package has been manually un-zipped, so no 
+    package file needs to be unzipped.
   .PARAMETER OverwriteExisting 
     Default: false
-    If true, specifies that the script can update path, application pool and other settings on existing IIS objects, if they already 
-    exist.  If this value is false, existing objects are not updated.
+    If set, specifies that the script can update path, application pool and other settings on existing IIS 
+    objects, if they already exist.  If this option is not used, existing objects are not updated, and may
+    have the wrong values.
   .PARAMETER AutoInstall
     Default: false
-    If true, the script will execute without user input.
+    If set, the script will execute without user input.
 #>
 
 param (
 		[string]$Site = "Default Web Site",
 		[int]$Port = 80,
 		[string]$Name = "Nucleus",
-		[string]$ApplicationPool = ("{0}{1}" -f $Name, "AppPool"),
+		[string]$ApplicationPool = "",
 		[string]$Path = "",
 		[string]$DataPath = "C:\ProgramData\Nucleus",
 		[string]$NetCoreVersion = "8.0.4",
     [string]$Environment = "Production",
-    [string]$ZipFile = "",
+    [string]$ZipFile = "detect",
     [switch]$OverwriteExisting = $false,
     [switch]$AutoInstall = $false		
 )
@@ -149,7 +165,7 @@ class Application
 	{
 		try
 		{
-		  $val = ((& "dotnet" --list-runtimes | Out-String -Stream | Select-String "Microsoft.AspNetCore.App $($this.NetCoreVersion)") -match "Microsoft.AspNetCore.App $($this.NetCoreVersion)");
+		  $val = ((& "dotnet" --list-runtimes | Out-String -Stream | Select-String "Microsoft.AspNetCore.App $($this.NetCoreVersion)") -match "Microsoft.AspNetCore.App $($this.NetCoreVersion)")
 		
 			if ($val -eq $true)
 			{
@@ -175,8 +191,7 @@ class Application
     # Run a separate PowerShell process because the script calls exit, so it will end the current PowerShell session.
     &powershell -NoProfile -ExecutionPolicy unrestricted -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; &([scriptblock]::Create((Invoke-WebRequest -UseBasicParsing 'https://dot.net/v1/dotnet-install.ps1'))) -Runtime aspnetcore -Version $($this.NetCoreVersion)"
   }
-
-  
+    
   #
   # Create a folder 
   #
@@ -282,11 +297,97 @@ class Application
     return $val
   } 
 
+  # return whether an upzip package was specified or detected
+  [boolean]DoUnzip()
+  {
+    return ($this.ZipFile -ne "") -and ($this.ZipFile -ne $null)
+  }
+  
+  # return whether the web site exists
+  [boolean]WebSiteExists()
+  {
+    return $this.GetWebSite() -eq $null
+  }
+  
+  # return whether to overwrite existing web site settings
+  # That is, OverwriteExisting=true and the web application name is an empty string
+  [boolean]DoUpdateWebSite()
+  {
+    return ($this.OverwriteExisting -eq $true) -and ($this.Name -eq "")
+  }
+
+  # return whether a web application should be created or updated
+  # That is, Name has not been set to an empty string
+  [boolean]DoCreateWebApplication()
+  {
+    return $this.Name -ne ""
+  }
+
+  # return whether to install ASP.net
+  # That is, NetCoreVersion is not set to anm empty string, and the specified version is not already installed
+  [boolean]DoInstallAspNet()
+  {
+    return (($this.NetCoreVersion -ne "") -and (-not ($this.IsDotNetInstalled)))
+  }
+
+  # return whether the application pool exists
+  [boolean]ApplicationPoolExists()
+  {
+    return $this.GetApplicationPool() -ne $null
+  }
+
+  # return whether the DataPath folder already exists
+  [boolean]DataPathExists()
+  {
+    return Test-Path -Path $this.DataPath
+  }
+
+  # return the appSettings configuration file name for the specified environment
+  [string]GetAppSettingsFileName()
+  {
+    return ("{0}{1}{2}{3}" -f $this.Path, "\appSettings.", $this.Environment, ".json")
+  }
+
+  # return the databaseSettings configuration file name for the specified environment
+  [string]GetDatabaseSettingsFileName()
+  {
+    return ("{0}{1}{2}{3}" -f $this.Path, "\databaseSettings.", $this.Environment, ".json")
+  }
+
+  [string]GetWebConfigEnvironment()
+  {
+    $webConfigFile = "$($this.Path)\web.config"
+    if (Test-Path -Path $webConfigFile)
+    {
+      $xml = [xml](Get-Content -Path $webConfigFile)
+      $setting = $xml.SelectSingleNode("//system.webServer/aspNetCore/environmentVariables/environmentVariable[@name='ASPNETCORE_ENVIRONMENT']")
+
+      return $setting.Value
+    }
+    else
+    {
+      return $null
+    }
+  }
+
+  # return whether to update the ASPNETCORE_ENVIRONMENT element in web.config
+  # 1. web.config must exist or ZipFile must be set (the zip file contains a web.config)
+  # 2. If the file exists, it must have no existing value, or have a value that does not match the configured environment
+  [boolean]DoUpdateWebConfig()
+  {
+    $webConfigFile = "$($this.Path)\web.config"
+    
+    $val = $this.GetWebConfigEnvironment()
+    return ((($this.ZipFile -ne "") -or (Test-Path -Path $webConfigFile)) -and ($val -ne $this.Environment))
+  }
+
+  # display a setting on-screen 
   [void]WriteLine([string]$caption, [string]$value)
   {
     $this.WriteLine($caption, $value, $false);
   }
 
+  # display a setting on-screen
   [void]WriteLine([string]$caption, [string]$value, [boolean]$highlight)
   {
     [int]$chars = 30
@@ -298,6 +399,7 @@ class Application
     Write-Host - "$("$($caption):".PadRight($chars)) $value" -ForeGroundColor $color
   }
   
+  # display current settings 
   [void] DisplaySettings()
   {
     Write-Host ""
@@ -317,25 +419,32 @@ class Application
     Write-Host "This script will:"
     Write-Host "-----------------"
 
-    if ($this.IsDotNetInstalled)
+    if ($this.DoInstallAspNet())
     {
-	    Write-Host "- Not install ASP.NET core, because version $($this.NetCoreVersion) is already installed."
+      Write-Host "- Install ASP.NET core $($this.NetCoreVersion)"
     }
     else
     {
-	    Write-Host "- Install ASP.NET core $($this.NetCoreVersion)"
+	    if ($this.NetCoreVersion -eq "")
+	    {
+        Write-Host "- Not install ASP.NET core, because you set NetCoreVersion to an empty value."
+      }
+      else
+      {
+        Write-Host "- Not install ASP.NET core, because version $($this.NetCoreVersion) is already installed."
+      }
     }
 
-    if ($this.ZipFile -eq "")
-    {
-      Write-Host "- Not un-zip any install or update package."
-    }
-    else
+    if ($this.DoUnzip())
     {
       Write-Host "- Un-zip '$($this.ZipFile)' to '$($this.Path)'." -ForeGroundColor yellow
     }
+    else
+    {
+      Write-Host "- Not un-zip any install or update package."
+    }
 
-    if ($this.GetWebSite() -eq $null)
+    if ($this.WebSiteExists())
     {
 	    Write-Host "- Create an IIS site named '$($this.Site)'." -ForeGroundColor yellow
       if ($this.IsPortInUse())
@@ -346,7 +455,7 @@ class Application
     else
     {
       # we only overwrite web site settings if this.Name is empty and OverwriteExisting = true
-      if (($this.OverwriteExisting) -and ($this.Name -eq ""))
+      if ($this.DoUpdateWebSite())
 	    {
         Write-Host "- Overwrite the existing values for the IIS site named '$($this.Site)'." -ForeGroundColor yellow
       }
@@ -354,6 +463,20 @@ class Application
       {
         Write-Host "- Not create an IIS site named '$($this.Site)', because it already exists."
       }
+    }
+
+    if (-not $this.ApplicationPoolExists())
+    {
+	    Write-Host "- Create an Application Pool named '$($this.ApplicationPool)'." -ForeGroundColor yellow
+    }
+    else 
+    {
+	    Write-Host "- Not create an Application Pool named '$($this.ApplicationPool)' because it already exists."
+    }
+    
+    if (-not ($this.DataPathExists()))
+    {
+      Write-Host "- Create an Application Data folder named '$($this.DataPath)' and set permissions`n  for the Application Pool user." -ForeGroundColor yellow
     }
 
     # Create the new application if it already doesn't exist
@@ -373,45 +496,58 @@ class Application
       }
     }
 
-    if ($this.GetApplicationPool() -eq $null)
-    {
-	    Write-Host "- Create an Application Pool named '$($this.ApplicationPool)'." -ForeGroundColor yellow
-    }
-    else 
-    {
-	    Write-Host "- Not create an Application Pool named '$($this.ApplicationPool)' because it already exists."
-    }
-    
-    if (-not (Test-Path -Path $this.DataPath))
-    {
-      Write-Host "- Create an Application Data folder named '$($this.DataPath)' and set permissions for the Application Pool user." -ForeGroundColor yellow
-    }
-
-    $appSettingsFile = ("{0}{1}{2}{3}" -f $this.Path, "\appSettings.", $this.Environment, ".json")
-    $databaseSettingsFile = ("{0}{1}{2}{3}" -f $this.Path, "\databaseSettings.", $this.Environment, ".json")
+    $appSettingsFile = $this.GetAppSettingsFileName()
+    $databaseSettingsFile = $this.GetDatabaseSettingsFileName()
 
     if (-not (Test-Path -Path $appSettingsFile))
     {      
-      Write-Host "- Create an empty '$appSettingsFile' file, and set permissions for the Application Pool user." -ForeGroundColor yellow
+      Write-Host "- Create an empty '$appSettingsFile' file, and set Read/Modify permissions`n  for the Application Pool user." -ForeGroundColor yellow
     }
     else
     {
-      Write-Host "- Not create '$appSettingsFile' or change permissions because the file already exists."
+      Write-Host "- Not create '$appSettingsFile' or set permissions because the file already exists."
+     
+      # check for an already-configured DataPath setting that doesn't match the current settings 
+      $json = Get-Content -Path  $appSettingsFile -Force | ConvertFrom-Json 
+
+      if (($json.Nucleus -ne $null) -and ($json.Nucleus.FolderOptions -ne $null) -and ($json.Nucleus.FolderOptions.DataFolder -ne $null))
+      {
+        if ($json.Nucleus.FolderOptions.DataFolder -ne $this.DataPath)
+        {
+          Write-Host "  WARNING:`n  '$appSettingsFile' has a DataFolder setting that does not match '$($this.DataPath)'." -ForeGroundColor red
+          Write-Host "  This process will not automatically update the setting, you must edit the file manually." -ForeGroundColor red
+        }
+      }    
     }
 
     if (-not (Test-Path -Path $databaseSettingsFile))
     {      
-      Write-Host "- Create an empty '$databaseSettingsFile' file, and set permissions for the Application Pool user." -ForeGroundColor yellow
+      Write-Host "- Create an empty '$databaseSettingsFile' file, and set Read/Modify permissions`n  for the Application Pool user." -ForeGroundColor yellow
     }
     else
     {
-      Write-Host "- Not create '$databaseSettingsFile' or change permissions because the file already exists."
+      Write-Host "- Not create '$databaseSettingsFile' or set permissions because the file already exists."
     }
 
-    Write-Host "- Set permissions on '$($this.Path)' for the Application Pool user." -ForeGroundColor yellow
+    Write-Host "- Set Read/Execute permissions on the '$($this.Path)' folder for the Application Pool user." -ForeGroundColor yellow
     
     $webConfigFile = "$($this.Path)\web.config"
-    Write-Host "- Set the ASPNETCORE_ENVIRONMENT environment variable in $($webConfigFile)'." -ForeGroundColor yellow
+      
+    if ($this.DoUpdateWebConfig())
+    {
+      Write-Host "- Set the ASPNETCORE_ENVIRONMENT environment variable in $($webConfigFile)' to '$($this.Environment)'." -ForeGroundColor yellow
+    }
+    else
+    {
+      if (-not (Test-Path -Path $webConfigFile))
+      {
+        Write-Host "- Not set the ASPNETCORE_ENVIRONMENT environment variable in $($webConfigFile)' because the file does not exist." 
+      }
+      else
+      {
+        Write-Host "- Not set the ASPNETCORE_ENVIRONMENT environment variable in $($webConfigFile)' because it is already set." 
+      }
+    }
 
     Write-Host ""
   }
@@ -420,58 +556,54 @@ class Application
   [void]Create()
   {    
     # install ASP.NET Core 
-    if (-not $this.IsDotNetInstalled) 
+    if ($this.DoInstallAspNet())
     {
-		  Write-Host "Installing ASP.Net Core version '$($this.DotNetVersion)' ..."
+		  Write-Host "Installing ASP.Net Core version '$($this.NetCoreVersion)' ..."
 		  $this.InstallWindowsHostingBundle()
     }
 
     # unzip the application install or upgrade Set
-    if (($this.ZipFile -ne "") -and ($this.ZipFile -ne $null))
+    if ($this.DoUnzip())
     {
-      Write-Host "Un-zipping $($this.ZipFile) to $($this.Path)  ..."
+      Write-Host "Un-zipping $($this.ZipFile) to $($this.Path)  ..." -NoNewLine
       Expand-Archive -Path $this.ZipFile -DestinationPath $this.Path -Force
+		  Write-Host " OK."
     }
 
+    Start-IISCommitDelay
     $manager = Get-IISServerManager
 
     # Create the application pool 
-    if ($this.GetApplicationPool() -eq $null)
-    {
+    if (-not $this.ApplicationPoolExists())
+    {      
       Write-Host "Creating Application Pool '$($this.ApplicationPool)' ..." -NoNewLine
       $pool = $manager.ApplicationPools.Add($this.ApplicationPool)      
       $pool.ManagedRuntimeVersion = "v4.0"
-      $manager.CommitChanges();
-		  # Set-ItemProperty -Path ("{0}{1}" -f "IIS:\AppPools\", $this.ApplicationPool) managedRuntimeVersion "v4.0"
 		  Write-Host " OK."
     }
 
     # Create the web site 
-    if ($this.GetWebSite() -eq $null)
-		{
+    if ($this.WebSiteExists())
+		{      
       Write-Host "Creating IIS web site '$($this.Site)' ..." -NoNewLine
       $binding = ("{0}{1}{2}" -f "*:", $this.Port, ":")
 			$newSite = New-IISSite -Name $this.Site -PhysicalPath $this.Path -BindingInformation $binding -PassThru
       $newSite.Applications["/"].ApplicationPoolName = $this.ApplicationPool
-      $manager.CommitChanges();
 			Write-Host " OK."
 		}    
-    elseif (($this.OverwriteExisting -eq $true) -and ($this.Path -eq ""))
+    elseif ($this.DoUpdateWebSite())
     {
       # overwrite the web site settings 
       Write-Host "Updating IIS web site '$($this.Site)' ..." -NoNewLine
       $existingSite = $manager.Sites[$this.Site]
       $existingSite.Applications["/"].VirtualDirectories["/"].PhysicalPath = $this.Path
       $existingSite.Applications["/"].ApplicationPoolName = $this.ApplicationPool
-      $manager.CommitChanges();
 			Write-Host " OK."
-      #Set-ItemProperty IIS:\Sites\$this.Site -name physicalPath -value $this.Path
-      #Set-ItemProperty IIS:\Sites\$this.Site -name applicationPool -value $this.ApplicationPool
     }
 		
     # Create the web application, if the configured name is not blank.  If the configured name is blank, that means that Nucleus 
     # is being set up at the "web site" level, rather than as an application within a web site.
-    if ($this.Name -ne "")
+    if ($this.DoCreateWebApplication())
     {
 		  $existingWebSite = $manager.Sites[$this.Site]
       if ($this.GetWebApplication() -eq $null) 
@@ -479,9 +611,7 @@ class Application
         Write-Host "Creating Web Application '$($this.Name)' using path '$($this.Path)' ..." -NoNewLine
         $newApplication = $existingWebSite.Applications.Add(("{0}{1}" -f "/", $this.Name), $this.Path)
         $newApplication.ApplicationPoolName = $this.ApplicationPool
-        $manager.CommitChanges();
-		    #New-WebApplication -Site $this.Site -Name $this.Name -PhysicalPath $this.Path -ApplicationPool $this.ApplicationPool -Verbose
-		    Write-Host " OK."
+        Write-Host " OK."
       }
       elseif ($this.OverwriteExisting -eq $true)
       {
@@ -490,31 +620,32 @@ class Application
         $existingApplication = $existingWebSite.Applications[("{0}{1}" -f "/", $this.Name)]
         $existingApplication.VirtualDirectories["/"].PhysicalPath = $this.Path
         $existingApplication.ApplicationPoolName = $this.ApplicationPool
-        $manager.CommitChanges();
         Write-Host " OK."
-        # Set-ItemProperty IIS:\Sites\$this.Site\$this.Name -name physicalPath -value $this.Path
-        # Set-ItemProperty IIS:\Sites\$this.Site\$this.Name -name applicationPool -value $this.ApplicationPool
       }
     }
+    
+    Stop-IISCommitDelay
+    $manager.CommitChanges();
+		    
     $appPoolUser = ("{0}\{1}" -f "IIS AppPool", $this.ApplicationPool)
     
     # Set permissions for the install folder
-    Write-Host "Setting permissions for user '$($appPoolUser)' on '$($this.Path)'... " -NoNewLine
+    Write-Host "Setting Read/Execute permissions on the '$($this.Path)' folder for the user '$($appPoolUser)'... " -NoNewLine
     (& ICACLS $this.Path /grant ("{0}{1}" -f $appPoolUser, ":(OI)(CI)RX"))
     Write-Host "OK."
 
     # Create config files for the specified environment and set permissions 
-    $appSettingsFile = ("{0}{1}{2}{3}" -f $this.Path, "\appSettings.", $this.Environment, ".json")
+    $appSettingsFile = $this.GetAppSettingsFileName()
     if (-not (Test-Path -Path $appSettingsFile))
     {
-      Write-Host "Creating $($appSettingsFile) and setting permissions for user '$($appPoolUser)'... " -NoNewLine
+      Write-Host "Creating a $($appSettingsFile) file and setting Read/Modify permissions for the user '$($appPoolUser)'... " -NoNewLine
       $content = "{`n`t""Nucleus"": {`n`t`t""FolderOptions"": {`n`t`t`t""DataFolder"": """"`n`t`t }`n`t}`n}"
       New-Item -Path $appSettingsFile -ItemType "file" -Value $content
       (& ICACLS $appSettingsFile /grant ("{0}{1}" -f $appPoolUser, ":RM"))
       Write-Host "OK."
     }   
     
-    # configure data Path
+    # configure the app data Path in appSettings.[environment.json
     $json = Get-Content -Path  $appSettingsFile -Force | ConvertFrom-Json 
 
     if (($json.Nucleus.FolderOptions -ne $null) -and ($json.Nucleus.FolderOptions.DataFolder -ne $null))
@@ -524,55 +655,57 @@ class Application
     $json | ConvertTo-Json | Out-File $appSettingsFile  
 
 
-    $databaseSettingsFile = ("{0}{1}{2}{3}" -f $this.Path, "\databaseSettings.", $this.Environment, ".json")
+    $databaseSettingsFile = $this.GetDatabaseSettingsFileName()
     if (-not (Test-Path -Path $databaseSettingsFile))
     {
-      Write-Host "Creating $($databaseSettingsFile) and setting permissions for user '$($appPoolUser)'... " -NoNewLine
+      Write-Host "Creating a $($databaseSettingsFile) file and setting Read/Modify permissions for the user '$($appPoolUser)'... " -NoNewLine
       New-Item -Path $databaseSettingsFile -ItemType "file" -Value "{}"
       (& ICACLS $databaseSettingsFile /grant ("{0}{1}" -f $appPoolUser, ":RM"))
       Write-Host "OK."
     }
 
     # add the environment name to web.config
-    # aspNetCore/environmentVariables/environmentVariable @name="ASPNETCORE_ENVIRONMENT" value="{environment}" />
-    $webConfigFile = "$($this.Path)\web.config"
-    if (Test-Path -Path $webConfigFile)
+    # aspNetCore/environmentVariables/environmentVariable @name="ASPNETCORE_ENVIRONMENT" value="{environment}" 
+    if ($this.DoUpdateWebConfig())
     {
-      Write-Host "Adding environment variables to $($webConfigFile)... " -NoNewLine
+      $webConfigFile = "$($this.Path)\web.config"
+      if (Test-Path -Path $webConfigFile)
+      {
+        Write-Host "Adding environment variables to $($webConfigFile)... " -NoNewLine
     
-      $xml = [xml](Get-Content -Path $webConfigFile)
-      $netcoreElement = $xml.configuration."system.webServer".aspNetCore
-      if ($netcoreElement -eq $null)
-      {
-        Write-Host "Unable to update the environment name in $webConfigFile because a <aspNetCore> element was not found."
-      }
-      else
-      {
-        $environmentVariablesElement = $netcoreElement.SelectSingleNode("environmentVariables")
-        if ($environmentVariablesElement -eq $null)
+        $xml = [xml](Get-Content -Path $webConfigFile)
+        $netcoreElement = $xml.configuration."system.webServer".aspNetCore
+        if ($netcoreElement -eq $null)
         {
-          $environmentVariablesElement = $xml.CreateElement("environmentVariables")
-          $netcoreElement.AppendChild($environmentVariablesElement)
+          Write-Host "Unable to update the environment name in $webConfigFile because a <aspNetCore> element was not found."
         }
+        else
+        {
+          $environmentVariablesElement = $netcoreElement.SelectSingleNode("environmentVariables")
+          if ($environmentVariablesElement -eq $null)
+          {
+            $environmentVariablesElement = $xml.CreateElement("environmentVariables")
+            $netcoreElement.AppendChild($environmentVariablesElement)
+          }
 
-        $netCoreEnvironmentenvironmentVariableElement = $environmentVariablesElement.SelectSingleNode("environmentVariable[@name='ASPNETCORE_ENVIRONMENT']")
-        if ($netCoreEnvironmentenvironmentVariableElement -eq $null)
-        {
-          $netCoreEnvironmentenvironmentVariableElement = $xml.CreateElement("environmentVariable")
-          $netCoreEnvironmentenvironmentVariableElement.SetAttribute("name", "ASPNETCORE_ENVIRONMENT")
-          $environmentVariablesElement.AppendChild($netCoreEnvironmentenvironmentVariableElement)          
-        }
+          $netCoreEnvironmentenvironmentVariableElement = $environmentVariablesElement.SelectSingleNode("environmentVariable[@name='ASPNETCORE_ENVIRONMENT']")
+          if ($netCoreEnvironmentenvironmentVariableElement -eq $null)
+          {
+            $netCoreEnvironmentenvironmentVariableElement = $xml.CreateElement("environmentVariable")
+            $netCoreEnvironmentenvironmentVariableElement.SetAttribute("name", "ASPNETCORE_ENVIRONMENT")
+            $environmentVariablesElement.AppendChild($netCoreEnvironmentenvironmentVariableElement)          
+          }
                 
-        $netCoreEnvironmentenvironmentVariableElement.SetAttribute("value", $this.Environment)
+          $netCoreEnvironmentenvironmentVariableElement.SetAttribute("value", $this.Environment)
 
-        $xml.Save("$webConfigFile")
-      }
+          $xml.Save("$webConfigFile")
+        }
       
-      Write-Host "OK."
+        Write-Host "OK."
+      }
     }
-
     # Create data directory
-    if (-not (Test-Path -Path $this.DataPath))
+    if (-not ($this.DataPathExists()))
     {
       Write-Host "Creating Application Data folder '$($this.DataPath)... " -NoNewLine
       New-Item -Path $this.DataPath -ItemType "directory"
@@ -631,7 +764,10 @@ function PromptWithDefaultBoolean($message, $defaultValue)
 # Main function point start
 #
 
-# if path was not specified on the command line, determine where the application is installed 
+
+Write-Host "Nucleus IIS installer powershell script version $SHELL_SCRIPT_VERSION"
+
+# if path was not specified on the command line, try to detect where the application is (to be) installed 
 if ($Path -eq "")
 {
   if ($PSScriptRoot -match "Windows\\Utils$")
@@ -646,66 +782,102 @@ if ($Path -eq "")
 }
 
 # if it was not specified on the command line, determine whether there is an install set in the script location
-if ($ZipFile -eq "")
+if ($ZipFile -eq "detect")
 {
-  if (Test-Path -Path $PSScriptRoot\Nucleus.*.zip)
-  {
-    $version = $null
-    #$installType = ""
+  $ZipFile = ""
 
-    # look for the latest install zip
-    Get-ChildItem -Path $PSScriptRoot\Nucleus.*.zip | ForEach-Object {
-      if ($_.Name -match "^([A-Za-z_]+)\.(?<version>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Install\.zip")
-      {
-        $thisVersion = $matches.Version
-        if (($ZipFile -eq "") -or ($version -eq $null) -or ([System.Version]$thisVersion > $version))
+  if (Test-Path -Path $Path\Nucleus.*.zip)
+  {
+    $latestVersion = $null
+
+    # detect whether Nucleus is already installed
+    if (-not (Test-Path -Path $Path\Nucleus.Web.dll))
+    {
+      # Nucleus.Web.dll not found, look for the latest install zip
+      Get-ChildItem -Path $Path\Nucleus.*.Install.zip | ForEach-Object {
+        if ($_.Name -match "^([A-Za-z_]+)\.(?<version>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Install\.zip")
         {
-          $ZipFile = $_.Name
-          #$installType = "Install"
+          $thisVersion = $matches.Version
+          if (($ZipFile -eq "") -or ($latestVersion -eq $null) -or ([System.Version]$thisVersion -gt $latestVersion))
+          {
+            $ZipFile = $_.Name
+            $latestVersion = [System.Version]$thisVersion
+          }
         }
       }
     }
-
-    # if no install zip was found, look for the latest upgrade zip
-    Get-ChildItem -Path $PSScriptRoot\Nucleus.*.zip | ForEach-Object {
-      if ($_.Name -match "^([A-Za-z_]+)\.(?<version>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Upgrade\.zip")
-      {
-        $thisVersion = $matches.Version
-        if (($ZipFile -eq "") -or ($version -eq $null) -or ([System.Version]$thisVersion > $version))
+    else
+    {
+      # Nucleus.Web.dll was found, look for the latest upgrade zip
+      Get-ChildItem -Path $Path\Nucleus.*.Upgrade.zip | ForEach-Object {
+        if ($_.Name -match "^([A-Za-z_]+)\.(?<version>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Upgrade\.zip")
         {
-          $ZipFile = $_.Name
-          #$installType = "Upgrade"
+          $thisVersion = $matches.Version
+          if (($ZipFile -eq "") -or ($latestVersion -eq $null) -or ([System.Version]$thisVersion -gt $latestVersion))
+          {
+            $ZipFile = $_.Name
+            $latestVersion = [System.Version]$thisVersion          
+          }
         }
       }
     }
   }
 }
 
-Write-Host "Nucleus IIS installer powershell script version $SHELL_SCRIPT_VERSION"
+# default ApplicationPool if it was not set in the command line
+if ($ApplicationPool -eq "")
+{
+  if ($Name -eq "")
+  {
+    # default AppPool from site name
+    $ApplicationPool = ("{0}{1}" -f $Site, "AppPool")
+  }
+  else
+  {
+    # default AppPool from application name
+    $ApplicationPool = ("{0}{1}" -f $Name, "AppPool")
+  }
+}
+
 $application = [Application]::new($OverwriteExisting, $Site, $Name, $Port, $ApplicationPool, $Path, $DataPath, $NetCoreVersion, $Environment, $ZipFile)
 
-$cancel = $false;
-$changeSettings = $true;
-
-while (($cancel -ne $true) -and ($changeSettings -eq $true))
+$operation = ""
+while (($operation -eq "") -or ($operation -eq "change-settings"))
 {
   $application.DisplaySettings()
 
   if ($AutoInstall -eq $true)
   {
-    $changeSettings = $false
-    $cancel = $false
+    operation = "install"
   }
   else
   {
     Write-Host "Do you want to install Nucleus and set up IIS with these settings?"
     Write-Host ""
     $response = Read-Host "[C] Change settings, [Y] Yes, continue, [X] Cancel"
-    $changeSettings = ($response -eq "c" )
-    $cancel = (($response -eq "x") -or ($response -eq ""))
+
+    switch ($response)
+    {
+      "c" {
+        # change settings
+        $operation = "change-settings"
+      }
+      "x" {
+        # exit
+        $operation = "exit"
+      }
+      "y" {
+        # continue with install 
+        $operation = "install"
+      }
+      Default {
+        # invalid entry
+        $operation = ""
+      }
+    }    
   }
 
-  if (($cancel -ne $true) -and ($changeSettings -eq $true))
+  if ($operation-eq "change-settings")
   {
     # Prompt for whether to overwrite existing values
     $application.OverwriteExisting = PromptWithDefaultBoolean "Overwrite Existing IIS values?" $application.OverwriteExisting
@@ -725,11 +897,11 @@ while (($cancel -ne $true) -and ($changeSettings -eq $true))
     # Prompt for app pool name 
     $application.ApplicationPool = PromptWithDefault "Application pool name" $application.ApplicationPool
   }
-}
+} # end loop 
 
  Write-Host ""
  
-if ($cancel -ne $true)
+if ($operation -eq "install")
 {
   if (($application.Name -eq "none") -or ($application.Name -eq "'none'"))
   {
@@ -741,14 +913,14 @@ if ($cancel -ne $true)
   {
 	  if ($application.IsPortInUse())
     {
-      $cancel = $true
+      $operation = "exit"
       Write-Host "Port $($application.Port) is already in use.  You must use a different value." -ForeGroundColor red
       Write-Host ""
     }
   }
 }
 
-if ($cancel -ne $true)
+if ($operation -eq "install")
 {
   $application.Create()
     

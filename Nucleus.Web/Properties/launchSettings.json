@@ -31,6 +31,14 @@
       },
       "applicationUrl": "https://golem.inventua.com:5001"
     },
+    "Nucleus.Web.Golem-Testing": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Testing"
+      },
+      "applicationUrl": "https://golem.inventua.com:5001"
+    },
     "Nucleus.Web.Minion-Kestrel": {
       "commandName": "Project",
       "launchBrowser": true,

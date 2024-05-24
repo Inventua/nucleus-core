@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -36,7 +35,7 @@ namespace Nucleus.Core.Layout
       Nucleus.Abstractions.RoutingConstants.API_ROUTE_PATH_PREFIX,
       Nucleus.Abstractions.RoutingConstants.EXTENSIONS_ROUTE_PATH_PREFIX,
       Nucleus.Abstractions.RoutingConstants.SITEMAP_ROUTE_PATH,
-      Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX,
+      Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX
     };
 
     public PageRoutingMiddleware(Context context, Application application, IPageManager pageManager, ISiteManager siteManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager, ILogger<PageRoutingMiddleware> logger)
@@ -94,79 +93,79 @@ namespace Nucleus.Core.Layout
         {
           Logger.LogTrace("Skipped site detection for '{request}'.", context.Request.Path);
 
-          this.Context.Site = null;
-          await next(context);
-          return;
+          this.Context.Site = null;          
         }
-
-        Logger.LogTrace("Matching site by host '{host}' and pathbase '{pathbase}'.", context.Request.Host, context.Request.PathBase);
-
-        this.Context.Site = await this.SiteManager.Get(context.Request.Host.Value, context.Request.PathBase);
-
-        if (this.Context.Site == null)
+        else
         {
-          Logger.LogTrace("Using default site.");
-          this.Context.Site = await this.SiteManager.Get("", "");
+          Logger.LogTrace("Matching site by host '{host}' and pathbase '{pathbase}'.", context.Request.Host, context.Request.PathBase);
+
+          this.Context.Site = await this.SiteManager.Get(context.Request.Host.Value, context.Request.PathBase);
+
+          if (this.Context.Site == null)
+          {
+            Logger.LogTrace("Using default site.");
+            this.Context.Site = await this.SiteManager.Get("", "");
+
+            if (this.Context.Site != null)
+            {
+              // Add "default" site to the site alias table 
+              SiteAlias alias = new() { Alias = $"{context.Request.Host}{context.Request.PathBase}" };
+              await this.SiteManager.SaveAlias(this.Context.Site, alias);
+
+              // If the site doesn't already have a default alias, set it to the new alias
+              if (this.Context.Site.DefaultSiteAlias == null)
+              {
+                this.Context.Site.DefaultSiteAlias = alias;
+                await this.SiteManager.Save(this.Context.Site);
+              }
+            }
+          }
 
           if (this.Context.Site != null)
           {
-            // Add "default" site to the site alias table 
-            SiteAlias alias = new() { Alias = $"{context.Request.Host}{context.Request.PathBase}" };
-            await this.SiteManager.SaveAlias(this.Context.Site, alias);
+            string requestedPath = System.Web.HttpUtility.UrlDecode(context.Request.Path);
+            Logger.LogTrace("Using site '{siteid}'.", this.Context.Site.Id);
 
-            // If the site doesn't already have a default alias, set it to the new alias
-            if (this.Context.Site.DefaultSiteAlias == null)
+            if (!SkipPageDetection(context))
             {
-              this.Context.Site.DefaultSiteAlias = alias;
-              await this.SiteManager.Save(this.Context.Site);
+              Logger.LogTrace("Lookup page by path '{path}'.", requestedPath);
+
+              await FindPage(requestedPath);
+
+              if (this.Context.Page == null)
+              {
+                // if the page was not found, try searching for path & query.  This is to support pages routes which include a query string, which
+                // users may have in place to provide for urls from legacy systems like DNN which can have querystring values which identify a page.
+                string requestedPathAndQuery = System.Web.HttpUtility.UrlDecode(context.Request.Path + context.Request.QueryString);
+
+                Logger.LogTrace("Lookup page by path '{path}'.", requestedPathAndQuery);
+
+                await FindPage(requestedPathAndQuery);
+              }
             }
-          }
-        }
 
-        if (this.Context.Site != null)
-        {
-          string requestedPath = System.Web.HttpUtility.UrlDecode(context.Request.Path);
-          Logger.LogTrace("Using site '{siteid}'.", this.Context.Site.Id);
-
-          if (!SkipPageDetection(context))
-          {
-            Logger.LogTrace("Lookup page by path '{path}'.", requestedPath);
-
-            await FindPage(requestedPath);
-
-            if (this.Context.Page == null)
+            if (this.Context.Page != null)
             {
-              // if the page was not found, try searching for path & query.  This is to support pages routes which include a query string, which
-              // users may have in place to provide for urls from legacy systems like DNN which can have querystring values which identify a page.
-              string requestedPathAndQuery = System.Web.HttpUtility.UrlDecode(context.Request.Path + context.Request.QueryString);
+              if (this.Context.Page.Disabled)
+              {
+                Logger.LogTrace("Page id '{pageid}' is disabled.", pageId);
+                this.Context.Page = null;
+              }
+              else
+              {
+                Logger.LogTrace("Page found: '{pageid}'.", this.Context.Page.Id);
+              }
 
-              Logger.LogTrace("Lookup page by path '{path}'.", requestedPathAndQuery);
-
-              await FindPage(requestedPathAndQuery);
-            }
-          }
-
-          if (this.Context.Page != null)
-          {
-            if (this.Context.Page.Disabled)
-            {
-              Logger.LogTrace("Page id '{pageid}' is disabled.", pageId);
-              this.Context.Page = null;
+              // When HandleLinkType returns false, it means we should not continue because we are redirecting to another site
+              if (!await HandleLinkType(context))
+              {
+                return;
+              }
             }
             else
             {
-              Logger.LogTrace("Page found: '{pageid}'.", this.Context.Page.Id);
+              Logger.LogTrace("Path '{path}' is not a page.", requestedPath);
             }
-
-            // When HandleLinkType returns false, it means we should not continue because we are redirecting to another site
-            if (!await HandleLinkType(context))
-            {
-              return;
-            }
-          }
-          else
-          {
-            Logger.LogTrace("Path '{path}' is not a page.", requestedPath);
           }
         }
       }

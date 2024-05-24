@@ -14,12 +14,13 @@ namespace Nucleus.Core.Authorization
 {
   public class PageViewPermissionAuthorizationHandler : AuthorizationHandler<PageViewPermissionAuthorizationRequirement>
   {
-
-    private Nucleus.Abstractions.Models.Context CurrentContext { get; }
+    private Application Application{ get; }
+    private Context CurrentContext { get; }
     private ILogger<PageViewPermissionAuthorizationHandler> Logger { get; }
 
-    public PageViewPermissionAuthorizationHandler(Nucleus.Abstractions.Models.Context context, ILogger<PageViewPermissionAuthorizationHandler> logger)
+    public PageViewPermissionAuthorizationHandler(Application application, Context context, ILogger<PageViewPermissionAuthorizationHandler> logger)
     {
+      this.Application = application;
       this.CurrentContext = context;
       this.Logger = logger;
     }
@@ -75,18 +76,13 @@ namespace Nucleus.Core.Authorization
         }
       }
 
-
-      //if (this.CurrentContext.Module != null)
-      //{
-      //	context.Succeed(requirement);
-      //}
-
-      if (this.CurrentContext.Page == null && !context.HasSucceeded)
+      if (!this.Application.IsInstalled & this.CurrentContext.Site == null && this.CurrentContext.Page == null)
       {
-        // the user can't have Page view permission if no page was specified
-        Logger.LogTrace("User {0}: Access denied, no page specified.", context.User);
-        context.Fail();
+        // special case.  We check whether Nucleus is install/redirect to the setup wizard in Nucleus.Web.DefaultController, which has [AuthorizeController(PAGE_VIEW_POLICY)] in order
+        // to check permissions for Nucleus pages, which calls this class.  So we have to return a success case in order to get to the code in Nucleus.Web.DefaultController.Index
+        context.Succeed(requirement);
       }
+
       return Task.CompletedTask;
     }
   }

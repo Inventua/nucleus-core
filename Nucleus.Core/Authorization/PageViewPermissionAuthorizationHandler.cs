@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Nucleus.Abstractions.Models;
-using System.Security.Claims;
 using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models;
 using Nucleus.Extensions.Authorization;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Core.Authorization
 {
@@ -16,12 +12,14 @@ namespace Nucleus.Core.Authorization
   {
     private Application Application{ get; }
     private Context CurrentContext { get; }
+    private ISiteManager SiteManager { get; }
     private ILogger<PageViewPermissionAuthorizationHandler> Logger { get; }
 
-    public PageViewPermissionAuthorizationHandler(Application application, Context context, ILogger<PageViewPermissionAuthorizationHandler> logger)
+    public PageViewPermissionAuthorizationHandler(Application application, Context context, ISiteManager siteManager, ILogger<PageViewPermissionAuthorizationHandler> logger)
     {
       this.Application = application;
       this.CurrentContext = context;
+      this.SiteManager = siteManager;
       this.Logger = logger;
     }
 
@@ -31,13 +29,13 @@ namespace Nucleus.Core.Authorization
     /// <param name="context"></param>
     /// <param name="requirement"></param>
     /// <returns></returns>
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PageViewPermissionAuthorizationRequirement requirement)
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PageViewPermissionAuthorizationRequirement requirement)
     {
       if (context.User.IsSystemAdministrator())
       {
         Logger.LogTrace("User {0}: Access granted (System administrator).", context.User.GetUserId());
         context.Succeed(requirement);
-        return Task.CompletedTask;
+        return;
       }
 
       if (this.CurrentContext.Site != null)
@@ -46,7 +44,7 @@ namespace Nucleus.Core.Authorization
         {
           Logger.LogTrace("User {0}: Access granted (Site administrator).", context.User.GetUserId());
           context.Succeed(requirement);
-          return Task.CompletedTask;
+          return;
         }
       }
 
@@ -76,14 +74,14 @@ namespace Nucleus.Core.Authorization
         }
       }
 
-      if (!this.Application.IsInstalled & this.CurrentContext.Site == null && this.CurrentContext.Page == null)
+      if (this.CurrentContext.Site == null && (!this.Application.IsInstalled || await this.SiteManager.Count() == 0))
       {
         // special case.  We check whether Nucleus is install/redirect to the setup wizard in Nucleus.Web.DefaultController, which has [AuthorizeController(PAGE_VIEW_POLICY)] in order
         // to check permissions for Nucleus pages, which calls this class.  So we have to return a success case in order to get to the code in Nucleus.Web.DefaultController.Index
         context.Succeed(requirement);
       }
 
-      return Task.CompletedTask;
+      return;
     }
   }
 }

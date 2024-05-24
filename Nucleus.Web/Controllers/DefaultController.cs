@@ -50,14 +50,11 @@ public class DefaultController : Controller
     Boolean useSiteErrorPage = false;
 
     // If the site hasn't been set up yet (empty database), redirect to the site wizard.
-    if (this.Context.Site == null && this.Context.Page == null)
+    if (this.ShouldRedirectToSetupWizard())
     {
-      if (this.ShouldRedirectToSetupWizard())
-      {
-        return RedirectToAction("Index", "SiteWizard", new { area = "Setup" });
-      }
+      return RedirectToAction("Index", "SiteWizard", new { area = "Setup" });
     }
-
+   
     // if the user's password has expired, redirect them to the change password page, as long as the current request isn't for the change password page
     if (User.IsPasswordExpired())
     {
@@ -183,7 +180,7 @@ public class DefaultController : Controller
 
   private Boolean ShouldRedirectToSetupWizard()
   {
-    return (!this.Application.IsInstalled);
+    return (this.Context.Site == null && this.Context.Page == null && !this.Application.IsInstalled && !this.Request.Path.StartsWithSegments("/Setup/SiteWizard", StringComparison.OrdinalIgnoreCase));
   }
 
   /// <summary>

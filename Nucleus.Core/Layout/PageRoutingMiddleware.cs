@@ -177,14 +177,11 @@ namespace Nucleus.Core.Layout
       // the setup wizard.  This is to handle cases where there is a /Setup/install-log.config file present (indicating
       // that setup has previously completed), but the database is empty.  This is mostly a scenario that happens in
       // testing, but it could also happen if a user decided to attach to a different (new) database.
-      if (context.Response.StatusCode == (int)System.Net.HttpStatusCode.NotFound && this.Context.Site == null)
+      if (context.Response.StatusCode > 300 && !context.Request.Path.StartsWithSegments("/Setup/SiteWizard", StringComparison.OrdinalIgnoreCase) && this.Context.Site == null && (!this.Application.IsInstalled || await this.SiteManager.Count() == 0))
       {
-        if (await this.SiteManager.Count() == 0)
-        {
-          String relativePath = $"{(String.IsNullOrEmpty(context.Request.PathBase) ? "" : context.Request.PathBase + "/")}Setup/SiteWizard";
-          context.Response.Redirect(relativePath);
-        }
-      }
+        String relativePath = $"{(String.IsNullOrEmpty(context.Request.PathBase) ? "" : context.Request.PathBase + "/")}Setup/SiteWizard";
+        context.Response.Redirect(relativePath);
+      }      
     }
 
     /// <summary>

@@ -66,7 +66,7 @@ namespace Nucleus.Core.Authentication
         if (this.Context.Request.IsSigned(out Guid accessKey))
         {
           // handle request with an API key-derived signature
-          return await HandleApiRequest(sessionId, accessKey);
+          return await HandleApiRequest(accessKey);
         }
         else
         {
@@ -259,7 +259,7 @@ namespace Nucleus.Core.Authentication
       }
     }
 
-    private async Task<AuthenticateResult> HandleApiRequest(string sessionId, Guid accessKey)
+    private async Task<AuthenticateResult> HandleApiRequest(Guid accessKey)
     {
       ApiKey apiKey = await this.ApiKeyManager.Get(accessKey);
       if (apiKey == null)

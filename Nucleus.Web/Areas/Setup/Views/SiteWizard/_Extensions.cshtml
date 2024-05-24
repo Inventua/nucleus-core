@@ -18,6 +18,7 @@
     <div class="installable-package">
       <label>
         <span>
+          @Html.HiddenFor(model => model.InstallableExtensions[count].PackageId)
           @Html.HiddenFor(model => model.InstallableExtensions[count].Filename)
           @if (Model.InstallableExtensions[count].IsRequired)
           {

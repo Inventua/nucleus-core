@@ -692,6 +692,15 @@ public class SiteWizardController : Controller
                     installableExtension.IsSelected = true;
                   }
                 }
+                else
+                {
+                  // retain user selection
+                  InstallableExtension existingExtensionSelection = viewModel.InstallableExtensions.Where(extension => extension.PackageId == installableExtension.PackageId).FirstOrDefault();
+                  if (existingExtensionSelection != null)
+                  {
+                    installableExtension.IsSelected = existingExtensionSelection.IsSelected || installableExtension.IsRequired;
+                  }
+                }
 
                 installableExtensions.Add(installableExtension);
               }

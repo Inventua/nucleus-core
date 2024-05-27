@@ -7,22 +7,28 @@
 @using (Html.BeginNucleusForm("SaveSettings", "SignupAdmin", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
   <fieldset role="group" aria-label="reCAPTCHA Settings" class="flex-grow-1">
-    <SettingsControl caption="reCAPTCHA Site Key" helptext="Specifies your reCAPTCHA site key. Visit https://www.google.com/recaptcha/admin/create to create a site key.">
-      @Html.TextBoxFor(model => model.RecaptchaSiteKey)
+    <SettingsControl caption="Enable reCAPTCHA?" rendermode="LabelLast" class="inner-inline EnableRecaptcha" helptext="Sets whether to enable or disable reCAPTCHA.">
+      @Html.CheckBoxFor(model => model.RecaptchaEnabled, new { @class = "ToggleSwitch" })
     </SettingsControl>
 
-    <div class="nucleus-flex-fields">
-      <SettingsControl caption="reCAPTCHA Secret Key" helptext="Specifies your reCAPTCHA secret key." class="flex-grow-2">
-        @Html.PasswordFor(model => model.RecaptchaSecretKey, new { value = (Model.IsSecretKeySet ? Nucleus.Modules.Account.ViewModels.SignupSettings.DUMMY_PASSWORD : "") })
+    <div class="RecaptchaSettings">
+      <SettingsControl caption="reCAPTCHA Site Key" helptext="Specifies your reCAPTCHA site key. Visit https://www.google.com/recaptcha/admin/create to create a site key.">
+      @Html.TextBoxFor(model => model.RecaptchaSiteKey)
       </SettingsControl>
 
-      <SettingsControl caption="reCAPTCHA Action" helptext="Specifies your reCAPTCHA action using only alphanumeric characters, slashes, and underscore. This is used in the reCAPTCHA admin console for reporting and for adaptive risk analysis." class="flex-grow-2">
-        @Html.TextBoxFor(model => model.RecaptchaAction)
-      </SettingsControl>
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="reCAPTCHA Secret Key" helptext="Specifies your reCAPTCHA secret key." class="flex-grow-2">
+          @Html.PasswordFor(model => model.RecaptchaSecretKey, new { value = (Model.IsSecretKeySet ? Nucleus.Modules.Account.ViewModels.SignupSettings.DUMMY_PASSWORD : "") })
+        </SettingsControl>
 
-      <SettingsControl caption="reCAPTCHA Score Threshold" helptext="Specifies the minimum required reCAPTCHA interaction score. A value of 0 permits all messages, while a value of 1 blocks all messages. The default setting is 0.5.">
-        @Html.TextBoxFor(model => model.RecaptchaScoreThreshold, new { @type = "number", @inputmode = "decimal", @min = "0.0", @max = "1.0", @step = "0.1" })
-      </SettingsControl>
+        <SettingsControl caption="reCAPTCHA Action" helptext="Specifies your reCAPTCHA action using only alphanumeric characters, slashes, and underscore. This is used in the reCAPTCHA admin console for reporting and for adaptive risk analysis." class="flex-grow-2">
+          @Html.TextBoxFor(model => model.RecaptchaAction)
+        </SettingsControl>
+
+        <SettingsControl caption="reCAPTCHA Score Threshold" helptext="Specifies the minimum required reCAPTCHA interaction score. A value of 0 permits all messages, while a value of 1 blocks all messages. The default setting is 0.5.">
+          @Html.TextBoxFor(model => model.RecaptchaScoreThreshold, new { @type = "number", @inputmode = "decimal", @min = "0.0", @max = "1.0", @step = "0.1" })
+        </SettingsControl>
+      </div>
     </div>
   </fieldset>
   <div class="nucleus-form-buttonrow">
@@ -30,3 +36,22 @@
   </div>
 }
 
+<script>
+  SignupSettings_ShowSettings();
+
+  jQuery('.EnableRecaptcha input[type=checkbox]').on('change', SignupSettings_ShowSettings);
+
+  function SignupSettings_ShowSettings()
+  {
+    if (jQuery('.EnableRecaptcha input[type=checkbox]').is(':checked'))
+    {
+      jQuery('.RecaptchaSettings').css('opacity', '1.0');
+      jQuery('.RecaptchaSettings * ').removeAttr('disabled');
+    }
+    else
+    {
+      jQuery('.RecaptchaSettings').css('opacity', '0.25');
+      jQuery('.RecaptchaSettings *').attr('disabled', 'disabled');
+    }
+  }
+</script>

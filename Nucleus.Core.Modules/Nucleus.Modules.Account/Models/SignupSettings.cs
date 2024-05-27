@@ -9,11 +9,14 @@ public class SignupSettings
 {
   private class ModuleSettingsKeys
   {
+    public const string MODULESETTING_RECAPTCHA_ENABLED = "signup:recaptcha-enabled";
     public const string MODULESETTING_RECAPTCHA_SITE_KEY = "signup:recaptcha-site-key";
     public const string MODULESETTING_RECAPTCHA_SECRET_KEY = "signup:recaptcha-secret-key";
     public const string MODULESETTING_RECAPTCHA_ACTION = "signup:recaptcha-action";
     public const string MODULESETTING_RECAPTCHA_SCORE_THRESHOLD = "signup:recaptcha-score-threshold";
   }
+  
+  public Boolean RecaptchaEnabled { get; set; }
 
   public string RecaptchaSiteKey { get; set; }
 
@@ -58,10 +61,9 @@ public class SignupSettings
 
   public void ReadSettings(PageModule module)
   {
-    this.RecaptchaSiteKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SITE_KEY, "");
-    this.RecaptchaEncryptedSecretKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SECRET_KEY, "");
-    this.RecaptchaAction = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ACTION, "");
-    this.RecaptchaScoreThreshold = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SCORE_THRESHOLD, 0.5);
+    this.RecaptchaEnabled = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ENABLED, false);
+
+    ReadRecaptchaSettings(module);
   }
 
   public void ReadEncryptedKeys(PageModule module)
@@ -69,8 +71,17 @@ public class SignupSettings
     this.RecaptchaEncryptedSecretKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SECRET_KEY, "");
   }
 
+  public void ReadRecaptchaSettings(PageModule module)
+  {
+    this.RecaptchaSiteKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SITE_KEY, "");
+    this.RecaptchaEncryptedSecretKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SECRET_KEY, "");
+    this.RecaptchaAction = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ACTION, "");
+    this.RecaptchaScoreThreshold = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SCORE_THRESHOLD, 0.5);
+  }
+
   public void SetSettings(Site site, PageModule module)
   {
+    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ENABLED, this.RecaptchaEnabled);
     module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SITE_KEY, this.RecaptchaSiteKey);
     module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SECRET_KEY, this.RecaptchaEncryptedSecretKey);
     module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ACTION, this.RecaptchaAction);

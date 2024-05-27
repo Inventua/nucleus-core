@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Nucleus.Modules.ContactUs.Models;
 
-public class RecaptchaToken
+public class SiteVerifyResponseToken
 {
 	[JsonProperty("challenge_ts")]
 	public DateTime Challenge_ts { get; set; }

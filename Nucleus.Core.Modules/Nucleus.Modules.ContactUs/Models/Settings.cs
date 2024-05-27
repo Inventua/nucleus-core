@@ -24,6 +24,7 @@ public class Settings
     public const string MODULESETTING_REQUIRECATEGORY = "contactus:require-category";
     public const string MODULESETTING_REQUIRESUBJECT = "contactus:require-subject";
 
+    public const string MODULESETTING_RECAPTCHA_ENABLED = "contactus:recaptcha-enabled";
     public const string MODULESETTING_RECAPTCHA_SITE_KEY = "contactus:recaptcha-site-key";
     public const string MODULESETTING_RECAPTCHA_SECRET_KEY = "contactus:recaptcha-secret-key";
     public const string MODULESETTING_RECAPTCHA_ACTION = "contactus:recaptcha-action";
@@ -56,7 +57,9 @@ public class Settings
 
 	public Boolean RequireSubject { get; set; }
 
-	public string RecaptchaSiteKey { get; set; }
+  public Boolean RecaptchaEnabled { get; set; }
+  
+  public string RecaptchaSiteKey { get; set; }
 
 	private string RecaptchaEncryptedSecretKey { get; set; }
 
@@ -115,15 +118,22 @@ public class Settings
 		this.RequireCategory = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_REQUIRECATEGORY, true);
 		this.RequireSubject = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_REQUIRESUBJECT, true);
 
-		this.RecaptchaSiteKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SITE_KEY, "");
-		this.RecaptchaEncryptedSecretKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SECRET_KEY, "");
-		this.RecaptchaAction = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ACTION, "");
-    this.RecaptchaScoreThreshold = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SCORE_THRESHOLD, 0.5);
+    this.RecaptchaEnabled = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ENABLED, false);
+
+    ReadRecaptchaSettings(module);
   }
 
   public void ReadEncryptedKeys(PageModule module)
   {
     this.RecaptchaEncryptedSecretKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SECRET_KEY, "");
+  }
+
+  public void ReadRecaptchaSettings(PageModule module)
+  {
+    this.RecaptchaSiteKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SITE_KEY, "");
+    this.RecaptchaEncryptedSecretKey = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SECRET_KEY, "");
+    this.RecaptchaAction = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ACTION, "");
+    this.RecaptchaScoreThreshold = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SCORE_THRESHOLD, 0.5);
   }
 
   public void SetSettings(Site site, PageModule module)
@@ -144,9 +154,10 @@ public class Settings
 		module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_REQUIRECATEGORY, this.RequireCategory);
 		module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_REQUIRESUBJECT, this.RequireSubject);
 
-		module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SITE_KEY, this.RecaptchaSiteKey);
-		module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SECRET_KEY, this.RecaptchaEncryptedSecretKey);
-		module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ACTION, this.RecaptchaAction);
+    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ENABLED, this.RecaptchaEnabled);
+    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SITE_KEY, this.RecaptchaSiteKey);
+    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SECRET_KEY, this.RecaptchaEncryptedSecretKey);
+    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_ACTION, this.RecaptchaAction);
     module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_RECAPTCHA_SCORE_THRESHOLD, this.RecaptchaScoreThreshold);
   }
 

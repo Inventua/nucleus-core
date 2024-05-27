@@ -42,28 +42,36 @@ public class ContactUsAdminController : Controller
       return BadRequest(ModelState);
     }
 
-    if (String.IsNullOrEmpty(viewModel.RecaptchaSecretKey))
+    if (viewModel.RecaptchaEnabled)
     {
-      viewModel.SetSecretKey(this.Context.Site, "");
+      if (String.IsNullOrEmpty(viewModel.RecaptchaSecretKey))
+      {
+        viewModel.SetSecretKey(this.Context.Site, "");
+      }
+      else if (viewModel.RecaptchaSecretKey != ViewModels.Settings.DUMMY_PASSWORD)
+      {
+        viewModel.SetSecretKey(this.Context.Site, viewModel.RecaptchaSecretKey);
+      }
+      else
+      {
+        viewModel.ReadEncryptedKeys(this.Context.Module);
+      }
+
+      if (!String.IsNullOrEmpty(viewModel.RecaptchaSiteKey))
+      {
+        Validate(viewModel.RecaptchaSecretKey, nameof(viewModel.RecaptchaSecretKey), "Enter your Google reCAPTCHA secret key.");
+        Validate(viewModel.RecaptchaAction, nameof(viewModel.RecaptchaAction), "Enter the reCAPTCHA action.");
+
+        if (!ControllerContext.ModelState.IsValid)
+        {
+          return BadRequest(ControllerContext.ModelState);
+        }
+      }
     }
-    else if (viewModel.RecaptchaSecretKey != ViewModels.Settings.DUMMY_PASSWORD)
-		{
-			viewModel.SetSecretKey(this.Context.Site, viewModel.RecaptchaSecretKey);
-		}
     else
     {
-      viewModel.ReadEncryptedKeys(this.Context.Module);
-    }
-
-    if (!String.IsNullOrEmpty(viewModel.RecaptchaSiteKey))
-    {
-      Validate(viewModel.RecaptchaSecretKey, nameof(viewModel.RecaptchaSecretKey), "Enter your Google reCAPTCHA secret key.");
-      Validate(viewModel.RecaptchaAction, nameof(viewModel.RecaptchaAction), "Enter the reCAPTCHA action.");
-
-      if (!ControllerContext.ModelState.IsValid)
-      {
-        return BadRequest(ControllerContext.ModelState);
-      }
+      // Repopulate the viewmodel for recaptcha
+      viewModel.ReadRecaptchaSettings(this.Context.Module);
     }
 
     viewModel.SetSettings(this.Context.Site, this.Context.Module);

@@ -71,14 +71,30 @@ The mail template arguments specific to the Contact Us module are:
 ```
   <p>A new message was sent from the @Model.Site.Name portal by @Model.Message.FirstName @Model.Message.LastName.</p>
 
-  @if (!String.IsNullOrEmpty(Model.Message.Company)) 
+  @if (Model.Settings.ShowCompany)
   {
-    <p>Company: @Model.Message.Company</p>
+    @if (!String.IsNullOrEmpty(Model.Message.Company)) 
+    {
+      <p>Company: @Model.Message.Company</p>
+    }
   }
 
   <p>Email: @Model.Message.Email</p>
-  <p>Phone Number: @Model.Message.PhoneNumber</p>
-  <p>Category: @Model.Message.Category</p>
+  @if (Model.Settings.ShowPhoneNumber)
+  {
+    <p>Phone Number: @Model.Message.PhoneNumber</p>
+  }
+  @if (Model.Settings.ShowCategory)
+  {
+    <p>Category: @Model.Message.Category</p>
+  }
 
   @Model.Message.Body
+
+  @if (Model.Settings.RecaptchaEnabled)
+  {
+    <div>
+      User verification score: @Model.UserVerificationScore
+    </div>
+  }
 ```

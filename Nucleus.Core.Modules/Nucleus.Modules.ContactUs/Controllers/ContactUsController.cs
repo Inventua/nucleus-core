@@ -89,7 +89,7 @@ public class ContactUsController : Controller
 		ModelState.AddModelError(propertyName, message);
 	}
 
-	private async Task<Models.RecaptchaToken> CaptchaVerify(ViewModels.Viewer viewModel)
+	private async Task<Models.SiteVerifyResponseToken> CaptchaVerify(ViewModels.Viewer viewModel)
 	{
 		Models.Settings settings = new();
 		settings.ReadSettings(this.Context.Module);
@@ -107,7 +107,7 @@ public class ContactUsController : Controller
 		}
 
 		string response = await VerifyRecaptchaToken(key, viewModel.RecaptchaVerificationToken);
-		Models.RecaptchaToken responseToken = Newtonsoft.Json.JsonConvert.DeserializeObject<Models.RecaptchaToken>(response);
+		Models.SiteVerifyResponseToken responseToken = Newtonsoft.Json.JsonConvert.DeserializeObject<Models.SiteVerifyResponseToken>(response);
 
 		return responseToken;
 	}
@@ -142,9 +142,9 @@ public class ContactUsController : Controller
 	[HttpPost]
 	public async Task<ActionResult> Send(ViewModels.Viewer viewModel)
 	{
-		Models.RecaptchaToken recaptchaToken;
+    Models.SiteVerifyResponseToken responseToken = null;
 
-		Models.Settings settings = new();
+    Models.Settings settings = new();
 		settings.ReadSettings(this.Context.Module);
 
 		ControllerContext.ModelState.Remove<ViewModels.Viewer>(model => model.Message.Category.Name);
@@ -156,43 +156,39 @@ public class ContactUsController : Controller
 		if (!ControllerContext.ModelState.IsValid)
 		{
 			return BadRequest(ControllerContext.ModelState);
-		}		
+		}
 
-		try
-		{
-			recaptchaToken = await CaptchaVerify(viewModel);
-
-			if (!recaptchaToken.Success)
-			{
-				if (recaptchaToken.ErrorCodes.Count > 0 )
-				{
-					this.Logger.LogWarning("Unsuccessful reCAPTCHA verification.  Errors: '{errorCodes}'.", String.Join(',', recaptchaToken.ErrorCodes));
-				}
-				return BadRequest("Unable to send message. Please contact the system administrator.");
-			}
-
-			if (recaptchaToken.Action != settings.RecaptchaAction)			
-			{
-				this.Logger.LogWarning("Unexpected reCAPTCHA action in response.  Expected: '{expectedAction}', received: '{receivedAction}'.", settings.RecaptchaAction, recaptchaToken.Action);
-				return BadRequest("Unable to send message. Please contact the system administrator.");
-			}
-
-      if (recaptchaToken.Score < Convert.ToSingle(settings.RecaptchaScoreThreshold))
+    if (settings.RecaptchaEnabled)
+    {
+      try
       {
-        this.Logger.LogWarning("Suspected robot from {address}. Recaptcha verify score was {score}. Action: {action}.", HttpContext.Connection.RemoteIpAddress, recaptchaToken.Score, recaptchaToken.Action);
+        GoogleRecaptchaHandler googleRecaptcha = new(
+          this.HttpClientFactory,
+          this.Logger,
+          settings.GetSecretKey(this.Context.Site),
+          settings.RecaptchaAction,
+          settings.RecaptchaScoreThreshold,
+          this.HttpContext.Connection.RemoteIpAddress.ToString()
+        );
 
-				// pretend that the message was sent so that robots can't detect success or failure.
-				viewModel.MessageSent = true;
-				return View("Viewer", viewModel);
-			}
-		}
-		catch (Exception ex)
-		{
-			this.Logger.LogError(ex, "Verifying reCAPTCHA token.");
-			return BadRequest();
-		}
+        responseToken = await googleRecaptcha.VerifyToken(viewModel.RecaptchaVerificationToken);
+        
+        if (!responseToken.Success)
+        {
+          // pretend it worked
+          viewModel.MessageSent = true;
+          return View("Viewer", viewModel); 
+        }
+      }
+      catch (Exception ex)
+      {
+        this.Logger?.LogError(ex, "Verifying reCAPTCHA token.");
+        viewModel.MessageSent = true;
+        return View("Viewer", viewModel);
+      }
+    }
 
-		if (this.Context != null && this.Context.Site != null)
+    if (this.Context != null && this.Context.Site != null)
 		{
 			// send contact email (if recipients and mail template have been set)
 			if (!String.IsNullOrEmpty(settings.SendTo))
@@ -202,11 +198,11 @@ public class ContactUsController : Controller
 					MailTemplate template = await this.MailTemplateManager.Get(settings.MailTemplateId);
 					if (template != null)
 					{
-						Models.Mail.TemplateModel args = new()
-						{
-							Site = this.Context.Site,
-							Message = viewModel.Message,
-							UserVerificationScore = recaptchaToken.Score,
+            Models.Mail.TemplateModel args = new()
+            {
+              Site = this.Context.Site,
+              Message = viewModel.Message,
+              UserVerificationScore = responseToken?.Score ?? 0,
 							Settings = GetCensored(settings)
 						};
 
@@ -252,6 +248,7 @@ public class ContactUsController : Controller
 		return new Models.Settings()
 		{
 			MailTemplateId = settings.MailTemplateId,
+      RecaptchaEnabled = settings.RecaptchaEnabled,
 			RecaptchaAction = settings.RecaptchaAction,
 			RequireCategory = settings.RequireCategory,
 			RequireCompany = settings.RequireCompany,

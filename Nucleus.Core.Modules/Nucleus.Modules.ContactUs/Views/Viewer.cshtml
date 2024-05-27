@@ -10,10 +10,10 @@
 }
 else
 {
-	@if (!String.IsNullOrEmpty(Model.RecaptchaSiteKey))
+	@if (!Model.RecaptchaEnabled)
 	{
-		@Html.AddScript("https://www.google.com/recaptcha/api.js?render=explicit&onload=onRecaptchaLoadCallback")
-		@Html.AddScript("~#/viewer.js")
+		@Html.AddScript("https://www.google.com/recaptcha/api.js?render=explicit&onload=onRecaptchaLoadCallback", true)
+		@Html.AddScript("~#/viewer.js", true)
 	}
 	@if (String.IsNullOrEmpty(Model.SendTo))
 	{
@@ -100,14 +100,6 @@ else
           siteKey: '@Model.RecaptchaSiteKey',
           badgeElement: jQuery('.recaptcha-badge')
         });
-
-				@* jQuery('.contact-us-send').Recaptcha({
-          form: jQuery('.contact-us-form'),
-					verificationTokenElement: jQuery('.contact-us-recaptcha-verification-token'),
-					siteKey: '@Model.RecaptchaSiteKey',
-					action: '@Model.RecaptchaAction',
-					badgeElement: jQuery('.recaptcha-badge')
-				}); *@
 			}
 		}
 	</script>

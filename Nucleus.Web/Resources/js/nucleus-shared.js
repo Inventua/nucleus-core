@@ -842,24 +842,32 @@ function _Page()
           }
 
           var elements = jQuery(elementSelector);
+          var properties = Object.keys(request.responseJSON);
 
           // sort the messages by element ordinal position
-          for (var prop in request.responseJSON)
+          properties.sort(function (a, b)
           {
-            var element = jQuery('[name="' + prop + '"]');
-            var index = _getElementIndex(elements, element.attr('id'));
-            if (typeof (index) === 'undefined')
+            var elementa = jQuery('[name="' + a + '"]');
+            var indexa = _getElementIndex(elements, elementa.attr('id'));
+
+            var elementb = jQuery('[name="' + b + '"]');
+            var indexb = _getElementIndex(elements, elementb.attr('id'));
+
+            return indexa - indexb;
+          });
+
+          // retrieve validation messages in element order
+          properties.forEach((prop) =>
+          {
+            request.responseJSON[prop].forEach((message) =>
             {
-              // id doesn't match any on-screen element, so add it to the end of the list
-              index = messages.length;
-            }
-            message = request.responseJSON[prop].toString();
-            if (!message.endsWith("."))
-            {
-              message += '.';
-            }
-            messages[index] = '<li>' + message + '</li>';
-          }
+              if (!message.endsWith("."))
+              {
+                message += '.';
+              }
+              messages[messages.length] = '<li>' + message + '</li>';
+            });
+          });
 
           // if the first element is in a tab, select the tab
           if (elements.length !== 0)
@@ -873,7 +881,7 @@ function _Page()
             }
           }
 
-          // display error message
+          // display error messages
           var validationMessage = '<ul>' + messages.join('') + '</ul>';
 
           errorData = new Object();

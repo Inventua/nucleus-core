@@ -30,7 +30,7 @@ namespace Nucleus.Abstractions.Models
     /// </summary>
     public string ControlPanelUri { get; private set; } = "~/Admin/Index/Index";
 
-    private string GetInstallLogPath()
+    private static string GetInstallLogPath()
 		{
 			return System.IO.Path.Combine(Environment.CurrentDirectory, "Setup", "install-log.config"); 
 		}

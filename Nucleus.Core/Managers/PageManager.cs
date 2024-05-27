@@ -526,8 +526,14 @@ public partial class PageManager : IPageManager
             page.SortOrder += 10;
           }
 
-          await this.Save(site, previousPage);
-          await this.Save(site, page);
+          using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+          {
+            await provider.SavePage(site, previousPage);
+          }
+          using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+          {
+            await provider.SavePage(site, page);
+          }
 
           InvalidateCache(page.Id);
           InvalidateCache(previousPage.Id);
@@ -576,8 +582,14 @@ public partial class PageManager : IPageManager
             previousPage.SortOrder += 10;
           }
 
-          await this.Save(site, previousPage);
-          await this.Save(site, page);
+          using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+          {
+            await provider.SavePage(site, previousPage);
+          }
+          using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+          {
+            await provider.SavePage(site, page);
+          } 
 
           InvalidateCache(page.Id);
           InvalidateCache(previousPage.Id);

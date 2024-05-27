@@ -4,7 +4,7 @@
 <h1 class="nucleus-control-panel-heading">Pages</h1>
 @using (Html.BeginAreaForm("Search", "Pages", "Admin", FormMethod.Post, new { @data_target = "#Page_Search_Results", @autocomplete = "off" }))
 {
-  <div class="nucleus-form-tools">
+  <div class="nucleus-form-tools page-index">
     @Html.TextBoxFor(model => model.SearchTerm, new { @class = "h-100", @data_autopostbackevent = "keyup", @placeholder = "search", @type = "search" })
     <input type="submit" value="&#xe8b6;" class="nucleus-material-icon btn btn-outline-secondary" />
 
@@ -25,6 +25,12 @@
         <li class="collapse copy-page-enabled">
           <a href="@Url.AreaAction("NewPageFromCopy", "Pages", "Admin")" class="dropdown-item d-flex" data-target="form.parent()" accesskey="C">
             Copy this page
+            <span class="nucleus-material-icon ms-auto">&#xe5e1;</span>
+          </a>
+        </li>
+        <li class="collapse copy-page-enabled">
+          <a href="@Url.AreaAction("NewPageFromCopy", "Pages", "Admin", new {copyContent = true})" class="dropdown-item d-flex" data-target="form.parent()" accesskey="C">
+            Copy this page with Content
             <span class="nucleus-material-icon ms-auto">&#xe5e1;</span>
           </a>
         </li>
@@ -119,9 +125,13 @@
     {
       jQuery('.copy-page-disabled').removeClass('show');
       jQuery('.copy-page-enabled').addClass('show');
-      var href = new URL(jQuery('.copy-page-enabled a').attr('href'), window.location.origin);
-      href.search = 'sourcePageId=' + jQuery('#Page_Id').val();
-      jQuery('.copy-page-enabled a').attr('href', href);
+
+      jQuery('.copy-page-enabled a').each(function () 
+      { 
+        var href = new URL(jQuery(this).attr('href'), window.location.origin);
+        href.search = 'sourcePageId=' + jQuery('#Page_Id').val() + ((href.search.includes('copyContent=True')) ? '&copyContent=True' : '');
+        jQuery(this).attr('href', href);
+      });      
     }
   });
 

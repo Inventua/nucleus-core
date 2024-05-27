@@ -1,4 +1,6 @@
 ﻿[*.cs]
+# IDE0290: Use primary constructor
+dotnet_diagnostic.IDE0290.severity = none
 
 # CS1712: Enforce typeparam xml comments
 dotnet_diagnostic.CS1712.severity = silent

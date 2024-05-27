@@ -1,26 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Nucleus.Abstractions.Models;
-using System.Security.Claims;
 using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models;
 using Nucleus.Extensions.Authorization;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Core.Authorization
 {
   public class PageViewPermissionAuthorizationHandler : AuthorizationHandler<PageViewPermissionAuthorizationRequirement>
   {
-
-    private Nucleus.Abstractions.Models.Context CurrentContext { get; }
+    private Application Application{ get; }
+    private Context CurrentContext { get; }
+    private ISiteManager SiteManager { get; }
+    
+    private IUserManager UserManager { get; }
     private ILogger<PageViewPermissionAuthorizationHandler> Logger { get; }
 
-    public PageViewPermissionAuthorizationHandler(Nucleus.Abstractions.Models.Context context, ILogger<PageViewPermissionAuthorizationHandler> logger)
+    public PageViewPermissionAuthorizationHandler(Application application, Context context, ISiteManager siteManager, IUserManager userManager, ILogger<PageViewPermissionAuthorizationHandler> logger)
     {
+      this.Application = application;
       this.CurrentContext = context;
+      this.SiteManager = siteManager;
+      this.UserManager = userManager;
       this.Logger = logger;
     }
 
@@ -30,13 +32,13 @@ namespace Nucleus.Core.Authorization
     /// <param name="context"></param>
     /// <param name="requirement"></param>
     /// <returns></returns>
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PageViewPermissionAuthorizationRequirement requirement)
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PageViewPermissionAuthorizationRequirement requirement)
     {
       if (context.User.IsSystemAdministrator())
       {
         Logger.LogTrace("User {0}: Access granted (System administrator).", context.User.GetUserId());
         context.Succeed(requirement);
-        return Task.CompletedTask;
+        return;
       }
 
       if (this.CurrentContext.Site != null)
@@ -45,7 +47,7 @@ namespace Nucleus.Core.Authorization
         {
           Logger.LogTrace("User {0}: Access granted (Site administrator).", context.User.GetUserId());
           context.Succeed(requirement);
-          return Task.CompletedTask;
+          return;
         }
       }
 
@@ -75,19 +77,16 @@ namespace Nucleus.Core.Authorization
         }
       }
 
-
-      //if (this.CurrentContext.Module != null)
-      //{
-      //	context.Succeed(requirement);
-      //}
-
-      if (this.CurrentContext.Page == null && !context.HasSucceeded)
+      if (this.CurrentContext.Site == null && (!this.Application.IsInstalled || await this.SiteManager.Count() == 0) && await this.UserManager.CountSystemAdministrators() == 0)
       {
-        // the user can't have Page view permission if no page was specified
-        Logger.LogTrace("User {0}: Access denied, no page specified.", context.User);
-        context.Fail();
+        // special case.  We check whether Nucleus is installed and redirect to the setup wizard in PageRoutingMiddleware, but we check for
+        // a NotFound response there.  That response comes from Nucleus.Web.DefaultController, which has [AuthorizeController(PAGE_VIEW_POLICY)] in order
+        // to check permissions for Nucleus pages, which calls this class.
+        // So we have to return a success case in order to get to the code in Nucleus.Web.DefaultController.Index
+        context.Succeed(requirement);
       }
-      return Task.CompletedTask;
+
+      return;
     }
   }
 }

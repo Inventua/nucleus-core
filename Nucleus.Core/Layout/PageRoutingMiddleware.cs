@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +22,7 @@ namespace Nucleus.Core.Layout
     private Context Context { get; }
     private Application Application { get; }
     private IPageManager PageManager { get; }
+    private IUserManager UserManager { get; }
     private ISiteManager SiteManager { get; }
 
     private IFileSystemManager FileSystemManager { get; }
@@ -32,19 +32,20 @@ namespace Nucleus.Core.Layout
     private ICacheManager CacheManager { get; }
 
     private static readonly string[] KNOWN_NON_PAGE_PATHS =
-    {
+    [
       Nucleus.Abstractions.RoutingConstants.API_ROUTE_PATH_PREFIX,
       Nucleus.Abstractions.RoutingConstants.EXTENSIONS_ROUTE_PATH_PREFIX,
       Nucleus.Abstractions.RoutingConstants.SITEMAP_ROUTE_PATH,
-      Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX,
-    };
+      Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX
+    ];
 
-    public PageRoutingMiddleware(Context context, Application application, IPageManager pageManager, ISiteManager siteManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager, ILogger<PageRoutingMiddleware> logger)
+    public PageRoutingMiddleware(Context context, Application application, IPageManager pageManager, ISiteManager siteManager, IUserManager userManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager, ILogger<PageRoutingMiddleware> logger)
     {
       this.Context = context;
       this.Application = application;
       this.PageManager = pageManager;
       this.SiteManager = siteManager;
+      this.UserManager = userManager;
       this.FileSystemManager = fileSystemManager;
       this.CacheManager = cacheManager;
       this.Logger = logger;
@@ -90,83 +91,83 @@ namespace Nucleus.Core.Layout
       }
       else
       {
-        if (SkipSiteDetection(context))
+        if (SkipSiteDetection(context) || !this.Application.IsInstalled)          
         {
           Logger.LogTrace("Skipped site detection for '{request}'.", context.Request.Path);
 
-          this.Context.Site = null;
-          await next(context);
-          return;
+          this.Context.Site = null;          
         }
-
-        Logger.LogTrace("Matching site by host '{host}' and pathbase '{pathbase}'.", context.Request.Host, context.Request.PathBase);
-
-        this.Context.Site = await this.SiteManager.Get(context.Request.Host.Value, context.Request.PathBase);
-
-        if (this.Context.Site == null)
+        else
         {
-          Logger.LogTrace("Using default site.");
-          this.Context.Site = await this.SiteManager.Get("", "");
+          Logger.LogTrace("Matching site by host '{host}' and pathbase '{pathbase}'.", context.Request.Host, context.Request.PathBase);
+
+          this.Context.Site = await this.SiteManager.Get(context.Request.Host.Value, context.Request.PathBase);
+
+          if (this.Context.Site == null)
+          {
+            Logger.LogTrace("Using default site.");
+            this.Context.Site = await this.SiteManager.Get("", "");
+
+            if (this.Context.Site != null)
+            {
+              // Add "default" site to the site alias table 
+              SiteAlias alias = new() { Alias = $"{context.Request.Host}{context.Request.PathBase}" };
+              await this.SiteManager.SaveAlias(this.Context.Site, alias);
+
+              // If the site doesn't already have a default alias, set it to the new alias
+              if (this.Context.Site.DefaultSiteAlias == null)
+              {
+                this.Context.Site.DefaultSiteAlias = alias;
+                await this.SiteManager.Save(this.Context.Site);
+              }
+            }
+          }
 
           if (this.Context.Site != null)
           {
-            // Add "default" site to the site alias table 
-            SiteAlias alias = new() { Alias = $"{context.Request.Host}{context.Request.PathBase}" };
-            await this.SiteManager.SaveAlias(this.Context.Site, alias);
+            string requestedPath = System.Web.HttpUtility.UrlDecode(context.Request.Path);
+            Logger.LogTrace("Using site '{siteid}'.", this.Context.Site.Id);
 
-            // If the site doesn't already have a default alias, set it to the new alias
-            if (this.Context.Site.DefaultSiteAlias == null)
+            if (!SkipPageDetection(context))
             {
-              this.Context.Site.DefaultSiteAlias = alias;
-              await this.SiteManager.Save(this.Context.Site);
+              Logger.LogTrace("Lookup page by path '{path}'.", requestedPath);
+
+              await FindPage(requestedPath);
+
+              if (this.Context.Page == null)
+              {
+                // if the page was not found, try searching for path & query.  This is to support pages routes which include a query string, which
+                // users may have in place to provide for urls from legacy systems like DNN which can have querystring values which identify a page.
+                string requestedPathAndQuery = System.Web.HttpUtility.UrlDecode(context.Request.Path + context.Request.QueryString);
+
+                Logger.LogTrace("Lookup page by path '{path}'.", requestedPathAndQuery);
+
+                await FindPage(requestedPathAndQuery);
+              }
             }
-          }
-        }
 
-        if (this.Context.Site != null)
-        {
-          string requestedPath = System.Web.HttpUtility.UrlDecode(context.Request.Path);
-          Logger.LogTrace("Using site '{siteid}'.", this.Context.Site.Id);
-
-          if (!SkipPageDetection(context))
-          {
-            Logger.LogTrace("Lookup page by path '{path}'.", requestedPath);
-
-            await FindPage(requestedPath);
-
-            if (this.Context.Page == null)
+            if (this.Context.Page != null)
             {
-              // if the page was not found, try searching for path & query.  This is to support pages routes which include a query string, which
-              // users may have in place to provide for urls from legacy systems like DNN which can have querystring values which identify a page.
-              string requestedPathAndQuery = System.Web.HttpUtility.UrlDecode(context.Request.Path + context.Request.QueryString);
+              if (this.Context.Page.Disabled)
+              {
+                Logger.LogTrace("Page id '{pageid}' is disabled.", pageId);
+                this.Context.Page = null;
+              }
+              else
+              {
+                Logger.LogTrace("Page found: '{pageid}'.", this.Context.Page.Id);
+              }
 
-              Logger.LogTrace("Lookup page by path '{path}'.", requestedPathAndQuery);
-
-              await FindPage(requestedPathAndQuery);
-            }
-          }
-
-          if (this.Context.Page != null)
-          {
-            if (this.Context.Page.Disabled)
-            {
-              Logger.LogTrace("Page id '{pageid}' is disabled.", pageId);
-              this.Context.Page = null;
+              // When HandleLinkType returns false, it means we should not continue because we are redirecting to another site
+              if (!await HandleLinkType(context))
+              {
+                return;
+              }
             }
             else
             {
-              Logger.LogTrace("Page found: '{pageid}'.", this.Context.Page.Id);
+              Logger.LogTrace("Path '{path}' is not a page.", requestedPath);
             }
-
-            // When HandleLinkType returns false, it means we should not continue because we are redirecting to another site
-            if (!await HandleLinkType(context))
-            {
-              return;
-            }
-          }
-          else
-          {
-            Logger.LogTrace("Path '{path}' is not a page.", requestedPath);
           }
         }
       }
@@ -174,18 +175,27 @@ namespace Nucleus.Core.Layout
       await next(context);
 
       // If the request path did not match a site, and the response is a 404 (so it didn't match a controller route
-      // or any other component that can handle the request), and there are no sites in the sites table, redirect to 
-      // the setup wizard.  This is to handle cases where there is a /Setup/install-log.config file present (indicating
-      // that setup has previously completed), but the database is empty.  This is mostly a scenario that happens in
-      // testing, but it could also happen if a user decided to attach to a different (new) database.
-      if (context.Response.StatusCode == (int)System.Net.HttpStatusCode.NotFound && this.Context.Site == null)
+      // or any other component that can handle the request), redirect to the setup wizard, if Nucleus has not been set up.
+      //
+      // The criteria for checking whether Nucleus has not been set up is:
+      // - The setup/install-log.config file does not exist, or the Extensions folder does not exist (Application.IsInstalled=false),
+      //   or there are no sites in the database.
+      // - AND there are no system administrator users in the database
+      //
+      // The calls to SkipSiteDetection and SkipPageDetection check that the request path isn't a known non-page path
+      // like favicon.ico, or the setup wizard itself, to prevent redirection for those cases.
+      if (
+        context.Response.StatusCode == (int)System.Net.HttpStatusCode.NotFound && 
+        this.Context.Site == null && 
+        !SkipSiteDetection(context) && 
+        !SkipPageDetection(context) && 
+        (!this.Application.IsInstalled || await this.SiteManager.Count() == 0) &&
+        await this.UserManager.CountSystemAdministrators() == 0
+      )
       {
-        if (await this.SiteManager.Count() == 0)
-        {
-          String relativePath = $"{(String.IsNullOrEmpty(context.Request.PathBase) ? "" : context.Request.PathBase + "/")}Setup/SiteWizard";
-          context.Response.Redirect(relativePath);
-        }
-      }
+        String relativePath = $"{(String.IsNullOrEmpty(context.Request.PathBase) ? "" : context.Request.PathBase + "/")}Setup/SiteWizard";
+        context.Response.Redirect(relativePath);
+      }      
     }
 
     /// <summary>
@@ -271,7 +281,7 @@ namespace Nucleus.Core.Layout
 
         while (this.Context.Page == null && !String.IsNullOrEmpty(partPath))
         {
-          int lastIndexOfSeparator = partPath.LastIndexOfAny(new char[] { '/', '&', '?' });
+          int lastIndexOfSeparator = partPath.LastIndexOfAny(['/', '&', '?']);
           string nextParameterPart = partPath[(lastIndexOfSeparator + 1)..];
           if (nextParameterPart.Length > 0)
           {
@@ -285,7 +295,7 @@ namespace Nucleus.Core.Layout
             }
           }
 
-          partPath = partPath.Substring(0, lastIndexOfSeparator);
+          partPath = partPath[..lastIndexOfSeparator];
 
           if (!String.IsNullOrEmpty(partPath))
           {
@@ -308,7 +318,7 @@ namespace Nucleus.Core.Layout
       }
     }
 
-    private PageRoute GetFoundRoute(Page page, string matchedPath)
+    private static PageRoute GetFoundRoute(Page page, string matchedPath)
     {
       foreach (PageRoute pageRoute in page.Routes.ToArray())
       {
@@ -317,6 +327,7 @@ namespace Nucleus.Core.Layout
           return pageRoute;
         }
       }
+
       return page.DefaultPageRoute();
     }
 
@@ -333,7 +344,7 @@ namespace Nucleus.Core.Layout
     ///    report it as a plain-text error.
     ///  - favicon.ico
     /// </remarks>
-    private Boolean SkipSiteDetection(HttpContext context)
+    private static Boolean SkipSiteDetection(HttpContext context)
     {
       // Browsers often send a request for /favicon.ico even when the page doesn't specify an icon.  When a site is set up with an "favicon", the
       // path is a link to /files/path, not /favicon.ico, so /favicon.ico is never a legitimate request.
@@ -358,11 +369,6 @@ namespace Nucleus.Core.Layout
         }
       }
 
-      if (!this.Application.IsInstalled)
-      {
-        return true;
-      }
-
       return false;
     }
 
@@ -373,7 +379,7 @@ namespace Nucleus.Core.Layout
     /// <remarks>
     /// Skip logic to identify the current page when the http request is for a file, API method, extension resource file or the search engine site map.
     /// </remarks>
-    private Boolean SkipPageDetection(HttpContext context)
+    private static Boolean SkipPageDetection(HttpContext context)
     {
       if (context.Request.Path.HasValue && context.Request.Path != "/")
       {

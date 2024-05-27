@@ -201,9 +201,10 @@ namespace Nucleus.Web.Controllers.Admin
 		/// <returns></returns>
 		[HttpGet]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
-    public async Task<ActionResult> NewPageFromCopy(Guid sourcePageId)
+    public async Task<ActionResult> NewPageFromCopy(Guid sourcePageId, Boolean copyContent)
     {
       ViewModels.Admin.PageIndex viewModel;
+      List<Content> pageContent = new();
 
       // use specified page as a template
       Page sourcePage = await this.PageManager.Get(sourcePageId);
@@ -223,10 +224,25 @@ namespace Nucleus.Web.Controllers.Admin
       {
         permission.Id = Guid.NewGuid();
       }
+
       foreach (PageModule module in page.Modules)
       {
+        List<Content> contentItems = await ContentManager.List(module);
         module.Id = Guid.NewGuid();
+
+        if (copyContent)
+        {// get a list of content items which belong to the source module(s), copy them and add to pageContent (they are saved below)
+          pageContent.AddRange(contentItems.Select(content =>
+          {
+            Content newItem = new();
+            content.CopyTo(newItem);
+            newItem.Id = Guid.NewGuid();
+            newItem.PageModuleId = module.Id;
+            return newItem;
+          }));
+        }
       }
+
       foreach (Permission permission in page.Modules.SelectMany(module => module.Permissions))
       {
         permission.Id = Guid.NewGuid();
@@ -237,6 +253,18 @@ namespace Nucleus.Web.Controllers.Admin
       foreach (PageModule module in page.Modules)
       {
         await this.PageModuleManager.Save(page, module);
+      }
+
+      if (copyContent)
+      {
+        foreach (Content content in pageContent)
+        {
+          PageModule module = page.Modules.Where(module => module.Id == content.PageModuleId).FirstOrDefault();
+          if (module != null)
+          {
+            await this.ContentManager.Save(module, content);
+          }
+        }
       }
 
       viewModel = await BuildIndexViewModel(page.Id, true);

@@ -892,6 +892,11 @@ ul.nucleus-control-panel-items button
   width: 14rem;
 }
 
+.nucleus-adminpage .page-index .copy-page-enabled 
+{
+	min-width: 17rem
+}
+
 .nucleus-admin-content .container-style-colorselector
 {
   appearance: none;

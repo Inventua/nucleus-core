@@ -13,13 +13,16 @@ namespace Nucleus.Core.Authorization
     private Application Application{ get; }
     private Context CurrentContext { get; }
     private ISiteManager SiteManager { get; }
+    
+    private IUserManager UserManager { get; }
     private ILogger<PageViewPermissionAuthorizationHandler> Logger { get; }
 
-    public PageViewPermissionAuthorizationHandler(Application application, Context context, ISiteManager siteManager, ILogger<PageViewPermissionAuthorizationHandler> logger)
+    public PageViewPermissionAuthorizationHandler(Application application, Context context, ISiteManager siteManager, IUserManager userManager, ILogger<PageViewPermissionAuthorizationHandler> logger)
     {
       this.Application = application;
       this.CurrentContext = context;
       this.SiteManager = siteManager;
+      this.UserManager = userManager;
       this.Logger = logger;
     }
 
@@ -74,10 +77,12 @@ namespace Nucleus.Core.Authorization
         }
       }
 
-      if (this.CurrentContext.Site == null && (!this.Application.IsInstalled || await this.SiteManager.Count() == 0))
+      if (this.CurrentContext.Site == null && (!this.Application.IsInstalled || await this.SiteManager.Count() == 0) && await this.UserManager.CountSystemAdministrators() == 0)
       {
-        // special case.  We check whether Nucleus is install/redirect to the setup wizard in Nucleus.Web.DefaultController, which has [AuthorizeController(PAGE_VIEW_POLICY)] in order
-        // to check permissions for Nucleus pages, which calls this class.  So we have to return a success case in order to get to the code in Nucleus.Web.DefaultController.Index
+        // special case.  We check whether Nucleus is installed and redirect to the setup wizard in PageRoutingMiddleware, but we check for
+        // a NotFound response there.  That response comes from Nucleus.Web.DefaultController, which has [AuthorizeController(PAGE_VIEW_POLICY)] in order
+        // to check permissions for Nucleus pages, which calls this class.
+        // So we have to return a success case in order to get to the code in Nucleus.Web.DefaultController.Index
         context.Succeed(requirement);
       }
 

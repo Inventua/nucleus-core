@@ -49,50 +49,43 @@ public class DefaultController : Controller
   {
     Boolean useSiteErrorPage = false;
 
-    // If the site hasn't been set up yet (empty database), redirect to the site wizard.
-    if (this.ShouldRedirectToSetupWizard())
-    {
-      return RedirectToAction("Index", "SiteWizard", new { area = "Setup" });
-    }
-   
     // if the user's password has expired, redirect them to the change password page, as long as the current request isn't for the change password page
     if (User.IsPasswordExpired())
     {
       SitePages sitePages = this.Context.Site.GetSitePages();
-      Page loginPage = null;
+      Page changePasswordPage = null;
 
       if (sitePages.UserChangePasswordPageId.HasValue)
       {
-        loginPage = await this.PageManager.Get(sitePages.UserChangePasswordPageId.Value);
+        changePasswordPage = await this.PageManager.Get(sitePages.UserChangePasswordPageId.Value);
       }
 
-      if (loginPage != null)
+      if (changePasswordPage != null)
       {
-        if (this.Context.Page.Id != loginPage.Id)
+        if (this.Context.Page.Id != changePasswordPage.Id)
         {
-          string redirectUrl = loginPage.DefaultPageRoute()?.Path;
+          string redirectUrl = changePasswordPage.DefaultPageRoute()?.Path;
 
           if (!String.IsNullOrEmpty(redirectUrl))
           {
-            Logger.LogTrace("Redirecting user with expired password to {redirectUrl}.", redirectUrl);
+            Logger.LogTrace("Redirecting user '{username}' with expired password to '{redirectUrl}'.", User.Identity.Name, redirectUrl);
             return Redirect(redirectUrl);
           }
           else
           {
-            Logger.LogWarning("Unable to redirect a user with an expired password to the 'Change Password' page because the site's configured 'Change Password' page does not have a default route.", redirectUrl);
+            Logger.LogWarning("Unable to redirect user '{username}' with an expired password to the 'Change Password' page because the site's configured 'Change Password' page does not have a default route.", User.Identity.Name);
           }
         }
       }
       else
       {
         // if the site does not have a "change password" page set, redirect to the built-in one instead
-
         return Redirect(Url.AreaAction("EditPassword", "User", "Account", new { returnUrl = this.HttpContext.Request.ToString() }));
       }
     }
 
-    // If the page was not found, display the error page if one is defined for the site, or if the requested Uri is one
-    // of the file names/extensions that we always return a "raw" 404 error for, return NotFound().
+    // If the page was not found, display the error page if one is defined for the site, and the request does not match a
+    // "known" file name or extension (checked in No404Redirect).  Otherwise, return a 404: NotFound.
     if (this.Context.Page == null)
     {
       Logger.LogTrace("Not found: {path}.", ControllerContext.HttpContext.Request.Path);
@@ -113,28 +106,28 @@ public class DefaultController : Controller
         }
       }
 
-      // Either no error page is defined, or the requested url matches one of the file names/extensions that we always return 
-      // a "raw" 404 error for
+      // return a "raw" 404 error 
       if (!useSiteErrorPage)
       {
         return NotFound();
       }
     }
 
+    // Handle "PermanentRedirect" page routes.
+    // We check useSiteErrorPage here because when we are showing the site's "friendly" 404/Not Found  page, we don't return a redirect, we
+    // set context.Page to the 404 error page, so we end up here.  We do not need to process permanent redirects on the requested page when
+    // we are displaying the site's "not found" page (there won't be any, since the page was not found).
     if (!useSiteErrorPage)
     {
-      // Handle "PermanentRedirect" page routes
-      foreach (PageRoute pageRoute in this.Context.Page.Routes.ToArray())
+      if (this.Context.MatchedRoute?.Type == PageRoute.PageRouteTypes.PermanentRedirect)
       {
-        if (this.Context.MatchedRoute?.Type == PageRoute.PageRouteTypes.PermanentRedirect)
-        {
-          string redirectUrl = this.Url.PageLink(this.Context.Page);
-          Logger.LogTrace("Permanently redirecting request to {redirectUrl}.", redirectUrl);
-          return RedirectPermanent(redirectUrl);
-        }
-      }
+        string redirectUrl = this.Url.PageLink(this.Context.Page);
+        Logger.LogTrace("Permanently redirecting request '{originalRequest}' to '{redirectUrl}'.", Request.Path, redirectUrl);
+        return RedirectPermanent(redirectUrl);
+      }      
     }
 
+    // display the requested page
     return View(GetLayoutPath(this.WebHostEnvironment, this.Context, this.Logger), await BuildViewModel(this.Url, this.Context, this.HttpContext, this.Application, this.FileSystemManager ));
   }
 
@@ -151,16 +144,18 @@ public class DefaultController : Controller
   }
 
   internal static async Task<Nucleus.ViewFeatures.ViewModels.Layout> BuildViewModel(IUrlHelper url, Context context, HttpContext httpContext, Application app, IFileSystemManager fileSystemManager)
-  {    
-    Nucleus.ViewFeatures.ViewModels.Layout viewModel = new(context);
+  {
+    Nucleus.ViewFeatures.ViewModels.Layout viewModel = new(context)
+    {
+      CanEdit = httpContext.User.CanEditContent(context.Site, context.Page) && app.ControlPanelUri != "",
+      ControlPanelUri = app.ControlPanelUri,
+      IsEditing = httpContext.User.IsEditing(httpContext, context.Site, context.Page),
+      DefaultPageUri = url.GetAbsoluteUri(context.Page.DefaultPageRoute().Path).AbsoluteUri,
+      SiteIconPath = url.Content(await context.Site.GetIconPath(fileSystemManager)),
+      SiteCssFilePath = url.Content(await context.Site.GetCssFilePath(fileSystemManager))
+    };
 
-    viewModel.ControlPanelUri = app.ControlPanelUri;
-    viewModel.IsEditing = httpContext.User.IsEditing(httpContext, context.Site, context.Page);
-    viewModel.CanEdit = httpContext.User.CanEditContent(context.Site, context.Page) && viewModel.ControlPanelUri != "";
-    viewModel.DefaultPageUri = url.GetAbsoluteUri(context.Page.DefaultPageRoute().Path).AbsoluteUri;
-    viewModel.SiteIconPath = url.Content(await context.Site.GetIconPath(fileSystemManager));
-    viewModel.SiteCssFilePath = url.Content(await context.Site.GetCssFilePath(fileSystemManager));
-    viewModel.ControlPanelDockingCssClass = viewModel.CanEdit && IsTopDockSelected(httpContext) ? "control-panel-dock-top" : "";
+    viewModel.ControlPanelDockingCssClass = viewModel.CanEdit && IsTopDockSelected(httpContext) ? "control-panel-dock-top" : "";   
 
     if (viewModel.IsEditing)
     {
@@ -176,11 +171,6 @@ public class DefaultController : Controller
     }
 
     return viewModel;
-  }
-
-  private Boolean ShouldRedirectToSetupWizard()
-  {
-    return (this.Context.Site == null && this.Context.Page == null && !this.Application.IsInstalled && !this.Request.Path.StartsWithSegments("/Setup/SiteWizard", StringComparison.OrdinalIgnoreCase));
   }
 
   /// <summary>

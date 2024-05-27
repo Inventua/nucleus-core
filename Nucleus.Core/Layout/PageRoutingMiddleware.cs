@@ -22,6 +22,7 @@ namespace Nucleus.Core.Layout
     private Context Context { get; }
     private Application Application { get; }
     private IPageManager PageManager { get; }
+    private IUserManager UserManager { get; }
     private ISiteManager SiteManager { get; }
 
     private IFileSystemManager FileSystemManager { get; }
@@ -31,19 +32,20 @@ namespace Nucleus.Core.Layout
     private ICacheManager CacheManager { get; }
 
     private static readonly string[] KNOWN_NON_PAGE_PATHS =
-    {
+    [
       Nucleus.Abstractions.RoutingConstants.API_ROUTE_PATH_PREFIX,
       Nucleus.Abstractions.RoutingConstants.EXTENSIONS_ROUTE_PATH_PREFIX,
       Nucleus.Abstractions.RoutingConstants.SITEMAP_ROUTE_PATH,
       Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX
-    };
+    ];
 
-    public PageRoutingMiddleware(Context context, Application application, IPageManager pageManager, ISiteManager siteManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager, ILogger<PageRoutingMiddleware> logger)
+    public PageRoutingMiddleware(Context context, Application application, IPageManager pageManager, ISiteManager siteManager, IUserManager userManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager, ILogger<PageRoutingMiddleware> logger)
     {
       this.Context = context;
       this.Application = application;
       this.PageManager = pageManager;
       this.SiteManager = siteManager;
+      this.UserManager = userManager;
       this.FileSystemManager = fileSystemManager;
       this.CacheManager = cacheManager;
       this.Logger = logger;
@@ -89,7 +91,7 @@ namespace Nucleus.Core.Layout
       }
       else
       {
-        if (SkipSiteDetection(context))
+        if (SkipSiteDetection(context) || !this.Application.IsInstalled)          
         {
           Logger.LogTrace("Skipped site detection for '{request}'.", context.Request.Path);
 
@@ -173,11 +175,23 @@ namespace Nucleus.Core.Layout
       await next(context);
 
       // If the request path did not match a site, and the response is a 404 (so it didn't match a controller route
-      // or any other component that can handle the request), and there are no sites in the sites table, redirect to 
-      // the setup wizard.  This is to handle cases where there is a /Setup/install-log.config file present (indicating
-      // that setup has previously completed), but the database is empty.  This is mostly a scenario that happens in
-      // testing, but it could also happen if a user decided to attach to a different (new) database.
-      if (context.Response.StatusCode > 300 && !context.Request.Path.StartsWithSegments("/Setup/SiteWizard", StringComparison.OrdinalIgnoreCase) && this.Context.Site == null && (!this.Application.IsInstalled || await this.SiteManager.Count() == 0))
+      // or any other component that can handle the request), redirect to the setup wizard, if Nucleus has not been set up.
+      //
+      // The criteria for checking whether Nucleus has not been set up is:
+      // - The setup/install-log.config file does not exist, or the Extensions folder does not exist (Application.IsInstalled=false),
+      //   or there are no sites in the database.
+      // - AND there are no system administrator users in the database
+      //
+      // The calls to SkipSiteDetection and SkipPageDetection check that the request path isn't a known non-page path
+      // like favicon.ico, or the setup wizard itself, to prevent redirection for those cases.
+      if (
+        context.Response.StatusCode == (int)System.Net.HttpStatusCode.NotFound && 
+        this.Context.Site == null && 
+        !SkipSiteDetection(context) && 
+        !SkipPageDetection(context) && 
+        (!this.Application.IsInstalled || await this.SiteManager.Count() == 0) &&
+        await this.UserManager.CountSystemAdministrators() == 0
+      )
       {
         String relativePath = $"{(String.IsNullOrEmpty(context.Request.PathBase) ? "" : context.Request.PathBase + "/")}Setup/SiteWizard";
         context.Response.Redirect(relativePath);
@@ -267,7 +281,7 @@ namespace Nucleus.Core.Layout
 
         while (this.Context.Page == null && !String.IsNullOrEmpty(partPath))
         {
-          int lastIndexOfSeparator = partPath.LastIndexOfAny(new char[] { '/', '&', '?' });
+          int lastIndexOfSeparator = partPath.LastIndexOfAny(['/', '&', '?']);
           string nextParameterPart = partPath[(lastIndexOfSeparator + 1)..];
           if (nextParameterPart.Length > 0)
           {
@@ -281,7 +295,7 @@ namespace Nucleus.Core.Layout
             }
           }
 
-          partPath = partPath.Substring(0, lastIndexOfSeparator);
+          partPath = partPath[..lastIndexOfSeparator];
 
           if (!String.IsNullOrEmpty(partPath))
           {
@@ -304,7 +318,7 @@ namespace Nucleus.Core.Layout
       }
     }
 
-    private PageRoute GetFoundRoute(Page page, string matchedPath)
+    private static PageRoute GetFoundRoute(Page page, string matchedPath)
     {
       foreach (PageRoute pageRoute in page.Routes.ToArray())
       {
@@ -313,6 +327,7 @@ namespace Nucleus.Core.Layout
           return pageRoute;
         }
       }
+
       return page.DefaultPageRoute();
     }
 
@@ -329,7 +344,7 @@ namespace Nucleus.Core.Layout
     ///    report it as a plain-text error.
     ///  - favicon.ico
     /// </remarks>
-    private Boolean SkipSiteDetection(HttpContext context)
+    private static Boolean SkipSiteDetection(HttpContext context)
     {
       // Browsers often send a request for /favicon.ico even when the page doesn't specify an icon.  When a site is set up with an "favicon", the
       // path is a link to /files/path, not /favicon.ico, so /favicon.ico is never a legitimate request.
@@ -354,11 +369,6 @@ namespace Nucleus.Core.Layout
         }
       }
 
-      if (!this.Application.IsInstalled)
-      {
-        return true;
-      }
-
       return false;
     }
 
@@ -369,7 +379,7 @@ namespace Nucleus.Core.Layout
     /// <remarks>
     /// Skip logic to identify the current page when the http request is for a file, API method, extension resource file or the search engine site map.
     /// </remarks>
-    private Boolean SkipPageDetection(HttpContext context)
+    private static Boolean SkipPageDetection(HttpContext context)
     {
       if (context.Request.Path.HasValue && context.Request.Path != "/")
       {

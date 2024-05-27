@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Nucleus.Abstractions.Models;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Primitives;
+using Nucleus.Abstractions.Models;
 
 namespace Nucleus.Web.ViewModels.Setup
 {
@@ -17,11 +12,11 @@ namespace Nucleus.Web.ViewModels.Setup
 
     // database settings
     public Boolean IsDatabaseConfigured { get; set; }
-    public IEnumerable<string> DatabaseProviders { get; set; } = new string[] { };
+    public IEnumerable<string> DatabaseProviders { get; set; } = [];
     public string DatabaseProvider { get; set; } = "SqlServer";
     public string DatabaseServer { get; set; }
 
-    public IEnumerable<string> Databases { get; set; } = new string[] { REFRESH_DATABASES };
+    public IEnumerable<string> Databases { get; set; } = [REFRESH_DATABASES];
     public string DatabaseName { get; set; }
 
     public string DatabaseConnectionString { get; set; }
@@ -34,17 +29,11 @@ namespace Nucleus.Web.ViewModels.Setup
     public Nucleus.Abstractions.IPreflight.ValidationResults Preflight { get; set; }
 
     // file system
-    public List<FileSystemType> AvailableFileSystemTypes { get; set; } = new();
-    public List<SelectedFileSystem> SelectedFileSystems { get; set; } = new();
+    public List<FileSystemType> AvailableFileSystemTypes { get; set; } = [];
+    public List<SelectedFileSystem> SelectedFileSystems { get; set; } = [];
 
     public FileSystemType AddFileSystemType { get; set; }
     public string ScrollTo { get; set; }
-
-    //public Boolean UseLocalFileSystem { get; set; } = true;
-
-    //public Boolean UseAzureStorage { get; set; } = true;
-
-    //public Boolean UseAmazonS3 { get; set; } = true;
 
     // site settings
     public string SelectedTemplate { get; set; }
@@ -66,7 +55,7 @@ namespace Nucleus.Web.ViewModels.Setup
     public string SystemAdminPassword { get; set; }
 
     [Required(ErrorMessage = "You must enter a System Administrator password confirmation")]
-    [Compare(nameof(SystemAdminPassword), ErrorMessage = "The new password and confirm password values must match")]
+    [Compare(nameof(SystemAdminPassword), ErrorMessage = "The System Administrator password and confirm password values must match")]
     public string SystemAdminConfirmPassword { get; set; }
 
     [Required(ErrorMessage = "You must enter a Site Administrator user name")]
@@ -76,7 +65,7 @@ namespace Nucleus.Web.ViewModels.Setup
     public string SiteAdminPassword { get; set; }
 
     [Required(ErrorMessage = "You must enter a Site Administrator password confirmation")]
-    [Compare(nameof(SiteAdminPassword), ErrorMessage = "The new password and confirm password values must match")]
+    [Compare(nameof(SiteAdminPassword), ErrorMessage = "The Site Administrator password and confirm password values must match")]
     public string SiteAdminConfirmPassword { get; set; }
 
     public IList<InstallableExtension> InstallableExtensions { get; set; }
@@ -93,7 +82,7 @@ namespace Nucleus.Web.ViewModels.Setup
       public string DefaultKey { get; set; }
       public string DefaultName { get; set; }
 
-      public List<FileSystemProperty> Properties { get; set; } = new();
+      public List<FileSystemProperty> Properties { get; set; } = [];
     }
 
     public class FileSystemProperty
@@ -122,7 +111,7 @@ namespace Nucleus.Web.ViewModels.Setup
       public string Name { get; set; }
       public FileSystemType FileSystemType { get; set; }
       public Boolean IsRemoved { get; set; }
-      public List<FileSystemProperty> Values { get; set; } = new();
+      public List<FileSystemProperty> Values { get; set; } = [];
     }
 
     public class SiteTemplate

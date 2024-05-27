@@ -29,23 +29,20 @@ public class SiteWizardController : Controller
   private IExtensionManager ExtensionManager { get; }
   private ISiteManager SiteManager { get; }
   private IUserManager UserManager { get; }
-  private ILayoutManager LayoutManager { get; }
-  private IContainerManager ContainerManager { get; }
-  private Abstractions.IPreflight PreFlight { get; }
-  private Abstractions.Models.Configuration.FolderOptions FolderOptions { get; }
+  private IPreflight PreFlight { get; }
   private IFileSystemManager FileSystemManager { get; }
 
-  private Abstractions.Models.Application Application { get; }
+  private Application Application { get; }
   private ILogger<SiteWizardController> Logger { get; }
 
-  private static Guid HTML_MODULE_PACKAGE_ID = Guid.Parse("4036fdb6-6114-4740-b3c4-d3dbc8f37540");
-  private static Guid SMTP_CLIENT_PACKAGE_ID = Guid.Parse("2cefdc41-bb7c-48c7-9dd0-9f1975bcd502");
-  private static Guid STANDARD_LAYOUTS_CONTAINERS_PACKAGE_ID = Guid.Parse("c71695ec-111a-4ee6-9ba6-cdce64a6afd5");
+  private static readonly Guid HTML_MODULE_PACKAGE_ID = Guid.Parse("4036fdb6-6114-4740-b3c4-d3dbc8f37540");
+  private static readonly Guid SMTP_CLIENT_PACKAGE_ID = Guid.Parse("2cefdc41-bb7c-48c7-9dd0-9f1975bcd502");
+  private static readonly Guid STANDARD_LAYOUTS_CONTAINERS_PACKAGE_ID = Guid.Parse("c71695ec-111a-4ee6-9ba6-cdce64a6afd5");
 
-  private static Guid[] REQUIRED_EXTENSIONS = { HTML_MODULE_PACKAGE_ID, SMTP_CLIENT_PACKAGE_ID };
-  private static Guid[] RECOMMENDED_EXTENSIONS = { STANDARD_LAYOUTS_CONTAINERS_PACKAGE_ID };
+  private static readonly Guid[] REQUIRED_EXTENSIONS = [HTML_MODULE_PACKAGE_ID, SMTP_CLIENT_PACKAGE_ID];
+  private static readonly Guid[] RECOMMENDED_EXTENSIONS = [STANDARD_LAYOUTS_CONTAINERS_PACKAGE_ID];
 
-  private static FileSystemType LOCAL_FILES = new()
+  private static readonly FileSystemType LOCAL_FILES = new()
   {
     PackageId = Guid.NewGuid(),  // local file system is in the core, so it will never match an extension package id
     FriendlyName = "Local File System",
@@ -54,46 +51,43 @@ public class SiteWizardController : Controller
     DefaultName = "Local"
   };
 
-  private static FileSystemType AMAZON_S3 = new()
+  private static readonly FileSystemType AMAZON_S3 = new()
   {
     PackageId = Guid.Parse("28f54611-c14a-4a98-af7c-6a5a3d62b2e0"),
     FriendlyName = "Amazon S3",
-    Properties = new()
-      {
+    Properties =
+      [
         new("Access Key", "AccessKey", ""),
         new("Secret", "Secret", ""),
         new("Service Url", "ServiceUrl", ""),
         new("Root Path", "RootPath", "")
-      },
+      ],
     ProviderType = "Nucleus.Extensions.AmazonS3FileSystemProvider.FileSystemProvider,Nucleus.Extensions.AmazonS3FileSystemProvider",
     DefaultKey = "amazon",
     DefaultName = "Amazon"
   };
 
-  private static FileSystemType AZURE_STORAGE = new()
+  private static readonly FileSystemType AZURE_STORAGE = new()
   {
     PackageId = Guid.Parse("e27c5782-df19-462f-806c-9b6897dd8ae9"),
     FriendlyName = "Azure Storage",
-    Properties = new() { new("Connection String", "ConnectionString", "") },
+    Properties = [new("Connection String", "ConnectionString", "")],
     ProviderType = "Nucleus.Extensions.AzureBlobStorageFileSystemProvider.FileSystemProvider,Nucleus.Extensions.AzureBlobStorageFileSystemProvider",
     DefaultKey = "azure",
     DefaultName = "Azure"
   };
 
-  public SiteWizardController(IWebHostEnvironment webHostEnvironment, IHostApplicationLifetime hostApplicationLifetime, Abstractions.Models.Application application, IOptions<Abstractions.Models.Configuration.FolderOptions> folderOptions, Abstractions.IPreflight preFlight, IExtensionManager extensionManager, ISiteManager siteManager, IFileSystemManager fileSystemManager, IUserManager userManager, ILayoutManager layoutManager, IContainerManager containerManager, ILogger<SiteWizardController> logger)
+  public SiteWizardController(IWebHostEnvironment webHostEnvironment, IHostApplicationLifetime hostApplicationLifetime, Abstractions.Models.Application application, IPreflight preFlight, IExtensionManager extensionManager, ISiteManager siteManager, IFileSystemManager fileSystemManager, IUserManager userManager, ILogger<SiteWizardController> logger)
   {
     this.WebHostEnvironment = webHostEnvironment;
     this.Logger = logger;
     this.HostApplicationLifetime = hostApplicationLifetime;
     this.Application = application;
-    this.FolderOptions = folderOptions.Value;
     this.PreFlight = preFlight;
     this.ExtensionManager = extensionManager;
     this.FileSystemManager = fileSystemManager;
     this.SiteManager = siteManager;
     this.UserManager = userManager;
-    this.LayoutManager = layoutManager;
-    this.ContainerManager = containerManager;
   }
 
   [HttpGet]
@@ -387,7 +381,7 @@ public class SiteWizardController : Controller
       viewModel.Site.DefaultSiteAlias.Alias = viewModel.Site.DefaultSiteAlias.Alias.Substring("https://".Length);
     }
 
-    template.Site.Aliases = new() { viewModel.Site.DefaultSiteAlias };
+    template.Site.Aliases = [viewModel.Site.DefaultSiteAlias];
     template.Site.DefaultSiteAlias = viewModel.Site.DefaultSiteAlias;
 
     template.Site.AdministratorsRole = viewModel.Site.AdministratorsRole;
@@ -409,23 +403,26 @@ public class SiteWizardController : Controller
       Abstractions.Models.User sysAdminUser = new()
       {
         UserName = viewModel.SystemAdminUserName,
-        IsSystemAdministrator = true
+        IsSystemAdministrator = true,
+        Secrets = new()
       };
-      sysAdminUser.Secrets = new();
+
       sysAdminUser.Secrets.SetPassword(viewModel.SystemAdminPassword);
       sysAdminUser.Approved = true;
       sysAdminUser.Verified = true;
+
       await this.UserManager.SaveSystemAdministrator(sysAdminUser);
     }
 
     // create site admin user
-    Abstractions.Models.User siteAdminUser = new()
+    User siteAdminUser = new()
     {
-      UserName = viewModel.SiteAdminUserName
+      UserName = viewModel.SiteAdminUserName,
+      Secrets = new(),
+      Roles = [viewModel.Site.AdministratorsRole]
     };
-    siteAdminUser.Secrets = new();
+
     siteAdminUser.Secrets.SetPassword(viewModel.SiteAdminPassword);
-    siteAdminUser.Roles = new List<Role>() { viewModel.Site.AdministratorsRole };
     siteAdminUser.Approved = true;
     siteAdminUser.Verified = true;
 
@@ -476,14 +473,14 @@ public class SiteWizardController : Controller
 
   private async Task<ViewModels.Setup.SiteWizard> BuildViewModel(ViewModels.Setup.SiteWizard viewModel, ReadFlags flags)
   {
-    List<ModuleDefinition> modulesInTemplate = new();
-    List<LayoutDefinition> layoutsInTemplate = new();
-    List<ContainerDefinition> containersInTemplate = new();
+    List<ModuleDefinition> modulesInTemplate = [];
+    List<LayoutDefinition> layoutsInTemplate = [];
+    List<ContainerDefinition> containersInTemplate = [];
 
-    List<ViewModels.Setup.SiteWizard.InstallableExtension> installableExtensions = new();
+    List<ViewModels.Setup.SiteWizard.InstallableExtension> installableExtensions = [];
 
-    List<string> otherWarnings = new();
-    List<string> missingExtensionWarnings = new();
+    List<string> otherWarnings = [];
+    List<string> missingExtensionWarnings = [];
 
     if (flags.HasFlag(ReadFlags.Extensions))
     {
@@ -537,7 +534,7 @@ public class SiteWizardController : Controller
 
     if (flags.HasFlag(ReadFlags.Templates))
     {
-      viewModel.Templates = new();
+      viewModel.Templates = [];
       foreach (FileInfo templateFile in TemplatesFolder().EnumerateFiles("*.xml").OrderBy(file => file.Name).ToList())
       {
         using (System.IO.Stream stream = templateFile.OpenRead())
@@ -601,7 +598,7 @@ public class SiteWizardController : Controller
           {
             layoutsInTemplate = layoutsInTemplate.Concat
             (
-              new List<LayoutDefinition>() { template.Site.DefaultLayoutDefinition }
+              [template.Site.DefaultLayoutDefinition]
             )
             .ToList();
           }
@@ -844,7 +841,7 @@ public class SiteWizardController : Controller
   /// to find them.
   /// </summary>
   /// <param name="viewModel"></param>
-  private void AddAvailableFileSystems(ViewModels.Setup.SiteWizard viewModel)
+  private static void AddAvailableFileSystems(ViewModels.Setup.SiteWizard viewModel)
   {
     viewModel.AvailableFileSystemTypes.Clear();
 
@@ -870,13 +867,13 @@ public class SiteWizardController : Controller
     return result;
   }
 
-  private IEnumerable<string> ListDatabases(ViewModels.Setup.SiteWizard viewModel)
+  private static IEnumerable<string> ListDatabases(ViewModels.Setup.SiteWizard viewModel)
   {
     IDatabaseProvider provider = CreateProvider(viewModel.DatabaseProvider);
     return provider.ListDatabases(CreateConnectionString(viewModel, true)).OrderBy(name => name);
   }
 
-  private string CreateConnectionString(ViewModels.Setup.SiteWizard viewModel, Boolean skipDatabaseName)
+  private static string CreateConnectionString(ViewModels.Setup.SiteWizard viewModel, Boolean skipDatabaseName)
   {
     string database = "";
     string identity = "";
@@ -955,7 +952,7 @@ public class SiteWizardController : Controller
     }
     catch (System.Reflection.ReflectionTypeLoadException)
     {
-      return Array.Empty<Type>();
+      return [];
     }
   }
 }

@@ -28,7 +28,7 @@ namespace Nucleus.ViewFeatures
 		/// <returns></returns>
 		public static string RelativePageLink(Page page)
 		{
-      if (page == null) throw new ArgumentNullException(nameof(page));
+      ArgumentNullException.ThrowIfNull(page);
 
       if (page.DefaultPageRoute()?.Path == null || page.Disabled) return "";
 
@@ -44,7 +44,7 @@ namespace Nucleus.ViewFeatures
           if (page.DefaultPageRoute()?.Path == null) return "";
           path = page.DefaultPageRoute().Path;
           // We append a "/" so that if the path contains dots the net core static file provider doesn't interpret the path as a file
-          path = $"~" + (path.StartsWith("/") ? "" : "/") + path + (path.EndsWith("/") ? "" : "/");
+          path = $"~" + (path.StartsWith('/') ? "" : "/") + path + (path.EndsWith('/') ? "" : "/");
           break;
       }
 
@@ -59,7 +59,7 @@ namespace Nucleus.ViewFeatures
 		/// <returns></returns>
 		public static string PageLink(this IUrlHelper helper, Page page)
 		{
-			if (page == null) throw new ArgumentNullException(nameof(page));
+			ArgumentNullException.ThrowIfNull(page);
 
       return helper.Content(RelativePageLink(page));
 
@@ -80,12 +80,13 @@ namespace Nucleus.ViewFeatures
 		/// <returns></returns>
 		public static string PageLink(this IUrlHelper helper, Page page, string relativePath)
 		{
-			if (page == null) throw new ArgumentNullException(nameof(page));
+      ArgumentNullException.ThrowIfNull(page);
 
-			if (relativePath.StartsWith("/"))
+      if (relativePath.StartsWith('/'))
 			{
 				relativePath = relativePath[1..];
 			}
+
 			return PageLink(helper, page) + relativePath;
 		}
 
@@ -297,7 +298,7 @@ namespace Nucleus.ViewFeatures
 		/// <param name="extensionName"></param>
 		public static string ApiAction(this IUrlHelper helper, string actionName, string controllerName, string extensionName)
 		{
-			RouteValueDictionary routeValues = new(); ;
+			RouteValueDictionary routeValues = [];
 			UrlRouteContext context = new();
 
 			routeValues.Add("extension", extensionName);
@@ -332,7 +333,13 @@ namespace Nucleus.ViewFeatures
 				localPath = $"{localPath}/";
 			}
 
-			UriBuilder builder = new(helper.ActionContext.HttpContext.Request.Scheme, helper.ActionContext.HttpContext.Request.Host.Host, helper.ActionContext.HttpContext.Request.Host.Port.HasValue ? helper.ActionContext.HttpContext.Request.Host.Port.Value : -1, helper.ActionContext.HttpContext.Request.PathBase + localPath);
+			UriBuilder builder = new
+      (
+        helper.ActionContext.HttpContext.Request.Scheme,
+        helper.ActionContext.HttpContext.Request.Host.Host, 
+        helper.ActionContext.HttpContext.Request.Host.Port ?? -1, 
+        helper.ActionContext.HttpContext.Request.PathBase + localPath
+      );
 
 			return builder.Uri;
 		}

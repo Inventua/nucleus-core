@@ -34,7 +34,7 @@
       // handle clicks on an associated label control
       targetControl.on('click', function (event)
       {
-        toggleControl = jQuery(this).prev();
+        toggleControl = jQuery(this).next();
         if (!(toggleControl).is('input[type=range]')) return;
 
         toggleControl.val(toggleControl.val() === '1' ? '2' : '1');

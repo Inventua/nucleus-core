@@ -1,11 +1,11 @@
-﻿<package id="2f4b7999-9c15-4afa-9ed0-9549602ba7a5" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
+<package id="2f4b7999-9c15-4afa-9ed0-9549602ba7a5" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>OAuth Client</name>
-  <version>1.4.0</version>
+  <version>2.0.0</version>
   <publisher name="Inventua" url="http://www.inventua.comn" email="support@inventua.com" />
   <description>
 		The OAuth client allows users to sign on to Nucleus using an external OAuth2 service.
 	</description>
-  <compatibility minVersion="1.4.0.0" maxVersion="*" />
+  <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
   <components>
     <component folderName="OAuth Client" optional="false">
       <controlPanelExtensionDefinition id="C93446E0-CEB6-40E6-80A9-E15BC7CB85A2">

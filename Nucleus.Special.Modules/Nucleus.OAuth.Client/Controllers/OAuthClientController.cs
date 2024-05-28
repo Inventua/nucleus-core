@@ -88,7 +88,7 @@ namespace Nucleus.OAuth.Client.Controllers
 		/// redirecting to the provider's AuthorizationEndpoint.
 		/// </remarks>
 		[HttpGet]
-		[Route($"/{RoutingConstants.EXTENSIONS_ROUTE_PATH}/{{extension=OAuthClient}}/{{action=Authenticate}}/{{providerName}}")]
+		[Route($"/{RoutingConstants.EXTENSIONS_ROUTE_PATH_PREFIX}/{{extension=OAuthClient}}/{{action=Authenticate}}/{{providerName}}")]
 		public ActionResult Authenticate(string providerName, string returnUrl)
 		{
 			if (!String.IsNullOrEmpty(providerName))

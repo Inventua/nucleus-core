@@ -921,11 +921,11 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
   public async Task SaveModuleDefinition(ModuleDefinition moduleDefinition)
   {
     Boolean isNew = !this.Context.ModuleDefinitions.Where(existing => existing.Id == moduleDefinition.Id).AsNoTracking().Any();
-    
+
     this.Context.Attach(moduleDefinition);
 
     // the ClassTypeName column is no longer used, but is present in the database and is not nullable, so we have to set a value
-    this.Context.Entry(moduleDefinition).Property<String>("ClassTypeName").CurrentValue="";
+    this.Context.Entry(moduleDefinition).Property<String>("ClassTypeName").CurrentValue = "";
 
     this.Context.Entry(moduleDefinition).State = isNew ? EntityState.Added : EntityState.Modified;
     await this.Context.SaveChangesAsync();
@@ -1547,7 +1547,7 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
       {
         await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM UserRoles WHERE RoleId={role.Id}");
         await this.Context.Database.ExecuteSqlInterpolatedAsync($"DELETE FROM Permissions WHERE RoleId={role.Id}");
-                
+
         this.Context.Remove(role);
         await this.Context.SaveChangesAsync();
 
@@ -2142,11 +2142,33 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
 
   public async Task TruncateScheduledTaskHistory(Guid scheduledTaskId, int keepHistoryCount)
   {
-    await this.Context.ScheduledTaskHistory
+    // We have to read items to keep and then delete with not contains() below because MySQL 
+    // does not support LIMIT in a subquery, and EF generates SQL with a limit in a subquery when
+    // we use ExecuteDeleteAsync() with .Skip().
+    // References:
+    // https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql/issues/1903
+    // https://learn.microsoft.com/en-us/ef/core/what-is-new/ef-core-8.0/whatsnew#better-use-of-in-queries
+
+    // TODO! NET90 review to see if new version(s) fix this problem.
+
+    List<Guid> keepHistoryItems = await this.Context.ScheduledTaskHistory
       .Where(history => history.ScheduledTaskId == scheduledTaskId)
       .OrderByDescending(history => history.StartDate)
-      .Skip(keepHistoryCount)
+      .Take(keepHistoryCount)
+      .AsNoTracking()
+      .Select(historyItem => historyItem.Id)
+      .ToListAsync();
+
+    await this.Context.ScheduledTaskHistory
+      .Where(history => history.ScheduledTaskId == scheduledTaskId && !keepHistoryItems.Contains(history.Id))
       .ExecuteDeleteAsync();
+
+    // Keep this commented out code in case this issue is resolved in the future.
+    //await this.Context.ScheduledTaskHistory
+    //  .Where(history => history.ScheduledTaskId == scheduledTaskId)
+    //  .OrderByDescending(history => history.StartDate)
+    //  .Skip(keepHistoryCount)
+    //  .ExecuteDeleteAsync();
   }
   #endregion
 

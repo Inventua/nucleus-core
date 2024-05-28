@@ -37,7 +37,7 @@ public class IFrameSettingsController : Controller
   {
     viewModel.SetSettings(this.Context.Module);
 
-    await this.PageModuleManager.SaveSettings(this.Context.Module);
+    await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
     return Ok();
   }

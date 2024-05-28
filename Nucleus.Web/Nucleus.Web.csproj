@@ -12,15 +12,15 @@
   </PropertyGroup>
   
 	<ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.4" />
+		<PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.5" />
 		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.7.0-rc.1" />
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.4" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
 	</ItemGroup>
 	
 	<PropertyGroup>
@@ -127,7 +127,9 @@
 		</EmbeddedResource>
 		<Content Include="Resources\js\nucleus-admin-extensions.js" />
 		<Content Include="Resources\js\nucleus-admin-extensions.min.js" />
-		<Content Include="Utils\Windows\nucleus-install.ps1" />
+		<Content Include="Utils\Windows\nucleus-install.ps1">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 		<EmbeddedResource Include="Areas\Setup\Views\SiteWizard\Complete.js">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>

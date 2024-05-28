@@ -42,14 +42,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.57" />
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.2.0" />
-    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.2.0" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.61" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
   </ItemGroup>
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>StaticContent</ExtensionFolder>
-		<VersionPrefix>1.2.0</VersionPrefix>
+		<VersionPrefix>2.0.0</VersionPrefix>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 	</PropertyGroup>	
 	

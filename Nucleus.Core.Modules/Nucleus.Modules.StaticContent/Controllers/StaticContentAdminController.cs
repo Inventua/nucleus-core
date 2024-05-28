@@ -42,7 +42,7 @@ namespace Nucleus.Modules.StaticContent.Controllers
 			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_DEFAULT_FILE_ID, viewModel.DefaultFile.Id);
 			this.Context.Module.ModuleSettings.Set(Models.Settings.MODULESETTING_ADD_COPY_BUTTONS, viewModel.AddCopyButtons);
 
-			this.PageModuleManager.SaveSettings(this.Context.Module);
+			this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 
 			this.CacheManager.StaticContentCache().Clear();
 

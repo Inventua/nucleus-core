@@ -61,15 +61,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.4.0-pre-alpha2" />
-    <PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="1.3.0" />
-    <PackageReference Include="Inventua.Nucleus.Extensions" Version="1.4.0-pre-alpha2" />
-    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.4.0-pre-alpha2" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
+    <PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="2.0.0-rc1" />
+    <PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0-rc1" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
   </ItemGroup>
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>Links</ExtensionFolder>
-		<Version>1.4.0</Version>
+		<Version>2.0.0</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
     <CopyToDefaultSetup>true</CopyToDefaultSetup>
 	</PropertyGroup>

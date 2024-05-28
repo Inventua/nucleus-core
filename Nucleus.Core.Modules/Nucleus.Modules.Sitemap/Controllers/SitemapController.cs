@@ -110,7 +110,7 @@ namespace Nucleus.Modules.Sitemap.Controllers
 			this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.SETTINGS_SHOWDESCRIPTION, viewModel.ShowDescription);
       this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.SETTINGS_DIRECTION, viewModel.Direction);
       
-      await this.PageModuleManager.SaveSettings(this.Context.Module);
+      await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 			
 			return Ok();
 		}

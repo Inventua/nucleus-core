@@ -43,8 +43,8 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="1.4.0-pre-alpha2.19" />
-		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="1.4.0-pre-alpha2.8" />
+		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
+		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
 		<PackageReference Include="SendGrid" Version="9.29.3" />
 	</ItemGroup>
 
@@ -57,7 +57,7 @@
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>SendGrid Mail</ExtensionFolder>
-		<Version>1.0.0</Version>
+		<Version>2.0.0</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
     <CopyToDefaultSetup>false</CopyToDefaultSetup>
 	</PropertyGroup>

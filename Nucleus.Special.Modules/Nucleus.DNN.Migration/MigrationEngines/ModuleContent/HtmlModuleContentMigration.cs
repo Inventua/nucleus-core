@@ -116,7 +116,7 @@ public class HtmlModuleContentMigration : ModuleContentMigrationBase
 
       // apply "guesses" to the content to help with images/other file links.  This assumes that the contents of
       // /Portals/[index] will be copied in the same directory structure to Nucleus
-      content.Value = content.Value.Replace($"/Portals/{dnnPage.PortalId}/", $"/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH}/{fileSystemProvider.Key}/", StringComparison.OrdinalIgnoreCase);
+      content.Value = content.Value.Replace($"/Portals/{dnnPage.PortalId}/", $"/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX}/{fileSystemProvider.Key}/", StringComparison.OrdinalIgnoreCase);
 
       await this.ContentManager.Save(newModule, content);
     }

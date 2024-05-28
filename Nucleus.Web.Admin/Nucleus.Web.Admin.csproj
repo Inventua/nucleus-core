@@ -18,7 +18,7 @@
     <ProjectReference Include="$(SolutionDir)\Nucleus.Extensions\Nucleus.Extensions.csproj" />
     <ProjectReference Include="$(SolutionDir)\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.4" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
   </ItemGroup>
     
   <ItemGroup>

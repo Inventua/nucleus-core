@@ -1,13 +1,13 @@
 <package id="22fd6994-e5b6-4215-b64f-1be4f85aa6eb" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>SAML Server</name>
-  <version>1.4.0</version>
+  <version>2.0.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
     The SAML server extension implements the SAML2 protocol to provide authentication (single-signon) services 
     to other web sites and applications. Users can use their Nucleus credentials to access web sites which are 
     configured to use Nucleus as their SAML2 identity provider.
   </description>
-  <compatibility minVersion="1.4.0.0" maxVersion="*" />
+  <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
   <components>
     <component folderName="SAMLServer" optional="false">
       <controlPanelExtensionDefinition id="01CC95F7-20AD-4776-97A9-40B32F6D0968">

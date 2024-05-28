@@ -38,10 +38,9 @@ namespace Nucleus.Core.Mail
       {
         throw new InvalidOperationException("No mail client is configured for this site.");
       }
-        //(IMailClient)this.Services.GetRequiredService(typeof(SmtpMailClient));
+        
       mailClient.Site = site;
       return mailClient;
-			//return new SmtpMailClient();
 		}
 	}
 }

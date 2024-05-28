@@ -1,40 +1,35 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="6b3532f0-bb69-4d18-bc5a-4d4c8e326af5" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
-	<name>IFrame</name>
-	<version>1.0.0</version>
-	<publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
-	<description>
+  <name>IFrame</name>
+  <version>2.0.0</version>
+  <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
+  <description>
 		Module used for embedding another HTML page in your site.
 	</description>
-	<compatibility minVersion="1.0.1.0" maxVersion="*" />
-	
-	<components>
-		<component folderName="IFrame" optional="false">
-			<moduleDefinition id="505e91b2-df6b-49b9-b66e-770ed68db047">
-				<friendlyName>IFrame</friendlyName>
+  <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
+  <components>
+    <component folderName="IFrame" optional="false">
+      <moduleDefinition id="505e91b2-df6b-49b9-b66e-770ed68db047">
+        <friendlyName>IFrame</friendlyName>
         <helpUrl>https://www.nucleus-cms.com/documentation/modules/iframe/</helpUrl>
-				<extension>IFrame</extension>
+        <extension>IFrame</extension>
         <viewController>IFrameViewerController</viewController>
         <settingsController>IFrameSettingsController</settingsController>
-				<viewAction>Index</viewAction>
-				<editAction>Settings</editAction>
+        <viewAction>Index</viewAction>
+        <editAction>Settings</editAction>
         <categories>Content</categories>
-			</moduleDefinition>
-
-			<file name="readme.txt" />
-			<file name="viewer.css" />
-			<file name="settings.css" />
-			
-			<folder name="Bin">
-				<file name="Nucleus.Modules.IFrame.dll" />
-			</folder>
-			
-			<folder name="Views">
-				<file name="_ViewImports.cshtml" />
-				<file name="Viewer.cshtml" />
-				<file name="Settings.cshtml" />
-			</folder>			
-		</component>
-	</components>
-	
+      </moduleDefinition>
+      <file name="readme.txt" />
+      <file name="viewer.css" />
+      <file name="settings.css" />
+      <folder name="Bin">
+        <file name="Nucleus.Modules.IFrame.dll" />
+      </folder>
+      <folder name="Views">
+        <file name="_ViewImports.cshtml" />
+        <file name="Viewer.cshtml" />
+        <file name="Settings.cshtml" />
+      </folder>
+    </component>
+  </components>
 </package>

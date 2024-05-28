@@ -1,12 +1,12 @@
-﻿<package id="e6350984-dd4d-43d6-a12b-25b4c4bb18de" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
+<package id="e6350984-dd4d-43d6-a12b-25b4c4bb18de" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Sitemap</name>
-  <version>1.4.0</version>
+  <version>2.0.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
     The site map module displays a list of pages within your site.  It can be used as a full site map for users, as a side-menu, or to
     display a list of pages in on a landing page.
   </description>
-  <compatibility minVersion="1.4.0.0" maxVersion="*" />
+  <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
   <components>
     <component folderName="Sitemap" optional="false">
       <moduleDefinition id="0392bf73-c646-4ccc-bcb5-372a75b9ea84">

@@ -16,6 +16,7 @@ using Nucleus.DNN.Migration.MigrationEngines;
 using static Nucleus.DNN.Migration.MigrationEngines.MigrationEngineBase;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Nucleus.DNN.Migration;
+using Nucleus.Abstractions.Mail;
 
 //https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.storage.irelationalcommand.executereaderasync?view=efcore-7.0
 
@@ -33,13 +34,15 @@ public class DNNMigrationController : Controller
   private ILayoutManager LayoutManager { get; }
   private IContainerManager ContainerManager { get; }
   private IMailTemplateManager MailTemplateManager { get; }
+  private IMailClientFactory MailClientFactory { get; }
 
   private IOptions<DatabaseOptions> DatabaseOptions { get; }
 
-  public DNNMigrationController(Context Context, DNNMigrationManager dnnMigrationManager, IFileSystemManager fileSystemManager, IOptions<DatabaseOptions> databaseOptions, IUserManager userManager, IMailTemplateManager mailTemplateManager, ILayoutManager layoutManager, IContainerManager containerManager)
+  public DNNMigrationController(Context Context, DNNMigrationManager dnnMigrationManager, IFileSystemManager fileSystemManager, IMailClientFactory mailClientFactory, IOptions<DatabaseOptions> databaseOptions, IUserManager userManager, IMailTemplateManager mailTemplateManager, ILayoutManager layoutManager, IContainerManager containerManager)
   {
     this.Context = Context;
     this.DNNMigrationManager = dnnMigrationManager;
+    this.MailClientFactory = mailClientFactory;
     this.FileSystemManager = fileSystemManager;
     this.DatabaseOptions = databaseOptions;
     this.UserManager = userManager;
@@ -711,7 +714,14 @@ public class DNNMigrationController : Controller
 
     viewModel.MailTemplates = await this.MailTemplateManager.List(this.Context.Site);
 
-    viewModel.IsMailConfigured = !String.IsNullOrEmpty(this.Context.Site.GetSiteMailSettings().HostName);
+    try
+    {
+      viewModel.IsMailConfigured = this.MailClientFactory.Create(this.Context.Site) != null;// !String.IsNullOrEmpty(this.Context.Site.GetSiteMailSettings().HostName);
+    }
+    catch
+    {
+      viewModel.IsMailConfigured = false;
+    }
 
     this.DNNMigrationManager.ClearMigrationEngines();
     await this.DNNMigrationManager.CreateMigrationEngine<NotifyUser>(this.HttpContext.RequestServices, viewModel.Users);

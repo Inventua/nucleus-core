@@ -1,11 +1,11 @@
-﻿<package id="e27c5782-df19-462f-806c-9b6897dd8ae9" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
+<package id="e27c5782-df19-462f-806c-9b6897dd8ae9" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Azure Storage File System Provider</name>
-  <version>1.4.0</version>
+  <version>2.0.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
 		Nucleus file system provider for Azure storage.
 	</description>
-  <compatibility minVersion="1.2.0.0" maxVersion="*" />
+  <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
   <components>
     <component folderName="AzureBlobStorageFileSystemProvider" optional="false">
       <file name="readme.txt" />
@@ -16,15 +16,15 @@
         <file name="Azure.Storage.Blobs.dll" />
         <file name="Azure.Storage.Common.dll" />
         <file name="Azure.Core.dll" />
+        <file name="System.ClientModel.dll" />
       </folder>
-
-		<cleanup>
-			<folder name="Bin">
-				<!-- these were shipped in an earlier version, but are not required because they are shipped with Nucleus 1.4.0 -->
-				<file name="System.Memory.Data.dll" />
-				<file name="Microsoft.Bcl.AsyncInterfaces.dll" />
-			</folder>
-		</cleanup>
+      <cleanup>
+        <folder name="Bin">
+          <!-- these were shipped in an earlier version, but are not required because they are shipped with Nucleus 1.4.0 -->
+          <file name="System.Memory.Data.dll" />
+          <file name="Microsoft.Bcl.AsyncInterfaces.dll" />
+        </folder>
+      </cleanup>
     </component>
   </components>
 </package>

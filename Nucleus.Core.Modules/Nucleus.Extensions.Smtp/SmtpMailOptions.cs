@@ -159,7 +159,7 @@ public class SmtpMailOptions : IMailSettings // <SmtpMailOptions>
 
     if (this.Password != UNCHANGED_PASSWORD)
     {
-      site.SiteSettings.TrySetValue(Site.SiteMailSettingKeys.MAIL_PASSWORD, EncryptPassword(site, this.Password));
+      site.SiteSettings.TrySetValue(SmtpClientSettingsKeys.MAIL_PASSWORD, EncryptPassword(site, this.Password));
     }
   }
 

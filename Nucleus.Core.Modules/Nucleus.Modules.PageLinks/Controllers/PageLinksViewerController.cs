@@ -38,14 +38,16 @@ public class PageLinksViewerController : Controller
 
 		viewModel.GetSettings(this.Context.Module);
 
-    // Set as a comma separated string for enabled headers.
+    // Get a comma-separated string of enabled headers element names
     viewModel.EnabledHeaders = string.Join(',', viewModel.IncludeHeaders
       .Where(header => header.Value)
       .Select(header => header.Key));
 
-    viewModel.PageLinks = (await this.PageLinksManager.List(this.Context.Module))
-      .Where(pageLink => !String.IsNullOrEmpty(pageLink.TargetId))
-      .ToList();
+    if (viewModel.Mode == Settings.Modes.Manual)
+    {
+      viewModel.PageLinks = (await this.PageLinksManager.List(this.Context.Module))
+        .Where(pageLink => !String.IsNullOrEmpty(pageLink.TargetId));
+    }
 
     return viewModel;
 	}

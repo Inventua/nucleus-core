@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
+using Nucleus.Modules.PageLinks.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,5 +14,5 @@ namespace Nucleus.Modules.PageLinks.ViewModels;
 
 public class Settings : Models.Settings
 {
-
+  public List<PageLink> PageLinks { get; set; } = [];
 }

@@ -40,8 +40,7 @@ public class Settings
 
   public string HeadingClass { get; set; }
   public string RootSelector { get; set; }
-  public List<PageLink> PageLinks { get; set; } = [];
-
+  
   public void GetSettings(PageModule module)
   {
     this.Title = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_TITLE, "");

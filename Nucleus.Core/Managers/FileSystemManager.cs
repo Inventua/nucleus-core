@@ -422,6 +422,9 @@ public class FileSystemManager : IFileSystemManager
 		// any permissions to save, but we do want to save the database record).
 		await SaveFolderPermissions(site, result);
 
+    // re-load the new folder to ensure that it is fully populated
+    result = await this.GetFolder(site, result.Id);
+
 		return result;
 	}
 

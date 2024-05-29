@@ -169,9 +169,13 @@ namespace Nucleus.Web
         // https://learn.microsoft.com/en-au/aspnet/core/performance/caching/output?view=aspnetcore-8.0
         services.AddOutputCache(options=> 
         {
-          options.AddBasePolicy(builder => builder.Expire(TimeSpan.FromSeconds(10)));
-          options.AddPolicy("Expire20", builder => builder.Expire(TimeSpan.FromSeconds(20)));
-          options.AddPolicy("Expire30", builder => builder.Expire(TimeSpan.FromSeconds(30)));
+          options.AddBasePolicy(builder => builder.NoCache());
+          options.AddPolicy("Expire20s", builder => builder.Expire(TimeSpan.FromSeconds(20)));
+          options.AddPolicy("Expire30s", builder => builder.Expire(TimeSpan.FromSeconds(30)));
+          options.AddPolicy("Expire60s", builder => builder.Expire(TimeSpan.FromSeconds(60)));
+          options.AddPolicy("Expire5m", builder => builder.Expire(TimeSpan.FromMinutes(5)));
+          options.AddPolicy("Expire15m", builder => builder.Expire(TimeSpan.FromMinutes(15)));
+          options.AddPolicy("Expire30m", builder => builder.Expire(TimeSpan.FromMinutes(30)));
         });
 
         // Enable compression
@@ -288,8 +292,6 @@ namespace Nucleus.Web
     {
       try
       {
-        // this makes output caching available to controllers, it does not do anything automatically
-        app.UseOutputCache();
 
         app.UseNucleusOpenTelemetryEndPoint(this.Configuration, this.Environment);
 
@@ -346,6 +348,9 @@ namespace Nucleus.Web
         app.UseMiddleware<ModuleRoutingMiddleware>();
         app.UseAuthorization();
         app.UseControlPanel(this.Configuration.GetSection("Nucleus:ControlPanel:Name").Value);
+
+        // this makes output caching available to controllers, it does not do anything automatically
+        app.UseOutputCache();
 
         app.UseEndpoints(routes =>
         {

@@ -17,7 +17,13 @@ namespace Nucleus.Core.Layout
 	/// </remarks>
 	public class DefaultNoCacheMiddleware : Microsoft.AspNetCore.Http.IMiddleware
 	{
-		public DefaultNoCacheMiddleware()
+    static readonly Microsoft.Net.Http.Headers.CacheControlHeaderValue DEFAULT_CACHE_HEADERVALUES = new ()
+			{
+				NoCache = true,
+				NoStore = true
+			};
+    
+    public DefaultNoCacheMiddleware()
 		{
 
 		}
@@ -30,14 +36,8 @@ namespace Nucleus.Core.Layout
 		/// <returns></returns>
 		public async Task InvokeAsync(HttpContext context, RequestDelegate next)
 		{
-			context.Response.GetTypedHeaders().CacheControl =
-				new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
-				{
-					NoCache = true,
-					NoStore = true
-				};
-
-			await next(context);
+      context.Response.GetTypedHeaders().CacheControl = DEFAULT_CACHE_HEADERVALUES;
+      await next(context);
 		}
 	}
 }

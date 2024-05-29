@@ -27,7 +27,7 @@
 				"include": [ "PostgreSQL" ],
 				"operation": {
 					"sql": {
-						"sql": "INSERT INTO \"PermissionTypes\" (\"Id\", \"Scope\", \"Name\", \"SortOrder\") SELECT * FROM (SELECT '77D424BF-E5EB-4E70-9B08-72ECCE931683' AS \"Id\", 'urn:nucleus:entities:folder/permissiontype/browse' AS \"Scope\", 'Browse' AS \"Name\", 2 AS \"SortOrder\") AS \"NewData\" WHERE NOT EXISTS(SELECT * FROM \"PermissionTypes\" WHERE \"Id\"='77D424BF-E5EB-4E70-9B08-72ECCE931683');"
+						"sql": "INSERT INTO \"PermissionTypes\" (\"Id\", \"Scope\", \"Name\", \"SortOrder\") SELECT * FROM (SELECT uuid('77D424BF-E5EB-4E70-9B08-72ECCE931683') AS \"Id\", 'urn:nucleus:entities:folder/permissiontype/browse' AS \"Scope\", 'Browse' AS \"Name\", 2 AS \"SortOrder\") AS \"NewData\" WHERE NOT EXISTS(SELECT * FROM \"PermissionTypes\" WHERE \"Id\"='77D424BF-E5EB-4E70-9B08-72ECCE931683');"
 					}
 				}
 

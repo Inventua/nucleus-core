@@ -29,7 +29,7 @@
     {
       "addColumn": {
         "table": "Files",
-        "name": "width",
+        "name": "Width",
         "clrType": "int",
         "isnullable": true
       }

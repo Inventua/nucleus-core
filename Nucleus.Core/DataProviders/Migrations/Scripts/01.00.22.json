@@ -4,8 +4,33 @@
   "operations": [
     {
       // in v1.4, we renamed layout footer panes to "FooterPane" to better reflect their usage
-      "sql": {
-        "sql": "UPDATE PageModules SET Pane = 'FooterPane' WHERE Pane = 'BottomPane';"
+      "DatabaseProviderSpecificOperation": {
+        "include": [ "SqlServer", "Sqlite" ],
+        "operation": {
+          "sql": {
+            "sql": "UPDATE [PageModules] SET [Pane] = 'FooterPane' WHERE [Pane] = 'BottomPane';"
+          }
+        }
+      }
+    },
+    {
+      "DatabaseProviderSpecificOperation": {
+        "include": [ "MySql" ],
+        "operation": {
+          "sql": {
+            "sql": "UPDATE `PageModules` SET `Pane` = 'FooterPane' WHERE `Pane` = 'BottomPane';"
+          }
+        }
+      }
+    },
+    {
+      "DatabaseProviderSpecificOperation": {
+        "exclude": [ "PostgreSQL" ],
+        "operation": {
+          "sql": {
+            "sql": "UPDATE \"PageModules\" SET \"Pane\" = 'FooterPane' WHERE \"Pane\" = 'BottomPane';"
+          }
+        }
       }
     }
   ]

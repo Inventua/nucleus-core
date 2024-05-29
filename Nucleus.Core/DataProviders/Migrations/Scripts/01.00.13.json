@@ -27,8 +27,27 @@
       }
     },
     {
-      "sql": {
-        "sql": "UPDATE Pages SET LinkType = 0 WHERE LinkType IS NULL;"
+      // Sql Server unique indexes do not allow multiple rows set to NULL by default, so we have to execute a specific
+      // command to create the index.
+      "DatabaseProviderSpecificOperation": {
+        "include": [ "PostgreSQL" ],
+        "operation": {
+          "sql": {
+            "sql": "UPDATE \"Pages\" SET \"LinkType\" = 0 WHERE \"LinkType\" IS NULL;"
+          }
+        }
+      }
+    },
+    {
+      // Sql Server unique indexes do not allow multiple rows set to NULL by default, so we have to execute a specific
+      // command to create the index.
+      "DatabaseProviderSpecificOperation": {
+        "exclude": [ "PostgreSQL" ],
+        "operation": {
+          "sql": {
+            "sql": "UPDATE Pages SET LinkType = 0 WHERE LinkType IS NULL;"
+          }
+        }
       }
     }
   ]

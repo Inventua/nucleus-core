@@ -91,7 +91,7 @@ public static class Extensions
       services.AddResourceMonitoring();
       services.AddHostedService<TelemetryMonitor>();
 
-      services.AddScoped<TelemetryMiddleware>();
+      services.AddSingleton<TelemetryMiddleware>();
     }
 
     return services;

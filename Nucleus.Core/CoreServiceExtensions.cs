@@ -50,7 +50,7 @@ public static class CoreServiceExtensions
     // Register action & post-configuration for security header options 
     AddOption<SecurityHeaderOptions>(services, configuration, SecurityHeaderOptions.Section);
     // Add middleware
-    services.AddScoped<SecurityHeadersMiddleware>();
+    services.AddSingleton<SecurityHeadersMiddleware>();
     return services;
   }
 
@@ -63,7 +63,7 @@ public static class CoreServiceExtensions
   public static IServiceCollection AddDefaultCacheMiddleware(this IServiceCollection services, IConfiguration configuration)
   {
     // Add middleware
-    services.AddScoped<DefaultNoCacheMiddleware>();
+    services.AddSingleton<DefaultNoCacheMiddleware>();
     return services;
   }
 

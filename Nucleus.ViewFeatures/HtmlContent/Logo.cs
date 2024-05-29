@@ -28,12 +28,14 @@ namespace Nucleus.ViewFeatures.HtmlContent
 	/// <hidden />
 	internal static class Logo
 	{
-		internal static async Task<TagBuilder> Build(ViewContext context, string caption, object htmlAttributes)
+		internal static async Task<TagBuilder> Build(ViewContext context, string caption, Boolean fallbackToSiteName, object htmlAttributes)
 		{
 			IUrlHelper urlHelper = context.HttpContext.RequestServices.GetService<IUrlHelperFactory>().GetUrlHelper(context);
 			Site site = context.HttpContext.RequestServices.GetService<Context>().Site;
 			IFileSystemManager fileSystemManager = context.HttpContext.RequestServices.GetService<IFileSystemManager>();
 			
+      TagBuilder outputBuilder = new("a");
+					
 			if (site.SiteSettings.TryGetValue(Site.SiteFilesKeys.LOGO_FILEID, out Guid fileId))
 			{
 				File logoFile = null;
@@ -53,7 +55,6 @@ namespace Nucleus.ViewFeatures.HtmlContent
 				if (logoFile != null)
 				{
 					string linkTitle = String.IsNullOrEmpty(caption) ? site.Name : caption;
-					TagBuilder outputBuilder = new("a");
 					outputBuilder.Attributes.Add("href", urlHelper.Content("~/"));
 					outputBuilder.Attributes.Add("title", linkTitle);
 					
@@ -95,7 +96,20 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 					return outputBuilder;
 				}
-			}	
+			}
+
+      // if the logo file is not present, or not selected, render the site name.  This code generally applies when a site 
+      // is being set up for the first time, and a logo is not selected.
+      if (fallbackToSiteName)
+      {
+        string siteTitle = String.IsNullOrEmpty(caption) ? site.Name : caption;
+        outputBuilder.Attributes.Add("href", urlHelper.Content("~/"));
+        outputBuilder.AddCssClass("m-auto px-3 link-dark fw-bold");
+        outputBuilder.InnerHtml.Append(siteTitle);
+        outputBuilder.MergeAttributes(htmlAttributes);
+
+        return outputBuilder;
+      }
 			
 			return null;						
 		}		

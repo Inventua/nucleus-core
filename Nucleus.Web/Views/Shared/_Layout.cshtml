@@ -24,6 +24,7 @@
 	}
 	<link rel="canonical" href="@Model.DefaultPageUri" />
 	<title>@Model.Context.Page.Title</title>
+  <RemoveWhitespace>
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.BOOTSTRAP)
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_SHARED)
@@ -44,6 +45,7 @@
 	@Html.RenderStyles()
 	@Html.RenderScripts()
   @Html.RenderWebAssemblies()
+  </RemoveWhitespace>
 </head>
 <body class="@Model.ControlPanelDockingCssClass">
   @if (Model.CanEdit)

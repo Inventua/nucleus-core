@@ -10,7 +10,7 @@
 }
 else
 {
-	@if (!Model.RecaptchaEnabled)
+	@if (Model.RecaptchaEnabled)
 	{
 		@Html.AddScript("https://www.google.com/recaptcha/api.js?render=explicit&onload=onRecaptchaLoadCallback", true)
 		@Html.AddScript("~#/viewer.js", true)

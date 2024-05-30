@@ -5,7 +5,7 @@
 @using Nucleus.Extensions
 @using Nucleus.Abstractions.Models.Configuration
 @Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
-@if (!String.IsNullOrEmpty(Model.RecaptchaSiteKey))
+@if (Model.RecaptchaEnabled)
 {
   @Html.AddScript("https://www.google.com/recaptcha/api.js?render=explicit&onload=onRecaptchaLoadCallback", true)
   @Html.AddScript("~#/signup.js")

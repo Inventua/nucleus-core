@@ -5,8 +5,7 @@
 	<meta charset="utf-8" />	
 	@if (!String.IsNullOrEmpty(Model.Context.Page.Description))
 	{
-		<meta name="DESCRIPTION" content="@Model.Context.Page.Description" />
-    <meta property="og:description" content="@Model.Context.Page.Description" />
+    <meta name="DESCRIPTION" property="og:description" content="@Model.Context.Page.Description" />
 	}
   <meta property="og:site_name" content="@Model.Context.Site.Name" />
   <meta property="og:title" content="@Model.Context.Page.Title" />

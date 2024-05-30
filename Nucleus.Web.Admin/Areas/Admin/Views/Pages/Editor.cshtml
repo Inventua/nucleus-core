@@ -218,7 +218,19 @@
 
 <script>
   jQuery('#nucleus-control-panel-heading').html('Pages - ' + jQuery('.PageName').val());
+  
+  // add the current page Id to the "New Blank Page" button url so that Pages.Controller.NewPageBlank can use it to set the new page parent id.
+  var newHref = new URL(jQuery('.new-page-blank').attr('href'), document.baseURI);
+  newHref.search = '?sourcePageId=' + jQuery('#Page_Id').val();
+  jQuery('.new-page-blank').attr('href',  newHref.toString());
 
+  jQuery('.PageName').focus();  
+  // when a new page is created (or copied, or created from a template), it will have no routes.  We want the user to enter the page name 
+  if (@Model.Page.Routes.Count == 0)
+  {
+    jQuery('.PageName').select();
+  }
+  
   jQuery('.PageName').on('change', function ()
   {
     if (jQuery('.DefaultPagePath').val() === '')

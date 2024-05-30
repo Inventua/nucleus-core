@@ -11,8 +11,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	@if (!String.IsNullOrEmpty(Model.Context.Page.Description))
 	{
-		<meta name="DESCRIPTION" content="@Model.Context.Page.Description" />
-		<meta property="og:description" content="@Model.Context.Page.Description" />
+    <meta name="DESCRIPTION" property="og:description" content="@Model.Context.Page.Description" />
 	}
 	<meta property="og:site_name" content="@Model.Context.Site.Name" />
 	<meta property="og:title" content="@Model.Context.Page.Title" />
@@ -24,6 +23,7 @@
 	}
 	<link rel="canonical" href="@Model.DefaultPageUri" />
 	<title>@Model.Context.Page.Title</title>
+  <RemoveWhitespace>
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.JQUERY)
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.BOOTSTRAP)
 	@Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_SHARED)
@@ -44,6 +44,7 @@
 	@Html.RenderStyles()
 	@Html.RenderScripts()
   @Html.RenderWebAssemblies()
+  </RemoveWhitespace>
 </head>
 <body class="@Model.ControlPanelDockingCssClass">
   @if (Model.CanEdit)

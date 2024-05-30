@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Nucleus.Abstractions.Models.FileSystem;
+using Nucleus.Modules.PageLinks.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,5 +13,6 @@ namespace Nucleus.Modules.PageLinks.ViewModels
 	public class Viewer : Models.Settings
 	{
     public string EnabledHeaders { get; set; }
+    public IEnumerable<PageLink> PageLinks { get; set; } = [];
   }
 }

@@ -2,14 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Configuration;
@@ -18,9 +15,7 @@ using Nucleus.Core.Layout;
 namespace Nucleus.Core.Services.Instrumentation;
 
 public class TelemetryMiddleware : IMiddleware
-{
-  private Context Context { get; }
-
+{  
   private Counter<int> PagesVisitedCounter { get; }
   private Counter<int> ErrorCounter { get; }
 
@@ -38,10 +33,8 @@ public class TelemetryMiddleware : IMiddleware
     Resource
   }
 
-  public TelemetryMiddleware(Context context, IMeterFactory meterFactory)
+  public TelemetryMiddleware(IMeterFactory meterFactory)
   {
-    this.Context = context;
-
     Meter pagesVisitedMeter = meterFactory.Create("nucleus.routing", typeof(PageRoutingMiddleware).Assembly.GetName().Version.ToString());
     this.PagesVisitedCounter = pagesVisitedMeter.CreateCounter<int>("nucleus.routing.page_visited", description: "Nucleus pages visited.");
     this.ErrorCounter = pagesVisitedMeter.CreateCounter<int>("nucleus.routing.error_count", description: "Nucleus error responses.");
@@ -52,26 +45,28 @@ public class TelemetryMiddleware : IMiddleware
     // process the request before publishing metrics 
     await next(context);
 
+    Context nucleusContext = context.RequestServices.GetService<Context>();
+
     if (!HttpStatusCodeIsSuccess(context.Response.StatusCode))
     {
       // publish error counters
       this.ErrorCounter.Add(1,
-        new KeyValuePair<string, object>("site_name", this.Context.Site?.Name),
-        new KeyValuePair<string, object>("site_id", this.Context.Site?.Id),
+        new KeyValuePair<string, object>("site_name", nucleusContext?.Site?.Name),
+        new KeyValuePair<string, object>("site_id", nucleusContext?.Site?.Id),
         new KeyValuePair<string, object>("http_status_code", context.Response.StatusCode),
         new KeyValuePair<string, object>("http_request_path", context.Request.Path.ToString()));
     }
     else 
     {
-      if (this.Context.Site != null && this.Context.Page != null)
+      if (nucleusContext?.Site != null && nucleusContext?.Page != null)
       {
         // publish page visits
         this.PagesVisitedCounter.Add(1,
-          new KeyValuePair<string, object>("site_name", this.Context.Site?.Name),
-          new KeyValuePair<string, object>("site_id", this.Context.Site?.Id),
-          new KeyValuePair<string, object>("page_name", this.Context.Page?.Name),
-          new KeyValuePair<string, object>("page_id", this.Context.Page?.Id),
-          new KeyValuePair<string, object>("matched_route", this.Context?.MatchedRoute?.Path)
+          new KeyValuePair<string, object>("site_name", nucleusContext.Site?.Name),
+          new KeyValuePair<string, object>("site_id", nucleusContext.Site?.Id),
+          new KeyValuePair<string, object>("page_name", nucleusContext.Page?.Name),
+          new KeyValuePair<string, object>("page_id", nucleusContext.Page?.Id),
+          new KeyValuePair<string, object>("matched_route", nucleusContext?.MatchedRoute?.Path)
         );
       }
 
@@ -102,7 +97,7 @@ public class TelemetryMiddleware : IMiddleware
 
           if (routeType == TelemetryRouteTypes.Unknown)
           {
-            routeType = DetermineType(context.Request);
+            routeType = DetermineType(context.Request, nucleusContext);
           }
 
           if (routeType != TelemetryRouteTypes.Unknown)
@@ -126,9 +121,9 @@ public class TelemetryMiddleware : IMiddleware
   /// </summary>
   /// <param name="request"></param>
   /// <returns></returns>
-  private TelemetryRouteTypes DetermineType(HttpRequest request)
+  private TelemetryRouteTypes DetermineType(HttpRequest request, Context nucleusContext)
   {
-    if (this.Context.Page != null) return TelemetryRouteTypes.Page;
+    if (nucleusContext.Page != null) return TelemetryRouteTypes.Page;
     if (request.Path.StartsWithSegments("/" + RoutingConstants.FILES_ROUTE_PATH_PREFIX)) return TelemetryRouteTypes.File;
 
     // check for static resources

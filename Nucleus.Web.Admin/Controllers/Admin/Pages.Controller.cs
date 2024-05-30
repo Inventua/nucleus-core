@@ -64,9 +64,16 @@ namespace Nucleus.Web.Controllers.Admin
     /// <returns></returns>
     [HttpGet]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
-    public async Task<ActionResult> Index()
+    public async Task<ActionResult> Index(Guid? pageId)
     {
-      return View("Index", await BuildIndexViewModel());
+      if (pageId == null)
+      {
+        return View("Index", await BuildIndexViewModel());
+      }
+      else
+      {
+        return View("Index", await BuildIndexViewModel(pageId.Value, true));
+      }
     }
 
     /// <summary>
@@ -183,10 +190,13 @@ namespace Nucleus.Web.Controllers.Admin
     /// <returns></returns>
     [HttpGet]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
-    public async Task<ActionResult> NewPageBlank(ViewModels.Admin.PageEditor.PageEditorModes mode)
+    public async Task<ActionResult> NewPageBlank(Guid sourcePageId, ViewModels.Admin.PageEditor.PageEditorModes mode)
     {
       ViewModels.Admin.PageEditor viewModel;
+      
+      Page sourcePage = await this.PageManager.Get(sourcePageId);      
       Page page = await this.PageManager.CreateNew(this.Context.Site);
+      page.ParentId = sourcePage?.ParentId;
 
       viewModel = await BuildPageEditorViewModel(page, null, true);
 
@@ -216,6 +226,7 @@ namespace Nucleus.Web.Controllers.Admin
       page.Id = Guid.Empty;
       page.Name = $"Copy of {page.Name}";
       page.Title = "";
+      page.SortOrder = 0;
 
       // new page can't use the template page's routes
       page.Routes.Clear();
@@ -278,7 +289,7 @@ namespace Nucleus.Web.Controllers.Admin
     /// <returns></returns>
     [HttpGet]
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
-    public async Task<ActionResult> NewPageFromTemplate(Guid templateId)
+    public async Task<ActionResult> NewPageFromTemplate(Guid sourcePageId, Guid templateId)
     {
       ViewModels.Admin.PageIndex viewModel;
 
@@ -298,6 +309,10 @@ namespace Nucleus.Web.Controllers.Admin
       // no need to reset ids, because ParseTemplate auto-generates new Ids, but we do need to clear some fields
       page.Name = "new page";
       page.Title = "";
+      page.SortOrder = 0;
+
+      Page sourcePage = await this.PageManager.Get(sourcePageId);
+      page.ParentId = sourcePage?.ParentId;
 
       // new page can't use the template page's routes
       page.Routes.Clear();

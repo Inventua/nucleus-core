@@ -897,6 +897,18 @@ ul.nucleus-control-panel-items button
 	min-width: 17rem
 }
 
+.nucleus-adminpage .page-index .new-page-from-template select, .nucleus-adminpage .page-index .new-page-from-template select
+{
+  border-color: var(--bs-border-color-translucent);
+  border-width: 4px;
+  cursor: pointer;
+}
+
+.nucleus-adminpage .page-index .new-page-from-template:hover select, .nucleus-adminpage .page-index .new-page-from-template:focus select
+{
+  border-color: var(--bs-border-color);
+}
+
 .nucleus-admin-content .container-style-colorselector
 {
   appearance: none;

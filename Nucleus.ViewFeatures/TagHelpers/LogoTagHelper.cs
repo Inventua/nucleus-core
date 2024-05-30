@@ -36,7 +36,12 @@ namespace Nucleus.ViewFeatures.TagHelpers
 		/// The inner text of the anchor element.
 		/// </summary>
 		public string Caption { get; set; }
-		
+
+    /// <summary>
+    /// Specifies whether to render the site title if no logo file could be found
+    /// </summary>
+    public Boolean FallbackToSiteTitle { get; set; } = true;
+
 		/// <summary>
 		/// Generate the output.
 		/// </summary>
@@ -45,7 +50,7 @@ namespace Nucleus.ViewFeatures.TagHelpers
 		/// <returns></returns>
 		async public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
 		{			
-			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Logo.Build(this.ViewContext, this.Caption, null);
+			TagBuilder builder = await Nucleus.ViewFeatures.HtmlContent.Logo.Build(this.ViewContext, this.Caption, this.FallbackToSiteTitle, null);
 
 			if (builder == null)
 			{

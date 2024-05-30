@@ -18,7 +18,7 @@
           @Html.DropDownListFor(model => model.CategoryListId, new SelectList(Model.Lists, "Id", "Name"), "(not selected)")
         </SettingsControl>
 
-        <SettingsControl caption="Mail Templates" helptext="Email template used to generate email messages.">
+        <SettingsControl caption="Mail Template" helptext="Email template used to generate email messages.">
           @Html.DropDownListFor(model => model.MailTemplateId, new SelectList(Model.MailTemplates, "Id", "Name"), "(not selected)")
         </SettingsControl>
       </div>

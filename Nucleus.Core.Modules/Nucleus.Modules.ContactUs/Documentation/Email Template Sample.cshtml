@@ -1,24 +1,32 @@
 ﻿<p>A new message was sent from the @Model.Site.Name portal by @Model.Message.FirstName @Model.Message.LastName.</p>
 
-@if (Model.Settings.ShowCompany)
+@if (Model.Settings.ShowCompany && !String.IsNullOrEmpty(Model.Message.Company))
 {
-  @if (!String.IsNullOrEmpty(Model.Message.Company)) 
-  {
-    <p>Company: @Model.Message.Company</p>
-  }
+  <p>Company: @Model.Message.Company</p>
 }
 
 <p>Email: @Model.Message.Email</p>
-@if (Model.Settings.ShowPhoneNumber)
+
+@if (Model.Settings.ShowCompany && !String.IsNullOrEmpty(Model.Message.Company))
+{
+  <p>Phone Number: @Model.Message.Company</p>
+}
+@if (Model.Settings.ShowPhoneNumber && !String.IsNullOrEmpty(Model.Message.PhoneNumber))
 {
   <p>Phone Number: @Model.Message.PhoneNumber</p>
 }
-@if (Model.Settings.ShowCategory)
+@if (Model.Settings.ShowCategory && Model.Message.Category != null)
 {
   <p>Category: @Model.Message.Category</p>
 }
+@if (Model.Settings.ShowSubject && !String.IsNullOrEmpty(Model.Message.Subject))
+{
+  <p>Category: @Model.Message.Subject</p>
+}
 
-@Model.Message.Body
+<p>
+  @Model.Message.Body
+</p>
 
 @if (Model.Settings.RecaptchaEnabled)
 {

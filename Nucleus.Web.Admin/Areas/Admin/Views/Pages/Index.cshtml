@@ -14,9 +14,9 @@
       </button>
       <ul class="dropdown-menu new-page-dropdown-menu">
         <li>
-          <a href="@Url.AreaAction("NewPageBlank", "Pages", "Admin")" class="dropdown-item d-flex fw-bold active" data-target="#nucleus-page-editor" accesskey="N">
+          <a href="@Url.AreaAction("NewPageBlank", "Pages", "Admin")" class="dropdown-item d-flex fw-bold active new-page-blank" data-target="#nucleus-page-editor" accesskey="N">
             Blank page
-            <span class="nucleus-material-icon ms-auto">&#xe5e1;</span>
+            @* <span class="nucleus-material-icon ms-auto">&#xe5e1;</span> *@
           </a>
         </li>
         <li class="copy-page-disabled collapse">
@@ -25,22 +25,22 @@
         <li class="collapse copy-page-enabled">
           <a href="@Url.AreaAction("NewPageFromCopy", "Pages", "Admin")" class="dropdown-item d-flex" data-target="form.parent()" accesskey="C">
             Copy this page
-            <span class="nucleus-material-icon ms-auto">&#xe5e1;</span>
+            @* <span class="nucleus-material-icon ms-auto">&#xe5e1;</span> *@
           </a>
         </li>
         <li class="collapse copy-page-enabled">
           <a href="@Url.AreaAction("NewPageFromCopy", "Pages", "Admin", new {copyContent = true})" class="dropdown-item d-flex" data-target="form.parent()" accesskey="C">
-            Copy this page with Content
-            <span class="nucleus-material-icon ms-auto">&#xe5e1;</span>
+            Copy this page with content
+            @* <span class="nucleus-material-icon ms-auto">&#xe5e1;</span> *@
           </a>
         </li>
         @if (Model.PageTemplates.Any())
         {
           <li><hr class="dropdown-divider"></li>
           <li>
-            <div class="px-3">
+            <div class="px-3 d-flex flex-column new-page-from-template">
               <div class="mb-2 text-nowrap">New page from template</div>
-              @Html.DropDownListFor(model => model.SelectedPageTemplateFileId, Model.PageTemplates, "(select)", new { @class = "form-select w-auto page-template-select" })
+              @Html.DropDownListFor(model => model.SelectedPageTemplateFileId, Model.PageTemplates, "(select template)", new { @class = "form-select w-auto page-template-select" })
             </div>
           </li>
         }
@@ -71,15 +71,15 @@
     Page.LoadPartialContent(null, '@Url.Content("~/Admin/Pages/Editor?id=")' + '@Model.PageId', '#nucleus-page-editor');
     </text>
   }
-    // Open a page for editing
-    jQuery('.nucleus-index-wrapper').on('click', 'li[data-target="#nucleus-page-editor"] a', function (e)
+  // Open a page for editing
+  jQuery('.nucleus-index-wrapper').on('click', 'li[data-target="#nucleus-page-editor"] a', function (e)
+  {
+    if (jQuery('.new-page-dropdown-btn').dropdown())
     {
-      if (jQuery('.new-page-dropdown-btn').dropdown())
-      {
-        jQuery('.new-page-dropdown-btn').dropdown('hide');
-      }
-      Page.LoadPartialContent(e, '@Url.Content("~/Admin/Pages/Editor?id=")' + jQuery(this).attr('data-id'), '#nucleus-page-editor');
-    });
+      jQuery('.new-page-dropdown-btn').dropdown('hide');
+    }
+    Page.LoadPartialContent(e, '@Url.Content("~/Admin/Pages/Editor?id=")' + jQuery(this).attr('data-id'), '#nucleus-page-editor');
+  });
 
   jQuery('.nucleus-index-wrapper').on('keydown', 'a', function (event)
   {
@@ -134,9 +134,9 @@
       });      
     }
   });
-
+    
   jQuery('.page-template-select').on('change', function (event) 
   { 
-    Page.LoadPartialContent(event, '@Url.AreaAction("NewPageFromTemplate", "Pages", "Admin")' + '?templateId=' + jQuery('.page-template-select').val(), '.nucleus-adminpage');
+    Page.LoadPartialContent(event, '@Url.AreaAction("NewPageFromTemplate", "Pages", "Admin")' + '?templateId=' + jQuery('.page-template-select').val() + '&sourcePageId=' + jQuery('#Page_Id').val(), '.nucleus-adminpage');
   });
 </script>

@@ -12,7 +12,7 @@
 			{
 				<div>
 					<div>
-						<a href="@Url.Content("~/Admin/Pages/Editor")?id=@item.Id" data-target="#nucleus-page-editor">@item.Name</a>
+            <a href="@Url.Content("~/Admin/Pages/Index")?pageId=@item.Id" data-target=".nucleus-adminpage">@item.Name</a>
 						@if (!String.IsNullOrEmpty(item.Name == item.Title ? "" : item.Title))
 						{
 							<span class="nucleus-search-results-subtitle">@(item.Name == item.Title ? "" : item.Title)</span>

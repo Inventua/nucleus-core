@@ -44,7 +44,7 @@
         @if (Model.IsSiteAdmin)
         {
           @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("System", "View system information and logs.", "~/Admin/System/Index", "Y", "&#xe871;", "SystemIcon"))
-          @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Pages", "Manage your pages.", "~/Admin/Pages/Index", "P", "&#xef42;", "PagesIcon"))
+          @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Pages", "Manage your pages.", "~/Admin/Pages/Index" + "?pageId=" + @Model.CurrentPage.Id, "P", "&#xef42;", "PagesIcon"))
           @await Html.PartialAsync("_IndexIcon", new Nucleus.Web.ViewModels.Admin.IndexIcon("Manage", "Administer site-specific entities and settings.", "~/Admin/Manage/Index", "M", "&#xf02e;", "ManageIcon"))
         }
         @if (Model.IsSystemAdministrator)

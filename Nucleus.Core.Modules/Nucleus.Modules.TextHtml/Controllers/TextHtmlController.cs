@@ -46,7 +46,7 @@ namespace Nucleus.Modules.TextHtml.Controllers
 
 			if (this.Context.Module != null)
 			{
-        viewModel.Content =(await this.ContentManager.List(this.Context.Module)).FirstOrDefault() ?? new();
+        viewModel.Content =(await this.ContentManager.List(this.Context.Module)).FirstOrDefault();
 			}
 
       return viewModel;
@@ -91,9 +91,9 @@ namespace Nucleus.Modules.TextHtml.Controllers
 
     [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
     [HttpPost]
-    public async Task<ActionResult> UpdateContent(Guid id, string value)
+    public async Task<ActionResult> UpdateContent(Guid? id, string value)
     {
-      Content content = await this.ContentManager.Get(id);
+      Content content = id == null ? new Content() { SortOrder = 10 } : await this.ContentManager.Get(id.Value);
       content.Value = value;
       await this.ContentManager.Save(this.Context.Module, content);
 

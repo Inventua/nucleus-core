@@ -43,6 +43,7 @@
         <file name="Microsoft.IdentityModel.Logging.dll" />
         <file name="System.IdentityModel.Tokens.Jwt.dll" />
         <file name="Microsoft.IdentityModel.JsonWebTokens.dll" />
+        <file name="System.Security.Permissions.dll" />
       </folder>
       <folder name="Views">
         <file name="Viewer.cshtml" />

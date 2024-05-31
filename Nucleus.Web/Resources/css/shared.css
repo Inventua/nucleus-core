@@ -91,7 +91,7 @@ body.control-panel-dock-top.nucleus-admin-frame-expanded
 
 .nucleus-admin-frame-placeholder
 {
-  width: calc(var(--control-panel-size) + 4px);
+  width: var(--control-panel-size);
 	height: 100%;
 }
 

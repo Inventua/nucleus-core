@@ -92,7 +92,7 @@ namespace Nucleus.Core.Search
         }
 
         activeSiteSearchIndexManagers.Add(site.Id, activeSearchIndexManagers);
-        await ClearIndexes(site, activeSearchIndexManagers);
+        await ClearIndexes(fullSite, activeSearchIndexManagers);
       }
 
       foreach (IContentMetaDataProducer contentProvider in this.SearchContentProviders)
@@ -200,7 +200,7 @@ namespace Nucleus.Core.Search
         url = url[1..];
       }
 
-      if (!url.EndsWith('/'))
+      if (!url.EndsWith('/') && !url.Contains('#'))
       {
         url += "/";
       }

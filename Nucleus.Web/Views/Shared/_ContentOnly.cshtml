@@ -5,8 +5,12 @@
 	<meta charset="utf-8" />	
 	@if (!String.IsNullOrEmpty(Model.Context.Page.Description))
 	{
-    <meta name="DESCRIPTION" property="og:description" content="@Model.Context.Page.Description" />
+    <meta name="description" property="og:description" content="@Model.Context.Page.Description" />
 	}
+  @if (!Model.Context.Page.IncludeInSearch)
+  {
+    <meta name="robots" content="noindex" />
+  }
   <meta property="og:site_name" content="@Model.Context.Site.Name" />
   <meta property="og:title" content="@Model.Context.Page.Title" />
   <meta property="og:url" content="@Model.DefaultPageUri" />

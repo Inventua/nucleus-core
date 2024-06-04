@@ -123,7 +123,7 @@ public static class PluginExtensions
       }
     }
 
-    builder.Logger()?.LogInformation("Added ({count}) controllers from: {assemblies}.", logEntries.Count,
+    builder.Logger()?.LogInformation("Added controllers from: ({count}) {assemblies}.", logEntries.Count,
       String.Join(", ", logEntries));
 
     return builder;

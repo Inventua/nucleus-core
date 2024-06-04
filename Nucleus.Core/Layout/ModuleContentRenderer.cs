@@ -34,8 +34,9 @@ public class ModuleContentRenderer : IModuleContentRenderer
   private IPageManager PageManager { get; }
 
   private ILogger<ModuleContentRenderer> Logger { get; }
+#if DEBUG
   private Histogram<float> ModulesRenderedHistogram { get; }
-
+#endif
   private static readonly RecyclableMemoryStreamManager RecyclableMemoryStreamManager = new();
 
   public ModuleContentRenderer(IPageManager pageManager, IPageModuleManager pageModuleManager, IMeterFactory meterFactory, ILogger<ModuleContentRenderer> logger)
@@ -43,10 +44,11 @@ public class ModuleContentRenderer : IModuleContentRenderer
     this.PageManager = pageManager;
     this.PageModuleManager = pageModuleManager;
     this.Logger = logger;
-
-    // dotnet-counters monitor -n Nucleus.Web --counters nucleus.perf
+#if DEBUG
+    // dotnet-counters monitor -n Nucleus.Web --counters nucleus.perf --showDeltas --maxHistograms 200
     Meter performancedMeter = meterFactory.Create("nucleus.perf", typeof(ModuleContentRenderer).Assembly.GetName().Version.ToString());
-    this.ModulesRenderedHistogram = performancedMeter.CreateHistogram<float>("nucleus.perf.rendering.modules", description: "Nucleus modules render performance.");
+    this.ModulesRenderedHistogram = performancedMeter.CreateHistogram<float>("nucleus.perf.rendering.modules", description: "Nucleus modules render performance.", unit: "ms");    
+#endif
   }
 
   /// <summary>
@@ -321,9 +323,12 @@ public class ModuleContentRenderer : IModuleContentRenderer
     Context scopedContext;
     IServiceProvider originalServiceProvider;
     HttpResponse response;
+
+#if DEBUG
     Stopwatch stopWatch = new();
 
     stopWatch.Start();
+#endif
 
     HttpContext newHttpContext = httpContextFactory.Create(viewContext?.HttpContext.Features);
 
@@ -372,14 +377,15 @@ public class ModuleContentRenderer : IModuleContentRenderer
         {
           response = newHttpContext.Response;
         }
-
+#if DEBUG
         stopWatch.Stop();
-        
-        this.ModulesRenderedHistogram.Record((float)stopWatch.ElapsedTicks / Stopwatch.Frequency * 1000,  // ms with decimals
-          new KeyValuePair<string, object>("module_title", scopedContext.Module?.Title),
-          new KeyValuePair<string, object>("module_id", scopedContext.Module?.Id),
-          new KeyValuePair<string, object>("module_type", scopedContext.Module?.ModuleDefinition?.FriendlyName));
 
+        this.ModulesRenderedHistogram.Record((float)stopWatch.ElapsedTicks / Stopwatch.Frequency * 1000,  // ms with decimals
+          new KeyValuePair<string, object>("module.title", scopedContext.Module?.Title),
+          new KeyValuePair<string, object>("module.id", scopedContext.Module?.Id),
+          new KeyValuePair<string, object>("module.type", scopedContext.Module?.ModuleDefinition?.FriendlyName),
+          new KeyValuePair<string, object>("request.path", viewContext.HttpContext.Request.Path));
+#endif
         return response;
       }
       catch (Exception)
@@ -510,25 +516,6 @@ public class ModuleContentRenderer : IModuleContentRenderer
   private static ControllerActionDescriptor BuildActionDescriptor(IActionDescriptorCollectionProvider actionDescriptorProvider, string controllerName, string action, PageModule moduleinfo)
   {
     ControllerActionDescriptor actionDescriptor = null;
-
-    ////if (String.IsNullOrEmpty(controllerName) || String.IsNullOrEmpty(moduleinfo.ModuleDefinition.Extension))
-    ////{
-    ////  // backward compatibility
-    ////  Type moduleControllerType = Type.GetType(moduleinfo.ModuleDefinition.ClassTypeName);
-
-    ////  if (moduleControllerType != null)
-    ////  {
-    ////    TypeInfo moduleControllerTypeInfo = moduleControllerType.GetTypeInfo();
-
-    ////    moduleinfo.ModuleDefinition.Extension = Nucleus.Core.Plugins.AssemblyLoader.GetExtensionFolderName(moduleControllerTypeInfo.Assembly.Location).Replace(" ", "");
-    ////    controllerName = moduleControllerType.Name;
-    ////    if (controllerName.EndsWith("Controller"))
-    ////    {
-    ////      // remove "Controller" from the end of the controller name
-    ////      controllerName = controllerName[..^"Controller".Length];
-    ////    }
-    ////  }
-    ////}
 
     if (!String.IsNullOrEmpty(controllerName))
     {

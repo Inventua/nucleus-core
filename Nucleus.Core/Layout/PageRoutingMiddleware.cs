@@ -7,6 +7,7 @@ using Nucleus.Extensions.Logging;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Nucleus.Core.Layout
 {
@@ -19,8 +20,6 @@ namespace Nucleus.Core.Layout
   /// </summary>
   public class PageRoutingMiddleware : Microsoft.AspNetCore.Http.IMiddleware
   {
-    private Context Context { get; }
-    private Application Application { get; }
     private IPageManager PageManager { get; }
     private IUserManager UserManager { get; }
     private ISiteManager SiteManager { get; }
@@ -39,10 +38,8 @@ namespace Nucleus.Core.Layout
       Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX
     ];
 
-    public PageRoutingMiddleware(Context context, Application application, IPageManager pageManager, ISiteManager siteManager, IUserManager userManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager, ILogger<PageRoutingMiddleware> logger)
+    public PageRoutingMiddleware(IPageManager pageManager, ISiteManager siteManager, IUserManager userManager, IFileSystemManager fileSystemManager, ICacheManager cacheManager, ILogger<PageRoutingMiddleware> logger)
     {
-      this.Context = context;
-      this.Application = application;
       this.PageManager = pageManager;
       this.SiteManager = siteManager;
       this.UserManager = userManager;
@@ -60,26 +57,29 @@ namespace Nucleus.Core.Layout
     /// <returns></returns>
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
+      Context nucleusContext = context.RequestServices.GetService<Context>();
+      Application nucleusApplication = context.RequestServices.GetService<Application>();
+
       if (Guid.TryParse(context.Request.Query["pageid"], out Guid pageId))
       {
         Logger.LogTrace("Request for page id '{pageid}'.", pageId);
-        this.Context.Page = await this.PageManager.Get(pageId);
+        nucleusContext.Page = await this.PageManager.Get(pageId);
 
-        if (this.Context.Page != null)
+        if (nucleusContext.Page != null)
         {
-          if (this.Context.Page.Disabled)
+          if (nucleusContext.Page.Disabled)
           {
             Logger.LogTrace("Page id '{pageid}' is disabled.", pageId);
-            this.Context.Page = null;
+            nucleusContext.Page = null;
           }
           else
           {
             Logger.LogTrace("Page id '{pageid}' found.", pageId);
-            this.Context.Site = await this.SiteManager.Get(this.Context.Page);
+            nucleusContext.Site = await this.SiteManager.Get(nucleusContext.Page);
           }
 
           // When HandleLinkType returns false, it means we should not continue because we are redirecting to another page
-          if (!await HandleLinkType(context))
+          if (!await HandleLinkType(context, nucleusContext))
           {
             return;
           }
@@ -91,50 +91,50 @@ namespace Nucleus.Core.Layout
       }
       else
       {
-        if (SkipSiteDetection(context) || !this.Application.IsInstalled)          
+        if (SkipSiteDetection(context) || !nucleusApplication.IsInstalled)
         {
           Logger.LogTrace("Skipped site detection for '{request}'.", context.Request.Path);
 
-          this.Context.Site = null;          
+          nucleusContext.Site = null;
         }
         else
         {
           Logger.LogTrace("Matching site by host '{host}' and pathbase '{pathbase}'.", context.Request.Host, context.Request.PathBase);
 
-          this.Context.Site = await this.SiteManager.Get(context.Request.Host.Value, context.Request.PathBase);
+          nucleusContext.Site = await this.SiteManager.Get(context.Request.Host.Value, context.Request.PathBase);
 
-          if (this.Context.Site == null)
+          if (nucleusContext.Site == null)
           {
             Logger.LogTrace("Using default site.");
-            this.Context.Site = await this.SiteManager.Get("", "");
+            nucleusContext.Site = await this.SiteManager.Get("", "");
 
-            if (this.Context.Site != null)
+            if (nucleusContext.Site != null)
             {
               // Add "default" site to the site alias table 
               SiteAlias alias = new() { Alias = $"{context.Request.Host}{context.Request.PathBase}" };
-              await this.SiteManager.SaveAlias(this.Context.Site, alias);
+              await this.SiteManager.SaveAlias(nucleusContext.Site, alias);
 
               // If the site doesn't already have a default alias, set it to the new alias
-              if (this.Context.Site.DefaultSiteAlias == null)
+              if (nucleusContext.Site.DefaultSiteAlias == null)
               {
-                this.Context.Site.DefaultSiteAlias = alias;
-                await this.SiteManager.Save(this.Context.Site);
+                nucleusContext.Site.DefaultSiteAlias = alias;
+                await this.SiteManager.Save(nucleusContext.Site);
               }
             }
           }
 
-          if (this.Context.Site != null)
+          if (nucleusContext.Site != null)
           {
             string requestedPath = System.Web.HttpUtility.UrlDecode(context.Request.Path);
-            Logger.LogTrace("Using site '{siteid}'.", this.Context.Site.Id);
+            Logger.LogTrace("Using site '{siteid}'.", nucleusContext.Site.Id);
 
             if (!SkipPageDetection(context))
             {
               Logger.LogTrace("Lookup page by path '{path}'.", requestedPath);
 
-              await FindPage(requestedPath);
+              await FindPage(requestedPath, nucleusContext);
 
-              if (this.Context.Page == null)
+              if (nucleusContext.Page == null)
               {
                 // if the page was not found, try searching for path & query.  This is to support pages routes which include a query string, which
                 // users may have in place to provide for urls from legacy systems like DNN which can have querystring values which identify a page.
@@ -142,24 +142,24 @@ namespace Nucleus.Core.Layout
 
                 Logger.LogTrace("Lookup page by path '{path}'.", requestedPathAndQuery);
 
-                await FindPage(requestedPathAndQuery);
+                await FindPage(requestedPathAndQuery, nucleusContext);
               }
             }
 
-            if (this.Context.Page != null)
+            if (nucleusContext.Page != null)
             {
-              if (this.Context.Page.Disabled)
+              if (nucleusContext.Page.Disabled)
               {
                 Logger.LogTrace("Page id '{pageid}' is disabled.", pageId);
-                this.Context.Page = null;
+                nucleusContext.Page = null;
               }
               else
               {
-                Logger.LogTrace("Page found: '{pageid}'.", this.Context.Page.Id);
+                Logger.LogTrace("Page found: '{pageid}'.", nucleusContext.Page.Id);
               }
 
               // When HandleLinkType returns false, it means we should not continue because we are redirecting to another site
-              if (!await HandleLinkType(context))
+              if (!await HandleLinkType(context, nucleusContext))
               {
                 return;
               }
@@ -185,17 +185,17 @@ namespace Nucleus.Core.Layout
       // The calls to SkipSiteDetection and SkipPageDetection check that the request path isn't a known non-page path
       // like favicon.ico, or the setup wizard itself, to prevent redirection for those cases.
       if (
-        context.Response.StatusCode == (int)System.Net.HttpStatusCode.NotFound && 
-        this.Context.Site == null && 
-        !SkipSiteDetection(context) && 
-        !SkipPageDetection(context) && 
-        (!this.Application.IsInstalled || await this.SiteManager.Count() == 0) &&
+        context.Response.StatusCode == (int)System.Net.HttpStatusCode.NotFound &&
+        nucleusContext.Site == null &&
+        !SkipSiteDetection(context) &&
+        !SkipPageDetection(context) &&
+        (!nucleusApplication.IsInstalled || await this.SiteManager.Count() == 0) &&
         await this.UserManager.CountSystemAdministrators() == 0
       )
       {
         String relativePath = $"{(String.IsNullOrEmpty(context.Request.PathBase) ? "" : context.Request.PathBase + "/")}Setup/SiteWizard";
         context.Response.Redirect(relativePath);
-      }      
+      }
     }
 
     /// <summary>
@@ -204,49 +204,49 @@ namespace Nucleus.Core.Layout
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    private async Task<Boolean> HandleLinkType(HttpContext context)
+    private async Task<Boolean> HandleLinkType(HttpContext context, Context nucleusContext)
     {
-      switch (this.Context.Page.LinkType)
+      switch (nucleusContext.Page.LinkType)
       {
         case Page.LinkTypes.Normal:
           return true;
 
         case Page.LinkTypes.Url:
-          if (!String.IsNullOrEmpty(this.Context.Page.LinkUrl))
+          if (!String.IsNullOrEmpty(nucleusContext.Page.LinkUrl))
           {
-            Logger.LogTrace("Page: '{pageid}' has link type: url.  Redirecting to '{linkUrl}'", this.Context.Page.Id, this.Context.Page.LinkUrl);
-            context.Response.Redirect(this.Context.Page.LinkUrl);
+            Logger.LogTrace("Page: '{pageid}' has link type: url.  Redirecting to '{linkUrl}'", nucleusContext.Page.Id, nucleusContext.Page.LinkUrl);
+            context.Response.Redirect(nucleusContext.Page.LinkUrl);
             return false;
           }
           else
           {
-            Logger.LogTrace("Page: '{pageid}' has link type: Url, but the does not have a LinkPageUrl set.  Treating as a normal page.", this.Context.Page.Id);
+            Logger.LogTrace("Page: '{pageid}' has link type: Url, but the does not have a LinkPageUrl set.  Treating as a normal page.", nucleusContext.Page.Id);
             break;
           }
 
         case Page.LinkTypes.Page:
-          if (this.Context.Page.LinkPageId.HasValue)
+          if (nucleusContext.Page.LinkPageId.HasValue)
           {
-            this.Context.Page = await this.PageManager.Get(this.Context.Page.LinkPageId.Value);
-            Logger.LogTrace("Page: '{pageid}' has link type: Page.  Using page id '{linkPageId}'", this.Context.Page.Id, this.Context.Page.LinkPageId);
+            nucleusContext.Page = await this.PageManager.Get(nucleusContext.Page.LinkPageId.Value);
+            Logger.LogTrace("Page: '{pageid}' has link type: Page.  Using page id '{linkPageId}'", nucleusContext.Page.Id, nucleusContext.Page.LinkPageId);
           }
           else
           {
-            Logger.LogTrace("Page: '{pageid}' has link type: Page, but the does not have a LinkPageId set.  Treating as a normal page.", this.Context.Page.Id);
+            Logger.LogTrace("Page: '{pageid}' has link type: Page, but the does not have a LinkPageId set.  Treating as a normal page.", nucleusContext.Page.Id);
           }
           break;
 
         case Page.LinkTypes.File:
-          if (this.Context.Page.LinkFileId.HasValue)
+          if (nucleusContext.Page.LinkFileId.HasValue)
           {
-            Nucleus.Abstractions.Models.FileSystem.File file = await this.FileSystemManager.GetFile(this.Context.Site, this.Context.Page.LinkFileId.Value);
+            Nucleus.Abstractions.Models.FileSystem.File file = await this.FileSystemManager.GetFile(nucleusContext.Site, nucleusContext.Page.LinkFileId.Value);
             context.Response.Redirect($"{(String.IsNullOrEmpty(context.Request.PathBase) ? "" : context.Request.PathBase + "/")}/{Nucleus.Abstractions.RoutingConstants.FILES_ROUTE_PATH_PREFIX}/{file.EncodeFileId()}");
-            Logger.LogTrace("Page: '{pageid}' has link type: File.  Using file id '{linkFileId}'", this.Context.Page.Id, this.Context.Page.LinkFileId);
+            Logger.LogTrace("Page: '{pageid}' has link type: File.  Using file id '{linkFileId}'", nucleusContext.Page.Id, nucleusContext.Page.LinkFileId);
             return false;
           }
           else
           {
-            Logger.LogTrace("Page: '{pageid}' has link type: File, but the does not have a LinkFileId set.  Treating as a normal page.", this.Context.Page.Id);
+            Logger.LogTrace("Page: '{pageid}' has link type: File, but the does not have a LinkFileId set.  Treating as a normal page.", nucleusContext.Page.Id);
           }
           break;
       }
@@ -263,13 +263,13 @@ namespace Nucleus.Core.Layout
     /// This function includes logic to partly match the requested path, and set Context.LocalPath to the 
     /// unmatched portion of the path, and also caches partly-matched paths.
     /// </remarks>
-    private async Task FindPage(string requestPath)
+    private async Task FindPage(string requestPath, Context nucleusContext)
     {
-      string pagePathCacheKey = (this.Context.Site.Id.ToString() + "^" + requestPath).ToLower();
+      string pagePathCacheKey = (nucleusContext.Site.Id.ToString() + "^" + requestPath).ToLower();
 
       FoundPage found = await this.CacheManager.PageRouteCache().GetAsync(pagePathCacheKey, async pagePathCacheKey =>
       {
-        Page page = await this.PageManager.Get(this.Context.Site, requestPath);
+        Page page = await this.PageManager.Get(nucleusContext.Site, requestPath);
 
         if (page != null)
         {
@@ -279,7 +279,7 @@ namespace Nucleus.Core.Layout
         string partPath = requestPath;
         string parameters = "";
 
-        while (this.Context.Page == null && !String.IsNullOrEmpty(partPath))
+        while (nucleusContext.Page == null && !String.IsNullOrEmpty(partPath))
         {
           int lastIndexOfSeparator = partPath.LastIndexOfAny(['/', '&', '?']);
           string nextParameterPart = partPath[(lastIndexOfSeparator + 1)..];
@@ -299,7 +299,7 @@ namespace Nucleus.Core.Layout
 
           if (!String.IsNullOrEmpty(partPath))
           {
-            page = await this.PageManager.Get(this.Context.Site, partPath);
+            page = await this.PageManager.Get(nucleusContext.Site, partPath);
             if (page != null)
             {
               return new() { Page = page, LocalPath = new(parameters), RequestPath = requestPath, MatchedRoute = GetFoundRoute(page, partPath) };
@@ -312,9 +312,9 @@ namespace Nucleus.Core.Layout
 
       if (found != null)
       {
-        this.Context.Page = found.Page;
-        this.Context.LocalPath = found.LocalPath;
-        this.Context.MatchedRoute = found.MatchedRoute;
+        nucleusContext.Page = found.Page;
+        nucleusContext.LocalPath = found.LocalPath;
+        nucleusContext.MatchedRoute = found.MatchedRoute;
       }
     }
 

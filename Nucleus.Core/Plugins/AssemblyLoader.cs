@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Extensions.Logging;
@@ -22,7 +23,7 @@ namespace Nucleus.Core.Plugins;
 public class AssemblyLoader
 {
   private static System.Collections.Concurrent.ConcurrentDictionary<string, AssemblyLoadContext> ExtensionLoadContexts { get; } = new(StringComparer.OrdinalIgnoreCase);
-  private static System.Collections.Concurrent.ConcurrentDictionary<string, AssemblyLoadContext> TypeContextCache { get; } = new(StringComparer.OrdinalIgnoreCase);
+  private static System.Collections.Concurrent.ConcurrentDictionary<string, string> TypeContextCache { get; } = new(StringComparer.OrdinalIgnoreCase);
 
   private static List<Assembly> LoadedAssemblies { get; set; }
 
@@ -85,7 +86,7 @@ public class AssemblyLoader
         assemblyLoadContext = new PluginLoadContext(extensionFolder, pluginPath);
         ExtensionLoadContexts.TryAdd(extensionFolder, assemblyLoadContext);
       }
-    }   
+    }
 
     // Load the assembly
     try
@@ -94,7 +95,7 @@ public class AssemblyLoader
       string[] assemblyPathParts = System.IO.Path.GetDirectoryName(path).Split(['/', '\\']);
 
       //if (System.IO.Path.GetDirectoryName(path).ToLower().Replace('\\', '/').Contains("/runtimes/") && System.IO.Path.GetDirectoryName(path).ToLower().Replace('\\', '/').EndsWith("/native"))
-      if (assemblyPathParts.Contains("runtimes", StringComparer.OrdinalIgnoreCase) && assemblyPathParts.Last()?.Equals("native",StringComparison.OrdinalIgnoreCase) == true)
+      if (assemblyPathParts.Contains("runtimes", StringComparer.OrdinalIgnoreCase) && assemblyPathParts.Last()?.Equals("native", StringComparison.OrdinalIgnoreCase) == true)
       {
         return null;
       }
@@ -168,7 +169,7 @@ public class AssemblyLoader
   /// CurrentContextualReflectionContext to load the requested assembly. 
   /// </summary>
   /// <param name="context">Request assembly load context.</param>
-  /// <param name="assemblyName">Requested assenmbly.</param>
+  /// <param name="assemblyName">Requested assembly.</param>
   /// <remarks>
   /// This code resolves extension assemblies from the PluginLoadContext when the Nucleus.Core.Layout.ModuleContentRenderer 
   /// calls actionInvoker.InvokeAsync().  Without this handler, .InvokeAsync throws "System.IO.FileNotFoundException: Could 
@@ -213,9 +214,15 @@ public class AssemblyLoader
       );
   }
 
+  public static AssemblyLoadContext.ContextualReflectionScope EnterExtensionContext(string typeName)
+  {
+    return EnterExtensionContext(null, typeName);
+  }
+
   /// <summary>
   /// Retrieves the AssemblyLoadContext for the specified type and sets the CurrentContextualReflectionContext to it.
   /// </summary>
+  /// <param name="extensionName"></param>
   /// <param name="typeName"></param>
   /// <returns></returns>
   /// <remarks>
@@ -227,35 +234,81 @@ public class AssemblyLoader
   /// disposed, the CurrentContextualReflectionContext is reset back to the default AssemblyLoadContext.
   /// </remarks>
   /// <example>
-  /// using (System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope scope = Nucleus.Core.Plugins.AssemblyLoader.EnterExtensionContext(moduleinfo.ModuleDefinition.ClassTypeName))
+  /// using (System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope scope = Nucleus.Core.Plugins.AssemblyLoader.EnterExtensionContext(actionDescriptor.ControllerTypeInfo.AssemblyQualifiedName))
   ///	{
   ///		moduleControllerTypeInfo = Type.GetType(moduleinfo.ModuleDefinition.ClassTypeName).GetTypeInfo();
   ///	}
   /// </example>
-  public static System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope EnterExtensionContext(string typeName)
+  public static AssemblyLoadContext.ContextualReflectionScope EnterExtensionContext(string extensionName, string typeName)
   {
-    if (TypeContextCache.TryGetValue(typeName, out AssemblyLoadContext value))
-    {
-      return value.EnterContextualReflection();
-    }
-    else
-    {
-      // If the type was not found in the cache, loop through the ModuleLoadContexts until it is found (and add it to the cache for next time)
-      foreach (AssemblyLoadContext context in ExtensionLoadContexts.Values)
-      {
-        System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope scope = context.EnterContextualReflection();
+    AssemblyLoadContext.ContextualReflectionScope scope;
 
-        if (Type.GetType(typeName) != null)
+    if (TypeContextCache.TryGetValue(typeName, out string assemblyLoadContextName))
+    {
+      if (assemblyLoadContextName == AssemblyLoadContext.Default.Name)
+      {
+        return AssemblyLoadContext.Default.EnterContextualReflection();
+      }
+      else
+      {
+        if (ExtensionLoadContexts.TryGetValue(assemblyLoadContextName, out AssemblyLoadContext assemblyLoadContext))
         {
-          TypeContextCache.TryAdd(typeName, context);
+          return assemblyLoadContext.EnterContextualReflection();
+        }
+      }
+    }
+
+    // If the type was not found in the cache, try to find it in a assembly load context.
+
+    // if the type is available from the default assembly load context, use it
+    if (TryAssemblyLoadContext(System.Runtime.Loader.AssemblyLoadContext.Default, typeName, out scope))
+    {
+      return scope;
+    }
+
+    // prefer the supplied extension's assembly load context, if specified
+    if (extensionName != null)
+    {
+      if (ExtensionLoadContexts.TryGetValue(extensionName, out AssemblyLoadContext context))
+      {
+        if (TryAssemblyLoadContext(context, typeName, out scope))
+        {
           return scope;
         }
-
-        scope.Dispose();
       }
-
-      return System.Runtime.Loader.AssemblyLoadContext.Default.EnterContextualReflection();
     }
+
+    // loop through the ModuleLoadContexts until we find the type 
+    foreach (AssemblyLoadContext context in ExtensionLoadContexts.Values)
+    {
+      if (TryAssemblyLoadContext(context, typeName, out scope))
+      {
+        return scope;
+      }
+    }
+
+    // this is a catch-all.  There are no known scenarios where this code should never be reached, as the requested type should
+    // be in an assembly which is in the default assembly load context, or one of the extension assembly load contexts.
+    return System.Runtime.Loader.AssemblyLoadContext.Default.EnterContextualReflection();
+
+  }
+
+  private static Boolean TryAssemblyLoadContext(AssemblyLoadContext context, string typeName, out System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope scope)
+  {
+    scope = context.EnterContextualReflection();
+
+    Type type = Type.GetType(typeName);
+    if (type != null)
+    {
+      if (AssemblyLoadContext.CurrentContextualReflectionContext.Assemblies.Contains(type.Assembly))
+      {
+        TypeContextCache.TryAdd(typeName, context.Name);
+      }
+      return true;      
+    }
+
+    scope.Dispose();
+    return false;
   }
 
   /// <summary>
@@ -297,7 +350,7 @@ public class AssemblyLoader
   {
     if (ExtensionLoadContexts.TryGetValue(pluginName, out AssemblyLoadContext context))
     {
-      ExtensionLoadContexts.Remove(pluginName, out AssemblyLoadContext _ );
+      ExtensionLoadContexts.Remove(pluginName, out AssemblyLoadContext _);
 
       context.Unload();
 
@@ -317,8 +370,6 @@ public class AssemblyLoader
   internal static Boolean IsExcludedAssembly(Assembly assembly)
   {
     return IsExcludedAssembly(assembly.Location);
-    //string assemblySubFolder = System.IO.Path.GetDirectoryName(assembly.Location).Split(['/', '\\']).LastOrDefault();
-    //return EXCLUDED_ASSSEMBLY_PATHS.Contains(assemblySubFolder);
   }
 
   /// <summary>
@@ -331,7 +382,10 @@ public class AssemblyLoader
   /// </remarks>
   private static IEnumerable<string> EnumerateAssemblyNames()
   {
-    // get all assemblies (dlls) in /bin 			
+    // assemblies (dlls) in /bin must be returned first, so that if an assembly/version exists in both /bin and in an extension/bin folder, the 
+    // "core" bin assembly is added to the type cache & gets used in preference to the other one.
+
+    // get all assemblies (dlls) in /bin
     foreach (string filename in System.IO.Directory.EnumerateFiles(System.IO.Path.GetDirectoryName(typeof(AssemblyLoader).Assembly.Location), "*.dll", System.IO.SearchOption.AllDirectories))
     {
       if (!IsExcludedAssembly(filename))
@@ -396,12 +450,6 @@ public class AssemblyLoader
 
       try
       {
-        // We use .FirstOrDefault for performance - we want all of the assemblies implementing <T>, but we only need one match
-        // not all of them.
-        //type = assembly.GetTypes().FirstOrDefault
-        //(
-        //	typ => !typ.IsAbstract && typeof(T).IsAssignableFrom(typ) && !typ.Equals(typeof(T))
-        //);
         type = assembly.GetExportedTypes().FirstOrDefault
         (
           typ => !typ.IsAbstract && typeof(T).IsAssignableFrom(typ) && !typ.Equals(typeof(T))
@@ -426,10 +474,10 @@ public class AssemblyLoader
   }
 
   /// <summary>
-		/// Return a list of all types. 
-		/// </summary>
-		/// <returns>A list of .net types in the main application folder and in extension folders.</returns>
-		public static IEnumerable<Type> GetTypes()
+  /// Return a list of all types. 
+  /// </summary>
+  /// <returns>A list of .net types in the main application folder and in extension folders.</returns>
+  public static IEnumerable<Type> GetTypes()
   {
     foreach (Assembly assembly in ListAssemblies())
     {
@@ -495,7 +543,7 @@ public class AssemblyLoader
   /// <returns></returns>
   public static IEnumerable<Type> GetTypesWithAttribute<TAttribute>(Assembly assembly)
     where TAttribute : Attribute
-  {    
+  {
     if (assembly != null)
     {
       foreach (Type type in GetTypes(assembly)
@@ -503,7 +551,7 @@ public class AssemblyLoader
       {
         yield return type;
       }
-    }    
+    }
   }
 
   private static Type[] GetTypes(System.Reflection.Assembly assembly)
@@ -520,13 +568,13 @@ public class AssemblyLoader
   }
 
   /// <summary>
-		/// List assemblies in /bin and in extension folders.
-		/// </summary>
-		/// <returns></returns>
-		/// <remarks>
-		/// A side effect of this function is a call to LoadAssemblies().  This loads assemblies into their AssemblyLoadContexts.  When 
+  /// List assemblies in /bin and in extension folders.
+  /// </summary>
+  /// <returns></returns>
+  /// <remarks>
+  /// A side effect of this function is a call to LoadAssemblies().  This loads assemblies into their AssemblyLoadContexts.  When 
   /// LoadAssemblies() is called, the result is cached in _loadedAssemblies to improve startup performance.
-		/// </remarks>
+  /// </remarks>
   internal static IEnumerable<Assembly> ListAssemblies()
   {
     LoadedAssemblies ??= LoadAssemblies();//.Where(assembly => !IsExcludedAssembly(assembly)).ToList();
@@ -555,7 +603,7 @@ public class AssemblyLoader
       if (assembly != null)
       {
         assemblies.Add(assembly);
-      }      
+      }
     }
 
     return assemblies;

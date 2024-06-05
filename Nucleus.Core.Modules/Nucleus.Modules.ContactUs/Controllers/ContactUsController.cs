@@ -75,83 +75,31 @@ public class ContactUsController : Controller
 
 	private void Validate(ViewModels.Viewer viewModel, Models.Settings settings)
 	{
-		Validate(settings.RequireName, viewModel.Message.FirstName, MessagePropertyName(nameof(viewModel.Message.FirstName)), "Please enter your first name.");
-		Validate(settings.RequireName, viewModel.Message.LastName, MessagePropertyName(nameof(viewModel.Message.LastName)), "Please enter your last name.");
-		Validate(settings.RequirePhoneNumber, viewModel.Message.PhoneNumber, MessagePropertyName(nameof(viewModel.Message.PhoneNumber)), "Please enter your phone number.");
-		Validate(settings.RequireCompany, viewModel.Message.Company, MessagePropertyName(nameof(viewModel.Message.Company)), "Please enter your company name.");
+		Validate(settings.RequireName, viewModel.Message.FirstName, MessagePropertyName(nameof(viewModel.Message.FirstName)), "Enter your first name.");
+		Validate(settings.RequireName, viewModel.Message.LastName, MessagePropertyName(nameof(viewModel.Message.LastName)), "Enter your last name.");
+		Validate(settings.RequirePhoneNumber, viewModel.Message.PhoneNumber, MessagePropertyName(nameof(viewModel.Message.PhoneNumber)), "Enter your phone number.");
+		Validate(settings.RequireCompany, viewModel.Message.Company, MessagePropertyName(nameof(viewModel.Message.Company)), "Enter your company name.");
 
-		Validate(settings.RequireCategory, viewModel.Message.Category, MessagePropertyName(nameof(viewModel.Message.Category)), "Please select a category related to your enquiry.");
-		Validate(settings.RequireSubject, viewModel.Message.Subject, MessagePropertyName(nameof(viewModel.Message.Subject)), "Please enter the subject of your enquiry.");
-	}
+		Validate(settings.RequireCategory, viewModel.Message.Category, MessagePropertyName(nameof(viewModel.Message.Category)), "Select a message category.");
+		Validate(settings.RequireSubject, viewModel.Message.Subject, MessagePropertyName(nameof(viewModel.Message.Subject)), "Enter the subject of your message.");
+  }
 
-	private void AddValidationMessage(string propertyName, string message)
-	{
-		ModelState.AddModelError(propertyName, message);
-	}
-
-	private async Task<Models.SiteVerifyResponseToken> CaptchaVerify(ViewModels.Viewer viewModel)
-	{
-		Models.Settings settings = new();
-		settings.ReadSettings(this.Context.Module);
-		string key = settings.GetSecretKey(this.Context.Site);
-
-		if (String.IsNullOrEmpty(settings.RecaptchaSiteKey) || String.IsNullOrEmpty(key))
-		{
-			// Recaptcha is not enabled, return true to allow form submission.
-			return new() 
-			{ 
-				Success = true, 
-				Score = 1.0f, 
-				Action = settings.RecaptchaAction
-			};
-		}
-
-		string response = await VerifyRecaptchaToken(key, viewModel.RecaptchaVerificationToken);
-		Models.SiteVerifyResponseToken responseToken = Newtonsoft.Json.JsonConvert.DeserializeObject<Models.SiteVerifyResponseToken>(response);
-
-		return responseToken;
-	}
-
-
-  /// <summary>
-  /// Verify the user response token.
-  /// </summary>
-  /// <param name="secretKey"></param>
-  /// <param name="recaptchaToken"></param>
-  /// <returns></returns>
-	private async Task<string> VerifyRecaptchaToken(string secretKey, string recaptchaToken)
-	{
-    HttpResponseMessage responseMessage;
-
-    using (HttpClient httpClient = this.HttpClientFactory.CreateClient())
-		{
-      responseMessage = await httpClient.PostAsync($"{GOOGLE_RECAPTCHA_VERIFY_SITE}",
-        new FormUrlEncodedContent(new[]
-        {
-          new KeyValuePair<string, string>("secret", secretKey),
-          new KeyValuePair<string, string>("response", recaptchaToken),
-          new KeyValuePair<string, string>("remoteip", this.HttpContext.Connection.RemoteIpAddress.ToString())
-        })
-      );
-		}
-
-    responseMessage.EnsureSuccessStatusCode();
-    return await responseMessage.Content.ReadAsStringAsync();
-	}
-
-	[HttpPost]
+  [HttpPost]
 	public async Task<ActionResult> Send(ViewModels.Viewer viewModel)
 	{
     Models.SiteVerifyResponseToken responseToken = null;
 
+    // Remove automatic validation for category because we have custom validation in .Validate()
+    ControllerContext.ModelState.RemoveAll<ViewModels.Viewer>(model => model.Message.Category);
+
+    // Remove the required validation for recipients and mail template as they are validation for settings page.
+    ControllerContext.ModelState.Remove<ViewModels.Viewer>(model => model.SendTo);
+    ControllerContext.ModelState.Remove<ViewModels.Viewer>(model => model.MailTemplateId);
+    ControllerContext.ModelState.Remove<ViewModels.Viewer>(model => model.CategoryListId);
+
     Models.Settings settings = new();
 		settings.ReadSettings(this.Context.Module);
-
-		ControllerContext.ModelState.Remove<ViewModels.Viewer>(model => model.Message.Category.Name);
-
-		viewModel.Message.Category = await this.ListManager.GetListItem(viewModel.Message.Category.Id);
-
-		Validate(viewModel, settings);
+    Validate(viewModel, settings);
 
 		if (!ControllerContext.ModelState.IsValid)
 		{
@@ -190,12 +138,17 @@ public class ContactUsController : Controller
 
     if (this.Context != null && this.Context.Site != null)
 		{
-			// send contact email (if recipients and mail template have been set)
-			if (!String.IsNullOrEmpty(settings.SendTo))
+      if (viewModel.Message.Category.Id != Guid.Empty)
+      {
+        viewModel.Message.Category = await this.ListManager.GetListItem(viewModel.Message.Category.Id);
+      }
+
+      // send contact email (if recipients and mail template have been set)
+      if (!String.IsNullOrEmpty(settings.SendTo))
 			{
-				if (settings.MailTemplateId != Guid.Empty)
+				if (settings.MailTemplateId != null && settings.MailTemplateId != Guid.Empty)
 				{
-					MailTemplate template = await this.MailTemplateManager.Get(settings.MailTemplateId);
+					MailTemplate template = await this.MailTemplateManager.Get(settings.MailTemplateId.Value);
 					if (template != null)
 					{
             Models.Mail.TemplateModel args = new()
@@ -272,10 +225,25 @@ public class ContactUsController : Controller
 		};
 
 		viewModel.ReadSettings(this.Context.Module);
-		viewModel.CategoryList = (await this.ListManager.Get(viewModel.CategoryListId));
 
-		// default values if user is logged on
-		if (User.Identity.IsAuthenticated)
+    if (viewModel.CategoryListId != null && viewModel.CategoryListId != Guid.Empty)
+    {
+      viewModel.CategoryList = await this.ListManager.Get(viewModel.CategoryListId.Value);
+    }
+
+    //Test if a mail provider has been selected 
+    try
+    {
+      IMailClient mailClient = this.MailClientFactory.Create(this.Context.Site);
+      viewModel.IsMailConfigured = true;
+    }
+    catch (InvalidOperationException) 
+    {
+      viewModel.IsMailConfigured = false;
+    }
+
+      // default values if user is logged on
+    if (User.Identity.IsAuthenticated)
 		{
 			viewModel.Message.FirstName = User.GetUserClaim<String>(System.Security.Claims.ClaimTypes.GivenName);
 			viewModel.Message.LastName = User.GetUserClaim<String>(System.Security.Claims.ClaimTypes.Surname);

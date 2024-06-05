@@ -73,7 +73,13 @@
     </fieldset>
 
     <fieldset role="group" aria-label="reCAPTCHA Settings">
-      <SettingsControl caption="Enable reCAPTCHA?" rendermode="LabelLast" class="inner-inline EnableRecaptcha" helptext="Sets whether to enable or disable reCAPTCHA.">
+      <div class="alert alert-info mt-3">
+        <h3 class="mt-0">Google reCAPTCHA</h3>
+        <p>The Google reCAPTCHA service protects your contact page from abuse.</p>
+        <a href="https://cloud.google.com/security/products/recaptcha" target="_blank" class="">About Google reCAPTCHA</a>
+      </div>
+
+      <SettingsControl caption="Enable reCAPTCHA?" rendermode="LabelLast" class="inner-inline EnableRecaptcha" helptext="Enable reCAPTCHA to protect your contact form from abuse.">
         @Html.CheckBoxFor(model => model.RecaptchaEnabled, new { @class = "ToggleSwitch" })
       </SettingsControl>
 
@@ -87,7 +93,7 @@
             @Html.PasswordFor(model => model.RecaptchaSecretKey, new { value = (Model.IsSecretKeySet ? Nucleus.Modules.ContactUs.ViewModels.Settings.DUMMY_PASSWORD : "") })
           </SettingsControl>
 
-          <SettingsControl caption="reCAPTCHA Action" helptext="Specifies your reCAPTCHA action using only alphanumeric characters, slashes, and underscore. This is used in the reCAPTCHA admin console for reporting and for adaptive risk analysis." class="flex-grow-2">
+          <SettingsControl caption="reCAPTCHA Action" helptext="Specifies your reCAPTCHA action. Use only alphanumeric characters, slashes, and underscore. This is used in the reCAPTCHA admin console for reporting and for adaptive risk analysis. Recommended value: contact_us." class="flex-grow-2">
             @Html.TextBoxFor(model => model.RecaptchaAction)
           </SettingsControl>
 

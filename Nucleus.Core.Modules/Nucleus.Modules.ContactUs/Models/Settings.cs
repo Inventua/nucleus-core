@@ -31,11 +31,14 @@ public class Settings
     public const string MODULESETTING_RECAPTCHA_SCORE_THRESHOLD = "contactus:recaptcha-score-threshold";
   }
 
+  [Required(ErrorMessage = "Send to recipients is required.", AllowEmptyStrings = false)]
   public string SendTo { get; set; }
 
-	public Guid CategoryListId { get; set; }
+  [Required(ErrorMessage = "Category is required.")]
+	public Guid? CategoryListId { get; set; }
 
-	public Guid MailTemplateId { get; set; }
+  [Required(ErrorMessage = "Mail template is required.")] 
+  public Guid? MailTemplateId { get; set; }
 
 	public Boolean ShowName { get; set; }
 
@@ -71,6 +74,7 @@ public class Settings
     }
   }
 
+  [RegularExpression("^[A-Za-z0-9/_]+$", ErrorMessage = "Action can only contain alphanumeric characters, slashes, and underscores.")]
 	public string RecaptchaAction {  get; set; }
 
   [Range(0.0, 1.0, ErrorMessage = "Score threshold must be between 0.0 and 1.0.")]

@@ -11,6 +11,8 @@ public class Viewer : Models.Settings
 	public Models.Message Message { get; set; } = new();
 
 	public Boolean IsAdmin { get; set; }
-
+  
+  public Boolean IsMailConfigured { get; set; }
+  
 	public string RecaptchaVerificationToken { get; set; }
 }

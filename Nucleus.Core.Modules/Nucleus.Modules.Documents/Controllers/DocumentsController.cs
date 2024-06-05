@@ -245,7 +245,7 @@ namespace Nucleus.Modules.Documents.Controllers
 			//}
 
       // Check that the selected Viewer Layout file exists, if not, use the default (Table.cshtml)
-      IFileInfo layoutFile = this.WebHostEnvironment.ContentRootFileProvider.GetFileInfo("Extensions/Documents/Views/{layoutPath}");
+      IFileInfo layoutFile = this.WebHostEnvironment.ContentRootFileProvider.GetFileInfo($"Extensions/Documents/Views/{layoutPath}");
       if (!layoutFile.Exists)
       {        
         layoutPath = $"ViewerLayouts/Table.cshtml";

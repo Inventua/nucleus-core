@@ -1,28 +1,28 @@
 ﻿@model Nucleus.Extensions.Smtp.SmtpMailOptions
 <div class="nucleus-flex-fields">
-  <SettingsControl caption="SMTP Host" helptext="SMTP host name">
+  <SettingsControl caption="SMTP Host" helptext="SMTP server host name.">
     @Html.TextBoxFor(model => model.HostName)
   </SettingsControl>
 
-  <SettingsControl caption="SMTP Port" helptext="SMTP Port">
+  <SettingsControl caption="SMTP Port" helptext="SMTP server port. For SSL connections, this is usually 587.">
     @Html.TextBoxFor(model => model.Port)
   </SettingsControl>
 </div>
 
-<SettingsControl caption="Use SSL?" helptext="Use SSL?" rendermode="LabelLast" class="inner-inline">
+<SettingsControl caption="Use SSL?" helptext="Specifies whether to use SSL for connections to your SMTP mail server.  If your mail server supports it, you should use SSL." rendermode="LabelLast" class="inner-inline">
   @Html.CheckBoxFor(model => model.UseSsl, new { @class = "ToggleSwitch" })
 </SettingsControl>
 
-<SettingsControl caption="Sender Email" helptext="Sender Email">
+<SettingsControl caption="Sender Email" helptext="Specify the sender email address for system emails.">
   @Html.TextBoxFor(model => model.Sender)
 </SettingsControl>
 
 <div class="nucleus-flex-fields">
-  <SettingsControl caption="User Name" helptext="Username">
+  <SettingsControl caption="User Name" helptext="Specifies the username which is used for authentication with your mail server.">
     @Html.TextBoxFor(model => model.UserName)
   </SettingsControl>
 
-  <SettingsControl caption="Password" helptext="Password">
+  <SettingsControl caption="Password" helptext="Specifies the password which is used for authentication with your mail server.">
     @Html.PasswordFor(model => model.Password, new { @value = Nucleus.Extensions.Smtp.SmtpMailOptions.UNCHANGED_PASSWORD })    
   </SettingsControl>
 </div>

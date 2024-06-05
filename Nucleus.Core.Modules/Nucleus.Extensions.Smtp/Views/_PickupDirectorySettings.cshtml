@@ -1,8 +1,12 @@
 ﻿@model Nucleus.Extensions.Smtp.PickupDirectoryMailOptions
-<SettingsControl caption="Folder" helptext="Mail folder.">
+<div class="alert alert-info mt-3">
+  The Pickup Directory mail client is typically used in test or development environments, so that generated emails are saved to the file system 
+  instead of being sent to users. 
+</div>
+<SettingsControl caption="Folder" helptext="Enter a full path for a file system folder on your web server where emails will be saved in eml (RFC 5322) format.">
   @Html.TextBoxFor(model => model.PickupDirectoryLocation)
 </SettingsControl>
 
-<SettingsControl caption="Sender Email" helptext="Sender Email">
+<SettingsControl caption="Sender Email" helptext="Specify the sender email address for system emails.">
   @Html.TextBoxFor(model => model.Sender)
 </SettingsControl>

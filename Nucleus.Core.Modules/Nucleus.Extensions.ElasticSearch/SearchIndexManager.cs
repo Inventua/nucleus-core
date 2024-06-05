@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Nest;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 
@@ -61,7 +62,11 @@ namespace Nucleus.Extensions.ElasticSearch
 			}
 
 			await this.Request(site).DeleteIndex();
-		}
+
+      // re-create the index
+      _request = null;
+      await this.Request(site).Connect();
+    }
 
     private List<ContentMetaData> queue = new();
 

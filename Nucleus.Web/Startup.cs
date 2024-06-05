@@ -246,7 +246,7 @@ namespace Nucleus.Web
         services.AddDataProviderFactory(this.Configuration);
         services.AddCoreDataProvider(this.Configuration);
 
-        services.Logger().LogInformation("Adding Nucleus core services");
+        services.Logger().LogInformation("Adding Nucleus Core Services");
         services.AddNucleusCoreServices(this.Configuration);
         services.AddScoped<IContainerController, Nucleus.Web.Controllers.ContainerController>();
 

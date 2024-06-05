@@ -195,7 +195,10 @@
                       <tr>
                         <td class="py-2">
                           @assembly.FullName 
-                          <div class="text-muted">@assembly.Location[Model.ContentRootPath.Length..]</div>
+                          @if (!@assembly.IsDynamic && @assembly.Location.StartsWith(Model.ContentRootPath))
+                          {
+                            <div class="text-muted">@assembly.Location[Model.ContentRootPath.Length..]</div>
+                          }
                           <div suppress-empty="true" class="text-muted text-decoration-underline">
                             @if (!String.IsNullOrEmpty(@assembly.Product()) && @assembly.Product() != assembly.GetName().Name)
                             {

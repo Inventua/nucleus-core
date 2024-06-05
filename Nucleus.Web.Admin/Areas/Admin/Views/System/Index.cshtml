@@ -2,6 +2,7 @@
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
+@using Nucleus.Extensions
 <div class="System d-flex flex-column h-100">
   <h1 class="nucleus-control-panel-heading">System</h1>
 
@@ -15,6 +16,7 @@
     @*<TabItem target="#system-configuration" caption="Configuration"></TabItem>*@
     <TabItem target="#system-database" caption="Database"></TabItem>
     <TabItem target="#system-logs" caption="Logs"></TabItem>
+    <TabItem target="#system-internals" caption="Extensions"></TabItem>
   </Tab>
 
   <TabContent>
@@ -169,6 +171,52 @@
         
         @await Html.PartialAsync("_LogLevels", Model)
       </modal>
+    </TabPanel>
+
+    <TabPanel id="system-internals">     
+      <div class="overflow-auto">
+      <table class="table table-sm table-sticky-headers table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Extension</th>
+            <th scope="col">Assemblies</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach (var assemblyLoadContext in Model.ExtensionLoadContexts)
+          {
+            <tr>
+              <td class="text-nowrap fw-bold align-text-top">@assemblyLoadContext.Name</td>
+              <td>
+                <table class="small">
+                  <tbody>
+                    @foreach(var assembly in assemblyLoadContext.Assemblies)
+                    {
+                      <tr>
+                        <td class="py-2">
+                          @assembly.FullName 
+                          <div class="text-muted">@assembly.Location[Model.ContentRootPath.Length..]</div>
+                          <div suppress-empty="true" class="text-muted text-decoration-underline">
+                            @if (!String.IsNullOrEmpty(@assembly.Product()) && @assembly.Product() != assembly.GetName().Name)
+                            {
+                              @assembly.Product()<text>, </text>
+                            }
+                            @if (!String.IsNullOrEmpty(@assembly.Copyright()))
+                            {
+                              @assembly.Copyright()
+                            }
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                    </tbody>
+                </table>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      </div>
     </TabPanel>
   </TabContent>
 </div>

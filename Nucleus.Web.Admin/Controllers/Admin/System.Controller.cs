@@ -421,7 +421,10 @@ public class SystemController : Controller
     //viewModelOutput.Configuration = Sanitize((this.Configuration as IConfigurationRoot).GetDebugView());
     viewModelOutput.RunningTasks = this.RunningTaskQueue.ToList();
 
-    List<ViewModels.Admin.SystemIndex.DatabaseConnection> connections = new();
+    viewModelOutput.ExtensionLoadContexts = Nucleus.Core.Plugins.AssemblyLoader.ListExtensionLoadContexts().OrderBy(loadContext => loadContext.Name).ToArray();
+    viewModelOutput.ContentRootPath = this.HostingEnvironment.ContentRootPath;
+
+    List <ViewModels.Admin.SystemIndex.DatabaseConnection> connections = new();
 
     foreach (DatabaseSchema schema in this.DatabaseOptions.Value.Schemas)
     {

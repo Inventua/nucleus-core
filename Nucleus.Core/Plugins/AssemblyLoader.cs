@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Models.Configuration;
 using Nucleus.Extensions.Logging;
@@ -19,10 +19,15 @@ namespace Nucleus.Core.Plugins;
 /// The methods within this class are used by Nucleus Core.  Nucleus applications (plugins) would not typically need to use the methods
 /// of the AssemblyLoader class.
 /// </internal>
+/// <remarks>
 /// <see cref="https://github.com/dotnet/coreclr/blob/master/Documentation/design-docs/AssemblyLoadContext.ContextualReflection.md" />
+/// </remarks>
 public class AssemblyLoader
 {
   private static System.Collections.Concurrent.ConcurrentDictionary<string, AssemblyLoadContext> ExtensionLoadContexts { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+  // TypeContextCache is <typeName,loadContextName> where typeName is the type's AssemblyQualifiedName and loadContextName is the key of an 
+  // entry in ExtensionLoadContexts.
   private static System.Collections.Concurrent.ConcurrentDictionary<string, string> TypeContextCache { get; } = new(StringComparer.OrdinalIgnoreCase);
 
   private static List<Assembly> LoadedAssemblies { get; set; }
@@ -607,5 +612,15 @@ public class AssemblyLoader
     }
 
     return assemblies;
+  }
+
+  public static AssemblyLoadContext[] ListExtensionLoadContexts()
+  {
+    return ExtensionLoadContexts.Values.ToArray();
+  }
+
+  public static ReadOnlyDictionary<string, string> ListTypeContextCache()
+  {
+    return new(TypeContextCache);
   }
 }

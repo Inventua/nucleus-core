@@ -6,101 +6,103 @@
 @Html.AddStyle(AddStyleHtmlHelper.WellKnownScripts.NUCLEUS_FORMS)
 @if (Model.MessageSent)
 {
-	<div class="alert alert-info">Your message has been sent.</div>
+  <div class="alert alert-info">Your message has been sent.</div>
 }
 else
 {
-	@if (Model.RecaptchaEnabled)
-	{
-		@Html.AddScript("https://www.google.com/recaptcha/api.js?render=explicit&onload=onRecaptchaLoadCallback", true)
-		@Html.AddScript("~#/viewer.js", true)
-	}
-	@if (String.IsNullOrEmpty(Model.SendTo))
-	{
-		@if (Model.IsAdmin)
-		{
-			<div class="alert alert-warning">No email recipients have been configured. This module will not display to end users.</div>
-		}
-	}
-	@if (Model.MailTemplateId == Guid.Empty)
-	{
-		@if (Model.IsAdmin)
-		{
-			<div class="alert alert-warning">No email template has been configured. This module will not display to end users.</div>
-		}
-	}
-	@if (!string.IsNullOrEmpty(Model.SendTo) && Model.MailTemplateId != Guid.Empty)
-	{
-		@using (Html.BeginNucleusForm("Send", "ContactUs", FormMethod.Post, new { @class="contact-us-form", @enctype = "multipart/form-data", @data_target = "form.parent()" }))
-		{
-			<fieldset aria-label="Contact Us">
-				@if (Model.ShowName)
-				{
-					<div class="nucleus-flex-fields">
-						<SettingsControl caption="First Name" helptext="Please enter your first name.">
-							@Html.TextBoxFor(model => model.Message.FirstName, new { @maxlength = 256, @autocomplete = "given-name" })
-						</SettingsControl>
-						<SettingsControl caption="Last Name" helptext="Please enter your last name.">
-							@Html.TextBoxFor(model => model.Message.LastName, new { @maxlength = 256, @autocomplete = "family-name" })
-						</SettingsControl>
-					</div>
-				}
+  @if (Model.RecaptchaEnabled)
+  {
+    @Html.AddScript("https://www.google.com/recaptcha/api.js?render=explicit&onload=onRecaptchaLoadCallback", true)
+    @Html.AddScript("~#/viewer.js", true)
+  }
+  
+  @if (!Model.IsMailConfigured && Model.IsAdmin)
+  {
+    <div class="alert alert-warning">No mail client has been configured. Use Manage/Mail Settings to configure your mail client.</div>
+  }
+  @if (String.IsNullOrEmpty(Model.SendTo) && Model.IsAdmin)
+  {
+    <div class="alert alert-warning">No email recipients have been configured. This module will not display to end users.</div>
+  }
+  @if (Model.MailTemplateId == Guid.Empty && Model.IsAdmin)
+  {
+    <div class="alert alert-warning">No email template has been configured. This module will not display to end users.</div>
+  }
+  @if (!string.IsNullOrEmpty(Model.SendTo) && Model.MailTemplateId != Guid.Empty)
+  {
+    @using (Html.BeginNucleusForm("Send", "ContactUs", FormMethod.Post, new { @class = "contact-us-form", @enctype = "multipart/form-data", @data_target = "form.parent()" }))
+    {
+      <fieldset aria-label="Contact Us">
+        @if (Model.ShowName)
+        {
+          <div class="nucleus-flex-fields">
+            <SettingsControl caption="First Name" helptext="Please enter your first name.">
+              @Html.TextBoxFor(model => model.Message.FirstName, new { @maxlength = 256, @autocomplete = "given-name" })
+            </SettingsControl>
+            <SettingsControl caption="Last Name" helptext="Please enter your last name.">
+              @Html.TextBoxFor(model => model.Message.LastName, new { @maxlength = 256, @autocomplete = "family-name" })
+            </SettingsControl>
+          </div>
+        }
 
-				<div class="nucleus-flex-fields">
-					<SettingsControl caption="Email" helptext="Please enter your email address.">
-						@Html.TextBoxFor(model => model.Message.Email, new { @maxlength = 256, @type = "email", @autocomplete = "email" })
-					</SettingsControl>
-					@if (Model.ShowPhoneNumber)
-					{
-						<SettingsControl caption="Phone Number" helptext="Please enter your phone number.">
-							@Html.TextBoxFor(model => model.Message.PhoneNumber, new { @maxlength = 64, @type = "tel", @autocomplete = "tel" })
-						</SettingsControl>
-					}
-				</div>
-				@if (Model.ShowCompany)
-				{
-					<SettingsControl caption="Company" helptext="Please enter the name of your company.">
-						@Html.TextBoxFor(model => model.Message.Company, new { @maxlength = 256, @autocomplete = "organization" })
-					</SettingsControl>
-				}
-				@if (Model.ShowCategory && Model.CategoryList != null)
-				{
-					<SettingsControl caption="@Model.CategoryList.Name" helptext="Select the most appropriate category related to your enquiry.">
-						@Html.DropDownListFor(model => model.Message.Category.Id, new SelectList(Model.CategoryList.Items, "Id", "Name"), "(not selected)")
-					</SettingsControl>
-				}
-				@if (Model.ShowSubject)
-				{
-					<SettingsControl caption="Subject" helptext="Please enter the subject of your enquiry.">
-						@Html.TextBoxFor(model => model.Message.Subject, new { @maxlength = 256 })
-					</SettingsControl>
-				}
-				<SettingsControl caption="Message Body" helptext="Please enter your message in detail.">
-					@Html.TextAreaFor(model => model.Message.Body, new { @rows = 10 })
-				</SettingsControl>
-			</fieldset>
+        <div class="nucleus-flex-fields">
+          <SettingsControl caption="Email" helptext="Please enter your email address.">
+            @Html.TextBoxFor(model => model.Message.Email, new { @maxlength = 256, @type = "email", @autocomplete = "email" })
+          </SettingsControl>
+          @if (Model.ShowPhoneNumber)
+          {
+            <SettingsControl caption="Phone Number" helptext="Please enter your phone number.">
+              @Html.TextBoxFor(model => model.Message.PhoneNumber, new { @maxlength = 64, @type = "tel", @autocomplete = "tel" })
+            </SettingsControl>
+          }
+        </div>
+        @if (Model.ShowCompany)
+        {
+          <SettingsControl caption="Company" helptext="Please enter the name of your company.">
+            @Html.TextBoxFor(model => model.Message.Company, new { @maxlength = 256, @autocomplete = "organization" })
+          </SettingsControl>
+        }
+        @if (Model.ShowCategory && Model.CategoryList != null)
+        {
+          <SettingsControl caption="@Model.CategoryList.Name" helptext="Select the most appropriate category related to your enquiry.">
+            @Html.DropDownListFor(model => model.Message.Category.Id, new SelectList(Model.CategoryList.Items, "Id", "Name"), "(not selected)")
+          </SettingsControl>
+        }
+        @if (Model.ShowSubject)
+        {
+          <SettingsControl caption="Subject" helptext="Please enter the subject of your enquiry.">
+            @Html.TextBoxFor(model => model.Message.Subject, new { @maxlength = 256 })
+          </SettingsControl>
+        }
+        <SettingsControl caption="Message Body" helptext="Please enter your message in detail.">
+          @Html.TextAreaFor(model => model.Message.Body, new { @rows = 10 })
+        </SettingsControl>
+      </fieldset>
 
-			<div class="nucleus-control-panel-heading d-flex">
-				@if (!String.IsNullOrEmpty(Model.RecaptchaSiteKey))
-				{
-					@Html.HiddenFor(model => model.RecaptchaVerificationToken, new { @class = "contact-us-recaptcha-verification-token" })
-				}
+      <div class="nucleus-control-panel-heading d-flex">
+        @if (!String.IsNullOrEmpty(Model.RecaptchaSiteKey))
+        {
+          @Html.HiddenFor(model => model.RecaptchaVerificationToken, new { @class = "contact-us-recaptcha-verification-token" })
+        }
         <button type="submit" class="btn btn-primary align-self-end contact-us-send" data-verification-site-key="@Model.RecaptchaSiteKey" data-verification-badge-element-selector=".recaptcha-badge" data-verification-token-element-selector=".contact-us-recaptcha-verification-token" data-verification-action="@Model.RecaptchaAction" formaction="@Url.NucleusAction("Send", "ContactUs", "ContactUs")">Send</button>
-				<div class="recaptcha-badge ms-auto"></div>
-			</div>
-		}
-	}
+        <div class="recaptcha-badge ms-auto"></div>
+      </div>
+    }
+  }
 
-	<script>
-		function onRecaptchaLoadCallback()
-		{
-			if ('@Model.RecaptchaSiteKey' !== '')
-			{
-        jQuery('.contact-us-send').Recaptcha({
-          siteKey: '@Model.RecaptchaSiteKey',
-          badgeElement: jQuery('.recaptcha-badge')
-        });
-			}
-		}
-	</script>
+  @if (Model.RecaptchaEnabled)
+  {
+    <script>
+      function onRecaptchaLoadCallback()
+      {
+        if ('@Model.RecaptchaSiteKey' !== '')
+        {
+          jQuery('.contact-us-send').Recaptcha({
+            siteKey: '@Model.RecaptchaSiteKey',
+            badgeElement: jQuery('.recaptcha-badge')
+          });
+        }
+      }
+    </script>
+  }
 }

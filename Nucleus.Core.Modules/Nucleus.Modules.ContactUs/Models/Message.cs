@@ -14,7 +14,7 @@ namespace Nucleus.Modules.ContactUs.Models
 
 		public string LastName { get; set; }	
 
-		[Required(ErrorMessage = "Please enter your email address.")]
+		[Required(ErrorMessage = "Enter your email address.")]
 		public string Email { get; set; }	
 
 		public string Company { get; set; }
@@ -25,7 +25,7 @@ namespace Nucleus.Modules.ContactUs.Models
 
 		public string Subject { get; set; }
 
-		[Required(ErrorMessage = "Please enter the message body.")]
+		[Required(ErrorMessage = "Enter the message body.")]
 		public string Body { get; set; }
 	}
 

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Nucleus.Modules.ContactUs.Controllers;
 
@@ -37,9 +38,9 @@ public class ContactUsAdminController : Controller
   [HttpPost]
 	public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
 	{
-    if (!ModelState.IsValid)
+    if (!viewModel.ShowCategory)
     {
-      return BadRequest(ModelState);
+      ModelState.Remove<ViewModels.Settings>(model => model.CategoryListId);
     }
 
     if (viewModel.RecaptchaEnabled)
@@ -57,21 +58,22 @@ public class ContactUsAdminController : Controller
         viewModel.ReadEncryptedKeys(this.Context.Module);
       }
 
-      if (!String.IsNullOrEmpty(viewModel.RecaptchaSiteKey))
+      if (viewModel.RecaptchaEnabled)
       {
-        Validate(viewModel.RecaptchaSecretKey, nameof(viewModel.RecaptchaSecretKey), "Enter your Google reCAPTCHA secret key.");
-        Validate(viewModel.RecaptchaAction, nameof(viewModel.RecaptchaAction), "Enter the reCAPTCHA action.");
-
-        if (!ControllerContext.ModelState.IsValid)
-        {
-          return BadRequest(ControllerContext.ModelState);
-        }
+        Validate(viewModel.RecaptchaSiteKey, nameof(viewModel.RecaptchaSiteKey), "reCAPTCHA site key is required.");
+        Validate(viewModel.RecaptchaSecretKey, nameof(viewModel.RecaptchaSecretKey), "reCAPTCHA secret key is required.");
+        Validate(viewModel.RecaptchaAction, nameof(viewModel.RecaptchaAction), "reCAPTCHA action is required.");
       }
     }
     else
     {
       // Repopulate the viewmodel for recaptcha
       viewModel.ReadRecaptchaSettings(this.Context.Module);
+    }
+
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
     }
 
     viewModel.SetSettings(this.Context.Site, this.Context.Module);

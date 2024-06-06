@@ -141,10 +141,11 @@ class Application
 	[string]$NetCoreVersion
   [string]$Environment
   [string]$ZipFile
+  [string]$InstallType
 
 	# Constructors
 	Application() { $this.Init(@{}) }
-	Application([boolean]$OverwriteExisting, [string]$Site, [string]$Name, [int]$Port, [string]$ApplicationPool, [string]$Path, [string]$DataPath, [string]$NetCoreVersion, [string]$Environment, [string]$ZipFile) 
+	Application([boolean]$OverwriteExisting, [string]$Site, [string]$Name, [int]$Port, [string]$ApplicationPool, [string]$Path, [string]$DataPath, [string]$NetCoreVersion, [string]$Environment, [string]$ZipFile, [string]$InstallType) 
 	{
     $this.OverwriteExisting = $OverwriteExisting
 		$this.Site = $Site
@@ -156,6 +157,7 @@ class Application
 		$this.NetCoreVersion = $NetCoreVersion
     $this.Environment = $Environment
     $this.ZipFile = $ZipFile
+    $this.InstallType = $InstallType
 	}
 
 	# Functions
@@ -396,7 +398,14 @@ class Application
     {
       $color = "Yellow"
     }
-    Write-Host - "$("$($caption):".PadRight($chars)) $value" -ForeGroundColor $color
+    if ($caption -ne "")
+    {
+      Write-Host "- $("$($caption):".PadRight($chars)) $value" -ForeGroundColor $color
+    }
+    else
+    {
+      Write-Host "  $("$($caption) ".PadRight($chars)) $value" -ForeGroundColor $color
+    }
   }
   
   # display current settings 
@@ -409,6 +418,25 @@ class Application
     $this.WriteLine("Nucleus Application path", $this.Path)
     $this.WriteLine("Application Environment", $this.Environment)
     $this.WriteLine("Application Install set", $this.ZipFile)
+    
+    # detect whether Nucleus is already installed, verify that the correct install set type was detected
+    if (Test-Path -Path "$this.Path\Nucleus.Web.dll")
+    {
+      if ($this.InstallType -eq "Install")
+      {
+        # Nucleus.Web.dll was found, if the latest install set is an install, display warning
+        $this.WriteLine("", "WARNING: Nucleus is already installed, but the detected install set is a new install set.", $true)
+      }
+    }
+    else
+    {
+      if ($this.InstallType -eq "Upgrade")
+      {
+        # Nucleus.Web.dll was not found, if the latest install set is an upgrade, display warning
+        $this.WriteLine("", "WARNING: Nucleus is not installed, but the detected install set is an upgrade set.", $true)
+      }
+    }
+
     $this.WriteLine("IIS Site Name", $this.Site)
     $this.WriteLine("IIS Application Name", $this.Name)
     $this.WriteLine("IIS Application Pool Name", $this.ApplicationPool)
@@ -533,7 +561,7 @@ class Application
     
     $webConfigFile = "$($this.Path)\web.config"
       
-    if ($this.DoUpdateWebConfig())
+    if ($this.DoUpdateWebConfig() -or $this.DoUnzip())
     {
       Write-Host "- Set the ASPNETCORE_ENVIRONMENT environment variable in $($webConfigFile)' to '$($this.Environment)'." -ForeGroundColor yellow
     }
@@ -790,39 +818,20 @@ if ($ZipFile -eq "detect")
   {
     $latestVersion = $null
 
-    # detect whether Nucleus is already installed
-    if (-not (Test-Path -Path $Path\Nucleus.Web.dll))
-    {
-      # Nucleus.Web.dll not found, look for the latest install zip
-      Get-ChildItem -Path $Path\Nucleus.*.Install.zip | ForEach-Object {
-        if ($_.Name -match "^([A-Za-z_]+)\.(?<version>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Install\.zip")
+      Get-ChildItem -Path $Path\Nucleus.*.*.zip | ForEach-Object {
+        if ($_.Name -match "^([A-Za-z_]+)\.(?<Version>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.(?<Type>[A-Za-z]*)\.zip$")
         {
           $thisVersion = $matches.Version
+          $InstallType = $matches.Type
           if (($ZipFile -eq "") -or ($latestVersion -eq $null) -or ([System.Version]$thisVersion -gt $latestVersion))
           {
             $ZipFile = $_.Name
-            $latestVersion = [System.Version]$thisVersion
+            $latestVersion = [System.Version]$thisVersion            
           }
         }
-      }
-    }
-    else
-    {
-      # Nucleus.Web.dll was found, look for the latest upgrade zip
-      Get-ChildItem -Path $Path\Nucleus.*.Upgrade.zip | ForEach-Object {
-        if ($_.Name -match "^([A-Za-z_]+)\.(?<version>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Upgrade\.zip")
-        {
-          $thisVersion = $matches.Version
-          if (($ZipFile -eq "") -or ($latestVersion -eq $null) -or ([System.Version]$thisVersion -gt $latestVersion))
-          {
-            $ZipFile = $_.Name
-            $latestVersion = [System.Version]$thisVersion          
-          }
-        }
-      }
+      }    
     }
   }
-}
 
 # default ApplicationPool if it was not set in the command line
 if ($ApplicationPool -eq "")
@@ -839,7 +848,7 @@ if ($ApplicationPool -eq "")
   }
 }
 
-$application = [Application]::new($OverwriteExisting, $Site, $Name, $Port, $ApplicationPool, $Path, $DataPath, $NetCoreVersion, $Environment, $ZipFile)
+$application = [Application]::new($OverwriteExisting, $Site, $Name, $Port, $ApplicationPool, $Path, $DataPath, $NetCoreVersion, $Environment, $ZipFile, $InstallType)
 
 $operation = ""
 while (($operation -eq "") -or ($operation -eq "change-settings"))

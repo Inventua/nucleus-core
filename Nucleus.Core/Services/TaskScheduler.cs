@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
-using Nucleus.Abstractions.Models.TaskScheduler;
-using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions;
-using Nucleus.Data.Common;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models.TaskScheduler;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Core.Services
 {
@@ -107,7 +103,7 @@ namespace Nucleus.Core.Services
 
     private async Task<Boolean> ShouldRunNow(ScheduledTask task, Boolean ignoreSchedule)
     {
-      if (task.Enabled || ignoreSchedule)
+      if (IsTaskEnabled(task) || ignoreSchedule)
       {
         ScheduledTaskHistory history = await this.ScheduledTaskManager.GetMostRecentHistory(task, Environment.MachineName);
 
@@ -128,6 +124,11 @@ namespace Nucleus.Core.Services
       return false;
     }
 
+    private static Boolean IsTaskEnabled(ScheduledTask task)
+    {
+      return task.Enabled && task.Interval > 0 && task.IntervalType != ScheduledTask.Intervals.None;
+    }
+
     /// <summary>
     /// This implementation of ISystemEventHandler[ScheduledTask, Update] causes the updated scheduled task to be evaluated for 
     /// execution immediately.
@@ -136,7 +137,10 @@ namespace Nucleus.Core.Services
     /// <returns></returns>
     public async Task Invoke(ScheduledTask task)
     {
-      await CheckAndRun(task, true);
+      if (IsTaskEnabled(task))
+      {
+        await CheckAndRun(task, true);
+      }
     }
 
     /// <summary>

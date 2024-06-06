@@ -16,7 +16,8 @@
     @*<TabItem target="#system-configuration" caption="Configuration"></TabItem>*@
     <TabItem target="#system-database" caption="Database"></TabItem>
     <TabItem target="#system-logs" caption="Logs"></TabItem>
-    <TabItem target="#system-internals" caption="Extensions"></TabItem>
+    <TabItem target="#system-cache" caption="Cache"></TabItem>
+    <TabItem target="#system-internals" caption="Loaded Extensions"></TabItem>
   </Tab>
 
   <TabContent>
@@ -171,6 +172,33 @@
         
         @await Html.PartialAsync("_LogLevels", Model)
       </modal>
+    </TabPanel>
+
+    <TabPanel id="system-cache">
+      <div class="alert alert-info">
+        If a cache is full, the oldest entry will be removed when a new entry is added. Cache capacity is configured in your appSettings.@(Model.EnvironmentName).json file.
+      </div>
+      <div class="overflow-auto">
+        <table class="table table-sm table-sticky-headers table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Usage</th>
+              <th scope="col">Cache Item Expiry</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach (var cache in Model.CacheReport)
+            {
+              <tr>
+                <td class="text-nowrap fw-bold align-text-top">@cache.Name</td>
+                <td>@cache.Count of @cache.Options.Capacity (@(Math.Round((decimal)cache.Count / cache.Options.Capacity * 100, 1))<text>% full</text>)</td>
+                <td>@cache.Options.ExpiryTime</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </TabPanel>
 
     <TabPanel id="system-internals">     

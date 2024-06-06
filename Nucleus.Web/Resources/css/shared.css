@@ -795,6 +795,12 @@ input:disabled, select:disabled
 	outline: -webkit-focus-ring-color auto 1px;
 }
 
+button.btn.disabled
+{
+  cursor: not-allowed;
+  pointer-events: unset;
+}
+
 /*  Toggle switch plugin  */
 input[type=range].ToggleSwitch
 {

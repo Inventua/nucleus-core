@@ -15,14 +15,14 @@
       {
         <button class="btn btn-success nucleus-open-page" accesskey="O">Open Page</button>
       }
-      @if (Model.PageEditorMode == Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default && Model.Page.Id != Guid.Empty && !Model.Page.IsFirst)
+      @if (Model.PageEditorMode == Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default && Model.Page.Id != Guid.Empty)
       {
-        @Html.SubmitButton("&#xe5d8;", "Move Up", Url.AreaAction("MovePageUp", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @accesskey = "U", @data_target = ".nucleus-adminpage" })
+        <button disabled="@Model.Page.IsFirst" type="submit" accesskey="U" class="btn btn-secondary nucleus-material-icon@(Model.Page.IsFirst ? " disabled" : "")" data-target=".nucleus-adminpage" title="Move Page Up" formaction="@Url.AreaAction("MovePageUp", "Pages", "Admin", new { id = Model.Page.Id })">&#xe5d8;</button>
       }
 
-      @if (Model.PageEditorMode == Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default && Model.Page.Id != Guid.Empty && !Model.Page.IsLast)
+      @if (Model.PageEditorMode == Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default && Model.Page.Id != Guid.Empty)
       {
-        @Html.SubmitButton("&#xe5db;", "Move Down", Url.AreaAction("MovePageDown", "Pages", "Admin", new { id = Model.Page.Id }), new { @class = "btn btn-secondary", @accesskey = "D", @data_target = ".nucleus-adminpage" })
+        <button disabled="@Model.Page.IsLast" type="submit" accesskey="D" class="btn btn-secondary nucleus-material-icon@(Model.Page.IsLast ? " disabled" : "")" data-target=".nucleus-adminpage" title="Move Page Down" formaction="@Url.AreaAction("MovePageDown", "Pages" , "Admin" , new { id=Model.Page.Id })">&#xe5db;</button>
       }
     </div>
 

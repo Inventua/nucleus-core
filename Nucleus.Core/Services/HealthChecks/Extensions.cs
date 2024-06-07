@@ -17,6 +17,7 @@ using System.Text.Json;
 using Microsoft.IO;
 using System.Net;
 using Microsoft.Extensions.Primitives;
+using Nucleus.Extensions;
 
 namespace Nucleus.Core.Services.HealthChecks;
 
@@ -43,7 +44,7 @@ public static class Extensions
       // add all IHealthCheck implementations, including those from Nucleus core, and also any which are provided by Nucleus extensions
       foreach (Type type in AssemblyLoader.GetTypes<IHealthCheck>().Where(type => type.IsPublic))
       {
-        logEntries.Add($"{type.FullName} from {type.Assembly.FullName} [{System.IO.Path.GetRelativePath(Environment.CurrentDirectory, type.Assembly.Location)}]");
+        logEntries.Add($"{type.FullName} from {type.Assembly.ShortName()} [{System.IO.Path.GetRelativePath(Environment.CurrentDirectory, type.Assembly.Location)}]");
 
         builder.Add
         (

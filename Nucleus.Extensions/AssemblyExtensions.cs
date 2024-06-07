@@ -65,5 +65,15 @@ namespace Nucleus.Extensions
 			AssemblyCopyrightAttribute attr = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
 			return (attr == null ? String.Empty : attr.Copyright);
 		}
-	}
+
+    /// <summary>
+		/// Gets the assembly name and version.
+		/// </summary>
+		/// <param name="assembly">The <see href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly">Assembly</see> to read data from.</param>
+		/// <returns></returns>
+		public static string ShortName(this Assembly assembly)
+    {
+      return ($"{assembly.ManifestModule}, Version {assembly.Version()}");
+    }
+  }
 }

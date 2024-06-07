@@ -65,7 +65,7 @@ body.control-panel-dock-top.nucleus-admin-frame-expanded
 	font-family: 'Material Icons';
 	font-style: normal;
 	font-weight: 400;
-	src: url(/Resources/material-icons.woff2) format('woff2');
+	src: url(../material-icons.woff2) format('woff2');
 	font-display: auto;
 }
 

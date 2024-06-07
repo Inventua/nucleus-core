@@ -521,6 +521,11 @@ class Application
       else
       {
 	      Write-Host "- Not create an IIS application '$($this.Site)/$($this.Name)', because it already exists."
+        if ($this.OverwriteExisting -eq $false)
+        {
+          Write-Host "  The 'OverwriteExisting setting is not set, so the existing site will not be updated. Use the Change settings" -ForeGroundColor yellow
+          Write-Host "  option to enable it (press C), or specify OverwriteExisting on the command line." -ForeGroundColor yellow
+        }
       }
     }
 

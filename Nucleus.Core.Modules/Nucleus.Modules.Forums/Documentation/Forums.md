@@ -210,39 +210,52 @@ You can use the post as a parameter for the AbsoluteUrl() extension to create a 
 ```
 @Model.User?.UserName,
 
-<p>At @(Model.Reply != null ? Model.Reply.DateAdded : Model.Post.DateAdded) a new message was posted to a forum or forum post that you are tracking at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>: </p>
+<p>
+  At @(Model.Reply != null ? Model.Reply.DateAdded : Model.Post.DateAdded) a new message was posted to a forum or forum post that you are tracking at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>: 
+</p>
 <br />
-<strong><a href="@Model.Site.AbsoluteUrl(@Model.Page, @Model.Forum.Name.FriendlyEncode(), true)">@Model.Forum.Name</a></strong>
+<strong>
+  <a href="@Model.Site.AbsoluteUrl(@Model.Page, @Model.Forum.Name.FriendlyEncode(), true)">
+    @Model.Forum.Name
+  </a>
+</strong>
 
 @if (Model.Post != null)
 {
-  <h3><text>@Model.Post.Subject</text>, posted by @(Model.Reply != null ? Model.Reply.PostedBy?.UserName : Model.Post.PostedBy?.UserName)</h3>
+  <h3>
+    <text>@Model.Post.Subject</text>, posted by @(Model.Reply != null ? Model.Reply.PostedBy?.UserName : Model.Post.PostedBy?.UserName)
+  </h3>
 }
-  
+
 @if (Model.Reply != null)
 {
-  <div>    
+  <div>
     @Model.Reply.Body
   </div>
 }
 
 <div>
-To view the complete thread and reply, please visit:
-@if (Model.Reply == null)
+  To view the complete thread and reply, please visit:
+  @if (Model.Reply == null)
   {
-    <a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{Model.Forum.Name.FriendlyEncode()}/{@Model.Post.Id}", true)">@Model.Site.AbsoluteUrl(Model.Page, $"{Model.Forum.Name.FriendlyEncode()}/{Model.Post.Id}", true)</a>
+    <a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{Model.Forum.Name.FriendlyEncode()}/{@Model.Post.Id}", true)">
+      @Model.Site.AbsoluteUrl(Model.Page, $"{Model.Forum.Name.FriendlyEncode()}/{Model.Post.Id}", true)
+    </a>
   }
   else
   {
-    <a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{Model.Forum.Name.FriendlyEncode()}/{@Model.Reply.Post.Id}", true)">@Model.Site.AbsoluteUrl(Model.Page, $"{Model.Forum.Name.FriendlyEncode()}/{Model.Reply.Post.Id}", true)</a>
+    <a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{Model.Forum.Name.FriendlyEncode()}/{@Model.Reply.Post.Id}", true)">
+      @Model.Site.AbsoluteUrl(Model.Page, $"{Model.Forum.Name.FriendlyEncode()}/{Model.Reply.Post.Id}#{Model.Reply.Id}", true)
+    </a>
   }
 </div>
 
 <br />
 <div>
-  You were sent this email because you are subscribed to a forum or post at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>, or are the
-  original poster of this forum message.  <a href="@Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true)">Click here</a>
-  to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true).
+  You were sent this email because you are subscribed to a forum or post at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>, 
+  or are the original poster of this forum message.  
+  <a href="@Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true)">Click here</a>to manage your subscriptions, 
+  or browse to @Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true).
 </div>
 ```
 
@@ -314,7 +327,9 @@ To view the complete thread and reply, please visit:
   <p>@Model.Post.Body</p>
   <p>
     To view the complete thread and reply, please visit:
-    <a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Post.Id}", true)">@Model.Post.Subject</a>
+    <a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Post.Id}", true)">
+      @Model.Post.Subject
+    </a>
   </p>
 }
 else
@@ -323,7 +338,9 @@ else
   <p>@Model.Reply.Body</p>
   <p>
     To view the complete thread and reply, please visit:
-    <a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Reply.Post.Id}", true)/#_@Model.Reply.Id">@Model.Reply.Post.Subject</a>
+    <a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Reply.Post.Id}", true)/#_@Model.Reply.Id">
+      @Model.Reply.Post.Subject
+    </a>
   </p>
 }
 
@@ -343,7 +360,9 @@ else
   <p>@Model.Post.Body</p>
   <p>
     To view the complete thread and reply, please visit: 
-    <a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Post.Id}", true)">@Model.Post.Subject</a>
+    <a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Post.Id}", true)">
+      @Model.Post.Subject
+    </a>
   </p>
 }
 else
@@ -352,7 +371,9 @@ else
   <p>@Model.Reply.Body</p>
   <p>
     To view the complete thread and reply, please visit:
-    <a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Reply.Post.Id}", true)/#_@Model.Reply.Id">@Model.Reply.Post.Subject</a>
+    <a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Reply.Post.Id}", true)/#_@Model.Reply.Id">
+      @Model.Reply.Post.Subject
+    </a>
   </p>
 }
 
@@ -374,7 +395,9 @@ else
   <p>@Model.Post.Body</p>
   <p>
     To view the complete thread and reply, please visit:
-    <a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Post.Id}", true)">@Model.Post.Subject</a>
+    <a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Post.Id}", true)">
+      @Model.Post.Subject
+    </a>
   </p>
 }
 else
@@ -383,7 +406,9 @@ else
   <p>@Model.Reply.Body</p>
   <p>
     To view the complete thread and reply, please visit:
-    <a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Reply.Post.Id}", true)/#_@Model.Reply.Id">@Model.Reply.Post.Subject</a>
+    <a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Reply.Post.Id}", true)/#_@Model.Reply.Id">
+      @Model.Reply.Post.Subject
+    </a>
   </p>
 }
 

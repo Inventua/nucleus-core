@@ -1,6 +1,7 @@
 ﻿@model Nucleus.Modules.StaticContent.ViewModels.Viewer
+@using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Modules.StaticContent
-@* @Html.AddStyle("~#/viewer.css") *@
+@Html.AddStyle("~#/viewer.css")
 @if (Model.AddCopyButtons)
 {
   @Html.AddScript("~#/viewer.js")

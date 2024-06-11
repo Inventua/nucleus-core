@@ -1,1 +1,11 @@
-﻿
+﻿.StaticContent pre
+{
+  white-space: pre-wrap;
+}
+
+.StaticContent .nucleus-copy-button
+{
+	position: absolute;
+	right: 1rem;
+	top: 0.25rem;
+}

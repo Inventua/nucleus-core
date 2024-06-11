@@ -39,8 +39,7 @@ jQuery(function ()
     jQuery('.site-template-list-group-item').removeClass('active');
     jQuery('.site-template-list-group-item[data-select="' + jQuery(this).val() + '"]').addClass('active');
   });
-  
-  
+    
   jQuery('button[data-bs-toggle="tab"][data-bs-target="#site-install"]').on('shown.bs.tab', function (event)
   {
     // refresh the extensions display if the user navigates from the file systems tab to the extensions tab
@@ -112,4 +111,28 @@ function navigateTab(e)
   }
 
   newTab.find('.nav-link').tab('show');
+}
+
+function WaitForRestart()
+{
+  jQuery('#site-wizard').modal('show');
+  window.setTimeout(TestSiteStarted, 4000);
+}
+
+function TestSiteStarted()
+{
+  jQuery.ajax({
+    url: document.baseURI,
+    async: true,
+    method: 'GET',
+    success: function (data, status, request)
+    {
+      jQuery('.wizard-restarting').removeClass('show');
+      jQuery('.wizard-restarted').addClass('show');
+    },
+    error: function (request, status, message)
+    {
+      window.setTimeout(TestSiteStarted, 2000);
+    }
+  })
 }

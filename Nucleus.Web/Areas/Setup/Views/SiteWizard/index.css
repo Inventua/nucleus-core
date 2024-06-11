@@ -47,6 +47,11 @@
   font-size: 1rem;
 }
 
+#site-wizard .big-text
+{
+  font-size: 3.5rem;
+}
+
 #site-wizard .nav-tabs
 {
 	gap: 0.25rem;

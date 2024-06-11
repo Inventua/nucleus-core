@@ -1,21 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Nucleus.Abstractions.Models;
-using Nucleus.Abstractions;
 using Microsoft.AspNetCore.Authorization;
-using System.IO;
-using Nucleus.Abstractions.Managers;
-using Nucleus.Extensions;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Nucleus.Abstractions;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models;
 using Nucleus.Data.Common;
-using static Nucleus.Web.ViewModels.Setup.SiteWizard;
+using Nucleus.Extensions;
 using Nucleus.Web.ViewModels.Setup;
+using static Nucleus.Web.ViewModels.Setup.SiteWizard;
 
 namespace Nucleus.Web.Controllers.Setup;
 
@@ -211,16 +211,16 @@ public class SiteWizardController : Controller
     config.Set(connection, "Type", viewModel.DatabaseProvider);
     config.Set(connection, "ConnectionString", viewModel.DatabaseConnectionString);
 
+    // prepare the output viewmodel before saving changes because in IIS, the update will trigger a restart
+    viewModel = await BuildViewModel(viewModel, ReadFlags.General);
+
+    // save changes
     config.CommitChanges();
 
-    // Wait 3 seconds after returning and restart
-    Task restartTask = Task.Run(async () =>
-    {
-      await Task.Delay(3000);
-      this.HostApplicationLifetime.StopApplication();
-    });
+    // Restart. IIS and nginx will automatically restart Nucleus after the app stops.
+    this.HostApplicationLifetime.StopApplication();
 
-    return View("Restarting", await BuildViewModel(viewModel, ReadFlags.General));
+    return View("Restarting", viewModel);
   }
 
   [HttpPost]
@@ -287,6 +287,7 @@ public class SiteWizardController : Controller
   {
     ModelState.Clear();
     return View("_Extensions", await BuildViewModel(viewModel, ReadFlags.Extensions));
+    
   }
 
   [HttpPost]
@@ -300,6 +301,11 @@ public class SiteWizardController : Controller
     if (!String.IsNullOrEmpty(viewModel.SiteAdminUserName) && viewModel.SiteAdminUserName == viewModel.SystemAdminUserName)
     {
       ModelState.AddModelError(nameof(ViewModels.Setup.SiteWizard.SiteAdminUserName), "Please enter different user names for the system admin and site admin users.");
+    }
+
+    if (viewModel.SelectedFileSystems?.Any() != true)
+    {      
+      ModelState.AddModelError($"{nameof(ViewModels.Setup.SiteWizard.AddFileSystemType)}.{nameof(ViewModels.Setup.SiteWizard.AddFileSystemType.ProviderType)}", "Please select at least one file system provider.");
     }
 
     if (ModelState.IsValid)
@@ -519,6 +525,34 @@ public class SiteWizardController : Controller
         ReadConfiguredFileSystems(viewModel);
       }
 
+      if (flags.HasFlag(ReadFlags.All) && viewModel.SelectedFileSystems?.Any() != true)
+      {
+        // if there are no file systems selected and ReadFlags.All (meaning that this is the first call to BuildViewModel), add a default
+        // file system.
+
+        if (!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")))
+        {
+          // if we are running in Azure, add a default Azure blob storage provider
+          viewModel.SelectedFileSystems.Add(new()
+          {
+            FileSystemType = AZURE_STORAGE,
+            Key = AZURE_STORAGE.DefaultKey,
+            Name = AZURE_STORAGE.DefaultName,
+            Values = AZURE_STORAGE.Properties
+          });
+        }
+        else
+        {
+          // otherwise, add a default local file system provider
+          viewModel.SelectedFileSystems.Add(new()
+          {
+            FileSystemType = LOCAL_FILES,
+            Key = LOCAL_FILES.DefaultKey,
+            Name = LOCAL_FILES.DefaultName,
+            Values = LOCAL_FILES.Properties
+          });
+        }
+      }
     }
 
     // re-populate selected file system values.  We always do this, regardless of the flags setting because when we

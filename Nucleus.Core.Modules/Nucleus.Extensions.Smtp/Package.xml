@@ -19,6 +19,7 @@
         <file name="MailKit.dll" />
         <file name="MimeKit.dll" />
         <file name="BouncyCastle.Cryptography.dll" />
+        <file name="System.Security.Cryptography.Pkcs.dll" />
       </folder>
     </component>
   </components>

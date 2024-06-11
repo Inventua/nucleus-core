@@ -23,18 +23,8 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.5" />
 		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.7.0-rc.1" />
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
-
-    <!-- https://github.com/dotnet/aspnetcore/issues/38892 (comment dated Dec 27, 2023) -->
-    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0" GeneratePathProperty="true" />
-    <PackageReference Include="System.Formats.Asn1" Version="8.0.0" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />    
 	</ItemGroup>
-
-  <!-- https://github.com/dotnet/aspnetcore/issues/38892 (comment dated Dec 27, 2023) -->
-  <Target Name="CopySystemSecurityCryptographyPkcs" AfterTargets="Build">
-    <Copy SourceFiles="$(PkgSystem_Security_Cryptography_Pkcs)\lib\net8.0\System.Security.Cryptography.Pkcs.dll" DestinationFolder="$(OutDir)" />
-    <Copy SourceFiles="$(PkgSystem_Formats_Asn1)\lib\net8.0\System.Formats.Asn1.dll" DestinationFolder="$(OutDir)" />
-  </Target>
   	
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<Optimize>False</Optimize>

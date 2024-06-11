@@ -1,10 +1,14 @@
 ﻿@Model.User?.UserName,
 
-<p>New messages have been posted to forums or forum posts that you are tracking at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>: </p>
+<p>
+  New messages have been posted to forums or forum posts that you are tracking at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>: 
+</p>
 <br />
 @foreach (var forum in Model.Forums)
 {
-  <h2><a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a></h2>
+  <h2>
+    <a href="@Model.Site.AbsoluteUrl(@Model.Page, @forum.Name.FriendlyEncode(), true)">@forum.Name</a>
+  </h2>
 
   <table>
     <tr>
@@ -21,7 +25,11 @@
       @foreach (var post in forum.Posts)
       {
         <tr>
-          <td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">@post.Subject</a></td>
+          <td>
+            <a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@post.Id}", true)">
+              @post.Subject
+            </a>
+          </td>
           <td>@post.PostedBy?.UserName</td>
           <td>@post?.DateAdded</td>
         </tr>
@@ -35,7 +43,11 @@
       @foreach (var reply in forum.Replies)
       {
         <tr>
-          <td><a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}#{Model.Reply.Id}", true)">@reply.Post.Subject</a></td>
+          <td>
+            <a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@forum.Name.FriendlyEncode()}/{@reply.Post.Id}#{Model.Reply.Id}", true)">
+              @reply.Post.Subject
+            </a>
+          </td>
           <td>@reply.PostedBy?.UserName</td>
           <td>@reply?.DateAdded</td>
         </tr>
@@ -48,7 +60,8 @@
 }
 <br />
 <div>
-  You were sent this email because you are subscribed to a forum or post at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>, or are the
-  original poster of this forum message.  <a href="@Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true)">Click here</a>
-  to manage your subscriptions, or browse to @Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true).
+  You were sent this email because you are subscribed to a forum or post at <a href="@Model.Site.AbsoluteUrl(true)">@Model.Site.Name</a>, 
+  or are the original poster of this forum message.
+  <a href="@Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true)">Click here</a> to manage your subscriptions, 
+  or browse to @Model.Site.AbsoluteUrl(@Model.Page.ManageSubscriptionsRelativeUrl, true).
 </div>

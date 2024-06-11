@@ -6,7 +6,9 @@
   <p>@Model.Post.Body</p>
   <p>
     To view the complete thread and reply, please visit:
-    <a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Post.Id}", true)">@Model.Post.Subject</a>
+    <a href="@Model.Site.AbsoluteUrl( @Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Post.Id}", true)">
+      @Model.Post.Subject
+    </a>
   </p>
 }
 else
@@ -15,7 +17,9 @@ else
   <p>@Model.Reply.Body</p>
   <p>
     To view the complete thread and reply, please visit:
-    <a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Reply.Post.Id}", true)/#_@Model.Reply.Id">@Model.Reply.Post.Subject</a>
+    <a href="@Model.Site.AbsoluteUrl(@Model.Page, $"{@Model.Forum.Name.FriendlyEncode()}/{@Model.Reply.Post.Id}", true)/#_@Model.Reply.Id">
+      @Model.Reply.Post.Subject
+    </a>
   </p>
 }
 

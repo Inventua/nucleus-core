@@ -5,9 +5,6 @@
 @using Nucleus.Abstractions.Models
 @using Nucleus.Abstractions.Models.TaskScheduler
 @using Nucleus.Extensions
-<SettingsControl caption="Last Run">
-  <div>@(Model.LatestHistory == null ? "Never" : (Model.LatestHistory.FinishDate.HasValue ? Model.LatestHistory.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone()) : "Never"))</div>
-</SettingsControl>
 @switch (Model.Progress.Status)
 {
   case ScheduledTaskProgress.State.Running:
@@ -32,12 +29,34 @@
     </div>
     break;
 
-  default:    
-    <SettingsControl caption="Next Run">
-      <div>@(Model.LatestHistory == null ? "Immediate" : Model.ScheduledTask.IntervalType == ScheduledTask.Intervals.Startup ? "After the next restart" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "Immediate"))</div>
-    </SettingsControl>
+  default:
+    @if (Model.ScheduledTask.Id != Guid.Empty)
+    {
+      <div class="nucleus-flex-fields d-inline-flex column-gap-5">
+        <SettingsControl caption="Last Started">
+          <div>@(Model.LatestHistory == null ? "Never" : Model.LatestHistory.StartDate.FormatDate(this.Context.Request.GetUserTimeZone()))</div>
+        </SettingsControl>
+        @if (Model.LatestHistory != null && Model.LatestHistory.FinishDate.HasValue)
+        {
+          <SettingsControl caption="Finished at">
+            <div>@Model.LatestHistory.FinishDate.FormatDate(this.Context.Request.GetUserTimeZone())</div>
+          </SettingsControl>
+        }
+      </div>
+      <SettingsControl caption="Next Run">
+        @if (Model.ScheduledTask.IntervalType == ScheduledTask.Intervals.None)
+        {
+          <div>Never</div>
+        }
+        else
+        {
+          <div>@(Model.LatestHistory == null ? "Immediate" : Model.ScheduledTask.IntervalType == ScheduledTask.Intervals.Startup ? "After the next restart" : (Model.LatestHistory.NextScheduledRun.HasValue ? Model.LatestHistory.NextScheduledRun.FormatDate(this.Context.Request.GetUserTimeZone()) : "Immediate"))</div>
+        }
+      </SettingsControl>
+    }
     break;
 }
+
 @if (Model.Progress.Status != ScheduledTaskProgress.State.Running)
 {
   <script>

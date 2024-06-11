@@ -482,8 +482,10 @@ public partial class PageManager : IPageManager
       if (page.SortOrder != sortOrder)
       {
         page.SortOrder = sortOrder;
-        //await provider.SavePage(site, page);
-        await this.Save(site, page);
+        using (ILayoutDataProvider provider = this.DataProviderFactory.CreateProvider<ILayoutDataProvider>())
+        {
+          await provider.SavePage(site, page);
+        }
         this.CacheManager.PageCache().Remove(page.Id);
       }
 

@@ -6,6 +6,9 @@
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+		<StartupObject>Nucleus.Web.Program</StartupObject>
+		<DebugType>portable</DebugType>
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -21,14 +24,18 @@
 		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.7.0-rc.1" />
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
+
+    <!-- https://github.com/dotnet/aspnetcore/issues/38892 (comment dated Dec 27, 2023) -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0" GeneratePathProperty="true" />
+    <PackageReference Include="System.Formats.Asn1" Version="8.0.0" GeneratePathProperty="true" />
 	</ItemGroup>
-	
-	<PropertyGroup>
-		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<StartupObject>Nucleus.Web.Program</StartupObject>
-		<DebugType>portable</DebugType>
-	</PropertyGroup>
-	
+
+  <!-- https://github.com/dotnet/aspnetcore/issues/38892 (comment dated Dec 27, 2023) -->
+  <Target Name="CopySystemSecurityCryptographyPkcs" AfterTargets="Build">
+    <Copy SourceFiles="$(PkgSystem_Security_Cryptography_Pkcs)\lib\net8.0\System.Security.Cryptography.Pkcs.dll" DestinationFolder="$(OutDir)" />
+    <Copy SourceFiles="$(PkgSystem_Formats_Asn1)\lib\net8.0\System.Formats.Asn1.dll" DestinationFolder="$(OutDir)" />
+  </Target>
+  	
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<Optimize>False</Optimize>
 	</PropertyGroup>
@@ -55,8 +62,9 @@
 		<Content Remove="databaseSettings.*.json" />
 		<Content Remove="hosting.*.json" />
 		<Content Remove="iis-dev\web.config" />
-		<Content Remove="Resources\Libraries\Monaco\0.44.0\package.json" />
+    <Content Remove="Resources\Libraries\Monaco\0.44.0\package.json" />
 		<Content Remove="Setup\install-log.config" />
+		<Content Remove="web.template.config" />
 		<EmbeddedResource Remove="Extensions\**" />
 		<EmbeddedResource Remove="logs\**" />
 		<EmbeddedResource Remove="publish\**" />
@@ -75,28 +83,7 @@
 		<None Remove="license.txt" />
 		<None Remove="module.build.targets" />
 		<None Remove="package.xsd" />
-		<None Remove="Resources\css\admin.css" />
-		<None Remove="Resources\css\admin.min.css" />
-		<None Remove="Resources\css\editmode.css" />
-		<None Remove="Resources\css\editmode.min.css" />
-		<None Remove="Resources\css\forms.css" />
-		<None Remove="Resources\css\forms.min.css" />
-		<None Remove="Resources\css\shared.css" />
-		<None Remove="Resources\css\shared.min.css" />
-		<None Remove="Resources\js\jquery-3.6.0.min.js" />
-		<None Remove="Resources\js\jquery-pagelist.min.js" />
-		<None Remove="Resources\js\jquery-toggleswitch.min.js" />
-		<None Remove="Resources\js\nucleus-admin.js" />
-		<None Remove="Resources\js\nucleus-admin.min.js" />
-		<None Remove="Resources\js\nucleus-editmode.js" />
-		<None Remove="Resources\js\nucleus-shared.min.js" />
-		<None Remove="Resources\Libraries\HtmlEditors\trumbowyg\trumbowyg.js" />
-		<None Remove="Resources\Libraries\HtmlEditors\trumbowyg\trumbowyg.min.js" />
-		<None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\icons.svg" />
-		<None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\sass\trumbowyg.scss" />
-		<None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.css" />
-		<None Remove="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.min.css" />
-		<None Remove="Resources\material-icons.woff2" />
+		<None Remove="Resources\**\*" />
 		<None Remove="Setup\Templates\Site\default-site-template.xml" />
 		<None Remove="Setup\Templates\Site\empty-site-template.xml" />
 		<None Remove="Shared\Containers\container-styles.css" />
@@ -125,8 +112,6 @@
 		<EmbeddedResource Include="Areas\Setup\Views\SiteWizard\index.js">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>
-		<Content Include="Resources\js\nucleus-admin-extensions.js" />
-		<Content Include="Resources\js\nucleus-admin-extensions.min.js" />
 		<Content Include="Utils\Windows\nucleus-install.ps1">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
@@ -143,28 +128,11 @@
 		<Content Include="package.xsd">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
-		<Content Include="Resources\css\admin.css" />
-		<Content Include="Resources\css\admin.min.css" />
-		<Content Include="Resources\css\editmode.min.css" />
-		<Content Include="Resources\css\forms.css" />
-		<Content Include="Resources\css\forms.min.css" />
-		<Content Include="Resources\css\editmode.css" />
-		<Content Include="Resources\css\shared.css" />
-		<Content Include="Resources\css\shared.min.css" />
-		<Content Include="Resources\js\jquery-pagelist.min.js" />
-		<Content Include="Resources\js\jquery-toggleswitch.min.js" />
-		<Content Include="Resources\js\nucleus-admin.js" />
-		<Content Include="Resources\js\nucleus-admin.min.js" />
-		<Content Include="Resources\js\nucleus-editmode.js" />
-		<Content Include="Resources\js\nucleus-shared.min.js" />
-		<Content Include="Resources\js\nucleus-shared.js" />
-		<Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\trumbowyg.js" />
-		<Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\trumbowyg.min.js" />
-		<Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\icons.svg" />
-		<Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\sass\trumbowyg.scss" />
-		<Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.css" />
-		<Content Include="Resources\Libraries\HtmlEditors\trumbowyg\02.25.01\ui\trumbowyg.min.css" />
-		<Content Include="Resources\material-icons.woff2" />
+		<Content Include="Resources\**\*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Remove="**\*.vspscc" />
+    <Content Remove="**\*.scc" />
 		<Content Include="Setup\Templates\Site\*.xml">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
@@ -210,7 +178,7 @@
 		<None Include="appSettings.*.json">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>
-		<None Include="bundleconfig.json" />
+		<None Include="bundleconfig.json" />    
 		<None Include="iis-dev\**\*" />
 		<_ContentIncludedByDefault Remove="appSettings.linux.json" />
 		<None Include="databaseSettings.*.json">
@@ -220,10 +188,11 @@
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>
 		<None Include="iis-dev\web.config" />
-		<None Include="Resources\Libraries\Monaco\0.44.0\package.json" />
+    <None Include="Resources\Libraries\Monaco\0.44.0\package.json" />
 		<None Include="Setup\install-log.config">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>
+		<None Include="web.template.config" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -285,8 +254,8 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
-
-	<Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="Exists('iis-dev')">
+  	
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="Exists('iis-dev')">
 		<Touch Files="iis-dev\App_Offline.htm" AlwaysCreate="true" />
 	</Target>
 

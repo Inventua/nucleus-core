@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.ObjectModel;
+using System.Runtime.Loader;
+using Nucleus.Abstractions.Models.Cache;
 
 namespace Nucleus.Web.ViewModels.Admin
 {	
@@ -35,7 +38,11 @@ namespace Nucleus.Web.ViewModels.Admin
 
 		public IEnumerable<Nucleus.Abstractions.Models.TaskScheduler.RunningTask> RunningTasks { get; set; }
 
-		public IEnumerable<DatabaseConnection> DatabaseConnections { get; set; }
+    public AssemblyLoadContext[] ExtensionLoadContexts { get; set; }
+    public string ContentRootPath { get; set; }
+    public List<CacheReport> CacheReport { get; set; }
+
+    public IEnumerable<DatabaseConnection> DatabaseConnections { get; set; }
 		public long UsersOnline { get; set; }
 
 		public Dictionary<string, string> WebServerInformation { get; set; } = new();

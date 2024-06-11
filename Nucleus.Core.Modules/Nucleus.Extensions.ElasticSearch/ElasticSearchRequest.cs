@@ -72,7 +72,10 @@ namespace Nucleus.Extensions.ElasticSearch
 			connectionSettings.RequestTimeout(TimeSpan.FromSeconds(30));
 			connectionSettings.EnableApiVersioningHeader();
       connectionSettings.ConnectionLimit(20);
-      
+#if DEBUG
+      connectionSettings.DisableDirectStreaming();
+#endif
+
       if (!String.IsNullOrEmpty(this.Username))
 			{
 				connectionSettings.BasicAuthentication(this.Username, this.Password);
@@ -450,16 +453,18 @@ namespace Nucleus.Extensions.ElasticSearch
 							ParseField(nameof(ElasticSearchDocument.Roles))
 						}.ToArray()
 					},
-					Size = query.PagingSettings.PageSize,
+#if DEBUG
+          Pretty = true,
+			    Explain = true,
+			    Human = true,
+#endif
+          Size = query.PagingSettings.PageSize,
 					From = query.PagingSettings.FirstRowIndex,
 					Highlight = BuildHighlighter(),
 					PostFilter = BuildSiteFilter(query) & BuildRolesFilter(query) & BuildArgsFilter(query) & BuildScopeFilter(query),
 					Sort = BuildSortFilter(query)
 				};
 
-			// .Pretty = Me.DebugMode,
-			// .Explain = Me.DebugMode,
-			// .Human = Me.DebugMode,
 			ISearchResponse<ElasticSearchDocument> response = await Search(searchRequest);
 
 			if (response.IsValid)
@@ -562,7 +567,7 @@ namespace Nucleus.Extensions.ElasticSearch
 			{
 				foreach (Role role in query.Roles)
 				{
-					objRolesContainer = objRolesContainer | BuildTermQuery(nameof(ElasticSearchDocument.Roles), role.Id.ToString());
+					objRolesContainer = objRolesContainer | BuildTermQuery(nameof(ElasticSearchDocument.Roles), role.Id);
 				}
 
 				return new BoolQuery()
@@ -571,7 +576,7 @@ namespace Nucleus.Extensions.ElasticSearch
 					{
 						new BoolQuery()
 						{
-								Should = new QueryContainer[] { objRolesContainer, BuildTermQuery(nameof(ElasticSearchDocument.IsSecure), "false") }
+							Should = new QueryContainer[] { objRolesContainer, BuildTermQuery(nameof(ElasticSearchDocument.IsSecure), "false") }
 						}
 					}
 				};
@@ -584,7 +589,7 @@ namespace Nucleus.Extensions.ElasticSearch
 
 		private Nest.QueryContainer BuildSiteFilter(SearchQuery query)
 		{
-			return BuildTermQuery(ParseField(nameof(ElasticSearchDocument.SiteId)), query.Site.Id.ToString());
+			return BuildTermQuery(nameof(ElasticSearchDocument.SiteId), query.Site.Id);
 		}
 
 		private Nest.QueryContainer BuildScopeFilter(SearchQuery query)
@@ -633,7 +638,16 @@ namespace Nucleus.Extensions.ElasticSearch
 			};
 		}
 
-		private Nest.QueryContainer BuildTermsQuery(string fieldName, List<string> values)
+    private Nest.QueryContainer BuildTermQuery(string fieldName, Guid value)
+    {
+      return new TermQuery()
+      {
+        Field = ParseField(fieldName),
+        Value = value
+      };
+    }
+
+    private Nest.QueryContainer BuildTermsQuery(string fieldName, List<string> values)
 		{
 			return new TermsQuery()
 			{
@@ -642,9 +656,9 @@ namespace Nucleus.Extensions.ElasticSearch
 			};
 		}
 
-		private string ParseField(string Value)
+		private string ParseField(string value)
 		{
-			return Value.Substring(0, 1).ToLower() + Value.Substring(1);
+			return value.Substring(0, 1).ToLower() + value.Substring(1);
 		}
 
 

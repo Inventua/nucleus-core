@@ -19,11 +19,11 @@
 				<h2>List</h2>
 				@Html.HiddenFor(model => model.List.Id)
 
-				<SettingsControl caption="Name" helptext="List name">
+				<SettingsControl caption="Name" helptext="Name of your List. This is shown in settings pages when you select a list.">
 					@Html.TextBoxFor(model => model.List.Name, new { @maxlength = 256 })
 				</SettingsControl>
 
-				<SettingsControl caption="Description" helptext="Description">
+				<SettingsControl caption="Description" helptext="Description of the list. Use this to describe what you will use the list for, for your future reference.">
 					@Html.TextAreaFor(model => model.List.Description, new { @maxlength = 512 })
 				</SettingsControl>
 			</fieldset>

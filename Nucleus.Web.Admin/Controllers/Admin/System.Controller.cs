@@ -32,16 +32,18 @@ public class SystemController : Controller
   private IOptions<DatabaseOptions> DatabaseOptions { get; }
   private ISessionManager SessionManager { get; }
   private Context Context { get; }
+  private ICacheManager CacheManager { get; }
   private IWebHostEnvironment HostingEnvironment { get; }
 
   private const string LINUX_OS_INFO_FILE = "/etc/os-release";
 
 
-  public SystemController(IWebHostEnvironment hostingEnvironment, Context context, RunningTaskQueue runningTaskQueue, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager)
+  public SystemController(IWebHostEnvironment hostingEnvironment, Context context, RunningTaskQueue runningTaskQueue, ICacheManager cacheManager, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager)
   {
     this.HostingEnvironment = hostingEnvironment;
     this.Context = context;
     this.RunningTaskQueue = runningTaskQueue;
+    this.CacheManager = cacheManager;
     this.Logger = logger;
     this.DatabaseOptions = databaseOptions;
     this.Configuration = configuration;
@@ -421,7 +423,11 @@ public class SystemController : Controller
     //viewModelOutput.Configuration = Sanitize((this.Configuration as IConfigurationRoot).GetDebugView());
     viewModelOutput.RunningTasks = this.RunningTaskQueue.ToList();
 
-    List<ViewModels.Admin.SystemIndex.DatabaseConnection> connections = new();
+    viewModelOutput.ExtensionLoadContexts = Nucleus.Core.Plugins.AssemblyLoader.ListExtensionLoadContexts().OrderBy(loadContext => loadContext.Name).ToArray();
+    viewModelOutput.ContentRootPath = this.HostingEnvironment.ContentRootPath;
+    viewModelOutput.CacheReport = this.CacheManager.Report().OrderBy(cacheReport => cacheReport.Name).ToList();
+
+    List <ViewModels.Admin.SystemIndex.DatabaseConnection> connections = new();
 
     foreach (DatabaseSchema schema in this.DatabaseOptions.Value.Schemas)
     {

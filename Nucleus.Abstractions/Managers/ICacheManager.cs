@@ -1,4 +1,6 @@
-﻿using Nucleus.Abstractions.Models.Cache;
+﻿using System.Collections.Generic;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Nucleus.Abstractions.Models.Cache;
 
 namespace Nucleus.Abstractions.Managers
 {
@@ -39,5 +41,11 @@ namespace Nucleus.Abstractions.Managers
 		/// Remove expired items from all caches.
 		/// </summary>
 		public void Collect();
+
+    /// <summary>
+    /// Return a report containing the current state of all caches.
+    /// </summary>
+    /// <returns></returns>
+    public List<CacheReport> Report();
 	}
 }

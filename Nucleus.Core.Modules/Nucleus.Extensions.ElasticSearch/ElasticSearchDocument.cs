@@ -37,7 +37,7 @@ namespace Nucleus.Extensions.ElasticSearch
 			this.ContentType = content.ContentType;
       this.Type = content.Type;
 
-			if (content.Content.Any() && (settings.AttachmentMaxSize == 0 ||  content.Content.Length <= settings.AttachmentMaxSize))
+			if (content.Content.Any() && (settings.AttachmentMaxSize == 0 ||  content.Content.Length <= settings.AttachmentMaxSize * 1024 * 1024))
 			{
 				this.Content = Convert.ToBase64String(content.Content);
 			}

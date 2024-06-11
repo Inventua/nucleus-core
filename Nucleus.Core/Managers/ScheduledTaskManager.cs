@@ -163,6 +163,18 @@ namespace Nucleus.Core.Managers
     public async Task RunNow(ScheduledTask scheduledTask)
     {
       ScheduledTaskHistory history = await this.GetMostRecentHistory(scheduledTask, null);
+
+      if (history == null)
+      {
+        history = new() 
+        {
+          ScheduledTaskId = scheduledTask.Id,
+          Server = Environment.MachineName,
+          StartDate = DateTime.UtcNow,
+          Status = ScheduledTaskProgress.State.None
+        };
+      }
+
       history.NextScheduledRun = null;
       await this.SaveHistory(history);
 

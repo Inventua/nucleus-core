@@ -30,6 +30,7 @@ public class SignupSettings
     }
   }
 
+  [RegularExpression("^[A-Za-z0-9/_]+$", ErrorMessage = "Action can only contain alphanumeric characters, slashes, and underscores.")]
   public string RecaptchaAction { get; set; }
 
   [Range(0.0, 1.0, ErrorMessage = "Score threshold must be between 0.0 and 1.0.")]

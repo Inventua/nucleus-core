@@ -2,7 +2,6 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Abstractions
 @addTagHelper "*, Nucleus.ViewFeatures"
-@Html.AddScript("~/Areas/Setup/Views/SiteWizard/Complete.js", true)
 @{
 	Layout = "_Generic";
 	ViewData["title"] = "Nucleus Setup Wizard";
@@ -33,4 +32,6 @@
     </div>
 	</div>
 </Modal>
-
+<script>
+  jQuery(function () { WaitForRestart(); });
+</script>

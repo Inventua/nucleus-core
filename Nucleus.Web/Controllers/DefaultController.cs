@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
@@ -23,6 +24,7 @@ namespace Nucleus.Web.Controllers;
 public class DefaultController : Controller
 {
   private IWebHostEnvironment WebHostEnvironment { get; }
+  private ApplicationPartManager ApplicationPartManager { get; }
   private ILogger<DefaultController> Logger { get; }
   private Context Context { get; }
   private IFileSystemManager FileSystemManager { get; }
@@ -34,9 +36,11 @@ public class DefaultController : Controller
   private static readonly HashSet<string> FILTERED_FILE_NAMES = new(["favicon.ico", "robots.txt"], StringComparer.OrdinalIgnoreCase);
   private static readonly HashSet<string> FILTERED_FILE_EXTENSIONS = new([".txt", ".css", ".js", ".map"], StringComparer.OrdinalIgnoreCase);
 
-  public DefaultController(IWebHostEnvironment webHostEnvironment, ILogger<DefaultController> logger, Context context, Application application, IFileSystemManager fileSystemManager, IPageManager pageManager)
+  public DefaultController(IWebHostEnvironment webHostEnvironment, ApplicationPartManager applicationPartManager, ILogger<DefaultController> logger, Context context, Application application, IFileSystemManager fileSystemManager, IPageManager pageManager)
   {
     this.WebHostEnvironment = webHostEnvironment;
+    this.ApplicationPartManager = applicationPartManager;
+
     this.Application = application;
     this.Logger = logger;
     this.Context = context;
@@ -129,13 +133,21 @@ public class DefaultController : Controller
     }
 
     // display the requested page
-    return View(GetLayoutPath(this.WebHostEnvironment, this.Context, this.Logger), await BuildViewModel(this.Url, this.Context, this.HttpContext, this.Application, this.FileSystemManager, this.Logger));
+    return View(GetLayoutPath(this.WebHostEnvironment, this.ApplicationPartManager, this.Context, this.Logger), await BuildViewModel(this.Url, this.Context, this.HttpContext, this.Application, this.FileSystemManager, this.Logger));
   }
 
-  internal static string GetLayoutPath(IWebHostEnvironment env, Context context, ILogger logger)
+  internal static string GetLayoutPath(IWebHostEnvironment env, ApplicationPartManager applicationPartManager, Context context, ILogger logger)
   {
     string layoutPath = context.Page.LayoutPath(context.Site);
-    if (!env.ContentRootFileProvider.GetFileInfo(layoutPath).Exists)
+    IEnumerable<CompiledRazorAssemblyPart> parts = applicationPartManager.ApplicationParts
+     .Where(part => part is CompiledRazorAssemblyPart)
+     .Select(part => part as CompiledRazorAssemblyPart);
+
+    if 
+    (
+      !env.ContentRootFileProvider.GetFileInfo(layoutPath).Exists &&
+      !parts.Any(part => (part as IRazorCompiledItemProvider).CompiledItems.Any(item => item.Identifier == '/' + layoutPath))
+    )
     {
       logger.LogWarning("A page with title '{title}' and route '{route}' is configured to use a missing layout '{layout}'.  The default layout was used instead.", context.Page.Title, context.MatchedRoute.Path, layoutPath);
       layoutPath = $"{Nucleus.Abstractions.Models.Configuration.FolderOptions.LAYOUTS_FOLDER}/{Nucleus.Abstractions.Managers.ILayoutManager.DEFAULT_LAYOUT}";

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
@@ -15,15 +16,18 @@ namespace Nucleus.Web.Controllers;
 public class ErrorController : Controller
 {
   private IWebHostEnvironment WebHostEnvironment { get; }
+  private ApplicationPartManager ApplicationPartManager { get; }
   private Context Context { get; }
   private IPageManager PageManager { get; }
   private IFileSystemManager FileSystemManager { get; }
   private Application Application { get; }
   private ILogger<ErrorController> Logger { get; }
 
-  public ErrorController(IWebHostEnvironment webHostEnvironment, Context context, Application application, IFileSystemManager fileSystemManager, IPageManager pageManager, ILogger<ErrorController> logger)
+  public ErrorController(IWebHostEnvironment webHostEnvironment, ApplicationPartManager applicationPartManager, Context context, Application application, IFileSystemManager fileSystemManager, IPageManager pageManager, ILogger<ErrorController> logger)
   {
     this.WebHostEnvironment = webHostEnvironment;
+    this.ApplicationPartManager = applicationPartManager;
+
     this.Context = context;
     this.Application = application;
     this.FileSystemManager = fileSystemManager;
@@ -70,7 +74,7 @@ public class ErrorController : Controller
     if (errorPage != null)
     {
       this.Context.Page = errorPage;      
-      return View(DefaultController.GetLayoutPath(this.WebHostEnvironment, this.Context, this.Logger), await DefaultController.BuildViewModel(this.Url, this.Context, this.HttpContext, this.Application, this.FileSystemManager, this.Logger));
+      return View(DefaultController.GetLayoutPath(this.WebHostEnvironment, this.ApplicationPartManager, this.Context, this.Logger), await DefaultController.BuildViewModel(this.Url, this.Context, this.HttpContext, this.Application, this.FileSystemManager, this.Logger));
     }
     else
     {

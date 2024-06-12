@@ -145,27 +145,35 @@
     <Content Include="Setup\Extensions\*.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-		<Content Include="Shared\Containers\container-styles.css">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Shared\Containers\default.md" />
-		<Content Include="Shared\Containers\default.css">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
+		<EmbeddedResource Include="Shared\Containers\container-styles.css">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Shared\Containers\default.md">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Shared\Containers\default.css">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
 		<Content Include="Shared\Containers\default.min.css" />
-		<Content Include="Shared\Containers\default.png" />
-		<Content Include="Shared\Controls\Views\PagingControl.css">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
+		<EmbeddedResource Include="Shared\Containers\default.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Shared\Controls\Views\PagingControl.css">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
 		<Content Include="Shared\Controls\Views\PagingControl.min.css" />
-		<Content Include="Shared\Layouts\default.css">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Shared\Layouts\default.md" />
-		<Content Include="Shared\Layouts\default.png" />
-		<Content Include="Shared\Layouts\layout-styles.css">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
+		<EmbeddedResource Include="Shared\Layouts\default.css">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Shared\Layouts\default.md">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Shared\Layouts\default.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Shared\Layouts\layout-styles.css">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
 		<Content Include="Utils\Ubuntu\appSettings.template">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>

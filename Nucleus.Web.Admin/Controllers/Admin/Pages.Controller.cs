@@ -993,9 +993,13 @@ namespace Nucleus.Web.Controllers.Admin
     private async Task<List<Nucleus.Abstractions.Models.FileSystem.File>> ListPageTemplates()
     {
       Folder pageTemplatesFolder = await this.GetTemplatesFolder();
+      if (pageTemplatesFolder == null ) 
+      {
+        return [];
+      }
 
-      return (await this.FileSystemManager.ListFolder(this.Context.Site, pageTemplatesFolder.Id, "(.*).xml"))
-        .Files;
+      pageTemplatesFolder = await this.FileSystemManager.ListFolder(this.Context.Site, pageTemplatesFolder.Id, "(.*).xml");
+      return pageTemplatesFolder.Files;
     }
 
     private async Task SaveTemplate(System.IO.Stream templateStream, string filename)
@@ -1009,7 +1013,9 @@ namespace Nucleus.Web.Controllers.Admin
       Folder systemFolder;
       Folder pageTemplatesFolder;
 
-      string key = this.FileSystemManager.ListProviders().First().Key;
+      string key = this.FileSystemManager.ListProviders().FirstOrDefault()?.Key;
+
+      if (String.IsNullOrEmpty(key)) return null;
 
       try
       {

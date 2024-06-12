@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
@@ -128,7 +129,7 @@ public class DefaultController : Controller
     }
 
     // display the requested page
-    return View(GetLayoutPath(this.WebHostEnvironment, this.Context, this.Logger), await BuildViewModel(this.Url, this.Context, this.HttpContext, this.Application, this.FileSystemManager ));
+    return View(GetLayoutPath(this.WebHostEnvironment, this.Context, this.Logger), await BuildViewModel(this.Url, this.Context, this.HttpContext, this.Application, this.FileSystemManager, this.Logger));
   }
 
   internal static string GetLayoutPath(IWebHostEnvironment env, Context context, ILogger logger)
@@ -143,17 +144,35 @@ public class DefaultController : Controller
     return layoutPath;
   }
 
-  internal static async Task<Nucleus.ViewFeatures.ViewModels.Layout> BuildViewModel(IUrlHelper url, Context context, HttpContext httpContext, Application app, IFileSystemManager fileSystemManager)
+  internal static async Task<Nucleus.ViewFeatures.ViewModels.Layout> BuildViewModel(IUrlHelper url, Context context, HttpContext httpContext, Application app, IFileSystemManager fileSystemManager, ILogger logger)
   {
     Nucleus.ViewFeatures.ViewModels.Layout viewModel = new(context)
     {
       CanEdit = httpContext.User.CanEditContent(context.Site, context.Page) && app.ControlPanelUri != "",
       ControlPanelUri = app.ControlPanelUri,
       IsEditing = httpContext.User.IsEditing(httpContext, context.Site, context.Page),
-      DefaultPageUri = url.GetAbsoluteUri(context.Page.DefaultPageRoute().Path).AbsoluteUri,
-      SiteIconPath = url.Content(await context.Site.GetIconPath(fileSystemManager)),
-      SiteCssFilePath = url.Content(await context.Site.GetCssFilePath(fileSystemManager))
+      DefaultPageUri = url.GetAbsoluteUri(context.Page.DefaultPageRoute().Path).AbsoluteUri      
     };
+
+    try
+    {
+      viewModel.SiteIconPath = url.Content(await context.Site.GetIconPath(fileSystemManager));
+    }
+    catch (Exception ex)
+    {
+      // an exception reading the site icon should not be a fatal error
+      logger?.LogError(ex, "Error reading site icon path.");
+    }
+
+    try
+    {
+      viewModel.SiteCssFilePath = url.Content(await context.Site.GetCssFilePath(fileSystemManager));
+    }
+    catch (Exception ex)
+    {
+      // an exception reading the site css file should not be a fatal error
+      logger?.LogError(ex, "Error reading site css file path.");
+    }
 
     viewModel.ControlPanelDockingCssClass = viewModel.CanEdit && IsTopDockSelected(httpContext) ? "control-panel-dock-top" : "";   
 

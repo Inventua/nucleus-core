@@ -70,7 +70,7 @@ public class ErrorController : Controller
     if (errorPage != null)
     {
       this.Context.Page = errorPage;      
-      return View(DefaultController.GetLayoutPath(this.WebHostEnvironment, this.Context, this.Logger), await DefaultController.BuildViewModel(this.Url, this.Context, this.HttpContext, this.Application, this.FileSystemManager));
+      return View(DefaultController.GetLayoutPath(this.WebHostEnvironment, this.Context, this.Logger), await DefaultController.BuildViewModel(this.Url, this.Context, this.HttpContext, this.Application, this.FileSystemManager, this.Logger));
     }
     else
     {

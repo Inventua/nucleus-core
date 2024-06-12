@@ -71,9 +71,23 @@ namespace Nucleus.Extensions
 		/// </summary>
 		/// <param name="assembly">The <see href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.assembly">Assembly</see> to read data from.</param>
 		/// <returns></returns>
+    /// <remarks>
+    /// This value is typically used in application log messages.
+    /// </remarks>
 		public static string ShortName(this Assembly assembly)
     {
-      return ($"{assembly.ManifestModule}, Version {assembly.Version()}");
+      return ($"{assembly.ManifestModule} version {assembly.Version()}");
+    }
+
+    /// <summary>
+    /// Returns the assembly name, version and relative location.
+    /// </summary>
+    /// <param name="assembly"></param>
+    /// <returns></returns>
+    /// This value is typically used in application log messages.
+    public static string LogName(this Assembly assembly)
+    {
+      return $"{assembly.ShortName()} [{System.IO.Path.GetRelativePath(Environment.CurrentDirectory, assembly.Location)}]";
     }
   }
 }

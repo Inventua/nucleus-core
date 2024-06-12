@@ -113,7 +113,7 @@ public static class PluginExtensions
 
     foreach (Assembly assembly in AssemblyLoader.GetAssembliesImplementing<Controller>(builder.Logger()))
     {
-      logEntries.Add($"{assembly.ShortName()} [{System.IO.Path.GetRelativePath(Environment.CurrentDirectory, assembly.Location)}]");
+      logEntries.Add(assembly.LogName());
 
       AssemblyPart part = new(assembly);
 
@@ -146,7 +146,7 @@ public static class PluginExtensions
 
     foreach (Type type in AssemblyLoader.GetTypes<Nucleus.Abstractions.IScheduledTask>())
     {
-      LogEntries.Add($"{type.FullName} from {type.Assembly.ShortName()} [{System.IO.Path.GetRelativePath(Environment.CurrentDirectory, type.Assembly.Location)}]");
+      LogEntries.Add($"{type.FullName} from {type.Assembly.LogName()}");
       builder.Services.AddTransient(type);
     }
 
@@ -171,7 +171,7 @@ public static class PluginExtensions
 
     foreach (Type type in AssemblyLoader.GetTypes<Nucleus.Abstractions.Portable.IPortable>())
     {
-      logEntries.Add($"{type.FullName} from {type.Assembly.ShortName()} [{System.IO.Path.GetRelativePath(Environment.CurrentDirectory, type.Assembly.Location)}]");
+      logEntries.Add($"{type.FullName} from {type.Assembly.LogName()}");
       builder.Services.AddSingleton(typeof(Nucleus.Abstractions.Portable.IPortable), type);
     }
 
@@ -216,26 +216,22 @@ public static class PluginExtensions
         Nucleus.Abstractions.ControlPanelAttribute controlPanelAttr = assembly.GetCustomAttribute<Nucleus.Abstractions.ControlPanelAttribute>();
         if (controlPanelAttr != null)
         {
-          if (controlPanelAttr.ResourcesRootPath != "/")
-          {
-            requestPath = controlPanelAttr.ResourcesRootPath;
-          }
-          
-          providers.Add(AddFileProvider(app, new ManifestEmbeddedFileProvider(assembly, "/"), requestPath));
+          requestPath = controlPanelAttr.ResourcesRootPath;          
+          providers.Add(AddFileProvider(app, new ManifestEmbeddedFileProvider(assembly, "/"), requestPath != "/" ? requestPath : null ));
 
-          logEntries.Add($"{assembly.ShortName()}, path: '{requestPath}'");
+          logEntries.Add($"{assembly.LogName()}, path: '{requestPath}'");
         }
         else if (IsNucleusExtension(assembly))
         {
           extensions.Add(assembly);
-          logEntries.Add($"{assembly.ShortName()}, path: '/Extensions'");
+          logEntries.Add($"{assembly.LogName()}, path: '/Extensions'");
         }
         else
         {
           // the assembly is not a control panel implementation or an extension (but contains embedded files), add embedded files at
           // the root.  Nucleus.Web is an example of this.
           providers.Add(AddFileProvider(app, new ManifestEmbeddedFileProvider(assembly, "/"), null));
-          logEntries.Add($"{assembly.ShortName()}, path: '/'");
+          logEntries.Add($"{assembly.LogName()}, path: '/'");
         }
       }
     }
@@ -258,7 +254,7 @@ public static class PluginExtensions
 
     env.ContentRootFileProvider = new CompositeFileProvider(providers);
 
-    app.Logger()?.LogInformation("Added embedded files providers from: {log}.", String.Join(", ", logEntries));
+    app.Logger()?.LogInformation("Added embedded files from: {log}.", String.Join(", ", logEntries));
     
     return app;  
   }
@@ -306,11 +302,12 @@ public static class PluginExtensions
 
     foreach (Assembly assembly in AssemblyLoader.GetAssembliesWithAttribute<Microsoft.AspNetCore.Razor.Hosting.RazorCompiledItemAttribute>())
     {
+      logEntries.Add(assembly.LogName());
+
       foreach (ApplicationPart part in CompiledRazorAssemblyApplicationPartFactory.GetDefaultApplicationParts(assembly))
       {
         if (!ApplicationPartContains(builder, part))
         {
-          logEntries.Add(part.Name);
           builder.PartManager.ApplicationParts.Add(part);
         }
       }

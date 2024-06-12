@@ -7,13 +7,19 @@
 @using (Html.BeginNucleusForm("SaveSettings", "SignupAdmin", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
   <fieldset role="group" aria-label="reCAPTCHA Settings" class="flex-grow-1">
-    <SettingsControl caption="Enable reCAPTCHA?" rendermode="LabelLast" class="inner-inline EnableRecaptcha" helptext="Sets whether to enable or disable reCAPTCHA.">
+    <div class="alert alert-info">
+      <h3 class="mt-0">Google reCAPTCHA</h3>
+      <p>The Google reCAPTCHA service protects your signup page from abuse.</p>
+      <a href="https://cloud.google.com/security/products/recaptcha" target="_blank" class="">About Google reCAPTCHA</a>
+    </div>
+
+    <SettingsControl caption="Enable reCAPTCHA?" rendermode="LabelLast" class="inner-inline EnableRecaptcha" helptext="Enable reCAPTCHA to protect your signup form from abuse.">
       @Html.CheckBoxFor(model => model.RecaptchaEnabled, new { @class = "ToggleSwitch" })
     </SettingsControl>
 
     <div class="RecaptchaSettings">
       <SettingsControl caption="reCAPTCHA Site Key" helptext="Specifies your reCAPTCHA site key. Visit https://www.google.com/recaptcha/admin/create to create a site key.">
-      @Html.TextBoxFor(model => model.RecaptchaSiteKey)
+        @Html.TextBoxFor(model => model.RecaptchaSiteKey)
       </SettingsControl>
 
       <div class="nucleus-flex-fields">
@@ -21,7 +27,7 @@
           @Html.PasswordFor(model => model.RecaptchaSecretKey, new { value = (Model.IsSecretKeySet ? Nucleus.Modules.Account.ViewModels.SignupSettings.DUMMY_PASSWORD : "") })
         </SettingsControl>
 
-        <SettingsControl caption="reCAPTCHA Action" helptext="Specifies your reCAPTCHA action using only alphanumeric characters, slashes, and underscore. This is used in the reCAPTCHA admin console for reporting and for adaptive risk analysis." class="flex-grow-2">
+        <SettingsControl caption="reCAPTCHA Action" helptext="Specifies your reCAPTCHA action. Use only alphanumeric characters, slashes, and underscore. This is used in the reCAPTCHA admin console for reporting and for adaptive risk analysis. Recommended value: signup." class="flex-grow-2">
           @Html.TextBoxFor(model => model.RecaptchaAction)
         </SettingsControl>
 

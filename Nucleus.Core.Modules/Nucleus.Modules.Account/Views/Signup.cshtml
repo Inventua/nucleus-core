@@ -67,15 +67,18 @@
     </div>
   }
 }
-<script>
-  function onRecaptchaLoadCallback()
-  {
-    if ('@Model.RecaptchaSiteKey' !== '')
+@if (Model.RecaptchaEnabled)
+{
+  <script>
+    function onRecaptchaLoadCallback()
     {
-      jQuery('.signup-save').Recaptcha({
-        siteKey: '@Model.RecaptchaSiteKey',
-        badgeElement: jQuery('.recaptcha-badge')
-      });
+      if ('@Model.RecaptchaSiteKey' !== '')
+      {
+        jQuery('.signup-save').Recaptcha({
+          siteKey: '@Model.RecaptchaSiteKey',
+          badgeElement: jQuery('.recaptcha-badge')
+        });
+      }
     }
-  }
-</script>
+  </script>
+}

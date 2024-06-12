@@ -31,12 +31,6 @@ public class SignupAdminController : Controller
   [HttpPost]
   public async Task<ActionResult> SaveSettings(ViewModels.SignupSettings viewModel)
   {
-    if (!ModelState.IsValid)
-    {
-      return BadRequest(ModelState);
-    }
-
-
     if (viewModel.RecaptchaEnabled)
     {
       if (String.IsNullOrEmpty(viewModel.RecaptchaSecretKey))
@@ -52,21 +46,22 @@ public class SignupAdminController : Controller
         viewModel.ReadEncryptedKeys(this.Context.Module);
       }
 
-      if (!String.IsNullOrEmpty(viewModel.RecaptchaSiteKey))
+      if (viewModel.RecaptchaEnabled)
       {
-        Validate(viewModel.RecaptchaSecretKey, nameof(viewModel.RecaptchaSecretKey), "Enter your Google reCAPTCHA secret key.");
-        Validate(viewModel.RecaptchaAction, nameof(viewModel.RecaptchaAction), "Enter the reCAPTCHA action.");
-
-        if (!ControllerContext.ModelState.IsValid)
-        {
-          return BadRequest(ControllerContext.ModelState);
-        }
+        Validate(viewModel.RecaptchaSiteKey, nameof(viewModel.RecaptchaSiteKey), "reCAPTCHA site key is required.");
+        Validate(viewModel.RecaptchaSecretKey, nameof(viewModel.RecaptchaSecretKey), "reCAPTCHA secret key is required.");
+        Validate(viewModel.RecaptchaAction, nameof(viewModel.RecaptchaAction), "reCAPTCHA action is required.");
       }
     }
     else
     {
       // Repopulate the recaptcha settings
       viewModel.ReadRecaptchaSettings(this.Context.Module);
+    }
+
+    if (!ModelState.IsValid)
+    {
+      return BadRequest(ModelState);
     }
 
     viewModel.SetSettings(this.Context.Site, this.Context.Module);

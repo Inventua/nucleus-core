@@ -193,6 +193,7 @@ namespace Nucleus.Core.Layout
         await this.UserManager.CountSystemAdministrators() == 0
       )
       {
+        this.Logger?.LogWarning("Nucleus is not installed, redirecting to site wizard.");
         String relativePath = $"{(String.IsNullOrEmpty(context.Request.PathBase) ? "" : context.Request.PathBase + "/")}Setup/SiteWizard";
         context.Response.Redirect(relativePath);
       }

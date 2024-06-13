@@ -599,7 +599,7 @@ class Application
     if ($this.DoUnzip())
     {
       Write-Host "Un-zipping $($this.ZipFile) to $($this.Path)  ..." -NoNewLine
-      Expand-Archive -Path $this.ZipFile -DestinationPath $this.Path -Force
+      Expand-Archive -Path "$($this.Path)\$($this.ZipFile)" -DestinationPath $this.Path -Force
 		  Write-Host " OK."
     }
 
@@ -685,7 +685,7 @@ class Application
     {
       $json.Nucleus.FolderOptions.DataFolder = $this.DataPath
     }    
-    $json | ConvertTo-Json | Out-File $appSettingsFile  
+    $json | ConvertTo-Json -Depth 100 | Out-File $appSettingsFile  
 
 
     $databaseSettingsFile = $this.GetDatabaseSettingsFileName()

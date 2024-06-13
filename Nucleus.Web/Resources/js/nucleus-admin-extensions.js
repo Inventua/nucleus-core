@@ -18,7 +18,7 @@ function _extensionsStore()
 
   function _handleStoreEvents(event)
   {
-    var storeWindow = jQuery('#StoreFrame').first().contentWindow;
+    var storeWindow = jQuery('#StoreFrame').first()[0].contentWindow;
     switch (event.data.method)
     {
       case 'install':

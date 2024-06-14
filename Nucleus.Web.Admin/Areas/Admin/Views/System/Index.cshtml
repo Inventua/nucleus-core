@@ -176,7 +176,11 @@
 
     <TabPanel id="system-cache">
       <div class="alert alert-info">
-        If a cache is full, the oldest entry will be removed when a new entry is added. Cache capacity is configured in your appSettings.@(Model.EnvironmentName).json file.
+        <span class="d-flex align-items-center">
+          If a cache is full, the oldest entry will be removed when a new entry is added. Cache settings are configured in your appSettings.@(Model.EnvironmentName).json file.
+
+          <a class="nucleus-material-icon btn btn-none fs-5 ms-2" href="https://www.nucleus-cms.com/configuration-reference/#nucleuscacheoptions" target="_blank">&#xe887;</a>
+        </span>
       </div>
       <div class="overflow-auto">
         <table class="table table-sm table-sticky-headers table-striped">

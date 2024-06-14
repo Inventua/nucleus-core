@@ -391,7 +391,18 @@ public class AssemblyLoader
     // "core" bin assembly is added to the type cache & gets used in preference to the other one.
 
     // get all assemblies (dlls) in /bin
-    foreach (string filename in System.IO.Directory.EnumerateFiles(System.IO.Path.GetDirectoryName(typeof(AssemblyLoader).Assembly.Location), "*.dll", System.IO.SearchOption.AllDirectories))
+    string binariesFolder = System.IO.Path.GetDirectoryName(typeof(AssemblyLoader).Assembly.Location);
+    foreach (string filename in System.IO.Directory.EnumerateFiles(binariesFolder, "*.dll", System.IO.SearchOption.TopDirectoryOnly))
+    {
+      if (!IsExcludedAssembly(filename))
+      {
+        yield return FolderOptions.NormalizePath(filename);
+      }
+    }
+
+    // get all assemblies (dlls) in /bin/runtimes/**
+    string runtimesFolder = System.IO.Path.Join(System.IO.Path.GetDirectoryName(typeof(AssemblyLoader).Assembly.Location), "runtimes");
+    foreach (string filename in System.IO.Directory.EnumerateFiles(runtimesFolder, "*.dll", System.IO.SearchOption.AllDirectories))
     {
       if (!IsExcludedAssembly(filename))
       {
@@ -403,7 +414,7 @@ public class AssemblyLoader
 
     if (System.IO.Directory.Exists(extensionsFolder))
     {
-      // get all extension assemblies (dlls) in /extensions/*
+      // get all extension assemblies (dlls) in /extensions/**
       foreach (string foldername in System.IO.Directory.EnumerateFiles(extensionsFolder, "*.dll", System.IO.SearchOption.AllDirectories))
       {
         yield return FolderOptions.NormalizePath(foldername);

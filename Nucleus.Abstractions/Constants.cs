@@ -105,7 +105,7 @@ public static class RoutingConstants
   /// Routes in the reserved routes list can't be used as page routes.
   /// </remarks>
   // the "pages" route isn't currently used for anything, but is reserved in case we want to use it later
-  public static readonly string[] RESERVED_ROUTES = [ADMIN_ROUTE_PATH_PREFIX, EXTENSIONS_ROUTE_PATH_PREFIX, "pages", "oauth2", SITEMAP_ROUTE_PATH, ERROR_ROUTE_PATH, API_ROUTE_PATH_PREFIX];
+  public static readonly string[] RESERVED_ROUTES = [ADMIN_ROUTE_PATH_PREFIX, EXTENSIONS_ROUTE_PATH_PREFIX, FILES_ROUTE_PATH_PREFIX, "pages", "oauth2", SITEMAP_ROUTE_PATH, ERROR_ROUTE_PATH, API_ROUTE_PATH_PREFIX];
 }
 
 /// <summary>

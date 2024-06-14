@@ -57,7 +57,7 @@
 			  {
 				  <div class="search-result">
             <div>
-              <a class="result-link" href="@result.Url" title="@result.Title?.Trim()">@result.Title?.Trim()</a>
+              <a class="result-link" href="@Url.Content("~" + result.Url)" title="@result.Title?.Trim()">@result.Title?.Trim()</a>
               @if (Model.Settings.ShowType && !String.IsNullOrEmpty(result.Type))
               {
                 <span class="fst-italic small text-muted result-type">@result.Type</span>

@@ -92,9 +92,14 @@ public static class AddScriptHtmlHelper
     public const int EARLY = -1000;
 
     /// <summary>
+    /// Default sort order for well-known scripts.
+    /// </summary>
+    public const int WELLKNOWN = 0;
+
+    /// <summary>
     /// Default.
     /// </summary>
-    public const int DEFAULT = 0;
+    public const int DEFAULT = 100;
 
     /// <summary>
     /// Place the script late in the script order.
@@ -171,7 +176,7 @@ public static class AddScriptHtmlHelper
   /// <param name="isAsync"></param>
   private static IHtmlContent AddWellKnownScript(IHtmlHelper htmlHelper, string script, Boolean isAsync)
   {
-    return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(htmlHelper.ResolveExtensionUrl(script)), isAsync, false, WellKnownScriptOrders.DEFAULT, GetCoreVersion());
+    return AddScript(htmlHelper.ViewContext.HttpContext, new Microsoft.AspNetCore.Mvc.Routing.UrlHelper(htmlHelper.ViewContext).Content(htmlHelper.ResolveExtensionUrl(script)), isAsync, false, WellKnownScriptOrders.WELLKNOWN, GetCoreVersion());
   }
 
   /// <summary>

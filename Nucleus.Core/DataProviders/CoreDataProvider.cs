@@ -474,7 +474,8 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
           EF.Functions.Like(page.Name, $"%{searchTerm}%") ||
           EF.Functions.Like(page.Title, $"%{searchTerm}%") ||
           EF.Functions.Like(page.Description, $"%{searchTerm}%") ||
-          EF.Functions.Like(page.Keywords, $"%{searchTerm}%")
+          EF.Functions.Like(page.Keywords, $"%{searchTerm}%") ||
+          page.Modules.Any(module => EF.Functions.Like(module.Title, $"%{searchTerm}%")) 
         )
         &&
         (
@@ -485,7 +486,7 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
       );
 
     pagingSettings.TotalCount = await query
-        .CountAsync();
+      .CountAsync();
 
     results = await query
     .Include(page => page.LayoutDefinition)

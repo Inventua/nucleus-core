@@ -301,7 +301,7 @@ expressed as a time span (hh:mm:ss).
 Nucleus core cache keys are PageCache, PageRouteCache, PageMenuCache, MailTemplateCache, PageModuleCache, RoleCache, RoleGroupCache, 
 ScheduledTaskCache, SiteCache, SiteDetectCache, UserCache, FolderCache, ListCache, ContentCache, SessionCache.  Extensions may cache 
 values, refer to each extension's documentation for the cache key name.  If configuration values are omitted, the default capacity is 
-1000, and expiry time is 5 minutes.
+1000, and expiry time is 5 minutes. You can view a list of caches and their configured values in the System control panel / cache tab.
 
 {.table-25-75}
 |                                  |                                                                                      |
@@ -312,12 +312,14 @@ values, refer to each extension's documentation for the cache key name.  If conf
 ```
 "Nucleus":
   ...
-  "PageCache": {
-    "Capacity": 500,
-    "ExpiryTime": "00:15:00"
-  },
-  "PageModuleCache": {
-    "Capacity": 2000,
-    "ExpiryTime": "00:15:00"
+  "CacheOptions": {
+    "PageCache": {
+      "Capacity": 500,
+      "ExpiryTime": "00:15:00"
+    },
+    "PageModuleCache": {
+      "Capacity": 2000,
+      "ExpiryTime": "00:15:00"
+    }
   }
 ```

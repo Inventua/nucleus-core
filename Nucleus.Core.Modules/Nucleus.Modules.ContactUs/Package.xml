@@ -20,17 +20,21 @@
       </moduleDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />
+      <folder name="bin">
+        <file name="Nucleus.Modules.ContactUs.dll" />
+      </folder>
+      <!-- place files in cleanup element -->
       <file name="viewer.js" />
       <file name="viewer.min.js" />
       <file name="settings.css" />
       <file name="settings.min.css" />
-      <folder name="Bin">
-        <file name="Nucleus.Modules.ContactUs.dll" />
-      </folder>
       <folder name="Views">
         <file name="Viewer.cshtml" />
         <file name="Settings.cshtml" />
       </folder>
+      <!-- end files -->
+      <cleanup>
+      </cleanup>
     </component>
   </components>
 </package>

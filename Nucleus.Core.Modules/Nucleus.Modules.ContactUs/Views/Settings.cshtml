@@ -24,7 +24,7 @@
       </div>
 
       <div class="nucleus-flex-fields">
-        <div>
+        <div class="ShowSetting">
           <h2 class="flex-grow-1">Visibility</h2>
           <SettingsControl caption="Show Name?" class="inner-inline" rendermode="LabelLast" helptext="Show the first name and last name fields.">
             @Html.CheckBoxFor(model => model.ShowName, new { @class = "ToggleSwitch" })
@@ -47,7 +47,7 @@
           </SettingsControl>
         </div>
 
-        <div>
+        <div class="RequireSetting">
           <h2 class="flex-grow-1">Required</h2>
           <SettingsControl caption="Require Name?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the first name and last name fields are mandatory.">
             @Html.CheckBoxFor(model => model.RequireName, new { @class = "ToggleSwitch" })

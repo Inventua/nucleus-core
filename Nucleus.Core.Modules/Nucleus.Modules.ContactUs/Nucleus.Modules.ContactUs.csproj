@@ -7,6 +7,7 @@
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -30,6 +31,7 @@
     <None Remove="Views\Email Template Sample.cshtml" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
+    <None Remove="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,10 +40,11 @@
     <Content Include="readme.txt" />
     <Content Include="settings.css" />
     <Content Include="settings.min.css" />
-    <Content Include="viewer.js" />
+    <EmbeddedResource Include="viewer.js" />
     <Content Include="viewer.min.js" />
     <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />
+    <Content Include="_ViewImports.cshtml" />
   </ItemGroup>
 
 	<ItemGroup>

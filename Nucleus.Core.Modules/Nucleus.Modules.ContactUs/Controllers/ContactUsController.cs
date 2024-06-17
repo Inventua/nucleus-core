@@ -75,13 +75,13 @@ public class ContactUsController : Controller
 
 	private void Validate(ViewModels.Viewer viewModel, Models.Settings settings)
 	{
-		Validate(settings.RequireName, viewModel.Message.FirstName, MessagePropertyName(nameof(viewModel.Message.FirstName)), "Enter your first name.");
-		Validate(settings.RequireName, viewModel.Message.LastName, MessagePropertyName(nameof(viewModel.Message.LastName)), "Enter your last name.");
-		Validate(settings.RequirePhoneNumber, viewModel.Message.PhoneNumber, MessagePropertyName(nameof(viewModel.Message.PhoneNumber)), "Enter your phone number.");
-		Validate(settings.RequireCompany, viewModel.Message.Company, MessagePropertyName(nameof(viewModel.Message.Company)), "Enter your company name.");
+		Validate(settings.RequireName && settings.ShowName, viewModel.Message.FirstName, MessagePropertyName(nameof(viewModel.Message.FirstName)), "Enter your first name.");
+		Validate(settings.RequireName && settings.ShowName, viewModel.Message.LastName, MessagePropertyName(nameof(viewModel.Message.LastName)), "Enter your last name.");
+		Validate(settings.RequirePhoneNumber && settings.ShowPhoneNumber, viewModel.Message.PhoneNumber, MessagePropertyName(nameof(viewModel.Message.PhoneNumber)), "Enter your phone number.");
+		Validate(settings.RequireCompany && settings.ShowCompany, viewModel.Message.Company, MessagePropertyName(nameof(viewModel.Message.Company)), "Enter your company name.");
 
-		Validate(settings.RequireCategory, viewModel.Message.Category, MessagePropertyName(nameof(viewModel.Message.Category)), "Select a message category.");
-		Validate(settings.RequireSubject, viewModel.Message.Subject, MessagePropertyName(nameof(viewModel.Message.Subject)), "Enter the subject of your message.");
+		Validate(settings.RequireCategory && settings.ShowCategory, viewModel.Message.Category, MessagePropertyName(nameof(viewModel.Message.Category)), "Select a message category.");
+		Validate(settings.RequireSubject && settings.ShowSubject, viewModel.Message.Subject, MessagePropertyName(nameof(viewModel.Message.Subject)), "Enter the subject of your message.");
   }
 
   [HttpPost]

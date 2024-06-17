@@ -53,7 +53,7 @@
     Default: C:\ProgramData\Nucleus
     Specifies the folder where Nucleus stores data.
   .PARAMETER NetCoreVersion
-    Default: 8.0.4
+    Default: 8.0.6
     Specifies the version of ASP.NET Core to check for and install if required.
   .PARAMETER Environment
     Default: Production
@@ -80,7 +80,7 @@ param (
 		[string]$ApplicationPool = "",
 		[string]$Path = "",
 		[string]$DataPath = "C:\ProgramData\Nucleus",
-		[string]$NetCoreVersion = "8.0.4",
+		[string]$NetCoreVersion = "8.0.6",
     [string]$Environment = "Production",
     [string]$ZipFile = "detect",
     [switch]$OverwriteExisting = $false,
@@ -329,7 +329,7 @@ class Application
   # That is, NetCoreVersion is not set to anm empty string, and the specified version is not already installed
   [boolean]DoInstallAspNet()
   {
-    return (($this.NetCoreVersion -ne "") -and (-not ($this.IsDotNetInstalled)))
+    return (($this.NetCoreVersion -ne "") -and (-not ($this.IsDotNetInstalled())))
   }
 
   # return whether the application pool exists

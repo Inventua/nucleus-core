@@ -40,7 +40,7 @@ public static class PluginExtensions
 
     builder.Services.Configure<RazorViewEngineOptions>(options =>
     {
-      options.ViewLocationExpanders.Add(new ExtensionViewLocationExpander());      
+      options.ViewLocationExpanders.Add(new ExtensionViewLocationExpander());
     });
 
     ConfigureRazorRuntimeCompilation(builder);
@@ -216,8 +216,8 @@ public static class PluginExtensions
         Nucleus.Abstractions.ControlPanelAttribute controlPanelAttr = assembly.GetCustomAttribute<Nucleus.Abstractions.ControlPanelAttribute>();
         if (controlPanelAttr != null)
         {
-          requestPath = controlPanelAttr.ResourcesRootPath;          
-          providers.Add(AddFileProvider(app, new ManifestEmbeddedFileProvider(assembly, "/"), requestPath != "/" ? requestPath : null ));
+          requestPath = controlPanelAttr.ResourcesRootPath;
+          providers.Add(AddFileProvider(app, new ManifestEmbeddedFileProvider(assembly, "/"), requestPath != "/" ? requestPath : null));
 
           logEntries.Add($"{assembly.LogName()}, path: '{requestPath}'");
         }
@@ -240,8 +240,8 @@ public static class PluginExtensions
     // is used to handle all extensions with embedded files.
     if (extensions.Count != 0)
     {
-      providers.Add(AddFileProvider(app, new Nucleus.Core.FileProviders.NucleusExtensionManifestEmbeddedFileProvider(extensions), null));      
-    }     
+      providers.Add(AddFileProvider(app, new Nucleus.Core.FileProviders.NucleusExtensionManifestEmbeddedFileProvider(extensions), null));
+    }
 
     if (env.ContentRootFileProvider is CompositeFileProvider compositeFileProvider)
     {
@@ -255,13 +255,13 @@ public static class PluginExtensions
     env.ContentRootFileProvider = new CompositeFileProvider(providers);
 
     app.Logger()?.LogInformation("Added embedded files from: {log}.", String.Join(", ", logEntries));
-    
-    return app;  
+
+    return app;
   }
 
   private static Boolean IsNucleusExtension(Assembly assembly)
   {
-    return AssemblyLoader.GetTypesWithAttribute<Nucleus.Abstractions.ExtensionAttribute>(assembly).Any();    
+    return AssemblyLoader.GetTypesWithAttribute<Nucleus.Abstractions.ExtensionAttribute>(assembly).Any();
   }
 
   private static IFileProvider AddFileProvider(IApplicationBuilder app, IFileProvider provider, string requestPath)
@@ -304,11 +304,21 @@ public static class PluginExtensions
     {
       logEntries.Add(assembly.LogName());
 
+      string assemblyLocation = assembly.Location;
+      string extensionFolder = AssemblyLoader.GetExtensionFolderName(assemblyLocation);
+
       foreach (ApplicationPart part in CompiledRazorAssemblyApplicationPartFactory.GetDefaultApplicationParts(assembly))
       {
-        if (!ApplicationPartContains(builder, part))
+        // for assemblies which are not in an extension folder, use the normal ApplicationPart instance returned by GetDefaultApplicationParts()
+
+        // for assemblies which ARE in an extension folder, use an instance of our own ApplicationPart class (ExtensionCompiledRazorApplicationPart),
+        // which overrides the CompiledItems property to use our ExtensionRazorCompiledItemLoader, which has the end result of adding an
+        // /Extensions/extension-folder prefix to the identifier property of each RazorCompiledItem returned, so that the "path" of compiled razor
+        // items matches the path which is expected by Plugins.ExtensionViewLocationExpander.  See comments in ExtensionRazorCompiledItem.cs.
+        ApplicationPart razorPart = String.IsNullOrEmpty(extensionFolder) ? part : new ExtensionCompiledRazorApplicationPart(assembly);
+        if (!ApplicationPartContains(builder, razorPart))
         {
-          builder.PartManager.ApplicationParts.Add(part);
+          builder.PartManager.ApplicationParts.Add(razorPart);
         }
       }
     }

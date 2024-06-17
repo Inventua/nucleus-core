@@ -1,6 +1,7 @@
 ﻿.StaticContent pre
 {
   white-space: pre-wrap;
+  position: relative;  /* this is so that copy buttons are positioned relative to their containing pre block */
 }
 
 .StaticContent .nucleus-copy-button

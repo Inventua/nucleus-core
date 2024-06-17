@@ -138,7 +138,7 @@ public class ContactUsController : Controller
 
     if (this.Context != null && this.Context.Site != null)
 		{
-      if (viewModel.Message.Category.Id != Guid.Empty)
+      if (viewModel.Message.Category != null && viewModel.Message.Category.Id != Guid.Empty)
       {
         viewModel.Message.Category = await this.ListManager.GetListItem(viewModel.Message.Category.Id);
       }

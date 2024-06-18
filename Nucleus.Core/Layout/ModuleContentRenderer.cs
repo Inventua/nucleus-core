@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Loader;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
@@ -33,22 +34,44 @@ public class ModuleContentRenderer : IModuleContentRenderer
   private IPageModuleManager PageModuleManager { get; }
   private IPageManager PageManager { get; }
 
+  // IActionDescriptorCollectionProvider is a singleton so we can get the instance in our constructor
+  // (reference: https://github.com/dotnet/aspnetcore/blob/42925a4cebf501fd00aae1a1e899a969b4a2bd9a/src/Mvc/Mvc.Core/src/DependencyInjection/MvcCoreServiceCollectionExtensions.cs#L155)
+  private IActionDescriptorCollectionProvider ActionDescriptorProvider { get; }
+
+  // IActionInvokerFactory is a singleton so we can get the instance in our constructor
+  // (reference: https://github.com/dotnet/aspnetcore/blob/42925a4cebf501fd00aae1a1e899a969b4a2bd9a/src/Mvc/Mvc.Core/src/DependencyInjection/MvcCoreServiceCollectionExtensions.cs#L187)
+  private IActionInvokerFactory ActionInvokerFactory { get; }
+
+  private Dictionary<string, ControllerActionDescriptor> ExtensionActionDescriptors { get; set; }
+
   private ILogger<ModuleContentRenderer> Logger { get; }
 #if DEBUG
   private Histogram<float> ModulesRenderedHistogram { get; }
 #endif
   private static readonly RecyclableMemoryStreamManager RecyclableMemoryStreamManager = new();
 
-  public ModuleContentRenderer(IPageManager pageManager, IPageModuleManager pageModuleManager, IMeterFactory meterFactory, ILogger<ModuleContentRenderer> logger)
+  public ModuleContentRenderer(IActionDescriptorCollectionProvider actionDescriptorProvider, IActionInvokerFactory actionInvokerFactory, IPageManager pageManager, IPageModuleManager pageModuleManager, IMeterFactory meterFactory, ILogger<ModuleContentRenderer> logger)
   {
+    this.ActionDescriptorProvider = actionDescriptorProvider;
+    this.ActionInvokerFactory = actionInvokerFactory;
+
     this.PageManager = pageManager;
     this.PageModuleManager = pageModuleManager;
     this.Logger = logger;
 #if DEBUG
     // dotnet-counters monitor -n Nucleus.Web --counters nucleus.perf --showDeltas --maxHistograms 200
     Meter performancedMeter = meterFactory.Create("nucleus.perf", typeof(ModuleContentRenderer).Assembly.GetName().Version.ToString());
-    this.ModulesRenderedHistogram = performancedMeter.CreateHistogram<float>("nucleus.perf.rendering.modules", description: "Nucleus modules render performance.", unit: "ms");    
+    this.ModulesRenderedHistogram = performancedMeter.CreateHistogram<float>("nucleus.perf.rendering.modules", description: "Nucleus modules render performance.", unit: "ms");
 #endif
+
+
+    Microsoft.Extensions.Primitives.IChangeToken changeToken = (actionDescriptorProvider as ActionDescriptorCollectionProvider)?.GetChangeToken();
+    changeToken?.RegisterChangeCallback((state) => ResetExtensionActionDescriptorsCache(state), null);
+  }
+
+  private void ResetExtensionActionDescriptorsCache(object state)
+  {
+    ExtensionActionDescriptors = null;
   }
 
   /// <summary>
@@ -80,7 +103,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
         .Where(module => paneName == "*" || module.Pane.Equals(paneName, StringComparison.OrdinalIgnoreCase));
 
     // if the pane is empty and the user is editing, add a "move module" drag target to the start of the pane
-    if (!modules.Any() && isEditing)
+    if (isEditing && !modules.Any())
     {
       output.AppendHtml(Nucleus.Extensions.PageModuleExtensions.BuildMoveDropTarget(null, paneName, $"Move to {paneName}"));
     }
@@ -113,7 +136,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
         }
       }
 
-      // if the pane is not empty, add a "move module" drag target to the end of the pane
+      // if the user is editing, add a "move module" drag target to the end of the pane
       if (isEditing)
       {
         output.AppendHtml(Nucleus.Extensions.PageModuleExtensions.BuildMoveDropTarget(null, paneName, $"Move to end of {paneName}"));
@@ -133,7 +156,8 @@ public class ModuleContentRenderer : IModuleContentRenderer
   /// <returns></returns>
   public async Task<IHtmlContent> RenderModuleView(ViewContext viewContext, Site site, Page page, PageModule moduleInfo, LocalPath localPath, Boolean renderContainer)
   {
-    IActionInvokerFactory actionInvokerFactory = viewContext.HttpContext.RequestServices.GetService<IActionInvokerFactory>();
+    // IHttpContextFactory is transient so we need to get it every time we want to use it
+    // https://github.com/dotnet/aspnetcore/blob/42925a4cebf501fd00aae1a1e899a969b4a2bd9a/src/Hosting/Hosting/src/WebHostBuilder.cs#L292
     IHttpContextFactory httpContextFactory = viewContext.HttpContext.RequestServices.GetService<IHttpContextFactory>();
 
     HtmlContentBuilder output = new();
@@ -141,7 +165,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
 
     if (user.HasViewPermission(site, page, moduleInfo))
     {
-      HttpResponse moduleOutput = await BuildModuleOutput(httpContextFactory, actionInvokerFactory, viewContext, site, page, moduleInfo, localPath, moduleInfo.ModuleDefinition.ViewController, moduleInfo.ModuleDefinition.ViewAction, renderContainer);
+      HttpResponse moduleOutput = await BuildModuleOutput(httpContextFactory, viewContext, site, page, moduleInfo, localPath, moduleInfo.ModuleDefinition.ViewController, moduleInfo.ModuleDefinition.ViewAction, renderContainer);
 
       if (moduleOutput.StatusCode == (int)System.Net.HttpStatusCode.PermanentRedirect)
       {
@@ -161,7 +185,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
             Page redirectPage = await this.PageManager.Get(redirectModuleInfo.PageId);
             if (user.HasViewPermission(site, redirectPage, redirectModuleInfo))
             {
-              moduleOutput = await BuildModuleOutput(httpContextFactory, actionInvokerFactory, viewContext, site, redirectPage, redirectModuleInfo, localPath, redirectModuleInfo.ModuleDefinition.ViewController, redirectModuleInfo.ModuleDefinition.ViewAction, renderContainer);
+              moduleOutput = await BuildModuleOutput(httpContextFactory, viewContext, site, redirectPage, redirectModuleInfo, localPath, redirectModuleInfo.ModuleDefinition.ViewController, redirectModuleInfo.ModuleDefinition.ViewAction, renderContainer);
             }
             else
             {
@@ -190,11 +214,11 @@ public class ModuleContentRenderer : IModuleContentRenderer
 
       Boolean isEditing = user.IsEditing(viewContext.HttpContext, site, page, moduleInfo);
 
+      // modules can return NoContent to indicate that they have nothing to display, and should not be rendered (including that 
+      // their container is not rendered).  We check to see if the user is editing the page & ignore NoContent so that editors
+      // can always edit settings.        
       if (moduleOutput.StatusCode == (int)System.Net.HttpStatusCode.NoContent && !isEditing)
       {
-        // modules can return NoContent to indicate that they have nothing to display, and should not be rendered (including that 
-        // their container is not rendered).  We check to see if the user is editing the page & ignore NoContent so that editors
-        // can always edit settings.        
         moduleOutput.StatusCode = (int)System.Net.HttpStatusCode.OK;
         return output;
       }
@@ -208,11 +232,12 @@ public class ModuleContentRenderer : IModuleContentRenderer
       {
         if (isEditing && user.IsSiteAdmin(site))
         {
+          // an admin user is editing, and the module has admin permissions only, show a "Visible by Administrators only" warning
           moduleView.AddCssClass("nucleus-adminviewonly");
         }
         else
         {
-          // suppress display of modules with no permissions when an admin is not in editing mode
+          // suppress display of modules with admin-only permissions when the user is not editing or is not an admin
           moduleOutput.StatusCode = (int)System.Net.HttpStatusCode.OK;
           return output;
         }
@@ -225,6 +250,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
 
       if (isEditing)
       {
+        // add editing controls
         moduleView.AddCssClass("nucleus-module-editing");
 
         moduleView.InnerHtml.AppendHtml(moduleInfo.BuildMoveDropTarget(moduleInfo.Pane, "Move here"));
@@ -292,12 +318,13 @@ public class ModuleContentRenderer : IModuleContentRenderer
   /// <returns></returns>
   public async Task<IHtmlContent> RenderModuleEditor(ViewContext viewContext, Site site, Page page, PageModule moduleInfo, LocalPath localPath, Boolean renderContainer)
   {
-    IActionInvokerFactory actionInvokerFactory = viewContext.HttpContext.RequestServices.GetService<IActionInvokerFactory>();
+    // IHttpContextFactory is transient so we need to get it every time we want to use it
+    // https://github.com/dotnet/aspnetcore/blob/42925a4cebf501fd00aae1a1e899a969b4a2bd9a/src/Hosting/Hosting/src/WebHostBuilder.cs#L292
     IHttpContextFactory httpContextFactory = viewContext.HttpContext.RequestServices.GetService<IHttpContextFactory>();
 
     if (moduleInfo.ModuleDefinition.EditAction != null && viewContext.HttpContext.User.HasEditPermission(site, page, moduleInfo))
     {
-      HttpResponse moduleOutput = await BuildModuleOutput(httpContextFactory, actionInvokerFactory, viewContext, site, page, moduleInfo, localPath, String.IsNullOrEmpty(moduleInfo.ModuleDefinition.SettingsController) ? moduleInfo.ModuleDefinition.ViewController : moduleInfo.ModuleDefinition.SettingsController, moduleInfo.ModuleDefinition.EditAction, renderContainer);
+      HttpResponse moduleOutput = await BuildModuleOutput(httpContextFactory, viewContext, site, page, moduleInfo, localPath, String.IsNullOrEmpty(moduleInfo.ModuleDefinition.SettingsController) ? moduleInfo.ModuleDefinition.ViewController : moduleInfo.ModuleDefinition.SettingsController, moduleInfo.ModuleDefinition.EditAction, renderContainer);
 
       return ToHtmlContent(moduleOutput);
     }
@@ -318,15 +345,12 @@ public class ModuleContentRenderer : IModuleContentRenderer
   /// <remarks>
   /// Permissions checks should be done by the caller.
   /// </remarks>
-  private async Task<HttpResponse> BuildModuleOutput(IHttpContextFactory httpContextFactory, IActionInvokerFactory actionInvokerFactory, ViewContext viewContext, Site site, Page page, PageModule moduleinfo, LocalPath localPath, string controller, string action, Boolean RenderContainer)
+  private async Task<HttpResponse> BuildModuleOutput(IHttpContextFactory httpContextFactory, ViewContext viewContext, Site site, Page page, PageModule moduleinfo, LocalPath localPath, string controller, string action, Boolean RenderContainer)
   {
-    Context scopedContext;
-    IServiceProvider originalServiceProvider;
     HttpResponse response;
 
 #if DEBUG
     Stopwatch stopWatch = new();
-
     stopWatch.Start();
 #endif
 
@@ -336,7 +360,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
     {
       // We must store and restore the original newHttpContext.RequestServices, so that the main HttpContext.RequestServices 
       // object doesn't get disposed in between calls (when there are multiple modules on a page).
-      originalServiceProvider = newHttpContext.RequestServices;
+      IServiceProvider originalServiceProvider = newHttpContext.RequestServices;
 
       try
       {
@@ -344,8 +368,8 @@ public class ModuleContentRenderer : IModuleContentRenderer
         // executed, it gets DI objects from the module scope
         newHttpContext.RequestServices = moduleScope.ServiceProvider;
 
-        IActionDescriptorCollectionProvider actionDescriptorProvider = moduleScope.ServiceProvider.GetRequiredService<IActionDescriptorCollectionProvider>();
-        ControllerActionDescriptor actionDescriptor = BuildActionDescriptor(actionDescriptorProvider, controller, action, moduleinfo);
+        //IActionDescriptorCollectionProvider actionDescriptorProvider = moduleScope.ServiceProvider.GetRequiredService<IActionDescriptorCollectionProvider>();
+        ControllerActionDescriptor actionDescriptor = GetActionDescriptor(controller, action, moduleinfo);
 
         // Report common error (when the module definition is invalid)
         if (actionDescriptor == null || actionDescriptor.MethodInfo == null)
@@ -353,7 +377,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
           throw new InvalidOperationException($"Module Definition is invalid: Action '{action}' does not exist in extension '{moduleinfo.ModuleDefinition.Extension}', controller '{controller}'.");
         }
 
-        scopedContext = (Context)moduleScope.ServiceProvider.GetService(typeof(Context));
+        Context scopedContext = (Context)moduleScope.ServiceProvider.GetService(typeof(Context));
 
         // set context.Module to the module being processed
         scopedContext.Module = moduleinfo;
@@ -361,9 +385,9 @@ public class ModuleContentRenderer : IModuleContentRenderer
         scopedContext.Site = site;
         scopedContext.LocalPath = localPath;
 
-        using (System.Runtime.Loader.AssemblyLoadContext.ContextualReflectionScope scope = Nucleus.Core.Plugins.AssemblyLoader.EnterExtensionContext(moduleinfo.ModuleDefinition.Extension, actionDescriptor.ControllerTypeInfo.AssemblyQualifiedName))
+        using (AssemblyLoadContext.ContextualReflectionScope scope = Plugins.AssemblyLoader.EnterExtensionContext(moduleinfo.ModuleDefinition.Extension, actionDescriptor.ControllerTypeInfo.AssemblyQualifiedName))
         {
-          await BuildContent(newHttpContext, actionInvokerFactory, actionDescriptor);
+          await BuildContent(newHttpContext, actionDescriptor);
         }
 
         // Restore the original service provider before moduleScope is disposed to prevent it from also being disposed
@@ -371,7 +395,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
 
         if (RenderContainer)
         {
-          response = await BuildContainerOutput(actionInvokerFactory, site, page, localPath, moduleinfo, newHttpContext);
+          response = await BuildContainerOutput(site, page, localPath, moduleinfo, newHttpContext);
         }
         else
         {
@@ -382,8 +406,8 @@ public class ModuleContentRenderer : IModuleContentRenderer
 
         this.ModulesRenderedHistogram.Record((float)stopWatch.ElapsedTicks / Stopwatch.Frequency * 1000,  // ms with decimals
           new KeyValuePair<string, object>("module.title", scopedContext.Module?.Title),
-          new KeyValuePair<string, object>("module.id", scopedContext.Module?.Id),
-          new KeyValuePair<string, object>("module.type", scopedContext.Module?.ModuleDefinition?.FriendlyName),
+          //new KeyValuePair<string, object>("module.id", scopedContext.Module?.Id),
+          new KeyValuePair<string, object>("module.type", $"{scopedContext.Module?.ModuleDefinition?.Extension}:{scopedContext.Module?.ModuleDefinition?.FriendlyName}"),
           new KeyValuePair<string, object>("request.path", viewContext.HttpContext.Request.Path));
 #endif
         return response;
@@ -406,7 +430,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
   /// <remarks>
   /// The rendered output of a container includes the module output.
   /// </remarks>
-  private static async Task<HttpResponse> BuildContainerOutput(IActionInvokerFactory actionInvokerFactory, Site site, Page page, LocalPath localPath, PageModule moduleinfo, HttpContext httpContext)
+  private async Task<HttpResponse> BuildContainerOutput(Site site, Page page, LocalPath localPath, PageModule moduleinfo, HttpContext httpContext)
   {
     ContainerContext scopedContainerContext;
     IServiceProvider originalServiceProvider;
@@ -444,7 +468,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
           .Where(descriptor => descriptor.ActionName.Equals(nameof(IContainerController.RenderContainer)))
           .FirstOrDefault();
 
-        await BuildContent(httpContext, actionInvokerFactory, actionDescriptor);
+        await BuildContent(httpContext, actionDescriptor);
 
         // Restore the original service provider before moduleScope is disposed to prevent it from also being disposed
         httpContext.RequestServices = originalServiceProvider;
@@ -467,31 +491,31 @@ public class ModuleContentRenderer : IModuleContentRenderer
   /// <param name="actionInvokerFactory"></param>
   /// <param name="actionDescriptor"></param>
   /// <returns></returns>
-  private static async Task BuildContent(HttpContext httpContext, IActionInvokerFactory actionInvokerFactory, ControllerActionDescriptor actionDescriptor)
+  private async Task BuildContent(HttpContext httpContext, ControllerActionDescriptor actionDescriptor)
   {
-    
-      // Populate the actionDescriptor.Parameters list with action (method) parameters so that they are bound.
-      // actionDescriptor.Parameters must be a new List, or actionDescriptor.Parameters.Add() will fail with a 
-      // 'Collection was of a fixed size' exception.
-      actionDescriptor.Parameters = actionDescriptor.MethodInfo.GetParameters().Select(param => new ParameterDescriptor() { Name = param.Name, ParameterType = param.ParameterType }).ToList();
+    // Populate the actionDescriptor.Parameters list with action (method) parameters.
+    // actionDescriptor.Parameters must be a new List, or actionDescriptor.Parameters.Add() will fail with a 
+    // 'Collection was of a fixed size' exception.
+    actionDescriptor.Parameters = actionDescriptor.MethodInfo.GetParameters()
+      .Select(param => new ParameterDescriptor() { Name = param.Name, ParameterType = param.ParameterType })
+      .ToList();
 
-      // We must create a new routeData object (don't use htmlHelper.ViewContext.RouteData), because we must provide the controller, area and
-      // action names for the module, rather than the route values for the original http request.
-      Microsoft.AspNetCore.Routing.RouteData routeData = new();
-      foreach (KeyValuePair<string, string> routeValue in actionDescriptor.RouteValues)
-      {
-        routeData.Values[routeValue.Key] = routeValue.Value;
-      }
+    // We must create a new routeData object (don't use htmlHelper.ViewContext.RouteData), because we must provide the controller, area and
+    // action names for the module, rather than the route values for the original http request.
+    Microsoft.AspNetCore.Routing.RouteData routeData = new();
+    foreach (KeyValuePair<string, string> routeValue in actionDescriptor.RouteValues)
+    {
+      routeData.Values[routeValue.Key] = routeValue.Value;
+    }
 
-      ActionContext actionContext = new(httpContext, routeData, actionDescriptor);
-      ControllerContext controllerContext = new(actionContext);
+    ActionContext actionContext = new(httpContext, routeData, actionDescriptor);
+    ControllerContext controllerContext = new(actionContext);
 
-      // we catch the module's rendered output in a memory stream so that we can add it to the page output
-      httpContext.Response.Body = RecyclableMemoryStreamManager.GetStream();
+    // we catch the module's rendered output in a memory stream so that we can add it to the page output
+    httpContext.Response.Body = RecyclableMemoryStreamManager.GetStream();
 
-      // Create the controller and run the controller action
-      await actionInvokerFactory.CreateInvoker(controllerContext).InvokeAsync();
-    
+    // Create the controller and run the controller action
+    await this.ActionInvokerFactory.CreateInvoker(controllerContext).InvokeAsync();
   }
 
   /// <summary>
@@ -501,7 +525,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
   /// <returns></returns>
   private static Boolean HasAdminPermissionOnly(PageModule moduleInfo)
   {
-    return !(moduleInfo.InheritPagePermissions || moduleInfo.Permissions.Any());
+    return !(moduleInfo.InheritPagePermissions || moduleInfo.Permissions.Count != 0);
   }
 
   /// <summary>
@@ -513,16 +537,29 @@ public class ModuleContentRenderer : IModuleContentRenderer
   /// <param name="moduleinfo"></param>
   /// <returns></returns>
   /// <exception cref="InvalidOperationException"></exception>
-  private static ControllerActionDescriptor BuildActionDescriptor(IActionDescriptorCollectionProvider actionDescriptorProvider, string controllerName, string action, PageModule moduleinfo)
+  private ControllerActionDescriptor GetActionDescriptor(string controllerName, string action, PageModule moduleinfo)
   {
     ControllerActionDescriptor actionDescriptor = null;
-
+   
     if (!String.IsNullOrEmpty(controllerName))
     {
-      actionDescriptor = actionDescriptorProvider.ActionDescriptors.Items
-        .OfType<ControllerActionDescriptor>()
-        .Where(descriptor => IsMatch(descriptor, moduleinfo.ModuleDefinition.Extension, controllerName, action))
-        .FirstOrDefault();
+      IEnumerable<ControllerActionDescriptor> descriptors = this.ActionDescriptorProvider.ActionDescriptors.Items
+          .OfType<ControllerActionDescriptor>();
+
+      this.ExtensionActionDescriptors ??= new(descriptors.Count());
+
+      string key = $"{controllerName}::{action}()";
+      if (!this.ExtensionActionDescriptors.TryGetValue(key, out actionDescriptor))
+      {
+        actionDescriptor = descriptors
+          .Where(descriptor => IsMatch(descriptor, moduleinfo.ModuleDefinition.Extension, controllerName, action))
+          .FirstOrDefault();
+
+        if (actionDescriptor != null)
+        {
+          this.ExtensionActionDescriptors.TryAdd(key, actionDescriptor);
+        }
+      }
     }
 
     if (actionDescriptor == null)
@@ -536,7 +573,8 @@ public class ModuleContentRenderer : IModuleContentRenderer
   }
 
   /// <summary>
-  /// Returns whether the specified <paramref name="actionDescriptor"/> matches the specified <paramref name="controller"/>, <paramref name="action"/> and <paramref name="extension"/>.
+  /// Returns whether the specified <paramref name="actionDescriptor"/> matches the specified <paramref name="controller"/>, <paramref name="action"/> 
+  /// and <paramref name="extension"/>.
   /// </summary>
   /// <param name="actionDescriptor"></param>
   /// <param name="action"></param>
@@ -545,10 +583,17 @@ public class ModuleContentRenderer : IModuleContentRenderer
   /// <returns></returns>
   private static Boolean IsMatch(ControllerActionDescriptor actionDescriptor, string extension, string controller, string action)
   {
-    return
-      (new string[] { actionDescriptor.ControllerName, actionDescriptor.ControllerName + "Controller" }).Contains(controller) &&
-      actionDescriptor.ActionName.Equals(action) &&
-      actionDescriptor.RouteValues.ContainsKey("extension") && actionDescriptor.RouteValues["extension"]?.Equals(extension) == true;
+    if (actionDescriptor.RouteValues.TryGetValue("extension", out string actionExtension) && actionExtension != null)
+    {
+      return
+        (new string[] { actionDescriptor.ControllerName, actionDescriptor.ControllerName + "Controller" }).Contains(controller) &&
+        actionDescriptor.ActionName.Equals(action) &&
+        actionExtension.Equals(extension);
+    }
+    else
+    {
+      return false;
+    }
   }
 
   /// <summary>

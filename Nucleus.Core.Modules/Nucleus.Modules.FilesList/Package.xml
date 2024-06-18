@@ -4,8 +4,8 @@
   <version>2.0.0</version>
   <publisher name="Inventua" url="https://www.inventua.com" email="support@inventua.com" />
   <description>
-		The Files List module presents a list of downloadable files from the specified folder.
-	</description>
+    The Files List module presents a list of downloadable files from the specified folder.
+  </description>
   <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
   <components>
     <component folderName="FilesList" optional="false">
@@ -20,22 +20,27 @@
         <categories>Content</categories>
       </moduleDefinition>
       <file name="readme.txt" />
-      <file name="viewer.css" />
-      <file name="settings.css" />
+      
       <folder name="bin">
         <file name="Nucleus.Modules.FilesList.dll" />
       </folder>
-      <folder name="Views">
-        <file name="_ViewImports.cshtml" />
-        <file name="Viewer.cshtml" />
-        <file name="Settings.cshtml" />
-        <folder name="ViewerLayouts">
-          <file name="Table.cshtml" />
-          <file name="Ordered List.cshtml" />
-          <file name="Unordered List.cshtml" />
-          <file name="Tile.cshtml" />
+      
+      <cleanup>
+        <file name="viewer.css" />
+        <file name="settings.css" />
+
+        <folder name="Views">
+          <file name="_ViewImports.cshtml" />
+          <file name="Viewer.cshtml" />
+          <file name="Settings.cshtml" />
+          <folder name="ViewerLayouts">
+            <file name="Table.cshtml" />
+            <file name="Ordered List.cshtml" />
+            <file name="Unordered List.cshtml" />
+            <file name="Tile.cshtml" />
+          </folder>
         </folder>
-      </folder>
+      </cleanup>
     </component>
   </components>
 </package>

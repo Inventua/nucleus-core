@@ -28,7 +28,7 @@ for you, as well as [Visual Studio extensions](https://marketplace.visualstudio.
     <component folderName="MyExtension" optional="false">
       <file name="myextension.css" />
       
-      <folder name="Bin">
+      <folder name="bin">
         <file name="MyExtension.dll" />        
       </folder>
       

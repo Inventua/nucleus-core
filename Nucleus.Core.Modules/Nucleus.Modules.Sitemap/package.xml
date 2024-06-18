@@ -22,7 +22,7 @@
       <file name="license.txt" />
       <file name="sitemap.css" />
       <file name="_ViewImports.cshtml" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.Modules.Sitemap.dll" />
       </folder>
       <folder name="Views">

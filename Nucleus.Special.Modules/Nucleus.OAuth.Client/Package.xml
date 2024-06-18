@@ -29,7 +29,7 @@
       <file name="license.txt" />
       <file name="viewer.css" />
       <file name="settings.css" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.OAuth.Client.dll" />
         <file name="Microsoft.AspNetCore.Authentication.Facebook.dll" />
         <file name="Microsoft.AspNetCore.Authentication.Google.dll" />

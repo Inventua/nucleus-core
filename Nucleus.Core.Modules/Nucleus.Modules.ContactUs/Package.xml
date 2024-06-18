@@ -24,7 +24,7 @@
       <file name="viewer.min.js" />
       <file name="settings.css" />
       <file name="settings.min.css" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.Modules.ContactUs.dll" />
       </folder>
       <folder name="Views">

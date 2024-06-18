@@ -6,14 +6,15 @@
 		<RootNamespace>Nucleus.Modules.Search</RootNamespace>
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+		<RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
-<ItemGroup>
+  <ItemGroup>
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
 		<None Remove="*.zip" />
@@ -36,12 +37,12 @@
 
   <ItemGroup>
     <Content Include="license.txt" />
-    <Content Include="viewer.css" />
+    <EmbeddedResource Include="viewer.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
-    <Content Include="Viewer.js" />
-    <Content Include="viewer.min.css" />
-    <Content Include="Viewer.min.js" />
+    <EmbeddedResource Include="Viewer.js" />
+    <EmbeddedResource Include="viewer.min.css" />
+    <EmbeddedResource Include="Viewer.min.js" />
     <Content Include="Views\_ViewerInput.cshtml" />
     <Content Include="Views\_PageMenu.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -56,6 +57,8 @@
     <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
     <PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0-rc1" />
     <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+    <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
   </ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

@@ -18,7 +18,7 @@
       </moduleDefinition>
       <file name="readme.txt" />
       <file name="settings.css" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.CopilotClient.dll" />
         <file name="Microsoft.Bot.Connector.DirectLine.dll" />
         <file name="Microsoft.Rest.ClientRuntime.dll" />

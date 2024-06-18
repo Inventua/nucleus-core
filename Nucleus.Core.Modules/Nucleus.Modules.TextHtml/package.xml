@@ -21,7 +21,7 @@
       </moduleDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.Modules.TextHtml.dll" />
       </folder>
       <folder name="Views">

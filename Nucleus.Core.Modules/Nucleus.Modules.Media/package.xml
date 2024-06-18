@@ -20,15 +20,19 @@
       </moduleDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />
-      <file name="_ViewImports.cshtml" />
-      <file name="media.css" />
-      <folder name="Bin">
+
+      <folder name="bin">
         <file name="Nucleus.Modules.Media.dll" />
       </folder>
-      <folder name="Views">
-        <file name="Viewer.cshtml" />
-        <file name="Settings.cshtml" />
-      </folder>
+      
+      <cleanup>
+        <file name="_ViewImports.cshtml" />
+        <file name="media.css" />
+        <folder name="Views">
+          <file name="Viewer.cshtml" />
+          <file name="Settings.cshtml" />
+        </folder>
+      </cleanup>
     </component>
   </components>
 </package>

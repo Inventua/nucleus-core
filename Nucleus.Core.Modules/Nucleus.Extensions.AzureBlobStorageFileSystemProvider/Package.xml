@@ -10,7 +10,7 @@
     <component folderName="AzureBlobStorageFileSystemProvider" optional="false">
       <file name="readme.txt" />
       <file name="license.txt" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.Extensions.AzureBlobStorageFileSystemProvider.dll" />
         <file name="System.IO.Hashing.dll" />
         <file name="Azure.Storage.Blobs.dll" />
@@ -19,7 +19,7 @@
         <file name="System.ClientModel.dll" />
       </folder>
       <cleanup>
-        <folder name="Bin">
+        <folder name="bin">
           <!-- these were shipped in an earlier version, but are not required because they are shipped with Nucleus 1.4.0 -->
           <file name="System.Memory.Data.dll" />
           <file name="Microsoft.Bcl.AsyncInterfaces.dll" />

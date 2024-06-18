@@ -6,14 +6,15 @@
 		<RootNamespace>Nucleus.Modules.IFrame</RootNamespace>
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+		<RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
   </PropertyGroup>
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
-<ItemGroup>
+  <ItemGroup>
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
 		<None Remove="*.zip" />
@@ -24,6 +25,11 @@
     <Content Include="**\*.js" />
     <Content Include="**\*.cshtml" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Content Remove="settings.css" />
+    <Content Remove="viewer.css" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="package.xml" />
@@ -33,11 +39,18 @@
   <ItemGroup>
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="settings.css" />
+    <EmbeddedResource Include="viewer.css" />
   </ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+    <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

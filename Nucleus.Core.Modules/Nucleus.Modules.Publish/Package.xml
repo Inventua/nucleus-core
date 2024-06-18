@@ -33,7 +33,7 @@
       <file name="viewer.css" />
       <file name="settings.css" />
       <file name="_ViewImports.cshtml" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.Modules.Publish.dll" />
       </folder>
       <folder name="Views">

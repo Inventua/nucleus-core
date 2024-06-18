@@ -21,7 +21,7 @@
       <file name="license.txt" />
       <file name="viewer.css" />
       <file name="viewer.min.css" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.XmlDocumentation.dll" />
       </folder>
       <folder name="Views">

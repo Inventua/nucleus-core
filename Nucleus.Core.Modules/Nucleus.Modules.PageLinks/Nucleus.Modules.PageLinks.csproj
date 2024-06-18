@@ -7,6 +7,8 @@
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<RazorCompileOnBuild>true</RazorCompileOnBuild>
+  <RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -23,6 +25,14 @@
     <Content Include="**\*.css" />
     <Content Include="**\*.js" />
     <Content Include="**\*.cshtml" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Remove="settings.css" />
+    <Content Remove="viewer.css" />
+    <Content Remove="viewer.js" />
+    <Content Remove="viewer.min.css" />
+    <Content Remove="viewer.min.js" />
   </ItemGroup>
   
   <ItemGroup>
@@ -43,6 +53,11 @@
 
   <ItemGroup>
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.00.json" />
+    <EmbeddedResource Include="settings.css" />
+    <EmbeddedResource Include="viewer.css" />
+    <EmbeddedResource Include="viewer.js" />
+    <EmbeddedResource Include="viewer.min.css" />
+    <EmbeddedResource Include="viewer.min.js" />
   </ItemGroup>
 
 	<ItemGroup>
@@ -50,6 +65,8 @@
 		<PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="2.0.0-rc1" />
 		<PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0-rc1" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+    <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

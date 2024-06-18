@@ -10,7 +10,7 @@
     <component folderName="AmazonS3FileSystemProvider" optional="false">
       <file name="readme.txt" />
       <file name="license.txt" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.Extensions.AmazonS3FileSystemProvider.dll" />
         <file name="AWSSDK.Core.dll" />
         <file name="AWSSDK.S3.dll" />

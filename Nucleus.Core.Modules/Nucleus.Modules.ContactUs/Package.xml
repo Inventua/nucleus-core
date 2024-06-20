@@ -20,17 +20,19 @@
       </moduleDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />
-      <file name="viewer.js" />
-      <file name="viewer.min.js" />
-      <file name="settings.css" />
-      <file name="settings.min.css" />
       <folder name="bin">
         <file name="Nucleus.Modules.ContactUs.dll" />
       </folder>
-      <folder name="Views">
-        <file name="Viewer.cshtml" />
-        <file name="Settings.cshtml" />
-      </folder>
+      <cleanup>
+        <file name="viewer.js" />
+        <file name="viewer.min.js" />
+        <file name="settings.css" />
+        <file name="settings.min.css" />
+        <folder name="Views">
+          <file name="Viewer.cshtml" />
+          <file name="Settings.cshtml" />
+        </folder>
+      </cleanup>
     </component>
   </components>
 </package>

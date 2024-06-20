@@ -7,6 +7,7 @@
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -37,12 +38,12 @@
     <Content Include="license.txt" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
-    <Content Include="settings.css" />
-    <Content Include="settings.min.css" />
-    <Content Include="viewer.js" />
-    <Content Include="viewer.min.js" />
-    <Content Include="Views\Viewer.cshtml" />
-    <Content Include="Views\Settings.cshtml" />
+    <EmbeddedResource Include="settings.css" />
+    <EmbeddedResource Include="settings.min.css" />
+    <EmbeddedResource Include="viewer.js" />
+    <EmbeddedResource Include="viewer.min.js" />
+    <EmbeddedResource Include="Views\Viewer.cshtml" />
+    <EmbeddedResource Include="Views\Settings.cshtml" />
     <Content Include="_ViewImports.cshtml" />
   </ItemGroup>
 
@@ -50,6 +51,8 @@
     <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
     <PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0-rc1" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+    <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

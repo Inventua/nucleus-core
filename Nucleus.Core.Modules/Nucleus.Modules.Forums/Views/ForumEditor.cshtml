@@ -169,29 +169,29 @@
     if (jQuery('#forum-properties .UseGroupSettings input[type=checkbox]').is(':checked'))
     {
       jQuery('#forum-properties .ForumSettings').css('opacity', '0.25');
-      jQuery('#forum-properties .ForumSettings *').attr('disabled', 'disabled');
+      jQuery('#forum-properties .ForumSettings *').prop('disabled', true);
 
       jQuery('#forum-permissions-select, #forum-permissions').css('opacity', '0.25');
-      jQuery('#forum-permissions-select, #forum-permissions').attr('disabled', 'disabled');
+      jQuery('#forum-permissions-select, #forum-permissions').prop('disabled', true);
     }
     else
     {
       jQuery('#forum-properties .ForumSettings').css('opacity', '1.0');
-      jQuery('#forum-properties .ForumSettings *').removeAttr('disabled');
+      jQuery('#forum-properties .ForumSettings *').prop('disabled', false);
 
       jQuery('#forum-permissions-select, #forum-permissions').css('opacity', '1.0');
-      jQuery('#forum-permissions-select, #forum-permissions').removeAttr('disabled');
+      jQuery('#forum-permissions-select, #forum-permissions').prop('disabled', false);
     }
 
     if (!jQuery('#forum-properties .AllowAttachments input[type=checkbox]').is(':checked'))
     {
       jQuery('#forum-properties .AttachmentsFolder').css('opacity', '0.25');
-      jQuery('#forum-properties .AttachmentsFolder *').attr('disabled', 'disabled');
+      jQuery('#forum-properties .AttachmentsFolder *').prop('disabled', true);
     }
     else
     {
       jQuery('#forum-properties .AttachmentsFolder').css('opacity', '1.0');
-      jQuery('#forum-properties .AttachmentsFolder *').removeAttr('disabled');
+      jQuery('#forum-properties .AttachmentsFolder *').prop('disabled', false);
     }
   }
 </script>

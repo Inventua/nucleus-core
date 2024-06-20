@@ -141,12 +141,12 @@
     if (!jQuery('#group-properties .AllowAttachments input[type=checkbox]').is(':checked'))
     {
       jQuery('#group-properties .AttachmentsFolder').css('opacity', '0.25');
-      jQuery('#group-properties .AttachmentsFolder *').attr('disabled', 'disabled');
+      jQuery('#group-properties .AttachmentsFolder *').prop('disabled', true);
     }
     else
     {
       jQuery('#group-properties .AttachmentsFolder').css('opacity', '1.0');
-      jQuery('#group-properties .AttachmentsFolder *').removeAttr('disabled');
+      jQuery('#group-properties .AttachmentsFolder *').prop('disabled', false);
     }
   }
 </script>

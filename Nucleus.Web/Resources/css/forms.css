@@ -71,12 +71,12 @@
     margin-bottom: 1px;
   }
 
-  .settings-control label.disabled
+  .settings-control label:disabled
   {
     opacity: 0.5;
   }
 
-  .settings-control input[type=text].disabled
+  .settings-control input[type=text]:disabled
   {
     opacity: 0.5;
     cursor: not-allowed;
@@ -88,11 +88,11 @@
     font-size: 0.95em;
   }
 
-    .settings-control input[type=checkbox]
-    {
-      font-size: 1em;
-      vertical-align: middle;
-    }
+  .settings-control input[type=checkbox]
+  {
+    font-size: 1em;
+    vertical-align: middle;
+  }
 
   .settings-control.inline, .settings-control.inline input, .settings-control.inline span
   {
@@ -137,7 +137,7 @@ table input[type=radio]
   }
 
 /* This section is mostly to override Safari/IOS styling of various elements */
-input[type=text], input[type=email], input[type=tel], input[type=search], input[type=url], input[type=password], select, textarea
+input[type=text], input[type=email], input[type=tel], input[type=search], input[type=url], input[type=password], input[type=number], select, textarea
 {
   padding: 0 0.25rem;
   border: solid 1px black;

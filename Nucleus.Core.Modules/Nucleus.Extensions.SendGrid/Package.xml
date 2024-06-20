@@ -15,9 +15,11 @@
         <file name="StarkbankEcdsa.dll" />
         <file name="SendGrid.dll" />
       </folder>
-      <folder name="Views">
-        <file name="_SendGridSettings.cshtml" />
-      </folder>
+      <cleanup>
+        <folder name="Views">
+          <file name="_SendGridSettings.cshtml" />
+        </folder>  
+      </cleanup>
     </component>
   </components>
 </package>

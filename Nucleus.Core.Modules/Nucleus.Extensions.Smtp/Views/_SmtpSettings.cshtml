@@ -1,4 +1,5 @@
 ﻿@model Nucleus.Extensions.Smtp.SmtpMailOptions
+@addTagHelper "*, Nucleus.ViewFeatures"
 <div class="nucleus-flex-fields">
   <SettingsControl caption="SMTP Host" helptext="SMTP server host name.">
     @Html.TextBoxFor(model => model.HostName)

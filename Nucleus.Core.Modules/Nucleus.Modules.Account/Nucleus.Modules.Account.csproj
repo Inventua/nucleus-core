@@ -5,7 +5,8 @@
 		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>    
   </PropertyGroup>
 
 	<ItemGroup>
@@ -41,14 +42,15 @@
 	  <None Remove="Views\SignupSettings.cshtml" />
 	  <None Remove="Views\UserProfile.cshtml" />
 	  <None Remove="Views\UserProfileSettings.cshtml" />
+	  <None Remove="_ViewImports.cshtml" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Content Include="license.txt" />
 	  <Content Include="package.xml" />
 	  <Content Include="readme.txt" />
-	  <Content Include="signup.js" />
-	  <Content Include="signup.min.js" />
+	  <EmbeddedResource Include="signup.js" />
+	  <EmbeddedResource Include="signup.min.js" />
 	  <Content Include="Views\ChangePassword.cshtml" />
 	  <Content Include="Views\ResetPassword.cshtml" />
 	  <Content Include="Views\Recover.cshtml" />
@@ -59,6 +61,7 @@
 	  <Content Include="Views\SignupSettings.cshtml" />
 	  <Content Include="Views\Signup.cshtml" />
 	  <Content Include="Views\Login.cshtml" />
+	  <Content Include="_ViewImports.cshtml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -66,6 +69,8 @@
 	  <PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0-rc1" />
 	  <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="8.0.5" />
+    <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

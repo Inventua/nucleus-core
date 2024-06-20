@@ -6,7 +6,8 @@
 		<RootNamespace>Nucleus.Modules.AcceptTerms</RootNamespace>
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -31,16 +32,18 @@
     <None Remove="settings.css" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
+    <None Remove="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="license.txt" />
-    <Content Include="viewer.css" />
+    <EmbeddedResource Include="viewer.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
-    <Content Include="settings.css" />
+    <EmbeddedResource Include="settings.css" />
     <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />
+    <Content Include="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,6 +55,8 @@
 		<PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="2.0.0-rc1" />
 		<PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0-rc1" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+    <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

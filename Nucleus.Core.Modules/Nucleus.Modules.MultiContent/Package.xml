@@ -4,8 +4,8 @@
   <version>2.0.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
-		Present content in various forms: alert, tabbed, carousel and accordion.
-	</description>
+    Present content in various forms: alert, tabbed, carousel and accordion.
+  </description>
   <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
   <components>
     <component folderName="MultiContent" optional="false">
@@ -20,33 +20,35 @@
       </moduleDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />
-      <file name="viewer.css" />
-      <file name="settings.css" />
       <folder name="bin">
         <file name="Nucleus.Modules.MultiContent.dll" />
       </folder>
-      <folder name="Views">
-        <file name="Viewer.cshtml" />
-        <file name="Settings.cshtml" />
-        <file name="_ContentList.cshtml" />
-        <file name="Editor.cshtml" />
-        <folder name="ViewerLayouts">
-          <file name="Accordion.cshtml" />
-          <file name="Alert.cshtml" />
-          <file name="Carousel.cshtml" />
-          <file name="Tabs.cshtml" />
-          <file name="Pills.cshtml" />
-          <file name="Faq.cshtml" />
+      <cleanup>
+        <file name="viewer.css" />
+        <file name="settings.css" />
+        <folder name="Views">
+          <file name="Viewer.cshtml" />
+          <file name="Settings.cshtml" />
+          <file name="_ContentList.cshtml" />
+          <file name="Editor.cshtml" />
+          <folder name="ViewerLayouts">
+            <file name="Accordion.cshtml" />
+            <file name="Alert.cshtml" />
+            <file name="Carousel.cshtml" />
+            <file name="Tabs.cshtml" />
+            <file name="Pills.cshtml" />
+            <file name="Faq.cshtml" />
+          </folder>
+          <folder name="LayoutSettings">
+            <file name="_AccordionSettings.cshtml" />
+            <file name="_AlertSettings.cshtml" />
+            <file name="_CarouselSettings.cshtml" />
+            <file name="_TabsSettings.cshtml" />
+            <file name="_PillsSettings.cshtml" />
+            <file name="_FaqSettings.cshtml" />
+          </folder>
         </folder>
-        <folder name="LayoutSettings">
-          <file name="_AccordionSettings.cshtml" />
-          <file name="_AlertSettings.cshtml" />
-          <file name="_CarouselSettings.cshtml" />
-          <file name="_TabsSettings.cshtml" />
-          <file name="_PillsSettings.cshtml" />
-          <file name="_FaqSettings.cshtml" />
-        </folder>
-      </folder>
+      </cleanup>
     </component>
   </components>
 </package>

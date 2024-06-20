@@ -14,7 +14,7 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
-<ItemGroup>
+  <ItemGroup>
 		<None Remove="**\*.vspscc" />
 		<None Remove="**\*.scc" />
 		<None Remove="*.zip" />
@@ -34,13 +34,15 @@
   </ItemGroup>
   
   <ItemGroup>
+    <None Remove="license.txt" />
     <None Remove="Views\ViewerLayouts\Ordered List.cshtml" />
     <None Remove="Views\ViewerLayouts\Table.cshtml" />
     <None Remove="Views\ViewerLayouts\Tile.cshtml" />
     <None Remove="Views\ViewerLayouts\Unordered List.cshtml" />
   </ItemGroup>
-
+    
   <ItemGroup>
+    <Content Include="license.txt" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
   </ItemGroup>
@@ -62,12 +64,13 @@
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
 	</ItemGroup>
-
+  
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>FilesList</ExtensionFolder>
 		<Version>2.0.0</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
     <CopyToDefaultSetup>false</CopyToDefaultSetup>
+    <NucleusEmbedViewerLayouts>true</NucleusEmbedViewerLayouts>
 	</PropertyGroup>
 
 	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />

@@ -4,8 +4,8 @@
   <version>2.0.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
-		Xml documentation viewer.
-	</description>
+    Xml documentation viewer.
+  </description>
   <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
   <components>
     <component folderName="XmlDocumentation" optional="false">
@@ -19,19 +19,21 @@
       </moduleDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />
-      <file name="viewer.css" />
-      <file name="viewer.min.css" />
       <folder name="bin">
         <file name="Nucleus.XmlDocumentation.dll" />
       </folder>
-      <folder name="Views">
-        <file name="Viewer.cshtml" />
-        <file name="_RenderClass.cshtml" />
-        <file name="_RenderMember.cshtml" />
-        <file name="_RenderMixedContent.cshtml" />
-        <file name="_RenderMixedContentTemplate.cshtml" />
-        <file name="Settings.cshtml" />
-      </folder>
+      <cleanup>
+        <file name="viewer.css" />
+        <file name="viewer.min.css" />
+        <folder name="Views">
+          <file name="Viewer.cshtml" />
+          <file name="_RenderClass.cshtml" />
+          <file name="_RenderMember.cshtml" />
+          <file name="_RenderMixedContent.cshtml" />
+          <file name="_RenderMixedContentTemplate.cshtml" />
+          <file name="Settings.cshtml" />
+        </folder>
+      </cleanup>
     </component>
   </components>
 </package>

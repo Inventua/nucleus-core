@@ -24,10 +24,12 @@
       <folder name="bin">
         <file name="Nucleus.Modules.TextHtml.dll" />
       </folder>
-      <folder name="Views">
-        <file name="Viewer.cshtml" />
-        <file name="Settings.cshtml" />
-      </folder>
+      <cleanup>        
+        <folder name="Views">
+          <file name="Viewer.cshtml" />
+          <file name="Settings.cshtml" />
+        </folder>
+      </cleanup>
     </component>
   </components>
 </package>

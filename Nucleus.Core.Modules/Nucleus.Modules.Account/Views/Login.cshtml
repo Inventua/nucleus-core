@@ -60,7 +60,6 @@
       <div class="mt-2 account-recover">
         @Html.LinkButton("", "Trouble logging in?", @Url.NucleusAction("Index", "Recover", "Account"), false, new
           {
-            @class = "ms-2",
             @returnurl = Model.ReturnUrl,
             @data_target = "form.parent()"
           })

@@ -27,6 +27,7 @@
     <None Remove="settings.css" />
     <None Remove="Views\AnalyticsScript.cshtml" />
     <None Remove="Views\Settings.cshtml" />
+    <None Remove="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,6 +38,7 @@
     <Content Include="settings.css" />
     <Content Include="Views\AnalyticsScript.cshtml" />
     <Content Include="Views\Settings.cshtml" />
+    <Content Include="_ViewImports.cshtml" />
   </ItemGroup>
 
 	<ItemGroup>

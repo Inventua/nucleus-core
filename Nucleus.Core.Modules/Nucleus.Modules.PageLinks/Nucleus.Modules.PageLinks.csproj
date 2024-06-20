@@ -39,6 +39,7 @@
     <None Remove="DataProviders\Migrations\Scripts\01.00.00.json" />
     <None Remove="viewer.js" />
     <None Remove="Views\_PageLinksList.cshtml" />
+    <None Remove="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

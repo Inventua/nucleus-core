@@ -42,6 +42,7 @@
     <None Remove="Views\ViewPost.cshtml" />
     <None Remove="Views\_ForumList.cshtml" />
     <None Remove="Views\_GroupPermissions.cshtml" />
+    <None Remove="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,6 +62,7 @@
     <Content Include="Views\ViewForum.cshtml" />
     <Content Include="Views\ListForums.cshtml" />
     <Content Include="Views\Settings.cshtml" />
+    <Content Include="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

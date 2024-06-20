@@ -6,8 +6,9 @@
 		<RootNamespace>Nucleus.Extensions.Smtp</RootNamespace>
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+		<RazorCompileOnBuild>true</RazorCompileOnBuild>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <!--<GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>-->
   </PropertyGroup>
 
 	<ItemGroup>
@@ -55,6 +56,9 @@
     <!-- https://github.com/dotnet/aspnetcore/issues/38892 (comment dated Dec 27, 2023) -->
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0" GeneratePathProperty="true" />
     <PackageReference Include="System.Formats.Asn1" Version="8.0.0" GeneratePathProperty="true" />
+    
+    <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
 	</ItemGroup>
 
   <!-- https://github.com/dotnet/aspnetcore/issues/38892 (comment dated Dec 27, 2023) -->

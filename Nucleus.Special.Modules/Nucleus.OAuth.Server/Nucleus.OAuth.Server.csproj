@@ -30,6 +30,7 @@
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\_ClientAppsList.cshtml" />
     <None Remove="Views\_PageMenu.cshtml" />
+    <None Remove="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,6 +45,7 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Include="Views\_PageMenu.cshtml" />
+    <Content Include="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

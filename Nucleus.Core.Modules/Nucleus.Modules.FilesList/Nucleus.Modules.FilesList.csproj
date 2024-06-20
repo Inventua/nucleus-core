@@ -6,7 +6,8 @@
 		<RootNamespace>Nucleus.Modules.FilesList</RootNamespace>
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -26,6 +27,9 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Content Remove="settings.css" />
+    <Content Remove="viewer.css" />
+    <Content Remove="viewer.min.css" />
     <Content Remove="Views\ViewerLayouts\Tile.css" />
   </ItemGroup>
   
@@ -46,9 +50,17 @@
     <Content Include="readme.txt" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="settings.css" />
+    <EmbeddedResource Include="viewer.css" />
+    <EmbeddedResource Include="viewer.min.css" />
+  </ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+    <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

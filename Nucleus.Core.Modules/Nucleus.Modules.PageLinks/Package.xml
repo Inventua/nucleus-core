@@ -3,8 +3,8 @@
   <version>2.0.0</version>
   <publisher name="Inventua" url="https://www.inventua.com" email="support@inventua.com" />
   <description>
-		Displays a list of link targets for the current page.
-	</description>
+    Displays a list of link targets for the current page.
+  </description>
   <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
   <components>
     <component folderName="PageLinks" optional="false">
@@ -19,19 +19,21 @@
         <categories>Navigation</categories>
       </moduleDefinition>
       <file name="readme.txt" />
-      <file name="viewer.css" />
-      <file name="settings.css" />
-      <file name="viewer.js" />
-      <file name="viewer.min.js" />
-      <file name="viewer.min.css" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.Modules.PageLinks.dll" />
       </folder>
-      <folder name="Views">
-        <file name="_PageLinksList.cshtml" />
-        <file name="Viewer.cshtml" />
-        <file name="Settings.cshtml" />
-      </folder>
+      <cleanup>
+        <file name="viewer.css" />
+        <file name="settings.css" />
+        <file name="viewer.js" />
+        <file name="viewer.min.js" />
+        <file name="viewer.min.css" />
+        <folder name="Views">
+          <file name="_PageLinksList.cshtml" />
+          <file name="Viewer.cshtml" />
+          <file name="Settings.cshtml" />
+        </folder>
+      </cleanup>
     </component>
   </components>
 </package>

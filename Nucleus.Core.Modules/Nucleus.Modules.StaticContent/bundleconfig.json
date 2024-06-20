@@ -1,8 +1,8 @@
 [
   {
-    "outputFileName": "viewer.min.js",
+    "outputFileName": "settings.min.css",
     "inputFiles": [
-      "viewer.js"
+      "settings.css"
     ]
   },
   {
@@ -12,9 +12,9 @@
     ]
   },
   {
-    "outputFileName": "settings.min.css",
+    "outputFileName": "viewer.min.js",
     "inputFiles": [
-      "settings.css"
+      "viewer.js"
     ]
   }
 ]

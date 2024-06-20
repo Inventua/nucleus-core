@@ -45,7 +45,7 @@
       <file name="license.txt" />
       <file name="signup.js" />
       <file name="signup.min.js" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.Modules.Account.dll" />
       </folder>
       <folder name="Views">

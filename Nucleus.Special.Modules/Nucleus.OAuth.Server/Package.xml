@@ -21,7 +21,7 @@
       <file name="readme.txt" />
       <file name="license.txt" />
       <file name="settings.css" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.OAuth.Server.dll" />
         <file name="System.IdentityModel.Tokens.Jwt.dll" />
         <file name="Microsoft.IdentityModel.Abstractions.dll" />

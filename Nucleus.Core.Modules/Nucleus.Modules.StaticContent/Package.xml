@@ -19,19 +19,24 @@
         <editAction>Settings</editAction>
         <categories>Content</categories>
       </moduleDefinition>
+      
       <file name="readme.txt" />
       <file name="license.txt" />
-      <file name="viewer.css" />
-      <file name="settings.css" />
-      <file name="viewer.js" />
-      <folder name="Bin">
+
+      <folder name="bin">
         <file name="Nucleus.Modules.StaticContent.dll" />
         <file name="HtmlAgilityPack.dll" />
       </folder>
-      <folder name="Views">
-        <file name="Viewer.cshtml" />
-        <file name="Settings.cshtml" />
-      </folder>
+      
+      <cleanup>
+        <file name="viewer.css" />
+        <file name="settings.css" />
+        <file name="viewer.js" />
+        <folder name="Views">
+          <file name="Viewer.cshtml" />
+          <file name="Settings.cshtml" />
+        </folder>
+      </cleanup>
     </component>
   </components>
 </package>

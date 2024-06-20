@@ -22,7 +22,7 @@
       <file name="license.txt" />
       <file name="viewer.css" />
       <file name="settings.css" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.Modules.MultiContent.dll" />
       </folder>
       <folder name="Views">

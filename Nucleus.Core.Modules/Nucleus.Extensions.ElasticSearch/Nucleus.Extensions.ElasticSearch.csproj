@@ -6,7 +6,8 @@
 		<RootNamespace>Nucleus.Extensions.ElasticSearch</RootNamespace>
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+		<RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -24,14 +25,18 @@
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="settings.css" />
+    <None Remove="settings.min.css" />
     <None Remove="Views\Settings.cshtml" />
+    <None Remove="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="license.txt" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
-    <Content Include="settings.css" />
+    <Content Include="_ViewImports.cshtml" />
+    <EmbeddedResource Include="settings.css" />
+    <EmbeddedResource Include="settings.min.css" />
     <Content Include="Views\Settings.cshtml" />
   </ItemGroup>
 
@@ -39,6 +44,8 @@
 		<PackageReference Include="NEST" Version="7.17.5" />
 		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+    <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
   </ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

@@ -22,7 +22,7 @@
       <file name="readme.txt" />
       <file name="license.txt" />
       <file name="settings.css" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.Modules.Shadow.dll" />
       </folder>
       <folder name="Views">

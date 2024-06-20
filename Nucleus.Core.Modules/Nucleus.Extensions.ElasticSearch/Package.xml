@@ -19,18 +19,19 @@
       </controlPanelExtensionDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />
-      <file name="settings.css" />
-      <!--<file name="disable-private-loadcontext.json" />-->
-      <folder name="Bin">
+      
+      <folder name="bin">
         <file name="Nucleus.Extensions.ElasticSearch.dll" />
         <file name="Nest.dll" />
         <file name="ElasticSearch.Net.dll" />
       </folder>
-      <folder name="Views">
-        <file name="Settings.cshtml" />
-      </folder>
+      
       <cleanup>
         <file name="disable-private-loadcontext.json" />
+        <file name="settings.css" />
+        <folder name="Views">
+          <file name="Settings.cshtml" />
+        </folder>
       </cleanup>
     </component>
   </components>

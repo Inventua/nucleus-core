@@ -10,6 +10,8 @@ using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Abstractions.Models.Paging;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Nucleus.Modules.FilesList.Controllers
 {
@@ -18,14 +20,15 @@ namespace Nucleus.Modules.FilesList.Controllers
 	{
 		private Context Context { get; }
 		private FolderOptions FolderOptions { get; }
-
-		private IPageModuleManager PageModuleManager { get; }
+    private IWebHostEnvironment WebHostEnvironment { get; }
+    private IPageModuleManager PageModuleManager { get; }
 		private IFileSystemManager FileSystemManager { get; }
 		private IRoleManager RoleManager { get; }
 		private ILogger<FilesListViewerController> Logger { get; }
 
-		public FilesListViewerController(Context Context, IOptions<FolderOptions> folderOptions, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, IRoleManager roleManager, ILogger<FilesListViewerController> logger)
+		public FilesListViewerController(IWebHostEnvironment webHostEnvironment, Context Context, IOptions<FolderOptions> folderOptions, IPageModuleManager pageModuleManager, IFileSystemManager fileSystemManager, IRoleManager roleManager, ILogger<FilesListViewerController> logger)
 		{
+      this.WebHostEnvironment = webHostEnvironment;
 			this.Context = Context;
 			this.FolderOptions = folderOptions.Value;
 			this.PageModuleManager = pageModuleManager;
@@ -74,12 +77,17 @@ namespace Nucleus.Modules.FilesList.Controllers
 
 			viewModel.LayoutPath = $"ViewerLayouts/{viewModel.Layout}.cshtml";
 
-			if (!System.IO.File.Exists($"{this.FolderOptions.GetExtensionFolder("FilesList", false)}//Views/{viewModel.LayoutPath}"))
-			{
-				viewModel.LayoutPath = $"ViewerLayouts/Table.cshtml";
-			}
+			//if (!System.IO.File.Exists($"{this.FolderOptions.GetExtensionFolder("FilesList", false)}//Views/{viewModel.LayoutPath}"))
+			//{
+			//	viewModel.LayoutPath = $"ViewerLayouts/Table.cshtml";
+			//}
+      IFileInfo layoutFile = this.WebHostEnvironment.ContentRootFileProvider.GetFileInfo($"Extensions/Documents/Views/{viewModel.LayoutPath}");
+      if (!layoutFile.Exists)
+      {
+        viewModel.LayoutPath = $"ViewerLayouts/Table.cshtml";
+      }
 
-			return viewModel;
+      return viewModel;
 		}
 	}
 }

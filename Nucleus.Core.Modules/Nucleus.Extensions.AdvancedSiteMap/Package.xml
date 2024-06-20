@@ -13,7 +13,7 @@
     <component folderName="AdvancedSiteMap" optional="false">
       <file name="readme.txt" />
       <file name="license.txt" />
-      <folder name="Bin">
+      <folder name="bin">
         <file name="Nucleus.Extensions.AdvancedSiteMap.dll" />
       </folder>
     </component>

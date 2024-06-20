@@ -53,7 +53,7 @@
     Default: C:\ProgramData\Nucleus
     Specifies the folder where Nucleus stores data.
   .PARAMETER NetCoreVersion
-    Default: 8.0.6
+    Default: 8.0.4
     Specifies the version of ASP.NET Core to check for and install if required.
   .PARAMETER Environment
     Default: Production
@@ -80,7 +80,7 @@ param (
 		[string]$ApplicationPool = "",
 		[string]$Path = "",
 		[string]$DataPath = "C:\ProgramData\Nucleus",
-		[string]$NetCoreVersion = "8.0.6",
+		[string]$NetCoreVersion = "8.0.4",
     [string]$Environment = "Production",
     [string]$ZipFile = "detect",
     [switch]$OverwriteExisting = $false,
@@ -420,7 +420,7 @@ class Application
     $this.WriteLine("Application Install set", $this.ZipFile)
     
     # detect whether Nucleus is already installed, verify that the correct install set type was detected
-    if (Test-Path -Path "$this.Path\Nucleus.Web.dll")
+    if (Test-Path -Path "$($this.Path)\Nucleus.Web.dll")
     {
       if ($this.InstallType -eq "Install")
       {
@@ -523,8 +523,9 @@ class Application
 	      Write-Host "- Not create an IIS application '$($this.Site)/$($this.Name)', because it already exists."
         if ($this.OverwriteExisting -eq $false)
         {
-          Write-Host "  The 'OverwriteExisting setting is not set, so the existing site will not be updated. Use the Change settings" -ForeGroundColor yellow
-          Write-Host "  option to enable it (press C), or specify OverwriteExisting on the command line." -ForeGroundColor yellow
+          Write-Host "  The 'OverwriteExisting setting is not set, so the existing IIS Site settings will not be updated. If you want to" -ForeGroundColor yellow
+          Write-Host "  update the existing IIS Site settings, use the Change settings option to enable it (press C), or specify" -ForeGroundColor yellow
+          Write-Host "  OverwriteExisting on the command line." -ForeGroundColor yellow
         }
       }
     }

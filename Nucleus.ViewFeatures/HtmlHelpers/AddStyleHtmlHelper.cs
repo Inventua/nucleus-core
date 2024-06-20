@@ -398,14 +398,14 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
 
       if (pathBase.HasValue && stylesheetPath.StartsWith(pathBase, StringComparison.OrdinalIgnoreCase))
       {
-        localFilePath = System.IO.Path.GetDirectoryName(stylesheetPath.Substring(pathBase.Value.Length).Replace('/', Path.DirectorySeparatorChar));
+        localFilePath = System.IO.Path.GetDirectoryName(stylesheetPath.Substring(pathBase.Value.Length).Replace('\\', '/'));
       }
       else
       {
-        localFilePath = System.IO.Path.GetDirectoryName(stylesheetPath.Replace('/', Path.DirectorySeparatorChar)); ;
+        localFilePath = System.IO.Path.GetDirectoryName(stylesheetPath.Replace( '\\', '/'));
       }
 
-      IFileInfo file = webHostingEnvironment.ContentRootFileProvider.GetFileInfo(localFilePath);
+      IFileInfo file = webHostingEnvironment.ContentRootFileProvider.GetFileInfo(localFilePath + '/' + fileName);
       return file.Exists;
 
       //return System.IO.File.Exists(System.IO.Path.Join(contentRootPath, localStyleFilePath, fileName));

@@ -52,12 +52,12 @@
     if (jQuery('.EnableRecaptcha input[type=checkbox]').is(':checked'))
     {
       jQuery('.RecaptchaSettings').css('opacity', '1.0');
-      jQuery('.RecaptchaSettings * ').removeAttr('disabled');
+      jQuery('.RecaptchaSettings * ').prop('disabled', false);
     }
     else
     {
       jQuery('.RecaptchaSettings').css('opacity', '0.25');
-      jQuery('.RecaptchaSettings *').attr('disabled', 'disabled');
+      jQuery('.RecaptchaSettings *').prop('disabled', true);
     }
   }
 </script>

@@ -53,7 +53,9 @@
 
 		jQuery('.permissions-table input[type=checkbox]').on('change', function ()
 		{
-			jQuery('.folder-permissions-copy-dropdown').addClass('disabled');
+			jQuery('.folder-permissions-copy-dropdown')
+        .addClass('disabled')
+        .prop('disabled', true);
 		});
 	});
 </script>

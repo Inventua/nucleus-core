@@ -65,7 +65,9 @@
     jQuery('.pagelinks-mode').on('change', function (event)
     {
       // Disable tab in automatic mode
-      jQuery('button[aria-controls="pagelink-list"]').toggleClass('disabled', jQuery(this).val() === '0');
+      jQuery('button[aria-controls="pagelink-list"]')
+        .toggleClass('disabled', jQuery(this).val() === '0')
+        .prop('disabled', jQuery(this).val() === '0');
     });
   });
 </script>

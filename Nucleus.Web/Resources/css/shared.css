@@ -817,11 +817,10 @@ input[type=range].ToggleSwitch
 	margin-right: 0.25em;
 }
 
-input[type=range].ToggleSwitch.disabled
+input[type=range].ToggleSwitch:disabled
 {
   opacity: 0.25;
 }
-
 
 input[type=range].ToggleSwitch::-webkit-slider-thumb 
 {

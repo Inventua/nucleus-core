@@ -23,17 +23,15 @@
       <folder name="bin">
         <file name="Nucleus.Modules.ContactUs.dll" />
       </folder>
-      <!-- place files in cleanup element -->
-      <file name="viewer.js" />
-      <file name="viewer.min.js" />
-      <file name="settings.css" />
-      <file name="settings.min.css" />
-      <folder name="Views">
-        <file name="Viewer.cshtml" />
-        <file name="Settings.cshtml" />
-      </folder>
-      <!-- end files -->
       <cleanup>
+        <file name="viewer.js" />
+        <file name="viewer.min.js" />
+        <file name="settings.css" />
+        <file name="settings.min.css" />
+        <folder name="Views">
+          <file name="Viewer.cshtml" />
+          <file name="Settings.cshtml" />
+        </folder>
       </cleanup>
     </component>
   </components>

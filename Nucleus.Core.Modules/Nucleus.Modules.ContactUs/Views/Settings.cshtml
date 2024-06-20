@@ -24,30 +24,30 @@
       </div>
 
       <div class="nucleus-flex-fields">
-        <div class="ShowSetting">
+        <div class="ShowSettings">
           <h2 class="flex-grow-1">Visibility</h2>
           <SettingsControl caption="Show Name?" class="inner-inline" rendermode="LabelLast" helptext="Show the first name and last name fields.">
-            @Html.CheckBoxFor(model => model.ShowName, new { @class = "ToggleSwitch" })
+            @Html.CheckBoxFor(model => model.ShowName, new { @class = "ToggleSwitch", @data_related = "RequireName" })
           </SettingsControl>
 
           <SettingsControl caption="Show Phone Number?" class="inner-inline" rendermode="LabelLast" helptext="Show the phone number field.">
-            @Html.CheckBoxFor(model => model.ShowPhoneNumber, new { @class = "ToggleSwitch" })
+            @Html.CheckBoxFor(model => model.ShowPhoneNumber, new { @class = "ToggleSwitch", @data_related = "RequirePhoneNumber" })
           </SettingsControl>
 
           <SettingsControl caption="Show Company?" class="inner-inline" rendermode="LabelLast" helptext="Show the company name field.">
-            @Html.CheckBoxFor(model => model.ShowCompany, new { @class = "ToggleSwitch" })
+            @Html.CheckBoxFor(model => model.ShowCompany, new { @class = "ToggleSwitch", @data_related = "RequireCompany" })
           </SettingsControl>
 
           <SettingsControl caption="Show Category?" class="inner-inline" rendermode="LabelLast" helptext="Show the category field.">
-            @Html.CheckBoxFor(model => model.ShowCategory, new { @class = "ToggleSwitch" })
+            @Html.CheckBoxFor(model => model.ShowCategory, new { @class = "ToggleSwitch", @data_related = "RequireCategory" })
           </SettingsControl>
 
           <SettingsControl caption="Show Subject?" class="inner-inline" rendermode="LabelLast" helptext="Show the subject field.">
-            @Html.CheckBoxFor(model => model.ShowSubject, new { @class = "ToggleSwitch" })
+            @Html.CheckBoxFor(model => model.ShowSubject, new { @class = "ToggleSwitch", @data_related = "RequireSubject" })
           </SettingsControl>
         </div>
 
-        <div class="RequireSetting">
+        <div class="RequireSettings">
           <h2 class="flex-grow-1">Required</h2>
           <SettingsControl caption="Require Name?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the first name and last name fields are mandatory.">
             @Html.CheckBoxFor(model => model.RequireName, new { @class = "ToggleSwitch" })
@@ -61,7 +61,7 @@
             @Html.CheckBoxFor(model => model.RequireCompany, new { @class = "ToggleSwitch" })
           </SettingsControl>
 
-          <SettingsControl caption="Require Category?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the phone number field is mandatory.">
+          <SettingsControl caption="Require Category?" class="inner-inline" rendermode="LabelLast" helptext="Specify whether the category field is mandatory.">
             @Html.CheckBoxFor(model => model.RequireCategory, new { @class = "ToggleSwitch" })
           </SettingsControl>
 
@@ -110,21 +110,43 @@
   </div>
 }
 <script>
-  ContactUs_ShowSettings();
+  jQuery(function ()
+  {
+    jQuery('.ShowSettings input[type=checkbox]').each(ContactUs_SetRequireSetting); // initialize
+    ContactUs_ShowRecaptchaSettings();
 
-  jQuery('.EnableRecaptcha input[type=checkbox]').on('change', ContactUs_ShowSettings);
+    jQuery('.ShowSettings input[type=checkbox]').on('change.ShowSettings', ContactUs_SetRequireSetting);
+    jQuery('.EnableRecaptcha input[type=checkbox]').on('change', ContactUs_ShowRecaptchaSettings);
 
-  function ContactUs_ShowSettings()
+    jQuery("form").on("submit", function (e)
+    {
+      jQuery(".RequireSettings input:checkbox").prop("disabled", false);
+    });
+
+  });
+
+  function ContactUs_ShowRecaptchaSettings()
   {
     if (jQuery('.EnableRecaptcha input[type=checkbox]').is(':checked'))
     {
       jQuery('.RecaptchaSettings').css('opacity', '1.0');
-      jQuery('.RecaptchaSettings *').removeAttr('disabled');
+      jQuery('.RecaptchaSettings *').prop('disabled', false);
     }
     else
     {
       jQuery('.RecaptchaSettings').css('opacity', '0.25');
-      jQuery('.RecaptchaSettings *').attr('disabled', 'disabled');
+      jQuery('.RecaptchaSettings *').prop('disabled', true);
     }
+  }
+
+  function ContactUs_SetRequireSetting()
+  {
+    let enabled = !jQuery(this).is(':checked');
+    let target = jQuery(this).attr('data-related');
+    let targetElement = jQuery('.RequireSettings input[type=checkbox][id=' + target)
+      .parent()
+      .find('input');
+
+    targetElement.prop('disabled', enabled);
   }
 </script>

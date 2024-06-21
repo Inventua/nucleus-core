@@ -351,6 +351,9 @@ namespace Nucleus.Web.Controllers.Admin
 
       viewModel = await BuildViewModel(viewModel);
       viewModel.Title = "Uninstall Complete";
+
+      this.HostApplicationLifetime.StopApplication();
+
       return View("Complete", viewModel);
     }
 

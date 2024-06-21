@@ -1,6 +1,5 @@
 ﻿:root
 {
-  --search-normal-width: 25rem;
   --search-compact-width: 15rem;
 }
 .search-result
@@ -19,13 +18,20 @@
 
 .search-term
 {
-	width: var(--search-normal-width);
-  outline: none;
+	outline: none;
 }
 
-.search-display-compact .search-terms, .search-display-minimal .search-term
+.search-display-full label, .search-display-compact label, .search-display-minimal label
 {
-	width: var(--search-compact-width);
+  display: grid;
+  grid-template-columns: 1fr minmax(auto,10fr) 1fr;
+  grid-column-gap: var(--nucleus-default-gap-horizontal);
+  align-items: center;
+}
+
+.search-display-compact .search-term, .search-display-minimal .search-term
+{
+	max-width: var(--search-compact-width);
 }
 
 .suggestions-result 

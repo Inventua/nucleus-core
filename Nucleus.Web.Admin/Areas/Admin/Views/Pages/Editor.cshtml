@@ -107,14 +107,14 @@
 
           <div class="nucleus-flex-fields">
             <SettingsControl caption="Page Layout" helptext="Select a page layout for this page, or select '(site default)' to use the default layout for this site.">
-              <div class="nucleus-flex-fields">
+              <div class="d-flex gap-1">
                 @Html.DropDownListFor(model => model.Page.LayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"), new { @class = "flex-1" })
                 <button type="submit" formaction="@Url.AreaAction("LayoutSelector", "Pages", "Admin")" data-target="#page-layout-selector-dialog" class="btn btn-sm btn-outline-dark nucleus-material-icon" title="Layout selector.">&#xe66b;</button>
               </div>
             </SettingsControl>
 
             <SettingsControl caption="Default Container" helptext="Select a default container for modules on this page, or select '(site default)' to use the default layout for this site.">
-              <div class="nucleus-flex-fields">
+              <div class="d-flex gap-1">
                 @Html.DropDownListFor((model) => model.Page.DefaultContainerDefinition.Id, new SelectList(Model.PageContainers, "Id", "FriendlyName"), new { @class = "flex-1"})
                 <button type="submit" formaction="@Url.AreaAction("ContainerSelector", "Pages", "Admin")" data-target="#page-container-selector-dialog" class="btn btn-sm btn-outline-dark nucleus-material-icon" title="Container selector.">&#xe162;</button>
               </div>

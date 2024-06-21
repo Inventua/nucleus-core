@@ -6,15 +6,17 @@
 @using Nucleus.Abstractions.Models
 @using Nucleus.Abstractions.Models.Mail
 @using Nucleus.Core
-<table>
+<table class="table table-sm">
+  <thead>
 	<tr>
 		<th>Name</th>
 		<th>Type</th>
 	</tr>
-
+  </thead>
+  <tbody>		
 	@if (Model.Site.UserProfileProperties != null)
 	{
-		int count = 0;
+    int count = 0;
 		@foreach (UserProfileProperty prop in Model.Site.UserProfileProperties)
 		{
 			<tr>
@@ -38,4 +40,5 @@
 			count++;
 		}
 	}
+  </tbody>
 </table>

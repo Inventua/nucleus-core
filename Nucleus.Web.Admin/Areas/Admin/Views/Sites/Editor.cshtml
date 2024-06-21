@@ -50,14 +50,14 @@
 
 				<div class="nucleus-flex-fields">
 					<SettingsControl caption="Default Layout" helptext="Default presentation layout for the site.  Pages which do not specify a layout use the site default.">
-            <div class="nucleus-flex-fields">
+            <div class="d-flex gap-1">
 					    @Html.DropDownListFor(model => model.Site.DefaultLayoutDefinition.Id, new SelectList(Model.Layouts, "Id", "FriendlyName"), new  { @class = "flex-1"})
               <button type="submit" formaction="@Url.AreaAction("LayoutSelector", "Sites", "Admin")" data-target="#site-layout-selector-dialog" class="btn btn-sm btn-outline-dark nucleus-material-icon" title="Layout selector.">&#xe66b;</button>
             </div>
 					</SettingsControl>
 
 					<SettingsControl caption="Default Container" helptext="Default module container for the site.  Modules which which do not specify a layout use the page default, and if the page default is not set they use the site default container.">
-						<div class="nucleus-flex-fields">
+						<div class="d-flex gap-1">
               @Html.DropDownListFor((model) => model.Site.DefaultContainerDefinition.Id, new SelectList(Model.Containers, "Id", "FriendlyName"), new  { @class = "flex-1"} )
               <button type="submit" formaction="@Url.AreaAction("ContainerSelector", "Sites", "Admin")" data-target="#site-container-selector-dialog" class="btn btn-sm btn-outline-dark nucleus-material-icon" title="Container selector.">&#xe162;</button>
             </div>

@@ -34,6 +34,7 @@
 	padding: var(--nucleus-default-gap-vertical) var(--nucleus-default-gap-horizontal);
 	background: inherit;
 	color: inherit;
+  font-weight: inherit;
 }
 
 .multi-content-faq .accordion-button:after, .multi-content-faq .accordion-button:before,

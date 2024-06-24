@@ -130,7 +130,23 @@ public class ModuleContentRenderer : IModuleContentRenderer
             this.Logger?.LogError(e, "Error rendering {pane}.", moduleInfo.Pane);
             if (viewContext.HttpContext.User.IsSiteAdmin(context.Site))
             {
-              output.AppendHtml(e.Message);
+              TagBuilder outputBuilder = new("div");
+              outputBuilder.AddCssClass("alert alert-warning mx-2");
+
+              TagBuilder headingBuilder = new("strong");
+              headingBuilder.InnerHtml.AppendHtml("Error rendering module: ");
+              if (!String.IsNullOrEmpty($"'{moduleInfo.Title}'"))
+              {
+                headingBuilder.InnerHtml.AppendHtml($"{moduleInfo.Title}: ");
+              }
+              headingBuilder.InnerHtml.AppendHtml($"[{moduleInfo.ModuleDefinition?.FriendlyName}]");
+
+              TagBuilder messageBuilder = new("p");
+              messageBuilder.InnerHtml.AppendHtml(e.Message);
+
+              outputBuilder.InnerHtml.AppendHtml(headingBuilder);
+              outputBuilder.InnerHtml.AppendHtml(messageBuilder);
+              output.AppendHtml(outputBuilder);
             }
           }
         }
@@ -564,7 +580,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
 
     if (actionDescriptor == null)
     {
-      throw new InvalidOperationException($"Unable to load an action descriptor for the module '{moduleinfo.ModuleDefinition.FriendlyName}' [{controllerName}.{action}].  Check your package.xml and controller class.  The most common cause of this error is that your package.xml has the wrong controller or action name specified, or your controller class doesn't have a Nucleus 'Extension' attribute.");
+      throw new InvalidOperationException($"Unable to load an action descriptor for the module '{moduleinfo.ModuleDefinition.FriendlyName}' [{controllerName}.{action}].  Check your package.xml and controller class.  A common cause of this error is that your package.xml has the wrong controller or action name specified, or your controller class doesn't have a Nucleus 'Extension' attribute.");
     }
 
     actionDescriptor.RouteValues["extension"] = moduleinfo.ModuleDefinition.Extension;

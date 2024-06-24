@@ -408,9 +408,22 @@ public class FileSystemManager : IFileSystemManager
 	{
 		// create the physical folder
 		FileSystemProvider fileSystemProvider = this.FileSystemProviderFactory.Get(site, providerName);
-		Folder parentFolder = await fileSystemProvider.GetFolder(UseSiteHomeDirectory(site, parentPath));
+    Folder rootFolder;
+    Folder parentFolder;
 		string message = "";
 
+    try
+    {
+      rootFolder = await fileSystemProvider.GetFolder(UseSiteHomeDirectory(site, "/"));
+    }
+    catch (System.IO.FileNotFoundException)
+    {
+      // if the root folder was not found, try to create it				
+      rootFolder = RemoveSiteHomeDirectory(site, await fileSystemProvider.CreateFolder("", UseSiteHomeDirectory(site, "")));
+    }
+
+    parentFolder = await fileSystemProvider.GetFolder(UseSiteHomeDirectory(site, parentPath));
+    
 		if (!IsValidFolderName(parentFolder, newFolder, ref message))
 		{
 			throw new InvalidOperationException(message);
@@ -508,7 +521,7 @@ public class FileSystemManager : IFileSystemManager
 		}
 		catch (System.IO.FileNotFoundException)
 		{
-			// if the root folder was not found, try to create it				
+			// if the folder was not found, try to create it				
 			folder = await provider.CreateFolder("", UseSiteHomeDirectory(site, existingFolder.Path));
 		}
 
@@ -554,7 +567,7 @@ public class FileSystemManager : IFileSystemManager
 		}
 		catch (System.IO.FileNotFoundException)
 		{
-			// if the root folder was not found, try to create it				
+			// if the folder was not found, try to create it				
 			folder = await provider.CreateFolder("", UseSiteHomeDirectory(site, existingFolder.Path));
 		}
 
@@ -594,7 +607,7 @@ public class FileSystemManager : IFileSystemManager
 		}
 		catch (System.IO.FileNotFoundException)
 		{
-			// if the root folder was not found, try to create it				
+			// if the folder was not found, try to create it				
 			folder = await provider.CreateFolder("", UseSiteHomeDirectory(site, existingFolder.Path));
 		}
 
@@ -660,7 +673,7 @@ public class FileSystemManager : IFileSystemManager
 		}
 		catch (System.IO.FileNotFoundException)
 		{
-			// if the root folder was not found, try to create it				
+			// if the folder was not found, try to create it				
 			folder = await provider.CreateFolder("", UseSiteHomeDirectory(site, existingFolder.Path));
 		}
 

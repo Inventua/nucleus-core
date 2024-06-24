@@ -3,7 +3,7 @@
   "version": "01.00.22",
   "operations": [
     {
-      // in v1.4, we renamed layout footer panes to "FooterPane" to better reflect their usage
+      // in v1.4/2.0, we renamed layout footer panes to "FooterPane" to better reflect their usage
       "DatabaseProviderSpecificOperation": {
         "include": [ "SqlServer", "Sqlite" ],
         "operation": {
@@ -25,7 +25,7 @@
     },
     {
       "DatabaseProviderSpecificOperation": {
-        "exclude": [ "PostgreSQL" ],
+        "include": [ "PostgreSQL" ],
         "operation": {
           "sql": {
             "sql": "UPDATE \"PageModules\" SET \"Pane\" = 'FooterPane' WHERE \"Pane\" = 'BottomPane';"

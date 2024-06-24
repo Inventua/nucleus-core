@@ -1102,9 +1102,12 @@ ul.nucleus-control-panel-items button
 
 .nucleus-adminpage .nucleus-file-system-manager
 {
-  min-width: 750px;
   height: 100%;
 }
+  .nucleus-file-system-manager .top-commandbar
+  {
+    column-gap: 1rem;
+  }
 
   .nucleus-adminpage .nucleus-file-system-manager .files-droptarget.dragging
   {
@@ -1241,5 +1244,15 @@ ul.nucleus-control-panel-items button
   .nucleus-admin-content .grid-2-column, .nucleus-admin-content .grid-3-column
   {
     display: block;
+  }
+
+  .nucleus-file-system-manager .files-droptarget, .nucleus-file-system-manager .file-size, .nucleus-file-system-manager .file-dimensions
+  {
+    display: none!important;
+  }
+
+  .nucleus-file-system-manager .top-commandbar .d-flex
+  {
+    margin: 0!important;
   }
 }

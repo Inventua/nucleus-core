@@ -4,8 +4,8 @@
   <version>2.0.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
-		Use this extension to add Google Analytics reporting to your site.
-	</description>
+    Use this extension to add Google Analytics reporting to your site.
+  </description>
   <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
   <components>
     <component folderName="GoogleAnalytics" optional="false">
@@ -19,15 +19,17 @@
       </controlPanelExtensionDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />
-      <file name="viewer.css" />
-      <file name="settings.css" />
       <folder name="bin">
         <file name="Nucleus.Extensions.GoogleAnalytics.dll" />
       </folder>
-      <folder name="Views">
-        <file name="Settings.cshtml" />
-        <file name="AnalyticsScript.cshtml" />
-      </folder>
+      <cleanup>
+        <file name="settings.css" />
+        <file name="viewer.css" />
+        <folder name="Views">
+          <file name="Settings.cshtml" />
+          <file name="AnalyticsScript.cshtml" />
+        </folder>
+      </cleanup>
     </component>
   </components>
 </package>

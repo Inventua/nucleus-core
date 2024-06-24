@@ -33,10 +33,12 @@
     <None Remove="Views\_PageMenu.cshtml" />
     <None Remove="Views\_Suggestions.cshtml" />
     <None Remove="Views\_ViewerInput.cshtml" />
+    <None Remove="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="license.txt" />
+    <Content Include="_ViewImports.cshtml" />
     <EmbeddedResource Include="viewer.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />

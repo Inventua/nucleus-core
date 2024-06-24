@@ -6,7 +6,8 @@
 		<RootNamespace>Nucleus.Extensions.Shadow</RootNamespace>
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <RazorCompileOnBuild>true</RazorCompileOnBuild>    
   </PropertyGroup>
 
 	<ItemGroup>
@@ -33,7 +34,7 @@
     <Content Include="license.txt" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
-    <Content Include="settings.css" />
+    <EmbeddedResource Include="settings.css" />
 		<Content Include="Views\_ViewImports.cshtml" />
     <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />
@@ -42,6 +43,8 @@
 	<ItemGroup>
 		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+    <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

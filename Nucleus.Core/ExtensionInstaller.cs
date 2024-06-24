@@ -688,8 +688,9 @@ namespace Nucleus.Core
 		{
 			// delete specified sub-folders
 			foreach (Abstractions.Models.Extensions.FolderDefinition subFolder in folder.Items.Where(item => item is Abstractions.Models.Extensions.FolderDefinition))
-			{
-				if (!DeleteFolder(componentFolder, subFolder))
+			{       
+        subFolder.name = folder.name + '/' + subFolder.name;
+        if (!DeleteFolder(componentFolder, subFolder))
 				{
 					return false;
 				}
@@ -814,7 +815,7 @@ namespace Nucleus.Core
 			
 			if (folder != null)
 			{
-				filePath = BuildExtensionFilePath(componentFolder, $"{folder.name}{System.IO.Path.DirectorySeparatorChar}{file.name}");
+				filePath = BuildExtensionFilePath(componentFolder, $"{folder.name}/{file.name}");
 			}
 			else
 			{
@@ -864,7 +865,7 @@ namespace Nucleus.Core
 		/// <returns></returns>
 		private string BuildExtensionFilePath(string folderPath, string filePath, Boolean create)
 		{
-			string path = Path.Combine(this.FolderOptions.Value.GetExtensionFolder(folderPath, create), filePath);
+			string path = Nucleus.Abstractions.Models.Configuration.FolderOptions.NormalizePath(Path.Join(this.FolderOptions.Value.GetExtensionFolder(folderPath, create), filePath));
 
 			if (create)
 			{
@@ -874,6 +875,7 @@ namespace Nucleus.Core
 					System.IO.Directory.CreateDirectory(folder);
 				}
 			}
+
 			return path;
 		}
         

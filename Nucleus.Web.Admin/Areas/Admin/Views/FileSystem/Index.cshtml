@@ -10,33 +10,29 @@
 
   @using (Html.BeginAreaForm("Navigate", "FileSystem", "Admin", FormMethod.Post, new { @class = "d-flex flex-column overflow-auto", @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
   {
-    <div class="nucleus-form-buttonrow d-flex">
-      <div class="nucleus-show-progress nucleus-show-progress-inside">
+    <div class="nucleus-form-buttonrow nucleus-flex-fields top-commandbar mx-1">
+      <div class="nucleus-show-progress nucleus-show-progress-inside d-flex gap-1 align-items-center">
         <RemoveWhiteSpace>
-          @Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "providerKey nucleus-default-control ms-1" })
+          @Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "flex-1 nucleus-default-control providerKey" })
           <span>
             @foreach (var ancestor in Model.Ancestors)
             {
               @if (ancestor != Model.Ancestors.First())
               {
-                <text>&nbsp;/&nbsp;</text>
                 @Html.AreaActionLink(ancestor.Name, "Index", "FileSystem", "Admin", new { folderId = ancestor.Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
               }
               else
               {
-                <text>&nbsp;</text>
-                <a title="Top level" href="@Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = ancestor.Id })" class="btn btn-sm btn-outline-primary me-1 NavigateLink nucleus-show-progress nucleus-show-progress-after nucleus-material-icon" data-target=".nucleus-adminpage">
-                  &#xe2c7;
-                </a>
+                <a title="Top level" href="@Url.AreaAction("Index", "FileSystem", "Admin", new { folderId = ancestor.Id })" class="btn btn-sm btn-outline-primary NavigateLink nucleus-show-progress nucleus-show-progress-after nucleus-material-icon" data-target=".nucleus-adminpage">&#xe2c7;</a>
               }
             }
           </span>
         </RemoveWhiteSpace>
       </div>
 
-      <div class="d-flex align-items-center ms-auto">
-        @Html.TextBoxFor(model => model.SearchTerm, new { @class = "" })
-        @Html.SubmitButton("", "Search", @Url.AreaAction("Search", "FileSystem", "Admin"), new { @data_target = "#filesystem-search-results", @class = "btn btn-primary btn-sm ms-2" })
+      <div class="d-flex align-items-center ms-auto gap-1 nucleus-show-progress nucleus-show-progress-inside">
+        @Html.TextBoxFor(model => model.SearchTerm, new { @class = "flex-1" })
+        @Html.SubmitButton("", "Search", @Url.AreaAction("Search", "FileSystem", "Admin"), new { @data_target = "#filesystem-search-results", @class = "btn btn-primary btn-sm" })
       </div>
     </div>
 
@@ -144,10 +140,10 @@
                     @Html.AreaActionLink(Model.Folders[folderCount].Name, "Index", "FileSystem", "Admin", new { folderId = @Model.Folders[folderCount].Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
                   </label>
                 </td>
-                <td>Folder</td>
-                <td>@Model.Folders[folderCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-                <td />
-                <td />
+                <td class="file-type">Folder</td>
+                <td class="file-modified-date">@Model.Folders[folderCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+                <td class="file-size" />
+                <td class="file-dimensions" />
               </tr>
             }
 
@@ -162,10 +158,10 @@
                     @Html.HiddenFor(model => Model.Files[fileCount].Id)
                   </label>
                 </td>
-                <td>File</td>
-                <td class="Date@(isRecent ? " fw-bold" : "")">@Model.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
-                <td>@Model.Files[fileCount].Size.FormatFileSize()</td>
-                <td>
+                <td class="file-type">File</td>
+                <td class="file-modified-date@(isRecent ? " fw-bold" : "")">@Model.Files[fileCount].DateModified.FormatDate(this.Context.Request.GetUserTimeZone())</td>
+                <td class="file-size">@Model.Files[fileCount].Size.FormatFileSize()</td>
+                <td class="file-dimensions">
                   @if (Model.Files[fileCount].Width > 0 && Model.Files[fileCount].Height > 0)
                   {
                     @($"{Model.Files[fileCount].Width} x {Model.Files[fileCount].Height}")

@@ -31,10 +31,12 @@
     <None Remove="viewer.min.js" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
+    <None Remove="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="license.txt" />
+    <Content Include="_ViewImports.cshtml" />
     <EmbeddedResource Include="viewer.css" />
     <EmbeddedResource Include="viewer.min.css" />
     <Content Include="package.xml" />

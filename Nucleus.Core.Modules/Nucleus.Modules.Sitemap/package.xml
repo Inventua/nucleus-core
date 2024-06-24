@@ -20,16 +20,18 @@
       </moduleDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />
-      <file name="sitemap.css" />
-      <file name="_ViewImports.cshtml" />
       <folder name="bin">
         <file name="Nucleus.Modules.Sitemap.dll" />
       </folder>
-      <folder name="Views">
-        <file name="Viewer.cshtml" />
-        <file name="Settings.cshtml" />
-        <file name="_PageMenu.cshtml" />
-      </folder>
+      <cleanup>
+        <file name="sitemap.css" />
+        <file name="_ViewImports.cshtml" />
+        <folder name="Views">
+          <file name="Viewer.cshtml" />
+          <file name="Settings.cshtml" />
+          <file name="_PageMenu.cshtml" />
+        </folder>
+      </cleanup>
     </component>
   </components>
 </package>

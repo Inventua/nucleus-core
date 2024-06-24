@@ -4,8 +4,8 @@
   <version>2.0.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
-		The 'Accept Terms' module displays your terms text on-screen and requires the user to accept the terms before they can use the page which contains the module.
-	</description>
+    The 'Accept Terms' module displays your terms text on-screen and requires the user to accept the terms before they can use the page which contains the module.
+  </description>
   <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
   <components>
     <component folderName="AcceptTerms" optional="false">
@@ -21,15 +21,17 @@
       </moduleDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />
-      <file name="viewer.css" />
-      <file name="settings.css" />
       <folder name="bin">
         <file name="Nucleus.Modules.AcceptTerms.dll" />
       </folder>
-      <folder name="Views">
-        <file name="Viewer.cshtml" />
-        <file name="Settings.cshtml" />
-      </folder>
+      <cleanup>
+        <file name="viewer.css" />
+        <file name="settings.css" />
+        <folder name="Views">
+          <file name="Viewer.cshtml" />
+          <file name="Settings.cshtml" />
+        </folder>
+      </cleanup>
     </component>
   </components>
 </package>

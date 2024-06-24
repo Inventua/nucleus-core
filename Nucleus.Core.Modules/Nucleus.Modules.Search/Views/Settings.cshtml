@@ -12,9 +12,8 @@
 			@Html.DropDownListFor(model => model.SearchProvider, new SelectList(Model.SearchProviders, "ClassName", "Name", "(none)"))
 		</SettingsControl>
 
-
 		<fieldset role="group" aria-labelledby="heading">
-			<label>Search Input</label>
+			<h3>Search Input</h3>
 			<div class="nucleus-flex-fields">
 				<SettingsControl caption="Display Mode" helptext="Specify the search input controls display mode.">
 					@Html.DropDownListFor(model => model.DisplayMode, Html.GetEnumSelectList(typeof(Nucleus.Modules.Search.ViewModels.Settings.DisplayModes)))

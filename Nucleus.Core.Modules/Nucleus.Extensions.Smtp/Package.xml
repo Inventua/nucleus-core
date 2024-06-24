@@ -10,10 +10,6 @@
     <component folderName="Smtp Mail" optional="false">
       <file name="readme.txt" />
       <file name="license.txt" />
-      <folder name="Views">
-        <file name="_SmtpSettings.cshtml" />
-        <file name="_PickupDirectorySettings.cshtml" />
-      </folder>
       <folder name="bin">
         <file name="Nucleus.Extensions.Smtp.dll" />
         <file name="MailKit.dll" />
@@ -21,6 +17,12 @@
         <file name="BouncyCastle.Cryptography.dll" />
         <file name="System.Security.Cryptography.Pkcs.dll" />
       </folder>
+      <cleanup>
+        <folder name="Views">
+          <file name="_SmtpSettings.cshtml" />
+          <file name="_PickupDirectorySettings.cshtml" />
+        </folder>        
+      </cleanup>
     </component>
   </components>
 </package>

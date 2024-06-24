@@ -17,7 +17,7 @@
     @if (Model.Settings.DisplayMode == Settings.DisplayModes.Full)
     {
       <label>
-        <span>@Model.Settings.SearchCaption</span>
+        <span class="text-nowrap">@Model.Settings.SearchCaption</span>
         @await Html.PartialAsync("_ViewerInput.cshtml", Model)
       </label>
     }    

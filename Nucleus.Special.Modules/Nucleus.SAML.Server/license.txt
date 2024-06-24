@@ -1,4 +1,4 @@
-﻿Copyright 2022-2024 Inventua Pty Ltd.  http://www.inventua.com		http://www.nucleus-cms.com
+﻿Copyright 2022-2024 Inventua Pty Ltd.  https://www.inventua.com  https://www.nucleus-cms.com
 
 The Nucleus SAML Server extension is open source, but it is not free.
 

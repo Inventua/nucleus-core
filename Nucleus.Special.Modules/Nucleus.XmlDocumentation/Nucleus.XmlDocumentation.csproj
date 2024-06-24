@@ -7,6 +7,7 @@
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
 	</PropertyGroup>
 	
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -35,25 +36,29 @@
     <None Remove="Views\_RenderMember.cshtml" />
     <None Remove="Views\_RenderMixedContent.cshtml" />
     <None Remove="Views\_RenderMixedContentTemplate.cshtml" />
+    <None Remove="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="license.txt" />
-    <Content Include="viewer.css" />
+    <EmbeddedResource Include="viewer.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
-    <Content Include="viewer.min.css" />
+    <EmbeddedResource Include="viewer.min.css" />
     <Content Include="Views\_RenderClass.cshtml" />
     <Content Include="Views\_RenderMember.cshtml" />
     <Content Include="Views\_RenderMixedContentTemplate.cshtml" />
     <Content Include="Views\_RenderMixedContent.cshtml" />
     <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />
+    <Content Include="_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
     <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+    <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
   </ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

@@ -81,7 +81,7 @@ namespace Nucleus.Modules.FilesList.Controllers
 			//{
 			//	viewModel.LayoutPath = $"ViewerLayouts/Table.cshtml";
 			//}
-      IFileInfo layoutFile = this.WebHostEnvironment.ContentRootFileProvider.GetFileInfo($"Extensions/Documents/Views/{viewModel.LayoutPath}");
+      IFileInfo layoutFile = this.WebHostEnvironment.ContentRootFileProvider.GetFileInfo($"Extensions/FilesList/Views/{viewModel.LayoutPath}");
       if (!layoutFile.Exists)
       {
         viewModel.LayoutPath = $"ViewerLayouts/Table.cshtml";

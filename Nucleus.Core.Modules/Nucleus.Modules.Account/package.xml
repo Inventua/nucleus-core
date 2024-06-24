@@ -3,8 +3,8 @@
   <version>2.0.0</version>
   <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
   <description>
-		Application install set for the core user account modules (signup and login).			
-	</description>
+    Application install set for the core user account modules (signup and login).
+  </description>
   <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
   <components>
     <component folderName="Account" optional="false">
@@ -43,23 +43,25 @@
       </moduleDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />
-      <file name="signup.js" />
-      <file name="signup.min.js" />
       <folder name="bin">
         <file name="Nucleus.Modules.Account.dll" />
       </folder>
-      <folder name="Views">
-        <file name="Signup.cshtml" />
-        <file name="SignupSettings.cshtml" />
-        <file name="Login.cshtml" />
-        <file name="Settings.cshtml" />
-        <file name="Recover.cshtml" />
-        <file name="ChangePassword.cshtml" />
-        <file name="ChangePasswordSettings.cshtml" />
-        <file name="UserProfile.cshtml" />
-        <file name="UserProfileSettings.cshtml" />
-        <file name="ResetPassword.cshtml" />
-      </folder>
+      <cleanup>
+        <file name="signup.js" />
+        <file name="signup.min.js" />
+        <folder name="Views">
+          <file name="Signup.cshtml" />
+          <file name="SignupSettings.cshtml" />
+          <file name="Login.cshtml" />
+          <file name="Settings.cshtml" />
+          <file name="Recover.cshtml" />
+          <file name="ChangePassword.cshtml" />
+          <file name="ChangePasswordSettings.cshtml" />
+          <file name="UserProfile.cshtml" />
+          <file name="UserProfileSettings.cshtml" />
+          <file name="ResetPassword.cshtml" />
+        </folder>
+      </cleanup>
     </component>
   </components>
 </package>

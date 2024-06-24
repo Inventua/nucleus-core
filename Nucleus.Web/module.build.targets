@@ -39,6 +39,18 @@
 			Text="The %NUCLEUS_PATH% environment path is not set, your extension will not be copied." />	
 	</Target>
 
+  <!-- 
+  Embed cshtml files in Views\ViewerLayouts so we can enumerate them for the settings page and check fore them at runtime.  The 
+  EmbedRazorGenerateSources project property should do this, but it does not seem to work. Putting the ItemGroup in a Target makes 
+  this happen at build time, but not when you load the project in Visual Studio, so the files are not shown as "Ebmedded resource" in
+  the properties window.
+  -->
+  <Target Name="NucleusModuleEmbedViewerLayouts" BeforeTargets="BeforeBuild" Condition="'$(NucleusEmbedViewerLayouts)' == 'true'">
+    <ItemGroup>
+      <EmbeddedResource Include="Views\ViewerLayouts\*.cshtml" />
+    </ItemGroup>
+  </Target>
+  
 	<Target Name="GetPackageAssemblies" AfterTargets="PostBuildEvent">
 		<XmlPeek XmlInputPath="package.xml" Namespaces="&lt;Namespace Prefix='p' Uri='urn:nucleus/schemas/package/1.0'/&gt;" Query="//p:package/p:components/p:component/p:folder[@name='Bin' or @name='bin']/p:file/@name">
 			<Output TaskParameter="Result" ItemName="_XmlPackageAssemblies" />

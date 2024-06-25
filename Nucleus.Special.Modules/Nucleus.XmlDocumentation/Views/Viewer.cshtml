@@ -28,12 +28,12 @@
 								</h2>
 
 								<div id="@document.Namespace.MenuId()" class="list-group accordion-collapse collapse @(Model.DefaultOpen || Model.SelectedDocument==document ? "show" : "")">
-									<a class="list-group-item assembly-landing" href="@document.GenerateUrl(Model.Page)">@document.AssemblyName Assembly</a>
+									<a class="list-group-item assembly-landing" href="@Url.Content("~" + @document.GenerateUrl(Model.Page))">@document.AssemblyName Assembly</a>
 
 									<ul>
 										@foreach (var apiClass in document.Classes)
 										{
-                      <li><a id="@apiClass.MenuId()" class="list-group-item @(apiClass.FullName==Model.SelectedClass?.FullName ? "active" : "")" href="@apiClass.GenerateUrl(Model.Page, document)" )" title="@apiClass.Name">@apiClass.Name</a></li>
+                      <li><a id="@apiClass.MenuId()" class="list-group-item @(apiClass.FullName==Model.SelectedClass?.FullName ? "active" : "")" href="@Url.Content("~" + @apiClass.GenerateUrl(Model.Page, document))" )" title="@apiClass.Name">@apiClass.Name</a></li>
 										}
 									</ul>
 								</div>

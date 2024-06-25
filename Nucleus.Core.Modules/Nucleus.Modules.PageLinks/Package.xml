@@ -1,7 +1,7 @@
 <package id="fdcdf6c6-9cc2-48db-990d-c33d2cc6d640" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>PageLinks</name>
   <version>2.0.0</version>
-  <publisher name="Inventua" url="https://www.inventua.com" email="support@inventua.com" />
+  <publisher name="Inventua" url="https://www.inventua.com/nucleus/" email="support@inventua.com" />
   <description>
     Displays a list of link targets for the current page.
   </description>

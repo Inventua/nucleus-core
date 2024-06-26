@@ -62,12 +62,12 @@ function _handleContentLoaded(e, args)
 	jQuery('#nucleus-edit-content-btn').off('click.toggleMode');
 	jQuery('#nucleus-edit-content-btn').on('click.toggleMode', ToggleEditMode);
 
-  jQuery('.nucleus-control-panel-sidebar .dock-top-btn, .nucleus-control-panel-sidebar .dock-left-btn').off('click.toggleDocking');
-  jQuery('.nucleus-control-panel-sidebar .dock-top-btn, .nucleus-control-panel-sidebar .dock-left-btn').on('click.toggleDocking', function (event)
-  {
-    jQuery('body').toggleClass('control-panel-dock-top');
-    window.parent.document.dispatchEvent(new CustomEvent('ToggleControlPanelDocking'));
-  });
+	jQuery('.nucleus-control-panel-sidebar .dock-top-btn, .nucleus-control-panel-sidebar .dock-left-btn').off('click.toggleDocking');
+	jQuery('.nucleus-control-panel-sidebar .dock-top-btn, .nucleus-control-panel-sidebar .dock-left-btn').on('click.toggleDocking', function (event)
+	{
+		jQuery('body').toggleClass('control-panel-dock-top');
+		window.parent.document.dispatchEvent(new CustomEvent('ToggleControlPanelDocking'));
+	});
 
 	function AdminMenuItem_Click(event)
 	{
@@ -122,19 +122,29 @@ function _handleContentLoaded(e, args)
 		navstack.pop();		
 	});
 
-	if (navstack.length !== 0 && navstack[navstack.length - 1] !== args.url)
-	{
-		jQuery('.nucleus-btn-page-back').attr('href', navstack[navstack.length-1]).show();
-	}
-	else
-	{
-		jQuery('.nucleus-btn-page-back').removeAttr('href').hide();
+  jQuery('.nucleus-btn-page-back')
+    .removeAttr('href')
+    .hide();
+
+  if (jQuery(args.event.target).parents('.track-reset').length !== 0)
+  {
+    navstack = [];
+  }
+
+  if (typeof (args.url) !== 'undefined' && (navstack.length === 0 || navstack[navstack.length - 1] !== args.url))
+  {
+    if (args.target.hasClass('nucleus-adminpage') && jQuery(args.event.target).parents('.track-nav').length !== 0)
+		{
+			navstack.push(args.url);
+		}
 	}
 
-	if (typeof (args.url) !== 'undefined' && navstack[navstack.length - 1] !== args.url)
+  if (navstack.length > 1 && navstack[navstack.length - 2] !== args.url)
 	{
-		navstack.push(args.url);
-	}
+    jQuery('.nucleus-btn-page-back')
+      .attr('href', navstack[navstack.length - 2])
+      .show();
+  }
 
 	// For clicked items within a list, apply the 'selected' css class to the selected LI, and remove from other LI elements in the parent list
 	if (typeof (args.event) !== 'undefined' && args.event !== null)
@@ -159,6 +169,6 @@ function _handleContentLoaded(e, args)
 	args.target.find('.nucleus-btn-close-results').off('click.closeResults');
 	args.target.find('.nucleus-btn-close-results').on('click.closeResults', function (event) { jQuery(this).parents('.nucleus-search-results').hide();});
 
-  if (jQuery().HtmlEditor) { args.target.find('.HtmlEditorControl').HtmlEditor({ isAdminMode: true }); }
+	if (jQuery().HtmlEditor) { args.target.find('.HtmlEditorControl').HtmlEditor({ isAdminMode: true }); }
 	
 }

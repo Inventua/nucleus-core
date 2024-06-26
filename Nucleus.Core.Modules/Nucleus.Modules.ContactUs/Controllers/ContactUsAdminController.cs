@@ -38,7 +38,7 @@ public class ContactUsAdminController : Controller
   [HttpPost]
 	public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
 	{
-    if (!viewModel.ShowCategory)
+    if (!(viewModel.ShowCategory && viewModel.RequireCategory))
     {
       ModelState.Remove<ViewModels.Settings>(model => model.CategoryListId);
     }

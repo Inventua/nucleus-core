@@ -17,7 +17,12 @@ namespace Nucleus.Web.ViewModels.Setup
     public string DatabaseServer { get; set; }
 
     public IEnumerable<string> Databases { get; set; } = [REFRESH_DATABASES];
+    public string ListDatabasesError { get; set; }
+
     public string DatabaseName { get; set; }
+    public Boolean UseEncryption { get; set; }
+    public Boolean TrustServerCertificate { get; set; }
+    public Boolean ShowDatabasePicker { get; set; }
 
     public string DatabaseConnectionString { get; set; }
 

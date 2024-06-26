@@ -24,16 +24,23 @@
       switchElement.addClass(targetControl.is(':checked') ? "checked" : "");
 
       // handle clicks on the toggle control (range control)
-      switchElement.on('change input click', function (event)
+      switchElement.off('.toggleswitch');
+      switchElement.on('change.toggleswitch input.toggleswitch click.toggleswitch', function (event)
       {
+        event.preventDefault();
+        event.stopImmediatePropagation();
         targetControl = jQuery(this).prev();
         if (!(targetControl).is('input[type=checkbox]')) return;
         toggle(targetControl, jQuery(this));
       });
 
       // handle clicks on an associated label control
-      targetControl.on('click', function (event)
+      targetControl.off('.toggleswitch');
+      targetControl.on('click.toggleswitch', function (event)
       {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
         toggleControl = jQuery(this).next();
         if (!(toggleControl).is('input[type=range]')) return;
 
@@ -42,22 +49,16 @@
       });
 
       targetControl.after(switchElement);
-
     });    
   }
 
   function toggle(targetControl, toggleswitchControl)
   {
-    targetControl.prop('checked', toggleswitchControl.val() > 1);
-    targetControl.trigger('change');
-
-    if (toggleswitchControl.val() > 1)
+    if (targetControl.is(':checked') !== toggleswitchControl.val() > 1)
     {
-      toggleswitchControl.addClass('checked');
-    }
-    else
-    {
-      toggleswitchControl.removeClass('checked');
+      targetControl.prop('checked', toggleswitchControl.val() > 1);
+      toggleswitchControl.toggleClass('checked', toggleswitchControl.val() > 1);
+      targetControl.trigger('change');
     }
 	}
 })(jQuery);

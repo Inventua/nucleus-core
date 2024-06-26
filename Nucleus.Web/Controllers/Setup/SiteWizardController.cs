@@ -147,6 +147,7 @@ public class SiteWizardController : Controller
     }
 
     viewModel.Databases = ListDatabases(viewModel);
+    viewModel.ShowDatabasePicker = true;
     return View("_Database", await BuildViewModel(viewModel, ReadFlags.DatabaseProviders));
   }
 
@@ -161,7 +162,14 @@ public class SiteWizardController : Controller
   {
     if (!String.IsNullOrEmpty(viewModel.DatabaseServer))
     {
-      viewModel.Databases = ListDatabases(viewModel);
+      try
+      {
+        viewModel.Databases = ListDatabases(viewModel);
+      }
+      catch (Exception ex)
+      {
+        viewModel.ListDatabasesError = ex.Message;
+      }
     }
 
     if (viewModel.DatabaseProvider == "Sqlite" || (!String.IsNullOrEmpty(viewModel.DatabaseName) && viewModel.DatabaseName != ViewModels.Setup.SiteWizard.REFRESH_DATABASES))
@@ -171,6 +179,11 @@ public class SiteWizardController : Controller
     else
     {
       viewModel.DatabaseConnectionString = "";
+    }
+
+    if (viewModel.DatabaseName == REFRESH_DATABASES)
+    {
+      viewModel.ShowDatabasePicker = true;
     }
 
     ModelState.Clear();
@@ -911,6 +924,7 @@ public class SiteWizardController : Controller
   {
     string database = "";
     string identity = "";
+    string encrypt = "";
 
     // special case for Sqlite, which doesn't need or support integrated security, authentication, server name
     if (viewModel.DatabaseProvider == "Sqlite")
@@ -923,7 +937,7 @@ public class SiteWizardController : Controller
       switch (viewModel.DatabaseProvider)
       {
         case "SqlServer":
-          identity = "Integrated Security=true;";
+          identity = $"Integrated Security=true;";
           break;
 
         case "ProgresSql":
@@ -959,12 +973,17 @@ public class SiteWizardController : Controller
       }
     }
 
+    if (viewModel.DatabaseProvider == "SqlServer")
+    {
+      encrypt = $"Encrypt={viewModel.UseEncryption.ToString().ToLower()};Trust Server Certificate={viewModel.TrustServerCertificate.ToString().ToLower()};";
+    }
+
     if (!skipDatabaseName && !String.IsNullOrEmpty(viewModel.DatabaseName))
     {
       database = $"database={viewModel.DatabaseName};";
     }
-
-    return $"server={viewModel.DatabaseServer};{database}{identity}";
+        
+    return $"server={viewModel.DatabaseServer};{database}{identity}{encrypt}";
   }
 
   private static IDatabaseProvider CreateProvider(string providerType)

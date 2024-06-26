@@ -48,8 +48,7 @@ jQuery(function ()
       jQuery('#refresh-extensions').trigger('click');
     }
   });
-  
-  jQuery('button[data-bs-toggle="tab"][data-bs-target="#user-settings"]').on('shown.bs.tab', function (event)
+    jQuery('button[data-bs-toggle="tab"][data-bs-target="#user-settings"]').on('shown.bs.tab', function (event)
   {
     jQuery('#wizard-button-next').removeClass('show');
     jQuery('#wizard-button-finish').addClass('show');
@@ -69,6 +68,12 @@ jQuery(function ()
   jQuery('button[data-bs-toggle="tab"]:not([data-bs-target="#site-preflight"])').on('shown.bs.tab', function (event)
   {
     jQuery('#wizard-button-back').addClass('show');
+  });
+
+  jQuery(document).on('click', '.copy-connection-string', function ()
+  {
+    Page.CopyToClipboard(jQuery('#DatabaseConnectionString'));
+    return false;
   });
 
   jQuery('#site-wizard').modal('show');

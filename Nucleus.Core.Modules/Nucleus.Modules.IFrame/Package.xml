@@ -2,7 +2,7 @@
 <package id="6b3532f0-bb69-4d18-bc5a-4d4c8e326af5" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>IFrame</name>
   <version>2.0.0</version>
-  <publisher name="Inventua" url="http://www.inventua.com" email="support@inventua.com" />
+  <publisher name="Inventua" url="https://www.inventua.com/nucleus/" email="support@inventua.com" />
   <description>
     Module used for embedding another HTML page in your site.
   </description>

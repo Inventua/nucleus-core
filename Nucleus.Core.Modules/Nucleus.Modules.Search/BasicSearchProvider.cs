@@ -1,29 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel;
 using System.Threading.Tasks;
-using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Abstractions.Search;
 using Nucleus.Extensions;
-using DocumentFormat.OpenXml.Wordprocessing;
-using System.ComponentModel;
-using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Modules.Search
 {
-	[DisplayName("Basic Page Search Provider")]
+  [DisplayName("Basic Page Search Provider")]
 	public class BasicSearchProvider : ISearchProvider
 	{
 		private ISiteManager SiteManager { get; }
 		private IPageManager PageManager { get; }
-		
+    private IFileSystemManager FileSystemManager { get; }
 
-		public BasicSearchProvider(ISiteManager siteManager, IListManager listManager, IRoleManager roleManager, IPageManager pageManager)
-		{
+    public BasicSearchProvider(ISiteManager siteManager, IRoleManager roleManager, IPageManager pageManager, IFileSystemManager fileSystemManager)
+    {
 			this.SiteManager = siteManager;
 			this.PageManager = pageManager;
+      this.FileSystemManager = fileSystemManager; 
 		}
 
 		public async Task<SearchResults> Search(SearchQuery query)
@@ -33,12 +31,23 @@ namespace Nucleus.Modules.Search
 				throw new ArgumentException($"The site property is required.", nameof(query.Site));
 			}
 
-			Abstractions.Models.Paging.PagedResult<Page> pages = await this.PageManager.Search(query.Site, query.SearchTerm, query.Roles, query.PagingSettings);
+      Abstractions.Models.Paging.PagedResult<Page> pages = null;
+      Abstractions.Models.Paging.PagedResult<File> files = null;
+
+      if (query.IncludedScopes.Contains(Nucleus.Abstractions.Models.Page.URN))
+      {
+        pages = await this.PageManager.Search(query.Site, query.SearchTerm, query.Roles, query.PagingSettings);
+      }
+
+      if (query.IncludedScopes.Contains(Nucleus.Abstractions.Models.FileSystem.Folder.URN) || query.IncludedScopes.Contains(Nucleus.Abstractions.Models.FileSystem.File.URN))
+      {
+        files = await this.FileSystemManager.Search(query.Site, query.SearchTerm, query.Roles, query.PagingSettings);
+      }
 
 			return new SearchResults()
 			{
-				Results = await ToSearchResults(pages),
-				Total = pages.TotalCount
+				Results = ToSearchResults(query.Site, pages, files),
+				Total = pages?.TotalCount ?? 0 + files?.TotalCount ?? 0
 			};
 		}
 
@@ -51,23 +60,34 @@ namespace Nucleus.Modules.Search
 			});
 		}
 
-		private async Task<IEnumerable<SearchResult>> ToSearchResults(Abstractions.Models.Paging.PagedResult<Page> pages)
+		private IEnumerable<SearchResult> ToSearchResults(Abstractions.Models.Site site, Abstractions.Models.Paging.PagedResult<Page> pages, Abstractions.Models.Paging.PagedResult<File> files)
 		{
 			List<SearchResult> results = new();
 
-			foreach (Page page in pages.Items)
-			{
-				results.Add(await ToSearchResult(page));
-			}
+      if (pages != null)
+      {
+        foreach (Page page in pages.Items)
+        {
+          results.Add(ToSearchResult(site, page));
+        }
+      }
 
-			return results;
+      if (files != null)
+      {
+        foreach (File file in files.Items)
+        {
+          results.Add(ToSearchResult(site, file));
+        }
+      }
+
+      return results;
 		}
 
-		private async Task<SearchResult> ToSearchResult(Page page)
+		private SearchResult ToSearchResult(Abstractions.Models.Site site, Page page)
 		{
 			return new SearchResult()
 			{
-				Site = await this.SiteManager.Get(page.SiteId),
+				Site = site,
 				Url = page.DefaultPageRoute().Path,
 				Title = page.Title,
 				Summary = page.Description,
@@ -81,5 +101,21 @@ namespace Nucleus.Modules.Search
 				Keywords = page.Keywords?.Split(',')
 			};
 		}
-	}
+
+    private SearchResult ToSearchResult(Abstractions.Models.Site site, File file)
+    {
+      return new SearchResult()
+      {
+        Site = site,
+        Url = $"files/{file.EncodeFileId()}",
+        Title = System.IO.Path.GetFileName(file.Path),
+        
+        Scope = File.URN,
+        SourceId = file.Id,
+        ContentType = "text/html",
+        PublishedDate = file.DateChanged ?? file.DateAdded,
+        Type = "File",                
+      };
+    }
+  }
 }

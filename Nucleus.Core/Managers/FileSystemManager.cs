@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Nucleus.Abstractions.FileSystemProviders;
+using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
-using Nucleus.Data.Common;
+using Nucleus.Abstractions.Models.Paging;
 using Nucleus.Core.DataProviders;
-using Nucleus.Abstractions.Managers;
-using Nucleus.Abstractions.FileSystemProviders;
+using Nucleus.Data.Common;
 using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
-using Nucleus.Abstractions.Models.Extensions;
-using Nucleus.Abstractions.Models.Paging;
-using System.Security.Claims;
 
 namespace Nucleus.Core.Managers;
 
@@ -1195,4 +1194,20 @@ public class FileSystemManager : IFileSystemManager
 			}
 		}
 	}
+
+  /// <summary>
+  /// Return a list of all <see cref="File"/>s for the site which match the specified search term.
+  /// </summary>
+  /// <param name="site"></param>
+  /// <param name="searchTerm"></param>
+  /// <param name="userRoleNames"></param>
+  /// <param name="pagingSettings"></param>
+  /// <returns></returns>
+  public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<File>> Search(Site site, string searchTerm, IEnumerable<Role> userRoles, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+  {
+    using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
+    {
+      return await provider.SearchFiles(site, searchTerm, userRoles, pagingSettings);
+    }
+  }
 }

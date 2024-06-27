@@ -238,7 +238,7 @@ public partial class PageManager : IPageManager
   /// </summary>
   /// <param name="site"></param>
   /// <param name="searchTerm"></param>
-  /// <param name="userRoleNames"></param>
+  /// <param name="userRoles"></param>
   /// <param name="pagingSettings"></param>
   /// <returns></returns>
   public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<Page>> Search(Site site, string searchTerm, IEnumerable<Role> userRoles, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)

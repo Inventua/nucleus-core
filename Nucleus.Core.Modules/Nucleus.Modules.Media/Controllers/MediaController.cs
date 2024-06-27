@@ -257,7 +257,8 @@ namespace Nucleus.Modules.Media.Controllers
 
 				viewModel.Style =
 					(String.IsNullOrEmpty(viewModel.Height) ? "" : $"height:{viewModel.Height};") +
-					(String.IsNullOrEmpty(viewModel.Width) ? "width: 100%;" : $"width:{viewModel.Width};");						
+					(String.IsNullOrEmpty(viewModel.Width) ? "width: 100%;" : $"width:{viewModel.Width};") + 
+          (String.IsNullOrEmpty(viewModel.Height) || String.IsNullOrEmpty(viewModel.Width) ? "aspect-ratio: 16 / 9;" : "");
 			}
 
 			return viewModel;

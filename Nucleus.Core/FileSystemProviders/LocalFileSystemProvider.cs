@@ -164,7 +164,7 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 			else
 			{
-				throw new System.IO.FileNotFoundException(null, path);
+				throw new System.IO.FileNotFoundException($"Could not find folder '{path}'.", path);
 			}
 		}
 
@@ -185,7 +185,7 @@ namespace Nucleus.Core.FileSystemProviders
 			else
 			{
 				// file not found
-				throw new System.IO.FileNotFoundException(null, path);
+				throw new System.IO.FileNotFoundException($"Could not find file '{path}'.", path);
 			}
 		}
 
@@ -207,7 +207,7 @@ namespace Nucleus.Core.FileSystemProviders
 
 			if (file == null)
 			{
-				throw new System.IO.FileNotFoundException(null, path);
+				throw new System.IO.FileNotFoundException($"Could not find file '{path}'.", path);
 			}
 
 			System.IO.FileInfo fileInfo = new(BuildPath(path));
@@ -217,7 +217,7 @@ namespace Nucleus.Core.FileSystemProviders
 			}
 			else
 			{
-				throw new System.IO.FileNotFoundException(null, path);
+				throw new System.IO.FileNotFoundException($"Could not find file '{path}'.", path);
 			}
 		}
 

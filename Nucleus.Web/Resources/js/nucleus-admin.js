@@ -126,18 +126,21 @@ function _handleContentLoaded(e, args)
     .removeAttr('href')
     .hide();
 
-  if (jQuery(args.event.target).parents('.track-reset').length !== 0)
+  if (args.event !== null && typeof args.event !== 'undefined' && args.event.target !== null && typeof args.event.target !== 'undefined')
   {
-    navstack = [];
-  }
+    if (jQuery(args.event.target).hasClass('track-reset') || jQuery(args.event.target).parents('.track-reset').length !== 0)
+    {
+      navstack = [];
+    }
 
-  if (typeof (args.url) !== 'undefined' && (navstack.length === 0 || navstack[navstack.length - 1] !== args.url))
-  {
-    if (args.target.hasClass('nucleus-adminpage') && jQuery(args.event.target).parents('.track-nav').length !== 0)
-		{
-			navstack.push(args.url);
-		}
-	}
+    if (typeof (args.url) !== 'undefined' && (navstack.length === 0 || navstack[navstack.length - 1] !== args.url))
+    {
+      if (args.target.hasClass('nucleus-adminpage') && (jQuery(args.event.target).hasClass('track-nav') || jQuery(args.event.target).parents('.track-nav').length !== 0))
+      {
+        navstack.push(args.url);
+      }
+    }
+  }
 
   if (navstack.length > 1 && navstack[navstack.length - 2] !== args.url)
 	{

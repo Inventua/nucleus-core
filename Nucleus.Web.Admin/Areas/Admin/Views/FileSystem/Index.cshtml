@@ -12,13 +12,16 @@
   {
     <div class="nucleus-form-buttonrow nucleus-flex-fields top-commandbar mx-1">
       <div class="nucleus-show-progress nucleus-show-progress-inside d-flex gap-1 align-items-center">
+          @Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "flex-1 nucleus-default-control providerKey" })        
+      </div>
+      <div>
         <RemoveWhiteSpace>
-          @Html.DropDownListFor(model => model.SelectedProviderKey, new SelectList(Model.Providers, nameof(FileSystemProviderInfo.Key), nameof(FileSystemProviderInfo.Name)), "(select)", new { @class = "flex-1 nucleus-default-control providerKey" })
           <span>
             @foreach (var ancestor in Model.Ancestors)
             {
               @if (ancestor != Model.Ancestors.First())
               {
+                <text>&nbsp;/&nbsp;</text>
                 @Html.AreaActionLink(ancestor.Name, "Index", "FileSystem", "Admin", new { folderId = ancestor.Id }, new { @class = "NavigateLink nucleus-show-progress nucleus-show-progress-after", @data_target = ".nucleus-adminpage" })
               }
               else
@@ -29,8 +32,7 @@
           </span>
         </RemoveWhiteSpace>
       </div>
-
-      <div class="d-flex align-items-center ms-auto gap-1 nucleus-show-progress nucleus-show-progress-inside">
+      <div class="d-flex align-items-center flex-0 gap-1 nucleus-show-progress nucleus-show-progress-inside">
         @Html.TextBoxFor(model => model.SearchTerm, new { @class = "flex-1" })
         @Html.SubmitButton("", "Search", @Url.AreaAction("Search", "FileSystem", "Admin"), new { @data_target = "#filesystem-search-results", @class = "btn btn-primary btn-sm" })
       </div>

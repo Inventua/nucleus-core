@@ -1,0 +1,63 @@
+﻿<Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003' ToolsVersion="15.0">
+  <Target Name="CompileExtensions" BeforeTargets="BeforePublish">
+    <ItemGroup>
+      <ExtensionProjects Include="..\Nucleus.Core.Modules\**\*.csproj" />
+    </ItemGroup>
+    <Message Importance="high" Text="Extension projects: @(ExtensionProjects)" />
+    <MSBuild Projects="@(ExtensionProjects)" Properties="Configuration=Release" />
+  </Target>
+
+  <Target Name="RemoveUnwantedFiles" AfterTargets="AfterPublish">
+    <ItemGroup>
+      <UnwantedFiles Include="$(PublishUrl)Areas\Admin\**\*.*;" />
+    </ItemGroup>
+    <Delete Files="@(UnwantedFiles)" />
+    <RemoveDir Directories="$(PublishUrl)Areas\" />
+  </Target>
+
+  <Target Name="IncludeSharedLayoutAndContainerCshtmlFiles" AfterTargets="AfterPublish">
+    <ItemGroup>
+      <SharedContainerCshtmlFiles Include="Shared\Containers\*.cshtml;" />
+      <SharedLayoutCshtmlFiles Include="Shared\Layouts\*.cshtml;" />
+    </ItemGroup>
+    <Copy SourceFiles="@(SharedContainerCshtmlFiles)" DestinationFolder="$(PublishUrl)\Shared\Containers" />
+    <Copy SourceFiles="@(SharedLayoutCshtmlFiles)" DestinationFolder="$(PublishUrl)\Shared\Layouts" />
+  </Target>
+
+  <Target Name="CopyWebConfigTemplate" AfterTargets="AfterPublish" Condition=" '$(Configuration)' == 'Release' ">
+    <!-- web.config contains development settings, web.template.config contains production settings.  This step replaces web.config with -->
+    <!-- the web.template.config file during release builds so that the deployed/published web.config is the right one -->
+    <Copy SourceFiles="web.template.config" DestinationFiles="$(PublishUrl)\web.config" Retries="2" />
+  </Target>
+
+  <Target Name="PostBuildMoveBin" AfterTargets="AfterPublish">
+    <!-- move binaries to /bin -->
+    <ItemGroup>
+      <TopLevelFilesToMoveToBin 
+        Include="$(PublishUrl)\*.*" 
+        Exclude="$(PublishUrl)\*Settings.json;$(PublishUrl)\hosting.json;$(PublishUrl)\config.schema.json;$(PublishUrl)\*.txt;$(PublishUrl)\_ViewImports.cshtml;$(PublishUrl)\package.xsd;$(PublishUrl)\web.config;" />
+      <SubFolderFilesToMoveToBin
+        Include="$(PublishUrl)\**\*"
+        Exclude="$(PublishUrl)\*.*;$(PublishUrl)\Resources\**\*;$(PublishUrl)\Setup\**\*;$(PublishUrl)\Shared\**\*;$(PublishUrl)\Utils\**\*;$(PublishUrl)\wwwroot\**\*;" />
+      <SubFoldersToRemove
+        Include="$(PublishUrl)\refs\;$(PublishUrl)\runtimes\;"/>
+    </ItemGroup>
+    
+    <Move SourceFiles="@(TopLevelFilesToMoveToBin)" DestinationFolder="$(PublishUrl)\bin" />
+    <!--<Move SourceFiles="@(SubFolderFilesToMoveToBin)" DestinationFiles="$(PublishUrl)\bin\%(Identity)" />-->
+    <Move SourceFiles="@(SubFolderFilesToMoveToBin)" DestinationFolder="$(PublishUrl)\bin\%(RecursiveDir)" />
+    <RemoveDir Directories="@(SubFoldersToRemove)"/>
+  </Target>
+  
+  <Target Name="PostBuildZipPackage" AfterTargets="AfterPublish">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="CurrentAssembly" />
+    </GetAssemblyIdentity>
+    <PropertyGroup>
+      <VersionNumber>%(CurrentAssembly.Version)</VersionNumber>
+    </PropertyGroup>
+    <message Importance="High" text="Publishing zip: $(SolutionDir)Publish\Nucleus.$(VersionNumber).zip" />
+    <MakeDir Directories="$(SolutionDir)..\Publish\Release" />
+    <ZipDirectory SourceDirectory="$(PublishUrl)" DestinationFile="$(SolutionDir)..\Publish\Release\Nucleus.$(VersionNumber).$(Nucleus_PublishType).zip" Overwrite="true" />
+  </Target>
+</Project>

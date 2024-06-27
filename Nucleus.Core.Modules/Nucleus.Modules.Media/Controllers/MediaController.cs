@@ -177,7 +177,8 @@ namespace Nucleus.Modules.Media.Controllers
 				case ".gif":
 				case ".png":
 				case ".bmp":
-				case ".tif":
+        case ".webp":
+        case ".tif":
 				case ".tiff":
 					return ViewModels.Viewer.MediaTypes.Image;
 

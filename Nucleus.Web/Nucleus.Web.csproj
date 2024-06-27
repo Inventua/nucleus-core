@@ -90,6 +90,7 @@
 		<None Remove="module.build.targets" />
 		<None Remove="package.xsd" />
 		<None Remove="Resources\**\*" />
+		<None Remove="readme.txt" />
 		<None Remove="Setup\Templates\Site\default-site-template.xml" />
 		<None Remove="Setup\Templates\Site\empty-site-template.xml" />
 		<None Remove="Shared\Containers\container-styles.css" />
@@ -117,7 +118,10 @@
 	<ItemGroup>	  
 		<EmbeddedResource Include="Areas\Setup\Views\SiteWizard\index.js">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</EmbeddedResource>
+		</EmbeddedResource>	  
+		<Content Include="readme.txt">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 		<Content Include="Utils\Windows\nucleus-install.ps1">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>

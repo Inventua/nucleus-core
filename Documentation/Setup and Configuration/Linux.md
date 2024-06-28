@@ -1,6 +1,11 @@
 # Hosting in Linux 
+
+See also: 
+[Hosting in Windows/IIS](/manage/hosting/windows/) 
+[Hosting in Azure App Service](/manage/hosting/azure-app-service/) 
+
 > **_NOTE:_**   We have created a shell script to automate many of the steps.  This page describes the use of the shell script.  This 
-process has been tested with [*Ubuntu Server 22.04*](https://ubuntu.com/download/server).  The script will configure an instance of Nucleus which uses a Sqlite 
+process has been tested with [*Ubuntu Server 24.04*](https://ubuntu.com/download/server).  The script will configure an instance of Nucleus which uses a Sqlite 
 database.  After you have completed basic installation, you can [configure Nucleus to use a different database type](/getting-started/#using-a-different-database-provider). 
 
 ## Linux Installation
@@ -9,9 +14,9 @@ Set up your Linux environment.  There are many options for setting up Linux, inc
 - Use the [Raspberry Pi Imager](https://www.raspberrypi.com/software/) to [install Ubuntu for Raspberry Pi](https://ubuntu.com/download/raspberry-pi) to an SD card.  
 **_TIP:_**  In the Raspberry Pi imager, use the Settings icon (gear symbol) to set up your host name, SSH and admin credentials automatically.
 - [Create a Linux virtual machine in Azure](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/quick-create-portal).  
-Choose Ubuntu Server 20.04 LTS or later when you are prompted for an Image.
+Choose Ubuntu Server 24.04 LTS or later when you are prompted for an Image.
 - [Create a Linux virtual machine in Amazon Web Services](https://aws.amazon.com/getting-started/hands-on/launch-a-virtual-machine/).  
-Choose Ubuntu Server 20.04 LTS or later when you are prompted for a Blueprint.
+Choose Ubuntu Server 24.04 LTS or later when you are prompted for a Blueprint.
 - [Use the Ubuntu docker image](https://hub.docker.com/_/ubuntu) to run Ubuntu in [Docker](https://www.docker.com/). 
 
 ## Nucleus Installation

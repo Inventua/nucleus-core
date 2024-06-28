@@ -1,4 +1,8 @@
 # Hosting in Azure App Service 
+See also: 
+[Hosting in Windows/IIS](/manage/hosting/windows/) 
+[Hosting in Linux](/manage/hosting/linux/) 
+
 > **_NOTE:_**   This guide assumes that you are using Azure Sql Server as your database, and Azure App Storage as your file system.  
 
 1.  If you don't already have one, [create an Azure free account](https://azure.microsoft.com/en-au/free). The free App Service tier isn't 

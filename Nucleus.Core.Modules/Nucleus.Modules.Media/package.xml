@@ -16,7 +16,7 @@
         <viewController>Media</viewController>
         <viewAction>Index</viewAction>
         <editAction>Edit</editAction>
-        <categories>Content,Media</categories>
+        <categories>Content</categories>
       </moduleDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />

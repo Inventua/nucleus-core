@@ -2289,33 +2289,19 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
     await this.Context.SaveChangesAsync<File>();
   }
 
-  public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<File>> SearchFiles(Site site, string searchTerm, IEnumerable<Role> userRoles, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
+  public async Task<List<File>> SearchFiles(Site site, string searchTerm)
   {
-    List<File> results;
-    IEnumerable<Guid> userRoleIds = userRoles?.Select(role => role.Id);
-
     var query = this.Context.Files.Where(file =>
       EF.Property<Guid>(file, "SiteId") == site.Id &&
         (
           EF.Functions.Like(file.Path, $"%{searchTerm}%") 
         )
-        &&
-        (
-          userRoleIds == null  // this function only works for admins
-        )
       );
 
-    pagingSettings.TotalCount = await query
-      .CountAsync();
-
-    results = await query
-      .Skip(pagingSettings.FirstRowIndex)
-      .Take(pagingSettings.PageSize)
+    return await query
       .AsSplitQuery()
       .AsNoTracking()
       .ToListAsync();
-
-    return new Nucleus.Abstractions.Models.Paging.PagedResult<File>(pagingSettings, results);
   }
   #endregion
 

@@ -2,6 +2,7 @@
 <h2 class="nucleus-modal-caption">Search Results</h2>
 @using (Html.BeginAreaForm("Search", "FileSystem", "Admin", FormMethod.Post, new { @class = "", @data_target = "#filesystem-search-results", @enctype = "multipart/form-data" }))
 {
+  @Html.HiddenFor(model => model.SearchTerm)
   @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.PagingSettings, propertyName = nameof(Model.PagingSettings) })
 
   <div class="overflow-auto">

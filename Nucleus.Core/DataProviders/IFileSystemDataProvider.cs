@@ -23,5 +23,5 @@ internal interface IFileSystemDataProvider : IDisposable
   abstract Task<File> SaveFile(Site site, File file);
   abstract Task DeleteFile(File file);
 
-  abstract Task<Nucleus.Abstractions.Models.Paging.PagedResult<File>> SearchFiles(Site site, string searchTerm, IEnumerable<Role> userRoles, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings);
+  abstract Task<List<File>> SearchFiles(Site site, string searchTerm);
 }

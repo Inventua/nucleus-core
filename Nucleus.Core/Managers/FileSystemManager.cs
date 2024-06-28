@@ -1204,10 +1204,64 @@ public class FileSystemManager : IFileSystemManager
   /// <param name="pagingSettings"></param>
   /// <returns></returns>
   public async Task<Nucleus.Abstractions.Models.Paging.PagedResult<File>> Search(Site site, string searchTerm, IEnumerable<Role> userRoles, Nucleus.Abstractions.Models.Paging.PagingSettings pagingSettings)
-  {
+  {    
     using (IFileSystemDataProvider provider = this.DataProviderFactory.CreateProvider<IFileSystemDataProvider>())
     {
-      return await provider.SearchFiles(site, searchTerm, userRoles, pagingSettings);
+      List<File> files = await provider.SearchFiles(site, searchTerm);
+      List<File> viewableFiles = [];
+
+      // we have to do permissions checking and paging here, because the database does not store parent/child (Folder/File) relationships,
+      // and permissions are on the Folder, not the file.
+      foreach (File file in files)
+      {
+        if (await CanViewFile(site, file, userRoles))
+        {
+          viewableFiles.Add(file);
+        }
+      }
+
+      return new(pagingSettings)
+      {
+        TotalCount = viewableFiles.Count,
+        Items = viewableFiles
+          .Skip(pagingSettings.FirstRowIndex)
+          .Take(pagingSettings.PageSize)
+          .ToList()
+      };
     }
   }
+
+  private async Task<Boolean> CanViewFile(Site site, File file, IEnumerable<Role> userRoles)
+  {
+    try
+    {
+      File fullFile = await this.GetFile(site, file.Id);
+
+      if (userRoles == null || fullFile.Parent.IncludeInSearch)
+      {
+        if (userRoles == null || !userRoles.Any()) return true;
+
+        foreach (Permission permission in fullFile.Parent.Permissions)
+        {
+          if (permission.IsFolderViewPermission())
+          {
+
+            if (permission.AllowAccess && permission.Role != null)
+            {
+              if (userRoles.Any(role => role.Id == permission.Role.Id))
+              {
+                return true;
+              }
+            }
+          }
+        }
+      }
+    }
+    catch (System.IO.FileNotFoundException)
+    {
+      return false;
+    }
+
+    return false;
+  }  
 }

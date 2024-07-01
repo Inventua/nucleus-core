@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Hosting;
 using Nucleus.Extensions.Excel;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Diagnostics.ResourceMonitoring;
+using System.Threading;
 
 namespace Nucleus.Web.Controllers.Admin;
 
@@ -34,13 +36,15 @@ public class SystemController : Controller
   private Context Context { get; }
   private ICacheManager CacheManager { get; }
   private IWebHostEnvironment HostingEnvironment { get; }
+  private IResourceMonitor Monitor { get; }
 
   private const string LINUX_OS_INFO_FILE = "/etc/os-release";
 
 
-  public SystemController(IWebHostEnvironment hostingEnvironment, Context context, RunningTaskQueue runningTaskQueue, ICacheManager cacheManager, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager)
+  public SystemController(IWebHostEnvironment hostingEnvironment, IResourceMonitor monitor, Context context, RunningTaskQueue runningTaskQueue, ICacheManager cacheManager, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager)
   {
     this.HostingEnvironment = hostingEnvironment;
+    this.Monitor = monitor;
     this.Context = context;
     this.RunningTaskQueue = runningTaskQueue;
     this.CacheManager = cacheManager;
@@ -309,12 +313,23 @@ public class SystemController : Controller
 
   }
 
-
+  private ResourceUtilization GetUtilization()
+  {
+    try
+    {
+      return this.Monitor.GetUtilization(TimeSpan.FromSeconds(5));
+    }
+    catch (Exception)
+    {
+      return default;
+    }    
+  }
 
   private async Task<ViewModels.Admin.SystemIndex> BuildViewModel(ViewModels.Admin.SystemIndex viewModelInput)
   {
     System.Diagnostics.Process.GetCurrentProcess().Refresh();
     TimeSpan uptime = DateTime.UtcNow - System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime();
+    ResourceUtilization resourceUtilization = GetUtilization();
 
     ViewModels.Admin.SystemIndex viewModelOutput = new()
     {
@@ -328,6 +343,8 @@ public class SystemController : Controller
       OperatingSystem = Environment.OSVersion.ToString(),
       OperatingSystemUser = $"{Environment.UserDomainName}/{Environment.UserName}",
       StartTime = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime(),
+      CpuUsedPercentage = resourceUtilization.CpuUsedPercentage,
+      MemoryUsedPercentage = resourceUtilization.MemoryUsedPercentage,
       Uptime = FormatUptime(uptime)
     };
 

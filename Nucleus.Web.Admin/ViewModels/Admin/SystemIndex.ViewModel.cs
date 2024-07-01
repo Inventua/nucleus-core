@@ -31,8 +31,10 @@ namespace Nucleus.Web.ViewModels.Admin
 		public DateTime StartTime { get; set; }
 		public string Uptime { get; set; }
 		public string EnvironmentName { get; set; }
+    public double CpuUsedPercentage { get; set; }
+    public double MemoryUsedPercentage { get; set; }
 
-		public LogSettingsViewModel LogSettings { get; set; } = new() { HasLoggingConfiguration = true };
+    public LogSettingsViewModel LogSettings { get; set; } = new() { HasLoggingConfiguration = true };
 
 		public string Configuration { get; set; }
 

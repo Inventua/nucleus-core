@@ -56,6 +56,14 @@
             <th scope="row">Process Start Time</th>
             <td>@Model.StartTime.FormatDate(this.Context.Request.GetUserTimeZone()) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(FormatExtensions.TimespanFormats.TimeOffset)] (@Model.Uptime)</td>
           </tr>
+          <tr>
+            <th scope="row">CPU Used</th>
+            <td>@Model.CpuUsedPercentage.ToString("0.00")%</td>
+          </tr>
+          <tr>
+            <th scope="row">Memory Used</th>
+            <td>@Model.MemoryUsedPercentage.ToString("0.00")%</td>
+          </tr>
         </tbody>
       </table>
     </TabPanel>

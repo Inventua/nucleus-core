@@ -1,5 +1,5 @@
 ﻿/*! monaco-editor | Provides a jQuery plugin wrapper for the Monaco editor for use in admin pages in Nucleus CMS.  (c) Inventua Pty Ptd.  www.nucleus-cms.com */
-var require = { paths: { vs: 'Resources/Libraries/Monaco/0.44.0/min/vs' } };
+var require = { paths: { vs: 'Resources/Libraries/Monaco/0.50.0/min/vs' } };
 (function ($)
 {
   jQuery.fn.MonacoEditor = function (conf)

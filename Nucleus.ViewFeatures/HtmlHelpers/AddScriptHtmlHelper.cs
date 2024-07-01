@@ -107,6 +107,26 @@ public static class AddScriptHtmlHelper
     public const int LATE = 1000;
   }
 
+  private const string WELLKNOWN_BOOTSTRAP = "~/Resources/Libraries/Bootstrap/5.3.2/js/bootstrap.bundle.js";
+  private const string WELLKNOWN_JQUERY = "~/Resources/Libraries/jQuery/3.7.1/jquery.js";
+  private const string WELLKNOWN_NUCLEUS_SHARED = "~/Resources/js/nucleus-shared.js";
+  private const string WELLKNOWN_NUCLEUS_PAGELIST = "~/Resources/js/jquery-pagelist.js";
+  private const string WELLKNOWN_NUCLEUS_ADMIN = "~/Resources/js/nucleus-admin.js";
+  private const string WELLKNOWN_NUCLEUS_TOGGLESWITCH = "~/Resources/js/jquery-toggleswitch.js";
+  private const string WELLKNOWN_NUCLEUS_EDITMODE = "~/Resources/js/nucleus-editmode.js";
+
+  // when we use a new monaco version, paths must also be updated in:
+  // - Resources\Libraries\Monaco\Nucleus\monaco-editor.js 
+  // - AddStyleHtmlHelper.cs [WELLKNOWN_NUCLEUS_MONACO_EDITOR]
+  private const string WELLKNOWN_NUCLEUS_MONACO_EDITOR = "~/Resources/Libraries/Monaco/Nucleus/monaco-editor.js";
+  private const string WELLKNOWN_NUCLEUS_MONACO_EDITOR_LOADER = "~/Resources/Libraries/Monaco/0.50.0/min/vs/loader.js";
+  private const string WELLKNOWN_NUCLEUS_MONACO_EDITOR_LOADER_NLS = "~/Resources/Libraries/Monaco/0.50.0/min/vs/editor/editor.main.nls.js";
+  private const string WELLKNOWN_NUCLEUS_MONACO_EDITOR_MAIN = "~/Resources/Libraries/Monaco/0.50.0/min/vs/editor/editor.main.js";
+
+  private const string WELLKNOWN_BLAZOR_SERVER = "~/_framework/blazor.server.js";
+  private const string WELLKNOWN_BLAZOR_WEB = "~/_framework/blazor.web.js";
+  private const string WELLKNOWN_BLAZOR_WEBASSEMBLY = "~/_framework/blazor.webassembly.js";
+
   /// <summary>
   /// Add a well-known script.
   /// </summary>
@@ -118,40 +138,40 @@ public static class AddScriptHtmlHelper
     switch (script)
     {
       case WellKnownScripts.BOOTSTRAP:
-        AddWellKnownScript(htmlHelper, "~/Resources/Libraries/Bootstrap/5.3.2/js/bootstrap.bundle.js");
+        AddWellKnownScript(htmlHelper, WELLKNOWN_BOOTSTRAP);
         break;
       case WellKnownScripts.JQUERY:
-        AddWellKnownScript(htmlHelper, "~/Resources/Libraries/jQuery/3.7.1/jquery.js");
+        AddWellKnownScript(htmlHelper, WELLKNOWN_JQUERY);
         break;
       case WellKnownScripts.NUCLEUS_SHARED:
-        AddWellKnownScript(htmlHelper, "~/Resources/js/nucleus-shared.js");
+        AddWellKnownScript(htmlHelper, WELLKNOWN_NUCLEUS_SHARED);
         break;
       case WellKnownScripts.NUCLEUS_PAGELIST:
-        AddWellKnownScript(htmlHelper, "~/Resources/js/jquery-pagelist.js", true);
+        AddWellKnownScript(htmlHelper, WELLKNOWN_NUCLEUS_PAGELIST, true);
         break;
       case WellKnownScripts.NUCLEUS_ADMIN:
-        AddWellKnownScript(htmlHelper, "~/Resources/js/nucleus-admin.js");
+        AddWellKnownScript(htmlHelper, WELLKNOWN_NUCLEUS_ADMIN);
         break;
       case WellKnownScripts.NUCLEUS_TOGGLESWITCH:
-        AddWellKnownScript(htmlHelper, "~/Resources/js/jquery-toggleswitch.js");
+        AddWellKnownScript(htmlHelper, WELLKNOWN_NUCLEUS_TOGGLESWITCH);
         break;
       case WellKnownScripts.NUCLEUS_EDITMODE:
-        AddWellKnownScript(htmlHelper, "~/Resources/js/nucleus-editmode.js");
+        AddWellKnownScript(htmlHelper, WELLKNOWN_NUCLEUS_EDITMODE);
         break;
       case WellKnownScripts.NUCLEUS_MONACO_EDITOR:
-        AddWellKnownScript(htmlHelper, "~/Resources/Libraries/Monaco/Nucleus/monaco-editor.js", false);
-        AddWellKnownScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/loader.js", false);
-        AddWellKnownScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/editor/editor.main.nls.js", true);
-        AddWellKnownScript(htmlHelper, "~/Resources/Libraries/Monaco/0.44.0/min/vs/editor/editor.main.js", true);
+        AddWellKnownScript(htmlHelper, WELLKNOWN_NUCLEUS_MONACO_EDITOR, false);
+        AddWellKnownScript(htmlHelper, WELLKNOWN_NUCLEUS_MONACO_EDITOR_LOADER, false);
+        AddWellKnownScript(htmlHelper, WELLKNOWN_NUCLEUS_MONACO_EDITOR_LOADER_NLS, true);
+        AddWellKnownScript(htmlHelper, WELLKNOWN_NUCLEUS_MONACO_EDITOR_MAIN, true);
         break;
       case WellKnownScripts.BLAZOR_SERVER:
-        AddWellKnownScript(htmlHelper, "~/_framework/blazor.server.js");
+        AddWellKnownScript(htmlHelper, WELLKNOWN_BLAZOR_SERVER);
         break;
       case WellKnownScripts.BLAZOR_WEB:
-        AddWellKnownScript(htmlHelper, "~/_framework/blazor.web.js");
+        AddWellKnownScript(htmlHelper, WELLKNOWN_BLAZOR_WEB);
         break;
       case WellKnownScripts.BLAZOR_WEBASSEMBLY:
-        AddWellKnownScript(htmlHelper, "~/_framework/blazor.webassembly.js");
+        AddWellKnownScript(htmlHelper, WELLKNOWN_BLAZOR_WEBASSEMBLY);
         break;
     }
 

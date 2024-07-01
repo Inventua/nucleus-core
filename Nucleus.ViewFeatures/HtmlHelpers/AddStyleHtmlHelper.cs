@@ -74,7 +74,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     private const string WELLKNOWN_NUCLEUS_FORMS = "~/Resources/css/forms.css";
     private const string WELLKNOWN_NUCLEUS_EDITMODE = "~/Resources/css/editmode.css";
     private const string WELLKNOWN_NUCLEUS_PAGINGCONTROL = "~/Shared/Controls/Views/PagingControl.css";
-    private const string WELLKNOWN_NUCLEUS_MONACO_EDITOR = "~/Resources/Libraries/Monaco/0.44.0/min/vs/editor/editor.main.css";
+    private const string WELLKNOWN_NUCLEUS_MONACO_EDITOR = "~/Resources/Libraries/Monaco/0.50.0/min/vs/editor/editor.main.css";
     private const string WELLKNOWN_NUCLEUS_CONTAINER_STYLES = "~/Shared/Containers/container-styles.css";
 
     private static readonly string[] WELL_KNOWN_PATHS = 

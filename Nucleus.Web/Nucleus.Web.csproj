@@ -64,11 +64,8 @@
 		<Content Remove="publish\**" />
 		<Content Remove="appSettings.*.json" />
 		<Content Remove="bundleconfig.json" />
-		<Content Remove="iis-dev\**\*" />
 		<Content Remove="databaseSettings.*.json" />
 		<Content Remove="hosting.*.json" />
-		<Content Remove="iis-dev\web.config" />
-    <Content Remove="Resources\Libraries\Monaco\0.44.0\package.json" />
 		<Content Remove="Setup\install-log.config" />
 		<Content Remove="web.template.config" />
 		<EmbeddedResource Remove="Extensions\**" />
@@ -198,8 +195,7 @@
 		<None Include="appSettings.*.json">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>
-		<None Include="bundleconfig.json" />    
-		<None Include="iis-dev\**\*" />
+		<None Include="bundleconfig.json" />
 		<_ContentIncludedByDefault Remove="appSettings.linux.json" />
 		<None Include="databaseSettings.*.json">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
@@ -207,8 +203,10 @@
 		<None Include="hosting.*.json">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>
-		<None Include="iis-dev\web.config" />
-    <None Include="Resources\Libraries\Monaco\0.44.0\package.json" />
+		<Content Remove="Resources\Libraries\Monaco\0.50.0\package.json" />
+		<Content Remove="Resources\Libraries\Monaco\Nucleus\readme.txt" />
+    <None Include="Resources\Libraries\Monaco\0.50.0\package.json" />
+    <None Include="Resources\Libraries\Monaco\Nucleus\readme.txt" />
 		<None Include="Setup\install-log.config">
 		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>

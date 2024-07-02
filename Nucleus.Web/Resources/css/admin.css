@@ -264,11 +264,32 @@ body
 .nucleus-control-panel-sidebar li
 {
   display: flex;
-  padding: 0.75rem;
   opacity: 0.9;
   user-select: none;
-  cursor: default;
   list-style-type: none;
+}
+
+.nucleus-control-panel-sidebar ul button
+{
+  display: block;
+  text-decoration: none;
+  text-align: center;
+  background-color: transparent;
+  padding: 0.75rem;
+  flex: 1;
+  border: 0;
+}
+
+.nucleus-control-panel-sidebar li span.nucleus-index-icon
+{
+  display: block;
+  height: auto;
+  width: 48px;
+  margin: auto;
+  box-sizing: border-box;
+  font-family: 'Material Icons';
+  font-size: 42px;
+  line-height: normal;
 }
 
 .control-panel-dock-top .nucleus-control-panel-sidebar li
@@ -385,29 +406,6 @@ body
 .control-panel-dock-top .dock-top-btn
 {
   display: none;
-}
-
-.nucleus-control-panel-sidebar ul button
-{
-  display: block;
-  text-decoration: none;
-  text-align: center;
-  background-color: transparent;
-  padding: 0;
-  border: 0;
-  margin: auto;
-}
-
-.nucleus-control-panel-sidebar li span.nucleus-index-icon
-{
-  display: block;
-  height: auto;
-  width: 48px;
-  margin: auto;
-  box-sizing: border-box;
-  font-family: 'Material Icons';
-  font-size: 42px;
-  line-height: normal;
 }
 
 .nucleus-control-panel-items

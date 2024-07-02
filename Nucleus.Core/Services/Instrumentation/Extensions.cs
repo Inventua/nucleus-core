@@ -1,19 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using OpenTelemetry.Trace;
+using Microsoft.Extensions.Logging;
+using Nucleus.Abstractions.Models.Configuration;
+using Nucleus.Core.Logging;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Builder;
-using Nucleus.Abstractions.Models.Configuration;
-using Microsoft.AspNetCore.Hosting;
-using Nucleus.Core.Logging;
+using OpenTelemetry.Trace;
 
 // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/diagnostic-resource-monitoring#see-also
 
@@ -88,11 +83,13 @@ public static class Extensions
       //  builder.AddOtlpExporter();
       //});
 
-      services.AddResourceMonitoring();
       services.AddHostedService<TelemetryMonitor>();
 
       services.AddSingleton<TelemetryMiddleware>();
     }
+
+    // we add resource monitoring regardless of config file settings, because we use IResourceMonitor in the system information page
+    services.AddResourceMonitoring();
 
     return services;
   }

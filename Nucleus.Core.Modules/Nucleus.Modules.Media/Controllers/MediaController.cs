@@ -238,7 +238,7 @@ public class MediaController : Controller
           viewModel.SourceUrl = viewModel.Url;
           break;
         case Models.Settings.AvailableSourceTypes.YouTube:
-          viewModel.SourceUrl = $"https://www.youtube.com/embed/{viewModel.YoutubeId}?mute=1&autoplay={(viewModel.AutoPlay ? "1" : "0")}";
+          viewModel.SourceUrl = $"https://www.youtube-nocookie.com/embed/{viewModel.YoutubeId}?mute=1&autoplay={(viewModel.AutoPlay ? "1" : "0")}";
           break;
       }
 

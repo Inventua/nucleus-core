@@ -421,6 +421,12 @@ table.table-sticky-headers thead th
 	margin-right: 0;
 }
 
+.nucleus-content img
+{
+  /* resize (shrink) images if they do not fit */
+  max-width: 100%;
+}
+
 /* bootstrap tabs. Supplement bootstrap tab style to add a border and padding */
 .tab-content
 {  
@@ -457,7 +463,7 @@ table.table-sticky-headers thead th
   padding-right: var(--nucleus-default-gap-horizontal);
 }
 
-/* override bootstrap padding so that .nucleus-menu controls padding*/
+/* override bootstrap padding so that .nucleus-menu controls padding */
 .nucleus-menu > .container-fluid
 {
   padding: 0;  

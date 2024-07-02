@@ -2,6 +2,7 @@
 {
   --search-compact-width: 15rem;
 }
+
 .search-result
 {
 	margin-bottom: var(--nucleus-default-gap-vertical);
@@ -24,7 +25,7 @@
 .search-display-full label, .search-display-compact label, .search-display-minimal label
 {
   display: grid;
-  grid-template-columns: 1fr minmax(auto,10fr) 1fr;
+  grid-template-columns: 1fr minmax(auto,10fr) auto;
   grid-column-gap: var(--nucleus-default-gap-horizontal);
   align-items: center;
 }

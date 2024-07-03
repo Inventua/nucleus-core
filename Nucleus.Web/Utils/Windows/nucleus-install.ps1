@@ -386,18 +386,31 @@ class Application
   # display a setting on-screen 
   [void]WriteLine([string]$caption, [string]$value)
   {
-    $this.WriteLine($caption, $value, $false);
+    $this.WriteLine($caption, $value, $false)
   }
 
   # display a setting on-screen
   [void]WriteLine([string]$caption, [string]$value, [boolean]$highlight)
   {
-    [int]$chars = 30
     [string]$color = "Gray"
     if ($highlight -eq $true)
     {
       $color = "Yellow"
     }
+    $this.WriteLine($caption, $value, $color)
+  }
+
+  # display a setting on-screen
+  [void]WriteAlert([string]$caption, [string]$value)
+  {
+    [string]$color = "Red"
+    $this.WriteLine($caption, $value, $color)
+  }
+
+  # display a setting on-screen
+  [void]WriteLine([string]$caption, [string]$value, [string]$color)
+  {
+    [int]$chars = 30
     if ($caption -ne "")
     {
       Write-Host "- $("$($caption):".PadRight($chars)) $value" -ForeGroundColor $color
@@ -420,12 +433,12 @@ class Application
     $this.WriteLine("Application Install set", $this.ZipFile)
     
     # detect whether Nucleus is already installed, verify that the correct install set type was detected
-    if (Test-Path -Path "$($this.Path)\Nucleus.Web.dll")
+    if (Test-Path -Path "$($this.Path)\bin\Nucleus.Web.dll")
     {
       if ($this.InstallType -eq "Install")
       {
         # Nucleus.Web.dll was found, if the latest install set is an install, display warning
-        $this.WriteLine("", "WARNING: Nucleus is already installed, but the detected install set is a new install set.", $true)
+        $this.WriteAlert("", "WARNING: Nucleus is already installed, but the detected install set is a new install set.")
       }
     }
     else
@@ -433,7 +446,7 @@ class Application
       if ($this.InstallType -eq "Upgrade")
       {
         # Nucleus.Web.dll was not found, if the latest install set is an upgrade, display warning
-        $this.WriteLine("", "WARNING: Nucleus is not installed, but the detected install set is an upgrade set.", $true)
+        $this.WriteAlert("", "WARNING: Nucleus is not installed, but the detected install set is an upgrade set.")
       }
     }
 

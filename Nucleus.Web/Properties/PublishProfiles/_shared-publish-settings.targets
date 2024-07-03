@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <ExcludeApp_Data>false</ExcludeApp_Data>
+    <DeleteExistingFiles>true</DeleteExistingFiles>
+    <LaunchSiteAfterPublish>false</LaunchSiteAfterPublish>
+    <LastUsedBuildConfiguration>Release</LastUsedBuildConfiguration>
+    <LastUsedPlatform>Any CPU</LastUsedPlatform>
+    <PublishProvider>FileSystem</PublishProvider>
+    <PublishUrl>Publish\</PublishUrl>  <!-- Visual studio uses this one -->
+    <PublishDir>Publish\</PublishDir>  <!-- command line (dotnet publish) uses this one -->
+    <WebPublishMethod>FileSystem</WebPublishMethod>
+    <SiteUrlToLaunchAfterPublish />
+    <TargetFramework>net8.0</TargetFramework>
+    <ProjectGuid>387821b9-3bd3-4d1f-ae73-b1595a80ad48</ProjectGuid>
+    <SelfContained>false</SelfContained>
+    <IsWebConfigTransformDisabled>true</IsWebConfigTransformDisabled>
+    <DebugType>none</DebugType>
+    <AllowedReferenceRelatedFileExtensions>*.pdb</AllowedReferenceRelatedFileExtensions>    
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="**\*.Development.json" />
+    <Content Remove="**\*.pdb" />
+    <Content Remove="**\bin\**\*.xml" />
+    <Content Remove="Setup\install-log.config" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Nucleus_PublishType)' == 'Upgrade'">
+    <Content Remove="**\*.Production.json;databaseSettings*.json;web.config;hosting*.json" />
+  </ItemGroup>
+</Project>

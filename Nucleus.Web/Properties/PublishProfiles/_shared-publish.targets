@@ -1,10 +1,32 @@
 ﻿<Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003' ToolsVersion="15.0">
+
+  <ItemGroup Condition="'$(Nucleus_PublishType)' == 'Upgrade'">
+    <Content Remove="**\*.Development.json;**\*.Production.json;databaseSettings*.json;web.config;hosting*.json" />
+    <Content Remove="**\*.pdb" />
+    <Content Remove="**\bin\**\*.xml" />
+    <Content Remove="Setup\install-log.config" />
+  </ItemGroup>
+
+  <!-- Remove config files from the upgrade set so that an upgrade doesn't overwrite user changes to them -->
+  <Target Name="ClearConfigFiles" BeforeTargets="BeforePublish" Condition="'$(PublishUrl)' != '' And '$(Nucleus_PublishType)' == 'Upgrade'">
+    <ItemGroup>
+      <ConfigFilesToDelete Include="$(PublishUrl)databaseSettings*.json;$(PublishUrl)*.Production.json;$(PublishUrl)web.config;$(PublishUrl)hosting*.json" />
+    </ItemGroup>
+    <Message Importance="High" text="ClearExistingFiles: @(ConfigFilesToDelete)" />
+    <Delete Files="@(ConfigFilesToDelete)" ContinueOnError="false" />
+  </Target>
+
   <Target Name="CompileExtensions" BeforeTargets="BeforePublish">
     <ItemGroup>
       <ExtensionProjects Include="..\Nucleus.Core.Modules\**\*.csproj" />
     </ItemGroup>
     <Message Importance="high" Text="Extension projects: @(ExtensionProjects)" />
-    <MSBuild Projects="@(ExtensionProjects)" Properties="Configuration=Release" />
+    <!-- 
+    RuntimeIdentifier= (with no value) is used to compile extensions as "portable".  This is important when the 
+    target runtime is set to a specific value in the pubxml file that imports this .targets file, as extensions
+    need to be compiled as portable, and not for a specific target runtime.
+    -->
+    <MSBuild Projects="@(ExtensionProjects)" Properties="Configuration=Release;RuntimeIdentifier=" />
   </Target>
 
   <Target Name="RemoveUnwantedFiles" AfterTargets="AfterPublish">
@@ -58,6 +80,10 @@
     </PropertyGroup>
     <message Importance="High" text="Publishing zip: $(SolutionDir)Publish\Nucleus.$(VersionNumber).zip" />
     <MakeDir Directories="$(SolutionDir)..\Publish\Release" />
-    <ZipDirectory SourceDirectory="$(PublishUrl)" DestinationFile="$(SolutionDir)..\Publish\Release\Nucleus.$(VersionNumber).$(Nucleus_PublishType).zip" Overwrite="true" />
+    <PropertyGroup>
+      <RuntimeIdentifierFilenamePart>$(RuntimeIdentifier.Replace("-", "_"))</RuntimeIdentifierFilenamePart>
+      <RuntimeIdentifierFilenamePart Condition="'$(RuntimeIdentifier)' == ''">portable</RuntimeIdentifierFilenamePart>
+    </PropertyGroup>
+    <ZipDirectory SourceDirectory="$(PublishUrl)" DestinationFile="$(SolutionDir)..\Publish\Release\Nucleus.$(VersionNumber).$(Nucleus_PublishType)-$(RuntimeIdentifierFilenamePart).zip" Overwrite="true" />
   </Target>
 </Project>

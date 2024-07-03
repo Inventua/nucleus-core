@@ -99,7 +99,6 @@ public class AssemblyLoader
       // exclude anything in the bin/runtimes/**/native folder, these are not .net assemblies
       string[] assemblyPathParts = System.IO.Path.GetDirectoryName(path).Split(['/', '\\']);
 
-      //if (System.IO.Path.GetDirectoryName(path).ToLower().Replace('\\', '/').Contains("/runtimes/") && System.IO.Path.GetDirectoryName(path).ToLower().Replace('\\', '/').EndsWith("/native"))
       if (assemblyPathParts.Contains("runtimes", StringComparer.OrdinalIgnoreCase) && assemblyPathParts.Last()?.Equals("native", StringComparison.OrdinalIgnoreCase) == true)
       {
         return null;
@@ -402,11 +401,16 @@ public class AssemblyLoader
 
     // get all assemblies (dlls) in /bin/runtimes/**
     string runtimesFolder = System.IO.Path.Join(System.IO.Path.GetDirectoryName(typeof(AssemblyLoader).Assembly.Location), "runtimes");
-    foreach (string filename in System.IO.Directory.EnumerateFiles(runtimesFolder, "*.dll", System.IO.SearchOption.AllDirectories))
+    
+    // platform-specific installs do not have a runtimes folder
+    if (System.IO.Directory.Exists(runtimesFolder))
     {
-      if (!IsExcludedAssembly(filename))
+      foreach (string filename in System.IO.Directory.EnumerateFiles(runtimesFolder, "*.dll", System.IO.SearchOption.AllDirectories))
       {
-        yield return FolderOptions.NormalizePath(filename);
+        if (!IsExcludedAssembly(filename))
+        {
+          yield return FolderOptions.NormalizePath(filename);
+        }
       }
     }
 

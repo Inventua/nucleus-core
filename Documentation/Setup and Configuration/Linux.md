@@ -36,9 +36,19 @@ connect from another computer:
 
 3.  Download the installer shell script and installation file:  
 <kbd>wget https://github.com/Inventua/nucleus-core/tree/main/Nucleus.Web/Utils/Ubuntu/nucleus-install.sh > nucleus-install.sh</kbd>
-<br/>
-<kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v1.1.0/Nucleus.1.3.0.0.Install.zip > Nucleus.1.3.0.0.Install.zip</kbd>  
 <br />
+Processor: X64
+<kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-linux_x64.zip > Nucleus.2.0.0.0.Install-linux_x64.zip</kbd>  
+<br/>
+ or
+<br/>
+Processor: ARM64 (for example: Raspberry Pi 3, 4, 5)
+<kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-linux_arm64.zip > Nucleus.2.0.0.0.Install-linux_arm64.zip</kbd>  
+<br />
+Processor: Other (for example: MacOS)
+<kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-portable.zip > Nucleus.2.0.0.0.Install-portable.zip</kbd>  
+<br />
+
 If you are installing a later version of Nucleus, download the zip file for that version instead - the installer shell script automatically 
 checks the folder which contains the shell script for the zip file with the most recent version of Nucleus. 
 [Download the latest Nucleus version](https://github.com/Inventua/nucleus-core/releases/latest)
@@ -236,7 +246,7 @@ If you are not able to access Nucleus using your browser, you can try the follow
 
 3.  Check the Nucleus error log.  
 Navigate to the Nucleus log folder:  
-<kbd>cd /home/nucleus/data/logs</kbd>  
+<kbd>cd /home/nucleus/data/Logs</kbd>  
 then list the contents:  
 <kbd>ls</kbd>.  
 Choose today's log - log filenames use UTC dates, so 

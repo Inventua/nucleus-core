@@ -108,8 +108,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishInstall.linux-arm64.pubxml" />
+		<_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishInstall.linux-x64.pubxml" />
 		<_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishInstall.pubxml" />
+		<_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishInstall.win-x64.pubxml" />
+		<_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishUpgrade.linux-arm64.pubxml" />
+		<_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishUpgrade.linux-x64.pubxml" />
 		<_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishUpgrade.pubxml" />
+		<_WebToolingArtifacts Remove="Properties\PublishProfiles\PublishUpgrade.win-x64.pubxml" />
+		<_WebToolingArtifacts Remove="Properties\PublishProfiles\readme.md" />
+		<_WebToolingArtifacts Remove="Properties\PublishProfiles\_shared-publish-settings.targets" />
 	</ItemGroup>
 
 	<ItemGroup>	  

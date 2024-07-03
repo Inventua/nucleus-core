@@ -166,7 +166,7 @@ if [ "$INSTALL_ZIPFILE" == "" ]; then
   # loop through nucleus install zip files and get the latest version
   for zipfileversion in Nucleus.*.zip;
   do
-    if [[ $zipfileversion =~ ^([A-Za-z_]+)\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Install\.zip ]]; then
+    if [[ $zipfileversion =~ ^([A-Za-z_]+)\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Install-{0,1}([A-Za-z_0-9]*)\.zip ]]; then
       # default to the first zip file found
       if [ "$INSTALL_ZIPFILE" == "" ]; then
         INSTALL_ZIPFILE=$zipfileversion
@@ -187,7 +187,7 @@ if [ "$INSTALL_ZIPFILE" == "" ]; then
     # loop through nucleus upgrade zip files and get the latest version
     for zipfileversion in Nucleus.*.zip;
     do
-      if [[ $zipfileversion =~ ^([A-Za-z_]+)\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Upgrade\.zip ]]; then
+      if [[ $zipfileversion =~ ^([A-Za-z_]+)\.([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.Upgrade-{0,1}([A-Za-z_0-9]*)\.zip ]]; then
         # default to the first zip file found
         if [ "$INSTALL_ZIPFILE" == "" ]; then
           INSTALL_ZIPFILE=$zipfileversion

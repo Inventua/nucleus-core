@@ -825,7 +825,7 @@ if ($ZipFile -eq "detect")
     $latestVersion = $null
 
       Get-ChildItem -Path $Path\Nucleus.*.*.zip | ForEach-Object {
-        if ($_.Name -match "^([A-Za-z_]+)\.(?<Version>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.(?<Type>[A-Za-z]*)\.zip$")
+        if ($_.Name -match "^([A-Za-z_]+)\.(?<Version>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\.(?<Type>[A-Za-z]*)-{0,1}(?<platform>[A-Za-z_0-9]*)\.zip$")
         {
           $thisVersion = $matches.Version
           $InstallType = $matches.Type

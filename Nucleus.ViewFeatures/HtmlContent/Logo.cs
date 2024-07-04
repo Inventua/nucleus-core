@@ -104,7 +104,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
       {
         string siteTitle = String.IsNullOrEmpty(caption) ? site.Name : caption;
         outputBuilder.Attributes.Add("href", urlHelper.Content("~/"));
-        outputBuilder.AddCssClass("m-auto px-3 link-dark fw-bold");
+        outputBuilder.AddCssClass("my-auto px-3 link-dark fw-bold");
         outputBuilder.InnerHtml.Append(siteTitle);
         outputBuilder.MergeAttributes(htmlAttributes);
 

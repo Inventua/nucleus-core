@@ -1,9 +1,10 @@
-# Hosting in Azure App Service 
-See also: 
-[Hosting in Windows/IIS](/manage/hosting/windows/) 
-[Hosting in Linux](/manage/hosting/linux/) 
+# Hosting in Azure App Service
 
-> **_NOTE:_**   This guide assumes that you are using Azure Sql Server as your database, and Azure App Storage as your file system.  
+See also: 
+- [Installing Nucleus in Windows](/manage/hosting/windows/)
+- [Installing Nucleus in Linux](/manage/hosting/linux/) 
+
+> This guide assumes that you are using Azure Sql Server as your database, and Azure App Storage as your file system.  
 
 1.  If you don't already have one, [create an Azure free account](https://azure.microsoft.com/en-au/free). The free App Service tier isn't 
 appropriate for a production site, but you can use it to get started, and upgrade your App Service tier later.
@@ -32,94 +33,35 @@ FTP information.
 
 9.  Un-zip the install package (zip file) locally, then upload the files to your Azure /site/wwwroot folder.
 
-10.  The Nucleus setup wizard can automatically set up your database configuration, so you can skip this step and paste your database connection string 
-into the wizard when prompted.  
-\
-If you want to manually configure your database settings, edit `databaseSettings.Production.json`{.file-name} 
-or `databaseSettings.Development.json`{.file-name}.  If you are setting up a development environment you will need to create a 
-`databaseSettings.Development.json`{.file-name} file.  Use the template below and copy/paste your Azure database connection string in to 
-the `ConnectionString` setting. 
-```json
-{
-  "Nucleus": {
-    "Database": {
-      "Connections": [
-        // Database connections are available to the core and extensions, but must be configured in the Schemas 
-        // section in order to be used.
-        {
-          "Key": "nucleus-azure",
-          "Type": "SqlServer",
-          "ConnectionString": "[copy your connection string from Azure Portal]"
-        }
-      ],
-      "Schemas": [
-        {
-          // A name of "*" makes this schema the default.  The ConnectionKey value must match a Key from the Connections
-          // section.
-          "Name": "*",
-          "ConnectionKey": "nucleus-azure"
-        }
-      ]
-    }
-  }
-}
-```
+10.  Create an Azure storage account.
 
-11.  Create an Azure storage account.
-
-12.  In Azure Portal, open your storage account, select "Access Keys" from the "Security+Networking" submenu and click the "Show Keys"
+11. In Azure Portal, open your storage account, select "Access Keys" from the "Security+Networking" submenu and click the "Show Keys"
 link.  Click the copy button next to the first connection string to copy it to the clipboard.
 
-13.  The Nucleus setup wizard can automatically set up your file system configuration, so you can skip this step and paste your Azure Storage 
-connection string into the wizard when prompted.  
-\
-If you want to manually configure your file system provider, edit `appSettings.Production.json`{.file-name} or `appSettings.Development.json`{.file-name}. 
-Locate the Nucleus/FileSystems/Providers section and add a setting for your Azure storage account.  
-```json
-"FileSystems": {
-  "Providers": [
-    // File providers have a key, name, provider type and root folder.  You can specify multiple file providers, and the user
-    // will be presented with a list.  The "Name" property is shown to the user.  Each entry has a key which uniquely identifies 
-    // the provider entry.
-    {
-      "Key": "Azure-Storage",
-      "Name": "Azure-Storage",
-      "ProviderType": "Nucleus.Extensions.AzureBlobStorageFileSystemProvider.FileSystemProvider,Nucleus.Extensions.AzureBlobStorageFileSystemProvider",
-      "ConnectionString": "DefaultEndpointsProtocol=https;AccountName=your-account-name;AccountKey=your-account-key;EndpointSuffix=core.windows.net",
-      "RootPath": "my-container/my-nucleus-root-folder"
-    }
-  ]
-```
-
-> If you want to use a specific container, or container/sub-folder as your root for Nucleus file storage, set the `RootPath` configuration 
-property to your container name (and optionally, a sub-folder).  If you want Nucleus to be able to access all containers and 
-folders within your Azure storage service, you can set the `RootPath` value to an empty string, or remove the setting. 
-
-14.  Nucleus writes logs, cache and other files to sub-folders of `%ProgramData%\Nucleus` by default.  In Windows, this 
+12. Nucleus writes logs, cache and other files to sub-folders of `%ProgramData%\Nucleus` by default.  In Windows, this 
 is `C:\ProgramData\Nucleus`{.file-name}, which is an appropriate location for the files.  In an Azure App Service, 
 `%ProgramData%\Nucleus`{.file-name} is mapped to `\local\ProgramData`{.file-name}, which is treated as temporary storage 
 and is reset every time your Azure App Service is restarted.  This is not ideal for logs, so you should configure Nucleus 
-to save log files within the Azure `%HOME%` folder.  [Understanding the Azure App Service file system](https://github.com/projectkudu/kudu/wiki/Understanding-the-Azure-App-Service-file-system)  
-\
-Edit the `appSettings.json`{.file-name} or `appSettings.Production.json`{.file-name} file.  Locate the FolderOptions section, 
-which is commented out by default.  Remove the comments, and set Nucleus:FolderOptions:DataFolder to 
+to save log files within the Azure `%HOME%` folder. For more information, refer to [Understanding the Azure App Service file system](https://github.com/projectkudu/kudu/wiki/Understanding-the-Azure-App-Service-file-system). 
+
+    Create or edit the `appSettings.Development.json`{.file-name} or `appSettings.Production.json`{.file-name} file and set Nucleus:FolderOptions:DataFolder to 
 `{WebRootFolder}/App_Data/Nucleus`.  The `{WebRootFolder}` token is replaced automatically at run time.  
 
-```
-"Nucleus:" 
-{
-  "FolderOptions": {
-    "DataFolder": "{WebRootFolder}/App_Data/Nucleus"
-}
-```  
-> In an Azure App Service, `{WebRootFolder}` is replaced at run-time by `/site/wwwroot/`{.file-name}, so the logs would be written to 
+    ```
+    "Nucleus:" 
+    {
+      "FolderOptions": {
+        "DataFolder": "{WebRootFolder}/App_Data/Nucleus"
+    }
+    ```  
+    > In an Azure App Service, `{WebRootFolder}` is replaced at run-time by `/site/wwwroot/`{.file-name}, so the logs would be written to 
 `/site/wwwroot/App_Data/Nucleus/Logs`{.file-name}.  `/site/wwwroot/App_Data`{.file-name} is a safe location to use for logs and 
 other Nucleus data because files stored within `/App_Data`{.file-name} are never directly served by IIS.  The 
-`/site/wwwroot/`{.file-name} folder is the Azure App Service `%HOME%` directory, which Azure App Service treats as persistent 
+`/site/wwwroot/`{.file-name} folder is in the Azure App Service `%HOME%` directory, which Azure App Service treats as persistent 
 storage.  
 
-15.  Get your site Url from the Azure portal by clicking "App services", then selecting your App Service.  Click the site Url to 
-launch your site.
+15.  Get your site Url from the Azure portal by clicking "App services", then select your App Service.  Click the site Url to 
+launch your site to, [run the setup wizard](/getting-started/#setup-wizard).
 
 ## Troubleshooting
 If the site does not launch or returns an error, click the "App Service Logs" option in Azure Portal.  Enable 

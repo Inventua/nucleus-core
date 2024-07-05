@@ -4,7 +4,7 @@
   position: relative;  /* this is so that copy buttons are positioned relative to their containing pre block */
 }
 
-.StaticContent .nucleus-copy-button
+.StaticContent .nucleus-copy-button.d-block
 {
 	position: absolute;
 	right: 1rem;

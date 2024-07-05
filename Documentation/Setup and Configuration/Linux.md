@@ -1,12 +1,11 @@
-# Hosting in Linux 
+# Installing Nucleus in Linux 
 
 See also: 
-[Hosting in Windows/IIS](/manage/hosting/windows/) 
-[Hosting in Azure App Service](/manage/hosting/azure-app-service/) 
+- [Installing Nucleus in Windows](/manage/hosting/windows/) 
+- [Installing Nucleus in Azure App Service](/manage/hosting/azure-app-service/) 
 
-> **_NOTE:_**   We have created a shell script to automate many of the steps.  This page describes the use of the shell script.  This 
-process has been tested with [*Ubuntu Server 24.04*](https://ubuntu.com/download/server).  The script will configure an instance of Nucleus which uses a Sqlite 
-database.  After you have completed basic installation, you can [configure Nucleus to use a different database type](/getting-started/#using-a-different-database-provider). 
+> **_NOTE:_**   The nucleus-install.sh shell script automates many of the steps.  This page describes the use of the shell script.  This 
+process has been tested with [*Ubuntu Server 24.04*](https://ubuntu.com/download/server). 
 
 ## Linux Installation
 Set up your Linux environment.  There are many options for setting up Linux, including: 
@@ -34,30 +33,28 @@ connect from another computer:
 <br/>
 <kbd>cd nucleus-install-files</kbd>
 
-3.  Download the installer shell script and installation file:  
-<kbd>wget https://github.com/Inventua/nucleus-core/tree/main/Nucleus.Web/Utils/Ubuntu/nucleus-install.sh > nucleus-install.sh</kbd>
-<br />
-Processor: X64
-<kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-linux_x64.zip > Nucleus.2.0.0.0.Install-linux_x64.zip</kbd>  
-<br/>
- or
-<br/>
-Processor: ARM64 (for example: Raspberry Pi 3, 4, 5)
-<kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-linux_arm64.zip > Nucleus.2.0.0.0.Install-linux_arm64.zip</kbd>  
-<br />
-Processor: Other (for example: MacOS)
-<kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-portable.zip > Nucleus.2.0.0.0.Install-portable.zip</kbd>  
-<br />
+3.  Download the installer shell script:  
+<kbd>wget https://raw.githubusercontent.com/Inventua/nucleus-core/main/Nucleus.Web/Utils/Ubuntu/nucleus-install.sh > nucleus-install.sh</kbd>
 
-If you are installing a later version of Nucleus, download the zip file for that version instead - the installer shell script automatically 
+4.  Download the installation set:  
+    ### x64
+    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-linux_x64.zip > Nucleus.2.0.0.0.Install-linux_x64.zip</kbd>  
+
+    ### Arm64 (for example: Raspberry Pi 3, 4, 5)
+    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-linux_arm64.zip > Nucleus.2.0.0.0.Install-linux_arm64.zip</kbd>  
+
+    ### Portable (other runtime environments: for example: MacOS)
+    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-portable.zip > Nucleus.2.0.0.0.Install-portable.zip</kbd>  
+
+    If you are installing a later version of Nucleus, download the zip file for that version instead - the installer shell script automatically 
 checks the folder which contains the shell script for the zip file with the most recent version of Nucleus. 
 [Download the latest Nucleus version](https://github.com/Inventua/nucleus-core/releases/latest)
 
-4.  Run the installer shell script:  
+5.  Run the installer shell script:  
 <kbd>sudo bash ./nucleus-install.sh</kbd>
 <br />
 <br />
-The installation shell script creates a user named `nucleus-service`, installs the ASP.NET Core 6 runtime, unzip package and Nucleus, then copies 
+The installation shell script creates a user named `nucleus-service`, installs the ASP.NET Core runtime, unzips the install set Nucleus, and then copies 
 the application settings template with settings for Linux, sets file system object ownership and permissions and configures systemd to 
 automatically start, monitor and restart Nucleus.  The `nucleus-service` user is used to run Nucleus, and does not have a password or a shell 
 configured, so you can't log in as this user.
@@ -83,9 +80,9 @@ For a fresh install you will not generally need to specify any command-line opti
 Example:  
 <kbd>sudo bash ./nucleus-install.sh --zipfile Nucleus.1.3.0.0.Install.zip --target-directory /home/services/nucleus-production</kbd>
 
-5.  Test your installation.  
-Use a device with a web browser to test your site.  You will need the IP address of your server, or its host name.  By default, 
-Nucleus is configured to use http on port 5000.
+
+6. Once you have completed this process, [run the setup wizard](/getting-started/#setup-wizard).
+Use the IP address of your server, or its host name.  By default, Nucleus is configured to use http on port 5000.
 
 ```
 http://host-name:5000
@@ -95,19 +92,10 @@ http://host-name:5000
 http://ip-address:5000
 ```
 
-You should see the Nucleus setup wizard, which performs file system access checks, prompts you to set your site properties and 
-administrator users and creates your new site.
-
 
 ## Extended configuration
 
-### Configure your database provider
-You can leave the default settings as-is to use Sqlite, or [configure Nucleus to use a different database type](/getting-started/#using-a-different-database-provider).
-
-> If your Nucleus instance is for testing or development, or is an embedded IOT web server or small web application or site, Sqlite is a good choice. 
-For larger production web applications and sites, you should consider using Microsoft SQL Server, MySql or PostgreSql. 
-
-### Set up a reverse proxy (optional)
+### Set up a reverse proxy 
 Depending on your environment and objectives, you may need to configure a reverse proxy server.  Refer to ['When to use Kestrel with a reverse proxy'](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/when-to-use-a-reverse-proxy) 
 for more information.  
 You can set up [Nginx](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx#install-nginx), Kubernetes, 

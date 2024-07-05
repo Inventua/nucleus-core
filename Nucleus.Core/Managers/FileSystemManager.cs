@@ -1185,15 +1185,18 @@ public class FileSystemManager : IFileSystemManager
 
 		this.CacheManager.FolderCache().Remove(folder.Id);
 		this.CacheManager.FolderPathCache().Remove(FileSystemCachePath(site, folder.Provider, folder.Path));
+    
+    // Query the folder for propagation
+    Folder parentFolder = await this.ListFolder(site, folder.Id, "");
 
-		if (folder.Folders.Any())
-		{
-			foreach (Folder childFolder in folder.Folders)
-			{
-				await CopyPermissionsToDescendants(site, childFolder, parentPermissions, operation);
-			}
-		}
-	}
+    if (parentFolder.Folders.Any())
+    {
+      foreach (Folder childFolder in parentFolder.Folders)
+      {
+        await CopyPermissionsToDescendants(site, childFolder, parentPermissions, operation);
+      }
+    }
+  }
 
   /// <summary>
   /// Return a list of all <see cref="File"/>s for the site which match the specified search term.

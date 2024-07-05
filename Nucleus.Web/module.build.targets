@@ -83,7 +83,11 @@
   </Target>
   
   <Target Name="CheckPackageContent" DependsOnTargets="ResolveReferences" AfterTargets="PostBuildEvent">
-    <CheckMissingNucleusContent PackageFile="Package.xml" ProjectContent="@(Content)" ProjectEmbedded="@(EmbeddedResource)" RazorCompileOnBuild="$(RazorCompileOnBuild)" Condition="'$(NUCLEUS_TOOLS_PATH)' != '' AND %(NucleusMSBuildTasksAssembly.Version) >= $([System.Version]::Parse('1.4.0.0'))" />  
+    <PropertyGroup>
+      <RazorCompileOnBuildSetting>false</RazorCompileOnBuildSetting>
+      <RazorCompileOnBuildSetting Condition="'$(RazorCompileOnBuild)' != ''">$(RazorCompileOnBuild)</RazorCompileOnBuildSetting>
+    </PropertyGroup>
+    <CheckMissingNucleusContent PackageFile="Package.xml" ProjectContent="@(Content)" ProjectEmbedded="@(EmbeddedResource)" RazorCompileOnBuild="$(RazorCompileOnBuildSetting)" Condition="'$(NUCLEUS_TOOLS_PATH)' != '' AND %(NucleusMSBuildTasksAssembly.Version) >= $([System.Version]::Parse('1.4.0.0'))" />  
   </Target>
   <UsingTask
     TaskName="CheckMissingNucleusContent"

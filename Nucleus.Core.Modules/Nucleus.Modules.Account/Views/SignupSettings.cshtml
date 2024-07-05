@@ -18,12 +18,12 @@
     </SettingsControl>
 
     <div class="RecaptchaSettings">
-      <SettingsControl caption="reCAPTCHA Site Key" helptext="Specifies your reCAPTCHA site key. Visit https://www.google.com/recaptcha/admin/create to create a site key.">
+      <SettingsControl caption="reCAPTCHA Site Key" helptext="Visit https://www.google.com/recaptcha/admin/create to create a recaptcha site key.">
         @Html.TextBoxFor(model => model.RecaptchaSiteKey)
       </SettingsControl>
 
       <div class="nucleus-flex-fields">
-        <SettingsControl caption="reCAPTCHA Secret Key" helptext="Specifies your reCAPTCHA secret key." class="flex-grow-2">
+        <SettingsControl caption="reCAPTCHA Secret Key" helptext="To get your reCAPTCHA secret key in the Google Captcha web console, click the Enterprise Key's Overview, select the 'Integration' tab and click 'USE LEGACY KEY'." class="flex-grow-2">
           @Html.PasswordFor(model => model.RecaptchaSecretKey, new { value = (Model.IsSecretKeySet ? Nucleus.Modules.Account.ViewModels.SignupSettings.DUMMY_PASSWORD : "") })
         </SettingsControl>
 

@@ -99,6 +99,12 @@ public class ContactUsController : Controller
 
     Models.Settings settings = new();
 		settings.ReadSettings(this.Context.Module);
+
+    if (viewModel.Message.Category != null && viewModel.Message.Category?.Id != null && viewModel.Message.Category.Id != Guid.Empty)
+    {
+      viewModel.Message.Category = await this.ListManager.GetListItem(viewModel.Message.Category.Id);
+    }
+
     Validate(viewModel, settings);
 
 		if (!ControllerContext.ModelState.IsValid)

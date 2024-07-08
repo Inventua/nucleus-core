@@ -268,7 +268,8 @@ public class SystemController : Controller
       {
         case "excel":
           var exporter = new ExcelWriter<ViewModels.Admin.SystemIndex.LogEntry>(ExcelWorksheet.Modes.AutoDetect, nameof(ViewModels.Admin.SystemIndex.LogEntry.IsValid));
-          exporter.Worksheet.Name = System.IO.Path.GetFileNameWithoutExtension(logFile);
+          string worksheetName = System.IO.Path.GetFileNameWithoutExtension(logFile);
+          exporter.Worksheet.Name = worksheetName.Substring(0, worksheetName.Length > 32 ? 32 : worksheetName.Length);          
           exporter.Export(data);
           return File(exporter.GetOutputStream(), ExcelWorksheet.MIMETYPE_EXCEL, $"{exporter.Worksheet.Name}.xlsx");
 

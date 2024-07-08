@@ -37,7 +37,7 @@
 
     @if (Model.MailTemplate.Id != Guid.Empty)
     {
-      <button type="submit" class="btn btn-danger" data-target=".nucleus-adminpage" formaction="@Url.AreaAction("DeleteMailTemplate", "MailTemplates", "Admin")" data-confirm="Delete this Mail Template?">Delete Mail Template</button>
+      <button type="submit" class="btn btn-danger ms-auto" data-target=".nucleus-adminpage" formaction="@Url.AreaAction("DeleteMailTemplate", "MailTemplates", "Admin")" data-confirm="Delete this Mail Template?">Delete Mail Template</button>
     }
   </div>
 

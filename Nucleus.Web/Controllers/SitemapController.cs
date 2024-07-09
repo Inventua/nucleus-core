@@ -1,16 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.Sitemap;
 using Nucleus.Extensions;
-using Nucleus.ViewFeatures;
 using Nucleus.Extensions.Authorization;
-using System.Threading.Tasks;
-using Nucleus.Abstractions;
-using System.Collections.Generic;
-using Nucleus.Core.Managers;
-using System;
-using System.Linq;
+using Nucleus.ViewFeatures;
 
 namespace Nucleus.Web.Controllers;
 
@@ -27,6 +26,11 @@ public class SitemapController : Controller
     this.PageManager = pageManager;
   }
 
+  /// <summary>
+  /// Generate sitemap.xml
+  /// </summary>
+  /// <returns></returns>
+  [HttpGet]
   public async Task<ActionResult> Index()
   {
     Sitemap siteMap = new();
@@ -64,6 +68,11 @@ public class SitemapController : Controller
     return File(output, "application/xml");
   }
 
+  /// <summary>
+  /// Generate robots.txt
+  /// </summary>
+  /// <returns></returns>
+  [HttpGet]
   public async Task<ActionResult> Robots()
   {
     SitePages sitePages = this.Context.Site.GetSitePages();
@@ -71,30 +80,30 @@ public class SitemapController : Controller
     List<string> reservedPaths = new();
     foreach (string path in BLOCKED_ROUTES)
     {
-      AddPath(reservedPaths, path);
+      AddReservedPath(reservedPaths, path);
     }
 
     // always exclude the built-in "emergency" user pages (login, change password, user profile).  These are fallback pages which would only be used when
     // the site does not have the relevant page(s) set up 
-    AddPath(reservedPaths, "/user/account/*");
+    AddReservedPath(reservedPaths, "/user/account/*");
     // robots.txt paths are case-sensitive
-    AddPath(reservedPaths, "/User/Account/*");
+    AddReservedPath(reservedPaths, "/User/Account/*");
 
-    // exclude special pages
-    await AddPage(reservedPaths, sitePages.LoginPageId);
-    await AddPage(reservedPaths, sitePages.UserChangePasswordPageId);
-    await AddPage(reservedPaths, sitePages.UserProfilePageId);
-    await AddPage(reservedPaths, sitePages.ErrorPageId);
+    // add "disallow" instructions for special pages
+    await AddReservedPage(reservedPaths, sitePages.LoginPageId);
+    await AddReservedPage(reservedPaths, sitePages.UserChangePasswordPageId);
+    await AddReservedPage(reservedPaths, sitePages.UserProfilePageId);
+    await AddReservedPage(reservedPaths, sitePages.ErrorPageId);
     
-    await AddPage(reservedPaths, sitePages.NotFoundPageId);
-    await AddPage(reservedPaths, sitePages.UserRegisterPageId);
+    await AddReservedPage(reservedPaths, sitePages.NotFoundPageId);
+    await AddReservedPage(reservedPaths, sitePages.UserRegisterPageId);
 
     // add exclusions for pages with the "Include in search" property set to false
     foreach (Page page in await this.PageManager.List(this.Context.Site))
     {
-      if (!page.IncludeInSearch)
+      if (!page.IncludeInSearch && !page.Disabled)
       {
-        await AddPage(reservedPaths, page);
+        await AddReservedPage(reservedPaths, page);
       }
     }
 
@@ -102,30 +111,33 @@ public class SitemapController : Controller
     return File(System.Text.Encoding.UTF8.GetBytes(output), "text/plain");
   }
 
-  public async Task AddPage(List<string> reservedPaths, Guid? pageId)
+  private async Task AddReservedPage(List<string> reservedPaths, Guid? pageId)
   {
     if (pageId.HasValue)
     {
       Page page = await this.PageManager.Get(pageId.Value);
-      await AddPage(reservedPaths, page);      
+      if (page != null)
+      {
+        await AddReservedPage(reservedPaths, page);
+      }
     }
   }
 
-  public async Task AddPage(List<string> reservedPaths, Page page)
+  private async Task AddReservedPage(List<string> reservedPaths, Page page)
   {  
-    // only include robots.txt entries for pages which can be accessed by users who have not logged on, so that we don't expose Urls for
+    // only include robots.txt "disallow" entries for pages which can be accessed by users who have not logged on, so that we don't expose Urls for
     // pages which are private
     page.Permissions = await this.PageManager.ListPermissions(page);
     if (this.Context.Site.AllUsersRole?.HasViewPermission(page) == true)
     {
       foreach (PageRoute route in page.Routes.Where(route => route.Type == PageRoute.PageRouteTypes.Active))
       {
-        AddPath(reservedPaths, route.Path);
+        AddReservedPath(reservedPaths, route.Path);
       }
     }    
   }
 
-  public void AddPath(List<string> reservedPaths, string path)
+  private void AddReservedPath(List<string> reservedPaths, string path)
   {    
     reservedPaths.Add($"Disallow: {(!path.StartsWith('/') ? "/" : "")}{path}");    
   }

@@ -11,9 +11,9 @@
   @using (Html.BeginAreaForm("Select", "Pages", "Admin", FormMethod.Post, new { @class = "overflow-auto flex-1", @data_target = Model.PageEditorMode != Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default ? ".nucleus-adminpage" : "#nucleus-page-editor", @autocomplete = "off" }))
   {
     <div class="position-absolute m-1 top-0 end-0">
-      @if (Model.Page.Id != Guid.Empty)
+      @if (Model.Page.Id != Guid.Empty && !Model.Page.Disabled)
       {
-        <button class="btn btn-success nucleus-open-page" accesskey="O">Open Page</button>
+        <button type="button" class="btn btn-success nucleus-open-page" accesskey="O">Open Page</button>
       }
       @if (Model.PageEditorMode == Nucleus.Web.ViewModels.Admin.PageEditor.PageEditorModes.Default && Model.Page.Id != Guid.Empty)
       {

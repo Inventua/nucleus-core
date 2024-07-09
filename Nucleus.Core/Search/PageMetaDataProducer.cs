@@ -148,7 +148,7 @@ public class PageMetaDataProducer : IContentMetaDataProducer
         if (!response.IsSuccessStatusCode)
         {
           // response was an error, use page meta-data only
-          Logger.LogWarning("Could not download page content for page id '{pageid}' using url '[url]'.  Status code: [{statusCode}].", page?.Id, request.RequestUri, response.StatusCode);
+          Logger.LogWarning("Could not download page content for page id '{pageid}' using url '[{url}]'.  Status code: [{statusCode}].", page?.Id, request.RequestUri, response.StatusCode);
         }
         else
         {
@@ -171,7 +171,7 @@ public class PageMetaDataProducer : IContentMetaDataProducer
       }
       catch (Exception ex)
       {
-        Logger.LogError(ex, "Error downloading page content for page id '{pageid}' using url '[url]'.", page?.Id, request.RequestUri);
+        Logger.LogError(ex, "Error downloading page content for page id '{pageid}' using url '[{url}]'.", page?.Id, request.RequestUri);
       }
 
       return contentItem;
@@ -194,7 +194,18 @@ public class PageMetaDataProducer : IContentMetaDataProducer
   private static string PageLink(Page page)
   {
     if (page == null || page.Disabled || page.DefaultPageRoute() == null) return "";
-    string path = page.DefaultPageRoute().Path;
+    string path;
+
+    switch (page.LinkType)
+    {
+      case Page.LinkTypes.Url:
+        path = page.LinkUrl;
+        break;
+
+      default:
+        path = page.DefaultPageRoute().Path;
+        break;
+    }
 
     // We append a "/" so that if the path contains dots the net core static file provider doesn't interpret the path as a file
     return path + (path.EndsWith('/') ? "" : "/");

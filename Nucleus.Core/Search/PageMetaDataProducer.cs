@@ -141,29 +141,37 @@ public class PageMetaDataProducer : IContentMetaDataProducer
       // Signal Nucleus to only render module content
       request.Headers.Add("X-Nucleus-OverrideLayout", "ContentOnly");
 
-      System.Net.Http.HttpResponseMessage response = this.HttpClient.Send(request);
+      try
+      {
+        System.Net.Http.HttpResponseMessage response = this.HttpClient.Send(request);
 
-      if (!response.IsSuccessStatusCode)
-      {
-        // response was an error, use page meta-data only
-      }
-      else
-      {
-        using (System.IO.Stream responseStream = await response.Content.ReadAsStreamAsync())
+        if (!response.IsSuccessStatusCode)
         {
-          // Kestrel doesn't return a content-length, so we have to read into a memory stream first in order to determine the 
-          // size of the content array.
-          await responseStream.CopyToAsync(htmlContent);
-          responseStream.Close();
+          // response was an error, use page meta-data only
+          Logger.LogWarning("Could not download page content for page id '{pageid}' using url '[url]'.  Status code: [{statusCode}].", page?.Id, request.RequestUri, response.StatusCode);
         }
+        else
+        {
+          using (System.IO.Stream responseStream = await response.Content.ReadAsStreamAsync())
+          {
+            // Kestrel doesn't return a content-length, so we have to read into a memory stream first in order to determine the 
+            // size of the content array.
+            await responseStream.CopyToAsync(htmlContent);
+            responseStream.Close();
+          }
 
-        contentItem.ContentType = "text/html";
+          contentItem.ContentType = "text/html";
 
-        contentItem.Size = htmlContent.Length;
+          contentItem.Size = htmlContent.Length;
 
-        htmlContent.Position = 0;
-        contentItem.Content = htmlContent.ToArray();
-        htmlContent.Close();
+          htmlContent.Position = 0;
+          contentItem.Content = htmlContent.ToArray();
+          htmlContent.Close();
+        }
+      }
+      catch (Exception ex)
+      {
+        Logger.LogError(ex, "Error downloading page content for page id '{pageid}' using url '[url]'.", page?.Id, request.RequestUri);
       }
 
       return contentItem;

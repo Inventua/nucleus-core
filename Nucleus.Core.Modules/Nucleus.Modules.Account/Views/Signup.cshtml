@@ -61,7 +61,7 @@
       {
         @Html.HiddenFor(model => model.RecaptchaVerificationToken, new { @class = "signup-recaptcha-verification-token" })
       }
-      <button type="submit" class="btn btn-primary align-self-end me-2 signup-save" data-verification-site-key="@Model.RecaptchaSiteKey" data-verification-badge-element-selector=".recaptcha-badge" data-verification-token-element-selector=".signup-recaptcha-verification-token" data-verification-action="@Model.RecaptchaAction">Save Changes</button>
+      <button type="submit" class="btn btn-primary align-self-end me-2 signup-save" data-verification-site-key="@Model.RecaptchaSiteKey" data-verification-badge-element-selector=".recaptcha-badge" data-verification-token-element-selector=".signup-recaptcha-verification-token" data-verification-action="@Model.RecaptchaAction">Register</button>
       <a href="@Url.Content(Model.ReturnUrl)" class="btn btn-secondary align-self-end">Cancel</a>
       <div class="recaptcha-badge ms-auto"></div>
     </div>

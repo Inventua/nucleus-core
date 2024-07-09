@@ -156,12 +156,12 @@ namespace Nucleus.Core.Layout
               else
               {
                 Logger.LogTrace("Page found: '{pageid}'.", nucleusContext.Page.Id);
-              }
 
-              // When HandleLinkType returns false, it means we should not continue because we are redirecting to another site
-              if (!await HandleLinkType(context, nucleusContext))
-              {
-                return;
+                // When HandleLinkType returns false, it means we should not continue because we are redirecting to another site
+                if (!await HandleLinkType(context, nucleusContext))
+                {
+                  return;
+                }
               }
             }
             else

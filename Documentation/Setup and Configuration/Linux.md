@@ -124,14 +124,14 @@ a recognized certification authority.
 
 <kbd>sudo openssl req -nodes -new -keyout nucleus.key -x509 -days 365 -out nucleus.crt -subj "/"</kbd>
 
-<kbd>sudo chown :nucleus-service nucleus.key nucleus.crt</kbd>
-<br />
-<kbd>sudo chmod g+rw nucleus.key nucleus.crt</kbd>
-<br />
 <kbd>sudo cp nucleus.crt /home/nucleus/certs</kbd>
-<br />
+
 <kbd>sudo cp nucleus.key /home/nucleus/certs</kbd>
 
+<kbd>sudo chown :nucleus-service /home/nucleus/certs/nucleus.key /home/nucleus/certs/nucleus.crt</kbd>
+
+<kbd>sudo chmod g+rw /home/nucleus/certs/nucleus.key /home/nucleus/certs/nucleus.crt</kbd>
+<br />
 #### Configure Nucleus to use the certificate
 If you are using a reverse proxy, you will generally want to configure the reverse proxy to use your certificate and manage ("terminate") SSL 
 connections, so you won't need to configure Nucleus for https, and can skip this section.
@@ -150,8 +150,8 @@ present (commented out), so you can just un-comment the section and fill in the 
           "KeyPath": "/home/nucleus/certs/nucleus.key",
           "Password": "your-certificate password"
         }
-
-        
+      }
+              
 ### Nginx Walkthrough
 Follow the steps in this section if you want to install and configure Nginx as a reverse proxy.
 

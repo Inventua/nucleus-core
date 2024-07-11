@@ -17,7 +17,8 @@ namespace Nucleus.Extensions.Razor
 		private static readonly ConcurrentDictionary<string, object> CompiledTemplateCache = new();
 		private readonly static string[] UsingNamespaces = 
     [ 
-      "System", 
+      "System",
+      "System.Collections",
       "System.Collections.Generic", 
       "System.Linq", 
       "System.Text", 

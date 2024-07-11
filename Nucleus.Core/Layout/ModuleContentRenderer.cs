@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
+using Google.Protobuf.Reflection;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -575,12 +576,22 @@ public class ModuleContentRenderer : IModuleContentRenderer
         {
           this.ExtensionActionDescriptors.TryAdd(key, actionDescriptor);
         }
+
+        else if (moduleinfo.ModuleDefinition.Id == Guid.Parse("f0a9ec71-c29e-436e-96e1-72dcdc44c32b"))
+        {
+          // special case: missing Nucleus.Modules.Account:Login module. In some cases (like selecting an existing populated database), users
+          // can get past the setup wizard without installing the default modules. This can be addressed by logging on as a system administrator
+          // and installing the modules, and we have a "fallback" login module, so we redirect to that instead.
+          actionDescriptor = descriptors
+              .Where(descriptor => descriptor.ControllerTypeInfo.FullName == "Nucleus.Web.Controllers.AccountController" && descriptor.ActionName == "Index")
+              .FirstOrDefault();
+        }
       }
     }
 
     if (actionDescriptor == null)
-    {
-      throw new InvalidOperationException($"Unable to load an action descriptor for the module '{moduleinfo.ModuleDefinition.FriendlyName}' [{controllerName}.{action}].  Check your package.xml and controller class.  A common cause of this error is that your package.xml has the wrong controller or action name specified, or your controller class doesn't have a Nucleus 'Extension' attribute.");
+    {      
+      throw new InvalidOperationException($"Unable to load an action descriptor for the module '{moduleinfo.ModuleDefinition.FriendlyName}' [{controllerName}.{action}].  Check your package.xml and controller class.  A common cause of this error is that your package.xml has the wrong controller or action name specified, or your controller class doesn't have a Nucleus 'Extension' attribute.");      
     }
 
     actionDescriptor.RouteValues["extension"] = moduleinfo.ModuleDefinition.Extension;

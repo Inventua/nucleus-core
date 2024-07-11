@@ -147,8 +147,7 @@ present (commented out), so you can just un-comment the section and fill in the 
         "Url": "https://*:5001",  // or "https://your-hostname:5001" if you want to specify a host name
         "Certificate": {
           "Path": "/home/nucleus/certs/nucleus.crt",
-          "KeyPath": "/home/nucleus/certs/nucleus.key",
-          "Password": "your-certificate password"
+          "KeyPath": "/home/nucleus/certs/nucleus.key"
         }
       }
               

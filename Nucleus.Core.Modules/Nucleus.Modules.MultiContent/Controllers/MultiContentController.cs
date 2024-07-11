@@ -77,20 +77,23 @@ public class MultiContentController : Controller
   {
     this.Context.Module.ModuleSettings.Set(MODULESETTING_LAYOUT, viewModel.Layout);
 
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_OPENFIRST, viewModel.LayoutSettings.OpenFirst);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_RENDERFLUSH, viewModel.LayoutSettings.RenderFlush);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOWCONTROLS, viewModel.LayoutSettings.ShowControls);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOWINDICATORS, viewModel.LayoutSettings.ShowIndicators);
+    if (viewModel.LayoutSettings != null)
+    {
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_OPENFIRST, viewModel.LayoutSettings.OpenFirst);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_RENDERFLUSH, viewModel.LayoutSettings.RenderFlush);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOWCONTROLS, viewModel.LayoutSettings.ShowControls);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOWINDICATORS, viewModel.LayoutSettings.ShowIndicators);
 
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOWCLOSEBUTTON, viewModel.LayoutSettings.ShowCloseButton);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_ALERTSTYLE, viewModel.LayoutSettings.AlertStyle);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_ALIGNMENT, viewModel.LayoutSettings.Alignment);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_ORIENTATION, viewModel.LayoutSettings.Orientation);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_FILL, viewModel.LayoutSettings.Fill);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_JUSTIFY, viewModel.LayoutSettings.Justify);
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_ICON, viewModel.LayoutSettings.Icon);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOWCLOSEBUTTON, viewModel.LayoutSettings.ShowCloseButton);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_ALERTSTYLE, viewModel.LayoutSettings.AlertStyle);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_ALIGNMENT, viewModel.LayoutSettings.Alignment);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_ORIENTATION, viewModel.LayoutSettings.Orientation);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_FILL, viewModel.LayoutSettings.Fill);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_JUSTIFY, viewModel.LayoutSettings.Justify);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_ICON, viewModel.LayoutSettings.Icon);
 
-    this.Context.Module.ModuleSettings.Set(MODULESETTING_INTERVAL, viewModel.LayoutSettings.Interval);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_INTERVAL, viewModel.LayoutSettings.Interval);
+    }
 
     await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
 

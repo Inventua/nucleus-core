@@ -30,6 +30,7 @@
     <None Remove="viewer.min.css" />
     <None Remove="Views\Editor.cshtml" />
     <None Remove="Views\LayoutSettings\_FaqSettings.cshtml" />
+    <None Remove="Views\LayoutSettings\_PlainSettings.cshtml" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
     <None Remove="Views\ViewerLayouts\Accordion.cshtml" />
@@ -37,6 +38,7 @@
     <None Remove="Views\ViewerLayouts\Carousel.cshtml" />
     <None Remove="Views\ViewerLayouts\Faq.cshtml" />
     <None Remove="Views\ViewerLayouts\Pills.cshtml" />
+    <None Remove="Views\ViewerLayouts\Plain.cshtml" />
     <None Remove="Views\ViewerLayouts\Tabs.cshtml" />
     <None Remove="Views\ViewerLayouts\_AccordionSettings.cshtml" />
     <None Remove="Views\ViewerLayouts\_AlertSettings.cshtml" />
@@ -49,6 +51,8 @@
 
   <ItemGroup>
     <Content Include="license.txt" />
+    <Content Include="Views\LayoutSettings\_PlainSettings.cshtml" />
+    <Content Include="Views\ViewerLayouts\Plain.cshtml" />
     <EmbeddedResource Include="viewer.css" />
     <EmbeddedResource Include="viewer.min.css" />
     <Content Include="package.xml" />

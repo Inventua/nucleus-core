@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
+using Microsoft.Extensions.Options;
 
 namespace Nucleus.Abstractions.Models;
 
@@ -12,9 +11,10 @@ public class Application
   /// <summary>
   /// Initialize a new instance of the class.
   /// </summary>
-  public Application()
-  {
-    this.IsInstalled = GetInstallLogPaths().Any(filePath => System.IO.File.Exists(filePath)) && System.IO.Directory.Exists(Configuration.FolderOptions.GetExtensionsFolderStatic(false));
+  public Application(IOptions<Nucleus.Abstractions.Models.Configuration.DatabaseOptions> options)
+  {    
+    this.IsInstalled = options.Value.IsDatabaseConfigured() && System.IO.Directory.Exists(Configuration.FolderOptions.GetExtensionsFolderStatic(false));
+    //this.IsInstalled = GetInstallLogPaths().Any(filePath => System.IO.File.Exists(filePath)) && System.IO.Directory.Exists(Configuration.FolderOptions.GetExtensionsFolderStatic(false));
   }
 
   /// <summary>
@@ -31,15 +31,15 @@ public class Application
   /// </summary>
   public string ControlPanelUri { get; private set; } = "~/Admin/Index/Index";
 
-  private static string[] GetInstallLogPaths()
-  {
-    return [System.IO.Path.Combine(Environment.CurrentDirectory, "Setup", "install-log.config"), GetMainInstallLogPath()];
-  }
+  //private static string[] GetInstallLogPaths()
+  //{
+  //  return [System.IO.Path.Combine(Environment.CurrentDirectory, "Setup", "install-log.config"), GetMainInstallLogPath()];
+  //}
 
-  private static string GetMainInstallLogPath()
-  {
-    return System.IO.Path.Combine(Environment.CurrentDirectory, "install-log.config");
-  }
+  //private static string GetMainInstallLogPath()
+  //{
+  //  return System.IO.Path.Combine(Environment.CurrentDirectory, "install-log.config");
+  //}
 
   /// <summary>
   /// Set the base Uri for the control panel.
@@ -61,17 +61,17 @@ public class Application
   /// </summary>
   public void SetInstalled()
   {
-    string version;
+    //string version;
 
-    AssemblyInformationalVersionAttribute attr = Assembly.GetCallingAssembly().GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>();
-    version = (attr == null ? String.Empty : attr.InformationalVersion);
+    //AssemblyInformationalVersionAttribute attr = Assembly.GetCallingAssembly().GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>();
+    //version = (attr == null ? String.Empty : attr.InformationalVersion);
 
-    System.IO.File.WriteAllText(GetMainInstallLogPath(),
-      System.Text.Json.JsonSerializer.Serialize(new
-      {
-        InstallDate = DateTime.UtcNow,
-        InstallVersion = version
-      }));
+    //System.IO.File.WriteAllText(GetMainInstallLogPath(),
+    //  System.Text.Json.JsonSerializer.Serialize(new
+    //  {
+    //    InstallDate = DateTime.UtcNow,
+    //    InstallVersion = version
+    //  }));
 
     this.IsInstalled = true;
   }

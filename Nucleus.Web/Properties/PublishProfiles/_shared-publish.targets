@@ -15,7 +15,7 @@
     <Message Importance="High" text="ClearExistingFiles: @(ConfigFilesToDelete)" />
     <Delete Files="@(ConfigFilesToDelete)" ContinueOnError="false" />
   </Target>
-
+  
   <Target Name="CompileExtensions" BeforeTargets="BeforePublish">
     <ItemGroup>
       <ExtensionProjects Include="..\Nucleus.Core.Modules\**\*.csproj" />
@@ -45,8 +45,8 @@
     <Copy SourceFiles="@(SharedContainerCshtmlFiles)" DestinationFolder="$(PublishUrl)\Shared\Containers" />
     <Copy SourceFiles="@(SharedLayoutCshtmlFiles)" DestinationFolder="$(PublishUrl)\Shared\Layouts" />
   </Target>
-
-  <Target Name="CopyWebConfigTemplate" AfterTargets="AfterPublish" Condition=" '$(Configuration)' == 'Release' ">
+  
+  <Target Name="CopyWebConfigTemplate" AfterTargets="AfterPublish" Condition=" '$(Configuration)' == 'Release' and ('$(RuntimeIdentifier)' == '' or $(RuntimeIdentifier.StartsWith('win')))">
     <!-- web.config contains development settings, web.template.config contains production settings.  This step replaces web.config with -->
     <!-- the web.template.config file during release builds so that the deployed/published web.config is the right one -->
     <Copy SourceFiles="web.template.config" DestinationFiles="$(PublishUrl)\web.config" Retries="2" />

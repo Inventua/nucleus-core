@@ -102,6 +102,7 @@
 		<None Remove="Shared\Layouts\default.png" />
 		<None Remove="Shared\Layouts\layout-styles.css" />
 		<None Remove="Utils\Ubuntu\appSettings.template" />
+		<None Remove="Utils\Ubuntu\databaseSettings.template" />
 		<None Remove="Utils\Ubuntu\nucleus-install.sh" />
 		<None Remove="Utils\Ubuntu\nucleus.service" />
 		<None Remove="Utils\Windows\nucleus-install.ps1" />
@@ -125,6 +126,9 @@
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>	  
 		<Content Include="readme.txt">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>	  
+		<Content Include="Utils\Ubuntu\databaseSettings.template">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Utils\Windows\nucleus-install.ps1">

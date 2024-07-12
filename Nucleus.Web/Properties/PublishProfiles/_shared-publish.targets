@@ -37,13 +37,15 @@
     <RemoveDir Directories="$(PublishUrl)Areas\" />
   </Target>
 
-  <Target Name="IncludeSharedLayoutAndContainerCshtmlFiles" AfterTargets="AfterPublish">
+  <Target Name="IncludeRequiredCshtmlFiles" AfterTargets="AfterPublish">
     <ItemGroup>
       <SharedContainerCshtmlFiles Include="Shared\Containers\*.cshtml;" />
       <SharedLayoutCshtmlFiles Include="Shared\Layouts\*.cshtml;" />
+      <RootCshtmlFiles Include="_*.cshtml;" />
     </ItemGroup>
     <Copy SourceFiles="@(SharedContainerCshtmlFiles)" DestinationFolder="$(PublishUrl)\Shared\Containers" />
     <Copy SourceFiles="@(SharedLayoutCshtmlFiles)" DestinationFolder="$(PublishUrl)\Shared\Layouts" />
+    <Copy SourceFiles="@(RootCshtmlFiles)" DestinationFolder="$(PublishUrl)" />
   </Target>
   
   <Target Name="CopyWebConfigTemplate" AfterTargets="AfterPublish" Condition=" '$(Configuration)' == 'Release' and ('$(RuntimeIdentifier)' == '' or $(RuntimeIdentifier.StartsWith('win')))">

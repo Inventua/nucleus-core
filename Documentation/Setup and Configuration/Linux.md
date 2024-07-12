@@ -3,6 +3,7 @@
 See also: 
 - [Installing Nucleus in Windows](/manage/hosting/windows/) 
 - [Installing Nucleus in Azure App Service](/manage/hosting/azure-app-service/) 
+- [Installing Nucleus in a Docker Container](/manage/hosting/docker/)
 
 > **_NOTE:_**   The nucleus-install.sh shell script automates many of the steps.  This page describes the use of the shell script.  This 
 process has been tested with [*Ubuntu Server 24.04*](https://ubuntu.com/download/server). 

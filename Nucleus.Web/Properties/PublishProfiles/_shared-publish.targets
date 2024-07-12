@@ -60,7 +60,7 @@
         Exclude="$(PublishUrl)\*Settings.json;$(PublishUrl)\hosting.json;$(PublishUrl)\config.schema.json;$(PublishUrl)\*.txt;$(PublishUrl)\_ViewImports.cshtml;$(PublishUrl)\package.xsd;$(PublishUrl)\web.config;" />
       <SubFolderFilesToMoveToBin
         Include="$(PublishUrl)\**\*"
-        Exclude="$(PublishUrl)\*.*;$(PublishUrl)\Resources\**\*;$(PublishUrl)\Setup\**\*;$(PublishUrl)\Shared\**\*;$(PublishUrl)\Utils\**\*;$(PublishUrl)\wwwroot\**\*;" />
+        Exclude="$(PublishUrl)\*.*;$(PublishUrl)\Resources\**\*;$(PublishUrl)\Setup\**\*;$(PublishUrl)\Shared\**\*;$(PublishUrl)\Utils\**\*;$(PublishUrl)\wwwroot\**\*;$(PublishUrl)\bin\**\*;" />
       <SubFoldersToRemove
         Include="$(PublishUrl)\refs\;$(PublishUrl)\runtimes\;"/>
     </ItemGroup>
@@ -78,12 +78,12 @@
     <PropertyGroup>
       <VersionNumber>%(CurrentAssembly.Version)</VersionNumber>
     </PropertyGroup>
-    <message Importance="High" text="Publishing zip: $(SolutionDir)Publish\Nucleus.$(VersionNumber).zip" />
-    <MakeDir Directories="$(SolutionDir)..\Publish\Release" />
+    <message Importance="High" text="Publishing zip: $([MSBuild]::EnsureTrailingSlash('$(SolutionDir)'))..\Publish\Release\Nucleus.$(VersionNumber).$(Nucleus_PublishType)-$(RuntimeIdentifierFilenamePart).zip" />
+    <MakeDir Directories="$([MSBuild]::EnsureTrailingSlash('$(SolutionDir)'))..\Publish\Release" />
     <PropertyGroup>
       <RuntimeIdentifierFilenamePart>$(RuntimeIdentifier.Replace("-", "_"))</RuntimeIdentifierFilenamePart>
       <RuntimeIdentifierFilenamePart Condition="'$(RuntimeIdentifier)' == ''">portable</RuntimeIdentifierFilenamePart>
     </PropertyGroup>
-    <ZipDirectory SourceDirectory="$(PublishUrl)" DestinationFile="$(SolutionDir)..\Publish\Release\Nucleus.$(VersionNumber).$(Nucleus_PublishType)-$(RuntimeIdentifierFilenamePart).zip" Overwrite="true" />
+    <ZipDirectory SourceDirectory="$(PublishUrl)" DestinationFile="$([MSBuild]::EnsureTrailingSlash('$(SolutionDir)'))..\Publish\Release\Nucleus.$(VersionNumber).$(Nucleus_PublishType)-$(RuntimeIdentifierFilenamePart).zip" Overwrite="true" />
   </Target>
 </Project>

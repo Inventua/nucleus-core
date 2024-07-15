@@ -2,7 +2,8 @@
 @using Nucleus.Extensions
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
-@Html.AddStyle("~!/../../viewer.css")
+@Html.AddStyle("~#/viewer.css")
+@Html.AddScript("~#/carousel.js")
 <div id="carousel-@Model.Module.Id" class="carousel slide carousel-dark multi-content-carousel@(Model.LayoutSettings.ShowControls ? " multi-content-carousel-show-controls" : "")" data-bs-ride="carousel" data-bs-interval="@Model.LayoutSettings.Interval">
 	@if (Model.LayoutSettings.ShowIndicators)
 	{
@@ -40,16 +41,15 @@
 	}
 </div>
 <script>
-	jQuery(document).ready(function () 
-	{
-		var height = 0;
-		// normalize carousel item heights
-		jQuery('#carousel-@Model.Module.Id .carousel-item').each(function (index, element) 
-		{
-			var elementHeight = jQuery(element).height();
-			if (elementHeight > height) height= elementHeight;
-		});
-		jQuery('#carousel-@Model.Module.Id .carousel-item').height(height);
-	});
-	
+  jQuery(function ()
+  {
+    jQuery('#carousel-@Model.Module.Id').NormalizeItemHeights();
+
+    jQuery(window).on('resize orientationchange', function ()
+    {
+      jQuery('#carousel-@Model.Module.Id').NormalizeItemHeights(); //run it again
+    });
+
+  });
+
 </script>

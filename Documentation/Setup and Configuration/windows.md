@@ -5,6 +5,7 @@ in Windows/Internet Information Services using the Sqlite database provider and 
 See also: 
 - [Installing Nucleus in Azure App Service](/manage/hosting/azure-app-service/) 
 - [Installing Nucleus in Linux](/manage/hosting/linux/) 
+- [Installing Nucleus in a Docker Container](/manage/hosting/docker/)
 
 ## Basic Setup 
 > The instructions below are for Windows.  

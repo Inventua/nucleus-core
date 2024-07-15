@@ -1,9 +1,9 @@
 # Installing Nucleus
 Nucleus can be used with different hosting environments, database providers and file system providers. 
 
-|                           |                     |                                               |
-|---------------------------|---------------------|-----------------------------------------------|
-| Hosting Environments      | Windows, Azure App Service, Linux     |
+|                           |                                                                    |
+|---------------------------|--------------------------------------------------------------------|
+| Hosting Environments      | Windows, Azure App Service, Linux, Docker     |
 | Databases                 | Sql Server (including Azure SQL), Sqlite, PostgreSQL, MySql/MariaDb | 
 | File Systems              | Local file system, Azure Blob Storage, Amazon S3                    |
 
@@ -19,6 +19,7 @@ include runtimes for all possible platforms.
     - [Windows](/manage/hosting/windows/)  
     - [Azure App Service](/manage/hosting/azure-app-service/)  
     - [Linux](/manage/hosting/linux/)
+    - [Docker](/manage/hosting/docker/)
 
    After you have completed the installation process, proceed to step 3.
 

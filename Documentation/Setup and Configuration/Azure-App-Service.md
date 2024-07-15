@@ -3,8 +3,7 @@
 See also: 
 - [Installing Nucleus in Windows](/manage/hosting/windows/)
 - [Installing Nucleus in Linux](/manage/hosting/linux/) 
-
-> This guide assumes that you are using Azure Sql Server as your database, and Azure App Storage as your file system. 
+- [Installing Nucleus in a Docker Container](/manage/hosting/docker/)
 
 1. If you don't already have one, [create an Azure free account](https://azure.microsoft.com/en-au/free). The free App Service tier isn't 
 appropriate for a production site, but you can use it to get started, and upgrade your App Service tier later.

@@ -29,4 +29,5 @@
   <ItemGroup Condition="'$(Nucleus_PublishType)' == 'Upgrade'">
     <Content Remove="**\*.Production.json;databaseSettings*.json;web.config;hosting*.json" />
   </ItemGroup>
+
 </Project>

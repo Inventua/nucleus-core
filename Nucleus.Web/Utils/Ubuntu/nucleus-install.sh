@@ -341,6 +341,10 @@ unzip -q -o "$INSTALL_ZIPFILE" -d "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP
 if [ ! -f "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/appSettings.Production.json" ]; then
   cp "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Utils/Ubuntu/appSettings.template" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/appSettings.Production.json"
 fi
+# Copy the Ubuntu appSettings.template to appSettings.Production.json
+if [ ! -f "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/databaseSettings.Production.json" ]; then
+  cp "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/Utils/Ubuntu/databaseSettings.template" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/databaseSettings.Production.json"
+fi
 
 # Set the group ownership of the folders/files that we just unzipped
 chown -R :$SERVICE_ACCOUNT "$TARGET_DIRECTORY"
@@ -358,7 +362,8 @@ chmod -R u+rwX "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
 chmod -R g+rX-w "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}"
 
 # allow nucleus to modify the production config files (the wizard and log settings screens write config settings)
-chmod -R g+rw "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/appSettings.Production.json" "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/databaseSettings.Production.json"
+chmod -R g+rw "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/appSettings.Production.json" 
+chmod -R g+rw "$TARGET_DIRECTORY/${DIRECTORIES[DIRECTORY_APP]}/databaseSettings.Production.json"
 
 # Nucleus must have read, write and execute permissions to /Extensions in order to install Extensions
 # Nucleus must have read, write and execute permissions to /Setup because we create install-log.config to indicate that the setup wizard has completed

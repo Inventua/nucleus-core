@@ -15,7 +15,7 @@
     <Message Importance="High" text="ClearExistingFiles: @(ConfigFilesToDelete)" />
     <Delete Files="@(ConfigFilesToDelete)" ContinueOnError="false" />
   </Target>
-
+  
   <Target Name="CompileExtensions" BeforeTargets="BeforePublish">
     <ItemGroup>
       <ExtensionProjects Include="..\Nucleus.Core.Modules\**\*.csproj" />
@@ -37,16 +37,18 @@
     <RemoveDir Directories="$(PublishUrl)Areas\" />
   </Target>
 
-  <Target Name="IncludeSharedLayoutAndContainerCshtmlFiles" AfterTargets="AfterPublish">
+  <Target Name="IncludeRequiredCshtmlFiles" AfterTargets="AfterPublish">
     <ItemGroup>
       <SharedContainerCshtmlFiles Include="Shared\Containers\*.cshtml;" />
       <SharedLayoutCshtmlFiles Include="Shared\Layouts\*.cshtml;" />
+      <RootCshtmlFiles Include="_*.cshtml;" />
     </ItemGroup>
     <Copy SourceFiles="@(SharedContainerCshtmlFiles)" DestinationFolder="$(PublishUrl)\Shared\Containers" />
     <Copy SourceFiles="@(SharedLayoutCshtmlFiles)" DestinationFolder="$(PublishUrl)\Shared\Layouts" />
+    <Copy SourceFiles="@(RootCshtmlFiles)" DestinationFolder="$(PublishUrl)" />
   </Target>
-
-  <Target Name="CopyWebConfigTemplate" AfterTargets="AfterPublish" Condition=" '$(Configuration)' == 'Release' ">
+  
+  <Target Name="CopyWebConfigTemplate" AfterTargets="AfterPublish" Condition=" '$(Configuration)' == 'Release' and ('$(RuntimeIdentifier)' == '' or $(RuntimeIdentifier.StartsWith('win')))">
     <!-- web.config contains development settings, web.template.config contains production settings.  This step replaces web.config with -->
     <!-- the web.template.config file during release builds so that the deployed/published web.config is the right one -->
     <Copy SourceFiles="web.template.config" DestinationFiles="$(PublishUrl)\web.config" Retries="2" />
@@ -60,7 +62,7 @@
         Exclude="$(PublishUrl)\*Settings.json;$(PublishUrl)\hosting.json;$(PublishUrl)\config.schema.json;$(PublishUrl)\*.txt;$(PublishUrl)\_ViewImports.cshtml;$(PublishUrl)\package.xsd;$(PublishUrl)\web.config;" />
       <SubFolderFilesToMoveToBin
         Include="$(PublishUrl)\**\*"
-        Exclude="$(PublishUrl)\*.*;$(PublishUrl)\Resources\**\*;$(PublishUrl)\Setup\**\*;$(PublishUrl)\Shared\**\*;$(PublishUrl)\Utils\**\*;$(PublishUrl)\wwwroot\**\*;" />
+        Exclude="$(PublishUrl)\*.*;$(PublishUrl)\Resources\**\*;$(PublishUrl)\Setup\**\*;$(PublishUrl)\Shared\**\*;$(PublishUrl)\Utils\**\*;$(PublishUrl)\wwwroot\**\*;$(PublishUrl)\bin\**\*;" />
       <SubFoldersToRemove
         Include="$(PublishUrl)\refs\;$(PublishUrl)\runtimes\;"/>
     </ItemGroup>
@@ -78,12 +80,12 @@
     <PropertyGroup>
       <VersionNumber>%(CurrentAssembly.Version)</VersionNumber>
     </PropertyGroup>
-    <message Importance="High" text="Publishing zip: $(SolutionDir)Publish\Nucleus.$(VersionNumber).zip" />
-    <MakeDir Directories="$(SolutionDir)..\Publish\Release" />
+    <message Importance="High" text="Publishing zip: $([MSBuild]::EnsureTrailingSlash('$(SolutionDir)'))..\Publish\Release\Nucleus.$(VersionNumber).$(Nucleus_PublishType)-$(RuntimeIdentifierFilenamePart).zip" />
+    <MakeDir Directories="$([MSBuild]::EnsureTrailingSlash('$(SolutionDir)'))..\Publish\Release" />
     <PropertyGroup>
       <RuntimeIdentifierFilenamePart>$(RuntimeIdentifier.Replace("-", "_"))</RuntimeIdentifierFilenamePart>
       <RuntimeIdentifierFilenamePart Condition="'$(RuntimeIdentifier)' == ''">portable</RuntimeIdentifierFilenamePart>
     </PropertyGroup>
-    <ZipDirectory SourceDirectory="$(PublishUrl)" DestinationFile="$(SolutionDir)..\Publish\Release\Nucleus.$(VersionNumber).$(Nucleus_PublishType)-$(RuntimeIdentifierFilenamePart).zip" Overwrite="true" />
+    <ZipDirectory SourceDirectory="$(PublishUrl)" DestinationFile="$([MSBuild]::EnsureTrailingSlash('$(SolutionDir)'))..\Publish\Release\Nucleus.$(VersionNumber).$(Nucleus_PublishType)-$(RuntimeIdentifierFilenamePart).zip" Overwrite="true" />
   </Target>
 </Project>

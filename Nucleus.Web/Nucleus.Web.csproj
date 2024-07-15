@@ -51,8 +51,9 @@
 		<ProjectReference Include="$(SolutionDir)\Nucleus.Core\Nucleus.Core.csproj" />
 		<ProjectReference Include="$(SolutionDir)\Nucleus.Extensions\Nucleus.Extensions.csproj" />
 		<ProjectReference Include="$(SolutionDir)\Nucleus.ViewFeatures\Nucleus.ViewFeatures.csproj" />
+    <ProjectReference Include="$(SolutionDir)\Nucleus.Data.Common\Nucleus.Data.Common.csproj" />
 		<ProjectReference Include="$(SolutionDir)\Nucleus.Web.Admin\Nucleus.Web.Admin.csproj" />
-		<ProjectReference Include="..\Nucleus.WebAssembly\Nucleus.WebAssembly.csproj" />		
+		<ProjectReference Include="$(SolutionDir)\Nucleus.WebAssembly\Nucleus.WebAssembly.csproj" />		
 	</ItemGroup>
 	
 	<ItemGroup>
@@ -102,6 +103,7 @@
 		<None Remove="Shared\Layouts\default.png" />
 		<None Remove="Shared\Layouts\layout-styles.css" />
 		<None Remove="Utils\Ubuntu\appSettings.template" />
+		<None Remove="Utils\Ubuntu\databaseSettings.template" />
 		<None Remove="Utils\Ubuntu\nucleus-install.sh" />
 		<None Remove="Utils\Ubuntu\nucleus.service" />
 		<None Remove="Utils\Windows\nucleus-install.ps1" />
@@ -125,6 +127,9 @@
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</EmbeddedResource>	  
 		<Content Include="readme.txt">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>	  
+		<Content Include="Utils\Ubuntu\databaseSettings.template">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Utils\Windows\nucleus-install.ps1">

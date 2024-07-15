@@ -1,42 +1,5 @@
 # Release Notes
 
-## Version 1.3.0.0
-17 January 2024
-
-- Setup Wizard
-Added database and file system provider configuration to the setup wizard.
-
-- Search system improvements:
-Added permissions checking on results, added a "type" property for on-screen display.  Improved performance and reliability by adding the ability to check whether a search item's source  has been updated and only re-index content if content has changed.
-
-- Permissions:
-Added folder "browse" permission type.
-
-- User Manager:
-Added filtering for user list (approved, verified, role membership).
-
-- Authentication:
-Added Windows Authentication.
-Added password expiry functionality.
-
-- DNN Migration:
-Added supporting functionality for the new DNN Migration utility.  The (free) DNN migration utility can be installed using the Nucleus store.
-
-- Pages:
-Added page "link types".  Pages can have a link type: Normal, Url (redirect to specified url), Page (render a different page from within the site) or File (download a file).
-
-- Mail Template Editor
-Implemented "Monaco" editor.
-
-- Developer tools:
-Added new analyzers, build tasks, code fix providers to help developers identify common problems.
-
-- General:
-Various UI improvements, bug fixes and performance enhancements.
-
-You can view a full list of updates in GitHub: https://github.com/Inventua/nucleus-core/commits/main
-
-
 ## Version 1.2.0.0
 22 June 2023
 

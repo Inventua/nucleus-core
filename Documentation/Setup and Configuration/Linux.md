@@ -3,6 +3,7 @@
 See also: 
 - [Installing Nucleus in Windows](/manage/hosting/windows/) 
 - [Installing Nucleus in Azure App Service](/manage/hosting/azure-app-service/) 
+- [Installing Nucleus in a Docker Container](/manage/hosting/docker/)
 
 > **_NOTE:_**   The nucleus-install.sh shell script automates many of the steps.  This page describes the use of the shell script.  This 
 process has been tested with [*Ubuntu Server 24.04*](https://ubuntu.com/download/server). 
@@ -124,14 +125,14 @@ a recognized certification authority.
 
 <kbd>sudo openssl req -nodes -new -keyout nucleus.key -x509 -days 365 -out nucleus.crt -subj "/"</kbd>
 
-<kbd>sudo chown :nucleus-service nucleus.key nucleus.crt</kbd>
-<br />
-<kbd>sudo chmod g+rw nucleus.key nucleus.crt</kbd>
-<br />
 <kbd>sudo cp nucleus.crt /home/nucleus/certs</kbd>
-<br />
+
 <kbd>sudo cp nucleus.key /home/nucleus/certs</kbd>
 
+<kbd>sudo chown :nucleus-service /home/nucleus/certs/nucleus.key /home/nucleus/certs/nucleus.crt</kbd>
+
+<kbd>sudo chmod g+rw /home/nucleus/certs/nucleus.key /home/nucleus/certs/nucleus.crt</kbd>
+<br />
 #### Configure Nucleus to use the certificate
 If you are using a reverse proxy, you will generally want to configure the reverse proxy to use your certificate and manage ("terminate") SSL 
 connections, so you won't need to configure Nucleus for https, and can skip this section.
@@ -147,11 +148,10 @@ present (commented out), so you can just un-comment the section and fill in the 
         "Url": "https://*:5001",  // or "https://your-hostname:5001" if you want to specify a host name
         "Certificate": {
           "Path": "/home/nucleus/certs/nucleus.crt",
-          "KeyPath": "/home/nucleus/certs/nucleus.key",
-          "Password": "your-certificate password"
+          "KeyPath": "/home/nucleus/certs/nucleus.key"
         }
-
-        
+      }
+              
 ### Nginx Walkthrough
 Follow the steps in this section if you want to install and configure Nginx as a reverse proxy.
 

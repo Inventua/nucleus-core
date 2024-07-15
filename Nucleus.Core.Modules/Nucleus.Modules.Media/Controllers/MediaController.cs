@@ -233,6 +233,14 @@ public class MediaController : Controller
       {
         case Models.Settings.AvailableSourceTypes.File:
           viewModel.SourceUrl = Url.FileLink(viewModel.SelectedFile, true);
+          if (String.IsNullOrEmpty(viewModel.Height))
+          {
+            viewModel.Height = $"{viewModel.SelectedFile.Height}px";
+          }
+          if (String.IsNullOrEmpty(viewModel.Width))
+          {
+            viewModel.Width = $"{viewModel.SelectedFile.Width}px";
+          }
           break;
         case Models.Settings.AvailableSourceTypes.Url:
           viewModel.SourceUrl = viewModel.Url;
@@ -246,7 +254,7 @@ public class MediaController : Controller
 
       viewModel.Style =
         (String.IsNullOrEmpty(viewModel.Height) ? "" : $"height:{viewModel.Height};") +
-        (String.IsNullOrEmpty(viewModel.Width) ? "width: 100%;" : $"width:{viewModel.Width};") +
+        (String.IsNullOrEmpty(viewModel.Width) ? "width: auto;" : $"width:{viewModel.Width};") +
         (viewModel.SourceType == Models.Settings.AvailableSourceTypes.YouTube && (String.IsNullOrEmpty(viewModel.Height) || String.IsNullOrEmpty(viewModel.Width)) ? "aspect-ratio: 16 / 9;" : "");
     }
 

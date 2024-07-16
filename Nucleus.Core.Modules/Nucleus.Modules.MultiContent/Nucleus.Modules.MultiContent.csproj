@@ -22,6 +22,8 @@
 	</ItemGroup>
 
   <ItemGroup>
+    <None Remove="carousel.js" />
+    <None Remove="carousel.min.js" />
     <None Remove="license.txt" />
     <None Remove="viewer.css" />
     <None Remove="package.xml" />
@@ -53,6 +55,8 @@
     <Content Include="license.txt" />
     <Content Include="Views\LayoutSettings\_PlainSettings.cshtml" />
     <Content Include="Views\ViewerLayouts\Plain.cshtml" />
+    <EmbeddedResource Include="carousel.js" />
+    <EmbeddedResource Include="carousel.min.js" />
     <EmbeddedResource Include="viewer.css" />
     <EmbeddedResource Include="viewer.min.css" />
     <Content Include="package.xml" />

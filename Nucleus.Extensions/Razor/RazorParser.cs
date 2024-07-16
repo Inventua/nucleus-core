@@ -103,9 +103,19 @@ namespace Nucleus.Extensions.Razor
 			builder.Options.TemplateFilename = " ";
 			builder.Options.DefaultUsings = [];
 
-			builder.AddAssemblyReference(typeof(System.Uri).Assembly);
-			builder.AddAssemblyReference(typeof(System.Collections.Generic.CollectionExtensions).Assembly);
-			builder.AddAssemblyReference(typeof(Nucleus.Extensions.AssemblyExtensions).Assembly);
+      // System.Runtime.dll
+      builder.AddAssemblyReference(typeof(System.Uri).Assembly);
+
+      // System.Collections.dll
+      builder.AddAssemblyReferenceByName("System.Collections");
+
+      // System.Collections.Generic.dll
+      builder.AddAssemblyReference(typeof(System.Collections.Generic.CollectionExtensions).Assembly);
+
+      // Nucleus.Extensions.dll
+      builder.AddAssemblyReference(typeof(Nucleus.Extensions.AssemblyExtensions).Assembly);
+
+      // Nucleus.Abstractions.dll
 			builder.AddAssemblyReference(typeof(Nucleus.Abstractions.Models.Page).Assembly);
 
 			foreach (string ns in UsingNamespaces)

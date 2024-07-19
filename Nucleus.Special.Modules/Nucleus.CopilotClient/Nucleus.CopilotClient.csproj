@@ -1,31 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
-		<RootNamespace>Nucleus.CopilotClient</RootNamespace>
-		<EnableDefaultContentItems>false</EnableDefaultContentItems>
-		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+    <RootNamespace>Nucleus.CopilotClient</RootNamespace>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
   </PropertyGroup>
 
-	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
   <ItemGroup>
-		<None Remove="**\*.vspscc" />
-		<None Remove="**\*.scc" />
-		<None Remove="*.zip" />
-	</ItemGroup>
-  
+    <None Remove="**\*.vspscc" />
+    <None Remove="**\*.scc" />
+    <None Remove="*.zip" />
+  </ItemGroup>
+
   <ItemGroup>
     <Content Include="**\*.css" />
     <Content Include="**\*.js" />
     <Content Include="**\*.cshtml" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <None Remove="Views\viewer.js" />
   </ItemGroup>
@@ -40,25 +40,26 @@
     <Content Include="readme.txt" />
   </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
-		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
-		<PackageReference Include="Microsoft.Bot.Connector.DirectLine" Version="3.0.2" />
-		<PackageReference Include="Microsoft.Rest.ClientRuntime" Version="2.3.24" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+    <PackageReference Include="Microsoft.Bot.Connector.DirectLine" Version="3.0.2" />
+    <PackageReference Include="Microsoft.Rest.ClientRuntime" Version="2.3.24" />
+  </ItemGroup>
 
-	<ItemGroup>
-	  <Content Update="Views\viewer.js">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </Content>
-	</ItemGroup>
+  <ItemGroup>
+    <Content Update="Views\viewer.js">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
-	<PropertyGroup Label="Nucleus">
-		<ExtensionFolder>CopilotClient</ExtensionFolder>
-		<Version>2.0.0</Version>
-		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+  <PropertyGroup Label="Nucleus">
+    <ExtensionFolder>CopilotClient</ExtensionFolder>
+    <Version>2.0.0</Version>
+    <Copyright>(c) Inventua Pty Ptd</Copyright>
+    <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
     <CopyToDefaultSetup>false</CopyToDefaultSetup>
-	</PropertyGroup>
+  </PropertyGroup>
 
-	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+  <Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
 </Project>

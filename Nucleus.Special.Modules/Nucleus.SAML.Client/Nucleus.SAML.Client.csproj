@@ -1,24 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
-		<RootNamespace>Nucleus.SAML.Client</RootNamespace>
-		<EnableDefaultContentItems>false</EnableDefaultContentItems>
-		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>false</RazorCompileOnBuild>
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+    <RootNamespace>Nucleus.SAML.Client</RootNamespace>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
-	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
-<ItemGroup>
-		<None Remove="**\*.vspscc" />
-		<None Remove="**\*.scc" />
-		<None Remove="*.zip" />
-	</ItemGroup>
+  <ItemGroup>
+    <None Remove="**\*.vspscc" />
+    <None Remove="**\*.scc" />
+    <None Remove="*.zip" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="license.txt" />
@@ -30,7 +30,7 @@
     <None Remove="Views\ViewerLayouts\DropDown-Button.cshtml" />
     <None Remove="Views\ViewerLayouts\DropDown.cshtml" />
     <None Remove="Views\ViewerLayouts\List.cshtml" />
-		<None Remove="Views\_ViewImports.cshtml" />
+    <None Remove="Views\_ViewImports.cshtml" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
   </ItemGroup>
@@ -45,22 +45,23 @@
     <Content Include="Views\ViewerLayouts\DropDown.cshtml" />
     <Content Include="Views\ViewerLayouts\DropDown-Button.cshtml" />
     <Content Include="Views\ViewerLayouts\List.cshtml" />
-		<Content Include="_ViewImports.cshtml" />
+    <Content Include="_ViewImports.cshtml" />
     <Content Include="Views\Viewer.cshtml" />
     <Content Include="Views\Settings.cshtml" />
   </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
-		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
-		<PackageReference Include="ITfoxtec.Identity.Saml2.MvcCore" Version="4.10.8" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+    <PackageReference Include="ITfoxtec.Identity.Saml2.MvcCore" Version="4.10.8" />
+  </ItemGroup>
 
-	<PropertyGroup Label="Nucleus">
-		<ExtensionFolder>SAML Client</ExtensionFolder>
-		<Version>2.0.0</Version>
-		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
-	</PropertyGroup>
+  <PropertyGroup Label="Nucleus">
+    <ExtensionFolder>SAML Client</ExtensionFolder>
+    <Version>2.0.0</Version>
+    <Copyright>(c) Inventua Pty Ptd</Copyright>
+    <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+  </PropertyGroup>
 
-	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+  <Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
 </Project>

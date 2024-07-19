@@ -1,25 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
-		<RootNamespace>Nucleus.Extensions.Smtp</RootNamespace>
-		<EnableDefaultContentItems>false</EnableDefaultContentItems>
-		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+    <RootNamespace>Nucleus.Extensions.Smtp</RootNamespace>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <RazorCompileOnBuild>true</RazorCompileOnBuild>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <!--<GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>-->
   </PropertyGroup>
 
-	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
-<ItemGroup>
-		<None Remove="**\*.vspscc" />
-		<None Remove="**\*.scc" />
-		<None Remove="*.zip" />
-	</ItemGroup>
+  <ItemGroup>
+    <None Remove="**\*.vspscc" />
+    <None Remove="**\*.scc" />
+    <None Remove="*.zip" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="**\*.css" />
@@ -32,11 +32,11 @@
     <None Remove="Views\_PickupDirectorySettings.cshtml" />
     <None Remove="Views\_SmtpSettings.cshtml" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Content Include="license.txt" />
     <Content Include="package.xml" />
-    <Content Include="readme.txt" />   
+    <Content Include="readme.txt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,11 +44,11 @@
     <Content Include="readme.txt" />
   </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
-		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+  <ItemGroup>
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
     <PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0-rc1" />
-		<PackageReference Include="MailKit" Version="4.6.0" />
+    <PackageReference Include="MailKit" Version="4.6.0" />
 
     <!-- MimeKit (used by MailKit) appears to have a run-time dependency on System.Security.Cryptography.Pkcs, but it -->
     <!-- seems that System.Security.Cryptography.Pkcs is generally only required at compile time, so it does not get  -->
@@ -56,34 +56,36 @@
     <!-- https://github.com/dotnet/aspnetcore/issues/38892 (comment dated Dec 27, 2023) -->
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0" GeneratePathProperty="true" />
     <PackageReference Include="System.Formats.Asn1" Version="8.0.0" GeneratePathProperty="true" />
-    
+
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
-	</ItemGroup>
+  </ItemGroup>
 
   <!-- https://github.com/dotnet/aspnetcore/issues/38892 (comment dated Dec 27, 2023) -->
   <Target Name="CopySystemSecurityCryptographyPkcs" AfterTargets="PostBuildEvent">
     <Copy SourceFiles="$(PkgSystem_Security_Cryptography_Pkcs)\lib\net8.0\System.Security.Cryptography.Pkcs.dll" DestinationFolder="$(OutDir)" />
     <Copy SourceFiles="$(PkgSystem_Formats_Asn1)\lib\net8.0\System.Formats.Asn1.dll" DestinationFolder="$(OutDir)" />
   </Target>
-  
-	<ItemGroup>
-	  <Content Update="Views\_PickupDirectorySettings.cshtml">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
-	  <Content Update="Views\_SmtpSettings.cshtml">
-	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	  </Content>
-	</ItemGroup>
 
-	<PropertyGroup Label="Nucleus">
-		<ExtensionFolder>Smtp Mail</ExtensionFolder>
-		<Version>2.0.0</Version>
-		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+  <ItemGroup>
+    <Content Update="Views\_PickupDirectorySettings.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\_SmtpSettings.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <PropertyGroup Label="Nucleus">
+    <ExtensionFolder>Smtp Mail</ExtensionFolder>
+    <Version>2.0.0</Version>
+    <Product>Nucleus</Product>
+    <Copyright>(c) Inventua Pty Ptd</Copyright>
+    <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
     <CopyToDefaultSetup>true</CopyToDefaultSetup>
-	</PropertyGroup>
+  </PropertyGroup>
 
-	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+  <Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
 </Project>

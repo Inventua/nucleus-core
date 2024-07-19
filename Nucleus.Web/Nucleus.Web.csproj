@@ -33,7 +33,7 @@
     -->
     <!-- https://github.com/dotnet/aspnetcore/issues/38892 (comment dated Dec 27, 2023) -->
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0" GeneratePathProperty="true" />
-    <PackageReference Include="System.Formats.Asn1" Version="8.0.0" GeneratePathProperty="true" />
+    <PackageReference Include="System.Formats.Asn1" Version="8.0.1" GeneratePathProperty="true" />
   </ItemGroup>
 
   <!-- https://github.com/dotnet/aspnetcore/issues/38892 (comment dated Dec 27, 2023) -->

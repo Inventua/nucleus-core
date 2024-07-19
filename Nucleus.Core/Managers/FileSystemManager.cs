@@ -1059,7 +1059,7 @@ public class FileSystemManager : IFileSystemManager
 			}
 			else
 			{
-				return $"{site.HomeDirectory}{System.IO.Path.AltDirectorySeparatorChar}{path}";
+				return $"{site.HomeDirectory}{(!path.StartsWith(System.IO.Path.AltDirectorySeparatorChar) ? System.IO.Path.AltDirectorySeparatorChar : "")}{path}";
 			}
 		}
 	}

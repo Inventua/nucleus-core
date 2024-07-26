@@ -1,7 +1,7 @@
 # Release Notes
 
 ## Version 2.0.0.0
-10 July 2024
+26 July 2024
 
 - Upgraded to .NET Core 8, Entity Framework 8, Bootstrap 5.3.
  

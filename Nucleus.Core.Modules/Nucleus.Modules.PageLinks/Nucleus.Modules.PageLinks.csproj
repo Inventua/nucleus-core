@@ -62,10 +62,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
-    <PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="2.0.0-rc1" />
-    <PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0-rc1" />
-    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="2.0.0" />
+    <PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0" />
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
   </ItemGroup>

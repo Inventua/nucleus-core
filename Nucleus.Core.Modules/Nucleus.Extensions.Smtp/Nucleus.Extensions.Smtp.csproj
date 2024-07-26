@@ -45,9 +45,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
-    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
-    <PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0-rc1" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0" />
+    <PackageReference Include="Inventua.Nucleus.Extensions" Version="2.0.0" />
     <PackageReference Include="MailKit" Version="4.6.0" />
 
     <!-- MimeKit (used by MailKit) appears to have a run-time dependency on System.Security.Cryptography.Pkcs, but it -->

@@ -1,5 +1,5 @@
 ## Lists
-Lists are a general-purpose set of names and values.  Modules use lists instead of having their own management user interface and database entities for simple 
+Lists are a general-purpose set of names and values.  Modules use lists instead of having their own management user interface and database tables for simple 
 name/value collections.  For example the documents and publish modules use lists for document/article categories, and the forums module uses lists for forum post 
 status.
 

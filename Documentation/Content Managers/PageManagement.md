@@ -9,6 +9,7 @@ the right of any page which contains child pages to open a list of child pages. 
 search for pages by typing part of the page name, title, description or keywords.  Search results are displayed 
 automatically while you type.
 
+![Page Editor](Page-Editor.png)
 ## Basic Properties
 
 {.table-25-75}
@@ -19,6 +20,7 @@ automatically while you type.
 | Parent Page      | Pages can be organized in a heirachical structure.  This structure is used by control panel menus, in menus and by the site map but has no effect on the page Url. |
 | Description      | Description of the page.  Some search engines use the page description to generate result snippets. |
 | Page Disabled    | Specifies whether the page is available.  Disabled pages are not displayed in menus, and navigating to a disabled page will generate a '404: Not found' response. |
+| Link Type        | You can create pages which redirect to another page, a file or external Url using the Link Type control. |
 
 ## Meta Data/SEO
 

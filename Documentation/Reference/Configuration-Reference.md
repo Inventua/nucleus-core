@@ -3,6 +3,9 @@ Nucleus configuration settings may be split across multiple .json files and can 
 submitted as command-line arguments.  Refer to the [Configuration](/Configuration/) page for information on how Nucleus 
 loads configuration settings.
 
+> The default configuration settings, along with the settings which are set up automatically by the [Setup Wizard](/getting-started/#setup-wizard) 
+are suitable for most users, so you don't need modify configuration files unless you require special settings.
+
 > The default `appSettings.json` file contains a full set of available configuration settings (some are commented out), which 
 you should use as a reference for the file format.
 
@@ -90,15 +93,13 @@ General top-level settings.
 ```
 
 ### Nucleus:ResourceFileOptions
-Controls use of minified and merged javascript and css stylesheets.  Developers may want to set these values to false in order to more easily debug client-side javascript and css. 
+Specifies use of minified javascript and css stylesheets.  Developers may want to set these values to false in order to more easily debug client-side javascript and css. 
 
 {.table-25-75}
 |                                  |                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | UseMinifiedJs                    | (Boolean) Specifies whether to use minified versions of .js files, when they are available.  Default value is true.  | 
 | UseMinifiedCss                   | (Boolean) Specifies whether to use minified versions of .css files, when they are available.  Default value is true. | 
-| MergeJs                          | (Boolean) Specifies whether to merge .js files into a single file.  Default value is true. | 
-| MergeCss                         | (Boolean) Specifies whether to merge .css files into a single file.  Default value is true. | 
 
 ```
 "Nucleus": 
@@ -106,9 +107,7 @@ Controls use of minified and merged javascript and css stylesheets.  Developers 
   "ResourceFileOptions": 
   {
     "UseMinifiedJs": true,
-    "UseMinifiedCss": true,
-    "MergeJs": true,
-    "MergeCss": true
+    "UseMinifiedCss": true
   }
   ...   
 }
@@ -141,11 +140,12 @@ Each scripts section has properties:
 |----------------------------------|--------------------------------------------------------------------------------------|
 | Type                             | (String) javascript or stylesheet.  | 
 | Path                             | (String) Application-relative path to the script or javascript file.  Start with a `~` to represent the application root. | 
-| IsDynamic                        | (Boolean) If set to true, prevents the script from being merged.  This is to support Html editors that perform dynamic loading of other scripts and therefore must be served from their "real" path. | 
 
 ### Nucleus:FileSystems
+The FileSystems section controls static file validation and file system providers settings. File system providers are initially configured by the 
+[Setup Wizard](/getting-started/#setup-wizard).
 
-### Nucleus:FileSystems:AllowedFileTypes
+#### Nucleus:FileSystems:AllowedFileTypes
 AllowedFileTypes are used to specify one or more file extensions and a list of signatures for each file type.  Files with extensions
 do not match an entry in this list cannot be uploaded and will generate an error.  The integrity of uploaded files is validated by comparing 
 the first few bytes of the file with the specified signatures.  The file bytes must match at least one of the signatures.  Signatures are 
@@ -182,7 +182,7 @@ file types.
 }
 ```
     
-### Nucleus:FileSystems:Providers
+#### Nucleus:FileSystems:Providers
 Specifies one or more file system providers.  The configuration section for each file provider has a key, name and provider type (class name).
 You can specify multiple file providers, and the user can choose from a list in the user interface.  The "Name" property is shown 
 to the user.  Each entry has a key which uniquely identifies the provider entry.
@@ -214,7 +214,7 @@ The `Nucleus:FileSystems:Providers` element is an array of file system provider 
 }
 ```
 
-### Nucleus:FileSystems:PasswordOptions
+### Nucleus:PasswordOptions
 Specifies authentication and password settings.
 
 {.table-25-75}
@@ -247,7 +247,7 @@ Specifies authentication and password settings.
 }
 ```
 
-### Nucleus:FileSystems:PasswordOptions:PasswordComplexityRules
+### Nucleus:PasswordOptions:PasswordComplexityRules
 Password complexity rules are regular expressions.  You can specify multiple password complexity rules and all of them must succeed (match) in order for a password to be valid.  
 
 {.table-25-75}

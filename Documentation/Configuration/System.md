@@ -1,5 +1,5 @@
 ## System Control Panel
-The System control panel displays read-only environment and status information for Nucleus.
+The System control panel displays environment and status information for Nucleus.
 
 ![System Control Panel](System.png)
 
@@ -19,5 +19,11 @@ The database tab displays your configured database connection information, along
 server version and database size.  User ID and password values are replaced with '*' characters.
 
 ## Logs
-If you have configured the text file logger, you view logs for the current web server by selecting a log from the drop-down list in the 
+If you have configured the text file logger, you can view logs by selecting a log from the drop-down list in the 
 ==Logs== tab.  
+
+## Cache
+The Cache tab displays a list of caches with their usage and capacity. This information can be used to optimize your caching settings.
+
+## Loaded Extensions
+The Loaded Extensions tab displays a list of loaded extensions, their assemblies and versions and can be used for troubleshooting and verification purposes.

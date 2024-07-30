@@ -35,6 +35,7 @@ prefer.
   helper can resolve the Url to your stylesheet, and ensures that no duplicate links to stylesheets are 
   rendered. The AddStyle Html helper parses the leading ~! characters and renders an Url which is relative 
   the currently executing view path (the folder which contains your layout .cshtml file).
+  ~!/ refers to the folder that the cshtml file is in, #!/ refers to the root folder for the extension. 
 *@
 @Html.AddStyle("~!/your-layout.css")
 

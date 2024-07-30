@@ -64,14 +64,14 @@ namespace Nucleus.Modules.Sitemap.Controllers
       this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.SETTINGS_ROOTPAGE, viewModel.RootPageId);
       this.Context.Module.ModuleSettings.Set(ModuleSettingsKeys.SETTINGS_SHOWDESCRIPTION, viewModel.ShowDescription);
 
-      await this.PageModuleManager.SaveSettings(this.Context.Module);
+      await this.PageModuleManager.SaveSettings(this.Context.Page, this.Context.Module);
       
       return Ok();
     }
 
     private ViewModels.Sitemap BuildViewModel()
     {
-      ViewModels.Sitemap viewModel = new ViewModels.Sitemap();
+      ViewModels.Sitemap viewModel = new();
 
       if (this.Context.Module != null)
       {
@@ -92,16 +92,15 @@ If your extension has settings which apply to the ==Site== rather than to a spec
 ==SiteSettings== table.  The process is similar to saving and retrieving values for module settings.
 
 Obtain a reference to the current [Site](/api-documentation/Nucleus.Abstractions.Models.Site/) by including a 
-[Context](/api-documentation/Nucleus.Abstractions.Models.Context/) parameter in your constructor.  You can access the current 
-module from the ==Context.Site== property.
-
-In the settings-related actions of your controller class, save site settings by adding or updating values 
+[Context](/api-documentation/Nucleus.Abstractions.Models.Context/) parameter in your constructor.  Use the 
+[Context.Site](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.Models.Site/) property to
+read and write site settings. In the settings-related actions of your controller class, save site settings by adding or updating values 
 in the [Site.SiteSettings](/api-documentation/Nucleus.Abstractions.Models.Site/#SiteSettings) property by using 
-[SiteSettingsExtensions.TrySetValue](/api-documentation/Nucleus.Extensions.SiteSettingsExtensions/#TrySetValue(ListSiteSettingStringNullableBoolean)), 
-then calling [ISiteManager.Save](/api-documentation/Nucleus.Abstractions.Managers.ISiteManager/#Save(Site)).  
+[TrySetValue](/api-documentation/Nucleus.Extensions.SiteSettingsExtensions/#TrySetValue(ListSiteSettingStringNullableBoolean)), 
+then calling [SiteManager.Save](/api-documentation/Nucleus.Abstractions.Managers.ISiteManager/#Save(Site)).  
 
-You can retrieve your settings by calling the [SiteSettingsExtensions.TryGetValue](/api-documentation/Nucleus.Extensions.SiteSettingsExtensions/) 
-extension of the [Site.SiteSettings](/api-documentation/Nucleus.Abstractions.Models.Site/#SiteSettings) property.
+You can retrieve your settings by calling the [TryGetValue](/api-documentation/Nucleus.Extensions.SiteSettingsExtensions/) 
+extension of the [Context.Site.SiteSettings](/api-documentation/Nucleus.Abstractions.Models.Site/#SiteSettings) property.
 
 > Each site setting consists of a ==SettingName== and a SettingValue.  Site setting values are limited to 1024 characters and are 
 stored in the database as a string.  The .TrySet and .TryGet methods automatically convert your settings to and from ==Boolean==, ==Double==, 
@@ -163,11 +162,15 @@ namespace Nucleus.Extensions.GoogleAnalytics.Controllers
 
 ### Content
 Modules which store Html, Markdown or text content should use the ==Content== table to store content.  Content records consist of a 
-reference to the module which they belong to, a title, the content and a sort index.  You can store multiple content records for a single 
-module instance in the ==Content== table. 
+reference to the module which they belong to, a title, the content, content type and a sort index.  You can store multiple content records for a single 
+module instance in the ==Content== table. The default content type is text/html. If you are saving markdown content, set ContenType to text/markdown. If 
+you are saving plain text, set ContentType to text/plain.
 
 Obtain a reference to [IContentManager](/api-documentation/Nucleus.Abstractions.Managers.IContentManager/) by including a
 parameter in your constructor.  The ==Content Manager== has methods to Save, List and manage content records.
+
+If you use the [Content.ToHtml](/api-documentation/Nucleus.Extensions.xml/Nucleus.Extensions.ContentExtensions/) extension method from 
+Nucleus.Extensions.ContentExtensions to render your content, any of the three supported content types will be converted to Html.
 
 > This example is from the Multi-Content module.  Code which does not demonstrate the content manager has been removed for brevity.
 ```

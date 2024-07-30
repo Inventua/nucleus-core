@@ -5,7 +5,8 @@ classes.
 
 
 ## Cache Extension
-To implement caching, create a cache extension class.  Each Nucleus cache collection specfies a key type and model type.  
+To implement caching, create a cache extension class.  Each Nucleus cache collection specfies a key type and model type. The examples below are from 
+the [Links](https://github.com/Inventua/nucleus-core/tree/main/Nucleus.Core.Modules/Nucleus.Modules.Links) module.
 
 ```
 using Nucleus.Abstractions.Models.Cache;
@@ -73,7 +74,7 @@ public async Task<Link> Get(Site site, Guid id)
 
 > The code to retrieve the item from the database is not executed unless the item specified by `id` is not present in the cache.
 
-> In the examples above, the cache item key is a Guid, but you can use different types for cache item keys.
+> In the examples above, the cache item key is a Guid, but you can use other .Net types as cache item keys.
 
 ## Removing an item from the Cache
 If the cached entity is changed, you must remove it from the cache.  In your ==Manager== class `.Save` method (or any other method which 

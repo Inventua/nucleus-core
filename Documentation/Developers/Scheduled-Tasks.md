@@ -1,4 +1,4 @@
-Scheduled tasks perform their work periodically and are generally used to perform system maintenance, like expiring cache entries or updating a search 
+Scheduled tasks perform their work periodically and are generally used to perform system maintenance, like expiring cache entries, updating a search 
 index, or sending notification e-mails. 
 
 To create a new scheduled task, create a class which inherits 
@@ -70,7 +70,7 @@ a percent) if you have a long-running task, and to report success or failure by 
 the .Net core [ILogger](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.logging.ilogger) to report information, warnings 
 or errors.
 
-> If your scheduled task uses logging and your site is configured to use the Nucleus Text File Logger, the text file logger automatically detects 
+> If your scheduled task uses logging and your site is configured to use the Nucleus Text File Logger (which is the default), the text file logger automatically detects 
 log entries which originate from a scheduled task and writes log output to a file system path which is specific to your scheduled task, 
 `[LogFolder]\Scheduled Tasks\[schedule-name]`.  Log output from scheduled tasks is also written to the main Nucleus log. 
 Site administrators can review scheduled task logs in isolation from the rest of the system logs by viewing the log file directly, or by 
@@ -91,6 +91,11 @@ Example:
   ...
 }
 ```
+
+You can also update logging settings in the `System` Control Panel, in the Logs tab.
+
+![Log Settings](log-settings.png)
+
 
 > **_NOTE:_**   Nucleus automatically detects scheduled tasks in installed assemblies, so you don't need to add anything special to your
 extension manifest (other than including the assembly which contains your class), or any lines of code in your [startup](https://www.nucleus-cms.com/developers/startup-classes/)

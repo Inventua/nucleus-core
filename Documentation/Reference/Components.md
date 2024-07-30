@@ -9,20 +9,22 @@ uses the [MIT](https://github.com/Inventua/nucleus-core/blob/main/Nucleus.Web/li
 This document was updated to include references which are part of Nucleus version 1.3.0.
 
 ## Core
+{.table-0-75-0}
 |                                  |                                                             | License                         |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | [DocumentPartner.ClosedXML](https://github.com/ClosedXML/ClosedXML)	| ClosedXML is a .NET library for reading, manipulating and writing Excel 2007+ (.xlsx, .xlsm) files.	| [MIT](https://github.com/ClosedXML/ClosedXML/blob/develop/LICENSE) |
 | [ExcelNumberFormat](https://github.com/andersnm/ExcelNumberFormat)	| .NET library to parse ECMA-376 number format strings and format values like Excel and other spreadsheet software.	| [MIT](https://github.com/andersnm/ExcelNumberFormat/blob/master/LICENSE) |
 | [Markdig](https://github.com/xoofx/markdig)  |	Markdig is a fast, powerful, CommonMark compliant, extensible Markdown processor for .NET. |	[BSD 2-Clause](https://github.com/xoofx/markdig/blob/master/license.txt) |
 | [Open XML SDK](https://github.com/dotnet/Open-XML-SDK)	| The Open XML SDK provides tools for working with Office Word, Excel, and PowerPoint documents.	| [MIT](https://github.com/dotnet/Open-XML-SDK/blob/main/LICENSE) |
-| [RazorEngineCore](https://github.com/adoconnection/RazorEngineCore)  |	.NET 6 Razor Template Engine. |	[MIT](https://github.com/adoconnection/RazorEngineCore/blob/master/LICENSE) |
+| [RazorEngineCore](https://github.com/adoconnection/RazorEngineCore)  |	.NET Razor Template Engine. |	[MIT](https://github.com/adoconnection/RazorEngineCore/blob/master/LICENSE) |
 | [SkiaSharp](https://github.com/mono/SkiaSharp)  |	SkiaSharp is a cross-platform 2D graphics API for .NET platforms. |	[MIT](https://github.com/mono/SkiaSharp/blob/main/LICENSE.md) |
-| [MailKit](https://github.com/jstedfast/MailKit)  |	MailKit is a cross-platform mail client library built on top of MimeKit.	| [MIT](https://github.com/jstedfast/MailKit/blob/master/LICENSE) |
 | [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)  |	Popular high-performance JSON framework for .NET. |	[MIT](https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md) |
+| [OpenTelemetry](https://opentelemetry.io/) |OpenTelemetry is a vendor-neutral open source observability framework for instrumenting, generating, collecting, and exporting telemetry data. | [Apache2.0](https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/LICENSE.TXT) |
 
 <br/>  
 
 ## Database Providers
+{.table-0-75-0}
 |                                  |                                                             | License                         |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | [Npgsql](https://github.com/npgsql/efcore.pg) | PostgreSQL/Npgsql provider for Entity Framework Core. |	[Custom/BSD style](https://github.com/npgsql/efcore.pg/blob/main/LICENSE) |
@@ -31,6 +33,7 @@ This document was updated to include references which are part of Nucleus versio
 <br/>  
 
 ## File System Providers
+{.table-0-75-0}
 |                                  |                                                             | License                         |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | [Azure Blob Storage](https://learn.microsoft.com/en-au/azure/storage/blobs/storage-blobs-overview) | Azure Storage Blobs client library for .NET. |	[MIT](https://licenses.nuget.org/MIT) |
@@ -39,6 +42,7 @@ This document was updated to include references which are part of Nucleus versio
 <br/>  
 
 ## Client-side (javascript/css libraries)
+{.table-0-75-0}
 |                                  |                                                             | License                         |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | [Jquery](https://github.com/jquery/jquery)    |  jQuery is a JavaScript library designed to simplify HTML DOM tree traversal and manipulation, as well as event handling, CSS animation, and Ajax. | [MIT](https://jquery.org/license/) |
@@ -48,13 +52,31 @@ This document was updated to include references which are part of Nucleus versio
 <br/>
 
 ## Static Content Module
+{.table-0-75-0}
 |                                  |                                                             | License                         |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | [HtmlAgilityPack](https://github.com/zzzprojects/html-agility-pack) | HTML parser that builds a read/write DOM and supports plain XPATH or XSLT. |	[MIT](https://github.com/zzzprojects/html-agility-pack/blob/master/LICENSE) |
 
 <br/>
 
+## SMTP Mail Extension
+{.table-0-75-0}
+|                                  |                                                             | License                         |
+|----------------------------------|--------------------------------------------------------------------------------------|
+| [MailKit](https://github.com/jstedfast/MailKit)  |	MailKit is a cross-platform mail client library built on top of MimeKit.	| [MIT](https://github.com/jstedfast/MailKit/blob/master/LICENSE) |
+
+<br/>
+
+## SendGrid Mail Extension
+{.table-0-75-0}
+|                                  |                                                             | License                         |
+|----------------------------------|--------------------------------------------------------------------------------------|
+| [SendGrid .Net Library](https://github.com/sendgrid/sendgrid-csharp)  |	Library which allows developers to use the Twilio SendGrid Web API v3 via C# with .NET.	| [MIT](https://github.com/sendgrid/sendgrid-csharp/blob/main/LICENSE) |
+
+<br/>
+
 ## Elastic Search Extension
+{.table-0-75-0}
 |                                  |                                                             | License                         |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | [NEST](https://github.com/elastic/elasticsearch-net) | .NET interface to Elasticsearch.	| [Apache-2.0](https://github.com/elastic/elasticsearch-net/blob/main/LICENSE.txt) |	
@@ -62,14 +84,15 @@ This document was updated to include references which are part of Nucleus versio
 <br/>
 
 ## SAML Client and SAML Server Extension
+{.table-0-75-0}
 |                                  |                                                             | License                         |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | [ITfoxtec.Identity.Saml2](https://github.com/ITfoxtec/ITfoxtec.Identity.Saml2) | ITfoxtec Identity Saml2 package.	| [BSD 3-Clause](https://github.com/ITfoxtec/ITfoxtec.Identity.Saml2/blob/master/LICENSE) |	
 
 <br/>
 
-
 ## Material Icons
+{.table-0-75-0}
 |                                  |                                                             | License                         |
 |----------------------------------|--------------------------------------------------------------------------------------|
 | [Google Material Icons](https://developers.google.com/fonts/docs/material_icons) | Material Icons font.	| [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0.txt) |	

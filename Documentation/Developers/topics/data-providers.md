@@ -20,7 +20,7 @@ and has methods which use a DbContext.  Inherit [DbContext](/api-documentation/N
 has extra functionality so that Nucleus can automatically configure the correct database provider, including automatic database schema [migrations](/developers/database-scripts/).
 
 Your DbContext implementation will be the same as a standard entity framework [DbContext](https://docs.microsoft.com/en-us/dotnet/api/system.data.entity.dbcontext) with 
-one or more [DbSet](https://docs.microsoft.com/en-us/dotnet/api/system.data.entity.dbset-1) properties, and an 
+one or more [DbSet](https://docs.microsoft.com/en-us/dotnet/api/system.data.entity.dbset-1) properties, and (optionally) an 
 [OnModelCreating](https://docs.microsoft.com/en-us/dotnet/api/system.data.entity.dbcontext.onmodelcreating) override to tell entity framework more about 
 your model classes and database objects.
 
@@ -28,19 +28,19 @@ Your [DataProvider](/api-documentation/Nucleus.Data.EntityFramework.xml/Nucleus.
 
 {.file-name}
 ### Data Provider Example
+The examples below are from the [Documents](https://github.com/Inventua/nucleus-core/tree/main/Nucleus.Core.Modules/Nucleus.Modules.Documents) module.
 ```
 using System;
-using Nucleus.Abstractions.Models;
-using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
 using System.Collections.Generic;
-using System.Linq;
 using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.EventHandlers;
 using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
+using Nucleus.Abstractions.Models;
 using Nucleus.Modules.Documents.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Documents.DataProviders;
 
@@ -128,8 +128,8 @@ extension method provided by the [Nucleus.Data.Common](/api-documentation/Nucleu
 [Startup Class](/developers/startup-classes/) to add and configure your data provider and associated objects.
 
 ### Example
-The example below is from the core Documents module.  Code which does not demonstrate adding a data provider has been removed 
-for brevity.
+The example below is from the [Documents](https://github.com/Inventua/nucleus-core/tree/main/Nucleus.Core.Modules/Nucleus.Modules.Documents) module. Code 
+which does not demonstrate adding a data provider has been removed for brevity.
 
 ```
 using Microsoft.AspNetCore.Hosting;

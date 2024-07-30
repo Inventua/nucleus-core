@@ -2,6 +2,8 @@
 Health checks are exposed by Nucleus as HTTP endpoints. Health checks can be used by load balancers and other infrastructure components to check the 
 status of Nucleus on a server.
 
+> Health checks are not enabled by default.  See the [Configuration](#configuration) section below for instructions.
+
 Three health checks are available:
 
 {.table-25-75}
@@ -20,6 +22,12 @@ The output from health check endpoints depends on the value of the HTTP request 
 | text/html            | The output is a simple status (Healthy, Degraded or Unhealthy) in HTML - that is, wrapped with html and body tags.                                    |  
 | application/health+json or application/json | The output is in JSON format and includes a detailed list of failed checks (see below). |  
 | any other value      | The output is a simple status (Healthy, Degraded or Unhealthy) in text/plain format.           |  
+
+> If you want to view the output from the Health endpoint, you will have to use a tool like [Postman](https://www.postman.com/), so that you can set
+the value of the `Accept` header in your HTTP request. You can also use the `curl` command: 
+<kbd>
+curl https://your-site/_health --header "Accept:application/json"
+</kbd>
 
 > The application/health+json output is intended to conform with the draft specification [draft-inadarei-api-health-check-06](https://datatracker.ietf.org/doc/html/draft-inadarei-api-health-check-06). This 
 specification has expired, but is the closest thing to a standard available. If the status is Degraded or Unhealthy, each check may contain a "additional-info" 

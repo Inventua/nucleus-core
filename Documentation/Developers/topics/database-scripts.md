@@ -7,18 +7,18 @@ the DataProvider/database-type/scripts folder, where database-type is:
 {.table-25-75}
 | Name             |  Description                                                                          |
 |------------------|---------------------------------------------------------------------------------------|
-| Migrations       |  scripts which can be used with all of the database providers, normally in .json format.  |
-| SqlServer        |  Microsoft SQL Server scripts, normally in .sql format. |
-| MySql            |  MySql/MariaDb scripts, normally in .sql format. |
-| Sqlite           |  Sqlite scripts, normally in .sql format. |
-| PostgreSql       |  PostgreSql scripts, normally in .sql format. |
+| Migrations       |  Contains scripts which can be used with all of the database providers, in .json format.  |
+| SqlServer        |  Contains Microsoft SQL Server scripts, in .sql format. |
+| MySql            |  Contains MySql/MariaDb scripts, in .sql format. |
+| Sqlite           |  Contains Sqlite scripts, in .sql format. |
+| PostgreSql       |  Contains PostgreSql scripts, in .sql format. |
 
 > You can create database scripts in SQL format, but database definition SQL commands differ between database 
 providers.  This may be a useful option for developers of line-of-business applications which do not need to support more than
 one database type.  Scripts in .sql format must be located in the `Migrations\SQLite\Scripts`, `Migrations\SqlServer\Scripts`,
 `Migrations\MySql\Scripts` and `Migrations\PostgreSql\Scripts` folders.  Script files in .sql format are text files which contain 
 one or more SQL commands, each of which must end in `GO`, followed by a new line.  
-**The`.json` format is recommended, because you can use it to write scripts which target all of the database providers instead 
+**The `.json` format is recommended, because you can use it to write scripts which target all of the database providers instead 
 of writing separate scripts for each database provider.**
 
 Script files must be named `{version}.json` or `{version}.sql`, where ==\{version\}== is a version number which can be parsed by 
@@ -94,6 +94,11 @@ Script files in `.json` format consist of a schema name, version and operations 
 }
 ```
 
+**Examples**
+- [Documents Module Scripts](https://github.com/Inventua/nucleus-core/blob/main/Nucleus.Core.Modules/Nucleus.Modules.Documents/DataProviders/Migrations/Scripts)
+- [Links Module Scripts](https://github.com/Inventua/nucleus-core/tree/main/Nucleus.Core.Modules/Nucleus.Modules.Links/DataProviders/Migrations/Scripts)
+
+
 > **How it works**\
 ==Operation== elements in your json script are deserialized into Entity Framework objects from the 
 [Microsoft.EntityFrameworkCore.Migrations.Operations](https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.operations) 
@@ -162,8 +167,6 @@ namespace, and you can use them in json database script files, but Nucleus doesn
 ### DatabaseProviderSpecificOperation
 You may need to execute different operations for specific database providers.  The DatabaseProviderSpecificOperation wraps any operation with a set of `Include` or `Exclude` provider 
 names to limit when the operation is executed.  Supported values for the `Include` and `Exclude` properties are Sqlite, SqlServer, MySql and PostgreSql.
-
-> It is unusual to need to use `DatabaseProviderSpecificOperation` in an extension script.
 
 ```
 {

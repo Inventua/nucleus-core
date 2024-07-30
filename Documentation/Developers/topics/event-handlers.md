@@ -19,10 +19,11 @@ or ISingletonSystemEventHandler interface.
 > singleton handlers for the same model and event.
 
 The functions used to raise and handle events both specify a TModel and TEvent.  The TModel type is the type of the model entity which has changed, and the TEvent 
-type represents the event which occurred.  TEvent can be any type, but Nucleus has classes for [create](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.SystemEventTypes.Create/),  
-[update](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.SystemEventTypes.Update/), and 
+type represents the event which occurred.  TEvent can be any type, but Nucleus has classes for 
+[create](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.SystemEventTypes.Create/), [update](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.SystemEventTypes.Update/), and 
 [delete](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.SystemEventTypes.Delete/).  If you need to represent a different kind of event, just 
-create a class for it.  The TEvent class is used as a key in the dependency injection services collection, and does not need to inherit any class, or have any methods or properties.
+create a class for it. The TEvent class is used as a key in the dependency injection services collection, and does not need to inherit any class, or 
+have any methods or properties.
 
 ### Example
 The example below is from the core Documents module.  This class adds a transient System Event Handler to receive Nucleus system events - in this case, a MigrateEvent which is triggered after a 
@@ -49,7 +50,6 @@ public class Startup : IHostingStartup
     builder.ConfigureServices((context, services) => 
     {
       // code which does not demonstrate event handling has been removed from this example
-
       services.AddSingletonSystemEventHandler<MigrateEventArgs, MigrateEvent, MigrationEventHandler>();
     });
   }
@@ -72,7 +72,7 @@ public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISystemE
 }
 ```
 
-> **_Note:_**:  The Data migration event [MigrateEvent](/api-documentation/Nucleus.Data.Common.xml/Nucleus.Data.Common.MigrateEvent/) 
+> **_Note:_** The Data migration event [MigrateEvent](/api-documentation/Nucleus.Data.Common.xml/Nucleus.Data.Common.MigrateEvent/) 
 is sent to **all** subscribers, so you must check the `.SchemaName` property of the [MigrateEventArgs](/api-documentation/Nucleus.Data.Common.xml/Nucleus.Data.Common.MigrateEventArgs/) 
 object that is passed to the ==Invoke== method to make sure that it applies to your extension.  Data schema migration doesn't happen immediately 
 when you install an update, it runs the first time the extension accesses the database.

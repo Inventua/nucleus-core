@@ -1,7 +1,7 @@
-Some extensions do not have a user interface, but need to provide a way for site administrators to set configuration settings.  Use a control panel extension to add an item to the 
-Manage or Settings control panel.
+Some extensions do not have a user interface for end users, but need to provide a way for site administrators to set configuration settings.  Use a 
+control panel extension to add an item to the `Manage` or `Settings` control panel.
 
-A Control Panel extension is an MVC Controller/ViewModel/View, just like a module.  A `<controlPanelExtensionDefinition>` entry in the manifest registers your control panel extension 
+A Control Panel extension is an MVC Controller/ViewModel/View, just like a module.  A `<controlPanelExtensionDefinition>` entry in the manifest (package.xml) registers your control panel extension 
 with Nucleus.  A simple example of a control panel extension is in the [Nucleus Google Analytics extension](https://github.com/Inventua/nucleus-core/tree/main/Nucleus.Core.Modules/Nucleus.Extensions.GoogleAnalytics), 
 which is used to manage your site's Google Analytics ID.
 
@@ -16,6 +16,7 @@ which is used to manage your site's Google Analytics ID.
   <editAction>Settings</editAction>
 </controlPanelExtensionDefinition>
 ```
+Replace {generate-guid} with your own GUID value.
 
 #### Control Panel Extension Definition Values
 {.table-25-75}
@@ -31,7 +32,7 @@ which is used to manage your site's Google Analytics ID.
 
 > Element names are case-sensitive, and must appear in the order shown above.
 
-> If your control panel extension settings view has a header element with a `class="nucleus-control-panel-heading"`, Nucleus will automatically
+> If your control panel extension settings view has a header (H1...H6) element with a `class="nucleus-control-panel-heading"`, Nucleus will automatically
 set the control panel or dialog heading to the value of your header element and will remove the original header element.  This is recommended, 
 as it increases the vertical space available for your settings view contents.
 

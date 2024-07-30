@@ -120,6 +120,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Developers", "Developers", 
 		Documentation\Developers\Layouts-and-Containers.md = Documentation\Developers\Layouts-and-Containers.md
 		Documentation\Developers\Layouts-and-Containers.png = Documentation\Developers\Layouts-and-Containers.png
 		Documentation\Developers\Layouts-and-Containers.vsdx = Documentation\Developers\Layouts-and-Containers.vsdx
+		Documentation\Developers\log-settings.png = Documentation\Developers\log-settings.png
 		Documentation\Developers\Modules.md = Documentation\Developers\Modules.md
 		Documentation\Developers\Other.md = Documentation\Developers\Other.md
 		Documentation\Developers\Scheduled-Tasks.md = Documentation\Developers\Scheduled-Tasks.md

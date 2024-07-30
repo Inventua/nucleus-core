@@ -67,7 +67,7 @@
               @Html.DropDownListFor(model => model.Page.LinkType, Html.GetEnumSelectList<Page.LinkTypes>(), new { @class = "page-link-type" })
             </SettingsControl>
 
-            <div class="d-flex align-items-end flex-1 mt-auto">
+            <div class="d-flex align-items-end flex-1 mt-auto gap-2">
               <SettingsControl caption="Page Disabled?" rendermode="LabelLast" class="inner-inline mt-auto" helptext="Specifies whether the page is available.  Disabled pages are not displayed in menus, and navigating to a disabled page will generate a '404: Not found' response.">
                 @Html.CheckBoxFor(model => model.Page.Disabled, new { @class = "ToggleSwitch" })
               </SettingsControl>

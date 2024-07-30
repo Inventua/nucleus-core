@@ -20,7 +20,7 @@ namespace Nucleus.XmlDocumentation
 
 		public static string GenerateUrl(this ApiDocument document, Page page)
 		{
-			return PageLink(page, $"{@document.SourceFile.Name}/#{document.Namespace.MenuId()}");
+			return PageLink(page, $"{@document.SourceFile.Name}") + $"#{document.Namespace.MenuId()}";
 		}
 
 		private static string PageLink(Page page, string relativePath)

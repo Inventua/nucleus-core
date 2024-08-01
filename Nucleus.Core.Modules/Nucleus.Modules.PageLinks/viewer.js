@@ -16,7 +16,7 @@
     // create and return the page links list 
     function _buildPageLinksList(rootElement, includedHeaders, headingClass)
     {
-      let headerElements = rootElement.children().find(':header:visible');
+      let headerElements = rootElement.find(':header:visible');
       let pageLinkslistElement = jQuery('<div></div>');
 
       if (headerElements.length > 0)

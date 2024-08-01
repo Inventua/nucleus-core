@@ -25,6 +25,11 @@
 	margin-bottom: 1rem;
 }
 
+.XmlDocumentation .api-content h2:not(:first-child)
+{
+	margin-top: 1rem;
+}
+
 .XmlDocumentation .api-content h3
 {
 	font-size: 1.1rem;

@@ -7,12 +7,12 @@
 @if (Model != null && Model.Members?.Any() == true)
 {
 	<div class="@Model.CssClass">
-		<h3>@Model.Caption</h3>
+		<h3 class="is-page-link">@Model.Caption</h3>
 
-		@foreach (var member in Model.Members)
+    @foreach (var member in Model.Members.OrderBy(item => item.Name))
 		{
 			<div id="@member.ControlId()" class="api-member api-member-@(member.Type.ToString().ToLower())">
-				<h4>
+        <h4 class="is-page-link">
 					@member.Name
 					@switch (member.Type)
 					{

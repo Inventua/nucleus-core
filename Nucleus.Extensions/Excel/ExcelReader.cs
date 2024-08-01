@@ -186,7 +186,7 @@ namespace Nucleus.Extensions.Excel
     }
 
     /// <summary>
-    /// Return the spreadsheet as a stream.
+    /// Read a spreadsheet from the specified stream.
     /// </summary>
     /// <returns></returns>
     public void SetInputStream(System.IO.Stream stream)
@@ -196,7 +196,7 @@ namespace Nucleus.Extensions.Excel
     }
 
     /// <summary>
-    /// Read the heading row and reset the row index to the first data row.
+    /// Read the heading row and set the row index to the first data row.
     /// </summary>
     public void ReadHeadingRow()
     {
@@ -220,7 +220,7 @@ namespace Nucleus.Extensions.Excel
     }
 
     /// <summary>
-    /// Write the specified values to the next row of the current worksheet.
+    /// Read the next row of the current worksheet and return an object array containing the values.
     /// </summary>
     /// <exception cref="ArgumentException"></exception>
     public object[] ReadRow()

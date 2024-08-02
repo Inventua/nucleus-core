@@ -1,8 +1,4 @@
-﻿/* =============================================================
- * Plug-in that creates a list of jump links based on the jQuery 
- * selector used as the root for detected elements.
- * =============================================================
- */
+﻿/*! Plug-in that creates a list of page links based on page content.  Part of the Nucleus CMS PageLinks module.  (c) Inventua Pty Ptd.  www.nucleus-cms.com */
 (function ($)
 {
   jQuery.fn.PageLinkViewer = function (conf)
@@ -79,7 +75,7 @@
       }
 
       let listElement = jQuery('<li></li>');
-      let linkElement = jQuery('<a href="#">' + linkText + '</a>');
+      let linkElement = jQuery('<a href="#" title="' + linkText + '">' + linkText + '</a>');
       if (elementId === '')
       {
         // if the header element does not have an id, set the PageLinksTarget property and attach an event handler to 

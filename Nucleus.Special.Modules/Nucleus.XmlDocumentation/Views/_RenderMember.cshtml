@@ -11,20 +11,24 @@
 
     @foreach (var member in Model.Members.OrderBy(item => item.Name))
 		{
-			<div id="@member.ControlId()" class="api-member api-member-@(member.Type.ToString().ToLower())">
-        <h4 class="is-page-link" data-title="@member.Name @(member.Type == ApiMember.MemberTypes.Method ? "(" + member.Parameters.GetSimpleParameterTypes() + ")" : "")" data-title="@member.Name @(member.Type == ApiMember.MemberTypes.Method ? "(" + member.Parameters.GetSimpleParameterTypes() + ")" : "")">          
-					@member.Name
+			<div class="api-member api-member-@(member.Type.ToString().ToLower())">
+        <h4 id="@member.ControlId()" class="is-page-link" data-title="@member.Title()" data-title="@member.Title()">
+          @member.Name
 					@switch (member.Type)
 					{
 						case ApiMember.MemberTypes.Method:
 							var typeName = member.Parameters.GetSimpleParameterTypes();
 							if (!String.IsNullOrEmpty(typeName))
 							{
-								<text>(@typeName) Method</text>
-							}
+                <text>(@typeName) Method</text>
+              }
 							break;
 						case ApiMember.MemberTypes.Constructor:
-							<text>Constructor</text>
+              var constructorParams = member.Parameters.GetSimpleParameterTypes();
+              if (!String.IsNullOrEmpty(constructorParams))
+              {
+                <text>(@constructorParams) Constructor</text>
+              }
 							break;
 						case ApiMember.MemberTypes.Property:
 							<text>Property</text>

@@ -113,7 +113,7 @@
 {
 	font-size: .875em;
 	word-wrap: break-word;
-	font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+	font-family: Cascadia Mono,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
 	direction: ltr;
 	unicode-bidi: bidi-override;
 }

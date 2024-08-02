@@ -3,7 +3,7 @@
   <version>2.0.1</version>
   <publisher name="Inventua" url="https://www.inventua.com/nucleus/" email="support@inventua.com" />
   <description>
-    Displays a list of link targets for the current page.
+    The page links module displays a list of links which are used to navigate to elements in the current page.
   </description>
   <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
   <components>

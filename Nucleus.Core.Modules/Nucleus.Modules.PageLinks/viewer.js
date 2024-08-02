@@ -72,10 +72,10 @@
       let relativeUrl = new URL(window.location.href);
       relativeUrl.hash = '#' + elementId;
 
-      let linkText = jQuery(element).prop('data-title');
+      let linkText = jQuery(element).attr('data-title');
       if (typeof linkText === 'undefined')
       {
-        linkText = jQuery(element).text();
+        linkText = jQuery(element).text().trim();
       }
 
       let listElement = jQuery('<li></li>');

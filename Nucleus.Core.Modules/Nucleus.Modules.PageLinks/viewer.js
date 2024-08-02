@@ -74,6 +74,8 @@
         linkText = jQuery(element).text().trim();
       }
 
+      linkText = linkText.replace('<', '&lt;').replace('>', '&gt;')
+
       let listElement = jQuery('<li></li>');
       let linkElement = jQuery('<a href="#" title="' + linkText + '">' + linkText + '</a>');
       if (elementId === '')

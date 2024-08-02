@@ -18,6 +18,7 @@
     {
       let headerElements = rootElement.find(':header:visible');
       let pageLinkslistElement = jQuery('<div></div>');
+      let headerIndex = 1;
 
       if (headerElements.length > 0)
       {
@@ -27,7 +28,11 @@
         for (let headersIndex = 0; headersIndex < headerElements.length; headersIndex++)
         {
           let headerElement = headerElements[headersIndex];
-          let headerIndex = parseInt(headerElement.nodeName.substring(1), 10);
+
+          if (_shouldIncludeHeader(headerElement, includedHeaders, headingClass))
+          {
+            headerIndex = parseInt(headerElement.nodeName.substring(1), 10);
+          }
 
           // render a child list on change of level
           if (headerIndex !== currentHeaderIndex)

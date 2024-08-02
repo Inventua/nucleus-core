@@ -31,7 +31,7 @@
                   <a class="list-group-item assembly-landing" href="@Url.Content("~" + @document.GenerateUrl(Model.Page))">@document.AssemblyName Assembly</a>
 
                   <ul>
-                    @foreach (var apiClass in document.Classes)
+                    @foreach (var apiClass in document.Classes.OrderBy(item => item.Name))
                     {
                       <li><a id="@apiClass.MenuId()" class="list-group-item @(apiClass.FullName==Model.SelectedClass?.FullName ? "active" : "")" href="@Url.Content("~" + @apiClass.GenerateUrl(Model.Page, document))" )" title="@apiClass.Name">@apiClass.Name</a></li>
                     }

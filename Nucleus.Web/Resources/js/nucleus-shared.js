@@ -1404,7 +1404,7 @@ function _Page()
       {
         var urlPath = url.startsWith('/') ? url.substring(1) : url;
         var newPath = new URL(document.baseURI + urlPath).pathname;
-        if ((window.self !== window.top && jQuery(frameElement).attr('id') !== 'AdminFrame') || _hasCommonBasePath(this._selectedTabPath, newPath))        
+        if ((window.self !== window.top && jQuery(frameElement).attr('id') !== 'nucleus-admin-frame') || _hasCommonBasePath(this._selectedTabPath, newPath))        
         {
           // trigger click to select the tab (and un-select other tabs)
           target.find('.nav .nav-item:nth-child(' + this._selectedTab + ') button').trigger('click');

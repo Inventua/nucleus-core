@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using ClosedXML.Excel;
 using System.Reflection;
+using ClosedXML.Excel;
 
 namespace Nucleus.Extensions.Excel
 {
@@ -19,6 +17,7 @@ namespace Nucleus.Extensions.Excel
     /// <summary>
     /// Use this constructor if you want to set up columns manually using the <see cref="ExcelWorksheet.AddColumn(PropertyInfo)"/> method.
     /// </summary>
+    /// <param name="input"></param>
     public ExcelReader(System.IO.Stream input) : this(input, Modes.IncludeSpecifiedPropertiesOnly, Array.Empty<string>()) { }
 
     /// <summary>

@@ -12,7 +12,7 @@
     @foreach (var member in Model.Members.OrderBy(item => item.Name))
 		{
 			<div id="@member.ControlId()" class="api-member api-member-@(member.Type.ToString().ToLower())">
-        <h4 class="is-page-link">
+        <h4 class="is-page-link" data-title="@member.Name @(member.Type == ApiMember.MemberTypes.Method ? "(" + member.Parameters.GetSimpleParameterTypes() + ")" : "")">          
 					@member.Name
 					@switch (member.Type)
 					{
@@ -35,7 +35,7 @@
 						case ApiMember.MemberTypes.Field:
 							<text>Field</text>
 							break;						
-					}
+					}          
 				</h4>
 				@switch (member.Type)
 				{

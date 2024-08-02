@@ -126,7 +126,7 @@ namespace Nucleus.XmlDocumentation.Models
 				if (this.Name.Contains("#ctor"))
 				{
 					this.Type = MemberTypes.Constructor;
-					this.Name = this.ClassName;
+					this.Name = this.FullName.Substring(0, this.FullName.LastIndexOf('.')).Substring(assemblyName.Length + 1);
 				}
 
 				this.Namespace = this.ClassName.Substring(0, this.ClassName.LastIndexOf('.'));

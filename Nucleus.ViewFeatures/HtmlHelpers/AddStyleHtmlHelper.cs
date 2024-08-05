@@ -217,7 +217,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     ///  ~! for the currently executing view path, or ~# for the currently executing extension. 
     /// </remarks>
     /// <example>
-    /// @Html.AddScript("~/Extensions/MyModule/MyModule.css")
+    /// @Html.AddScript("~#/MyModule.css")
     /// </example>
     public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath)
     {
@@ -253,7 +253,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     ///  ~! for the currently executing view path, or ~# for the currently executing extension. 
     /// </remarks>
     /// <example>
-    /// @Html.AddScript("~/Extensions/MyModule/MyModule.css")
+    /// @Html.AddScript(~#/MyModule.css)
     /// </example>
     public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, Boolean defer)
     {
@@ -273,7 +273,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     ///  ~! for the currently executing view path, or ~# for the currently executing extension. 
     /// </remarks>
     /// <example>
-    /// @Html.AddScript("~/Extensions/MyModule/MyModule.css")
+    /// @Html.AddScript(~#/MyModule.css)
     /// </example>
     public static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, Boolean defer, Boolean isDynamic)
     {
@@ -295,7 +295,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     ///  ~! for the currently executing view path, or ~# for the currently executing extension. 
     /// </remarks>
     /// <example>
-    /// @Html.AddScript("~/Extensions/MyModule/MyModule.css")
+    /// @Html.AddScript(~#/MyModule.css)
     /// </example>
     private static IHtmlContent AddStyle(this IHtmlHelper htmlHelper, string stylesheetPath, Boolean defer, Boolean isDynamic, string version, int sortIndex)
     {
@@ -317,7 +317,7 @@ namespace Nucleus.ViewFeatures.HtmlHelpers
     ///  ~! for the currently executing view path, or ~# for the currently executing extension. 
     /// </remarks>
     /// <example>
-    /// @Html.AddScript("~/Extensions/MyModule/MyModule.css")
+    /// @Html.AddScript(~#/MyModule.css)
     /// </example>
     internal static IHtmlContent AddStyle(ViewContext context, string stylesheetPath, Boolean defer, Boolean isDynamic, string version, int sortIndex)
     {

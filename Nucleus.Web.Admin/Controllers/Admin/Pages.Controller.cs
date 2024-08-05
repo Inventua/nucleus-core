@@ -1171,9 +1171,11 @@ public class PagesController : Controller
     }
 
     viewModel.ParentPageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, page.ParentId);
+    // prevent selection of a child page as "parent" to prevent recursive relationship
+    RemoveChildren(viewModel.ParentPageMenu, page.Id);
+
     viewModel.LinkPageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, viewModel.Page.LinkPageId);
 
-    //viewModel.AvailableModules = await GetAvailableModules();
     viewModel.AvailablePageRoles = await GetAvailableRoles(viewModel.Page?.Permissions);
     viewModel.PagePermissionTypes = await this.PageManager.ListPagePermissionTypes();
 
@@ -1226,6 +1228,31 @@ public class PagesController : Controller
     }
 
     return viewModel;
+  }
+
+  private void RemoveChildren(PageMenu menu, Guid parentId)
+  {
+    if (menu.Children == null) return;
+
+    if (menu.Page?.Id == parentId)
+    {
+      menu.HasChildren = false;
+      return;
+    }
+
+    foreach (PageMenu childMenu in menu.Children)
+    {
+      if (childMenu.Page?.Id == parentId)
+      {
+        childMenu.HasChildren = false;
+        return;
+      }
+
+      if (childMenu.HasChildren)
+      {
+        RemoveChildren(childMenu, parentId);
+      }
+    }
   }
 
   private async Task<IEnumerable<SelectListItem>> GetAvailableModules()

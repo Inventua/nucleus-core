@@ -117,7 +117,7 @@ namespace Nucleus.ViewFeatures.HtmlContent
 
 				control.InnerHtml.AppendHtml(itemBuilder);
 
-				if (childItem.HasChildren && childItem.Page.Id != disabledPageId)
+				if (childItem.HasChildren)
 				{
 					itemBuilder.InnerHtml.AppendHtml(HtmlHelpers.PageMenuHtmlHelper.RenderExpandButton(childItem.Page, true));
 				}

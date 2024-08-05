@@ -51,7 +51,7 @@
           // render a child list after processing the last heading in the list
           if (headersIndex === headerElements.length - 1)
           {
-            let parentListItem = _getParentListItem(headerElements, pageLinkslistElement, jQuery(headerElement), includedHeaders, headingClass);
+            let parentListItem = _getParentListItem(headerElements, pageLinkslistElement, jQuery(headerElements[headersIndex - 1]), includedHeaders, headingClass);
             parentListItem.append(parentListItem.is('li') ? jQuery('<ol></ol>').append(queuedPageLinks) : queuedPageLinks);
           }
         }
@@ -121,13 +121,18 @@
             let parentListItem = null;
       
             // handle headers which are linked by id
-            let relativeUrl = new URL(window.location.href);
-            relativeUrl.hash = '#' + jQuery(headerElement).prop('id');
-            parentListItem = jQuery(listElement).find('a[href*="' + relativeUrl.toString() + '"]').parent();
-
-            if (parentListItem.length !== 0) return parentListItem;
-
-            if (parentListItem === null || parentListItem.length === 0)
+            if (jQuery(headerElement).prop('id') !== '')
+            {
+              let relativeUrl = new URL(window.location.href);
+              relativeUrl.hash = '#' + jQuery(headerElement).prop('id');
+              parentListItem = jQuery(listElement).find('a[href*="' + relativeUrl.toString() + '"]').parent();
+            }
+            
+            if (parentListItem !== null && parentListItem.length !== 0)
+            {
+              return parentListItem;
+            }
+            else
             {
               // handle headers which are linked by the PageLinksTarget property
               let links = jQuery(listElement).find('a');
@@ -145,7 +150,7 @@
 
       return listElement;
     }
-    
+
     // return whether the header element should be included in the page links list, based on module settings
     function _shouldIncludeHeader(element, includedHeaders, headingClass)
     {

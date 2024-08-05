@@ -717,7 +717,7 @@ ul.nucleus-control-panel-items button
     flex-wrap: wrap !important;
   }
 
-    .nucleus-page-list li a, .nucleus-page-list li span
+    .nucleus-page-list li a
     {
       color: inherit !important;
     }

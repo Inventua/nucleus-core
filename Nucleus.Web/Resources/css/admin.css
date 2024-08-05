@@ -719,11 +719,15 @@ ul.nucleus-control-panel-items button
 
     .nucleus-page-list li a, .nucleus-page-list li span
     {
+      color: inherit !important;
+    }
+
+    .nucleus-page-list li a, .nucleus-page-list li span
+    {
       padding: 4px !important;
       font-size: inherit !important;
       flex-grow: 1 !important;
-      text-decoration: none !important;
-      color: inherit !important;
+      text-decoration: none !important;      
     }
 
 .nucleus-admin-content .nucleus-editor-panel

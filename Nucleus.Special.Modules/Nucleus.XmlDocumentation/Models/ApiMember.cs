@@ -25,7 +25,7 @@ public class ApiMember
   public string ControlId()
   {
     string result = (this.Name + (this.Params?.Any() == true ? $"({this.Parameters.GetSimpleParameterTypes()})" : ""));
-    result = System.Text.RegularExpressions.Regex.Replace(result, "[ <>()]", "");
+    result = System.Text.RegularExpressions.Regex.Replace(result, "[\\[\\] <>()]", "");
     result = System.Text.RegularExpressions.Regex.Replace(result, "[,]", "-");
     return result;
   }

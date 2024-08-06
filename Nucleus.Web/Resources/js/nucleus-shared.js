@@ -1032,6 +1032,13 @@ function _Page()
     if (typeof action !== 'undefined')
     {
       jQuery('#' + DIALOG_ID).find('.btn-primary').on('click', action);
+      jQuery('#' + DIALOG_ID).on('keypress', function (event)
+      {
+        if (event.which == 13)
+        {
+          jQuery(this).find('.btn-primary').trigger('click');
+        }
+      });
     }
 
     // only create a new instance of bootstrap.Modal for the dialog if one doesn't already exist.  
@@ -1176,7 +1183,7 @@ function _Page()
         if (source.parents('.modal').first().find(target).length === 0)
         {
           // a modal is visible, data is non-blank, target is not the modal or one of its descendants, hide the modal
-          jQuery('.modal:visible').first().modal('hide');
+          source.parents('.modal').first().modal('hide');
         }
       }
     }

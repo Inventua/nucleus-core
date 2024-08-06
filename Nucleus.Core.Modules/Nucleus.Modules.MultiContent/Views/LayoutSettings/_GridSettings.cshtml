@@ -1,0 +1,30 @@
+﻿@model Nucleus.Modules.MultiContent.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+<div class="nucleus-flex-fields">
+  <SettingsControl caption="Columns" helptext="Choose grid items columns.">    
+    @Html.DropDownListFor(model => model.LayoutSettings.Columns, Html.GetEnumSelectList<Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.ColumnStyles>())
+  </SettingsControl>
+
+  <SettingsControl caption="Alignment" helptext="Choose alignment.">
+    @Html.DropDownListFor(model => model.LayoutSettings.Alignment, Html.GetEnumSelectList<Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.AlignmentStyles>())
+  </SettingsControl>
+
+  <div></div>
+</div>
+
+<div class="nucleus-flex-fields">
+  <SettingsControl caption="Border Style" helptext="Choose grid items border style.">
+    @Html.DropDownListFor(model => model.LayoutSettings.BorderStyle, Html.GetEnumSelectList<Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.BorderStyles>())
+  </SettingsControl>
+
+  <SettingsControl caption="Border Size" helptext="Choose grid items border size.">
+    @Html.DropDownListFor(model => model.LayoutSettings.BorderSize, Html.GetEnumSelectList<Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.LineWidths>())
+  </SettingsControl>
+
+  <SettingsControl caption="Padding" helptext="Choose grid items padding.">
+    @Html.DropDownListFor(model => model.LayoutSettings.PaddingSize, Html.GetEnumSelectList<Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.LineWidths>())
+  </SettingsControl>
+</div>

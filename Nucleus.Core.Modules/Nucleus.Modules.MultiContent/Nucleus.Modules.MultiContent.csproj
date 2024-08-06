@@ -32,6 +32,7 @@
     <None Remove="viewer.min.css" />
     <None Remove="Views\Editor.cshtml" />
     <None Remove="Views\LayoutSettings\_FaqSettings.cshtml" />
+    <None Remove="Views\LayoutSettings\_GridSettings.cshtml" />
     <None Remove="Views\LayoutSettings\_PlainSettings.cshtml" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
@@ -39,6 +40,7 @@
     <None Remove="Views\ViewerLayouts\Alert.cshtml" />
     <None Remove="Views\ViewerLayouts\Carousel.cshtml" />
     <None Remove="Views\ViewerLayouts\Faq.cshtml" />
+    <None Remove="Views\ViewerLayouts\Grid.cshtml" />
     <None Remove="Views\ViewerLayouts\Pills.cshtml" />
     <None Remove="Views\ViewerLayouts\Plain.cshtml" />
     <None Remove="Views\ViewerLayouts\Tabs.cshtml" />
@@ -53,7 +55,9 @@
 
   <ItemGroup>
     <Content Include="license.txt" />
+    <Content Include="Views\LayoutSettings\_GridSettings.cshtml" />
     <Content Include="Views\LayoutSettings\_PlainSettings.cshtml" />
+    <Content Include="Views\ViewerLayouts\Grid.cshtml" />
     <Content Include="Views\ViewerLayouts\Plain.cshtml" />
     <EmbeddedResource Include="carousel.js" />
     <EmbeddedResource Include="carousel.min.js" />
@@ -90,7 +94,7 @@
 
   <PropertyGroup Label="Nucleus">
     <ExtensionFolder>MultiContent</ExtensionFolder>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <Product>Nucleus</Product>
     <Copyright>(c) Inventua Pty Ptd</Copyright>
     <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>

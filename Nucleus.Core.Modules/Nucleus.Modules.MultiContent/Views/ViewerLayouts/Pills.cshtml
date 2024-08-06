@@ -2,7 +2,7 @@
 @using Nucleus.Extensions
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
-@Html.AddStyle("~!/../../viewer.css")
+@Html.AddStyle("~#/viewer.css")
 <div class="multi-content-pills">
 	<div class="nav nav-pills@(Model.LayoutSettings.Alignment == Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.AlignmentStyles.Center ? " justify-content-center" : Model.LayoutSettings.Alignment == Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.AlignmentStyles.Right ? " justify-content-end" : " justify-content-start")@(Model.LayoutSettings.Orientation== Nucleus.Modules.MultiContent.ViewModels.LayoutSettings.OrientationStyles.Vertical ? " flex-column" : "")@(Model.LayoutSettings.Fill ? " nav-fill" : "")@(Model.LayoutSettings.Justify ? " nav-justified" : "")" role="tablist">
 		@foreach (var content in Model.Contents)

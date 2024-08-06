@@ -2,7 +2,7 @@
 @using Nucleus.Extensions
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
-@Html.AddStyle("~!/../../viewer.css")
+@Html.AddStyle("~#/viewer.css")
 @foreach (var content in Model.Contents)
 {
 <div role="alert" class="alert @($"alert-{Model.LayoutSettings.AlertStyle.ToLower()}")@(Model.LayoutSettings.ShowCloseButton ? " alert-dismissible fade show" : "")">

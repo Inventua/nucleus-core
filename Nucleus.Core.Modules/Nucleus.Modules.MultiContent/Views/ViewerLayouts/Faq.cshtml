@@ -2,7 +2,7 @@
 @using Nucleus.Extensions
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
-@Html.AddStyle("~!/../../viewer.css")
+@Html.AddStyle("~#/viewer.css")
 <ol class="multi-content-faq accordion accordion-flush align-@(Model.LayoutSettings.Alignment.ToString().ToLower()) icon-@(Model.LayoutSettings.Icon.ToString().ToLower())" id="faq-@Model.Module.Id">
 	@foreach (var content in Model.Contents)
 	{

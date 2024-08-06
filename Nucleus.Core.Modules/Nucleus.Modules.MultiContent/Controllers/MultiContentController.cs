@@ -40,6 +40,11 @@ public class MultiContentController : Controller
   private const string MODULESETTING_JUSTIFY = "multicontent:justify";
   private const string MODULESETTING_ICON = "multicontent:icon";
 
+  private const string MODULESETTING_COLUMNS = "multicontent:columns";
+  private const string MODULESETTING_BORDERSTYLE = "multicontent:border-style";
+  private const string MODULESETTING_BORDERSIZE = "multicontent:border-size";
+  private const string MODULESETTING_PADDINGSIZE = "multicontent:padding-size";
+
   private const string MODULESETTING_INTERVAL = "multicontent:interval";
 
   public MultiContentController(IWebHostEnvironment webHostEnvironment, IOptions<FolderOptions> folderOptions, Context context, IPageModuleManager pageModuleManager, IContentManager contentManager)
@@ -91,6 +96,11 @@ public class MultiContentController : Controller
       this.Context.Module.ModuleSettings.Set(MODULESETTING_FILL, viewModel.LayoutSettings.Fill);
       this.Context.Module.ModuleSettings.Set(MODULESETTING_JUSTIFY, viewModel.LayoutSettings.Justify);
       this.Context.Module.ModuleSettings.Set(MODULESETTING_ICON, viewModel.LayoutSettings.Icon);
+
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_COLUMNS, viewModel.LayoutSettings.Columns);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_BORDERSTYLE, viewModel.LayoutSettings.BorderStyle);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_BORDERSIZE, viewModel.LayoutSettings.BorderSize);
+      this.Context.Module.ModuleSettings.Set(MODULESETTING_PADDINGSIZE, viewModel.LayoutSettings.PaddingSize);
 
       this.Context.Module.ModuleSettings.Set(MODULESETTING_INTERVAL, viewModel.LayoutSettings.Interval);
     }
@@ -202,6 +212,11 @@ public class MultiContentController : Controller
     settings.Fill = this.Context.Module.ModuleSettings.Get(MODULESETTING_FILL, false);
     settings.Justify = this.Context.Module.ModuleSettings.Get(MODULESETTING_JUSTIFY, false);
     settings.Icon = this.Context.Module.ModuleSettings.Get(MODULESETTING_ICON, ViewModels.LayoutSettings.Icons.Default);
+
+    settings.Columns = this.Context.Module.ModuleSettings.Get(MODULESETTING_COLUMNS, ViewModels.LayoutSettings.ColumnStyles.Columns_Auto);
+    settings.BorderStyle= this.Context.Module.ModuleSettings.Get(MODULESETTING_BORDERSTYLE, ViewModels.LayoutSettings.BorderStyles.Border_Default);
+    settings.BorderSize= this.Context.Module.ModuleSettings.Get(MODULESETTING_BORDERSIZE, ViewModels.LayoutSettings.LineWidths.Width_Default);
+    settings.PaddingSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_PADDINGSIZE, ViewModels.LayoutSettings.LineWidths.Width_Default);
 
     settings.Interval = this.Context.Module.ModuleSettings.Get(MODULESETTING_INTERVAL, settings.Interval);
 

@@ -242,8 +242,6 @@ public class FileSystemManager : IFileSystemManager
 	{
 		Boolean isAnonymousOrAllUsers = role.Equals(site.AnonymousUsersRole) || role.Equals(site.AllUsersRole);
 
-		//using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
-		//{
 		List<PermissionType> permissionTypes = await this.PermissionsManager.ListPermissionTypes(Folder.URN);
 		List<Permission> permissions = new();
 
@@ -252,11 +250,11 @@ public class FileSystemManager : IFileSystemManager
 			Permission permission = new();
 			permission.Role = role;
 
-			//if (isAnonymousOrAllUsers && !permissionType.IsFolderViewPermission())
 			if (isAnonymousOrAllUsers && permissionType.IsFolderEditPermission())
 			{
 				permission.AllowAccess = false;
-				permission.PermissionType = new() { Scope = PermissionType.PermissionScopeNamespaces.Disabled };
+        permission.IsDisabled = true;
+        permission.PermissionType = permissionType;// new() { Scope = PermissionType.PermissionScopeNamespaces.Disabled };
 			}
 			else
 			{

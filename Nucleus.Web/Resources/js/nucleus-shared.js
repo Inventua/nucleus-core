@@ -1288,28 +1288,56 @@ function _Page()
       target.find('input[type=file]').val('');
     }
 
-    // set the text and disabled attribute for <option> elements with a text value of "-".  We need to do this in .setTimeout to give the 
-    // content to render first.
-    jQuery('select option').each(function ()
+    // set the text and disabled attribute for <option> elements with a text value of "-". The text value is padded with extra "-" characters
+    // to fill the width of the SELECT element. This method of including a separator is used instead of a HR because using a HR in a SELECT 
+    // does not present well in Edge / Chrome, and is not supported at all in some browsers.
+    // We do this in the focus eventso that the SELECT control and its parent are guaranteed to be visible, otherwise the measurement
+    // logic does not work.
+    jQuery('select').on('focus', function ()
     {
-      if (jQuery(this).text() == '-')
+      var selectElement = jQuery(this);
+      jQuery(this).find('option').each(function (index, element)
       {
-        window.setTimeout(function (element) 
+        var optionElement = jQuery(element);
+        if (optionElement.text() == '-')
         {
-          var parent = element.parent();
+          var dashCharacter = '\u2014';
           // determine how many dashes will fit
-          var measure = jQuery('<span>-</span>');
-          measure.css('font-size', element.parent().css('font-size'));
-          parent.parent().append(measure);
-          var dashCount = Math.floor(parent.width() / measure.width());
-          measure.remove();
+          var measurementSample = jQuery('<span>' + dashCharacter + '</span>');
+          measurementSample
+            .css('font-family', selectElement.css('font-family'))
+            .css('font-size', selectElement.css('font-size'));
+          selectElement.parent().append(measurementSample);
+          var dashCount = Math.floor(selectElement.outerWidth() / measurementSample.width());
+          measurementSample.remove();
           // set option element to disabled, fill with the calculated number of dashes
           if (!Number.isInteger(dashCount)) dashCount = 10;
-          element.text("-".repeat(dashCount));
-          element.attr('disabled', 'disabled');
-        }, 100, jQuery(this));
-      }
+          optionElement.text(dashCharacter.repeat(dashCount));
+          optionElement.attr('disabled', 'disabled');          
+        }
+      });
     });
+
+    //jQuery('select option').each(function ()
+    //{
+    //  if (jQuery(this).text() == '-')
+    //  {
+    //    window.setTimeout(function (element) 
+    //    {
+    //      var parent = element.parent();
+    //      // determine how many dashes will fit
+    //      var measure = jQuery('<span>-</span>');
+    //      measure.css('font-size', element.parent().css('font-size'));
+    //      parent.parent().append(measure);
+    //      var dashCount = Math.floor(parent.width() / measure.width());
+    //      measure.remove();
+    //      // set option element to disabled, fill with the calculated number of dashes
+    //      if (!Number.isInteger(dashCount)) dashCount = 10;
+    //      element.text("-".repeat(dashCount));
+    //      element.attr('disabled', 'disabled');
+    //    }, 100, jQuery(this));
+    //  }
+    //});
 
     // attempt to set focus to the first control in the response
 

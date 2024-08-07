@@ -43,7 +43,7 @@ else
                 @Html.HiddenFor(model => Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].Id)
                 @Html.HiddenFor(model => Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Id)
                 @Html.HiddenFor(model => Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope)
-                @if (Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].PermissionType.Scope == PermissionType.PermissionScopeNamespaces.Disabled)
+                @if (Model.ModulePermissions[item.Role.Id].Permissions[permissionsCount].IsDisabled)
                 {
                   <span class="nucleus-material-icon">&#xe8f5;</span>
                 }

@@ -45,7 +45,15 @@ namespace Nucleus.Abstractions.Models
 		/// </remarks>
 		public Boolean AllowAccess { get; set; }
 
-	}
+    /// <summary>
+		/// Flag indicating whether the permission is disabled for the specified role.
+		/// </summary>
+		/// <remarks>
+		/// This value is set when auto-generating a placeholder permission.  It indicates that the permission cannot be changed in the admin user 
+    /// interface, and should not be saved in the database.
+		/// </remarks>
+		public Boolean IsDisabled { get; set; }
+  }
 
 	
 

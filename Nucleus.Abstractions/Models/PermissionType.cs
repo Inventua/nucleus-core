@@ -31,10 +31,11 @@ namespace Nucleus.Abstractions.Models
 			/// </summary>
 			public const string Folder = Nucleus.Abstractions.Models.FileSystem.Folder.URN + "/permissiontype";
 
-			/// <summary>
-			/// Namespace representing a disabled permission.
-			/// </summary>
-			public const string Disabled = "urn:nucleus:entities:disabled/permissiontype";
+      /// <summary>
+      /// Namespace representing a disabled permission.
+      /// </summary>
+      [Obsolete("Permission.PermissionType.Disabled is deprecated, use Permission.IsDisabled instead.")]
+      public const string Disabled = "urn:nucleus:entities:disabled/permissiontype";
 		}
 
 		/// <summary>

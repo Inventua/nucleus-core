@@ -122,7 +122,10 @@ namespace Nucleus.Data.EntityFramework
 				.WithMany(site => site.UserProfileProperties)
 				.HasForeignKey("SiteId").IsRequired();
 
-			builder.Entity<Permission>().ToTable("Permissions");
+			builder.Entity<Permission>()
+        .ToTable("Permissions")
+        .Ignore(permission => permission.IsDisabled);
+
 			builder.Entity<PermissionType>().ToTable("PermissionTypes");
 			
 			return builder;

@@ -58,7 +58,7 @@
 
 	<PropertyGroup Label="Nucleus">
 		<ExtensionFolder>StaticContent</ExtensionFolder>
-		<VersionPrefix>2.0.0</VersionPrefix>
+		<VersionPrefix>2.0.1</VersionPrefix>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
 	</PropertyGroup>	
 	

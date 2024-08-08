@@ -8,7 +8,7 @@ body
 .nucleus-control-panel
 {
   display: flex;
-  background: #444;
+  background-color: var(--control-panel-background-color);
   height: 100%;
 }
 

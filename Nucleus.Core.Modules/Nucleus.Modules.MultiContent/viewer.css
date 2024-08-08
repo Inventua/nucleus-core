@@ -93,7 +93,7 @@
   display: grid;
   row-gap: var(--nucleus-default-gap-vertical);
   column-gap: var(--nucleus-default-gap-horizontal);
-  grid-auto-rows: 1fr;
+  /*grid-auto-rows: 1fr;*/
   grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
 }
 

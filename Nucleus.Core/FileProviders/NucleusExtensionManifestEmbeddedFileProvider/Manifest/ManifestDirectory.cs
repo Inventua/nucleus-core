@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using global::Microsoft.Extensions.Primitives;
 
@@ -40,6 +41,19 @@ internal class ManifestDirectory : ManifestEntry
       if (segment.Equals(child.Name, StringComparison.OrdinalIgnoreCase))
       {
         return child;
+      }
+    }
+
+    if (segment.HasValue)
+    {
+      // try again without spaces.  If an extension folder name has a space in it, the Url will also have a space in it, but this won't match
+      // the embedded files manifest, which uses the assembly namespace as a prefix, and the assembly namespace can't contain spaces
+      foreach (var child in Children)
+      {
+        if (segment.Value.Replace(" ", "").Equals(child.Name, StringComparison.OrdinalIgnoreCase))
+        {
+          return child;
+        }
       }
     }
 

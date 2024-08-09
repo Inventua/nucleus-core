@@ -11,14 +11,14 @@ to your constructor.  Call [RaiseEvent](/api-documentation/Nucleus.Abstractions.
 raise an event.  
 
 ### Handling an Event
-To handle an event, create a class which implements the [ISystemEventHandler](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.ISystemEventHandlerT0T1/)
+To handle an event, create a class which implements the [ISystemEventHandler](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.IScopedSystemEventHandlerT0T1/)
 or ISingletonSystemEventHandler interface.  
 
-> The ISingletonSystemEventHandler interface was added in Nucleus 1.3.  Previously, singleton event handlers could implement ISystemEventHandler, but
-> this causes problems when retrieving event handler implementations from dependency injection when there are both scoped and 
+> The IScopedSystemEventHandler and ISingletonSystemEventHandler interfaces were added in Nucleus 1.3.  Previously, extensions could implement ISystemEventHandler, but
+> this caused problems when retrieving event handler implementations from dependency injection when there are both scoped and 
 > singleton handlers for the same model and event.
 
-The functions used to raise and handle events both specify a TModel and TEvent.  The TModel type is the type of the model entity which has changed, and the TEvent 
+The functions used to raise and handle events both specify a `TModel` and `TEvent`.  The TModel type is the type of the model entity which has changed, and the TEvent 
 type represents the event which occurred.  TEvent can be any type, but Nucleus has classes for 
 [create](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.SystemEventTypes.Create/), [update](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.SystemEventTypes.Update/), and 
 [delete](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.EventHandlers.SystemEventTypes.Delete/).  If you need to represent a different kind of event, just 
@@ -26,48 +26,64 @@ create a class for it. The TEvent class is used as a key in the dependency injec
 have any methods or properties.
 
 ### Example
-The example below is from the core Documents module.  This class adds a transient System Event Handler to receive Nucleus system events - in this case, a MigrateEvent which is triggered after a 
-data provider migration script is executed.  Some extensions use the MigrateEvent to perform post-installation or post-upgrade steps which can't be included in a database migration script.  
+The example below is from the Static Content module ([source code](https://github.com/Inventua/nucleus-core/tree/main/Nucleus.Core.Modules/Nucleus.Modules.StaticContent)). 
+This class adds a scoped System Event Handler to receive Nucleus system events - in this case, an Update event which is triggered after a 
+file is updated.
 
 ```
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Nucleus.Modules.Documents.DataProviders;
-using Nucleus.Abstractions.Search;
-using Nucleus.Data.EntityFramework;
-using Nucleus.Data.Common;
-using Nucleus.Abstractions.EventHandlers;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models;
 
-[assembly:HostingStartup(typeof(Nucleus.Modules.Documents.Startup))]
+[assembly: HostingStartup(typeof(Nucleus.Modules.StaticContent.Startup))]
 
-namespace Nucleus.Modules.Documents;
+namespace Nucleus.Modules.StaticContent;
 
 public class Startup : IHostingStartup
 {
   public void Configure(IWebHostBuilder builder)
   {
-    builder.ConfigureServices((context, services) => 
+    builder.ConfigureServices((context, services) =>
     {
-      // code which does not demonstrate event handling has been removed from this example
-      services.AddSingletonSystemEventHandler<MigrateEventArgs, MigrateEvent, MigrationEventHandler>();
+      services.AddScoped<Nucleus.Abstractions.EventHandlers.IScopedSystemEventHandler<Nucleus.Abstractions.Models.FileSystem.File, Nucleus.Abstractions.EventHandlers.SystemEventTypes.Update>, FileEventHandler>();
     });
   }
 }
 
-public class MigrationEventHandler : Nucleus.Abstractions.EventHandlers.ISystemEventHandler<MigrateEventArgs, MigrateEvent>
+public class FileEventHandler : Nucleus.Abstractions.EventHandlers.IScopedSystemEventHandler<Nucleus.Abstractions.Models.FileSystem.File, Nucleus.Abstractions.EventHandlers.SystemEventTypes.Update>
 {
-  public Task Invoke(MigrateEventArgs item)
+  private ICacheManager CacheManager { get; }
+  private IExtensionManager ExtensionManager { get; }
+  private Context Context { get; }
+
+  public FileEventHandler(Context context, ICacheManager cacheManager, IExtensionManager extensionManager)
   {
-    if (item.SchemaName == "Nucleus.Modules.Documents")
+    this.Context = context;
+    this.CacheManager = cacheManager;
+    this.ExtensionManager = extensionManager;
+  }
+
+  public async Task Invoke(Nucleus.Abstractions.Models.FileSystem.File file)
+  {
+    // if a file changes, clear the static content cache for static content modules which use the specified file
+
+    // This must match the value in package.xml
+    Guid moduleDefinitionId = Guid.Parse("0930d4fe-0469-47e6-a28b-7c42d85a61fd");
+
+    foreach (PageModule module in await this.ExtensionManager.ListPageModules(new Nucleus.Abstractions.Models.ModuleDefinition() { Id = moduleDefinitionId }))
     {
-      if (item.ToVersion == new System.Version(1,0,0))
+      Models.Settings settings = new();
+
+      settings.ReadSettings(module);
+
+      if (settings.DefaultFileId == file.Id)
       {
-        // This is an example of how you would execute code after a db schema migration.
-        // There is no implementation in this example - you would add your code to implement event handling here. 
+        this.CacheManager.StaticContentCache().Remove(this.Context.Site.Id + ":" + file.Id);
       }
     }
-    return Task.CompletedTask;
   }
 }
 ```

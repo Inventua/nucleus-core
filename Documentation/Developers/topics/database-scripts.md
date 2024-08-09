@@ -18,7 +18,7 @@ providers.  This may be a useful option for developers of line-of-business appli
 one database type.  Scripts in .sql format must be located in the `Migrations\SQLite\Scripts`, `Migrations\SqlServer\Scripts`,
 `Migrations\MySql\Scripts` and `Migrations\PostgreSql\Scripts` folders.  Script files in .sql format are text files which contain 
 one or more SQL commands, each of which must end in `GO`, followed by a new line.  
-**The `.json` format is recommended, because you can use it to write scripts which target all of the database providers instead 
+**The `.json` format is recommended, because you can use it to write a script which works with all of the database providers instead 
 of writing separate scripts for each database provider.**
 
 Script files must be named `{version}.json` or `{version}.sql`, where ==\{version\}== is a version number which can be parsed by 
@@ -36,7 +36,7 @@ Script files in `.json` format consist of a schema name, version and operations 
 | Name             |  Description                                                                          |
 |------------------|---------------------------------------------------------------------------------------|
 | schemaName       |  This is a unique name for your database objects (schema).  It is used to track whether a script has run, and must be unique to your extension.  It's a good idea to use your project namespace as the schema name.   |
-| version          |  The version of the database schema represented by this script.  This value should match the script file name.  |
+| version          |  The version of the database schema represented by this script.  This value must match the version in the script file name.  |
 | operations       |  Contains one or more operations which are executed by the script. (see below for more information). |
 
 #### Example
@@ -104,13 +104,17 @@ Script files in `.json` format consist of a schema name, version and operations 
 [Microsoft.EntityFrameworkCore.Migrations.Operations](https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.operations) 
 namespace.  The element name in the script file matches the class name, with the 'Operation' suffix removed - for example, the json file 
 operation ==CreateTable== represents the Entity Framework [CreateTableOperation](https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.operations.createtableoperation?view=efcore-6.0)
-class.  For each operation, Nucleus uses another Entity Framework class, 
+class.  
+\
+For each operation, Nucleus uses another Entity Framework class, 
 [IMigrationsSqlGenerator](https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.imigrationssqlgenerator) 
 to generate SQL for the operation represented by the operation object and then executes the SQL.  
-The `DatabaseProviderSpecificOperation` operation is implemented by Nucleus to wrap an operation in a condition (see below).  Except for 
-MySql, the entire script is executed within a transaction.  
-[MySql does not support multiple data definition SQL statements in a single transaction](https://dev.mysql.com/doc/refman/8.0/en/implicit-commit.html), so we don't create a 
-transaction when you are using a MySql or MariaDb database.
+\
+The `DatabaseProviderSpecificOperation` operation is implemented by Nucleus to wrap an operation in a condition (see below).  
+\
+Except for MySql, the entire script is executed within a transaction. 
+[MySql does not support multiple data definition SQL statements in a single transaction](https://dev.mysql.com/doc/refman/8.0/en/implicit-commit.html), so 
+Nucleus does not create a transaction when you are using a MySql or MariaDb database.
 
 ### Operations
 

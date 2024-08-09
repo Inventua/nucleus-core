@@ -21,10 +21,10 @@
 - Mail:
   - Added generic Mail Provider interface for mail providers, moved core SMTP implementation to a new extension and added a new SendGrid mail extension.
 
-Performance:
-- Enabled Razor compile at build time for the admin UI and most extensions.
-- Embedded static resources in assemblies.
-- Core module renderer performance improvements.
+- Performance:
+  - Enabled Razor compile at build time for the admin UI and most extensions.
+  - Embedded static resources in assemblies.
+  - Core module renderer performance improvements.
 
 - Developer Features:
   - Added support for Blazor, including WebAssembly in addition to MVC.

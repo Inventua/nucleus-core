@@ -6,7 +6,7 @@ by Nucleus so that you can easily prepare a list.  Some of the components listed
 Components from Microsoft are not listed here.  Some components may use other third-party components themselves, these are not listed here.  Nucleus 
 uses the [MIT](https://github.com/Inventua/nucleus-core/blob/main/Nucleus.Web/license.txt) license.
 
-This document was updated to include references which are part of Nucleus version 1.3.0.
+This document was updated to include references which are part of Nucleus version 2.0.0.
 
 ## Core
 {.table-0-75-0}
@@ -45,7 +45,7 @@ This document was updated to include references which are part of Nucleus versio
 {.table-0-75-0}
 |                                  |                                                             | License                         |
 |----------------------------------|--------------------------------------------------------------------------------------|
-| [Jquery](https://github.com/jquery/jquery)    |  jQuery is a JavaScript library designed to simplify HTML DOM tree traversal and manipulation, as well as event handling, CSS animation, and Ajax. | [MIT](https://jquery.org/license/) |
+| [JQuery](https://github.com/jquery/jquery)    |  jQuery is a JavaScript library designed to simplify HTML DOM tree traversal and manipulation, as well as event handling, CSS animation, and Ajax. | [MIT](https://jquery.org/license/) |
 | [Bootstrap](https://github.com/twbs/bootstrap) | Front-end framework for faster and easier web development. | [MIT](https://github.com/twbs/bootstrap/blob/main/LICENSE) |
 | [TinyMCE](https://github.com/tinymce/tinymce/tree/master) | Open source rich text editor. | [MIT](https://github.com/tinymce/tinymce/blob/master/LICENSE.TXT) |
 

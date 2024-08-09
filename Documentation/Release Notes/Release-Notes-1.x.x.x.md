@@ -19,7 +19,7 @@ Version 1.1.0.0 includes administration user interface enhancements, a change to
 Amazon S3 file system provider, Linux support and other enhancements and bug fixes in the core, and in core modules.
 
 ### Linux
-Updated code file system paths to use "/" character intead of "\" (which works in both Linux and Windows), updated case-sensitive 
+Updated code file system paths to use "/" character instead of "\\" (which works in both Linux and Windows), updated case-sensitive 
 file names, created Nucleus installation shell script and documentation for Linux.
 
 ### Caching

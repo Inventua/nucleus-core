@@ -107,7 +107,7 @@
                   @foreach (var apiClass in Model.SelectedDocument.Classes.Where(item => item.Type == Nucleus.XmlDocumentation.Models.ApiMember.MemberTypes.Class).OrderBy(item => item.Name))
                   {
                     <li class="list-group-item">
-                      <h3>
+                      <h3 class="is-page-link">
                         <a class="list-group-item-action" href="@Url.PageLink(Model.Page, $"{Model.SelectedDocument.SourceFile.Name}/{apiClass.ControlId()}/")">@apiClass.Name</a>
                       </h3>
 
@@ -126,7 +126,7 @@
                   @foreach (var apiClass in Model.SelectedDocument.Classes.Where(item => item.Type == Nucleus.XmlDocumentation.Models.ApiMember.MemberTypes.Interface).OrderBy(item => item.Name))
                   {
                     <li class="list-group-item">
-                      <h3>
+                      <h3 class="is-page-link">
                         <a class="list-group-item-action" href="@Url.PageLink(Model.Page, $"{Model.SelectedDocument.SourceFile.Name}/{apiClass.ControlId()}/")">@apiClass.Name</a>
                       </h3>
 

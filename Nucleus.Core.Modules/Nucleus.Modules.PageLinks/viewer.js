@@ -1,8 +1,4 @@
-﻿/* =============================================================
- * Plug-in that creates a list of jump links based on the jQuery 
- * selector used as the root for detected elements.
- * =============================================================
- */
+﻿/*! Plug-in that creates a list of page links based on page content.  Part of the Nucleus CMS PageLinks module.  (c) Inventua Pty Ptd.  www.nucleus-cms.com */
 (function ($)
 {
   jQuery.fn.PageLinkViewer = function (conf)
@@ -16,8 +12,9 @@
     // create and return the page links list 
     function _buildPageLinksList(rootElement, includedHeaders, headingClass)
     {
-      let headerElements = rootElement.children().find(':header:visible');
+      let headerElements = rootElement.find(':header:visible');
       let pageLinkslistElement = jQuery('<div></div>');
+      let headerIndex = 1;
 
       if (headerElements.length > 0)
       {
@@ -27,7 +24,11 @@
         for (let headersIndex = 0; headersIndex < headerElements.length; headersIndex++)
         {
           let headerElement = headerElements[headersIndex];
-          let headerIndex = parseInt(headerElement.nodeName.substring(1), 10);
+
+          if (_shouldIncludeHeader(headerElement, includedHeaders, headingClass))
+          {
+            headerIndex = parseInt(headerElement.nodeName.substring(1), 10);
+          }
 
           // render a child list on change of level
           if (headerIndex !== currentHeaderIndex)
@@ -50,7 +51,7 @@
           // render a child list after processing the last heading in the list
           if (headersIndex === headerElements.length - 1)
           {
-            let parentListItem = _getParentListItem(headerElements, pageLinkslistElement, jQuery(headerElement), includedHeaders, headingClass);
+            let parentListItem = _getParentListItem(headerElements, pageLinkslistElement, jQuery(headerElements[headersIndex - 1]), includedHeaders, headingClass);
             parentListItem.append(parentListItem.is('li') ? jQuery('<ol></ol>').append(queuedPageLinks) : queuedPageLinks);
           }
         }
@@ -67,14 +68,16 @@
       let relativeUrl = new URL(window.location.href);
       relativeUrl.hash = '#' + elementId;
 
-      let linkText = jQuery(element).prop('data-title');
+      let linkText = jQuery(element).attr('data-title');
       if (typeof linkText === 'undefined')
       {
-        linkText = jQuery(element).text();
+        linkText = jQuery(element).text().trim();
       }
 
+      linkText = linkText.replace('<', '&lt;').replace('>', '&gt;')
+
       let listElement = jQuery('<li></li>');
-      let linkElement = jQuery('<a href="#">' + linkText + '</a>');
+      let linkElement = jQuery('<a href="#" title="' + linkText + '">' + linkText + '</a>');
       if (elementId === '')
       {
         // if the header element does not have an id, set the PageLinksTarget property and attach an event handler to 
@@ -118,13 +121,18 @@
             let parentListItem = null;
       
             // handle headers which are linked by id
-            let relativeUrl = new URL(window.location.href);
-            relativeUrl.hash = '#' + jQuery(headerElement).prop('id');
-            parentListItem = jQuery(listElement).find('a[href*="' + relativeUrl.toString() + '"]').parent();
-
-            if (parentListItem.length !== 0) return parentListItem;
-
-            if (parentListItem === null || parentListItem.length === 0)
+            if (jQuery(headerElement).prop('id') !== '')
+            {
+              let relativeUrl = new URL(window.location.href);
+              relativeUrl.hash = '#' + jQuery(headerElement).prop('id');
+              parentListItem = jQuery(listElement).find('a[href*="' + relativeUrl.toString() + '"]').parent();
+            }
+            
+            if (parentListItem !== null && parentListItem.length !== 0)
+            {
+              return parentListItem;
+            }
+            else
             {
               // handle headers which are linked by the PageLinksTarget property
               let links = jQuery(listElement).find('a');
@@ -142,7 +150,7 @@
 
       return listElement;
     }
-    
+
     // return whether the header element should be included in the page links list, based on module settings
     function _shouldIncludeHeader(element, includedHeaders, headingClass)
     {

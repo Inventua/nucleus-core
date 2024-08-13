@@ -1,9 +1,9 @@
-# Installing Nucleus in Linux 
+# Set up Nucleus in Linux 
 
 See also: 
-- [Installing Nucleus in Windows](/manage/hosting/windows/) 
-- [Installing Nucleus in Azure App Service](/manage/hosting/azure-app-service/) 
-- [Installing Nucleus in a Docker Container](/manage/hosting/docker/)
+- [Set up Nucleus in Windows](/manage/hosting/windows/) 
+- [Set up Nucleus in Azure App Service](/manage/hosting/azure-app-service/) 
+- [Set up Nucleus in a Docker Container](/manage/hosting/docker/)
 
 > **_NOTE:_**   The nucleus-install.sh shell script automates many of the steps.  This page describes the use of the shell script.  This 
 process has been tested with [*Ubuntu Server 24.04*](https://ubuntu.com/download/server). 
@@ -83,7 +83,7 @@ before running the script:
     <kbd>sudo bash ./nucleus-install.sh --zipfile Nucleus.2.0.0.0.Install.zip --target-directory /home/services/nucleus-production</kbd>
 
 6. Once you have completed this process, [run the setup wizard](/getting-started/#setup-wizard).
-Use the IP address of your server, or its host name.  By default, Nucleus is configured to use http on port 5000.
+Open a web browser and enter the IP address of your server, or its host name.  By default, Nucleus is configured to use http on port 5000.
 
     ```
     http://host-name:5000
@@ -91,6 +91,7 @@ Use the IP address of your server, or its host name.  By default, Nucleus is con
     http://ip-address:5000
     ```
 
+[Click here](/getting-started/#setup-wizard) to return to the **Installing Nucleus** page.
 
 ## Extended Configuration
 

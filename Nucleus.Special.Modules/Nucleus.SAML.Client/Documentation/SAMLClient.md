@@ -29,7 +29,7 @@ The SAML client extension settings are accessed in the `Manage` control panel.
 > Use the "Remove from Roles" option with caution.  This option is intended for site operators who control a number of sites with a shared user base, and who want to implement SAML for single sign-on (SSO). 
 
 ## Configuration
-SAML2 Identity providers are configured in a .json configuration file.  This is typically appSettings.{environment}.json, but you can use a
+SAML2 Identity providers are configured in a .json configuration file.  This is typically appSettings.Production.json or appSettings.Development.json, but you can use a
 [different file](/configuration-files/) if you want to.  Identity Provider settings are in the Nucleus:SAMLProviders section.  
 
 {.table-25-75}
@@ -69,23 +69,26 @@ SAML2 Identity providers are configured in a .json configuration file.  This is 
     "Key": "nucleus-test",
     // on-screen name
     "FriendlyName": "Nucleus test",
-    // AuthnRequest issuer.  This is optional, but note that the Nucleus SAML server always requires an issuer, as do many 
-    // others. IdP metadata does not supply this value.
+    // AuthnRequest issuer.  This is optional, but note that the Nucleus SAML server always requires
+    // an issuer, as do many others. IdP metadata does not supply this value.
     "Issuer": "my-site.com",
-    // IdP metadata url (optional).  If this is specified correctly, most of the other settings are not required.  If other settings
-    // are specified in addition to IdPMetadataUrl, they are overridden by settings from the IdP meta-data.
+    // IdP metadata url (optional).  If this is specified correctly, most of the other settings are 
+    // not required.  If other settings are specified in addition to IdPMetadataUrl, they are 
+    // overridden by settings from the IdP meta-data.
     "IdPMetadataUrl": "https://identity-provider-url/saml2/idp/metadata/my-site.com",
     // AuthnResponse allowed issuer
     "AllowedIssuer": "service-provider-domain-name",
     // Property of AuthnRequest, specifies binding to use for AuthnResponse
-    "ResponseProtocolBinding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact", // urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
+    "ResponseProtocolBinding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact", 
+    // - "ResponseProtocolBinding" can also be urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST
     // return url
     "ArtifactResolutionServiceUrl": "https://identity-provider-url/saml2/idp/artifact",
     // Specifies whether to sign the AuthnRequest
     "SignAuthnRequest": "true",
     // Specifies whether to sign metadata
     "SignMetadata": "true",
-    // Signature used to sign the AuthnRequest, if SignAuthnRequest is true.  This certificate should include a private key and can have a password.
+    // Signature used to sign the AuthnRequest, if SignAuthnRequest is true.  This certificate should 
+    // include a private key and can have a password.
     "SigningCertificateFile": "C:\Certificates\sp-certificate-with-private-key.pfx",
     // Either SigningCertificateFile OR SigningCertificateThumbprint should be specified, but not both
     // "SigningCertificateFileThumbprint": "A1234567890",
@@ -93,18 +96,22 @@ SAML2 Identity providers are configured in a .json configuration file.  This is 
     "SigningCertificatePassword": "my-cert-password",
     // Signature algorithm for signed AuthnRequest.  
     "SignatureAlgorithm": "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
-    // certificate used to validate AuthnResponse.  This signature should NOT include a private key, and can not have a password.
+    // certificate used to validate AuthnResponse.  This signature should NOT include a private key, 
+    // and can not have a password.
     "SignatureValidationCertificateFile": "C:\Certificates\\idp-certificate-no-private-key.cer",
-    // Either SignatureValidationCertificateFile OR SignatureValidationCertificateThumbprint should be specified, but not both
+    // Either SignatureValidationCertificateFile OR SignatureValidationCertificateThumbprint should 
+    // be specified, but not both
     // "SignatureValidationCertificateThumbprint": "A1234567890",
     // Identity provider (IdP) sign on endpoint
     "SingleSignOnDestination": "https://identity-provider-url/saml2/idp/login",
     // Identity provider (IdP) logout endpoint
     "SingleLogoutDestination": "https://identity-provider-url/saml2/idp/logout",
-    // List of claims mappings, used to map assertion values to service provider (SP) claims.  samlKey is the value returned by the identity 
-    // provider.  claimType is the value used by the service provider (Nucleus).  In this example, most of the assertion attributes returned 
-    // by the Identity Provider are the same as the Service Provider, but that won't always be the case.  Any assertion attributes that are 
-    // returned by the Identity Provider which are not included in the MapClaims section are ignored.
+    // List of claims mappings, used to map assertion values to service provider (SP) claims.  samlKey 
+    // is the value returned by the identity provider.  claimType is the value used by the service 
+    // provider (Nucleus).  In this example, most of the assertion attributes returned by the Identity 
+    // Provider are the same as the Service Provider, but that won't always be the case.  Any assertion
+    // attributes that are returned by the Identity Provider which are not included in the MapClaims 
+    // section are ignored.
     "MapClaims": 
     [
       {

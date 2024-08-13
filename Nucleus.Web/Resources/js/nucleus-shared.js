@@ -1032,6 +1032,13 @@ function _Page()
     if (typeof action !== 'undefined')
     {
       jQuery('#' + DIALOG_ID).find('.btn-primary').on('click', action);
+      jQuery('#' + DIALOG_ID).on('keypress', function (event)
+      {
+        if (event.which == 13)
+        {
+          jQuery(this).find('.btn-primary').trigger('click');
+        }
+      });
     }
 
     // only create a new instance of bootstrap.Modal for the dialog if one doesn't already exist.  
@@ -1176,7 +1183,7 @@ function _Page()
         if (source.parents('.modal').first().find(target).length === 0)
         {
           // a modal is visible, data is non-blank, target is not the modal or one of its descendants, hide the modal
-          jQuery('.modal:visible').first().modal('hide');
+          source.parents('.modal').first().modal('hide');
         }
       }
     }
@@ -1281,28 +1288,56 @@ function _Page()
       target.find('input[type=file]').val('');
     }
 
-    // set the text and disabled attribute for <option> elements with a text value of "-".  We need to do this in .setTimeout to give the 
-    // content to render first.
-    jQuery('select option').each(function ()
+    // set the text and disabled attribute for <option> elements with a text value of "-". The text value is padded with extra "-" characters
+    // to fill the width of the SELECT element. This method of including a separator is used instead of a HR because using a HR in a SELECT 
+    // does not present well in Edge / Chrome, and is not supported at all in some browsers.
+    // We do this in the focus eventso that the SELECT control and its parent are guaranteed to be visible, otherwise the measurement
+    // logic does not work.
+    jQuery('select').on('focus', function ()
     {
-      if (jQuery(this).text() == '-')
+      var selectElement = jQuery(this);
+      jQuery(this).find('option').each(function (index, element)
       {
-        window.setTimeout(function (element) 
+        var optionElement = jQuery(element);
+        if (optionElement.text() == '-')
         {
-          var parent = element.parent();
+          var dashCharacter = '\u2014';
           // determine how many dashes will fit
-          var measure = jQuery('<span>-</span>');
-          measure.css('font-size', element.parent().css('font-size'));
-          parent.parent().append(measure);
-          var dashCount = Math.floor(parent.width() / measure.width());
-          measure.remove();
+          var measurementSample = jQuery('<span>' + dashCharacter + '</span>');
+          measurementSample
+            .css('font-family', selectElement.css('font-family'))
+            .css('font-size', selectElement.css('font-size'));
+          selectElement.parent().append(measurementSample);
+          var dashCount = Math.floor(selectElement.outerWidth() / measurementSample.width());
+          measurementSample.remove();
           // set option element to disabled, fill with the calculated number of dashes
           if (!Number.isInteger(dashCount)) dashCount = 10;
-          element.text("-".repeat(dashCount));
-          element.attr('disabled', 'disabled');
-        }, 100, jQuery(this));
-      }
+          optionElement.text(dashCharacter.repeat(dashCount));
+          optionElement.attr('disabled', 'disabled');          
+        }
+      });
     });
+
+    //jQuery('select option').each(function ()
+    //{
+    //  if (jQuery(this).text() == '-')
+    //  {
+    //    window.setTimeout(function (element) 
+    //    {
+    //      var parent = element.parent();
+    //      // determine how many dashes will fit
+    //      var measure = jQuery('<span>-</span>');
+    //      measure.css('font-size', element.parent().css('font-size'));
+    //      parent.parent().append(measure);
+    //      var dashCount = Math.floor(parent.width() / measure.width());
+    //      measure.remove();
+    //      // set option element to disabled, fill with the calculated number of dashes
+    //      if (!Number.isInteger(dashCount)) dashCount = 10;
+    //      element.text("-".repeat(dashCount));
+    //      element.attr('disabled', 'disabled');
+    //    }, 100, jQuery(this));
+    //  }
+    //});
 
     // attempt to set focus to the first control in the response
 
@@ -1404,7 +1439,7 @@ function _Page()
       {
         var urlPath = url.startsWith('/') ? url.substring(1) : url;
         var newPath = new URL(document.baseURI + urlPath).pathname;
-        if ((window.self !== window.top && jQuery(frameElement).attr('id') !== 'AdminFrame') || _hasCommonBasePath(this._selectedTabPath, newPath))        
+        if ((window.self !== window.top && jQuery(frameElement).attr('id') !== 'nucleus-admin-frame') || _hasCommonBasePath(this._selectedTabPath, newPath))        
         {
           // trigger click to select the tab (and un-select other tabs)
           target.find('.nav .nav-item:nth-child(' + this._selectedTab + ') button').trigger('click');

@@ -5,106 +5,106 @@
 @* Renders documentation for a class or interface. *@
 @if (Model != null)
 {
-<div class="api-class">
-	<h2>@Model.Content.Name @(Model.Content.Type)</h2>
-	<div><small class="text-muted">Namespace: @Model.Content.Namespace</small></div>
-	<div><small class="text-muted">Assembly: @(Model.Content.AssemblyName + ".dll")</small></div>
-	@if (Model.Content.Summary?.Items?.Any() == true)
-	{
-		<div class="api-summary">
-			@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, Model.Content.Summary))
-		</div>
-	}
-	@if (Model.Content.Internal != null)
-	{
-		<div class="alert alert-warning" role="alert">			
-			<h3>Internal Use</h3>
-			@if (Model.Content.Internal.Items?.Any() == true)
-			{
-				@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, Model.Content.Internal))
-			}
-			else
-			{
-				<div>This @(Model.Content.Type.ToString().ToLower()) is marked as internal use only.  Internal use classes are not intended for use by extensions, and backward and forward compatibility is not guaranteed.</div>
-			}
-		</div>
-	}
-	@if (Model.Content.TypeParams?.Any() == true)
-	{
-		<div class="api-typeparameters">
-			<h5>Type Parameters</h5>
-			<table class="table">
-				@foreach (var parameter in Model.Content.TypeParams)
-				{
-					<tr>
-						<td>@parameter.Name</td>
-						<td>@parameter.Description</td>
-					</tr>
-				}
-			</table>
-		</div>
-	}
-	@if (Model.Content.Remarks?.Items?.Any() == true)
-	{
-		<div class="api-remarks">
-			<h3>Remarks</h3>
-			<div>
-				@await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent (Model.Page, Model.Content.Remarks))
-			</div>
-		</div>
-	}
-	@if (Model.Content.Examples?.Any() == true)
-	{
-		<div class="api-examples">
-			<h3>@(Model.Content.Examples.Count() == 1 ? "Example" : "Examples")</h3>
-			@foreach (var example in Model.Content.Examples)
-			{
-				<pre><code>@example.FilterXMLWhiteSpace()</code></pre>
-			}
-		</div>
-	}
+  <div class="api-class">
+    <h2>@Model.Content.Name @(Model.Content.Type)</h2>
+    <div><small class="text-muted">Namespace: @Model.Content.Namespace</small></div>
+    <div><small class="text-muted">Assembly: @(Model.Content.AssemblyName + ".dll")</small></div>
+    @if (Model.Content.Summary?.Items?.Any() == true)
+    {
+      <div class="api-summary">
+        @await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent(Model.Page, Model.Content.Summary))
+      </div>
+    }
+    @if (Model.Content.Internal != null)
+    {
+      <div class="alert alert-warning" role="alert">
+        <h3>Internal Use</h3>
+        @if (Model.Content.Internal.Items?.Any() == true)
+        {
+          @await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent(Model.Page, Model.Content.Internal))
+        }
+        else
+        {
+          <div>This @(Model.Content.Type.ToString().ToLower()) is marked as internal use only.  Internal use classes are not intended for use by extensions, and backward and forward compatibility is not guaranteed.</div>
+        }
+      </div>
+    }
+    @if (Model.Content.TypeParams?.Any() == true)
+    {
+      <div class="api-typeparameters">
+        <h5>Type Parameters</h5>
+        <table class="table">
+          @foreach (var parameter in Model.Content.TypeParams)
+          {
+            <tr>
+              <td>@parameter.Name</td>
+              <td>@parameter.Description</td>
+            </tr>
+          }
+        </table>
+      </div>
+    }
+    @if (Model.Content.Remarks?.Items?.Any() == true)
+    {
+      <div class="api-remarks">
+        <h3 class="is-page-link">Remarks</h3>
+        <div>
+          @await Html.PartialAsync("_RenderMixedContent.cshtml", new MixedContent(Model.Page, Model.Content.Remarks))
+        </div>
+      </div>
+    }
+    @if (Model.Content.Examples?.Any() == true)
+    {
+      <div class="api-examples">
+        <h3 class="is-page-link">@(Model.Content.Examples.Count() == 1 ? "Example" : "Examples")</h3>
+        @foreach (var example in Model.Content.Examples)
+        {
+          <pre><code>@example.FilterXMLWhiteSpace()</code></pre>
+        }
+      </div>
+    }
 
-	@if (Model.Content.Constructors?.Any() == true)
-	{
-			@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = Model.Content.Constructors.Count() == 1 ? "Constructor" : "Constructors", CssClass = "api-constructors", Members = Model.Content.Constructors })
-	}
+    @if (Model.Content.Constructors?.Any() == true)
+    {
+      @await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = Model.Content.Constructors.Count() == 1 ? "Constructor" : "Constructors", CssClass = "api-constructors", Members = Model.Content.Constructors })
+    }
 
-	@if (Model.Content.Properties.Any() == true)
-	{
-		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = "Properties", CssClass = "api-properties", Members = Model.Content.Properties })
-	}
+    @if (Model.Content.Properties.Any() == true)
+    {
+      @await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = "Properties", CssClass = "api-properties", Members = Model.Content.Properties })
+    }
 
-	@if (Model.Content.Fields?.Any() == true)
-	{
-		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = "Fields", CssClass = "api-fields", Members = Model.Content.Fields })
-	}
+    @if (Model.Content.Fields?.Any() == true)
+    {
+      @await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = "Fields", CssClass = "api-fields", Members = Model.Content.Fields })
+    }
 
-	@if (Model.Content.Methods?.Any() == true)
-	{
-		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = "Methods", CssClass = "api-methods", Members = Model.Content.Methods })
-	}
+    @if (Model.Content.Methods?.Any() == true)
+    {
+      @await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = "Methods", CssClass = "api-methods", Members = Model.Content.Methods })
+    }
 
-	@if (Model.Content.Events?.Any() == true)
-	{
-		@await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = "Events", CssClass = "api-events", Members = Model.Content.Events })
-	}
+    @if (Model.Content.Events?.Any() == true)
+    {
+      @await Html.PartialAsync("_RenderMember.cshtml", new Section() { Page = Model.Page, Caption = "Events", CssClass = "api-events", Members = Model.Content.Events })
+    }
 
-	@if (Model.Content.SeeAlso?.Any() == true)
-	{
-		<div class="api-seealso">
-			<h5>See Also</h5>
-			@foreach (var seeAlso in Model.Content.SeeAlso)
-			{
-				@if (seeAlso.Uri != null)
-				{
-					<mark><a href="@(seeAlso.Uri.IsAbsoluteUri ? seeAlso.Uri.ToString() : Url.PageLink(Model.Page, seeAlso.Uri.ToString()))">@seeAlso.LinkText</a></mark>
-				}
-				else
-				{
-					<mark>@seeAlso.CodeReference</mark>
-				}
-			}
-		</div>
-	}
-</div>
+    @if (Model.Content.SeeAlso?.Any() == true)
+    {
+      <div class="api-seealso">
+        <h5 class="is-page-link">See Also</h5>
+        @foreach (var seeAlso in Model.Content.SeeAlso)
+        {
+          @if (seeAlso.Uri != null)
+          {
+            <mark><a href="@(seeAlso.Uri.IsAbsoluteUri ? seeAlso.Uri.ToString() : Url.PageLink(Model.Page, seeAlso.Uri.ToString()))">@seeAlso.LinkText</a></mark>
+          }
+          else
+          {
+            <mark>@seeAlso.CodeReference</mark>
+          }
+        }
+      </div>
+    }
+  </div>
 }

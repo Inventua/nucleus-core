@@ -31,7 +31,7 @@ public class PagesController : Controller
   private IContentManager ContentManager { get; set; }
 
   public const string CUSTOM_CONTAINER_STYLE_VALUE = "__custom";
-
+   
   public PagesController(
     IWebHostEnvironment webHostEnvironment,
     Context context,
@@ -1171,9 +1171,11 @@ public class PagesController : Controller
     }
 
     viewModel.ParentPageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, page.ParentId);
+    // prevent selection of a child page as "parent" to prevent recursive relationship
+    RemoveChildren(viewModel.ParentPageMenu, page.Id);
+
     viewModel.LinkPageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, viewModel.Page.LinkPageId);
 
-    //viewModel.AvailableModules = await GetAvailableModules();
     viewModel.AvailablePageRoles = await GetAvailableRoles(viewModel.Page?.Permissions);
     viewModel.PagePermissionTypes = await this.PageManager.ListPagePermissionTypes();
 
@@ -1228,6 +1230,31 @@ public class PagesController : Controller
     return viewModel;
   }
 
+  private void RemoveChildren(PageMenu menu, Guid parentId)
+  {
+    if (menu.Children == null) return;
+
+    if (menu.Page?.Id == parentId)
+    {
+      menu.HasChildren = false;
+      return;
+    }
+
+    foreach (PageMenu childMenu in menu.Children)
+    {
+      if (childMenu.Page?.Id == parentId)
+      {
+        childMenu.HasChildren = false;
+        return;
+      }
+
+      if (childMenu.HasChildren)
+      {
+        RemoveChildren(childMenu, parentId);
+      }
+    }
+  }
+
   private async Task<IEnumerable<SelectListItem>> GetAvailableModules()
   {
     List<SelectListItem> results = new();
@@ -1269,6 +1296,36 @@ public class PagesController : Controller
     return results;
   }
 
+  private int SiteRolesSortOrder(Role role)
+  {
+    if (this.Context.Site.AllUsersRole.Equals(role))
+    {
+      return 1;
+    }
+
+    if (this.Context.Site.AnonymousUsersRole.Equals(role))
+    {
+      return 2;
+    }
+    
+    if (this.Context.Site.RegisteredUsersRole.Equals(role))
+    {
+      return 3;
+    }
+
+    if (this.Context.Site.AdministratorsRole.Equals(role))
+    {
+      return 4;
+    }
+
+    if (role.Name == "-")
+    {
+      return 5;
+    }
+
+    return 1000;
+  }
+
   private async Task<IEnumerable<SelectListItem>> GetAvailableRoles(List<Permission> existingPermissions)
   {
     IEnumerable<Role> availableRoles = (await this.RoleManager.List(this.Context.Site))
@@ -1276,13 +1333,15 @@ public class PagesController : Controller
       (
         role => role.Id != this.Context.Site.AdministratorsRole?.Id && (existingPermissions == null || !existingPermissions.Where(item => item.Role.Id == role.Id).Any())
       )
-      .OrderBy(role => role.Name);
+      .Append(new() { Id=Guid.NewGuid(), Name = "-" })
+      .OrderBy(role => SiteRolesSortOrder(role))
+      .ThenBy(role => role.Name);
 
     IEnumerable<string> roleGroups = availableRoles
       .Where(role => role.RoleGroup != null)
       .Select(role => role.RoleGroup.Name)
       .Distinct()
-      .OrderBy(name => name);
+      .OrderBy(name => name);      
 
     Dictionary<string, SelectListGroup> groups = roleGroups.ToDictionary(name => name, name => new SelectListGroup() { Name = name });
 

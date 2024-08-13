@@ -1,0 +1,18 @@
+﻿@model Nucleus.Modules.MultiContent.ViewModels.Viewer
+@using Nucleus.Extensions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@Html.AddStyle("~#/viewer.css")
+<div class="multi-content-grid@(Model.CssClass())" id="grid-@Model.Module.Id">
+  @foreach (var content in Model.Contents)
+  {
+    <div class="@(Model.ItemCssClass())">
+      <h3 inline-edit-route="@Url.NucleusAction("UpdateTitle", "MultiContent", "MultiContent", new { @id = content.Id } )">
+        @(!String.IsNullOrEmpty(content.Title) ? content.Title : "No title")
+      </h3>
+      <div inline-edit-mode="Html" inline-edit-route="@Url.NucleusAction("UpdateContent", "MultiContent", "MultiContent", new { @id = content.Id } )">
+        @Html.Raw(content.ToHtml())
+      </div>
+    </div>
+  }
+</div>

@@ -1,13 +1,13 @@
-# Installing Nucleus in Docker
+# Set up Nucleus in Docker
 
 See also: 
-- [Installing Nucleus in Windows](/manage/hosting/windows/) 
-- [Installing Nucleus in Azure App Service](/manage/hosting/azure-app-service/) 
-- [Installing Nucleus in Linux](/manage/hosting/linux/) 
+- [Set up Nucleus in Windows](/manage/hosting/windows/) 
+- [Set up Nucleus in Azure App Service](/manage/hosting/azure-app-service/) 
+- [Set up Nucleus in Linux](/manage/hosting/linux/) 
 
 [Docker](https://www.docker.com/) is an open-source platform that automates the deployment, scaling, and management of applications inside lightweight, portable 
 containers. Containers allow developers to package an application with all of its dependencies and configurations into a single, consistent unit that can run 
-anywhere, whether on a developer’s local machine, on-premises servers, or in the cloud.
+anywhere, whether on a developer's local machine, on-premises servers, or in the cloud.
 
 Running Nucleus in a Docker container is useful for testing, evaluation or even in some production scenarios. [Kubernetes](https://kubernetes.io/) is an open source 
 system for automating deployment, scaling, and management of containerized applications and is often used in production environments.
@@ -41,7 +41,7 @@ CMD ["dotnet", "bin/Nucleus.Web.dll"]
 <kbd>docker build -f dockerfile -t nucleus:2.0.0.0 .</kbd>
 > The dot at the end of the command is required.
 
-> The Linux installer script has some steps which configure the service manager using [systemctl](https://manpages.ubuntu.com/manpages/kinetic/man1/systemctl.1.html), 
+> The Linux installer script for Nucleus has some steps which configure the service manager using [systemctl](https://manpages.ubuntu.com/manpages/kinetic/man1/systemctl.1.html), 
 and the Ubuntu docker image does not contain systemctl. In Docker, Nucleus is started by the CMD instruction in your docker file, so the service manager steps are not
 required, and you can ignore the error messages.
 
@@ -58,3 +58,5 @@ The `docker run` command above will automatically start the container. If it is 
 
 ## Run Nucleus
 Browse to [http://localhost:8090](http://localhost:8090). The first time you browse to Nucleus, it will run the [Setup Wizard](/getting-started/#setup-wizard).
+
+[Click here](/getting-started/#setup-wizard) to return to the **Installing Nucleus** page.

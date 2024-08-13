@@ -1,48 +1,50 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-		<RootNamespace>Nucleus.Extensions.AzureBlobStorageFileSystemProvider</RootNamespace>
-		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <RootNamespace>Nucleus.Extensions.AzureBlobStorageFileSystemProvider</RootNamespace>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
   </PropertyGroup>
 
-	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
-<ItemGroup>
-		<None Remove="**\*.vspscc" />
-		<None Remove="**\*.scc" />
-		<None Remove="*.zip" />
-	</ItemGroup>
+  <ItemGroup>
+    <None Remove="**\*.vspscc" />
+    <None Remove="**\*.scc" />
+    <None Remove="*.zip" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="LICENSE.txt" />
     <None Remove="package.xml" />
-    <None Remove="readme.txt" />    
+    <None Remove="readme.txt" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="license.txt" />
     <Content Include="package.xml" />
-    <Content Include="readme.txt" />    
+    <Content Include="readme.txt" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Blobs" Version="12.20.0" />
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
-    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0" />
   </ItemGroup>
 
-	<PropertyGroup Label="Nucleus">
-		<ExtensionFolder>AzureBlobStorageFileSystemProvider</ExtensionFolder>
-		<Version>2.0.0</Version>
-		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
-		<CopyToDefaultSetup>true</CopyToDefaultSetup>
-	</PropertyGroup>
-	
-	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+  <PropertyGroup Label="Nucleus">
+    <ExtensionFolder>AzureBlobStorageFileSystemProvider</ExtensionFolder>
+    <Version>2.0.0</Version>
+    <Product>Nucleus</Product>
+    <Copyright>(c) Inventua Pty Ptd</Copyright>
+    <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+    <CopyToDefaultSetup>true</CopyToDefaultSetup>
+  </PropertyGroup>
+
+  <Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
 </Project>

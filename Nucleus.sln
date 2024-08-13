@@ -69,7 +69,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup and Configuration", "
 		Documentation\Setup and Configuration\Installation.md = Documentation\Setup and Configuration\Installation.md
 		Documentation\Setup and Configuration\Linux.md = Documentation\Setup and Configuration\Linux.md
 		Documentation\Setup and Configuration\Lists.md = Documentation\Setup and Configuration\Lists.md
-		Documentation\Setup and Configuration\Logging.md = Documentation\Setup and Configuration\Logging.md
 		Documentation\Setup and Configuration\Mail-Templates.md = Documentation\Setup and Configuration\Mail-Templates.md
 		Documentation\Setup and Configuration\Roles.md = Documentation\Setup and Configuration\Roles.md
 		Documentation\Setup and Configuration\Scheduled-Tasks-Editor.png = Documentation\Setup and Configuration\Scheduled-Tasks-Editor.png
@@ -109,6 +108,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Content Managers", "Content
 		Documentation\Content Managers\FilesAndFolders-FileManager.png = Documentation\Content Managers\FilesAndFolders-FileManager.png
 		Documentation\Content Managers\FilesAndFolders.md = Documentation\Content Managers\FilesAndFolders.md
 		Documentation\Content Managers\FilesAndFolders.png = Documentation\Content Managers\FilesAndFolders.png
+		Documentation\Content Managers\Page-Editor.png = Documentation\Content Managers\Page-Editor.png
 		Documentation\Content Managers\PageManagement.md = Documentation\Content Managers\PageManagement.md
 		Documentation\Content Managers\PageManagement.png = Documentation\Content Managers\PageManagement.png
 	EndProjectSection
@@ -119,6 +119,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Developers", "Developers", 
 		Documentation\Developers\Layouts-and-Containers.md = Documentation\Developers\Layouts-and-Containers.md
 		Documentation\Developers\Layouts-and-Containers.png = Documentation\Developers\Layouts-and-Containers.png
 		Documentation\Developers\Layouts-and-Containers.vsdx = Documentation\Developers\Layouts-and-Containers.vsdx
+		Documentation\Developers\log-settings.png = Documentation\Developers\log-settings.png
 		Documentation\Developers\Modules.md = Documentation\Developers\Modules.md
 		Documentation\Developers\Other.md = Documentation\Developers\Other.md
 		Documentation\Developers\Scheduled-Tasks.md = Documentation\Developers\Scheduled-Tasks.md
@@ -203,6 +204,54 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Web.Admin", "Nucleus.Web.Admin\Nucleus.Web.Admin.csproj", "{5038799C-D90D-4B04-934F-AA5381A91929}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.WebAssembly", "Nucleus.WebAssembly\Nucleus.WebAssembly.csproj", "{147FFD6B-1E2E-4E0B-BB4C-75C329D338C9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup", "Setup", "{104CB2EC-C0BD-457B-BA13-8172BCC868E5}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Setup\Azure-App-Service.md = Documentation\Setup\Azure-App-Service.md
+		Documentation\Setup\Docker.md = Documentation\Setup\Docker.md
+		Documentation\Setup\Installation.md = Documentation\Setup\Installation.md
+		Documentation\Setup\Linux.md = Documentation\Setup\Linux.md
+		Documentation\Setup\setup-wizard-checks.png = Documentation\Setup\setup-wizard-checks.png
+		Documentation\Setup\setup-wizard-db.png = Documentation\Setup\setup-wizard-db.png
+		Documentation\Setup\setup-wizard-extensions.png = Documentation\Setup\setup-wizard-extensions.png
+		Documentation\Setup\setup-wizard-filesystems.png = Documentation\Setup\setup-wizard-filesystems.png
+		Documentation\Setup\setup-wizard-finish.png = Documentation\Setup\setup-wizard-finish.png
+		Documentation\Setup\setup-wizard-site.png = Documentation\Setup\setup-wizard-site.png
+		Documentation\Setup\setup-wizard-template.png = Documentation\Setup\setup-wizard-template.png
+		Documentation\Setup\setup-wizard-users.png = Documentation\Setup\setup-wizard-users.png
+		Documentation\Setup\windows.md = Documentation\Setup\windows.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configuration", "{E16AB101-25E6-482A-B4A2-EAAC19656C8A}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Configuration\Api-Keys.md = Documentation\Configuration\Api-Keys.md
+		Documentation\Configuration\Api-Keys.png = Documentation\Configuration\Api-Keys.png
+		Documentation\Configuration\Configuration.md = Documentation\Configuration\Configuration.md
+		Documentation\Configuration\Install-Extensions.md = Documentation\Configuration\Install-Extensions.md
+		Documentation\Configuration\Install-Extensions.png = Documentation\Configuration\Install-Extensions.png
+		Documentation\Configuration\Lists.md = Documentation\Configuration\Lists.md
+		Documentation\Configuration\log-settings.png = Documentation\Configuration\log-settings.png
+		Documentation\Configuration\Logging.md = Documentation\Configuration\Logging.md
+		Documentation\Configuration\Mail-Templates.md = Documentation\Configuration\Mail-Templates.md
+		Documentation\Configuration\Mail-Templates.png = Documentation\Configuration\Mail-Templates.png
+		Documentation\Configuration\Roles.md = Documentation\Configuration\Roles.md
+		Documentation\Configuration\Roles.png = Documentation\Configuration\Roles.png
+		Documentation\Configuration\Scheduled-Tasks-Editor.png = Documentation\Configuration\Scheduled-Tasks-Editor.png
+		Documentation\Configuration\Scheduled-Tasks.md = Documentation\Configuration\Scheduled-Tasks.md
+		Documentation\Configuration\Scheduled-Tasks.png = Documentation\Configuration\Scheduled-Tasks.png
+		Documentation\Configuration\Search-Settings.md = Documentation\Configuration\Search-Settings.md
+		Documentation\Configuration\Site-Settings-Editor.png = Documentation\Configuration\Site-Settings-Editor.png
+		Documentation\Configuration\Site-Settings.md = Documentation\Configuration\Site-Settings.md
+		Documentation\Configuration\Site-Settings.png = Documentation\Configuration\Site-Settings.png
+		Documentation\Configuration\System-Administrators.md = Documentation\Configuration\System-Administrators.md
+		Documentation\Configuration\System.md = Documentation\Configuration\System.md
+		Documentation\Configuration\System.png = Documentation\Configuration\System.png
+		Documentation\Configuration\User-Editor.png = Documentation\Configuration\User-Editor.png
+		Documentation\Configuration\Users.md = Documentation\Configuration\Users.md
+		Documentation\Configuration\Users.png = Documentation\Configuration\Users.png
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Extensions.AzureSearch", "Nucleus.Core.Modules\Nucleus.Extensions.AzureSearch\Nucleus.Extensions.AzureSearch.csproj", "{D171C245-5228-473B-BB1C-6D1F4AF7830D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -394,6 +443,10 @@ Global
 		{147FFD6B-1E2E-4E0B-BB4C-75C329D338C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{147FFD6B-1E2E-4E0B-BB4C-75C329D338C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{147FFD6B-1E2E-4E0B-BB4C-75C329D338C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D171C245-5228-473B-BB1C-6D1F4AF7830D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D171C245-5228-473B-BB1C-6D1F4AF7830D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D171C245-5228-473B-BB1C-6D1F4AF7830D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D171C245-5228-473B-BB1C-6D1F4AF7830D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -440,6 +493,9 @@ Global
 		{3112275E-9ABE-494C-A5A9-83EF913CEC0C} = {CD49EF69-179E-461A-9C51-041EA3B901CE}
 		{319B4F09-DF9F-4421-BA89-11116E068B60} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{675D5641-BDF7-4B51-80BB-326A75EBBAF9} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
+		{104CB2EC-C0BD-457B-BA13-8172BCC868E5} = {800D8125-BD40-410A-B1E9-C1E62224DC03}
+		{E16AB101-25E6-482A-B4A2-EAAC19656C8A} = {800D8125-BD40-410A-B1E9-C1E62224DC03}
+		{D171C245-5228-473B-BB1C-6D1F4AF7830D} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D84CD364-9C8E-400E-84AA-45562061ED44}

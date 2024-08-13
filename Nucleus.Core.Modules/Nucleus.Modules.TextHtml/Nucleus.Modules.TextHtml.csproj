@@ -1,60 +1,61 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
-		<EnableDefaultContentItems>false</EnableDefaultContentItems>
-		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>true</RazorCompileOnBuild>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <RazorCompileOnBuild>true</RazorCompileOnBuild>
   </PropertyGroup>
 
-	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
-	<PropertyGroup Label="Globals">
-	  <SccProjectName></SccProjectName>
-	  <SccProvider></SccProvider>
-	  <SccAuxPath></SccAuxPath>
-	  <SccLocalPath></SccLocalPath>
-	</PropertyGroup>
+  <PropertyGroup Label="Globals">
+    <SccProjectName></SccProjectName>
+    <SccProvider></SccProvider>
+    <SccAuxPath></SccAuxPath>
+    <SccLocalPath></SccLocalPath>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<None Remove="**\*.vspscc" />
-		<None Remove="**\*.scc" />
-		<None Remove="*.zip" />
-	</ItemGroup>
+  <ItemGroup>
+    <None Remove="**\*.vspscc" />
+    <None Remove="**\*.scc" />
+    <None Remove="*.zip" />
+  </ItemGroup>
 
-	<ItemGroup>
-	  <None Remove="license.txt" />
-	  <None Remove="package.xml" />
-	  <None Remove="readme.txt" />
-	  <None Remove="Views\Settings.cshtml" />
-	</ItemGroup>
+  <ItemGroup>
+    <None Remove="license.txt" />
+    <None Remove="package.xml" />
+    <None Remove="readme.txt" />
+    <None Remove="Views\Settings.cshtml" />
+  </ItemGroup>
 
-	<ItemGroup>
-	  <Content Include="license.txt" />
-	  <Content Include="package.xml" />
-	  <Content Include="readme.txt" />
-	  <Content Include="Views\Settings.cshtml" />
-	</ItemGroup>
+  <ItemGroup>
+    <Content Include="license.txt" />
+    <Content Include="package.xml" />
+    <Content Include="readme.txt" />
+    <Content Include="Views\Settings.cshtml" />
+  </ItemGroup>
 
-	<ItemGroup>
-	  <Content Include="Views\Viewer.cshtml" />
-	</ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Viewer.cshtml" />
+  </ItemGroup>
 
-	<ItemGroup>
-	  <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
-	  <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0" />
+  </ItemGroup>
 
-	<PropertyGroup Label="Nucleus">
-		<ExtensionFolder>TextHtml</ExtensionFolder>
-		<Version>2.0.0</Version>
-		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+  <PropertyGroup Label="Nucleus">
+    <ExtensionFolder>TextHtml</ExtensionFolder>
+    <Version>2.0.0</Version>
+    <Copyright>(c) Inventua Pty Ptd</Copyright>
+    <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
     <CopyToDefaultSetup>true</CopyToDefaultSetup>
-	</PropertyGroup>
+  </PropertyGroup>
 
-	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+  <Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
 
 </Project>

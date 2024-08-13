@@ -7,7 +7,7 @@ of developing a Nucleus module.
 ## Project Templates
 The easiest way to develop a module is to start with one of the Visual Studio templates provided by the Nucleus [Developer Tools](/downloads).  
 
-There are three templates:
+There are three module templates:
 
 ### Nucleus Complex Extension Project
 Use the Nucleus Complex Extension Project template when you are developing a module that will save data in its own database tables.
@@ -29,6 +29,6 @@ a package which contains layouts and containers, a search provider or a file sys
 Includes project references to the Nucleus Nuget packages, a sample manifest file, project file entries which link to the Nucleus MSBuild script, and a ViewImports 
 file to import the Nucleus namespaces used by modules, but no template controllers, views, data providers or other classes.  
 
-
+> Nucleus Developer Tools also contains a [Layout extensions](/develop-extensions/layouts-and-containers/) template.
 
 

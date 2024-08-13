@@ -36,7 +36,7 @@ namespace Nucleus.Extensions
 				{ 
 					if (isAnonymousOrAllUsers && !(permission.PermissionType.Scope.EndsWith($"/{PermissionType.PermissionScopeTypes.VIEW}")) && !(permission.PermissionType.Scope.EndsWith($"/{PermissionType.PermissionScopeTypes.BROWSE}")))
 					{
-						permission.PermissionType = new() { Scope = PermissionType.PermissionScopeNamespaces.Disabled };
+						permission.IsDisabled = true;
 						permission.AllowAccess = false;
 					}				
 				}

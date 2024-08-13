@@ -125,15 +125,11 @@ public static class SiteExtensions
   /// Set the site's selected mail client.
   /// </summary>
   /// <param name="site"></param>
-  /// <param name="mailClientType"></param>
-  /// <returns>
-  /// The type name of the site's selected mail client, or null if no mail client is selected.
-  /// </returns>
+  /// <param name="mailClientType">The .NET type name (class and and assembly) of the mail client.</param>
   public static void SetMailClientType(this Site site, string mailClientType)
   {
     site.SiteSettings.TrySetValue(Site.SiteMailSettingKeys.MAIL_CLIENT_TYPENAME, mailClientType);
   }
-
 
   /// <summary>
   /// Return the relative path to the site's icon image file.

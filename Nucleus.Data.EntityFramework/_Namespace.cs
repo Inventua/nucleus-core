@@ -13,7 +13,7 @@ namespace Nucleus.Data.EntityFramework
 	/// based data provider should reference this assembly.
 	/// </summary>
 	[System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-	class NamespaceDoc
+	internal class NamespaceDoc
 	{
 	}
 }

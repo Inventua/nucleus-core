@@ -9,21 +9,21 @@ Nucleus can be used with different hosting environments, database providers and 
 
 ## Basic Setup 
 
-1. Download the install set (zip format) from the [downloads](/downloads) page.  For a new installation, you will need to download the 
+1. Download the install set (zip format) for your platform from the [downloads](/downloads) page.  For a new installation, you will need to download the 
 Nucleus.[version].Install-[platform].zip file.
    > There are platform-specific install sets for Windows x64, Linux x64 and Linux arm64, as well as a **portable** install set which can be used on 
 any platform that supports .NET core. The platform-specific install sets are about 60% of the size of the portable sets because they do not 
 include runtimes for all possible platforms. 
 
 2. Follow the setup guide for your run-time environment to install prerequisites and Nucleus.
-    - [Windows](/manage/hosting/windows/)  
-    - [Azure App Service](/manage/hosting/azure-app-service/)  
-    - [Linux](/manage/hosting/linux/)
-    - [Docker](/manage/hosting/docker/)
+    - [Windows Setup Guide](/manage/hosting/windows/)  
+    - [Azure App Service Setup Guide](/manage/hosting/azure-app-service/)  
+    - [Linux Setup Guide](/manage/hosting/linux/)
+    - [Docker Setup Guide](/manage/hosting/docker/)
 
-   After you have completed the installation process, proceed to step 3.
+   After you have completed the installation process, return here and proceed to step 3.
 
-3. Open a browser and browse to your Nucleus Url, and use the setup wizard to configure your file system provider(s), database provider, install
+3. Open a web browser and browse to your Nucleus Url, and use the setup wizard to configure your file system provider(s), database provider, install
 default extensions, and create administrator users.
 
 ## Setup Wizard
@@ -51,7 +51,8 @@ can skip past the settings and paste your connection string into the "Connection
 4. Select database-specific connection settings.
    > Different database types have different settings available, and Sqlite doesn't have any settings.  When you use SQL Server, MySql or PostgreSQL, you 
 choose whether to use integrated security or user name and password authentication, and Sql Server also has encryption and certificate options. The
-values that you should choose depend on how your server is configured.
+values that you should choose depend on how your server is configured. If you need to specify settings that are not available in the Setup Wizard, you can 
+manually prepare your own connection string and paste it into the "Connection string" text box.
 
 5. Click ""Refresh"", then select your database name.
 
@@ -77,16 +78,20 @@ You can configure one or more file systems. This is where your site's content fi
 If you configure more than one file system, the file system management controls in Nucleus will display them in a drop-down list, and you can select 
 the file system that you want to work with. You can store different files in differernt file system if you need to.
 
-- Local File System  
+- #### Local File System  
   You can use the local file system to store your site's files. By default in Windows, files are stored in 
 `C:\ProgramData\Nucleus\Content`. In Linux, the default location is `/home/nucleus/data/Content`. If you want to change where local files are stored, you will 
-need to edit your configuration files.  [Configuration Reference - Folder Options](https://www.nucleus-cms.com/configuration-reference/#nucleusfolderoptions).
-- Azure Blob Storage  
-  After you set up Azure storage in the Microsoft Azure Portal, select your storage service and click ""Access Keys"" in the Security + Networking 
-menu.  
+need to edit your configuration files.  [Configuration Reference - Folder Options](https://www.nucleus-cms.com/configuration-reference/#nucleusfolderoptions). If
+you are going to use Azure Blob Storage or Amazon S3, you can click 'Remove' to remove the local file system provider.
+- #### Azure Blob Storage  
+  You will need a connection string to use Azure Blob Storage.  Select Azure Storage from the drop-down list in the setup wizard, then click ""Add"" to add the Azure storage provider.
+
+  **Connection string**: After you set up Azure storage in the Microsoft Azure Portal, select your storage service and click ""Access Keys"" in the ""Security + Networking"" 
+menu to view your ""connection string"". Copy the value into the Azure Storage connection string text box.
 [Create an Azure storage account](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-create?tabs=azure-portal).
-- Amazon S3  
-  For Amazon S3, you need your S3 access key, secret, service Url and root path.
+- #### Amazon S3  
+  For Amazon S3, you need your S3 access key, secret, service Url and root path. Select Amazon S3 from the drop-down list and click ""Add"" to add the Amazon S3 storage provider 
+and enter your service information. 
 
   **Access Key and Secret**: Use the Amazon ""IAM Dashboard"" (identity and access managment) dashboard. Click ""Users"", and create an access key. Make sure to record your 
 access key and secret, as the AWS control panel will not allow you to view the secret after you initially create it. 
@@ -100,7 +105,7 @@ is the Amazon code for your region.
 Click Next to continue.
 
 ### Extensions
-The install set comes with a set of common extensions. Select the extensions that you want to install and click Next.  You can install more extensions later.
+The install set includes some common Nucleus extensions. Select the extensions that you want to install and click Next.  You can install more extensions later.
 > Extensions which are used by your selected site template, or by your selected file systems are automatically selected, and cannot be un-selected.
 
 {.text-center}![Extensions](setup-wizard-extensions.png)

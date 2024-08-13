@@ -1,25 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
-		<RootNamespace>Nucleus.Modules.MultiContent</RootNamespace>
-		<EnableDefaultContentItems>false</EnableDefaultContentItems>
-		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+    <RootNamespace>Nucleus.Modules.MultiContent</RootNamespace>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <RazorCompileOnBuild>true</RazorCompileOnBuild>
-    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest> 
-    <RazorCompileOnBuild>true</RazorCompileOnBuild>   
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <RazorCompileOnBuild>true</RazorCompileOnBuild>
   </PropertyGroup>
 
-	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
   <ItemGroup>
-		<None Remove="**\*.vspscc" />
-		<None Remove="**\*.scc" />
-		<None Remove="*.zip" />
-	</ItemGroup>
+    <None Remove="**\*.vspscc" />
+    <None Remove="**\*.scc" />
+    <None Remove="*.zip" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="carousel.js" />
@@ -32,6 +32,7 @@
     <None Remove="viewer.min.css" />
     <None Remove="Views\Editor.cshtml" />
     <None Remove="Views\LayoutSettings\_FaqSettings.cshtml" />
+    <None Remove="Views\LayoutSettings\_GridSettings.cshtml" />
     <None Remove="Views\LayoutSettings\_PlainSettings.cshtml" />
     <None Remove="Views\Settings.cshtml" />
     <None Remove="Views\Viewer.cshtml" />
@@ -39,6 +40,7 @@
     <None Remove="Views\ViewerLayouts\Alert.cshtml" />
     <None Remove="Views\ViewerLayouts\Carousel.cshtml" />
     <None Remove="Views\ViewerLayouts\Faq.cshtml" />
+    <None Remove="Views\ViewerLayouts\Grid.cshtml" />
     <None Remove="Views\ViewerLayouts\Pills.cshtml" />
     <None Remove="Views\ViewerLayouts\Plain.cshtml" />
     <None Remove="Views\ViewerLayouts\Tabs.cshtml" />
@@ -53,7 +55,9 @@
 
   <ItemGroup>
     <Content Include="license.txt" />
+    <Content Include="Views\LayoutSettings\_GridSettings.cshtml" />
     <Content Include="Views\LayoutSettings\_PlainSettings.cshtml" />
+    <Content Include="Views\ViewerLayouts\Grid.cshtml" />
     <Content Include="Views\ViewerLayouts\Plain.cshtml" />
     <EmbeddedResource Include="carousel.js" />
     <EmbeddedResource Include="carousel.min.js" />
@@ -82,19 +86,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
-    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0" />
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
   </ItemGroup>
 
   <PropertyGroup Label="Nucleus">
-		<ExtensionFolder>MultiContent</ExtensionFolder>
-		<Version>2.0.0</Version>
-		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+    <ExtensionFolder>MultiContent</ExtensionFolder>
+    <Version>2.0.1</Version>
+    <Product>Nucleus</Product>
+    <Copyright>(c) Inventua Pty Ptd</Copyright>
+    <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
     <CopyToDefaultSetup>true</CopyToDefaultSetup>
     <NucleusEmbedViewerLayouts>true</NucleusEmbedViewerLayouts>
-	</PropertyGroup>
+  </PropertyGroup>
 
-	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+  <Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
 </Project>

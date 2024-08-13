@@ -1,25 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Nucleus.Extensions;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
-using DocumentFormat.OpenXml.Wordprocessing;
+using Nucleus.Extensions;
 
 namespace Nucleus.ViewFeatures
 {
-	/// <summary>
-	/// Extensions used to render links to Nucleus pages, files and actions.
-	/// </summary>
-	public static class UrlHelperExtensions
+  /// <summary>
+  /// Extensions used to render links to Nucleus pages, files and actions.
+  /// </summary>
+  public static class UrlHelperExtensions
 	{		
 		/// <summary>
 		/// Output an relative url, with the leading "~" character for use by UrlHelper.Content for the specified <see cref="Page"/>.
@@ -323,6 +317,14 @@ namespace Nucleus.ViewFeatures
 		/// </remarks>
 		public static System.Uri GetAbsoluteUri(this IUrlHelper helper, string localPath)
 		{
+      string fragment = "";
+
+      if (localPath.Contains('#'))
+      {
+        fragment = localPath.Substring(localPath.LastIndexOf('#'));
+        localPath = localPath.Substring(0, localPath.LastIndexOf('#') - 1);
+      }
+
 			if (!localPath.StartsWith('/'))
 			{
 				localPath = $"/{localPath}";
@@ -338,7 +340,8 @@ namespace Nucleus.ViewFeatures
         helper.ActionContext.HttpContext.Request.Scheme,
         helper.ActionContext.HttpContext.Request.Host.Host, 
         helper.ActionContext.HttpContext.Request.Host.Port ?? -1, 
-        helper.ActionContext.HttpContext.Request.PathBase + localPath
+        helper.ActionContext.HttpContext.Request.PathBase + localPath,
+        fragment
       );
 
 			return builder.Uri;

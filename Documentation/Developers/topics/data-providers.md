@@ -15,12 +15,15 @@ and [DbContext](/api-documentation/Nucleus.Data.EntityFramework.xml/Nucleus.Data
 you need to do is add your data provider to dependency injection and Nucleus takes care of the rest.
 
 ## Creating your data provider
-When using entity framework, your data provider inherits [DataProvider](/api-documentation/Nucleus.Data.EntityFramework.xml/Nucleus.Data.EntityFramework.DataProvider/) 
-and has methods which use a DbContext.  Inherit [DbContext](/api-documentation/Nucleus.Data.EntityFramework.xml/Nucleus.Data.EntityFramework.DbContext/), which 
+When using entity framework, your data provider inherits [Nucleus.Data.EntityFramework.DataProvider](/api-documentation/Nucleus.Data.EntityFramework.xml/Nucleus.Data.EntityFramework.DataProvider/) 
+and has methods which use a DbContext.  Inherit [Nucleus.Data.EntityFramework.DbContext](/api-documentation/Nucleus.Data.EntityFramework.xml/Nucleus.Data.EntityFramework.DbContext/), which 
 has extra functionality so that Nucleus can automatically configure the correct database provider, including automatic database schema [migrations](/developers/database-scripts/).
 
+> The Nucleus Developer Tools `Nucleus Complex Extension Project` template creates an extension with a data provider for you automatically, along with 
+code to register the data provider at startup.
+
 Your DbContext implementation will be the same as a standard entity framework [DbContext](https://docs.microsoft.com/en-us/dotnet/api/system.data.entity.dbcontext) with 
-one or more [DbSet](https://docs.microsoft.com/en-us/dotnet/api/system.data.entity.dbset-1) properties, and an 
+one or more [DbSet](https://docs.microsoft.com/en-us/dotnet/api/system.data.entity.dbset-1) properties, and (optionally) an 
 [OnModelCreating](https://docs.microsoft.com/en-us/dotnet/api/system.data.entity.dbcontext.onmodelcreating) override to tell entity framework more about 
 your model classes and database objects.
 
@@ -28,19 +31,19 @@ Your [DataProvider](/api-documentation/Nucleus.Data.EntityFramework.xml/Nucleus.
 
 {.file-name}
 ### Data Provider Example
+The examples below are from the Documents module ([source code](https://github.com/Inventua/nucleus-core/tree/main/Nucleus.Core.Modules/Nucleus.Modules.Documents)).
 ```
 using System;
-using Nucleus.Abstractions.Models;
-using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
 using System.Collections.Generic;
-using System.Linq;
 using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.EventHandlers;
 using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
+using Nucleus.Abstractions.Models;
 using Nucleus.Modules.Documents.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace Nucleus.Modules.Documents.DataProviders;
 
@@ -96,7 +99,8 @@ public class DocumentsDbContext : Nucleus.Data.EntityFramework.DbContext
 {
   public DbSet<Document> Documents { get; set; }
 
-  public DocumentsDbContext(DbContextConfigurator<DocumentsDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) : base(dbConfigurator, httpContextAccessor, loggerFactory)  {  }
+  public DocumentsDbContext(DbContextConfigurator<DocumentsDataProvider> dbConfigurator, IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory) 
+    : base(dbConfigurator, httpContextAccessor, loggerFactory)  { }
 
   /// <summary>
   /// Configure entity framework with schema information that it cannot automatically detect.
@@ -128,8 +132,8 @@ extension method provided by the [Nucleus.Data.Common](/api-documentation/Nucleu
 [Startup Class](/developers/startup-classes/) to add and configure your data provider and associated objects.
 
 ### Example
-The example below is from the core Documents module.  Code which does not demonstrate adding a data provider has been removed 
-for brevity.
+The examples below are from the Documents module ([source code](https://github.com/Inventua/nucleus-core/tree/main/Nucleus.Core.Modules/Nucleus.Modules.Documents)). 
+Code which does not demonstrate adding a data provider has been removed for brevity.
 
 ```
 using Microsoft.AspNetCore.Hosting;

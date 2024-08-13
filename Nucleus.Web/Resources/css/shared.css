@@ -57,7 +57,7 @@ body
 
 body.control-panel-dock-top.nucleus-admin-frame-expanded 
 {
-  overflow:hidden;
+  overflow: hidden;
 }
 
 @font-face 
@@ -85,7 +85,14 @@ body.control-panel-dock-top.nucleus-admin-frame-expanded
 /* to the main display, admin.css is for elements within the admin iframe.  */
 .nucleus-admin-frame
 {
-	width: var(--control-panel-size);
+	position: fixed;
+	background-color: var(--control-panel-background-color);
+	top: 0;
+	left: 0;
+	border: 0;
+	z-index: 1040;  
+	transition: none;  /* prevent transition on close */
+  width: var(--control-panel-size);
 	height: 100%;
 }
 
@@ -93,6 +100,7 @@ body.control-panel-dock-top.nucleus-admin-frame-expanded
 {
   width: var(--control-panel-size);
 	height: 100%;
+	float: left;
 }
 
 .control-panel-dock-top .nucleus-admin-frame, .control-panel-dock-top .nucleus-admin-frame-placeholder
@@ -106,25 +114,9 @@ body.control-panel-dock-top.nucleus-admin-frame-expanded
   position: absolute; /*sticky;*/
 }
 
-.nucleus-admin-frame-placeholder
-{
-	float: left;
-}
-
 .control-panel-dock-top .nucleus-admin-frame-placeholder
 {
   float: none;
-}
-
-.nucleus-admin-frame
-{
-	position: fixed;
-	background-color: var(--control-panel-background-color);
-	top: 0;
-	left: 0;
-	border: 0;
-	z-index: 1040;  
-	transition: none;  /* prevent transition on close */
 }
 
 .nucleus-admin-frame-expanded .nucleus-admin-frame

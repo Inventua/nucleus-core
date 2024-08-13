@@ -1,23 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
-		<RootNamespace>Nucleus.DNN.Migration</RootNamespace>
-		<EnableDefaultContentItems>false</EnableDefaultContentItems>
-		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
+    <RootNamespace>Nucleus.DNN.Migration</RootNamespace>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
   </PropertyGroup>
 
-	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
 
-<ItemGroup>
-		<None Remove="**\*.vspscc" />
-		<None Remove="**\*.scc" />
-		<None Remove="*.zip" />
-	</ItemGroup>
+  <ItemGroup>
+    <None Remove="**\*.vspscc" />
+    <None Remove="**\*.scc" />
+    <None Remove="*.zip" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="index.css" />
@@ -35,7 +35,7 @@
     <None Remove="Views\_Progress.cshtml" />
     <None Remove="Views\_Roles.cshtml" />
     <None Remove="Views\_Users.cshtml" />
-		<None Remove="Views\_ViewImports.cshtml" />
+    <None Remove="Views\_ViewImports.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,7 +53,7 @@
     <Content Include="Views\_Users.cshtml" />
     <Content Include="Views\_Pages.cshtml" />
     <Content Include="Views\_Roles.cshtml" />
-		<Content Include="Views\_ViewImports.cshtml" />
+    <Content Include="Views\_ViewImports.cshtml" />
     <Content Include="Views\Index.cshtml" />
   </ItemGroup>
 
@@ -61,18 +61,20 @@
     <EmbeddedResource Include="DataProviders\Migrations\Scripts\01.00.00.json" />
   </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0-rc1" />
-		<PackageReference Include="Inventua.Nucleus.Data.Common" Version="2.0.0-rc1" />
-		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0-rc1" />
-		<PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="2.0.0-rc1" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Inventua.Nucleus.Data.Common" Version="2.0.0" />
+    <PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0" />
+    <PackageReference Include="Inventua.Nucleus.Data.EntityFramework" Version="2.0.0" />
+  </ItemGroup>
 
-	<PropertyGroup Label="Nucleus">
-		<ExtensionFolder>DNNMigration</ExtensionFolder>
-		<Version>2.0.0</Version>
-		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
-	</PropertyGroup>
+  <PropertyGroup Label="Nucleus">
+    <ExtensionFolder>DNNMigration</ExtensionFolder>
+    <Version>2.0.0</Version>
+    <Product>Nucleus</Product>
+    <Copyright>(c) Inventua Pty Ptd</Copyright>
+    <NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
+  </PropertyGroup>
 
-	<Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
+  <Import Label="ModulePostBuild" Project="$(NUCLEUS_PATH)module.build.targets" Condition="Exists('$(NUCLEUS_PATH)module.build.targets')" />
 </Project>

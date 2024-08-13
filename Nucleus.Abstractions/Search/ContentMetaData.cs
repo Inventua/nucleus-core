@@ -138,7 +138,6 @@ namespace Nucleus.Abstractions.Search
 		/// </remarks>
 		public IEnumerable<Role> Roles { get; set; }
 
-		/// <inheritdoc />
 		/// <hidden/>
 		protected virtual void Dispose(bool disposing)
 		{

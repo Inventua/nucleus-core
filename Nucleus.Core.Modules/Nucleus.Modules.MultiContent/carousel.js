@@ -15,10 +15,21 @@
 
       if (!carouselControl.is('.carousel')) return;
 
+      _normalizeHeights(carouselControl);
+
+      jQuery(window).on('resize', function ()
+      {
+        _normalizeHeights(carouselControl);
+      });
+    });
+
+    function _normalizeHeights(target)
+    {
       var tallestHeight = 0;
+      target.find('.carousel-item').css('height', '');
 
       // normalize carousel item heights
-      jQuery(this).find('.carousel-item').each(function (index, element) 
+      target.find('.carousel-item').each(function (index, element) 
       {
         let wasMadeActive = false;
         if (!jQuery(element).hasClass('active'))
@@ -43,8 +54,8 @@
         }
       });
 
-      jQuery(this).find('.carousel-item').height(tallestHeight);
-    });
+      target.find('.carousel-item').height(tallestHeight);
+    }
   }
 
 })(jQuery);

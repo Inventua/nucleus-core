@@ -13,7 +13,6 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<PackageId>Nucleus.ViewFeatures</PackageId>
 		<Description>Html Helpers, Tag Helpers, Url Helpers and shared controls used by Nucleus core and extensions.</Description>
 
     <!-- Version is set by core.build.targets, can be overridden here for pre-release builds -->
@@ -61,7 +60,7 @@
 	  </None>
 	</ItemGroup>
 
-	<Target Name="GetPackageAssemblies" AfterTargets="PostBuildEvent">
+	<Target Name="GetPackageAssemblies" AfterTargets="CopyFilesToOutputDirectory">
 		<Copy SourceFiles="bin\$(Configuration)\$(TargetFramework)\Nucleus.ViewFeatures.xml" DestinationFolder="$(SolutionDir)\..\Publish\XmlDocumentation" Retries="2" />		
 	</Target>
 

@@ -1,7 +1,8 @@
 ## Amazon S3 File System Provider Extension
 The Amazon S3 File System Provider extension is a file system provider which allows you to use the [Amazon S3 storage service](https://aws.amazon.com/s3/) with Nucleus.
 
-> After you install it, you must configure the Amazon S3 file system provider in application configuration files.  
+> If you don't install the Amazon S3 file system provider using the Setup Wizard, after you install it, you must configure the Amazon S3 file system 
+provider in application configuration files.  
 
 To use Amazon S3 Storage, install the Amazon S3 File System Provider extension, then add a configuration section for the Amazon S3 file system 
 provider.  The provider type name for the Azure Blob Storage file system provider is 
@@ -40,7 +41,7 @@ in the S3 menu to view your service settings.  You will also need to use the Ama
 [create your access key](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys) 
 and shared secret.
 
-For the Amazon S3 file system provider, you should generally set the `RootFolder` setting.  You can set it to a bucket name, and you can also 
+For the Amazon S3 file system provider, you should generally set the `RootPath` setting.  You can set it to a bucket name, and you can also 
 include a sub-folder path within the specified bucket.  The S3 file system provider can't create S3 buckets, only files and 
 folders within the specified bucket, so the bucket must be created using the AWS console.  
 

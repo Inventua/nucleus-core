@@ -55,8 +55,10 @@ namespace Nucleus.Extensions
 					}
 					return Markdown.ToHtml(content, pipeline);
 
-				case "text/plain":					
-					return content.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br />");
+				case "text/plain":
+          // replace double-line feeds with two <br> elements so that paragraphs work. Single line feeds get removed as they are
+          // interpreted as being for ease of editing rather than intended for display.
+					return content.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n\n", "<br /><br />").Replace("\n", "");
 
 				default:  // "text/html"
 					return content;

@@ -39,9 +39,9 @@ public class PermissionsManager : IPermissionsManager
         {
           if (!results.Where(permission => permission.PermissionType.Scope == permissionType.Scope && permission.Role.Id == role.Id).Any())
           {
-            // a role does not have an available permission, add 
+            // a role does not have an available permission, add a placeholder
             results.Add(new Permission()
-            {
+            {              
               AllowAccess = false,
               Role = role,
               PermissionType = permissionType
@@ -84,7 +84,7 @@ public class PermissionsManager : IPermissionsManager
     }
 
     // add/update permissions
-    foreach (Permission newPermission in permissions.Where(permission => permission.PermissionType.Scope != PermissionType.PermissionScopeNamespaces.Disabled))
+    foreach (Permission newPermission in permissions.Where(permission => !permission.IsDisabled))
     {
       using (IPermissionsDataProvider provider = this.DataProviderFactory.CreateProvider<IPermissionsDataProvider>())
       {

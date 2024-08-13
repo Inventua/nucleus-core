@@ -8,7 +8,7 @@ body
 .nucleus-control-panel
 {
   display: flex;
-  background: #444;
+  background-color: var(--control-panel-background-color);
   height: 100%;
 }
 
@@ -717,13 +717,17 @@ ul.nucleus-control-panel-items button
     flex-wrap: wrap !important;
   }
 
+    .nucleus-page-list li a
+    {
+      color: inherit !important;
+    }
+
     .nucleus-page-list li a, .nucleus-page-list li span
     {
       padding: 4px !important;
       font-size: inherit !important;
       flex-grow: 1 !important;
-      text-decoration: none !important;
-      color: inherit !important;
+      text-decoration: none !important;      
     }
 
 .nucleus-admin-content .nucleus-editor-panel

@@ -14,11 +14,12 @@ relevant Javascript and/or CSS files.
 ## Settings Views
 Settings pages are displayed within the Nucleus administrative user interface.  They are Razor views which render partial HTML.
 
-> This example is from the ==Accept Terms== module.  Some elements have been removed for brevity.
+> This example is from the ==Accept Terms== module ([source code](https://github.com/Inventua/nucleus-core/tree/main/Nucleus.Core.Modules/Nucleus.Modules.AcceptTerms)). 
+Some elements have been removed for brevity.
 
 ```
 @model Nucleus.Modules.AcceptTerms.ViewModels.Settings
-@Html.AddStyle("~!/../settings.css")
+@Html.AddStyle("~#/settings.css")
 @using (Html.BeginNucleusForm("Settings", "AcceptTerms", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
   <fieldset role="group" aria-labelledby="heading">
@@ -46,27 +47,30 @@ Settings pages are displayed within the Nucleus administrative user interface.  
 }
 ```
 
+> The ``nucleus-flex-fields`` CSS class displays settings controls side-by-side on large screens, and automatically adapts to small screens like tables 
+or phones by positioning settings vertically.
+
 ### Adding stylesheets
 Use the [AddStyle](/api-documentation/Nucleus.ViewFeatures.HtmlHelpers.AddStyleHtmlHelper/#mnu-Nucleus-ViewFeatures-HtmlHelpers-AddStyleHtmlHelper) 
 Html helper to add styles to your module output.  By using `AddStyle`, Nucleus can add your styles in the Html `<head>` element, 
-can merge style sheets, and will use the minified versions of your style sheets when configured to do so.
+can prevent duplicates, and will use the minified versions of your style sheets when configured to do so.
 
 ```
-@Html.AddStyle("~!/../settings.css")
+@Html.AddStyle("~#/settings.css")
 ```
 
 > The `AddStyle` Html helper recognizes special value prefixes in your script path.  The `~!` prefix represents the currently executing view path, 
-and `~#` represents the root path for the currently executing extension (`/extensions/your-extension`).
+and `~#` represents the root path for the currently executing extension (`/Extensions/your-extension-folder`).
 
 ### Headings
-In a ==Settings== view, the contents of any header element with the class `nucleus-modal-caption` are copied to the header of the modal dialog which
-is displayed to contain your settings view, and is then removed from the document.
+In a ==Settings== view, the contents of any header element with the class `nucleus-modal-caption` are automatically copied to the header of the modal 
+dialog which is displayed to contain your settings view, and is then removed from the document.
 ```
 <h1 class="nucleus-modal-caption">Documents Settings</h1>
 ```
 
 ### BeginNucleusForm
-The BeginNucleusForm Html helper is similar to the asp.net BeginForm Html helper.  It creates a `<form>` tag which routes to an extension controller 
+The BeginNucleusForm Html helper is similar to the ASP.net BeginForm Html helper.  It creates a `<form>` tag which routes to an extension controller 
 action (that is, the form has a `formaction` attribute which starts with `/extensions/your-extension`).
 
 ```
@@ -107,7 +111,7 @@ element (using data-target) when your module is also capable of displaying the r
 controller must use [this.Context.LocalPath](https://www.nucleus-cms.com/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.Models.LocalPath/) to 
 parse additional elements from the path (url) to navigate within your module.
 
-### NucleusAction url helper
+### NucleusAction Url helper
 In your submit button(s), you can use `@Url.NucleusAction` to specify a `formaction` for your control.  Similar to `BeginNucleusForm`, the `NucleusAction` 
 url helper works like the asp.net `Action` helper, but generates a Url which routes to an extension controller action (that is, the url starts with 
 `/extensions/your-extension`).
@@ -116,11 +120,12 @@ url helper works like the asp.net `Action` helper, but generates a Url which rou
 <div class="nucleus-form-tools">
   @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "Documents", "Documents"), new { })
 </div>
-```
 
-> The example above uses the SubmitButton Html helper, which renders a `<button type='submit' class='btn btn-primary' formaction='value'/>` element.  If you 
-prefer not to use the SubmitButton Html helper you could achieve the same result with `<button type='submit' class='btn btn-primary' formaction='@Url.NucleusAction("SaveSettings", "Documents", "Documents")'/>`
+<div class="nucleus-form-tools">
+  <button type="submit" class='btn btn-primary' formaction="@Url.NucleusAction("SaveSettings", "Documents", "Documents")">Save Settings</button>
+</div>
+```
 
 ## Viewer Views
 ==Viewer== views are less constrained than ==Settings== views.  You can still use Nucleus Tag Helpers, Html Helpers and Url helpers, but depending on your
-module's functionality you may not need to.
+module's functionality you may choose not to.

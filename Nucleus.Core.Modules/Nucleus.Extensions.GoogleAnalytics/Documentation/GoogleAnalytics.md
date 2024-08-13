@@ -15,3 +15,4 @@ The Google Analytics extension settings are accessed in the `Manage` control pan
 |                     |                                                                                      |
 |---------------------|--------------------------------------------------------------------------------------|
 | Google Analytics ID | Enter your Google Analytics measurement ID.  If you want to temporarily disable Google Analytics reporting, set this entry to blank.  |
+| Don't track Administrator Users | Specifies that Analytics should not track activity when a sysem administrator or site administrator is logged in.  |

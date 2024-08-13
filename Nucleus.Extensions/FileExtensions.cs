@@ -71,7 +71,7 @@ namespace Nucleus.Extensions
 			}
 			else
 			{
-				if (mimeType.StartsWith("text/") && !mimeType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
+				if (addCharset && mimeType.StartsWith("text/") && !mimeType.Contains("utf-8", StringComparison.OrdinalIgnoreCase))
 				{
 					mimeType += "; charset=utf-8";
 				}

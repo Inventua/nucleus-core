@@ -1,22 +1,20 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Nucleus.Abstractions;
-using Nucleus.Abstractions.Models;
-using Nucleus.Abstractions.Models.FileSystem;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nucleus.XmlDocumentation.Models;
-using Nucleus.XmlDocumentation.Models.Serialization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Models.FileSystem;
 using Nucleus.Extensions;
+using Nucleus.XmlDocumentation.Models;
 
 namespace Nucleus.XmlDocumentation.Controllers
 {
-	[Extension("XmlDocumentation")]
+  [Extension("XmlDocumentation")]
 	public class XmlDocumentationController : Controller
 	{
 		internal const string MODULESETTING_DOCUMENTATION_FOLDER_ID = "xmldocumentation:folderid";
@@ -92,7 +90,7 @@ namespace Nucleus.XmlDocumentation.Controllers
 
 						foreach (File xmlDocument in documentationFolder.Files)
 						{
-							DocumentationParser parser = new(this.FileSystemManager,this.Context.Site, xmlDocument);
+							DocumentationParser parser = new(this.FileSystemManager, this.Context.Site, xmlDocument);
 							if (parser.IsValid)
 							{
 								results.Add(parser.Document);

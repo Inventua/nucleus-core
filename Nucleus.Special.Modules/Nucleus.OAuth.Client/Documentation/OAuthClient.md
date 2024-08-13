@@ -49,10 +49,10 @@ start remote authentication is `https://your-site/extensions/oauthclient/authent
 OAuth provider entry which does not have a name.
 
 ## Configuration
-OAuth providers are configured in the Nucleus:OAuthProviders section in a .json configuration file.  This is typically appSettings.[environment].json, but you can use a
+OAuth providers are configured in the Nucleus:OAuthProviders section in a .json configuration file.  This is typically appSettings.Production.json or appSettings.Development.json, but you can use a
 [different file](/configuration-files/) if you want to.
 
-> The Google, Facebook, Twitter and Microsoft Account services have pre-configued default settings, so you only need to configure the client id and client secret that you generate using the 
+> The Google, Facebook, Twitter and Microsoft Account services have pre-configured default settings, so you only need to configure the client id and client secret that you generate using the 
 OAuth service's web site tools.  [Click here](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social#setup-login-providers-required-by-your-application)
 for instructions on how to use their web sites to generate client credentials.  Most OAuth services need for you to enter your Redirect URI, which is 
 `https://your-site/extensions/oauthclient/callback/providerName`, where providerName is the name of an entry in your configuration file, or is the type of an 
@@ -60,7 +60,7 @@ OAuth provider entry which does not have a name.
 
 > The Twitter OAuth2 service does not return the user's email address.  If you need the user's email address, don't allow users to login using Twitter.
 
-> The Nucleus OAuth Server example above uses the generic `OAuth` provider, which can also be used to use other OAuth services.
+> If you are using the Nucleus OAuth Server or another OAuth service that doesn't have built-in settings, use the type `OAuth`.
 
 ### Configuration Settings
 
@@ -127,19 +127,36 @@ represents roles, and you will need a `MapJsonKeys` entry for it if you want to 
   {
     "Type": "OAuth",
     "Name": "Some other Server",
-    "FriendlyName": "My Nucleus OAuth Server",
+    "FriendlyName": "Another OAuth Service",
     "AuthorizationEndpoint": "https://site-url/oauth2/authorize",
     "TokenEndpoint": "https://site-url/oauth2/token",
     "UserInformationEndpoint": "https://site-url/oauth2/userinfo",
     "ClientId": "your-clientid-here",
     "ClientSecret": "your-secret-here",
     "MapJsonKeys": [
-      { "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", "jsonKey": "user.name" },
-      { "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname", "jsonKey": "user.firstname" },
-      { "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", "jsonKey": "user.lastname" },
-      { "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", "jsonKey": "user.username" },
-      { "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", "jsonKey": "user.email" },
-      { "claimtype": "http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "jsonKey": "user.roles" }
+      { 
+        "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", 
+        "jsonKey": "user.name" },
+      { 
+        "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname", 
+        "jsonKey": "user.firstname" 
+      },
+      { 
+        "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname", 
+        "jsonKey": "user.lastname" 
+      },
+      { 
+        "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", 
+        "jsonKey": "user.username" 
+      },
+      { 
+        "claimtype": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", 
+        "jsonKey": "user.email" 
+      },
+      { 
+        "claimtype": "http://schemas.microsoft.com/ws/2008/06/identity/claims/role", 
+        "jsonKey": "user.roles" 
+      }
     ],
     "Scope": [ "OAuth2" ]
   }

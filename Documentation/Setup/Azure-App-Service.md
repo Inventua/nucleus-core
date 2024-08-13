@@ -1,33 +1,33 @@
-# Hosting in Azure App Service
+# Set up Nucleus in Azure App Service
 
 See also: 
-- [Installing Nucleus in Windows](/manage/hosting/windows/)
-- [Installing Nucleus in Linux](/manage/hosting/linux/) 
-- [Installing Nucleus in a Docker Container](/manage/hosting/docker/)
+- [Set up Nucleus in Windows](/manage/hosting/windows/)
+- [Set up Nucleus in Linux](/manage/hosting/linux/) 
+- [Set up Nucleus in a Docker Container](/manage/hosting/docker/)
 
 1. If you don't already have one, [create an Azure free account](https://azure.microsoft.com/en-au/free). The free App Service tier isn't 
 appropriate for a production site, but you can use it to get started, and upgrade your App Service tier later.
 
-2. Sign in to the [Azure portal](https://portal.azure.com/), click "App Services" and create an App service.
+2. Sign in to the [Azure portal](https://portal.azure.com/), click "App Services" and create an App service. Choose .NET 8 and 64-bit when prompted.
 
 3. Identify your app service IP address. In the Azure portal App services page, click your App Service, then choose the 
-"Networking" option under "Settings". The IP address is displayed as "Inbound Address". Copy the IP address, you will need this 
+""Networking"" option under ""Settings"". The IP address is displayed as "Inbound Address". Copy the IP address, you will need this 
 value for step 6.
 
-4. Select the "Configuration" menu item for your App Service, then click the "Default documents" link at the top of the 
+4. Select the ""Configuration"" menu item (in ""Settings""), then click the ""Default documents"" link at the top of the 
 page. Remove all of the default documents, and add a single "/" default document. Click Save at the top of the page.
 
 5. Return to the Azure portal home page, click "SQL Databases" and create a database.
 
 6. In the Azure portal SQL databases page, select your database, and click the "Set server firewall" link at the top of the 
-page. Add the IP address that you collected in step 3, then click "Save" at the top of the page.
+page. Add the IP address that you collected in step 3, then click ""Save"" at the top of the page.
 
-7. Get your database connection information by clicking the "Connection strings" link. Note that the connection string 
+7. Get your database connection information by clicking the ""Connection strings"" link. Note that the connection string 
 password is not set in the displayed connection string - you must substitute the password that you entered when you created the
-database. The connection string is required for step 10.
+database. The connection string is required later, in the Nucleus Setup Wizard.
 
 8. Connect to your App service using an FTP client. You can get your FTP credentials and endpoint by using the 
-"Deployment Center" option after selecting your App Service. Click the "FTPS credentials" link at the top of the page to view 
+""Deployment Center"" option after selecting your App Service. Click the ""FTPS credentials"" link at the top of the page to view 
 FTP information.
 
 9. Download the install set (zip format) from the [downloads](/downloads) page. For a new installation, you will need to download the 
@@ -37,7 +37,7 @@ Nucleus.[version].Install-win_x64.zip file.
 
 11. Create an Azure storage account.
 
-12. In Azure Portal, open your storage account, select "Access Keys" from the "Security+Networking" submenu and click the "Show Keys"
+12. In Azure Portal, open your storage account, select ""Access Keys"" from the ""Security+Networking"" submenu and click the ""Show Keys""
 link. Click the copy button next to the first connection string to copy it to the clipboard.
 
 13. Nucleus writes logs, cache and other files to sub-folders of `%ProgramData%\Nucleus` by default. In Windows, this 
@@ -65,7 +65,10 @@ storage.
 14. Get your site Url from the Azure portal by clicking "App services", then select your App Service. Click the site Url to 
 launch your site to, [run the setup wizard](/getting-started/#setup-wizard).
 
+[Click here](/getting-started/#setup-wizard) to return to the **Installing Nucleus** page.
+
 ## Troubleshooting
-If the site does not launch or returns an error, click the "App Service Logs" option in Azure Portal. Enable 
-Application Logging(Filesystem) and Web Server logging, then click "Log Stream" (in the left-hand menu). Try to open your site
-again, and error details will be shown in the Log Stream page.
+If your App Service does not launch or returns an error:
+- First, try stopping and starting your App Service.
+- View Application Logs. Select your App Service, then click the ""App Service Logs"" option in the ""Monitoring"" menu in in Azure Portal. Enable Application 
+Logging(Filesystem) and Web Server logging, then click "Log Stream". Try to browse to your site again, and error details will be shown in the Log Stream page.

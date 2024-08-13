@@ -4,10 +4,13 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
 @Html.AddStyle("~!/../settings.css")
-<table class="Contents">
+<table class="table table-sm table-borderless table-striped Contents">
+  <thead>
 	<tr>
-		<th>Title</th>
+		<th colspan="5">Title</th>
 	</tr>
+  </thead>
+  <tbody>
 	@for (int contentCount = 0; contentCount < Model.Contents.Count; contentCount++)
 	{
 		<tr>
@@ -32,4 +35,5 @@
 			</td>
 		</tr>
 	}
+  </tbody>
 </table>

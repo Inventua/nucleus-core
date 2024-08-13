@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package id="a0b382dc-2e07-4573-9f58-4f7c3bac989e" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
   <name>Static Content</name>
-  <version>2.0.0</version>
+  <version>2.0.1</version>
   <publisher name="Inventua" url="https://www.inventua.com/nucleus/" email="support@inventua.com" />
   <description>
     The Static Content module displays static content files inline in markdown, html or text file format, and can serve other supported file types as regular HTTP responses.

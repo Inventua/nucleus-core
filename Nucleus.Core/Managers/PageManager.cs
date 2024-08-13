@@ -275,7 +275,8 @@ public partial class PageManager : IPageManager
           if (isAnonymousOrAllUsers && !permissionType.IsPageViewPermission())
           {
             permission.AllowAccess = false;
-            permission.PermissionType = new() { Scope = PermissionType.PermissionScopeNamespaces.Disabled };
+            permission.IsDisabled = true;
+            permission.PermissionType = permissionType; // new() { Scope = PermissionType.PermissionScopeNamespaces.Disabled };
           }
           else
           {

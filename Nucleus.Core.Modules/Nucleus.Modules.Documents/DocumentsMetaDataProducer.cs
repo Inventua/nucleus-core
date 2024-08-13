@@ -105,14 +105,16 @@ namespace Nucleus.Modules.Documents
 					Scope = Models.Document.URN,
           Type = "Document",
 					Roles = await GetViewRoles(page, module),
-					ContentType = "text/html"
+					ContentType = "application/octet-stream"
 				};
 
 				// include the linked file as content
 				using (System.IO.Stream responseStream = await this.FileSystemManager.GetFileContents(site, document.File))
 				{
+          documentContentItem.ContentType = document.File.GetMIMEType(false);
+
 					documentContentItem.Content = new byte[responseStream.Length];
-					responseStream.Read(documentContentItem.Content, 0, documentContentItem.Content.Length);
+          responseStream.Read(documentContentItem.Content, 0, documentContentItem.Content.Length);
 					responseStream.Close();
 				}
 

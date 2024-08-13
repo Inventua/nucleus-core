@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using ClosedXML.Excel;
 using System.Reflection;
+using ClosedXML.Excel;
 
 namespace Nucleus.Extensions.Excel
 {
@@ -19,6 +17,7 @@ namespace Nucleus.Extensions.Excel
     /// <summary>
     /// Use this constructor if you want to set up columns manually using the <see cref="ExcelWorksheet.AddColumn(PropertyInfo)"/> method.
     /// </summary>
+    /// <param name="input"></param>
     public ExcelReader(System.IO.Stream input) : this(input, Modes.IncludeSpecifiedPropertiesOnly, Array.Empty<string>()) { }
 
     /// <summary>
@@ -186,7 +185,7 @@ namespace Nucleus.Extensions.Excel
     }
 
     /// <summary>
-    /// Return the spreadsheet as a stream.
+    /// Read a spreadsheet from the specified stream.
     /// </summary>
     /// <returns></returns>
     public void SetInputStream(System.IO.Stream stream)
@@ -196,7 +195,7 @@ namespace Nucleus.Extensions.Excel
     }
 
     /// <summary>
-    /// Read the heading row and reset the row index to the first data row.
+    /// Read the heading row and set the row index to the first data row.
     /// </summary>
     public void ReadHeadingRow()
     {
@@ -220,7 +219,7 @@ namespace Nucleus.Extensions.Excel
     }
 
     /// <summary>
-    /// Write the specified values to the next row of the current worksheet.
+    /// Read the next row of the current worksheet and return an object array containing the values.
     /// </summary>
     /// <exception cref="ArgumentException"></exception>
     public object[] ReadRow()

@@ -51,7 +51,7 @@ namespace Nucleus.Core.Layout
 			{
 				if (!context.Response.Headers.ContainsKey(name))
 				{
-					if (context.Request.Headers.Accept.Contains("text/html") || !IsHtmlOnlyHeader(name))
+					if (context.Request.Headers.Accept.Any(acceptHeader => acceptHeader.Contains("text/html")) || !IsHtmlOnlyHeader(name))
 					{
 						context.Response.Headers.Append(name, value);
 					}

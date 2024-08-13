@@ -1,6 +1,6 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.FileSystem
 @using Nucleus.Abstractions.Models
-@using (Html.BeginAreaForm("SaveFolderSettings", "FileSystem", "Admin", new { @id = Model.Folder.Path }, FormMethod.Post, new { @data_target = "form.parent()" }))
+@using (Html.BeginAreaForm("SaveFolderSettings", "FileSystem", "Admin", FormMethod.Post, new { @data_target = "form.parent()" }))
 {	
 	<h2 class="nucleus-modal-caption">Folder Settings</h2>
 	<Tab>

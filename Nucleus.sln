@@ -251,6 +251,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configurat
 		Documentation\Configuration\Users.png = Documentation\Configuration\Users.png
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Extensions.AzureSearch", "Nucleus.Core.Modules\Nucleus.Extensions.AzureSearch\Nucleus.Extensions.AzureSearch.csproj", "{D171C245-5228-473B-BB1C-6D1F4AF7830D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -441,6 +443,10 @@ Global
 		{147FFD6B-1E2E-4E0B-BB4C-75C329D338C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{147FFD6B-1E2E-4E0B-BB4C-75C329D338C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{147FFD6B-1E2E-4E0B-BB4C-75C329D338C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D171C245-5228-473B-BB1C-6D1F4AF7830D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D171C245-5228-473B-BB1C-6D1F4AF7830D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D171C245-5228-473B-BB1C-6D1F4AF7830D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D171C245-5228-473B-BB1C-6D1F4AF7830D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -489,6 +495,7 @@ Global
 		{675D5641-BDF7-4B51-80BB-326A75EBBAF9} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{104CB2EC-C0BD-457B-BA13-8172BCC868E5} = {800D8125-BD40-410A-B1E9-C1E62224DC03}
 		{E16AB101-25E6-482A-B4A2-EAAC19656C8A} = {800D8125-BD40-410A-B1E9-C1E62224DC03}
+		{D171C245-5228-473B-BB1C-6D1F4AF7830D} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D84CD364-9C8E-400E-84AA-45562061ED44}

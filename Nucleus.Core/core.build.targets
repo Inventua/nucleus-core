@@ -14,6 +14,11 @@
 		<Copyright>(c) Inventua Pty Ptd</Copyright>
 	</PropertyGroup>
 
+  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
+    <!-- Reference InheritDoc (https://github.com/saucecontrol/InheritDoc) for release builds -->
+    <PackageReference Include="SauceControl.InheritDoc" Version="2.*" PrivateAssets="all" />
+  </ItemGroup>
+  
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <!-- 
     Release mode only:
@@ -26,5 +31,9 @@
     --> 
     <BlazorWebAssemblyOmitDebugProxyOutput>true</BlazorWebAssemblyOmitDebugProxyOutput>
    
+    <!-- 
+    Enable InheritDoc (https://github.com/saucecontrol/InheritDoc) for release builds
+    -->
+    <InheritDocEnabled>true</InheritDocEnabled>
   </PropertyGroup>
 </Project>

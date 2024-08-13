@@ -50,7 +50,7 @@
     </None>
     <None Include="license.txt" Pack="true" PackagePath="" />
   </ItemGroup>
-  <Target Name="GetPackageAssemblies" AfterTargets="PostBuildEvent">
+  <Target Name="GetPackageAssemblies" AfterTargets="CopyFilesToOutputDirectory">
     <Copy SourceFiles="bin\$(Configuration)\$(TargetFramework)\Nucleus.Abstractions.xml" DestinationFolder="$(SolutionDir)\..\Publish\XmlDocumentation" Retries="2" />
   </Target>
 

@@ -65,7 +65,7 @@ storage.
 14. Get your site Url from the Azure portal by clicking "App services", then select your App Service. Click the site Url to 
 launch your site to, [run the setup wizard](/getting-started/#setup-wizard).
 
-[Click here](/getting-started/#setup-wizard) to return to the **Installing Nucleus** page.
+[Return to the Installing Nucleus page](/getting-started/#setup-wizard) to continue. 
 
 ## Troubleshooting
 If your App Service does not launch or returns an error:

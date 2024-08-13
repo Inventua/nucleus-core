@@ -24,37 +24,32 @@ Nucleus.[version].Install-win_x64.zip file.
 
    3. At the prompt, navigate to your installation directory using the `CD` command:
       ```
-      cd c:\Nucleus
-   
+      cd c:\Nucleus  
       ```
 
    4. Run the Powershell script:
       ```
-      .\nucleus-install.ps1
-
+      .\nucleus-install.ps1  
       ```
       Follow the prompts to install Nucleus. Once the script is complete, open a web browser and enter the IP address of your server, or its host name.  When you use Internet 
       Information Services (IIS) in Windows, the default port is 80, so you don't need to specify a port in your web browser.
 
       ```
       http://host-name
-      ```
 
-      ```
       http://ip-address
       ```
       
-      The [Setup Wizard](/getting-started/#setup-wizard) will run.
+      The [Setup Wizard](/getting-started/#setup-wizard) will run.  
 
-      [Click here](/getting-started/#setup-wizard) to return to the **Installing Nucleus** page.
+      [Return to the Installing Nucleus page](/getting-started/#setup-wizard) to continue. 
 
       #### Powershell script command-line options
-      You can optionally specify command-line options for the PowerShell script. For a new installation you will not generally need to specify any command-line options. You can 
+      > You can optionally specify command-line options for the PowerShell script. For a new installation you will not generally need to specify any command-line options. You can 
       view command-line options with the "Get-Help" command:
  
       ```
-      Get-Help .\nucleus-install.ps1 
-
+      Get-Help .\nucleus-install.ps1  
       ```
 
       {.table-25-75}
@@ -99,17 +94,15 @@ You can use the command-line command:
 <kbd>ICACLS "[your-installation-folder]\\*.Production.json" /grant "IIS AppPool\\[AppPool Name]:RM"</kbd>  
 If you are setting up a development environment, replace `Production` with `Development`. 
 
-   7. Once the script is complete, open a web browser and enter the IP address of your server, or its host name.  When you use Internet 
+   7.  Open a web browser and enter the IP address of your server, or its host name.  When you use Internet 
       Information Services (IIS) in Windows, the default port is 80, so you don't need to specify a port in your web browser.
 
       ```
       http://host-name
-      ```
 
-      ```
       http://ip-address
       ```
       
-      The [Setup Wizard](/getting-started/#setup-wizard) will run.
+      The [Setup Wizard](/getting-started/#setup-wizard) will run.  
 
-[Click here](/getting-started/#setup-wizard) to return to the **Installing Nucleus** page.
+[Return to the Installing Nucleus page](/getting-started/#setup-wizard) to continue. 

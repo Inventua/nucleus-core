@@ -59,4 +59,4 @@ The `docker run` command above will automatically start the container. If it is 
 ## Run Nucleus
 Browse to [http://localhost:8090](http://localhost:8090). The first time you browse to Nucleus, it will run the [Setup Wizard](/getting-started/#setup-wizard).
 
-[Click here](/getting-started/#setup-wizard) to return to the **Installing Nucleus** page.
+[Return to the Installing Nucleus page](/getting-started/#setup-wizard) to continue. 

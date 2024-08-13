@@ -91,7 +91,7 @@ Open a web browser and enter the IP address of your server, or its host name.  B
     http://ip-address:5000
     ```
 
-[Click here](/getting-started/#setup-wizard) to return to the **Installing Nucleus** page.
+[Return to the Installing Nucleus page](/getting-started/#setup-wizard) to continue. 
 
 ## Extended Configuration
 

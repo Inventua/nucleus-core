@@ -9,7 +9,7 @@ using Nucleus.Abstractions.Models.Mail;
 namespace Nucleus.Abstractions.Mail;
 
 /// <summary>
-/// Base implementation of IMailClient which includes an implementation of the <see cref="Site"/> property, and shared methods used to create emails.
+/// Base implementation of <see cref="IMailClient"/> which includes an implementation of the <see cref="Site"/> property, and shared methods used to create emails.
 /// </summary>
 public abstract class MailClientBase : IMailClient
 {
@@ -31,22 +31,22 @@ public abstract class MailClientBase : IMailClient
   /// Return the extended settings type for the mail client.
   /// </summary>
   /// <remarks>
-  /// Return null if there is no settings view for the mail client.
+  /// Returns null if there is no settings view for the mail client.
   /// </remarks>
   public abstract IMailSettings GetSettings(Site site);
 
   /// <summary>
   /// Save the settings for the mail client.
   /// </summary>
-  /// <remarks>
-  /// Return null if there is no settings view for the mail client.
-  /// </remarks>
   public abstract void SetSettings(Site site, IMailSettings settings);
 
   /// <summary>
-  /// returns a style element (as a string) containing default mail css.
+  /// Returns a style element (as a string) containing default mail css.
   /// </summary>
   /// <returns></returns>
+  /// <remarks>
+  /// The returned style element is added to the lt;head&gt; element of generated emails.
+  /// </remarks>
   public string BuildDefaultCss()
   {
     Type type = typeof(MailClientBase);

@@ -23,19 +23,23 @@ namespace Nucleus.Abstractions.Managers
   /// <seealso href="https://www.nucleus-cms.com/developers/caching-data/">Caching Data</seealso>
   public interface ICacheManager
 	{
-		/// <summary>
-		/// Get the Cache collection for the specified type and entity, or create and add a new one if it does not exist.
-		/// </summary>
-		/// <typeparam name="TKey"></typeparam>
-		/// <typeparam name="TModel"></typeparam>
-		/// <returns></returns>
-		/// <remarks>
-		/// Cache options for the specified entity are automatically read from configuration.  The configuration file key is 
-		/// Nucleus:CacheOptions:[caller-name]Cache.  The caller should be an extension method, see 
-		/// <see href="https://www.nucleus-cms.com/developers/caching-data/">Caching Data</see> for details.
-		/// Get an instance of this class from dependency injection by including a parameter in your class constructor.
-		/// </remarks>
-		public CacheCollection<TKey, TModel> Get<TKey, TModel>([System.Runtime.CompilerServices.CallerMemberName] string caller = "Default");
+    /// <summary>
+    /// Get the Cache collection for the specified type and entity, or create and add a new one if it does not exist.
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TModel"></typeparam>
+    /// <param name="caller">
+    /// A name for the cache collection. This parameter uses the CallerMemberName attribute to get the name of the class which called the method, and the 
+    /// value is used in logging messages.
+    /// </param>
+    /// <returns></returns>
+    /// <remarks>
+    /// Cache options for the specified entity are automatically read from configuration.  The configuration file key is 
+    /// Nucleus:CacheOptions:[caller-name]Cache.  The caller should be an extension method, see 
+    /// <see href="https://www.nucleus-cms.com/developers/caching-data/">Caching Data</see> for details.
+    /// Get an instance of this class from dependency injection by including a parameter in your class constructor.
+    /// </remarks>
+    public CacheCollection<TKey, TModel> Get<TKey, TModel>([System.Runtime.CompilerServices.CallerMemberName] string caller = "Default");
 
 		/// <summary>
 		/// Remove expired items from all caches.
@@ -43,7 +47,7 @@ namespace Nucleus.Abstractions.Managers
 		public void Collect();
 
     /// <summary>
-    /// Return a report containing the current state of all caches.
+    /// Report the current state of all caches.
     /// </summary>
     /// <returns></returns>
     public List<CacheReport> Report();

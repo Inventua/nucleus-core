@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Nucleus.Abstractions.Mail
 {
 	/// <summary>
-	/// Allows Nucleus core and extensions to sent email using SMTP.
+	/// Allows Nucleus core and extensions to sent email using a configured email provider.
 	/// </summary>
 	/// <remarks>
 	/// Use <see cref="IMailClientFactory.Create(Site)"/> to create an instance of this class.

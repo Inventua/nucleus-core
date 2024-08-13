@@ -1,18 +1,19 @@
 ﻿using Nucleus.Abstractions.Models;
 
-namespace Nucleus.Abstractions.Mail
+namespace Nucleus.Abstractions.Mail;
+
+/// <summary>
+/// Creates instances of IMailClient
+/// </summary>
+public interface IMailClientFactory
 {
   /// <summary>
-  /// Creates instances of IMailClient
+  /// Create a new mail client. The mail provider type is that which is configured for the specifed site.
   /// </summary>
-  public interface IMailClientFactory
-	{
-		/// <summary>
-		/// Create a new instance of the <see cref="IMailClient"/> class for the specifed site.
-		/// </summary>
-		/// <param name="site"></param>
-		/// <returns></returns>
+  /// <param name="site"></param>
+  /// <returns>
+  /// A new instance of <see cref="IMailClient"/>.
+  /// </returns>
 
-		public IMailClient Create(Site site);
-	}
+  public IMailClient Create(Site site);
 }

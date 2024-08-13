@@ -12,7 +12,6 @@ process has been tested with [*Ubuntu Server 24.04*](https://ubuntu.com/download
 Set up your Linux environment.  There are many options for setting up Linux, including: 
 - [Install Ubuntu](https://ubuntu.com/server/docs/installation) on a standalone computer.  
 - Use the [Raspberry Pi Imager](https://www.raspberrypi.com/software/) to [install Ubuntu for Raspberry Pi](https://ubuntu.com/download/raspberry-pi) to an SD card.  
-**_TIP:_**  In the Raspberry Pi imager, use the Settings icon (gear symbol) to set up your host name, SSH and admin credentials automatically.
 - [Create a Linux virtual machine in Azure](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/quick-create-portal).  
 Choose Ubuntu Server 24.04 LTS or later when you are prompted for an Image.
 - [Create a Linux virtual machine in Amazon Web Services](https://aws.amazon.com/getting-started/hands-on/launch-a-virtual-machine/).  
@@ -35,17 +34,17 @@ connect from another computer:
 <kbd>cd nucleus-install-files</kbd>
 
 3.  Download the installer shell script:  
-<kbd>wget https://raw.githubusercontent.com/Inventua/nucleus-core/main/Nucleus.Web/Utils/Ubuntu/nucleus-install.sh > nucleus-install.sh</kbd>
+<kbd>wget https://raw.githubusercontent.com/Inventua/nucleus-core/main/Nucleus.Web/Utils/Ubuntu/nucleus-install.sh</kbd>
 
 4.  Download the installation set:  
-    ### x64
-    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-linux_x64.zip > Nucleus.2.0.0.0.Install-linux_x64.zip</kbd>  
+    #### x64
+    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-linux_x64.zip</kbd>  
 
-    ### Arm64 (for example: Raspberry Pi 3, 4, 5)
-    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-linux_arm64.zip > Nucleus.2.0.0.0.Install-linux_arm64.zip</kbd>  
+    #### Arm64 (for example: Raspberry Pi 3, 4, 5)
+    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-linux_arm64.zip</kbd>  
 
-    ### Portable (other runtime environments: for example: MacOS)
-    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-portable.zip > Nucleus.2.0.0.0.Install-portable.zip</kbd>  
+    #### Portable (other runtime environments: for example: MacOS)
+    <kbd>wget https://github.com/Inventua/nucleus-core/releases/download/v2.0.0/Nucleus.2.0.0.0.Install-portable.zip</kbd>  
 
     If you are installing a later version of Nucleus, download the zip file for that version instead - the installer shell script automatically 
 checks the folder which contains the shell script for the zip file with the most recent version of Nucleus. 
@@ -68,33 +67,32 @@ before running the script:
 <br />
 <br />
 
-### Shell script command-line options
-For a fresh install you will not generally need to specify any command-line options.  
+    ### Custom installation
+    > For a fresh install you will not generally need to specify any command-line options.  
 
-|                                  |                                                             |
-|----------------------------------|--------------------------------------------------------------------------------------|
-| -u, --createuser                 | Use `--createuser false` to prevent the `nucleus-service` user from being created.  You should only use this option if the user has already been created.  |
-| -d, --createdirectories          | Use `--createdirectories false` to prevent creation of the `/home/nucleus`, `/home/nucleus/app` and /home/nucleus/data directories.  This also prevents the commands which set the correct owner and permissions to directories.   |
-| -z, --zipfile                    | Override auto-detection of the Nucleus install zip file name and specify the file to use.  |
-| -t,  --target-directory          | Override the default application path (/home/nucleus).  If used in combination with `--createuser true` (the default), the specified directory will be assigned as the user's home directory.    |
+    #### Shell script command-line options
+    |                                  |                                                             |
+    |----------------------------------|--------------------------------------------------------------------------------------|
+    | -u, --createuser                 | Use `--createuser false` to prevent the `nucleus-service` user from being created.  You should only use this option if the user has already been created.  |
+    | -d, --createdirectories          | Use `--createdirectories false` to prevent creation of the `/home/nucleus`, `/home/nucleus/app` and /home/nucleus/data directories.  This also prevents the commands which set the correct owner and permissions to directories.   |
+    | -z, --zipfile                    | Override auto-detection of the Nucleus install zip file name and specify the file to use.  |
+    | -t,  --target-directory          | Override the default application path (/home/nucleus).  If used in combination with `--createuser true` (the default), the specified directory will be assigned as the user's home directory.    |
 
-Example:  
-<kbd>sudo bash ./nucleus-install.sh --zipfile Nucleus.1.3.0.0.Install.zip --target-directory /home/services/nucleus-production</kbd>
-
+    Example:  
+    To install to the `/home/services/nucleus-production` folder instead of using the default folder: 
+    <kbd>sudo bash ./nucleus-install.sh --zipfile Nucleus.2.0.0.0.Install.zip --target-directory /home/services/nucleus-production</kbd>
 
 6. Once you have completed this process, [run the setup wizard](/getting-started/#setup-wizard).
 Use the IP address of your server, or its host name.  By default, Nucleus is configured to use http on port 5000.
 
-```
-http://host-name:5000
-```
-
-```
-http://ip-address:5000
-```
+    ```
+    http://host-name:5000
+    
+    http://ip-address:5000
+    ```
 
 
-## Extended configuration
+## Extended Configuration
 
 ### Set up a reverse proxy 
 Depending on your environment and objectives, you may need to configure a reverse proxy server.  Refer to ['When to use Kestrel with a reverse proxy'](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/when-to-use-a-reverse-proxy) 

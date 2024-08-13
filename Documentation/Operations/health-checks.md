@@ -2,14 +2,14 @@
 Health checks are exposed by Nucleus as HTTP endpoints. Health checks can be used by load balancers and other infrastructure components to check the 
 status of Nucleus on a server.
 
-> Health checks are not enabled by default.  See the [Configuration](#configuration) section below for instructions.
+> Health checks are not enabled by default.  See the [Configuration](/manage/operations/health-checks/#configuration) section below for instructions.
 
 Three health checks are available:
 
 {.table-25-75}
 |                      |                                                                                               |
 |----------------------|-----------------------------------------------------------------------------------------------|
-| Live                 | Checks that Nucleus can respond to HTTP requests.  The default endpoint is `/_live`. The *Live* check doesn't check anything, and always returns a `Healthy` status.             |  
+| Live                 | Checks that Nucleus can respond to HTTP requests.  The default endpoint is `/_live`. The *Live* check doesn't check anything, and always returns a `Healthy` status if Nucleus is running.             |  
 | Ready                | Checks that Nucleus has completed its startup process. The default endpoint is `/_ready`. The *Ready* check returns a `Degraded` status while Nucleus is starting, and a `Healthy` status once Nucleus has started.      |  
 | Health               | Performs a variety of health checks on Nucleus components. The default endpoint is `/_health`. The *Health* check calls all implementations of the [IHealthCheck](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.diagnostics.healthchecks.ihealthcheck) interface.  Nucleus Core implements a number of health checks and extensions may provide additional health checks. |  
 

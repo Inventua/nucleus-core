@@ -16,7 +16,7 @@ which is used to manage your site's Google Analytics ID.
   <editAction>Settings</editAction>
 </controlPanelExtensionDefinition>
 ```
-Replace {generate-guid} with your own GUID value.
+Replace \{generate-guid}\ with your own GUID value.
 
 #### Control Panel Extension Definition Values
 {.table-25-75}
@@ -40,4 +40,4 @@ as it increases the vertical space available for your settings view contents.
 a reference to the current [Context](/api-documentation/Nucleus.Abstractions.xml/Nucleus.Abstractions.Models.Context/) by including 
 it as a parameter in your controller constructor. Control Panel Extensions with a ==Global== scope need to implement their own data provider 
 to save settings to extension-specific database tables, because global settings don't belong to a specific site (control panel extensions 
-with a ==Site== scope can do this too, if required).  
+with a ==Site== scope can do this too, if required). See [Saving Settings](/developers/saving-settings/#site-settings) for more information.

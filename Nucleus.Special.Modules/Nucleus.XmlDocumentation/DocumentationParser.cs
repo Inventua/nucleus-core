@@ -55,6 +55,10 @@ public class DocumentationParser
         switch (apiMember.Type)
         {
           case ApiMember.MemberTypes.Namespace:
+            // when InheritDoc (https://github.com/saucecontrol/InheritDoc) is used, the namespace documentation is correctly set as type "Namespace"            
+            result.Namespace.Summary = apiMember.Summary;
+            result.Namespace.Remarks = apiMember.Remarks;
+            result.Namespace.Examples = apiMember.Examples;
             break;
 
           case ApiMember.MemberTypes.Class:
@@ -63,6 +67,7 @@ public class DocumentationParser
             // Special handling for namespace documentation
             if (apiMember.Name == "NamespaceDoc")
             {
+              // when InheritDoc (https://github.com/saucecontrol/InheritDoc) is NOT used, the namespace documentation is just a class named "NamespaceDoc"
               result.Namespace.Summary = apiMember.Summary;
               result.Namespace.Remarks = apiMember.Remarks;
               result.Namespace.Examples = apiMember.Examples;
@@ -690,8 +695,13 @@ public class DocumentationParser
     {
       ApiMember member = new(value);
 
-      if (!member.FullName.StartsWith(prefix))
-        return false;
+      if (member.Type == ApiMember.MemberTypes.Enum || member.Type == ApiMember.MemberTypes.Class || member.Type == ApiMember.MemberTypes.Interface)
+      {
+        if (!member.FullName.StartsWith(prefix))
+        {
+          return false;
+        }
+      }
     }
     return true;
   }

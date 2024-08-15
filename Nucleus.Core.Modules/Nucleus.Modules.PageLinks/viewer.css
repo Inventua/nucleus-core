@@ -15,6 +15,21 @@
   list-style-type: none;
 }
 
+.page-links.page-links-horizontal
+{
+  display: flex;
+  row-gap: var(--nucleus-default-gap-vertical);
+  column-gap: var(--nucleus-default-gap-horizontal);
+}
+ 
+.page-links.page-links-grid
+{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  row-gap: var(--nucleus-default-gap-vertical);
+  column-gap: var(--nucleus-default-gap-horizontal);
+}
+
 .page-links ol
 {
   list-style-type: none;
@@ -32,3 +47,4 @@ h1, h2, h3, h4, h5, h6
   background-color: var(--page-links-highlight-background-color)!important;
   transition: background-color ease-out var(--page-links-highlight-transition-duration);
 }
+

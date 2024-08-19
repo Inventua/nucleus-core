@@ -41,10 +41,16 @@ namespace Nucleus.Abstractions.Models.FileSystem
 		/// </summary>
 		public DateTime? DirectUrlExpiry { get; set; }
 
-		/// <summary>
-		/// Clear the file selection, leaving the provider and parent folder selection intact.
+    /// <summary>
+		/// The "raw" identifier for the file, provided by the file system provider. This is not guaranted to be a Url, it is a 
+    /// value used by the underlying provider as a unique Id for the file.
 		/// </summary>
-		public void ClearSelection()
+		public string RawUri { get; set; }
+
+    /// <summary>
+    /// Clear the file selection, leaving the provider and parent folder selection intact.
+    /// </summary>
+    public void ClearSelection()
 		{
 			this.Id = Guid.Empty;
 			this.Path = null;

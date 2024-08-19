@@ -134,9 +134,12 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 
 			try
 			{
-				BlobClient blobClient = new(this.Options.ConnectionString, pathUri.ContainerName, pathUri.Key);
-				Azure.Response<BlobProperties> response = await blobClient.GetPropertiesAsync();
-				return BuildFile(path, response.Value);
+        BlobServiceClient client = new(this.Options.ConnectionString);
+        BlobClient blobClient = new(this.Options.ConnectionString, pathUri.ContainerName, pathUri.Key);
+        
+        Azure.Response<BlobProperties> response = await blobClient.GetPropertiesAsync();
+        
+				return BuildFile(client.Uri, path, response.Value);
 			}
 			catch (Azure.RequestFailedException ex)
 			{
@@ -353,7 +356,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 								// Add file if it matches the specifed pattern
 								if (String.IsNullOrEmpty(pattern) || System.Text.RegularExpressions.Regex.IsMatch(item?.Blob.Name, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase))
 								{
-									folder.Files.Add(BuildFile(containerClient.Name, item.Blob));
+									folder.Files.Add(BuildFile(client.Uri, containerClient.Name, item.Blob));
 								}
 							}
 						}
@@ -402,8 +405,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 
 			await blobClient.UploadAsync(content, new BlobHttpHeaders { ContentType = mimeType, CacheControl = "max-age=3600" });
 
-			//return BuildFile(newObjectPath);
-			return BuildFile(pathUri);
+			return BuildFile(client.Uri, pathUri);
 		}
 			
 
@@ -419,7 +421,7 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 			}
 		}
 
-		private File BuildFile(PathUri path)
+		private File BuildFile(Uri providerUri, PathUri path)
 		{
 			return new File()
 			{
@@ -427,24 +429,26 @@ namespace Nucleus.Extensions.AzureBlobStorageFileSystemProvider
 				Path = path.RelativePath,
 				Name = path.DisplayName,
 				Parent = new Folder() { Provider = this.Key, Path = path.Parent.RelativePath },
+        RawUri = $"{providerUri}{path.FullPath}",
 				Capabilities = FileSystemCapabilities.File
 			};
 		}
 
-		private File BuildFile(string containerName, BlobItem fileItem)
+		private File BuildFile(System.Uri providerUri, string containerName, BlobItem fileItem)
 		{
 			PathUri path = new(this.RootPath, containerName, fileItem.Name);
-			File file = BuildFile(path);
-			file.DateModified = fileItem.Properties.LastModified.Value.UtcDateTime;
+			File file = BuildFile(providerUri, path);      
+      file.DateModified = fileItem.Properties.LastModified.Value.UtcDateTime;
 			file.Size = fileItem.Properties.ContentLength.Value;
 			return file;
 		}
 
-		private File BuildFile(string name, BlobProperties properties)
+		private File BuildFile(System.Uri providerUri, string name, BlobProperties properties)
 		{
 			PathUri path = new(this.RootPath, name);
-			File file = BuildFile(path);
-			file.DateModified = properties.LastModified.UtcDateTime;
+			File file = BuildFile(providerUri, path); 
+
+      file.DateModified = properties.LastModified.UtcDateTime;
 			file.Size = properties.ContentLength;
 			return file;
 		}

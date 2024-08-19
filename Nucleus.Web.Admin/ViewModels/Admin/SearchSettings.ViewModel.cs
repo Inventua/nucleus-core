@@ -12,7 +12,18 @@ namespace Nucleus.Web.ViewModels.Admin
 		public Boolean ClearIndex { get; set; }
 		public Boolean IndexPublicPagesOnly { get; set; }
     public Boolean IndexPublicFilesOnly { get; set; }
-
+    
     public Boolean IndexPagesUseSsl { get; set; } = true;
+
+    public List<AvailableSearchProvider> SearchProviders { get; set; }
+
+    public string DefaultSearchProvider { get; set; }
+
+    public class AvailableSearchProvider
+    {
+      public string Name { get; set; }
+      public string ClassName { get; set; }
+
+    }
   }
 }

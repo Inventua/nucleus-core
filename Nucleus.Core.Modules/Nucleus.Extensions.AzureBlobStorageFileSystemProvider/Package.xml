@@ -5,7 +5,7 @@
   <description>
 		Nucleus file system provider for Azure storage.
 	</description>
-  <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
+  <compatibility minVersion="2.0.0.1" maxVersion="2.*" />
   <components>
     <component folderName="AzureBlobStorageFileSystemProvider" optional="false">
       <file name="readme.txt" />

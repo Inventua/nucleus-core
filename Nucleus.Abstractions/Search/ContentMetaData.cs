@@ -28,15 +28,20 @@ namespace Nucleus.Abstractions.Search
 		/// </remarks>
 		public string Url { get; set; }
 
-
-		/// <summary>
-		/// Title for the resource.
+    /// <summary>
+		/// The "raw" identifier for the resource.  This is typically used for cloud-hosted files and is provided by the file system provider. 
+    /// This is not guaranted to be a Url, it is a value used by a search index underlying provider as a unique Id for the file.
 		/// </summary>
-		/// <remarks>
-		/// The title displayed in search results.  Title is optional, but highly recommended.  If the title is not set, the search result
-		/// will display the Url in place of a title.
-		/// </remarks>
-		public string Title { get; set; }
+		public string RawUri { get; set; }
+
+    /// <summary>
+    /// Title for the resource.
+    /// </summary>
+    /// <remarks>
+    /// The title displayed in search results.  Title is optional, but highly recommended.  If the title is not set, the search result
+    /// will display the Url in place of a title.
+    /// </remarks>
+    public string Title { get; set; }
 
 		/// <summary>
 		/// Short summary for the resource.

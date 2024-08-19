@@ -60,10 +60,15 @@ namespace Nucleus.Abstractions.Models
 			/// </summary>
 			public const string APIKEY_ID = "searchfeeder:apikey:id";
 
-			/// <summary>
-			/// API key for the search feeder to use for reading page content.
+      /// <summary>
+			/// The class name and assmebly of the selected default search provider.
 			/// </summary>
-			public const string CLEAR_INDEX = "searchfeeder:clear-index";
+			public const string DEFAULT_SEARCH_PROVIDER = "searchfeeder:default-search-provider";
+
+      /// <summary>
+      /// API key for the search feeder to use for reading page content.
+      /// </summary>
+      public const string CLEAR_INDEX = "searchfeeder:clear-index";
 
 			/// <summary>
 			/// Specifies whether to index pages which are not available for "all users"

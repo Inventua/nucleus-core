@@ -9,7 +9,7 @@
 		<h2 class="nucleus-modal-caption">Search Settings</h2>
 		
 		<SettingsControl caption="Search Provider" helptext="Select a search provider.">
-			@Html.DropDownListFor(model => model.SearchProvider, new SelectList(Model.SearchProviders, "ClassName", "Name", "(none)"))
+			@Html.DropDownListFor(model => model.SearchProvider, new SelectList(Model.SearchProviders, "ClassName", "Name"), "(default)")
 		</SettingsControl>
 
 		<fieldset role="group" aria-labelledby="heading">
@@ -18,6 +18,10 @@
 				<SettingsControl caption="Display Mode" helptext="Specify the search input controls display mode.">
 					@Html.DropDownListFor(model => model.DisplayMode, Html.GetEnumSelectList(typeof(Nucleus.Modules.Search.ViewModels.Settings.DisplayModes)))
 				</SettingsControl>
+
+        <SettingsControl caption="Search Mode" helptext="Specify whether search matches contain any or all terms in your search term.">
+          @Html.DropDownListFor(model => model.SearchMode, Html.GetEnumSelectList(typeof(Nucleus.Modules.Search.ViewModels.Settings.SearchModes)))
+        </SettingsControl>
 
 				<SettingsControl caption="Search Caption" helptext="Specifies the label displayed next to the search term.  This is only visible when display mode is set to 'Full'.">
 					@Html.TextBoxFor(model => model.SearchCaption, new {  })

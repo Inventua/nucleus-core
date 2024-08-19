@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Nucleus.Abstractions.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Authorization;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Logging;
+using Nucleus.Abstractions.Models;
+using Nucleus.Extensions.Authorization;
 
 namespace Nucleus.Data.EntityFramework;
 
@@ -112,6 +111,21 @@ public abstract class DbContext : Microsoft.EntityFrameworkCore.DbContext
       builder.ConfigureModuleEntities();
       builder.ConfigureFileSystemEntities();
     }
+  }
+
+  /// <summary>
+  /// Apply model conventions which apply to all entities.
+  /// </summary>
+  /// <param name="configurationBuilder"></param>
+  protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+  {
+    configurationBuilder
+        .Properties<DateTime>()
+        .HaveConversion<DateTimeUtcConverter>();
+
+    configurationBuilder
+        .Properties<DateTime?>()
+        .HaveConversion<NullableDateTimeUtcConverter>();
   }
 
   /// <summary>

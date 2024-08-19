@@ -127,9 +127,12 @@ public class FileSystemController : Controller
       return BadRequest("Search term is required.");
     }
 
-    ISearchProvider searchProvider = null;
-
-    searchProvider = this.SearchProviders.FirstOrDefault();
+    ISearchProvider searchProvider = this.SearchProviders.FirstOrDefault();
+    if (this.Context.Site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.DEFAULT_SEARCH_PROVIDER, out string defaultSearchProvider))
+    {
+      searchProvider = this.SearchProviders
+        .Where(provider => provider.GetType().FullName == defaultSearchProvider).FirstOrDefault() ?? this.SearchProviders.FirstOrDefault();
+    }
 
     if (searchProvider == null)
     {

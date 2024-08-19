@@ -294,6 +294,7 @@ namespace Nucleus.Data.EntityFramework
 				.Ignore(file => file.IsSelected)
 				.Ignore(file => file.Parent)
 				.Ignore(file => file.Size)
+        .Ignore(file => file.RawUri)
 				.Ignore(folder => folder.Capabilities);
 
 			// Add SiteId shadow property

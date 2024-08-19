@@ -3,15 +3,16 @@
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Extensions
+@using Nucleus.Modules.Search
 @using Nucleus.Modules.Search.ViewModels
-@Html.AddStyle("~!/../viewer.css")
-@Html.AddScript("~!/../viewer.js")
+@Html.AddStyle("~#/viewer.css")
+@Html.AddScript("~#/viewer.js")
 @using (Html.BeginNucleusForm("Suggest", "Search", "Search", FormMethod.Post, new { @data_target = ".search-suggestions", @role = "search", @data_resultsurl = Url.Content(Model.ResultsUrl) }))
 {
-	@Html.HiddenFor(model=>model.Settings.IncludeFiles)
-	@Html.HiddenFor(model=>model.Settings.IncludeScopes)
-	@Html.HiddenFor(model=>model.Settings.MaximumSuggestions)
-	@Html.HiddenFor(model=>model.Settings.SearchProvider)
+  @Html.HiddenFor(model => model.Settings.IncludeFiles)
+  @Html.HiddenFor(model => model.Settings.IncludeScopes)
+  @Html.HiddenFor(model => model.Settings.MaximumSuggestions)
+  @Html.HiddenFor(model => model.Settings.SearchProvider)
 
   <div class="search-display-@Model.Settings.DisplayMode.ToString().ToLower()">
     @if (Model.Settings.DisplayMode == Settings.DisplayModes.Full)
@@ -20,102 +21,87 @@
         <span class="text-nowrap">@Model.Settings.SearchCaption</span>
         @await Html.PartialAsync("_ViewerInput.cshtml", Model)
       </label>
-    }    
+    }
     else
     {
       @await Html.PartialAsync("_ViewerInput.cshtml", Model)
     }
   </div>
-	@if (Model.Settings.MaximumSuggestions > 0)
-	{
-		<div class="search-suggestions collapse@(Model.SearchResults?.Results?.Any() == true ? " show" : "")"></div>
-	}
+  @if (Model.Settings.MaximumSuggestions > 0)
+  {
+    <div class="search-suggestions collapse@(Model.SearchResults?.Results?.Any() == true ? " show" : "")"></div>
+  }
 }
 @if (Model.Settings.ResultsPageId == Guid.Empty)
 {
-	@if (Model.SearchResults != null)
-	{
-		@if (Model.SearchResults.Total == 0)
-		{
+  @if (Model.SearchResults != null)
+  {
+    @if (Model.SearchResults.Total == 0)
+    {
       <div>No results for '@Model.SearchTerm'@Html.Raw(".")</div>
-		}
-		else
-		{
-			<div>Displaying search results @(((Model.PagingSettings.CurrentPageIndex - 1) * @Model.PagingSettings.PageSize) + 1) to @Model.PagingSettings.LastDisplayedRowIndex of @Model.SearchResults.Total for '@Model.SearchTerm'@Html.Raw(".")</div>
-		}
-	}
+    }
+    else
+    {
+      <div>Displaying search results @(((Model.PagingSettings.CurrentPageIndex - 1) * @Model.PagingSettings.PageSize) + 1) to @Model.PagingSettings.LastDisplayedRowIndex of @Model.SearchResults.Total for '@Model.SearchTerm'@Html.Raw(".")</div>
+    }
+  }
 
-	@using (Html.BeginNucleusForm("Index", "Search", "Search", FormMethod.Post, new { @data_target = "form.parent()", @role = "search" }))
-	{
-		@Html.HiddenFor(model => model.SearchTerm, new { @id = ""})
-		@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.PagingSettings, propertyName = nameof(Model.PagingSettings) })
+  @using (Html.BeginNucleusForm("Index", "Search", "Search", FormMethod.Post, new { @data_target = "form.parent()", @role = "search" }))
+  {
+    @Html.HiddenFor(model => model.SearchTerm, new { @id = "" })
+    @await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.PagingSettings, propertyName = nameof(Model.PagingSettings) })
 
-		@if (Model.SearchResults?.Results?.Any() == true)
-		{
+    @if (Model.SearchResults?.Results?.Any() == true)
+    {
       <div class="search-results">
-			  @foreach (var result in Model.SearchResults.Results)
-			  {
-				  <div class="search-result">
+        @foreach (var result in Model.SearchResults.Results)
+        {
+          <div class="search-result">
             <div>
-              <a class="result-link" href="@Url.Content("~" + result.Url)" title="@result.Title?.Trim()">@result.Title?.Trim()</a>
+              <a class="result-link" href="@(result.Url.StartsWith('/') ? Url.Content("~" + result.Url) : result.Url)" title="@result.Title?.Trim()">@result.Title?.Trim()</a>
               @if (Model.Settings.ShowType && !String.IsNullOrEmpty(result.Type))
               {
                 <span class="fst-italic small text-muted result-type">@result.Type</span>
               }
-            </div>          
+            </div>
             @if (Model.Settings.ShowUrl)
-					  {
-						  <span class="fst-italic small result-url">@Url.GetAbsoluteUri(result.Url)</span>
-					  }
-					  @if ((Model.Settings.ShowPublishDate || Model.Settings.ShowSize) && (result.PublishedDate.HasValue || result.Size.HasValue))
-					  {
-						  <div class="text-muted small fst-italic result-meta">
-							  @if (Model.Settings.ShowPublishDate && result.PublishedDate.HasValue)
-							  {
-								  <span>Published: @result.PublishedDate.FormatDate(this.Context.Request.GetUserTimeZone())@Html.Raw(".")</span>
-							  }
+            {
+              <span class="fst-italic small result-url">@(result.Url.StartsWith('/') ? Url.GetAbsoluteUri(result.Url) : result.Url)</span>
+            }
+            @if ((Model.Settings.ShowPublishDate || Model.Settings.ShowSize) && (result.PublishedDate.HasValue || result.Size.HasValue))
+            {
+              <div class="text-muted small fst-italic result-meta">
+                @if (Model.Settings.ShowPublishDate && result.PublishedDate.HasValue)
+                {
+                  <span>Published: @result.PublishedDate.FormatDate(this.Context.Request.GetUserTimeZone())@Html.Raw(".")</span>
+                }
 
                 @if (Model.Settings.ShowSize && result.Size.HasValue && result.Scope == @Nucleus.Abstractions.Models.FileSystem.File.URN)
-							  {
-								  <span>@result.Size.FormatFileSize()</span>
-							  }
-						  </div>
-					  }
-
-					  @if (Model.Settings.ShowSummary && !String.IsNullOrEmpty(@result.Summary))
-					  {
-						  <div class="result-summary">@result.Summary</div>
-					  }
-					  @if (Model.Settings.ShowCategories && result.Categories != null && result.Categories.Any())
-					  {
-						  <ul class="list-inline comma-separated result-categories">
-							  @foreach (var category in result.Categories)
-							  {
-								  <li class="list-inline-item">@category.Name</li>
-							  }
-						  </ul>
-					  }
-
-            @{
-              double? assessmentCalculation = 0;
-              string assessmentText = "";
-
-              if (Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0 && result.Score.HasValue)
-              {
-                assessmentCalculation = result.Score / Model.SearchResults.MaxScore.Value * 100;
-                assessmentText = assessmentCalculation switch
                 {
-                  > 99 => "Best Match",
-                  > 75 => "Good Match",
-                  > 50 => "Medium Match",
-                  _ => "Low Match"
-                };
-              }
+                  <span>@result.Size.FormatFileSize()</span>
+                }
+              </div>
             }
-            @if ((Model.Settings.ShowScoreAssessment && Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0) || (Model.Settings.ShowScore && result.Score.HasValue && assessmentCalculation.HasValue))
+
+            @if (Model.Settings.ShowSummary && !String.IsNullOrEmpty(@result.Summary))
+            {
+              <div class="result-summary">@result.Summary</div>
+            }
+            @if (Model.Settings.ShowCategories && result.Categories != null && result.Categories.Any())
+            {
+              <ul class="list-inline comma-separated result-categories">
+                @foreach (var category in result.Categories)
+                {
+                  <li class="list-inline-item">@category.Name</li>
+                }
+              </ul>
+            }
+                        
+            @if (Model.Settings.ShowScore)
             {
               <span class="fw-light small result-score">
-                @if (Model.Settings.ShowScoreAssessment && Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0 && result.Score.HasValue)
+                @result.GetAssessment(Model.SearchResults.MaxScore, Model.Settings.ShowScoreAssessment).Text
+                @* @if (Model.Settings.ShowScoreAssessment && Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0 && result.Score.HasValue)
                 {
                   @assessmentText
                 }
@@ -123,25 +109,24 @@
                 {
                   <text> - </text>
                 }
-                @if (Model.Settings.ShowScore && assessmentCalculation.HasValue)
+                @if (Model.Settings.ShowScore && !String.IsNullOrEmpty(assessmentCalculationText))
                 {
                   <text>Score: </text>
-                  @assessmentCalculation.Value.ToString("0.0")
-                  <text>%</text>
-                }
+                  @assessmentCalculationText
+                } *@
               </span>
-            }          
-				  </div>
-			  }
+            }
+          </div>
+        }
       </div>
     }
-	}
+  }
 }
 <script>
   // position the suggestions drop-down below the search term text box
   try
   {
-    jQuery('.search-suggestions').each(function(index) 
+    jQuery('.search-suggestions').each(function (index)
     {
       var element = jQuery(this).parents('section').find('.search-term');
       if (element.length !== 0)
@@ -156,19 +141,19 @@
   }
 
   @if (!String.IsNullOrEmpty(Model.SearchTerm) && Model.SearchResults != null)
-  { 
+  {
     <text>
-    jQuery(document).ready(function ()
-    {
-      if (typeof gtag !== 'undefined')
+      jQuery(document).ready(function ()
       {
-        gtag('event', 'search', 
-        { 
-          'term': '@Model.SearchTerm', 
-          'total-results': @Model.SearchResults.Total 
-        });
-      }
-    });
+        if (typeof gtag !== 'undefined')
+        {
+          gtag('event', 'search',
+            {
+              'term': '@Model.SearchTerm',
+              'total-results': @Model.SearchResults.Total
+            });
+        }
+      });
     </text>
   }
 </script>

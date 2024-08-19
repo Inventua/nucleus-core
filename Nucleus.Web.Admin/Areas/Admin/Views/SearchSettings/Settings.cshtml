@@ -5,36 +5,40 @@
 @using Nucleus.Extensions;
 @using Nucleus.Extensions.Authorization
 <div class="nucleus-editor-panel">
-@using (Html.BeginAreaForm("Save", "SearchSettings", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
-{
-	<h1 class="nucleus-control-panel-heading">Search Settings</h1>
-	<fieldset role="group" aria-label="Search Settings">
-		<SettingsControl caption="Api Key" helptext="Select the API key used to access site pages when feeding the index.">
-			@Html.DropDownListFor(model => model.ApiKey.Id, new SelectList(Model.ApiKeys, "Id", "Name"), "(create)")
-		</SettingsControl>
-		
-		<SettingsControl caption="Clear Index before feed?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to clear search indexes at the start of the search feed process.  This leaves your search index temporarily empty while the search feed runs, but clears out potentially deleted entries.">
-			@Html.CheckBoxFor(model => model.ClearIndex, new { @class = "ToggleSwitch" })
-		</SettingsControl>
+  @using (Html.BeginAreaForm("Save", "SearchSettings", "Admin", FormMethod.Post, new { @data_target = ".nucleus-adminpage", @enctype = "multipart/form-data" }))
+  {
+    <h1 class="nucleus-control-panel-heading">Search Settings</h1>
+    <fieldset role="group" aria-label="Search Settings">
+      <SettingsControl caption="Default Search Provider" helptext="Select your default search provider.">
+        @Html.DropDownListFor(model => model.DefaultSearchProvider, new SelectList(Model.SearchProviders, "ClassName", "Name"), "(none)")
+      </SettingsControl>
 
-		<div class="nucleus-flex-fields">
-			<SettingsControl caption="Index Public Pages Only?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to index all pages, or just pages which are visible to 'All Users'.">
-				@Html.CheckBoxFor(model => model.IndexPublicPagesOnly, new { @class = "ToggleSwitch" })
-			</SettingsControl>
+      <SettingsControl caption="Api Key" helptext="Select the API key used to access site pages when feeding the index.">
+        @Html.DropDownListFor(model => model.ApiKey.Id, new SelectList(Model.ApiKeys, "Id", "Name"), "(create)")
+      </SettingsControl>
 
-			<SettingsControl caption="Index Public Files Only?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to index all files, or just files which are visible to 'All Users'.">
-				@Html.CheckBoxFor(model => model.IndexPublicFilesOnly, new { @class = "ToggleSwitch" })
-			</SettingsControl>
-		</div>
+      <SettingsControl caption="Clear Index before feed?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to clear search indexes at the start of the search feed process.  This leaves your search index temporarily empty while the search feed runs, but clears out potentially deleted entries.">
+        @Html.CheckBoxFor(model => model.ClearIndex, new { @class = "ToggleSwitch" })
+      </SettingsControl>
 
-		<SettingsControl caption="Use SSL to Retrieve Page Content?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to use SSL (https) to retrieve page content when indexing pages.">
-			@Html.CheckBoxFor(model => model.IndexPagesUseSsl, new { @class = "ToggleSwitch" })
-		</SettingsControl>
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="Index Public Pages Only?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to index all pages, or just pages which are visible to 'All Users'.">
+          @Html.CheckBoxFor(model => model.IndexPublicPagesOnly, new { @class = "ToggleSwitch" })
+        </SettingsControl>
 
-	</fieldset>
+        <SettingsControl caption="Index Public Files Only?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to index all files, or just files which are visible to 'All Users'.">
+          @Html.CheckBoxFor(model => model.IndexPublicFilesOnly, new { @class = "ToggleSwitch" })
+        </SettingsControl>
+      </div>
 
-	<div class="nucleus-button-panel">
-		<input type="submit" class="btn btn-primary nucleus-dialogresult" value="Save Changes" formaction="@Url.AreaAction("Save", "SearchSettings", "Admin")" data-target=".nucleus-adminpage" />				
-	</div>
-}
+      <SettingsControl caption="Use SSL to Retrieve Page Content?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to use SSL (https) to retrieve page content when indexing pages.">
+        @Html.CheckBoxFor(model => model.IndexPagesUseSsl, new { @class = "ToggleSwitch" })
+      </SettingsControl>
+
+    </fieldset>
+
+    <div class="nucleus-button-panel">
+      <input type="submit" class="btn btn-primary nucleus-dialogresult" value="Save Changes" formaction="@Url.AreaAction("Save", "SearchSettings", "Admin")" data-target=".nucleus-adminpage" />
+    </div>
+  }
 </div>

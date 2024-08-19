@@ -65,11 +65,11 @@ namespace Nucleus.ViewFeatures
 
 				if (value.TimeOfDay == TimeSpan.Zero)
 				{
-					return $"{System.TimeZoneInfo.ConvertTime(value, System.TimeZoneInfo.Utc, timezone).ToShortDateString()}";
+					return $"{System.TimeZoneInfo.ConvertTime(value.ToUniversalTime(), System.TimeZoneInfo.Utc, timezone).ToShortDateString()}";
 				}
 				else
 				{
-					return $"{System.TimeZoneInfo.ConvertTime(value, System.TimeZoneInfo.Utc, timezone).ToString("g")}";
+					return $"{System.TimeZoneInfo.ConvertTime(value.ToUniversalTime(), System.TimeZoneInfo.Utc, timezone).ToString("g")}";
 				}
 			}
 		}

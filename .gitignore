@@ -380,3 +380,4 @@ Nucleus.Core.Modules/**/*.zip
 Nucleus.Special.Modules/**/*.zip
 Nucleus.Core.Modules/**/AppPackage
 Nucleus.Web/Setup/install-log.config
+/Nucleus.Core.Modules/Nucleus.Extensions.AzureSearch/indexer.json

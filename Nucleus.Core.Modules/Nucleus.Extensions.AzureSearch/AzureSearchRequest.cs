@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Azure;
+using Azure.Core;
+using Azure.Core.Serialization;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
 using Azure.Search.Documents.Models;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 
@@ -20,6 +25,7 @@ internal class AzureSearchRequest
 
   public Uri Uri { get; }
   public string IndexName { get; }
+  public string IndexerName { get; }
 
   private string ApiKey { get; }
 
@@ -28,13 +34,14 @@ internal class AzureSearchRequest
   private SearchIndexClient _searchIndexClient { get; set; }
   private SearchClient _searchClient { get; set; }
 
-  public AzureSearchRequest(Uri uri, string apiKey, string indexName)
-      : this(uri, apiKey, indexName, TimeSpan.Zero) { }
+  public AzureSearchRequest(Uri uri, string apiKey, string indexName, string indexerName)
+      : this(uri, apiKey, indexName, indexerName, TimeSpan.Zero) { }
 
-  public AzureSearchRequest(Uri uri, string apiKey, string indexName, TimeSpan indexingPause)
+  public AzureSearchRequest(Uri uri, string apiKey, string indexName, string indexerName, TimeSpan indexingPause)
   {
     this.Uri = uri;
     this.IndexName = indexName.ToLower();  // search indexes must be lower case
+    this.IndexerName = indexerName;
     this.ApiKey = apiKey;
     this.IndexingPause = indexingPause;
   }
@@ -80,12 +87,24 @@ internal class AzureSearchRequest
 
   public async Task<bool> Connect()
   {
-    SearchIndexClient client = new SearchIndexClient(this.Uri, new AzureKeyCredential(this.ApiKey));
+    JsonSerializerOptions serializerOptions = new()
+    {
+      DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+    };
+
+    Azure.Core.Serialization.JsonObjectSerializer serializer = new(serializerOptions);
+
+    SearchClientOptions options = new()
+    {
+      Serializer = serializer
+    };
+
+    SearchIndexClient client = new SearchIndexClient(this.Uri, new AzureKeyCredential(this.ApiKey), options);
 
     // check index
     try
     {
-      var indexResponse = await client.GetIndexAsync(this.IndexName);
+      Response<SearchIndex> indexResponse = await client.GetIndexAsync(this.IndexName);
     }
     catch (Azure.RequestFailedException ex)
     {
@@ -105,16 +124,110 @@ internal class AzureSearchRequest
     FieldBuilder builder = new();
     IList<SearchField> fields = builder.Build(typeof(AzureSearchDocument));
 
-    SearchIndex searchIndex = new(this.IndexName, fields);
+    SearchIndex searchIndex = new(this.IndexName, fields)
+    {
+      Similarity = new BM25Similarity() { B = 0.75, K1 = 1.2 }
+    };
 
     searchIndex.Suggesters.Add(new(SUGGESTER_NAME, BuildSuggesterFields()));
-    searchIndex.Similarity = new BM25Similarity() { B = 0.75, K1 = 1.2 };
-    //searchIndex.SemanticSearch.Configurations.Add(new SemanticConfiguration())
-    //var map = new List<Azure.Search.Documents.Indexes.Models.FieldMapping>() { new("Url") { SourceFieldName= "metadata_storage_name" } };
 
     Response<SearchIndex> createIndexResponse = await client.CreateIndexAsync(searchIndex);
+  }
 
+  public async Task<Boolean> ClearIndex()
+  {
+    Boolean result = await this.DeleteIndex();
+    
+    // re-create the index
+    await this.Connect();
 
+    // reset the Azure search indexer
+    if (!string.IsNullOrEmpty(this.IndexerName))
+    {
+      await this.ResetIndexer(this.IndexerName);
+    }
+
+    return result;
+  }
+
+  public async Task<List<string>> ListIndexers()
+  {
+    SearchIndexerClient client = new(this.Uri, new AzureKeyCredential(this.ApiKey));
+    var response = await client.GetIndexerNamesAsync();
+
+    return response.Value.ToList();
+  }
+
+  public async Task<string> CreateIndexer(string key, string connectionString, string rootPath, string folder)
+  {
+    if (string.IsNullOrEmpty(rootPath))
+    {
+      rootPath = folder;
+      folder = "";
+    }
+    PathUri path = new(rootPath, folder);
+    SearchIndexerClient client = new(this.Uri, new AzureKeyCredential(this.ApiKey));
+
+    // create or update a data source
+    SearchIndexerDataSourceConnection dataSource = new
+    (
+      $"data-source-{key}".ToLower(),
+      SearchIndexerDataSourceType.AzureBlob,
+      connectionString,
+      new SearchIndexerDataContainer(path.ContainerName) { Query = path.RelativePath }
+    )
+    {
+      Description = $"Auto-generated indexer data source for the {this.IndexName} index. This data source was created by Nucleus."
+    };
+
+    var createDataSourceResponse = await client.CreateOrUpdateDataSourceConnectionAsync(dataSource);
+
+    // create a BLOB storage indexer
+    SearchIndexer searchIndexer = new($"indexer-{key}".ToLower(), dataSource.Name, this.IndexName)
+    {
+      Description = $"Auto-generated storage indexer for the {this.IndexName} index. This indexer was created by Nucleus.",
+
+      Parameters = new()
+      {
+        IndexingParametersConfiguration = new()
+        {
+          {"indexedFileNameExtensions", ""},
+          {"excludedFileNameExtensions", ""},
+          {"failOnUnsupportedContentType", false},
+          {"indexStorageMetadataOnlyForOversizedDocuments", false},
+          {"dataToExtract", "contentAndMetadata"},
+          {"parsingMode", "default"},
+        }
+      }
+    };
+
+    FieldMapping idMapping = new("metadata_storage_path")
+    {
+      TargetFieldName = nameof(AzureSearchDocument.Id),
+      MappingFunction = new FieldMappingFunction("base64Encode")
+    };
+
+    idMapping.MappingFunction.Parameters.Add("useHttpServerUtilityUrlTokenEncode", false);
+
+    searchIndexer.FieldMappings.Add(idMapping);
+    searchIndexer.FieldMappings.Add(new("metadata_content_type") { TargetFieldName = nameof(AzureSearchDocument.ContentType) });
+    searchIndexer.FieldMappings.Add(new("metadata_storage_name") { TargetFieldName = nameof(AzureSearchDocument.Title) });
+
+    var createIndexerResponse = await client.CreateOrUpdateIndexerAsync(searchIndexer);
+
+    return searchIndexer.Name;
+  }
+
+  public async Task RunIndexer(string name)
+  {
+    SearchIndexerClient client = new(this.Uri, new AzureKeyCredential(this.ApiKey));
+    var response = await client.RunIndexerAsync(name);
+  }
+
+  public async Task ResetIndexer(string name)
+  {
+    SearchIndexerClient client = new(this.Uri, new AzureKeyCredential(this.ApiKey));
+    var response = await client.ResetIndexerAsync(name);
   }
 
   public async Task<SearchIndexStatistics> GetIndexSettings()
@@ -138,36 +251,41 @@ internal class AzureSearchRequest
     return await this.Connect();
   }
 
-  public async Task IndexContent(AzureSearchDocument content)
+  public async Task<IndexDocumentsResult> IndexContent(AzureSearchDocument content)
   {
     IndexDocumentsBatch<AzureSearchDocument> batch = new();
     batch.Actions.Add(new IndexDocumentsAction<AzureSearchDocument>(IndexActionType.MergeOrUpload, content));
-    
+
     // SearchIndexingBufferedSender: https://learn.microsoft.com/en-us/dotnet/api/azure.search.documents.searchindexingbufferedsender-1?view=azure-dotnet
 
-    var response = await (await this.GetSearchClient()).IndexDocumentsAsync<AzureSearchDocument>(batch);
+    SearchClient client = await this.GetSearchClient();
 
+    Response<IndexDocumentsResult> response = await client.IndexDocumentsAsync<AzureSearchDocument>(batch);
+    return response.Value;
   }
 
-  public async Task RemoveContent(AzureSearchDocument content)
+  public async Task<IndexDocumentsResult> RemoveContent(AzureSearchDocument content)
   {
-    var response = (await this.GetSearchClient()).DeleteDocuments<AzureSearchDocument>(new List<AzureSearchDocument>() { content }, new() { });
+    SearchClient client = await this.GetSearchClient();
+    Response<IndexDocumentsResult> response = await client.DeleteDocumentsAsync<AzureSearchDocument>(new List<AzureSearchDocument>() { content }, new() { });
+    return response.Value;
   }
-
 
   public async Task<Response<SearchResults<AzureSearchDocument>>> Search(SearchQuery query)
   {
-    // todo: populate searchOptions
+    SearchClient client = await this.GetSearchClient();
+
+    // https://learn.microsoft.com/en-us/dotnet/api/azure.search.documents.searchoptions.querytype?view=azure-dotnet
     SearchOptions searchOptions = new()
     {
       HighlightPostTag = "<em>",
       HighlightPreTag = "</em>",
       IncludeTotalCount = true,
-      QueryType = SearchQueryType.Full,// SearchQueryType.Semantic,
-      SearchMode = query.StrictSearchTerms ? SearchMode.All : SearchMode.Any,      
+      QueryType = SearchQueryType.Simple,  // SearchQueryType.Semantic,
+      SearchMode = query.StrictSearchTerms ? SearchMode.All : SearchMode.Any,
       Size = query.PagingSettings.PageSize,
       Filter = BuildFilter($"{BuildSiteFilter(query)}", $"{BuildRolesFilter(query)}", $"{BuildScopeFilter(query)}", $"{BuildArgsFilter(query)}"),
-      Skip = query.PagingSettings.CurrentPageIndex
+      Skip = query.PagingSettings.CurrentPageIndex - 1
     };
 
     AddRange(searchOptions.SearchFields, BuildSearchFields());
@@ -179,31 +297,35 @@ internal class AzureSearchRequest
       AddRange(searchOptions.OrderBy, BuildOrderBy(query));
     }
 
-    Response<SearchResults<AzureSearchDocument>> result = await Search(searchOptions);
-    return result;
-  }
+    if (query.SearchTerm.Length > 100)
+    {
+      // Azure Search has a 100 character limit for the search term
+      query.SearchTerm = query.SearchTerm[..100];
+    }
 
-  private async Task<Response<SearchResults<AzureSearchDocument>>> Search(SearchOptions searchRequest)
-  {
-    var client = await this.GetSearchClient();
-    return await client.SearchAsync<AzureSearchDocument>(searchRequest);
+    return await client.SearchAsync<AzureSearchDocument>(query.SearchTerm, searchOptions);
   }
 
   public async Task<Response<SuggestResults<AzureSearchDocument>>> Suggest(SearchQuery query)
   {
-    var client = await this.GetSearchClient();
+    SearchClient client = await this.GetSearchClient();
 
     SuggestOptions searchOptions = new()
-    {       
+    {
       Size = query.PagingSettings.PageSize,
-      Filter= BuildFilter(BuildSiteFilter(query), BuildRolesFilter(query), BuildScopeFilter(query), BuildArgsFilter(query)),
-      //Filter = SearchFilter.Create($"{BuildSiteFilter(query)} {BuildRolesFilter(query)} {BuildScopeFilter(query)} {BuildArgsFilter(query)}"),
+      Filter = BuildFilter(BuildSiteFilter(query), BuildRolesFilter(query), BuildScopeFilter(query), BuildArgsFilter(query)),
       UseFuzzyMatching = true
     };
 
     AddRange(searchOptions.SearchFields, BuildSuggesterFields());
     AddRange(searchOptions.Select, BuildSelectFields());
     AddRange(searchOptions.OrderBy, BuildOrderBy(query));
+
+    if (query.SearchTerm.Length > 100)
+    {
+      // Azure Search has a 100 character limit for the search term
+      query.SearchTerm = query.SearchTerm[..100];
+    }
 
     Response<SuggestResults<AzureSearchDocument>> result = await client.SuggestAsync<AzureSearchDocument>(query.SearchTerm, SUGGESTER_NAME, searchOptions);
 
@@ -274,9 +396,9 @@ internal class AzureSearchRequest
 
   private List<string> BuildOrderBy(SearchQuery query)
   {
-    return new List<string>() 
+    return new List<string>()
     {
-      "search.score()"
+      "search.score() desc"
     };
   }
 
@@ -292,8 +414,8 @@ internal class AzureSearchRequest
     if (query.Roles?.Any() == true)
     {
       // Id.ToString is required here, SearchFilter.Create cannot handle Guids
-      string values = SearchFilter.Create($"{String.Join(",", query.Roles.Select(role => role.Id.ToString())) + "))"}");
-      return $"{nameof(AzureSearchDocument.Roles)}/any(g: search.in(g, {values} or {nameof(AzureSearchDocument.IsSecure)} = 'false'";
+      string values = SearchFilter.Create($"{String.Join(",", query.Roles.Select(role => role.Id.ToString()))}");
+      return $"({nameof(AzureSearchDocument.Roles)}/any(g: search.in(g, {values})) or {nameof(AzureSearchDocument.IsSecure)} eq false)";
     }
     else
     {
@@ -307,18 +429,18 @@ internal class AzureSearchRequest
 
     if (query.IncludedScopes.Any())
     {
-      string values= SearchFilter.Create($"{String.Join(",", query.IncludedScopes.Select(scope => scope))}");
+      string values = SearchFilter.Create($"{String.Join(",", query.IncludedScopes.Select(scope => scope))}");
       result += $"search.in({nameof(AzureSearchDocument.Scope)}, {values}, ',')";
     }
 
     if (query.ExcludedScopes.Any())
     {
-      string values =  SearchFilter.Create($"{String.Join(",", query.ExcludedScopes.Select(scope => scope))}");
-      string result2 = $"search.in({nameof(AzureSearchDocument.Scope)}, {values}, ',') eq false";
+      string values = SearchFilter.Create($"{String.Join(",", query.ExcludedScopes.Select(scope => scope))}");
+      string result2 = $"(search.in({nameof(AzureSearchDocument.Scope)}, {values}, ',') eq false)";
 
       if (!String.IsNullOrEmpty(result))
       {
-        result = $"({result} and {result2}";
+        result = $"({result} and {result2})";
       }
       else
       {

@@ -1,91 +1,88 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 
-namespace Nucleus.Extensions.AzureSearch
-{
-  // https://www.elastic.co/guide/en/elasticsearch/client/net-api/current/elasticsearch-net-getting-started.html
+namespace Nucleus.Extensions.AzureSearch;
 
-  public class AzureSearchIndexManager : ISearchIndexManager
+public class AzureSearchIndexManager : ISearchIndexManager
+{  
+  private ILogger<AzureSearchIndexManager> Logger { get; }
+
+  private AzureSearchRequest _request { get; set; }
+  private Boolean HasStartedIndexer { get; set; }
+
+  public AzureSearchIndexManager(ILogger<AzureSearchIndexManager> logger)
   {
-    private ILogger<AzureSearchIndexManager> Logger { get; }
+    this.Logger = logger;
+  }
 
-    private AzureSearchRequest _request { get; set; }
+  private AzureSearchRequest Request(Site site)
+  {
+    ConfigSettings settings = new(site);
 
-    public AzureSearchIndexManager(ILogger<AzureSearchIndexManager> logger)
+    if (String.IsNullOrEmpty(settings.ServerUrl))
     {
-      this.Logger = logger;
+      throw new InvalidOperationException($"The Azure search server url is not set for site '{site.Name}'.");
     }
 
-    private AzureSearchRequest Request(Site site)
+    if (String.IsNullOrEmpty(settings.IndexName))
     {
-      ConfigSettings settings = new(site);
-
-      if (String.IsNullOrEmpty(settings.ServerUrl))
-      {
-        throw new InvalidOperationException($"The Azure search server url is not set for site '{site.Name}'.");
-      }
-
-      if (String.IsNullOrEmpty(settings.IndexName))
-      {
-        throw new InvalidOperationException($"The Azure search index name is not set for site '{site.Name}'.");
-      }
-
-      if (_request == null || !_request.Equals(new System.Uri(settings.ServerUrl), settings.IndexName, ConfigSettings.DecryptApiKey(site, settings.EncryptedApiKey)))
-      {
-        _request = new(new System.Uri(settings.ServerUrl), ConfigSettings.DecryptApiKey(site, settings.EncryptedApiKey), settings.IndexName, TimeSpan.FromSeconds(settings.IndexingPause));
-      }
-
-      return _request;
+      throw new InvalidOperationException($"The Azure search index name is not set for site '{site.Name}'.");
     }
 
-
-    public async Task ClearIndex(Site site)
+    if (_request == null || !_request.Equals(new System.Uri(settings.ServerUrl), settings.IndexName, ConfigSettings.DecryptApiKey(site, settings.EncryptedApiKey)))
     {
-      if (site == null)
-      {
-        throw new NullReferenceException("site must not be null.");
-      }
-
-      await this.Request(site).DeleteIndex();
-
-      // re-create the index
-      _request = null;
-      await this.Request(site).Connect();
-    }
-  
-
-    public async Task Index(ContentMetaData metadata)
-    {
-      if (metadata.Site == null)
-      {
-        throw new NullReferenceException("metaData.Site must not be null.");
-      }
-
-      ConfigSettings settings = new(metadata.Site);
-
-      AzureSearchDocument document = new(metadata, settings);
-
-      // test use
-      if (document.ContentType == "text/html")
-      {
-        await this.Request(metadata.Site).IndexContent(document);
-      }
-
-      // free up memory - file content is part of the feed data, and this could exhaust available memory 
-      document.Dispose();
+      _request = new(new System.Uri(settings.ServerUrl), ConfigSettings.DecryptApiKey(site, settings.EncryptedApiKey), settings.IndexName, settings.IndexerName, TimeSpan.FromSeconds(settings.IndexingPause));
     }
 
-    public async Task Remove(ContentMetaData metaData)
+    return _request;
+  }
+
+  public async Task ClearIndex(Site site)
+  {
+    if (site == null)
     {
-      ConfigSettings settings = new(metaData.Site);
-
-      AzureSearchDocument document = new(metaData, settings);
-
-      await this.Request(metaData.Site).RemoveContent(document);
+      throw new NullReferenceException("site must not be null.");
     }
 
+    await this.Request(site).ClearIndex();
+  }
+
+  public async Task Index(ContentMetaData metadata)
+  {
+    if (metadata.Site == null)
+    {
+      throw new NullReferenceException("metaData.Site must not be null.");
+    }
+
+    ConfigSettings settings = new(metadata.Site);
+
+    if (!HasStartedIndexer)
+    {
+      this.HasStartedIndexer = true;
+      if (!string.IsNullOrEmpty(settings.IndexerName))
+      {
+        await this.Request(metadata.Site).RunIndexer(settings.IndexerName);
+      }
+    }
+
+    AzureSearchDocument document = new(metadata, settings);
+        
+    await this.Request(metadata.Site).IndexContent(document);
+    
+    // free up memory - file content is part of the feed data, and this could exhaust available memory 
+    document.Dispose();
+  }
+
+  public async Task Remove(ContentMetaData metadata)
+  {
+    ConfigSettings settings = new(metadata.Site);
+
+    AzureSearchDocument document = new(metadata, settings);
+
+    await this.Request(metadata.Site).RemoveContent(document);
   }
 }

@@ -83,6 +83,14 @@ This document was updated to include references which are part of Nucleus versio
 
 <br/>
 
+## Azure Search Extension
+{.table-0-75-0}
+|                                  |                                                             | License                         |
+|----------------------------------|--------------------------------------------------------------------------------------|
+| [Azure.Search.Documents](https://github.com/Azure/azure-sdk-for-net/tree/main/sdk/search/Azure.Search.Documents) | .NET interface to Azure Search.	| [MIT](https://github.com/Azure/azure-sdk-for-net/blob/main/LICENSE.txt) |	
+
+<br/>
+
 ## SAML Client and SAML Server Extension
 {.table-0-75-0}
 |                                  |                                                             | License                         |

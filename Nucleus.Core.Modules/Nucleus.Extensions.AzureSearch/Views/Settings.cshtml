@@ -3,74 +3,84 @@
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
 @using Nucleus.Abstractions.Models
-<h2 class="nucleus-control-panel-heading">Azure Search Settings</h2>
-@Html.AddStyle("~!/../settings.css")
-@using (Html.BeginNucleusForm("Settings", "AzureSearch", FormMethod.Post, new { @enctype = "multipart/form-data" }))
-{
-  <fieldset role="group" aria-label="Settings">
-    <div class="nucleus-flex-fields">
-      <SettingsControl caption="Azure Search Server Url" helptext="Enter the URL for your Azure Search server, including the port.">
-        @Html.TextBoxFor(model => model.ServerUrl)
+<div class="nucleus-editor-panel">
+  <h2 class="nucleus-control-panel-heading">Azure Search Settings</h2>
+  @Html.AddStyle("~!/../settings.css")
+  @using (Html.BeginNucleusForm("Settings", "AzureSearch", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+  {
+    <fieldset role="group" aria-label="Settings" class="flex-1">
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="Azure Search Server Url" helptext="Enter the URL for your Azure Search server, including the port.">
+          @Html.TextBoxFor(model => model.ServerUrl)
+        </SettingsControl>
+
+        <SettingsControl caption="Index Name" helptext="Enter the index name to use for this site.">
+          @Html.TextBoxFor(model => model.IndexName)
+        </SettingsControl>
+      </div>
+
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="Api Key" helptext="Enter the Azure search Api Key.  You can find this value in Azure Portal/Azure Search/Settings/Keys.">
+          @Html.PasswordFor(model => model.ApiKey, new { @value = Model.ApiKey })
+        </SettingsControl>
+      </div>
+
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="Azure Search Indexer" helptext="Select the Azure Search indexer to use during feed.">
+          @Html.DropDownListFor(model => model.IndexerName, new SelectList(Model.Indexers), "(none)")
+        </SettingsControl>
+        <button type="submit" class="btn btn-secondary" data-target=".nucleus-editor-panel.parent()" formaction="@Url.NucleusAction("Settings", "AzureSearchSettings", "AzureSearch")">Refresh</button>
+        <button type="submit" class="btn btn-success" data-target=".nucleus-editor-panel.parent()" data-confirm="This will create or update a Azure Blob Storage data source and a search indexer. If you already have a data source and/or indexer, some settings may be overwritten. Do you want to continue?" formaction="@Url.NucleusAction("CreateIndexer", "AzureSearchSettings", "AzureSearch")">Create</button>
+      </div>
+
+      <SettingsControl caption="Attachments Size Limit (mb)" helptext="Enter maximum file size to submit to the Azure search server for indexing. A value of zero specifies no limit.">
+        @Html.TextBoxFor(model => model.AttachmentMaxSize, new { @type = "number", @class = "attachments-size-limit" })
       </SettingsControl>
 
-      <SettingsControl caption="Index Name" helptext="Enter the index name to use for this site.">
-        @Html.TextBoxFor(model => model.IndexName)
-      </SettingsControl>
-    </div>
+      <div class="w-75">
+        <SettingsControl caption="Indexing Pause (seconds)" helptext="Specifies the pause time (in seconds) between indexing operations.  In some environments (particularly Azure), indexing requests which are sent in rapid succession can exhaust available server resources (In Azure, SNAT ports).  This setting causes the search feed to pause between requests, which gives the server time to release unused resources.  The default value is 1.">
+          @Html.RangeFor(model => model.IndexingPause, 0, 15, 0.5)
+        </SettingsControl>
+      </div>
 
-    <div class="nucleus-flex-fields">
-      <SettingsControl caption="Api Key" helptext="Enter the Azure search Api Key.  You can find this value in Azure Portal/Azure Search/Settings/Keys.">
-        @Html.PasswordFor(model => model.ApiKey, new { @value = Model.ApiKey })
-      </SettingsControl>
-    </div>
-
-    <SettingsControl caption="Attachments Size Limit (mb)" helptext="Enter maximum file size to submit to the Azure search server for indexing. A value of zero specifies no limit.">
-      @Html.TextBoxFor(model => model.AttachmentMaxSize, new { @type = "number", @class = "attachments-size-limit" })
+      @* <h3>Boost</h3>
+    <div class="w-75">
+    <SettingsControl caption="Title" helptext="Title boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.Title, 0.5, 5, 0.5)
+    </SettingsControl>
+    <SettingsControl caption="Summary" helptext="Summary boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.Summary, 0.5, 5, 0.5)
+    </SettingsControl>
+    <SettingsControl caption="Categories" helptext="Categories boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.Categories, 0.5, 5, 0.5)
+    </SettingsControl>
+    <SettingsControl caption="Keywords" helptext="Keywords boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.Keywords, 0.5, 5, 0.5)
+    </SettingsControl>
+    <SettingsControl caption="Content" helptext="Content boost.  The default value is 1.  For web pages, the page content and meta-data is the search content.  For files, the file content is the search content.">
+    @Html.RangeFor(model => model.Boost.Content, 0.5, 5, 0.5)
     </SettingsControl>
 
-    <div class="w-75">
-      <SettingsControl caption="Indexing Pause (seconds)" helptext="Specifies the pause time (in seconds) between indexing operations.  In some environments (particularly Azure), indexing requests which are sent in rapid succession can exhaust available server resources (In Azure, SNAT ports).  This setting causes the search feed to pause between requests, which gives the server time to release unused resources.  The default value is 1.">
-        @Html.RangeFor(model => model.IndexingPause, 0, 15, 0.5)
-      </SettingsControl>
+    <SettingsControl caption="Attachment Title" helptext="Attachment Title boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.AttachmentTitle, 0.5, 5, 0.5)
+    </SettingsControl>
+    <SettingsControl caption="Attachment Name" helptext="Attachment Name (file name) boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.AttachmentName, 0.5, 5, 0.5)
+    </SettingsControl>
+    <SettingsControl caption="Attachment Author" helptext="Attachment Author boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.AttachmentAuthor, 0.5, 5, 0.5)
+    </SettingsControl>
+    <SettingsControl caption="Attachment Keywords" helptext="Attachment keywords boost.  The default value is 1.">
+    @Html.RangeFor(model => model.Boost.AttachmentKeywords, 0.5, 5, 0.5)
+    </SettingsControl>
+    </div>*@
+    </fieldset>
+
+    <div class="nucleus-form-buttonrow">
+      @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "AzureSearchSettings", "AzureSearch"), new { })
+      @Html.SubmitButton("", "Get Index Count", @Url.NucleusAction("GetIndexCount", "AzureSearchSettings", "AzureSearch"), new { })
+      @* @Html.SubmitButton("", "Get Index Settings", @Url.NucleusAction("GetIndexSettings", "AzureSearchSettings", "AzureSearch"), new { }) *@
+      @Html.SubmitButton("", "Clear Index", @Url.NucleusAction("ClearIndex", "AzureSearchSettings", "AzureSearch"), new { @class = "btn btn-danger", @data_confirm = "This will delete the selected Azure Search index, and it will be automatically re-created the next time the search feeder runs.  Do you want to continue?" })
     </div>
-
-    <h3>Boost</h3>
-    <div class="w-75">
-      <SettingsControl caption="Title" helptext="Title boost.  The default value is 1.">
-        @Html.RangeFor(model => model.Boost.Title, 0.5, 5, 0.5)
-      </SettingsControl>
-      <SettingsControl caption="Summary" helptext="Summary boost.  The default value is 1.">
-        @Html.RangeFor(model => model.Boost.Summary, 0.5, 5, 0.5)
-      </SettingsControl>
-      <SettingsControl caption="Categories" helptext="Categories boost.  The default value is 1.">
-        @Html.RangeFor(model => model.Boost.Categories, 0.5, 5, 0.5)
-      </SettingsControl>
-      <SettingsControl caption="Keywords" helptext="Keywords boost.  The default value is 1.">
-        @Html.RangeFor(model => model.Boost.Keywords, 0.5, 5, 0.5)
-      </SettingsControl>
-      <SettingsControl caption="Content" helptext="Content boost.  The default value is 1.  For web pages, the page content and meta-data is the search content.  For files, the file content is the search content.">
-        @Html.RangeFor(model => model.Boost.Content, 0.5, 5, 0.5)
-      </SettingsControl>
-
-      <SettingsControl caption="Attachment Title" helptext="Attachment Title boost.  The default value is 1.">
-        @Html.RangeFor(model => model.Boost.AttachmentTitle, 0.5, 5, 0.5)
-      </SettingsControl>
-      <SettingsControl caption="Attachment Name" helptext="Attachment Name (file name) boost.  The default value is 1.">
-        @Html.RangeFor(model => model.Boost.AttachmentName, 0.5, 5, 0.5)
-      </SettingsControl>
-      <SettingsControl caption="Attachment Author" helptext="Attachment Author boost.  The default value is 1.">
-        @Html.RangeFor(model => model.Boost.AttachmentAuthor, 0.5, 5, 0.5)
-      </SettingsControl>
-      <SettingsControl caption="Attachment Keywords" helptext="Attachment keywords boost.  The default value is 1.">
-        @Html.RangeFor(model => model.Boost.AttachmentKeywords, 0.5, 5, 0.5)
-      </SettingsControl>
-    </div>
-  </fieldset>
-
-  <div class="nucleus-form-buttonrow">
-    @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "AzureSearchSettings", "AzureSearch"), new { })
-    @Html.SubmitButton("", "Get Index Count", @Url.NucleusAction("GetIndexCount", "AzureSearchSettings", "AzureSearch"), new { })
-    @*@Html.SubmitButton("", "Get Index Settings", @Url.NucleusAction("GetIndexSettings", "Settings", "AzureSearch"), new { })*@
-    @Html.SubmitButton("", "Clear Index", @Url.NucleusAction("ClearIndex", "AzureSearchSettings", "AzureSearch"), new { @class = "btn btn-danger", @data_confirm = "This will delete the selected Azure Search index, and it will be automatically re-created the next time the search feeder runs.  Do you want to continue?" })
-  </div>
-}
+  }
+</div>

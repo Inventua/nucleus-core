@@ -1,309 +1,361 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
-using Microsoft.Extensions.Primitives;
+using HtmlAgilityPack;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 
-namespace Nucleus.Extensions.AzureSearch
+namespace Nucleus.Extensions.AzureSearch;
+
+internal class AzureSearchDocument : IDisposable
 {
-  //[Nest.ElasticsearchType(IdProperty = nameof(Id))]
-  public class AzureSearchDocument : IDisposable
-	{
-		private bool disposedValue;
+  private bool disposedValue;
+  private readonly string[] HtmlElements = ["div", "span", "p", "h1", "h2", "h3", "h4", "h5", "h6", ""];
 
-		/// <summary>
-		/// Constructor used by NEST deserialization for search results.
-		/// </summary>
-		public AzureSearchDocument() { }	
+  /// <summary>
+  /// Constructor used by NEST deserialization for search results.
+  /// </summary>
+  public AzureSearchDocument() { }
 
-		/// <summary>
-		/// Constructor used when generating a feed.
-		/// </summary>
-		/// <param name="content"></param>
-		public AzureSearchDocument(ContentMetaData content, ConfigSettings settings)
-		{
-			this.Id = GenerateId(content);
+  /// <summary>
+  /// Constructor used when generating a feed.
+  /// </summary>
+  /// <param name="content"></param>
+  public AzureSearchDocument(ContentMetaData content, ConfigSettings settings)
+  {
+    var test = Microsoft.AspNetCore.WebUtilities.WebEncoders.Base64UrlEncode(System.Text.Encoding.UTF8.GetBytes("https://nucleusteststorage.blob.core.windows.net/homeportal/MICAS 2025.01 -Draft 2.1.docx"));
+    // aHR0cHM6Ly9udWNsZXVzdGVzdHN0b3JhZ2UuYmxvYi5jb3JlLndpbmRvd3MubmV0L2hvbWVwb3J0YWwvTUlDQVMlMjAyMDI1LjAxJTIwLURyYWZ0JTIwMi4xLmRvY3g
 
-			this.SiteId = content.Site.Id.ToString();
-			this.Url = content.Url;
-			this.Title = content.Title;
-			this.Summary = content.Summary;
+    // aAB0AHQAcABzADoALwAvAG4AdQBjAGwAZQB1AHMAdABlAHMAdABzAHQAbwByAGEAZwBlAC4AYgBsAG8AYgAuAGMAbwByAGUALgB3AGkAbgBkAG8AdwBzAC4AbgBlAHQALwBoAG8AbQBlAHAAbwByAHQAYQBsAC8ATQBJAEMAQQBTACUAMgAwADIAMAAyADUALgAwADEAJQAyADAALQBEAHIAYQBmAHQAJQAyADAAMgAuADEALgBkAG8AYwB4AA2
 
-			this.Scope = content.Scope;
-			this.SourceId = content.SourceId.ToString();
+    this.Id = GenerateId(content);
 
-			this.ContentType = content.ContentType;
-      this.Type = content.Type;
+    this.SiteId = content.Site.Id.ToString();
+    this.Url = content.Url;
+    this.Title = content.Title;
+    this.Summary = content.Summary;
 
-			if (content.Content.Any() && (settings.AttachmentMaxSize == 0 ||  content.Content.Length <= settings.AttachmentMaxSize * 1024 * 1024))
-			{
-        this.Content = Convert.ToBase64String(content.Content);
-			}
-			else
-			{
-				this.Content = null;
-			}
+    this.Scope = content.Scope;
+    this.SourceId = content.SourceId.ToString();
 
-			if (content.PublishedDate.HasValue)
-			{
-				this.PublishedDate = content.PublishedDate.Value.Date;
-			}
+    this.ContentType = content.ContentType;
+    this.Type = content.Type;
 
-      if (content.Size.HasValue)
+    if (content.Content.Any() && (settings.AttachmentMaxSize == 0 || content.Content.Length <= settings.AttachmentMaxSize * 1024 * 1024))
+    {
+      this.Content = ToText(content);
+    }
+    else
+    {
+      this.Content = null;
+    }
+
+    if (content.PublishedDate.HasValue)
+    {
+      this.PublishedDate = content.PublishedDate.Value.Date;
+    }
+
+    if (content.Size.HasValue)
+    {
+      this.Size = content.Size.Value;
+    }
+
+    this.Keywords = content.Keywords?.ToList() ?? new();
+
+    if (content.Categories == null)
+    {
+      this.Categories = [];
+    }
+    else
+    {
+      this.Categories = content.Categories.Select(category => category.Id.ToString()).ToList();
+    }
+
+    if (content.Roles == null)
+    {
+      this.Roles = [];
+    }
+    else
+    {
+      this.Roles = content.Roles?.Select(role => role.Id.ToString()).ToList();
+    }
+
+    this.IsSecure = !this.IsPublic(content.Site, content.Roles);
+  }
+
+  public string ToText(ContentMetaData metaData)
+  {
+    switch (metaData.ContentType)
+    {
+      case "text/html":
+        HtmlAgilityPack.HtmlDocument htmlContent = new();
+        htmlContent.LoadHtml(System.Text.Encoding.UTF8.GetString(metaData.Content));
+
+        return ConvertHtmlToPlainText(new StringBuilder(), htmlContent.DocumentNode).ToString();
+
+      case "text/plain":
+      case "text/csv":
+      case "text/markdown":
+        return System.Text.Encoding.UTF8.GetString(metaData.Content);
+
+      default:
+        // Azure search cannot process file content from a feed, the search service must be set up with "Indexers" that run in the Azure Cloud
+        // to collect and parse file content.
+        return null;
+    }
+  }
+
+  private StringBuilder ConvertHtmlToPlainText(StringBuilder builder, HtmlNode node)
+  {
+    foreach (HtmlNode subnode in node.ChildNodes)
+    {
+      if (subnode.NodeType == HtmlNodeType.Text && HtmlElements.Contains(node.Name, StringComparer.OrdinalIgnoreCase))
       {
-        this.Size = content.Size.Value;
+        // Append the text of the current node to the StringBuilder
+        if (!String.IsNullOrWhiteSpace(subnode.InnerText))
+        {
+          builder.AppendLine(subnode.InnerText.Trim());
+        }
+      }
+      else if (subnode.NodeType == HtmlNodeType.Element)
+      {
+        // Recursively convert the child nodes to plain text
+        ConvertHtmlToPlainText(builder, subnode);
+      }
+    }
+
+    return builder;
+  }
+
+  private string GenerateId(ContentMetaData content)
+  {
+    // for Azure Search, we do not use Scope or SourceId in the key, because we want to maintain compatibility with the
+    // built-in Azure Search indexers, which encode the Url as base64.
+    /// We use a base-64 string for Azure Search (rather than the base 64 encoded SHA384 hash that we use for Elastic Search) to maintain
+    /// compatibility with the built-in Azure Search indexers.
+    // The documentation states that Azure does "Url-safe" base64 encoding, which is why we use WebEncoders.Base64UrlEncode
+    // method rather than Convert.ToBase64String
+
+    string key = !String.IsNullOrEmpty(content.RawUri) ? content.RawUri : content.Url;
+    return Microsoft.AspNetCore.WebUtilities.WebEncoders.Base64UrlEncode(System.Text.Encoding.UTF8.GetBytes(System.Web.HttpUtility.UrlPathEncode(key)));
+  }
+
+  /// <summary>
+  /// Unique id for the document
+  /// </summary>
+  [SimpleField(IsFilterable = true, IsKey = true)]
+  public string Id { get; set; }
+
+  /// <summary>
+  /// This Id of the site which the resource belongs to.
+  /// </summary>
+  [SimpleField(IsFilterable = true)]
+  public string SiteId { get; set; }
+
+  /// <summary>
+  /// Url used to access the resource for this search item.
+  /// </summary>
+  /// <remarks>
+  /// This value is required.
+  /// </remarks>
+  public string Url { get; set; }   // metadata_storage_name
+
+  /// <summary>
+  /// Title for the resource.
+  /// </summary>
+  /// <remarks>
+  /// The title displayed in search results.  Title is optional, but highly recommended.  If the title is not set, the search result
+  /// will display the Url in place of a title.
+  /// </remarks>
+  [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
+  public string Title { get; set; } = "";
+
+  /// <summary>
+  /// Short summary for the resource.
+  /// </summary>
+  /// <remarks>
+  /// The summary displayed in search results.  Summary is optional.  If it is not set, the search result will not display
+  /// a summary.
+  /// </remarks>
+  [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
+  public string Summary { get; set; } = "";
+
+  /// <summary>
+  /// URN of the entity which was used to create this search entry.
+  /// </summary>
+  /// <remarks>
+  /// This value is optional.  If set, it can be used to allow users to select that only specified result types are included in their
+  /// search results.
+  /// </remarks>
+  [SimpleField(IsFilterable = true)]
+  public string Scope { get; set; } = "";
+
+  /// <summary>
+  /// Unique Id for the search entry source.
+  /// </summary>
+  /// <remarks>
+  /// This value is optional.  If set, it can be used to manage the individual search result for update and delete operations.
+  /// </remarks>
+  [SimpleField(IsFilterable = true)]
+  public string SourceId { get; set; } = "";
+
+  /// <summary>
+  /// Search entry content, used for content indexing.
+  /// </summary>
+  [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
+  public string Content { get; set; }
+
+  /// <summary>
+  /// Search entry MIME type.
+  /// </summary>
+  /// <remarks>
+  /// This value should be set to the MIME type of the Content field.  This value is used for search result filtering and also
+  /// to tell Azure Search what content type is in the content field.
+  /// </remarks>
+  [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
+  public string ContentType { get; set; } = "";  // metadata_content_type
+
+  /// <summary>
+  /// Search entry display type.
+  /// </summary>
+  [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft, IsFilterable = true)]
+  public string Type { get; set; } = "";
+
+  /// <summary>
+  /// Source entity published date
+  /// </summary>
+  /// <remarks>
+  /// This value is optional.  If specified, it can be displayed in search results.
+  /// </remarks>
+  [SimpleField(IsFilterable = true, IsSortable = true)]
+  public DateTime? PublishedDate { get; set; }
+
+  /// <summary>
+  /// The size of the resource in bytes.
+  /// </summary>
+  /// <remarks>
+  /// This value is optional and should only be supplied if it is relevant to the resource.  If specified, it can be displayed in search results.
+  /// </remarks>
+  public long Size { get; set; } = 0;
+
+  /// <summary>
+  /// A list of keywords for the resource.
+  /// </summary>
+  /// <remarks>
+  /// This value is optional.  If supplied, keywords contribute to the search result weighting.
+  /// </remarks>
+  [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft, IsFilterable = true)]
+  public List<string> Keywords { get; set; } = [];
+
+  /// <summary>
+  /// A list of categories for the resource.
+  /// </summary>
+  /// <remarks>
+  /// This value is optional.  If supplied, categories contribute to the search result weighting, and may also be used to filter results.
+  /// </remarks>
+  [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft, IsFilterable = true)]
+  public List<string> Categories { get; set; } = [];
+
+  /// <summary>
+  /// A list of roles with view access to the resource.
+  /// </summary>
+  /// <remarks>
+  /// This value is optional.  If it not specified, search feeders will try to fill in roles by using the roles for the relevant
+  /// page, module or folder.  Roles are used to filter search results to resources which the current user can view.
+  /// </remarks>
+  [SimpleField(IsFilterable = true)]
+  public List<string> Roles { get; set; } = [];
+
+  /// <summary>
+  /// Specifies whether the document is visible to anonymous users.
+  /// </summary>
+  [SimpleField(IsFilterable = true)]
+  public Boolean IsSecure { get; set; }
+
+  /// <summary>
+  /// The date/time that the item was processed by elastic search.
+  /// </summary>
+  /// <remarks>
+  /// This is auto-populated by the ingest pipeline
+  /// </remarks>
+  //public string FeedProcessingDateTime { get; set; }
+
+
+  /// <summary>
+  /// Search result score.
+  /// </summary>
+  /// <remarks>
+  /// This is populated for returned search results and can be used to sort results by relevance.
+  /// </remarks>
+  //public double? Score { get; set; }
+
+  // This is populated in the elastic search database by the attachment pipeline.  It is never populated by search results, but is
+  // used to represent the field in Elastic search (to include it for search queries)
+  // todo: public Nest.Attachment Attachment { get; set; }
+
+  /// <summary>
+  /// Content ingest status or error message.
+  /// </summary>
+  /// <remarks>
+  /// This value is generated by the attachment pipeline.
+  /// </remarks>
+  //public string Status { get; set; }	
+
+  private bool IsPublic(Site site, IEnumerable<Role> roles)
+  {
+    foreach (Role role in roles)
+    {
+      if (role == site.AnonymousUsersRole || role == site.AllUsersRole)
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  protected virtual void Dispose(bool disposing)
+  {
+    if (!disposedValue)
+    {
+      if (disposing)
+      {
+        // dispose managed state (managed objects).  Attachments and content can consume quite a bit of memory, so we 
+        // clean them up here.					
+        this.Content = null;
       }
 
-			this.Keywords = content.Keywords?.ToList() ?? new();
+      disposedValue = true;
+    }
+  }
 
-			if (content.Categories == null)
-			{
-				this.Categories = [];
-			}
-			else
-			{
-				this.Categories = content.Categories.Select(category => category.Id.ToString()).ToList();
-			}
-
-			if (content.Roles == null)
-			{
-				this.Roles = [];
-			}
-			else
-			{
-				this.Roles = content.Roles?.Select(role => role.Id.ToString()).ToList();
-			}
-
-			this.IsSecure = !this.IsPublic(content.Site, content.Roles);
-		}
-
-		public string GenerateId(ContentMetaData content)
-		{
-      // for Azure Search, we do not use Scope or SourceId in the key, because we want to maintain compatibility with the
-      // built-in Azure Search indexers, which encode the Url as base64.
-		  /// We use a base-64 string for Azure Search (rather than the base 64 encoded SHA384 hash that we use for Elastic Search) to maintain
-      /// compatibility with the built-in Azure Search indexers.
-      // The documentation states that Azure does "Url-safe" base64 encoding, which is why we use the Base64UrlEncoder.Encode
-      // method rather than Convert.ToBase64String
-      return Microsoft.IdentityModel.Tokens.Base64UrlEncoder.Encode(content.Url);
-		}
-
-    /// <summary>
-    /// Unique id for the document
-    /// </summary>
-    [SimpleField(IsFilterable = true, IsKey = true)]
-    public string Id { get; set; }
-
-    /// <summary>
-    /// This Id of the site which the resource belongs to.
-    /// </summary>
-    [SimpleField(IsFilterable = true)]
-    public string SiteId { get; set; }
-
-    /// <summary>
-    /// Url used to access the resource for this search item.
-    /// </summary>
-    /// <remarks>
-    /// This value is required.
-    /// </remarks>
-    public string Url { get; set; }   // metadata_storage_name
-
-    /// <summary>
-    /// Title for the resource.
-    /// </summary>
-    /// <remarks>
-    /// The title displayed in search results.  Title is optional, but highly recommended.  If the title is not set, the search result
-    /// will display the Url in place of a title.
-    /// </remarks>
-    [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
-    public string Title { get; set; } = "";
-
-    /// <summary>
-    /// Short summary for the resource.
-    /// </summary>
-    /// <remarks>
-    /// The summary displayed in search results.  Summary is optional.  If it is not set, the search result will not display
-    /// a summary.
-    /// </remarks>
-    [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
-    public string Summary { get; set; } = "";
-
-    /// <summary>
-    /// URN of the entity which was used to create this search entry.
-    /// </summary>
-    /// <remarks>
-    /// This value is optional.  If set, it can be used to allow users to select that only specified result types are included in their
-    /// search results.
-    /// </remarks>
-    [SimpleField(IsFilterable = true)]
-    public string Scope { get; set; } = "";
-
-    /// <summary>
-    /// Unique Id for the search entry source.
-    /// </summary>
-    /// <remarks>
-    /// This value is optional.  If set, it can be used to manage the individual search result for update and delete operations.
-    /// </remarks>
-    [SimpleField(IsFilterable = true)]
-    public string SourceId { get; set; } = "";
-
-    /////// <summary>
-    /////// Search entry content, used for content indexing.
-    /////// </summary>
-    public string Content { get; set; }
-
-    /// <summary>
-    /// Search entry MIME type.
-    /// </summary>
-    /// <remarks>
-    /// This value should be set to the MIME type of the Content field.  This value is used for search result filtering and also
-    /// to tell Azure Search what content type is in the content field.
-    /// </remarks>
-    [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
-    public string ContentType { get; set; } = "";  // metadata_content_type
-
-    /// <summary>
-		/// Search entry display type.
-		/// </summary>
-		[SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft, IsFilterable = true)]
-    public string Type { get; set; } = "";
-
-    /// <summary>
-    /// Source entity published date
-    /// </summary>
-    /// <remarks>
-    /// This value is optional.  If specified, it can be displayed in search results.
-    /// </remarks>
-    [SimpleField(IsFilterable = true, IsSortable = true)]
-    public DateTime? PublishedDate { get; set; }
-
-    /// <summary>
-    /// The size of the resource in bytes.
-    /// </summary>
-    /// <remarks>
-    /// This value is optional and should only be supplied if it is relevant to the resource.  If specified, it can be displayed in search results.
-    /// </remarks>
-    public long Size { get; set; } = 0;
-
-    /// <summary>
-    /// A list of keywords for the resource.
-    /// </summary>
-    /// <remarks>
-    /// This value is optional.  If supplied, keywords contribute to the search result weighting.
-    /// </remarks>
-    [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft, IsFilterable = true)]
-    public List<string> Keywords { get; set; } = [];
-
-    /// <summary>
-    /// A list of categories for the resource.
-    /// </summary>
-    /// <remarks>
-    /// This value is optional.  If supplied, categories contribute to the search result weighting, and may also be used to filter results.
-    /// </remarks>
-    [SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft, IsFilterable = true)]
-    public List<string> Categories { get; set; } = [];
-
-    /// <summary>
-    /// A list of roles with view access to the resource.
-    /// </summary>
-    /// <remarks>
-    /// This value is optional.  If it not specified, search feeders will try to fill in roles by using the roles for the relevant
-    /// page, module or folder.  Roles are used to filter search results to resources which the current user can view.
-    /// </remarks>
-    [SimpleField(IsFilterable = true)]
-    public List<string> Roles { get; set; } = [];
-
-    /// <summary>
-    /// Specifies whether the document is visible to anonymous users.
-    /// </summary>
-    [SimpleField(IsFilterable = true)]
-    public Boolean IsSecure { get; set; }
-
-		/// <summary>
-    /// The date/time that the item was processed by elastic search.
-    /// </summary>
-    /// <remarks>
-    /// This is auto-populated by the ingest pipeline
-    /// </remarks>
-		//public string FeedProcessingDateTime { get; set; }
+  public void Dispose()
+  {
+    // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+    Dispose(disposing: true);
+    GC.SuppressFinalize(this);
+  }
 
 
-    /// <summary>
-    /// Search result score.
-    /// </summary>
-    /// <remarks>
-    /// This is populated for returned search results and can be used to sort results by relevance.
-    /// </remarks>
-    //public double? Score { get; set; }
+  //////[SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
+  //////public string Content { get; set; } = "";
 
-		// This is populated in the elastic search database by the attachment pipeline.  It is never populated by search results, but is
-		// used to represent the field in Elastic search (to include it for search queries)
-		// todo: public Nest.Attachment Attachment { get; set; }
+  //// Azure.Search.Documents.Indexes.Models.DocumentExtractionSkill
+  //// InputFieldMappingEntry
+  //[System.Text.Json.Serialization.JsonPropertyName("file_data")]
+  //public FileData File_Data { get; set; }
+  //public class FileData
+  //{
+  //  [System.Text.Json.Serialization.JsonPropertyName("$type")]
+  //  public string Type { get; set; } = "file";
 
-		/// <summary>
-		/// Content ingest status or error message.
-		/// </summary>
-		/// <remarks>
-		/// This value is generated by the attachment pipeline.
-		/// </remarks>
-		//public string Status { get; set; }	
+  //  [System.Text.Json.Serialization.JsonPropertyName("content")]
+  //  public string Content { get; set; }
 
-		private bool IsPublic(Site site, IEnumerable<Role> roles)
-		{
-			foreach (Role role in roles)
-			{
-				if (role == site.AnonymousUsersRole || role == site.AllUsersRole)
-				{
-					return true;
-				}
-			}
-		
-			return false;
-		}
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!disposedValue)
-			{
-				if (disposing)
-				{
-					// dispose managed state (managed objects).  Attachments and content can consume quite a bit of memory, so we 
-					// clean them up here.					
-					this.Content = null;
-				}
-
-				disposedValue = true;
-			}
-		}
-
-		public void Dispose()
-		{
-			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-			Dispose(disposing: true);
-			GC.SuppressFinalize(this);
-		}
-
-
-    //////[SearchableField(AnalyzerName = LexicalAnalyzerName.Values.EnMicrosoft)]
-    //////public string Content { get; set; } = "";
-
-    //// Azure.Search.Documents.Indexes.Models.DocumentExtractionSkill
-    //// InputFieldMappingEntry
-    //[System.Text.Json.Serialization.JsonPropertyName("file_data")]
-    //public FileData File_Data { get; set; }
-    //public class FileData
-    //{
-    //  [System.Text.Json.Serialization.JsonPropertyName("$type")]
-    //  public string Type { get; set; } = "file";
-
-    //  [System.Text.Json.Serialization.JsonPropertyName("content")]
-    //  public string Content { get; set; }
-
-    //  [System.Text.Json.Serialization.JsonPropertyName("source")]
-    //  public string Source { get; set; }
-    //}
-	}
+  //  [System.Text.Json.Serialization.JsonPropertyName("source")]
+  //  public string Source { get; set; }
+  //}
 }

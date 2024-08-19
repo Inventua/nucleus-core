@@ -5,7 +5,7 @@
   <description>
 		Nucleus search providers for Azure Search.
 	</description>
-  <compatibility minVersion="2.0.0.0" maxVersion="*" />
+  <compatibility minVersion="2.0.0.1" maxVersion="*" />
   <components>
     <component folderName="AzureSearch" optional="false">
       <controlPanelExtensionDefinition id="204D31FE-3B6B-47F8-B435-B8470F6462D5">
@@ -16,7 +16,6 @@
         <scope>Site</scope>
         <editAction>Settings</editAction>
       </controlPanelExtensionDefinition>
-      
       <file name="readme.txt" />
       <!-- 
         when the project property GenerateEmbeddedFilesManifest=true and your static resources Build Action=Embedded resource, static resource
@@ -29,9 +28,7 @@
         <file name="Azure.Core.dll" />
         <file name="System.ClientModel.dll" />
         <file name="Azure.Search.Documents.dll" />
-        <file name="Microsoft.IdentityModel.Tokens.dll" />
-        <file name="Microsoft.IdentityModel.Abstractions.dll" />
-        <file name="Microsoft.IdentityModel.Logging.dll" />
+        <file name="HtmlAgilityPack.dll" />
       </folder>
       <!-- 
         when the project property RazorCompileOnBuild=true view (.cshtml) files do not need to be included in package.xml (this file) 

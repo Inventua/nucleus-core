@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Nucleus.Abstractions.Models;
 
 namespace Nucleus.Extensions.AzureSearch;
@@ -8,23 +9,25 @@ public class ConfigSettings
   internal const string SITESETTING_SERVER_URL = "azuresearch:server-url";
   internal const string SITESETTING_INDEX_NAME = "azuresearch:indexname";
   internal const string SITESETTING_SERVER_APIKEY = "azuresearch:apikey";
+  internal const string SITESETTING_INDEXER_NAME = "azuresearch:indexername";
 
   internal const string SITESETTING_ATTACHMENT_MAXSIZE = "azuresearch:attachment-maxsize";
   internal const string SITESETTING_INDEXING_PAUSE = "azuresearch:indexing-pause";
 
-  internal const string SITESETTING_BOOST_TITLE = "azuresearch:boost-title";
-  internal const string SITESETTING_BOOST_SUMMARY = "azuresearch:boost-summary";
-  internal const string SITESETTING_BOOST_CATEGORIES = "azuresearch:boost-categories";
-  internal const string SITESETTING_BOOST_KEYWORDS = "azuresearch:boost-keywords";
-  internal const string SITESETTING_BOOST_CONTENT = "azuresearch:boost-content";
+  //internal const string SITESETTING_BOOST_TITLE = "azuresearch:boost-title";
+  //internal const string SITESETTING_BOOST_SUMMARY = "azuresearch:boost-summary";
+  //internal const string SITESETTING_BOOST_CATEGORIES = "azuresearch:boost-categories";
+  //internal const string SITESETTING_BOOST_KEYWORDS = "azuresearch:boost-keywords";
+  //internal const string SITESETTING_BOOST_CONTENT = "azuresearch:boost-content";
 
-  internal const string SITESETTING_BOOST_ATTACHMENT_AUTHOR = "azuresearch:boost-attachment-author";
-  internal const string SITESETTING_BOOST_ATTACHMENT_KEYWORDS = "azuresearch:boost-attachment-keywords";
-  internal const string SITESETTING_BOOST_ATTACHMENT_NAME = "azuresearch:boost-attachment-name";
-  internal const string SITESETTING_BOOST_ATTACHMENT_TITLE = "azuresearch:boost-attachment-title";
+  //internal const string SITESETTING_BOOST_ATTACHMENT_AUTHOR = "azuresearch:boost-attachment-author";
+  //internal const string SITESETTING_BOOST_ATTACHMENT_KEYWORDS = "azuresearch:boost-attachment-keywords";
+  //internal const string SITESETTING_BOOST_ATTACHMENT_NAME = "azuresearch:boost-attachment-name";
+  //internal const string SITESETTING_BOOST_ATTACHMENT_TITLE = "azuresearch:boost-attachment-title";
 
   public string ServerUrl { get; set; }
   public string IndexName { get; set; }
+  public string IndexerName { get; set; }
   public int AttachmentMaxSize { get; set; } = 32;
 
   public string EncryptedApiKey { get; set; }
@@ -32,6 +35,8 @@ public class ConfigSettings
   public double IndexingPause { get; set; } = 1;
 
   public Nucleus.Abstractions.Search.SearchQuery.BoostSettings Boost { get; set; } = new();
+
+  public List<string> Indexers { get; set; }
 
   // This constructor is used by model binding
   public ConfigSettings() { }
@@ -46,6 +51,11 @@ public class ConfigSettings
     if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_INDEX_NAME, out string indexName))
     {
       this.IndexName = indexName;
+    }
+
+    if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_INDEXER_NAME, out string indexerName))
+    {
+      this.IndexerName = indexerName;
     }
 
     if (site.SiteSettings.TryGetValue(ConfigSettings.SITESETTING_SERVER_APIKEY, out string encryptedApiKey))
@@ -69,16 +79,16 @@ public class ConfigSettings
       }
     }
 
-    this.Boost.Title = GetSetting(site, SITESETTING_BOOST_TITLE, this.Boost.Title);
-    this.Boost.Summary = GetSetting(site, SITESETTING_BOOST_SUMMARY, this.Boost.Summary);
-    this.Boost.Categories = GetSetting(site, SITESETTING_BOOST_CATEGORIES, this.Boost.Categories);
-    this.Boost.Keywords = GetSetting(site, SITESETTING_BOOST_KEYWORDS, this.Boost.Keywords);
-    this.Boost.Content = GetSetting(site, SITESETTING_BOOST_CONTENT, this.Boost.Content);
+    //this.Boost.Title = GetSetting(site, SITESETTING_BOOST_TITLE, this.Boost.Title);
+    //this.Boost.Summary = GetSetting(site, SITESETTING_BOOST_SUMMARY, this.Boost.Summary);
+    //this.Boost.Categories = GetSetting(site, SITESETTING_BOOST_CATEGORIES, this.Boost.Categories);
+    //this.Boost.Keywords = GetSetting(site, SITESETTING_BOOST_KEYWORDS, this.Boost.Keywords);
+    //this.Boost.Content = GetSetting(site, SITESETTING_BOOST_CONTENT, this.Boost.Content);
 
-    this.Boost.AttachmentAuthor = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_AUTHOR, this.Boost.AttachmentAuthor);
-    this.Boost.AttachmentKeywords = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_KEYWORDS, this.Boost.AttachmentKeywords);
-    this.Boost.AttachmentName = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_NAME, this.Boost.AttachmentName);
-    this.Boost.AttachmentTitle = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_TITLE, this.Boost.AttachmentTitle);
+    //this.Boost.AttachmentAuthor = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_AUTHOR, this.Boost.AttachmentAuthor);
+    //this.Boost.AttachmentKeywords = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_KEYWORDS, this.Boost.AttachmentKeywords);
+    //this.Boost.AttachmentName = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_NAME, this.Boost.AttachmentName);
+    //this.Boost.AttachmentTitle = GetSetting(site, SITESETTING_BOOST_ATTACHMENT_TITLE, this.Boost.AttachmentTitle);
   }
 
   private double GetSetting(Site site, string key, double defaultValue)

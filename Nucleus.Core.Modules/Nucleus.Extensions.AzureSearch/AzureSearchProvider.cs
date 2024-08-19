@@ -55,20 +55,19 @@ public class AzureSearchProvider : ISearchProvider
     }
 
 
-    AzureSearchRequest request = new(new System.Uri(settings.ServerUrl), ConfigSettings.DecryptApiKey(query.Site, settings.EncryptedApiKey), settings.IndexName);
+    AzureSearchRequest request = new(new System.Uri(settings.ServerUrl), ConfigSettings.DecryptApiKey(query.Site, settings.EncryptedApiKey), settings.IndexName, settings.IndexerName);
 
     if (query.Boost == null)
     {
       query.Boost = settings.Boost;
     }
-    
-    var response = await request.Search(query);
+
+    Response<SearchResults<AzureSearchDocument>> response = await request.Search(query);
 
     return new SearchResults()
     {
       Results = await ToSearchResults(response),
-      MaxScore = 1, // todo  result.MaxScore,
-      Total = response.Value.TotalCount.Value
+      Total = response.Value.TotalCount.HasValue ? response.Value.TotalCount.Value : 0
     };
   }
 
@@ -133,14 +132,13 @@ public class AzureSearchProvider : ISearchProvider
       query.Boost = settings.Boost;
     }
 
-    AzureSearchRequest request = new(new System.Uri(settings.ServerUrl), ConfigSettings.DecryptApiKey(query.Site, settings.EncryptedApiKey), settings.IndexName);
+    AzureSearchRequest request = new(new System.Uri(settings.ServerUrl), ConfigSettings.DecryptApiKey(query.Site, settings.EncryptedApiKey), settings.IndexName, settings.IndexerName);
 
     Response<SuggestResults<AzureSearchDocument>> result = await request.Suggest(query);
 
     return new SearchResults()
     {
       Results = await ToSearchResults(result),
-      MaxScore = 1, // todo: result.MaxScore,
       Total = result.Value.Results.Count
     };
   }
@@ -161,7 +159,7 @@ public class AzureSearchProvider : ISearchProvider
   {
     return new SearchResult()
     {
-      //Score = document.Score,
+      //Score = document.Score,  // Azure Search doesn't return a score for suggestions
 
       Site = await this.SiteManager.Get(Guid.Parse(result.Document.SiteId)),
       Url = result.Document.Url,

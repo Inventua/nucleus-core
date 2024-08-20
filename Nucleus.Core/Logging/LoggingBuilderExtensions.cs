@@ -56,6 +56,36 @@ namespace Nucleus.Core.Logging
       return builder;
     }
 
+    /// <summary>
+    ///   Adds a Startup Text file logger with options defined in configuration.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="configuration"></param>
+    /// <returns>ILoggingBuilder</returns>
+    /// <remarks>
+    /// This method should only be used by StartupLogger.cs. It creates a StartupTextFileLoggingProvider which is used
+    /// during startup to log messages to text files.
+    /// </remarks>
+    internal static ILoggingBuilder AddStartupTextFileLogger(this ILoggingBuilder builder, IConfiguration configuration)
+    {
+      builder.Services.AddOption<TextFileLoggerOptions>(configuration, TextFileLoggerOptions.Section);
+
+      // The TextFileLogger is used by the StartupLogger for logging during dependency injection setup.
+      // The IOptions<FolderOptions> and IConfiguration instance which is added to the dependency injection container won't be
+      // configured/available yet when ConfigureTextFileLogger.PostConfigure is called for the instance which is used by StartupLogger,
+      // so we have to save the configuration object in a static and read the data folder setting "manually" in ConfigureTextFileLogger.
+      // This is not an elegant solution, but the alternative would be to require an appSettings setting for Nucleus:TextFileLoggerOptions:Path,
+      // and we want that setting to be optional.
+      ConfigureTextFileLogger.Configuration = configuration;
+
+      builder.Services.ConfigureOptions<ConfigureTextFileLogger>();
+      builder.Services.AddSingleton<ILoggerProvider, StartupTextFileLoggingProvider>();
+      builder.Services.AddTransient<IExternalScopeProvider, LoggerExternalScopeProvider>();
+
+      return builder;
+    }
+
+
     public class ConfigureTextFileLogger : IPostConfigureOptions<TextFileLoggerOptions>
     {
       private IOptions<Nucleus.Abstractions.Models.Configuration.FolderOptions> FolderOptions { get; }

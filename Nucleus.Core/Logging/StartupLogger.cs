@@ -26,22 +26,22 @@ namespace Nucleus.Core.Logging
 		private static ILogger _startupLogger;
 		
 		/// <summary>
-		/// Create logger for logging during startup
+		/// Create logger for use during startup
 		/// </summary>
 		/// <param name="services"></param>
 		/// <param name="configuration"></param>
 		public static void AddStartupLogger(this IServiceCollection services, IConfiguration configuration)
 		{
-			// Create loggers for logging during startup
-			using var loggerFactory = LoggerFactory.Create(builder =>
-			{
-				builder.AddSimpleConsole(options => { options.TimestampFormat = "dd-MMM-yyyy HH:mm:ss: "; });
-				builder.AddDebug();
-				builder.AddTextFileLogger(configuration);
-			});
+      // Create loggers for logging during startup
+      using var loggerFactory = LoggerFactory.Create(builder =>
+      {
+        builder.AddSimpleConsole(options => { options.TimestampFormat = "dd-MMM-yyyy HH:mm:ss: "; });
+        builder.AddDebug();
+        builder.AddStartupTextFileLogger(configuration);
+      });
 
-			_startupLogger = loggerFactory.CreateLogger("Startup");
-		}
+      _startupLogger = loggerFactory.CreateLogger("Startup");
+    }
 
     private static ILogger CreateLogger()
     {

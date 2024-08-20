@@ -13,6 +13,7 @@ using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models.Configuration;
+using Microsoft.AspNetCore.Http;
 
 namespace Nucleus.Core.Logging
 {
@@ -23,17 +24,19 @@ namespace Nucleus.Core.Logging
   {
     internal DateTime LastExpiredLogsCheckDate { get; set; }
     public TextFileLoggerOptions Options { get; }
-    private IExternalScopeProvider ScopeProvider { get; set; }
+    private IExternalScopeProvider ScopeProvider { get; }
+    private IHttpContextAccessor HttpContextAccessor { get; }
 
-    public TextFileLoggingProvider(IOptions<TextFileLoggerOptions> TextFileLoggerOptions, IExternalScopeProvider scopeProvider)
+    public TextFileLoggingProvider(IHttpContextAccessor accessor, IOptions<TextFileLoggerOptions> TextFileLoggerOptions, IExternalScopeProvider scopeProvider)
 		{
+      this.HttpContextAccessor = accessor;
       this.Options = TextFileLoggerOptions.Value;
       this.ScopeProvider = scopeProvider;
     }
 
 		public ILogger CreateLogger(string categoryName)
 		{
-      return new TextFileLogger(this, this.Options, this.ScopeProvider, categoryName);
+      return new TextFileLogger(this, this.Options, this.ScopeProvider, categoryName, this.HttpContextAccessor?.HttpContext);
 		}
 
 		public void Dispose()

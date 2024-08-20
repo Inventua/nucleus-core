@@ -63,14 +63,10 @@ namespace Nucleus.ViewFeatures
 					timezone = TimeZoneInfo.Local;
 				}
 
-				if (value.TimeOfDay == TimeSpan.Zero)
-				{
-					return $"{System.TimeZoneInfo.ConvertTime(value.ToUniversalTime(), System.TimeZoneInfo.Utc, timezone).ToShortDateString()}";
-				}
-				else
-				{
-					return $"{System.TimeZoneInfo.ConvertTime(value.ToUniversalTime(), System.TimeZoneInfo.Utc, timezone).ToString("g")}";
-				}
+        // deserialized dates can have Kind=Unspecified, which breaks conversion to the specified time zone. We assume that dates
+        // are Utc unless their .Kind is already DateTimeKind.Local
+        DateTime utcValue = value.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(value, DateTimeKind.Utc): value;
+				return $"{TimeZoneInfo.ConvertTime(utcValue, timezone):g}";				
 			}
 		}
 

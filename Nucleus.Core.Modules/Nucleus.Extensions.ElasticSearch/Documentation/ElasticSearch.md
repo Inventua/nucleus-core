@@ -1,12 +1,26 @@
 ## Elastic Search Extension
 The Elastic Search extension provides a search index manager and a search provider (it both feeds the search index and retrieves search results).  
 
-> The Elastic Search extension provides an interface to Elastic Search, but does not include the Elastic Search application. You need an 
-[Elastic Search](https://www.elastic.co/) server to use the Elastic Search provider.  If you are setting up a new Elastic Search server, make sure to 
+> You need an 
+[Elastic Search](https://www.elastic.co/) server to use the Elastic Search provider.  If you are setting up your own Elastic Search server, make sure to 
 install the [Ingest Attachment plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/current/ingest-attachment.html).
 
-> Nucleus has built-in support for submitting pages and files to the index, and some modules (like the Documents module) also contain Search meta-data 
-providers which submit search index entries. 
+### How it works
+
+#### Nucleus
+The Nucleus search system is built to support a variety of search services. The Nucleus search system consists of:
+- **Search meta-data providers**: Extensions and core components of Nucleus implement meta-data providers, which provide data to the search indexing system. The 
+core includes meta-data providers for site pages and files, and modules (like Documents and Forums) also "publish" their data by implementing their own meta-data 
+providers.
+- **Search index managers**: Search extensions may implement a search index manager in order to populate an index. All configured search index managers receive all
+data from meta-data providers, and use meta-data however to populate their index. Some search extensions (like a Google custom search) don't have a search index 
+manager and just provide a search provider. 
+- **Search providers**: Search providers retrieve search results from an index.
+- The **[Search Module](/documentation/modules/search/)** presents a search user interface so that users can perform a search, and view results.
+- A [search feeder scheduled task](/other-extensions/elastic-search/#search-feeder-scheduled-task) runs periodically. It calls all meta-data providers and passes their data to all search index managers.
+
+#### Elastic Search
+The Elastic Search extension provides a search index manager and a search provider, so it can populate your Elastic Search index, and query it for search results.
 
 The Elastic Search extension settings are accessed in the `Manage` control panel.
 
@@ -52,6 +66,7 @@ increase the search feed duration to around 3.5 hours.
 | Get Index Settings        | Displays Elastic Search configuration information. |
 | Clear Index               | Use the `Clear Index` function to delete your index.  It will be automatically re-created the next time that the index feeder task runs. |
 
+## Search Feeder Scheduled Task
 > Nucleus has a built-in Scheduled Task which collects data from all installed search meta-data providers, and submits that data to all installed search index managers.  You 
 must create and enable the scheduled task in the `Settings/Scheduler` control panel as it is not enabled by default.
 

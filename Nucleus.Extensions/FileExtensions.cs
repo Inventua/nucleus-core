@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Models;
@@ -43,16 +45,35 @@ namespace Nucleus.Extensions
 		/// <returns></returns>
 		public static Guid DecodeFileId(string encodedPath)
 		{
-			string idString = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(encodedPath));
+      // File Id is a Guid. The largest string representation of a Guid with hyphens and braces is 38 bytes
+      const int GUID_LENGTH = 38;
 
-			if (!Guid.TryParse(idString, out Guid id))
-			{
-				throw new InvalidOperationException($"Encoded path {encodedPath} is not valid.");
-			}
-			else
-			{
-				return id;
-			}
+      byte[] decodedId = ArrayPool<byte>.Shared.Rent(GUID_LENGTH);
+
+      try
+      {
+        if (Convert.TryFromBase64String(encodedPath, decodedId, out int bytesWritten))
+        {
+          string idString = System.Text.Encoding.UTF8.GetString(decodedId, 0, bytesWritten);
+
+          if (!Guid.TryParse(idString, out Guid id))
+          {
+            throw new InvalidOperationException($"Encoded path '{encodedPath}' is not a valid Base64-encoded Guid.");
+          }
+          else
+          {
+            return id;
+          }
+        }
+        else
+        {
+          throw new InvalidOperationException($"Encoded path '{encodedPath}' is not valid base64.");
+        }
+      }
+      finally
+      {
+        ArrayPool<byte>.Shared.Return(decodedId);
+      }
 		}
 
 		/// <summary>

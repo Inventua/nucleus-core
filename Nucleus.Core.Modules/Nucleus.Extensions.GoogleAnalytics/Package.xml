@@ -16,6 +16,7 @@
         <extensionName>GoogleAnalytics</extensionName>
         <scope>Site</scope>
         <editAction>Settings</editAction>
+        <icon><![CDATA[&#xef3e;]]></icon>
       </controlPanelExtensionDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />

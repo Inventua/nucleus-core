@@ -37,6 +37,7 @@ namespace Nucleus.Web.Controllers.Admin
 			{
 				Extensions = (await this.ExtensionManager.ListControlPanelExtensions(ControlPanelExtensionDefinition.ControlPanelExtensionScopes.Site))
 					.Where(extension => HasPermission(extension))
+          .OrderBy(extension => extension.FriendlyName)
 					.ToList()
 			};
 

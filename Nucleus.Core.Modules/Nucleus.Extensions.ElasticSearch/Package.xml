@@ -16,6 +16,7 @@
         <extensionName>ElasticSearch</extensionName>
         <scope>Site</scope>
         <editAction>Settings</editAction>
+        <icon><![CDATA[&#xf02f;]]></icon>
       </controlPanelExtensionDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />

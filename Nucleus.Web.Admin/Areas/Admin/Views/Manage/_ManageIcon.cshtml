@@ -1,8 +1,19 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.ManageIcon
 <li class="@Model.ClassName">
   <button title="@Model.Title" type="button" data-target=".nucleus-adminpage" data-href="@Url.Content(@Model.Url)" accesskey="@Model.AccessKey" class="track-nav nucleus-show-progress nucleus-show-progress-inside">
-		<span class="nucleus-index-icon">@Html.Raw(Model.Glyph)</span>
-		<div class="nucleus-index-button-content">
+    @if (Model.Glyph?.Length == 1 || Model.Glyph?.StartsWith("&#x") == true)
+    { @* material icons *@
+      <span class="nucleus-index-icon">@Html.Raw(Model.Glyph)</span>
+    }
+    else if (Model.Glyph?.StartsWith("/") == true)
+    { @* image *@
+      <img class="nucleus-index-icon" src="@Html.Raw(Model.Glyph)"/>
+    }
+    else
+    { @* not specified, use default "puzzle piece" material icon *@
+      <span class="nucleus-index-icon">&#xe87b;</span>
+    }
+    <div class="nucleus-index-button-content">
 			<h3>@Model.Caption</h3>
 			<span>@Model.Summary</span>
 		</div>

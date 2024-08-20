@@ -15,6 +15,7 @@
         <extensionName>AzureSearch</extensionName>
         <scope>Site</scope>
         <editAction>Settings</editAction>
+        <icon><![CDATA[&#xf02f;]]></icon>
       </controlPanelExtensionDefinition>
       <file name="readme.txt" />
       <!-- 

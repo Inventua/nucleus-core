@@ -16,7 +16,7 @@
 	
 	@foreach (var extension in Model.Extensions)
 	{
-		@await Html.PartialAsync("../Manage/_ManageIcon", new ManageIcon(@extension.FriendlyName, @extension.FriendlyName, @extension.Description, @Url.NucleusAction(extension.EditAction, extension.ControllerName, extension.ExtensionName), @extension.FriendlyName.Substring(0,1), "&#xe87b;", "ExtensionIcon"))	
+		@await Html.PartialAsync("../Manage/_ManageIcon", new ManageIcon(@extension.FriendlyName, @extension.FriendlyName, @extension.Description, @Url.NucleusAction(extension.EditAction, extension.ControllerName, extension.ExtensionName), @extension.FriendlyName.Substring(0,1), extension.Icon, "ExtensionIcon"))	
 	}
 </ul>
 

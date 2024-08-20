@@ -66,5 +66,10 @@ namespace Nucleus.Abstractions.Models
 		/// The Action name for the default "Editor" for the control panel extension.
 		/// </summary>
 		public string EditAction { get; set; }
-	}
+
+    /// <summary>
+		/// The icon for the control panel extension.
+		/// </summary>
+		public string Icon { get; set; }
+  }
 }

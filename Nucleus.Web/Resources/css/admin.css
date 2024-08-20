@@ -441,9 +441,19 @@ ul.nucleus-control-panel-items button
 .nucleus-control-panel-items .nucleus-index-icon
 {
   margin: 0 0.75rem 0 0;
+}
+
+.nucleus-control-panel-items span.nucleus-index-icon
+{
   font-family: 'Material Icons';
   font-size: 2.75rem;
   line-height: 100%;
+}
+
+.nucleus-control-panel-items img.nucleus-index-icon
+{
+  max-width: 2.75rem;
+  height: auto;
 }
 
 .nucleus-control-panel-items li:hover, .nucleus-control-panel-items li:active, .nucleus-control-panel-items li:hover *, .nucleus-control-panel-items li:active *

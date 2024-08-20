@@ -15,6 +15,7 @@
         <extensionName>SAMLClient</extensionName>
         <scope>Site</scope>
         <editAction>SiteSettings</editAction>
+        <icon><![CDATA[&#xf042;]]></icon>
       </controlPanelExtensionDefinition>
       <moduleDefinition id="6E77A1F2-C865-4F98-ADB6-F0144DB55A79">
         <friendlyName>SAML Provider Selector</friendlyName>

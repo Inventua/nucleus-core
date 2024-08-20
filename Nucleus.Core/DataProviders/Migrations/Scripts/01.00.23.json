@@ -1,0 +1,15 @@
+{
+	"schemaName": "Nucleus.Core",
+  "version": "01.00.23",
+  "operations": [
+    {
+      "addColumn": {
+        "table": "ControlPanelExtensionDefinitions",
+        "name": "Icon",
+        "clrType": "string",
+        "maxLength": 1024,
+        "isnullable": true
+      }    
+    }
+  ]
+}

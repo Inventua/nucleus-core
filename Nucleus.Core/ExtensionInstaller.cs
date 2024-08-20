@@ -260,7 +260,8 @@ namespace Nucleus.Core
 								ControllerName = controlPanelExtensionDef.controllerName,
 								ExtensionName = controlPanelExtensionDef.extensionName,
 								Scope = (ControlPanelExtensionDefinition.ControlPanelExtensionScopes)System.Enum.Parse(typeof(ControlPanelExtensionDefinition.ControlPanelExtensionScopes), controlPanelExtensionDef.scope.ToString(), true),
-								EditAction = controlPanelExtensionDef.editAction
+								EditAction = controlPanelExtensionDef.editAction,
+                Icon = controlPanelExtensionDef.icon
 							};
 
 							await this.ExtensionManager.SaveControlPanelExtensionDefinition(extensionDefinition);

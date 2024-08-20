@@ -7,7 +7,7 @@
 @Html.AddScript("~#/viewer.js")
 @if (Model.Mode == Nucleus.Modules.PageLinks.Models.Settings.Modes.Manual)
 {
-  <ol class="page-links">
+  <ol class="page-links @Model.DirectionClass()">
     @foreach (var pageLink in Model.PageLinks)
     {
       <li><a href="@this.Context.Request.Path@(new char[] {'#', '.'}.Contains(pageLink.TargetId.First()) ? "" : "#")@pageLink.TargetId">@pageLink.Title</a></li>
@@ -16,11 +16,11 @@
 }
 else if (Model.Mode == Nucleus.Modules.PageLinks.Models.Settings.Modes.Automatic)
 {
-  <ol class="page-links" data-page-links-rootselector="@Model.RootSelector" data-page-links-includeheaders="@Model.EnabledHeaders" data-page-links-heading-class="@Model.HeadingClass"></ol>
+  <ol class="page-links @Model.DirectionClass()" data-page-links-rootselector="@Model.RootSelector" data-page-links-includeheaders="@Model.EnabledHeaders" data-page-links-heading-class="@Model.HeadingClass"></ol>
   <script>
     jQuery(function () 
     { 
       jQuery('.page-links').PageLinkViewer();
-    });        
+    });
   </script>
 }

@@ -21,6 +21,10 @@
           <SettingsControl caption="Mode" helptext="Select whether to automatically generate page links, or manually specify them.">
             @Html.DropDownListFor(model => model.Mode, Html.GetEnumSelectList<Nucleus.Modules.PageLinks.Models.Settings.Modes>(), new { @class = "pagelinks-mode" })
           </SettingsControl>
+          <SettingsControl caption="Direction" helptext="Select whether to render the site map as a vertical or horizontal list.">
+            @Html.DropDownListFor(model => model.Direction, Html.GetEnumSelectList<Nucleus.Modules.PageLinks.ViewModels.Settings.Directions>())
+          </SettingsControl>
+
         </div>
         <div class="nucleus-flex-fields">
           <SettingsControl caption="Heading Css Class" helptext="Include only header elements which have one or more of the specified css classes, separate multiple classes with a comma. Automatic mode only.">

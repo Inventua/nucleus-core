@@ -14,5 +14,18 @@ namespace Nucleus.Modules.PageLinks.ViewModels
 	{
     public string EnabledHeaders { get; set; }
     public IEnumerable<PageLink> PageLinks { get; set; } = [];
+
+    public string DirectionClass()
+    {
+      switch (this.Direction)
+      {
+        case Directions.Horizontal:
+          return "page-links-horizontal";
+        case Directions.Grid:
+          return "page-links-grid";
+        default:
+          return "";
+      }
+    }
   }
 }

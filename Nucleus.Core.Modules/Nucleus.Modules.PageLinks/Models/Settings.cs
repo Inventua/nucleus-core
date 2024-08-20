@@ -15,6 +15,7 @@ public class Settings
     public const string MODULESETTING_INCLUDE_HEADERS = "pagelinks:include-headers";
     public const string MODULESETTING_HEADING_CLASS = "pagelinks:heading-class";
     public const string MODULESETTING_ROOT_SELECTOR = "pagelinks:root-selector";
+    public const string MODULESETTING_DIRECTION = "pagelinks:direction";
   }
 
   public enum Modes
@@ -34,13 +35,21 @@ public class Settings
     [Display(Name = "Heading 6 (H6)", Description = "Include H6 elements in automatically generated page links.")] H6 = 32
   }
 
+  public enum Directions
+  {
+    Vertical = 0,
+    Horizontal = 1,
+    Grid = 2
+  }
+
   public string Title { get; set; }
   public Modes Mode { get; set; }
   public Dictionary<HtmlHeaderTags, Boolean> IncludeHeaders { get; set; } = [];
 
   public string HeadingClass { get; set; }
   public string RootSelector { get; set; }
-  
+  public Directions Direction { get; set; }
+
   public void GetSettings(PageModule module)
   {
     this.Title = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_TITLE, "");
@@ -48,6 +57,7 @@ public class Settings
     this.HeadingClass = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_HEADING_CLASS, "");
     this.RootSelector = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_ROOT_SELECTOR, "");
     this.IncludeHeaders = GetIncludeHeadersDictionary(module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_INCLUDE_HEADERS, HtmlHeaderTags.H1 | HtmlHeaderTags.H2 | HtmlHeaderTags.H3 | HtmlHeaderTags.H4 | HtmlHeaderTags.H5 | HtmlHeaderTags.H6));
+    this.Direction = module.ModuleSettings.Get(ModuleSettingsKeys.MODULESETTING_DIRECTION, Directions.Vertical);
   }
 
   public void SetSettings(PageModule module)
@@ -57,6 +67,7 @@ public class Settings
     module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_HEADING_CLASS, this.HeadingClass);
     module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_ROOT_SELECTOR, this.RootSelector);
     module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_INCLUDE_HEADERS, GetIncludeHeadersFromDictionary());
+    module.ModuleSettings.Set(ModuleSettingsKeys.MODULESETTING_DIRECTION, this.Direction);
   }
 
   private Dictionary<HtmlHeaderTags, Boolean> GetIncludeHeadersDictionary(HtmlHeaderTags value)

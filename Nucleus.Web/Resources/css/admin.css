@@ -1192,6 +1192,18 @@ ul.nucleus-control-panel-items button
   position: absolute;
   right: 1rem;
   top: 0.25rem;
+  transition: 0.2s all; 
+  padding: .25rem 0.5rem;
+}
+
+#system-logs .nucleus-copy-button:hover, #task-logs .nucleus-copy-button:hover
+{
+  background-color: #eee;
+}
+
+#system-logs .nucleus-copy-button:active, #task-logs .nucleus-copy-button:active
+{
+  color: #bbb;
 }
 
 .nucleus-log-level
@@ -1214,9 +1226,20 @@ ul.nucleus-control-panel-items button
   border-radius: 4px;
 }
 
-.nucleus-log-category
+.nucleus-log-category, .nucleus-log-ipaddress, .nucleus-log-requestpath
 {
-  color: #888;
+  color: #888;  
+}
+
+.nucleus-log-ipaddress, .nucleus-log-requestpath
+{
+  margin-right: 1.5rem;
+  font-size: 0.85rem; 
+}
+
+.nucleus-log-ipaddress span, .nucleus-log-requestpath span
+{
+  color: black;
 }
 
 .nucleus-log-message

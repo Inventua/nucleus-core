@@ -17,7 +17,7 @@ namespace Nucleus.Core.Logging;
 /// A Text file logger is created by the <see cref="TextFileLoggingProvider"/>.  Text file logs are
 /// automatically deleted after 7 days.  Logging is configured in appSettings.json.
 /// </remarks>
-public class TextFileLogger : ILogger
+internal class TextFileLogger : ILogger
 {
   private const int MAX_QUEUE_SIZE = 100;
 
@@ -29,16 +29,16 @@ public class TextFileLogger : ILogger
   private TextFileLoggerOptions Options { get; }
   private IExternalScopeProvider ScopeProvider { get; set; }
   private System.Collections.Concurrent.ConcurrentQueue<string> Queue { get; } = new();
-  private HttpContext HttpContext { get; }
-
+  private TextFileLoggerRequestInformation RequestInformation { get; }
+    
   private static SemaphoreSlim _fileAccessSemaphore { get; } = new(1);
 
-  public TextFileLogger(TextFileLoggingProvider provider, TextFileLoggerOptions options, IExternalScopeProvider scopeProvider, string category, HttpContext httpContext)
+  public TextFileLogger(TextFileLoggingProvider provider, TextFileLoggerOptions options, IExternalScopeProvider scopeProvider, string category, TextFileLoggerRequestInformation requestInformation)
   {
     this.Provider = provider;
     this.Options = options;
     this.Category = category;
-    this.HttpContext = httpContext;
+    this.RequestInformation = requestInformation;
     this.ScopeProvider = scopeProvider;
   }
 
@@ -125,22 +125,22 @@ public class TextFileLogger : ILogger
     string requestInformation;
 
     // add request information, if we have a valid Http Context
-    if (this.HttpContext != null)
+    if (this.RequestInformation != null)
     {
-      requestInformation = $",Remote IP: {this.HttpContext.Connection?.RemoteIpAddress},Request Path: {this.HttpContext.Request?.Path}";
+      requestInformation = $",{this.RequestInformation?.RemoteIpAddress},{this.RequestInformation?.RequestPath}";
     }
     else
     {
-      requestInformation = "";
+      requestInformation = $",{Environment.MachineName},";
     }
 
     if (exception != null)
     {
-      return $"{DateTime.UtcNow:O},{logLevel},{this.Category},{formatter(state, exception)} {exception.Message}: {exception}{requestInformation}".Replace(Environment.NewLine, "|").Replace("\n", "");
+      return $"A,{DateTime.UtcNow:O},{logLevel},{this.Category}{requestInformation},{formatter(state, exception)} {exception.Message}: {exception}".Replace(Environment.NewLine, "|").Replace("\n", "");
     }
     else
     {
-      return $"{DateTime.UtcNow:O},{logLevel},{this.Category},{formatter(state, exception)}{requestInformation}".Replace(Environment.NewLine, "|");
+      return $"A,{DateTime.UtcNow:O},{logLevel},{this.Category}{requestInformation},{formatter(state, exception)}".Replace(Environment.NewLine, "|");
     }
   }
 

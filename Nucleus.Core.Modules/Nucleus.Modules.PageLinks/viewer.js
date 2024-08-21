@@ -10,7 +10,7 @@
     // private functions
 
     // create and return the page links list 
-    function _buildPageLinksList(rootElement, includedHeaders, headingClass)
+    function _buildPageLinksList(rootElement, includedHeaders, headingClass, myContainerHeading)
     {
       let headerElements = rootElement.find(':header:visible');
       let pageLinkslistElement = jQuery('<div></div>');
@@ -25,7 +25,7 @@
         {
           let headerElement = headerElements[headersIndex];
 
-          if (_shouldIncludeHeader(headerElement, includedHeaders, headingClass))
+          if (_shouldIncludeHeader(headerElement, includedHeaders, headingClass, myContainerHeading))
           {
             headerIndex = parseInt(headerElement.nodeName.substring(1), 10);
           }
@@ -42,7 +42,7 @@
             currentHeaderIndex = headerIndex;
           }
 
-          if (_shouldIncludeHeader(headerElement, includedHeaders, headingClass))
+          if (_shouldIncludeHeader(headerElement, includedHeaders, headingClass, myContainerHeading))
           {
             let pageLinkItem = _buildPageLink(jQuery(headerElement));
             queuedPageLinks.push(pageLinkItem);            
@@ -99,7 +99,7 @@
     }
 
     // return the parent of the list item which is linked to the specified element
-    function _getParentListItem(headerElements, listElement, element, includedHeaders, headingClass)
+    function _getParentListItem(headerElements, listElement, element, includedHeaders, headingClasses, myContainerHeading)
     {
       // first item is always added to the top-level list
       if (headerElements[0] === element[0])
@@ -115,7 +115,7 @@
           let headerElement = headerElements[headersCount];
           let headerLevel = parseInt(headerElement.nodeName.substring(1), 10);
 
-          if (_shouldIncludeHeader(headerElement, includedHeaders, headingClass) && headerLevel < thisHeaderLevel)
+          if (_shouldIncludeHeader(headerElement, includedHeaders, headingClasses, myContainerHeading) && headerLevel < thisHeaderLevel)
           {
             // find the list item which is linked to the "parent" header element
             let parentListItem = null;
@@ -152,18 +152,18 @@
     }
 
     // return whether the header element should be included in the page links list, based on module settings
-    function _shouldIncludeHeader(element, includedHeaders, headingClass)
+    function _shouldIncludeHeader(element, includedHeaders, headingClasses, myContainerHeading)
     {
-      let doIncludeHeader = includedHeaders.toUpperCase().split(',').includes(element.nodeName);
-
+      let doIncludeHeader = includedHeaders.toUpperCase().split(',').includes(element.nodeName) && !jQuery(element).is(myContainerHeading);
+       
       if (doIncludeHeader)
       {
-        if (headingClass === '') return true;
+        if (headingClasses === '') return true;
 
-        let headingClassArray = headingClass.split(',');
-        for (let index = 0; index < headingClassArray.length; index++)
+        let headingClassesArray = headingClasses.split(',');
+        for (let index = 0; index < headingClassesArray.length; index++)
         {
-          if (jQuery(element).hasClass(headingClassArray[index].trim().replace(/^\./gm, ''))) return true;
+          if (jQuery(element).hasClass(headingClassesArray[index].trim().replace(/^\./gm, ''))) return true;
         }
       }
       return false;
@@ -216,7 +216,8 @@
       {
         let rootSelector = pageLinksWrapper.attr('data-page-links-rootselector');
         let includedHeaders = pageLinksWrapper.attr('data-page-links-includeheaders');
-        let headingClass = pageLinksWrapper.attr('data-page-links-heading-class');
+        let headingClasses = pageLinksWrapper.attr('data-page-links-heading-class');
+        let myContainerHeading = pageLinksWrapper.parents('section').siblings('h1,h2,h3,h4,h5,h6').first();
 
         // remove the attributes because they are only needed until this code has executed. Also removing them prevents the plugin from
         // running twice on the same wrapper.
@@ -229,7 +230,7 @@
           rootSelector = 'body';
         }
 
-        pageLinksWrapper.append(_buildPageLinksList(jQuery(rootSelector), includedHeaders, headingClass));
+        pageLinksWrapper.append(_buildPageLinksList(jQuery(rootSelector), includedHeaders, headingClasses, myContainerHeading));
       }
     })
   };

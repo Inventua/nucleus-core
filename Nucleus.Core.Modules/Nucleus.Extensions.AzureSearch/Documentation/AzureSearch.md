@@ -13,7 +13,7 @@ to index file meta-data, along with your site content, you can use Azure Search,
 #### Nucleus
 The Nucleus search system is built to support a variety of search services. The Nucleus search system consists of:
 - **Search meta-data providers**: Extensions and core components of Nucleus implement meta-data providers, which provide data to the search indexing system. The 
-core includes meta-data providers for site pages and files, and modules (like Documents and Forums) also "publish" their data by implementing their own meta-data 
+core includes meta-data providers for site pages and files, and modules (like Documents and Forums) also publish their data by implementing their own meta-data 
 providers.
 - **Search index managers**: Search extensions may implement a search index manager in order to populate an index. All configured search index managers receive all
 data from meta-data providers, and use meta-data however to populate their index. Some search extensions (like a Google custom search) don't have a search index 

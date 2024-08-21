@@ -1,16 +1,16 @@
 ## Amazon S3 File System Provider Extension
 The Amazon S3 File System Provider extension is a file system provider which allows you to use the [Amazon S3 storage service](https://aws.amazon.com/s3/) with Nucleus.
 
-> If you don't install the Amazon S3 file system provider using the Setup Wizard, after you install it, you must configure the Amazon S3 file system 
-provider in application configuration files.  
+The easiest way to set up the Amazon S3 File System Provider extension is during setup,  using the [Setup Wizard](/getting-started/#setup-wizard). If you use the Setup Wizard, 
+you don't need to follow the steps below.
 
 To use Amazon S3 Storage, install the Amazon S3 File System Provider extension, then add a configuration section for the Amazon S3 file system 
 provider.  The provider type name for the Azure Blob Storage file system provider is 
 `Nucleus.Extensions.AmazonS3FileSystemProvider.FileSystemProvider,Nucleus.Extensions.AmazonS3FileSystemProvider`.
 
 ### Limitations and Features:
-- The Amazon S3 File System Provider extension does not support creating buckets.  Create a bucket in the AWS console.  
-- If your AWS account only has one bucket, the Amazon S3 File System Provider extension automatically navigates to it and does not show the top level (list of buckets).
+- **The Amazon S3 File System Provider extension does not support creating buckets.  Create a bucket in the AWS console.** 
+- If your AWS S3 service only has one bucket, the Amazon S3 File System Provider extension automatically navigates to it and does not show the top level (list of buckets).
 - Amazon S3 is case-sensitive.  To avoid confusion, the Amazon S3 File System Provider extension always converts new folder names and uploaded file names to lower 
 case.  Any pre-existing or manually-updated folders or files in your S3 bucket are not changed.
 - The Amazon S3 service does not support objects (other than "buckets") at the "top level", you must navigate within a bucket to create folders and upload files.
@@ -31,8 +31,6 @@ case.  Any pre-existing or manually-updated folders or files in your S3 bucket a
   "RootPath": "YOUR-BUCKET-NAME"
 }
 ```
-
-See also:  [Using a different File System provider](https://www.nucleus-cms.com/getting-started#using-a-different-file-system-provider)
 
 Replace the ==YOUR-ACCESS-KEY==, ==YOUR-SECRET==, the service Url value and ==YOUR-BUCKET-NAME== 
 with values from the AWS console.  Log in to the AWS console, click `Services`, scroll down and click the `Storage` menu item on 

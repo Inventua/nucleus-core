@@ -1,0 +1,25 @@
+﻿@model Nucleus.Extensions.GoogleCustomSearch.ViewModels.Settings
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@Html.AddStyle("~#/settings.css")
+<h1 class="nucleus-modal-caption">Google Custom Search Settings</h1>
+@using (Html.BeginNucleusForm("SaveSettings", "Settings", "GoogleCustomSearch", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+  <fieldset role="group" aria-labelledby="heading" class="flex-grow-1">
+		<h2 class="nucleus-control-panel-heading">Settings</h2>
+		<div class="nucleus-flex-fields">
+      <SettingsControl caption="API Key" helptext="To get your API key, visit the Custom Search JSON API Guide (https://developers.google.com/custom-search/v1/introduction) and click on 'Get a Key'.">
+        @Html.PasswordFor(model => model.ApiKey, new { value = (Model.IsApiKeySet ? Nucleus.Extensions.GoogleCustomSearch.ViewModels.Settings.DUMMY_API_KEY : "") })
+      </SettingsControl>
+      <SettingsControl caption="Programmable Search Engine ID" helptext="Visit the Programmable Search Engine (https://programmablesearchengine.google.com/controlpanel/all) and enter your search engine details to create your ID.">
+        @Html.TextBoxFor(model => model.SearchEngineId)
+      </SettingsControl>
+		</div>
+	</fieldset>
+
+	<div class="nucleus-form-buttonrow">
+    @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "Settings", "GoogleCustomSearch"), new { })
+	</div>
+}

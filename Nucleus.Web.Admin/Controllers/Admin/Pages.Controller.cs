@@ -416,7 +416,7 @@ public class PagesController : Controller
   [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.PAGE_EDIT_POLICY)]
   public async Task<ActionResult> AddPageRoute(ViewModels.Admin.PageEditor viewModel)
   {
-    viewModel.Page.Routes.Add(new PageRoute());
+    viewModel.Page.Routes.Add(new PageRoute() { Id = Guid.NewGuid() });
 
     return View("Editor", await BuildPageEditorViewModel(viewModel.Page, viewModel.PagePermissions, true));
   }
@@ -521,6 +521,19 @@ public class PagesController : Controller
     viewModel.Page.LinkFileId = viewModel.SelectedLinkFile?.Id;
 
     await this.PageManager.Save(this.Context.Site, viewModel.Page);
+
+    //if (isNew)
+    //{
+      // New routes have an empty id until they are saved so we have to assign the default route here, after ids have been assigned.
+      //Guid? defaultRouteId = viewModel.Page.DefaultPageRouteId;
+      //if (!viewModel.Page.DefaultPageRouteId.HasValue || viewModel.Page.DefaultPageRouteId == Guid.Empty)
+      //{
+      //  Page page = await this.PageManager.Get(viewModel.Page.Id);
+
+      //  page.DefaultPageRouteId = defaultRouteId;
+      //  await this.PageManager.Save(this.Context.Site, page);
+      //}
+    //}
 
     if (viewModel.PageEditorMode != ViewModels.Admin.PageEditor.PageEditorModes.Default)
     {

@@ -27,10 +27,12 @@
     <None Remove="DataProviders\Migrations\Scripts\01.00.04.json" />
     <None Remove="DataProviders\Migrations\Scripts\01.00.05.json" />
     <None Remove="license.txt" />
+    <None Remove="settings.min.css" />
     <None Remove="viewer.css" />
     <None Remove="package.xml" />
     <None Remove="readme.txt" />
     <None Remove="settings.css" />
+    <None Remove="viewer.min.css" />
     <None Remove="Views\EditPost.cshtml" />
     <None Remove="Views\ForumEditor.cshtml" />
     <None Remove="Views\GroupEditor.cshtml" />
@@ -47,10 +49,12 @@
 
   <ItemGroup>
     <Content Include="license.txt" />
+    <Content Include="settings.min.css" />
     <Content Include="viewer.css" />
     <Content Include="package.xml" />
     <Content Include="readme.txt" />
     <Content Include="settings.css" />
+    <Content Include="viewer.min.css" />
     <Content Include="Views\_GroupPermissions.cshtml" />
     <Content Include="Views\ManageSubscriptions.cshtml" />
     <Content Include="Views\_ForumList.cshtml" />

@@ -69,6 +69,7 @@ public class SearchController : Controller
   [HttpPost]
   public async Task<ActionResult> Index(ViewModels.Viewer viewModel)
   {
+    ModelState.Clear();
     return View("Viewer", await BuildViewModel(viewModel));
   }
 

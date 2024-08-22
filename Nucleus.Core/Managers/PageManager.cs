@@ -64,7 +64,7 @@ public partial class PageManager : IPageManager
     Page result = new();
 
     // default route (url)
-    result.Routes.Add(new PageRoute());
+    result.Routes.Add(new PageRoute() { Id = Guid.NewGuid() });
 
     return Task.FromResult(result);
   }

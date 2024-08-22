@@ -475,7 +475,7 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
           EF.Functions.Like(page.Title, $"%{searchTerm}%") ||
           EF.Functions.Like(page.Description, $"%{searchTerm}%") ||
           EF.Functions.Like(page.Keywords, $"%{searchTerm}%") ||
-          page.Modules.Any(module => EF.Functions.Like(module.Title, $"%{searchTerm}%")) 
+          page.Modules.Any(module => EF.Functions.Like(module.Title, $"%{searchTerm}%"))
         )
         &&
         (
@@ -565,29 +565,35 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
     // New pages can't save a default page route, because routes can't be created until the page exists.  So we have to 
     // store the default page route value, save the page, then save the routes, then update the page with the selected default
     // page route (to avoid a database foreign key violation error)
-    if (existingPage == null)
-    {
-      this.Context.Entry(pageClone).Property("DefaultPageRouteId").CurrentValue = null;
-      await this.Context.SaveChangesAsync<Page>();
-      page.Id = pageClone.Id;
-    }
-    else
-    {
-      await this.Context.SaveChangesAsync<Page>();
-    }
+    //if (existingPage == null)
+    //{
+    this.Context.Entry(pageClone).Property("DefaultPageRouteId").CurrentValue = null;
+    await this.Context.SaveChangesAsync<Page>();
+    page.Id = pageClone.Id;
+    //}
+    //else
+    //{
+    //  await this.Context.SaveChangesAsync<Page>();
+    //}
 
     // add/update/remove related records
     this.Context.ChangeTracker.Clear();
     await SavePageRoutes(site, page, existingPage?.Routes);
 
     // update default page route & raise events
+
+    if (this.Context.Entry(pageClone).Property("DefaultPageRouteId").CurrentValue == null)
+    {
+      // No default route was selected, choose the first one.
+      this.Context.Entry(pageClone).Property("DefaultPageRouteId").CurrentValue = page.Routes.FirstOrDefault()?.Id;
+    }
+
+    this.Context.Update(pageClone);
+    await this.Context.SaveChangesAsync<Page>();
+
     if (existingPage == null)
     {
-      // new record
-      this.Context.Entry(pageClone).Property("DefaultPageRouteId").CurrentValue = page.DefaultPageRouteId;
-      this.Context.Update(pageClone);
-      await this.Context.SaveChangesAsync<Page>();
-
+      //new record
       this.EventManager.RaiseEvent<Page, Create>(page);
     }
     else
@@ -2294,7 +2300,7 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
     var query = this.Context.Files.Where(file =>
       EF.Property<Guid>(file, "SiteId") == site.Id &&
         (
-          EF.Functions.Like(file.Path, $"%{searchTerm}%") 
+          EF.Functions.Like(file.Path, $"%{searchTerm}%")
         )
       );
 

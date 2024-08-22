@@ -151,7 +151,7 @@
               <tr>
                 <td>
                   @Html.HiddenFor(model => model.Page.Routes[urlCount].Id)
-                  @Html.TextBoxFor(model => model.Page.Routes[urlCount].Path, (@Model.Page.Routes[urlCount].Id == Guid.Empty ? new { @class = "DefaultPagePath", @maxlength = 256 } : null))
+                  @Html.TextBoxFor(model => model.Page.Routes[urlCount].Path, (@String.IsNullOrEmpty(Model.Page.Routes[urlCount].Path) ? new { @class = "DefaultPagePath", @maxlength = 256 } : null))
                 </td>
 
                 <td class="ps-1">@Html.DropDownListFor(model => model.Page.Routes[urlCount].Type, Html.GetEnumSelectList<PageRoute.PageRouteTypes>())</td>

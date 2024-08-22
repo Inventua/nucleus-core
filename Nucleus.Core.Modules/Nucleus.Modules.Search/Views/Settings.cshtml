@@ -9,7 +9,7 @@
 		<h2 class="nucleus-modal-caption">Search Settings</h2>
 		
 		<SettingsControl caption="Search Provider" helptext="Select a search provider.">
-			@Html.DropDownListFor(model => model.SearchProvider, new SelectList(Model.SearchProviders, "ClassName", "Name"), "(default)")
+			@Html.DropDownListFor(model => model.SearchProvider, new SelectList(Model.SearchProviders, "ClassName", "Name"), "(default)", new { data_autopostbackevent = "change"})
 		</SettingsControl>
 
 		<fieldset role="group" aria-labelledby="heading">
@@ -36,7 +36,7 @@
 				</SettingsControl>
 
 				<SettingsControl caption="Maximum Number of Suggestions" helptext="Specify how many suggestions to display while the user enters search terms.">
-					@Html.TextBoxFor(model => model.MaximumSuggestions, new { @type = "number", @min = "0", @max = "100" })
+          @Html.TextBoxFor(model => model.MaximumSuggestions, new { @type = "number", @min = "0", @max = @Model.SearchProviderCapabilities.MaximumSuggestions, @class = (Model.SearchProviderCapabilities.MaximumSuggestions == 0 ? "disabled" : "") })
 				</SettingsControl>
 			</div>
 
@@ -45,11 +45,11 @@
 			</SettingsControl>
 
 			<SettingsControl caption="Include Scopes" helptext="Use this setting to restrict results to specified scopes, or leave blank for all scopes.  Specify included scopes by entering one or more scopes separated by line feeds.  A scope is the URN of the data type which was used to create a search entry (Examples: site pages - urn:nucleus:entities:page, files - urn:nucleus:entities:file).  This setting affects both search suggestions and search results.  This is an advanced setting which may not be supported by all search providers.">
-				@Html.TextAreaFor(model => model.IncludeScopes, new { @rows = 5})
+        @Html.TextAreaFor(model => model.IncludeScopes, new { @rows = 5, @class = (Model.SearchProviderCapabilities.CanFilterByScope ? "" : "disabled") })
 			</SettingsControl>
 						
 			<SettingsControl caption="Include Files in Results?" rendermode="LabelLast" class="inner-inline" helptext="Specify whether to include files in search results.">
-				@Html.CheckBoxFor(model => model.IncludeFiles, new { @class = "ToggleSwitch" })
+				@Html.CheckBoxFor(model => model.IncludeFiles, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanFilterByScope ? " disabled" : "") })
 			</SettingsControl>
 		</fieldset>
 
@@ -57,11 +57,11 @@
 			Results display settings are configured in the search module instance on the results page.
 		</div>
 
-		<fieldset class="search-instance-settings collapse show">
-			<label>Results Display</label>
+    <fieldset class="search-instance-settings collapse show mt-4" aria-labelledby="heading">
+			<h3>Results Display</h3>
 			<div class="nucleus-flex-fields">
         <SettingsControl caption="Show Type?" rendermode="LabelLast" class="inner-inline" helptext="Display search result types.">
-					@Html.CheckBoxFor(model => model.ShowType, new { @class = "ToggleSwitch" })
+					@Html.CheckBoxFor(model => model.ShowType, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportType  ? " disabled" : "") })
 				</SettingsControl>
 
 				<SettingsControl caption="Show Summary?" rendermode="LabelLast" class="inner-inline" helptext="Display search result item summaries/descriptions.">
@@ -69,11 +69,11 @@
 				</SettingsControl>
 
 				<SettingsControl caption="Show Categories?" rendermode="LabelLast" class="inner-inline" helptext="Display search result categories.">
-					@Html.CheckBoxFor(model => model.ShowCategories, new { @class = "ToggleSwitch" })
+          @Html.CheckBoxFor(model => model.ShowCategories, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportCategories ? " disabled" : "") })
 				</SettingsControl>
 
 				<SettingsControl caption="Show Published Date?" rendermode="LabelLast" class="inner-inline" helptext="Display search result publication date, if available.">
-					@Html.CheckBoxFor(model => model.ShowPublishDate, new { @class = "ToggleSwitch" })
+          @Html.CheckBoxFor(model => model.ShowPublishDate, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportPublishedDate ? " disabled" : "") })
 				</SettingsControl>
       </div>
       <div class="nucleus-flex-fields">
@@ -82,15 +82,15 @@
 				</SettingsControl>
 
 				<SettingsControl caption="Show Size?" rendermode="LabelLast" class="inner-inline" helptext="Display search result size, if available.">
-					@Html.CheckBoxFor(model => model.ShowSize, new { @class = "ToggleSwitch" })
+          @Html.CheckBoxFor(model => model.ShowSize, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportSize ? " disabled" : "") })
 				</SettingsControl>
 
 				<SettingsControl caption="Show Score?" rendermode="LabelLast" class="inner-inline" helptext="Display search result score.">
-					@Html.CheckBoxFor(model => model.ShowScore, new { @class = "ToggleSwitch" })
+          @Html.CheckBoxFor(model => model.ShowScore, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportScore ? " disabled" : "") })
 				</SettingsControl>
 
         <SettingsControl caption="Show Score Assessment?" rendermode="LabelLast" class="inner-inline" helptext="Display search result score assessment.">
-          @Html.CheckBoxFor(model => model.ShowScoreAssessment, new { @class = "ToggleSwitch" })
+          @Html.CheckBoxFor(model => model.ShowScoreAssessment, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportScore ? " disabled" : "") })
         </SettingsControl>
 			</div>
 		</fieldset>
@@ -100,8 +100,14 @@
 	</div>
 }
 <script>
+  jQuery('#search-settings .disabled').each(function ()
+  {
+    jQuery(this).prop('disabled', true);
+  });
+
 	$(document).ready(function()
 	{
+
 		// Read the child pages of the item containing the "+" button
 		jQuery('#search-settings').on('click', '.nucleus-get-childpages', function (e)
 		{

@@ -57,6 +57,8 @@ namespace Nucleus.Modules.Search.ViewModels
 		public string IncludeScopes { get; set; }
 		public int MaximumSuggestions { get; set; }
 
+    public Abstractions.Search.ISearchProviderCapabilities SearchProviderCapabilities { get; set; }
+
 		public List<AvailableSearchProvider> SearchProviders { get; set; }
 
 		public string SearchProvider { get; set; }

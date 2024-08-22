@@ -69,6 +69,7 @@ public class SearchController : Controller
   [HttpPost]
   public async Task<ActionResult> Index(ViewModels.Viewer viewModel)
   {
+    ModelState.Clear();
     return View("Viewer", await BuildViewModel(viewModel));
   }
 
@@ -81,9 +82,16 @@ public class SearchController : Controller
 
   [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
   [HttpGet]
+  public async Task<ActionResult> Settings()
+  {
+    return View("Settings", await BuildSettingsViewModel(null));
+  }
+
+  [Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.MODULE_EDIT_POLICY)]
   [HttpPost]
   public async Task<ActionResult> Settings(ViewModels.Settings viewModel)
   {
+    ModelState.Clear();
     return View("Settings", await BuildSettingsViewModel(viewModel));
   }
 
@@ -166,39 +174,64 @@ public class SearchController : Controller
       viewModel.ResultsUrl = "~" + this.Context.Page.DefaultPageRoute().Path;
     }
 
+
+    ISearchProvider searchProvider = GetSelectedSearchProvider(viewModel.Settings);      
+    viewModel.Settings.SearchProviderCapabilities = searchProvider.GetCapabilities();
+
+    // override unsupported settings
+    if (viewModel.Settings.SearchProviderCapabilities.MaximumSuggestions < viewModel.Settings.MaximumSuggestions)
+    {
+      viewModel.Settings.MaximumSuggestions = viewModel.Settings.SearchProviderCapabilities.MaximumSuggestions;
+    }
+
+    foreach (int pageSize in viewModel.PagingSettings.PageSizes.ToList())
+    {
+      if (viewModel.Settings.SearchProviderCapabilities.MaximumPageSize < pageSize)
+      {
+        viewModel.PagingSettings.PageSizes.Remove(pageSize);
+      }
+    }
+
+    if (!viewModel.Settings.SearchProviderCapabilities.CanReportPublishedDate)
+    {
+      viewModel.Settings.ShowPublishDate = false;
+    }
+
+    if (!viewModel.Settings.SearchProviderCapabilities.CanReportCategories)
+    {
+      viewModel.Settings.ShowCategories = false;
+    }
+
+    if (!viewModel.Settings.SearchProviderCapabilities.CanReportType)
+    {
+      viewModel.Settings.ShowType = false;
+    }
+
+    if (!viewModel.Settings.SearchProviderCapabilities.CanReportScore)
+    {
+      viewModel.Settings.ShowScore = false;
+      viewModel.Settings.ShowScoreAssessment = false;
+    }
+
+    if (!viewModel.Settings.SearchProviderCapabilities.CanReportSize)
+    {
+      viewModel.Settings.ShowSize = false;
+    }
+
+    if (!viewModel.Settings.SearchProviderCapabilities.CanReportType)
+    {
+      viewModel.Settings.ShowType = false;
+    }
+
     if (!String.IsNullOrEmpty(viewModel.SearchTerm))
     {
-      ISearchProvider searchProvider = null;
-      if (!String.IsNullOrEmpty(viewModel.Settings.SearchProvider))
-      {
-        // use selected
-        searchProvider = this.SearchProviders
-          .Where(provider => provider.GetType().FullName.Equals(viewModel.Settings.SearchProvider))
-          .FirstOrDefault();
-      }
-      else
-      {
-        // use site default
-        if (this.Context.Site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.DEFAULT_SEARCH_PROVIDER, out string defaultSearchProvider))
-        {
-          searchProvider = this.SearchProviders
-            .Where(provider => provider.GetType().FullName == defaultSearchProvider).FirstOrDefault();
-        }
-      }
-
-      if (searchProvider == null && this.SearchProviders.Count() == 1)
-      {
-        // selected/site default is not set, use first provider, if there is only one
-        searchProvider = this.SearchProviders.First();
-      }
-
       if (searchProvider == null)
       {
         throw new InvalidOperationException("There is no search provider selected.");
       }
 
       SearchResults results = await searchProvider.Search(await BuildSearchQuery(viewModel));
-
+      
       viewModel.PagingSettings.TotalCount = Convert.ToInt32(results.Total);
       viewModel.SearchResults = results;
     }
@@ -364,9 +397,8 @@ public class SearchController : Controller
     if (viewModel == null)
     {
       viewModel = new();
+      GetSettings(viewModel);
     }
-
-    GetSettings(viewModel);
 
     viewModel.PageMenu = await this.PageManager.GetAdminMenu(this.Context.Site, null, this.ControllerContext.HttpContext.User, 1);
     viewModel.SearchProviders = this.SearchProviders
@@ -374,7 +406,38 @@ public class SearchController : Controller
       .OrderBy(provider => provider.Name)
       .ToList();
 
+    viewModel.SearchProviderCapabilities = GetSelectedSearchProvider(viewModel)?.GetCapabilities() ?? new Abstractions.Search.DefaultSearchProviderCapabilities();
+
     return viewModel;
+  }
+
+  private ISearchProvider GetSelectedSearchProvider(ViewModels.Settings viewModel)
+  {
+    ISearchProvider searchProvider = null;
+    if (!String.IsNullOrEmpty(viewModel.SearchProvider))
+    {
+      // use selected
+      searchProvider = this.SearchProviders
+        .Where(provider => provider.GetType().FullName.Equals(viewModel.SearchProvider))
+        .FirstOrDefault();
+    }
+    else
+    {
+      // use site default
+      if (this.Context.Site.SiteSettings.TryGetValue(Site.SiteSearchSettingsKeys.DEFAULT_SEARCH_PROVIDER, out string defaultSearchProvider))
+      {
+        searchProvider = this.SearchProviders
+          .Where(provider => provider.GetType().FullName == defaultSearchProvider).FirstOrDefault();
+      }
+    }
+
+    if (searchProvider == null && this.SearchProviders.Count() == 1)
+    {
+      // selected/site default is not set, use first provider, if there is only one
+      searchProvider = this.SearchProviders.First();
+    }
+
+    return searchProvider;
   }
 
   private void GetSettings(ViewModels.Settings settings)

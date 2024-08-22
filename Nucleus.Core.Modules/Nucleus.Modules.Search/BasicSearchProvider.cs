@@ -22,23 +22,34 @@ public class BasicSearchProvider : ISearchProvider
     this.PageManager = pageManager;
     this.FileSystemManager = fileSystemManager;
   }
-    
+
+  public ISearchProviderCapabilities GetCapabilities()
+  {
+    return new DefaultSearchProviderCapabilities()
+    {
+      CanReportCategories = false,
+      CanReportScore = false,
+      CanReportSize = false,
+      MaximumSuggestions = 0
+    };
+  }
+
   public async Task<SearchResults> Search(SearchQuery query)
   {
     if (query.Site == null) throw new InvalidOperationException($"The query.Site property is required.");
-    
+
     // we have to query the database twice instead of doing a single search operation, so we have to ignore paging settings for the 
     // initial queries, and then do our own Skip/Take after sorting the results.
     Abstractions.Models.Paging.PagedResult<Page> pages =
-      IsScopeIncluded(query, Page.URN) 
-        ? await this.PageManager.Search(query.Site, query.SearchTerm, query.Roles, new() { PageSize = Int32.MaxValue }) 
+      IsScopeIncluded(query, Page.URN)
+        ? await this.PageManager.Search(query.Site, query.SearchTerm, query.Roles, new() { PageSize = Int32.MaxValue })
         : null;
 
-    Abstractions.Models.Paging.PagedResult<File> files = 
-      IsScopeIncluded(query, Folder.URN) || IsScopeIncluded(query, File.URN) 
-        ? await this.FileSystemManager.Search(query.Site, query.SearchTerm, query.Roles, new() { PageSize = Int32.MaxValue }) 
+    Abstractions.Models.Paging.PagedResult<File> files =
+      IsScopeIncluded(query, Folder.URN) || IsScopeIncluded(query, File.URN)
+        ? await this.FileSystemManager.Search(query.Site, query.SearchTerm, query.Roles, new() { PageSize = Int32.MaxValue })
         : null;
-    
+
     List<SearchResult> results = ToSearchResults(query.Site, pages, files)
       .OrderBy(result => result.Title)
       .ToList();
@@ -70,11 +81,11 @@ public class BasicSearchProvider : ISearchProvider
       result = true;
     }
 
-    if (query.ExcludedScopes.Contains(scope, StringComparer.OrdinalIgnoreCase)) 
+    if (query.ExcludedScopes.Contains(scope, StringComparer.OrdinalIgnoreCase))
     {
       result = false;
     }
-    
+
     return result;
   }
 

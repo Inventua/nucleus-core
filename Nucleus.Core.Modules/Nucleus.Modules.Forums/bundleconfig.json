@@ -1,0 +1,14 @@
+[
+  {
+    "outputFileName": "viewer.min.css",
+    "inputFiles": [
+      "viewer.css"
+    ]
+  },
+  {
+    "outputFileName": "settings.min.css",
+    "inputFiles": [
+      "settings.css"
+    ]
+  }
+]

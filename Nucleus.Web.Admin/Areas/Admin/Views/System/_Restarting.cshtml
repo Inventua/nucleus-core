@@ -1,0 +1,42 @@
+﻿@model Nucleus.Web.ViewModels.Admin.SystemIndexRestartComplete
+<div class="system-restarting collapse show m-4">
+  <p>Your web site is restarting, please wait.</p>
+  <div class="progress mt-2">
+    <div class="progress-bar progress-bar-striped progress-bar-animated indeterminate" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+  </div>
+</div>
+
+<div class="system-restarted collapse m-4 nucleus-flex-fields">
+  <span class="nucleus-material-icon me-2 mb-auto text-primary big-text">&#xe86c;</span>
+  <div>
+    <h2>Restart Complete.</h2>
+    <div class="mt-4">
+      <a href="@Model.SiteUrl">Click here</a> to navigate to your site.
+    </div>
+  </div>
+</div>
+
+<script>
+  jQuery(document).ready(function ()
+  {
+    window.setTimeout(TestSiteStarted, 2000);
+  });
+
+  function TestSiteStarted()
+  {
+    jQuery.ajax({
+      url: '@Url.Content("~/")',
+      async: true,
+      method: 'GET',
+      success: function (data, status, request)
+      {
+        jQuery('.system-restarting').removeClass('show');
+        jQuery('.system-restarted').addClass('show');
+      },
+      error: function (request, status, message)
+      {
+        window.setTimeout(TestSiteStarted, 2000);
+      }
+    })
+  }
+</script>

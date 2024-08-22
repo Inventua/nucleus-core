@@ -110,6 +110,11 @@ body
   font-size: 0.7rem;
 }
 
+.nucleus-admin-content .big-text
+{
+  font-size: 3.5rem;
+}
+
 .nucleus-admin-content select:focus
 {
   box-shadow: 0 0 0 0.25rem rgba(180, 180, 180, 0.5)

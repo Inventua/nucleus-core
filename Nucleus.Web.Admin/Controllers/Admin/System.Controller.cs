@@ -1,25 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq;
-using Nucleus.Extensions;
-using Microsoft.AspNetCore.Authorization;
-using Nucleus.Abstractions;
-using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
-using Nucleus.Abstractions.Models;
-using Nucleus.Abstractions.Models.TaskScheduler;
-using Nucleus.Abstractions.Models.Configuration;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Nucleus.Abstractions.Managers;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Nucleus.Extensions.Excel;
-using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Diagnostics.ResourceMonitoring;
-using System.Threading;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
+using Nucleus.Abstractions;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Models.Configuration;
+using Nucleus.Abstractions.Models.TaskScheduler;
+using Nucleus.Extensions;
+using Nucleus.Extensions.Excel;
+using Nucleus.Extensions.Logging;
 
 namespace Nucleus.Web.Controllers.Admin;
 
@@ -36,13 +31,15 @@ public class SystemController : Controller
   private Context Context { get; }
   private ICacheManager CacheManager { get; }
   private IWebHostEnvironment HostingEnvironment { get; }
+  private IHostApplicationLifetime HostApplicationLifetime { get; }
   private IResourceMonitor Monitor { get; }
 
   private const string LINUX_OS_INFO_FILE = "/etc/os-release";
 
 
-  public SystemController(IWebHostEnvironment hostingEnvironment, IResourceMonitor monitor, Context context, RunningTaskQueue runningTaskQueue, ICacheManager cacheManager, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager)
+  public SystemController(IHostApplicationLifetime hostApplicationLifetime, IWebHostEnvironment hostingEnvironment, IResourceMonitor monitor, Context context, RunningTaskQueue runningTaskQueue, ICacheManager cacheManager, ILogger<SystemController> logger, IOptions<DatabaseOptions> databaseOptions, IOptions<TextFileLoggerOptions> options, IConfiguration configuration, ISessionManager sessionManager)
   {
+    this.HostApplicationLifetime = hostApplicationLifetime;
     this.HostingEnvironment = hostingEnvironment;
     this.Monitor = monitor;
     this.Context = context;
@@ -69,6 +66,43 @@ public class SystemController : Controller
   {
     return View("Index", await BuildViewModel(viewModelInput));
   }
+
+  /// <summary>
+  /// Shudown Nucleus/restart.
+  /// </summary>
+  /// <returns></returns>
+  [HttpPost]
+  public ActionResult Restart()
+  {
+    this.HostApplicationLifetime.StopApplication();
+    return View("_Restarting", new ViewModels.Admin.SystemIndexRestartComplete() { SiteUrl = this.Context.Site.AbsoluteUrl("/", Request.Scheme == "https")  });
+  }
+
+  /// <summary>
+  /// Clear cache.
+  /// </summary>
+  /// <returns></returns>
+  [HttpPost]
+  public async Task<ActionResult> ClearCache(ViewModels.Admin.SystemIndex viewModel, string cache)
+  {
+    if (!String.IsNullOrEmpty(cache))
+    {
+      this.CacheManager.Clear(cache);
+    }
+    return View("Index", await BuildViewModel(viewModel));
+  }
+
+  /// <summary>
+  /// Clear cache.
+  /// </summary>
+  /// <returns></returns>
+  [HttpPost]
+  public async Task<ActionResult> ClearAllCaches(ViewModels.Admin.SystemIndex viewModel)
+  {
+    this.CacheManager.ClearAll();
+    return View("Index", await BuildViewModel(viewModel));
+  }
+
 
   private string FormatUptime(TimeSpan value)
   {

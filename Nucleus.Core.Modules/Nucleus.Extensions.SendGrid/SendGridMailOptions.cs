@@ -28,7 +28,7 @@ public class SendGridMailOptions : IMailSettings
 
   private string _apiKey;
   /// <summary>
-  /// SMTP server password
+  /// SendGrid API key
   /// </summary>
   public string ApiKey
   {
@@ -64,7 +64,7 @@ public class SendGridMailOptions : IMailSettings
 
     if (site.SiteSettings.TryGetValue(SendGridMailSettingKeys.SENDGRID_APIKEY, out string apiKey))
     {
-      this.ApiKey = DecryptPassword(site, apiKey);
+      this.ApiKey = Decrypt(site, apiKey);
     }
   }
 
@@ -75,25 +75,25 @@ public class SendGridMailOptions : IMailSettings
 
     if (this.ApiKey != UNCHANGED_APIKEY)
     {
-      site.SiteSettings.TrySetValue(SendGridMailSettingKeys.SENDGRID_APIKEY, EncryptPassword(site, this.ApiKey));
+      site.SiteSettings.TrySetValue(SendGridMailSettingKeys.SENDGRID_APIKEY, Encrypt(site, this.ApiKey));
     }
   }
 
   /// <summary>
-  /// Encrypt and encode a password and return the result.
+  /// Encrypt and encode a value and return the result.
   /// </summary>
   /// <param name="site"></param>
-  /// <param name="password"></param>
+  /// <param name="value"></param>
   /// <returns></returns>
-  private static string EncryptPassword(Site site, string password)
+  private static string Encrypt(Site site, string value)
   {
-    if (String.IsNullOrEmpty(password))
+    if (String.IsNullOrEmpty(value))
     {
       return null;
     }
 
     // Convert string to byte array
-    byte[] bytesIn = System.Text.Encoding.UTF8.GetBytes(password);
+    byte[] bytesIn = System.Text.Encoding.UTF8.GetBytes(value);
 
     // Preparing the memory stream for encrypted string.
     System.IO.MemoryStream msOut = new();
@@ -121,20 +121,20 @@ public class SendGridMailOptions : IMailSettings
   }
 
   /// <summary>
-  /// Encrypt and encode a password and return the result.
+  /// Encrypt and encode a value and return the result.
   /// </summary>
   /// <param name="site"></param>
-  /// <param name="password"></param>
+  /// <param name="encryptedValue"></param>
   /// <returns></returns>
-  private static string DecryptPassword(Site site, string password)
+  private static string Decrypt(Site site, string encryptedValue)
   {
-    if (String.IsNullOrEmpty(password))
+    if (String.IsNullOrEmpty(encryptedValue))
     {
       return null;
     }
 
     // Convert string to byte array
-    byte[] bytesIn = System.Convert.FromBase64String(password);
+    byte[] bytesIn = System.Convert.FromBase64String(encryptedValue);
 
     // Preparing the memory stream for encrypted string.
     System.IO.MemoryStream msOut = new();

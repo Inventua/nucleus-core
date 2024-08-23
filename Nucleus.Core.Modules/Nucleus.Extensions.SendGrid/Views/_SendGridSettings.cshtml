@@ -8,6 +8,6 @@
   @Html.PasswordFor(model => model.ApiKey, new { @value = Nucleus.Extensions.SendGrid.SendGridMailOptions.UNCHANGED_APIKEY })
 </SettingsControl>
 
-<SettingsControl caption="Sender Email" helptext="Sender Email">
+<SettingsControl caption="Sender Email" helptext="Enter the sender email address for system emails.">
   @Html.TextBoxFor(model => model.Sender)
 </SettingsControl>

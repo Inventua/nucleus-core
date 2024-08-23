@@ -26,12 +26,8 @@
   @Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_SHARED)
   @Html.AddScript(AddScriptHtmlHelper.WellKnownScripts.NUCLEUS_ADMIN)
   @Html.AddHtmlEditor()
-  <merge-stylesheets>
-    @Html.RenderStyles()
-  </merge-stylesheets>
-  <merge-scripts>
-    @Html.RenderScripts()
-  </merge-scripts>
+  @Html.RenderStyles()
+  @Html.RenderScripts()
 </head>
 <body class="@Model.ControlPanelDockingCssClass">
   <div class="nucleus-control-panel">
@@ -66,8 +62,9 @@
     <div class="nucleus-control-panel-content collapse" aria-expanded="false">
       <div class="nucleus-control-panel-content-header border-bottom mb-1">
         <h1 id="nucleus-control-panel-heading"></h1>
-        <a class="nucleus-btn-close-frame">&#xe5cd;</a>
-        <a class="nucleus-btn-page-back" data-target=".nucleus-adminpage">&#xe5c4;</a>
+        <a aria-label="Help" id="nucleus-control-panel-helpbutton" class="btn btn-sm btn-help nucleus-material-icon collapse" target="_blank" href="">&#xe887;</a>
+        <a class="btn btn-sm nucleus-material-icon nucleus-btn-close-frame">&#xe5cd;</a>
+        <a class="btn btn-sm nucleus-material-icon nucleus-btn-page-back" data-target=".nucleus-adminpage">&#xe5c4;</a>
       </div>
       <div class="nucleus-adminpage nucleus-admin-content">
         <div class="nucleus-admin-index-spinner-wrapper">

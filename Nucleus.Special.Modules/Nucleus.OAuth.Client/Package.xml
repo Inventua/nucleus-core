@@ -10,6 +10,7 @@
     <component folderName="OAuth Client" optional="false">
       <controlPanelExtensionDefinition id="C93446E0-CEB6-40E6-80A9-E15BC7CB85A2">
         <friendlyName>OAuth Client</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/other-extensions/oauth-client/</helpUrl>
         <description>Configure OAuth client.</description>
         <controllerName>OAuthClientAdmin</controllerName>
         <extensionName>OAuthClient</extensionName>

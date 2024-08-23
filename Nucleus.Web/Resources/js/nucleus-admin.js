@@ -48,7 +48,25 @@ function _handleContentLoaded(e, args)
 		jQuery('#nucleus-control-panel-heading').html(heading.html());
 		jQuery('#nucleus-control-panel-heading').show();
 		heading.remove();
-	}
+  }
+
+  // set help icon
+  var helpLink = jQuery('.nucleus-help-url').first();
+  var controlPanelHelpLink = jQuery('#nucleus-control-panel-helpbutton');
+  if (controlPanelHelpLink.length !== 0)
+  {
+    if (helpLink.length !== 0)
+    {
+      controlPanelHelpLink.attr('href', helpLink.attr('href'));
+      controlPanelHelpLink.removeClass('collapse');
+      helpLink.remove();
+    }
+    else
+    {
+      controlPanelHelpLink.attr('href', '');
+      controlPanelHelpLink.addClass('collapse');
+    }
+  }
 
 	// Open/close (expand) the admin frame when the user clicks an icon
 	jQuery('.nucleus-control-panel .nucleus-control-panel-sidebar LI:not(#nucleus-edit-content-btn)').off('click.sidebar');

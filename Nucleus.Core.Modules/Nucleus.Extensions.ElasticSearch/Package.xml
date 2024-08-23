@@ -11,6 +11,7 @@
     <component folderName="ElasticSearch" optional="false">
       <controlPanelExtensionDefinition id="3cf5e589-01c2-491b-8967-b05c084d1e87">
         <friendlyName>Elastic Search Settings</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/other-extensions/elastic-search/</helpUrl>
         <description>Configure Elastic Search settings.</description>
         <controllerName>Settings</controllerName>
         <extensionName>ElasticSearch</extensionName>

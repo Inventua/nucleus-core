@@ -11,6 +11,7 @@
     <component folderName="GoogleAnalytics" optional="false">
       <controlPanelExtensionDefinition id="955b089f-f002-446e-bde0-71f3fe64caab">
         <friendlyName>Google Analytics</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/other-extensions/google-analytics/</helpUrl>
         <description>Configure Google Analytics settings.</description>
         <controllerName>GoogleAnalytics</controllerName>
         <extensionName>GoogleAnalytics</extensionName>

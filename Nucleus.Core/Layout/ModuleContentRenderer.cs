@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
-using Google.Protobuf.Reflection;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -352,6 +351,31 @@ public class ModuleContentRenderer : IModuleContentRenderer
   }
 
   /// <summary>
+  /// Render the specified control panel extension.
+  /// </summary>
+  /// <param name="htmlHelper"></param>
+  /// <param name="moduleInfo">Specifies the module being rendered.</param>
+  /// <param name="renderContainer">Specifies whether to wrap the module output in a container.</param>
+  /// <returns></returns>
+  public async Task<IHtmlContent> RenderControlPanelExtension(ViewContext viewContext, Site site, ControlPanelExtensionDefinition controlPanelExtension)
+  {
+    // IHttpContextFactory is transient so we need to get it every time we want to use it
+    // https://github.com/dotnet/aspnetcore/blob/42925a4cebf501fd00aae1a1e899a969b4a2bd9a/src/Hosting/Hosting/src/WebHostBuilder.cs#L292
+    IHttpContextFactory httpContextFactory = viewContext.HttpContext.RequestServices.GetService<IHttpContextFactory>();
+
+    if (controlPanelExtension.EditAction != null)
+    {
+      HttpResponse moduleOutput = await BuildControlPanelExtensionOutput(httpContextFactory, viewContext, site, controlPanelExtension, controlPanelExtension.ControllerName, controlPanelExtension.EditAction);
+
+      return ToHtmlContent(moduleOutput);
+    }
+    else
+    {
+      return HtmlString.Empty;
+    }
+  }
+
+  /// <summary>
   /// Render the specified action for a module.
   /// </summary>
   /// <param name="viewContext"></param>
@@ -427,6 +451,79 @@ public class ModuleContentRenderer : IModuleContentRenderer
           new KeyValuePair<string, object>("module.type", $"{scopedContext.Module?.ModuleDefinition?.Extension}:{scopedContext.Module?.ModuleDefinition?.FriendlyName}"),
           new KeyValuePair<string, object>("request.path", viewContext.HttpContext.Request.Path));
 #endif
+        return response;
+      }
+      catch (Exception)
+      {
+        // Restore the original service provider before moduleScope is disposed to prevent it from also being disposed
+        newHttpContext.RequestServices = originalServiceProvider;
+        throw;
+      }
+    }
+  }
+
+  /// <summary>
+  /// Render the specified action for a control panel extension.
+  /// </summary>
+  /// <param name="viewContext"></param>
+  /// <param name="moduleinfo">Specifies the module being rendered.</param>
+  /// <param name="action">Specifies the name of the action being rendered.</param>
+  /// <param name="RenderContainer">Specifies whether to wrap the module output in a container.</param>
+  /// <returns></returns>
+  /// <remarks>
+  /// Permissions checks should be done by the caller.
+  /// </remarks>
+  private async Task<HttpResponse> BuildControlPanelExtensionOutput(IHttpContextFactory httpContextFactory, ViewContext viewContext, Site site, ControlPanelExtensionDefinition controlPanelExtension, string controller, string action)
+  {
+    HttpResponse response;
+
+#if DEBUG
+    Stopwatch stopWatch = new();
+    stopWatch.Start();
+#endif
+
+    HttpContext newHttpContext = httpContextFactory.Create(viewContext?.HttpContext.Features);
+
+    await using (AsyncServiceScope moduleScope = newHttpContext.RequestServices.CreateAsyncScope())
+    {
+      // We must store and restore the original newHttpContext.RequestServices, so that the main HttpContext.RequestServices 
+      // object doesn't get disposed in between calls (when there are multiple modules on a page).
+      IServiceProvider originalServiceProvider = newHttpContext.RequestServices;
+
+      try
+      {
+        // Set context.RequestServices to the current module scope Service Provider, so when the module's controller is created and 
+        // executed, it gets DI objects from the module scope
+        newHttpContext.RequestServices = moduleScope.ServiceProvider;
+
+        //IActionDescriptorCollectionProvider actionDescriptorProvider = moduleScope.ServiceProvider.GetRequiredService<IActionDescriptorCollectionProvider>();
+        ControllerActionDescriptor actionDescriptor = GetActionDescriptor(controller, action, controlPanelExtension);
+
+        // Report common error (when the module definition is invalid)
+        if (actionDescriptor == null || actionDescriptor.MethodInfo == null)
+        {
+          throw new InvalidOperationException($"Control Panel Definition is invalid: Action '{action}' does not exist in extension '{controlPanelExtension.ExtensionName}', controller '{controller}'.");
+        }
+
+        Context scopedContext = (Context)moduleScope.ServiceProvider.GetService(typeof(Context));
+
+        // set context.Module to the module being processed
+        scopedContext.Module = null;
+        scopedContext.Page = null;
+        scopedContext.Site = site;
+        scopedContext.LocalPath = null;
+
+        using (AssemblyLoadContext.ContextualReflectionScope scope = Plugins.AssemblyLoader.EnterExtensionContext(controlPanelExtension.ExtensionName, actionDescriptor.ControllerTypeInfo.AssemblyQualifiedName))
+        {
+          await BuildContent(newHttpContext, actionDescriptor);
+        }
+
+        // Restore the original service provider before moduleScope is disposed to prevent it from also being disposed
+        newHttpContext.RequestServices = originalServiceProvider;
+                
+        response = newHttpContext.Response;
+        
+
         return response;
       }
       catch (Exception)
@@ -546,7 +643,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
   }
 
   /// <summary>
-  /// Build an action descriptor for the specified <paramref name="controllerName"/> and <paramref name="action"/>.
+  /// Build an action descriptor for the specified <paramref name="moduleinfo"/>, <paramref name="controllerName"/> and <paramref name="action"/>.
   /// </summary>
   /// <param name="actionDescriptorProvider"></param>
   /// <param name="controllerName"></param>
@@ -595,6 +692,50 @@ public class ModuleContentRenderer : IModuleContentRenderer
     }
 
     actionDescriptor.RouteValues["extension"] = moduleinfo.ModuleDefinition.Extension;
+
+    return actionDescriptor;
+  }
+
+  /// <summary>
+  /// Build an action descriptor for the specified <paramref name="controlPanelExtension"/>, <paramref name="controllerName"/> and <paramref name="action"/>.
+  /// </summary>
+  /// <param name="actionDescriptorProvider"></param>
+  /// <param name="controllerName"></param>
+  /// <param name="action"></param>
+  /// <param name="controlPanelExtension"></param>
+  /// <returns></returns>
+  /// <exception cref="InvalidOperationException"></exception>
+  private ControllerActionDescriptor GetActionDescriptor(string controllerName, string action, ControlPanelExtensionDefinition controlPanelExtension)
+  {
+    ControllerActionDescriptor actionDescriptor = null;
+
+    if (!String.IsNullOrEmpty(controllerName))
+    {
+      IEnumerable<ControllerActionDescriptor> descriptors = this.ActionDescriptorProvider.ActionDescriptors.Items
+          .OfType<ControllerActionDescriptor>();
+
+      this.ExtensionActionDescriptors ??= new(descriptors.Count());
+
+      string key = $"{controllerName}::{action}()";
+      if (!this.ExtensionActionDescriptors.TryGetValue(key, out actionDescriptor))
+      {
+        actionDescriptor = descriptors
+          .Where(descriptor => IsMatch(descriptor, controlPanelExtension.ExtensionName, controllerName, action))
+          .FirstOrDefault();
+
+        if (actionDescriptor != null)
+        {
+          this.ExtensionActionDescriptors.TryAdd(key, actionDescriptor);
+        }
+      }
+    }
+
+    if (actionDescriptor == null)
+    {
+      throw new InvalidOperationException($"Unable to load an action descriptor for the control panel extension '{controlPanelExtension.FriendlyName}' [{controllerName}.{action}].  Check your package.xml and controller class.  A common cause of this error is that your package.xml has the wrong controller or action name specified, or your controller class doesn't have a Nucleus 'Extension' attribute.");
+    }
+
+    actionDescriptor.RouteValues["extension"] = controlPanelExtension.ExtensionName;
 
     return actionDescriptor;
   }

@@ -10,6 +10,7 @@
     <component folderName="SAML Client" optional="false">
       <controlPanelExtensionDefinition id="FC4C96E3-BFE2-4D6F-A56A-358202982E72">
         <friendlyName>SAML Client</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/other-extensions/saml-client/</helpUrl>
         <description>Configure SAML client.</description>
         <controllerName>SAMLClientAdmin</controllerName>
         <extensionName>SAMLClient</extensionName>

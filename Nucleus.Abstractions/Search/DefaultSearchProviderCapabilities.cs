@@ -28,4 +28,7 @@ public class DefaultSearchProviderCapabilities : ISearchProviderCapabilities
 
   /// <inheritdoc />
   public bool CanReportType { get; init; } = true;
+
+  /// <inheritdoc/>
+  public bool CanReportMatchedTerms { get; init; } = true;  
 }

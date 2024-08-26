@@ -4,14 +4,10 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Azure;
-using Azure.Core;
-using Azure.Core.Serialization;
 using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
 using Azure.Search.Documents.Models;
-using DocumentFormat.OpenXml.Office2010.ExcelAc;
-using Microsoft.Extensions.Options;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 
@@ -278,8 +274,8 @@ internal class AzureSearchRequest
     // https://learn.microsoft.com/en-us/dotnet/api/azure.search.documents.searchoptions.querytype?view=azure-dotnet
     SearchOptions searchOptions = new()
     {
-      HighlightPostTag = "<em>",
-      HighlightPreTag = "</em>",
+      HighlightPreTag = "<em>",
+      HighlightPostTag = "</em>",
       IncludeTotalCount = true,
       QueryType = SearchQueryType.Simple,  // SearchQueryType.Semantic,
       SearchMode = query.StrictSearchTerms ? SearchMode.All : SearchMode.Any,
@@ -390,7 +386,8 @@ internal class AzureSearchRequest
     return new List<string>()
     {
       nameof(AzureSearchDocument.Title),
-      nameof(AzureSearchDocument.Summary)
+      nameof(AzureSearchDocument.Summary),
+      nameof(AzureSearchDocument.Content)
     };
   }
 

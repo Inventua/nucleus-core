@@ -58,7 +58,7 @@
         {
           <div class="search-result">
             <div>
-              <a class="result-link" href="@(result.Url.StartsWith('/') ? Url.Content("~" + result.Url) : result.Url)" title="@result.Title?.Trim()">@result.Title?.Trim()</a>
+              <a class="result-link" href="@Url.Content(result.GetUrl(Model.Settings.IncludeUrlTextFragment))" rel="noopener" title="@result.GetTitleText()">@Html.Raw(result.Title?.Trim())</a>
               @if (Model.Settings.ShowType && !String.IsNullOrEmpty(result.Type))
               {
                 <span class="fst-italic small text-muted result-type">@result.Type</span>
@@ -85,7 +85,7 @@
 
             @if (Model.Settings.ShowSummary && !String.IsNullOrEmpty(@result.Summary))
             {
-              <div class="result-summary">@result.Summary</div>
+              <div class="result-summary">@Html.Raw(result.Summary)</div>
             }
             @if (Model.Settings.ShowCategories && result.Categories != null && result.Categories.Any())
             {

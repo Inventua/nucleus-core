@@ -5,99 +5,107 @@
 @using Nucleus.Abstractions.Models
 @using (Html.BeginNucleusForm("Settings", "Search", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
-	<div id="search-settings" class="flex-grow-1">
-		<h2 class="nucleus-modal-caption">Search Settings</h2>
-		
-		<SettingsControl caption="Search Provider" helptext="Select a search provider.">
-			@Html.DropDownListFor(model => model.SearchProvider, new SelectList(Model.SearchProviders, "ClassName", "Name"), "(default)", new { data_autopostbackevent = "change"})
-		</SettingsControl>
+  <div id="search-settings" class="flex-grow-1">
+    <h2 class="nucleus-modal-caption">Search Settings</h2>
 
-		<fieldset role="group" aria-labelledby="heading">
-			<h3>Search Input</h3>
-			<div class="nucleus-flex-fields">
-				<SettingsControl caption="Display Mode" helptext="Specify the search input controls display mode.">
-					@Html.DropDownListFor(model => model.DisplayMode, Html.GetEnumSelectList(typeof(Nucleus.Modules.Search.ViewModels.Settings.DisplayModes)))
-				</SettingsControl>
+    <SettingsControl caption="Search Provider" helptext="Select a search provider.">
+      @Html.DropDownListFor(model => model.SearchProvider, new SelectList(Model.SearchProviders, "ClassName", "Name"), "(default)", new { data_autopostbackevent = "change" })
+    </SettingsControl>
+
+    <fieldset role="group" aria-labelledby="heading">
+      <h3>Search Input</h3>
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="Display Mode" helptext="Specify the search input controls display mode.">
+          @Html.DropDownListFor(model => model.DisplayMode, Html.GetEnumSelectList(typeof(Nucleus.Modules.Search.ViewModels.Settings.DisplayModes)))
+        </SettingsControl>
 
         <SettingsControl caption="Search Mode" helptext="Specify whether search matches contain any or all terms in your search term.">
           @Html.DropDownListFor(model => model.SearchMode, Html.GetEnumSelectList(typeof(Nucleus.Modules.Search.ViewModels.Settings.SearchModes)))
         </SettingsControl>
 
-				<SettingsControl caption="Search Caption" helptext="Specifies the label displayed next to the search term.  This is only visible when display mode is set to 'Full'.">
-					@Html.TextBoxFor(model => model.SearchCaption, new {  })
-				</SettingsControl>
+        <SettingsControl caption="Search Caption" helptext="Specifies the label displayed next to the search term.  This is only visible when display mode is set to 'Full'.">
+          @Html.TextBoxFor(model => model.SearchCaption, new { })
+        </SettingsControl>
 
-				<SettingsControl caption="Prompt" helptext="Specifies the text displayed within the search text box before the user has entered anything.">
-					@Html.TextBoxFor(model => model.Prompt, new {  })
-				</SettingsControl>
+        <SettingsControl caption="Prompt" helptext="Specifies the text displayed within the search text box before the user has entered anything.">
+          @Html.TextBoxFor(model => model.Prompt, new { })
+        </SettingsControl>
 
-				<SettingsControl caption="Search Button Caption" helptext="Specifies the text displayed in the search button.   This is only visible when display mode is set to 'Full' or 'Compact'.">
-					@Html.TextBoxFor(model => model.SearchButtonCaption, new {  })
-				</SettingsControl>
+        <SettingsControl caption="Search Button Caption" helptext="Specifies the text displayed in the search button.   This is only visible when display mode is set to 'Full' or 'Compact'.">
+          @Html.TextBoxFor(model => model.SearchButtonCaption, new { })
+        </SettingsControl>
 
-				<SettingsControl caption="Maximum Number of Suggestions" helptext="Specify how many suggestions to display while the user enters search terms.">
+        <SettingsControl caption="Maximum Number of Suggestions" helptext="Specify how many suggestions to display while the user enters search terms.">
           @Html.TextBoxFor(model => model.MaximumSuggestions, new { @type = "number", @min = "0", @max = @Model.SearchProviderCapabilities.MaximumSuggestions, @class = (Model.SearchProviderCapabilities.MaximumSuggestions == 0 ? "disabled" : "") })
-				</SettingsControl>
-			</div>
+        </SettingsControl>
+      </div>
 
-			<SettingsControl caption="Results Page" helptext="Results Page.  This page should contain a search module.  Select (none) to display results on the same page as the search module.">
-				@Html.PageListFor(model => model.ResultsPageId, Model.PageMenu, Guid.Empty)
-			</SettingsControl>
+      <SettingsControl caption="Results Page" helptext="Results Page.  This page should contain a search module.  Select (none) to display results on the same page as the search module.">
+        @Html.PageListFor(model => model.ResultsPageId, Model.PageMenu, Guid.Empty)
+      </SettingsControl>
 
-			<SettingsControl caption="Include Scopes" helptext="Use this setting to restrict results to specified scopes, or leave blank for all scopes.  Specify included scopes by entering one or more scopes separated by line feeds.  A scope is the URN of the data type which was used to create a search entry (Examples: site pages - urn:nucleus:entities:page, files - urn:nucleus:entities:file).  This setting affects both search suggestions and search results.  This is an advanced setting which may not be supported by all search providers.">
+      <SettingsControl caption="Include Scopes" helptext="Use this setting to restrict results to specified scopes, or leave blank for all scopes.  Specify included scopes by entering one or more scopes separated by line feeds.  A scope is the URN of the data type which was used to create a search entry (Examples: site pages - urn:nucleus:entities:page, files - urn:nucleus:entities:file).  This setting affects both search suggestions and search results.  This is an advanced setting which may not be supported by all search providers.">
         @Html.TextAreaFor(model => model.IncludeScopes, new { @rows = 5, @class = (Model.SearchProviderCapabilities.CanFilterByScope ? "" : "disabled") })
-			</SettingsControl>
-						
-			<SettingsControl caption="Include Files in Results?" rendermode="LabelLast" class="inner-inline" helptext="Specify whether to include files in search results.">
-				@Html.CheckBoxFor(model => model.IncludeFiles, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanFilterByScope ? " disabled" : "") })
-			</SettingsControl>
-		</fieldset>
+      </SettingsControl>
 
-		<div class="alert alert-info results-page-selected collapse">
-			Results display settings are configured in the search module instance on the results page.
-		</div>
+      <SettingsControl caption="Include Files in Results?" rendermode="LabelLast" class="inner-inline" helptext="Specify whether to include files in search results.">
+        @Html.CheckBoxFor(model => model.IncludeFiles, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanFilterByScope ? " disabled" : "") })
+      </SettingsControl>
+    </fieldset>
+
+    <div class="alert alert-info results-page-selected collapse">
+      Results display settings are configured in the search module instance on the results page.
+    </div>
 
     <fieldset class="search-instance-settings collapse show mt-4" aria-labelledby="heading">
-			<h3>Results Display</h3>
-			<div class="nucleus-flex-fields">
-        <SettingsControl caption="Show Type?" rendermode="LabelLast" class="inner-inline" helptext="Display search result types.">
-					@Html.CheckBoxFor(model => model.ShowType, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportType  ? " disabled" : "") })
-				</SettingsControl>
+      <h3>Results Display</h3>
 
-				<SettingsControl caption="Show Summary?" rendermode="LabelLast" class="inner-inline" helptext="Display search result item summaries/descriptions.">
-					@Html.CheckBoxFor(model => model.ShowSummary, new { @class = "ToggleSwitch" })
-				</SettingsControl>
-
-				<SettingsControl caption="Show Categories?" rendermode="LabelLast" class="inner-inline" helptext="Display search result categories.">
-          @Html.CheckBoxFor(model => model.ShowCategories, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportCategories ? " disabled" : "") })
-				</SettingsControl>
-
-				<SettingsControl caption="Show Published Date?" rendermode="LabelLast" class="inner-inline" helptext="Display search result publication date, if available.">
-          @Html.CheckBoxFor(model => model.ShowPublishDate, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportPublishedDate ? " disabled" : "") })
-				</SettingsControl>
-      </div>
       <div class="nucleus-flex-fields">
+        <SettingsControl caption="Include text fragments in Url?" rendermode="LabelLast" class="inner-inline" helptext="Specifies whether to include text fragements for matching search terms in link Urls. Text fragments highlight matching search terms in the target document.">
+          @Html.CheckBoxFor(model => model.IncludeUrlTextFragment, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportMatchedTerms ? " disabled" : "") })
+        </SettingsControl>
+
+        <SettingsControl caption="Show Type?" rendermode="LabelLast" class="inner-inline" helptext="Display search result types.">
+          @Html.CheckBoxFor(model => model.ShowType, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportType ? " disabled" : "") })
+        </SettingsControl>
+
+        <SettingsControl caption="Show Summary?" rendermode="LabelLast" class="inner-inline" helptext="Display search result item summaries/descriptions.">
+          @Html.CheckBoxFor(model => model.ShowSummary, new { @class = "ToggleSwitch" })
+        </SettingsControl>
+      </div>
+      
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="Show Categories?" rendermode="LabelLast" class="inner-inline" helptext="Display search result categories.">
+          @Html.CheckBoxFor(model => model.ShowCategories, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportCategories ? " disabled" : "") })
+        </SettingsControl>
+
+        <SettingsControl caption="Show Published Date?" rendermode="LabelLast" class="inner-inline" helptext="Display search result publication date, if available.">
+          @Html.CheckBoxFor(model => model.ShowPublishDate, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportPublishedDate ? " disabled" : "") })
+        </SettingsControl>
+
         <SettingsControl caption="Show Url?" rendermode="LabelLast" class="inner-inline" helptext="Display search result Url.">
-					@Html.CheckBoxFor(model => model.ShowUrl, new { @class = "ToggleSwitch" })
-				</SettingsControl>
+          @Html.CheckBoxFor(model => model.ShowUrl, new { @class = "ToggleSwitch" })
+        </SettingsControl>
+      </div>
 
-				<SettingsControl caption="Show Size?" rendermode="LabelLast" class="inner-inline" helptext="Display search result size, if available.">
+      <div class="nucleus-flex-fields">
+        <SettingsControl caption="Show Size?" rendermode="LabelLast" class="inner-inline" helptext="Display search result size, if available.">
           @Html.CheckBoxFor(model => model.ShowSize, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportSize ? " disabled" : "") })
-				</SettingsControl>
+        </SettingsControl>
 
-				<SettingsControl caption="Show Score?" rendermode="LabelLast" class="inner-inline" helptext="Display search result score.">
+        <SettingsControl caption="Show Score?" rendermode="LabelLast" class="inner-inline" helptext="Display search result score.">
           @Html.CheckBoxFor(model => model.ShowScore, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportScore ? " disabled" : "") })
-				</SettingsControl>
+        </SettingsControl>
 
         <SettingsControl caption="Show Score Assessment?" rendermode="LabelLast" class="inner-inline" helptext="Display search result score assessment.">
           @Html.CheckBoxFor(model => model.ShowScoreAssessment, new { @class = "ToggleSwitch" + (!Model.SearchProviderCapabilities.CanReportScore ? " disabled" : "") })
         </SettingsControl>
-			</div>
-		</fieldset>
-	</div>
-	<div class="nucleus-form-buttonrow">
-		@Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "Search", "Search"), new { })
-	</div>
+      </div>
+    </fieldset>
+  </div>
+  <div class="nucleus-form-buttonrow">
+    @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "Search", "Search"), new { })
+  </div>
 }
 <script>
   jQuery('#search-settings .disabled').each(function ()
@@ -105,54 +113,54 @@
     jQuery(this).prop('disabled', true);
   });
 
-	$(document).ready(function()
-	{
+  $(document).ready(function ()
+  {
 
-		// Read the child pages of the item containing the "+" button
-		jQuery('#search-settings').on('click', '.nucleus-get-childpages', function (e)
-		{
-			// Add a ul to contain the new pages
-			Page.LoadPartialContent(e, '@Url.NucleusAction("GetChildPages", "Search", "Search")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
+    // Read the child pages of the item containing the "+" button
+    jQuery('#search-settings').on('click', '.nucleus-get-childpages', function (e)
+    {
+      // Add a ul to contain the new pages
+      Page.LoadPartialContent(e, '@Url.NucleusAction("GetChildPages", "Search", "Search")' + '?id=' + jQuery(this).attr('data-id'), jQuery(this).closest('li'));
 
-			// hide the "+" button
-			jQuery(this).removeClass('show');
-		});
+      // hide the "+" button
+      jQuery(this).removeClass('show');
+    });
 
-		// Hide the child pages of the item containing the "-" button
-		jQuery('#search-settings').on('click', '.nucleus-hide-childpages', function (e)
-		{
-			// hide the "-" button
-			jQuery(this).removeClass('show');
+    // Hide the child pages of the item containing the "-" button
+    jQuery('#search-settings').on('click', '.nucleus-hide-childpages', function (e)
+    {
+      // hide the "-" button
+      jQuery(this).removeClass('show');
 
-			// show the "+" button
-			jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
+      // show the "+" button
+      jQuery(this).siblings('.nucleus-get-childpages').addClass('show');
 
-			jQuery(this).closest('li').find('ul').remove();
-		});
+      jQuery(this).closest('li').find('ul').remove();
+    });
 
-		/* enable/disable per-module settings */
+    /* enable/disable per-module settings */
 
-		/* on load */
-		enableInstanceSettings(jQuery('#ResultsPageId').val() === '00000000-0000-0000-0000-000000000000');
+    /* on load */
+    enableInstanceSettings(jQuery('#ResultsPageId').val() === '00000000-0000-0000-0000-000000000000');
 
-		/* when the user changes the results page selection */
-		jQuery('#search-settings .nucleus-page-list a').on('click', function ()
-		{
-			enableInstanceSettings(jQuery(this).attr('data-id') === '00000000-0000-0000-0000-000000000000');
-		});
+    /* when the user changes the results page selection */
+    jQuery('#search-settings .nucleus-page-list a').on('click', function ()
+    {
+      enableInstanceSettings(jQuery(this).attr('data-id') === '00000000-0000-0000-0000-000000000000');
+    });
 
-		function enableInstanceSettings(enable)
-		{
-			if (enable)
-			{
-				jQuery('#search-settings .search-instance-settings').addClass('show');
-				jQuery('#search-settings .results-page-selected').removeClass('show');
-			}
-			else
-			{
-				jQuery('#search-settings .search-instance-settings').removeClass('show');
-				jQuery('#search-settings .results-page-selected').addClass('show');
-			}
-		}
-	});
+    function enableInstanceSettings(enable)
+    {
+      if (enable)
+      {
+        jQuery('#search-settings .search-instance-settings').addClass('show');
+        jQuery('#search-settings .results-page-selected').removeClass('show');
+      }
+      else
+      {
+        jQuery('#search-settings .search-instance-settings').removeClass('show');
+        jQuery('#search-settings .results-page-selected').addClass('show');
+      }
+    }
+  });
 </script>

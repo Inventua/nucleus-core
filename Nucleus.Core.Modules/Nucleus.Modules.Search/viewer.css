@@ -71,3 +71,8 @@
 {
   content: ')';
 }
+
+.search-result em
+{
+  background-color: yellow;
+}

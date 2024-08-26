@@ -50,4 +50,9 @@ public interface ISearchProviderCapabilities
   /// Specifies whether the search provider results include a <see cref="ContentMetaData.Type"/>.
   /// </summary>
   public Boolean CanReportType { get; }
+
+  /// <summary>
+  /// Specifies whether the search provider can detected matched terms to populate <see cref="SearchResult.MatchedTerms" />.
+  /// </summary>
+  public Boolean CanReportMatchedTerms { get; }
 }

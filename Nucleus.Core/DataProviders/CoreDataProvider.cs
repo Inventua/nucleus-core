@@ -1,24 +1,21 @@
 ﻿using System;
-using Nucleus.Abstractions.Models;
-using Nucleus.Abstractions.Models.Mail;
-using Nucleus.Abstractions.Models.TaskScheduler;
-using Nucleus.Data.Common;
-using Microsoft.Extensions.Logging;
-using Nucleus.Extensions.Logging;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Data;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.EventHandlers;
 using Nucleus.Abstractions.EventHandlers.SystemEventTypes;
+using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
+using Nucleus.Abstractions.Models.Mail;
 using Nucleus.Abstractions.Models.Paging;
-using Nucleus.Extensions;
+using Nucleus.Abstractions.Models.TaskScheduler;
 using Nucleus.Abstractions.Search;
-using Nucleus.Abstractions;
+using Nucleus.Extensions;
 
 namespace Nucleus.Core.DataProviders;
 
@@ -1693,19 +1690,22 @@ public class CoreDataProvider : Nucleus.Data.EntityFramework.DataProvider, ILayo
 
   public async Task DeleteExpiredSessions()
   {
-    List<UserSession> sessions = await this.Context.UserSessions.Where(session => session.ExpiryDate < DateTime.UtcNow).ToListAsync();
-    this.Context.RemoveRange(sessions);
+    await this.Context.UserSessions
+      .Where(session => session.ExpiryDate < DateTime.UtcNow)
+      .ExecuteDeleteAsync();
 
-    try
-    {
-      await this.Context.SaveChangesAsync();
-    }
-    catch (DbUpdateConcurrencyException)
-    {
-      // DeleteUserSession can also delete sessions.  DeleteExpiredSessions runs in a scheduled task (so can happen any time).  Ignore 
-      // DbUpdateConcurrencyException error thrown if the record is already deleted.
-    }
+    ////List<UserSession> sessions = await this.Context.UserSessions.Where(session => session.ExpiryDate < DateTime.UtcNow).ToListAsync();
+    ////this.Context.RemoveRange(sessions);
 
+    ////try
+    ////{
+    ////  await this.Context.SaveChangesAsync();
+    ////}
+    ////catch (DbUpdateConcurrencyException)
+    ////{
+    ////  // DeleteUserSession can also delete sessions.  DeleteExpiredSessions runs in a scheduled task (so can happen any time).  Ignore 
+    ////  // DbUpdateConcurrencyException error thrown if the record is already deleted.
+    ////}
   }
 
   public async Task<long> CountUsersOnline(Site site)

@@ -33,7 +33,8 @@ public class SearchProvider : ISearchProvider
       CanReportPublishedDate = false,
       CanReportType = false,
       CanFilterByScope = false,
-      MaximumPageSize = 10       
+      MaximumPageSize = 10,
+      CanReportMatchedTerms = false
     };
   }
 
@@ -62,7 +63,7 @@ public class SearchProvider : ISearchProvider
     }
         
     Google.Apis.CustomSearchAPI.v1.CseResource.ListRequest request = this.GetService().Cse.List();
-
+    
     request.Key = settings.GetApiKey(query.Site);
     request.Cx = settings.SearchEngineId;
 
@@ -71,7 +72,7 @@ public class SearchProvider : ISearchProvider
     request.Start = query.PagingSettings.FirstRowIndex+1;
     request.Num = query.PagingSettings.PageSize;
     request.Safe = settings.SafeSearch;
-
+    
     Google.Apis.CustomSearchAPI.v1.Data.Search response = await request.ExecuteAsync();
 
     if (!long.TryParse(response.SearchInformation.TotalResults, out long totalResultsCount))
@@ -85,14 +86,14 @@ public class SearchProvider : ISearchProvider
       Total = totalResultsCount
     };
   }
-
+  
   private CustomSearchAPIService GetService()
   {
     if (_service == null)
     {
       _service = new();
     }
-
+    
     return _service;
   }
 

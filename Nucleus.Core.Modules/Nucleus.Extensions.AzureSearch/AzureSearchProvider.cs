@@ -1,21 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Nucleus.Abstractions.Models;
-using Nucleus.Abstractions.Managers;
-using Nucleus.Abstractions.Search;
 using System.ComponentModel;
+using System.IO.Enumeration;
+using System.Linq;
+using System.Threading.Tasks;
 using Azure;
-using Azure.Search.Documents;
-using Azure.Search.Documents.Indexes;
-using Azure.Search.Documents.Indexes.Models;
 using Azure.Search.Documents.Models;
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using Azure.Core;
+using DocumentFormat.OpenXml.Drawing;
+using Nucleus.Abstractions.Managers;
+using Nucleus.Abstractions.Models;
+using Nucleus.Abstractions.Search;
 
 namespace Nucleus.Extensions.AzureSearch;
 
@@ -41,7 +35,7 @@ public class AzureSearchProvider : ISearchProvider
     {
       throw new ArgumentException($"The site property is required.", nameof(query.Site));
     }
-        
+
     ConfigSettings settings = new(query.Site);
 
     if (String.IsNullOrEmpty(settings.ServerUrl))
@@ -71,14 +65,45 @@ public class AzureSearchProvider : ISearchProvider
     };
   }
 
-  private async Task<IEnumerable<SearchResult>> ToSearchResults( Response<SearchResults<AzureSearchDocument>> response)
+  private SearchResult<AzureSearchDocument> ReplaceHighlights(SearchResult<AzureSearchDocument> searchResult)
+  {
+    if (searchResult.Highlights != null)
+    {
+      // replace document field values with highlighted ones
+      foreach (KeyValuePair<string, IList<string>> highlight in searchResult.Highlights)
+      {
+        string fieldName = highlight.Key;
+
+        foreach (string higlightItem in highlight.Value)
+        {
+          switch (fieldName)
+          {
+            case string name when name.Equals(nameof(AzureSearchDocument.Title), StringComparison.OrdinalIgnoreCase):
+            {
+              searchResult.Document.Title = higlightItem;
+              break;
+            }
+            case string name when name.Equals(nameof(AzureSearchDocument.Summary), StringComparison.OrdinalIgnoreCase):
+            {
+              searchResult.Document.Summary = higlightItem;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    return searchResult;
+  }
+
+  private async Task<IEnumerable<SearchResult>> ToSearchResults(Response<SearchResults<AzureSearchDocument>> response)
   {
     List<SearchResult> results = new();
     //response.Value.SemanticSearch.
 
     foreach (SearchResult<AzureSearchDocument> document in response.Value.GetResultsAsync().ToBlockingEnumerable())
     {
-      results.Add(await ToSearchResult(document));
+      results.Add(await ToSearchResult(ReplaceHighlights(document)));
     }
 
     return results;
@@ -89,6 +114,12 @@ public class AzureSearchProvider : ISearchProvider
     return new SearchResult()
     {
       Score = result.Score,
+      MatchedTerms = result.Highlights?
+        .SelectMany(highlight => highlight.Value)
+        .SelectMany(highlightValue => ExtractHighlightedTerms(highlightValue))
+        .Where(value => !String.IsNullOrEmpty(value))
+        .Distinct()
+        .ToList(),
 
       Site = await this.SiteManager.Get(Guid.Parse(result.Document.SiteId)),
       Url = result.Document.Url,
@@ -98,7 +129,7 @@ public class AzureSearchProvider : ISearchProvider
       Scope = result.Document.Scope,
       Type = result.Document.Type,
       SourceId = String.IsNullOrEmpty(result.Document.SourceId) ? null : Guid.Parse(result.Document.SourceId),
-      ContentType = result.Document .ContentType,
+      ContentType = result.Document.ContentType,
       PublishedDate = result.Document.PublishedDate,
 
       Size = result.Document.Size,
@@ -106,6 +137,24 @@ public class AzureSearchProvider : ISearchProvider
       Categories = await ToCategories(result.Document.Categories),
       Roles = await ToRoles(result.Document.Roles)
     };
+  }
+
+  private List<string> ExtractHighlightedTerms(string highlightedValue)
+  {
+    List<string> results = new();
+
+    System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches(highlightedValue, "<em>(?<term>[^\\/]*)<\\/em>");
+    foreach (System.Text.RegularExpressions.Match match in matches)
+    {
+      if (match.Success)
+      {
+        {
+          results.Add(match.Groups["term"].Value);
+        }
+      }
+    }
+    
+    return results;
   }
 
   public async Task<SearchResults> Suggest(SearchQuery query)
@@ -143,19 +192,19 @@ public class AzureSearchProvider : ISearchProvider
     };
   }
 
-  private async Task <IEnumerable<SearchResult>> ToSearchResults(Response<SuggestResults<AzureSearchDocument>> response)
+  private async Task<IEnumerable<SearchResult>> ToSearchResults(Response<SuggestResults<AzureSearchDocument>> response)
   {
     List<SearchResult> results = new();
 
     foreach (SearchSuggestion<AzureSearchDocument> document in response.Value.Results)
     {
-      results.Add(await ToSearchResult( document));
+      results.Add(await ToSearchResult(document));
     }
 
     return results;
   }
 
-  private async Task <SearchResult> ToSearchResult(SearchSuggestion<AzureSearchDocument> result)
+  private async Task<SearchResult> ToSearchResult(SearchSuggestion<AzureSearchDocument> result)
   {
     return new SearchResult()
     {

@@ -1,17 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
-using Nucleus.Abstractions.Models.FileSystem;
-using Nucleus.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Nucleus.Abstractions.Search;
+using Nucleus.Extensions;
 using Nucleus.Extensions.Authorization;
-using Nucleus.ViewFeatures;
 
 namespace Nucleus.Modules.Search.Controllers;
 
@@ -36,6 +34,8 @@ public class SearchController : Controller
   private const string MODULESETTING_SHOW_SUMMARY = "search:show-summary";
   private const string MODULESETTING_SHOW_CATEGORIES = "search:show-categories";
   private const string MODULESETTING_SHOW_PUBLISHEDDATE = "search:show-publisheddate";
+
+  private const string MODULESETTING_INCLUDE_URL_TEXT_FRAGMENT = "search:include-text-fragment";
 
   private const string MODULESETTING_SHOW_TYPE = "search:show-type";
   private const string MODULESETTING_SHOW_SIZE = "search:show-size";
@@ -133,6 +133,7 @@ public class SearchController : Controller
     this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SUMMARY, viewModel.ShowSummary);
     this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_CATEGORIES, viewModel.ShowCategories);
     this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_PUBLISHEDDATE, viewModel.ShowPublishDate);
+   this.Context.Module.ModuleSettings.Set (MODULESETTING_INCLUDE_URL_TEXT_FRAGMENT, viewModel.IncludeUrlTextFragment);
 
     this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_TYPE, viewModel.ShowType);
     this.Context.Module.ModuleSettings.Set(MODULESETTING_SHOW_SIZE, viewModel.ShowSize);
@@ -221,6 +222,11 @@ public class SearchController : Controller
     if (!viewModel.Settings.SearchProviderCapabilities.CanReportType)
     {
       viewModel.Settings.ShowType = false;
+    }
+
+    if (!viewModel.Settings.SearchProviderCapabilities.CanReportMatchedTerms)
+    {
+      viewModel.Settings.IncludeUrlTextFragment = false;
     }
 
     if (!String.IsNullOrEmpty(viewModel.SearchTerm))
@@ -459,6 +465,7 @@ public class SearchController : Controller
     settings.ShowSize = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SIZE, true);
     settings.ShowScore = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SCORE, true);
     settings.ShowScoreAssessment = this.Context.Module.ModuleSettings.Get(MODULESETTING_SHOW_SCORE_ASSESSMENT, true);
+    settings.IncludeUrlTextFragment = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_URL_TEXT_FRAGMENT, true);
 
     settings.IncludeScopes = this.Context.Module.ModuleSettings.Get(MODULESETTING_INCLUDE_SCOPES, "");
     settings.MaximumSuggestions = this.Context.Module.ModuleSettings.Get(MODULESETTING_MAXIMUM_SUGGESTIONS, 5);

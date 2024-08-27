@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models.Cache;
 using Nucleus.Abstractions.Models.Configuration;
+using System.Linq;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace Nucleus.Core.Managers;
 
@@ -115,5 +117,23 @@ public class CacheManager : ICacheManager
         cache.Collect();
       }
     }
+  }
+
+  public void ClearAll()
+  {
+    lock (lockObject)
+    {
+      foreach (ICacheCollection cache in this.Caches.Values)
+      {
+        cache.Clear();
+      }
+    }
+  }
+    
+  public void Clear(string cacheName)
+  {
+    ICacheCollection cache = this.Caches.Values.Where(cache => cache.Name == cacheName).FirstOrDefault();
+
+    cache?.Clear();
   }
 }

@@ -22,6 +22,8 @@ namespace Nucleus.Core.Plugins;
 /// </summary>
 public static class PluginExtensions
 {
+  private static string[] RAZOR_FILETYPES = [".cshtml", ".razor"];
+
   /// <summary>
   /// Add extension controllers, compiled razor views, scheduled tasks and IPortable implementations.
   /// </summary>
@@ -71,14 +73,19 @@ public static class PluginExtensions
 
         if (assemblyPath.StartsWith(extensionsFolder, StringComparison.OrdinalIgnoreCase))
         {
-          // Note:  AdditionalReferencePaths expects the file name of an assembly, not a directory name.
-          if (!references.TryGetValue(assembly.GetName().FullName, out string value))
+          string extensionFolder = AssemblyLoader.GetExtensionFolderName(assembly.Location);
+          
+          if (HasRazorCompilableComponents(System.IO.Path.Join(extensionsFolder, extensionFolder)))
           {
-            references.Add(assembly.GetName().FullName, assemblyPath);
-          }
-          else if (assemblyPath != value)
-          {
-            builder.Logger().LogInformation("Skipped adding Razor runtime compliation additional reference path '{path}' because another copy exists at '{existing}'.", assemblyPath, value);
+            // Note:  AdditionalReferencePaths expects the file name of an assembly, not a directory name.
+            if (!references.TryGetValue(assembly.GetName().FullName, out string value))
+            {
+              references.Add(assembly.GetName().FullName, assemblyPath);
+            }
+            else if (assemblyPath != value)
+            {
+              builder.Logger().LogInformation("Skipped adding Razor runtime compliation additional reference path '{path}' because another copy exists at '{existing}'.", assemblyPath, value);
+            }
           }
         }
       }
@@ -96,6 +103,21 @@ public static class PluginExtensions
     });
 
     return builder;
+  }
+
+  /// <summary>
+  /// Return whether the specified folder and its subfolders contain any razor files which can be compiled at run time.
+  /// </summary>
+  /// <param name="extensionFolder"></param>
+  /// <returns></returns>
+  /// <remarks>
+  /// ConfigureRazorRuntimeCompilation uses this function to determine whether to add extension assemblies to the AdditionalReferencePaths 
+  /// list by checking whether the extension folder and subfolders contain any files which may be compiled at run time.
+  /// </remarks>
+  private static Boolean HasRazorCompilableComponents(string extensionFolder)
+  {
+    return System.IO.Directory.GetFiles(extensionFolder, "*.*", System.IO.SearchOption.AllDirectories)
+      .Any(file => RAZOR_FILETYPES.Contains(System.IO.Path.GetExtension(file), StringComparer.OrdinalIgnoreCase));  
   }
 
   /// <summary>
@@ -314,12 +336,12 @@ public static class PluginExtensions
         // for assemblies which ARE in an extension folder, use an instance of our own ApplicationPart class (ExtensionCompiledRazorApplicationPart),
         // which overrides the CompiledItems property to use our ExtensionRazorCompiledItemLoader, which has the end result of adding an
         // /Extensions/extension-folder prefix to the identifier property of each RazorCompiledItem returned, so that the "path" of compiled razor
-        // items matches the path which is expected by Plugins.ExtensionViewLocationExpander.  See comments in ExtensionRazorCompiledItem.cs.
+        // items matches the path which is expected by Plugins.ExtensionViewLocationExpander.  See comments in ExtensionRazorCompiledItem.cs.        
         ApplicationPart razorPart = String.IsNullOrEmpty(extensionFolder) ? part : new ExtensionCompiledRazorApplicationPart(assembly);
         if (!ApplicationPartContains(builder, razorPart))
         {
           builder.PartManager.ApplicationParts.Add(razorPart);
-        }
+        }        
       }
     }
 

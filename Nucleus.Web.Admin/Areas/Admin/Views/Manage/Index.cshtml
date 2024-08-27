@@ -18,6 +18,6 @@
 	
 	@foreach (var extension in Model.Extensions)
 	{
-    @await Html.PartialAsync("_ManageIcon", new ManageIcon(@extension.FriendlyName, @extension.FriendlyName, @extension.Description, @Url.NucleusAction(extension.EditAction, extension.ControllerName, extension.ExtensionName), @extension.FriendlyName.Substring(0, 1), extension.Icon, "ExtensionIcon"))
+    @await Html.PartialAsync("_ManageIcon", new ManageIcon(@extension.FriendlyName, @extension.FriendlyName, @extension.Description, @Url.AreaAction("View", "Manage", "Admin", new { id = extension.Id }), @extension.FriendlyName.Substring(0, 1), extension.Icon, "ExtensionIcon"))
 	}
 </ul>

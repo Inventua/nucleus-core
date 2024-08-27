@@ -7,6 +7,7 @@ using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Search;
 using System.ComponentModel;
+using Nest;
 
 namespace Nucleus.Extensions.ElasticSearch
 {
@@ -55,7 +56,7 @@ namespace Nucleus.Extensions.ElasticSearch
 
 			return new SearchResults()
 			{
-				Results = await ToSearchResults(result.Documents),
+				Results = await ToSearchResults(result),
         MaxScore = result.MaxScore,
         Total = result.Total
 			};
@@ -90,31 +91,39 @@ namespace Nucleus.Extensions.ElasticSearch
 
       return new SearchResults()
       {
-        Results = await ToSearchResults(result.Documents),
+        Results = await ToSearchResults(result),
         MaxScore = result.MaxScore,
 				Total = result.Total
 			};
 		}
 
-		private async Task<IEnumerable<SearchResult>> ToSearchResults(IReadOnlyCollection<ElasticSearchDocument> documents)
+		private async Task<IEnumerable<SearchResult>> ToSearchResults(Nest.ISearchResponse<ElasticSearchDocument> searchResults)
 		{
 			List<SearchResult> results = new();
 
-			foreach (ElasticSearchDocument document in documents)
+			foreach (ElasticSearchDocument document in searchResults.Documents)
 			{
-				results.Add(await ToSearchResult(document));
+				results.Add(await ToSearchResult(document, searchResults.Hits.Where(hit => hit.Source.Id == document.Id)));
 			}
 
 			return results;
 		}
 
-		private async Task<SearchResult> ToSearchResult(ElasticSearchDocument document)
+		private async Task<SearchResult> ToSearchResult(ElasticSearchDocument document, IEnumerable<IHit<ElasticSearchDocument>> hits)
 		{
 			return new SearchResult()
 			{
 				Score = document.Score,
 
-				Site = await this.SiteManager.Get(document.SiteId),
+        MatchedTerms = hits?
+          .SelectMany(highlight => highlight.Highlight)
+          .SelectMany(highlight => highlight.Value)
+          .SelectMany(highlightValue => ExtractHighlightedTerms(highlightValue))
+          .Where(value => !String.IsNullOrEmpty(value))
+          .Distinct()
+          .ToList(),
+
+        Site = await this.SiteManager.Get(document.SiteId),
 				Url = document.Url,
 				Title = document.Title,
 				Summary = document.Summary,
@@ -132,7 +141,25 @@ namespace Nucleus.Extensions.ElasticSearch
 			};
 		}
 
-		private async Task<IEnumerable<ListItem>> ToCategories(IEnumerable<Guid> idList)
+    private List<string> ExtractHighlightedTerms(string highlightedValue)
+    {
+      List<string> results = new();
+
+      System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches(highlightedValue, "<em>(?<term>[^\\/]*)<\\/em>");
+      
+      foreach (System.Text.RegularExpressions.Match match in matches)
+      {
+        if (match.Success)
+        {
+          results.Add(match.Groups["term"].Value);
+        }
+      }
+      
+
+      return results;
+    }
+
+    private async Task<IEnumerable<ListItem>> ToCategories(IEnumerable<Guid> idList)
 		{
 			if (idList == null) return default;
 

@@ -47,6 +47,17 @@ namespace Nucleus.Abstractions.Managers
 		public void Collect();
 
     /// <summary>
+		/// Clear all caches.
+		/// </summary>
+		public void ClearAll();
+
+    /// <summary>
+		/// Clear the specified cache.
+		/// </summary>
+		public void Clear(string name);
+
+
+    /// <summary>
     /// Report the current state of all caches.
     /// </summary>
     /// <returns></returns>

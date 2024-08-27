@@ -1,0 +1,9 @@
+﻿@model Nucleus.Extensions.AzureEmailCommunications.AzureEmailCommunicationsOptions
+@addTagHelper "*, Nucleus.ViewFeatures"
+<SettingsControl caption="Connection String" helptext="Enter or paste your Azure Communications service connection string. In Azure Portal, go to the Overview page for your Communication Service, and click Manage Keys to get your connection string.">
+  @Html.PasswordFor(model => model.ConnectionString, new { @value = Nucleus.Extensions.AzureEmailCommunications.AzureEmailCommunicationsOptions.UNCHANGED_CONNECTIONSTRING })
+</SettingsControl>
+
+<SettingsControl caption="Sender Email" helptext="Enter the sender email address for system emails.">
+  @Html.TextBoxFor(model => model.Sender)
+</SettingsControl>

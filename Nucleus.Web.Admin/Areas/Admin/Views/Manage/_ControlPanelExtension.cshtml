@@ -1,0 +1,10 @@
+﻿@model Nucleus.Web.ViewModels.Admin.Manage
+@addTagHelper "*, Nucleus.ViewFeatures"
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.ViewFeatures
+@using Nucleus.Abstractions.Models
+@if (!String.IsNullOrEmpty(Model.ControlPanelExtension.HelpUrl))
+{
+  <a class="nucleus-help-url" href="@Model.ControlPanelExtension.HelpUrl">&#xe887;</a>
+}
+@await Html.RenderControlPanelExtensionAsync(Model.ControlPanelExtension)

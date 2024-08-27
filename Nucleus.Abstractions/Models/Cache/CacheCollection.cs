@@ -21,6 +21,11 @@ public interface ICacheCollection
   public void Collect();
 
   /// <summary>
+  /// Remove all items from the cache.
+  /// </summary>
+  public void Clear();
+
+  /// <summary>
   /// Cache name.
   /// </summary>
   public string Name { get; }

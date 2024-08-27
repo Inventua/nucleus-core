@@ -255,6 +255,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.AzureSea
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleus.Extensions.GoogleCustomSearch", "Nucleus.Core.Modules\Nucleus.Extensions.GoogleCustomSearch\Nucleus.Extensions.GoogleCustomSearch.csproj", "{45CD9585-B73A-4C5F-979D-1740E52B86C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nucleus.Extensions.AzureEmailCommunications", "Nucleus.Core.Modules\Nucleus.Extensions.AzureEmailCommunications\Nucleus.Extensions.AzureEmailCommunications.csproj", "{EF0450DF-4946-42C8-9E8C-42549DB3F89F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -453,6 +455,10 @@ Global
 		{45CD9585-B73A-4C5F-979D-1740E52B86C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45CD9585-B73A-4C5F-979D-1740E52B86C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45CD9585-B73A-4C5F-979D-1740E52B86C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF0450DF-4946-42C8-9E8C-42549DB3F89F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF0450DF-4946-42C8-9E8C-42549DB3F89F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF0450DF-4946-42C8-9E8C-42549DB3F89F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF0450DF-4946-42C8-9E8C-42549DB3F89F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -503,6 +509,7 @@ Global
 		{E16AB101-25E6-482A-B4A2-EAAC19656C8A} = {800D8125-BD40-410A-B1E9-C1E62224DC03}
 		{D171C245-5228-473B-BB1C-6D1F4AF7830D} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 		{45CD9585-B73A-4C5F-979D-1740E52B86C8} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
+		{EF0450DF-4946-42C8-9E8C-42549DB3F89F} = {B2A29AB0-1E90-4829-ADB4-7C343C0A41B8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D84CD364-9C8E-400E-84AA-45562061ED44}

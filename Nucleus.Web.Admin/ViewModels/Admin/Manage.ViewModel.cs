@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Nucleus.Abstractions.Models;
+﻿using Nucleus.Abstractions.Models;
 
-namespace Nucleus.Web.ViewModels.Admin
+namespace Nucleus.Web.ViewModels.Admin;
+
+public class Manage
 {
-	public class Manage
-	{
-		public List<ControlPanelExtensionDefinition> Extensions { get; set; }
-
-	}
+  public List<ControlPanelExtensionDefinition> Extensions { get; set; }
+  public ControlPanelExtensionDefinition ControlPanelExtension { get; set; }
 }

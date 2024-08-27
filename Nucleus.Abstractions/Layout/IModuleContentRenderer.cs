@@ -63,6 +63,14 @@ namespace Nucleus.Abstractions.Layout
     /// <returns></returns>
     public Task<IHtmlContent> RenderModuleEditor(ViewContext viewContext, Site site, Page page, PageModule moduleInfo, LocalPath localPath, Boolean renderContainer);
 
-		
-	}
+
+    /// <summary>
+    /// Render the specified control panel extension.
+    /// </summary>
+    /// <param name="viewContext"></param>
+    /// <param name="site"></param>
+    /// <param name="controlPanelExtension">Specifies the control panel extension being rendered.</param>
+    /// <returns></returns>
+    public Task<IHtmlContent> RenderControlPanelExtension(ViewContext viewContext, Site site, ControlPanelExtensionDefinition controlPanelExtension);
+  }
 }

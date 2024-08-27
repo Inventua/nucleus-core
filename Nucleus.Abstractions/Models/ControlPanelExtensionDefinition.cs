@@ -71,5 +71,10 @@ namespace Nucleus.Abstractions.Models
 		/// The icon for the control panel extension.
 		/// </summary>
 		public string Icon { get; set; }
+
+    /// <summary>
+		/// Control panel extension help Url.
+		/// </summary>
+		public string HelpUrl { get; set; }
   }
 }

@@ -22,7 +22,7 @@
 
   <TabContent>
     <TabPanel id="system-information" active="true">
-      <table class="table table-borderless table-sm headers-column">
+      <table class="table table-striped table-borderless table-sm headers-column">
         <tbody>
           <tr>
             <th scope="row">Product</th>
@@ -37,8 +37,12 @@
             <td>@Model.Server</td>
           </tr>
           <tr>
-            <th scope="row">Server Time</th>
-            <td>@DateTime.UtcNow.FormatDate(this.Context.Request.GetUserTimeZone()) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(FormatExtensions.TimespanFormats.TimeOffset)]</td>
+            <th scope="row">.NET Version</th>
+            <td>@Model.Framework</td>
+          </tr>
+          <tr>
+            <th scope="row">.NET Environment Name</th>
+            <td>@Model.EnvironmentName</td>
           </tr>
           <tr>
             <th scope="row">Operating System</th>
@@ -49,12 +53,12 @@
             <td>@Model.OperatingSystemUser</td>
           </tr>
           <tr>
-            <th scope="row">.NET Version</th>
-            <td>@Model.Framework</td>
-          </tr>
-          <tr>
             <th scope="row">Process Start Time</th>
             <td>@Model.StartTime.FormatDate(this.Context.Request.GetUserTimeZone()) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(FormatExtensions.TimespanFormats.TimeOffset)] (@Model.Uptime)</td>
+          </tr>
+          <tr>
+            <th scope="row">Server Time</th>
+            <td>@DateTime.UtcNow.FormatDate(this.Context.Request.GetUserTimeZone()) [UTC @this.Context.Request.GetUserTimeZone().BaseUtcOffset.FormatTimeSpan(FormatExtensions.TimespanFormats.TimeOffset)]</td>
           </tr>
           <tr>
             <th scope="row">CPU Used</th>
@@ -66,6 +70,11 @@
           </tr>
         </tbody>
       </table>
+
+      @using (Html.BeginAreaForm("Restart", "System", "Admin", FormMethod.Post, new { @class = "mt-4" }))
+      {
+        <button type="submit" class="btn btn-danger" data-target=".System" data-confirm="This will shut down Nucleus. In Azure, IIS, NGINX and other hosting environments, the site will automatically restart. Do you want to continue?">Restart Site</button>
+      }
     </TabPanel>
 
     <TabPanel id="system-activity">
@@ -177,88 +186,99 @@
           Your current logging settings are listed below.  These settings are typically configured in your
           <span class="font-monospace">appSettings.@(Model.EnvironmentName).json</span>	file.
         </div>
-        
+
         @await Html.PartialAsync("_LogLevels", Model)
       </modal>
     </TabPanel>
 
     <TabPanel id="system-cache">
-      <div class="alert alert-info">
-        <span class="d-flex align-items-center">
-          If a cache is full, the oldest entry will be removed when a new entry is added. Cache settings are configured in your appSettings.@(Model.EnvironmentName).json file.
+      @using (Html.BeginAreaForm("ClearCache", "System", "Admin", FormMethod.Post))
+      {
+        <div class="alert alert-info">
+          <span class="d-flex align-items-center">
+            If a cache is full, the oldest entry will be removed when a new entry is added. Cache settings are configured in your appSettings.@(Model.EnvironmentName).json file.
 
-          <a class="nucleus-material-icon btn btn-none fs-5 ms-2" href="https://www.nucleus-cms.com/configuration-reference/#nucleuscacheoptions" target="_blank">&#xe887;</a>
-        </span>
-      </div>
+            <a class="nucleus-material-icon btn btn-none fs-5 ms-2" href="https://www.nucleus-cms.com/configuration-reference/#nucleuscacheoptions" target="_blank">&#xe887;</a>
+          </span>
+        </div>
+        <div class="overflow-auto">
+          <table class="table table-sm table-sticky-headers table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Usage</th>
+                <th scope="col">Cache Item Expiry</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach (var cache in Model.CacheReport)
+              {
+                <tr>
+                  <td class="text-nowrap fw-bold align-text-top">@cache.Name</td>
+                  <td>@cache.Count of @cache.Options.Capacity (@(Math.Round((decimal)cache.Count / cache.Options.Capacity * 100, 1))<text>% full</text>)</td>
+                  <td>@cache.Options.ExpiryTime</td>
+                  <td>
+                    <button type="submit" class="btn btn-sm btn-primary" data-target=".System.parent()" formaction="@Url.AreaAction("ClearCache", "System", "Admin", new { @cache = cache.Name} )">Clear Cache</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <button type="submit" class="btn btn-primary" data-target=".System.parent()" formaction="@Url.AreaAction("ClearAllCaches", "System", "Admin")">Clear All Caches</button>
+      }      
+    </TabPanel>
+
+    <TabPanel id="system-internals">
       <div class="overflow-auto">
         <table class="table table-sm table-sticky-headers table-striped">
           <thead>
             <tr>
-              <th scope="col">Name</th>
-              <th scope="col">Usage</th>
-              <th scope="col">Cache Item Expiry</th>
+              <th scope="col">Extension</th>
+              <th scope="col">Assemblies</th>
             </tr>
           </thead>
           <tbody>
-            @foreach (var cache in Model.CacheReport)
+            @foreach (var assemblyLoadContext in Model.ExtensionLoadContexts)
             {
               <tr>
-                <td class="text-nowrap fw-bold align-text-top">@cache.Name</td>
-                <td>@cache.Count of @cache.Options.Capacity (@(Math.Round((decimal)cache.Count / cache.Options.Capacity * 100, 1))<text>% full</text>)</td>
-                <td>@cache.Options.ExpiryTime</td>
+                <td class="text-nowrap fw-bold align-text-top">@assemblyLoadContext.Name</td>
+                <td>
+                  <table class="small">
+                    <tbody>
+                      @foreach (var assembly in assemblyLoadContext.Assemblies)
+                      {
+                        <tr>
+                          <td class="py-2">
+                            @assembly.FullName
+                            @if (!@assembly.IsDynamic && @assembly.Location.StartsWith(Model.ContentRootPath))
+                            {
+                              <div class="text-muted">@assembly.Location[Model.ContentRootPath.Length..]</div>
+                            }
+                            <div suppress-empty="true" class="text-muted text-decoration-underline">
+                              @if (!String.IsNullOrEmpty(@assembly.Product()) && @assembly.Product() != assembly.GetName().Name)
+                              {
+                                @assembly.Product()
+
+                                <text>, </text>
+                              }
+                              @if (!String.IsNullOrEmpty(@assembly.Copyright()))
+                              {
+                                @assembly.Copyright()
+                              }
+                            </div>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </td>
               </tr>
             }
           </tbody>
         </table>
-      </div>
-    </TabPanel>
-
-    <TabPanel id="system-internals">     
-      <div class="overflow-auto">
-      <table class="table table-sm table-sticky-headers table-striped">
-        <thead>
-          <tr>
-            <th scope="col">Extension</th>
-            <th scope="col">Assemblies</th>
-          </tr>
-        </thead>
-        <tbody>
-          @foreach (var assemblyLoadContext in Model.ExtensionLoadContexts)
-          {
-            <tr>
-              <td class="text-nowrap fw-bold align-text-top">@assemblyLoadContext.Name</td>
-              <td>
-                <table class="small">
-                  <tbody>
-                    @foreach(var assembly in assemblyLoadContext.Assemblies)
-                    {
-                      <tr>
-                        <td class="py-2">
-                          @assembly.FullName 
-                          @if (!@assembly.IsDynamic && @assembly.Location.StartsWith(Model.ContentRootPath))
-                          {
-                            <div class="text-muted">@assembly.Location[Model.ContentRootPath.Length..]</div>
-                          }
-                          <div suppress-empty="true" class="text-muted text-decoration-underline">
-                            @if (!String.IsNullOrEmpty(@assembly.Product()) && @assembly.Product() != assembly.GetName().Name)
-                            {
-                              @assembly.Product()<text>, </text>
-                            }
-                            @if (!String.IsNullOrEmpty(@assembly.Copyright()))
-                            {
-                              @assembly.Copyright()
-                            }
-                          </div>
-                        </td>
-                      </tr>
-                    }
-                    </tbody>
-                </table>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
       </div>
     </TabPanel>
   </TabContent>

@@ -10,6 +10,7 @@
     <component folderName="AzureSearch" optional="false">
       <controlPanelExtensionDefinition id="204D31FE-3B6B-47F8-B435-B8470F6462D5">
         <friendlyName>Azure Search Settings</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/other-extensions/azure-search/</helpUrl>
         <description>Configure Azure Search settings.</description>
         <controllerName>AzureSearchSettings</controllerName>
         <extensionName>AzureSearch</extensionName>

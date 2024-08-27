@@ -6,11 +6,12 @@
   <description>
     The Elastic Search extension provides a search index manager and a search provider (it both feeds the search index and retrieves search results).
   </description>
-  <compatibility minVersion="2.0.0.0" maxVersion="2.*" />
+  <compatibility minVersion="2.0.0.1" maxVersion="2.*" />
   <components>
     <component folderName="ElasticSearch" optional="false">
       <controlPanelExtensionDefinition id="3cf5e589-01c2-491b-8967-b05c084d1e87">
         <friendlyName>Elastic Search Settings</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/other-extensions/elastic-search/</helpUrl>
         <description>Configure Elastic Search settings.</description>
         <controllerName>Settings</controllerName>
         <extensionName>ElasticSearch</extensionName>
@@ -20,13 +21,11 @@
       </controlPanelExtensionDefinition>
       <file name="readme.txt" />
       <file name="license.txt" />
-      
       <folder name="bin">
         <file name="Nucleus.Extensions.ElasticSearch.dll" />
         <file name="Nest.dll" />
         <file name="ElasticSearch.Net.dll" />
       </folder>
-      
       <cleanup>
         <file name="disable-private-loadcontext.json" />
         <file name="settings.css" />

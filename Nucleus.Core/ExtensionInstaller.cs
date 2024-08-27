@@ -255,8 +255,9 @@ namespace Nucleus.Core
 							ControlPanelExtensionDefinition extensionDefinition = new()
 							{
 								Id = Guid.Parse(controlPanelExtensionDef.id),
-								FriendlyName = controlPanelExtensionDef.friendlyName,								  
-								Description = controlPanelExtensionDef.description,
+								FriendlyName = controlPanelExtensionDef.friendlyName,
+                HelpUrl = controlPanelExtensionDef.helpUrl,
+                Description = controlPanelExtensionDef.description,
 								ControllerName = controlPanelExtensionDef.controllerName,
 								ExtensionName = controlPanelExtensionDef.extensionName,
 								Scope = (ControlPanelExtensionDefinition.ControlPanelExtensionScopes)System.Enum.Parse(typeof(ControlPanelExtensionDefinition.ControlPanelExtensionScopes), controlPanelExtensionDef.scope.ToString(), true),
@@ -346,7 +347,8 @@ namespace Nucleus.Core
 								{
 									Id = Guid.Parse(controlPanelExtensionDef.id),
 									FriendlyName = controlPanelExtensionDef.friendlyName,
-									Description = controlPanelExtensionDef.description,
+                  HelpUrl = controlPanelExtensionDef.helpUrl,
+                  Description = controlPanelExtensionDef.description,
 									ControllerName = controlPanelExtensionDef.controllerName,
 									ExtensionName = controlPanelExtensionDef.extensionName,
 									Scope = (ControlPanelExtensionDefinition.ControlPanelExtensionScopes)System.Enum.Parse(typeof(ControlPanelExtensionDefinition.ControlPanelExtensionScopes), controlPanelExtensionDef.scope.ToString(), true),
@@ -435,8 +437,26 @@ namespace Nucleus.Core
 					this.ExtensionManager.DeleteModuleDefinition(moduleDefinition);
 				}
 
-				// delete layouts
-				foreach (Nucleus.Abstractions.Models.Extensions.LayoutDefinition layoutDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.LayoutDefinition>())
+        // delete control panel extension definitions
+        foreach (Nucleus.Abstractions.Models.Extensions.ControlPanelExtensionDefinition controlPanelDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.ControlPanelExtensionDefinition>())
+        {
+          ControlPanelExtensionDefinition extensionDefinition = new()
+          {
+            Id = Guid.Parse(controlPanelDef.id),
+            FriendlyName = controlPanelDef.friendlyName,
+            HelpUrl = controlPanelDef.helpUrl,
+            Description = controlPanelDef.description,
+            ControllerName = controlPanelDef.controllerName,
+            ExtensionName = controlPanelDef.extensionName,
+            Scope = (ControlPanelExtensionDefinition.ControlPanelExtensionScopes)System.Enum.Parse(typeof(ControlPanelExtensionDefinition.ControlPanelExtensionScopes), controlPanelDef.scope.ToString(), true),
+            EditAction = controlPanelDef.editAction
+          };
+
+          this.ExtensionManager.DeleteControlPanelExtensionDefinition(extensionDefinition);
+        }
+
+        // delete layouts
+        foreach (Nucleus.Abstractions.Models.Extensions.LayoutDefinition layoutDef in component.Items.OfType<Nucleus.Abstractions.Models.Extensions.LayoutDefinition>())
 				{
 
 					LayoutDefinition layoutDefinition = new()

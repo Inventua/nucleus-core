@@ -1,0 +1,15 @@
+{
+	"schemaName": "Nucleus.Core",
+  "version": "01.00.24",
+  "operations": [
+    {
+      "addColumn": {
+        "table": "ControlPanelExtensionDefinitions",
+        "name": "HelpUrl",
+        "clrType": "string",
+        "maxLength": 256,
+        "isnullable": true
+      }    
+    }
+  ]
+}

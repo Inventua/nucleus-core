@@ -10,6 +10,7 @@
     <component folderName="GoogleCustomSearch" optional="false">
       <controlPanelExtensionDefinition id="a4aaf40e-2a49-4237-a12b-08cc53d1555a">
         <friendlyName>Google Custom Search Settings</friendlyName>
+        <helpUrl>https://www.nucleus-cms.com/other-extensions/google-custom-search/</helpUrl>
         <description>Configure Google Custom Search settings.</description>
         <controllerName>Settings</controllerName>
         <extensionName>GoogleCustomSearch</extensionName>

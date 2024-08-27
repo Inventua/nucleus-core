@@ -53,7 +53,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Google.Apis.CustomSearchAPI.v1" Version="1.68.0.3395" />
-		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0" />
+		<PackageReference Include="Inventua.Nucleus.Abstractions" Version="2.0.0.1-alpha-1.4" />
 		<PackageReference Include="Inventua.Nucleus.ViewFeatures" Version="2.0.0" />
 
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->

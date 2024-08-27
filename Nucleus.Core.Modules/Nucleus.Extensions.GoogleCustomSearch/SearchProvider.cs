@@ -22,6 +22,21 @@ public class SearchProvider : ISearchProvider
     this.SiteManager = siteManager;
   }
 
+  public ISearchProviderCapabilities GetCapabilities()
+  {
+    return new DefaultSearchProviderCapabilities()
+    {
+      CanReportCategories = false,
+      CanReportScore = false,
+      CanReportSize = false,
+      MaximumSuggestions = 0,
+      CanReportPublishedDate = false,
+      CanReportType = false,
+      CanFilterByScope = false,
+      MaximumPageSize = 10       
+    };
+  }
+
   public async Task<SearchResults> Search(SearchQuery query)
   {
     if (query.Site == null)
@@ -49,14 +64,13 @@ public class SearchProvider : ISearchProvider
     Google.Apis.CustomSearchAPI.v1.CseResource.ListRequest request = this.GetService().Cse.List();
 
     request.Key = settings.GetApiKey(query.Site);
+    request.Cx = settings.SearchEngineId;
 
     request.Q = query.SearchTerm;
-    request.Cx = settings.SearchEngineId; 
     request.ExactTerms = query.StrictSearchTerms ? query.SearchTerm : null;
-    request.Start = query.PagingSettings.FirstRowIndex+1; 
+    request.Start = query.PagingSettings.FirstRowIndex+1;
     request.Num = query.PagingSettings.PageSize;
-    
-    //request.Safe = CseResource.ListRequest.SafeEnum.Active;  TODO!
+    request.Safe = settings.SafeSearch;
 
     Google.Apis.CustomSearchAPI.v1.Data.Search response = await request.ExecuteAsync();
 

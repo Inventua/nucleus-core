@@ -36,13 +36,16 @@ public class SettingsController : Controller
 
     viewModel.GetSettings(this.Context.Site);
 
+    viewModel.SafeSearchOptions.Add(Google.Apis.CustomSearchAPI.v1.CseResource.ListRequest.SafeEnum.SafeUndefined.ToString());
+    viewModel.SafeSearchOptions.Add(Google.Apis.CustomSearchAPI.v1.CseResource.ListRequest.SafeEnum.Active.ToString());
+    viewModel.SafeSearchOptions.Add(Google.Apis.CustomSearchAPI.v1.CseResource.ListRequest.SafeEnum.Off.ToString());
+
     return viewModel;
   }
 
   [HttpPost]
   public async Task<ActionResult> SaveSettings(ViewModels.Settings viewModel)
   {
-    //viewModel.SetApiKey(this.Context.Site, viewModel.api)
     if (String.IsNullOrEmpty(viewModel.ApiKey))
     {
       viewModel.SetApiKey(this.Context.Site, "");

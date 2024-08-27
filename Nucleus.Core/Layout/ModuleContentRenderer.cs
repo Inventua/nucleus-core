@@ -8,6 +8,7 @@ using System.Runtime.Loader;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -42,12 +43,21 @@ public class ModuleContentRenderer : IModuleContentRenderer
   // (reference: https://github.com/dotnet/aspnetcore/blob/42925a4cebf501fd00aae1a1e899a969b4a2bd9a/src/Mvc/Mvc.Core/src/DependencyInjection/MvcCoreServiceCollectionExtensions.cs#L187)
   private IActionInvokerFactory ActionInvokerFactory { get; }
 
+  /// <summary>
+  /// Cache of extension controller action descriptors.
+  /// </summary>
+  /// <remarks>
+  /// Cache is keyed by ControllerName::Action()
+  /// </remarks>
   private Dictionary<string, ControllerActionDescriptor> ExtensionActionDescriptors { get; set; }
 
   private ILogger<ModuleContentRenderer> Logger { get; }
 #if DEBUG
   private Histogram<float> ModulesRenderedHistogram { get; }
 #endif
+
+  // RecyclableMemoryStream replaces use of IO.MemoryStream to catch module output in .BuildContent(). The BuildContent function is called
+  // frequently, and RecyclableMemoryStream avoids object allocation and garbage collection, which provides a performance improvement.
   private static readonly RecyclableMemoryStreamManager RecyclableMemoryStreamManager = new();
 
   public ModuleContentRenderer(IActionDescriptorCollectionProvider actionDescriptorProvider, IActionInvokerFactory actionInvokerFactory, IPageManager pageManager, IPageModuleManager pageModuleManager, IMeterFactory meterFactory, ILogger<ModuleContentRenderer> logger)
@@ -64,9 +74,15 @@ public class ModuleContentRenderer : IModuleContentRenderer
     this.ModulesRenderedHistogram = performancedMeter.CreateHistogram<float>("nucleus.perf.rendering.modules", description: "Nucleus modules render performance.", unit: "ms");
 #endif
 
+    RecyclableMemoryStreamManager.StreamDisposed += this.RecyclableMemoryStreamManager_StreamDisposed;
 
     Microsoft.Extensions.Primitives.IChangeToken changeToken = (actionDescriptorProvider as ActionDescriptorCollectionProvider)?.GetChangeToken();
     changeToken?.RegisterChangeCallback((state) => ResetExtensionActionDescriptorsCache(state), null);
+  }
+
+  private void RecyclableMemoryStreamManager_StreamDisposed(object sender, RecyclableMemoryStreamManager.StreamDisposedEventArgs e)
+  {
+    this.Logger?.LogTrace("Disposed RecyclableMemoryStream '{tag}' after {lifetime:0.00} ms.", e.Tag, e.Lifetime.TotalMilliseconds);
   }
 
   private void ResetExtensionActionDescriptorsCache(object state)
@@ -626,7 +642,9 @@ public class ModuleContentRenderer : IModuleContentRenderer
     ControllerContext controllerContext = new(actionContext);
 
     // we catch the module's rendered output in a memory stream so that we can add it to the page output
-    httpContext.Response.Body = RecyclableMemoryStreamManager.GetStream();
+    string tag = $"{httpContext.Request.GetDisplayUrl()}: {actionDescriptor.DisplayName}";
+    this.Logger?.LogTrace("Allocate RecyclableMemoryStream '{tag}'", tag);
+    httpContext.Response.Body = RecyclableMemoryStreamManager.GetStream(tag : tag);
 
     // Create the controller and run the controller action
     await this.ActionInvokerFactory.CreateInvoker(controllerContext).InvokeAsync();
@@ -640,6 +658,17 @@ public class ModuleContentRenderer : IModuleContentRenderer
   private static Boolean HasAdminPermissionOnly(PageModule moduleInfo)
   {
     return !(moduleInfo.InheritPagePermissions || moduleInfo.Permissions.Count != 0);
+  }
+
+  private IEnumerable<ControllerActionDescriptor> GetActionDescriptors()
+  {
+    return this.ActionDescriptorProvider.ActionDescriptors.Items
+      .OfType<ControllerActionDescriptor>();
+  }
+
+  private static string BuildKey(string controllerName, string action)
+  {
+    return $"{controllerName}::{action}()";
   }
 
   /// <summary>
@@ -657,14 +686,23 @@ public class ModuleContentRenderer : IModuleContentRenderer
    
     if (!String.IsNullOrEmpty(controllerName))
     {
-      IEnumerable<ControllerActionDescriptor> descriptors = this.ActionDescriptorProvider.ActionDescriptors.Items
-          .OfType<ControllerActionDescriptor>();
+      IEnumerable<ControllerActionDescriptor> descriptors = null;
 
-      this.ExtensionActionDescriptors ??= new(descriptors.Count());
+      if (this.ExtensionActionDescriptors == null)
+      {
+        descriptors = GetActionDescriptors();
 
-      string key = $"{controllerName}::{action}()";
+        this.ExtensionActionDescriptors ??= new(descriptors.Count());
+      }
+
+      string key = BuildKey(controllerName, action);
       if (!this.ExtensionActionDescriptors.TryGetValue(key, out actionDescriptor))
       {
+        if (descriptors == null)
+        {
+          descriptors = GetActionDescriptors();
+        }
+
         actionDescriptor = descriptors
           .Where(descriptor => IsMatch(descriptor, moduleinfo.ModuleDefinition.Extension, controllerName, action))
           .FirstOrDefault();
@@ -680,8 +718,8 @@ public class ModuleContentRenderer : IModuleContentRenderer
           // can get past the setup wizard without installing the default modules. This can be addressed by logging on as a system administrator
           // and installing the modules, and we have a "fallback" login module, so we redirect to that instead.
           actionDescriptor = descriptors
-              .Where(descriptor => descriptor.ControllerTypeInfo.FullName == "Nucleus.Web.Controllers.AccountController" && descriptor.ActionName == "Index")
-              .FirstOrDefault();
+            .Where(descriptor => descriptor.ControllerTypeInfo.FullName == "Nucleus.Web.Controllers.AccountController" && descriptor.ActionName == "Index")
+            .FirstOrDefault();
         }
       }
     }
@@ -716,7 +754,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
 
       this.ExtensionActionDescriptors ??= new(descriptors.Count());
 
-      string key = $"{controllerName}::{action}()";
+      string key = BuildKey(controllerName, action);
       if (!this.ExtensionActionDescriptors.TryGetValue(key, out actionDescriptor))
       {
         actionDescriptor = descriptors

@@ -17,6 +17,11 @@
         @Html.TextBoxFor(model => model.SearchEngineId)
       </SettingsControl>
 		</div>
+
+    <SettingsControl caption="Safe Search" helptext="Controls whether SafeSearch is enabled.">
+      @Html.DropDownListFor(model => model.SafeSearch, new SelectList(Model.SafeSearchOptions))
+    </SettingsControl>
+
 	</fieldset>
 
 	<div class="nucleus-form-buttonrow">

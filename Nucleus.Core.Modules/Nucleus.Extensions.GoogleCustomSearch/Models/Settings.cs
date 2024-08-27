@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Google.Apis.CustomSearchAPI.v1;
 
 namespace Nucleus.Extensions.GoogleCustomSearch.Models;
 
@@ -14,12 +15,15 @@ public class Settings
   {
     public const string SITESETTING_API_KEY = "googlecustomsearch:apikey";
     public const string SITESETTING_SEARCH_ENGINE_ID = "googlecustomsearch:searchengineid";
+    public const string SITESETTING_SAFE_SEARCH = "googlecustomsearch:safesearch";
   }
 
   private string EncryptedApiKey { get; set; }
-  //public string ApiKey { get; set; }
 
   public string SearchEngineId { get; set; }
+
+  public CseResource.ListRequest.SafeEnum SafeSearch { get; set; } = CseResource.ListRequest.SafeEnum.Active;
+
 
   public Boolean IsApiKeySet
   {
@@ -29,9 +33,9 @@ public class Settings
     }
   }
 
-  public void SetApiKey(Site site, string apiKey )
+  public void SetApiKey(Site site, string apiKey)
   {
-    if (string.IsNullOrEmpty (apiKey))
+    if (string.IsNullOrEmpty(apiKey))
     {
       this.EncryptedApiKey = "";
     }
@@ -53,7 +57,6 @@ public class Settings
     }
   }
 
-
   public void GetSettings(Site site)
   {
     if (site.SiteSettings.TryGetValue(SiteSettingsKeys.SITESETTING_API_KEY, out string apiKey))
@@ -66,6 +69,13 @@ public class Settings
       this.SearchEngineId = searchEngineId;
     }
 
+    if (site.SiteSettings.TryGetValue(SiteSettingsKeys.SITESETTING_SAFE_SEARCH, out string safeSearch))
+    {
+      if (Enum.TryParse<CseResource.ListRequest.SafeEnum>(safeSearch, out CseResource.ListRequest.SafeEnum safeSearchEnum))
+      {
+        this.SafeSearch = safeSearchEnum;
+      }
+    }
   }
 
   public void ReadEncryptedApiKey(Site site)
@@ -80,6 +90,7 @@ public class Settings
   {
     site.SiteSettings.TrySetValue(SiteSettingsKeys.SITESETTING_API_KEY, this.EncryptedApiKey);
     site.SiteSettings.TrySetValue(SiteSettingsKeys.SITESETTING_SEARCH_ENGINE_ID, this.SearchEngineId);
+    site.SiteSettings.TrySetValue(SiteSettingsKeys.SITESETTING_SAFE_SEARCH, this.SafeSearch.ToString());
   }
 
   /// <summary>

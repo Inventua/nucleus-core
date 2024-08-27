@@ -15,4 +15,7 @@ public class Settings : Models.Settings
   public const string DUMMY_API_KEY = "!@#NOT_CHANGED^&*";
 
   public string ApiKey { get; set; }
+
+  public List<string> SafeSearchOptions { get; set; } = new();
+
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Azure;
 using Azure.Search.Documents.Models;
 using DocumentFormat.OpenXml.Drawing;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
@@ -49,7 +50,7 @@ public class AzureSearchProvider : ISearchProvider
     }
 
 
-    AzureSearchRequest request = new(new System.Uri(settings.ServerUrl), ConfigSettings.DecryptApiKey(query.Site, settings.EncryptedApiKey), settings.IndexName, settings.IndexerName);
+    AzureSearchRequest request = CreateRequest(query.Site, settings);
 
     if (query.Boost == null)
     {
@@ -60,9 +61,17 @@ public class AzureSearchProvider : ISearchProvider
 
     return new SearchResults()
     {
-      Results = await ToSearchResults(response),
+      Results = await ToSearchResults(query.Site, response),
+      Answers = await ToSemanticResults(query.Site, response),
       Total = response.Value.TotalCount.HasValue ? response.Value.TotalCount.Value : 0
     };
+  }
+
+  private async Task<AzureSearchDocument> GetDocumentByKey(Site site, string key)
+  {
+    ConfigSettings settings = new(site);
+    AzureSearchRequest request = CreateRequest(site, settings);
+    return await request.GetContentByKey(key);
   }
 
   private SearchResult<AzureSearchDocument> ReplaceHighlights(SearchResult<AzureSearchDocument> searchResult)
@@ -93,27 +102,78 @@ public class AzureSearchProvider : ISearchProvider
       }
     }
 
+    if (searchResult.SemanticSearch != null && searchResult.SemanticSearch.Captions.Any())
+    {
+      searchResult.Document.Summary = String.Join(" ", searchResult.SemanticSearch.Captions.Select(caption => caption.Highlights));
+    }
+
     return searchResult;
   }
 
-  private async Task<IEnumerable<SearchResult>> ToSearchResults(Response<SearchResults<AzureSearchDocument>> response)
+  private async Task<IEnumerable<SearchResult>> ToSearchResults(Site site, Response<SearchResults<AzureSearchDocument>> response)
   {
     List<SearchResult> results = new();
-    //response.Value.SemanticSearch.
-
+        
     foreach (SearchResult<AzureSearchDocument> document in response.Value.GetResultsAsync().ToBlockingEnumerable())
     {
-      results.Add(await ToSearchResult(ReplaceHighlights(document)));
+      results.Add(await ToSearchResult(site, ReplaceHighlights(document)));
     }
 
     return results;
   }
 
-  private async Task<SearchResult> ToSearchResult(SearchResult<AzureSearchDocument> result)
+  private async Task<IEnumerable<SemanticResult>> ToSemanticResults(Site site, Response<SearchResults<AzureSearchDocument>> response)
+  {
+    List<SemanticResult> results = new();
+
+    if (response.Value.SemanticSearch?.Answers?.Any() == true)
+    {
+      foreach (QueryAnswerResult answer in response.Value.SemanticSearch?.Answers)
+      {
+        results.Add(await ToSemanticResult(site, answer));
+      }
+    }
+    return results;
+  }
+
+  private async Task<SemanticResult> ToSemanticResult(Site site, QueryAnswerResult result)
+  {
+    // (QueryAnswerResult)result.Key contains the Id for the document which yielded the answer
+    AzureSearchDocument relatedDocument = await GetDocumentByKey(site, result.Key);
+
+    return new SemanticResult()
+    {
+      Score = result.Score,
+      Answer = result.Highlights,
+      MatchedTerms = ExtractHighlightedTerms(result.Highlights)?
+        .Where(value => !String.IsNullOrEmpty(value))
+        .Distinct()
+        .ToList(),
+
+      Site = site,
+      Url = relatedDocument?.Url,
+      Title = relatedDocument?.Title,
+      Summary = relatedDocument.Summary,
+      
+      Scope = relatedDocument?.Scope,
+      Type = relatedDocument?.Type,
+      SourceId = String.IsNullOrEmpty(relatedDocument?.SourceId) ? null : Guid.Parse(relatedDocument?.SourceId),
+      ContentType = relatedDocument?.ContentType,
+      PublishedDate = relatedDocument?.PublishedDate,
+
+      Size = relatedDocument?.Size,
+      Keywords = relatedDocument?.Keywords,
+      Categories = await ToCategories(relatedDocument?.Categories),
+      Roles = await ToRoles(relatedDocument?.Roles)
+    };
+  }
+
+
+  private async Task<SearchResult> ToSearchResult(Site site, SearchResult<AzureSearchDocument> result)
   {
     return new SearchResult()
     {
-      Score = result.Score,
+      Score = result.SemanticSearch?.RerankerScore ?? result.Score,
       MatchedTerms = result.Highlights?
         .SelectMany(highlight => highlight.Value)
         .SelectMany(highlightValue => ExtractHighlightedTerms(highlightValue))
@@ -121,7 +181,7 @@ public class AzureSearchProvider : ISearchProvider
         .Distinct()
         .ToList(),
 
-      Site = await this.SiteManager.Get(Guid.Parse(result.Document.SiteId)),
+      Site = site,
       Url = result.Document.Url,
       Title = result.Document.Title,
       Summary = result.Document.Summary,
@@ -181,7 +241,7 @@ public class AzureSearchProvider : ISearchProvider
       query.Boost = settings.Boost;
     }
 
-    AzureSearchRequest request = new(new System.Uri(settings.ServerUrl), ConfigSettings.DecryptApiKey(query.Site, settings.EncryptedApiKey), settings.IndexName, settings.IndexerName);
+    AzureSearchRequest request = CreateRequest(query.Site, settings);
 
     Response<SuggestResults<AzureSearchDocument>> result = await request.Suggest(query);
 
@@ -190,6 +250,22 @@ public class AzureSearchProvider : ISearchProvider
       Results = await ToSearchResults(result),
       Total = result.Value.Results.Count
     };
+  }
+
+  private AzureSearchRequest CreateRequest(Site site, ConfigSettings settings)
+  {
+    return new
+    (
+      new System.Uri(settings.ServerUrl),
+      ConfigSettings.DecryptApiKey(site, settings.EncryptedApiKey),
+      settings.IndexName,
+      settings.IndexerName,
+      settings.SemanticConfigurationName,
+      settings.VectorizationEnabled,
+      settings.AzureOpenAIEndpoint,
+      ConfigSettings.DecryptApiKey(site, settings.EncryptedAzureOpenAIApiKey),
+      settings.AzureOpenAIDeploymentName
+    );
   }
 
   private async Task<IEnumerable<SearchResult>> ToSearchResults(Response<SuggestResults<AzureSearchDocument>> response)

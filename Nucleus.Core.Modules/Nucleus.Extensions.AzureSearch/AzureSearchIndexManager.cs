@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Azure.Core;
 using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
@@ -8,7 +9,7 @@ using Nucleus.Abstractions.Search;
 namespace Nucleus.Extensions.AzureSearch;
 
 public class AzureSearchIndexManager : ISearchIndexManager
-{  
+{
   private ILogger<AzureSearchIndexManager> Logger { get; }
 
   private AzureSearchRequest _request { get; set; }
@@ -35,7 +36,18 @@ public class AzureSearchIndexManager : ISearchIndexManager
 
     if (_request == null || !_request.Equals(new System.Uri(settings.ServerUrl), settings.IndexName, ConfigSettings.DecryptApiKey(site, settings.EncryptedApiKey)))
     {
-      _request = new(new System.Uri(settings.ServerUrl), ConfigSettings.DecryptApiKey(site, settings.EncryptedApiKey), settings.IndexName, settings.IndexerName, TimeSpan.FromSeconds(settings.IndexingPause));
+      _request = new
+      (
+        new System.Uri(settings.ServerUrl),
+        ConfigSettings.DecryptApiKey(site, settings.EncryptedApiKey),
+        settings.IndexName,
+        settings.IndexerName,
+        settings.SemanticConfigurationName,
+        settings.VectorizationEnabled,
+        settings.AzureOpenAIEndpoint,
+        ConfigSettings.DecryptApiKey(site, settings.EncryptedAzureOpenAIApiKey),
+        settings.AzureOpenAIDeploymentName
+      );
     }
 
     return _request;
@@ -70,9 +82,9 @@ public class AzureSearchIndexManager : ISearchIndexManager
     }
 
     AzureSearchDocument document = new(metadata, settings);
-        
+
     await this.Request(metadata.Site).IndexContent(document);
-    
+
     // free up memory - file content is part of the feed data, and this could exhaust available memory 
     document.Dispose();
   }

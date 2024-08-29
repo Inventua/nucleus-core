@@ -31,6 +31,9 @@
         <file name="System.ClientModel.dll" />
         <file name="Azure.Search.Documents.dll" />
         <file name="HtmlAgilityPack.dll" />
+        <file name="Microsoft.Bcl.AsyncInterfaces.dll" />
+        <file name="OpenAI.dll" />
+        <file name="Azure.AI.OpenAI.dll" />
       </folder>
       <!-- 
         when the project property RazorCompileOnBuild=true view (.cshtml) files do not need to be included in package.xml (this file) 

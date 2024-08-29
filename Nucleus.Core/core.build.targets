@@ -8,7 +8,7 @@
 <Project>
 	<PropertyGroup>
     <VersionPrefix>2.0.0.1</VersionPrefix>
-		<VersionSuffix>alpha-1.41</VersionSuffix>
+		<VersionSuffix>alpha-1.42</VersionSuffix>
     <Authors>Inventua Pty Ltd</Authors>
 		<Product>Nucleus</Product>
 		<Copyright>(c) Inventua Pty Ptd</Copyright>

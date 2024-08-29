@@ -19,7 +19,7 @@ using Nucleus.Extensions.Logging;
 namespace Nucleus.Web.Controllers.Admin;
 
 [Area("Admin")]
-[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SITE_ADMIN_POLICY)]
+[Authorize(Policy = Nucleus.Abstractions.Authorization.Constants.SYSTEM_ADMIN_POLICY)]
 public class SystemController : Controller
 {
   private string LogFolderPath { get; }

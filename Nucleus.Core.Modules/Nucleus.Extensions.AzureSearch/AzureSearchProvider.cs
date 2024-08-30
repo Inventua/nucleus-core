@@ -102,7 +102,7 @@ public class AzureSearchProvider : ISearchProvider
       }
     }
 
-    if (searchResult.SemanticSearch != null && searchResult.SemanticSearch.Captions.Any())
+    if (searchResult.SemanticSearch != null && searchResult.SemanticSearch?.Captions?.Any() == true)
     {
       searchResult.Document.Summary = String.Join(" ", searchResult.SemanticSearch.Captions.Select(caption => caption.Highlights));
     }
@@ -141,10 +141,18 @@ public class AzureSearchProvider : ISearchProvider
     // (QueryAnswerResult)result.Key contains the Id for the document which yielded the answer
     AzureSearchDocument relatedDocument = await GetDocumentByKey(site, result.Key);
 
+    string prefix="";
+
+    if (result.Highlights.Length > 0 && !Char.IsAsciiLetterUpper(result.Highlights.First()))
+    {
+      prefix = " ...";
+    }
+
     return new SemanticResult()
     {
       Score = result.Score,
-      Answer = result.Highlights,
+      Answer = prefix + result.Highlights,
+
       MatchedTerms = ExtractHighlightedTerms(result.Highlights)?
         .Where(value => !String.IsNullOrEmpty(value))
         .Distinct()

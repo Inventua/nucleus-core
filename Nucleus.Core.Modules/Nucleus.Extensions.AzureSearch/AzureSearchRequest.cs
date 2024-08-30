@@ -47,7 +47,7 @@ internal class AzureSearchRequest
   internal const int VECTOR_DIMENSIONS = 1536;
 
   internal const string SKILL_SET_NAME = "skillset-content-vectorization";
-  internal static readonly char[] TOKEN_SPLIT_CHARS = [' ', ',', ';', ':', '<', '>', '.', '\t', '\n', '\r'];
+  internal static readonly char[] TOKEN_SPLIT_CHARS = [' ', ',', ';', ':', '<', '>', '.', '!', '#', '_', '\t', '\n', '\r'];
   internal const int TOKENS_PER_PAGE = 2500;
 
   // this list is from https://learn.microsoft.com/en-us/azure/search/cognitive-search-skill-document-extraction#supported-document-formats
@@ -167,20 +167,52 @@ internal class AzureSearchRequest
   {
     List<string> vectorFields = [nameof(AzureSearchDocument.TitleVector), nameof(AzureSearchDocument.SummaryVector), nameof(AzureSearchDocument.ContentVector)];
 
-    FieldBuilder builder = new();
-    IList<SearchField> fields = builder.Build(typeof(AzureSearchDocument))
-      // exclude vector fields from default index. They are added later if vectorization is enabled
-      .Where(field => !vectorFields.Contains(field.Name))
-      .ToList();
+    SearchIndex searchIndex = await client.GetIndexAsync(this.IndexName);
 
-    SearchIndex searchIndex = new(this.IndexName, fields)
+    if (searchIndex == null)
     {
-      Similarity = new BM25Similarity() { B = 0.75, K1 = 1.2 }
-    };
+      FieldBuilder builder = new();
+      IList<SearchField> fields = builder.Build(typeof(AzureSearchDocument))
+        // exclude vector fields from the default index. They are added later if vectorization 
+        // is enabled
+        .Where(field => !vectorFields.Contains(field.Name))
+        .ToList();
 
-    searchIndex.Suggesters.Add(new(SUGGESTER_NAME, BuildSuggesterFields()));
+      searchIndex = new(this.IndexName, fields);
+    }
 
-    Response<SearchIndex> createIndexResponse = await client.CreateIndexAsync(searchIndex);
+    searchIndex.Similarity = new BM25Similarity() { B = 0.75, K1 = 1.2 };
+
+    if (!searchIndex.Suggesters.Any())
+    {
+      searchIndex.Suggesters.Add(new(SUGGESTER_NAME, BuildSuggesterFields()));
+    }
+
+    if (!searchIndex.ScoringProfiles.Any())
+    {
+      ScoringProfile defaultScoringProfile = new($"scoring-profile-{this.IndexName}");
+
+      Dictionary<string, double> weights = new()
+      {
+        { nameof(AzureSearchDocument.Title), 2 },
+        { nameof(AzureSearchDocument.Summary), 1 },
+        { nameof(AzureSearchDocument.Content), 1 },
+        { nameof(AzureSearchDocument.Keywords), 1.5 },
+
+        { nameof(AzureSearchDocument.Categories), 1.5 },
+        { nameof(AzureSearchDocument.TitleVector), 2 },
+        { nameof(AzureSearchDocument.ContentVector), 1 },
+        { nameof(AzureSearchDocument.SummaryVector), 1 },
+      };
+
+      defaultScoringProfile.TextWeights = new(weights);
+
+      searchIndex.ScoringProfiles.Add(defaultScoringProfile);
+
+      searchIndex.DefaultScoringProfile = defaultScoringProfile.Name;
+    }
+
+    Response<SearchIndex> createIndexResponse = await client.CreateOrUpdateIndexAsync(searchIndex, true);
   }
 
   public async Task<Boolean> ClearIndex()
@@ -577,6 +609,7 @@ internal class AzureSearchRequest
       HighlightPreTag = "<em>",
       HighlightPostTag = "</em>",
       IncludeTotalCount = true,
+      ScoringStatistics = ScoringStatistics.Global,
       QueryType = String.IsNullOrEmpty(this.SemanticConfigurationName) ? SearchQueryType.Simple : SearchQueryType.Semantic,
       SearchMode = query.StrictSearchTerms ? SearchMode.All : SearchMode.Any,
       Size = query.PagingSettings.PageSize,
@@ -595,7 +628,7 @@ internal class AzureSearchRequest
       {
         searchOptions.SemanticSearch.QueryCaption = new(QueryCaptionType.Extractive);
         searchOptions.SemanticSearch.QueryAnswer = new(QueryAnswerType.Extractive) { Count = 3 };
-        searchOptions.SemanticSearch.ErrorMode = SemanticErrorMode.Fail;
+        searchOptions.SemanticSearch.ErrorMode = SemanticErrorMode.Partial;
       }
     }
 
@@ -607,10 +640,20 @@ internal class AzureSearchRequest
       };
       VectorizableTextQuery vectorQuery = new(query.SearchTerm);
 
+      // https://learn.microsoft.com/en-us/azure/search/vector-search-how-to-query?tabs=query-2024-07-01%2Cbuiltin-portal#number-of-ranked-results-in-a-vector-query-response
+      vectorQuery.KNearestNeighborsCount = 10; // default is 50
       vectorQuery.Fields.Add(nameof(AzureSearchDocument.TitleVector));
       vectorQuery.Fields.Add(nameof(AzureSearchDocument.SummaryVector));
       vectorQuery.Fields.Add(nameof(AzureSearchDocument.ContentVector));
+      //vectorQuery.Exhaustive = true;
+      vectorQuery.Weight = 2;
 
+      // todo at some future point, as Threshold is not supported by the current version of 
+      // Azure.Search.Documents
+      // https://learn.microsoft.com/en-us/azure/search/vector-search-how-to-query?tabs=query-2024-07-01%2Cbuiltin-portal#set-thresholds-to-exclude-low-scoring-results-preview
+      //vectorQuery.Threshold.Kind = vectorSimilarity
+      //vectorQuery.Threshold.Value = 0.8
+      
       searchOptions.VectorSearch.Queries.Add(vectorQuery);
     }
 
@@ -618,10 +661,10 @@ internal class AzureSearchRequest
     AddRange(searchOptions.Select, BuildSelectFields());
     AddRange(searchOptions.HighlightFields, BuildHighlightFields(query));
 
-    if (searchOptions.QueryType != SearchQueryType.Semantic)
-    {
-      AddRange(searchOptions.OrderBy, BuildOrderBy(query));
-    }
+    //if (searchOptions.QueryType != SearchQueryType.Semantic)
+    //{
+    //  AddRange(searchOptions.OrderBy, BuildOrderBy(query));
+    //}
 
     if (query.SearchTerm.Length > 100)
     {
@@ -645,7 +688,7 @@ internal class AzureSearchRequest
 
     AddRange(searchOptions.SearchFields, BuildSuggesterFields());
     AddRange(searchOptions.Select, BuildSelectFields());
-    AddRange(searchOptions.OrderBy, BuildOrderBy(query));
+    //AddRange(searchOptions.OrderBy, BuildOrderBy(query));
 
     if (query.SearchTerm.Length > 100)
     {
@@ -677,6 +720,7 @@ internal class AzureSearchRequest
     return
     [
       nameof(AzureSearchDocument.Title),
+      nameof(AzureSearchDocument.Summary),
       nameof(AzureSearchDocument.Content),
       nameof(AzureSearchDocument.Keywords),
       nameof(AzureSearchDocument.Categories)
@@ -721,13 +765,17 @@ internal class AzureSearchRequest
     ];
   }
 
-  private List<string> BuildOrderBy(SearchQuery query)
-  {
-    return
-    [
-      "search.score() desc"
-    ];
-  }
+
+  // from: https://learn.microsoft.com/en-us/azure/search/hybrid-search-overview
+  // Explicit sort orders override relevanced-ranked results, so if you want similarity and BM25 relevance, omit
+  // sorting in your query."
+  ////private List<string> BuildOrderBy(SearchQuery query)
+  ////{
+  ////  return
+  ////  [
+  ////    "search.score() desc"
+  ////  ];
+  ////}
 
   private string BuildSiteFilter(SearchQuery query)
   {

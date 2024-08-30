@@ -60,7 +60,6 @@
 
     <!-- This isn't used by our code, it is used at compile-time to make GenerateEmbeddedFilesManifest work -->
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.5" />
-    <PackageReference Include="Microsoft.ML.Tokenizers" Version="0.22.0-preview.24378.1" />
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">

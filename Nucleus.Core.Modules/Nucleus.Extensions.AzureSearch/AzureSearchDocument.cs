@@ -291,7 +291,7 @@ internal class AzureSearchDocument : IDisposable
   /// This value is optional.  If it not specified, search feeders will try to fill in roles by using the roles for the relevant
   /// page, module or folder.  Roles are used to filter search results to resources which the current user can view.
   /// </remarks>
-  [SimpleField(IsFilterable = true)]
+  [SimpleField(IsFilterable = true, IsFacetable = true)]
   public List<string> Roles { get; set; } = [];
 
   /// <summary>

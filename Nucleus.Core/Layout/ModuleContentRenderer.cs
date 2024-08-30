@@ -47,7 +47,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
   /// Cache of extension controller action descriptors.
   /// </summary>
   /// <remarks>
-  /// Cache is keyed by ControllerName::Action()
+  /// Cache is keyed by ExtensionName::ControllerName::Action()
   /// </remarks>
   private Dictionary<string, ControllerActionDescriptor> ExtensionActionDescriptors { get; set; }
 
@@ -666,9 +666,9 @@ public class ModuleContentRenderer : IModuleContentRenderer
       .OfType<ControllerActionDescriptor>();
   }
 
-  private static string BuildKey(string controllerName, string action)
+  private static string BuildKey(string extensionName, string controllerName, string action)
   {
-    return $"{controllerName}::{action}()";
+    return $"{extensionName}::{controllerName}::{action}()";
   }
 
   /// <summary>
@@ -695,7 +695,7 @@ public class ModuleContentRenderer : IModuleContentRenderer
         this.ExtensionActionDescriptors ??= new(descriptors.Count());
       }
 
-      string key = BuildKey(controllerName, action);
+      string key = BuildKey(moduleinfo.ModuleDefinition.Extension, controllerName, action);
       if (!this.ExtensionActionDescriptors.TryGetValue(key, out actionDescriptor))
       {
         if (descriptors == null)
@@ -749,14 +749,23 @@ public class ModuleContentRenderer : IModuleContentRenderer
 
     if (!String.IsNullOrEmpty(controllerName))
     {
-      IEnumerable<ControllerActionDescriptor> descriptors = this.ActionDescriptorProvider.ActionDescriptors.Items
-          .OfType<ControllerActionDescriptor>();
+      IEnumerable<ControllerActionDescriptor> descriptors = null;
 
-      this.ExtensionActionDescriptors ??= new(descriptors.Count());
+      if (this.ExtensionActionDescriptors == null)
+      {
+        descriptors = GetActionDescriptors();
 
-      string key = BuildKey(controllerName, action);
+        this.ExtensionActionDescriptors ??= new(descriptors.Count());
+      }
+
+      string key = BuildKey(controlPanelExtension.ExtensionName, controllerName, action);
       if (!this.ExtensionActionDescriptors.TryGetValue(key, out actionDescriptor))
       {
+        if (descriptors == null)
+        {
+          descriptors = GetActionDescriptors();
+        }
+
         actionDescriptor = descriptors
           .Where(descriptor => IsMatch(descriptor, controlPanelExtension.ExtensionName, controllerName, action))
           .FirstOrDefault();

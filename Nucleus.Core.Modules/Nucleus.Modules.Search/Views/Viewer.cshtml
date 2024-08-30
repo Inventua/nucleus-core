@@ -41,7 +41,7 @@
     @if (Model.SearchResults?.Answers?.Any() == true)
     {
       <div class="search-answers">
-        <h3>Suggested Answers</h3>
+        <h3>Suggested Answer@(Model.SearchResults.Answers.Count() > 1 ? "s" : "")</h3>
         @foreach (var result in Model.SearchResults.Answers)
         {
           <div class="search-answer">@Html.Raw(result.Answer)</div>

@@ -74,6 +74,11 @@
 	background-color: var(--nucleus-default-hover-color);
 }
 
+.search-result .result-summary, .search-answer
+{
+  font-size: 0.9rem;
+}
+
 .search-result .result-type:before
 {
   content: '(';
@@ -87,4 +92,10 @@
 .search-result em, .search-answer em
 {
   background-color: yellow;
+}
+
+.search-answers > h3
+{
+  font-size: 1.2rem;
+  margin-bottom: 0;
 }

@@ -10,10 +10,6 @@ using Azure.Search.Documents.Indexes.Models;
 using Azure.Search.Documents.Models;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
-using Microsoft.ML.Tokenizers;
-using System.Text;
-using HtmlAgilityPack;
-using Nucleus.ViewFeatures;
 
 namespace Nucleus.Extensions.AzureSearch;
 
@@ -50,9 +46,13 @@ internal class AzureSearchRequest
 
   internal const int VECTOR_DIMENSIONS = 1536;
 
-  internal const string SKILL_SET_NAME = "skillset-content-extraction";
-  internal static readonly char[] TOKEN_SPLIT_CHARS = [' ', '\t', '\n', '\r'];
+  internal const string SKILL_SET_NAME = "skillset-content-vectorization";
+  internal static readonly char[] TOKEN_SPLIT_CHARS = [' ', ',', ';', ':', '<', '>', '.', '\t', '\n', '\r'];
   internal const int TOKENS_PER_PAGE = 2500;
+
+  // this list is from https://learn.microsoft.com/en-us/azure/search/cognitive-search-skill-document-extraction#supported-document-formats
+  // we set the indexer "included extensions" so that Azure Search doesn't try to run the skill set for documents which won't have content, to avoid warnings
+  private static readonly string[] INDEXER_EXTENSIONS = [".csv", ".eml", ".epub", ".gz", ".html", ".json", ".kml", ".docx", ".doc", ".docm", ".xlsx", ".xls", ".xlsm", ".pptx", ".ppt", ".pptm", ".msg", ".xml", ".odt", ".ods", ".odp", ".pdf", ".rtf", ".xml", ".zip"];
 
   public AzureSearchRequest(Uri uri, string apiKey, string indexName, string indexerName, string semanticRankingConfigurationName, Boolean useVectorSearch, string azureOpenAIEndpoint, string azureOpenAIApiKey, string azureOpenAIDeploymentName)
       : this(uri, apiKey, indexName, indexerName, semanticRankingConfigurationName, useVectorSearch, azureOpenAIEndpoint, azureOpenAIApiKey, azureOpenAIDeploymentName, TimeSpan.Zero) { }
@@ -251,7 +251,10 @@ internal class AzureSearchRequest
     // create skill sets, if vectorization is enabled
     if (this.UseVectorSearch)
     {
-      SplitSkill splitSkill = new 
+      // this code creates a text-splitting skill and embedding (vector generation) skill for the file content. Generating vectors for the 
+      // title and summary fields is handled by the push feed.
+
+      SplitSkill splitSkill = new
       (
         new List<InputFieldMappingEntry>()
         {
@@ -266,11 +269,12 @@ internal class AzureSearchRequest
       {
         Name = "Text Splitter",
         DefaultLanguageCode = "en",
-        TextSplitMode = TextSplitMode.Pages//,
-         //Context = "/document"
+        TextSplitMode = TextSplitMode.Pages,
+        // this version only generates tokens for the first page, so there's no need to split more than one page
+        MaximumPagesToTake = 1
       };
 
-      AzureOpenAIEmbeddingSkill embeddingSkill = new
+      AzureOpenAIEmbeddingSkill contentVectorizationSkill = new
       (
         new List<InputFieldMappingEntry>()
         {
@@ -291,8 +295,8 @@ internal class AzureSearchRequest
         ModelName = VECTORIZER_MODEL_NAME
       };
 
-      SearchIndexerSkillset indexerSkillset = new(SKILL_SET_NAME, [splitSkill, embeddingSkill]);
-     
+      SearchIndexerSkillset indexerSkillset = new(SKILL_SET_NAME, [splitSkill, contentVectorizationSkill]);
+
       Response<SearchIndexerSkillset> skillsetResponse = await client.CreateOrUpdateSkillsetAsync(indexerSkillset);
     }
 
@@ -306,7 +310,7 @@ internal class AzureSearchRequest
       {
         IndexingParametersConfiguration = new()
         {
-          {"indexedFileNameExtensions", ""},
+          {"indexedFileNameExtensions", string.Join(',', INDEXER_EXTENSIONS)},
           {"excludedFileNameExtensions", ""},
           {"failOnUnsupportedContentType", false},
           {"indexStorageMetadataOnlyForOversizedDocuments", false},
@@ -485,7 +489,7 @@ internal class AzureSearchRequest
     if (this.UseVectorSearch)
     {
       Azure.AI.OpenAI.AzureOpenAIClient aiClient = new(new(this.AzureOpenAIEndpoint), new System.ClientModel.ApiKeyCredential(this.AzureOpenAIApiKey));
-      
+
       OpenAI.Embeddings.EmbeddingClient embedddingClient = aiClient.GetEmbeddingClient(this.AzureOpenAIDeploymentName);
 
       if (!String.IsNullOrEmpty(content.Title))
@@ -505,27 +509,36 @@ internal class AzureSearchRequest
         try
         {
           // try to fit into the token limit.  
-          
+
           string[] tokens = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
           int pages = tokens.Length / TOKENS_PER_PAGE;
           int page = 0;
-          string vectorContent = string.Join(' ', content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Skip(page * TOKENS_PER_PAGE).Take(TOKENS_PER_PAGE));
+          string[] tokenizedContent = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+          string vectorContent = string.Join(' ', tokenizedContent.Skip(page * TOKENS_PER_PAGE).Take(TOKENS_PER_PAGE));
 
-          System.ClientModel.ClientResult<OpenAI.Embeddings.Embedding> contentVectorResponse = await embedddingClient.GenerateEmbeddingAsync(vectorContent);
-          content.ContentVector = contentVectorResponse.Value.Vector.ToArray();
-          //for (int page=0; page < pages; page++) 
-          //{ 
-          //  string vectorContent = string.Join(' ', content.Content.Split(filter, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Skip(page* TOKENS_PER_PAGE).Take(TOKENS_PER_PAGE));
+          // only try to generate vectors if the "tokenized" content is not empty
+          if (!string.IsNullOrEmpty(vectorContent))
+          {
+            // only try to generate vectors if the "tokenized and paged" content has been reduced in size enough to fit into the token limit. Some documents may not have enough
+            // delimiter characters to work with our (very) basic tokenization method
+            if (vectorContent.Length < TOKENS_PER_PAGE * 8)
+            {
+              System.ClientModel.ClientResult<OpenAI.Embeddings.Embedding> contentVectorResponse = await embedddingClient.GenerateEmbeddingAsync(vectorContent);
+              content.ContentVector = contentVectorResponse.Value.Vector.ToArray();
+              //for (int page=0; page < pages; page++) 
+              //{ 
+              //  string vectorContent = string.Join(' ', content.Content.Split(filter, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Skip(page* TOKENS_PER_PAGE).Take(TOKENS_PER_PAGE));
 
-          //  System.ClientModel.ClientResult<OpenAI.Embeddings.Embedding> contentVectorResponse = await embedddingClient.GenerateEmbeddingAsync(vectorContent);
-          //  content.Pages.Add(new() { Content = vectorContent, ContentVector = contentVectorResponse.Value.Vector.ToArray(), PageNumber = page+1 });
-          //}; 
-
+              //  System.ClientModel.ClientResult<OpenAI.Embeddings.Embedding> contentVectorResponse = await embedddingClient.GenerateEmbeddingAsync(vectorContent);
+              //  content.Pages.Add(new() { Content = vectorContent, ContentVector = contentVectorResponse.Value.Vector.ToArray(), PageNumber = page+1 });
+              //}; 
+            }
+          }
         }
         catch (System.ClientModel.ClientResultException)
         {
           // content is too long (more than 8191 tokens)
-          
+
         }
       }
     }

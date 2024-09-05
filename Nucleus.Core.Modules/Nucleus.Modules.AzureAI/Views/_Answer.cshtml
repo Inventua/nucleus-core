@@ -1,0 +1,39 @@
+﻿@model Nucleus.Modules.AzureAI.ViewModels.Viewer
+@using Nucleus.Abstractions
+@using Nucleus.ViewFeatures
+@using Nucleus.ViewFeatures.HtmlHelpers
+@using Nucleus.Modules.AzureAI.ViewModels
+@if (Model.History.Count > 0)
+{
+  var historyIndex = Model.History.Count - 1;
+  <div class="alert @(Model.History[historyIndex].IsError ? "alert-warning" : "alert-success") alert-dismissible p-2 fade show">
+    <h3><span>> </span>@Model.History[historyIndex].Question</h3>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+    @Html.HiddenFor(model => Model.History[historyIndex].Question)
+    @Html.HiddenFor(model => Model.History[historyIndex].IsError, new {@class = "is-error" })
+
+    <div class="mb-1 small">
+      <div>
+        @Model.History[historyIndex].DateTime?.ToLocalTime().ToString("G")
+      </div>
+      <div>
+        @Html.Raw(Model.History[historyIndex].Answer)
+      </div>
+    </div>
+
+    @if (Model.History[historyIndex].Citations != null)
+    {
+      <ol>
+        @foreach (var citation in Model.History[historyIndex].Citations.Select((Value, Index) => new { Index, Value }))
+        {
+          <li>
+            <a href="@citation.Value.Url" target="_blank">
+              @citation.Value.Title
+            </a>
+          </li>
+        }
+      </ol>
+    }
+  </div>
+}

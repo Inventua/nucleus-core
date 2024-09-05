@@ -46,7 +46,8 @@ public class AzureSearchIndexManager : ISearchIndexManager
         settings.VectorizationEnabled,
         settings.AzureOpenAIEndpoint,
         ConfigSettings.DecryptApiKey(site, settings.EncryptedAzureOpenAIApiKey),
-        settings.AzureOpenAIDeploymentName
+        settings.AzureOpenAIDeploymentName,
+        this.Logger
       );
     }
 

@@ -10,6 +10,7 @@ using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nucleus.Extensions.AzureSearch.Controllers;
 
@@ -22,14 +23,16 @@ public class AzureSearchSettingsController : Controller
   private ISearchIndexHistoryManager SearchIndexHistoryManager { get; }
   private IFileSystemManager FileSystemManager { get; } 
   private IConfiguration Configuration { get; }
+  private ILogger<AzureSearchSettingsController> Logger { get; }
 
-  public AzureSearchSettingsController(Context context, IConfiguration configuration, ISiteManager siteManager, IFileSystemManager fileSystemManager, ISearchIndexHistoryManager searchIndexHistoryManager)
+  public AzureSearchSettingsController(Context context, IConfiguration configuration, ISiteManager siteManager, IFileSystemManager fileSystemManager, ISearchIndexHistoryManager searchIndexHistoryManager, ILogger<AzureSearchSettingsController> logger)
   {
     this.Context = context;
     this.Configuration = configuration;
     this.SiteManager = siteManager;
     this.FileSystemManager = fileSystemManager;
     this.SearchIndexHistoryManager = searchIndexHistoryManager;
+    this.Logger = logger;
   }
 
   [HttpGet]
@@ -256,7 +259,8 @@ public class AzureSearchSettingsController : Controller
       settings.VectorizationEnabled,
       settings.AzureOpenAIEndpoint,
       GetOpenAIApiKey(settings),
-      settings.AzureOpenAIDeploymentName
+      settings.AzureOpenAIDeploymentName,
+      this.Logger
     );
   }
 

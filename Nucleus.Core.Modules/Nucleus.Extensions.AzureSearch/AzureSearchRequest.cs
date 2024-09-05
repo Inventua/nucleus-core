@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Azure;
@@ -8,12 +9,15 @@ using Azure.Search.Documents;
 using Azure.Search.Documents.Indexes;
 using Azure.Search.Documents.Indexes.Models;
 using Azure.Search.Documents.Models;
+using Microsoft.Extensions.Logging;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Search;
 
+// https://learn.microsoft.com/en-us/azure/search/index-projections-concept-intro?tabs=kstore-rest
+
 namespace Nucleus.Extensions.AzureSearch;
 
-internal class AzureSearchRequest
+internal partial class AzureSearchRequest
 {
   // https://learn.microsoft.com/en-us/dotnet/api/overview/azure/search.documents-readme?view=azure-dotnet
 
@@ -29,6 +33,7 @@ internal class AzureSearchRequest
   public string AzureOpenAIDeploymentName { get; }
 
   private string AzureSearchApiKey { get; }
+  private ILogger Logger { get; }
 
   private TimeSpan IndexingPause { get; } = TimeSpan.FromSeconds(1);
 
@@ -50,14 +55,19 @@ internal class AzureSearchRequest
   internal static readonly char[] TOKEN_SPLIT_CHARS = [' ', ',', ';', ':', '<', '>', '.', '!', '#', '_', '\t', '\n', '\r'];
   internal const int TOKENS_PER_PAGE = 2500;
 
+  internal const string ID_PAGE_REGEX = ".*_pages_(?<page>[0-9]*)";
+
+  [System.Text.RegularExpressions.GeneratedRegex(ID_PAGE_REGEX)]
+  private static partial System.Text.RegularExpressions.Regex GET_CHUNK_PAGE_ID_REGEX();
+
   // this list is from https://learn.microsoft.com/en-us/azure/search/cognitive-search-skill-document-extraction#supported-document-formats
   // we set the indexer "included extensions" so that Azure Search doesn't try to run the skill set for documents which won't have content, to avoid warnings
   private static readonly string[] INDEXER_EXTENSIONS = [".csv", ".eml", ".epub", ".gz", ".html", ".json", ".kml", ".docx", ".doc", ".docm", ".xlsx", ".xls", ".xlsm", ".pptx", ".ppt", ".pptm", ".msg", ".xml", ".odt", ".ods", ".odp", ".pdf", ".rtf", ".xml", ".zip"];
 
-  public AzureSearchRequest(Uri uri, string apiKey, string indexName, string indexerName, string semanticRankingConfigurationName, Boolean useVectorSearch, string azureOpenAIEndpoint, string azureOpenAIApiKey, string azureOpenAIDeploymentName)
-      : this(uri, apiKey, indexName, indexerName, semanticRankingConfigurationName, useVectorSearch, azureOpenAIEndpoint, azureOpenAIApiKey, azureOpenAIDeploymentName, TimeSpan.Zero) { }
+  public AzureSearchRequest(Uri uri, string apiKey, string indexName, string indexerName, string semanticRankingConfigurationName, Boolean useVectorSearch, string azureOpenAIEndpoint, string azureOpenAIApiKey, string azureOpenAIDeploymentName, ILogger logger)
+      : this(uri, apiKey, indexName, indexerName, semanticRankingConfigurationName, useVectorSearch, azureOpenAIEndpoint, azureOpenAIApiKey, azureOpenAIDeploymentName, TimeSpan.Zero, logger) { }
 
-  public AzureSearchRequest(Uri uri, string apiKey, string indexName, string indexerName, string semanticRankingConfigurationName, Boolean useVectorSearch, string azureOpenAIEndpoint, string azureOpenAIApiKey, string azureOpenAIDeploymentName, TimeSpan indexingPause)
+  public AzureSearchRequest(Uri uri, string apiKey, string indexName, string indexerName, string semanticRankingConfigurationName, Boolean useVectorSearch, string azureOpenAIEndpoint, string azureOpenAIApiKey, string azureOpenAIDeploymentName, TimeSpan indexingPause, ILogger logger)
   {
     this.Uri = uri;
     this.IndexName = indexName.ToLower();  // search indexes must be lower case
@@ -70,6 +80,8 @@ internal class AzureSearchRequest
     this.AzureOpenAIEndpoint = azureOpenAIEndpoint;
     this.AzureOpenAIApiKey = azureOpenAIApiKey;
     this.AzureOpenAIDeploymentName = azureOpenAIDeploymentName;
+
+    this.Logger = logger;
   }
 
   /// <summary>
@@ -80,7 +92,23 @@ internal class AzureSearchRequest
   {
     if (this._searchIndexClient == null)
     {
-      await Connect();
+      SearchIndexClient client = CreateIndexClient();
+
+      // check index
+      try
+      {
+        Response<SearchIndex> indexResponse = await client.GetIndexAsync(this.IndexName);
+      }
+      catch (Azure.RequestFailedException ex)
+      {
+        if (ex.Status == 404)
+        {
+          // index not found: create it
+          await this.CreateIndex(client);
+        }
+      }
+
+      this._searchIndexClient = client;      
     }
 
     return _searchIndexClient;
@@ -100,7 +128,7 @@ internal class AzureSearchRequest
     return _searchClient;
   }
 
-  private SearchIndexClient GetIndexClient()
+  private SearchIndexClient CreateIndexClient()
   {
     JsonSerializerOptions serializerOptions = new()
     {
@@ -141,33 +169,30 @@ internal class AzureSearchRequest
     }
   }
 
-  public async Task<bool> Connect()
-  {
-    SearchIndexClient client = GetIndexClient();
-
-    // check index
-    try
-    {
-      Response<SearchIndex> indexResponse = await client.GetIndexAsync(this.IndexName);
-    }
-    catch (Azure.RequestFailedException ex)
-    {
-      if (ex.Status == 404)
-      {
-        // index not found: create it
-        await this.CreateIndex(client);
-      }
-    }
-
-    this._searchIndexClient = client;
-    return true;
-  }
+  
 
   private async Task CreateIndex(SearchIndexClient client)
   {
     List<string> vectorFields = [nameof(AzureSearchDocument.TitleVector), nameof(AzureSearchDocument.SummaryVector), nameof(AzureSearchDocument.ContentVector)];
+    SearchIndex searchIndex;
+    try
+    {
+      // index exists, update it
+      searchIndex = await client.GetIndexAsync(this.IndexName);
 
-    SearchIndex searchIndex = await client.GetIndexAsync(this.IndexName);
+      //FieldBuilder builder = new();
+      //IList<SearchField> fields = builder.Build(typeof(AzureSearchDocument))
+      //  // exclude vector fields from the default index. They are added later if vectorization 
+      //  // is enabled
+      //  .Where(field => field.Name == nameof(AzureSearchDocument.PageNumber))
+      //  .ToList();
+      //searchIndex.Fields.Add(fields.First());
+    }
+    catch (Azure.RequestFailedException)
+    {
+      // index does not exist
+      searchIndex = null;
+    }
 
     if (searchIndex == null)
     {
@@ -199,10 +224,7 @@ internal class AzureSearchRequest
         { nameof(AzureSearchDocument.Content), 1 },
         { nameof(AzureSearchDocument.Keywords), 1.5 },
 
-        { nameof(AzureSearchDocument.Categories), 1.5 },
-        { nameof(AzureSearchDocument.TitleVector), 2 },
-        { nameof(AzureSearchDocument.ContentVector), 1 },
-        { nameof(AzureSearchDocument.SummaryVector), 1 },
+        { nameof(AzureSearchDocument.Categories), 1.5 }
       };
 
       defaultScoringProfile.TextWeights = new(weights);
@@ -227,8 +249,6 @@ internal class AzureSearchRequest
     // re-create the index
     Response<SearchIndex> createIndexResponse = await client.CreateIndexAsync(searchIndex);
 
-    await this.Connect();
-
     // reset the Azure search indexer
     if (!string.IsNullOrEmpty(this.IndexerName))
     {
@@ -248,10 +268,10 @@ internal class AzureSearchRequest
 
   public async Task<List<string>> ListSemanticRankingConfigurations()
   {
-    SearchIndexClient client = this.GetIndexClient();
+    SearchIndexClient client = await this.SearchIndexClient();
     Response<SearchIndex> response = await client.GetIndexAsync(this.IndexName);
 
-    return response.Value.SemanticSearch?.Configurations.Select(config => config.Name).ToList() ?? new();
+    return response.Value.SemanticSearch?.Configurations.Select(config => config.Name).ToList() ?? [];
   }
 
   public async Task<string> CreateIndexer(string key, string connectionString, string rootPath, string folder)
@@ -288,34 +308,22 @@ internal class AzureSearchRequest
 
       SplitSkill splitSkill = new
       (
-        new List<InputFieldMappingEntry>()
-        {
-          new("text") { Source = "/document/content" }//,
-          //new("languageCode") { Source = "/document/Language" },
-        },
-        new List<OutputFieldMappingEntry>()
-        {
-          new("textItems") { TargetName = "pages" }
-        }
+        inputs: [ new("text") { Source = "/document/content" } ],
+        outputs: [ new("textItems") { TargetName = "pages" } ]
       )
       {
         Name = "Text Splitter",
         DefaultLanguageCode = "en",
-        TextSplitMode = TextSplitMode.Pages,
-        // this version only generates tokens for the first page, so there's no need to split more than one page
-        MaximumPagesToTake = 1
+        TextSplitMode = TextSplitMode.Pages, 
+        MaximumPageLength=10000, 
+        MaximumPagesToTake = 0, 
+        PageOverlapLength=100
       };
 
       AzureOpenAIEmbeddingSkill contentVectorizationSkill = new
       (
-        new List<InputFieldMappingEntry>()
-        {
-          new("text") { Source = "/document/pages/*" }
-        },
-        new List<OutputFieldMappingEntry>()
-        {
-          new("embedding") { TargetName = "content_vector" }
-        }
+        inputs: [ new("text") { Source = "/document/pages/*" } ],
+        outputs: [ new("embedding") { TargetName = "content_vector" } ]
       )
       {
         Name = "Vector Embedding - Content",
@@ -329,9 +337,22 @@ internal class AzureSearchRequest
 
       SearchIndexerSkillset indexerSkillset = new(SKILL_SET_NAME, [splitSkill, contentVectorizationSkill]);
 
+      SearchIndexerIndexProjectionSelector projectionSelector = new
+      (
+        targetIndexName: this.IndexName,
+        parentKeyFieldName: nameof(AzureSearchDocument.ParentId),
+        sourceContext: "/document/pages/*",
+        mappings:
+        [
+          new(nameof(AzureSearchDocument.Title)) { Source = "/document/metadata_storage_name" },
+          new(nameof(AzureSearchDocument.Content)) { Source = "/document/pages/*" },
+          new(nameof(AzureSearchDocument.ContentVector)) { Source = "/document/pages/*/content_vector" }
+        ]);
+
+      indexerSkillset.IndexProjection = new SearchIndexerIndexProjection(selectors: [projectionSelector]);
+
       Response<SearchIndexerSkillset> skillsetResponse = await client.CreateOrUpdateSkillsetAsync(indexerSkillset);
     }
-
 
     // create a BLOB storage indexer
     SearchIndexer searchIndexer = new($"indexer-{key}-{this.IndexName}".ToLower(), dataSource.Name, this.IndexName)
@@ -371,11 +392,6 @@ internal class AzureSearchRequest
 
     if (this.UseVectorSearch)
     {
-      // pageNumber probably doesn't work
-      //searchIndexer.OutputFieldMappings.Add(new("/document/pages/*/pageNumber") { TargetFieldName = $"{nameof(AzureSearchDocument.Pages)}/{nameof(AzureSearchDocumentPage.PageNumber)}" });
-      //searchIndexer.OutputFieldMappings.Add(new("/document/pages/*") { TargetFieldName = $"{nameof(AzureSearchDocument.Pages)}/{nameof(AzureSearchDocumentPage.ContentVector)}" });
-      //searchIndexer.OutputFieldMappings.Add(new("/document/pages/*/content_vector") { TargetFieldName = $"{nameof(AzureSearchDocument.Pages)}/{nameof(AzureSearchDocumentPage.ContentVector)}" });
-
       searchIndexer.OutputFieldMappings.Add(new("/document/pages/0/content_vector") { TargetFieldName = nameof(AzureSearchDocument.ContentVector) });
     }
 
@@ -386,7 +402,7 @@ internal class AzureSearchRequest
 
   public async Task<Boolean> AddVectorization()
   {
-    SearchIndexClient client = GetIndexClient();
+    SearchIndexClient client = await this.SearchIndexClient();
 
     SearchIndex searchIndex = await client.GetIndexAsync(this.IndexName);
 
@@ -426,19 +442,28 @@ internal class AzureSearchRequest
 
     Response<SearchIndex> createIndexResponse = await client.CreateOrUpdateIndexAsync(searchIndex, true);
 
+    // todo: add vector fields to scoring profile
+    //{ nameof(AzureSearchDocument.TitleVector), 2 },
+    //{ nameof(AzureSearchDocument.ContentVector), 1 },
+    //{ nameof(AzureSearchDocument.SummaryVector), 1 },
     return true;
   }
 
   public async Task<Boolean> IsVectorizationConfigured()
   {
-    SearchIndexClient client = GetIndexClient();
+    SearchIndexClient client = await this.SearchIndexClient();
 
     SearchIndex searchIndex = await client.GetIndexAsync(this.IndexName);
 
     return searchIndex.VectorSearch != null;
   }
 
-  private void AddVectorField(SearchIndex searchIndex, string fieldName)
+  /// <summary>
+  /// Add a vector field to the index, if it is not already present.
+  /// </summary>
+  /// <param name="searchIndex"></param>
+  /// <param name="fieldName"></param>
+  private static void AddVectorField(SearchIndex searchIndex, string fieldName)
   {
     if (!searchIndex.Fields.Any(field => field.Name == fieldName))
     {
@@ -453,7 +478,8 @@ internal class AzureSearchRequest
 
   public async Task<string> AddSemanticRanking()
   {
-    SearchIndexClient client = GetIndexClient();
+    SearchIndexClient client = await this.SearchIndexClient();
+
     string semanticConfigurationName = $"semantic-config-{this.IndexName}";
 
     SearchIndex searchIndex = await client.GetIndexAsync(this.IndexName);
@@ -517,7 +543,7 @@ internal class AzureSearchRequest
   {
     IndexDocumentsBatch<AzureSearchDocument> batch = new();
 
-    // generate vectors
+    // generate vectors for simple content types
     if (this.UseVectorSearch)
     {
       Azure.AI.OpenAI.AzureOpenAIClient aiClient = new(new(this.AzureOpenAIEndpoint), new System.ClientModel.ApiKeyCredential(this.AzureOpenAIApiKey));
@@ -538,15 +564,34 @@ internal class AzureSearchRequest
 
       if (!String.IsNullOrEmpty(content.Content))
       {
-        try
-        {
-          // try to fit into the token limit.  
+        // try to fit into the token limit.  
 
-          string[] tokens = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-          int pages = tokens.Length / TOKENS_PER_PAGE;
-          int page = 0;
-          string[] tokenizedContent = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        string[] tokens = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        int pages = (int)Math.Floor((decimal)tokens.Length / TOKENS_PER_PAGE) + 1;
+        //int page = 0;
+        string[] tokenizedContent = content.Content.Split(TOKEN_SPLIT_CHARS, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        //string vectorContent = string.Join(' ', tokenizedContent.Skip(page * TOKENS_PER_PAGE).Take(TOKENS_PER_PAGE));
+
+
+        //System.ClientModel.ClientResult<OpenAI.Embeddings.Embedding> contentVectorResponse = await embedddingClient.GenerateEmbeddingAsync(vectorContent);
+        //content.ContentVector = contentVectorResponse.Value.Vector.ToArray();
+
+        for (int page = 0; page < pages; page++)
+        {
           string vectorContent = string.Join(' ', tokenizedContent.Skip(page * TOKENS_PER_PAGE).Take(TOKENS_PER_PAGE));
+          //string vectorContent = string.Join(' ', content.Content.Split(filter, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Skip(page * TOKENS_PER_PAGE).Take(TOKENS_PER_PAGE));
+
+          AzureSearchDocument pagedDocument = new();
+
+          CopyMetaData(content, pagedDocument);
+          pagedDocument.Content = vectorContent;
+
+          pagedDocument.Id = content.Id;
+          if (page > 0)
+          {
+            pagedDocument.Id += $"_pages_{page}";
+            pagedDocument.Title += $" [{page}]";
+          }
 
           // only try to generate vectors if the "tokenized" content is not empty
           if (!string.IsNullOrEmpty(vectorContent))
@@ -555,40 +600,134 @@ internal class AzureSearchRequest
             // delimiter characters to work with our (very) basic tokenization method
             if (vectorContent.Length < TOKENS_PER_PAGE * 8)
             {
-              System.ClientModel.ClientResult<OpenAI.Embeddings.Embedding> contentVectorResponse = await embedddingClient.GenerateEmbeddingAsync(vectorContent);
-              content.ContentVector = contentVectorResponse.Value.Vector.ToArray();
-              //for (int page=0; page < pages; page++) 
-              //{ 
-              //  string vectorContent = string.Join(' ', content.Content.Split(filter, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Skip(page* TOKENS_PER_PAGE).Take(TOKENS_PER_PAGE));
+              try
+              {
+                System.ClientModel.ClientResult<OpenAI.Embeddings.Embedding> contentVectorResponse = await embedddingClient.GenerateEmbeddingAsync(vectorContent);
+                pagedDocument.ContentVector = contentVectorResponse.Value.Vector.ToArray();
+              }
+              catch (System.ClientModel.ClientResultException)
+              {
+                // content is too long (more than 8191 tokens)
+                this.Logger.LogWarning("A vector for content of type '{type}', url '{url}' was not generated because the content could not be tokenized.", content.Type, content.Url);
+              }
 
-              //  System.ClientModel.ClientResult<OpenAI.Embeddings.Embedding> contentVectorResponse = await embedddingClient.GenerateEmbeddingAsync(vectorContent);
-              //  content.Pages.Add(new() { Content = vectorContent, ContentVector = contentVectorResponse.Value.Vector.ToArray(), PageNumber = page+1 });
-              //}; 
+              if (pagedDocument.ContentVector != null || page == 0)
+              {
+                batch.Actions.Add(new IndexDocumentsAction<AzureSearchDocument>(IndexActionType.MergeOrUpload, pagedDocument));
+              }
+              else
+              {
+                this.Logger.LogWarning("Skipped saving chunk for content of type '{type}', url '{url}', page {page} because a content vector could not be generated.", content.Type, content.Url, page);
+              }
+            }
+            else
+            {
+              this.Logger.LogWarning("Skipped saving chunk for content of type '{type}', url '{url}', page {page} because the chunk was too large.", content.Type, content.Url, page);
             }
           }
-        }
-        catch (System.ClientModel.ClientResultException)
-        {
-          // content is too long (more than 8191 tokens)
-
         }
       }
     }
 
-    batch.Actions.Add(new IndexDocumentsAction<AzureSearchDocument>(IndexActionType.MergeOrUpload, content));
-
-    // SearchIndexingBufferedSender: https://learn.microsoft.com/en-us/dotnet/api/azure.search.documents.searchindexingbufferedsender-1?view=azure-dotnet
-
     SearchClient client = await this.GetSearchClient();
 
-    Response<IndexDocumentsResult> response = await client.IndexDocumentsAsync<AzureSearchDocument>(batch);
-    return response.Value;
+    if (String.IsNullOrEmpty(content.Content))
+    {
+      batch.Actions.Add(new IndexDocumentsAction<AzureSearchDocument>(IndexActionType.MergeOrUpload, content));
+
+      if (this.UseVectorSearch)
+      {
+        // for index entries which may be handled by an Azure Search indexer, look for related index entries (documents with a ParentId set to our Id)
+        // and set meta-data for those index entries
+        try
+        {
+          Response<SearchResults<AzureSearchDocument>> relatedDocumentsResponse = client.Search<AzureSearchDocument>(BuildRelatedItemsQuery(content.Id));
+
+          if (relatedDocumentsResponse.Value != null)
+          {
+            foreach (SearchResult<AzureSearchDocument> relatedDocument in relatedDocumentsResponse.Value.GetResultsAsync().ToBlockingEnumerable())
+            {
+              CopyMetaData(content, relatedDocument.Document);
+
+              // extract page number (for chunks) from the Id, which is generated by the Azute Search skill set index projection. Azure
+              // search starts page counts at 0, so we +1 
+              System.Text.RegularExpressions.Match match = GET_CHUNK_PAGE_ID_REGEX().Match(relatedDocument.Document.Id);
+              if (match.Success && int.TryParse(match.Groups["page"].Value, out int pageNumber))
+              {                
+                relatedDocument.Document.PageNumber = pageNumber + 1;
+              }
+              batch.Actions.Add(new IndexDocumentsAction<AzureSearchDocument>(IndexActionType.MergeOrUpload, relatedDocument.Document));
+            }
+          }
+        }
+        catch(Exception ex)
+        {
+          this.Logger.LogError(ex, "Updating meta-data for chunk entries for content of type '{type}', url '{url}'.", content.Type, content.Url);
+        }
+      }
+    }
+
+    if (batch.Actions.Count > 0)
+    {
+      Response<IndexDocumentsResult> response = await client.IndexDocumentsAsync<AzureSearchDocument>(batch);
+
+      if (this.IndexingPause > TimeSpan.Zero)
+      {
+        await Task.Delay(this.IndexingPause);
+      }
+
+      return response.Value;
+    }
+
+    return null;
+  }
+
+  private static void CopyMetaData(AzureSearchDocument source, AzureSearchDocument target)
+  {
+    target.SiteId = source.SiteId;
+    target.Url = source.Url;
+
+    target.Title = source.Title;
+    target.TitleVector = source.TitleVector;
+
+    if (string.IsNullOrEmpty(target.Summary))
+    {
+      target.Summary = source.Summary;
+      target.SummaryVector = source.SummaryVector;
+    }
+
+    target.Size = source.Size;
+    target.ContentType = source.ContentType;
+    target.Categories = source.Categories;
+    target.Keywords = source.Keywords;
+    target.Language = source.Language;
+    target.PublishedDate = source.PublishedDate;
+    target.Scope = source.Scope;
+    target.SourceId = source.SourceId;
+    target.Type = source.Type;
+    
+    target.IsSecure = source.IsSecure;
+    target.Roles = target.Roles;
+  }
+
+  private static SearchOptions BuildRelatedItemsQuery(string id)
+  {
+    SearchOptions options = new()
+    {
+      IncludeTotalCount = true,
+      QueryType = SearchQueryType.Simple,  
+      Filter = BuildFilter($"{BuildParentIdFilter(id)}"),
+      Skip = 0,
+      Size = 1000
+    };
+
+    return options;
   }
 
   public async Task<IndexDocumentsResult> RemoveContent(AzureSearchDocument content)
   {
     SearchClient client = await this.GetSearchClient();
-    Response<IndexDocumentsResult> response = await client.DeleteDocumentsAsync<AzureSearchDocument>(new List<AzureSearchDocument>() { content }, new() { });
+    Response<IndexDocumentsResult> response = await client.DeleteDocumentsAsync<AzureSearchDocument>([content]);
     return response.Value;
   }
 
@@ -613,7 +752,7 @@ internal class AzureSearchRequest
       QueryType = String.IsNullOrEmpty(this.SemanticConfigurationName) ? SearchQueryType.Simple : SearchQueryType.Semantic,
       SearchMode = query.StrictSearchTerms ? SearchMode.All : SearchMode.Any,
       Size = query.PagingSettings.PageSize,
-      Filter = BuildFilter($"{BuildSiteFilter(query)}", $"{BuildRolesFilter(query)}", $"{BuildScopeFilter(query)}", $"{BuildArgsFilter(query)}"),
+      Filter = BuildFilter($"{BuildSiteFilter(query)}", $"{BuildRolesFilter(query)}", $"{BuildScopeFilter(query)}", $"{BuildArgsFilter(query)}", $"{BuildPageNumberFilter(query)}"),
       Skip = query.PagingSettings.CurrentPageIndex - 1
     };
 
@@ -638,10 +777,11 @@ internal class AzureSearchRequest
       {
         FilterMode = VectorFilterMode.PostFilter
       };
-      VectorizableTextQuery vectorQuery = new(query.SearchTerm);
-
-      // https://learn.microsoft.com/en-us/azure/search/vector-search-how-to-query?tabs=query-2024-07-01%2Cbuiltin-portal#number-of-ranked-results-in-a-vector-query-response
-      vectorQuery.KNearestNeighborsCount = 10; // default is 50
+      VectorizableTextQuery vectorQuery = new(query.SearchTerm)
+      {
+        // https://learn.microsoft.com/en-us/azure/search/vector-search-how-to-query?tabs=query-2024-07-01%2Cbuiltin-portal#number-of-ranked-results-in-a-vector-query-response
+        KNearestNeighborsCount = 10 // default is 50
+      };
       vectorQuery.Fields.Add(nameof(AzureSearchDocument.TitleVector));
       vectorQuery.Fields.Add(nameof(AzureSearchDocument.SummaryVector));
       vectorQuery.Fields.Add(nameof(AzureSearchDocument.ContentVector));
@@ -653,7 +793,7 @@ internal class AzureSearchRequest
       // https://learn.microsoft.com/en-us/azure/search/vector-search-how-to-query?tabs=query-2024-07-01%2Cbuiltin-portal#set-thresholds-to-exclude-low-scoring-results-preview
       //vectorQuery.Threshold.Kind = vectorSimilarity
       //vectorQuery.Threshold.Value = 0.8
-      
+
       searchOptions.VectorSearch.Queries.Add(vectorQuery);
     }
 
@@ -685,7 +825,7 @@ internal class AzureSearchRequest
       Filter = BuildFilter(BuildSiteFilter(query), BuildRolesFilter(query), BuildScopeFilter(query), BuildArgsFilter(query)),
       UseFuzzyMatching = true
     };
-
+    
     AddRange(searchOptions.SearchFields, BuildSuggesterFields());
     AddRange(searchOptions.Select, BuildSelectFields());
     //AddRange(searchOptions.OrderBy, BuildOrderBy(query));
@@ -701,7 +841,7 @@ internal class AzureSearchRequest
     return result;
   }
 
-  private void AddRange(ICollection<string> list, IEnumerable<string> values)
+  private static void AddRange(ICollection<string> list, IEnumerable<string> values)
   {
     foreach (string value in values)
     {
@@ -709,13 +849,13 @@ internal class AzureSearchRequest
     }
   }
 
-  private string BuildFilter(params string[] values)
+  private static string BuildFilter(params string[] values)
   {
     // filter null values, add spaces in between filter expressions
     return String.Join(" and ", values.Where(value => !String.IsNullOrEmpty(value)));
   }
 
-  private List<string> BuildSearchFields()
+  private static List<string> BuildSearchFields()
   {
     return
     [
@@ -727,7 +867,7 @@ internal class AzureSearchRequest
     ];
   }
 
-  private List<string> BuildSuggesterFields()
+  private static List<string> BuildSuggesterFields()
   {
     return
     [
@@ -735,7 +875,7 @@ internal class AzureSearchRequest
     ];
   }
 
-  private List<string> BuildSelectFields()
+  private static List<string> BuildSelectFields()
   {
     return
     [
@@ -755,7 +895,7 @@ internal class AzureSearchRequest
     ];
   }
 
-  private List<string> BuildHighlightFields(SearchQuery query)
+  private static List<string> BuildHighlightFields(SearchQuery query)
   {
     return
     [
@@ -777,13 +917,30 @@ internal class AzureSearchRequest
   ////  ];
   ////}
 
-  private string BuildSiteFilter(SearchQuery query)
+  private static string BuildSiteFilter(SearchQuery query)
   {
-    // Id.ToString is required here, SearchFilter.Create cannot handle Guids
+    // Id.ToString is required here.
+    // IDE0071 "thinks" that string interpolation can be simplified by removing .ToString, but the parameter to Search.Create
+    // is a FormattableString object rather than a "regular" interpolated string, and SearchFilter.Create doesn't know how to
+    // deal with Guids.
+#pragma warning disable IDE0071 // Simplify interpolation
     return $"{nameof(AzureSearchDocument.SiteId)} eq {SearchFilter.Create($"{query.Site.Id.ToString()}")}";
+#pragma warning restore IDE0071 // Simplify interpolation
   }
 
-  private string BuildRolesFilter(SearchQuery query)
+  private static string BuildParentIdFilter(string parentId)
+  {
+    // Id.ToString is required here, SearchFilter.Create cannot handle Guids
+    return $"{nameof(AzureSearchDocument.ParentId)} eq {SearchFilter.Create($"{parentId}")}";
+  }
+
+  private static string BuildPageNumberFilter(SearchQuery query)
+  {
+    // We exclude "page 0" from search results, because it is a repeat of the main document (index entry)
+    return $"{nameof(AzureSearchDocument.PageNumber)} ne 1";
+  }
+
+  private static string BuildRolesFilter(SearchQuery query)
   {
     // https://learn.microsoft.com/en-us/azure/search/search-query-odata-search-in-function
     if (query.Roles?.Any() == true)
@@ -798,17 +955,17 @@ internal class AzureSearchRequest
     }
   }
 
-  private string BuildScopeFilter(SearchQuery query)
+  private static string BuildScopeFilter(SearchQuery query)
   {
     string result = "";
 
-    if (query.IncludedScopes.Any())
+    if (query.IncludedScopes.Count != 0)
     {
       string values = SearchFilter.Create($"{String.Join(",", query.IncludedScopes.Select(scope => scope))}");
       result += $"search.in({nameof(AzureSearchDocument.Scope)}, {values}, ',')";
     }
 
-    if (query.ExcludedScopes.Any())
+    if (query.ExcludedScopes.Count != 0)
     {
       string values = SearchFilter.Create($"{String.Join(",", query.ExcludedScopes.Select(scope => scope))}");
       string result2 = $"(search.in({nameof(AzureSearchDocument.Scope)}, {values}, ',') eq false)";
@@ -826,7 +983,7 @@ internal class AzureSearchRequest
     return String.IsNullOrEmpty(result) ? null : result;
   }
 
-  private string BuildArgsFilter(SearchQuery query)
+  private static string BuildArgsFilter(SearchQuery query)
   {
     // future use
     return null;

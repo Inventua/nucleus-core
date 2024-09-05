@@ -1,9 +1,12 @@
 ﻿@model Nucleus.Web.ViewModels.Admin.PageIndex
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.Extensions;
-<div class="nucleus-admin-search collapse@(Model.SearchResults?.Items?.Any() == true ? " show" : "")">
-	<a class="nucleus-btn-close-results" onclick="jQuery('.nucleus-admin-search').removeClass('show');">&#xe5cd;</a>
-	<h2>Search Results</h2>
+<div class="collapse@(Model.SearchResults?.Items?.Any() == true ? " show" : "") nucleus-admin-search">
+  <div class="d-flex">
+    <h2>Search Results</h2>
+    <a class="btn btn-sm nucleus-material-icon nucleus-btn-close-results" onclick="jQuery('.nucleus-admin-search').removeClass('show');">&#xe5cd;</a>	
+  </div>
+
 	@await Component.InvokeAsync(typeof(Nucleus.ViewFeatures.Controls.PagingControl), new { model = @Model.SearchResults, propertyName = "SearchResults" })
 	@if (Model.SearchResults?.Items?.Any() == true)
 	{

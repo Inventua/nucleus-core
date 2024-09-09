@@ -26,7 +26,7 @@
         @Html.TextBoxFor(model => model.OpenAIChatHistoryCount, new { @type = "number", @min = "1", @class = "" })
       </SettingsControl>
 
-      <SettingsControl caption="OpenAI Max Tokens" helptext="The maximum number of tokens allowed for the generated answer.">
+      <SettingsControl caption="OpenAI Max Tokens" helptext="The maximum number of tokens allowed for the generated answer. A lower setting will make the response shorter, but if it is too low, the response won’t contain enough information.">
         @Html.TextBoxFor(model => model.OpenAIMaxTokens, new { @type = "number", @min = "0", @max = "4096", @class = "" })
       </SettingsControl>
 
@@ -39,7 +39,6 @@
       <SettingsControl caption="Show in-scope results only" class="inner-inline" rendermode="LabelLast" helptext="When this setting is disabled, the model supplements its responses with its own knowledge in addition to your documents. When this setting is enabled, the model attempts to only rely on your documents for responses.">
         @Html.CheckBoxFor(model => model.OpenAIInScopeOnly, new { @class = "ToggleSwitch" })
       </SettingsControl>
-
     </div>
 
     <div class="nucleus-flex-fields">

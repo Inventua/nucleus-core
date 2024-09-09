@@ -1,18 +1,15 @@
-﻿using System.Linq;
+﻿using System.ClientModel;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Azure;
-using System;
 using Azure.AI.OpenAI;
 using Azure.AI.OpenAI.Chat;
-//using Azure.Identity;
-using OpenAI.Chat;
 using Microsoft.AspNetCore.Mvc;
 using Nucleus.Abstractions;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models;
-using System.ClientModel;
-using System.Collections;
-using System.Collections.Generic;
+//using Azure.Identity;
+using OpenAI.Chat;
 
 namespace Nucleus.Modules.AzureAI.Controllers;
 
@@ -76,10 +73,28 @@ public class AzureAIViewerController : Controller
       List<AzureChatCitation> distinctCitations = messageContext.Citations.DistinctBy(citation => citation.Url).ToList();
 
       viewModel.History.Last().DateTime = completion.CreatedAt;
-      viewModel.History.Last().Answer = ParseCitations(completion.Content, messageContext.Citations.ToList(), distinctCitations)
-        .Replace("\n\n", "<br />")  // replace two CRs with one BR
-        .Replace("\n", "<br />");   // make sure we replace any remaining CRs
+      viewModel.History.Last().Answer = ParseCitations(completion.Content, messageContext.Citations.ToList(), distinctCitations);
 
+      if (viewModel.History.Last().Answer.Contains("<body>") && viewModel.History.Last().Answer.Contains("</body>"))
+      {
+        System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(viewModel.History.Last().Answer, "<body>(?<body>.*)<\\/body>", System.Text.RegularExpressions.RegexOptions.Singleline);
+        if (match.Success)
+        {
+          viewModel.History.Last().Answer = match.Groups["body"].Value.Trim();
+        }
+      }
+      else if (viewModel.History.Last().Answer.Trim().StartsWith("```html"))
+      {
+        viewModel.History.Last().Answer = viewModel.History.Last().Answer
+          .Replace("```html", "")
+          .Replace("```", "");  
+      }
+      else
+      {
+        viewModel.History.Last().Answer = viewModel.History.Last().Answer
+          .Replace("\n\n", "<br />")  // replace two CRs with one BR
+          .Replace("\n", "<br />");   // make sure we replace any remaining CRs
+      }
       //viewModel.History.Last().Answer = string.Join("", completion.Content?.Select(content => content.Text));
       viewModel.History.Last().Citations = distinctCitations;
     }

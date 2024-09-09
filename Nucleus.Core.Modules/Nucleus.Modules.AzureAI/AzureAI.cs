@@ -34,7 +34,7 @@ public class AzureAI
     int retryCount = 0;
     
     ChatClient chatClient = BuildChatClient();
-
+    
     while (true)
     {
       if (retryCount > 0)
@@ -66,7 +66,7 @@ public class AzureAI
   {
     AzureKeyCredential credential = new(Models.Settings.DecryptApiKey(this.Site, this.Settings.AzureOpenAIEncryptedApiKey));
     AzureOpenAIClient azureClient = new(new Uri(this.Settings.AzureOpenAIEndpoint), credential);
-
+    
     ChatClient chatClient = azureClient.GetChatClient(this.Settings.OpenAIChatModelDeploymentName);
     
     return chatClient;

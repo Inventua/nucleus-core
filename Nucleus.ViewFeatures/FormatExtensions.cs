@@ -66,7 +66,16 @@ namespace Nucleus.ViewFeatures
         // deserialized dates can have Kind=Unspecified, which breaks conversion to the specified time zone. We assume that dates
         // are Utc unless their .Kind is already DateTimeKind.Local
         DateTime utcValue = value.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(value, DateTimeKind.Utc): value;
-				return $"{TimeZoneInfo.ConvertTime(utcValue, timezone):g}";				
+
+        // if the time component is 12:00:00 AM, display date only, otherwise include the time
+        if (utcValue.TimeOfDay == TimeSpan.Zero)
+        {
+          return $"{TimeZoneInfo.ConvertTime(utcValue, timezone):d}";
+        }
+        else
+        {
+          return $"{TimeZoneInfo.ConvertTime(utcValue, timezone):g}";
+        }
 			}
 		}
 

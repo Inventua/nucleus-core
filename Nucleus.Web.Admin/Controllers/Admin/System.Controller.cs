@@ -362,6 +362,16 @@ public class SystemController : Controller
 
   private async Task<ViewModels.Admin.SystemIndex> BuildViewModel(ViewModels.Admin.SystemIndex viewModelInput)
   {
+    // this technique for detecting Azure App Service is from https://github.com/dotnet/aspnetcore/blob/52aecd223059d0c846599904e5d4bf0f324037bc/src/Logging.AzureAppServices/src/WebAppContext.cs
+    Boolean isRunningInAzureAppService = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("HOME")) && !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
+
+    string operatingSystem = Environment.OSVersion.ToString();
+
+    if (isRunningInAzureAppService)
+    {
+      operatingSystem += $" (Azure App Service {Environment.GetEnvironmentVariable("WEBSITE_PLATFORM_VERSION")})";
+    }
+
     System.Diagnostics.Process.GetCurrentProcess().Refresh();
     TimeSpan uptime = DateTime.UtcNow - System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime();
     ResourceUtilization resourceUtilization = GetUtilization();
@@ -372,10 +382,11 @@ public class SystemController : Controller
       Product = this.GetType().Assembly.Product(),
       Company = this.GetType().Assembly.Company(),
       Copyright = this.GetType().Assembly.Copyright(),
+      License = ReadLicense(),
       Version = this.GetType().Assembly.Version(),
       Framework = Environment.Version.ToString(),
       EnvironmentName = this.HostingEnvironment.EnvironmentName,
-      OperatingSystem = Environment.OSVersion.ToString(),
+      OperatingSystem = operatingSystem,
       OperatingSystemUser = $"{Environment.UserDomainName}/{Environment.UserName}",
       StartTime = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToUniversalTime(),
       CpuUsedPercentage = resourceUtilization.CpuUsedPercentage,
@@ -535,5 +546,25 @@ public class SystemController : Controller
     //	viewModelOutput.WebServerInformation.Add("clr", azureCounters.clrTest);
     //}
     return viewModelOutput;
+  }
+
+  private string ReadLicense()
+  {
+    try
+    {
+      string licenseFilePath = Path.Join(this.HostingEnvironment.WebRootPath, "license.txt");
+      if (System.IO.File.Exists(licenseFilePath))
+      {
+        return System.IO.File.ReadAllText(licenseFilePath).ToHtml("text/plain");
+      }
+      else
+      {
+        return "license.txt not found.";
+      }
+    }
+    catch
+    {
+      return "Unable to read license.txt";
+    }
   }
 }

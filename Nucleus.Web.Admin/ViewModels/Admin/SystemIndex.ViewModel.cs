@@ -15,6 +15,8 @@ public class SystemIndex
 
   public string Copyright { get; set; }
 
+  public string License { get; set; }
+
   public string Framework { get; set; }
 
   public string OperatingSystem { get; set; }
@@ -69,6 +71,8 @@ public class SystemIndex
 
     public Boolean LogIncludeTrace { get; set; } = true;
     public Boolean LogIncludeError { get; set; } = true;
+    public Boolean LogIncludeCritical { get; set; } = true;
+
 
     public List<KeyValuePair<Boolean, string>> LogSortOrders { get; } = new() { new(true, "Sort Descending"), new(false, "Sort Ascending") };
 
@@ -117,9 +121,9 @@ public class SystemIndex
           case "A":
             length = parts[0].Length + 1;
 
-            if (DateTime.TryParse(parts[1], out logDate))
+            if (DateTime.TryParse(parts[1], System.Globalization.CultureInfo.InvariantCulture,System.Globalization.DateTimeStyles.AssumeUniversal, out logDate))
             {
-              this.Date = DateTime.SpecifyKind(logDate, DateTimeKind.Utc);
+              this.Date = logDate;
               length += parts[1].Length + 1;
             }
             else
@@ -203,6 +207,8 @@ public class SystemIndex
           return logSettings.LogIncludeError;
         case nameof(LogLevel.Warning):
           return logSettings.LogIncludeWarning;
+        case nameof(LogLevel.Critical):
+          return logSettings.LogIncludeCritical;
         default:
           return true;
       }

@@ -46,6 +46,9 @@
 
 			<SettingsControl caption="Include" helptext="Specify log levels to display.">
         <div class="log-levels">
+          <SettingsControl caption="Critical" rendermode="LabelLast" class="inner-inline" helptext="Include logs with log level: Critical.">
+            @Html.CheckBoxFor(model => model.LogIncludeCritical, new { @class = "ToggleSwitch" })
+          </SettingsControl>
           <SettingsControl caption="Error" rendermode="LabelLast" class="inner-inline" helptext="Include logs with log level: Error.">
             @Html.CheckBoxFor(model => model.LogIncludeError, new { @class = "ToggleSwitch" })
           </SettingsControl>

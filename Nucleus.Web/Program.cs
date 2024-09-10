@@ -14,6 +14,8 @@ using Nucleus.Core.Logging;
 using Nucleus.Abstractions.Managers;
 using Nucleus.Abstractions.Models.Configuration;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Diagnostics.ResourceMonitoring;
+using Grpc.Core;
 
 namespace Nucleus.Web
 {
@@ -89,6 +91,11 @@ namespace Nucleus.Web
           .UseSystemd()
           .Build();
 
+        IHostApplicationLifetime lifetime = WebHost.Services.GetService<IHostApplicationLifetime>();
+        
+        // log a shutdown message
+        lifetime.ApplicationStopping.Register(LogShutdown);        
+        
         if (await CheckForAutoUpdates(WebHost))
         {
           // shut down to clean up
@@ -108,6 +115,46 @@ namespace Nucleus.Web
           WebHost.Run();
         }        
       }
+    }
+
+    /// <summary>
+    /// Log a shutdown message with some telemetry information.
+    /// </summary>
+    /// <remarks>
+    /// This function is called by the IHostApplicationLifetime.ApplicationStopping handler, which is set up in Main(). The ApplicationStopping 
+    /// handler is not triggered when running from Visual studio and closing the browser. To test, open the console window and press ctrl-C, or use 
+    /// the "Restart Site" button in the System control panel.
+    /// </remarks>
+    private static void LogShutdown()
+    {
+      IResourceMonitor resourceMonitor = WebHost.Services.GetService<IResourceMonitor>();
+      System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
+      process.Refresh();
+
+      TimeSpan upTime = DateTime.UtcNow - process.StartTime.ToUniversalTime();
+      string formattedUptime = "";
+      {
+        if (upTime.Days > 0)
+        {
+          formattedUptime += $"{upTime.Days} days, ";
+        }
+
+        if (upTime.Days > 0 || upTime.Hours > 0)
+        {
+          formattedUptime += $"{upTime.Hours} hours, ";
+        }
+
+        if (upTime.Days > 0 || upTime.Hours > 0 || upTime.Minutes > 0)
+        {
+          formattedUptime += $"{upTime.Minutes} minutes, ";
+        }
+
+        formattedUptime += $"{upTime.Seconds} seconds";
+      }
+
+      ResourceUtilization resourceUtilization = resourceMonitor.GetUtilization(TimeSpan.FromSeconds(5));
+
+      WebHost?.Logger()?.LogCritical("Nucleus is shutting down. CPU: {cpu}, Memory: {memory}%, Start Time: {start}, Uptime: {uptime}.", resourceUtilization.CpuUsedPercentage.ToString("0.00"), resourceUtilization.MemoryUsedPercentage, process.StartTime, formattedUptime);
     }
 
     public static void LaunchBrowser(string[] args)

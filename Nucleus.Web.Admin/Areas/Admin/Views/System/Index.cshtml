@@ -23,7 +23,7 @@
 
   <TabContent>
     <TabPanel id="system-information" active="true">
-      <table class="table table-striped table-borderless table-sm headers-column">
+      <table class="table table-striped table-sm headers-column">
         <tbody>
           <tr>
             <th scope="row">Product</th>
@@ -219,10 +219,10 @@
               @foreach (var cache in Model.CacheReport)
               {
                 <tr>
-                  <td class="text-nowrap fw-bold align-text-top">@cache.Name</td>
+                  <th scope="row" class="text-nowrap fw-bold">@cache.Name</th>
                   <td>@cache.Count of @cache.Options.Capacity (@(Math.Round((decimal)cache.Count / cache.Options.Capacity * 100, 1))<text>% full</text>)</td>
                   <td>@cache.Options.ExpiryTime</td>
-                  <td>
+                  <td class="w-min-fit-content pe-4">
                     <button type="submit" class="btn btn-sm btn-primary" data-target=".System.parent()" formaction="@Url.AreaAction("ClearCache", "System", "Admin", new { @cache = cache.Name} )">Clear Cache</button>
                   </td>
                 </tr>

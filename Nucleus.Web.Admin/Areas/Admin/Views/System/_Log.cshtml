@@ -17,15 +17,21 @@
           <tr>
             <td>@entry.Date.FormatDate(this.Context.Request.GetUserTimeZone())</td>
             <td><span class="nucleus-log-level nucleus-log-level-@entry.Level.ToLower()">@entry.Level</span></td>
-            <td class="position-relative">
+            <td class="position-relative pe-4">
               <div class="nucleus-log-category">@entry.Category</div>
-              @if (!String.IsNullOrEmpty(entry.RequestPath))
+
+              @if (!String.IsNullOrEmpty(entry.RequestPath) || !String.IsNullOrEmpty(entry.IpAddress))
               {
-                <label class="nucleus-log-requestpath">Request Path: <span>@entry.RequestPath</span></label>
-              }
-              @if (!String.IsNullOrEmpty(entry.IpAddress))
-              {
-                <label class="nucleus-log-ipaddress">Remote Address: <span>@entry.IpAddress</span></label>
+                <div class="d-flex mb-2">
+                @if (!String.IsNullOrEmpty(entry.RequestPath))
+                {
+                  <div class="nucleus-log-requestpath flex-1">Request Path: <span>@entry.RequestPath</span></div>
+                }
+                @if (!String.IsNullOrEmpty(entry.IpAddress))
+                {
+                  <div class="nucleus-log-ipaddress">Remote Address: <span>@entry.IpAddress</span></div>
+                }
+                </div>
               }
               <div class="nucleus-log-message text-break">@(new Microsoft.AspNetCore.Html.HtmlString(System.Web.HttpUtility.HtmlEncode(entry.Message)))</div>
 

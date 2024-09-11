@@ -910,7 +910,10 @@ public class ForumsManager
     {
       if (permission.PermissionType.Scope == scope && permission.AllowAccess)
       {
-        return user.Roles.Where(role => role.Id == permission.Role.Id).Any();
+        if (user.Roles.Any(role => role.Id == permission.Role.Id))
+        {
+          return true;
+        }
       }
     }
 

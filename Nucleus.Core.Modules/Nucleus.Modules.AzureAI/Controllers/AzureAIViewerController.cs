@@ -134,19 +134,7 @@ public class AzureAIViewerController : Controller
               string link = $"<a href='{newCitation.Url}' class='citation-reference' target='_blank' title='{newCitation.Title}'>{newIndex}</a>";
               text = text.Replace($"[doc{citationIndex}]", link);
             }
-            else
-            {
-
-            }
           }
-          else
-          {
-
-          }
-        }
-        else
-        {
-
         }
       }
 

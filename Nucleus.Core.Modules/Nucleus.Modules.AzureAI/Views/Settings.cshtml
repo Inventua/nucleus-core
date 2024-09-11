@@ -18,7 +18,7 @@
     </SettingsControl>
 
     <SettingsControl caption="OpenAI Role" helptext="Additional instructions for the model to inform how it should behave and any context it should reference when generating a response. You can describe the assistant's personality and tell it how to format responses.">
-      @Html.TextAreaFor(model => model.OpenAIRoleInfo)
+      @Html.TextAreaFor(model => model.OpenAIRoleInfo, new { @rows = "5" })
     </SettingsControl>
 
     <div class="nucleus-flex-fields">

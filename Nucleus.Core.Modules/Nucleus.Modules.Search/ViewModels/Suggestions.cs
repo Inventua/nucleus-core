@@ -8,12 +8,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Nucleus.Abstractions.Search;
 
-namespace Nucleus.Modules.Search.ViewModels
+namespace Nucleus.Modules.Search.ViewModels;
+
+public class Suggestions : Models.Settings
 {
-  public class Suggestions
-  {
-    public string SearchTerm { get; set; }
-    public SearchResults SearchResults { get; set; }
-    public Settings Settings { get; set; } = new();
-  }
+  public string SearchTerm { get; set; }
+  public SearchResults SearchResults { get; set; }
 }

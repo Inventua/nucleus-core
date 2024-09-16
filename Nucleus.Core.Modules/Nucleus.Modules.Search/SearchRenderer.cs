@@ -33,14 +33,14 @@ namespace Nucleus.Modules.Search
 				resultsPageUrl = "~/" + resultsPageUrl;
 			}
 
-			model.Settings.SearchProvider = provider;
+			model.SearchProvider = provider;
 			model.SearchTerm = htmlHelper.ViewContext.HttpContext.Request.Query["search"];
 			model.ResultsUrl = resultsPageUrl;
-			model.Settings.DisplayMode = displayMode;
-			model.Settings.Prompt = prompt;
-			model.Settings.MaximumSuggestions = maximumSuggestions;
-			model.Settings.IncludeFiles = includeFiles;
-			model.Settings.IncludeScopes = includeScopes;
+			model.DisplayMode = displayMode;
+			model.Prompt = prompt;
+			model.MaximumSuggestions = maximumSuggestions;
+			model.IncludeFiles = includeFiles;
+			model.IncludeScopes = includeScopes;
 
 			// This (generally) gets called by a tag helper or Html helper in a layout, so the "current" folder is the layout's folder - so we 
 			// must specify a full path to the view.

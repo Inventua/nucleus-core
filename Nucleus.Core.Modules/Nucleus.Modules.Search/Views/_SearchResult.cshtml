@@ -6,36 +6,36 @@
 @using Nucleus.Extensions
 <div class="search-result">
   <div>
-    <a class="result-link" href="@Url.Content(Model.Result.GetUrl(Model.Settings.IncludeUrlTextFragment))" rel="noopener" title="@Model.Result.GetTitleText()">@Html.Raw(Model.Result.Title?.Trim())</a>
-    @if (Model.Settings.ShowType && !String.IsNullOrEmpty(Model.Result.Type))
+    <a class="result-link" href="@Url.Content(Model.Result.GetUrl(Model.IncludeUrlTextFragment))" rel="noopener" title="@Model.Result.GetTitleText()">@Html.Raw(Model.Result.Title?.Trim())</a>
+    @if (Model.ShowType && !String.IsNullOrEmpty(Model.Result.Type))
     {
       <span class="fst-italic small text-muted result-type">@Model.Result.Type</span>
     }
   </div>
-  @if (Model.Settings.ShowUrl)
+  @if (Model.ShowUrl)
   {
     <span class="fst-italic small result-url">@(Model.Result.Url.StartsWith('/') ? Url.GetAbsoluteUri(Model.Result.Url) : Model.Result.Url)</span>
   }
-  @if ((Model.Settings.ShowPublishDate || Model.Settings.ShowSize) && (Model.Result.PublishedDate.HasValue || Model.Result.Size.HasValue))
+  @if ((Model.ShowPublishDate || Model.ShowSize) && (Model.Result.PublishedDate.HasValue || Model.Result.Size.HasValue))
   {
     <div class="text-muted small fst-italic result-meta">
-      @if (Model.Settings.ShowPublishDate && Model.Result.PublishedDate.HasValue)
+      @if (Model.ShowPublishDate && Model.Result.PublishedDate.HasValue)
       {
         <span>Published: @Model.Result.PublishedDate.FormatDate(this.Context.Request.GetUserTimeZone())@Html.Raw(".")</span>
       }
 
-      @if (Model.Settings.ShowSize && Model.Result.Size.HasValue && Model.Result.Scope == @Nucleus.Abstractions.Models.FileSystem.File.URN)
+      @if (Model.ShowSize && Model.Result.Size.HasValue && Model.Result.Scope == @Nucleus.Abstractions.Models.FileSystem.File.URN)
       {
         <span>@Model.Result.Size.FormatFileSize()</span>
       }
     </div>
   }
 
-  @if (Model.Settings.ShowSummary && !String.IsNullOrEmpty(@Model.Result.Summary))
+  @if (Model.ShowSummary && !String.IsNullOrEmpty(@Model.Result.Summary))
   {
     <div class="result-summary">@Html.Raw(Model.Result.Summary)</div>
   }
-  @if (Model.Settings.ShowCategories && Model.Result.Categories != null && Model.Result.Categories.Any())
+  @if (Model.ShowCategories && Model.Result.Categories != null && Model.Result.Categories.Any())
   {
     <ul class="list-inline comma-separated result-categories">
       @foreach (var category in Model.Result.Categories)
@@ -45,10 +45,10 @@
     </ul>
   }
 
-  @if (Model.Settings.ShowScore)
+  @if (Model.ShowScore)
   {
     <span class="fw-light small result-score">
-      @Model.Result.GetAssessment(Model.MaxScore, Model.Settings.ShowScoreAssessment).Text
+      @Model.Result.GetAssessment(Model.MaxScore, Model.ShowScoreAssessment).Text
       @* @if (Model.Settings.ShowScoreAssessment && Model.SearchResults.MaxScore.HasValue && Model.SearchResults.MaxScore.Value > 0 && Model.Result.Score.HasValue)
     {
     @assessmentText

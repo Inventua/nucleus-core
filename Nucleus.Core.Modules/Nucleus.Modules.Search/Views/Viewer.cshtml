@@ -45,7 +45,7 @@
         @foreach (var result in Model.SearchResults.Answers)
         {
           <div class="search-answer">@Html.Raw(result.Answer)</div>
-          @await Html.PartialAsync("_SearchResult.cshtml", new SearchResult(Model.Settings, Model.SearchResults.MaxScore, result))
+          @await Html.PartialAsync("_SearchResult.cshtml", new SearchResult(Model.SearchResults.MaxScore, result))
         }
       </div>
     }
@@ -70,8 +70,8 @@
       <div class="search-results">
         @foreach (var result in Model.SearchResults.Results)
         {
-          <div class="search-result">
-            <div>
+          @await Html.PartialAsync("_SearchResult.cshtml", new SearchResult(Model.SearchResults.MaxScore, result))
+        }
       </div>
     }
   }

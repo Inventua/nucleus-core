@@ -185,13 +185,13 @@ namespace Nucleus.Modules.Forums.DataProviders
 			ForumStatistics result = new();
 			
 			result.PostCount = await this.Context.Posts
-				.Where(post => post.ForumId == forumId)
+				.Where(post => post.ForumId == forumId && post.IsApproved)
 				.AsNoTracking()
 				.CountAsync();
 
 			result.ReplyCount = await this.Context.Posts
 				.Where(post => post.ForumId == forumId)
-				.SelectMany(post => post.Replies)
+				.SelectMany(post => post.Replies.Where(reply => reply.IsApproved))
 				.AsNoTracking()
 				.CountAsync();
 

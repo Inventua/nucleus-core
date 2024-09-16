@@ -7,8 +7,7 @@
 	{
 		if (event.keyCode === 13)
 		{
-			_doSearch(this);
-			return false;
+			return _doSearch(this);
 		}
 	});
 
@@ -67,7 +66,14 @@
 			window.clearTimeout(suggestionsTimeout);
 		}
 
-		var form = jQuery(element).parents('form');		
-		window.location = form.attr('data-resultsurl') + '?search=' + form.find('.search-term').val();		
+    var form = jQuery(element).parents('form');	
+
+    if (typeof form.attr('data-resultsurl') !== 'undefined' && form.attr('data-resultsurl') !== '')
+    {
+      window.location = form.attr('data-resultsurl') + '?search=' + form.find('.search-term').val();
+      return false;
+    }
+
+    return true;
 	}
 });

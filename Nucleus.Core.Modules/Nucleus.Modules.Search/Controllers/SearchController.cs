@@ -172,7 +172,7 @@ public class SearchController : Controller
     }
     else
     {
-      viewModel.ResultsUrl = "~" + this.Context.Page.DefaultPageRoute().Path;
+      viewModel.ResultsUrl = "";// "~" + this.Context.Page.DefaultPageRoute().Path;
     }
 
 

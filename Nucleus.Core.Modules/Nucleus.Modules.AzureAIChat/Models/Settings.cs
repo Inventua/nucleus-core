@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Nucleus.Abstractions.Models;
 using Nucleus.Extensions;
 
-namespace Nucleus.Modules.AzureAI.Models;
+namespace Nucleus.Modules.AzureAIChat.Models;
 
 public class Settings
 {
@@ -80,6 +80,12 @@ public class Settings
 
   // This constructor is used by model binding
   public Settings() { }
+
+  public void GetSettings(Site site, PageModule module)
+  {
+    GetSiteSettings(site);
+    GetModuleSettings(module);
+  }
 
   public void GetSiteSettings(Site site)
   {

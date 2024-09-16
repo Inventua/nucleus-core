@@ -1,11 +1,11 @@
-﻿@model Nucleus.Modules.AzureAI.ViewModels.Viewer
+﻿@model Nucleus.Modules.AzureAIChat.ViewModels.Viewer
 @using Nucleus.Abstractions
 @using Nucleus.ViewFeatures
 @using Nucleus.ViewFeatures.HtmlHelpers
-@using Nucleus.Modules.AzureAI.ViewModels
+@using Nucleus.Modules.AzureAIChat.ViewModels
 @Html.AddStyle("~!/../viewer.css")
 
-@using (Html.BeginNucleusForm("Chat", "AzureAIViewer", "AzureAI", FormMethod.Post, new { @enctype = "multipart/form-data", @class = "azure-ai-chat" }))
+@using (Html.BeginNucleusForm("Chat", "AzureAIChatViewer", "AzureAIChat", FormMethod.Post, new { @enctype = "multipart/form-data", @class = "azure-ai-chat" }))
 {
   <div class="d-flex gap-2 align-items-center mb-2">
     @Html.TextBoxFor(model => model.Question, new { @class = "chat-question flex-1", @placeholder = "message", @type = "search" })

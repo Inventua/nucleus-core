@@ -8,11 +8,11 @@ using Azure.AI.OpenAI.Chat;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Nucleus.Abstractions.Models.FileSystem;
 
-namespace Nucleus.Modules.AzureAI.ViewModels;
+namespace Nucleus.Modules.AzureAIChat.ViewModels;
 public class Viewer : Models.Settings
 {
   public string Question { get; set; }
 
-  public List<Models.ChatHistory> History { get; set; } = [];
+  public List<Models.ChatItem> History { get; set; } = [];
 
 }

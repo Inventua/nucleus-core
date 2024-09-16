@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
-[assembly: HostingStartup(typeof(Nucleus.Modules.AzureAI.Startup))]
+[assembly: HostingStartup(typeof(Nucleus.Modules.AzureAIChat.Startup))]
 
-namespace Nucleus.Modules.AzureAI;
+namespace Nucleus.Modules.AzureAIChat;
 public class Startup : IHostingStartup
 {
   public void Configure(IWebHostBuilder builder)

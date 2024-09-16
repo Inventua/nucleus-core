@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Azure.AI.OpenAI.Chat;
 
-namespace Nucleus.Modules.AzureAI.Models;
-public class ChatHistory
+namespace Nucleus.Modules.AzureAIChat.Models;
+public class ChatItem
 {
   public string Question { get; set; }
 

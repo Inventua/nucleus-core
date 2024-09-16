@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Nucleus.Abstractions.Models;
 using Nucleus.Abstractions.Models.FileSystem;
 
-namespace Nucleus.Modules.AzureAI.ViewModels;
+namespace Nucleus.Modules.AzureAIChat.ViewModels;
 public class Settings : Models.Settings
 {
 

@@ -1,5 +1,5 @@
 <package id="e9e3de3b-ab7e-49ee-8d91-f65fe28a5f7f" xmlns="urn:nucleus/schemas/package/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:nucleus/schemas/package/1.0 http://www.nucleus-cms.com/schemas/package.xsd">
-  <name>AzureAI</name>
+  <name>Azure AI Chat</name>
   <version>1.0.0.0</version>
   <publisher name="Inventua" url="https://www.inventua.com/nucleus" email="support@inventua.com" />
   <description>
@@ -7,12 +7,12 @@
 	</description>
   <compatibility minVersion="2.0.0.0" maxVersion="*" />
   <components>
-    <component folderName="AzureAI" optional="false">
+    <component folderName="AzureAIChat" optional="false">
       <moduleDefinition id="81046b51-6666-414c-b33e-a830daf5855e">
-        <friendlyName>AzureAI</friendlyName>
-        <extension>AzureAI</extension>
-        <viewController>AzureAIViewerController</viewController>
-        <settingsController>AzureAISettingsController</settingsController>
+        <friendlyName>Azure AI Chat</friendlyName>
+        <extension>AzureAIChat</extension>
+        <viewController>AzureAIChatViewerController</viewController>
+        <settingsController>AzureAIChatSettingsController</settingsController>
         <viewAction>Index</viewAction>
         <editAction>Settings</editAction>
       </moduleDefinition>
@@ -24,7 +24,7 @@
       <!--<file name="viewer.css" />
 			<file name="settings.css" />-->
       <folder name="bin">
-        <file name="Nucleus.Modules.AzureAI.dll" />
+        <file name="Nucleus.Modules.AzureAIChat.dll" />
         <file name="OpenAI.dll" />
         <file name="System.ClientModel.dll" />
         <file name="Microsoft.Bcl.AsyncInterfaces.dll" />

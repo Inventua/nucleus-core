@@ -3,7 +3,7 @@
     <TargetFramework>net8.0</TargetFramework>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<DisableFastUpToDateCheck>True</DisableFastUpToDateCheck>
-		<RootNamespace>Nucleus.Modules.AzureAI</RootNamespace>
+		<RootNamespace>Nucleus.Modules.AzureAIChat</RootNamespace>
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
@@ -66,7 +66,7 @@
 	</ItemGroup>
 
 	<PropertyGroup Label="Nucleus">
-		<ExtensionFolder>AzureAI</ExtensionFolder>
+		<ExtensionFolder>AzureAIChat</ExtensionFolder>
 		<Version>1.0.0.0</Version>
 		<NUCLEUS_PATH>$([MSBuild]::EnsureTrailingSlash('$(NUCLEUS_PATH)'))</NUCLEUS_PATH>
     <CopyToDefaultSetup>false</CopyToDefaultSetup>

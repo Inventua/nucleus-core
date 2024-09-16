@@ -1,4 +1,4 @@
-﻿@model Nucleus.Modules.AzureAI.ViewModels.Settings
+﻿@model Nucleus.Modules.AzureAIChat.ViewModels.Settings
 @addTagHelper "*, Nucleus.ViewFeatures"
 @using Nucleus.ViewFeatures.HtmlHelpers
 @using Nucleus.ViewFeatures
@@ -10,7 +10,7 @@
   service and API keys.
 </div>
 
-@using (Html.BeginNucleusForm("SaveSettings", "SaveSettings", "AzureAISettings", "AzureAI", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+@using (Html.BeginNucleusForm("SaveSettings", "SaveSettings", "AzureAIChatSettings", "AzureAIChat", FormMethod.Post, new { @enctype = "multipart/form-data" }))
 {
   <fieldset role="group" aria-labelledby="heading" class="flex-grow-1">
     <SettingsControl caption="OpenAI Chat Model Deployment Name" helptext="Enter the name of a chat model that you have deployed in Azure AI Studio.">
@@ -69,6 +69,7 @@
       </SettingsControl>
     </div>
 
+    <h3>Error Handling</h3>
     <div class="nucleus-flex-fields">
       <SettingsControl caption="Maximum Retries" helptext="Sets how many times to retry the Open AI service if an error is returned.">
         @Html.RangeFor(model => model.OpenAIMaxRetries, 0, 3, 1)
@@ -81,6 +82,6 @@
   </fieldset>
 
   <div class="nucleus-form-buttonrow">
-    @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "AzureAISettings", "AzureAI"), new { })
+    @Html.SubmitButton("", "Save Settings", @Url.NucleusAction("SaveSettings", "AzureAIChatSettings", "AzureAIChat"), new { })
   </div>
 }
